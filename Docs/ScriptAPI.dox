@@ -56,7 +56,7 @@ namespace Urho3D
 - String GetFileName(const String&)
 - String GetExtension(const String&)
 - String GetFileNameAndExtension(const String&)
-- String ReplaceExtension(const String&)
+- String ReplaceExtension(const String&, const String&)
 - String AddTrailingSlash(const String&)
 - String RemoveTrailingSlash(const String&)
 - String GetParentPath(const String&)
@@ -2302,6 +2302,7 @@ Properties:<br>
 - Material@[] materials
 - BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
+- Zone@ zone (readonly)
 - float animationLodBias
 - float invisibleLodFactor
 - Skeleton@ skeleton (readonly)
@@ -2310,7 +2311,6 @@ Properties:<br>
 - uint numMorphs (readonly)
 - String[] morphNames (readonly)
 - float[] morphWeights
-- Zone@ zone (readonly)
 
 
 AnimationController

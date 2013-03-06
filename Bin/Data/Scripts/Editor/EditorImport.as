@@ -24,8 +24,6 @@ void ImportModel(const String&in fileName)
     
     String modelName = "Models/" + GetFileName(fileName) + ".mdl";
     String outFileName = sceneResourcePath + modelName;
-    String materialListName = sceneResourcePath + "_tempmatlist_.txt";
-
     fileSystem.CreateDir(sceneResourcePath + "Models");
 
     Array<String> args;
@@ -33,7 +31,6 @@ void ImportModel(const String&in fileName)
     args.Push("\"" + fileName + "\"");
     args.Push("\"" + outFileName + "\"");
     args.Push("-p\"" + sceneResourcePath + "\"");
-    args.Push("-m\"" + materialListName + "\"");
     if (generateTangents)
         args.Push("-t");
 
@@ -43,22 +40,35 @@ void ImportModel(const String&in fileName)
         StaticModel@ newModel = newNode.CreateComponent("StaticModel");
         newNode.position = GetNewNodePosition();
         newModel.model = cache.GetResource("Model", modelName);
-
-        if (fileSystem.FileExists(materialListName))
-        {
-            File list(materialListName, FILE_READ);
-            for (uint i = 0; i < newModel.numGeometries; ++i)
-            {
-                if (!list.eof)
-                    newModel.materials[i] = cache.GetResource("Material", list.ReadLine());
-                else
-                    break;
-            }
-            list.Close();
-            fileSystem.Delete(materialListName);
-        }
+        ApplyMaterialList(newModel);
 
         UpdateAndFocusNode(newNode);
+    }
+}
+
+void ApplyMaterialList(StaticModel@ newModel)
+{
+    String materialListName;
+
+    if (newModel.model !is null)
+        materialListName = ReplaceExtension(newModel.model.name, ".txt");
+    else
+        return;
+
+    if (!cache.Exists(materialListName))
+        return;
+
+    File@ list = cache.GetFile(materialListName);
+    if (list !is null)
+    {
+        for (uint i = 0; i < newModel.numGeometries; ++i)
+        {
+            if (!list.eof)
+                newModel.materials[i] = cache.GetResource("Material", list.ReadLine());
+            else
+                break;
+        }
+        list.Close();
     }
 }
 

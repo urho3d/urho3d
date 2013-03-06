@@ -3,6 +3,7 @@
 
 Window@ nodeWindow;
 
+bool applyMaterialList = true;
 
 void CreateNodeWindow()
 {
@@ -113,8 +114,18 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index)
     // If node name changed, update it in the scene window also
     if (serializables[0] is editNode && serializables[0].attributeInfos[index].name == "Name")
         UpdateSceneWindowNodeOnly(editNode);
-}
 
+    // If a StaticModel/AnimatedModel/Skybox model was changed, apply a possibly different material list
+    if (applyMaterialList && serializables[0].attributeInfos[index].name == "Model")
+    {
+        for (uint i = 0; i < serializables.length; ++i)
+        {
+            StaticModel@ staticModel = cast<StaticModel>(serializables[i]);
+            if (staticModel !is null)
+                ApplyMaterialList(staticModel);
+        }
+    }
+}
 
 void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializables)
 {

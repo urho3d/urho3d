@@ -39,8 +39,8 @@ void Start()
     input.mouseVisible = true;
 
     CreateScene();
-    CreateUI();
     LoadConfig();
+    CreateUI();
     ParseArguments();
 }
 
@@ -89,39 +89,54 @@ void LoadConfig()
     XMLElement cameraElem = configElem.GetChild("camera");
     XMLElement objectElem = configElem.GetChild("object");
     XMLElement renderingElem = configElem.GetChild("rendering");
+    XMLElement uiElem = configElem.GetChild("ui");
+    XMLElement inspectorElem = configElem.GetChild("attributeinspector");
 
     if (!cameraElem.isNull)
     {
-        camera.nearClip = cameraElem.GetFloat("nearclip");
-        camera.farClip = cameraElem.GetFloat("farclip");
-        camera.fov = cameraElem.GetFloat("fov");
-        cameraBaseSpeed = cameraElem.GetFloat("speed");
+        if (cameraElem.HasAttribute("nearclip")) camera.nearClip = cameraElem.GetFloat("nearclip");
+        if (cameraElem.HasAttribute("farclip")) camera.farClip = cameraElem.GetFloat("farclip");
+        if (cameraElem.HasAttribute("fov")) camera.fov = cameraElem.GetFloat("fov");
+        if (cameraElem.HasAttribute("speed")) cameraBaseSpeed = cameraElem.GetFloat("speed");
     }
 
     if (!objectElem.isNull)
     {
-        newNodeDistance = objectElem.GetFloat("newnodedistance");
-        moveStep = objectElem.GetFloat("movestep");
-        rotateStep = objectElem.GetFloat("rotatestep");
-        scaleStep = objectElem.GetFloat("scalestep");
-        moveSnap = objectElem.GetBool("movesnap");
-        rotateSnap = objectElem.GetBool("rotatesnap");
-        scaleSnap = objectElem.GetBool("scalesnap");
-        useLocalIDs = objectElem.GetBool("uselocalids");
-        generateTangents = objectElem.GetBool("generatetangents");
-        pickMode = objectElem.GetInt("pickmode");
+        if (objectElem.HasAttribute("newnodedistance")) newNodeDistance = objectElem.GetFloat("newnodedistance");
+        if (objectElem.HasAttribute("movestep")) moveStep = objectElem.GetFloat("movestep");
+        if (objectElem.HasAttribute("rotatestep")) rotateStep = objectElem.GetFloat("rotatestep");
+        if (objectElem.HasAttribute("scalestep")) scaleStep = objectElem.GetFloat("scalestep");
+        if (objectElem.HasAttribute("movesnap")) moveSnap = objectElem.GetBool("movesnap");
+        if (objectElem.HasAttribute("rotatesnap")) rotateSnap = objectElem.GetBool("rotatesnap");
+        if (objectElem.HasAttribute("scalesnap")) scaleSnap = objectElem.GetBool("scalesnap");
+        if (objectElem.HasAttribute("uselocalids")) useLocalIDs = objectElem.GetBool("uselocalids");
+        if (objectElem.HasAttribute("applymateriallist")) applyMaterialList = objectElem.GetBool("applymateriallist");
+        if (objectElem.HasAttribute("generatetangents")) generateTangents = objectElem.GetBool("generatetangents");
+        if (objectElem.HasAttribute("pickmode")) pickMode = objectElem.GetInt("pickmode");
     }
 
     if (!renderingElem.isNull)
     {
-        renderer.textureQuality = renderingElem.GetInt("texturequality");
-        renderer.materialQuality = renderingElem.GetInt("materialquality");
-        SetShadowResolution(renderingElem.GetInt("shadowresolution"));
-        renderer.shadowQuality = renderingElem.GetInt("shadowquality");
-        renderer.maxOccluderTriangles = renderingElem.GetInt("maxoccludertriangles");
-        renderer.specularLighting = renderingElem.GetBool("specularlighting");
-        renderer.dynamicInstancing = instancingSetting = renderingElem.GetBool("dynamicinstancing");
-        engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
+        if (renderingElem.HasAttribute("texturequality")) renderer.textureQuality = renderingElem.GetInt("texturequality");
+        if (renderingElem.HasAttribute("materialquality")) renderer.materialQuality = renderingElem.GetInt("materialquality");
+        if (renderingElem.HasAttribute("shadowresolution")) SetShadowResolution(renderingElem.GetInt("shadowresolution"));
+        if (renderingElem.HasAttribute("shadowquality")) renderer.shadowQuality = renderingElem.GetInt("shadowquality");
+        if (renderingElem.HasAttribute("maxoccludertriangles")) renderer.maxOccluderTriangles = renderingElem.GetInt("maxoccludertriangles");
+        if (renderingElem.HasAttribute("specularlighting")) renderer.specularLighting = renderingElem.GetBool("specularlighting");
+        if (renderingElem.HasAttribute("dynamicinstancing")) renderer.dynamicInstancing = instancingSetting = renderingElem.GetBool("dynamicinstancing");
+        if (renderingElem.HasAttribute("framelimiter")) engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
+    }
+    
+    if (!uiElem.isNull)
+    {
+        if (uiElem.HasAttribute("minopacity")) uiMinOpacity = uiElem.GetFloat("minopacity");
+        if (uiElem.HasAttribute("maxopacity")) uiMaxOpacity = uiElem.GetFloat("maxopacity");
+    }
+
+    if (!inspectorElem.isNull)
+    {
+        if (inspectorElem.HasAttribute("originalcolor")) normalTextColor = inspectorElem.GetColor("original");
+        if (inspectorElem.HasAttribute("modifiedcolor")) modifiedTextColor = inspectorElem.GetColor("modified");
     }
 }
 
@@ -135,8 +150,7 @@ void SaveConfig()
     XMLElement objectElem = configElem.CreateChild("object");
     XMLElement renderingElem = configElem.CreateChild("rendering");
     XMLElement uiElem = configElem.CreateChild("ui");
-    XMLElement attributeInspector = configElem.CreateChild("attribute-inspector");
-    XMLElement textLabelColorElem = attributeInspector.CreateChild("text-label-color");
+    XMLElement inspectorElem = configElem.CreateChild("attributeinspector");
 
     cameraElem.SetFloat("nearclip", camera.nearClip);
     cameraElem.SetFloat("farclip", camera.farClip);
@@ -151,6 +165,7 @@ void SaveConfig()
     objectElem.SetBool("rotatesnap", rotateSnap);
     objectElem.SetBool("scalesnap", scaleSnap);
     objectElem.SetBool("uselocalids", useLocalIDs);
+    objectElem.SetBool("applymateriallist", applyMaterialList);
     objectElem.SetBool("generatetangents", generateTangents);
     objectElem.SetInt("pickmode", pickMode);
 
@@ -163,11 +178,11 @@ void SaveConfig()
     renderingElem.SetBool("dynamicinstancing", graphics.sm3Support ? renderer.dynamicInstancing : instancingSetting);
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
     
-    uiElem.SetFloat("min-opacity", uiMinOpacity);
-    uiElem.SetFloat("max-opacity", uiMaxOpacity);
-    
-    textLabelColorElem.SetColor("original-attribute", normalTextColor);
-    textLabelColorElem.SetColor("modified-attribute", modifiedTextColor);
+    uiElem.SetFloat("minopacity", uiMinOpacity);
+    uiElem.SetFloat("maxopacity", uiMaxOpacity);
+
+    inspectorElem.SetColor("originalcolor", normalTextColor);
+    inspectorElem.SetColor("modifiedcolor", modifiedTextColor);
 
     config.Save(File(configFileName, FILE_WRITE));
 }

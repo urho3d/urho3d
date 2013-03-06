@@ -706,6 +706,22 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHODPR(T, IsDataLost, () const, bool), asCALL_THISCALL);
 }
 
+/// Template function for registering a class derived from StaticModel.
+template <class T> void RegisterStaticModel(asIScriptEngine* engine, const char* className, bool registerSetModel)
+{
+    RegisterDrawable<T>(engine, className);
+    RegisterSubclass<StaticModel, T>(engine, "StaticModel", className);
+    if (registerSetModel)
+        engine->RegisterObjectMethod(className, "void set_model(Model@+)", asMETHOD(T, SetModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Model@+ get_model() const", asMETHOD(T, GetModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_material(Material@+)", asMETHODPR(T, SetMaterial, (Material*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool set_materials(uint, Material@+)", asMETHODPR(T, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Material@+ get_materials(uint) const", asMETHOD(T, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const BoundingBox& get_boundingBox() const", asMETHOD(T, GetBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_numGeometries() const", asMETHOD(T, GetNumGeometries), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Zone@+ get_zone() const", asMETHOD(T, GetZone), asCALL_THISCALL);
+}
+
 static bool UIElementLoadXML(File* file, UIElement* ptr)
 {
     if (file)

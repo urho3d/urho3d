@@ -726,15 +726,7 @@ static void RegisterStaticModel(asIScriptEngine* engine)
 
 static void RegisterSkybox(asIScriptEngine* engine)
 {
-    RegisterDrawable<StaticModel>(engine, "Skybox");
-    engine->RegisterObjectMethod("Skybox", "void set_model(Model@+)", asMETHOD(Skybox, SetModel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "Model@+ get_model() const", asMETHOD(Skybox, GetModel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "void set_material(Material@+)", asMETHODPR(Skybox, SetMaterial, (Material*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "bool set_materials(uint, Material@+)", asMETHODPR(Skybox, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "Material@+ get_materials(uint) const", asMETHOD(Skybox, GetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "const BoundingBox& get_boundingBox() const", asMETHOD(Skybox, GetBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "uint get_numGeometries() const", asMETHOD(Skybox, GetNumGeometries), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skybox", "Zone@+ get_zone() const", asMETHOD(StaticModel, GetZone), asCALL_THISCALL);
+    RegisterStaticModel<Skybox>(engine, "Skybox", true);
 }
 
 static void AnimatedModelSetModel(Model* model, AnimatedModel* ptr)
@@ -767,7 +759,7 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "bool get_enabled() const", asMETHOD(AnimationState, IsEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float get_length() const", asMETHOD(AnimationState, GetLength), asCALL_THISCALL);
     
-    RegisterDrawable<AnimatedModel>(engine, "AnimatedModel");
+    RegisterStaticModel<AnimatedModel>(engine, "AnimatedModel", false);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ AddAnimationState(Animation@+)", asMETHOD(AnimatedModel, AddAnimationState), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(Animation@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (Animation*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String&in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const String&), void), asCALL_THISCALL);
@@ -780,12 +772,6 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(Animation@+) const", asMETHODPR(AnimatedModel, GetAnimationState, (Animation*) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ GetAnimationState(uint) const", asMETHODPR(AnimatedModel, GetAnimationState, (unsigned) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void set_model(Model@+)", asFUNCTION(AnimatedModelSetModel), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("AnimatedModel", "Model@+ get_model() const", asMETHOD(AnimatedModel, GetModel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_material(Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (Material*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool set_materials(uint, Material@+)", asMETHODPR(AnimatedModel, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Material@+ get_materials(uint) const", asMETHOD(AnimatedModel, GetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& get_boundingBox() const", asMETHOD(AnimatedModel, GetBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "uint get_numGeometries() const", asMETHOD(AnimatedModel, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void set_animationLodBias(float)", asMETHOD(AnimatedModel, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float get_animationLodBias() const", asMETHOD(AnimatedModel, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void set_invisibleLodFactor(float)", asMETHOD(AnimatedModel, SetInvisibleLodFactor), asCALL_THISCALL);
@@ -797,7 +783,6 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "const String& get_morphNames(uint) const", asFUNCTION(AnimatedModelGetMorphName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeights(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float get_morphWeights(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const String&) const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Zone@+ get_zone() const", asMETHOD(AnimatedModel, GetZone), asCALL_THISCALL);
 }
 
 static void RegisterAnimationController(asIScriptEngine* engine)

@@ -796,13 +796,13 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     for (uint i = 0; i < serializables.length; ++i)
         serializables[i].ApplyAttributes();
 
+    // Do the editor logic after attribute has been edited.
+    PostEditAttribute(serializables, index);
+
     // If not an intermediate edit, reload the editor fields with validated values
     // (attributes may have interactions; therefore we load everything, not just the value being edited)
     if (!intermediateEdit)
         UpdateAttributes(false);
-
-    // do the editor logic after attribute has been edited.
-    PostEditAttribute(serializables, index);
 }
 
 // Resource picker functionality
@@ -852,7 +852,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("ScriptFile", "*.as"));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
     resourcePickers.Push(ResourcePicker("Sound", soundFilters));
-    sceneResourcePath = fileSystem.programDir + "Data";
+    sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
 }
 
 ResourcePicker@ GetResourcePicker(const String&in resourceType)
@@ -993,6 +993,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         }
     }
 
+    PostEditAttribute(resourceTargets, resourcePickIndex);
     UpdateAttributes(false);
 
     resourceTargets.Clear();

@@ -21,6 +21,7 @@
 //
 
 #include "Precompiled.h"
+#include "AnimatedModel.h"
 #include "Batch.h"
 #include "Camera.h"
 #include "Context.h"
@@ -33,7 +34,6 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
-#include "StaticModel.h"
 
 #include "DebugNew.h"
 
@@ -230,6 +230,15 @@ void StaticModel::SetModel(Model* model)
 {
     if (!model || model == model_)
         return;
+    
+    // If script erroneously calls StaticModel::SetModel on an AnimatedModel, warn and redirect
+    if (GetType() == AnimatedModel::GetTypeStatic())
+    {
+        LOGWARNING("StaticModel::SetModel() called on AnimatedModel. Redirecting to AnimatedModel::SetModel()");
+        AnimatedModel* animatedModel = static_cast<AnimatedModel*>(this);
+        animatedModel->SetModel(model);
+        return;
+    }
     
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
     if (model_)

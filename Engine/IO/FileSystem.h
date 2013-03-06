@@ -114,7 +114,7 @@ String GetParentPath(const String& pathName);
 String GetInternalPath(const String& pathName);
 /// Convert a path to the format required by the operating system.
 String GetNativePath(const String& pathName);
-/// Convert a path to the format required by the operating system in wide characters
+/// Convert a path to the format required by the operating system in wide characters.
 WString GetWideNativePath(const String& pathName);
 
 }

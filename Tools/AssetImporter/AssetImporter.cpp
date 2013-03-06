@@ -95,13 +95,14 @@ struct OutScene
 SharedPtr<Context> context_(new Context());
 const aiScene* scene_ = 0;
 aiNode* rootNode_ = 0;
-String materialListName_;
 String resourcePath_;
 bool useSubdirs_ = true;
 bool localIDs_ = false;
 bool saveBinary_ = false;
 bool createZone_ = true;
 bool noAnimations_ = false;
+bool noMaterials_ = false;
+
 float defaultTicksPerSecond_ = 4800.0f;
 
 int main(int argc, char** argv);
@@ -178,7 +179,7 @@ void Run(const Vector<String>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model Output a model\n"
+            "model Output a model and a material list\n"
             "scene Output a scene\n"
             "dump  Dump scene node structure. No output file is generated\n"
             "lod   Combine several Urho3D models as LOD levels of the output model\n"
@@ -188,7 +189,6 @@ void Run(const Vector<String>& arguments)
             "-b    Save scene in binary format, default format is XML\n"
             "-h    Generate hard instead of smooth normals if input file has no normals\n"
             "-i    Use local ID's for scene nodes\n"
-            "-mX   Output a material list file X (model mode only)\n"
             "-na   Do not output animations\n"
             "-nm   Do not output materials\n"
             "-ns   Do not create subdirectories for resources\n"
@@ -209,8 +209,6 @@ void Run(const Vector<String>& arguments)
     
     String command = arguments[0].ToLower();
     String rootNodeName;
-    
-    bool noMaterials = false;
     
     unsigned flags = 
         aiProcess_ConvertToLeftHanded |
@@ -249,10 +247,6 @@ void Run(const Vector<String>& arguments)
                 localIDs_ = true;
                 break;
                 
-            case 'm':
-                materialListName_ = GetInternalPath(parameter);
-                break;
-                
             case 'p':
                 resourcePath_ = AddTrailingSlash(parameter);
                 break;
@@ -279,7 +273,7 @@ void Run(const Vector<String>& arguments)
                         break;
                         
                     case 'm':
-                        noMaterials = true;
+                        noMaterials_ = true;
                         break;
                         
                     case 's':
@@ -347,7 +341,7 @@ void Run(const Vector<String>& arguments)
         if (command == "scene")
             ExportScene(outFile);
         
-        if (!noMaterials)
+        if (!noMaterials_)
         {
             HashSet<String> usedTextures;
             ExportMaterials(usedTextures);
@@ -438,17 +432,18 @@ void ExportModel(const String& outName)
         BuildAndSaveAnimations(model);
     }
     
-    // Write material references if requested
-    if (!materialListName_.Empty())
+    // If exporting materials, also save material list for use by the editor
+    if (!noMaterials_)
     {
+        String materialListName = ReplaceExtension(model.outName_, ".txt");
         File listFile(context_);
-        if (listFile.Open(materialListName_, FILE_WRITE))
+        if (listFile.Open(materialListName, FILE_WRITE))
         {
             for (unsigned i = 0; i < model.meshes_.Size(); ++i)
                 listFile.WriteLine(GetMeshMaterialName(model.meshes_[i]));
         }
         else
-            PrintLine("Warning: could not write material list file " + materialListName_);
+            PrintLine("Warning: could not write material list file " + materialListName);
     }
 }
 
