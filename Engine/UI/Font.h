@@ -29,7 +29,7 @@ namespace Urho3D
 {
 
 class Graphics;
-class Texture;
+class Texture2D;
 
 static const int FONT_TEXTURE_MIN_SIZE = 128;
 static const int FONT_TEXTURE_MAX_SIZE = 2048;
@@ -56,6 +56,14 @@ struct FontGlyph
     HashMap<unsigned, unsigned> kerning_;
 };
 
+/// %Font file type.
+enum FONT_TYPE
+{
+    FONT_TTF,
+    FONT_IMAGE,
+    FONT_NONE
+};
+
 /// %Font face description.
 class FontFace : public RefCounted
 {
@@ -71,7 +79,7 @@ public:
     short GetKerning(unsigned c, unsigned d) const;
     
     /// Texture.
-    SharedPtr<Texture> texture_;
+    SharedPtr<Texture2D> texture_;
     /// Glyphs.
     Vector<FontGlyph> glyphs_;
     /// Point size.
@@ -83,6 +91,8 @@ public:
     /// Kerning flag.
     bool hasKerning_;
 };
+
+class Texture2D;
 
 /// %Font resource.
 class Font : public Resource
@@ -100,9 +110,15 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     const FontFace* GetFace(int pointSize);
     
+private:
+    bool LoadTTFont(Deserializer& source);
+    bool LoadImageFont(Deserializer& source);
+
+    /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
+    const FontFace* GetFaceTTF(int pointSize);
+    const FontFace* GetFaceImage(int pointSize);
 private:
     /// Created faces.
     HashMap<int, SharedPtr<FontFace> > faces_;
@@ -110,6 +126,10 @@ private:
     SharedArrayPtr<unsigned char> fontData_;
     /// Size of font data.
     unsigned fontDataSize_;
+    /// Font type
+    FONT_TYPE fontType_;
+    /// ImageFont Data
+    SharedPtr<FontFace> fontFace_;
 };
 
 }
