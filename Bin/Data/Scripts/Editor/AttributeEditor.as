@@ -70,7 +70,11 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ seria
     LineEdit@ attrEdit = LineEdit();
     attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
     attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
-    attrEdit.active = editable;
+    if (!editable)
+    {
+        attrEdit.active = false;
+        attrEdit.color = attrEdit.colors[C_TOPLEFT] * 0.8f;
+    }
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
