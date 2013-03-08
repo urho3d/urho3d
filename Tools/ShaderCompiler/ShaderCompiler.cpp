@@ -193,7 +193,7 @@ void Run(const Vector<String>& arguments)
     if (arguments.Size() < 1)
     {
         ErrorExit(
-            "ShaderCompiler <definitionfile> <outputpath> [options]\n\n"
+            "Usage: ShaderCompiler <definitionfile> <outputpath> [options]\n\n"
             "Options:\n"
             "-tVS|PS Compile only vertex or pixel shaders, by default compile both\n"
             "-vX     Compile only the shader variation X\n"
