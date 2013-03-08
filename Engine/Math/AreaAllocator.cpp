@@ -26,7 +26,18 @@
 namespace Urho3D
 {
 
-AreaAllocator::AreaAllocator(int width, int height)
+AreaAllocator::AreaAllocator(int width, int height) :
+    size_(width, height),
+    maxSize_(IntVector2::ZERO),
+    doubleWidth_(true)
+{
+    Reset(width, height);
+}
+
+AreaAllocator::AreaAllocator(int width, int height, int maxWidth, int maxHeight) :
+    size_(width, height),
+    maxSize_(maxWidth, maxHeight),
+    doubleWidth_(true)
 {
     Reset(width, height);
 }
@@ -49,117 +60,65 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     PODVector<IntRect>::Iterator best = freeAreas_.End();
     int bestFreeArea = M_MAX_INT;
     
-    for (PODVector<IntRect>::Iterator i = freeAreas_.Begin(); i != freeAreas_.End(); ++i)
+    for(;;)
     {
-        int freeWidth = i->right_ - i->left_;
-        int freeHeight = i->bottom_ - i->top_;
-        
-        if (freeWidth >= width && freeHeight >= height)
+        for (PODVector<IntRect>::Iterator i = freeAreas_.Begin(); i != freeAreas_.End(); ++i)
         {
-            // Calculate rank for free area. Lower is better
-            int freeArea = freeWidth * freeHeight;
+            int freeWidth = i->Width();
+            int freeHeight = i->Height();
             
-            if (best == freeAreas_.End() || freeArea < bestFreeArea)
+            if (freeWidth >= width && freeHeight >= height)
             {
-                best = i;
-                bestFreeArea = freeArea;
+                // Calculate rank for free area. Lower is better
+                int freeArea = freeWidth * freeHeight;
+                
+                if (freeArea < bestFreeArea)
+                {
+                    best = i;
+                    bestFreeArea = freeArea;
+                }
             }
         }
+        
+        if (best == freeAreas_.End())
+        {
+            if (doubleWidth_ && size_.x_ < maxSize_.x_)
+            {
+                int oldWidth = size_.x_;
+                size_.x_ <<= 1;
+                IntRect newArea(oldWidth, 0, size_.x_, size_.y_);
+                freeAreas_.Push(newArea);
+            }
+            else if (!doubleWidth_ && size_.y_ < maxSize_.y_)
+            {
+                int oldHeight = size_.y_;
+                size_.y_ <<= 1;
+                IntRect newArea(0, oldHeight, size_.x_, size_.y_);
+                freeAreas_.Push(newArea);
+            }
+            else
+                return false;
+            
+            doubleWidth_ = !doubleWidth_;
+        }
+        else
+            break;
     }
     
-    if (best == freeAreas_.End())
-        return false;
-    
-    IntRect reserved;
-    reserved.left_ = best->left_;
-    reserved.top_ = best->top_;
-    reserved.right_ = best->left_ + width;
-    reserved.bottom_ = best->top_ + height;
-    
+    IntRect reserved(best->left_, best->top_, best->left_ + width, best->top_ + height);
     x = best->left_;
     y = best->top_;
     
-    // Remove the reserved area from all free areas
-    for (unsigned i = 0; i < freeAreas_.Size();)
+    // Reserved the area by spliting up the remaining free area
+    best->left_ = reserved.right_;
+    if (best->Height() > 2 * height)
     {
-        if (SplitRect(freeAreas_[i], reserved))
-            freeAreas_.Erase(i);
-        else
-            ++i;
+        IntRect splitArea(reserved.left_, reserved.bottom_, best->right_, best->bottom_);
+        best->bottom_ = reserved.bottom_;
+        freeAreas_.Push(splitArea);
     }
-    
-    Cleanup();
+
     return true;
-}
-
-bool AreaAllocator::SplitRect(IntRect original, const IntRect& reserve)
-{
-    if (reserve.right_ > original.left_ && reserve.left_ < original.right_ && reserve.bottom_ > original.top_ &&
-        reserve.top_ < original.bottom_)
-    {
-        // Check for splitting from the right
-        if (reserve.right_ < original.right_) 
-        {
-            IntRect newRect = original;
-            newRect.left_ = reserve.right_;
-            freeAreas_.Push(newRect);
-        }
-        // Check for splitting from the left
-        if (reserve.left_ > original.left_)
-        {
-            IntRect newRect = original;
-            newRect.right_ = reserve.left_;
-            freeAreas_.Push(newRect);
-        }
-        // Check for splitting from the bottom
-        if (reserve.bottom_ < original.bottom_)
-        {
-            IntRect newRect = original;
-            newRect.top_ = reserve.bottom_;
-            freeAreas_.Push(newRect);
-        }
-        // Check for splitting from the top
-        if (reserve.top_ > original.top_)
-        {
-            IntRect newRect = original;
-            newRect.bottom_ = reserve.top_;
-            freeAreas_.Push(newRect);
-        }
-        
-        return true;
-    }
-    
-    return false;
-}
-
-void AreaAllocator::Cleanup()
-{
-    // Remove rects which are contained within another rect
-    for (unsigned i = 0; i < freeAreas_.Size(); )
-    {
-        bool erased = false;
-        for (unsigned j = i + 1; j < freeAreas_.Size(); )
-        {
-            if ((freeAreas_[i].left_ >= freeAreas_[j].left_) &&
-                (freeAreas_[i].top_ >= freeAreas_[j].top_) &&
-                (freeAreas_[i].right_ <= freeAreas_[j].right_) &&
-                (freeAreas_[i].bottom_ <= freeAreas_[j].bottom_))
-            {
-                freeAreas_.Erase(i);
-                erased = true;
-                break;
-            }
-            if ((freeAreas_[j].left_ >= freeAreas_[i].left_) &&
-                (freeAreas_[j].top_ >= freeAreas_[i].top_) &&
-                (freeAreas_[j].right_ <= freeAreas_[i].right_) &&
-                (freeAreas_[j].bottom_ <= freeAreas_[i].bottom_))
-                freeAreas_.Erase(j);
-            else
-                ++j;
-        }
-        if (!erased)
-            ++i;
-    }
 }
 
 }

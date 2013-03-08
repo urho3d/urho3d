@@ -33,20 +33,25 @@ class AreaAllocator
 public:
     /// Construct with given width and height.
     AreaAllocator(int width, int height);
+    /// Construct with given width and height, and set the maximum it allows to grow.
+    AreaAllocator(int width, int height, int maxWidth, int maxHeight);
     
     /// Reset to given width and height and remove all previous allocations.
     void Reset(int width, int height);
     /// Try to allocate an area. Return true if successful, with x & y coordinates filled.
     bool Allocate(int width, int height, int& x, int& y);
+    /// Return the final area size (if it is allowed to grow).
+    IntVector2 GetSize() const { return size_; }
 
 private:
-    /// Cut the reserved area from a rectangle. Return true if the rectangle should be removed from the vector.
-    bool SplitRect(IntRect original, const IntRect& reserved);
-    /// Remove overlapping free rectangles.
-    void Cleanup();
-    
     /// Free rectangles.
     PODVector<IntRect> freeAreas_;
+    /// Current size.
+    IntVector2 size_;
+    /// Maximum size it allows to grow. It is zero when it is not allowed to grow.
+    IntVector2 maxSize_;
+    /// The dimension use for next growth. Use internally.
+    bool doubleWidth_;
 };
 
 }

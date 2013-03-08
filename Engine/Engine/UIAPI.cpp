@@ -41,6 +41,7 @@ namespace Urho3D
 static void RegisterFont(asIScriptEngine* engine)
 {
     RegisterResource<Font>(engine, "Font");
+    engine->RegisterObjectMethod("Font", "const String&  get_pathName() const", asMETHOD(Font, GetPathName), asCALL_THISCALL);
 }
 
 static void RegisterUIElement(asIScriptEngine* engine)

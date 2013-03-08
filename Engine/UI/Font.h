@@ -29,7 +29,7 @@ namespace Urho3D
 {
 
 class Graphics;
-class Texture2D;
+class Texture;
 
 static const int FONT_TEXTURE_MIN_SIZE = 128;
 static const int FONT_TEXTURE_MAX_SIZE = 2048;
@@ -59,9 +59,10 @@ struct FontGlyph
 /// %Font file type.
 enum FONT_TYPE
 {
+    FONT_NONE = 0,
     FONT_TTF,
-    FONT_IMAGE,
-    FONT_NONE
+    FONT_BITMAP,
+    MAX_FONT_TYPES
 };
 
 /// %Font face description.
@@ -79,7 +80,7 @@ public:
     short GetKerning(unsigned c, unsigned d) const;
     
     /// Texture.
-    SharedPtr<Texture2D> texture_;
+    SharedPtr<Texture> texture_;
     /// Glyphs.
     Vector<FontGlyph> glyphs_;
     /// Point size.
@@ -91,8 +92,6 @@ public:
     /// Kerning flag.
     bool hasKerning_;
 };
-
-class Texture2D;
 
 /// %Font resource.
 class Font : public Resource
@@ -106,30 +105,29 @@ public:
     virtual ~Font();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    
-    const FontFace* GetFace(int pointSize);
-    
-private:
-    bool LoadTTFont(Deserializer& source);
-    bool LoadImageFont(Deserializer& source);
-
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
-    const FontFace* GetFaceTTF(int pointSize);
-    const FontFace* GetFaceImage(int pointSize);
+    const FontFace* GetFace(int pointSize);
+    /// Return a fully qualified path name of font file.
+    const String& GetPathName() const { return pathName_; }
+    
 private:
+    /// Return True-type font face. Called internally. Return null on error.
+    const FontFace* GetFaceTTF(int pointSize);
+    /// Return bitmap font face. Called internally. Return null on error.
+    const FontFace* GetFaceBitmap(int pointSize);
+    
     /// Created faces.
     HashMap<int, SharedPtr<FontFace> > faces_;
     /// Font data.
     SharedArrayPtr<unsigned char> fontData_;
     /// Size of font data.
     unsigned fontDataSize_;
-    /// Font type
+    /// Font type.
     FONT_TYPE fontType_;
-    /// ImageFont Data
-    SharedPtr<FontFace> fontFace_;
+    /// FQPN of font file.
+    String pathName_;
 };
 
 }

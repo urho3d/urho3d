@@ -3046,6 +3046,7 @@ Properties:<br>
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
+- String pathName (readonly)
 
 
 UIElement
