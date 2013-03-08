@@ -148,6 +148,8 @@ void ProcessFile(const String& fileName)
             
             // Handle escapes
             line.Replace("*", "\x060*\x060");
+            if (line.Find("http") == String::NPOS)
+                line.Replace("_", "\x060_\x060");
             line.Replace("[", "\x060[\x060");
             line.Replace("]", "\x060]\x060");
             line.Replace("&auml;", "\x0c3\x0a4");

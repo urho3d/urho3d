@@ -273,19 +273,19 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         
         switch (components)
         {
-            case 1:
+        case 1:
             format = useAlpha ? Graphics::GetAlphaFormat() : Graphics::GetLuminanceFormat();
             break;
             
-            case 2:
+        case 2:
             format = Graphics::GetLuminanceAlphaFormat();
             break;
             
-            case 3:
+        case 3:
             format = Graphics::GetRGBFormat();
             break;
             
-            case 4:
+        case 4:
             format = Graphics::GetRGBAFormat();
             break;
         }
