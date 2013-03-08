@@ -85,6 +85,8 @@ generate documentation into the "Docs" subdirectory, open the Doxyfile in the
 root directory with doxywizard and click "Run doxygen" from the "Run" tab.
 Get Doxygen from http://www.doxygen.org
 
+The documentation is also available online at http://cadaver.homeftp.net/urho3d
+
 
 Building prerequisites
 ----------------------
