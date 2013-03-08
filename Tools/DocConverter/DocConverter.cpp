@@ -43,11 +43,16 @@ SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 String inDir_;
 String outDir_;
 String mainPageName_;
+Vector<String> pageNames_;
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
+void ScanPageNames(const String& fileName);
 void ProcessFile(const String& fileName);
 String AssembleString(const Vector<String>& tokens, unsigned startIndex);
+void RemoveAutoLinks(String& line);
+bool IsPageName(const String& str, unsigned startIndex, unsigned endIndex);
+bool IsUpperCamelCase(const String& str, unsigned startIndex, unsigned endIndex);
 
 int main(int argc, char** argv)
 {
@@ -78,8 +83,39 @@ void Run(const Vector<String>& arguments)
     
     Vector<String> docFiles;
     fileSystem_->ScanDir(docFiles, inDir_, "*.dox", SCAN_FILES, false);
+    
+    pageNames_.Push(mainPageName_);
+    for (unsigned i = 0; i < docFiles.Size(); ++i)
+        ScanPageNames(inDir_ + docFiles[i]);
+    
     for (unsigned i = 0; i < docFiles.Size(); ++i)
         ProcessFile(inDir_ + docFiles[i]);
+}
+
+void ScanPageNames(const String& fileName)
+{
+    PrintUnicodeLine("Scanning document file " + fileName + " for page names");
+    
+    File inputFile(context_, fileName);
+    
+    String outputFileName;
+    File outputFile(context_);
+    bool inVerbatim = false;
+    
+    if (!inputFile.IsOpen())
+    {
+        PrintUnicodeLine("WARNING: Failed to open input file " + fileName + ", skipping");
+        return;
+    }
+    
+    while (!inputFile.IsEof())
+    {
+        String line = inputFile.ReadLine();
+        Vector<String> tokens = line.Split(' ');
+        
+        if (line.StartsWith("\\page") && tokens.Size() > 1)
+            pageNames_.Push(tokens[1]);
+    }
 }
 
 void ProcessFile(const String& fileName)
@@ -104,14 +140,21 @@ void ProcessFile(const String& fileName)
         
         if (!inVerbatim)
         {
-            if (line.StartsWith("{") || line.StartsWith("}") || line.StartsWith("namespace") || line.StartsWith("/*") || line.StartsWith("*/"))
+            if (line.StartsWith("{") || line.StartsWith("}") || line.StartsWith("namespace") || line.StartsWith("/*") ||
+                line.StartsWith("*/"))
                 continue;
             
             line.Replace("%", "");
-            line.Replace("*", "\x060*\x060");
-            line.Replace("\\n", "<br>");
             
-            Vector<String> tokens = line.Split(' ');
+            // Handle escapes
+            line.Replace("*", "\x060*\x060");
+            line.Replace("[", "\x060[\x060");
+            line.Replace("]", "\x060]\x060");
+            line.Replace("&auml;", "\x0c3\x0a4");
+            line.Replace("&ouml;", "\x0c3\x0b6");
+            line.Replace("&Auml;", "\x0c3\x084");
+            line.Replace("&Ouml;", "\x0c3\x096");
+            line.Replace("\\n", "<br>");
             
             // Replace links
             for (;;)
@@ -119,12 +162,12 @@ void ProcessFile(const String& fileName)
                 unsigned refIndex = line.Find("\\ref");
                 if (refIndex != String::NPOS)
                 {
-                    //PrintUnicodeLine("Handling \\ref on line " + line);
                     Vector<String> refTokens = line.Substring(refIndex).Split(' ');
                     if (refTokens.Size() > 1)
                     {
                         String refTarget = refTokens[1];
-                        unsigned refTargetEnd = line.Find(' ', refIndex + 5 + refTarget.Length());
+                        unsigned refTargetBegin = refIndex + 5;
+                        unsigned refTargetEnd = line.Find(' ', refTargetBegin  + refTarget.Length());
                         if (refTarget.EndsWith("."))
                         {
                             refTarget = refTarget.Substring(0, refTarget.Length() - 1);
@@ -132,31 +175,43 @@ void ProcessFile(const String& fileName)
                         }
                         unsigned refBeginQuote = line.Find('\"', refTargetEnd);
                         unsigned refEndQuote = line.Find('\"', refBeginQuote+1);
-                        if (refTarget.Find("::") == String::NPOS)
+                        
+                        if (IsPageName(refTarget, 0, refTarget.Length()))
                         {
                             if (refBeginQuote != String::NPOS && refEndQuote != String::NPOS)
-                                line = line.Substring(0, refIndex) + "[" + refTarget + " " + line.Substring(refBeginQuote + 1, refEndQuote - refBeginQuote - 1) + "]" + line.Substring(refEndQuote + 1);
+                                line = line.Substring(0, refIndex) + "[" + refTarget + " " + line.Substring(refBeginQuote + 1,
+                                refEndQuote - refBeginQuote - 1) + "]" + line.Substring(refEndQuote + 1);
                             else
                                 line = line.Substring(0, refIndex) + "[" + refTarget + "]" + line.Substring(refTargetEnd);
                         }
                         else
                         {
-                            String refClass = refTarget.Substring(0, refTarget.Find("::"));
-                            line = line.Substring(0, refIndex) + line.Substring(refBeginQuote + 1, refEndQuote - refBeginQuote - 1) + line.Substring(refEndQuote + 1);
+                            // If link is not a valid page name, just output the link body as is
+                            if (refBeginQuote != String::NPOS && refEndQuote != String::NPOS)
+                            {
+                                line = line.Substring(0, refIndex) + line.Substring(refBeginQuote + 1,
+                                refEndQuote - refBeginQuote - 1) + line.Substring(refEndQuote + 1);
+                            }
+                            else
+                                line = line.Substring(0, refIndex) + line.Substring(refTargetBegin);
                         }
                     }
                     else
                     {
-                        PrintUnicodeLine("WARNING: \\ref tag which could not be handled");
+                        PrintUnicodeLine("WARNING: \\ref tag which could not be handled on line " + line);
                         break;
                     }
-                    
-                    //PrintUnicodeLine("Line after ref handling: " + line);
                 }
                 else
                     break;
             }
             
+            // Remove automatic wiki link generation from words that are not actual page names
+            RemoveAutoLinks(line);
+            
+            Vector<String> tokens = line.Split(' ');
+            
+            // Check page and section transitions and handle markup conversion
             if (line.StartsWith("\\mainpage") && tokens.Size() > 1)
             {
                 outputFileName = outDir_ + mainPageName_ + ".wiki";
@@ -222,4 +277,99 @@ String AssembleString(const Vector<String>& tokens, unsigned startIndex)
     }
     
     return ret;
+}
+
+void RemoveAutoLinks(String& line)
+{
+    bool inLink = false;
+    bool inWord = false;
+    bool inWebLink = false;
+    unsigned wordStart = 0;
+    
+    for (unsigned i = 0; i < line.Length(); ++i)
+    {
+        if (line[i] == '[')
+        {
+            inLink = true;
+            continue;
+        }
+        else if (line[i] == ']')
+        {
+            inLink = false;
+            continue;
+        }
+        
+        if (line.Substring(i, 4) == "http")
+        {
+            inWebLink = true;
+            i += 3;
+            continue;
+        }
+        else if (inWebLink && !isalpha(line[i]) && !isdigit(line[i]) && line[i] != '/' && line[i] != ':' && line[i] != '-' &&
+            line[i] != '_' && line[i] != '.')
+            inWebLink = false;
+            
+        else if (!inLink && !inWebLink)
+        {
+            if (!inWord && isalpha(line[i]))
+            {
+                inWord = true;
+                wordStart = i;
+            }
+            else if (inWord && !isalpha(line[i]) && !isdigit(line[i]))
+            {
+                inWord = false;
+                unsigned wordEnd = i;
+                if (!IsPageName(line, wordStart, wordEnd) && IsUpperCamelCase(line, wordStart, wordEnd))
+                {
+                    line.Insert(wordStart, '!');
+                    ++i;
+                }
+            }
+        }
+    }
+    if (inWord && !inLink && !inWebLink && !IsPageName(line, wordStart, line.Length()) && IsUpperCamelCase(line,
+        wordStart, line.Length()))
+    {
+        line.Insert(wordStart, '!');
+    }
+}
+
+bool IsPageName(const String& str, unsigned startIndex, unsigned endIndex)
+{
+    String word = str.Substring(startIndex, endIndex - startIndex);
+  
+    for (unsigned i = 0; i < pageNames_.Size(); ++i)
+    {
+        if (word == pageNames_[i])
+            return true;
+    }
+    
+    return false;
+}
+
+bool IsUpperCamelCase(const String& str, unsigned startIndex, unsigned endIndex)
+{
+    if (endIndex - startIndex < 2)
+        return false;
+    if (!isupper(str[startIndex]))
+        return false;
+    if (!islower(str[startIndex + 1]))
+        return false;
+    
+    unsigned transitions = 1;
+    
+    for (unsigned i = startIndex + 2; i < endIndex - 1; ++i)
+    {
+        if (isupper(str[i]) && isupper(str[i+1]))
+            return false;
+        
+        if (isupper(str[i]) && (islower(str[i+1]) || isdigit(str[i+1])))
+        {
+            ++transitions;
+            ++i;
+        }
+    }
+    
+    return transitions > 1;
 }
