@@ -101,11 +101,18 @@ void ProcessFile(const String& fileName)
     while (!inputFile.IsEof())
     {
         String line = inputFile.ReadLine();
-        line.Replace("%", "");
-        Vector<String> tokens = line.Split(' ');
         
         if (!inVerbatim)
         {
+            if (line.StartsWith("{") || line.StartsWith("}") || line.StartsWith("namespace") || line.StartsWith("/*") || line.StartsWith("*/"))
+                continue;
+            
+            line.Replace("%", "");
+            line.Replace("*", "\x060*\x060");
+            line.Replace("\\n", "<br>");
+            
+            Vector<String> tokens = line.Split(' ');
+            
             // Replace links
             for (;;)
             {
@@ -182,8 +189,10 @@ void ProcessFile(const String& fileName)
             }
             else if (line.StartsWith("- "))
                 outputFile.WriteLine(" * " + line.Substring(2));
-            else if (line.StartsWith("{") || line.StartsWith("}") || line.StartsWith("namespace") || line.StartsWith("/*") || line.StartsWith("*/"))
-                continue;
+            else if (line.StartsWith("  - "))
+                outputFile.WriteLine("   * " + line.Substring(4));
+            else if (line.StartsWith("-# "))
+                outputFile.WriteLine(" * " + line.Substring(3));
             else
                 outputFile.WriteLine(line);
             
