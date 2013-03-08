@@ -42,6 +42,7 @@ SharedPtr<Context> context_(new Context());
 SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 String inDir_;
 String outDir_;
+String mainPageName_;
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
@@ -64,15 +65,16 @@ int main(int argc, char** argv)
 
 void Run(const Vector<String>& arguments)
 {
-    if (arguments.Size() < 2)
+    if (arguments.Size() < 3)
     {
         ErrorExit(
-            "Usage: DocConverter <inputpath> <outputpath>"
+            "Usage: DocConverter <dox input path> <wiki output path> <mainpage name>"
         );
     }
     
     inDir_ = AddTrailingSlash(arguments[0]);
     outDir_ = AddTrailingSlash(arguments[1]);
+    mainPageName_ = arguments[2];
     
     Vector<String> docFiles;
     fileSystem_->ScanDir(docFiles, inDir_, "*.dox", SCAN_FILES, false);
@@ -148,7 +150,15 @@ void ProcessFile(const String& fileName)
                     break;
             }
             
-            if (line.StartsWith("\\page") && tokens.Size() > 1)
+            if (line.StartsWith("\\mainpage") && tokens.Size() > 1)
+            {
+                outputFileName = outDir_ + mainPageName_ + ".wiki";
+                if (!outputFile.Open(outputFileName, FILE_WRITE))
+                    PrintUnicodeLine("WARNING: Failed to open output file " + outputFileName);
+                outputFile.WriteLine("#labels featured");
+                outputFile.WriteLine("= " + AssembleString(tokens, 1) + " =");
+            }
+            else if (line.StartsWith("\\page") && tokens.Size() > 1)
             {
                 outputFileName = outDir_ + tokens[1] + ".wiki";
                 if (!outputFile.Open(outputFileName, FILE_WRITE))
@@ -172,7 +182,7 @@ void ProcessFile(const String& fileName)
             }
             else if (line.StartsWith("- "))
                 outputFile.WriteLine(" * " + line.Substring(2));
-            else if (line.StartsWith("{") || line.StartsWith("}") || line.StartsWith("namespace"))
+            else if (line.StartsWith("{") || line.StartsWith("}") || line.StartsWith("namespace") || line.StartsWith("/*") || line.StartsWith("*/"))
                 continue;
             else
                 outputFile.WriteLine(line);
