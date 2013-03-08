@@ -1348,7 +1348,13 @@ Urho3D uses a task-based multithreading model. The WorkQueue subsystem can be su
 
 On single-core systems no worker threads will be created, and tasks are immediately processed by the main thread instead. In the presence of more cores, a worker thread will be created for each hardware core except one which is reserved for the main thread. Hyperthreaded cores are not included, as creating worker threads also for them leads to unpredictable extra synchronization overhead.
 
-The work items include a function pointer to call, with the signature "void WorkFunction(const WorkItem* item, unsigned threadIndex)." The thread index ranges from 0 to n, where 0 represents the main thread and n is the number of worker threads created. Its function is to aid in splitting work into per-thread data structures that need no locking. The work item also contains three void pointers: start, end and aux, which can be used to describe a range of sub-work items, and an auxiliary data structure, which may for example be the object that originally queued the work.
+The work items include a function pointer to call, with the signature
+
+\verbatim
+void WorkFunction(const WorkItem* item, unsigned threadIndex)
+\endverbatim
+
+The thread index ranges from 0 to n, where 0 represents the main thread and n is the number of worker threads created. Its function is to aid in splitting work into per-thread data structures that need no locking. The work item also contains three void pointers: start, end and aux, which can be used to describe a range of sub-work items, and an auxiliary data structure, which may for example be the object that originally queued the work.
 
 Multithreading is so far not exposed to scripts, and is currently used only in a limited manner: to speed up the preparation of rendering views, including lit object and shadow caster queries, occlusion tests and particle system, animation and skinning updates. Raycasts into the Octree are also threaded, but physics raycasts are not.
 
