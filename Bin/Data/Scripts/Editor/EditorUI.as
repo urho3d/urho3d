@@ -165,7 +165,7 @@ void CreateMenuBar()
         Menu@ fileMenu = CreateMenu("View");
         Window@ filePopup = fileMenu.popup;
         filePopup.AddChild(CreateMenuItem("Scene hierarchy", 'H', QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Node / component edit", 'N', QUAL_CTRL));
+        filePopup.AddChild(CreateMenuItem("Attribute inspector", 'N', QUAL_CTRL));
         filePopup.AddChild(CreateMenuItem("Editor settings", 0, 0));
         filePopup.AddChild(CreateMenuItem("Editor preferences", 0, 0));
         uiMenuBar.AddChild(fileMenu);
@@ -381,7 +381,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
         ReloadResources();
     else if (action == "Scene hierarchy")
         ShowSceneWindow();
-    else if (action == "Node / component edit")
+    else if (action == "Attribute inspector")
         ShowNodeWindow();
     else if (action == "Editor settings")
         ShowEditorSettingsDialog();

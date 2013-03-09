@@ -489,7 +489,7 @@ const FontFace* Font::GetFaceBitmap(int pointSize)
     newFace->glyphs_.Reserve(count);
     
     XMLElement charElem = charsElem.GetChild("char");
-    while(!charElem.IsNull())
+    while (!charElem.IsNull())
     {
         int id = charElem.GetInt("id");
         FontGlyph glyph;

@@ -11,7 +11,7 @@
         <attribute name="Max Size" value="2147483647 16" />
         <attribute name="Layout Mode" value="Horizontal" />
         <element type="Text">
-            <attribute name="Text" value="Node / component edit" />
+            <attribute name="Text" value="Attribute inspector" />
         </element>
         <element type="Button" style="CloseButton">
             <attribute name="Name" value="CloseButton" />

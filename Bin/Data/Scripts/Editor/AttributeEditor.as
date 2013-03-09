@@ -21,7 +21,17 @@ Color normalTextColor(1.0f, 1.0f, 1.0f);
 Color modifiedTextColor(1.0f, 0.8f, 0.5f);
 Color nonEditableTextColor(0.7f, 0.7f, 0.7f);
 
+const String DIFF_VALUE("---");
+
 String sceneResourcePath;
+
+void SetEditable(UIElement@ element, bool editable)
+{
+    element.active = editable;
+    element.colors[C_TOPLEFT] = editable ? element.colors[C_BOTTOMRIGHT] : nonEditableTextColor;
+    element.colors[C_BOTTOMLEFT] = element.colors[C_TOPLEFT];
+    element.colors[C_TOPRIGHT] = element.colors[C_TOPLEFT];
+}
 
 UIElement@ CreateAttributeEditorParentWithSeparatedLabel(ListView@ list, String name, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
 {
@@ -70,11 +80,7 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ seria
     LineEdit@ attrEdit = LineEdit();
     attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
     attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
-    if (!editable)
-    {
-        attrEdit.active = false;
-        attrEdit.color = attrEdit.colors[C_TOPLEFT] * 0.8f;
-    }
+    SetEditable(attrEdit, editable);
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
@@ -104,7 +110,7 @@ UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ seria
     CheckBox@ attrEdit = CheckBox();
     attrEdit.style = uiStyle;
     attrEdit.SetFixedSize(16, 16);
-    attrEdit.active = editable;
+    SetEditable(attrEdit, editable);
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
@@ -152,7 +158,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         attrEdit.style = uiStyle;
         attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
         attrEdit.resizePopup = true;
-        attrEdit.active = editable;
+        SetEditable(attrEdit, editable);
         attrEdit.vars["Index"] = index;
         attrEdit.vars["SubIndex"] = subIndex;
         attrEdit.SetLayout(LM_HORIZONTAL, 0, IntRect(4, 1, 4, 1));
@@ -199,7 +205,7 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
     Button@ pickButton = Button();
     pickButton.style = uiStyle;
     pickButton.SetFixedSize(36, ATTR_HEIGHT - 2);
-    pickButton.active = editable;
+    SetEditable(pickButton, editable);
     pickButton.vars["Index"] = index;
     pickButton.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(pickButton, serializables);
@@ -333,13 +339,13 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, bo
         }
     }
 
-    if (sameValue)
-        LoadAttributeEditor(parent, value, value.type, info.enumNames, info.defaultValue, editable);
+    // Attribute with different values from multiple-select is loaded with default/empty value and non-editable
+    LoadAttributeEditor(parent, sameValue ? value : Variant(), value.type, info.enumNames, info.defaultValue, editable && sameValue, sameValue);
 
     inLoadAttributeEditor = false;
 }
 
-void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Array<String>@ enumNames, Variant defaultValue, bool editable)
+void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Array<String>@ enumNames, Variant defaultValue, bool editable, bool sameValue = true)
 {
     uint index = parent.vars["Index"].GetUInt();
 
@@ -360,128 +366,220 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
     if (type == VAR_STRING || type == VAR_BUFFER)
     {
         LineEdit@ attrEdit = parent.children[1];
-        attrEdit.text = value.ToString();
+        attrEdit.text = sameValue ? value.ToString() : DIFF_VALUE;
+        SetEditable(attrEdit, editable);
     }
-    if (type == VAR_BOOL)
+    else if (type == VAR_BOOL)
     {
         CheckBox@ attrEdit = parent.children[1];
         attrEdit.checked = value.GetBool();
+        SetEditable(attrEdit, editable);
     }
-    if (type == VAR_FLOAT)
+    else if (type == VAR_FLOAT)
     {
         LineEdit@ attrEdit = parent.children[1];
-        attrEdit.text = String(value.GetFloat());
+        attrEdit.text = sameValue ? String(value.GetFloat()) : DIFF_VALUE;
+        SetEditable(attrEdit, editable);
     }
-    if (type == VAR_VECTOR2)
+    else if (type == VAR_VECTOR2)
     {
         Vector2 vec = value.GetVector2();
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
-        attrEditX.text = String(vec.x);
-        attrEditY.text = String(vec.y);
+        if (sameValue)
+        {
+            attrEditX.text = String(vec.x);
+            attrEditY.text = String(vec.y);
+        }
+        else
+        {
+            attrEditX.text = DIFF_VALUE;
+            attrEditY.text = DIFF_VALUE;
+        }
         attrEditX.cursorPosition = 0;
         attrEditY.cursorPosition = 0;
+        SetEditable(attrEditX, editable);
+        SetEditable(attrEditY, editable);
     }
-    if (type == VAR_INTVECTOR2)
+    else if (type == VAR_INTVECTOR2)
     {
         IntVector2 vec = value.GetIntVector2();
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
-        attrEditX.text = String(vec.x);
-        attrEditY.text = String(vec.y);
+        if (sameValue)
+        {
+            attrEditX.text = String(vec.x);
+            attrEditY.text = String(vec.y);
+        }
+        else
+        {
+            attrEditX.text = DIFF_VALUE;
+            attrEditY.text = DIFF_VALUE;
+        }
         attrEditX.cursorPosition = 0;
         attrEditY.cursorPosition = 0;
+        SetEditable(attrEditX, editable);
+        SetEditable(attrEditY, editable);
     }
-    if(type == VAR_INTRECT)
+    else if (type == VAR_INTRECT)
     {
         IntRect rect = value.GetIntRect();
         LineEdit@ attrEditLeft = parent.children[1];
         LineEdit@ attrEditTop = parent.children[2];
         LineEdit@ attrEditRight = parent.children[3];
         LineEdit@ attrEditBottom = parent.children[4];
-        attrEditLeft.text = String(rect.left);
-        attrEditTop.text = String(rect.top);
-        attrEditRight.text = String(rect.right);
-        attrEditBottom.text = String(rect.bottom);
+        if (sameValue)
+        {
+            attrEditLeft.text = String(rect.left);
+            attrEditTop.text = String(rect.top);
+            attrEditRight.text = String(rect.right);
+            attrEditBottom.text = String(rect.bottom);
+        }
+        else
+        {
+            attrEditLeft.text = DIFF_VALUE;
+            attrEditTop.text = DIFF_VALUE;
+            attrEditRight.text = DIFF_VALUE;
+            attrEditBottom.text = DIFF_VALUE;
+        }
         attrEditLeft.cursorPosition = 0;
         attrEditTop.cursorPosition = 0;
         attrEditRight.cursorPosition = 0;
         attrEditBottom.cursorPosition = 0;
+        SetEditable(attrEditLeft, editable);
+        SetEditable(attrEditTop, editable);
+        SetEditable(attrEditRight, editable);
+        SetEditable(attrEditBottom, editable);
     }
-    if (type == VAR_VECTOR3)
+    else if (type == VAR_VECTOR3)
     {
         Vector3 vec = value.GetVector3();
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
         LineEdit@ attrEditZ = parent.children[3];
-        attrEditX.text = String(vec.x);
-        attrEditY.text = String(vec.y);
-        attrEditZ.text = String(vec.z);
+        if (sameValue)
+        {
+            attrEditX.text = String(vec.x);
+            attrEditY.text = String(vec.y);
+            attrEditZ.text = String(vec.z);
+        }
+        else
+        {
+            attrEditX.text = DIFF_VALUE;
+            attrEditY.text = DIFF_VALUE;
+            attrEditZ.text = DIFF_VALUE;
+        }
         attrEditX.cursorPosition = 0;
         attrEditY.cursorPosition = 0;
-        attrEditZ.cursorPosition = 0;     
+        attrEditZ.cursorPosition = 0;
+        SetEditable(attrEditX, editable);
+        SetEditable(attrEditY, editable);
+        SetEditable(attrEditZ, editable);
     }
-    if (type == VAR_VECTOR4)
+    else if (type == VAR_VECTOR4)
     {
         Vector4 vec = value.GetVector4();
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
         LineEdit@ attrEditZ = parent.children[3];
         LineEdit@ attrEditW = parent.children[4];
-        attrEditX.text = String(vec.x);
-        attrEditY.text = String(vec.y);
-        attrEditZ.text = String(vec.z);
-        attrEditW.text = String(vec.w);
+        if (sameValue)
+        {
+            attrEditX.text = String(vec.x);
+            attrEditY.text = String(vec.y);
+            attrEditZ.text = String(vec.z);
+            attrEditW.text = String(vec.w);
+        }
+        else
+        {
+            attrEditX.text = DIFF_VALUE;
+            attrEditY.text = DIFF_VALUE;
+            attrEditZ.text = DIFF_VALUE;
+            attrEditW.text = DIFF_VALUE;
+        }
         attrEditX.cursorPosition = 0;
         attrEditY.cursorPosition = 0;
         attrEditZ.cursorPosition = 0;
         attrEditW.cursorPosition = 0;
+        SetEditable(attrEditX, editable);
+        SetEditable(attrEditY, editable);
+        SetEditable(attrEditZ, editable);
+        SetEditable(attrEditW, editable);
     }
-    if (type == VAR_COLOR)
+    else if (type == VAR_COLOR)
     {
         Color col = value.GetColor();
         LineEdit@ attrEditR = parent.children[1];
         LineEdit@ attrEditG = parent.children[2];
         LineEdit@ attrEditB = parent.children[3];
         LineEdit@ attrEditA = parent.children[4];
-        attrEditR.text = String(col.r);
-        attrEditG.text = String(col.g);
-        attrEditB.text = String(col.b);
-        attrEditA.text = String(col.a);
+        if (sameValue)
+        {
+            attrEditR.text = String(col.r);
+            attrEditG.text = String(col.g);
+            attrEditB.text = String(col.b);
+            attrEditA.text = String(col.a);
+        }
+        else
+        {
+            attrEditR.text = DIFF_VALUE;
+            attrEditG.text = DIFF_VALUE;
+            attrEditB.text = DIFF_VALUE;
+            attrEditA.text = DIFF_VALUE;
+        }
+        SetEditable(attrEditR, editable);
+        SetEditable(attrEditG, editable);
+        SetEditable(attrEditB, editable);
+        SetEditable(attrEditA, editable);
     }
-    if (type == VAR_QUATERNION)
+    else if (type == VAR_QUATERNION)
     {
         Vector3 vec = value.GetQuaternion().eulerAngles;
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
         LineEdit@ attrEditZ = parent.children[3];
-        attrEditX.text = String(vec.x);
-        attrEditY.text = String(vec.y);
-        attrEditZ.text = String(vec.z);
+        if (sameValue)
+        {
+            attrEditX.text = String(vec.x);
+            attrEditY.text = String(vec.y);
+            attrEditZ.text = String(vec.z);
+        }
+        else
+        {
+            attrEditX.text = DIFF_VALUE;
+            attrEditY.text = DIFF_VALUE;
+            attrEditZ.text = DIFF_VALUE;
+        }
         attrEditX.cursorPosition = 0;
         attrEditY.cursorPosition = 0;
         attrEditZ.cursorPosition = 0;
+        SetEditable(attrEditX, editable);
+        SetEditable(attrEditY, editable);
+        SetEditable(attrEditZ, editable);
     }
-    if (type == VAR_INT)
+    else if (type == VAR_INT)
     {
         if (enumNames is null || enumNames.empty)
         {
             LineEdit@ attrEdit = parent.children[1];
-            attrEdit.text = String(value.GetInt());
+            attrEdit.text = sameValue ? String(value.GetInt()) : DIFF_VALUE;
+            SetEditable(attrEdit, editable);
         }
         else
         {
             DropDownList@ attrEdit = parent.children[1];
             attrEdit.selection = value.GetInt();
+            SetEditable(attrEdit, editable);
         }
     }
-    if (type == VAR_RESOURCEREF)
+    else if (type == VAR_RESOURCEREF)
     {
         LineEdit@ attrEdit = parent.children[1].children[0];
-        attrEdit.text = cache.GetResourceName(value.GetResourceRef().id);
+        attrEdit.text = sameValue ? cache.GetResourceName(value.GetResourceRef().id) : DIFF_VALUE;
         attrEdit.cursorPosition = 0;
+        SetEditable(attrEdit, editable);
     }
-    if (type == VAR_RESOURCEREFLIST)
+    else if (type == VAR_RESOURCEREFLIST)
     {
         UIElement@ list = parent.parent;
         ResourceRefList refList = value.GetResourceRefList();
@@ -491,11 +589,12 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             if (parent is null)
                 break;
             LineEdit@ attrEdit = parent.children[1].children[0];
-            attrEdit.text = cache.GetResourceName(refList.ids[subIndex]);
+            attrEdit.text = sameValue ? cache.GetResourceName(refList.ids[subIndex]) : DIFF_VALUE;
             attrEdit.cursorPosition = 0;
+            SetEditable(attrEdit, editable);
         }
     }
-    if (type == VAR_VARIANTVECTOR)
+    else if (type == VAR_VARIANTVECTOR)
     {
         UIElement@ list = parent.parent;
         Array<Variant>@ vector = value.GetVariantVector();
@@ -504,10 +603,10 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             parent = GetAttributeEditorParent(list, index, i);
             if (parent is null)
                 break;
-            LoadAttributeEditor(parent, vector[i], vector[i].type, null, Variant(), editable);
+            LoadAttributeEditor(parent, vector[i], vector[i].type, null, Variant(), editable, sameValue);
         }
     }
-    if (type == VAR_VARIANTMAP)
+    else if (type == VAR_VARIANTMAP)
     {
         UIElement@ list = parent.parent;
         VariantMap map = value.GetVariantMap();
@@ -518,7 +617,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             if (parent is null)
                 break;
             Variant value = map[keys[i]];
-            LoadAttributeEditor(parent, value, value.type, null, Variant(), editable);
+            LoadAttributeEditor(parent, value, value.type, null, Variant(), editable, sameValue);
         }
     }
 }
