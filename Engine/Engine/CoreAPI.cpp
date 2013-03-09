@@ -571,6 +571,16 @@ static Time* GetTime()
     return GetScriptContext()->GetSubsystem<Time>();
 }
 
+static unsigned TimeGetSystemTime(Time* time)
+{
+    return Time::GetSystemTime();
+}
+
+static String TimeGetTimeStamp(Time* time)
+{
+    return Time::GetTimeStamp();
+}
+
 static void RegisterTimer(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Timer", sizeof(Timer), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
@@ -582,8 +592,8 @@ static void RegisterTimer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Time", "uint get_frameNumber() const", asMETHOD(Time, GetFrameNumber), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "float get_timeStep() const", asMETHOD(Time, GetTimeStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("Time", "float get_elapsedTime()", asMETHOD(Time, GetElapsedTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Time", "uint get_systemTime() const", asMETHOD(Time, GetSystemTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Time", "String get_timeStamp() const", asMETHOD(Time, GetTimeStamp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Time", "uint get_systemTime() const", asFUNCTION(TimeGetSystemTime), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Time", "String get_timeStamp() const", asFUNCTION(TimeGetTimeStamp), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("Time@+ get_time()", asFUNCTION(GetTime), asCALL_CDECL);
 }
 

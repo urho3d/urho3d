@@ -88,17 +88,13 @@ void SceneResolver::Resolve()
                 {
                     HashMap<unsigned, WeakPtr<Node> >::ConstIterator k = nodes_.Find(oldNodeID);
                     
-                    if (k == nodes_.End() || !k->second_)
-                    {
-                        #ifdef ENABLE_LOGGING
-                        WriteToLog(component->GetContext(), LOG_WARNING, "Could not resolve node ID " + String(oldNodeID));
-                        #endif
-                    }
-                    else
+                    if (k != nodes_.End() && k->second_)
                     {
                         unsigned newNodeID = k->second_->GetID();
                         component->SetAttribute(j, Variant(newNodeID));
                     }
+                    else
+                        LOGWARNING("Could not resolve node ID " + String(oldNodeID));
                 }
             }
             if (info.mode_ & AM_COMPONENTID)
@@ -109,18 +105,14 @@ void SceneResolver::Resolve()
                 if (oldComponentID)
                 {
                     HashMap<unsigned, WeakPtr<Component> >::ConstIterator k = components_.Find(oldComponentID);
-
-                    if (k == components_.End() || !k->second_)
-                    {
-                        #ifdef ENABLE_LOGGING
-                        WriteToLog(component->GetContext(), LOG_WARNING, "Could not resolve component ID " + String(oldComponentID));
-                        #endif
-                    }
-                    else
+                    
+                    if (k != components_.End() && k->second_)
                     {
                         unsigned newComponentID = k->second_->GetID();
                         component->SetAttribute(j, Variant(newComponentID));
                     }
+                    else
+                        LOGWARNING("Could not resolve component ID " + String(oldComponentID));
                 }
             }
         }

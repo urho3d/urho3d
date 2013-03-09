@@ -61,10 +61,6 @@ public:
     
     /// Open the log file.
     void Open(const String& fileName);
-    /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
-    void Write(int level, const String& message);
-    /// Write raw output to the log.
-    void WriteRaw(const String& message);
     /// Set logging level.
     void SetLevel(int level);
     /// Set whether to timestamp log messages.
@@ -77,36 +73,36 @@ public:
     /// Return whether log messages are timestamped.
     bool GetTimeStamp() const { return timeStamp_; }
     /// Return last log message.
-    const String& GetLastMessage() const { return lastMessage_; }
+    String GetLastMessage() const;
     /// Return whether log is in quiet mode (only errors printed to standard error stream).
     bool IsQuiet() const { return quiet_; }
     
+    /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
+    static void Write(int level, const String& message);
+    /// Write raw output to the log.
+    static void WriteRaw(const String& message);
+    
 private:
     /// Log file.
-    SharedPtr<File> logFile_;
+    static SharedPtr<File> logFile_;
     /// Last log message.
-    String lastMessage_;
+    static String lastMessage_;
     /// Logging level.
-    int level_;
+    static int level_;
     /// Timestamp log messages flag.
-    bool timeStamp_;
+    static bool timeStamp_;
     /// In write flag to prevent recursion.
-    bool inWrite_;
+    static bool inWrite_;
     /// Quiet mode flag.
-    bool quiet_;
+    static bool quiet_;
 };
 
-/// Write to the log (static).
-void WriteToLog(Context* context, int level, const String& message);
-/// Write raw output to the log (static).
-void WriteToLogRaw(Context* context, const String& message);
-
 #ifdef ENABLE_LOGGING
-#define LOGDEBUG(message) WriteToLog(context_, LOG_DEBUG, message)
-#define LOGINFO(message) WriteToLog(context_, LOG_INFO, message)
-#define LOGWARNING(message) WriteToLog(context_, LOG_WARNING, message)
-#define LOGERROR(message) WriteToLog(context_, LOG_ERROR, message)
-#define LOGRAW(message) WriteToLogRaw(context_, message)
+#define LOGDEBUG(message) Log::Write(LOG_DEBUG, message)
+#define LOGINFO(message) Log::Write(LOG_INFO, message)
+#define LOGWARNING(message) Log::Write(LOG_WARNING, message)
+#define LOGERROR(message) Log::Write(LOG_ERROR, message)
+#define LOGRAW(message) Log::WriteRaw(message)
 #else
 #define LOGDEBUG(message)
 #define LOGINFO(message)

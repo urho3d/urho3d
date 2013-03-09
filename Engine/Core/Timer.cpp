@@ -126,7 +126,7 @@ float Time::GetElapsedTime()
     return elapsedTime_.GetMSec(false) / 1000.0f;
 }
 
-unsigned Time::GetSystemTime() const
+unsigned Time::GetSystemTime()
 {
     #ifdef WIN32
     unsigned currentTime = timeGetTime();
@@ -139,7 +139,7 @@ unsigned Time::GetSystemTime() const
     return currentTime;
 }
 
-String Time::GetTimeStamp() const
+String Time::GetTimeStamp()
 {
     time_t sysTime;
     time(&sysTime);

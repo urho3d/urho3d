@@ -185,5 +185,5 @@ if (NOT USE_OPENGL)
 endif ()
 
 # Urho3D extras. Uncomment to enable
-add_subdirectory (Extras/OgreBatchConverter)
+# add_subdirectory (Extras/OgreBatchConverter)
 

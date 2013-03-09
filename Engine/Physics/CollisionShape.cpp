@@ -87,9 +87,7 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
         {
-            #ifdef ENABLE_LOGGING
-            WriteToLog(model->GetContext(), LOG_WARNING, "Skipping null geometry for triangle mesh collision");
-            #endif
+            LOGWARNING("Skipping null geometry for triangle mesh collision");
             continue;
         }
         
@@ -102,9 +100,7 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
         {
-            #ifdef ENABLE_LOGGING
-            WriteToLog(model->GetContext(), LOG_WARNING, "Skipping geometry with no CPU-side geometry data for triangle mesh collision");
-            #endif
+            LOGWARNING("Skipping geometry with no CPU-side geometry data for triangle mesh collision");
             continue;
         }
         
@@ -167,9 +163,7 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
         {
-            #ifdef ENABLE_LOGGING
-            WriteToLog(model->GetContext(), LOG_WARNING, "Skipping null geometry for convex hull collision");
-            #endif
+            LOGWARNING("Skipping null geometry for convex hull collision");
             continue;
         };
         
@@ -182,9 +176,7 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
         {
-            #ifdef ENABLE_LOGGING
-            WriteToLog(model->GetContext(), LOG_WARNING, "Skipping geometry with no CPU-side geometry data for convex hull collision");
-            #endif
+            LOGWARNING("Skipping geometry with no CPU-side geometry data for convex hull collision");
             continue;
         }
         

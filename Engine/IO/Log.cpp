@@ -25,6 +25,7 @@
 #include "File.h"
 #include "IOEvents.h"
 #include "Log.h"
+#include "Mutex.h"
 #include "ProcessUtils.h"
 #include "Timer.h"
 
@@ -44,27 +45,44 @@ namespace Urho3D
 
 OBJECTTYPESTATIC(Log);
 
+SharedPtr<File> Log::logFile_;
+String Log::lastMessage_;
+#ifdef _DEBUG
+int Log::level_ = LOG_DEBUG;
+#else
+int Log::level_ = LOG_INFO;
+#endif
+bool Log::timeStamp_ = true;
+bool Log::inWrite_ = false;
+bool Log::quiet_ = false;
+
+static PODVector<Log*> logInstances;
+
 Log::Log(Context* context) :
-    Object(context),
-    #ifdef _DEBUG
-    level_(LOG_DEBUG),
-    #else
-    level_(LOG_INFO),
-    #endif
-    timeStamp_(true),
-    inWrite_(false),
-    quiet_(false)
+    Object(context)
 {
+    MutexLock lock(GetStaticMutex());
+    logInstances.Push(this);
 }
 
 Log::~Log()
 {
+    MutexLock lock(GetStaticMutex());
+    
+    logInstances.Remove(this);
+    
+    // Close log file if was last instance
+    if (logInstances.Empty())
+        logFile_.Reset();
 }
 
 void Log::Open(const String& fileName)
 {
     #if !defined(ANDROID) && !defined(IOS)
-    if (fileName.Empty())
+    MutexLock lock(GetStaticMutex());
+    
+    // Only the first log instance actually opens the file, the rest are routed to it
+    if ((logFile_ && logFile_->IsOpen()) || fileName.Empty())
         return;
     
     logFile_ = new File(context_);
@@ -78,97 +96,10 @@ void Log::Open(const String& fileName)
     #endif
 }
 
-void Log::Write(int level, const String& message)
-{
-    assert(level >= LOG_DEBUG && level < LOG_NONE);
-    
-    // Prevent recursion
-    if (inWrite_)
-        return;
-    
-    // Check message level
-    if (level_ > level)
-        return;
-    
-    inWrite_ = true;
-    lastMessage_ = message;
-    String formattedMessage = levelPrefixes[level] + ": " + message;
-    
-    if (timeStamp_)
-    {
-        Time* time = GetSubsystem<Time>();
-        if (time)
-            formattedMessage = "[" + time->GetTimeStamp() + "] " + formattedMessage;
-    }
-    
-    #if defined(ANDROID)
-    int androidLevel = ANDROID_LOG_DEBUG + level;
-    __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
-    #elif defined(IOS)
-    SDL_IOS_LogMessage(message.CString());
-    #else
-    if (quiet_)
-    {
-        // If in quiet mode, still print the error message to the standard error stream
-        if (level == LOG_ERROR)
-            PrintUnicodeLine(formattedMessage, true);
-    }
-    else
-        PrintUnicodeLine(formattedMessage, level == LOG_ERROR);
-    #endif
-    
-    if (logFile_)
-    {
-        logFile_->WriteLine(formattedMessage);
-        logFile_->Flush();
-    }
-    
-    using namespace LogMessage;
-    
-    VariantMap eventData;
-    eventData[P_MESSAGE] = formattedMessage;
-    SendEvent(E_LOGMESSAGE, eventData);
-    
-    inWrite_ = false;
-}
-
-void Log::WriteRaw(const String& message)
-{
-    // Prevent recursion
-    if (inWrite_)
-        return;
-    
-    inWrite_ = true;
-    lastMessage_ = message;
-    
-    #if defined(ANDROID)
-    __android_log_print(ANDROID_LOG_INFO, "Urho3D", message.CString());
-    #elif defined(IOS)
-    SDL_IOS_LogMessage(message.CString());
-    #else
-    if (!quiet_)
-        PrintUnicode(message);
-    #endif
-    
-    if (logFile_)
-    {
-        logFile_->Write(message.CString(), message.Length());
-        logFile_->Flush();
-    }
-    
-    using namespace LogMessage;
-    
-    VariantMap eventData;
-    eventData[P_MESSAGE] = message;
-    SendEvent(E_LOGMESSAGE, eventData);
-    
-    inWrite_ = false;
-}
-
 void Log::SetLevel(int level)
 {
     assert(level >= LOG_DEBUG && level < LOG_NONE);
-
+    
     level_ = level;
 }
 
@@ -182,18 +113,111 @@ void Log::SetQuiet(bool quiet)
     quiet_ = quiet;
 }
 
-void WriteToLog(Context* context, int level, const String& message)
+String Log::GetLastMessage() const
 {
-    Log* log = context->GetSubsystem<Log>();
-    if (log)
-        log->Write(level, message);
+    MutexLock lock(GetStaticMutex());
+    return lastMessage_;
 }
 
-void WriteToLogRaw(Context* context, const String& message)
+void Log::Write(int level, const String& message)
 {
-    Log* log = context->GetSubsystem<Log>();
-    if (log)
-        log->WriteRaw(message);
+    assert(level >= LOG_DEBUG && level < LOG_NONE);
+    
+    // Check message level
+    if (level_ > level)
+        return;
+    
+    // Prevent recursion during log event
+    if (inWrite_)
+        return;
+    
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        String formattedMessage = levelPrefixes[level] + ": " + message;
+        lastMessage_ = message;
+        
+        if (timeStamp_)
+            formattedMessage = "[" + Time::GetTimeStamp() + "] " + formattedMessage;
+        
+        #if defined(ANDROID)
+        int androidLevel = ANDROID_LOG_DEBUG + level;
+        __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
+        #elif defined(IOS)
+        SDL_IOS_LogMessage(message.CString());
+        #else
+        if (quiet_)
+        {
+            // If in quiet mode, still print the error message to the standard error stream
+            if (level == LOG_ERROR)
+                PrintUnicodeLine(formattedMessage, true);
+        }
+        else
+            PrintUnicodeLine(formattedMessage, level == LOG_ERROR);
+        #endif
+        
+        if (logFile_)
+        {
+            logFile_->WriteLine(formattedMessage);
+            logFile_->Flush();
+        }
+        
+        // Log messages can be safely sent as an event only in single-instance mode
+        if (logInstances.Size() == 1)
+        {
+            inWrite_ = true;
+            
+            using namespace LogMessage;
+            
+            VariantMap eventData;
+            eventData[P_MESSAGE] = formattedMessage;
+            logInstances[0]->SendEvent(E_LOGMESSAGE, eventData);
+            
+            inWrite_ = false;
+        }
+    }
+}
+
+void Log::WriteRaw(const String& message)
+{
+    // Prevent recursion during log event
+    if (inWrite_)
+        return;
+    
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        lastMessage_ = message;
+        
+        #if defined(ANDROID)
+        __android_log_print(ANDROID_LOG_INFO, "Urho3D", message.CString());
+        #elif defined(IOS)
+        SDL_IOS_LogMessage(message.CString());
+        #else
+        if (!quiet_)
+            PrintUnicode(message);
+        #endif
+        
+        if (logFile_)
+        {
+            logFile_->Write(message.CString(), message.Length());
+            logFile_->Flush();
+        }
+        
+        // Log messages can be safely sent as an event only in single-instance mode
+        if (logInstances.Size() == 1)
+        {
+            inWrite_ = true;
+            
+            using namespace LogMessage;
+            
+            VariantMap eventData;
+            eventData[P_MESSAGE] = message;
+            logInstances[0]->SendEvent(E_LOGMESSAGE, eventData);
+            
+            inWrite_ = false;
+        }
+    }
 }
 
 }

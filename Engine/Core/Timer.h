@@ -99,11 +99,11 @@ public:
     unsigned GetTimerPeriod() const { return timerPeriod_; }
     /// Return elapsed time from program start as seconds.
     float GetElapsedTime();
-    /// Get system time as milliseconds.
-    unsigned GetSystemTime() const;
-    /// Get a date/time stamp as a string.
-    String GetTimeStamp() const;
     
+    /// Get system time as milliseconds.
+    static unsigned GetSystemTime();
+    /// Get a date/time stamp as a string.
+    static String GetTimeStamp();
     /// Sleep for a number of milliseconds.
     static void Sleep(unsigned mSec);
     
