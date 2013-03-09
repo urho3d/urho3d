@@ -36,48 +36,48 @@ void MakeAIHarder()
 
 class AIController
 {
-    void Control(Ninja@ ninja, Node@ node, float timeStep)
-    {
-        Scene@ scene = node.scene;
+    // Use a weak handle instead of a normal handle to point to the current target
+    // so that we don't mistakenly keep it alive.
+    WeakHandle currentTarget;
+    float newTargetTimer = 0;
 
-        // Get closest ninja on the player's side
-        Node@ targetNode;
-        Ninja@ targetNinja;
-        Array<Node@> nodes = scene.GetChildrenWithScript("Ninja", true);
-        float closestDistance = M_INFINITY;
-        for (uint i = 0; i < nodes.length; ++i)
+    void Control(Ninja@ ownNinja, Node@ ownNode, float timeStep)
+    {
+        // Get new target if none. Do not constantly scan for new targets to conserve CPU time
+        if (currentTarget.Get() is null)
         {
-            Node@ otherNode = nodes[i];
-            Ninja@ otherNinja = cast<Ninja>(otherNode.scriptObject);
-            if (otherNinja.side == SIDE_PLAYER && otherNinja.health > 0)
-            {
-                float distance = (node.position - otherNode.position).lengthSquared;
-                if (distance < closestDistance)
-                {
-                    @targetNode = otherNode;
-                    @targetNinja = otherNinja;
-                    closestDistance = distance;
-                }
-            }
+            newTargetTimer += timeStep;
+            if (newTargetTimer > 0.5)
+                GetNewTarget(ownNode);
         }
+
+        Node@ targetNode = currentTarget.Get();
 
         if (targetNode !is null)
         {
+            // Check that current target is still alive. Otherwise choose new
+            Ninja@ targetNinja = cast<Ninja>(targetNode.scriptObject);
+            if (targetNinja is null || targetNinja.health <= 0)
+            {
+                currentTarget = null;
+                return;
+            }
+
             RigidBody@ targetBody = targetNode.GetComponent("RigidBody");
 
-            ninja.controls.Set(CTRL_FIRE, false);
-            ninja.controls.Set(CTRL_JUMP, false);
+            ownNinja.controls.Set(CTRL_FIRE, false);
+            ownNinja.controls.Set(CTRL_JUMP, false);
 
             float deltaX = 0.0f;
             float deltaY = 0.0f;
 
             // Aim from own head to target's feet
-            Vector3 ownPos(node.position + Vector3(0, 90, 0));
+            Vector3 ownPos(ownNode.position + Vector3(0, 90, 0));
             Vector3 targetPos(targetNode.position + Vector3(0, -90, 0));
             float distance = (targetPos - ownPos).length;
 
             // Use prediction according to target distance & estimated snowball speed
-            Vector3 currentAim(ninja.GetAim() * Vector3(0, 0, 1));
+            Vector3 currentAim(ownNinja.GetAim() * Vector3(0, 0, 1));
             float predictDistance = distance;
             if (predictDistance > 5000) predictDistance = 5000;
             Vector3 predictedPos = targetPos + targetBody.linearVelocity * predictDistance / aiPrediction;
@@ -102,72 +102,94 @@ class AIController
             targetPitch.Normalize();
             deltaY = Clamp(Quaternion(currentPitch, targetPitch).pitch, -aiAimSpeed, aiAimSpeed);
 
-            ninja.controls.yaw += 0.1 * deltaX;
-            ninja.controls.pitch += 0.1 * deltaY;
+            ownNinja.controls.yaw += 0.1 * deltaX;
+            ownNinja.controls.pitch += 0.1 * deltaY;
 
             // Firing? if close enough and relatively correct aim
             if ((distance < 2500) && (currentAim.DotProduct(targetAim) > 0.75))
             {
                 if (Random(1.0) < aiAggression)
-                    ninja.controls.Set(CTRL_FIRE, true);
+                    ownNinja.controls.Set(CTRL_FIRE, true);
             }
 
             // Movement
-            ninja.dirChangeTime -= timeStep;
-            if (ninja.dirChangeTime <= 0)
+            ownNinja.dirChangeTime -= timeStep;
+            if (ownNinja.dirChangeTime <= 0)
             {
-                ninja.dirChangeTime = 0.5 + Random(1.0);
-                ninja.controls.Set(CTRL_UP|CTRL_DOWN|CTRL_LEFT|CTRL_RIGHT, false);
+                ownNinja.dirChangeTime = 0.5 + Random(1.0);
+                ownNinja.controls.Set(CTRL_UP|CTRL_DOWN|CTRL_LEFT|CTRL_RIGHT, false);
 
                 // Far distance: go forward
                 if (distance > 3000)
-                    ninja.controls.Set(CTRL_UP, true);
+                    ownNinja.controls.Set(CTRL_UP, true);
                 else if (distance > 600)
                 {
                     // Medium distance: random strafing, predominantly forward
                     float v = Random(1.0);
                     if (v < 0.8)
-                        ninja.controls.Set(CTRL_UP, true);
+                        ownNinja.controls.Set(CTRL_UP, true);
                     float h = Random(1.0);
                     if (h < 0.3)
-                        ninja.controls.Set(CTRL_LEFT, true);
+                        ownNinja.controls.Set(CTRL_LEFT, true);
                     if (h > 0.7)
-                        ninja.controls.Set(CTRL_RIGHT, true);
+                        ownNinja.controls.Set(CTRL_RIGHT, true);
                 }
                 else
                 {
                     // Close distance: random strafing backwards
                     float v = Random(1.0);
                     if (v < 0.8)
-                        ninja.controls.Set(CTRL_DOWN, true);
+                        ownNinja.controls.Set(CTRL_DOWN, true);
                     float h = Random(1.0);
                     if (h < 0.4)
-                        ninja.controls.Set(CTRL_LEFT, true);
+                        ownNinja.controls.Set(CTRL_LEFT, true);
                     if (h > 0.6)
-                        ninja.controls.Set(CTRL_RIGHT, true);
+                        ownNinja.controls.Set(CTRL_RIGHT, true);
                 }
             }
 
             // Random jump, if going forward
-            if ((ninja.controls.IsDown(CTRL_UP)) && (distance < 1000))
+            if ((ownNinja.controls.IsDown(CTRL_UP)) && (distance < 1000))
             {
                 if (Random(1.0) < (aiAggression / 5.0))
-                    ninja.controls.Set(CTRL_JUMP, true);
+                    ownNinja.controls.Set(CTRL_JUMP, true);
             }
         }
         else
         {
             // If no target, walk idly
-            ninja.controls.Set(CTRL_ALL, false);
-            ninja.controls.Set(CTRL_UP, true);
-            ninja.dirChangeTime -= timeStep;
-            if (ninja.dirChangeTime <= 0)
+            ownNinja.controls.Set(CTRL_ALL, false);
+            ownNinja.controls.Set(CTRL_UP, true);
+            ownNinja.dirChangeTime -= timeStep;
+            if (ownNinja.dirChangeTime <= 0)
             {
-                ninja.dirChangeTime = 1.0 + Random(2.0);
-                ninja.controls.yaw += 0.1 * (Random(600.0) - 300.0);
+                ownNinja.dirChangeTime = 1.0 + Random(2.0);
+                ownNinja.controls.yaw += 0.1 * (Random(600.0) - 300.0);
             }
-            if (ninja.isSliding)
-                ninja.controls.yaw += 0.2;
+            if (ownNinja.isSliding)
+                ownNinja.controls.yaw += 0.2;
+        }
+    }
+    
+    void GetNewTarget(Node@ ownNode)
+    {
+        newTargetTimer = 0;
+
+        Array<Node@> nodes = ownNode.scene.GetChildrenWithScript("Ninja", true);
+        float closestDistance = M_INFINITY;
+        for (uint i = 0; i < nodes.length; ++i)
+        {
+            Node@ otherNode = nodes[i];
+            Ninja@ otherNinja = cast<Ninja>(otherNode.scriptObject);
+            if (otherNinja.side == SIDE_PLAYER && otherNinja.health > 0)
+            {
+                float distance = (ownNode.position - otherNode.position).lengthSquared;
+                if (distance < closestDistance)
+                {
+                    currentTarget = otherNode;
+                    closestDistance = distance;
+                }
+            }
         }
     }
 }
