@@ -71,8 +71,16 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_INFINITY);
     engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_EPSILON);
+    engine->RegisterGlobalProperty("const float M_LARGE_EPSILON", (void*)&M_LARGE_EPSILON);
+    engine->RegisterGlobalProperty("const float M_LARGE_VALUE", (void*)&M_LARGE_VALUE);
     engine->RegisterGlobalProperty("const float M_DEGTORAD", (void*)&M_DEGTORAD);
+    engine->RegisterGlobalProperty("const float M_DEGTORAD_2", (void*)&M_DEGTORAD_2);
     engine->RegisterGlobalProperty("const float M_RADTODEG", (void*)&M_RADTODEG);
+    engine->RegisterGlobalProperty("const float M_PI", (void*)&M_PI);
+    engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_MIN_INT);
+    engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_MAX_INT);
+    engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
+    engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
     
     engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Sin(float)", asFUNCTION(Sin), asCALL_CDECL);

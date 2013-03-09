@@ -30,9 +30,8 @@
 namespace Urho3D
 {
 
-#ifndef M_PI
+#undef M_PI
 static const float M_PI = 3.14159265358979323846264338327950288f;
-#endif
 
 static const int M_MIN_INT = 0x80000000;
 static const int M_MAX_INT = 0x7fffffff;

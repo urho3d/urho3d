@@ -108,8 +108,16 @@ namespace Urho3D
 \section ScriptAPI_GlobalConstants Global constants
 - float M_INFINITY
 - float M_EPSILON
+- float M_LARGE_EPSILON
+- float M_LARGE_VALUE
 - float M_DEGTORAD
+- float M_DEGTORAD_2
 - float M_RADTODEG
+- float M_PI
+- int M_MIN_INT
+- int M_MAX_INT
+- uint M_MIN_UNSIGNED
+- uint M_MAX_UNSIGNED
 - int LOG_DEBUG
 - int LOG_INFO
 - int LOG_WARNING
