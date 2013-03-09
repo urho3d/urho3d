@@ -119,7 +119,7 @@ void UpdateAttributes(bool fullUpdate)
                     AddComponentContainer();
                 
                 Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
-                componentTitle.text = GetComponentTitle(editComponents[j], 0) + multiplierText;
+                componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents], 0) + multiplierText;
                 
                 Array<Serializable@> components;
                 for (uint i = 0; i < numEditableComponents; ++i)
