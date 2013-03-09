@@ -302,10 +302,6 @@ const FontFace* Font::GetFaceTTF(int pointSize)
     newFace->rowHeight_ = Max((face->size->metrics.height + 63) >> 6, maxHeight);
     
     // Now try to pack into the smallest possible texture
-    int totalArea = 0;
-    for (unsigned i = 0; i < numGlyphs; ++i)
-        totalArea += (newFace->glyphs_[i].width_ + 1) * (newFace->glyphs_[i].height_ + 1);
-    
     bool success = true;
     AreaAllocator allocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MAX_SIZE, FONT_TEXTURE_MAX_SIZE);
     for (unsigned i = 0; i < numGlyphs; ++i)
