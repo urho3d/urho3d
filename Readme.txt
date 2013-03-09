@@ -12,6 +12,7 @@ Credits
 Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com)
 - Colin Barrett
+- Carlo Carollo
 - Alex Fuller
 - Jason Kinzer
 - Miika Santala

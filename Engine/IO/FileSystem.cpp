@@ -501,10 +501,13 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     if (path.Length() > startPath.Length())
         deltaPath = path.Substring(startPath.Length());
     
+    String filterExtension = filter.Substring(filter.Find('.'));
+    if (filterExtension.Contains('*'))
+        filterExtension.Clear();
+    
     #ifdef WIN32
-    String pathAndFilter = GetNativePath(path + filter);
     WIN32_FIND_DATAW info;
-    HANDLE handle = FindFirstFileW(WString(pathAndFilter).CString(), &info);
+    HANDLE handle = FindFirstFileW(WString(path + "*").CString(), &info);
     if (handle != INVALID_HANDLE_VALUE)
     {
         do
@@ -522,7 +525,10 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                         ScanDirInternal(result, path + fileName, startPath, filter, flags, recursive);
                 }
                 else if (flags & SCAN_FILES)
-                    result.Push(deltaPath + fileName);
+                {
+                    if (filterExtension.Empty() || fileName.EndsWith(filterExtension))
+                        result.Push(deltaPath + fileName);
+                }
             }
         } 
         while (FindNextFileW(handle, &info));
@@ -530,9 +536,6 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
         FindClose(handle);
     }
     #else
-    String filterExtension = filter.Substring(filter.Find('.'));
-    if (filterExtension.Contains('*'))
-        filterExtension.Clear();
     DIR *dir;
     struct dirent *de;
     struct stat st;

@@ -319,7 +319,7 @@ void FileSelector::RefreshFiles()
     
     Vector<String> directories;
     Vector<String> files;
-    fileSystem->ScanDir(directories, path_, "*.*", SCAN_DIRS, false);
+    fileSystem->ScanDir(directories, path_, "*", SCAN_DIRS, false);
     fileSystem->ScanDir(files, path_, GetFilter(), SCAN_FILES, false);
     
     fileEntries_.Reserve(directories.Size() + files.Size());

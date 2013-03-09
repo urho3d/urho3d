@@ -1,1 +1,1 @@
-DocConverter ..\Docs ..\..\urho3dwiki Urho3D
+DocConverter ..\Docs ..\..\wiki Urho3D

@@ -183,3 +183,7 @@ if (NOT USE_OPENGL)
     add_subdirectory (ThirdParty/MojoShader)
     add_subdirectory (Tools/ShaderCompiler)
 endif ()
+
+# Urho3D extras. Uncomment to enable
+add_subdirectory (Extras/OgreBatchConverter)
+
