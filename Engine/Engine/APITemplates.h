@@ -731,6 +731,20 @@ static bool UIElementLoadXML(File* file, UIElement* ptr)
         return false;
 }
 
+static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
+{
+    if (file)
+    {
+        XMLElement rootElem = file->GetRoot("element");
+        if (rootElem)
+            return ptr->LoadXML(rootElem, styleFile);
+        else
+            return false;
+    }
+    else
+        return false;
+}
+    
 static bool UIElementSaveXML(File* file, UIElement* ptr)
 {
     if (file)
@@ -783,7 +797,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     RegisterNamedObjectConstructor<T>(engine, className);
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+)", asMETHODPR(T, LoadXML, (const XMLElement&, XMLFile*), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTION(UIElementLoadXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTIONPR(UIElementLoadXML, (File*, UIElement*), bool), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool LoadXML(XMLFile@+, XMLFile@+)", asFUNCTIONPR(UIElementLoadXML, (XMLFile*, XMLFile*, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(File@+)", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetStyle(XMLFile@+, const String&in)", asMETHODPR(T, SetStyle, (XMLFile*, const String&), void), asCALL_THISCALL);

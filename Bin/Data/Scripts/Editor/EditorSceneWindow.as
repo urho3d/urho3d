@@ -546,25 +546,32 @@ void HandleSceneWindowSelectionChange()
             editComponents = selectedComponents;
     }
     
-    // If just nodes selected, and no components, show the first component(s) for editing if possible
+    // If just nodes selected, and no components, show as much matching component(s) for editing as possible
     if (!selectedNodes.empty && selectedComponents.empty && selectedNodes[0].numComponents > 0)
     {
-        ShortStringHash compType = selectedNodes[0].components[0].type;
-        bool sameType = true;
-        for (uint i = 1; i < selectedNodes.length; ++i)
+        uint count = 0;
+        for (uint j = 0; j < selectedNodes[0].numComponents; ++j)
         {
-            if (selectedNodes[i].numComponents == 0 || selectedNodes[i].components[0].type != compType)
+            ShortStringHash compType = selectedNodes[0].components[j].type;
+            bool sameType = true;
+            for (uint i = 1; i < selectedNodes.length; ++i)
             {
-                sameType = false;
-                break;
+                if (selectedNodes[i].numComponents <= j || selectedNodes[i].components[j].type != compType)
+                {
+                    sameType = false;
+                    break;
+                }
+            }
+
+            if (sameType)
+            {
+                ++count;
+                for (uint i = 0; i < selectedNodes.length; ++i)
+                    editComponents.Push(selectedNodes[i].components[j]);
             }
         }
-
-        if (sameType)
-        {
-            for (uint i = 0; i < selectedNodes.length; ++i)
-                editComponents.Push(selectedNodes[i].components[0]);
-        }
+        if (count > 1)
+            numEditableComponentsPerNode = count;
     }
 
     if (selectedNodes.empty && editNode !is null)

@@ -22,6 +22,7 @@ Array<Component@> selectedComponents;
 Node@ editNode;
 Array<Node@> editNodes;
 Array<Component@> editComponents;
+uint numEditableComponentsPerNode = 1;
 
 Array<XMLFile@> copyBuffer;
 bool copyBufferLocal = false;
@@ -36,6 +37,7 @@ void ClearSelection()
     editNode = null;
     editNodes.Clear();
     editComponents.Clear();
+    numEditableComponentsPerNode = 1;
 
     HideGizmo();
 }

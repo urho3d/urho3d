@@ -1,9 +1,25 @@
-// Urho3D editor node/component edit window handling
+// Urho3D editor attribute inspector window handling
 #include "Scripts/Editor/AttributeEditor.as"
 
 Window@ nodeWindow;
+UIElement@ componentParentContainer;
 
 bool applyMaterialList = true;
+
+void AddComponentContainer()
+{
+    componentParentContainer.LoadXML(cache.GetResource("XMLFile", "UI/EditorComponent.xml"), uiStyle);
+}
+
+void DeleteAllComponentContainers()
+{
+    componentParentContainer.RemoveAllChildren();
+}
+
+UIElement@ GetComponentContainer(uint index)
+{
+    return componentParentContainer.children[index];
+}
 
 void CreateNodeWindow()
 {
@@ -14,6 +30,8 @@ void CreateNodeWindow()
     InitVectorStructs();
 
     nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"), uiStyle);
+    componentParentContainer = nodeWindow.GetChild("ComponentParentContainer", true);
+    AddComponentContainer();
     ui.root.AddChild(nodeWindow);
     int height = Min(ui.root.height - 60, 500);
     nodeWindow.SetSize(300, height);
@@ -44,7 +62,6 @@ void UpdateNodeWindow()
     PickResourceCanceled();
 
     Text@ nodeTitle = nodeWindow.GetChild("NodeTitle", true);
-    Text@ componentTitle = nodeWindow.GetChild("ComponentTitle", true);
 
     if (editNode is null)
     {
@@ -63,21 +80,6 @@ void UpdateNodeWindow()
         nodeTitle.text = editNode.typeName + " (" + idStr + ")";
     }
 
-    if (editComponents.empty)
-    {
-        if (selectedComponents.length <= 1)
-            componentTitle.text = "No component";
-        else
-            componentTitle.text = selectedComponents.length + " components";
-    }
-    else
-    {
-        String multiplierText;
-        if (editComponents.length > 1)
-            multiplierText = " (" + editComponents.length + "x)";
-        componentTitle.text = GetComponentTitle(editComponents[0], 0) + multiplierText;
-    }
-
     UpdateAttributes(true);
 }
 
@@ -86,14 +88,46 @@ void UpdateAttributes(bool fullUpdate)
     if (nodeWindow !is null)
     {
         Array<Serializable@> nodes;
-        Array<Serializable@> components;
         if (editNode !is null)
             nodes.Push(editNode);
-        for (uint i = 0; i < editComponents.length; ++i)
-            components.Push(editComponents[i]);
-
         UpdateAttributes(nodes, nodeWindow.GetChild("NodeAttributeList", true), fullUpdate);
-        UpdateAttributes(components, nodeWindow.GetChild("ComponentAttributeList", true), fullUpdate);
+
+        if (fullUpdate)
+            DeleteAllComponentContainers();
+        
+        if (editComponents.empty)
+        {
+            if (componentParentContainer.numChildren == 0)
+                AddComponentContainer();
+            
+            Text@ componentTitle = GetComponentContainer(0).GetChild("ComponentTitle");
+            if (selectedComponents.length <= 1)
+                componentTitle.text = "No component";
+            else
+                componentTitle.text = selectedComponents.length + " components";            
+        }
+        else
+        {
+            uint numEditableComponents = editComponents.length / numEditableComponentsPerNode;
+            String multiplierText;
+            if (numEditableComponents > 1)
+                multiplierText = " (" + numEditableComponents + "x)";
+            
+            for (uint j = 0; j < numEditableComponentsPerNode; ++j)
+            {
+                if (j >= componentParentContainer.numChildren)
+                    AddComponentContainer();
+                
+                Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
+                componentTitle.text = GetComponentTitle(editComponents[j], 0) + multiplierText;
+                
+                Array<Serializable@> components;
+                for (uint i = 0; i < numEditableComponents; ++i)
+                    components.Push(editComponents[j * numEditableComponents + i]);
+                
+                UpdateAttributes(components, GetComponentContainer(j).GetChild("ComponentAttributeList"), fullUpdate);
+            }
+        }
     }
 }
 
