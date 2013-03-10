@@ -42,7 +42,9 @@ ScrollView::ScrollView(Context* context) :
     viewPosition_(IntVector2::ZERO),
     viewSize_(IntVector2::ZERO),
     viewPositionAttr_(IntVector2::ZERO),
-    pageStep_(1.0f)
+    pageStep_(1.0f),
+    scrollBarsAutoVisible_(true),
+    ignoreEvents_(false)
 {
     clipChildren_ = true;
     active_ = true;
@@ -78,6 +80,7 @@ void ScrollView::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(ScrollView, VAR_INTVECTOR2, "View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScrollView, VAR_BOOL, "Auto Show/Hide Scrollbars", GetScrollBarsAutoVisible, SetScrollBarsAutoVisible, bool, true, AM_FILE);
     COPY_BASE_ATTRIBUTES(ScrollView, UIElement);
 }
 
@@ -221,6 +224,12 @@ void ScrollView::SetScrollBarsVisible(bool horizontal, bool vertical)
 {
     horizontalScrollBar_->SetVisible(horizontal);
     verticalScrollBar_->SetVisible(vertical);
+    scrollBarsAutoVisible_ = false;
+}
+
+void ScrollView::SetScrollBarsAutoVisible(bool enable)
+{
+    scrollBarsAutoVisible_ = enable;
 }
 
 void ScrollView::SetScrollStep(float step)
@@ -275,8 +284,9 @@ void ScrollView::UpdateScrollBars()
         horizontalScrollBar_->SetValue((float)viewPosition_.x_ / (float)size.x_);
         horizontalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.x_);
         
-        // Hide/Show the horizontal scroll bar as needed
-        needResize = SetScrollBarVisible(horizontalScrollBar_, range > 0.0f);
+        // Hide/show the horizontal scroll bar as needed
+        if (scrollBarsAutoVisible_)
+            needResize = SetScrollBarVisible(horizontalScrollBar_, range > 0.0f);
     }
     if (verticalScrollBar_ && size.y_ > 0 && viewSize_.y_ > 0)
     {
@@ -285,11 +295,13 @@ void ScrollView::UpdateScrollBars()
         verticalScrollBar_->SetValue((float)viewPosition_.y_ / (float)size.y_);
         verticalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.y_);
         
-        // Hide/Show the vertical scroll bar as needed
-        needResize = SetScrollBarVisible(verticalScrollBar_, range > 0.0f) || needResize;
+        // Hide/show the vertical scroll bar as needed
+        if (scrollBarsAutoVisible_)
+            needResize = SetScrollBarVisible(verticalScrollBar_, range > 0.0f) || needResize;
     }
     
     ignoreEvents_ = false;
+    
     // Since the scrollbar visibility changed event is intentionally ignored to prevent
     // infinite loop in the above code, call OnResize now if needed
     if (needResize)

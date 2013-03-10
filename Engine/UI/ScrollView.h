@@ -58,8 +58,10 @@ public:
     void SetViewPosition(const IntVector2& position);
     /// Set view offset from the top-left corner.
     void SetViewPosition(int x, int y);
-    /// Set scrollbars' visibility.
+    /// Set scrollbars' visibility manually. Disables scrollbar autoshow/hide.
     void SetScrollBarsVisible(bool horizontal, bool vertical);
+    /// Set whether to automatically show/hide scrollbars. Default true.
+    void SetScrollBarsAutoVisible(bool enable);
     /// Set arrow key scroll step. Also sets it on the scrollbars.
     void SetScrollStep(float step);
     /// Set arrow key page step.
@@ -75,6 +77,8 @@ public:
     ScrollBar* GetVerticalScrollBar() const { return verticalScrollBar_; }
     /// Return scroll panel.
     BorderImage* GetScrollPanel() const { return scrollPanel_; }
+    /// Return whether scrollbars are automatically shown/hidden.
+    bool GetScrollBarsAutoVisible() const { return scrollBarsAutoVisible_; }
     /// Return arrow key scroll step.
     float GetScrollStep() const;
     /// Return arrow key page step.
@@ -107,7 +111,9 @@ protected:
     IntVector2 viewPositionAttr_;
     /// Arrow key page step.
     float pageStep_;
-    /// Ignore scrollbar events flag. Used to prevent possible endless loop when setting position.
+    /// Automatically show/hide scrollbars flag.
+    bool scrollBarsAutoVisible_;
+    /// Ignore scrollbar events flag. Used to prevent possible endless loop when resizing.
     bool ignoreEvents_;
     
 private:

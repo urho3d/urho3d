@@ -3916,6 +3916,7 @@ Properties:<br>
 - ScrollBar@ horizontalScrollBar (readonly)
 - ScrollBar@ verticalScrollBar (readonly)
 - BorderImage@ scrollPanel (readonly)
+- bool scrollBarsAutoVisible
 
 
 ListView
@@ -4038,6 +4039,7 @@ Properties:<br>
 - ScrollBar@ horizontalScrollBar (readonly)
 - ScrollBar@ verticalScrollBar (readonly)
 - BorderImage@ scrollPanel (readonly)
+- bool scrollBarsAutoVisible
 - float scrollStep
 - float pageStep
 - uint numItems (readonly)

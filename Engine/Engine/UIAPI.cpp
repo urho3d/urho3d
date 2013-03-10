@@ -179,6 +179,8 @@ static void RegisterScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "ScrollBar@+ get_horizontalScrollBar() const", asMETHOD(ScrollView, GetHorizontalScrollBar), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "ScrollBar@+ get_verticalScrollBar() const", asMETHOD(ScrollView, GetVerticalScrollBar), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "BorderImage@+ get_scrollPanel() const", asMETHOD(ScrollView, GetScrollPanel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void set_scrollBarsAutoVisible(bool)", asMETHOD(ScrollView, SetScrollBarsAutoVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "bool get_scrollBarsAutoVisible() const", asMETHOD(ScrollView, GetScrollBarsAutoVisible), asCALL_THISCALL);
 }
 
 void ListViewSetSelections(CScriptArray* selections, ListView* ptr)
@@ -242,6 +244,8 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "ScrollBar@+ get_horizontalScrollBar() const", asMETHOD(ListView, GetHorizontalScrollBar), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "ScrollBar@+ get_verticalScrollBar() const", asMETHOD(ListView, GetVerticalScrollBar), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "BorderImage@+ get_scrollPanel() const", asMETHOD(ListView, GetScrollPanel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void set_scrollBarsAutoVisible(bool)", asMETHOD(ListView, SetScrollBarsAutoVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool get_scrollBarsAutoVisible() const", asMETHOD(ListView, GetScrollBarsAutoVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_scrollStep(float)", asMETHOD(ListView, SetScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float get_scrollStep() const", asMETHOD(ListView, GetScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_pageStep(float)", asMETHOD(ListView, SetPageStep), asCALL_THISCALL);
