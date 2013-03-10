@@ -619,12 +619,12 @@ void Renderer::Update(float timeStep)
                 debug->SetView(viewport->GetCamera());
         }
         
-        // Update view. This may queue further views. Reset shadow map allocations, as they can be reused between views.
+        // Update view. This may queue further views
         ResetShadowMapAllocations(); // Each view can reuse the same shadow maps
         view->Update(frame_);
     }
     
-    // Reset update flag from queued render surfaces. At this point no new views can be added on this frame.
+    // Reset update flag from queued render surfaces. At this point no new views can be added on this frame
     for (unsigned i = 0; i < queuedViews_.Size(); ++i)
     {
         WeakPtr<RenderSurface>& renderTarget = queuedViews_[i].first_;
