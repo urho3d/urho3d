@@ -620,6 +620,7 @@ void Renderer::Update(float timeStep)
         }
         
         // Update view. This may queue further views. Reset shadow map allocations, as they can be reused between views.
+        ResetShadowMapAllocations(); // Each view can reuse the same shadow maps
         view->Update(frame_);
     }
     
