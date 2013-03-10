@@ -44,7 +44,7 @@ void PrintUnicode(const String& str, bool error = false);
 /// Print Unicode text to the console with a newline appended. Will not be printed to the MSVC output window.
 void PrintUnicodeLine(const String& str, bool error = false);
 /// Print ASCII text to the console with a newline appended. Uses printf() to allow printing into the MSVC output window.
-void PrintLine(const String& str);
+void PrintLine(const String& str, bool error = false);
 /// Parse arguments from the command line.
 const Vector<String>& ParseArguments(const String& cmdLine);
 /// Parse arguments from the command line.

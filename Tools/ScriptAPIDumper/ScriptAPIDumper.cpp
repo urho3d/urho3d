@@ -42,18 +42,26 @@ int main(int argc, char** argv)
     ParseArguments(argc, argv);
     #endif
     
+    String outputFile;
     if (GetArguments().Size() < 1)
-        ErrorExit("Usage: ScriptAPIDumper <output file>\n");
+        Log::WriteRaw("Usage: ScriptAPIDumper [output file]\n", true);  // Print usage message to stderr
+    else
+        outputFile = GetArguments()[0];
 
     SharedPtr<Context> context(new Context());
     SharedPtr<Engine> engine(new Engine(context));
     if (!engine->InitializeScripting())
         ErrorExit("Unabled to initialize script engine. The application will now exit.");
-    Log* log;   // All subsystems are auto-disposed
-    context->RegisterSubsystem(log = new Log(context));
-    log->SetLevel(LOG_ERROR);
-    log->SetQuiet(true);
-    log->Open(GetArguments()[0]);
+    
+    if (!outputFile.Empty())
+    {
+        Log* log;   // All subsystems are auto-disposed
+        context->RegisterSubsystem(log = new Log(context));
+        log->SetLevel(LOG_ERROR);
+        log->SetQuiet(true);
+        log->Open(outputFile);
+    }
+    // If without output file, dump to stdout instead
     context->GetSubsystem<Script>()->DumpAPI();
    
     return EXIT_SUCCESS;

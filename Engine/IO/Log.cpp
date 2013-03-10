@@ -178,7 +178,7 @@ void Log::Write(int level, const String& message)
     }
 }
 
-void Log::WriteRaw(const String& message)
+void Log::WriteRaw(const String& message, bool error)
 {
     // Prevent recursion during log event
     if (inWrite_)
@@ -195,7 +195,7 @@ void Log::WriteRaw(const String& message)
         SDL_IOS_LogMessage(message.CString());
         #else
         if (!quiet_)
-            PrintUnicode(message);
+            PrintUnicode(message, error);
         #endif
         
         if (logFile_)

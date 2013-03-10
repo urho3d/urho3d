@@ -80,7 +80,7 @@ public:
     /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
     static void Write(int level, const String& message);
     /// Write raw output to the log.
-    static void WriteRaw(const String& message);
+    static void WriteRaw(const String& message, bool error = false);
     
 private:
     /// Log file.

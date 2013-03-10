@@ -124,7 +124,7 @@ void ErrorDialog(const String& title, const String& message)
     #ifdef WIN32
     MessageBoxW(0, WString(message).CString(), WString(title).CString(), 0);
     #else
-    PrintLine(message);
+    PrintLine(message, true);
     #endif
 }
 
@@ -179,10 +179,10 @@ void PrintUnicodeLine(const String& str, bool error)
     PrintUnicode(str + '\n', error);
 }
 
-void PrintLine(const String& str)
+void PrintLine(const String& str, bool error)
 {
     #if !defined(ANDROID) && !defined(IOS)
-    printf("%s\n", str.CString());
+    fprintf(error ? stderr: stdout, "%s\n", str.CString());
     #endif
 }
 

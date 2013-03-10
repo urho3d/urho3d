@@ -546,7 +546,7 @@ void HandleSceneWindowSelectionChange()
             editComponents = selectedComponents;
     }
     
-    // If just nodes selected, and no components, show as much matching component(s) for editing as possible
+    // If just nodes selected, and no components, show as many matching components for editing as possible
     if (!selectedNodes.empty && selectedComponents.empty && selectedNodes[0].numComponents > 0)
     {
         uint count = 0;

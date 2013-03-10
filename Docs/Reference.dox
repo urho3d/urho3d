@@ -1475,12 +1475,10 @@ Dump the %Script API in Doxygen format.
 Usage:
 
 \verbatim
-ScriptAPIDumper <output file>
+ScriptAPIDumper [output file]
 \endverbatim
 
-The output file can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory.
-
-Note that if you build ScriptAPIDumper from source, it must be built with ENABLE_LOGGING defined as the tool requires Log subsystem to capture the output.
+The output file can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
 
 \section Tools_DocConverter DocConverter
 

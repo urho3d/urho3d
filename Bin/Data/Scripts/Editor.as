@@ -16,19 +16,20 @@ bool instancingSetting = true;
 
 void Start()
 {
-    if (engine.headless)
-    {
-        ErrorDialog("Urho3D Editor", "Headless mode is not supported. The program will now exit.");
-        engine.Exit();
-        return;
-    }
-
+    // Assign the value ASAP because configFileName is needed on exit, including exit on error
     if (GetPlatform() == "Windows")
         configPath = "Urho3D/Editor/";
     else
         // Unix-like platforms usually hide application configuration file
         configPath = ".Urho3D/Editor/";
     configFileName = fileSystem.userDocumentsDir + configPath + "Config.xml";
+    
+    if (engine.headless)
+    {
+        ErrorDialog("Urho3D Editor", "Headless mode is not supported. The program will now exit.");
+        engine.Exit();
+        return;
+    }
 
     SubscribeToEvent("Update", "HandleUpdate");
     // Enable console commands from the editor script
@@ -154,10 +155,14 @@ void SaveConfig()
     XMLElement uiElem = configElem.CreateChild("ui");
     XMLElement inspectorElem = configElem.CreateChild("attributeinspector");
 
-    cameraElem.SetFloat("nearclip", camera.nearClip);
-    cameraElem.SetFloat("farclip", camera.farClip);
-    cameraElem.SetFloat("fov", camera.fov);
-    cameraElem.SetFloat("speed", cameraBaseSpeed);
+    // The save config may be called on error exit so some of the objects below could still be null
+    if (camera !is null)
+    {
+        cameraElem.SetFloat("nearclip", camera.nearClip);
+        cameraElem.SetFloat("farclip", camera.farClip);
+        cameraElem.SetFloat("fov", camera.fov);
+        cameraElem.SetFloat("speed", cameraBaseSpeed);
+    }
 
     objectElem.SetFloat("newnodedistance", newNodeDistance);
     objectElem.SetFloat("movestep", moveStep);
@@ -171,13 +176,19 @@ void SaveConfig()
     objectElem.SetBool("generatetangents", generateTangents);
     objectElem.SetInt("pickmode", pickMode);
 
-    renderingElem.SetInt("texturequality", renderer.textureQuality);
-    renderingElem.SetInt("materialquality", renderer.materialQuality);
-    renderingElem.SetInt("shadowresolution", GetShadowResolution());
-    renderingElem.SetInt("shadowquality", renderer.shadowQuality);
-    renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
-    renderingElem.SetBool("specularlighting", renderer.specularLighting);
-    renderingElem.SetBool("dynamicinstancing", graphics.sm3Support ? renderer.dynamicInstancing : instancingSetting);
+    if (renderer !is null)
+    {
+        renderingElem.SetInt("texturequality", renderer.textureQuality);
+        renderingElem.SetInt("materialquality", renderer.materialQuality);
+        renderingElem.SetInt("shadowresolution", GetShadowResolution());
+        renderingElem.SetInt("shadowquality", renderer.shadowQuality);
+        renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
+        renderingElem.SetBool("specularlighting", renderer.specularLighting);
+    }
+    
+    if (graphics !is null)
+        renderingElem.SetBool("dynamicinstancing", graphics.sm3Support ? renderer.dynamicInstancing : instancingSetting);
+    
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
     
     uiElem.SetFloat("minopacity", uiMinOpacity);

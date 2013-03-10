@@ -236,8 +236,8 @@ void Script::ClearLogMessages()
 
 void Script::DumpAPI()
 {
-    #ifdef ENABLE_LOGGING
-    LOGRAW("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
+    // Does not use LOGRAW macro here to ensure the messages are always dumped regarless of ENABLE_LOGGING compiler directive and of Log subsystem availability
+    Log::WriteRaw("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
     
     Vector<PropertyInfo> globalPropertyInfos;
     Vector<String> globalFunctions;
@@ -255,17 +255,17 @@ void Script::DumpAPI()
             globalFunctions.Push(declaration);
     }
     
-    LOGRAW("\\section ScriptAPI_GlobalFunctions Global functions\n");
+    Log::WriteRaw("\\section ScriptAPI_GlobalFunctions Global functions\n");
     
     for (unsigned i = 0; i < globalFunctions.Size(); ++i)
         OutputAPIRow(globalFunctions[i]);
     
-    LOGRAW("\\section ScriptAPI_GlobalProperties Global properties\n");
+    Log::WriteRaw("\\section ScriptAPI_GlobalProperties Global properties\n");
     
     for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
         OutputAPIRow(globalPropertyInfos[i].type_ + " " + globalPropertyInfos[i].name_, true);
     
-    LOGRAW("\\section ScriptAPI_GlobalConstants Global constants\n");
+    Log::WriteRaw("\\section ScriptAPI_GlobalConstants Global constants\n");
     
     unsigned properties = scriptEngine_->GetGlobalPropertyCount();
     for (unsigned i = 0; i < properties; ++i)
@@ -280,7 +280,7 @@ void Script::DumpAPI()
         OutputAPIRow(type + " " + String(propertyName), true);
     }
     
-    LOGRAW("\\section ScriptAPI_Classes Classes\n");
+    Log::WriteRaw("\\section ScriptAPI_Classes Classes\n");
     
     unsigned types = scriptEngine_->GetObjectTypeCount();
     for (unsigned i = 0; i < types; ++i)
@@ -292,7 +292,7 @@ void Script::DumpAPI()
             Vector<String> methodDeclarations;
             Vector<PropertyInfo> propertyInfos;
             
-            LOGRAW("\n" + typeName + "\n");
+            Log::WriteRaw("\n" + typeName + "\n");
             
             unsigned methods = type->GetMethodCount();
             for (unsigned j = 0; j < methods; ++j)
@@ -334,14 +334,14 @@ void Script::DumpAPI()
             
             if (!methodDeclarations.Empty())
             {
-                LOGRAW("\nMethods:<br>\n");
+                Log::WriteRaw("\nMethods:<br>\n");
                 for (unsigned j = 0; j < methodDeclarations.Size(); ++j)
                     OutputAPIRow(methodDeclarations[j]);
             }
             
             if (!propertyInfos.Empty())
             {
-                LOGRAW("\nProperties:<br>\n");
+                Log::WriteRaw("\nProperties:<br>\n");
                 for (unsigned j = 0; j < propertyInfos.Size(); ++j)
                 {
                     String remark;
@@ -354,12 +354,11 @@ void Script::DumpAPI()
                 }
             }
             
-            LOGRAW("\n");
+            Log::WriteRaw("\n");
         }
     }
     
-    LOGRAW("*/\n\n}\n");
-    #endif
+    Log::WriteRaw("*/\n\n}\n");
 }
 
 void Script::MessageCallback(const asSMessageInfo* msg)
@@ -446,7 +445,6 @@ asIScriptContext* Script::GetScriptFileContext()
 
 void Script::OutputAPIRow(const String& row, bool removeReference)
 {
-    #ifdef ENABLE_LOGGING
     String out = row;
     ///\todo We need Regex capability in String class to handle whole-word replacement correctly.
     // Temporary fix to prevent property name like 'doubleClickInterval' from being wrongly replaced.
@@ -457,8 +455,7 @@ void Script::OutputAPIRow(const String& row, bool removeReference)
     if (removeReference)
         out.Replace("&", "");
     
-    LOGRAW("- " + out + "\n");
-    #endif
+    Log::WriteRaw("- " + out + "\n");
 }
 
 void RegisterScriptLibrary(Context* context)

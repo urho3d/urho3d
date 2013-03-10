@@ -46,34 +46,34 @@ static Log* GetLog()
 
 #ifdef ENABLE_LOGGING
 
-static void Print(const String& value)
+static void Print(const String& value, bool error)
 {
-    GetLog()->WriteRaw(value + "\n");
+    Log::WriteRaw(value + "\n", error);
 }
 
-static void Print(int value)
+static void Print(int value, bool error)
 {
-    GetLog()->WriteRaw(String(value) + "\n");
+    Log::WriteRaw(String(value) + "\n", error);
 }
 
-static void Print(unsigned value)
+static void Print(unsigned value, bool error)
 {
-    GetLog()->WriteRaw(String(value) + "\n");
+    Log::WriteRaw(String(value) + "\n", error);
 }
 
-static void Print(float value)
+static void Print(float value, bool error)
 {
-    GetLog()->WriteRaw(String(value) + "\n");
+    Log::WriteRaw(String(value) + "\n", error);
 }
 
-static void Print(bool value)
+static void Print(bool value, bool error)
 {
-    GetLog()->WriteRaw(String(value) + "\n");
+    Log::WriteRaw(String(value) + "\n");
 }
 
-static void LogWrite(const String& str, Log* ptr)
+static void LogWrite(Log* ptr, const String& str, bool error)
 {
-    ptr->WriteRaw(str + "\n");
+    ptr->WriteRaw(str + "\n", error);
 }
 
 static void LogDebug(const String& str, Log* ptr)
@@ -98,12 +98,12 @@ static void LogError(const String& str, Log* ptr)
 
 #else
 
-static void Print(const String& value) {}
-static void Print(int value) {}
-static void Print(unsigned value) {}
-static void Print(float value) {}
-static void Print(bool value) {}
-static void LogWrite(const String& str, Log* ptr) {}
+static void Print(const String& value, bool error) {}
+static void Print(int value, bool error) {}
+static void Print(unsigned value, bool error) {}
+static void Print(float value, bool error) {}
+static void Print(bool value, bool error) {}
+static void LogWrite(Log* ptr, const String& str, bool error) {}
 static void LogDebug(const String& str, Log* ptr) {}
 static void LogInfo(const String& str, Log* ptr) {}
 static void LogWarning(const String& str, Log* ptr) {}
@@ -120,7 +120,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int LOG_NONE", (void*)&LOG_NONE);
     
     RegisterObject<Log>(engine, "Log");
-    engine->RegisterObjectMethod("Log", "void Write(const String&in)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Log", "void Write(const String&in, bool error = false)", asFUNCTION(LogWrite), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("Log", "void Debug(const String&in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Info(const String&in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Warning(const String&in)", asFUNCTION(LogWarning), asCALL_CDECL_OBJLAST);
@@ -135,11 +135,11 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("Log@+ get_log()", asFUNCTION(GetLog), asCALL_CDECL);
     
     // Register also Print() functions for convenience
-    engine->RegisterGlobalFunction("void Print(const String&in)", asFUNCTIONPR(Print, (const String&), void), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void Print(int)", asFUNCTIONPR(Print, (int), void), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void Print(uint)", asFUNCTIONPR(Print, (unsigned), void), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void Print(float)", asFUNCTIONPR(Print, (float), void), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void Print(bool)", asFUNCTIONPR(Print, (bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(const String&in, bool error = false)", asFUNCTIONPR(Print, (const String&, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(int, bool error = false)", asFUNCTIONPR(Print, (int, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(uint, bool error = false)", asFUNCTIONPR(Print, (unsigned, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(float, bool error = false)", asFUNCTIONPR(Print, (float, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(bool, bool error = false)", asFUNCTIONPR(Print, (bool, bool), void), asCALL_CDECL);
 }
 
 static File* ConstructFile()
