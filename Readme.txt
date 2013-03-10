@@ -15,6 +15,7 @@ Urho3D development, contributions and bugfixes by:
 - Carlo Carollo
 - Alex Fuller
 - Jason Kinzer
+- Vladimir Pobedinskij
 - Miika Santala
 - Wei Tjong Yao
 - Magic.Lixin
