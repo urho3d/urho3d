@@ -123,12 +123,8 @@ void Log::Write(int level, const String& message)
 {
     assert(level >= LOG_DEBUG && level < LOG_NONE);
     
-    // Check message level
-    if (level_ > level)
-        return;
-    
-    // Prevent recursion during log event
-    if (inWrite_)
+    // Do not log if message level excluded or if currently sending a log event
+    if (level_ > level || inWrite_)
         return;
     
     {

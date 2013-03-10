@@ -71,29 +71,29 @@ static void Print(bool value, bool error)
     Log::WriteRaw(String(value) + "\n");
 }
 
-static void LogWrite(Log* ptr, const String& str, bool error)
+static void LogWrite(const String& str, bool error, Log* ptr)
 {
-    ptr->WriteRaw(str + "\n", error);
+    Log::WriteRaw(str + "\n", error);
 }
 
 static void LogDebug(const String& str, Log* ptr)
 {
-    ptr->Write(LOG_DEBUG, str);
+    Log::Write(LOG_DEBUG, str);
 }
 
 static void LogInfo(const String& str, Log* ptr)
 {
-    ptr->Write(LOG_INFO, str);
+    Log::Write(LOG_INFO, str);
 }
 
 static void LogWarning(const String& str, Log* ptr)
 {
-    ptr->Write(LOG_WARNING, str);
+    Log::Write(LOG_WARNING, str);
 }
 
 static void LogError(const String& str, Log* ptr)
 {
-    ptr->Write(LOG_ERROR, str);
+    Log::Write(LOG_ERROR, str);
 }
 
 #else
@@ -103,7 +103,7 @@ static void Print(int value, bool error) {}
 static void Print(unsigned value, bool error) {}
 static void Print(float value, bool error) {}
 static void Print(bool value, bool error) {}
-static void LogWrite(Log* ptr, const String& str, bool error) {}
+static void LogWrite(const String& str, bool error, Log* ptr) {}
 static void LogDebug(const String& str, Log* ptr) {}
 static void LogInfo(const String& str, Log* ptr) {}
 static void LogWarning(const String& str, Log* ptr) {}
@@ -120,7 +120,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int LOG_NONE", (void*)&LOG_NONE);
     
     RegisterObject<Log>(engine, "Log");
-    engine->RegisterObjectMethod("Log", "void Write(const String&in, bool error = false)", asFUNCTION(LogWrite), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("Log", "void Write(const String&in, bool error = false)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Debug(const String&in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Info(const String&in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Warning(const String&in)", asFUNCTION(LogWarning), asCALL_CDECL_OBJLAST);

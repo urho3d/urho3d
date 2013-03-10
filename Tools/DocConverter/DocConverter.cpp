@@ -54,6 +54,8 @@ void RemoveAutoLinks(String& line);
 bool IsPageName(const String& str, unsigned startIndex, unsigned endIndex);
 bool IsUpperCamelCase(const String& str, unsigned startIndex, unsigned endIndex);
 
+#define OUTPUTLINE(line) { if (outputFile.IsOpen()) outputFile.WriteLine(line); }
+
 int main(int argc, char** argv)
 {
     Vector<String> arguments;
@@ -94,7 +96,7 @@ void Run(const Vector<String>& arguments)
 
 void ScanPageNames(const String& fileName)
 {
-    PrintUnicodeLine("Scanning document file " + fileName + " for page names");
+    PrintLine("Scanning document file " + fileName + " for page names");
     
     File inputFile(context_, fileName);
     
@@ -104,7 +106,7 @@ void ScanPageNames(const String& fileName)
     
     if (!inputFile.IsOpen())
     {
-        PrintUnicodeLine("WARNING: Failed to open input file " + fileName + ", skipping");
+        PrintLine("WARNING: Failed to open input file " + fileName + ", skipping");
         return;
     }
     
@@ -120,7 +122,7 @@ void ScanPageNames(const String& fileName)
 
 void ProcessFile(const String& fileName)
 {
-    PrintUnicodeLine("Processing document file " + fileName);
+    PrintLine("Processing document file " + fileName);
     
     File inputFile(context_, fileName);
     
@@ -130,7 +132,7 @@ void ProcessFile(const String& fileName)
     
     if (!inputFile.IsOpen())
     {
-        PrintUnicodeLine("WARNING: Failed to open input file " + fileName + ", skipping");
+        PrintLine("WARNING: Failed to open input file " + fileName + ", skipping");
         return;
     }
     
@@ -200,7 +202,7 @@ void ProcessFile(const String& fileName)
                     }
                     else
                     {
-                        PrintUnicodeLine("WARNING: \\ref tag which could not be handled on line " + line);
+                        PrintLine("WARNING: \\ref tag which could not be handled on line " + line);
                         break;
                     }
                 }
@@ -218,40 +220,40 @@ void ProcessFile(const String& fileName)
             {
                 outputFileName = outDir_ + mainPageName_ + ".wiki";
                 if (!outputFile.Open(outputFileName, FILE_WRITE))
-                    PrintUnicodeLine("WARNING: Failed to open output file " + outputFileName);
-                outputFile.WriteLine("#labels featured");
-                outputFile.WriteLine("= " + AssembleString(tokens, 1) + " =");
+                    PrintLine("WARNING: Failed to open output file " + outputFileName);
+                OUTPUTLINE("#labels featured")
+                OUTPUTLINE("= " + AssembleString(tokens, 1) + " =")
             }
             else if (line.StartsWith("\\page") && tokens.Size() > 1)
             {
                 outputFileName = outDir_ + tokens[1] + ".wiki";
                 if (!outputFile.Open(outputFileName, FILE_WRITE))
-                    PrintUnicodeLine("WARNING: Failed to open output file " + outputFileName);
+                    PrintLine("WARNING: Failed to open output file " + outputFileName);
                 if (tokens.Size() > 2)
-                    outputFile.WriteLine("= " + AssembleString(tokens, 2) + " =");
+                    OUTPUTLINE("= " + AssembleString(tokens, 2) + " =")
                 else
-                    outputFile.WriteLine("= " + tokens[1] + " =");
+                    OUTPUTLINE("= " + tokens[1] + " =")
             }
             else if (line.StartsWith("\\section"))
             {
                 if (tokens.Size() > 2)
-                    outputFile.WriteLine("== " + AssembleString(tokens, 2) + " ==");
+                    OUTPUTLINE("== " + AssembleString(tokens, 2) + " ==")
                 else
-                    outputFile.WriteLine("== " + tokens[1] + " ==");
+                    OUTPUTLINE("== " + tokens[1] + " ==")
             }
             else if (line.StartsWith("\\verbatim") || line.StartsWith("\\code"))
             {
-                outputFile.WriteLine("{{{");
+                OUTPUTLINE("{{{")
                 inVerbatim = true;
             }
             else if (line.StartsWith("- "))
-                outputFile.WriteLine(" * " + line.Substring(2));
+                OUTPUTLINE(" * " + line.Substring(2))
             else if (line.StartsWith("  - "))
-                outputFile.WriteLine("   * " + line.Substring(4));
+                OUTPUTLINE("   * " + line.Substring(4))
             else if (line.StartsWith("-# "))
-                outputFile.WriteLine(" * " + line.Substring(3));
+                OUTPUTLINE(" * " + line.Substring(3))
             else
-                outputFile.WriteLine(line);
+                OUTPUTLINE(line)
             
         }
         else
