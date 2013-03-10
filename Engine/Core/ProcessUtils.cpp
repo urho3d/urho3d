@@ -130,7 +130,7 @@ void ErrorDialog(const String& title, const String& message)
 
 void ErrorExit(const String& message, int exitCode)
 {
-    PrintLine(message);
+    PrintLine(message, true);
     exit(exitCode);
 }
 

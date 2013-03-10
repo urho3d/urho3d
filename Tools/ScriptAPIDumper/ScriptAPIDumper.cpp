@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     
     String outputFile;
     if (GetArguments().Size() < 1)
-        Log::WriteRaw("Usage: ScriptAPIDumper [output file]\n", true);  // Print usage message to stderr
+        PrintLine("Usage: ScriptAPIDumper [output file]\n", true);  // Print usage message to stderr
     else
         outputFile = GetArguments()[0];
 
