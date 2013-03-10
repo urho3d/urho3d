@@ -42,7 +42,7 @@ class Application : public Object
     
 public:
     Application(Context* context);
-    int Run(const String& scriptFileName);
+    int Run();
     
 private:
     void ErrorExit();
@@ -56,60 +56,11 @@ int Run()
 {
     try
     {
-        // Check for script file name
-        const Vector<String>& arguments = GetArguments();
-        String scriptFileName;
-        for (unsigned i = 0; i < arguments.Size(); ++i)
-        {
-            if (arguments[i][0] != '-')
-            {
-                scriptFileName = GetInternalPath(arguments[i]);
-                break;
-            }
-        }
-        
-        #if defined(ANDROID) || defined(IOS)
-        // Can not pass script name on mobile devices, so choose a hardcoded default
-        scriptFileName = "Scripts/NinjaSnowWar.as";
-        #endif
-        
-        // Show usage if not found
-        if (scriptFileName.Empty())
-        {
-            ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
-                "The script file should implement the function void Start() for initializing the "
-                "application and subscribing to all necessary events, such as the frame update.\n"
-                #ifndef WIN32
-                "\nCommand line options:\n"
-                "-x<res>     Horizontal resolution\n"
-                "-y<res>     Vertical resolution\n"
-                "-m<level>   Enable hardware multisampling\n"
-                "-v          Enable vertical sync\n"
-                "-t          Enable triple buffering\n"
-                "-w          Start in windowed mode\n"
-                "-s          Enable resizing when in windowed mode\n"
-                "-q          Enable quiet mode which does not log to standard output stream\n"
-                "-b<length>  Sound buffer length in milliseconds\n"
-                "-r<freq>    Sound mixing frequency in Hz\n"
-                "-headless   Headless mode. No application window will be created\n"
-                "-log<level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'\n"
-                "-lqshadows  Use low-quality (1-sample) shadow filtering\n"
-                "-noshadows  Disable shadow rendering\n"
-                "-nolimit    Disable frame limiter\n"
-                "-nothreads  Disable worker threads\n"
-                "-nosound    Disable sound output\n"
-                "-noip       Disable sound mixing interpolation\n"
-                "-sm2        Force SM2.0 rendering\n"
-                #endif
-            );
-            return EXIT_FAILURE;
-        }
-        
         // Create the execution context and the application object. The application object is needed to subscribe to events
         // which allow to live-reload the script.
         SharedPtr<Context> context(new Context());
         SharedPtr<Application> application(new Application(context));
-        return application->Run(scriptFileName);
+        return application->Run();
     }
     catch (std::bad_alloc&)
     {
@@ -126,10 +77,61 @@ Application::Application(Context* context) :
 {
 }
 
-int Application::Run(const String& scriptFileName)
+int Application::Run()
 {
+    // Check for script file name
+    const Vector<String>& arguments = GetArguments();
+    String scriptFileName;
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i][0] != '-')
+        {
+            scriptFileName = GetInternalPath(arguments[i]);
+            break;
+        }
+    }
+    
+    #if defined(ANDROID) || defined(IOS)
+    // Can not pass script name on mobile devices, so choose a hardcoded default
+    scriptFileName = "Scripts/NinjaSnowWar.as";
+    #endif
+    
+    // Show usage if not found
+    if (scriptFileName.Empty())
+    {
+        ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
+            "The script file should implement the function void Start() for initializing the "
+            "application and subscribing to all necessary events, such as the frame update.\n"
+            #ifndef WIN32
+            "\nCommand line options:\n"
+            "-x<res>     Horizontal resolution\n"
+            "-y<res>     Vertical resolution\n"
+            "-m<level>   Enable hardware multisampling\n"
+            "-v          Enable vertical sync\n"
+            "-t          Enable triple buffering\n"
+            "-w          Start in windowed mode\n"
+            "-s          Enable resizing when in windowed mode\n"
+            "-q          Enable quiet mode which does not log to standard output stream\n"
+            "-b<length>  Sound buffer length in milliseconds\n"
+            "-r<freq>    Sound mixing frequency in Hz\n"
+            "-headless   Headless mode. No application window will be created\n"
+            "-log<level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'\n"
+            "-prepass    Use light pre-pass rendering\n"
+            "-deferred   Use deferred rendering\n"
+            "-lqshadows  Use low-quality (1-sample) shadow filtering\n"
+            "-noshadows  Disable shadow rendering\n"
+            "-nolimit    Disable frame limiter\n"
+            "-nothreads  Disable worker threads\n"
+            "-nosound    Disable sound output\n"
+            "-noip       Disable sound mixing interpolation\n"
+            "-sm2        Force SM2.0 rendering\n"
+            #endif
+        );
+        return EXIT_FAILURE;
+    }
+    
     SharedPtr<Engine> engine(new Engine(context_));
-    if (engine->Initialize("Urho3D", "Urho3D.log", GetArguments()))
+    if (engine->Initialize("Urho3D", "Urho3D.log", arguments))
     {
         // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
         engine->InitializeScripting();
