@@ -529,21 +529,29 @@ void HandleSceneWindowSelectionChange()
         editNode = commonNode;
     }
     
-    // Now check if the component(s) can be edited. If many selected, must have same type
+    // Now check if the component(s) can be edited. If many selected, must have same type or have same edit node
     if (!selectedComponents.empty)
     {
-        ShortStringHash compType = selectedComponents[0].type;
-        bool sameType = true;
-        for (uint i = 1; i < selectedComponents.length; ++i)
+        if (editNode is null)
         {
-            if (selectedComponents[i].type != compType)
+            ShortStringHash compType = selectedComponents[0].type;
+            bool sameType = true;
+            for (uint i = 1; i < selectedComponents.length; ++i)
             {
-                sameType = false;
-                break;
+                if (selectedComponents[i].type != compType)
+                {
+                    sameType = false;
+                    break;
+                }
             }
+            if (sameType)
+                editComponents = selectedComponents;
         }
-        if (sameType)
+        else
+        {
             editComponents = selectedComponents;
+            numEditableComponentsPerNode = selectedComponents.length;
+        }
     }
     
     // If just nodes selected, and no components, show as many matching components for editing as possible

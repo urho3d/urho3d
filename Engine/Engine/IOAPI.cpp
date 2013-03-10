@@ -68,7 +68,7 @@ static void Print(float value, bool error)
 
 static void Print(bool value, bool error)
 {
-    Log::WriteRaw(String(value) + "\n");
+    Log::WriteRaw(String(value) + "\n", error);
 }
 
 static void LogWrite(const String& str, bool error, Log* ptr)

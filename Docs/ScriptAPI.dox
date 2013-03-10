@@ -751,9 +751,9 @@ VariantMap
 
 Methods:<br>
 - bool Contains(const String&) const
-- void Erase(const String&)
+- bool Erase(const String&)
 - bool Contains(ShortStringHash) const
-- void Erase(ShortStringHash)
+- bool Erase(ShortStringHash)
 - void Clear()
 
 Properties:<br>

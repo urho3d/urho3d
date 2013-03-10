@@ -34,7 +34,7 @@ UIElement@ SetEditable(UIElement@ element, bool editable)
 
 UIElement@ SetValue(LineEdit@ element, const String&in value, bool sameValue)
 {
-    element.text = sameValue ? value : "---";
+    element.text = sameValue ? value : STRIKED_OUT;
     element.cursorPosition = 0;
     return element;
 }

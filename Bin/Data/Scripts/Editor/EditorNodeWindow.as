@@ -3,12 +3,15 @@
 
 Window@ nodeWindow;
 UIElement@ componentParentContainer;
+XMLFile@ componentXMLResource;
 
 bool applyMaterialList = true;
 
+const String STRIKED_OUT = "---";
+
 void AddComponentContainer()
 {
-    componentParentContainer.LoadXML(cache.GetResource("XMLFile", "UI/EditorComponent.xml"), uiStyle);
+    componentParentContainer.LoadXML(componentXMLResource, uiStyle);
 }
 
 void DeleteAllComponentContainers()
@@ -30,6 +33,7 @@ void CreateNodeWindow()
     InitVectorStructs();
 
     nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"), uiStyle);
+    componentXMLResource = cache.GetResource("XMLFile", "UI/EditorComponent.xml");
     componentParentContainer = nodeWindow.GetChild("ComponentParentContainer", true);
     AddComponentContainer();
     ui.root.AddChild(nodeWindow);
@@ -56,41 +60,50 @@ void ShowNodeWindow()
     nodeWindow.BringToFront();
 }
 
+void AppendID(String&inout localIds, String&inout ids, Node@ node)
+{
+    if (node.id >= FIRST_LOCAL_ID)
+        localIds += " " + String(node.id - FIRST_LOCAL_ID);
+    else
+        ids += " " + String(node.id);
+}
+
 void UpdateNodeWindow()
 {
     // If a resource pick was in progress, it cannot be completed now, as component was changed
     PickResourceCanceled();
 
     Text@ nodeTitle = nodeWindow.GetChild("NodeTitle", true);
-
-    if (editNode is null)
-    {
-        if (selectedNodes.length <= 1)
-            nodeTitle.text = "No node";
-        else
-            nodeTitle.text = selectedNodes.length + " nodes";
-    }
-    else
+    if (editNodes.length == 0)
+        nodeTitle.text = "No node";
+    else if (editNode !is null)
     {
         String idStr;
         if (editNode.id >= FIRST_LOCAL_ID)
-            idStr = "Local ID " + String(editNode.id - FIRST_LOCAL_ID);
+            idStr = " Local ID " + String(editNode.id - FIRST_LOCAL_ID);
         else
-            idStr = "ID " + String(editNode.id);
-        nodeTitle.text = editNode.typeName + " (" + idStr + ")";
+            idStr = " ID " + String(editNode.id);
+        nodeTitle.text = editNode.typeName + idStr;
     }
+    else
+        nodeTitle.text = editNodes[0].typeName + " ID " + STRIKED_OUT + " (" + editNodes.length + "x)";
 
     UpdateAttributes(true);
+}
+
+Array<Serializable@> ToSerializableArray(Array<Node@> nodes)
+{
+    Array<Serializable@> serializables;
+    for (uint i = 0; i < nodes.length; ++i)
+        serializables.Push(nodes[i]);
+    return serializables;
 }
 
 void UpdateAttributes(bool fullUpdate)
 {
     if (nodeWindow !is null)
     {
-        Array<Serializable@> nodes;
-        if (editNode !is null)
-            nodes.Push(editNode);
-        UpdateAttributes(nodes, nodeWindow.GetChild("NodeAttributeList", true), fullUpdate);
+        UpdateAttributes(ToSerializableArray(editNodes), nodeWindow.GetChild("NodeAttributeList", true), fullUpdate);
 
         if (fullUpdate)
             DeleteAllComponentContainers();
@@ -135,18 +148,18 @@ void UpdateNodeAttributes()
 {
     if (nodeWindow !is null)
     {
-        Array<Serializable@> nodes;
-        if (editNode !is null)
-            nodes.Push(editNode);
-        UpdateAttributes(nodes, nodeWindow.GetChild("NodeAttributeList", true), false);
+        UpdateAttributes(ToSerializableArray(editNodes), nodeWindow.GetChild("NodeAttributeList", true), false);
     }
 }
 
 void PostEditAttribute(Array<Serializable@>@ serializables, uint index)
 {
     // If node name changed, update it in the scene window also
-    if (serializables[0] is editNode && serializables[0].attributeInfos[index].name == "Name")
-        UpdateSceneWindowNodeOnly(editNode);
+    if (serializables[0].attributeInfos[index].name == "Name")
+    {
+        for (uint i = 0; i < serializables.length; ++i)
+            UpdateSceneWindowNodeOnly(serializables[i]);
+    }
 
     // If a StaticModel/AnimatedModel/Skybox model was changed, apply a possibly different material list
     if (applyMaterialList && serializables[0].attributeInfos[index].name == "Model")
@@ -209,7 +222,7 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
 
 void CreateNewVariable(StringHash eventType, VariantMap& eventData)
 {
-    if (editNode is null)
+    if (editNodes.length == 0)
         return;
 
     DropDownList@ dropDown = eventData["Element"].GetUIElement();
@@ -244,14 +257,18 @@ void CreateNewVariable(StringHash eventType, VariantMap& eventData)
     }
 
     // If we overwrite an existing variable, must recreate the editor(s) for the correct type
-    bool overwrite = editNode.vars.Contains(sanitatedVarName);
-    editNode.vars[sanitatedVarName] = newValue;
+    bool overwrite = false;
+    for (uint i = 0; i < editNodes.length; ++i)
+    {
+        overwrite = overwrite || editNodes[i].vars.Contains(sanitatedVarName);
+        editNodes[i].vars[sanitatedVarName] = newValue;
+    }
     UpdateAttributes(overwrite);
 }
 
 void DeleteVariable(StringHash eventType, VariantMap& eventData)
 {
-    if (editNode is null)
+    if (editNodes.length == 0)
         return;
 
     LineEdit@ nameEdit = nodeWindow.GetChild("VarNameEdit", true);
@@ -259,6 +276,12 @@ void DeleteVariable(StringHash eventType, VariantMap& eventData)
     if (sanitatedVarName.empty)
         return;
 
-    editNode.vars.Erase(sanitatedVarName);
-    UpdateAttributes(false);
+    bool erased = false;
+    for (uint i = 0; i < editNodes.length; ++i)
+    {
+        // \todo Should first check whether var in question is editable
+        erased = editNodes[i].vars.Erase(sanitatedVarName) || erased;
+    }
+    if (erased)
+        UpdateAttributes(false);
 }

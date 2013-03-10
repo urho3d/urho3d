@@ -364,9 +364,9 @@ static bool VariantMapContains(const String& key, VariantMap& map)
     return map.Contains(ShortStringHash(key));
 }
 
-static void VariantMapErase(const String& key, VariantMap& map)
+static bool VariantMapErase(const String& key, VariantMap& map)
 {
-    map.Erase(ShortStringHash(key));
+    return map.Erase(ShortStringHash(key));
 }
 
 static bool VariantMapContainsHash(ShortStringHash key, VariantMap& map)
@@ -374,9 +374,9 @@ static bool VariantMapContainsHash(ShortStringHash key, VariantMap& map)
     return map.Contains(key);
 }
 
-static void VariantMapEraseHash(ShortStringHash key, VariantMap& map)
+static bool VariantMapEraseHash(ShortStringHash key, VariantMap& map)
 {
-    map.Erase(key);
+    return map.Erase(key);
 }
 
 static CScriptArray* VariantMapGetKeys(const VariantMap& map)
@@ -530,9 +530,9 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(ShortStringHash)", asFUNCTION(VariantMapAtHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(ShortStringHash) const", asFUNCTION(VariantMapAtHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "bool Contains(const String&in) const", asFUNCTION(VariantMapContains), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "void Erase(const String&in)", asFUNCTION(VariantMapErase), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "bool Erase(const String&in)", asFUNCTION(VariantMapErase), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "bool Contains(ShortStringHash) const", asFUNCTION(VariantMapContainsHash), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "void Erase(ShortStringHash)", asFUNCTION(VariantMapEraseHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "bool Erase(ShortStringHash)", asFUNCTION(VariantMapEraseHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHOD(VariantMap, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, Size), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "Array<ShortStringHash>@ get_keys() const", asFUNCTION(VariantMapGetKeys), asCALL_CDECL_OBJLAST);

@@ -344,6 +344,9 @@ bool SceneDelete()
 
     BeginSelectionModify();
     ListView@ list = sceneWindow.GetChild("NodeList", true);
+    
+    // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
+    list.ClearSelection();
 
     // Remove nodes
     for (uint i = 0; i < selectedNodes.length; ++i)
