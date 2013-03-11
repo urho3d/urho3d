@@ -176,17 +176,20 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
 
 void ScrollView::OnResize()
 {
-    IntVector2 panelSize = GetSize();
-    if (verticalScrollBar_->IsVisible())
-        panelSize.x_ -= verticalScrollBar_->GetWidth();
-    if (horizontalScrollBar_->IsVisible())
-        panelSize.y_ -= horizontalScrollBar_->GetHeight();
-    
-    scrollPanel_->SetSize(panelSize);
-    horizontalScrollBar_->SetWidth(scrollPanel_->GetWidth());
-    verticalScrollBar_->SetHeight(scrollPanel_->GetHeight());
-    
+    UpdatePanelSize();
     UpdateViewSize();
+    
+    // If scrollbar autovisibility is enabled, check whether scrollbars should be visible.
+    // This may force another update of the panel size
+    if (scrollBarsAutoVisible_)
+    {
+        ignoreEvents_ = true;
+        horizontalScrollBar_->SetVisible(horizontalScrollBar_->GetRange() > M_EPSILON);
+        verticalScrollBar_->SetVisible(verticalScrollBar_->GetRange() > M_EPSILON);
+        ignoreEvents_ = false;
+        
+        UpdatePanelSize();
+    }
 }
 
 void ScrollView::SetContentElement(UIElement* element)
@@ -206,7 +209,7 @@ void ScrollView::SetContentElement(UIElement* element)
         SubscribeToEvent(contentElement_, E_RESIZED, HANDLER(ScrollView, HandleElementResized));
     }
     
-    UpdateViewSize();
+    OnResize();
 }
 
 void ScrollView::SetViewPosition(const IntVector2& position)
@@ -222,14 +225,20 @@ void ScrollView::SetViewPosition(int x, int y)
 
 void ScrollView::SetScrollBarsVisible(bool horizontal, bool vertical)
 {
+    scrollBarsAutoVisible_ = false;
     horizontalScrollBar_->SetVisible(horizontal);
     verticalScrollBar_->SetVisible(vertical);
-    scrollBarsAutoVisible_ = false;
 }
 
 void ScrollView::SetScrollBarsAutoVisible(bool enable)
 {
-    scrollBarsAutoVisible_ = enable;
+    if (enable != scrollBarsAutoVisible_)
+    {
+        scrollBarsAutoVisible_ = enable;
+        // Check whether scrollbars should be visible now
+        if (enable)
+            OnResize();
+    }
 }
 
 void ScrollView::SetScrollStep(float step)
@@ -254,6 +263,25 @@ void ScrollView::SetViewPositionAttr(const IntVector2& value)
     SetViewPosition(value);
 }
 
+void ScrollView::UpdatePanelSize()
+{
+    // Ignore events in case content element resizes itself along with the panel
+    // (content element resize triggers our OnResize(), so it could lead to infinite recursion)
+    ignoreEvents_ = true;
+    
+    IntVector2 panelSize = GetSize();
+    if (verticalScrollBar_->IsVisible())
+        panelSize.x_ -= verticalScrollBar_->GetWidth();
+    if (horizontalScrollBar_->IsVisible())
+        panelSize.y_ -= horizontalScrollBar_->GetHeight();
+    
+    scrollPanel_->SetSize(panelSize);
+    horizontalScrollBar_->SetWidth(scrollPanel_->GetWidth());
+    verticalScrollBar_->SetHeight(scrollPanel_->GetHeight());
+    
+    ignoreEvents_ = false;
+}
+
 void ScrollView::UpdateViewSize()
 {
     IntVector2 size(IntVector2::ZERO);
@@ -263,13 +291,13 @@ void ScrollView::UpdateViewSize()
     
     viewSize_.x_ = Max(size.x_, scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
     viewSize_.y_ = Max(size.y_, scrollPanel_->GetHeight() - panelBorder.top_ - panelBorder.bottom_);
+    
     UpdateView(viewPosition_);
     UpdateScrollBars();
 }
 
 void ScrollView::UpdateScrollBars()
 {
-    bool needResize = false;
     ignoreEvents_ = true;
     
     IntVector2 size = scrollPanel_->GetSize();
@@ -283,10 +311,6 @@ void ScrollView::UpdateScrollBars()
         horizontalScrollBar_->SetRange(range);
         horizontalScrollBar_->SetValue((float)viewPosition_.x_ / (float)size.x_);
         horizontalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.x_);
-        
-        // Hide/show the horizontal scroll bar as needed
-        if (scrollBarsAutoVisible_)
-            needResize = SetScrollBarVisible(horizontalScrollBar_, range > 0.0f);
     }
     if (verticalScrollBar_ && size.y_ > 0 && viewSize_.y_ > 0)
     {
@@ -294,18 +318,9 @@ void ScrollView::UpdateScrollBars()
         verticalScrollBar_->SetRange(range);
         verticalScrollBar_->SetValue((float)viewPosition_.y_ / (float)size.y_);
         verticalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.y_);
-        
-        // Hide/show the vertical scroll bar as needed
-        if (scrollBarsAutoVisible_)
-            needResize = SetScrollBarVisible(verticalScrollBar_, range > 0.0f) || needResize;
     }
     
     ignoreEvents_ = false;
-    
-    // Since the scrollbar visibility changed event is intentionally ignored to prevent
-    // infinite loop in the above code, call OnResize now if needed
-    if (needResize)
-        OnResize();
 }
 
 void ScrollView::UpdateView(const IntVector2& position)
@@ -331,22 +346,15 @@ void ScrollView::UpdateView(const IntVector2& position)
     }
 }
 
-bool ScrollView::SetScrollBarVisible(ScrollBar* scrollBar, bool visible)
-{
-    bool oldVisible = scrollBar->IsVisible();
-    scrollBar->SetVisible(visible);
-    return oldVisible != scrollBar->IsVisible();
-}
-
 void ScrollView::HandleScrollBarChanged(StringHash eventType, VariantMap& eventData)
 {
-    IntVector2 size = scrollPanel_->GetSize();
-    IntRect panelBorder = scrollPanel_->GetClipBorder();
-    size.x_ -= panelBorder.left_ + panelBorder.right_;
-    size.y_ -= panelBorder.top_ + panelBorder.bottom_;
-    
     if (!ignoreEvents_)
     {
+        IntVector2 size = scrollPanel_->GetSize();
+        IntRect panelBorder = scrollPanel_->GetClipBorder();
+        size.x_ -= panelBorder.left_ + panelBorder.right_;
+        size.y_ -= panelBorder.top_ + panelBorder.bottom_;
+        
         UpdateView(IntVector2(
             (int)(horizontalScrollBar_->GetValue() * (float)size.x_),
             (int)(verticalScrollBar_->GetValue() * (float)size.y_)
@@ -363,7 +371,8 @@ void ScrollView::HandleScrollBarVisibleChanged(StringHash eventType, VariantMap&
 
 void ScrollView::HandleElementResized(StringHash eventType, VariantMap& eventData)
 {
-    UpdateViewSize();
+    if (!ignoreEvents_)
+        OnResize();
 }
 
 }

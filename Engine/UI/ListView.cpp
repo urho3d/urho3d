@@ -132,7 +132,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_UP:
             delta = -1;
             break;
-
+            
         case KEY_DOWN:
             delta = 1;
             break;
@@ -140,7 +140,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_PAGEUP:
             pageDirection = -1;
             // Fallthru
-
+            
         case KEY_PAGEDOWN:
             {
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
@@ -201,6 +201,11 @@ void ListView::OnResize()
     // Set the content element width to match the scrollpanel minus clipping
     IntRect panelBorder = scrollPanel_->GetClipBorder();
     contentElement_->SetWidth(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
+    
+    // If scrollbar autovisibility is enabled, need one final pass to correct the view
+    /// \todo Rework, this is inefficient
+    if (scrollBarsAutoVisible_)
+        ScrollView::OnResize();
 }
 
 void ListView::AddItem(UIElement* item)

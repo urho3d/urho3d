@@ -88,7 +88,9 @@ public:
     void SetViewPositionAttr(const IntVector2& value);
     
 protected:
-    /// Update view size from the content element.
+    /// Resize panel based on scrollbar visibility.
+    void UpdatePanelSize();
+    /// Recalculate view size, validate view position and update scrollbars.
     void UpdateViewSize();
     /// Update the scrollbars' ranges and positions.
     void UpdateScrollBars();
@@ -117,8 +119,6 @@ protected:
     bool ignoreEvents_;
     
 private:
-    /// Return true when scrollbar has the visible flag toggled.
-    static bool SetScrollBarVisible(ScrollBar* scrollBar, bool visible);
     /// Handle scrollbar value changed.
     void HandleScrollBarChanged(StringHash eventType, VariantMap& eventData);
     /// Handle scrollbar visibility changed.
