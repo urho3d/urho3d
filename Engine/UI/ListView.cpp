@@ -68,6 +68,8 @@ ListView::ListView(Context* context) :
     doubleClickInterval_(500),
     lastClickedItem_(M_MAX_UNSIGNED)
 {
+    resizeContentWidth_ = true;
+    
     UIElement* container = new UIElement(context_);
     container->SetInternal(true);
     container->SetActive(true);
@@ -192,20 +194,6 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     eventData[P_BUTTONS] = buttons;
     eventData[P_QUALIFIERS] = qualifiers;
     SendEvent(E_UNHANDLEDKEY, eventData);
-}
-
-void ListView::OnResize()
-{
-    ScrollView::OnResize();
-    
-    // Set the content element width to match the scrollpanel minus clipping
-    IntRect panelBorder = scrollPanel_->GetClipBorder();
-    contentElement_->SetWidth(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
-    
-    // If scrollbar autovisibility is enabled, need one final pass to correct the view
-    /// \todo Rework, this is inefficient
-    if (scrollBarsAutoVisible_)
-        ScrollView::OnResize();
 }
 
 void ListView::AddItem(UIElement* item)

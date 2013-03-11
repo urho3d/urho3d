@@ -44,7 +44,8 @@ ScrollView::ScrollView(Context* context) :
     viewPositionAttr_(IntVector2::ZERO),
     pageStep_(1.0f),
     scrollBarsAutoVisible_(true),
-    ignoreEvents_(false)
+    ignoreEvents_(false),
+    resizeContentWidth_(false)
 {
     clipChildren_ = true;
     active_ = true;
@@ -278,6 +279,12 @@ void ScrollView::UpdatePanelSize()
     scrollPanel_->SetSize(panelSize);
     horizontalScrollBar_->SetWidth(scrollPanel_->GetWidth());
     verticalScrollBar_->SetHeight(scrollPanel_->GetHeight());
+    
+    if (resizeContentWidth_ && contentElement_)
+    {
+        IntRect panelBorder = scrollPanel_->GetClipBorder();
+        contentElement_->SetWidth(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
+    }
     
     ignoreEvents_ = false;
 }

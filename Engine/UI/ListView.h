@@ -54,8 +54,6 @@ public:
     
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
-    /// React to resize.
-    virtual void OnResize();
     
     /// Add item to the end of the list.
     void AddItem(UIElement* item);

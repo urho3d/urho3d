@@ -117,6 +117,8 @@ protected:
     bool scrollBarsAutoVisible_;
     /// Ignore scrollbar events flag. Used to prevent possible endless loop when resizing.
     bool ignoreEvents_;
+    /// Resize content widget width to match panel. Internal flag, used by the ListView class.
+    bool resizeContentWidth_;
     
 private:
     /// Handle scrollbar value changed.
