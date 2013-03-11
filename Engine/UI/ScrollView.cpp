@@ -305,14 +305,14 @@ void ScrollView::UpdateScrollBars()
     size.x_ -= panelBorder.left_ + panelBorder.right_;
     size.y_ -= panelBorder.top_ + panelBorder.bottom_;
     
-    if (horizontalScrollBar_ && size.x_ > 0 && viewSize_.x_ > 0)
+    if (size.x_ > 0 && viewSize_.x_ > 0)
     {
         float range = (float)viewSize_.x_ / (float)size.x_ - 1.0f;
         horizontalScrollBar_->SetRange(range);
         horizontalScrollBar_->SetValue((float)viewPosition_.x_ / (float)size.x_);
         horizontalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.x_);
     }
-    if (verticalScrollBar_ && size.y_ > 0 && viewSize_.y_ > 0)
+    if (size.y_ > 0 && viewSize_.y_ > 0)
     {
         float range = (float)viewSize_.y_ / (float)size.y_ - 1.0f;
         verticalScrollBar_->SetRange(range);
