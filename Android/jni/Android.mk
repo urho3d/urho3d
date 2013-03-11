@@ -5,6 +5,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := AngelScript
 
+LOCAL_ARM_MODE := arm
+
 LOCAL_SRC_FILES := \
     $(subst $(LOCAL_PATH)/,, \
     $(wildcard $(LOCAL_PATH)/source/*.cpp) \
