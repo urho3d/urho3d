@@ -3,7 +3,7 @@
 -- Use export OgreMaterial.
 function writeOgreMaterial material outname =
 (
-	local t, matname, mat, ext;
+	local t, matname, mat, ext ;
 
 	mat = material ;
 	local outFile ;
@@ -16,14 +16,71 @@ function writeOgreMaterial material outname =
 		outFile = createfile fname ;
 
 		format "<material>\n" to:outFile ;
-		format "    <technique name=\"Techniques/Diff.xml\" />\n" to:outFile ;
-		format "    <parameter name=\"MatDiffColor\" value=\"% % % 1\" />\n" (material.diffuse.r/255.0) (material.diffuse.g/255.0) (material.diffuse.b/255.0) to:outFile ;
-		format "    <parameter name=\"MatSpecColor\" value=\"% % % %\" />\n" (material.specular.r/255.0) (material.specular.g/255.0) (material.specular.b/255.0) (material.specularLevel*100.0) to:outFile ;
+		
+		local tname="NoTexture" ;
+		
 		if ((material.diffusemap != undefined) and (iskindof material.diffusemap Bitmaptexture)) then
-		(	
-			t = filterstring material.diffusemap.filename "\\" ;
-			format "    <texture unit=\"diffuse\" name=\"textures%\" />\n" t[arrayLength t] to:outFile ;
+		(
+			tname = "Diff" ;
+			
+			if ((material.bumpMap != undefined) and (iskindof material.bumpMap Bitmaptexture)) then
+			(
+				tname = tname + "Normal" ;
+				
+				if (material.specularLevel != 0.0) then
+				(
+					tname = tname + "Spec" ;
+				)
+				
+				if ((material.opacityMap != undefined) and (iskindof material.opacityMap Bitmaptexture)) then
+				(
+					tname = tname + "AlphaMask" ;
+				)
+			)
+			else
+			(
+				if (material.specularLevel != 0.0) then
+				(
+					tname = tname + "Spec" ;
+				)
+				if ((material.opacityMap != undefined) and (iskindof material.opacityMap Bitmaptexture)) then
+				(
+					tname = tname + "AlphaMask" ;
+				)
+			)
+			
+			format "    <technique name=\"Techniques/%.xml\" />\n" (tname) to:outFile ;
 		)
+		else
+		(
+			if (material.opacity != 100.0) then
+			(
+				tname = tname + "Alpha" ;
+			)
+			
+			format "    <technique name=\"Techniques/%.xml\" />\n" (tname) to:outFile ;
+		)
+		
+		format "    <parameter name=\"MatDiffColor\" value=\"% % % %\" />\n" (material.diffuse.r/255.0) (material.diffuse.g/255.0) (material.diffuse.b/255.0) ((100-material.opacity)/100.0) to:outFile ;
+		format "    <parameter name=\"MatSpecColor\" value=\"% % % %\" />\n" (material.specular.r/255.0) (material.specular.g/255.0) (material.specular.b/255.0) (material.specularLevel*100.0) to:outFile ;
+		
+		if ((material.diffusemap != undefined) and (iskindof material.diffusemap Bitmaptexture)) then
+		(
+			t = filterstring material.diffusemap.filename "\\" ;
+			format "    <texture unit=\"diffuse\" name=\"textures/%\" />\n" t[arrayLength t] to:outFile ;
+		)
+		
+		if ((material.bumpMap != undefined) and (iskindof material.bumpMap Bitmaptexture)) then
+		(
+			t = filterstring material.diffusemap.filename "\\" ;
+			format "    <texture unit=\"normal\" name=\"textures/%\" />\n" t[arrayLength t] to:outFile ;
+		)
+		
+		if ((material.opacityMap != undefined) and (iskindof material.opacityMap Bitmaptexture)) then
+		(
+			tname = tname + "AlphaMask" ;
+		)
+		
 		format "</material>\n" to:outFile ;
 		close outFile ;
 	)
@@ -35,7 +92,7 @@ function exportOgreMaterial material outName =
 	if (classof material == OgreMaterial or classof material == ogreMaterial) then
 	(
 	    --outFile = createfile outName ;
-		writeOgreMaterial material outname;
+		writeOgreMaterial material outname ;
 		--close outFile ;
 	)
 	else
@@ -52,22 +109,76 @@ function exportOgreMaterial material outName =
 function writeStandardMaterial material outname =
 (
 	local outFile ;
-	local t, matname, mat, ext, fname;
+	local t, matname, mat, ext, fname ;
 	
 	matname = replaceSpaces material.name ;
 	ext = ".mat.xml" ;
 	fname = outname + "_" + matname + ext ;
-	outFile = createfile fname;
+	outFile = createfile fname ;
 	format "<material>\n" to:outFile ;
-	format "    <technique name=\"Techniques/Diff.xml\" />\n" to:outFile ;
-	format "    <parameter name=\"MatDiffColor\" value=\"% % % 1\" />\n" (material.diffuse.r/255.0) (material.diffuse.g/255.0) (material.diffuse.b/255.0) to:outFile ;
-	format "    <parameter name=\"MatSpecColor\" value=\"% % % %\" />\n" (material.specular.r/255.0) (material.specular.g/255.0) (material.specular.b/255.0) (material.specularLevel*100.0) to:outFile ;
+	
+	local tname="NoTexture" ;
+	
 	if ((material.diffusemap != undefined) and (iskindof material.diffusemap Bitmaptexture)) then
-	(	
+	(
+		tname = "Diff" ;
+		
+		if ((material.bumpMap != undefined) and (iskindof material.bumpMap Bitmaptexture)) then
+		(
+			tname = tname + "Normal" ;
+			
+			if (material.specularLevel != 0.0) then
+			(
+				tname = tname + "Spec" ;
+			)
+			
+			if ((material.opacityMap != undefined) and (iskindof material.opacityMap Bitmaptexture)) then
+			(
+				tname = tname + "AlphaMask" ;
+			)
+		)
+		else
+		(
+			if (material.specularLevel != 0.0) then
+			(
+				tname = tname + "Spec" ;
+			)
+			if ((material.opacityMap != undefined) and (iskindof material.opacityMap Bitmaptexture)) then
+			(
+				tname = tname + "AlphaMask" ;
+			)
+		)
+		
+		format "    <technique name=\"Techniques/%.xml\" />\n" (tname) to:outFile ;
+	)
+	else
+	(
+		if (material.opacity != 100.0) then
+		(
+			tname = tname + "Alpha" ;
+		)
+		
+		format "    <technique name=\"Techniques/%.xml\" />\n" (tname) to:outFile ;
+	)
+	
+	format "    <parameter name=\"MatDiffColor\" value=\"% % % %\" />\n" (material.diffuse.r/255.0) (material.diffuse.g/255.0) (material.diffuse.b/255.0) ((100-material.opacity)/100.0) to:outFile ;
+	format "    <parameter name=\"MatSpecColor\" value=\"% % % %\" />\n" (material.specular.r/255.0) (material.specular.g/255.0) (material.specular.b/255.0) (material.specularLevel*100.0) to:outFile ;
+	
+	if ((material.diffusemap != undefined) and (iskindof material.diffusemap Bitmaptexture)) then
+	(
 		t = filterstring material.diffusemap.filename "\\" ;
 		format "    <texture unit=\"diffuse\" name=\"textures/%\" />\n" t[arrayLength t] to:outFile ;
 	)
+	
+	if ((material.bumpMap != undefined) and (iskindof material.bumpMap Bitmaptexture)) then
+	(
+		t = filterstring material.diffusemap.filename "\\" ;
+		format "    <texture unit=\"normal\" name=\"textures/%\" />\n" t[arrayLength t] to:outFile ;
+	)
+	
+	
 	format "</material>\n" to:outFile ;
+
 	close outFile ;
 )
 
@@ -116,18 +227,18 @@ function exportMaterial material outname =
 		
 	if (material!=undefined and classof material == MultiMaterial) then
 	(
-		exportMultiMaterial material outname;
+		exportMultiMaterial material outname ;
 	)
 	else 
 	(
 		if (material!=undefined and classof material == StandardMaterial) then
 		(
-			exportStandardMaterial material outname;
+			exportStandardMaterial material outname ;
 		)
 		else
 		(
 			messageBox "You have to choose a Standard Material or a MultiMaterial." ;
-			return 0;
+			return 0 ;
 		)
 	)
 	--messageBox "Exporting material successful !" ;
@@ -142,10 +253,10 @@ function exportAllSceneMaterials outname =
 	for material in sceneMaterials do
 	(			
 		if (material!=undefined and classof material == MultiMaterial) then
-			exportMultiMaterial material outname;
+			exportMultiMaterial material outname ;
 		else (
 			if (material!=undefined and classof material == StandardMaterial) then
-				exportStandardMaterial material outname;
+				exportStandardMaterial material outname ;
 		)
 		format "\n" to:outFile ;
 	)		
