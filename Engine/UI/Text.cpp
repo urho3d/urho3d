@@ -152,34 +152,37 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         if (!face)
             return;
         
-        UIBatch batch(BLEND_ALPHA, currentScissor, face->texture_, &quads);
-        
-        unsigned rowIndex = 0;
-        int x = GetRowStartPosition(rowIndex);
-        int y = 0;
-        
-        for (unsigned i = 0; i < printText_.Size(); ++i)
+        for (unsigned page = 0; page < face->textures_.Size(); ++page)
         {
-            unsigned c = printText_[i];
+            UIBatch batch(BLEND_ALPHA, currentScissor, face->textures_[page], &quads);
             
-            if (c != '\n')
+            unsigned rowIndex = 0;
+            int x = GetRowStartPosition(rowIndex);
+            int y = 0;
+            
+            for (unsigned i = 0; i < printText_.Size(); ++i)
             {
-                const FontGlyph& glyph = face->GetGlyph(c);
-                if (c != ' ')
-                    batch.AddQuad(*this, x + glyph.offsetX_, y + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+                unsigned c = printText_[i];
                 
-                x += glyph.advanceX_;
-                if (i < printText_.Size() - 1)
-                    x += face->GetKerning(c, printText_[i + 1]);
+                if (c != '\n')
+                {
+                    const FontGlyph& glyph = face->GetGlyph(c);
+                    if (glyph.page_ == page)
+                        batch.AddQuad(*this, x + glyph.offsetX_, y + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+                    
+                    x += glyph.advanceX_;
+                    if (i < printText_.Size() - 1)
+                        x += face->GetKerning(c, printText_[i + 1]);
+                }
+                else
+                {
+                    x = GetRowStartPosition(++rowIndex);
+                    y += rowHeight_;
+                }
             }
-            else
-            {
-                x = GetRowStartPosition(++rowIndex);
-                y += rowHeight_;
-            }
+            
+            UIBatch::AddOrMerge(batch, batches);
         }
-        
-        UIBatch::AddOrMerge(batch, batches);
     }
     
     // Reset hovering for next frame

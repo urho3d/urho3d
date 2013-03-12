@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     #endif
     
     Run(arguments);
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 void Run(const Vector<String>& arguments)
@@ -82,6 +82,9 @@ void Run(const Vector<String>& arguments)
     inDir_ = AddTrailingSlash(arguments[0]);
     outDir_ = AddTrailingSlash(arguments[1]);
     mainPageName_ = arguments[2];
+    
+    if (!fileSystem_->DirExists(outDir_))
+        ErrorExit("Wiki output path does not exist, conversion was skipped.");
     
     Vector<String> docFiles;
     fileSystem_->ScanDir(docFiles, inDir_, "*.dox", SCAN_FILES, false);
@@ -102,7 +105,6 @@ void ScanPageNames(const String& fileName)
     
     String outputFileName;
     File outputFile(context_);
-    bool inVerbatim = false;
     
     if (!inputFile.IsOpen())
     {

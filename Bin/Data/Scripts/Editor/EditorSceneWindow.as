@@ -585,7 +585,16 @@ void HandleSceneWindowSelectionChange()
     if (selectedNodes.empty && editNode !is null)
         editNodes.Push(editNode);
     else
+    {
         editNodes = selectedNodes;
+        
+        // Ensure the first one in array is not the scene node because the first node is used as template for attribute editing
+        if (editNodes.length > 1 && editNodes[0] is editorScene)
+        {
+            editNodes.Erase(0);
+            editNodes.Push(editorScene);
+        }
+    }
 
     PositionGizmo();
     UpdateNodeWindow();

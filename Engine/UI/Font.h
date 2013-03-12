@@ -52,6 +52,8 @@ struct FontGlyph
     short offsetY_;
     /// Horizontal advance.
     short advanceX_;
+    /// Page.
+    unsigned page_;
     /// Kerning information.
     HashMap<unsigned, unsigned> kerning_;
 };
@@ -78,9 +80,11 @@ public:
     const FontGlyph& GetGlyph(unsigned c) const;
     /// Return the kerning for a character and the next character.
     short GetKerning(unsigned c, unsigned d) const;
+    /// Return true when one of the texture has a data loss.
+    bool IsDataLost() const;
     
     /// Texture.
-    SharedPtr<Texture> texture_;
+    Vector<SharedPtr<Texture> > textures_;
     /// Glyphs.
     Vector<FontGlyph> glyphs_;
     /// Point size.

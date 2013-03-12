@@ -1,1 +1,0 @@
-ScriptAPIDumper ../Docs/ScriptAPI.dox
