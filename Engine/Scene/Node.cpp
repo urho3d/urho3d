@@ -759,14 +759,20 @@ unsigned Node::GetNumNetworkComponents() const
     return num;
 }
 
-void Node::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const
+void Node::GetComponents(PODVector<Component*>& dest, ShortStringHash type, bool recursive) const
 {
     dest.Clear();
-    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    
+    if (!recursive)
     {
-        if ((*i)->GetType() == type)
-            dest.Push(*i);
+        for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+        {
+            if ((*i)->GetType() == type)
+                dest.Push(*i);
+        }
     }
+    else
+        GetComponentsRecursive(dest, type);
 }
 
 bool Node::HasComponent(ShortStringHash type) const
@@ -1220,6 +1226,17 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortString
         if (!node->children_.Empty())
             node->GetChildrenWithComponentRecursive(dest, type);
     }
+}
+
+void Node::GetComponentsRecursive(PODVector<Component*>& dest, ShortStringHash type) const
+{
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if ((*i)->GetType() == type)
+            dest.Push(*i);
+    }
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->GetComponentsRecursive(dest, type);
 }
 
 Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode)

@@ -1348,7 +1348,7 @@ Methods:<br>
 - Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
 - Node@ GetChild(const String&, bool arg1 = false) const
 - Component@[]@ GetComponents() const
-- Component@[]@ GetComponents(const String&) const
+- Component@[]@ GetComponents(const String&, bool arg1 = false) const
 - Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
 - Vector3 LocalToWorld(const Vector3&) const
@@ -1469,7 +1469,7 @@ Methods:<br>
 - Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
 - Node@ GetChild(const String&, bool arg1 = false) const
 - Component@[]@ GetComponents() const
-- Component@[]@ GetComponents(const String&) const
+- Component@[]@ GetComponents(const String&, bool arg1 = false) const
 - Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
 - Vector3 LocalToWorld(const Vector3&) const

@@ -254,8 +254,8 @@ public:
     unsigned GetNumNetworkComponents() const;
     /// Return all components.
     const Vector<SharedPtr<Component> >& GetComponents() const { return components_; }
-    /// Return all components of type.
-    void GetComponents(PODVector<Component*>& dest, ShortStringHash type) const;
+    /// Return all components of type. Optionally recursive.
+    void GetComponents(PODVector<Component*>& dest, ShortStringHash type, bool recursive = false) const;
     /// Return component by type. If there are several, returns the first.
     Component* GetComponent(ShortStringHash type) const;
     /// Return whether has a specific component.
@@ -275,7 +275,7 @@ public:
     /// Template version of returning a component by type.
     template <class T> T* GetComponent() const;
     /// Template version of returning all components of type.
-    template <class T> void GetComponents(PODVector<T*>& dest) const;
+    template <class T> void GetComponents(PODVector<T*>& dest, bool recursive = false) const;
     /// Template version of checking whether has a specific component.
     template <class T> bool HasComponent() const;
     
@@ -329,6 +329,8 @@ private:
     void GetChildrenRecursive(PODVector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively.
     void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortStringHash type) const;
+    /// Return specific components recursively.
+    void GetComponentsRecursive(PODVector<Component*>& dest, ShortStringHash type) const;
     /// Clone node recursively.
     Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
     /// Remove a component from this node with the specified iterator.
@@ -376,7 +378,7 @@ template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cas
 template <class T> T* Node::GetOrCreateComponent(CreateMode mode) { return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode)); }
 template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const { GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive); }
 template <class T> T* Node::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
-template <class T> void Node::GetComponents(PODVector<T*>& dest) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic()); }
+template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic(), recursive); }
 template <class T> bool Node::HasComponent() const { return HasComponent(T::GetTypeStatic()); }
 
 template <class T> T* Node::GetDerivedComponent() const

@@ -417,10 +417,10 @@ static CScriptArray* NodeGetComponents(Node* ptr)
     return VectorToHandleArray<Component>(ptr->GetComponents(), "Array<Component@>");
 }
 
-static CScriptArray* NodeGetComponentsWithType(const String& typeName, Node* ptr)
+static CScriptArray* NodeGetComponentsWithType(const String& typeName, bool recursive, Node* ptr)
 {
     PODVector<Component*> components;
-    ptr->GetComponents(components, ShortStringHash(typeName));
+    ptr->GetComponents(components, ShortStringHash(typeName), recursive);
     return VectorToHandleArray<Component>(components, "Array<Component@>");
 }
 
@@ -539,7 +539,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithClassName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents() const", asFUNCTION(NodeGetComponents), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in, bool recursive = false) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String&in) const", asFUNCTION(NodeGetComponentWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool HasComponent(const String&in) const", asFUNCTION(NodeHasComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Vector3 LocalToWorld(const Vector3&in) const", asMETHODPR(T, LocalToWorld, (const Vector3&) const, Vector3), asCALL_THISCALL);
