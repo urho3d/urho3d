@@ -1,1 +1,1 @@
-./Urho3D Scripts/TestScene.as $*
+./Urho3D Scripts/TestScene.as $@

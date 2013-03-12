@@ -9,4 +9,4 @@
 #   Start the server with "./NinjaSnowWar.sh -w server"
 #   Start the client on the same host with "./NinjaSnowWar.sh -w -nobgm `hostname`"
 #
-./Urho3D Scripts/NinjaSnowWar.as $*
+./Urho3D Scripts/NinjaSnowWar.as $@

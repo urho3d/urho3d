@@ -1,1 +1,1 @@
-./Urho3D Scripts/Editor.as $*
+./Urho3D Scripts/Editor.as $@

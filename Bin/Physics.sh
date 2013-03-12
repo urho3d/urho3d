@@ -1,1 +1,1 @@
-./Urho3D Scripts/Physics.as $*
+./Urho3D Scripts/Physics.as $@

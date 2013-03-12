@@ -1,1 +1,1 @@
-./Urho3D Scripts/LightTest.as $*
+./Urho3D Scripts/LightTest.as $@

@@ -1,1 +1,1 @@
-./Urho3D Scripts/Terrain.as $*
+./Urho3D Scripts/Terrain.as $@

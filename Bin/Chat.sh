@@ -1,1 +1,1 @@
-./Urho3D Scripts/Chat.as $*
+./Urho3D Scripts/Chat.as $@
