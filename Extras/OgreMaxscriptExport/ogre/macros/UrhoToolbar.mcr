@@ -1,8 +1,8 @@
 -- ogreToolbar.mcr
 --
--- Banania - 2004
+-- cin - 2013
 --
--- Macroscript for the Ogre Toolbar 2.0
+-- Macroscript for the Urho Toolbar 1.0
 --
 -- Thanks to John Martin and Etienne Mallard for the work they did in the previous versions
 --
@@ -13,22 +13,22 @@ include "ogre/lib/ogreMaterialLib.ms"
 include "ogre/lib/ogreMaterialPlugin.ms"
 
 macroScript showOgreExportTools
-	category:"Ogre Tools"
-	internalCategory:"Ogre Tools"
-	buttonText:"Ogre Exporter"
-	tooltip:"Ogre Exporter"
+	category:"Urho Tools"
+	internalCategory:"Urho Tools"
+	buttonText:"Urho Exporter"
+	tooltip:"Urho Exporter"
 	Icon:#("Maintoolbar",49)
 (
 	-- create a floater
-	OgreExportFloater = newRolloutFloater "Ogre Exporter - 1.19" 280 800 ;
+	OgreExportFloater = newRolloutFloater "Urho Ogre Exporter - 1.00" 280 800 ;
 	
 	rollout OgreExportOptions "Options" width:270 height:140 rolledUp:true
 	(
 		button openScript "open OgreScript.ini" pos:[7,8] width:116 height:26 toolTip:"open the script to edit your settings"
 		checkbox CBconvertXML "convert XML file after export" pos:[8,42] width:255 height:22 checked:true
-		label lbl01 "XML Converter Program" pos:[8,64] width:256 height:18
+		label lbl01 "OgreImporter.exe path" pos:[8,64] width:256 height:18
 		editText editXMLconverter "" pos:[7,80] width:253 height:23
-		button browseXMLconverter "Browse" pos:[188,106] width:72 height:25 toolTip:"choose your XML converter"
+		button browseXMLconverter "Browse" pos:[188,106] width:72 height:25 toolTip:"choose your OgreImporter.exe"
 		groupBox grp1 "Conversion settings" pos:[8,132] width:254 height:125
 		checkbox CBgenerateedges "Generate Edges List (for stencil shadows)" pos:[12,145] width:245 height:20 checked:true
 		checkbox CBgeneratetangents "Generate Tangent Vectors (for normal mapping)" pos:[12,163] width:245 height:20 checked:false
@@ -56,7 +56,7 @@ macroScript showOgreExportTools
 			(
 				if (not (doesFileExist editXMLconverter.text)) then
 				(
-					editXMLconverter.text = "The file/directory specified in the .ini for the XML converter does not exist !";
+					editXMLconverter.text = "The file/directory specified in the .ini for the OgreImporter.exe does not exist !";
 					CBconvertXML.checked = false;
 				)
 			)
@@ -107,7 +107,7 @@ macroScript showOgreExportTools
 			print editXMLconverter.text;
 			if (not (doesFileExist editXMLconverter.text)) then
 			(
-				editXMLconverter.text = "The file/directory specified in the .ini for the XML converter does not exist !";
+				editXMLconverter.text = "The file/directory specified in the .ini for the OgreImporter.exe does not exist !";
 				CBconvertXML.checked = false;
 			)
 			else
@@ -316,32 +316,29 @@ macroScript showOgreExportTools
 					
 							if (exportingMeshDone) then 
 							(
-								if (OgreExportOptions.CBgenerateedges.enabled==false or OgreExportOptions.CBgenerateedges.checked==false) then
-									OptionConv = OptionConv + " -e";
-								if (OgreExportOptions.CBgeneratetangents.enabled and OgreExportOptions.CBgeneratetangents.checked) then
-								(
-									if (OgreExportMesh.CBexportUV.enabled and OgreExportMesh.CBexportUV.checked and (OgreExportMesh.SPchannels.value>0)) then
-										OptionConv = OptionConv + " -t";
-									else
-										messageBox "Tangent vectors cannot be generated without UV sets. Generation will be deactivated." ;
-								)
-								if (OgreExportOptions.CBgeneratelod.enabled and OgreExportOptions.CBgeneratelod.checked) then
-									OptionConv = OptionConv + " -l " + (OgreExportOptions.SPlodlevels.value as string) + " -d " + (OgreExportOptions.SPloddistance.value as string) + " -p " + (OgreExportOptions.SPlodreduction.value as string);
+								--if (OgreExportOptions.CBgenerateedges.enabled==false or OgreExportOptions.CBgenerateedges.checked==false) then
+								--	OptionConv = OptionConv + " -e";
+								--if (OgreExportOptions.CBgeneratetangents.enabled and OgreExportOptions.CBgeneratetangents.checked) then
+								--(
+									--if (OgreExportMesh.CBexportUV.enabled and OgreExportMesh.CBexportUV.checked and (OgreExportMesh.SPchannels.value>0)) then
+									--	OptionConv = OptionConv + " -t";
+									--else
+									--	messageBox "Tangent vectors cannot be generated without UV sets. Generation will be deactivated." ;
+								--)
+								--if (OgreExportOptions.CBgeneratelod.enabled and OgreExportOptions.CBgeneratelod.checked) then
+								--	OptionConv = OptionConv + " -l " + (OgreExportOptions.SPlodlevels.value as string) + " -d " + (OgreExportOptions.SPloddistance.value as string) + " -p " + (OgreExportOptions.SPlodreduction.value as string);
 								
-								DOSCommand (OgreExportOptions.editXMLconverter.text + OptionConv + " \"" + editFilename.text + ".mesh.xml\" \"" + editFilename.text + ".mesh\"") ;
-								DOSCommand ("copy \"" + editFilename.text + ".mesh\" \"" + mediaPath + "\"") ;
+								print (OgreExportOptions.editXMLconverter.text +       " \"" + editFilename.text + ".mesh.xml\" \"" + editFilename.text + ".mdl\"") ;								
+								DOSCommand (OgreExportOptions.editXMLconverter.text +  " \"" + editFilename.text + ".mesh.xml\" \"" + editFilename.text + ".mdl\"") ;
+								--DOSCommand ("copy \"" + editFilename.text + ".mesh\" \"" + mediaPath + "\"") ;
 							)
-							if (exportingSkelDone) then 
-							(
-								DOSCommand (OgreExportOptions.editXMLconverter.text + " \"" + editFilename.text + ".skeleton.xml\" \"" + editFilename.text + ".skeleton\"") ;
-								DOSCommand ("copy \"" + editFilename.text + ".skeleton\" \"" + mediaPath + "\"") ;						
-							)
-							messageBox "OgreXMLConverter has been run and files copied to the media directory."
-							print (OgreExportOptions.editXMLconverter.text + OptionConv + " \"" + editFilename.text + ".mesh.xml\" \"" + editFilename.text + ".mesh\"") ;
-						)
-						else
-						(
-							messageBox "gmax cannot launch XMLConverter due to its limitations..."
+							--if (exportingSkelDone) then 
+							--(
+								--DOSCommand (OgreExportOptions.editXMLconverter.text + " \"" + editFilename.text + ".skeleton.xml\" \"" + editFilename.text + ".skeleton\"") ;
+								--DOSCommand ("copy \"" + editFilename.text + ".skeleton\" \"" + mediaPath + "\"") ;						
+							--)
+							--messageBox "OgreXMLConverter has been run and files copied to the media directory."
+
 						)
 					)
 				)
@@ -630,12 +627,12 @@ macroScript showOgreExportTools
 	
 	rollout OgreExportAbout "About" rolledUp:true
 	(
-		label label11 "For use with the Ogre graphics engine." align:#center;
-		label label12 "See website for details: http://ogre.sourceforge.net" align:#center;
+		label label11 "For use with the Urho graphics engine." align:#center;
+		label label12 "See website for details: http://code.google.com/p/urho3d/" align:#center;
 		label label13 "This software is distributed under the terms of the LGPL." align:#center ;
 		label label16 "Based on the exporter realised by" align:#center ;
-		label label14 "EarthquakeProof - mallard@iie.cnam.fr  (summer 2003)" align:#center ;
-		label label15 "by Banania - November 2004" align:#center ;
+		label label14 "EarthquakeProof - mallard@iie.cnam.fr 2003 and Banania - 2004" align:#center ;
+		label label15 "cin - March 2013" align:#center ;	
 	)
 	
 	-- add the rollout, which contains the dialog	

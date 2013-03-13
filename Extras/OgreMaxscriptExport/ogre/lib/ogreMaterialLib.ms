@@ -81,6 +81,11 @@ function writeOgreMaterial material outname =
 			tname = tname + "AlphaMask" ;
 		)
 		
+		if (material.twoSided == true) then
+		(
+			format "    <cull value=\"none\" />\n" to:outFile ;
+		)
+		
 		format "</material>\n" to:outFile ;
 		close outFile ;
 	)
@@ -115,6 +120,7 @@ function writeStandardMaterial material outname =
 	ext = ".mat.xml" ;
 	fname = outname + "_" + matname + ext ;
 	outFile = createfile fname ;
+	
 	format "<material>\n" to:outFile ;
 	
 	local tname="NoTexture" ;
@@ -176,6 +182,15 @@ function writeStandardMaterial material outname =
 		format "    <texture unit=\"normal\" name=\"textures/%\" />\n" t[arrayLength t] to:outFile ;
 	)
 	
+	if ((material.opacityMap != undefined) and (iskindof material.opacityMap Bitmaptexture)) then
+	(
+		tname = tname + "AlphaMask" ;
+	)
+	
+	if (material.twoSided == true) then
+	(
+		format "    <cull value=\"none\" />\n" to:outFile ;
+	)
 	
 	format "</material>\n" to:outFile ;
 

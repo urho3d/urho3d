@@ -6,7 +6,7 @@ OgreBatchConverter
 
 OgreMaxscriptExport
 
-- Contributed by Vladimir Pobedinskij. A modified version of the Maxscript
+- Contributed by Vladimir Pobedinsky. A modified version of the Maxscript 
   Exporter from the Ogre SDK that will import Ogre .mesh.xml files (for feeding
   into OgreImporter) and materials in Urho3D .xml format.
 
