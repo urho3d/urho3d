@@ -699,10 +699,11 @@ void InitResourcePicker()
     Array<String> imageFilters = {"*.png", "*.jpg"};
     Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.ktx", "*.pvr"};
     Array<String> soundFilters = {"*.wav","*.ogg"};
+    Array<String> materialFilters = {"*.xml", "*.material"};
     resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
     resourcePickers.Push(ResourcePicker("Model", "*.mdl"));
-    resourcePickers.Push(ResourcePicker("Material", "*.xml"));
+    resourcePickers.Push(ResourcePicker("Material", materialFilters));
     resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
     resourcePickers.Push(ResourcePicker("ScriptFile", "*.as"));
