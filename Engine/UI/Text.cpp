@@ -185,10 +185,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         for (unsigned page = 0; page < face->textures_.Size(); ++page)
         {
             UIBatch batch(BLEND_ALPHA, currentScissor, face->textures_[page], &quads);
-            
-            for (PODVector<UIQuad>::ConstIterator i = pageQuads[page].Begin(); i != pageQuads[page].End(); ++i)
-                batch.AddQuad(*i);
-            
+            batch.AddQuad(pageQuads[page]);
             UIBatch::AddOrMerge(batch, batches);
         }
     }

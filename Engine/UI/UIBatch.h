@@ -86,6 +86,8 @@ public:
     
     /// Begin adding quads.
     void Begin(PODVector<UIQuad>* quads);
+    /// Add a collection of quads. Each quad is added without first checking whether it is properly defined.
+    void AddQuad(const PODVector<UIQuad>& quads);
     /// Add a quad.
     void AddQuad(UIQuad quad);
     /// Add a quad.

@@ -128,6 +128,15 @@ void UIBatch::Begin(PODVector<UIQuad>* quads)
     quadCount_ = 0;
 }
 
+void UIBatch::AddQuad(const PODVector<UIQuad>& quads)
+{
+    if (!quads_ || quads.Empty())
+        return;
+    
+    *quads_ += quads;
+    quadCount_ += quads.Size();
+}
+
 void UIBatch::AddQuad(UIQuad quad)
 {
     if (!quads_)
