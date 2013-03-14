@@ -11,7 +11,7 @@ function writeOgreMaterial material outname =
 	if (mat != undefined) then 
 	(
 		matname = material.name ;
-		ext = ".mat.xml" ;
+		ext = ".material" ;
 		fname = outname +"_"+ matname + ext ;
 		outFile = createfile fname ;
 
@@ -117,7 +117,7 @@ function writeStandardMaterial material outname =
 	local t, matname, mat, ext, fname ;
 	
 	matname = replaceSpaces material.name ;
-	ext = ".mat.xml" ;
+	ext = ".material" ;
 	fname = outname + "_" + matname + ext ;
 	outFile = createfile fname ;
 	
