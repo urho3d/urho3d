@@ -3045,6 +3045,8 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@)
+- bool SaveXML(File@, int, bool arg2 = false)
+- bool SaveXML(const String&, int, bool arg2 = false)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3054,7 +3056,6 @@ Properties:<br>
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
-- String pathName (readonly)
 
 
 UIElement

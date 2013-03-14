@@ -152,34 +152,42 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         if (!face)
             return;
         
+        Vector<PODVector<UIQuad> > pageQuads(face->textures_.Size());
+        
+        unsigned rowIndex = 0;
+        int x = GetRowStartPosition(rowIndex);
+        int y = 0;
+        
+        for (unsigned i = 0; i < printText_.Size(); ++i)
+        {
+            unsigned c = printText_[i];
+            
+            if (c != '\n')
+            {
+                const FontGlyph* p = face->GetGlyph(c);
+                if (!p)
+                    continue;
+                
+                const FontGlyph& glyph = *p;
+                pageQuads[glyph.page_].Push(UIQuad(*this, x + glyph.offsetX_, y + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_));
+                
+                x += glyph.advanceX_;
+                if (i < printText_.Size() - 1)
+                    x += face->GetKerning(c, printText_[i + 1]);
+            }
+            else
+            {
+                x = GetRowStartPosition(++rowIndex);
+                y += rowHeight_;
+            }
+        }
+            
         for (unsigned page = 0; page < face->textures_.Size(); ++page)
         {
             UIBatch batch(BLEND_ALPHA, currentScissor, face->textures_[page], &quads);
             
-            unsigned rowIndex = 0;
-            int x = GetRowStartPosition(rowIndex);
-            int y = 0;
-            
-            for (unsigned i = 0; i < printText_.Size(); ++i)
-            {
-                unsigned c = printText_[i];
-                
-                if (c != '\n')
-                {
-                    const FontGlyph& glyph = face->GetGlyph(c);
-                    if (glyph.page_ == page)
-                        batch.AddQuad(*this, x + glyph.offsetX_, y + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
-                    
-                    x += glyph.advanceX_;
-                    if (i < printText_.Size() - 1)
-                        x += face->GetKerning(c, printText_[i + 1]);
-                }
-                else
-                {
-                    x = GetRowStartPosition(++rowIndex);
-                    y += rowHeight_;
-                }
-            }
+            for (PODVector<UIQuad>::ConstIterator i = pageQuads[page].Begin(); i != pageQuads[page].End(); ++i)
+                batch.AddQuad(*i);
             
             UIBatch::AddOrMerge(batch, batches);
         }
@@ -346,9 +354,13 @@ void Text::UpdateText(bool inResize)
                                 nextBreak = j;
                                 break;
                             }
-                            futureRowWidth += face->GetGlyph(d).advanceX_;
-                            if (j < unicodeText_.Size() - 1)
-                                futureRowWidth += face->GetKerning(d, unicodeText_[j + 1]);
+                            const FontGlyph* glyph = face->GetGlyph(d);
+                            if (glyph)
+                            {
+                                futureRowWidth += glyph->advanceX_;
+                                if (j < unicodeText_.Size() - 1)
+                                    futureRowWidth += face->GetKerning(d, unicodeText_[j + 1]);
+                            }
                             if (d == '-' && futureRowWidth <= maxWidth)
                             {
                                 nextBreak = j + 1;
@@ -384,9 +396,13 @@ void Text::UpdateText(bool inResize)
                     {
                         // When copying a space, position is allowed to be over row width
                         c = unicodeText_[i];
-                        rowWidth += face->GetGlyph(c).advanceX_;
-                        if (i < text_.Length() - 1)
-                            rowWidth += face->GetKerning(c, unicodeText_[i + 1]);
+                        const FontGlyph* glyph = face->GetGlyph(c);
+                        if (glyph)
+                        {
+                            rowWidth += glyph->advanceX_;
+                            if (i < text_.Length() - 1)
+                                rowWidth += face->GetKerning(c, unicodeText_[i + 1]);
+                        }
                         if (rowWidth <= maxWidth)
                         {
                             printText_.Push(c);
@@ -412,10 +428,13 @@ void Text::UpdateText(bool inResize)
             
             if (c != '\n')
             {
-                const FontGlyph& glyph = face->GetGlyph(c);
-                rowWidth += glyph.advanceX_;
-                if (i < printText_.Size() - 1)
-                    rowWidth += face->GetKerning(c, printText_[i + 1]);
+                const FontGlyph* glyph = face->GetGlyph(c);
+                if (glyph)
+                {
+                    rowWidth += glyph->advanceX_;
+                    if (i < printText_.Size() - 1)
+                        rowWidth += face->GetKerning(c, printText_[i + 1]);
+                }
             }
             else
             {
@@ -450,11 +469,14 @@ void Text::UpdateText(bool inResize)
             unsigned c = printText_[i];
             if (c != '\n')
             {
-                const FontGlyph& glyph = face->GetGlyph(c);
-                charSizes_[printToText[i]] = IntVector2(glyph.advanceX_, rowHeight_);
-                x += glyph.advanceX_;
-                if (i < printText_.Size() - 1)
-                    x += face->GetKerning(c, printText_[i + 1]);
+                const FontGlyph* glyph = face->GetGlyph(c);
+                charSizes_[printToText[i]] = IntVector2(glyph ? glyph->advanceX_ : 0, rowHeight_);
+                if (glyph)
+                {
+                    x += glyph->advanceX_;
+                    if (i < printText_.Size() - 1)
+                        x += face->GetKerning(c, printText_[i + 1]);
+                }
             }
             else
             {

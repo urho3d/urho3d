@@ -38,10 +38,20 @@
 namespace Urho3D
 {
 
+static bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, Font* ptr)
+{
+    if (fileName.Empty())
+        return false;
+    
+    File file(ptr->GetContext(), fileName, FILE_WRITE);
+    return ptr->SaveXML(file, pointSize, usedGlyphs);
+}
+
 static void RegisterFont(asIScriptEngine* engine)
 {
     RegisterResource<Font>(engine, "Font");
-    engine->RegisterObjectMethod("Font", "const String&  get_pathName() const", asMETHOD(Font, GetPathName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool arg2 = false)", asMETHOD(Font, SaveXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "bool SaveXML(const String&in, int, bool arg2 = false)", asFUNCTION(FontSaveXML), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterUIElement(asIScriptEngine* engine)

@@ -87,6 +87,8 @@ public:
     /// Begin adding quads.
     void Begin(PODVector<UIQuad>* quads);
     /// Add a quad.
+    void AddQuad(UIQuad quad);
+    /// Add a quad.
     void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY);
     /// Add a quad with scaled texture.
     void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight);

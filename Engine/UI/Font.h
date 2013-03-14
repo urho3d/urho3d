@@ -29,6 +29,7 @@ namespace Urho3D
 {
 
 class Graphics;
+class Image;
 class Texture;
 
 static const int FONT_TEXTURE_MIN_SIZE = 128;
@@ -38,6 +39,9 @@ static const int FONT_DPI = 96;
 /// %Font glyph description.
 struct FontGlyph
 {
+    /// Construct.
+    FontGlyph();
+    
     /// X position in texture.
     short x_;
     /// Y position in texture.
@@ -56,6 +60,8 @@ struct FontGlyph
     unsigned page_;
     /// Kerning information.
     HashMap<unsigned, unsigned> kerning_;
+    /// Used flag.
+    mutable bool used_;
 };
 
 /// %Font file type.
@@ -76,8 +82,8 @@ public:
     /// Destruct.
     ~FontFace();
     
-    /// Return the glyph structure corresponding to a character.
-    const FontGlyph& GetGlyph(unsigned c) const;
+    /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
+    const FontGlyph* GetGlyph(unsigned c) const;
     /// Return the kerning for a character and the next character.
     short GetKerning(unsigned c, unsigned d) const;
     /// Return true when one of the texture has a data loss.
@@ -111,16 +117,26 @@ public:
     static void RegisterObject(Context* context);
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
+    /// Save resource as a new bitmap font type in XML format. Return true if successful.
+    bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false);
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     const FontFace* GetFace(int pointSize);
-    /// Return a fully qualified path name of font file.
-    const String& GetPathName() const { return pathName_; }
     
 private:
     /// Return True-type font face. Called internally. Return null on error.
     const FontFace* GetFaceTTF(int pointSize);
     /// Return bitmap font face. Called internally. Return null on error.
     const FontFace* GetFaceBitmap(int pointSize);
+    /// Convert graphics format to number of components.
+    unsigned ConvertFormatToNumComponents(unsigned format);
+    /// Pack used glyphs into smallest texture size and smallest number of texture.
+    SharedPtr<FontFace> Pack(const FontFace* fontFace);
+    /// Load font face texture from image resource.
+    SharedPtr<Texture> LoadFaceTexture(SharedPtr<Image> image);
+    /// Save font face texture as image resource.
+    SharedPtr<Image> SaveFaceTexture(Texture* texture);
+    /// Save font face texture as image file.
+    bool SaveFaceTexture(Texture* texture, const String& fileName);
     
     /// Created faces.
     HashMap<int, SharedPtr<FontFace> > faces_;
@@ -130,8 +146,6 @@ private:
     unsigned fontDataSize_;
     /// Font type.
     FONT_TYPE fontType_;
-    /// FQPN of font file.
-    String pathName_;
 };
 
 }

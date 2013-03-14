@@ -120,39 +120,35 @@ UIBatch::UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, 
 
 void UIBatch::Begin(PODVector<UIQuad>* quads)
 {
-    if (quads)
+    if (!quads)
+        return;
+    
+    quads_ = quads;
+    quadStart_ = quads_->Size();
+    quadCount_ = 0;
+}
+
+void UIBatch::AddQuad(UIQuad quad)
+{
+    if (!quads_)
+        return;
+    
+    if (quad.defined_)
     {
-        quads_ = quads;
-        quadStart_ = quads_->Size();
-        quadCount_ = 0;
+        quads_->Push(quad);
+        ++quadCount_;
     }
 }
 
 void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY)
 {
-    if (!quads_)
-        return;
-   
-    UIQuad quad(element, x, y, width, height, texOffsetX, texOffsetY);
-    if (quad.defined_)
-    {
-        quads_->Push(quad);
-        ++quadCount_;
-    }
+    AddQuad(UIQuad(element, x, y, width, height, texOffsetX, texOffsetY));
 }
 
 void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
     int texHeight)
 {
-    if (!quads_)
-        return;
-    
-    UIQuad quad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight);
-    if (quad.defined_)
-    {
-        quads_->Push(quad);
-        ++quadCount_;
-    }
+    AddQuad(UIQuad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight));
 }
 
 void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
@@ -200,12 +196,7 @@ void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int hei
         return;
     
     Color derivedColor(color.r_, color.g_, color.b_, color.a_ * element.GetDerivedOpacity());
-    UIQuad quad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight, &derivedColor);
-    if (quad.defined_)
-    {
-        quads_->Push(quad);
-        ++quadCount_;
-    }
+    AddQuad(UIQuad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight, &derivedColor));
 }
 
 bool UIBatch::Merge(const UIBatch& batch)
