@@ -101,6 +101,24 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
         return 0;
 }
 
+/// Template function for data buffer to array conversion.
+template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, const char* arrayName)
+{
+    asIScriptContext *context = asGetActiveContext();
+    if (context)
+    {
+        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        CScriptArray* arr = new CScriptArray(size, type);
+        
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            *(static_cast<T*>(arr->At(i))) = buffer[i];
+        
+        return arr;
+    }
+    else
+        return 0;
+}
+
 /// Template function for Vector to handle array conversion.
 template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, const char* arrayName)
 {

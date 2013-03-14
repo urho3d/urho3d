@@ -149,6 +149,7 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     for (uint i = 0; i < numCoords; ++i)
     {
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
+        attrEdit.vars["Coordinate"] = i;
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
     }     
@@ -342,22 +343,22 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, bo
     AttributeInfo info = serializables[0].attributeInfos[index];
     bool sameValue = true;
     Variant value = serializables[0].attributes[index];
-    for (uint i = 1; i < serializables.length; ++i)
+    Array<Variant> values;
+    for (uint i = 0; i < serializables.length; ++i)
     {
-        if (serializables[i].attributes[index] != value)
-        {
+        Variant val = serializables[i].attributes[index];
+        if (val != value)
             sameValue = false;
-            break;
-        }
+        values.Push(val);
     }
 
     // Attribute with different values from multiple-select is loaded with default/empty value and non-editable
-    LoadAttributeEditor(parent, value, value.type, info.enumNames, info.defaultValue, editable && sameValue, sameValue);
+    LoadAttributeEditor(parent, value, value.type, info.enumNames, info.defaultValue, editable, sameValue, values);
 
     inLoadAttributeEditor = false;
 }
 
-void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Array<String>@ enumNames, Variant defaultValue, bool editable, bool sameValue = true)
+void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Array<String>@ enumNames, Variant defaultValue, bool editable, bool sameValue, Array<Variant> values)
 {
     uint index = parent.vars["Index"].GetUInt();
 
@@ -376,20 +377,20 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
     }
     
     if (type == VAR_FLOAT || type == VAR_STRING || type == VAR_BUFFER)
-        SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable);
+        SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
     else if (type == VAR_BOOL)
-        SetEditable(SetValue(parent.children[1], value.GetBool(), sameValue), editable);
+        SetEditable(SetValue(parent.children[1], value.GetBool(), sameValue), editable && sameValue);
     else if (type == VAR_INT)
     {
         if (enumNames is null || enumNames.empty)
-            SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable);
+            SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
         else
-            SetEditable(SetValue(parent.children[1], value.GetInt(), sameValue), editable);
+            SetEditable(SetValue(parent.children[1], value.GetInt(), sameValue), editable && sameValue);
     }
     else if (type == VAR_RESOURCEREF)
     {
-        SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(value.GetResourceRef().id), sameValue), editable);
-        SetEditable(parent.children[1].children[1], editable);  // If editable then can pick
+        SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(value.GetResourceRef().id), sameValue), editable && sameValue);
+        SetEditable(parent.children[1].children[1], editable && sameValue);  // If editable then can pick
         SetEditable(parent.children[1].children[2], sameValue); // If same value then can open
     }
     else if (type == VAR_RESOURCEREFLIST)
@@ -401,7 +402,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             parent = GetAttributeEditorParent(list, index, subIndex);
             if (parent is null)
                 break;
-            SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(refList.ids[subIndex]), sameValue), editable);
+            SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(refList.ids[subIndex]), sameValue), editable && sameValue);
         }
     }
     else if (type == VAR_VARIANTVECTOR)
@@ -413,7 +414,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             parent = GetAttributeEditorParent(list, index, i);
             if (parent is null)
                 break;
-            LoadAttributeEditor(parent, vector[i], vector[i].type, null, Variant(), editable, sameValue);
+            LoadAttributeEditor(parent, vector[i], vector[i].type, null, Variant(), editable, sameValue, values);
         }
     }
     else if (type == VAR_VARIANTMAP)
@@ -427,21 +428,37 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             if (parent is null)
                 break;
             Variant value = map[keys[i]];
-            LoadAttributeEditor(parent, value, value.type, null, Variant(), editable, sameValue);
+            LoadAttributeEditor(parent, value, value.type, null, Variant(), editable, sameValue, values);
         }
     }
     else
     {
-        // Convert Quaternion value to Vector3 value first
-        if (type == VAR_QUATERNION)
-            value = value.GetQuaternion().eulerAngles;
-        Array<String> components = value.ToString().Split(' ');
-        for (uint i = 0; i < components.length; ++i)
-            SetEditable(SetValue(parent.children[i + 1], components[i], sameValue), editable);
+        Array<Array<String> > coordinates;
+        for (uint i = 0; i < values.length; ++i)
+        {
+            Variant value = values[i];
+            
+            // Convert Quaternion value to Vector3 value first
+            if (type == VAR_QUATERNION)
+                value = value.GetQuaternion().eulerAngles;
+            
+            coordinates.Push(value.ToString().Split(' '));
+        }
+        for (uint i = 0; i < coordinates[0].length; ++i)
+        {
+            sameValue = true;
+            String value = coordinates[0][i];
+            for (uint j = 1; j < coordinates.length; ++j)
+            {
+                if (coordinates[j][i] != value)
+                    sameValue = false;
+            }
+            SetEditable(SetValue(parent.children[i + 1], value, sameValue), editable && sameValue);
+        }
     }
 }
 
-void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables, uint index, uint subIndex)
+void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables, uint index, uint subIndex, uint coordinate)
 {
     AttributeInfo info = serializables[0].attributeInfos[index];
 
@@ -450,8 +467,9 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
         for (uint i = 0; i < serializables.length; ++i)
         {
             ResourceRefList refList = serializables[i].attributes[index].GetResourceRefList();
-            Variant newValue = GetEditorValue(parent, VAR_RESOURCEREF, null);
-            ResourceRef ref = newValue.GetResourceRef();
+            Variant[] values(1);
+            GetEditorValue(parent, VAR_RESOURCEREF, null, coordinate, values);
+            ResourceRef ref = values[0].GetResourceRef();
             refList.ids[subIndex] = ref.id;
             serializables[i].attributes[index] = Variant(refList);
         }
@@ -461,8 +479,9 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
         for (uint i = 0; i < serializables.length; ++i)
         {
             Array<Variant>@ vector = serializables[i].attributes[index].GetVariantVector();
-            Variant newValue = GetEditorValue(parent, vector[subIndex].type, null);
-            vector[subIndex] = newValue;
+            Variant[] values(1);
+            GetEditorValue(parent, vector[subIndex].type, null, coordinate, values);
+            vector[subIndex] = values[0];
             serializables[i].attributes[index] = Variant(vector);
         }
     }
@@ -472,117 +491,121 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
         {
             VariantMap map = serializables[0].attributes[index].GetVariantMap();
             ShortStringHash key(parent.vars["Key"].GetUInt());
-            Variant newValue = GetEditorValue(parent, map[key].type, null);
-            map[key] = newValue;
+            Variant[] values(1);
+            GetEditorValue(parent, map[key].type, null, coordinate, values);
+            map[key] = values[0];
             serializables[i].attributes[index] = Variant(map);
         }
     }
     else
     {
-        Variant newValue = GetEditorValue(parent, info.type, info.enumNames);
-        for (uint i = 0; i < serializables.length; ++i) {
-            serializables[i].attributes[index] = newValue;
-        }
+        Array<Variant> values;
+        for (uint i = 0; i < serializables.length; ++i)
+            values.Push(serializables[i].attributes[index]);
+        GetEditorValue(parent, info.type, info.enumNames, coordinate, values);
+        for (uint i = 0; i < serializables.length; ++i)
+            serializables[i].attributes[index] = values[i];
     }
 }
 
-Variant GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumNames)
+void FillValue(Array<Variant>&inout values, Variant value)
 {
+    for (uint i = 0; i < values.length; ++i)
+        values[i] = value;
+}
+void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumNames, uint coordinate, Array<Variant>&inout values)
+{
+    LineEdit@ attrEdit = parent.children[coordinate + 1];
     if (type == VAR_STRING)
-    {
-        LineEdit@ attrEdit = parent.children[1];
-        return Variant(attrEdit.text.Trimmed());
-    }
-    if (type == VAR_BOOL)
+        FillValue(values, Variant(attrEdit.text.Trimmed()));
+    else if (type == VAR_BOOL)
     {
         CheckBox@ attrEdit = parent.children[1];
-        return Variant(attrEdit.checked);
+        FillValue(values, Variant(attrEdit.checked));
     }
-    if (type == VAR_FLOAT)
+    else if (type == VAR_FLOAT)
+        FillValue(values, Variant(attrEdit.text.ToFloat()));
+    else if (type == VAR_VECTOR2)
     {
-        LineEdit@ attrEdit = parent.children[1];
-        return Variant(attrEdit.text.ToFloat());
+        for (uint i = 0; i < values.length; ++i)
+        {
+            float[] data = values[i].GetVector2().data;
+            data[coordinate] = attrEdit.text.ToFloat();
+            values[i] = Vector2(data);
+        }
     }
-    if (type == VAR_VECTOR2)
+    else if (type == VAR_VECTOR3)
     {
-        LineEdit@ attrEditX = parent.children[1];
-        LineEdit@ attrEditY = parent.children[2];
-        Vector2 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat());
-        return Variant(vec);
+        for (uint i = 0; i < values.length; ++i)
+        {
+            float[] data = values[i].GetVector3().data;
+            data[coordinate] = attrEdit.text.ToFloat();
+            values[i] = Vector3(data);
+        }
     }
-    if (type == VAR_VECTOR3)
+    else if (type == VAR_VECTOR4)
     {
-        LineEdit@ attrEditX = parent.children[1];
-        LineEdit@ attrEditY = parent.children[2];
-        LineEdit@ attrEditZ = parent.children[3];
-        Vector3 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat());
-        return Variant(vec);
+        for (uint i = 0; i < values.length; ++i)
+        {
+            float[] data = values[i].GetVector4().data;
+            data[coordinate] = attrEdit.text.ToFloat();
+            values[i] = Vector4(data);
+        }
     }
-    if (type == VAR_VECTOR4)
+    else if (type == VAR_COLOR)
     {
-        LineEdit@ attrEditX = parent.children[1];
-        LineEdit@ attrEditY = parent.children[2];
-        LineEdit@ attrEditZ = parent.children[3];
-        LineEdit@ attrEditW = parent.children[4];
-        Vector4 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat(), attrEditW.text.ToFloat());
-        return Variant(vec);
+        for (uint i = 0; i < values.length; ++i)
+        {
+            float[] data = values[i].GetColor().data;
+            data[coordinate] = attrEdit.text.ToFloat();
+            values[i] = Color(data);
+        }
     }
-    if (type == VAR_COLOR)
+    else if (type == VAR_QUATERNION)
     {
-        LineEdit@ attrEditR = parent.children[1];
-        LineEdit@ attrEditG = parent.children[2];
-        LineEdit@ attrEditB = parent.children[3];
-        LineEdit@ attrEditA = parent.children[4];
-        Color col(attrEditR.text.ToFloat(), attrEditG.text.ToFloat(), attrEditB.text.ToFloat(), attrEditA.text.ToFloat());
-        return Variant(col);
+        for (uint i = 0; i < values.length; ++i)
+        {
+            float[] data = values[i].GetQuaternion().eulerAngles.data;
+            data[coordinate] = attrEdit.text.ToFloat();
+            values[i] = Quaternion(Vector3(data));
+        }
     }
-    if (type == VAR_QUATERNION)
-    {
-        LineEdit@ attrEditX = parent.children[1];
-        LineEdit@ attrEditY = parent.children[2];
-        LineEdit@ attrEditZ = parent.children[3];
-        Vector3 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat());
-        return Variant(Quaternion(vec));
-    }
-    if (type == VAR_INT)
+    else if (type == VAR_INT)
     {
         if (enumNames is null || enumNames.empty)
-        {
-            LineEdit@ attrEdit = parent.children[1];
-            return Variant(attrEdit.text.ToInt());
-        }
+            FillValue(values, Variant(attrEdit.text.ToInt()));
         else
         {
             DropDownList@ attrEdit = parent.children[1];
-            return Variant(attrEdit.selection);
+            FillValue(values, Variant(attrEdit.selection));
         }
     }
-    if (type == VAR_RESOURCEREF)
+    else if (type == VAR_RESOURCEREF)
     {
         LineEdit@ attrEdit = parent.children[0];
         ResourceRef ref;
         ref.id = StringHash(attrEdit.text.Trimmed());
         ref.type = ShortStringHash(attrEdit.vars["Type"].GetUInt());
-        return Variant(ref);
+        FillValue(values, Variant(ref));
     }
-    if (type == VAR_INTVECTOR2)
+    else if (type == VAR_INTVECTOR2)
     {
-        LineEdit@ attrEditX = parent.children[1];
-        LineEdit@ attrEditY = parent.children[2];
-        IntVector2 vec(attrEditX.text.ToInt(), attrEditY.text.ToInt());
-        return Variant(vec);
+        for (uint i = 0; i < values.length; ++i)
+        {
+            int[] data = values[i].GetIntVector2().data;
+            data[coordinate] = attrEdit.text.ToInt();
+            values[i] = IntVector2(data);
+        }
     }
-    if (type == VAR_INTRECT)
+    else if (type == VAR_INTRECT)
     {
-        LineEdit@ attrEditLeft = parent.children[1];
-        LineEdit@ attrEditTop = parent.children[2];
-        LineEdit@ attrEditRight = parent.children[3];
-        LineEdit@ attrEditBottom = parent.children[3];
-        IntRect vec(attrEditLeft.text.ToInt(), attrEditTop.text.ToInt(),
-                       attrEditRight.text.ToInt(), attrEditBottom.text.ToInt());
-        return Variant(vec);
+        for (uint i = 0; i < values.length; ++i)
+        {
+            int[] data = values[i].GetIntRect().data;
+            data[coordinate] = attrEdit.text.ToInt();
+            values[i] = IntRect(data);
+        }
     }
-    return Variant();
 }
 
 void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool fullUpdate)
@@ -634,9 +657,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 {
     // Changing elements programmatically may cause events to be sent. Stop possible infinite loop in that case.
     if (inLoadAttributeEditor)
-    {
         return;
-    }
 
     UIElement@ attrEdit = eventData["Element"].GetUIElement();
     UIElement@ parent = attrEdit.parent;
@@ -646,9 +667,10 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 
     uint index = attrEdit.vars["Index"].GetUInt();
     uint subIndex = attrEdit.vars["SubIndex"].GetUInt();
+    uint coordinate = attrEdit.vars["Coordinate"].GetUInt();
     bool intermediateEdit = eventType == textChangedEventType;
 
-    StoreAttributeEditor(parent, serializables, index, subIndex);
+    StoreAttributeEditor(parent, serializables, index, subIndex, coordinate);
     for (uint i = 0; i < serializables.length; ++i)
         serializables[i].ApplyAttributes();
 

@@ -216,6 +216,13 @@ public:
     {
     }
     
+    /// Construct from an int array.
+    IntVector2(const int* data) :
+        x_(data[0]),
+        y_(data[1])
+    {
+    }
+    
     /// Copy-construct from another vector.
     IntVector2(const IntVector2& rhs) :
         x_(rhs.x_),

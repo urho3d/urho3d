@@ -321,6 +321,7 @@ Methods:<br>
 - String ToString() const
 
 Properties:<br>
+- int[] data (readonly)
 - int x
 - int y
 
@@ -328,6 +329,7 @@ Properties:<br>
 IntRect
 
 Properties:<br>
+- int[] data (readonly)
 - IntVector2 size (readonly)
 - int width (readonly)
 - int height (readonly)
@@ -349,6 +351,7 @@ Methods:<br>
 - String ToString() const
 
 Properties:<br>
+- float[] data (readonly)
 - float length (readonly)
 - float lengthSquared (readonly)
 - float x
@@ -368,6 +371,7 @@ Methods:<br>
 - String ToString() const
 
 Properties:<br>
+- float[] data (readonly)
 - float length (readonly)
 - float lengthSquared (readonly)
 - float x
@@ -385,6 +389,7 @@ Methods:<br>
 - String ToString() const
 
 Properties:<br>
+- float[] data (readonly)
 - float x
 - float y
 - float z
@@ -661,6 +666,7 @@ Methods:<br>
 - String ToString() const
 
 Properties:<br>
+- float[] data (readonly)
 - Vector3 rgb (readonly)
 - float intensity (readonly)
 - float r

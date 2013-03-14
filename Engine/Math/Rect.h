@@ -197,6 +197,15 @@ public:
     {
     }
     
+    /// Construct from an int array.
+    IntRect(const int* data) :
+        left_(data[0]),
+        top_(data[1]),
+        right_(data[2]),
+        bottom_(data[3])
+    {
+    }
+
     /// Test for equality with another rect.
     bool operator == (const IntRect& rhs) const { return left_ == rhs.left_ && top_ == rhs.top_ && right_ == rhs.right_ && bottom_ == rhs.bottom_; }
     /// Test for inequality with another rect.

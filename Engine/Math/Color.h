@@ -80,7 +80,16 @@ public:
         a_(a)
     {
     }
-    
+
+    /// Construct from a float array.
+    Color(const float* data) :
+        r_(data[0]),
+        g_(data[1]),
+        b_(data[2]),
+        a_(data[3])
+    {
+    }
+
     /// Test for equality with another color.
     bool operator == (const Color& rhs) const { return Equals(r_, rhs.r_) && Equals(g_, rhs.g_) && Equals(b_, rhs.b_) && Equals(a_, rhs.a_); }
     /// Test for inequality with another color.
