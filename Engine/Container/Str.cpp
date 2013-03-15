@@ -221,31 +221,31 @@ String String::Replaced(const String& replaceThis, const String& replaceWith) co
     return ret;
 }
 
-void String::Append(const String& str)
+String& String::Append(const String& str)
 {
-    *this += str;
+    return *this += str;
 }
 
-void String::Append(const char* str)
+String& String::Append(const char* str)
 {
-    *this += str;
+    return *this += str;
 }
 
-void String::Append(char c)
+String& String::Append(char c)
 {
-    *this += c;
+    return *this += c;
 }
 
-void String::Append(const char* str, unsigned length)
+String& String::Append(const char* str, unsigned length)
 {
-    if (!str)
-        return;
-    
-    unsigned oldLength = length_;
-    Resize(oldLength + length);
-    CopyChars(&buffer_[oldLength], str, length);
+    if (str)
+    {
+        unsigned oldLength = length_;
+        Resize(oldLength + length);
+        CopyChars(&buffer_[oldLength], str, length);
+    }
+    return *this;
 }
-
 
 void String::Insert(unsigned pos, const String& str)
 {
@@ -473,6 +473,11 @@ String String::ToUpper() const
 Vector<String> String::Split(char separator) const
 {
     return Split(CString(), separator);
+}
+    
+void String::Join(const Vector<String>& subStrings, String glue)
+{
+    *this = Joined(subStrings, glue);
 }
 
 unsigned String::Find(char c, unsigned startPos) const
@@ -707,13 +712,13 @@ void String::ReplaceUTF8(unsigned index, unsigned unicodeChar)
     Replace(beginCharPos, byteOffset - beginCharPos, temp, dest - temp);
 }
 
-void String::AppendUTF8(unsigned unicodeChar)
+String& String::AppendUTF8(unsigned unicodeChar)
 {
     char temp[7];
     char* dest = temp;
     EncodeUTF8(dest, unicodeChar);
     *dest = 0;
-    Append(temp);
+    return Append(temp);
 }
 
 String String::SubstringUTF8(unsigned pos) const
@@ -938,15 +943,28 @@ Vector<String> String::Split(const char* str, char separator)
     return ret;
 }
 
-void String::AppendWithFormat(const char* formatString, ... )
+String String::Joined(const Vector<String>& subStrings, String glue)
+{
+    if (subStrings.Empty())
+        return String();
+    
+    String joinedString(subStrings[0]);
+    for (unsigned i = 1; i < subStrings.Size(); ++i)
+        joinedString.Append(glue).Append(subStrings[i]);
+    
+    return joinedString;
+}
+
+String& String::AppendWithFormat(const char* formatString, ... )
 {
     va_list args;
     va_start(args, formatString);
     AppendWithFormatArgs(formatString, args);
     va_end(args);
+    return *this;
 }
 
-void String::AppendWithFormatArgs(const char* formatString, va_list args)
+String& String::AppendWithFormatArgs(const char* formatString, va_list args)
 {
     int pos = 0, lastPos = 0;
     int length = strlen(formatString);
@@ -957,7 +975,7 @@ void String::AppendWithFormatArgs(const char* formatString, va_list args)
         while (pos < length && formatString[pos] != '%') pos++;
         Append(formatString + lastPos, pos - lastPos);
         if (pos >= length)
-            return;
+            return *this;
         
         char arg = formatString[pos + 1];
         pos += 2;

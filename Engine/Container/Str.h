@@ -278,13 +278,13 @@ public:
     /// Return a string with all occurrences of a string replaced.
     String Replaced(const String& replaceThis, const String& replaceWith) const;
     /// Append a string.
-    void Append(const String& str);
+    String& Append(const String& str);
     /// Append a C string.
-    void Append(const char* str);
+    String& Append(const char* str);
     /// Append a character.
-    void Append(char c);
+    String& Append(char c);
     /// Append characters.
-    void Append(const char* str, unsigned length);
+    String& Append(const char* str, unsigned length);
     /// Insert a string.
     void Insert(unsigned pos, const String& str);
     /// Insert a character.
@@ -336,6 +336,8 @@ public:
     String ToLower() const;
     /// Return substrings split by a separator char.
     Vector<String> Split(char separator) const;
+    /// Join substrings with a 'glue' string.
+    void Join(const Vector<String>& subStrings, String glue);
     /// Return index to the first occurrence of a string, or NPOS if not found.
     unsigned Find(const String& str, unsigned startPos = 0) const;
     /// Return index to the first occurrence of a character, or NPOS if not found.
@@ -380,7 +382,7 @@ public:
     /// Replace Unicode character at index from UTF8 content.
     void ReplaceUTF8(unsigned index, unsigned unicodeChar);
     /// Append Unicode character at the end as UTF8.
-    void AppendUTF8(unsigned unicodeChar);
+    String& AppendUTF8(unsigned unicodeChar);
     /// Return a UTF8 substring from position to end.
     String SubstringUTF8(unsigned pos) const;
     /// Return a UTF8 substring with length from position.
@@ -402,6 +404,8 @@ public:
     
     /// Return substrings split by a separator char.
     static Vector<String> Split(const char* str, char separator);
+    /// Return a string by joining substrings with a 'glue' string.
+    static String Joined(const Vector<String>& subStrings, String glue);
     /// Encode Unicode character to UTF8. Pointer will be incremented.
     static void EncodeUTF8(char*& dest, unsigned unicodeChar);
     /// Decode Unicode character from UTF8. Pointer will be incremented.
@@ -429,9 +433,9 @@ public:
     }
     
     /// Append to string using formatting.
-    void AppendWithFormat(const char* formatString, ... );
+    String& AppendWithFormat(const char* formatString, ... );
     /// Append to string using variable arguments.
-    void AppendWithFormatArgs(const char* formatString, va_list args);
+    String& AppendWithFormatArgs(const char* formatString, va_list args);
     
     /// Compare two C strings.
     static int Compare(const char* str1, const char* str2, bool caseSensitive);

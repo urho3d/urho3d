@@ -30,6 +30,7 @@ namespace Urho3D
 - void SetRandomSeed(uint)
 - uint GetRandomSeed()
 - String ToStringHex(int)
+- String Join(String[]&, const String&)
 - void ErrorDialog(const String&, const String&)
 - void OpenConsoleWindow()
 - String GetConsoleInput()
@@ -297,6 +298,7 @@ Methods:<br>
 - bool Contains(const String&) const
 - bool Contains(uint8) const
 - String[]@ Split(uint8) const
+- void Join(String[]&, const String&)
 - bool ToBool() const
 - float ToFloat() const
 - int ToInt() const

@@ -451,7 +451,10 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
             for (uint j = 1; j < coordinates.length; ++j)
             {
                 if (coordinates[j][i] != value)
+                {
                     sameValue = false;
+                    break;
+                }
             }
             SetEditable(SetValue(parent.children[i + 1], value, sameValue), editable && sameValue);
         }
@@ -525,42 +528,6 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
     }
     else if (type == VAR_FLOAT)
         FillValue(values, Variant(attrEdit.text.ToFloat()));
-    else if (type == VAR_VECTOR2)
-    {
-        for (uint i = 0; i < values.length; ++i)
-        {
-            float[] data = values[i].GetVector2().data;
-            data[coordinate] = attrEdit.text.ToFloat();
-            values[i] = Vector2(data);
-        }
-    }
-    else if (type == VAR_VECTOR3)
-    {
-        for (uint i = 0; i < values.length; ++i)
-        {
-            float[] data = values[i].GetVector3().data;
-            data[coordinate] = attrEdit.text.ToFloat();
-            values[i] = Vector3(data);
-        }
-    }
-    else if (type == VAR_VECTOR4)
-    {
-        for (uint i = 0; i < values.length; ++i)
-        {
-            float[] data = values[i].GetVector4().data;
-            data[coordinate] = attrEdit.text.ToFloat();
-            values[i] = Vector4(data);
-        }
-    }
-    else if (type == VAR_COLOR)
-    {
-        for (uint i = 0; i < values.length; ++i)
-        {
-            float[] data = values[i].GetColor().data;
-            data[coordinate] = attrEdit.text.ToFloat();
-            values[i] = Color(data);
-        }
-    }
     else if (type == VAR_QUATERNION)
     {
         for (uint i = 0; i < values.length; ++i)
@@ -568,6 +535,15 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
             float[] data = values[i].GetQuaternion().eulerAngles.data;
             data[coordinate] = attrEdit.text.ToFloat();
             values[i] = Quaternion(Vector3(data));
+        }
+    }
+    else if (type >= VAR_VECTOR2 && type <= VAR_COLOR)
+    {
+        for (uint i = 0; i < values.length; ++i)
+        {
+            String[] data = values[i].ToString().Split(' ');
+            data[coordinate] = String(attrEdit.text.ToFloat());
+            values[i] = Variant(type, Join(data, " "));
         }
     }
     else if (type == VAR_INT)
@@ -588,22 +564,13 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
         ref.type = ShortStringHash(attrEdit.vars["Type"].GetUInt());
         FillValue(values, Variant(ref));
     }
-    else if (type == VAR_INTVECTOR2)
+    else if (type == VAR_INTVECTOR2 || type == VAR_INTRECT)
     {
         for (uint i = 0; i < values.length; ++i)
         {
-            int[] data = values[i].GetIntVector2().data;
-            data[coordinate] = attrEdit.text.ToInt();
-            values[i] = IntVector2(data);
-        }
-    }
-    else if (type == VAR_INTRECT)
-    {
-        for (uint i = 0; i < values.length; ++i)
-        {
-            int[] data = values[i].GetIntRect().data;
-            data[coordinate] = attrEdit.text.ToInt();
-            values[i] = IntRect(data);
+            String[] data = values[i].ToString().Split(' ');
+            data[coordinate] = String(attrEdit.text.ToInt());
+            values[i] = Variant(type, Join(data, " "));
         }
     }
 }

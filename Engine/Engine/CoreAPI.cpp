@@ -519,7 +519,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "String ToString() const", asMETHOD(Variant, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool IsZero() const", asMETHOD(Variant, IsZero), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHOD(Variant, GetType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "const String &get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "const String& get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, const String&), asCALL_THISCALL);
     
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariantMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(ConstructVariantMapCopy), asCALL_CDECL_OBJLAST);
@@ -544,9 +544,30 @@ static CScriptArray* StringSplit(char separator, const String* str)
     return VectorToArray<String>(result, "Array<String>");
 }
 
+template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
+{
+    Vector<T> dest(arr->GetSize());
+    for (unsigned i = 0; i < arr->GetSize(); ++i)
+        dest[i] = *static_cast<T*>(arr->At(i));
+    return dest;
+}
+
+static void StringJoin(CScriptArray* arr, const String& glue, String* str)
+{
+    Vector<String> subStrings = ArrayToVector<String>(arr);
+    str->Join(subStrings, glue);
+}
+
+static String StringJoined(CScriptArray* arr, const String& glue)
+{
+    Vector<String> subStrings = ArrayToVector<String>(arr);
+    return String::Joined(subStrings, glue);
+}
+
 static void RegisterStringUtils(asIScriptEngine* engine)
 {
     engine->RegisterObjectMethod("String", "Array<String>@ Split(uint8) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "void Join(String[]&, const String&in)", asFUNCTION(StringJoin), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTIONPR(ToBool, (const String&), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "float ToFloat() const", asFUNCTIONPR(ToFloat, (const String&), float), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "int ToInt() const", asFUNCTIONPR(ToInt, (const String&), int), asCALL_CDECL_OBJLAST);
@@ -559,6 +580,7 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "Vector3 ToVector3() const", asFUNCTIONPR(ToVector3, (const String&), Vector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Vector4 ToVector4(bool allowMissingCoords = false) const", asFUNCTIONPR(ToVector4, (const String&, bool), Vector4), asCALL_CDECL_OBJFIRST);
     engine->RegisterGlobalFunction("String ToStringHex(int)", asFUNCTION(ToStringHex), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String Join(String[]&, const String&in glue)", asFUNCTION(StringJoined), asCALL_CDECL);
 }
 
 static void ConstructTimer(Timer* ptr)
