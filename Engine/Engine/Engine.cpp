@@ -590,6 +590,13 @@ void Engine::RegisterObjects()
     RegisterAudioLibrary(context_);
     RegisterUILibrary(context_);
     RegisterPhysicsLibrary(context_);
+    
+    // In debug mode, check that all factory created objects can be created without crashing
+    #ifdef _DEBUG
+    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+        SharedPtr<Object> object = i->second_->CreateObject();
+    #endif
 }
 
 void Engine::RegisterSubsystems()

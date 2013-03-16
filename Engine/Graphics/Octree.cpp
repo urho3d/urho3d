@@ -338,7 +338,8 @@ Octree::Octree(Context* context) :
     numLevels_(DEFAULT_OCTREE_LEVELS)
 {
     // Resize threaded ray query intermediate result vector according to number of worker threads
-    rayQueryResults_.Resize(GetSubsystem<WorkQueue>()->GetNumThreads() + 1);
+    WorkQueue* workQueue = GetSubsystem<WorkQueue>();
+    rayQueryResults_.Resize(workQueue ? workQueue->GetNumThreads() + 1 : 1);
 }
 
 Octree::~Octree()

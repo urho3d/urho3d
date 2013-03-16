@@ -60,6 +60,7 @@ OBJECTTYPESTATIC(UI);
 
 UI::UI(Context* context) :
     Object(context),
+    rootElement_(new UIElement(context)),
     mouseButtons_(0),
     qualifiers_(0),
     initialized_(false),
@@ -483,7 +484,6 @@ void UI::Initialize()
     
     graphics_ = graphics;
     
-    rootElement_ = new UIElement(context_);
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     
     noTextureVS_ = renderer->GetVertexShader("Basic_VCol");

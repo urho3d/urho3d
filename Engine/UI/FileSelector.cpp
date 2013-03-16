@@ -110,10 +110,6 @@ FileSelector::FileSelector(Context* context) :
     
     window_->AddChild(buttonLayout_);
     
-    UI* ui = GetSubsystem<UI>();
-    if (ui)
-        ui->GetRoot()->AddChild(window_);
-    
     Vector<String> defaultFilters;
     defaultFilters.Push("*.*");
     SetFilters(defaultFilters, 0);
@@ -122,9 +118,13 @@ FileSelector::FileSelector(Context* context) :
         SetPath(fileSystem->GetCurrentDir());
     
     // Focus the fileselector's filelist initially when created, and bring to front
+    UI* ui = GetSubsystem<UI>();
     if (ui)
+    {
+        ui->GetRoot()->AddChild(window_);
         ui->SetFocusElement(fileList_);
-    window_->BringToFront();
+        window_->BringToFront();
+    }
     
     SubscribeToEvent(filterList_, E_ITEMSELECTED, HANDLER(FileSelector, HandleFilterChanged));
     SubscribeToEvent(pathEdit_, E_TEXTFINISHED, HANDLER(FileSelector, HandlePathChanged));

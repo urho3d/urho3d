@@ -46,6 +46,8 @@ enum ScriptInstanceMethod
     METHOD_FIXEDPOSTUPDATE,
     METHOD_LOAD,
     METHOD_SAVE,
+    METHOD_READNETWORKUPDATE,
+    METHOD_WRITENETWORKUPDATE,
     METHOD_APPLYATTRIBUTES,
     MAX_SCRIPT_METHODS
 };
@@ -78,6 +80,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Return attribute descriptions, or null if none defined.
+    virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Add an event handler. Called by script exposed version of SubscribeToEvent().
@@ -121,26 +125,34 @@ public:
     void SetDelayedMethodCallsAttr(PODVector<unsigned char> value);
     /// Set fixed update time accumulator attribute.
     void SetFixedUpdateAccAttr(float value);
-    /// Set script data attribute by calling a script function.
+    /// Set script file serialization attribute by calling a script function.
     void SetScriptDataAttr(PODVector<unsigned char> data);
+    /// Set script network serialization attribute by calling a script function.
+    void SetScriptNetworkDataAttr(PODVector<unsigned char> data);
     /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;
     /// Return delayed method calls attribute.
     PODVector<unsigned char> GetDelayedMethodCallsAttr() const;
     /// Return fixed update time accumulator attribute.
     float GetFixedUpdateAccAttr() const;
-    /// Get script data attribute by calling a script function.
+    /// Get script file serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptDataAttr() const;
+    /// Get script network serialization attribute by calling a script function.
+    PODVector<unsigned char> GetScriptNetworkDataAttr() const;
     
 private:
     /// (Re)create the script object and check for supported methods if successfully created.
     void CreateObject();
     /// Release the script object.
     void ReleaseObject();
-    /// Clear supported methods.
-    void ClearMethods();
-    /// Check for supported methods.
-    void GetSupportedMethods();
+    /// Check for supported script methods.
+    void GetScriptMethods();
+    /// Check for script attributes.
+    void GetScriptAttributes();
+    /// Clear supported script methods.
+    void ClearScriptMethods();
+    /// Clear attributes to C++ side attributes only.
+    void ClearScriptAttributes();
     /// Handle scene update event.
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle scene post-update event.
@@ -180,6 +192,8 @@ private:
     float fixedPostUpdateAcc_;
     /// Delayed method calls.
     Vector<DelayedMethodCall> delayedMethodCalls_;
+    /// Attributes, including script object variables.
+    Vector<AttributeInfo> attributeInfos_;
 };
 
 /// Return the Urho3D context of the active script context.

@@ -299,6 +299,8 @@ The following methods that implement the component behaviour will be checked for
 - void FixedPostUpdate(float)
 - void Save(Serializer&)
 - void Load(Deserializer&)
+- void WriteNetworkUpdate(Serializer&)
+- void ReadNetworkUpdate(Deserializer&)
 - void ApplyAttributes()
 
 The update methods above correspond to the variable timestep scene update and post-update, and the fixed timestep physics world update and post-update. The application-wide update events are not handled by default.
@@ -319,6 +321,14 @@ ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");
 
 Note that these are not actual Node member functions on the C++ side, as the %Scene library is not allowed to depend on scripting.
 
+\section Scripting_ObjectSerialization Script object serialization
+
+After instantiation, the script object's public member variables that can be converted into Variant, and that don't begin with an underscore are automatically available as attributes of the ScriptInstance, and will be serialized. Note: this means that a ScriptInstance's attribute list changes dynamically depending on the class that has been instantiated.
+
+If the script object contains more complex data structures, you can also serialize and deserialize into a binary buffer manually by implementing the Load() and Save() methods.
+
+%Network replication of the script object variables must be handled manually by implementing WriteNetworkUpdate() and ReadNetworkUpdate() methods, that also write and read a binary buffer. These methods should write/read all replicated of variables of the object. Additionally, the ScriptInstance must be marked for network replication by calling MarkNetworkUpdate() whenever the replicated data changes. Because this replication mechanism can not sync per variable, but always sends the whole binary buffer if even one bit of the data changes, also consider using the automatically replicated node user variables.
+
 \section Script_DelayedCalls Delayed method calls
 
 Delayed method calls can be used in script objects to implement time-delayed actions. Use the DelayedExecute() function in script object code to add a method to be executed later. The parameters are the delay in seconds, repeat flag, the full declaration of the function, and optionally parameters, which must be placed in a Variant array. For example:
@@ -332,7 +342,7 @@ class Test : ScriptObject
         parameters.Push(Variant(100));
         DelayedExecute(1.0, false, "void Trigger(int)", parameters);
     }
-    
+
     void Trigger(int parameter)
     {
         Print("Delayed function triggered with parameter " + parameter);

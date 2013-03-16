@@ -937,8 +937,8 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
-            if (!newComponent->Load(compBuffer))
-                return false;
+            // Do not abort if component fails to load, as the component buffer is nested and we can skip to the next
+            newComponent->Load(compBuffer);
         }
     }
     

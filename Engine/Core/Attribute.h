@@ -66,7 +66,8 @@ struct AttributeInfo
         name_(0),
         offset_(0),
         enumNames_(0),
-        mode_(AM_DEFAULT)
+        mode_(AM_DEFAULT),
+        ptr_(0)
     {
     }
     
@@ -77,7 +78,8 @@ struct AttributeInfo
         offset_(offset),
         enumNames_(0),
         defaultValue_(defaultValue),
-        mode_(mode)
+        mode_(mode),
+        ptr_(0)
     {
     }
     
@@ -88,7 +90,8 @@ struct AttributeInfo
         offset_(offset),
         enumNames_(enumNames),
         defaultValue_(defaultValue),
-        mode_(mode)
+        mode_(mode),
+        ptr_(0)
     {
     }
     
@@ -100,7 +103,8 @@ struct AttributeInfo
         enumNames_(0),
         accessor_(accessor),
         defaultValue_(defaultValue),
-        mode_(mode)
+        mode_(mode),
+        ptr_(0)
     {
     }
     
@@ -112,7 +116,8 @@ struct AttributeInfo
         enumNames_(enumNames),
         accessor_(accessor),
         defaultValue_(defaultValue),
-        mode_(mode)
+        mode_(mode),
+        ptr_(0)
     {
     }
     
@@ -130,6 +135,8 @@ struct AttributeInfo
     Variant defaultValue_;
     /// Attribute mode: whether to use for serialization, network replication, or both.
     unsigned mode_;
+    /// Attribute data pointer if elsewhere than in the Serializable.
+    void* ptr_;
 };
 
 }

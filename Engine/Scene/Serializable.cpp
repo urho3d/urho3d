@@ -59,7 +59,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     }
     
     // Calculate the destination address
-    void* dest = reinterpret_cast<unsigned char*>(this) + attr.offset_;
+    void* dest = attr.ptr_ ? attr.ptr_ : reinterpret_cast<unsigned char*>(this) + attr.offset_;
     
     switch (attr.type_)
     {
@@ -147,7 +147,7 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
     }
     
     // Calculate the source address
-    void* src = reinterpret_cast<unsigned char*>(this) + attr.offset_;
+    void* src = attr.ptr_ ? attr.ptr_ : reinterpret_cast<unsigned char*>(this) + attr.offset_;
     
     switch (attr.type_)
     {
@@ -225,9 +225,19 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
     }
 }
 
+const Vector<AttributeInfo>* Serializable::GetAttributes() const
+{
+    return context_->GetAttributes(GetType());
+}
+
+const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const
+{
+    return networkState_ ? networkState_->attributes_ : context_->GetNetworkAttributes(GetType());
+}
+
 bool Serializable::Load(Deserializer& source)
 {
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
     
@@ -251,7 +261,7 @@ bool Serializable::Load(Deserializer& source)
 
 bool Serializable::Save(Serializer& dest)
 {
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
     
@@ -283,7 +293,7 @@ bool Serializable::LoadXML(const XMLElement& source)
         return false;
     }
     
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
     
@@ -353,7 +363,7 @@ bool Serializable::SaveXML(XMLElement& dest)
         return false;
     }
     
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
     
@@ -388,7 +398,7 @@ bool Serializable::SaveXML(XMLElement& dest)
 
 bool Serializable::SetAttribute(unsigned index, const Variant& value)
 {
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
@@ -418,7 +428,7 @@ bool Serializable::SetAttribute(unsigned index, const Variant& value)
 
 bool Serializable::SetAttribute(const String& name, const Variant& value)
 {
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
@@ -452,8 +462,9 @@ void Serializable::AllocateNetworkState()
 {
     if (!networkState_)
     {
+        const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
         networkState_ = new NetworkState();
-        networkState_->attributes_ = context_->GetNetworkAttributes(GetType());
+        networkState_->attributes_ = networkAttributes;
     }
 }
 
@@ -577,7 +588,7 @@ Variant Serializable::GetAttribute(unsigned index)
 {
     Variant ret;
     
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
@@ -597,7 +608,7 @@ Variant Serializable::GetAttribute(const String& name)
 {
     Variant ret;
     
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
@@ -619,7 +630,7 @@ Variant Serializable::GetAttribute(const String& name)
 
 unsigned Serializable::GetNumAttributes() const
 {
-    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = GetAttributes();
     return attributes ? attributes->Size() : 0;
 }
 
@@ -628,16 +639,6 @@ unsigned Serializable::GetNumNetworkAttributes() const
     const Vector<AttributeInfo>* attributes = networkState_ ? networkState_->attributes_ :
         context_->GetNetworkAttributes(GetType());
     return attributes ? attributes->Size() : 0;
-}
-
-const Vector<AttributeInfo>* Serializable::GetAttributes() const
-{
-    return context_->GetAttributes(GetType());
-}
-
-const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const
-{
-    return networkState_ ? networkState_->attributes_ : context_->GetNetworkAttributes(GetType());
 }
 
 }

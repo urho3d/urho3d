@@ -54,6 +54,10 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor.
     virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest);
+    /// Return attribute descriptions, or null if none defined.
+    virtual const Vector<AttributeInfo>* GetAttributes() const;
+    /// Return network replication attribute descriptions, or null if none defined.
+    virtual const Vector<AttributeInfo>* GetNetworkAttributes() const;
     /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source);
     /// Save as binary data. Return true if successful.
@@ -92,10 +96,6 @@ public:
     unsigned GetNumAttributes() const;
     /// Return number of network replication attributes.
     unsigned GetNumNetworkAttributes() const;
-    /// Return attribute descriptions, or null if none defined.
-    const Vector<AttributeInfo>* GetAttributes() const;
-    /// Return network replication attribute descriptions, or null if none defined.
-    const Vector<AttributeInfo>* GetNetworkAttributes() const;
     
 protected:
     /// Network attribute state.

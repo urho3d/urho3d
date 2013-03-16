@@ -827,6 +827,10 @@ void UIElement::BringToFront()
 {
     // Follow the parent chain to the top level window. If it has BringToFront mode, bring it to front now
     UIElement* root = GetRoot();
+    // If element is detached from hierarchy, this must be a no-op
+    if (!root)
+        return;
+    
     UIElement* ptr = this;
     while (ptr && ptr->GetParent() != root)
         ptr = ptr->GetParent();
