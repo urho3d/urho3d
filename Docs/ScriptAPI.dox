@@ -53,6 +53,7 @@ namespace Urho3D
 - void Print(uint, bool arg1 = false)
 - void Print(float, bool arg1 = false)
 - void Print(bool, bool arg1 = false)
+- void Print(Variant, bool arg1 = false)
 - String GetPath(const String&)
 - String GetFileName(const String&)
 - String GetExtension(const String&)

@@ -71,6 +71,11 @@ static void Print(bool value, bool error)
     Log::WriteRaw(String(value) + "\n", error);
 }
 
+static void Print(Variant value, bool error)
+{
+    Log::WriteRaw(value.ToString() + "\n", error);
+}
+
 static void LogWrite(const String& str, bool error, Log* ptr)
 {
     Log::WriteRaw(str + "\n", error);
@@ -103,6 +108,7 @@ static void Print(int value, bool error) {}
 static void Print(unsigned value, bool error) {}
 static void Print(float value, bool error) {}
 static void Print(bool value, bool error) {}
+static void Print(Variant value, bool error) {}
 static void LogWrite(const String& str, bool error, Log* ptr) {}
 static void LogDebug(const String& str, Log* ptr) {}
 static void LogInfo(const String& str, Log* ptr) {}
@@ -140,6 +146,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void Print(uint, bool error = false)", asFUNCTIONPR(Print, (unsigned, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(float, bool error = false)", asFUNCTIONPR(Print, (float, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(bool, bool error = false)", asFUNCTIONPR(Print, (bool, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(Variant, bool error = false)", asFUNCTIONPR(Print, (Variant, bool), void), asCALL_CDECL);
 }
 
 static File* ConstructFile()

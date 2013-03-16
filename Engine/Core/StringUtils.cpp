@@ -113,7 +113,8 @@ int ToInt(const char* source)
     if (!source)
         return 0;
     
-    return strtol(source, 0, 0);
+    // Explicitly ask for base 10 to prevent source starts with '0' or '0x' from being converted to base 8 or base 16, respectively
+    return strtol(source, 0, 10);
 }
 
 unsigned ToUInt(const String& source)
@@ -126,7 +127,7 @@ unsigned ToUInt(const char* source)
     if (!source)
         return 0;
     
-    return strtoul(source, 0, 0);
+    return strtoul(source, 0, 10);
 }
 
 float ToFloat(const String& source)
@@ -179,10 +180,10 @@ IntRect ToIntRect(const char* source)
         return ret;
     
     char* ptr = (char*)source;
-    ret.left_ = strtol(ptr, &ptr, 0);
-    ret.top_ = strtol(ptr, &ptr, 0);
-    ret.right_ = strtol(ptr, &ptr, 0);
-    ret.bottom_ = strtol(ptr, &ptr, 0);
+    ret.left_ = strtol(ptr, &ptr, 10);
+    ret.top_ = strtol(ptr, &ptr, 10);
+    ret.right_ = strtol(ptr, &ptr, 10);
+    ret.bottom_ = strtol(ptr, &ptr, 10);
     
     return ret;
 }
@@ -201,8 +202,8 @@ IntVector2 ToIntVector2(const char* source)
         return ret;
     
     char* ptr = (char*)source;
-    ret.x_ = strtol(ptr, &ptr, 0);
-    ret.y_ = strtol(ptr, &ptr, 0);
+    ret.x_ = strtol(ptr, &ptr, 10);
+    ret.y_ = strtol(ptr, &ptr, 10);
     
     return ret;
 }
