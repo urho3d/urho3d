@@ -101,6 +101,11 @@ bool ScriptFile::Load(Deserializer& source)
     // Map script module to script resource with userdata
     scriptModule_->SetUserData(this);
     
+    // Store include files as dependencies
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    for (HashSet<String>::Iterator i = includeFiles_.Begin(); i != includeFiles_.End(); ++i)
+        cache->StoreResourceDependency(this, *i);
+    
     return true;
 }
 
@@ -527,6 +532,8 @@ void ScriptFile::ReleaseModule()
         scriptModule_ = 0;
         compiled_ = false;
         SetMemoryUse(0);
+        
+        GetSubsystem<ResourceCache>()->ResetDependencies(this);
     }
 }
 

@@ -598,6 +598,38 @@ void ResourceCache::StoreNameHash(const String& name)
         hashToName_[hash] = name;
 }
 
+void ResourceCache::StoreResourceDependency(Resource* resource, const String& dependency)
+{
+    Vector<WeakPtr<Resource> >& dependents = dependentResources_[StringHash(dependency)];
+    WeakPtr<Resource> resourceWeak(resource);
+    if (!dependents.Contains(resourceWeak))
+        dependents.Push(resourceWeak);
+}
+
+void ResourceCache::ResetDependencies(Resource* resource)
+{
+    WeakPtr<Resource> resourceWeak(resource);
+    
+    for (HashMap<StringHash, Vector<WeakPtr<Resource> > >::Iterator i = dependentResources_.Begin(); i !=
+        dependentResources_.End();)
+    {
+        Vector<WeakPtr<Resource> >& dependents = i->second_;
+        bool remove = false;
+        
+        if (dependents.Contains(resourceWeak))
+        {
+            dependents.Remove(resourceWeak);
+            if (dependents.Empty())
+                remove = true;
+        }
+        
+        if (remove)
+            i = dependentResources_.Erase(i);
+        else
+            ++i;
+    }
+}
+
 const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, StringHash nameHash)
 {
     HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
@@ -688,14 +720,29 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
         String fileName;
         while (fileWatchers_[i]->GetNextChange(fileName))
         {
+            StringHash fileNameHash(fileName);
             // If the filename is a resource we keep track of, reload it
             for (HashMap<ShortStringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin(); j != resourceGroups_.End(); ++j)
             {
-                HashMap<StringHash, SharedPtr<Resource> >::Iterator k = j->second_.resources_.Find(StringHash(fileName));
+                HashMap<StringHash, SharedPtr<Resource> >::Iterator k = j->second_.resources_.Find(fileNameHash);
                 if (k != j->second_.resources_.End())
                 {
                     LOGDEBUG("Reloading changed resource " + fileName);
                     ReloadResource(k->second_);
+                }
+            }
+            // Check if this is a dependency resource, reload dependents
+            HashMap<StringHash, Vector<WeakPtr<Resource> > >::Iterator j = dependentResources_.Find(fileNameHash);
+            if (j != dependentResources_.End())
+            {
+                Vector<WeakPtr<Resource> >& dependents = j->second_;
+                for (unsigned k = 0; k < dependents.Size(); ++k)
+                {
+                    if (dependents[k])
+                    {
+                        LOGDEBUG("Reloading resource " + dependents[k]->GetName() + " depending on " + fileName);
+                        ReloadResource(dependents[k]);
+                    }
                 }
             }
         }

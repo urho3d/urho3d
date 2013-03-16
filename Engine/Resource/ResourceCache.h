@@ -132,6 +132,10 @@ public:
     String SanitateResourceName(const String& name) const;
     /// Store a hash-to-name mapping.
     void StoreNameHash(const String& name);
+    /// Store a dependency for a resource. If a dependency file changes, the resource will be reloaded.
+    void StoreResourceDependency(Resource* resource, const String& dependency);
+    /// Reset dependencies for a resource.
+    void ResetDependencies(Resource* resource);
     
 private:
     /// Find a resource.
@@ -153,6 +157,8 @@ private:
     Vector<SharedPtr<PackageFile> > packages_;
     /// Mapping of hashes to filenames.
     HashMap<StringHash, String> hashToName_;
+    /// Dependent resources.
+    HashMap<StringHash, Vector<WeakPtr<Resource> > > dependentResources_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
 };
