@@ -49,6 +49,9 @@ Shader::Shader(Context* context) :
 
 Shader::~Shader()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    if (cache)
+        cache->ResetDependencies(this);
 }
 
 void Shader::RegisterObject(Context* context)

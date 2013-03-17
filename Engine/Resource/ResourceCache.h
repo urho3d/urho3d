@@ -140,6 +140,8 @@ public:
 private:
     /// Find a resource.
     const SharedPtr<Resource>& FindResource(ShortStringHash type, StringHash nameHash);
+    /// Find a resource by name only. Searches all type groups.
+    const SharedPtr<Resource>& FindResource(StringHash nameHash);
     /// Release resources loaded from a package file.
     void ReleasePackageResources(PackageFile* package, bool force = false);
     /// Update a resource group. Recalculate memory use and release resources if over memory budget.
@@ -158,7 +160,7 @@ private:
     /// Mapping of hashes to filenames.
     HashMap<StringHash, String> hashToName_;
     /// Dependent resources.
-    HashMap<StringHash, Vector<WeakPtr<Resource> > > dependentResources_;
+    HashMap<StringHash, HashSet<StringHash> > dependentResources_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
 };

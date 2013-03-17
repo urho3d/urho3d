@@ -145,6 +145,8 @@ public:
 private:
     /// Re-evaluate occlusion rendering.
     void CheckOcclusion();
+    /// Reset to defaults.
+    void ResetToDefaults();
     
     /// Techniques.
     Vector<TechniqueEntry> techniques_;

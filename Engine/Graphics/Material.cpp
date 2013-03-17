@@ -105,22 +105,12 @@ OBJECTTYPESTATIC(Material);
 
 Material::Material(Context* context) :
     Resource(context),
-    cullMode_(CULL_CCW),
-    shadowCullMode_(CULL_CCW),
-    depthBias_(BiasParameters(0.0f, 0.0f)),
     auxViewFrameNumber_(0),
-    occlusion_(true),
-    specular_(false)
+    specular_(false),
+    occlusion_(true)
 {
     SetNumTechniques(1);
-    
-    // Setup often used default parameters
-    SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
-    SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-    SetShaderParameter("MatDiffColor", Vector4::ONE);
-    SetShaderParameter("MatEmissiveColor", Vector4::ZERO);
-    SetShaderParameter("MatEnvMapColor", Vector4::ONE);
-    SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    ResetToDefaults();
 }
 
 Material::~Material()
@@ -140,6 +130,8 @@ bool Material::Load(Deserializer& source)
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
+    
+    ResetToDefaults();
     
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -452,6 +444,25 @@ void Material::CheckOcclusion()
                 occlusion_ = true;
         }
     }
+}
+
+void Material::ResetToDefaults()
+{
+    for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+        textures_[i] = 0;
+    
+    shaderParameters_.Clear();
+    
+    SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
+    SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
+    SetShaderParameter("MatDiffColor", Vector4::ONE);
+    SetShaderParameter("MatEmissiveColor", Vector4::ZERO);
+    SetShaderParameter("MatEnvMapColor", Vector4::ONE);
+    SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    
+    cullMode_ = CULL_CCW;
+    shadowCullMode_ = CULL_CCW;
+    depthBias_ = BiasParameters(0.0f, 0.0f);
 }
 
 }
