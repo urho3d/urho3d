@@ -71,11 +71,11 @@ static const String filterModeNames[] =
 Texture::Texture(Context* context) :
     Resource(context),
     GPUObject(GetSubsystem<Graphics>()),
+    usage_(TEXTURE_STATIC),
     levels_(0),
     requestedLevels_(0),
     width_(0),
     height_(0),
-    dynamic_(false),
     shadowCompare_(false),
     parametersDirty_(true),
     filterMode_(FILTER_DEFAULT)
@@ -221,15 +221,6 @@ int Texture::GetLevelHeight(unsigned level) const
     if (level > levels_)
         return 0;
     return Max(height_ >> level, 1);
-}
-
-TextureUsage Texture::GetUsage() const
-{
-    /// \todo Check for rendertarget / depth-stencil mode
-    if (dynamic_)
-        return TEXTURE_DYNAMIC;
-    
-    return TEXTURE_STATIC;
 }
 
 unsigned Texture::GetDataSize(int width, int height) const

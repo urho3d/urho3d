@@ -142,6 +142,8 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         faceMemoryUse_[i] = 0;
     }
     
+    usage_ = usage;
+    
     if (usage == TEXTURE_RENDERTARGET)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
@@ -153,16 +155,13 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         addressMode_[COORD_W] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
-        dynamic_ = true;
     }
-    else
-         dynamic_ = usage == TEXTURE_DYNAMIC;
-
+    
     if (usage == TEXTURE_RENDERTARGET)
         SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(TextureCube, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
-
+    
     width_ = size;
     height_ = size;
     format_ = format;

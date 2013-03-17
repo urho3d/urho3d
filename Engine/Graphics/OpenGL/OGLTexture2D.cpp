@@ -146,26 +146,25 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
 {
     // Delete the old rendersurface if any
     renderSurface_.Reset();
-
+    
+    usage_ = usage;
+    
     if (usage >= TEXTURE_RENDERTARGET)
     {
         renderSurface_ = new RenderSurface(this, GL_TEXTURE_2D);
-        dynamic_ = true;
-
+        
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
         addressMode_[COORD_U] = ADDRESS_CLAMP;
         addressMode_[COORD_V] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
-    else
-        dynamic_ = usage == TEXTURE_DYNAMIC;
-
+    
     if (usage == TEXTURE_RENDERTARGET)
         SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture2D, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
-
+    
     width_ = width;
     height_ = height;
     format_ = format;

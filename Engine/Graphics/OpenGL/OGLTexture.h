@@ -91,7 +91,7 @@ public:
     /// Return mip level width, or 0 if level does not exist.
     int GetLevelHeight(unsigned level) const;
     /// Return texture usage type.
-    TextureUsage GetUsage() const;
+    TextureUsage GetUsage() const { return usage_; }
     /// Return data size in bytes for a rectangular region.
     unsigned GetDataSize(int width, int height) const;
     /// Return data size in bytes for a pixel or block row.
@@ -112,6 +112,8 @@ protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
     void CheckTextureBudget(ShortStringHash type);
     
+    /// Texture usage type.
+    TextureUsage usage_;
     /// OpenGL target.
     unsigned target_;
     /// Texture format.
@@ -124,8 +126,6 @@ protected:
     int width_;
     /// Texture height.
     int height_;
-    /// Dynamic flag.
-    bool dynamic_;
     /// Shadow compare mode, OpenGL only.
     bool shadowCompare_;
     /// Parameters dirty flag.
