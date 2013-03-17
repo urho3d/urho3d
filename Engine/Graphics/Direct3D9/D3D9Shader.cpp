@@ -60,6 +60,9 @@ bool Shader::Load(Deserializer& source)
 {
     PROFILE(LoadShader);
     
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    cache->ResetDependencies(this);
+    
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return false;
@@ -85,7 +88,6 @@ bool Shader::Load(Deserializer& source)
     File* sourceFile = dynamic_cast<File*>(&source);
     if (sourceFile && !sourceFile->IsPackaged())
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
         
         if (fileSystem && !fileSystem->HasRegisteredPaths())
@@ -99,6 +101,9 @@ bool Shader::Load(Deserializer& source)
                 String hlslFileName = path + fileName + ".hlsl";
                 sourceModifiedTime_ = fileSystem->GetLastModifiedTime(hlslFileName);
                 
+                String resourcePath = GetPath(GetName());
+                cache->StoreResourceDependency(this, resourcePath + fileName + ".hlsl");
+                
                 // Check also timestamps of any included files and the shader description file
                 if (sourceModifiedTime_)
                 {
@@ -108,8 +113,11 @@ bool Shader::Load(Deserializer& source)
                         String line = file->ReadLine();
                         if (line.StartsWith("#include"))
                         {
-                            String includeFileName = path + line.Substring(9).Replaced("\"", "").Trimmed();
-                            unsigned includeFileTime = fileSystem->GetLastModifiedTime(includeFileName);
+                            String includeName = line.Substring(9).Replaced("\"", "").Trimmed();
+                            String includeFullName = path + includeName;
+                            cache->StoreResourceDependency(this, resourcePath + includeName);
+                            
+                            unsigned includeFileTime = fileSystem->GetLastModifiedTime(includeFullName);
                             if (includeFileTime > sourceModifiedTime_)
                                 sourceModifiedTime_ = includeFileTime;
                         }
