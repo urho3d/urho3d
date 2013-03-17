@@ -755,10 +755,10 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
                             dependents.Push(dependent);
                     }
                     
-                    for (unsigned i = 0; i < dependents.Size(); ++i)
+                    for (unsigned k = 0; k < dependents.Size(); ++k)
                     {
-                        LOGDEBUG("Reloading resource " + dependents[i]->GetName() + " depending on " + fileName);
-                        ReloadResource(dependents[i]);
+                        LOGDEBUG("Reloading resource " + dependents[k]->GetName() + " depending on " + fileName);
+                        ReloadResource(dependents[k]);
                     }
                 }
             }
