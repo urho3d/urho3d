@@ -65,6 +65,8 @@ bool ScriptFile::Load(Deserializer& source)
     
     ReleaseModule();
     
+    GetSubsystem<ResourceCache>()->ResetDependencies(this);
+    
     // Create the module. Discard previous module if there was one
     asIScriptEngine* engine = script_->GetScriptEngine();
     scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
@@ -88,10 +90,7 @@ bool ScriptFile::Load(Deserializer& source)
     if (result < 0)
     {
         LOGERROR("Failed to compile script module " + GetName() + ":\n" + errors);
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        // if a script is compiled error we also tell resource cache do not
-        // remove it from resource group if auto reload is true.
-        return cache->GetAutoReloadResources();
+        return false;
     }
     if (!errors.Empty())
         LOGWARNING(errors);
@@ -100,11 +99,6 @@ bool ScriptFile::Load(Deserializer& source)
     compiled_ = true;
     // Map script module to script resource with userdata
     scriptModule_->SetUserData(this);
-    
-    // Store include files as dependencies
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    for (HashSet<String>::Iterator i = includeFiles_.Begin(); i != includeFiles_.End(); ++i)
-        cache->StoreResourceDependency(this, *i);
     
     return true;
 }
@@ -421,6 +415,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     // Process includes first
     for (unsigned i = 0; i < includeFiles.Size(); ++i)
     {
+        cache->StoreResourceDependency(this, includeFiles[i]);
         SharedPtr<File> file = cache->GetFile(includeFiles[i]);
         if (file)
         {
@@ -532,8 +527,6 @@ void ScriptFile::ReleaseModule()
         scriptModule_ = 0;
         compiled_ = false;
         SetMemoryUse(0);
-        
-        GetSubsystem<ResourceCache>()->ResetDependencies(this);
     }
 }
 

@@ -311,9 +311,9 @@ bool ResourceCache::ReloadResource(Resource* resource)
         return true;
     }
     
-    // If reloading failed, remove the resource from cache
+    // If reloading failed, do not remove the resource from cache, to allow for a new live edit to
+    // attempt loading again
     resource->SendEvent(E_RELOADFAILED);
-    ReleaseResource(resource->GetType(), resource->GetNameHash());
     return false;
 }
 

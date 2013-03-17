@@ -48,6 +48,9 @@ Shader::Shader(Context* context) :
 
 Shader::~Shader()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    if (cache)
+        cache->ResetDependencies(this);
 }
 
 void Shader::RegisterObject(Context* context)
@@ -172,6 +175,8 @@ bool Shader::ProcessSource(SharedArrayPtr<char>& dest, unsigned& length, const S
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     if (!cache)
         return false;
+    
+    cache->StoreResourceDependency(this, fileName);
     
     Vector<String> glslCode;
     
