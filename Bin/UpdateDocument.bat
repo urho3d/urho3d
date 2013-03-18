@@ -1,6 +1,6 @@
 @echo off
 @echo "Dumping Script API..."
-ScriptAPIDumper ../Docs/ScriptAPI.dox
+ScriptCompiler -dumpapi ../Docs/ScriptAPI.dox
 if errorlevel 1 exit /B 1
 @echo "Converting Doxygen files to Wiki..."
 DocConverter ../Docs ../../wiki Urho3D

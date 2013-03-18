@@ -384,7 +384,7 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 - Template functions for getting components or resources by type are not supported. Instead automatic type casts are performed as necessary.
 
-Check the automatically built \ref ScriptAPI "Scripting API" documentation for the exact function signatures. Note that the API documentation can be regenerated to the Urho3D log file by calling \ref Script::DumpAPI "DumpAPI()" function on the Script subsystem or by using \ref Tools_ScriptAPIDumper "ScriptAPIDumper tool".
+Check the automatically built \ref ScriptAPI "Scripting API" documentation for the exact function signatures. Note that the API documentation can be regenerated to the Urho3D log file by calling \ref Script::DumpAPI "DumpAPI()" function on the Script subsystem or by using \ref Tools_ScriptCompiler "ScriptCompiler tool".
 
 \section Scripting_Limitations Limitations
 
@@ -1478,30 +1478,21 @@ The D3DX library from the DirectX runtime or SDK needs to be installed. Note tha
 
 Note that GLSL shaders in the Bin/CoreData/Shaders/GLSL directory also use similar XML definition files, but no precompiling tool exists for them; they are always compiled during runtime.
 
-\section Tools_ScriptAPIDumper ScriptAPIDumper
-
-Dump the %Script API in Doxygen format.
-
-Usage:
-
-\verbatim
-ScriptAPIDumper [output file]
-\endverbatim
-
-The output file can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
-
-
 \section Tools_ScriptCompiler ScriptCompiler
 
-Compiles AngelScript file(s) to binary bytecode for faster loading.
+Compiles AngelScript file(s) to binary bytecode for faster loading. Can also dump the %Script API in Doxygen format.
 
 Usage:
 
 \verbatim
 ScriptCompiler <input file> [resource path for includes]
+ScriptCompiler -dumpapi [output file]
+
 \endverbatim
 
 The output files are saved with the extension .asc (compiled AngelScript.) Binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
+
+The script API dump mode can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
 
 \section Tools_DocConverter DocConverter
 

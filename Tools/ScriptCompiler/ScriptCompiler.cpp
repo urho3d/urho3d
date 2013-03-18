@@ -27,6 +27,7 @@
 #include "Log.h"
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
+#include "Script.h"
 #include "ScriptFile.h"
 
 #ifdef WIN32
@@ -47,11 +48,23 @@ int main(int argc, char** argv)
     const Vector<String>& arguments = ParseArguments(argc, argv);
     #endif
     
+    bool dumpApiMode = false;
     String outputFile;
+    
     if (arguments.Size() < 1)
-        ErrorExit("Usage: ScriptCompiler <input file> [resource path for includes]");
+        ErrorExit("Usage: ScriptCompiler <input file> [resource path for includes]\n"
+                  "       ScriptCompiler -dumpapi [output file]");
     else
-        outputFile = arguments[0];
+    {
+        if (arguments[0] != "-dumpapi")
+            outputFile = arguments[0];
+        else
+        {
+            dumpApiMode = true;
+            if (arguments.Size() > 1)
+                outputFile = arguments[1];
+        }
+    }
     
     SharedPtr<Context> context(new Context());
     SharedPtr<Engine> engine(new Engine(context));
@@ -66,25 +79,38 @@ int main(int argc, char** argv)
     if (!engine->InitializeScripting())
         ErrorExit("Unable to initialize script engine. The application will now exit.");
     
-    String path, file, extension;
-    SplitPath(outputFile, path, file, extension);
-    
-    ResourceCache* cache = context->GetSubsystem<ResourceCache>();
-    
-    // Add resource path to be able to resolve includes
-    if (arguments.Size() > 1)
-        cache->AddResourceDir(arguments[1]);
-    else
-        cache->AddResourceDir(cache->GetPreferredResourceDir(path));
-    
-    if (!file.StartsWith("*"))
-        CompileScript(context, outputFile);
+    if (!dumpApiMode)
+    {
+        String path, file, extension;
+        SplitPath(outputFile, path, file, extension);
+        
+        ResourceCache* cache = context->GetSubsystem<ResourceCache>();
+        
+        // Add resource path to be able to resolve includes
+        if (arguments.Size() > 1)
+            cache->AddResourceDir(arguments[1]);
+        else
+            cache->AddResourceDir(cache->GetPreferredResourceDir(path));
+        
+        if (!file.StartsWith("*"))
+            CompileScript(context, outputFile);
+        else
+        {
+            Vector<String> scriptFiles;
+            context->GetSubsystem<FileSystem>()->ScanDir(scriptFiles, path, file + extension, SCAN_FILES, false);
+            for (unsigned i = 0; i < scriptFiles.Size(); ++i)
+                CompileScript(context, path + scriptFiles[i]);
+        }
+    }
     else
     {
-        Vector<String> scriptFiles;
-        context->GetSubsystem<FileSystem>()->ScanDir(scriptFiles, path, file + extension, SCAN_FILES, false);
-        for (unsigned i = 0; i < scriptFiles.Size(); ++i)
-            CompileScript(context, path + scriptFiles[i]);
+        if (!outputFile.Empty())
+        {
+            log->SetQuiet(true);
+            log->Open(outputFile);
+        }
+        // If without output file, dump to stdout instead
+        context->GetSubsystem<Script>()->DumpAPI();
     }
     
     return EXIT_SUCCESS;
