@@ -118,8 +118,6 @@ bool ScriptFile::Load(Deserializer& source)
     
     ReleaseModule();
     
-    GetSubsystem<ResourceCache>()->ResetDependencies(this);
-    
     // Create the module. Discard previous module if there was one
     asIScriptEngine* engine = script_->GetScriptEngine();
     scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
@@ -616,6 +614,10 @@ void ScriptFile::ReleaseModule()
         scriptModule_ = 0;
         compiled_ = false;
         SetMemoryUse(0);
+        
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        if (cache)
+            cache->ResetDependencies(this);
     }
 }
 
