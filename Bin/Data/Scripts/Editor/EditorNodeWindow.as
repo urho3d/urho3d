@@ -47,6 +47,7 @@ void CreateNodeWindow()
     SubscribeToEvent(nodeWindow.GetChild("CloseButton", true), "Released", "HideNodeWindow");
     SubscribeToEvent(nodeWindow.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNewVariable");
     SubscribeToEvent(nodeWindow.GetChild("DeleteVarButton", true), "Released", "DeleteVariable");
+    SubscribeToEvent("ScriptObjectCreated", "HandleScriptObjectCreated");
 }
 
 void HideNodeWindow()
@@ -117,7 +118,7 @@ void UpdateAttributes(bool fullUpdate)
             if (selectedComponents.length <= 1)
                 componentTitle.text = "No component";
             else
-                componentTitle.text = selectedComponents.length + " components";            
+                componentTitle.text = selectedComponents.length + " components";
         }
         else
         {
@@ -284,4 +285,19 @@ void DeleteVariable(StringHash eventType, VariantMap& eventData)
     }
     if (erased)
         UpdateAttributes(false);
+}
+
+void HandleScriptObjectCreated(StringHash eventType, VariantMap& eventData)
+{
+    Object@ sender = GetEventSender();
+    
+    for (uint i = 0; i < editComponents.length; ++i)
+    {
+        if (sender is editComponents[i])
+        {
+            // Update inspector fully, as attribute set might have changed
+            UpdateAttributes(true);
+            break;
+        }
+    }
 }

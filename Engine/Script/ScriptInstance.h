@@ -34,6 +34,11 @@ namespace Urho3D
 class Script;
 class ScriptFile;
 
+/// Script object created.
+EVENT(E_SCRIPTOBJECTCREATED, ScriptObjectCreated)
+{
+}
+
 /// Inbuilt scripted component methods.
 enum ScriptInstanceMethod
 {

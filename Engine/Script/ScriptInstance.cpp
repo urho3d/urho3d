@@ -138,6 +138,7 @@ void ScriptInstance::SetClassName(const String& className)
         return;
     
     ReleaseObject();
+    
     className_ = className;
     CreateObject();
     MarkNetworkUpdate();
@@ -380,6 +381,8 @@ void ScriptInstance::CreateObject()
         
         if (methods_[METHOD_START])
             scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);
+        
+        SendEvent(E_SCRIPTOBJECTCREATED);
     }
     else
         LOGERROR("Failed to create object of class " + className_ + " from " + scriptFile_->GetName());

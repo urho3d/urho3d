@@ -386,6 +386,14 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 Check the automatically built \ref ScriptAPI "Scripting API" documentation for the exact function signatures. Note that the API documentation can be regenerated to the Urho3D log file by calling \ref Script::DumpAPI "DumpAPI()" function on the Script subsystem or by using \ref Tools_ScriptCompiler "ScriptCompiler tool".
 
+\section Script_Bytecode Precompiling scripts to bytecode
+
+Instead of compiling scripts from source on-the-fly during startup, they can also be precompiled to bytecode, then loaded. Use the \ref Tools_ScriptCompiler "ScriptCompiler" utility for this. In this case the resource request has to be pointed to the compiled file, which by default has the .asc extension:
+
+\code
+ScriptFile* file = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>("Scripts/MyScript.asc");
+\endcode
+
 \section Scripting_Limitations Limitations
 
 There are some complexities of the scripting system one has to watch out for:
