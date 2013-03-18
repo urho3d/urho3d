@@ -34,7 +34,7 @@ namespace Urho3D
 class Script;
 class ScriptFile;
 
-/// Script object created.
+/// Script object created successfully.
 EVENT(E_SCRIPTOBJECTCREATED, ScriptObjectCreated)
 {
 }
