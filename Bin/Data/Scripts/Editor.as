@@ -42,7 +42,6 @@ void Start()
     CreateScene();
     LoadConfig();
     CreateUI();
-    ResetScene();
     ParseArguments();
 }
 
@@ -54,6 +53,7 @@ void Stop()
 void ParseArguments()
 {
     Array<String> arguments = GetArguments();
+    bool loaded = false;
 
     // The first argument should be the editor script name. Scan for a scene to load
     for (uint i = 1; i < arguments.length; ++i)
@@ -61,9 +61,13 @@ void ParseArguments()
         if (arguments[i][0] != '-')
         {
             LoadScene(arguments[i]);
+            loaded = true;
             break;
         }
     }
+    
+    if (!loaded)
+        ResetScene();
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)

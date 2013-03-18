@@ -69,9 +69,6 @@ void ResetScene()
     octree.Resize(BoundingBox(-1000.0, 1000.0), 8);
     editorScene.CreateComponent("DebugRenderer");
 
-    // Disable the Expand/Collapse buttons until there is selection
-    EnableExpandCollapseButtons(false);
-    
     UpdateSceneWindow();
     UpdateNodeWindow();
 
