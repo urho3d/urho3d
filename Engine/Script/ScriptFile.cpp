@@ -39,6 +39,59 @@
 namespace Urho3D
 {
 
+/// Helper class for saving AngelScript bytecode.
+class ByteCodeSerializer : public asIBinaryStream
+{
+public:
+    /// Construct.
+    ByteCodeSerializer(Serializer& dest) :
+        dest_(dest)
+    {
+    }
+    
+    /// Read from stream (no-op).
+    virtual void Read(void* ptr, asUINT size)
+    {
+        // No-op, can not read from a Serializer
+    }
+    
+    /// Write to stream.
+    virtual void Write(const void* ptr, asUINT size)
+    {
+        dest_.Write(ptr, size);
+    }
+    
+private:
+    /// Destination stream.
+    Serializer& dest_;
+};
+
+/// Helper class for loading AngelScript bytecode.
+class ByteCodeDeserializer : public asIBinaryStream
+{
+public:
+    /// Construct.
+    ByteCodeDeserializer(Deserializer& source) :
+        source_(source)
+    {
+    }
+    
+    /// Read from stream.
+    virtual void Read(void* ptr, asUINT size)
+    {
+        source_.Read(ptr, size);
+    }
+    
+    /// Write to stream (no-op).
+    virtual void Write(const void* ptr, asUINT size)
+    {
+    }
+    
+private:
+    /// Source stream.
+    Deserializer& source_;
+};
+
 OBJECTTYPESTATIC(ScriptFile);
 
 ScriptFile::ScriptFile(Context* context) :
@@ -76,7 +129,25 @@ bool ScriptFile::Load(Deserializer& source)
         return false;
     }
     
-    // Add the initial section and check for includes
+    // Check if this file is precompiled bytecode
+    if (source.ReadFileID() == "ASBC")
+    {
+        if (scriptModule_->LoadByteCode(&ByteCodeDeserializer(source)) >= 0)
+        {
+            LOGINFO("Loaded script module " + GetName() + " from bytecode");
+            compiled_ = true;
+            // Map script module to script resource with userdata
+            scriptModule_->SetUserData(this);
+            
+            return true;
+        }
+        else
+            return false;
+    }
+    else
+        source.Seek(0);
+    
+    // Not bytecode: add the initial section and check for includes
     if (!AddScriptSection(engine, source))
         return false;
     
@@ -277,6 +348,17 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
         obj->AddRef();
     
     return obj;
+}
+
+bool ScriptFile::SaveByteCode(Serializer& dest)
+{
+    if (compiled_)
+    {
+        dest.WriteFileID("ASBC");
+        return scriptModule_->SaveByteCode(&ByteCodeSerializer(dest), true) >= 0;
+    }
+    else
+        return false;
 }
 
 asIScriptFunction* ScriptFile::GetFunction(const String& declaration)

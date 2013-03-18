@@ -743,6 +743,7 @@ void InitResourcePicker()
     Array<String> imageFilters = {"*.png", "*.jpg"};
     Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.ktx", "*.pvr"};
     Array<String> soundFilters = {"*.wav","*.ogg"};
+    Array<String> scriptFilters = {"*.as", "*.asc"};
     Array<String> materialFilters = {"*.xml", "*.material"};
     resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
@@ -750,7 +751,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("Material", materialFilters));
     resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
-    resourcePickers.Push(ResourcePicker("ScriptFile", "*.as"));
+    resourcePickers.Push(ResourcePicker("ScriptFile", scriptFilters));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
     resourcePickers.Push(ResourcePicker("Sound", soundFilters));
     sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");

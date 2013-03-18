@@ -1409,17 +1409,14 @@ void View::SetTextures(const RenderPathCommand& command)
         }
         
         // Bind a texture from the resource system
-        if (cache)
+        Texture2D* texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
+        if (texture)
+            graphics_->SetTexture(i, texture);
+        else
         {
-            Texture2D* texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
-            if (texture)
-                graphics_->SetTexture(i, texture);
-            else
-            {
-                // If requesting a texture fails, clear the texture name to prevent redundant attempts
-                RenderPathCommand& cmdWrite = const_cast<RenderPathCommand&>(command);
-                cmdWrite.textureNames_[i] = String::EMPTY;
-            }
+            // If requesting a texture fails, clear the texture name to prevent redundant attempts
+            RenderPathCommand& cmdWrite = const_cast<RenderPathCommand&>(command);
+            cmdWrite.textureNames_[i] = String::EMPTY;
         }
     }
 }

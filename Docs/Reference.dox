@@ -1490,6 +1490,19 @@ ScriptAPIDumper [output file]
 
 The output file can be used to replace the 'ScriptAPI.dox' file in the 'Docs' directory. If the output file name is not provided then the script API would be dumped to standard output (console) instead.
 
+
+\section Tools_ScriptCompiler ScriptCompiler
+
+Compiles AngelScript file(s) to binary bytecode for faster loading.
+
+Usage:
+
+\verbatim
+ScriptCompiler <input file> [resource path for includes]
+\endverbatim
+
+The output files are saved with the extension .asc (compiled AngelScript.) Binary files are not automatically loaded instead of the text format (.as) script files, instead resource requests and resource references in objects need to point to the compiled files. In a final build of an application it may be convenient to simply replace the text format script files with the compiled scripts.
+
 \section Tools_DocConverter DocConverter
 
 Automatically converts the Urho3D Doxygen pages to Google Code wiki format.
@@ -1647,6 +1660,14 @@ uint       Number of texture units
 uint       Bytecode size
 byte[]     Bytecode
 \endverbatim
+
+\section FileFormats_Script Compiled AngelScript (.asc)
+
+\verbatim
+byte[4]    Identifier "ASBC"
+?          Bytecode, produced by AngelScript serializer
+\endverbatim
+
 
 \page CodingConventions Coding conventions
 

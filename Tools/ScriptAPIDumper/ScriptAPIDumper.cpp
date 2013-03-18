@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     SharedPtr<Context> context(new Context());
     SharedPtr<Engine> engine(new Engine(context));
     if (!engine->InitializeScripting())
-        ErrorExit("Unabled to initialize script engine. The application will now exit.");
+        ErrorExit("Unable to initialize script engine. The application will now exit.");
     
     if (!outputFile.Empty())
     {

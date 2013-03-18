@@ -70,6 +70,8 @@ public:
     bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Create a script object.
     asIScriptObject* CreateObject(const String& className);
+    /// Save the script bytecode. Return true if successful.
+    bool SaveByteCode(Serializer& dest);
     
     /// Return script module.
     asIScriptModule* GetScriptModule() const { return scriptModule_; }
