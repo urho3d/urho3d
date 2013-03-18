@@ -11,7 +11,7 @@
         <attribute name="Max Size" value="2147483647 16" />
         <attribute name="Layout Mode" value="Horizontal" />
         <element type="Text">
-            <attribute name="Text" value="Scene hierarchy" />
+            <attribute name="Text" value="Hierarchy" />
         </element>
         <element type="Button" style="CloseButton">
             <attribute name="Name" value="CloseButton" />

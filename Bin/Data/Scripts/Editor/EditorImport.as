@@ -137,7 +137,7 @@ void ImportTundraScene(const String&in fileName)
     }
 
     // Clear old scene, then create a zone and a directional light first
-    CreateScene();
+    ResetScene();
 
     // Set standard gravity
     editorScene.physicsWorld.gravity = Vector3(0, -9.81, 0);

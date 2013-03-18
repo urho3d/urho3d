@@ -3985,9 +3985,8 @@ Methods:<br>
 - void ChangeSelection(int, bool)
 - void SetSelections(uint[]@)
 - void ClearSelection()
-- void SetChildItemsVisible(uint, bool)
-- void SetChildItemsVisible(bool)
-- void ToggleChildItemsVisible(uint)
+- void Expand(uint, bool, bool arg2 = false)
+- void ToggleExpand(uint, bool arg1 = false)
 - bool IsSelected(uint) const
 - UIElement@[]@ GetItems() const
 

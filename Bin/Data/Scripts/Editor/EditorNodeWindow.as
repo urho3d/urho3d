@@ -7,7 +7,7 @@ XMLFile@ componentXMLResource;
 
 bool applyMaterialList = true;
 
-const String STRIKED_OUT = "---";
+const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
 
 void AddComponentContainer()
 {

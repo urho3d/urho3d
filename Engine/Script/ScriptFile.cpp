@@ -359,9 +359,13 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                         String includeFile(&buffer[pos+1], len - 2);
                         pos += len;
                         
-                        // If the file is not found as it is, add the path of current file
+                        // If the file is not found as it is, add the path of current file but only if it is found there
                         if (!cache->Exists(includeFile))
-                            includeFile = GetPath(GetName()) + includeFile;
+                        {
+                            String prefixedIncludeFile = GetPath(GetName()) + includeFile;
+                            if (cache->Exists(prefixedIncludeFile))
+                                includeFile = prefixedIncludeFile;
+                        }
                         
                         String includeFileLower = includeFile.ToLower();
                         
@@ -423,7 +427,10 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                 return false;
         }
         else
+        {
+            LOGERROR("Could not process all the include directives in " + GetName());
             return false;
+        }
     }
     
     // Then add this section

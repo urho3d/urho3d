@@ -106,8 +106,8 @@ OBJECTTYPESTATIC(Material);
 Material::Material(Context* context) :
     Resource(context),
     auxViewFrameNumber_(0),
-    specular_(false),
-    occlusion_(true)
+    occlusion_(true),
+    specular_(false)
 {
     SetNumTechniques(1);
     ResetToDefaults();

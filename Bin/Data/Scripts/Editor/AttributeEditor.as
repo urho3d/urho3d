@@ -418,7 +418,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
                     }
                 }
             }
-            SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(firstID), sameValue || idSameValue), editable && (sameValue || idSameValue));
+            SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(firstID), idSameValue), editable && idSameValue);
         }
     }
     else if (type == VAR_VARIANTVECTOR)
@@ -446,7 +446,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
                     }
                 }
             }
-            LoadAttributeEditor(parent, firstValue, firstValue.type, null, Variant(), editable, sameValue || varSameValue, values);
+            LoadAttributeEditor(parent, firstValue, firstValue.type, null, Variant(), editable, varSameValue, values);
         }
     }
     else if (type == VAR_VARIANTMAP)
@@ -475,7 +475,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
                     }
                 }
             }
-            LoadAttributeEditor(parent, firstValue, firstValue.type, null, Variant(), editable, sameValue || varSameValue, values);
+            LoadAttributeEditor(parent, firstValue, firstValue.type, null, Variant(), editable, varSameValue, values);
         }
     }
     else
@@ -507,7 +507,7 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
                     }
                 }
             }
-            SetEditable(SetValue(parent.children[i + 1], value, sameValue || coordinateSameValue), editable && (sameValue || coordinateSameValue));
+            SetEditable(SetValue(parent.children[i + 1], value, coordinateSameValue), editable && coordinateSameValue);
         }
     }
 }

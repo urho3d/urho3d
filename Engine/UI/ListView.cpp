@@ -36,6 +36,7 @@ namespace Urho3D
 {
 
 static const ShortStringHash indentHash("Indent");
+static const ShortStringHash expandedHash("Expanded");
 
 static const char* highlightModes[] =
 {
@@ -52,9 +53,17 @@ template<> HighlightMode Variant::Get<HighlightMode>() const
 
 int GetItemIndent(UIElement* item)
 {
-    if (!item)
-        return 0;
-    return item->GetVar(indentHash).GetInt();
+    return item ? item->GetVar(indentHash).GetInt() : 0;
+}
+
+bool GetItemExpanded(UIElement* item)
+{
+    return item ? item->GetVar(expandedHash).GetBool() : true;
+}
+    
+void SetItemExpanded(UIElement* item, bool enable)
+{
+    item->SetVar(expandedHash, enable);
 }
 
 OBJECTTYPESTATIC(ListView);
@@ -116,7 +125,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_RIGHT:
             if (hierarchyMode_)
             {
-                SetChildItemsVisible(selection, key == KEY_RIGHT);
+                Expand(selection, key == KEY_RIGHT);
                 return;
             }
             break;
@@ -126,7 +135,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_KP_ENTER:
             if (hierarchyMode_)
             {
-                ToggleChildItemsVisible(selection);
+                ToggleExpand(selection);
                 return;
             }
             break;
@@ -222,6 +231,9 @@ void ListView::InsertItem(unsigned index, UIElement* item)
         
         UpdateSelectionEffect();
     }
+    
+    if (hierarchyMode_)
+        SetItemExpanded(item, item->IsVisible());
 }
 
 void ListView::RemoveItem(UIElement* item, unsigned index)
@@ -289,6 +301,7 @@ void ListView::RemoveAllItems()
     
     contentElement_->EnableLayoutUpdate();
     contentElement_->UpdateLayout();
+    UpdateViewSize();
 }
 
 void ListView::SetSelection(unsigned index)
@@ -501,76 +514,60 @@ void ListView::SetDoubleClickInterval(float interval)
     doubleClickInterval_ = Max((int)(interval * 1000.0f), 0);
 }
 
-void ListView::SetChildItemsVisible(unsigned index, bool enable)
+void ListView::Expand(unsigned index, bool enable, bool recursive)
 {
-    unsigned numItems = GetNumItems();
-    
-    if (!hierarchyMode_ || index >= numItems)
+    if (!hierarchyMode_)
         return;
+    
+    unsigned numItems = GetNumItems();
+    if (index >= numItems)
+        return;
+    
+    UIElement* item = GetItem(index++);
+    SetItemExpanded(item, enable);
+    int baseIndent = GetItemIndent(item);
+    
+    PODVector<bool> expanded(baseIndent + 1);
+    expanded[baseIndent] = enable;
     
     contentElement_->DisableLayoutUpdate();
     
-    int baseIndent = GetItemIndent(GetItem(index));
-    
-    for (unsigned i = index + 1; i < numItems; ++i)
+    while (index < numItems)
     {
-        UIElement* item = GetItem(i);
-        if (GetItemIndent(item) > baseIndent)
-            item->SetVisible(enable);
-        else
+        item = GetItem(index++);
+        int indent = GetItemIndent(item);
+        if (indent <= baseIndent)
             break;
+
+        // Propagate the state to children when it is recursive
+        if (recursive)
+            SetItemExpanded(item, enable);
+        
+        // Use the parent expanded flag to influence the visibility of its children
+        bool visible = enable && expanded[indent - 1];
+        item->SetVisible(visible);
+
+        if (indent >= expanded.Size())
+            expanded.Resize(indent + 1);
+        expanded[indent] = visible && GetItemExpanded(item);
     }
     
     contentElement_->EnableLayoutUpdate();
     contentElement_->UpdateLayout();
+    UpdateViewSize();
 }
 
-void ListView::SetChildItemsVisible(bool enable)
+void ListView::ToggleExpand(unsigned index, bool recursive)
 {
-    unsigned numItems = GetNumItems();
-    
-    for (unsigned i = 0; i < numItems; ++i)
-    {
-        if (!GetItemIndent(GetItem(i)))
-            SetChildItemsVisible(i, enable);
-    }
-    
-    unsigned firstSelected = GetSelection();
-    if (firstSelected != M_MAX_UNSIGNED)
-        EnsureItemVisibility(firstSelected);
-}
-
-void ListView::ToggleChildItemsVisible(unsigned index)
-{
-    unsigned numItems = GetNumItems();
-    
-    if (!hierarchyMode_ || index >= numItems)
+    if (!hierarchyMode_)
         return;
     
-    contentElement_->DisableLayoutUpdate();
+    unsigned numItems = GetNumItems();
+    if (index >= numItems)
+        return;
     
-    int baseIndent = GetItemIndent(GetItem(index));
-    bool firstChild = true;
-    bool firstChildVisible;
-    for (unsigned i = index + 1; i < numItems; ++i)
-    {
-        UIElement* item = GetItem(i);
-        if (GetItemIndent(item) > baseIndent)
-        {
-            if (firstChild)
-            {
-                item->SetVisible(firstChildVisible = !item->IsVisible());
-                firstChild = false;
-            }
-            else
-                item->SetVisible(firstChildVisible);
-        }
-        else
-            break;
-    }
-    
-    contentElement_->EnableLayoutUpdate();
-    contentElement_->UpdateLayout();
+    UIElement* item = GetItem(index);
+    Expand(index, !GetItemExpanded(item), recursive);
 }
 
 unsigned ListView::GetNumItems() const

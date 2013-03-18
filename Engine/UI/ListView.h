@@ -89,12 +89,11 @@ public:
     void SetClearSelectionOnDefocus(bool enable);
     /// Set item doubleclick interval in seconds.
     void SetDoubleClickInterval(float interval);
-    /// Show or hide child items starting from index. Only has effect in hierarchy mode.
-    void SetChildItemsVisible(unsigned index, bool enable);
-    /// Show or hide all child items. Only has effect in hierarchy mode.
-    void SetChildItemsVisible(bool enable);
-    /// Toggle child items' visibility starting from index. Only has effect in hierarchy mode.
-    void ToggleChildItemsVisible(unsigned index);
+    
+    /// Expand item at index. Only has effect in hierarchy mode.
+    void Expand(unsigned index, bool enable, bool recursive = false);
+    /// Toggle item's expanded flag at index. Only has effect in hierarchy mode.
+    void ToggleExpand(unsigned index, bool recursive = false);
     
     /// Return number of items.
     unsigned GetNumItems() const;

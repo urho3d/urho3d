@@ -1,4 +1,4 @@
-// Urho3D editor scene hierarchy window handling
+// Urho3D editor hierarchy window handling
 
 const int ITEM_NONE = 0;
 const int ITEM_NODE = 1;
@@ -48,8 +48,8 @@ void CreateSceneWindow()
     list.scrollPanel.dragDropMode = DD_TARGET;
 
     SubscribeToEvent(sceneWindow.GetChild("CloseButton", true), "Released", "HideSceneWindow");
-    SubscribeToEvent(sceneWindow.GetChild("ExpandAllButton", true), "Released", "ExpandSceneHierarchy");
-    SubscribeToEvent(sceneWindow.GetChild("CollapseAllButton", true), "Released", "CollapseSceneHierarchy");
+    SubscribeToEvent(sceneWindow.GetChild("ExpandAllButton", true), "Released", "ExpandCollapseHierarchy");
+    SubscribeToEvent(sceneWindow.GetChild("CollapseAllButton", true), "Released", "ExpandCollapseHierarchy");
     SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "SelectionChanged", "HandleSceneWindowSelectionChange");
     SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemDoubleClicked", "HandleSceneWindowItemDoubleClick");
     SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "UnhandledKey", "HandleSceneWindowKey");
@@ -72,29 +72,26 @@ void HideSceneWindow()
     sceneWindow.visible = false;
 }
 
-void ExpandSceneHierarchy()
+void ExpandCollapseHierarchy(StringHash eventType, VariantMap& eventData)
 {
+    Button@ button = eventData["Element"].GetUIElement();
+    bool enable = button.name == "ExpandAllButton";
+
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.SetChildItemsVisible(true);
+    Array<uint> selections = list.selections;
+    for (uint i = 0; i < selections.length; ++i)
+        list.Expand(selections[i], enable, true);
 }
 
-void CollapseSceneHierarchy()
+void EnableExpandCollapseButtons(bool enable)
 {
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.contentElement.DisableLayoutUpdate();
-    // Show root-level nodes, but no components
-    for (uint i = 0; i < list.numItems; ++i)
+    String[] buttons = { "ExpandAllButton", "CollapseAllButton" };
+    for (uint i = 0; i < buttons.length; ++i)
     {
-        UIElement@ item = list.items[i];
-        int indent = item.vars["Indent"].GetInt();
-        int type = item.vars["Type"].GetInt();
-        if (type == ITEM_COMPONENT || indent > 1)
-            item.visible = false;
-        else
-            item.visible = true;
+        UIElement@ element = sceneWindow.GetChild(buttons[i], true);
+        element.active = enable;
+        element.children[0].color = enable ? normalTextColor : nonEditableTextColor;
     }
-    list.contentElement.EnableLayoutUpdate();
-    list.contentElement.UpdateLayout();
 }
 
 void ClearSceneWindow()
@@ -384,11 +381,11 @@ void SelectNode(Node@ node, bool multiselect)
                                 
     uint nodeItem = GetNodeListIndex(node);
 
-    // Go in the parent chain up to the first non-root level to make sure the chain is expanded
+    // Go in the parent chain up to make sure the chain is expanded
     for (;;)
     {
         Node@ parent = node.parent;
-        if (node is editorScene || parent is editorScene || parent is null)
+        if (node is editorScene || parent is null)
             break;
         node = parent;
     }
@@ -398,12 +395,12 @@ void SelectNode(Node@ node, bool multiselect)
 
     if (nodeItem < numItems)
     {
-        // Expand the node chain now, but do not expand the whole scene in case the component was in the root
+        // Expand the node chain now
         if (!multiselect || !list.IsSelected(nodeItem))
         {
-            list.items[nodeItem].visible = true;
-            if (parentItem != 0 && parentItem < numItems)
-                list.SetChildItemsVisible(parentItem, true);
+            if (parentItem < numItems)
+                list.Expand(parentItem, true);
+            list.Expand(nodeItem, true);
         }
         // This causes an event to be sent, in response we set the node/component selections, and refresh editors
         if (!multiselect)
@@ -422,49 +419,48 @@ void SelectComponent(Component@ component, bool multiselect)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
-    if (component is null)
+    if (component is null && !multiselect)
     {
-        if (!multiselect)
-            list.ClearSelection();
+        list.ClearSelection();
         return;
     }
+    
     Node@ node = component.node;
-    if (node is null)
+    if (node is null && !multiselect)
     {
-        if (!multiselect)
-            list.ClearSelection();
+        list.ClearSelection();
         return;
     }
 
-    // Go in the parent chain up to the first non-root level to make sure the chain is expanded
+    uint nodeItem = GetNodeListIndex(node);
+    uint componentItem = GetComponentListIndex(component);
+    
+    // Go in the parent chain up to make sure the chain is expanded
     for (;;)
     {
         Node@ parent = node.parent;
-        if (node is editorScene || parent is editorScene || parent is null)
+        if (node is editorScene || parent is null)
             break;
         node = parent;
     }
 
     uint numItems = list.numItems;
-    uint nodeItem = GetNodeListIndex(node);
-    uint componentItem = GetComponentListIndex(component);
+    uint parentItem = GetNodeListIndex(node);
 
-    if (nodeItem >= list.numItems)
+    if (parentItem >= list.numItems && !multiselect)
     {
-        if (!multiselect)
-            list.ClearSelection();
+        list.ClearSelection();
         return;
     }
 
     if (nodeItem < numItems && componentItem < numItems)
     {
-        // Expand the node chain now, but do not expand the whole scene in case the component was in the root
+        // Expand the node chain now
         if (!multiselect || !list.IsSelected(componentItem))
         {
-            list.items[nodeItem].visible = true;
-            if (nodeItem != 0)
-                list.SetChildItemsVisible(nodeItem, true);
-            list.items[componentItem].visible = true;
+            if (parentItem < numItems)
+                list.Expand(parentItem, true);
+            list.Expand(nodeItem, true);
         }
         // This causes an event to be sent, in response we set the node/component selections, and refresh editors
         if (!multiselect)
@@ -489,6 +485,9 @@ void HandleSceneWindowSelectionChange()
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     Array<uint> indices = list.selections;
 
+    // Enable Expand/Collapse button when there is selection
+    EnableExpandCollapseButtons(indices.length > 0);
+    
     for (uint i = 0; i < indices.length; ++i)
     {
         uint index = indices[i];
@@ -605,15 +604,7 @@ void HandleSceneWindowItemDoubleClick(StringHash eventType, VariantMap& eventDat
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
     uint index = eventData["Selection"].GetUInt();
-    if (index == 0)
-    {
-        if (list.numItems > 1 && list.items[1].visible == true)
-            CollapseSceneHierarchy();
-        else
-            list.ToggleChildItemsVisible(index);
-    }
-    else
-        list.ToggleChildItemsVisible(index);
+    list.ToggleExpand(index);
 }
 
 void HandleSceneWindowKey(StringHash eventType, VariantMap& eventData)
@@ -795,16 +786,11 @@ bool CheckForExistingGlobalComponent(Node@ node, const String&in typeName)
 bool SaveExpandedStatus(uint itemIndex)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    uint nextIndex = itemIndex + 1;
-    if (nextIndex < list.numItems && list.items[nextIndex].vars["Indent"].GetInt() > list.items[itemIndex].vars["Indent"].GetInt()
-        && list.items[nextIndex].visible == false)
-        return false;
-    else
-        return true;
+    return list.items[itemIndex].vars["Expanded"].GetBool();
 }
 
 void RestoreExpandedStatus(uint itemIndex, bool expanded)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.SetChildItemsVisible(itemIndex, expanded);
+    list.Expand(itemIndex, expanded);
 }

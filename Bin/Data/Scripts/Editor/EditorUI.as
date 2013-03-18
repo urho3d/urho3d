@@ -164,7 +164,7 @@ void CreateMenuBar()
     {
         Menu@ fileMenu = CreateMenu("View");
         Window@ filePopup = fileMenu.popup;
-        filePopup.AddChild(CreateMenuItem("Scene hierarchy", 'H', QUAL_CTRL));
+        filePopup.AddChild(CreateMenuItem("Hierarchy", 'H', QUAL_CTRL));
         filePopup.AddChild(CreateMenuItem("Attribute inspector", 'N', QUAL_CTRL));
         filePopup.AddChild(CreateMenuItem("Editor settings", 0, 0));
         filePopup.AddChild(CreateMenuItem("Editor preferences", 0, 0));
@@ -319,7 +319,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
     if (uiFileSelector is null)
     {
         if (action == "New scene")
-            CreateScene();
+            ResetScene();
         else if (action == "Open scene...")
         {
             CreateFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
@@ -379,7 +379,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     if (action == "Reload resources")
         ReloadResources();
-    else if (action == "Scene hierarchy")
+    else if (action == "Hierarchy")
         ShowSceneWindow();
     else if (action == "Attribute inspector")
         ShowNodeWindow();

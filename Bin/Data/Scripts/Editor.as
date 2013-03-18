@@ -42,6 +42,7 @@ void Start()
     CreateScene();
     LoadConfig();
     CreateUI();
+    ResetScene();
     ParseArguments();
 }
 

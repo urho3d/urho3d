@@ -44,31 +44,41 @@ void ClearSelection()
 
 void CreateScene()
 {
-    ClearSelection();
-
-    // Create a scene with default values, these will be overridden when loading scenes
+    // Create a scene only once here
     editorScene = Scene("");
-    Octree@ octree = editorScene.CreateComponent("Octree");
-    PhysicsWorld@ physicsWorld = editorScene.CreateComponent("PhysicsWorld");
-    octree.Resize(BoundingBox(-1000.0, 1000.0), 8);
-    editorScene.CreateComponent("DebugRenderer");
-
+    
     // Allow access to the scene from the console
     script.defaultScene = editorScene;
     
     // Always pause the scene, and do updates manually
     editorScene.active = false;
 
-    if (sceneWindow !is null)
-    {
-        UpdateSceneWindow();
-        UpdateNodeWindow();
-    }
+    // Camera is not bounded to a scene but still need to be created once here
+    CreateCamera();
+}
+
+void ResetScene()
+{
+    ClearSelection();
+
+    // Create a scene with default values, these will be overridden when loading scenes
+    editorScene.Clear();
+    editorScene.name = "";
+    Octree@ octree = editorScene.CreateComponent("Octree");
+    PhysicsWorld@ physicsWorld = editorScene.CreateComponent("PhysicsWorld");
+    octree.Resize(BoundingBox(-1000.0, 1000.0), 8);
+    editorScene.CreateComponent("DebugRenderer");
+
+    // Disable the Expand/Collapse buttons until there is selection
+    EnableExpandCollapseButtons(false);
+    
+    UpdateSceneWindow();
+    UpdateNodeWindow();
 
     runUpdate = false;
     sceneFileName = "";
     UpdateWindowTitle();
-    CreateCamera();
+    ResetCamera();
     CreateGizmo();
 }
 
@@ -199,7 +209,6 @@ void LoadScene(const String&in fileName)
 
     // Clear the old scene
     ClearSelection();
-    ClearSceneWindow();
     editorScene.Clear();
 
     // Add the new resource path
