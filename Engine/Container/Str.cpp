@@ -34,8 +34,6 @@ char String::endZero = 0;
 
 const String String::EMPTY;
 
-void PrintArgs(const char *formatString, va_list args);
-
 String::String(const WString& str) :
     length_(0),
     capacity_(0),
@@ -1051,6 +1049,8 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
             }
         }
     }
+
+    return *this;
 }
 
 int String::Compare(const char* lhs, const char* rhs, bool caseSensitive)

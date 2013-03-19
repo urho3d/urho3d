@@ -130,7 +130,8 @@ bool ScriptFile::Load(Deserializer& source)
     // Check if this file is precompiled bytecode
     if (source.ReadFileID() == "ASBC")
     {
-        if (scriptModule_->LoadByteCode(&ByteCodeDeserializer(source)) >= 0)
+        ByteCodeDeserializer deserializer = ByteCodeDeserializer(source);
+        if (scriptModule_->LoadByteCode(&deserializer) >= 0)
         {
             LOGINFO("Loaded script module " + GetName() + " from bytecode");
             compiled_ = true;
@@ -353,7 +354,8 @@ bool ScriptFile::SaveByteCode(Serializer& dest)
     if (compiled_)
     {
         dest.WriteFileID("ASBC");
-        return scriptModule_->SaveByteCode(&ByteCodeSerializer(dest), true) >= 0;
+        ByteCodeSerializer serializer = ByteCodeSerializer(dest);
+        return scriptModule_->SaveByteCode(&serializer, true) >= 0;
     }
     else
         return false;

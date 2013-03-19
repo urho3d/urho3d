@@ -112,9 +112,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     }
 #elif defined(__linux__)
     int flags = IN_CREATE|IN_DELETE|IN_MODIFY|IN_MOVED_FROM|IN_MOVED_TO;
-    int handle;
-    dirHandle_;
-    handle = inotify_add_watch(watchHandle_, pathName.CString(), flags);
+    int handle = inotify_add_watch(watchHandle_, pathName.CString(), flags);
 
     if (handle < 0)
     {

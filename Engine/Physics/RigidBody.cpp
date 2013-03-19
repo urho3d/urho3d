@@ -46,8 +46,6 @@ namespace Urho3D
 static const float DEFAULT_MASS = 0.0f;
 static const float DEFAULT_FRICTION = 0.5f;
 static const float DEFAULT_RESTITUTION = 0.0f;
-static const float DEFAULT_LINEAR_REST_THRESHOLD = 0.8f;
-static const float DEFAULT_ANGULAR_REST_THRESHOLD = 1.0f;
 static const unsigned DEFAULT_COLLISION_LAYER = 0x1;
 static const unsigned DEFAULT_COLLISION_MASK = M_MAX_UNSIGNED;
 

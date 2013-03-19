@@ -51,7 +51,7 @@ public:
     /// Construct.
     CustomGeometry(Context* context);
     /// Destruct.
-    ~CustomGeometry();
+    virtual ~CustomGeometry();
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     

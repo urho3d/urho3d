@@ -186,10 +186,10 @@ void ReloadResources()
         cache.ReloadResource(sceneResources[i]);
 }
 
-void LoadScene(const String&in fileName)
+bool LoadScene(const String&in fileName)
 {
     if (fileName.empty)
-        return;
+        return false;
     
     ui.cursor.shape = CS_BUSY;
     
@@ -197,12 +197,12 @@ void LoadScene(const String&in fileName)
     if (!fileSystem.FileExists(fileName))
     {
         log.Error("No such scene: " + fileName);
-        return;
+        return false;
     }
 
     File file(fileName, FILE_READ);
     if (!file.open)
-        return;
+        return false;
 
     // Clear the old scene
     ClearSelection();
@@ -212,10 +212,11 @@ void LoadScene(const String&in fileName)
     SetResourcePath(GetPath(fileName));
 
     String extension = GetExtension(fileName);
+    bool loaded;
     if (extension != ".xml")
-        editorScene.Load(file);
+        loaded = editorScene.Load(file);
     else
-        editorScene.LoadXML(file);
+        loaded = editorScene.LoadXML(file);
 
     // Always pause the scene, and do updates manually
     editorScene.active = false;
@@ -228,6 +229,8 @@ void LoadScene(const String&in fileName)
     UpdateNodeWindow();
     ResetCamera();
     CreateGizmo();
+
+    return loaded;
 }
 
 void SaveScene(const String&in fileName)

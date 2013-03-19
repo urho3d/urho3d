@@ -42,7 +42,6 @@ namespace Urho3D
 static const int MIN_BUFFERLENGTH = 20;
 static const int MIN_MIXRATE = 11025;
 static const int MAX_MIXRATE = 48000;
-static const int AUDIO_FPS = 100;
 
 static void SDLAudioCallback(void *userdata, Uint8 *stream, int len);
 

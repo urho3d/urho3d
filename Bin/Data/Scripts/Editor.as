@@ -60,8 +60,7 @@ void ParseArguments()
     {
         if (arguments[i][0] != '-')
         {
-            LoadScene(arguments[i]);
-            loaded = true;
+            loaded = LoadScene(arguments[i]);
             break;
         }
     }

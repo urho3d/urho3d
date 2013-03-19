@@ -406,6 +406,7 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer &msg)
             
         default:
             processed = false;
+            break;
     }
     
     return processed;

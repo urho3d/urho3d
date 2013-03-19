@@ -31,6 +31,8 @@ namespace Urho3D
 class ScriptEventListener
 {
 public:
+    /// Destruct
+    virtual ~ScriptEventListener() {};
     /// Add a scripted event handler. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(StringHash eventType, const String& handlerName) = 0;
     /// Add a scripted event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
