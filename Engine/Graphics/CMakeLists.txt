@@ -22,7 +22,7 @@ set (LINK_LIBS_ONLY SDL)
 
 if (USE_OPENGL)
     if (NOT IOS)
-        set (LIBS ${LIBS} ../../ThirdParty/GLee)
+        set (LIBS ${LIBS} ../../ThirdParty/GLEW)
     endif()
 else ()
     set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} d3d9.lib)

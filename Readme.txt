@@ -50,7 +50,7 @@ Urho3D uses the following third-party libraries:
 - AngelScript 2.26.1 WIP (http://www.angelcode.com/angelscript/)
 - Bullet 2.80 (http://www.bulletphysics.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
-- GLee 5.4 (http://elf-stone.com/)
+- GLEW 1.9.0 (http://glew.sourceforge.net/)
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
 - MojoShader (http://icculus.org/mojoshader/)

@@ -12,7 +12,7 @@ set (INCLUDE_DIRS_ONLY ../Engine)
 set (LINK_LIBS_ONLY SDL)
 
 if (USE_OPENGL)
-    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../../ThirdParty/GLee)
+    set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../../ThirdParty/GLEW)
 endif ()
 
 # Setup target

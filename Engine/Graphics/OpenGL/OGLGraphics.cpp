@@ -355,25 +355,30 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
             
             // If OpenGL extensions not yet initialized, initialize now
             #ifndef GL_ES_VERSION_2_0
-            if (!GLeeInitialized())
-                GLeeInit();
+            GLenum err = glewInit();
+            if (GLEW_OK != err)
+            {
+                LOGERROR("Cannot initialize OpenGL");
+                Release(true, true);
+                return false;
+            }
             
-            if (!_GLEE_VERSION_2_0)
+            if (!GLEW_VERSION_2_0)
             {
                 LOGERROR("OpenGL 2.0 is required");
                 Release(true, true);
                 return false;
             }
             
-            if (!_GLEE_EXT_framebuffer_object || !_GLEE_EXT_packed_depth_stencil)
+            if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
             {
                 LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
                 Release(true, true);
                 return false;
             }
         
-            dxtTextureSupport_ = _GLEE_EXT_texture_compression_s3tc;
-            anisotropySupport_ = _GLEE_EXT_texture_filter_anisotropic;
+            dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
+            anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
             #else
             dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
             etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");

@@ -33,7 +33,7 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #else
-#include <GLee.h>
+#include <glew.h>
 #endif
 
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT

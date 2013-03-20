@@ -59,6 +59,14 @@ if (NOT WIN32)
     add_definitions (-DUNIX)
 endif ()
 
+# Set static for GLEW.
+if (NOT IOS)
+    if (USE_OPENGL)
+        add_definitions(-DGLEW_STATIC)
+        add_definitions(-DGLEW_NO_GLU)
+    endif ()
+endif ()
+
 # Compiler-specific options
 if (MSVC)
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
@@ -167,7 +175,7 @@ add_subdirectory (Urho3D)
 
 if (NOT IOS)
     if (USE_OPENGL)
-        add_subdirectory (ThirdParty/GLee)
+        add_subdirectory (ThirdParty/GLEW)
     endif ()
     add_subdirectory (ThirdParty/Assimp)
     add_subdirectory (ThirdParty/LibCpuId)

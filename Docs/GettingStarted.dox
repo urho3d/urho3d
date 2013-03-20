@@ -255,7 +255,7 @@ The third-party libraries are used for the following functionality:
 - AngelScript: scripting language implementation
 - Bullet: physics simulation implementation
 - FreeType: font rendering
-- GLee: OpenGL extensions handling
+- GLEW: OpenGL extensions handling
 - kNet: UDP networking
 - libcpuid: CPU properties detection
 - MojoShader: parsing HLSL bytecode after shader compilation
