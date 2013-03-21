@@ -26,6 +26,8 @@
 #include "Texture.h"
 #include "UIElement.h"
 
+#include <cstring>
+
 #include "DebugNew.h"
 
 namespace Urho3D
@@ -61,10 +63,8 @@ UIQuad::UIQuad(const UIElement& element, int x, int y, int width, int height, in
         bottomRightColor_ = GetInterpolatedColor(element, x + width, y + height);
     }
     
-    const IntVector2& screenPos = element.GetScreenPosition();
-    
-    left_ = x + screenPos.x_;
-    top_ = y + screenPos.y_;
+    left_ = x;
+    top_ = y;
     right_ = left_ + width;
     bottom_ = top_ + height;
     leftUV_ = texOffsetX;
@@ -107,7 +107,8 @@ UIBatch::UIBatch() :
 {
 }
 
-UIBatch::UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads) :
+UIBatch::UIBatch(const Matrix3x4& transform, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads) :
+    transform_(transform),
     blendMode_(blendMode),
     scissor_(scissor),
     texture_(texture),
@@ -210,11 +211,12 @@ void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int hei
 
 bool UIBatch::Merge(const UIBatch& batch)
 {
-    if ((batch.blendMode_ != blendMode_) ||
-        (batch.scissor_ != scissor_) ||
-        (batch.texture_ != texture_) ||
-        (batch.quads_ != quads_) ||
-        (batch.quadStart_ != quadStart_ + quadCount_))
+    if (memcmp(&batch.transform_, &transform_, sizeof transform_) ||
+        batch.blendMode_ != blendMode_ ||
+        batch.scissor_ != scissor_ ||
+        batch.texture_ != texture_ ||
+        batch.quads_ != quads_ ||
+        batch.quadStart_ != quadStart_ + quadCount_)
         return false;
     
     quadCount_ += batch.quadCount_;
@@ -231,7 +233,6 @@ void UIBatch::UpdateGeometry(Graphics* graphics, void* lockedData)
     #else
     Vector2 posAdjust(0.5f, 0.5f);
     #endif
-    Vector2 invScreenSize(1.0f / (float)graphics->GetWidth(), 1.0f / (float)graphics->GetHeight());
     
     float* dest = (float*)lockedData;
     
@@ -244,8 +245,8 @@ void UIBatch::UpdateGeometry(Graphics* graphics, void* lockedData)
             const UIQuad& quad = quads_->At(quadStart_ + i);
             Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
             
-            topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust) * invScreenSize;
-            bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust) * invScreenSize;
+            topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust);
+            bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust);
             topLeftUV = Vector2((float)quad.leftUV_, (float)quad.topUV_) * invTextureSize;
             bottomRightUV = Vector2((float)quad.rightUV_, (float)quad.bottomUV_) * invTextureSize;
             
@@ -281,8 +282,8 @@ void UIBatch::UpdateGeometry(Graphics* graphics, void* lockedData)
             const UIQuad& quad = quads_->At(quadStart_ + i);
             Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
             
-            topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust) * invScreenSize;
-            bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust) * invScreenSize;
+            topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust);
+            bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust);
             
             *dest++ = topLeft.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.topLeftColor_; dest++;

@@ -43,6 +43,11 @@ static const char* blendModes[] =
     0
 };
 
+template<> BlendMode Variant::Get<BlendMode>() const
+{
+    return (BlendMode)GetInt();
+}
+
 OBJECTTYPESTATIC(BorderImage);
 
 BorderImage::BorderImage(Context* context) :
@@ -50,8 +55,8 @@ BorderImage::BorderImage(Context* context) :
     imageRect_(IntRect::ZERO),
     border_(IntRect::ZERO),
     hoverOffset_(IntVector2::ZERO),
-    tiled_(false),
-    blendMode_(0)
+    blendMode_(BLEND_REPLACE),
+    tiled_(false)
 {
 }
 
@@ -68,7 +73,7 @@ void BorderImage::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTVECTOR2, "Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(BorderImage, VAR_BOOL, "Tiled", IsTiled, SetTiled, bool, true, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(BorderImage, "Blend Mode", GetBlendMode, SetBlendMode, unsigned, blendModes, 0, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(BorderImage, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModes, 0, AM_FILE);
     COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
 }
 
@@ -125,14 +130,14 @@ void BorderImage::SetHoverOffset(int x, int y)
     hoverOffset_ = IntVector2(x, y);
 }
 
+void BorderImage::SetBlendMode(BlendMode mode)
+{
+    blendMode_ = mode;
+}
+
 void BorderImage::SetTiled(bool enable)
 {
     tiled_ = enable;
-}
-
-void BorderImage::SetBlendMode(unsigned mode)
-{
-    blendMode_ = mode;
 }
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset)
@@ -142,7 +147,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qua
         color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
         
-    UIBatch batch(blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : static_cast<BlendMode>(blendMode_), currentScissor, texture_, &quads);
+    UIBatch batch(GetBatchTransform(), blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &quads);
     
     // Calculate size of the inner rect, and texture dimensions of the inner rect
     const IntVector2& size = GetSize();

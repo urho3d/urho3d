@@ -243,6 +243,10 @@ public:
     void SetLayoutSpacing(int spacing);
     /// Set layout border.
     void SetLayoutBorder(const IntRect& border);
+    /// Set content rotation pivot offset.
+    void SetRotationPivot(const IntVector2& pivot);
+    /// Set content rotation angle in degrees. Positive is clockwise. Note: child elements do not rotate.
+    void SetRotation(float angle);
     /// Manually update layout. Should not be necessary in most cases, but is provided for completeness.
     void UpdateLayout();
     /// Disable automatic layout update. Should only be used if there are performance problems.
@@ -346,6 +350,10 @@ public:
     int GetLayoutSpacing() const { return layoutSpacing_; }
     /// Return layout border.
     const IntRect& GetLayoutBorder() const { return layoutBorder_; }
+    /// Return rotation pivot offset.
+    const IntVector2& GetRotationPivot() const { return rotationPivot_; }
+    /// Return rotation angle.
+    float GetRotation() const { return rotation_; }
     /// Return number of child elements.
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return child element by index.
@@ -390,6 +398,8 @@ public:
     void SetTempVisible(bool enable);
     /// Adjust scissor for rendering.
     void AdjustScissor(IntRect& currentScissor);
+    /// Get transform for rendering batches.
+    Matrix3x4 GetBatchTransform();
     /// Get UI rendering batches with a specified offset. Also recurses to child elements.
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
         currentScissor);
@@ -444,6 +454,10 @@ protected:
     int layoutSpacing_;
     /// Layout borders.
     IntRect layoutBorder_;
+    /// Rotation pivot offset.
+    IntVector2 rotationPivot_;
+    /// Rotation angle.
+    float rotation_;
     /// Resize nesting level to prevent multiple events and endless loop.
     unsigned resizeNestingLevel_;
     /// Layout update nesting level to prevent endless loop.

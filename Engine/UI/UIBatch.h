@@ -24,6 +24,7 @@
 
 #include "Color.h"
 #include "GraphicsDefs.h"
+#include "Matrix3x4.h"
 #include "Rect.h"
 
 namespace Urho3D
@@ -82,7 +83,7 @@ public:
     /// Construct with defaults.
     UIBatch();
     /// Construct
-    UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads);
+    UIBatch(const Matrix3x4& transform, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads);
     
     /// Begin adding quads.
     void Begin(PODVector<UIQuad>* quads);
@@ -106,6 +107,8 @@ public:
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
     
+    /// Transform matrix.
+    Matrix3x4 transform_;
     /// Blending mode.
     BlendMode blendMode_;
     /// Scissor rectangle.

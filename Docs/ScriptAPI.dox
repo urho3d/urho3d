@@ -3154,6 +3154,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3255,6 +3257,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3269,6 +3273,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 
 
 Button
@@ -3363,6 +3369,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3377,6 +3385,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 - IntVector2 pressedOffset
 - IntVector2 labelOffset
 - float repeatDelay
@@ -3473,6 +3483,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3487,6 +3499,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 - bool checked
 - IntVector2 checkedOffset
 
@@ -3581,6 +3595,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3595,6 +3611,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 - CursorShape shape
 
 
@@ -3688,6 +3706,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3702,6 +3722,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 - Orientation orientation
 - float range
 - float value
@@ -3799,6 +3821,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3909,6 +3933,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4033,6 +4059,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4155,6 +4183,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4268,6 +4298,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4282,6 +4314,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 - String text
 - uint cursorPosition
 - float cursorBlinkRate
@@ -4389,6 +4423,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4403,6 +4439,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 - IntVector2 pressedOffset
 - IntVector2 labelOffset
 - float repeatDelay
@@ -4514,6 +4552,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4528,6 +4568,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 - IntVector2 pressedOffset
 - IntVector2 labelOffset
 - float repeatDelay
@@ -4633,6 +4675,8 @@ Properties:<br>
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- IntVector2 rotationPivot
+- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4647,6 +4691,8 @@ Properties:<br>
 - IntRect imageRect
 - IntRect border
 - IntVector2 hoverOffset
+- BlendMode blendMode
+- bool tiled
 - bool movable
 - bool resizable
 - IntRect resizeBorder

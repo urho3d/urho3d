@@ -912,6 +912,10 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "int get_layoutSpacing() const", asMETHOD(T, GetLayoutSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_layoutBorder(const IntRect&)", asMETHOD(T, SetLayoutBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& get_layoutBorder() const", asMETHOD(T, GetLayoutBorder), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_rotationPivot(const IntVector2&)", asMETHOD(T, SetRotationPivot), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_rotationPivot() const", asMETHOD(T, GetRotationPivot), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_rotation(float)", asMETHOD(T, SetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float get_rotation() const", asMETHOD(T, GetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_childOffset() const", asMETHOD(T, GetChildOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(UIElementGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(UIElementGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);
@@ -939,6 +943,10 @@ template <class T> void RegisterBorderImage(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "const IntRect& get_border() const", asMETHOD(T, GetBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_hoverOffset(const IntVector2&in)", asMETHODPR(T, SetHoverOffset, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_hoverOffset() const", asMETHOD(T, GetHoverOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_blendMode(BlendMode)", asMETHOD(T, SetBlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "BlendMode get_blendMode() const", asMETHOD(T, GetBlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_tiled(bool)", asMETHOD(T, SetTiled), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_tiled() const", asMETHOD(T, IsTiled), asCALL_THISCALL);
 }
 
 /// Template function for registering a class derived from Button.

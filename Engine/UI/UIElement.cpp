@@ -126,6 +126,8 @@ UIElement::UIElement(Context* context) :
     layoutMode_(LM_FREE),
     layoutSpacing_(0),
     layoutBorder_(IntRect::ZERO),
+    rotationPivot_(IntVector2::ZERO),
+    rotation_(0.0f),
     resizeNestingLevel_(0),
     layoutNestingLevel_(0),
     layoutMinSize_(0),
@@ -186,6 +188,8 @@ void UIElement::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Rotation Pivot", GetRotationPivot, SetRotationPivot, IntVector2, IntVector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
     ATTRIBUTE(UIElement, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
 }
 
@@ -712,6 +716,16 @@ void UIElement::SetLayoutBorder(const IntRect& border)
     UpdateLayout();
 }
 
+void UIElement::SetRotationPivot(const IntVector2& pivot)
+{
+    rotationPivot_ = pivot;
+}
+
+void UIElement::SetRotation(float angle)
+{
+    rotation_ = angle;
+}
+
 void UIElement::UpdateLayout()
 {
     if (layoutMode_ == LM_FREE || layoutNestingLevel_)
@@ -1233,6 +1247,24 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
         if (currentScissor.bottom_ < currentScissor.top_)
             currentScissor.bottom_ = currentScissor.top_;
     }
+}
+
+Matrix3x4 UIElement::GetBatchTransform()
+{
+    const IntVector2& screenPos = GetScreenPosition();
+    const IntVector2& size = GetSize();
+    Vector3 pivot((float)rotationPivot_.x_, (float)rotationPivot_.y_, 0.0f);
+    
+    Matrix3x4 rotationAdjust(Matrix3x4::IDENTITY);
+    rotationAdjust.SetTranslation(-pivot);
+    
+    Matrix3x4 rotation(Vector3::ZERO, Quaternion(rotation_, Vector3::FORWARD), 1.0f);
+    rotation.SetTranslation(pivot);
+    
+    Matrix3x4 translation(Matrix3x4::IDENTITY);
+    translation.SetTranslation(Vector3((float)screenPos.x_, (float)screenPos.y_, 0.0f));
+    
+    return translation * rotation * rotationAdjust;
 }
 
 void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect

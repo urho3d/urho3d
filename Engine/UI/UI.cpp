@@ -289,7 +289,8 @@ void UI::Render()
     
     vertexBuffer_->Unlock();
     
-    Vector2 scale(2.0f, -2.0f);
+    Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
+    Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
     Vector2 offset(-1.0f, 1.0f);
     
     Matrix4 projection(Matrix4::IDENTITY);
@@ -338,8 +339,7 @@ void UI::Render()
         }
         
         graphics_->SetShaders(vs, ps);
-        if (graphics_->NeedParameterUpdate(SP_OBJECTTRANSFORM, this))
-            graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
+        graphics_->SetShaderParameter(VSP_MODEL, batch.transform_);
         if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
         if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
