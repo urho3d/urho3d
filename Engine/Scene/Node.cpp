@@ -28,6 +28,7 @@
 #include "Profiler.h"
 #include "ReplicationState.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 #include "SmoothedTransform.h"
 #include "XMLFile.h"
 
@@ -494,6 +495,19 @@ void Node::AddChild(Node* node)
     node->parent_ = this;
     node->MarkDirty();
     node->MarkNetworkUpdate();
+    
+    // Send change event
+    if (scene_)
+    {
+        using namespace NodeAdded;
+        
+        VariantMap eventData;
+        eventData[P_SCENE] = (void*)scene_;
+        eventData[P_PARENT] = (void*)this;
+        eventData[P_NODE] = (void*)node;
+        
+        scene_->SendEvent(E_NODEADDED, eventData);
+    }
 }
 
 void Node::RemoveChild(Node* node)
@@ -1184,6 +1198,19 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     component->MarkNetworkUpdate();
     MarkNetworkUpdate();
     MarkReplicationDirty();
+    
+    // Send change event
+    if (scene_)
+    {
+        using namespace ComponentAdded;
+        
+        VariantMap eventData;
+        eventData[P_SCENE] = (void*)scene_;
+        eventData[P_NODE] = (void*)this;
+        eventData[P_COMPONENT] = (void*)component;
+        
+        scene_->SendEvent(E_COMPONENTADDED, eventData);
+    }
 }
 
 void Node::UpdateWorldTransform() const
@@ -1199,6 +1226,19 @@ void Node::UpdateWorldTransform() const
 
 void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
 {
+    // Send change event. Do not send when already being destroyed
+    if (Refs() > 0 && scene_)
+    {
+        using namespace NodeRemoved;
+        
+        VariantMap eventData;
+        eventData[P_SCENE] = (void*)scene_;
+        eventData[P_PARENT] = (void*)this;
+        eventData[P_NODE] = (void*)(*i).Get();
+        
+        scene_->SendEvent(E_NODEREMOVED, eventData);
+    }
+    
     (*i)->parent_ = 0;
     (*i)->MarkDirty();
     (*i)->MarkNetworkUpdate();
@@ -1281,6 +1321,19 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
 void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
 {
     WeakPtr<Component> componentWeak(*i);
+    
+    // Send node change event. Do not send when already being destroyed
+    if (Refs() > 0 && scene_)
+    {
+        using namespace ComponentRemoved;
+        
+        VariantMap eventData;
+        eventData[P_SCENE] = (void*)scene_;
+        eventData[P_NODE] = (void*)this;
+        eventData[P_COMPONENT] = (void*)(*i).Get();
+        
+        scene_->SendEvent(E_COMPONENTREMOVED, eventData);
+    }
     
     RemoveListener(*i);
     if (scene_)

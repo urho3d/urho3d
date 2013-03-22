@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "ReplicationState.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 
 #include "DebugNew.h"
 
@@ -180,6 +181,22 @@ void Component::SetNode(Node* node)
 {
     node_ = node;
     OnNodeSet(node_);
+}
+
+void Component::SendAttributeListChange()
+{
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        using namespace AttributeListChanged;
+        
+        VariantMap eventData;
+        eventData[P_SCENE] = (void*)scene;
+        eventData[P_NODE] = (void*)GetNode();
+        eventData[P_COMPONENT] = (void*)this;
+        
+        scene->SendEvent(E_ATTRIBUTELISTCHANGED, eventData);
+    }
 }
 
 Component* Component::GetComponent(ShortStringHash type) const

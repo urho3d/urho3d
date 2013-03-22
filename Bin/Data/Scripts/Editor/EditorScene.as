@@ -26,7 +26,6 @@ uint numEditableComponentsPerNode = 1;
 
 Array<XMLFile@> copyBuffer;
 bool copyBufferLocal = false;
-bool copyBufferExpanded = false;
 
 bool inSelectionModify = false;
 
@@ -61,6 +60,8 @@ void ResetScene()
 {
     ClearSelection();
 
+    suppressSceneChanges = true;
+
     // Create a scene with default values, these will be overridden when loading scenes
     editorScene.Clear();
     editorScene.name = "";
@@ -71,6 +72,8 @@ void ResetScene()
 
     UpdateSceneWindow();
     UpdateNodeWindow();
+    
+    suppressSceneChanges = false;
 
     runUpdate = false;
     sceneFileName = "";
@@ -190,7 +193,7 @@ bool LoadScene(const String&in fileName)
 {
     if (fileName.empty)
         return false;
-    
+
     ui.cursor.shape = CS_BUSY;
     
     // Always load the scene from the filesystem, not from resource paths
@@ -205,6 +208,8 @@ bool LoadScene(const String&in fileName)
         return false;
 
     // Clear the old scene
+    suppressSceneChanges = true;
+
     ClearSelection();
     editorScene.Clear();
 
@@ -227,6 +232,9 @@ bool LoadScene(const String&in fileName)
     UpdateWindowTitle();
     UpdateSceneWindow();
     UpdateNodeWindow();
+
+    suppressSceneChanges = false;
+
     ResetCamera();
     CreateGizmo();
 
@@ -285,7 +293,7 @@ void LoadNode(const String&in fileName)
 
     if (newNode !is null)
     {
-        UpdateAndFocusNode(newNode);
+        FocusNode(newNode);
         instantiateFileName = fileName;
     }
 }
@@ -371,8 +379,6 @@ bool SceneDelete()
         node.Remove();
         EndModify(id);
 
-        UpdateSceneWindowNode(nodeIndex, null);
-
         // If deleting only one node, select the next item in the same index
         if (selectedNodes.length == 1 && selectedComponents.empty)
             list.selection = nodeIndex;
@@ -400,8 +406,6 @@ bool SceneDelete()
         BeginModify(id);
         node.RemoveComponent(component);
         EndModify(id);
-
-        UpdateSceneWindowNode(nodeIndex, node);
 
         // If deleting only one component, select the next item in the same index
         if (selectedComponents.length == 1 && selectedNodes.empty)
@@ -463,7 +467,6 @@ bool SceneCopy()
             copyBuffer.Push(xml);
         }
 
-        copyBufferExpanded = SaveExpandedStatus(GetNodeListIndex(selectedNodes[0]));
         return true;
     }
 }
@@ -513,15 +516,8 @@ bool ScenePaste()
             newNode.ApplyAttributes();
             EndModify(newNode.id);
             EndModify(editorScene.id);
-
-            uint addIndex = GetParentAddIndex(newNode);
-            UpdateSceneWindowNode(addIndex, newNode);
-            RestoreExpandedStatus(addIndex, copyBufferExpanded);
         }
     }
-
-    if (pasteComponents)
-        UpdateSceneWindowNode(editNode);
 
     return true;
 }
@@ -532,7 +528,6 @@ void SceneUnparent()
         return;
 
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.contentElement.DisableLayoutUpdate();
 
     // Parent selected nodes to root
     for (uint i = 0; i < selectedNodes.length; ++i)
@@ -549,20 +544,7 @@ void SceneUnparent()
         sourceNode.parent = targetNode;
         EndModify(sourceNode.id);
         EndModify(targetNode.id);
-
-        ListView@ list = sceneWindow.GetChild("NodeList", true);
-
-        uint sourceIndex = GetNodeListIndex(sourceNode);
-        bool expanded = SaveExpandedStatus(sourceIndex);
-        list.RemoveItem(sourceIndex);
-        uint addIndex = GetParentAddIndex(sourceNode);
-        UpdateSceneWindowNode(addIndex, sourceNode);
-        UpdateNodeAttributes();
-        RestoreExpandedStatus(addIndex, expanded);
     }
-
-    list.contentElement.EnableLayoutUpdate();
-    list.contentElement.UpdateLayout();
 }
 
 void SceneResetPosition()

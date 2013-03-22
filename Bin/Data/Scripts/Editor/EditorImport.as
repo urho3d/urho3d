@@ -42,7 +42,7 @@ void ImportModel(const String&in fileName)
         newModel.model = cache.GetResource("Model", modelName);
         ApplyMaterialList(newModel);
 
-        UpdateAndFocusNode(newNode);
+        FocusNode(newNode);
     }
 }
 

@@ -87,4 +87,44 @@ EVENT(E_ASYNCLOADFINISHED, AsyncLoadFinished)
     PARAM(P_SCENE, Scene);                  // Scene pointer
 };
 
+/// A child node has been added to a parent node.
+EVENT(E_NODEADDED, NodeAdded)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_PARENT, Parent);                // Node pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
+/// A child node is about to be removed from a parent node.
+EVENT(E_NODEREMOVED, NodeRemoved)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_PARENT, Parent);                // Node pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
+/// A component has been created to a node.
+EVENT(E_COMPONENTADDED, ComponentAdded)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+    PARAM(P_COMPONENT, Component);          // Component pointer
+}
+
+/// A component is about to be removed from a node.
+EVENT(E_COMPONENTREMOVED, ComponentRemoved)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+    PARAM(P_COMPONENT, Component);          // Component pointer
+}
+
+/// The attribute structure of a component has changed, requiring refresh in editor.
+EVENT(E_ATTRIBUTELISTCHANGED, AttributeListChanged)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+    PARAM(P_COMPONENT, Component);          // Component pointer
+}
+
 }

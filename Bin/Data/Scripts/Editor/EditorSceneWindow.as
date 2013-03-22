@@ -7,6 +7,8 @@ const uint NO_ITEM = 0xffffffff;
 
 Window@ sceneWindow;
 
+bool suppressSceneChanges = false;
+
 void CreateSceneWindow()
 {
     if (sceneWindow !is null)
@@ -57,8 +59,10 @@ void CreateSceneWindow()
     SubscribeToEvent(newComponentList, "ItemSelected", "HandleCreateComponent");
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
     SubscribeToEvent("DragDropFinish", "HandleDragDropFinish");
-    SubscribeToEvent("BoneHierarchyCreated", "HandleBoneHierarchyCreated");
-    SubscribeToEvent("TerrainCreated", "HandleTerrainCreated");
+    SubscribeToEvent(editorScene, "NodeAdded", "HandleNodeAdded");
+    SubscribeToEvent(editorScene, "NodeRemoved", "HandleNodeRemoved");
+    SubscribeToEvent(editorScene, "ComponentAdded", "HandleComponentAdded");
+    SubscribeToEvent(editorScene, "ComponentRemoved", "HandleComponentRemoved");
 }
 
 void ShowSceneWindow()
@@ -116,16 +120,19 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
-    // Whenever we're updating the root, disable layout update to optimize speed
-    if (node is editorScene)
-        list.contentElement.DisableLayoutUpdate();
+    // Whenever we're updating, disable layout update to optimize speed
+    list.contentElement.DisableLayoutUpdate();
 
     // Remove old item if exists
     if (itemIndex < list.numItems && (node is null || (list.items[itemIndex].vars["Type"].GetInt() == ITEM_NODE &&
         list.items[itemIndex].vars["NodeID"].GetUInt() == node.id)))
         list.RemoveItem(itemIndex);
     if (node is null)
+    {
+        list.contentElement.EnableLayoutUpdate();
+        list.contentElement.UpdateLayout();
         return itemIndex;
+    }
 
     int indent = GetNodeIndent(node);
 
@@ -161,11 +168,8 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
     }
 
     // Re-enable layout update (and do manual layout) now
-    if (node is editorScene)
-    {
-        list.contentElement.EnableLayoutUpdate();
-        list.contentElement.UpdateLayout();
-    }
+    list.contentElement.EnableLayoutUpdate();
+    list.contentElement.UpdateLayout();
 
     return itemIndex;
 }
@@ -378,7 +382,7 @@ void SelectNode(Node@ node, bool multiselect)
         list.ClearSelection();
         return;
     }
-                                
+
     uint nodeItem = GetNodeListIndex(node);
 
     // Go in the parent chain up to make sure the chain is expanded
@@ -636,7 +640,6 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         targetNode = editorScene;
 
     // Perform the reparenting
-    // Set transform so that the world transform stays through the parent change
     BeginModify(targetNode.id);
     BeginModify(sourceNode.id);
     sourceNode.parent = targetNode;
@@ -646,18 +649,12 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     // Verify success
     if (sourceNode.parent !is targetNode)
         return;
-    
-    // Update the node list now. If a node was moved into the root, this potentially refreshes the whole scene window.
-    // Therefore disable layout update first
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
 
-    uint sourceIndex = GetNodeListIndex(sourceNode);
-    bool expanded = SaveExpandedStatus(sourceIndex);
-    list.RemoveItem(sourceIndex);
-    uint addIndex = GetParentAddIndex(sourceNode);
-    UpdateSceneWindowNode(addIndex, sourceNode);
+    // Node coordinates may change as a result of the drag/drop.
+    /// \todo This should also be detected via an event
     UpdateNodeAttributes();
-    RestoreExpandedStatus(addIndex, expanded);
+
+    FocusNode(sourceNode); // Focus the node at its new position in the list
 }
 
 bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
@@ -685,17 +682,15 @@ bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
     return true;
 }
 
-void UpdateAndFocusNode(Node@ node)
+void FocusNode(Node@ node)
 {
-    UpdateSceneWindowNode(node);
     uint index = GetNodeListIndex(node);
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     list.selection = index;
 }
 
-void UpdateAndFocusComponent(Component@ component)
+void FocusComponent(Component@ component)
 {
-    UpdateSceneWindowNode(component.node);
     uint index = GetComponentListIndex(component);
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     list.selection = index;
@@ -712,7 +707,7 @@ void HandleCreateNode(StringHash eventType, VariantMap& eventData)
     // Set the new node a certain distance from the camera
     newNode.position = GetNewNodePosition();
 
-    UpdateAndFocusNode(newNode);
+    FocusNode(newNode);
 }
 
 void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
@@ -733,23 +728,7 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
     /// \todo Allow to specify the createmode
     Component@ newComponent = editNode.CreateComponent(text.text, editNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
 
-    UpdateAndFocusComponent(newComponent);
-}
-
-void HandleBoneHierarchyCreated(StringHash eventType, VariantMap& eventData)
-{
-    Node@ node = eventData["Node"].GetNode();
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-    if (list.numItems > 0 && GetNodeListIndex(node) != NO_ITEM)
-        UpdateSceneWindowNode(node);
-}
-
-void HandleTerrainCreated(StringHash eventType, VariantMap& eventData)
-{
-    Node@ node = eventData["Node"].GetNode();
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-    if (list.numItems > 0 && GetNodeListIndex(node) != NO_ITEM)
-        UpdateSceneWindowNode(node);
+    FocusComponent(newComponent);
 }
 
 void CreateBuiltinObject(const String& name)
@@ -761,7 +740,7 @@ void CreateBuiltinObject(const String& name)
     StaticModel@ object = newNode.CreateComponent("StaticModel");
     object.model = cache.GetResource("Model", "Models/" + name + ".mdl");
 
-    UpdateAndFocusNode(newNode);
+    FocusNode(newNode);
 }
 
 bool CheckSceneWindowFocus()
@@ -783,14 +762,44 @@ bool CheckForExistingGlobalComponent(Node@ node, const String&in typeName)
         return node.HasComponent(typeName);
 }
 
-bool SaveExpandedStatus(uint itemIndex)
+void HandleNodeAdded(StringHash eventType, VariantMap& eventData)
 {
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-    return list.items[itemIndex].vars["Expanded"].GetBool();
+    if (suppressSceneChanges)
+        return;
+
+    Node@ node = eventData["Node"].GetNode();
+    UpdateSceneWindowNode(node);
 }
 
-void RestoreExpandedStatus(uint itemIndex, bool expanded)
+void HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.Expand(itemIndex, expanded);
+    if (suppressSceneChanges)
+        return;
+
+    Node@ node = eventData["Node"].GetNode();
+    uint index = GetNodeListIndex(node);
+    UpdateSceneWindowNode(index, null);
+}
+
+void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressSceneChanges)
+        return;
+
+    Node@ node = eventData["Node"].GetNode();
+    UpdateSceneWindowNode(node);
+}
+
+void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressSceneChanges)
+        return;
+
+    Component@ component = eventData["Component"].GetComponent();
+    uint index = GetComponentListIndex(component);
+    if (index != NO_ITEM)
+    {
+        ListView@ list = sceneWindow.GetChild("NodeList", true);
+        list.RemoveItem(index);
+    }
 }
