@@ -1,0 +1,270 @@
+//
+// Copyright (c) 2008-2013 the Urho3D project.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#include "Precompiled.h"
+#include "Context.h"
+#include "ResourceCache.h"
+#include "Sprite.h"
+#include "Texture2D.h"
+
+#include "DebugNew.h"
+
+namespace Urho3D
+{
+
+extern const char* blendModeNames[];
+extern const char* horizontalAlignments[];
+extern const char* verticalAlignments[];
+
+OBJECTTYPESTATIC(Sprite);
+
+Sprite::Sprite(Context* context) :
+    UIElement(context),
+    floatPosition_(Vector2::ZERO),
+    hotSpot_(IntVector2::ZERO),
+    scale_(Vector2::ONE),
+    rotation_(0.0f),
+    imageRect_(IntRect::ZERO),
+    blendMode_(BLEND_REPLACE)
+{
+}
+
+Sprite::~Sprite()
+{
+}
+
+void Sprite::RegisterObject(Context* context)
+{
+    context->RegisterFactory<Sprite>();
+    
+    ACCESSOR_ATTRIBUTE(Sprite, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Position", GetPosition, SetPosition, Vector2, Vector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Hotspot", GetHotSpot, SetHotSpot, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Scale", GetScale, SetScale, Vector2, Vector2::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Sprite, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Sprite, VAR_INT, "Priority", GetPriority, SetPriority, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Sprite, VAR_FLOAT, "Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_COLOR, "Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
+    ATTRIBUTE(Sprite, VAR_COLOR, "Top Left Color", color_[0], Color::WHITE, AM_FILE);
+    ATTRIBUTE(Sprite, VAR_COLOR, "Top Right Color", color_[1], Color::WHITE, AM_FILE);
+    ATTRIBUTE(Sprite, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
+    ATTRIBUTE(Sprite, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Sprite, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Sprite, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, false, AM_FILE);
+    ATTRIBUTE(Sprite, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
+}
+
+bool Sprite::IsWithinScissor(const IntRect& currentScissor)
+{
+    /// \todo Implement properly, for now just checks visibility flag
+    return visible_;
+}
+
+const IntVector2& Sprite::GetScreenPosition() const
+{
+    // This updates screen position for a sprite
+    GetTransform();
+    return screenPosition_;
+}
+
+void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
+{
+    bool allOpaque = true;
+    if (GetDerivedOpacity() < 1.0f || color_[C_TOPLEFT].a_ < 1.0f || color_[C_TOPRIGHT].a_ < 1.0f ||
+        color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
+        allOpaque = false;
+    
+    const IntVector2& size = GetSize();
+    UIBatch batch(blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &quads);
+    
+    batch.AddQuad(UIQuad(*this, GetTransform(), 0, 0, size.x_, size.y_, imageRect_.left_, imageRect_.top_, imageRect_.right_ -
+        imageRect_.left_, imageRect_.bottom_ - imageRect_.top_));
+    
+    UIBatch::AddOrMerge(batch, batches);
+    
+    // Reset hovering for next frame
+    hovering_ = false;
+}
+
+void Sprite::SetPosition(const Vector2& position)
+{
+    if (position != floatPosition_)
+    {
+        floatPosition_ = position;
+        MarkDirty();
+    }
+}
+
+void Sprite::SetPosition(float x, float y)
+{
+    SetPosition(Vector2(x, y));
+}
+
+void Sprite::SetHotSpot(const IntVector2& hotSpot)
+{
+    if (hotSpot != hotSpot_)
+    {
+        hotSpot_ = hotSpot;
+        MarkDirty();
+    }
+}
+
+void Sprite::SetHotSpot(int x, int y)
+{
+    SetHotSpot(IntVector2(x, y));
+}
+
+void Sprite::SetScale(const Vector2& scale)
+{
+    if (scale != scale_)
+    {
+        scale_ = scale;
+        MarkDirty();
+    }
+}
+
+void Sprite::SetScale(float x, float y)
+{
+    SetScale(Vector2(x, y));
+}
+
+void Sprite::SetScale(float scale)
+{
+    SetScale(Vector2(scale, scale));
+}
+
+void Sprite::SetRotation(float angle)
+{
+    if (angle != rotation_)
+    {
+        rotation_ = angle;
+        MarkDirty();
+    }
+}
+
+void Sprite::SetTexture(Texture* texture)
+{
+    texture_ = texture;
+    if (imageRect_ == IntRect::ZERO)
+        SetFullImageRect();
+}
+
+void Sprite::SetImageRect(const IntRect& rect)
+{
+    if (rect != IntRect::ZERO)
+        imageRect_ = rect;
+}
+
+void Sprite::SetFullImageRect()
+{
+    if (texture_)
+        SetImageRect(IntRect(0, 0, texture_->GetWidth(), texture_->GetHeight()));
+}
+
+void Sprite::SetBlendMode(BlendMode mode)
+{
+    blendMode_ = mode;
+}
+
+const Matrix3x4& Sprite::GetTransform() const
+{
+    if (positionDirty_)
+    {
+        Vector2 pos = floatPosition_;
+        
+        Matrix3x4 parentTransform;
+        
+        if (parent_)
+        {
+            Sprite* parentSprite = dynamic_cast<Sprite*>(parent_);
+            if (parentSprite)
+                parentTransform = parentSprite->GetTransform();
+            else
+            {
+                const IntVector2& parentScreenPos = parent_->GetScreenPosition() + parent_->GetChildOffset();
+                parentTransform = Matrix3x4::IDENTITY;
+                parentTransform.SetTranslation(Vector3((float)parentScreenPos.x_, (float)parentScreenPos.y_, 0.0f));
+            }
+            
+            switch (GetHorizontalAlignment())
+            {
+            case HA_LEFT:
+                break;
+                
+            case HA_CENTER:
+                pos.x_ += (float)(parent_->GetSize().x_ / 2);
+                break;
+                
+            case HA_RIGHT:
+                pos.x_ += (float)parent_->GetSize().x_;
+                break;
+            }
+            switch (GetVerticalAlignment())
+            {
+            case VA_TOP:
+                break;
+                
+            case VA_CENTER:
+                pos.y_ += (float)(parent_->GetSize().y_ / 2);
+                break;
+                
+            case VA_BOTTOM:
+                pos.y_ += (float)(parent_->GetSize().y_);
+                break;
+            }
+        }
+        else
+            parentTransform = Matrix3x4::IDENTITY;
+        
+        Matrix3x4 hotspotAdjust(Matrix3x4::IDENTITY);
+        hotspotAdjust.SetTranslation(Vector3((float)-hotSpot_.x_, (float)-hotSpot_.y_, 0.0f));
+        
+        Matrix3x4 mainTransform(Vector3(pos, 0.0f), Quaternion(rotation_, Vector3::FORWARD), Vector3(scale_, 1.0f));
+        
+        transform_ = parentTransform * mainTransform * hotspotAdjust;
+        positionDirty_ = false;
+        
+        // Calculate an approximate screen position for GetElementAt(), or pixel-perfect child elements
+        Vector3 topLeftCorner = transform_ * Vector3::ZERO;
+        screenPosition_ = IntVector2((int)topLeftCorner.x_, (int)topLeftCorner.y_);
+    }
+    
+    return transform_;
+}
+
+void Sprite::SetTextureAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetTexture(cache->GetResource<Texture2D>(value.id_));
+}
+
+ResourceRef Sprite::GetTextureAttr() const
+{
+    return GetResourceRef(texture_, Texture2D::GetTypeStatic());
+}
+
+}

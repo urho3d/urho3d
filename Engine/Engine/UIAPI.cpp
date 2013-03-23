@@ -31,6 +31,7 @@
 #include "ListView.h"
 #include "ScrollBar.h"
 #include "Slider.h"
+#include "Sprite.h"
 #include "Text.h"
 #include "UI.h"
 #include "Window.h"
@@ -101,6 +102,30 @@ static void RegisterUIElement(asIScriptEngine* engine)
 static void RegisterBorderImage(asIScriptEngine* engine)
 {
     RegisterBorderImage<BorderImage>(engine, "BorderImage");
+}
+
+static void RegisterSprite(asIScriptEngine* engine)
+{
+    RegisterUIElement<Sprite>(engine, "Sprite", true);
+    engine->RegisterObjectMethod("Sprite", "void SetPosition(float, float)", asMETHODPR(Sprite, SetPosition, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void SetHotSpot(int, int)", asMETHODPR(Sprite, SetHotSpot, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void SetScale(float, float)", asMETHODPR(Sprite, SetScale, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void SetScale(float)", asMETHODPR(Sprite, SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void SetFullImageRect()", asMETHOD(Sprite, SetFullImageRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void set_position(const Vector2&)", asMETHODPR(Sprite, SetPosition, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "const Vector2& get_position() const", asMETHODPR(Sprite, GetPosition, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void set_hotSpot(const IntVector2&)", asMETHODPR(Sprite, SetHotSpot, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "const IntVector2& get_hotSpot() const", asMETHOD(Sprite, GetHotSpot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void set_scale(const Vector2&)", asMETHODPR(Sprite, SetScale, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "const Vector2& get_scale() const", asMETHOD(Sprite, GetScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void set_rotation(float)", asMETHOD(Sprite, SetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "float get_rotation() const", asMETHOD(Sprite, GetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void set_texture(Texture@+)", asMETHOD(Sprite, SetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "Texture@+ get_texture() const", asMETHOD(Sprite, GetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void set_imageRect(const IntRect&in)", asMETHODPR(Sprite, SetImageRect, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "const IntRect& get_imageRect() const", asMETHOD(Sprite, GetImageRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "void set_blendMode(BlendMode)", asMETHOD(Sprite, SetBlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite", "BlendMode get_blendMode() const", asMETHOD(Sprite, GetBlendMode), asCALL_THISCALL);
 }
 
 static void RegisterCursor(asIScriptEngine* engine)
@@ -516,6 +541,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterFont(engine);
     RegisterUIElement(engine);
     RegisterBorderImage(engine);
+    RegisterSprite(engine);
     RegisterButton(engine);
     RegisterCheckBox(engine);
     RegisterCursor(engine);

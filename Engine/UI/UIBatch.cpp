@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Graphics.h"
+#include "Matrix3x4.h"
 #include "ShaderVariation.h"
 #include "Texture.h"
 #include "UIElement.h"
@@ -30,6 +31,12 @@
 
 namespace Urho3D
 {
+
+#ifdef USE_OPENGL
+static const Vector2 posAdjust(Vector2::ZERO);
+#else
+static const Vector2 posAdjust(0.5f, 0.5f);
+#endif
 
 UIQuad::UIQuad() :
     defined_(false)
@@ -61,10 +68,17 @@ UIQuad::UIQuad(const UIElement& element, int x, int y, int width, int height, in
         bottomRightColor_ = GetInterpolatedColor(element, x + width, y + height);
     }
     
-    left_ = x;
-    top_ = y;
-    right_ = left_ + width;
-    bottom_ = top_ + height;
+    const IntVector2& screenPos = element.GetScreenPosition();
+    
+    float left = (float)(x + screenPos.x_);
+    float right = left + (float)width;
+    float top = (float)(y + screenPos.y_);
+    float bottom = top + (float)height;
+    topLeft_ = Vector2(left, top) - posAdjust;
+    topRight_ = Vector2(right, top) - posAdjust;
+    bottomLeft_ = Vector2(left, bottom) - posAdjust;
+    bottomRight_ = Vector2(right, bottom) - posAdjust;
+    
     leftUV_ = texOffsetX;
     topUV_ = texOffsetY;
     rightUV_ = texOffsetX + (texWidth ? texWidth : width);
@@ -72,7 +86,50 @@ UIQuad::UIQuad(const UIElement& element, int x, int y, int width, int height, in
     
     defined_ = true;
 }
+
+UIQuad::UIQuad(const UIElement& element, const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
+    int texWidth, int texHeight, Color* color) :
+    defined_(false)
+{
+    if (color || !element.HasColorGradient())
+    {
+        unsigned uintColor = (color ? *color : element.GetDerivedColor()).ToUInt();
+        
+        // If alpha is 0, nothing will be rendered, so do not add the quad
+        if (!(uintColor & 0xff000000))
+            return;
+        
+        topLeftColor_ = uintColor;
+        topRightColor_ = uintColor;
+        bottomLeftColor_ = uintColor;
+        bottomRightColor_ = uintColor;
+    }
+    else
+    {
+        topLeftColor_ = GetInterpolatedColor(element, x, y);
+        topRightColor_ = GetInterpolatedColor(element, x + width, y);
+        bottomLeftColor_ = GetInterpolatedColor(element, x, y + height);
+        bottomRightColor_ = GetInterpolatedColor(element, x + width, y + height);
+    }
     
+    Vector3 v1 = transform * Vector3((float)x, (float)y, 0.0f);
+    Vector3 v2 = transform * Vector3((float)x + (float)width, (float)y, 0.0f);
+    Vector3 v3 = transform * Vector3((float)x, (float)y + (float)height, 0.0f);
+    Vector3 v4 = transform * Vector3((float)x + (float)width, (float)y + (float)height, 0.0f);
+    
+    topLeft_.x_ = v1.x_; topLeft_.y_ = v1.y_;
+    topRight_.x_ = v2.x_; topRight_.y_ = v2.y_;
+    bottomLeft_.x_ = v3.x_; bottomLeft_.y_ = v3.y_;
+    bottomRight_.x_ = v4.x_; bottomRight_.y_ = v4.y_;
+    
+    leftUV_ = texOffsetX;
+    topUV_ = texOffsetY;
+    rightUV_ = texOffsetX + (texWidth ? texWidth : (int)width);
+    bottomUV_ = texOffsetY + (texHeight ? texHeight : (int)height);
+    
+    defined_ = true;
+}
+
 unsigned UIQuad::GetInterpolatedColor(const UIElement& element, int x, int y)
 {
     const IntVector2& size = element.GetSize();
@@ -105,8 +162,7 @@ UIBatch::UIBatch() :
 {
 }
 
-UIBatch::UIBatch(const Matrix3x4& transform, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads) :
-    transform_(transform),
+UIBatch::UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads) :
     blendMode_(blendMode),
     scissor_(scissor),
     texture_(texture),
@@ -119,9 +175,6 @@ UIBatch::UIBatch(const Matrix3x4& transform, BlendMode blendMode, const IntRect&
 
 void UIBatch::Begin(PODVector<UIQuad>* quads)
 {
-    if (!quads)
-        return;
-    
     quads_ = quads;
     quadStart_ = quads_->Size();
     quadCount_ = 0;
@@ -129,7 +182,7 @@ void UIBatch::Begin(PODVector<UIQuad>* quads)
 
 void UIBatch::AddQuad(const PODVector<UIQuad>& quads)
 {
-    if (!quads_ || quads.Empty())
+    if (quads.Empty())
         return;
     
     *quads_ += quads;
@@ -138,9 +191,6 @@ void UIBatch::AddQuad(const PODVector<UIQuad>& quads)
 
 void UIBatch::AddQuad(UIQuad quad)
 {
-    if (!quads_)
-        return;
-    
     if (quad.defined_)
     {
         quads_->Push(quad);
@@ -162,9 +212,6 @@ void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int hei
 void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
     int texHeight, bool tiled)
 {
-    if (!quads_)
-        return;
-
     if (!(element.HasColorGradient() || element.GetDerivedColor().ToUInt() & 0xff000000))
         return; // No gradient and alpha is 0, so do not add the quads
     
@@ -173,26 +220,26 @@ void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int hei
         AddQuad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight);
         return;
     }
-
+    
     int tileX = 0;
     int tileY = 0;
     int tileW = 0;
     int tileH = 0;
-
+    
     while (tileY < height)
     {
         tileX = 0;
         tileH = Min(height - tileY, texHeight);
-
+        
         while (tileX < width)
         {
             tileW = Min(width - tileX, texWidth);
-
+            
             AddQuad(element, x + tileX, y + tileY, tileW, tileH, texOffsetX, texOffsetY, tileW, tileH);
-
+            
             tileX += tileW;
         }
-
+        
         tileY += tileH;
     }
 }
@@ -200,17 +247,13 @@ void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int hei
 void UIBatch::AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
     int texHeight, const Color& color)
 {
-    if (!quads_)
-        return;
-    
     Color derivedColor(color.r_, color.g_, color.b_, color.a_ * element.GetDerivedOpacity());
     AddQuad(UIQuad(element, x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight, &derivedColor));
 }
 
 bool UIBatch::Merge(const UIBatch& batch)
 {
-    if (memcmp(&batch.transform_, &transform_, sizeof transform_) ||
-        batch.blendMode_ != blendMode_ ||
+    if (batch.blendMode_ != blendMode_ ||
         batch.scissor_ != scissor_ ||
         batch.texture_ != texture_ ||
         batch.quads_ != quads_ ||
@@ -226,12 +269,6 @@ void UIBatch::UpdateGeometry(Graphics* graphics, void* lockedData)
     if (!quadCount_)
         return;
     
-    #ifdef USE_OPENGL
-    Vector2 posAdjust(Vector2::ZERO);
-    #else
-    Vector2 posAdjust(0.5f, 0.5f);
-    #endif
-    
     float* dest = (float*)lockedData;
     
     if (texture_)
@@ -241,34 +278,31 @@ void UIBatch::UpdateGeometry(Graphics* graphics, void* lockedData)
         for (unsigned i = 0; i < quadCount_; ++i)
         {
             const UIQuad& quad = quads_->At(quadStart_ + i);
-            Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
             
-            topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust);
-            bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust);
-            topLeftUV = Vector2((float)quad.leftUV_, (float)quad.topUV_) * invTextureSize;
-            bottomRightUV = Vector2((float)quad.rightUV_, (float)quad.bottomUV_) * invTextureSize;
+            Vector2 topLeftUV = Vector2((float)quad.leftUV_, (float)quad.topUV_) * invTextureSize;
+            Vector2 bottomRightUV = Vector2((float)quad.rightUV_, (float)quad.bottomUV_) * invTextureSize;
             
-            *dest++ = topLeft.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = quad.topLeft_.x_; *dest++ = quad.topLeft_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.topLeftColor_; dest++;
             *dest++ = topLeftUV.x_; *dest++ = topLeftUV.y_;
             
-            *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = quad.topRight_.x_; *dest++ = quad.topRight_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.topRightColor_; dest++;
             *dest++ = bottomRightUV.x_; *dest++ = topLeftUV.y_;
             
-            *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
+            *dest++ = quad.bottomLeft_.x_; *dest++ = quad.bottomLeft_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.bottomLeftColor_; dest++;
             *dest++ = topLeftUV.x_; *dest++ = bottomRightUV.y_;
             
-            *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = quad.topRight_.x_; *dest++ = quad.topRight_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.topRightColor_; dest++;
             *dest++ = bottomRightUV.x_; *dest++ = topLeftUV.y_;
             
-            *dest++ = bottomRight.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
+            *dest++ = quad.bottomRight_.x_; *dest++ = quad.bottomRight_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.bottomRightColor_; dest++;
             *dest++ = bottomRightUV.x_; *dest++ = bottomRightUV.y_;
             
-            *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
+            *dest++ = quad.bottomLeft_.x_; *dest++ = quad.bottomLeft_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.bottomLeftColor_; dest++;
             *dest++ = topLeftUV.x_; *dest++ = bottomRightUV.y_;
         }
@@ -278,32 +312,28 @@ void UIBatch::UpdateGeometry(Graphics* graphics, void* lockedData)
         for (unsigned i = 0; i < quadCount_; ++i)
         {
             const UIQuad& quad = quads_->At(quadStart_ + i);
-            Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
             
-            topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust);
-            bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust);
-            
-            *dest++ = topLeft.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = quad.topLeft_.x_; *dest++ = quad.topLeft_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.topLeftColor_; dest++;
             dest += 2; // Jump over unused UV coordinates
             
-            *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = quad.topRight_.x_; *dest++ = quad.topRight_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.topRightColor_; dest++;
             dest += 2;
             
-            *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
+            *dest++ = quad.bottomLeft_.x_; *dest++ = quad.bottomLeft_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.bottomLeftColor_; dest++;
             dest += 2;
             
-            *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = quad.topRight_.x_; *dest++ = quad.topRight_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.topRightColor_; dest++;
             dest += 2;
             
-            *dest++ = bottomRight.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
+            *dest++ = quad.bottomRight_.x_; *dest++ = quad.bottomRight_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.bottomRightColor_; dest++;
             dest += 2;
             
-            *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
+            *dest++ = quad.bottomLeft_.x_; *dest++ = quad.bottomLeft_.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quad.bottomLeftColor_; dest++;
             dest += 2;
         }

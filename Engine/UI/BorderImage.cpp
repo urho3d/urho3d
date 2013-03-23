@@ -31,17 +31,7 @@
 namespace Urho3D
 {
 
-static const char* blendModes[] =
-{
-    "Replace",
-    "Add",
-    "Multiply",
-    "Alpha",
-    "AddAlpha",
-    "PreMultiply",
-    "InvDestAlpha",
-    0
-};
+extern const char* blendModeNames[];
 
 template<> BlendMode Variant::Get<BlendMode>() const
 {
@@ -73,19 +63,8 @@ void BorderImage::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTVECTOR2, "Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(BorderImage, VAR_BOOL, "Tiled", IsTiled, SetTiled, bool, true, AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(BorderImage, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModes, 0, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(BorderImage, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
     COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
-}
-
-void BorderImage::SetTextureAttr(ResourceRef value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetTexture(cache->GetResource<Texture2D>(value.id_));
-}
-
-ResourceRef BorderImage::GetTextureAttr() const
-{
-    return GetResourceRef(texture_, Texture2D::GetTypeStatic());
 }
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
@@ -146,8 +125,8 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qua
     if (GetDerivedOpacity() < 1.0f || color_[C_TOPLEFT].a_ < 1.0f || color_[C_TOPRIGHT].a_ < 1.0f ||
         color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
-        
-    UIBatch batch(GetBatchTransform(), blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &quads);
+    
+    UIBatch batch(blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &quads);
     
     // Calculate size of the inner rect, and texture dimensions of the inner rect
     int x = GetIndentWidth();
@@ -209,6 +188,17 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qua
     
     // Reset hovering for next frame
     hovering_ = false;
+}
+
+void BorderImage::SetTextureAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetTexture(cache->GetResource<Texture2D>(value.id_));
+}
+
+ResourceRef BorderImage::GetTextureAttr() const
+{
+    return GetResourceRef(texture_, Texture2D::GetTypeStatic());
 }
 
 }

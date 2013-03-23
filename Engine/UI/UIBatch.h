@@ -24,7 +24,6 @@
 
 #include "Color.h"
 #include "GraphicsDefs.h"
-#include "Matrix3x4.h"
 #include "Rect.h"
 
 namespace Urho3D
@@ -32,6 +31,7 @@ namespace Urho3D
 
 class PixelShader;
 class Graphics;
+class Matrix3x4;
 class ShaderVariation;
 class Texture;
 class UIElement;
@@ -44,18 +44,21 @@ struct UIQuad
     /// Construct.
     UIQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
         int texWidth = 0, int texHeight = 0, Color* color = 0);
-
+    /// Construct using a transform matrix.
+    UIQuad(const UIElement& element, const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
+        int texWidth = 0, int texHeight = 0, Color* color = 0);
+    
     /// Return an interpolated color for an UI element.
     static unsigned GetInterpolatedColor(const UIElement& element, int x, int y);
-
-    /// Left coordinate.
-    int left_;
-    /// Top coordinate.
-    int top_;
-    /// Right coordinate.
-    int right_;
-    /// Bottom coordinate.
-    int bottom_;
+    
+    /// Top left position.
+    Vector2 topLeft_;
+    /// Top right position.
+    Vector2 topRight_;
+    /// Bottom left position.
+    Vector2 bottomLeft_;
+    /// Bottom right position.
+    Vector2 bottomRight_;
     /// Left texture coordinate.
     short leftUV_;
     /// Top texture coordinate.
@@ -82,8 +85,8 @@ class UIBatch
 public:
     /// Construct with defaults.
     UIBatch();
-    /// Construct
-    UIBatch(const Matrix3x4& transform, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads);
+    /// Construct.
+    UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads);
     
     /// Begin adding quads.
     void Begin(PODVector<UIQuad>* quads);
@@ -107,8 +110,6 @@ public:
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
     
-    /// Transform matrix.
-    Matrix3x4 transform_;
     /// Blending mode.
     BlendMode blendMode_;
     /// Scissor rectangle.

@@ -207,4 +207,20 @@ EVENT(E_FILESELECTED, FileSelected)
     PARAM(P_OK, Ok);                        // bool
 }
 
+/// A child element has been added to an element. Sent by the UI root element.
+EVENT(E_ELEMENTADDED, ElementAdded)
+{
+    PARAM(P_ROOT, Root);                    // UIElement pointer
+    PARAM(P_PARENT, Parent);                // UIElement pointer
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+}
+
+/// A child element is about to be removed from an element. Sent by the UI root element.
+EVENT(E_ELEMENTREMOVED, ElementRemoved)
+{
+    PARAM(P_ROOT, Root);                    // UIElement pointer
+    PARAM(P_PARENT, Parent);                // UIElement pointer
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+}
+
 }

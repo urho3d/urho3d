@@ -104,7 +104,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
     // Hovering or whole selection batch
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
-        UIBatch batch(GetBatchTransform(), BLEND_ALPHA, currentScissor, 0, &quads);
+        UIBatch batch(BLEND_ALPHA, currentScissor, 0, &quads);
         batch.AddQuad(*this, 0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0, selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ :
             hoverColor_);
         UIBatch::AddOrMerge(batch, batches);
@@ -113,7 +113,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
     // Partial selection batch
     if (!selected_ && selectionLength_ && charSizes_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
     {
-        UIBatch batch(GetBatchTransform(), BLEND_ALPHA, currentScissor, 0, &quads);
+        UIBatch batch(BLEND_ALPHA, currentScissor, 0, &quads);
         
         IntVector2 currentStart = charPositions_[selectionStart_];
         IntVector2 currentEnd = currentStart;
@@ -184,7 +184,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
             
         for (unsigned page = 0; page < face->textures_.Size(); ++page)
         {
-            UIBatch batch(GetBatchTransform(), BLEND_ALPHA, currentScissor, face->textures_[page], &quads);
+            UIBatch batch(BLEND_ALPHA, currentScissor, face->textures_[page], &quads);
             batch.AddQuad(pageQuads[page]);
             UIBatch::AddOrMerge(batch, batches);
         }
@@ -525,12 +525,16 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     switch (textAlignment_)
     {
     case HA_LEFT:
-        return ret;
+        break;
     case HA_CENTER:
-        return ret + (GetSize().x_ - rowWidth) / 2;
+        ret += (GetSize().x_ - rowWidth) / 2;
+        break;
     case HA_RIGHT:
-        return ret + GetSize().x_ - rowWidth;
+        ret += GetSize().x_ - rowWidth;
+        break;
     }
+    
+    return ret;
 }
 
 }

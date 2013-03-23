@@ -293,7 +293,7 @@ void InitUI()
     cursor.style = uiStyle;
     cursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = cursor;
-    if (GetPlatform() == "Android")
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
         ui.cursor.visible = false;
 }
 

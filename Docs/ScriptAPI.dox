@@ -3159,8 +3159,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3168,8 +3166,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 
 
@@ -3267,8 +3265,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3276,8 +3272,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect
@@ -3285,6 +3281,89 @@ Properties:<br>
 - IntVector2 hoverOffset
 - BlendMode blendMode
 - bool tiled
+
+
+Sprite
+
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- bool LoadXML(const XMLElement&, XMLFile@)
+- bool LoadXML(File@)
+- bool LoadXML(XMLFile@, XMLFile@)
+- bool SaveXML(File@)
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void BringToFront()
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetPosition(float, float)
+- void SetHotSpot(int, int)
+- void SetScale(float, float)
+- void SetScale(float)
+- void SetFullImageRect()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- XMLFile@ style (writeonly)
+- String name
+- IntVector2 size
+- int width
+- int height
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- Color color (writeonly)
+- Color[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool sortChildren
+- bool useDerivedOpacity
+- bool visible
+- bool colorGradient (readonly)
+- XMLFile@ defaultStyle
+- uint[] numChildren (readonly)
+- uint numAllChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ root (readonly)
+- float derivedOpacity (readonly)
+- VariantMap vars (readonly)
+- Vector2 position
+- IntVector2 hotSpot
+- Vector2 scale
+- float rotation
+- Texture@ texture
+- IntRect imageRect
+- BlendMode blendMode
 
 
 Button
@@ -3384,8 +3463,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3393,8 +3470,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect
@@ -3503,8 +3580,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3512,8 +3587,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect
@@ -3620,8 +3695,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3629,8 +3702,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect
@@ -3736,8 +3809,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3745,8 +3816,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect
@@ -3856,8 +3927,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3865,8 +3934,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Orientation orientation
 - float range
@@ -3973,8 +4042,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3982,8 +4049,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - UIElement@ contentElement
 - IntVector2 viewPosition
@@ -4106,8 +4173,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4115,8 +4180,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - IntVector2 viewPosition
 - UIElement@ contentElement (readonly)
@@ -4235,8 +4300,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4244,8 +4307,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Font@ font (readonly)
 - int fontSize (readonly)
@@ -4355,8 +4418,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4364,8 +4425,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect
@@ -4485,8 +4546,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4494,8 +4553,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect
@@ -4619,8 +4678,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4628,8 +4685,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect
@@ -4747,8 +4804,6 @@ Properties:<br>
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- IntVector2 rotationPivot
-- float rotation
 - IntVector2 childOffset (readonly)
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -4756,8 +4811,8 @@ Properties:<br>
 - UIElement@ parent (readonly)
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
-- float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
 - VariantMap vars (readonly)
 - Texture@ texture
 - IntRect imageRect

@@ -97,8 +97,6 @@ private:
     void Update(float timeStep, UIElement* element);
     /// Generate batches from an UI element recursively.
     void GetBatches(UIElement* element, IntRect currentScissor);
-    /// Return whether element is visible and within the scissor rectangle
-    bool IsVisible(UIElement* element, const IntRect& currentScissor);
     /// Return UI element at screen position recursively.
     void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly);
     /// Return the first element in hierarchy that can alter focus.

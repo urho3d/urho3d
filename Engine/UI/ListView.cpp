@@ -728,7 +728,7 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
         bool visible = enable && expanded[indent - 1];
         item->SetVisible(visible);
 
-        if (indent >= expanded.Size())
+        if (indent >= (int)expanded.Size())
             expanded.Resize(indent + 1);
         expanded[indent] = visible && GetItemExpanded(item);
     }

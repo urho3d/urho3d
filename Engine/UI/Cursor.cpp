@@ -208,14 +208,15 @@ void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, c
 {
     unsigned initialSize = quads.Size();
     const IntVector2& offset = shapeInfos_[shape_].hotSpot_;
+    Vector2 floatOffset((float)offset.x_, (float)offset.y_);
     
     BorderImage::GetBatches(batches, quads, currentScissor);
     for (unsigned i = initialSize; i < quads.Size(); ++i)
     {
-        quads[i].left_ -= offset.x_;
-        quads[i].top_ -= offset.y_;
-        quads[i].right_ -= offset.x_;
-        quads[i].bottom_ -= offset.y_;
+        quads[i].topLeft_ -= floatOffset;
+        quads[i].topRight_ -= floatOffset;
+        quads[i].bottomLeft_ -= floatOffset;
+        quads[i].bottomRight_ -= floatOffset;
     }
 }
 

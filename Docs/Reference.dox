@@ -1183,6 +1183,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 - ScrollBar: a slider with back and forward buttons
 - ScrollView: a scrollable view of child elements
 - Slider: a horizontal or vertical slider bar
+- Sprite: a texture image which supports subpixel positioning, scaling and rotating.
 - Text: static text that can be multiline
 - UIElement: container for other elements, renders nothing by itself
 - Window: a movable and resizable window
@@ -1224,7 +1225,6 @@ tells to instantiate a Button element, and that it should use the style "CloseBu
 
 Note that when %UI elements are serialized back to XML using \ref UI::SaveLayout "SaveLayout()" it is no longer possible to separate what was defined in the style XML file, and what in the actual layout file. Instead all attributes will be serialized.
 
-
 \section UI_Layouts UI element layout
 
 By default %UI elements operate in a "free" layout mode, where child elements' positions can be specified relative to any of the parent element corners, but they are not automatically positioned or resized.
@@ -1232,6 +1232,12 @@ By default %UI elements operate in a "free" layout mode, where child elements' p
 To create automatically adjusting layouts, the layout mode can be switched to either "horizontal" or "vertical". Now the child elements will be positioned left to right or top to bottom, based on the order in which they were added. They will be preferably resized to fit the parent element, taking into account their minimum and maximum sizes, but failing to do that, the parent element will be resized.
 
 Left, top, right & bottom border widths and spacing between elements can also be specified for the layout. A grid layout is not directly supported, but it can be manually created with a horizontal layout inside a vertical layout, or vice versa.
+
+\section UI_Sprites Sprites
+
+Sprites are a special kind of %UI element that allow subpixel (float) positioning and scaling, as well as rotation, while the other elements use integer positioning for pixel-perfect display. Sprites can be used to implement rotating HUD elements such as minimaps or speedometer needles.
+
+Due to the free transformability, sprites can not be reliably queried with \ref UI::GetElementAt "GetElementAt()". Also, only other sprites should be parented to sprites, as the other elements do not support scaling and rotation.
 
 
 \page Serialization Serialization

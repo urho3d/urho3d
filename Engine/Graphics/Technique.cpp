@@ -35,7 +35,7 @@
 namespace Urho3D
 {
 
-static const String blendModeNames[] =
+const char* blendModeNames[] =
 {
     "replace",
     "add",
@@ -44,7 +44,7 @@ static const String blendModeNames[] =
     "addalpha",
     "premulalpha",
     "invdestalpha",
-    ""
+    0
 };
 
 static const String compareModeNames[] =
@@ -187,7 +187,7 @@ bool Technique::Load(Deserializer& source)
             if (passElem.HasAttribute("blend"))
             {
                 String blend = passElem.GetAttributeLower("blend");
-                newPass->SetBlendMode((BlendMode)GetStringListIndex(blend, blendModeNames, BLEND_REPLACE));
+                newPass->SetBlendMode((BlendMode)GetStringListIndex(blend.CString(), blendModeNames, BLEND_REPLACE));
             }
             
             if (passElem.HasAttribute("depthtest"))

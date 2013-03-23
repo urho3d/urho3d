@@ -42,6 +42,7 @@
 #include "Shader.h"
 #include "ShaderVariation.h"
 #include "Slider.h"
+#include "Sprite.h"
 #include "Text.h"
 #include "Texture2D.h"
 #include "UI.h"
@@ -94,9 +95,6 @@ UI::~UI()
 
 void UI::SetCursor(Cursor* cursor)
 {
-    if (!rootElement_)
-        return;
-    
     // Remove old cursor (if any) and set new
     if (cursor_)
     {
@@ -118,9 +116,6 @@ void UI::SetCursor(Cursor* cursor)
 
 void UI::SetFocusElement(UIElement* element)
 {
-    if (!rootElement_)
-        return;
-    
     using namespace FocusChanged;
     
     VariantMap eventData;
@@ -165,9 +160,6 @@ void UI::SetFocusElement(UIElement* element)
 
 void UI::Clear()
 {
-    if (!rootElement_)
-        return;
-    
     rootElement_->RemoveAllChildren();
     if (cursor_)
         rootElement_->AddChild(cursor_);
@@ -339,7 +331,8 @@ void UI::Render()
         }
         
         graphics_->SetShaders(vs, ps);
-        graphics_->SetShaderParameter(VSP_MODEL, batch.transform_);
+        if (graphics_->NeedParameterUpdate(SP_OBJECTTRANSFORM, this))
+            graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
         if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
         if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
@@ -427,9 +420,6 @@ void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool activeOnly)
 {
-    if (!rootElement_)
-        return 0;
-    
     UIElement* result = 0;
     GetElementAt(result, rootElement_, position, activeOnly);
     return result;
@@ -447,9 +437,6 @@ UIElement* UI::GetFocusElement() const
 
 UIElement* UI::GetFrontElement() const
 {
-    if (!rootElement_)
-        return 0;
-    
     const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
     int maxPriority = M_MIN_INT;
     UIElement* front = 0;
@@ -542,14 +529,14 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
             int currentPriority = (*i)->GetPriority();
             while (j != children.End() && (*j)->GetPriority() == currentPriority)
             {
-                if (IsVisible(*j, currentScissor))
+                if ((*j)->IsWithinScissor(currentScissor))
                     (*j)->GetBatches(batches_, quads_, currentScissor);
                 ++j;
             }
             // Now recurse into the children
             while (i != j)
             {
-                if (IsVisible(*i, currentScissor))
+                if ((*i)->IsVisible())
                     GetBatches(*i, currentScissor);
                 ++i;
             }
@@ -560,27 +547,13 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     {
         while (i != children.End())
         {
+            if ((*i)->IsWithinScissor(currentScissor))
+                (*i)->GetBatches(batches_, quads_, currentScissor);
             if ((*i)->IsVisible())
-            {
-                if (IsVisible(*i, currentScissor))
-                    (*i)->GetBatches(batches_, quads_, currentScissor);
                 GetBatches(*i, currentScissor);
-            }
             ++i;
         }
     }
-}
-
-bool UI::IsVisible(UIElement* element, const IntRect& currentScissor)
-{
-    // First check element's visibility
-    if (!element->IsVisible())
-        return false;
-
-    // Then check element dimensions against the scissor rectangle
-    const IntVector2& screenPos = element->GetScreenPosition();
-    return screenPos.x_ < currentScissor.right_ && screenPos.x_ + element->GetWidth() > currentScissor.left_ &&
-        screenPos.y_ < currentScissor.bottom_ && screenPos.y_ + element->GetHeight() > currentScissor.top_;
 }
 
 void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly)
@@ -1041,6 +1014,7 @@ void RegisterUILibrary(Context* context)
     
     UIElement::RegisterObject(context);
     BorderImage::RegisterObject(context);
+    Sprite::RegisterObject(context);
     Button::RegisterObject(context);
     CheckBox::RegisterObject(context);
     Cursor::RegisterObject(context);

@@ -37,7 +37,7 @@
 namespace Urho3D
 {
 
-static const char* horizontalAlignments[] =
+const char* horizontalAlignments[] =
 {
     "Left",
     "Center",
@@ -45,7 +45,7 @@ static const char* horizontalAlignments[] =
     0
 };
 
-static const char* verticalAlignments[] =
+const char* verticalAlignments[] =
 {
     "Top",
     "Center",
@@ -126,12 +126,12 @@ UIElement::UIElement(Context* context) :
     layoutMode_(LM_FREE),
     layoutSpacing_(0),
     layoutBorder_(IntRect::ZERO),
-    rotationPivot_(IntVector2::ZERO),
-    rotation_(0.0f),
     resizeNestingLevel_(0),
     layoutNestingLevel_(0),
     layoutMinSize_(0),
     indent_(0),
+    indentSpacing_(16),
+    positionDirty_(true),
     position_(IntVector2::ZERO),
     size_(IntVector2::ZERO),
     minSize_(IntVector2::ZERO),
@@ -140,12 +140,10 @@ UIElement::UIElement(Context* context) :
     horizontalAlignment_(HA_LEFT),
     verticalAlignment_(VA_TOP),
     opacity_(1.0f),
-    positionDirty_(true),
     opacityDirty_(true),
     derivedColorDirty_(true),
     sortOrderDirty_(false),
-    colorGradient_(false),
-    indentSpacing_(16)
+    colorGradient_(false)
 {
 }
 
@@ -192,8 +190,6 @@ void UIElement::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Indent", GetIndent, SetIndent, int, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Rotation Pivot", GetRotationPivot, SetRotationPivot, IntVector2, IntVector2::ZERO, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
     ATTRIBUTE(UIElement, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
 }
 
@@ -310,6 +306,66 @@ void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads
 {
     // Reset hovering for next frame
     hovering_ = false;
+}
+
+bool UIElement::IsWithinScissor(const IntRect& currentScissor)
+{
+    if (!visible_)
+        return false;
+    
+    const IntVector2& screenPos = GetScreenPosition();
+    return screenPos.x_ < currentScissor.right_ && screenPos.x_ + GetWidth() > currentScissor.left_ &&
+        screenPos.y_ < currentScissor.bottom_ && screenPos.y_ + GetHeight() > currentScissor.top_;
+}
+
+const IntVector2& UIElement::GetScreenPosition() const
+{
+    if (positionDirty_)
+    {
+        IntVector2 pos = position_;
+        const UIElement* parent = parent_;
+        
+        if (parent)
+        {
+            const IntVector2& parentScreenPos = parent->GetScreenPosition();
+            
+            switch (horizontalAlignment_)
+            {
+            case HA_LEFT:
+                pos.x_ += parentScreenPos.x_;
+                break;
+                
+            case HA_CENTER:
+                pos.x_ += parentScreenPos.x_ + parent_->size_.x_ / 2 - size_.x_ / 2;
+                break;
+                
+            case HA_RIGHT:
+                pos.x_ += parentScreenPos.x_ + parent_->size_.x_ - size_.x_;
+                break;
+            }
+            switch (verticalAlignment_)
+            {
+            case VA_TOP:
+                pos.y_ += parentScreenPos.y_;
+                break;
+                
+            case VA_CENTER:
+                pos.y_ += parentScreenPos.y_ + parent_->size_.y_ / 2 - size_.y_ / 2;
+                break;
+                
+            case VA_BOTTOM:
+                pos.y_ += parentScreenPos.y_ + parent_->size_.y_ - size_.y_;
+                break;
+            }
+            
+            pos += parent_->childOffset_;
+        }
+        
+        screenPosition_ = pos;
+        positionDirty_ = false;
+    }
+    
+    return screenPosition_;
 }
 
 void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
@@ -735,16 +791,6 @@ void UIElement::SetIndentSpacing(int indentSpacing)
     indentSpacing_ = Max(indentSpacing, 0);
 }
 
-void UIElement::SetRotationPivot(const IntVector2& pivot)
-{
-    rotationPivot_ = pivot;
-}
-
-void UIElement::SetRotation(float angle)
-{
-    rotation_ = angle;
-}
-
 void UIElement::UpdateLayout()
 {
     if (layoutMode_ == LM_FREE || layoutNestingLevel_)
@@ -963,14 +1009,43 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     element->parent_ = this;
     element->MarkDirty();
     UpdateLayout();
+    
+    // Send change event
+    UIElement* root = GetRoot();
+    if (root)
+    {
+        using namespace ElementAdded;
+        
+        VariantMap eventData;
+        eventData[P_ROOT] = (void*)root;
+        eventData[P_PARENT] = (void*)this;
+        eventData[P_ELEMENT] = (void*)element;
+        
+        root->SendEvent(E_ELEMENTADDED, eventData);
+    }
 }
 
 void UIElement::RemoveChild(UIElement* element, unsigned index)
 {
+    UIElement* root = GetRoot();
+    
     for (unsigned i = index; i < children_.Size(); ++i)
     {
         if (children_[i] == element)
         {
+            // Send change event if not already being destroyed
+            if (Refs() > 0 && root)
+            {
+                using namespace ElementRemoved;
+                
+                VariantMap eventData;
+                eventData[P_ROOT] = (void*)root;
+                eventData[P_PARENT] = (void*)this;
+                eventData[P_ELEMENT] = (void*)element;
+                
+                root->SendEvent(E_ELEMENTREMOVED, eventData);
+            }
+            
             element->Detach();
             children_.Erase(i);
             UpdateLayout();
@@ -991,8 +1066,25 @@ void UIElement::RemoveChildAtIndex(unsigned index)
 
 void UIElement::RemoveAllChildren()
 {
+    UIElement* root = GetRoot();
+    
     for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i < children_.End(); )
+    {
+        // Send change event if not already being destroyed
+        if (Refs() > 0 && root)
+        {
+            using namespace ElementRemoved;
+            
+            VariantMap eventData;
+            eventData[P_ROOT] = (void*)root;
+            eventData[P_PARENT] = (void*)this;
+            eventData[P_ELEMENT] = (void*)(*i).Get();
+            
+            root->SendEvent(E_ELEMENTREMOVED, eventData);
+        }
+        
         (*i++)->Detach();
+    }
     children_.Clear();
 }
 
@@ -1016,58 +1108,6 @@ void UIElement::SetVar(ShortStringHash key, const Variant& value)
 void UIElement::SetInternal(bool enable)
 {
     internal_ = enable;
-}
-
-IntVector2 UIElement::GetScreenPosition() const
-{
-    if (positionDirty_)
-    {
-        IntVector2 pos = position_;
-        const UIElement* parent = parent_;
-        const UIElement* current = this;
-        
-        while (parent)
-        {
-            switch (current->horizontalAlignment_)
-            {
-            case HA_LEFT:
-                pos.x_ += parent->position_.x_;
-                break;
-                
-            case HA_CENTER:
-                pos.x_ += parent->position_.x_ + parent->size_.x_ / 2 - current->size_.x_ / 2;
-                break;
-                
-            case HA_RIGHT:
-                pos.x_ += parent->position_.x_ + parent->size_.x_ - current->size_.x_;
-                break;
-            }
-            switch (current->verticalAlignment_)
-            {
-            case VA_TOP:
-                pos.y_ += parent->position_.y_;
-                break;
-                
-            case VA_CENTER:
-                pos.y_ += parent->position_.y_ + parent->size_.y_ / 2 - current->size_.y_ / 2;
-                break;
-                
-            case VA_BOTTOM:
-                pos.y_ += parent->position_.y_ + parent->size_.y_ - current->size_.y_;
-                break;
-            }
-            
-            pos += parent->childOffset_;
-            
-            current = parent;
-            parent = parent->parent_;
-        }
-        
-        screenPosition_ = pos;
-        positionDirty_ = false;
-    }
-    
-    return screenPosition_;
 }
 
 float UIElement::GetDerivedOpacity() const
@@ -1302,35 +1342,19 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
     }
 }
 
-Matrix3x4 UIElement::GetBatchTransform()
-{
-    const IntVector2& screenPos = GetScreenPosition();
-    const IntVector2& size = GetSize();
-    Vector3 pivot((float)rotationPivot_.x_, (float)rotationPivot_.y_, 0.0f);
-    
-    Matrix3x4 rotationAdjust(Matrix3x4::IDENTITY);
-    rotationAdjust.SetTranslation(-pivot);
-    
-    Matrix3x4 rotation(Vector3::ZERO, Quaternion(rotation_, Vector3::FORWARD), 1.0f);
-    rotation.SetTranslation(pivot);
-    
-    Matrix3x4 translation(Matrix3x4::IDENTITY);
-    translation.SetTranslation(Vector3((float)screenPos.x_, (float)screenPos.y_, 0.0f));
-    
-    return translation * rotation * rotationAdjust;
-}
-
 void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
     currentScissor)
 {
+    Vector2 floatOffset((float)offset.x_, (float)offset.y_);
     unsigned initialSize = quads.Size();
+    
     GetBatches(batches, quads, currentScissor);
     for (unsigned i = initialSize; i < quads.Size(); ++i)
     {
-        quads[i].left_ += offset.x_;
-        quads[i].top_ += offset.y_;
-        quads[i].right_ += offset.x_;
-        quads[i].bottom_ += offset.y_;
+        quads[i].topLeft_ += floatOffset;
+        quads[i].topRight_ += floatOffset;
+        quads[i].bottomLeft_ += floatOffset;
+        quads[i].bottomRight_ += floatOffset;
     }
     
     AdjustScissor(currentScissor);

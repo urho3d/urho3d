@@ -80,7 +80,7 @@ void InitUI()
     newCursor.style = uiStyle;
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = newCursor;
-    if (GetPlatform() == "Android")
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
         ui.cursor.visible = false;
 
     downloadsText = Text();

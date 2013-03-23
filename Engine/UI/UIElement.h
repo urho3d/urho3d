@@ -123,6 +123,10 @@ public:
     
     /// Perform UI element update.
     virtual void Update(float timeStep);
+    /// Return whether is visible and inside a scissor rectangle and should be rendered.
+    virtual bool IsWithinScissor(const IntRect& currentScissor);
+    /// Update and return screen position.
+    virtual const IntVector2& GetScreenPosition() const;
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     /// React to mouse hover.
@@ -249,10 +253,6 @@ public:
     void SetIndent(int indent);
     /// Set indent spacing (number of pixels per indentation level).
     void SetIndentSpacing(int indentSpacing);
-    /// Set content rotation pivot offset.
-    void SetRotationPivot(const IntVector2& pivot);
-    /// Set content rotation angle in degrees. Positive is clockwise. Note: child elements do not rotate.
-    void SetRotation(float angle);
     /// Manually update layout. Should not be necessary in most cases, but is provided for completeness.
     void UpdateLayout();
     /// Disable automatic layout update. Should only be used if there are performance problems.
@@ -288,8 +288,6 @@ public:
     const String& GetName() const { return name_; }
     /// Return position.
     const IntVector2& GetPosition() const { return position_; }
-    /// Return screen position.
-    IntVector2 GetScreenPosition() const;
     /// Return size.
     const IntVector2& GetSize() const { return size_; }
     /// Return width.
@@ -360,10 +358,6 @@ public:
     int GetLayoutSpacing() const { return layoutSpacing_; }
     /// Return layout border.
     const IntRect& GetLayoutBorder() const { return layoutBorder_; }
-    /// Return rotation pivot offset.
-    const IntVector2& GetRotationPivot() const { return rotationPivot_; }
-    /// Return rotation angle.
-    float GetRotation() const { return rotation_; }
     /// Return number of child elements.
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return child element by index.
@@ -414,8 +408,6 @@ public:
     void SetTempVisible(bool enable);
     /// Adjust scissor for rendering.
     void AdjustScissor(IntRect& currentScissor);
-    /// Get transform for rendering batches.
-    Matrix3x4 GetBatchTransform();
     /// Get UI rendering batches with a specified offset. Also recurses to child elements.
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
         currentScissor);
@@ -470,10 +462,6 @@ protected:
     int layoutSpacing_;
     /// Layout borders.
     IntRect layoutBorder_;
-    /// Rotation pivot offset.
-    IntVector2 rotationPivot_;
-    /// Rotation angle.
-    float rotation_;
     /// Resize nesting level to prevent multiple events and endless loop.
     unsigned resizeNestingLevel_;
     /// Layout update nesting level to prevent endless loop.
@@ -482,7 +470,13 @@ protected:
     int layoutMinSize_;
     /// Horizontal indentation.
     int indent_;
-
+    /// Indent spacing (number of pixels per indentation level).
+    int indentSpacing_;
+    /// Screen position.
+    mutable IntVector2 screenPosition_;
+    /// Screen position dirty flag.
+    mutable bool positionDirty_;
+    
 private:
     /// Return child elements recursively.
     void GetChildrenRecursive(PODVector<UIElement*>& dest) const;
@@ -497,8 +491,6 @@ private:
     
     /// Position.
     IntVector2 position_;
-    /// Screen position.
-    mutable IntVector2 screenPosition_;
     /// Size.
     IntVector2 size_;
     /// Minimum size.
@@ -517,8 +509,6 @@ private:
     mutable float derivedOpacity_;
     /// Derived color. Only valid when no gradient.
     mutable Color derivedColor_;
-    /// Screen position dirty flag.
-    mutable bool positionDirty_;
     /// Derived opacity dirty flag.
     mutable bool opacityDirty_;
     /// Derived color dirty flag (only used when no gradient.)
@@ -527,8 +517,6 @@ private:
     bool sortOrderDirty_;
     /// Has color gradient flag.
     bool colorGradient_;
-    /// Indent spacing (number of pixels per indentation level).
-    int indentSpacing_;
     /// Default style file.
     SharedPtr<XMLFile> defaultStyle_;
 };
