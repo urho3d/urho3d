@@ -63,6 +63,7 @@ void CreateSceneWindow()
     SubscribeToEvent(editorScene, "NodeRemoved", "HandleNodeRemoved");
     SubscribeToEvent(editorScene, "ComponentAdded", "HandleComponentAdded");
     SubscribeToEvent(editorScene, "ComponentRemoved", "HandleComponentRemoved");
+    SubscribeToEvent(editorScene, "NodeNameChanged", "HandleNodeNameChanged");
 }
 
 void ShowSceneWindow()
@@ -802,4 +803,13 @@ void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
         ListView@ list = sceneWindow.GetChild("NodeList", true);
         list.RemoveItem(index);
     }
+}
+
+void HandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressSceneChanges)
+        return;
+    
+    Node@ node = eventData["Node"].GetNode();
+    UpdateSceneWindowNodeOnly(node);
 }

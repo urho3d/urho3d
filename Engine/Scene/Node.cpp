@@ -226,6 +226,18 @@ void Node::SetName(const String& name)
     nameHash_ = StringHash(name);
     
     MarkNetworkUpdate();
+    
+    // Send change event
+    if (scene_)
+    {
+        using namespace NodeNameChanged;
+        
+        VariantMap eventData;
+        eventData[P_SCENE] = (void*)scene_;
+        eventData[P_NODE] = (void*)this;
+        
+        scene_->SendEvent(E_NODENAMECHANGED, eventData);
+    }
 }
 
 void Node::SetPosition(const Vector3& position)

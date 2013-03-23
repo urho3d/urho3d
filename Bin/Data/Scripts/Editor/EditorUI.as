@@ -125,7 +125,6 @@ void CreateMenuBar()
         filePopup.AddChild(CreateMenuItem("Run script...", 0, 0));
         filePopup.AddChild(CreateMenuDivider());
         filePopup.AddChild(CreateMenuItem("Set resource path...", 0, 0));
-        filePopup.AddChild(CreateMenuItem("Reload resources", 'R', QUAL_CTRL));
         filePopup.AddChild(CreateMenuDivider());
         filePopup.AddChild(CreateMenuItem("Exit", 0, 0));
         uiMenuBar.AddChild(fileMenu);
@@ -377,9 +376,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
         }
     }
 
-    if (action == "Reload resources")
-        ReloadResources();
-    else if (action == "Hierarchy")
+    if (action == "Hierarchy")
         ShowSceneWindow();
     else if (action == "Attribute inspector")
         ShowNodeWindow();

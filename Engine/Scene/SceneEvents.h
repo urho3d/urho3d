@@ -119,6 +119,13 @@ EVENT(E_COMPONENTREMOVED, ComponentRemoved)
     PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
+/// A node's name has changed, requiring refresh in the editor.
+EVENT(E_NODENAMECHANGED, NodeNameChanged)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
 /// The attribute structure of a component has changed, requiring refresh in editor.
 EVENT(E_ATTRIBUTELISTCHANGED, AttributeListChanged)
 {

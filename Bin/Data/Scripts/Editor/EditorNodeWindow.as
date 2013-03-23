@@ -155,13 +155,6 @@ void UpdateNodeAttributes()
 
 void PostEditAttribute(Array<Serializable@>@ serializables, uint index)
 {
-    // If node name changed, update it in the scene window also
-    if (serializables[0].attributeInfos[index].name == "Name")
-    {
-        for (uint i = 0; i < serializables.length; ++i)
-            UpdateSceneWindowNodeOnly(serializables[i]);
-    }
-
     // If a StaticModel/AnimatedModel/Skybox model was changed, apply a possibly different material list
     if (applyMaterialList && serializables[0].attributeInfos[index].name == "Model")
     {
