@@ -190,8 +190,14 @@ void Log::WriteRaw(const String& message, bool error)
         #elif defined(IOS)
         SDL_IOS_LogMessage(message.CString());
         #else
-        if (!quiet_)
-            PrintUnicode(message, error);
+        if (quiet_)
+        {
+            // If in quiet mode, still print the error message to the standard error stream
+            if (error)
+            	PrintUnicode(message, true);
+        }
+        else
+        	PrintUnicode(message, error);
         #endif
         
         if (logFile_)

@@ -776,9 +776,14 @@ static UIElement* UIElementCreateChild(const String& typeName, const String& nam
     return ptr->CreateChild(ShortStringHash(typeName), name);
 }
 
-static void UIElementRemoveChild(UIElement* child, UIElement* ptr)
+static void UIElementRemoveChild(UIElement* child, unsigned index, UIElement* ptr)
 {
-    ptr->RemoveChild(child);
+    ptr->RemoveChild(child, index);
+}
+
+static void UIElementRemoveChild(unsigned index, UIElement* ptr)
+{
+    ptr->RemoveChildAtIndex(index);
 }
 
 static CScriptArray* UIElementGetChildren(bool recursive, UIElement* ptr)
@@ -837,7 +842,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "UIElement@+ CreateChild(const String&in, const String&in name = String())", asFUNCTION(UIElementCreateChild), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void AddChild(UIElement@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void InsertChild(uint, UIElement@+)", asMETHOD(T, InsertChild), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void RemoveChild(UIElement@+)", asFUNCTION(UIElementRemoveChild), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void RemoveChild(UIElement@+, uint arg1 = 0)", asFUNCTIONPR(UIElementRemoveChild, (UIElement*, unsigned, UIElement*), void), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void RemoveChild(uint)", asFUNCTIONPR(UIElementRemoveChild, (unsigned, UIElement*), void), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
@@ -906,12 +912,19 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "FocusMode get_focusMode() const", asMETHOD(T, GetFocusMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_dragDropMode(uint)", asMETHOD(T, SetDragDropMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_dragDropMode() const", asMETHOD(T, GetDragDropMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_defaultStyle(XMLFile@+)", asMETHOD(T, SetDefaultStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "XMLFile@+ get_defaultStyle()", asMETHOD(T, GetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_layoutMode(LayoutMode)", asMETHOD(T, SetLayoutMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "LayoutMode get_layoutMode() const", asMETHOD(T, GetLayoutMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_layoutSpacing(int)", asMETHOD(T, SetLayoutSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_layoutSpacing() const", asMETHOD(T, GetLayoutSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_layoutBorder(const IntRect&)", asMETHOD(T, SetLayoutBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& get_layoutBorder() const", asMETHOD(T, GetLayoutBorder), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_indent(int)", asMETHOD(T, SetIndent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indent() const", asMETHOD(T, GetIndent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_indentSpacing(int)", asMETHOD(T, SetIndentSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indentSpacing() const", asMETHOD(T, GetIndentSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indentWidth() const", asMETHOD(T, GetIndentWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_rotationPivot(const IntVector2&)", asMETHOD(T, SetRotationPivot), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_rotationPivot() const", asMETHOD(T, GetRotationPivot), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_rotation(float)", asMETHOD(T, SetRotation), asCALL_THISCALL);

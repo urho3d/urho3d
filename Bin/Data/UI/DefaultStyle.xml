@@ -245,6 +245,14 @@
             <attribute name="Clip Border" value="1 1 1 1" />
         </element>
     </element>
+    <element type="ListViewHierarchyOverlay">
+        <attribute name="Min Size" value="16 16" />
+        <attribute name="Max Size" value="16 16" />
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="160 0 176 16" />
+        <attribute name="Checked Image Offset" value="16 0" />
+        <attribute name="Hover Image Offset" value="0 16" />
+    </element>
     <element type="Menu">
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
         <attribute name="Image Rect" value="96 0 112 16" />

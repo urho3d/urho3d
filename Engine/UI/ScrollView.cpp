@@ -284,6 +284,7 @@ void ScrollView::UpdatePanelSize()
     {
         IntRect panelBorder = scrollPanel_->GetClipBorder();
         contentElement_->SetWidth(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
+        UpdateViewSize();
     }
     
     ignoreEvents_ = false;

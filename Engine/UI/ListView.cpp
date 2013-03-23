@@ -21,7 +21,7 @@
 //
 
 #include "Precompiled.h"
-#include "BorderImage.h"
+#include "CheckBox.h"
 #include "Context.h"
 #include "InputEvents.h"
 #include "ListView.h"
@@ -34,9 +34,6 @@
 
 namespace Urho3D
 {
-
-static const ShortStringHash indentHash("Indent");
-static const ShortStringHash expandedHash("Expanded");
 
 static const char* highlightModes[] =
 {
@@ -51,41 +48,128 @@ template<> HighlightMode Variant::Get<HighlightMode>() const
     return (HighlightMode)GetInt();
 }
 
-int GetItemIndent(UIElement* item)
-{
-    return item ? item->GetVar(indentHash).GetInt() : 0;
-}
+static const ShortStringHash expandedHash("Expanded");
 
 bool GetItemExpanded(UIElement* item)
 {
-    return item ? item->GetVar(expandedHash).GetBool() : true;
+    return item ? item->GetVar(expandedHash).GetBool() : false;
 }
-    
+
 void SetItemExpanded(UIElement* item, bool enable)
 {
     item->SetVar(expandedHash, enable);
 }
 
+static const ShortStringHash hierarchyParentHash("HierarchyParent");
+
+bool GetItemHierarchyParent(UIElement* item)
+{
+    return item ? item->GetVar(hierarchyParentHash).GetBool() : false;
+}
+
+void SetItemHierarchyParent(UIElement* item, bool enable)
+{
+    item->SetVar(hierarchyParentHash, enable);
+}
+
+/// Hierarchy container (used by ListView internally when in hierarchy mode).
+class HierarchyContainer : public UIElement
+{
+    OBJECT(HierarchyContainer);
+
+public:
+    /// Construct.
+    HierarchyContainer(Context* context, UIElement* overlayContainer) :
+        UIElement(context),
+        overlayContainer_(overlayContainer)
+    {
+        SubscribeToEvent(this, E_LAYOUTUPDATED, HANDLER(HierarchyContainer, HandleLayoutUpdated));
+        SubscribeToEvent(overlayContainer->GetParent(), E_VIEWCHANGED, HANDLER(HierarchyContainer, HandleViewChanged));
+        SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HierarchyContainer, HandleUIMouseClick));
+    }
+
+    /// Handle layout updated by adjusting the position of the overlays.
+    void HandleLayoutUpdated(StringHash eventType, VariantMap& eventData)
+    {
+        // Adjust the container size for child clipping effect
+        overlayContainer_->SetSize(GetParent()->GetSize());
+
+        for (unsigned i = 0; i < children_.Size(); ++i)
+        {
+            const IntVector2& position = children_[i]->GetPosition();
+            CheckBox* overlay = static_cast<CheckBox*>(overlayContainer_->GetChild(i));
+            bool visible = children_[i]->IsVisible() && GetItemHierarchyParent(children_[i]);
+            overlay->SetVisible(visible);
+            if (visible)
+            {
+                overlay->SetPosition(position.x_, position.y_);
+                overlay->SetChecked(GetItemExpanded(children_[i]));
+            }
+        }
+    }
+
+    /// Handle view changed by scrolling the overlays in tandem.
+    void HandleViewChanged(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace ViewChanged;
+
+        int x = eventData[P_X].GetInt();
+        int y = eventData[P_Y].GetInt();
+
+        IntRect panelBorder = GetParent()->GetClipBorder();
+        overlayContainer_->SetChildOffset(IntVector2(-x + panelBorder.left_, -y + panelBorder.top_));
+    }
+
+    /// Handle mouse click on overlays by toggling the expansion state of the corresponding item
+    void HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace UIMouseClick;
+
+        UIElement* overlay = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+        if (overlay)
+        {
+            const Vector<SharedPtr<UIElement> >& children = overlayContainer_->GetChildren();
+            Vector<SharedPtr<UIElement> >::ConstIterator i = children.Find(SharedPtr<UIElement>(overlay));
+            if (i != children.End())
+                static_cast<ListView*>(overlayContainer_->GetParent())->ToggleExpand(i - children.Begin());
+        }
+    }
+
+    /// Insert a child element into a specific position in the child list.
+    void InsertChild(unsigned index, UIElement* element)
+    {
+        // Insert the overlay at the same index position to the overlay container
+        CheckBox* overlay = new CheckBox(context_);
+        overlay->SetStyle(overlayContainer_->GetDefaultStyle(), "ListViewHierarchyOverlay");
+        overlay->SetIndent(element->GetIndent() - 1);
+        overlay->SetFixedWidth(element->GetIndentWidth());
+        overlayContainer_->InsertChild(index, overlay);
+
+        // Then insert the element as child as per normal
+        UIElement::InsertChild(index, element);
+    }
+
+private:
+    UIElement* overlayContainer_;
+};
+
+OBJECTTYPESTATIC(HierarchyContainer);
 OBJECTTYPESTATIC(ListView);
 
 ListView::ListView(Context* context) :
     ScrollView(context),
     highlightMode_(HM_FOCUS),
     multiselect_(false),
-    hierarchyMode_(false),
+    hierarchyMode_(true),	// Init to true here so that the setter below takes effect
     clearSelectionOnDefocus_(false),
     doubleClickInterval_(500),
     lastClickedItem_(M_MAX_UNSIGNED)
 {
     resizeContentWidth_ = true;
-    
-    UIElement* container = new UIElement(context_);
-    container->SetInternal(true);
-    container->SetActive(true);
-    container->SetLayout(LM_VERTICAL);
-    container->SetSortChildren(false);
-    SetContentElement(container);
-    
+
+    // By default list view is set to non-hierarchy mode
+    SetHierarchyMode(false);
+
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
     SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleFocusChanged));
 }
@@ -97,7 +181,7 @@ ListView::~ListView()
 void ListView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ListView>();
-    
+
     ENUM_ACCESSOR_ATTRIBUTE(ListView, "Highlight Mode", GetHighlightMode, SetHighlightMode, HighlightMode, highlightModes, HM_FOCUS, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Multiselect", GetMultiselect, SetMultiselect, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Hierarchy Mode", GetHierarchyMode, SetHierarchyMode, bool, false, AM_FILE);
@@ -116,7 +200,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     bool additive = multiselect_ && qualifiers & (QUAL_SHIFT | QUAL_CTRL);
     int delta = 0;
     int pageDirection = 1;
-    
+
     if (selection != M_MAX_UNSIGNED && numItems)
     {
         switch (key)
@@ -129,7 +213,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
                 return;
             }
             break;
-            
+
         case KEY_RETURN:
         case KEY_RETURN2:
         case KEY_KP_ENTER:
@@ -139,19 +223,19 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
                 return;
             }
             break;
-            
+
         case KEY_UP:
             delta = -1;
             break;
-            
+
         case KEY_DOWN:
             delta = 1;
             break;
-            
+
         case KEY_PAGEUP:
             pageDirection = -1;
             // Fallthru
-            
+
         case KEY_PAGEDOWN:
             {
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
@@ -178,25 +262,25 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
                 delta = okSelection - selection - pageDirection * invisible;
             }
             break;
-            
+
         case KEY_HOME:
             delta = -(int)GetNumItems();
             break;
-            
+
         case KEY_END:
             delta = GetNumItems();
             break;
         }
     }
-    
+
     if (delta)
     {
         ChangeSelection(delta, additive);
         return;
     }
-    
+
     using namespace UnhandledKey;
-    
+
     VariantMap eventData;
     eventData[P_ELEMENT] = (void*)this;
     eventData[P_KEY] = key;
@@ -205,21 +289,67 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     SendEvent(E_UNHANDLEDKEY, eventData);
 }
 
-void ListView::AddItem(UIElement* item)
+void ListView::OnResize()
 {
-    InsertItem(contentElement_->GetNumChildren(), item);
+    ScrollView::OnResize();
+
+    // When in hierarchy mode also need to resize the overlay container
+    if (hierarchyMode_)
+        overlayContainer_->SetSize(scrollPanel_->GetSize());
 }
 
-void ListView::InsertItem(unsigned index, UIElement* item)
+void ListView::AddItem(UIElement* item)
+{
+    InsertItem(M_MAX_UNSIGNED, item);
+}
+
+void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem)
 {
     if (!item || item->GetParent() == contentElement_)
         return;
-    
+
     // Enable input so that clicking the item can be detected
     item->SetActive(true);
     item->SetSelected(false);
-    contentElement_->InsertChild(index, item);
-    
+
+    unsigned numItems = contentElement_->GetNumChildren();
+    if (hierarchyMode_)
+    {
+        int baseIndent = 0;
+        if (parentItem)
+        {
+            baseIndent = parentItem->GetIndent();
+            SetItemHierarchyParent(parentItem, true);
+        }
+        item->SetIndent(baseIndent + 1);
+        SetItemExpanded(item, item->IsVisible());
+
+        // Adjust the index to ensure it is within the children index limit of the parent item
+        unsigned indexLimit = FindItem(parentItem);
+        if (index <= indexLimit)
+            index = indexLimit + 1;
+        else
+        {
+            while (++indexLimit < numItems)
+            {
+                if (contentElement_->GetChild(indexLimit)->GetIndent() <= baseIndent)
+                    break;
+            }
+            if (index > indexLimit)
+                index = indexLimit;
+        }
+
+        // Use the 'overrided' version to insert the child item
+        static_cast<HierarchyContainer*>(contentElement_.Get())->InsertChild(index, item);
+    }
+    else
+    {
+        if (index > numItems)
+            index = numItems;
+
+        contentElement_->InsertChild(index, item);
+    }
+
     // If necessary, shift the following selections
     if (!selections_.Empty())
     {
@@ -228,18 +358,15 @@ void ListView::InsertItem(unsigned index, UIElement* item)
             if (selections_[i] >= index)
                 ++selections_[i];
         }
-        
+
         UpdateSelectionEffect();
     }
-    
-    if (hierarchyMode_)
-        SetItemExpanded(item, item->IsVisible());
 }
 
 void ListView::RemoveItem(UIElement* item, unsigned index)
 {
     unsigned numItems = GetNumItems();
-    
+
     for (unsigned i = index; i < numItems; ++i)
     {
         if (GetItem(i) == item)
@@ -247,26 +374,49 @@ void ListView::RemoveItem(UIElement* item, unsigned index)
             item->SetSelected(false);
             selections_.Remove(i);
 
-            // Remove any child items in hierarchy mode
             unsigned removed = 1;
             if (hierarchyMode_)
             {
-                int baseIndent = GetItemIndent(item);
-                for (unsigned j = i + 1; ; ++j)
+                // Remove any child items in hierarchy mode
+                if (GetItemHierarchyParent(item))
                 {
-                    UIElement* childItem = GetItem(i + 1);
-                    if (!childItem)
-                        break;
-                    if (GetItemIndent(childItem) > baseIndent)
+                    int baseIndent = item->GetIndent();
+                    for (unsigned j = i + 1; ; ++j)
                     {
-                        childItem->SetSelected(false);
-                        selections_.Erase(j);
-                        contentElement_->RemoveChild(childItem, i + 1);
-                        ++removed;
+                        UIElement* childItem = GetItem(i + 1);
+                        if (!childItem)
+                            break;
+                        if (childItem->GetIndent() > baseIndent)
+                        {
+                            childItem->SetSelected(false);
+                            selections_.Erase(j);
+                            contentElement_->RemoveChildAtIndex(i + 1);
+                            overlayContainer_->RemoveChildAtIndex(i + 1);
+                            ++removed;
+                        }
+                        else
+                            break;
                     }
-                    else
-                        break;
                 }
+
+                // Check if the parent of removed item still has other children
+                if (i > 0)
+                {
+                    int baseIndent = item->GetIndent();
+                    UIElement* prevKin = GetItem(i - 1);		// Could be parent or sibling
+                    if (prevKin->GetIndent() < baseIndent)
+                    {
+                        UIElement* nextKin = GetItem(i + 1);	// Could be sibling or parent-sibling or 0 if index out of bound
+                        if (!nextKin || nextKin->GetIndent() < baseIndent)
+                        {
+                            // If we reach here then the parent has no other children
+                            SetItemHierarchyParent(prevKin, false);
+                        }
+                    }
+                }
+
+                // Remove the overlay at the same index
+                overlayContainer_->RemoveChildAtIndex(i);
             }
 
             // If necessary, shift the following selections
@@ -277,11 +427,11 @@ void ListView::RemoveItem(UIElement* item, unsigned index)
                     if (selections_[j] > i)
                         selections_[j] -= removed;
                 }
-                
+
                 UpdateSelectionEffect();
             }
-            
-            contentElement_->RemoveChild(item, i);
+
+            contentElement_->RemoveChildAtIndex(i);
             break;
         }
     }
@@ -295,13 +445,14 @@ void ListView::RemoveItem(unsigned index)
 void ListView::RemoveAllItems()
 {
     contentElement_->DisableLayoutUpdate();
-    
+
     ClearSelection();
     contentElement_->RemoveAllChildren();
-    
+    if (hierarchyMode_)
+        overlayContainer_->RemoveAllChildren();
+
     contentElement_->EnableLayoutUpdate();
     contentElement_->UpdateLayout();
-    UpdateViewSize();
 }
 
 void ListView::SetSelection(unsigned index)
@@ -315,7 +466,7 @@ void ListView::SetSelection(unsigned index)
 void ListView::SetSelections(const PODVector<unsigned>& indices)
 {
     unsigned numItems = GetNumItems();
-    
+
     // Remove first items that should no longer be selected
     for (PODVector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
     {
@@ -323,9 +474,9 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
         if (!indices.Contains(index))
         {
             i = selections_.Erase(i);
-            
+
             using namespace ItemSelected;
-            
+
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_SELECTION] = index;
@@ -334,9 +485,9 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
         else
             ++i;
     }
-    
+
     bool added = false;
-    
+
     // Then add missing items
     for (PODVector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
     {
@@ -352,9 +503,9 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
                     selections_.Push(index);
                     added = true;
                 }
-                
+
                 using namespace ItemSelected;
-                
+
                 VariantMap eventData;
                 eventData[P_ELEMENT] = (void*)this;
                 eventData[P_SELECTION] = *i;
@@ -365,11 +516,11 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
         if (!multiselect_)
             break;
     }
-    
+
     // Re-sort selections if necessary
     if (added)
         Sort(selections_.Begin(), selections_.End());
-    
+
     UpdateSelectionEffect();
     SendEvent(E_SELECTIONCHANGED);
 }
@@ -382,21 +533,21 @@ void ListView::AddSelection(unsigned index)
     {
         if (index >= GetNumItems())
             return;
-        
+
         if (!selections_.Contains(index))
         {
             selections_.Push(index);
-            
+
             using namespace ItemSelected;
-            
+
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMSELECTED, eventData);
-            
+
             Sort(selections_.Begin(), selections_.End());
         }
-        
+
         EnsureItemVisibility(index);
         UpdateSelectionEffect();
         SendEvent(E_SELECTIONCHANGED);
@@ -407,17 +558,17 @@ void ListView::RemoveSelection(unsigned index)
 {
     if (index >= GetNumItems())
         return;
-    
+
     if (selections_.Remove(index))
     {
         using namespace ItemSelected;
-        
+
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_SELECTION] = index;
         SendEvent(E_ITEMDESELECTED, eventData);
     }
-    
+
     EnsureItemVisibility(index);
     UpdateSelectionEffect();
     SendEvent(E_SELECTIONCHANGED);
@@ -428,7 +579,7 @@ void ListView::ToggleSelection(unsigned index)
     unsigned numItems = GetNumItems();
     if (index >= numItems)
         return;
-    
+
     if (selections_.Contains(index))
         RemoveSelection(index);
     else
@@ -441,7 +592,7 @@ void ListView::ChangeSelection(int delta, bool additive)
         return;
     if (!multiselect_)
         additive = false;
-    
+
     // If going downwards, use the last selection as a base. Otherwise use first
     unsigned selection = delta > 0 ? selections_.Back() : selections_.Front();
     int direction = delta > 0 ? 1 : -1;
@@ -460,10 +611,10 @@ void ListView::ChangeSelection(int delta, bool additive)
         if (item->IsVisible())
         {
             indices.Push(okSelection = newSelection);
-            delta -= direction;            
+            delta -= direction;
         }
     }
-    
+
     if (!additive)
         SetSelection(okSelection);
     else
@@ -488,7 +639,37 @@ void ListView::SetMultiselect(bool enable)
 
 void ListView::SetHierarchyMode(bool enable)
 {
+    if (enable == hierarchyMode_)
+        return;
+
     hierarchyMode_ = enable;
+    UIElement* container;
+    if (enable)
+    {
+        overlayContainer_ = CreateChild<UIElement>();
+        overlayContainer_->SetInternal(true);
+        overlayContainer_->SetLayoutMode(LM_FREE);
+        overlayContainer_->SetSortChildren(false);
+        overlayContainer_->SetClipChildren(true);
+
+        container = new HierarchyContainer(context_, overlayContainer_);
+    }
+    else
+    {
+        if (overlayContainer_)
+        {
+            RemoveChild(overlayContainer_);
+            overlayContainer_.Reset();
+        }
+
+        container = new UIElement(context_);
+    }
+
+    SetContentElement(container);
+    container->SetInternal(true);
+    container->SetActive(true);
+    container->SetLayout(LM_VERTICAL);
+    container->SetSortChildren(false);
 }
 
 void ListView::SetClearSelectionOnDefocus(bool enable)
@@ -496,7 +677,7 @@ void ListView::SetClearSelectionOnDefocus(bool enable)
     if (enable != clearSelectionOnDefocus_)
     {
         clearSelectionOnDefocus_ = enable;
-    
+
         if (clearSelectionOnDefocus_)
         {
             SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleDefocused));
@@ -518,31 +699,31 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
 {
     if (!hierarchyMode_)
         return;
-    
+
     unsigned numItems = GetNumItems();
     if (index >= numItems)
         return;
-    
+
     UIElement* item = GetItem(index++);
     SetItemExpanded(item, enable);
-    int baseIndent = GetItemIndent(item);
-    
+    int baseIndent = item->GetIndent();
+
     PODVector<bool> expanded(baseIndent + 1);
     expanded[baseIndent] = enable;
-    
+
     contentElement_->DisableLayoutUpdate();
-    
+
     while (index < numItems)
     {
         item = GetItem(index++);
-        int indent = GetItemIndent(item);
+        int indent = item->GetIndent();
         if (indent <= baseIndent)
             break;
 
         // Propagate the state to children when it is recursive
         if (recursive)
             SetItemExpanded(item, enable);
-        
+
         // Use the parent expanded flag to influence the visibility of its children
         bool visible = enable && expanded[indent - 1];
         item->SetVisible(visible);
@@ -551,21 +732,20 @@ void ListView::Expand(unsigned index, bool enable, bool recursive)
             expanded.Resize(indent + 1);
         expanded[indent] = visible && GetItemExpanded(item);
     }
-    
+
     contentElement_->EnableLayoutUpdate();
     contentElement_->UpdateLayout();
-    UpdateViewSize();
 }
 
 void ListView::ToggleExpand(unsigned index, bool recursive)
 {
     if (!hierarchyMode_)
         return;
-    
+
     unsigned numItems = GetNumItems();
     if (index >= numItems)
         return;
-    
+
     UIElement* item = GetItem(index);
     Expand(index, !GetItemExpanded(item), recursive);
 }
@@ -587,6 +767,16 @@ PODVector<UIElement*> ListView::GetItems() const
     return items;
 }
 
+unsigned ListView::FindItem(UIElement* item) const
+{
+    const Vector<SharedPtr<UIElement> >& children = contentElement_->GetChildren();
+    Vector<SharedPtr<UIElement> >::ConstIterator i = children.Find(SharedPtr<UIElement>(item));
+    if (i != children.End())
+        return i - children.Begin();
+    else
+        return M_MAX_UNSIGNED;
+}
+
 unsigned ListView::GetSelection() const
 {
     if (selections_.Empty())
@@ -603,20 +793,25 @@ UIElement* ListView::GetSelectedItem() const
 PODVector<UIElement*> ListView::GetSelectedItems() const
 {
     PODVector<UIElement*> ret;
-    
+
     for (PODVector<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         UIElement* item = GetItem(*i);
         if (item)
             ret.Push(item);
     }
-    
+
     return ret;
 }
 
 bool ListView::IsSelected(unsigned index) const
 {
     return selections_.Contains(index);
+}
+
+bool ListView::IsExpanded(unsigned index) const
+{
+    return GetItemExpanded(contentElement_->GetChild(index));
 }
 
 float ListView::GetDoubleClickInterval() const
@@ -628,7 +823,7 @@ void ListView::UpdateSelectionEffect()
 {
     unsigned numItems = GetNumItems();
     bool highlighted = highlightMode_ == HM_ALWAYS || HasFocus();
-    
+
     for (unsigned i = 0; i < numItems; ++i)
     {
         UIElement* item = GetItem(i);
@@ -648,18 +843,18 @@ void ListView::EnsureItemVisibility(UIElement* item)
 {
     if (!item || !item->IsVisible())
         return;
-    
+
     IntVector2 newView = GetViewPosition();
     IntVector2 currentOffset = item->GetPosition() - newView;
     const IntRect& clipBorder = scrollPanel_->GetClipBorder();
     IntVector2 windowSize(scrollPanel_->GetWidth() - clipBorder.left_ - clipBorder.right_, scrollPanel_->GetHeight() -
         clipBorder.top_ - clipBorder.bottom_);
-    
+
     if (currentOffset.y_ < 0)
         newView.y_ += currentOffset.y_;
     if (currentOffset.y_ + item->GetHeight() > windowSize.y_)
         newView.y_ += currentOffset.y_ + item->GetHeight() - windowSize.y_;
-    
+
     SetViewPosition(newView);
 }
 
@@ -668,9 +863,9 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
     if (eventData[UIMouseClick::P_BUTTON].GetInt() != MOUSEB_LEFT)
         return;
     int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
-    
+
     UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
-    
+
     unsigned numItems = GetNumItems();
     for (unsigned i = 0; i < numItems; ++i)
     {
@@ -684,7 +879,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                     lastClickedItem_ = i;
                 SetSelection(i);
             }
-            
+
             // Check multiselect with shift & ctrl
             if (multiselect_)
             {
@@ -731,7 +926,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                 else if (qualifiers & QUAL_CTRL)
                     ToggleSelection(i);
             }
-            
+
             if (isDoubleClick)
             {
                 VariantMap eventData;
@@ -739,7 +934,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                 eventData[ItemDoubleClicked::P_SELECTION] = i;
                 SendEvent(E_ITEMDOUBLECLICKED, eventData);
             }
-            
+
             return;
         }
     }
@@ -748,7 +943,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
 {
     using namespace FocusChanged;
-    
+
     UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].GetPtr());
     while (element)
     {

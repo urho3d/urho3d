@@ -26,8 +26,6 @@
 #include "Texture.h"
 #include "UIElement.h"
 
-#include <cstring>
-
 #include "DebugNew.h"
 
 namespace Urho3D

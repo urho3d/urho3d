@@ -393,7 +393,14 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
         LOGERROR("Could not create unknown UI element " + typeName);
         return root;
     }
-    
+
+    if (styleFile)
+        // Set it as default for later use by children elements
+        root->SetDefaultStyle(styleFile);
+    else
+        // Use default style file of the root element if it has one
+        styleFile = rootElement_->GetDefaultStyle(false);
+
     root->LoadXML(rootElem, styleFile);
     return root;
 }
@@ -670,10 +677,11 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     mouseButtons_ = eventData[MouseButtonDown::P_BUTTONS].GetInt();
     qualifiers_ = eventData[MouseButtonDown::P_QUALIFIERS].GetInt();
-    int button = eventData[MouseButtonDown::P_BUTTON].GetInt();
     
     if (cursor_ && cursor_->IsVisible())
     {
+        int button = eventData[MouseButtonDown::P_BUTTON].GetInt();
+
         IntVector2 pos = cursor_->GetPosition();
         WeakPtr<UIElement> element(GetElementAt(pos));
         

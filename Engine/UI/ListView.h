@@ -23,7 +23,6 @@
 #pragma once
 
 #include "ScrollView.h"
-#include "HashSet.h"
 
 namespace Urho3D
 {
@@ -54,11 +53,16 @@ public:
     
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
-    
+    /// React to resize.
+    virtual void OnResize();
+
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
-    /// Insert item at a specific position.
-    void InsertItem(unsigned index, UIElement* item);
+    /// \brief Insert item at a specific index. In hierarchy mode, the optional parameter will be used to determine the child's indent level in respect to its parent.
+    /// If index is greater than the total items then the new item is inserted at the end of the list.
+    /// In hierarchy mode, if index is greater than the index of last children of the specified parent item then the new item is inserted next to the last children.
+    /// And if the index is lesser than the index of the parent item itself then the new item is inserted before the first child item.
+    void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0);
     /// Remove specific item, starting search at the specified index if provided. In hierarchy mode will also remove any children.
     void RemoveItem(UIElement* item, unsigned index = 0);
     /// Remove item at index. In hierarchy mode will also remove any children.
@@ -83,7 +87,8 @@ public:
     void SetHighlightMode(HighlightMode mode);
     /// Enable multiselect.
     void SetMultiselect(bool enable);
-    /// Enable hierarchy mode. Allows hiding/showing items that have "indent" userdata.
+    /// \brief Enable hierarchy mode. Allows items to have parent-child relationship at different indent level and the ability to expand/collapse child items.
+    /// All items in the list will be lost during mode change.
     void SetHierarchyMode(bool enable);
     /// Enable clearing of selection on defocus.
     void SetClearSelectionOnDefocus(bool enable);
@@ -101,6 +106,8 @@ public:
     UIElement* GetItem(unsigned index) const;
     /// Return all items.
     PODVector<UIElement*> GetItems() const;
+    /// Return index of item, or M_MAX_UNSIGNED If not found.
+    unsigned FindItem(UIElement* item) const;
     /// Return first selected index, or M_MAX_UNSIGNED if none selected.
     unsigned GetSelection() const;
     /// Return all selected indices.
@@ -111,6 +118,8 @@ public:
     PODVector<UIElement*> GetSelectedItems() const;
     /// Return whether an item at index is seleccted.
     bool IsSelected(unsigned index) const;
+    /// Return whether an item at index has its children expanded (in hierachy mode only).
+    bool IsExpanded(unsigned index) const;
     /// Return highlight mode.
     HighlightMode GetHighlightMode() const { return highlightMode_; }
     /// Return whether multiselect enabled.
@@ -138,6 +147,8 @@ protected:
     bool multiselect_;
     /// Hierarchy mode flag.
     bool hierarchyMode_;
+    /// Overlay container, used in hierarchy mode only.
+    SharedPtr<UIElement> overlayContainer_;
     /// Clear selection on defocus flag.
     bool clearSelectionOnDefocus_;
     /// Doubleclick interval.

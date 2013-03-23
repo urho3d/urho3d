@@ -233,7 +233,7 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void SetViewPosition(int, int)", asMETHODPR(ListView, SetViewPosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void SetScrollBarsVisible(bool, bool)", asMETHOD(ListView, SetScrollBarsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void AddItem(UIElement@+)", asMETHOD(ListView, AddItem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void InsertItem(uint, UIElement@+)", asMETHOD(ListView, InsertItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void InsertItem(uint, UIElement@+, UIElement@+ arg2 = null)", asMETHOD(ListView, InsertItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void RemoveItem(UIElement@+, uint index = 0)", asMETHODPR(ListView, RemoveItem, (UIElement*, unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void RemoveItem(uint)", asMETHODPR(ListView, RemoveItem, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void RemoveAllItems()", asMETHOD(ListView, RemoveAllItems), asCALL_THISCALL);
@@ -246,7 +246,9 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void Expand(uint, bool, bool arg2 = false)", asMETHOD(ListView, Expand), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void ToggleExpand(uint, bool arg1 = false)", asMETHOD(ListView, ToggleExpand), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool IsSelected(uint) const", asMETHOD(ListView, IsSelected), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool IsExpanded(uint) const", asMETHOD(ListView, IsExpanded), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "Array<UIElement@>@ GetItems() const", asFUNCTION(ListViewGetItems), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ListView", "uint FindItem(UIElement@+)", asMETHOD(ListView, FindItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_viewPosition(const IntVector2&in)", asMETHODPR(ListView, SetViewPosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "const IntVector2& get_viewPosition() const", asMETHOD(ListView, GetViewPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ get_contentElement() const", asMETHOD(ListView, GetContentElement), asCALL_THISCALL);

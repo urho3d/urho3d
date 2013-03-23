@@ -520,14 +520,16 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     if (rowIndex < rowWidths_.Size())
         rowWidth = rowWidths_[rowIndex];
     
+    int ret = GetIndentWidth();
+
     switch (textAlignment_)
     {
-    default:
-        return 0;
+    case HA_LEFT:
+        return ret;
     case HA_CENTER:
-        return (GetSize().x_ - rowWidth) / 2;
+        return ret + (GetSize().x_ - rowWidth) / 2;
     case HA_RIGHT:
-        return GetSize().x_ - rowWidth;
+        return ret + GetSize().x_ - rowWidth;
     }
 }
 

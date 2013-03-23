@@ -121,7 +121,7 @@ void DropDownList::OnShowPopup()
 
 void DropDownList::AddItem(UIElement* item)
 {
-    InsertItem(listView_->GetNumItems(), item);
+    InsertItem(M_MAX_UNSIGNED, item);
 }
 
 void DropDownList::InsertItem(unsigned index, UIElement* item)

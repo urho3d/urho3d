@@ -131,6 +131,7 @@ UIElement::UIElement(Context* context) :
     resizeNestingLevel_(0),
     layoutNestingLevel_(0),
     layoutMinSize_(0),
+    indent_(0),
     position_(IntVector2::ZERO),
     size_(IntVector2::ZERO),
     minSize_(IntVector2::ZERO),
@@ -143,7 +144,8 @@ UIElement::UIElement(Context* context) :
     opacityDirty_(true),
     derivedColorDirty_(true),
     sortOrderDirty_(false),
-    colorGradient_(false)
+    colorGradient_(false),
+    indentSpacing_(16)
 {
 }
 
@@ -188,6 +190,8 @@ void UIElement::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Layout Spacing", GetLayoutSpacing, SetLayoutSpacing, int, 0, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Layout Border", GetLayoutBorder, SetLayoutBorder, IntRect, IntRect::ZERO, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Indent", GetIndent, SetIndent, int, 0, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_INT, "Indent Spacing", GetIndentSpacing, SetIndentSpacing, int, 16, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Rotation Pivot", GetRotationPivot, SetRotationPivot, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
     ATTRIBUTE(UIElement, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
@@ -690,6 +694,11 @@ void UIElement::SetStyleAuto(XMLFile* file)
     SetStyle(file, GetTypeName());
 }
 
+void UIElement::SetDefaultStyle(XMLFile* style)
+{
+    defaultStyle_ = style;
+}
+
 void UIElement::SetLayout(LayoutMode mode, int spacing, const IntRect& border)
 {
     layoutMode_ = mode;
@@ -716,6 +725,16 @@ void UIElement::SetLayoutBorder(const IntRect& border)
     UpdateLayout();
 }
 
+void UIElement::SetIndent(int indent)
+{
+    indent_ = indent;
+}
+
+void UIElement::SetIndentSpacing(int indentSpacing)
+{
+    indentSpacing_ = Max(indentSpacing, 0);
+}
+
 void UIElement::SetRotationPivot(const IntVector2& pivot)
 {
     rotationPivot_ = pivot;
@@ -739,6 +758,8 @@ void UIElement::UpdateLayout()
     PODVector<int> minSizes;
     PODVector<int> maxSizes;
     
+    int baseIndent = GetIndentWidth();
+
     if (layoutMode_ == LM_HORIZONTAL)
     {
         int minChildHeight = 0;
@@ -747,15 +768,15 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            positions.Push(0);
-            sizes.Push(children_[i]->GetWidth());
-            minSizes.Push(children_[i]->GetMinWidth());
-            maxSizes.Push(children_[i]->GetMaxWidth());
+            positions.Push(baseIndent);
+            unsigned indent = children_[i]->GetIndentWidth();
+            sizes.Push(children_[i]->GetWidth() + indent);
+            minSizes.Push(children_[i]->GetMinWidth() + indent);
+            maxSizes.Push(children_[i]->GetMaxWidth() + indent);
             minChildHeight = Max(minChildHeight, children_[i]->GetMinHeight());
         }
         
-        CalculateLayout(positions, sizes, minSizes, maxSizes, GetWidth(), layoutBorder_.left_, layoutBorder_.right_,
-            layoutSpacing_);
+        CalculateLayout(positions, sizes, minSizes, maxSizes, GetWidth(), layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
         
         int width = CalculateLayoutParentSize(sizes, layoutBorder_.left_, layoutBorder_.right_, layoutSpacing_);
         int height = Max(GetHeight(), minChildHeight + layoutBorder_.top_ + layoutBorder_.bottom_);
@@ -790,15 +811,14 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            positions.Push(0);
+            positions.Push(baseIndent);
             sizes.Push(children_[i]->GetHeight());
             minSizes.Push(children_[i]->GetMinHeight());
             maxSizes.Push(children_[i]->GetMaxHeight());
-            minChildWidth = Max(minChildWidth, children_[i]->GetMinWidth());
+            minChildWidth = Max(minChildWidth, children_[i]->GetMinWidth() + children_[i]->GetIndentWidth());
         }
         
-        CalculateLayout(positions, sizes, minSizes, maxSizes, GetHeight(), layoutBorder_.top_, layoutBorder_.bottom_,
-            layoutSpacing_);
+        CalculateLayout(positions, sizes, minSizes, maxSizes, GetHeight(), layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
         
         int height = CalculateLayoutParentSize(sizes, layoutBorder_.top_, layoutBorder_.bottom_, layoutSpacing_);
         int width = Max(GetWidth(), minChildWidth + layoutBorder_.left_ + layoutBorder_.right_);
@@ -824,6 +844,12 @@ void UIElement::UpdateLayout()
         }
     }
     
+    using namespace LayoutUpdated;
+
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)this;
+    SendEvent(E_LAYOUTUPDATED, eventData);
+
     EnableLayoutUpdate();
 }
 
@@ -953,6 +979,16 @@ void UIElement::RemoveChild(UIElement* element, unsigned index)
     }
 }
 
+void UIElement::RemoveChildAtIndex(unsigned index)
+{
+    if (index >= children_.Size())
+        return;
+
+    children_[index]->Detach();
+    children_.Erase(index);
+    UpdateLayout();
+}
+
 void UIElement::RemoveAllChildren()
 {
     for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i < children_.End(); )
@@ -1063,6 +1099,23 @@ bool UIElement::HasFocus() const
         return false;
     else
         return ui->GetFocusElement() == this;
+}
+
+XMLFile* UIElement::GetDefaultStyle(bool recursiveUp) const
+{
+    if (recursiveUp)
+    {
+        const UIElement* element = this;
+        while (element)
+        {
+            if (element->defaultStyle_)
+                return element->defaultStyle_;
+            element = element->parent_;
+        }
+        return 0;
+    }
+    else
+        return defaultStyle_;
 }
 
 void UIElement::GetChildren(PODVector<UIElement*>& dest, bool recursive) const

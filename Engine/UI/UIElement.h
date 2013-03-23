@@ -235,6 +235,8 @@ public:
     void SetStyle(const XMLElement& element);
     /// Set style from an XML file. Find the style element automatically.
     void SetStyleAuto(XMLFile* file);
+    /// Set default style for later use by children elements.
+    void SetDefaultStyle(XMLFile* style);
     /// Set layout.
     void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);
     /// Set layout mode only.
@@ -243,6 +245,10 @@ public:
     void SetLayoutSpacing(int spacing);
     /// Set layout border.
     void SetLayoutBorder(const IntRect& border);
+    /// Set horizontal indentation.
+    void SetIndent(int indent);
+    /// Set indent spacing (number of pixels per indentation level).
+    void SetIndentSpacing(int indentSpacing);
     /// Set content rotation pivot offset.
     void SetRotationPivot(const IntVector2& pivot);
     /// Set content rotation angle in degrees. Positive is clockwise. Note: child elements do not rotate.
@@ -263,6 +269,8 @@ public:
     void InsertChild(unsigned index, UIElement* element);
     /// Remove a child element. Starting search at specified index if provided.
     void RemoveChild(UIElement* element, unsigned index = 0);
+    /// Remove a child element at index.
+    void RemoveChildAtIndex(unsigned index);
     /// Remove all child elements.
     void RemoveAllChildren();
     /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
@@ -344,6 +352,8 @@ public:
     FocusMode GetFocusMode() const { return focusMode_; }
     /// Return drag and drop flags.
     unsigned GetDragDropMode() const { return dragDropMode_; }
+    /// Return default style.
+    XMLFile* GetDefaultStyle(bool recursiveUp = true) const;
     /// Return layout mode.
     LayoutMode GetLayoutMode() const { return layoutMode_; }
     /// Return layout spacing.
@@ -389,6 +399,12 @@ public:
     void SortChildren();
     /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated.
     int GetLayoutMinSize() const { return layoutMinSize_; }
+    /// Return horizontal indentation.
+    int GetIndent() const { return indent_; }
+    /// Return indent spacing (number of pixels per indentation level).
+    int GetIndentSpacing() const { return indentSpacing_; }
+    /// Return indent width in pixels.
+    int GetIndentWidth() const { return indent_ * indentSpacing_; }
     
     /// Set child offset.
     void SetChildOffset(const IntVector2& offset);
@@ -405,7 +421,7 @@ public:
         currentScissor);
     /// Get color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return color_[0]; }
-    
+
 protected:
     /// Mark screen position as needing an update.
     void MarkDirty();
@@ -464,7 +480,9 @@ protected:
     unsigned layoutNestingLevel_;
     /// Layout element minimum size in layout direction.
     int layoutMinSize_;
-    
+    /// Horizontal indentation.
+    int indent_;
+
 private:
     /// Return child elements recursively.
     void GetChildrenRecursive(PODVector<UIElement*>& dest) const;
@@ -509,6 +527,10 @@ private:
     bool sortOrderDirty_;
     /// Has color gradient flag.
     bool colorGradient_;
+    /// Indent spacing (number of pixels per indentation level).
+    int indentSpacing_;
+    /// Default style file.
+    SharedPtr<XMLFile> defaultStyle_;
 };
 
 template <class T> T* UIElement::CreateChild(const String& name) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name)); }

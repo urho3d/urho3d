@@ -32,7 +32,7 @@ void CreateNodeWindow()
     InitResourcePicker();
     InitVectorStructs();
 
-    nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"), uiStyle);
+    nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"));
     componentXMLResource = cache.GetResource("XMLFile", "UI/EditorComponent.xml");
     componentParentContainer = nodeWindow.GetChild("ComponentParentContainer", true);
     AddComponentContainer();
@@ -133,7 +133,7 @@ void UpdateAttributes(bool fullUpdate)
                     AddComponentContainer();
                 
                 Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
-                componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents], 0) + multiplierText;
+                componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents]) + multiplierText;
                 
                 Array<Serializable@> components;
                 for (uint i = 0; i < numEditableComponents; ++i)

@@ -277,10 +277,9 @@ bool SceneDelete()
         return false;
 
     BeginSelectionModify();
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
     
     // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
-    list.ClearSelection();
+    hierarchyList.ClearSelection();
 
     // Remove nodes
     for (uint i = 0; i < selectedNodes.length; ++i)
@@ -298,7 +297,7 @@ bool SceneDelete()
 
         // If deleting only one node, select the next item in the same index
         if (selectedNodes.length == 1 && selectedComponents.empty)
-            list.selection = nodeIndex;
+            hierarchyList.selection = nodeIndex;
     }
 
     // Then remove components, if they still remain
@@ -326,7 +325,7 @@ bool SceneDelete()
 
         // If deleting only one component, select the next item in the same index
         if (selectedComponents.length == 1 && selectedNodes.empty)
-            list.selection = index;
+            hierarchyList.selection = index;
     }
 
     EndSelectionModify();
@@ -350,7 +349,6 @@ bool SceneCopy()
     if (!selectedNodes.empty && !selectedComponents.empty)
         return false;
 
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
     copyBuffer.Clear();
 
     // Copy components
@@ -393,7 +391,6 @@ bool ScenePaste()
     if (editNode is null || !CheckSceneWindowFocus() || copyBuffer.empty)
         return false;
 
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
     bool pasteComponents = false;
 
     for (uint i = 0; i < copyBuffer.length; ++i)
@@ -444,8 +441,6 @@ void SceneUnparent()
     if (!CheckSceneWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
         return;
 
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-
     // Parent selected nodes to root
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
@@ -493,11 +488,10 @@ void SceneResetScale()
 
 void SceneSelectAll()
 {
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-    if (!list.selections.empty)
+    if (!hierarchyList.selections.empty)
     {
         BeginSelectionModify();
-        list.ClearSelection();
+        hierarchyList.ClearSelection();
         EndSelectionModify();
     }
     else
@@ -507,7 +501,7 @@ void SceneSelectAll()
         Array<uint> indices;
         for (uint i = 0; i < rootLevelNodes.length; ++i)
             indices.Push(GetNodeListIndex(rootLevelNodes[i]));
-        list.SetSelections(indices);
+        hierarchyList.SetSelections(indices);
         EndSelectionModify();
     }
 }

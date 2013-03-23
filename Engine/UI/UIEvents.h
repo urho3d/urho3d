@@ -88,6 +88,12 @@ EVENT(E_DEFOCUSED, Defocused)
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
+/// UI element layout updated.
+EVENT(E_LAYOUTUPDATED, LayoutUpdated)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+}
+
 /// UI button pressed.
 EVENT(E_PRESSED, Pressed)
 {

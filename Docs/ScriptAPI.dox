@@ -3101,7 +3101,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -3151,9 +3152,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -3202,7 +3207,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -3254,9 +3260,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -3311,7 +3321,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -3366,9 +3377,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -3427,7 +3442,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -3480,9 +3496,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -3539,7 +3559,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -3592,9 +3613,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -3650,7 +3675,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -3703,9 +3729,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -3765,7 +3795,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -3818,9 +3849,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -3878,7 +3913,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -3930,9 +3966,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -3989,7 +4029,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -4001,7 +4042,7 @@ Methods:<br>
 - void SetViewPosition(int, int)
 - void SetScrollBarsVisible(bool, bool)
 - void AddItem(UIElement@)
-- void InsertItem(uint, UIElement@)
+- void InsertItem(uint, UIElement@, UIElement@ arg2 = null)
 - void RemoveItem(UIElement@, uint arg1 = 0)
 - void RemoveItem(uint)
 - void RemoveAllItems()
@@ -4014,7 +4055,9 @@ Methods:<br>
 - void Expand(uint, bool, bool arg2 = false)
 - void ToggleExpand(uint, bool arg1 = false)
 - bool IsSelected(uint) const
+- bool IsExpanded(uint) const
 - UIElement@[]@ GetItems() const
+- uint FindItem(UIElement@)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -4056,9 +4099,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -4126,7 +4173,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -4180,9 +4228,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -4243,7 +4295,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -4295,9 +4348,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -4363,7 +4420,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -4420,9 +4478,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -4486,7 +4548,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -4549,9 +4612,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)
@@ -4620,7 +4687,8 @@ Methods:<br>
 - UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
@@ -4672,9 +4740,13 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
 - IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
 - IntVector2 rotationPivot
 - float rotation
 - IntVector2 childOffset (readonly)

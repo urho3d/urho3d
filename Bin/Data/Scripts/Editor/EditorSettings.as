@@ -8,7 +8,7 @@ void CreateEditorSettingsDialog()
     if (settingsDialog !is null)
         return;
     
-    settingsDialog = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSettingsDialog.xml"), uiStyle);
+    settingsDialog = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSettingsDialog.xml"));
     ui.root.AddChild(settingsDialog);
     settingsDialog.opacity = uiMaxOpacity;
     CenterDialog(settingsDialog);

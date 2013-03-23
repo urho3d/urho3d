@@ -24,7 +24,7 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="4" />
         <element type="Button">
-            <attribute name="Name" value="ExpandAllButton" />
+            <attribute name="Name" value="ExpandButton" />
             <attribute name="Min Size" value="70 17" />
             <attribute name="Max Size" value="70 17" />
             <attribute name="Layout Mode" value="Vertical" />
@@ -35,7 +35,7 @@
             </element>
         </element>
         <element type="Button">
-            <attribute name="Name" value="CollapseAllButton" />
+            <attribute name="Name" value="CollapseButton" />
             <attribute name="Min Size" value="70 17" />
             <attribute name="Max Size" value="70 17" />
             <attribute name="Layout Mode" value="Vertical" />
@@ -43,6 +43,16 @@
             <element type="Text">
                 <attribute name="Text" value="Collapse" />
                 <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="CheckBox">
+            <attribute name="Name" value="AllCheckBox" />
+            <attribute name="Min Size" value="15 15" />
+            <attribute name="Max Size" value="15 15" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="20 0 0 0" />
+            <element type="Text">
+                <attribute name="Text" value="All" />
             </element>
         </element>
     </element>

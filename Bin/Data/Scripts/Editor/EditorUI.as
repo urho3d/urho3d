@@ -25,6 +25,7 @@ float uiMaxOpacity = 0.7;
 void CreateUI()
 {
     uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
+    ui.root.defaultStyle = uiStyle;
 
     CreateCursor();
     CreateMenuBar();
