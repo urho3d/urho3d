@@ -110,11 +110,19 @@ void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, c
     hovering_ = false;
 }
 
+void Sprite::OnPositionSet()
+{
+    // If the integer position was set (layout update?), copy to the float position
+    floatPosition_ = Vector2((float)position_.x_, (float)position_.y_);
+}
+
 void Sprite::SetPosition(const Vector2& position)
 {
     if (position != floatPosition_)
     {
         floatPosition_ = position;
+        // Copy to the integer position
+        position_ = IntVector2((int)position.x_, (int)position.y_);
         MarkDirty();
     }
 }

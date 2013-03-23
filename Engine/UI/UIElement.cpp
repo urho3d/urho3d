@@ -131,8 +131,8 @@ UIElement::UIElement(Context* context) :
     layoutMinSize_(0),
     indent_(0),
     indentSpacing_(16),
-    positionDirty_(true),
     position_(IntVector2::ZERO),
+    positionDirty_(true),
     size_(IntVector2::ZERO),
     minSize_(IntVector2::ZERO),
     maxSize_(M_MAX_INT, M_MAX_INT),
@@ -417,6 +417,10 @@ void UIElement::OnResize()
 {
 }
 
+void UIElement::OnPositionSet()
+{
+}
+
 bool UIElement::LoadXML(Deserializer& source)
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
@@ -446,6 +450,7 @@ void UIElement::SetPosition(const IntVector2& position)
     if (position != position_)
     {
         position_ = position;
+        OnPositionSet();
         MarkDirty();
     }
 }

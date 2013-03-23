@@ -93,7 +93,7 @@ The scripting language used is AngelScript (http://www.angelcode.com/angelscript
 
 On Android and iOS there are no command line options, so running the NinjaSnowWar example is hardcoded. This can be changed from the file Urho3D/Urho3D.cpp.
 
-Currently eight example application scripts exist:
+Currently nine example application scripts exist:
 
 \section Running_NinjaSnowWar NinjaSnowWar
 
@@ -195,6 +195,17 @@ On the client, first type the server address to the text edit box and click "Con
 either press return or click "Send" to send them. Press ESC to exit.
 
 To connect automatically, the server address can also be given on the command line, for example Chat.bat 127.0.0.1
+
+\section Running_SpriteTest SpriteTest
+
+Simple example of using sprites in the user interface. To start, run SpriteTest.bat in the Bin directory, or use the command Urho3D.exe Scripts\SpriteTest.as
+
+Key controls:
+
+\verbatim
+F1          Toggle AngelScript console
+T           Toggle profiling display
+\endverbatim
 
 \section Running_Commandline Command line options
 

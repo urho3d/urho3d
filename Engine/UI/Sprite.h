@@ -47,6 +47,8 @@ public:
     virtual const IntVector2& GetScreenPosition() const;
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
+    /// React to position change.
+    virtual void OnPositionSet();
     
     /// Set floating point position.
     void SetPosition(const Vector2& position);

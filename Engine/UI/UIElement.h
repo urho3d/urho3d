@@ -151,6 +151,8 @@ public:
     virtual void OnChar(unsigned c, int buttons, int qualifiers);
     /// React to resize.
     virtual void OnResize();
+    /// React to position change.
+    virtual void OnPositionSet();
     
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
@@ -472,6 +474,8 @@ protected:
     int indent_;
     /// Indent spacing (number of pixels per indentation level).
     int indentSpacing_;
+    /// Position.
+    IntVector2 position_;
     /// Screen position.
     mutable IntVector2 screenPosition_;
     /// Screen position dirty flag.
@@ -489,8 +493,6 @@ private:
     /// Detach from parent.
     void Detach();
     
-    /// Position.
-    IntVector2 position_;
     /// Size.
     IntVector2 size_;
     /// Minimum size.
