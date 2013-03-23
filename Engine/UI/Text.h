@@ -47,7 +47,7 @@ public:
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to resize.
     virtual void OnResize();
     

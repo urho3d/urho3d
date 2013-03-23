@@ -302,7 +302,7 @@ void UIElement::Update(float timeStep)
 {
 }
 
-void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
+void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     // Reset hovering for next frame
     hovering_ = false;
@@ -1347,26 +1347,24 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
     }
 }
 
-void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
+void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect
     currentScissor)
 {
     Vector2 floatOffset((float)offset.x_, (float)offset.y_);
-    unsigned initialSize = quads.Size();
+    unsigned initialSize = vertexData.Size();
     
-    GetBatches(batches, quads, currentScissor);
-    for (unsigned i = initialSize; i < quads.Size(); ++i)
+    GetBatches(batches, vertexData, currentScissor);
+    for (unsigned i = initialSize; i < vertexData.Size(); i += 6)
     {
-        quads[i].topLeft_ += floatOffset;
-        quads[i].topRight_ += floatOffset;
-        quads[i].bottomLeft_ += floatOffset;
-        quads[i].bottomRight_ += floatOffset;
+        vertexData[i] += floatOffset.x_;
+        vertexData[i + 1] += floatOffset.y_;
     }
     
     AdjustScissor(currentScissor);
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         if ((*i)->IsVisible())
-            (*i)->GetBatchesWithOffset(offset, batches, quads, currentScissor);
+            (*i)->GetBatchesWithOffset(offset, batches, vertexData, currentScissor);
     }
 }
 

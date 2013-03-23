@@ -91,7 +91,7 @@ const IntVector2& Sprite::GetScreenPosition() const
     return screenPosition_;
 }
 
-void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
+void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     bool allOpaque = true;
     if (GetDerivedOpacity() < 1.0f || color_[C_TOPLEFT].a_ < 1.0f || color_[C_TOPRIGHT].a_ < 1.0f ||
@@ -99,10 +99,10 @@ void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, c
         allOpaque = false;
     
     const IntVector2& size = GetSize();
-    UIBatch batch(blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &quads);
+    UIBatch batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData);
     
-    batch.AddQuad(UIQuad(*this, GetTransform(), 0, 0, size.x_, size.y_, imageRect_.left_, imageRect_.top_, imageRect_.right_ -
-        imageRect_.left_, imageRect_.bottom_ - imageRect_.top_));
+    batch.AddQuad(GetTransform(), 0, 0, size.x_, size.y_, imageRect_.left_, imageRect_.top_, imageRect_.right_ -
+        imageRect_.left_, imageRect_.bottom_ - imageRect_.top_);
     
     UIBatch::AddOrMerge(batch, batches);
     

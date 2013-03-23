@@ -99,13 +99,13 @@ void Text::ApplyAttributes()
     UpdateText();
 }
 
-void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
+void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     // Hovering or whole selection batch
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
-        UIBatch batch(BLEND_ALPHA, currentScissor, 0, &quads);
-        batch.AddQuad(*this, 0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0, selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ :
+        UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+        batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0, selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ :
             hoverColor_);
         UIBatch::AddOrMerge(batch, batches);
     }
@@ -113,7 +113,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
     // Partial selection batch
     if (!selected_ && selectionLength_ && charSizes_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
     {
-        UIBatch batch(BLEND_ALPHA, currentScissor, 0, &quads);
+        UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
         
         IntVector2 currentStart = charPositions_[selectionStart_];
         IntVector2 currentEnd = currentStart;
@@ -124,7 +124,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
             {
                 if (charPositions_[i].y_ != currentStart.y_)
                 {
-                    batch.AddQuad(*this, currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
+                    batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
                         0, 0, 0, 0, selectionColor_);
                     currentStart = charPositions_[i];
                     currentEnd = currentStart + charSizes_[i];
@@ -138,7 +138,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         }
         if (currentEnd != currentStart)
         {
-            batch.AddQuad(*this, currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
+            batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
                 0, 0, 0, 0, selectionColor_);
         }
         
@@ -152,41 +152,39 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         if (!face)
             return;
         
-        Vector<PODVector<UIQuad> > pageQuads(face->textures_.Size());
-        
-        unsigned rowIndex = 0;
-        int x = GetRowStartPosition(rowIndex);
-        int y = 0;
-        
-        for (unsigned i = 0; i < printText_.Size(); ++i)
+        for (unsigned n = 0; n < face->textures_.Size(); ++n)
         {
-            unsigned c = printText_[i];
-            
-            if (c != '\n')
+            UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, face->textures_[n], &vertexData);
+
+            unsigned rowIndex = 0;
+            int x = GetRowStartPosition(rowIndex);
+            int y = 0;
+        
+            for (unsigned i = 0; i < printText_.Size(); ++i)
             {
-                const FontGlyph* p = face->GetGlyph(c);
-                if (!p)
-                    continue;
-                
-                const FontGlyph& glyph = *p;
-                pageQuads[glyph.page_].Push(UIQuad(*this, x + glyph.offsetX_, y + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_));
-                
-                x += glyph.advanceX_;
-                if (i < printText_.Size() - 1)
-                    x += face->GetKerning(c, printText_[i + 1]);
-            }
-            else
-            {
-                x = GetRowStartPosition(++rowIndex);
-                y += rowHeight_;
-            }
-        }
+                unsigned c = printText_[i];
             
-        for (unsigned page = 0; page < face->textures_.Size(); ++page)
-        {
-            UIBatch batch(BLEND_ALPHA, currentScissor, face->textures_[page], &quads);
-            batch.AddQuad(pageQuads[page]);
-            UIBatch::AddOrMerge(batch, batches);
+                if (c != '\n')
+                {
+                    const FontGlyph* p = face->GetGlyph(c);
+                    if (!p || p->page_ != n)
+                        continue;
+                                 
+                    const FontGlyph& glyph = *p;
+                    pageBatch.AddQuad(x + glyph.offsetX_, y + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+                
+                    x += glyph.advanceX_;
+                    if (i < printText_.Size() - 1)
+                        x += face->GetKerning(c, printText_[i + 1]);
+                }
+                else
+                {
+                    x = GetRowStartPosition(++rowIndex);
+                    y += rowHeight_;
+                }
+            }
+
+            UIBatch::AddOrMerge(pageBatch, batches);
         }
     }
     

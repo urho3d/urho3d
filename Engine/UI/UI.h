@@ -150,8 +150,8 @@ private:
     WeakPtr<UIElement> focusElement_;
     /// UI rendering batches.
     PODVector<UIBatch> batches_;
-    /// UI rendering quads.
-    PODVector<UIQuad> quads_;
+    /// UI rendering vertex data.
+    PODVector<float> vertexData_;
     /// UI vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// UI element query vector.

@@ -36,49 +36,6 @@ class ShaderVariation;
 class Texture;
 class UIElement;
 
-/// %UI rendering quad.
-struct UIQuad
-{
-    /// Construct with defaults.
-    UIQuad();
-    /// Construct.
-    UIQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
-        int texWidth = 0, int texHeight = 0, Color* color = 0);
-    /// Construct using a transform matrix.
-    UIQuad(const UIElement& element, const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
-        int texWidth = 0, int texHeight = 0, Color* color = 0);
-    
-    /// Return an interpolated color for an UI element.
-    static unsigned GetInterpolatedColor(const UIElement& element, int x, int y);
-    
-    /// Top left position.
-    Vector2 topLeft_;
-    /// Top right position.
-    Vector2 topRight_;
-    /// Bottom left position.
-    Vector2 bottomLeft_;
-    /// Bottom right position.
-    Vector2 bottomRight_;
-    /// Left texture coordinate.
-    short leftUV_;
-    /// Top texture coordinate.
-    short topUV_;
-    /// Right texture coordinate.
-    short rightUV_;
-    /// Bottom texture coordinate.
-    short bottomUV_;
-    /// Top left color.
-    unsigned topLeftColor_;
-    /// Top right color.
-    unsigned topRightColor_;
-    /// Bottom left color.
-    unsigned bottomLeftColor_;
-    /// Bottom right color.
-    unsigned bottomRightColor_;
-    /// Defined flag.
-    bool defined_;
-};
-
 /// %UI rendering draw call.
 class UIBatch
 {
@@ -86,42 +43,38 @@ public:
     /// Construct with defaults.
     UIBatch();
     /// Construct.
-    UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<UIQuad>* quads);
+    UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData);
     
-    /// Begin adding quads.
-    void Begin(PODVector<UIQuad>* quads);
-    /// Add a collection of quads. Each quad is added without first checking whether it is properly defined.
-    void AddQuad(const PODVector<UIQuad>& quads);
     /// Add a quad.
-    void AddQuad(UIQuad quad);
-    /// Add a quad.
-    void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY);
-    /// Add a quad with scaled texture.
-    void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight);
+    void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0, Color* color = 0);
+    /// Add a quad using a transform matrix.
+    void AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0, Color* color = 0);
     /// Add a quad with tiled texture.
-    void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
+    void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
     /// Add a quad with custom color.
-    void AddQuad(const UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, const Color& color);
+    void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, const Color& color);
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
-    /// Update the vertex data.
-    void UpdateGeometry(Graphics* graphics, void* lockedData);
+    /// Return an interpolated color for the UI element.
+    unsigned GetInterpolatedColor(int x, int y);
     
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
     
+    /// Element this batch represents.
+    UIElement* element_;
     /// Blending mode.
     BlendMode blendMode_;
     /// Scissor rectangle.
     IntRect scissor_;
     /// Texture.
     Texture* texture_;
-    /// Quads.
-    PODVector<UIQuad>* quads_;
-    /// Quad start index.
-    unsigned quadStart_;
-    /// Number of quads.
-    unsigned quadCount_;
+    /// Vertex data
+    PODVector<float>* vertexData_;
+    /// Vertex data start index.
+    unsigned vertexStart_;
+    /// Vertex data end index.
+    unsigned vertexEnd_;
 };
 
 }

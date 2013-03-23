@@ -204,19 +204,17 @@ VariantVector Cursor::GetShapesAttr() const
     return ret;
 }
 
-void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
+void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    unsigned initialSize = quads.Size();
+    unsigned initialSize = vertexData.Size();
     const IntVector2& offset = shapeInfos_[shape_].hotSpot_;
-    Vector2 floatOffset((float)offset.x_, (float)offset.y_);
+    Vector2 floatOffset(-(float)offset.x_, -(float)offset.y_);
     
-    BorderImage::GetBatches(batches, quads, currentScissor);
-    for (unsigned i = initialSize; i < quads.Size(); ++i)
+    BorderImage::GetBatches(batches, vertexData, currentScissor);
+    for (unsigned i = initialSize; i < vertexData.Size(); i += 6)
     {
-        quads[i].topLeft_ -= floatOffset;
-        quads[i].topRight_ -= floatOffset;
-        quads[i].bottomLeft_ -= floatOffset;
-        quads[i].bottomRight_ -= floatOffset;
+        vertexData[i] += floatOffset.x_;
+        vertexData[i + 1] += floatOffset.y_;
     }
 }
 

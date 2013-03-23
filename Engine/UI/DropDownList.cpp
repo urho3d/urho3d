@@ -74,9 +74,9 @@ void DropDownList::ApplyAttributes()
     SetSelection(selectionAttr_);
 }
 
-void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
+void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    Menu::GetBatches(batches, quads, currentScissor);
+    Menu::GetBatches(batches, vertexData, currentScissor);
     
     if (!placeholder_->IsVisible())
         return;
@@ -92,7 +92,7 @@ void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& qu
         // GetBatches() usually resets the hover flag. Therefore get its value and then reset it for the real rendering
         bool hover = selectedItem->IsHovering();
         selectedItem->SetHovering(false);
-        selectedItem->GetBatchesWithOffset(offset, batches, quads, currentScissor);
+        selectedItem->GetBatchesWithOffset(offset, batches, vertexData, currentScissor);
         selectedItem->SetHovering(hover);
     }
 }

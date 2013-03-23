@@ -82,7 +82,7 @@ void Button::Update(float timeStep)
     }
 }
 
-void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
+void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
     if (hovering_)
@@ -90,7 +90,7 @@ void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, c
     if (pressed_ || selected_)
         offset += pressedOffset_;
     
-    BorderImage::GetBatches(batches, quads, currentScissor, offset);
+    BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
 void Button::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)

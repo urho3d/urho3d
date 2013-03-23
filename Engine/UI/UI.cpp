@@ -52,6 +52,8 @@
 
 #include "Sort.h"
 
+#include <cstring>
+
 #include "DebugNew.h"
 
 namespace Urho3D
@@ -244,9 +246,9 @@ void UI::RenderUpdate()
         cursor_->SetTempVisible(false);
     }
     
-    // Get batches & quads from the UI elements
+    // Get rendering batches from the UI elements
     batches_.Clear();
-    quads_.Clear();
+    vertexData_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
     GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
 
@@ -262,11 +264,11 @@ void UI::Render()
     
     PROFILE(RenderUI);
     
-    if (quads_.Empty())
+    if (vertexData_.Empty())
         return;
     
     // Update quad geometry into the vertex buffer
-    unsigned numVertices = quads_.Size() * 6;
+    unsigned numVertices = vertexData_.Size() / 6;
     // Resize the vertex buffer if too small or much too large
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
@@ -276,9 +278,8 @@ void UI::Render()
     if (!dest)
         return;
     
-    for (unsigned i = 0; i < batches_.Size(); ++i)
-        batches_[i].UpdateGeometry(graphics_, ((unsigned char*)dest) + batches_[i].quadStart_ * vertexSize * 6);
-    
+    memcpy(dest, &vertexData_[0], vertexData_.Size() * sizeof(float));
+
     vertexBuffer_->Unlock();
     
     Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
@@ -309,7 +310,7 @@ void UI::Render()
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         const UIBatch& batch = batches_[i];
-        if (!batch.quadCount_)
+        if (batch.vertexStart_ == batch.vertexEnd_)
             continue;
         
         if (!batch.texture_)
@@ -342,7 +343,7 @@ void UI::Render()
         graphics_->SetScissorTest(true, batch.scissor_);
         graphics_->SetTexture(0, batch.texture_);
         graphics_->SetVertexBuffer(vertexBuffer_);
-        graphics_->Draw(TRIANGLE_LIST, batch.quadStart_ * 6, batch.quadCount_ * 6);
+        graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / 6, (batch.vertexEnd_ - batch.vertexStart_) / 6);
     }
 }
 
@@ -530,7 +531,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
             while (j != children.End() && (*j)->GetPriority() == currentPriority)
             {
                 if ((*j)->IsWithinScissor(currentScissor))
-                    (*j)->GetBatches(batches_, quads_, currentScissor);
+                    (*j)->GetBatches(batches_, vertexData_, currentScissor);
                 ++j;
             }
             // Now recurse into the children
@@ -548,7 +549,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
         while (i != children.End())
         {
             if ((*i)->IsWithinScissor(currentScissor))
-                (*i)->GetBatches(batches_, quads_, currentScissor);
+                (*i)->GetBatches(batches_, vertexData_, currentScissor);
             if ((*i)->IsVisible())
                 GetBatches(*i, currentScissor);
             ++i;

@@ -54,7 +54,7 @@ void CheckBox::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(CheckBox, BorderImage);
 }
 
-void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
+void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
     if (hovering_ || selected_)
@@ -62,7 +62,7 @@ void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads,
     if (checked_)
         offset += checkedOffset_;
     
-    BorderImage::GetBatches(batches, quads, currentScissor, offset);
+    BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
 void CheckBox::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
