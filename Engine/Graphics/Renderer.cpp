@@ -977,7 +977,7 @@ RenderSurface* Renderer::GetDepthStencil(int width, int height)
     if (width == graphics_->GetWidth() && height == graphics_->GetHeight() && graphics_->GetMultiSample() <= 1)
         return 0;
     else
-        return GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat())->GetRenderSurface();
+        return GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat(), false, false)->GetRenderSurface();
 }
 
 OcclusionBuffer* Renderer::GetOcclusionBuffer(Camera* camera)

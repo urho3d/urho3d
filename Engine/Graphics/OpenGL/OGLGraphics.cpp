@@ -2286,8 +2286,8 @@ void Graphics::CommitFramebuffer()
             impl_->sRGBWrite_ = sRGBWrite;
         }
         #endif
-
-	    return;
+        
+        return;
     }
     
     // Search for a new framebuffer based on format & size, or create new

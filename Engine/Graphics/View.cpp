@@ -1534,8 +1534,10 @@ void View::AllocateScreenBuffers()
         neededBuffers = 2;
     
     // Allocate screen buffers with filtering active in case the quad commands need that
+    // Follow the sRGB mode of the destination rendertarget
+    bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
     for (unsigned i = 0; i < neededBuffers; ++i)
-        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true));
+        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB));
     
     // Allocate extra render targets defined by the rendering path
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
@@ -1558,7 +1560,7 @@ void View::AllocateScreenBuffers()
             height = rtSize_.y_ / (height ? height : 1);
         }
         
-        renderTargets_[StringHash(rtInfo.name_)] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_);
+        renderTargets_[StringHash(rtInfo.name_)] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_, rtInfo.sRGB_);
     }
 }
 
