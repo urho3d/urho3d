@@ -94,8 +94,6 @@ protected:
     void SetID(unsigned id);
     /// Set scene node. Called by Node when creating the component.
     void SetNode(Node* node);
-    /// Send an attribute list change event.
-    void SendAttributeListChange();
     
     /// Scene node.
     Node* node_;

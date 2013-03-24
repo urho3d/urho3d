@@ -47,7 +47,6 @@ void CreateNodeWindow()
     SubscribeToEvent(nodeWindow.GetChild("CloseButton", true), "Released", "HideNodeWindow");
     SubscribeToEvent(nodeWindow.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNewVariable");
     SubscribeToEvent(nodeWindow.GetChild("DeleteVarButton", true), "Released", "DeleteVariable");
-    SubscribeToEvent("AttributeListChanged", "HandleAttributeListChanged");
 }
 
 void HideNodeWindow()
@@ -278,22 +277,4 @@ void DeleteVariable(StringHash eventType, VariantMap& eventData)
     }
     if (erased)
         UpdateAttributes(false);
-}
-
-void HandleAttributeListChanged(StringHash eventType, VariantMap& eventData)
-{
-    if (suppressSceneChanges)
-        return;
-
-    Component@ component = eventData["Component"].GetComponent();
-
-    for (uint i = 0; i < editComponents.length; ++i)
-    {
-        if (component is editComponents[i])
-        {
-            // Update inspector fully, as attribute set might have changed
-            UpdateAttributes(true);
-            break;
-        }
-    }
 }

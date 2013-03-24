@@ -381,8 +381,6 @@ void ScriptInstance::CreateObject()
         
         if (methods_[METHOD_START])
             scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);
-        
-        SendAttributeListChange();
     }
     else
         LOGERROR("Failed to create object of class " + className_ + " from " + scriptFile_->GetName());
@@ -403,7 +401,6 @@ void ScriptInstance::ReleaseObject()
         
         ClearScriptMethods();
         ClearScriptAttributes();
-        SendAttributeListChange();
         
         scriptObject_->SetUserData(0);
         scriptObject_->Release();

@@ -166,50 +166,87 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         if (!face)
             return;
 
-        // Only traversing thru the printText once regardless of number of textures/pages in the font
-        Vector<PODVector<GlyphLocation> > pageGlyphLocations(face->textures_.Size());
-        
-        unsigned rowIndex = 0;
-        int x = GetRowStartPosition(rowIndex);
-        int y = 0;
-
-        for (unsigned i = 0; i < printText_.Size(); ++i)
+        if (face->textures_.Size() > 1)
         {
-            unsigned c = printText_[i];
-
-            if (c != '\n')
+            // Only traversing thru the printText once regardless of number of textures/pages in the font
+            Vector<PODVector<GlyphLocation> > pageGlyphLocations(face->textures_.Size());
+            
+            unsigned rowIndex = 0;
+            int x = GetRowStartPosition(rowIndex);
+            int y = 0;
+            
+            for (unsigned i = 0; i < printText_.Size(); ++i)
             {
-                const FontGlyph* p = face->GetGlyph(c);
-                if (!p)
-                    continue;
-
-                pageGlyphLocations[p->page_].Push(GlyphLocation(x, y, p));
-
-                x += p->advanceX_;
-                if (i < printText_.Size() - 1)
-                    x += face->GetKerning(c, printText_[i + 1]);
+                unsigned c = printText_[i];
+                
+                if (c != '\n')
+                {
+                    const FontGlyph* p = face->GetGlyph(c);
+                    if (!p)
+                        continue;
+                    
+                    pageGlyphLocations[p->page_].Push(GlyphLocation(x, y, p));
+                    
+                    x += p->advanceX_;
+                    if (i < printText_.Size() - 1)
+                        x += face->GetKerning(c, printText_[i + 1]);
+                }
+                else
+                {
+                    x = GetRowStartPosition(++rowIndex);
+                    y += rowHeight_;
+                }
             }
-            else
+            
+            for (unsigned n = 0; n < face->textures_.Size(); ++n)
             {
-                x = GetRowStartPosition(++rowIndex);
-                y += rowHeight_;
+                // One batch per texture/page
+                UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, face->textures_[n], &vertexData);
+                
+                const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations[n];
+                for (unsigned i = 0; i < pageGlyphLocation.Size(); ++i)
+                {
+                    const GlyphLocation& glyphLocation = pageGlyphLocation[i];
+                    const FontGlyph& glyph = *glyphLocation.glyph_;
+                    pageBatch.AddQuad(glyphLocation.x_ + glyph.offsetX_, glyphLocation.y_ + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+                }
+                
+                batches.Push(pageBatch);
             }
         }
-
-        for (unsigned n = 0; n < face->textures_.Size(); ++n)
+        else
         {
-        	// One batch per texture/page
-            UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, face->textures_[n], &vertexData);
-
-            const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations[n];
-            for (unsigned i = 0; i < pageGlyphLocation.Size(); ++i)
+            // If only one texture page, construct the UI batch directly
+            unsigned rowIndex = 0;
+            int x = GetRowStartPosition(rowIndex);
+            int y = 0;
+            
+            UIBatch batch(this, BLEND_ALPHA, currentScissor, face->textures_[0], &vertexData);
+            
+            for (unsigned i = 0; i < printText_.Size(); ++i)
             {
-                const GlyphLocation& glyphLocation = pageGlyphLocation[i];
-                const FontGlyph& glyph = *glyphLocation.glyph_;
-                pageBatch.AddQuad(glyphLocation.x_ + glyph.offsetX_, glyphLocation.y_ + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+                unsigned c = printText_[i];
+                
+                if (c != '\n')
+                {
+                    const FontGlyph* p = face->GetGlyph(c);
+                    if (!p)
+                        continue;
+                    
+                    batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_);
+                    
+                    x += p->advanceX_;
+                    if (i < printText_.Size() - 1)
+                        x += face->GetKerning(c, printText_[i + 1]);
+                }
+                else
+                {
+                    x = GetRowStartPosition(++rowIndex);
+                    y += rowHeight_;
+                }
             }
-
-            batches.Push(pageBatch);
+            
+            UIBatch::AddOrMerge(batch, batches);
         }
     }
     

@@ -126,12 +126,4 @@ EVENT(E_NODENAMECHANGED, NodeNameChanged)
     PARAM(P_NODE, Node);                    // Node pointer
 }
 
-/// The attribute structure of a component has changed, requiring refresh in editor.
-EVENT(E_ATTRIBUTELISTCHANGED, AttributeListChanged)
-{
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_COMPONENT, Component);          // Component pointer
-}
-
 }

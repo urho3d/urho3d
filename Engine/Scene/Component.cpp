@@ -183,22 +183,6 @@ void Component::SetNode(Node* node)
     OnNodeSet(node_);
 }
 
-void Component::SendAttributeListChange()
-{
-    Scene* scene = GetScene();
-    if (scene)
-    {
-        using namespace AttributeListChanged;
-        
-        VariantMap eventData;
-        eventData[P_SCENE] = (void*)scene;
-        eventData[P_NODE] = (void*)GetNode();
-        eventData[P_COMPONENT] = (void*)this;
-        
-        scene->SendEvent(E_ATTRIBUTELISTCHANGED, eventData);
-    }
-}
-
 Component* Component::GetComponent(ShortStringHash type) const
 {
     return node_ ? node_->GetComponent(type) : 0;
