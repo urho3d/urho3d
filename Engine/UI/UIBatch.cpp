@@ -44,6 +44,8 @@ UIBatch::UIBatch() :
     element_(0),
     blendMode_(BLEND_REPLACE),
     texture_(0),
+    invTextureSize_(Vector2::ONE),
+    fixedColor_(0),
     vertexData_(0),
     vertexStart_(0),
     vertexEnd_(0)
