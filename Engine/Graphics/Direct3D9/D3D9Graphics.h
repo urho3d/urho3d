@@ -76,7 +76,7 @@ class Graphics : public Object
 public:
     /// Construct.
     Graphics(Context* context);
-    /// Destruct. Close the window and release the Direct3D9 device.
+    /// Destruct. Release the Direct3D9 device and close the window.
     virtual ~Graphics();
     
     /// Set external window handle. Only effective before setting the initial screen mode.
@@ -87,7 +87,7 @@ public:
     bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
-    /// Set whether the main window uses sRGB writing.
+    /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
     /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
@@ -222,7 +222,7 @@ public:
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
-    /// Return whether the main window is using SRGB writing.
+    /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
@@ -413,7 +413,7 @@ private:
     bool vsync_;
     /// Triple buffering flag.
     bool tripleBuffer_;
-    /// sRGB writing flag for the main window.
+    /// sRGB conversion on write flag for the main window.
     bool sRGB_;
     /// Direct3D device lost flag.
     bool deviceLost_;

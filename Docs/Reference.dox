@@ -676,6 +676,9 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 </texture>
 \endcode
 
+The sRGB flag controls both whether the texture should be sampled with sRGB to linear conversion, and if used as a rendertarget, pixels should be converted back to sRGB when writing to it.
+To control whether the backbuffer should use sRGB conversion on write, call \ref Graphics::SetSRGB "SetSRGB()" on the Graphics subsystem.
+
 \section Materials_Techniques Techniques and passes
 
 A technique definition looks like this:

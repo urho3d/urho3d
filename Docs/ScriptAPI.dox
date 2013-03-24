@@ -1671,6 +1671,7 @@ Properties:<br>
 - RenderTargetSizeMode sizeMode
 - bool active
 - bool filtered
+- bool sRGB
 
 
 RenderPathCommand
@@ -1756,6 +1757,7 @@ Properties:<br>
 - TextureFilterMode filterMode
 - TextureAddressMode[] addressMode
 - Color borderColor
+- bool sRGB
 - Texture@ backupTexture
 - bool dataLost (readonly)
 
@@ -1824,6 +1826,7 @@ Properties:<br>
 - TextureFilterMode filterMode
 - TextureAddressMode[] addressMode
 - Color borderColor
+- bool sRGB
 - Texture@ backupTexture
 - bool dataLost (readonly)
 - RenderSurface@ renderSurface (readonly)
@@ -1859,6 +1862,7 @@ Properties:<br>
 - TextureFilterMode filterMode
 - TextureAddressMode[] addressMode
 - Color borderColor
+- bool sRGB
 - Texture@ backupTexture
 - bool dataLost (readonly)
 - RenderSurface@[] renderSurfaces (readonly)
@@ -2767,6 +2771,7 @@ Properties:<br>
 - int refs (readonly)
 - int weakRefs (readonly)
 - String windowTitle
+- bool sRGB
 - int width (readonly)
 - int height (readonly)
 - int multiSample (readonly)
@@ -2782,6 +2787,7 @@ Properties:<br>
 - bool lightPrepassSupport (readonly)
 - bool deferredSupport (readonly)
 - bool hardwareShadowSupport (readonly)
+- bool sRGBSupport (readonly)
 - bool forceSM2
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)

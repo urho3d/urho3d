@@ -92,13 +92,13 @@ public:
     bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
-    /// Set whether the main window uses sRGB writing.
+    /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
-    /// Toggle between full screen and windowed mode.
+    /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     /// Close the window.
     void Close();
-    /// Take a screenshot.
+    /// Take a screenshot. Return true if successful.
     bool TakeScreenShot(Image& destImage);
     /// Begin frame rendering. Return true if device available and can render.
     bool BeginFrame();
@@ -231,7 +231,7 @@ public:
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
-    /// Return whether the main window is using SRGB writing.
+    /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
     /// Return whether device is lost, and can not yet render.
     bool IsDeviceLost() const;
@@ -424,7 +424,7 @@ private:
     bool vsync_;
     /// Triple buffering flag.
     bool tripleBuffer_;
-    /// sRGB writing flag for the main window.
+    /// sRGB conversion on write flag for the main window.
     bool sRGB_;
     /// Light prepass support flag.
     bool lightPrepassSupport_;
