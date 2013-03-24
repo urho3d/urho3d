@@ -927,15 +927,20 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     return newShadowMap;
 }
 
-Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool filtered)
+Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb)
 {
     bool depthStencil = (format == Graphics::GetDepthStencilFormat());
     if (depthStencil)
+    {
         filtered = false;
+        srgb = false;
+    }
     
     long long searchKey = ((long long)format << 32) | (width << 16) | height;
     if (filtered)
         searchKey |= 0x8000000000000000LL;
+    if (srgb)
+        searchKey |= 0x4000000000000000LL;
     
     // If new size or format, initialize the allocation stats
     if (screenBuffers_.Find(searchKey) == screenBuffers_.End())
@@ -949,6 +954,7 @@ Texture2D* Renderer::GetScreenBuffer(int width, int height, unsigned format, boo
     if (allocations >= screenBuffers_[searchKey].Size())
     {
         SharedPtr<Texture2D> newBuffer(new Texture2D(context_));
+        newBuffer->SetSRGB(srgb);
         newBuffer->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET);
         newBuffer->SetFilterMode(filtered ? FILTER_BILINEAR : FILTER_NEAREST);
         newBuffer->ResetUseTimer();

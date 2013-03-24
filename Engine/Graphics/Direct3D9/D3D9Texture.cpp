@@ -65,7 +65,8 @@ Texture::Texture(Context* context) :
     requestedLevels_(0),
     width_(0),
     height_(0),
-    filterMode_(FILTER_DEFAULT)
+    filterMode_(FILTER_DEFAULT),
+    sRGB_(false)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;
@@ -98,6 +99,11 @@ void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
 void Texture::SetBorderColor(const Color& color)
 {
     borderColor_ = color;
+}
+
+void Texture::SetSRGB(bool enable)
+{
+    sRGB_ = enable;
 }
 
 void Texture::SetBackupTexture(Texture* texture)
@@ -261,6 +267,9 @@ void Texture::LoadParameters(const XMLElement& element)
                     mipsToSkip_[i] = mipsToSkip_[i - 1];
             }
         }
+
+        if (name == "srgb")
+            SetSRGB(paramElem.GetBool("enable"));
         
         paramElem = paramElem.GetNext();
     }

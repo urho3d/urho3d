@@ -87,6 +87,8 @@ public:
     bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
+    /// Set whether the main window uses sRGB writing.
+    void SetSRGB(bool enable);
     /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     /// Close the window.
@@ -220,6 +222,8 @@ public:
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
+    /// Return whether the main window is using SRGB writing.
+    bool IsSRGB() const { return sRGB_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
     /// Return number of primitives drawn this frame.
@@ -242,6 +246,8 @@ public:
     bool GetHardwareShadowSupport() const { return hardwareShadowSupport_; }
     /// Return whether stream offset is supported.
     bool GetStreamOffsetSupport() const { return streamOffsetSupport_; }
+    /// Return whether sRGB textures are supported.
+    bool GetSRGBSupport() const { return sRGBSupport_; }
     /// Return supported fullscreen resolutions.
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
@@ -407,6 +413,8 @@ private:
     bool vsync_;
     /// Triple buffering flag.
     bool tripleBuffer_;
+    /// sRGB writing flag for the main window.
+    bool sRGB_;
     /// Direct3D device lost flag.
     bool deviceLost_;
     /// Light pre-pass rendering support flag.
@@ -417,6 +425,8 @@ private:
     bool hardwareShadowSupport_;
     /// Stream offset support flag.
     bool streamOffsetSupport_;
+    /// sRGB texture support flag.
+    bool sRGBSupport_;
     /// Shader Model 3 flag.
     bool hasSM3_;
     /// Force Shader Model 2 flag.

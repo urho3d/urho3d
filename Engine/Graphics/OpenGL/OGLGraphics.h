@@ -92,6 +92,8 @@ public:
     bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
+    /// Set whether the main window uses sRGB writing.
+    void SetSRGB(bool enable);
     /// Toggle between full screen and windowed mode.
     bool ToggleFullscreen();
     /// Close the window.
@@ -229,6 +231,8 @@ public:
     bool GetVSync() const { return vsync_; }
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
+    /// Return whether the main window is using SRGB writing.
+    bool GetSRGB() const { return sRGB_; }
     /// Return whether device is lost, and can not yet render.
     bool IsDeviceLost() const;
     /// Return number of primitives drawn this frame.
@@ -253,6 +257,8 @@ public:
     bool GetHardwareShadowSupport() const { return true; }
     /// Return whether stream offset is supported. Always false on OpenGL.
     bool GetStreamOffsetSupport() const { return false; }
+    /// Return whether sRGB textures are supported.
+    bool GetSRGBSupport() const { return sRGBSupport_; }
     /// Return supported fullscreen resolutions.
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
@@ -416,6 +422,8 @@ private:
     bool vsync_;
     /// Triple buffering flag.
     bool tripleBuffer_;
+    /// sRGB writing flag for the main window.
+    bool sRGB_;
     /// Light prepass support flag.
     bool lightPrepassSupport_;
     /// Deferred rendering support flag.
@@ -428,6 +436,8 @@ private:
     bool etcTextureSupport_;
     /// PVRTC formats support flag.
     bool pvrtcTextureSupport_;
+    /// sRGB texture support flag.
+    bool sRGBSupport_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

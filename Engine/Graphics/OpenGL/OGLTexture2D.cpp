@@ -219,19 +219,21 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     
     graphics_->SetTextureForUpdate(this);
     
+    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
+    
     if (!IsCompressed())
     {
         if (wholeLevel)
-            glTexImage2D(target_, level, format_, width, height, 0, GetExternalFormat(format_), GetDataType(format_), data);
+            glTexImage2D(target_, level, format, width, height, 0, GetExternalFormat(format_), GetDataType(format_), data);
         else
             glTexSubImage2D(target_, level, x, y, width, height, GetExternalFormat(format_), GetDataType(format_), data);
     }
     else
     {
         if (wholeLevel)
-            glCompressedTexImage2D(target_, level, format_, width, height, 0, GetDataSize(width, height), data);
+            glCompressedTexImage2D(target_, level, format, width, height, 0, GetDataSize(width, height), data);
         else
-            glCompressedTexSubImage2D(target_, level, x, y, width, height, format_, GetDataSize(width, height), data);
+            glCompressedTexSubImage2D(target_, level, x, y, width, height, format, GetDataSize(width, height), data);
     }
     
     graphics_->SetTexture(0, 0);
@@ -410,20 +412,21 @@ bool Texture2D::Create()
         return true;
     }
     
+    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
     
     // Create a renderbuffer instead of a texture if depth texture is not properly supported, or if this will be a packed
     // depth stencil texture
     #ifndef GL_ES_VERSION_2_0
-    if (format_ == Graphics::GetDepthStencilFormat())
+    if (format == Graphics::GetDepthStencilFormat())
     #else
     if (!graphics_->GetShadowMapFormat() && externalFormat == GL_DEPTH_COMPONENT)
     #endif
     {
         if (renderSurface_)
         {
-            renderSurface_->CreateRenderBuffer(width_, height_, format_);
+            renderSurface_->CreateRenderBuffer(width_, height_, format);
             return true;
         }
         else
@@ -437,10 +440,11 @@ bool Texture2D::Create()
     
     // If not compressed, create the initial level 0 texture with null data
     bool success = true;
+    
     if (!IsCompressed())
     {
         glGetError();
-        glTexImage2D(target_, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
+        glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, 0);
         if (glGetError())
         {
             LOGERROR("Failed to create texture");

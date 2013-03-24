@@ -78,7 +78,8 @@ Texture::Texture(Context* context) :
     height_(0),
     shadowCompare_(false),
     parametersDirty_(true),
-    filterMode_(FILTER_DEFAULT)
+    filterMode_(FILTER_DEFAULT),
+    sRGB_(false)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;
@@ -117,6 +118,11 @@ void Texture::SetBorderColor(const Color& color)
 {
     borderColor_ = color;
     parametersDirty_ = true;
+}
+
+void Texture::SetSRGB(bool enable)
+{
+    sRGB_ = enable;
 }
 
 void Texture::SetBackupTexture(Texture* texture)
@@ -298,17 +304,20 @@ unsigned Texture::GetRowDataSize(int width) const
 unsigned Texture::GetExternalFormat(unsigned format)
 {
     #ifndef GL_ES_VERSION_2_0
-    // For DEPTH_COMPONENTxx textures DEPTH_COMPONENT needs to be returned
     if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24 || format == GL_DEPTH_COMPONENT32)
         return GL_DEPTH_COMPONENT;
     else if (format == GL_DEPTH24_STENCIL8_EXT)
         return GL_DEPTH_STENCIL_EXT;
-    else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB)
+    else if (format == GL_LUMINANCE16F_ARB || format == GL_LUMINANCE32F_ARB || format == GL_SLUMINANCE_EXT)
         return GL_LUMINANCE;
+    else if (format == GL_SLUMINANCE_ALPHA_EXT)
+        return GL_LUMINANCE_ALPHA;
     else if (format == GL_RG16 || format == GL_RG16F || format == GL_RG32F)
         return GL_RG;
-    else if (format == GL_RGBA16 || format == GL_RGBA16F_ARB || format == GL_RGBA32F_ARB)
+    else if (format == GL_RGBA16 || format == GL_RGBA16F_ARB || format == GL_RGBA32F_ARB || format == GL_SRGB_ALPHA_EXT)
         return GL_RGBA;
+    else if (format == GL_SRGB_EXT)
+        return GL_RGB;
     else
         return format;
     #else
@@ -408,8 +417,41 @@ void Texture::LoadParameters(const XMLElement& elem)
             }
         }
         
+        if (name == "srgb")
+            SetSRGB(paramElem.GetBool("enable"));
+        
         paramElem = paramElem.GetNext();
     }
+}
+
+unsigned Texture::GetSRGBFormat(unsigned format)
+{
+    #ifndef GL_ES_VERSION_2_0
+    if (!graphics_ || !graphics_->GetSRGBSupport())
+        return format;
+    
+    switch (format)
+    {
+    case GL_RGB:
+        return GL_SRGB_EXT;
+    case GL_RGBA:
+        return GL_SRGB_ALPHA_EXT;
+    case GL_LUMINANCE:
+        return GL_SLUMINANCE_EXT;
+    case GL_LUMINANCE_ALPHA:
+        return GL_SLUMINANCE_ALPHA_EXT;
+    case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+        return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
+    case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+        return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT;
+    case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+        return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+    default:
+        return format;
+    }
+    #else
+    return format;
+    #endif
 }
 
 void Texture::CheckTextureBudget(ShortStringHash type)

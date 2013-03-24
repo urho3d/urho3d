@@ -83,6 +83,10 @@ private:
     D3DTEXTUREADDRESS wAddressModes_[MAX_TEXTURE_UNITS];
     /// Texture border colors in use.
     Color borderColors_[MAX_TEXTURE_UNITS];
+    /// sRGB mode in use.
+    bool sRGBModes_[MAX_TEXTURE_UNITS];
+    /// sRGB write flag.
+    bool sRGBWrite_;
     /// Color surfaces in use.
     IDirect3DSurface9* colorSurfaces_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.

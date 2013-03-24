@@ -167,6 +167,7 @@ Graphics::Graphics(Context* context_) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
+    sRGBSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
@@ -379,6 +380,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
         
             dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
             anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
+            sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
             #else
             dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
             etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
@@ -437,6 +439,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
 bool Graphics::SetMode(int width, int height)
 {
     return SetMode(width, height, fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
+}
+
+void Graphics::SetSRGB(bool enabled)
+{
+    sRGB_ = enabled && sRGBSupport_;
 }
 
 bool Graphics::ToggleFullscreen()

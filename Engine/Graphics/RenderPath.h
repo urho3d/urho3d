@@ -65,7 +65,8 @@ struct RenderTargetInfo
         size_(IntVector2::ZERO),
         sizeMode_(SIZE_ABSOLUTE),
         active_(true),
-        filtered_(false)
+        filtered_(false),
+        sRGB_(false)
     {
     }
     
@@ -86,6 +87,8 @@ struct RenderTargetInfo
     bool active_;
     /// Filtering flag.
     bool filtered_;
+    /// sRGB sampling/writing mode flag.
+    bool sRGB_;
 };
 
 /// Rendering path command.

@@ -216,10 +216,12 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     
     graphics_->SetTextureForUpdate(this);
     
+    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
+    
     if (!IsCompressed())
     {
         if (wholeLevel)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, format_, width, height, 0, GetExternalFormat(format_),
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, format, width, height, 0, GetExternalFormat(format_),
                 GetDataType(format_), data);
         else
             glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, x, y, width, height, GetExternalFormat(format_),
@@ -228,10 +230,10 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     else
     {
         if (wholeLevel)
-            glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, format_, width, height, 0,
+            glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, format, width, height, 0,
                 GetDataSize(width, height), data);
         else
-            glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, x, y, width, height, format_,
+            glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, x, y, width, height, format,
                 GetDataSize(width, height), data);
     }
     
@@ -528,6 +530,7 @@ bool TextureCube::Create()
     graphics_->SetTextureForUpdate(this);
     
     // If not compressed, create the initial level 0 texture with null data
+    unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
     
@@ -537,7 +540,7 @@ bool TextureCube::Create()
         glGetError();
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width_, height_, 0, externalFormat, dataType, 0);
             if (glGetError())
                 success = false;
         }

@@ -265,7 +265,7 @@ void UI::Render()
         return;
     
     // Update quad geometry into the vertex buffer
-    unsigned numVertices = vertexData_.Size() / 6;
+    unsigned numVertices = vertexData_.Size() / UI_VERTEX_SIZE;
     // Resize the vertex buffer if too small or much too large
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
@@ -333,7 +333,8 @@ void UI::Render()
         graphics_->SetScissorTest(true, batch.scissor_);
         graphics_->SetTexture(0, batch.texture_);
         graphics_->SetVertexBuffer(vertexBuffer_);
-        graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / 6, (batch.vertexEnd_ - batch.vertexStart_) / 6);
+        graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE, (batch.vertexEnd_ - batch.vertexStart_) /
+            UI_VERTEX_SIZE);
     }
 }
 

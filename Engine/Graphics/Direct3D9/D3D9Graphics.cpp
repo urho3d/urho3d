@@ -182,11 +182,13 @@ Graphics::Graphics(Context* context) :
     resizable_(false),
     vsync_(false),
     tripleBuffer_(false),
+    sRGB_(false),
     deviceLost_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     hardwareShadowSupport_(false),
     streamOffsetSupport_(false),
+    sRGBSupport_(true),
     hasSM3_(false),
     forceSM2_(false),
     numPrimitives_(0),
@@ -370,7 +372,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     impl_->presentParams_.hDeviceWindow              = WIN_GetWindowHandle(impl_->window_);
     impl_->presentParams_.EnableAutoDepthStencil     = TRUE;
     impl_->presentParams_.AutoDepthStencilFormat     = D3DFMT_D24S8;
-    impl_->presentParams_.Flags                      = 0;
+    impl_->presentParams_.Flags                      = D3DPRESENT_LINEAR_CONTENT;
     impl_->presentParams_.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 
     if (vsync)
@@ -441,6 +443,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
 bool Graphics::SetMode(int width, int height)
 {
     return SetMode(width, height, fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
+}
+
+void Graphics::SetSRGB(bool enabled)
+{
+    sRGB_ = enabled;
 }
 
 bool Graphics::ToggleFullscreen()
@@ -1274,6 +1281,12 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
                 impl_->borderColors_[index] = borderColor;
             }
         }
+        bool sRGB = texture->GetSRGB();
+        if (sRGB != impl_->sRGBModes_[index])
+        {
+            impl_->device_->SetSamplerState(index, D3DSAMP_SRGBTEXTURE, sRGB ? TRUE : FALSE);
+            impl_->sRGBModes_[index] = sRGB;
+        }
     }
 }
 
@@ -1342,6 +1355,17 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
         {
             if (textures_[i] == parentTexture)
                 SetTexture(i, textures_[i]->GetBackupTexture());
+        }
+    }
+    
+    // First rendertarget controls sRGB write mode
+    if (!index)
+    {
+        bool sRGBWrite = renderTarget ? renderTarget->GetParentTexture()->GetSRGB() : sRGB_;
+        if (sRGBWrite != impl_->sRGBWrite_)
+        {
+            impl_->device_->SetRenderState(D3DRS_SRGBWRITEENABLE, sRGBWrite ? TRUE : FALSE);
+            impl_->sRGBWrite_ = sRGBWrite;
         }
     }
 }
@@ -2286,6 +2310,7 @@ void Graphics::ResetCachedState()
         impl_->vAddressModes_[i] = D3DTADDRESS_WRAP;
         impl_->wAddressModes_[i] = D3DTADDRESS_WRAP;
         impl_->borderColors_[i] = Color(0.0f, 0.0f, 0.0f, 0.0f);
+        impl_->sRGBModes_[i] = false;
     }
     
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
@@ -2298,6 +2323,7 @@ void Graphics::ResetCachedState()
     impl_->depthStencilSurface_ = 0;
     viewTexture_ = 0;
     viewport_ = IntRect(0, 0, width_, height_);
+    impl_->sRGBWrite_ = false;
     
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
         streamFrequencies_[i] = 1;

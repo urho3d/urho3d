@@ -663,6 +663,19 @@ Make sure the normal map is oriented correctly: an even surface should have the 
 
 Specular maps encode the specular surface color as RGB. Note that deferred rendering is only able to use monochromatic specular intensity from the G channel, while forward and light pre-pass rendering use fully colored specular. DXT1 format should suit these textures well.
 
+Textures can have an accompanying XML file which specifies load-time parameters, such as addressing, mipmapping, and number of mip levels to skip on each quality level:
+
+\code
+<texture>
+    <address coord="u|v|w" mode="wrap|mirror|clamp|border" />
+    <border color="r g b a" />
+    <filter mode="nearest|bilinear|trilinear|anisotropic|default" />
+    <mipmap enable="false|true" />
+    <quality low="x" medium="y" high="z" />
+    <srgb enable="false|true" />
+</texture>
+\endcode
+
 \section Materials_Techniques Techniques and passes
 
 A technique definition looks like this:
@@ -811,7 +824,7 @@ The render path XML definition looks like this:
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" active="true|false" size="x y"|sizedivisor="x y"|rtsizedivisor="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" />
+        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" />
     <command type="clear" tag="TagName" active="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" usescissor="true|false" vertexlights="true|false">
         <output index="0" name="RTName1" />

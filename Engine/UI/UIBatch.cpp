@@ -104,7 +104,7 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
     float bottomUV = (texOffsetY + (texHeight ? texHeight : height)) * invTextureSize_.y_;
     
     unsigned begin = vertexData_->Size();
-    vertexData_->Resize(begin + 6 * 6);
+    vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
     float* dest = &(vertexData_->At(begin));
     vertexEnd_ = vertexData_->Size();
     
@@ -170,7 +170,7 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
     float bottomUV = ((float)(texOffsetY + (texHeight ? texHeight : height))) * invTextureSize_.y_;
     
     unsigned begin = vertexData_->Size();
-    vertexData_->Resize(begin + 6 * 6);
+    vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
     float* dest = &(vertexData_->At(begin));
     vertexEnd_ = vertexData_->Size();
 

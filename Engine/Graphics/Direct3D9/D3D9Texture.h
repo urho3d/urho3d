@@ -53,6 +53,8 @@ public:
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
     /// Set border color for border addressing mode.
     void SetBorderColor(const Color& color);
+    /// Set sRGB sampling and writing mode.
+    void SetSRGB(bool enable);
     /// Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
     
@@ -72,6 +74,8 @@ public:
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
     /// Return border color.
     const Color& GetBorderColor() const { return borderColor_; }
+    /// Return whether is using sRGB sampling and writing.
+    bool GetSRGB() const { return sRGB_; }
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
     /// Return mip level width, or 0 if level does not exist.
@@ -118,6 +122,8 @@ protected:
     unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
     /// Border color.
     Color borderColor_;
+    /// sRGB sampling and writing mode flag.
+    bool sRGB_;
     /// Backup texture.
     SharedPtr<Texture> backupTexture_;
 };

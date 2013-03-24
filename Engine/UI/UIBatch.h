@@ -36,6 +36,8 @@ class ShaderVariation;
 class Texture;
 class UIElement;
 
+static const unsigned UI_VERTEX_SIZE = 6;
+
 /// %UI rendering draw call.
 class UIBatch
 {
