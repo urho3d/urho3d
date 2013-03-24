@@ -69,6 +69,8 @@ public:
     IntRect scissor_;
     /// Texture.
     Texture* texture_;
+    /// Inverse texture size.
+    Vector2 invTextureSize_;
     /// Vertex data
     PODVector<float>* vertexData_;
     /// Vertex data start index.

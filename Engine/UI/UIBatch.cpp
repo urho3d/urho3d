@@ -38,6 +38,8 @@ static const float posAdjust = 0.0f;
 static const float posAdjust = 0.5f;
 #endif
 
+static const Vector3 posAdjustVec(posAdjust, posAdjust, 0.0f);
+
 UIBatch::UIBatch() :
     element_(0),
     blendMode_(BLEND_REPLACE),
@@ -53,6 +55,7 @@ UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor
     blendMode_(blendMode),
     scissor_(scissor),
     texture_(texture),
+    invTextureSize_(texture ? Vector2(1.0f / (float)texture->GetWidth(), 1.0f / (float)texture->GetHeight()) : Vector2::ONE),
     vertexData_(vertexData),
     vertexStart_(vertexData->Size()),
     vertexEnd_(vertexData->Size())
@@ -88,21 +91,15 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
     
     const IntVector2& screenPos = element_->GetScreenPosition();
     
-    Vector2 invTextureSize;
-    if (texture_)
-        invTextureSize = Vector2(1.0f / (float)texture_->GetWidth(), 1.0f / (float)texture_->GetHeight());
-    else
-        invTextureSize = Vector2::ONE;
-    
     float left = (float)(x + screenPos.x_) - posAdjust;
     float right = left + (float)width;
     float top = (float)(y + screenPos.y_) - posAdjust;
     float bottom = top + (float)height;
     
-    float leftUV = texOffsetX * invTextureSize.x_;
-    float topUV = texOffsetY * invTextureSize.y_;
-    float rightUV = (texOffsetX + (texWidth ? texWidth : width)) * invTextureSize.x_;
-    float bottomUV = (texOffsetY + (texHeight ? texHeight : height)) * invTextureSize.y_;
+    float leftUV = texOffsetX * invTextureSize_.x_;
+    float topUV = texOffsetY * invTextureSize_.y_;
+    float rightUV = (texOffsetX + (texWidth ? texWidth : width)) * invTextureSize_.x_;
+    float bottomUV = (texOffsetY + (texHeight ? texHeight : height)) * invTextureSize_.y_;
     
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * 6);
@@ -160,23 +157,15 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
         bottomRightColor = GetInterpolatedColor(x + width, y + height);
     }
     
-    Vector2 invTextureSize;
-    if (texture_)
-        invTextureSize = Vector2(1.0f / (float)texture_->GetWidth(), 1.0f / (float)texture_->GetHeight());
-    else
-        invTextureSize = Vector2::ONE;
-    
-    Vector3 posAdjustVec(posAdjust, posAdjust, 0.0f);
-    
     Vector3 v1 = (transform * Vector3((float)x, (float)y, 0.0f)) - posAdjustVec;
     Vector3 v2 = (transform * Vector3((float)x + (float)width, (float)y, 0.0f)) - posAdjustVec;
     Vector3 v3 = (transform * Vector3((float)x, (float)y + (float)height, 0.0f)) - posAdjustVec;
     Vector3 v4 = (transform * Vector3((float)x + (float)width, (float)y + (float)height, 0.0f)) - posAdjustVec;
     
-    float leftUV = ((float)texOffsetX) * invTextureSize.x_;
-    float topUV = ((float)texOffsetY) * invTextureSize.y_;
-    float rightUV = ((float)(texOffsetX + (texWidth ? texWidth : width))) * invTextureSize.x_;
-    float bottomUV = ((float)(texOffsetY + (texHeight ? texHeight : height))) * invTextureSize.y_;
+    float leftUV = ((float)texOffsetX) * invTextureSize_.x_;
+    float topUV = ((float)texOffsetY) * invTextureSize_.y_;
+    float rightUV = ((float)(texOffsetX + (texWidth ? texWidth : width))) * invTextureSize_.x_;
+    float bottomUV = ((float)(texOffsetY + (texHeight ? texHeight : height))) * invTextureSize_.y_;
     
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * 6);
