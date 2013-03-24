@@ -273,14 +273,7 @@ void UI::Render()
     if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
         vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
     
-    unsigned vertexSize = vertexBuffer_->GetVertexSize();
-    void* dest = vertexBuffer_->Lock(0, numVertices, true);
-    if (!dest)
-        return;
-    
-    memcpy(dest, &vertexData_[0], vertexData_.Size() * sizeof(float));
-
-    vertexBuffer_->Unlock();
+    vertexBuffer_->SetData(&vertexData_[0]);
     
     Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
     Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
