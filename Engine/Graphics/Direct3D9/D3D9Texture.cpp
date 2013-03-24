@@ -103,6 +103,9 @@ void Texture::SetBorderColor(const Color& color)
 
 void Texture::SetSRGB(bool enable)
 {
+    if (graphics_)
+        enable &= graphics_->GetSRGBSupport();
+    
     sRGB_ = enable;
 }
 

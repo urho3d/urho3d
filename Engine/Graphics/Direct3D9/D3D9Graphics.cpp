@@ -188,7 +188,8 @@ Graphics::Graphics(Context* context) :
     deferredSupport_(false),
     hardwareShadowSupport_(false),
     streamOffsetSupport_(false),
-    sRGBSupport_(true),
+    sRGBSupport_(false),
+    sRGBWriteSupport_(false),
     hasSM3_(false),
     forceSM2_(false),
     numPrimitives_(0),
@@ -447,7 +448,7 @@ bool Graphics::SetMode(int width, int height)
 
 void Graphics::SetSRGB(bool enabled)
 {
-    sRGB_ = enabled;
+    sRGB_ = enabled && sRGBWriteSupport_;
 }
 
 bool Graphics::ToggleFullscreen()
@@ -1281,11 +1282,14 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
                 impl_->borderColors_[index] = borderColor;
             }
         }
-        bool sRGB = texture->GetSRGB();
-        if (sRGB != impl_->sRGBModes_[index])
+        if (sRGBSupport_)
         {
-            impl_->device_->SetSamplerState(index, D3DSAMP_SRGBTEXTURE, sRGB ? TRUE : FALSE);
-            impl_->sRGBModes_[index] = sRGB;
+            bool sRGB = texture->GetSRGB();
+            if (sRGB != impl_->sRGBModes_[index])
+            {
+                impl_->device_->SetSamplerState(index, D3DSAMP_SRGBTEXTURE, sRGB ? TRUE : FALSE);
+                impl_->sRGBModes_[index] = sRGB;
+            }
         }
     }
 }
@@ -1359,7 +1363,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     }
     
     // First rendertarget controls sRGB write mode
-    if (!index)
+    if (!index && sRGBWriteSupport_)
     {
         bool sRGBWrite = renderTarget ? renderTarget->GetParentTexture()->GetSRGB() : sRGB_;
         if (sRGBWrite != impl_->sRGBWrite_)
@@ -2247,6 +2251,11 @@ void Graphics::CheckFeatureSupport()
     // Check for stream offset (needed for instancing)
     if (impl_->deviceCaps_.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
         streamOffsetSupport_ = true;
+    
+    // Check for sRGB read & write
+    /// \todo Should be checked for each texture format separately
+    sRGBSupport_ = impl_->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE);
+    sRGBWriteSupport_ = impl_->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE);
     
     SendEvent(E_GRAPHICSFEATURES);
 }

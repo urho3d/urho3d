@@ -257,8 +257,10 @@ public:
     bool GetHardwareShadowSupport() const { return true; }
     /// Return whether stream offset is supported. Always false on OpenGL.
     bool GetStreamOffsetSupport() const { return false; }
-    /// Return whether sRGB textures are supported.
+    /// Return whether sRGB conversion on texture sampling is supported.
     bool GetSRGBSupport() const { return sRGBSupport_; }
+    /// Return whether sRGB conversion on rendertarget writing is supported.
+    bool GetSRGBWriteSupport() const { return sRGBWriteSupport_; }
     /// Return supported fullscreen resolutions.
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
@@ -438,8 +440,10 @@ private:
     bool etcTextureSupport_;
     /// PVRTC formats support flag.
     bool pvrtcTextureSupport_;
-    /// sRGB texture support flag.
+    /// sRGB conversion on read support flag.
     bool sRGBSupport_;
+    /// sRGB conversion on write support flag.
+    bool sRGBWriteSupport_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

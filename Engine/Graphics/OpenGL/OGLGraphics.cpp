@@ -169,6 +169,7 @@ Graphics::Graphics(Context* context_) :
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
     sRGBSupport_(false),
+    sRGBWriteSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
@@ -382,6 +383,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
             dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
             anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
             sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
+            sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
             #else
             dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
             etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
@@ -444,7 +446,8 @@ bool Graphics::SetMode(int width, int height)
 
 void Graphics::SetSRGB(bool enabled)
 {
-    enabled &= sRGBSupport_;
+    enabled &= sRGBWriteSupport_;
+    
     if (enabled != sRGB_)
     {
         sRGB_ = enabled;
@@ -2276,14 +2279,17 @@ void Graphics::CommitFramebuffer()
         
         #ifndef GL_ES_VERSION_2_0
         // Disable/enable sRGB write
-        bool sRGBWrite = sRGB_;
-        if (sRGBWrite != impl_->sRGBWrite_)
+        if (sRGBWriteSupport_)
         {
-            if (sRGBWrite)
-                glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-            else
-                glDisable(GL_FRAMEBUFFER_SRGB_EXT);
-            impl_->sRGBWrite_ = sRGBWrite;
+            bool sRGBWrite = sRGB_;
+            if (sRGBWrite != impl_->sRGBWrite_)
+            {
+                if (sRGBWrite)
+                    glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+                else
+                    glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+                impl_->sRGBWrite_ = sRGBWrite;
+            }
         }
         #endif
         
@@ -2448,14 +2454,17 @@ void Graphics::CommitFramebuffer()
     
     #ifndef GL_ES_VERSION_2_0
     // Disable/enable sRGB write
-    bool sRGBWrite = renderTargets_[0] ? renderTargets_[0]->GetParentTexture()->GetSRGB() : sRGB_;
-    if (sRGBWrite != impl_->sRGBWrite_)
+    if (sRGBWriteSupport_)
     {
-        if (sRGBWrite)
-            glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-        else
-            glDisable(GL_FRAMEBUFFER_SRGB_EXT);
-        impl_->sRGBWrite_ = sRGBWrite;
+        bool sRGBWrite = renderTargets_[0] ? renderTargets_[0]->GetParentTexture()->GetSRGB() : sRGB_;
+        if (sRGBWrite != impl_->sRGBWrite_)
+        {
+            if (sRGBWrite)
+                glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+            else
+                glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+            impl_->sRGBWrite_ = sRGBWrite;
+        }
     }
     #endif
 }

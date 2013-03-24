@@ -2788,6 +2788,7 @@ Properties:<br>
 - bool deferredSupport (readonly)
 - bool hardwareShadowSupport (readonly)
 - bool sRGBSupport (readonly)
+- bool sRGBWriteSupport (readonly)
 - bool forceSM2
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)
