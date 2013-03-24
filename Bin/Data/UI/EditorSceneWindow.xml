@@ -59,6 +59,7 @@
     <element type="ListView">
         <attribute name="Name" value="NodeList" />
         <attribute name="Hierarchy Mode" value="true" />
+        <attribute name="Base Indent" value="1" />
         <attribute name="Highlight Mode" value="Always" />
         <attribute name="Multiselect" value="true" />
     </element>

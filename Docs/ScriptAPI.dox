@@ -4200,6 +4200,7 @@ Properties:<br>
 - HighlightMode highlightMode
 - bool multiselect
 - bool hierarchyMode
+- int baseIndent
 - bool clearSelectionOnDefocus
 - float doubleClickInterval
 

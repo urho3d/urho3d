@@ -299,6 +299,8 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "bool get_multiselect() const", asMETHOD(ListView, GetMultiselect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_hierarchyMode(bool)", asMETHOD(ListView, SetHierarchyMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool get_hierarchyMode() const", asMETHOD(ListView, GetHierarchyMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void set_baseIndent(int)", asMETHOD(ListView, SetBaseIndent), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "int get_baseIndent() const", asMETHOD(ListView, GetBaseIndent), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_clearSelectionOnDefocus(bool)", asMETHOD(ListView, SetClearSelectionOnDefocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool get_clearSelectionOnDefocus() const", asMETHOD(ListView, GetClearSelectionOnDefocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_doubleClickInterval(float)", asMETHOD(ListView, SetDoubleClickInterval), asCALL_THISCALL);

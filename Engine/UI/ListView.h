@@ -90,6 +90,8 @@ public:
     /// \brief Enable hierarchy mode. Allows items to have parent-child relationship at different indent level and the ability to expand/collapse child items.
     /// All items in the list will be lost during mode change.
     void SetHierarchyMode(bool enable);
+    /// Set base indent, i.e. the indent level of the ultimate parent item.
+    void SetBaseIndent(int baseIndent);
     /// Enable clearing of selection on defocus.
     void SetClearSelectionOnDefocus(bool enable);
     /// Set item doubleclick interval in seconds.
@@ -128,6 +130,8 @@ public:
     bool GetClearSelectionOnDefocus() const { return clearSelectionOnDefocus_; }
     /// Return whether hierarchy mode enabled.
     bool GetHierarchyMode() const { return hierarchyMode_; }
+    /// Return base indent.
+    int GetBaseIndent() const { return baseIndent_; }
     /// Return item doubleclick interval in seconds.
     float GetDoubleClickInterval() const;
     
@@ -147,6 +151,8 @@ protected:
     bool multiselect_;
     /// Hierarchy mode flag.
     bool hierarchyMode_;
+    /// Base indent, used in hierarchy mode only.
+    int baseIndent_;
     /// Overlay container, used in hierarchy mode only.
     SharedPtr<UIElement> overlayContainer_;
     /// Clear selection on defocus flag.

@@ -140,14 +140,29 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
     text.vars["Type"] = ITEM_NODE;
     text.vars["NodeID"] = node.id;
     text.text = GetNodeTitle(node);
-    
+
+    BorderImage@ icon = BorderImage();
+    icon.texture = cache.GetResource("Texture2D", "Textures/UrhoDecal.dds");
+    icon.blendMode = BLEND_ADD;
+    text.AddChild(icon);
+
     // Nodes can be moved by drag and drop. The root node (scene) can not.
     if (node.typeName == "Node")
+    {
         text.dragDropMode = DD_SOURCE_AND_TARGET;
+        icon.color = Color(1, 1, 0);
+    }
     else
+    {
         text.dragDropMode = DD_TARGET;
+        icon.color = Color(1, 0, 0);
+    }
 
     hierarchyList.InsertItem(itemIndex++, text, parentItem);
+
+    // Get the indent level after the item is inserted
+    icon.indent = text.indent - 1;
+    icon.SetFixedSize(text.indentWidth, 16);
 
     // Update components first
     for (uint i = 0; i < node.numComponents; ++i)
@@ -199,7 +214,14 @@ void AddComponentToSceneWindow(Component@ component, uint compItemIndex, UIEleme
     text.vars["NodeID"] = component.node.id;
     text.vars["ComponentID"] = component.id;
     text.text = GetComponentTitle(component);
+    
+    BorderImage@ icon = BorderImage();
+    icon.texture = cache.GetResource("Texture2D", "Textures/Mushroom.dds");
+    text.AddChild(icon);
+
     hierarchyList.InsertItem(compItemIndex, text, parentItem);
+    icon.indent = text.indent - 1;
+    icon.SetFixedSize(text.indentWidth - 4, 14);
 }
 
 uint GetNodeListIndex(Node@ node)

@@ -141,8 +141,10 @@ public:
         // Insert the overlay at the same index position to the overlay container
         CheckBox* overlay = new CheckBox(context_);
         overlay->SetStyle(overlayContainer_->GetDefaultStyle(), "ListViewHierarchyOverlay");
-        overlay->SetIndent(element->GetIndent() - 1);
-        overlay->SetFixedWidth(element->GetIndentWidth());
+        int baseIndent = static_cast<ListView*>(overlayContainer_->GetParent())->GetBaseIndent();
+        int indent = element->GetIndent() - baseIndent - 1;
+        overlay->SetIndent(indent);
+        overlay->SetFixedWidth((indent + 1) * element->GetIndentSpacing());
         overlayContainer_->InsertChild(index, overlay);
 
         // Then insert the element as child as per normal
@@ -161,6 +163,7 @@ ListView::ListView(Context* context) :
     highlightMode_(HM_FOCUS),
     multiselect_(false),
     hierarchyMode_(true),	// Init to true here so that the setter below takes effect
+    baseIndent_(0),
     clearSelectionOnDefocus_(false),
     doubleClickInterval_(500),
     lastClickedItem_(M_MAX_UNSIGNED)
@@ -185,6 +188,7 @@ void ListView::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE(ListView, "Highlight Mode", GetHighlightMode, SetHighlightMode, HighlightMode, highlightModes, HM_FOCUS, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Multiselect", GetMultiselect, SetMultiselect, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Hierarchy Mode", GetHierarchyMode, SetHierarchyMode, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ListView, VAR_INT, "Base Indent", GetBaseIndent, SetBaseIndent, int, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Clear Sel. On Defocus", GetClearSelectionOnDefocus, SetClearSelectionOnDefocus, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_FLOAT, "Double Click Interval", GetDoubleClickInterval, SetDoubleClickInterval, float, 0.5f, AM_FILE);
     COPY_BASE_ATTRIBUTES(ListView, ScrollView);
@@ -315,7 +319,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
     unsigned numItems = contentElement_->GetNumChildren();
     if (hierarchyMode_)
     {
-        int baseIndent = 0;
+        int baseIndent = baseIndent_;
         if (parentItem)
         {
             baseIndent = parentItem->GetIndent();
@@ -670,6 +674,12 @@ void ListView::SetHierarchyMode(bool enable)
     container->SetActive(true);
     container->SetLayout(LM_VERTICAL);
     container->SetSortChildren(false);
+}
+
+void ListView::SetBaseIndent(int baseIndent)
+{
+	baseIndent_ = baseIndent;
+	UpdateLayout();
 }
 
 void ListView::SetClearSelectionOnDefocus(bool enable)
