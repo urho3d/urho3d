@@ -56,12 +56,12 @@ UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor
     scissor_(scissor),
     texture_(texture),
     invTextureSize_(texture ? Vector2(1.0f / (float)texture->GetWidth(), 1.0f / (float)texture->GetHeight()) : Vector2::ONE),
+    fixedColor_(element->GetDerivedColor().ToUInt()),
     vertexData_(vertexData),
     vertexStart_(vertexData->Size()),
     vertexEnd_(vertexData->Size())
 {
 }
-
 
 void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight,
     Color* color)
@@ -70,7 +70,7 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 
     if (color || !element_->HasColorGradient())
     {
-        unsigned uintColor = (color ? *color : element_->GetDerivedColor()).ToUInt();
+        unsigned uintColor = color ? color->ToUInt() : fixedColor_;
         
         // If alpha is 0, nothing will be rendered, so do not add the quad
         if (!(uintColor & 0xff000000))
@@ -132,13 +132,13 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 }
 
 void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
-    int texWidth, int texHeight, Color* color) 
+    int texWidth, int texHeight, Color* color)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
     
     if (color || !element_->HasColorGradient())
     {
-        unsigned uintColor = (color ? *color : element_->GetDerivedColor()).ToUInt();
+        unsigned uintColor = color ? color->ToUInt() : fixedColor_;
         
         // If alpha is 0, nothing will be rendered, so do not add the quad
         if (!(uintColor & 0xff000000))

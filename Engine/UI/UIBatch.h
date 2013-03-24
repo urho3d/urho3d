@@ -71,7 +71,9 @@ public:
     Texture* texture_;
     /// Inverse texture size.
     Vector2 invTextureSize_;
-    /// Vertex data
+    /// Element color if not using a gradient.
+    unsigned fixedColor_;
+    /// Vertex data.
     PODVector<float>* vertexData_;
     /// Vertex data start index.
     unsigned vertexStart_;
