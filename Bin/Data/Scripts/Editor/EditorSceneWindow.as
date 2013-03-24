@@ -182,7 +182,7 @@ void UpdateSceneWindowNodeOnly(uint itemIndex, Node@ node)
 void UpdateSceneWindowNode(Node@ node)
 {
     // In case of node's parent is not found in the hierarchy list then the node will inserted at the root level, but it should not happen
-    UpdateSceneWindowNode(M_MAX_UNSIGNED, node, hierarchyList.items[GetNodeListIndex(node.parent)]);
+    UpdateSceneWindowNode(GetNodeListIndex(node), node, hierarchyList.items[GetNodeListIndex(node.parent)]);
 }
 
 void UpdateSceneWindowNodeOnly(Node@ node)
