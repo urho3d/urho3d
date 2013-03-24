@@ -223,7 +223,7 @@ public:
     /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether the main window is using SRGB writing.
-    bool IsSRGB() const { return sRGB_; }
+    bool GetSRGB() const { return sRGB_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
     /// Return number of primitives drawn this frame.
