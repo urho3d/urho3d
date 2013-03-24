@@ -161,6 +161,7 @@ Graphics::Graphics(Context* context_) :
     resizable_(false),
     vsync_(false),
     tripleBuffer_(false),
+    sRGB_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     anisotropySupport_(false),
@@ -443,7 +444,12 @@ bool Graphics::SetMode(int width, int height)
 
 void Graphics::SetSRGB(bool enabled)
 {
-    sRGB_ = enabled && sRGBSupport_;
+    enabled &= sRGBSupport_;
+    if (enabled != sRGB_)
+    {
+        sRGB_ = enabled;
+        impl_->fboDirty_ = true;
+    }
 }
 
 bool Graphics::ToggleFullscreen()
@@ -2053,6 +2059,11 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, impl_->boundFbo_);
 }
 
+void Graphics::MarkFBODirty()
+{
+    impl_->fboDirty_ = true;
+}
+
 unsigned Graphics::GetAlphaFormat()
 {
     return GL_ALPHA;
@@ -2263,7 +2274,20 @@ void Graphics::CommitFramebuffer()
             impl_->boundFbo_ = impl_->systemFbo_;
         }
         
-        return;
+        #ifndef GL_ES_VERSION_2_0
+        // Disable/enable sRGB write
+        bool sRGBWrite = sRGB_;
+        if (sRGBWrite != impl_->sRGBWrite_)
+        {
+            if (sRGBWrite)
+                glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+            else
+                glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+            impl_->sRGBWrite_ = sRGBWrite;
+        }
+        #endif
+
+	    return;
     }
     
     // Search for a new framebuffer based on format & size, or create new
@@ -2421,6 +2445,19 @@ void Graphics::CommitFramebuffer()
             i->second_.depthAttachment_ = 0;
         }
     }
+    
+    #ifndef GL_ES_VERSION_2_0
+    // Disable/enable sRGB write
+    bool sRGBWrite = renderTargets_[0] ? renderTargets_[0]->GetParentTexture()->GetSRGB() : sRGB_;
+    if (sRGBWrite != impl_->sRGBWrite_)
+    {
+        if (sRGBWrite)
+            glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+        else
+            glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+        impl_->sRGBWrite_ = sRGBWrite;
+    }
+    #endif
 }
 
 bool Graphics::CheckFramebuffer()
@@ -2498,6 +2535,7 @@ void Graphics::ResetCachedState()
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
     impl_->boundFbo_ = impl_->systemFbo_;
+    impl_->sRGBWrite_ = false;
     
     // Set initial state to match Direct3D
     if (impl_->context_)

@@ -354,6 +354,8 @@ public:
     void Restore();
     /// Clean up a render surface from all FBOs.
     void CleanupRenderSurface(RenderSurface* surface);
+    /// Mark the FBO needing an update.
+    void MarkFBODirty();
     
     /// Return the API-specific alpha texture format.
     static unsigned GetAlphaFormat();

@@ -68,9 +68,11 @@ public:
     /// Return render surface for one face.
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
     
-private:
+protected:
     /// Create texture.
-    bool Create();
+    virtual bool Create();
+    
+private:
     /// Handle render surface update event.
     void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
     

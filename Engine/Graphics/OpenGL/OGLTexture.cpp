@@ -27,6 +27,7 @@
 #include "Log.h"
 #include "Material.h"
 #include "Profiler.h"
+#include "RenderSurface.h"
 #include "ResourceCache.h"
 #include "StringUtils.h"
 #include "Texture.h"
@@ -122,7 +123,20 @@ void Texture::SetBorderColor(const Color& color)
 
 void Texture::SetSRGB(bool enable)
 {
-    sRGB_ = enable;
+    if (graphics_)
+        enable &= graphics_->GetSRGBSupport();
+    
+    if (enable != sRGB_)
+    {
+        sRGB_ = enable;
+        // If texture had already been created, must recreate it to set the sRGB texture format
+        if (object_)
+            Create();
+        
+        // If texture in use in the framebuffer, mark it dirty
+        if (graphics_ && graphics_->GetRenderTarget(0) && graphics_->GetRenderTarget(0)->GetParentTexture() == this)
+            graphics_->MarkFBODirty();
+    }
 }
 
 void Texture::SetBackupTexture(Texture* texture)

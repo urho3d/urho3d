@@ -64,9 +64,11 @@ public:
     /// Return render surface.
     RenderSurface* GetRenderSurface() const { return renderSurface_; }
     
-private:
+protected:
     /// Create texture.
-    bool Create();
+    virtual bool Create();
+    
+private:
     /// Handle render surface update event.
     void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
     
