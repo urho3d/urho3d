@@ -180,10 +180,10 @@ void DecalSet::RegisterObject(Context* context)
 {
     context->RegisterFactory<DecalSet>();
     
+    ACCESSOR_ATTRIBUTE(DecalSet, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_INT, "Max Vertices", GetMaxVertices, SetMaxVertices, unsigned, DEFAULT_MAX_VERTICES, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_INT, "Max Indices", GetMaxIndices, SetMaxIndices, unsigned, DEFAULT_MAX_INDICES, AM_DEFAULT);
-    ATTRIBUTE(DecalSet, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(DecalSet, Drawable);

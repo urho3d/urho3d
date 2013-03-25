@@ -59,7 +59,7 @@ void CustomGeometry::RegisterObject(Context* context)
 {
     context->RegisterFactory<CustomGeometry>();
     
-    ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);

@@ -42,7 +42,7 @@ void PointOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool insi
     {
         Drawable* drawable = *start++;
         
-        if (drawable->IsVisible() && (drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
+        if ((drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
         {
             if (inside || drawable->GetWorldBoundingBox().IsInside(point_))
                 result_.Push(drawable);
@@ -64,7 +64,7 @@ void SphereOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool ins
     {
         Drawable* drawable = *start++;
         
-        if (drawable->IsVisible() && (drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
+        if ((drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
         {
             if (inside || sphere_.IsInsideFast(drawable->GetWorldBoundingBox()))
                 result_.Push(drawable);
@@ -86,7 +86,7 @@ void BoxOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool inside
     {
         Drawable* drawable = *start++;
         
-        if (drawable->IsVisible() && (drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
+        if ((drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
         {
             if (inside || box_.IsInsideFast(drawable->GetWorldBoundingBox()))
                 result_.Push(drawable);
@@ -108,7 +108,7 @@ void FrustumOctreeQuery::TestDrawables(Drawable** start, Drawable** end, bool in
     {
         Drawable* drawable = *start++;
         
-        if (drawable->IsVisible() && (drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
+        if ((drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
         {
             if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                 result_.Push(drawable);

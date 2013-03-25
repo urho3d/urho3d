@@ -226,8 +226,6 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, bool, const String&in, const Array<Variant>@+)", asFUNCTION(ScriptInstanceDelayedExecute), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, bool, const String&in)", asFUNCTION(ScriptInstanceDelayedExecuteNoParams), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptInstance", "void ClearDelayedExecute(const String&in declaration = String())", asMETHOD(ScriptInstance, ClearDelayedExecute), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScriptInstance", "void set_active(bool)", asMETHOD(ScriptInstance, SetActive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScriptInstance", "bool get_active() const", asMETHOD(ScriptInstance, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void set_fixedUpdateFps(int)", asMETHOD(ScriptInstance, SetFixedUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "int get_fixedUpdateFps() const", asMETHOD(ScriptInstance, GetFixedUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void set_scriptFile(ScriptFile@+)", asMETHOD(ScriptInstance, SetScriptFile), asCALL_THISCALL);

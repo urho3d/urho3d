@@ -49,6 +49,8 @@ public:
     
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled() {}
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest);
     /// Save as XML data. Return true if successful.
@@ -58,6 +60,8 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) {};
     
+    /// Set enabled/disabled state.
+    void SetEnabled(bool enabled);
     /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
     
@@ -67,6 +71,10 @@ public:
     Node* GetNode() const { return node_; }
     /// Return the scene the node belongs to.
     Scene* GetScene() const;
+    /// Return whether is enabled.
+    bool IsEnabled() const { return enabled_; }
+    /// Return whether is effectively enabled (node is also enabled.)
+    bool IsEnabledEffective() const;
     /// Return components in the same scene node by type.
     void GetComponents(PODVector<Component*>& dest, ShortStringHash type) const;
     /// Return component in the same scene node by type. If there are several, returns the first.
@@ -101,6 +109,8 @@ protected:
     unsigned id_;
     /// Network update queued flag.
     bool networkUpdate_;
+    /// Enabled flag.
+    bool enabled_;
 };
 
 template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }

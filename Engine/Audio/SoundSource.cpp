@@ -136,6 +136,7 @@ void SoundSource::RegisterObject(Context* context)
 {
     context->RegisterFactory<SoundSource>();
     
+    ACCESSOR_ATTRIBUTE(SoundSource, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ATTRIBUTE(SoundSource, "Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Frequency", frequency_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Gain", gain_, 1.0f, AM_DEFAULT);
@@ -333,7 +334,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
 
 void SoundSource::Update(float timeStep)
 {
-    if (!audio_)
+    if (!audio_ || !IsEnabledEffective())
         return;
     
     // If there is no actual audio output, perform fake mixing into a nonexistent buffer to check stopping/looping
@@ -367,19 +368,19 @@ void SoundSource::Update(float timeStep)
 
 void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation)
 {
-    if (!position_ || !sound_)
+    if (!position_ || !sound_ || !IsEnabledEffective())
         return;
     
     if (sound_->IsCompressed())
     {
         if (decoder_)
         {
-            // If Decoder already exists, Decode new compressed audio
+            // If Decoder already exists, decode new compressed audio
             bool eof = false;
             unsigned currentPos = position_ - decodeBuffer_->GetStart();
             if (currentPos != decodePosition_)
             {
-                // If buffer has wrapped, Decode first to the end
+                // If buffer has wrapped, decode first to the end
                 if (currentPos < decodePosition_)
                 {
                     unsigned bytes = decodeBuffer_->GetDataSize() - decodePosition_;
@@ -1180,7 +1181,7 @@ void SoundSource::MixZeroVolume(Sound* sound, unsigned samples, int mixRate)
 
 void SoundSource::MixNull(float timeStep)
 {
-    if (!position_ || !sound_)
+    if (!position_ || !sound_ || !IsEnabledEffective())
         return;
     
     // Advance only the time position

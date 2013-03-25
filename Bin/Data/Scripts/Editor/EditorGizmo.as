@@ -69,7 +69,7 @@ void CreateGizmo()
     gizmo.materials[0] = cache.GetResource("Material", "Materials/RedUnlit.xml");
     gizmo.materials[1] = cache.GetResource("Material", "Materials/GreenUnlit.xml");
     gizmo.materials[2] = cache.GetResource("Material", "Materials/BlueUnlit.xml");
-    gizmo.visible = false;
+    gizmo.enabled = false;
     gizmo.viewMask = 0x80000000; // Editor raycasts use viewmask 0x7fffffff
     gizmo.occludee = false;
 
@@ -77,17 +77,27 @@ void CreateGizmo()
     gizmoAxisY.lastSelected = false;
     gizmoAxisZ.lastSelected = false;
     lastGizmoMode = EDIT_MOVE;
-
-    // Add to the octree manually
-    if (editorScene.octree !is null)
-        editorScene.octree.AddManualDrawable(gizmo);
 }
 
 void HideGizmo()
 {
     if (gizmo !is null)
-        gizmo.visible = false;
+        gizmo.enabled = false;
 }
+
+void ShowGizmo()
+{
+    if (gizmo !is null)
+    {
+        gizmo.enabled = true;
+
+        // Because setting enabled = false detaches the gizmo from octree,
+        // and it is a manually added drawable, must readd to octree when showing
+        if (editorScene.octree !is null)
+            editorScene.octree.AddManualDrawable(gizmo);
+    }
+}
+
 
 void UpdateGizmo()
 {
@@ -140,12 +150,15 @@ void PositionGizmo()
         lastGizmoMode = editMode;
     }
 
-    gizmo.visible = editMode != EDIT_SELECT;
+    if (editMode != EDIT_SELECT && !gizmo.enabled)
+        ShowGizmo();
+    else if (editMode == EDIT_SELECT && gizmo.enabled)
+        HideGizmo();
 }
 
 void ResizeGizmo()
 {
-    if (gizmo is null || !gizmo.visible)
+    if (gizmo is null || !gizmo.enabled)
         return;
 
     float c = 0.1;
@@ -176,7 +189,7 @@ void GizmoMoved()
 
 void UseGizmo()
 {
-    if (gizmo is null || !gizmo.visible || editMode == EDIT_SELECT)
+    if (gizmo is null || !gizmo.enabled || editMode == EDIT_SELECT)
         return;
 
     IntVector2 pos = ui.cursorPosition;
@@ -268,7 +281,7 @@ void UseGizmo()
 
 bool IsGizmoSelected()
 {
-    return gizmo !is null && gizmo.visible && (gizmoAxisX.selected || gizmoAxisY.selected || gizmoAxisZ.selected);
+    return gizmo !is null && gizmo.enabled && (gizmoAxisX.selected || gizmoAxisY.selected || gizmoAxisZ.selected);
 }
 
 bool MoveNodes(Vector3 adjust)

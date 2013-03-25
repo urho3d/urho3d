@@ -391,6 +391,9 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     RegisterSubclass<Component, T>(engine, "Component", className);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHODPR(T, Remove, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void MarkNetworkUpdate() const", asMETHODPR(T, MarkNetworkUpdate, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_enabled(bool)", asMETHODPR(T, SetEnabled, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHODPR(T, IsEnabled, () const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_enabledEffective() const", asMETHODPR(T, IsEnabledEffective, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHODPR(T, GetID, () const, unsigned), asCALL_THISCALL);
     if (nodeRegistered)
         engine->RegisterObjectMethod(className, "Node@+ get_node() const", asMETHODPR(T, GetNode, () const, Node*), asCALL_THISCALL);
@@ -646,8 +649,6 @@ template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* cl
     RegisterComponent<T>(engine, className);
     RegisterSubclass<Drawable, T>(engine, "Drawable", className);
     engine->RegisterObjectMethod(className, "bool get_inView() const", asFUNCTION(DrawableIsInView), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "void set_visible(bool)", asMETHOD(T, SetVisible), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_visible() const", asMETHOD(T, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_castShadows(bool)", asMETHOD(T, SetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_castShadows() const", asMETHOD(T, GetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_occluder(bool)", asMETHOD(T, SetOccluder), asCALL_THISCALL);

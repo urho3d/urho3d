@@ -91,11 +91,11 @@ void Terrain::RegisterObject(Context* context)
 {
     context->RegisterFactory<Terrain>();
     
+    ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(Terrain, VAR_VECTOR3, "Vertex Spacing", spacing_, DEFAULT_SPACING, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Occluder", IsOccluder, SetOccluder, bool,  false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
@@ -122,6 +122,17 @@ void Terrain::ApplyAttributes()
 {
     if (recreateTerrain_)
         CreateGeometry();
+}
+
+void Terrain::OnSetEnabled()
+{
+    bool enabled = IsEnabledEffective();
+    
+    for (unsigned i = 0; i < patches_.Size(); ++i)
+    {
+        if (patches_[i])
+            patches_[i]->SetEnabled(enabled);
+    }
 }
 
 void Terrain::SetSpacing(const Vector3& spacing)
@@ -260,18 +271,6 @@ void Terrain::SetMaxLights(unsigned num)
     {
         if (patches_[i])
             patches_[i]->SetMaxLights(num);
-    }
-    
-    MarkNetworkUpdate();
-}
-
-void Terrain::SetVisible(bool enable)
-{
-    visible_ = enable;
-    for (unsigned i = 0; i < patches_.Size(); ++i)
-    {
-        if (patches_[i])
-            patches_[i]->SetVisible(enable);
     }
     
     MarkNetworkUpdate();
@@ -658,7 +657,10 @@ void Terrain::CreateGeometry()
                 patch->SetOwner(this);
                 patch->SetCoordinates(IntVector2(x, z));
                 
+                bool enabled = IsEnabledEffective();
+                
                 // Copy initial drawable parameters
+                patch->SetEnabled(enabled);
                 patch->SetMaterial(material_);
                 patch->SetDrawDistance(drawDistance_);
                 patch->SetShadowDistance(shadowDistance_);
@@ -668,7 +670,6 @@ void Terrain::CreateGeometry()
                 patch->SetShadowMask(shadowMask_);
                 patch->SetZoneMask(zoneMask_);
                 patch->SetMaxLights(maxLights_);
-                patch->SetVisible(visible_);
                 patch->SetCastShadows(castShadows_);
                 patch->SetOccluder(occluder_);
                 patch->SetOccludee(occludee_);

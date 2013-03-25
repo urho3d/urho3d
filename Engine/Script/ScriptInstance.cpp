@@ -63,7 +63,6 @@ ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
     script_(GetSubsystem<Script>()),
     scriptObject_(0),
-    active_(true),
     subscribed_(false),
     fixedUpdateFps_(0),
     fixedUpdateInterval_(0.0f),
@@ -83,9 +82,9 @@ void ScriptInstance::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScriptInstance>();
     
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
-    ATTRIBUTE(ScriptInstance, VAR_BOOL, "Is Active", active_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", GetFixedUpdateFps, SetFixedUpdateFps, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_FLOAT, "Time Accumulator", GetFixedUpdateAccAttr, SetFixedUpdateAccAttr, float, 0.0f, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
@@ -141,12 +140,6 @@ void ScriptInstance::SetClassName(const String& className)
     
     className_ = className;
     CreateObject();
-    MarkNetworkUpdate();
-}
-
-void ScriptInstance::SetActive(bool active)
-{
-    active_ = active;
     MarkNetworkUpdate();
 }
 
@@ -497,7 +490,7 @@ void ScriptInstance::GetScriptAttributes()
 
 void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!active_ || !scriptObject_)
+    if (!IsEnabledEffective() || !scriptObject_)
         return;
     
     using namespace SceneUpdate;
@@ -544,7 +537,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
 
 void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!active_ || !scriptObject_)
+    if (!IsEnabledEffective() || !scriptObject_)
         return;
     
     using namespace ScenePostUpdate;
@@ -556,7 +549,7 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
 
 void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
-    if (!active_ || !scriptObject_)
+    if (!IsEnabledEffective() || !scriptObject_)
         return;
     
     using namespace PhysicsPreStep;
@@ -583,7 +576,7 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
 
 void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
 {
-    if (!active_ || !scriptObject_)
+    if (!IsEnabledEffective() || !scriptObject_)
         return;
     
     using namespace PhysicsPostStep;
@@ -610,7 +603,7 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
 
 void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 {
-    if (!active_ || !scriptFile_ || !scriptObject_)
+    if (!IsEnabledEffective() || !scriptFile_ || !scriptObject_)
         return;
     
     asIScriptFunction* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());

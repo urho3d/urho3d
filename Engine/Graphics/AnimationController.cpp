@@ -61,6 +61,7 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>();
     
+    ACCESSOR_ATTRIBUTE(AnimationController, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimationController, VAR_VARIANTVECTOR, "Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
 }
@@ -715,6 +716,9 @@ AnimationState* AnimationController::FindAnimationState(const String& name) cons
 
 void AnimationController::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (!IsEnabledEffective())
+        return;
+    
     using namespace ScenePostUpdate;
     
     Update(eventData[P_TIMESTEP].GetFloat());

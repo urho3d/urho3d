@@ -81,9 +81,9 @@ void AnimatedModel::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedModel>();
     
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);

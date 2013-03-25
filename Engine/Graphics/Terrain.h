@@ -49,6 +49,8 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
     
     /// Set patch quads per side. Must be a power of two.
     void SetPatchSize(int size);
@@ -74,8 +76,6 @@ public:
     void SetZoneMask(unsigned mask);
     /// Set maximum number of per-pixel lights for patches. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
-    /// Set visible flag for patches.
-    void SetVisible(bool enable);
     /// Set shadowcaster flag for patches.
     void SetCastShadows(bool enable);
     /// Set occlusion flag for patches. Occlusion uses the coarsest LOD and may potentially be too aggressive, so use with caution.

@@ -110,6 +110,7 @@ void Light::RegisterObject(Context* context)
 {
     context->RegisterFactory<Light>();
     
+    ACCESSOR_ATTRIBUTE(Light, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Light, VAR_COLOR, "Color", GetColor, SetColor, Color, Color(), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY, AM_DEFAULT);
@@ -118,7 +119,6 @@ void Light::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Per Vertex", perVertex_, false, AM_DEFAULT);

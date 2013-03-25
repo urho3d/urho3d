@@ -37,9 +37,6 @@
 namespace Urho3D
 {
 
-// Normalize rotation quaternion after this many incremental updates to prevent distortion
-static const int NORMALIZE_ROTATION_EVERY = 32;
-
 OBJECTTYPESTATIC(Node);
 
 Node::Node(Context* context) :
@@ -47,7 +44,7 @@ Node::Node(Context* context) :
     worldTransform_(Matrix3x4::IDENTITY),
     dirty_(false),
     networkUpdate_(false),
-    rotateCount_(0),
+    enabled_(true),
     parent_(0),
     scene_(0),
     id_(0),
@@ -72,7 +69,7 @@ void Node::RegisterObject(Context* context)
 {
     context->RegisterFactory<Node>();
     
-    /// \todo When position/rotation updates are received from the network, route to SmoothedTransform if exists
+    ACCESSOR_ATTRIBUTE(Node, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
@@ -251,7 +248,6 @@ void Node::SetPosition(const Vector3& position)
 void Node::SetRotation(const Quaternion& rotation)
 {
     rotation_ = rotation;
-    rotateCount_ = 0;
     MarkDirty();
     
     MarkNetworkUpdate();
@@ -279,7 +275,6 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation)
 {
     position_ = position;
     rotation_ = rotation;
-    rotateCount_ = 0;
     MarkDirty();
     
     MarkNetworkUpdate();
@@ -294,7 +289,6 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, con
 {
     position_ = position;
     rotation_ = rotation;
-    rotateCount_ = 0;
     scale_ = scale;
     MarkDirty();
     
@@ -386,16 +380,9 @@ void Node::TranslateRelative(const Vector3& delta)
 void Node::Rotate(const Quaternion& delta, bool fixedAxis)
 {
     if (!fixedAxis)
-        rotation_ = rotation_ * delta;
+        rotation_ = (rotation_ * delta).Normalized();
     else
-        rotation_ = delta * rotation_;
-    
-    if (++rotateCount_ >= NORMALIZE_ROTATION_EVERY)
-    {
-        rotation_.Normalize();
-        rotateCount_ = 0;
-    }
-    
+        rotation_ = (delta * rotation_).Normalized();
     MarkDirty();
     
     MarkNetworkUpdate();
@@ -444,6 +431,68 @@ void Node::Scale(const Vector3& scale)
     MarkDirty();
     
     MarkNetworkUpdate();
+}
+
+void Node::SetEnabled(bool enabled)
+{
+    // The enabled state of the whole scene can not be changed. SetActive() is used instead to start/stop updates.
+    if (GetType() == Scene::GetTypeStatic())
+    {
+        LOGERROR("Can not change enabled state of the Scene");
+        return;
+    }
+    
+    if (enabled != enabled_)
+    {
+        enabled_ = enabled;
+        
+        MarkNetworkUpdate();
+        
+        // Send change event
+        if (scene_)
+        {
+            using namespace NodeEnabledChanged;
+            
+            VariantMap eventData;
+            eventData[P_SCENE] = (void*)scene_;
+            eventData[P_NODE] = (void*)this;
+            
+            scene_->SendEvent(E_NODEENABLEDCHANGED, eventData);
+        }
+        
+        for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
+        {
+            (*i)->OnSetEnabled();
+            
+            // Send change event for the component
+            if (scene_)
+            {
+                using namespace ComponentEnabledChanged;
+                
+                VariantMap eventData;
+                eventData[P_SCENE] = (void*)scene_;
+                eventData[P_NODE] = (void*)this;
+                eventData[P_COMPONENT] = (void*)(*i);
+                
+                scene_->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
+            }
+        }
+    }
+}
+
+void Node::SetEnabledRecursive(bool enabled)
+{
+    // The enabled state of the whole scene can not be changed. SetActive() is used instead to start/stop updates.
+    if (GetType() == Scene::GetTypeStatic())
+    {
+        LOGERROR("Can not change enabled state of the Scene");
+        return;
+    }
+    
+    SetEnabled(enabled);
+    
+    for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->SetEnabledRecursive(enabled);
 }
 
 void Node::SetOwner(Connection* owner)

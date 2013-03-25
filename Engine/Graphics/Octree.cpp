@@ -289,8 +289,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         {
             Drawable* drawable = *start++;
             
-            if (drawable->IsVisible() && (drawable->GetDrawableFlags() & query.drawableFlags_) &&
-                (drawable->GetViewMask() & query.viewMask_))
+            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && (drawable->GetViewMask() & query.viewMask_))
                 drawable->ProcessRayQuery(query, query.result_);
         }
     }
@@ -317,8 +316,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         {
             Drawable* drawable = *start++;
             
-            if (drawable->IsVisible() && (drawable->GetDrawableFlags() & query.drawableFlags_) &&
-                (drawable->GetViewMask() & query.viewMask_))
+            if ((drawable->GetDrawableFlags() & query.drawableFlags_) && (drawable->GetViewMask() & query.viewMask_))
                 drawables.Push(drawable);
         }
     }

@@ -64,13 +64,13 @@ void Zone::RegisterObject(Context* context)
 {
     context->RegisterFactory<Zone>();
     
+    ACCESSOR_ATTRIBUTE(Zone, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, 0, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, 0, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
@@ -85,8 +85,17 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     
     // If bounding box, visibility or priority changes, dirty the drawable as applicable
     if ((attr.offset_ >= offsetof(Zone, boundingBox_) && attr.offset_ < (offsetof(Zone, boundingBox_) + sizeof(BoundingBox))) ||
-        attr.offset_ == offsetof(Zone, visible_) || attr.offset_ == offsetof(Zone, priority_))
+        attr.offset_ == offsetof(Zone, priority_))
         OnMarkedDirty(node_);
+}
+
+void Zone::OnSetEnabled()
+{
+    // When a Zone is disabled, clear the cached zone from all drawables inside bounding box before removing from octree
+    if (!IsEnabledEffective())
+        OnMarkedDirty(node_);
+    
+    Drawable::OnSetEnabled();
 }
 
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

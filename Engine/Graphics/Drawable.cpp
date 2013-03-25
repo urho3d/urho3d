@@ -57,7 +57,6 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     Component(context),
     drawableFlags_(drawableFlags),
     worldBoundingBoxDirty_(true),
-    visible_(true),
     castShadows_(false),
     occluder_(false),
     occludee_(true),
@@ -98,6 +97,16 @@ void Drawable::RegisterObject(Context* context)
     ATTRIBUTE(Drawable, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
     ATTRIBUTE(Drawable, VAR_INT, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Drawable, VAR_INT, "Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+}
+
+void Drawable::OnSetEnabled()
+{
+    bool enabled = IsEnabledEffective();
+    
+    if (enabled && !octant_)
+        AddToOctree();
+    else if (!enabled && octant_)
+        RemoveFromOctree();
 }
 
 void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -194,12 +203,6 @@ void Drawable::SetZoneMask(unsigned mask)
 void Drawable::SetMaxLights(unsigned num)
 {
     maxLights_ = num;
-    MarkNetworkUpdate();
-}
-
-void Drawable::SetVisible(bool enable)
-{
-    visible_ = enable;
     MarkNetworkUpdate();
 }
 
@@ -367,6 +370,10 @@ void Drawable::OnMarkedDirty(Node* node)
 
 void Drawable::AddToOctree()
 {
+    // Do not add to octree when disabled
+    if (!IsEnabledEffective())
+        return;
+    
     Scene* scene = GetScene();
     if (scene)
     {

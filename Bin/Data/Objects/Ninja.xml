@@ -8,7 +8,6 @@
 	<component type="ScriptInstance" id="16777216">
 		<attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
 		<attribute name="Class Name" value="Ninja" />
-		<attribute name="Is Active" value="true" />
 		<attribute name="Fixed Update FPS" value="0" />
 		<attribute name="Time Accumulator" value="0" />
 		<attribute name="Delayed Method Calls" value="0" />
@@ -59,7 +58,6 @@
 		<component type="AnimatedModel" id="6">
 			<attribute name="Model" value="Model;Models/Ninja.mdl" />
 			<attribute name="Material" value="Material;Materials/Ninja.xml;Materials/Ninja.xml" />
-			<attribute name="Is Visible" value="true" />
 			<attribute name="Is Occluder" value="false" />
 			<attribute name="Can Be Occluded" value="true" />
 			<attribute name="Cast Shadows" value="true" />
@@ -111,7 +109,6 @@
     	<component type="ScriptInstance" id="8">
     		<attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
     		<attribute name="Class Name" value="FootSteps" />
-    		<attribute name="Is Active" value="true" />
     		<attribute name="Fixed Update FPS" value="0" />
     		<attribute name="Time Accumulator" value="0" />
     		<attribute name="Delayed Method Calls" value="0" />

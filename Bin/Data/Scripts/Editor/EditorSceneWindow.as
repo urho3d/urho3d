@@ -66,6 +66,8 @@ void CreateSceneWindow()
     SubscribeToEvent(editorScene, "ComponentAdded", "HandleComponentAdded");
     SubscribeToEvent(editorScene, "ComponentRemoved", "HandleComponentRemoved");
     SubscribeToEvent(editorScene, "NodeNameChanged", "HandleNodeNameChanged");
+    SubscribeToEvent(editorScene, "NodeEnabledChanged", "HandleNodeEnabledChanged");
+    SubscribeToEvent(editorScene, "ComponentEnabledChanged", "HandleComponentEnabledChanged");
 }
 
 void ShowSceneWindow()
@@ -151,6 +153,7 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
 
     hierarchyList.InsertItem(itemIndex, text, parentItem);
     IconizeUIElement(text, node.typeName);
+    SetIconEnabledColor(text, node.enabled);
 
     // Advance the index for the child components and/or nodes
     if (itemIndex == M_MAX_UNSIGNED)
@@ -179,24 +182,29 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
     return itemIndex;
 }
 
-void UpdateSceneWindowNodeOnly(uint itemIndex, Node@ node)
-{
-    Text@ text = hierarchyList.items[itemIndex];
-    if (text is null)
-        return;
-    text.text = GetNodeTitle(node);
-}
-
 void UpdateSceneWindowNode(Node@ node)
 {
     // In case of node's parent is not found in the hierarchy list then the node will inserted at the root level, but it should not happen
     UpdateSceneWindowNode(GetNodeListIndex(node), node, hierarchyList.items[GetNodeListIndex(node.parent)]);
 }
 
-void UpdateSceneWindowNodeOnly(Node@ node)
+void UpdateSceneWindowNodeText(Node@ node)
 {
     uint index = GetNodeListIndex(node);
-    UpdateSceneWindowNodeOnly(index, node);
+    Text@ text = hierarchyList.items[index];
+    if (text is null)
+        return;
+    text.text = GetNodeTitle(node);
+    SetIconEnabledColor(text, node.enabled);
+}
+
+void UpdateSceneWindowComponentText(Component@ component)
+{
+    uint index = GetComponentListIndex(component);
+    Text@ text = hierarchyList.items[index];
+    if (text is null)
+        return;
+    SetIconEnabledColor(text, component.enabledEffective);
 }
 
 void AddComponentToSceneWindow(Component@ component, uint compItemIndex, UIElement@ parentItem)
@@ -210,6 +218,7 @@ void AddComponentToSceneWindow(Component@ component, uint compItemIndex, UIEleme
     
     hierarchyList.InsertItem(compItemIndex, text, parentItem);
     IconizeUIElement(text, component.typeName);
+    SetIconEnabledColor(text, component.enabledEffective);
 }
 
 uint GetNodeListIndex(Node@ node)
@@ -743,5 +752,25 @@ void HandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
         return;
     
     Node@ node = eventData["Node"].GetNode();
-    UpdateSceneWindowNodeOnly(node);
+    UpdateSceneWindowNodeText(node);
+}
+
+void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressSceneChanges)
+        return;
+    
+    Node@ node = eventData["Node"].GetNode();
+    UpdateSceneWindowNodeText(node);
+    UpdateNodeWindowIcons();
+}
+
+void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressSceneChanges)
+        return;
+    
+    Component@ component = eventData["Component"].GetComponent();
+    UpdateSceneWindowComponentText(component);
+    UpdateNodeWindowIcons();
 }

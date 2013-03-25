@@ -943,8 +943,6 @@ static void RegisterTerrain(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Terrain", "const IntVector2& get_numVertices() const", asMETHOD(Terrain, GetNumVertices), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "const IntVector2& get_numPatches() const", asMETHOD(Terrain, GetNumPatches), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ get_patches(uint) const", asMETHODPR(Terrain, GetPatch, (unsigned) const, TerrainPatch*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Terrain", "void set_visible(bool)", asMETHOD(Terrain, SetVisible), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Terrain", "bool get_visible() const", asMETHOD(Terrain, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_castShadows(bool)", asMETHOD(Terrain, SetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "bool get_castShadows() const", asMETHOD(Terrain, GetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_occluder(bool)", asMETHOD(Terrain, SetOccluder), asCALL_THISCALL);

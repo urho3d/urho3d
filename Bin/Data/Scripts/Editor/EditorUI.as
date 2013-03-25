@@ -615,4 +615,12 @@ void IconizeUIElement(UIElement@ element, const String&in iconType)
 
     // Set the icon type
     icon.SetStyle(iconStyle, iconType);
+    icon.color = Color(1,1,1,1); // Reset to enabled color
+}
+
+void SetIconEnabledColor(UIElement@ element, bool enabled)
+{
+    BorderImage@ icon = element.GetChild("Icon");
+    if (icon !is null)
+        icon.color = enabled ? Color(1,1,1,1) : Color(1,0,0,1);
 }

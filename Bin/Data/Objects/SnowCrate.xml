@@ -8,7 +8,6 @@
 	<component type="ScriptInstance" id="16777219">
 		<attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
 		<attribute name="Class Name" value="SnowCrate" />
-		<attribute name="Is Active" value="true" />
 		<attribute name="Fixed Update FPS" value="0" />
 		<attribute name="Time Accumulator" value="0" />
 		<attribute name="Delayed Method Calls" value="0" />
@@ -23,7 +22,6 @@
 	<component type="StaticModel" id="11">
 		<attribute name="Model" value="Model;Models/SnowCrate.mdl" />
 		<attribute name="Material" value="Material;Materials/SnowCrate.xml" />
-		<attribute name="Is Visible" value="true" />
 		<attribute name="Is Occluder" value="false" />
 		<attribute name="Can Be Occluded" value="true" />
 		<attribute name="Cast Shadows" value="true" />

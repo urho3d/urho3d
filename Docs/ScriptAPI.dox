@@ -1311,6 +1311,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 
@@ -1364,6 +1366,7 @@ Methods:<br>
 - Vector3 LocalToWorld(const Vector4&) const
 - Vector3 WorldToLocal(const Vector3&) const
 - Vector3 WorldToLocal(const Vector4&) const
+- void SetEnabledRecursive(bool)
 - bool SaveXML(File@)
 - Node@ Clone(CreateMode arg0 = REPLICATED)
 - ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode arg2 = REPLICATED)
@@ -1398,6 +1401,7 @@ Properties:<br>
 - String name
 - Node@ parent
 - VariantMap vars (readonly)
+- bool enabled
 - Scene@ scene (readonly)
 - Connection@ owner
 - ScriptObject@ scriptObject (readonly)
@@ -1427,6 +1431,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - Vector3 targetPosition
@@ -1602,6 +1608,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 
@@ -1636,6 +1644,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - float nearClip
@@ -2018,10 +2028,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2079,10 +2090,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2138,10 +2150,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2190,10 +2203,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2238,10 +2252,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2315,10 +2330,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2396,6 +2412,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 
@@ -2435,10 +2453,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2485,10 +2504,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2543,10 +2563,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2592,10 +2613,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2640,10 +2662,11 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2684,6 +2707,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - Material@ material
@@ -2693,7 +2718,6 @@ Properties:<br>
 - IntVector2 numVertices (readonly)
 - IntVector2 numPatches (readonly)
 - TerrainPatch@[] patches (readonly)
-- bool visible
 - bool castShadows
 - bool occluder
 - bool occludee
@@ -2749,6 +2773,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - BoundingBox worldBoundingBox (readonly)
@@ -2942,6 +2968,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 
@@ -2974,6 +3002,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - SoundType soundType
@@ -3016,6 +3046,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - SoundType soundType
@@ -4927,6 +4959,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - float basePriority
@@ -5028,6 +5062,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - ShapeType shapeType
@@ -5072,6 +5108,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - float mass
@@ -5124,6 +5162,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - ConstraintType constraintType
@@ -5182,6 +5222,8 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
 - Vector3 gravity
@@ -5240,9 +5282,10 @@ Properties:<br>
 - uint numAttributes (readonly)
 - Variant[] attributes
 - AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
-- bool active
 - int fixedUpdateFps
 - ScriptFile@ scriptFile
 - ScriptObject@ object (readonly)

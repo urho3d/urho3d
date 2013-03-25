@@ -119,11 +119,26 @@ EVENT(E_COMPONENTREMOVED, ComponentRemoved)
     PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
-/// A node's name has changed, requiring refresh in the editor.
+/// A node's name has changed.
 EVENT(E_NODENAMECHANGED, NodeNameChanged)
 {
     PARAM(P_SCENE, Scene);                  // Scene pointer
     PARAM(P_NODE, Node);                    // Node pointer
+}
+
+/// A node's enabled state has changed.
+EVENT(E_NODEENABLEDCHANGED, NodeEnabledChanged)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
+/// A component's enabled state has changed.
+EVENT(E_COMPONENTENABLEDCHANGED, ComponentEnabledChanged)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+    PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
 }

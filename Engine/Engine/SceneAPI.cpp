@@ -58,6 +58,9 @@ static void RegisterNode(asIScriptEngine* engine)
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
     RegisterComponent<Component>(engine, "Component", false, false);
     RegisterNode<Node>(engine, "Node");
+    engine->RegisterObjectMethod("Node", "void SetEnabledRecursive(bool)", asMETHOD(Node, SetEnabledRecursive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "void set_enabled(bool)", asMETHOD(Node, SetEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "bool get_enabled() const", asMETHOD(Node, IsEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "bool SaveXML(File@+)", asFUNCTION(NodeSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "Node@+ Clone(CreateMode mode = REPLICATED)", asMETHOD(Node, Clone), asCALL_THISCALL);
     RegisterObjectConstructor<Node>(engine, "Node");

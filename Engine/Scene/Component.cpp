@@ -38,7 +38,8 @@ Component::Component(Context* context) :
     Serializable(context),
     node_(0),
     id_(0),
-    networkUpdate_(false)
+    networkUpdate_(false),
+    enabled_(true)
 {
 }
 
@@ -74,6 +75,31 @@ bool Component::SaveXML(XMLElement& dest)
     
     // Write attributes
     return Serializable::SaveXML(dest);
+}
+
+void Component::SetEnabled(bool enabled)
+{
+    if (enabled != enabled_)
+    {
+        enabled_ = enabled;
+        OnSetEnabled();
+        
+        MarkNetworkUpdate();
+        
+        // Send change event for the component
+        Scene* scene = GetScene();
+        if (scene)
+        {
+            using namespace ComponentEnabledChanged;
+            
+            VariantMap eventData;
+            eventData[P_SCENE] = (void*)scene;
+            eventData[P_NODE] = (void*)node_;
+            eventData[P_COMPONENT] = (void*)this;
+            
+            scene->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
+        }
+    }
 }
 
 void Component::Remove()
@@ -186,6 +212,11 @@ void Component::SetNode(Node* node)
 Component* Component::GetComponent(ShortStringHash type) const
 {
     return node_ ? node_->GetComponent(type) : 0;
+}
+
+bool Component::IsEnabledEffective() const
+{
+    return node_ ? node_->IsEnabled() && enabled_ : enabled_;
 }
 
 void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const

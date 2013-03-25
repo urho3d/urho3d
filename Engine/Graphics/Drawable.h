@@ -116,6 +116,8 @@ public:
     /// Register object attributes. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
@@ -151,8 +153,6 @@ public:
     void SetZoneMask(unsigned mask);
     /// Set maximum number of per-pixel lights. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
-    /// Set visible flag.
-    void SetVisible(bool enable);
     /// Set shadowcaster flag.
     void SetCastShadows(bool enable);
     /// Set occlusion flag.
@@ -182,8 +182,6 @@ public:
     unsigned GetZoneMask() const { return zoneMask_; }
     /// Return maximum number of per-pixel lights.
     unsigned GetMaxLights() const { return maxLights_; }
-    /// Return visible flag.
-    bool IsVisible() const { return visible_; }
     /// Return shadowcaster flag.
     bool GetCastShadows() const { return castShadows_; }
     /// Return occluder flag.
@@ -266,8 +264,6 @@ protected:
     unsigned char drawableFlags_;
     /// Bounding box dirty flag.
     bool worldBoundingBoxDirty_;
-    /// Visible flag.
-    bool visible_;
     /// Shadowcaster flag.
     bool castShadows_;
     /// Occluder flag.

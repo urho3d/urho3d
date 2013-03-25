@@ -81,7 +81,7 @@ public:
         {
             Drawable* drawable = *start++;
             
-            if (drawable->GetCastShadows() && drawable->IsVisible() && (drawable->GetDrawableFlags() & drawableFlags_) &&
+            if (drawable->GetCastShadows() && (drawable->GetDrawableFlags() & drawableFlags_) &&
                 (drawable->GetViewMask() & viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
@@ -110,8 +110,8 @@ public:
             Drawable* drawable = *start++;
             unsigned char flags = drawable->GetDrawableFlags();
             
-            if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && drawable->IsVisible() &&
-                (drawable->GetViewMask() & viewMask_))
+            if ((flags == DRAWABLE_ZONE || (flags == DRAWABLE_GEOMETRY && drawable->IsOccluder())) && (drawable->GetViewMask() &
+                viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);
@@ -153,8 +153,7 @@ public:
         {
             Drawable* drawable = *start++;
             
-            if (drawable->IsVisible() && (drawable->GetDrawableFlags() & drawableFlags_) &&
-                (drawable->GetViewMask() & viewMask_))
+            if ((drawable->GetDrawableFlags() & drawableFlags_) && (drawable->GetViewMask() & viewMask_))
             {
                 if (inside || frustum_.IsInsideFast(drawable->GetWorldBoundingBox()))
                     result_.Push(drawable);

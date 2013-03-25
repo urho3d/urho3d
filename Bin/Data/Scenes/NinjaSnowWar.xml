@@ -37,7 +37,6 @@
 			<attribute name="Fog Color" value="0.2 0.2 0.7 1" />
 			<attribute name="Fog Start" value="5000" />
 			<attribute name="Fog End" value="15000" />
-			<attribute name="Is Visible" value="true" />
 			<attribute name="Override Mode" value="false" />
 			<attribute name="Ambient Gradient" value="false" />
 			<attribute name="Priority" value="0" />
@@ -61,7 +60,6 @@
 			<attribute name="Spot Aspect Ratio" value="1" />
 			<attribute name="Attenuation Texture" value="Texture2D;" />
 			<attribute name="Light Shape Texture" value="Texture2D;" />
-			<attribute name="Is Visible" value="true" />
 			<attribute name="Can Be Occluded" value="true" />
 			<attribute name="Cast Shadows" value="true" />
 			<attribute name="Per Vertex" value="false" />
@@ -94,7 +92,6 @@
 		<component type="StaticModel" id="16777220">
 			<attribute name="Model" value="Model;Models/Level.mdl" />
 			<attribute name="Material" value="Material;Materials/Snow.xml" />
-			<attribute name="Is Visible" value="true" />
 			<attribute name="Is Occluder" value="false" />
 			<attribute name="Can Be Occluded" value="true" />
 			<attribute name="Cast Shadows" value="false" />
@@ -147,7 +144,6 @@
 		<component type="Skybox" id="16777222">
 			<attribute name="Model" value="Model;Models/CloudPlane.mdl" />
 			<attribute name="Material" value="Material;Materials/CloudPlane.xml" />
-			<attribute name="Is Visible" value="true" />
 			<attribute name="Is Occluder" value="false" />
 			<attribute name="Can Be Occluded" value="true" />
 			<attribute name="Cast Shadows" value="false" />

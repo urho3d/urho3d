@@ -135,7 +135,8 @@ void UpdateAttributes(bool fullUpdate)
                 Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
                 componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents]) + multiplierText;
                 IconizeUIElement(componentTitle, editComponents[j * numEditableComponents].typeName);
-                
+                SetIconEnabledColor(componentTitle, editComponents[j * numEditableComponents].enabledEffective);
+
                 Array<Serializable@> components;
                 for (uint i = 0; i < numEditableComponents; ++i)
                     components.Push(editComponents[j * numEditableComponents + i]);
@@ -144,6 +145,8 @@ void UpdateAttributes(bool fullUpdate)
             }
         }
     }
+    
+    UpdateNodeWindowIcons();
 }
 
 void UpdateNodeAttributes()
@@ -151,6 +154,42 @@ void UpdateNodeAttributes()
     if (nodeWindow !is null)
     {
         UpdateAttributes(ToSerializableArray(editNodes), nodeWindow.GetChild("NodeAttributeList", true), false);
+    }
+}
+
+void UpdateNodeWindowIcons()
+{
+    Text@ nodeTitle = nodeWindow.GetChild("NodeTitle", true);
+    if (editNode !is null)
+        SetIconEnabledColor(nodeTitle, editNode.enabled);
+    else if (editNodes.length > 0)
+    {
+        bool hasSameEnabledState = true;
+
+        for (uint i = 1; i < editNodes.length; ++i)
+        {
+            if (editNodes[i].enabled != editNodes[0].enabled)
+            {
+                hasSameEnabledState = false;
+                break;
+            }
+        }
+        if (hasSameEnabledState)
+            SetIconEnabledColor(nodeTitle, editNodes[0].enabled);
+    }
+
+    if (!editComponents.empty)
+    {
+        uint numEditableComponents = editComponents.length / numEditableComponentsPerNode;
+    
+        for (uint j = 0; j < numEditableComponentsPerNode; ++j)
+        {
+            if (j >= componentParentContainer.numChildren)
+                return;
+            
+            Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
+            SetIconEnabledColor(componentTitle, editComponents[j * numEditableComponents].enabledEffective);
+        }
     }
 }
 

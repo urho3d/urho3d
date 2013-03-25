@@ -129,6 +129,10 @@ public:
     void Scale(float scale);
     /// Modify scale.
     void Scale(const Vector3& scale);
+    /// Set enabled/disabled state. Components in disabled nodes become effectively disabled regardless of their own enable/disable state.
+    void SetEnabled(bool enabled);
+    /// Set enabled/disabled state recursively.
+    void SetEnabledRecursive(bool enabled);
     /// Set owner connection for networking.
     void SetOwner(Connection* owner);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
@@ -178,6 +182,8 @@ public:
     Node* GetParent() const { return parent_; }
     /// Return scene.
     Scene* GetScene() const { return scene_; }
+    /// Return whether is enabled. Disables nodes effectively disable all their components.
+    bool IsEnabled() const { return enabled_; }
     /// Return owner connection in networking.
     Connection* GetOwner() const { return owner_; }
     /// Return position relative to parent node.
@@ -342,8 +348,8 @@ private:
     mutable bool dirty_;
     /// Network update queued flag.
     bool networkUpdate_;
-    /// Consecutive rotation count for rotation renormalization.
-    unsigned short rotateCount_;
+    /// Enabled flag.
+    bool enabled_;
     /// Parent scene node.
     Node* parent_;
     /// Scene (root node.)

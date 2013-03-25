@@ -95,8 +95,6 @@ public:
     void SetScriptFile(ScriptFile* scriptFile);
     /// Set class name only. Recreate object if necessary.
     void SetClassName(const String& className);
-    /// Enable or disable scripted updates and event handlers.
-    void SetActive(bool active);
     /// Set fixed updates per second. 0 (default) uses the physics frame rate.
     void SetFixedUpdateFps(int fps);
     /// Query for a method by declaration and execute if found.
@@ -114,8 +112,6 @@ public:
     asIScriptObject* GetScriptObject() const { return scriptObject_; }
     /// Return class name.
     const String& GetClassName() const { return className_; }
-    /// Return whether scripted updates and event handlers are enabled.
-    bool IsActive() const { return active_; }
     /// Return fixed updates per second.
     int GetFixedUpdateFps() const { return fixedUpdateFps_; }
     
@@ -178,8 +174,6 @@ private:
     String className_;
     /// Pointers to supported inbuilt methods.
     asIScriptFunction* methods_[MAX_SCRIPT_METHODS];
-    /// Active flag.
-    bool active_;
     /// Subscribed to scene update event flag.
     bool subscribed_;
     /// Fixed update FPS.

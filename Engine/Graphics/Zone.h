@@ -43,6 +43,8 @@ public:
     
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     

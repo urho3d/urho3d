@@ -75,7 +75,7 @@ Array<String> fillModeText = {
 
 void CreateCamera()
 {
-    // Note: the camera will not be bound into the scene, so that it is not listed, and does not get deleted
+    // Note: the camera is not inside the scene, so that it is not listed, and does not get deleted
     cameraNode = Node();
     camera = cameraNode.CreateComponent("Camera");
     audio.listener = cameraNode.CreateComponent("SoundListener");
