@@ -80,7 +80,7 @@ void InitScene()
             objectNode.position = GetRandomPosition();
 
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
-        object.visible = false;
+        object.enabled = false;
         objects.Push(object);
     }
     
@@ -94,7 +94,7 @@ void InitScene()
         if (color.r == 0.5 && color.g == 0.5 && color.b == 0.5)
             color = Color(1, 1, 1);
 
-        light.visible = false;
+        light.enabled = false;
         light.range = 2.0;
         light.color = color;
         light.specularIntensity = 1.0;
@@ -142,13 +142,13 @@ void LoadNewModel()
 void EnableLights()
 {
     for (uint i = 0; i < lights.length; ++i)
-        lights[i].visible = i < numLights;
+        lights[i].enabled = i < numLights;
 }
 
 void EnableObjects()
 {
     for (uint i = 0; i < objects.length; ++i)
-        objects[i].visible = i < numObjects;
+        objects[i].enabled = i < numObjects;
 }
 
 void RandomizePositions()
