@@ -101,7 +101,7 @@
     </element>
     <element type="TerrainPatch">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 0 46 14" />
+        <attribute name="Image Rect" value="224 0 238 14" />
     </element>
     <element type="Zone">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
