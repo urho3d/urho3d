@@ -276,7 +276,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
 {
     Scene* scene = viewport->GetScene();
     Camera* camera = viewport->GetCamera();
-    if (!scene || !camera || !camera->GetNode())
+    if (!scene || !camera || !camera->GetNode() || !camera->IsEnabledEffective())
         return false;
     
     // If scene is loading asynchronously, it is incomplete and should not be rendered

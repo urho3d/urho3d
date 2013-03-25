@@ -103,7 +103,8 @@ void SoundSource3D::CalculateAttenuation()
         SoundListener* listener = audio_->GetListener();
         
         // Listener must either be sceneless or in the same scene, else attenuate sound to silence
-        if (listener && listener->GetNode() && (!listener->GetScene() || listener->GetScene() == GetScene()))
+        if (listener && listener->GetNode() && listener->IsEnabledEffective() && (!listener->GetScene() ||
+            listener->GetScene() == GetScene()))
         {
             Node* listenerNode = listener->GetNode();
             Vector3 relativePos(listenerNode->GetWorldRotation().Inverse() * (node_->GetWorldPosition() - listenerNode->GetWorldPosition()));
