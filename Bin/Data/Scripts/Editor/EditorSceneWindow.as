@@ -120,7 +120,7 @@ void UpdateSceneWindow()
 }
 
 uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
-{  
+{
     // Whenever we're updating, disable layout update to optimize speed
     hierarchyList.contentElement.DisableLayoutUpdate();
 
@@ -158,7 +158,13 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
         icon.color = Color(1, 0, 0);
     }
 
-    hierarchyList.InsertItem(itemIndex++, text, parentItem);
+    hierarchyList.InsertItem(itemIndex, text, parentItem);
+
+    // Advance the index for the child components and/or nodes
+    if (itemIndex == M_MAX_UNSIGNED)
+        itemIndex = hierarchyList.numItems;
+    else
+        ++itemIndex;
 
     // Get the indent level after the item is inserted
     icon.indent = text.indent - 1;
@@ -168,8 +174,7 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
     for (uint i = 0; i < node.numComponents; ++i)
     {
         Component@ component = node.components[i];
-        AddComponentToSceneWindow(component, itemIndex, text);
-        ++itemIndex;
+        AddComponentToSceneWindow(component, itemIndex++, text);
     }
 
     // Then update child nodes recursively
@@ -598,21 +603,11 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         targetNode = editorScene;
 
     // Perform the reparenting
-    BeginModify(targetNode.id);
-    BeginModify(sourceNode.id);
-    sourceNode.parent = targetNode;
-    EndModify(sourceNode.id);
-    EndModify(targetNode.id);
-
-    // Verify success
-    if (sourceNode.parent !is targetNode)
+    if (!SceneChangeParent(sourceNode, targetNode))
         return;
 
-    // Node coordinates may change as a result of the drag/drop.
-    /// \todo This should also be detected via an event
-    UpdateNodeAttributes();
-
-    FocusNode(sourceNode); // Focus the node at its new position in the list
+    // Focus the node at its new position in the list which in turn should trigger a refresh in attribute inspector
+    FocusNode(sourceNode);
 }
 
 bool TestSceneWindowElements(UIElement@ source, UIElement@ target)

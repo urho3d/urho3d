@@ -442,21 +442,34 @@ void SceneUnparent()
         return;
 
     // Parent selected nodes to root
+    Array<Node@> changedNodes;
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
         Node@ sourceNode = selectedNodes[i];
         if (sourceNode.parent is null || sourceNode.parent is editorScene)
             continue; // Root or already parented to root
 
-        Node@ targetNode = editorScene;
-
-        // Perform the reparenting
-        BeginModify(targetNode.id);
-        BeginModify(sourceNode.id);
-        sourceNode.parent = targetNode;
-        EndModify(sourceNode.id);
-        EndModify(targetNode.id);
+        // Perform the reparenting, continue loop even if action fails
+        SceneChangeParent(sourceNode, editorScene);
+        changedNodes.Push(sourceNode);
     }
+
+    // Reselect the changed nodes at their new position in the list
+    for (uint i = 0; i < changedNodes.length; ++i)
+        hierarchyList.AddSelection(GetNodeListIndex(changedNodes[i]));
+}
+
+bool SceneChangeParent(Node@ sourceNode, Node@ targetNode)
+{
+    // Perform the reparenting
+    BeginModify(targetNode.id);
+    BeginModify(sourceNode.id);
+    sourceNode.parent = targetNode;
+    EndModify(sourceNode.id);
+    EndModify(targetNode.id);
+    
+    // Return true if success
+    return sourceNode.parent is targetNode;
 }
 
 void SceneResetPosition()
