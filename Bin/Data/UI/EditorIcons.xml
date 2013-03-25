@@ -1,110 +1,110 @@
 <elements>
     <element type="Scene">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="0 0 16 16" />
+        <attribute name="Image Rect" value="16 0 30 14" />
     </element>
     <element type="Node">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="16 0 32 16" />
+        <attribute name="Image Rect" value="0 0 14 14" />
     </element>
     <element type="AnimatedModel">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 0 48 16" />
+        <attribute name="Image Rect" value="32 16 46 30" />
     </element>
     <element type="AnimationController">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="48 0 64 16" />
+        <attribute name="Image Rect" value="128 0 142 14" />
     </element>
     <element type="BillboardSet">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="64 0 80 16" />
+        <attribute name="Image Rect" value="48 16 62 30" />
     </element>
     <element type="Camera">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="80 0 96 16" />
+        <attribute name="Image Rect" value="176 0 190 14" />
     </element>
     <element type="CollisionShape">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="96 0 112 16" />
+        <attribute name="Image Rect" value="96 0 110 14" />
     </element>
     <element type="Constraint">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="112 0 128 16" />
+        <attribute name="Image Rect" value="112 0 126 14" />
     </element>
     <element type="CustomGeometry">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="0 16 16 32" />
+        <attribute name="Image Rect" value="32 0 46 14" />
     </element>
     <element type="DebugRenderer">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="16 16 32 32" />
+        <attribute name="Image Rect" value="160 0 174 14" />
     </element>
     <element type="DecalSet">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 16 48 32" />
+        <attribute name="Image Rect" value="48 16 62 30" />
     </element>
     <element type="Light">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="48 16 64 32" />
+        <attribute name="Image Rect" value="48 0 62 14" />
     </element>
     <element type="NetworkPriority">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="64 16 80 32" />
+        <attribute name="Image Rect" value="144 0 158 14" />
     </element>
     <element type="Octree">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="80 16 96 32" />
+        <attribute name="Image Rect" value="160 0 174 14" />
     </element>
     <element type="ParticleEmitter">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="96 16 112 32" />
+        <attribute name="Image Rect" value="0 16 14 30" />
     </element>
     <element type="PhysicsWorld">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="112 16 128 32" />
+        <attribute name="Image Rect" value="160 0 174 14" />
     </element>
     <element type="RigidBody">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="0 32 16 48" />
+        <attribute name="Image Rect" value="80 0 94 14" />
     </element>
     <element type="ScriptInstance">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="16 32 32 48" />
+        <attribute name="Image Rect" value="64 0 78 14" />
     </element>
     <element type="Skybox">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 48 48" />
+        <attribute name="Image Rect" value="16 16 30 30" />
     </element>
     <element type="SmoothedTransform">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="48 32 64 48" />
+        <attribute name="Image Rect" value="144 0 158 14" />
     </element>
     <element type="SoundListener">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="64 32 80 48" />
+        <attribute name="Image Rect" value="192 0 206 14" />
     </element>
     <element type="SoundSource">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="80 32 96 48" />
+        <attribute name="Image Rect" value="208 0 222 14" />
     </element>
     <element type="SoundSource3D">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="96 32 112 48" />
+        <attribute name="Image Rect" value="208 0 222 14" />
     </element>
     <element type="StaticModel">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="112 32 128 48" />
+        <attribute name="Image Rect" value="32 0 46 14" />
     </element>
     <element type="Terrain">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="0 48 16 64" />
+        <attribute name="Image Rect" value="224 0 238 14" />
     </element>
     <element type="TerrainPatch">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="16 48 32 64" />
+        <attribute name="Image Rect" value="32 0 46 14" />
     </element>
     <element type="Zone">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 48 48 64" />
+        <attribute name="Image Rect" value="240 0 254 14" />
     </element>
 </elements>
