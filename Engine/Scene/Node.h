@@ -129,9 +129,9 @@ public:
     void Scale(float scale);
     /// Modify scale.
     void Scale(const Vector3& scale);
-    /// Set enabled/disabled state. Components in disabled nodes become effectively disabled regardless of their own enable/disable state.
+    /// Set enabled/disabled state. Components in a disabled node become effectively disabled regardless of their own enable/disable state.
     void SetEnabled(bool enabled);
-    /// Set enabled/disabled state recursively.
+    /// Set enabled/disabled state recursively also to child nodes.
     void SetEnabledRecursive(bool enabled);
     /// Set owner connection for networking.
     void SetOwner(Connection* owner);
