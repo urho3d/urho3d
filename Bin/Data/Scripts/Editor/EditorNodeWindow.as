@@ -60,20 +60,13 @@ void ShowNodeWindow()
     nodeWindow.BringToFront();
 }
 
-void AppendID(String&inout localIds, String&inout ids, Node@ node)
-{
-    if (node.id >= FIRST_LOCAL_ID)
-        localIds += " " + String(node.id - FIRST_LOCAL_ID);
-    else
-        ids += " " + String(node.id);
-}
-
 void UpdateNodeWindow()
 {
     // If a resource pick was in progress, it cannot be completed now, as component was changed
     PickResourceCanceled();
 
     Text@ nodeTitle = nodeWindow.GetChild("NodeTitle", true);
+    String nodeType;
     if (editNodes.length == 0)
         nodeTitle.text = "No node";
     else if (editNode !is null)
@@ -83,10 +76,15 @@ void UpdateNodeWindow()
             idStr = " Local ID " + String(editNode.id - FIRST_LOCAL_ID);
         else
             idStr = " ID " + String(editNode.id);
-        nodeTitle.text = editNode.typeName + idStr;
+        nodeType = editNode.typeName;
+        nodeTitle.text = nodeType + idStr;
     }
     else
-        nodeTitle.text = editNodes[0].typeName + " ID " + STRIKED_OUT + " (" + editNodes.length + "x)";
+    {
+        nodeType = editNodes[0].typeName;
+        nodeTitle.text = nodeType + " ID " + STRIKED_OUT + " (" + editNodes.length + "x)";
+    }
+    IconizeUIElement(nodeTitle, nodeType);
 
     UpdateAttributes(true);
 }
@@ -118,6 +116,9 @@ void UpdateAttributes(bool fullUpdate)
                 componentTitle.text = "No component";
             else
                 componentTitle.text = selectedComponents.length + " components";
+            
+            // Ensure there is no icon
+            IconizeUIElement(componentTitle, "");
         }
         else
         {
@@ -133,6 +134,7 @@ void UpdateAttributes(bool fullUpdate)
                 
                 Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
                 componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents]) + multiplierText;
+                IconizeUIElement(componentTitle, editComponents[j * numEditableComponents].typeName);
                 
                 Array<Serializable@> components;
                 for (uint i = 0; i < numEditableComponents; ++i)

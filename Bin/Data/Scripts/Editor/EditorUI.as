@@ -1,6 +1,7 @@
 // Urho3D editor user interface
 
 XMLFile@ uiStyle;
+XMLFile@ iconStyle;
 UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
@@ -26,6 +27,8 @@ void CreateUI()
 {
     uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
     ui.root.defaultStyle = uiStyle;
+    
+    iconStyle = cache.GetResource("XMLFile", "UI/EditorIcons.xml");
 
     CreateCursor();
     CreateMenuBar();
@@ -572,4 +575,44 @@ void HideUI(bool hide = true)
         if (children[i].type != textType)
             children[i].opacity = opacity;
     }
+}
+
+void IconizeUIElement(UIElement@ element, const String&in iconType)
+{
+    // Check if the icon has been created before
+    BorderImage@ icon = element.GetChild("Icon");
+
+    // If iconType is empty, it is a request to remove the existing icon 
+    if (iconType.empty)
+    {
+        // Remove the icon if it exists
+        if (icon !is null)
+            icon.Remove();
+        
+        // Revert back the indent but only if it is indented by this function
+        if (element.vars["IconIndented"].GetBool())
+            element.indent = 0;
+        
+        return;
+    }
+    
+    // The UI element must itself has been indented to reserve the space for the icon
+    if (element.indent == 0)
+    {
+        element.indent = 1;
+        element.vars["IconIndented"] = true; 
+    }
+
+    // If no icon yet then create one with the correct indent and size in respect to the UI element
+    if (icon is null)
+    {
+        // The icon is placed at one indent level less than the UI element
+        icon = BorderImage("Icon");
+        icon.indent = element.indent - 1;
+        icon.SetFixedSize(element.indentWidth - 2, 14);
+        element.AddChild(icon);
+    }
+
+    // Set the icon type
+    icon.SetStyle(iconStyle, iconType);
 }
