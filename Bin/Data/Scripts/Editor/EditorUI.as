@@ -99,7 +99,7 @@ void CreateCursor()
 void CreateMenuBar()
 {
     uiMenuBar = BorderImage("MenuBar");
-    uiMenuBar.active = true;
+    uiMenuBar.enabled = true;
     uiMenuBar.SetStyle(uiStyle, "EditorMenuBar");
     uiMenuBar.SetLayout(LM_HORIZONTAL);
     uiMenuBar.opacity = uiMaxOpacity;

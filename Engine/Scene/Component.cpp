@@ -77,11 +77,11 @@ bool Component::SaveXML(XMLElement& dest)
     return Serializable::SaveXML(dest);
 }
 
-void Component::SetEnabled(bool enabled)
+void Component::SetEnabled(bool enable)
 {
-    if (enabled != enabled_)
+    if (enable != enabled_)
     {
-        enabled_ = enabled;
+        enabled_ = enable;
         OnSetEnabled();
         
         MarkNetworkUpdate();

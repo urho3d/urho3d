@@ -121,8 +121,7 @@ void InitScene()
         // Add FXAA effect to the renderpath. Clone the default renderpath so that we don't affect it
         RenderPath@ newRenderPath = renderer.viewports[0].renderPath.Clone();
         newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml"));
-        newRenderPath.SetActive("Bloom", false);
-        newRenderPath.SetActive("EdgeFilter", false);
+        newRenderPath.SetEnabled("EdgeFilter", false);
         renderer.viewports[0].renderPath = newRenderPath;
 
         audio.listener = cameraNode.CreateComponent("SoundListener");
@@ -242,7 +241,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             camera.orthographic = !camera.orthographic;
 
         if (input.keyPress['F'])
-            renderer.viewports[0].renderPath.ToggleActive("EdgeFilter");
+            renderer.viewports[0].renderPath.ToggleEnabled("EdgeFilter");
 
         if (input.keyPress['T'])
             debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);

@@ -354,7 +354,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
 
 void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    if (!active_)
+    if (!enabled_)
         return;
     
     using namespace KeyDown;

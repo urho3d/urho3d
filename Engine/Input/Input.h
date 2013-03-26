@@ -174,8 +174,8 @@ public:
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
     /// Return whether the operating system mouse cursor is visible.
     bool IsMouseVisible() const { return mouseVisible_; }
-    /// Return whether application window is active.
-    bool IsActive() { return active_; }
+    /// Return whether application window has input focus.
+    bool HasFocus() { return inputFocus_; }
     /// Return whether application window is minimized.
     bool IsMinimized() const;
     
@@ -184,14 +184,14 @@ private:
     void Initialize();
     /// Setup internal joystick structures.
     void ResetJoysticks();
-    /// Activate the application.
-    void MakeActive();
-    /// Deactivate the application.
-    void MakeInactive();
+    /// Prepare input state for application gaining input focus.
+    void GainFocus();
+    /// Prepare input state for application losing input focus.
+    void LoseFocus();
     /// Clear input state.
     void ResetState();
-    /// Send an activation event. Called when minimized or active status changes.
-    void SendActivationEvent();
+    /// Send an input focus or window minimization change event.
+    void SendInputFocusEvent();
     /// Handle a mouse button change.
     void SetMouseButton(int button, bool newState);
     /// Handle a key change.
@@ -233,12 +233,12 @@ private:
     bool toggleFullscreen_;
     /// Operating system mouse cursor visible flag.
     bool mouseVisible_;
-    /// Active flag.
-    bool active_;
+    /// Input focus flag.
+    bool inputFocus_;
     /// Minimized flag.
     bool minimized_;
-    /// Activated on this frame flag.
-    bool activated_;
+    /// Gained focus on this frame -flag.
+    bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
     /// Initialized flag.

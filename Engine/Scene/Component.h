@@ -61,7 +61,7 @@ public:
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) {};
     
     /// Set enabled/disabled state.
-    void SetEnabled(bool enabled);
+    void SetEnabled(bool enable);
     /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
     

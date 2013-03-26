@@ -304,7 +304,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
-        if (!command.active_)
+        if (!command.enabled_)
             continue;
         
         if (command.type_ == CMD_SCENEPASS)
@@ -330,7 +330,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
-        if (!command.active_)
+        if (!command.enabled_)
             continue;
         
         if (command.type_ == CMD_LIGHTVOLUMES)
@@ -990,7 +990,7 @@ void View::UpdateGeometries()
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
-            if (!command.active_)
+            if (!command.enabled_)
                 continue;
             
             if (command.type_ == CMD_SCENEPASS)
@@ -1158,7 +1158,7 @@ void View::ExecuteRenderPathCommands()
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
-            if (!command.active_)
+            if (!command.enabled_)
                 continue;
             lastCommandIndex = i;
         }
@@ -1166,7 +1166,7 @@ void View::ExecuteRenderPathCommands()
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
-            if (!command.active_)
+            if (!command.enabled_)
                 continue;
             
             // If command writes and reads the target at same time, pingpong automatically
@@ -1449,7 +1449,7 @@ void View::RenderQuad(const RenderPathCommand& command)
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
     {
         const RenderTargetInfo& rtInfo = renderPath_->renderTargets_[i];
-        if (!rtInfo.active_)
+        if (!rtInfo.enabled_)
             continue;
         
         StringHash nameHash(rtInfo.name_);
@@ -1518,7 +1518,7 @@ void View::AllocateScreenBuffers()
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
-        if (!command.active_)
+        if (!command.enabled_)
             continue;
         if (CheckViewportRead(command))
         {
@@ -1542,7 +1542,7 @@ void View::AllocateScreenBuffers()
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
     {
         const RenderTargetInfo& rtInfo = renderPath_->renderTargets_[i];
-        if (!rtInfo.active_)
+        if (!rtInfo.enabled_)
             continue;
         
         unsigned width = rtInfo.size_.x_;

@@ -48,7 +48,7 @@ ScrollView::ScrollView(Context* context) :
     resizeContentWidth_(false)
 {
     clipChildren_ = true;
-    active_ = true;
+    enabled_ = true;
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
     
     horizontalScrollBar_ = CreateChild<ScrollBar>();
@@ -61,7 +61,7 @@ ScrollView::ScrollView(Context* context) :
     verticalScrollBar_->SetOrientation(O_VERTICAL);
     scrollPanel_ = CreateChild<BorderImage>();
     scrollPanel_->SetInternal(true);
-    scrollPanel_->SetActive(true);
+    scrollPanel_->SetEnabled(true);
     scrollPanel_->SetClipChildren(true);
     
     SubscribeToEvent(horizontalScrollBar_, E_SCROLLBARCHANGED, HANDLER(ScrollView, HandleScrollBarChanged));

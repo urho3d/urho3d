@@ -490,8 +490,8 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     // Allow pause only in singleplayer
     if (key == 'P' && singlePlayer && !console.visible && gameOn)
     {
-        gameScene.active = !gameScene.active;
-        if (!gameScene.active)
+        gameScene.updateEnabled = !gameScene.updateEnabled;
+        if (!gameScene.updateEnabled)
             SetMessage("PAUSED");
         else
             SetMessage("");

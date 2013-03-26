@@ -55,8 +55,8 @@ void RenderTargetInfo::LoadParameters(const XMLElement& element)
 {
     name_ = element.GetAttribute("name");
     tag_ = element.GetAttribute("tag");
-    if (element.HasAttribute("active"))
-        active_ = element.GetBool("active");
+    if (element.HasAttribute("enabled"))
+        enabled_ = element.GetBool("enabled");
     
     String formatName = element.GetAttribute("format");
     format_ = Graphics::GetFormat(formatName);
@@ -90,8 +90,8 @@ void RenderPathCommand::LoadParameters(const XMLElement& element)
 {
     type_ = (RenderCommandType)GetStringListIndex(element.GetAttributeLower("type"), commandTypeNames, CMD_NONE);
     tag_ = element.GetAttribute("tag");
-    if (element.HasAttribute("active"))
-        active_ = element.GetBool("active");
+    if (element.HasAttribute("enabled"))
+        enabled_ = element.GetBool("enabled");
     
     switch (type_)
     {
@@ -299,33 +299,33 @@ bool RenderPath::Append(XMLFile* file)
     return true;
 }
 
-void RenderPath::SetActive(const String& tag, bool active)
+void RenderPath::SetEnabled(const String& tag, bool active)
 {
     for (unsigned i = 0; i < renderTargets_.Size(); ++i)
     {
         if (!renderTargets_[i].tag_.Compare(tag, false))
-            renderTargets_[i].active_ = active;
+            renderTargets_[i].enabled_ = active;
     }
     
     for (unsigned i = 0; i < commands_.Size(); ++i)
     {
         if (!commands_[i].tag_.Compare(tag, false))
-            commands_[i].active_ = active;
+            commands_[i].enabled_ = active;
     }
 }
 
-void RenderPath::ToggleActive(const String& tag)
+void RenderPath::ToggleEnabled(const String& tag)
 {
     for (unsigned i = 0; i < renderTargets_.Size(); ++i)
     {
         if (!renderTargets_[i].tag_.Compare(tag, false))
-            renderTargets_[i].active_ = !renderTargets_[i].active_;
+            renderTargets_[i].enabled_ = !renderTargets_[i].enabled_;
     }
     
     for (unsigned i = 0; i < commands_.Size(); ++i)
     {
         if (!commands_[i].tag_.Compare(tag, false))
-            commands_[i].active_ = !commands_[i].active_;
+            commands_[i].enabled_ = !commands_[i].enabled_;
     }
 }
 

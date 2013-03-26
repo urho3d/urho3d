@@ -922,8 +922,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool get_useDerivedOpacity() const", asMETHOD(T, GetUseDerivedOpacity), asCALL_THISCALL);
     if (!isSprite)
     {
-        engine->RegisterObjectMethod(className, "void set_active(bool)", asMETHOD(T, SetActive), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_active() const", asMETHOD(T, IsActive), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "void set_enabled(bool)", asMETHOD(T, SetEnabled), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHOD(T, IsEnabled), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool get_focus() const", asMETHOD(T, HasFocus), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_selected(bool)", asMETHOD(T, SetSelected), asCALL_THISCALL);

@@ -324,8 +324,8 @@ void CreateCamera()
         RenderPath@ newRenderPath = renderer.viewports[0].renderPath.Clone();
         newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/Bloom.xml"));
         newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/EdgeFilter.xml"));
-        newRenderPath.SetActive("Bloom", false);
-        newRenderPath.SetActive("EdgeFilter", false);
+        newRenderPath.SetEnabled("Bloom", false);
+        newRenderPath.SetEnabled("EdgeFilter", false);
         renderer.viewports[0].renderPath = newRenderPath;
 
         audio.listener = cameraNode.CreateComponent("SoundListener");
@@ -444,10 +444,10 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
 
         if (key == 'B')
-            renderer.viewports[0].renderPath.ToggleActive("Bloom");
+            renderer.viewports[0].renderPath.ToggleEnabled("Bloom");
 
         if (key == 'F')
-            renderer.viewports[0].renderPath.ToggleActive("EdgeFilter");
+            renderer.viewports[0].renderPath.ToggleEnabled("EdgeFilter");
 
         if (key == 'O')
             camera.orthographic = !camera.orthographic;

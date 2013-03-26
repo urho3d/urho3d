@@ -67,7 +67,7 @@ public:
     /// Return target rotation in world space.
     Quaternion GetTargetWorldRotation() const;
     /// Return whether smoothing is in progress.
-    bool IsActive() const { return smoothingMask_ != 0; }
+    bool IsInProgress() const { return smoothingMask_ != 0; }
     
 protected:
     /// Handle scene node being assigned at creation.

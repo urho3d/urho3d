@@ -181,7 +181,7 @@ void UI::Update(float timeStep)
         
         // Hover effect
         // If a drag is going on, transmit hover only to the element being dragged, unless it's a drop target
-        if (element)
+        if (element && element->IsEnabled())
         {
             if (!dragElement_ || dragElement_ == element || dragDropTest)
                 element->OnHover(element->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
@@ -220,7 +220,7 @@ void UI::Update(float timeStep)
         {
             TouchState* touch = input->GetTouch(i);
             UIElement* element = GetElementAt(touch->position_);
-            if (element)
+            if (element && element->IsEnabled())
                 element->OnHover(element->ScreenToElement(touch->position_), touch->position_, MOUSEB_LEFT, 0, 0);
         }
     }
@@ -410,16 +410,16 @@ void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
     nonFocusedMouseWheel_ = nonFocusedMouseWheel;
 }
 
-UIElement* UI::GetElementAt(const IntVector2& position, bool activeOnly)
+UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly)
 {
     UIElement* result = 0;
-    GetElementAt(result, rootElement_, position, activeOnly);
+    GetElementAt(result, rootElement_, position, enabledOnly);
     return result;
 }
 
-UIElement* UI::GetElementAt(int x, int y, bool activeOnly)
+UIElement* UI::GetElementAt(int x, int y, bool enabledOnly)
 {
-    return GetElementAt(IntVector2(x, y), activeOnly);
+    return GetElementAt(IntVector2(x, y), enabledOnly);
 }
 
 UIElement* UI::GetFocusElement() const
@@ -436,7 +436,7 @@ UIElement* UI::GetFrontElement() const
     for (unsigned i = 0; i < rootChildren.Size(); ++i)
     {
         // Do not take into account input-disabled elements, hidden elements or those that are always in the front
-        if (!rootChildren[i]->IsActive() || !rootChildren[i]->IsVisible() || !rootChildren[i]->GetBringToBack())
+        if (!rootChildren[i]->IsEnabled() || !rootChildren[i]->IsVisible() || !rootChildren[i]->GetBringToBack())
             continue;
         
         int priority = rootChildren[i]->GetPriority();
@@ -548,7 +548,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     }
 }
 
-void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly)
+void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly)
 {
     if (!current)
         return;
@@ -568,11 +568,11 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
             {
                 // Store the current result, then recurse into its children. Because children
                 // are sorted from lowest to highest priority, the topmost match should remain
-                if (element->IsActive() || !activeOnly)
+                if (element->IsEnabled() || !enabledOnly)
                     result = element;
                 
                 if (hasChildren)
-                    GetElementAt(result, element, position, activeOnly);
+                    GetElementAt(result, element, position, enabledOnly);
                 // Layout optimization: if the element has no children, can break out after the first match
                 else if (parentLayoutMode != LM_FREE)
                     break;
@@ -582,7 +582,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                 if (hasChildren)
                 {
                     if (element->IsInsideCombined(position, true))
-                        GetElementAt(result, element, position, activeOnly);
+                        GetElementAt(result, element, position, enabledOnly);
                 }
                 // Layout optimization: if position is much beyond the visible screen, check how many elements we can skip,
                 // or if we already passed all visible elements
@@ -701,7 +701,7 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
         
         if (dragElement_ && !mouseButtons_)
         {
-            if (dragElement_->IsActive() && dragElement_->IsVisible())
+            if (dragElement_->IsEnabled() && dragElement_->IsVisible())
             {
                 dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, cursor_);
                 
@@ -771,7 +771,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         if (dragElement_ && mouseButtons_)
         {
             IntVector2 pos = cursor_->GetPosition();
-            if (dragElement_->IsActive() && dragElement_->IsVisible())
+            if (dragElement_->IsEnabled() && dragElement_->IsVisible())
                 dragElement_->OnDragMove(dragElement_->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
             else
             {
@@ -871,12 +871,12 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     
     // Transmit hover end to the position where the finger was lifted
     UIElement* element = GetElementAt(pos);
-    if (element)
+    if (element && element->IsEnabled())
         element->OnHover(element->ScreenToElement(pos), pos, 0, 0, 0);
     
     if (dragElement_)
     {
-        if (dragElement_->IsActive() && dragElement_->IsVisible())
+        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
         {
             dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, cursor_);
             
@@ -919,7 +919,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     
     if (dragElement_)
     {
-        if (dragElement_->IsActive() && dragElement_->IsVisible())
+        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
             dragElement_->OnDragMove(dragElement_->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
         else
         {

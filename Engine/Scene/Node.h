@@ -130,9 +130,9 @@ public:
     /// Modify scale.
     void Scale(const Vector3& scale);
     /// Set enabled/disabled state. Components in a disabled node become effectively disabled regardless of their own enable/disable state.
-    void SetEnabled(bool enabled);
+    void SetEnabled(bool enable);
     /// Set enabled/disabled state recursively also to child nodes.
-    void SetEnabledRecursive(bool enabled);
+    void SetEnabledRecursive(bool enable);
     /// Set owner connection for networking.
     void SetOwner(Connection* owner);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.

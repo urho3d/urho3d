@@ -541,7 +541,7 @@ void Engine::ApplyFrameLimit()
     
     int maxFps = maxFps_;
     Input* input = GetSubsystem<Input>();
-    if (input && !input->IsActive())
+    if (input && !input->HasFocus())
         maxFps = Min(maxInactiveFps_, maxFps);
     
     long long elapsed = 0;

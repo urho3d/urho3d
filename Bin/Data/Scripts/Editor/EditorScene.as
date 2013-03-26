@@ -50,7 +50,7 @@ void CreateScene()
     script.defaultScene = editorScene;
     
     // Always pause the scene, and do updates manually
-    editorScene.active = false;
+    editorScene.updateEnabled = false;
 
     // Camera is not bounded to a scene but still need to be created once here
     CreateCamera();
@@ -141,7 +141,7 @@ bool LoadScene(const String&in fileName)
         loaded = editorScene.LoadXML(file);
 
     // Always pause the scene, and do updates manually
-    editorScene.active = false;
+    editorScene.updateEnabled = false;
 
     sceneFileName = fileName;
     sceneModified = false;
@@ -164,7 +164,7 @@ void SaveScene(const String&in fileName)
         return;
 
     // Unpause when saving so that the scene will work properly when loaded outside the editor
-    editorScene.active = true;
+    editorScene.updateEnabled = true;
 
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
@@ -173,7 +173,7 @@ void SaveScene(const String&in fileName)
     else
         editorScene.SaveXML(file);
 
-    editorScene.active = false;
+    editorScene.updateEnabled = false;
 
     sceneFileName = fileName;
     sceneModified = false;

@@ -97,8 +97,8 @@ public:
     Node* InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Clear scene completely of nodes and components.
     void Clear();
-    /// Set active flag. Only active scenes will be updated automatically.
-    void SetActive(bool enable);
+    /// Enable or disable scene update.
+    void SetUpdateEnabled(bool enable);
     /// Set update time scale. 1.0 = real time (default.)
     void SetTimeScale(float scale);
     /// Set elapsed time in seconds. This can be used to prevent inaccuracy in the timer if the scene runs for a long time.
@@ -122,8 +122,8 @@ public:
     Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
-    /// Return active flag.
-    bool IsActive() const { return active_; }
+    /// Return whether updates are enabled.
+    bool IsUpdateEnabled() const { return updateEnabled_; }
     /// Return asynchronous loading flag.
     bool IsAsyncLoading() const { return asyncLoading_; }
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
@@ -236,8 +236,8 @@ private:
     float smoothingConstant_;
     /// Motion smoothing snap threshold.
     float snapThreshold_;
-    /// Active flag.
-    bool active_;
+    /// Update enabled flag.
+    bool updateEnabled_;
     /// Asynchronous loading flag.
     bool asyncLoading_;
     /// Threaded update flag.

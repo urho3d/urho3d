@@ -116,7 +116,7 @@ UIElement::UIElement(Context* context) :
     clipChildren_(false),
     sortChildren_(true),
     useDerivedOpacity_(true),
-    active_(false),
+    enabled_(false),
     selected_(false),
     visible_(true),
     hovering_(false),
@@ -176,7 +176,7 @@ void UIElement::RegisterObject(Context* context)
     ATTRIBUTE(UIElement, VAR_COLOR, "Top Right Color", color_[1], Color::WHITE, AM_FILE);
     ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
     ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Active", IsActive, SetActive, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
@@ -666,9 +666,9 @@ void UIElement::SetUseDerivedOpacity(bool enable)
     useDerivedOpacity_ = enable;
 }
 
-void UIElement::SetActive(bool enable)
+void UIElement::SetEnabled(bool enable)
 {
-    active_ = enable;
+    enabled_ = enable;
 }
 
 void UIElement::SetFocusMode(FocusMode mode)
@@ -929,7 +929,7 @@ void UIElement::BringToFront()
         return;
     
     // Get the highest priority used by all other top level elements, assign that to the new front element
-    // and decrease others' priority where necessary. However, take into account only active (enabled)
+    // and decrease others' priority where necessary. However, take into account only input-enabled
     // elements and those which have the BringToBack flag set
     HashSet<int> usedPriorities;
     
@@ -938,7 +938,7 @@ void UIElement::BringToFront()
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
     {
         UIElement* other = *i;
-        if (other->IsActive() && other->bringToBack_ && other != ptr)
+        if (other->IsEnabled() && other->bringToBack_ && other != ptr)
         {
             int priority = other->GetPriority();
             usedPriorities.Insert(priority);
@@ -959,7 +959,7 @@ void UIElement::BringToFront()
             UIElement* other = *i;
             int priority = other->GetPriority();
             
-            if (other->IsActive() && other->bringToBack_ && other != ptr && priority >= minPriority && priority <= maxPriority)
+            if (other->IsEnabled() && other->bringToBack_ && other != ptr && priority >= minPriority && priority <= maxPriority)
                 other->SetPriority(priority - 1);
         }
     }

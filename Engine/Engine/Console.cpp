@@ -58,7 +58,7 @@ Console::Console(Context* context) :
     background_ = new BorderImage(context_);
     background_->SetBringToBack(false);
     background_->SetClipChildren(true);
-    background_->SetActive(true);
+    background_->SetEnabled(true);
     background_->SetVisible(false); // Hide by default
     background_->SetPriority(200); // Show on top of the debug HUD
     background_->SetLayout(LM_VERTICAL);

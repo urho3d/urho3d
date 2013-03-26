@@ -289,7 +289,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RenderTargetInfo", "uint format", offsetof(RenderTargetInfo, format_));
     engine->RegisterObjectProperty("RenderTargetInfo", "IntVector2 size", offsetof(RenderTargetInfo, size_));
     engine->RegisterObjectProperty("RenderTargetInfo", "RenderTargetSizeMode sizeMode", offsetof(RenderTargetInfo, sizeMode_));
-    engine->RegisterObjectProperty("RenderTargetInfo", "bool active", offsetof(RenderTargetInfo, active_));
+    engine->RegisterObjectProperty("RenderTargetInfo", "bool enabled", offsetof(RenderTargetInfo, enabled_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool filtered", offsetof(RenderTargetInfo, filtered_));
     engine->RegisterObjectProperty("RenderTargetInfo", "bool sRGB", offsetof(RenderTargetInfo, sRGB_));
     
@@ -315,7 +315,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RenderPathCommand", "Color clearColor", offsetof(RenderPathCommand, clearColor_));
     engine->RegisterObjectProperty("RenderPathCommand", "float clearDepth", offsetof(RenderPathCommand, clearDepth_));
     engine->RegisterObjectProperty("RenderPathCommand", "uint clearStencil", offsetof(RenderPathCommand, clearStencil_));
-    engine->RegisterObjectProperty("RenderPathCommand", "bool active", offsetof(RenderPathCommand, active_));
+    engine->RegisterObjectProperty("RenderPathCommand", "bool enabled", offsetof(RenderPathCommand, enabled_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool useFogColor", offsetof(RenderPathCommand, useFogColor_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool markToStencil", offsetof(RenderPathCommand, markToStencil_));
     engine->RegisterObjectProperty("RenderPathCommand", "bool vertexLights", offsetof(RenderPathCommand, vertexLights_));
@@ -329,8 +329,8 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderPath", "RenderPath@ Clone()", asFUNCTION(RenderPathClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("RenderPath", "bool LoadParameters(XMLFile@+)", asMETHOD(RenderPath, LoadParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "bool Append(XMLFile@+)", asMETHOD(RenderPath, Append), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "void SetActive(const String&in, bool)", asMETHOD(RenderPath, SetActive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "void ToggleActive(const String&in)", asMETHOD(RenderPath, ToggleActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void SetEnabled(const String&in, bool)", asMETHOD(RenderPath, SetEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void ToggleEnabled(const String&in)", asMETHOD(RenderPath, ToggleEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "void AddRenderTarget(const RenderTargetInfo&in)", asMETHOD(RenderPath, AddRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(uint)", asMETHODPR(RenderPath, RemoveRenderTarget, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "void RemoveRenderTarget(const String&in)", asMETHODPR(RenderPath, RemoveRenderTarget, (const String&), void), asCALL_THISCALL);
@@ -865,7 +865,7 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
 static void RegisterParticleEmitter(asIScriptEngine* engine)
 {
     RegisterDrawable<ParticleEmitter>(engine, "ParticleEmitter");
-    engine->RegisterObjectMethod("ParticleEmitter", "void SetActive(bool, bool)", asMETHOD(ParticleEmitter, SetActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void SetEmitting(bool, bool)", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_material(Material@+)", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Material@+ get_material() const", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_relative(bool)", asMETHOD(ParticleEmitter, SetRelative), asCALL_THISCALL);
@@ -878,7 +878,7 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "float get_animationLodBias() const", asMETHOD(ParticleEmitter, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool set_parameters(XMLFile@+ file)", asMETHOD(ParticleEmitter, LoadParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "XMLFile@+ get_parameters() const", asMETHOD(ParticleEmitter, GetParameters), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "bool get_active() const", asMETHOD(ParticleEmitter, IsActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "bool get_emitting() const", asMETHOD(ParticleEmitter, IsEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticles() const", asMETHOD(ParticleEmitter, GetNumParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Zone@+ get_zone() const", asMETHOD(ParticleEmitter, GetZone), asCALL_THISCALL);
 }

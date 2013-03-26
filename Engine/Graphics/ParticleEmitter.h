@@ -86,15 +86,15 @@ public:
     
     /// Load emitter parameters from an XML file. Return true if successful.
     bool LoadParameters(XMLFile* file);
-    /// Set emitter active/inactive state and optionally reset active/inactive timer.
-    void SetActive(bool enable, bool resetPeriod = false);
+    /// Set whether should be emitting and optionally reset emission period.
+    void SetEmitting(bool enable, bool resetPeriod = false);
     
     /// Return parameter XML file.
     XMLFile* GetParameters() const { return parameterSource_; }
     /// Return number of particles.
     unsigned GetNumParticles() const { return particles_.Size(); }
-    /// Return whether emitter is active.
-    bool IsActive() const { return active_; }
+    /// Return whether is currently emitting.
+    bool IsEmitting() const { return emitting_; }
     
     /// Set parameter source attribute.
     void SetParameterSourceAttr(ResourceRef value);
@@ -186,8 +186,8 @@ private:
     float sizeAdd_;
     /// Particle size multiplicative parameter.
     float sizeMul_;
-    /// Emitter active/inactive state.
-    bool active_;
+    /// Currently emitting flag.
+    bool emitting_;
     /// Update when invisible flag.
     bool updateInvisible_;
     /// Last scene timestep.

@@ -54,7 +54,7 @@ Slider::Slider(Context* context) :
     dragSlider_(false),
     repeatRate_(0.0f)
 {
-    active_ = true;
+    enabled_ = true;
     knob_ = CreateChild<BorderImage>();
     knob_->SetInternal(true);
     

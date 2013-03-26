@@ -44,7 +44,7 @@ Window::Window(Context* context) :
 {
     bringToFront_ = true;
     clipChildren_ = true;
-    active_ = true;
+    enabled_ = true;
 }
 
 Window::~Window()

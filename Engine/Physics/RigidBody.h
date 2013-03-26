@@ -115,7 +115,7 @@ public:
     void SetCollisionMask(unsigned mask);
     /// Set collision group and mask.
     void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
-    /// Set collision event signaling mode. Default is to signal when active.
+    /// Set collision event signaling mode. Default is to signal when rigid bodies are active.
     void SetCollisionEventMode(CollisionEventMode mode);
     /// Apply force to center of mass.
     void ApplyForce(const Vector3& force);
@@ -182,7 +182,7 @@ public:
     bool IsKinematic() const { return kinematic_; }
     /// Return phantom mode flag.
     bool IsPhantom() const { return phantom_; }
-    /// Return whether rigid body is active.
+    /// Return whether rigid body is active (not sleeping.)
     bool IsActive() const;
     /// Return collision layer.
     unsigned GetCollisionLayer() const { return collisionLayer_; }

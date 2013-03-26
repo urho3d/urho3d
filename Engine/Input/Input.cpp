@@ -74,9 +74,9 @@ Input::Input(Context* context) :
     windowID_(0),
     toggleFullscreen_(true),
     mouseVisible_(false),
-    active_(false),
+    inputFocus_(false),
     minimized_(false),
-    activated_(false),
+    focusedThisFrame_(false),
     suppressNextMouseMove_(false),
     initialized_(false)
 {
@@ -148,21 +148,21 @@ void Input::Update()
     if (window)
     {
         unsigned flags = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
-        if (!active_ && (graphics_->GetFullscreen() || mouseVisible_) && flags == (SDL_WINDOW_INPUT_FOCUS |
+        if (!inputFocus_ && (graphics_->GetFullscreen() || mouseVisible_) && flags == (SDL_WINDOW_INPUT_FOCUS |
             SDL_WINDOW_MOUSE_FOCUS))
-            activated_ = true;
-        else if (active_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
-            MakeInactive();
+            focusedThisFrame_ = true;
+        else if (inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
+            LoseFocus();
         
         // Activate input now if necessary
-        if (activated_)
-            MakeActive();
+        if (focusedThisFrame_)
+            GainFocus();
     }
     else
         return;
     
     // Check for mouse move
-    if (active_)
+    if (inputFocus_)
     {
         IntVector2 mousePosition = GetMousePosition();
         mouseMove_ = mousePosition - lastMousePosition_;
@@ -220,7 +220,7 @@ void Input::SetMouseVisible(bool enable)
                 return;
             }
             
-            if (!mouseVisible_ && active_)
+            if (!mouseVisible_ && inputFocus_)
                 SDL_ShowCursor(SDL_FALSE);
             else
                 SDL_ShowCursor(SDL_TRUE);
@@ -405,8 +405,8 @@ JoystickState* Input::GetJoystick(unsigned index)
 
 bool Input::IsMinimized() const
 {
-    // Return minimized state also when inactive in fullscreen
-    if (!active_ && graphics_ && graphics_->GetFullscreen())
+    // Return minimized state also when unfocused in fullscreen
+    if (!inputFocus_ && graphics_ && graphics_->GetFullscreen())
         return true;
     else
         return minimized_;
@@ -425,7 +425,7 @@ void Input::Initialize()
         mouseVisible_ = true;
     
     // Set the initial activation
-    activated_ = true;
+    focusedThisFrame_ = true;
     initialized_ = true;
     
     {
@@ -452,12 +452,12 @@ void Input::ResetJoysticks()
         joysticks_[i].name_ = SDL_JoystickName(i);
 }
 
-void Input::MakeActive()
+void Input::GainFocus()
 {
     ResetState();
     
-    active_ = true;
-    activated_ = false;
+    inputFocus_ = true;
+    focusedThisFrame_ = false;
     
     // Re-establish mouse cursor hiding as necessary
     if (!mouseVisible_)
@@ -468,20 +468,20 @@ void Input::MakeActive()
     else
         lastMousePosition_ = GetMousePosition();
     
-    SendActivationEvent();
+    SendInputFocusEvent();
 }
 
-void Input::MakeInactive()
+void Input::LoseFocus()
 {
     ResetState();
     
-    active_ = false;
-    activated_ = false;
+    inputFocus_ = false;
+    focusedThisFrame_ = false;
     
     // Show the mouse cursor when inactive
     SDL_ShowCursor(SDL_TRUE);
     
-    SendActivationEvent();
+    SendInputFocusEvent();
 }
 
 void Input::ResetState()
@@ -523,28 +523,28 @@ void Input::ResetState()
     mouseButtonPress_ = 0;
 }
 
-void Input::SendActivationEvent()
+void Input::SendInputFocusEvent()
 {
-    using namespace Activation;
+    using namespace InputFocus;
     
     VariantMap eventData;
-    eventData[P_ACTIVE] = IsActive();
+    eventData[P_FOCUS] = HasFocus();
     eventData[P_MINIMIZED] = IsMinimized();
-    SendEvent(E_ACTIVATION, eventData);
+    SendEvent(E_INPUTFOCUS, eventData);
 }
 
 void Input::SetMouseButton(int button, bool newState)
 {
-    // After deactivation in windowed hidden mouse mode, activate only after a left-click inside the window
+    // After losing focus in windowed hidden mouse mode, regain only after a left-click inside the window
     // This allows glitchfree window dragging on all operating systems
     if (!mouseVisible_ && !graphics_->GetFullscreen())
     {
-        if (!active_ && newState && button == MOUSEB_LEFT)
-            activated_ = true;
+        if (!inputFocus_ && newState && button == MOUSEB_LEFT)
+            focusedThisFrame_ = true;
     }
     
-    // If we are not active yet, do not react to the mouse button down
-    if (newState && !active_)
+    // If we do not have focus yet, do not react to the mouse button down
+    if (newState && !inputFocus_)
         return;
     
     if (newState)
@@ -573,8 +573,8 @@ void Input::SetMouseButton(int button, bool newState)
 
 void Input::SetKey(int key, bool newState)
 {
-    // If we are not active yet, do not react to the key down
-    if (newState && !active_)
+    // If we do not have focus yet, do not react to the key down
+    if (newState && !inputFocus_)
         return;
     
     bool repeat = false;
@@ -611,8 +611,8 @@ void Input::SetKey(int key, bool newState)
 
 void Input::SetMouseWheel(int delta)
 {
-    // If we are not active yet, do not react to the wheel
-    if (!active_)
+    // If we do not have focus yet, do not react to the wheel
+    if (!inputFocus_)
         return;
     
     if (delta)
@@ -855,13 +855,13 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 
             case SDL_WINDOWEVENT_MINIMIZED:
                 input->minimized_ = true;
-                input->SendActivationEvent();
+                input->SendInputFocusEvent();
                 break;
                 
             case SDL_WINDOWEVENT_MAXIMIZED:
             case SDL_WINDOWEVENT_RESTORED:
                 input->minimized_ = false;
-                input->SendActivationEvent();
+                input->SendInputFocusEvent();
             #ifdef IOS
                 // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet.
                 // Apply them now
@@ -920,7 +920,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         lastMousePosition_ = center;
     }
     
-    activated_ = true;
+    focusedThisFrame_ = true;
     
     // After setting a new screen mode we should not be minimized
     minimized_ = (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) != 0;

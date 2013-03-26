@@ -58,7 +58,7 @@ Scene::Scene(Context* context) :
     elapsedTime_(0),
     smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
     snapThreshold_(DEFAULT_SNAP_THRESHOLD),
-    active_(true),
+    updateEnabled_(true),
     asyncLoading_(false),
     threadedUpdate_(false)
 {
@@ -370,9 +370,9 @@ void Scene::Clear()
     localComponentID_ = FIRST_LOCAL_ID;
 }
 
-void Scene::SetActive(bool enable)
+void Scene::SetUpdateEnabled(bool enable)
 {
-    active_ = enable;
+    updateEnabled_ = enable;
 }
 
 void Scene::SetTimeScale(float scale)
@@ -803,7 +803,7 @@ void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
     
-    if (active_)
+    if (updateEnabled_)
         Update(eventData[P_TIMESTEP].GetFloat());
 }
 

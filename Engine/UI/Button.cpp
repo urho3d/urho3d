@@ -42,7 +42,7 @@ Button::Button(Context* context) :
     repeatTimer_(0.0f),
     pressed_(false)
 {
-    active_ = true;
+    enabled_ = true;
 }
 
 Button::~Button()

@@ -51,7 +51,7 @@ LineEdit::LineEdit(Context* context) :
     doubleClickInterval_(500)
 {
     clipChildren_ = true;
-    active_ = true;
+    enabled_ = true;
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
     
     text_ = CreateChild<Text>();

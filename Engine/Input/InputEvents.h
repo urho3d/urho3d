@@ -148,10 +148,10 @@ EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
     PARAM(P_POSITION, Position);            // int
 }
 
-/// Application activation state changed.
-EVENT(E_ACTIVATION, Activation)
+/// Application input focus or minimization changed.
+EVENT(E_INPUTFOCUS, InputFocus)
 {
-    PARAM(P_ACTIVE, Active);                // bool
+    PARAM(P_FOCUS, Focus);                  // bool
     PARAM(P_MINIMIZED, Minimized);          // bool
 }
 

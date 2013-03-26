@@ -433,18 +433,18 @@ void Node::Scale(const Vector3& scale)
     MarkNetworkUpdate();
 }
 
-void Node::SetEnabled(bool enabled)
+void Node::SetEnabled(bool enable)
 {
-    // The enabled state of the whole scene can not be changed. SetActive() is used instead to start/stop updates.
+    // The enabled state of the whole scene can not be changed. SetUpdateEnabled() is used instead to start/stop updates.
     if (GetType() == Scene::GetTypeStatic())
     {
         LOGERROR("Can not change enabled state of the Scene");
         return;
     }
     
-    if (enabled != enabled_)
+    if (enable != enabled_)
     {
-        enabled_ = enabled;
+        enabled_ = enable;
         
         MarkNetworkUpdate();
         
@@ -480,19 +480,19 @@ void Node::SetEnabled(bool enabled)
     }
 }
 
-void Node::SetEnabledRecursive(bool enabled)
+void Node::SetEnabledRecursive(bool enable)
 {
-    // The enabled state of the whole scene can not be changed. SetActive() is used instead to start/stop updates.
+    // The enabled state of the whole scene can not be changed. SetUpdateEnabled() is used instead to start/stop updates.
     if (GetType() == Scene::GetTypeStatic())
     {
         LOGERROR("Can not change enabled state of the Scene");
         return;
     }
     
-    SetEnabled(enabled);
+    SetEnabled(enable);
     
     for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
-        (*i)->SetEnabledRecursive(enabled);
+        (*i)->SetEnabledRecursive(enable);
 }
 
 void Node::SetOwner(Connection* owner)

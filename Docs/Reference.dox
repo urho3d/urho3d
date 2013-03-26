@@ -124,7 +124,7 @@ Because the \ref Object::SendEvent "SendEvent()" function is public, an event ca
 The main loop iteration (also called a frame) is driven by the Engine. In contrast it is the program's (for example Urho3D.exe) responsibility to continuously loop this iteration. The iteration consists of the Engine calling the Time subsystem's \ref Time::BeginFrame "BeginFrame()" and \ref Time::EndFrame "EndFrame()" functions, and in between sending various update events. The event order is:
 
 - E_BEGINFRAME: signals the beginning of the new frame. Input and Network react to this to check for operating system window messages and arrived network packets.
-- E_UPDATE: application-wide logic update event. By default each active Scene reacts to this and triggers the scene update (more on this below.)
+- E_UPDATE: application-wide logic update event. By default each update-enabled Scene reacts to this and triggers the scene update (more on this below.)
 - E_POSTUPDATE: application-wide logic post-update event. The UI subsystem updates its logic here.
 - E_RENDERUPDATE: Renderer updates its viewports here to prepare for rendering, and the UI generates render commands necessary to render the user interface.
 - E_POSTRENDERUPDATE: by default nothing hooks to this. This can be used to implement logic that requires the rendering views to be up-to-date, for example to do accurate raycasts. Scenes may not be modified at this point; especially scene objects may not be deleted or crashes may occur.
@@ -143,15 +143,15 @@ Variable timestep logic updates are preferable to fixed timestep, because they a
 
 \section MainLoop_ApplicationState Main loop and the application activation state
 
-The window's activation state (active or inactive, minimized or not) can be queried from the Input subsystem. It can also effect the main loop in the following ways:
+The window's state (has input focus, minimized or not) can be queried from the Input subsystem. It can also effect the main loop in the following ways:
 
 - Rendering is always skipped when the window is minimized.
 
-- To avoid spinning the CPU and GPU unnecessarily, it is possible to define a smaller maximum FPS when in inactive. See \ref Engine::SetMaxInactiveFps "SetMaxInactiveFps()"
+- To avoid spinning the CPU and GPU unnecessarily, it is possible to define a smaller maximum FPS when no input focus. See \ref Engine::SetMaxInactiveFps "SetMaxInactiveFps()"
 
 - It is also possible to automatically pause update events and audio when the window is minimized. Use \ref Engine::SetPauseMinimized "SetPauseMinimized()" to control this behaviour. By default it is not enabled on desktop, and enabled on mobile devices (Android and iOS.) For singleplayer games this is recommended to avoid unwanted progression while away from the program. However in a multiplayer game this should not be used, as the missing scene updates would likely desync the client with the server.
 
-- On mobile devices the window becoming minimized can mean that it will never become maximized again, in case the OS decides it needs to free memory and kills your program. Therefore you should listen for the E_ACTIVATION event from the Input subsystem and immediately save your program state as applicable if the program becomes inactive/minimized.
+- On mobile devices the window becoming minimized can mean that it will never become maximized again, in case the OS decides it needs to free memory and kills your program. Therefore you should listen for the E_INPUTFOCUS event from the Input subsystem and immediately save your program state as applicable if the program loses input focus or is minimized.
 
 - On mobile devices it is also unsafe to access or create any graphics resources while the window is minimized (as the graphics context may be destroyed during this time); doing so can crash the program. It is recommended to leave the pause-minimized feature on to ensure you do not have to check for this in your update code.
 
@@ -201,7 +201,9 @@ It is also legal to create a Node that does not belong to a scene. This is parti
 
 \section SceneModel_Update Scene updates and serialization
 
-A Scene can be either active or inactive (paused.) Active scenes will be automatically updated on each main loop iteration. See \ref Scene::SetActive "SetActive()".
+A Scene whose updates are enabled (default) will be automatically updated on each main loop iteration. See \ref Scene::SetUpdateEnabled "SetUpdateEnabled()".
+
+Nodes and components can be excluded from the scene update by disabling them, see \ref Node::SetEnabled "SetEnabled()". Disabling for example a drawable component also makes it invisible, a sound source component becomes inaudible etc. If a node is disabled, all of its components are treated as disabled regardless of their own enable/disable state.
 
 Scenes can be loaded and saved in either binary or XML format; see \ref Serialization "Serialization" for details.
 
@@ -311,7 +313,7 @@ When a scene node hierarchy with script objects is instantiated (such as when lo
 
 Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an object method, the ScriptInstance becomes the event receiver on the C++ side, and forwards the events to the script object. If called from a function, the ScriptFile will be the event receiver. Note that object-based event handling only works when the script object in question is attached to a ScriptInstance component, as a C++ side proxy is always needed. If you simply create a new free-standing object in script, it will not be able to subscribe to events.
 
-The script object's active/inactive state can be controlled through the \ref ScriptInstance::SetActive "SetActive()" function. When inactive, the scripted update methods or event handlers will not be called. This can be used to reduce CPU load in a large or densely populated scene.
+The script object's enabled state can be controlled through the \ref ScriptInstance::SetEnabled "SetEnabled()" function. When disabled, the scripted update methods or event handlers will not be called. This can be used to reduce CPU load in a large or densely populated scene.
 
 There are shortcut methods on the script side for creating and accessing a node's script object: node.CreateScriptObject() and node.GetScriptObject(). Alternatively, if the node has only one ScriptInstance, and a specific class is not needed, the node's scriptObject property can also be used. CreateScriptObject() takes the script file name (or alternatively, a ScriptFile object handle) and class name as parameters and creates a ScriptInstance component automatically, then creates the script object. For example:
 
@@ -818,7 +820,7 @@ The available commands are:
 - forwardlights: Render per-pixel forward lighting for opaque objects. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
 
-A render path can be loaded from a main XML file by calling \ref RenderPath::LoadParameters "LoadParameters()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be activated or deactivated by calling \ref RenderPath::SetActive "SetActive()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
+A render path can be loaded from a main XML file by calling \ref RenderPath::LoadParameters "LoadParameters()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be enabled or disabled by calling \ref RenderPath::SetEnabled "SetEnabled()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
 
 It is legal to both write to the destination viewport and sample from it during the same command: pingpong copies of its contents will be made automatically. If the viewport has hardware multisampling on, the multisampled backbuffer will be resolved to a texture before the first command which samples it.
 
@@ -826,9 +828,9 @@ The render path XML definition looks like this:
 
 \code
 <renderpath>
-    <rendertarget name="RTName" tag="TagName" active="true|false" size="x y"|sizedivisor="x y"|rtsizedivisor="x y"
+    <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|rtsizedivisor="x y"
         format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" />
-    <command type="clear" tag="TagName" active="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
+    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" usescissor="true|false" vertexlights="true|false">
         <output index="0" name="RTName1" />
         <output index="1" name="RTName2" />
@@ -1052,7 +1054,7 @@ In script, the polling API is accessed via properties: input.keyDown[], input.ke
 
 To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime. 
 
-From the input subsystem you can also query whether the application is active/inactive, or minimized.
+From the input subsystem you can also query whether the application window has input focus, or is minimized.
 
 
 \page Audio %Audio

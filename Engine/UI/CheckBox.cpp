@@ -38,7 +38,7 @@ CheckBox::CheckBox(Context* context) :
     checkedOffset_(IntVector2::ZERO),
     checked_(false)
 {
-    active_ = true;
+    enabled_ = true;
 }
 
 CheckBox::~CheckBox()

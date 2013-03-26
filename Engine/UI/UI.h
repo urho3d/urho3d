@@ -76,9 +76,9 @@ public:
     /// Return cursor.
     Cursor* GetCursor() const { return cursor_; }
     /// Return UI element at screen coordinates.
-    UIElement* GetElementAt(const IntVector2& position, bool activeOnly = true);
+    UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
     /// Return UI element at screen coordinates.
-    UIElement* GetElementAt(int x, int y, bool activeOnly = true);
+    UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Return focused element.
     UIElement* GetFocusElement() const;
     /// Return topmost enabled root-level element.
@@ -98,7 +98,7 @@ private:
     /// Generate batches from an UI element recursively.
     void GetBatches(UIElement* element, IntRect currentScissor);
     /// Return UI element at screen position recursively.
-    void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly);
+    void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly);
     /// Return the first element in hierarchy that can alter focus.
     UIElement* GetFocusableElement(UIElement* element);
     /// Handle screen mode event.

@@ -48,7 +48,7 @@ ScrollBar::ScrollBar(Context* context) :
     upRect_(IntRect::ZERO),
     downRect_(IntRect::ZERO)
 {
-    active_ = true;
+    enabled_ = true;
     
     backButton_ = CreateChild<Button>();
     backButton_->SetInternal(true);

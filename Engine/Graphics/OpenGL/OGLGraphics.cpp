@@ -444,13 +444,13 @@ bool Graphics::SetMode(int width, int height)
     return SetMode(width, height, fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
-void Graphics::SetSRGB(bool enabled)
+void Graphics::SetSRGB(bool enable)
 {
-    enabled &= sRGBWriteSupport_;
+    enable &= sRGBWriteSupport_;
     
-    if (enabled != sRGB_)
+    if (enable != sRGB_)
     {
-        sRGB_ = enabled;
+        sRGB_ = enable;
         impl_->fboDirty_ = true;
     }
 }

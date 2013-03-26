@@ -56,7 +56,7 @@ public:
     void SetMinFps(int fps);
     /// Set maximum frames per second. The engine will sleep if FPS is higher than this.
     void SetMaxFps(int fps);
-    /// Set maximum frames per second when the application is inactive.
+    /// Set maximum frames per second when the application does not have input focus.
     void SetMaxInactiveFps(int fps);
     /// Set whether to pause update events and audio when minimized.
     void SetPauseMinimized(bool enable);
@@ -73,7 +73,7 @@ public:
     int GetMinFps() const { return minFps_; }
     /// Return the maximum frames per second.
     int GetMaxFps() const { return maxFps_; }
-    /// Return the maximum frames per second when the application is inactive.
+    /// Return the maximum frames per second when the application does not have input focus.
     int GetMaxInactiveFps() const { return maxInactiveFps_; }
     /// Return whether to pause update events and audio when minimized.
     bool GetPauseMinimized() const { return pauseMinimized_; }
@@ -105,7 +105,7 @@ private:
     unsigned minFps_;
     /// Maximum frames per second.
     unsigned maxFps_;
-    /// Maximum frames per second when the application is inactive.
+    /// Maximum frames per second when the application does not have input focus.
     unsigned maxInactiveFps_;
     /// Pause when minimized flag.
     bool pauseMinimized_;

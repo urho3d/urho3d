@@ -313,7 +313,7 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
         return;
 
     // Enable input so that clicking the item can be detected
-    item->SetActive(true);
+    item->SetEnabled(true);
     item->SetSelected(false);
 
     unsigned numItems = contentElement_->GetNumChildren();
@@ -671,7 +671,7 @@ void ListView::SetHierarchyMode(bool enable)
 
     SetContentElement(container);
     container->SetInternal(true);
-    container->SetActive(true);
+    container->SetEnabled(true);
     container->SetLayout(LM_VERTICAL);
     container->SetSortChildren(false);
 }

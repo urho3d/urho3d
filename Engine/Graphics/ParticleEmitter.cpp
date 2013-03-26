@@ -65,7 +65,7 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     rotationSpeedMax_(0.0f),
     sizeAdd_(0.0f),
     sizeMul_(1.0f),
-    active_(true),
+    emitting_(true),
     updateInvisible_(false),
     lastTimeStep_(0.0f),
     lastUpdateFrameNumber_(M_MAX_UNSIGNED)
@@ -84,7 +84,7 @@ void ParticleEmitter::RegisterObject(Context* context)
     
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", GetParameterSourceAttr, SetParameterSourceAttr, ResourceRef, ResourceRef(XMLFile::GetTypeStatic()), AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Active", active_, true, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Emitting", emitting_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
@@ -106,11 +106,11 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     
     // Check active/inactive period switching
     periodTimer_ += lastTimeStep_;
-    if (active_)
+    if (emitting_)
     {
         if (activeTime_ && periodTimer_ >= activeTime_)
         {
-            active_ = false;
+            emitting_ = false;
             periodTimer_ -= activeTime_;
         }
     }
@@ -118,13 +118,13 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     {
         if (inactiveTime_ && periodTimer_ >= inactiveTime_)
         {
-            active_ = true;
+            emitting_ = true;
             periodTimer_ -= inactiveTime_;
         }
     }
     
     // Check for emitting a new particle
-    if (active_)
+    if (emitting_)
     {
         emissionTimer_ += lastTimeStep_;
         if (emissionTimer_ > 0.0f)
@@ -351,11 +351,11 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     return true;
 }
 
-void ParticleEmitter::SetActive(bool enable, bool resetPeriod)
+void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
 {
-    if (enable != active_ || resetPeriod)
+    if (enable != emitting_ || resetPeriod)
     {
-        active_ = enable;
+        emitting_ = enable;
         periodTimer_ = 0.0f;
         MarkNetworkUpdate();
     }

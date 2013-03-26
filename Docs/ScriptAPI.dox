@@ -1439,7 +1439,7 @@ Properties:<br>
 - Quaternion targetRotation
 - Vector3 targetWorldPosition
 - Quaternion targetWorldRotation
-- bool active (readonly)
+- bool inProgress (readonly)
 
 
 Scene
@@ -1538,7 +1538,7 @@ Properties:<br>
 - String name
 - Node@ parent
 - VariantMap vars (readonly)
-- bool active
+- bool updateEnabled
 - float timeScale
 - float elapsedTime
 - float smoothingConstant
@@ -1679,7 +1679,7 @@ Properties:<br>
 - uint format
 - IntVector2 size
 - RenderTargetSizeMode sizeMode
-- bool active
+- bool enabled
 - bool filtered
 - bool sRGB
 
@@ -1702,7 +1702,7 @@ Properties:<br>
 - Color clearColor
 - float clearDepth
 - uint clearStencil
-- bool active
+- bool enabled
 - bool useFogColor
 - bool markToStencil
 - bool vertexLights
@@ -1718,8 +1718,8 @@ Methods:<br>
 - RenderPath@ Clone()
 - bool LoadParameters(XMLFile@)
 - bool Append(XMLFile@)
-- void SetActive(const String&, bool)
-- void ToggleActive(const String&)
+- void SetEnabled(const String&, bool)
+- void ToggleEnabled(const String&)
 - void AddRenderTarget(const RenderTargetInfo&)
 - void RemoveRenderTarget(uint)
 - void RemoveRenderTarget(const String&)
@@ -2494,7 +2494,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- void SetActive(bool, bool)
+- void SetEmitting(bool, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -2527,7 +2527,7 @@ Properties:<br>
 - bool scaled
 - float animationLodBias
 - XMLFile@ parameters
-- bool active (readonly)
+- bool emitting (readonly)
 - uint numParticles (readonly)
 - Zone@ zone (readonly)
 
@@ -2917,7 +2917,7 @@ Properties:<br>
 - uint numJoysticks (readonly)
 - String[] joystickNames (readonly)
 - JoystickState@[] joysticks (readonly)
-- bool active (readonly)
+- bool focus (readonly)
 - bool minimized (readonly)
 
 
@@ -3183,7 +3183,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -3289,7 +3289,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -3487,7 +3487,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -3604,7 +3604,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -3719,7 +3719,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -3833,7 +3833,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -3951,7 +3951,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -4066,7 +4066,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -4197,7 +4197,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -4325,7 +4325,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -4443,7 +4443,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -4571,7 +4571,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -4703,7 +4703,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible
@@ -4829,7 +4829,7 @@ Properties:<br>
 - bool clipChildren
 - bool sortChildren
 - bool useDerivedOpacity
-- bool active
+- bool enabled
 - bool focus
 - bool selected
 - bool visible

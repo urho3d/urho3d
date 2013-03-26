@@ -445,7 +445,7 @@
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="11" />
         <attribute name="Hover Color" value="0.45 0.70 0.45" />
-        <attribute name="Is Active" value="true" />
+        <attribute name="Is Enabled" value="true" />
     </element>
     <element type="FileSelectorTitleLayout">
         <attribute name="Min Size" value="0 16" />
@@ -489,7 +489,7 @@
         <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
         <attribute name="Font Size" value="12" />
         <attribute name="Hover Color" value="0.45 0.70 0.45" />
-        <attribute name="Is Active" value="true" />        
+        <attribute name="Is Enabled" value="true" />
     </element>
     <element type="EditorAttributeEdit">
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />

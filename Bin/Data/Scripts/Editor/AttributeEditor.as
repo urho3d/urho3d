@@ -25,7 +25,7 @@ String sceneResourcePath;
 
 UIElement@ SetEditable(UIElement@ element, bool editable)
 {
-    element.active = editable;
+    element.enabled = editable;
     element.colors[C_TOPLEFT] = editable ? element.colors[C_BOTTOMRIGHT] : nonEditableTextColor;
     element.colors[C_BOTTOMLEFT] = element.colors[C_TOPLEFT];
     element.colors[C_TOPRIGHT] = element.colors[C_TOPLEFT];

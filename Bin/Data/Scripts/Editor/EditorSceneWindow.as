@@ -98,7 +98,7 @@ void EnableExpandCollapseButtons(bool enable)
     for (uint i = 0; i < buttons.length; ++i)
     {
         UIElement@ element = sceneWindow.GetChild(buttons[i], true);
-        element.active = enable;
+        element.enabled = enable;
         element.children[0].color = enable ? normalTextColor : nonEditableTextColor;
     }
 }

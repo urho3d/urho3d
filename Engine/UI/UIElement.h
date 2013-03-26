@@ -224,7 +224,7 @@ public:
     /// Set whether parent elements' opacity affects opacity. Default true.
     void SetUseDerivedOpacity(bool enable);
     /// Set whether reacts to input.
-    void SetActive(bool enable);
+    void SetEnabled(bool enable);
     /// Set whether is focused. Only one element can be focused at a time.
     void SetFocus(bool enable);
     /// Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
@@ -337,7 +337,7 @@ public:
     /// Return whether has focus.
     bool HasFocus() const;
     /// Return whether reacts to input.
-    bool IsActive() const { return active_; }
+    bool IsEnabled() const { return enabled_; }
     /// Return whether is selected. Actual meaning is element dependent.
     bool IsSelected() const { return selected_; }
     /// Return whether is visible.
@@ -445,7 +445,7 @@ protected:
     /// Use derived opacity flag.
     bool useDerivedOpacity_;
     /// Input enabled flag.
-    bool active_;
+    bool enabled_;
     /// Selected flag.
     bool selected_;
     /// Visible flag.

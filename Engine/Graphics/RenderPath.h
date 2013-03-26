@@ -64,7 +64,7 @@ struct RenderTargetInfo
     RenderTargetInfo() :
         size_(IntVector2::ZERO),
         sizeMode_(SIZE_ABSOLUTE),
-        active_(true),
+        enabled_(true),
         filtered_(false),
         sRGB_(false)
     {
@@ -83,8 +83,8 @@ struct RenderTargetInfo
     IntVector2 size_;
     /// Size mode.
     RenderTargetSizeMode sizeMode_;
-    /// Active flag.
-    bool active_;
+    /// Enabled flag.
+    bool enabled_;
     /// Filtering flag.
     bool filtered_;
     /// sRGB sampling/writing mode flag.
@@ -97,7 +97,7 @@ struct RenderPathCommand
     /// Construct.
     RenderPathCommand() :
         clearFlags_(0),
-        active_(true),
+        enabled_(true),
         useFogColor_(false),
         markToStencil_(false),
         useLitBase_(true),
@@ -144,8 +144,8 @@ struct RenderPathCommand
     float clearDepth_;
     /// Clear stencil value.
     unsigned clearStencil_;
-    /// Active flag.
-    bool active_;
+    /// Enabled flag.
+    bool enabled_;
     /// Use fog color for clearing.
     bool useFogColor_;
     /// Mark to stencil flag.
@@ -183,10 +183,10 @@ public:
     bool LoadParameters(XMLFile* file);
     /// Append data from an XML file. Return true if successful.
     bool Append(XMLFile* file);
-    /// Activate/inactivate commands and rendertargets by tag.
-    void SetActive(const String& tag, bool active);
-    /// Toggle activation of commands and rendertargets by tag.
-    void ToggleActive(const String& tag);
+    /// Enable/disable commands and rendertargets by tag.
+    void SetEnabled(const String& tag, bool active);
+    /// Toggle enabled state of commands and rendertargets by tag.
+    void ToggleEnabled(const String& tag);
     /// Assign rendertarget at index.
     void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
     /// Add a rendertarget.

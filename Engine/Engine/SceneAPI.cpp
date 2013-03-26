@@ -150,7 +150,7 @@ static void RegisterSmoothedTransform(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SmoothedTransform", "Vector3 get_targetWorldPosition() const", asMETHOD(SmoothedTransform, GetTargetWorldPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "void set_targetWorldRotation(const Quaternion&in)", asMETHOD(SmoothedTransform, SetTargetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("SmoothedTransform", "Quaternion get_targetWorldRotation() const", asMETHOD(SmoothedTransform, GetTargetWorldRotation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SmoothedTransform", "bool get_active() const", asMETHOD(SmoothedTransform, IsActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SmoothedTransform", "bool get_inProgress() const", asMETHOD(SmoothedTransform, IsInProgress), asCALL_THISCALL);
 }
 
 static void RegisterScene(asIScriptEngine* engine)
@@ -182,8 +182,8 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "Node@+ GetNode(uint)", asMETHOD(Scene, GetNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "const String& GetVarName(ShortStringHash) const", asMETHOD(Scene, GetVarName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_active(bool)", asMETHOD(Scene, SetActive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool get_active() const", asMETHOD(Scene, IsActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_updateEnabled(bool)", asMETHOD(Scene, SetUpdateEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool get_updateEnabled() const", asMETHOD(Scene, IsUpdateEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_timeScale(float)", asMETHOD(Scene, SetTimeScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float get_timeScale() const", asMETHOD(Scene, GetTimeScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_elapsedTime(float)", asMETHOD(Scene, SetElapsedTime), asCALL_THISCALL);
