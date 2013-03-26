@@ -111,7 +111,7 @@ void InitAudio()
 
     if (!nobgm)
     {
-        // Note: the non-positional sound source component does not need to be in the scene
+        // Note: the non-positional sound source component need to be attached to the scene to become effective
         Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
         musicFile.looped = true;
         musicSource = scene.CreateComponent("SoundSource");

@@ -174,21 +174,33 @@ void UpdateNodeWindowIcons()
                 break;
             }
         }
-        if (hasSameEnabledState)
-            SetIconEnabledColor(nodeTitle, editNodes[0].enabled);
+        
+        SetIconEnabledColor(nodeTitle, editNodes[0].enabled, !hasSameEnabledState);
     }
 
     if (!editComponents.empty)
     {
         uint numEditableComponents = editComponents.length / numEditableComponentsPerNode;
-    
+        
         for (uint j = 0; j < numEditableComponentsPerNode; ++j)
         {
             if (j >= componentParentContainer.numChildren)
                 return;
             
             Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
-            SetIconEnabledColor(componentTitle, editComponents[j * numEditableComponents].enabledEffective);
+            
+            bool enabledEffective = editComponents[j * numEditableComponents].enabledEffective;
+            bool hasSameEnabledState = true;
+            for (uint i = 1; i < numEditableComponents; ++i)
+            {
+                if (editComponents[j * numEditableComponents + i].enabledEffective != enabledEffective)
+                {
+                    hasSameEnabledState = false;
+                    break;
+                }
+            }
+            
+            SetIconEnabledColor(componentTitle, enabledEffective, !hasSameEnabledState);
         }
     }
 }

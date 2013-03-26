@@ -618,9 +618,19 @@ void IconizeUIElement(UIElement@ element, const String&in iconType)
     icon.color = Color(1,1,1,1); // Reset to enabled color
 }
 
-void SetIconEnabledColor(UIElement@ element, bool enabled)
+void SetIconEnabledColor(UIElement@ element, bool enabled, bool partial = false)
 {
     BorderImage@ icon = element.GetChild("Icon");
     if (icon !is null)
-        icon.color = enabled ? Color(1,1,1,1) : Color(1,0,0,1);
+    {
+        if (partial)
+        {
+            icon.colors[C_TOPLEFT] = Color(1,1,1,1);
+            icon.colors[C_BOTTOMLEFT] = Color(1,1,1,1);
+            icon.colors[C_TOPRIGHT] = Color(1,0,0,1);
+            icon.colors[C_BOTTOMRIGHT] = Color(1,0,0,1);
+        }
+        else
+            icon.color = enabled ? Color(1,1,1,1) : Color(1,0,0,1);
+    }
 }
