@@ -216,7 +216,7 @@ Component* Component::GetComponent(ShortStringHash type) const
 
 bool Component::IsEnabledEffective() const
 {
-    return node_ ? node_->IsEnabled() && enabled_ : enabled_;
+    return enabled_ && node_ && node_->IsEnabled();
 }
 
 void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const

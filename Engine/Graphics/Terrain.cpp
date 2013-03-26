@@ -640,6 +640,8 @@ void Terrain::CreateGeometry()
 
         patches_.Reserve(numPatches_.x_ * numPatches_.y_);
 
+        bool enabled = IsEnabledEffective();
+
         // Create patches and set node transforms
         for (int z = 0; z < numPatches_.y_; ++z)
         {
@@ -656,8 +658,6 @@ void Terrain::CreateGeometry()
                 TerrainPatch* patch = patchNode->GetOrCreateComponent<TerrainPatch>();
                 patch->SetOwner(this);
                 patch->SetCoordinates(IntVector2(x, z));
-                
-                bool enabled = IsEnabledEffective();
                 
                 // Copy initial drawable parameters
                 patch->SetEnabled(enabled);
