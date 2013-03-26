@@ -74,7 +74,8 @@ RigidBody::RigidBody(Context* context) :
     phantom_(false),
     useGravity_(true),
     hasSmoothedTransform_(false),
-    readdBody_(false)
+    readdBody_(false),
+	inWorld_(false)
 {
     compoundShape_ = new btCompoundShape();
 }
@@ -94,6 +95,7 @@ void RigidBody::RegisterObject(Context* context)
 {
     context->RegisterFactory<RigidBody>();
     
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
@@ -131,10 +133,17 @@ void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 void RigidBody::ApplyAttributes()
 {
     if (readdBody_)
-    {
         AddBodyToWorld();
-        readdBody_ = false;
-    }
+}
+
+void RigidBody::OnSetEnabled()
+{
+	bool enabled = IsEnabledEffective();
+
+	if (enabled && !inWorld_)
+		AddBodyToWorld();
+	else if (!enabled && inWorld_)
+		RemoveBodyFromWorld();
 }
 
 void RigidBody::getWorldTransform(btTransform &worldTrans) const
@@ -752,11 +761,7 @@ void RigidBody::ReleaseBody()
         for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->ReleaseConstraint();
         
-        if (physicsWorld_)
-        {
-            btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-            world->removeRigidBody(body_);
-        }
+		RemoveBodyFromWorld();
         
         delete body_;
         body_ = 0;
@@ -829,9 +834,8 @@ void RigidBody::AddBodyToWorld()
     
     bool massUpdated = false;
     
-    btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     if (body_)
-        world->removeRigidBody(body_);
+        RemoveBodyFromWorld();
     else
     {
         // Correct inertia will be calculated below
@@ -883,8 +887,14 @@ void RigidBody::AddBodyToWorld()
         flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
     body_->setCollisionFlags(flags);
     
+	if (!IsEnabledEffective())
+		return;
+
+    btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     world->addRigidBody(body_, collisionLayer_, collisionMask_);
-    
+    inWorld_ = true;
+	readdBody_ = false;
+
     if (mass_ > 0.0f)
         Activate();
     else
@@ -892,6 +902,16 @@ void RigidBody::AddBodyToWorld()
         SetLinearVelocity(Vector3::ZERO);
         SetAngularVelocity(Vector3::ZERO);
     }
+}
+
+void RigidBody::RemoveBodyFromWorld()
+{
+    if (physicsWorld_ && body_ && inWorld_)
+	{
+		btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+		world->removeRigidBody(body_);
+		inWorld_ = false;
+	}
 }
 
 void RigidBody::HandleTargetPosition(StringHash eventType, VariantMap& eventData)

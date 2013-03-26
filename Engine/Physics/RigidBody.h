@@ -62,7 +62,9 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
-    /// Return initial world transform to Bullet.
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
+	/// Return initial world transform to Bullet.
     virtual void getWorldTransform(btTransform &worldTrans) const;
     /// Update world transform from Bullet.
     virtual void setWorldTransform(const btTransform &worldTrans);
@@ -219,6 +221,8 @@ protected:
 private:
     /// Create the rigid body, or re-add to the physics world with changed flags. Calls UpdateMass().
     void AddBodyToWorld();
+	/// Remove the rigid body from the physics world.
+	void RemoveBodyFromWorld();
     /// Handle SmoothedTransform target position update.
     void HandleTargetPosition(StringHash eventType, VariantMap& eventData);
     /// Handle SmoothedTransform target rotation update.
@@ -258,6 +262,8 @@ private:
     bool hasSmoothedTransform_;
     /// Readd body to world flag.
     bool readdBody_;
+	/// Body exists in world flag.
+	bool inWorld_;
 };
 
 }

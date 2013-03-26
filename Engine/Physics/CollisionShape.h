@@ -128,7 +128,7 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
-        /// Handle enabled/disabled state change.
+    /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);

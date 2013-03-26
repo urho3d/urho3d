@@ -55,8 +55,8 @@ namespace Urho3D
 
 static const float DEFAULT_COLLISION_MARGIN = 0.04f;
 
-static const btVector3 white(1.0f, 1.0f, 1.0f);
-static const btVector3 green(0.0f, 1.0f, 0.0f);
+static const btVector3 WHITE(1.0f, 1.0f, 1.0f);
+static const btVector3 GREEN(0.0f, 1.0f, 0.0f);
 
 static const char* typeNames[] = 
 {
@@ -342,7 +342,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
         world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_, bodyActive ?
-            white : green);
+            WHITE : GREEN);
         
         physicsWorld_->SetDebugRenderer(0);
     }
