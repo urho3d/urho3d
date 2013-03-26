@@ -559,10 +559,10 @@ void PhysicsWorld::SendCollisionEvents()
             
             RigidBody* bodyA = static_cast<RigidBody*>(objectA->getUserPointer());
             RigidBody* bodyB = static_cast<RigidBody*>(objectB->getUserPointer());
-			// If it's not a rigidbody, maybe a ghost object
-			if (!bodyA || !bodyB)
-				continue;
-
+            // If it's not a rigidbody, maybe a ghost object
+            if (!bodyA || !bodyB)
+                continue;
+            
             WeakPtr<RigidBody> bodyWeakA(bodyA);
             WeakPtr<RigidBody> bodyWeakB(bodyB);
             

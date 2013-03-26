@@ -77,6 +77,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateStats(timeStep);
     UpdateScene(timeStep);
     UpdateGizmo();
+    UpdateDirtyUI();
 }
 
 void LoadConfig()

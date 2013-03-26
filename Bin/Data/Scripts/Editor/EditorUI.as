@@ -146,6 +146,7 @@ void CreateMenuBar()
         editPopup.AddChild(CreateMenuItem("Reset position", 0, 0));
         editPopup.AddChild(CreateMenuItem("Reset rotation", 0, 0));
         editPopup.AddChild(CreateMenuItem("Reset scale", 0, 0));
+        editPopup.AddChild(CreateMenuItem("Enable/disable", 'E', QUAL_CTRL));
         editPopup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL));
         editPopup.AddChild(CreateMenuDivider());
         editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
@@ -402,6 +403,8 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
         SceneResetRotation();
     else if (action == "Reset scale")
         SceneResetScale();
+    else if (action == "Enable/disable")
+        SceneToggleEnable();
     else if (action == "Unparent")
         SceneUnparent();
     else if (action == "Select all")
@@ -632,5 +635,15 @@ void SetIconEnabledColor(UIElement@ element, bool enabled, bool partial = false)
         }
         else
             icon.color = enabled ? Color(1,1,1,1) : Color(1,0,0,1);
+    }
+}
+
+void UpdateDirtyUI()
+{
+    // Perform some event-triggered updates latently in case a large hierarchy was changed
+    if (nodeWindowIconsDirty)
+    {
+        UpdateNodeWindowIcons();
+        nodeWindowIconsDirty = false;
     }
 }

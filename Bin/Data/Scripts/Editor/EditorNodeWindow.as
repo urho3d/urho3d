@@ -6,6 +6,7 @@ UIElement@ componentParentContainer;
 XMLFile@ componentXMLResource;
 
 bool applyMaterialList = true;
+bool nodeWindowIconsDirty = false;
 
 const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
 

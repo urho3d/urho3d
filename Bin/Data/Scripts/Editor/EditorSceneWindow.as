@@ -188,13 +188,14 @@ void UpdateSceneWindowNode(Node@ node)
     UpdateSceneWindowNode(GetNodeListIndex(node), node, hierarchyList.items[GetNodeListIndex(node.parent)]);
 }
 
-void UpdateSceneWindowNodeText(Node@ node)
+void UpdateSceneWindowNodeText(Node@ node, bool iconOnly = false)
 {
     uint index = GetNodeListIndex(node);
     Text@ text = hierarchyList.items[index];
     if (text is null)
         return;
-    text.text = GetNodeTitle(node);
+    if (!iconOnly)
+        text.text = GetNodeTitle(node);
     SetIconEnabledColor(text, node.enabled);
 }
 
@@ -761,8 +762,8 @@ void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
         return;
     
     Node@ node = eventData["Node"].GetNode();
-    UpdateSceneWindowNodeText(node);
-    UpdateNodeWindowIcons();
+    UpdateSceneWindowNodeText(node, true);
+    nodeWindowIconsDirty = true;
 }
 
 void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
@@ -772,5 +773,5 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
     
     Component@ component = eventData["Component"].GetComponent();
     UpdateSceneWindowComponentText(component);
-    UpdateNodeWindowIcons();
+    nodeWindowIconsDirty = true;
 }

@@ -75,7 +75,7 @@ RigidBody::RigidBody(Context* context) :
     useGravity_(true),
     hasSmoothedTransform_(false),
     readdBody_(false),
-	inWorld_(false)
+    inWorld_(false)
 {
     compoundShape_ = new btCompoundShape();
 }
@@ -138,12 +138,12 @@ void RigidBody::ApplyAttributes()
 
 void RigidBody::OnSetEnabled()
 {
-	bool enabled = IsEnabledEffective();
-
-	if (enabled && !inWorld_)
-		AddBodyToWorld();
-	else if (!enabled && inWorld_)
-		RemoveBodyFromWorld();
+    bool enabled = IsEnabledEffective();
+    
+    if (enabled && !inWorld_)
+        AddBodyToWorld();
+    else if (!enabled && inWorld_)
+        RemoveBodyFromWorld();
 }
 
 void RigidBody::getWorldTransform(btTransform &worldTrans) const
@@ -761,7 +761,7 @@ void RigidBody::ReleaseBody()
         for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->ReleaseConstraint();
         
-		RemoveBodyFromWorld();
+        RemoveBodyFromWorld();
         
         delete body_;
         body_ = 0;
@@ -887,14 +887,14 @@ void RigidBody::AddBodyToWorld()
         flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
     body_->setCollisionFlags(flags);
     
-	if (!IsEnabledEffective())
-		return;
-
+    if (!IsEnabledEffective())
+        return;
+    
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     world->addRigidBody(body_, collisionLayer_, collisionMask_);
     inWorld_ = true;
-	readdBody_ = false;
-
+    readdBody_ = false;
+    
     if (mass_ > 0.0f)
         Activate();
     else
@@ -907,11 +907,11 @@ void RigidBody::AddBodyToWorld()
 void RigidBody::RemoveBodyFromWorld()
 {
     if (physicsWorld_ && body_ && inWorld_)
-	{
-		btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-		world->removeRigidBody(body_);
-		inWorld_ = false;
-	}
+    {
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        world->removeRigidBody(body_);
+        inWorld_ = false;
+    }
 }
 
 void RigidBody::HandleTargetPosition(StringHash eventType, VariantMap& eventData)

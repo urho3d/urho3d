@@ -459,6 +459,27 @@ void SceneUnparent()
         hierarchyList.AddSelection(GetNodeListIndex(changedNodes[i]));
 }
 
+void SceneToggleEnable()
+{
+    if (!CheckSceneWindowFocus())
+        return;
+
+    // Toggle enabled state of nodes recursively
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        // Do not attempt to disable the Scene
+        if (selectedNodes[i].typeName == "Node")
+            selectedNodes[i].SetEnabled(!selectedNodes[i].enabled, true);
+    }
+    for (uint i = 0; i < selectedComponents.length; ++i)
+    {
+        // Some components purposefully do not expose the Enabled attribute, and it does not affect them in any way
+        // (Octree, PhysicsWorld). Check that the first attribute is in fact called "Is Enabled"
+        if (selectedComponents[i].numAttributes > 0 && selectedComponents[i].attributeInfos[0].name == "Is Enabled")
+            selectedComponents[i].enabled = !selectedComponents[i].enabled;
+    }
+}
+
 bool SceneChangeParent(Node@ sourceNode, Node@ targetNode)
 {
     // Perform the reparenting
