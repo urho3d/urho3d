@@ -96,6 +96,20 @@ void ParticleEmitter::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 }
 
+void ParticleEmitter::OnSetEnabled()
+{
+    BillboardSet::OnSetEnabled();
+    
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        if (IsEnabledEffective())
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
+        else
+            UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
+    }
+}
+
 void ParticleEmitter::Update(const FrameInfo& frame)
 {
     // If there is an amount mismatch between particles and billboards, correct it
@@ -415,7 +429,7 @@ void ParticleEmitter::OnNodeSet(Node* node)
     if (node)
     {
         Scene* scene = GetScene();
-        if (scene)
+        if (scene && IsEnabledEffective())
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
     }
 }
@@ -570,9 +584,6 @@ void ParticleEmitter::GetVector3MinMax(const XMLElement& element, Vector3& minVa
 
 void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!IsEnabledEffective())
-        return;
-    
     // Store scene's timestep and use it instead of global timestep, as time scale may be other than 1
     using namespace ScenePostUpdate;
     

@@ -66,6 +66,18 @@ void AnimationController::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
 }
 
+void AnimationController::OnSetEnabled()
+{
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        if (IsEnabledEffective())
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
+        else
+            UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
+    }
+}
+
 void AnimationController::Update(float timeStep)
 {
     AnimatedModel* model = GetComponent<AnimatedModel>();
@@ -677,8 +689,8 @@ void AnimationController::OnNodeSet(Node* node)
 {
     if (node)
     {
-        Scene* scene = node->GetScene();
-        if (scene)
+        Scene* scene = GetScene();
+        if (scene && IsEnabledEffective())
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
     }
 }
@@ -716,9 +728,6 @@ AnimationState* AnimationController::FindAnimationState(const String& name) cons
 
 void AnimationController::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!IsEnabledEffective())
-        return;
-    
     using namespace ScenePostUpdate;
     
     Update(eventData[P_TIMESTEP].GetFloat());

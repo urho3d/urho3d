@@ -87,6 +87,9 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
+    
     /// Update the animations. Is called from HandleScenePostUpdate().
     void Update(float timeStep);
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success.

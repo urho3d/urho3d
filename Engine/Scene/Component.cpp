@@ -83,7 +83,6 @@ void Component::SetEnabled(bool enable)
     {
         enabled_ = enable;
         OnSetEnabled();
-        
         MarkNetworkUpdate();
         
         // Send change event for the component
