@@ -70,9 +70,9 @@ void Start()
     if (runServer || runClient)
         singlePlayer = false;
 
-    InitAudio();
     InitConsole();
     InitScene();
+    InitAudio();
     InitNetworking();
     CreateCamera();
     CreateOverlays();
@@ -114,7 +114,7 @@ void InitAudio()
         // Note: the non-positional sound source component does not need to be in the scene
         Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
         musicFile.looped = true;
-        musicSource = SoundSource();
+        musicSource = scene.CreateComponent("SoundSource");
         musicSource.Play(musicFile);
     }
 }
