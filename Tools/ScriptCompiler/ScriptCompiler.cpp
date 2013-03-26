@@ -126,7 +126,7 @@ void CompileScript(Context* context, const String& fileName)
     
     ScriptFile script(context);
     if (!script.Load(inFile))
-        ErrorExit("Failed to compile script file " + fileName + ": " + context->GetSubsystem<Log>()->GetLastMessage());
+        ErrorExit();
     
     String outFileName = ReplaceExtension(fileName, ".asc");
     File outFile(context, outFileName, FILE_WRITE);

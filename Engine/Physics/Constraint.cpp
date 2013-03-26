@@ -44,7 +44,6 @@ namespace Urho3D
 
 static const char* typeNames[] =
 {
-    "None",
     "Point",
     "Hinge",
     "Slider",
@@ -57,7 +56,7 @@ OBJECTTYPESTATIC(Constraint);
 Constraint::Constraint(Context* context) :
     Component(context),
     constraint_(0),
-    constraintType_(CONSTRAINT_NONE),
+    constraintType_(CONSTRAINT_POINT),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     otherPosition_(Vector3::ZERO),
@@ -66,7 +65,7 @@ Constraint::Constraint(Context* context) :
     lowLimit_(Vector2::ZERO),
     otherBodyNodeID_(0),
     disableCollision_(false),
-    recreateConstraint_(false),
+    recreateConstraint_(true),
     framesDirty_(false)
 {
 }
@@ -84,7 +83,7 @@ void Constraint::RegisterObject(Context* context)
     context->RegisterFactory<Constraint>();
     
     ACCESSOR_ATTRIBUTE(Constraint, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, typeNames, CONSTRAINT_NONE, AM_DEFAULT);
+    ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Position", otherPosition_, Vector3::ZERO, AM_DEFAULT);
@@ -138,8 +137,6 @@ void Constraint::ApplyAttributes()
         }
         
         CreateConstraint();
-        recreateConstraint_ = false;
-        framesDirty_ = false;
     }
     else if (framesDirty_)
     {
@@ -162,18 +159,13 @@ void Constraint::GetDependencyNodes(PODVector<Node*>& dest)
 
 void Constraint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug && physicsWorld_ && constraint_)
+    if (debug && physicsWorld_ && constraint_ && IsEnabledEffective())
     {
         physicsWorld_->SetDebugRenderer(debug);
         physicsWorld_->SetDebugDepthTest(depthTest);
         physicsWorld_->GetWorld()->debugDrawConstraint(constraint_);
         physicsWorld_->SetDebugRenderer(0);
     }
-}
-
-void Constraint::Clear()
-{
-    SetConstraintType(CONSTRAINT_NONE);
 }
 
 void Constraint::SetConstraintType(ConstraintType type)
@@ -464,6 +456,9 @@ void Constraint::CreateConstraint()
         
         physicsWorld_->GetWorld()->addConstraint(constraint_, disableCollision_);
     }
+    
+    recreateConstraint_ = false;
+    framesDirty_ = false;
 }
 
 void Constraint::ApplyFrames()

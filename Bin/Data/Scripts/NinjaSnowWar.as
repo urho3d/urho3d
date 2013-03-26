@@ -28,6 +28,7 @@ const float spawnAreaSize = 500;
 
 Scene@ gameScene;
 Node@ gameCameraNode;
+Node@ musicNode;
 Camera@ gameCamera;
 Text@ scoreText;
 Text@ hiscoreText;
@@ -111,10 +112,13 @@ void InitAudio()
 
     if (!nobgm)
     {
-        // Note: the non-positional sound source component need to be attached to the scene to become effective
         Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
         musicFile.looped = true;
-        musicSource = scene.CreateComponent("SoundSource");
+        
+        // Note: the non-positional sound source component need to be attached to a scene node to become effective
+        // Due to networked mode clearing the scene on connect, do not attach to the scene itself
+        musicNode = Node();
+        musicSource = musicNode.CreateComponent("SoundSource");
         musicSource.Play(musicFile);
     }
 }

@@ -33,8 +33,7 @@ namespace Urho3D
 /// Supported constraint types.
 enum ConstraintType
 {
-    CONSTRAINT_NONE = 0,
-    CONSTRAINT_POINT,
+    CONSTRAINT_POINT = 0,
     CONSTRAINT_HINGE,
     CONSTRAINT_SLIDER,
     CONSTRAINT_CONETWIST
@@ -69,8 +68,6 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// Remove constraint.
-    void Clear();
     /// Set constraint type and recreate the constraint.
     void SetConstraintType(ConstraintType type);
     /// Set other body to connect to. Set to null to connect to the static world.

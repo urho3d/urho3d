@@ -225,7 +225,7 @@ void Light::UpdateBatches(const FrameInfo& frame)
 
 void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug)
+    if (debug && IsEnabledEffective())
     {
         switch (lightType_)
         {

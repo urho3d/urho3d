@@ -130,7 +130,9 @@ void ErrorDialog(const String& title, const String& message)
 
 void ErrorExit(const String& message, int exitCode)
 {
-    PrintLine(message, true);
+    if (!message.Empty())
+        PrintLine(message, true);
+    
     exit(exitCode);
 }
 

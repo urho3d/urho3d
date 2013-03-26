@@ -6,11 +6,11 @@ Node@ cameraNode;
 
 float yaw = 0.0;
 float pitch = 0.0;
-int modelIndex = 0;
-int maxLights = 100;
-int maxObjects = 100;
-int numLights = 0;
-int numObjects = 1;
+uint modelIndex = 0;
+uint maxLights = 100;
+uint maxObjects = 100;
+uint numLights = 0;
+uint numObjects = 1;
 
 Array<String> modelNames = {"Models/Box.mdl", "Models/Mushroom.mdl", "Models/Jack.mdl"};
 Array<String> materialNames = {"Materials/Stone.xml", "Materials/Mushroom.xml", "Materials/Jack.xml"};
@@ -73,7 +73,7 @@ void InitScene()
     zone.fogEnd = 300.0;
     zone.boundingBox = BoundingBox(-1000.0, 1000.0);
 
-    for (int i = 0; i < maxObjects; ++i)
+    for (uint i = 0; i < maxObjects; ++i)
     {
         Node@ objectNode = testScene.CreateChild("Object");
         if (i >= 1)
@@ -84,7 +84,7 @@ void InitScene()
         objects.Push(object);
     }
     
-    for (int i = 0; i < maxLights; ++i)
+    for (uint i = 0; i < maxLights; ++i)
     {
         Node@ lightNode = testScene.CreateChild("Light");
         Light@ light = lightNode.CreateComponent("Light");
@@ -248,9 +248,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
         if (input.keyPress['Z'])
         {
-            --modelIndex;
-            if (modelIndex < 0)
-                modelIndex = 0;
+            if (modelIndex > 0)
+                --modelIndex;
             LoadNewModel();
         }
 

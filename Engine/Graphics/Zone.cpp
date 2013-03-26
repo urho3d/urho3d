@@ -100,7 +100,7 @@ void Zone::OnSetEnabled()
 
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug)
+    if (debug && IsEnabledEffective())
         debug->AddBoundingBox(boundingBox_, node_->GetWorldTransform(), Color::GREEN, depthTest);
 }
 

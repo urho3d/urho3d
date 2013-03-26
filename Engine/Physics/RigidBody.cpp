@@ -193,7 +193,7 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
 
 void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug && physicsWorld_ && body_)
+    if (debug && physicsWorld_ && body_ && IsEnabledEffective())
     {
         physicsWorld_->SetDebugRenderer(debug);
         physicsWorld_->SetDebugDepthTest(depthTest);

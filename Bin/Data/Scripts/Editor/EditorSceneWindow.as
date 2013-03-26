@@ -671,8 +671,13 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
     // For now, make a local node's all components local
     /// \todo Allow to specify the createmode
     Component@ newComponent = editNode.CreateComponent(text.text, editNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
-
-    FocusComponent(newComponent);
+    if (newComponent !is null)
+    {
+        // Some components such as CollisionShape do not create their internal object before the first call to ApplyAttributes()
+        // to prevent unnecessary initialization with default values. Call now
+        newComponent.ApplyAttributes();
+        FocusComponent(newComponent);
+    }
 }
 
 void CreateBuiltinObject(const String& name)

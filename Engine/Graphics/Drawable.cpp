@@ -152,7 +152,7 @@ Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
 
 void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug)
+    if (debug && IsEnabledEffective())
         debug->AddBoundingBox(GetWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
 }
 

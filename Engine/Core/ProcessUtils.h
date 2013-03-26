@@ -36,7 +36,7 @@ void InitFPU();
 /// Display an error dialog with the specified title and message.
 void ErrorDialog(const String& title, const String& message);
 /// Exit the application with an error message to the console.
-void ErrorExit(const String& message, int exitCode = EXIT_FAILURE);
+void ErrorExit(const String& message = String::EMPTY, int exitCode = EXIT_FAILURE);
 /// Open a console window.
 void OpenConsoleWindow();
 /// Print Unicode text to the console. Will not be printed to the MSVC output window.

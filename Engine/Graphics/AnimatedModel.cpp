@@ -271,7 +271,7 @@ UpdateGeometryType AnimatedModel::GetUpdateGeometryType()
 
 void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug)
+    if (debug && IsEnabledEffective())
     {
         debug->AddBoundingBox(GetWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
         debug->AddSkeleton(skeleton_, Color(0.75f, 0.75f, 0.75f), depthTest);

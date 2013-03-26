@@ -60,7 +60,6 @@ static const btVector3 GREEN(0.0f, 1.0f, 0.0f);
 
 static const char* typeNames[] = 
 {
-    "None",
     "Box",
     "Sphere",
     "StaticPlane",
@@ -253,14 +252,14 @@ OBJECTTYPESTATIC(CollisionShape);
 CollisionShape::CollisionShape(Context* context) :
     Component(context),
     shape_(0),
-    shapeType_(SHAPE_NONE),
+    shapeType_(SHAPE_BOX),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     size_(Vector3::ONE),
     cachedWorldScale_(Vector3::ONE),
     lodLevel_(0),
     margin_(DEFAULT_COLLISION_MARGIN),
-    recreateShape_(false)
+    recreateShape_(true)
 {
 }
 
@@ -277,7 +276,7 @@ void CollisionShape::RegisterObject(Context* context)
     context->RegisterFactory<CollisionShape>();
     
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_NONE, AM_DEFAULT);
+    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_BOX, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
@@ -301,7 +300,6 @@ void CollisionShape::ApplyAttributes()
     {
         UpdateShape();
         NotifyRigidBody();
-        recreateShape_ = false;
     }
 }
 
@@ -312,7 +310,7 @@ void CollisionShape::OnSetEnabled()
 
 void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (debug && physicsWorld_ && shape_ && node_)
+    if (debug && physicsWorld_ && shape_ && node_ && IsEnabledEffective())
     {
         physicsWorld_->SetDebugRenderer(debug);
         physicsWorld_->SetDebugDepthTest(depthTest);
@@ -346,15 +344,6 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         
         physicsWorld_->SetDebugRenderer(0);
     }
-}
-
-void CollisionShape::Clear()
-{
-    shapeType_ = SHAPE_NONE;
-    
-    UpdateShape();
-    NotifyRigidBody();
-    MarkNetworkUpdate();
 }
 
 void CollisionShape::SetBox(const Vector3& size, const Vector3& position, const Quaternion& rotation)
@@ -834,6 +823,8 @@ void CollisionShape::UpdateShape()
     
     if (physicsWorld_)
         physicsWorld_->CleanupGeometryCache();
+    
+    recreateShape_ = false;
 }
 
 void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& eventData)
