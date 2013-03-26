@@ -55,6 +55,9 @@ namespace Urho3D
 
 static const float DEFAULT_COLLISION_MARGIN = 0.04f;
 
+static const btVector3 white(1.0f, 1.0f, 1.0f);
+static const btVector3 green(0.0f, 1.0f, 0.0f);
+
 static const char* typeNames[] = 
 {
     "None",
@@ -273,6 +276,7 @@ void CollisionShape::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionShape>();
     
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_NONE, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
@@ -301,6 +305,11 @@ void CollisionShape::ApplyAttributes()
     }
 }
 
+void CollisionShape::OnSetEnabled()
+{
+    NotifyRigidBody();
+}
+
 void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (debug && physicsWorld_ && shape_ && node_)
@@ -311,8 +320,12 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         // Use the rigid body's world transform if possible, as it may be different from the rendering transform
         Matrix3x4 worldTransform;
         RigidBody* body = GetComponent<RigidBody>();
+        bool bodyActive = false;
         if (body)
+        {
             worldTransform = Matrix3x4(body->GetPosition(), body->GetRotation(), node_->GetWorldScale());
+            bodyActive = body->IsActive();
+        }
         else
             worldTransform = node_->GetWorldTransform();
         
@@ -328,8 +341,8 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         Quaternion worldRotation = worldTransform.Rotation() * rotation_;
         
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_, btVector3(0.0f,
-            1.0f, 0.0f));
+        world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_, bodyActive ?
+            white : green);
         
         physicsWorld_->SetDebugRenderer(0);
     }
@@ -567,19 +580,22 @@ void CollisionShape::NotifyRigidBody()
         // Remove the shape first to ensure it is not added twice
         compound->removeChildShape(shape_);
         
-        // Then add with updated offset
-        Vector3 position = position_;
-        // For terrains, undo the height centering performed automatically by Bullet
-        if (shapeType_ == SHAPE_TERRAIN && geometry_)
+        if (IsEnabledEffective())
         {
-            HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
-            position.y_ += (heightfield->minHeight_ + heightfield->maxHeight_) * 0.5f;
+            // Then add with updated offset
+            Vector3 position = position_;
+            // For terrains, undo the height centering performed automatically by Bullet
+            if (shapeType_ == SHAPE_TERRAIN && geometry_)
+            {
+                HeightfieldData* heightfield = static_cast<HeightfieldData*>(geometry_.Get());
+                position.y_ += (heightfield->minHeight_ + heightfield->maxHeight_) * 0.5f;
+            }
+            
+            btTransform offset;
+            offset.setOrigin(ToBtVector3(node_->GetWorldScale() * position));
+            offset.setRotation(ToBtQuaternion(rotation_));
+            compound->addChildShape(offset, shape_);
         }
-        
-        btTransform offset;
-        offset.setOrigin(ToBtVector3(node_->GetWorldScale() * position));
-        offset.setRotation(ToBtQuaternion(rotation_));
-        compound->addChildShape(offset, shape_);
         
         // Finally tell the rigid body to update its mass
         rigidBody_->UpdateMass();
@@ -677,7 +693,7 @@ void CollisionShape::OnMarkedDirty(Node* node)
                     newWorldScale * size_));
             }
             break;
-        
+            
         default:
             break;
         }
@@ -720,11 +736,9 @@ void CollisionShape::UpdateShape()
             shape_ = new btSphereShape(size_.x_ * 0.5f);
             shape_->setLocalScaling(ToBtVector3(newWorldScale));
             break;
-
+            
         case SHAPE_STATICPLANE:
-            /// \todo: plane normal is always hard coded
-            shape_ = new btStaticPlaneShape(btVector3(0,1,0), size_.y_);
-            shape_->setLocalScaling(ToBtVector3(newWorldScale));
+            shape_ = new btStaticPlaneShape(btVector3(0.0f, 1.0f, 0.0f), 0.0f);
             break;
             
         case SHAPE_CYLINDER:

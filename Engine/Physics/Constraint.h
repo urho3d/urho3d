@@ -62,6 +62,8 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
     /// Return the depended on nodes to order network updates.
     virtual void GetDependencyNodes(PODVector<Node*>& dest);
     /// Visualize the component as debug geometry.
