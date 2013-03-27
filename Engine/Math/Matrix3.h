@@ -95,6 +95,24 @@ public:
         return *this;
     }
     
+    /// Test for equality with another matrix without epsilon.
+    bool operator == (const Matrix3& rhs) const
+    {
+        const float* leftData = Data();
+        const float* rightData = rhs.Data();
+        
+        for (unsigned i = 0; i < 9; ++i)
+        {
+            if (leftData[i] != rightData[i])
+                return false;
+        }
+        
+        return true;
+    }
+    
+    /// Test for inequality with another matrix without epsilon.
+    bool operator != (const Matrix3& rhs) const { return !(*this == rhs); }
+    
     /// Multiply a Vector3.
     Vector3 operator * (const Vector3& rhs) const
     {
@@ -225,6 +243,21 @@ public:
             m21_ * scale.y_,
             m22_ * scale.z_
         );
+    }
+    
+    /// Test for equality with another matrix with epsilon.
+    bool Equals(const Matrix3& rhs) const
+    {
+        const float* leftData = Data();
+        const float* rightData = rhs.Data();
+        
+        for (unsigned i = 0; i < 9; ++i)
+        {
+            if (!Urho3D::Equals(leftData[i], rightData[i]))
+                return false;
+        }
+        
+        return true;
     }
     
     /// Return inverse.

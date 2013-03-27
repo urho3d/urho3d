@@ -434,6 +434,7 @@ Methods:<br>
 - void SetScale(float)
 - Matrix3 Transpose() const
 - Matrix3 Inverse() const
+- bool Equals(const Matrix3&) const
 
 Properties:<br>
 - float m00
@@ -462,6 +463,7 @@ Methods:<br>
 - Matrix4 Transpose() const
 - void Decompose(Vector3&, Quaternion&, Vector3&) const
 - Matrix4 Inverse() const
+- bool Equals(const Matrix4&) const
 
 Properties:<br>
 - float m00
@@ -496,6 +498,7 @@ Methods:<br>
 - Vector3 Translation() const
 - void Decompose(Vector3&, Quaternion&, Vector3&) const
 - Matrix3x4 Inverse() const
+- bool Equals(const Matrix3x4&) const
 
 Properties:<br>
 - float m00

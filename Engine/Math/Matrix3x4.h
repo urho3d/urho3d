@@ -182,6 +182,24 @@ public:
         return *this;
     }
     
+    /// Test for equality with another matrix without epsilon.
+    bool operator == (const Matrix3x4& rhs) const
+    {
+        const float* leftData = Data();
+        const float* rightData = rhs.Data();
+        
+        for (unsigned i = 0; i < 12; ++i)
+        {
+            if (leftData[i] != rightData[i])
+                return false;
+        }
+        
+        return true;
+    }
+    
+    /// Test for inequality with another matrix without epsilon.
+    bool operator != (const Matrix3x4& rhs) const { return !(*this == rhs); }
+    
     /// Multiply a Vector3 which is assumed to represent position.
     Vector3 operator * (const Vector3& rhs) const
     {
@@ -388,6 +406,21 @@ public:
             sqrtf(m01_ * m01_ + m11_ * m11_ + m21_ * m21_),
             sqrtf(m02_ * m02_ + m12_ * m12_ + m22_ * m22_)
         );
+    }
+    
+    /// Test for equality with another matrix with epsilon.
+    bool Equals(const Matrix3x4& rhs) const
+    {
+        const float* leftData = Data();
+        const float* rightData = rhs.Data();
+        
+        for (unsigned i = 0; i < 12; ++i)
+        {
+            if (!Urho3D::Equals(leftData[i], rightData[i]))
+                return false;
+        }
+        
+        return true;
     }
     
     /// Return decomposition to translation, rotation and scale.

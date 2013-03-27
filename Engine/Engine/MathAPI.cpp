@@ -503,12 +503,14 @@ static void RegisterMatrix3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix3", "Matrix3 opAdd(const Matrix3&in) const", asMETHODPR(Matrix3, operator +, (const Matrix3 &) const, Matrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "Matrix3 opSub(const Matrix3&in) const", asMETHODPR(Matrix3, operator -, (const Matrix3 &) const, Matrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "Matrix3& opAssign(const Matrix3&in)", asMETHODPR(Matrix3, operator =, (const Matrix3 &), Matrix3&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "bool opEquals(const Matrix3&in) const", asMETHOD(Matrix3, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "Vector3 Scale() const", asMETHODPR(Matrix3, Scale, () const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "Matrix3 Scaled(const Vector3&in) const", asMETHODPR(Matrix3, Scaled, (const Vector3 &) const, Matrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "void SetScale(const Vector3&in)", asMETHODPR(Matrix3,SetScale, (const Vector3 &), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "void SetScale(float)", asMETHODPR(Matrix3,SetScale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "Matrix3 Transpose() const", asMETHODPR(Matrix3, Transpose, () const, Matrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3", "Matrix3 Inverse() const", asMETHODPR(Matrix3, Inverse, () const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3", "bool Equals(const Matrix3&in) const", asMETHOD(Matrix3, Equals), asCALL_THISCALL);
     engine->RegisterObjectProperty("Matrix3", "float m00", offsetof(Matrix3, m00_));
     engine->RegisterObjectProperty("Matrix3", "float m01", offsetof(Matrix3, m01_));
     engine->RegisterObjectProperty("Matrix3", "float m02", offsetof(Matrix3, m02_));
@@ -555,6 +557,7 @@ static void RegisterMatrix4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix4", "Matrix4 opSub(const Matrix4&) const", asMETHODPR(Matrix4, operator -, (const Matrix4&) const, Matrix4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "Matrix4& opAssign(const Matrix3&)", asMETHODPR(Matrix4, operator =, (const Matrix3&), Matrix4&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "Matrix4& opAssign(const Matrix4&)", asMETHODPR(Matrix4, operator =, (const Matrix4&), Matrix4&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "bool opEquals(const Matrix4&in) const", asMETHOD(Matrix4, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "Quaternion Rotation() const", asMETHODPR(Matrix4, Rotation, () const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "Matrix3 RotationMatrix() const", asMETHODPR(Matrix4, RotationMatrix, () const, Matrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "Vector3 Scale() const", asMETHODPR(Matrix4, Scale, () const, Vector3), asCALL_THISCALL);
@@ -567,6 +570,7 @@ static void RegisterMatrix4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix4", "Matrix4 Transpose() const", asMETHODPR(Matrix4, Transpose, () const, Matrix4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "void Decompose(Vector3&, Quaternion&, Vector3&) const", asMETHODPR(Matrix4,Decompose, (Vector3 &, Quaternion &, Vector3 &) const, void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix4", "Matrix4 Inverse() const", asMETHODPR(Matrix4, Inverse, () const, Matrix4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix4", "bool Equals(const Matrix4&in) const", asMETHOD(Matrix4, Equals), asCALL_THISCALL);
     engine->RegisterObjectProperty("Matrix4", "float m00", offsetof(Matrix4, m00_));
     engine->RegisterObjectProperty("Matrix4", "float m01", offsetof(Matrix4, m01_));
     engine->RegisterObjectProperty("Matrix4", "float m02", offsetof(Matrix4, m02_));
@@ -640,6 +644,7 @@ static void RegisterMatrix3x4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4& opAssign(const Matrix3&in)", asMETHODPR(Matrix3x4, operator =, (const Matrix3&), Matrix3x4&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4& opAssign(const Matrix3x4&in)", asMETHODPR(Matrix3x4, operator =, (const Matrix3x4&), Matrix3x4&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4& opAssign(const Matrix4&in)", asMETHODPR(Matrix3x4, operator =, (const Matrix4&), Matrix3x4&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "bool opEquals(const Matrix3x4&in) const", asMETHOD(Matrix3x4, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Quaternion Rotation() const", asMETHODPR(Matrix3x4, Rotation, () const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3 RotationMatrix() const", asMETHODPR(Matrix3x4, RotationMatrix, () const, Matrix3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Vector3 Scale() const", asMETHODPR(Matrix3x4, Scale, () const, Vector3), asCALL_THISCALL);
@@ -651,6 +656,7 @@ static void RegisterMatrix3x4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix3x4", "Vector3 Translation() const", asMETHODPR(Matrix3x4, Translation, () const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "void Decompose(Vector3&, Quaternion&, Vector3&) const", asMETHODPR(Matrix3x4, Decompose, (Vector3&, Quaternion&, Vector3&) const, void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 Inverse() const", asMETHODPR(Matrix3x4, Inverse, () const, Matrix3x4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "bool Equals(const Matrix3x4&in) const", asMETHOD(Matrix3x4, Equals), asCALL_THISCALL);
     engine->RegisterObjectProperty("Matrix3x4", "float m00", offsetof(Matrix3x4, m00_));
     engine->RegisterObjectProperty("Matrix3x4", "float m01", offsetof(Matrix3x4, m01_));
     engine->RegisterObjectProperty("Matrix3x4", "float m02", offsetof(Matrix3x4, m02_));

@@ -906,15 +906,7 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
                 {
                     // Check also that the offset matrix matches, in case we for example have a separate attachment AnimatedModel
                     // with a different bind pose
-                    const float* offsetA = bones_[index].offsetMatrix_.Data();
-                    const float* offsetB = bone->offsetMatrix_.Data();
-                    unsigned j;
-                    for (j = 0; j < 12; ++j)
-                    {
-                        if (!Equals(offsetA[j], offsetB[j]))
-                            break;
-                    }
-                    if (j == 12)
+                    if (bones_[index].offsetMatrix_.Equals(bone->offsetMatrix_))
                     {
                         found = true;
                         break;
