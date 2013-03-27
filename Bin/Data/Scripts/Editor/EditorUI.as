@@ -110,10 +110,11 @@ void CreateMenuBar()
     {
         Menu@ fileMenu = CreateMenu("File");
         Window@ filePopup = fileMenu.popup;
-        filePopup.AddChild(CreateMenuItem("New scene", 'N', QUAL_SHIFT | QUAL_CTRL, "Ctrl+Shift+N"));
-        filePopup.AddChild(CreateMenuItem("Open scene...", 'O', QUAL_CTRL, "Ctrl+O"));
-        filePopup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL, "Ctrl+S"));
-        filePopup.AddChild(CreateMenuItem("Save scene as...", 'S', QUAL_SHIFT | QUAL_CTRL, "Ctrl+Shift+S"));
+        filePopup.vars["Popup"] = "File";
+        filePopup.AddChild(CreateMenuItem("New scene", 'N', QUAL_SHIFT | QUAL_CTRL));
+        filePopup.AddChild(CreateMenuItem("Open scene...", 'O', QUAL_CTRL));
+        filePopup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL));
+        filePopup.AddChild(CreateMenuItem("Save scene as...", 'S', QUAL_SHIFT | QUAL_CTRL));
         filePopup.AddChild(CreateMenuDivider());
 
         Menu@ loadNodeMenu = CreateMenuItem("Load node");
@@ -139,19 +140,20 @@ void CreateMenuBar()
     {
         Menu@ editMenu = CreateMenu("Edit");
         Window@ editPopup = editMenu.popup;
-        editPopup.AddChild(CreateMenuItem("Cut", 'X', QUAL_CTRL, "Ctrl+X"));
-        editPopup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL, "Ctrl+C"));
-        editPopup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL, "Ctrl+V"));
-        editPopup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY, "Del"));
-        editPopup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL, "Ctrl+A"));
+        editPopup.vars["Popup"] = "Edit";
+        editPopup.AddChild(CreateMenuItem("Cut", 'X', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY));
+        editPopup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL));
         editPopup.AddChild(CreateMenuDivider());
         editPopup.AddChild(CreateMenuItem("Reset position"));
         editPopup.AddChild(CreateMenuItem("Reset rotation"));
         editPopup.AddChild(CreateMenuItem("Reset scale"));
-        editPopup.AddChild(CreateMenuItem("Enable/disable", 'E', QUAL_CTRL, "Ctrl+E"));
-        editPopup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL, "Ctrl+U"));
+        editPopup.AddChild(CreateMenuItem("Enable/disable", 'E', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL));
         editPopup.AddChild(CreateMenuDivider());
-        editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL, "Ctrl+P"));
+        editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
         AdjustAccelIndent(editPopup);
         uiMenuBar.AddChild(editMenu);
     }
@@ -159,6 +161,7 @@ void CreateMenuBar()
     {
         Menu@ createMenu = CreateMenu("Create");
         Window@ createPopup = createMenu.popup;
+        createPopup.vars["Popup"] = "Create";
         createPopup.AddChild(CreateMenuItem("Box"));
         createPopup.AddChild(CreateMenuItem("Cone"));
         createPopup.AddChild(CreateMenuItem("Cylinder"));
@@ -171,8 +174,9 @@ void CreateMenuBar()
     {
         Menu@ viewMenu = CreateMenu("View");
         Window@ viewPopup = viewMenu.popup;
-        viewPopup.AddChild(CreateMenuItem("Hierarchy", 'H', QUAL_CTRL, "Ctrl+H"));
-        viewPopup.AddChild(CreateMenuItem("Attribute inspector", 'I', QUAL_CTRL, "Ctrl+I"));
+        viewPopup.vars["Popup"] = "View";
+        viewPopup.AddChild(CreateMenuItem("Hierarchy", 'H', QUAL_CTRL));
+        viewPopup.AddChild(CreateMenuItem("Attribute inspector", 'I', QUAL_CTRL));
         viewPopup.AddChild(CreateMenuItem("Editor settings"));
         viewPopup.AddChild(CreateMenuItem("Editor preferences"));
         AdjustAccelIndent(viewPopup);
@@ -184,7 +188,7 @@ void CreateMenuBar()
     uiMenuBar.AddChild(spacer);
 }
 
-Menu@ CreateMenuItem(const String&in title, int accelKey = 0, int accelQual = 0, const String&in accel = "", int padding = 16)
+Menu@ CreateMenuItem(const String&in title, int accelKey = 0, int accelQual = 0, int padding = 16)
 {
     Menu@ menu = Menu(title);
     menu.style = uiStyle;
@@ -200,12 +204,7 @@ Menu@ CreateMenuItem(const String&in title, int accelKey = 0, int accelQual = 0,
     if (accelKey != 0)
     {
         menuText.layoutMode = LM_HORIZONTAL;
-        Text@ accelKeyText = Text();
-        accelKeyText.SetStyle(uiStyle, "EditorMenuText");
-        accelKeyText.horizontalAlignment = HA_RIGHT;
-        accelKeyText.indent = 1;
-        accelKeyText.text = accel;
-        menuText.AddChild(accelKeyText);
+        menuText.AddChild(CreateAccelKeyText(accelKey, accelQual));
     }
 
     return menu;
@@ -222,6 +221,7 @@ BorderImage@ CreateMenuDivider()
 Window@ CreatePopup(Menu@ baseMenu)
 {
     Window@ popup = Window();
+    popup.vars["Popup"] = baseMenu.name;
     popup.style = uiStyle;
     popup.SetLayout(LM_VERTICAL, 1, IntRect(2, 6, 2, 6));
     baseMenu.popup = popup;
@@ -232,7 +232,7 @@ Window@ CreatePopup(Menu@ baseMenu)
 
 Menu@ CreateMenu(const String&in title)
 {
-    Menu@ menu = CreateMenuItem(title, 0, 0, "", 8);
+    Menu@ menu = CreateMenuItem(title, 0, 0, 8);
     menu.name = "";
     menu.SetFixedWidth(menu.width);
     CreatePopup(menu);
@@ -240,34 +240,59 @@ Menu@ CreateMenu(const String&in title)
     return menu;
 }
 
+Text@ CreateAccelKeyText(int accelKey, int accelQual)
+{
+    Text@ accelKeyText = Text();
+    accelKeyText.SetStyle(uiStyle, "EditorMenuText");
+    accelKeyText.horizontalAlignment = HA_RIGHT;
+    accelKeyText.indent = 1;
+    
+    String text;
+    if (accelKey == KEY_DELETE)
+        text = "Del";
+    else if (accelKey == KEY_SPACE)
+        text = "Space";
+    else
+        text.AppendUTF8(accelKey);
+    if (accelQual & QUAL_ALT > 0)
+        text = "Alt+" + text;
+    if (accelQual & QUAL_SHIFT > 0)
+        text = "Shift+" + text;
+    if (accelQual & QUAL_CTRL > 0)
+        text = "Ctrl+" + text;
+    accelKeyText.text = text;
+    
+    return accelKeyText;
+}
+
 void AdjustAccelIndent(Window@ popup)
 {
-	// Find the maximum menu text width
-	int maxWidth = 0;
+    // Find the maximum menu text width
+    int maxWidth = 0;
     for (uint i = 0; i < popup.numChildren; ++i)
     {
-    	UIElement@ element = popup.children[i];
-    	if (element.type != menuType)	// Skip if not menu item
-    		continue;
-    	
-    	int width = element.children[0].width;
-    	if (width > maxWidth)
-    		maxWidth = width;
+        UIElement@ element = popup.children[i];
+        if (element.type != menuType)	// Skip if not menu item
+            continue;
+        
+        int width = element.children[0].width;
+        if (width > maxWidth)
+            maxWidth = width;
     }
     
     // Adjust the indent spacing to slightly wider than the maximum width
     maxWidth += 20;
     for (uint i = 0; i < popup.numChildren; ++i)
     {
-    	UIElement@ element = popup.children[i];
-    	if (element.type != menuType)
-    		continue;
-    	
-    	element = element.children[0];
-    	if (element.numChildren == 0)	// Skip if menu text does not have accel
-    		continue;
-    	
-    	element.children[0].indentSpacing = maxWidth;
+        UIElement@ element = popup.children[i];
+        if (element.type != menuType)
+            continue;
+        
+        element = element.children[0];
+        if (element.numChildren == 0)	// Skip if menu text does not have accel
+            continue;
+        
+        element.children[0].indentSpacing = maxWidth;
     }
 }
 
@@ -282,6 +307,7 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     uiFileSelector.path = initialPath;
     uiFileSelector.SetButtonTexts(ok, cancel);
     uiFileSelector.SetFilters(filters, initialFilter);
+    uiFileSelector.window.vars["Popup"] = "FileSelector";
 
     CenterDialog(uiFileSelector.window);
 }
@@ -621,7 +647,8 @@ void HideUI(bool hide = true)
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
     {
-        if (children[i].type != textType)
+        // Texts and popup windows are excluded
+        if (children[i].type != textType && !children[i].vars.Contains("Popup"))
             children[i].opacity = opacity;
     }
 }
