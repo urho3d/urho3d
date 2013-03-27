@@ -6,7 +6,7 @@ UIElement@ componentParentContainer;
 XMLFile@ componentXMLResource;
 
 bool applyMaterialList = true;
-bool nodeWindowIconsDirty = false;
+bool attributesDirty = false;
 
 const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
 
@@ -100,6 +100,8 @@ Array<Serializable@> ToSerializableArray(Array<Node@> nodes)
 
 void UpdateAttributes(bool fullUpdate)
 {
+    attributesDirty = false;
+
     if (nodeWindow !is null)
     {
         UpdateAttributes(ToSerializableArray(editNodes), nodeWindow.GetChild("NodeAttributeList", true), fullUpdate);
@@ -145,9 +147,9 @@ void UpdateAttributes(bool fullUpdate)
                 UpdateAttributes(components, GetComponentContainer(j).GetChild("ComponentAttributeList"), fullUpdate);
             }
         }
+
+        UpdateNodeWindowIcons();
     }
-    
-    UpdateNodeWindowIcons();
 }
 
 void UpdateNodeAttributes()

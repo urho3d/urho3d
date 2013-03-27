@@ -768,7 +768,7 @@ void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
     
     Node@ node = eventData["Node"].GetNode();
     UpdateSceneWindowNodeText(node, true);
-    nodeWindowIconsDirty = true;
+    attributesDirty = true;
 }
 
 void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
@@ -778,5 +778,5 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
     
     Component@ component = eventData["Component"].GetComponent();
     UpdateSceneWindowComponentText(component);
-    nodeWindowIconsDirty = true;
+    attributesDirty = true;
 }

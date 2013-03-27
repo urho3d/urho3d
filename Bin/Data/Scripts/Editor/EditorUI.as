@@ -641,9 +641,6 @@ void SetIconEnabledColor(UIElement@ element, bool enabled, bool partial = false)
 void UpdateDirtyUI()
 {
     // Perform some event-triggered updates latently in case a large hierarchy was changed
-    if (nodeWindowIconsDirty)
-    {
-        UpdateNodeWindowIcons();
-        nodeWindowIconsDirty = false;
-    }
+    if (attributesDirty)
+        UpdateAttributes(false);
 }
