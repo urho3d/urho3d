@@ -237,7 +237,7 @@ private:
     bool inputFocus_;
     /// Minimized flag.
     bool minimized_;
-    /// Gained focus on this frame -flag.
+    /// Gained focus on this frame flag.
     bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;

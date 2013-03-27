@@ -63,11 +63,12 @@ ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
     script_(GetSubsystem<Script>()),
     scriptObject_(0),
-    subscribed_(false),
     fixedUpdateFps_(0),
     fixedUpdateInterval_(0.0f),
     fixedUpdateAcc_(0.0f),
-    fixedPostUpdateAcc_(0.0f)
+    fixedPostUpdateAcc_(0.0f),
+    subscribed_(false),
+    subscribedPostFixed_(false)
 {
     ClearScriptMethods();
     ClearScriptAttributes();
@@ -96,6 +97,11 @@ void ScriptInstance::ApplyAttributes()
 {
     if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
+}
+
+void ScriptInstance::OnSetEnabled()
+{
+    UpdateEventSubscription();
 }
 
 bool ScriptInstance::CreateObject(ScriptFile* scriptFile, const String& className)
@@ -183,10 +189,7 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
     if (!subscribed_)
-    {
-        SubscribeToEvent(GetScene(), E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
-        subscribed_ = true;
-    }
+        UpdateEventSubscription();
 }
 
 void ScriptInstance::ClearDelayedExecute(const String& declaration)
@@ -271,6 +274,9 @@ void ScriptInstance::SetDelayedMethodCallsAttr(PODVector<unsigned char> value)
         i->declaration_ = buf.ReadString();
         i->parameters_ = buf.ReadVariantVector();
     }
+    
+    if (delayedMethodCalls_.Size() && !subscribed_)
+        UpdateEventSubscription();
 }
 
 void ScriptInstance::SetFixedUpdateAccAttr(float value)
@@ -371,6 +377,7 @@ void ScriptInstance::CreateObject()
         ClearDelayedExecute();
         GetScriptMethods();
         GetScriptAttributes();
+        UpdateEventSubscription();
         
         if (methods_[METHOD_START])
             scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);
@@ -391,6 +398,7 @@ void ScriptInstance::ReleaseObject()
         exceptions.Push(E_RELOADFINISHED);
         UnsubscribeFromAllEventsExcept(exceptions, false);
         subscribed_ = false;
+        subscribedPostFixed_ = false;
         
         ClearScriptMethods();
         ClearScriptAttributes();
@@ -418,28 +426,6 @@ void ScriptInstance::GetScriptMethods()
 {
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
         methods_[i] = scriptFile_->GetMethod(scriptObject_, methodDeclarations[i]);
-    
-    // Subscribe to the update events as supported
-    Scene* scene = GetScene();
-    if (scene)
-    {
-        if (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART])
-        {
-            SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
-            subscribed_ = true;
-        }
-        if (methods_[METHOD_POSTUPDATE])
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
-        
-        PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
-        if (world)
-        {
-            if (methods_[METHOD_FIXEDUPDATE])
-                SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(ScriptInstance, HandlePhysicsPreStep));
-            if (methods_[METHOD_FIXEDPOSTUPDATE])
-                SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
-        }
-    }
 }
 
 void ScriptInstance::GetScriptAttributes()
@@ -488,9 +474,66 @@ void ScriptInstance::GetScriptAttributes()
     }
 }
 
+void ScriptInstance::UpdateEventSubscription()
+{
+    Scene* scene = GetScene();
+    if (!scene)
+        return;
+    
+    bool enabled = scriptObject_ && IsEnabledEffective();
+    
+    if (enabled)
+    {
+        if (!subscribed_ && (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART] || delayedMethodCalls_.Size()))
+        {
+            SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
+            subscribed_ = true;
+        }
+        
+        if (!subscribedPostFixed_)
+        {
+            if (methods_[METHOD_POSTUPDATE])
+                SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ScriptInstance, HandleScenePostUpdate));
+            
+            PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
+            if (world)
+            {
+                if (methods_[METHOD_FIXEDUPDATE])
+                    SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(ScriptInstance, HandlePhysicsPreStep));
+                if (methods_[METHOD_FIXEDPOSTUPDATE])
+                    SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
+            }
+            
+            subscribedPostFixed_ = true;
+        }
+    }
+    else
+    {
+        if (subscribed_)
+        {
+            UnsubscribeFromEvent(scene, E_SCENEUPDATE);
+            subscribed_ = false;
+        }
+        
+        if (subscribedPostFixed_)
+        {
+            UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
+            
+            PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
+            if (world)
+            {
+                UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
+                UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
+            }
+            
+            subscribedPostFixed_ = false;
+        }
+    }
+}
+
 void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!IsEnabledEffective() || !scriptObject_)
+    if (!scriptObject_)
         return;
     
     using namespace SceneUpdate;
@@ -537,7 +580,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
 
 void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!IsEnabledEffective() || !scriptObject_)
+    if (!scriptObject_)
         return;
     
     using namespace ScenePostUpdate;
@@ -549,7 +592,7 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
 
 void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
-    if (!IsEnabledEffective() || !scriptObject_)
+    if (!scriptObject_)
         return;
     
     using namespace PhysicsPreStep;
@@ -576,7 +619,7 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
 
 void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
 {
-    if (!IsEnabledEffective() || !scriptObject_)
+    if (!scriptObject_)
         return;
     
     using namespace PhysicsPostStep;

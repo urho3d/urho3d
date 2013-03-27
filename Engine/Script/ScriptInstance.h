@@ -84,6 +84,8 @@ public:
     virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
     /// Add an event handler. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
@@ -149,6 +151,8 @@ private:
     void ClearScriptMethods();
     /// Clear attributes to C++ side attributes only.
     void ClearScriptAttributes();
+    /// Subscribe/unsubscribe from scene updates as necessary.
+    void UpdateEventSubscription();
     /// Handle scene update event.
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle scene post-update event.
@@ -174,8 +178,6 @@ private:
     String className_;
     /// Pointers to supported inbuilt methods.
     asIScriptFunction* methods_[MAX_SCRIPT_METHODS];
-    /// Subscribed to scene update event flag.
-    bool subscribed_;
     /// Fixed update FPS.
     int fixedUpdateFps_;
     /// Fixed update time interval.
@@ -188,6 +190,10 @@ private:
     Vector<DelayedMethodCall> delayedMethodCalls_;
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
+    /// Subscribed to scene update events flag.
+    bool subscribed_;
+    /// Subscribed to scene post and fixed update events flag.
+    bool subscribedPostFixed_;
 };
 
 /// Return the Urho3D context of the active script context.

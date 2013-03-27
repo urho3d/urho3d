@@ -196,6 +196,13 @@ void DecalSet::ApplyAttributes()
         AssignBoneNodes();
 }
 
+void DecalSet::OnSetEnabled()
+{
+    Drawable::OnSetEnabled();
+    
+    UpdateEventSubscription(true);
+}
+
 void DecalSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     // Do not return raycast hits
@@ -444,19 +451,15 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     numVertices_ += newDecal.vertices_.Size();
     numIndices_ += newDecal.indices_.Size();
     
-    // Subscribe to scene post-update if defined a time-limited decal
-    Scene* scene = GetScene();
-    if (!subscribed_ && newDecal.timeToLive_ > 0.0f && scene)
-    {
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
-        subscribed_ = true;
-    }
-    
     // Remove oldest decals if total vertices exceeded
     while (decals_.Size() && (numVertices_ > maxVertices_ || numIndices_ > maxIndices_))
         RemoveDecals(1);
     
     LOGDEBUG("Added decal with " + String(newDecal.vertices_.Size()) + " vertices");
+    
+    // If new decal is time limited, subscribe to scene post-update
+    if (newDecal.timeToLive_ > 0.0f && !subscribed_)
+        UpdateEventSubscription(false);
     
     MarkDecalsDirty();
     return true;
@@ -510,8 +513,6 @@ void DecalSet::SetDecalsAttr(VariantVector value)
     
     skinned_ = value[index++].GetBool();
     unsigned numDecals = value[index++].GetInt();
-
-    bool hasTimeLimitedDecal = false;
     
     while (numDecals--)
     {
@@ -545,16 +546,6 @@ void DecalSet::SetDecalsAttr(VariantVector value)
         newDecal.CalculateBoundingBox();
         numVertices_ += newDecal.vertices_.Size();
         numIndices_ += newDecal.indices_.Size();
-        
-        if (!hasTimeLimitedDecal && newDecal.timeToLive_ > 0.0f)
-            hasTimeLimitedDecal = true;
-    }
-
-    // Subscribe to scene post-update if defined a time-limited decal
-    if (!subscribed_ && hasTimeLimitedDecal && scene)
-    {
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
-        subscribed_ = true;
     }
     
     if (skinned_)
@@ -582,6 +573,7 @@ void DecalSet::SetDecalsAttr(VariantVector value)
         skinningDirty_ = true;
     }
     
+    UpdateEventSubscription(true);
     UpdateBatch();
     MarkDecalsDirty();
     bufferSizeDirty_ = true;
@@ -1120,6 +1112,43 @@ void DecalSet::AssignBoneNodes()
         if (boneNode)
             boneNode->AddListener(this);
         i->node_ = boneNode;
+    }
+}
+
+void DecalSet::UpdateEventSubscription(bool checkAllDecals)
+{
+    Scene* scene = GetScene();
+    if (!scene)
+        return;
+    
+    bool enabled = IsEnabledEffective();
+    
+    if (enabled && checkAllDecals)
+    {
+        bool hasTimeLimitedDecals = false;
+        
+        for (List<Decal>::ConstIterator i = decals_.Begin(); i != decals_.End(); ++i)
+        {
+            if (i->timeToLive_ > 0.0f)
+            {
+                hasTimeLimitedDecals = true;
+                break;
+            }
+        }
+        
+        // If no time limited decals, no need to subscribe to scene update
+        enabled = hasTimeLimitedDecals;
+    }
+    
+    if (enabled && !subscribed_)
+    {
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(DecalSet, HandleScenePostUpdate));
+        subscribed_ = true;
+    }
+    else if (!enabled && subscribed_)
+    {
+        UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
+        subscribed_ = false;
     }
 }
 

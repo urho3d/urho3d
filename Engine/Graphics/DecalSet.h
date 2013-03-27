@@ -113,6 +113,8 @@ public:
     
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -190,6 +192,8 @@ private:
     void UpdateBatch();
     /// Find bones after loading.
     void AssignBoneNodes();
+    /// Subscribe/unsubscribe from scene post-update as necessary.
+    void UpdateEventSubscription(bool checkAllDecals);
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
