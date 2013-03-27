@@ -71,9 +71,9 @@ void Start()
     if (runServer || runClient)
         singlePlayer = false;
 
+    InitAudio();
     InitConsole();
     InitScene();
-    InitAudio();
     InitNetworking();
     CreateCamera();
     CreateOverlays();
@@ -115,7 +115,7 @@ void InitAudio()
         Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
         musicFile.looped = true;
         
-        // Note: the non-positional sound source component need to be attached to a scene node to become effective
+        // Note: the non-positional sound source component need to be attached to a node to become effective
         // Due to networked mode clearing the scene on connect, do not attach to the scene itself
         musicNode = Node();
         musicSource = musicNode.CreateComponent("SoundSource");
