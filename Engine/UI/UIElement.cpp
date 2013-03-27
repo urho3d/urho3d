@@ -789,11 +789,15 @@ void UIElement::SetLayoutBorder(const IntRect& border)
 void UIElement::SetIndent(int indent)
 {
     indent_ = indent;
+    if (parent_)
+    	parent_->UpdateLayout();
 }
 
 void UIElement::SetIndentSpacing(int indentSpacing)
 {
     indentSpacing_ = Max(indentSpacing, 0);
+    if (parent_)
+    	parent_->UpdateLayout();
 }
 
 void UIElement::UpdateLayout()
@@ -848,8 +852,10 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            children_[i]->SetHorizontalAlignment(HA_LEFT);
+            HorizontalAlignment horizontalAlignment = children_[i]->horizontalAlignment_;
+            children_[i]->horizontalAlignment_ = HA_LEFT;
             children_[i]->SetPosition(positions[j], GetLayoutChildPosition(children_[i]).y_);
+            children_[i]->horizontalAlignment_ = horizontalAlignment;
             children_[i]->SetSize(sizes[j], height - layoutBorder_.top_ - layoutBorder_.bottom_);
             ++j;
         }
@@ -888,8 +894,10 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            children_[i]->SetVerticalAlignment(VA_TOP);
+            VerticalAlignment verticalAlignment = children_[i]->verticalAlignment_;
+            children_[i]->verticalAlignment_ = VA_TOP;
             children_[i]->SetPosition(GetLayoutChildPosition(children_[i]).x_, positions[j]);
+            children_[i]->verticalAlignment_ = verticalAlignment;
             children_[i]->SetSize(width - layoutBorder_.left_ - layoutBorder_.right_, sizes[j]);
             ++j;
         }

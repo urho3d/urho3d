@@ -6,6 +6,7 @@ UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
 const ShortStringHash windowType("Window");
+const ShortStringHash menuType("Menu");
 
 Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.*"};
 Array<String> uiAllFilters = {"*.*"};
@@ -109,70 +110,73 @@ void CreateMenuBar()
     {
         Menu@ fileMenu = CreateMenu("File");
         Window@ filePopup = fileMenu.popup;
-        filePopup.AddChild(CreateMenuItem("New scene", 0, 0));
-        filePopup.AddChild(CreateMenuItem("Open scene...", 'O', QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Save scene as...", 'S', QUAL_SHIFT | QUAL_CTRL));
+        filePopup.AddChild(CreateMenuItem("New scene", 'N', QUAL_SHIFT | QUAL_CTRL, "Ctrl+Shift+N"));
+        filePopup.AddChild(CreateMenuItem("Open scene...", 'O', QUAL_CTRL, "Ctrl+O"));
+        filePopup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL, "Ctrl+S"));
+        filePopup.AddChild(CreateMenuItem("Save scene as...", 'S', QUAL_SHIFT | QUAL_CTRL, "Ctrl+Shift+S"));
         filePopup.AddChild(CreateMenuDivider());
 
-        Menu@ loadNodeMenu = CreateMenuItem("Load node", 0, 0);
+        Menu@ loadNodeMenu = CreateMenuItem("Load node");
         Window@ loadNodePopup = CreatePopup(loadNodeMenu);
         loadNodeMenu.popupOffset = IntVector2(loadNodeMenu.width, 0);
-        loadNodePopup.AddChild(CreateMenuItem("As replicated...", 0, 0));
-        loadNodePopup.AddChild(CreateMenuItem("As local...", 0, 0));
+        loadNodePopup.AddChild(CreateMenuItem("As replicated..."));
+        loadNodePopup.AddChild(CreateMenuItem("As local..."));
         filePopup.AddChild(loadNodeMenu);
         
-        filePopup.AddChild(CreateMenuItem("Save node as...", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Save node as..."));
         filePopup.AddChild(CreateMenuDivider());
-        filePopup.AddChild(CreateMenuItem("Import model...", 0, 0));
-        filePopup.AddChild(CreateMenuItem("Import scene...", 0, 0));
-        filePopup.AddChild(CreateMenuItem("Run script...", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Import model..."));
+        filePopup.AddChild(CreateMenuItem("Import scene..."));
+        filePopup.AddChild(CreateMenuItem("Run script..."));
         filePopup.AddChild(CreateMenuDivider());
-        filePopup.AddChild(CreateMenuItem("Set resource path...", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Set resource path..."));
         filePopup.AddChild(CreateMenuDivider());
-        filePopup.AddChild(CreateMenuItem("Exit", 0, 0));
+        filePopup.AddChild(CreateMenuItem("Exit"));
+        AdjustAccelIndent(filePopup);
         uiMenuBar.AddChild(fileMenu);
     }
 
     {
         Menu@ editMenu = CreateMenu("Edit");
         Window@ editPopup = editMenu.popup;
-        editPopup.AddChild(CreateMenuItem("Cut", 'X', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY));
-        editPopup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuItem("Cut", 'X', QUAL_CTRL, "Ctrl+X"));
+        editPopup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL, "Ctrl+C"));
+        editPopup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL, "Ctrl+V"));
+        editPopup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY, "Del"));
+        editPopup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL, "Ctrl+A"));
         editPopup.AddChild(CreateMenuDivider());
-        editPopup.AddChild(CreateMenuItem("Reset position", 0, 0));
-        editPopup.AddChild(CreateMenuItem("Reset rotation", 0, 0));
-        editPopup.AddChild(CreateMenuItem("Reset scale", 0, 0));
-        editPopup.AddChild(CreateMenuItem("Enable/disable", 'E', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuItem("Reset position"));
+        editPopup.AddChild(CreateMenuItem("Reset rotation"));
+        editPopup.AddChild(CreateMenuItem("Reset scale"));
+        editPopup.AddChild(CreateMenuItem("Enable/disable", 'E', QUAL_CTRL, "Ctrl+E"));
+        editPopup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL, "Ctrl+U"));
         editPopup.AddChild(CreateMenuDivider());
-        editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL, "Ctrl+P"));
+        AdjustAccelIndent(editPopup);
         uiMenuBar.AddChild(editMenu);
     }
 
     {
         Menu@ createMenu = CreateMenu("Create");
         Window@ createPopup = createMenu.popup;
-        createPopup.AddChild(CreateMenuItem("Box", 0, 0));
-        createPopup.AddChild(CreateMenuItem("Cone", 0, 0));
-        createPopup.AddChild(CreateMenuItem("Cylinder", 0, 0));
-        createPopup.AddChild(CreateMenuItem("Plane", 0, 0));
-        createPopup.AddChild(CreateMenuItem("Pyramid", 0, 0));
-        createPopup.AddChild(CreateMenuItem("Sphere", 0, 0));
+        createPopup.AddChild(CreateMenuItem("Box"));
+        createPopup.AddChild(CreateMenuItem("Cone"));
+        createPopup.AddChild(CreateMenuItem("Cylinder"));
+        createPopup.AddChild(CreateMenuItem("Plane"));
+        createPopup.AddChild(CreateMenuItem("Pyramid"));
+        createPopup.AddChild(CreateMenuItem("Sphere"));
         uiMenuBar.AddChild(createMenu);
     }
 
     {
-        Menu@ fileMenu = CreateMenu("View");
-        Window@ filePopup = fileMenu.popup;
-        filePopup.AddChild(CreateMenuItem("Hierarchy", 'H', QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Attribute inspector", 'N', QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Editor settings", 0, 0));
-        filePopup.AddChild(CreateMenuItem("Editor preferences", 0, 0));
-        uiMenuBar.AddChild(fileMenu);
+        Menu@ viewMenu = CreateMenu("View");
+        Window@ viewPopup = viewMenu.popup;
+        viewPopup.AddChild(CreateMenuItem("Hierarchy", 'H', QUAL_CTRL, "Ctrl+H"));
+        viewPopup.AddChild(CreateMenuItem("Attribute inspector", 'I', QUAL_CTRL, "Ctrl+I"));
+        viewPopup.AddChild(CreateMenuItem("Editor settings"));
+        viewPopup.AddChild(CreateMenuItem("Editor preferences"));
+        AdjustAccelIndent(viewPopup);
+        uiMenuBar.AddChild(viewMenu);
     }
 
     BorderImage@ spacer = BorderImage("MenuBarSpacer");
@@ -180,7 +184,7 @@ void CreateMenuBar()
     uiMenuBar.AddChild(spacer);
 }
 
-Menu@ CreateMenuItem(const String&in title, int accelKey, int accelQual, int padding = 16)
+Menu@ CreateMenuItem(const String&in title, int accelKey = 0, int accelQual = 0, const String&in accel = "", int padding = 16)
 {
     Menu@ menu = Menu(title);
     menu.style = uiStyle;
@@ -192,6 +196,17 @@ Menu@ CreateMenuItem(const String&in title, int accelKey, int accelQual, int pad
     menuText.SetStyle(uiStyle, "EditorMenuText");
     menuText.text = title;
     menu.AddChild(menuText);
+
+    if (accelKey != 0)
+    {
+        menuText.layoutMode = LM_HORIZONTAL;
+        Text@ accelKeyText = Text();
+        accelKeyText.SetStyle(uiStyle, "EditorMenuText");
+        accelKeyText.horizontalAlignment = HA_RIGHT;
+        accelKeyText.indent = 1;
+        accelKeyText.text = accel;
+        menuText.AddChild(accelKeyText);
+    }
 
     return menu;
 }
@@ -217,12 +232,43 @@ Window@ CreatePopup(Menu@ baseMenu)
 
 Menu@ CreateMenu(const String&in title)
 {
-    Menu@ menu = CreateMenuItem(title, 0, 0, 8);
+    Menu@ menu = CreateMenuItem(title, 0, 0, "", 8);
     menu.name = "";
     menu.SetFixedWidth(menu.width);
     CreatePopup(menu);
 
     return menu;
+}
+
+void AdjustAccelIndent(Window@ popup)
+{
+	// Find the maximum menu text width
+	int maxWidth = 0;
+    for (uint i = 0; i < popup.numChildren; ++i)
+    {
+    	UIElement@ element = popup.children[i];
+    	if (element.type != menuType)	// Skip if not menu item
+    		continue;
+    	
+    	int width = element.children[0].width;
+    	if (width > maxWidth)
+    		maxWidth = width;
+    }
+    
+    // Adjust the indent spacing to slightly wider than the maximum width
+    maxWidth += 20;
+    for (uint i = 0; i < popup.numChildren; ++i)
+    {
+    	UIElement@ element = popup.children[i];
+    	if (element.type != menuType)
+    		continue;
+    	
+    	element = element.children[0];
+    	if (element.numChildren == 0)	// Skip if menu text does not have accel
+    		continue;
+    	
+    	element.children[0].indentSpacing = maxWidth;
+    }
 }
 
 void CreateFileSelector(const String&in title, const String&in ok, const String&in cancel, const String&in initialPath, Array<String>@ filters,
