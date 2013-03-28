@@ -703,8 +703,8 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool 
         // Resize the node editor according to the number of variables, up to a certain maximum
         if (list.name == "NodeAttributeList")
         {
-        	if ((editNode !is null && editNode.typeName == "Node") || (editNodes.length > 0 && editNodes[0].typeName == "Node"))
-        		--count;	// The 'Is Enabled' attribute is not inserted as list item
+            if ((editNode !is null && editNode.typeName == "Node") || (editNodes.length > 0 && editNodes[0].typeName == "Node"))
+                --count;	// The 'Is Enabled' attribute is not inserted as list item
             uint maxAttrs = Clamp(count, MIN_NODE_ATTRIBUTES, MAX_NODE_ATTRIBUTES);
             list.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 2);
         }

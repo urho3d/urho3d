@@ -549,12 +549,10 @@ void HandleSceneWindowSelectionChange()
     {
         editNodes = selectedNodes;
         
-        // Ensure the first one in array is not the scene node because the first node is used as template for attribute editing
+        // Cannot multi-edit on scene and node(s) together as scene and node does not share identical attributes,
+        // editing via gizmo does not makes too much sense either
         if (editNodes.length > 1 && editNodes[0] is editorScene)
-        {
             editNodes.Erase(0);
-            editNodes.Push(editorScene);
-        }
     }
 
     PositionGizmo();
