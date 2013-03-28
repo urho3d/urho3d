@@ -932,7 +932,11 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void set_visible(bool)", asMETHOD(T, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_visible() const", asMETHOD(T, IsVisible), asCALL_THISCALL);
     if (!isSprite)
+    {
         engine->RegisterObjectMethod(className, "bool get_hovering() const", asMETHOD(T, IsHovering), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "void set_internal(bool) const", asMETHOD(T, SetInternal), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "bool get_internal() const", asMETHOD(T, IsInternal), asCALL_THISCALL);
+    }
     engine->RegisterObjectMethod(className, "bool get_colorGradient() const", asMETHOD(T, HasColorGradient), asCALL_THISCALL);
     if (!isSprite)
     {

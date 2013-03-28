@@ -28,6 +28,7 @@
         <attribute name="Highlight Mode" value="Always" />
         <attribute name="Min Size" value="0 74" />
         <attribute name="Max Size" value="2147483647 74" />
+        <attribute name="Clip Children" value="false" />
     </element>
     <element>
         <attribute name="Min Size" value="0 17" />

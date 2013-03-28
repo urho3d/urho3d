@@ -11,6 +11,7 @@
         </element>
         <element type="ListView">
             <attribute name="Name" value="ComponentAttributeList" />
+            <attribute name="Clip Children" value="false" />
         </element>
     </element>
 </element>

@@ -38,7 +38,7 @@ void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attr
     
     for (Vector<AttributeInfo>::Iterator j = infos.Begin(); j != infos.End(); ++j)
     {
-        if (!String::Compare(j->name_, name, true))
+        if (!j->name_.Compare(name, true))
         {
             infos.Erase(j);
             break;
@@ -164,7 +164,7 @@ AttributeInfo* Context::GetAttribute(ShortStringHash objectType, const char* nam
     
     for (Vector<AttributeInfo>::Iterator j = infos.Begin(); j != infos.End(); ++j)
     {
-        if (!String::Compare(j->name_, name, true))
+        if (!j->name_.Compare(name, true))
             return &(*j);
     }
     

@@ -777,7 +777,6 @@ AttributeInfo
 
 Properties:<br>
 - String[]@ enumNames (readonly)
-- String name (readonly)
 - VariantType type
 - String name
 - Variant defaultValue
@@ -3191,6 +3190,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -3297,6 +3297,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -3495,6 +3496,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -3612,6 +3614,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -3727,6 +3730,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -3841,6 +3845,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -3959,6 +3964,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -4074,6 +4080,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -4205,6 +4212,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -4333,6 +4341,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -4451,6 +4460,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -4579,6 +4589,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -4711,6 +4722,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
@@ -4837,6 +4849,7 @@ Properties:<br>
 - bool selected
 - bool visible
 - bool hovering (readonly)
+- bool internal
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode

@@ -659,11 +659,6 @@ static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
     return VectorToArray<String>(enumNames, "Array<String>");
 }
 
-static String AttributeInfoGetName(AttributeInfo* ptr)
-{
-    return String(ptr->name_);
-}
-
 static void SendEvent(const String& eventType, VariantMap& eventData)
 {
     Object* sender = GetScriptContextEventListenerObject();
@@ -765,9 +760,8 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAttributeInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AttributeInfo", "AttributeInfo& opAssign(const AttributeInfo&in)", asMETHODPR(AttributeInfo, operator =, (const AttributeInfo&), AttributeInfo&), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_enumNames() const", asFUNCTION(AttributeInfoGetEnumNames), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("AttributeInfo", "String get_name() const", asFUNCTION(AttributeInfoGetName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("AttributeInfo", "VariantType type", offsetof(AttributeInfo, type_));
-    engine->RegisterObjectProperty("AttributeInfo", "const String name", offsetof(AttributeInfo, name_));
+    engine->RegisterObjectProperty("AttributeInfo", "String name", offsetof(AttributeInfo, name_));
     engine->RegisterObjectProperty("AttributeInfo", "Variant defaultValue", offsetof(AttributeInfo, defaultValue_));
     engine->RegisterObjectProperty("AttributeInfo", "uint mode", offsetof(AttributeInfo, mode_));
     

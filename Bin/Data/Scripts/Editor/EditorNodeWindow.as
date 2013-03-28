@@ -48,6 +48,7 @@ void CreateNodeWindow()
     SubscribeToEvent(nodeWindow.GetChild("CloseButton", true), "Released", "HideNodeWindow");
     SubscribeToEvent(nodeWindow.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNewVariable");
     SubscribeToEvent(nodeWindow.GetChild("DeleteVarButton", true), "Released", "DeleteVariable");
+    SubscribeToEvent(nodeWindow, "LayoutUpdated", "HandleWindowLayoutUpdated");
 }
 
 void HideNodeWindow()
@@ -59,6 +60,25 @@ void ShowNodeWindow()
 {
     nodeWindow.visible = true;
     nodeWindow.BringToFront();
+}
+
+void AdjustListViewChild(ListView@ list)
+{
+	// At the moment, only 'Is Enabled' container (place-holder + check box) is being created as child of the list view instead of as list item
+    int width = list.width;
+    for (uint i = 0; i < list.numChildren; ++i)
+    {
+        UIElement@ element = list.children[i];
+        if (!element.internal)
+            element.SetFixedWidth(width);
+    }
+}
+
+void HandleWindowLayoutUpdated()
+{
+    AdjustListViewChild(nodeWindow.GetChild("NodeAttributeList"));
+    for (uint i = 0; i < componentParentContainer.numChildren; ++i)
+        AdjustListViewChild(GetComponentContainer(i).GetChild("ComponentAttributeList"));
 }
 
 void UpdateNodeWindow()

@@ -115,12 +115,13 @@ void Text::ApplyAttributes()
 
 void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    // Hovering or whole selection batch
+    // Hovering and/or whole selection batch
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
+        bool both = hovering_ && selected_ && hoverColor_.a_ > 0.0 && selectionColor_.a_ > 0.0f;
         UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
-        batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0, selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ :
-            hoverColor_);
+        batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0, both ? selectionColor_.Lerp(hoverColor_, 0.5f) :
+            (selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ : hoverColor_));
         UIBatch::AddOrMerge(batch, batches);
     }
     

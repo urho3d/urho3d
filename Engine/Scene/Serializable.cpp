@@ -309,7 +309,7 @@ bool Serializable::LoadXML(const XMLElement& source)
         while (attempts)
         {
             const AttributeInfo& attr = attributes->At(i);
-            if ((attr.mode_ & AM_FILE) && !String::Compare(attr.name_, name, true))
+            if ((attr.mode_ & AM_FILE) && !attr.name_.Compare(name, true))
             {
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
@@ -437,7 +437,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     
     for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
-        if (!String::Compare(i->name_, name.CString(), true))
+        if (!i->name_.Compare(name, true))
         {
             // Check that the new value's type matches the attribute type
             if (value.GetType() == i->type_)
@@ -617,7 +617,7 @@ Variant Serializable::GetAttribute(const String& name)
     
     for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
-        if (!String::Compare(i->name_, name.CString(), true))
+        if (!i->name_.Compare(name, true))
         {
             OnGetAttribute(*i, ret);
             return ret;

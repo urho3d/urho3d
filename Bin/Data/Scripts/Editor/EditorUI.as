@@ -268,10 +268,11 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
 void AdjustAccelIndent(Window@ popup)
 {
     // Find the maximum menu text width
+	Array<UIElement@> children = popup.GetChildren();
     int maxWidth = 0;
-    for (uint i = 0; i < popup.numChildren; ++i)
+    for (uint i = 0; i < children.length; ++i)
     {
-        UIElement@ element = popup.children[i];
+        UIElement@ element = children[i];
         if (element.type != menuType)	// Skip if not menu item
             continue;
         
@@ -282,9 +283,9 @@ void AdjustAccelIndent(Window@ popup)
     
     // Adjust the indent spacing to slightly wider than the maximum width
     maxWidth += 20;
-    for (uint i = 0; i < popup.numChildren; ++i)
+    for (uint i = 0; i < children.length; ++i)
     {
-        UIElement@ element = popup.children[i];
+        UIElement@ element = children[i];
         if (element.type != menuType)
             continue;
         

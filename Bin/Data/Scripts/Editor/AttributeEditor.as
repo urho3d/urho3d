@@ -61,7 +61,7 @@ UIElement@ CreateAttributeEditorParentWithSeparatedLabel(ListView@ list, const S
 
     if (suppressedSeparatedLabel)
     {
-        UIElement@ placeHolder = UIElement();
+        UIElement@ placeHolder = UIElement(name);
         editorParent.AddChild(placeHolder);
     }
     else
@@ -71,6 +71,22 @@ UIElement@ CreateAttributeEditorParentWithSeparatedLabel(ListView@ list, const S
         attrNameText.text = name;
         editorParent.AddChild(attrNameText);
     }
+
+    return editorParent;
+}
+
+UIElement@ CreateAttributeEditorParentAsListChild(ListView@ list, const String&in name, uint index, uint subIndex)
+{
+    UIElement@ editorParent = UIElement("Edit" + String(index) + "_" + String(subIndex));
+    editorParent.vars["Index"] = index;
+    editorParent.vars["SubIndex"] = subIndex;
+    editorParent.SetLayout(LM_HORIZONTAL);
+    editorParent.SetFixedSize(list.width, ATTR_HEIGHT);
+    editorParent.position = IntVector2(0, -ATTR_HEIGHT);
+    list.AddChild(editorParent);
+
+    UIElement@ placeHolder = UIElement(name);
+    editorParent.AddChild(placeHolder);
 
     return editorParent;
 }
@@ -102,28 +118,29 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ seria
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
     parent.AddChild(attrEdit);
+    
     return attrEdit;
 }
 
-void CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, uint index)
+UIElement@ CreateStringAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex)
 {
-    AttributeInfo info = serializables[0].attributeInfos[index];
-    CreateAttributeEditor(list, serializables, info.name, info.type, info.enumNames, index, 0);
-}
-
-UIElement@ CreateStringAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex)
-{
-    UIElement@ parent = CreateAttributeEditorParent(list, name, index, subIndex);
+    UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
     LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
     attrEdit.dragDropMode = DD_TARGET;
     SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
     SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
+    
     return parent;
 }
 
-UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex)
+UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex)
 {
-    UIElement@ parent = CreateAttributeEditorParent(list, name, index, subIndex);
+    UIElement@ parent;
+    if (info.name == "Is Enabled")
+        parent = CreateAttributeEditorParentAsListChild(list, info.name, index, subIndex);
+    else
+        parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
+    
     CheckBox@ attrEdit = CheckBox();
     attrEdit.style = uiStyle;
     attrEdit.SetFixedSize(16, 16);
@@ -132,12 +149,14 @@ UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ seria
     SetAttributeEditorID(attrEdit, serializables);
     parent.AddChild(attrEdit);
     SubscribeToEvent(attrEdit, "Toggled", "EditAttribute");
+    
     return parent;
 }
 
-UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex)
+UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex)
 {
-    UIElement@ parent = CreateAttributeEditorParent(list, name, index, subIndex);
+    UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
+    VariantType type = info.type;
     uint numCoords = type - VAR_FLOAT + 1;
     if (type == VAR_QUATERNION)
         numCoords = 3;
@@ -152,15 +171,16 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         attrEdit.vars["Coordinate"] = i;
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
-    }     
+    }
+    
     return parent;    
 }
 
-UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex)
+UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex)
 {
-    UIElement@ parent = CreateAttributeEditorParent(list, name, index, subIndex);
+    UIElement@ parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
     // Check for enums
-    if (enumNames is null || enumNames.empty)
+    if (info.enumNames is null || info.enumNames.empty)
     {
         // No enums, create a numeric editor
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
@@ -178,11 +198,11 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         attrEdit.SetLayout(LM_HORIZONTAL, 0, IntRect(4, 1, 4, 1));
         SetAttributeEditorID(attrEdit, serializables);
 
-        for (uint i = 0; i < enumNames.length; ++i)
+        for (uint i = 0; i < info.enumNames.length; ++i)
         {
             Text@ choice = Text();
             choice.SetStyle(uiStyle, "EditorEnumAttributeText");
-            choice.text = enumNames[i];
+            choice.text = info.enumNames[i];
             attrEdit.AddItem(choice);
         }
         parent.AddChild(attrEdit);
@@ -192,11 +212,11 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     return parent;
 }
 
-UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
+UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
 {
     UIElement@ parent;
     ShortStringHash resourceType;
-    VariantType attrType = serializables[0].attributeInfos[index].type;
+    VariantType attrType = info.type;
     if (attrType == VAR_RESOURCEREF)
         resourceType = serializables[0].attributes[index].GetResourceRef().type;
     else if (attrType == VAR_RESOURCEREFLIST)
@@ -205,10 +225,10 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
         resourceType = serializables[0].attributes[index].GetVariantVector()[subIndex].GetResourceRef().type;
 
      // Create the attribute name on a separate non-interactive line to allow for more space
-    parent = CreateAttributeEditorParentWithSeparatedLabel(list, name, index, subIndex, suppressedSeparatedLabel);
+    parent = CreateAttributeEditorParentWithSeparatedLabel(list, info.name, index, subIndex, suppressedSeparatedLabel);
 
     UIElement@ container = UIElement();
-    container.SetLayout(LM_HORIZONTAL, 4, IntRect(name.StartsWith("   ") ? 20 : 10, 0, 4, 0));    // Left margin is indented more when the name is so
+    container.SetLayout(LM_HORIZONTAL, 4, IntRect(info.name.StartsWith("   ") ? 20 : 10, 0, 4, 0));    // Left margin is indented more when the name is so
     container.SetFixedHeight(ATTR_HEIGHT);
     parent.AddChild(container);
         
@@ -245,29 +265,36 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
     openButton.AddChild(openButtonText);
     container.AddChild(openButton);
     SubscribeToEvent(openButton, "Released", "OpenResource");
+    
     return parent;
 }
 
-UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
+UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
 {
     UIElement@ parent;
-
-    AttributeInfo info = serializables[0].attributeInfos[index];
+    
+    VariantType type = info.type;
     if (type == VAR_STRING || type == VAR_BUFFER)
-        parent = CreateStringAttributeEditor(list, serializables, name, type, enumNames, index, subIndex);
+        parent = CreateStringAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_BOOL)
-        parent = CreateBoolAttributeEditor(list, serializables, name, type, enumNames, index, subIndex);
+        parent = CreateBoolAttributeEditor(list, serializables, info, index, subIndex);
     else if ((type >= VAR_FLOAT && type <= VAR_VECTOR4) || type == VAR_QUATERNION || type == VAR_COLOR || type == VAR_INTVECTOR2 || type == VAR_INTRECT)
-        parent = CreateNumAttributeEditor(list, serializables, name, type, enumNames, index, subIndex);
+        parent = CreateNumAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_INT)
-        parent = CreateIntAttributeEditor(list, serializables, name, type, enumNames, index, subIndex);
+        parent = CreateIntAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_RESOURCEREF)
-        parent = CreateResourceRefAttributeEditor(list, serializables, name, type, enumNames, index, subIndex, suppressedSeparatedLabel);
+        parent = CreateResourceRefAttributeEditor(list, serializables, info, index, subIndex, suppressedSeparatedLabel);
     else if (type == VAR_RESOURCEREFLIST)
     {
         uint numRefs = serializables[0].attributes[index].GetResourceRefList().length;
+        
+        // Straightly speaking the individual resource reference in the list is not an attribute of the serializable
+        // However, the AttributeInfo structure is used here to reduce the number of parameters being passed in the function
+        AttributeInfo refInfo;
+        refInfo.name = info.name;
+        refInfo.type = VAR_RESOURCEREF;
         for (uint i = 0; i < numRefs; ++i)
-            CreateAttributeEditor(list, serializables, name, VAR_RESOURCEREF, null, index, i, i > 0);
+            CreateAttributeEditor(list, serializables, refInfo, index, i, i > 0);
     }
     else if (type == VAR_VARIANTVECTOR)
     {
@@ -279,7 +306,11 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         Array<Variant>@ vector = serializables[0].attributes[index].GetVariantVector();
         for (uint i = 0; i < vector.length; ++i)
         {
-            CreateAttributeEditor(list, serializables, vectorStruct.variableNames[nameIndex], vector[i].type, null, index, i);
+            // The individual variant in the vector is not an attribute of the serializable, the structure is reused for convenience
+            AttributeInfo vectorInfo;
+            vectorInfo.name = vectorStruct.variableNames[nameIndex];
+            vectorInfo.type = vector[i].type;
+            CreateAttributeEditor(list, serializables, vectorInfo, index, i);
             ++nameIndex;
             if (nameIndex >= vectorStruct.variableNames.length)
                 nameIndex = vectorStruct.restartIndex;
@@ -292,7 +323,12 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         for (uint i = 0; i < keys.length; ++i)
         {
             Variant value = map[keys[i]];
-            parent = CreateAttributeEditor(list, serializables, scene.GetVarName(keys[i]) + " (Var)", value.type, null, index, i);
+            
+            // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
+            AttributeInfo mapInfo;
+            mapInfo.name = scene.GetVarName(keys[i]) + " (Var)";
+            mapInfo.type = value.type;
+            parent = CreateAttributeEditor(list, serializables, mapInfo, index, i);
             // Add the variant key to the parent
             parent.vars["Key"] = keys[i].value;
         }
@@ -332,15 +368,16 @@ UIElement@ GetAttributeEditorParent(UIElement@ parent, uint index, uint subIndex
     return parent.GetChild("Edit" + String(index) + "_" + String(subIndex), true);
 }
 
-void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, bool editable, uint index)
+void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index)
 {
+    bool editable = info.mode & AM_NOEDIT == 0;
+    
     UIElement@ parent = GetAttributeEditorParent(list, index, 0);
     if (parent is null)
         return;
 
     inLoadAttributeEditor = true;
 
-    AttributeInfo info = serializables[0].attributeInfos[index];
     bool sameValue = true;
     Variant value = serializables[0].attributes[index];
     Array<Variant> values;
@@ -353,36 +390,37 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, bo
     }
 
     // Attribute with different values from multiple-select is loaded with default/empty value and non-editable
-    LoadAttributeEditor(parent, value, value.type, info.enumNames, info.defaultValue, editable, sameValue, values);
+    LoadAttributeEditor(parent, value, info, editable, sameValue, values);
 
     inLoadAttributeEditor = false;
 }
 
-void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Array<String>@ enumNames, Variant defaultValue, bool editable, bool sameValue, const Array<Variant>&in values)
+void LoadAttributeEditor(UIElement@ parent, Variant value, const AttributeInfo&in info, bool editable, bool sameValue, const Array<Variant>&in values)
 {
     uint index = parent.vars["Index"].GetUInt();
 
     // Assume the first child is always a text label element or a container that containing a text label element
     UIElement@ label = parent.children[0];
-    if (label.type == containerType)
+    if (label.type == containerType && label.numChildren > 0)
         label = label.children[0];
     if (label.type == textType)
     {
         bool modified;
-        if (defaultValue.type == VAR_NONE || defaultValue.type == VAR_RESOURCEREFLIST)
+        if (info.defaultValue.type == VAR_NONE || info.defaultValue.type == VAR_RESOURCEREFLIST)
             modified = !value.IsZero();
         else
-            modified = value != defaultValue;
+            modified = value != info.defaultValue;
         cast<Text>(label).color = (editable ? (modified ? modifiedTextColor : normalTextColor) : nonEditableTextColor);
     }
     
+    VariantType type = info.type;    
     if (type == VAR_FLOAT || type == VAR_STRING || type == VAR_BUFFER)
         SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
     else if (type == VAR_BOOL)
         SetEditable(SetValue(parent.children[1], value.GetBool(), sameValue), editable && sameValue);
     else if (type == VAR_INT)
     {
-        if (enumNames is null || enumNames.empty)
+        if (info.enumNames is null || info.enumNames.empty)
             SetEditable(SetValue(parent.children[1], value.ToString(), sameValue), editable && sameValue);
         else
             SetEditable(SetValue(parent.children[1], value.GetInt(), sameValue), editable && sameValue);
@@ -446,7 +484,11 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
                     }
                 }
             }
-            LoadAttributeEditor(parent, firstValue, firstValue.type, null, Variant(), editable, varSameValue, values);
+            
+            // The individual variant in the list is not an attribute of the serializable, the structure is reused for convenience
+            AttributeInfo info;
+            info.type = firstValue.type;
+            LoadAttributeEditor(parent, firstValue, info, editable, varSameValue, values);
         }
     }
     else if (type == VAR_VARIANTMAP)
@@ -475,7 +517,11 @@ void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Arr
                     }
                 }
             }
-            LoadAttributeEditor(parent, firstValue, firstValue.type, null, Variant(), editable, varSameValue, values);
+            
+            // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
+            AttributeInfo info;
+            info.type = firstValue.type;
+            LoadAttributeEditor(parent, firstValue, info, editable, varSameValue, values);
         }
     }
     else
@@ -646,10 +692,19 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool 
     if (fullUpdate)
     {
         list.RemoveAllItems();
+        Array<UIElement@> children = list.GetChildren();
+        for (uint i = 0; i < children.length; ++i)
+        {
+            if (!children[i].internal)
+                children[i].Remove();
+        }
 
+        //\todo Remove the hardcoding
         // Resize the node editor according to the number of variables, up to a certain maximum
         if (list.name == "NodeAttributeList")
         {
+        	if ((editNode !is null && editNode.typeName == "Node") || (editNodes.length > 0 && editNodes[0].typeName == "Node"))
+        		--count;	// The 'Is Enabled' attribute is not inserted as list item
             uint maxAttrs = Clamp(count, MIN_NODE_ATTRIBUTES, MAX_NODE_ATTRIBUTES);
             list.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 2);
         }
@@ -666,9 +721,9 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool 
             continue;
 
         if (fullUpdate)
-            CreateAttributeEditor(list, serializables, i);
+            CreateAttributeEditor(list, serializables, info, i, 0);
 
-        LoadAttributeEditor(list, serializables, info.mode & AM_NOEDIT == 0, i);
+        LoadAttributeEditor(list, serializables, info, i);
     }
     
     if (fullUpdate)

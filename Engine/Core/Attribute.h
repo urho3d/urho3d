@@ -63,7 +63,6 @@ struct AttributeInfo
     /// Construct empty.
     AttributeInfo() :
         type_(VAR_NONE),
-        name_(0),
         offset_(0),
         enumNames_(0),
         mode_(AM_DEFAULT),
@@ -124,7 +123,7 @@ struct AttributeInfo
     /// Attribute type.
     VariantType type_;
     /// Name.
-    const char* name_;
+    String name_;
     /// Byte offset from start of object.
     unsigned offset_;
     /// Enum names.
