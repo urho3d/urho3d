@@ -188,14 +188,13 @@ void PrintLine(const String& str, bool error)
     #endif
 }
 
-const Vector<String>& ParseArguments(const String& cmdLine)
+const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument)
 {
     arguments.Clear();
     
     unsigned cmdStart = 0, cmdEnd = 0;
     bool inCmd = false;
     bool inQuote = false;
-    bool firstArgument = true;
     
     for (unsigned i = 0; i < cmdLine.Length(); ++i)
     {
@@ -208,9 +207,9 @@ const Vector<String>& ParseArguments(const String& cmdLine)
                 inCmd = false;
                 cmdEnd = i;
                 // Do not store the first argument (executable name)
-                if (!firstArgument)
+                if (!skipFirstArgument)
                     arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
-                firstArgument = false;
+                skipFirstArgument = false;
             }
         }
         else
@@ -225,7 +224,7 @@ const Vector<String>& ParseArguments(const String& cmdLine)
     if (inCmd)
     {
         cmdEnd = cmdLine.Length();
-        if (!firstArgument)
+        if (!skipFirstArgument)
             arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
     }
     

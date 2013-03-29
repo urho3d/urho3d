@@ -45,15 +45,15 @@ void PrintUnicode(const String& str, bool error = false);
 void PrintUnicodeLine(const String& str, bool error = false);
 /// Print ASCII text to the console with a newline appended. Uses printf() to allow printing into the MSVC output window.
 void PrintLine(const String& str, bool error = false);
-/// Parse arguments from the command line.
-const Vector<String>& ParseArguments(const String& cmdLine);
+/// Parse arguments from the command line. First argument is by default assumed to be the executable name and is skipped.
+const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument = true);
 /// Parse arguments from the command line.
 const Vector<String>& ParseArguments(const char* cmdLine);
 /// Parse arguments from a wide char command line.
 const Vector<String>& ParseArguments(const WString& cmdLine);
 /// Parse arguments from a wide char command line.
 const Vector<String>& ParseArguments(const wchar_t* cmdLine);
-/// Parse arguments from argc & argv
+/// Parse arguments from argc & argv.
 const Vector<String>& ParseArguments(int argc, char** argv);
 /// Return previously parsed arguments.
 const Vector<String>& GetArguments();
