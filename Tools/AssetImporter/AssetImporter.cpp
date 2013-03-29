@@ -1306,6 +1306,10 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
             ErrorExit(modelNames[i] + " has different per-geometry bone mappings than " + modelNames[0]);
     }
     
+    Vector<SharedPtr<VertexBuffer> > vbVector;
+    Vector<SharedPtr<IndexBuffer> > ibVector;
+    PODVector<unsigned> emptyMorphRange;
+    
     // Create the final model
     SharedPtr<Model> outModel(new Model(context_));
     outModel->SetNumGeometries(srcModels[0]->GetNumGeometries());
@@ -1317,8 +1321,22 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
             Geometry* geom = srcModels[j]->GetGeometry(i, 0);
             geom->SetLodDistance(lodDistances[j]);
             outModel->SetGeometry(i, j, geom);
+            
+            for (unsigned k = 0; k < geom->GetNumVertexBuffers(); ++k)
+            {
+                SharedPtr<VertexBuffer> vb(geom->GetVertexBuffer(k));
+                if (!vbVector.Contains(vb))
+                    vbVector.Push(vb);
+            }
+            
+            SharedPtr<IndexBuffer> ib(geom->GetIndexBuffer());
+            if (!ibVector.Contains(ib))
+                ibVector.Push(ib);
         }
     }
+    
+    outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
+    outModel->SetIndexBuffers(ibVector);
     outModel->SetSkeleton(srcModels[0]->GetSkeleton());
     outModel->SetGeometryBoneMappings(srcModels[0]->GetGeometryBoneMappings());
     outModel->SetBoundingBox(srcModels[0]->GetBoundingBox());

@@ -349,6 +349,9 @@ uint GetAttributeEditorCount(Array<Serializable@>@ serializables)
             AttributeInfo info = serializables[0].attributeInfos[i];
             if (!showNonEditableAttribute && info.mode & AM_NOEDIT != 0)
                 continue;
+            // "Is Enabled" is not inserted into the main attribute list, so do not count
+            if (info.name == "Is Enabled")
+                continue;
             if (info.type == VAR_RESOURCEREFLIST)
                 count += serializables[0].attributes[i].GetResourceRefList().length;
             else if (info.type == VAR_VARIANTVECTOR && GetVectorStruct(serializables, i) !is null)

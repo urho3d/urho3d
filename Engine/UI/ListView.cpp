@@ -678,8 +678,8 @@ void ListView::SetHierarchyMode(bool enable)
 
 void ListView::SetBaseIndent(int baseIndent)
 {
-	baseIndent_ = baseIndent;
-	UpdateLayout();
+    baseIndent_ = baseIndent;
+    UpdateLayout();
 }
 
 void ListView::SetClearSelectionOnDefocus(bool enable)
