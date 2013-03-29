@@ -117,15 +117,15 @@ void InitScene()
         newNode.position = Vector3(50, 0, 50);
         newNode.SetScale(10);
 
-        RigidBody@ body = newNode.CreateComponent("RigidBody");
-        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
-
         StaticModel@ object = newNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
         object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
         object.castShadows = true;
         object.occluder = true;
+
+        RigidBody@ body = newNode.CreateComponent("RigidBody");
+        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+        shape.SetTriangleMesh(object.model, 0);
     }
 
     // Create mushroom groups

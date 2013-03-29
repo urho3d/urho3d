@@ -469,8 +469,11 @@ void ListView::SetSelection(unsigned index)
 
 void ListView::SetSelections(const PODVector<unsigned>& indices)
 {
+    // Make a weak pointer to self to check for destruction as a response to events
+    WeakPtr<ListView> self(this);
+    
     unsigned numItems = GetNumItems();
-
+    
     // Remove first items that should no longer be selected
     for (PODVector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
     {
@@ -478,20 +481,23 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
         if (!indices.Contains(index))
         {
             i = selections_.Erase(i);
-
+            
             using namespace ItemSelected;
-
+            
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMDESELECTED, eventData);
+            
+            if (self.Expired())
+                return;
         }
         else
             ++i;
     }
-
+    
     bool added = false;
-
+    
     // Then add missing items
     for (PODVector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
     {
@@ -507,51 +513,60 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
                     selections_.Push(index);
                     added = true;
                 }
-
+                
                 using namespace ItemSelected;
-
+                
                 VariantMap eventData;
                 eventData[P_ELEMENT] = (void*)this;
                 eventData[P_SELECTION] = *i;
                 SendEvent(E_ITEMSELECTED, eventData);
+                
+                if (self.Expired())
+                    return;
             }
         }
         // If no multiselect enabled, allow setting only one item
         if (!multiselect_)
             break;
     }
-
+    
     // Re-sort selections if necessary
     if (added)
         Sort(selections_.Begin(), selections_.End());
-
+    
     UpdateSelectionEffect();
     SendEvent(E_SELECTIONCHANGED);
 }
 
 void ListView::AddSelection(unsigned index)
 {
+    // Make a weak pointer to self to check for destruction as a response to events
+    WeakPtr<ListView> self(this);
+    
     if (!multiselect_)
         SetSelection(index);
     else
     {
         if (index >= GetNumItems())
             return;
-
+        
         if (!selections_.Contains(index))
         {
             selections_.Push(index);
-
+            
             using namespace ItemSelected;
-
+            
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMSELECTED, eventData);
-
+            
+            if (self.Expired())
+                return;
+            
             Sort(selections_.Begin(), selections_.End());
         }
-
+        
         EnsureItemVisibility(index);
         UpdateSelectionEffect();
         SendEvent(E_SELECTIONCHANGED);
