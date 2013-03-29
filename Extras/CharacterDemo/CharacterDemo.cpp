@@ -106,7 +106,7 @@ private:
     /// Camera scene node.
     SharedPtr<Node> cameraNode_;
     /// The controllable character.
-    SharedPtr<Character> character_;
+    WeakPtr<Character> character_;
     /// First person camera flag.
     bool firstPerson_;
 };
@@ -274,8 +274,9 @@ void CharacterDemo::CreateCharacter()
     CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
     shape->SetCapsule(0.7f, 1.8f, Vector3(0.0f, 0.9f, 0.0f));
     
-    // Create our logic component, which takes care of steering the character with key/mouse input
-    // Remember the character so that we can set controls to it
+    // Create our logic component, which takes care of steering the character
+    // Remember the character so that we can set its controls. Use a WeakPtr because the scene hierarchy already owns it
+    // and keeps it alive as long as it's not removed from the hierarchy
     character_ = objectNode->CreateComponent<Character>();
 }
 
@@ -296,25 +297,31 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (input->GetKeyPress('F'))
         firstPerson_ = !firstPerson_;
     
-    // Get movement controls and assign them to the character
-    character_->controls_.Set(CTRL_UP, input->GetKeyDown('W'));
-    character_->controls_.Set(CTRL_DOWN, input->GetKeyDown('S'));
-    character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
-    character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
-    character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
-    
-    // Add character yaw & pitch from the mouse motion
-    character_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
-    character_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
-    // Limit pitch
-    character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
-    
-    // Set rotation already here so that it's updated every rendering frame instead of every physics frame
-    character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
+    if (character_)
+    {
+        // Get movement controls and assign them to the character
+        character_->controls_.Set(CTRL_UP, input->GetKeyDown('W'));
+        character_->controls_.Set(CTRL_DOWN, input->GetKeyDown('S'));
+        character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
+        character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
+        character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
+        
+        // Add character yaw & pitch from the mouse motion
+        character_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
+        character_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
+        // Limit pitch
+        character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
+        
+        // Set rotation already here so that it's updated every rendering frame instead of every physics frame
+        character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
+    }
 }
 
 void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (!character_)
+        return;
+    
     Node* characterNode = character_->GetNode();
     
     // Get camera lookat dir from character yaw + pitch
@@ -405,7 +412,7 @@ void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
         inAirTimer_ += timeStep;
     else
         inAirTimer_ = 0.0f;
-    // When character has been in air less than 1/10 second, still interpreted as being on ground
+    // When character has been in air less than 1/10 second, it's still interpreted as being on ground
     bool softGrounded = inAirTimer_ < INAIR_THRESHOLD_TIME;
     
     // Update movement & animation
@@ -450,7 +457,7 @@ void Character::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
             okToJump_ = true;
     }
     
-    // Play or stop (fade out) walk animation based on whether is moving
+    // Play walk animation if moving on ground, otherwise fade it out
     if (softGrounded && !moveDir.Equals(Vector3::ZERO))
         animCtrl->PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2f);
     else
