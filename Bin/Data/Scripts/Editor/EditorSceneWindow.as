@@ -116,9 +116,6 @@ void UpdateSceneWindow()
     ClearSceneWindow();
     UpdateSceneWindowNode(0, editorScene, null);
 
-    // Re-enable layout update
-    hierarchyList.EnableLayoutUpdate();
-
     // Clear copybuffer when whole window refreshed
     copyBuffer.Clear();
 }
