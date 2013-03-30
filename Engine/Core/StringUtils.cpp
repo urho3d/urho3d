@@ -401,12 +401,12 @@ String ToString(const char* formatString, ...)
 
 bool IsAlpha(unsigned ch)
 {
-    return ch < 255 ? isalpha(ch) : false;
+    return ch < 256 ? isalpha(ch) != 0 : false;
 }
 
 bool IsDigit(unsigned ch)
 {
-    return ch < 255 ? isdigit(ch) : false;
+    return ch < 256 ? isdigit(ch) != 0 : false;
 }
 
 }
