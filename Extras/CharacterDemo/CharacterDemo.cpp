@@ -192,6 +192,7 @@ void CharacterDemo::CreateScene()
         object->SetOccluder(true);
         
         RigidBody* body = objectNode->CreateComponent<RigidBody>();
+        body->SetCollisionLayer(2);
         CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetBox(Vector3::ONE);
     }
@@ -208,6 +209,7 @@ void CharacterDemo::CreateScene()
         object->SetCastShadows(true);
         
         RigidBody* body = objectNode->CreateComponent<RigidBody>();
+        body->SetCollisionLayer(2);
         CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetBox(Vector3::ONE);
     }
@@ -225,6 +227,7 @@ void CharacterDemo::CreateScene()
         object->SetOccluder(true);
         
         RigidBody* body = objectNode->CreateComponent<RigidBody>();
+        body->SetCollisionLayer(2);
         CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetBox(Vector3::ONE);
     }
@@ -242,6 +245,7 @@ void CharacterDemo::CreateScene()
         object->SetCastShadows(true);
         
         RigidBody* body = objectNode->CreateComponent<RigidBody>();
+        body->SetCollisionLayer(2);
         CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetTriangleMesh(object->GetModel(), 0);
     }
@@ -252,30 +256,31 @@ void CharacterDemo::CreateCharacter()
     Node* objectNode = scene_->CreateChild("Jack");
     objectNode->SetPosition(Vector3(0.0f, 1.0f, 0.0f));
     
+    // Create the rendering component + animation controller
     AnimatedModel* object = objectNode->CreateComponent<AnimatedModel>();
     object->SetModel(cache_->GetResource<Model>("Models/Jack.mdl"));
     object->SetMaterial(cache_->GetResource<Material>("Materials/Jack.xml"));
     object->SetCastShadows(true);
-    
-    AnimationController* ctrl = objectNode->CreateComponent<AnimationController>();
+    objectNode->CreateComponent<AnimationController>();
     
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
     RigidBody* body = objectNode->CreateComponent<RigidBody>();
+    body->SetCollisionLayer(1);
     body->SetMass(1.0f);
     
     // Set zero angular factor so that physics doesn't turn the character on its own.
     // Instead we will control the character yaw manually
     body->SetAngularFactor(Vector3::ZERO);
     
-    // Set the rigid body to signal collision also when in rest, so that we get ground collisions properly
+    // Set the rigidbody to signal collision also when in rest, so that we get ground collisions properly
     body->SetCollisionEventMode(COLLISION_ALWAYS);
     
-    // Set a capsule shape for character collision
+    // Set a capsule shape for collision
     CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
     shape->SetCapsule(0.7f, 1.8f, Vector3(0.0f, 0.9f, 0.0f));
     
-    // Create our logic component, which takes care of steering the character
-    // Remember the character so that we can set its controls. Use a WeakPtr because the scene hierarchy already owns it
+    // Create the character logic component, which takes care of steering the rigidbody
+    // Remember it so that we can set the controls. Use a WeakPtr because the scene hierarchy already owns it
     // and keeps it alive as long as it's not removed from the hierarchy
     character_ = objectNode->CreateComponent<Character>();
 }
@@ -299,7 +304,7 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
     
     if (character_)
     {
-        // Get movement controls and assign them to the character
+        // Get movement controls and assign them to the character logic component
         character_->controls_.Set(CTRL_UP, input->GetKeyDown('W'));
         character_->controls_.Set(CTRL_DOWN, input->GetKeyDown('S'));
         character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
@@ -341,15 +346,15 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
     else
     {
         // Third person camera: position behind the character
-        Vector3 aimPoint = characterNode->GetPosition() + Vector3(0.0f, 1.75f, 0.0f);
+        Vector3 aimPoint = characterNode->GetPosition() + rot * Vector3(0.0f, 1.75f, 0.0f);
         Vector3 minDist = aimPoint + dir * Vector3(0, 0, -CAMERA_MIN_DIST);
         Vector3 maxDist = aimPoint + dir * Vector3(0, 0, -CAMERA_MAX_DIST);
         
-        // Collide camera ray with physics world to ensure we see the character properly
+        // Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the character properly
         Vector3 rayDir = (maxDist - minDist).Normalized();
         float rayDistance = CAMERA_MAX_DIST - CAMERA_MIN_DIST + CAMERA_SAFETY_DIST;
         PhysicsRaycastResult result;
-        scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, Ray(minDist, rayDir), rayDistance);
+        scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, Ray(minDist, rayDir), rayDistance, 2);
         if (result.body_)
             rayDistance = Min(rayDistance, result.distance_ - CAMERA_SAFETY_DIST);
         
