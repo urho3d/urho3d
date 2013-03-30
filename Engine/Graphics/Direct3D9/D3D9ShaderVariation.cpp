@@ -26,8 +26,6 @@
 #include "Shader.h"
 #include "ShaderVariation.h"
 
-#include <ctype.h>
-
 #include "DebugNew.h"
 
 namespace Urho3D

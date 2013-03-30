@@ -157,8 +157,10 @@ struct Material
 	aiString textureSpecular;
 	aiString textureAmbient;
 	aiString textureBump;
+	aiString textureNormal;
 	aiString textureSpecularity;
 	aiString textureOpacity;
+	aiString textureDisp;
 
 	//!	Ambient color 
 	aiColor3D ambient;
@@ -310,7 +312,7 @@ struct Model
 		m_Groups.clear();
 
 		for ( std::map<std::string, Material*>::iterator it = m_MaterialMap.begin(); it != m_MaterialMap.end(); ++it ) {
-//			delete it->second;
+			delete it->second;
 		}
 	}
 };

@@ -26,7 +26,7 @@
 
 #include <cstring>
 #include <cstdarg>
-#include <ctype.h>
+#include <cctype>
 
 namespace Urho3D
 {

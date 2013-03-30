@@ -146,11 +146,11 @@ bool Scene::Save(Serializer& dest)
     
     if (Node::Save(dest))
     {
-    	FinishSaving(&dest);
-    	return true;
+        FinishSaving(&dest);
+        return true;
     }
     else
-    	return false;
+        return false;
 }
 
 bool Scene::LoadXML(const XMLElement& source)
@@ -217,11 +217,11 @@ bool Scene::SaveXML(Serializer& dest)
     
     if (xml->Save(dest))
     {
-    	FinishSaving(&dest);
-    	return true;
+        FinishSaving(&dest);
+        return true;
     }
     else
-    	return false;
+        return false;
 }
 
 bool Scene::LoadAsync(File* file)

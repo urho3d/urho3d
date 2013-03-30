@@ -26,7 +26,6 @@
 
 #include <cstdio>
 #include <cstring>
-#include <ctype.h>
 
 #include "DebugNew.h"
 

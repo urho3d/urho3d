@@ -61,7 +61,9 @@ namespace IFC {
 	typedef aiColor4t<IfcFloat> IfcColor4; 
 
 
-// helper for std::for_each to delete all heap-allocated items in a container
+// ------------------------------------------------------------------------------------------------
+// Helper for std::for_each to delete all heap-allocated items in a container
+// ------------------------------------------------------------------------------------------------
 template<typename T>
 struct delete_fun
 {
@@ -70,26 +72,94 @@ struct delete_fun
 	}
 };
 
+
+
+// ------------------------------------------------------------------------------------------------
+// Helper used during mesh construction. Aids at creating aiMesh'es out of relatively few polygons.
+// ------------------------------------------------------------------------------------------------
+struct TempMesh
+{
+	std::vector<IfcVector3> verts;
+	std::vector<unsigned int> vertcnt;
+
+	// utilities
+	aiMesh* ToMesh();
+	void Clear();
+	void Transform(const IfcMatrix4& mat);
+	IfcVector3 Center() const;
+	void Append(const TempMesh& other);
+
+	bool IsEmpty() const {
+		return verts.empty() && vertcnt.empty();
+	}
+
+	void RemoveAdjacentDuplicates();
+	void RemoveDegenerates();
+
+	void FixupFaceOrientation();
+	IfcVector3 ComputeLastPolygonNormal(bool normalize = true) const;
+	void ComputePolygonNormals(std::vector<IfcVector3>& normals, 
+		bool normalize = true, 
+		size_t ofs = 0) const;
+
+	void Swap(TempMesh& other);
+};
+
+
 // ------------------------------------------------------------------------------------------------
 // Temporary representation of an opening in a wall or a floor
 // ------------------------------------------------------------------------------------------------
-struct TempMesh;
 struct TempOpening 
 {
-	const IFC::IfcExtrudedAreaSolid* solid;
+	const IFC::IfcSolidModel* solid;
 	IfcVector3 extrusionDir;
+	
 	boost::shared_ptr<TempMesh> profileMesh;
+	boost::shared_ptr<TempMesh> profileMesh2D;
+
+	// list of points generated for this opening. This is used to
+	// create connections between two opposing holes created
+	// from a single opening instance (two because walls tend to
+	// have two sides). If !empty(), the other side of the wall
+	// has already been processed.
+	std::vector<IfcVector3> wallPoints;
 
 	// ------------------------------------------------------------------------------
-	TempOpening(const IFC::IfcExtrudedAreaSolid* solid,IfcVector3 extrusionDir,boost::shared_ptr<TempMesh> profileMesh)
+	TempOpening()
+		: solid()
+		, extrusionDir()
+		, profileMesh()
+	{
+	}
+
+	// ------------------------------------------------------------------------------
+	TempOpening(const IFC::IfcSolidModel* solid,IfcVector3 extrusionDir,
+		boost::shared_ptr<TempMesh> profileMesh, 
+		boost::shared_ptr<TempMesh> profileMesh2D)
 		: solid(solid)
 		, extrusionDir(extrusionDir)
 		, profileMesh(profileMesh)
+		, profileMesh2D(profileMesh2D)
 	{
 	}
 
 	// ------------------------------------------------------------------------------
 	void Transform(const IfcMatrix4& mat); // defined later since TempMesh is not complete yet
+
+
+
+	// ------------------------------------------------------------------------------
+	// Helper to sort openings by distance from a given base point
+	struct DistanceSorter {
+
+		DistanceSorter(const IfcVector3& base) : base(base) {}
+
+		bool operator () (const TempOpening& a, const TempOpening& b) const {
+			return (a.profileMesh->Center()-base).SquareLength() < (b.profileMesh->Center()-base).SquareLength();
+		}
+
+		IfcVector3 base;
+	};
 };
 
 
@@ -100,7 +170,7 @@ struct ConversionData
 {
 	ConversionData(const STEP::DB& db, const IFC::IfcProject& proj, aiScene* out,const IFCImporter::Settings& settings)
 		: len_scale(1.0)
-		, angle_scale(1.0)
+		, angle_scale(-1.0)
 		, db(db)
 		, proj(proj)
 		, out(out)
@@ -138,7 +208,10 @@ struct ConversionData
 	// for later processing by a parent, which is a wall. 
 	std::vector<TempOpening>* apply_openings;
 	std::vector<TempOpening>* collect_openings;
+
+	std::set<uint64_t> already_processed;
 };
+
 
 // ------------------------------------------------------------------------------------------------
 // Binary predicate to compare vectors with a given, quadratic epsilon.
@@ -155,23 +228,18 @@ struct FuzzyVectorCompare {
 
 
 // ------------------------------------------------------------------------------------------------
-// Helper used during mesh construction. Aids at creating aiMesh'es out of relatively few polygons.
+// Ordering predicate to totally order R^2 vectors first by x and then by y
 // ------------------------------------------------------------------------------------------------
-struct TempMesh
-{
-	std::vector<IfcVector3> verts;
-	std::vector<unsigned int> vertcnt;
+struct XYSorter {
 
-	// utilities
-	aiMesh* ToMesh();
-	void Clear();
-	void Transform(const IfcMatrix4& mat);
-	IfcVector3 Center() const;
-	void Append(const TempMesh& other);
-	void RemoveAdjacentDuplicates();
+	// sort first by X coordinates, then by Y coordinates
+	bool operator () (const IfcVector2&a, const IfcVector2& b) const {
+		if (a.x == b.x) {
+			return a.y < b.y;
+		}
+		return a.x < b.x;
+	}
 };
-
-
 
 
 
@@ -198,8 +266,40 @@ bool ProcessProfile(const IfcProfileDef& prof, TempMesh& meshout, ConversionData
 unsigned int ProcessMaterials(const IFC::IfcRepresentationItem& item, ConversionData& conv);
 
 // IFCGeometry.cpp
+IfcMatrix3 DerivePlaneCoordinateSpace(const TempMesh& curmesh, bool& ok, IfcVector3& norOut);
 bool ProcessRepresentationItem(const IfcRepresentationItem& item, std::vector<unsigned int>& mesh_indices, ConversionData& conv);
 void AssignAddedMeshes(std::vector<unsigned int>& mesh_indices,aiNode* nd,ConversionData& /*conv*/);
+
+void ProcessSweptAreaSolid(const IfcSweptAreaSolid& swept, TempMesh& meshout, 
+						   ConversionData& conv);
+
+void ProcessExtrudedAreaSolid(const IfcExtrudedAreaSolid& solid, TempMesh& result, 
+							  ConversionData& conv, bool collect_openings);
+
+// IFCBoolean.cpp
+
+void ProcessBoolean(const IfcBooleanResult& boolean, TempMesh& result, ConversionData& conv);
+void ProcessBooleanHalfSpaceDifference(const IfcHalfSpaceSolid* hs, TempMesh& result, 
+									   const TempMesh& first_operand, 
+									   ConversionData& conv);
+
+void ProcessPolygonalBoundedBooleanHalfSpaceDifference(const IfcPolygonalBoundedHalfSpace* hs, TempMesh& result, 
+													   const TempMesh& first_operand, 
+													   ConversionData& conv);
+void ProcessBooleanExtrudedAreaSolidDifference(const IfcExtrudedAreaSolid* as, TempMesh& result, 
+											   const TempMesh& first_operand, 
+											   ConversionData& conv);
+
+
+// IFCOpenings.cpp
+
+bool GenerateOpenings(std::vector<TempOpening>& openings,
+					  const std::vector<IfcVector3>& nors, 
+					  TempMesh& curmesh,
+					  bool check_intersection,
+					  bool generate_connection_geometry,
+					  const IfcVector3& wall_extrusion_axis = IfcVector3(0,1,0));
+
 
 
 // IFCCurve.cpp
@@ -304,8 +404,8 @@ public:
 	using Curve::SampleDiscrete;
 };
 
-
-
+// IfcProfile.cpp
+bool ProcessCurve(const IfcCurve& curve,  TempMesh& meshout, ConversionData& conv);
 }
 }
 

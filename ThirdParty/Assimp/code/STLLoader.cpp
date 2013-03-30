@@ -203,7 +203,7 @@ void STLImporter::LoadASCIIFile()
 	pMesh->mNormals  = new aiVector3D[pMesh->mNumVertices];
 	
 	unsigned int curFace = 0, curVertex = 3;
-	while (true)
+	for ( ;; )
 	{
 		// go to the next token
 		if(!SkipSpacesAndLineEnd(&sz))
@@ -382,9 +382,9 @@ bool STLImporter::LoadBinaryFile()
 
 				DefaultLogger::get()->info("STL: Mesh has vertex colors");
 			}
-			aiColor4D* clr = &pMesh->mColors[0][pMesh->mNumFaces*3];
+			aiColor4D* clr = &pMesh->mColors[0][i*3];
 			clr->a = 1.0f;
-			if (bIsMaterialise) // fuck, this is reversed
+			if (bIsMaterialise) // this is reversed
 			{
 				clr->r = (color & 0x31u) / 31.0f;
 				clr->g = ((color & (0x31u<<5))>>5u) / 31.0f;

@@ -60,9 +60,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	 *
 	 * Other (mixed) configuration switches are listed here:
 	 *    ASSIMP_BUILD_NO_COMPRESSED_X 
-	 *      - Disable support for compressed X files
+	 *      - Disable support for compressed X files (zip)
 	 *    ASSIMP_BUILD_NO_COMPRESSED_BLEND
-	 *      - Disable support for compressed Blender files*/
+	 *      - Disable support for compressed Blender files (zip)
+	 *    ASSIMP_BUILD_NO_COMPRESSED_IFC
+	 *      - Disable support for IFCZIP files (unzip)
+	 */
 	//////////////////////////////////////////////////////////////////////////
 
 #ifndef ASSIMP_BUILD_NO_COMPRESSED_X
@@ -71,6 +74,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_COMPRESSED_BLEND
 #	define ASSIMP_BUILD_NEED_Z_INFLATE
+#endif
+
+#ifndef ASSIMP_BUILD_NO_COMPRESSED_IFC
+#	define ASSIMP_BUILD_NEED_Z_INFLATE
+#	define ASSIMP_BUILD_NEED_UNZIP
+#endif
+
+#ifndef ASSIMP_BUILD_NO_Q3BSP_IMPORTER
+#	define ASSIMP_BUILD_NEED_Z_INFLATE
+#	define ASSIMP_BUILD_NEED_UNZIP
 #endif
 
 	//////////////////////////////////////////////////////////////////////////
@@ -135,6 +148,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	/* Tells the compiler that a function never returns. Used in code analysis
 	 * to skip dead paths (e.g. after an assertion evaluated to false). */
 #	define AI_WONT_RETURN __declspec(noreturn)
+
+#elif defined(SWIG)
+
+	/* Do nothing, the relevant defines are all in AssimpSwigPort.i */
+
 #else
 	
 #	define AI_WONT_RETURN

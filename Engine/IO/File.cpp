@@ -327,7 +327,7 @@ unsigned File::GetChecksum()
 {
     if (offset_ || checksum_)
         return checksum_;
-    if (!handle_)
+    if (!handle_ || mode_ == FILE_WRITE)
         return 0;
     
     PROFILE(CalculateFileChecksum);

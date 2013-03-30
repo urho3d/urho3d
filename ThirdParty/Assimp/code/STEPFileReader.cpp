@@ -44,8 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "AssimpPCH.h"
 #include "STEPFileReader.h"
+#include "STEPFileEncoding.h"
 #include "TinyFormatter.h"
 #include "fast_atof.h"
+
 
 using namespace Assimp;
 namespace EXPRESS = STEP::EXPRESS;
@@ -160,6 +162,30 @@ STEP::DB* STEP::ReadFileHeader(boost::shared_ptr<IOStream> stream)
 }
 
 
+namespace {
+
+// ------------------------------------------------------------------------------------------------
+// check whether the given line contains an entity definition (i.e. starts with "#<number>=")
+bool IsEntityDef(const std::string& snext)
+{
+	if (snext[0] == '#') {
+		// it is only a new entity if it has a '=' after the
+		// entity ID.
+		for(std::string::const_iterator it = snext.begin()+1; it != snext.end(); ++it) {
+			if (*it == '=') {
+				return true;
+			}
+			if (*it < '0' || *it > '9') {
+				break;
+			}
+		}
+	}
+	return false;
+}
+
+}
+
+
 // ------------------------------------------------------------------------------------------------
 void STEP::ReadFile(DB& db,const EXPRESS::ConversionSchema& scheme,
 	const char* const* types_to_track, size_t len,
@@ -171,8 +197,9 @@ void STEP::ReadFile(DB& db,const EXPRESS::ConversionSchema& scheme,
 
 	const DB::ObjectMap& map = db.GetObjects();
 	LineSplitter& splitter = db.GetSplitter();
-	for(; splitter; ++splitter) {
-		const std::string& s = *splitter;
+	while (splitter) {
+		bool has_next = false;
+		std::string s = *splitter;
 		if (s == "ENDSEC;") {
 			break;
 		}
@@ -184,6 +211,7 @@ void STEP::ReadFile(DB& db,const EXPRESS::ConversionSchema& scheme,
 		ai_assert(s.length());
 		if (s[0] != '#') {
 			DefaultLogger::get()->warn(AddLineNumber("expected token \'#\'",line));
+			++splitter;
 			continue;
 		}
 
@@ -195,25 +223,75 @@ void STEP::ReadFile(DB& db,const EXPRESS::ConversionSchema& scheme,
 		const std::string::size_type n0 = s.find_first_of('=');
 		if (n0 == std::string::npos) {
 			DefaultLogger::get()->warn(AddLineNumber("expected token \'=\'",line));
+			++splitter;
 			continue;
 		}
 
 		const uint64_t id = strtoul10_64(s.substr(1,n0-1).c_str());
 		if (!id) {
 			DefaultLogger::get()->warn(AddLineNumber("expected positive, numeric entity id",line));
+			++splitter;
 			continue;
 		}
 
-		const std::string::size_type n1 = s.find_first_of('(',n0);
+		std::string::size_type n1 = s.find_first_of('(',n0);
 		if (n1 == std::string::npos) {
-			DefaultLogger::get()->warn(AddLineNumber("expected token \'(\'",line));
-			continue;
+
+			has_next = true;
+			bool ok = false;
+
+			for( ++splitter; splitter; ++splitter) {
+				const std::string& snext = *splitter;
+				if (snext.empty()) {
+					continue;
+				}
+
+				// the next line doesn't start an entity, so maybe it is 
+				// just a continuation  for this line, keep going
+				if (!IsEntityDef(snext)) {
+					s.append(snext);
+					n1 = s.find_first_of('(',n0);
+					ok = (n1 != std::string::npos);
+				}
+				else {
+					break;
+				}
+			}
+
+			if(!ok) {
+				DefaultLogger::get()->warn(AddLineNumber("expected token \'(\'",line));
+				continue;
+			}
 		}
 
-		const std::string::size_type n2 = s.find_last_of(')');
-		if (n2 == std::string::npos || n2 < n1) {
-			DefaultLogger::get()->warn(AddLineNumber("expected token \')\'",line));
-			continue;
+		std::string::size_type n2 = s.find_last_of(')');
+		if (n2 == std::string::npos || n2 < n1 || n2 == s.length() - 1 || s[n2 + 1] != ';') {
+			
+			has_next = true;
+			bool ok = false;
+
+			for( ++splitter; splitter; ++splitter) {
+				const std::string& snext = *splitter;
+				if (snext.empty()) {
+					continue;
+				}
+
+				// the next line doesn't start an entity, so maybe it is 
+				// just a continuation  for this line, keep going
+				if (!IsEntityDef(snext)) {
+					s.append(snext);
+					n2 = s.find_last_of(')');
+					ok = !(n2 == std::string::npos || n2 < n1 || n2 == s.length() - 1 || s[n2 + 1] != ';');
+				}
+				else {
+					break;
+				}
+			}
+
+			if(!ok) {
+				DefaultLogger::get()->warn(AddLineNumber("expected token \')\'",line));
+				continue;
+			}
 		}
 
 		if (map.find(id) != map.end()) {
@@ -239,6 +317,10 @@ void STEP::ReadFile(DB& db,const EXPRESS::ConversionSchema& scheme,
 
 			db.InternInsert(new LazyObject(db,id,line,sz,copysz));
 		}
+
+		if(!has_next) {
+			++splitter;
+		}
 	}
 
 	if (!splitter) {
@@ -250,7 +332,6 @@ void STEP::ReadFile(DB& db,const EXPRESS::ConversionSchema& scheme,
 			db.GetRefs().size()," inverse index entries"));
 	}
 }
-
 
 // ------------------------------------------------------------------------------------------------
 boost::shared_ptr<const EXPRESS::DataType> EXPRESS::DataType::Parse(const char*& inout,uint64_t line, const EXPRESS::ConversionSchema* schema /*= NULL*/)
@@ -339,7 +420,15 @@ boost::shared_ptr<const EXPRESS::DataType> EXPRESS::DataType::Parse(const char*&
 
 		inout = cur + 1;
 
-		return boost::make_shared<EXPRESS::STRING>(std::string(start, static_cast<size_t>(cur - start)));
+		// assimp is supposed to output UTF8 strings, so we have to deal
+		// with foreign encodings.
+		std::string stemp = std::string(start, static_cast<size_t>(cur - start));
+		if(!StringToUTF8(stemp)) {
+			// TODO: route this to a correct logger with line numbers etc., better error messages
+			DefaultLogger::get()->error("an error occurred reading escape sequences in ASCII text");
+		}
+
+		return boost::make_shared<EXPRESS::STRING>(stemp);
 	}
 	else if (*cur == '\"' ) {
 		throw STEP::SyntaxError("binary data not supported yet",line);
@@ -436,7 +525,7 @@ STEP::LazyObject::LazyObject(DB& db, uint64_t id,uint64_t /*line*/, const char* 
 				--skip_depth;
 			}
 
-			if (skip_depth == 1 && *a=='#') {
+			if (skip_depth >= 1 && *a=='#') {
 				const char* tmp;
 				const int64_t num = static_cast<int64_t>( strtoul10_64(a+1,&tmp) );
 				db.MarkRef(num,id);

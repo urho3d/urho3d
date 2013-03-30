@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "AssimpPCH.h"
-#ifndef ASSIMP_BUILD_NO_DAE_IMPORTER
+#ifndef ASSIMP_BUILD_NO_COLLADA_IMPORTER
 
 #include "ColladaParser.h"
 #include "fast_atof.h"
@@ -487,7 +487,7 @@ void ColladaParser::ReadController( Collada::Controller& pController)
 			else if( IsElement( "skin"))
 			{
 				// read the mesh it refers to. According to the spec this could also be another
-				// controller, but I refuse to implement every bullshit idea they've come up with
+				// controller, but I refuse to implement every single idea they've come up with
 				int sourceIndex = GetAttribute( "source");
 				pController.mMeshId = mReader->getAttributeValue( sourceIndex) + 1;
 			} 
@@ -599,7 +599,7 @@ void ColladaParser::ReadControllerWeights( Collada::Controller& pController)
 		if( mReader->getNodeType() == irr::io::EXN_ELEMENT) 
 		{
 			// Input channels for weight data. Two possible semantics: "JOINT" and "WEIGHT"
-			if( IsElement( "input"))
+			if( IsElement( "input") && vertexCount > 0 )
 			{
 				InputChannel channel;
 
@@ -628,7 +628,7 @@ void ColladaParser::ReadControllerWeights( Collada::Controller& pController)
 				if( !mReader->isEmptyElement())
 					SkipElement();
 			}
-			else if( IsElement( "vcount"))
+			else if( IsElement( "vcount") && vertexCount > 0 )
 			{
 				// read weight count per vertex
 				const char* text = GetTextContent();
@@ -648,7 +648,7 @@ void ColladaParser::ReadControllerWeights( Collada::Controller& pController)
 				// reserve weight count 
 				pController.mWeights.resize( numWeights);
 			}
-			else if( IsElement( "v"))
+			else if( IsElement( "v") && vertexCount > 0 )
 			{
 				// read JointIndex - WeightIndex pairs
 				const char* text = GetTextContent();
@@ -1097,9 +1097,6 @@ void ColladaParser::ReadEffectLibrary()
 			if( IsElement( "effect"))
 			{
 				// read ID. Do I have to repeat my ranting about "optional" attributes?
-				// Alex: .... no, not necessary. Please shut up and leave more space for 
-				// me to complain about the fucking Collada spec with its fucking
-				// 'optional' attributes ...
 				int attrID = GetAttribute( "id");
 				std::string id = mReader->getAttributeValue( attrID);
 
@@ -1369,9 +1366,11 @@ void ColladaParser::ReadEffectColor( aiColor4D& pColor, Sampler& pSampler)
 				int attrTex = GetAttribute( "texture");
 				pSampler.mName = mReader->getAttributeValue( attrTex);
 
-				// get name of UV source channel
-				attrTex = GetAttribute( "texcoord");
-				pSampler.mUVChannel = mReader->getAttributeValue( attrTex);
+				// get name of UV source channel. Specification demands it to be there, but some exporters
+				// don't write it. It will be the default UV channel in case it's missing.
+				attrTex = TestAttribute( "texcoord");
+				if( attrTex >= 0 )
+	  				pSampler.mUVChannel = mReader->getAttributeValue( attrTex);
 				//SkipElement();
 			}
 			else if( IsElement( "technique"))
@@ -1611,7 +1610,7 @@ void ColladaParser::ReadSource()
 			}
 			else if( IsElement( "technique_common"))
 			{
-				// I don't fucking care for your profiles bullshit
+				// I don't care for your profiles 
 			}
 			else if( IsElement( "accessor"))
 			{
@@ -1654,6 +1653,7 @@ void ColladaParser::ReadDataArray()
 	std::string id = mReader->getAttributeValue( indexID);
 	int indexCount = GetAttribute( "count");
 	unsigned int count = (unsigned int) mReader->getAttributeValueAsInt( indexCount);
+	if (count == 0) { return; } // some exporters write empty data arrays with count="0"
 	const char* content = TestTextContent();
 
   // read values and store inside an array in the data library
@@ -1795,14 +1795,13 @@ void ColladaParser::ReadAccessor( const std::string& pID)
 				SkipElement();
 			} else
 			{
-				ThrowException( "Unexpected sub element in tag \"accessor\".");
+				ThrowException( boost::str( boost::format( "Unexpected sub element <%s> in tag <accessor>") % mReader->getNodeName()));
 			}
 		} 
 		else if( mReader->getNodeType() == irr::io::EXN_ELEMENT_END)
 		{
 			if( strcmp( mReader->getNodeName(), "accessor") != 0)
-				ThrowException( "Expected end of \"accessor\" element.");
-
+				ThrowException( "Expected end of <accessor> element.");
 			break;
 		}
 	}
@@ -1826,13 +1825,13 @@ void ColladaParser::ReadVertexData( Mesh* pMesh)
 				ReadInputChannel( pMesh->mPerVertexData);
 			} else
 			{
-				ThrowException( "Unexpected sub element in tag \"vertices\".");
+				ThrowException( boost::str( boost::format( "Unexpected sub element <%s> in tag <vertices>") % mReader->getNodeName()));
 			}
 		} 
 		else if( mReader->getNodeType() == irr::io::EXN_ELEMENT_END)
 		{
 			if( strcmp( mReader->getNodeName(), "vertices") != 0)
-				ThrowException( "Expected end of \"vertices\" element.");
+				ThrowException( "Expected end of <vertices> element.");
 
 			break;
 		}
@@ -1919,13 +1918,13 @@ void ColladaParser::ReadIndexData( Mesh* pMesh)
 				}
 			} else
 			{
-				ThrowException( "Unexpected sub element in tag \"vertices\".");
+				ThrowException( boost::str( boost::format( "Unexpected sub element <%s> in tag <%s>") % mReader->getNodeName() % elementName));
 			}
 		} 
 		else if( mReader->getNodeType() == irr::io::EXN_ELEMENT_END)
 		{
 			if( mReader->getNodeName() != elementName)
-				ThrowException( boost::str( boost::format( "Expected end of \"%s\" element.") % elementName));
+				ThrowException( boost::str( boost::format( "Expected end of <%s> element.") % elementName));
 
 			break;
 		}
@@ -2063,7 +2062,7 @@ void ColladaParser::ReadPrimitives( Mesh* pMesh, std::vector<InputChannel>& pPer
 		{
 			// warn if the vertex channel does not refer to the <vertices> element in the same mesh
 			if( input.mAccessor != pMesh->mVertexID)
-				ThrowException( "Unsupported vertex referencing scheme. I fucking hate Collada.");
+				ThrowException( "Unsupported vertex referencing scheme.");
 			continue;
 		}
 
@@ -2155,7 +2154,7 @@ void ColladaParser::ExtractDataObjectFromChannel( const InputChannel& pInput, si
 
 	// get a pointer to the start of the data object referred to by the accessor and the local index
 	const float* dataObject = &(acc.mData->mValues[0]) + acc.mOffset + pLocalIndex* acc.mStride;
-	
+
 	// assemble according to the accessors component sub-offset list. We don't care, yet,
 	// what kind of object exactly we're extracting here
 	float obj[4];
@@ -2172,74 +2171,79 @@ void ColladaParser::ExtractDataObjectFromChannel( const InputChannel& pInput, si
 				DefaultLogger::get()->error("Collada: just one vertex position stream supported");
 			break;
 		case IT_Normal: 
-      // pad to current vertex count if necessary
-      if( pMesh->mNormals.size() < pMesh->mPositions.size()-1)
-        pMesh->mNormals.insert( pMesh->mNormals.end(), pMesh->mPositions.size() - pMesh->mNormals.size() - 1, aiVector3D( 0, 1, 0));
+			// pad to current vertex count if necessary
+			if( pMesh->mNormals.size() < pMesh->mPositions.size()-1)
+				pMesh->mNormals.insert( pMesh->mNormals.end(), pMesh->mPositions.size() - pMesh->mNormals.size() - 1, aiVector3D( 0, 1, 0));
 
-      // ignore all normal streams except 0 - there can be only one normal
-      if( pInput.mIndex == 0)
+			// ignore all normal streams except 0 - there can be only one normal
+			if( pInput.mIndex == 0)
 				pMesh->mNormals.push_back( aiVector3D( obj[0], obj[1], obj[2])); 
 			else 
 				DefaultLogger::get()->error("Collada: just one vertex normal stream supported");
 			break;
 		case IT_Tangent: 
-      // pad to current vertex count if necessary
-      if( pMesh->mTangents.size() < pMesh->mPositions.size()-1)
-        pMesh->mTangents.insert( pMesh->mTangents.end(), pMesh->mPositions.size() - pMesh->mTangents.size() - 1, aiVector3D( 1, 0, 0));
+			// pad to current vertex count if necessary
+			if( pMesh->mTangents.size() < pMesh->mPositions.size()-1)
+				pMesh->mTangents.insert( pMesh->mTangents.end(), pMesh->mPositions.size() - pMesh->mTangents.size() - 1, aiVector3D( 1, 0, 0));
 
-      // ignore all tangent streams except 0 - there can be only one tangent
-      if( pInput.mIndex == 0)
+			// ignore all tangent streams except 0 - there can be only one tangent
+			if( pInput.mIndex == 0)
 				pMesh->mTangents.push_back( aiVector3D( obj[0], obj[1], obj[2])); 
 			else 
 				DefaultLogger::get()->error("Collada: just one vertex tangent stream supported");
 			break;
 		case IT_Bitangent: 
-      // pad to current vertex count if necessary
-      if( pMesh->mBitangents.size() < pMesh->mPositions.size()-1)
-        pMesh->mBitangents.insert( pMesh->mBitangents.end(), pMesh->mPositions.size() - pMesh->mBitangents.size() - 1, aiVector3D( 0, 0, 1));
+			// pad to current vertex count if necessary
+			if( pMesh->mBitangents.size() < pMesh->mPositions.size()-1)
+				pMesh->mBitangents.insert( pMesh->mBitangents.end(), pMesh->mPositions.size() - pMesh->mBitangents.size() - 1, aiVector3D( 0, 0, 1));
 
-      // ignore all bitangent streams except 0 - there can be only one bitangent
-      if( pInput.mIndex == 0)
+			// ignore all bitangent streams except 0 - there can be only one bitangent
+			if( pInput.mIndex == 0)
 				pMesh->mBitangents.push_back( aiVector3D( obj[0], obj[1], obj[2])); 
 			else 
 				DefaultLogger::get()->error("Collada: just one vertex bitangent stream supported");
 			break;
 		case IT_Texcoord: 
-      // up to 4 texture coord sets are fine, ignore the others
+			// up to 4 texture coord sets are fine, ignore the others
 			if( pInput.mIndex < AI_MAX_NUMBER_OF_TEXTURECOORDS) 
-      {
-        // pad to current vertex count if necessary
-        if( pMesh->mTexCoords[pInput.mIndex].size() < pMesh->mPositions.size()-1)
-          pMesh->mTexCoords[pInput.mIndex].insert( pMesh->mTexCoords[pInput.mIndex].end(), 
-            pMesh->mPositions.size() - pMesh->mTexCoords[pInput.mIndex].size() - 1, aiVector3D( 0, 0, 0));
+			{
+				// pad to current vertex count if necessary
+				if( pMesh->mTexCoords[pInput.mIndex].size() < pMesh->mPositions.size()-1)
+					pMesh->mTexCoords[pInput.mIndex].insert( pMesh->mTexCoords[pInput.mIndex].end(), 
+						pMesh->mPositions.size() - pMesh->mTexCoords[pInput.mIndex].size() - 1, aiVector3D( 0, 0, 0));
 
 				pMesh->mTexCoords[pInput.mIndex].push_back( aiVector3D( obj[0], obj[1], obj[2]));
 				if (0 != acc.mSubOffset[2] || 0 != acc.mSubOffset[3]) /* hack ... consider cleaner solution */
 					pMesh->mNumUVComponents[pInput.mIndex]=3;
 			}	else 
-      {
+			{
 				DefaultLogger::get()->error("Collada: too many texture coordinate sets. Skipping.");
-      }
+			}
 			break;
 		case IT_Color: 
-      // up to 4 color sets are fine, ignore the others
+			// up to 4 color sets are fine, ignore the others
 			if( pInput.mIndex < AI_MAX_NUMBER_OF_COLOR_SETS)
-      {
-        // pad to current vertex count if necessary
-        if( pMesh->mColors[pInput.mIndex].size() < pMesh->mPositions.size()-1)
-          pMesh->mColors[pInput.mIndex].insert( pMesh->mColors[pInput.mIndex].end(), 
-            pMesh->mPositions.size() - pMesh->mColors[pInput.mIndex].size() - 1, aiColor4D( 0, 0, 0, 1));
+			{
+				// pad to current vertex count if necessary
+				if( pMesh->mColors[pInput.mIndex].size() < pMesh->mPositions.size()-1)
+					pMesh->mColors[pInput.mIndex].insert( pMesh->mColors[pInput.mIndex].end(), 
+						pMesh->mPositions.size() - pMesh->mColors[pInput.mIndex].size() - 1, aiColor4D( 0, 0, 0, 1));
 
-				pMesh->mColors[pInput.mIndex].push_back( aiColor4D( obj[0], obj[1], obj[2], obj[3])); 
-      } else 
-      {
+				aiColor4D result(0, 0, 0, 1);
+				for (size_t i = 0; i < pInput.mResolved->mSize; ++i)
+				{
+					result[i] = obj[pInput.mResolved->mSubOffset[i]];
+				}
+				pMesh->mColors[pInput.mIndex].push_back(result); 
+			} else 
+			{
 				DefaultLogger::get()->error("Collada: too many vertex color sets. Skipping.");
-      }
+			}
 
 			break;
-	default:
-		// IT_Invalid and IT_Vertex 
-		ai_assert(false && "shouldn't ever get here");
+		default:
+			// IT_Invalid and IT_Vertex 
+			ai_assert(false && "shouldn't ever get here");
 	}
 }
 

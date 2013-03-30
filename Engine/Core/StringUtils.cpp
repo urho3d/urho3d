@@ -24,7 +24,6 @@
 #include "StringUtils.h"
 
 #include <cstdio>
-#include <ctype.h>
 
 #include "DebugNew.h"
 
@@ -398,6 +397,16 @@ String ToString(const char* formatString, ...)
     ret.AppendWithFormatArgs(formatString, args);
     va_end(args);
     return ret;
+}
+
+bool IsAlpha(unsigned ch)
+{
+    return ch < 255 ? isalpha(ch) : false;
+}
+
+bool IsDigit(unsigned ch)
+{
+    return ch < 255 ? isdigit(ch) : false;
 }
 
 }

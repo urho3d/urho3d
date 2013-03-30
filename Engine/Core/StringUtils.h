@@ -91,5 +91,9 @@ unsigned GetStringListIndex(const char* value, const String* strings, unsigned d
 unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive = false);
 /// Return a formatted string.
 String ToString(const char* formatString, ...);
+/// Return whether a char is an alphabet letter.
+bool IsAlpha(unsigned ch);
+/// Return whether a char is a digit.
+bool IsDigit(unsigned ch);
 
 }

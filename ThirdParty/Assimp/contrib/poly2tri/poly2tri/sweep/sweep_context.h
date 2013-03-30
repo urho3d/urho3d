@@ -158,7 +158,7 @@ inline AdvancingFront* SweepContext::front()
 
 inline int SweepContext::point_count()
 {
-  return static_cast<int>(points_.size());
+  return points_.size();
 }
 
 inline void SweepContext::set_head(Point* p1)

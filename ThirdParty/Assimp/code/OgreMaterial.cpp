@@ -65,9 +65,8 @@ namespace Ogre
 aiMaterial* OgreImporter::LoadMaterial(const std::string MaterialName) const
 {
 	const aiScene* const m_CurrentScene=this->m_CurrentScene;//make sure, that we can access but not change the scene
-	(void)m_CurrentScene;
 
-	/*For bettetr understanding of the material parser, here is a material example file:
+	/*For better understanding of the material parser, here is a material example file:
 
 	material Sarg
 	{
@@ -143,17 +142,27 @@ aiMaterial* OgreImporter::LoadMaterial(const std::string MaterialName) const
 					if(NULL==MatFilePtr)
 					{
 						DefaultLogger::get()->error(m_MaterialLibFilename+" and "+MaterialFileName + " could not be opened, Material will not be loaded!");
-						return NULL;
+						return new aiMaterial();
 					}
 				}
 			}
 		}
+		//Fill the stream
 		boost::scoped_ptr<IOStream> MaterialFile(MatFilePtr);
-		vector<char> FileData(MaterialFile->FileSize());
-		MaterialFile->Read(&FileData[0], MaterialFile->FileSize(), 1);
-		BaseImporter::ConvertToUTF8(FileData);
+		if(MaterialFile->FileSize()>0)
+		{
+			vector<char> FileData(MaterialFile->FileSize());
+			MaterialFile->Read(&FileData[0], MaterialFile->FileSize(), 1);
+			BaseImporter::ConvertToUTF8(FileData);
 
-		ss << &FileData[0];
+			FileData.push_back('\0');//terminate the string with zero, so that the ss can parse it correctly
+			ss << &FileData[0];
+		}
+		else
+		{
+			DefaultLogger::get()->warn("Material " + MaterialName + " seams to be empty");
+			return NULL;
+		}
 	}
 
 	//create the material

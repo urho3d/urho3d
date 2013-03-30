@@ -311,18 +311,18 @@ void RemoveAutoLinks(String& line)
             i += 3;
             continue;
         }
-        else if (inWebLink && !isalpha(line[i]) && !isdigit(line[i]) && line[i] != '/' && line[i] != ':' && line[i] != '-' &&
+        else if (inWebLink && !IsAlpha(line[i]) && !IsDigit(line[i]) && line[i] != '/' && line[i] != ':' && line[i] != '-' &&
             line[i] != '_' && line[i] != '.')
             inWebLink = false;
             
         else if (!inLink && !inWebLink)
         {
-            if (!inWord && isalpha(line[i]))
+            if (!inWord && IsAlpha(line[i]))
             {
                 inWord = true;
                 wordStart = i;
             }
-            else if (inWord && !isalpha(line[i]) && !isdigit(line[i]))
+            else if (inWord && !IsAlpha(line[i]) && !IsDigit(line[i]))
             {
                 inWord = false;
                 unsigned wordEnd = i;

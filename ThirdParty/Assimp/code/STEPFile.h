@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #ifndef INCLUDED_AI_STEPFILE_H
 #define INCLUDED_AI_STEPFILE_H
 

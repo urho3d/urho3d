@@ -389,9 +389,13 @@ SET(IFC_SRCS
 	code/IFCMaterial.cpp
 	code/IFCProfile.cpp
 	code/IFCCurve.cpp
+	code/IFCBoolean.cpp
+	code/IFCOpenings.cpp
 	code/STEPFile.h
 	code/STEPFileReader.h
 	code/STEPFileReader.cpp
+	code/STEPFileEncoding.h
+	code/STEPFileEncoding.cpp
 )
 SOURCE_GROUP( IFC FILES ${IFC_SRCS})
 
@@ -401,6 +405,33 @@ SET( XGL_SRCS
 )
 SOURCE_GROUP( XGL FILES ${XGL_SRCS})
 
+SET(FBX_SRCS
+	code/FBXImporter.cpp
+	code/FBXCompileConfig.h
+	code/FBXImporter.h
+	code/FBXParser.cpp
+	code/FBXParser.h
+	code/FBXTokenizer.cpp
+	code/FBXTokenizer.h
+	code/FBXImportSettings.h
+	code/FBXConverter.h
+	code/FBXConverter.cpp
+	code/FBXUtil.h
+	code/FBXUtil.cpp
+	code/FBXDocument.h
+	code/FBXDocument.cpp
+	code/FBXProperties.h
+	code/FBXProperties.cpp
+	code/FBXMeshGeometry.cpp
+	code/FBXMaterial.cpp
+	code/FBXModel.cpp
+	code/FBXAnimation.cpp
+	code/FBXNodeAttribute.cpp
+	code/FBXDeformer.cpp
+	code/FBXBinaryTokenizer.cpp
+	code/FBXDocumentUtil.cpp
+)
+SOURCE_GROUP( FBX FILES ${FBX_SRCS})
 
 SET( PostProcessing_SRCS
 	code/CalcTangentsProcess.cpp
@@ -646,6 +677,7 @@ SET( SOURCE_FILES
 	${NDO_SRCS}
 	${IFC_SRCS}
 	${XGL_SRCS}
+	${FBX_SRCS}
 )
 
 SET( CONTRIB_FILES
