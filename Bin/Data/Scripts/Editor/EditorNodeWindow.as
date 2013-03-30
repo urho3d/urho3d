@@ -64,7 +64,7 @@ void ShowNodeWindow()
 
 void AdjustListViewChild(ListView@ list)
 {
-	// At the moment, only 'Is Enabled' container (place-holder + check box) is being created as child of the list view instead of as list item
+    // At the moment, only 'Is Enabled' container (place-holder + check box) is being created as child of the list view instead of as list item
     int width = list.width;
     for (uint i = 0; i < list.numChildren; ++i)
     {

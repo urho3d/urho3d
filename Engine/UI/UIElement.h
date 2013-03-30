@@ -87,6 +87,15 @@ enum LayoutMode
     LM_VERTICAL
 };
 
+/// Traversal mode.
+enum TraversalMode
+{
+    /// Traverse thru children having same priority first and recurse into their children before traversing children having higher priority.
+    TM_BREADTH_FIRST = 0,
+    /// Traverse thru each child and its children immediately after in sequence.
+    TM_DEPTH_FIRST
+};
+
 /// Drag and drop disabled.
 static const unsigned DD_DISABLED = 0x0;
 /// Drag and drop source flag.
@@ -283,6 +292,9 @@ public:
     void SetVar(ShortStringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
     void SetInternal(bool enable);
+    /// Set traversal mode. The default traversal mode is TM_BREADTH_FIRST for non-root element. Root element should be set to TM_DEPTH_FIRST to avoid artifacts during rendering.
+    void SetTraversalMode(TraversalMode traversalMode);
+
     /// Template version of creating a child element.
     template <class T> T* CreateChild(const String& name = String::EMPTY);
     
@@ -415,6 +427,8 @@ public:
         currentScissor);
     /// Get color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return color_[0]; }
+    /// Get traversal mode.
+    TraversalMode GetTraversalMode() const { return traversalMode_; }
 
 protected:
     /// Mark screen position as needing an update.
@@ -521,6 +535,8 @@ private:
     bool colorGradient_;
     /// Default style file.
     SharedPtr<XMLFile> defaultStyle_;
+    /// Traversal mode.
+    TraversalMode traversalMode_;
 };
 
 template <class T> T* UIElement::CreateChild(const String& name) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name)); }

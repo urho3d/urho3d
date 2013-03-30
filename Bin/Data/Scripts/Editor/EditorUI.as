@@ -5,24 +5,35 @@ XMLFile@ iconStyle;
 UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
-const ShortStringHash windowType("Window");
-const ShortStringHash menuType("Menu");
+const ShortStringHash UI_ELEMENT_TYPE("UIElement");
+const ShortStringHash WINDOW_TYPE("Window");
+const ShortStringHash MENU_TYPE("Menu");
+const ShortStringHash TEXT_TYPE("Text");
+const ShortStringHash CURSOR_TYPE("Cursor");
+
+const String TEMP_SCENE_NAME("_tempscene_.xml");
+
+const int SHOW_POPUP_INDICATOR = -1;
 
 Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.*"};
+Array<String> uiElementFilters = {"*.xml"};
 Array<String> uiAllFilters = {"*.*"};
 Array<String> uiScriptFilters = {"*.as", "*.*"};
 uint uiSceneFilter = 0;
+uint uiElementFilter = 0;
 uint uiNodeFilter = 0;
 uint uiImportFilter = 0;
 uint uiScriptFilter = 0;
 String uiScenePath = fileSystem.programDir + "Data/Scenes";
+String uiElementPath = fileSystem.programDir + "Data/UI";
 String uiNodePath = fileSystem.programDir + "Data/Objects";
 String uiImportPath;
 String uiScriptPath = fileSystem.programDir + "Data/Scripts";
 
-bool uiHidden = false;
+bool uiFaded = false;
 float uiMinOpacity = 0.3;
 float uiMaxOpacity = 0.7;
+bool uiHidden = false;
 
 void CreateUI()
 {
@@ -33,7 +44,7 @@ void CreateUI()
 
     CreateCursor();
     CreateMenuBar();
-    CreateSceneWindow();
+    CreateHierarchyWindow();
     CreateNodeWindow();
     CreateEditorSettingsDialog();
     CreateEditorPreferencesDialog();
@@ -44,8 +55,8 @@ void CreateUI()
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
     SubscribeToEvent("KeyDown", "HandleKeyDown");
-    SubscribeToEvent("KeyUp", "UnhideUI");
-    SubscribeToEvent("MouseButtonUp", "UnhideUI");
+    SubscribeToEvent("KeyUp", "UnfadeUI");
+    SubscribeToEvent("MouseButtonUp", "UnfadeUI");
 }
 
 void ResizeUI()
@@ -70,9 +81,12 @@ void ResizeUI()
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
     {
-        if (children[i].type == windowType)
+        if (children[i].type == WINDOW_TYPE)
             AdjustPosition(children[i]);
     }
+    
+    // Relayout root UI element
+    editorUIElement.SetSize(graphics.width, graphics.height);
 }
 
 void AdjustPosition(Window@ window)
@@ -108,79 +122,102 @@ void CreateMenuBar()
     ui.root.AddChild(uiMenuBar);
 
     {
-        Menu@ fileMenu = CreateMenu("File");
-        Window@ filePopup = fileMenu.popup;
-        filePopup.vars["Popup"] = "File";
-        filePopup.AddChild(CreateMenuItem("New scene", 'N', QUAL_SHIFT | QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Open scene...", 'O', QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL));
-        filePopup.AddChild(CreateMenuItem("Save scene as...", 'S', QUAL_SHIFT | QUAL_CTRL));
-        filePopup.AddChild(CreateMenuDivider());
+        Menu@ menu = CreateMenu("File");
+        Window@ popup = menu.popup;
+        popup.vars["Popup"] = "File";
+        popup.AddChild(CreateMenuItem("New scene", 'N', QUAL_SHIFT | QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Open scene...", 'O', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Save scene as...", 'S', QUAL_SHIFT | QUAL_CTRL));
+        popup.AddChild(CreateMenuDivider());
 
-        Menu@ loadNodeMenu = CreateMenuItem("Load node");
+        Menu@ loadNodeMenu = CreateMenuItem("Load node", SHOW_POPUP_INDICATOR);
         Window@ loadNodePopup = CreatePopup(loadNodeMenu);
-        loadNodeMenu.popupOffset = IntVector2(loadNodeMenu.width, 0);
         loadNodePopup.AddChild(CreateMenuItem("As replicated..."));
         loadNodePopup.AddChild(CreateMenuItem("As local..."));
-        filePopup.AddChild(loadNodeMenu);
+        popup.AddChild(loadNodeMenu);
         
-        filePopup.AddChild(CreateMenuItem("Save node as..."));
-        filePopup.AddChild(CreateMenuDivider());
-        filePopup.AddChild(CreateMenuItem("Import model..."));
-        filePopup.AddChild(CreateMenuItem("Import scene..."));
-        filePopup.AddChild(CreateMenuItem("Run script..."));
-        filePopup.AddChild(CreateMenuDivider());
-        filePopup.AddChild(CreateMenuItem("Set resource path..."));
-        filePopup.AddChild(CreateMenuDivider());
-        filePopup.AddChild(CreateMenuItem("Exit"));
-        AdjustAccelIndent(filePopup);
-        uiMenuBar.AddChild(fileMenu);
+        popup.AddChild(CreateMenuItem("Save node as..."));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Import model..."));
+        popup.AddChild(CreateMenuItem("Import scene..."));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Run script..."));
+        popup.AddChild(CreateMenuItem("Set resource path..."));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Exit"));
+        AdjustAccelIndent(popup);
+        loadNodeMenu.popupOffset = IntVector2(loadNodeMenu.width, 0);
+        uiMenuBar.AddChild(menu);
+    }
+    
+    {
+        Menu@ menu = CreateMenu("UI-element");
+        Window@ popup = menu.popup;
+        popup.vars["Popup"] = "UI-element";
+        popup.AddChild(CreateMenuItem("New UI-element...", 'N', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Open UI-element...", 'O', QUAL_ALT));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Close UI-element", 'C', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Close all UI-elements"));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Save UI-element", 'S', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Save UI-element as..."));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Load child element..."));
+        popup.AddChild(CreateMenuItem("Save child element as..."));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Set default style..."));
+        AdjustAccelIndent(popup);
+        uiMenuBar.AddChild(menu);
     }
 
     {
-        Menu@ editMenu = CreateMenu("Edit");
-        Window@ editPopup = editMenu.popup;
-        editPopup.vars["Popup"] = "Edit";
-        editPopup.AddChild(CreateMenuItem("Cut", 'X', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY));
-        editPopup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuDivider());
-        editPopup.AddChild(CreateMenuItem("Reset position"));
-        editPopup.AddChild(CreateMenuItem("Reset rotation"));
-        editPopup.AddChild(CreateMenuItem("Reset scale"));
-        editPopup.AddChild(CreateMenuItem("Enable/disable", 'E', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL));
-        editPopup.AddChild(CreateMenuDivider());
-        editPopup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
-        AdjustAccelIndent(editPopup);
-        uiMenuBar.AddChild(editMenu);
+        Menu@ menu = CreateMenu("Edit");
+        Window@ popup = menu.popup;
+        popup.vars["Popup"] = "Edit";
+        popup.AddChild(CreateMenuItem("Cut", 'X', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY));
+        popup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Reset position"));
+        popup.AddChild(CreateMenuItem("Reset rotation"));
+        popup.AddChild(CreateMenuItem("Reset scale"));
+        popup.AddChild(CreateMenuItem("Enable/disable", 'E', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
+        AdjustAccelIndent(popup);
+        uiMenuBar.AddChild(menu);
     }
 
     {
-        Menu@ createMenu = CreateMenu("Create");
-        Window@ createPopup = createMenu.popup;
-        createPopup.vars["Popup"] = "Create";
-        createPopup.AddChild(CreateMenuItem("Box"));
-        createPopup.AddChild(CreateMenuItem("Cone"));
-        createPopup.AddChild(CreateMenuItem("Cylinder"));
-        createPopup.AddChild(CreateMenuItem("Plane"));
-        createPopup.AddChild(CreateMenuItem("Pyramid"));
-        createPopup.AddChild(CreateMenuItem("Sphere"));
-        uiMenuBar.AddChild(createMenu);
+        Menu@ menu = CreateMenu("Create");
+        Window@ popup = menu.popup;
+        popup.vars["Popup"] = "Create";
+        popup.AddChild(CreateMenuItem("Box"));
+        popup.AddChild(CreateMenuItem("Cone"));
+        popup.AddChild(CreateMenuItem("Cylinder"));
+        popup.AddChild(CreateMenuItem("Plane"));
+        popup.AddChild(CreateMenuItem("Pyramid"));
+        popup.AddChild(CreateMenuItem("Sphere"));
+        uiMenuBar.AddChild(menu);
     }
 
     {
-        Menu@ viewMenu = CreateMenu("View");
-        Window@ viewPopup = viewMenu.popup;
-        viewPopup.vars["Popup"] = "View";
-        viewPopup.AddChild(CreateMenuItem("Hierarchy", 'H', QUAL_CTRL));
-        viewPopup.AddChild(CreateMenuItem("Attribute inspector", 'I', QUAL_CTRL));
-        viewPopup.AddChild(CreateMenuItem("Editor settings"));
-        viewPopup.AddChild(CreateMenuItem("Editor preferences"));
-        AdjustAccelIndent(viewPopup);
-        uiMenuBar.AddChild(viewMenu);
+        Menu@ menu = CreateMenu("View");
+        Window@ popup = menu.popup;
+        popup.vars["Popup"] = "View";
+        popup.AddChild(CreateMenuItem("Hierarchy", 'H', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Attribute inspector", 'I', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Editor settings"));
+        popup.AddChild(CreateMenuItem("Editor preferences"));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Hide editor", KEY_F12, QUAL_ANY));
+        AdjustAccelIndent(popup);
+        uiMenuBar.AddChild(menu);
     }
 
     BorderImage@ spacer = BorderImage("MenuBarSpacer");
@@ -188,12 +225,174 @@ void CreateMenuBar()
     uiMenuBar.AddChild(spacer);
 }
 
+void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
+{
+    Menu@ menu = eventData["Element"].GetUIElement();
+    if (menu is null)
+        return;
+
+    String action = menu.name;
+    if (action.empty)
+        return;
+
+    HandlePopup(menu);
+
+    if (uiFileSelector is null)
+    {
+        // File
+        if (action == "New scene")
+            ResetScene();
+        else if (action == "Open scene...")
+        {
+            CreateFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenSceneFile");
+        }
+        else if (action == "Save scene" && !editorScene.fileName.empty && editorScene.fileName != TEMP_SCENE_NAME)
+            SaveScene(editorScene.fileName);
+        else if (action == "Save scene as..." || action == "Save scene")
+        {
+            CreateFileSelector("Save scene as", "Save", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
+            uiFileSelector.fileName = GetFileNameAndExtension(editorScene.fileName);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveSceneFile");
+        }
+        else if (action == "As replicated...")
+        {
+            instantiateMode = REPLICATED;
+            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
+        }
+        else if (action == "As local...")
+        {
+            instantiateMode = LOCAL;
+            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
+        }
+        else if (action == "Save node as...")
+        {
+            if (selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
+            {
+                CreateFileSelector("Save node", "Save", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+                uiFileSelector.fileName = GetFileNameAndExtension(instantiateFileName);
+                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveNodeFile");
+            }
+        }
+        else if (action == "Import model...")
+        {
+            CreateFileSelector("Import model", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportModel");
+        }
+        else if (action == "Import scene...")
+        {
+            CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
+        }
+        else if (action == "Run script...")
+        {
+            CreateFileSelector("Run script", "Run", "Cancel", uiScriptPath, uiScriptFilters, uiScriptFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleRunScript");
+        }
+        else if (action == "Set resource path...")
+        {
+            CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
+            uiFileSelector.directoryMode = true;
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
+        }
+        // UI-element
+        else if (action == "New UI-element...")
+            NewUIElement();
+        else if (action == "Open UI-element...")
+        {
+            CreateFileSelector("Open UI-element", "Open", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenUIElementFile");
+        }
+        else if (action == "Close UI-element")
+            CloseUIElement();
+        else if (action == "Close all UI-elements")
+            CloseUIElement(true);
+        else if (action == "Save UI-element" && editUIElement !is null && !editUIElement.vars[FILENAME_VAR].GetString().empty)
+            SaveUIElement(editUIElement.vars[FILENAME_VAR].GetString());
+        else if (action == "Save UI-element as..." || action == "Save UI-element")
+        {
+            if (editUIElement !is null)
+            {
+                CreateFileSelector("Save UI-element as", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+                uiFileSelector.fileName = GetFileNameAndExtension(editUIElement.vars[FILENAME_VAR].GetString());
+                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveUIElementFile");
+            }
+        }
+        else if (action == "Load child element...")
+        {
+            if (editUIElement !is null)
+            {
+                CreateFileSelector("Load child element", "Load", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadChildUIElementFile");
+            }
+        }
+        else if (action == "Save child element as...")
+        {
+            if (editUIElement !is null && !editUIElement.vars.Contains(FILENAME_VAR))
+            {
+                CreateFileSelector("Save child element", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+                uiFileSelector.fileName = GetFileNameAndExtension(childElementFileName);
+                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveChildUIElementFile");
+            }
+        }
+        else if (action == "Set default style...")
+        {
+            CreateFileSelector("Set default style", "Set", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleUIElementDefaultStyle");
+        }
+    }
+
+    // File
+    if (action == "Exit")
+        engine.Exit();
+    // Edit
+    else if (action == "Cut")
+        SceneCut();
+    else if (action == "Copy")
+        SceneCopy();
+    else if (action == "Paste")
+        ScenePaste();
+    else if (action == "Delete")
+        SceneDelete();
+    else if (action == "Reset position")
+        SceneResetPosition();
+    else if (action == "Reset rotation")
+        SceneResetRotation();
+    else if (action == "Reset scale")
+        SceneResetScale();
+    else if (action == "Enable/disable")
+        SceneToggleEnable();
+    else if (action == "Unparent")
+        SceneUnparent();
+    else if (action == "Select all")
+        SceneSelectAll();
+    else if (action == "Toggle update")
+        ToggleUpdate();
+    // Create
+    else if (action == "Box" || action == "Cone" || action == "Cylinder" || action == "Plane" ||
+        action == "Pyramid" || action == "Sphere")
+        CreateBuiltinObject(action);
+    // View
+    else if (action == "Hierarchy")
+        ShowHierarchyWindow();
+    else if (action == "Attribute inspector")
+        ShowNodeWindow();
+    else if (action == "Editor settings")
+        ShowEditorSettingsDialog();
+    else if (action == "Editor preferences")
+        ShowEditorPreferencesDialog();
+    else if (action == "Hide editor")
+        HideUI(!uiHidden);
+}
+
 Menu@ CreateMenuItem(const String&in title, int accelKey = 0, int accelQual = 0, int padding = 16)
 {
     Menu@ menu = Menu(title);
     menu.style = uiStyle;
     menu.SetLayout(LM_HORIZONTAL, 0, IntRect(padding, 2, padding, 2));
-    if (accelKey != 0)
+    if (accelKey > 0)
         menu.SetAccelerator(accelKey, accelQual);
 
     Text@ menuText = Text();
@@ -252,6 +451,33 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
         text = "Del";
     else if (accelKey == KEY_SPACE)
         text = "Space";
+    // Cannot use range as the key constants below do not appear to be in sequence
+    else if (accelKey == KEY_F1)
+        text = "F1";
+    else if (accelKey == KEY_F2)
+        text = "F2";
+    else if (accelKey == KEY_F3)
+        text = "F3";
+    else if (accelKey == KEY_F4)
+        text = "F4";
+    else if (accelKey == KEY_F5)
+        text = "F5";
+    else if (accelKey == KEY_F6)
+        text = "F6";
+    else if (accelKey == KEY_F7)
+        text = "F7";
+    else if (accelKey == KEY_F8)
+        text = "F8";
+    else if (accelKey == KEY_F9)
+        text = "F9";
+    else if (accelKey == KEY_F10)
+        text = "F10";
+    else if (accelKey == KEY_F11)
+        text = "F11";
+    else if (accelKey == KEY_F12)
+        text = "F12";
+    else if (accelKey == SHOW_POPUP_INDICATOR)
+        text = ">";
     else
         text.AppendUTF8(accelKey);
     if (accelQual & QUAL_ALT > 0)
@@ -268,12 +494,12 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
 void AdjustAccelIndent(Window@ popup)
 {
     // Find the maximum menu text width
-	Array<UIElement@> children = popup.GetChildren();
+    Array<UIElement@> children = popup.GetChildren();
     int maxWidth = 0;
     for (uint i = 0; i < children.length; ++i)
     {
         UIElement@ element = children[i];
-        if (element.type != menuType)	// Skip if not menu item
+        if (element.type != MENU_TYPE)	// Skip if not menu item
             continue;
         
         int width = element.children[0].width;
@@ -286,7 +512,7 @@ void AdjustAccelIndent(Window@ popup)
     for (uint i = 0; i < children.length; ++i)
     {
         UIElement@ element = children[i];
-        if (element.type != menuType)
+        if (element.type != MENU_TYPE)
             continue;
         
         element = element.children[0];
@@ -309,6 +535,7 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     uiFileSelector.SetButtonTexts(ok, cancel);
     uiFileSelector.SetFilters(filters, initialFilter);
     uiFileSelector.window.vars["Popup"] = "FileSelector";
+    uiFileSelector.window.priority = 1000;	// Ensure when it is visible then it has the highest priority (in front of all others UI)
 
     CenterDialog(uiFileSelector.window);
 }
@@ -349,12 +576,11 @@ void CenterDialog(UIElement@ element)
 
 void UpdateWindowTitle()
 {
-    String sceneName = GetFileNameAndExtension(sceneFileName);
-    if (sceneName.empty)
+    String sceneName = GetFileNameAndExtension(editorScene.fileName);
+    if (sceneName.empty || sceneName == TEMP_SCENE_NAME)
         sceneName = "Untitled";
     if (sceneModified)
         sceneName += "*";
-
     graphics.windowTitle = "Urho3D editor - " + sceneName;
 }
 
@@ -379,116 +605,6 @@ void HandlePopup(Menu@ menu)
 
     if (menu.parent is uiMenuBar)
         menu.showPopup = false;
-}
-
-void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
-{
-    Menu@ menu = eventData["Element"].GetUIElement();
-    if (menu is null)
-        return;
-
-    String action = menu.name;
-    if (action.empty)
-        return;
-
-    HandlePopup(menu);
-
-    if (uiFileSelector is null)
-    {
-        if (action == "New scene")
-            ResetScene();
-        else if (action == "Open scene...")
-        {
-            CreateFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenSceneFile");
-        }
-        else if (action == "Save scene" && !sceneFileName.empty)
-            SaveScene(sceneFileName);
-        else if (action == "Save scene as..." || action == "Save scene")
-        {
-            CreateFileSelector("Save scene as", "Save", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
-            uiFileSelector.fileName = GetFileNameAndExtension(sceneFileName);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveSceneFile");
-        }
-        else if (action == "As replicated...")
-        {
-            instantiateMode = REPLICATED;
-            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
-        }
-        else if (action == "As local...")
-        {
-            instantiateMode = LOCAL;
-            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
-        }
-        else if (action == "Save node as...")
-        {
-            if (selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
-            {
-                CreateFileSelector("Save node", "Save", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
-                uiFileSelector.fileName = GetFileNameAndExtension(instantiateFileName);
-                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveNodeFile");
-            }
-        }
-        else if (action == "Import model...")
-        {
-            CreateFileSelector("Import model", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportModel");
-        }
-        else if (action == "Import scene...")
-        {
-            CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
-        }
-        else if (action == "Run script...")
-        {
-            CreateFileSelector("Run script", "Run", "Cancel", uiScriptPath, uiScriptFilters, uiScriptFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleRunScript");
-        }
-        else if (action == "Set resource path...")
-        {
-            CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
-            uiFileSelector.directoryMode = true;
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
-        }
-    }
-
-    if (action == "Hierarchy")
-        ShowSceneWindow();
-    else if (action == "Attribute inspector")
-        ShowNodeWindow();
-    else if (action == "Editor settings")
-        ShowEditorSettingsDialog();
-    else if (action == "Editor preferences")
-        ShowEditorPreferencesDialog();
-    else if (action == "Cut")
-        SceneCut();
-    else if (action == "Copy")
-        SceneCopy();
-    else if (action == "Paste")
-        ScenePaste();
-    else if (action == "Delete")
-        SceneDelete();
-    else if (action == "Reset position")
-        SceneResetPosition();
-    else if (action == "Reset rotation")
-        SceneResetRotation();
-    else if (action == "Reset scale")
-        SceneResetScale();
-    else if (action == "Enable/disable")
-        SceneToggleEnable();
-    else if (action == "Unparent")
-        SceneUnparent();
-    else if (action == "Select all")
-        SceneSelectAll();
-    else if (action == "Toggle update")
-        ToggleUpdate();
-    else if (action == "Box" || action == "Cone" || action == "Cylinder" || action == "Plane" ||
-        action == "Pyramid" || action == "Sphere")
-        CreateBuiltinObject(action);
-    else if (action == "Exit")
-        engine.Exit();
 }
 
 String ExtractFileName(VariantMap& eventData)
@@ -568,6 +684,36 @@ void HandleResourcePath(StringHash eventType, VariantMap& eventData)
     SetResourcePath(ExtractFileName(eventData), false);
 }
 
+void HandleOpenUIElementFile(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiElementFilter, uiElementPath);
+    OpenUIElement(ExtractFileName(eventData));
+}
+
+void HandleSaveUIElementFile(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiElementFilter, uiElementPath);
+    SaveUIElement(ExtractFileName(eventData));
+}
+
+void HandleLoadChildUIElementFile(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiElementFilter, uiElementPath);
+    LoadChildUIElement(ExtractFileName(eventData));
+}
+
+void HandleSaveChildUIElementFile(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiElementFilter, uiElementPath);
+    SaveChildUIElement(ExtractFileName(eventData));
+}
+
+void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiElementFilter, uiElementPath);
+    SetUIElementDefaultStyle(ExtractFileName(eventData));
+}
+
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
@@ -578,11 +724,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (key == KEY_ESC)
     {
         UIElement@ front = ui.frontElement;
-        if (console.visible)
+        if (uiHidden)
+            UnhideUI();
+        else if (console.visible)
             console.visible = false;
         else if (uiFileSelector !is null && front is uiFileSelector.window)
             CloseFileSelector();
-        else if (front is settingsDialog)
+        else if (front is settingsDialog || front is preferencesDialog)
         {
             ui.focusElement = null;
             front.visible = false;
@@ -634,6 +782,26 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 }
 
+void UnfadeUI()
+{
+    FadeUI(false);
+}
+
+void FadeUI(bool fade = true)
+{
+    if (uiHidden || uiFaded == fade)
+        return;
+    
+    float opacity = (uiFaded = fade) ? uiMinOpacity : uiMaxOpacity;
+    Array<UIElement@> children = ui.root.GetChildren();
+    for (uint i = 0; i < children.length; ++i)
+    {
+        // Texts, popup windows, and editorUIElement are excluded
+        if (children[i].type != TEXT_TYPE && children[i] !is editorUIElement && !children[i].vars.Contains("Popup"))
+            children[i].opacity = opacity;
+    }
+}
+
 void UnhideUI()
 {
     HideUI(false);
@@ -644,13 +812,24 @@ void HideUI(bool hide = true)
     if (uiHidden == hide)
         return;
     
-    float opacity = (uiHidden = hide) ? uiMinOpacity : uiMaxOpacity;
+    bool visible = !(uiHidden = hide);
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
     {
-        // Texts and popup windows are excluded
-        if (children[i].type != textType && !children[i].vars.Contains("Popup"))
-            children[i].opacity = opacity;
+        // Cursor, FileSelector, and editorUIElement are excluded
+        if (children[i].type != CURSOR_TYPE && children[i] !is editorUIElement && (uiFileSelector is null || children[i] !is uiFileSelector.window))
+        {
+            if (visible)
+            {
+                if (!children[i].visible)
+                    children[i].visible = children[i].vars["HideUI"].GetBool();
+            }
+            else
+            {
+                children[i].vars["HideUI"] = children[i].visible;
+                children[i].visible = false;
+            }
+        }
     }
 }
 

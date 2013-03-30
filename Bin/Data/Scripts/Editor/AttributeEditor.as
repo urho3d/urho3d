@@ -9,13 +9,10 @@ const uint MIN_NODE_ATTRIBUTES = 4;
 const uint MAX_NODE_ATTRIBUTES = 8;
 const int ATTRNAME_WIDTH = 150;
 const int ATTR_HEIGHT = 19;
+const StringHash TEXT_CHANGED_EVENT_TYPE("TextChanged");
+
 bool inLoadAttributeEditor = false;
-
 bool showNonEditableAttribute = false;
-
-const ShortStringHash textType("Text");
-const ShortStringHash containerType("UIElement");
-const StringHash textChangedEventType("TextChanged");
 
 Color normalTextColor(1.0f, 1.0f, 1.0f);
 Color modifiedTextColor(1.0f, 0.8f, 0.5f);
@@ -398,15 +395,15 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, co
     inLoadAttributeEditor = false;
 }
 
-void LoadAttributeEditor(UIElement@ parent, Variant value, const AttributeInfo&in info, bool editable, bool sameValue, const Array<Variant>&in values)
+void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const AttributeInfo&in info, bool editable, bool sameValue, const Array<Variant>&in values)
 {
     uint index = parent.vars["Index"].GetUInt();
 
     // Assume the first child is always a text label element or a container that containing a text label element
     UIElement@ label = parent.children[0];
-    if (label.type == containerType && label.numChildren > 0)
+    if (label.type == UI_ELEMENT_TYPE && label.numChildren > 0)
         label = label.children[0];
-    if (label.type == textType)
+    if (label.type == TEXT_TYPE)
     {
         bool modified;
         if (info.defaultValue.type == VAR_NONE || info.defaultValue.type == VAR_RESOURCEREFLIST)
@@ -612,7 +609,7 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
     }
 }
 
-void FillValue(Array<Variant>& values, Variant value)
+void FillValue(Array<Variant>& values, const Variant&in value)
 {
     for (uint i = 0; i < values.length; ++i)
         values[i] = value;
@@ -748,7 +745,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     uint index = attrEdit.vars["Index"].GetUInt();
     uint subIndex = attrEdit.vars["SubIndex"].GetUInt();
     uint coordinate = attrEdit.vars["Coordinate"].GetUInt();
-    bool intermediateEdit = eventType == textChangedEventType;
+    bool intermediateEdit = eventType == TEXT_CHANGED_EVENT_TYPE;
 
     StoreAttributeEditor(parent, serializables, index, subIndex, coordinate);
     for (uint i = 0; i < serializables.length; ++i)

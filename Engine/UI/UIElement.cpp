@@ -143,7 +143,8 @@ UIElement::UIElement(Context* context) :
     opacityDirty_(true),
     derivedColorDirty_(true),
     sortOrderDirty_(false),
-    colorGradient_(false)
+    colorGradient_(false),
+    traversalMode_(TM_BREADTH_FIRST)
 {
 }
 
@@ -790,14 +791,14 @@ void UIElement::SetIndent(int indent)
 {
     indent_ = indent;
     if (parent_)
-    	parent_->UpdateLayout();
+        parent_->UpdateLayout();
 }
 
 void UIElement::SetIndentSpacing(int indentSpacing)
 {
     indentSpacing_ = Max(indentSpacing, 0);
     if (parent_)
-    	parent_->UpdateLayout();
+        parent_->UpdateLayout();
 }
 
 void UIElement::UpdateLayout()
@@ -1121,6 +1122,11 @@ void UIElement::SetVar(ShortStringHash key, const Variant& value)
 void UIElement::SetInternal(bool enable)
 {
     internal_ = enable;
+}
+
+void UIElement::SetTraversalMode(TraversalMode traversalMode)
+{
+    traversalMode_ = traversalMode;
 }
 
 float UIElement::GetDerivedOpacity() const

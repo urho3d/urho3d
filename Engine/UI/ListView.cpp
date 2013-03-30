@@ -324,24 +324,24 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
         {
             baseIndent = parentItem->GetIndent();
             SetItemHierarchyParent(parentItem, true);
+
+            // Adjust the index to ensure it is within the children index limit of the parent item
+            unsigned indexLimit = FindItem(parentItem);
+            if (index <= indexLimit)
+                index = indexLimit + 1;
+            else
+            {
+                while (++indexLimit < numItems)
+                {
+                    if (contentElement_->GetChild(indexLimit)->GetIndent() <= baseIndent)
+                        break;
+                }
+                if (index > indexLimit)
+                    index = indexLimit;
+            }
         }
         item->SetIndent(baseIndent + 1);
         SetItemExpanded(item, item->IsVisible());
-
-        // Adjust the index to ensure it is within the children index limit of the parent item
-        unsigned indexLimit = FindItem(parentItem);
-        if (index <= indexLimit)
-            index = indexLimit + 1;
-        else
-        {
-            while (++indexLimit < numItems)
-            {
-                if (contentElement_->GetChild(indexLimit)->GetIndent() <= baseIndent)
-                    break;
-            }
-            if (index > indexLimit)
-                index = indexLimit;
-        }
 
         // Use the 'overrided' version to insert the child item
         static_cast<HierarchyContainer*>(contentElement_.Get())->InsertChild(index, item);

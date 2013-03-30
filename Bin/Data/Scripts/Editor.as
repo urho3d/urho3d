@@ -2,6 +2,7 @@
 
 #include "Scripts/Editor/EditorView.as"
 #include "Scripts/Editor/EditorScene.as"
+#include "Scripts/Editor/EditorUIElement.as"
 #include "Scripts/Editor/EditorGizmo.as"
 #include "Scripts/Editor/EditorSettings.as"
 #include "Scripts/Editor/EditorPreferences.as"
@@ -32,6 +33,7 @@ void Start()
     }
 
     SubscribeToEvent("Update", "HandleUpdate");
+    
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
     // Enable automatic resource reloading
@@ -39,9 +41,15 @@ void Start()
     // Use OS mouse without grabbing it
     input.mouseVisible = true;
 
+    // Create root scene node
     CreateScene();
+    // Load editor settings and preferences
     LoadConfig();
+    // Create user interface for the editor
     CreateUI();
+    // Create root UI element where all 'editable' UI elements would be parented to
+    CreateUIElement();
+    // Load the initial scene if provided
     ParseArguments();
 }
 

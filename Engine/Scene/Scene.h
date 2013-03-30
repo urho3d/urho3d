@@ -191,6 +191,8 @@ private:
     void FinishAsyncLoading();
     /// Finish loading. Sets the scene filename and checksum.
     void FinishLoading(Deserializer* source);
+    /// Finish saving. Sets the scene filename and checksum.
+    void FinishSaving(Serializer* dest);
     
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;

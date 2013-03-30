@@ -70,6 +70,8 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true)     // Default Mac OS X and Linux behaviour
     #endif
 {
+	rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
+
     SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
     SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
@@ -513,7 +515,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     // For non-root elements draw all children of same priority before recursing into their children: assumption is that they have
     // same renderstate
     Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin();
-    if (element != rootElement_)
+    if (element->GetTraversalMode() == TM_BREADTH_FIRST)
     {
         Vector<SharedPtr<UIElement> >::ConstIterator j = i;
         while (i != children.End())

@@ -1492,6 +1492,7 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "int Compare(const String&in, bool caseSensitive = true) const", asMETHODPR(String, Compare, (const String&, bool) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool Contains(const String&in) const", asMETHODPR(String, Contains, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool Contains(uint8) const", asMETHODPR(String, Contains, (char) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "void Clear()", asMETHOD(String, Clear), asCALL_THISCALL);
     
     // Register automatic conversion functions for convenience
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructStringInt), asCALL_CDECL_OBJLAST);

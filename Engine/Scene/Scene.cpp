@@ -117,6 +117,8 @@ bool Scene::Load(Deserializer& source)
     
     LOGINFO("Loading scene from " + source.GetName());
     
+    Clear();
+
     // Load the whole scene, then perform post-load if successfully loaded
     if (Node::Load(source))
     {
@@ -142,7 +144,13 @@ bool Scene::Save(Serializer& dest)
     if (ptr)
         LOGINFO("Saving scene to " + ptr->GetName());
     
-    return Node::Save(dest);
+    if (Node::Save(dest))
+    {
+    	FinishSaving(&dest);
+    	return true;
+    }
+    else
+    	return false;
 }
 
 bool Scene::LoadXML(const XMLElement& source)
@@ -183,6 +191,8 @@ bool Scene::LoadXML(Deserializer& source)
     
     LOGINFO("Loading scene from " + source.GetName());
     
+    Clear();
+
     if (Node::LoadXML(xml->GetRoot()))
     {
         FinishLoading(&source);
@@ -205,7 +215,13 @@ bool Scene::SaveXML(Serializer& dest)
     if (ptr)
         LOGINFO("Saving scene to " + ptr->GetName());
     
-    return xml->Save(dest);
+    if (xml->Save(dest))
+    {
+    	FinishSaving(&dest);
+    	return true;
+    }
+    else
+    	return false;
 }
 
 bool Scene::LoadAsync(File* file)
@@ -362,6 +378,7 @@ void Scene::Clear()
     StopAsyncLoading();
     RemoveAllChildren();
     RemoveAllComponents();
+    SetName(String::EMPTY);
     fileName_.Clear();
     checksum_ = 0;
     replicatedNodeID_ = FIRST_REPLICATED_ID;
@@ -875,6 +892,16 @@ void Scene::FinishLoading(Deserializer* source)
     {
         fileName_ = source->GetName();
         checksum_ = source->GetChecksum();
+    }
+}
+
+void Scene::FinishSaving(Serializer* dest)
+{
+    Deserializer* ptr = dynamic_cast<Deserializer*>(dest);
+    if (ptr)
+    {
+        fileName_ = ptr->GetName();
+        checksum_ = ptr->GetChecksum();
     }
 }
 

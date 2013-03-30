@@ -3,29 +3,32 @@
 const int ITEM_NONE = 0;
 const int ITEM_NODE = 1;
 const int ITEM_COMPONENT = 2;
+const int ITEM_UI_ELEMENT = 3;
 const uint NO_ITEM = M_MAX_UNSIGNED;
+const ShortStringHash SCENE_TYPE("Scene");
+const ShortStringHash NODE_TYPE("Node");
+const String TITLE_NO_CHANGE(uint8(0));
 
-Window@ sceneWindow;
+Window@ hierarchyWindow;
 ListView@ hierarchyList;
 
-bool suppressSceneChanges = false;
-
-void CreateSceneWindow()
+void CreateHierarchyWindow()
 {
-    if (sceneWindow !is null)
+    if (hierarchyWindow !is null)
         return;
 
-    sceneWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSceneWindow.xml"));
-    hierarchyList = sceneWindow.GetChild("NodeList");
-    ui.root.AddChild(sceneWindow);
+    hierarchyWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSceneWindow.xml"));
+    hierarchyList = hierarchyWindow.GetChild("NodeList");
+    ui.root.AddChild(hierarchyWindow);
     int height = Min(ui.root.height - 60, 500);
-    sceneWindow.SetSize(300, height);
-    sceneWindow.SetPosition(20, 40);
-    sceneWindow.opacity = uiMaxOpacity;
-    sceneWindow.BringToFront();
-    UpdateSceneWindow();
+    hierarchyWindow.SetSize(300, height);
+    hierarchyWindow.SetPosition(20, 40);
+    hierarchyWindow.opacity = uiMaxOpacity;
+    hierarchyWindow.BringToFront();
 
-    DropDownList@ newNodeList = sceneWindow.GetChild("NewNodeList", true);
+    UpdateHierarchyWindowItem(editorScene);
+
+    DropDownList@ newNodeList = hierarchyWindow.GetChild("NewNodeList", true);
     Array<String> newNodeChoices = {"Replicated", "Local"};
     for (uint i = 0; i < newNodeChoices.length; ++i)
     {
@@ -35,7 +38,7 @@ void CreateSceneWindow()
         newNodeList.AddItem(choice);
     }
 
-    DropDownList@ newComponentList = sceneWindow.GetChild("NewComponentList", true);
+    DropDownList@ newComponentList = hierarchyWindow.GetChild("NewComponentList", true);
     Array<String> componentTypes = GetAvailableComponents();
     for (uint i = 0; i < componentTypes.length; ++i)
     {
@@ -51,12 +54,11 @@ void CreateSceneWindow()
     hierarchyList.contentElement.dragDropMode = DD_TARGET;
     hierarchyList.scrollPanel.dragDropMode = DD_TARGET;
 
-    SubscribeToEvent(sceneWindow.GetChild("CloseButton", true), "Released", "HideSceneWindow");
-    SubscribeToEvent(sceneWindow.GetChild("ExpandButton", true), "Released", "ExpandCollapseHierarchy");
-    SubscribeToEvent(sceneWindow.GetChild("CollapseButton", true), "Released", "ExpandCollapseHierarchy");
-    SubscribeToEvent(hierarchyList, "SelectionChanged", "HandleSceneWindowSelectionChange");
-    SubscribeToEvent(hierarchyList, "ItemDoubleClicked", "HandleSceneWindowItemDoubleClick");
-    SubscribeToEvent(hierarchyList, "UnhandledKey", "HandleSceneWindowKey");
+    SubscribeToEvent(hierarchyWindow.GetChild("CloseButton", true), "Released", "HideHierarchyWindow");
+    SubscribeToEvent(hierarchyWindow.GetChild("ExpandButton", true), "Released", "ExpandCollapseHierarchy");
+    SubscribeToEvent(hierarchyWindow.GetChild("CollapseButton", true), "Released", "ExpandCollapseHierarchy");
+    SubscribeToEvent(hierarchyList, "SelectionChanged", "HandleHierarchyListSelectionChange");
+    SubscribeToEvent(hierarchyList, "ItemDoubleClicked", "HandleHierarchyListItemDoubleClick");
     SubscribeToEvent(newNodeList, "ItemSelected", "HandleCreateNode");
     SubscribeToEvent(newComponentList, "ItemSelected", "HandleCreateComponent");
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
@@ -70,22 +72,24 @@ void CreateSceneWindow()
     SubscribeToEvent(editorScene, "ComponentEnabledChanged", "HandleComponentEnabledChanged");
 }
 
-void ShowSceneWindow()
+void ShowHierarchyWindow()
 {
-    sceneWindow.visible = true;
-    sceneWindow.BringToFront();
+    hierarchyWindow.visible = true;
+    hierarchyWindow.BringToFront();
 }
 
-void HideSceneWindow()
+void HideHierarchyWindow()
 {
-    sceneWindow.visible = false;
+    hierarchyWindow.visible = false;
 }
 
 void ExpandCollapseHierarchy(StringHash eventType, VariantMap& eventData)
 {
     Button@ button = eventData["Element"].GetUIElement();
     bool enable = button.name == "ExpandButton";
-    bool all = cast<CheckBox>(sceneWindow.GetChild("AllCheckBox", true)).checked;
+    CheckBox@ checkBox = cast<CheckBox>(hierarchyWindow.GetChild("AllCheckBox", true));
+    bool all = checkBox.checked;
+    checkBox.checked = false;	// Auto-reset
 
     Array<uint> selections = hierarchyList.selections;
     for (uint i = 0; i < selections.length; ++i)
@@ -97,39 +101,48 @@ void EnableExpandCollapseButtons(bool enable)
     String[] buttons = { "ExpandButton", "CollapseButton", "AllCheckBox" };
     for (uint i = 0; i < buttons.length; ++i)
     {
-        UIElement@ element = sceneWindow.GetChild(buttons[i], true);
+        UIElement@ element = hierarchyWindow.GetChild(buttons[i], true);
         element.enabled = enable;
         element.children[0].color = enable ? normalTextColor : nonEditableTextColor;
     }
 }
 
-void ClearSceneWindow()
+void UpdateHierarchyWindowItem(Serializable@ serializable, bool clear = false)
 {
-    if (sceneWindow is null)
-        return;
+    if (clear)
+    {
+        // Remove the current selection before updating the list item (in turn trigger an update on the attribute editor)
+        hierarchyList.ClearSelection();
 
-    hierarchyList.RemoveAllItems();
+        // Clear copybuffer when whole window refreshed
+        copyBuffer.Clear();
+    }
+
+    // In case of item's parent is not found in the hierarchy list then the item will be inserted at the list root level
+    Serializable@ parent;
+    if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
+        parent = cast<Node>(serializable).parent;
+    else if (serializable !is editorUIElement)
+        parent = cast<UIElement>(serializable).parent;
+    UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
+    UpdateHierarchyWindowItem(GetListIndex(serializable), serializable, parentItem);
 }
 
-void UpdateSceneWindow()
-{
-    ClearSceneWindow();
-    UpdateSceneWindowNode(0, editorScene, null);
-
-    // Clear copybuffer when whole window refreshed
-    copyBuffer.Clear();
-}
-
-uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
+uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIElement@ parentItem)
 {
     // Whenever we're updating, disable layout update to optimize speed
     hierarchyList.contentElement.DisableLayoutUpdate();
 
+    String idVar;
+    Variant id;
+    int itemType = ITEM_NONE;
+    if (serializable !is null)
+        GetID(serializable, idVar, id, itemType);
+    
     // Remove old item if exists
-    if (itemIndex < hierarchyList.numItems && (node is null || (hierarchyList.items[itemIndex].vars["Type"].GetInt() == ITEM_NODE &&
-        hierarchyList.items[itemIndex].vars["NodeID"].GetUInt() == node.id)))
+    if (itemIndex < hierarchyList.numItems && (serializable is null || MatchID(hierarchyList.items[itemIndex], idVar, id, itemType)))
         hierarchyList.RemoveItem(itemIndex);
-    if (node is null)
+    if (serializable is null)
     {
         hierarchyList.contentElement.EnableLayoutUpdate();
         hierarchyList.contentElement.UpdateLayout();
@@ -138,38 +151,61 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
 
     Text@ text = Text();
     text.SetStyle(uiStyle, "FileSelectorListText");
-    text.vars["Type"] = ITEM_NODE;
-    text.vars["NodeID"] = node.id;
-    text.text = GetNodeTitle(node);
+    SetID(text, serializable);
 
-    // Nodes can be moved by drag and drop. The root node (scene) can not.
-    if (node.typeName == "Node")
-        text.dragDropMode = DD_SOURCE_AND_TARGET;
-    else
+    // The root node (scene) cannot be moved by drag and drop.
+    if (serializable.type == SCENE_TYPE)
         text.dragDropMode = DD_TARGET;
+    else
+        text.dragDropMode = DD_SOURCE_AND_TARGET;
 
     hierarchyList.InsertItem(itemIndex, text, parentItem);
-    IconizeUIElement(text, node.typeName);
-    SetIconEnabledColor(text, node.enabled);
 
-    // Advance the index for the child components and/or nodes
+    // Advance the index for the child items
     if (itemIndex == M_MAX_UNSIGNED)
         itemIndex = hierarchyList.numItems;
     else
         ++itemIndex;
 
-    // Update components first
-    for (uint i = 0; i < node.numComponents; ++i)
+    String iconType = serializable.typeName;
+    if (serializable is editorUIElement)
+        iconType = "Root" + iconType;
+    IconizeUIElement(text, iconType);
+    
+    if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
     {
-        Component@ component = node.components[i];
-        AddComponentToSceneWindow(component, itemIndex++, text);
-    }
+        Node@ node = cast<Node>(serializable);
+        
+        text.text = GetNodeTitle(node);
+        SetIconEnabledColor(text, node.enabled);
 
-    // Then update child nodes recursively
-    for (uint i = 0; i < node.numChildren; ++i)
+        // Update components first
+        for (uint i = 0; i < node.numComponents; ++i)
+        {
+            Component@ component = node.components[i];
+            AddComponentItem(itemIndex++, component, text);
+        }
+    
+        // Then update child nodes recursively
+        for (uint i = 0; i < node.numChildren; ++i)
+        {
+            Node@ childNode = node.children[i];
+            itemIndex = UpdateHierarchyWindowItem(itemIndex, childNode, text);
+        }
+    }
+    else
     {
-        Node@ childNode = node.children[i];
-        itemIndex = UpdateSceneWindowNode(itemIndex, childNode, text);
+        UIElement@ element = cast<UIElement>(serializable);
+        
+        text.text = GetUIElementTitle(element);
+        SetIconEnabledColor(text, element.visible);
+
+        // Then update child elements recursively
+        for (uint i = 0; i < element.numChildren; ++i)
+        {
+            UIElement@ childElement = element.children[i];
+            itemIndex = UpdateHierarchyWindowItem(itemIndex, childElement, text);
+        }
     }
 
     // Re-enable layout update (and do manual layout) now
@@ -179,33 +215,19 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node, UIElement@ parentItem)
     return itemIndex;
 }
 
-void UpdateSceneWindowNode(Node@ node)
+void UpdateHierarchyWindowItemText(uint itemIndex, bool iconEnabled, const String&in textTitle = TITLE_NO_CHANGE)
 {
-    // In case of node's parent is not found in the hierarchy list then the node will inserted at the root level, but it should not happen
-    UpdateSceneWindowNode(GetNodeListIndex(node), node, hierarchyList.items[GetNodeListIndex(node.parent)]);
-}
-
-void UpdateSceneWindowNodeText(Node@ node, bool iconOnly = false)
-{
-    uint index = GetNodeListIndex(node);
-    Text@ text = hierarchyList.items[index];
+    Text@ text = hierarchyList.items[itemIndex];
     if (text is null)
         return;
-    if (!iconOnly)
-        text.text = GetNodeTitle(node);
-    SetIconEnabledColor(text, node.enabled);
+    
+    SetIconEnabledColor(text, iconEnabled);
+    
+    if (textTitle != TITLE_NO_CHANGE)
+        text.text = textTitle;
 }
 
-void UpdateSceneWindowComponentText(Component@ component)
-{
-    uint index = GetComponentListIndex(component);
-    Text@ text = hierarchyList.items[index];
-    if (text is null)
-        return;
-    SetIconEnabledColor(text, component.enabledEffective);
-}
-
-void AddComponentToSceneWindow(Component@ component, uint compItemIndex, UIElement@ parentItem)
+void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ parentItem)
 {
     Text@ text = Text();
     text.SetStyle(uiStyle, "FileSelectorListText");
@@ -219,36 +241,57 @@ void AddComponentToSceneWindow(Component@ component, uint compItemIndex, UIEleme
     SetIconEnabledColor(text, component.enabledEffective);
 }
 
-uint GetNodeListIndex(Node@ node)
+void SetID(Text@ text, Serializable@ serializable)
 {
-    if (node is null)
+    if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
+    {
+        text.vars["Type"] = ITEM_NODE;
+        text.vars["NodeID"] = cast<Node>(serializable).id;
+    }
+    else
+    {
+        text.vars["Type"] = ITEM_UI_ELEMENT;
+        text.vars["ElementName"] = cast<UIElement>(serializable).name;
+    }
+}
+
+void GetID(Serializable@ serializable, String& idVar, Variant& id, int& itemType)
+{
+    if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
+    {
+        idVar = "NodeID";
+        id = Variant(cast<Node>(serializable).id);
+        itemType = ITEM_NODE;
+    }
+    else
+    {
+        idVar = "ElementName";
+        id = Variant(cast<UIElement>(serializable).name);
+        itemType = ITEM_UI_ELEMENT;
+    }
+}
+
+bool MatchID(UIElement@ element, const String&in idVar, const Variant&in id, int itemType)
+{
+    return element.vars["Type"].GetInt() == itemType && element.vars[idVar] == id;
+}
+
+uint GetListIndex(Serializable@ serializable)
+{
+    if (serializable is null)
         return NO_ITEM;
 
     uint numItems = hierarchyList.numItems;
-    uint nodeID = node.id;
+    
+    String idVar;
+    Variant id;
+    int itemType = ITEM_NONE;
+    GetID(serializable, idVar, id, itemType);
 
     for (uint i = 0; i < numItems; ++i)
     {
         UIElement@ item = hierarchyList.items[i];
-        if (item.vars["Type"].GetInt() == ITEM_NODE && item.vars["NodeID"].GetUInt() == nodeID)
-            return i;
-    }
-
-    return NO_ITEM;
-}
-
-uint GetNodeListIndex(Node@ node, uint startPos)
-{
-    if (node is null)
-        return NO_ITEM;
-
-    uint numItems = hierarchyList.numItems;
-    uint nodeID = node.id;
-
-    for (uint i = startPos; i < numItems; --i)
-    {
-        UIElement@ item = hierarchyList.items[i];
-        if (item.vars["Type"].GetInt() == ITEM_NODE && item.vars["NodeID"].GetInt() == int(nodeID))
+        if (MatchID(item, idVar, id, itemType))
             return i;
     }
 
@@ -297,17 +340,9 @@ uint GetComponentListIndex(Component@ component)
     return NO_ITEM;
 }
 
-int GetNodeIndent(Node@ node)
+String GetUIElementTitle(UIElement@ element)
 {
-    int indent = 0;
-    for (;;)
-    {
-        if (node.parent is null)
-            break;
-        ++indent;
-        node = node.parent;
-    }
-    return indent;
+    return element.name.empty ? element.typeName : element.name;
 }
 
 String GetNodeTitle(Node@ node)
@@ -341,7 +376,7 @@ void SelectNode(Node@ node, bool multiselect)
         return;
     }
 
-    uint nodeItem = GetNodeListIndex(node);
+    uint nodeItem = GetListIndex(node);
 
     // Go in the parent chain up to make sure the chain is expanded
     for (;;)
@@ -353,7 +388,7 @@ void SelectNode(Node@ node, bool multiselect)
     }
     
     uint numItems = hierarchyList.numItems;
-    uint parentItem = GetNodeListIndex(node);
+    uint parentItem = GetListIndex(node);
 
     if (nodeItem < numItems)
     {
@@ -392,7 +427,7 @@ void SelectComponent(Component@ component, bool multiselect)
         return;
     }
 
-    uint nodeItem = GetNodeListIndex(node);
+    uint nodeItem = GetListIndex(node);
     uint componentItem = GetComponentListIndex(component);
     
     // Go in the parent chain up to make sure the chain is expanded
@@ -405,7 +440,7 @@ void SelectComponent(Component@ component, bool multiselect)
     }
 
     uint numItems = hierarchyList.numItems;
-    uint parentItem = GetNodeListIndex(node);
+    uint parentItem = GetListIndex(node);
 
     if (parentItem >= hierarchyList.numItems && !multiselect)
     {
@@ -435,12 +470,13 @@ void SelectComponent(Component@ component, bool multiselect)
     }
 }
 
-void HandleSceneWindowSelectionChange()
+void HandleHierarchyListSelectionChange()
 {
     if (inSelectionModify)
         return;
     
-    ClearSelection();
+    ClearSceneSelection();
+    ClearUIElementSelection();
 
     Array<uint> indices = hierarchyList.selections;
 
@@ -546,8 +582,8 @@ void HandleSceneWindowSelectionChange()
     {
         editNodes = selectedNodes;
         
-        // Cannot multi-edit on scene and node(s) together as scene and node does not share identical attributes,
-        // editing via gizmo does not makes too much sense either
+        // Cannot multi-edit on scene and node(s) together as scene and node do not share identical attributes,
+        // editing via gizmo does not make too much sense either
         if (editNodes.length > 1 && editNodes[0] is editorScene)
             editNodes.Erase(0);
     }
@@ -556,29 +592,24 @@ void HandleSceneWindowSelectionChange()
     UpdateNodeWindow();
 }
 
-void HandleSceneWindowItemDoubleClick(StringHash eventType, VariantMap& eventData)
+void HandleHierarchyListItemDoubleClick(StringHash eventType, VariantMap& eventData)
 {
     uint index = eventData["Selection"].GetUInt();
     hierarchyList.ToggleExpand(index);
-}
-
-void HandleSceneWindowKey(StringHash eventType, VariantMap& eventData)
-{
-    int key = eventData["Key"].GetInt();
 }
 
 void HandleDragDropTest(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ source = eventData["Source"].GetUIElement();
     UIElement@ target = eventData["Target"].GetUIElement();
-    eventData["Accept"] = TestSceneWindowElements(source, target);
+    eventData["Accept"] = TestDragDrop(source, target);
 }
 
 void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ source = eventData["Source"].GetUIElement();
     UIElement@ target = eventData["Target"].GetUIElement();
-    bool accept =  TestSceneWindowElements(source, target);
+    bool accept =  TestDragDrop(source, target);
     eventData["Accept"] = accept;
     if (!accept)
         return;
@@ -598,7 +629,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     FocusNode(sourceNode);
 }
 
-bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
+bool TestDragDrop(UIElement@ source, UIElement@ target)
 {
     // Test for validity of reparenting by drag and drop
     Node@ sourceNode;
@@ -625,7 +656,7 @@ bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
 
 void FocusNode(Node@ node)
 {
-    uint index = GetNodeListIndex(node);
+    uint index = GetListIndex(node);
     hierarchyList.selection = index;
 }
 
@@ -687,14 +718,10 @@ void CreateBuiltinObject(const String& name)
     FocusNode(newNode);
 }
 
-bool CheckSceneWindowFocus()
+bool CheckHierarchyWindowFocus()
 {
-    // When we do scene operations based on key shortcuts, make sure either the 3D scene or the node list is focused,
-    // not for example a file selector
-    if (ui.focusElement is hierarchyList || ui.focusElement is null)
-        return true;
-    else
-        return false;
+    // When we do edit operations based on key shortcuts, make sure the hierarchy list is focused, not for example a file selector
+    return ui.focusElement is hierarchyList || ui.focusElement is null;
 }
 
 bool CheckForExistingGlobalComponent(Node@ node, const String&in typeName)
@@ -711,7 +738,7 @@ void HandleNodeAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetNode();
-    UpdateSceneWindowNode(node);
+    UpdateHierarchyWindowItem(node);
 }
 
 void HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
@@ -720,8 +747,8 @@ void HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetNode();
-    uint index = GetNodeListIndex(node);
-    UpdateSceneWindowNode(index, null, null);
+    uint index = GetListIndex(node);
+    UpdateHierarchyWindowItem(index, null, null);
 }
 
 void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
@@ -730,7 +757,7 @@ void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetNode();
-    UpdateSceneWindowNode(node);
+    UpdateHierarchyWindowItem(node);
 }
 
 void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
@@ -742,7 +769,7 @@ void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
     uint index = GetComponentListIndex(component);
     if (index != NO_ITEM)
     {
-        ListView@ list = sceneWindow.GetChild("NodeList", true);
+        ListView@ list = hierarchyWindow.GetChild("NodeList", true);
         list.RemoveItem(index);
     }
 }
@@ -753,7 +780,7 @@ void HandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
         return;
     
     Node@ node = eventData["Node"].GetNode();
-    UpdateSceneWindowNodeText(node);
+    UpdateHierarchyWindowItemText(GetListIndex(node), node.enabled, GetNodeTitle(node));
 }
 
 void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
@@ -762,7 +789,7 @@ void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
         return;
     
     Node@ node = eventData["Node"].GetNode();
-    UpdateSceneWindowNodeText(node, true);
+    UpdateHierarchyWindowItemText(GetListIndex(node), node.enabled);
     attributesDirty = true;
 }
 
@@ -772,6 +799,6 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
         return;
     
     Component@ component = eventData["Component"].GetComponent();
-    UpdateSceneWindowComponentText(component);
+    UpdateHierarchyWindowItemText(GetComponentListIndex(component), component.enabledEffective);
     attributesDirty = true;
 }

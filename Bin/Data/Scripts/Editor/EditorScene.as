@@ -11,7 +11,6 @@ const int MAX_PICK_MODES = 4;
 
 Scene@ editorScene;
 
-String sceneFileName;
 String instantiateFileName;
 CreateMode instantiateMode = REPLICATED;
 bool sceneModified = false;
@@ -27,9 +26,10 @@ uint numEditableComponentsPerNode = 1;
 Array<XMLFile@> copyBuffer;
 bool copyBufferLocal = false;
 
+bool suppressSceneChanges = false;
 bool inSelectionModify = false;
 
-void ClearSelection()
+void ClearSceneSelection()
 {
     selectedNodes.Clear();
     selectedComponents.Clear();
@@ -58,26 +58,24 @@ void CreateScene()
 
 void ResetScene()
 {
-    ClearSelection();
-
     suppressSceneChanges = true;
 
     // Create a scene with default values, these will be overridden when loading scenes
     editorScene.Clear();
-    editorScene.name = "";
     Octree@ octree = editorScene.CreateComponent("Octree");
     PhysicsWorld@ physicsWorld = editorScene.CreateComponent("PhysicsWorld");
     octree.Resize(BoundingBox(-1000.0, 1000.0), 8);
     editorScene.CreateComponent("DebugRenderer");
 
-    UpdateSceneWindow();
+    sceneModified = false;
+    runUpdate = false;
+
+    UpdateWindowTitle();
+    UpdateHierarchyWindowItem(editorScene, true);
     UpdateNodeWindow();
     
     suppressSceneChanges = false;
-
-    runUpdate = false;
-    sceneFileName = "";
-    UpdateWindowTitle();
+    
     ResetCamera();
     CreateGizmo();
 }
@@ -124,14 +122,10 @@ bool LoadScene(const String&in fileName)
     if (!file.open)
         return false;
 
-    // Clear the old scene
-    suppressSceneChanges = true;
-
-    ClearSelection();
-    editorScene.Clear();
-
     // Add the new resource path
     SetResourcePath(GetPath(fileName));
+
+    suppressSceneChanges = true;
 
     String extension = GetExtension(fileName);
     bool loaded;
@@ -143,11 +137,11 @@ bool LoadScene(const String&in fileName)
     // Always pause the scene, and do updates manually
     editorScene.updateEnabled = false;
 
-    sceneFileName = fileName;
     sceneModified = false;
     runUpdate = false;
+    
     UpdateWindowTitle();
-    UpdateSceneWindow();
+    UpdateHierarchyWindowItem(editorScene, true);
     UpdateNodeWindow();
 
     suppressSceneChanges = false;
@@ -163,6 +157,8 @@ void SaveScene(const String&in fileName)
     if (fileName.empty || GetFileName(fileName).empty)
         return;
 
+    ui.cursor.shape = CS_BUSY;
+    
     // Unpause when saving so that the scene will work properly when loaded outside the editor
     editorScene.updateEnabled = true;
 
@@ -175,7 +171,6 @@ void SaveScene(const String&in fileName)
 
     editorScene.updateEnabled = false;
 
-    sceneFileName = fileName;
     sceneModified = false;
     UpdateWindowTitle();
 }
@@ -195,6 +190,8 @@ void LoadNode(const String&in fileName)
     if (!file.open)
         return;
 
+    ui.cursor.shape = CS_BUSY;
+    
     // Before instantiating, set resource path if empty
     if (sceneResourcePath.empty)
         SetResourcePath(GetPath(fileName));
@@ -220,6 +217,8 @@ void SaveNode(const String&in fileName)
     if (fileName.empty || GetFileName(fileName).empty)
         return;
 
+    ui.cursor.shape = CS_BUSY;
+    
     if (selectedNodes.length == 1)
     {
         File file(fileName, FILE_WRITE);
@@ -268,14 +267,16 @@ void EndSelectionModify()
 {
     // The large operation on selected nodes has ended. Update node/component selection now
     inSelectionModify = false;
-    HandleSceneWindowSelectionChange();
+    HandleHierarchyListSelectionChange();
 }
 
 bool SceneDelete()
 {
-    if (!CheckSceneWindowFocus() || (selectedComponents.empty && selectedNodes.empty))
+    if (!CheckHierarchyWindowFocus() || (selectedComponents.empty && selectedNodes.empty))
         return false;
 
+    ui.cursor.shape = CS_BUSY;
+    
     BeginSelectionModify();
     
     // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
@@ -289,7 +290,7 @@ bool SceneDelete()
             continue; // Root or already deleted
 
         uint id = node.id;
-        uint nodeIndex = GetNodeListIndex(node);
+        uint nodeIndex = GetListIndex(node);
 
         BeginModify(id);
         node.Remove();
@@ -309,7 +310,7 @@ bool SceneDelete()
             continue; // Already deleted
 
         uint index = GetComponentListIndex(component);
-        uint nodeIndex = GetNodeListIndex(node);
+        uint nodeIndex = GetListIndex(node);
         if (index == NO_ITEM || nodeIndex == NO_ITEM)
             continue;
 
@@ -342,13 +343,15 @@ bool SceneCut()
 
 bool SceneCopy()
 {
-    if ((selectedNodes.empty && selectedComponents.empty) || !CheckSceneWindowFocus())
+    if ((selectedNodes.empty && selectedComponents.empty) || !CheckHierarchyWindowFocus())
         return false;
 
     // Must have either only components, or only nodes
     if (!selectedNodes.empty && !selectedComponents.empty)
         return false;
 
+    ui.cursor.shape = CS_BUSY;
+    
     copyBuffer.Clear();
 
     // Copy components
@@ -388,9 +391,11 @@ bool SceneCopy()
 
 bool ScenePaste()
 {
-    if (editNode is null || !CheckSceneWindowFocus() || copyBuffer.empty)
+    if (editNode is null || !CheckHierarchyWindowFocus() || copyBuffer.empty)
         return false;
 
+    ui.cursor.shape = CS_BUSY;
+    
     bool pasteComponents = false;
 
     for (uint i = 0; i < copyBuffer.length; ++i)
@@ -438,9 +443,11 @@ bool ScenePaste()
 
 void SceneUnparent()
 {
-    if (!CheckSceneWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
+    if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
         return;
 
+    ui.cursor.shape = CS_BUSY;
+    
     // Parent selected nodes to root
     Array<Node@> changedNodes;
     for (uint i = 0; i < selectedNodes.length; ++i)
@@ -456,14 +463,16 @@ void SceneUnparent()
 
     // Reselect the changed nodes at their new position in the list
     for (uint i = 0; i < changedNodes.length; ++i)
-        hierarchyList.AddSelection(GetNodeListIndex(changedNodes[i]));
+        hierarchyList.AddSelection(GetListIndex(changedNodes[i]));
 }
 
 void SceneToggleEnable()
 {
-    if (!CheckSceneWindowFocus())
+    if (!CheckHierarchyWindowFocus())
         return;
 
+    ui.cursor.shape = CS_BUSY;
+    
     // Toggle enabled state of nodes recursively
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
@@ -534,7 +543,7 @@ void SceneSelectAll()
         Array<Node@> rootLevelNodes = editorScene.GetChildren();
         Array<uint> indices;
         for (uint i = 0; i < rootLevelNodes.length; ++i)
-            indices.Push(GetNodeListIndex(rootLevelNodes[i]));
+            indices.Push(GetListIndex(rootLevelNodes[i]));
         hierarchyList.SetSelections(indices);
         EndSelectionModify();
     }

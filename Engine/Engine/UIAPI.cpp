@@ -88,6 +88,10 @@ static void RegisterUIElement(asIScriptEngine* engine)
     engine->RegisterEnumValue("LayoutMode", "LM_HORIZONTAL", LM_HORIZONTAL);
     engine->RegisterEnumValue("LayoutMode", "LM_VERTICAL", LM_VERTICAL);
     
+    engine->RegisterEnum("TraversalMode");
+    engine->RegisterEnumValue("TraversalMode", "TM_BREADTH_FIRST", TM_BREADTH_FIRST);
+    engine->RegisterEnumValue("TraversalMode", "TM_DEPTH_FIRST", TM_DEPTH_FIRST);
+
     engine->RegisterGlobalProperty("const uint DD_DISABLED", (void*)&DD_DISABLED);
     engine->RegisterGlobalProperty("const uint DD_SOURCE", (void*)&DD_SOURCE);
     engine->RegisterGlobalProperty("const uint DD_TARGET", (void*)&DD_TARGET);

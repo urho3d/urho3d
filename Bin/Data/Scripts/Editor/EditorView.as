@@ -174,22 +174,22 @@ void UpdateView(float timeStep)
         if (input.keyDown['W'] || input.keyDown[KEY_UP])
         {
             cameraNode.TranslateRelative(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
-            HideUI();
+            FadeUI();
         }
         if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
         {
             cameraNode.TranslateRelative(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
-            HideUI();
+            FadeUI();
         }
         if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
         {
             cameraNode.TranslateRelative(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
-            HideUI();
+            FadeUI();
         }
         if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
         {
             cameraNode.TranslateRelative(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
-            HideUI();
+            FadeUI();
         }
     }
 
@@ -207,7 +207,7 @@ void UpdateView(float timeStep)
                 cameraPitch = 90.0;
 
             cameraNode.rotation = Quaternion(cameraPitch, cameraYaw, 0);
-            HideUI();
+            FadeUI();
         }
     }
 

@@ -298,6 +298,7 @@ Methods:<br>
 - int Compare(const String&, bool arg1 = true) const
 - bool Contains(const String&) const
 - bool Contains(uint8) const
+- void Clear()
 - String[]@ Split(uint8) const
 - void Join(String[]&, const String&)
 - bool ToBool() const
@@ -3194,6 +3195,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3301,6 +3303,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3500,6 +3503,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3618,6 +3622,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3734,6 +3739,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3849,6 +3855,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3968,6 +3975,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4084,6 +4092,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4216,6 +4225,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4345,6 +4355,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4464,6 +4475,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4593,6 +4605,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4726,6 +4739,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4853,6 +4867,7 @@ Properties:<br>
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - uint dragDropMode
+- TraversalMode traversalMode
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing

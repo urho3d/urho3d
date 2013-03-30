@@ -87,7 +87,7 @@ void ImportScene(const String&in fileName)
     else
     {
         // Export scene to a temp file, then load and delete it if successful
-        String tempSceneName = sceneResourcePath + "_tempscene_.xml";
+        String tempSceneName = sceneResourcePath + TEMP_SCENE_NAME;
         Array<String> args;
         args.Push("scene");
         args.Push("\"" + fileName + "\"");
@@ -100,10 +100,8 @@ void ImportScene(const String&in fileName)
 
         if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
         {
-            String currentFileName = sceneFileName;
             LoadScene(tempSceneName);
             fileSystem.Delete(tempSceneName);
-            sceneFileName = currentFileName;
             UpdateWindowTitle();
         }
     }
@@ -338,7 +336,7 @@ void ImportTundraScene(const String&in fileName)
             childNode.parent = parentNode;
     }
 
-    UpdateSceneWindow();
+    UpdateHierarchyWindowItem(editorScene, true);
     UpdateWindowTitle();
     assetMappings.Clear();
 }

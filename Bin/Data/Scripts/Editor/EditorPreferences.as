@@ -99,8 +99,8 @@ void EditUIMinOpacity(StringHash eventType, VariantMap& eventData)
     LineEdit@ edit = eventData["Element"].GetUIElement();
     uiMinOpacity = edit.text.ToFloat();
     edit.text = String(uiMinOpacity);
-    HideUI();
-    UnhideUI();
+    FadeUI();
+    UnfadeUI();
 }
 
 void EditUIMaxOpacity(StringHash eventType, VariantMap& eventData)
@@ -108,8 +108,8 @@ void EditUIMaxOpacity(StringHash eventType, VariantMap& eventData)
     LineEdit@ edit = eventData["Element"].GetUIElement();
     uiMaxOpacity = edit.text.ToFloat();
     edit.text = String(uiMaxOpacity);
-    HideUI();
-    UnhideUI();
+    FadeUI();
+    UnfadeUI();
 }
 
 void ToggleShowNonEditableAttribute(StringHash eventType, VariantMap& eventData)

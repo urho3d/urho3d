@@ -944,6 +944,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "FocusMode get_focusMode() const", asMETHOD(T, GetFocusMode), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_dragDropMode(uint)", asMETHOD(T, SetDragDropMode), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "uint get_dragDropMode() const", asMETHOD(T, GetDragDropMode), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "void set_traversalMode(TraversalMode)", asMETHOD(T, SetTraversalMode), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "TraversalMode get_traversalMode() const", asMETHOD(T, GetTraversalMode), asCALL_THISCALL);
     }
     engine->RegisterObjectMethod(className, "void set_defaultStyle(XMLFile@+)", asMETHOD(T, SetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "XMLFile@+ get_defaultStyle()", asMETHOD(T, GetDefaultStyle), asCALL_THISCALL);
