@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Component.h"
+#include "VectorBuffer.h"
 
 namespace Urho3D
 {

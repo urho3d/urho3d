@@ -510,7 +510,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
         }
         else
         {
-            LOGERROR("Could not process all the include directives in " + GetName());
+            LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i]);
             return false;
         }
     }
