@@ -261,7 +261,7 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
         Node* headNode = characterNode->GetChild("Bip01_Head", true);
         if (headNode)
         {
-            cameraNode_->SetPosition(headNode->GetWorldPosition() + dir * Vector3(0.0f, 0.2f, 0.2f));
+            cameraNode_->SetPosition(headNode->GetWorldPosition() + rot * Vector3(0.0f, 0.15f, 0.2f));
             cameraNode_->SetRotation(dir);
         }
     }
