@@ -48,7 +48,6 @@ const float INAIR_THRESHOLD_TIME = 0.1f;
 
 const float CAMERA_MIN_DIST = 1.0f;
 const float CAMERA_MAX_DIST = 5.0f;
-const float CAMERA_SAFETY_DIST = 0.5f;
 
 class Character : public Component
 {
@@ -115,7 +114,7 @@ int Run()
 {
     SharedPtr<Context> context(new Context());
     SharedPtr<Engine> engine(new Engine(context));
-    engine->Initialize("Character", "Character.log", GetArguments());
+    engine->Initialize("CharacterDemo", "CharacterDemo.log", GetArguments());
     
     SharedPtr<CharacterDemo> characterDemo(new CharacterDemo(context));
     characterDemo->Start();
@@ -293,7 +292,9 @@ void CharacterDemo::SubscribeToEvents()
 
 void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
+    using namespace Update;
+    
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
     Input* input = GetSubsystem<Input>();
 
     if (input->GetKeyDown(KEY_ESC))
@@ -346,19 +347,18 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
     else
     {
         // Third person camera: position behind the character
-        Vector3 aimPoint = characterNode->GetPosition() + rot * Vector3(0.0f, 1.75f, 0.0f);
-        Vector3 minDist = aimPoint + dir * Vector3(0, 0, -CAMERA_MIN_DIST);
-        Vector3 maxDist = aimPoint + dir * Vector3(0, 0, -CAMERA_MAX_DIST);
+        Vector3 aimPoint = characterNode->GetPosition() + rot * Vector3(0.0f, 1.7f, 0.0f);
         
         // Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the character properly
-        Vector3 rayDir = (maxDist - minDist).Normalized();
-        float rayDistance = CAMERA_MAX_DIST - CAMERA_MIN_DIST + CAMERA_SAFETY_DIST;
+        Vector3 rayDir = dir * Vector3::BACK;
+        float rayDistance = CAMERA_MAX_DIST;
         PhysicsRaycastResult result;
-        scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, Ray(minDist, rayDir), rayDistance, 2);
+        scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, Ray(aimPoint, rayDir), rayDistance, 2);
         if (result.body_)
-            rayDistance = Min(rayDistance, result.distance_ - CAMERA_SAFETY_DIST);
+            rayDistance = Min(rayDistance, result.distance_);
+        rayDistance = Clamp(rayDistance, CAMERA_MIN_DIST, CAMERA_MAX_DIST);
         
-        cameraNode_->SetPosition(minDist + rayDir * rayDistance);
+        cameraNode_->SetPosition(aimPoint + rayDir * rayDistance);
         cameraNode_->SetRotation(dir);
     }
 }
