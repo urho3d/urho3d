@@ -70,7 +70,7 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true)     // Default Mac OS X and Linux behaviour
     #endif
 {
-	rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
+    rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
 
     SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
