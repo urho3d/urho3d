@@ -163,8 +163,23 @@ class Variant;
 
 /// Vector of variants.
 typedef Vector<Variant> VariantVector;
+
 /// Map of variants.
-typedef HashMap<ShortStringHash, Variant> VariantMap;
+class VariantMap : public HashMap<ShortStringHash, Variant>
+{
+public:
+    /// Index the map by string hash. Create a new pair if key not found.
+    Variant& operator [] (const ShortStringHash& key)
+    {
+        return HashMap<ShortStringHash, Variant>::operator [] (key);
+    }
+    
+    /// Index the map by string. Create a new pair if key not found.
+    Variant& operator [] (const String& key)
+    {
+        return HashMap<ShortStringHash, Variant>::operator [] (ShortStringHash(key));
+    }
+};
 
 /// Variable that supports a fixed set of types.
 class Variant

@@ -38,12 +38,13 @@ static const int LOG_ERROR = 3;
 /// Disable all log messages.
 static const int LOG_NONE = 4;
 
-static const String levelPrefixes[] =
+static const String logLevelPrefixes[] =
 {
     "DEBUG",
     "INFO",
     "WARNING",
-    "ERROR"
+    "ERROR",
+    ""
 };
 
 class File;

@@ -101,119 +101,10 @@ Engine::~Engine()
     context_->RemoveSubsystem<Graphics>();
 }
 
-bool Engine::Initialize(const String& windowTitle, const String& logName, const Vector<String>& arguments, void* externalWindow)
+bool Engine::Initialize(const VariantMap& parameters)
 {
     if (initialized_)
         return true;
-    
-    String renderPath;
-    int width = 0;
-    int height = 0;
-    int multiSample = 1;
-    int buffer = 100;
-    int mixRate = 44100;
-    bool fullscreen = true;
-    bool resizable = false;
-    bool vsync = false;
-    bool tripleBuffer = false;
-    bool forceSM2 = false;
-    bool shadows = true;
-    bool lqShadows = false;
-    bool sound = true;
-    bool stereo = true;
-    bool interpolation = true;
-    bool threads = true;
-    int logLevel = -1;
-    bool quiet = false;
-    
-    for (unsigned i = 0; i < arguments.Size(); ++i)
-    {
-        if (arguments[i][0] == '-' && arguments[i].Length() >= 2)
-        {
-            String argument = arguments[i].Substring(1).ToLower();
-            
-            if (argument == "headless")
-                headless_ = true;
-            else if (argument.Substring(0, 3) == "log")
-            {
-                argument = argument.Substring(3).ToUpper();
-                for (logLevel = sizeof(levelPrefixes) / sizeof(String) - 1; logLevel > -1; --logLevel)
-                {
-                    if (argument == levelPrefixes[logLevel])
-                        break;
-                }
-            }
-            else if (argument == "nolimit")
-                SetMaxFps(0);
-            else if (argument == "nosound")
-                sound = false;
-            else if (argument == "noip")
-                interpolation = false;
-            else if (argument == "mono")
-                stereo = false;
-            else if (argument == "prepass")
-                renderPath = "RenderPaths/Prepass.xml";
-            else if (argument == "deferred")
-                renderPath = "RenderPaths/Deferred.xml";
-            else if (argument == "noshadows")
-                shadows = false;
-            else if (argument == "lqshadows")
-                lqShadows = true;
-            else if (argument == "nothreads")
-                threads = false;
-            else if (argument == "sm2")
-                forceSM2 = true;
-            else
-            {
-                int value;
-                if (argument.Length() > 1)
-                    value = ToInt(argument.Substring(1));
-                
-                switch (tolower(argument[0]))
-                {
-                case 'x':
-                    width = value;
-                    break;
-                    
-                case 'y':
-                    height = value;
-                    break;
-                
-                case 'm':
-                    multiSample = value;
-                    break;
-                    
-                case 'b':
-                    buffer = value;
-                    break;
-                    
-                case 'r':
-                    mixRate = value;
-                    break;
-                    
-                case 'v':
-                    vsync = true;
-                    break;
-                    
-                case 't':
-                    tripleBuffer = true;
-                    break;
-                    
-                case 'w':
-                    fullscreen = false;
-                    break;
-                        
-                case 's':
-                    resizable = true;
-                    break;
-
-                case 'q':
-                    quiet = true;
-                    break;
-                }
-            }
-        }
-    }
     
     // Register object factories and attributes first, then subsystems
     RegisterObjects();
@@ -223,18 +114,22 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     Log* log = GetSubsystem<Log>();
     if (log)
     {
-        if (logLevel != -1)
-            log->SetLevel(logLevel);
-        log->SetQuiet(quiet);
-        log->Open(logName);
+        if (HasParameter(parameters, "LogLevel"))
+            log->SetLevel(GetParameter(parameters, "LogLevel").GetInt());
+        log->SetQuiet(GetParameter(parameters, "LogQuiet", false).GetBool());
+        log->Open(GetParameter(parameters, "LogName", "Urho3D.log").GetString());
     }
     
     // Set maximally accurate low res timer
     GetSubsystem<Time>()->SetTimerPeriod(1);
     
+    // Configure max FPS
+    if (GetParameter(parameters, "FrameLimiter", true) == false)
+        SetMaxFps(0);
+    
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
-    unsigned numThreads = threads ? GetNumPhysicalCPUs() - 1 : 0;
+    unsigned numThreads = GetParameter(parameters, "WorkerThreads", true).GetBool() ? GetNumPhysicalCPUs() - 1 : 0;
     if (numThreads)
     {
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
@@ -242,50 +137,99 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         LOGINFO(ToString("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : ""));
     }
     
-    // Add default resource paths: CoreData package or directory, Data package or directory
+    // Add resource paths
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     String exePath = fileSystem->GetProgramDir();
     
-    if (fileSystem->FileExists(exePath + "CoreData.pak"))
-    {
-        SharedPtr<PackageFile> package(new PackageFile(context_));
-        package->Open(exePath + "CoreData.pak");
-        cache->AddPackageFile(package);
-    }
-    else if (fileSystem->DirExists(exePath + "CoreData"))
-        cache->AddResourceDir(exePath + "CoreData");
+    Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "CoreData;Data").GetString().Split(';');
+    Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
     
-    if (fileSystem->FileExists(exePath + "Data.pak"))
+    // Prefer to add the resource paths as packages if possible
+    for (unsigned i = 0; i < resourcePaths.Size(); ++i)
     {
-        SharedPtr<PackageFile> package(new PackageFile(context_));
-        package->Open(exePath + "Data.pak");
-        cache->AddPackageFile(package);
+        bool success = false;
+        String packageName = exePath + resourcePaths[i] + ".pak";
+        
+        if (fileSystem->FileExists(packageName))
+        {
+            SharedPtr<PackageFile> package(new PackageFile(context_));
+            if (package->Open(packageName))
+            {
+                cache->AddPackageFile(package);
+                success = true;
+            }
+        }
+        
+        if (!success && fileSystem->DirExists(exePath + resourcePaths[i]))
+            success = cache->AddResourceDir(exePath + resourcePaths[i]);
+        
+        if (!success)
+        {
+            LOGERROR("Failed to add resource path " + resourcePaths[i]);
+            return false;
+        }
     }
-    else if (fileSystem->DirExists(exePath + "Data"))
-        cache->AddResourceDir(exePath + "Data");
     
+    // Then add specified packages
+    for (unsigned i = 0; i < resourcePackages.Size(); ++i)
+    {
+        bool success = false;
+        
+        if (fileSystem->FileExists(exePath + resourcePackages[i]))
+        {
+            SharedPtr<PackageFile> package(new PackageFile(context_));
+            if (package->Open(exePath + resourcePackages[i]))
+            {
+                cache->AddPackageFile(package);
+                success = true;
+            }
+        }
+        
+        if (!success)
+        {
+            LOGERROR("Failed to add resource package " + resourcePackages[i]);
+            return false;
+        }
+    }
+    
+
     // Initialize graphics & audio output
     if (!headless_)
     {
         Graphics* graphics = GetSubsystem<Graphics>();
         Renderer* renderer = GetSubsystem<Renderer>();
         
-        if (externalWindow)
-            graphics->SetExternalWindow(externalWindow);
-        graphics->SetForceSM2(forceSM2);
-        graphics->SetWindowTitle(windowTitle);
-        if (!graphics->SetMode(width, height, fullscreen, resizable, vsync, tripleBuffer, multiSample))
+        if (HasParameter(parameters, "ExternalWindow"))
+            graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetPtr());
+        graphics->SetForceSM2(GetParameter(parameters, "ForceSM2", false).GetBool());
+        graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Urho3D").GetString());
+        if (!graphics->SetMode(
+            GetParameter(parameters, "WindowWidth", 0).GetInt(),
+            GetParameter(parameters, "WindowHeight", 0).GetInt(),
+            GetParameter(parameters, "FullScreen", true).GetBool(),
+            GetParameter(parameters, "WindowResizable", true).GetBool(),
+            GetParameter(parameters, "VSync", false).GetBool(),
+            GetParameter(parameters, "TripleBuffer", false).GetBool(),
+            GetParameter(parameters, "MultiSample", 1).GetInt()
+        ))
             return false;
         
-        if (!renderPath.Empty())
-            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(renderPath));
-        renderer->SetDrawShadows(shadows);
-        if (shadows && lqShadows)
+        if (HasParameter(parameters, "RenderPath"))
+            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, "RenderPath").GetString()));
+        renderer->SetDrawShadows(GetParameter(parameters, "Shadows", true).GetBool());
+        if (renderer->GetDrawShadows() && GetParameter(parameters, "LowQualityShadows", false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);
         
-        if (sound)
-            GetSubsystem<Audio>()->SetMode(buffer, mixRate, stereo, interpolation);
+        if (GetParameter(parameters, "Sound", true).GetBool())
+        {
+            GetSubsystem<Audio>()->SetMode(
+                GetParameter(parameters, "SoundBuffer", 100).GetInt(),
+                GetParameter(parameters, "SoundMixRate", 44100).GetInt(),
+                GetParameter(parameters, "SoundStereo", true).GetBool(),
+                GetParameter(parameters, "SoundInterpolation", true).GetBool()
+            );
+        }
     }
     
     // Init FPU state of main thread
@@ -579,6 +523,113 @@ void Engine::ApplyFrameLimit()
     }
     
     timeStep_ = elapsed / 1000000.0f;
+}
+
+VariantMap Engine::ParseParameters(const Vector<String>& arguments)
+{
+    VariantMap ret;
+    
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i][0] == '-' && arguments[i].Length() >= 2)
+        {
+            String argument = arguments[i].Substring(1).ToLower();
+            
+            if (argument == "headless")
+                ret["Headless"] = true;
+            else if (argument.Substring(0, 3) == "log")
+            {
+                argument = argument.Substring(3);
+                int logLevel = GetStringListIndex(argument, logLevelPrefixes, -1);
+                if (logLevel != -1)
+                    ret["LogLevel"] = logLevel;
+            }
+            else if (argument == "nolimit")
+                ret["FrameLimiter"] = false;
+            else if (argument == "nosound")
+                ret["Sound"] = false;
+            else if (argument == "noip")
+                ret["SoundInterpolation"] = false;
+            else if (argument == "mono")
+                ret["SoundStereo"] = false;
+            else if (argument == "prepass")
+                ret["RenderPath"] = "RenderPaths/Prepass.xml";
+            else if (argument == "deferred")
+                ret["RenderPath"] = "RenderPaths/Deferred.xml";
+            else if (argument == "noshadows")
+                ret["Shadows"] = false;
+            else if (argument == "lqshadows")
+                ret["LowQualityShadows"] = true;
+            else if (argument == "nothreads")
+                ret["WorkerThreads"] = false;
+            else if (argument == "sm2")
+                ret["ForceSM2"] = true;
+            else
+            {
+                int value;
+                if (argument.Length() > 1)
+                    value = ToInt(argument.Substring(1));
+                
+                switch (tolower(argument[0]))
+                {
+                case 'x':
+                    ret["WindowWidth"] = value;
+                    break;
+                    
+                case 'y':
+                    ret["WindowHeight"] = value;
+                    break;
+                
+                case 'm':
+                    ret["MultiSample"] = value;
+                    break;
+                    
+                case 'b':
+                    ret["SoundBuffer"] = value;
+                    break;
+                    
+                case 'r':
+                    ret["SoundMixRate"] = value;
+                    break;
+                    
+                case 'v':
+                    ret["VSync"] = true;
+                    break;
+                    
+                case 't':
+                    ret["TripleBuffer"] = true;
+                    break;
+                    
+                case 'w':
+                    ret["FullScreen"] = false;
+                    break;
+                        
+                case 's':
+                    ret["WindowResizable"] = true;
+                    break;
+                    
+                case 'q':
+                    ret["LogQuiet"] = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    return ret;
+}
+
+bool Engine::HasParameter(const VariantMap& parameters, const String& parameter)
+{
+    ShortStringHash nameHash(parameter);
+    return parameters.Find(nameHash) != parameters.End();
+}
+
+const Variant& Engine::GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue)
+{
+    ShortStringHash nameHash(parameter);
+    VariantMap::ConstIterator i = parameters.Find(nameHash);
+    return i != parameters.End() ? i->second_ : defaultValue;
 }
 
 void Engine::RegisterObjects()

@@ -351,7 +351,7 @@ static void DestructVariantMap(VariantMap* ptr)
 
 static Variant& VariantMapAt(const String& key, VariantMap& map)
 {
-    return map[ShortStringHash(key)];
+    return map[key];
 }
 
 static Variant& VariantMapAtHash(ShortStringHash key, VariantMap& map)

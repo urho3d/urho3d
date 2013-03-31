@@ -36,7 +36,12 @@ int Run()
 {
     SharedPtr<Context> context(new Context());
     SharedPtr<Engine> engine(new Engine(context));
-    engine->Initialize("CharacterDemo", "CharacterDemo.log", GetArguments());
+    
+    VariantMap engineParameters = Engine::ParseParameters(GetArguments());
+    engineParameters["WindowTitle"] = "CharacterDemo";
+    engineParameters["LogName"] = "CharacterDemo.log";
+    
+    engine->Initialize(engineParameters);
     
     SharedPtr<CharacterDemo> characterDemo(new CharacterDemo(context));
     characterDemo->Start();

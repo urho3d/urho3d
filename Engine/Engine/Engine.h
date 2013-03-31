@@ -42,8 +42,8 @@ public:
     /// Destruct. Free all subsystems.
     virtual ~Engine();
     
-    /// Initialize and show the application window. Return true if successful.
-    bool Initialize(const String& windowTitle = "Urho3D", const String& logName = "Urho3D.log", const Vector<String>& arguments = Vector<String>(), void* externalWindow = 0);
+    /// Initialize engine using parameters given and show the application window. Return true if successful.
+    bool Initialize(const VariantMap& parameters);
     /// Initialize script subsystem and register the script API. Return true if successful (engine must be initialized first.)
     bool InitializeScripting();
     /// Run one frame.
@@ -90,6 +90,13 @@ public:
     void Render();
     /// Get the timestep for the next frame and sleep for frame limiting if necessary.
     void ApplyFrameLimit();
+    
+    /// Parse the engine startup parameters map from command line arguments.
+    static VariantMap ParseParameters(const Vector<String>& arguments);
+    /// Return whether startup parameters contains a specific parameter.
+    static bool HasParameter(const VariantMap& parameters, const String& parameter);
+    /// Get an engine startup parameter, with default value if missing.
+    static const Variant& GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
     
 private:
     /// Register object factories and attributes.

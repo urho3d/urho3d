@@ -130,7 +130,7 @@ void Log::Write(int level, const String& message)
     {
         MutexLock lock(GetStaticMutex());
         
-        String formattedMessage = levelPrefixes[level] + ": " + message;
+        String formattedMessage = logLevelPrefixes[level] + ": " + message;
         lastMessage_ = message;
         
         if (timeStamp_)

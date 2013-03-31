@@ -131,7 +131,7 @@ int Application::Run()
     }
     
     SharedPtr<Engine> engine(new Engine(context_));
-    if (engine->Initialize("Urho3D", "Urho3D.log", arguments))
+    if (engine->Initialize(Engine::ParseParameters(arguments)))
     {
         // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
         engine->InitializeScripting();
