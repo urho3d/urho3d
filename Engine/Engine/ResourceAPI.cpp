@@ -38,7 +38,7 @@ void RegisterResource(asIScriptEngine* engine)
 
 static Resource* ResourceCacheGetResource(const String& type, const String& name, ResourceCache* ptr)
 {
-    return ptr->GetResource(ShortStringHash(type), name);
+    return ptr->GetResource(type, name);
 }
 
 static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
@@ -53,32 +53,32 @@ static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
 
 static void ResourceCacheReleaseResource(const String& type, const String& name, bool force, ResourceCache* ptr)
 {
-    ptr->ReleaseResource(ShortStringHash(type), name, force);
+    ptr->ReleaseResource(type, name, force);
 }
 
 static void ResourceCacheReleaseResources(const String& type, bool force, ResourceCache* ptr)
 {
-    ptr->ReleaseResources(ShortStringHash(type), force);
+    ptr->ReleaseResources(type, force);
 }
 
 static void ResourceCacheReleaseResourcesPartial(const String& type, const String& partialName, bool force, ResourceCache* ptr)
 {
-    ptr->ReleaseResources(ShortStringHash(type), partialName, force);
+    ptr->ReleaseResources(type, partialName, force);
 }
 
 static void ResourceCacheSetMemoryBudget(const String& type, unsigned budget, ResourceCache* ptr)
 {
-    ptr->SetMemoryBudget(ShortStringHash(type), budget);
+    ptr->SetMemoryBudget(type, budget);
 }
 
 static unsigned ResourceCacheGetMemoryBudget(const String& type, ResourceCache* ptr)
 {
-    return ptr->GetMemoryBudget(ShortStringHash(type));
+    return ptr->GetMemoryBudget(type);
 }
 
 static unsigned ResourceCacheGetMemoryUse(const String& type, ResourceCache* ptr)
 {
-    return ptr->GetMemoryUse(ShortStringHash(type));
+    return ptr->GetMemoryUse(type);
 }
 
 static ResourceCache* GetResourceCache()

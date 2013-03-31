@@ -241,7 +241,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
         UIElement* child = 0;
         
         if (!internalElem)
-            child = CreateChild(ShortStringHash(typeName));
+            child = CreateChild(typeName);
         else
         {
             for (unsigned i = nextInternalChild; i < children_.Size(); ++i)

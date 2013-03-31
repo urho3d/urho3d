@@ -124,11 +124,11 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
         if (!internalElem)
         {
             if (!popupElem)
-                child = CreateChild(ShortStringHash(typeName));
+                child = CreateChild(typeName);
             else
             {
                 // Do not add the popup element as a child even temporarily, as that can break layouts
-                SharedPtr<UIElement> popup = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(typeName)));
+                SharedPtr<UIElement> popup = DynamicCast<UIElement>(context_->CreateObject(typeName));
                 if (!popup)
                     LOGERROR("Could not create popup element type " + ShortStringHash(typeName).ToString());
                 else

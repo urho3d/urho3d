@@ -234,8 +234,8 @@ void Variant::FromString(VariantType type, const char* value)
             {
                 SetType(VAR_RESOURCEREF);
                 ResourceRef& ref = *(reinterpret_cast<ResourceRef*>(&value_));
-                ref.type_ = ShortStringHash(values[0]);
-                ref.id_ = StringHash(values[1]);
+                ref.type_ = values[0];
+                ref.id_ = values[1];
             }
         }
         break;
@@ -247,10 +247,10 @@ void Variant::FromString(VariantType type, const char* value)
             {
                 SetType(VAR_RESOURCEREFLIST);
                 ResourceRefList& refList = *(reinterpret_cast<ResourceRefList*>(&value_));
-                refList.type_ = ShortStringHash(values[0]);
+                refList.type_ = values[0];
                 refList.ids_.Resize(values.Size() - 1);
                 for (unsigned i = 1; i < values.Size(); ++i)
-                    refList.ids_[i - 1] = StringHash(values[i]);
+                    refList.ids_[i - 1] = values[i];
             }
         }
         break;

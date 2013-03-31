@@ -393,6 +393,11 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const String& nameIn)
     return GetResource(type, StringHash(name));
 }
 
+Resource* ResourceCache::GetResource(ShortStringHash type, const char* name)
+{
+    return GetResource(type, String(name));
+}
+
 Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
 {
     // If null hash, return null pointer immediately
@@ -605,7 +610,7 @@ void ResourceCache::StoreResourceDependency(Resource* resource, const String& de
         return;
     
     StringHash nameHash(resource->GetName());
-    HashSet<StringHash>& dependents = dependentResources_[StringHash(dependency)];
+    HashSet<StringHash>& dependents = dependentResources_[dependency];
     dependents.Insert(nameHash);
 }
 

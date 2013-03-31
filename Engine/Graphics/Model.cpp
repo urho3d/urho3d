@@ -200,7 +200,7 @@ bool Model::Load(Deserializer& source)
         ModelMorph newMorph;
         
         newMorph.name_ = source.ReadString();
-        newMorph.nameHash_ = StringHash(newMorph.name_);
+        newMorph.nameHash_ = newMorph.name_;
         newMorph.weight_ = 0.0f;
         unsigned nubuffers_ = source.ReadUInt();
         

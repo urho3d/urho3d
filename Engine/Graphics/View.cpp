@@ -1400,7 +1400,7 @@ void View::SetTextures(const RenderPathCommand& command)
         }
         
         // Bind a rendertarget
-        HashMap<StringHash, Texture2D*>::ConstIterator j = renderTargets_.Find(StringHash(command.textureNames_[i]));
+        HashMap<StringHash, Texture2D*>::ConstIterator j = renderTargets_.Find(command.textureNames_[i]);
         if (j != renderTargets_.End())
         {
             graphics_->SetTexture(i, j->second_);
@@ -1461,11 +1461,11 @@ void View::RenderQuad(const RenderPathCommand& command)
         float width = (float)renderTargets_[nameHash]->GetWidth();
         float height = (float)renderTargets_[nameHash]->GetHeight();
         
-        graphics_->SetShaderParameter(StringHash(invSizeName), Vector4(1.0f / width, 1.0f / height, 0.0f, 0.0f));
+        graphics_->SetShaderParameter(invSizeName, Vector4(1.0f / width, 1.0f / height, 0.0f, 0.0f));
         #ifdef USE_OPENGL
-        graphics_->SetShaderParameter(StringHash(offsetsName), Vector4::ZERO);
+        graphics_->SetShaderParameter(offsetsName, Vector4::ZERO);
         #else
-        graphics_->SetShaderParameter(StringHash(offsetsName), Vector4(0.5f / width, 0.5f / height, 0.0f, 0.0f));
+        graphics_->SetShaderParameter(offsetsName, Vector4(0.5f / width, 0.5f / height, 0.0f, 0.0f));
         #endif
     }
     
@@ -1559,7 +1559,7 @@ void View::AllocateScreenBuffers()
             height = rtSize_.y_ / (height ? height : 1);
         }
         
-        renderTargets_[StringHash(rtInfo.name_)] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_, rtInfo.sRGB_);
+        renderTargets_[rtInfo.name_] = renderer_->GetScreenBuffer(width, height, rtInfo.format_, rtInfo.filtered_, rtInfo.sRGB_);
     }
 }
 

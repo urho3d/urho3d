@@ -403,17 +403,17 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
 
 static Component* NodeCreateComponent(const String& typeName, CreateMode mode, Node* ptr)
 {
-    return ptr->CreateComponent(ShortStringHash(typeName), mode);
+    return ptr->CreateComponent(typeName, mode);
 }
 
 static Component* NodeGetOrCreateComponent(const String& typeName, CreateMode mode, Node* ptr)
 {
-    return ptr->GetOrCreateComponent(ShortStringHash(typeName), mode);
+    return ptr->GetOrCreateComponent(typeName, mode);
 }
 
 static void NodeRemoveComponent(const String& typeName, Node* ptr)
 {
-    ptr->RemoveComponent(ShortStringHash(typeName));
+    ptr->RemoveComponent(typeName);
 }
 
 static Component* NodeGetComponent(unsigned index, Node* ptr)
@@ -430,7 +430,7 @@ static Component* NodeGetComponent(unsigned index, Node* ptr)
 
 static Component* NodeGetComponentWithType(const String& typeName, Node* ptr)
 {
-    return ptr->GetComponent(ShortStringHash(typeName));
+    return ptr->GetComponent(typeName);
 }
 
 static CScriptArray* NodeGetComponents(Node* ptr)
@@ -441,13 +441,13 @@ static CScriptArray* NodeGetComponents(Node* ptr)
 static CScriptArray* NodeGetComponentsWithType(const String& typeName, bool recursive, Node* ptr)
 {
     PODVector<Component*> components;
-    ptr->GetComponents(components, ShortStringHash(typeName), recursive);
+    ptr->GetComponents(components, typeName, recursive);
     return VectorToHandleArray<Component>(components, "Array<Component@>");
 }
 
 static bool NodeHasComponent(const String& typeName, Node* ptr)
 {
-    return ptr->HasComponent(ShortStringHash(typeName));
+    return ptr->HasComponent(typeName);
 }
 
 static CScriptArray* NodeGetChildren(bool recursive, Node* ptr)
@@ -460,7 +460,7 @@ static CScriptArray* NodeGetChildren(bool recursive, Node* ptr)
 static CScriptArray* NodeGetChildrenWithComponent(String& typeName, bool recursive, Node* ptr)
 {
     PODVector<Node*> nodes;
-    ptr->GetChildrenWithComponent(nodes, ShortStringHash(typeName), recursive);
+    ptr->GetChildrenWithComponent(nodes, typeName, recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
@@ -776,7 +776,7 @@ static bool UIElementSaveXML(File* file, UIElement* ptr)
 
 static UIElement* UIElementCreateChild(const String& typeName, const String& name, UIElement* ptr)
 {
-    return ptr->CreateChild(ShortStringHash(typeName), name);
+    return ptr->CreateChild(typeName, name);
 }
 
 static void UIElementRemoveChild(UIElement* child, unsigned index, UIElement* ptr)

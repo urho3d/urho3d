@@ -93,6 +93,8 @@ public:
     SharedPtr<File> GetFile(const String& name);
     /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
     Resource* GetResource(ShortStringHash type, const String& name);
+    /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
+    Resource* GetResource(ShortStringHash type, const char* name);
     /// Return a resource by type and name hash. Load if not loaded yet. Return null if fails.
     Resource* GetResource(ShortStringHash type, StringHash nameHash);
     /// Return all loaded resources of a specific type.
@@ -105,6 +107,8 @@ public:
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const String& name);
+    /// Template version of returning a resource by name.
+    template <class T> T* GetResource(const char* name);
     /// Template version of returning a resource by name hash.
     template <class T> T* GetResource(StringHash nameHash);
     /// Template version of returning loaded resources of a specific type.
@@ -166,6 +170,12 @@ private:
 };
 
 template <class T> T* ResourceCache::GetResource(const String& name)
+{
+    ShortStringHash type = T::GetTypeStatic();
+    return static_cast<T*>(GetResource(type, name));
+}
+
+template <class T> T* ResourceCache::GetResource(const char* name)
 {
     ShortStringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name));

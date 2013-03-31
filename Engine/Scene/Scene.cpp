@@ -431,12 +431,12 @@ void Scene::ClearRequiredPackageFiles()
 
 void Scene::RegisterVar(const String& name)
 {
-    varNames_[ShortStringHash(name)] = name;
+    varNames_[name] = name;
 }
 
 void Scene::UnregisterVar(const String& name)
 {
-    varNames_.Erase(ShortStringHash(name));
+    varNames_.Erase(name);
 }
 
 void Scene::UnregisterAllVars()
@@ -740,7 +740,7 @@ void Scene::SetVarNamesAttr(String value)
     
     varNames_.Clear();
     for (Vector<String>::ConstIterator i = varNames.Begin(); i != varNames.End(); ++i)
-        varNames_[ShortStringHash(*i)] = *i;
+        varNames_[*i] = *i;
 }
 
 String Scene::GetVarNamesAttr() const

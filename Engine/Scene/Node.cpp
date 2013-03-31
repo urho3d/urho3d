@@ -220,7 +220,7 @@ bool Node::SaveXML(Serializer& dest)
 void Node::SetName(const String& name)
 {
     name_ = name;
-    nameHash_ = StringHash(name);
+    nameHash_ = name_;
     
     MarkNetworkUpdate();
     
@@ -800,6 +800,11 @@ Node* Node::GetChild(const String& name, bool recursive) const
     return GetChild(StringHash(name), recursive);
 }
 
+Node* Node::GetChild(const char* name, bool recursive) const
+{
+    return GetChild(StringHash(name), recursive);
+}
+
 Node* Node::GetChild(StringHash nameHash, bool recursive) const
 {
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
@@ -1044,7 +1049,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
-        Component* newComponent = CreateComponent(ShortStringHash(typeName),
+        Component* newComponent = CreateComponent(typeName,
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {

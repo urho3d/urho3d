@@ -1352,7 +1352,7 @@ void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned 
 void Connection::SendPackageError(const String& name)
 {
     msg_.Clear();
-    msg_.WriteStringHash(StringHash(name));
+    msg_.WriteStringHash(name);
     SendMessage(MSG_PACKAGEDATA, true, false, msg_);
 }
 

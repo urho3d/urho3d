@@ -295,10 +295,10 @@ void Material::SetShaderParameter(const String& name, const Vector4& value)
     MaterialShaderParameter newParam;
     newParam.name_ = name;
     newParam.value_ = value;
-    StringHash stringHash(name);
-    shaderParameters_[stringHash] = newParam;
+    StringHash nameHash(name);
+    shaderParameters_[nameHash] = newParam;
     
-    if (stringHash == PSP_MATSPECCOLOR)
+    if (nameHash == PSP_MATSPECCOLOR)
         specular_ = value.x_ > 0.0f || value.y_ > 0.0f || value.z_ > 0.0f;
 }
 
@@ -360,10 +360,10 @@ void Material::SetDepthBias(const BiasParameters& parameters)
 
 void Material::RemoveShaderParameter(const String& name)
 {
-    StringHash stringHash(name);
-    shaderParameters_.Erase(stringHash);
+    StringHash nameHash(name);
+    shaderParameters_.Erase(nameHash);
 
-    if (stringHash == PSP_MATSPECCOLOR)
+    if (nameHash == PSP_MATSPECCOLOR)
         specular_ = false;
 }
 
@@ -421,7 +421,7 @@ Texture* Material::GetTexture(TextureUnit unit) const
 
 const Vector4& Material::GetShaderParameter(const String& name) const
 {
-    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(StringHash(name));
+    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(name);
     return i != shaderParameters_.End() ? i->second_.value_ : Vector4::ZERO;
 }
 

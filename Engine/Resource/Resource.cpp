@@ -49,7 +49,7 @@ bool Resource::Save(Serializer& dest)
 void Resource::SetName(const String& name)
 {
     name_ = name;
-    nameHash_ = StringHash(name);
+    nameHash_ = name;
 }
 
 void Resource::SetMemoryUse(unsigned size)

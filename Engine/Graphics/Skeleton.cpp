@@ -53,7 +53,7 @@ bool Skeleton::Load(Deserializer& source)
     {
         Bone newBone;
         newBone.name_ = source.ReadString();
-        newBone.nameHash_ = StringHash(newBone.name_);
+        newBone.nameHash_ = newBone.name_;
         newBone.parentIndex_ = source.ReadUInt();
         newBone.initialPosition_ = source.ReadVector3();
         newBone.initialRotation_ = source.ReadQuaternion();

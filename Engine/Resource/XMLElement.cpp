@@ -589,8 +589,8 @@ ResourceRef XMLElement::GetResourceRef() const
     Vector<String> values = String::Split(GetAttribute("value"), ';');
     if (values.Size() == 2)
     {
-        ret.type_ = ShortStringHash(values[0]);
-        ret.id_ = StringHash(values[1]);
+        ret.type_ = values[0];
+        ret.id_ = values[1];
         
         // Whenever we encounter a resource name read from a ResourceRef XML element, store the reverse mapping to
         // ResourceCache if possible. We will probably use the hash to request a resource shortly afterward
@@ -612,7 +612,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
         // ResourceCache if possible. We will probably use the hashes to request resources shortly afterward
         ResourceCache* cache = file_ ? file_->GetSubsystem<ResourceCache>() : 0;
         
-        ret.type_ = ShortStringHash(values[0]);
+        ret.type_ = values[0];
         ret.ids_.Resize(values.Size() - 1);
         for (unsigned i = 1; i < values.Size(); ++i)
         {

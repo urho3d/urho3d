@@ -106,6 +106,9 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (initialized_)
         return true;
     
+    // Set headless mode
+    headless_ = GetParameter(parameters, "Headless", false).GetBool();
+    
     // Register object factories and attributes first, then subsystems
     RegisterObjects();
     RegisterSubsystems();

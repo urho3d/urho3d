@@ -90,7 +90,7 @@ bool Animation::Load(Deserializer& source)
     
     // Read name and length
     animationName_ = source.ReadString();
-    animationNameHash_ = StringHash(animationName_);
+    animationNameHash_ = animationName_;
     length_ = source.ReadFloat();
     tracks_.Clear();
     
@@ -103,7 +103,7 @@ bool Animation::Load(Deserializer& source)
     {
         AnimationTrack& newTrack = tracks_[i];
         newTrack.name_ = source.ReadString();
-        newTrack.nameHash_ = StringHash(newTrack.name_);
+        newTrack.nameHash_ = newTrack.name_;
         newTrack.channelMask_ = source.ReadUByte();
         
         unsigned keyFrames = source.ReadUInt();

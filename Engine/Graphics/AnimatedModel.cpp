@@ -590,18 +590,12 @@ AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
 
 AnimationState* AnimatedModel::GetAnimationState(const String& animationName) const
 {
-    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
-    {
-        Animation* animation = (*i)->GetAnimation();
-        if (animation)
-        {
-            // Check both the animation and the resource name
-            if (animation->GetName() == animationName || animation->GetAnimationName() == animationName)
-                return *i;
-        }
-    }
-    
-    return 0;
+    return GetAnimationState(StringHash(animationName));
+}
+
+AnimationState* AnimatedModel::GetAnimationState(const char* animationName) const
+{
+    return GetAnimationState(StringHash(animationName));
 }
 
 AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const

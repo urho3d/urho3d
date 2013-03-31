@@ -50,10 +50,9 @@ public:
     }
     
     /// Construct from a C string case-insensitively.
-    explicit StringHash(const char* str);
-    
+    StringHash(const char* str);
     /// Construct from a string case-insensitively.
-    explicit StringHash(const String& str);
+    StringHash(const String& str);
     
     /// Assign from another hash.
     StringHash& operator = (const StringHash& rhs)
@@ -134,9 +133,9 @@ public:
     }
 
     /// Construct from a C string case-insensitively.
-    explicit ShortStringHash(const char* str);
+    ShortStringHash(const char* str);
     /// Construct from a string case-insensitively.
-    explicit ShortStringHash(const String& str);
+    ShortStringHash(const String& str);
     
     /// Assign from another hash.
     ShortStringHash& operator = (const ShortStringHash& rhs)
@@ -187,8 +186,5 @@ private:
     /// Hash value.
     unsigned short value_;
 };
-
-#define HASH(str) (StringHash(#str))
-#define SHORTHASH(str) (ShortStringHash(#str))
 
 }

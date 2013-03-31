@@ -118,7 +118,7 @@ void RenderPathCommand::LoadParameters(const XMLElement& element)
         break;
         
     case CMD_SCENEPASS:
-        pass_ = StringHash(element.GetAttribute("pass"));
+        pass_ = element.GetAttribute("pass");
         sortMode_ = (RenderCommandSortMode)GetStringListIndex(element.GetAttributeLower("sort"), sortModeNames, SORT_FRONTTOBACK);
         if (element.HasAttribute("marktostencil"))
             markToStencil_ = element.GetBool("marktostencil");
@@ -144,7 +144,7 @@ void RenderPathCommand::LoadParameters(const XMLElement& element)
             {
                 String name = parameterElem.GetAttribute("name");
                 Vector4 value = parameterElem.GetVector("value");
-                shaderParameters_[StringHash(name)] = value;
+                shaderParameters_[name] = value;
                 
                 parameterElem = parameterElem.GetNext("parameter");
             }
@@ -203,12 +203,12 @@ void RenderPathCommand::SetTextureName(TextureUnit unit, const String& name)
 
 void RenderPathCommand::SetShaderParameter(const String& name, const Vector4& value)
 {
-    shaderParameters_[StringHash(name)] = value;
+    shaderParameters_[name] = value;
 }
 
 void RenderPathCommand::RemoveShaderParameter(const String& name)
 {
-    shaderParameters_.Erase(StringHash(name));
+    shaderParameters_.Erase(name);
 }
 
 void RenderPathCommand::SetNumOutputs(unsigned num)
@@ -232,7 +232,7 @@ const String& RenderPathCommand::GetTextureName(TextureUnit unit) const
 
 const Vector4& RenderPathCommand::GetShaderParameter(const String& name) const
 {
-    HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters_.Find(StringHash(name));
+    HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters_.Find(name);
     return i != shaderParameters_.End() ? i->second_ : Vector4::ZERO;
 }
 

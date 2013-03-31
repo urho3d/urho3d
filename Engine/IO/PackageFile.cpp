@@ -63,7 +63,7 @@ bool PackageFile::Open(const String& fileName)
     }
     
     fileName_ = fileName;
-    nameHash_ = StringHash(fileName_);
+    nameHash_ = fileName_;
     totalSize_ = file->GetSize();
     
     unsigned numFiles = file->ReadUInt();

@@ -864,7 +864,7 @@ void BuildAndSaveAnimations(OutModel& model)
             
             AnimationTrack track;
             track.name_ = channelName;
-            track.nameHash_ = StringHash(channelName);
+            track.nameHash_ = channelName;
             
             // Check which channels are used
             track.channelMask_ = 0;

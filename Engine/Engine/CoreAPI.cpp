@@ -361,12 +361,12 @@ static Variant& VariantMapAtHash(ShortStringHash key, VariantMap& map)
 
 static bool VariantMapContains(const String& key, VariantMap& map)
 {
-    return map.Contains(ShortStringHash(key));
+    return map.Contains(key);
 }
 
 static bool VariantMapErase(const String& key, VariantMap& map)
 {
-    return map.Erase(ShortStringHash(key));
+    return map.Erase(key);
 }
 
 static bool VariantMapContainsHash(ShortStringHash key, VariantMap& map)
@@ -665,35 +665,35 @@ static void SendEvent(const String& eventType, VariantMap& eventData)
 {
     Object* sender = GetScriptContextEventListenerObject();
     if (sender)
-        sender->SendEvent(StringHash(eventType), eventData);
+        sender->SendEvent(eventType, eventData);
 }
 
 static void SubscribeToEvent(const String& eventType, const String& handlerName)
 {
     ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
-        listener->AddEventHandler(StringHash(eventType), handlerName);
+        listener->AddEventHandler(eventType, handlerName);
 }
 
 static void SubscribeToSenderEvent(Object* sender, const String& eventType, const String& handlerName)
 {
     ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
-        listener->AddEventHandler(sender, StringHash(eventType), handlerName);
+        listener->AddEventHandler(sender, eventType, handlerName);
 }
 
 static void UnsubscribeFromEvent(const String& eventType)
 {
     Object* listener = GetScriptContextEventListenerObject();
     if (listener)
-        listener->UnsubscribeFromEvent(StringHash(eventType));
+        listener->UnsubscribeFromEvent(eventType);
 }
 
 static void UnsubscribeFromSenderEvent(Object* sender, const String& eventType)
 {
     Object* listener = GetScriptContextEventListenerObject();
     if (listener)
-        listener->UnsubscribeFromEvent(sender, StringHash(eventType));
+        listener->UnsubscribeFromEvent(sender, eventType);
 }
 
 static void UnsubscribeFromSenderEvents(Object* sender)

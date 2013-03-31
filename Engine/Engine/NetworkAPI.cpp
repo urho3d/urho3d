@@ -77,12 +77,12 @@ static void RegisterNetworkPriority(asIScriptEngine* engine)
 
 void SendRemoteEvent(const String& eventType, bool inOrder, const VariantMap& eventData, Connection* ptr)
 {
-    ptr->SendRemoteEvent(StringHash(eventType), inOrder, eventData);
+    ptr->SendRemoteEvent(eventType, inOrder, eventData);
 }
 
 void SendRemoteNodeEvent(Node* receiver, const String& eventType, bool inOrder, const VariantMap& eventData, Connection* ptr)
 {
-    ptr->SendRemoteEvent(receiver, StringHash(eventType), inOrder, eventData);
+    ptr->SendRemoteEvent(receiver, eventType, inOrder, eventData);
 }
 
 static void RegisterConnection(asIScriptEngine* engine)
@@ -131,32 +131,32 @@ static CScriptArray* NetworkGetClientConnections(Network* ptr)
 
 static void NetworkBroadcastRemoteEvent(const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
 {
-    ptr->BroadcastRemoteEvent(StringHash(eventType), inOrder, eventData);
+    ptr->BroadcastRemoteEvent(eventType, inOrder, eventData);
 }
 
 static void NetworkBroadcastRemoteSceneEvent(Scene* scene, const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
 {
-    ptr->BroadcastRemoteEvent(scene, StringHash(eventType), inOrder, eventData);
+    ptr->BroadcastRemoteEvent(scene, eventType, inOrder, eventData);
 }
 
 static void NetworkBroadcastRemoteNodeEvent(Node* node, const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
 {
-    ptr->BroadcastRemoteEvent(node, StringHash(eventType), inOrder, eventData);
+    ptr->BroadcastRemoteEvent(node, eventType, inOrder, eventData);
 }
 
 static void NetworkRegisterRemoteEvent(const String& eventType, Network* ptr)
 {
-    ptr->RegisterRemoteEvent(StringHash(eventType));
+    ptr->RegisterRemoteEvent(eventType);
 }
 
 static void NetworkUnregisterRemoteEvent(const String& eventType, Network* ptr)
 {
-    ptr->UnregisterRemoteEvent(StringHash(eventType));
+    ptr->UnregisterRemoteEvent(eventType);
 }
 
 static bool NetworkCheckRemoteEvent(const String& eventType, Network* ptr)
 {
-    return ptr->CheckRemoteEvent(StringHash(eventType));
+    return ptr->CheckRemoteEvent(eventType);
 }
 
 void RegisterNetwork(asIScriptEngine* engine)

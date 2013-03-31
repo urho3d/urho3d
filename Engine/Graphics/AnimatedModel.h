@@ -105,6 +105,8 @@ public:
     AnimationState* GetAnimationState(Animation* animation) const;
     /// Return animation state by animation name.
     AnimationState* GetAnimationState(const String& animationName) const;
+    /// Return animation state by animation name.
+    AnimationState* GetAnimationState(const char* animationName) const;
     /// Return animation state by animation name hash.
     AnimationState* GetAnimationState(const StringHash animationNameHash) const;
     /// Return animation state by index.
