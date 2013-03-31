@@ -7,7 +7,7 @@ const int ITEM_UI_ELEMENT = 3;
 const uint NO_ITEM = M_MAX_UNSIGNED;
 const ShortStringHash SCENE_TYPE("Scene");
 const ShortStringHash NODE_TYPE("Node");
-const String TITLE_NO_CHANGE(uint8(0));
+const String NO_CHANGE(uint8(0));
 
 Window@ hierarchyWindow;
 ListView@ hierarchyList;
@@ -72,10 +72,11 @@ void CreateHierarchyWindow()
     SubscribeToEvent(editorScene, "ComponentEnabledChanged", "HandleComponentEnabledChanged");
 }
 
-void ShowHierarchyWindow()
+bool ShowHierarchyWindow()
 {
     hierarchyWindow.visible = true;
     hierarchyWindow.BringToFront();
+    return true;
 }
 
 void HideHierarchyWindow()
@@ -89,7 +90,7 @@ void ExpandCollapseHierarchy(StringHash eventType, VariantMap& eventData)
     bool enable = button.name == "ExpandButton";
     CheckBox@ checkBox = cast<CheckBox>(hierarchyWindow.GetChild("AllCheckBox", true));
     bool all = checkBox.checked;
-    checkBox.checked = false;	// Auto-reset
+    checkBox.checked = false;    // Auto-reset
 
     Array<uint> selections = hierarchyList.selections;
     for (uint i = 0; i < selections.length; ++i)
@@ -138,7 +139,7 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
     int itemType = ITEM_NONE;
     if (serializable !is null)
         GetID(serializable, idVar, id, itemType);
-    
+
     // Remove old item if exists
     if (itemIndex < hierarchyList.numItems && (serializable is null || MatchID(hierarchyList.items[itemIndex], idVar, id, itemType)))
         hierarchyList.RemoveItem(itemIndex);
@@ -153,8 +154,8 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
     text.SetStyle(uiStyle, "FileSelectorListText");
     SetID(text, serializable);
 
-    // The root node (scene) cannot be moved by drag and drop.
-    if (serializable.type == SCENE_TYPE)
+    // The root node (scene) and editor's root UIElement cannot be moved by drag and drop.
+    if (serializable.type == SCENE_TYPE || serializable is editorUIElement)
         text.dragDropMode = DD_TARGET;
     else
         text.dragDropMode = DD_SOURCE_AND_TARGET;
@@ -171,11 +172,11 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
     if (serializable is editorUIElement)
         iconType = "Root" + iconType;
     IconizeUIElement(text, iconType);
-    
+
     if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
     {
         Node@ node = cast<Node>(serializable);
-        
+
         text.text = GetNodeTitle(node);
         SetIconEnabledColor(text, node.enabled);
 
@@ -185,7 +186,7 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
             Component@ component = node.components[i];
             AddComponentItem(itemIndex++, component, text);
         }
-    
+
         // Then update child nodes recursively
         for (uint i = 0; i < node.numChildren; ++i)
         {
@@ -196,7 +197,7 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
     else
     {
         UIElement@ element = cast<UIElement>(serializable);
-        
+
         text.text = GetUIElementTitle(element);
         SetIconEnabledColor(text, element.visible);
 
@@ -215,15 +216,15 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
     return itemIndex;
 }
 
-void UpdateHierarchyWindowItemText(uint itemIndex, bool iconEnabled, const String&in textTitle = TITLE_NO_CHANGE)
+void UpdateHierarchyWindowItemText(uint itemIndex, bool iconEnabled, const String&in textTitle = NO_CHANGE)
 {
     Text@ text = hierarchyList.items[itemIndex];
     if (text is null)
         return;
-    
+
     SetIconEnabledColor(text, iconEnabled);
-    
-    if (textTitle != TITLE_NO_CHANGE)
+
+    if (textTitle != NO_CHANGE)
         text.text = textTitle;
 }
 
@@ -235,7 +236,7 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
     text.vars["NodeID"] = component.node.id;
     text.vars["ComponentID"] = component.id;
     text.text = GetComponentTitle(component);
-    
+
     hierarchyList.InsertItem(compItemIndex, text, parentItem);
     IconizeUIElement(text, component.typeName);
     SetIconEnabledColor(text, component.enabledEffective);
@@ -282,7 +283,7 @@ uint GetListIndex(Serializable@ serializable)
         return NO_ITEM;
 
     uint numItems = hierarchyList.numItems;
-    
+
     String idVar;
     Variant id;
     int itemType = ITEM_NONE;
@@ -386,7 +387,7 @@ void SelectNode(Node@ node, bool multiselect)
             break;
         node = parent;
     }
-    
+
     uint numItems = hierarchyList.numItems;
     uint parentItem = GetListIndex(node);
 
@@ -419,7 +420,7 @@ void SelectComponent(Component@ component, bool multiselect)
         hierarchyList.ClearSelection();
         return;
     }
-    
+
     Node@ node = component.node;
     if (node is null && !multiselect)
     {
@@ -429,7 +430,7 @@ void SelectComponent(Component@ component, bool multiselect)
 
     uint nodeItem = GetListIndex(node);
     uint componentItem = GetComponentListIndex(component);
-    
+
     // Go in the parent chain up to make sure the chain is expanded
     for (;;)
     {
@@ -474,7 +475,7 @@ void HandleHierarchyListSelectionChange()
 {
     if (inSelectionModify)
         return;
-    
+
     ClearSceneSelection();
     ClearUIElementSelection();
 
@@ -482,7 +483,7 @@ void HandleHierarchyListSelectionChange()
 
     // Enable Expand/Collapse button when there is selection
     EnableExpandCollapseButtons(indices.length > 0);
-    
+
     for (uint i = 0; i < indices.length; ++i)
     {
         uint index = indices[i];
@@ -522,7 +523,7 @@ void HandleHierarchyListSelectionChange()
         }
         editNode = commonNode;
     }
-    
+
     // Now check if the component(s) can be edited. If many selected, must have same type or have same edit node
     if (!selectedComponents.empty)
     {
@@ -547,7 +548,7 @@ void HandleHierarchyListSelectionChange()
             numEditableComponentsPerNode = selectedComponents.length;
         }
     }
-    
+
     // If just nodes selected, and no components, show as many matching components for editing as possible
     if (!selectedNodes.empty && selectedComponents.empty && selectedNodes[0].numComponents > 0)
     {
@@ -581,7 +582,7 @@ void HandleHierarchyListSelectionChange()
     else
     {
         editNodes = selectedNodes;
-        
+
         // Cannot multi-edit on scene and node(s) together as scene and node do not share identical attributes,
         // editing via gizmo does not make too much sense either
         if (editNodes.length > 1 && editNodes[0] is editorScene)
@@ -650,7 +651,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target)
         if (targetNode.parent is sourceNode)
             return false;
     }
-    
+
     return true;
 }
 
@@ -778,7 +779,7 @@ void HandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
 {
     if (suppressSceneChanges)
         return;
-    
+
     Node@ node = eventData["Node"].GetNode();
     UpdateHierarchyWindowItemText(GetListIndex(node), node.enabled, GetNodeTitle(node));
 }
@@ -787,7 +788,7 @@ void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
 {
     if (suppressSceneChanges)
         return;
-    
+
     Node@ node = eventData["Node"].GetNode();
     UpdateHierarchyWindowItemText(GetListIndex(node), node.enabled);
     attributesDirty = true;
@@ -797,7 +798,7 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
 {
     if (suppressSceneChanges)
         return;
-    
+
     Component@ component = eventData["Component"].GetComponent();
     UpdateHierarchyWindowItemText(GetComponentListIndex(component), component.enabledEffective);
     attributesDirty = true;

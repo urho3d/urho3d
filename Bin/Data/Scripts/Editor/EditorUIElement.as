@@ -28,13 +28,14 @@ void CreateUIElement()
     editorUIElement.name = "UI";
     editorUIElement.SetSize(graphics.width, graphics.height);
     editorUIElement.traversalMode = TM_DEPTH_FIRST;
-    
+
     UpdateHierarchyWindowItem(editorUIElement);
 }
 
-void NewUIElement()
+bool NewUIElement()
 {
     // TODO
+    return true;
 }
 
 void OpenUIElement(const String&in fileName)
@@ -43,17 +44,17 @@ void OpenUIElement(const String&in fileName)
         return;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     // Check if the UI element has been opened before
     for (uint i = 0; i < editorUIElement.numChildren; ++i)
     {
-    	if (editorUIElement.children[i].vars[FILENAME_VAR] == fileName)
-    	{
-    		log.Warning("UI element is already opened: " + fileName);
-    		return;
-    	}
+        if (editorUIElement.children[i].vars[FILENAME_VAR] == fileName)
+        {
+            log.Warning("UI element is already opened: " + fileName);
+            return;
+        }
     }
-    
+
     // Always load from the filesystem, not from resource paths
     if (!fileSystem.FileExists(fileName))
     {
@@ -82,39 +83,56 @@ void OpenUIElement(const String&in fileName)
         CenterDialog(element);
         editorUIElement.AddChild(element);
     }
-    
+
     UpdateHierarchyWindowItem(element, true);
     UpdateNodeWindow();
 
     suppressSceneChanges = false;
 }
 
-void CloseUIElement(bool all = false)
+bool CloseUIElement()
 {
     suppressUIElementChanges = true;
 
-    if (all)
-        editorUIElement.RemoveAllChildren();
-    else
+    for (uint i = 0; i < selectedUIElements.length; ++i)
     {
-        for (uint i = 0; i < selectedUIElements.length; ++i)
-        {
-            UIElement@ element = selectedUIElements[i];
-            while (!element.vars.Contains("FILENAME_VAR"))
-                element = element.parent;
-            element.Remove();
-        }
+        UIElement@ element = selectedUIElements[i];
+        while (!element.vars.Contains("FILENAME_VAR"))
+            element = element.parent;
+        element.Remove();
+        UpdateHierarchyWindowItem(element);
     }
-    
-    UpdateHierarchyWindowItem(editorUIElement, true);
-    UpdateNodeWindow();
-    
+
     suppressUIElementChanges = false;
+    
+    return true;
 }
 
-void SaveUIElement(const String&in fileName)
+bool CloseAllUIElements()
+{
+    suppressUIElementChanges = true;
+    
+    editorUIElement.RemoveAllChildren();
+    UpdateHierarchyWindowItem(editorUIElement, true);
+    UpdateNodeWindow();
+
+    suppressUIElementChanges = false;
+    
+    return true;
+}
+
+bool SaveUIElement(const String&in fileName)
 {
     // TODO
+    return true;
+}
+
+bool SaveUIElementWithExistingName()
+{
+    if (editUIElement is null || editUIElement.vars[FILENAME_VAR].GetString().empty)
+        return PickFile();
+    else
+        return SaveUIElement(editUIElement.vars[FILENAME_VAR].GetString());
 }
 
 void LoadChildUIElement(const String&in fileName)

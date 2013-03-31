@@ -126,11 +126,12 @@ void UpdateEditorSettingsDialog()
     }
 }
 
-void ShowEditorSettingsDialog()
+bool ShowEditorSettingsDialog()
 {
     UpdateEditorSettingsDialog();
     settingsDialog.visible = true;
     settingsDialog.BringToFront();
+    return true;
 }
 
 void HideEditorSettingsDialog()

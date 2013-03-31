@@ -82,11 +82,12 @@ void UpdateEditorPreferencesDialog()
     }
 }
 
-void ShowEditorPreferencesDialog()
+bool ShowEditorPreferencesDialog()
 {
     UpdateEditorPreferencesDialog();
     preferencesDialog.visible = true;
     preferencesDialog.BringToFront();
+    return true;
 }
 
 void HideEditorPreferencesDialog()

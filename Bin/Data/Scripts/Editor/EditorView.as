@@ -514,7 +514,8 @@ void ToggleOctreeDebug()
     octreeDebug = !octreeDebug;
 }
 
-void ToggleUpdate()
+bool ToggleUpdate()
 {
     runUpdate = !runUpdate;
+    return true;
 }

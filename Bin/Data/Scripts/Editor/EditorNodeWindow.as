@@ -56,10 +56,11 @@ void HideNodeWindow()
     nodeWindow.visible = false;
 }
 
-void ShowNodeWindow()
+bool ShowNodeWindow()
 {
     nodeWindow.visible = true;
     nodeWindow.BringToFront();
+    return true;
 }
 
 void AdjustListViewChild(ListView@ list)

@@ -45,10 +45,10 @@ void CreateScene()
 {
     // Create a scene only once here
     editorScene = Scene("");
-    
+
     // Allow access to the scene from the console
     script.defaultScene = editorScene;
-    
+
     // Always pause the scene, and do updates manually
     editorScene.updateEnabled = false;
 
@@ -56,8 +56,10 @@ void CreateScene()
     CreateCamera();
 }
 
-void ResetScene()
+bool ResetScene()
 {
+    ui.cursor.shape = CS_BUSY;
+
     suppressSceneChanges = true;
 
     // Create a scene with default values, these will be overridden when loading scenes
@@ -73,18 +75,20 @@ void ResetScene()
     UpdateWindowTitle();
     UpdateHierarchyWindowItem(editorScene, true);
     UpdateNodeWindow();
-    
+
     suppressSceneChanges = false;
-    
+
     ResetCamera();
     CreateGizmo();
+    
+    return true;
 }
 
 void SetResourcePath(String newPath, bool usePreferredDir = true)
 {
     if (newPath.empty)
         return;
-    
+
     if (usePreferredDir)
         newPath = AddTrailingSlash(cache.GetPreferredResourceDir(newPath));
     else
@@ -110,7 +114,7 @@ bool LoadScene(const String&in fileName)
         return false;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     // Always load the scene from the filesystem, not from resource paths
     if (!fileSystem.FileExists(fileName))
     {
@@ -139,7 +143,7 @@ bool LoadScene(const String&in fileName)
 
     sceneModified = false;
     runUpdate = false;
-    
+
     UpdateWindowTitle();
     UpdateHierarchyWindowItem(editorScene, true);
     UpdateNodeWindow();
@@ -152,13 +156,13 @@ bool LoadScene(const String&in fileName)
     return loaded;
 }
 
-void SaveScene(const String&in fileName)
+bool SaveScene(const String&in fileName)
 {
-    if (fileName.empty || GetFileName(fileName).empty)
-        return;
+    if (fileName.empty)
+        return false;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     // Unpause when saving so that the scene will work properly when loaded outside the editor
     editorScene.updateEnabled = true;
 
@@ -173,13 +177,23 @@ void SaveScene(const String&in fileName)
 
     sceneModified = false;
     UpdateWindowTitle();
+    
+    return true;
+}
+
+bool SaveSceneWithExistingName()
+{
+    if (editorScene.fileName.empty || editorScene.fileName == TEMP_SCENE_NAME)
+        return PickFile();
+    else
+        return SaveScene(editorScene.fileName);
 }
 
 void LoadNode(const String&in fileName)
 {
     if (fileName.empty)
         return;
-    
+
     if (!fileSystem.FileExists(fileName))
     {
         log.Error("No such node file " + fileName);
@@ -191,7 +205,7 @@ void LoadNode(const String&in fileName)
         return;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     // Before instantiating, set resource path if empty
     if (sceneResourcePath.empty)
         SetResourcePath(GetPath(fileName));
@@ -218,7 +232,7 @@ void SaveNode(const String&in fileName)
         return;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     if (selectedNodes.length == 1)
     {
         File file(fileName, FILE_WRITE);
@@ -276,9 +290,9 @@ bool SceneDelete()
         return false;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     BeginSelectionModify();
-    
+
     // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
     hierarchyList.ClearSelection();
 
@@ -351,7 +365,7 @@ bool SceneCopy()
         return false;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     copyBuffer.Clear();
 
     // Copy components
@@ -395,7 +409,7 @@ bool ScenePaste()
         return false;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     bool pasteComponents = false;
 
     for (uint i = 0; i < copyBuffer.length; ++i)
@@ -441,13 +455,13 @@ bool ScenePaste()
     return true;
 }
 
-void SceneUnparent()
+bool SceneUnparent()
 {
     if (!CheckHierarchyWindowFocus() || !selectedComponents.empty || selectedNodes.empty)
-        return;
+        return false;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     // Parent selected nodes to root
     Array<Node@> changedNodes;
     for (uint i = 0; i < selectedNodes.length; ++i)
@@ -464,15 +478,17 @@ void SceneUnparent()
     // Reselect the changed nodes at their new position in the list
     for (uint i = 0; i < changedNodes.length; ++i)
         hierarchyList.AddSelection(GetListIndex(changedNodes[i]));
+    
+    return true;
 }
 
-void SceneToggleEnable()
+bool SceneToggleEnable()
 {
     if (!CheckHierarchyWindowFocus())
-        return;
+        return false;
 
     ui.cursor.shape = CS_BUSY;
-    
+
     // Toggle enabled state of nodes recursively
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
@@ -487,6 +503,8 @@ void SceneToggleEnable()
         if (selectedComponents[i].numAttributes > 0 && selectedComponents[i].attributeInfos[0].name == "Is Enabled")
             selectedComponents[i].enabled = !selectedComponents[i].enabled;
     }
+    
+    return true;
 }
 
 bool SceneChangeParent(Node@ sourceNode, Node@ targetNode)
@@ -497,39 +515,48 @@ bool SceneChangeParent(Node@ sourceNode, Node@ targetNode)
     sourceNode.parent = targetNode;
     EndModify(sourceNode.id);
     EndModify(targetNode.id);
-    
+
     // Return true if success
     return sourceNode.parent is targetNode;
 }
 
-void SceneResetPosition()
+bool SceneResetPosition()
 {
     if (editNode !is null)
     {
         editNode.position = Vector3(0.0, 0.0, 0.0);
         UpdateNodeAttributes();
+        return true;
     }
+    else
+        return false;
 }
 
-void SceneResetRotation()
+bool SceneResetRotation()
 {
     if (editNode !is null)
     {
         editNode.rotation = Quaternion();
         UpdateNodeAttributes();
+        return true;
     }
+    else
+        return false;
 }
 
-void SceneResetScale()
+bool SceneResetScale()
 {
     if (editNode !is null)
     {
         editNode.scale = Vector3(1.0, 1.0, 1.0);
         UpdateNodeAttributes();
+        return true;
     }
+    else
+        return false;
 }
 
-void SceneSelectAll()
+bool SceneSelectAll()
 {
     if (!hierarchyList.selections.empty)
     {
@@ -547,4 +574,6 @@ void SceneSelectAll()
         hierarchyList.SetSelections(indices);
         EndSelectionModify();
     }
+    
+    return true; 
 }

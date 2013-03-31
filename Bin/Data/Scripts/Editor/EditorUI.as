@@ -12,6 +12,7 @@ const ShortStringHash TEXT_TYPE("Text");
 const ShortStringHash CURSOR_TYPE("Cursor");
 
 const String TEMP_SCENE_NAME("_tempscene_.xml");
+const String CALLBACK_VAR("Callback");
 
 const int SHOW_POPUP_INDICATOR = -1;
 
@@ -39,7 +40,7 @@ void CreateUI()
 {
     uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
     ui.root.defaultStyle = uiStyle;
-    
+
     iconStyle = cache.GetResource("XMLFile", "UI/EditorIcons.xml");
 
     CreateCursor();
@@ -63,7 +64,7 @@ void ResizeUI()
 {
     // Resize menu bar
     uiMenuBar.SetFixedWidth(graphics.width);
-    
+
     // Relayout stats bar
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
     if (graphics.width >= 1200)
@@ -76,7 +77,7 @@ void ResizeUI()
         SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, 0, 36, HA_LEFT, VA_TOP);
     }
-    
+
     // Relayout windows
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
@@ -84,7 +85,7 @@ void ResizeUI()
         if (children[i].type == WINDOW_TYPE)
             AdjustPosition(children[i]);
     }
-    
+
     // Relayout root UI element
     editorUIElement.SetSize(graphics.width, graphics.height);
 }
@@ -111,6 +112,10 @@ void CreateCursor()
         ui.cursor.visible = false;
 }
 
+// AngelScript does not support closures (yet), but funcdef should do just fine as a workaround for a few cases here for now
+funcdef bool MENU_CALLBACK();
+Array<MENU_CALLBACK@> menuCallbacks;
+
 void CreateMenuBar()
 {
     uiMenuBar = BorderImage("MenuBar");
@@ -125,50 +130,29 @@ void CreateMenuBar()
         Menu@ menu = CreateMenu("File");
         Window@ popup = menu.popup;
         popup.vars["Popup"] = "File";
-        popup.AddChild(CreateMenuItem("New scene", 'N', QUAL_SHIFT | QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Open scene...", 'O', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Save scene", 'S', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Save scene as...", 'S', QUAL_SHIFT | QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("New scene", @ResetScene, 'N', QUAL_SHIFT | QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Open scene...", @PickFile, 'O', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Save scene", @SaveSceneWithExistingName, 'S', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Save scene as...", @PickFile, 'S', QUAL_SHIFT | QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
 
-        Menu@ loadNodeMenu = CreateMenuItem("Load node", SHOW_POPUP_INDICATOR);
+        Menu@ loadNodeMenu = CreateMenuItem("Load node", null, SHOW_POPUP_INDICATOR);
         Window@ loadNodePopup = CreatePopup(loadNodeMenu);
-        loadNodePopup.AddChild(CreateMenuItem("As replicated..."));
-        loadNodePopup.AddChild(CreateMenuItem("As local..."));
+        loadNodePopup.AddChild(CreateMenuItem("As replicated...", @PickFile));
+        loadNodePopup.AddChild(CreateMenuItem("As local...", @PickFile));
         popup.AddChild(loadNodeMenu);
-        
-        popup.AddChild(CreateMenuItem("Save node as..."));
+
+        popup.AddChild(CreateMenuItem("Save node as...", @PickFile));
         popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Import model..."));
-        popup.AddChild(CreateMenuItem("Import scene..."));
+        popup.AddChild(CreateMenuItem("Import model...", @PickFile));
+        popup.AddChild(CreateMenuItem("Import scene...", @PickFile));
         popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Run script..."));
-        popup.AddChild(CreateMenuItem("Set resource path..."));
+        popup.AddChild(CreateMenuItem("Run script...", @PickFile));
+        popup.AddChild(CreateMenuItem("Set resource path...", @PickFile));
         popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Exit"));
+        popup.AddChild(CreateMenuItem("Exit", @Exit));
         AdjustAccelIndent(popup);
         loadNodeMenu.popupOffset = IntVector2(loadNodeMenu.width, 0);
-        uiMenuBar.AddChild(menu);
-    }
-    
-    {
-        Menu@ menu = CreateMenu("UI-element");
-        Window@ popup = menu.popup;
-        popup.vars["Popup"] = "UI-element";
-        popup.AddChild(CreateMenuItem("New UI-element...", 'N', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Open UI-element...", 'O', QUAL_ALT));
-        popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Close UI-element", 'C', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Close all UI-elements"));
-        popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Save UI-element", 'S', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Save UI-element as..."));
-        popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Load child element..."));
-        popup.AddChild(CreateMenuItem("Save child element as..."));
-        popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Set default style..."));
-        AdjustAccelIndent(popup);
         uiMenuBar.AddChild(menu);
     }
 
@@ -176,19 +160,19 @@ void CreateMenuBar()
         Menu@ menu = CreateMenu("Edit");
         Window@ popup = menu.popup;
         popup.vars["Popup"] = "Edit";
-        popup.AddChild(CreateMenuItem("Cut", 'X', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Copy", 'C', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Delete", KEY_DELETE, QUAL_ANY));
-        popup.AddChild(CreateMenuItem("Select all", 'A', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Cut", @SceneCut, 'X', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Copy", @SceneCopy, 'C', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Paste", @ScenePaste, 'V', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Delete", @SceneDelete, KEY_DELETE, QUAL_ANY));
+        popup.AddChild(CreateMenuItem("Select all", @SceneSelectAll, 'A', QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Reset position"));
-        popup.AddChild(CreateMenuItem("Reset rotation"));
-        popup.AddChild(CreateMenuItem("Reset scale"));
-        popup.AddChild(CreateMenuItem("Enable/disable", 'E', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Unparent", 'U', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
+        popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
+        popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
+        popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Toggle update", 'P', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Toggle update", @ToggleUpdate, 'P', QUAL_CTRL));
         AdjustAccelIndent(popup);
         uiMenuBar.AddChild(menu);
     }
@@ -197,12 +181,33 @@ void CreateMenuBar()
         Menu@ menu = CreateMenu("Create");
         Window@ popup = menu.popup;
         popup.vars["Popup"] = "Create";
-        popup.AddChild(CreateMenuItem("Box"));
-        popup.AddChild(CreateMenuItem("Cone"));
-        popup.AddChild(CreateMenuItem("Cylinder"));
-        popup.AddChild(CreateMenuItem("Plane"));
-        popup.AddChild(CreateMenuItem("Pyramid"));
-        popup.AddChild(CreateMenuItem("Sphere"));
+        popup.AddChild(CreateMenuItem("Box", @PickBuiltinObject));
+        popup.AddChild(CreateMenuItem("Cone", @PickBuiltinObject));
+        popup.AddChild(CreateMenuItem("Cylinder", @PickBuiltinObject));
+        popup.AddChild(CreateMenuItem("Plane", @PickBuiltinObject));
+        popup.AddChild(CreateMenuItem("Pyramid", @PickBuiltinObject));
+        popup.AddChild(CreateMenuItem("Sphere", @PickBuiltinObject));
+        uiMenuBar.AddChild(menu);
+    }
+
+    {
+        Menu@ menu = CreateMenu("UI-element");
+        Window@ popup = menu.popup;
+        popup.vars["Popup"] = "UI-element";
+        popup.AddChild(CreateMenuItem("New UI-element", @NewUIElement, 'N', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Open UI-element...", @PickFile, 'O', QUAL_ALT));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Close UI-element", @CloseUIElement, 'C', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Close all UI-elements", @CloseAllUIElements));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Save UI-element", @SaveUIElementWithExistingName, 'S', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Save UI-element as...", @PickFile));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Load child element...", @PickFile));
+        popup.AddChild(CreateMenuItem("Save child element as...", @PickFile));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Set default style...", @PickFile));
+        AdjustAccelIndent(popup);
         uiMenuBar.AddChild(menu);
     }
 
@@ -210,12 +215,12 @@ void CreateMenuBar()
         Menu@ menu = CreateMenu("View");
         Window@ popup = menu.popup;
         popup.vars["Popup"] = "View";
-        popup.AddChild(CreateMenuItem("Hierarchy", 'H', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Attribute inspector", 'I', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Editor settings"));
-        popup.AddChild(CreateMenuItem("Editor preferences"));
+        popup.AddChild(CreateMenuItem("Hierarchy", @ShowHierarchyWindow, 'H', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Attribute inspector", @ShowNodeWindow, 'I', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
+        popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
         popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Hide editor", KEY_F12, QUAL_ANY));
+        popup.AddChild(CreateMenuItem("Hide editor", @ToggleUI, KEY_F12, QUAL_ANY));
         AdjustAccelIndent(popup);
         uiMenuBar.AddChild(menu);
     }
@@ -225,175 +230,156 @@ void CreateMenuBar()
     uiMenuBar.AddChild(spacer);
 }
 
+bool Exit()
+{
+    engine.Exit();
+    return true;
+}
+
+bool PickFile()
+{
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+
+    String action = menu.name;
+    if (action.empty)
+        return false;
+
+    // File (Scene related)
+    if (action == "Open scene...")
+    {
+        CreateFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenSceneFile");
+    }
+    else if (action == "Save scene as..." || action == "Save scene")
+    {
+        CreateFileSelector("Save scene as", "Save", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
+        uiFileSelector.fileName = GetFileNameAndExtension(editorScene.fileName);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveSceneFile");
+    }
+    else if (action == "As replicated...")
+    {
+        instantiateMode = REPLICATED;
+        CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
+    }
+    else if (action == "As local...")
+    {
+        instantiateMode = LOCAL;
+        CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
+    }
+    else if (action == "Save node as...")
+    {
+        if (selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
+        {
+            CreateFileSelector("Save node", "Save", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
+            uiFileSelector.fileName = GetFileNameAndExtension(instantiateFileName);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveNodeFile");
+        }
+    }
+    else if (action == "Import model...")
+    {
+        CreateFileSelector("Import model", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportModel");
+    }
+    else if (action == "Import scene...")
+    {
+        CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
+    }
+    else if (action == "Run script...")
+    {
+        CreateFileSelector("Run script", "Run", "Cancel", uiScriptPath, uiScriptFilters, uiScriptFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleRunScript");
+    }
+    else if (action == "Set resource path...")
+    {
+        CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
+        uiFileSelector.directoryMode = true;
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
+    }
+    // UI-element
+    else if (action == "Open UI-element...")
+    {
+        CreateFileSelector("Open UI-element", "Open", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenUIElementFile");
+    }
+    else if (action == "Save UI-element as..." || action == "Save UI-element")
+    {
+        if (editUIElement !is null)
+        {
+            CreateFileSelector("Save UI-element as", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+            uiFileSelector.fileName = GetFileNameAndExtension(editUIElement.vars[FILENAME_VAR].GetString());
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveUIElementFile");
+        }
+    }
+    else if (action == "Load child element...")
+    {
+        if (editUIElement !is null)
+        {
+            CreateFileSelector("Load child element", "Load", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadChildUIElementFile");
+        }
+    }
+    else if (action == "Save child element as...")
+    {
+        if (editUIElement !is null && !editUIElement.vars.Contains(FILENAME_VAR))
+        {
+            CreateFileSelector("Save child element", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+            uiFileSelector.fileName = GetFileNameAndExtension(childElementFileName);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveChildUIElementFile");
+        }
+    }
+    else if (action == "Set default style...")
+    {
+        CreateFileSelector("Set default style", "Set", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleUIElementDefaultStyle");
+    }
+
+    return true;
+}
+
+bool PickBuiltinObject()
+{
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+
+    String action = menu.name;
+    if (action.empty)
+        return false;
+
+    CreateBuiltinObject(action);
+    return true;
+}
+
 void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 {
     Menu@ menu = eventData["Element"].GetUIElement();
     if (menu is null)
         return;
 
-    String action = menu.name;
-    if (action.empty)
-        return;
-
     HandlePopup(menu);
 
-    if (uiFileSelector is null)
-    {
-        // File
-        if (action == "New scene")
-            ResetScene();
-        else if (action == "Open scene...")
-        {
-            CreateFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenSceneFile");
-        }
-        else if (action == "Save scene" && !editorScene.fileName.empty && editorScene.fileName != TEMP_SCENE_NAME)
-            SaveScene(editorScene.fileName);
-        else if (action == "Save scene as..." || action == "Save scene")
-        {
-            CreateFileSelector("Save scene as", "Save", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
-            uiFileSelector.fileName = GetFileNameAndExtension(editorScene.fileName);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveSceneFile");
-        }
-        else if (action == "As replicated...")
-        {
-            instantiateMode = REPLICATED;
-            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
-        }
-        else if (action == "As local...")
-        {
-            instantiateMode = LOCAL;
-            CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
-        }
-        else if (action == "Save node as...")
-        {
-            if (selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
-            {
-                CreateFileSelector("Save node", "Save", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
-                uiFileSelector.fileName = GetFileNameAndExtension(instantiateFileName);
-                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveNodeFile");
-            }
-        }
-        else if (action == "Import model...")
-        {
-            CreateFileSelector("Import model", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportModel");
-        }
-        else if (action == "Import scene...")
-        {
-            CreateFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilters, uiImportFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleImportScene");
-        }
-        else if (action == "Run script...")
-        {
-            CreateFileSelector("Run script", "Run", "Cancel", uiScriptPath, uiScriptFilters, uiScriptFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleRunScript");
-        }
-        else if (action == "Set resource path...")
-        {
-            CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
-            uiFileSelector.directoryMode = true;
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
-        }
-        // UI-element
-        else if (action == "New UI-element...")
-            NewUIElement();
-        else if (action == "Open UI-element...")
-        {
-            CreateFileSelector("Open UI-element", "Open", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenUIElementFile");
-        }
-        else if (action == "Close UI-element")
-            CloseUIElement();
-        else if (action == "Close all UI-elements")
-            CloseUIElement(true);
-        else if (action == "Save UI-element" && editUIElement !is null && !editUIElement.vars[FILENAME_VAR].GetString().empty)
-            SaveUIElement(editUIElement.vars[FILENAME_VAR].GetString());
-        else if (action == "Save UI-element as..." || action == "Save UI-element")
-        {
-            if (editUIElement !is null)
-            {
-                CreateFileSelector("Save UI-element as", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
-                uiFileSelector.fileName = GetFileNameAndExtension(editUIElement.vars[FILENAME_VAR].GetString());
-                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveUIElementFile");
-            }
-        }
-        else if (action == "Load child element...")
-        {
-            if (editUIElement !is null)
-            {
-                CreateFileSelector("Load child element", "Load", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
-                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadChildUIElementFile");
-            }
-        }
-        else if (action == "Save child element as...")
-        {
-            if (editUIElement !is null && !editUIElement.vars.Contains(FILENAME_VAR))
-            {
-                CreateFileSelector("Save child element", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
-                uiFileSelector.fileName = GetFileNameAndExtension(childElementFileName);
-                SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveChildUIElementFile");
-            }
-        }
-        else if (action == "Set default style...")
-        {
-            CreateFileSelector("Set default style", "Set", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleUIElementDefaultStyle");
-        }
-    }
-
-    // File
-    if (action == "Exit")
-        engine.Exit();
-    // Edit
-    else if (action == "Cut")
-        SceneCut();
-    else if (action == "Copy")
-        SceneCopy();
-    else if (action == "Paste")
-        ScenePaste();
-    else if (action == "Delete")
-        SceneDelete();
-    else if (action == "Reset position")
-        SceneResetPosition();
-    else if (action == "Reset rotation")
-        SceneResetRotation();
-    else if (action == "Reset scale")
-        SceneResetScale();
-    else if (action == "Enable/disable")
-        SceneToggleEnable();
-    else if (action == "Unparent")
-        SceneUnparent();
-    else if (action == "Select all")
-        SceneSelectAll();
-    else if (action == "Toggle update")
-        ToggleUpdate();
-    // Create
-    else if (action == "Box" || action == "Cone" || action == "Cylinder" || action == "Plane" ||
-        action == "Pyramid" || action == "Sphere")
-        CreateBuiltinObject(action);
-    // View
-    else if (action == "Hierarchy")
-        ShowHierarchyWindow();
-    else if (action == "Attribute inspector")
-        ShowNodeWindow();
-    else if (action == "Editor settings")
-        ShowEditorSettingsDialog();
-    else if (action == "Editor preferences")
-        ShowEditorPreferencesDialog();
-    else if (action == "Hide editor")
-        HideUI(!uiHidden);
+    // Execute the callback if available
+    if (menu.vars.Contains(CALLBACK_VAR))
+        menuCallbacks[menu.vars[CALLBACK_VAR].GetUInt()]();
 }
 
-Menu@ CreateMenuItem(const String&in title, int accelKey = 0, int accelQual = 0, int padding = 16)
+Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0)
 {
     Menu@ menu = Menu(title);
     menu.style = uiStyle;
-    menu.SetLayout(LM_HORIZONTAL, 0, IntRect(padding, 2, padding, 2));
+    menu.SetLayout(LM_HORIZONTAL, 0, IntRect(8, 2, 8, 2));
     if (accelKey > 0)
         menu.SetAccelerator(accelKey, accelQual);
+    if (callback !is null)
+    {
+        menu.vars[CALLBACK_VAR] = menuCallbacks.length;
+        menuCallbacks.Push(callback);
+    }
 
     Text@ menuText = Text();
     menuText.SetStyle(uiStyle, "EditorMenuText");
@@ -431,8 +417,7 @@ Window@ CreatePopup(Menu@ baseMenu)
 
 Menu@ CreateMenu(const String&in title)
 {
-    Menu@ menu = CreateMenuItem(title, 0, 0, 8);
-    menu.name = "";
+    Menu@ menu = CreateMenuItem(title);
     menu.SetFixedWidth(menu.width);
     CreatePopup(menu);
 
@@ -445,7 +430,7 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
     accelKeyText.SetStyle(uiStyle, "EditorMenuText");
     accelKeyText.horizontalAlignment = HA_RIGHT;
     accelKeyText.indent = 1;
-    
+
     String text;
     if (accelKey == KEY_DELETE)
         text = "Del";
@@ -487,7 +472,7 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
     if (accelQual & QUAL_CTRL > 0)
         text = "Ctrl+" + text;
     accelKeyText.text = text;
-    
+
     return accelKeyText;
 }
 
@@ -499,14 +484,14 @@ void AdjustAccelIndent(Window@ popup)
     for (uint i = 0; i < children.length; ++i)
     {
         UIElement@ element = children[i];
-        if (element.type != MENU_TYPE)	// Skip if not menu item
+        if (element.type != MENU_TYPE)    // Skip if not menu item
             continue;
-        
+
         int width = element.children[0].width;
         if (width > maxWidth)
             maxWidth = width;
     }
-    
+
     // Adjust the indent spacing to slightly wider than the maximum width
     maxWidth += 20;
     for (uint i = 0; i < children.length; ++i)
@@ -514,11 +499,11 @@ void AdjustAccelIndent(Window@ popup)
         UIElement@ element = children[i];
         if (element.type != MENU_TYPE)
             continue;
-        
+
         element = element.children[0];
-        if (element.numChildren == 0)	// Skip if menu text does not have accel
+        if (element.numChildren == 0)    // Skip if menu text does not have accel
             continue;
-        
+
         element.children[0].indentSpacing = maxWidth;
     }
 }
@@ -535,7 +520,7 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     uiFileSelector.SetButtonTexts(ok, cancel);
     uiFileSelector.SetFilters(filters, initialFilter);
     uiFileSelector.window.vars["Popup"] = "FileSelector";
-    uiFileSelector.window.priority = 1000;	// Ensure when it is visible then it has the highest priority (in front of all others UI)
+    uiFileSelector.window.priority = 1000;    // Ensure when it is visible then it has the highest priority (in front of all others UI)
 
     CenterDialog(uiFileSelector.window);
 }
@@ -545,7 +530,7 @@ void CloseFileSelector(uint&out filterIndex, String&out path)
     // Save filter & path for next time
     filterIndex = uiFileSelector.filterIndex;
     path = uiFileSelector.path;
-    
+
     uiFileSelector = null;
 }
 
@@ -589,7 +574,7 @@ void HandlePopup(Menu@ menu)
     // Close the top level menu now unless the selected menu item has another popup
     if (menu.popup !is null)
         return;
-    
+
     for (;;)
     {
         UIElement@ menuParent = menu.parent;
@@ -610,11 +595,11 @@ void HandlePopup(Menu@ menu)
 String ExtractFileName(VariantMap& eventData)
 {
     String fileName;
-    
+
     // Check for OK
     if (eventData["OK"].GetBool())
         fileName = eventData["FileName"].GetString();
-    
+
     return fileName;
 }
 
@@ -658,7 +643,7 @@ void ExecuteScript(const String&in fileName)
 {
     if (fileName.empty)
         return;
-    
+
     File@ file = File(fileName, FILE_READ);
     if (file.open)
     {
@@ -666,7 +651,7 @@ void ExecuteScript(const String&in fileName)
         while (!file.eof)
             scriptCode += file.ReadLine() + "\n";
         file.Close();
-        
+
         if (script.Execute(scriptCode))
             log.Info("Script " + fileName + " ran successfully");
     }
@@ -717,7 +702,7 @@ void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
-    
+
     if (key == KEY_F1)
         console.Toggle();
 
@@ -791,7 +776,7 @@ void FadeUI(bool fade = true)
 {
     if (uiHidden || uiFaded == fade)
         return;
-    
+
     float opacity = (uiFaded = fade) ? uiMinOpacity : uiMaxOpacity;
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
@@ -800,6 +785,12 @@ void FadeUI(bool fade = true)
         if (children[i].type != TEXT_TYPE && children[i] !is editorUIElement && !children[i].vars.Contains("Popup"))
             children[i].opacity = opacity;
     }
+}
+
+bool ToggleUI()
+{
+    HideUI(!uiHidden);
+    return true;
 }
 
 void UnhideUI()
@@ -811,7 +802,7 @@ void HideUI(bool hide = true)
 {
     if (uiHidden == hide)
         return;
-    
+
     bool visible = !(uiHidden = hide);
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
@@ -838,25 +829,25 @@ void IconizeUIElement(UIElement@ element, const String&in iconType)
     // Check if the icon has been created before
     BorderImage@ icon = element.GetChild("Icon");
 
-    // If iconType is empty, it is a request to remove the existing icon 
+    // If iconType is empty, it is a request to remove the existing icon
     if (iconType.empty)
     {
         // Remove the icon if it exists
         if (icon !is null)
             icon.Remove();
-        
+
         // Revert back the indent but only if it is indented by this function
         if (element.vars["IconIndented"].GetBool())
             element.indent = 0;
-        
+
         return;
     }
-    
+
     // The UI element must itself has been indented to reserve the space for the icon
     if (element.indent == 0)
     {
         element.indent = 1;
-        element.vars["IconIndented"] = true; 
+        element.vars["IconIndented"] = true;
     }
 
     // If no icon yet then create one with the correct indent and size in respect to the UI element
