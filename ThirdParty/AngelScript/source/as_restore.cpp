@@ -216,7 +216,38 @@ int asCReader::ReadInner()
 		bool isNew;
 		asCScriptFunction *func = ReadFunction(isNew, false, true);
 		if( func )
+		{
 			module->funcDefs.PushLast(func);
+			engine->funcDefs.PushLast(func);
+
+			// TODO: clean up: This is also done by the builder. It should probably be moved to a method in the module
+			// Check if there is another identical funcdef from another module and if so reuse that instead
+			for( asUINT n = 0; n < engine->funcDefs.GetLength(); n++ )
+			{
+				asCScriptFunction *f2 = engine->funcDefs[n];
+				if( f2 == 0 || func == f2 )
+					continue;
+
+				if( f2->name == func->name &&
+					f2->nameSpace == func->nameSpace &&
+					f2->IsSignatureExceptNameEqual(func) )
+				{
+					// Replace our funcdef for the existing one
+					module->funcDefs[module->funcDefs.IndexOf(func)] = f2;
+					f2->AddRef();
+
+					engine->funcDefs.RemoveValue(func);
+
+					savedFunctions[savedFunctions.IndexOf(func)] = f2;
+
+					func->Release();
+
+					// Funcdefs aren't deleted when the ref count reaches zero so we must manually delete it here
+					asDELETE(func,asCScriptFunction);
+					break;
+				}
+			}
+		}
 		else
 			error = true;
 	}
@@ -696,7 +727,16 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 			length = ReadEncodedUInt();
 			func->sectionIdxs.SetLength(length);
 			for( i = 0; i < length; ++i )
-				func->sectionIdxs[i] = ReadEncodedUInt();
+			{
+				if( (i & 1) == 0 )
+					func->sectionIdxs[i] = ReadEncodedUInt();
+				else
+				{
+					asCString str;
+					ReadString(&str);
+					func->sectionIdxs[i] = engine->GetScriptSectionNameIndex(str.AddressOf());
+				}
+			}
 		}
 
 		ReadData(&func->isShared, 1);
@@ -2532,7 +2572,7 @@ asCScriptFunction *asCReader::GetCalledFunction(asCScriptFunction *func, asDWORD
 	{
 		// Find the function from the engine's bind array
 		int funcId = asBC_INTARG(&func->byteCode[programPos]);
-		return engine->importedFunctions[funcId&0xFFFF]->importedFunctionSignature;
+		return engine->importedFunctions[funcId & ~FUNC_IMPORTED]->importedFunctionSignature;
 	}
 	else if( bc == asBC_CallPtr )
 	{
@@ -2988,7 +3028,15 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 				if( (i & 1) == 0 )
 					WriteEncodedInt64(bytecodeNbrByPos[func->sectionIdxs[i]]);
 				else
-					WriteEncodedInt64(func->sectionIdxs[i]);
+				{
+					if( func->sectionIdxs[i] >= 0 )
+						WriteString(engine->scriptSectionNames[func->sectionIdxs[i]]);
+					else
+					{
+						char c = 0;
+						WriteData(&c, 1);
+					}
+				}
 			}
 		}
 
@@ -3512,7 +3560,7 @@ int asCWriter::AdjustGetOffset(int offset, asCScriptFunction *func, asDWORD prog
 		{
 			// Find the function from the engine's bind array
 			int funcId = asBC_INTARG(&func->byteCode[n]);
-			calledFunc = engine->importedFunctions[funcId&0xFFFF]->importedFunctionSignature;
+			calledFunc = engine->importedFunctions[funcId & ~FUNC_IMPORTED]->importedFunctionSignature;
 			break;
 		}
 		else if( bc == asBC_CallPtr )

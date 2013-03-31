@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -229,7 +229,9 @@ int asCScriptFunction::Release() const
 	gcFlag = false;
 	asASSERT( funcType != asFUNC_IMPORTED );
 	int r = refCount.atomicDec();
-	if( r == 0 && funcType != asFUNC_DUMMY ) // Dummy functions are allocated on the stack and cannot be deleted
+	if( r == 0 && 
+		funcType != asFUNC_FUNCDEF && // Funcdefs are treated as object types and will be deleted by ClearUnusedTypes()
+		funcType != asFUNC_DUMMY )    // Dummy functions are allocated on the stack and cannot be deleted
 		asDELETE(const_cast<asCScriptFunction*>(this),asCScriptFunction);
 
 	return r;

@@ -93,7 +93,6 @@ public:
 	bool IsEnumType()       const;
 	bool IsAnyType()        const {return tokenType == ttQuestion;}
 
-	bool IsSamePrimitiveBaseType(const asCDataType &dt)    const;
 	bool IsEqualExceptRef(const asCDataType &)             const;
 	bool IsEqualExceptRefAndConst(const asCDataType &)     const;
 	bool IsEqualExceptConst(const asCDataType &)           const;

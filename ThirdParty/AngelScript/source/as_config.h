@@ -404,16 +404,16 @@
 
 		// Marmalade doesn't use the Windows libraries
 		#define asVSNPRINTF(a, b, c, d) vsnprintf(a, b, c, d)
-		
-		// Marmalade doesn't seem to have proper support for 
-		// atomic instructions or read/write locks, so we turn off 
+
+		// Marmalade doesn't seem to have proper support for
+		// atomic instructions or read/write locks, so we turn off
 		// multithread support
 		//#define AS_POSIX_THREADS
 		#define AS_NO_THREADS
 		#define AS_NO_ATOMIC
 
 		// Marmalade has it's own way of identifying the CPU target
-		// Note, when building for ARM, the gnuc compiler will always  
+		// Note, when building for ARM, the gnuc compiler will always
 		// be used so we don't need to check for it here
 		#if defined(I3D_ARCH_X86)
 			#define AS_X86
@@ -566,7 +566,7 @@
 	// WII U
 	#if defined(__ghs__)
 		#define AS_WIIU
-	
+
 		// Native calling conventions are not yet supported
 		#define AS_MAX_PORTABILITY
 
@@ -581,7 +581,7 @@
 		#undef STDCALL
 		#define STDCALL
 
-		// Marmalade doesn't seem to have proper support for 
+		// Marmalade doesn't seem to have proper support for
 		// atomic instructions or read/write locks
 		#define AS_NO_THREADS
 		#define AS_NO_ATOMIC
@@ -591,7 +591,7 @@
 			#define AS_X86
 		#elif defined(I3D_ARCH_ARM)
 			#define AS_ARM
-		
+
 			// Marmalade appear to use the same ABI as Android when built for ARM
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
@@ -733,7 +733,6 @@
 
 		#elif defined(__x86_64__)
 			#define AS_X64_MINGW
-			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
 			#define AS_LARGE_OBJS_PASSED_BY_REF
 			#define AS_LARGE_OBJ_MIN_SIZE 3
 			#define COMPLEX_OBJS_PASSED_BY_REF
@@ -744,16 +743,17 @@
 		#define AS_WINDOWS_THREADS
 
 	// Linux
-	#elif defined(__linux__) && !defined(ANDROID)
+	#elif defined(__linux__) && !defined(ANDROID) && !defined(__ANDROID__)
+
+		#undef COMPLEX_MASK
+		#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+		#undef COMPLEX_RETURN_MASK
+		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+
 		#if defined(i386) && !defined(__LP64__)
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
-
-			#undef COMPLEX_MASK
-			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-			#undef COMPLEX_RETURN_MASK
-			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 
 			// Support native calling conventions on Intel 32bit CPU
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
@@ -762,10 +762,6 @@
 			#define AS_X64_GCC
 			#define HAS_128_BIT_PRIMITIVES
 			#define SPLIT_OBJS_BY_MEMBER_TYPES
-			#undef COMPLEX_MASK
-			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-			#undef COMPLEX_RETURN_MASK
-			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			#define AS_LARGE_OBJS_PASSED_BY_REF
 			#define AS_LARGE_OBJ_MIN_SIZE 5
 			// STDCALL is not available on 64bit Linux
@@ -873,7 +869,7 @@
 		#define STDCALL
 
 	// Android
-	#elif defined(ANDROID)
+	#elif defined(ANDROID) || defined(__ANDROID__)
 		#define AS_ANDROID
 		#define AS_NO_ATOMIC
 
@@ -997,7 +993,7 @@
 	#endif
 #endif
 
-// If the platform doesn't support atomic instructions we can't allow 
+// If the platform doesn't support atomic instructions we can't allow
 // multithreading as the reference counters won't be threadsafe
 #if defined(AS_NO_ATOMIC) && !defined(AS_NO_THREADS)
 	#define AS_NO_THREADS

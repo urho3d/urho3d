@@ -11,6 +11,7 @@ Credits
 
 Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com)
+- Wei Tjong Yao
 - Colin Barrett
 - Carlo Carollo
 - Alex Fuller
@@ -18,7 +19,6 @@ Urho3D development, contributions and bugfixes by:
 - Jason Kinzer
 - Vladimir Pobedinsky
 - Miika Santala
-- Wei Tjong Yao
 - Magic.Lixin
 - primitivewaste
 - skaiware
@@ -48,7 +48,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.26.1 WIP (http://www.angelcode.com/angelscript/)
+- AngelScript 2.26.2 (http://www.angelcode.com/angelscript/)
 - Bullet 2.80 (http://www.bulletphysics.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLEW 1.9.0 (http://glew.sourceforge.net/)

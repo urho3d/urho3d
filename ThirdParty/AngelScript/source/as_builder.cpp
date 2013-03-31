@@ -239,6 +239,9 @@ int asCBuilder::Build()
 	//       The builder needs to check for each of the global variable, what functions
 	//       that are accessed, and what global variables are access by these functions.
 
+	if( numWarnings > 0 && engine->ep.compilerWarnings == 2 )
+		WriteError(TXT_WARNINGS_TREATED_AS_ERROR, 0, 0);
+
 	if( numErrors > 0 )
 		return asERROR;
 
@@ -281,6 +284,9 @@ int asCBuilder::CompileGlobalVar(const char *sectionName, const char *code, int 
 	RegisterGlobalVar(node, script, module->defaultNamespace);
 
 	CompileGlobalVariables();
+
+	if( numWarnings > 0 && engine->ep.compilerWarnings == 2 )
+		WriteError(TXT_WARNINGS_TREATED_AS_ERROR, 0, 0);
 
 	if( numErrors > 0 )
 	{
@@ -403,14 +409,15 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 	funcDesc->name              = func->name;
 	funcDesc->funcId            = func->id;
 	funcDesc->paramNames        = parameterNames;
+	funcDesc->isExistingShared  = false;
 
 	asCCompiler compiler(engine);
-	if( compiler.CompileFunction(this, functions[0]->script, parameterNames, functions[0]->node, func, 0) >= 0 )
-	{
-		// Return the function
-		*outFunc = func;
-	}
-	else
+	compiler.CompileFunction(this, functions[0]->script, parameterNames, functions[0]->node, func, 0);
+
+	if( numWarnings > 0 && engine->ep.compilerWarnings == 2 )
+		WriteError(TXT_WARNINGS_TREATED_AS_ERROR, 0, 0);
+
+	if( numErrors > 0 )
 	{
 		// If the function was added to the module then remove it again
 		if( compileFlags & asCOMP_ADD_TO_MODULE )
@@ -425,6 +432,9 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 
 		return asERROR;
 	}
+
+	// Return the function
+	*outFunc = func;
 
 	return asSUCCESS;
 }
@@ -677,6 +687,9 @@ void asCBuilder::CompileFunctions()
 		sFunctionDescription *current = functions[n];
 		if( current == 0 ) continue;
 
+		// Don't compile the function again if it was an existing shared function
+		if( current->isExistingShared ) continue;
+
 		asCCompiler compiler(engine);
 		asCScriptFunction *func = engine->scriptFunctions[current->funcId];
 
@@ -711,7 +724,7 @@ void asCBuilder::CompileFunctions()
 		else if( current->name == current->objType->name )
 		{
 			asCScriptNode *node = classDecl->node;
-			
+
 			int r = 0, c = 0;
 			if( node )
 				current->script->ConvertPosToRowCol(node->tokenPos, &r, &c);
@@ -1317,6 +1330,33 @@ void asCBuilder::CompleteFuncDef(sFuncDef *funcDef)
 
 			// Don't copy the default arg expression as it is not allowed for function definitions
 		}
+
+		// TODO: Should we force the use of 'shared' for this check to be done?
+		// Check if there is another identical funcdef from another module and if so reuse that instead
+		for( asUINT n = 0; n < engine->funcDefs.GetLength(); n++ )
+		{
+			asCScriptFunction *f2 = engine->funcDefs[n];
+			if( f2 == 0 || func == f2 )
+				continue;
+
+			if( f2->name == func->name &&
+				f2->nameSpace == func->nameSpace &&
+				f2->IsSignatureExceptNameEqual(func) )
+			{
+				// Replace our funcdef for the existing one
+				funcDef->idx = f2->id;
+				module->funcDefs[module->funcDefs.IndexOf(func)] = f2;
+				f2->AddRef();
+
+				engine->funcDefs.RemoveValue(func);
+
+				func->Release();
+
+				// funcdefs aren't destroyed when the refCount reaches zero so we need to manually delete them
+				asDELETE(func, asCScriptFunction);
+				break;
+			}
+		}
 	}
 }
 
@@ -1515,12 +1555,12 @@ int asCBuilder::RegisterClass(asCScriptNode *node, asCScriptCode *file, asSNameS
 	if( st == 0 )
 		return asOUT_OF_MEMORY;
 
-	// By default all script classes are marked as garbage collected. 
+	// By default all script classes are marked as garbage collected.
 	// Only after the complete structure and relationship between classes
-	// is known, can the flag be cleared for those objects that truly cannot 
-	// form circular references. This is important because a template 
-	// callback may be called with a script class before the compilation 
-	// complete, and until it is known, the callback must assume the class 
+	// is known, can the flag be cleared for those objects that truly cannot
+	// form circular references. This is important because a template
+	// callback may be called with a script class before the compilation
+	// complete, and until it is known, the callback must assume the class
 	// is garbage collected.
 	st->flags = asOBJ_REF | asOBJ_SCRIPT_OBJECT | asOBJ_GC;
 
@@ -2020,7 +2060,7 @@ void asCBuilder::AddInterfaceToClass(sClassDeclaration *decl, asCScriptNode *err
 
 	if( decl->isExistingShared )
 	{
-		// If the class is an existing shared class, then just check if the 
+		// If the class is an existing shared class, then just check if the
 		// interface exists in the original declaration too
 		if( !decl->objType->Implements(intfType) )
 		{
@@ -2032,18 +2072,11 @@ void asCBuilder::AddInterfaceToClass(sClassDeclaration *decl, asCScriptNode *err
 	}
 	else
 	{
-		// If the interface is already in the class, then don't add it again
+		// If the interface is already in the class then don't add it again
 		if( decl->objType->Implements(intfType) )
-		{
-			int r, c;
-			decl->script->ConvertPosToRowCol(errNode->tokenPos, &r, &c);
-			asCString msg;
-			msg.Format(TXT_INTERFACE_s_ALREADY_IMPLEMENTED, intfType->GetName());
-			WriteWarning(decl->script->name, msg, r, c);
 			return;
-		}
 
-		// Add the interface to the class	
+		// Add the interface to the class
 		decl->objType->interfaces.PushLast(intfType);
 
 		// Add the inherited interfaces too
@@ -2107,7 +2140,7 @@ void asCBuilder::CompileInterfaces()
 				WriteError(TXT_INTERFACE_CAN_ONLY_IMPLEMENT_INTERFACE, intfDecl->script, node);
 				ok = false;
 			}
-	
+
 			if( ok )
 			{
 				// Make sure none of the implemented interfaces implement from this one
@@ -2140,7 +2173,7 @@ void asCBuilder::CompileInterfaces()
 		}
 	}
 
-	// Order the interfaces with inheritances so that the inherited 
+	// Order the interfaces with inheritances so that the inherited
 	// of inherited interfaces can be added properly
 	for( n = 0; n < interfaceDeclarations.GetLength(); n++ )
 	{
@@ -2170,7 +2203,7 @@ void asCBuilder::CompileInterfaces()
 		sClassDeclaration *intfDecl = interfaceDeclarations[n];
 		asCObjectType *intfType = intfDecl->objType;
 
-		// As new interfaces will be added to the end of the list, all 
+		// As new interfaces will be added to the end of the list, all
 		// interfaces will be traversed the same as recursively
 		for( asUINT m = 0; m < intfType->interfaces.GetLength(); m++ )
 		{
@@ -2382,8 +2415,8 @@ void asCBuilder::CompileClasses()
 			// types that contain this will accept this type
 			decl->validState = 1;
 
-			// We'll still validate the declaration to make sure nothing new is 
-			// added to the shared class that wasn't there in the previous 
+			// We'll still validate the declaration to make sure nothing new is
+			// added to the shared class that wasn't there in the previous
 			// compilation. We do not care if something that is there in the previous
 			// declaration is not included in the new declaration though.
 		}
@@ -2400,18 +2433,7 @@ void asCBuilder::CompileClasses()
 			for( unsigned int n = 0; n < baseType->interfaces.GetLength(); n++ )
 			{
 				if( !decl->objType->Implements(baseType->interfaces[n]) )
-				{
 					decl->objType->interfaces.PushLast(baseType->interfaces[n]);
-				}
-				else
-				{
-					// Warn if derived class already implements the interface
-					int r, c;
-					decl->script->ConvertPosToRowCol(decl->node->tokenPos, &r, &c);
-					asCString msg;
-					msg.Format(TXT_INTERFACE_s_ALREADY_IMPLEMENTED, baseType->interfaces[n]->GetName());
-					WriteWarning(decl->script->name, msg, r, c);
-				}
 			}
 
 			// TODO: Need to check for name conflict with new class methods
@@ -2719,7 +2741,7 @@ void asCBuilder::CompileClasses()
 	// TODO: runtime optimize: This algorithm can be further improved by checking the types that inherits from
 	//                         a base class. If the base class is not shared all the classes that derive from it
 	//                         are known at compile time, and can thus be checked for potential circular references too.
-	//                         
+	//
 	//                         Observe, that doing this would conflict with another potential future feature, which is to
 	//                         allow incremental builds, i.e. allow application to add or replace classes in an
 	//                         existing module. However, the applications that want to use that should use a special
@@ -2736,13 +2758,13 @@ void asCBuilder::CompileClasses()
 		if( decl->isExistingShared ) continue;
 
 		asCObjectType *ot = decl->objType;
-		
+
 		// Is there some path in which this structure is involved in circular references?
 		bool gc = false;
 		for( asUINT p = 0; p < ot->properties.GetLength(); p++ )
 		{
 			asCDataType dt = ot->properties[p]->type;
-			if( !dt.IsObject() ) 
+			if( !dt.IsObject() )
 				continue;
 
 			if( dt.IsObjectHandle() )
@@ -2753,8 +2775,8 @@ void asCBuilder::CompileClasses()
 
 				if( prop->flags & asOBJ_SCRIPT_OBJECT )
 				{
-					// For script objects, treat non-final classes as if they can contain references 
-					// as it is not known what derived classes might do. For final types, check all 
+					// For script objects, treat non-final classes as if they can contain references
+					// as it is not known what derived classes might do. For final types, check all
 					// properties to determine if any of those can cause a circular reference.
 					if( prop->flags & asOBJ_NOINHERIT )
 					{
@@ -2793,7 +2815,7 @@ void asCBuilder::CompileClasses()
 						break;
 					}
 				}
-				else if( prop->flags & asOBJ_GC ) 
+				else if( prop->flags & asOBJ_GC )
 				{
 					// If a type is not a script object, adopt its GC flag
 					gc = true;
@@ -3135,6 +3157,7 @@ void asCBuilder::AddDefaultConstructor(asCObjectType *objType, asCScriptCode *fi
 	func->name              = objType->name;
 	func->objType           = objType;
 	func->funcId            = funcId;
+	func->isExistingShared  = false;
 
 	// Add a default factory as well
 	funcId = engine->GetNextScriptFunctionId();
@@ -3565,10 +3588,12 @@ int asCBuilder::RegisterScriptFunctionFromNode(asCScriptNode *node, asCScriptCod
 
 	// Set the default namespace
 	if( ns == 0 )
+    {
 		if( objType )
 			ns = objType->nameSpace;
 		else
 			ns = engine->nameSpaces[0];
+    }
 
 	GetParsedFunctionDetails(node, file, objType, name, returnType, parameterNames, parameterTypes, inOutFlags, defaultArgs, isConstMethod, isConstructor, isDestructor, isPrivate, isOverride, isFinal, isShared, ns);
 
@@ -3579,10 +3604,12 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 {
 	// Determine default namespace if not specified
 	if( ns == 0 )
+    {
 		if( objType )
 			ns = objType->nameSpace;
 		else
 			ns = engine->nameSpaces[0];
+    }
 
 	if( isExistingShared )
 	{
@@ -3679,6 +3706,7 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 					f->isShared &&
 					f->name == name &&
 					f->nameSpace == ns &&
+					f->objectType == objType &&
 					f->IsSignatureExceptNameEqual(returnType, parameterTypes, inOutFlags, 0, false) )
 				{
 					funcId = func->funcId = f->id;
@@ -3747,6 +3775,8 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 	{
 		asCScriptFunction *f = engine->scriptFunctions[funcId];
 		module->AddScriptFunction(f);
+
+		// TODO: clean up: This should be done by AddScriptFunction() itself
 		module->globalFunctions.Put(f);
 		f->AddRef();
 	}
@@ -3758,6 +3788,8 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 
 	if( objType )
 	{
+		asASSERT( !isExistingShared );
+
 		engine->scriptFunctions[funcId]->AddRef();
 		if( isConstructor )
 		{
@@ -3830,13 +3862,6 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 
 int asCBuilder::RegisterVirtualProperty(asCScriptNode *node, asCScriptCode *file, asCObjectType *objType, bool isInterface, bool isGlobalFunction, asSNameSpace *ns, bool isExistingShared)
 {
-	if( isExistingShared )
-	{
-		// TODO: shared: Should validate that the function really exists in the class/interface
-		node->Destroy(engine);
-		return 0;
-	}
-
 	if( engine->ep.propertyAccessorMode != 2 )
 	{
 		WriteError(TXT_PROPERTY_ACCESSOR_DISABLED, file, node);
@@ -3847,10 +3872,12 @@ int asCBuilder::RegisterVirtualProperty(asCScriptNode *node, asCScriptCode *file
 	asASSERT( (objType && ns == 0) || isGlobalFunction );
 
 	if( ns == 0 )
+    {
 		if( objType )
 			ns = objType->nameSpace;
 		else
 			ns = engine->nameSpaces[0];
+    }
 
 	bool isPrivate = false;
 	asCString emulatedName;
@@ -3967,7 +3994,32 @@ int asCBuilder::RegisterVirtualProperty(asCScriptNode *node, asCScriptCode *file
 			WriteError(TXT_UNRECOGNIZED_VIRTUAL_PROPERTY_NODE, file, node);
 
 		if( success )
-			RegisterScriptFunction(funcNode, file, objType, isInterface, isGlobalFunction, ns, false, false, name, returnType, paramNames, paramTypes, paramModifiers, defaultArgs, isConst, false, false, isPrivate, isOverride, isFinal, false);
+		{
+			if( !isExistingShared )
+				RegisterScriptFunction(funcNode, file, objType, isInterface, isGlobalFunction, ns, false, false, name, returnType, paramNames, paramTypes, paramModifiers, defaultArgs, isConst, false, false, isPrivate, isOverride, isFinal, false);
+			else
+			{
+				// Should validate that the function really exists in the class/interface
+				bool found = false;
+				for( asUINT n = 0; n < objType->methods.GetLength(); n++ )
+				{
+					asCScriptFunction *func = engine->scriptFunctions[objType->methods[n]];
+					if( func->name == name &&
+						func->IsSignatureExceptNameEqual(returnType, paramTypes, paramModifiers, objType, isConst) )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if( !found )
+				{
+					asCString str;
+					str.Format(TXT_SHARED_s_DOESNT_MATCH_ORIGINAL, objType->GetName());
+					WriteError(str, file, node);
+				}
+			}
+		}
 
 		node = next;
 	};
@@ -3992,7 +4044,7 @@ int asCBuilder::RegisterImportedFunction(int importID, asCScriptNode *node, asCS
 
 	GetParsedFunctionDetails(node->firstChild, file, 0, name, returnType, parameterNames, parameterTypes, inOutFlags, defaultArgs, isConstMethod, isConstructor, isDestructor, isPrivate, isOverride, isFinal, isShared, ns);
 	CheckNameConflict(name.AddressOf(), node, file, ns);
-	
+
 	// Check that the same function hasn't been registered already in the namespace
 	asCArray<int> funcs;
 	GetFunctionDescriptions(name.AddressOf(), funcs, ns);
@@ -4025,10 +4077,10 @@ asCScriptFunction *asCBuilder::GetFunctionDescription(int id)
 {
 	// TODO: import: This should be improved when the imported functions are removed
 	// Get the description from the engine
-	if( (id & 0xFFFF0000) == 0 )
+	if( (id & FUNC_IMPORTED) == 0 )
 		return engine->scriptFunctions[id];
 	else
-		return engine->importedFunctions[id & 0xFFFF]->importedFunctionSignature;
+		return engine->importedFunctions[id & ~FUNC_IMPORTED]->importedFunctionSignature;
 }
 
 void asCBuilder::GetFunctionDescriptions(const char *name, asCArray<int> &funcs, asSNameSpace *ns)
@@ -4153,10 +4205,10 @@ void asCBuilder::WriteInfo(const asCString &message, asCScriptCode *file, asCScr
 void asCBuilder::WriteError(const asCString &message, asCScriptCode *file, asCScriptNode *node)
 {
 	int r = 0, c = 0;
-	if( node )
+	if( node && file )
 		file->ConvertPosToRowCol(node->tokenPos, &r, &c);
 
-	WriteError(file->name, message, r, c);
+	WriteError(file ? file->name : "", message, r, c);
 }
 
 void asCBuilder::WriteError(const asCString &scriptname, const asCString &message, int r, int c)
@@ -4172,13 +4224,16 @@ void asCBuilder::WriteError(const asCString &scriptname, const asCString &messag
 
 void asCBuilder::WriteWarning(const asCString &scriptname, const asCString &message, int r, int c)
 {
-	numWarnings++;
+	if( engine->ep.compilerWarnings )
+	{
+		numWarnings++;
 
-	// Need to pass the preMessage first
-	if( preMessage.isSet )
-		WriteInfo(preMessage.scriptname, preMessage.message, preMessage.r, preMessage.c, false);
+		// Need to pass the preMessage first
+		if( preMessage.isSet )
+			WriteInfo(preMessage.scriptname, preMessage.message, preMessage.r, preMessage.c, false);
 
-	engine->WriteMessage(scriptname.AddressOf(), r, c, asMSGTYPE_WARNING, message.AddressOf());
+		engine->WriteMessage(scriptname.AddressOf(), r, c, asMSGTYPE_WARNING, message.AddressOf());
+	}
 }
 
 asCString asCBuilder::GetScopeFromNode(asCScriptNode *node, asCScriptCode *script, asCScriptNode **next)
@@ -4323,7 +4378,7 @@ asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCod
 							// Return a dummy
 							return asCDataType::CreatePrimitive(ttInt, false);
 						}
-						
+
 						asASSERT( subTypes.GetLength() == ot->templateSubTypes.GetLength() );
 
 						// Check if any of the given subtypes are different from the template's declared subtypes
@@ -4336,7 +4391,7 @@ asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCod
 								break;
 							}
 						}
-						
+
 						if( isDifferent )
 						{
 							// This is a template instance

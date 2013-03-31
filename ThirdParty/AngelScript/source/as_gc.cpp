@@ -426,10 +426,31 @@ int asCGarbageCollector::ReportAndReleaseUndestroyedObjects()
 	{
 		asSObjTypePair gcObj = GetOldObjectAtIdx(n);
 
+		int refCount = 0;
+		if( gcObj.type->beh.gcGetRefCount && engine->scriptFunctions[gcObj.type->beh.gcGetRefCount] )
+			refCount = engine->CallObjectMethodRetInt(gcObj.obj, gcObj.type->beh.gcGetRefCount);
+
 		// Report the object as not being properly destroyed
 		asCString msg;
-		msg.Format(TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s, gcObj.type->name.AddressOf());
+		msg.Format(TXT_GC_CANNOT_FREE_OBJ_OF_TYPE_s_REF_COUNT_d, gcObj.type->name.AddressOf(), refCount - 1);
 		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+
+		// Add additional info for builtin types
+		if( gcObj.type->name == "_builtin_function_" )
+		{
+			msg.Format(TXT_PREV_TYPE_IS_NAMED_s, reinterpret_cast<asCScriptFunction*>(gcObj.obj)->GetName());
+			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
+		}
+		else if( gcObj.type->name == "_builtin_objecttype_" )
+		{
+			msg.Format(TXT_PREV_TYPE_IS_NAMED_s, reinterpret_cast<asCObjectType*>(gcObj.obj)->GetName());
+			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
+		}
+		else if( gcObj.type->name == "_builtin_globalprop_" )
+		{
+			msg.Format(TXT_PREV_TYPE_IS_NAMED_s, reinterpret_cast<asCGlobalProperty*>(gcObj.obj)->name.AddressOf());
+			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
+		}
 
 		// Release the reference that the GC holds if the release functions is still available
 		if( gcObj.type->beh.release && engine->scriptFunctions[gcObj.type->beh.release] )

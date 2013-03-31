@@ -440,7 +440,7 @@ void asCModule::InternalReset()
 	{
 		if( bindInformations[n] )
 		{
-			asUINT id = bindInformations[n]->importedFunctionSignature->id & 0xFFFF;
+			asUINT id = bindInformations[n]->importedFunctionSignature->id & ~FUNC_IMPORTED;
 			engine->importedFunctions[id] = 0;
 			engine->freeImportedFunctionIdxs.PushLast(id);
 
@@ -465,8 +465,8 @@ void asCModule::InternalReset()
 	// Free funcdefs
 	for( n = 0; n < funcDefs.GetLength(); n++ )
 	{
-		// TODO: funcdefs: These may be shared between modules, so we can't just remove them
-		engine->funcDefs.RemoveValue(funcDefs[n]);
+		// The funcdefs are not removed from the engine at this moment as they may still be referred
+		// to by other types. The engine's ClearUnusedTypes will take care of the clean up.
 		funcDefs[n]->Release();
 	}
 	funcDefs.SetLength(0);

@@ -342,6 +342,13 @@ int asCScriptEngine::SetEngineProperty(asEEngineProp property, asPWORD value)
 		ep.alwaysImplDefaultConstruct = value ? true : false;
 		break;
 
+	case asEP_COMPILER_WARNINGS:
+		if( value <= 2 )
+			ep.compilerWarnings = (int)value;
+		else
+			return asINVALID_ARG;
+		break;
+
 	default:
 		return asINVALID_ARG;
 	}
@@ -406,6 +413,9 @@ asPWORD asCScriptEngine::GetEngineProperty(asEEngineProp property) const
 
 	case asEP_ALWAYS_IMPL_DEFAULT_CONSTRUCT:
 		return ep.alwaysImplDefaultConstruct;
+
+	case asEP_COMPILER_WARNINGS:
+		return ep.compilerWarnings;
 	}
 
 	return 0;
@@ -439,6 +449,7 @@ asCScriptEngine::asCScriptEngine()
 		ep.autoGarbageCollect           = true;
 		ep.disallowGlobalVars           = false;
 		ep.alwaysImplDefaultConstruct   = false;
+		ep.compilerWarnings             = 1;         // 0 = no warnings, 1 = warning, 2 = treat as error
 	}
 
 	gc.engine = this;
@@ -673,6 +684,21 @@ asCScriptEngine::~asCScriptEngine()
 	functionBehaviours.ReleaseAllFunctions();
 	objectTypeBehaviours.ReleaseAllFunctions();
 	globalPropertyBehaviours.ReleaseAllFunctions();
+
+	// Destroy the funcdefs
+	// As funcdefs are shared between modules it shouldn't be a problem to keep the objects until the engine is released
+	// TODO: refactor: This really should be done by ClearUnusedTypes() as soon as the funcdef is no longer is use.
+	//                 Perhaps to make it easier to manage the memory for funcdefs each function definition should
+	//                 have it's own object type. That would make the funcdef much more similar to the other types
+	//                 and could then be handled in much the same way. When this is done the funcdef should also be
+	//                 changed so that it doesn't take up a function id, i.e. don't keep a reference to it in scriptFunctions.
+	for( n = 0; n < funcDefs.GetLength(); n++ )
+		if( funcDefs[n] )
+		{
+			asASSERT( funcDefs[n]->GetRefCount() == 0 );
+			asDELETE(funcDefs[n], asCScriptFunction);
+		}
+	funcDefs.SetLength(0);
 
 	// Free string constants
 	for( n = 0; n < stringConstants.GetLength(); n++ )
@@ -1010,6 +1036,10 @@ int asCScriptEngine::ClearUnusedTypes()
 		{
 			// Ignore factory stubs
 			if( func->name == "factstub" )
+				continue;
+
+			// Ignore funcdefs because these will only be destroyed when the engine is released
+			if( func->funcType == asFUNC_FUNCDEF )
 				continue;
 
 			asCObjectType *ot = func->returnType.GetObjectType();
@@ -1509,7 +1539,7 @@ int asCScriptEngine::RegisterObjectType(const char *name, int byteSize, asDWORD 
 		objectTypes.PushLast(type);
 		currentGroup->objTypes.PushLast(type);
 		registeredObjTypes.PushLast(type);
-		
+
 		// Define the template subtypes
 		for( asUINT subTypeIdx = 0; subTypeIdx < subtypeNames.GetLength(); subTypeIdx++ )
 		{
@@ -1809,7 +1839,7 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 
 				// If the parameter is object, and const reference for input or inout,
 				// and same type as this class, then this is a copy constructor.
-				if( paramType.IsObject() && paramType.IsReference() && paramType.IsReadOnly() && 
+				if( paramType.IsObject() && paramType.IsReference() && paramType.IsReadOnly() &&
 					(func.inOutFlags[0] & asTM_INREF) && paramType.GetObjectType() == objectType )
 					beh->copyconstruct = func.id;
 			}
@@ -3006,7 +3036,7 @@ void asCScriptEngine::OrphanTemplateInstances(asCObjectType *subType)
 		// If the template type isn't owned by any module it can't be orphaned
 		if( templateTypes[n]->module == 0 )
 			continue;
-		
+
 		for( asUINT subTypeIdx = 0; subTypeIdx < templateTypes[n]->templateSubTypes.GetLength(); subTypeIdx++ )
 		{
 			if( templateTypes[n]->templateSubTypes[subTypeIdx].GetObjectType() == subType )
@@ -3193,7 +3223,7 @@ asCObjectType *asCScriptEngine::GetTemplateInstanceType(asCObjectType *templateT
 
 	// Increase ref counter for sub type if it is an object type
 	for( n = 0; n < ot->templateSubTypes.GetLength(); n++ )
-		if( ot->templateSubTypes[n].GetObjectType() ) 
+		if( ot->templateSubTypes[n].GetObjectType() )
 			ot->templateSubTypes[n].GetObjectType()->AddRef();
 
 	templateTypes.PushLast(ot);
@@ -3233,6 +3263,7 @@ asCDataType asCScriptEngine::DetermineTypeForTemplate(const asCDataType &orig, a
 			}
 		}
 		asASSERT( found );
+		UNUSED_VAR( found );
 	}
 	else if( orig.GetObjectType() == tmpl )
 	{
@@ -3735,7 +3766,7 @@ void asCScriptEngine::CallGlobalFunction(void *param1, void *param2, asSSystemFu
 	else
 	{
 		// We must guarantee the order of the arguments which is why we copy them to this
-		// array. Otherwise the compiler may put them anywhere it likes, or even keep them 
+		// array. Otherwise the compiler may put them anywhere it likes, or even keep them
 		// in the registers which causes problem.
 		void *params[2] = {param1, param2};
 
@@ -3764,7 +3795,7 @@ bool asCScriptEngine::CallGlobalFunctionRetBool(void *param1, void *param2, asSS
 		//       fails, because the stack given to asCGeneric is not prepared with two 64bit arguments.
 
 		// We must guarantee the order of the arguments which is why we copy them to this
-		// array. Otherwise the compiler may put them anywhere it likes, or even keep them 
+		// array. Otherwise the compiler may put them anywhere it likes, or even keep them
 		// in the registers which causes problem.
 		void *params[2] = {param1, param2};
 		asCGeneric gen(this, s, 0, (asDWORD*)params);
@@ -4370,7 +4401,7 @@ asDWORD asCScriptEngine::SetDefaultAccessMask(asDWORD defaultMask)
 
 int asCScriptEngine::GetNextScriptFunctionId()
 {
-	// This function only returns the next function id that 
+	// This function only returns the next function id that
 	// should be used. It doesn't update the internal arrays.
 	if( freeScriptFunctionIds.GetLength() )
 		return freeScriptFunctionIds[freeScriptFunctionIds.GetLength()-1];
@@ -4384,7 +4415,7 @@ void asCScriptEngine::SetScriptFunction(asCScriptFunction *func)
 	if( freeScriptFunctionIds.GetLength() && freeScriptFunctionIds[freeScriptFunctionIds.GetLength()-1] == func->id )
 		freeScriptFunctionIds.PopLast();
 
-	if( func->id == scriptFunctions.GetLength() )
+	if( asUINT(func->id) == scriptFunctions.GetLength() )
 		scriptFunctions.PushLast(func);
 	else
 	{
@@ -4397,7 +4428,7 @@ void asCScriptEngine::SetScriptFunction(asCScriptFunction *func)
 void asCScriptEngine::FreeScriptFunctionId(int id)
 {
 	if( id < 0 ) return;
-	id &= 0xFFFF;
+	id &= ~FUNC_IMPORTED;
 	if( id >= (int)scriptFunctions.GetLength() ) return;
 
 	if( scriptFunctions[id] )

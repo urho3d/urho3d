@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -237,7 +237,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 asQWORD NOINLINE CallCDeclFunction(const asDWORD *args, int paramSize, asFUNCTION_t func)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 
@@ -348,7 +348,7 @@ endcopy:
 
 asQWORD NOINLINE CallCDeclFunctionObjLast(const void *obj, const asDWORD *args, int paramSize, asFUNCTION_t func)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 
@@ -453,7 +453,7 @@ endcopy:
 
 asQWORD NOINLINE CallCDeclFunctionObjFirst(const void *obj, const asDWORD *args, int paramSize, asFUNCTION_t func)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 
@@ -558,7 +558,7 @@ endcopy:
 
 asQWORD NOINLINE CallCDeclFunctionRetByRefObjFirst(const void *obj, const asDWORD *args, int paramSize, asFUNCTION_t func, void *retPtr)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 
@@ -675,7 +675,7 @@ endcopy:
 
 asQWORD NOINLINE CallCDeclFunctionRetByRef(const asDWORD *args, int paramSize, asFUNCTION_t func, void *retPtr)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 
@@ -787,7 +787,7 @@ endcopy:
 
 asQWORD NOINLINE CallCDeclFunctionRetByRefObjLast(const void *obj, const asDWORD *args, int paramSize, asFUNCTION_t func, void *retPtr)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 
@@ -903,7 +903,7 @@ endcopy:
 
 asQWORD NOINLINE CallSTDCallFunction(const asDWORD *args, int paramSize, asFUNCTION_t func)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 
@@ -1001,7 +1001,7 @@ endcopy:
 
 asQWORD NOINLINE CallThisCallFunction(const void *obj, const asDWORD *args, int paramSize, asFUNCTION_t func)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 
@@ -1122,7 +1122,7 @@ endcopy:
 
 asQWORD NOINLINE CallThisCallFunctionRetByRef(const void *obj, const asDWORD *args, int paramSize, asFUNCTION_t func, void *retPtr)
 {
-	volatile asQWORD retQW;
+	volatile asQWORD retQW = 0;
 
 #if defined ASM_INTEL
 

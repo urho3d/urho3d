@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -40,6 +40,7 @@
 #include "as_config.h"
 #include "as_configgroup.h"
 #include "as_scriptengine.h"
+#include "as_texts.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -156,6 +157,8 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 #endif
 
 				engine->objectTypes.RemoveIndex(idx);
+				if( engine->defaultArrayObjectType == t )
+					engine->defaultArrayObjectType = 0;
 
 				if( t->flags & asOBJ_TYPEDEF )
 					engine->registeredTypeDefs.RemoveValue(t);
@@ -188,12 +191,31 @@ void asCConfigGroup::ValidateNoUsage(asCScriptEngine *engine, asCObjectType *typ
 		if( func->name == "_beh_2_" || func->name == "_beh_3_" || func->objectType == type )
 			continue;
 
-		asASSERT( func->returnType.GetObjectType() != type );
+		// Ignore function definitions too, as they aren't released until the engine is destroyed
+		if( func->funcType == asFUNC_FUNCDEF )
+			continue;
 
-		for( asUINT p = 0; p < func->parameterTypes.GetLength(); p++ )
+		if( func->returnType.GetObjectType() == type )
 		{
-			asASSERT(func->parameterTypes[p].GetObjectType() != type);
+			asCString msg;
+			// We can only use the function name here, because the types used by the function may have been deleted already
+			msg.Format(TXT_TYPE_s_IS_STILL_USED_BY_FUNC_s, type->name.AddressOf(), func->GetName());
+			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
 		}
+		else
+		{
+			for( asUINT p = 0; p < func->parameterTypes.GetLength(); p++ )
+			{
+				if( func->parameterTypes[p].GetObjectType() == type )
+				{
+					asCString msg;
+					// We can only use the function name here, because the types used by the function may have been deleted already
+					msg.Format(TXT_TYPE_s_IS_STILL_USED_BY_FUNC_s, type->name.AddressOf(), func->GetName());
+					engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
+					break;
+				}
+			}
+		}	
 	}
 
 	// TODO: Check also usage of the type in global variables 

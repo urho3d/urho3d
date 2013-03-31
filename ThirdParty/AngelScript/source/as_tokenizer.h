@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -66,6 +66,7 @@ protected:
 	bool IsConstant(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
 	bool IsKeyWord(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
 	bool IsIdentifier(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
+	bool IsDigitInRadix(char ch, int radix) const;
 
 	const asCScriptEngine *engine;
 

@@ -473,7 +473,7 @@ setup_executable ()
 
 Before recreating the build files with CMake, create an empty HelloWorld.cpp into the HelloWorld directory. Now you can re-run CMake. If using Visual Studio, the HelloWorld project should now appear in the Urho3D solution, and you can start writing the actual application into HelloWorld.cpp.
 
-To start with, we need the include files for all the engine classes we are going to use, plus Windows.h for the WinMain function:
+First we need to include the header files for all the engine classes we are going to use, plus Main.h, which helps to create the main function in a cross-platform compatible way. Additionally, including DebugNew.h enables debug allocation in Visual Studio debug builds. This helps to track down memory leaks by adding file name and line number information to each heap memory allocation in our own code.
 
 \code
 #include "Camera.h"
@@ -524,7 +524,7 @@ public:
 };
 \endcode
 
-Before the actual HelloWorld implementation, we define the program entry point. The earlier included Main.h contains a DEFINE_MAIN macro which helps to create a cross-platform entry point (on Windows it will be WinMain(), on Linux just main() etc.) It parses the command line and then returns control to the user-defined function.
+Before the actual HelloWorld implementation, we define the program entry point. The earlier included Main.h contains a DEFINE_MAIN macro which creates the platform-specific main function (on Windows it will be WinMain(), on Linux just main() etc.) It parses the command line and then returns control to our function.
 
 \code
 int Run()

@@ -452,6 +452,7 @@ public:
 		bool   autoGarbageCollect;
 		bool   disallowGlobalVars;
 		bool   alwaysImplDefaultConstruct;
+		int    compilerWarnings;
 	} ep;
 };
 

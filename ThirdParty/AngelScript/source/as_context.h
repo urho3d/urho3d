@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -147,6 +147,7 @@ public:
 	void ExecuteNext();
 	void CleanStack();
 	void CleanStackFrame();
+	void CleanArgsOnStack();
 	void CleanReturnObject();
 	void DetermineLiveObjects(asCArray<int> &liveObjects, asUINT stackLevel);
 
@@ -185,6 +186,7 @@ public:
 
 	// Exception handling
 	bool      m_isStackMemoryNotAllocated;
+	bool      m_needToCleanupArgs;
 	bool      m_inExceptionHandler;
 	asCString m_exceptionString;
 	int       m_exceptionFunction;
