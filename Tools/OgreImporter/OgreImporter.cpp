@@ -244,7 +244,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     if (!meshFile_->Load(meshFileSource))
         ErrorExit("Could not load input file " + inputFileName);
     
-    XMLElement root = meshFile_->GetRoot();
+    XMLElement root = meshFile_->GetRoot("mesh");
     XMLElement subMeshes = root.GetChild("submeshes");
     XMLElement skeletonLink = root.GetChild("skeletonlink");
     if (root.IsNull())
@@ -895,7 +895,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             dest.WriteVector3(subGeometryCenters_[i]);
     }
     
-    XMLElement skeletonRoot = skelFile_->GetRoot("");
+    XMLElement skeletonRoot = skelFile_->GetRoot("skeleton");
     if (skeletonRoot && exportAnimations)
     {
         // Go through animations
