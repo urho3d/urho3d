@@ -194,7 +194,7 @@ void Log::WriteRaw(const String& message, bool error)
         {
             // If in quiet mode, still print the error message to the standard error stream
             if (error)
-            	PrintUnicode(message, true);
+                PrintUnicode(message, true);
         }
         else
         	PrintUnicode(message, error);

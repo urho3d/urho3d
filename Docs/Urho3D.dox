@@ -22,7 +22,7 @@ For further reference, see:
 \ref ObjectTypes "Object types and factories" <br>
 \ref Subsystems "Subsystems" <br>
 \ref Events "Events" <br>
-\ref MainLoop "Main loop and frame update" <br>
+\ref MainLoop "Engine initialization, main loop and frame update" <br>
 \ref SceneModel "Scene model" <br>
 \ref Resources "Resources" <br>
 \ref Scripting "Scripting" <br>
