@@ -116,7 +116,7 @@ void EditUIMaxOpacity(StringHash eventType, VariantMap& eventData)
 void ToggleShowNonEditableAttribute(StringHash eventType, VariantMap& eventData)
 {
     showNonEditableAttribute = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
-    UpdateAttributes(true);
+    UpdateAttributeInspector(true);
 }
 
 void EditOriginalAttributeTextColor(StringHash eventType, VariantMap& eventData)
@@ -129,7 +129,7 @@ void EditOriginalAttributeTextColor(StringHash eventType, VariantMap& eventData)
         edit.text = String(normalTextColor.g);
     else if (edit.name == "OriginalAttributeTextColor.b")
         edit.text = String(normalTextColor.b);
-    UpdateAttributes(false);
+    UpdateAttributeInspector(false);
 }
 
 void EditModifiedAttributeTextColor(StringHash eventType, VariantMap& eventData)
@@ -142,7 +142,7 @@ void EditModifiedAttributeTextColor(StringHash eventType, VariantMap& eventData)
         edit.text = String(modifiedTextColor.g);
     else if (edit.name == "ModifiedAttributeTextColor.b")
         edit.text = String(modifiedTextColor.b);
-    UpdateAttributes(false);
+    UpdateAttributeInspector(false);
 }
 
 void EditNonEditableAttributeTextColor(StringHash eventType, VariantMap& eventData)
@@ -155,5 +155,5 @@ void EditNonEditableAttributeTextColor(StringHash eventType, VariantMap& eventDa
         edit.text = String(nonEditableTextColor.g);
     else if (edit.name == "NonEditableAttributeTextColor.b")
         edit.text = String(nonEditableTextColor.b);
-    UpdateAttributes(false);
+    UpdateAttributeInspector(false);
 }

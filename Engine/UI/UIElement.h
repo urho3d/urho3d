@@ -378,6 +378,8 @@ public:
     UIElement* GetChild(unsigned index) const;
     /// Return child element by name.
     UIElement* GetChild(const String& name, bool recursive = false) const;
+    /// Return child element by variable.
+    UIElement* GetChild(const ShortStringHash& key, const Variant& value, bool recursive = false) const;
     /// Return immediate child elements.
     const Vector<SharedPtr<UIElement> >& GetChildren() const { return children_; }
     /// Return child elements either recursively or non-recursively.
@@ -389,7 +391,7 @@ public:
     /// Return derived color. Only valid when no gradient.
     const Color& GetDerivedColor() const;
     /// Return a user variable.
-    const Variant& GetVar(ShortStringHash key) const;
+    const Variant& GetVar(const ShortStringHash& key) const;
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
     

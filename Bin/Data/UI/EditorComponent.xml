@@ -1,6 +1,6 @@
 <element>
     <element>
-        <attribute name="Name" value="ComponentChildContainer" />
+        <attribute name="Name" value="ComponentContainer" />
         <attribute name="Layout Mode" value="Vertical" />
         <attribute name="Layout Spacing" value="4" />
         <element type="BorderImage" style="EditorDivider" />
@@ -10,7 +10,7 @@
             <attribute name="Max Size" value="2147483647 17" />
         </element>
         <element type="ListView">
-            <attribute name="Name" value="ComponentAttributeList" />
+            <attribute name="Name" value="AttributeList" />
             <attribute name="Clip Children" value="false" />
         </element>
     </element>

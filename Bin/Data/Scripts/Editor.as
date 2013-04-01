@@ -48,7 +48,7 @@ void Start()
     // Create user interface for the editor
     CreateUI();
     // Create root UI element where all 'editable' UI elements would be parented to
-    CreateUIElement();
+    CreateRootUIElement();
     // Load the initial scene if provided
     ParseArguments();
 }

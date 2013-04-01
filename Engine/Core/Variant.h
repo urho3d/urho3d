@@ -150,7 +150,7 @@ struct ResourceRefList
     
     /// Object type.
     ShortStringHash type_;
-    /// List of object identifiers (name hashes.)
+    /// List of object identifiers (name hashes).
     Vector<StringHash> ids_;
     
     /// Test for equality with another reference list.
@@ -191,7 +191,7 @@ public:
         *this = (int)value;
     }
     
-    /// Construct from a string hash (convert to integer.)
+    /// Construct from a string hash (convert to integer).
     Variant(const StringHash& value) :
         type_(VAR_NONE)
     {

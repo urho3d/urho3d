@@ -427,6 +427,9 @@
         <attribute name="Layout Mode" value="vertical" />
         <attribute name="Layout Spacing" value="4" />
         <attribute name="Layout Border" value="6 6 6 6" />
+        <attribute name="Is Modal" value="true" />
+        <attribute name="Modal Frame Color" value="0.45 0.70 0.45" />
+        <attribute name="Modal Frame Size" value="2 2" />
     </element>
     <element type="FileSelectorButton">
         <attribute name="Min Size" value="80 22" />

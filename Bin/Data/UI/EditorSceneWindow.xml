@@ -1,5 +1,5 @@
 <element type="Window">
-    <attribute name="Name" value="SceneWindow" />
+    <attribute name="Name" value="HierarchyWindow" />
     <attribute name="Is Movable" value="true" />
     <attribute name="Is Resizable" value="true" />
     <attribute name="Resize Border" value="6 6 6 6" />
@@ -57,7 +57,7 @@
         </element>
     </element>
     <element type="ListView">
-        <attribute name="Name" value="NodeList" />
+        <attribute name="Name" value="HierarchyList" />
         <attribute name="Hierarchy Mode" value="true" />
         <attribute name="Base Indent" value="1" />
         <attribute name="Highlight Mode" value="Always" />

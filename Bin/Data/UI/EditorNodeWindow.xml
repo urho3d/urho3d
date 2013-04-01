@@ -1,5 +1,5 @@
 <element type="Window">
-    <attribute name="Name" value="NodeWindow" />
+    <attribute name="Name" value="AttributeInspectorWindow" />
     <attribute name="Is Movable" value="true" />
     <attribute name="Is Resizable" value="true" />
     <attribute name="Resize Border" value="6 6 6 6" />
@@ -17,79 +17,8 @@
             <attribute name="Name" value="CloseButton" />
         </element>
     </element>
-    <element type="BorderImage" style="EditorDivider" />
-    <element type="Text">
-        <attribute name="Name" value="NodeTitle" />
-        <attribute name="Min Size" value="0 17" />
-        <attribute name="Max Size" value="2147483647 17" />
-    </element>
-    <element type="ListView">
-        <attribute name="Name" value="NodeAttributeList" />
-        <attribute name="Highlight Mode" value="Always" />
-        <attribute name="Min Size" value="0 74" />
-        <attribute name="Max Size" value="2147483647 74" />
-        <attribute name="Clip Children" value="false" />
-    </element>
     <element>
-        <attribute name="Min Size" value="0 17" />
-        <attribute name="Max Size" value="2147483647 17" />
-        <attribute name="Layout Mode" value="Horizontal" />
-        <attribute name="Layout Spacing" value="4" />
-        <element type="LineEdit">
-            <attribute name="Name" value="VarNameEdit" />
-        </element>
-        <element type="DropDownList">
-            <attribute name="Name" value="NewVarDropDown" />
-            <attribute name="Min Size" value="50 17" />
-            <attribute name="Max Size" value="50 17" />
-            <element type="Window" internal="true" popup="true">
-                <element type="ListView" internal="true">
-                    <element type="BorderImage" internal="true">
-                        <element internal="true">
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="Int" />
-                            </element>
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="Bool" />
-                            </element>
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="Float" />
-                            </element>
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="String" />
-                            </element>
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="Vector3" />
-                            </element>
-                            <element type="Text" style="FileSelectorFilterText">
-                                <attribute name="Text" value="Color" />
-                            </element>
-                        </element>
-                    </element>
-                </element>
-            </element>    
-            <element internal="true">
-                <attribute name="Is Visible" value="false" />
-            </element>
-            <element type="Text">
-                <attribute name="Text" value="New" />
-                <attribute name="Text Alignment" value="Center" />
-            </element>
-        </element>
-        <element type="Button">
-            <attribute name="Name" value="DeleteVarButton" />
-            <attribute name="Min Size" value="50 17" />
-            <attribute name="Max Size" value="50 17" />
-            <attribute name="Layout Mode" value="Vertical" />
-            <attribute name="Layout Border" value="1 1 1 1" />
-            <element type="Text">
-                <attribute name="Text" value="Del" />
-                <attribute name="Text Alignment" value="Center" />
-            </element>
-        </element>
-    </element>
-    <element>
-        <attribute name="Name" value="ComponentParentContainer" />
+        <attribute name="Name" value="ParentContainer" />
         <attribute name="Layout Mode" value="Vertical" />
         <attribute name="Layout Spacing" value="4" />
     </element>

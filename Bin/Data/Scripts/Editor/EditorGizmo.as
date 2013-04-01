@@ -31,6 +31,13 @@ class GizmoAxis
 
     void Update(Ray cameraRay, float scale, bool drag)
     {
+        // Do not select when UI has modal element
+        if (ui.modalElement !is null)
+        {
+            selected = false;
+            return;
+        }
+        
         Vector3 closest = cameraRay.ClosestPoint(axisRay);
         Vector3 projected = axisRay.Project(closest);
         d = axisRay.Distance(closest);
@@ -49,7 +56,7 @@ class GizmoAxis
             lastD = d;
         }
     }
-    
+
     void Moved()
     {
         lastT = t;
@@ -97,7 +104,6 @@ void ShowGizmo()
             editorScene.octree.AddManualDrawable(gizmo);
     }
 }
-
 
 void UpdateGizmo()
 {
@@ -270,7 +276,7 @@ void UseGizmo()
 
             moved = ScaleNodes(adjust);
         }
-        
+
         if (moved)
         {
             GizmoMoved();
@@ -330,7 +336,7 @@ bool MoveNodes(Vector3 adjust)
                 moved = true;
         }
     }
-    
+
     return moved;
 }
 
@@ -368,7 +374,7 @@ bool RotateNodes(Vector3 adjust)
             }
         }
     }
-    
+
     return moved;
 }
 
@@ -384,7 +390,7 @@ bool ScaleNodes(Vector3 adjust)
 
             Vector3 scale = node.scale;
             Vector3 oldScale = scale;
-            
+
             if (!scaleSnap)
                 scale += adjust;
             else
@@ -412,6 +418,6 @@ bool ScaleNodes(Vector3 adjust)
             node.scale = scale;
         }
     }
-    
+
     return moved;
 }

@@ -1228,6 +1228,24 @@ UIElement* UIElement::GetChild(const String& name, bool recursive) const
     return 0;
 }
 
+UIElement* UIElement::GetChild(const ShortStringHash& key, const Variant& value, bool recursive) const
+{
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        if ((*i)->GetVar(key) == value)
+            return *i;
+
+        if (recursive)
+        {
+            UIElement* element = (*i)->GetChild(key, value, true);
+            if (element)
+                return element;
+        }
+    }
+
+    return 0;
+}
+
 UIElement* UIElement::GetRoot() const
 {
     UIElement* root = parent_;
@@ -1250,7 +1268,7 @@ const Color& UIElement::GetDerivedColor() const
     return derivedColor_;
 }
 
-const Variant& UIElement::GetVar(ShortStringHash key) const
+const Variant& UIElement::GetVar(const ShortStringHash& key) const
 {
     VariantMap::ConstIterator i = vars_.Find(key);
     if (i != vars_.End())

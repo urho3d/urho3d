@@ -336,7 +336,7 @@ void ImportTundraScene(const String&in fileName)
             childNode.parent = parentNode;
     }
 
-    UpdateHierarchyWindowItem(editorScene, true);
+    UpdateHierarchyItem(editorScene, true);
     UpdateWindowTitle();
     assetMappings.Clear();
 }

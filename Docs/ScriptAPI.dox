@@ -746,7 +746,6 @@ Methods:<br>
 - void FromString(const String&, const String&)
 - void FromString(VariantType, const String&)
 - String ToString() const
-- bool IsZero() const
 - VectorBuffer GetBuffer() const
 - Node@ GetNode() const
 - Component@ GetComponent() const
@@ -758,6 +757,8 @@ Methods:<br>
 - PhysicsWorld@ GetPhysicsWorld() const
 
 Properties:<br>
+- bool zero (readonly)
+- bool empty (readonly)
 - VariantType type (readonly)
 - String typeName (readonly)
 
@@ -3150,7 +3151,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3256,7 +3259,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3365,7 +3370,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - void SetPosition(float, float)
 - void SetHotSpot(int, int)
 - void SetScale(float, float)
@@ -3453,7 +3460,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3574,7 +3583,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3691,7 +3702,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3807,7 +3820,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -3927,7 +3942,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -4045,7 +4062,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -4161,7 +4180,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -4306,7 +4327,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -4428,7 +4451,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -4553,7 +4578,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -4681,7 +4708,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -4820,7 +4849,9 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
@@ -4896,6 +4927,9 @@ Properties:<br>
 - bool movable
 - bool resizable
 - IntRect resizeBorder
+- bool modal
+- Color modalFrameColor
+- IntVector2 modalFrameSize
 
 
 FileSelector
@@ -4949,6 +4983,7 @@ Properties:<br>
 - Cursor@ cursor
 - IntVector2 cursorPosition (readonly)
 - UIElement@ focusElement
+- UIElement@ modalElement (readonly)
 - UIElement@ frontElement (readonly)
 - UIElement@ root (readonly)
 - bool nonFocusedMouseWheel

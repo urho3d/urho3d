@@ -378,6 +378,10 @@ void ViewMouseClick()
 
 void ViewRaycast(bool mouseClick)
 {
+    // Ignore if UI has modal element
+    if (ui.modalElement !is null)
+        return;
+
     DebugRenderer@ debug = editorScene.debugRenderer;
     IntVector2 pos = ui.cursorPosition;
     Component@ selected;

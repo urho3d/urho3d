@@ -41,17 +41,19 @@ class XMLFile;
 class UI : public Object
 {
     OBJECT(UI);
-    
+
 public:
     /// Construct.
     UI(Context* context);
     /// Destruct.
     virtual ~UI();
-    
+
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
     /// Set focused UI element.
     void SetFocusElement(UIElement* element);
+    /// Set modal element. Until it is dismissed, all the inputs and events are only sent to this modal element. Return true when successful.
+    bool SetModalElement(UIElement* modalElement);
     /// Clear the UI (excluding the cursor.)
     void Clear();
     /// Update the UI logic. Called by HandlePostUpdate().
@@ -70,7 +72,7 @@ public:
     void SetClipBoardText(const String& text);
     /// Set mouse wheel handling flag.
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
-    
+
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
     /// Return cursor.
@@ -80,7 +82,9 @@ public:
     /// Return UI element at screen coordinates.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Return focused element.
-    UIElement* GetFocusElement() const;
+    UIElement* GetFocusElement() const { return focusElement_; }
+    /// Return modal element.
+    UIElement* GetModalElement() const { return modalElement_; }
     /// Return topmost enabled root-level element.
     UIElement* GetFrontElement() const;
     /// Return cursor position.
@@ -89,7 +93,7 @@ public:
     const String& GetClipBoardText() const { return clipBoard_; }
     /// Return mouse wheel handling flag.
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
-    
+
 private:
     /// Initialize when screen mode initially se.
     void Initialize();
@@ -125,7 +129,7 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
-    
+
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Vertex shader for no texture.
@@ -148,6 +152,8 @@ private:
     WeakPtr<UIElement> dragElement_;
     /// Currently focused element
     WeakPtr<UIElement> focusElement_;
+    /// Modal element.
+    WeakPtr<UIElement> modalElement_;
     /// UI rendering batches.
     PODVector<UIBatch> batches_;
     /// UI rendering vertex data.

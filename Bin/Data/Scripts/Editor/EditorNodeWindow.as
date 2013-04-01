@@ -1,93 +1,131 @@
 // Urho3D editor attribute inspector window handling
 #include "Scripts/Editor/AttributeEditor.as"
 
-Window@ nodeWindow;
+Window@ attributeInspectorWindow;
+UIElement@ parentContainer;
 UIElement@ componentParentContainer;
+UIElement@ nodeContainer;
+XMLFile@ nodeXMLResource;
 XMLFile@ componentXMLResource;
 
 bool applyMaterialList = true;
 bool attributesDirty = false;
 
 const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
+const ShortStringHash NODE_IDS_VAR("NodeIDs");
+const ShortStringHash COMPONENT_IDS_VAR("ComponentIDs");
+
+uint componentContainerStartIndex = 0;
+
+void AddNodeContainer()
+{
+    if (nodeContainer !is null)
+        return;
+
+    uint index = parentContainer.numChildren;
+    parentContainer.LoadXML(nodeXMLResource, uiStyle);
+    nodeContainer = GetContainer(index);
+    SubscribeToEvent(nodeContainer.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNewVariable");
+    SubscribeToEvent(nodeContainer.GetChild("DeleteVarButton", true), "Released", "DeleteVariable");
+    ++componentContainerStartIndex;
+}
 
 void AddComponentContainer()
 {
-    componentParentContainer.LoadXML(componentXMLResource, uiStyle);
+    parentContainer.LoadXML(componentXMLResource, uiStyle);
 }
 
-void DeleteAllComponentContainers()
+void DeleteAllContainers()
 {
-    componentParentContainer.RemoveAllChildren();
+    parentContainer.RemoveAllChildren();
+    nodeContainer = null;
+    componentContainerStartIndex = 0;
+}
+
+UIElement@ GetContainer(uint index)
+{
+    return parentContainer.children[index];
 }
 
 UIElement@ GetComponentContainer(uint index)
 {
-    return componentParentContainer.children[index];
+    return parentContainer.children[componentContainerStartIndex + index];
 }
 
-void CreateNodeWindow()
+void CreateAttributeInspectorWindow()
 {
-    if (nodeWindow !is null)
+    if (attributeInspectorWindow !is null)
         return;
 
     InitResourcePicker();
     InitVectorStructs();
 
-    nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"));
+    attributeInspectorWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"));
+    nodeXMLResource = cache.GetResource("XMLFile", "UI/EditorNode.xml");
     componentXMLResource = cache.GetResource("XMLFile", "UI/EditorComponent.xml");
-    componentParentContainer = nodeWindow.GetChild("ComponentParentContainer", true);
-    AddComponentContainer();
-    ui.root.AddChild(nodeWindow);
+    parentContainer = attributeInspectorWindow.GetChild("ParentContainer");
+    ui.root.AddChild(attributeInspectorWindow);
     int height = Min(ui.root.height - 60, 500);
-    nodeWindow.SetSize(300, height);
-    nodeWindow.SetPosition(ui.root.width - 20 - nodeWindow.width, 40);
-    nodeWindow.opacity = uiMaxOpacity;
-    nodeWindow.BringToFront();
-    UpdateNodeWindow();
+    attributeInspectorWindow.SetSize(300, height);
+    attributeInspectorWindow.SetPosition(ui.root.width - 20 - attributeInspectorWindow.width, 40);
+    attributeInspectorWindow.opacity = uiMaxOpacity;
+    attributeInspectorWindow.BringToFront();
+    UpdateAttributeInspector();
 
-    SubscribeToEvent(nodeWindow.GetChild("CloseButton", true), "Released", "HideNodeWindow");
-    SubscribeToEvent(nodeWindow.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNewVariable");
-    SubscribeToEvent(nodeWindow.GetChild("DeleteVarButton", true), "Released", "DeleteVariable");
-    SubscribeToEvent(nodeWindow, "LayoutUpdated", "HandleWindowLayoutUpdated");
+    SubscribeToEvent(attributeInspectorWindow.GetChild("CloseButton", true), "Released", "HideAttributeInspectorWindow");
+    SubscribeToEvent(attributeInspectorWindow, "LayoutUpdated", "HandleWindowLayoutUpdated");
 }
 
-void HideNodeWindow()
+void HideAttributeInspectorWindow()
 {
-    nodeWindow.visible = false;
+    attributeInspectorWindow.visible = false;
 }
 
-bool ShowNodeWindow()
+bool ShowAttributeInspectorWindow()
 {
-    nodeWindow.visible = true;
-    nodeWindow.BringToFront();
+    attributeInspectorWindow.visible = true;
+    attributeInspectorWindow.BringToFront();
     return true;
-}
-
-void AdjustListViewChild(ListView@ list)
-{
-    // At the moment, only 'Is Enabled' container (place-holder + check box) is being created as child of the list view instead of as list item
-    int width = list.width;
-    for (uint i = 0; i < list.numChildren; ++i)
-    {
-        UIElement@ element = list.children[i];
-        if (!element.internal)
-            element.SetFixedWidth(width);
-    }
 }
 
 void HandleWindowLayoutUpdated()
 {
-    AdjustListViewChild(nodeWindow.GetChild("NodeAttributeList"));
-    for (uint i = 0; i < componentParentContainer.numChildren; ++i)
-        AdjustListViewChild(GetComponentContainer(i).GetChild("ComponentAttributeList"));
+    for (uint i = 0; i < parentContainer.numChildren; ++i)
+    {
+        ListView@ list = GetContainer(i).GetChild("AttributeList");
+
+        // At the moment, only 'Is Enabled' container (place-holder + check box) is being created as child of the list view instead of as list item
+        // When window resize and so the list's width is changed, adjust the 'Is enabled' container width so that check box stays at the right most position
+        int width = list.width;
+        for (uint i = 0; i < list.numChildren; ++i)
+        {
+            UIElement@ element = list.children[i];
+            if (!element.internal)
+                element.SetFixedWidth(width);
+        }
+    }
 }
 
-void UpdateNodeWindow()
+Array<Serializable@> ToSerializableArray(Array<Node@> nodes)
 {
-    // If a resource pick was in progress, it cannot be completed now, as component was changed
-    PickResourceCanceled();
+    Array<Serializable@> serializables;
+    for (uint i = 0; i < nodes.length; ++i)
+        serializables.Push(nodes[i]);
+    return serializables;
+}
 
-    Text@ nodeTitle = nodeWindow.GetChild("NodeTitle", true);
+void UpdateAttributeInspector(bool fullUpdate = true)
+{
+    attributesDirty = false;
+
+    if (fullUpdate)
+    {
+        DeleteAllContainers();
+        AddNodeContainer();
+        AddComponentContainer();
+    }
+
+    Text@ nodeTitle = nodeContainer.GetChild("NodeTitle");
     String nodeType;
     if (editNodes.length == 0)
         nodeTitle.text = "No node";
@@ -108,82 +146,65 @@ void UpdateNodeWindow()
     }
     IconizeUIElement(nodeTitle, nodeType);
 
-    UpdateAttributes(true);
-}
+    ListView@ list = nodeContainer.GetChild("AttributeList");
+    UpdateAttributes(ToSerializableArray(editNodes), list, fullUpdate);
 
-Array<Serializable@> ToSerializableArray(Array<Node@> nodes)
-{
-    Array<Serializable@> serializables;
-    for (uint i = 0; i < nodes.length; ++i)
-        serializables.Push(nodes[i]);
-    return serializables;
-}
-
-void UpdateAttributes(bool fullUpdate)
-{
-    attributesDirty = false;
-
-    if (nodeWindow !is null)
+    if (fullUpdate)
     {
-        UpdateAttributes(ToSerializableArray(editNodes), nodeWindow.GetChild("NodeAttributeList", true), fullUpdate);
-
-        if (fullUpdate)
-            DeleteAllComponentContainers();
-        
-        if (editComponents.empty)
-        {
-            if (componentParentContainer.numChildren == 0)
-                AddComponentContainer();
-            
-            Text@ componentTitle = GetComponentContainer(0).GetChild("ComponentTitle");
-            if (selectedComponents.length <= 1)
-                componentTitle.text = "No component";
-            else
-                componentTitle.text = selectedComponents.length + " components";
-            
-            // Ensure there is no icon
-            IconizeUIElement(componentTitle, "");
-        }
-        else
-        {
-            uint numEditableComponents = editComponents.length / numEditableComponentsPerNode;
-            String multiplierText;
-            if (numEditableComponents > 1)
-                multiplierText = " (" + numEditableComponents + "x)";
-            
-            for (uint j = 0; j < numEditableComponentsPerNode; ++j)
-            {
-                if (j >= componentParentContainer.numChildren)
-                    AddComponentContainer();
-                
-                Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
-                componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents]) + multiplierText;
-                IconizeUIElement(componentTitle, editComponents[j * numEditableComponents].typeName);
-                SetIconEnabledColor(componentTitle, editComponents[j * numEditableComponents].enabledEffective);
-
-                Array<Serializable@> components;
-                for (uint i = 0; i < numEditableComponents; ++i)
-                    components.Push(editComponents[j * numEditableComponents + i]);
-                
-                UpdateAttributes(components, GetComponentContainer(j).GetChild("ComponentAttributeList"), fullUpdate);
-            }
-        }
-
-        UpdateNodeWindowIcons();
+        //\TODO Avoid hardcoding
+        // Resize the node editor according to the number of variables, up to a certain maximum
+        uint maxAttrs = Clamp(list.contentElement.numChildren, MIN_NODE_ATTRIBUTES, MAX_NODE_ATTRIBUTES);
+        list.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 2);
+        nodeContainer.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 60);
     }
+
+    if (editComponents.empty)
+    {
+        Text@ componentTitle = GetComponentContainer(0).GetChild("ComponentTitle");
+        if (selectedComponents.length <= 1)
+            componentTitle.text = "No component";
+        else
+            componentTitle.text = selectedComponents.length + " components";
+
+        // Ensure there is no icon
+        IconizeUIElement(componentTitle, "");
+    }
+    else
+    {
+        uint numEditableComponents = editComponents.length / numEditableComponentsPerNode;
+        String multiplierText;
+        if (numEditableComponents > 1)
+            multiplierText = " (" + numEditableComponents + "x)";
+
+        for (uint j = 0; j < numEditableComponentsPerNode; ++j)
+        {
+            if (j >= parentContainer.numChildren - componentContainerStartIndex)
+                AddComponentContainer();
+
+            Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
+            componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents]) + multiplierText;
+            IconizeUIElement(componentTitle, editComponents[j * numEditableComponents].typeName);
+            SetIconEnabledColor(componentTitle, editComponents[j * numEditableComponents].enabledEffective);
+
+            Array<Serializable@> components;
+            for (uint i = 0; i < numEditableComponents; ++i)
+                components.Push(editComponents[j * numEditableComponents + i]);
+
+            UpdateAttributes(components, GetComponentContainer(j).GetChild("AttributeList"), fullUpdate);
+        }
+    }
+
+    UpdateAttributeInspectorIcons();
 }
 
 void UpdateNodeAttributes()
 {
-    if (nodeWindow !is null)
-    {
-        UpdateAttributes(ToSerializableArray(editNodes), nodeWindow.GetChild("NodeAttributeList", true), false);
-    }
+    UpdateAttributes(ToSerializableArray(editNodes), nodeContainer.GetChild("AttributeList"), false);
 }
 
-void UpdateNodeWindowIcons()
+void UpdateAttributeInspectorIcons()
 {
-    Text@ nodeTitle = nodeWindow.GetChild("NodeTitle", true);
+    Text@ nodeTitle = attributeInspectorWindow.GetChild("NodeTitle", true);
     if (editNode !is null)
         SetIconEnabledColor(nodeTitle, editNode.enabled);
     else if (editNodes.length > 0)
@@ -198,21 +219,18 @@ void UpdateNodeWindowIcons()
                 break;
             }
         }
-        
+
         SetIconEnabledColor(nodeTitle, editNodes[0].enabled, !hasSameEnabledState);
     }
 
     if (!editComponents.empty)
     {
         uint numEditableComponents = editComponents.length / numEditableComponentsPerNode;
-        
+
         for (uint j = 0; j < numEditableComponentsPerNode; ++j)
         {
-            if (j >= componentParentContainer.numChildren)
-                return;
-            
             Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
-            
+
             bool enabledEffective = editComponents[j * numEditableComponents].enabledEffective;
             bool hasSameEnabledState = true;
             for (uint i = 1; i < numEditableComponents; ++i)
@@ -223,7 +241,7 @@ void UpdateNodeWindowIcons()
                     break;
                 }
             }
-            
+
             SetIconEnabledColor(componentTitle, enabledEffective, !hasSameEnabledState);
         }
     }
@@ -252,23 +270,23 @@ void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializabl
     {
         for (uint i = 0; i < serializables.length; ++i)
             ids.Push(Variant(cast<Node>(serializables[i]).id));
-        attrEdit.vars["NodeIDs"] = ids;
+        attrEdit.vars[NODE_IDS_VAR] = ids;
     }
     else
     {
         for (uint i = 0; i < serializables.length; ++i)
             ids.Push(Variant(cast<Component>(serializables[i]).id));
-        attrEdit.vars["ComponentIDs"] = ids;
+        attrEdit.vars[COMPONENT_IDS_VAR] = ids;
     }
 }
 
 Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
 {
     Array<Serializable@> ret;
-
-    if (attrEdit.vars.Contains("NodeIDs"))
+    Variant variant = attrEdit.GetVar(NODE_IDS_VAR);
+    if (!variant.empty)
     {
-        Array<Variant>@ ids = attrEdit.vars["NodeIDs"].GetVariantVector();
+        Array<Variant>@ ids = variant.GetVariantVector();
         for (uint i = 0; i < ids.length; ++i)
         {
             Node@ node = editorScene.GetNode(ids[i].GetUInt());
@@ -276,17 +294,21 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
                 ret.Push(node);
         }
     }
-    if (attrEdit.vars.Contains("ComponentIDs"))
+    else
     {
-        Array<Variant>@ ids = attrEdit.vars["ComponentIDs"].GetVariantVector();
-        for (uint i = 0; i < ids.length; ++i)
+        variant = attrEdit.GetVar(COMPONENT_IDS_VAR);
+        if (!variant.empty)
         {
-            Component@ component = editorScene.GetComponent(ids[i].GetUInt());
-            if (component !is null)
-                ret.Push(component);
+            Array<Variant>@ ids = variant.GetVariantVector();
+            for (uint i = 0; i < ids.length; ++i)
+            {
+                Component@ component = editorScene.GetComponent(ids[i].GetUInt());
+                if (component !is null)
+                    ret.Push(component);
+            }
         }
     }
-    
+
     return ret;
 }
 
@@ -296,7 +318,7 @@ void CreateNewVariable(StringHash eventType, VariantMap& eventData)
         return;
 
     DropDownList@ dropDown = eventData["Element"].GetUIElement();
-    LineEdit@ nameEdit = nodeWindow.GetChild("VarNameEdit", true);
+    LineEdit@ nameEdit = attributeInspectorWindow.GetChild("VarNameEdit", true);
     String sanitatedVarName = nameEdit.text.Trimmed().Replaced(";", "");
     if (sanitatedVarName.empty)
         return;
@@ -326,14 +348,14 @@ void CreateNewVariable(StringHash eventType, VariantMap& eventData)
         break;
     }
 
-    // If we overwrite an existing variable, must recreate the editor(s) for the correct type
+    // If we overwrite an existing variable, must recreate the attribute-editor(s) for the correct type
     bool overwrite = false;
     for (uint i = 0; i < editNodes.length; ++i)
     {
         overwrite = overwrite || editNodes[i].vars.Contains(sanitatedVarName);
         editNodes[i].vars[sanitatedVarName] = newValue;
     }
-    UpdateAttributes(overwrite);
+    UpdateAttributeInspector(overwrite);
 }
 
 void DeleteVariable(StringHash eventType, VariantMap& eventData)
@@ -341,7 +363,7 @@ void DeleteVariable(StringHash eventType, VariantMap& eventData)
     if (editNodes.length == 0)
         return;
 
-    LineEdit@ nameEdit = nodeWindow.GetChild("VarNameEdit", true);
+    LineEdit@ nameEdit = attributeInspectorWindow.GetChild("VarNameEdit", true);
     String sanitatedVarName = nameEdit.text.Trimmed().Replaced(";", "");
     if (sanitatedVarName.empty)
         return;
@@ -353,5 +375,5 @@ void DeleteVariable(StringHash eventType, VariantMap& eventData)
         erased = editNodes[i].vars.Erase(sanitatedVarName) || erased;
     }
     if (erased)
-        UpdateAttributes(false);
+        UpdateAttributeInspector(false);
 }

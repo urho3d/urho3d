@@ -419,6 +419,12 @@ static void RegisterWindow(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Window", "bool get_resizable() const", asMETHOD(Window, IsResizable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void set_resizeBorder(const IntRect&in)", asMETHODPR(Window, SetResizeBorder, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "const IntRect& get_resizeBorder() const", asMETHOD(Window, GetResizeBorder), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Window", "void set_modal(bool)", asMETHOD(Window, SetModal), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Window", "bool get_modal() const", asMETHOD(Window, IsModal), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Window", "void set_modalFrameColor(const Color&in)", asMETHOD(Window, SetModalFrameColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Window", "const Color& get_modalFrameColor() const", asMETHOD(Window, GetModalFrameColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Window", "void set_modalFrameSize(const IntVector2&in)", asMETHOD(Window, SetModalFrameSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Window", "const IntVector2& get_modalFrameSize() const", asMETHOD(Window, GetModalFrameSize), asCALL_THISCALL);
 }
 
 static void FileSelectorSetFilters(CScriptArray* filters, unsigned defaultIndex, FileSelector* ptr)
@@ -535,6 +541,7 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "IntVector2 get_cursorPosition()", asMETHOD(UI, GetCursorPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_focusElement(UIElement@+)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_focusElement() const", asMETHOD(UI, GetFocusElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ get_modalElement() const", asMETHOD(UI, GetModalElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHOD(UI, GetFrontElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHOD(UI, GetRoot), asCALL_THISCALL);
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);

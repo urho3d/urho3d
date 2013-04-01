@@ -25,6 +25,7 @@
 #include "InputEvents.h"
 #include "Log.h"
 #include "Menu.h"
+#include "UI.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
@@ -362,7 +363,14 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     // Activate if accelerator key pressed
     if (eventData[P_KEY].GetInt() == acceleratorKey_ && (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetInt() ==
         acceleratorQualifiers_) && eventData[P_REPEAT].GetBool() == false)
+    {
+        // Ignore if UI has modal element
+        UI* ui = GetSubsystem<UI>();
+        if (ui->GetModalElement())
+            return;
+
         HandlePressedReleased(eventType, eventData);
+    }
 }
 
 }

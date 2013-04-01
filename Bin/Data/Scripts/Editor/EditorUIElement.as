@@ -11,8 +11,8 @@ Array<UIElement@> editUIElements;
 
 bool suppressUIElementChanges = false;
 
-const String FILENAME_VAR("__fileName");
-const String MODIFIED_VAR("__modified");
+const ShortStringHash FILENAME_VAR("__FileName");
+const ShortStringHash MODIFIED_VAR("__Modified");
 
 void ClearUIElementSelection()
 {
@@ -21,15 +21,15 @@ void ClearUIElementSelection()
     editUIElements.Clear();
 }
 
-void CreateUIElement()
+void CreateRootUIElement()
 {
     // Create a root UIElement only once here, do not confuse this with ui.root itself
     editorUIElement = ui.root.CreateChild("UIElement");
     editorUIElement.name = "UI";
     editorUIElement.SetSize(graphics.width, graphics.height);
-    editorUIElement.traversalMode = TM_DEPTH_FIRST;
+    editorUIElement.traversalMode = TM_DEPTH_FIRST;     // This is needed for root element to prevent artifacts
 
-    UpdateHierarchyWindowItem(editorUIElement);
+    UpdateHierarchyItem(editorUIElement);
 }
 
 bool NewUIElement()
@@ -74,18 +74,20 @@ void OpenUIElement(const String&in fileName)
 
     suppressUIElementChanges = true;
 
-    // If uiElementDefaultStyle is not set then use the editor's own default style
+    // If uiElementDefaultStyle is not set then automatically fallback to use the editor's own default style
     UIElement@ element = ui.LoadLayout(xmlFile, uiElementDefaultStyle);
     if (element !is null)
     {
         element.vars[FILENAME_VAR] = fileName;
         element.vars[MODIFIED_VAR] = false;
+
+        // \todo: should not always centered
         CenterDialog(element);
         editorUIElement.AddChild(element);
     }
 
-    UpdateHierarchyWindowItem(element, true);
-    UpdateNodeWindow();
+    UpdateHierarchyItem(element, true);
+    UpdateAttributeInspector();
 
     suppressSceneChanges = false;
 }
@@ -97,27 +99,28 @@ bool CloseUIElement()
     for (uint i = 0; i < selectedUIElements.length; ++i)
     {
         UIElement@ element = selectedUIElements[i];
-        while (!element.vars.Contains("FILENAME_VAR"))
+        while (!element.vars.Contains(FILENAME_VAR))
             element = element.parent;
         element.Remove();
-        UpdateHierarchyWindowItem(element);
+
+        UpdateHierarchyItem(GetListIndex(element), null, null);
     }
 
     suppressUIElementChanges = false;
-    
+
     return true;
 }
 
 bool CloseAllUIElements()
 {
     suppressUIElementChanges = true;
-    
+
     editorUIElement.RemoveAllChildren();
-    UpdateHierarchyWindowItem(editorUIElement, true);
-    UpdateNodeWindow();
+    UpdateHierarchyItem(editorUIElement, true);
+    UpdateAttributeInspector();
 
     suppressUIElementChanges = false;
-    
+
     return true;
 }
 

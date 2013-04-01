@@ -8,9 +8,16 @@ const uint NO_ITEM = M_MAX_UNSIGNED;
 const ShortStringHash SCENE_TYPE("Scene");
 const ShortStringHash NODE_TYPE("Node");
 const String NO_CHANGE(uint8(0));
+const ShortStringHash TYPE_VAR("Type");
+const ShortStringHash NODE_ID_VAR("NodeID");
+const ShortStringHash COMPONENT_ID_VAR("ComponentID");
+const ShortStringHash UI_ELEMENT_ID_VAR("__UIElementID");
 
 Window@ hierarchyWindow;
 ListView@ hierarchyList;
+
+// UIElement does not have unique ID, so use a running number to generate a new ID each time an item is inserted into hierarchy list
+uint uiElementNextID = 0;
 
 void CreateHierarchyWindow()
 {
@@ -18,7 +25,7 @@ void CreateHierarchyWindow()
         return;
 
     hierarchyWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSceneWindow.xml"));
-    hierarchyList = hierarchyWindow.GetChild("NodeList");
+    hierarchyList = hierarchyWindow.GetChild("HierarchyList");
     ui.root.AddChild(hierarchyWindow);
     int height = Min(ui.root.height - 60, 500);
     hierarchyWindow.SetSize(300, height);
@@ -26,7 +33,7 @@ void CreateHierarchyWindow()
     hierarchyWindow.opacity = uiMaxOpacity;
     hierarchyWindow.BringToFront();
 
-    UpdateHierarchyWindowItem(editorScene);
+    UpdateHierarchyItem(editorScene);
 
     DropDownList@ newNodeList = hierarchyWindow.GetChild("NewNodeList", true);
     Array<String> newNodeChoices = {"Replicated", "Local"};
@@ -108,7 +115,7 @@ void EnableExpandCollapseButtons(bool enable)
     }
 }
 
-void UpdateHierarchyWindowItem(Serializable@ serializable, bool clear = false)
+void UpdateHierarchyItem(Serializable@ serializable, bool clear = false)
 {
     if (clear)
     {
@@ -126,15 +133,15 @@ void UpdateHierarchyWindowItem(Serializable@ serializable, bool clear = false)
     else if (serializable !is editorUIElement)
         parent = cast<UIElement>(serializable).parent;
     UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
-    UpdateHierarchyWindowItem(GetListIndex(serializable), serializable, parentItem);
+    UpdateHierarchyItem(GetListIndex(serializable), serializable, parentItem);
 }
 
-uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIElement@ parentItem)
+uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ parentItem)
 {
     // Whenever we're updating, disable layout update to optimize speed
     hierarchyList.contentElement.DisableLayoutUpdate();
 
-    String idVar;
+    ShortStringHash idVar;
     Variant id;
     int itemType = ITEM_NONE;
     if (serializable !is null)
@@ -191,7 +198,7 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
         for (uint i = 0; i < node.numChildren; ++i)
         {
             Node@ childNode = node.children[i];
-            itemIndex = UpdateHierarchyWindowItem(itemIndex, childNode, text);
+            itemIndex = UpdateHierarchyItem(itemIndex, childNode, text);
         }
     }
     else
@@ -205,7 +212,7 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
         for (uint i = 0; i < element.numChildren; ++i)
         {
             UIElement@ childElement = element.children[i];
-            itemIndex = UpdateHierarchyWindowItem(itemIndex, childElement, text);
+            itemIndex = UpdateHierarchyItem(itemIndex, childElement, text);
         }
     }
 
@@ -216,7 +223,7 @@ uint UpdateHierarchyWindowItem(uint itemIndex, Serializable@ serializable, UIEle
     return itemIndex;
 }
 
-void UpdateHierarchyWindowItemText(uint itemIndex, bool iconEnabled, const String&in textTitle = NO_CHANGE)
+void UpdateHierarchyItemText(uint itemIndex, bool iconEnabled, const String&in textTitle = NO_CHANGE)
 {
     Text@ text = hierarchyList.items[itemIndex];
     if (text is null)
@@ -232,9 +239,9 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
 {
     Text@ text = Text();
     text.SetStyle(uiStyle, "FileSelectorListText");
-    text.vars["Type"] = ITEM_COMPONENT;
-    text.vars["NodeID"] = component.node.id;
-    text.vars["ComponentID"] = component.id;
+    text.vars[TYPE_VAR] = ITEM_COMPONENT;
+    text.vars[NODE_ID_VAR] = component.node.id;
+    text.vars[COMPONENT_ID_VAR] = component.id;
     text.text = GetComponentTitle(component);
 
     hierarchyList.InsertItem(compItemIndex, text, parentItem);
@@ -246,35 +253,37 @@ void SetID(Text@ text, Serializable@ serializable)
 {
     if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
     {
-        text.vars["Type"] = ITEM_NODE;
-        text.vars["NodeID"] = cast<Node>(serializable).id;
+        text.vars[TYPE_VAR] = ITEM_NODE;
+        text.vars[NODE_ID_VAR] = cast<Node>(serializable).id;
     }
     else
     {
-        text.vars["Type"] = ITEM_UI_ELEMENT;
-        text.vars["ElementName"] = cast<UIElement>(serializable).name;
+        text.vars[TYPE_VAR] = ITEM_UI_ELEMENT;
+        // Store the generated ID into both the variant map of the actual object and the text item
+        cast<UIElement>(serializable).vars[UI_ELEMENT_ID_VAR] = uiElementNextID;
+        text.vars[UI_ELEMENT_ID_VAR] = uiElementNextID++;
     }
 }
 
-void GetID(Serializable@ serializable, String& idVar, Variant& id, int& itemType)
+void GetID(Serializable@ serializable, ShortStringHash& idVar, Variant& id, int& itemType)
 {
     if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
     {
-        idVar = "NodeID";
+        idVar = NODE_ID_VAR;
         id = Variant(cast<Node>(serializable).id);
         itemType = ITEM_NODE;
     }
     else
     {
-        idVar = "ElementName";
-        id = Variant(cast<UIElement>(serializable).name);
+        idVar = UI_ELEMENT_ID_VAR;
+        id = cast<UIElement>(serializable).vars[UI_ELEMENT_ID_VAR];
         itemType = ITEM_UI_ELEMENT;
     }
 }
 
-bool MatchID(UIElement@ element, const String&in idVar, const Variant&in id, int itemType)
+bool MatchID(UIElement@ element, const ShortStringHash&in idVar, const Variant&in id, int itemType)
 {
-    return element.vars["Type"].GetInt() == itemType && element.vars[idVar] == id;
+    return element.vars[TYPE_VAR].GetInt() == itemType && element.vars[idVar] == id;
 }
 
 uint GetListIndex(Serializable@ serializable)
@@ -284,7 +293,7 @@ uint GetListIndex(Serializable@ serializable)
 
     uint numItems = hierarchyList.numItems;
 
-    String idVar;
+    ShortStringHash idVar;
     Variant id;
     int itemType = ITEM_NONE;
     GetID(serializable, idVar, id, itemType);
@@ -299,13 +308,22 @@ uint GetListIndex(Serializable@ serializable)
     return NO_ITEM;
 }
 
+UIElement@ GetListUIElement(uint index)
+{
+    UIElement@ item = hierarchyList.items[index];
+    if (item is null)
+        return null;
+
+    return editorUIElement.GetChild(UI_ELEMENT_ID_VAR, item.vars[UI_ELEMENT_ID_VAR], true);
+}
+
 Node@ GetListNode(uint index)
 {
     UIElement@ item = hierarchyList.items[index];
     if (item is null)
         return null;
 
-    return editorScene.GetNode(item.vars["NodeID"].GetUInt());
+    return editorScene.GetNode(item.vars[NODE_ID_VAR].GetUInt());
 }
 
 Component@ GetListComponent(uint index)
@@ -319,10 +337,10 @@ Component@ GetListComponent(UIElement@ item)
     if (item is null)
         return null;
 
-    if (item.vars["Type"].GetInt() != ITEM_COMPONENT)
+    if (item.vars[TYPE_VAR].GetInt() != ITEM_COMPONENT)
         return null;
 
-    return editorScene.GetComponent(item.vars["ComponentID"].GetUInt());
+    return editorScene.GetComponent(item.vars[COMPONENT_ID_VAR].GetUInt());
 }
 
 uint GetComponentListIndex(Component@ component)
@@ -334,7 +352,7 @@ uint GetComponentListIndex(Component@ component)
     for (uint i = 0; i < numItems; ++i)
     {
         UIElement@ item = hierarchyList.items[i];
-        if (item.vars["Type"].GetInt() == ITEM_COMPONENT && item.vars["ComponentID"].GetUInt() == component.id)
+        if (item.vars[TYPE_VAR].GetInt() == ITEM_COMPONENT && item.vars[COMPONENT_ID_VAR].GetUInt() == component.id)
             return i;
     }
 
@@ -488,7 +506,7 @@ void HandleHierarchyListSelectionChange()
     {
         uint index = indices[i];
         UIElement@ item = hierarchyList.items[index];
-        int type = item.vars["Type"].GetInt();
+        int type = item.vars[TYPE_VAR].GetInt();
         if (type == ITEM_COMPONENT)
         {
             Component@ comp = GetListComponent(index);
@@ -501,11 +519,19 @@ void HandleHierarchyListSelectionChange()
             if (node !is null)
                 selectedNodes.Push(node);
         }
+        else if (type == ITEM_UI_ELEMENT)
+        {
+            UIElement@ element = GetListUIElement(index);
+            if (element !is null && element !is editorUIElement)
+                selectedUIElements.Push(element);
+        }
     }
 
-    // If only one node selected, use it for editing
+    // If only one node/UIElement selected, use it for editing
     if (selectedNodes.length == 1)
         editNode = selectedNodes[0];
+    if (selectedUIElements.length == 1)
+        editUIElement = selectedUIElements[0];
 
     // If selection contains only components, and they have a common node, use it for editing
     if (selectedNodes.empty && !selectedComponents.empty)
@@ -589,8 +615,13 @@ void HandleHierarchyListSelectionChange()
             editNodes.Erase(0);
     }
 
+    if (selectedUIElements.empty && editUIElement !is null)
+        editUIElements.Push(editUIElement);
+    else
+        editUIElements = selectedUIElements;
+
     PositionGizmo();
-    UpdateNodeWindow();
+    UpdateAttributeInspector();
 }
 
 void HandleHierarchyListItemDoubleClick(StringHash eventType, VariantMap& eventData)
@@ -615,8 +646,8 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     if (!accept)
         return;
 
-    Node@ sourceNode = editorScene.GetNode(source.vars["NodeID"].GetUInt());
-    Node@ targetNode = editorScene.GetNode(target.vars["NodeID"].GetUInt());
+    Node@ sourceNode = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
+    Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetUInt());
 
     // If target is null, parent to scene
     if (targetNode is null)
@@ -635,10 +666,12 @@ bool TestDragDrop(UIElement@ source, UIElement@ target)
     // Test for validity of reparenting by drag and drop
     Node@ sourceNode;
     Node@ targetNode;
-    if (source.vars.Contains("NodeID"))
-        sourceNode = editorScene.GetNode(source.vars["NodeID"].GetUInt());
-    if (target.vars.Contains("NodeID"))
-        editorScene.GetNode(target.vars["NodeID"].GetUInt());
+    Variant variant = source.GetVar(NODE_ID_VAR);
+    if (!variant.empty)
+        sourceNode = editorScene.GetNode(variant.GetUInt());
+    variant = target.GetVar(NODE_ID_VAR);
+    if (!variant.empty)
+        targetNode = editorScene.GetNode(variant.GetUInt());
 
     if (sourceNode is null)
         return false;
@@ -739,7 +772,7 @@ void HandleNodeAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetNode();
-    UpdateHierarchyWindowItem(node);
+    UpdateHierarchyItem(node);
 }
 
 void HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
@@ -749,7 +782,7 @@ void HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 
     Node@ node = eventData["Node"].GetNode();
     uint index = GetListIndex(node);
-    UpdateHierarchyWindowItem(index, null, null);
+    UpdateHierarchyItem(index, null, null);
 }
 
 void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
@@ -758,7 +791,7 @@ void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetNode();
-    UpdateHierarchyWindowItem(node);
+    UpdateHierarchyItem(node);
 }
 
 void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
@@ -781,7 +814,7 @@ void HandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetNode();
-    UpdateHierarchyWindowItemText(GetListIndex(node), node.enabled, GetNodeTitle(node));
+    UpdateHierarchyItemText(GetListIndex(node), node.enabled, GetNodeTitle(node));
 }
 
 void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
@@ -790,7 +823,7 @@ void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetNode();
-    UpdateHierarchyWindowItemText(GetListIndex(node), node.enabled);
+    UpdateHierarchyItemText(GetListIndex(node), node.enabled);
     attributesDirty = true;
 }
 
@@ -800,6 +833,6 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
         return;
 
     Component@ component = eventData["Component"].GetComponent();
-    UpdateHierarchyWindowItemText(GetComponentListIndex(component), component.enabledEffective);
+    UpdateHierarchyItemText(GetComponentListIndex(component), component.enabledEffective);
     attributesDirty = true;
 }

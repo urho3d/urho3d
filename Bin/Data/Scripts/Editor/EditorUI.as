@@ -12,7 +12,7 @@ const ShortStringHash TEXT_TYPE("Text");
 const ShortStringHash CURSOR_TYPE("Cursor");
 
 const String TEMP_SCENE_NAME("_tempscene_.xml");
-const String CALLBACK_VAR("Callback");
+const ShortStringHash CALLBACK_VAR("Callback");
 
 const int SHOW_POPUP_INDICATOR = -1;
 
@@ -46,7 +46,7 @@ void CreateUI()
     CreateCursor();
     CreateMenuBar();
     CreateHierarchyWindow();
-    CreateNodeWindow();
+    CreateAttributeInspectorWindow();
     CreateEditorSettingsDialog();
     CreateEditorPreferencesDialog();
     CreateStatsBar();
@@ -181,12 +181,9 @@ void CreateMenuBar()
         Menu@ menu = CreateMenu("Create");
         Window@ popup = menu.popup;
         popup.vars["Popup"] = "Create";
-        popup.AddChild(CreateMenuItem("Box", @PickBuiltinObject));
-        popup.AddChild(CreateMenuItem("Cone", @PickBuiltinObject));
-        popup.AddChild(CreateMenuItem("Cylinder", @PickBuiltinObject));
-        popup.AddChild(CreateMenuItem("Plane", @PickBuiltinObject));
-        popup.AddChild(CreateMenuItem("Pyramid", @PickBuiltinObject));
-        popup.AddChild(CreateMenuItem("Sphere", @PickBuiltinObject));
+        String[] objects = { "Box", "Cone", "Cylinder", "Plane", "Pyramid", "Sphere" };
+        for (uint i = 0; i < objects.length; ++i)
+            popup.AddChild(CreateMenuItem(objects[i], @PickBuiltinObject));
         uiMenuBar.AddChild(menu);
     }
 
@@ -216,7 +213,7 @@ void CreateMenuBar()
         Window@ popup = menu.popup;
         popup.vars["Popup"] = "View";
         popup.AddChild(CreateMenuItem("Hierarchy", @ShowHierarchyWindow, 'H', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Attribute inspector", @ShowNodeWindow, 'I', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Attribute inspector", @ShowAttributeInspectorWindow, 'I', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
         popup.AddChild(CreateMenuDivider());
@@ -364,8 +361,9 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
     HandlePopup(menu);
 
     // Execute the callback if available
-    if (menu.vars.Contains(CALLBACK_VAR))
-        menuCallbacks[menu.vars[CALLBACK_VAR].GetUInt()]();
+    Variant variant = menu.GetVar(CALLBACK_VAR);
+    if (!variant.empty)
+        menuCallbacks[variant.GetUInt()]();
 }
 
 Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0)
@@ -521,7 +519,6 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     uiFileSelector.SetFilters(filters, initialFilter);
     uiFileSelector.window.vars["Popup"] = "FileSelector";
     uiFileSelector.window.priority = 1000;    // Ensure when it is visible then it has the highest priority (in front of all others UI)
-
     CenterDialog(uiFileSelector.window);
 }
 
@@ -886,5 +883,5 @@ void UpdateDirtyUI()
 {
     // Perform some event-triggered updates latently in case a large hierarchy was changed
     if (attributesDirty)
-        UpdateAttributes(false);
+        UpdateAttributeInspector(false);
 }

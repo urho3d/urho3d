@@ -73,8 +73,8 @@ bool ResetScene()
     runUpdate = false;
 
     UpdateWindowTitle();
-    UpdateHierarchyWindowItem(editorScene, true);
-    UpdateNodeWindow();
+    UpdateHierarchyItem(editorScene, true);
+    UpdateAttributeInspector();
 
     suppressSceneChanges = false;
 
@@ -145,8 +145,8 @@ bool LoadScene(const String&in fileName)
     runUpdate = false;
 
     UpdateWindowTitle();
-    UpdateHierarchyWindowItem(editorScene, true);
-    UpdateNodeWindow();
+    UpdateHierarchyItem(editorScene, true);
+    UpdateAttributeInspector();
 
     suppressSceneChanges = false;
 

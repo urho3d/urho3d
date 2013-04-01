@@ -46,7 +46,7 @@ enum WindowDragMode
 class Window : public BorderImage
 {
     OBJECT(Window);
-    
+
 public:
     /// Construct.
     Window(Context* context);
@@ -54,7 +54,10 @@ public:
     virtual ~Window();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
+    /// Return UI rendering batches.
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag begin.
@@ -63,21 +66,33 @@ public:
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag end.
     virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
-    
+
     /// Set whether can be moved.
     void SetMovable(bool enable);
     /// Set whether can be resized.
     void SetResizable(bool enable);
     /// Set resize area width at edges.
     void SetResizeBorder(const IntRect& rect);
-    
+    /// Set modal flag. When the modal flag is set, the focused window needs to be dismissed first to allow other UI elements to gain focus.
+    void SetModal(bool modal);
+    /// Set modal frame color.
+    void SetModalFrameColor(const Color& color);
+    /// Set modal frame size.
+    void SetModalFrameSize(const IntVector2& size);
+
     /// Return whether is movable.
     bool IsMovable() const { return movable_; }
     /// Return whether is resizable.
     bool IsResizable() const { return resizable_; }
     /// Return resize area width at edges.
     const IntRect& GetResizeBorder() const { return resizeBorder_; }
-    
+    /// Return modal flag.
+    bool IsModal() const { return modal_; }
+    /// Get modal frame color.
+    const Color& GetModalFrameColor() const { return modalFrameColor_; }
+    /// Get modal frame size.
+    const IntVector2& GetModalFrameSize() const { return modalFrameSize_; }
+
 protected:
     /// Identify drag mode (move/resize.)
     WindowDragMode GetDragMode(const IntVector2& position) const;
@@ -87,7 +102,7 @@ protected:
     void ValidatePosition();
     /// Check whether alignment supports moving and resizing.
     bool CheckAlignment() const;
-    
+
     /// Movable flag.
     bool movable_;
     /// Resizable flag.
@@ -102,6 +117,16 @@ protected:
     IntVector2 dragBeginPosition_;
     /// Original size at drag begin.
     IntVector2 dragBeginSize_;
+    /// Modal flag.
+    bool modal_;
+    /// Modal frame color, used when modal flag is set.
+    Color modalFrameColor_;
+    /// Modal frame size, used when modal flag is set.
+    IntVector2 modalFrameSize_;
+
+private:
+    /// Handle modal window being focused.
+    void HandleModalFocused(StringHash eventType, VariantMap& eventData);
 };
 
 }

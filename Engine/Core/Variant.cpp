@@ -62,38 +62,38 @@ static const String typeNames[] =
 Variant& Variant::operator = (const Variant& rhs)
 {
     SetType(rhs.GetType());
-    
+
     switch (type_)
     {
     case VAR_STRING:
         *(reinterpret_cast<String*>(&value_)) = *(reinterpret_cast<const String*>(&rhs.value_));
         break;
-        
+
     case VAR_BUFFER:
         *(reinterpret_cast<PODVector<unsigned char>*>(&value_)) = *(reinterpret_cast<const PODVector<unsigned char>*>(&rhs.value_));
         break;
-    
+
     case VAR_RESOURCEREF:
         *(reinterpret_cast<ResourceRef*>(&value_)) = *(reinterpret_cast<const ResourceRef*>(&rhs.value_));
         break;
-        
+
     case VAR_RESOURCEREFLIST:
         *(reinterpret_cast<ResourceRefList*>(&value_)) = *(reinterpret_cast<const ResourceRefList*>(&rhs.value_));
         break;
-        
+
     case VAR_VARIANTVECTOR:
         *(reinterpret_cast<VariantVector*>(&value_)) = *(reinterpret_cast<const VariantVector*>(&rhs.value_));
         break;
-        
+
     case VAR_VARIANTMAP:
         *(reinterpret_cast<VariantMap*>(&value_)) = *(reinterpret_cast<const VariantMap*>(&rhs.value_));
         break;
-        
+
     default:
         value_ = rhs.value_;
         break;
     }
-    
+
     return *this;
 }
 
@@ -101,57 +101,57 @@ bool Variant::operator == (const Variant& rhs) const
 {
     if (type_ != rhs.type_)
         return false;
-    
+
     switch (type_)
     {
     case VAR_INT:
         return value_.int_ == rhs.value_.int_;
-        
+
     case VAR_BOOL:
         return value_.bool_ == rhs.value_.bool_;
-        
+
     case VAR_FLOAT:
         return value_.float_ == rhs.value_.float_;
-        
+
     case VAR_VECTOR2:
         return *(reinterpret_cast<const Vector2*>(&value_)) == *(reinterpret_cast<const Vector2*>(&rhs.value_));
-        
+
     case VAR_VECTOR3:
         return *(reinterpret_cast<const Vector3*>(&value_)) == *(reinterpret_cast<const Vector3*>(&rhs.value_));
-        
+
     case VAR_VECTOR4:
     case VAR_QUATERNION:
     case VAR_COLOR:
         // Hack: use the Vector4 compare for all these classes, as they have the same memory structure
         return *(reinterpret_cast<const Vector4*>(&value_)) == *(reinterpret_cast<const Vector4*>(&rhs.value_));
-        
+
     case VAR_STRING:
         return *(reinterpret_cast<const String*>(&value_)) == *(reinterpret_cast<const String*>(&rhs.value_));
-        
+
     case VAR_BUFFER:
         return *(reinterpret_cast<const PODVector<unsigned char>*>(&value_)) == *(reinterpret_cast<const PODVector<unsigned char>*>(&rhs.value_));
-        
+
     case VAR_PTR:
         return value_.ptr_ == rhs.value_.ptr_;
-        
+
     case VAR_RESOURCEREF:
         return *(reinterpret_cast<const ResourceRef*>(&value_)) == *(reinterpret_cast<const ResourceRef*>(&rhs.value_));
-        
+
     case VAR_RESOURCEREFLIST:
         return *(reinterpret_cast<const ResourceRefList*>(&value_)) == *(reinterpret_cast<const ResourceRefList*>(&rhs.value_));
-        
+
     case VAR_VARIANTVECTOR:
         return *(reinterpret_cast<const VariantVector*>(&value_)) == *(reinterpret_cast<const VariantVector*>(&rhs.value_));
-        
+
     case VAR_VARIANTMAP:
         return *(reinterpret_cast<const VariantMap*>(&value_)) == *(reinterpret_cast<const VariantMap*>(&rhs.value_));
-        
+
     case VAR_INTRECT:
         return *(reinterpret_cast<const IntRect*>(&value_)) == *(reinterpret_cast<const IntRect*>(&rhs.value_));
-        
+
     case VAR_INTVECTOR2:
         return *(reinterpret_cast<const IntVector2*>(&value_)) == *(reinterpret_cast<const IntVector2*>(&rhs.value_));
-        
+
     default:
         return true;
     }
@@ -179,39 +179,39 @@ void Variant::FromString(VariantType type, const char* value)
     case VAR_INT:
         *this = ToInt(value);
         break;
-        
+
     case VAR_BOOL:
         *this = ToBool(value);
         break;
-        
+
     case VAR_FLOAT:
         *this = ToFloat(value);
         break;
-        
+
     case VAR_VECTOR2:
         *this = ToVector2(value);
         break;
-        
+
     case VAR_VECTOR3:
         *this = ToVector3(value);
         break;
-        
+
     case VAR_VECTOR4:
         *this = ToVector4(value);
         break;
-        
+
     case VAR_QUATERNION:
         *this = ToQuaternion(value);
         break;
-        
+
     case VAR_COLOR:
         *this = ToColor(value);
         break;
-        
+
     case VAR_STRING:
         *this = value;
         break;
-        
+
     case VAR_BUFFER:
         {
             SetType(VAR_BUFFER);
@@ -222,11 +222,11 @@ void Variant::FromString(VariantType type, const char* value)
                 buffer[i] = ToInt(values[i]);
         }
         break;
-        
+
     case VAR_PTR:
         *this = (void*)0;
         break;
-        
+
     case VAR_RESOURCEREF:
         {
             Vector<String> values = String::Split(value, ';');
@@ -239,7 +239,7 @@ void Variant::FromString(VariantType type, const char* value)
             }
         }
         break;
-        
+
     case VAR_RESOURCEREFLIST:
         {
             Vector<String> values = String::Split(value, ';');
@@ -254,15 +254,15 @@ void Variant::FromString(VariantType type, const char* value)
             }
         }
         break;
-        
+
     case VAR_INTRECT:
         *this = ToIntRect(value);
         break;
-        
+
     case VAR_INTVECTOR2:
         *this = ToIntVector2(value);
         break;
-        
+
     default:
         SetType(VAR_NONE);
     }
@@ -272,7 +272,7 @@ void Variant::SetBuffer(const void* data, unsigned size)
 {
     if (size && !data)
         size = 0;
-    
+
     SetType(VAR_BUFFER);
     PODVector<unsigned char>& buffer = *(reinterpret_cast<PODVector<unsigned char>*>(&value_));
     buffer.Resize(size);
@@ -291,31 +291,31 @@ String Variant::ToString() const
     {
     case VAR_INT:
         return String(value_.int_);
-        
+
     case VAR_BOOL:
         return String(value_.bool_);
-        
+
     case VAR_FLOAT:
         return String(value_.float_);
-        
+
     case VAR_VECTOR2:
         return (reinterpret_cast<const Vector2*>(&value_))->ToString();
-        
+
     case VAR_VECTOR3:
         return (reinterpret_cast<const Vector3*>(&value_))->ToString();
-        
+
     case VAR_VECTOR4:
         return (reinterpret_cast<const Vector4*>(&value_))->ToString();
-        
+
     case VAR_QUATERNION:
         return (reinterpret_cast<const Quaternion*>(&value_))->ToString();
-        
+
     case VAR_COLOR:
         return (reinterpret_cast<const Color*>(&value_))->ToString();
-        
+
     case VAR_STRING:
         return *(reinterpret_cast<const String*>(&value_));
-        
+
     case VAR_BUFFER:
         {
             const PODVector<unsigned char>& buffer = *(reinterpret_cast<const PODVector<unsigned char>*>(&value_));
@@ -328,17 +328,17 @@ String Variant::ToString() const
             }
             return ret;
         }
-        
+
     case VAR_PTR:
         // Pointer serialization not supported (convert to null)
         return String(0);
-        
+
     case VAR_INTRECT:
         return (reinterpret_cast<const IntRect*>(&value_))->ToString();
-        
+
     case VAR_INTVECTOR2:
         return (reinterpret_cast<const IntVector2*>(&value_))->ToString();
-        
+
     default:
         // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_VARIANTMAP
         // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
@@ -353,41 +353,41 @@ bool Variant::IsZero() const
     {
     case VAR_INT:
         return value_.int_ == 0;
-        
+
     case VAR_BOOL:
         return value_.bool_ == false;
-        
+
     case VAR_FLOAT:
         return value_.float_ == 0.0f;
-        
+
     case VAR_VECTOR2:
         return *reinterpret_cast<const Vector2*>(&value_) == Vector2::ZERO;
-        
+
     case VAR_VECTOR3:
         return *reinterpret_cast<const Vector3*>(&value_) == Vector3::ZERO;
-        
+
     case VAR_VECTOR4:
         return *reinterpret_cast<const Vector4*>(&value_) == Vector4::ZERO;
-        
+
     case VAR_QUATERNION:
         return *reinterpret_cast<const Quaternion*>(&value_) == Quaternion::IDENTITY;
-        
+
     case VAR_COLOR:
         // WHITE is considered empty (i.e. default) color in the Color class definition
         return *reinterpret_cast<const Color*>(&value_) == Color::WHITE;
-        
+
     case VAR_STRING:
         return reinterpret_cast<const String*>(&value_)->Empty();
-        
+
     case VAR_BUFFER:
         return reinterpret_cast<const PODVector<unsigned char>*>(&value_)->Empty();
-        
+
     case VAR_PTR:
         return value_.ptr_ == 0;
-        
+
     case VAR_RESOURCEREF:
         return reinterpret_cast<const ResourceRef*>(&value_)->id_ == StringHash::ZERO;
-        
+
     case VAR_RESOURCEREFLIST:
     {
         Vector<StringHash> ids = reinterpret_cast<const ResourceRefList*>(&value_)->ids_;
@@ -398,21 +398,21 @@ bool Variant::IsZero() const
         }
         return true;
     }
-    
+
     case VAR_VARIANTVECTOR:
         return reinterpret_cast<const VariantVector*>(&value_)->Empty();
-        
+
     case VAR_VARIANTMAP:
         return reinterpret_cast<const VariantMap*>(&value_)->Empty();
-        
+
     case VAR_INTRECT:
         return *reinterpret_cast<const IntRect*>(&value_) == IntRect::ZERO;
-        
+
     case VAR_INTVECTOR2:
         return *reinterpret_cast<const IntVector2*>(&value_) == IntVector2::ZERO;
-        
+
     default:
-        return false;
+        return true;
     }
 }
 
@@ -420,65 +420,65 @@ void Variant::SetType(VariantType newType)
 {
     if (type_ == newType)
         return;
-    
+
     switch (type_)
     {
     case VAR_STRING:
         (reinterpret_cast<String*>(&value_))->~String();
         break;
-        
+
     case VAR_BUFFER:
         (reinterpret_cast<PODVector<unsigned char>*>(&value_))->~PODVector<unsigned char>();
         break;
-        
+
     case VAR_RESOURCEREF:
         (reinterpret_cast<ResourceRef*>(&value_))->~ResourceRef();
         break;
-        
+
     case VAR_RESOURCEREFLIST:
         (reinterpret_cast<ResourceRefList*>(&value_))->~ResourceRefList();
         break;
-        
+
     case VAR_VARIANTVECTOR:
         (reinterpret_cast<VariantVector*>(&value_))->~VariantVector();
         break;
-        
+
     case VAR_VARIANTMAP:
         (reinterpret_cast<VariantMap*>(&value_))->~VariantMap();
         break;
-        
+
     default:
         break;
     }
-    
+
     type_ = newType;
-    
+
     switch (type_)
     {
     case VAR_STRING:
         new(reinterpret_cast<String*>(&value_)) String();
         break;
-        
+
     case VAR_BUFFER:
         new(reinterpret_cast<PODVector<unsigned char>*>(&value_)) PODVector<unsigned char>();
         break;
-        
+
     case VAR_RESOURCEREF:
         new(reinterpret_cast<ResourceRef*>(&value_)) ResourceRef();
         break;
-        
+
     case VAR_RESOURCEREFLIST:
         new(reinterpret_cast<ResourceRefList*>(&value_)) ResourceRefList();
         break;
-        
+
     case VAR_VARIANTVECTOR:
         new(reinterpret_cast<VariantVector*>(&value_)) VariantVector();
         break;
-        
+
     case VAR_VARIANTMAP:
         new(reinterpret_cast<VariantMap*>(&value_)) VariantMap();
         break;
-        
+
     default:
         break;
     }
@@ -648,7 +648,7 @@ VariantType Variant::GetTypeFromName(const char* typeName)
             return (VariantType)index;
         ++index;
     }
-    
+
     return VAR_NONE;
 }
 
