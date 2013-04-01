@@ -119,7 +119,7 @@ SendEvent("Update", eventData);
 Because the \ref Object::SendEvent "SendEvent()" function is public, an event can be "masqueraded" as originating from any object, even when not actually sent by that object's member function code. This can be used to simplify communication, particularly between components in the scene. For example, the \ref Physics "physics simulation" signals collision events by using the participating \ref Node "scene nodes" as senders. This means that any component can easily subscribe to its own node's collisions without having to know of the actual physics components involved. The same principle can also be used in any game-specific messaging, for example making a "damage received" event originate from the scene node, though it itself has no concept of damage or health.
 
 
-\page MainLoop Engine initialization, main loop and frame update
+\page MainLoop Engine initialization and main loop
 
 Before an Urho3D program can enter its main loop, the Engine subsystem object must be created and initialized by calling its \ref Engine::Initialize "Initialize()" function. During initialization the engine creates the rest of the subsystems. Parameters sent in a VariantMap can be used to direct how the Engine initializes itself and the subsystems. One way to configure the parameters is to parse them from the command line like Urho3D.exe does: this is accomplished by the helper function \ref Engine::ParseParameters "ParseParameters()".
 
