@@ -128,12 +128,13 @@ The full list of supported parameters, their datatypes and default values:
 - Headless (bool) Headless mode enable. Default false.
 - LogLevel (int) %Log verbosity level. Default LOG_INFO in release builds and LOG_DEBUG in debug builds.
 - LogQuiet (bool) %Log quiet mode, ie. to not write warning/info/debug log entries into standard output. Default false.
+- LogName (string) %Log filename. Default "Urho3D.log".
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
-- ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "CoreData;Data"
+- ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "CoreData;Data".
 - ResourcePackages (string) A semicolon-separated list of resource paths to use. Default empty.
 - ForceSM2 (bool) Whether to force %Shader %Model 2, effective in Direct3D9 mode only. Default false.
-- ExternalWindow (void ptr) External window handle to use instead of creating a rendering window. Default null.
+- ExternalWindow (void ptr) External window handle to use instead of creating an application window. Default null.
 - WindowTitle (string) %Window title. Default "Urho3D".
 - WindowWidth (int) %Window horizontal dimension. Default 0 (use desktop resolution, or 1024 in windowed mode.)
 - WindowHeight (int) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode.)
@@ -175,7 +176,7 @@ Variable timestep logic updates are preferable to fixed timestep, because they a
 
 \section MainLoop_ApplicationState Main loop and the application activation state
 
-The window's state (has input focus, minimized or not) can be queried from the Input subsystem. It can also effect the main loop in the following ways:
+The application window's state (has input focus, minimized or not) can be queried from the Input subsystem. It can also effect the main loop in the following ways:
 
 - Rendering is always skipped when the window is minimized.
 
