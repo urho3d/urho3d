@@ -450,7 +450,11 @@ bool ScenePaste()
 
             newComponent.LoadXML(rootElem);
             newComponent.ApplyAttributes();
-            SetSceneModified();
+            
+            // Create an undo action
+            CreateComponentAction action;
+            action.Define(newComponent);
+            group.actions.Push(action);
         }
         else if (mode == "node")
         {
@@ -459,7 +463,7 @@ bool ScenePaste()
             Node@ newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
             newNode.LoadXML(rootElem);
 
-            // Create an undo action for the paste
+            // Create an undo action
             CreateNodeAction action;
             action.Define(newNode);
             group.actions.Push(action);
