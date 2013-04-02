@@ -8,6 +8,7 @@ XMLFile@ componentXMLResource;
 
 bool applyMaterialList = true;
 bool attributesDirty = false;
+bool attributesFullDirty = false;
 
 const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
 const ShortStringHash NODE_IDS_VAR("NodeIDs");
@@ -130,6 +131,8 @@ Array<Serializable@> ToSerializableArray(Array<Node@> nodes)
 void UpdateAttributeInspector(bool fullUpdate = true)
 {
     attributesDirty = false;
+    if (fullUpdate)
+        attributesFullDirty = false;
 
     // If full update delete all containers and added them back as necessary
     if (fullUpdate)
@@ -291,20 +294,32 @@ void UpdateAttributeInspectorIcons()
     }
 }
 
-void PostEditAttribute(Array<Serializable@>@ serializables, uint index)
+void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Array<Variant>& oldValues)
+{
+    // Create undo actions for the edits
+    EditActionGroup group;
+    for (uint i = 0; i < serializables.length; ++i)
+    {
+        EditAttributeAction action;
+        action.Define(serializables[i], index, oldValues[i]);
+        group.actions.Push(action);
+    }
+    
+    SaveEditActionGroup(group);
+
+    for (uint i = 0; i < serializables.length; ++i)
+        PostEditAttribute(serializables[i], index);
+}
+
+void PostEditAttribute(Serializable@ serializable, uint index)
 {
     // If a StaticModel/AnimatedModel/Skybox model was changed, apply a possibly different material list
-    if (applyMaterialList && serializables[0].attributeInfos[index].name == "Model")
+    if (applyMaterialList && serializable.attributeInfos[index].name == "Model")
     {
-        for (uint i = 0; i < serializables.length; ++i)
-        {
-            StaticModel@ staticModel = cast<StaticModel>(serializables[i]);
-            if (staticModel !is null)
-                ApplyMaterialList(staticModel);
-        }
+        StaticModel@ staticModel = cast<StaticModel>(serializable);
+        if (staticModel !is null)
+            ApplyMaterialList(staticModel);
     }
-
-    SetSceneModified();
 }
 
 void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializables)

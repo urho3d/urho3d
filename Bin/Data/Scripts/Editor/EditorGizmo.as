@@ -9,6 +9,11 @@ const float rotSensitivity = 50.0;
 
 EditMode lastGizmoMode;
 
+// For undo
+bool previousGizmoDrag;
+bool needGizmoUndo;
+Array<Transform> oldGizmoTransforms;
+
 class GizmoAxis
 {
     Ray axisRay;
@@ -196,7 +201,11 @@ void GizmoMoved()
 void UseGizmo()
 {
     if (gizmo is null || !gizmo.enabled || editMode == EDIT_SELECT)
+    {
+        StoreGizmoEditActions();
+        previousGizmoDrag = false;
         return;
+    }
 
     IntVector2 pos = ui.cursorPosition;
     if (ui.GetElementAt(pos) !is null)
@@ -231,6 +240,14 @@ void UseGizmo()
 
     if (drag)
     {
+        // Store initial transforms for undo when gizmo drag started
+        if (!previousGizmoDrag)
+        {
+            oldGizmoTransforms.Resize(editNodes.length);
+            for (uint i = 0; i < editNodes.length; ++i)
+                oldGizmoTransforms[i].Define(editNodes[i]);
+        }
+
         bool moved = false;
 
         if (editMode == EDIT_MOVE)
@@ -281,8 +298,16 @@ void UseGizmo()
         {
             GizmoMoved();
             UpdateNodeAttributes();
+            needGizmoUndo = true;
         }
     }
+    else
+    {
+        if (previousGizmoDrag)
+            StoreGizmoEditActions();
+    }
+
+    previousGizmoDrag = drag;
 }
 
 bool IsGizmoSelected()
@@ -420,4 +445,23 @@ bool ScaleNodes(Vector3 adjust)
     }
 
     return moved;
+}
+
+void StoreGizmoEditActions()
+{
+    if (needGizmoUndo && editNodes.length > 0 && oldGizmoTransforms.length == editNodes.length)
+    {
+        EditActionGroup group;
+        
+        for (uint i = 0; i < editNodes.length; ++i)
+        {
+            EditNodeTransformAction action;
+            action.Define(editNodes[i], oldGizmoTransforms[i]);
+            group.actions.Push(action);
+        }
+        
+        SaveEditActionGroup(group);
+    }
+
+    needGizmoUndo = false;
 }

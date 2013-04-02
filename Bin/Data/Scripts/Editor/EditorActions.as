@@ -149,7 +149,8 @@ class CreateComponentAction : EditAction
         Node@ node = editorScene.GetNode(nodeID);
         if (node !is null)
         {
-            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), componentID < FIRST_LOCAL_ID ? REPLICATED : LOCAL, componentID);
+            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), componentID < FIRST_LOCAL_ID ?
+                REPLICATED : LOCAL, componentID);
             component.LoadXML(componentData.root);
             component.ApplyAttributes();
         }
@@ -177,7 +178,8 @@ class DeleteComponentAction : EditAction
         Node@ node = editorScene.GetNode(nodeID);
         if (node !is null)
         {
-            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), componentID < FIRST_LOCAL_ID ? REPLICATED : LOCAL, componentID);
+            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), componentID < FIRST_LOCAL_ID ?
+                REPLICATED : LOCAL, componentID);
             component.LoadXML(componentData.root);
             component.ApplyAttributes();
         }
@@ -191,6 +193,169 @@ class DeleteComponentAction : EditAction
         {
             ClearSceneSelection();
             node.RemoveComponent(component);
+        }
+    }
+}
+
+enum AttributeTargetType
+{
+    TARGET_NODE,
+    TARGET_COMPONENT,
+    TARGET_UIELEMENT
+}
+
+class EditAttributeAction : EditAction
+{
+    // \todo How to identify UI elements for undo/redo? They don't have IDs
+    uint targetID;
+    AttributeTargetType targetType;
+    uint attrIndex;
+    Variant undoValue;
+    Variant redoValue;
+
+    void Define(Serializable@ target, uint index, const Variant&in oldValue)
+    {
+        attrIndex = index;
+        undoValue = oldValue;
+        redoValue = target.attributes[index];
+
+        if (cast<Node>(target) !is null)
+        {
+            Node@ targetNode = target;
+            targetType = TARGET_NODE;
+            targetID = targetNode.id;
+        }
+        else if (cast<Component>(target) !is null)
+        {
+            Component@ targetComponent = target;
+            targetType = TARGET_COMPONENT;
+            targetID = targetComponent.id;
+        }
+        else
+        {
+            targetType = TARGET_UIELEMENT;
+        }
+    }
+
+    Serializable@ GetTarget()
+    {
+        switch (targetType)
+        {
+        case TARGET_NODE:
+            return editorScene.GetNode(targetID);
+        case TARGET_COMPONENT:
+            return editorScene.GetComponent(targetID);
+        default:
+            break;
+        }
+        
+        return null;
+    }
+
+    void Undo()
+    {
+        Serializable@ target = GetTarget();
+        if (target !is null)
+        {
+            target.attributes[attrIndex] = undoValue;
+            target.ApplyAttributes();
+            // Can't know if need a full update, so assume true
+            attributesFullDirty = true;
+            // Apply side effects
+            PostEditAttribute(target, attrIndex);
+        }
+    }
+
+    void Redo()
+    {
+        Serializable@ target = GetTarget();
+        if (target !is null)
+        {
+            target.attributes[attrIndex] = redoValue;
+            target.ApplyAttributes();
+            // Can't know if need a full update, so assume true
+            attributesFullDirty = true;
+            // Apply side effects
+            PostEditAttribute(target, attrIndex);
+        }
+    }
+}
+
+class ToggleNodeEnabledAction : EditAction
+{
+    uint nodeID;
+    bool undoValue;
+    
+    void Define(Node@ node, bool oldEnabled)
+    {
+        nodeID = node.id;
+        undoValue = oldEnabled;
+    }
+
+    void Undo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        if (node !is null)
+            node.SetEnabled(undoValue, true);
+    }
+
+    void Redo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        if (node !is null)
+            node.SetEnabled(!undoValue, true);
+    }
+}
+
+class Transform
+{
+    Vector3 position;
+    Quaternion rotation;
+    Vector3 scale;
+    
+    void Define(Node@ node)
+    {
+        position = node.position;
+        rotation = node.rotation;
+        scale = node.scale;
+    }
+
+    void Apply(Node@ node)
+    {
+        node.SetTransform(position, rotation, scale);
+    }
+}
+
+class EditNodeTransformAction : EditAction
+{
+    uint nodeID;
+    Transform undoTransform;
+    Transform redoTransform;
+
+    void Define(Node@ node, const Transform&in oldTransform)
+    {
+        nodeID = node.id;
+        undoTransform = oldTransform;
+        redoTransform.Define(node);
+    }
+
+    void Undo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        if (node !is null)
+        {
+            undoTransform.Apply(node);
+            UpdateNodeAttributes();
+        }
+    }
+    
+    void Redo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        if (node !is null)
+        {
+            redoTransform.Apply(node);
+            UpdateNodeAttributes();
         }
     }
 }

@@ -2,7 +2,7 @@
 //
 // Functions that you must implement:
 // - void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializables);
-// - void PostEditAttribute(Array<Serializable@>@ serializables, uint index);
+// - void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Array<Variant>& oldValues);
 // - Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit);
 
 const uint MIN_NODE_ATTRIBUTES = 4;
@@ -747,12 +747,17 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     uint coordinate = attrEdit.vars["Coordinate"].GetUInt();
     bool intermediateEdit = eventType == TEXT_CHANGED_EVENT_TYPE;
 
+    // Store old values so that PostEditAttribute can create undo actions
+    Array<Variant> oldValues;
+    for (uint i = 0; i < serializables.length; ++i)
+        oldValues.Push(serializables[i].attributes[index]);
+
     StoreAttributeEditor(parent, serializables, index, subIndex, coordinate);
     for (uint i = 0; i < serializables.length; ++i)
         serializables[i].ApplyAttributes();
 
     // Do the editor logic after attribute has been edited.
-    PostEditAttribute(serializables, index);
+    PostEditAttribute(serializables, index, oldValues);
 
     // If not an intermediate edit, reload the editor fields with validated values
     // (attributes may have interactions; therefore we load everything, not just the value being edited)
@@ -914,6 +919,11 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         return;
     }
 
+    // Store old values so that PostEditAttribute can create undo actions
+    Array<Variant> oldValues;
+    for (uint i = 0; i < resourceTargets.length; ++i)
+        oldValues.Push(resourceTargets[i].attributes[resourcePickIndex]);
+
     for (uint i = 0; i < resourceTargets.length; ++i)
     {
         Serializable@ target = resourceTargets[i];
@@ -949,7 +959,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         }
     }
 
-    PostEditAttribute(resourceTargets, resourcePickIndex);
+    PostEditAttribute(resourceTargets, resourcePickIndex, oldValues);
     UpdateAttributeInspector(false);
 
     resourceTargets.Clear();

@@ -513,44 +513,80 @@ bool SceneToggleEnable()
 
     ui.cursor.shape = CS_BUSY;
 
+    EditActionGroup group;
+
     // Toggle enabled state of nodes recursively
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
         // Do not attempt to disable the Scene
         if (selectedNodes[i].typeName == "Node")
-            selectedNodes[i].SetEnabled(!selectedNodes[i].enabled, true);
+        {
+            bool oldEnabled = selectedNodes[i].enabled;
+            selectedNodes[i].SetEnabled(!oldEnabled, true);
+
+            // Create undo action
+            ToggleNodeEnabledAction action;
+            action.Define(selectedNodes[i], oldEnabled);
+            group.actions.Push(action);
+        }
     }
     for (uint i = 0; i < selectedComponents.length; ++i)
     {
         // Some components purposefully do not expose the Enabled attribute, and it does not affect them in any way
         // (Octree, PhysicsWorld). Check that the first attribute is in fact called "Is Enabled"
         if (selectedComponents[i].numAttributes > 0 && selectedComponents[i].attributeInfos[0].name == "Is Enabled")
-            selectedComponents[i].enabled = !selectedComponents[i].enabled;
+        {
+            bool oldEnabled = selectedComponents[i].enabled;
+            selectedComponents[i].enabled = !oldEnabled;
+            
+            // Create undo action
+            EditAttributeAction action;
+            action.Define(selectedComponents[i], 0, Variant(oldEnabled));
+            group.actions.Push(action);
+        }
     }
+
+    SaveEditActionGroup(group);
 
     return true;
 }
 
 bool SceneChangeParent(Node@ sourceNode, Node@ targetNode, bool createUndoAction = true)
 {
-    // Perform the reparenting
+    // Create undo action if requested
     if (createUndoAction)
     {
         ReparentNodeAction action;
         action.Define(sourceNode, targetNode);
         SaveEditAction(action);
     }
+
     sourceNode.parent = targetNode;
 
     // Return true if success
-    return sourceNode.parent is targetNode;
+    if (sourceNode.parent is targetNode)
+    {
+        UpdateNodeAttributes(); // Parent change may have changed local transform
+        return true;
+    }
+    else
+        return false;
 }
 
 bool SceneResetPosition()
 {
     if (editNode !is null)
     {
+        Transform oldTransform;
+        oldTransform.Define(editNode);
+
         editNode.position = Vector3(0.0, 0.0, 0.0);
+        
+        // Create undo action
+        EditNodeTransformAction action;
+        action.Define(editNode, oldTransform);
+        SaveEditAction(action);
+
         UpdateNodeAttributes();
         return true;
     }
@@ -562,7 +598,16 @@ bool SceneResetRotation()
 {
     if (editNode !is null)
     {
+        Transform oldTransform;
+        oldTransform.Define(editNode);
+
         editNode.rotation = Quaternion();
+        
+        // Create undo action
+        EditNodeTransformAction action;
+        action.Define(editNode, oldTransform);
+        SaveEditAction(action);
+
         UpdateNodeAttributes();
         return true;
     }
@@ -574,7 +619,16 @@ bool SceneResetScale()
 {
     if (editNode !is null)
     {
+        Transform oldTransform;
+        oldTransform.Define(editNode);
+
         editNode.scale = Vector3(1.0, 1.0, 1.0);
+        
+        // Create undo action
+        EditNodeTransformAction action;
+        action.Define(editNode, oldTransform);
+        SaveEditAction(action);
+
         UpdateNodeAttributes();
         return true;
     }
