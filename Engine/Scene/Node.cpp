@@ -520,9 +520,9 @@ void Node::MarkDirty()
         (*i)->MarkDirty();
 }
 
-Node* Node::CreateChild(const String& name, CreateMode mode)
+Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id)
 {
-    Node* newNode = CreateChild(0, mode);
+    Node* newNode = CreateChild(id, mode);
     newNode->SetName(name);
     return newNode;
 }
@@ -602,13 +602,13 @@ Component* Node::CreateComponent(ShortStringHash type, CreateMode mode, unsigned
     return newComponent;
 }
 
-Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode)
+Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode, unsigned id)
 {
     Component* oldComponent = GetComponent(type);
     if (oldComponent)
         return oldComponent;
     else
-        return CreateComponent(type, mode);
+        return CreateComponent(type, mode, id);
 }
 
 void Node::RemoveComponent(Component* component)

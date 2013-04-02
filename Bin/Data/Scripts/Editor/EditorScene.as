@@ -8,6 +8,7 @@ const int PICK_LIGHTS = 1;
 const int PICK_ZONES = 2;
 const int PICK_RIGIDBODIES = 3;
 const int MAX_PICK_MODES = 4;
+const int MAX_UNDOSTACK_SIZE = 256;
 
 Scene@ editorScene;
 
@@ -447,7 +448,6 @@ bool ScenePaste()
             // If copied node was local, make the new local too
             Node@ newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
             newNode.LoadXML(rootElem);
-            newNode.ApplyAttributes();
 
             // Create an undo action for the paste
             CreateNodeAction action;
@@ -629,14 +629,9 @@ void SaveEditAction(EditAction@ action)
     // Create a group with 1 action
     EditActionGroup group;
     group.actions.Push(action);
-
-    // Truncate the stack first to current pos
-    undoStack.Resize(undoStackPos);
-    undoStack.Push(group);
-    ++undoStackPos;
-
-    SetSceneModified();
+    SaveEditActionGroup(group);
 }
+
 void SaveEditActionGroup(EditActionGroup@ group)
 {
     if (group.actions.empty)
@@ -647,20 +642,12 @@ void SaveEditActionGroup(EditActionGroup@ group)
     undoStack.Push(group);
     ++undoStackPos;
 
-    SetSceneModified();
-}
-
-void RewriteEditActionNodeIDs(uint oldID, uint newID)
-{
-    if (oldID == newID)
-        return;
-
-    // \todo If node has child nodes, their IDs should be rewritten too
-    for (uint i = 0; i < undoStack.length; ++i)
+    // Limit maximum undo steps
+    if (undoStack.length > MAX_UNDOSTACK_SIZE)
     {
-        for (uint j = 0; j < undoStack[i].actions.length; ++j)
-        {
-            undoStack[i].actions[j].RewriteNodeID(oldID, newID);
-        }
+        undoStack.Erase(0);
+        --undoStackPos;
     }
+
+    SetSceneModified();
 }

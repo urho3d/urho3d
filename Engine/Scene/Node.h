@@ -137,8 +137,8 @@ public:
     void SetOwner(Connection* owner);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components.
     void MarkDirty();
-    /// Create a child scene node.
-    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED);
+    /// Create a child scene node (with specified ID if provided).
+    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Add a child scene node.
     void AddChild(Node* node);
     /// Remove a child scene node.
@@ -148,7 +148,7 @@ public:
     /// Create a component to this node (with specified ID if provided).
     Component* CreateComponent(ShortStringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Create a component to this node if it does not exist already.
-    Component* GetOrCreateComponent(ShortStringHash type, CreateMode mode = REPLICATED);
+    Component* GetOrCreateComponent(ShortStringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Remove a component from this node.
     void RemoveComponent(Component* component);
     /// Remove the first component of specific type from this node.
@@ -168,9 +168,9 @@ public:
     /// Remove listener component.
     void RemoveListener(Component* component);
     /// Template version of creating a component.
-    template <class T> T* CreateComponent(CreateMode mode = REPLICATED);
+    template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     /// Template version of getting or creating a component.
-    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED);
+    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     
     /// Return ID.
     unsigned GetID() const { return id_; }
@@ -382,8 +382,8 @@ private:
     mutable VectorBuffer attrBuffer_;
 };
 
-template <class T> T* Node::CreateComponent(CreateMode mode) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode)); }
-template <class T> T* Node::GetOrCreateComponent(CreateMode mode) { return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode)); }
+template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode, id)); }
+template <class T> T* Node::GetOrCreateComponent(CreateMode mode, unsigned id) { return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode, id)); }
 template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const { GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive); }
 template <class T> T* Node::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
 template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic(), recursive); }

@@ -7,14 +7,6 @@ class EditAction
     void Redo()
     {
     }
-    
-    void RewriteNodeID(uint oldID, uint newID)
-    {
-    }
-
-    void RewriteComponentID(uint oldID, uint newID)
-    {
-    }
 }
 
 class EditActionGroup
@@ -53,21 +45,10 @@ class CreateNodeAction : EditAction
         Node@ parent = editorScene.GetNode(parentID);
         if (parent !is null)
         {
-            Node@ node = parent.CreateChild("", nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            Node@ node = parent.CreateChild("", nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL, nodeID);
             node.LoadXML(nodeData.root);
-            // Node gets a new ID. Rewrite it in all undo commands
-            RewriteEditActionNodeIDs(nodeID, node.id);
         }
     }
-    
-    void RewriteNodeID(uint oldID, uint newID)
-    {
-        if (nodeID == oldID)
-            nodeID = newID;
-        if (parentID == oldID)
-            parentID = newID;
-    }
-
 }
 
 class DeleteNodeAction : EditAction
@@ -90,10 +71,8 @@ class DeleteNodeAction : EditAction
         Node@ parent = editorScene.GetNode(parentID);
         if (parent !is null)
         {
-            Node@ node = parent.CreateChild("", nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+            Node@ node = parent.CreateChild("", nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL, nodeID);
             node.LoadXML(nodeData.root);
-            // Node gets a new ID. Rewrite it in all undo commands
-            RewriteEditActionNodeIDs(nodeID, node.id);
         }
     }
     
@@ -106,14 +85,6 @@ class DeleteNodeAction : EditAction
             ClearSceneSelection();
             parent.RemoveChild(node);
         }
-    }
-    
-    void RewriteNodeID(uint oldID, uint newID)
-    {
-        if (nodeID == oldID)
-            nodeID = newID;
-        if (parentID == oldID)
-            parentID = newID;
     }
 }
 
@@ -144,15 +115,5 @@ class ReparentNodeAction : EditAction
         Node@ node = editorScene.GetNode(nodeID);
         if (parent !is null && node !is null)
             node.parent = parent;
-    }
-
-    void RewriteNodeID(uint oldID, uint newID)
-    {
-        if (nodeID == oldID)
-            nodeID = newID;
-        if (oldParentID == oldID)
-            oldParentID = newID;
-        if (newParentID == oldID)
-            newParentID = newID;
     }
 }

@@ -401,14 +401,14 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(T, DrawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
 }
 
-static Component* NodeCreateComponent(const String& typeName, CreateMode mode, Node* ptr)
+static Component* NodeCreateComponent(const String& typeName, CreateMode mode, unsigned id, Node* ptr)
 {
-    return ptr->CreateComponent(typeName, mode);
+    return ptr->CreateComponent(typeName, mode, id);
 }
 
-static Component* NodeGetOrCreateComponent(const String& typeName, CreateMode mode, Node* ptr)
+static Component* NodeGetOrCreateComponent(const String& typeName, CreateMode mode, unsigned id, Node* ptr)
 {
-    return ptr->GetOrCreateComponent(typeName, mode);
+    return ptr->GetOrCreateComponent(typeName, mode, id);
 }
 
 static void NodeRemoveComponent(const String& typeName, Node* ptr)
@@ -545,13 +545,13 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void LookAt(const Vector3&in, const Vector3&in upAxis = Vector3(0, 1, 0), bool worldSpace = false)", asMETHOD(T, LookAt), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(float)", asMETHODPR(T, Scale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(const Vector3&in)", asMETHODPR(T, Scale, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = \"\", CreateMode mode = REPLICATED)", asMETHODPR(T, CreateChild, (const String&, CreateMode), Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = \"\", CreateMode mode = REPLICATED, uint id = 0)", asMETHODPR(T, CreateChild, (const String&, CreateMode, unsigned), Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void AddChild(Node@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveChild(Node@+)", asMETHODPR(T, RemoveChild, (Node*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Component@+ CreateComponent(const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeCreateComponent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Component@+ CreateComponent(const String&in, CreateMode mode = REPLICATED, uint id = 0)", asFUNCTION(NodeCreateComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, CreateMode mode = REPLICATED, uint id = 0)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveComponent(Component@+)", asMETHODPR(T, RemoveComponent, (Component*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveComponent(const String&in)", asFUNCTION(NodeRemoveComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool recursive = false) const", asFUNCTION(NodeGetChildren), asCALL_CDECL_OBJLAST);
