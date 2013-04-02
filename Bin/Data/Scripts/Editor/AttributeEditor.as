@@ -400,7 +400,7 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, co
     if (sameName)
         LoadAttributeEditor(parent, value, info, editable, sameValue, values);
     else
-        parent.Remove();
+        parent.visible = false;
 
     inLoadAttributeEditor = false;
 }
