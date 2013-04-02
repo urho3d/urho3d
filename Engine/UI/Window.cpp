@@ -225,7 +225,7 @@ void Window::SetResizeBorder(const IntRect& rect)
 void Window::SetModal(bool modal)
 {
     UI* ui = GetSubsystem<UI>();
-    if (ui->SetModalElement(modal ? this : 0))
+    if (ui->SetModalElement(this, modal))
         modal_ = modal;
 }
 

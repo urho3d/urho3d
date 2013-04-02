@@ -171,17 +171,21 @@ void UI::SetFocusElement(UIElement* element)
     SendEvent(E_FOCUSCHANGED, eventData);
 }
 
-bool UI::SetModalElement(UIElement* modalElement)
+bool UI::SetModalElement(UIElement* modalElement, bool enable)
 {
-    // Only allow one modal element at a time
-    if (modalElement_)
+    // Only allow one modal element at a time, only the currently active modal element can disable itself
+    if (modalElement_ && modalElement != modalElement_)
         return false;
-
+    
+    // The modal element must be parented to root
+    if (modalElement->GetParent() != rootElement_)
+        return false;
+    
     // Currently only allow modal window
     if (modalElement && modalElement->GetType() != Window::GetTypeStatic())
         return false;
-
-    modalElement_ = modalElement;
+    
+    modalElement_ = enable ? modalElement : 0;
     return true;
 }
 
