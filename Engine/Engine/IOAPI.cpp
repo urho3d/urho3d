@@ -26,6 +26,7 @@
 #include "Log.h"
 #include "PackageFile.h"
 #include "ProcessUtils.h"
+#include "StringUtils.h"
 #include "VectorBuffer.h"
 
 namespace Urho3D
@@ -76,6 +77,24 @@ static void Print(Variant value, bool error)
     Log::WriteRaw(value.ToString() + "\n", error);
 }
 
+static void PrintCallStack(bool error)
+{
+    asIScriptContext* context = asGetActiveContext();
+    if (context)
+    {
+        // Show the call stack
+        for (asUINT i = 0; i < context->GetCallstackSize(); i++)
+        {
+            asIScriptFunction* func;
+            const char* scriptSection;
+            int line, column;
+            func = context->GetFunction(i);
+            line = context->GetLineNumber(i, &column, &scriptSection);
+            Log::WriteRaw(ToString("%s:%s:%d,%d\n", scriptSection, func->GetDeclaration(), line, column), error);
+        }
+    }
+}
+
 static void LogWrite(const String& str, bool error, Log* ptr)
 {
     Log::WriteRaw(str + "\n", error);
@@ -109,6 +128,7 @@ static void Print(unsigned value, bool error) {}
 static void Print(float value, bool error) {}
 static void Print(bool value, bool error) {}
 static void Print(Variant value, bool error) {}
+static void PrintCallStack(bool error) {}
 static void LogWrite(const String& str, bool error, Log* ptr) {}
 static void LogDebug(const String& str, Log* ptr) {}
 static void LogInfo(const String& str, Log* ptr) {}
@@ -124,7 +144,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int LOG_WARNING", (void*)&LOG_WARNING);
     engine->RegisterGlobalProperty("const int LOG_ERROR", (void*)&LOG_ERROR);
     engine->RegisterGlobalProperty("const int LOG_NONE", (void*)&LOG_NONE);
-    
+
     RegisterObject<Log>(engine, "Log");
     engine->RegisterObjectMethod("Log", "void Write(const String&in, bool error = false)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Debug(const String&in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
@@ -139,7 +159,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Log", "void set_quiet(bool)", asMETHOD(Log, SetQuiet), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "bool get_quiet() const", asMETHOD(Log, IsQuiet), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Log@+ get_log()", asFUNCTION(GetLog), asCALL_CDECL);
-    
+
     // Register also Print() functions for convenience
     engine->RegisterGlobalFunction("void Print(const String&in, bool error = false)", asFUNCTIONPR(Print, (const String&, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(int, bool error = false)", asFUNCTIONPR(Print, (int, bool), void), asCALL_CDECL);
@@ -147,6 +167,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void Print(float, bool error = false)", asFUNCTIONPR(Print, (float, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(bool, bool error = false)", asFUNCTIONPR(Print, (bool, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(Variant, bool error = false)", asFUNCTIONPR(Print, (Variant, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void PrintCallStack(bool error = false)", asFUNCTION(PrintCallStack), asCALL_CDECL);
 }
 
 static File* ConstructFile()
@@ -173,7 +194,7 @@ static void ConstructVectorBufferFromStream(Deserializer* src, unsigned size, Ve
 {
     if (!src)
         size = 0;
-    
+
     new(ptr) VectorBuffer(*src, size);
 }
 
@@ -195,7 +216,7 @@ static unsigned char* VectorBufferAt(unsigned index, VectorBuffer* ptr)
         asGetActiveContext()->SetException("Index out of bounds");
         return 0;
     }
-    
+
     return ptr->GetModifiableData() + index;
 }
 
@@ -237,12 +258,12 @@ static int FileSystemSystemRun(const String& fileName, CScriptArray* srcArgument
 {
     if (!srcArguments)
         return -1;
-    
+
     unsigned numArguments = srcArguments->GetSize();
     Vector<String> destArguments(numArguments);
     for (unsigned i = 0; i < numArguments; ++i)
         destArguments[i] = *(static_cast<String*>(srcArguments->At(i)));
-    
+
     return ptr->SystemRun(fileName, destArguments);
 }
 
@@ -252,21 +273,21 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterEnumValue("FileMode", "FILE_READ", FILE_READ);
     engine->RegisterEnumValue("FileMode", "FILE_WRITE", FILE_WRITE);
     engine->RegisterEnumValue("FileMode", "FILE_READWRITE", FILE_READWRITE);
-    
+
     engine->RegisterGlobalProperty("const uint SCAN_FILES", (void*)&SCAN_FILES);
     engine->RegisterGlobalProperty("const uint SCAN_DIRS", (void*)&SCAN_DIRS);
     engine->RegisterGlobalProperty("const uint SCAN_HIDDEN", (void*)&SCAN_HIDDEN);
-    
+
     engine->RegisterObjectType("Serializer", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Serializer", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Serializer", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     RegisterSerializer<Serializer>(engine, "Serializer");
-    
+
     engine->RegisterObjectType("Deserializer", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Deserializer", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Deserializer", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     RegisterDeserializer<Deserializer>(engine, "Deserializer");
-    
+
     RegisterObject<File>(engine, "File");
     engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
     engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode mode = FILE_READ)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
@@ -277,7 +298,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("File", "bool get_packaged()", asMETHOD(File, IsPackaged), asCALL_THISCALL);
     RegisterSerializer<File>(engine, "File");
     RegisterDeserializer<File>(engine, "File");
-    
+
     engine->RegisterObjectType("VectorBuffer", sizeof(VectorBuffer), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVectorBufferCopy), asCALL_CDECL_OBJLAST);
@@ -291,7 +312,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VectorBuffer", "const uint8 &opIndex(uint) const", asFUNCTION(VectorBufferAt), asCALL_CDECL_OBJLAST);
     RegisterSerializer<VectorBuffer>(engine, "VectorBuffer");
     RegisterDeserializer<VectorBuffer>(engine, "VectorBuffer");
-    
+
     // Register VectorBuffer conversions to Variant
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVariantBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VectorBuffer&in)", asFUNCTION(VariantAssignBuffer), asCALL_CDECL_OBJLAST);
@@ -318,7 +339,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "String get_programDir() const", asMETHOD(FileSystem, GetProgramDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir() const", asMETHOD(FileSystem, GetUserDocumentsDir), asCALL_THISCALL);
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", asFUNCTION(GetFileSystem), asCALL_CDECL);
-    
+
     engine->RegisterGlobalFunction("String GetPath(const String&in)", asFUNCTION(GetPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetFileName(const String&in)", asFUNCTION(GetFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetExtension(const String&in)", asFUNCTION(GetExtension), asCALL_CDECL);
