@@ -209,7 +209,19 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         else
         {
             elementType = editUIElements[0].typeName;
-            titleText.text = elementType + " ID " + STRIKED_OUT + " (" + editUIElements.length + "x)";
+            
+            bool sameType = true;
+            for (uint i = 1; i < editUIElements.length; ++i)
+            {
+                if (editUIElements[i].typeName != elementType)
+                {
+                    sameType = false;
+                    break;
+                }
+            }
+            titleText.text = (sameType ? elementType : "Mixed type") + " ID " + STRIKED_OUT + " (" + editUIElements.length + "x)";
+            if (!sameType)
+                elementType = "";   // No icon
         }
         IconizeUIElement(titleText, elementType);
 

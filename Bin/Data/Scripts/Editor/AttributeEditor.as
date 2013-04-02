@@ -378,11 +378,18 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, co
 
     inLoadAttributeEditor = true;
 
+    bool sameName = true;
     bool sameValue = true;
     Variant value = serializables[0].attributes[index];
     Array<Variant> values;
     for (uint i = 0; i < serializables.length; ++i)
     {
+        if (index >= serializables[i].numAttributes || serializables[i].attributeInfos[index].name != info.name)
+        {
+            sameName = false;
+            break;
+        }
+        
         Variant val = serializables[i].attributes[index];
         if (val != value)
             sameValue = false;
@@ -390,7 +397,10 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, co
     }
 
     // Attribute with different values from multiple-select is loaded with default/empty value and non-editable
-    LoadAttributeEditor(parent, value, info, editable, sameValue, values);
+    if (sameName)
+        LoadAttributeEditor(parent, value, info, editable, sameValue, values);
+    else
+        parent.Remove();
 
     inLoadAttributeEditor = false;
 }
@@ -703,7 +713,7 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool 
     if (serializables.empty)
         return;
 
-    // If there are many serializables, they must share same attribute structure
+    // If there are many serializables, they must share same attribute structure (up to certain number if not all)
     for (uint i = 0; i < serializables[0].numAttributes; ++i)
     {
         AttributeInfo info = serializables[0].attributeInfos[i];
