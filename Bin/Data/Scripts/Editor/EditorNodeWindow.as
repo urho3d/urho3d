@@ -69,6 +69,7 @@ void CreateAttributeInspectorWindow()
     attributeInspectorWindow.SetPosition(ui.root.width - 20 - attributeInspectorWindow.width, 40);
     attributeInspectorWindow.opacity = uiMaxOpacity;
     attributeInspectorWindow.BringToFront();
+    UpdateAttributeInspector();
 
     SubscribeToEvent(attributeInspectorWindow.GetChild("CloseButton", true), "Released", "HideAttributeInspectorWindow");
     SubscribeToEvent(attributeInspectorWindow, "LayoutUpdated", "HandleWindowLayoutUpdated");
@@ -258,7 +259,7 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index)
                 ApplyMaterialList(staticModel);
         }
     }
-    
+
     SetSceneModified();
 }
 

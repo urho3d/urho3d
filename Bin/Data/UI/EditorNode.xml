@@ -1,7 +1,7 @@
 <!-- This container can be used for both Node and UIElement -->
 <element>
     <element>
-        <attribute name="Name" value="Node Container" />
+        <attribute name="Name" value="NodeContainer" />
         <attribute name="Layout Mode" value="Vertical" />
         <attribute name="Layout Spacing" value="4" />
         <element type="BorderImage" style="EditorDivider" />
