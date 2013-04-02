@@ -2,6 +2,7 @@
 
 #include "Scripts/Editor/EditorView.as"
 #include "Scripts/Editor/EditorScene.as"
+#include "Scripts/Editor/EditorActions.as"
 #include "Scripts/Editor/EditorUIElement.as"
 #include "Scripts/Editor/EditorGizmo.as"
 #include "Scripts/Editor/EditorSettings.as"

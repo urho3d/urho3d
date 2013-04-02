@@ -29,6 +29,9 @@ bool copyBufferLocal = false;
 bool suppressSceneChanges = false;
 bool inSelectionModify = false;
 
+Array<EditActionGroup> undoStack;
+uint undoStackPos = 0;
+
 void ClearSceneSelection()
 {
     selectedNodes.Clear();
@@ -75,6 +78,7 @@ bool ResetScene()
     UpdateWindowTitle();
     UpdateHierarchyItem(editorScene, true);
     UpdateAttributeInspector();
+    ClearEditActions();
 
     suppressSceneChanges = false;
 
@@ -147,6 +151,7 @@ bool LoadScene(const String&in fileName)
     UpdateWindowTitle();
     UpdateHierarchyItem(editorScene, true);
     UpdateAttributeInspector();
+    ClearEditActions();
 
     suppressSceneChanges = false;
 
@@ -255,15 +260,8 @@ void UpdateScene(float timeStep)
         editorScene.Update(timeStep);
 }
 
-void BeginModify(uint nodeID)
+void SetSceneModified()
 {
-    // Undo/Redo can be implemented here
-}
-
-void EndModify(uint nodeID)
-{
-    // Undo/Redo can be implemented here
-
     if (!sceneModified)
     {
         sceneModified = true;
@@ -296,6 +294,9 @@ bool SceneDelete()
     // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
     hierarchyList.ClearSelection();
 
+    // Group for storing undo actions
+    EditActionGroup group;
+
     // Remove nodes
     for (uint i = 0; i < selectedNodes.length; ++i)
     {
@@ -306,9 +307,13 @@ bool SceneDelete()
         uint id = node.id;
         uint nodeIndex = GetListIndex(node);
 
-        BeginModify(id);
+        // Create undo action
+        DeleteNodeAction action;
+        action.Define(node);
+        group.actions.Push(action);
+
         node.Remove();
-        EndModify(id);
+        SetSceneModified();
 
         // If deleting only one node, select the next item in the same index
         if (selectedNodes.length == 1 && selectedComponents.empty)
@@ -334,14 +339,15 @@ bool SceneDelete()
             continue;
 
         uint id = node.id;
-        BeginModify(id);
         node.RemoveComponent(component);
-        EndModify(id);
+        SetSceneModified();
 
         // If deleting only one component, select the next item in the same index
         if (selectedComponents.length == 1 && selectedNodes.empty)
             hierarchyList.selection = index;
     }
+
+    SaveEditActionGroup(group);
 
     EndSelectionModify();
     return true;
@@ -412,6 +418,9 @@ bool ScenePaste()
 
     bool pasteComponents = false;
 
+    // Group for storing undo actions
+    EditActionGroup group;
+
     for (uint i = 0; i < copyBuffer.length; ++i)
     {
         XMLElement rootElem = copyBuffer[i].root;
@@ -424,34 +433,32 @@ bool ScenePaste()
             if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, rootElem.GetAttribute("type")))
                 return false;
 
-            BeginModify(editNode.id);
-
             // If copied component was local, make the new local too
             Component@ newComponent = editNode.CreateComponent(rootElem.GetAttribute("type"), rootElem.GetBool("local") ? LOCAL :
                 REPLICATED);
             if (newComponent is null)
-            {
-                EndModify(editNode.id);
                 return false;
-            }
+
             newComponent.LoadXML(rootElem);
             newComponent.ApplyAttributes();
-            EndModify(editNode.id);
+            SetSceneModified();
         }
         else if (mode == "node")
         {
             // Make the paste go always to the root node, no matter of the selected node
-            BeginModify(editorScene.id);
             // If copied node was local, make the new local too
             Node@ newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
-            BeginModify(newNode.id);
             newNode.LoadXML(rootElem);
             newNode.ApplyAttributes();
-            EndModify(newNode.id);
-            EndModify(editorScene.id);
+            
+            // Create an undo action for the paste
+            CreateNodeAction action;
+            action.Define(newNode);
+            group.actions.Push(action);
         }
     }
 
+    SaveEditActionGroup(group);
     return true;
 }
 
@@ -462,6 +469,9 @@ bool SceneUnparent()
 
     ui.cursor.shape = CS_BUSY;
 
+    // Group for storing undo actions
+    EditActionGroup group;
+
     // Parent selected nodes to root
     Array<Node@> changedNodes;
     for (uint i = 0; i < selectedNodes.length; ++i)
@@ -471,14 +481,20 @@ bool SceneUnparent()
             continue; // Root or already parented to root
 
         // Perform the reparenting, continue loop even if action fails
-        SceneChangeParent(sourceNode, editorScene);
+        ReparentNodeAction action;
+        action.Define(sourceNode, editorScene);
+        group.actions.Push(action);
+
+        SceneChangeParent(sourceNode, editorScene, false);
         changedNodes.Push(sourceNode);
     }
 
     // Reselect the changed nodes at their new position in the list
     for (uint i = 0; i < changedNodes.length; ++i)
         hierarchyList.AddSelection(GetListIndex(changedNodes[i]));
-    
+
+    SaveEditActionGroup(group);
+
     return true;
 }
 
@@ -507,14 +523,16 @@ bool SceneToggleEnable()
     return true;
 }
 
-bool SceneChangeParent(Node@ sourceNode, Node@ targetNode)
+bool SceneChangeParent(Node@ sourceNode, Node@ targetNode, bool createUndoAction = true)
 {
     // Perform the reparenting
-    BeginModify(targetNode.id);
-    BeginModify(sourceNode.id);
+    if (createUndoAction)
+    {
+        ReparentNodeAction action;
+        action.Define(sourceNode, targetNode);
+        SaveEditAction(action);
+    }
     sourceNode.parent = targetNode;
-    EndModify(sourceNode.id);
-    EndModify(targetNode.id);
 
     // Return true if success
     return sourceNode.parent is targetNode;
@@ -576,4 +594,75 @@ bool SceneSelectAll()
     }
     
     return true; 
+}
+
+bool SceneUndo()
+{
+    if (undoStackPos > 0)
+    {
+        --undoStackPos;
+        for (uint i = 0; i < undoStack[undoStackPos].actions.length; ++i)
+            undoStack[undoStackPos].actions[i].Undo();
+    }
+
+    return true;
+}
+
+bool SceneRedo()
+{
+    if (undoStackPos < undoStack.length)
+    {
+        for (uint i = 0; i < undoStack[undoStackPos].actions.length; ++i)
+            undoStack[undoStackPos].actions[i].Redo();
+        ++undoStackPos;
+    }
+    
+    return true;
+}
+
+void ClearEditActions()
+{
+    undoStack.Clear();
+    undoStackPos = 0;
+}
+
+void SaveEditAction(EditAction@ action)
+{
+    // Create a group with 1 action
+    EditActionGroup group;
+    group.actions.Push(action);
+
+    // Truncate the stack first to current pos
+    undoStack.Resize(undoStackPos);
+    undoStack.Push(group);
+    ++undoStackPos;
+
+    SetSceneModified();
+}
+void SaveEditActionGroup(EditActionGroup@ group)
+{
+    if (group.actions.empty)
+        return;
+
+    // Truncate the stack first to current pos
+    undoStack.Resize(undoStackPos);
+    undoStack.Push(group);
+    ++undoStackPos;
+    
+    SetSceneModified();
+}
+
+void RewriteEditActionNodeIDs(uint oldID, uint newID)
+{
+    if (oldID == newID)
+        return;
+
+    // \todo If node has child nodes, their IDs should be rewritten too
+    for (uint i = 0; i < undoStack.length; ++i)
+    {
+        for (uint j = 0; j < undoStack[i].actions.length; ++j)
+        {
+            undoStack[i].actions[j].RewriteNodeID(oldID, newID);
+        }
+    }
 }

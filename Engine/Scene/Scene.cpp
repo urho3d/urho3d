@@ -582,26 +582,28 @@ unsigned Scene::GetFreeNodeID(CreateMode mode)
     {
         for (;;)
         {
-            if (!replicatedNodes_.Contains(replicatedNodeID_))
-                return replicatedNodeID_;
-            
-            if (replicatedNodeID_ != LAST_REPLICATED_ID)
+            unsigned ret = replicatedNodeID_;
+            if (replicatedNodeID_ < LAST_REPLICATED_ID)
                 ++replicatedNodeID_;
             else
                 replicatedNodeID_ = FIRST_REPLICATED_ID;
+            
+            if (!replicatedNodes_.Contains(ret))
+                return ret;
         }
     }
     else
     {
         for (;;)
         {
-            if (!localNodes_.Contains(localNodeID_))
-                return localNodeID_;
-            
-            if (localNodeID_ != LAST_LOCAL_ID)
+            unsigned ret =  localNodeID_;
+            if (localNodeID_ < LAST_LOCAL_ID)
                 ++localNodeID_;
             else
                 localNodeID_ = FIRST_LOCAL_ID;
+            
+            if (!localNodes_.Contains(ret))
+                return ret;
         }
     }
 }
@@ -612,26 +614,28 @@ unsigned Scene::GetFreeComponentID(CreateMode mode)
     {
         for (;;)
         {
-            if (!replicatedComponents_.Contains(replicatedComponentID_))
-                return replicatedComponentID_;
-            
-            if (replicatedComponentID_ != LAST_REPLICATED_ID)
+            unsigned ret = replicatedComponentID_;
+            if (replicatedComponentID_ < LAST_REPLICATED_ID)
                 ++replicatedComponentID_;
             else
                 replicatedComponentID_ = FIRST_REPLICATED_ID;
+            
+            if (!replicatedComponents_.Contains(ret))
+                return ret;
         }
     }
     else
     {
         for (;;)
         {
-            if (!localComponents_.Contains(localComponentID_))
-                return localComponentID_;
-            
-            if (localComponentID_ != LAST_LOCAL_ID)
+            unsigned ret =  localComponentID_;
+            if (localComponentID_ < LAST_LOCAL_ID)
                 ++localComponentID_;
             else
                 localComponentID_ = FIRST_LOCAL_ID;
+            
+            if (!localComponents_.Contains(ret))
+                return ret;
         }
     }
 }

@@ -711,6 +711,11 @@ void HandleCreateNode(StringHash eventType, VariantMap& eventData)
     // Set the new node a certain distance from the camera
     newNode.position = GetNewNodePosition();
 
+    // Create an undo action for the create
+    CreateNodeAction action;
+    action.Define(newNode);
+    SaveEditAction(action);
+
     FocusNode(newNode);
 }
 
@@ -738,6 +743,8 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
         newComponent.ApplyAttributes();
         FocusComponent(newComponent);
     }
+    
+    SetSceneModified();
 }
 
 void CreateBuiltinObject(const String& name)
@@ -748,6 +755,8 @@ void CreateBuiltinObject(const String& name)
 
     StaticModel@ object = newNode.CreateComponent("StaticModel");
     object.model = cache.GetResource("Model", "Models/" + name + ".mdl");
+
+    SetSceneModified();
 
     FocusNode(newNode);
 }

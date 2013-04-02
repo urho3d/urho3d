@@ -259,6 +259,8 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index)
                 ApplyMaterialList(staticModel);
         }
     }
+    
+    SetSceneModified();
 }
 
 void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializables)

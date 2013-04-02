@@ -160,6 +160,9 @@ void CreateMenuBar()
         Menu@ menu = CreateMenu("Edit");
         Window@ popup = menu.popup;
         popup.vars["Popup"] = "Edit";
+        popup.AddChild(CreateMenuItem("Undo", @SceneUndo, 'Z', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Redo", @SceneRedo, 'Y', QUAL_CTRL));
+        popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Cut", @SceneCut, 'X', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Copy", @SceneCopy, 'C', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Paste", @ScenePaste, 'V', QUAL_CTRL));
