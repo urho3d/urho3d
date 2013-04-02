@@ -118,7 +118,11 @@ void UpdateAttributeInspector(bool fullUpdate = true)
 
     // If full update delete all containers and added them back as necessary
     if (fullUpdate)
+    {
         DeleteAllContainers();
+        AddNodeContainer();
+        AddComponentContainer();
+    }
 
     Text@ nodeTitle = nodeContainer.GetChild("TitleText");
     String nodeType;
