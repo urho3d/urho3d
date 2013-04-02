@@ -72,10 +72,22 @@ void Window::RegisterObject(Context* context)
 
 void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
+    if (modal_)
+    {
+        // Shade
+        UIElement* rootElement = GetRoot();
+        const IntVector2& rootSize = rootElement->GetSize();
+        IntRect currentScissor(0, 0, rootSize.x_, rootSize.y_);
+        UIBatch batch(rootElement, BLEND_ALPHA, IntRect(0, 0, rootSize.x_, rootSize.y_), 0, &vertexData);
+        batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0, 0, 0, Color(0.0f, 0.0f, 0.0f, 0.25f));
+        UIBatch::AddOrMerge(batch, batches);
+    }
+
     BorderImage::GetBatches(batches, vertexData, currentScissor);
 
     if (modal_)
     {
+        // Modal frame
         UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
 
         int x = GetIndentWidth();

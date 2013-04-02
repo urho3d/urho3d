@@ -273,14 +273,7 @@ void UI::RenderUpdate()
     batches_.Clear();
     vertexData_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
-    IntRect currentScissor(0, 0, rootSize.x_, rootSize.y_);
-    if (modalElement_)
-    {
-        UIBatch batch(rootElement_, BLEND_ALPHA, currentScissor, 0, &vertexData_);
-        batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0, 0, 0, Color(0.0f, 0.0f, 0.0f, 0.25f));
-        UIBatch::AddOrMerge(batch, batches_);
-    }
-    GetBatches(rootElement_, currentScissor);
+    GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
 
     // Restore UI cursor visibility state
     if (osCursorVisible && cursor_)
