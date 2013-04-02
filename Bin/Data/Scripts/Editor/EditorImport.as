@@ -42,6 +42,11 @@ void ImportModel(const String&in fileName)
         newModel.model = cache.GetResource("Model", modelName);
         ApplyMaterialList(newModel);
 
+        // Create an undo action for the create
+        CreateNodeAction action;
+        action.Define(newNode);
+        SaveEditAction(action);
+
         FocusNode(newNode);
     }
 }
