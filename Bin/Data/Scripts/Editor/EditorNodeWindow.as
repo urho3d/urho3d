@@ -3,7 +3,6 @@
 
 Window@ attributeInspectorWindow;
 UIElement@ parentContainer;
-UIElement@ componentParentContainer;
 UIElement@ nodeContainer;
 XMLFile@ nodeXMLResource;
 XMLFile@ componentXMLResource;
