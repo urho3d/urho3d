@@ -13,6 +13,7 @@ bool attributesFullDirty = false;
 const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
 const ShortStringHash NODE_IDS_VAR("NodeIDs");
 const ShortStringHash COMPONENT_IDS_VAR("ComponentIDs");
+const ShortStringHash UI_ELEMENT_IDS_VAR("UIElementIDs");
 
 uint nodeContainerIndex = M_MAX_UNSIGNED;
 uint componentContainerStartIndex = 0;
@@ -346,7 +347,7 @@ void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializabl
         {
             for (uint i = 0; i < serializables.length; ++i)
                 ids.Push(cast<UIElement>(serializables[i]).GetVar(UI_ELEMENT_ID_VAR));
-            attrEdit.vars[COMPONENT_IDS_VAR] = ids;
+            attrEdit.vars[UI_ELEMENT_IDS_VAR] = ids;
         }
     }
 }
@@ -376,6 +377,20 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
                 Component@ component = editorScene.GetComponent(ids[i].GetUInt());
                 if (component !is null)
                     ret.Push(component);
+            }
+        }
+        else
+        {
+            variant = attrEdit.GetVar(UI_ELEMENT_IDS_VAR);
+            if (!variant.empty)
+            {
+                Array<Variant>@ ids = variant.GetVariantVector();
+                for (uint i = 0; i < ids.length; ++i)
+                {
+                    UIElement@ element = editorUIElement.GetChild(UI_ELEMENT_ID_VAR, Variant(ids[i].GetUInt()), true);
+                    if (element !is null)
+                        ret.Push(element);
+                }
             }
         }
     }

@@ -197,18 +197,10 @@ class DeleteComponentAction : EditAction
     }
 }
 
-enum AttributeTargetType
-{
-    TARGET_NODE,
-    TARGET_COMPONENT,
-    TARGET_UIELEMENT
-}
-
 class EditAttributeAction : EditAction
 {
-    // \todo How to identify UI elements for undo/redo? They don't have IDs
+    int targetType;
     uint targetID;
-    AttributeTargetType targetType;
     uint attrIndex;
     Variant undoValue;
     Variant redoValue;
@@ -221,19 +213,18 @@ class EditAttributeAction : EditAction
 
         if (cast<Node>(target) !is null)
         {
-            Node@ targetNode = target;
-            targetType = TARGET_NODE;
-            targetID = targetNode.id;
+            targetType = ITEM_NODE;
+            targetID = cast<Node>(target).id;
         }
         else if (cast<Component>(target) !is null)
         {
-            Component@ targetComponent = target;
-            targetType = TARGET_COMPONENT;
-            targetID = targetComponent.id;
+            targetType = ITEM_COMPONENT;
+            targetID = cast<Component>(target).id;
         }
-        else
+        else if (cast<UIElement>(target) !is null)
         {
-            targetType = TARGET_UIELEMENT;
+            targetType = ITEM_UI_ELEMENT;
+            targetID = cast<UIElement>(target).vars[UI_ELEMENT_ID_VAR].GetUInt();
         }
     }
 
@@ -241,12 +232,12 @@ class EditAttributeAction : EditAction
     {
         switch (targetType)
         {
-        case TARGET_NODE:
+        case ITEM_NODE:
             return editorScene.GetNode(targetID);
-        case TARGET_COMPONENT:
+        case ITEM_COMPONENT:
             return editorScene.GetComponent(targetID);
-        default:
-            break;
+        case ITEM_UI_ELEMENT:
+            return editorUIElement.GetChild(UI_ELEMENT_ID_VAR, Variant(targetID), true);
         }
         
         return null;
