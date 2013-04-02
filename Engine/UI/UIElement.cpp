@@ -1271,10 +1271,7 @@ const Color& UIElement::GetDerivedColor() const
 const Variant& UIElement::GetVar(const ShortStringHash& key) const
 {
     VariantMap::ConstIterator i = vars_.Find(key);
-    if (i != vars_.End())
-        return i->second_;
-    else
-        return Variant::EMPTY;
+    return i != vars_.End() ? i->second_ : Variant::EMPTY;
 }
 
 IntVector2 UIElement::ScreenToElement(const IntVector2& screenPosition)

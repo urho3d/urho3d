@@ -864,10 +864,7 @@ bool Node::HasComponent(ShortStringHash type) const
 const Variant& Node::GetVar(ShortStringHash key) const
 {
     VariantMap::ConstIterator i = vars_.Find(key);
-    if (i != vars_.End())
-        return i->second_;
-    else
-        return Variant::EMPTY;
+    return i != vars_.End() ? i->second_ : Variant::EMPTY;
 }
 
 Component* Node::GetComponent(ShortStringHash type) const

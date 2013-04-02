@@ -56,6 +56,8 @@
 namespace Urho3D
 {
 
+ShortStringHash VAR_ORIGIN("Origin");
+
 OBJECTTYPESTATIC(UI);
 
 UI::UI(Context* context) :
@@ -439,22 +441,7 @@ void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly)
 {
     UIElement* result = 0;
-    if (modalElement_)
-    {
-        // Create temporary root which only contains the modal element
-        SharedPtr<UIElement> fakeRoot(new UIElement(context_));
-
-        // Special care is needed to insert into fakeRoot without altering the actual modal element's parent
-        Vector<SharedPtr<UIElement> >& children = const_cast<Vector<SharedPtr<UIElement> >& >(fakeRoot->GetChildren());
-        children.Push(SharedPtr<UIElement>(modalElement_));
-
-        GetElementAt(result, fakeRoot, position, enabledOnly);
-
-        // Special care is needed to clear the children vector before the shared pointer goes out of scope to prevent it from detaching modal element
-        children.Clear();
-    }
-    else
-        GetElementAt(result, rootElement_, position, enabledOnly);
+    GetElementAt(result, rootElement_, position, enabledOnly);
     return result;
 }
 
@@ -600,6 +587,28 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     for (unsigned i = 0; i < children.Size(); ++i)
     {
         UIElement* element = children[i];
+        // If has a modal element, skip other elements from the root level
+        // Exception: if the element has the "origin" element in its variables it is a popup and should not be skipped
+        // if the origin element belongs to the modal element's hierarchy
+        if (current == rootElement_ && modalElement_ && element != modalElement_)
+        {
+            bool shouldSkip = true;
+            UIElement* originElement = static_cast<UIElement*>(element->GetVar(VAR_ORIGIN).GetPtr());
+            
+            while (originElement)
+            {
+                if (originElement == modalElement_)
+                {
+                    shouldSkip = false;
+                    break;
+                }
+                originElement = originElement->GetParent();
+            }
+            
+            if (shouldSkip)
+                continue;
+        }
+        
         bool hasChildren = element->GetNumChildren() > 0;
 
         if (element != cursor_.Get() && element->IsVisible())
