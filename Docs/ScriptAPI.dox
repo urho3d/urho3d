@@ -56,6 +56,7 @@ namespace Urho3D
 - void Print(float, bool arg1 = false)
 - void Print(bool, bool arg1 = false)
 - void Print(Variant, bool arg1 = false)
+- void PrintCallStack(bool arg0 = false)
 - String GetPath(const String&)
 - String GetFileName(const String&)
 - String GetExtension(const String&)
@@ -4928,6 +4929,7 @@ Properties:<br>
 - bool resizable
 - IntRect resizeBorder
 - bool modal
+- Color modalShadeColor
 - Color modalFrameColor
 - IntVector2 modalFrameSize
 
