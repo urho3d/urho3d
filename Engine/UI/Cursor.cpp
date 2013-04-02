@@ -55,7 +55,7 @@ Cursor::Cursor(Context* context) :
 {
     // Show on top of all other UI elements
     priority_ = M_MAX_INT;
-    
+
     for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
     {
         CursorShapeInfo& info = shapeInfos_[i];
@@ -81,9 +81,9 @@ Cursor::~Cursor()
 void Cursor::RegisterObject(Context* context)
 {
     context->RegisterFactory<Cursor>();
-    
-    ACCESSOR_ATTRIBUTE(Cursor, VAR_VARIANTVECTOR, "Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
+
     COPY_BASE_ATTRIBUTES(Cursor, BorderImage);
+    ACCESSOR_ATTRIBUTE(Cursor, VAR_VARIANTVECTOR, "Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
 }
 
 void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible)
@@ -106,13 +106,13 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
         int imageWidth = image->GetWidth();
         int width = imageRect.Width();
         int height = imageRect.Height();
-        
+
         // Assume little-endian for all the supported platforms
         unsigned rMask = 0x000000ff;
         unsigned gMask = 0x0000ff00;
         unsigned bMask = 0x00ff0000;
         unsigned aMask = 0xff000000;
-        
+
         SDL_Surface* surface = (comp >= 3 ? SDL_CreateRGBSurface(0, width, height, comp * 8, rMask, gMask, bMask, aMask) : 0);
         if (surface)
         {
@@ -143,12 +143,12 @@ void Cursor::SetShape(CursorShape shape)
         return;
 
     shape_ = shape;
-    
+
     CursorShapeInfo& info = shapeInfos_[shape_];
     texture_ = info.texture_;
     imageRect_ = info.imageRect_;
     SetSize(info.imageRect_.Size());
-    
+
     if (info.osCursor_)
         SDL_SetCursor(info.osCursor_);
 }
@@ -158,7 +158,7 @@ void Cursor::SetShapesAttr(VariantVector value)
     unsigned index = 0;
     if (!value.Size())
         return;
-    
+
     Input* input = GetSubsystem<Input>();
     bool osMouseVisible = input->IsMouseVisible();
 
@@ -181,14 +181,14 @@ void Cursor::SetShapesAttr(VariantVector value)
 VariantVector Cursor::GetShapesAttr() const
 {
     VariantVector ret;
-    
+
     unsigned numShapes = 0;
     for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
     {
         if (shapeInfos_[i].imageRect_ != IntRect::ZERO)
             ++numShapes;
     }
-    
+
     ret.Push(numShapes);
     for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
     {
@@ -200,7 +200,7 @@ VariantVector Cursor::GetShapesAttr() const
             ret.Push(shapeInfos_[i].hotSpot_);
         }
     }
-    
+
     return ret;
 }
 
@@ -209,7 +209,7 @@ void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     unsigned initialSize = vertexData.Size();
     const IntVector2& offset = shapeInfos_[shape_].hotSpot_;
     Vector2 floatOffset(-(float)offset.x_, -(float)offset.y_);
-    
+
     BorderImage::GetBatches(batches, vertexData, currentScissor);
     for (unsigned i = initialSize; i < vertexData.Size(); i += 6)
     {

@@ -49,7 +49,7 @@ ScrollBar::ScrollBar(Context* context) :
     downRect_(IntRect::ZERO)
 {
     enabled_ = true;
-    
+
     backButton_ = CreateChild<Button>();
     backButton_->SetInternal(true);
     backButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
@@ -59,12 +59,12 @@ ScrollBar::ScrollBar(Context* context) :
     forwardButton_ = CreateChild<Button>();
     forwardButton_->SetInternal(true);
     forwardButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
-    
+
     SubscribeToEvent(backButton_, E_PRESSED, HANDLER(ScrollBar, HandleBackButtonPressed));
     SubscribeToEvent(forwardButton_, E_PRESSED, HANDLER(ScrollBar, HandleForwardButtonPressed));
     SubscribeToEvent(slider_, E_SLIDERCHANGED, HANDLER(ScrollBar, HandleSliderChanged));
     SubscribeToEvent(slider_, E_SLIDERPAGED, HANDLER(ScrollBar, HandleSliderPaged));
-    
+
     // Set default orientation/layout
     SetOrientation(O_HORIZONTAL);
 }
@@ -76,7 +76,8 @@ ScrollBar::~ScrollBar()
 void ScrollBar::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollBar>();
-    
+
+    COPY_BASE_ATTRIBUTES(ScrollBar, UIElement);
     ENUM_ACCESSOR_ATTRIBUTE(ScrollBar, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
@@ -86,13 +87,12 @@ void ScrollBar::RegisterObject(Context* context)
     ATTRIBUTE(ScrollBar, VAR_INTRECT, "Right Image Rect", rightRect_, IntRect::ZERO, AM_FILE);
     ATTRIBUTE(ScrollBar, VAR_INTRECT, "Up Image Rect", upRect_, IntRect::ZERO, AM_FILE);
     ATTRIBUTE(ScrollBar, VAR_INTRECT, "Down Image Rect", downRect_, IntRect::ZERO, AM_FILE);
-    COPY_BASE_ATTRIBUTES(ScrollBar, UIElement);
 }
 
 void ScrollBar::ApplyAttributes()
 {
     UIElement::ApplyAttributes();
-    
+
     // Reapply orientation to the button images
     if (slider_->GetOrientation() == O_HORIZONTAL)
     {
@@ -110,7 +110,7 @@ void ScrollBar::OnResize()
 {
     // Disable layout operations while setting the button sizes is incomplete
     DisableLayoutUpdate();
-    
+
     if (slider_->GetOrientation() == O_HORIZONTAL)
     {
         int height = GetHeight();
@@ -123,14 +123,14 @@ void ScrollBar::OnResize()
         backButton_->SetFixedSize(width, width);
         forwardButton_->SetFixedSize(width, width);
     }
-    
+
     EnableLayoutUpdate();
 }
 
 void ScrollBar::SetOrientation(Orientation orientation)
 {
     slider_->SetOrientation(orientation);
-    
+
     if (orientation == O_HORIZONTAL)
     {
         backButton_->SetImageRect(leftRect_);
@@ -141,7 +141,7 @@ void ScrollBar::SetOrientation(Orientation orientation)
         backButton_->SetImageRect(upRect_);
         forwardButton_->SetImageRect(downRect_);
     }
-    
+
     OnResize();
     if (orientation == O_HORIZONTAL)
         SetLayout(LM_HORIZONTAL);
@@ -218,7 +218,7 @@ void ScrollBar::HandleSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     // Send the event forward
     VariantMap newEventData;
-    
+
     newEventData[ScrollBarChanged::P_ELEMENT] = (void*)this;
     newEventData[ScrollBarChanged::P_VALUE] = slider_->GetValue();
     SendEvent(E_SCROLLBARCHANGED, newEventData);
@@ -227,7 +227,7 @@ void ScrollBar::HandleSliderChanged(StringHash eventType, VariantMap& eventData)
 void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
 {
     using namespace SliderPaged;
- 
+
     if (eventData[P_BUTTONS].GetInt() & MOUSEB_LEFT)
     {
         if (eventData[P_OFFSET].GetInt() < 0)

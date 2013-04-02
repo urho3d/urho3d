@@ -50,7 +50,7 @@ ScrollView::ScrollView(Context* context) :
     clipChildren_ = true;
     enabled_ = true;
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
-    
+
     horizontalScrollBar_ = CreateChild<ScrollBar>();
     horizontalScrollBar_->SetInternal(true);
     horizontalScrollBar_->SetAlignment(HA_LEFT, VA_BOTTOM);
@@ -63,7 +63,7 @@ ScrollView::ScrollView(Context* context) :
     scrollPanel_->SetInternal(true);
     scrollPanel_->SetEnabled(true);
     scrollPanel_->SetClipChildren(true);
-    
+
     SubscribeToEvent(horizontalScrollBar_, E_SCROLLBARCHANGED, HANDLER(ScrollView, HandleScrollBarChanged));
     SubscribeToEvent(horizontalScrollBar_, E_VISIBLECHANGED, HANDLER(ScrollView, HandleScrollBarVisibleChanged));
     SubscribeToEvent(verticalScrollBar_, E_SCROLLBARCHANGED, HANDLER(ScrollView, HandleScrollBarChanged));
@@ -77,28 +77,28 @@ ScrollView::~ScrollView()
 void ScrollView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollView>();
-    
+
+    COPY_BASE_ATTRIBUTES(ScrollView, UIElement);
     REF_ACCESSOR_ATTRIBUTE(ScrollView, VAR_INTVECTOR2, "View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_BOOL, "Auto Show/Hide Scrollbars", GetScrollBarsAutoVisible, SetScrollBarsAutoVisible, bool, true, AM_FILE);
-    COPY_BASE_ATTRIBUTES(ScrollView, UIElement);
 }
 
 void ScrollView::ApplyAttributes()
 {
     UIElement::ApplyAttributes();
-    
+
     // Set the scrollbar orientations again and perform size update now that the style is known
     horizontalScrollBar_->SetOrientation(O_HORIZONTAL);
     verticalScrollBar_->SetOrientation(O_VERTICAL);
-    
+
     // If the scroll panel has a child, it should be the content element, which has some special handling
     if (scrollPanel_->GetNumChildren())
         SetContentElement(scrollPanel_->GetChild(0));
-    
+
     OnResize();
-    
+
     // Reapply view position with proper content element and size
     SetViewPosition(viewPositionAttr_);
 }
@@ -124,7 +124,7 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
                 horizontalScrollBar_->StepBack();
         }
         break;
-        
+
     case KEY_RIGHT:
         if (horizontalScrollBar_->IsVisible())
         {
@@ -134,11 +134,11 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
                 horizontalScrollBar_->StepForward();
         }
         break;
-        
+
     case KEY_HOME:
         qualifiers |= QUAL_CTRL;
         // Fallthru
-        
+
     case KEY_UP:
         if (verticalScrollBar_->IsVisible())
         {
@@ -148,11 +148,11 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
                 verticalScrollBar_->StepBack();
         }
         break;
-        
+
     case KEY_END:
         qualifiers |= QUAL_CTRL;
         // Fallthru
-        
+
     case KEY_DOWN:
         if (verticalScrollBar_->IsVisible())
         {
@@ -162,12 +162,12 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
                 verticalScrollBar_->StepForward();
         }
         break;
-        
+
     case KEY_PAGEUP:
         if (verticalScrollBar_->IsVisible())
             verticalScrollBar_->ChangeValue(-pageStep_);
         break;
-        
+
     case KEY_PAGEDOWN:
         if (verticalScrollBar_->IsVisible())
             verticalScrollBar_->ChangeValue(pageStep_);
@@ -179,7 +179,7 @@ void ScrollView::OnResize()
 {
     UpdatePanelSize();
     UpdateViewSize();
-    
+
     // If scrollbar autovisibility is enabled, check whether scrollbars should be visible.
     // This may force another update of the panel size
     if (scrollBarsAutoVisible_)
@@ -188,7 +188,7 @@ void ScrollView::OnResize()
         horizontalScrollBar_->SetVisible(horizontalScrollBar_->GetRange() > M_EPSILON);
         verticalScrollBar_->SetVisible(verticalScrollBar_->GetRange() > M_EPSILON);
         ignoreEvents_ = false;
-        
+
         UpdatePanelSize();
     }
 }
@@ -197,7 +197,7 @@ void ScrollView::SetContentElement(UIElement* element)
 {
     if (element == contentElement_)
         return;
-    
+
     if (contentElement_)
     {
         scrollPanel_->RemoveChild(contentElement_);
@@ -209,7 +209,7 @@ void ScrollView::SetContentElement(UIElement* element)
         scrollPanel_->AddChild(contentElement_);
         SubscribeToEvent(contentElement_, E_RESIZED, HANDLER(ScrollView, HandleElementResized));
     }
-    
+
     OnResize();
 }
 
@@ -269,24 +269,24 @@ void ScrollView::UpdatePanelSize()
     // Ignore events in case content element resizes itself along with the panel
     // (content element resize triggers our OnResize(), so it could lead to infinite recursion)
     ignoreEvents_ = true;
-    
+
     IntVector2 panelSize = GetSize();
     if (verticalScrollBar_->IsVisible())
         panelSize.x_ -= verticalScrollBar_->GetWidth();
     if (horizontalScrollBar_->IsVisible())
         panelSize.y_ -= horizontalScrollBar_->GetHeight();
-    
+
     scrollPanel_->SetSize(panelSize);
     horizontalScrollBar_->SetWidth(scrollPanel_->GetWidth());
     verticalScrollBar_->SetHeight(scrollPanel_->GetHeight());
-    
+
     if (resizeContentWidth_ && contentElement_)
     {
         IntRect panelBorder = scrollPanel_->GetClipBorder();
         contentElement_->SetWidth(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
         UpdateViewSize();
     }
-    
+
     ignoreEvents_ = false;
 }
 
@@ -296,10 +296,10 @@ void ScrollView::UpdateViewSize()
     if (contentElement_)
         size = contentElement_->GetSize();
     IntRect panelBorder = scrollPanel_->GetClipBorder();
-    
+
     viewSize_.x_ = Max(size.x_, scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_);
     viewSize_.y_ = Max(size.y_, scrollPanel_->GetHeight() - panelBorder.top_ - panelBorder.bottom_);
-    
+
     UpdateView(viewPosition_);
     UpdateScrollBars();
 }
@@ -307,12 +307,12 @@ void ScrollView::UpdateViewSize()
 void ScrollView::UpdateScrollBars()
 {
     ignoreEvents_ = true;
-    
+
     IntVector2 size = scrollPanel_->GetSize();
     IntRect panelBorder = scrollPanel_->GetClipBorder();
     size.x_ -= panelBorder.left_ + panelBorder.right_;
     size.y_ -= panelBorder.top_ + panelBorder.bottom_;
-    
+
     if (size.x_ > 0 && viewSize_.x_ > 0)
     {
         float range = (float)viewSize_.x_ / (float)size.x_ - 1.0f;
@@ -327,7 +327,7 @@ void ScrollView::UpdateScrollBars()
         verticalScrollBar_->SetValue((float)viewPosition_.y_ / (float)size.y_);
         verticalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.y_);
     }
-    
+
     ignoreEvents_ = false;
 }
 
@@ -337,15 +337,15 @@ void ScrollView::UpdateView(const IntVector2& position)
     IntRect panelBorder = scrollPanel_->GetClipBorder();
     IntVector2 panelSize(scrollPanel_->GetWidth() - panelBorder.left_ - panelBorder.right_, scrollPanel_->GetHeight() -
         panelBorder.top_ - panelBorder.bottom_);
-    
+
     viewPosition_.x_ = Clamp(position.x_, 0, viewSize_.x_ - panelSize.x_);
     viewPosition_.y_ = Clamp(position.y_, 0, viewSize_.y_ - panelSize.y_);
     scrollPanel_->SetChildOffset(IntVector2(-viewPosition_.x_ + panelBorder.left_, -viewPosition_.y_ + panelBorder.top_));
-    
+
     if (viewPosition_ != oldPosition)
     {
         using namespace ViewChanged;
-        
+
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_X] = viewPosition_.x_;
@@ -362,7 +362,7 @@ void ScrollView::HandleScrollBarChanged(StringHash eventType, VariantMap& eventD
         IntRect panelBorder = scrollPanel_->GetClipBorder();
         size.x_ -= panelBorder.left_ + panelBorder.right_;
         size.y_ -= panelBorder.top_ + panelBorder.bottom_;
-        
+
         UpdateView(IntVector2(
             (int)(horizontalScrollBar_->GetValue() * (float)size.x_),
             (int)(verticalScrollBar_->GetValue() * (float)size.y_)

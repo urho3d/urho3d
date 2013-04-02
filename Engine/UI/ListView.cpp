@@ -162,7 +162,7 @@ ListView::ListView(Context* context) :
     ScrollView(context),
     highlightMode_(HM_FOCUS),
     multiselect_(false),
-    hierarchyMode_(true),	// Init to true here so that the setter below takes effect
+    hierarchyMode_(true),    // Init to true here so that the setter below takes effect
     baseIndent_(0),
     clearSelectionOnDefocus_(false),
     doubleClickInterval_(500),
@@ -185,13 +185,13 @@ void ListView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ListView>();
 
+    COPY_BASE_ATTRIBUTES(ListView, ScrollView);
     ENUM_ACCESSOR_ATTRIBUTE(ListView, "Highlight Mode", GetHighlightMode, SetHighlightMode, HighlightMode, highlightModes, HM_FOCUS, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Multiselect", GetMultiselect, SetMultiselect, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Hierarchy Mode", GetHierarchyMode, SetHierarchyMode, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_INT, "Base Indent", GetBaseIndent, SetBaseIndent, int, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Clear Sel. On Defocus", GetClearSelectionOnDefocus, SetClearSelectionOnDefocus, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_FLOAT, "Double Click Interval", GetDoubleClickInterval, SetDoubleClickInterval, float, 0.5f, AM_FILE);
-    COPY_BASE_ATTRIBUTES(ListView, ScrollView);
 }
 
 void ListView::OnKey(int key, int buttons, int qualifiers)
@@ -407,10 +407,10 @@ void ListView::RemoveItem(UIElement* item, unsigned index)
                 if (i > 0)
                 {
                     int baseIndent = item->GetIndent();
-                    UIElement* prevKin = GetItem(i - 1);		// Could be parent or sibling
+                    UIElement* prevKin = GetItem(i - 1);        // Could be parent or sibling
                     if (prevKin->GetIndent() < baseIndent)
                     {
-                        UIElement* nextKin = GetItem(i + 1);	// Could be sibling or parent-sibling or 0 if index out of bound
+                        UIElement* nextKin = GetItem(i + 1);    // Could be sibling or parent-sibling or 0 if index out of bound
                         if (!nextKin || nextKin->GetIndent() < baseIndent)
                         {
                             // If we reach here then the parent has no other children
@@ -471,9 +471,9 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
 {
     // Make a weak pointer to self to check for destruction as a response to events
     WeakPtr<ListView> self(this);
-    
+
     unsigned numItems = GetNumItems();
-    
+
     // Remove first items that should no longer be selected
     for (PODVector<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
     {
@@ -481,23 +481,23 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
         if (!indices.Contains(index))
         {
             i = selections_.Erase(i);
-            
+
             using namespace ItemSelected;
-            
+
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMDESELECTED, eventData);
-            
+
             if (self.Expired())
                 return;
         }
         else
             ++i;
     }
-    
+
     bool added = false;
-    
+
     // Then add missing items
     for (PODVector<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
     {
@@ -513,14 +513,14 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
                     selections_.Push(index);
                     added = true;
                 }
-                
+
                 using namespace ItemSelected;
-                
+
                 VariantMap eventData;
                 eventData[P_ELEMENT] = (void*)this;
                 eventData[P_SELECTION] = *i;
                 SendEvent(E_ITEMSELECTED, eventData);
-                
+
                 if (self.Expired())
                     return;
             }
@@ -529,11 +529,11 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
         if (!multiselect_)
             break;
     }
-    
+
     // Re-sort selections if necessary
     if (added)
         Sort(selections_.Begin(), selections_.End());
-    
+
     UpdateSelectionEffect();
     SendEvent(E_SELECTIONCHANGED);
 }
@@ -542,31 +542,31 @@ void ListView::AddSelection(unsigned index)
 {
     // Make a weak pointer to self to check for destruction as a response to events
     WeakPtr<ListView> self(this);
-    
+
     if (!multiselect_)
         SetSelection(index);
     else
     {
         if (index >= GetNumItems())
             return;
-        
+
         if (!selections_.Contains(index))
         {
             selections_.Push(index);
-            
+
             using namespace ItemSelected;
-            
+
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMSELECTED, eventData);
-            
+
             if (self.Expired())
                 return;
-            
+
             Sort(selections_.Begin(), selections_.End());
         }
-        
+
         EnsureItemVisibility(index);
         UpdateSelectionEffect();
         SendEvent(E_SELECTIONCHANGED);

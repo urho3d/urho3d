@@ -743,7 +743,7 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
         newComponent.ApplyAttributes();
         FocusComponent(newComponent);
     }
-    
+
     SetSceneModified();
 }
 

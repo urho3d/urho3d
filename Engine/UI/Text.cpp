@@ -84,7 +84,8 @@ Text::~Text()
 void Text::RegisterObject(Context* context)
 {
     context->RegisterFactory<Text>();
-    
+
+    COPY_BASE_ATTRIBUTES(Text, UIElement);
     ACCESSOR_ATTRIBUTE(Text, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     ATTRIBUTE(Text, VAR_INT, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
     ATTRIBUTE(Text, VAR_STRING, "Text", text_, String::EMPTY, AM_FILE);
@@ -93,8 +94,7 @@ void Text::RegisterObject(Context* context)
     ATTRIBUTE(Text, VAR_BOOL, "Word Wrap", wordWrap_, false, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
-    COPY_BASE_ATTRIBUTES(Text, UIElement);
-    
+
     // Change the default value for UseDerivedOpacity
     context->GetAttribute<Text>("Use Derived Opacity")->defaultValue_ = false;
 }
@@ -102,12 +102,12 @@ void Text::RegisterObject(Context* context)
 void Text::ApplyAttributes()
 {
     UIElement::ApplyAttributes();
-    
+
     // Decode to Unicode now
     unicodeText_.Clear();
     for (unsigned i = 0; i < text_.Length();)
         unicodeText_.Push(text_.NextUTF8Char(i));
-    
+
     fontSize_ = Max(fontSize_, 1);
     ValidateSelection();
     UpdateText();
@@ -124,12 +124,12 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             (selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ : hoverColor_));
         UIBatch::AddOrMerge(batch, batches);
     }
-    
+
     // Partial selection batch
     if (!selected_ && selectionLength_ && charSizes_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
     {
         UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
-        
+
         IntVector2 currentStart = charPositions_[selectionStart_];
         IntVector2 currentEnd = currentStart;
         for (unsigned i = selectionStart_; i < selectionStart_ + selectionLength_; ++i)
@@ -156,10 +156,10 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
                 0, 0, 0, 0, selectionColor_);
         }
-        
+
         UIBatch::AddOrMerge(batch, batches);
     }
-    
+
     // Text batch
     if (font_)
     {
@@ -171,23 +171,23 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         {
             // Only traversing thru the printText once regardless of number of textures/pages in the font
             Vector<PODVector<GlyphLocation> > pageGlyphLocations(face->textures_.Size());
-            
+
             unsigned rowIndex = 0;
             int x = GetRowStartPosition(rowIndex);
             int y = 0;
-            
+
             for (unsigned i = 0; i < printText_.Size(); ++i)
             {
                 unsigned c = printText_[i];
-                
+
                 if (c != '\n')
                 {
                     const FontGlyph* p = face->GetGlyph(c);
                     if (!p)
                         continue;
-                    
+
                     pageGlyphLocations[p->page_].Push(GlyphLocation(x, y, p));
-                    
+
                     x += p->advanceX_;
                     if (i < printText_.Size() - 1)
                         x += face->GetKerning(c, printText_[i + 1]);
@@ -198,12 +198,12 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                     y += rowHeight_;
                 }
             }
-            
+
             for (unsigned n = 0; n < face->textures_.Size(); ++n)
             {
                 // One batch per texture/page
                 UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, face->textures_[n], &vertexData);
-                
+
                 const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations[n];
                 for (unsigned i = 0; i < pageGlyphLocation.Size(); ++i)
                 {
@@ -211,7 +211,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                     const FontGlyph& glyph = *glyphLocation.glyph_;
                     pageBatch.AddQuad(glyphLocation.x_ + glyph.offsetX_, glyphLocation.y_ + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
                 }
-                
+
                 batches.Push(pageBatch);
             }
         }
@@ -221,21 +221,21 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             unsigned rowIndex = 0;
             int x = GetRowStartPosition(rowIndex);
             int y = 0;
-            
+
             UIBatch batch(this, BLEND_ALPHA, currentScissor, face->textures_[0], &vertexData);
-            
+
             for (unsigned i = 0; i < printText_.Size(); ++i)
             {
                 unsigned c = printText_[i];
-                
+
                 if (c != '\n')
                 {
                     const FontGlyph* p = face->GetGlyph(c);
                     if (!p)
                         continue;
-                    
+
                     batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_);
-                    
+
                     x += p->advanceX_;
                     if (i < printText_.Size() - 1)
                         x += face->GetKerning(c, printText_[i + 1]);
@@ -246,11 +246,11 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                     y += rowHeight_;
                 }
             }
-            
+
             UIBatch::AddOrMerge(batch, batches);
         }
     }
-    
+
     // Reset hovering for next frame
     hovering_ = false;
 }
@@ -274,26 +274,26 @@ bool Text::SetFont(Font* font, int size)
         LOGERROR("Null font for Text");
         return false;
     }
-    
+
     if (font != font_ || size != fontSize_)
     {
         font_ = font;
         fontSize_ = Max(size, 1);
         UpdateText();
     }
-    
+
     return true;
 }
 
 void Text::SetText(const String& text)
 {
     text_ = text;
-    
+
     // Decode to Unicode now
     unicodeText_.Clear();
     for (unsigned i = 0; i < text_.Length();)
         unicodeText_.Push(text_.NextUTF8Char(i));
-    
+
     ValidateSelection();
     UpdateText();
 }
@@ -363,22 +363,22 @@ void Text::UpdateText(bool inResize)
 {
     int width = 0;
     int height = 0;
-    
+
     rowWidths_.Clear();
     printText_.Clear();
-    
+
     PODVector<unsigned> printToText;
-    
+
     if (font_)
     {
         const FontFace* face = font_->GetFace(fontSize_);
         if (!face)
             return;
-        
+
         rowHeight_ = face->rowHeight_;
         int rowWidth = 0;
         int rowHeight = (int)(rowSpacing_ * rowHeight_);
-        
+
         // First see if the text must be split up
         if (!wordWrap_)
         {
@@ -396,11 +396,11 @@ void Text::UpdateText(bool inResize)
             {
                 unsigned j;
                 unsigned c = unicodeText_[i];
-                
+
                 if (c != '\n')
                 {
                     bool ok = true;
-                    
+
                     if (nextBreak <= i)
                     {
                         int futureRowWidth = rowWidth;
@@ -431,7 +431,7 @@ void Text::UpdateText(bool inResize)
                             }
                         }
                     }
-                    
+
                     if (!ok)
                     {
                         // If did not find any breaks on the line, copy until j, or at least 1 char, to prevent infinite loop
@@ -449,7 +449,7 @@ void Text::UpdateText(bool inResize)
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
-                    
+
                     if (i < unicodeText_.Size())
                     {
                         // When copying a space, position is allowed to be over row width
@@ -477,13 +477,13 @@ void Text::UpdateText(bool inResize)
                 }
             }
         }
-        
+
         rowWidth = 0;
-        
+
         for (unsigned i = 0; i < printText_.Size(); ++i)
         {
             unsigned c = printText_[i];
-            
+
             if (c != '\n')
             {
                 const FontGlyph* glyph = face->GetGlyph(c);
@@ -502,22 +502,22 @@ void Text::UpdateText(bool inResize)
                 rowWidth = 0;
             }
         }
-        
+
         if (rowWidth)
         {
             width = Max(width, rowWidth);
             height += rowHeight;
             rowWidths_.Push(rowWidth);
         }
-        
+
         // Set row height even if text is empty
         if (!height)
             height = rowHeight;
-        
+
         // Store position & size of each character
         charPositions_.Resize(unicodeText_.Size() + 1);
         charSizes_.Resize(unicodeText_.Size());
-        
+
         unsigned rowIndex = 0;
         int x = GetRowStartPosition(rowIndex);
         int y = 0;
@@ -546,7 +546,7 @@ void Text::UpdateText(bool inResize)
         // Store the ending position
         charPositions_[unicodeText_.Size()] = IntVector2(x, y);
     }
-    
+
     // Set minimum and current size according to the text size, but respect fixed width if set
     if (GetMinWidth() != GetMaxWidth())
     {
@@ -559,7 +559,7 @@ void Text::UpdateText(bool inResize)
 void Text::ValidateSelection()
 {
     unsigned textLength = unicodeText_.Size();
-    
+
     if (textLength)
     {
         if (selectionStart_ >= textLength)
@@ -577,10 +577,10 @@ void Text::ValidateSelection()
 int Text::GetRowStartPosition(unsigned rowIndex) const
 {
     int rowWidth = 0;
-    
+
     if (rowIndex < rowWidths_.Size())
         rowWidth = rowWidths_[rowIndex];
-    
+
     int ret = GetIndentWidth();
 
     switch (textAlignment_)
@@ -594,7 +594,7 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
         ret += GetSize().x_ - rowWidth;
         break;
     }
-    
+
     return ret;
 }
 

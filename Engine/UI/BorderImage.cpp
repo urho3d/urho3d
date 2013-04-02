@@ -57,14 +57,14 @@ BorderImage::~BorderImage()
 void BorderImage::RegisterObject(Context* context)
 {
     context->RegisterFactory<BorderImage>();
-    
+
+    COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
     ACCESSOR_ATTRIBUTE(BorderImage, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTRECT, "Border", GetBorder, SetBorder, IntRect, IntRect::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BorderImage, VAR_INTVECTOR2, "Hover Image Offset", GetHoverOffset, SetHoverOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(BorderImage, VAR_BOOL, "Tiled", IsTiled, SetTiled, bool, true, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(BorderImage, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
-    COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
 }
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
@@ -125,20 +125,20 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
     if (GetDerivedOpacity() < 1.0f || color_[C_TOPLEFT].a_ < 1.0f || color_[C_TOPRIGHT].a_ < 1.0f ||
         color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
-    
+
     UIBatch batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData);
-    
+
     // Calculate size of the inner rect, and texture dimensions of the inner rect
     int x = GetIndentWidth();
     IntVector2 size = GetSize();
     size.x_ -= x;
     IntVector2 innerSize(
-        Max(size.x_ - border_.left_ - border_.right_, 0), 
+        Max(size.x_ - border_.left_ - border_.right_, 0),
         Max(size.y_ - border_.top_ - border_.bottom_, 0));
     IntVector2 innerTextureSize(
         Max(imageRect_.right_ - imageRect_.left_ - border_.left_ - border_.right_, 0),
         Max(imageRect_.bottom_ - imageRect_.top_ - border_.top_ - border_.bottom_, 0));
-    
+
     IntVector2 topLeft(imageRect_.left_, imageRect_.top_);
     topLeft += offset;
 
@@ -171,7 +171,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
     if (border_.bottom_)
     {
         if (border_.left_)
-            batch.AddQuad(x, border_.top_ + innerSize.y_, border_.left_, border_.bottom_, topLeft.x_, topLeft.y_ + border_.top_ + 
+            batch.AddQuad(x, border_.top_ + innerSize.y_, border_.left_, border_.bottom_, topLeft.x_, topLeft.y_ + border_.top_ +
                 innerTextureSize.y_);
         if (innerSize.x_)
             batch.AddQuad(x + border_.left_, border_.top_ + innerSize.y_, innerSize.x_, border_.bottom_, topLeft.x_ +
@@ -180,9 +180,9 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
             batch.AddQuad(x + border_.left_ + innerSize.x_, border_.top_ + innerSize.y_, border_.right_, border_.bottom_,
                 topLeft.x_ + border_.left_ + innerTextureSize.x_, topLeft.y_ + border_.top_ + innerTextureSize.y_);
     }
-    
+
     UIBatch::AddOrMerge(batch, batches);
-    
+
     // Reset hovering for next frame
     hovering_ = false;
 }

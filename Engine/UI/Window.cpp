@@ -61,6 +61,7 @@ void Window::RegisterObject(Context* context)
 {
     context->RegisterFactory<Window>();
 
+    COPY_BASE_ATTRIBUTES(Window, BorderImage);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_INTRECT, "Resize Border", GetResizeBorder, SetResizeBorder, IntRect, IntRect(DEFAULT_RESIZE_BORDER, \
         DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER), AM_FILE);
     ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Movable", IsMovable, SetMovable, bool, false, AM_FILE);
@@ -69,7 +70,6 @@ void Window::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_COLOR, "Modal Shade Color", GetModalShadeColor, SetModalShadeColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_COLOR, "Modal Frame Color", GetModalFrameColor, SetModalFrameColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_INTVECTOR2, "Modal Frame Size", GetModalFrameSize, SetModalFrameSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    COPY_BASE_ATTRIBUTES(Window, BorderImage);
 }
 
 void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)

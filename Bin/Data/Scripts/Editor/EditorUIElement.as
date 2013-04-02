@@ -87,7 +87,6 @@ void OpenUIElement(const String&in fileName)
     }
 
     UpdateHierarchyItem(element, true);
-    UpdateAttributeInspector();
 
     suppressSceneChanges = false;
 }
@@ -117,7 +116,6 @@ bool CloseAllUIElements()
 
     editorUIElement.RemoveAllChildren();
     UpdateHierarchyItem(editorUIElement, true);
-    UpdateAttributeInspector();
 
     suppressUIElementChanges = false;
 

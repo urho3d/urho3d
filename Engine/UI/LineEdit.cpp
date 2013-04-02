@@ -53,13 +53,13 @@ LineEdit::LineEdit(Context* context) :
     clipChildren_ = true;
     enabled_ = true;
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
-    
+
     text_ = CreateChild<Text>();
     text_->SetInternal(true);
     cursor_ = CreateChild<BorderImage>();
     cursor_->SetInternal(true);
     cursor_->SetPriority(1); // Show over text
-    
+
     SubscribeToEvent(this, E_FOCUSED, HANDLER(LineEdit, HandleFocused));
     SubscribeToEvent(this, E_DEFOCUSED, HANDLER(LineEdit, HandleDefocused));
 }
@@ -71,7 +71,8 @@ LineEdit::~LineEdit()
 void LineEdit::RegisterObject(Context* context)
 {
     context->RegisterFactory<LineEdit>();
-    
+
+    COPY_BASE_ATTRIBUTES(LineEdit, BorderImage);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_INT, "Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
@@ -79,13 +80,12 @@ void LineEdit::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
     ATTRIBUTE(LineEdit, VAR_INT, "Echo Character", echoCharacter_, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_FLOAT, "Double Click Interval", GetDoubleClickInterval, SetDoubleClickInterval, float, 0.5f, AM_FILE);
-    COPY_BASE_ATTRIBUTES(LineEdit, BorderImage);
 }
 
 void LineEdit::ApplyAttributes()
 {
     BorderImage::ApplyAttributes();
-    
+
     // Set the text's position to match clipping, so that text left edge is not left partially hidden
     text_->SetPosition(clipBorder_.left_, clipBorder_.top_);
 }
@@ -94,7 +94,7 @@ void LineEdit::Update(float timeStep)
 {
     if (cursorBlinkRate_ > 0.0f)
         cursorBlinkTimer_ = fmodf(cursorBlinkTimer_ + cursorBlinkRate_ * timeStep, 1.0f);
-    
+
     // Update cursor position if font has changed
     if (text_->GetFont() != lastFont_ || text_->GetFontSize() != lastFontSize_)
     {
@@ -102,7 +102,7 @@ void LineEdit::Update(float timeStep)
         lastFontSize_ = text_->GetFontSize();
         UpdateCursor();
     }
-   
+
     bool cursorVisible = HasFocus() ? cursorBlinkTimer_ < 0.5f : false;
     cursor_->SetVisible(cursorVisible);
 }
@@ -154,7 +154,7 @@ bool LineEdit::OnDragDropTest(UIElement* source)
         ShortStringHash sourceType = source->GetType();
         return sourceType == LineEdit::GetTypeStatic() || sourceType == Text::GetTypeStatic();
     }
-    
+
     return false;
 }
 
@@ -176,7 +176,7 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -184,7 +184,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
 {
     bool changed = false;
     bool cursorMoved = false;
-    
+
     switch (key)
     {
     case 'X':
@@ -193,10 +193,10 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         {
             unsigned start = text_->GetSelectionStart();
             unsigned length = text_->GetSelectionLength();
-            
+
             if (text_->GetSelectionLength())
                 GetSubsystem<UI>()->SetClipBoardText(line_.SubstringUTF8(start, length));
-            
+
             if (key == 'X')
             {
                 if (start + length < line_.LengthUTF8())
@@ -209,7 +209,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             }
         }
         break;
-        
+
     case 'V':
         if (textCopyable_ && qualifiers & QUAL_CTRL)
         {
@@ -237,11 +237,11 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             }
         }
         break;
-        
+
     case KEY_HOME:
         qualifiers |= QUAL_CTRL;
         // Fallthru
-            
+
     case KEY_LEFT:
         if (!(qualifiers & QUAL_SHIFT))
             text_->ClearSelection();
@@ -249,13 +249,13 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         {
             if (textSelectable_ && qualifiers & QUAL_SHIFT && !text_->GetSelectionLength())
                 dragBeginCursor_ = cursorPosition_;
-            
+
             if (qualifiers & QUAL_CTRL)
                 cursorPosition_ = 0;
             else
                 --cursorPosition_;
             cursorMoved = true;
-            
+
             if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
                 unsigned start = dragBeginCursor_;
@@ -267,7 +267,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             }
         }
         break;
-        
+
     case KEY_END:
         qualifiers |= QUAL_CTRL;
         // Fallthru
@@ -279,13 +279,13 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         {
             if (textSelectable_ && qualifiers & QUAL_SHIFT && !text_->GetSelectionLength())
                 dragBeginCursor_ = cursorPosition_;
-            
+
             if (qualifiers & QUAL_CTRL)
                 cursorPosition_ = line_.LengthUTF8();
             else
                 ++cursorPosition_;
             cursorMoved = true;
-            
+
             if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
                 unsigned start = dragBeginCursor_;
@@ -297,7 +297,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             }
         }
         break;
-        
+
     case KEY_DELETE:
         if (!text_->GetSelectionLength())
         {
@@ -321,14 +321,14 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             changed = true;
         }
         break;
-        
+
     case KEY_UP:
     case KEY_DOWN:
     case KEY_PAGEUP:
     case KEY_PAGEDOWN:
         {
             using namespace UnhandledKey;
-            
+
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_KEY] = key;
@@ -337,7 +337,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             SendEvent(E_UNHANDLEDKEY, eventData);
         }
         return;
-        
+
     case KEY_BACKSPACE:
         if (!text_->GetSelectionLength())
         {
@@ -365,13 +365,13 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             changed = true;
         }
         break;
-        
+
     case KEY_RETURN:
     case KEY_RETURN2:
     case KEY_KP_ENTER:
         {
             using namespace TextFinished;
-            
+
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_TEXT] = line_;
@@ -380,7 +380,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         }
         break;
     }
-    
+
     if (changed)
     {
         UpdateText();
@@ -393,11 +393,11 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
 void LineEdit::OnChar(unsigned c, int buttons, int qualifiers)
 {
     bool changed = false;
-    
+
     // If only CTRL is held down, do not edit
     if ((qualifiers & (QUAL_CTRL | QUAL_ALT)) == QUAL_CTRL)
         return;
-    
+
     if (c >= 0x20 && (!maxLength_ || line_.LengthUTF8() < maxLength_))
     {
         String charStr;
@@ -424,7 +424,7 @@ void LineEdit::OnChar(unsigned c, int buttons, int qualifiers)
         }
         changed = true;
     }
-    
+
     if (changed)
     {
         text_->ClearSelection();
@@ -448,7 +448,7 @@ void LineEdit::SetCursorPosition(unsigned position)
 {
     if (position > line_.LengthUTF8() || !cursorMovable_)
         position = line_.LengthUTF8();
-    
+
     if (position != cursorPosition_)
     {
         cursorPosition_ = position;
@@ -459,7 +459,7 @@ void LineEdit::SetCursorPosition(unsigned position)
 void LineEdit::SetCursorBlinkRate(float rate)
 {
     cursorBlinkRate_ = Max(rate, 0.0f);
-    
+
     if (cursorBlinkRate_ == 0.0f)
         cursorBlinkTimer_ = 0.0f;   // Cursor does not blink, i.e. always visible
 }
@@ -503,7 +503,7 @@ float LineEdit::GetDoubleClickInterval() const
 void LineEdit::UpdateText()
 {
     unsigned utf8Length = line_.LengthUTF8();
-    
+
     if (!echoCharacter_)
         text_->SetText(line_);
     else
@@ -518,9 +518,9 @@ void LineEdit::UpdateText()
         cursorPosition_ = utf8Length;
         UpdateCursor();
     }
-    
+
     using namespace TextChanged;
-    
+
     VariantMap eventData;
     eventData[P_ELEMENT] = (void*)this;
     eventData[P_TEXT] = line_;
@@ -533,11 +533,11 @@ void LineEdit::UpdateCursor()
     const PODVector<IntVector2>& charPositions = text_->GetCharPositions();
     if (charPositions.Size())
         x = cursorPosition_ < charPositions.Size() ? charPositions[cursorPosition_].x_ : charPositions.Back().x_;
-    
+
     text_->SetPosition(clipBorder_.left_, clipBorder_.top_);
     cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
     cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
-    
+
     // Scroll if necessary
     int sx = -GetChildOffset().x_;
     int left = clipBorder_.left_;
@@ -549,7 +549,7 @@ void LineEdit::UpdateCursor()
     if (sx < 0)
         sx = 0;
     SetChildOffset(IntVector2(-sx, 0));
-    
+
     // Restart blinking
     cursorBlinkTimer_ = 0.0f;
 }
@@ -559,16 +559,16 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
     IntVector2 screenPosition = ElementToScreen(position);
     IntVector2 textPosition = text_->ScreenToElement(screenPosition);
     const PODVector<IntVector2>& charPositions = text_->GetCharPositions();
-    
+
     if (textPosition.x_ < 0)
         return 0;
-    
+
     for (unsigned i = charPositions.Size() - 1; i < charPositions.Size(); --i)
     {
         if (textPosition.x_ >= charPositions[i].x_)
             return i;
     }
-    
+
     return M_MAX_UNSIGNED;
 }
 

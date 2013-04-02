@@ -56,14 +56,15 @@ void Sprite::RegisterObject(Context* context)
 {
     context->RegisterFactory<Sprite>();
     
-    ACCESSOR_ATTRIBUTE(Sprite, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
-    ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Position", GetPosition, SetPosition, Vector2, Vector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Hotspot", GetHotSpot, SetHotSpot, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Scale", GetScale, SetScale, Vector2, Vector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(Sprite, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Sprite, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
+    ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(Sprite, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
     ACCESSOR_ATTRIBUTE(Sprite, VAR_INT, "Priority", GetPriority, SetPriority, int, 0, AM_FILE);

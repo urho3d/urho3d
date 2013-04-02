@@ -363,8 +363,8 @@ void Script::DumpAPI()
 
 void Script::MessageCallback(const asSMessageInfo* msg)
 {
-    String message = String(msg->section) + " (" + String(msg->row) + "," + String(msg->col) + ") " +
-        String(msg->message);
+    String message;
+    message.AppendWithFormat("%s:%d,%d %s", msg->section, msg->row, msg->col, msg->message);
     
     if (logMode_ == LOGMODE_IMMEDIATE)
     {
@@ -393,10 +393,8 @@ void Script::MessageCallback(const asSMessageInfo* msg)
 
 void Script::ExceptionCallback(asIScriptContext* context)
 {
-    asIScriptFunction *function = context->GetExceptionFunction();
-    String message = "Exception '" + String(context->GetExceptionString()) + "' in '" +
-        String(function->GetDeclaration()) + "'\n";
-    message += GetCallStack(context);
+    String message;
+    message.AppendWithFormat("- Exception '%s' in '%s'\n%s", context->GetExceptionString(), context->GetExceptionFunction()->GetDeclaration(), GetCallStack(context).CString());
     
     asSMessageInfo msg;
     msg.row = context->GetExceptionLineNumber(&msg.col, &msg.section);

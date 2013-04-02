@@ -48,10 +48,10 @@ CheckBox::~CheckBox()
 void CheckBox::RegisterObject(Context* context)
 {
     context->RegisterFactory<CheckBox>();
-    
+
+    COPY_BASE_ATTRIBUTES(CheckBox, BorderImage);
     ACCESSOR_ATTRIBUTE(CheckBox, VAR_BOOL,"Is Checked", IsChecked, SetChecked, bool, true, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(CheckBox, VAR_INTVECTOR2,"Checked Image Offset", GetCheckedOffset, SetCheckedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
-    COPY_BASE_ATTRIBUTES(CheckBox, BorderImage);
 }
 
 void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
@@ -61,7 +61,7 @@ void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexD
         offset += hoverOffset_;
     if (checked_)
         offset += checkedOffset_;
-    
+
     BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
@@ -76,9 +76,9 @@ void CheckBox::SetChecked(bool enable)
     if (enable != checked_)
     {
         checked_ = enable;
-        
+
         using namespace Toggled;
-        
+
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_STATE] = checked_;

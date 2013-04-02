@@ -59,9 +59,9 @@ Menu::~Menu()
 void Menu::RegisterObject(Context* context)
 {
     context->RegisterFactory<Menu>();
-    
-    REF_ACCESSOR_ATTRIBUTE(Menu, VAR_INTVECTOR2, "Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+
     COPY_BASE_ATTRIBUTES(Menu, Button);
+    REF_ACCESSOR_ATTRIBUTE(Menu, VAR_INTVECTOR2, "Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
 void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
@@ -87,7 +87,7 @@ void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition,
         }
     }
 }
-    
+
 void Menu::OnShowPopup()
 {
 }
@@ -101,16 +101,16 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
         String styleName = source.GetAttribute("style");
         if (styleName.Empty())
             styleName = GetTypeName();
-        
+
         SetStyle(styleFile, styleName);
     }
-    
+
     // Then load rest of the attributes from the source
     if (!Serializable::LoadXML(source))
         return false;
-    
+
     unsigned nextInternalChild = 0;
-    
+
     // Load child elements. Internal elements are not to be created as they already exist
     XMLElement childElem = source.GetChild("element");
     while (childElem)
@@ -121,7 +121,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
         if (typeName.Empty())
             typeName = "UIElement";
         UIElement* child = 0;
-        
+
         if (!internalElem)
         {
             if (!popupElem)
@@ -155,23 +155,23 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
                         break;
                     }
                 }
-                
+
                 if (!child)
                     LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
             }
         }
-        
+
         if (child)
         {
             if (!child->LoadXML(childElem, styleFile))
                 return false;
         }
-        
+
         childElem = childElem.GetNext("element");
     }
-    
+
     ApplyAttributes();
-    
+
     return true;
 }
 
@@ -185,11 +185,11 @@ bool Menu::SaveXML(XMLElement& dest)
         if (!dest.SetBool("internal", internal_))
             return false;
     }
-    
+
     // Write attributes
     if (!Serializable::SaveXML(dest))
         return false;
-    
+
     // Write child elements
     for (unsigned i = 0; i < children_.Size(); ++i)
     {
@@ -198,7 +198,7 @@ bool Menu::SaveXML(XMLElement& dest)
         if (!element->SaveXML(childElem))
             return false;
     }
-    
+
     // Save the popup element as a "virtual" child element
     if (popup_)
     {
@@ -207,7 +207,7 @@ bool Menu::SaveXML(XMLElement& dest)
         if (!popup_->SaveXML(childElem))
             return false;
     }
-    
+
     return true;
 }
 
@@ -215,12 +215,12 @@ void Menu::SetPopup(UIElement* popup)
 {
     if (popup == this)
         return;
-    
+
     if (popup_ && !popup)
         ShowPopup(false);
-    
+
     popup_ = popup;
-    
+
     // Detach from current parent (if any) to only show when it is time
     if (popup_)
         popup_->Remove();
@@ -240,16 +240,16 @@ void Menu::ShowPopup(bool enable)
 {
     if (!popup_)
         return;
-    
+
     if (enable)
     {
         // Find the UI root element for showing the popup
         UIElement* root = GetRoot();
         if (!root)
             return;
-        
+
         OnShowPopup();
-        
+
         if (popup_->GetParent() != root)
             root->AddChild(popup_);
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
@@ -268,12 +268,12 @@ void Menu::ShowPopup(bool enable)
             if (menu)
                 menu->ShowPopup(false);
         }
-        
+
         popup_->SetVar(originHash, Variant::EMPTY);
         popup_->SetVisible(false);
         popup_->Remove();
     }
-    
+
     showPopup_ = enable;
     selected_ = enable;
 }
@@ -282,7 +282,7 @@ void Menu::SetAccelerator(int key, int qualifiers)
 {
     acceleratorKey_ = key;
     acceleratorQualifiers_ = qualifiers;
-    
+
     if (key)
         SubscribeToEvent(E_KEYDOWN, HANDLER(Menu, HandleKeyDown));
     else
@@ -302,15 +302,15 @@ void Menu::HandlePressedReleased(StringHash eventType, VariantMap& eventData)
         if (popup_)
             return;
     }
-    
+
     // Toggle popup visibility if exists
     ShowPopup(!showPopup_);
-    
+
     // Send event on each click if no popup, or whenever the popup is opened
     if (!popup_ || showPopup_)
     {
         using namespace MenuSelected;
-        
+
         VariantMap newEventData;
         newEventData[P_ELEMENT] = (void*)this;
         SendEvent(E_MENUSELECTED, newEventData);
@@ -321,23 +321,23 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
 {
     if (!showPopup_)
         return;
-    
+
     using namespace FocusChanged;
-    
+
     UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].GetPtr());
     UIElement* root = GetRoot();
-    
+
     // If another element was focused due to the menu button being clicked, do not hide the popup
     if (eventType == E_FOCUSCHANGED && static_cast<UIElement*>(eventData[P_CLICKEDELEMENT].GetPtr()))
         return;
-    
+
     // If clicked emptiness or defocused, hide the popup
     if (!element)
     {
         ShowPopup(false);
         return;
     }
-    
+
     // Otherwise see if the clicked element has either the menu item or the popup in its parent chain.
     // In that case, do not hide
     while (element)
@@ -349,7 +349,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
         else
             element = element->GetParent();
     }
-    
+
     ShowPopup(false);
 }
 
@@ -357,9 +357,9 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     if (!enabled_)
         return;
-    
+
     using namespace KeyDown;
-    
+
     // Activate if accelerator key pressed
     if (eventData[P_KEY].GetInt() == acceleratorKey_ && (acceleratorQualifiers_ == QUAL_ANY || eventData[P_QUALIFIERS].GetInt() ==
         acceleratorQualifiers_) && eventData[P_REPEAT].GetBool() == false)

@@ -52,19 +52,19 @@ Button::~Button()
 void Button::RegisterObject(Context* context)
 {
     context->RegisterFactory<Button>();
-    
+
+    COPY_BASE_ATTRIBUTES(Button, BorderImage);
     REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Label Offset", GetLabelOffset, SetLabelOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(Button, VAR_FLOAT, "Repeat Delay", GetRepeatDelay, SetRepeatDelay, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(Button, VAR_FLOAT, "Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
-    COPY_BASE_ATTRIBUTES(Button, BorderImage);
 }
 
 void Button::Update(float timeStep)
 {
     if (!hovering_ && pressed_)
         SetPressed(false);
-    
+
     // Send repeat events if pressed
     if (pressed_ && repeatRate_ > 0.0f)
     {
@@ -72,9 +72,9 @@ void Button::Update(float timeStep)
         if (repeatTimer_ <= 0.0f)
         {
             repeatTimer_ += 1.0f / repeatRate_;
-            
+
             using namespace Pressed;
-            
+
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             SendEvent(E_PRESSED, eventData);
@@ -89,7 +89,7 @@ void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
         offset += hoverOffset_;
     if (pressed_ || selected_)
         offset += pressedOffset_;
-    
+
     BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
@@ -101,9 +101,9 @@ void Button::OnHover(const IntVector2& position, const IntVector2& screenPositio
         if (!(buttons & MOUSEB_LEFT))
         {
             SetPressed(false);
-            
+
             using namespace Released;
-            
+
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
             SendEvent(E_RELEASED, eventData);
@@ -118,9 +118,9 @@ void Button::OnClick(const IntVector2& position, const IntVector2& screenPositio
         SetPressed(true);
         repeatTimer_ = repeatDelay_;
         hovering_ = true;
-        
+
         using namespace Pressed;
-        
+
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         SendEvent(E_PRESSED, eventData);

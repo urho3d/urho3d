@@ -57,7 +57,7 @@ Slider::Slider(Context* context) :
     enabled_ = true;
     knob_ = CreateChild<BorderImage>();
     knob_->SetInternal(true);
-    
+
     UpdateSlider();
 }
 
@@ -68,19 +68,19 @@ Slider::~Slider()
 void Slider::RegisterObject(Context* context)
 {
     context->RegisterFactory<Slider>();
-    
+
+    COPY_BASE_ATTRIBUTES(Slider, BorderImage);
     ENUM_ACCESSOR_ATTRIBUTE(Slider, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
     ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
-    COPY_BASE_ATTRIBUTES(Slider, BorderImage);
 }
 
 void Slider::Update(float timeStep)
 {
     if (dragSlider_)
         hovering_ = true;
-    
+
     // Propagate hover effect to the slider knob
     knob_->SetHovering(hovering_);
     knob_->SetSelected(hovering_);
@@ -89,10 +89,10 @@ void Slider::Update(float timeStep)
 void Slider::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     BorderImage::OnHover(position, screenPosition, buttons, qualifiers, cursor);
-    
+
     // Show hover effect if inside the slider knob
     hovering_ = knob_->IsInside(screenPosition, true);
-    
+
     // If not hovering on the knob, send it as page event
     if (!hovering_)
         Page(position, buttons, qualifiers);
@@ -118,10 +118,10 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
 {
     if (!dragSlider_ || GetSize() == knob_->GetSize())
         return;
-    
+
     float newValue = value_;
     IntVector2 delta = position - dragBeginCursor_;
-    
+
     if (orientation_ == O_HORIZONTAL)
     {
         int newX = Clamp(dragBeginPosition_.x_ + delta.x_, 0, GetWidth() - knob_->GetWidth());
@@ -134,7 +134,7 @@ void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         knob_->SetPosition(0, newY);
         newValue = (float)newY * range_ / (float)(GetHeight() - knob_->GetHeight());
     }
-    
+
     SetValue(newValue);
 }
 
@@ -172,9 +172,9 @@ void Slider::SetValue(float value)
     {
         value_ = value;
         UpdateSlider();
-        
+
         using namespace SliderChanged;
-        
+
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_VALUE] = value_;
@@ -195,7 +195,7 @@ void Slider::SetRepeatRate(float rate)
 void Slider::UpdateSlider()
 {
     const IntRect& border = knob_->GetBorder();
-    
+
     if (range_ > 0.0f)
     {
         if (orientation_ == O_HORIZONTAL)
@@ -227,7 +227,7 @@ void Slider::Page(const IntVector2& position, int buttons, int qualifiers)
     float length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());
 
     using namespace SliderPaged;
-    
+
     VariantMap eventData;
     eventData[P_ELEMENT] = (void*)this;
     eventData[P_OFFSET] = offset;

@@ -77,14 +77,13 @@ bool ResetScene()
 
     UpdateWindowTitle();
     UpdateHierarchyItem(editorScene, true);
-    UpdateAttributeInspector();
     ClearEditActions();
 
     suppressSceneChanges = false;
 
     ResetCamera();
     CreateGizmo();
-    
+
     return true;
 }
 
@@ -150,7 +149,6 @@ bool LoadScene(const String&in fileName)
 
     UpdateWindowTitle();
     UpdateHierarchyItem(editorScene, true);
-    UpdateAttributeInspector();
     ClearEditActions();
 
     suppressSceneChanges = false;
@@ -182,7 +180,7 @@ bool SaveScene(const String&in fileName)
 
     sceneModified = false;
     UpdateWindowTitle();
-    
+
     return true;
 }
 
@@ -450,7 +448,7 @@ bool ScenePaste()
             Node@ newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
             newNode.LoadXML(rootElem);
             newNode.ApplyAttributes();
-            
+
             // Create an undo action for the paste
             CreateNodeAction action;
             action.Define(newNode);
@@ -519,7 +517,7 @@ bool SceneToggleEnable()
         if (selectedComponents[i].numAttributes > 0 && selectedComponents[i].attributeInfos[0].name == "Is Enabled")
             selectedComponents[i].enabled = !selectedComponents[i].enabled;
     }
-    
+
     return true;
 }
 
@@ -592,8 +590,8 @@ bool SceneSelectAll()
         hierarchyList.SetSelections(indices);
         EndSelectionModify();
     }
-    
-    return true; 
+
+    return true;
 }
 
 bool SceneUndo()
@@ -616,7 +614,7 @@ bool SceneRedo()
             undoStack[undoStackPos].actions[i].Redo();
         ++undoStackPos;
     }
-    
+
     return true;
 }
 
@@ -648,7 +646,7 @@ void SaveEditActionGroup(EditActionGroup@ group)
     undoStack.Resize(undoStackPos);
     undoStack.Push(group);
     ++undoStackPos;
-    
+
     SetSceneModified();
 }
 
