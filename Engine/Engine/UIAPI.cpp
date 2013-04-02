@@ -43,7 +43,7 @@ static bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, 
 {
     if (fileName.Empty())
         return false;
-    
+
     File file(ptr->GetContext(), fileName, FILE_WRITE);
     return ptr->SaveXML(file, pointSize, usedGlyphs);
 }
@@ -61,33 +61,33 @@ static void RegisterUIElement(asIScriptEngine* engine)
     engine->RegisterEnumValue("HorizontalAlignment", "HA_LEFT", HA_LEFT);
     engine->RegisterEnumValue("HorizontalAlignment", "HA_CENTER", HA_CENTER);
     engine->RegisterEnumValue("HorizontalAlignment", "HA_RIGHT", HA_RIGHT);
-    
+
     engine->RegisterEnum("VerticalAlignment");
     engine->RegisterEnumValue("VerticalAlignment", "VA_TOP", VA_TOP);
     engine->RegisterEnumValue("VerticalAlignment", "VA_CENTER", VA_CENTER);
     engine->RegisterEnumValue("VerticalAlignment", "VA_BOTTOM", VA_BOTTOM);
-    
+
     engine->RegisterEnum("Corner");
     engine->RegisterEnumValue("Corner", "C_TOPLEFT", C_TOPLEFT);
     engine->RegisterEnumValue("Corner", "C_TOPRIGHT", C_TOPRIGHT);
     engine->RegisterEnumValue("Corner", "C_BOTTOMLEFT", C_BOTTOMLEFT);
     engine->RegisterEnumValue("Corner", "C_BOTTOMRIGHT", C_BOTTOMRIGHT);
-    
+
     engine->RegisterEnum("Orientation");
     engine->RegisterEnumValue("Orientation", "O_HORIZONTAL", O_HORIZONTAL);
     engine->RegisterEnumValue("Orientation", "O_VERTICAL", O_VERTICAL);
-    
+
     engine->RegisterEnum("FocusMode");
     engine->RegisterEnumValue("FocusMode", "FM_NOTFOCUSABLE", FM_NOTFOCUSABLE);
     engine->RegisterEnumValue("FocusMode", "FM_RESETFOCUS", FM_RESETFOCUS);
     engine->RegisterEnumValue("FocusMode", "FM_FOCUSABLE", FM_FOCUSABLE);
     engine->RegisterEnumValue("FocusMode", "FM_FOCUSABLE_DEFOCUSABLE", FM_FOCUSABLE_DEFOCUSABLE);
-    
+
     engine->RegisterEnum("LayoutMode");
     engine->RegisterEnumValue("LayoutMode", "LM_FREE", LM_FREE);
     engine->RegisterEnumValue("LayoutMode", "LM_HORIZONTAL", LM_HORIZONTAL);
     engine->RegisterEnumValue("LayoutMode", "LM_VERTICAL", LM_VERTICAL);
-    
+
     engine->RegisterEnum("TraversalMode");
     engine->RegisterEnumValue("TraversalMode", "TM_BREADTH_FIRST", TM_BREADTH_FIRST);
     engine->RegisterEnumValue("TraversalMode", "TM_DEPTH_FIRST", TM_DEPTH_FIRST);
@@ -96,9 +96,9 @@ static void RegisterUIElement(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint DD_SOURCE", (void*)&DD_SOURCE);
     engine->RegisterGlobalProperty("const uint DD_TARGET", (void*)&DD_TARGET);
     engine->RegisterGlobalProperty("const uint DD_SOURCE_AND_TARGET", (void*)&DD_SOURCE_AND_TARGET);
-    
+
     RegisterUIElement<UIElement>(engine, "UIElement");
-    
+
     // Register Variant GetPtr() for UIElement
     engine->RegisterObjectMethod("Variant", "UIElement@+ GetUIElement() const", asFUNCTION(GetVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
 }
@@ -143,7 +143,7 @@ static void RegisterCursor(asIScriptEngine* engine)
     engine->RegisterEnumValue("CursorShape", "CS_ACCEPTDROP", CS_ACCEPTDROP);
     engine->RegisterEnumValue("CursorShape", "CS_REJECTDROP", CS_REJECTDROP);
     engine->RegisterEnumValue("CursorShape", "CS_BUSY", CS_BUSY);
-    
+
     RegisterBorderImage<Cursor>(engine, "Cursor");
     engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in, bool arg4 = false)", asMETHOD(Cursor, DefineShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void set_shape(CursorShape)", asMETHOD(Cursor, SetShape), asCALL_THISCALL);
@@ -227,10 +227,10 @@ void ListViewSetSelections(CScriptArray* selections, ListView* ptr)
     unsigned numItems = selections->GetSize();
     PODVector<unsigned> dest;
     dest.Reserve(numItems);
-    
+
     for (unsigned i = 0; i < numItems; ++i)
         dest.Push(*((unsigned*)selections->At(i)));
-    
+
     ptr->SetSelections(dest);
 }
 
@@ -257,7 +257,7 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterEnumValue("HighlightMode", "HM_NEVER", HM_NEVER);
     engine->RegisterEnumValue("HighlightMode", "HM_FOCUS", HM_FOCUS);
     engine->RegisterEnumValue("HighlightMode", "HM_ALWAYS", HM_ALWAYS);
-    
+
     RegisterUIElement<ListView>(engine, "ListView");
     engine->RegisterObjectMethod("ListView", "void SetViewPosition(int, int)", asMETHODPR(ListView, SetViewPosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void SetScrollBarsVisible(bool, bool)", asMETHOD(ListView, SetScrollBarsVisible), asCALL_THISCALL);
@@ -421,6 +421,8 @@ static void RegisterWindow(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Window", "const IntRect& get_resizeBorder() const", asMETHOD(Window, GetResizeBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void set_modal(bool)", asMETHOD(Window, SetModal), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "bool get_modal() const", asMETHOD(Window, IsModal), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Window", "void set_modalShadeColor(const Color&in)", asMETHOD(Window, SetModalShadeColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Window", "const Color& get_modalShadeColor() const", asMETHOD(Window, GetModalShadeColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void set_modalFrameColor(const Color&in)", asMETHOD(Window, SetModalFrameColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "const Color& get_modalFrameColor() const", asMETHOD(Window, GetModalFrameColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void set_modalFrameSize(const IntVector2&in)", asMETHOD(Window, SetModalFrameSize), asCALL_THISCALL);
@@ -431,13 +433,13 @@ static void FileSelectorSetFilters(CScriptArray* filters, unsigned defaultIndex,
 {
     if (!filters)
         return;
-    
+
     unsigned numFilters = filters->GetSize();
     Vector<String> destFilters(numFilters);
-    
+
     for (unsigned i = 0; i < numFilters; ++i)
         destFilters[i] = *(static_cast<String*>(filters->At(i)));
-    
+
     ptr->SetFilters(destFilters, defaultIndex);
 }
 

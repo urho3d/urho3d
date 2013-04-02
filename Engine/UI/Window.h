@@ -75,6 +75,8 @@ public:
     void SetResizeBorder(const IntRect& rect);
     /// Set modal flag. When the modal flag is set, the focused window needs to be dismissed first to allow other UI elements to gain focus.
     void SetModal(bool modal);
+    /// Set modal shade color.
+    void SetModalShadeColor(const Color& color);
     /// Set modal frame color.
     void SetModalFrameColor(const Color& color);
     /// Set modal frame size.
@@ -88,6 +90,8 @@ public:
     const IntRect& GetResizeBorder() const { return resizeBorder_; }
     /// Return modal flag.
     bool IsModal() const { return modal_; }
+    /// Get modal shade color.
+    const Color& GetModalShadeColor() const { return modalShadeColor_; }
     /// Get modal frame color.
     const Color& GetModalFrameColor() const { return modalFrameColor_; }
     /// Get modal frame size.
@@ -119,6 +123,8 @@ protected:
     IntVector2 dragBeginSize_;
     /// Modal flag.
     bool modal_;
+    /// Modal shade color, used when modal flag is set.
+    Color modalShadeColor_;
     /// Modal frame color, used when modal flag is set.
     Color modalFrameColor_;
     /// Modal frame size, used when modal flag is set.

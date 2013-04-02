@@ -43,6 +43,7 @@ Window::Window(Context* context) :
     resizeBorder_(DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER),
     dragMode_(DRAG_NONE),
     modal_(false),
+    modalShadeColor_(Color::TRANSPARENT),
     modalFrameColor_(Color::TRANSPARENT),
     modalFrameSize_(IntVector2::ZERO)
 
@@ -65,6 +66,7 @@ void Window::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Movable", IsMovable, SetMovable, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Resizable", IsResizable, SetResizable, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Modal", IsModal, SetModal, bool, false, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Window, VAR_COLOR, "Modal Shade Color", GetModalShadeColor, SetModalShadeColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_COLOR, "Modal Frame Color", GetModalFrameColor, SetModalFrameColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_INTVECTOR2, "Modal Frame Size", GetModalFrameSize, SetModalFrameSize, IntVector2, IntVector2::ZERO, AM_FILE);
     COPY_BASE_ATTRIBUTES(Window, BorderImage);
@@ -72,20 +74,20 @@ void Window::RegisterObject(Context* context)
 
 void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    if (modal_)
+    if (modal_ && modalShadeColor_ != Color::TRANSPARENT)
     {
-        // Shade
+        // Modal shade
         UIElement* rootElement = GetRoot();
         const IntVector2& rootSize = rootElement->GetSize();
         IntRect currentScissor(0, 0, rootSize.x_, rootSize.y_);
         UIBatch batch(rootElement, BLEND_ALPHA, IntRect(0, 0, rootSize.x_, rootSize.y_), 0, &vertexData);
-        batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0, 0, 0, Color(0.0f, 0.0f, 0.0f, 0.25f));
+        batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0, 0, 0, modalShadeColor_);
         UIBatch::AddOrMerge(batch, batches);
     }
 
     BorderImage::GetBatches(batches, vertexData, currentScissor);
 
-    if (modal_)
+    if (modal_ && modalFrameColor_ != Color::TRANSPARENT && modalFrameSize_ != IntVector2::ZERO)
     {
         // Modal frame
         UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
@@ -225,6 +227,11 @@ void Window::SetModal(bool modal)
     UI* ui = GetSubsystem<UI>();
     if (ui->SetModalElement(modal ? this : 0))
         modal_ = modal;
+}
+
+void Window::SetModalShadeColor(const Color& color)
+{
+    modalShadeColor_ = color;
 }
 
 void Window::SetModalFrameColor(const Color& color)
