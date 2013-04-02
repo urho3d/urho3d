@@ -802,10 +802,7 @@ void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
     Component@ component = eventData["Component"].GetComponent();
     uint index = GetComponentListIndex(component);
     if (index != NO_ITEM)
-    {
-        ListView@ list = hierarchyWindow.GetChild("NodeList", true);
-        list.RemoveItem(index);
-    }
+        hierarchyList.RemoveItem(index);
 }
 
 void HandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
