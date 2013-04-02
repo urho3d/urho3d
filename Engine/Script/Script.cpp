@@ -395,7 +395,8 @@ void Script::ExceptionCallback(asIScriptContext* context)
 {
     asIScriptFunction *function = context->GetExceptionFunction();
     String message = "Exception '" + String(context->GetExceptionString()) + "' in '" +
-        String(function->GetDeclaration()) + "'";
+        String(function->GetDeclaration()) + "'\n";
+    message += GetCallStack(context);
     
     asSMessageInfo msg;
     msg.row = context->GetExceptionLineNumber(&msg.col, &msg.section);
@@ -403,6 +404,24 @@ void Script::ExceptionCallback(asIScriptContext* context)
     msg.message = message.CString();
     
     MessageCallback(&msg);
+}
+
+String Script::GetCallStack(asIScriptContext* context)
+{
+    String str("AngelScript callstack:\n");
+
+    // Append the call stack
+    for (asUINT i = 0; i < context->GetCallstackSize(); i++)
+    {
+        asIScriptFunction* func;
+        const char* scriptSection;
+        int line, column;
+        func = context->GetFunction(i);
+        line = context->GetLineNumber(i, &column, &scriptSection);
+        str.AppendWithFormat("\t%s:%s:%d,%d\n", scriptSection, func->GetDeclaration(), line, column);
+    }
+
+    return str;
 }
 
 ScriptFile* Script::GetDefaultScriptFile() const

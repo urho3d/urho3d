@@ -1,11 +1,12 @@
+<!-- This container can be used for both Node and UIElement -->
 <element>
     <element>
-        <attribute name="Name" value="NodeContainer" />
+        <attribute name="Name" value="Node Container" />
         <attribute name="Layout Mode" value="Vertical" />
         <attribute name="Layout Spacing" value="4" />
         <element type="BorderImage" style="EditorDivider" />
         <element type="Text">
-            <attribute name="Name" value="NodeTitle" />
+            <attribute name="Name" value="TitleText" />
             <attribute name="Min Size" value="0 17" />
             <attribute name="Max Size" value="2147483647 17" />
         </element>

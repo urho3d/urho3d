@@ -26,7 +26,6 @@
 #include "Log.h"
 #include "PackageFile.h"
 #include "ProcessUtils.h"
-#include "StringUtils.h"
 #include "VectorBuffer.h"
 
 namespace Urho3D
@@ -81,18 +80,7 @@ static void PrintCallStack(bool error)
 {
     asIScriptContext* context = asGetActiveContext();
     if (context)
-    {
-        // Show the call stack
-        for (asUINT i = 0; i < context->GetCallstackSize(); i++)
-        {
-            asIScriptFunction* func;
-            const char* scriptSection;
-            int line, column;
-            func = context->GetFunction(i);
-            line = context->GetLineNumber(i, &column, &scriptSection);
-            Log::WriteRaw(ToString("%s:%s:%d,%d\n", scriptSection, func->GetDeclaration(), line, column), error);
-        }
-    }
+        Log::WriteRaw(Script::GetCallStack(context), error);
 }
 
 static void LogWrite(const String& str, bool error, Log* ptr)

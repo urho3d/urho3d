@@ -74,6 +74,8 @@ public:
     void MessageCallback(const asSMessageInfo* msg);
     /// Handle a script exception.
     void ExceptionCallback(asIScriptContext* context);
+    /// Get call stack.
+    static String GetCallStack(asIScriptContext* context);
     
     /// Return the AngelScript engine.
     asIScriptEngine* GetScriptEngine() const { return scriptEngine_; }

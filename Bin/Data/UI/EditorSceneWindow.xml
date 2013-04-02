@@ -47,10 +47,12 @@
         </element>
         <element type="CheckBox">
             <attribute name="Name" value="AllCheckBox" />
-            <attribute name="Min Size" value="15 15" />
-            <attribute name="Max Size" value="15 15" />
-            <attribute name="Layout Mode" value="Horizontal" />
-            <attribute name="Layout Border" value="20 0 0 0" />
+            <attribute name="Min Size" value="45 15" />
+            <attribute name="Max Size" value="45 15" />
+            <attribute name="Indent Spacing" value="30" />
+            <attribute name="Indent" value="1" />
+            <attribute name="Layout Mode" value="Vertical" />
+            <attribute name="Layout Border" value="5 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="All" />
             </element>

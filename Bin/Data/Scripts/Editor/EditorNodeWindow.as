@@ -69,7 +69,6 @@ void CreateAttributeInspectorWindow()
     attributeInspectorWindow.SetPosition(ui.root.width - 20 - attributeInspectorWindow.width, 40);
     attributeInspectorWindow.opacity = uiMaxOpacity;
     attributeInspectorWindow.BringToFront();
-    UpdateAttributeInspector();
 
     SubscribeToEvent(attributeInspectorWindow.GetChild("CloseButton", true), "Released", "HideAttributeInspectorWindow");
     SubscribeToEvent(attributeInspectorWindow, "LayoutUpdated", "HandleWindowLayoutUpdated");
@@ -117,14 +116,11 @@ void UpdateAttributeInspector(bool fullUpdate = true)
 {
     attributesDirty = false;
 
+    // If full update delete all containers and added them back as necessary
     if (fullUpdate)
-    {
         DeleteAllContainers();
-        AddNodeContainer();
-        AddComponentContainer();
-    }
 
-    Text@ nodeTitle = nodeContainer.GetChild("NodeTitle");
+    Text@ nodeTitle = nodeContainer.GetChild("TitleText");
     String nodeType;
     if (editNodes.length == 0)
         nodeTitle.text = "No node";
@@ -159,7 +155,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
 
     if (editComponents.empty)
     {
-        Text@ componentTitle = GetComponentContainer(0).GetChild("ComponentTitle");
+        Text@ componentTitle = GetComponentContainer(0).GetChild("TitleText");
         if (selectedComponents.length <= 1)
             componentTitle.text = "No component";
         else
@@ -180,7 +176,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
             if (j >= parentContainer.numChildren - componentContainerStartIndex)
                 AddComponentContainer();
 
-            Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
+            Text@ componentTitle = GetComponentContainer(j).GetChild("TitleText");
             componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents]) + multiplierText;
             IconizeUIElement(componentTitle, editComponents[j * numEditableComponents].typeName);
             SetIconEnabledColor(componentTitle, editComponents[j * numEditableComponents].enabledEffective);
@@ -203,7 +199,7 @@ void UpdateNodeAttributes()
 
 void UpdateAttributeInspectorIcons()
 {
-    Text@ nodeTitle = attributeInspectorWindow.GetChild("NodeTitle", true);
+    Text@ nodeTitle = nodeContainer.GetChild("TitleText");
     if (editNode !is null)
         SetIconEnabledColor(nodeTitle, editNode.enabled);
     else if (editNodes.length > 0)
@@ -228,7 +224,7 @@ void UpdateAttributeInspectorIcons()
 
         for (uint j = 0; j < numEditableComponentsPerNode; ++j)
         {
-            Text@ componentTitle = GetComponentContainer(j).GetChild("ComponentTitle");
+            Text@ componentTitle = GetComponentContainer(j).GetChild("TitleText");
 
             bool enabledEffective = editComponents[j * numEditableComponents].enabledEffective;
             bool hasSameEnabledState = true;

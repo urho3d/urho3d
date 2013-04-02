@@ -6,8 +6,8 @@ XMLFile@ uiElementDefaultStyle;
 String childElementFileName;
 
 UIElement@ editUIElement;
-Array<UIElement@> selectedUIElements;
-Array<UIElement@> editUIElements;
+Array<Serializable@> selectedUIElements;
+Array<Serializable@> editUIElements;
 
 bool suppressUIElementChanges = false;
 

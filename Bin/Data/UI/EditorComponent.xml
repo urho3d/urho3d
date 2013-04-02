@@ -5,7 +5,7 @@
         <attribute name="Layout Spacing" value="4" />
         <element type="BorderImage" style="EditorDivider" />
         <element type="Text">
-            <attribute name="Name" value="ComponentTitle" />
+            <attribute name="Name" value="TitleText" />
             <attribute name="Min Size" value="0 17" />
             <attribute name="Max Size" value="2147483647 17" />
         </element>
