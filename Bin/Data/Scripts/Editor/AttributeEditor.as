@@ -13,7 +13,6 @@ const StringHash TEXT_CHANGED_EVENT_TYPE("TextChanged");
 
 bool inLoadAttributeEditor = false;
 bool showNonEditableAttribute = false;
-uint attributeCountAdjustment = 0;
 
 Color normalTextColor(1.0f, 1.0f, 1.0f);
 Color modifiedTextColor(1.0f, 0.8f, 0.5f);
@@ -361,7 +360,7 @@ uint GetAttributeEditorCount(Array<Serializable@>@ serializables)
         }
     }
 
-    return count - attributeCountAdjustment;
+    return count;
 }
 
 UIElement@ GetAttributeEditorParent(UIElement@ parent, uint index, uint subIndex)
@@ -390,7 +389,7 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, co
             sameName = false;
             break;
         }
-        
+
         Variant val = serializables[i].attributes[index];
         if (val != value)
             sameValue = false;
@@ -401,10 +400,7 @@ void LoadAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, co
     if (sameName)
         LoadAttributeEditor(parent, value, info, editable, sameValue, values);
     else
-    {
         parent.Remove();
-        ++attributeCountAdjustment;
-    }
 
     inLoadAttributeEditor = false;
 }
@@ -706,7 +702,6 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool 
     if (fullUpdate)
     {
         list.RemoveAllItems();
-        attributeCountAdjustment = 0;
         Array<UIElement@> children = list.GetChildren();
         for (uint i = 0; i < children.length; ++i)
         {
