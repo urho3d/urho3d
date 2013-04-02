@@ -225,6 +225,11 @@ void LoadNode(const String&in fileName)
 
     if (newNode !is null)
     {
+        // Create an undo action for the load
+        CreateNodeAction action;
+        action.Define(newNode);
+        SaveEditAction(action);
+
         FocusNode(newNode);
         instantiateFileName = fileName;
     }
@@ -336,6 +341,11 @@ bool SceneDelete()
         if (node is editorScene && (component.typeName == "Octree" || component.typeName == "PhysicsWorld" ||
             component.typeName == "DebugRenderer"))
             continue;
+
+        // Create undo action
+        DeleteComponentAction action;
+        action.Define(component);
+        group.actions.Push(action);
 
         uint id = node.id;
         node.RemoveComponent(component);
@@ -599,7 +609,8 @@ bool SceneUndo()
     if (undoStackPos > 0)
     {
         --undoStackPos;
-        for (uint i = 0; i < undoStack[undoStackPos].actions.length; ++i)
+        // Undo commands in reverse order
+        for (int i = int(undoStack[undoStackPos].actions.length - 1); i >= 0; --i)
             undoStack[undoStackPos].actions[i].Undo();
     }
 
@@ -610,6 +621,7 @@ bool SceneRedo()
 {
     if (undoStackPos < undoStack.length)
     {
+        // Redo commands in same order as stored
         for (uint i = 0; i < undoStack[undoStackPos].actions.length; ++i)
             undoStack[undoStackPos].actions[i].Redo();
         ++undoStackPos;

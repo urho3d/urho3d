@@ -117,3 +117,80 @@ class ReparentNodeAction : EditAction
             node.parent = parent;
     }
 }
+
+class CreateComponentAction : EditAction
+{
+    uint nodeID;
+    uint componentID;
+    XMLFile@ componentData;
+    
+    void Define(Component@ component)
+    {
+        componentID = component.id;
+        nodeID = component.node.id;
+        componentData = XMLFile();
+        XMLElement rootElem = componentData.CreateRoot("component");
+        component.SaveXML(rootElem);
+    }
+    
+    void Undo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        Component@ component = editorScene.GetComponent(componentID);
+        if (node !is null && component !is null)
+        {
+            ClearSceneSelection();
+            node.RemoveComponent(component);
+        }
+    }
+    
+    void Redo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        if (node !is null)
+        {
+            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), componentID < FIRST_LOCAL_ID ? REPLICATED : LOCAL, componentID);
+            component.LoadXML(componentData.root);
+            component.ApplyAttributes();
+        }
+    }
+
+}
+
+class DeleteComponentAction : EditAction
+{
+    uint nodeID;
+    uint componentID;
+    XMLFile@ componentData;
+    
+    void Define(Component@ component)
+    {
+        componentID = component.id;
+        nodeID = component.node.id;
+        componentData = XMLFile();
+        XMLElement rootElem = componentData.CreateRoot("component");
+        component.SaveXML(rootElem);
+    }
+
+    void Undo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        if (node !is null)
+        {
+            Component@ component = node.CreateComponent(componentData.root.GetAttribute("type"), componentID < FIRST_LOCAL_ID ? REPLICATED : LOCAL, componentID);
+            component.LoadXML(componentData.root);
+            component.ApplyAttributes();
+        }
+    }
+    
+    void Redo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        Component@ component = editorScene.GetComponent(componentID);
+        if (node !is null && component !is null)
+        {
+            ClearSceneSelection();
+            node.RemoveComponent(component);
+        }
+    }
+}

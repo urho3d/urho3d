@@ -741,6 +741,11 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
         // Some components such as CollisionShape do not create their internal object before the first call to ApplyAttributes()
         // to prevent unnecessary initialization with default values. Call now
         newComponent.ApplyAttributes();
+        
+        CreateComponentAction action;
+        action.Define(newComponent);
+        SaveEditAction(action);
+        
         FocusComponent(newComponent);
     }
 
@@ -756,7 +761,10 @@ void CreateBuiltinObject(const String& name)
     StaticModel@ object = newNode.CreateComponent("StaticModel");
     object.model = cache.GetResource("Model", "Models/" + name + ".mdl");
 
-    SetSceneModified();
+    // Create an undo action for the create
+    CreateNodeAction action;
+    action.Define(newNode);
+    SaveEditAction(action);
 
     FocusNode(newNode);
 }
