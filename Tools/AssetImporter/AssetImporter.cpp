@@ -1165,9 +1165,14 @@ void BuildAndSaveScene(OutScene& scene)
             float a = light->mAttenuationQuadratic;
             float b = light->mAttenuationLinear;
             float c = -10.0f;
-            float root1 = (-b + sqrtf(b*b - 4.0f * a * c)) / (2.0f * a);
-            float root2 = (-b - sqrtf(b*b - 4.0f * a * c)) / (2.0f * a);
-            outLight->SetRange(Max(root1, root2));
+            if (!Equals(a, 0.0f))
+            {
+                float root1 = (-b + sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
+                float root2 = (-b - sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
+                outLight->SetRange(Max(root1, root2));
+            }
+            else if (!Equals(b, 0.0f))
+                outLight->SetRange(-c / b);
         }
     }
     
