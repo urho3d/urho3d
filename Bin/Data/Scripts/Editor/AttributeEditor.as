@@ -320,15 +320,19 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         Array<ShortStringHash>@ keys = map.keys;
         for (uint i = 0; i < keys.length; ++i)
         {
+            String varName = scene.GetVarName(keys[i]);
             Variant value = map[keys[i]];
 
             // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
             AttributeInfo mapInfo;
-            mapInfo.name = scene.GetVarName(keys[i]) + " (Var)";
+            mapInfo.name = varName + " (Var)";
             mapInfo.type = value.type;
             parent = CreateAttributeEditor(list, serializables, mapInfo, index, i);
             // Add the variant key to the parent
             parent.vars["Key"] = keys[i].value;
+            // If variable name is not registered (i.e. it is an editor internal variable) then hide it
+            if (varName.empty)
+                parent.visible = false;
         }
     }
 
@@ -514,6 +518,10 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             parent = GetAttributeEditorParent(list, index, subIndex);
             if (parent is null)
                 break;
+
+            String varName = scene.GetVarName(keys[subIndex]);
+            if (varName.empty)
+                continue;
 
             Variant firstValue = map[keys[subIndex]];
             bool varSameValue = true;

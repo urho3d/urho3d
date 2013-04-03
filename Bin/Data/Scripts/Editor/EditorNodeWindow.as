@@ -40,8 +40,8 @@ UIElement@ GetNodeContainer()
     nodeContainerIndex = parentContainer.numChildren;
     parentContainer.LoadXML(nodeXMLResource, uiStyle);
     UIElement@ container = GetContainer(nodeContainerIndex);
-    SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNewVariable");
-    SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteVariable");
+    SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNodeVariable");
+    SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteNodeVariable");
     ++componentContainerStartIndex;
     return container;
 }
@@ -61,8 +61,8 @@ UIElement@ GetElementContainer()
     elementContainerIndex = parentContainer.numChildren;
     parentContainer.LoadXML(nodeXMLResource, uiStyle);
     UIElement@ container = GetContainer(elementContainerIndex);
-    SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNewVariable");
-    SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteVariable");
+    SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateUIElementVariable");
+    SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteUIElementVariable");
     return container;
 }
 
@@ -213,7 +213,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         else
         {
             elementType = editUIElements[0].typeName;
-            
+
             bool sameType = true;
             for (uint i = 1; i < editUIElements.length; ++i)
             {
@@ -305,7 +305,7 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
         action.Define(serializables[i], index, oldValues[i]);
         group.actions.Push(action);
     }
-    
+
     SaveEditActionGroup(group);
 
     for (uint i = 0; i < serializables.length; ++i)
@@ -398,20 +398,99 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
     return ret;
 }
 
-void CreateNewVariable(StringHash eventType, VariantMap& eventData)
+void CreateNodeVariable(StringHash eventType, VariantMap& eventData)
 {
     if (editNodes.length == 0)
         return;
 
-    DropDownList@ dropDown = eventData["Element"].GetUIElement();
-    LineEdit@ nameEdit = attributeInspectorWindow.GetChild("VarNameEdit", true);
-    String sanitatedVarName = nameEdit.text.Trimmed().Replaced(";", "");
-    if (sanitatedVarName.empty)
+    String newKey;
+    Variant newValue;
+    CreateNewVariable(eventData, newKey, newValue);
+    if (newKey.empty)
         return;
 
-    editorScene.RegisterVar(sanitatedVarName);
+    // If we overwrite an existing variable, must recreate the attribute-editor(s) for the correct type
+    bool overwrite = false;
+    for (uint i = 0; i < editNodes.length; ++i)
+    {
+        overwrite = overwrite || editNodes[i].vars.Contains(newKey);
+        editNodes[i].vars[newKey] = newValue;
+    }
+    UpdateAttributeInspector(overwrite);
+}
 
+void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
+{
+    if (editNodes.length == 0)
+        return;
+
+    String delKey;
+    DeleteVariable(eventData, delKey);
+    if (delKey.empty)
+        return;
+
+    bool erased = false;
+    for (uint i = 0; i < editNodes.length; ++i)
+    {
+        // \todo Should first check whether var in question is editable
+        erased = editNodes[i].vars.Erase(delKey) || erased;
+    }
+    if (erased)
+        UpdateAttributeInspector(false);
+}
+
+void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
+{
+    if (editUIElements.length == 0)
+        return;
+
+    String newKey;
     Variant newValue;
+    CreateNewVariable(eventData, newKey, newValue);
+    if (newKey.empty)
+        return;
+
+    // If we overwrite an existing variable, must recreate the attribute-editor(s) for the correct type
+    bool overwrite = false;
+    for (uint i = 0; i < editUIElements.length; ++i)
+    {
+        UIElement@ element = cast<UIElement>(editUIElements[i]);
+        overwrite = overwrite || element.vars.Contains(newKey);
+        element.vars[newKey] = newValue;
+    }
+    UpdateAttributeInspector(overwrite);
+}
+
+void DeleteUIElementVariable(StringHash eventType, VariantMap& eventData)
+{
+    if (editUIElements.length == 0)
+        return;
+
+    String delKey;
+    DeleteVariable(eventData, delKey);
+    if (delKey.empty)
+        return;
+
+    bool erased = false;
+    for (uint i = 0; i < editUIElements.length; ++i)
+    {
+        // \todo Should first check whether var in question is editable
+        erased = cast<UIElement>(editUIElements[i]).vars.Erase(delKey) || erased;
+    }
+    if (erased)
+        UpdateAttributeInspector(false);
+}
+
+void CreateNewVariable(VariantMap& eventData, String& newKey, Variant& newValue)
+{
+    DropDownList@ dropDown = eventData["Element"].GetUIElement();
+    LineEdit@ nameEdit = dropDown.parent.GetChild("VarNameEdit");
+    newKey = nameEdit.text.Trimmed().Replaced(";", "");
+    if (newKey.empty)
+        return;
+
+    editorScene.RegisterVar(newKey);
+
     switch (dropDown.selection)
     {
     case 0:
@@ -433,33 +512,11 @@ void CreateNewVariable(StringHash eventType, VariantMap& eventData)
         newValue = Color();
         break;
     }
-
-    // If we overwrite an existing variable, must recreate the attribute-editor(s) for the correct type
-    bool overwrite = false;
-    for (uint i = 0; i < editNodes.length; ++i)
-    {
-        overwrite = overwrite || editNodes[i].vars.Contains(sanitatedVarName);
-        editNodes[i].vars[sanitatedVarName] = newValue;
-    }
-    UpdateAttributeInspector(overwrite);
 }
 
-void DeleteVariable(StringHash eventType, VariantMap& eventData)
+void DeleteVariable(VariantMap& eventData, String& delKey)
 {
-    if (editNodes.length == 0)
-        return;
-
-    LineEdit@ nameEdit = attributeInspectorWindow.GetChild("VarNameEdit", true);
-    String sanitatedVarName = nameEdit.text.Trimmed().Replaced(";", "");
-    if (sanitatedVarName.empty)
-        return;
-
-    bool erased = false;
-    for (uint i = 0; i < editNodes.length; ++i)
-    {
-        // \todo Should first check whether var in question is editable
-        erased = editNodes[i].vars.Erase(sanitatedVarName) || erased;
-    }
-    if (erased)
-        UpdateAttributeInspector(false);
+    Button@ button = eventData["Element"].GetUIElement();
+    LineEdit@ nameEdit = button.parent.GetChild("VarNameEdit", true);
+    delKey = nameEdit.text.Trimmed().Replaced(";", "");
 }
