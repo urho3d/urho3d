@@ -742,7 +742,7 @@ When a model is imported, it will also be instantiated into the scene as a new s
 
 To do the actual importing, the editor will invoke AssetImporter.exe from the same directory as where Urho3D.exe resides, so be sure both are built.
 
-Importing lights is not properly supported yet. Instead, when a scene is imported, a zone for ambient lighting and a single directional light are created, so that you can at least see something.
+If the imported scene has no lights, a single directional light is created, so that you can at least see something.
 
 */
 

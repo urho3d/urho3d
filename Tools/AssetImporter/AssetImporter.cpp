@@ -155,6 +155,7 @@ String FromAIString(const aiString& str);
 Vector3 ToVector3(const aiVector3D& vec);
 Vector2 ToVector2(const aiVector2D& vec);
 Quaternion ToQuaternion(const aiQuaternion& quat);
+Matrix3x4 ToMatrix3x4(const aiMatrix4x4& mat);
 String SanitateAssetName(const String& name);
 
 int main(int argc, char** argv)
@@ -1071,19 +1072,23 @@ void BuildAndSaveScene(OutScene& scene)
         zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
         zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
         
-        Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
-        Light* light = lightNode->CreateComponent<Light>();
-        light->SetLightType(LIGHT_DIRECTIONAL);
-        lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
+        // Create default light only if scene does not define them
+        if (!scene_->HasLights())
+        {
+            Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
+            Light* light = lightNode->CreateComponent<Light>();
+            light->SetLightType(LIGHT_DIRECTIONAL);
+            lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
+        }
     }
     
     ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
     
+    // Create geometry nodes
     for (unsigned i = 0; i < scene.nodes_.Size(); ++i)
     {
         const OutModel& model = scene.models_[scene.nodeModelIndices_[i]];
         
-        // Create a static model component for each node
         Node* modelNode = outScene->CreateChild(FromAIString(scene.nodes_[i]->mName), localIDs_ ? LOCAL : REPLICATED);
         StaticModel* staticModel = modelNode->CreateComponent<StaticModel>();
         
@@ -1118,6 +1123,51 @@ void BuildAndSaveScene(OutScene& scene)
                 }
                 staticModel->SetMaterial(j, cache->GetResource<Material>(matName));
             }
+        }
+    }
+    
+    // Create lights
+    for (unsigned i = 0; i < scene_->mNumLights; ++i)
+    {
+        aiLight* light = scene_->mLights[i];
+        aiNode* lightNode = GetNode(FromAIString(light->mName), rootNode_, true);
+        if (!lightNode)
+            continue;
+        Matrix3x4 lightNodeTransform = ToMatrix3x4(GetDerivedTransform(lightNode, rootNode_));
+        Vector3 lightWorldPosition = lightNodeTransform * ToVector3(light->mPosition);
+        Vector3 lightWorldDirection = lightNodeTransform.RotationMatrix() * ToVector3(light->mDirection);
+        
+        Node* outNode = outScene->CreateChild(FromAIString(light->mName));
+        Light* outLight = outNode->CreateComponent<Light>();
+        outLight->SetColor(Color(light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b));
+        
+        switch (light->mType)
+        {
+        case aiLightSource_DIRECTIONAL:
+            outNode->SetDirection(lightWorldDirection);
+            outLight->SetLightType(LIGHT_DIRECTIONAL);
+            break;
+        case aiLightSource_SPOT:
+            outNode->SetPosition(lightWorldPosition);
+            outNode->SetDirection(lightWorldDirection);
+            outLight->SetLightType(LIGHT_SPOT);
+            outLight->SetFov(light->mAngleOuterCone * M_RADTODEG);
+            break;
+        case aiLightSource_POINT:
+            outNode->SetPosition(lightWorldPosition);
+            outLight->SetLightType(LIGHT_POINT);
+            break;
+        }
+        
+        // Calculate range from attenuation parameters so that light intensity has been reduced to 10% at that distance
+        if (light->mType != aiLightSource_DIRECTIONAL)
+        {
+            float a = light->mAttenuationQuadratic;
+            float b = light->mAttenuationLinear;
+            float c = -10.0f;
+            float root1 = (-b + sqrtf(b*b - 4.0f * a * c)) / (2.0f * a);
+            float root2 = (-b - sqrtf(b*b - 4.0f * a * c)) / (2.0f * a);
+            outLight->SetRange(Max(root1, root2));
         }
     }
     
@@ -1157,6 +1207,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     String diffuseTexName;
     String normalTexName;
     String specularTexName;
+    String lightmapTexName;
     Color diffuseColor;
     Color specularColor;
     bool hasAlpha = false;
@@ -1173,6 +1224,8 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
         normalTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), stringVal) == AI_SUCCESS)
+        specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
         diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
@@ -1197,6 +1250,9 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
             techniqueName += "Normal";
         if (!specularTexName.Empty())
             techniqueName += "Spec";
+        // For now lightmap does not coexist with normal & specular
+        if (normalTexName.Empty() && specularTexName.Empty() && !lightmapTexName.Empty())
+            techniqueName += "LightMap";
     }
     if (hasAlpha)
         techniqueName += "Alpha";
@@ -1224,6 +1280,13 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         normalElem.SetString("unit", "specular");
         normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + specularTexName);
         usedTextures.Insert(specularTexName);
+    }
+    if (!lightmapTexName.Empty())
+    {
+        XMLElement normalElem = materialElem.CreateChild("texture");
+        normalElem.SetString("unit", "emissive");
+        normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + lightmapTexName);
+        usedTextures.Insert(lightmapTexName);
     }
     
     XMLElement diffuseColorElem = materialElem.CreateChild("parameter");
@@ -1406,9 +1469,7 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
                 aiMatrix4x4 nodeDerivedInverse = GetMeshBakingTransform(node, model.rootNode_);
                 nodeDerivedInverse.Inverse();
                 offset *= nodeDerivedInverse;
-                Matrix3x4 ret;
-                memcpy(&ret.m00_, &offset.a1, sizeof(Matrix3x4));
-                return ret;
+                return ToMatrix3x4(offset);
             }
         }
     }
@@ -1673,6 +1734,13 @@ Vector2 ToVector2(const aiVector2D& vec)
 Quaternion ToQuaternion(const aiQuaternion& quat)
 {
     return Quaternion(quat.w, quat.x, quat.y, quat.z);
+}
+
+Matrix3x4 ToMatrix3x4(const aiMatrix4x4& mat)
+{
+    Matrix3x4 ret;
+    memcpy(&ret.m00_, &mat.a1, sizeof(Matrix3x4));
+    return ret;
 }
 
 String SanitateAssetName(const String& name)
