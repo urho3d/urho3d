@@ -93,6 +93,8 @@ void OpenUIElement(const String&in fileName)
 
 bool CloseUIElement()
 {
+    ui.cursor.shape = CS_BUSY;
+
     suppressUIElementChanges = true;
 
     for (uint i = 0; i < selectedUIElements.length; ++i)
@@ -111,6 +113,8 @@ bool CloseUIElement()
 
 bool CloseAllUIElements()
 {
+    ui.cursor.shape = CS_BUSY;
+
     suppressUIElementChanges = true;
 
     editorUIElement.RemoveAllChildren();
@@ -137,7 +141,30 @@ bool SaveUIElementWithExistingName()
 
 void LoadChildUIElement(const String&in fileName)
 {
-    // TODO
+    if (fileName.empty)
+        return;
+
+    ui.cursor.shape = CS_BUSY;
+
+    if (!fileSystem.FileExists(fileName))
+    {
+        log.Error("No such file: " + fileName);
+        return;
+    }
+
+    File file(fileName, FILE_READ);
+    if (!file.open)
+        return;
+
+    XMLFile@ xmlFile = XMLFile();
+    xmlFile.Load(file);
+
+    suppressUIElementChanges = true;
+
+    if (editUIElement.LoadXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle))
+        UpdateHierarchyItem(editUIElement.children[editUIElement.numChildren - 1]);
+    
+    suppressUIElementChanges = false;
 }
 
 void SaveChildUIElement(const String&in fileName)
