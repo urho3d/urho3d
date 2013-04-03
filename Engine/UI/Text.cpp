@@ -37,13 +37,7 @@ namespace Urho3D
 
 static const float MIN_ROW_SPACING = 0.5f;
 
-static const char* horizontalAlignments[] =
-{
-    "Left",
-    "Center",
-    "Right",
-    ""
-};
+extern const char* horizontalAlignments[];
 
 struct GlyphLocation
 {
