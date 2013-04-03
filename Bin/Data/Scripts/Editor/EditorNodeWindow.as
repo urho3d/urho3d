@@ -387,7 +387,7 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
                 Array<Variant>@ ids = variant.GetVariantVector();
                 for (uint i = 0; i < ids.length; ++i)
                 {
-                    UIElement@ element = editorUIElement.GetChild(UI_ELEMENT_ID_VAR, Variant(ids[i].GetUInt()), true);
+                    UIElement@ element = editorUIElement.GetChild(UI_ELEMENT_ID_VAR, ids[i], true);
                     if (element !is null)
                         ret.Push(element);
                 }
