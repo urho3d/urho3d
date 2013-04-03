@@ -13,6 +13,7 @@ const ShortStringHash CURSOR_TYPE("Cursor");
 
 const String TEMP_SCENE_NAME("_tempscene_.xml");
 const ShortStringHash CALLBACK_VAR("Callback");
+const ShortStringHash POPUP_ORIGIN_VAR("Origin");
 
 const int SHOW_POPUP_INDICATOR = -1;
 
@@ -129,7 +130,6 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("File");
         Window@ popup = menu.popup;
-        popup.vars["Popup"] = "File";
         popup.AddChild(CreateMenuItem("New scene", @ResetScene, 'N', QUAL_SHIFT | QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Open scene...", @PickFile, 'O', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene", @SaveSceneWithExistingName, 'S', QUAL_CTRL));
@@ -159,7 +159,6 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("Edit");
         Window@ popup = menu.popup;
-        popup.vars["Popup"] = "Edit";
         popup.AddChild(CreateMenuItem("Undo", @SceneUndo, 'Z', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Redo", @SceneRedo, 'Y', QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
@@ -183,7 +182,6 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("Create");
         Window@ popup = menu.popup;
-        popup.vars["Popup"] = "Create";
         String[] objects = { "Box", "Cone", "Cylinder", "Plane", "Pyramid", "Sphere" };
         for (uint i = 0; i < objects.length; ++i)
             popup.AddChild(CreateMenuItem(objects[i], @PickBuiltinObject));
@@ -193,7 +191,6 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("UI-element");
         Window@ popup = menu.popup;
-        popup.vars["Popup"] = "UI-element";
         popup.AddChild(CreateMenuItem("New UI-element", @NewUIElement, 'N', QUAL_ALT));
         popup.AddChild(CreateMenuItem("Open UI-element...", @PickFile, 'O', QUAL_ALT));
         popup.AddChild(CreateMenuDivider());
@@ -214,7 +211,6 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("View");
         Window@ popup = menu.popup;
-        popup.vars["Popup"] = "View";
         popup.AddChild(CreateMenuItem("Hierarchy", @ShowHierarchyWindow, 'H', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Attribute inspector", @ShowAttributeInspectorWindow, 'I', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
@@ -407,7 +403,6 @@ BorderImage@ CreateMenuDivider()
 Window@ CreatePopup(Menu@ baseMenu)
 {
     Window@ popup = Window();
-    popup.vars["Popup"] = baseMenu.name;
     popup.style = uiStyle;
     popup.SetLayout(LM_VERTICAL, 1, IntRect(2, 6, 2, 6));
     baseMenu.popup = popup;
@@ -520,7 +515,6 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     uiFileSelector.path = initialPath;
     uiFileSelector.SetButtonTexts(ok, cancel);
     uiFileSelector.SetFilters(filters, initialFilter);
-    uiFileSelector.window.vars["Popup"] = "FileSelector";
     uiFileSelector.window.priority = 1000;    // Ensure when it is visible then it has the highest priority (in front of all others UI)
     CenterDialog(uiFileSelector.window);
 }
@@ -781,8 +775,8 @@ void FadeUI(bool fade = true)
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
     {
-        // Texts, popup windows, and editorUIElement are excluded
-        if (children[i].type != TEXT_TYPE && children[i] !is editorUIElement && !children[i].vars.Contains("Popup"))
+        // Texts, popup&modal windows, and editorUIElement are excluded
+        if (children[i].type != TEXT_TYPE && children[i] !is editorUIElement && children[i] !is ui.modalElement && !children[i].vars.Contains(POPUP_ORIGIN_VAR))
             children[i].opacity = opacity;
     }
 }

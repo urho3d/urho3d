@@ -223,7 +223,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
                     break;
                 }
             }
-            titleText.text = (sameType ? elementType : "Mixed type") + " ID " + STRIKED_OUT + " (" + editUIElements.length + "x)";
+            titleText.text = (sameType ? elementType : "Mixed UI-element type") + " (" + editUIElements.length + "x)";
             if (!sameType)
                 elementType = "";   // No icon
         }
