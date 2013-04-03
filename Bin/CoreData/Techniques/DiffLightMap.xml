@@ -1,0 +1,9 @@
+<technique>
+    <pass name="base" vs="LitSolid_LightMap" ps="LitSolid_DiffLightMap" />
+    <pass name="light" vs="LitSolid" ps="LitSolid_Diff" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vs="LitSolid" ps="LitSolid_DiffPrepass" />
+    <pass name="material" vs="LitSolid_LightMap" ps="LitSolid_DiffLightMapMaterial" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vs="LitSolid_LightMap" ps="LitSolid_DiffLightMapDeferred" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

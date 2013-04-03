@@ -32,6 +32,9 @@ varying vec2 vTexCoord;
     #ifdef ENVCUBEMAP
         varying vec3 vReflectionVec;
     #endif
+    #ifdef LIGHTMAP
+        varying vec2 vTexCoord2;
+    #endif
 #endif
 
 void main()
@@ -120,15 +123,22 @@ void main()
         float specIntensity = specColor.g;
         float specPower = cMatSpecColor.a / 255.0;
 
-        gl_FragData[0] = vec4(GetFog(vVertexLight.rgb * diffColor.rgb, vVertexLight.a), 1.0);
+        vec3 finalColor = vVertexLight.rgb * diffColor.rgb;
+
+        #ifdef ENVCUBEMAP
+            normal = normalize(normal);
+            finalColor += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal)).rgb;
+        #endif
+        #ifdef LIGHTMAP
+            finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * diffColor.rgb;
+        #endif
+
+        gl_FragData[0] = vec4(GetFog(finalColor * diffColor.rgb, vVertexLight.a), 1.0);
         gl_FragData[1] = GetFogFactor(vVertexLight.a) * vec4(diffColor.rgb, specIntensity);
         gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
         gl_FragData[3] = vec4(EncodeDepth(vVertexLight.a), 0.0);
 
-        #ifdef ENVCUBEMAP
-            normal = normalize(normal);
-            gl_FragData[0].rgb += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal));
-        #endif
+
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight.rgb * diffColor.rgb;
@@ -150,7 +160,10 @@ void main()
                 vec3 normal = vNormal;
             #endif
             normal = normalize(normal);
-            finalColor.rgb += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal));
+            finalColor += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal)).rgb;
+        #endif
+        #ifdef LIGHTMAP
+            finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * diffColor.rgb;
         #endif
 
         gl_FragColor = vec4(GetFog(finalColor, vVertexLight.a), diffColor.a);

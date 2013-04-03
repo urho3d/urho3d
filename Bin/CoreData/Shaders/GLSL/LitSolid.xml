@@ -2,6 +2,7 @@
     <shader type="vs">
         <option name="Normal" define="NORMALMAP" />
         <option name="EnvCube" define="ENVCUBEMAP" />
+        <option name="LightMap" define="LIGHTMAP" />
         <variation name="" define="AMBIENT" />
         <variation name="1VL" define="NUMVERTEXLIGHTS=1" />
         <variation name="2VL" define="NUMVERTEXLIGHTS=2" />
@@ -31,18 +32,25 @@
         <option name="Packed" define="PACKEDNORMAL" require="NORMALMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
         <option name="EnvCube" define="ENVCUBEMAP" />
+        <option name="LightMap" define="LIGHTMAP" />
         <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="Ambient" define="AMBIENT" require="PERPIXEL" />
         <variation name="" define="AMBIENT" />
-        <variation name="Dir" exclude="EnvCube">
+        <variation name="Dir">
+            <exclude name="EnvCube" />
+            <exclude name="LightMap" />
             <define name="DIRLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <variation name="Spot" exclude="EnvCube">
+        <variation name="Spot">
+            <exclude name="EnvCube" />
+            <exclude name="LightMap" />
             <define name="SPOTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <variation name="Point" exclude="EnvCube">
+        <variation name="Point">
+            <exclude name="EnvCube" />
+            <exclude name="LightMap" />
             <define name="POINTLIGHT" />
             <define name="PERPIXEL" />
         </variation>

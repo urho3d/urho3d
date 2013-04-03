@@ -13,6 +13,9 @@
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
+    #ifdef LIGHTMAP
+        float2 iTexCoord2 : TEXCOORD1,
+    #endif
     #ifdef NORMALMAP
         float4 iTangent : TANGENT,
     #endif
@@ -54,6 +57,9 @@ void VS(float4 iPos : POSITION,
         out float4 oScreenPos : TEXCOORD5,
         #ifdef ENVCUBEMAP
             out float3 oReflectionVec : TEXCOORD6,
+        #endif
+        #ifdef LIGHTMAP
+            out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
     out float4 oPos : POSITION)
@@ -110,7 +116,13 @@ void VS(float4 iPos : POSITION,
         #endif
     #else
         // Ambient & per-vertex lighting
-        oVertexLight = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
+        #ifndef LIGHTMAP
+            oVertexLight = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
+        #else
+            // If using lightmap, disregard zone ambient light
+            oVertexLight = float4(0.0, 0.0, 0.0, GetDepth(oPos));
+            oTexCoord2 = iTexCoord2;
+        #endif
 
         #ifdef NUMVERTEXLIGHTS
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
@@ -153,6 +165,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float4 iScreenPos : TEXCOORD5,
         #ifdef ENVCUBEMAP
             float3 iReflectionVec : TEXCOORD6,
+        #endif
+        #ifdef LIGHTMAP
+            float2 iTexCoord2 : TEXCOORD7,
         #endif
     #endif
     #ifdef PREPASS
@@ -254,14 +269,18 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float specIntensity = specColor.g;
         float specPower = cMatSpecColor.a / 255.0;
 
-        oColor = float4(GetFog(iVertexLight.rgb * diffColor.rgb, iVertexLight.a), 1.0);
+        float3 finalColor = iVertexLight.rgb * diffColor.rgb;
+        #ifdef ENVCUBEMAP
+            finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal)).rgb;
+        #endif
+        #ifdef LIGHTMAP
+            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
+        #endif
+
+        oColor = float4(GetFog(finalColor, iVertexLight.a), 1.0);
         oAlbedo = GetFogFactor(iVertexLight.a) * float4(diffColor.rgb, specIntensity);
         oNormal = float4(normal * 0.5 + 0.5, specPower);
         oDepth = iVertexLight.a;
-
-        #ifdef ENVCUBEMAP
-            oColor.rgb += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal));
-        #endif
     #else
         // Ambient & per-vertex lighting
         float3 finalColor = iVertexLight.rgb * diffColor.rgb;
@@ -283,7 +302,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
                 float3 normal = iNormal;
             #endif
             normal = normalize(normal);
-            finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal));
+            finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal)).rgb;
+        #endif
+        #ifdef LIGHTMAP
+            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
         #endif
 
         oColor = float4(GetFog(finalColor, iVertexLight.a), diffColor.a);
