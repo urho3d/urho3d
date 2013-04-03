@@ -487,25 +487,28 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                 break;
 
             Variant firstValue = vector[subIndex];
-            bool varSameValue = true;
-            if (!sameValue)
+            bool sameValue = true;
+            Array<Variant> varValues;
+
+            // Reevaluate aach variant in the vector
+            for (uint i = 0; i < values.length; ++i)
             {
-                // Reevaluate aach variant in the vector
-                for (uint i = 0; i < values.length; ++i)
+                Array<Variant>@ vector = values[i].GetVariantVector();                
+                if (subIndex < vector.length)
                 {
-                    Array<Variant>@ vector = values[i].GetVariantVector();
-                    if (subIndex >= vector.length || vector[subIndex] != firstValue)
-                    {
-                        varSameValue = false;
-                        break;
-                    }
+                    Variant value = vector[subIndex];
+                    varValues.Push(value);
+                    if (value != firstValue)
+                        sameValue = false;
                 }
+                else
+                    sameValue = false;
             }
 
             // The individual variant in the list is not an attribute of the serializable, the structure is reused for convenience
             AttributeInfo info;
             info.type = firstValue.type;
-            LoadAttributeEditor(parent, firstValue, info, editable, varSameValue, values);
+            LoadAttributeEditor(parent, firstValue, info, editable, sameValue, varValues);
         }
     }
     else if (type == VAR_VARIANTMAP)
@@ -524,25 +527,28 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                 continue;
 
             Variant firstValue = map[keys[subIndex]];
-            bool varSameValue = true;
-            if (!sameValue)
+            bool sameValue = true;
+            Array<Variant> varValues;
+            
+            // Reevaluate each variant in the map
+            for (uint i = 0; i < values.length; ++i)
             {
-                // Reevaluate each variant in the map
-                for (uint i = 0; i < values.length; ++i)
+                VariantMap map = values[i].GetVariantMap();
+                if (map.Contains(keys[subIndex]))
                 {
-                    VariantMap map = values[i].GetVariantMap();
-                    if (!map.Contains(keys[subIndex]) || map[keys[subIndex]] != firstValue)
-                    {
-                        varSameValue = false;
-                        break;
-                    }
+                    Variant value = map[keys[subIndex]];
+                    varValues.Push(value);
+                    if (value != firstValue)
+                       sameValue = false;
                 }
+                else
+                    sameValue = false;
             }
 
             // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
             AttributeInfo info;
             info.type = firstValue.type;
-            LoadAttributeEditor(parent, firstValue, info, editable, varSameValue, values);
+            LoadAttributeEditor(parent, firstValue, info, editable, sameValue, varValues);
         }
     }
     else
@@ -600,7 +606,8 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
         for (uint i = 0; i < serializables.length; ++i)
         {
             Array<Variant>@ vector = serializables[i].attributes[index].GetVariantVector();
-            Variant[] values(1);
+            Variant[] values;
+            values.Push(vector[subIndex]);  // Each individual variant may have multiple coordinates itself
             GetEditorValue(parent, vector[subIndex].type, null, coordinate, values);
             vector[subIndex] = values[0];
             serializables[i].attributes[index] = Variant(vector);
@@ -610,11 +617,12 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
     {
         VariantMap map = serializables[0].attributes[index].GetVariantMap();
         ShortStringHash key(parent.vars["Key"].GetUInt());
-        Variant[] values(1);
-        GetEditorValue(parent, map[key].type, null, coordinate, values);
         for (uint i = 0; i < serializables.length; ++i)
         {
             VariantMap map = serializables[i].attributes[index].GetVariantMap();
+            Variant[] values;
+            values.Push(map[key]);  // Each individual variant may have multiple coordinates itself
+            GetEditorValue(parent, map[key].type, null, coordinate, values);
             map[key] = values[0];
             serializables[i].attributes[index] = Variant(map);
         }

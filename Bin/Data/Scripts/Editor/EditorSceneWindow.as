@@ -52,7 +52,6 @@ void CreateHierarchyWindow()
         Text@ choice = Text();
         choice.SetStyle(uiStyle, "FileSelectorFilterText");
         choice.text = componentTypes[i];
-        choice.indent = 1;
         IconizeUIElement(choice, componentTypes[i]);
         newComponentList.AddItem(choice);
     }

@@ -416,7 +416,10 @@ void CreateNodeVariable(StringHash eventType, VariantMap& eventData)
         overwrite = overwrite || editNodes[i].vars.Contains(newKey);
         editNodes[i].vars[newKey] = newValue;
     }
-    UpdateAttributeInspector(overwrite);
+    if (overwrite)
+        attributesFullDirty = true;
+    else
+        attributesDirty = true;
 }
 
 void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
@@ -436,7 +439,7 @@ void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
         erased = editNodes[i].vars.Erase(delKey) || erased;
     }
     if (erased)
-        UpdateAttributeInspector(false);
+        attributesDirty = true;
 }
 
 void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
@@ -458,7 +461,10 @@ void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
         overwrite = overwrite || element.vars.Contains(newKey);
         element.vars[newKey] = newValue;
     }
-    UpdateAttributeInspector(overwrite);
+    if (overwrite)
+        attributesFullDirty = true;
+    else
+        attributesDirty = true;
 }
 
 void DeleteUIElementVariable(StringHash eventType, VariantMap& eventData)
@@ -478,7 +484,7 @@ void DeleteUIElementVariable(StringHash eventType, VariantMap& eventData)
         erased = cast<UIElement>(editUIElements[i]).vars.Erase(delKey) || erased;
     }
     if (erased)
-        UpdateAttributeInspector(false);
+        attributesDirty = true;
 }
 
 void CreateNewVariable(VariantMap& eventData, String& newKey, Variant& newValue)
@@ -519,4 +525,6 @@ void DeleteVariable(VariantMap& eventData, String& delKey)
     Button@ button = eventData["Element"].GetUIElement();
     LineEdit@ nameEdit = button.parent.GetChild("VarNameEdit", true);
     delKey = nameEdit.text.Trimmed().Replaced(";", "");
+
+    // Do not actually unregister the variable name as the same variable name may still be used by other attribute list
 }
