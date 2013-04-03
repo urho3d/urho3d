@@ -703,12 +703,12 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (key == KEY_ESC)
     {
         UIElement@ front = ui.frontElement;
-        if (uiHidden)
+        if (uiFileSelector !is null && front is uiFileSelector.window)
+            CloseFileSelector();
+        else if (uiHidden)
             UnhideUI();
         else if (console.visible)
             console.visible = false;
-        else if (uiFileSelector !is null && front is uiFileSelector.window)
-            CloseFileSelector();
         else if (front is settingsDialog || front is preferencesDialog)
         {
             ui.focusElement = null;
@@ -801,8 +801,8 @@ void HideUI(bool hide = true)
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
     {
-        // Cursor, FileSelector, and editorUIElement are excluded
-        if (children[i].type != CURSOR_TYPE && children[i] !is editorUIElement && (uiFileSelector is null || children[i] !is uiFileSelector.window))
+        // Cursor and editorUIElement are excluded
+        if (children[i].type != CURSOR_TYPE && children[i] !is editorUIElement)
         {
             if (visible)
             {
