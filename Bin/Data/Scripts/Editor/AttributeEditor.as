@@ -132,8 +132,9 @@ UIElement@ CreateStringAttributeEditor(ListView@ list, Array<Serializable@>@ ser
 
 UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex)
 {
+    bool isUIElement = cast<UIElement>(serializables[0]) !is null;
     UIElement@ parent;
-    if (info.name == "Is Enabled")
+    if (info.name == (isUIElement ? "Is Visible" : "Is Enabled"))
         parent = CreateAttributeEditorParentAsListChild(list, info.name, index, subIndex);
     else
         parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
@@ -341,13 +342,15 @@ uint GetAttributeEditorCount(Array<Serializable@>@ serializables)
     if (!serializables.empty)
     {
         /// \todo When multi-editing, this only counts the editor count of the first serializable
+        bool isUIElement = cast<UIElement>(serializables[0]) !is null;
         for (uint i = 0; i < serializables[0].numAttributes; ++i)
         {
             AttributeInfo info = serializables[0].attributeInfos[i];
             if (!showNonEditableAttribute && info.mode & AM_NOEDIT != 0)
                 continue;
             // "Is Enabled" is not inserted into the main attribute list, so do not count
-            if (info.name == "Is Enabled")
+            // Similarly, for UIElement, "Is Visible" is not inserted
+            if (info.name == (isUIElement ? "Is Visible" : "Is Enabled"))
                 continue;
             if (info.type == VAR_RESOURCEREFLIST)
                 count += serializables[0].attributes[i].GetResourceRefList().length;

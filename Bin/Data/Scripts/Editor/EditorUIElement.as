@@ -88,7 +88,7 @@ void OpenUIElement(const String&in fileName)
 
     UpdateHierarchyItem(element, true);
 
-    suppressSceneChanges = false;
+    suppressUIElementChanges = false;
 }
 
 bool CloseUIElement()
@@ -101,9 +101,8 @@ bool CloseUIElement()
         while (!element.vars.Contains(FILENAME_VAR))
             element = element.parent;
         element.Remove();
-
-        UpdateHierarchyItem(GetListIndex(element), null, null);
     }
+    UpdateHierarchyItem(editorUIElement, true);
 
     suppressUIElementChanges = false;
 

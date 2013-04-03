@@ -262,6 +262,9 @@ void SetID(Text@ text, Serializable@ serializable)
         // Store the generated ID into both the variant map of the actual object and the text item
         cast<UIElement>(serializable).vars[UI_ELEMENT_ID_VAR] = uiElementNextID;
         text.vars[UI_ELEMENT_ID_VAR] = uiElementNextID++;
+        // Subscribe to name and visibility changed events
+        SubscribeToEvent(serializable, "ElementNameChanged", "HandleElementNameChanged");
+        SubscribeToEvent(serializable, "VisibleChanged", "HandleElementVisibilityChanged");
     }
 }
 
@@ -741,11 +744,11 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
         // Some components such as CollisionShape do not create their internal object before the first call to ApplyAttributes()
         // to prevent unnecessary initialization with default values. Call now
         newComponent.ApplyAttributes();
-        
+
         CreateComponentAction action;
         action.Define(newComponent);
         SaveEditAction(action);
-        
+
         FocusComponent(newComponent);
     }
 
@@ -849,4 +852,22 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
     Component@ component = eventData["Component"].GetComponent();
     UpdateHierarchyItemText(GetComponentListIndex(component), component.enabledEffective);
     attributesDirty = true;
+}
+
+void HandleElementNameChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressUIElementChanges)
+        return;
+
+    UIElement@ element = eventData["Element"].GetUIElement();
+    UpdateHierarchyItemText(GetListIndex(element), element.visible, GetUIElementTitle(element));
+}
+
+void HandleElementVisibilityChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressUIElementChanges)
+        return;
+
+    UIElement@ element = eventData["Element"].GetUIElement();
+    UpdateHierarchyItemText(GetListIndex(element), element.visible);
 }

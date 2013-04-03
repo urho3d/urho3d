@@ -223,4 +223,10 @@ EVENT(E_ELEMENTREMOVED, ElementRemoved)
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
+/// An element's name has changed.
+EVENT(E_ELEMENTNAMECHANGED, ElementNameChanged)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+}
+
 }

@@ -14,6 +14,7 @@ const ShortStringHash CURSOR_TYPE("Cursor");
 const String TEMP_SCENE_NAME("_tempscene_.xml");
 const ShortStringHash CALLBACK_VAR("Callback");
 const ShortStringHash POPUP_ORIGIN_VAR("Origin");
+const ShortStringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
 
 const int SHOW_POPUP_INDICATOR = -1;
 
@@ -697,9 +698,6 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
 
-    if (key == KEY_F1)
-        console.Toggle();
-
     if (key == KEY_ESC)
     {
         UIElement@ front = ui.frontElement;
@@ -715,15 +713,21 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             front.visible = false;
         }
     }
+    
+    // Ignore other keys when UI has a modal element
+    else if (ui.modalElement !is null)
+        return;
 
-    if (key == KEY_F2)
+    else if (key == KEY_F1)
+        console.Toggle();
+    else if (key == KEY_F2)
         ToggleRenderingDebug();
-    if (key == KEY_F3)
+    else if (key == KEY_F3)
         TogglePhysicsDebug();
-    if (key == KEY_F4)
+    else if (key == KEY_F4)
         ToggleOctreeDebug();
 
-    if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
+    else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
     {
         if (key == '1')
             editMode = EDIT_MOVE;
@@ -731,7 +735,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             editMode = EDIT_ROTATE;
         else if (key == '3')
             editMode = EDIT_SCALE;
-        if (key == '4')
+        else if (key == '4')
             editMode = EDIT_SELECT;
         else if (key == '5')
             axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
@@ -831,7 +835,7 @@ void IconizeUIElement(UIElement@ element, const String&in iconType)
             icon.Remove();
 
         // Revert back the indent but only if it is indented by this function
-        if (element.vars["IconIndented"].GetBool())
+        if (element.vars[INDENT_MODIFIED_BY_ICON_VAR].GetBool())
             element.indent = 0;
 
         return;
@@ -841,7 +845,7 @@ void IconizeUIElement(UIElement@ element, const String&in iconType)
     if (element.indent == 0)
     {
         element.indent = 1;
-        element.vars["IconIndented"] = true;
+        element.vars[INDENT_MODIFIED_BY_ICON_VAR] = true;
     }
 
     // If no icon yet then create one with the correct indent and size in respect to the UI element

@@ -444,6 +444,13 @@ bool UIElement::SaveXML(Serializer& dest)
 void UIElement::SetName(const String& name)
 {
     name_ = name;
+
+    using namespace ElementNameChanged;
+
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)this;
+
+    SendEvent(E_ELEMENTNAMECHANGED, eventData);
 }
 
 void UIElement::SetPosition(const IntVector2& position)
