@@ -544,189 +544,48 @@ public:
     
     /// Test for equality with another variant.
     bool operator == (const Variant& rhs) const;
+    /// Test for equality with an integer. To return true, both the type and value must match.
+    bool operator == (int rhs) const { return type_ == VAR_INT ? value_.int_ == rhs : false; }
+    /// Test for equality with an unsigned integer. To return true, both the type and value must match.
+    bool operator == (unsigned rhs) const { return type_ == VAR_INT ? value_.int_ == (int)rhs : false; }
+    /// Test for equality with a bool. To return true, both the type and value must match.
+    bool operator == (bool rhs) const { return type_ == VAR_BOOL ? value_.bool_ == rhs : false; }
+    /// Test for equality with a float. To return true, both the type and value must match.
+    bool operator == (float rhs) const { return type_ == VAR_FLOAT ? value_.float_ == rhs : false; }
+    /// Test for equality with a Vector2. To return true, both the type and value must match.
+    bool operator == (const Vector2& rhs) const { return type_ == VAR_VECTOR2 ? *(reinterpret_cast<const Vector2*>(&value_)) == rhs : false; }
+    /// Test for equality with a Vector3. To return true, both the type and value must match.
+    bool operator == (const Vector3& rhs) const { return type_ == VAR_VECTOR3 ? *(reinterpret_cast<const Vector3*>(&value_)) == rhs : false; }
+    /// Test for equality with a Vector4. To return true, both the type and value must match.
+    bool operator == (const Vector4& rhs) const { return type_ == VAR_VECTOR4 ? *(reinterpret_cast<const Vector4*>(&value_)) == rhs : false; }
+    /// Test for equality with a quaternion. To return true, both the type and value must match.
+    bool operator == (const Quaternion& rhs) const { return type_ == VAR_QUATERNION ? *(reinterpret_cast<const Quaternion*>(&value_)) == rhs : false; }
+    /// Test for equality with a color. To return true, both the type and value must match.
+    bool operator == (const Color& rhs) const { return type_ == VAR_COLOR ? *(reinterpret_cast<const Color*>(&value_)) == rhs : false; }
+    /// Test for equality with a string. To return true, both the type and value must match.
+    bool operator == (const String& rhs) const { return type_ == VAR_STRING ? *(reinterpret_cast<const String*>(&value_)) == rhs : false; }
+    /// Test for equality with a buffer. To return true, both the type and value must match.
+    bool operator == (const PODVector<unsigned char>& rhs) const { return type_ == VAR_BUFFER ? *(reinterpret_cast<const PODVector<unsigned char>*>(&value_)) == rhs : false; }
+    /// Test for equality with a pointer. To return true, both the type and value must match.
+    bool operator == (void* rhs) const { return type_ == VAR_PTR ? value_.ptr_ == rhs : false; }
+    /// Test for equality with a resource reference. To return true, both the type and value must match.
+    bool operator == (const ResourceRef& rhs) const { return type_ == VAR_RESOURCEREF ? *(reinterpret_cast<const ResourceRef*>(&value_)) == rhs : false; }
+    /// Test for equality with a resource reference list. To return true, both the type and value must match.
+    bool operator == (const ResourceRefList& rhs) const { return type_ == VAR_RESOURCEREFLIST ? *(reinterpret_cast<const ResourceRefList*>(&value_)) == rhs : false; }
+    /// Test for equality with a variant vector. To return true, both the type and value must match.
+    bool operator == (const VariantVector& rhs) const { return type_ == VAR_VARIANTVECTOR ? *(reinterpret_cast<const VariantVector*>(&value_)) == rhs : false; }
+    /// Test for equality with a variant map. To return true, both the type and value must match.
+    bool operator == (const VariantMap& rhs) const { return type_ == VAR_VARIANTMAP ? *(reinterpret_cast<const VariantMap*>(&value_)) == rhs : false; }
+    /// Test for equality with an integer rect. To return true, both the type and value must match.
+    bool operator == (const IntRect& rhs) const { return type_ == VAR_INTRECT ? *(reinterpret_cast<const IntRect*>(&value_)) == rhs : false; }
+    /// Test for equality with an IntVector2. To return true, both the type and value must match.
+    bool operator == (const IntVector2& rhs) const { return type_ == VAR_INTVECTOR2 ? *(reinterpret_cast<const IntVector2*>(&value_)) == rhs : false; }
+    /// Test for equality with a StringHash. To return true, both the type and value must match.
+    bool operator == (const StringHash& rhs) const { return type_ == VAR_INT ? (unsigned)value_.int_ == rhs.Value() : false; }
+    /// Test for equality with a ShortStringHash. To return true, both the type and value must match.
+    bool operator == (const ShortStringHash& rhs) const { return type_ == VAR_INT ? value_.int_ == rhs.Value() : false; }
     /// Test for inequality with another variant.
     bool operator != (const Variant& rhs) const { return !(*this == rhs); }
-    
-    /// Test for equality with an integer. To return true, both the type and value must match.
-    bool operator == (int rhs) const
-    {
-        if (type_ == VAR_INT)
-            return value_.int_ == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with an unsigned integer. To return true, both the type and value must match.
-    bool operator == (unsigned rhs) const
-    {
-        if (type_ == VAR_INT)
-            return value_.int_ == (int)rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a bool. To return true, both the type and value must match.
-    bool operator == (bool rhs) const
-    {
-        if (type_ == VAR_BOOL)
-            return value_.bool_ == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a float. To return true, both the type and value must match.
-    bool operator == (float rhs) const
-    {
-        if (type_ == VAR_FLOAT)
-            return value_.float_ == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a Vector2. To return true, both the type and value must match.
-    bool operator == (const Vector2& rhs) const
-    {
-        if (type_ == VAR_VECTOR2)
-            return *(reinterpret_cast<const Vector2*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a Vector3. To return true, both the type and value must match.
-    bool operator == (const Vector3& rhs) const
-    {
-        if (type_ == VAR_VECTOR3)
-            return *(reinterpret_cast<const Vector3*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a Vector4. To return true, both the type and value must match.
-    bool operator == (const Vector4& rhs) const
-    {
-        if (type_ == VAR_VECTOR4)
-            return *(reinterpret_cast<const Vector4*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a quaternion. To return true, both the type and value must match.
-    bool operator == (const Quaternion& rhs) const
-    {
-        if (type_ == VAR_QUATERNION)
-            return *(reinterpret_cast<const Quaternion*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a color. To return true, both the type and value must match.
-    bool operator == (const Color& rhs) const
-    {
-        if (type_ == VAR_COLOR)
-            return *(reinterpret_cast<const Color*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a string. To return true, both the type and value must match.
-    bool operator == (const String& rhs) const
-    {
-        if (type_ == VAR_STRING)
-            return *(reinterpret_cast<const String*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a buffer. To return true, both the type and value must match.
-    bool operator == (const PODVector<unsigned char>& rhs) const
-    {
-        if (type_ == VAR_BUFFER)
-            return *(reinterpret_cast<const PODVector<unsigned char>*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a pointer. To return true, both the type and value must match.
-    bool operator == (void* rhs) const
-    {
-        if (type_ == VAR_PTR)
-            return value_.ptr_ == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a resource reference. To return true, both the type and value must match.
-    bool operator == (const ResourceRef& rhs) const
-    {
-        if (type_ == VAR_RESOURCEREF)
-            return *(reinterpret_cast<const ResourceRef*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a resource reference list. To return true, both the type and value must match.
-    bool operator == (const ResourceRefList& rhs) const
-    {
-        if (type_ == VAR_RESOURCEREFLIST)
-            return *(reinterpret_cast<const ResourceRefList*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a variant vector. To return true, both the type and value must match.
-    bool operator == (const VariantVector& rhs) const
-    {
-        if (type_ == VAR_VARIANTVECTOR)
-            return *(reinterpret_cast<const VariantVector*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a variant map. To return true, both the type and value must match.
-    bool operator == (const VariantMap& rhs) const
-    {
-        if (type_ == VAR_VARIANTMAP)
-            return *(reinterpret_cast<const VariantMap*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with an integer rect. To return true, both the type and value must match.
-    bool operator == (const IntRect& rhs) const
-    {
-        if (type_ == VAR_INTRECT)
-            return *(reinterpret_cast<const IntRect*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with an IntVector2. To return true, both the type and value must match.
-    bool operator == (const IntVector2& rhs) const
-    {
-        if (type_ == VAR_INTVECTOR2)
-            return *(reinterpret_cast<const IntVector2*>(&value_)) == rhs;
-        else
-            return false;
-    }
-    
-    /// Test for equality with a StringHash. To return true, both the type and value must match.
-    bool operator == (const StringHash& rhs) const
-    {
-        if (type_ == VAR_INT)
-            return (unsigned)value_.int_ == rhs.Value();
-        else
-            return false;
-    }
-    
-    /// Test for equality with a ShortStringHash. To return true, both the type and value must match.
-    bool operator == (const ShortStringHash& rhs) const
-    {
-        if (type_ == VAR_INT)
-            return (unsigned short)value_.int_ == rhs.Value();
-        else
-            return false;
-    }
-    
     /// Test for inequality with an integer.
     bool operator != (int rhs) const { return !(*this == rhs); }
     /// Test for inequality with an unsigned integer.
@@ -778,164 +637,52 @@ public:
     void SetBuffer(const void* data, unsigned size);
     
     /// Return int or zero on type mismatch.
-    int GetInt() const
-    {
-        if (type_ != VAR_INT)
-            return 0;
-        return value_.int_;
-    }
-    
+    int GetInt() const { return type_ == VAR_INT ? value_.int_ : 0; }
     /// Return unsigned int or zero on type mismatch.
-    int GetUInt() const
-    {
-        if (type_ != VAR_INT)
-            return 0;
-        return (unsigned)value_.int_;
-    }
-    
+    int GetUInt() const { return type_ == VAR_INT ? (unsigned)value_.int_ : 0; }
     /// Return StringHash or zero on type mismatch.
-    StringHash GetStringHash() const
-    {
-        if (type_ != VAR_INT)
-            return StringHash::ZERO;
-        return StringHash(value_.int_);
-    }
-    
+    StringHash GetStringHash() const { return StringHash(GetUInt()); }
     /// Return ShortStringHash or zero on type mismatch.
-    ShortStringHash GetShortStringHash() const
-    {
-        if (type_ != VAR_INT)
-            return ShortStringHash::ZERO;
-        return ShortStringHash(value_.int_);
-    }
-    
+    ShortStringHash GetShortStringHash() const { return ShortStringHash(GetUInt()); }
     /// Return bool or false on type mismatch.
-    bool GetBool() const
-    {
-        if (type_ != VAR_BOOL)
-            return false;
-        return value_.bool_;
-    }
-    
+    bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }
     /// Return float or zero on type mismatch.
-    float GetFloat() const
-    {
-        if (type_ != VAR_FLOAT)
-            return 0.0f;
-        return value_.float_;
-    }
-    
+    float GetFloat() const { return type_ == VAR_FLOAT ? value_.float_ : 0.0f; }
     /// Return Vector2 or zero on type mismatch.
-    const Vector2& GetVector2() const
-    {
-        if (type_ != VAR_VECTOR2)
-            return Vector2::ZERO;
-        return *reinterpret_cast<const Vector2*>(&value_);
-    }
-    
+    const Vector2& GetVector2() const { return type_ == VAR_VECTOR2 ? *reinterpret_cast<const Vector2*>(&value_) : Vector2::ZERO; }
     /// Return Vector3 or zero on type mismatch.
-    const Vector3& GetVector3() const
-    {
-        if (type_ != VAR_VECTOR3)
-            return Vector3::ZERO;
-        return *reinterpret_cast<const Vector3*>(&value_);
-    }
-    
+    const Vector3& GetVector3() const { return type_ == VAR_VECTOR3 ? *reinterpret_cast<const Vector3*>(&value_) : Vector3::ZERO; }
     /// Return Vector4 or zero on type mismatch.
-    const Vector4& GetVector4() const
-    {
-        if (type_ != VAR_VECTOR4)
-            return Vector4::ZERO;
-        return *reinterpret_cast<const Vector4*>(&value_);
-    }
-    
+    const Vector4& GetVector4() const { return type_ == VAR_VECTOR4 ? *reinterpret_cast<const Vector4*>(&value_) : Vector4::ZERO; }
     /// Return quaternion or identity on type mismatch.
-    const Quaternion& GetQuaternion() const
-    {
-        if (type_ != VAR_QUATERNION)
-            return Quaternion::IDENTITY;
-        return *reinterpret_cast<const Quaternion*>(&value_);
-    }
-    
+    const Quaternion& GetQuaternion() const { return type_ == VAR_QUATERNION ? *reinterpret_cast<const Quaternion*>(&value_) : Quaternion::IDENTITY; }
     /// Return color or default on type mismatch.
-    const Color& GetColor() const
-    {
-        if (type_ != VAR_COLOR)
-            return Color::WHITE;
-        return *reinterpret_cast<const Color*>(&value_);
-    }
-    
+    const Color& GetColor() const { return type_ == VAR_COLOR ? *reinterpret_cast<const Color*>(&value_) : Color::WHITE; }
     /// Return string or empty on type mismatch.
-    const String& GetString() const
-    {
-        if (type_ != VAR_STRING)
-            return String::EMPTY;
-        return *reinterpret_cast<const String*>(&value_);
-    }
-    
+    const String& GetString() const { return type_ == VAR_STRING ? *reinterpret_cast<const String*>(&value_) : String::EMPTY; }
     /// Return buffer or empty on type mismatch.
-    const PODVector<unsigned char>& GetBuffer() const
-    {
-        if (type_ != VAR_BUFFER)
-            return emptyBuffer;
-        return *reinterpret_cast<const PODVector<unsigned char>*>(&value_);
-    }
-    
+    const PODVector<unsigned char>& GetBuffer() const { return type_ == VAR_BUFFER ? *reinterpret_cast<const PODVector<unsigned char>*>(&value_) : emptyBuffer; }
     /// Return pointer or null on type mismatch.
-    void* GetPtr() const
-    {
-        if (type_ != VAR_PTR)
-            return 0;
-        return value_.ptr_;
-    }
-    
+    void* GetPtr() const { return type_ == VAR_PTR ? value_.ptr_ : 0; }
     /// Return a resource reference or empty on type mismatch.
-    const ResourceRef& GetResourceRef() const
-    {
-        if (type_ != VAR_RESOURCEREF)
-            return emptyResourceRef;
-        return *reinterpret_cast<const ResourceRef*>(&value_);
-    }
-    
+    const ResourceRef& GetResourceRef() const { return type_ == VAR_RESOURCEREF ? *reinterpret_cast<const ResourceRef*>(&value_) : emptyResourceRef; }
     /// Return a resource reference list or empty on type mismatch.
-    const ResourceRefList& GetResourceRefList() const
-    {
-        if (type_ != VAR_RESOURCEREFLIST)
-            return emptyResourceRefList;
-        return *reinterpret_cast<const ResourceRefList*>(&value_);
-    }
-    
+    const ResourceRefList& GetResourceRefList() const { return type_ == VAR_RESOURCEREFLIST ? *reinterpret_cast<const ResourceRefList*>(&value_) : emptyResourceRefList; }
     /// Return a variant vector or empty on type mismatch.
-    const VariantVector& GetVariantVector() const
-    {
-        if (type_ != VAR_VARIANTVECTOR)
-            return emptyVariantVector;
-        return *reinterpret_cast<const VariantVector*>(&value_);
-    }
-    
+    const VariantVector& GetVariantVector() const { return type_ == VAR_VARIANTVECTOR ? *reinterpret_cast<const VariantVector*>(&value_) : emptyVariantVector; }
     /// Return a variant map or empty on type mismatch.
-    const VariantMap& GetVariantMap() const
-    {
-        if (type_ != VAR_VARIANTMAP)
-            return emptyVariantMap;
-        return *reinterpret_cast<const VariantMap*>(&value_);
-    }
-    
+    const VariantMap& GetVariantMap() const { return type_ == VAR_VARIANTMAP ? *reinterpret_cast<const VariantMap*>(&value_) : emptyVariantMap; }
     /// Return an integer rect or empty on type mismatch.
-    const IntRect& GetIntRect() const
-    {
-        if (type_ != VAR_INTRECT)
-            return IntRect::ZERO;
-        return *reinterpret_cast<const IntRect*>(&value_);
-    }
-    
+    const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? *reinterpret_cast<const IntRect*>(&value_) : IntRect::ZERO; }
     /// Return an IntVector2 or empty on type mismatch.
-    const IntVector2& GetIntVector2() const
-    {
-        if (type_ != VAR_INTVECTOR2)
-            return IntVector2::ZERO;
-        return *reinterpret_cast<const IntVector2*>(&value_);
-    }
+    const IntVector2& GetIntVector2() const { return type_ == VAR_INTVECTOR2 ? *reinterpret_cast<const IntVector2*>(&value_) : IntVector2::ZERO; }
+    
+    /// Return a pointer to a modifiable buffer or null on type mismatch.
+    PODVector<unsigned char>* GetBufferPtr() { return type_ == VAR_BUFFER ? reinterpret_cast<PODVector<unsigned char>*>(&value_) : 0; }
+    /// Return a pointer to a modifiable variant vector or null on type mismatch.
+    VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? reinterpret_cast<VariantVector*>(&value_) : 0; }
+    /// Return a pointer to a modifiable variant map or null on type mismatch.
+    VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? reinterpret_cast<VariantMap*>(&value_) : 0; }
     
     /// Return the value, template version.
     template <class T> T Get() const;

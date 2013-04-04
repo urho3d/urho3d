@@ -8,7 +8,8 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
 set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Engine/Graphics ../../Engine/Input ../../Engine/IO ../../Engine/Math 
-    ../../Engine/Network ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI ../../ThirdParty/Bullet/src)
+    ../../Engine/Network ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI)
+set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src)
 
 # Setup target
 if (WIN32)

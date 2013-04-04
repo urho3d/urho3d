@@ -45,6 +45,23 @@ LOCAL_C_INCLUDES := \
 include $(BUILD_STATIC_LIBRARY)
 
 
+# Detour library
+LOCAL_PATH = $(ROOT_PATH)/ThirdParty/Detour
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := Detour
+
+LOCAL_SRC_FILES := \
+    $(subst $(LOCAL_PATH)/,, \
+    $(wildcard $(LOCAL_PATH)/Source/*.cpp))
+
+LOCAL_C_INCLUDES := \
+    $(LOCAL_PATH)/Include
+
+include $(BUILD_STATIC_LIBRARY)
+
+
 # FreeType library
 LOCAL_PATH = $(ROOT_PATH)/ThirdParty/FreeType
 
@@ -128,6 +145,23 @@ LOCAL_MODULE := PugiXml
 LOCAL_SRC_FILES := \
     $(subst $(LOCAL_PATH)/,, \
     $(wildcard $(LOCAL_PATH)/src/*.cpp))
+
+include $(BUILD_STATIC_LIBRARY)
+
+
+# Recast library
+LOCAL_PATH = $(ROOT_PATH)/ThirdParty/Recast
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := Recast
+
+LOCAL_SRC_FILES := \
+    $(subst $(LOCAL_PATH)/,, \
+    $(wildcard $(LOCAL_PATH)/Source/*.cpp))
+
+LOCAL_C_INCLUDES := \
+    $(LOCAL_PATH)/Include
 
 include $(BUILD_STATIC_LIBRARY)
 
@@ -227,6 +261,7 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/Engine/Input \
     $(LOCAL_PATH)/Engine/IO \
     $(LOCAL_PATH)/Engine/Math \
+    $(LOCAL_PATH)/Engine/Navigation \
     $(LOCAL_PATH)/Engine/Network \
     $(LOCAL_PATH)/Engine/Physics \
     $(LOCAL_PATH)/Engine/Resource \
@@ -235,9 +270,11 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/Engine/UI \
     $(LOCAL_PATH)/ThirdParty/AngelScript/include \
     $(LOCAL_PATH)/ThirdParty/Bullet/src \
+    $(LOCAL_PATH)/ThirdParty/Detour/Include \
     $(LOCAL_PATH)/ThirdParty/FreeType/include \
     $(LOCAL_PATH)/ThirdParty/kNet/include \
     $(LOCAL_PATH)/ThirdParty/PugiXml/src \
+    $(LOCAL_PATH)/ThirdParty/Recast/Include \
     $(LOCAL_PATH)/ThirdParty/SDL/include \
     $(LOCAL_PATH)/ThirdParty/StanHull \
     $(LOCAL_PATH)/ThirdParty/STB \
@@ -254,6 +291,7 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/Engine/Input/*.cpp) \
     $(wildcard $(LOCAL_PATH)/Engine/IO/*.cpp) \
     $(wildcard $(LOCAL_PATH)/Engine/Math/*.cpp) \
+    $(wildcard $(LOCAL_PATH)/Engine/Navigation/*.cpp) \
     $(wildcard $(LOCAL_PATH)/Engine/Network/*.cpp) \
     $(wildcard $(LOCAL_PATH)/Engine/Physics/*.cpp) \
     $(wildcard $(LOCAL_PATH)/Engine/Resource/*.cpp) \
@@ -265,7 +303,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_CPPFLAGS += -DENABLE_LOGGING
 
-LOCAL_STATIC_LIBRARIES := AngelScript Bullet FreeType kNet PugiXml SDL StanHull STB JO
+LOCAL_STATIC_LIBRARIES := AngelScript Bullet Detour FreeType kNet PugiXml Recast SDL StanHull STB JO
 
 LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog
 

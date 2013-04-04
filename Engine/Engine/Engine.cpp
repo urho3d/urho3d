@@ -31,6 +31,7 @@
 #include "Graphics.h"
 #include "Input.h"
 #include "Log.h"
+#include "Navigation.h"
 #include "Network.h"
 #include "PackageFile.h"
 #include "PhysicsWorld.h"
@@ -644,6 +645,7 @@ void Engine::RegisterObjects()
     RegisterAudioLibrary(context_);
     RegisterUILibrary(context_);
     RegisterPhysicsLibrary(context_);
+    RegisterNavigationLibrary(context_);
     
     // In debug mode, check that all factory created objects can be created without crashing
     #ifdef _DEBUG
