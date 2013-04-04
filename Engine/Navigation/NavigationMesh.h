@@ -22,12 +22,15 @@
 
 #pragma once
 
+#include "BoundingBox.h"
 #include "Component.h"
 
 namespace Urho3D
 {
 
-/// Navigation mesh component.
+class Geometry;
+
+/// Navigation mesh component. Collects the navigation geometry from the scene and responds to path queries.
 class NavigationMesh : public Component
 {
     OBJECT(NavigationMesh);
@@ -39,6 +42,99 @@ public:
     virtual ~NavigationMesh();
     /// Register object factory.
     static void RegisterObject(Context* context);
+    
+    /// Set cell size.
+    void SetCellSize(float size);
+    /// Set cell height.
+    void SetCellHeight(float height);
+    /// Set navigation agent height.
+    void SetAgentHeight(float height);
+    /// Set navigation agent radius.
+    void SetAgentRadius(float radius);
+    /// Set navigation agent max vertical climb.
+    void SetAgentMaxClimb(float maxClimb);
+    /// Set navigation agent max slope.
+    void SetAgentMaxSlope(float maxSlope);
+    /// Set region minimum size.
+    void SetRegionMinSize(float size);
+    /// Set region merge size.
+    void SetRegionMergeSize(float size);
+    /// Set edge max length.
+    void SetEdgeMaxLength(float length);
+    /// Set edge max error.
+    void SetEdgeMaxError(float error);
+    /// Set detail sampling distance.
+    void SetDetailSampleDistance(float distance);
+    /// Set detail sampling maximum error.
+    void SetDetailSampleMaxError(float error);
+    
+    /// Retun cell size.
+    float GetCellSize() const { return cellSize_; }
+    /// Return cell height.
+    float GetCellHeight() const { return cellHeight_; }
+    /// Return navigation agent height.
+    float GetAgentHeight() const { return agentHeight_; }
+    /// Return navigation agent radius.
+    float GetAgentRadius() const { return agentRadius_; }
+    /// Return navigation agent max vertical climb.
+    float GetAgentMaxClimb() const { return agentMaxClimb_; }
+    /// Return navigation agent max slope.
+    float GetAgentMaxSlope() const { return agentMaxSlope_; }
+    /// Return region minimum size.
+    float GetRegionMinSize() const { return regionMinSize_; }
+    /// Return region merge size.
+    float GetRegionMergeSize() const { return regionMergeSize_; }
+    /// Return edge max length.
+    float GetEdgeMaxLength() const { return edgeMaxLength_; }
+    /// Return edge max error.
+    float GetEdgeMaxError() const { return edgeMaxError_; }
+    /// Return detail sampling distance.
+    float GetDetailSampleDistance() const { return detailSampleDistance_; }
+    /// Return detail sampling maximum error.
+    float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
+    /// Return the world bounding box.
+    const BoundingBox& GetWorldBoundingBox() const { return worldBoundingBox_; }
+    
+    /// Build/rebuild the navigation mesh. Return true if successful.
+    bool Build();
+    
+private:
+    /// Visit nodes and collect navigable geometry.
+    void CollectGeometries(Node* node, Node* baseNode, unsigned flags);
+    /// Add a geometry to the mesh.
+    void AddGeometry(Node* node, Geometry* geometry);
+    
+    /// Cell size.
+    float cellSize_;
+    /// Cell height.
+    float cellHeight_;
+    /// Navigation agent height.
+    float agentHeight_;
+    /// Navigation agent radius.
+    float agentRadius_;
+    /// Navigation agent max vertical climb.
+    float agentMaxClimb_;
+    /// Navigation agent max slope.
+    float agentMaxSlope_;
+    /// Region minimum size.
+    float regionMinSize_;
+    /// Region merge size.
+    float regionMergeSize_;
+    /// Edge max length.
+    float edgeMaxLength_;
+    /// Edge max error.
+    float edgeMaxError_;
+    /// Detail sampling distance.
+    float detailSampleDistance_;
+    /// Detail sampling maximum error.
+    float detailSampleMaxError_;
+    
+    /// World-space bounding box of the navigation mesh.
+    BoundingBox worldBoundingBox_;
+    /// Build phase vertices.
+    PODVector<Vector3> vertices_;
+    /// Build phase triangle indices.
+    PODVector<int> indices_;
 };
 
 }

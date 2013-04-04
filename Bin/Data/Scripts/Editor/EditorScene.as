@@ -701,6 +701,18 @@ bool SceneSelectAll()
     return true;
 }
 
+bool SceneRebuildNavigation()
+{
+    Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh");
+    for (uint i = 0; i < navMeshes.length; ++i)
+    {
+        NavigationMesh@ navMesh = navMeshes[i];
+        navMesh.Build();
+    }
+    
+    return true;
+}
+
 bool SceneUndo()
 {
     if (undoStackPos > 0)

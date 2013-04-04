@@ -21,18 +21,38 @@
 //
 
 #include "Precompiled.h"
+#include "Context.h"
 #include "Navigable.h"
-#include "NavigationMesh.h"
 
 #include "DebugNew.h"
 
 namespace Urho3D
 {
 
-void RegisterNavigationLibrary(Context* context)
+static const unsigned DEFAULT_FLAGS = 1;
+
+OBJECTTYPESTATIC(Navigable);
+
+Navigable::Navigable(Context* context) :
+    Component(context),
+    flags_(DEFAULT_FLAGS)
 {
-    Navigable::RegisterObject(context);
-    NavigationMesh::RegisterObject(context);
+}
+
+Navigable::~Navigable()
+{
+}
+
+void Navigable::RegisterObject(Context* context)
+{
+    context->RegisterFactory<Navigable>();
+    
+    ATTRIBUTE(Navigable, VAR_INT, "Navigation Flags", flags_, DEFAULT_FLAGS, AM_DEFAULT);
+}
+
+void Navigable::SetFlags(unsigned flags)
+{
+    flags_ = flags;
 }
 
 }

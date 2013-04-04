@@ -51,6 +51,8 @@ void RegisterUIAPI(asIScriptEngine* engine);
 void RegisterNetworkAPI(asIScriptEngine* engine);
 /// Register the Physics library to script.
 void RegisterPhysicsAPI(asIScriptEngine* engine);
+/// Register the Navigation library to script.
+void RegisterNavigationAPI(asIScriptEngine* engine);
 /// Register the Script library to script.
 void RegisterScriptAPI(asIScriptEngine* engine);
 /// Register the Engine library to script.

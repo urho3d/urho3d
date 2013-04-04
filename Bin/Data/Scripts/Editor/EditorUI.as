@@ -175,6 +175,8 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Toggle update", @ToggleUpdate, 'P', QUAL_CTRL));
+        popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }

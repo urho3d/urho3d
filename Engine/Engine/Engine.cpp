@@ -269,6 +269,7 @@ bool Engine::InitializeScripting()
         RegisterUIAPI(engine);
         RegisterNetworkAPI(engine);
         RegisterPhysicsAPI(engine);
+        RegisterNavigationAPI(engine);
         RegisterScriptAPI(engine);
         RegisterEngineAPI(engine);
     }

@@ -20,19 +20,35 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Navigable.h"
-#include "NavigationMesh.h"
+#pragma once
 
-#include "DebugNew.h"
+#include "Component.h"
 
 namespace Urho3D
 {
 
-void RegisterNavigationLibrary(Context* context)
+/// Navigable geometry properties component. Any geometry components from this node and child nodes will be included in the navigation mesh. Physics geometry is preferred to drawable geometry, if available.
+class Navigable : public Component
 {
-    Navigable::RegisterObject(context);
-    NavigationMesh::RegisterObject(context);
-}
+    OBJECT(Navigable);
+    
+public:
+    /// Construct.
+    Navigable(Context* context);
+    /// Destruct.
+    virtual ~Navigable();
+    /// Register object factory.
+    static void RegisterObject(Context* context);
+    
+    /// Set navigation geometry flags, meaning is user-defined.
+    void SetFlags(unsigned flags);
+    
+    /// Return navigation geometry flags.
+    unsigned GetFlags() const { return flags_; }
+    
+private:
+    /// Navigation geometry flags.
+    unsigned flags_;
+};
 
 }
