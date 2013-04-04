@@ -93,6 +93,8 @@ private:
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
     /// Handle keypress for checking accelerator.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
+    /// Auto popup timer.
+    Timer popupTimer_;
 };
 
 }

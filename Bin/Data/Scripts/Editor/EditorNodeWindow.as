@@ -150,9 +150,9 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         {
             String idStr;
             if (editNode.id >= FIRST_LOCAL_ID)
-                idStr = " Local ID " + String(editNode.id - FIRST_LOCAL_ID);
+                idStr = " Local ID (" + String(editNode.id - FIRST_LOCAL_ID) + ")";
             else
-                idStr = " ID " + String(editNode.id);
+                idStr = " ID (" + String(editNode.id) + ")";
             nodeType = editNode.typeName;
             nodeTitle.text = nodeType + idStr;
         }
@@ -208,7 +208,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         if (editUIElement !is null)
         {
             elementType = editUIElement.typeName;
-            titleText.text = elementType + " ID " + String(editUIElement.GetVar(UI_ELEMENT_ID_VAR).GetUInt());
+            titleText.text = elementType + " ID [" + editUIElement.GetVar(UI_ELEMENT_ID_VAR).ToString() + "]";
         }
         else
         {

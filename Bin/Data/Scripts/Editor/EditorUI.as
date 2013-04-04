@@ -137,11 +137,11 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Save scene as...", @PickFile, 'S', QUAL_SHIFT | QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
 
-        Menu@ loadNodeMenu = CreateMenuItem("Load node", null, SHOW_POPUP_INDICATOR);
-        Window@ loadNodePopup = CreatePopup(loadNodeMenu);
-        loadNodePopup.AddChild(CreateMenuItem("As replicated...", @PickFile));
-        loadNodePopup.AddChild(CreateMenuItem("As local...", @PickFile));
-        popup.AddChild(loadNodeMenu);
+        Menu@ childMenu = CreateMenuItem("Load node", null, SHOW_POPUP_INDICATOR);
+        Window@ childPopup = CreatePopup(childMenu);
+        childPopup.AddChild(CreateMenuItem("As replicated...", @PickFile));
+        childPopup.AddChild(CreateMenuItem("As local...", @PickFile));
+        popup.AddChild(childMenu);
 
         popup.AddChild(CreateMenuItem("Save node as...", @PickFile));
         popup.AddChild(CreateMenuDivider());
@@ -152,8 +152,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Set resource path...", @PickFile));
         popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Exit", @Exit));
-        AdjustAccelIndent(popup);
-        loadNodeMenu.popupOffset = IntVector2(loadNodeMenu.width, 0);
+        FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
 
@@ -176,36 +175,58 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Toggle update", @ToggleUpdate, 'P', QUAL_CTRL));
-        AdjustAccelIndent(popup);
+        FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
 
     {
         Menu@ menu = CreateMenu("Create");
         Window@ popup = menu.popup;
+        popup.AddChild(CreateMenuItem("Replicated node", @PickNode));
+        popup.AddChild(CreateMenuItem("Local node", @PickNode));
+        popup.AddChild(CreateMenuDivider());
+
+        Menu@ childMenu = CreateMenuItem("Component", null, SHOW_POPUP_INDICATOR);
+        Window@ childPopup = CreatePopup(childMenu);
+        String[] componentTypes = GetAvailableComponents();
+        for (uint i = 0; i < componentTypes.length; ++i)
+            childPopup.AddChild(CreateIconizedMenuItem(componentTypes[i], @PickComponent));
+        popup.AddChild(childMenu);
+
+        childMenu = CreateMenuItem("Builtin object", null, SHOW_POPUP_INDICATOR);
+        childPopup = CreatePopup(childMenu);
         String[] objects = { "Box", "Cone", "Cylinder", "Plane", "Pyramid", "Sphere" };
         for (uint i = 0; i < objects.length; ++i)
-            popup.AddChild(CreateMenuItem(objects[i], @PickBuiltinObject));
+            childPopup.AddChild(CreateIconizedMenuItem(objects[i], @PickBuiltinObject, 0, 0, "Node"));
+        popup.AddChild(childMenu);
+        popup.AddChild(CreateMenuDivider());
+
+        childMenu = CreateMenuItem("New UI-element", null, SHOW_POPUP_INDICATOR);
+        childPopup = CreatePopup(childMenu);
+        String[] typeNames = { "BorderImage", "Button", "CheckBox", "DropDownList", "LineEdit", "Menu", "ScrollBar", "ScrollView", "Slider", "Sprite", "Text", "Window" };
+        for (uint i = 0; i < typeNames.length; ++i)
+            childPopup.AddChild(CreateIconizedMenuItem(typeNames[i], @PickUIElement));
+        popup.AddChild(childMenu);
+
+        FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
 
     {
         Menu@ menu = CreateMenu("UI-element");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("New UI-element", @NewUIElement, 'N', QUAL_ALT));
         popup.AddChild(CreateMenuItem("Open UI-element...", @PickFile, 'O', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Save UI-element", @SaveUIElementWithExistingName, 'S', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Save UI-element as...", @PickFile));
         popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Close UI-element", @CloseUIElement, 'C', QUAL_ALT));
         popup.AddChild(CreateMenuItem("Close all UI-elements", @CloseAllUIElements));
-        popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Save UI-element", @SaveUIElementWithExistingName, 'S', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Save UI-element as...", @PickFile));
         popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Load child element...", @PickFile));
         popup.AddChild(CreateMenuItem("Save child element as...", @PickFile));
         popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Set default style...", @PickFile));
-        AdjustAccelIndent(popup);
+        FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
 
@@ -218,7 +239,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
         popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Hide editor", @ToggleUI, KEY_F12, QUAL_ANY));
-        AdjustAccelIndent(popup);
+        FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
 
@@ -338,6 +359,37 @@ bool PickFile()
     return true;
 }
 
+bool PickNode()
+{
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+
+    String action = menu.name;
+    if (action.empty)
+        return false;
+
+    CreateNode(action == "Replicated node" ? REPLICATED : LOCAL);
+    return true;
+}
+
+bool PickComponent()
+{
+    if (editNode is null)
+        return false;
+
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+
+    String action = menu.name;
+    if (action.empty)
+        return false;
+
+    CreateComponent(action);
+    return true;
+}
+
 bool PickBuiltinObject()
 {
     Menu@ menu = GetEventSender();
@@ -350,6 +402,19 @@ bool PickBuiltinObject()
 
     CreateBuiltinObject(action);
     return true;
+}
+
+bool PickUIElement()
+{
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+
+    String action = menu.name;
+    if (action.empty)
+        return false;
+
+    return NewUIElement(action);
 }
 
 void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
@@ -382,6 +447,35 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
     Text@ menuText = Text();
     menuText.SetStyle(uiStyle, "EditorMenuText");
     menuText.text = title;
+    menu.AddChild(menuText);
+
+    if (accelKey != 0)
+    {
+        menuText.layoutMode = LM_HORIZONTAL;
+        menuText.AddChild(CreateAccelKeyText(accelKey, accelQual));
+    }
+
+    return menu;
+}
+
+Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, const String&in iconType = "")
+{
+    Menu@ menu = Menu(title);
+    menu.style = uiStyle;
+    menu.SetLayout(LM_VERTICAL, 0, IntRect(8, 2, 8, 2));
+    if (accelKey > 0)
+        menu.SetAccelerator(accelKey, accelQual);
+    if (callback !is null)
+    {
+        menu.vars[CALLBACK_VAR] = menuCallbacks.length;
+        menuCallbacks.Push(callback);
+    }
+
+    Text@ menuText = Text();
+    menuText.SetStyle(uiStyle, "EditorMenuText");
+    menuText.text = title;
+    // If icon type is not provided, use the title instead
+    IconizeUIElement(menuText, iconType.empty ? title : iconType);
     menu.AddChild(menuText);
 
     if (accelKey != 0)
@@ -473,7 +567,7 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
     return accelKeyText;
 }
 
-void AdjustAccelIndent(Window@ popup)
+void FinalizedPopupMenu(Window@ popup)
 {
     // Find the maximum menu text width
     Array<UIElement@> children = popup.GetChildren();
@@ -496,12 +590,15 @@ void AdjustAccelIndent(Window@ popup)
         UIElement@ element = children[i];
         if (element.type != MENU_TYPE)
             continue;
+        Menu@ menu = element;
 
-        element = element.children[0];
-        if (element.numChildren == 0)    // Skip if menu text does not have accel
-            continue;
+        Text@ menuText = menu.children[0];
+        if (menuText.numChildren == 1)    // Skip if menu text does not have accel
+            menuText.children[0].indentSpacing = maxWidth;
 
-        element.children[0].indentSpacing = maxWidth;
+        // Adjust the popup offset taking the indentation into effect
+        if (menu.popup !is null)
+            menu.popupOffset = IntVector2(menu.width, 0);
     }
 }
 
@@ -713,7 +810,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             front.visible = false;
         }
     }
-    
+
     // Ignore other keys when UI has a modal element
     else if (ui.modalElement !is null)
         return;

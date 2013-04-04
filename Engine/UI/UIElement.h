@@ -112,7 +112,7 @@ class ResourceCache;
 class UIElement : public Serializable
 {
     OBJECT(UIElement);
-    
+
 public:
     /// Construct.
     UIElement(Context* context);
@@ -120,7 +120,7 @@ public:
     virtual ~UIElement();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Load from XML data. Return true if successful.
@@ -129,7 +129,7 @@ public:
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
-    
+
     /// Perform UI element update.
     virtual void Update(float timeStep);
     /// Return whether is visible and inside a scissor rectangle and should be rendered.
@@ -162,12 +162,12 @@ public:
     virtual void OnResize();
     /// React to position change.
     virtual void OnPositionSet();
-    
+
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest);
-    
+
     /// Set name.
     void SetName(const String& name);
     /// Set position.
@@ -294,10 +294,12 @@ public:
     void SetInternal(bool enable);
     /// Set traversal mode. The default traversal mode is TM_BREADTH_FIRST for non-root element. Root element should be set to TM_DEPTH_FIRST to avoid artifacts during rendering.
     void SetTraversalMode(TraversalMode traversalMode);
+    /// Set element event sender flag. When child element is added or deleted, the event would be sent using UIElement found in the parental chain having this flag set. If not set, the event is sent using UI's root as per normal.
+    void SetElementEventSender(bool flag);
 
     /// Template version of creating a child element.
     template <class T> T* CreateChild(const String& name = String::EMPTY);
-    
+
     /// Return name.
     const String& GetName() const { return name_; }
     /// Return position.
@@ -394,7 +396,7 @@ public:
     const Variant& GetVar(const ShortStringHash& key) const;
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
-    
+
     /// Convert screen coordinates to element coordinates.
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
     /// Convert element coordinates to screen coordinates.
@@ -415,7 +417,7 @@ public:
     int GetIndentSpacing() const { return indentSpacing_; }
     /// Return indent width in pixels.
     int GetIndentWidth() const { return indent_ * indentSpacing_; }
-    
+
     /// Set child offset.
     void SetChildOffset(const IntVector2& offset);
     /// Set hovering state.
@@ -431,11 +433,15 @@ public:
     const Color& GetColorAttr() const { return color_[0]; }
     /// Get traversal mode.
     TraversalMode GetTraversalMode() const { return traversalMode_; }
+    /// Get element event sender flag.
+    bool IsElementEventSender() const { return elementEventSender_; }
+    /// Get element event sender.
+    UIElement* GetElementEventSender() const;
 
 protected:
     /// Mark screen position as needing an update.
     void MarkDirty();
-    
+
     /// Name.
     String name_;
     /// Child elements.
@@ -496,7 +502,7 @@ protected:
     mutable IntVector2 screenPosition_;
     /// Screen position dirty flag.
     mutable bool positionDirty_;
-    
+
 private:
     /// Return child elements recursively.
     void GetChildrenRecursive(PODVector<UIElement*>& dest) const;
@@ -508,7 +514,7 @@ private:
     IntVector2 GetLayoutChildPosition(UIElement* child);
     /// Detach from parent.
     void Detach();
-    
+
     /// Size.
     IntVector2 size_;
     /// Minimum size.
@@ -539,6 +545,8 @@ private:
     SharedPtr<XMLFile> defaultStyle_;
     /// Traversal mode.
     TraversalMode traversalMode_;
+    /// Element creation/deletion event sender flag.
+    bool elementEventSender_;
 };
 
 template <class T> T* UIElement::CreateChild(const String& name) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name)); }

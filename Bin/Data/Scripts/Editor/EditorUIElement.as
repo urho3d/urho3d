@@ -27,14 +27,39 @@ void CreateRootUIElement()
     editorUIElement = ui.root.CreateChild("UIElement");
     editorUIElement.name = "UI";
     editorUIElement.SetSize(graphics.width, graphics.height);
-    editorUIElement.traversalMode = TM_DEPTH_FIRST;     // This is needed for root element to prevent artifacts
+    editorUIElement.traversalMode = TM_DEPTH_FIRST;     // This is needed for root-like element to prevent artifacts
 
+    // This is needed to distinguish our own element events from Editor's UI element events
+    editorUIElement.elementEventSender = true;
+    SubscribeToEvent(editorUIElement, "ElementAdded", "HandleUIElementAdded");
+    SubscribeToEvent(editorUIElement, "ElementRemoved", "HandleUIElementRemoved");
+
+    // Since this root UIElement is not being handled by above handlers, update it into hierarchy list manually
     UpdateHierarchyItem(editorUIElement);
 }
 
-bool NewUIElement()
+bool NewUIElement(const String&in typeName)
 {
-    // TODO
+    // If no edit element then parented to root
+    UIElement@ parent = editUIElement !is null ? editUIElement : editorUIElement;
+    UIElement@ element = parent.CreateChild(typeName);
+    if (element !is null)
+    {
+        if (editUIElement is null)
+        {
+            // If parented to root, set the internal variables
+            element.vars[FILENAME_VAR] = "";
+            element.vars[MODIFIED_VAR] = false;
+        }
+        element.style = uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle;
+
+        // Create an undo action for the create
+        CreateUIElementAction action;
+        action.Define(element);
+        SaveEditAction(action);
+
+        FocusUIElement(element);
+    }
     return true;
 }
 
@@ -84,9 +109,9 @@ void OpenUIElement(const String&in fileName)
         // \todo: should not always centered
         CenterDialog(element);
         editorUIElement.AddChild(element);
+        UpdateHierarchyItem(element);
+        ClearEditActions();
     }
-
-    UpdateHierarchyItem(element, true);
 
     suppressUIElementChanges = false;
 }
@@ -100,11 +125,16 @@ bool CloseUIElement()
     for (uint i = 0; i < selectedUIElements.length; ++i)
     {
         UIElement@ element = selectedUIElements[i];
-        while (!element.vars.Contains(FILENAME_VAR))
+        while (element !is null && !element.vars.Contains(FILENAME_VAR))
             element = element.parent;
-        element.Remove();
+        if (element !is null)
+        {
+            element.Remove();
+            UpdateHierarchyItem(GetListIndex(element), null, null);
+        }
     }
-    UpdateHierarchyItem(editorUIElement, true);
+    hierarchyList.ClearSelection();
+    ClearEditActions();
 
     suppressUIElementChanges = false;
 
@@ -119,6 +149,12 @@ bool CloseAllUIElements()
 
     editorUIElement.RemoveAllChildren();
     UpdateHierarchyItem(editorUIElement, true);
+
+    // Reset element ID number generator
+    uiElementNextID = 2;
+
+    hierarchyList.ClearSelection();
+    ClearEditActions();
 
     suppressUIElementChanges = false;
 
@@ -162,8 +198,18 @@ void LoadChildUIElement(const String&in fileName)
     suppressUIElementChanges = true;
 
     if (editUIElement.LoadXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle))
-        UpdateHierarchyItem(editUIElement.children[editUIElement.numChildren - 1]);
-    
+    {
+        UIElement@ element = editUIElement.children[editUIElement.numChildren - 1];
+        UpdateHierarchyItem(element);
+        
+        // Create an undo action for the load
+        CreateUIElementAction action;
+        action.Define(element);
+        SaveEditAction(action);
+        
+        FocusUIElement(element);
+    }
+
     suppressUIElementChanges = false;
 }
 

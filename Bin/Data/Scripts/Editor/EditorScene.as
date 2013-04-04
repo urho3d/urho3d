@@ -193,6 +193,45 @@ bool SaveSceneWithExistingName()
         return SaveScene(editorScene.fileName);
 }
 
+void CreateNode(CreateMode mode)
+{
+    Node@ newNode = editorScene.CreateChild("", mode);
+    // Set the new node a certain distance from the camera
+    newNode.position = GetNewNodePosition();
+
+    // Create an undo action for the create
+    CreateNodeAction action;
+    action.Define(newNode);
+    SaveEditAction(action);
+
+    FocusNode(newNode);
+}
+
+void CreateComponent(const String&in componentType)
+{
+    // If this is the root node, do not allow to create duplicate scene-global components
+    if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, componentType))
+        return;
+
+    // For now, make a local node's all components local
+    /// \todo Allow to specify the createmode
+    Component@ newComponent = editNode.CreateComponent(componentType, editNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+    if (newComponent !is null)
+    {
+        // Some components such as CollisionShape do not create their internal object before the first call to ApplyAttributes()
+        // to prevent unnecessary initialization with default values. Call now
+        newComponent.ApplyAttributes();
+
+        CreateComponentAction action;
+        action.Define(newComponent);
+        SaveEditAction(action);
+
+        FocusComponent(newComponent);
+    }
+
+    SetSceneModified();
+}
+
 void LoadNode(const String&in fileName)
 {
     if (fileName.empty)

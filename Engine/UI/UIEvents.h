@@ -61,6 +61,12 @@ EVENT(E_FOCUSCHANGED, FocusChanged)
     PARAM(P_CLICKEDELEMENT, ClickedElement); // UIElement pointer
 }
 
+/// UI element name changed.
+EVENT(E_NAMECHANGED, NameChanged)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+}
+
 /// UI element resized.
 EVENT(E_RESIZED, Resized)
 {
@@ -220,12 +226,6 @@ EVENT(E_ELEMENTREMOVED, ElementRemoved)
 {
     PARAM(P_ROOT, Root);                    // UIElement pointer
     PARAM(P_PARENT, Parent);                // UIElement pointer
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-}
-
-/// An element's name has changed.
-EVENT(E_ELEMENTNAMECHANGED, ElementNameChanged)
-{
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 

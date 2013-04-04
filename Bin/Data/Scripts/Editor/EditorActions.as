@@ -3,7 +3,7 @@ class EditAction
     void Undo()
     {
     }
-    
+
     void Redo()
     {
     }
@@ -35,11 +35,11 @@ class CreateNodeAction : EditAction
         Node@ node = editorScene.GetNode(nodeID);
         if (parent !is null && node !is null)
         {
-            ClearSceneSelection();
             parent.RemoveChild(node);
+            hierarchyList.ClearSelection();
         }
     }
-    
+
     void Redo()
     {
         Node@ parent = editorScene.GetNode(parentID);
@@ -47,6 +47,7 @@ class CreateNodeAction : EditAction
         {
             Node@ node = parent.CreateChild("", nodeID < FIRST_LOCAL_ID ? REPLICATED : LOCAL, nodeID);
             node.LoadXML(nodeData.root);
+            FocusNode(node);
         }
     }
 }
@@ -75,7 +76,7 @@ class DeleteNodeAction : EditAction
             node.LoadXML(nodeData.root);
         }
     }
-    
+
     void Redo()
     {
         Node@ parent = editorScene.GetNode(parentID);
@@ -93,7 +94,7 @@ class ReparentNodeAction : EditAction
     uint nodeID;
     uint oldParentID;
     uint newParentID;
-    
+
     void Define(Node@ node, Node@ newParent)
     {
         nodeID = node.id;
@@ -123,7 +124,7 @@ class CreateComponentAction : EditAction
     uint nodeID;
     uint componentID;
     XMLFile@ componentData;
-    
+
     void Define(Component@ component)
     {
         componentID = component.id;
@@ -132,18 +133,18 @@ class CreateComponentAction : EditAction
         XMLElement rootElem = componentData.CreateRoot("component");
         component.SaveXML(rootElem);
     }
-    
+
     void Undo()
     {
         Node@ node = editorScene.GetNode(nodeID);
         Component@ component = editorScene.GetComponent(componentID);
         if (node !is null && component !is null)
         {
-            ClearSceneSelection();
             node.RemoveComponent(component);
+            hierarchyList.ClearSelection();
         }
     }
-    
+
     void Redo()
     {
         Node@ node = editorScene.GetNode(nodeID);
@@ -153,6 +154,7 @@ class CreateComponentAction : EditAction
                 REPLICATED : LOCAL, componentID);
             component.LoadXML(componentData.root);
             component.ApplyAttributes();
+            FocusComponent(component);
         }
     }
 
@@ -163,7 +165,7 @@ class DeleteComponentAction : EditAction
     uint nodeID;
     uint componentID;
     XMLFile@ componentData;
-    
+
     void Define(Component@ component)
     {
         componentID = component.id;
@@ -184,7 +186,7 @@ class DeleteComponentAction : EditAction
             component.ApplyAttributes();
         }
     }
-    
+
     void Redo()
     {
         Node@ node = editorScene.GetNode(nodeID);
@@ -239,7 +241,7 @@ class EditAttributeAction : EditAction
         case ITEM_UI_ELEMENT:
             return editorUIElement.GetChild(UI_ELEMENT_ID_VAR, Variant(targetID), true);
         }
-        
+
         return null;
     }
 
@@ -276,7 +278,7 @@ class ToggleNodeEnabledAction : EditAction
 {
     uint nodeID;
     bool undoValue;
-    
+
     void Define(Node@ node, bool oldEnabled)
     {
         nodeID = node.id;
@@ -303,7 +305,7 @@ class Transform
     Vector3 position;
     Quaternion rotation;
     Vector3 scale;
-    
+
     void Define(Node@ node)
     {
         position = node.position;
@@ -339,7 +341,7 @@ class EditNodeTransformAction : EditAction
             UpdateNodeAttributes();
         }
     }
-    
+
     void Redo()
     {
         Node@ node = editorScene.GetNode(nodeID);
@@ -347,6 +349,55 @@ class EditNodeTransformAction : EditAction
         {
             redoTransform.Apply(node);
             UpdateNodeAttributes();
+        }
+    }
+}
+
+class CreateUIElementAction : EditAction
+{
+    Variant elementID;
+    Variant parentID;
+    XMLFile@ elementData;
+
+    void Define(UIElement@ element)
+    {
+        elementID = element.vars[UI_ELEMENT_ID_VAR];
+        parentID = element.parent.vars[UI_ELEMENT_ID_VAR];
+        elementData = XMLFile();
+        XMLElement rootElem = elementData.CreateRoot("element");
+        // Need another nested element tag otherwise the LoadXML() does not work as expected
+        XMLElement childElem = rootElem.CreateChild("element");
+        element.SaveXML(childElem);
+    }
+
+    void Undo()
+    {
+        UIElement@ parent = parentID == 0 ? editorUIElement : editorUIElement.GetChild(UI_ELEMENT_ID_VAR, parentID, true);
+        UIElement@ element = editorUIElement.GetChild(UI_ELEMENT_ID_VAR, elementID, true);
+        if (parent !is null && element !is null)
+        {
+            parent.RemoveChild(element);
+            hierarchyList.ClearSelection();
+        }
+    }
+
+    void Redo()
+    {
+        UIElement@ parent = parentID == 0 ? editorUIElement : editorUIElement.GetChild(UI_ELEMENT_ID_VAR, parentID, true);
+        if (parent !is null)
+        {
+            // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
+            suppressUIElementChanges = true;
+
+            if (parent.LoadXML(elementData.root))
+            {
+                UIElement@ element = parent.children[parent.numChildren - 1];
+                UpdateHierarchyItem(element);
+                FocusUIElement(element);
+            }
+
+            suppressUIElementChanges = false;
+
         }
     }
 }

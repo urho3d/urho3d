@@ -3159,6 +3159,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3210,6 +3211,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3267,6 +3269,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 
@@ -3320,6 +3323,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3374,6 +3378,7 @@ Methods:<br>
 - UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
+- UIElement@ GetElementEventSender() const
 - void SetPosition(float, float)
 - void SetHotSpot(int, int)
 - void SetScale(float, float)
@@ -3406,6 +3411,7 @@ Properties:<br>
 - bool visible
 - bool colorGradient (readonly)
 - XMLFile@ defaultStyle
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3468,6 +3474,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
@@ -3524,6 +3531,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3591,6 +3599,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetCheckedOffset(int, int)
@@ -3645,6 +3654,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3710,6 +3720,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&, bool arg4 = false)
@@ -3764,6 +3775,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3828,6 +3840,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void ChangeValue(float)
@@ -3882,6 +3895,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -3950,6 +3964,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void ChangeValue(float)
 - void StepBack()
 - void StepForward()
@@ -4004,6 +4019,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -4070,6 +4086,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetViewPosition(int, int)
 - void SetScrollBarsVisible(bool, bool)
 
@@ -4123,6 +4140,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -4188,6 +4206,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetViewPosition(int, int)
 - void SetScrollBarsVisible(bool, bool)
 - void AddItem(UIElement@)
@@ -4258,6 +4277,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -4335,6 +4355,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - bool SetFont(const String&, int)
 - bool SetFont(Font@, int)
 - void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)
@@ -4390,6 +4411,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -4459,6 +4481,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 
@@ -4512,6 +4535,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -4586,6 +4610,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
@@ -4644,6 +4669,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -4716,6 +4742,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
@@ -4780,6 +4807,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
@@ -4857,6 +4885,7 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
+- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 
@@ -4910,6 +4939,7 @@ Properties:<br>
 - int indentSpacing
 - int indentWidth (readonly)
 - IntVector2 childOffset (readonly)
+- bool elementEventSender
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)

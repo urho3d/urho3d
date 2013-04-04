@@ -65,39 +65,4 @@
         <attribute name="Highlight Mode" value="Always" />
         <attribute name="Multiselect" value="true" />
     </element>
-    <element>
-        <attribute name="Min Size" value="0 22" />
-        <attribute name="Max Size" value="2147483647 22" />
-        <attribute name="Layout Mode" value="Horizontal" />
-        <attribute name="Layout Spacing" value="4" />
-        <element />
-        <element type="DropDownList">
-            <attribute name="Name" value="NewNodeList" />
-            <attribute name="Min Size" value="90 22" />
-            <attribute name="Max Size" value="90 22" />
-            <attribute name="Layout Border" value="4 4 4 4" />
-            <element internal="true">
-                <attribute name="Is Visible" value="false" />
-            </element>
-            <element type="Text">
-                <attribute name="Text" value="New Node" />
-                <attribute name="Text Alignment" value="Center" />
-            </element>
-        </element>
-        <element />
-        <element type="DropDownList">
-            <attribute name="Name" value="NewComponentList" />
-            <attribute name="Min Size" value="90 22" />
-            <attribute name="Max Size" value="90 22" />
-            <attribute name="Layout Border" value="4 4 4 4" />
-            <element internal="true">
-                <attribute name="Is Visible" value="false" />
-            </element>
-            <element type="Text">
-                <attribute name="Text" value="New Comp" />
-                <attribute name="Text Alignment" value="Center" />
-            </element>
-        </element>
-        <element />
-    </element>
 </element>

@@ -49,7 +49,7 @@ template <class T, class U> U* RefCast(T* t)
 {
     if (!t)
         return 0;
-    
+
     return dynamic_cast<U*>(t);
 }
 
@@ -73,10 +73,10 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.Size(), type);
-        
+
         for (unsigned i = 0; i < arr->GetSize(); ++i)
             *(static_cast<T*>(arr->At(i))) = vector[i];
-        
+
         return arr;
     }
     else
@@ -91,10 +91,10 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.Size(), type);
-        
+
         for (unsigned i = 0; i < arr->GetSize(); ++i)
             *(static_cast<T*>(arr->At(i))) = vector[i];
-        
+
         return arr;
     }
     else
@@ -109,10 +109,10 @@ template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, c
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(size, type);
-        
+
         for (unsigned i = 0; i < arr->GetSize(); ++i)
             *(static_cast<T*>(arr->At(i))) = buffer[i];
-        
+
         return arr;
     }
     else
@@ -127,7 +127,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.Size(), type);
-        
+
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
@@ -136,7 +136,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
                 ptr->AddRef();
             *(static_cast<T**>(arr->At(i))) = ptr;
         }
-        
+
         return arr;
     }
     else
@@ -151,7 +151,7 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.Size(), type);
-        
+
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
@@ -160,7 +160,7 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
                 ptr->AddRef();
             *(static_cast<T**>(arr->At(i))) = ptr;
         }
-        
+
         return arr;
     }
     else
@@ -175,7 +175,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.Size(), type);
-        
+
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
@@ -184,7 +184,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >
                 ptr->AddRef();
             *(static_cast<T**>(arr->At(i))) = ptr;
         }
-        
+
         return arr;
     }
     else
@@ -196,10 +196,10 @@ template <class T, class U> void RegisterSubclass(asIScriptEngine* engine, const
 {
     if (!strcmp(classNameT, classNameU))
         return;
-    
+
     String declReturnT(String(classNameT) + "@+ f()");
     String declReturnU(String(classNameU) + "@+ f()");
-    
+
     engine->RegisterObjectBehaviour(classNameT, asBEHAVE_IMPLICIT_REF_CAST, declReturnU.CString(), asFUNCTION((RefCast<T, U>)), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour(classNameU, asBEHAVE_IMPLICIT_REF_CAST, declReturnT.CString(), asFUNCTION((RefCast<U, T>)), asCALL_CDECL_OBJLAST);
 }
@@ -497,7 +497,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
 {
     PODVector<Node*> nodes;
     PODVector<Node*> result;
-    
+
     ptr->GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
     for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
@@ -513,7 +513,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
             }
         }
     }
-    
+
     return VectorToHandleArray<Node>(result, "Array<Node@>");
 }
 
@@ -765,7 +765,7 @@ static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
     else
         return false;
 }
-    
+
 static bool UIElementSaveXML(File* file, UIElement* ptr)
 {
     if (file)
@@ -966,6 +966,9 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "int get_indentWidth() const", asMETHOD(T, GetIndentWidth), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "const IntVector2& get_childOffset() const", asMETHOD(T, GetChildOffset), asCALL_THISCALL);
     }
+    engine->RegisterObjectMethod(className, "void set_elementEventSender(bool)", asMETHOD(T, SetElementEventSender), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_elementEventSender() const", asMETHOD(T, IsElementEventSender), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ GetElementEventSender() const", asMETHOD(T, GetElementEventSender), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(UIElementGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(UIElementGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numChildren(bool) const", asMETHOD(T, GetNumChildren), asCALL_THISCALL);

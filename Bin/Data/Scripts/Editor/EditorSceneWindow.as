@@ -17,7 +17,7 @@ Window@ hierarchyWindow;
 ListView@ hierarchyList;
 
 // UIElement does not have unique ID, so use a running number to generate a new ID each time an item is inserted into hierarchy list
-uint uiElementNextID = 0;
+uint uiElementNextID = 1;
 
 void CreateHierarchyWindow()
 {
@@ -35,27 +35,6 @@ void CreateHierarchyWindow()
 
     UpdateHierarchyItem(editorScene);
 
-    DropDownList@ newNodeList = hierarchyWindow.GetChild("NewNodeList", true);
-    Array<String> newNodeChoices = {"Replicated", "Local"};
-    for (uint i = 0; i < newNodeChoices.length; ++i)
-    {
-        Text@ choice = Text();
-        choice.SetStyle(uiStyle, "FileSelectorFilterText");
-        choice.text = newNodeChoices[i];
-        newNodeList.AddItem(choice);
-    }
-
-    DropDownList@ newComponentList = hierarchyWindow.GetChild("NewComponentList", true);
-    Array<String> componentTypes = GetAvailableComponents();
-    for (uint i = 0; i < componentTypes.length; ++i)
-    {
-        Text@ choice = Text();
-        choice.SetStyle(uiStyle, "FileSelectorFilterText");
-        choice.text = componentTypes[i];
-        IconizeUIElement(choice, componentTypes[i]);
-        newComponentList.AddItem(choice);
-    }
-
     // Set drag & drop target mode on the node list background, which is used to parent nodes back to the root node
     hierarchyList.contentElement.dragDropMode = DD_TARGET;
     hierarchyList.scrollPanel.dragDropMode = DD_TARGET;
@@ -65,8 +44,6 @@ void CreateHierarchyWindow()
     SubscribeToEvent(hierarchyWindow.GetChild("CollapseButton", true), "Released", "ExpandCollapseHierarchy");
     SubscribeToEvent(hierarchyList, "SelectionChanged", "HandleHierarchyListSelectionChange");
     SubscribeToEvent(hierarchyList, "ItemDoubleClicked", "HandleHierarchyListItemDoubleClick");
-    SubscribeToEvent(newNodeList, "ItemSelected", "HandleCreateNode");
-    SubscribeToEvent(newComponentList, "ItemSelected", "HandleCreateComponent");
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
     SubscribeToEvent("DragDropFinish", "HandleDragDropFinish");
     SubscribeToEvent(editorScene, "NodeAdded", "HandleNodeAdded");
@@ -257,12 +234,21 @@ void SetID(Text@ text, Serializable@ serializable)
     }
     else
     {
+        UIElement@ element = cast<UIElement>(serializable);
+        Variant elementID = element.GetVar(UI_ELEMENT_ID_VAR);
+        if (elementID.empty)
+        {
+            // Generate new ID
+            elementID = uiElementNextID++;
+            // Store the generated ID into the variant map of the actual serializable object
+            element.vars[UI_ELEMENT_ID_VAR] = elementID;
+        }
+
         text.vars[TYPE_VAR] = ITEM_UI_ELEMENT;
-        // Store the generated ID into both the variant map of the actual object and the text item
-        cast<UIElement>(serializable).vars[UI_ELEMENT_ID_VAR] = uiElementNextID;
-        text.vars[UI_ELEMENT_ID_VAR] = uiElementNextID++;
+        text.vars[UI_ELEMENT_ID_VAR] = elementID;
+
         // Subscribe to name and visibility changed events
-        SubscribeToEvent(serializable, "ElementNameChanged", "HandleElementNameChanged");
+        SubscribeToEvent(serializable, "NameChanged", "HandleElementNameChanged");
         SubscribeToEvent(serializable, "VisibleChanged", "HandleElementVisibilityChanged");
     }
 }
@@ -363,7 +349,8 @@ uint GetComponentListIndex(Component@ component)
 
 String GetUIElementTitle(UIElement@ element)
 {
-    return element.name.empty ? element.typeName : element.name;
+    String elementID = element.vars[UI_ELEMENT_ID_VAR].ToString();
+    return (element.name.empty ? element.typeName : element.name) + " [" + elementID + "]";
 }
 
 String GetNodeTitle(Node@ node)
@@ -702,56 +689,10 @@ void FocusComponent(Component@ component)
     hierarchyList.selection = index;
 }
 
-void HandleCreateNode(StringHash eventType, VariantMap& eventData)
+void FocusUIElement(UIElement@ element)
 {
-    DropDownList@ list = eventData["Element"].GetUIElement();
-    uint mode = list.selection;
-    if (mode >= list.numItems)
-        return;
-
-    Node@ newNode = editorScene.CreateChild("", mode == 0 ? REPLICATED : LOCAL);
-    // Set the new node a certain distance from the camera
-    newNode.position = GetNewNodePosition();
-
-    // Create an undo action for the create
-    CreateNodeAction action;
-    action.Define(newNode);
-    SaveEditAction(action);
-
-    FocusNode(newNode);
-}
-
-void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
-{
-    if (editNode is null)
-        return;
-
-    DropDownList@ list = eventData["Element"].GetUIElement();
-    Text@ text = list.selectedItem;
-    if (text is null)
-        return;
-
-    // If this is the root node, do not allow to create duplicate scene-global components
-    if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, text.text))
-        return;
-
-    // For now, make a local node's all components local
-    /// \todo Allow to specify the createmode
-    Component@ newComponent = editNode.CreateComponent(text.text, editNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
-    if (newComponent !is null)
-    {
-        // Some components such as CollisionShape do not create their internal object before the first call to ApplyAttributes()
-        // to prevent unnecessary initialization with default values. Call now
-        newComponent.ApplyAttributes();
-
-        CreateComponentAction action;
-        action.Define(newComponent);
-        SaveEditAction(action);
-
-        FocusComponent(newComponent);
-    }
-
-    SetSceneModified();
+    uint index = GetListIndex(element);
+    hierarchyList.selection = index;
 }
 
 void CreateBuiltinObject(const String& name)
@@ -851,6 +792,24 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
     Component@ component = eventData["Component"].GetComponent();
     UpdateHierarchyItemText(GetComponentListIndex(component), component.enabledEffective);
     attributesDirty = true;
+}
+
+void HandleUIElementAdded(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressUIElementChanges)
+        return;
+
+    UIElement@ element = eventData["Element"].GetUIElement();
+    UpdateHierarchyItem(element);
+}
+
+void HandleUIElementRemoved(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressUIElementChanges)
+        return;
+
+    UIElement@ element = eventData["Element"].GetUIElement();
+    UpdateHierarchyItem(GetListIndex(element), null, null);
 }
 
 void HandleElementNameChanged(StringHash eventType, VariantMap& eventData)

@@ -35,6 +35,8 @@ namespace Urho3D
 
 extern ShortStringHash VAR_ORIGIN;
 
+const unsigned AUTO_POPUP_DELAY = 500;
+
 OBJECTTYPESTATIC(Menu);
 
 Menu::Menu(Context* context) :
@@ -82,6 +84,38 @@ void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition,
                     sibling->ShowPopup(false);
                     ShowPopup(true);
                     return;
+                }
+            }
+        }
+
+        // Show popup when parent menu has its popup shown
+        Menu* parentMenu = static_cast<Menu*>(GetParent()->GetVar(VAR_ORIGIN).GetPtr());
+        if (parentMenu && parentMenu->showPopup_)
+        {
+            unsigned elapsedTime = popupTimer_.GetMSec(false);
+            if (elapsedTime > 2 * AUTO_POPUP_DELAY)
+                popupTimer_.Reset();    // Restart timer
+            else if (elapsedTime > AUTO_POPUP_DELAY)
+                ShowPopup(true);
+        }
+    }
+    else
+    {
+        // Hide child menu popup when its parent is no longer being hovered
+        Vector<SharedPtr<UIElement> > children = GetRoot()->GetChildren();
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+        {
+            Menu* childMenu = static_cast<Menu*>((*i)->GetVar(VAR_ORIGIN).GetPtr());
+            if (childMenu)
+            {
+                Vector<SharedPtr<UIElement> > children = GetParent()->GetChildren();
+                for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+                {
+                    if ((*i) != this && (*i) == childMenu)
+                    {
+                        childMenu->ShowPopup(false);
+                        return;
+                    }
                 }
             }
         }
