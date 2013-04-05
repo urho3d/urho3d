@@ -212,7 +212,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
             GetParameter(parameters, "WindowHeight", 0).GetInt(),
             GetParameter(parameters, "FullScreen", true).GetBool(),
-            GetParameter(parameters, "WindowResizable", true).GetBool(),
+            GetParameter(parameters, "WindowResizable", false).GetBool(),
             GetParameter(parameters, "VSync", false).GetBool(),
             GetParameter(parameters, "TripleBuffer", false).GetBool(),
             GetParameter(parameters, "MultiSample", 1).GetInt()
