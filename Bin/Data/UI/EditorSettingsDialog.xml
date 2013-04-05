@@ -216,12 +216,12 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="8" />
         <element type="CheckBox">
-            <attribute name="Name" value="GenerateTangentsToggle" />
+            <attribute name="Name" value="ApplyMaterialListToggle" />
             <attribute name="Min Size" value="16 16" />
             <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
-            <attribute name="Text" value="Generate tangents on import" />
+            <attribute name="Text" value="Apply material list when model set" />
         </element>
     </element>
     <element>
@@ -229,13 +229,13 @@
         <attribute name="Max Size" value="2147483647 17" />
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="8" />
-        <element type="CheckBox">
-            <attribute name="Name" value="ApplyMaterialListToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
-        </element>
         <element type="Text">
-            <attribute name="Text" value="Apply material list when model set" />
+            <attribute name="Text" value="AssetImporter options" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="ImportOptionsEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
         </element>
     </element>
     <element type="BorderImage" style="EditorDivider" />

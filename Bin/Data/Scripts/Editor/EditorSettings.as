@@ -57,8 +57,8 @@ void UpdateEditorSettingsDialog()
     CheckBox@ applyMaterialListToggle = settingsDialog.GetChild("ApplyMaterialListToggle", true);
     applyMaterialListToggle.checked = applyMaterialList;
 
-    CheckBox@ generateTangentsToggle = settingsDialog.GetChild("GenerateTangentsToggle", true);
-    generateTangentsToggle.checked = generateTangents;
+    LineEdit@ importOptionsEdit = settingsDialog.GetChild("ImportOptionsEdit", true);
+    importOptionsEdit.text = importOptions;
 
     DropDownList@ pickModeEdit = settingsDialog.GetChild("PickModeEdit", true);
     pickModeEdit.selection = pickMode;
@@ -110,7 +110,8 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(scaleSnapToggle, "Toggled", "EditScaleSnap");
         SubscribeToEvent(localIDToggle, "Toggled", "EditUseLocalIDs");
         SubscribeToEvent(applyMaterialListToggle, "Toggled", "EditApplyMaterialList");
-        SubscribeToEvent(generateTangentsToggle, "Toggled", "EditGenerateTangents");
+        SubscribeToEvent(importOptionsEdit, "TextChanged", "EditImportOptions");
+        SubscribeToEvent(importOptionsEdit, "TextFinished", "EditImportOptions");
         SubscribeToEvent(pickModeEdit, "ItemSelected", "EditPickMode");
         SubscribeToEvent(textureQualityEdit, "ItemSelected", "EditTextureQuality");
         SubscribeToEvent(materialQualityEdit, "ItemSelected", "EditMaterialQuality");
@@ -233,10 +234,10 @@ void EditApplyMaterialList(StringHash eventType, VariantMap& eventData)
     applyMaterialList = edit.checked;
 }
 
-void EditGenerateTangents(StringHash eventType, VariantMap& eventData)
+void EditImportOptions(StringHash eventType, VariantMap& eventData)
 {
-    CheckBox@ edit = eventData["Element"].GetUIElement();
-    generateTangents = edit.checked;
+    LineEdit@ edit = eventData["Element"].GetUIElement();
+    importOptions = edit.text.Trimmed();
 }
 
 void EditPickMode(StringHash eventType, VariantMap& eventData)

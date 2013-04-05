@@ -1,6 +1,6 @@
 // Urho3D editor import functions
 
-bool generateTangents = false;
+String importOptions = "-t";
 
 class ParentAssignment
 {
@@ -31,8 +31,9 @@ void ImportModel(const String&in fileName)
     args.Push("\"" + fileName + "\"");
     args.Push("\"" + outFileName + "\"");
     args.Push("-p\"" + sceneResourcePath + "\"");
-    if (generateTangents)
-        args.Push("-t");
+    Array<String> options = importOptions.Trimmed().Split(' ');
+    for (uint i = 0; i < options.length; ++i)
+        args.Push(options[i]);
 
     if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
     {
@@ -98,8 +99,9 @@ void ImportScene(const String&in fileName)
         args.Push("\"" + fileName + "\"");
         args.Push("\"" + tempSceneName + "\"");
         args.Push("-p\"" + sceneResourcePath + "\"");
-        if (generateTangents)
-            args.Push("-t");
+        Array<String> options = importOptions.Trimmed().Split(' ');
+        for (uint i = 0; i < options.length; ++i)
+            args.Push(options[i]);
         if (useLocalIDs)
             args.Push("-i");
 

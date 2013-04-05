@@ -126,7 +126,7 @@ void LoadConfig()
         if (objectElem.HasAttribute("scalesnap")) scaleSnap = objectElem.GetBool("scalesnap");
         if (objectElem.HasAttribute("uselocalids")) useLocalIDs = objectElem.GetBool("uselocalids");
         if (objectElem.HasAttribute("applymateriallist")) applyMaterialList = objectElem.GetBool("applymateriallist");
-        if (objectElem.HasAttribute("generatetangents")) generateTangents = objectElem.GetBool("generatetangents");
+        if (objectElem.HasAttribute("importoptions")) importOptions = objectElem.GetAttribute("importoptions");
         if (objectElem.HasAttribute("pickmode")) pickMode = objectElem.GetInt("pickmode");
     }
 
@@ -187,7 +187,7 @@ void SaveConfig()
     objectElem.SetBool("scalesnap", scaleSnap);
     objectElem.SetBool("uselocalids", useLocalIDs);
     objectElem.SetBool("applymateriallist", applyMaterialList);
-    objectElem.SetBool("generatetangents", generateTangents);
+    objectElem.SetAttribute("importoptions", importOptions);
     objectElem.SetInt("pickmode", pickMode);
 
     if (renderer !is null)
