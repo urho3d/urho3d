@@ -1460,6 +1460,7 @@ Options:
 -nm   Do not output materials
 -ns   Do not create subdirectories for resources
 -nz   Do not create a zone and a directional light (scene mode only)
+-nf   Do not fix infacing normals
 -pX   Set path X for scene resources. Default is output file path
 -rX   Use scene node X as root node
 -t    Generate tangents to model(s)

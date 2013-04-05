@@ -194,6 +194,7 @@ void Run(const Vector<String>& arguments)
             "-nm   Do not output materials\n"
             "-ns   Do not create subdirectories for resources\n"
             "-nz   Do not create a zone and a directional light (scene mode only)\n"
+            "-nf   Do not fix infacing normals\n"
             "-pX   Set path X for scene resources. Default is output file path\n"
             "-rX   Use scene node X as root node\n"
             "-fX   Animation tick frequency to use if unspecified. Default 4800\n"
@@ -283,6 +284,10 @@ void Run(const Vector<String>& arguments)
                         
                     case 'z':
                         createZone_ = false;
+                        break;
+                        
+                    case 'f':
+                        flags &= ~aiProcess_FixInfacingNormals;
                         break;
                     }
                 }

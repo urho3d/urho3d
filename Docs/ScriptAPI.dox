@@ -531,6 +531,9 @@ Methods:<br>
 - bool Equals(const Rect&) const
 
 Properties:<br>
+- Vector2 center (readonly)
+- Vector2 size (readonly)
+- Vector2 halfSize (readonly)
 - Vector2 min
 - Vector2 max
 - float left
@@ -5327,6 +5330,79 @@ Properties:<br>
 - Vector3 gravity
 - int fps
 - bool interpolation
+
+
+Navigable
+
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- uint flags
+
+
+NavigationMesh
+
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void Build()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- float cellSize
+- float cellHeight
+- float agentHeight
+- float agentRadius
+- float agentMaxClimb
+- float agentMaxSlope
+- float regionMinSize
+- float regionMergeSize
+- float edgeMaxLength
+- float edgeMaxError
+- float detailSampleDistance
+- float detailSampleMaxError
+- BoundingBox worldBoundingBox (readonly)
 
 
 ScriptFile
