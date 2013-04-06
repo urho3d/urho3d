@@ -73,8 +73,8 @@ void Menu::Update(float timeStep)
         const Vector<SharedPtr<UIElement> >& children = popup_->GetChildren();
         for (unsigned i = 0; i < children.Size(); ++i)
         {
-            Menu* menu = static_cast<Menu*>(children[i].Get());
-            if (!menu->autoPopup_ && !menu->IsHovering())
+            Menu* menu = dynamic_cast<Menu*>(children[i].Get());
+            if (menu && !menu->autoPopup_ && !menu->IsHovering())
                 menu->autoPopup_ = true;
         }
     }
