@@ -31,8 +31,6 @@ namespace Urho3D
 void RegisterNavigable(asIScriptEngine* engine)
 {
     RegisterComponent<Navigable>(engine, "Navigable");
-    engine->RegisterObjectMethod("Navigable", "void set_flags(uint)", asMETHOD(Navigable, SetFlags), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Navigable", "uint get_flags() const", asMETHOD(Navigable, GetFlags), asCALL_THISCALL);
 }
 
 void RegisterNavigationMesh(asIScriptEngine* engine)

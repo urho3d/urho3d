@@ -22,15 +22,25 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "BoundingBox.h"
 #include "Component.h"
+
+class rcContext;
+class dtNavMesh;
+
+struct rcHeightfield;
+struct rcCompactHeightfield;
+struct rcContourSet;
+struct rcPolyMesh;
+struct rcPolyMeshDetail;
 
 namespace Urho3D
 {
 
 class Geometry;
 
-/// Navigation mesh component. Collects the navigation geometry from the scene and responds to path queries.
+/// Navigation mesh component. Collects the navigation geometry from child nodes with the Navigable component and responds to path queries.
 class NavigationMesh : public Component
 {
     OBJECT(NavigationMesh);
@@ -100,9 +110,13 @@ public:
     
 private:
     /// Visit nodes and collect navigable geometry.
-    void CollectGeometries(Node* node, Node* baseNode, unsigned flags);
+    void CollectGeometries(Node* node, Node* baseNode);
     /// Add a geometry to the mesh.
     void AddGeometry(Node* node, Geometry* geometry);
+    /// Release Recast temporary data.
+    void ReleaseBuildData();
+    /// Release the Detour navmesh.
+    void ReleaseNavMesh();
     
     /// Cell size.
     float cellSize_;
@@ -135,6 +149,21 @@ private:
     PODVector<Vector3> vertices_;
     /// Build phase triangle indices.
     PODVector<int> indices_;
+    
+    /// Recast context.
+    rcContext* ctx_;
+    /// Recast heightfield.
+    rcHeightfield* heightField_;
+    /// Recast compact heightfield.
+    rcCompactHeightfield* compactHeightField_;
+    /// Recast contour set.
+    rcContourSet* contourSet_;
+    /// Recast poly mesh.
+    rcPolyMesh* polyMesh_;
+    /// Recast detail poly mesh.
+    rcPolyMeshDetail* polyMeshDetail_;
+    /// Detour navmesh.
+    dtNavMesh* navMesh_;
 };
 
 }

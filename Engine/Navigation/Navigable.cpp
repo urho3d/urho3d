@@ -29,13 +29,10 @@
 namespace Urho3D
 {
 
-static const unsigned DEFAULT_FLAGS = 1;
-
 OBJECTTYPESTATIC(Navigable);
 
 Navigable::Navigable(Context* context) :
-    Component(context),
-    flags_(DEFAULT_FLAGS)
+    Component(context)
 {
 }
 
@@ -46,13 +43,6 @@ Navigable::~Navigable()
 void Navigable::RegisterObject(Context* context)
 {
     context->RegisterFactory<Navigable>();
-    
-    ATTRIBUTE(Navigable, VAR_INT, "Navigation Flags", flags_, DEFAULT_FLAGS, AM_DEFAULT);
-}
-
-void Navigable::SetFlags(unsigned flags)
-{
-    flags_ = flags;
 }
 
 }

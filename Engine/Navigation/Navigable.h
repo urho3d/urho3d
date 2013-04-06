@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-/// Navigable geometry properties component. Any geometry components from this node and child nodes will be included in the navigation mesh. Physics geometry is preferred to drawable geometry, if available.
+/// Navigable geometry properties component. Any geometry components from its node and child nodes will be included in the navigation mesh.
 class Navigable : public Component
 {
     OBJECT(Navigable);
@@ -39,16 +39,6 @@ public:
     virtual ~Navigable();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
-    /// Set navigation geometry flags, meaning is user-defined.
-    void SetFlags(unsigned flags);
-    
-    /// Return navigation geometry flags.
-    unsigned GetFlags() const { return flags_; }
-    
-private:
-    /// Navigation geometry flags.
-    unsigned flags_;
 };
 
 }
