@@ -92,7 +92,7 @@ void ExpandCollapseHierarchy(StringHash eventType, VariantMap& eventData)
 {
     Button@ button = eventData["Element"].GetUIElement();
     bool enable = button.name == "ExpandButton";
-    CheckBox@ checkBox = cast<CheckBox>(hierarchyWindow.GetChild("AllCheckBox", true));
+    CheckBox@ checkBox = hierarchyWindow.GetChild("AllCheckBox", true);
     bool all = checkBox.checked;
     checkBox.checked = false;    // Auto-reset
 
