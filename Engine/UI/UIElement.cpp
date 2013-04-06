@@ -239,10 +239,11 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
+        unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
         UIElement* child = 0;
 
         if (!internalElem)
-            child = CreateChild(typeName);
+            child = CreateChild(typeName, String::EMPTY, index);
         else
         {
             for (unsigned i = nextInternalChild; i < children_.Size(); ++i)
@@ -982,7 +983,7 @@ void UIElement::BringToFront()
     }
 }
 
-UIElement* UIElement::CreateChild(ShortStringHash type, const String& name)
+UIElement* UIElement::CreateChild(ShortStringHash type, const String& name, unsigned index)
 {
     // Check that creation succeeds and that the object in fact is a UI element
     SharedPtr<UIElement> newElement = DynamicCast<UIElement>(context_->CreateObject(type));
@@ -992,15 +993,16 @@ UIElement* UIElement::CreateChild(ShortStringHash type, const String& name)
         return 0;
     }
 
-    newElement->SetName(name);
+    if (!name.Empty())
+        newElement->SetName(name);
 
-    AddChild(newElement);
+    InsertChild(index, newElement);
     return newElement;
 }
 
 void UIElement::AddChild(UIElement* element)
 {
-    InsertChild(children_.Size(), element);
+    InsertChild(M_MAX_UNSIGNED, element);
 }
 
 void UIElement::InsertChild(unsigned index, UIElement* element)
@@ -1116,6 +1118,12 @@ void UIElement::Remove()
 {
     if (parent_)
         parent_->RemoveChild(this);
+}
+
+unsigned UIElement::FindChild(UIElement* element) const
+{
+    Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Find(SharedPtr<UIElement>(element));
+    return i != children_.End() ? i - children_.Begin() : M_MAX_UNSIGNED;
 }
 
 void UIElement::SetParent(UIElement* parent)
@@ -1247,7 +1255,8 @@ UIElement* UIElement::GetChild(const ShortStringHash& key, const Variant& value,
 {
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
-        if ((*i)->GetVar(key) == value)
+        const Variant& varValue = (*i)->GetVar(key);
+        if (value != Variant::EMPTY ? varValue == value : varValue != Variant::EMPTY)
             return *i;
 
         if (recursive)

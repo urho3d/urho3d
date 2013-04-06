@@ -12,12 +12,33 @@ const ShortStringHash TYPE_VAR("Type");
 const ShortStringHash NODE_ID_VAR("NodeID");
 const ShortStringHash COMPONENT_ID_VAR("ComponentID");
 const ShortStringHash UI_ELEMENT_ID_VAR("__UIElementID");
+const ShortStringHash[] ID_VARS = { ShortStringHash(""), NODE_ID_VAR, COMPONENT_ID_VAR, UI_ELEMENT_ID_VAR };
 
 Window@ hierarchyWindow;
 ListView@ hierarchyList;
 
 // UIElement does not have unique ID, so use a running number to generate a new ID each time an item is inserted into hierarchy list
-uint uiElementNextID = 1;
+const uint UI_ELEMENT_BASE_ID = 1;
+uint uiElementNextID = UI_ELEMENT_BASE_ID;
+
+Variant GetUIElementID(UIElement@ element)
+{
+    Variant elementID = element.GetVar(UI_ELEMENT_ID_VAR);
+    if (elementID.empty)
+    {
+        // Generate new ID
+        elementID = uiElementNextID++;
+        // Store the generated ID
+        element.vars[UI_ELEMENT_ID_VAR] = elementID;
+    }
+
+    return elementID;
+}
+
+UIElement@ GetUIElementByID(const Variant&in id)
+{
+    return id == UI_ELEMENT_BASE_ID ? editorUIElement : editorUIElement.GetChild(UI_ELEMENT_ID_VAR, id, true);
+}
 
 void CreateHierarchyWindow()
 {
@@ -99,15 +120,29 @@ void UpdateHierarchyItem(Serializable@ serializable, bool clear = false)
         hierarchyList.ClearSelection();
 
         // Clear copybuffer when whole window refreshed
-        copyBuffer.Clear();
+        sceneCopyBuffer.Clear();
+        uiElementCopyBuffer.Clear();
     }
 
     // In case of item's parent is not found in the hierarchy list then the item will be inserted at the list root level
     Serializable@ parent;
-    if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
+    switch (GetType(serializable))
+    {
+    case ITEM_NODE:
         parent = cast<Node>(serializable).parent;
-    else if (serializable !is editorUIElement)
+        break;
+
+    case ITEM_COMPONENT:
+        parent = cast<Component>(serializable).node;
+        break;
+
+    case ITEM_UI_ELEMENT:
         parent = cast<UIElement>(serializable).parent;
+        break;
+
+    default:
+        break;
+    }
     UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
     UpdateHierarchyItem(GetListIndex(serializable), serializable, parentItem);
 }
@@ -117,25 +152,23 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
     // Whenever we're updating, disable layout update to optimize speed
     hierarchyList.contentElement.DisableLayoutUpdate();
 
-    ShortStringHash idVar;
-    Variant id;
-    int itemType = ITEM_NONE;
-    if (serializable !is null)
-        GetID(serializable, idVar, id, itemType);
-
-    // Remove old item if exists
-    if (itemIndex < hierarchyList.numItems && (serializable is null || MatchID(hierarchyList.items[itemIndex], idVar, id, itemType)))
-        hierarchyList.RemoveItem(itemIndex);
     if (serializable is null)
     {
+        hierarchyList.RemoveItem(itemIndex);
         hierarchyList.contentElement.EnableLayoutUpdate();
         hierarchyList.contentElement.UpdateLayout();
         return itemIndex;
     }
 
+    int itemType = GetType(serializable);
+    Variant id = GetID(serializable, itemType);
+
+    // Remove old item if exists
+    if (itemIndex < hierarchyList.numItems && MatchID(hierarchyList.items[itemIndex], id, itemType))
+        hierarchyList.RemoveItem(itemIndex);
+
     Text@ text = Text();
     text.SetStyle(uiStyle, "FileSelectorListText");
-    SetID(text, serializable);
 
     // The root node (scene) and editor's root UIElement cannot be moved by drag and drop.
     if (serializable.type == SCENE_TYPE || serializable is editorUIElement)
@@ -156,40 +189,60 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
         iconType = "Root" + iconType;
     IconizeUIElement(text, iconType);
 
-    if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
+    SetID(text, serializable, itemType);
+    switch (itemType)
     {
-        Node@ node = cast<Node>(serializable);
-
-        text.text = GetNodeTitle(node);
-        SetIconEnabledColor(text, node.enabled);
-
-        // Update components first
-        for (uint i = 0; i < node.numComponents; ++i)
+    case ITEM_NODE:
         {
-            Component@ component = node.components[i];
-            AddComponentItem(itemIndex++, component, text);
+            Node@ node = cast<Node>(serializable);
+
+            text.text = GetNodeTitle(node);
+            SetIconEnabledColor(text, node.enabled);
+
+            // Update components first
+            for (uint i = 0; i < node.numComponents; ++i)
+            {
+                Component@ component = node.components[i];
+                AddComponentItem(itemIndex++, component, text);
+            }
+
+            // Then update child nodes recursively
+            for (uint i = 0; i < node.numChildren; ++i)
+            {
+                Node@ childNode = node.children[i];
+                itemIndex = UpdateHierarchyItem(itemIndex, childNode, text);
+            }
+
+            break;
         }
 
-        // Then update child nodes recursively
-        for (uint i = 0; i < node.numChildren; ++i)
+    case ITEM_COMPONENT:
         {
-            Node@ childNode = node.children[i];
-            itemIndex = UpdateHierarchyItem(itemIndex, childNode, text);
+            Component@ component = cast<Component>(serializable);
+            text.text = GetComponentTitle(component);
+            SetIconEnabledColor(text, component.enabledEffective);
+            break;
         }
-    }
-    else
-    {
-        UIElement@ element = cast<UIElement>(serializable);
 
-        text.text = GetUIElementTitle(element);
-        SetIconEnabledColor(text, element.visible);
-
-        // Then update child elements recursively
-        for (uint i = 0; i < element.numChildren; ++i)
+    case ITEM_UI_ELEMENT:
         {
-            UIElement@ childElement = element.children[i];
-            itemIndex = UpdateHierarchyItem(itemIndex, childElement, text);
+            UIElement@ element = cast<UIElement>(serializable);
+
+            text.text = GetUIElementTitle(element);
+            SetIconEnabledColor(text, element.visible);
+
+            // update child elements recursively
+            for (uint i = 0; i < element.numChildren; ++i)
+            {
+                UIElement@ childElement = element.children[i];
+                itemIndex = UpdateHierarchyItem(itemIndex, childElement, text);
+            }
+
+            break;
         }
+
+    default:
+        break;
     }
 
     // Re-enable layout update (and do manual layout) now
@@ -225,53 +278,68 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
     SetIconEnabledColor(text, component.enabledEffective);
 }
 
-void SetID(Text@ text, Serializable@ serializable)
+int GetType(Serializable@ serializable)
 {
-    if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
-    {
-        text.vars[TYPE_VAR] = ITEM_NODE;
-        text.vars[NODE_ID_VAR] = cast<Node>(serializable).id;
-    }
+    if (cast<Node>(serializable) !is null)
+        return ITEM_NODE;
+    else if (cast<Component>(serializable) !is null)
+        return ITEM_COMPONENT;
+    else if (cast<UIElement>(serializable) !is null)
+        return ITEM_UI_ELEMENT;
     else
+        return ITEM_NONE;
+}
+
+void SetID(Text@ text, Serializable@ serializable, int itemType = ITEM_NONE)
+{
+    // If item type is not provided, auto detect it
+    if (itemType == ITEM_NONE)
+        itemType = GetType(serializable);
+
+    text.vars[TYPE_VAR] = itemType;
+    text.vars[ID_VARS[itemType]] = GetID(serializable, itemType);
+
+    switch (itemType)
     {
-        UIElement@ element = cast<UIElement>(serializable);
-        Variant elementID = element.GetVar(UI_ELEMENT_ID_VAR);
-        if (elementID.empty)
-        {
-            // Generate new ID
-            elementID = uiElementNextID++;
-            // Store the generated ID into the variant map of the actual serializable object
-            element.vars[UI_ELEMENT_ID_VAR] = elementID;
-        }
+    case ITEM_COMPONENT:
+        text.vars[NODE_ID_VAR] = cast<Component>(serializable).node.id;
+        break;
 
-        text.vars[TYPE_VAR] = ITEM_UI_ELEMENT;
-        text.vars[UI_ELEMENT_ID_VAR] = elementID;
-
+    case ITEM_UI_ELEMENT:
         // Subscribe to name and visibility changed events
         SubscribeToEvent(serializable, "NameChanged", "HandleElementNameChanged");
         SubscribeToEvent(serializable, "VisibleChanged", "HandleElementVisibilityChanged");
+        break;
+
+    default:
+        break;
     }
 }
 
-void GetID(Serializable@ serializable, ShortStringHash& idVar, Variant& id, int& itemType)
+uint GetID(Serializable@ serializable, int itemType = ITEM_NONE)
 {
-    if (serializable.type == NODE_TYPE || serializable.type == SCENE_TYPE)
+    // If item type is not provided, auto detect it
+    if (itemType == ITEM_NONE)
+        itemType = GetType(serializable);
+
+    switch (itemType)
     {
-        idVar = NODE_ID_VAR;
-        id = Variant(cast<Node>(serializable).id);
-        itemType = ITEM_NODE;
+    case ITEM_NODE:
+        return cast<Node>(serializable).id;
+
+    case ITEM_COMPONENT:
+        return cast<Component>(serializable).id;
+
+    case ITEM_UI_ELEMENT:
+        return GetUIElementID(cast<UIElement>(serializable)).GetUInt();
     }
-    else
-    {
-        idVar = UI_ELEMENT_ID_VAR;
-        id = cast<UIElement>(serializable).vars[UI_ELEMENT_ID_VAR];
-        itemType = ITEM_UI_ELEMENT;
-    }
+
+    return M_MAX_UNSIGNED;
 }
 
-bool MatchID(UIElement@ element, const ShortStringHash&in idVar, const Variant&in id, int itemType)
+bool MatchID(UIElement@ element, const Variant&in id, int itemType)
 {
-    return element.vars[TYPE_VAR].GetInt() == itemType && element.vars[idVar] == id;
+    return element.GetVar(TYPE_VAR).GetInt() == itemType && element.GetVar(ID_VARS[itemType]) == id;
 }
 
 uint GetListIndex(Serializable@ serializable)
@@ -279,17 +347,13 @@ uint GetListIndex(Serializable@ serializable)
     if (serializable is null)
         return NO_ITEM;
 
+    int itemType = GetType(serializable);
+    Variant id = GetID(serializable, itemType);
+
     uint numItems = hierarchyList.numItems;
-
-    ShortStringHash idVar;
-    Variant id;
-    int itemType = ITEM_NONE;
-    GetID(serializable, idVar, id, itemType);
-
     for (uint i = 0; i < numItems; ++i)
     {
-        UIElement@ item = hierarchyList.items[i];
-        if (MatchID(item, idVar, id, itemType))
+        if (MatchID(hierarchyList.items[i], id, itemType))
             return i;
     }
 
@@ -302,7 +366,8 @@ UIElement@ GetListUIElement(uint index)
     if (item is null)
         return null;
 
-    return editorUIElement.GetChild(UI_ELEMENT_ID_VAR, item.vars[UI_ELEMENT_ID_VAR], true);
+    // Get the text item's ID and use it to retrieve the actual UIElement the text item is associated to
+    return GetUIElementByID(GetUIElementID(item));
 }
 
 Node@ GetListNode(uint index)
@@ -349,8 +414,7 @@ uint GetComponentListIndex(Component@ component)
 
 String GetUIElementTitle(UIElement@ element)
 {
-    String elementID = element.vars[UI_ELEMENT_ID_VAR].ToString();
-    return (element.name.empty ? element.typeName : element.name) + " [" + elementID + "]";
+    return (element.name.empty ? element.typeName : element.name) + " [" + GetUIElementID(element).ToString() + "]";
 }
 
 String GetNodeTitle(Node@ node)
@@ -714,7 +778,7 @@ void CreateBuiltinObject(const String& name)
 
 bool CheckHierarchyWindowFocus()
 {
-    // When we do edit operations based on key shortcuts, make sure the hierarchy list is focused, not for example a file selector
+    // When we do edit operations based on key shortcuts, make sure the hierarchy list is focused
     return ui.focusElement is hierarchyList || ui.focusElement is null;
 }
 
@@ -750,8 +814,8 @@ void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
-    Node@ node = eventData["Node"].GetNode();
-    UpdateHierarchyItem(node);
+    Component@ component = eventData["Component"].GetComponent();
+    UpdateHierarchyItem(component);
 }
 
 void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
@@ -828,4 +892,160 @@ void HandleElementVisibilityChanged(StringHash eventType, VariantMap& eventData)
 
     UIElement@ element = eventData["Element"].GetUIElement();
     UpdateHierarchyItemText(GetListIndex(element), element.visible);
+}
+
+// Hierarchy window edit functions
+bool Undo()
+{
+    if (undoStackPos > 0)
+    {
+        --undoStackPos;
+        // Undo commands in reverse order
+        for (int i = int(undoStack[undoStackPos].actions.length - 1); i >= 0; --i)
+            undoStack[undoStackPos].actions[i].Undo();
+    }
+
+    return true;
+}
+
+bool Redo()
+{
+    if (undoStackPos < undoStack.length)
+    {
+        // Redo commands in same order as stored
+        for (uint i = 0; i < undoStack[undoStackPos].actions.length; ++i)
+            undoStack[undoStackPos].actions[i].Redo();
+        ++undoStackPos;
+    }
+
+    return true;
+}
+
+bool Cut()
+{
+    if (CheckHierarchyWindowFocus())
+    {
+        bool ret = true;
+        if (!selectedNodes.empty || !selectedComponents.empty)
+            ret = ret && SceneCut();
+        // Not mutually exclusive
+        if (!selectedUIElements.empty)
+            ret = ret && UIElementCut();
+        return ret;
+    }
+
+    return false;
+}
+
+bool Copy()
+{
+    if (CheckHierarchyWindowFocus())
+    {
+        bool ret = true;
+        if (!selectedNodes.empty || !selectedComponents.empty)
+            ret = ret && selectedNodes.empty || selectedComponents.empty ? SceneCopy() : false;   // Node and component is mutually exclusive for copy action
+        // Not mutually exclusive
+        if (!selectedUIElements.empty)
+            ret = ret && UIElementCopy();
+        return ret;
+    }
+
+    return false;
+}
+
+bool Paste()
+{
+    if (CheckHierarchyWindowFocus())
+    {
+        bool ret = true;
+        if (editNode !is null && !sceneCopyBuffer.empty)
+            ret = ret && ScenePaste();
+        // Not mutually exclusive
+        if (editUIElement !is null && !uiElementCopyBuffer.empty)
+            ret = ret && UIElementPaste();
+        return ret;
+    }
+
+    return false;
+}
+
+bool Delete()
+{
+    if (CheckHierarchyWindowFocus())
+    {
+        bool ret = true;
+        if (!selectedNodes.empty || !selectedComponents.empty)
+            ret = ret && SceneDelete();
+        // Not mutually exclusive
+        if (!selectedUIElements.empty)
+            ret = ret && UIElementDelete();
+        return ret;
+    }
+
+    return false;
+}
+
+bool SelectAll()
+{
+    if (CheckHierarchyWindowFocus())
+    {
+        if (!selectedNodes.empty || !selectedComponents.empty)
+            return SceneSelectAll();
+        else if (!selectedUIElements.empty)
+            return UIElementSelectAll();
+        else
+            return SceneSelectAll();    // If nothing is selected yet, fall back to scene select all
+    }
+
+    return false;
+}
+
+void ClearEditActions()
+{
+    undoStack.Clear();
+    undoStackPos = 0;
+}
+
+void SaveEditAction(EditAction@ action)
+{
+    // Create a group with 1 action
+    EditActionGroup group;
+    group.actions.Push(action);
+    SaveEditActionGroup(group);
+}
+
+void SaveEditActionGroup(EditActionGroup@ group)
+{
+    if (group.actions.empty)
+        return;
+
+    // Truncate the stack first to current pos
+    undoStack.Resize(undoStackPos);
+    undoStack.Push(group);
+    ++undoStackPos;
+
+    // Limit maximum undo steps
+    if (undoStack.length > MAX_UNDOSTACK_SIZE)
+    {
+        undoStack.Erase(0);
+        --undoStackPos;
+    }
+
+    SetSceneModified();
+}
+
+void BeginSelectionModify()
+{
+    // A large operation on selected nodes is about to begin. Disable intermediate selection updates
+    inSelectionModify = true;
+
+    // Cursor shape reverts back to normal automatically after the large operation is completed
+    ui.cursor.shape = CS_BUSY;
+}
+
+void EndSelectionModify()
+{
+    // The large operation on selected nodes has ended. Update node/component selection now
+    inSelectionModify = false;
+    HandleHierarchyListSelectionChange();
 }

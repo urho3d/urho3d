@@ -150,16 +150,16 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         {
             String idStr;
             if (editNode.id >= FIRST_LOCAL_ID)
-                idStr = " Local ID (" + String(editNode.id - FIRST_LOCAL_ID) + ")";
+                idStr = " (Local ID " + String(editNode.id - FIRST_LOCAL_ID) + ")";
             else
-                idStr = " ID (" + String(editNode.id) + ")";
+                idStr = " (ID " + String(editNode.id) + ")";
             nodeType = editNode.typeName;
             nodeTitle.text = nodeType + idStr;
         }
         else
         {
             nodeType = editNodes[0].typeName;
-            nodeTitle.text = nodeType + " ID " + STRIKED_OUT + " (" + editNodes.length + "x)";
+            nodeTitle.text = nodeType + " (ID " + STRIKED_OUT + " : " + editNodes.length + "x)";
         }
         IconizeUIElement(nodeTitle, nodeType);
 
@@ -208,7 +208,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         if (editUIElement !is null)
         {
             elementType = editUIElement.typeName;
-            titleText.text = elementType + " ID [" + editUIElement.GetVar(UI_ELEMENT_ID_VAR).ToString() + "]";
+            titleText.text = elementType + " [ID " + GetUIElementID(editUIElement).ToString() + "]";
         }
         else
         {
@@ -223,7 +223,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
                     break;
                 }
             }
-            titleText.text = (sameType ? elementType : "Mixed UI-element type") + " (" + editUIElements.length + "x)";
+            titleText.text = (sameType ? elementType : "Mixed type") + " [ID " + STRIKED_OUT + " : " + editUIElements.length + "x]";
             if (!sameType)
                 elementType = "";   // No icon
         }
@@ -326,29 +326,29 @@ void PostEditAttribute(Serializable@ serializable, uint index)
 void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializables)
 {
     // All target serializables must be either nodes, ui-elements, or components
-    Node@ node = cast<Node>(serializables[0]);
     Array<Variant> ids;
-    if (node !is null)
+    switch (GetType(serializables[0]))
     {
+    case ITEM_NODE:
         for (uint i = 0; i < serializables.length; ++i)
-            ids.Push(Variant(cast<Node>(serializables[i]).id));
+            ids.Push(cast<Node>(serializables[i]).id);
         attrEdit.vars[NODE_IDS_VAR] = ids;
-    }
-    else
-    {
-        Component@ component = cast<Component>(serializables[0]);
-        if (component !is null)
-        {
-            for (uint i = 0; i < serializables.length; ++i)
-                ids.Push(Variant(cast<Component>(serializables[i]).id));
-            attrEdit.vars[COMPONENT_IDS_VAR] = ids;
-        }
-        else
-        {
-            for (uint i = 0; i < serializables.length; ++i)
-                ids.Push(cast<UIElement>(serializables[i]).GetVar(UI_ELEMENT_ID_VAR));
-            attrEdit.vars[UI_ELEMENT_IDS_VAR] = ids;
-        }
+        break;
+
+    case ITEM_COMPONENT:
+        for (uint i = 0; i < serializables.length; ++i)
+            ids.Push(cast<Component>(serializables[i]).id);
+        attrEdit.vars[COMPONENT_IDS_VAR] = ids;
+        break;
+
+    case ITEM_UI_ELEMENT:
+        for (uint i = 0; i < serializables.length; ++i)
+            ids.Push(GetUIElementID(cast<UIElement>(serializables[i])));
+        attrEdit.vars[UI_ELEMENT_IDS_VAR] = ids;
+        break;
+
+    default:
+        break;
     }
 }
 

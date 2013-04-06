@@ -369,8 +369,10 @@ void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem
 
 void ListView::RemoveItem(UIElement* item, unsigned index)
 {
-    unsigned numItems = GetNumItems();
+    if (!item)
+        return;
 
+    unsigned numItems = GetNumItems();
     for (unsigned i = index; i < numItems; ++i)
     {
         if (GetItem(i) == item)

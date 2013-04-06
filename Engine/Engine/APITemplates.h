@@ -774,9 +774,9 @@ static bool UIElementSaveXML(File* file, UIElement* ptr)
         return false;
 }
 
-static UIElement* UIElementCreateChild(const String& typeName, const String& name, UIElement* ptr)
+static UIElement* UIElementCreateChild(const String& typeName, const String& name, unsigned index, UIElement* ptr)
 {
-    return ptr->CreateChild(typeName, name);
+    return ptr->CreateChild(typeName, name, index);
 }
 
 static void UIElementRemoveChild(UIElement* child, unsigned index, UIElement* ptr)
@@ -846,15 +846,16 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "void EnableLayoutUpdate()", asMETHOD(T, EnableLayoutUpdate), asCALL_THISCALL);
     }
     engine->RegisterObjectMethod(className, "void BringToFront()", asMETHOD(T, BringToFront), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ CreateChild(const String&in, const String&in name = String())", asFUNCTION(UIElementCreateChild), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "UIElement@+ CreateChild(const String&in, const String&in name = String(), uint index = M_MAX_UNSIGNED)", asFUNCTION(UIElementCreateChild), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void AddChild(UIElement@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void InsertChild(uint, UIElement@+)", asMETHOD(T, InsertChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveChild(UIElement@+, uint arg1 = 0)", asFUNCTIONPR(UIElementRemoveChild, (UIElement*, unsigned, UIElement*), void), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveChild(uint)", asFUNCTIONPR(UIElementRemoveChild, (unsigned, UIElement*), void), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint FindChild(UIElement@+) const", asMETHOD(T, FindChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const ShortStringHash&in, const Variant&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const ShortStringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const ShortStringHash&in, const Variant&in value = Variant(), bool recursive = false) const", asMETHODPR(T, GetChild, (const ShortStringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren(bool recursive = false) const", asFUNCTION(UIElementGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "const Variant& GetVar(const ShortStringHash&in)", asMETHOD(T, GetVar), asCALL_THISCALL);
     if (!isSprite)

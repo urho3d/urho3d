@@ -273,7 +273,7 @@ public:
     /// Bring UI element to front.
     void BringToFront();
     /// Create and add a child element and return it.
-    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY);
+    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
     /// Add a child element.
     void AddChild(UIElement* element);
     /// Insert a child element into a specific position in the child list.
@@ -286,6 +286,8 @@ public:
     void RemoveAllChildren();
     /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
+    /// Find child index. Return M_MAX_UNSIGNED if not found.
+    unsigned FindChild(UIElement* element) const;
     /// Set parent element. Same as parent->AddChild(this).
     void SetParent(UIElement* parent);
     /// Set a user variable.
@@ -298,7 +300,7 @@ public:
     void SetElementEventSender(bool flag);
 
     /// Template version of creating a child element.
-    template <class T> T* CreateChild(const String& name = String::EMPTY);
+    template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
 
     /// Return name.
     const String& GetName() const { return name_; }
@@ -380,8 +382,8 @@ public:
     UIElement* GetChild(unsigned index) const;
     /// Return child element by name.
     UIElement* GetChild(const String& name, bool recursive = false) const;
-    /// Return child element by variable.
-    UIElement* GetChild(const ShortStringHash& key, const Variant& value, bool recursive = false) const;
+    /// Return child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
+    UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
     /// Return immediate child elements.
     const Vector<SharedPtr<UIElement> >& GetChildren() const { return children_; }
     /// Return child elements either recursively or non-recursively.
@@ -549,7 +551,7 @@ private:
     bool elementEventSender_;
 };
 
-template <class T> T* UIElement::CreateChild(const String& name) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name)); }
+template <class T> T* UIElement::CreateChild(const String& name, unsigned index) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index)); }
 
 }
 

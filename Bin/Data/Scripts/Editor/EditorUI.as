@@ -159,14 +159,14 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("Edit");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("Undo", @SceneUndo, 'Z', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Redo", @SceneRedo, 'Y', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Undo", @Undo, 'Z', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Redo", @Redo, 'Y', QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
-        popup.AddChild(CreateMenuItem("Cut", @SceneCut, 'X', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Copy", @SceneCopy, 'C', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Paste", @ScenePaste, 'V', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Delete", @SceneDelete, KEY_DELETE, QUAL_ANY));
-        popup.AddChild(CreateMenuItem("Select all", @SceneSelectAll, 'A', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Cut", @Cut, 'X', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
+        popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
         popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));

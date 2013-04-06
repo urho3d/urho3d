@@ -38,7 +38,7 @@ void RegisterNavigable(asIScriptEngine* engine)
 void RegisterNavigationMesh(asIScriptEngine* engine)
 {
     RegisterComponent<NavigationMesh>(engine, "NavigationMesh");
-    engine->RegisterObjectMethod("NavigationMesh", "void Build()", asMETHOD(NavigationMesh, Build), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "bool Build()", asMETHOD(NavigationMesh, Build), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "void set_cellSize(float)", asMETHOD(NavigationMesh, SetCellSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "float get_cellSize() const", asMETHOD(NavigationMesh, GetCellSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "void set_cellHeight(float)", asMETHOD(NavigationMesh, SetCellHeight), asCALL_THISCALL);

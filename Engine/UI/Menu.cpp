@@ -34,8 +34,7 @@ namespace Urho3D
 {
 
 extern ShortStringHash VAR_ORIGIN;
-
-const unsigned AUTO_POPUP_DELAY = 500;
+const ShortStringHash VAR_SHOW_POPUP("ShowPopup");
 
 OBJECTTYPESTATIC(Menu);
 
@@ -44,7 +43,8 @@ Menu::Menu(Context* context) :
     popupOffset_(IntVector2::ZERO),
     showPopup_(false),
     acceleratorKey_(0),
-    acceleratorQualifiers_(0)
+    acceleratorQualifiers_(0),
+    autoPopup_(true)
 {
     SubscribeToEvent(this, E_PRESSED, HANDLER(Menu, HandlePressedReleased));
     SubscribeToEvent(this, E_RELEASED, HANDLER(Menu, HandlePressedReleased));
@@ -66,59 +66,49 @@ void Menu::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Menu, VAR_INTVECTOR2, "Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
+void Menu::Update(float timeStep)
+{
+    if (popup_ && showPopup_)
+    {
+        const Vector<SharedPtr<UIElement> >& children = popup_->GetChildren();
+        for (unsigned i = 0; i < children.Size(); ++i)
+        {
+            Menu* menu = static_cast<Menu*>(children[i].Get());
+            if (!menu->autoPopup_ && !menu->IsHovering())
+                menu->autoPopup_ = true;
+        }
+    }
+}
+
 void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     Button::OnHover(position, screenPosition, buttons, qualifiers, cursor);
+
+    Menu* sibling = static_cast<Menu*>(parent_->GetChild(VAR_SHOW_POPUP, true));
     if (popup_ && !showPopup_)
     {
         // Check if popup is shown by one of the siblings
-        Vector<SharedPtr<UIElement> > children = GetParent()->GetChildren();
-        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
+        if (sibling)
         {
-            if ((*i) != this && (*i)->GetType() == Menu::GetTypeStatic())
-            {
-                Menu* sibling = static_cast<Menu*>(i->Get());
-                if (sibling->showPopup_)
-                {
-                    // "Move" the popup from sibling menu to this menu
-                    sibling->ShowPopup(false);
-                    ShowPopup(true);
-                    return;
-                }
-            }
+            // "Move" the popup from sibling menu to this menu
+            sibling->ShowPopup(false);
+            ShowPopup(true);
+            return;
         }
 
-        // Show popup when parent menu has its popup shown
-        Menu* parentMenu = static_cast<Menu*>(GetParent()->GetVar(VAR_ORIGIN).GetPtr());
-        if (parentMenu && parentMenu->showPopup_)
+        if (autoPopup_)
         {
-            unsigned elapsedTime = popupTimer_.GetMSec(false);
-            if (elapsedTime > 2 * AUTO_POPUP_DELAY)
-                popupTimer_.Reset();    // Restart timer
-            else if (elapsedTime > AUTO_POPUP_DELAY)
+            // Show popup when parent menu has its popup shown
+            Menu* parentMenu = static_cast<Menu*>(parent_->GetVar(VAR_ORIGIN).GetPtr());
+            if (parentMenu && parentMenu->showPopup_)
                 ShowPopup(true);
         }
     }
     else
     {
         // Hide child menu popup when its parent is no longer being hovered
-        Vector<SharedPtr<UIElement> > children = GetRoot()->GetChildren();
-        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
-        {
-            Menu* childMenu = static_cast<Menu*>((*i)->GetVar(VAR_ORIGIN).GetPtr());
-            if (childMenu)
-            {
-                Vector<SharedPtr<UIElement> > children = GetParent()->GetChildren();
-                for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
-                {
-                    if ((*i) != this && (*i) == childMenu)
-                    {
-                        childMenu->ShowPopup(false);
-                        return;
-                    }
-                }
-            }
-        }
+        if (sibling && sibling != this)
+            sibling->ShowPopup(false);
     }
 }
 
@@ -307,6 +297,7 @@ void Menu::ShowPopup(bool enable)
         popup_->SetVisible(false);
         popup_->Remove();
     }
+    SetVar(VAR_SHOW_POPUP, enable);
 
     showPopup_ = enable;
     selected_ = enable;
@@ -337,6 +328,8 @@ void Menu::HandlePressedReleased(StringHash eventType, VariantMap& eventData)
             return;
     }
 
+    // Manual handling of the popup, so switch off the auto popup flag
+    autoPopup_ = false;
     // Toggle popup visibility if exists
     ShowPopup(!showPopup_);
 

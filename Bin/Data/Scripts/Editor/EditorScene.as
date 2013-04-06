@@ -24,8 +24,7 @@ Array<Node@> editNodes;
 Array<Component@> editComponents;
 uint numEditableComponentsPerNode = 1;
 
-Array<XMLFile@> copyBuffer;
-bool copyBufferLocal = false;
+Array<XMLFile@> sceneCopyBuffer;
 
 bool suppressSceneChanges = false;
 bool inSelectionModify = false;
@@ -312,26 +311,8 @@ void SetSceneModified()
     }
 }
 
-void BeginSelectionModify()
-{
-    // A large operation on selected nodes is about to begin. Disable intermediate selection updates
-    inSelectionModify = true;
-}
-
-void EndSelectionModify()
-{
-    // The large operation on selected nodes has ended. Update node/component selection now
-    inSelectionModify = false;
-    HandleHierarchyListSelectionChange();
-}
-
 bool SceneDelete()
 {
-    if (!CheckHierarchyWindowFocus() || (selectedComponents.empty && selectedNodes.empty))
-        return false;
-
-    ui.cursor.shape = CS_BUSY;
-
     BeginSelectionModify();
 
     // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
@@ -347,7 +328,6 @@ bool SceneDelete()
         if (node.parent is null || node.scene is null)
             continue; // Root or already deleted
 
-        uint id = node.id;
         uint nodeIndex = GetListIndex(node);
 
         // Create undo action
@@ -386,7 +366,6 @@ bool SceneDelete()
         action.Define(component);
         group.actions.Push(action);
 
-        uint id = node.id;
         node.RemoveComponent(component);
         SetSceneModified();
 
@@ -411,16 +390,9 @@ bool SceneCut()
 
 bool SceneCopy()
 {
-    if ((selectedNodes.empty && selectedComponents.empty) || !CheckHierarchyWindowFocus())
-        return false;
-
-    // Must have either only components, or only nodes
-    if (!selectedNodes.empty && !selectedComponents.empty)
-        return false;
-
     ui.cursor.shape = CS_BUSY;
 
-    copyBuffer.Clear();
+    sceneCopyBuffer.Clear();
 
     // Copy components
     if (!selectedComponents.empty)
@@ -431,26 +403,24 @@ bool SceneCopy()
             XMLElement rootElem = xml.CreateRoot("component");
             selectedComponents[i].SaveXML(rootElem);
             rootElem.SetBool("local", selectedComponents[i].id >= FIRST_LOCAL_ID);
-            copyBuffer.Push(xml);
+            sceneCopyBuffer.Push(xml);
         }
         return true;
     }
-    // Copy node. The root node can not be copied
+    // Copy nodes.
     else
     {
         for (uint i = 0; i < selectedNodes.length; ++i)
         {
+            // Skip the root scene node as it cannot be copied
             if (selectedNodes[i] is editorScene)
-                return false;
-        }
+                continue;
 
-        for (uint i = 0; i < selectedNodes.length; ++i)
-        {
             XMLFile@ xml = XMLFile();
             XMLElement rootElem = xml.CreateRoot("node");
             selectedNodes[i].SaveXML(rootElem);
             rootElem.SetBool("local", selectedNodes[i].id >= FIRST_LOCAL_ID);
-            copyBuffer.Push(xml);
+            sceneCopyBuffer.Push(xml);
         }
 
         return true;
@@ -459,24 +429,17 @@ bool SceneCopy()
 
 bool ScenePaste()
 {
-    if (editNode is null || !CheckHierarchyWindowFocus() || copyBuffer.empty)
-        return false;
-
     ui.cursor.shape = CS_BUSY;
-
-    bool pasteComponents = false;
 
     // Group for storing undo actions
     EditActionGroup group;
 
-    for (uint i = 0; i < copyBuffer.length; ++i)
+    for (uint i = 0; i < sceneCopyBuffer.length; ++i)
     {
-        XMLElement rootElem = copyBuffer[i].root;
+        XMLElement rootElem = sceneCopyBuffer[i].root;
         String mode = rootElem.name;
         if (mode == "component")
         {
-            pasteComponents = true;
-
             // If this is the root node, do not allow to create duplicate scene-global components
             if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, rootElem.GetAttribute("type")))
                 return false;
@@ -489,7 +452,7 @@ bool ScenePaste()
 
             newComponent.LoadXML(rootElem);
             newComponent.ApplyAttributes();
-            
+
             // Create an undo action
             CreateComponentAction action;
             action.Define(newComponent);
@@ -581,7 +544,7 @@ bool SceneToggleEnable()
         {
             bool oldEnabled = selectedComponents[i].enabled;
             selectedComponents[i].enabled = !oldEnabled;
-            
+
             // Create undo action
             EditAttributeAction action;
             action.Define(selectedComponents[i], 0, Variant(oldEnabled));
@@ -624,7 +587,7 @@ bool SceneResetPosition()
         oldTransform.Define(editNode);
 
         editNode.position = Vector3(0.0, 0.0, 0.0);
-        
+
         // Create undo action
         EditNodeTransformAction action;
         action.Define(editNode, oldTransform);
@@ -645,7 +608,7 @@ bool SceneResetRotation()
         oldTransform.Define(editNode);
 
         editNode.rotation = Quaternion();
-        
+
         // Create undo action
         EditNodeTransformAction action;
         action.Define(editNode, oldTransform);
@@ -666,7 +629,7 @@ bool SceneResetScale()
         oldTransform.Define(editNode);
 
         editNode.scale = Vector3(1.0, 1.0, 1.0);
-        
+
         // Create undo action
         EditNodeTransformAction action;
         action.Define(editNode, oldTransform);
@@ -681,22 +644,13 @@ bool SceneResetScale()
 
 bool SceneSelectAll()
 {
-    if (!hierarchyList.selections.empty)
-    {
-        BeginSelectionModify();
-        hierarchyList.ClearSelection();
-        EndSelectionModify();
-    }
-    else
-    {
-        BeginSelectionModify();
-        Array<Node@> rootLevelNodes = editorScene.GetChildren();
-        Array<uint> indices;
-        for (uint i = 0; i < rootLevelNodes.length; ++i)
-            indices.Push(GetListIndex(rootLevelNodes[i]));
-        hierarchyList.SetSelections(indices);
-        EndSelectionModify();
-    }
+    BeginSelectionModify();
+    Array<Node@> rootLevelNodes = editorScene.GetChildren();
+    Array<uint> indices;
+    for (uint i = 0; i < rootLevelNodes.length; ++i)
+        indices.Push(GetListIndex(rootLevelNodes[i]));
+    hierarchyList.SetSelections(indices);
+    EndSelectionModify();
 
     return true;
 }
@@ -704,71 +658,13 @@ bool SceneSelectAll()
 bool SceneRebuildNavigation()
 {
     Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh");
+    bool success = true;
     for (uint i = 0; i < navMeshes.length; ++i)
     {
         NavigationMesh@ navMesh = navMeshes[i];
-        navMesh.Build();
-    }
-    
-    return true;
-}
-
-bool SceneUndo()
-{
-    if (undoStackPos > 0)
-    {
-        --undoStackPos;
-        // Undo commands in reverse order
-        for (int i = int(undoStack[undoStackPos].actions.length - 1); i >= 0; --i)
-            undoStack[undoStackPos].actions[i].Undo();
+        if (!navMesh.Build())
+            success = false;
     }
 
-    return true;
-}
-
-bool SceneRedo()
-{
-    if (undoStackPos < undoStack.length)
-    {
-        // Redo commands in same order as stored
-        for (uint i = 0; i < undoStack[undoStackPos].actions.length; ++i)
-            undoStack[undoStackPos].actions[i].Redo();
-        ++undoStackPos;
-    }
-
-    return true;
-}
-
-void ClearEditActions()
-{
-    undoStack.Clear();
-    undoStackPos = 0;
-}
-
-void SaveEditAction(EditAction@ action)
-{
-    // Create a group with 1 action
-    EditActionGroup group;
-    group.actions.Push(action);
-    SaveEditActionGroup(group);
-}
-
-void SaveEditActionGroup(EditActionGroup@ group)
-{
-    if (group.actions.empty)
-        return;
-
-    // Truncate the stack first to current pos
-    undoStack.Resize(undoStackPos);
-    undoStack.Push(group);
-    ++undoStackPos;
-
-    // Limit maximum undo steps
-    if (undoStack.length > MAX_UNDOSTACK_SIZE)
-    {
-        undoStack.Erase(0);
-        --undoStackPos;
-    }
-
-    SetSceneModified();
+    return success;
 }

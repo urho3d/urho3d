@@ -65,7 +65,7 @@ XMLElement XMLElement::CreateChild(const char* name)
 {
     if (!file_ || !node_)
         return XMLElement();
-    
+
     pugi::xml_node node(node_);
     pugi::xml_node child = node.append_child(name);
     return XMLElement(file_, child.internal_object());
@@ -75,7 +75,7 @@ bool XMLElement::RemoveChild(const XMLElement& element)
 {
     if (!file_ || !node_ || element.node_)
         return false;
-    
+
     pugi::xml_node node(node_);
     pugi::xml_node child(element.node_);
     return node.remove_child(child);
@@ -90,7 +90,7 @@ bool XMLElement::RemoveChild(const char* name)
 {
     if (!file_ || !node_)
         return false;
-    
+
     pugi::xml_node node(node_);
     return node.remove_child(name);
 }
@@ -104,7 +104,7 @@ bool XMLElement::RemoveChildren(const char* name)
 {
     if (!file_ || !node_)
         return false;
-    
+
     pugi::xml_node node(node_);
     if (!String::CStringLength(name))
     {
@@ -126,7 +126,7 @@ bool XMLElement::RemoveChildren(const char* name)
             node.remove_child(child);
         }
     }
-    
+
     return true;
 }
 
@@ -139,7 +139,7 @@ bool XMLElement::SetAttribute(const char* name, const char* value)
 {
     if (!file_ || !node_)
         return false;
-    
+
     pugi::xml_node node(node_);
     pugi::xml_attribute attr = node.attribute(name);
     if (attr.empty())
@@ -164,10 +164,10 @@ bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
 {
     String dataStr;
     const unsigned char* bytes = (const unsigned char*)data;
-    
+
     for (unsigned i = 0; i < size; ++i)
         dataStr += String((unsigned)bytes[i]) + " ";
-    
+
     return SetAttribute(name, dataStr);
 }
 
@@ -185,6 +185,11 @@ bool XMLElement::SetColor(const String& name, const Color& value)
 }
 
 bool XMLElement::SetFloat(const String& name, float value)
+{
+    return SetAttribute(name, String(value));
+}
+
+bool XMLElement::SetUInt(const String& name, unsigned value)
 {
     return SetAttribute(name, String(value));
 }
@@ -223,7 +228,7 @@ bool XMLElement::SetVariant(const Variant& value)
 {
     if (!SetAttribute("type", value.GetTypeName()))
         return false;
-    
+
     return SetVariantValue(value);
 }
 
@@ -233,16 +238,16 @@ bool XMLElement::SetVariantValue(const Variant& value)
     {
     case VAR_RESOURCEREF:
         return SetResourceRef(value.GetResourceRef());
-    
+
     case VAR_RESOURCEREFLIST:
         return SetResourceRefList(value.GetResourceRefList());
-        
+
     case VAR_VARIANTVECTOR:
         return SetVariantVector(value.GetVariantVector());
-        
+
     case VAR_VARIANTMAP:
         return SetVariantMap(value.GetVariantMap());
-        
+
     default:
         return SetAttribute("value", value.ToString().CString());
     }
@@ -252,11 +257,11 @@ bool XMLElement::SetResourceRef(const ResourceRef& value)
 {
     if (!file_ || !node_)
         return false;
-    
+
     // Need the context & resource cache to query for reverse hash mappings
     Context* context = file_->GetContext();
     ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
-    
+
     SetAttribute("value", String(context->GetTypeName(value.type_)) + ";" + cache->GetResourceName(value.id_));
     return true;
 }
@@ -265,18 +270,18 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
 {
     if (!file_ || !node_)
         return false;
-    
+
     // Need the context & resource cache to query for reverse hash mappings
     Context* context = file_->GetContext();
     ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
-    
+
     String str(context->GetTypeName(value.type_));
     for (unsigned i = 0; i < value.ids_.Size(); ++i)
     {
         str += ";";
         str += cache->GetResourceName(value.ids_[i]);
     }
-    
+
     SetAttribute("value", str.CString());
     return true;
 }
@@ -286,7 +291,7 @@ bool XMLElement::SetVariantVector(const VariantVector& value)
     // Must remove all existing variant child elements (if they exist) to not cause confusion
     if (!RemoveChildren("variant"))
         return false;
-    
+
     for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
         XMLElement variantElem = CreateChild("variant");
@@ -294,7 +299,7 @@ bool XMLElement::SetVariantVector(const VariantVector& value)
             return false;
         variantElem.SetVariant(*i);
     }
-    
+
     return true;
 }
 
@@ -302,7 +307,7 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
 {
     if (!RemoveChildren("variant"))
         return false;
-    
+
     for (VariantMap::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
         XMLElement variantElem = CreateChild("variant");
@@ -311,7 +316,7 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
         variantElem.SetInt("hash", i->first_.Value());
         variantElem.SetVariant(i->second_);
     }
-    
+
     return true;
 }
 
@@ -334,7 +339,7 @@ String XMLElement::GetName() const
 {
     if (!file_ || !node_)
         return String();
-    
+
     pugi::xml_node node(node_);
     return String(node.name());
 }
@@ -348,7 +353,7 @@ bool XMLElement::HasChild(const char* name) const
 {
     if (!file_ || !node_)
         return false;
-    
+
     pugi::xml_node node(node_);
     return !node.child(name).empty();
 }
@@ -362,7 +367,7 @@ XMLElement XMLElement::GetChild(const char* name) const
 {
     if (!file_ || !node_)
         return XMLElement();
-    
+
     pugi::xml_node node(node_);
     if (!String::CStringLength(name))
         return XMLElement(file_, node.first_child().internal_object());
@@ -379,7 +384,7 @@ XMLElement XMLElement::GetNext(const char* name) const
 {
     if (!file_ || !node_)
         return XMLElement();
-    
+
     pugi::xml_node node(node_);
     if (!String::CStringLength(name))
         return XMLElement(file_, node.next_sibling().internal_object());
@@ -391,7 +396,7 @@ XMLElement XMLElement::GetParent() const
 {
     if (!file_ || !node_)
         return XMLElement();
-    
+
     pugi::xml_node node(node_);
     return XMLElement(file_, node.parent().internal_object());
 }
@@ -400,17 +405,17 @@ unsigned XMLElement::GetNumAttributes() const
 {
     if (!file_ || !node_)
         return 0;
-    
+
     pugi::xml_node node(node_);
     unsigned ret = 0;
-    
+
     pugi::xml_attribute attr = node.first_attribute();
     while (!attr.empty())
     {
         ++ret;
         attr = attr.next_attribute();
     }
-    
+
     return ret;
 }
 
@@ -423,7 +428,7 @@ bool XMLElement::HasAttribute(const char* name) const
 {
     if (!file_ || !node_)
         return false;
-    
+
     pugi::xml_node node(node_);
     return !node.attribute(name).empty();
 }
@@ -432,7 +437,7 @@ String XMLElement::GetAttribute(const String& name) const
 {
     if (!file_ || !node_)
         return String();
-    
+
     pugi::xml_node node(node_);
     return String(node.attribute(name.CString()).value());
 }
@@ -441,7 +446,7 @@ const char* XMLElement::GetAttribute(const char* name) const
 {
     if (!file_ || !node_)
         return 0;
-    
+
     pugi::xml_node node(node_);
     return node.attribute(name).value();
 }
@@ -470,17 +475,17 @@ Vector<String> XMLElement::GetAttributeNames() const
 {
     if (!file_ || !node_)
         return Vector<String>();
-    
+
     pugi::xml_node node(node_);
     Vector<String> ret;
-    
+
     pugi::xml_attribute attr = node.first_attribute();
     while (!attr.empty())
     {
         ret.Push(String(attr.name()));
         attr = attr.next_attribute();
     }
-    
+
     return ret;
 }
 
@@ -492,7 +497,7 @@ bool XMLElement::GetBool(const String& name) const
 BoundingBox XMLElement::GetBoundingBox() const
 {
     BoundingBox ret;
-    
+
     ret.min_ = GetVector3("min");
     ret.max_ = GetVector3("max");
     ret.defined_ = true;
@@ -503,7 +508,7 @@ PODVector<unsigned char> XMLElement::GetBuffer(const String& name) const
 {
     PODVector<unsigned char> ret;
     Vector<String> bytes = GetAttribute(name).Split(' ');
-    
+
     ret.Resize(bytes.Size());
     for (unsigned i = 0; i < bytes.Size(); ++i)
         ret[i] = ToInt(bytes[i]);
@@ -517,7 +522,7 @@ bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
     unsigned char* destBytes = (unsigned char*)dest;
     if (size < bytes.Size())
         return false;
-    
+
     for (unsigned i = 0; i < bytes.Size(); ++i)
         destBytes[i] = ToInt(bytes[i]);
     return true;
@@ -531,6 +536,11 @@ Color XMLElement::GetColor(const String& name) const
 float XMLElement::GetFloat(const String& name) const
 {
     return ToFloat(GetAttribute(name));
+}
+
+unsigned XMLElement::GetUInt(const String& name) const
+{
+    return ToUInt(GetAttribute(name));
 }
 
 int XMLElement::GetInt(const String& name) const
@@ -567,7 +577,7 @@ Variant XMLElement::GetVariant() const
 Variant XMLElement::GetVariantValue(VariantType type) const
 {
     Variant ret;
-    
+
     if (type == VAR_RESOURCEREF)
         ret = GetResourceRef();
     else if (type == VAR_RESOURCEREFLIST)
@@ -578,40 +588,40 @@ Variant XMLElement::GetVariantValue(VariantType type) const
         ret = GetVariantMap();
     else
         ret.FromString(type, GetAttribute("value"));
-    
+
     return ret;
 }
 
 ResourceRef XMLElement::GetResourceRef() const
 {
     ResourceRef ret;
-    
+
     Vector<String> values = String::Split(GetAttribute("value"), ';');
     if (values.Size() == 2)
     {
         ret.type_ = values[0];
         ret.id_ = values[1];
-        
+
         // Whenever we encounter a resource name read from a ResourceRef XML element, store the reverse mapping to
         // ResourceCache if possible. We will probably use the hash to request a resource shortly afterward
         if (file_)
             file_->GetSubsystem<ResourceCache>()->StoreNameHash(values[1]);
     }
-    
+
     return ret;
 }
 
 ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
-    
+
     Vector<String> values = String::Split(GetAttribute("value"), ';');
     if (values.Size() >= 1)
     {
         // Whenever we encounter resource names read from a ResourceRefList XML element, store the reverse mapping to
         // ResourceCache if possible. We will probably use the hashes to request resources shortly afterward
         ResourceCache* cache = file_ ? file_->GetSubsystem<ResourceCache>() : 0;
-        
+
         ret.type_ = values[0];
         ret.ids_.Resize(values.Size() - 1);
         for (unsigned i = 1; i < values.Size(); ++i)
@@ -621,28 +631,28 @@ ResourceRefList XMLElement::GetResourceRefList() const
                 cache->StoreNameHash(values[i]);
         }
     }
-    
+
     return ret;
 }
 
 VariantVector XMLElement::GetVariantVector() const
 {
     VariantVector ret;
-    
+
     XMLElement variantElem = GetChild("variant");
     while (variantElem)
     {
         ret.Push(variantElem.GetVariant());
         variantElem = variantElem.GetNext("variant");
     }
-    
+
     return ret;
 }
 
 VariantMap XMLElement::GetVariantMap() const
 {
     VariantMap ret;
-    
+
     XMLElement variantElem = GetChild("variant");
     while (variantElem)
     {
@@ -650,7 +660,7 @@ VariantMap XMLElement::GetVariantMap() const
         ret[key] = variantElem.GetVariant();
         variantElem = variantElem.GetNext("variant");
     }
-    
+
     return ret;
 }
 

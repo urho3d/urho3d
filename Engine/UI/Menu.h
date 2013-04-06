@@ -47,6 +47,8 @@ public:
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
     
+    /// Perform UI element update.
+    virtual void Update(float timeStep);
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to the popup being shown.
@@ -93,8 +95,8 @@ private:
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
     /// Handle keypress for checking accelerator.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
-    /// Auto popup timer.
-    Timer popupTimer_;
+    /// Auto popup flag.
+    bool autoPopup_;
 };
 
 }

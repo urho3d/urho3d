@@ -49,7 +49,7 @@ public:
     XMLElement(const XMLElement& rhs);
     /// Destruct.
     ~XMLElement();
-    
+
     /// Create a child element.
     XMLElement CreateChild(const String& name);
     /// Create a child element.
@@ -80,6 +80,8 @@ public:
     bool SetColor(const String& name, const Color& value);
     /// Set a float attribute.
     bool SetFloat(const String& name, float value);
+    /// Set an unsigned integer attribute.
+    bool SetUInt(const String& name, unsigned value);
     /// Set an integer attribute.
     bool SetInt(const String& name, int value);
     /// Set an IntRect attribute.
@@ -110,7 +112,7 @@ public:
     bool SetVector3(const String& name, const Vector3& value);
     /// Set a Vector4 attribute.
     bool SetVector4(const String& name, const Vector4& value);
-    
+
     /// Return whether does not refer to an element.
     bool IsNull() const { return node_ == 0; }
     /// Return whether refers to an element.
@@ -165,6 +167,8 @@ public:
     Color GetColor(const String& name) const;
     /// Return a float attribute, or zero if missing.
     float GetFloat(const String& name) const;
+    /// Return an unsigned integer attribute, or zero if missing.
+    unsigned GetUInt(const String& name) const;
     /// Return an integer attribute, or zero if missing.
     int GetInt(const String& name) const;
     /// Return an IntRect attribute, or default if missing.
@@ -201,7 +205,7 @@ public:
     pugi::xml_node_struct* GetNode() const { return node_; }
     /// Empty XMLElement.
     static const XMLElement EMPTY;
-    
+
 private:
     /// XML file.
     WeakPtr<XMLFile> file_;

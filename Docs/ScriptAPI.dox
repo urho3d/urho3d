@@ -1235,6 +1235,7 @@ Methods:<br>
 - bool SetColor(const String&, const Color&)
 - bool SetFloat(const String&, float)
 - bool SetInt(const String&, int)
+- bool SetUInt(const String&, uint)
 - bool SetQuaternion(const String&, const Quaternion&)
 - bool SetVariant(const Variant&)
 - bool SetResourceRef(const String&, const ResourceRef&)
@@ -1257,6 +1258,7 @@ Methods:<br>
 - BoundingBox GetBoundingBox() const
 - Color GetColor(const String&) const
 - float GetFloat(const String&) const
+- uint GetUInt(const String&) const
 - int GetInt(const String&) const
 - Quaternion GetQuaternion(const String&) const
 - Variant GetVariant() const
@@ -3147,15 +3149,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -3257,15 +3260,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -3370,15 +3374,16 @@ Methods:<br>
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - UIElement@ GetElementEventSender() const
@@ -3462,15 +3467,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -3587,15 +3593,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -3708,15 +3715,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -3828,15 +3836,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -3952,15 +3961,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4074,15 +4084,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4194,15 +4205,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4343,15 +4355,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4469,15 +4482,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4598,15 +4612,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4730,15 +4745,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4873,15 +4889,16 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ))
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
 - void RemoveChild(UIElement@, uint arg1 = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
+- uint FindChild(UIElement@) const
 - UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant&, bool arg2 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -5376,7 +5393,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- void Build()
+- bool Build()
 
 Properties:<br>
 - ShortStringHash type (readonly)
