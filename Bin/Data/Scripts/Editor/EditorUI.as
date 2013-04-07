@@ -377,7 +377,7 @@ bool PickNode()
 
 bool PickComponent()
 {
-    if (editNode is null)
+    if (editNodes.empty)
         return false;
 
     Menu@ menu = GetEventSender();

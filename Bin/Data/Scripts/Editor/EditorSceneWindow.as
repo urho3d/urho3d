@@ -448,40 +448,37 @@ void SelectNode(Node@ node, bool multiselect)
         return;
     }
 
-    uint nodeItem = GetListIndex(node);
-
-    // Go in the parent chain up to make sure the chain is expanded
-    for (;;)
-    {
-        Node@ parent = node.parent;
-        if (node is editorScene || parent is null)
-            break;
-        node = parent;
-    }
-
+    uint index = GetListIndex(node);
     uint numItems = hierarchyList.numItems;
-    uint parentItem = GetListIndex(node);
 
-    if (nodeItem < numItems)
+    if (index < numItems)
     {
         // Expand the node chain now
-        if (!multiselect || !hierarchyList.IsSelected(nodeItem))
+        if (!multiselect || !hierarchyList.IsSelected(index))
         {
-            if (parentItem < numItems)
-                hierarchyList.Expand(parentItem, true);
-            hierarchyList.Expand(nodeItem, true);
+            // Go in the parent chain up to make sure the chain is expanded
+            for (;;)
+            {
+                Node@ parent = node.parent;
+                if (node is editorScene || parent is null)
+                    break;
+                node = parent;
+            }
+            uint parentIndex = GetListIndex(node);
+            if (parentIndex < numItems)
+                hierarchyList.Expand(parentIndex, true);
+            
+            hierarchyList.Expand(index, true);
         }
+        
         // This causes an event to be sent, in response we set the node/component selections, and refresh editors
         if (!multiselect)
-            hierarchyList.selection = nodeItem;
+            hierarchyList.selection = index;
         else
-            hierarchyList.ToggleSelection(nodeItem);
+            hierarchyList.ToggleSelection(index);
     }
-    else
-    {
-        if (!multiselect)
-            hierarchyList.ClearSelection();
-    }
+    else if (!multiselect)
+        hierarchyList.ClearSelection();
 }
 
 void SelectComponent(Component@ component, bool multiselect)
@@ -499,47 +496,82 @@ void SelectComponent(Component@ component, bool multiselect)
         return;
     }
 
-    uint nodeItem = GetListIndex(node);
-    uint componentItem = GetComponentListIndex(component);
-
-    // Go in the parent chain up to make sure the chain is expanded
-    for (;;)
-    {
-        Node@ parent = node.parent;
-        if (node is editorScene || parent is null)
-            break;
-        node = parent;
-    }
-
+    uint nodeIndex = GetListIndex(node);
+    uint componentIndex = GetComponentListIndex(component);
     uint numItems = hierarchyList.numItems;
-    uint parentItem = GetListIndex(node);
 
-    if (parentItem >= hierarchyList.numItems && !multiselect)
+    if (nodeIndex < numItems && componentIndex < numItems)
+    {
+        // Expand the node chain now
+        if (!multiselect || !hierarchyList.IsSelected(componentIndex))
+        {
+            // Go in the parent chain up to make sure the chain is expanded
+            for (;;)
+            {
+                Node@ parent = node.parent;
+                if (node is editorScene || parent is null)
+                    break;
+                node = parent;
+            }
+            uint parentNodeIndex = GetListIndex(node);
+            if (parentNodeIndex < numItems)
+                hierarchyList.Expand(parentNodeIndex, true);
+            else if (!multiselect)
+            {
+                hierarchyList.ClearSelection();
+                return;
+            }
+            
+            hierarchyList.Expand(nodeIndex, true);
+        }
+        // This causes an event to be sent, in response we set the node/component selections, and refresh editors
+        if (!multiselect)
+            hierarchyList.selection = componentIndex;
+        else
+            hierarchyList.ToggleSelection(componentIndex);
+    }
+    else if (!multiselect)
+        hierarchyList.ClearSelection();
+}
+
+void SelectUIElement(UIElement@ element, bool multiselect)
+{
+    if (element is null && !multiselect)
     {
         hierarchyList.ClearSelection();
         return;
     }
 
-    if (nodeItem < numItems && componentItem < numItems)
+    uint index = GetListIndex(element);
+    uint numItems = hierarchyList.numItems;
+
+    if (index < numItems)
     {
         // Expand the node chain now
-        if (!multiselect || !hierarchyList.IsSelected(componentItem))
+        if (!multiselect || !hierarchyList.IsSelected(index))
         {
-            if (parentItem < numItems)
-                hierarchyList.Expand(parentItem, true);
-            hierarchyList.Expand(nodeItem, true);
+            // Go in the parent chain up to make sure the chain is expanded
+            for (;;)
+            {
+                UIElement@ parent = element.parent;
+                if (element is editorUIElement || parent is null)
+                    break;
+                element = parent;
+            }
+            uint parentIndex = GetListIndex(element);
+            if (parentIndex < numItems)
+                hierarchyList.Expand(parentIndex, true);
+            
+            hierarchyList.Expand(index, true);
         }
-        // This causes an event to be sent, in response we set the node/component selections, and refresh editors
+        
         if (!multiselect)
-            hierarchyList.selection = componentItem;
+            hierarchyList.selection = index;
         else
-            hierarchyList.ToggleSelection(componentItem);
+            hierarchyList.ToggleSelection(index);
     }
-    else
-    {
-        if (!multiselect)
-            hierarchyList.ClearSelection();
-    }
+    else if (!multiselect)
+        hierarchyList.ClearSelection();
 }
 
 void HandleHierarchyListSelectionChange()

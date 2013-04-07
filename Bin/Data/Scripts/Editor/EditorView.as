@@ -64,7 +64,8 @@ Array<String> pickModeText = {
     "Geometries",
     "Lights",
     "Zones",
-    "Rigidbodies"
+    "Rigidbodies",
+    "UI-elements"
 };
 
 Array<String> fillModeText = {
@@ -382,15 +383,43 @@ void ViewRaycast(bool mouseClick)
     if (ui.modalElement !is null)
         return;
 
-    DebugRenderer@ debug = editorScene.debugRenderer;
-    IntVector2 pos = ui.cursorPosition;
-    Component@ selected;
-
-    // Do not raycast / change selection if hovering over an UI element or the gizmo
-    if (ui.GetElementAt(pos) !is null || IsGizmoSelected())
+    // Do not raycast / change selection if hovering over the gizmo
+    if (IsGizmoSelected())
         return;
 
+    IntVector2 pos = ui.cursorPosition;
+    UIElement@ elementAtPos = ui.GetElementAt(pos);
+    if (pickMode == PICK_UI_ELEMENTS)
+    {
+        bool leftClick = mouseClick && input.mouseButtonPress[MOUSEB_LEFT];
+        bool multiselect = input.qualifierDown[QUAL_CTRL];
+
+        if (elementAtPos !is null)
+        {
+            // Only interested in user-created UI elements
+            if (elementAtPos.GetElementEventSender() is editorUIElement)
+            {
+                // \todo Debug draw the UIElement
+                //DebugDrawUIElement();
+
+                if (leftClick)
+                    SelectUIElement(elementAtPos, multiselect);
+            }
+        }
+        else if (leftClick && !multiselect)
+            // If clicked on emptiness in non-multiselect mode, clear the selection
+           SelectUIElement(null, false);
+
+        return;
+    }
+
+    // Do not raycast / change selection if hovering over a UI element when not in PICK_UI_ELEMENTS Mode
+    if (elementAtPos !is null)
+        return;
+
+    DebugRenderer@ debug = editorScene.debugRenderer;
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+    Component@ selectedComponent;
 
     if (pickMode != PICK_RIGIDBODIES)
     {
@@ -405,7 +434,7 @@ void ViewRaycast(bool mouseClick)
             // If selecting a terrain patch, select the parent terrain instead
             if (drawable.typeName != "TerrainPatch")
             {
-                selected = drawable;
+                selectedComponent = drawable;
                 if (debug !is null)
                 {
                     debug.AddNode(drawable.node, 1.0, false);
@@ -413,7 +442,7 @@ void ViewRaycast(bool mouseClick)
                 }
             }
             else if (drawable.node.parent !is null)
-                selected = drawable.node.parent.GetComponent("Terrain");
+                selectedComponent = drawable.node.parent.GetComponent("Terrain");
         }
     }
     else
@@ -434,28 +463,28 @@ void ViewRaycast(bool mouseClick)
                 debug.AddNode(body.node, 1.0, false);
                 body.DrawDebugGeometry(debug, false);
             }
-            selected = body;
+            selectedComponent = body;
         }
     }
 
     if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
     {
         bool multiselect = input.qualifierDown[QUAL_CTRL];
-        if (selected !is null)
+        if (selectedComponent !is null)
         {
             if (input.qualifierDown[QUAL_SHIFT])
             {
                 // If we are selecting components, but have nodes in existing selection, do not multiselect to prevent confusion
                 if (!selectedNodes.empty)
                     multiselect = false;
-                SelectComponent(selected, multiselect);
+                SelectComponent(selectedComponent, multiselect);
             }
             else
             {
                 // If we are selecting nodes, but have components in existing selection, do not multiselect to prevent confusion
                 if (!selectedComponents.empty)
                     multiselect = false;
-                SelectNode(selected.node, multiselect);
+                SelectNode(selectedComponent.node, multiselect);
             }
         }
         else

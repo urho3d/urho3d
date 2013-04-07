@@ -5376,6 +5376,7 @@ Properties:<br>
 - bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- uint flags
 
 
 NavigationMesh

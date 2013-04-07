@@ -7,7 +7,8 @@ const int PICK_GEOMETRIES = 0;
 const int PICK_LIGHTS = 1;
 const int PICK_ZONES = 2;
 const int PICK_RIGIDBODIES = 3;
-const int MAX_PICK_MODES = 4;
+const int PICK_UI_ELEMENTS = 4;
+const int MAX_PICK_MODES = 5;
 const int MAX_UNDOSTACK_SIZE = 256;
 
 Scene@ editorScene;
@@ -212,21 +213,27 @@ void CreateComponent(const String&in componentType)
     if (editNode is editorScene && CheckForExistingGlobalComponent(editNode, componentType))
         return;
 
+    // Group for storing undo actions
+    EditActionGroup group;
+
     // For now, make a local node's all components local
     /// \todo Allow to specify the createmode
-    Component@ newComponent = editNode.CreateComponent(componentType, editNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
-    if (newComponent !is null)
+    for (uint i = 0; i < editNodes.length; ++i)
     {
-        // Some components such as CollisionShape do not create their internal object before the first call to ApplyAttributes()
-        // to prevent unnecessary initialization with default values. Call now
-        newComponent.ApplyAttributes();
+        Component@ newComponent = editNodes[i].CreateComponent(componentType, editNodes[i].id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
+        if (newComponent !is null)
+        {
+            // Some components such as CollisionShape do not create their internal object before the first call to ApplyAttributes()
+            // to prevent unnecessary initialization with default values. Call now
+            newComponent.ApplyAttributes();
 
-        CreateComponentAction action;
-        action.Define(newComponent);
-        SaveEditAction(action);
-
-        FocusComponent(newComponent);
+            CreateComponentAction action;
+            action.Define(newComponent);
+            group.actions.Push(action);
+        }
     }
+
+    SaveEditActionGroup(group);
 
     SetSceneModified();
 }

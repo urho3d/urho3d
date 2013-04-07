@@ -55,6 +55,9 @@ bool NewUIElement(const String&in typeName)
         }
         element.style = uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle;
 
+        // Position the newly created element at center
+        CenterDialog(element);
+
         // Create an undo action for the create
         CreateUIElementAction action;
         action.Define(element);
