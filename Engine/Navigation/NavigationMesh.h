@@ -40,6 +40,8 @@ namespace Urho3D
 
 class Geometry;
 
+struct NavigationBuildData;
+
 /// Navigation mesh component. Collects the navigation geometry from child nodes with the Navigable component and responds to path queries.
 class NavigationMesh : public Component
 {
@@ -52,6 +54,9 @@ public:
     virtual ~NavigationMesh();
     /// Register object factory.
     static void RegisterObject(Context* context);
+    
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     /// Set cell size.
     void SetCellSize(float size);
@@ -114,13 +119,11 @@ public:
     
 private:
     /// Visit nodes and collect navigable geometry.
-    void CollectGeometries(Node* node, Node* baseNode);
+    void CollectGeometries(NavigationBuildData& build, Node* node, Node* baseNode);
     /// Add a geometry to the mesh.
-    void AddGeometry(Node* node, Geometry* geometry);
+    void AddGeometry(NavigationBuildData& build, Node* node, Geometry* geometry);
     /// Create Detour navmesh. Return true if successful.
     bool CreateNavMesh(unsigned char* navData, unsigned navDataSize);
-    /// Release Recast temporary data.
-    void ReleaseBuildData();
     /// Release the Detour navmesh.
     void ReleaseNavMesh();
     
@@ -148,27 +151,8 @@ private:
     float detailSampleDistance_;
     /// Detail sampling maximum error.
     float detailSampleMaxError_;
-    /// World-space bounding box of the navigation mesh.
-    BoundingBox worldBoundingBox_;
-    /// Build phase vertices.
-    PODVector<Vector3> vertices_;
-    /// Build phase triangle indices.
-    PODVector<int> indices_;
-    /// Recast context.
-    rcContext* ctx_;
-    /// Recast heightfield.
-    rcHeightfield* heightField_;
-    /// Recast compact heightfield.
-    rcCompactHeightfield* compactHeightField_;
-    /// Recast contour set.
-    rcContourSet* contourSet_;
-    /// Recast poly mesh.
-    rcPolyMesh* polyMesh_;
-    /// Recast detail poly mesh.
-    rcPolyMeshDetail* polyMeshDetail_;
     /// Detour navmesh.
     dtNavMesh* navMesh_;
-    
     /// Navigation data attribute. Contains the unmodified Recast data.
     PODVector<unsigned char> navigationDataAttr_;
 };
