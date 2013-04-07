@@ -388,7 +388,7 @@ void ViewRaycast(bool mouseClick)
         return;
 
     IntVector2 pos = ui.cursorPosition;
-    UIElement@ elementAtPos = ui.GetElementAt(pos);
+    UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
     if (pickMode == PICK_UI_ELEMENTS)
     {
         bool leftClick = mouseClick && input.mouseButtonPress[MOUSEB_LEFT];
@@ -397,7 +397,7 @@ void ViewRaycast(bool mouseClick)
         if (elementAtPos !is null)
         {
             // Only interested in user-created UI elements
-            if (elementAtPos.GetElementEventSender() is editorUIElement)
+            if (elementAtPos !is editorUIElement && elementAtPos.GetElementEventSender() is editorUIElement)
             {
                 // \todo Debug draw the UIElement
                 //DebugDrawUIElement();
