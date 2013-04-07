@@ -103,7 +103,7 @@ void NavigationMesh::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Edge Max Error", GetEdgeMaxError, SetEdgeMaxError, float, DEFAULT_EDGE_MAX_ERROR, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Detail Sample Distance", GetDetailSampleDistance, SetDetailSampleDistance, float, DEFAULT_DETAIL_SAMPLE_DISTANCE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Detail Sample Max Error", GetDetailSampleMaxError, SetDetailSampleMaxError, float, DEFAULT_DETAIL_SAMPLE_MAX_ERROR, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_BUFFER, "Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_BUFFER, "Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
 }
 
 void NavigationMesh::SetCellSize(float size)
@@ -349,40 +349,26 @@ bool NavigationMesh::Build()
             return false;
         }
         
+        // Before creating the navmesh (which modifies the data) copy the data for serialization
+        navigationDataAttr_.Resize(navDataSize);
+        memcpy(&navigationDataAttr_[0], navData, navDataSize);
+        
         ReleaseBuildData();
         return CreateNavMesh(navData, navDataSize);
     }
 }
 
-void NavigationMesh::SetNavigationDataAttr(PODVector<unsigned char> data)
+void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& data)
 {
+    navigationDataAttr_ = data;
     if (!data.Size())
         return;
     
-    /// \todo Would be preferable not to have to make a copy of the data
+    /// \todo Would be preferable not to have to make a copy of the data, however Recast modifies it when creating the navmesh
     unsigned char* navData = (unsigned char*)dtAlloc(data.Size(), DT_ALLOC_PERM);
-    memcpy(navData, &data[0], data.Size());
+    memcpy(navData, &navigationDataAttr_[0], navigationDataAttr_.Size());
     
     CreateNavMesh(navData, data.Size());
-}
-
-PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
-{
-    PODVector<unsigned char> ret;
-    
-    const dtNavMesh* navMesh = navMesh_;
-    
-    if (navMesh && navMesh->getMaxTiles() > 0)
-    {
-        const dtMeshTile* tile = navMesh->getTile(0);
-        if (tile)
-        {
-            ret.Resize(tile->dataSize);
-            memcpy(&ret[0], tile->data, tile->dataSize);
-        }
-    }
-    
-    return ret;
 }
 
 void NavigationMesh::CollectGeometries(Node* node, Node* baseNode)

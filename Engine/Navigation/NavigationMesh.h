@@ -108,9 +108,9 @@ public:
     bool IsInitialized() const { return navMesh_ != 0; }
     
     /// Set navigation data attribute.
-    void SetNavigationDataAttr(PODVector<unsigned char> data);
+    void SetNavigationDataAttr(const PODVector<unsigned char>& data);
     /// Get navigation data attribute.
-    PODVector<unsigned char> GetNavigationDataAttr() const;
+    const PODVector<unsigned char>& GetNavigationDataAttr() const { return navigationDataAttr_; }
     
 private:
     /// Visit nodes and collect navigable geometry.
@@ -168,6 +168,9 @@ private:
     rcPolyMeshDetail* polyMeshDetail_;
     /// Detour navmesh.
     dtNavMesh* navMesh_;
+    
+    /// Navigation data attribute. Contains the unmodified Recast data.
+    PODVector<unsigned char> navigationDataAttr_;
 };
 
 }
