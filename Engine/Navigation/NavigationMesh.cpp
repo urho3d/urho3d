@@ -36,6 +36,7 @@
 
 #include <DetourNavMesh.h>
 #include <DetourNavMeshBuilder.h>
+#include <DetourNavMeshQuery.h>
 #include <Recast.h>
 
 #include "DebugNew.h"
@@ -55,6 +56,8 @@ static const float DEFAULT_EDGE_MAX_LENGTH = 12.0f;
 static const float DEFAULT_EDGE_MAX_ERROR = 1.3f;
 static const float DEFAULT_DETAIL_SAMPLE_DISTANCE = 6.0f;
 static const float DEFAULT_DETAIL_SAMPLE_MAX_ERROR = 1.0f;
+
+static const int MAX_POLYS = 256;
 
 /// Temporary data for building the Recast navigation mesh.
 struct NavigationBuildData
@@ -124,13 +127,18 @@ NavigationMesh::NavigationMesh(Context* context) :
     edgeMaxError_(DEFAULT_EDGE_MAX_ERROR),
     detailSampleDistance_(DEFAULT_DETAIL_SAMPLE_DISTANCE),
     detailSampleMaxError_(DEFAULT_DETAIL_SAMPLE_MAX_ERROR),
-    navMesh_(0)
+    navMesh_(0),
+    navMeshQuery_(0),
+    queryFilter_(new dtQueryFilter())
 {
 }
 
 NavigationMesh::~NavigationMesh()
 {
     ReleaseNavMesh();
+    
+    delete queryFilter_;
+    queryFilter_ = 0;
 }
 
 void NavigationMesh::RegisterObject(Context* context)
@@ -379,6 +387,14 @@ bool NavigationMesh::Build()
             return false;
         }
         
+        // Set polygon flags.
+        /// \todo Allow to define custom flags
+        for (int i = 0; i < build.polyMesh_->npolys; ++i)
+        {
+            if (build.polyMesh_->areas[i] == RC_WALKABLE_AREA)
+                build.polyMesh_->flags[i] = 0x1;
+        }
+        
         unsigned char* navData = 0;
         int navDataSize = 0;
         
@@ -417,6 +433,46 @@ bool NavigationMesh::Build()
         
         return CreateNavMesh(navData, navDataSize);
     }
+}
+
+void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents)
+{
+    PROFILE(FindPath);
+    
+    dest.Clear();
+    
+    if (!navMesh_ || !navMeshQuery_)
+        return;
+    
+    dtPolyRef startRef;
+    dtPolyRef endRef;
+    navMeshQuery_->findNearestPoly(&start.x_, &extents.x_, queryFilter_, &startRef, 0);
+    navMeshQuery_->findNearestPoly(&end.x_, &extents.x_, queryFilter_, &endRef, 0);
+    
+    if (!startRef || !endRef)
+        return;
+    
+    dtPolyRef polys[MAX_POLYS];
+    dtPolyRef pathPolys[MAX_POLYS];
+    Vector3 pathPoints[MAX_POLYS];
+    unsigned char pathFlags[MAX_POLYS];
+    int numPolys = 0;
+    int numPathPoints = 0;
+    
+    navMeshQuery_->findPath(startRef, endRef, &start.x_, &end.x_, queryFilter_, polys, &numPolys, MAX_POLYS);
+    if (!numPolys)
+        return;
+    
+    Vector3 actualEnd = end;
+    
+    // If full path was not found, clamp end point to the end polygon
+    if (polys[numPolys - 1] != endRef)
+        navMeshQuery_->closestPointOnPoly(polys[numPolys - 1], &end.x_, &actualEnd.x_);
+    
+    navMeshQuery_->findStraightPath(&start.x_, &actualEnd.x_, polys, numPolys, &pathPoints[0].x_, pathFlags, pathPolys, &numPathPoints, MAX_POLYS);
+    
+    for (int i = 0; i < numPathPoints; ++i)
+        dest.Push(pathPoints[i]);
 }
 
 void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& data)
@@ -552,6 +608,22 @@ bool NavigationMesh::CreateNavMesh(unsigned char* navData, unsigned navDataSize)
         return false;
     }
     
+    navMeshQuery_ = dtAllocNavMeshQuery();
+    if (!navMeshQuery_)
+    {
+        LOGERROR("Could not create Detour navmesh query");
+        ReleaseNavMesh();
+        return false;
+    }
+    
+    status = navMeshQuery_->init(navMesh_, 2048);
+    if (dtStatusFailed(status))
+    {
+        LOGERROR("Could not init navmesh query");
+        ReleaseNavMesh();
+        return false;
+    }
+    
     LOGDEBUG("Created Detour navmesh, data size " + String(navDataSize) + " bytes");
     return true;
 }
@@ -560,6 +632,9 @@ void NavigationMesh::ReleaseNavMesh()
 {
     dtFreeNavMesh(navMesh_);
     navMesh_ = 0;
+    
+    dtFreeNavMeshQuery(navMeshQuery_);
+    navMeshQuery_ = 0;
 }
 
 }

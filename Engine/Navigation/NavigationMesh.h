@@ -26,14 +26,9 @@
 #include "BoundingBox.h"
 #include "Component.h"
 
-class rcContext;
 class dtNavMesh;
-
-struct rcHeightfield;
-struct rcCompactHeightfield;
-struct rcContourSet;
-struct rcPolyMesh;
-struct rcPolyMeshDetail;
+class dtNavMeshQuery;
+class dtQueryFilter;
 
 namespace Urho3D
 {
@@ -84,6 +79,8 @@ public:
     void SetDetailSampleMaxError(float error);
     /// Rebuild the navigation data. Return true if successful.
     bool Build();
+    /// Find a path. Return non-empty list of points if successful.
+    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     
     /// Return cell size.
     float GetCellSize() const { return cellSize_; }
@@ -153,6 +150,10 @@ private:
     float detailSampleMaxError_;
     /// Detour navmesh.
     dtNavMesh* navMesh_;
+    /// Detour navmesh query.
+    dtNavMeshQuery* navMeshQuery_;
+    /// Detour navmesh query filter.
+    dtQueryFilter* queryFilter_;
     /// Navigation data attribute. Contains the unmodified Recast data.
     PODVector<unsigned char> navigationDataAttr_;
 };

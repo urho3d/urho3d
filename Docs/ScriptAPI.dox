@@ -5393,6 +5393,7 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - bool Build()
+- Vector3[]@ FindPath(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
 
 Properties:<br>
 - ShortStringHash type (readonly)
