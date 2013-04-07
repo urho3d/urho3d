@@ -77,8 +77,10 @@ public:
     void SetDetailSampleDistance(float distance);
     /// Set detail sampling maximum error.
     void SetDetailSampleMaxError(float error);
+    /// Rebuild the navigation data. Return true if successful.
+    bool Build();
     
-    /// Retun cell size.
+    /// Return cell size.
     float GetCellSize() const { return cellSize_; }
     /// Return cell height.
     float GetCellHeight() const { return cellHeight_; }
@@ -102,17 +104,21 @@ public:
     float GetDetailSampleDistance() const { return detailSampleDistance_; }
     /// Return detail sampling maximum error.
     float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
-    /// Return the world bounding box.
-    const BoundingBox& GetWorldBoundingBox() const { return worldBoundingBox_; }
+    /// Return whether has been initialized with valid navigation data.
+    bool IsInitialized() const { return navMesh_ != 0; }
     
-    /// Build/rebuild the navigation mesh. Return true if successful.
-    bool Build();
+    /// Set navigation data attribute.
+    void SetNavigationDataAttr(PODVector<unsigned char> data);
+    /// Get navigation data attribute.
+    PODVector<unsigned char> GetNavigationDataAttr() const;
     
 private:
     /// Visit nodes and collect navigable geometry.
     void CollectGeometries(Node* node, Node* baseNode);
     /// Add a geometry to the mesh.
     void AddGeometry(Node* node, Geometry* geometry);
+    /// Create Detour navmesh. Return true if successful.
+    bool CreateNavMesh(unsigned char* navData, unsigned navDataSize);
     /// Release Recast temporary data.
     void ReleaseBuildData();
     /// Release the Detour navmesh.
@@ -142,14 +148,12 @@ private:
     float detailSampleDistance_;
     /// Detail sampling maximum error.
     float detailSampleMaxError_;
-    
     /// World-space bounding box of the navigation mesh.
     BoundingBox worldBoundingBox_;
     /// Build phase vertices.
     PODVector<Vector3> vertices_;
     /// Build phase triangle indices.
     PODVector<int> indices_;
-    
     /// Recast context.
     rcContext* ctx_;
     /// Recast heightfield.

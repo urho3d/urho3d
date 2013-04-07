@@ -103,6 +103,7 @@ void NavigationMesh::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Edge Max Error", GetEdgeMaxError, SetEdgeMaxError, float, DEFAULT_EDGE_MAX_ERROR, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Detail Sample Distance", GetDetailSampleDistance, SetDetailSampleDistance, float, DEFAULT_DETAIL_SAMPLE_DISTANCE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Detail Sample Max Error", GetDetailSampleMaxError, SetDetailSampleMaxError, float, DEFAULT_DETAIL_SAMPLE_MAX_ERROR, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_BUFFER, "Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
 }
 
 void NavigationMesh::SetCellSize(float size)
@@ -348,31 +349,40 @@ bool NavigationMesh::Build()
             return false;
         }
         
-        LOGDEBUG("Navmesh data size " + String(navDataSize) + " bytes");
-        
-        navMesh_ = dtAllocNavMesh();
-        if (!navMesh_)
+        ReleaseBuildData();
+        return CreateNavMesh(navData, navDataSize);
+    }
+}
+
+void NavigationMesh::SetNavigationDataAttr(PODVector<unsigned char> data)
+{
+    if (!data.Size())
+        return;
+    
+    /// \todo Would be preferable not to have to make a copy of the data
+    unsigned char* navData = (unsigned char*)dtAlloc(data.Size(), DT_ALLOC_PERM);
+    memcpy(navData, &data[0], data.Size());
+    
+    CreateNavMesh(navData, data.Size());
+}
+
+PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
+{
+    PODVector<unsigned char> ret;
+    
+    const dtNavMesh* navMesh = navMesh_;
+    
+    if (navMesh && navMesh->getMaxTiles() > 0)
+    {
+        const dtMeshTile* tile = navMesh->getTile(0);
+        if (tile)
         {
-            LOGERROR("Could not create Detour navmesh");
-            dtFree(navData);
-            ReleaseBuildData();
-            return false;
-        }
-        
-        dtStatus status;
-        
-        status = navMesh_->init(navData, navDataSize, DT_TILE_FREE_DATA);
-        if (dtStatusFailed(status))
-        {
-            LOGERROR("Could not init Detour navmesh");
-            dtFree(navData);
-            ReleaseBuildData();
-            return false;
+            ret.Resize(tile->dataSize);
+            memcpy(&ret[0], tile->data, tile->dataSize);
         }
     }
     
-    ReleaseBuildData();
-    return true;
+    return ret;
 }
 
 void NavigationMesh::CollectGeometries(Node* node, Node* baseNode)
@@ -388,6 +398,9 @@ void NavigationMesh::CollectGeometries(Node* node, Node* baseNode)
     {
         /// \todo Evaluate whether should handle other types. Now StaticModel & TerrainPatch are supported, others skipped
         Drawable* drawable = drawables[i];
+        if (!drawable->IsEnabledEffective())
+            continue;
+        
         unsigned numGeometries = drawable->GetBatches().Size();
         unsigned lodLevel;
         if (drawable->GetType() == StaticModel::GetTypeStatic())
@@ -469,6 +482,33 @@ void NavigationMesh::AddGeometry(Node* node, Geometry* geometry)
     }
 }
 
+bool NavigationMesh::CreateNavMesh(unsigned char* navData, unsigned navDataSize)
+{
+    ReleaseNavMesh();
+    
+    navMesh_ = dtAllocNavMesh();
+    if (!navMesh_)
+    {
+        LOGERROR("Could not create Detour navmesh");
+        dtFree(navData);
+        return false;
+    }
+    
+    dtStatus status;
+    
+    status = navMesh_->init(navData, navDataSize, DT_TILE_FREE_DATA);
+    if (dtStatusFailed(status))
+    {
+        LOGERROR("Could not init Detour navmesh");
+        ReleaseNavMesh();
+        dtFree(navData);
+        return false;
+    }
+    
+    LOGDEBUG("Created Detour navmesh, data size " + String(navDataSize) + " bytes");
+    return true;
+}
+
 void NavigationMesh::ReleaseBuildData()
 {
     delete(ctx_);
@@ -502,6 +542,5 @@ void NavigationMesh::ReleaseNavMesh()
     dtFreeNavMesh(navMesh_);
     navMesh_ = 0;
 }
-
 
 }

@@ -664,6 +664,8 @@ bool SceneSelectAll()
 
 bool SceneRebuildNavigation()
 {
+    ui.cursor.shape = CS_BUSY;
+
     Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh");
     bool success = true;
     for (uint i = 0; i < navMeshes.length; ++i)

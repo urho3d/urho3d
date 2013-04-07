@@ -61,7 +61,7 @@ void RegisterNavigationMesh(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NavigationMesh", "float get_detailSampleDistance() const", asMETHOD(NavigationMesh, GetDetailSampleDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "void set_detailSampleMaxError(float)", asMETHOD(NavigationMesh, SetDetailSampleMaxError), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "float get_detailSampleMaxError() const", asMETHOD(NavigationMesh, GetDetailSampleMaxError), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavigationMesh", "const BoundingBox& get_worldBoundingBox()", asMETHOD(NavigationMesh, GetWorldBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "bool get_initialized() const", asMETHOD(NavigationMesh, IsInitialized), asCALL_THISCALL);
 }
 
 void RegisterNavigationAPI(asIScriptEngine* engine)
