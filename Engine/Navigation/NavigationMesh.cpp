@@ -263,8 +263,12 @@ bool NavigationMesh::Build()
         PODVector<Navigable*> navigables;
         node_->GetComponents<Navigable>(navigables, true);
         
+        HashSet<Node*> processedNodes;
         for (unsigned i = 0; i < navigables.Size(); ++i)
-            CollectGeometries(build, navigables[i]->GetNode(), navigables[i]->GetNode());
+        {
+            if (navigables[i]->IsEnabledEffective())
+                CollectGeometries(build, navigables[i]->GetNode(), processedNodes, navigables[i]->IsRecursive());
+        }
         
         LOGDEBUG("Navigation mesh has " + String(build.vertices_.Size()) + " vertices and " + String(build.indices_.Size()) +
             " indices");
@@ -488,11 +492,12 @@ void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& data)
     CreateNavMesh(navData, data.Size());
 }
 
-void NavigationMesh::CollectGeometries(NavigationBuildData& build, Node* node, Node* baseNode)
+void NavigationMesh::CollectGeometries(NavigationBuildData& build, Node* node, HashSet<Node*>& processedNodes, bool recursive)
 {
-    // If find a navigable from a child node that's not the current base node, abort so we're not going to add the geometry twice
-    if (node != baseNode && node->HasComponent<Navigable>())
+    // Make sure nodes are not included twice
+    if (processedNodes.Contains(node))
         return;
+    processedNodes.Insert(node);
     
     /// \todo Prefer physics geometry if available
     PODVector<Drawable*> drawables;
@@ -517,9 +522,12 @@ void NavigationMesh::CollectGeometries(NavigationBuildData& build, Node* node, N
             AddGeometry(build, node, drawable->GetLodGeometry(j, lodLevel));
     }
     
-    const Vector<SharedPtr<Node> >& children = node->GetChildren();
-    for(unsigned i = 0; i < children.Size(); ++i)
-        CollectGeometries(build, children[i], baseNode);
+    if (recursive)
+    {
+        const Vector<SharedPtr<Node> >& children = node->GetChildren();
+        for(unsigned i = 0; i < children.Size(); ++i)
+            CollectGeometries(build, children[i], processedNodes, recursive);
+    }
 }
 
 void NavigationMesh::AddGeometry(NavigationBuildData& build, Node* node, Geometry* geometry)

@@ -116,7 +116,7 @@ public:
     
 private:
     /// Visit nodes and collect navigable geometry.
-    void CollectGeometries(NavigationBuildData& build, Node* node, Node* baseNode);
+    void CollectGeometries(NavigationBuildData& build, Node* node, HashSet<Node*>& processedNodes, bool recursive);
     /// Add a geometry to the mesh.
     void AddGeometry(NavigationBuildData& build, Node* node, Geometry* geometry);
     /// Create Detour navmesh. Return true if successful.

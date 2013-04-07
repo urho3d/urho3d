@@ -93,7 +93,7 @@ The scripting language used is AngelScript (http://www.angelcode.com/angelscript
 
 On Android and iOS there are no command line options, so running the NinjaSnowWar example is hardcoded. This can be changed from the file Urho3D/Urho3D.cpp.
 
-Currently nine example application scripts exist:
+Currently ten example application scripts exist:
 
 \section Running_NinjaSnowWar NinjaSnowWar
 
@@ -151,6 +151,15 @@ For details on how to use the editor, see \ref EditorInstructions "Editor instru
 
 \verbatim
 L           Toggle buoyant liquid volume
+\endverbatim
+
+\section Running_Navigation Navigation
+
+A test of navigation mesh generation and path queries. Generates the same static scene as TestScene. To start, run Navigation.bat in the Bin directory, or use the command Urho3D.exe Scripts\Navigation.as. Controls are like in TestScene, except:
+
+\verbatim
+Left mouse  Set path query end point
+Shift+LMB   Set path query start point
 \endverbatim
 
 \section Running_Physics Physics

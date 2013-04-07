@@ -31,6 +31,8 @@ namespace Urho3D
 void RegisterNavigable(asIScriptEngine* engine)
 {
     RegisterComponent<Navigable>(engine, "Navigable");
+    engine->RegisterObjectMethod("Navigable", "void set_recursive(bool)", asMETHOD(Navigable, SetRecursive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Navigable", "bool get_recursive() const", asMETHOD(Navigable, IsRecursive), asCALL_THISCALL);
 }
 
 static CScriptArray* NavigationMeshFindPath(const Vector3& start, const Vector3& end, const Vector3& extents, NavigationMesh* ptr)

@@ -11,7 +11,6 @@ NavigationMesh@ navMesh;
 Vector3 startPos;
 Vector3 endPos;
 
-bool setStartPos = true;
 bool startPosSet = false;
 bool endPosSet = false;
 
@@ -44,6 +43,7 @@ void InitConsole()
     engine.CreateDebugHud();
     debugHud.style = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
+    debugHud.SetAppStats("Instructions:", "Shift+LMB to set startpoint, LMB to set endpoint");
 
     engine.CreateConsole();
     console.style = uiStyle;
@@ -290,13 +290,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
         if (key == KEY_F5)
         {
-            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/TestScene.xml", FILE_WRITE);
+            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Navigation.xml", FILE_WRITE);
             testScene.SaveXML(xmlFile);
         }
 
         if (key == KEY_F7)
         {
-            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/TestScene.xml", FILE_READ);
+            File@ xmlFile = File(fileSystem.programDir + "Data/Scenes/Navigation.xml", FILE_READ);
             if (xmlFile.open)
                 testScene.LoadXML(xmlFile);
         }
@@ -328,10 +328,11 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
     if (button == MOUSEB_LEFT && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
     {
+        bool setStartPos = input.qualifierDown[QUAL_SHIFT];
         IntVector2 pos = ui.cursorPosition;
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
-        RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
-    
+        RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 1000.0, DRAWABLE_GEOMETRY);
+
         if (result.drawable !is null)
         {
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
@@ -345,8 +346,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                 endPos = rayHitPos;
                 endPosSet = true;
             }
-            setStartPos = !setStartPos;
-            
+
             if (startPosSet && endPosSet)
                 path = navMesh.FindPath(startPos, endPos);
         }
@@ -370,13 +370,13 @@ void HandlePostRenderUpdate()
     if (drawDebug == 2)
         testScene.physicsWorld.DrawDebugGeometry(true);
     if (drawDebug == 3)
-        navMesh.DrawDebugGeometry(testScene.debugRenderer, false);
+        navMesh.DrawDebugGeometry(testScene.debugRenderer, true);
 
     IntVector2 pos = ui.cursorPosition;
     if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
     {
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
-        RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
+        RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 1000.0, DRAWABLE_GEOMETRY);
         if (result.drawable !is null)
         {
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;

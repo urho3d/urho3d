@@ -32,7 +32,8 @@ namespace Urho3D
 OBJECTTYPESTATIC(Navigable);
 
 Navigable::Navigable(Context* context) :
-    Component(context)
+    Component(context),
+    recursive_(true)
 {
 }
 
@@ -43,6 +44,13 @@ Navigable::~Navigable()
 void Navigable::RegisterObject(Context* context)
 {
     context->RegisterFactory<Navigable>();
+    
+    ATTRIBUTE(Navigable, VAR_BOOL, "Recursive", recursive_, true, AM_DEFAULT);
+}
+
+void Navigable::SetRecursive(bool enable)
+{
+    recursive_ = enable;
 }
 
 }
