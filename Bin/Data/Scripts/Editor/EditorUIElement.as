@@ -220,7 +220,22 @@ void LoadChildUIElement(const String&in fileName)
 
 void SaveChildUIElement(const String&in fileName)
 {
-    // TODO
+    if (fileName.empty)
+        return;
+
+    ui.cursor.shape = CS_BUSY;
+
+    File file(fileName, FILE_WRITE);
+    if (!file.open)
+        return;
+
+    XMLFile@ elementData = XMLFile();
+    XMLElement rootElem = elementData.CreateRoot("element");
+    // Need another nested element tag otherwise the LoadXML() does not work as expected
+    XMLElement childElem = rootElem.CreateChild("element");
+    editUIElement.SaveXML(childElem);
+    FilterInternalVars(childElem);
+    elementData.Save(file);
 }
 
 void SetUIElementDefaultStyle(const String&in fileName)
@@ -243,6 +258,38 @@ void SetUIElementDefaultStyle(const String&in fileName)
 
     uiElementDefaultStyle = XMLFile();
     uiElementDefaultStyle.Load(file);
+}
+
+void FilterInternalVars(XMLElement source)
+{
+    // Remove var that does not have its key registered in the 'attribute' tag
+    XMLElement childElem = source.GetChild("attribute");
+    while (childElem.notNull)
+    {
+        if (childElem.GetAttribute("name") == "Variables")
+        {
+            XMLElement variantElem = childElem.GetChild("variant");
+            while (variantElem.notNull)
+            {
+                XMLElement nextVariantElem = childElem.GetNext("variant");
+
+                // If variable name is empty then it is an internal variable
+                if (scene.GetVarName(variantElem.GetUInt("hash")).empty)
+                    childElem.RemoveChild(variantElem);
+
+                variantElem = nextVariantElem;
+            }
+        }
+        childElem = childElem.GetNext("attribute");
+    }
+
+    // Perform the action recursively for each 'element' tag
+    childElem = source.GetChild("element");
+    while (childElem.notNull)
+    {
+        FilterInternalVars(childElem);
+        childElem = childElem.GetNext("element");
+    }
 }
 
 bool UIElementCut()

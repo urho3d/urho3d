@@ -233,12 +233,11 @@ void CreateComponent(const String&in componentType)
         }
     }
 
-    // Although the edit nodes selection are not changed, call to ensure attribute inspector notices new components of the edit nodes   
-    HandleHierarchyListSelectionChange();
-
     SaveEditActionGroup(group);
-
     SetSceneModified();
+
+    // Although the edit nodes selection are not changed, call to ensure attribute inspector notices new components of the edit nodes
+    HandleHierarchyListSelectionChange();
 }
 
 void LoadNode(const String&in fileName)
@@ -285,25 +284,22 @@ void LoadNode(const String&in fileName)
 
 void SaveNode(const String&in fileName)
 {
-    if (fileName.empty || GetFileName(fileName).empty)
+    if (fileName.empty)
         return;
 
     ui.cursor.shape = CS_BUSY;
 
-    if (selectedNodes.length == 1)
-    {
-        File file(fileName, FILE_WRITE);
-        if (!file.open)
-            return;
+    File file(fileName, FILE_WRITE);
+    if (!file.open)
+        return;
 
-        String extension = GetExtension(fileName);
-        if (extension != ".xml")
-            selectedNodes[0].Save(file);
-        else
-            selectedNodes[0].SaveXML(file);
+    String extension = GetExtension(fileName);
+    if (extension != ".xml")
+        editNode.Save(file);
+    else
+        editNode.SaveXML(file);
 
-        instantiateFileName = fileName;
-    }
+    instantiateFileName = fileName;
 }
 
 void UpdateScene(float timeStep)

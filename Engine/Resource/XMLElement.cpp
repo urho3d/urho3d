@@ -73,7 +73,7 @@ XMLElement XMLElement::CreateChild(const char* name)
 
 bool XMLElement::RemoveChild(const XMLElement& element)
 {
-    if (!file_ || !node_ || element.node_)
+    if (!file_ || !node_ || !element.node_)
         return false;
 
     pugi::xml_node node(node_);

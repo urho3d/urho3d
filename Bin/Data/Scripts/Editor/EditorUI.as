@@ -292,7 +292,7 @@ bool PickFile()
     }
     else if (action == "Save node as...")
     {
-        if (selectedNodes.length == 1 && selectedNodes[0] !is editorScene)
+        if (editNode !is null && editNode !is editorScene)
         {
             CreateFileSelector("Save node", "Save", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
             uiFileSelector.fileName = GetFileNameAndExtension(instantiateFileName);
