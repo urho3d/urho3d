@@ -44,6 +44,7 @@
 namespace Urho3D
 {
 
+static const int DEFAULT_TILE_SIZE = 128;
 static const float DEFAULT_CELL_SIZE = 0.3f;
 static const float DEFAULT_CELL_HEIGHT = 0.2f;
 static const float DEFAULT_AGENT_HEIGHT = 2.0f;
@@ -57,9 +58,9 @@ static const float DEFAULT_EDGE_MAX_ERROR = 1.3f;
 static const float DEFAULT_DETAIL_SAMPLE_DISTANCE = 6.0f;
 static const float DEFAULT_DETAIL_SAMPLE_MAX_ERROR = 1.0f;
 
-static const int MAX_POLYS = 256;
+static const int MAX_POLYS = 2048;
 
-/// Temporary data for building the Recast navigation mesh.
+/// Temporary data for building one tile of the navigation mesh
 struct NavigationBuildData
 {
     /// Construct.
@@ -91,11 +92,11 @@ struct NavigationBuildData
         polyMeshDetail_ = 0;
     }
     
-    /// World-space bounding box of the navigation mesh.
+    /// World-space bounding box of the navigation mesh tile.
     BoundingBox worldBoundingBox_;
-    /// Build phase vertices.
+    /// Vertices from geometries.
     PODVector<Vector3> vertices_;
-    /// Build phase triangle indices.
+    /// Triangle indices from geometries.
     PODVector<int> indices_;
     /// Recast context.
     rcContext* ctx_;
@@ -111,10 +112,24 @@ struct NavigationBuildData
     rcPolyMeshDetail* polyMeshDetail_;
 };
 
+/// Temporary data for finding a path.
+struct FindPathData
+{
+    // Polygons.
+    dtPolyRef polys_[MAX_POLYS];
+    // Polygons on the path.
+    dtPolyRef pathPolys_[MAX_POLYS];
+    // Points on the path.
+    Vector3 pathPoints_[MAX_POLYS];
+    // Flags on the path.
+    unsigned char pathFlags_[MAX_POLYS];
+};
+
 OBJECTTYPESTATIC(NavigationMesh);
 
 NavigationMesh::NavigationMesh(Context* context) :
     Component(context),
+    tileSize_(DEFAULT_TILE_SIZE),
     cellSize_(DEFAULT_CELL_SIZE),
     cellHeight_(DEFAULT_CELL_HEIGHT),
     agentHeight_(DEFAULT_AGENT_HEIGHT),
@@ -127,9 +142,12 @@ NavigationMesh::NavigationMesh(Context* context) :
     edgeMaxError_(DEFAULT_EDGE_MAX_ERROR),
     detailSampleDistance_(DEFAULT_DETAIL_SAMPLE_DISTANCE),
     detailSampleMaxError_(DEFAULT_DETAIL_SAMPLE_MAX_ERROR),
+    numTilesX_(0),
+    numTilesZ_(0),
     navMesh_(0),
     navMeshQuery_(0),
-    queryFilter_(new dtQueryFilter())
+    queryFilter_(new dtQueryFilter()),
+    pathData_(new FindPathData())
 {
 }
 
@@ -139,12 +157,16 @@ NavigationMesh::~NavigationMesh()
     
     delete queryFilter_;
     queryFilter_ = 0;
+    
+    delete pathData_;
+    pathData_ = 0;
 }
 
 void NavigationMesh::RegisterObject(Context* context)
 {
     context->RegisterFactory<NavigationMesh>();
     
+    ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_INT, "Tile Size", GetTileSize, SetTileSize, int, DEFAULT_TILE_SIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Cell Size", GetCellSize, SetCellSize, float, DEFAULT_CELL_SIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Cell Height", GetCellHeight, SetCellHeight, float, DEFAULT_CELL_HEIGHT, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Agent Height", GetAgentHeight, SetAgentHeight, float, DEFAULT_AGENT_HEIGHT, AM_DEFAULT);
@@ -165,26 +187,38 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     if (!navMesh_ || !node_)
         return;
     
-    const dtNavMesh* navMesh = navMesh_;
-    const dtMeshTile* tile = navMesh->getTile(0);
-    if (!tile)
-        return;
-    
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     
-    for (int i = 0; i < tile->header->polyCount; ++i)
+    const dtNavMesh* navMesh = navMesh_;
+    
+    for (int z = 0; z < numTilesZ_; ++z)
     {
-        dtPoly* poly = tile->polys + i;
-        for (unsigned j = 0; j < poly->vertCount; ++j)
+        for (int x = 0; x < numTilesX_; ++x)
         {
-            debug->AddLine(
-                worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
-                worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
-                Color::YELLOW,
-                depthTest
-            );
+            const dtMeshTile* tile = navMesh->getTileAt(x, z, 0);
+            if (!tile)
+                continue;
+            
+            for (int i = 0; i < tile->header->polyCount; ++i)
+            {
+                dtPoly* poly = tile->polys + i;
+                for (unsigned j = 0; j < poly->vertCount; ++j)
+                {
+                    debug->AddLine(
+                        worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
+                        worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
+                        Color::YELLOW,
+                        depthTest
+                    );
+                }
+            }
         }
     }
+}
+
+void NavigationMesh::SetTileSize(int size)
+{
+    tileSize_ = Max(size, 16);
 }
 
 void NavigationMesh::SetCellSize(float size)
@@ -259,10 +293,12 @@ bool NavigationMesh::Build()
     if (!node_->GetWorldScale().Equals(Vector3::ONE))
         LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
     
-    NavigationBuildData build;
+    BoundingBox combinedBoundingBox;
+    Vector<GeometryInfo> geometryList;
     
     {
         PROFILE(CollectNavigationGeometry);
+        
         // Get Navigable components from child nodes, not from whole scene. This makes it theoretically possible to partition
         // the scene into several navigation meshes
         PODVector<Navigable*> navigables;
@@ -272,175 +308,288 @@ bool NavigationMesh::Build()
         for (unsigned i = 0; i < navigables.Size(); ++i)
         {
             if (navigables[i]->IsEnabledEffective())
-                CollectGeometries(build, navigables[i]->GetNode(), processedNodes, navigables[i]->IsRecursive());
+                CollectGeometries(geometryList, navigables[i]->GetNode(), processedNodes, navigables[i]->IsRecursive());
         }
-        
-        LOGDEBUG("Navigation mesh has " + String(build.vertices_.Size()) + " vertices and " + String(build.indices_.Size()) +
-            " indices");
     }
     
-    if (!build.vertices_.Size() || !build.indices_.Size())
+    if (geometryList.Empty())
         return true; // Nothing to do
     
+    // Build the combined bounding box
+    for (unsigned i = 0; i < geometryList.Size(); ++i)
+        combinedBoundingBox.Merge(geometryList[i].boundingBox_);
+    
     {
-        PROFILE(ProcessNavigationGeometry);
+        PROFILE(BuildNavigationMesh);
         
-        rcConfig cfg;
-        memset(&cfg, 0, sizeof cfg);
-        cfg.cs = cellSize_;
-        cfg.ch = cellHeight_;
-        cfg.walkableSlopeAngle = agentMaxSlope_;
-        cfg.walkableHeight = (int)ceilf(agentHeight_ / cfg.ch);
-        cfg.walkableClimb = (int)floorf(agentMaxClimb_ / cfg.ch);
-        cfg.walkableRadius = (int)ceilf(agentRadius_ / cfg.cs);
-        cfg.maxEdgeLen = (int)(edgeMaxLength_ / cellSize_);
-        cfg.maxSimplificationError = edgeMaxError_;
-        cfg.minRegionArea = (int)sqrtf(regionMinSize_);
-        cfg.mergeRegionArea = (int)sqrtf(regionMergeSize_);
-        cfg.maxVertsPerPoly = 6;
-        cfg.detailSampleDist = detailSampleDistance_ < 0.9f ? 0.0f : cellSize_ * detailSampleDistance_;
-        cfg.detailSampleMaxError = cellHeight_ * detailSampleMaxError_;
+        // Calculate number of tiles
+        int gridW = 0, gridH = 0;
+        float tileEdgeLength = (float)tileSize_ * cellSize_;
+        rcCalcGridSize(&combinedBoundingBox.min_.x_, &combinedBoundingBox.max_.x_, cellSize_, &gridW, &gridH);
+        numTilesX_ = (gridW + tileSize_ - 1) / tileSize_;
+        numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
         
-        rcVcopy(cfg.bmin, &build.worldBoundingBox_.min_.x_);
-        rcVcopy(cfg.bmax, &build.worldBoundingBox_.max_.x_);
-        rcCalcGridSize(cfg.bmin, cfg.bmax, cfg.cs, &cfg.width, &cfg.height);
-        
-        build.heightField_ = rcAllocHeightfield();
-        if (!build.heightField_)
+        // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
+        unsigned maxTiles = NextPowerOfTwo(numTilesX_ * numTilesZ_);
+        unsigned tileBits = 0;
+        unsigned temp = maxTiles;
+        while (temp > 1)
         {
-            LOGERROR("Could not allocate heightfield");
+            temp >>= 1;
+            ++tileBits;
+        }
+        
+        unsigned maxPolys = 1 << (22 - tileBits);
+        
+        dtNavMeshParams params;
+        rcVcopy(params.orig, &combinedBoundingBox.min_.x_);
+        params.tileWidth = tileEdgeLength;
+        params.tileHeight = tileEdgeLength;
+        params.maxTiles = maxTiles;
+        params.maxPolys = maxPolys;
+        
+        navigationDataAttr_.Clear();
+        navigationDataAttr_.WriteBoundingBox(combinedBoundingBox);
+        navigationDataAttr_.WriteFloat(params.tileWidth);
+        navigationDataAttr_.WriteFloat(params.tileHeight);
+        navigationDataAttr_.WriteInt(maxTiles);
+        navigationDataAttr_.WriteInt(maxPolys);
+        navigationDataAttr_.WriteInt(numTilesX_);
+        navigationDataAttr_.WriteInt(numTilesZ_);
+        
+        navMesh_ = dtAllocNavMesh();
+        if (!navMesh_)
+        {
+            LOGERROR("Could not allocate navigation mesh");
             return false;
         }
         
-        if (!rcCreateHeightfield(build.ctx_, *build.heightField_, cfg.width, cfg.height, cfg.bmin, cfg.bmax, cfg.cs, cfg.ch))
+        if (dtStatusFailed(navMesh_->init(&params)))
         {
-            LOGERROR("Could not create heightfield");
+            LOGERROR("Could not initialize navigation mesh");
+            ReleaseNavMesh();
             return false;
         }
         
-        unsigned numTriangles = build.indices_.Size() / 3;
-        SharedArrayPtr<unsigned char> triAreas(new unsigned char[numTriangles]);
-        memset(triAreas.Get(), 0, numTriangles);
+        // Build each tile
+        unsigned numTiles = 0;
         
-        rcMarkWalkableTriangles(build.ctx_, cfg.walkableSlopeAngle, &build.vertices_[0].x_, build.vertices_.Size(),
-            &build.indices_[0], numTriangles, triAreas.Get());
-        rcRasterizeTriangles(build.ctx_, &build.vertices_[0].x_, build.vertices_.Size(), &build.indices_[0],
-            triAreas.Get(), numTriangles, *build.heightField_, cfg.walkableClimb);
-        rcFilterLowHangingWalkableObstacles(build.ctx_, cfg.walkableClimb, *build.heightField_);
-        rcFilterLedgeSpans(build.ctx_, cfg.walkableHeight, cfg.walkableClimb, *build.heightField_);
-        rcFilterWalkableLowHeightSpans(build.ctx_, cfg.walkableHeight, *build.heightField_);
+        for (int z = 0; z < numTilesZ_; ++z)
+        {
+            for (int x = 0; x < numTilesX_; ++x)
+            {
+                PROFILE(BuildNavigationMeshTile);
+                
+                BoundingBox tileBoundingBox(Vector3(
+                    combinedBoundingBox.min_.x_ + tileEdgeLength * (float)x,
+                    combinedBoundingBox.min_.y_,
+                    combinedBoundingBox.min_.z_ + tileEdgeLength * (float)z
+                ),
+                Vector3(
+                    combinedBoundingBox.min_.x_ + tileEdgeLength * (float)(x + 1),
+                    combinedBoundingBox.max_.y_,
+                    combinedBoundingBox.min_.z_ + tileEdgeLength * (float)(z + 1)
+                ));
+                
+                NavigationBuildData build;
+                
+                rcConfig cfg;
+                memset(&cfg, 0, sizeof cfg);
+                cfg.cs = cellSize_;
+                cfg.ch = cellHeight_;
+                cfg.walkableSlopeAngle = agentMaxSlope_;
+                cfg.walkableHeight = (int)ceilf(agentHeight_ / cfg.ch);
+                cfg.walkableClimb = (int)floorf(agentMaxClimb_ / cfg.ch);
+                cfg.walkableRadius = (int)ceilf(agentRadius_ / cfg.cs);
+                cfg.maxEdgeLen = (int)(edgeMaxLength_ / cellSize_);
+                cfg.maxSimplificationError = edgeMaxError_;
+                cfg.minRegionArea = (int)sqrtf(regionMinSize_);
+                cfg.mergeRegionArea = (int)sqrtf(regionMergeSize_);
+                cfg.maxVertsPerPoly = 6;
+                cfg.tileSize = tileSize_;
+                cfg.borderSize = cfg.walkableRadius + 3; // Add padding
+                cfg.width = cfg.tileSize + cfg.borderSize * 2;
+                cfg.height = cfg.tileSize + cfg.borderSize * 2;
+                cfg.detailSampleDist = detailSampleDistance_ < 0.9f ? 0.0f : cellSize_ * detailSampleDistance_;
+                cfg.detailSampleMaxError = cellHeight_ * detailSampleMaxError_;
+                
+                rcVcopy(cfg.bmin, &tileBoundingBox.min_.x_);
+                rcVcopy(cfg.bmax, &tileBoundingBox.max_.x_);
+                cfg.bmin[0] -= cfg.borderSize * cfg.cs;
+                cfg.bmin[2] -= cfg.borderSize * cfg.cs;
+                cfg.bmax[0] += cfg.borderSize * cfg.cs;
+                cfg.bmax[2] += cfg.borderSize * cfg.cs;
+                
+                BoundingBox expandedBox(*reinterpret_cast<Vector3*>(cfg.bmin), *reinterpret_cast<Vector3*>(cfg.bmax));
+                GetTileGeometry(build, geometryList, expandedBox);
+                
+                build.heightField_ = rcAllocHeightfield();
+                if (!build.heightField_)
+                {
+                    LOGERROR("Could not allocate heightfield");
+                    continue;
+                }
+                
+                if (!rcCreateHeightfield(build.ctx_, *build.heightField_, cfg.width, cfg.height, cfg.bmin, cfg.bmax, cfg.cs,
+                    cfg.ch))
+                {
+                    LOGERROR("Could not create heightfield");
+                    continue;
+                }
+                
+                unsigned numTriangles = build.indices_.Size() / 3;
+                SharedArrayPtr<unsigned char> triAreas(new unsigned char[numTriangles]);
+                memset(triAreas.Get(), 0, numTriangles);
+                
+                rcMarkWalkableTriangles(build.ctx_, cfg.walkableSlopeAngle, &build.vertices_[0].x_, build.vertices_.Size(),
+                    &build.indices_[0], numTriangles, triAreas.Get());
+                rcRasterizeTriangles(build.ctx_, &build.vertices_[0].x_, build.vertices_.Size(), &build.indices_[0],
+                    triAreas.Get(), numTriangles, *build.heightField_, cfg.walkableClimb);
+                rcFilterLowHangingWalkableObstacles(build.ctx_, cfg.walkableClimb, *build.heightField_);
+                rcFilterLedgeSpans(build.ctx_, cfg.walkableHeight, cfg.walkableClimb, *build.heightField_);
+                rcFilterWalkableLowHeightSpans(build.ctx_, cfg.walkableHeight, *build.heightField_);
+                
+                build.compactHeightField_ = rcAllocCompactHeightfield();
+                if (!build.compactHeightField_)
+                {
+                    LOGERROR("Could not allocate create compact heightfield");
+                    continue;
+                }
+                if (!rcBuildCompactHeightfield(build.ctx_, cfg.walkableHeight, cfg.walkableClimb, *build.heightField_,
+                    *build.compactHeightField_))
+                {
+                    LOGERROR("Could not build compact heightfield");
+                    continue;
+                }
+                if (!rcErodeWalkableArea(build.ctx_, cfg.walkableRadius, *build.compactHeightField_))
+                {
+                    LOGERROR("Could not erode compact heightfield");
+                    continue;
+                }
+                if (!rcBuildDistanceField(build.ctx_, *build.compactHeightField_))
+                {
+                    LOGERROR("Could not build distance field");
+                    continue;
+                }
+                if (!rcBuildRegions(build.ctx_, *build.compactHeightField_, cfg.borderSize, cfg.minRegionArea,
+                    cfg.mergeRegionArea))
+                {
+                    LOGERROR("Could not build regions");
+                    continue;
+                }
+                
+                build.contourSet_ = rcAllocContourSet();
+                if (!build.contourSet_)
+                {
+                    LOGERROR("Could not allocate contour set");
+                    continue;
+                }
+                if (!rcBuildContours(build.ctx_, *build.compactHeightField_, cfg.maxSimplificationError, cfg.maxEdgeLen,
+                    *build.contourSet_))
+                {
+                    LOGERROR("Could not create contours");
+                    continue;
+                }
+                
+                build.polyMesh_ = rcAllocPolyMesh();
+                if (!build.polyMesh_)
+                {
+                    LOGERROR("Could not allocate poly mesh");
+                    continue;
+                }
+                if (!rcBuildPolyMesh(build.ctx_, *build.contourSet_, cfg.maxVertsPerPoly, *build.polyMesh_))
+                {
+                    LOGERROR("Could not triangulate contours");
+                    continue;
+                }
+                
+                build.polyMeshDetail_ = rcAllocPolyMeshDetail();
+                if (!build.polyMeshDetail_)
+                {
+                    LOGERROR("Could not allocate detail mesh");
+                    continue;
+                }
+                if (!rcBuildPolyMeshDetail(build.ctx_, *build.polyMesh_, *build.compactHeightField_, cfg.detailSampleDist,
+                    cfg.detailSampleMaxError, *build.polyMeshDetail_))
+                {
+                    LOGERROR("Could not build detail mesh");
+                    continue;
+                }
+                
+                // Set polygon flags
+                /// \todo Allow to define custom flags
+                for (int i = 0; i < build.polyMesh_->npolys; ++i)
+                {
+                    if (build.polyMesh_->areas[i] == RC_WALKABLE_AREA)
+                        build.polyMesh_->flags[i] = 0x1;
+                }
+                
+                unsigned char* navData = 0;
+                int navDataSize = 0;
+                
+                dtNavMeshCreateParams params;
+                memset(&params, 0, sizeof params);
+                params.verts = build.polyMesh_->verts;
+                params.vertCount = build.polyMesh_->nverts;
+                params.polys = build.polyMesh_->polys;
+                params.polyAreas = build.polyMesh_->areas;
+                params.polyFlags = build.polyMesh_->flags;
+                params.polyCount = build.polyMesh_->npolys;
+                params.nvp = build.polyMesh_->nvp;
+                params.detailMeshes = build.polyMeshDetail_->meshes;
+                params.detailVerts = build.polyMeshDetail_->verts;
+                params.detailVertsCount = build.polyMeshDetail_->nverts;
+                params.detailTris = build.polyMeshDetail_->tris;
+                params.detailTriCount = build.polyMeshDetail_->ntris;
+                params.walkableHeight = agentHeight_;
+                params.walkableRadius = agentRadius_;
+                params.walkableClimb = agentMaxClimb_;
+                params.tileX = x;
+                params.tileY = z;
+                rcVcopy(params.bmin, build.polyMesh_->bmin);
+                rcVcopy(params.bmax, build.polyMesh_->bmax);
+                params.cs = cfg.cs;
+                params.ch = cfg.ch;
+                params.buildBvTree = true;
+                
+                if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
+                {
+                    LOGERROR("Could not build navigation mesh tile data");
+                    continue;
+                }
+                
+                // Before adding the navmesh tile (which modifies the data) copy the data for serialization
+                navigationDataAttr_.WriteUInt(navDataSize);
+                navigationDataAttr_.Write(navData, navDataSize);
+                
+                if (dtStatusFailed(navMesh_->addTile(navData, navDataSize, DT_TILE_FREE_DATA, 0, 0)))
+                {
+                    LOGERROR("Failed to add navigation mesh tile");
+                    dtFree(navData);
+                    continue;
+                }
+                else
+                    ++numTiles;
+            }
+        }
         
-        build.compactHeightField_ = rcAllocCompactHeightfield();
-        if (!build.compactHeightField_)
+        navMeshQuery_ = dtAllocNavMeshQuery();
+        if (!navMeshQuery_)
         {
-            LOGERROR("Could not allocate create compact heightfield");
-            return false;
-        }
-        if (!rcBuildCompactHeightfield(build.ctx_, cfg.walkableHeight, cfg.walkableClimb, *build.heightField_,
-            *build.compactHeightField_))
-        {
-            LOGERROR("Could not build compact heightfield");
-            return false;
-        }
-        if (!rcErodeWalkableArea(build.ctx_, cfg.walkableRadius, *build.compactHeightField_))
-        {
-            LOGERROR("Could not erode compact heightfield");
-            return false;
-        }
-        if (!rcBuildDistanceField(build.ctx_, *build.compactHeightField_))
-        {
-            LOGERROR("Could not build distance field");
-            return false;
-        }
-        if (!rcBuildRegions(build.ctx_, *build.compactHeightField_, 0, cfg.minRegionArea, cfg.mergeRegionArea))
-        {
-            LOGERROR("Could not build regions");
+            LOGERROR("Could not create navigation mesh query");
+            ReleaseNavMesh();
             return false;
         }
         
-        build.contourSet_ = rcAllocContourSet();
-        if (!build.contourSet_)
+        if (dtStatusFailed(navMeshQuery_->init(navMesh_, MAX_POLYS)))
         {
-            LOGERROR("Could not allocate contour set");
-            return false;
-        }
-        if (!rcBuildContours(build.ctx_, *build.compactHeightField_, cfg.maxSimplificationError, cfg.maxEdgeLen,
-            *build.contourSet_))
-        {
-            LOGERROR("Could not create contours");
+            LOGERROR("Could not init navigation mesh query");
+            ReleaseNavMesh();
             return false;
         }
         
-        build.polyMesh_ = rcAllocPolyMesh();
-        if (!build.polyMesh_)
-        {
-            LOGERROR("Could not allocate poly mesh");
-            return false;
-        }
-        if (!rcBuildPolyMesh(build.ctx_, *build.contourSet_, cfg.maxVertsPerPoly, *build.polyMesh_))
-        {
-            LOGERROR("Could not triangulate contours");
-            return false;
-        }
-        
-        build.polyMeshDetail_ = rcAllocPolyMeshDetail();
-        if (!build.polyMeshDetail_)
-        {
-            LOGERROR("Could not allocate detail mesh");
-            return false;
-        }
-        if (!rcBuildPolyMeshDetail(build.ctx_, *build.polyMesh_, *build.compactHeightField_, cfg.detailSampleDist,
-            cfg.detailSampleMaxError, *build.polyMeshDetail_))
-        {
-            LOGERROR("Could not build detail mesh");
-            return false;
-        }
-        
-        // Set polygon flags.
-        /// \todo Allow to define custom flags
-        for (int i = 0; i < build.polyMesh_->npolys; ++i)
-        {
-            if (build.polyMesh_->areas[i] == RC_WALKABLE_AREA)
-                build.polyMesh_->flags[i] = 0x1;
-        }
-        
-        unsigned char* navData = 0;
-        int navDataSize = 0;
-        
-        dtNavMeshCreateParams params;
-        memset(&params, 0, sizeof params);
-        params.verts = build.polyMesh_->verts;
-        params.vertCount = build.polyMesh_->nverts;
-        params.polys = build.polyMesh_->polys;
-        params.polyAreas = build.polyMesh_->areas;
-        params.polyFlags = build.polyMesh_->flags;
-        params.polyCount = build.polyMesh_->npolys;
-        params.nvp = build.polyMesh_->nvp;
-        params.detailMeshes = build.polyMeshDetail_->meshes;
-        params.detailVerts = build.polyMeshDetail_->verts;
-        params.detailVertsCount = build.polyMeshDetail_->nverts;
-        params.detailTris = build.polyMeshDetail_->tris;
-        params.detailTriCount = build.polyMeshDetail_->ntris;
-        params.walkableHeight = agentHeight_;
-        params.walkableRadius = agentRadius_;
-        params.walkableClimb = agentMaxClimb_;
-        rcVcopy(params.bmin, build.polyMesh_->bmin);
-        rcVcopy(params.bmax, build.polyMesh_->bmax);
-        params.cs = cfg.cs;
-        params.ch = cfg.ch;
-        params.buildBvTree = true;
-        
-        if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
-        {
-            LOGERROR("Could not build Detour navmesh");
-            return false;
-        }
-        
-        // Before creating the navmesh (which modifies the data) copy the data for serialization
-        navigationDataAttr_.Resize(navDataSize);
-        memcpy(&navigationDataAttr_[0], navData, navDataSize);
-        
-        return CreateNavMesh(navData, navDataSize);
+        LOGDEBUG("Built navigation mesh with " + String(numTiles) + " tiles");
+        return true;
     }
 }
 
@@ -450,7 +599,7 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     
     dest.Clear();
     
-    if (!navMesh_ || !navMeshQuery_)
+    if (!navMesh_ || !navMeshQuery_ || !node_)
         return;
     
     // Navigation data is in local space. Transform path points from world to local
@@ -468,50 +617,107 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     if (!startRef || !endRef)
         return;
     
-    dtPolyRef polys[MAX_POLYS];
-    dtPolyRef pathPolys[MAX_POLYS];
-    Vector3 pathPoints[MAX_POLYS];
-    unsigned char pathFlags[MAX_POLYS];
     int numPolys = 0;
     int numPathPoints = 0;
     
-    navMeshQuery_->findPath(startRef, endRef, &localStart.x_, &localEnd.x_, queryFilter_, polys, &numPolys, MAX_POLYS);
+    navMeshQuery_->findPath(startRef, endRef, &localStart.x_, &localEnd.x_, queryFilter_, pathData_->polys_, &numPolys,
+        MAX_POLYS);
     if (!numPolys)
         return;
     
     Vector3 actualLocalEnd = localEnd;
     
     // If full path was not found, clamp end point to the end polygon
-    if (polys[numPolys - 1] != endRef)
-        navMeshQuery_->closestPointOnPoly(polys[numPolys - 1], &localEnd.x_, &actualLocalEnd.x_);
+    if (pathData_->polys_[numPolys - 1] != endRef)
+        navMeshQuery_->closestPointOnPoly(pathData_->polys_[numPolys - 1], &localEnd.x_, &actualLocalEnd.x_);
     
-    navMeshQuery_->findStraightPath(&localStart.x_, &actualLocalEnd.x_, polys, numPolys, &pathPoints[0].x_, pathFlags, pathPolys,
-        &numPathPoints, MAX_POLYS);
+    navMeshQuery_->findStraightPath(&localStart.x_, &actualLocalEnd.x_, pathData_->polys_, numPolys,
+        &pathData_->pathPoints_[0].x_, pathData_->pathFlags_, pathData_->pathPolys_, &numPathPoints, MAX_POLYS);
     
     // Transform path result back to world space
     for (int i = 0; i < numPathPoints; ++i)
-        dest.Push(transform * pathPoints[i]);
+        dest.Push(transform * pathData_->pathPoints_[i]);
 }
 
 void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& data)
 {
+    ReleaseNavMesh();
+    
     navigationDataAttr_ = data;
     if (!data.Size())
         return;
     
-    /// \todo Would be preferable not to have to make a copy of the data, however Recast modifies it when creating the navmesh
-    unsigned char* navData = (unsigned char*)dtAlloc(data.Size(), DT_ALLOC_PERM);
-    memcpy(navData, &navigationDataAttr_[0], navigationDataAttr_.Size());
+    navigationDataAttr_.Seek(0);
     
-    CreateNavMesh(navData, data.Size());
+    BoundingBox combinedBoundingBox = navigationDataAttr_.ReadBoundingBox();
+    dtNavMeshParams params;
+    rcVcopy(params.orig, &combinedBoundingBox.min_.x_);
+    params.tileWidth = navigationDataAttr_.ReadFloat();
+    params.tileHeight = navigationDataAttr_.ReadFloat();
+    params.maxTiles = navigationDataAttr_.ReadInt();
+    params.maxPolys = navigationDataAttr_.ReadInt();
+    numTilesX_ = navigationDataAttr_.ReadInt();
+    numTilesZ_ = navigationDataAttr_.ReadInt();
+    
+    navMesh_ = dtAllocNavMesh();
+    if (!navMesh_)
+    {
+        LOGERROR("Could not allocate navmesh");
+        return;
+    }
+    
+    if (dtStatusFailed(navMesh_->init(&params)))
+    {
+        LOGERROR("Could not initialize navmesh");
+        ReleaseNavMesh();
+        return;
+    }
+    
+    // Add tiles from serialized data
+    unsigned numTiles = 0;
+    
+    while (!navigationDataAttr_.IsEof())
+    {
+        unsigned navDataSize = navigationDataAttr_.ReadUInt();
+        unsigned char* navData = (unsigned char*)dtAlloc(navDataSize, DT_ALLOC_PERM);
+        navigationDataAttr_.Read(navData, navDataSize);
+        
+        if (dtStatusFailed(navMesh_->addTile(navData, navDataSize, DT_TILE_FREE_DATA, 0, 0)))
+        {
+            LOGERROR("Failed to add navigation mesh tile");
+            dtFree(navData);
+            continue;
+        }
+        else
+            ++numTiles;
+    }
+    
+    navMeshQuery_ = dtAllocNavMeshQuery();
+    if (!navMeshQuery_)
+    {
+        LOGERROR("Could not create navigation mesh query");
+        ReleaseNavMesh();
+        return;
+    }
+    
+    if (dtStatusFailed(navMeshQuery_->init(navMesh_, MAX_POLYS)))
+    {
+        LOGERROR("Could not init navigation mesh query");
+        ReleaseNavMesh();
+        return;
+    }
+    
+    LOGDEBUG("Built navigation mesh with " + String(numTiles) + " tiles");
 }
 
-void NavigationMesh::CollectGeometries(NavigationBuildData& build, Node* node, HashSet<Node*>& processedNodes, bool recursive)
+void NavigationMesh::CollectGeometries(Vector<GeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive)
 {
     // Make sure nodes are not included twice
     if (processedNodes.Contains(node))
         return;
     processedNodes.Insert(node);
+    
+    Matrix3x4 inverseTransform = node_->GetWorldTransform().Inverse();
     
     /// \todo Prefer physics geometry if available
     PODVector<Drawable*> drawables;
@@ -532,122 +738,85 @@ void NavigationMesh::CollectGeometries(NavigationBuildData& build, Node* node, H
         else
             continue;
         
+        GeometryInfo info;
+        info.transform_ = inverseTransform * node->GetWorldTransform();
+        info.boundingBox_ = drawable->GetWorldBoundingBox().Transformed(inverseTransform);
+        
         for (unsigned j = 0; j < numGeometries; ++j)
-            AddGeometry(build, node, drawable->GetLodGeometry(j, lodLevel));
+        {
+            info.geometry_ = drawable->GetLodGeometry(j, lodLevel);
+            geometryList.Push(info);
+        }
     }
     
     if (recursive)
     {
         const Vector<SharedPtr<Node> >& children = node->GetChildren();
         for(unsigned i = 0; i < children.Size(); ++i)
-            CollectGeometries(build, children[i], processedNodes, recursive);
+            CollectGeometries(geometryList, children[i], processedNodes, recursive);
     }
 }
 
-void NavigationMesh::AddGeometry(NavigationBuildData& build, Node* node, Geometry* geometry)
+void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<GeometryInfo>& geometryList, BoundingBox& box)
 {
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
-    unsigned vertexSize;
-    unsigned indexSize;
-    unsigned elementMask;
-    
-    // Transform geometry to local space of the navigation mesh node
-    Matrix3x4 transform = node_->GetWorldTransform().Inverse() * node->GetWorldTransform();
-    
-    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
+    for (unsigned i = 0; i < geometryList.Size(); ++i)
     {
-        LOGERROR("Could not use geometry from node " + node->GetName() + ": vertex or index raw data null or positions missing");
-        return;
-    }
-    
-    unsigned srcIndexStart = geometry->GetIndexStart();
-    unsigned srcIndexCount = geometry->GetIndexCount();
-    unsigned srcVertexStart = geometry->GetVertexStart();
-    unsigned srcVertexCount = geometry->GetVertexCount();
-    
-    if (!srcIndexCount)
-    {
-        LOGERROR("Could not use geometry from node " + node->GetName() + ": no indices");
-        return;
-    }
-    
-    unsigned destVertexStart = build.vertices_.Size();
-    
-    for (unsigned i = srcVertexStart; i < srcVertexStart + srcVertexCount; ++i)
-    {
-        Vector3 vertex = transform * *((const Vector3*)(&vertexData[i * vertexSize]));
-        build.worldBoundingBox_.Merge(vertex);
-        build.vertices_.Push(vertex);
-    }
-    
-    // Copy remapped indices
-    if (indexSize == sizeof(unsigned short))
-    {
-        const unsigned short* indices = ((const unsigned short*)indexData) + srcIndexStart;
-        const unsigned short* indicesEnd = indices + srcIndexCount;
-        
-        while (indices < indicesEnd)
+        if (box.IsInsideFast(geometryList[i].boundingBox_) != OUTSIDE)
         {
-            build.indices_.Push(*indices - srcVertexStart + destVertexStart);
-            ++indices;
+            Geometry* geometry = geometryList[i].geometry_;
+            Matrix3x4& transform = geometryList[i].transform_;
+            
+            const unsigned char* vertexData;
+            const unsigned char* indexData;
+            unsigned vertexSize;
+            unsigned indexSize;
+            unsigned elementMask;
+            
+            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+            if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
+                continue;
+            
+            unsigned srcIndexStart = geometry->GetIndexStart();
+            unsigned srcIndexCount = geometry->GetIndexCount();
+            unsigned srcVertexStart = geometry->GetVertexStart();
+            unsigned srcVertexCount = geometry->GetVertexCount();
+            
+            if (!srcIndexCount)
+                continue;
+            
+            unsigned destVertexStart = build.vertices_.Size();
+            
+            for (unsigned j = srcVertexStart; j < srcVertexStart + srcVertexCount; ++j)
+            {
+                Vector3 vertex = transform * *((const Vector3*)(&vertexData[j * vertexSize]));
+                build.vertices_.Push(vertex);
+            }
+            
+            // Copy remapped indices
+            if (indexSize == sizeof(unsigned short))
+            {
+                const unsigned short* indices = ((const unsigned short*)indexData) + srcIndexStart;
+                const unsigned short* indicesEnd = indices + srcIndexCount;
+                
+                while (indices < indicesEnd)
+                {
+                    build.indices_.Push(*indices - srcVertexStart + destVertexStart);
+                    ++indices;
+                }
+            }
+            else
+            {
+                const unsigned* indices = ((const unsigned*)indexData) + srcIndexStart;
+                const unsigned* indicesEnd = indices + srcIndexCount;
+                
+                while (indices < indicesEnd)
+                {
+                    build.indices_.Push(*indices - srcVertexStart + destVertexStart);
+                    ++indices;
+                }
+            }
         }
     }
-    else
-    {
-        const unsigned* indices = ((const unsigned*)indexData) + srcIndexStart;
-        const unsigned* indicesEnd = indices + srcIndexCount;
-        
-        while (indices < indicesEnd)
-        {
-            build.indices_.Push(*indices - srcVertexStart + destVertexStart);
-            ++indices;
-        }
-    }
-}
-
-bool NavigationMesh::CreateNavMesh(unsigned char* navData, unsigned navDataSize)
-{
-    ReleaseNavMesh();
-    
-    navMesh_ = dtAllocNavMesh();
-    if (!navMesh_)
-    {
-        LOGERROR("Could not create Detour navmesh");
-        dtFree(navData);
-        return false;
-    }
-    
-    dtStatus status;
-    
-    status = navMesh_->init(navData, navDataSize, DT_TILE_FREE_DATA);
-    if (dtStatusFailed(status))
-    {
-        LOGERROR("Could not init Detour navmesh");
-        ReleaseNavMesh();
-        dtFree(navData);
-        return false;
-    }
-    
-    navMeshQuery_ = dtAllocNavMeshQuery();
-    if (!navMeshQuery_)
-    {
-        LOGERROR("Could not create Detour navmesh query");
-        ReleaseNavMesh();
-        return false;
-    }
-    
-    status = navMeshQuery_->init(navMesh_, 2048);
-    if (dtStatusFailed(status))
-    {
-        LOGERROR("Could not init navmesh query");
-        ReleaseNavMesh();
-        return false;
-    }
-    
-    LOGDEBUG("Created Detour navmesh, data size " + String(navDataSize) + " bytes");
-    return true;
 }
 
 void NavigationMesh::ReleaseNavMesh()
@@ -657,6 +826,9 @@ void NavigationMesh::ReleaseNavMesh()
     
     dtFreeNavMeshQuery(navMeshQuery_);
     navMeshQuery_ = 0;
+    
+    numTilesX_ = 0;
+    numTilesZ_ = 0;
 }
 
 }

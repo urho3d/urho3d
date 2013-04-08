@@ -6,8 +6,6 @@ float yaw = 0.0;
 float pitch = 0.0;
 int drawDebug = 0;
 
-NavigationMesh@ navMesh;
-
 Vector3 startPos;
 Vector3 endPos;
 
@@ -179,7 +177,7 @@ void InitScene()
     }
     
     testScene.CreateComponent("Navigable");
-    navMesh = testScene.CreateComponent("NavigationMesh");
+    NavigationMesh@ navMesh = testScene.CreateComponent("NavigationMesh");
     navMesh.Build();
 }
 
@@ -348,7 +346,10 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             }
 
             if (startPosSet && endPosSet)
+            {
+                NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
                 path = navMesh.FindPath(startPos, endPos);
+            }
         }
     }
 }
@@ -370,7 +371,10 @@ void HandlePostRenderUpdate()
     if (drawDebug == 2)
         testScene.physicsWorld.DrawDebugGeometry(true);
     if (drawDebug == 3)
+    {
+        NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
         navMesh.DrawDebugGeometry(testScene.debugRenderer, true);
+    }
 
     IntVector2 pos = ui.cursorPosition;
     if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)

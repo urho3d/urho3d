@@ -47,6 +47,8 @@ void RegisterNavigationMesh(asIScriptEngine* engine)
     RegisterComponent<NavigationMesh>(engine, "NavigationMesh");
     engine->RegisterObjectMethod("NavigationMesh", "bool Build()", asMETHOD(NavigationMesh, Build), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindPath), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("NavigationMesh", "void set_tileSize(int)", asMETHOD(NavigationMesh, SetTileSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "int get_tileSize() const", asMETHOD(NavigationMesh, GetTileSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "void set_cellSize(float)", asMETHOD(NavigationMesh, SetCellSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "float get_cellSize() const", asMETHOD(NavigationMesh, GetCellSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "void set_cellHeight(float)", asMETHOD(NavigationMesh, SetCellHeight), asCALL_THISCALL);

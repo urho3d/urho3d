@@ -25,6 +25,8 @@
 #include "ArrayPtr.h"
 #include "BoundingBox.h"
 #include "Component.h"
+#include "Matrix3x4.h"
+#include "VectorBuffer.h"
 
 class dtNavMesh;
 class dtNavMeshQuery;
@@ -35,7 +37,19 @@ namespace Urho3D
 
 class Geometry;
 
+struct FindPathData;
 struct NavigationBuildData;
+
+/// Geometry with transform and bounds information.
+struct GeometryInfo
+{
+    /// Geometry object.
+    Geometry* geometry_;
+    /// Transform relative to the navigation mesh root node.
+    Matrix3x4 transform_;
+    /// Bounding box relative to the navigation mesh root node.
+    BoundingBox boundingBox_;
+};
 
 /// Navigation mesh component. Collects the navigation geometry from child nodes with the Navigable component and responds to path queries.
 class NavigationMesh : public Component
@@ -53,6 +67,8 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
+    /// Set tile size.
+    void SetTileSize(int size);
     /// Set cell size.
     void SetCellSize(float size);
     /// Set cell height.
@@ -82,6 +98,8 @@ public:
     /// Find a path between world space points. Return non-empty list of points if successful.
     void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     
+    /// Return tile size.
+    int GetTileSize() const { return tileSize_; }
     /// Return cell size.
     float GetCellSize() const { return cellSize_; }
     /// Return cell height.
@@ -112,18 +130,18 @@ public:
     /// Set navigation data attribute.
     void SetNavigationDataAttr(const PODVector<unsigned char>& data);
     /// Get navigation data attribute.
-    const PODVector<unsigned char>& GetNavigationDataAttr() const { return navigationDataAttr_; }
+    const PODVector<unsigned char>& GetNavigationDataAttr() const { return navigationDataAttr_.GetBuffer(); }
     
 private:
     /// Visit nodes and collect navigable geometry.
-    void CollectGeometries(NavigationBuildData& build, Node* node, HashSet<Node*>& processedNodes, bool recursive);
-    /// Add a geometry to the mesh.
-    void AddGeometry(NavigationBuildData& build, Node* node, Geometry* geometry);
-    /// Create Detour navmesh. Return true if successful.
-    bool CreateNavMesh(unsigned char* navData, unsigned navDataSize);
-    /// Release the Detour navmesh.
+    void CollectGeometries(Vector<GeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
+    /// Get geometry data within a bounding box.
+    void GetTileGeometry(NavigationBuildData& build, Vector<GeometryInfo>& geometryList, BoundingBox& box);
+    /// Release the Detour navmesh and the query.
     void ReleaseNavMesh();
     
+    /// Tile size.
+    int tileSize_;
     /// Cell size.
     float cellSize_;
     /// Cell height.
@@ -150,12 +168,18 @@ private:
     float detailSampleMaxError_;
     /// Detour navmesh.
     dtNavMesh* navMesh_;
+    /// Number of tiles in X direction.
+    int numTilesX_;
+    /// Number of tiles in Z direction.
+    int numTilesZ_;
     /// Detour navmesh query.
     dtNavMeshQuery* navMeshQuery_;
     /// Detour navmesh query filter.
     dtQueryFilter* queryFilter_;
+    /// Temporary data for finding a path.
+    FindPathData* pathData_;
     /// Navigation data attribute. Contains the unmodified Recast data.
-    PODVector<unsigned char> navigationDataAttr_;
+    VectorBuffer navigationDataAttr_;
 };
 
 }
