@@ -162,7 +162,7 @@ void NavigationMesh::RegisterObject(Context* context)
 
 void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (!navMesh_)
+    if (!navMesh_ || !node_)
         return;
     
     const dtNavMesh* navMesh = navMesh_;
@@ -170,14 +170,16 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     if (!tile)
         return;
     
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    
     for (int i = 0; i < tile->header->polyCount; ++i)
     {
         dtPoly* poly = tile->polys + i;
         for (unsigned j = 0; j < poly->vertCount; ++j)
         {
             debug->AddLine(
-                *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
-                *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
+                worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
+                worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
                 Color::YELLOW,
                 depthTest
             );
@@ -253,6 +255,9 @@ bool NavigationMesh::Build()
     
     if (!node_)
         return false;
+    
+    if (!node_->GetWorldScale().Equals(Vector3::ONE))
+        LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
     
     NavigationBuildData build;
     
@@ -448,10 +453,17 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     if (!navMesh_ || !navMeshQuery_)
         return;
     
+    // Navigation data is in local space. Transform path points from world to local
+    const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverseTransform = transform.Inverse();
+    
+    Vector3 localStart = inverseTransform * start;
+    Vector3 localEnd = inverseTransform * end;
+    
     dtPolyRef startRef;
     dtPolyRef endRef;
-    navMeshQuery_->findNearestPoly(&start.x_, &extents.x_, queryFilter_, &startRef, 0);
-    navMeshQuery_->findNearestPoly(&end.x_, &extents.x_, queryFilter_, &endRef, 0);
+    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
+    navMeshQuery_->findNearestPoly(&localEnd.x_, &extents.x_, queryFilter_, &endRef, 0);
     
     if (!startRef || !endRef)
         return;
@@ -463,20 +475,22 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     int numPolys = 0;
     int numPathPoints = 0;
     
-    navMeshQuery_->findPath(startRef, endRef, &start.x_, &end.x_, queryFilter_, polys, &numPolys, MAX_POLYS);
+    navMeshQuery_->findPath(startRef, endRef, &localStart.x_, &localEnd.x_, queryFilter_, polys, &numPolys, MAX_POLYS);
     if (!numPolys)
         return;
     
-    Vector3 actualEnd = end;
+    Vector3 actualLocalEnd = localEnd;
     
     // If full path was not found, clamp end point to the end polygon
     if (polys[numPolys - 1] != endRef)
-        navMeshQuery_->closestPointOnPoly(polys[numPolys - 1], &end.x_, &actualEnd.x_);
+        navMeshQuery_->closestPointOnPoly(polys[numPolys - 1], &localEnd.x_, &actualLocalEnd.x_);
     
-    navMeshQuery_->findStraightPath(&start.x_, &actualEnd.x_, polys, numPolys, &pathPoints[0].x_, pathFlags, pathPolys, &numPathPoints, MAX_POLYS);
+    navMeshQuery_->findStraightPath(&localStart.x_, &actualLocalEnd.x_, polys, numPolys, &pathPoints[0].x_, pathFlags, pathPolys,
+        &numPathPoints, MAX_POLYS);
     
+    // Transform path result back to world space
     for (int i = 0; i < numPathPoints; ++i)
-        dest.Push(pathPoints[i]);
+        dest.Push(transform * pathPoints[i]);
 }
 
 void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& data)
@@ -538,6 +552,9 @@ void NavigationMesh::AddGeometry(NavigationBuildData& build, Node* node, Geometr
     unsigned indexSize;
     unsigned elementMask;
     
+    // Transform geometry to local space of the navigation mesh node
+    Matrix3x4 transform = node_->GetWorldTransform().Inverse() * node->GetWorldTransform();
+    
     geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
     if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
     {
@@ -557,9 +574,6 @@ void NavigationMesh::AddGeometry(NavigationBuildData& build, Node* node, Geometr
     }
     
     unsigned destVertexStart = build.vertices_.Size();
-    
-    // Copy draw range vertices transformed into world space
-    Matrix3x4 transform = node->GetWorldTransform();
     
     for (unsigned i = srcVertexStart; i < srcVertexStart + srcVertexCount; ++i)
     {

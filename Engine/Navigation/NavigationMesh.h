@@ -79,7 +79,7 @@ public:
     void SetDetailSampleMaxError(float error);
     /// Rebuild the navigation data. Return true if successful.
     bool Build();
-    /// Find a path. Return non-empty list of points if successful.
+    /// Find a path between world space points. Return non-empty list of points if successful.
     void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     
     /// Return cell size.
