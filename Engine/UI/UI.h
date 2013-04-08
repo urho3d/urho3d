@@ -62,6 +62,8 @@ public:
     void RenderUpdate();
     /// Render the UI.
     void Render();
+    /// Debug draw a UI element.
+    void DebugDraw(UIElement* element);
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
     SharedPtr<UIElement> LoadLayout(Deserializer& source, XMLFile* styleFile = 0);
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
@@ -99,6 +101,8 @@ private:
     void Initialize();
     /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
+    /// Render the batches.
+    void Render(const PODVector<UIBatch>& batches, const PODVector<float>& vertexData);
     /// Generate batches from an UI element recursively.
     void GetBatches(UIElement* element, IntRect currentScissor);
     /// Return UI element at screen position recursively.
@@ -158,6 +162,10 @@ private:
     PODVector<UIBatch> batches_;
     /// UI rendering vertex data.
     PODVector<float> vertexData_;
+    /// UI rendering batches for debug draw.
+    PODVector<UIBatch> debugDrawBatches_;
+    /// UI rendering vertex data for debug draw.
+    PODVector<float> debugDrawVertexData_;
     /// UI vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
     /// UI element query vector.

@@ -548,6 +548,7 @@ BoundingBox
 Methods:<br>
 - void Define(const Vector3&, const Vector3&)
 - void Define(float, float)
+- void Define(const Vector3&)
 - void Define(const BoundingBox&)
 - void Define(const Frustum&)
 - void Define(const Polyhedron&)
@@ -5019,6 +5020,7 @@ UI
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Clear()
+- void DebugDraw(UIElement@)
 - UIElement@ LoadLayout(File@)
 - UIElement@ LoadLayout(File@, XMLFile@)
 - UIElement@ LoadLayout(XMLFile@)

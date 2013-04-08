@@ -74,39 +74,31 @@ void Window::RegisterObject(Context* context)
 
 void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    if (modal_ && modalShadeColor_ != Color::TRANSPARENT)
+    if (modal_)
     {
         // Modal shade
-        UIElement* rootElement = GetRoot();
-        const IntVector2& rootSize = rootElement->GetSize();
-        IntRect currentScissor(0, 0, rootSize.x_, rootSize.y_);
-        UIBatch batch(rootElement, BLEND_ALPHA, IntRect(0, 0, rootSize.x_, rootSize.y_), 0, &vertexData);
-        batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0, 0, 0, modalShadeColor_);
-        UIBatch::AddOrMerge(batch, batches);
+        if (modalShadeColor_ != Color::TRANSPARENT)
+        {
+            UIElement* rootElement = GetRoot();
+            const IntVector2& rootSize = rootElement->GetSize();
+            UIBatch batch(rootElement, BLEND_ALPHA, IntRect(0, 0, rootSize.x_, rootSize.y_), 0, &vertexData);
+            batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0, 0, 0, modalShadeColor_);
+            UIBatch::AddOrMerge(batch, batches);
+        }
+
+        // Modal frame
+        if (modalFrameColor_ != Color::TRANSPARENT && modalFrameSize_ != IntVector2::ZERO)
+        {
+            UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+            int x = GetIndentWidth();
+            IntVector2 size = GetSize();
+            size.x_ -= x;
+            batch.AddQuad(x - modalFrameSize_.x_, -modalFrameSize_.y_, size.x_ + 2 * modalFrameSize_.x_, size.y_ + 2 * modalFrameSize_.y_, 0, 0, 0, 0, modalFrameColor_);
+            UIBatch::AddOrMerge(batch, batches);
+        }
     }
 
     BorderImage::GetBatches(batches, vertexData, currentScissor);
-
-    if (modal_ && modalFrameColor_ != Color::TRANSPARENT && modalFrameSize_ != IntVector2::ZERO)
-    {
-        // Modal frame
-        UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
-
-        int x = GetIndentWidth();
-        IntVector2 size = GetSize();
-        size.x_ -= x;
-
-        // Left
-        batch.AddQuad(x - modalFrameSize_.x_, 0, modalFrameSize_.x_, size.y_, 0, 0, 0, 0, modalFrameColor_);
-        // Top
-        batch.AddQuad(x - modalFrameSize_.x_, -modalFrameSize_.y_, size.x_ + 2 * modalFrameSize_.x_, modalFrameSize_.y_, 0, 0, 0, 0, modalFrameColor_);
-        // Right
-        batch.AddQuad(size.x_, 0, modalFrameSize_.x_, size.y_, 0, 0, 0, 0, modalFrameColor_);
-        // Bottom
-        batch.AddQuad(x - modalFrameSize_.x_, size.y_, size.x_ + 2 * modalFrameSize_.x_, modalFrameSize_.y_, 0, 0, 0, 0, modalFrameColor_);
-
-        UIBatch::AddOrMerge(batch, batches);
-    }
 }
 
 void Window::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)

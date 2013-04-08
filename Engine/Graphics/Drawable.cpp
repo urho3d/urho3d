@@ -1,4 +1,4 @@
-//  
+//
 
 // Copyright (c) 2008-2013 the Urho3D project.
 //
@@ -102,7 +102,7 @@ void Drawable::RegisterObject(Context* context)
 void Drawable::OnSetEnabled()
 {
     bool enabled = IsEnabledEffective();
-    
+
     if (enabled && !octant_)
         AddToOctree();
     else if (!enabled && octant_)
@@ -127,16 +127,16 @@ void Drawable::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(node_->GetWorldPosition());
-    
+
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         batches_[i].distance_ = distance_;
         batches_[i].worldTransform_ = &worldTransform;
     }
-    
+
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
-    
+
     if (newLodDistance != lodDistance_)
         lodDistance_ = newLodDistance;
 }
@@ -153,7 +153,7 @@ Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)
 void Drawable::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (debug && IsEnabledEffective())
-        debug->AddBoundingBox(GetWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
+        debug->AddBoundingBox(GetWorldBoundingBox(), Color::GREEN, depthTest);
 }
 
 void Drawable::SetDrawDistance(float distance)
@@ -243,7 +243,7 @@ const BoundingBox& Drawable::GetWorldBoundingBox()
         OnWorldBoundingBoxUpdate();
         worldBoundingBoxDirty_ = false;
     }
-    
+
     return worldBoundingBox_;
 }
 
@@ -251,7 +251,7 @@ void Drawable::SetZone(Zone* zone, bool temporary)
 {
     zone_ = zone;
     lastZone_ = zone;
-    
+
     // If the zone assignment was temporary (inconclusive) set the dirty flag so that it will be re-evaluated on the next frame
     zoneDirty_ = temporary;
 }
@@ -311,12 +311,12 @@ void Drawable::LimitLights()
     // Maximum lights value 0 means unlimited
     if (!maxLights_ || lights_.Size() <= maxLights_)
         return;
-    
+
     // If more lights than allowed, move to vertex lights and cut the list
     const BoundingBox& box = GetWorldBoundingBox();
     for (unsigned i = 0; i < lights_.Size(); ++i)
         lights_[i]->SetIntensitySortValue(box);
-    
+
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
     vertexLights_.Insert(vertexLights_.End(), lights_.Begin() + maxLights_, lights_.End());
     lights_.Resize(maxLights_);
@@ -326,11 +326,11 @@ void Drawable::LimitVertexLights()
 {
     if (vertexLights_.Size() <= MAX_VERTEX_LIGHTS)
         return;
-    
+
     const BoundingBox& box = GetWorldBoundingBox();
     for (unsigned i = vertexLights_.Size() - 1; i < vertexLights_.Size(); --i)
         vertexLights_[i]->SetIntensitySortValue(box);
-    
+
     Sort(vertexLights_.Begin(), vertexLights_.End(), CompareDrawables);
     vertexLights_.Resize(MAX_VERTEX_LIGHTS);
 }
@@ -361,7 +361,7 @@ void Drawable::OnMarkedDirty(Node* node)
     worldBoundingBoxDirty_ = true;
     if (!reinsertionQueued_ && octant_)
         octant_->GetRoot()->QueueReinsertion(this);
-    
+
     // Mark zone assignment dirty. Due to possibly being called from a worker thread, it is unsafe to manipulate the Zone weak
     // pointer here
     if (node == node_)
@@ -373,7 +373,7 @@ void Drawable::AddToOctree()
     // Do not add to octree when disabled
     if (!IsEnabledEffective())
         return;
-    
+
     Scene* scene = GetScene();
     if (scene)
     {

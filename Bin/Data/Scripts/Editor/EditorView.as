@@ -362,6 +362,10 @@ void HandlePostRenderUpdate()
     for (uint i = 0; i < selectedComponents.length; ++i)
         selectedComponents[i].DrawDebugGeometry(debug, false);
 
+    // Visualize the currently selected UI-elements
+    for (uint i = 0; i < selectedUIElements.length; ++i)
+        ui.DebugDraw(selectedUIElements[i]);
+
     if (renderingDebug)
         renderer.DrawDebugGeometry(false);
     if (physicsDebug && editorScene.physicsWorld !is null)
@@ -387,6 +391,8 @@ void ViewRaycast(bool mouseClick)
     if (IsGizmoSelected())
         return;
 
+    DebugRenderer@ debug = editorScene.debugRenderer;
+
     IntVector2 pos = ui.cursorPosition;
     UIElement@ elementAtPos = ui.GetElementAt(pos, pickMode != PICK_UI_ELEMENTS);
     if (pickMode == PICK_UI_ELEMENTS)
@@ -394,21 +400,17 @@ void ViewRaycast(bool mouseClick)
         bool leftClick = mouseClick && input.mouseButtonPress[MOUSEB_LEFT];
         bool multiselect = input.qualifierDown[QUAL_CTRL];
 
-        if (elementAtPos !is null)
+        // Only interested in user-created UI elements
+        if (elementAtPos !is editorUIElement && elementAtPos.GetElementEventSender() is editorUIElement)
         {
-            // Only interested in user-created UI elements
-            if (elementAtPos !is editorUIElement && elementAtPos.GetElementEventSender() is editorUIElement)
-            {
-                // \todo Debug draw the UIElement
-                //DebugDrawUIElement();
+            ui.DebugDraw(elementAtPos);
 
-                if (leftClick)
-                    SelectUIElement(elementAtPos, multiselect);
-            }
+            if (leftClick)
+                SelectUIElement(elementAtPos, multiselect);
         }
-        else if (leftClick && !multiselect)
-            // If clicked on emptiness in non-multiselect mode, clear the selection
-           SelectUIElement(null, false);
+        // If clicked on emptiness in non-multiselect mode, clear the selection
+        else if (leftClick && !multiselect && ui.GetElementAt(pos) is null)
+            hierarchyList.ClearSelection();
 
         return;
     }
@@ -417,7 +419,6 @@ void ViewRaycast(bool mouseClick)
     if (elementAtPos !is null)
         return;
 
-    DebugRenderer@ debug = editorScene.debugRenderer;
     Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
     Component@ selectedComponent;
 

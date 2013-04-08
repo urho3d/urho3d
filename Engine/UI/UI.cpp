@@ -176,15 +176,15 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
     // Only allow one modal element at a time, only the currently active modal element can disable itself
     if (modalElement_ && modalElement != modalElement_)
         return false;
-    
+
     // The modal element must be parented to root
     if (modalElement->GetParent() != rootElement_)
         return false;
-    
+
     // Currently only allow modal window
     if (modalElement && modalElement->GetType() != Window::GetTypeStatic())
         return false;
-    
+
     modalElement_ = enable ? modalElement : 0;
     return true;
 }
@@ -288,85 +288,28 @@ void UI::RenderUpdate()
 
 void UI::Render()
 {
-    // Engine does not render when window is closed or device is lost
-    assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
-
     PROFILE(RenderUI);
+    Render(batches_, vertexData_);
+    Render(debugDrawBatches_, debugDrawVertexData_);
 
-    if (vertexData_.Empty())
-        return;
+    // Clear the debug draw batches and data
+    debugDrawBatches_.Clear();
+    debugDrawVertexData_.Clear();
+}
 
-    // Update quad geometry into the vertex buffer
-    unsigned numVertices = vertexData_.Size() / UI_VERTEX_SIZE;
-    // Resize the vertex buffer if too small or much too large
-    if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
-        vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
-
-    vertexBuffer_->SetData(&vertexData_[0]);
-
-    Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
-    Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
-    Vector2 offset(-1.0f, 1.0f);
-
-    Matrix4 projection(Matrix4::IDENTITY);
-    projection.m00_ = scale.x_;
-    projection.m03_ = offset.x_;
-    projection.m11_ = scale.y_;
-    projection.m13_ = offset.y_;
-    projection.m22_ = 1.0f;
-    projection.m23_ = 0.0f;
-    projection.m33_ = 1.0f;
-
-    graphics_->ClearParameterSources();
-    graphics_->SetCullMode(CULL_CCW);
-    graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(false);
-    graphics_->SetStencilTest(false);
-    graphics_->ResetRenderTargets();
-
-    ShaderVariation* ps = 0;
-    ShaderVariation* vs = 0;
-
-    unsigned alphaFormat = Graphics::GetAlphaFormat();
-
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+void UI::DebugDraw(UIElement* element)
+{
+    if (element)
     {
-        const UIBatch& batch = batches_[i];
-        if (batch.vertexStart_ == batch.vertexEnd_)
-            continue;
+        const IntVector2& rootSize = rootElement_->GetSize();
+        IntRect currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
 
-        if (!batch.texture_)
-        {
-            ps = noTexturePS_;
-            vs = noTextureVS_;
-        }
-        else
-        {
-            // If texture contains only an alpha channel, use alpha shader (for fonts)
-            vs = diffTextureVS_;
+        // Set clipping scissor for child elements. No need to draw if zero size
+        element->AdjustScissor(currentScissor);
+        if (currentScissor.left_ == currentScissor.right_ || currentScissor.top_ == currentScissor.bottom_)
+            return;
 
-            if (batch.texture_->GetFormat() == alphaFormat)
-                ps = alphaTexturePS_;
-            else if (batch.blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
-                ps = diffMaskTexturePS_;
-            else
-                ps = diffTexturePS_;
-        }
-
-        graphics_->SetShaders(vs, ps);
-        if (graphics_->NeedParameterUpdate(SP_OBJECTTRANSFORM, this))
-            graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
-        if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
-            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-        if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
-            graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
-
-        graphics_->SetBlendMode(batch.blendMode_);
-        graphics_->SetScissorTest(true, batch.scissor_);
-        graphics_->SetTexture(0, batch.texture_);
-        graphics_->SetVertexBuffer(vertexBuffer_);
-        graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE, (batch.vertexEnd_ - batch.vertexStart_) /
-            UI_VERTEX_SIZE);
+        element->GetDebugDrawBatches(debugDrawBatches_, debugDrawVertexData_, currentScissor);
     }
 }
 
@@ -529,6 +472,88 @@ void UI::Update(float timeStep, UIElement* element)
         Update(timeStep, *i);
 }
 
+void UI::Render(const PODVector<UIBatch>& batches, const PODVector<float>& vertexData)
+{
+    // Engine does not render when window is closed or device is lost
+    assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
+
+    if (vertexData.Empty())
+        return;
+
+    // Update quad geometry into the vertex buffer
+    unsigned numVertices = vertexData.Size() / UI_VERTEX_SIZE;
+    // Resize the vertex buffer if too small or much too large
+    if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
+        vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
+
+    vertexBuffer_->SetData(&vertexData[0]);
+
+    Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
+    Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
+    Vector2 offset(-1.0f, 1.0f);
+
+    Matrix4 projection(Matrix4::IDENTITY);
+    projection.m00_ = scale.x_;
+    projection.m03_ = offset.x_;
+    projection.m11_ = scale.y_;
+    projection.m13_ = offset.y_;
+    projection.m22_ = 1.0f;
+    projection.m23_ = 0.0f;
+    projection.m33_ = 1.0f;
+
+    graphics_->ClearParameterSources();
+    graphics_->SetCullMode(CULL_CCW);
+    graphics_->SetDepthTest(CMP_ALWAYS);
+    graphics_->SetDepthWrite(false);
+    graphics_->SetStencilTest(false);
+    graphics_->ResetRenderTargets();
+
+    ShaderVariation* ps = 0;
+    ShaderVariation* vs = 0;
+
+    unsigned alphaFormat = Graphics::GetAlphaFormat();
+
+    for (unsigned i = 0; i < batches.Size(); ++i)
+    {
+        const UIBatch& batch = batches[i];
+        if (batch.vertexStart_ == batch.vertexEnd_)
+            continue;
+
+        if (!batch.texture_)
+        {
+            ps = noTexturePS_;
+            vs = noTextureVS_;
+        }
+        else
+        {
+            // If texture contains only an alpha channel, use alpha shader (for fonts)
+            vs = diffTextureVS_;
+
+            if (batch.texture_->GetFormat() == alphaFormat)
+                ps = alphaTexturePS_;
+            else if (batch.blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
+                ps = diffMaskTexturePS_;
+            else
+                ps = diffTexturePS_;
+        }
+
+        graphics_->SetShaders(vs, ps);
+        if (graphics_->NeedParameterUpdate(SP_OBJECTTRANSFORM, this))
+            graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
+        if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+        if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
+            graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
+
+        graphics_->SetBlendMode(batch.blendMode_);
+        graphics_->SetScissorTest(true, batch.scissor_);
+        graphics_->SetTexture(0, batch.texture_);
+        graphics_->SetVertexBuffer(vertexBuffer_);
+        graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE, (batch.vertexEnd_ - batch.vertexStart_) /
+            UI_VERTEX_SIZE);
+    }
+}
+
 void UI::GetBatches(UIElement* element, IntRect currentScissor)
 {
     // Set clipping scissor for child elements. No need to draw if zero size
@@ -598,7 +623,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
         {
             bool shouldSkip = true;
             UIElement* originElement = static_cast<UIElement*>(element->GetVar(VAR_ORIGIN).GetPtr());
-            
+
             while (originElement)
             {
                 if (originElement == modalElement_)
@@ -608,11 +633,11 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                 }
                 originElement = originElement->GetParent();
             }
-            
+
             if (shouldSkip)
                 continue;
         }
-        
+
         bool hasChildren = element->GetNumChildren() > 0;
 
         if (element != cursor_.Get() && element->IsVisible())

@@ -467,10 +467,10 @@ void SelectNode(Node@ node, bool multiselect)
             uint parentIndex = GetListIndex(node);
             if (parentIndex < numItems)
                 hierarchyList.Expand(parentIndex, true);
-            
+
             hierarchyList.Expand(index, true);
         }
-        
+
         // This causes an event to be sent, in response we set the node/component selections, and refresh editors
         if (!multiselect)
             hierarchyList.selection = index;
@@ -521,7 +521,7 @@ void SelectComponent(Component@ component, bool multiselect)
                 hierarchyList.ClearSelection();
                 return;
             }
-            
+
             hierarchyList.Expand(nodeIndex, true);
         }
         // This causes an event to be sent, in response we set the node/component selections, and refresh editors
@@ -536,12 +536,6 @@ void SelectComponent(Component@ component, bool multiselect)
 
 void SelectUIElement(UIElement@ element, bool multiselect)
 {
-    if (element is null && !multiselect)
-    {
-        hierarchyList.ClearSelection();
-        return;
-    }
-
     uint index = GetListIndex(element);
     uint numItems = hierarchyList.numItems;
 
@@ -561,10 +555,10 @@ void SelectUIElement(UIElement@ element, bool multiselect)
             uint parentIndex = GetListIndex(element);
             if (parentIndex < numItems)
                 hierarchyList.Expand(parentIndex, true);
-            
+
             hierarchyList.Expand(index, true);
         }
-        
+
         if (!multiselect)
             hierarchyList.selection = index;
         else
@@ -846,8 +840,11 @@ void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
+    // Insert the newly added component at last component position but before the first child node position of the parent node
+    Node@ node = eventData["Node"].GetNode();
     Component@ component = eventData["Component"].GetComponent();
-    UpdateHierarchyItem(component);
+    uint index = node.numChildren > 0 ? GetListIndex(node.children[0]) : M_MAX_UNSIGNED;
+    UpdateHierarchyItem(index, component, hierarchyList.items[GetListIndex(node)]);
 }
 
 void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)

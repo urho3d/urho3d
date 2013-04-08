@@ -79,7 +79,7 @@ AnimatedModel::~AnimatedModel()
 void AnimatedModel::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedModel>();
-    
+
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
@@ -102,7 +102,7 @@ bool AnimatedModel::Load(Deserializer& source)
     loading_ = true;
     bool success = Component::Load(source);
     loading_ = false;
-    
+
     return success;
 }
 
@@ -111,7 +111,7 @@ bool AnimatedModel::LoadXML(const XMLElement& source)
     loading_ = true;
     bool success = Component::LoadXML(source);
     loading_ = false;
-    
+
     return success;
 }
 
@@ -130,20 +130,20 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
         Drawable::ProcessRayQuery(query, results);
         return;
     }
-    
+
     // Check ray hit distance to AABB before proceeding with bone-level tests
     if (query.ray_.HitDistance(GetWorldBoundingBox()) > query.maxDistance_)
         return;
-    
+
     const Vector<Bone>& bones = skeleton_.GetBones();
     Sphere boneSphere;
-    
+
     for (unsigned i = 0; i < bones.Size(); ++i)
     {
         const Bone& bone = bones[i];
         if (!bone.node_)
             continue;
-        
+
         float distance;
 
         // Use hitbox if available
@@ -191,7 +191,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
     // Update animation here
     if (!animationDirty_ && !animationOrderDirty_)
         return;
-    
+
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
     if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
@@ -206,7 +206,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
         float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
         animationLodDistance_ = frame.camera_->GetLodDistance(distance, scale, lodBias_) * invisibleLodFactor_;
     }
-    
+
     UpdateAnimation(frame);
 }
 
@@ -214,7 +214,7 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 {
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
-    
+
     // Note: per-geometry distances do not take skinning into account
     if (batches_.Size() > 1)
     {
@@ -229,10 +229,10 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         batches_[0].distance_ = distance_;
         batches_[0].worldTransform_ = &worldTransform;
     }
-    
+
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
-    
+
     // If model is rendered from several views, use the minimum LOD distance for animation LOD
     if (frame.frameNumber_ != animationLodFrameNumber_)
     {
@@ -241,7 +241,7 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
     }
     else
         animationLodDistance_ = Min(animationLodDistance_, newLodDistance);
-    
+
     if (newLodDistance != lodDistance_)
     {
         lodDistance_ = newLodDistance;
@@ -253,7 +253,7 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
     if (morphsDirty_)
         UpdateMorphs();
-    
+
     if (skinningDirty_)
         UpdateSkinning();
 }
@@ -272,7 +272,7 @@ void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (debug && IsEnabledEffective())
     {
-        debug->AddBoundingBox(GetWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
+        debug->AddBoundingBox(GetWorldBoundingBox(), Color::GREEN, depthTest);
         debug->AddSkeleton(skeleton_, Color(0.75f, 0.75f, 0.75f), depthTest);
     }
 }
@@ -281,15 +281,15 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
 {
     if (!model || model == model_)
         return;
-    
+
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
     if (model_)
         UnsubscribeFromEvent(model_, E_RELOADFINISHED);
     if (model)
         SubscribeToEvent(model, E_RELOADFINISHED, HANDLER(AnimatedModel, HandleModelReloadFinished));
-    
+
     model_ = model;
-    
+
     // Copy the subgeometry & LOD level structure
     SetNumGeometries(model->GetNumGeometries());
     const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
@@ -299,14 +299,14 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         geometries_[i] = geometries[i];
         geometryData_[i].center_ = geometryCenters[i];
     }
-    
+
     // Copy geometry bone mappings
     const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
     geometryBoneMappings_.Clear();
     geometryBoneMappings_.Reserve(geometryBoneMappings.Size());
     for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
         geometryBoneMappings_.Push(geometryBoneMappings[i]);
-    
+
     // Copy morphs. Note: morph vertex buffers will be created later on-demand
     morphVertexBuffers_.Clear();
     morphs_.Clear();
@@ -324,12 +324,12 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
             morphElementMask_ |= j->second_.elementMask_;
         morphs_.Push(newMorph);
     }
-    
+
     // Copy bounding box & skeleton
     SetBoundingBox(model->GetBoundingBox());
     SetSkeleton(model->GetSkeleton(), createBones);
     ResetLodLevels();
-    
+
     // Enable skinning in batches
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
@@ -356,7 +356,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
             batches_[i].shaderDataSize_ = 0;
         }
     }
-    
+
     MarkNetworkUpdate();
 }
 
@@ -367,15 +367,15 @@ AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
         LOGERROR("Can not add animation state to non-master model");
         return 0;
     }
-    
+
     if (!animation || !skeleton_.GetNumBones())
         return 0;
-    
+
     // Check for not adding twice
     AnimationState* existing = GetAnimationState(animation);
     if (existing)
         return existing;
-    
+
     SharedPtr<AnimationState> newState(new AnimationState(this, animation));
     animationStates_.Push(newState);
     MarkAnimationOrderDirty();
@@ -465,7 +465,7 @@ void AnimatedModel::SetInvisibleLodFactor(float factor)
         factor = 0.0f;
     else if (factor != 0.0f && factor < 1.0f)
         factor = 1.0f;
-    
+
     invisibleLodFactor_ = factor;
     MarkNetworkUpdate();
 }
@@ -474,23 +474,23 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
 {
     if (index >= morphs_.Size())
         return;
-    
+
     // If morph vertex buffers have not been created yet, create now
     if (weight > 0.0f && morphVertexBuffers_.Empty())
         CloneGeometries();
-    
+
     weight = Clamp(weight, 0.0f, 1.0f);
-    
+
     if (weight != morphs_[index].weight_)
     {
         morphs_[index].weight_ = weight;
-        
+
         // For a master model, set the same morph weight on non-master models
         if (isMaster_)
         {
             PODVector<AnimatedModel*> models;
             GetComponents<AnimatedModel>(models);
-            
+
             // Indexing might not be the same, so use the name hash instead
             for (unsigned i = 1; i < models.Size(); ++i)
             {
@@ -498,7 +498,7 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
                     models[i]->SetMorphWeight(morphs_[index].nameHash_, weight);
             }
         }
-        
+
         MarkMorphsDirty();
         MarkNetworkUpdate();
     }
@@ -532,20 +532,20 @@ void AnimatedModel::ResetMorphWeights()
 {
     for (Vector<ModelMorph>::Iterator i = morphs_.Begin(); i != morphs_.End(); ++i)
         i->weight_ = 0.0f;
-    
+
     // For a master model, reset weights on non-master models
     if (isMaster_)
     {
         PODVector<AnimatedModel*> models;
         GetComponents<AnimatedModel>(models);
-        
+
         for (unsigned i = 1; i < models.Size(); ++i)
         {
             if (!models[i]->isMaster_)
                 models[i]->ResetMorphWeights();
         }
     }
-    
+
     MarkMorphsDirty();
     MarkNetworkUpdate();
 }
@@ -562,7 +562,7 @@ float AnimatedModel::GetMorphWeight(const String& name) const
         if (i->name_ == name)
             return i->weight_;
     }
-    
+
     return 0.0f;
 }
 
@@ -573,7 +573,7 @@ float AnimatedModel::GetMorphWeight(StringHash nameHash) const
         if (i->nameHash_ == nameHash)
             return i->weight_;
     }
-    
+
     return 0.0f;
 }
 
@@ -584,7 +584,7 @@ AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
         if ((*i)->GetAnimation() == animation)
             return *i;
     }
-    
+
     return 0;
 }
 
@@ -610,7 +610,7 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
                 return *i;
         }
     }
-    
+
     return 0;
 }
 
@@ -626,7 +626,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         LOGERROR("AnimatedModel not attached to a scene node, can not create bone nodes");
         return;
     }
-    
+
     if (isMaster_)
     {
         // Check if bone structure has stayed compatible (reloading the model.) In that case retain the old bones and animations
@@ -635,7 +635,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             Vector<Bone>& destBones = skeleton_.GetModifiableBones();
             const Vector<Bone>& srcBones = skeleton.GetBones();
             bool compatible = true;
-            
+
             for (unsigned i = 0; i < destBones.Size(); ++i)
             {
                 if (destBones[i].node_ && destBones[i].name_ == srcBones[i].name_ && destBones[i].parentIndex_ ==
@@ -657,9 +657,9 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             if (compatible)
                 return;
         }
-        
+
         RemoveAllAnimationStates();
-        
+
         // Detach the rootbone of the previous model if any
         if (createBones)
         {
@@ -667,9 +667,9 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             if (rootBone)
                 node_->RemoveChild(rootBone->node_);
         }
-        
+
         skeleton_.Define(skeleton);
-        
+
         // Remove collision information from dummy bones that do not affect skinning, to prevent them from being merged
         // to the bounding box
         Vector<Bone>& bones = skeleton_.GetModifiableBones();
@@ -680,7 +680,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             if (i->collisionMask_ & BONECOLLISION_SPHERE && i->radius_ < M_EPSILON)
                 i->collisionMask_ &= ~BONECOLLISION_SPHERE;
         }
-        
+
         // Create scene nodes for the bones
         if (createBones)
         {
@@ -692,7 +692,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                 boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
                 i->node_ = boneNode;
             }
-            
+
             for (unsigned i = 0; i < bones.Size(); ++i)
             {
                 unsigned parentIndex = bones[i].parentIndex_;
@@ -700,11 +700,11 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                     bones[parentIndex].node_->AddChild(bones[i].node_);
             }
         }
-        
+
         MarkAnimationDirty();
-        
+
         using namespace BoneHierarchyCreated;
-        
+
         VariantMap eventData;
         eventData[P_NODE] = (void*)node_;
         node_->SendEvent(E_BONEHIERARCHYCREATED, eventData);
@@ -713,7 +713,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
     {
         // For non-master models: use the bone nodes of the master model
         skeleton_.Define(skeleton);
-        
+
         if (createBones)
         {
             Vector<Bone>& bones = skeleton_.GetModifiableBones();
@@ -726,11 +726,11 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             }
         }
     }
-    
+
     // Reserve space for skinning matrices
     skinMatrices_.Resize(skeleton_.GetNumBones());
     SetGeometryBoneMappings();
-    
+
     assignBonesPending_ = !createBones;
 }
 
@@ -763,7 +763,7 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
             const ResourceRef& animRef = value[index++].GetResourceRef();
             SharedPtr<AnimationState> newState(new AnimationState(this, cache->GetResource<Animation>(animRef.id_)));
             animationStates_.Push(newState);
-            
+
             newState->SetStartBone(skeleton_.GetBone(value[index++].GetString()));
             newState->SetLooped(value[index++].GetBool());
             newState->SetWeight(value[index++].GetFloat());
@@ -777,7 +777,7 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
             animationStates_.Push(newState);
         }
     }
-    
+
     MarkAnimationOrderDirty();
 }
 
@@ -827,14 +827,14 @@ const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const
     attrBuffer_.Clear();
     for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
         attrBuffer_.WriteUByte((unsigned char)(i->weight_ * 255.0f));
-    
+
     return attrBuffer_.GetBuffer();
 }
 
 void AnimatedModel::OnNodeSet(Node* node)
 {
     Drawable::OnNodeSet(node);
-    
+
     // If this AnimatedModel is the first in the node, it is the master which controls animation & morphs
     isMaster_ = GetComponent<AnimatedModel>() == this;
 }
@@ -842,7 +842,7 @@ void AnimatedModel::OnNodeSet(Node* node)
 void AnimatedModel::OnMarkedDirty(Node* node)
 {
     Drawable::OnMarkedDirty(node);
-    
+
     // If the scene node or any of the bone nodes move, mark skinning dirty
     skinningDirty_ = true;
 }
@@ -855,14 +855,14 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
     {
         // If has bones, update world bounding box based on them
         worldBoundingBox_.defined_ = false;
-        
+
         const Vector<Bone>& bones = skeleton_.GetBones();
         for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
         {
             Node* boneNode = i->node_;
             if (!boneNode)
                 continue;
-            
+
             // Use hitbox if available. If not, use only half of the sphere radius
             if (i->collisionMask_ & BONECOLLISION_BOX)
                 worldBoundingBox_.Merge(i->boundingBox_.Transformed(boneNode->GetWorldTransform()));
@@ -875,10 +875,10 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
 void AnimatedModel::AssignBoneNodes()
 {
     assignBonesPending_ = false;
-    
+
     if (!node_)
         return;
-    
+
     // Find the bone nodes from the node hierarchy and add listeners
     Vector<Bone>& bones = skeleton_.GetModifiableBones();
     bool boneFound = false;
@@ -892,19 +892,19 @@ void AnimatedModel::AssignBoneNodes()
         }
         i->node_ = boneNode;
     }
-    
+
     // If no bones found, this may be a prefab where the bone information was left out.
     // In that case reassign the skeleton now if possible
     if (!boneFound && model_)
         SetSkeleton(model_->GetSkeleton(), true);
-    
+
     // Re-assign the same start bone to animations to get the proper bone node this time
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;
         state->SetStartBone(state->GetStartBone());
     }
-    
+
     MarkAnimationDirty();
 }
 
@@ -938,7 +938,7 @@ void AnimatedModel::CloneGeometries()
     const Vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
     HashMap<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
     morphVertexBuffers_.Resize(originalVertexBuffers.Size());
-    
+
     for (unsigned i = 0; i < originalVertexBuffers.Size(); ++i)
     {
         VertexBuffer* original = originalVertexBuffers[i];
@@ -959,7 +959,7 @@ void AnimatedModel::CloneGeometries()
         else
             morphVertexBuffers_[i].Reset();
     }
-    
+
     // Geometries will always be cloned fully. They contain only references to buffer, so they are relatively light
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
@@ -967,7 +967,7 @@ void AnimatedModel::CloneGeometries()
         {
             SharedPtr<Geometry> original = geometries_[i][j];
             SharedPtr<Geometry> clone(new Geometry(context_));
-            
+
             // Add an additional vertex stream into the clone, which supplies only the morphable vertex data, while the static
             // data comes from the original vertex buffer(s)
             const Vector<SharedPtr<VertexBuffer> >& originalBuffers = original->GetVertexBuffers();
@@ -979,13 +979,13 @@ void AnimatedModel::CloneGeometries()
                     ++totalBuf;
             }
             clone->SetNumVertexBuffers(totalBuf);
-            
+
             unsigned l = 0;
             for (unsigned k = 0; k < originalBuffers.Size(); ++k)
             {
                 VertexBuffer* originalBuffer = originalBuffers[k];
                 unsigned originalMask = original->GetVertexElementMask(k);
-                
+
                 if (clonedVertexBuffers.Contains(originalBuffer))
                 {
                     VertexBuffer* clonedBuffer = clonedVertexBuffers[originalBuffer];
@@ -995,15 +995,15 @@ void AnimatedModel::CloneGeometries()
                 else
                     clone->SetVertexBuffer(l++, originalBuffer, originalMask);
             }
-            
+
             clone->SetIndexBuffer(original->GetIndexBuffer());
             clone->SetDrawRange(original->GetPrimitiveType(), original->GetIndexStart(), original->GetIndexCount());
             clone->SetLodDistance(original->GetLodDistance());
-            
+
             geometries_[i][j] = clone;
         }
     }
-    
+
     // Make sure the rendering batches use the new cloned geometries
     ResetLodLevels();
     MarkMorphsDirty();
@@ -1017,7 +1017,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
     unsigned vertexSize = srcBuffer->GetVertexSize();
     float* dest = (float*)destVertexData;
     unsigned char* src = (unsigned char*)srcVertexData;
-    
+
     while (vertexCount--)
     {
         if (mask & MASK_POSITION)
@@ -1042,7 +1042,7 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
             *dest++ = tangentSrc[2];
             *dest++ = tangentSrc[3];
         }
-        
+
         src += vertexSize;
     }
 }
@@ -1051,24 +1051,24 @@ void AnimatedModel::SetGeometryBoneMappings()
 {
     geometrySkinMatrices_.Clear();
     geometrySkinMatrixPtrs_.Clear();
-    
+
     if (!geometryBoneMappings_.Size())
         return;
-    
+
     // Check if all mappings are empty, then we do not need to use mapped skinning
     bool allEmpty = true;
     for (unsigned i = 0; i < geometryBoneMappings_.Size(); ++i)
         if (geometryBoneMappings_[i].Size())
             allEmpty = false;
-    
+
     if (allEmpty)
         return;
-    
+
     // Reserve space for per-geometry skinning matrices
     geometrySkinMatrices_.Resize(geometryBoneMappings_.Size());
     for (unsigned i = 0; i < geometryBoneMappings_.Size(); ++i)
         geometrySkinMatrices_[i].Resize(geometryBoneMappings_[i].Size());
-    
+
     // Build original-to-skinindex matrix pointer mapping for fast copying
     // Note: at this point layout of geometrySkinMatrices_ cannot be modified or pointers become invalid
     geometrySkinMatrixPtrs_.Resize(skeleton_.GetNumBones());
@@ -1096,19 +1096,19 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
         else
             animationLodTimer_ = 0.0f;
     }
-    
+
     // Make sure animations are in ascending priority order
     if (animationOrderDirty_)
     {
         Sort(animationStates_.Begin(), animationStates_.End(), CompareAnimationOrder);
         animationOrderDirty_ = false;
     }
-    
+
     // Reset skeleton, then apply all animations
     skeleton_.Reset();
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
         (*i)->Apply();
-    
+
     // Animation has changed the bounding box: mark node for octree reinsertion
     Drawable::OnMarkedDirty(node_);
     // For optimization, recalculate world bounding box already here (during the threaded update)
@@ -1122,7 +1122,7 @@ void AnimatedModel::UpdateSkinning()
     const Vector<Bone>& bones = skeleton_.GetBones();
     // Use model's world transform in case a bone is missing
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    
+
     // Skinning with global matrices only
     if (!geometrySkinMatrices_.Size())
     {
@@ -1145,13 +1145,13 @@ void AnimatedModel::UpdateSkinning()
                 skinMatrices_[i] = bone.node_->GetWorldTransform() * bone.offsetMatrix_;
             else
                 skinMatrices_[i] = worldTransform;
-            
+
             // Copy the skin matrix to per-geometry matrices as needed
             for (unsigned j = 0; j < geometrySkinMatrixPtrs_[i].Size(); ++j)
                 *geometrySkinMatrixPtrs_[i][j] = skinMatrices_[i];
         }
     }
-    
+
     skinningDirty_ = false;
 }
 
@@ -1160,7 +1160,7 @@ void AnimatedModel::UpdateMorphs()
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return;
-    
+
     if (morphs_.Size())
     {
         // Reset the morph data range from all morphable vertex buffers, then apply morphs
@@ -1172,14 +1172,14 @@ void AnimatedModel::UpdateMorphs()
                 VertexBuffer* originalBuffer = model_->GetVertexBuffers()[i];
                 unsigned morphStart = model_->GetMorphRangeStart(i);
                 unsigned morphCount = model_->GetMorphRangeCount(i);
-                
+
                 void* dest = buffer->Lock(morphStart, morphCount);
                 if (dest)
                 {
                     // Reset morph range by copying data from the original vertex buffer
                     CopyMorphVertices(dest, originalBuffer->GetShadowData() + morphStart * originalBuffer->GetVertexSize(),
                         morphCount, buffer, originalBuffer);
-                    
+
                     for (unsigned j = 0; j < morphs_.Size(); ++j)
                     {
                         if (morphs_[j].weight_ > 0.0f)
@@ -1189,13 +1189,13 @@ void AnimatedModel::UpdateMorphs()
                                 ApplyMorph(buffer, dest, morphStart, k->second_, morphs_[j].weight_);
                         }
                     }
-                    
+
                     buffer->Unlock();
                 }
             }
         }
     }
-    
+
     morphsDirty_ = false;
 }
 
@@ -1206,15 +1206,15 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
     unsigned normalOffset = buffer->GetElementOffset(ELEMENT_NORMAL);
     unsigned tangentOffset = buffer->GetElementOffset(ELEMENT_TANGENT);
     unsigned vertexSize = buffer->GetVertexSize();
-    
+
     unsigned char* srcData = morph.morphData_;
     unsigned char* destData = (unsigned char*)destVertexData;
-    
+
     while (vertexCount--)
     {
         unsigned vertexIndex = *((unsigned*)srcData) - morphRangeStart;
         srcData += sizeof(unsigned);
-        
+
         if (elementMask & MASK_POSITION)
         {
             float* dest = (float*)(destData + vertexIndex * vertexSize);

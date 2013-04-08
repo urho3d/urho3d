@@ -37,6 +37,8 @@
 namespace Urho3D
 {
 
+const Color DEBUG_DRAW_COLOR(Color::BLUE);
+
 const char* horizontalAlignments[] =
 {
     "Left",
@@ -309,6 +311,20 @@ void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertex
 {
     // Reset hovering for next frame
     hovering_ = false;
+}
+
+void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+{
+    UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+    // Left
+    batch.AddQuad(0, 0, 1, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    // Top
+    batch.AddQuad(0, 0, size_.x_, 1, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    // Right
+    batch.AddQuad(size_.x_ - 1, 0, 1, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    // Bottom
+    batch.AddQuad(0, size_.y_ - 1, size_.x_, 1, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    UIBatch::AddOrMerge(batch, batches);
 }
 
 bool UIElement::IsWithinScissor(const IntRect& currentScissor)

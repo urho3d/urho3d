@@ -233,6 +233,9 @@ void CreateComponent(const String&in componentType)
         }
     }
 
+    // Although the edit nodes selection are not changed, call to ensure attribute inspector notices new components of the edit nodes   
+    HandleHierarchyListSelectionChange();
+
     SaveEditActionGroup(group);
 
     SetSceneModified();
