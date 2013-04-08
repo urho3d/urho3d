@@ -172,17 +172,17 @@ bool SaveScene(const String&in fileName)
 
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
-    if (extension != ".xml")
-        editorScene.Save(file);
-    else
-        editorScene.SaveXML(file);
+    bool success = (extension != ".xml" ? editorScene.Save(file) : editorScene.SaveXML(file));
 
     editorScene.updateEnabled = false;
 
-    sceneModified = false;
-    UpdateWindowTitle();
+    if (success)
+    {
+        sceneModified = false;
+        UpdateWindowTitle();
+    }
 
-    return true;
+    return success;
 }
 
 bool SaveSceneWithExistingName()
@@ -282,24 +282,23 @@ void LoadNode(const String&in fileName)
     }
 }
 
-void SaveNode(const String&in fileName)
+bool SaveNode(const String&in fileName)
 {
     if (fileName.empty)
-        return;
+        return false;
 
     ui.cursor.shape = CS_BUSY;
 
     File file(fileName, FILE_WRITE);
     if (!file.open)
-        return;
+        return false;
 
     String extension = GetExtension(fileName);
-    if (extension != ".xml")
-        editNode.Save(file);
-    else
-        editNode.SaveXML(file);
+    bool success = (extension != ".xml" ? editNode.Save(file) : editNode.SaveXML(file));
+    if (success)
+        instantiateFileName = fileName;
 
-    instantiateFileName = fileName;
+    return success;
 }
 
 void UpdateScene(float timeStep)

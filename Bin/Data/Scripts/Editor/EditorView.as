@@ -362,9 +362,12 @@ void HandlePostRenderUpdate()
     for (uint i = 0; i < selectedComponents.length; ++i)
         selectedComponents[i].DrawDebugGeometry(debug, false);
 
-    // Visualize the currently selected UI-elements
-    for (uint i = 0; i < selectedUIElements.length; ++i)
-        ui.DebugDraw(selectedUIElements[i]);
+    // Visualize the currently selected UI-elements but only when UI does not have modal element
+    if (ui.modalElement is null)
+    {
+        for (uint i = 0; i < selectedUIElements.length; ++i)
+            ui.DebugDraw(selectedUIElements[i]);
+    }
 
     if (renderingDebug)
         renderer.DrawDebugGeometry(false);

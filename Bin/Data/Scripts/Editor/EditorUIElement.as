@@ -114,7 +114,10 @@ void OpenUIElement(const String&in fileName)
         // \todo: should not always centered
         CenterDialog(element);
         editorUIElement.AddChild(element);
+
         UpdateHierarchyItem(element);
+        FocusUIElement(element);
+
         ClearEditActions();
     }
 
@@ -168,16 +171,48 @@ bool CloseAllUIElements()
 
 bool SaveUIElement(const String&in fileName)
 {
-    // TODO
-    return true;
+    if (fileName.empty)
+        return false;
+
+    ui.cursor.shape = CS_BUSY;
+
+    File file(fileName, FILE_WRITE);
+    if (!file.open)
+        return false;
+
+    XMLFile@ elementData = XMLFile();
+    XMLElement rootElem = elementData.CreateRoot("element");
+    bool success = editUIElement.SaveXML(rootElem);
+    if (success)
+    {
+        FilterInternalVars(rootElem);
+        success = elementData.Save(file);
+    }
+    if (success)
+    {
+        editUIElement.vars[FILENAME_VAR] = fileName;
+        editUIElement.vars[MODIFIED_VAR] = false;
+
+        sceneModified = false;
+        UpdateWindowTitle();
+    }
+
+    return success;
 }
 
 bool SaveUIElementWithExistingName()
 {
-    if (editUIElement is null || editUIElement.vars[FILENAME_VAR].GetString().empty)
-        return PickFile();
+    if (editUIElement is null)
+        return false;
+
+    Variant fileNameVar = editUIElement.GetVar(FILENAME_VAR);
+    if (fileNameVar.empty)  // Only top level UI-element has this variable
+        return false;
+    
+    if (fileNameVar.GetString().empty)
+        return PickFile();  // No name yet, so pick one
     else
-        return SaveUIElement(editUIElement.vars[FILENAME_VAR].GetString());
+        return SaveUIElement(fileNameVar.GetString());
 }
 
 void LoadChildUIElement(const String&in fileName)
@@ -218,24 +253,29 @@ void LoadChildUIElement(const String&in fileName)
     suppressUIElementChanges = false;
 }
 
-void SaveChildUIElement(const String&in fileName)
+bool SaveChildUIElement(const String&in fileName)
 {
     if (fileName.empty)
-        return;
+        return false;
 
     ui.cursor.shape = CS_BUSY;
 
     File file(fileName, FILE_WRITE);
     if (!file.open)
-        return;
+        return false;
 
     XMLFile@ elementData = XMLFile();
     XMLElement rootElem = elementData.CreateRoot("element");
     // Need another nested element tag otherwise the LoadXML() does not work as expected
     XMLElement childElem = rootElem.CreateChild("element");
-    editUIElement.SaveXML(childElem);
-    FilterInternalVars(childElem);
-    elementData.Save(file);
+    bool success = editUIElement.SaveXML(childElem);
+    if (success)
+    {
+        FilterInternalVars(childElem);
+        success = elementData.Save(file);
+    }
+
+    return success;
 }
 
 void SetUIElementDefaultStyle(const String&in fileName)
@@ -262,7 +302,7 @@ void SetUIElementDefaultStyle(const String&in fileName)
 
 void FilterInternalVars(XMLElement source)
 {
-    // Remove var that does not have its key registered in the 'attribute' tag
+    // Remove unregistered var for each 'attribute' tag
     XMLElement childElem = source.GetChild("attribute");
     while (childElem.notNull)
     {
@@ -271,13 +311,9 @@ void FilterInternalVars(XMLElement source)
             XMLElement variantElem = childElem.GetChild("variant");
             while (variantElem.notNull)
             {
-                XMLElement nextVariantElem = childElem.GetNext("variant");
-
-                // If variable name is empty then it is an internal variable
-                if (scene.GetVarName(variantElem.GetUInt("hash")).empty)
-                    childElem.RemoveChild(variantElem);
-
-                variantElem = nextVariantElem;
+                // If variable name is empty (unregistered) then it is an internal variable
+                bool removed = scene.GetVarName(variantElem.GetUInt("hash")).empty && childElem.RemoveChild(variantElem);
+                variantElem = removed ? childElem.GetChild("variant") : childElem.GetNext("variant");
             }
         }
         childElem = childElem.GetNext("attribute");

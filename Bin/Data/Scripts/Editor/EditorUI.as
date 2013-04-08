@@ -328,7 +328,7 @@ bool PickFile()
     }
     else if (action == "Save UI-element as..." || action == "Save UI-element")
     {
-        if (editUIElement !is null)
+        if (editUIElement !is null && editUIElement.vars.Contains(FILENAME_VAR))
         {
             CreateFileSelector("Save UI-element as", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
             uiFileSelector.fileName = GetFileNameAndExtension(editUIElement.vars[FILENAME_VAR].GetString());
