@@ -26,7 +26,6 @@
 #include "BoundingBox.h"
 #include "Component.h"
 #include "Matrix3x4.h"
-#include "VectorBuffer.h"
 
 class dtNavMesh;
 class dtNavMeshQuery;
@@ -93,8 +92,10 @@ public:
     void SetDetailSampleDistance(float distance);
     /// Set detail sampling maximum error.
     void SetDetailSampleMaxError(float error);
-    /// Rebuild the navigation data. Return true if successful.
+    /// Rebuild the navigation mesh. Return true if successful.
     bool Build();
+    /// Rebuild part of the navigation mesh contained by the world-space bounding box. Return true if successful.
+    bool Build(const BoundingBox& boundingBox);
     /// Find a path between world space points. Return non-empty list of points if successful.
     void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     
@@ -126,20 +127,40 @@ public:
     float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
     /// Return whether has been initialized with valid navigation data.
     bool IsInitialized() const { return navMesh_ != 0; }
+    /// Return local space bounding box of the navigation mesh.
+    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
+    /// Return world space bounding box of the navigation mesh.
+    BoundingBox GetWorldBoundingBox() const;
+    /// Return number of tiles.
+    IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
     
     /// Set navigation data attribute.
-    void SetNavigationDataAttr(const PODVector<unsigned char>& data);
+    void SetNavigationDataAttr(PODVector<unsigned char> data);
     /// Get navigation data attribute.
-    const PODVector<unsigned char>& GetNavigationDataAttr() const { return navigationDataAttr_.GetBuffer(); }
+    PODVector<unsigned char> GetNavigationDataAttr() const;
     
 private:
+    /// Collect geometry from under Navigable components.
+    void CollectGeometries(Vector<GeometryInfo>& geometryList);
     /// Visit nodes and collect navigable geometry.
     void CollectGeometries(Vector<GeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
     /// Get geometry data within a bounding box.
     void GetTileGeometry(NavigationBuildData& build, Vector<GeometryInfo>& geometryList, BoundingBox& box);
-    /// Release the Detour navmesh and the query.
-    void ReleaseNavMesh();
+    /// Build one tile of the navigation mesh. Return true if successful.
+    bool BuildTile(Vector<GeometryInfo>& geometryList, int x, int z);
+    /// Initialize navigation mesh query. Return true if successful.
+    bool InitializeQuery();
+    /// Release the navigation mesh and the query.
+    void ReleaseNavigationMesh();
     
+    /// Detour navigation mesh.
+    dtNavMesh* navMesh_;
+    /// Detour navigation mesh query.
+    dtNavMeshQuery* navMeshQuery_;
+    /// Detour navigation mesh query filter.
+    dtQueryFilter* queryFilter_;
+    /// Temporary data for finding a path.
+    FindPathData* pathData_;
     /// Tile size.
     int tileSize_;
     /// Cell size.
@@ -166,20 +187,12 @@ private:
     float detailSampleDistance_;
     /// Detail sampling maximum error.
     float detailSampleMaxError_;
-    /// Detour navmesh.
-    dtNavMesh* navMesh_;
     /// Number of tiles in X direction.
     int numTilesX_;
     /// Number of tiles in Z direction.
     int numTilesZ_;
-    /// Detour navmesh query.
-    dtNavMeshQuery* navMeshQuery_;
-    /// Detour navmesh query filter.
-    dtQueryFilter* queryFilter_;
-    /// Temporary data for finding a path.
-    FindPathData* pathData_;
-    /// Navigation data attribute. Contains the unmodified Recast data.
-    VectorBuffer navigationDataAttr_;
+    /// Whole navigation mesh bounding box.
+    BoundingBox boundingBox_;
 };
 
 }

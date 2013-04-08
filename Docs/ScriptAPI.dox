@@ -5396,6 +5396,7 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - bool Build()
+- bool Build(const BoundingBox&)
 - Vector3[]@ FindPath(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
 
 Properties:<br>
@@ -5410,6 +5411,7 @@ Properties:<br>
 - bool enabledEffective (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- int tileSize
 - float cellSize
 - float cellHeight
 - float agentHeight
@@ -5423,6 +5425,9 @@ Properties:<br>
 - float detailSampleDistance
 - float detailSampleMaxError
 - bool initialized (readonly)
+- BoundingBox boundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
+- IntVector2 numTiles (readonly)
 
 
 ScriptFile

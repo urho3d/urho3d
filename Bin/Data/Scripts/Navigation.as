@@ -41,7 +41,7 @@ void InitConsole()
     engine.CreateDebugHud();
     debugHud.style = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
-    debugHud.SetAppStats("Instructions:", "Shift+LMB to set startpoint, LMB to set endpoint");
+    debugHud.SetAppStats("Instructions:", "\nShift+LMB to set startpoint\nLMB to set endpoint\nMMB to create/delete object and rebuild partial navmesh");
 
     engine.CreateConsole();
     console.style = uiStyle;
@@ -352,6 +352,59 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             }
         }
     }
+    
+    if (button == MOUSEB_MIDDLE)
+    {
+        IntVector2 pos = ui.cursorPosition;
+        if (ui.GetElementAt(pos, true) !is null)
+            return;
+    
+        Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+        RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 1000.0, DRAWABLE_GEOMETRY);
+    
+        bool rebuild = false;
+        BoundingBox rebuildBox;
+    
+        if (result.drawable !is null)
+        {
+            Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
+            if (result.node.name == "Mushroom")
+            {
+                rebuild = true;
+                rebuildBox = result.drawable.worldBoundingBox;
+                result.node.Remove();
+            }
+            else
+            {
+                Node@ objectNode = testScene.CreateChild("Mushroom");
+                objectNode.position = rayHitPos;
+                objectNode.rotation = Quaternion(0, Random(360.0), 0);
+                objectNode.SetScale(5);
+    
+                StaticModel@ object = objectNode.CreateComponent("StaticModel");
+                object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
+                object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
+                object.castShadows = true;
+    
+                RigidBody@ body = objectNode.CreateComponent("RigidBody");
+                CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
+                shape.SetTriangleMesh(object.model, 0);
+                
+                rebuild = true;
+                rebuildBox = object.worldBoundingBox;
+            }
+        }
+        
+        if (rebuild)
+        {
+            NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
+            navMesh.Build(rebuildBox);
+            
+            // Recalculate path if applicable
+            if (startPosSet && endPosSet)
+                path = navMesh.FindPath(startPos, endPos);
+        }
+    }
 }
 
 void HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
@@ -377,7 +430,7 @@ void HandlePostRenderUpdate()
     }
 
     IntVector2 pos = ui.cursorPosition;
-    if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
+    if (ui.GetElementAt(pos, true) is null)
     {
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
         RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 1000.0, DRAWABLE_GEOMETRY);

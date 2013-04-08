@@ -45,7 +45,8 @@ static CScriptArray* NavigationMeshFindPath(const Vector3& start, const Vector3&
 void RegisterNavigationMesh(asIScriptEngine* engine)
 {
     RegisterComponent<NavigationMesh>(engine, "NavigationMesh");
-    engine->RegisterObjectMethod("NavigationMesh", "bool Build()", asMETHOD(NavigationMesh, Build), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "bool Build()", asMETHODPR(NavigationMesh, Build, (void), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "bool Build(const BoundingBox&in)", asMETHODPR(NavigationMesh, Build, (const BoundingBox&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindPath), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("NavigationMesh", "void set_tileSize(int)", asMETHOD(NavigationMesh, SetTileSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "int get_tileSize() const", asMETHOD(NavigationMesh, GetTileSize), asCALL_THISCALL);
@@ -74,6 +75,9 @@ void RegisterNavigationMesh(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NavigationMesh", "void set_detailSampleMaxError(float)", asMETHOD(NavigationMesh, SetDetailSampleMaxError), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "float get_detailSampleMaxError() const", asMETHOD(NavigationMesh, GetDetailSampleMaxError), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "bool get_initialized() const", asMETHOD(NavigationMesh, IsInitialized), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "const BoundingBox& get_boundingBox() const", asMETHOD(NavigationMesh, GetBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "BoundingBox get_worldBoundingBox() const", asMETHOD(NavigationMesh, GetWorldBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "IntVector2 get_numTiles() const", asMETHOD(NavigationMesh, GetNumTiles), asCALL_THISCALL);
 }
 
 void RegisterNavigationAPI(asIScriptEngine* engine)
