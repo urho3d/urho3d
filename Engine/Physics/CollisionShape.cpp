@@ -78,16 +78,13 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
 {
     modelName_ = model->GetName();
     meshData_ = new btTriangleMesh();
-    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
     
-    for (unsigned i = 0; i < geometries.Size(); ++i)
+    unsigned numGeometries = model->GetNumGeometries();
+    
+    for (unsigned i = 0; i < numGeometries; ++i)
     {
-        unsigned subGeometryLodLevel = lodLevel;
-        if (subGeometryLodLevel >= geometries[i].Size())
-            subGeometryLodLevel = geometries[i].Size() - 1;
-        
-        Geometry* geom = geometries[i][subGeometryLodLevel];
-        if (!geom)
+        Geometry* geometry = model->GetGeometry(i, lodLevel);
+        if (!geometry)
         {
             LOGWARNING("Skipping null geometry for triangle mesh collision");
             continue;
@@ -99,15 +96,15 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         unsigned indexSize;
         unsigned elementMask;
         
-        geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+        geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
         if (!vertexData || !indexData)
         {
             LOGWARNING("Skipping geometry with no CPU-side geometry data for triangle mesh collision");
             continue;
         }
         
-        unsigned indexStart = geom->GetIndexStart();
-        unsigned indexCount = geom->GetIndexCount();
+        unsigned indexStart = geometry->GetIndexStart();
+        unsigned indexCount = geometry->GetIndexCount();
         
         // 16-bit indices
         if (indexSize == sizeof(unsigned short))
@@ -152,17 +149,13 @@ TriangleMeshData::~TriangleMeshData()
 ConvexData::ConvexData(Model* model, unsigned lodLevel)
 {
     modelName_ = model->GetName();
-    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
     
     PODVector<Vector3> originalVertices;
+    unsigned numGeometries = model->GetNumGeometries();
     
-    for (unsigned i = 0; i < geometries.Size(); ++i)
+    for (unsigned i = 0; i < numGeometries; ++i)
     {
-        unsigned subGeometryLodLevel = lodLevel;
-        if (subGeometryLodLevel >= geometries[i].Size())
-            subGeometryLodLevel = geometries[i].Size() - 1;
-        
-        Geometry* geom = geometries[i][subGeometryLodLevel];
+        Geometry* geom = model->GetGeometry(i, lodLevel);
         if (!geom)
         {
             LOGWARNING("Skipping null geometry for convex hull collision");
@@ -340,8 +333,8 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             position.y_ += (heightfield->minHeight_ + heightfield->maxHeight_) * 0.5f;
         }
         
-        Vector3 worldPosition = worldTransform * position;
-        Quaternion worldRotation = worldTransform.Rotation() * rotation_;
+        Vector3 worldPosition(worldTransform * position);
+        Quaternion worldRotation(worldTransform.Rotation() * rotation_);
         
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
         world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_, bodyActive ?
@@ -564,6 +557,27 @@ void CollisionShape::SetLodLevel(unsigned lodLevel)
         }
         MarkNetworkUpdate();
     }
+}
+
+BoundingBox CollisionShape::GetWorldBoundingBox() const
+{
+    if (shape_ && node_)
+    {
+        // Use the rigid body's world transform if possible, as it may be different from the rendering transform
+        RigidBody* body = GetComponent<RigidBody>();
+        Matrix3x4 worldTransform = body ? Matrix3x4(body->GetPosition(), body->GetRotation(), node_->GetWorldScale()) :
+            node_->GetWorldTransform();
+        
+        Vector3 worldPosition(worldTransform * position_);
+        Quaternion worldRotation(worldTransform.Rotation() * rotation_);
+        btTransform shapeWorldTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition));
+        btVector3 aabbMin, aabbMax;
+        shape_->getAabb(shapeWorldTransform, aabbMin, aabbMax);
+        
+        return BoundingBox(ToVector3(aabbMin), ToVector3(aabbMax));
+    }
+    else
+        return BoundingBox();
 }
 
 void CollisionShape::NotifyRigidBody()

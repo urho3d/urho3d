@@ -162,7 +162,7 @@ public:
     /// Mark for update before octree reinsertion.
     void MarkForUpdate();
     
-    /// Return world bounding box.
+    /// Return world-space bounding box.
     const BoundingBox& GetWorldBoundingBox();
     /// Return drawable flags.
     unsigned char GetDrawableFlags() const { return drawableFlags_; }

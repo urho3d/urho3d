@@ -1391,18 +1391,18 @@ void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& mod
         outModel->SetNumGeometryLodLevels(i, srcModels.Size());
         for (unsigned j = 0; j < srcModels.Size(); ++j)
         {
-            Geometry* geom = srcModels[j]->GetGeometry(i, 0);
-            geom->SetLodDistance(lodDistances[j]);
-            outModel->SetGeometry(i, j, geom);
+            Geometry* geometry = srcModels[j]->GetGeometry(i, 0);
+            geometry->SetLodDistance(lodDistances[j]);
+            outModel->SetGeometry(i, j, geometry);
             
-            for (unsigned k = 0; k < geom->GetNumVertexBuffers(); ++k)
+            for (unsigned k = 0; k < geometry->GetNumVertexBuffers(); ++k)
             {
-                SharedPtr<VertexBuffer> vb(geom->GetVertexBuffer(k));
+                SharedPtr<VertexBuffer> vb(geometry->GetVertexBuffer(k));
                 if (!vbVector.Contains(vb))
                     vbVector.Push(vb);
             }
             
-            SharedPtr<IndexBuffer> ib(geom->GetIndexBuffer());
+            SharedPtr<IndexBuffer> ib(geometry->GetIndexBuffer());
             if (!ibVector.Contains(ib))
                 ibVector.Push(ib);
         }

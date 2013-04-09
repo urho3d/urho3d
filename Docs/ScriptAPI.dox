@@ -5195,6 +5195,7 @@ Properties:<br>
 - float margin
 - Model@ model
 - uint lodLevel
+- BoundingBox worldBoundingBox (readonly)
 
 
 RigidBody

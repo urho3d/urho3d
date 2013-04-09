@@ -28,6 +28,7 @@
 #include "Geometry.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
+#include "Model.h"
 #include "Navigable.h"
 #include "NavigationMesh.h"
 #include "Profiler.h"
@@ -594,30 +595,62 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     
     Matrix3x4 inverseTransform = node_->GetWorldTransform().Inverse();
     
-    /// \todo Prefer physics geometry if available
-    PODVector<Drawable*> drawables;
-    node->GetDerivedComponents<Drawable>(drawables);
-    for (unsigned i = 0; i < drawables.Size(); ++i)
+    // Prefer compatible physics collision shapes (triangle mesh, convex hull, box) if found.
+    // Then fallback to visible geometry
+    PODVector<CollisionShape*> collisionShapes;
+    node->GetComponents<CollisionShape>(collisionShapes);
+    bool collisionShapeFound = false;
+    
+    for (unsigned i = 0; i < collisionShapes.Size(); ++i)
     {
-        /// \todo Evaluate whether should handle other types. Now StaticModel & TerrainPatch are supported, others skipped
-        Drawable* drawable = drawables[i];
-        if (!drawable->IsEnabledEffective())
+        CollisionShape* shape = collisionShapes[i];
+        if (!shape->IsEnabledEffective())
             continue;
         
-        NavigationGeometryInfo info;
+        ShapeType type = shape->GetShapeType();
+        if ((type == SHAPE_BOX || type == SHAPE_TRIANGLEMESH || type == SHAPE_CONVEXHULL) && shape->GetCollisionShape())
+        {
+            NavigationGeometryInfo info;
+            
+            Matrix3x4 scaleMatrix(Matrix3x4::IDENTITY);
+            scaleMatrix.SetScale(shape->GetSize());
+            
+            info.component_ = shape;
+            info.transform_ = inverseTransform * node->GetWorldTransform() * scaleMatrix;
+            info.boundingBox_ = shape->GetWorldBoundingBox().Transformed(inverseTransform);
+            
+            geometryList.Push(info);
+            collisionShapeFound = true;
+        }
+    }
+    
+    if (!collisionShapeFound)
+    {
+        PODVector<Drawable*> drawables;
+        node->GetDerivedComponents<Drawable>(drawables);
         
-        if (drawable->GetType() == StaticModel::GetTypeStatic())
-            info.lodLevel_ = static_cast<StaticModel*>(drawable)->GetOcclusionLodLevel();
-        else if (drawable->GetType() == TerrainPatch::GetTypeStatic())
-            info.lodLevel_ = 0;
-        else
-            continue;
-        
-        info.component_ = drawable;
-        info.transform_ = inverseTransform * node->GetWorldTransform();
-        info.boundingBox_ = drawable->GetWorldBoundingBox().Transformed(inverseTransform);
-        
-        geometryList.Push(info);
+        for (unsigned i = 0; i < drawables.Size(); ++i)
+        {
+            /// \todo Evaluate whether should handle other types. Now StaticModel & TerrainPatch are supported, others skipped
+            Drawable* drawable = drawables[i];
+            if (!drawable->IsEnabledEffective())
+                continue;
+            
+            NavigationGeometryInfo info;
+            
+            if (drawable->GetType() == StaticModel::GetTypeStatic())
+                info.lodLevel_ = static_cast<StaticModel*>(drawable)->GetOcclusionLodLevel();
+            else if (drawable->GetType() == TerrainPatch::GetTypeStatic())
+                info.lodLevel_ = 0;
+            else
+                continue;
+            
+            info.component_ = drawable;
+            info.transform_ = inverseTransform * node->GetWorldTransform();
+            info.boundingBox_ = drawable->GetWorldBoundingBox().Transformed(inverseTransform);
+            
+            geometryList.Push(info);
+        }
     }
     
     if (recursive)
@@ -635,69 +668,133 @@ void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<Navigati
         if (box.IsInsideFast(geometryList[i].boundingBox_) != OUTSIDE)
         {
             const Matrix3x4& transform = geometryList[i].transform_;
-            Drawable* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
             
-            if (drawable)
+            CollisionShape* shape = dynamic_cast<CollisionShape*>(geometryList[i].component_);
+            if (shape)
             {
-                const Vector<SourceBatch>& batches = drawable->GetBatches();
-                
-                for (unsigned j = 0; j < batches.Size(); ++j)
+                switch (shape->GetShapeType())
                 {
-                    Geometry* geometry = drawable->GetLodGeometry(j, geometryList[i].lodLevel_);
-                    if (!geometry)
-                        continue;
-                
-                    const unsigned char* vertexData;
-                    const unsigned char* indexData;
-                    unsigned vertexSize;
-                    unsigned indexSize;
-                    unsigned elementMask;
-                    
-                    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-                    if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
-                        continue;
-                    
-                    unsigned srcIndexStart = geometry->GetIndexStart();
-                    unsigned srcIndexCount = geometry->GetIndexCount();
-                    unsigned srcVertexStart = geometry->GetVertexStart();
-                    unsigned srcVertexCount = geometry->GetVertexCount();
-                    
-                    if (!srcIndexCount)
-                        continue;
-                    
-                    unsigned destVertexStart = build.vertices_.Size();
-                    
-                    for (unsigned k = srcVertexStart; k < srcVertexStart + srcVertexCount; ++k)
+                case SHAPE_TRIANGLEMESH:
                     {
-                        Vector3 vertex = transform * *((const Vector3*)(&vertexData[k * vertexSize]));
-                        build.vertices_.Push(vertex);
-                    }
-                    
-                    // Copy remapped indices
-                    if (indexSize == sizeof(unsigned short))
-                    {
-                        const unsigned short* indices = ((const unsigned short*)indexData) + srcIndexStart;
-                        const unsigned short* indicesEnd = indices + srcIndexCount;
+                        Model* model = shape->GetModel();
+                        if (!model)
+                            continue;
                         
-                        while (indices < indicesEnd)
-                        {
-                            build.indices_.Push(*indices - srcVertexStart + destVertexStart);
-                            ++indices;
-                        }
+                        unsigned lodLevel = shape->GetLodLevel();
+                        for (unsigned j = 0; j < model->GetNumGeometries(); ++j)
+                            AddTriMeshGeometry(build, model->GetGeometry(j, lodLevel), transform);
                     }
-                    else
+                    break;
+                    
+                case SHAPE_CONVEXHULL:
                     {
-                        const unsigned* indices = ((const unsigned*)indexData) + srcIndexStart;
-                        const unsigned* indicesEnd = indices + srcIndexCount;
+                        ConvexData* data = static_cast<ConvexData*>(shape->GetGeometryData());
+                        if (!data)
+                            continue;
                         
-                        while (indices < indicesEnd)
-                        {
-                            build.indices_.Push(*indices - srcVertexStart + destVertexStart);
-                            ++indices;
-                        }
+                        unsigned numVertices = data->vertexCount_;
+                        unsigned numIndices = data->indexCount_;
+                        unsigned destVertexStart = build.vertices_.Size();
+                        
+                        for (unsigned j = 0; j < numVertices; ++j)
+                            build.vertices_.Push(transform * data->vertexData_[j]);
+                        
+                        for (unsigned j = 0; j < numIndices; ++j)
+                            build.indices_.Push(data->indexData_[j] + destVertexStart);
                     }
+                    break;
+                    
+                case SHAPE_BOX:
+                    {
+                        unsigned destVertexStart = build.vertices_.Size();
+                        
+                        build.vertices_.Push(transform * Vector3(-0.5f, 0.5f, -0.5f));
+                        build.vertices_.Push(transform * Vector3(0.5f, 0.5f, -0.5f));
+                        build.vertices_.Push(transform * Vector3(0.5f, -0.5f, -0.5f));
+                        build.vertices_.Push(transform * Vector3(-0.5f, -0.5f, -0.5f));
+                        build.vertices_.Push(transform * Vector3(-0.5f, 0.5f, 0.5f));
+                        build.vertices_.Push(transform * Vector3(0.5f, 0.5f, 0.5f));
+                        build.vertices_.Push(transform * Vector3(0.5f, -0.5f, 0.5f));
+                        build.vertices_.Push(transform * Vector3(-0.5f, -0.5f, 0.5f));
+                        
+                        const unsigned indices[] = {
+                            0, 1, 2, 0, 2, 3, 1, 5, 6, 1, 6, 2, 4, 5, 1, 4, 1, 0, 5, 4, 7, 5, 7, 6,
+                            4, 0, 3, 4, 3, 7, 1, 0, 4, 1, 4, 5
+                        };
+                        
+                        for (unsigned j = 0; j < 36; ++j)
+                            build.indices_.Push(indices[j] + destVertexStart);
+                    }
+                    break;
                 }
             }
+            else
+            {
+                Drawable* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
+                if (drawable)
+                {
+                    const Vector<SourceBatch>& batches = drawable->GetBatches();
+                    
+                    for (unsigned j = 0; j < batches.Size(); ++j)
+                        AddTriMeshGeometry(build, drawable->GetLodGeometry(j, geometryList[i].lodLevel_), transform);
+                }
+            }
+        }
+    }
+}
+
+void NavigationMesh::AddTriMeshGeometry(NavigationBuildData& build, Geometry* geometry, const Matrix3x4& transform)
+{
+    if (!geometry)
+        return;
+    
+    const unsigned char* vertexData;
+    const unsigned char* indexData;
+    unsigned vertexSize;
+    unsigned indexSize;
+    unsigned elementMask;
+    
+    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+    if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
+        return;
+    
+    unsigned srcIndexStart = geometry->GetIndexStart();
+    unsigned srcIndexCount = geometry->GetIndexCount();
+    unsigned srcVertexStart = geometry->GetVertexStart();
+    unsigned srcVertexCount = geometry->GetVertexCount();
+    
+    if (!srcIndexCount)
+        return;
+    
+    unsigned destVertexStart = build.vertices_.Size();
+    
+    for (unsigned k = srcVertexStart; k < srcVertexStart + srcVertexCount; ++k)
+    {
+        Vector3 vertex = transform * *((const Vector3*)(&vertexData[k * vertexSize]));
+        build.vertices_.Push(vertex);
+    }
+    
+    // Copy remapped indices
+    if (indexSize == sizeof(unsigned short))
+    {
+        const unsigned short* indices = ((const unsigned short*)indexData) + srcIndexStart;
+        const unsigned short* indicesEnd = indices + srcIndexCount;
+        
+        while (indices < indicesEnd)
+        {
+            build.indices_.Push(*indices - srcVertexStart + destVertexStart);
+            ++indices;
+        }
+    }
+    else
+    {
+        const unsigned* indices = ((const unsigned*)indexData) + srcIndexStart;
+        const unsigned* indicesEnd = indices + srcIndexCount;
+        
+        while (indices < indicesEnd)
+        {
+            build.indices_.Push(*indices - srcVertexStart + destVertexStart);
+            ++indices;
         }
     }
 }
@@ -705,6 +802,9 @@ void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<Navigati
 bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z)
 {
     PROFILE(BuildNavigationMeshTile);
+    
+    // Remove previous tile (if any)
+    navMesh_->removeTile(navMesh_->getTileRefAt(x, z, 0), 0, 0);
     
     float tileEdgeLength = (float)tileSize_ * cellSize_;
     
@@ -750,6 +850,9 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     
     BoundingBox expandedBox(*reinterpret_cast<Vector3*>(cfg.bmin), *reinterpret_cast<Vector3*>(cfg.bmax));
     GetTileGeometry(build, geometryList, expandedBox);
+    
+    if (build.vertices_.Empty() || build.indices_.Empty())
+        return true; // Nothing to do
     
     build.heightField_ = rcAllocHeightfield();
     if (!build.heightField_)
@@ -886,8 +989,6 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
         return false;
     }
     
-    // Remove previous tile (if any), then add new
-    navMesh_->removeTile(navMesh_->getTileRefAt(x, z, 0), 0, 0);
     if (dtStatusFailed(navMesh_->addTile(navData, navDataSize, DT_TILE_FREE_DATA, 0, 0)))
     {
         LOGERROR("Failed to add navigation mesh tile");

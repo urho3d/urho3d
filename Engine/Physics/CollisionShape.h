@@ -171,6 +171,8 @@ public:
     
     /// Return Bullet collision shape.
     btCollisionShape* GetCollisionShape() const { return shape_; }
+    /// Return the shared geometry data.
+    CollisionGeometryData* GetGeometryData() const { return geometry_; }
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return shape type.
@@ -187,6 +189,8 @@ public:
     Model* GetModel() const { return model_; }
     /// Return model LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
+    /// Return world-space bounding box.
+    BoundingBox GetWorldBoundingBox() const;
     
     /// Update the new collision shape to the RigidBody, and tell it to update its mass.
     void NotifyRigidBody();

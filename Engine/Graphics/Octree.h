@@ -72,7 +72,7 @@ public:
         }
     }
     
-    /// Return world bounding box.
+    /// Return world-space bounding box.
     const BoundingBox& GetWorldBoundingBox() const { return worldBoundingBox_; }
     /// Return bounding box used for fitting drawable objects.
     const BoundingBox& GetCullingBox() const { return cullingBox_; }

@@ -148,6 +148,8 @@ private:
     void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
     /// Get geometry data within a bounding box.
     void GetTileGeometry(NavigationBuildData& build, Vector<NavigationGeometryInfo>& geometryList, BoundingBox& box);
+    /// Add a triangle mesh to the geometry data.
+    void AddTriMeshGeometry(NavigationBuildData& build, Geometry* geometry, const Matrix3x4& transform);
     /// Build one tile of the navigation mesh. Return true if successful.
     bool BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z);
     /// Initialize navigation mesh query. Return true if successful.
