@@ -1219,6 +1219,23 @@ The following queries into the physics world are provided:
 - %Sphere and box overlap tests, see \ref PhysicsWorld::GetRigidBodies() "GetRigidBodies()".
 - Which other rigid bodies are colliding with a body, see \ref RigidBody::GetCollidingBodies() "GetCollidingBodies()". In script this maps into the collidingBodies property.
 
+\page Navigation Navigation
+
+Urho3D implements navigation mesh generation and pathfinding by using the Recast & Detour libraries.
+
+The navigation functionality is exposed through the NavigationMesh and Navigable components.
+
+NavigationMesh collects geometry from its child nodes that have been tagged with the Navigable component. By default the Navigable component behaves recursively: geometry from its child nodes will be collected too, unless the recursion is disabled. If possible, physics CollisionShape geometry is preferred, however only the triangle mesh, convex hull and box shapes are supported. If no suitable physics geometry is found from a node, static drawable geometry is used instead from StaticModel and TerrainPatch components if they exist. The LOD level used is the same as for occlusion and raycasts (see \ref StaticModel::SetOcclusionLodLevel "SetOcclusionLodLevel()".
+
+The easiest way to make the whole scene participate in navigation mesh generation is to create the %NavigationMesh and %Navigable components to the scene root node.
+
+The navigation mesh generation must be triggered manually by calling \ref NavigationMesh::Build "Build()". After the initial build, portions of the mesh can also be rebuilt by specifying a world bounding box for the volume to be rebuilt, but this can not expand the total bounding box size. Once the navigation mesh is built, it will be serialized and deserialized with the scene.
+
+To query for a path between start and end points on the navigation mesh, call \ref NavigationMesh::FindPath "FindPath()".
+
+For a demonstration of the navigation capabilities, check the Navigation script application, which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
+
+
 \page UI User interface
 
 Urho3D implements a simple, hierarchical user interface system based on rectangular elements. The elements provided by default are:

@@ -30,6 +30,7 @@ For further reference, see:
 \ref Input "Input" <br>
 \ref Audio "Audio" <br>
 \ref Physics "Physics" <br>
+\ref Navigation "Navigation" <br>
 \ref UI "User interface" <br>
 \ref Serialization "Serialization" <br>
 \ref Network "Networking" <br>
