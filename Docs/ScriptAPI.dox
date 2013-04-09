@@ -5028,6 +5028,7 @@ Methods:<br>
 - bool SaveLayout(File@, UIElement@)
 - UIElement@ GetElementAt(const IntVector2&, bool arg1 = true)
 - UIElement@ GetElementAt(int, int, bool arg2 = true)
+- bool HasModalElement() const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -5037,9 +5038,9 @@ Properties:<br>
 - Cursor@ cursor
 - IntVector2 cursorPosition (readonly)
 - UIElement@ focusElement
-- UIElement@ modalElement (readonly)
 - UIElement@ frontElement (readonly)
 - UIElement@ root (readonly)
+- UIElement@ modalRoot (readonly)
 - bool nonFocusedMouseWheel
 
 

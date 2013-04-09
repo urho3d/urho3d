@@ -57,22 +57,27 @@ namespace Urho3D
 {
 
 ShortStringHash VAR_ORIGIN("Origin");
+const ShortStringHash VAR_ORIGINAL_PARENT("OriginalParent");
+const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
 
 OBJECTTYPESTATIC(UI);
 
 UI::UI(Context* context) :
     Object(context),
     rootElement_(new UIElement(context)),
+    rootModalElement_(new UIElement(context)),
     mouseButtons_(0),
     qualifiers_(0),
     initialized_(false),
     #ifdef WIN32
-    nonFocusedMouseWheel_(false)    // Default MS Windows behaviour
+    nonFocusedMouseWheel_(false),    // Default MS Windows behaviour
     #else
-    nonFocusedMouseWheel_(true)     // Default Mac OS X and Linux behaviour
+    nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
     #endif
+    nonModalBatchSize_(0)
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
+    rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);
 
     SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
@@ -131,12 +136,12 @@ void UI::SetFocusElement(UIElement* element)
             return;
 
         // Only allow child elements of the modal element to receive focus
-        if (modalElement_)
+        if (HasModalElement())
         {
             UIElement* topLevel = element->GetParent();
             while (topLevel && topLevel->GetParent() != rootElement_)
                 topLevel = topLevel->GetParent();
-            if (topLevel != modalElement_)
+            if (topLevel)   // If parented to non-modal root then ignore
                 return;
         }
 
@@ -173,32 +178,88 @@ void UI::SetFocusElement(UIElement* element)
 
 bool UI::SetModalElement(UIElement* modalElement, bool enable)
 {
-    // Only allow one modal element at a time, only the currently active modal element can disable itself
-    if (modalElement_ && modalElement != modalElement_)
-        return false;
-
-    // The modal element must be parented to root
-    if (modalElement->GetParent() != rootElement_)
+    if (!modalElement)
         return false;
 
     // Currently only allow modal window
-    if (modalElement && modalElement->GetType() != Window::GetTypeStatic())
+    if (modalElement->GetType() != Window::GetTypeStatic())
         return false;
 
-    modalElement_ = enable ? modalElement : 0;
-    return true;
+    assert(rootModalElement_);
+    const Vector<SharedPtr<UIElement> >& children = rootModalElement_->GetChildren();
+    if (enable)
+    {
+        // Make sure it is not already the child of the root modal element
+        for (unsigned i = 0; i < children.Size(); ++i)
+        {
+            if (children[i] == modalElement)
+                return false;
+        }
+
+        // Adopt modal root as parent
+        modalElement->SetVar(VAR_ORIGINAL_PARENT, modalElement->GetParent());
+        modalElement->SetParent(rootModalElement_);
+
+        // If it is a popup element, bring along its top-level parent
+        UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
+        if (originElement)
+        {
+            UIElement* element = originElement;
+            while (element && element->GetParent() != rootElement_)
+                element = element->GetParent();
+            if (element)
+            {
+                originElement->SetVar(VAR_PARENT_CHANGED, element);
+                element->SetVar(VAR_ORIGINAL_PARENT, element->GetParent());
+                element->SetParent(rootModalElement_);
+            }
+        }
+
+        return true;
+    }
+    else
+    {
+        // Only the modal element can disable itself
+        for (unsigned i = 0; i < children.Size(); ++i)
+        {
+            if (children[i] == modalElement)
+            {
+                // Revert back to original parent
+                modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()));
+                const_cast<VariantMap&>(modalElement->GetVars()).Erase(VAR_ORIGINAL_PARENT);
+
+                // If it is a popup element, revert back its top-level parent to its original parent
+                UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
+                if (originElement)
+                {
+                    UIElement* element = static_cast<UIElement*>(originElement->GetVar(VAR_PARENT_CHANGED).GetPtr());
+                    if (element)
+                    {
+                        const_cast<VariantMap&>(originElement->GetVars()).Erase(VAR_PARENT_CHANGED);
+                        element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()));
+                        const_cast<VariantMap&>(element->GetVars()).Erase(VAR_ORIGINAL_PARENT);
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 void UI::Clear()
 {
     rootElement_->RemoveAllChildren();
+    rootModalElement_->RemoveAllChildren();
     if (cursor_)
         rootElement_->AddChild(cursor_);
 }
 
 void UI::Update(float timeStep)
 {
-    assert(rootElement_);
+    assert(rootElement_ && rootModalElement_);
 
     PROFILE(UpdateUI);
 
@@ -258,11 +319,12 @@ void UI::Update(float timeStep)
     }
 
     Update(timeStep, rootElement_);
+    Update(timeStep, rootModalElement_);
 }
 
 void UI::RenderUpdate()
 {
-    assert(rootElement_ && graphics_);
+    assert(rootElement_ && rootModalElement_ && graphics_);
 
     PROFILE(GetUIBatches);
 
@@ -275,11 +337,18 @@ void UI::RenderUpdate()
         cursor_->SetTempVisible(false);
     }
 
-    // Get rendering batches from the UI elements
+    // Get rendering batches from the non-modal UI elements
     batches_.Clear();
     vertexData_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
-    GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
+    IntRect currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
+    GetBatches(rootElement_, currentScissor);
+
+    // Save the batch size of the non-modal batches for later use
+    nonModalBatchSize_ = batches_.Size();
+
+    // Get rendering batches from the modal UI elements
+    GetBatches(rootModalElement_, currentScissor);
 
     // Restore UI cursor visibility state
     if (osCursorVisible && cursor_)
@@ -289,8 +358,12 @@ void UI::RenderUpdate()
 void UI::Render()
 {
     PROFILE(RenderUI);
-    Render(batches_, vertexData_);
-    Render(debugDrawBatches_, debugDrawVertexData_);
+    // Render non-modal batches
+    Render(batches_, vertexData_, 0, nonModalBatchSize_);
+    // Render debug draw
+    Render(debugDrawBatches_, debugDrawVertexData_, 0, debugDrawBatches_.Size());
+    // Render modal batches
+    Render(batches_, vertexData_, nonModalBatchSize_, batches_.Size());
 
     // Clear the debug draw batches and data
     debugDrawBatches_.Clear();
@@ -388,7 +461,7 @@ void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly)
 {
     UIElement* result = 0;
-    GetElementAt(result, rootElement_, position, enabledOnly);
+    GetElementAt(result, HasModalElement() ? rootModalElement_ : rootElement_, position, enabledOnly);
     return result;
 }
 
@@ -399,10 +472,6 @@ UIElement* UI::GetElementAt(int x, int y, bool enabledOnly)
 
 UIElement* UI::GetFrontElement() const
 {
-    // If modal element is set then return it
-    if (modalElement_)
-        return modalElement_;
-
     const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
     int maxPriority = M_MIN_INT;
     UIElement* front = 0;
@@ -424,12 +493,14 @@ UIElement* UI::GetFrontElement() const
     return front;
 }
 
-IntVector2 UI::GetCursorPosition()
+IntVector2 UI::GetCursorPosition() const
 {
-    if (!cursor_)
-        return IntVector2::ZERO;
-    else
-        return cursor_->GetPosition();
+    return cursor_ ? cursor_->GetPosition() : IntVector2::ZERO;
+}
+
+bool UI::HasModalElement() const
+{
+    return rootModalElement_->GetNumChildren() > 0;
 }
 
 void UI::Initialize()
@@ -445,6 +516,7 @@ void UI::Initialize()
     graphics_ = graphics;
 
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
+    rootModalElement_->SetSize(rootElement_->GetSize());
 
     noTextureVS_ = renderer->GetVertexShader("Basic_VCol");
     diffTextureVS_ = renderer->GetVertexShader("Basic_DiffVCol");
@@ -472,7 +544,7 @@ void UI::Update(float timeStep, UIElement* element)
         Update(timeStep, *i);
 }
 
-void UI::Render(const PODVector<UIBatch>& batches, const PODVector<float>& vertexData)
+void UI::Render(const PODVector<UIBatch>& batches, const PODVector<float>& vertexData, unsigned batchStart, unsigned batchSize)
 {
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
@@ -513,7 +585,7 @@ void UI::Render(const PODVector<UIBatch>& batches, const PODVector<float>& verte
 
     unsigned alphaFormat = Graphics::GetAlphaFormat();
 
-    for (unsigned i = 0; i < batches.Size(); ++i)
+    for (unsigned i = batchStart; i < batchSize; ++i)
     {
         const UIBatch& batch = batches[i];
         if (batch.vertexStart_ == batch.vertexEnd_)
@@ -616,28 +688,6 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     for (unsigned i = 0; i < children.Size(); ++i)
     {
         UIElement* element = children[i];
-        // If has a modal element, skip other elements from the root level
-        // Exception: if the element has the "origin" element in its variables it is a popup and should not be skipped
-        // if the origin element belongs to the modal element's hierarchy
-        if (current == rootElement_ && modalElement_ && element != modalElement_)
-        {
-            bool shouldSkip = true;
-            UIElement* originElement = static_cast<UIElement*>(element->GetVar(VAR_ORIGIN).GetPtr());
-
-            while (originElement)
-            {
-                if (originElement == modalElement_)
-                {
-                    shouldSkip = false;
-                    break;
-                }
-                originElement = originElement->GetParent();
-            }
-
-            if (shouldSkip)
-                continue;
-        }
-
         bool hasChildren = element->GetNumChildren() > 0;
 
         if (element != cursor_.Get() && element->IsVisible())
@@ -713,7 +763,10 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     if (!initialized_)
         Initialize();
     else
+    {
         rootElement_->SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
+        rootModalElement_->SetSize(rootElement_->GetSize());
+    }
 }
 
 void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
@@ -1015,6 +1068,27 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
     int key = eventData[P_KEY].GetInt();
 
+    // Dismiss modal element if any when ESC key is pressed
+    if (key == KEY_ESC && HasModalElement())
+    {
+        UIElement* element = rootModalElement_->GetChild(rootModalElement_->GetNumChildren() - 1);
+        if (element->GetVars().Contains(VAR_ORIGIN))
+            // If it is a popup, dismiss by defocusing it
+            SetFocusElement(0);
+        else
+        {
+            // If it is a modal window, by resetting its modal flag and auto-remove it
+            Window* window = dynamic_cast<Window*>(element);
+            if (window)
+            {
+                window->SetModal(false);
+                window->Remove();
+            }
+        }
+
+        return;
+    }
+
     UIElement* element = focusElement_;
     if (element)
     {
@@ -1022,7 +1096,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         if (key == KEY_TAB)
         {
             UIElement* topLevel = element->GetParent();
-            while (topLevel && topLevel->GetParent() != rootElement_)
+            while (topLevel && topLevel->GetParent() != rootElement_ && topLevel->GetParent() != rootModalElement_)
                 topLevel = topLevel->GetParent();
             if (topLevel)
             {

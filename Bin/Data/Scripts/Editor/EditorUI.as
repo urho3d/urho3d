@@ -13,7 +13,6 @@ const ShortStringHash CURSOR_TYPE("Cursor");
 
 const String TEMP_SCENE_NAME("_tempscene_.xml");
 const ShortStringHash CALLBACK_VAR("Callback");
-const ShortStringHash POPUP_ORIGIN_VAR("Origin");
 const ShortStringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
 
 const int SHOW_POPUP_INDICATOR = -1;
@@ -126,6 +125,12 @@ void CreateMenuBar()
     uiMenuBar.SetLayout(LM_HORIZONTAL);
     uiMenuBar.opacity = uiMaxOpacity;
     uiMenuBar.SetFixedWidth(graphics.width);
+
+    BorderImage@ logo = BorderImage("Logo");
+    logo.texture = cache.GetResource("Texture2D", "Textures/Logo.png");
+    logo.SetFixedWidth(50);
+    uiMenuBar.AddChild(logo);
+
     ui.root.AddChild(uiMenuBar);
 
     {
@@ -799,22 +804,23 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
     if (key == KEY_ESC)
     {
-        UIElement@ front = ui.frontElement;
-        if (uiFileSelector !is null && front is uiFileSelector.window)
-            CloseFileSelector();
-        else if (uiHidden)
+        if (uiHidden)
             UnhideUI();
         else if (console.visible)
             console.visible = false;
-        else if (front is settingsDialog || front is preferencesDialog)
+        else
         {
-            ui.focusElement = null;
-            front.visible = false;
+            UIElement@ front = ui.frontElement;
+            if (front is settingsDialog || front is preferencesDialog)
+            {
+                ui.focusElement = null;
+                front.visible = false;
+            }
         }
     }
 
     // Ignore other keys when UI has a modal element
-    else if (ui.modalElement !is null)
+    else if (ui.HasModalElement())
         return;
 
     else if (key == KEY_F1)
@@ -878,8 +884,8 @@ void FadeUI(bool fade = true)
     Array<UIElement@> children = ui.root.GetChildren();
     for (uint i = 0; i < children.length; ++i)
     {
-        // Texts, popup&modal windows, and editorUIElement are excluded
-        if (children[i].type != TEXT_TYPE && children[i] !is editorUIElement && children[i] !is ui.modalElement && !children[i].vars.Contains(POPUP_ORIGIN_VAR))
+        // Texts, popup&modal windows (which are anyway only in ui.modalRoot), and editorUIElement are excluded
+        if (children[i].type != TEXT_TYPE && children[i] !is editorUIElement)
             children[i].opacity = opacity;
     }
 }
@@ -984,4 +990,15 @@ void UpdateDirtyUI()
     // Perform some event-triggered updates latently in case a large hierarchy was changed
     if (attributesFullDirty || attributesDirty)
         UpdateAttributeInspector(attributesFullDirty);
+    
+    for (uint i = 0; i < modalUIElements.length; ++i)
+    {
+        // If it is detached then reparent it to editor root UI element
+        if (modalUIElements[i].parent is null)
+        {
+            editorUIElement.AddChild(modalUIElements[i]);
+            modalUIElements.Erase(i);
+            break;  // Only one at a time
+        }
+    }
 }

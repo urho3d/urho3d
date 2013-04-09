@@ -362,12 +362,9 @@ void HandlePostRenderUpdate()
     for (uint i = 0; i < selectedComponents.length; ++i)
         selectedComponents[i].DrawDebugGeometry(debug, false);
 
-    // Visualize the currently selected UI-elements but only when UI does not have modal element
-    if (ui.modalElement is null)
-    {
-        for (uint i = 0; i < selectedUIElements.length; ++i)
-            ui.DebugDraw(selectedUIElements[i]);
-    }
+    // Visualize the currently selected UI-elements
+    for (uint i = 0; i < selectedUIElements.length; ++i)
+        ui.DebugDraw(selectedUIElements[i]);
 
     if (renderingDebug)
         renderer.DrawDebugGeometry(false);
@@ -387,7 +384,7 @@ void ViewMouseClick()
 void ViewRaycast(bool mouseClick)
 {
     // Ignore if UI has modal element
-    if (ui.modalElement !is null)
+    if (ui.HasModalElement())
         return;
 
     // Do not raycast / change selection if hovering over the gizmo

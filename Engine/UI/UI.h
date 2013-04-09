@@ -52,7 +52,7 @@ public:
     void SetCursor(Cursor* cursor);
     /// Set focused UI element.
     void SetFocusElement(UIElement* element);
-    /// Set modal element. Until it is dismissed, all the inputs and events are only sent to this modal element. Return true when successful. Only the current modal element can clear its modal status.
+    /// Set modal element. Until all the modal elements are dismissed, all the inputs and events are only sent to them. Return true when successful. Only the modal element can clear its modal status or when it is being destructed.
     bool SetModalElement(UIElement* modalElement, bool enable);
     /// Clear the UI (excluding the cursor.)
     void Clear();
@@ -77,6 +77,8 @@ public:
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
+    /// Return root modal element.
+    UIElement* GetRootModalElement() const { return rootModalElement_; }
     /// Return cursor.
     Cursor* GetCursor() const { return cursor_; }
     /// Return UI element at screen coordinates.
@@ -85,16 +87,16 @@ public:
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Return focused element.
     UIElement* GetFocusElement() const { return focusElement_; }
-    /// Return modal element.
-    UIElement* GetModalElement() const { return modalElement_; }
-    /// Return topmost enabled root-level element.
+    /// Return topmost enabled root-level non-modal element.
     UIElement* GetFrontElement() const;
     /// Return cursor position.
-    IntVector2 GetCursorPosition();
+    IntVector2 GetCursorPosition() const;
     /// Return clipboard text.
     const String& GetClipBoardText() const { return clipBoard_; }
     /// Return mouse wheel handling flag.
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
+    /// Return true when UI has modal element(s).
+    bool HasModalElement() const;
 
 private:
     /// Initialize when screen mode initially se.
@@ -102,7 +104,7 @@ private:
     /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
     /// Render the batches.
-    void Render(const PODVector<UIBatch>& batches, const PODVector<float>& vertexData);
+    void Render(const PODVector<UIBatch>& batches, const PODVector<float>& vertexData, unsigned batchStart, unsigned batchSize);
     /// Generate batches from an UI element recursively.
     void GetBatches(UIElement* element, IntRect currentScissor);
     /// Return UI element at screen position recursively.
@@ -150,14 +152,14 @@ private:
     SharedPtr<ShaderVariation> alphaTexturePS_;
     /// UI root element.
     SharedPtr<UIElement> rootElement_;
+    /// UI root modal element.
+    SharedPtr<UIElement> rootModalElement_;
     /// Cursor.
     SharedPtr<Cursor> cursor_;
     /// UI element being dragged.
     WeakPtr<UIElement> dragElement_;
     /// Currently focused element
     WeakPtr<UIElement> focusElement_;
-    /// Modal element.
-    WeakPtr<UIElement> modalElement_;
     /// UI rendering batches.
     PODVector<UIBatch> batches_;
     /// UI rendering vertex data.
@@ -180,6 +182,8 @@ private:
     bool initialized_;
     /// Flag to switch mouse wheel event to be sent to non-focused element at cursor.
     bool nonFocusedMouseWheel_;
+    /// Non-modal batch size (used internally for rendering).
+    unsigned nonModalBatchSize_;
 };
 
 /// Register UI library objects.

@@ -27,6 +27,7 @@
 #include "Menu.h"
 #include "UI.h"
 #include "UIEvents.h"
+#include "Window.h"
 
 #include "DebugNew.h"
 
@@ -54,7 +55,7 @@ Menu::Menu(Context* context) :
 
 Menu::~Menu()
 {
-    if (popup_)
+    if (popup_ && showPopup_)
         ShowPopup(false);
 }
 
@@ -240,6 +241,13 @@ void Menu::SetPopup(UIElement* popup)
     if (popup == this)
         return;
 
+    // Currently only allow popup 'window'
+    if (popup->GetType() != Window::GetTypeStatic())
+    {
+        LOGERROR("Could not set popup element of type " + popup->GetTypeName() + ", only support popup window for now");
+        return;
+    }
+
     if (popup_ && !popup)
         ShowPopup(false);
 
@@ -267,18 +275,13 @@ void Menu::ShowPopup(bool enable)
 
     if (enable)
     {
-        // Find the UI root element for showing the popup
-        UIElement* root = GetRoot();
-        if (!root)
-            return;
-
         OnShowPopup();
 
-        if (popup_->GetParent() != root)
-            root->AddChild(popup_);
+        popup_->SetVar(VAR_ORIGIN, (void*)this);
+        static_cast<Window*>(popup_.Get())->SetModal(true);
+
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
         popup_->SetVisible(true);
-        popup_->SetVar(VAR_ORIGIN, (void*)this);
         popup_->BringToFront();
     }
     else
@@ -293,7 +296,9 @@ void Menu::ShowPopup(bool enable)
                 menu->ShowPopup(false);
         }
 
-        popup_->SetVar(VAR_ORIGIN, Variant::EMPTY);
+        static_cast<Window*>(popup_.Get())->SetModal(false);
+        const_cast<VariantMap&>(popup_->GetVars()).Erase(VAR_ORIGIN);
+
         popup_->SetVisible(false);
         popup_->Remove();
     }
@@ -393,7 +398,7 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     {
         // Ignore if UI has modal element
         UI* ui = GetSubsystem<UI>();
-        if (ui->GetModalElement())
+        if (ui->HasModalElement())
             return;
 
         HandlePressedReleased(eventType, eventData);

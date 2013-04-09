@@ -37,7 +37,7 @@ class GizmoAxis
     void Update(Ray cameraRay, float scale, bool drag)
     {
         // Do not select when UI has modal element
-        if (ui.modalElement !is null)
+        if (ui.HasModalElement())
         {
             selected = false;
             return;

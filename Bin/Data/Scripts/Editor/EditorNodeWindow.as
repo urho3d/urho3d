@@ -308,8 +308,22 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
 
     SaveEditActionGroup(group);
 
+    // If a UI-element changing its 'Is Modal' attribute, clear the hierarchy list selection
+    bool saveModalElement = false;
+    if (serializables[0].attributeInfos[index].name == "Is Modal")
+    {
+        hierarchyList.ClearSelection();
+        saveModalElement = true;
+    }
+
     for (uint i = 0; i < serializables.length; ++i)
+    {
         PostEditAttribute(serializables[i], index);
+
+        // Need to save a reference of the modal element being tested as otherwise there is no way to get it back when it is being dismissed by ESC key
+        if (saveModalElement)
+            modalUIElements.Push(serializables[i]);
+    }
 }
 
 void PostEditAttribute(Serializable@ serializable, uint index)

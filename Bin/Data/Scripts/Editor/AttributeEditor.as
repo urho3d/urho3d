@@ -493,7 +493,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             // Reevaluate aach variant in the vector
             for (uint i = 0; i < values.length; ++i)
             {
-                Array<Variant>@ vector = values[i].GetVariantVector();                
+                Array<Variant>@ vector = values[i].GetVariantVector();
                 if (subIndex < vector.length)
                 {
                     Variant value = vector[subIndex];
@@ -529,7 +529,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             Variant firstValue = map[keys[subIndex]];
             bool sameValue = true;
             Array<Variant> varValues;
-            
+
             // Reevaluate each variant in the map
             for (uint i = 0; i < values.length; ++i)
             {
@@ -781,7 +781,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     // If not an intermediate edit, reload the editor fields with validated values
     // (attributes may have interactions; therefore we load everything, not just the value being edited)
     if (!intermediateEdit)
-        UpdateAttributeInspector(false);
+        attributesDirty = true;
 }
 
 // Resource picker functionality

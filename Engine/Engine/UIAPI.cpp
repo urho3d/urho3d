@@ -539,14 +539,15 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "bool SaveLayout(File@+, UIElement@+)", asFUNCTION(UISaveLayout), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool HasModalElement() const", asMETHOD(UI, HasModalElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_cursor(Cursor@+)", asMETHOD(UI, SetCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "Cursor@+ get_cursor() const", asMETHOD(UI, GetCursor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "IntVector2 get_cursorPosition()", asMETHOD(UI, GetCursorPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "IntVector2 get_cursorPosition() const", asMETHOD(UI, GetCursorPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_focusElement(UIElement@+)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_focusElement() const", asMETHOD(UI, GetFocusElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "UIElement@+ get_modalElement() const", asMETHOD(UI, GetModalElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHOD(UI, GetFrontElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHOD(UI, GetRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ get_modalRoot() const", asMETHOD(UI, GetRootModalElement), asCALL_THISCALL);
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
     engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHOD(UI, SetNonFocusedMouseWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHOD(UI, IsNonFocusedMouseWheel), asCALL_THISCALL);

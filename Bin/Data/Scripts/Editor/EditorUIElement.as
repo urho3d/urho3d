@@ -8,6 +8,7 @@ String childElementFileName;
 UIElement@ editUIElement;
 Array<Serializable@> selectedUIElements;
 Array<Serializable@> editUIElements;
+Array<UIElement@> modalUIElements;
 
 Array<XMLFile@> uiElementCopyBuffer;
 
@@ -76,13 +77,10 @@ void OpenUIElement(const String&in fileName)
     ui.cursor.shape = CS_BUSY;
 
     // Check if the UI element has been opened before
-    for (uint i = 0; i < editorUIElement.numChildren; ++i)
+    if (editorUIElement.GetChild(FILENAME_VAR, Variant(fileName)) !is null)
     {
-        if (editorUIElement.children[i].vars[FILENAME_VAR] == fileName)
-        {
-            log.Warning("UI element is already opened: " + fileName);
-            return;
-        }
+        log.Warning("UI element is already opened: " + fileName);
+        return;
     }
 
     // Always load from the filesystem, not from resource paths
@@ -208,7 +206,7 @@ bool SaveUIElementWithExistingName()
     Variant fileNameVar = editUIElement.GetVar(FILENAME_VAR);
     if (fileNameVar.empty)  // Only top level UI-element has this variable
         return false;
-    
+
     if (fileNameVar.GetString().empty)
         return PickFile();  // No name yet, so pick one
     else
