@@ -88,6 +88,10 @@ struct ConvexData : public CollisionGeometryData
     SharedArrayPtr<Vector3> vertexData_;
     /// Number of vertices.
     unsigned vertexCount_;
+    /// Index data.
+    SharedArrayPtr<unsigned> indexData_;
+    /// Number of indices.
+    unsigned indexCount_;
 };
 
 /// Heightfield geometry data.

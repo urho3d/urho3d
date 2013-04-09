@@ -209,8 +209,13 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         
         vertexCount_ = result.mNumOutputVertices;
         vertexData_ = new Vector3[vertexCount_];
-        // Copy vertex data
+        
+        indexCount_ = result.mNumIndices;
+        indexData_ = new unsigned[indexCount_];
+        
+        // Copy vertex data & index data
         memcpy(vertexData_.Get(), result.mOutputVertices, vertexCount_ * sizeof(Vector3));
+        memcpy(indexData_.Get(), result.mIndices, indexCount_ * sizeof(unsigned));
         
         lib.ReleaseResult(result);
     }

@@ -295,7 +295,7 @@ bool NavigationMesh::Build()
     if (!node_->GetWorldScale().Equals(Vector3::ONE))
         LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
     
-    Vector<GeometryInfo> geometryList;
+    Vector<NavigationGeometryInfo> geometryList;
     CollectGeometries(geometryList);
     
     if (geometryList.Empty())
@@ -386,7 +386,7 @@ bool NavigationMesh::Build(const BoundingBox& boundingBox)
     
     float tileEdgeLength = (float)tileSize_ * cellSize_;
     
-    Vector<GeometryInfo> geometryList;
+    Vector<NavigationGeometryInfo> geometryList;
     CollectGeometries(geometryList);
     
     int sx = Clamp((int)((localSpaceBox.min_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
@@ -568,7 +568,7 @@ PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
     return ret.GetBuffer();
 }
 
-void NavigationMesh::CollectGeometries(Vector<GeometryInfo>& geometryList)
+void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryList)
 {
     PROFILE(CollectNavigationGeometry);
     
@@ -585,7 +585,7 @@ void NavigationMesh::CollectGeometries(Vector<GeometryInfo>& geometryList)
     }
 }
 
-void NavigationMesh::CollectGeometries(Vector<GeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive)
+void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive)
 {
     // Make sure nodes are not included twice
     if (processedNodes.Contains(node))
@@ -604,24 +604,20 @@ void NavigationMesh::CollectGeometries(Vector<GeometryInfo>& geometryList, Node*
         if (!drawable->IsEnabledEffective())
             continue;
         
-        unsigned numGeometries = drawable->GetBatches().Size();
-        unsigned lodLevel;
+        NavigationGeometryInfo info;
+        
         if (drawable->GetType() == StaticModel::GetTypeStatic())
-            lodLevel = static_cast<StaticModel*>(drawable)->GetOcclusionLodLevel();
+            info.lodLevel_ = static_cast<StaticModel*>(drawable)->GetOcclusionLodLevel();
         else if (drawable->GetType() == TerrainPatch::GetTypeStatic())
-            lodLevel = 0;
+            info.lodLevel_ = 0;
         else
             continue;
         
-        GeometryInfo info;
+        info.component_ = drawable;
         info.transform_ = inverseTransform * node->GetWorldTransform();
         info.boundingBox_ = drawable->GetWorldBoundingBox().Transformed(inverseTransform);
         
-        for (unsigned j = 0; j < numGeometries; ++j)
-        {
-            info.geometry_ = drawable->GetLodGeometry(j, lodLevel);
-            geometryList.Push(info);
-        }
+        geometryList.Push(info);
     }
     
     if (recursive)
@@ -632,69 +628,81 @@ void NavigationMesh::CollectGeometries(Vector<GeometryInfo>& geometryList, Node*
     }
 }
 
-void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<GeometryInfo>& geometryList, BoundingBox& box)
+void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<NavigationGeometryInfo>& geometryList, BoundingBox& box)
 {
     for (unsigned i = 0; i < geometryList.Size(); ++i)
     {
         if (box.IsInsideFast(geometryList[i].boundingBox_) != OUTSIDE)
         {
-            Geometry* geometry = geometryList[i].geometry_;
-            Matrix3x4& transform = geometryList[i].transform_;
+            const Matrix3x4& transform = geometryList[i].transform_;
+            Drawable* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
             
-            const unsigned char* vertexData;
-            const unsigned char* indexData;
-            unsigned vertexSize;
-            unsigned indexSize;
-            unsigned elementMask;
-            
-            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-            if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
-                continue;
-            
-            unsigned srcIndexStart = geometry->GetIndexStart();
-            unsigned srcIndexCount = geometry->GetIndexCount();
-            unsigned srcVertexStart = geometry->GetVertexStart();
-            unsigned srcVertexCount = geometry->GetVertexCount();
-            
-            if (!srcIndexCount)
-                continue;
-            
-            unsigned destVertexStart = build.vertices_.Size();
-            
-            for (unsigned j = srcVertexStart; j < srcVertexStart + srcVertexCount; ++j)
+            if (drawable)
             {
-                Vector3 vertex = transform * *((const Vector3*)(&vertexData[j * vertexSize]));
-                build.vertices_.Push(vertex);
-            }
-            
-            // Copy remapped indices
-            if (indexSize == sizeof(unsigned short))
-            {
-                const unsigned short* indices = ((const unsigned short*)indexData) + srcIndexStart;
-                const unsigned short* indicesEnd = indices + srcIndexCount;
+                const Vector<SourceBatch>& batches = drawable->GetBatches();
                 
-                while (indices < indicesEnd)
+                for (unsigned j = 0; j < batches.Size(); ++j)
                 {
-                    build.indices_.Push(*indices - srcVertexStart + destVertexStart);
-                    ++indices;
-                }
-            }
-            else
-            {
-                const unsigned* indices = ((const unsigned*)indexData) + srcIndexStart;
-                const unsigned* indicesEnd = indices + srcIndexCount;
+                    Geometry* geometry = drawable->GetLodGeometry(j, geometryList[i].lodLevel_);
+                    if (!geometry)
+                        continue;
                 
-                while (indices < indicesEnd)
-                {
-                    build.indices_.Push(*indices - srcVertexStart + destVertexStart);
-                    ++indices;
+                    const unsigned char* vertexData;
+                    const unsigned char* indexData;
+                    unsigned vertexSize;
+                    unsigned indexSize;
+                    unsigned elementMask;
+                    
+                    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+                    if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
+                        continue;
+                    
+                    unsigned srcIndexStart = geometry->GetIndexStart();
+                    unsigned srcIndexCount = geometry->GetIndexCount();
+                    unsigned srcVertexStart = geometry->GetVertexStart();
+                    unsigned srcVertexCount = geometry->GetVertexCount();
+                    
+                    if (!srcIndexCount)
+                        continue;
+                    
+                    unsigned destVertexStart = build.vertices_.Size();
+                    
+                    for (unsigned k = srcVertexStart; k < srcVertexStart + srcVertexCount; ++k)
+                    {
+                        Vector3 vertex = transform * *((const Vector3*)(&vertexData[k * vertexSize]));
+                        build.vertices_.Push(vertex);
+                    }
+                    
+                    // Copy remapped indices
+                    if (indexSize == sizeof(unsigned short))
+                    {
+                        const unsigned short* indices = ((const unsigned short*)indexData) + srcIndexStart;
+                        const unsigned short* indicesEnd = indices + srcIndexCount;
+                        
+                        while (indices < indicesEnd)
+                        {
+                            build.indices_.Push(*indices - srcVertexStart + destVertexStart);
+                            ++indices;
+                        }
+                    }
+                    else
+                    {
+                        const unsigned* indices = ((const unsigned*)indexData) + srcIndexStart;
+                        const unsigned* indicesEnd = indices + srcIndexCount;
+                        
+                        while (indices < indicesEnd)
+                        {
+                            build.indices_.Push(*indices - srcVertexStart + destVertexStart);
+                            ++indices;
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-bool NavigationMesh::BuildTile(Vector<GeometryInfo>& geometryList, int x, int z)
+bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z)
 {
     PROFILE(BuildNavigationMeshTile);
     

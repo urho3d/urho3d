@@ -39,11 +39,13 @@ class Geometry;
 struct FindPathData;
 struct NavigationBuildData;
 
-/// Geometry with transform and bounds information.
-struct GeometryInfo
+/// Description of a navigation mesh geometry component, with transform and bounds information.
+struct NavigationGeometryInfo
 {
-    /// Geometry object.
-    Geometry* geometry_;
+    /// Component.
+    Component* component_;
+    /// Geometry LOD level if applicable.
+    unsigned lodLevel_;
     /// Transform relative to the navigation mesh root node.
     Matrix3x4 transform_;
     /// Bounding box relative to the navigation mesh root node.
@@ -141,13 +143,13 @@ public:
     
 private:
     /// Collect geometry from under Navigable components.
-    void CollectGeometries(Vector<GeometryInfo>& geometryList);
+    void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList);
     /// Visit nodes and collect navigable geometry.
-    void CollectGeometries(Vector<GeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
+    void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
     /// Get geometry data within a bounding box.
-    void GetTileGeometry(NavigationBuildData& build, Vector<GeometryInfo>& geometryList, BoundingBox& box);
+    void GetTileGeometry(NavigationBuildData& build, Vector<NavigationGeometryInfo>& geometryList, BoundingBox& box);
     /// Build one tile of the navigation mesh. Return true if successful.
-    bool BuildTile(Vector<GeometryInfo>& geometryList, int x, int z);
+    bool BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z);
     /// Initialize navigation mesh query. Return true if successful.
     bool InitializeQuery();
     /// Release the navigation mesh and the query.
