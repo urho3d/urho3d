@@ -52,11 +52,13 @@ bool NewUIElement(const String&in typeName)
             // If parented to root, set the internal variables
             element.vars[FILENAME_VAR] = "";
             element.vars[MODIFIED_VAR] = false;
+            // and position the newly created element at center
+            CenterDialog(element);
         }
+        // Use the predefined UI style if set, otherwise use editor's own UI style
         element.style = uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle;
-
-        // Position the newly created element at center
-        CenterDialog(element);
+        // Does not allow UI subsystem to reorder children while editing the element in the editor
+        element.sortChildren = false;
 
         // Create an undo action for the create
         CreateUIElementAction action;
@@ -108,8 +110,9 @@ void OpenUIElement(const String&in fileName)
         element.vars[FILENAME_VAR] = fileName;
         element.vars[MODIFIED_VAR] = false;
 
-        // \todo: should not always centered
-        CenterDialog(element);
+        // Does not allow UI subsystem to reorder children while editing the element in the editor
+        element.sortChildren = false;
+
         editorUIElement.AddChild(element);
 
         UpdateHierarchyItem(element);

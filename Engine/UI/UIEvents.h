@@ -75,6 +75,14 @@ EVENT(E_RESIZED, Resized)
     PARAM(P_HEIGHT, Height);                // int
 }
 
+/// UI element positioned.
+EVENT(E_POSITIONED, Positioned)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+}
+
 /// UI element visibility changed.
 EVENT(E_VISIBLECHANGED, VisibleChanged)
 {

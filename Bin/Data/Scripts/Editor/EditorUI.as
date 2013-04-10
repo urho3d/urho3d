@@ -126,11 +126,6 @@ void CreateMenuBar()
     uiMenuBar.opacity = uiMaxOpacity;
     uiMenuBar.SetFixedWidth(graphics.width);
 
-    BorderImage@ logo = BorderImage("Logo");
-    logo.texture = cache.GetResource("Texture2D", "Textures/Logo.png");
-    logo.SetFixedWidth(50);
-    uiMenuBar.AddChild(logo);
-
     ui.root.AddChild(uiMenuBar);
 
     {
@@ -253,6 +248,11 @@ void CreateMenuBar()
     BorderImage@ spacer = BorderImage("MenuBarSpacer");
     spacer.SetStyle(uiStyle, "EditorMenuBar");
     uiMenuBar.AddChild(spacer);
+
+    BorderImage@ logo = BorderImage("Logo");
+    logo.texture = cache.GetResource("Texture2D", "Textures/Logo.png");
+    logo.SetFixedWidth(50);
+    uiMenuBar.AddChild(logo);
 }
 
 bool Exit()

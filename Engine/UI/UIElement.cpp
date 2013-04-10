@@ -478,6 +478,14 @@ void UIElement::SetPosition(const IntVector2& position)
         position_ = position;
         OnPositionSet();
         MarkDirty();
+
+        using namespace Positioned;
+
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_X] = position_.x_;
+        eventData[P_Y] = position_.y_;
+        SendEvent(E_POSITIONED, eventData);
     }
 }
 

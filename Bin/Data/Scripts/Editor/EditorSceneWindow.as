@@ -306,9 +306,11 @@ void SetID(Text@ text, Serializable@ serializable, int itemType = ITEM_NONE)
         break;
 
     case ITEM_UI_ELEMENT:
-        // Subscribe to name and visibility changed events
+        // Subscribe to UI-element events
         SubscribeToEvent(serializable, "NameChanged", "HandleElementNameChanged");
         SubscribeToEvent(serializable, "VisibleChanged", "HandleElementVisibilityChanged");
+        SubscribeToEvent(serializable, "Resized", "HandleElementAttributeChanged");
+        SubscribeToEvent(serializable, "Positioned", "HandleElementAttributeChanged");
         break;
 
     default:
@@ -921,6 +923,14 @@ void HandleElementVisibilityChanged(StringHash eventType, VariantMap& eventData)
 
     UIElement@ element = eventData["Element"].GetUIElement();
     UpdateHierarchyItemText(GetListIndex(element), element.visible);
+}
+
+void HandleElementAttributeChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressUIElementChanges)
+        return;
+
+    attributesDirty = true;
 }
 
 // Hierarchy window edit functions

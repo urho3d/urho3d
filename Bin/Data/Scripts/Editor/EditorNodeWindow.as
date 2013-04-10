@@ -296,6 +296,19 @@ void UpdateAttributeInspectorIcons()
     }
 }
 
+bool PreEditAttribute(Array<Serializable@>@ serializables, uint index)
+{
+    // If resizing UI element by attribute editor, prevent hierarchy window element-resized event handler to update the attribute inspector
+    if (GetType(serializables[0]) == ITEM_UI_ELEMENT)
+    {
+        String name(serializables[0].attributeInfos[index].name);
+        if (name == "Position" || name == "Size" || name == "Text")
+            suppressUIElementChanges = true;
+    }
+
+    return true;
+}
+
 void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Array<Variant>& oldValues)
 {
     // Create undo actions for the edits
@@ -308,12 +321,19 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
     }
     SaveEditActionGroup(group);
 
-    // If a UI-element changing its 'Is Modal' attribute, clear the hierarchy list selection
-    bool saveModalElement = false;
-    if (GetType(serializables[0]) == ITEM_UI_ELEMENT && serializables[0].attributeInfos[index].name == "Is Modal")
+    bool testModalElement = false;
+    if (GetType(serializables[0]) == ITEM_UI_ELEMENT)
     {
-        hierarchyList.ClearSelection();
-        saveModalElement = true;
+        String name(serializables[0].attributeInfos[index].name);
+
+        // If a UI-element changing its 'Is Modal' attribute, clear the hierarchy list selection
+        if (name == "Is Modal")
+        {
+            hierarchyList.ClearSelection();
+            testModalElement = true;
+        }
+        else if (name == "Position" || name == "Size" || name == "Text")
+            suppressUIElementChanges = false;
     }
 
     for (uint i = 0; i < serializables.length; ++i)
@@ -322,7 +342,7 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
 
         // Set a user-defined var to prevent auto-removal of the modal element being tested in the editor
         // After losing the modal flag, the modal element should be reparented to its original parent automatically
-        if (saveModalElement)
+        if (testModalElement)
             cast<UIElement>(serializables[i]).vars[NO_AUTO_REMOVE] = true;
     }
 }

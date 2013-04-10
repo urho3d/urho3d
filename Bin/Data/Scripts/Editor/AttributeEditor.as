@@ -1,7 +1,8 @@
 // Attribute editor
 //
-// Functions that you must implement:
+// Functions that caller must implement:
 // - void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializables);
+// - bool PreEditAttribute(Array<Serializable@>@ serializables, uint index);
 // - void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Array<Variant>& oldValues);
 // - Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit);
 
@@ -766,6 +767,10 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     uint coordinate = attrEdit.vars["Coordinate"].GetUInt();
     bool intermediateEdit = eventType == TEXT_CHANGED_EVENT_TYPE;
 
+    // Do the editor pre logic before attribute is being modified
+    if (!PreEditAttribute(serializables, index))
+        return;
+
     // Store old values so that PostEditAttribute can create undo actions
     Array<Variant> oldValues;
     for (uint i = 0; i < serializables.length; ++i)
@@ -775,7 +780,7 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     for (uint i = 0; i < serializables.length; ++i)
         serializables[i].ApplyAttributes();
 
-    // Do the editor logic after attribute has been edited.
+    // Do the editor post logic after attribute has been modified.
     PostEditAttribute(serializables, index, oldValues);
 
     // If not an intermediate edit, reload the editor fields with validated values
