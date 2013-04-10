@@ -927,7 +927,8 @@ void HandleElementVisibilityChanged(StringHash eventType, VariantMap& eventData)
 
 void HandleElementAttributeChanged(StringHash eventType, VariantMap& eventData)
 {
-    if (suppressUIElementChanges)
+    // Do not refresh the attribute inspector while the attribute is being edited via the attribute-editors
+    if (suppressUIElementChanges || inEditAttribute)
         return;
 
     UIElement@ element = eventData["Element"].GetUIElement();
@@ -935,7 +936,7 @@ void HandleElementAttributeChanged(StringHash eventType, VariantMap& eventData)
     {
         if (editUIElements[i] is element)
             attributesDirty = true;
-    }    
+    }
 }
 
 // Hierarchy window edit functions

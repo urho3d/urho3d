@@ -333,10 +333,16 @@ bool PickFile()
     }
     else if (action == "Save UI-element as..." || action == "Save UI-element")
     {
-        if (editUIElement !is null && editUIElement.vars.Contains(FILENAME_VAR))
+        if (editUIElement !is null)
         {
+            UIElement@ element = editUIElement;
+            while (element !is null && !element.vars.Contains(FILENAME_VAR))
+                element = element.parent;
+            if (element is null)
+                return false;
+
             CreateFileSelector("Save UI-element as", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
-            uiFileSelector.fileName = GetFileNameAndExtension(editUIElement.vars[FILENAME_VAR].GetString());
+            uiFileSelector.fileName = GetFileNameAndExtension(element.GetVar(FILENAME_VAR).GetString());
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveUIElementFile");
         }
     }
@@ -350,7 +356,7 @@ bool PickFile()
     }
     else if (action == "Save child element as...")
     {
-        if (editUIElement !is null && !editUIElement.vars.Contains(FILENAME_VAR))
+        if (editUIElement !is null)
         {
             CreateFileSelector("Save child element", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
             uiFileSelector.fileName = GetFileNameAndExtension(childElementFileName);

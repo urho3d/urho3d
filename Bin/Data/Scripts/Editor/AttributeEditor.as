@@ -5,6 +5,7 @@
 // - bool PreEditAttribute(Array<Serializable@>@ serializables, uint index);
 // - void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Array<Variant>& oldValues);
 // - Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit);
+// - String GetVariableName(ShortStringHash hash);
 
 const uint MIN_NODE_ATTRIBUTES = 4;
 const uint MAX_NODE_ATTRIBUTES = 8;
@@ -13,6 +14,7 @@ const int ATTR_HEIGHT = 19;
 const StringHash TEXT_CHANGED_EVENT_TYPE("TextChanged");
 
 bool inLoadAttributeEditor = false;
+bool inEditAttribute = false;
 bool showNonEditableAttribute = false;
 
 Color normalTextColor(1.0f, 1.0f, 1.0f);
@@ -321,7 +323,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         Array<ShortStringHash>@ keys = map.keys;
         for (uint i = 0; i < keys.length; ++i)
         {
-            String varName = scene.GetVarName(keys[i]);
+            String varName = GetVariableName(keys[i]);
             Variant value = map[keys[i]];
 
             // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
@@ -523,7 +525,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             if (parent is null)
                 break;
 
-            String varName = scene.GetVarName(keys[subIndex]);
+            String varName = GetVariableName(keys[subIndex]);
             if (varName.empty)
                 continue;
 
@@ -771,6 +773,8 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
     if (!PreEditAttribute(serializables, index))
         return;
 
+    inEditAttribute = true;
+
     // Store old values so that PostEditAttribute can create undo actions
     Array<Variant> oldValues;
     for (uint i = 0; i < serializables.length; ++i)
@@ -782,6 +786,8 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 
     // Do the editor post logic after attribute has been modified.
     PostEditAttribute(serializables, index, oldValues);
+
+    inEditAttribute = false;
 
     // If not an intermediate edit, reload the editor fields with validated values
     // (attributes may have interactions; therefore we load everything, not just the value being edited)

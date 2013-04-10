@@ -298,14 +298,6 @@ void UpdateAttributeInspectorIcons()
 
 bool PreEditAttribute(Array<Serializable@>@ serializables, uint index)
 {
-    // If resizing UI element by attribute editor, prevent hierarchy window element-resized event handler to update the attribute inspector
-    if (GetType(serializables[0]) == ITEM_UI_ELEMENT)
-    {
-        String name(serializables[0].attributeInfos[index].name);
-        if (name == "Position" || name == "Size" || name == "Text")
-            suppressUIElementChanges = true;
-    }
-
     return true;
 }
 
@@ -321,19 +313,12 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
     }
     SaveEditActionGroup(group);
 
+    // If a UI-element changing its 'Is Modal' attribute, clear the hierarchy list selection
     bool testModalElement = false;
-    if (GetType(serializables[0]) == ITEM_UI_ELEMENT)
+    if (GetType(serializables[0]) == ITEM_UI_ELEMENT && serializables[0].attributeInfos[index].name == "Is Modal")
     {
-        String name(serializables[0].attributeInfos[index].name);
-
-        // If a UI-element changing its 'Is Modal' attribute, clear the hierarchy list selection
-        if (name == "Is Modal")
-        {
-            hierarchyList.ClearSelection();
-            testModalElement = true;
-        }
-        else if (name == "Position" || name == "Size" || name == "Text")
-            suppressUIElementChanges = false;
+        hierarchyList.ClearSelection();
+        testModalElement = true;
     }
 
     for (uint i = 0; i < serializables.length; ++i)
@@ -438,18 +423,21 @@ void CreateNodeVariable(StringHash eventType, VariantMap& eventData)
     if (editNodes.length == 0)
         return;
 
-    String newKey;
-    Variant newValue;
-    CreateNewVariable(eventData, newKey, newValue);
-    if (newKey.empty)
+    String newName = ExtractVariableName(eventData);
+    if (newName.empty)
         return;
+
+    // Create scene variable
+    editorScene.RegisterVar(newName);
+
+    Variant newValue = ExtractVariantType(eventData);
 
     // If we overwrite an existing variable, must recreate the attribute-editor(s) for the correct type
     bool overwrite = false;
     for (uint i = 0; i < editNodes.length; ++i)
     {
-        overwrite = overwrite || editNodes[i].vars.Contains(newKey);
-        editNodes[i].vars[newKey] = newValue;
+        overwrite = overwrite || editNodes[i].vars.Contains(newName);
+        editNodes[i].vars[newName] = newValue;
     }
     if (overwrite)
         attributesFullDirty = true;
@@ -462,16 +450,17 @@ void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
     if (editNodes.length == 0)
         return;
 
-    String delKey;
-    DeleteVariable(eventData, delKey);
-    if (delKey.empty)
+    String delName = ExtractVariableName(eventData);
+    if (delName.empty)
         return;
+
+    // Note: intentionally do not unregister the variable name here as the same variable name may still be used by other attribute list
 
     bool erased = false;
     for (uint i = 0; i < editNodes.length; ++i)
     {
         // \todo Should first check whether var in question is editable
-        erased = editNodes[i].vars.Erase(delKey) || erased;
+        erased = editNodes[i].vars.Erase(delName) || erased;
     }
     if (erased)
         attributesDirty = true;
@@ -482,19 +471,22 @@ void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
     if (editUIElements.length == 0)
         return;
 
-    String newKey;
-    Variant newValue;
-    CreateNewVariable(eventData, newKey, newValue);
-    if (newKey.empty)
+    String newName = ExtractVariableName(eventData);
+    if (newName.empty)
         return;
+
+    // Create UIElement variable
+    uiElementVarNames[newName] = newName;
+
+    Variant newValue = ExtractVariantType(eventData);
 
     // If we overwrite an existing variable, must recreate the attribute-editor(s) for the correct type
     bool overwrite = false;
     for (uint i = 0; i < editUIElements.length; ++i)
     {
         UIElement@ element = cast<UIElement>(editUIElements[i]);
-        overwrite = overwrite || element.vars.Contains(newKey);
-        element.vars[newKey] = newValue;
+        overwrite = overwrite || element.vars.Contains(newName);
+        element.vars[newName] = newValue;
     }
     if (overwrite)
         attributesFullDirty = true;
@@ -507,59 +499,57 @@ void DeleteUIElementVariable(StringHash eventType, VariantMap& eventData)
     if (editUIElements.length == 0)
         return;
 
-    String delKey;
-    DeleteVariable(eventData, delKey);
-    if (delKey.empty)
+    String delName = ExtractVariableName(eventData);
+    if (delName.empty)
         return;
+
+    // Note: intentionally do not unregister the variable name here as the same variable name may still be used by other attribute list
 
     bool erased = false;
     for (uint i = 0; i < editUIElements.length; ++i)
     {
         // \todo Should first check whether var in question is editable
-        erased = cast<UIElement>(editUIElements[i]).vars.Erase(delKey) || erased;
+        erased = cast<UIElement>(editUIElements[i]).vars.Erase(delName) || erased;
     }
     if (erased)
         attributesDirty = true;
 }
 
-void CreateNewVariable(VariantMap& eventData, String& newKey, Variant& newValue)
+String ExtractVariableName(VariantMap& eventData)
+{
+    UIElement@ element = eventData["Element"].GetUIElement();
+    LineEdit@ nameEdit = element.parent.GetChild("VarNameEdit");
+    return nameEdit.text.Trimmed();
+}
+
+Variant ExtractVariantType(VariantMap& eventData)
 {
     DropDownList@ dropDown = eventData["Element"].GetUIElement();
-    LineEdit@ nameEdit = dropDown.parent.GetChild("VarNameEdit");
-    newKey = nameEdit.text.Trimmed().Replaced(";", "");
-    if (newKey.empty)
-        return;
-
-    editorScene.RegisterVar(newKey);
-
     switch (dropDown.selection)
     {
     case 0:
-        newValue = int(0);
-        break;
+        return int(0);
     case 1:
-        newValue = false;
-        break;
+        return false;
     case 2:
-        newValue = float(0.0);
-        break;
+        return float(0.0);
     case 3:
-        newValue = String();
-        break;
+        return Variant(String());
     case 4:
-        newValue = Vector3();
-        break;
+        return Variant(Vector3());
     case 5:
-        newValue = Color();
-        break;
+        return Variant(Color());
     }
+
+    return Variant();   // This should not happen
 }
 
-void DeleteVariable(VariantMap& eventData, String& delKey)
+String GetVariableName(ShortStringHash hash)
 {
-    Button@ button = eventData["Element"].GetUIElement();
-    LineEdit@ nameEdit = button.parent.GetChild("VarNameEdit", true);
-    delKey = nameEdit.text.Trimmed().Replaced(";", "");
-
-    // Do not actually unregister the variable name as the same variable name may still be used by other attribute list
+    // First try to get it from scene
+    String name = editorScene.GetVarName(hash);
+    // Then from the UIElement variable names
+    if (name.empty && uiElementVarNames.Contains(hash))
+        name = uiElementVarNames[hash].ToString();
+    return name;    // Since this is a reverse mapping, it does not really matter from which side the name is retrieved back
 }

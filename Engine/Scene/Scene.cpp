@@ -378,6 +378,7 @@ void Scene::Clear()
     StopAsyncLoading();
     RemoveAllChildren();
     RemoveAllComponents();
+    UnregisterAllVars();
     SetName(String::EMPTY);
     fileName_.Clear();
     checksum_ = 0;
