@@ -930,7 +930,12 @@ void HandleElementAttributeChanged(StringHash eventType, VariantMap& eventData)
     if (suppressUIElementChanges)
         return;
 
-    attributesDirty = true;
+    UIElement@ element = eventData["Element"].GetUIElement();
+    for (uint i = 0; i < editUIElements.length; ++i)
+    {
+        if (editUIElements[i] is element)
+            attributesDirty = true;
+    }    
 }
 
 // Hierarchy window edit functions
