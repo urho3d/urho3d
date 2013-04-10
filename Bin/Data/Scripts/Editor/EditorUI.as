@@ -990,15 +990,4 @@ void UpdateDirtyUI()
     // Perform some event-triggered updates latently in case a large hierarchy was changed
     if (attributesFullDirty || attributesDirty)
         UpdateAttributeInspector(attributesFullDirty);
-    
-    for (uint i = 0; i < modalUIElements.length; ++i)
-    {
-        // If it is detached then reparent it to editor root UI element
-        if (modalUIElements[i].parent is null)
-        {
-            editorUIElement.AddChild(modalUIElements[i]);
-            modalUIElements.Erase(i);
-            break;  // Only one at a time
-        }
-    }
 }

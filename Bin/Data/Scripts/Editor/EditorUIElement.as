@@ -8,7 +8,6 @@ String childElementFileName;
 UIElement@ editUIElement;
 Array<Serializable@> selectedUIElements;
 Array<Serializable@> editUIElements;
-Array<UIElement@> modalUIElements;
 
 Array<XMLFile@> uiElementCopyBuffer;
 
@@ -436,10 +435,16 @@ bool UIElementDelete()
 bool UIElementSelectAll()
 {
     BeginSelectionModify();
-    Array<UIElement@> elements = editorUIElement.GetChildren(true);
     Array<uint> indices;
-    for (uint i = 0; i < elements.length; ++i)
-        indices.Push(GetListIndex(elements[i]));
+    uint baseIndex = GetListIndex(editorUIElement);
+    indices.Push(baseIndex);
+    int baseIndent = hierarchyList.items[baseIndex].indent;
+    for (uint i = baseIndex + 1; i < hierarchyList.numItems; ++i)
+    {
+        if (hierarchyList.items[i].indent <= baseIndent)
+            break;
+        indices.Push(i);
+    }
     hierarchyList.SetSelections(indices);
     EndSelectionModify();
 

@@ -1142,10 +1142,10 @@ unsigned UIElement::FindChild(UIElement* element) const
     return i != children_.End() ? i - children_.Begin() : M_MAX_UNSIGNED;
 }
 
-void UIElement::SetParent(UIElement* parent)
+void UIElement::SetParent(UIElement* parent, unsigned index)
 {
     if (parent)
-        parent->AddChild(this);
+        parent->InsertChild(index, this);
 }
 
 void UIElement::SetVar(ShortStringHash key, const Variant& value)

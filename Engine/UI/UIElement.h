@@ -290,8 +290,8 @@ public:
     void Remove();
     /// Find child index. Return M_MAX_UNSIGNED if not found.
     unsigned FindChild(UIElement* element) const;
-    /// Set parent element. Same as parent->AddChild(this).
-    void SetParent(UIElement* parent);
+    /// Set parent element. Same as parent->InsertChild(index, this).
+    void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
     /// Set a user variable.
     void SetVar(ShortStringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.

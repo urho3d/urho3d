@@ -14,6 +14,7 @@ const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
 const ShortStringHash NODE_IDS_VAR("NodeIDs");
 const ShortStringHash COMPONENT_IDS_VAR("ComponentIDs");
 const ShortStringHash UI_ELEMENT_IDS_VAR("UIElementIDs");
+const ShortStringHash NO_AUTO_REMOVE("NoAutoRemove");
 
 uint nodeContainerIndex = M_MAX_UNSIGNED;
 uint componentContainerStartIndex = 0;
@@ -305,12 +306,11 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
         action.Define(serializables[i], index, oldValues[i]);
         group.actions.Push(action);
     }
-
     SaveEditActionGroup(group);
 
     // If a UI-element changing its 'Is Modal' attribute, clear the hierarchy list selection
     bool saveModalElement = false;
-    if (serializables[0].attributeInfos[index].name == "Is Modal")
+    if (GetType(serializables[0]) == ITEM_UI_ELEMENT && serializables[0].attributeInfos[index].name == "Is Modal")
     {
         hierarchyList.ClearSelection();
         saveModalElement = true;
@@ -320,9 +320,10 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
     {
         PostEditAttribute(serializables[i], index);
 
-        // Need to save a reference of the modal element being tested as otherwise there is no way to get it back when it is being dismissed by ESC key
+        // Set a user-defined var to prevent auto-removal of the modal element being tested in the editor
+        // After losing the modal flag, the modal element should be reparented to its original parent automatically
         if (saveModalElement)
-            modalUIElements.Push(serializables[i]);
+            cast<UIElement>(serializables[i]).vars[NO_AUTO_REMOVE] = true;
     }
 }
 

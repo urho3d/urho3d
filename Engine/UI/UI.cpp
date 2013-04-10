@@ -58,7 +58,9 @@ namespace Urho3D
 
 ShortStringHash VAR_ORIGIN("Origin");
 const ShortStringHash VAR_ORIGINAL_PARENT("OriginalParent");
+const ShortStringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
 const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
+const ShortStringHash VAR_NO_AUTO_REMOVE("NoAutoRemove");
 
 OBJECTTYPESTATIC(UI);
 
@@ -197,7 +199,9 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
         }
 
         // Adopt modal root as parent
-        modalElement->SetVar(VAR_ORIGINAL_PARENT, modalElement->GetParent());
+        UIElement* oriParent = modalElement->GetParent();
+        modalElement->SetVar(VAR_ORIGINAL_PARENT, oriParent);
+        modalElement->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(modalElement) : M_MAX_UNSIGNED);
         modalElement->SetParent(rootModalElement_);
 
         // If it is a popup element, bring along its top-level parent
@@ -210,7 +214,9 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
             if (element)
             {
                 originElement->SetVar(VAR_PARENT_CHANGED, element);
-                element->SetVar(VAR_ORIGINAL_PARENT, element->GetParent());
+                oriParent = element->GetParent();
+                element->SetVar(VAR_ORIGINAL_PARENT, oriParent);
+                element->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(element) : M_MAX_UNSIGNED);
                 element->SetParent(rootModalElement_);
             }
         }
@@ -225,8 +231,10 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
             if (children[i] == modalElement)
             {
                 // Revert back to original parent
-                modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()));
-                const_cast<VariantMap&>(modalElement->GetVars()).Erase(VAR_ORIGINAL_PARENT);
+                modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()), modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
+                VariantMap& vars = const_cast<VariantMap&>(modalElement->GetVars());
+                vars.Erase(VAR_ORIGINAL_PARENT);
+                vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
 
                 // If it is a popup element, revert back its top-level parent to its original parent
                 UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
@@ -236,8 +244,10 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
                     if (element)
                     {
                         const_cast<VariantMap&>(originElement->GetVars()).Erase(VAR_PARENT_CHANGED);
-                        element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()));
-                        const_cast<VariantMap&>(element->GetVars()).Erase(VAR_ORIGINAL_PARENT);
+                        element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()), element->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
+                        vars = const_cast<VariantMap&>(element->GetVars());
+                        vars.Erase(VAR_ORIGINAL_PARENT);
+                        vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
                     }
                 }
 
@@ -1082,7 +1092,10 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             if (window)
             {
                 window->SetModal(false);
-                window->Remove();
+                if (window->GetVars().Contains(VAR_NO_AUTO_REMOVE))
+                    const_cast<VariantMap&>(window->GetVars()).Erase(VAR_NO_AUTO_REMOVE);
+                else
+                    window->Remove();
             }
         }
 

@@ -3161,12 +3161,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3222,7 +3222,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3272,12 +3272,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 
@@ -3335,7 +3335,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3386,8 +3386,8 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
-- const Variant& GetVar(const ShortStringHash&)
 - UIElement@ GetElementEventSender() const
+- const Variant& GetVar(const ShortStringHash&)
 - void SetPosition(float, float)
 - void SetHotSpot(int, int)
 - void SetScale(float, float)
@@ -3424,7 +3424,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - float derivedOpacity (readonly)
 - VariantMap vars (readonly)
@@ -3479,12 +3479,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
@@ -3545,7 +3545,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3605,12 +3605,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetCheckedOffset(int, int)
@@ -3669,7 +3669,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3727,12 +3727,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&, bool arg4 = false)
@@ -3791,7 +3791,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3848,12 +3848,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void ChangeValue(float)
@@ -3912,7 +3912,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3973,12 +3973,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void ChangeValue(float)
 - void StepBack()
 - void StepForward()
@@ -4037,7 +4037,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -4096,12 +4096,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetViewPosition(int, int)
 - void SetScrollBarsVisible(bool, bool)
 
@@ -4159,7 +4159,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -4217,12 +4217,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetViewPosition(int, int)
 - void SetScrollBarsVisible(bool, bool)
 - void AddItem(UIElement@)
@@ -4297,7 +4297,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -4367,12 +4367,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - bool SetFont(const String&, int)
 - bool SetFont(Font@, int)
 - void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)
@@ -4432,7 +4432,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -4494,12 +4494,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 
@@ -4557,7 +4557,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -4624,12 +4624,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
@@ -4692,7 +4692,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -4757,12 +4757,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
@@ -4831,7 +4831,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -4901,12 +4901,12 @@ Methods:<br>
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- UIElement@ GetElementEventSender() const
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 
@@ -4964,7 +4964,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - uint numAllChildren (readonly)
 - UIElement@[] children (readonly)
-- UIElement@ parent (readonly)
+- UIElement@ parent
 - UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - IntRect combinedScreenRect (readonly)

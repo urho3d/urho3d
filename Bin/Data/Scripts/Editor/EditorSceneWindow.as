@@ -1020,7 +1020,7 @@ bool SelectAll()
     {
         if (!selectedNodes.empty || !selectedComponents.empty)
             return SceneSelectAll();
-        else if (!selectedUIElements.empty)
+        else if (!selectedUIElements.empty || hierarchyList.items[GetListIndex(editorUIElement)].selected)
             return UIElementSelectAll();
         else
             return SceneSelectAll();    // If nothing is selected yet, fall back to scene select all
