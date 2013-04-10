@@ -974,7 +974,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(UIElementGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numChildren(bool) const", asMETHOD(T, GetNumChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_children(uint) const", asMETHODPR(T, GetChild, (unsigned) const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_parent(UIElement@+, uint arg1 = M_MAX_UNSIGNED)", asMETHOD(T, SetParent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_parent(UIElement@+)", asMETHOD(T, SetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_parent() const", asMETHOD(T, GetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_root() const", asMETHOD(T, GetRoot), asCALL_THISCALL);
     if (!isSprite)
