@@ -57,7 +57,7 @@ bool NewUIElement(const String&in typeName)
         }
         // Use the predefined UI style if set, otherwise use editor's own UI style
         element.style = uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle;
-        // Does not allow UI subsystem to reorder children while editing the element in the editor
+        // Do not allow UI subsystem to reorder children while editing the element in the editor
         element.sortChildren = false;
 
         // Create an undo action for the create
@@ -68,6 +68,15 @@ bool NewUIElement(const String&in typeName)
         FocusUIElement(element);
     }
     return true;
+}
+
+void ResetSortChildren(UIElement@ element)
+{
+    element.sortChildren = false;
+
+    // Perform the action recursively for child elements
+    for (uint i = 0; i < element.numChildren; ++i)
+        ResetSortChildren(element.children[i]);
 }
 
 void OpenUIElement(const String&in fileName)
@@ -110,8 +119,8 @@ void OpenUIElement(const String&in fileName)
         element.vars[FILENAME_VAR] = fileName;
         element.vars[MODIFIED_VAR] = false;
 
-        // Does not allow UI subsystem to reorder children while editing the element in the editor
-        element.sortChildren = false;
+        // Do not allow UI subsystem to reorder children while editing the element in the editor
+        ResetSortChildren(element);
 
         editorUIElement.AddChild(element);
 
@@ -240,6 +249,7 @@ void LoadChildUIElement(const String&in fileName)
     if (editUIElement.LoadXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle))
     {
         UIElement@ element = editUIElement.children[editUIElement.numChildren - 1];
+        ResetSortChildren(element);
         UpdateHierarchyItem(element);
 
         // Create an undo action for the load
