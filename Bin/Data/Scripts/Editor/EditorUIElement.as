@@ -124,7 +124,7 @@ void OpenUIElement(const String&in fileName)
 
         // Do not allow UI subsystem to reorder children while editing the element in the editor
         ResetSortChildren(element);
-        // Register variable names from the 'enriched' variant XMLElement, if any
+        // Register variable names from the 'enriched' XMLElement, if any
         RegisterUIElementVar(xmlFile.root);
 
         editorUIElement.AddChild(element);
@@ -146,9 +146,7 @@ bool CloseUIElement()
 
     for (uint i = 0; i < selectedUIElements.length; ++i)
     {
-        UIElement@ element = selectedUIElements[i];
-        while (element !is null && !element.vars.Contains(FILENAME_VAR))
-            element = element.parent;
+        UIElement@ element = GetTopLevelUIElement(selectedUIElements[i]);
         if (element !is null)
         {
             element.Remove();
@@ -194,9 +192,7 @@ bool SaveUIElement(const String&in fileName)
     if (!file.open)
         return false;
 
-    UIElement@ element = editUIElement;
-    while (element !is null && !element.vars.Contains(FILENAME_VAR))
-        element = element.parent;
+    UIElement@ element = GetTopLevelUIElement(editUIElement);
     if (element is null)
         return false;
 
@@ -207,14 +203,14 @@ bool SaveUIElement(const String&in fileName)
     {
         FilterInternalVars(rootElem);
         success = elementData.Save(file);
-    }
-    if (success)
-    {
-        element.vars[FILENAME_VAR] = fileName;
-        element.vars[MODIFIED_VAR] = false;
+        if (success)
+        {
+            element.vars[FILENAME_VAR] = fileName;
+            element.vars[MODIFIED_VAR] = false;
 
-        sceneModified = false;
-        UpdateWindowTitle();
+            sceneModified = false;
+            UpdateWindowTitle();
+        }
     }
 
     return success;
@@ -224,9 +220,7 @@ bool SaveUIElementWithExistingName()
 {
     ui.cursor.shape = CS_BUSY;
 
-    UIElement@ element = editUIElement;
-    while (element !is null && !element.vars.Contains(FILENAME_VAR))
-        element = element.parent;
+    UIElement@ element = GetTopLevelUIElement(editUIElement);
     if (element is null)
         return false;
 
@@ -326,8 +320,9 @@ void SetUIElementDefaultStyle(const String&in fileName)
 
 void FilterInternalVars(XMLElement source)
 {
+    // For each 'attribute' tag, check the following two cases:
     // If variable name is empty (or unregistered) then it is an internal variable and should be removed
-    // If it is registered then 'enrich' the XMLElement to store the variable name in plaintext
+    // If it is registered then it is a user-defined variable, so 'enrich' the XMLElement to store the variable name in plaintext
     XMLElement childElem = source.GetChild("attribute");
     while (childElem.notNull)
     {
@@ -384,12 +379,17 @@ void RegisterUIElementVar(XMLElement source)
     }
 }
 
+UIElement@ GetTopLevelUIElement(UIElement@ element)
+{
+    // Only top level UI-element contains the FILENAME_VAR
+    while (element !is null && !element.vars.Contains(FILENAME_VAR))
+        element = element.parent;
+    return element;
+}
+
 bool UIElementCut()
 {
-    if (UIElementCopy())
-        return UIElementDelete();
-    else
-        return false;
+    return UIElementCopy() && UIElementDelete();
 }
 
 bool UIElementCopy()

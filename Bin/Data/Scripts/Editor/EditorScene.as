@@ -387,10 +387,7 @@ bool SceneDelete()
 
 bool SceneCut()
 {
-    if (SceneCopy())
-        return SceneDelete();
-    else
-        return false;
+    return SceneCopy() && SceneDelete();
 }
 
 bool SceneCopy()

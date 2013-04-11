@@ -335,9 +335,7 @@ bool PickFile()
     {
         if (editUIElement !is null)
         {
-            UIElement@ element = editUIElement;
-            while (element !is null && !element.vars.Contains(FILENAME_VAR))
-                element = element.parent;
+            UIElement@ element = GetTopLevelUIElement(editUIElement);
             if (element is null)
                 return false;
 
