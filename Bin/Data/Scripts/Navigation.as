@@ -333,6 +333,8 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
         if (result.drawable !is null)
         {
+            NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
+
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
             if (setStartPos)
             {
@@ -347,7 +349,6 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
             if (startPosSet && endPosSet)
             {
-                NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
                 path = navMesh.FindPath(startPos, endPos);
             }
         }

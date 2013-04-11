@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-/// Navigable component, tags geometry for inclusion in the navigation mesh. Optionally auto-includes geometry also from child nodes.
+/// Component which tags geometry for inclusion in the navigation mesh. Optionally auto-includes geometry from child nodes.
 class Navigable : public Component
 {
     OBJECT(Navigable);

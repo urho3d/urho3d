@@ -5400,6 +5400,9 @@ Methods:<br>
 - bool Build()
 - bool Build(const BoundingBox&)
 - Vector3[]@ FindPath(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- Vector3 GetRandomPoint()
+- Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
 
 Properties:<br>
 - ShortStringHash type (readonly)

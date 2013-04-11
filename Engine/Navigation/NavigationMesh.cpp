@@ -37,6 +37,7 @@
 #include "TerrainPatch.h"
 #include "VectorBuffer.h"
 
+#include <cfloat>
 #include <DetourNavMesh.h>
 #include <DetourNavMeshBuilder.h>
 #include <DetourNavMeshQuery.h>
@@ -427,10 +428,10 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     
     // Navigation data is in local space. Transform path points from world to local
     const Matrix3x4& transform = node_->GetWorldTransform();
-    Matrix3x4 inverseTransform = transform.Inverse();
+    Matrix3x4 inverse = transform.Inverse();
     
-    Vector3 localStart = inverseTransform * start;
-    Vector3 localEnd = inverseTransform * end;
+    Vector3 localStart = inverse * start;
+    Vector3 localEnd = inverse * end;
     
     dtPolyRef startRef;
     dtPolyRef endRef;
@@ -462,9 +463,89 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
         dest.Push(transform * pathData_->pathPoints_[i]);
 }
 
+Vector3 NavigationMesh::GetRandomPoint()
+{
+    if (!navMesh_ || !node_)
+        return Vector3::ZERO;
+    
+    if (!navMeshQuery_)
+    {
+        if (!InitializeQuery())
+            return Vector3::ZERO;
+    }
+    
+    dtPolyRef polyRef;
+    Vector3 point(Vector3::ZERO);
+    
+    navMeshQuery_->findRandomPoint(queryFilter_, Random, &polyRef, &point.x_);
+    
+    return node_->GetWorldTransform() * point;
+}
+
+Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents)
+{
+    if (!navMesh_ || !node_)
+        return Vector3::ZERO;
+    
+    if (!navMeshQuery_)
+    {
+        if (!InitializeQuery())
+            return Vector3::ZERO;
+    }
+    
+    const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverse = transform.Inverse();
+    Vector3 localCenter = inverse * center;
+    
+    dtPolyRef startRef;
+    navMeshQuery_->findNearestPoly(&localCenter.x_, &extents.x_, queryFilter_, &startRef, 0);
+    if (!startRef)
+        return center;
+    
+    dtPolyRef polyRef;
+    Vector3 point(localCenter);
+    
+    navMeshQuery_->findRandomPointAroundCircle(startRef, &localCenter.x_, radius, queryFilter_, Random, &polyRef, &point.x_);
+    
+    return transform * point;
+}
+
 BoundingBox NavigationMesh::GetWorldBoundingBox() const
 {
     return node_ ? boundingBox_.Transformed(node_->GetWorldTransform()) : boundingBox_;
+}
+
+Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents)
+{
+    if (!navMesh_ || !node_)
+        return Vector3::ZERO;
+    
+    if (!navMeshQuery_)
+    {
+        if (!InitializeQuery())
+            return Vector3::ZERO;
+    }
+    
+    const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverse = transform.Inverse();
+    
+    Vector3 localStart = inverse * start;
+    Vector3 localEnd = inverse * end;
+    
+    dtPolyRef startRef;
+    navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
+    if (!startRef)
+        return start;
+    
+    Vector3 localHitNormal;
+    float t;
+    int numPolys;
+    
+    navMeshQuery_->raycast(startRef, &localStart.x_, &localEnd.x_, queryFilter_, &t, &localHitNormal.x_, pathData_->polys_, &numPolys, MAX_POLYS);
+    if (t == FLT_MAX)
+        t = 1.0f;
+    
+    return start.Lerp(end, t);
 }
 
 void NavigationMesh::SetNavigationDataAttr(PODVector<unsigned char> data)
@@ -593,7 +674,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
         return;
     processedNodes.Insert(node);
     
-    Matrix3x4 inverseTransform = node_->GetWorldTransform().Inverse();
+    Matrix3x4 inverse = node_->GetWorldTransform().Inverse();
     
     // Prefer compatible physics collision shapes (triangle mesh, convex hull, box) if found.
     // Then fallback to visible geometry
@@ -616,8 +697,8 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
             scaleMatrix.SetScale(shape->GetSize());
             
             info.component_ = shape;
-            info.transform_ = inverseTransform * node->GetWorldTransform() * scaleMatrix;
-            info.boundingBox_ = shape->GetWorldBoundingBox().Transformed(inverseTransform);
+            info.transform_ = inverse * node->GetWorldTransform() * scaleMatrix;
+            info.boundingBox_ = shape->GetWorldBoundingBox().Transformed(inverse);
             
             geometryList.Push(info);
             collisionShapeFound = true;
@@ -646,8 +727,8 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
                 continue;
             
             info.component_ = drawable;
-            info.transform_ = inverseTransform * node->GetWorldTransform();
-            info.boundingBox_ = drawable->GetWorldBoundingBox().Transformed(inverseTransform);
+            info.transform_ = inverse * node->GetWorldTransform();
+            info.boundingBox_ = drawable->GetWorldBoundingBox().Transformed(inverse);
             
             geometryList.Push(info);
         }
