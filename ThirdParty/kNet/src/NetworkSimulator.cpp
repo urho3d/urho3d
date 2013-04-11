@@ -38,7 +38,19 @@ NetworkSimulator::~NetworkSimulator()
 		LOG(LogError, "NetworkSimulator: Leaked %d buffers with improper NetworkSimulator teardown!", (int)queuedBuffers.size());
 }
 
-static float rand01() { return (float)rand() / (RAND_MAX+1); }
+/// Generates a float in half-open interval [0, 1[.
+static float rand01()
+{ 
+	assert(RAND_MAX >= 0x7FFF); ///\todo static assert.
+	return (float)(rand()&0x7FFF) / 0x8000;
+}
+
+/// Generates a float in closed interval [0, 1].
+static float rand01incl()
+{ 
+	assert(RAND_MAX >= 0x7FFF); ///\todo static assert.
+	return (float)(rand()&0x7FFF) / 0x7FFF;
+}
 
 void NetworkSimulator::Free()
 {
@@ -67,7 +79,7 @@ void NetworkSimulator::SubmitSendBuffer(kNet::OverlappedTransferBuffer *buffer, 
         b.buffer = socket->BeginSend(buffer->bytesContains);
 		if (b.buffer)
 		{
-			assert(b.buffer->buffer.len >= buffer->bytesContains);
+			assert(b.buffer->buffer.len >= (u32)buffer->bytesContains);
 			memcpy(b.buffer->buffer.buf, buffer->buffer.buf, buffer->bytesContains);
 			b.buffer->bytesContains = buffer->bytesContains;
 
@@ -75,7 +87,7 @@ void NetworkSimulator::SubmitSendBuffer(kNet::OverlappedTransferBuffer *buffer, 
 			if (corruptionType == CorruptDatagram)
 				MaybeCorruptBufferToggleBits(b.buffer->buffer.buf, b.buffer->bytesContains);
 
-			b.timeUntilTransfer.StartMSecs(constantPacketSendDelay + (float)rand() * uniformRandomPacketSendDelay / RAND_MAX);
+			b.timeUntilTransfer.StartMSecs(constantPacketSendDelay + rand01incl() * uniformRandomPacketSendDelay);
 			queuedBuffers.push_back(b);
 		}
 	}
@@ -86,7 +98,7 @@ void NetworkSimulator::SubmitSendBuffer(kNet::OverlappedTransferBuffer *buffer, 
 
 	QueuedBuffer b;
 	b.buffer = buffer;
-	b.timeUntilTransfer.StartMSecs(constantPacketSendDelay + (float)rand() * uniformRandomPacketSendDelay / RAND_MAX);
+	b.timeUntilTransfer.StartMSecs(constantPacketSendDelay + rand01incl() * uniformRandomPacketSendDelay);
 	queuedBuffers.push_back(b);
 }
 
@@ -107,10 +119,10 @@ void NetworkSimulator::MaybeCorruptBufferToggleBits(void *buffer, size_t numByte
 	// Should corrupt this data?
 	if (rand01() < corruptToggleBitsRate)
 	{
-		int numBitsToCorrupt = corruptMinBits + rand() * (corruptMaxBits - corruptMinBits + 1) / (RAND_MAX+1);
+		int numBitsToCorrupt = corruptMinBits + (int)(rand01() * (corruptMaxBits - corruptMinBits + 1));
 		for(int i = 0; i < numBitsToCorrupt; ++i)
 		{
-			int byteIndex = rand() * numBytes / (RAND_MAX+1);
+			int byteIndex = (int)(rand01() * numBytes);
 			int bitIndex = rand() % 8;
 			int bitMask = (1 << bitIndex);
 			((char*)buffer)[byteIndex] ^= bitMask;

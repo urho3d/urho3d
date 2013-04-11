@@ -125,10 +125,10 @@ template<typename ResultType, typename InputType,
 ResultType PackBits(InputType a, InputType r, InputType g, InputType b)
 {
 	return (ResultType)(
-		(ResultType)a << APos & BitMaskT<APos, ABits>::val | 
-		(ResultType)r << RPos & BitMaskT<RPos, RBits>::val |
-		(ResultType)g << GPos & BitMaskT<GPos, GBits>::val |
-		(ResultType)b << BPos & BitMaskT<BPos, BBits>::val);
+		(ResultType)((a << APos) & BitMaskT<APos, ABits>::val) | 
+		(ResultType)((r << RPos) & BitMaskT<RPos, RBits>::val) |
+		(ResultType)((g << GPos) & BitMaskT<GPos, GBits>::val) |
+		(ResultType)((b << BPos) & BitMaskT<BPos, BBits>::val));
 }
 
 /** @return The given 4 bit fields packed into a single larger bitfield. */
@@ -138,10 +138,10 @@ ResultType PackBits(int APos, int ABits, int RPos, int RBits,
 									  InputType a, InputType r, InputType g, InputType b)
 {
 	return (ResultType)(
-		(ResultType)a << APos & BitMask(APos, ABits) | 
-		(ResultType)r << RPos & BitMask(RPos, RBits) |
-		(ResultType)g << GPos & BitMask(GPos, GBits) |
-		(ResultType)b << BPos & BitMask(BPos, BBits));
+		(ResultType)((a << APos) & BitMask(APos, ABits)) | 
+		(ResultType)((r << RPos) & BitMask(RPos, RBits)) |
+		(ResultType)((g << GPos) & BitMask(GPos, GBits)) |
+		(ResultType)((b << BPos) & BitMask(BPos, BBits)));
 }
 
 /** Extracts the given adjacent bits from a larger bitfield. Aggressively templatized version.

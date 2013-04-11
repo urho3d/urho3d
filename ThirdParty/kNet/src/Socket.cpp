@@ -295,8 +295,8 @@ void Socket::EnqueueNewReceiveBuffer(OverlappedTransferBuffer *buffer)
             // Urho3D: only close TCP sockets upon receiving 0 bytes
             if (transport == SocketOverTCP && readOpen)
             {
-                LOG(LogInfo, "Socket::EnqueueNewReceiveBuffer: Received 0 bytes from the network. Read connection closed in socket %s.", ToString().c_str());
-                readOpen = false;
+			LOG(LogInfo, "Socket::EnqueueNewReceiveBuffer: Received 0 bytes from the network. Read connection closed in socket %s.", ToString().c_str());
+			readOpen = false;
             }
 			DeleteOverlappedTransferBuffer(buffer);
 			return;
@@ -406,8 +406,8 @@ size_t Socket::Receive(char *dst, size_t maxBytes, EndPoint *endPoint)
         // Urho3D: only close TCP sockets upon receiving 0 bytes
         if (transport == SocketOverTCP && readOpen)
         {
-            LOG(LogInfo, "Socket::Receive: Received 0 bytes from network. Read-connection closed to socket %s.", ToString().c_str());
-            readOpen = false;
+		LOG(LogInfo, "Socket::Receive: Received 0 bytes from network. Read-connection closed to socket %s.", ToString().c_str());
+		readOpen = false;
         }
 		return 0;
 	}
@@ -535,10 +535,10 @@ OverlappedTransferBuffer *Socket::BeginReceive()
 			DeleteOverlappedTransferBuffer(receivedData);
             // Urho3D: only close TCP sockets upon receiving 0 bytes
             if (transport == SocketOverTCP && readOpen)
-            {
-                LOG(LogInfo, "Socket::BeginReceive: Received 0 bytes from the network. Read connection closed in socket %s.", ToString().c_str());
-                readOpen = false;
-            }
+				{
+					LOG(LogInfo, "Socket::BeginReceive: Received 0 bytes from the network. Read connection closed in socket %s.", ToString().c_str());
+					readOpen = false;
+				}
 			return 0;
 		}
 

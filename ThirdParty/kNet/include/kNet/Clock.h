@@ -113,7 +113,6 @@ private:
 #ifdef WIN32
 	static LARGE_INTEGER ddwTimerFrequency; ///< Ticks per second.
 	static LARGE_INTEGER ddwTimer;          ///< Temporary storage for Win32 function calls.
-
 #endif
 };
 

@@ -16,6 +16,13 @@
 /** @file Types.h
 	@brief Provides platform-independent fixed size types. */
 
+// Preprocessor macro for suppressing unused formal parameter warnings while still showing the variable name in Doxygen documentation.
+#if defined(DOXYGEN) // DOXYGEN is a special define used when Doxygen is run.
+#define UNUSED(x) x
+#else
+#define UNUSED(x)
+#endif
+
 #ifndef KNET_NO_FIXEDWIDTH_TYPES
 
 #include "kNetBuildConfig.h"

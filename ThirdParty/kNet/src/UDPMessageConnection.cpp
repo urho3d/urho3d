@@ -293,13 +293,13 @@ void UDPMessageConnection::HandleFlowControl()
 
 			// Need more: increase sendrate. Factor in RTT and acks
 			if (needMore && numLossesLastFrame == 0)
-			{
+		{
 				float delta = (50.f + 2.f * numAcksLastFrame) / maxRTT;
 				if (slowModeDelay > 0)
 					delta *= 0.2f;
 				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
-				lowestDatagramSendRateOnPacketLoss = datagramSendRate;
-			}
+			lowestDatagramSendRateOnPacketLoss = datagramSendRate;
+		}
 			// Need less: decrease sendrate if not already at minimum
 			else if (needLess && datagramSendRate > minBandwidth)
 				datagramSendRate = max(datagramSendRate * 0.98f, minBandwidth);

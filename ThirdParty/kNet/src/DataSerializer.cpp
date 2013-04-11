@@ -442,7 +442,7 @@ std::string DataSerializer::DebugReadBits(int startIndex, int endIndex) const
 {
 	std::stringstream ss;
 	for(int i = startIndex; i < endIndex; ++i)
-		ss << DebugReadBit(i) ? "1" : "0";
+		ss << (DebugReadBit(i) ? "1" : "0");
 	return ss.str();
 }
 

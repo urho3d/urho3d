@@ -45,7 +45,7 @@ public:
 	/// associated with the given message. If the application returns 0, the message doesn't
 	/// have a ContentID and it is processed normally.
 	/// The ContentID of the message is used to determine if a message replaces another.
-	virtual u32 ComputeContentID(message_id_t messageId, const char *data, size_t numBytes)
+	virtual u32 ComputeContentID(message_id_t UNUSED(messageId), const char * UNUSED(data), size_t UNUSED(numBytes))
 	{
 		// The default behavior is to not have a content ID on any message.
 		return 0;

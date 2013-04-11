@@ -43,7 +43,7 @@ namespace kNet
 
 BasicSerializedDataType StringToSerialType(const char *type)
 {
-	if (type == "string" || type == "std::string")
+	if (!strcmp(type, "string") || !strcmp(type, "std::string"))
 		return SerialString;
 	assert(NumSerialTypes-2 == NUMELEMS(data));
 	for(int i = 0; i < NUMELEMS(data); ++i)
