@@ -176,10 +176,47 @@ static CScriptArray* XMLElementGetVariantVector(XMLElement* ptr)
     return VectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
 }
 
+static void ConstructXPathResultSet(XPathResultSet* ptr)
+{
+    new(ptr) XPathResultSet();
+}
+
+static void ConstructXPathResultSetCopy(const XPathResultSet& xpathResultSet, XPathResultSet* ptr)
+{
+    new(ptr) XPathResultSet(xpathResultSet);
+}
+
+static void DestructXPathResultSet(XPathResultSet* ptr)
+{
+    ptr->~XPathResultSet();
+}
+
+static XMLElement XPathResultSetAt(unsigned index, XPathResultSet* ptr)
+{
+    return ptr->operator [](index);
+}
+
+static void ConstructXPathQuery(XPathQuery* ptr)
+{
+    new(ptr) XPathQuery();
+}
+
+static void ConstructXPathQueryWithString(const String& queryString, XPathQuery* ptr)
+{
+    new(ptr) XPathQuery(queryString);
+}
+
+static void DestructXPathQuery(XPathQuery* ptr)
+{
+    ptr->~XPathQuery();
+}
+
 static void RegisterXMLElement(asIScriptEngine* engine)
 {
     RegisterResource<XMLFile>(engine, "XMLFile");
     engine->RegisterObjectType("XMLElement", sizeof(XMLElement), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+    engine->RegisterObjectType("XPathResultSet", sizeof(XPathResultSet), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+    engine->RegisterObjectType("XPathQuery", sizeof(XPathQuery), asOBJ_VALUE | asOBJ_APP_CLASS_CD);
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructXMLElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f(const XMLElement&in)", asFUNCTION(ConstructXMLElementCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructXMLElement), asCALL_CDECL_OBJLAST);
@@ -188,7 +225,10 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool RemoveChild(const XMLElement&in)", asMETHODPR(XMLElement, RemoveChild, (const XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool RemoveChild(const String&in)", asMETHODPR(XMLElement, RemoveChild, (const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool RemoveChildren(const String&in name = String())", asMETHODPR(XMLElement, RemoveChildren, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement SelectSingle(const String&in)", asMETHOD(XMLElement, SelectSingle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XPathResultSet Select(const String&in)", asMETHOD(XMLElement, Select), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetAttribute(const String&in, const String&in)", asMETHODPR(XMLElement, SetAttribute, (const String&, const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool SetAttribute(const String&in)", asMETHODPR(XMLElement, SetAttribute, (const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetBool(const String&in, bool)", asMETHOD(XMLElement, SetBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetBoundingBox(const BoundingBox&in)", asMETHOD(XMLElement, SetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetColor(const String&in, const Color&in)", asMETHOD(XMLElement, SetColor), asCALL_THISCALL);
@@ -204,9 +244,8 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool SetVector2(const String&in, const Vector2&in)", asMETHOD(XMLElement, SetVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetVector3(const String&in, const Vector3&in)", asMETHOD(XMLElement, SetVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetVector4(const String&in, const Vector3&in)", asMETHOD(XMLElement, SetVector4), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "uint GetNumAttributes() const", asMETHOD(XMLElement, GetNumAttributes), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool HasAttribute(const String&in) const", asMETHODPR(XMLElement, HasAttribute, (const String&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "String GetAttribute(const String&in) const", asMETHODPR(XMLElement, GetAttribute, (const String&) const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "String GetAttribute(const String&in arg0 = String()) const", asMETHODPR(XMLElement, GetAttribute, (const String&) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String GetAttributeLower(const String&in) const", asMETHODPR(XMLElement, GetAttributeLower, (const String&) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String GetAttributeUpper(const String&in) const", asMETHODPR(XMLElement, GetAttributeUpper, (const String&) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Array<String>@ GetAttributeNames() const", asFUNCTION(XMLElementGetAttributeNames), asCALL_CDECL_OBJLAST);
@@ -229,10 +268,38 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "Vector3 GetVector3(const String&in) const", asMETHOD(XMLElement, GetVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Vector4 GetVector4(const String&in) const", asMETHOD(XMLElement, GetVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String get_name() const", asMETHOD(XMLElement, GetName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "uint get_numAttributes() const", asMETHOD(XMLElement, GetNumAttributes), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool get_isNull() const", asMETHOD(XMLElement, IsNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool get_notNull() const", asMETHOD(XMLElement, NotNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLElement get_parent() const", asMETHOD(XMLElement, GetParent), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement get_nextResult() const", asMETHOD(XMLElement, GetNextResult), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLFile@+ get_file() const", asMETHOD(XMLElement, GetFile), asCALL_THISCALL);
+
+    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructXPathResultSet), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f(const XPathResultSet&in)", asFUNCTION(ConstructXPathResultSetCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructXPathResultSet), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XPathResultSet", "XPathResultSet& opAssign(const XPathResultSet&in)", asMETHOD(XPathResultSet, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathResultSet", "XMLElement opIndex(uint index)", asFUNCTION(XPathResultSetAt), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XPathResultSet", "XMLElement get_firstResult()", asMETHOD(XPathResultSet, FirstResult), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathResultSet", "uint get_size()", asMETHOD(XPathResultSet, Size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathResultSet", "bool get_empty()", asMETHOD(XPathResultSet, Empty), asCALL_THISCALL);
+
+    engine->RegisterObjectBehaviour("XPathQuery", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructXPathQuery), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("XPathQuery", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructXPathQueryWithString), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("XPathQuery", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructXPathQuery), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XPathQuery", "void Bind()", asMETHOD(XPathQuery, Bind), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "bool SetVariable(const String&in, bool)", asMETHODPR(XPathQuery, SetVariable, (const String&, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "bool SetVariable(const String&in, float)", asMETHODPR(XPathQuery, SetVariable, (const String&, float), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "bool SetVariable(const String&in, const String&in)", asMETHODPR(XPathQuery, SetVariable, (const String&, const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "bool SetVariable(const String&in, const XPathResultSet&in)", asMETHODPR(XPathQuery, SetVariable, (const String&, const XPathResultSet&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "void RemoveVariables()", asMETHOD(XPathQuery, RemoveVariables), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "void SetQuery(const String&, bool arg1 = false)", asMETHOD(XPathQuery, SetQuery), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "bool EvaluateToBool(XMLElement)", asMETHOD(XPathQuery, EvaluateToBool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "float EvaluateToFloat(XMLElement)", asMETHOD(XPathQuery, EvaluateToFloat), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "String EvaluateToString(XMLElement)", asMETHOD(XPathQuery, EvaluateToString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "XPathResultSet Evaluate(XMLElement)", asMETHOD(XPathQuery, Evaluate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "void set_query(const String&)", asMETHOD(XPathQuery, SetQuery), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XPathQuery", "String get_query() const", asMETHOD(XPathQuery, GetQuery), asCALL_THISCALL);
 }
 
 static XMLElement XMLFileGetRootDefault(XMLFile* ptr)

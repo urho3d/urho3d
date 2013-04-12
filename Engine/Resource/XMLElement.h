@@ -30,12 +30,17 @@
 namespace pugi
 {
     struct xml_node_struct;
+    class xpath_node;
+    class xpath_node_set;
+    class xpath_query;
+    class xpath_variable_set;
 }
 
 namespace Urho3D
 {
 
 class XMLFile;
+class XPathResultSet;
 
 /// Element in an XML file.
 class XMLElement
@@ -45,6 +50,8 @@ public:
     XMLElement();
     /// Construct with document and node pointers.
     XMLElement(XMLFile* file, pugi::xml_node_struct* node);
+    /// Construct from xpath query result set.
+    XMLElement(const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, unsigned xpathResultIndex);
     /// Copy-construct from another element.
     XMLElement(const XMLElement& rhs);
     /// Destruct.
@@ -64,10 +71,20 @@ public:
     bool RemoveChildren(const String& name = String::EMPTY);
     /// Remove child elements of certain name, or all child elements if name is empty. Return true if successful.
     bool RemoveChildren(const char* name);
+
+    /// Select an element/attribute using XPath query.
+    XMLElement SelectSingle(const String& query, pugi::xpath_variable_set* variables = 0);
+    /// Select elements/attributes using XPath query.
+    XPathResultSet Select(const String& query, pugi::xpath_variable_set* variables = 0);
+
     /// Set an attribute.
     bool SetAttribute(const String& name, const String& value);
     /// Set an attribute.
     bool SetAttribute(const char* name, const char* value);
+    /// Set an attribute. Only valid if it is an attribute only XPath query result.
+    bool SetAttribute(const String& value);
+    /// Set an attribute. Only valid if it is an attribute only XPath query result.
+    bool SetAttribute(const char* value);
     /// Set a bool attribute.
     bool SetBool(const String& name, bool value);
     /// Set a BoundingBox attribute.
@@ -113,13 +130,13 @@ public:
     /// Set a Vector4 attribute.
     bool SetVector4(const String& name, const Vector4& value);
 
-    /// Return whether does not refer to an element.
-    bool IsNull() const { return node_ == 0; }
-    /// Return whether refers to an element.
-    bool NotNull() const { return node_ != 0; }
-    /// Return true if refers to an element.
-    operator bool () const { return node_ != 0; }
-    /// Return element name.
+    /// Return whether does not refer to an element or an XPath node.
+    bool IsNull() const { return !node_ && !xpathNode_; }
+    /// Return whether refers to an element or an XPath node.
+    bool NotNull() const { return node_ || xpathNode_; }
+    /// Return true if refers to an element or an XPath node.
+    operator bool () const { return node_ || xpathNode_; }
+    /// Return element name (or attribute name if it is an attribute only XPath query result).
     String GetName() const;
     /// Return whether has a child element.
     bool HasChild(const String& name) const;
@@ -133,6 +150,8 @@ public:
     XMLElement GetNext(const String& name = String::EMPTY) const;
     /// Return next sibling element.
     XMLElement GetNext(const char* name) const;
+    /// Return next XPath query result. Only valid when this instance of XMLElement is itself one of the query result in the result set.
+    XMLElement GetNextResult() const;
     /// Return parent element.
     XMLElement GetParent() const;
     /// Return number of attributes.
@@ -142,7 +161,7 @@ public:
     /// Return whether has an attribute.
     bool HasAttribute(const char* name) const;
     /// Return attribute, or empty if missing.
-    String GetAttribute(const String& name) const;
+    String GetAttribute(const String& name = String::EMPTY) const;
     /// Return attribute, or empty if missing.
     const char* GetAttribute(const char* name) const;
     /// Return attribute in lowercase, or empty if missing.
@@ -201,8 +220,14 @@ public:
     Vector4 GetVector(const String& name) const;
     /// Return XML file.
     XMLFile* GetFile() const;
-    /// Return pugixml node.s
+    /// Return pugixml xml_node_struct.
     pugi::xml_node_struct* GetNode() const { return node_; }
+    /// Return XPath query result set.
+    const XPathResultSet* GetXPathResultSet() const { return xpathResultSet_; }
+    /// Return pugixml xpath_node.
+    const pugi::xpath_node* GetXPathNode() const { return xpathNode_; }
+    /// Return current result index.
+    unsigned GetXPathResultIndex() const { return xpathResultIndex_; }
     /// Empty XMLElement.
     static const XMLElement EMPTY;
 
@@ -211,6 +236,90 @@ private:
     WeakPtr<XMLFile> file_;
     /// Pugixml node.
     pugi::xml_node_struct* node_;
+    /// XPath query result set.
+    const XPathResultSet* xpathResultSet_;
+    /// Pugixml xpath_node.
+    const pugi::xpath_node* xpathNode_;
+    /// Current XPath query result index (used internally to advance to subsequent query result).
+    mutable unsigned xpathResultIndex_;
+};
+
+/// XPath query result set.
+class XPathResultSet
+{
+public:
+    /// Construct empty result set.
+    XPathResultSet();
+    /// Construct with result set from XPath query.
+    XPathResultSet(pugi::xpath_node_set* resultSet);
+    // Copy-construct.
+    XPathResultSet(const XPathResultSet& rhs);
+    /// Destruct.
+    ~XPathResultSet();
+    /// Assignment operator.
+    XPathResultSet& operator = (const XPathResultSet& rhs);
+    /// Return the n-th result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
+    XMLElement operator[](unsigned index) const;
+    /// Return the first result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
+    XMLElement FirstResult();
+    /// Return size of result set.
+    unsigned Size() const;
+    /// Return whether result set is empty.
+    bool Empty() const;
+    /// Return pugixml xpath_node_set.
+    pugi::xpath_node_set* GetXPathNodeSet() const { return resultSet_; }
+
+private:
+    /// Pugixml xpath_node_set.
+    pugi::xpath_node_set* resultSet_;
+};
+
+/// XPath query.
+class XPathQuery
+{
+public:
+    /// Construct empty.
+    XPathQuery();
+    /// Construct XPath query object.
+    XPathQuery(const String& queryString);
+    /// Destruct.
+    ~XPathQuery();
+    /// Bind query object with variable set.
+    void Bind();
+    /// Add/Set a bool variable. Return true if successful.
+    bool SetVariable(const String& name, bool value);
+    /// Add/Set a float variable. Return true if successful.
+    bool SetVariable(const String& name, float value);
+    /// Add/Set a string variable. Return true if successful.
+    bool SetVariable(const String& name, const String& value);
+    /// Add/Set an XPath query result set variable. Return true if successful.
+    bool SetVariable(const String& name, const XPathResultSet& value);
+    /// Remove all variables.
+    void RemoveVariables();
+    /// Set XPath query string.
+    void SetQuery(const String& queryString, bool bind = false);
+    /// Evaluate XPath query and expecting a boolean return value.
+    bool EvaluateToBool(XMLElement element) const;
+    /// Evaluate XPath query and expecting a float return value.
+    float EvaluateToFloat(XMLElement element) const;
+    /// Evaluate XPath query and expecting a string return value.
+    String EvaluateToString(XMLElement element) const;
+    /// Evaluate XPath query and expecting an XPath query result set as return value.
+    XPathResultSet Evaluate(XMLElement element) const;
+    /// Return query string.
+    String GetQuery() const { return queryString_; }
+    /// Return pugixml xpath_query.
+    pugi::xpath_query* GetXPathQuery() const { return query_; }
+    /// Return pugixml xpath_variable_set.
+    pugi::xpath_variable_set* GetXPathVariableSet() const { return variables_; }
+
+private:
+    /// XPath query string.
+    String queryString_;
+    /// Pugixml xpath_query.
+    pugi::xpath_query* query_;
+    /// Pugixml xpath_variable_set.
+    pugi::xpath_variable_set* variables_;
 };
 
 }

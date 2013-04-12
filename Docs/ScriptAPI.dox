@@ -1230,7 +1230,10 @@ Methods:<br>
 - bool RemoveChild(const XMLElement&)
 - bool RemoveChild(const String&)
 - bool RemoveChildren(const String& arg0 = String ( ))
+- XMLElement SelectSingle(const String&)
+- XPathResultSet Select(const String&)
 - bool SetAttribute(const String&, const String&)
+- bool SetAttribute(const String&)
 - bool SetBool(const String&, bool)
 - bool SetBoundingBox(const BoundingBox&)
 - bool SetColor(const String&, const Color&)
@@ -1246,9 +1249,8 @@ Methods:<br>
 - bool SetVector2(const String&, const Vector2&)
 - bool SetVector3(const String&, const Vector3&)
 - bool SetVector4(const String&, const Vector3&)
-- uint GetNumAttributes() const
 - bool HasAttribute(const String&) const
-- String GetAttribute(const String&) const
+- String GetAttribute(const String& arg0 = String ( )) const
 - String GetAttributeLower(const String&) const
 - String GetAttributeUpper(const String&) const
 - String[]@ GetAttributeNames() const
@@ -1273,10 +1275,39 @@ Methods:<br>
 
 Properties:<br>
 - String name (readonly)
+- uint numAttributes (readonly)
 - bool isNull (readonly)
 - bool notNull (readonly)
 - XMLElement parent (readonly)
+- XMLElement nextResult (readonly)
 - XMLFile@ file (readonly)
+
+
+XPathResultSet
+
+Properties:<br>
+- XMLElement firstResult (readonly)
+- uint size (readonly)
+- bool empty (readonly)
+
+
+XPathQuery
+
+Methods:<br>
+- void Bind()
+- bool SetVariable(const String&, bool)
+- bool SetVariable(const String&, float)
+- bool SetVariable(const String&, const String&)
+- bool SetVariable(const String&, const XPathResultSet&)
+- void RemoveVariables()
+- void SetQuery(const String&, bool arg1 = false)
+- bool EvaluateToBool(XMLElement)
+- float EvaluateToFloat(XMLElement)
+- String EvaluateToString(XMLElement)
+- XPathResultSet Evaluate(XMLElement)
+
+Properties:<br>
+- String query
 
 
 Serializable

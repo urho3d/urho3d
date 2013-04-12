@@ -318,64 +318,36 @@ void SetUIElementDefaultStyle(const String&in fileName)
     uiElementDefaultStyle.Load(file);
 }
 
+XPathQuery filterInternalVarsQuery("//attribute[@name='Variables']/variant");
+
 void FilterInternalVars(XMLElement source)
 {
-    // For each 'attribute' tag, check the following two cases:
-    // If variable name is empty (or unregistered) then it is an internal variable and should be removed
-    // If it is registered then it is a user-defined variable, so 'enrich' the XMLElement to store the variable name in plaintext
-    XMLElement childElem = source.GetChild("attribute");
-    while (childElem.notNull)
+    XPathResultSet resultSet = filterInternalVarsQuery.Evaluate(source);
+    XMLElement resultElem = resultSet.firstResult;
+    while (resultElem.notNull)
     {
-        if (childElem.GetAttribute("name") == "Variables")
-        {
-            XMLElement variantElem = childElem.GetChild("variant");
-            while (variantElem.notNull)
-            {
-                String name = GetVariableName(variantElem.GetUInt("hash"));
-                if (name.empty)
-                    childElem.RemoveChild(variantElem);
-                else
-                    variantElem.SetAttribute("name", name);
-                variantElem = variantElem.GetNext("variant");
-            }
-        }
-        childElem = childElem.GetNext("attribute");
-    }
-
-    // Perform the action recursively for each 'element' tag
-    childElem = source.GetChild("element");
-    while (childElem.notNull)
-    {
-        FilterInternalVars(childElem);
-        childElem = childElem.GetNext("element");
+        String name = GetVariableName(resultElem.GetUInt("hash"));
+        if (name.empty)
+            // If variable name is empty (or unregistered) then it is an internal variable and should be removed
+            resultElem.parent.RemoveChild(resultElem);
+        else
+            // If it is registered then it is a user-defined variable, so 'enrich' the XMLElement to store the variable name in plaintext
+            resultElem.SetAttribute("name", name);
+        resultElem = resultElem.nextResult;
     }
 }
 
+XPathQuery registerUIElemenVarsQuery("//attribute[@name='Variables']/variant/@name");
+
 void RegisterUIElementVar(XMLElement source)
 {
-    XMLElement childElem = source.GetChild("attribute");
-    while (childElem.notNull)
+    XPathResultSet resultSet = registerUIElemenVarsQuery.Evaluate(source);
+    XMLElement resultAttr = resultSet.firstResult;  // Since we are selecting attribute, the resultset is in attribute context
+    while (resultAttr.notNull)
     {
-        if (childElem.GetAttribute("name") == "Variables")
-        {
-            XMLElement variantElem = childElem.GetChild("variant");
-            while (variantElem.notNull)
-            {
-                String name = variantElem.GetAttribute("name");
-                if (!name.empty)
-                    uiElementVarNames[name] = name;
-                variantElem = variantElem.GetNext("variant");
-            }
-        }
-        childElem = childElem.GetNext("attribute");
-    }
-
-    // Perform the action recursively for each 'element' tag
-    childElem = source.GetChild("element");
-    while (childElem.notNull)
-    {
-        RegisterUIElementVar(childElem);
-        childElem = childElem.GetNext("element");
+        String name = resultAttr.GetAttribute();
+        uiElementVarNames[name] = name;
+        resultAttr = resultAttr.nextResult;
     }
 }
 
