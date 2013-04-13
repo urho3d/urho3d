@@ -62,10 +62,10 @@ XMLElement::XMLElement(const XPathResultSet* resultSet, const pugi::xpath_node* 
 
 XMLElement::XMLElement(const XMLElement& rhs) :
     file_(rhs.file_),
-    node_(rhs.file_ ? rhs.node_ : 0),
-    xpathResultSet_(rhs.file_ ? 0 : rhs.xpathResultSet_),
-    xpathNode_(rhs.file_ ? 0 : rhs.xpathResultSet_ ? rhs.xpathNode_ : new pugi::xpath_node(rhs.xpathNode_->attribute(), rhs.xpathNode_->node())),
-    xpathResultIndex_(rhs.file_ ? 0 : rhs.xpathResultIndex_)
+    node_(rhs.node_),
+    xpathResultSet_(rhs.xpathResultSet_),
+    xpathNode_(rhs.xpathResultSet_ ? rhs.xpathNode_ : (rhs.xpathNode_ ? new pugi::xpath_node(rhs.xpathNode_->attribute(), rhs.xpathNode_->node()) : 0)),
+    xpathResultIndex_(rhs.xpathResultIndex_)
 {
 }
 
@@ -77,6 +77,16 @@ XMLElement::~XMLElement()
         delete xpathNode_;
         xpathNode_ = 0;
     }
+}
+
+XMLElement& XMLElement::operator = (const XMLElement& rhs)
+{
+    file_ = rhs.file_;
+    node_ = rhs.node_;
+    xpathResultSet_ = rhs.xpathResultSet_;
+    xpathNode_ = rhs.xpathResultSet_ ? rhs.xpathNode_ : (rhs.xpathNode_ ? new pugi::xpath_node(rhs.xpathNode_->attribute(), rhs.xpathNode_->node()) : 0);
+    xpathResultIndex_ = rhs.xpathResultIndex_;
+    return *this;
 }
 
 XMLElement XMLElement::CreateChild(const String& name)

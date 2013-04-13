@@ -56,6 +56,8 @@ public:
     XMLElement(const XMLElement& rhs);
     /// Destruct.
     ~XMLElement();
+    /// Assignment operator.
+    XMLElement& operator = (const XMLElement& rhs);
 
     /// Create a child element.
     XMLElement CreateChild(const String& name);
