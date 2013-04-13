@@ -55,7 +55,7 @@ XMLElement::XMLElement(XMLFile* file, pugi::xml_node_struct* node) :
 XMLElement::XMLElement(const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, unsigned xpathResultIndex) :
     node_(0),
     xpathResultSet_(resultSet),
-    xpathNode_(resultSet ? xpathNode : new pugi::xpath_node(xpathNode->attribute(), xpathNode->node())),
+    xpathNode_(resultSet ? xpathNode : (xpathNode ? new pugi::xpath_node(xpathNode->attribute(), xpathNode->node()) : 0)),
     xpathResultIndex_(xpathResultIndex)
 {
 }
@@ -776,14 +776,15 @@ XPathResultSet::XPathResultSet() :
 }
 
 XPathResultSet::XPathResultSet(pugi::xpath_node_set* resultSet) :
-    resultSet_(new pugi::xpath_node_set(resultSet->begin(), resultSet->end()))
+    resultSet_(resultSet ? new pugi::xpath_node_set(resultSet->begin(), resultSet->end()) : 0)
 {
     // Sort the node set in forward document order
-    resultSet_->sort();
+    if (resultSet_)
+        resultSet_->sort();
 }
 
 XPathResultSet::XPathResultSet(const XPathResultSet& rhs) :
-    resultSet_(new pugi::xpath_node_set(rhs.resultSet_->begin(), rhs.resultSet_->end()))
+    resultSet_(rhs.resultSet_ ? new pugi::xpath_node_set(rhs.resultSet_->begin(), rhs.resultSet_->end()) : 0)
 {
 }
 
@@ -795,13 +796,13 @@ XPathResultSet::~XPathResultSet()
 
 XPathResultSet& XPathResultSet::operator = (const XPathResultSet& rhs)
 {
-    resultSet_ = new pugi::xpath_node_set(rhs.resultSet_->begin(), rhs.resultSet_->end());
+    resultSet_ = rhs.resultSet_ ? new pugi::xpath_node_set(rhs.resultSet_->begin(), rhs.resultSet_->end()) : 0;
     return *this;
 }
 
 XMLElement XPathResultSet::operator[](unsigned index) const
 {
-    return index >= Size() ? XMLElement() : XMLElement(this, &resultSet_->operator [](index), index);
+    return resultSet_ && index >= Size() ? XMLElement() : XMLElement(this, &resultSet_->operator [](index), index);
 }
 
 XMLElement XPathResultSet::FirstResult()
