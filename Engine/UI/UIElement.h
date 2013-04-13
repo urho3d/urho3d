@@ -328,6 +328,12 @@ public:
     int GetMaxWidth() const { return maxSize_.x_; }
     /// Return minimum height.
     int GetMaxHeight() const { return maxSize_.y_; }
+    /// Return true if size is fixed.
+    bool IsFixedSize() const { return minSize_ == maxSize_; }
+    /// Return true if width is fixed.
+    bool IsFixedWidth() const { return minSize_.x_ == maxSize_.x_; }
+    /// Return true if height is fixed.
+    bool IsFixedHeight() const { return minSize_.y_ == maxSize_.y_; }
     /// Return child element offset.
     const IntVector2& GetChildOffset() const { return childOffset_; }
     /// Return horizontal alignment.

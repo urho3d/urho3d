@@ -27,7 +27,7 @@
             <attribute name="Name" value="ExpandButton" />
             <attribute name="Min Size" value="70 17" />
             <attribute name="Max Size" value="70 17" />
-            <attribute name="Layout Mode" value="Vertical" />
+            <attribute name="Layout Mode" value="Horizontal" />
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">>
                 <attribute name="Text" value="Expand" />
@@ -38,7 +38,7 @@
             <attribute name="Name" value="CollapseButton" />
             <attribute name="Min Size" value="70 17" />
             <attribute name="Max Size" value="70 17" />
-            <attribute name="Layout Mode" value="Vertical" />
+            <attribute name="Layout Mode" value="Horizontal" />
             <attribute name="Layout Border" value="1 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="Collapse" />
@@ -51,7 +51,7 @@
             <attribute name="Max Size" value="45 15" />
             <attribute name="Indent Spacing" value="30" />
             <attribute name="Indent" value="1" />
-            <attribute name="Layout Mode" value="Vertical" />
+            <attribute name="Layout Mode" value="Horizontal" />
             <attribute name="Layout Border" value="5 1 1 1" />
             <element type="Text">
                 <attribute name="Text" value="All" />

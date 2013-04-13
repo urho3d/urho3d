@@ -62,6 +62,7 @@ LineEdit::LineEdit(Context* context) :
 
     SubscribeToEvent(this, E_FOCUSED, HANDLER(LineEdit, HandleFocused));
     SubscribeToEvent(this, E_DEFOCUSED, HANDLER(LineEdit, HandleDefocused));
+    SubscribeToEvent(this, E_LAYOUTUPDATED, HANDLER(LineEdit, HandleFocused));
 }
 
 LineEdit::~LineEdit()
@@ -86,8 +87,11 @@ void LineEdit::ApplyAttributes()
 {
     BorderImage::ApplyAttributes();
 
-    // Set the text's position to match clipping, so that text left edge is not left partially hidden
-    text_->SetPosition(clipBorder_.left_, clipBorder_.top_);
+    // Set the text's position to match clipping and indent width, so that text left edge is not left partially hidden
+    text_->SetPosition(GetIndentWidth() + clipBorder_.left_, clipBorder_.top_);
+
+    // Sync the text line
+    line_ = text_->GetText();
 }
 
 void LineEdit::Update(float timeStep)
@@ -534,7 +538,7 @@ void LineEdit::UpdateCursor()
     if (charPositions.Size())
         x = cursorPosition_ < charPositions.Size() ? charPositions[cursorPosition_].x_ : charPositions.Back().x_;
 
-    text_->SetPosition(clipBorder_.left_, clipBorder_.top_);
+    text_->SetPosition(GetIndentWidth() + clipBorder_.left_, clipBorder_.top_);
     cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
     cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
 

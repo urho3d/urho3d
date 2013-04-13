@@ -894,6 +894,9 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "int get_maxWidth() const", asMETHOD(T, GetMaxWidth), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_maxHeight(int)", asMETHOD(T, SetMaxHeight), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "int get_maxHeight() const", asMETHOD(T, GetMaxHeight), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "bool get_fixedSize() const", asMETHOD(T, IsFixedSize), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "bool get_fixedWidth() const", asMETHOD(T, IsFixedWidth), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "bool get_fixedHeight() const", asMETHOD(T, IsFixedHeight), asCALL_THISCALL);
     }
     engine->RegisterObjectMethod(className, "void set_horizontalAlignment(HorizontalAlignment)", asMETHOD(T, SetHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "HorizontalAlignment get_horizontalAlignment() const", asMETHOD(T, GetHorizontalAlignment), asCALL_THISCALL);

@@ -3219,6 +3219,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -3332,6 +3335,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -3542,6 +3548,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -3666,6 +3675,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -3788,6 +3800,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -3909,6 +3924,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -4034,6 +4052,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -4156,6 +4177,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -4294,6 +4318,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -4429,6 +4456,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -4554,6 +4584,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -4689,6 +4722,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -4828,6 +4864,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
@@ -4961,6 +5000,9 @@ Properties:<br>
 - IntVector2 maxSize
 - int maxWidth
 - int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder

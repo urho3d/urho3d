@@ -823,6 +823,7 @@ void UIElement::SetIndent(int indent)
     indent_ = indent;
     if (parent_)
         parent_->UpdateLayout();
+    UpdateLayout();
 }
 
 void UIElement::SetIndentSpacing(int indentSpacing)
@@ -830,6 +831,7 @@ void UIElement::SetIndentSpacing(int indentSpacing)
     indentSpacing_ = Max(indentSpacing, 0);
     if (parent_)
         parent_->UpdateLayout();
+    UpdateLayout();
 }
 
 void UIElement::UpdateLayout()
@@ -900,7 +902,7 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            positions.Push(baseIndentWidth);
+            positions.Push(0);
             sizes.Push(children_[i]->GetHeight());
             minSizes.Push(children_[i]->GetMinHeight());
             maxSizes.Push(children_[i]->GetMaxHeight());
@@ -928,7 +930,7 @@ void UIElement::UpdateLayout()
                 continue;
             VerticalAlignment verticalAlignment = children_[i]->verticalAlignment_;
             children_[i]->verticalAlignment_ = VA_TOP;
-            children_[i]->SetPosition(GetLayoutChildPosition(children_[i]).x_, positions[j]);
+            children_[i]->SetPosition(GetLayoutChildPosition(children_[i]).x_ + baseIndentWidth, positions[j]);
             children_[i]->verticalAlignment_ = verticalAlignment;
             children_[i]->SetSize(width - layoutBorder_.left_ - layoutBorder_.right_, sizes[j]);
             ++j;
