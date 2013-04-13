@@ -606,19 +606,21 @@ void BuildAndSaveModel(OutModel& model)
     PrintLine("Writing model " + rootNodeName);
     
     SharedPtr<Model> outModel(new Model(context_));
-    outModel->SetNumGeometries(model.meshes_.Size());
     Vector<PODVector<unsigned> > allBoneMappings;
     BoundingBox box;
+    
+    unsigned numValidGeometries = 0;
     
     bool combineBuffers = true;
     // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
     unsigned elementMask = GetElementMask(model.meshes_[0]);
-    for (unsigned i = 1; i < model.meshes_.Size(); ++i)
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
-        if (GetElementMask(model.meshes_[i]) != elementMask)
+        if (GetNumValidFaces(model.meshes_[i]))
         {
-            combineBuffers = false;
-            break;
+            ++numValidGeometries;
+            if (i > 0 && GetElementMask(model.meshes_[i]) != elementMask)
+                combineBuffers = false;
         }
     }
     // Check if keeping separate buffers allows to avoid 32-bit indices
@@ -627,8 +629,11 @@ void BuildAndSaveModel(OutModel& model)
         bool allUnder65k = true;
         for (unsigned i = 0; i < model.meshes_.Size(); ++i)
         {
-            if (model.meshes_[i]->mNumVertices > 65535)
-                allUnder65k = false;
+            if (GetNumValidFaces(model.meshes_[i]))
+            {
+                if (model.meshes_[i]->mNumVertices > 65535)
+                    allUnder65k = false;
+            }
         }
         if (allUnder65k == true)
             combineBuffers = false;
@@ -642,12 +647,17 @@ void BuildAndSaveModel(OutModel& model)
     Vector<SharedPtr<IndexBuffer> > ibVector;
     unsigned startVertexOffset = 0;
     unsigned startIndexOffset = 0;
+    unsigned destGeomIndex = 0;
+    
+    outModel->SetNumGeometries(numValidGeometries);
     
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
         unsigned elementMask = GetElementMask(mesh);
         unsigned validFaces = GetNumValidFaces(mesh);
+        if (!validFaces)
+            continue;
         
         bool largeIndices;
         if (combineBuffers)
@@ -751,14 +761,15 @@ void BuildAndSaveModel(OutModel& model)
         geom->SetIndexBuffer(ib);
         geom->SetVertexBuffer(0, vb);
         geom->SetDrawRange(TRIANGLE_LIST, startIndexOffset, validFaces * 3, true);
-        outModel->SetNumGeometryLodLevels(i, 1);
-        outModel->SetGeometry(i, 0, geom);
-        outModel->SetGeometryCenter(i, center);
+        outModel->SetNumGeometryLodLevels(destGeomIndex, 1);
+        outModel->SetGeometry(destGeomIndex, 0, geom);
+        outModel->SetGeometryCenter(destGeomIndex, center);
         if (model.bones_.Size() > MAX_SKIN_MATRICES)
             allBoneMappings.Push(boneMappings);
         
         startVertexOffset += mesh->mNumVertices;
         startIndexOffset += validFaces * 3;
+        ++destGeomIndex;
     }
     
     outModel->SetBoundingBox(box);
