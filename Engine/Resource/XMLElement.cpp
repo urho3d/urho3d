@@ -451,14 +451,6 @@ XMLElement XMLElement::GetNext(const char* name) const
         return XMLElement(file_, node.next_sibling(name).internal_object());
 }
 
-XMLElement XMLElement::GetNextResult() const
-{
-    if (!xpathResultSet_ || !xpathNode_)
-        return XMLElement();
-
-    return xpathResultSet_->operator [](++xpathResultIndex_);
-}
-
 XMLElement XMLElement::GetParent() const
 {
     if ((!file_ || !node_) && !xpathNode_)
@@ -758,6 +750,14 @@ Vector4 XMLElement::GetVector(const String& name) const
 XMLFile* XMLElement::GetFile() const
 {
     return file_;
+}
+
+XMLElement XMLElement::NextResult() const
+{
+    if (!xpathResultSet_ || !xpathNode_)
+        return XMLElement();
+
+    return xpathResultSet_->operator [](++xpathResultIndex_);
 }
 
 XPathResultSet::XPathResultSet() :

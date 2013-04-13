@@ -272,8 +272,8 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool get_isNull() const", asMETHOD(XMLElement, IsNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool get_notNull() const", asMETHOD(XMLElement, NotNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLElement get_parent() const", asMETHOD(XMLElement, GetParent), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "XMLElement get_nextResult() const", asMETHOD(XMLElement, GetNextResult), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLFile@+ get_file() const", asMETHOD(XMLElement, GetFile), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement get_nextResult() const", asMETHOD(XMLElement, NextResult), asCALL_THISCALL);
 
     engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructXPathResultSet), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("XPathResultSet", asBEHAVE_CONSTRUCT, "void f(const XPathResultSet&in)", asFUNCTION(ConstructXPathResultSetCopy), asCALL_CDECL_OBJLAST);

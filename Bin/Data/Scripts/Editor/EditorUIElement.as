@@ -318,6 +318,7 @@ void SetUIElementDefaultStyle(const String&in fileName)
     uiElementDefaultStyle.Load(file);
 }
 
+// Prepare XPath query object only once and use it multiple times
 XPathQuery filterInternalVarsQuery("//attribute[@name='Variables']/variant");
 
 void FilterInternalVars(XMLElement source)

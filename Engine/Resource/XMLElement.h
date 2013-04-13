@@ -150,8 +150,6 @@ public:
     XMLElement GetNext(const String& name = String::EMPTY) const;
     /// Return next sibling element.
     XMLElement GetNext(const char* name) const;
-    /// Return next XPath query result. Only valid when this instance of XMLElement is itself one of the query result in the result set.
-    XMLElement GetNextResult() const;
     /// Return parent element.
     XMLElement GetParent() const;
     /// Return number of attributes.
@@ -228,6 +226,8 @@ public:
     const pugi::xpath_node* GetXPathNode() const { return xpathNode_; }
     /// Return current result index.
     unsigned GetXPathResultIndex() const { return xpathResultIndex_; }
+    /// Return next XPath query result. Only valid when this instance of XMLElement is itself one of the query result in the result set.
+    XMLElement NextResult() const;
     /// Empty XMLElement.
     static const XMLElement EMPTY;
 
