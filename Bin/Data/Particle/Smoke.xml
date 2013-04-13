@@ -9,12 +9,12 @@
     <sorting enable="true" />
     <rotationspeed min="-60" max="60" />
     <direction min="-0.15 1 -0.15" max="0.15 1 0.15" />
-    <velocity min="100" max="130" />
-    <particlesize min="20 20" max="30 30" />
+    <velocity min="1" max="1.3" />
+    <particlesize min="0.2 0.2" max="0.3 0.3" />
     <sizedelta add="0" mul="1.3" />
     <timetolive value="4" />
-    <constantforce value="0.0 -20 0.0" />
-    <colorfade color="0.2 0.2 0.2 0.0" time="0.0" />
-    <colorfade color="0.2 0.2 0.2 1.0" time="0.25" />
-    <colorfade color="0.6 0.6 0.6 0.0" time="4.0" />
+    <constantforce value="0 -0.2 0" />
+    <colorfade color="0.2 0.2 0.2 0" time="0.0" />
+    <colorfade color="0.2 0.2 0.2 1" time="0.25" />
+    <colorfade color="0.6 0.6 0.6 0" time="4.0" />
 </particleemitter>

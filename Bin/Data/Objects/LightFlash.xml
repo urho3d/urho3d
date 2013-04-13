@@ -16,7 +16,7 @@
         <attribute name="Light Type" type="Enum" value="Point" />
         <attribute name="Color" value="2 2 2 1" />
         <attribute name="Specular Intensity" value="0" />
-        <attribute name="Range" value="500" />
+        <attribute name="Range" value="5" />
         <attribute name="Spot FOV" value="30" />
         <attribute name="Spot Aspect Ratio" value="1" />
         <attribute name="Attenuation Texture" value="Texture2D;Textures/RampWide.png" />

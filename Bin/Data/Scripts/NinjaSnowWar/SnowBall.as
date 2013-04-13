@@ -1,6 +1,6 @@
 #include "Scripts/NinjaSnowWar/GameObject.as"
 
-const float snowballMinHitSpeed = 100;
+const float snowballMinHitSpeed = 1;
 const float snowballDampingForce = 20;
 const float snowballDuration = 5;
 const float snowballGroundHitDuration = 1;

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <node id="2">
 	<attribute name="Name" value="Ninja" />
-	<attribute name="Position" value="0 10 20" />
+	<attribute name="Position" value="0 0 0" />
 	<attribute name="Rotation" value="1 0 0 0" />
 	<attribute name="Scale" value="1 1 1" />
 	<attribute name="Variables" />
@@ -15,21 +15,21 @@
 	</component>
 	<component type="NetworkPriority" id="16777217">
 		<attribute name="Base Priority" value="110" />
-		<attribute name="Distance Factor" value="0.02" />
+		<attribute name="Distance Factor" value="2" />
 		<attribute name="Minimum Priority" value="50" />
 		<attribute name="Always Update Owner" value="true" />
 	</component>
 	<component type="CollisionShape" id="4">
 		<attribute name="Shape Type" value="Capsule" />
-		<attribute name="Size" value="70 180 70" />
+		<attribute name="Size" value="0.7 1.8 0.7" />
 		<attribute name="Offset Position" value="0 0 0" />
 		<attribute name="Offset Rotation" value="1 0 0 0" />
-		<attribute name="Collision Margin" value="1" />
+		<attribute name="Collision Margin" value="0.01" />
 		<attribute name="Model" value="Model;" />
 		<attribute name="LOD Level" value="0" />
 	</component>
 	<component type="RigidBody" id="5">
-		<attribute name="Physics Position" value="0 10 20" />
+		<attribute name="Physics Position" value="0 0 0" />
 		<attribute name="Physics Rotation" value="1 0 0 0" />
 		<attribute name="Mass" value="80" />
 		<attribute name="Friction" value="0.5" />
@@ -40,7 +40,7 @@
 		<attribute name="Angular Factor" value="0 0 0" />
 		<attribute name="Linear Damping" value="0" />
 		<attribute name="Angular Damping" value="0" />
-		<attribute name="Linear Rest Threshold" value="0.8" />
+		<attribute name="Linear Rest Threshold" value="0.01" />
 		<attribute name="Angular Rest Threshold" value="1" />
 		<attribute name="Collision Layer" value="1" />
 		<attribute name="Collision Mask" value="3" />
@@ -51,7 +51,7 @@
 	</component>
 	<node id="3">
 		<attribute name="Name" value="" />
-		<attribute name="Position" value="0 -90 0" />
+		<attribute name="Position" value="0 -0.9 0" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />
@@ -61,7 +61,7 @@
 			<attribute name="Is Occluder" value="false" />
 			<attribute name="Can Be Occluded" value="true" />
 			<attribute name="Cast Shadows" value="true" />
-			<attribute name="Draw Distance" value="15000" />
+			<attribute name="Draw Distance" value="0" />
 			<attribute name="Shadow Distance" value="0" />
 			<attribute name="LOD Bias" value="1" />
 			<attribute name="Animation LOD Bias" value="1" />
@@ -114,201 +114,5 @@
     		<attribute name="Delayed Method Calls" value="0" />
     		<attribute name="Script Data" value="" />
     	</component>
-		<node id="16777216">
-			<attribute name="Name" value="Joint1" />
-			<attribute name="Position" value="0.185046 0.51196 -0" />
-			<attribute name="Rotation" value="1 -0 -0 0" />
-			<attribute name="Scale" value="1 1 1" />
-			<attribute name="Variables" />
-			<node id="16777217">
-				<attribute name="Name" value="Joint2" />
-				<attribute name="Position" value="0 108.105 1.56659" />
-				<attribute name="Rotation" value="1 -0 -0 0" />
-				<attribute name="Scale" value="1 1 1" />
-				<attribute name="Variables" />
-				<node id="16777218">
-					<attribute name="Name" value="Joint3" />
-					<attribute name="Position" value="0.421854 9.67481 1.0444" />
-					<attribute name="Rotation" value="1 -0 -0 0" />
-					<attribute name="Scale" value="1 1 1" />
-					<attribute name="Variables" />
-					<node id="16777219">
-						<attribute name="Name" value="Joint4" />
-						<attribute name="Position" value="0.421854 8.41288 3.72529e-007" />
-						<attribute name="Rotation" value="1 -0 -0 0" />
-						<attribute name="Scale" value="1 1 1" />
-						<attribute name="Variables" />
-						<node id="16777220">
-							<attribute name="Name" value="Joint5" />
-							<attribute name="Position" value="-0.843709 17.1516 1.02305" />
-							<attribute name="Rotation" value="1 -0 -0 0" />
-							<attribute name="Scale" value="1 1 1" />
-							<attribute name="Variables" />
-							<node id="16777221">
-								<attribute name="Name" value="Joint6" />
-								<attribute name="Position" value="3.72529e-008 19.7703 -2.61099" />
-								<attribute name="Rotation" value="1 -0 -0 0" />
-								<attribute name="Scale" value="1 1 1" />
-								<attribute name="Variables" />
-								<node id="16777222">
-									<attribute name="Name" value="Joint7" />
-									<attribute name="Position" value="0 4.74305 1.0444" />
-									<attribute name="Rotation" value="1 -0 -0 0" />
-									<attribute name="Scale" value="1 1 1" />
-									<attribute name="Variables" />
-									<node id="16777223">
-										<attribute name="Name" value="Joint8" />
-										<attribute name="Position" value="-0.185046 9.18524 3.08366" />
-										<attribute name="Rotation" value="1 -0 -0 0" />
-										<attribute name="Scale" value="1 1 1" />
-										<attribute name="Variables" />
-									</node>
-								</node>
-								<node id="16777224">
-									<attribute name="Name" value="Joint9" />
-									<attribute name="Position" value="14.3431 -3.65739 -6.76722" />
-									<attribute name="Rotation" value="1 -0 -0 0" />
-									<attribute name="Scale" value="1 1 1" />
-									<attribute name="Variables" />
-									<node id="16777225">
-										<attribute name="Name" value="Joint10" />
-										<attribute name="Position" value="5.90596 -2.02329 -0" />
-										<attribute name="Rotation" value="1 -0 -0 0" />
-										<attribute name="Scale" value="1 1 1" />
-										<attribute name="Variables" />
-										<node id="16777226">
-											<attribute name="Name" value="Joint11" />
-											<attribute name="Position" value="3.37483 -29.4451 5.74418" />
-											<attribute name="Rotation" value="1 -0 -0 0" />
-											<attribute name="Scale" value="1 1 1" />
-											<attribute name="Variables" />
-											<node id="16777227">
-												<attribute name="Name" value="Joint12" />
-												<attribute name="Position" value="1.33815 -28.6038 3.13318" />
-												<attribute name="Rotation" value="1 -0 -0 0" />
-												<attribute name="Scale" value="1 1 1" />
-												<attribute name="Variables" />
-												<node id="16777228">
-													<attribute name="Name" value="Joint13" />
-													<attribute name="Position" value="0.136921 -6.24266 3.42546" />
-													<attribute name="Rotation" value="1 -0 -0 0" />
-													<attribute name="Scale" value="1 1 1" />
-													<attribute name="Variables" />
-													<node id="16777229">
-														<attribute name="Name" value="Joint29" />
-														<attribute name="Position" value="-0.0284957 -5.80133 76.0905" />
-														<attribute name="Rotation" value="1 -0 -0 0" />
-														<attribute name="Scale" value="1 1 1" />
-														<attribute name="Variables" />
-													</node>
-												</node>
-											</node>
-										</node>
-									</node>
-								</node>
-								<node id="16777230">
-									<attribute name="Name" value="Joint14" />
-									<attribute name="Position" value="-14.3431 -3.69103 -6.76722" />
-									<attribute name="Rotation" value="1 -0 -0 0" />
-									<attribute name="Scale" value="1 1 1" />
-									<attribute name="Variables" />
-									<node id="16777231">
-										<attribute name="Name" value="Joint15" />
-										<attribute name="Position" value="-7.17153 -2.10322 -0" />
-										<attribute name="Rotation" value="1 -0 -0 0" />
-										<attribute name="Scale" value="1 1 1" />
-										<attribute name="Variables" />
-										<node id="16777232">
-											<attribute name="Name" value="Joint16" />
-											<attribute name="Position" value="-2.53113 -28.6038 5.74418" />
-											<attribute name="Rotation" value="1 -0 -0 0" />
-											<attribute name="Scale" value="1 1 1" />
-											<attribute name="Variables" />
-											<node id="16777233">
-												<attribute name="Name" value="Joint17" />
-												<attribute name="Position" value="-1.68742 -30.2864 3.13318" />
-												<attribute name="Rotation" value="1 -0 -0 0" />
-												<attribute name="Scale" value="1 1 1" />
-												<attribute name="Variables" />
-											</node>
-										</node>
-									</node>
-								</node>
-							</node>
-						</node>
-					</node>
-				</node>
-				<node id="16777234">
-					<attribute name="Name" value="Joint18" />
-					<attribute name="Position" value="9.70265 -8.41289 2.08879" />
-					<attribute name="Rotation" value="1 -0 -0 0" />
-					<attribute name="Scale" value="1 1 1" />
-					<attribute name="Variables" />
-					<node id="16777235">
-						<attribute name="Name" value="Joint19" />
-						<attribute name="Position" value="2.95298 -43.747 -1.56659" />
-						<attribute name="Rotation" value="1 -0 -0 0" />
-						<attribute name="Scale" value="1 1 1" />
-						<attribute name="Variables" />
-						<node id="16777236">
-							<attribute name="Name" value="Joint20" />
-							<attribute name="Position" value="-0.843709 -46.1989 -11.34" />
-							<attribute name="Rotation" value="1 -0 -0 0" />
-							<attribute name="Scale" value="1 1 1" />
-							<attribute name="Variables" />
-							<node id="16777237">
-								<attribute name="Name" value="Joint21" />
-								<attribute name="Position" value="1.43906 -9.37045 13.1049" />
-								<attribute name="Rotation" value="1 -0 -0 0" />
-								<attribute name="Scale" value="1 1 1" />
-								<attribute name="Variables" />
-								<node id="16777238">
-									<attribute name="Name" value="Joint22" />
-									<attribute name="Position" value="0.421854 -0.438055 7.61888" />
-									<attribute name="Rotation" value="1 -0 -0 0" />
-									<attribute name="Scale" value="1 1 1" />
-									<attribute name="Variables" />
-								</node>
-							</node>
-						</node>
-					</node>
-				</node>
-				<node id="16777239">
-					<attribute name="Name" value="Joint23" />
-					<attribute name="Position" value="-8.85894 -8.41289 2.08879" />
-					<attribute name="Rotation" value="1 -0 -0 0" />
-					<attribute name="Scale" value="1 1 1" />
-					<attribute name="Variables" />
-					<node id="16777240">
-						<attribute name="Name" value="Joint24" />
-						<attribute name="Position" value="-3.37484 -43.3263 -1.56659" />
-						<attribute name="Rotation" value="1 -0 -0 0" />
-						<attribute name="Scale" value="1 1 1" />
-						<attribute name="Variables" />
-						<node id="16777241">
-							<attribute name="Name" value="Joint25" />
-							<attribute name="Position" value="-0.843709 -46.6195 -11.34" />
-							<attribute name="Rotation" value="1 -0 -0 0" />
-							<attribute name="Scale" value="1 1 1" />
-							<attribute name="Variables" />
-							<node id="16777242">
-								<attribute name="Name" value="Joint26" />
-								<attribute name="Position" value="-0.557851 -9.7911 13.1049" />
-								<attribute name="Rotation" value="1 -0 -0 0" />
-								<attribute name="Scale" value="1 1 1" />
-								<attribute name="Variables" />
-								<node id="16777243">
-									<attribute name="Name" value="Joint27" />
-									<attribute name="Position" value="0 -0.017411 7.61888" />
-									<attribute name="Rotation" value="1 -0 -0 0" />
-									<attribute name="Scale" value="1 1 1" />
-									<attribute name="Variables" />
-								</node>
-							</node>
-						</node>
-					</node>
-				</node>
-			</node>
-		</node>
 	</node>
 </node>

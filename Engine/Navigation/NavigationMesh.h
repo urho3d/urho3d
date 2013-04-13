@@ -98,14 +98,17 @@ public:
     bool Build();
     /// Rebuild part of the navigation mesh contained by the world-space bounding box. Return true if successful.
     bool Build(const BoundingBox& boundingBox);
-    /// Find a path between world space points. Return non-empty list of points if successful.
+    /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
     void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     /// Return a random point on the navigation mesh.
     Vector3 GetRandomPoint();
     /// Return a random point on the navigation mesh within a circle. The circle radius is only a guideline and in practice the returned point may be further away.
     Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE);
+    /// Return distance to wall from a point. Maximum search radius must be specified.
+    float GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE);
     /// Perform a walkability raycast on the navigation mesh between start and end and return the point where a wall was hit, or the end point if no walls.
     Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+
     /// Return tile size.
     int GetTileSize() const { return tileSize_; }
     /// Return cell size.
@@ -157,7 +160,7 @@ private:
     void AddTriMeshGeometry(NavigationBuildData& build, Geometry* geometry, const Matrix3x4& transform);
     /// Build one tile of the navigation mesh. Return true if successful.
     bool BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z);
-    /// Initialize navigation mesh query. Return true if successful.
+    /// Ensure that the navigation mesh query is initialized. Return true if successful.
     bool InitializeQuery();
     /// Release the navigation mesh and the query.
     void ReleaseNavigationMesh();

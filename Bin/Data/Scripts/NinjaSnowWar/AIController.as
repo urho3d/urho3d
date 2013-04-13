@@ -1,11 +1,11 @@
 const float initialAggression = 0.0020;
-const float initialPrediction = 3000;
+const float initialPrediction = 30;
 const float initialAimSpeed = 10;
 const float deltaAggression = 0.000025;
-const float deltaPrediction = -15;
+const float deltaPrediction = -0.15;
 const float deltaAimSpeed = 0.30;
 const float maxAggression = 0.01;
-const float maxPrediction = 2000;
+const float maxPrediction = 20;
 const float maxAimSpeed = 40;
 
 float aiAggression = initialAggression;
@@ -72,19 +72,19 @@ class AIController
             float deltaY = 0.0f;
 
             // Aim from own head to target's feet
-            Vector3 ownPos(ownNode.position + Vector3(0, 90, 0));
-            Vector3 targetPos(targetNode.position + Vector3(0, -90, 0));
+            Vector3 ownPos(ownNode.position + Vector3(0, 0.9, 0));
+            Vector3 targetPos(targetNode.position + Vector3(0, -0.9, 0));
             float distance = (targetPos - ownPos).length;
 
             // Use prediction according to target distance & estimated snowball speed
             Vector3 currentAim(ownNinja.GetAim() * Vector3(0, 0, 1));
             float predictDistance = distance;
-            if (predictDistance > 5000) predictDistance = 5000;
+            if (predictDistance > 50) predictDistance = 50;
             Vector3 predictedPos = targetPos + targetBody.linearVelocity * predictDistance / aiPrediction;
             Vector3 targetAim = (predictedPos - ownPos);
 
             // Add distance/height compensation
-            float compensation = Max(targetAim.length - 1500, 0);
+            float compensation = Max(targetAim.length - 15, 0);
             targetAim += Vector3(0, 0.6, 0) * compensation;
 
             // X-aiming
@@ -106,7 +106,7 @@ class AIController
             ownNinja.controls.pitch += 0.1 * deltaY;
 
             // Firing? if close enough and relatively correct aim
-            if ((distance < 2500) && (currentAim.DotProduct(targetAim) > 0.75))
+            if ((distance < 25) && (currentAim.DotProduct(targetAim) > 0.75))
             {
                 if (Random(1.0) < aiAggression)
                     ownNinja.controls.Set(CTRL_FIRE, true);
@@ -120,9 +120,9 @@ class AIController
                 ownNinja.controls.Set(CTRL_UP|CTRL_DOWN|CTRL_LEFT|CTRL_RIGHT, false);
 
                 // Far distance: go forward
-                if (distance > 3000)
+                if (distance > 30)
                     ownNinja.controls.Set(CTRL_UP, true);
-                else if (distance > 600)
+                else if (distance > 6)
                 {
                     // Medium distance: random strafing, predominantly forward
                     float v = Random(1.0);
@@ -163,14 +163,14 @@ class AIController
             ownNinja.dirChangeTime -= timeStep;
             if (ownNinja.dirChangeTime <= 0)
             {
-                ownNinja.dirChangeTime = 1.0 + Random(2.0);
-                ownNinja.controls.yaw += 0.1 * (Random(600.0) - 300.0);
+                ownNinja.dirChangeTime = 1 + Random(2);
+                ownNinja.controls.yaw += 0.1 * (Random(600) - 300);
             }
             if (ownNinja.isSliding)
                 ownNinja.controls.yaw += 0.2;
         }
     }
-    
+
     void GetNewTarget(Node@ ownNode)
     {
         newTargetTimer = 0;

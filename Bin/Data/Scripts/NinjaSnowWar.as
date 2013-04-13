@@ -14,9 +14,9 @@ const float touchSensitivity = 2.0;
 const float joySensitivity = 0.5;
 const float joyMoveDeadZone = 0.333;
 const float joyLookDeadZone = 0.05;
-const float cameraMinDist = 25;
-const float cameraMaxDist = 500;
-const float cameraSafetyDist = 30;
+const float cameraMinDist = 0.25;
+const float cameraMaxDist = 5;
+const float cameraSafetyDist = 0.3;
 const int initialMaxEnemies = 5;
 const int finalMaxEnemies = 25;
 const int maxPowerups = 5;
@@ -24,7 +24,7 @@ const int incrementEach = 10;
 const int playerHealth = 20;
 const float enemySpawnRate = 1;
 const float powerupSpawnRate = 15;
-const float spawnAreaSize = 500;
+const float spawnAreaSize = 5;
 
 Scene@ gameScene;
 Node@ gameCameraNode;
@@ -114,7 +114,7 @@ void InitAudio()
     {
         Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
         musicFile.looped = true;
-        
+
         // Note: the non-positional sound source component need to be attached to a node to become effective
         // Due to networked mode clearing the scene on connect, do not attach to the scene itself
         musicNode = Node();
@@ -151,7 +151,7 @@ void InitScene()
         return;
 
     gameScene.LoadXML(cache.GetFile("Scenes/NinjaSnowWar.xml"));
-    
+
     // On mobile devices render the shadowmap first
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
         renderer.reuseShadowMaps = false;
@@ -193,11 +193,11 @@ void CreateCamera()
 {
     // Note: the camera is not in the scene
     gameCameraNode = Node();
-    gameCameraNode.position = Vector3(0, 200, -1000);
+    gameCameraNode.position = Vector3(0, 2, -10);
 
     gameCamera = gameCameraNode.CreateComponent("Camera");
-    gameCamera.nearClip = 50.0;
-    gameCamera.farClip = 16000.0;
+    gameCamera.nearClip = 0.5;
+    gameCamera.farClip = 160;
 
     if (!engine.headless)
     {
@@ -318,9 +318,9 @@ void SpawnPlayer(Connection@ connection)
 {
     Vector3 spawnPosition;
     if (singlePlayer)
-        spawnPosition = Vector3(0, 90, 0);
+        spawnPosition = Vector3(0, 0.9, 0);
     else
-        spawnPosition = Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 90, Random(spawnAreaSize) - spawnAreaSize);
+        spawnPosition = Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 0.9, Random(spawnAreaSize) - spawnAreaSize);
 
     Node@ playerNode = SpawnObject(spawnPosition, Quaternion(), "Ninja");
     // Set owner connection. Owned nodes are always updated to the owner at full frequency
@@ -481,13 +481,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
     if (key == KEY_F1)
         console.Toggle();
-    
+
     if (key == KEY_F2)
         debugHud.ToggleAll();
-    
+
     if (key == KEY_F3)
         drawDebug = !drawDebug;
-    
+
     if (key == KEY_F4)
         drawOctreeDebug = !drawOctreeDebug;
 
@@ -614,7 +614,7 @@ void HandleUpdateHiscores(StringHash eventType, VariantMap& eventData)
     String allHiscores;
     for (uint i = 0; i < hiscores.length; ++i)
         allHiscores += hiscores[i].name + " " + hiscores[i].score + "\n";
-    hiscoreText.text = allHiscores;    
+    hiscoreText.text = allHiscores;
 }
 
 void HandleNetworkUpdateSent()
@@ -781,11 +781,11 @@ void SpawnObjects(float timeStep)
 
         if (numPowerups < maxPowerups)
         {
-            const float maxOffset = 4000;
-            float xOffset = Random(maxOffset * 2.0f) - maxOffset;
-            float zOffset = Random(maxOffset * 2.0f) - maxOffset;
+            const float maxOffset = 40;
+            float xOffset = Random(maxOffset * 2.0) - maxOffset;
+            float zOffset = Random(maxOffset * 2.0) - maxOffset;
 
-            SpawnObject(Vector3(xOffset, 5000, zOffset), Quaternion(), "SnowCrate");
+            SpawnObject(Vector3(xOffset, 50, zOffset), Quaternion(), "SnowCrate");
         }
     }
 
@@ -794,7 +794,7 @@ void SpawnObjects(float timeStep)
     if (enemySpawnTimer > enemySpawnRate)
     {
         enemySpawnTimer = 0;
-        int numEnemies = 0;        
+        int numEnemies = 0;
         Array<Node@> ninjaNodes = gameScene.GetChildrenWithScript("Ninja", true);
         for (uint i = 0; i < ninjaNodes.length; ++i)
         {
@@ -805,21 +805,21 @@ void SpawnObjects(float timeStep)
 
         if (numEnemies < maxEnemies)
         {
-            const float maxOffset = 4000;
+            const float maxOffset = 40;
             float offset = Random(maxOffset * 2.0) - maxOffset;
             // Random north/east/south/west direction
             int dir = RandomInt() & 3;
             dir *= 90;
             Quaternion rotation(0, dir, 0);
 
-            Node@ enemyNode = SpawnObject(rotation * Vector3(offset, 1000, -12000), rotation, "Ninja");
+            Node@ enemyNode = SpawnObject(rotation * Vector3(offset, 10, -120), rotation, "Ninja");
 
             // Initialize variables
             Ninja@ enemyNinja = cast<Ninja>(enemyNode.scriptObject);
             enemyNinja.side = SIDE_ENEMY;
             @enemyNinja.controller = AIController();
             RigidBody@ enemyBody = enemyNode.GetComponent("RigidBody");
-            enemyBody.linearVelocity = rotation * Vector3(0, 1000, 3000);
+            enemyBody.linearVelocity = rotation * Vector3(0, 10, 30);
         }
     }
 }
@@ -862,7 +862,7 @@ void UpdateControls()
                     playerControls.yaw += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.x;
                     playerControls.pitch += touchSensitivity * gameCamera.fov / graphics.height * touch.delta.y;
                 }
-                
+
                 if (touch.touchID == moveTouchID)
                 {
                     int relX = touch.position.x - touchButtonSize / 2;
@@ -877,11 +877,11 @@ void UpdateControls()
                         playerControls.Set(CTRL_RIGHT, true);
                 }
             }
-            
+
             if (fireTouchID >= 0)
                 playerControls.Set(CTRL_FIRE, true);
         }
-        
+
         if (input.numJoysticks > 0)
         {
             JoystickState@ joystick = input.joysticks[0];
@@ -898,7 +898,7 @@ void UpdateControls()
                     if (joystick.buttonDown[5])
                         playerControls.Set(CTRL_FIRE, true);
                 }
-    
+
                 if (joystick.numHats > 0)
                 {
                     if (joystick.hatPosition[0] & HAT_LEFT != 0)
@@ -925,7 +925,7 @@ void UpdateControls()
                 {
                     float lookX = joystick.axisPosition[joystick.numAxes - 2];
                     float lookY = joystick.axisPosition[joystick.numAxes - 1];
-    
+
                     if (lookX < -joyLookDeadZone)
                         playerControls.yaw -= joySensitivity * lookX * lookX;
                     if (lookX > joyLookDeadZone)
@@ -1027,7 +1027,7 @@ void UpdateCamera()
 
     Vector3 pos = playerNode.position;
     Quaternion dir;
-    
+
     // Make controls seem more immediate by forcing the current mouse yaw into player ninja's Y-axis rotation
     if (playerNode.vars["Health"].GetInt() > 0)
         playerNode.rotation = Quaternion(0, playerControls.yaw, 0);
@@ -1035,7 +1035,7 @@ void UpdateCamera()
     dir = dir * Quaternion(playerNode.rotation.yaw, Vector3(0, 1, 0));
     dir = dir * Quaternion(playerControls.pitch, Vector3(1, 0, 0));
 
-    Vector3 aimPoint = pos + Vector3(0, 100, 0);
+    Vector3 aimPoint = pos + Vector3(0, 1, 0);
     Vector3 minDist = aimPoint + dir * Vector3(0, 0, -cameraMinDist);
     Vector3 maxDist = aimPoint + dir * Vector3(0, 0, -cameraMaxDist);
 

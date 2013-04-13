@@ -417,14 +417,8 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     
     dest.Clear();
     
-    if (!navMesh_ || !node_)
+    if (!InitializeQuery())
         return;
-    
-    if (!navMeshQuery_)
-    {
-        if (!InitializeQuery())
-            return;
-    }
     
     // Navigation data is in local space. Transform path points from world to local
     const Matrix3x4& transform = node_->GetWorldTransform();
@@ -465,14 +459,8 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
 
 Vector3 NavigationMesh::GetRandomPoint()
 {
-    if (!navMesh_ || !node_)
+    if (!InitializeQuery())
         return Vector3::ZERO;
-    
-    if (!navMeshQuery_)
-    {
-        if (!InitializeQuery())
-            return Vector3::ZERO;
-    }
     
     dtPolyRef polyRef;
     Vector3 point(Vector3::ZERO);
@@ -484,14 +472,8 @@ Vector3 NavigationMesh::GetRandomPoint()
 
 Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents)
 {
-    if (!navMesh_ || !node_)
-        return Vector3::ZERO;
-    
-    if (!navMeshQuery_)
-    {
-        if (!InitializeQuery())
-            return Vector3::ZERO;
-    }
+    if (!InitializeQuery())
+        return center;
     
     const Matrix3x4& transform = node_->GetWorldTransform();
     Matrix3x4 inverse = transform.Inverse();
@@ -510,21 +492,32 @@ Vector3 NavigationMesh::GetRandomPointInCircle(const Vector3& center, float radi
     return transform * point;
 }
 
-BoundingBox NavigationMesh::GetWorldBoundingBox() const
+float NavigationMesh::GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents)
 {
-    return node_ ? boundingBox_.Transformed(node_->GetWorldTransform()) : boundingBox_;
+    if (!InitializeQuery())
+        return radius;
+    
+    const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverse = transform.Inverse();
+    Vector3 localPoint = inverse * point;
+    
+    dtPolyRef startRef;
+    navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, queryFilter_, &startRef, 0);
+    if (!startRef)
+        return radius;
+    
+    float hitDist = radius;
+    Vector3 hitPos;
+    Vector3 hitNormal;
+    
+    navMeshQuery_->findDistanceToWall(startRef, &localPoint.x_, radius, queryFilter_, &hitDist, &hitPos.x_, &hitNormal.x_);
+    return hitDist;
 }
 
 Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const Vector3& extents)
 {
-    if (!navMesh_ || !node_)
-        return Vector3::ZERO;
-    
-    if (!navMeshQuery_)
-    {
-        if (!InitializeQuery())
-            return Vector3::ZERO;
-    }
+    if (!InitializeQuery())
+        return end;
     
     const Matrix3x4& transform = node_->GetWorldTransform();
     Matrix3x4 inverse = transform.Inverse();
@@ -535,7 +528,7 @@ Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const 
     dtPolyRef startRef;
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
     if (!startRef)
-        return start;
+        return end;
     
     Vector3 localHitNormal;
     float t;
@@ -546,6 +539,11 @@ Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const 
         t = 1.0f;
     
     return start.Lerp(end, t);
+}
+
+BoundingBox NavigationMesh::GetWorldBoundingBox() const
+{
+    return node_ ? boundingBox_.Transformed(node_->GetWorldTransform()) : boundingBox_;
 }
 
 void NavigationMesh::SetNavigationDataAttr(PODVector<unsigned char> data)
@@ -1082,6 +1080,12 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
 
 bool NavigationMesh::InitializeQuery()
 {
+    if (!navMesh_ || !node_)
+        return false;
+    
+    if (navMeshQuery_)
+        return true;
+    
     navMeshQuery_ = dtAllocNavMeshQuery();
     if (!navMeshQuery_)
     {

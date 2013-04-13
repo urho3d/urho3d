@@ -4,12 +4,12 @@
 const int LAYER_MOVE = 0;
 const int LAYER_ATTACK = 1;
 
-const float ninjaMoveForce = 2500;
-const float ninjaAirMoveForce = 100;
+const float ninjaMoveForce = 25;
+const float ninjaAirMoveForce = 1;
 const float ninjaDampingForce = 5;
-const float ninjaJumpForce = 45000;
-const Vector3 ninjaThrowVelocity(0, 425, 2000);
-const Vector3 ninjaThrowPosition(0, 20, 100);
+const float ninjaJumpForce = 450;
+const Vector3 ninjaThrowVelocity(0, 4.25, 20);
+const Vector3 ninjaThrowPosition(0, 0.2, 1);
 const float ninjaThrowDelay = 0.1;
 const float ninjaCorpseDuration = 3;
 const int ninjaPoints = 250;
@@ -177,7 +177,7 @@ class Ninja : GameObject
                 if (okToJump && inAirTime < 0.1f)
                 {
                     // Lift slightly off the ground for better animation
-                    body.position = body.position + Vector3(0, 3, 0);
+                    body.position = body.position + Vector3(0, 0.03, 0);
                     body.ApplyImpulse(Vector3(0, ninjaJumpForce, 0));
                     inAirTime = 1.0f;
                     animCtrl.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false,  0.1);
@@ -293,7 +293,7 @@ class Ninja : GameObject
             animCtrl.PlayExclusive("Models/Ninja_Death1.ani", LAYER_MOVE, false, 0.2);
             animCtrl.SetSpeed("Models/Ninja_Death1.ani", 0.5);
             if ((deathTime >= 0.3) && (deathTime < 0.8))
-                modelNode.Translate(Vector3(0, 0, 425 * timeStep));
+                modelNode.Translate(Vector3(0, 0, 4.25 * timeStep));
         }
         else if (deathDir > 0)
         {
@@ -302,20 +302,20 @@ class Ninja : GameObject
             animCtrl.PlayExclusive("Models/Ninja_Death2.ani", LAYER_MOVE, false, 0.2);
             animCtrl.SetSpeed("Models/Ninja_Death2.ani", 0.5);
             if ((deathTime >= 0.4) && (deathTime < 0.8))
-                modelNode.Translate(Vector3(0, 0, -425 * timeStep));
+                modelNode.Translate(Vector3(0, 0, -4.25 * timeStep));
         }
 
         // Create smokecloud just before vanishing
         if ((deathTime > (ninjaCorpseDuration - 1)) && (!smoke))
         {
-            SpawnParticleEffect(node.position + Vector3(0, -40, 0), "Particle/Smoke.xml", 8);
+            SpawnParticleEffect(node.position + Vector3(0, -0.4, 0), "Particle/Smoke.xml", 8);
             smoke = true;
         }
 
         if (deathTime > ninjaCorpseDuration)
         {
-            SpawnObject(node.position + Vector3(0, -50, 0), Quaternion(), "LightFlash");
-            SpawnSound(node.position + Vector3(0, -50, 0), "Sounds/BigExplosion.wav", 2);
+            SpawnObject(node.position + Vector3(0, -0.5, 0), Quaternion(), "LightFlash");
+            SpawnSound(node.position + Vector3(0, -0.5, 0), "Sounds/BigExplosion.wav", 2);
             node.Remove();
         }
     }

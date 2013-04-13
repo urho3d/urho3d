@@ -1,9 +1,6 @@
 #include "Scripts/NinjaSnowWar/GameObject.as"
 
 const int potionHealAmount = 5;
-const float potionMass = 10;
-const float potionFriction = 0.5;
-const float potionDrawDistance = 15000;
 
 class Potion : GameObject
 {

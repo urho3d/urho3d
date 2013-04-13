@@ -1,9 +1,7 @@
 #include "Scripts/NinjaSnowWar/GameObject.as"
 
+
 const int snowcrateHealth = 5;
-const float snowcrateMass = 200;
-const float snowcrateFriction = 0.35;
-const float snowcrateDrawDistance = 15000;
 const int snowcratePoints = 250;
 
 class SnowCrate : GameObject
