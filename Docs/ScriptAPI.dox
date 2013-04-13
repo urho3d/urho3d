@@ -1279,8 +1279,8 @@ Properties:<br>
 - bool isNull (readonly)
 - bool notNull (readonly)
 - XMLElement parent (readonly)
-- XMLElement nextResult (readonly)
 - XMLFile@ file (readonly)
+- XMLElement nextResult (readonly)
 
 
 XPathResultSet

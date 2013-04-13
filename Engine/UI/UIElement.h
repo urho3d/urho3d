@@ -30,6 +30,8 @@
 namespace Urho3D
 {
 
+const Color DEBUG_DRAW_COLOR(Color::BLUE);
+
 /// %UI element horizontal alignment.
 enum HorizontalAlignment
 {

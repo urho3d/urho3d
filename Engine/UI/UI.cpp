@@ -385,14 +385,7 @@ void UI::DebugDraw(UIElement* element)
     if (element)
     {
         const IntVector2& rootSize = rootElement_->GetSize();
-        IntRect currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
-
-        // Set clipping scissor for child elements. No need to draw if zero size
-        element->AdjustScissor(currentScissor);
-        if (currentScissor.left_ == currentScissor.right_ || currentScissor.top_ == currentScissor.bottom_)
-            return;
-
-        element->GetDebugDrawBatches(debugDrawBatches_, debugDrawVertexData_, currentScissor);
+        element->GetDebugDrawBatches(debugDrawBatches_, debugDrawVertexData_, IntRect(0, 0, rootSize.x_, rootSize.y_));
     }
 }
 

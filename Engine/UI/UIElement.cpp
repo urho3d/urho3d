@@ -37,8 +37,6 @@
 namespace Urho3D
 {
 
-const Color DEBUG_DRAW_COLOR(Color::BLUE);
-
 const char* horizontalAlignments[] =
 {
     "Left",

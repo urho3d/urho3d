@@ -54,9 +54,9 @@ LineEdit::LineEdit(Context* context) :
     enabled_ = true;
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
-    text_ = CreateChild<Text>();
+    text_ = CreateChild<Text>("LE_Text");
     text_->SetInternal(true);
-    cursor_ = CreateChild<BorderImage>();
+    cursor_ = CreateChild<BorderImage>("LE_Cursor");
     cursor_->SetInternal(true);
     cursor_->SetPriority(1); // Show over text
 

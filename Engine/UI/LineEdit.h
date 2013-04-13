@@ -34,7 +34,7 @@ class Text;
 class LineEdit : public BorderImage
 {
     OBJECT(LineEdit);
-    
+
 public:
     /// Construct.
     LineEdit(Context* context);
@@ -42,12 +42,12 @@ public:
     virtual ~LineEdit();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Perform UI element update.
     virtual void Update(float timeStep);
-    
+
     /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag begin.
@@ -62,7 +62,7 @@ public:
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to a key press translated to a character.
     virtual void OnChar(unsigned c, int buttons, int qualifiers);
-    
+
     /// Set text.
     void SetText(const String& text);
     /// Set cursor position.
@@ -112,7 +112,7 @@ protected:
     void UpdateCursor();
     /// Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found.
     unsigned GetCharIndex(const IntVector2& position);
-    
+
     /// Text element.
     SharedPtr<Text> text_;
     /// Cursor element.
@@ -140,12 +140,12 @@ protected:
     /// Text selectable flag.
     bool textSelectable_;
     /// Copy-paste enable flag.
-    bool textCopyable_;    
+    bool textCopyable_;
     /// Doubleclick interval.
     unsigned doubleClickInterval_;
     /// Doubleclick timer.
     Timer doubleClickTimer_;
-    
+
 private:
     /// Handle being focused.
     void HandleFocused(StringHash eventType, VariantMap& eventData);
