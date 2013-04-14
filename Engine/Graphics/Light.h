@@ -110,7 +110,7 @@ struct CascadeParameters
     
     /// Far clip values of the splits.
     float splits_[4];
-    /// The point relative to final split far clip where fade out begins. (0.0 - 1.0)
+    /// The point relative to the total shadow range where shadow fade begins (0.0 - 1.0)
     float fadeStart_;
     /// Automatic depth bias adjustment strength.
     float biasAutoAdjust_;

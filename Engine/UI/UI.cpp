@@ -45,6 +45,7 @@
 #include "Sort.h"
 #include "Sprite.h"
 #include "Text.h"
+#include "Text3D.h"
 #include "Texture2D.h"
 #include "UI.h"
 #include "UIEvents.h"
@@ -1204,6 +1205,7 @@ void RegisterUILibrary(Context* context)
     CheckBox::RegisterObject(context);
     Cursor::RegisterObject(context);
     Text::RegisterObject(context);
+    Text3D::RegisterObject(context);
     Window::RegisterObject(context);
     LineEdit::RegisterObject(context);
     Slider::RegisterObject(context);
