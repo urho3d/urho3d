@@ -1260,6 +1260,8 @@ The root %UI element can be queried from the UI subsystem. It is an empty canvas
 
 Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
 
+To allow the elements react to mouse input, either a mouse cursor element must be defined using \ref UI::SetCursor "SetCursor()" or the operating system mouse cursor must be set visible from the Input subsystem.
+
 \section UI_Defining Defining UI elements in XML
 
 User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two distinct use cases for %UI definition files: either defining just the %UI element style and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file Data/UI/DefaultStyle.xml.

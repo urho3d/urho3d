@@ -273,10 +273,13 @@ void UI::Update(float timeStep)
 
     PROFILE(UpdateUI);
 
-    if (cursor_ && cursor_->IsVisible())
+    IntVector2 cursorPos;
+    bool cursorVisible;
+    GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    
+    if (cursorVisible)
     {
-        IntVector2 pos = cursor_->GetPosition();
-        WeakPtr<UIElement> element(GetElementAt(pos));
+        WeakPtr<UIElement> element(GetElementAt(cursorPos));
 
         bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
         bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
@@ -287,10 +290,10 @@ void UI::Update(float timeStep)
         if (element && element->IsEnabled())
         {
             if (!dragElement_ || dragElement_ == element || dragDropTest)
-                element->OnHover(element->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
+                element->OnHover(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
         }
         else
-            cursor_->SetShape(CS_NORMAL);
+            SetCursorShape(CS_NORMAL);
 
         // Drag and drop test
         if (dragDropTest)
@@ -308,10 +311,10 @@ void UI::Update(float timeStep)
                 accept = eventData[P_ACCEPT].GetBool();
             }
 
-            cursor_->SetShape(accept ? CS_ACCEPTDROP : CS_REJECTDROP);
+            SetCursorShape(accept ? CS_ACCEPTDROP : CS_REJECTDROP);
         }
         else if (dragSource)
-            cursor_->SetShape(dragElement_ == element ? CS_ACCEPTDROP : CS_REJECTDROP);
+            SetCursorShape(dragElement_ == element ? CS_ACCEPTDROP : CS_REJECTDROP);
     }
 
     // Touch hover
@@ -498,7 +501,7 @@ UIElement* UI::GetFrontElement() const
 
 IntVector2 UI::GetCursorPosition() const
 {
-    return cursor_ ? cursor_->GetPosition() : IntVector2::ZERO;
+    return cursor_ ? cursor_->GetPosition() : GetSubsystem<Input>()->GetMousePosition();
 }
 
 bool UI::HasModalElement() const
@@ -759,6 +762,27 @@ UIElement* UI::GetFocusableElement(UIElement* element)
     return element;
 }
 
+void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
+{
+    if (cursor_)
+    {
+        pos = cursor_->GetPosition();
+        visible = cursor_->IsVisible();
+    }
+    else
+    {
+        Input* input = GetSubsystem<Input>();
+        pos = input->GetMousePosition();
+        visible = input->IsMouseVisible();
+    }
+}
+
+void UI::SetCursorShape(CursorShape shape)
+{
+    if (cursor_)
+        cursor_->SetShape(shape);
+}
+
 void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScreenMode;
@@ -777,12 +801,15 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     mouseButtons_ = eventData[MouseButtonDown::P_BUTTONS].GetInt();
     qualifiers_ = eventData[MouseButtonDown::P_QUALIFIERS].GetInt();
 
-    if (cursor_ && cursor_->IsVisible())
+    IntVector2 cursorPos;
+    bool cursorVisible;
+    GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    
+    if (cursorVisible)
     {
         int button = eventData[MouseButtonDown::P_BUTTON].GetInt();
 
-        IntVector2 pos = cursor_->GetPosition();
-        WeakPtr<UIElement> element(GetElementAt(pos));
+        WeakPtr<UIElement> element(GetElementAt(cursorPos));
 
         if (element)
         {
@@ -794,13 +821,13 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             }
 
             // Handle click
-            element->OnClick(element->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
+            element->OnClick(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
 
             // Handle start of drag. OnClick() may have caused destruction of the element, so check the pointer again
             if (element && !dragElement_ && mouseButtons_ == MOUSEB_LEFT)
             {
                 dragElement_ = element;
-                element->OnDragBegin(element->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
+                element->OnDragBegin(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
             }
         }
         else
@@ -813,8 +840,8 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
         VariantMap eventData;
         eventData[UIMouseClick::P_ELEMENT] = (void*)element.Get();
-        eventData[UIMouseClick::P_X] = pos.x_;
-        eventData[UIMouseClick::P_Y] = pos.y_;
+        eventData[UIMouseClick::P_X] = cursorPos.x_;
+        eventData[UIMouseClick::P_Y] = cursorPos.y_;
         eventData[UIMouseClick::P_BUTTON] = button;
         eventData[UIMouseClick::P_BUTTONS] = mouseButtons_;
         eventData[UIMouseClick::P_QUALIFIERS] = qualifiers_;
@@ -829,21 +856,23 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
 
-    if (cursor_ && (cursor_->IsVisible() || dragElement_))
+    IntVector2 cursorPos;
+    bool cursorVisible;
+    GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    
+    if (cursorVisible || dragElement_)
     {
-        IntVector2 pos = cursor_->GetPosition();
-
         if (dragElement_ && !mouseButtons_)
         {
             if (dragElement_->IsEnabled() && dragElement_->IsVisible())
             {
-                dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, cursor_);
+                dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor_);
 
                 // Drag and drop finish
                 bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
                 if (dragSource)
                 {
-                    WeakPtr<UIElement> target(GetElementAt(pos));
+                    WeakPtr<UIElement> target(GetElementAt(cursorPos));
                     bool dragTarget = target && (target->GetDragDropMode() & DD_TARGET) != 0;
                     bool dragDropFinish = dragSource && dragTarget && target != dragElement_;
 
@@ -878,11 +907,11 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
 
+    Input* input = GetSubsystem<Input>();
+    const IntVector2& rootSize = rootElement_->GetSize();
+
     if (cursor_)
     {
-        Input* input = GetSubsystem<Input>();
-        const IntVector2& rootSize = rootElement_->GetSize();
-
         if (!input->IsMouseVisible())
         {
             // Relative mouse motion: move cursor only when visible
@@ -901,17 +930,20 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
             // Absolute mouse motion: move always
             cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()));
         }
-
-        if (dragElement_ && mouseButtons_)
+    }
+    
+    IntVector2 cursorPos;
+    bool cursorVisible;
+    GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    
+    if (cursorVisible && dragElement_ && mouseButtons_)
+    {
+        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
+            dragElement_->OnDragMove(dragElement_->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
+        else
         {
-            IntVector2 pos = cursor_->GetPosition();
-            if (dragElement_->IsEnabled() && dragElement_->IsVisible())
-                dragElement_->OnDragMove(dragElement_->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
-            else
-            {
-                dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, cursor_);
-                dragElement_.Reset();
-            }
+            dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor_);
+            dragElement_.Reset();
         }
     }
 }
@@ -924,16 +956,19 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
     int delta = eventData[P_WHEEL].GetInt();
 
+    IntVector2 cursorPos;
+    bool cursorVisible;
+    GetCursorPositionAndVisible(cursorPos, cursorVisible);
+    
     UIElement* element;
     if (!nonFocusedMouseWheel_&& (element = focusElement_))
         element->OnWheel(delta, mouseButtons_, qualifiers_);
     else
     {
         // If no element has actual focus or in non-focused mode, get the element at cursor
-        if (cursor_)
+        if (cursorVisible)
         {
-            IntVector2 pos = cursor_->GetPosition();
-            element = GetElementAt(pos);
+            element = GetElementAt(cursorPos);
             if (nonFocusedMouseWheel_)
             {
                 // Going up the hierarchy chain to find element that could handle mouse wheel

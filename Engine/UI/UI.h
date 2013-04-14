@@ -37,6 +37,8 @@ class VertexBuffer;
 class XMLElement;
 class XMLFile;
 
+enum CursorShape;
+
 /// %UI subsystem. Manages the graphical user interface.
 class UI : public Object
 {
@@ -114,6 +116,10 @@ private:
     void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly);
     /// Return the first element in hierarchy that can alter focus.
     UIElement* GetFocusableElement(UIElement* element);
+    /// Return cursor position and visibility either from the cursor element, or the Input subsystem.
+    void GetCursorPositionAndVisible(IntVector2& pos, bool& visible);
+    /// Set cursor shape if it exists.
+    void SetCursorShape(CursorShape shape);
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.
@@ -138,7 +144,7 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
-
+    
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Vertex shader for no texture.
