@@ -21,7 +21,9 @@ void ImportModel(const String&in fileName)
 {
     if (fileName.empty)
         return;
-    
+
+    ui.cursor.shape = CS_BUSY;
+
     String modelName = "Models/" + GetFileName(fileName) + ".mdl";
     String outFileName = sceneResourcePath + modelName;
     fileSystem.CreateDir(sceneResourcePath + "Models");
@@ -86,7 +88,9 @@ void ImportScene(const String&in fileName)
 {
     if (fileName.empty)
         return;
-    
+
+    ui.cursor.shape = CS_BUSY;
+
     // Handle Tundra scene files here in code, otherwise via AssetImporter
     if (GetExtension(fileName) == ".txml")
         ImportTundraScene(fileName);
