@@ -559,6 +559,8 @@ private:
     TraversalMode traversalMode_;
     /// Element creation/deletion event sender flag.
     bool elementEventSender_;
+    /// XPath query for selecting UI-style.
+    static XPathQuery styleXPathQuery_;
 };
 
 template <class T> T* UIElement::CreateChild(const String& name, unsigned index) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index)); }

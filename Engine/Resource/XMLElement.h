@@ -40,6 +40,7 @@ namespace Urho3D
 {
 
 class XMLFile;
+class XPathQuery;
 class XPathResultSet;
 
 /// Element in an XML file.
@@ -51,7 +52,7 @@ public:
     /// Construct with document and node pointers.
     XMLElement(XMLFile* file, pugi::xml_node_struct* node);
     /// Construct from xpath query result set.
-    XMLElement(const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, unsigned xpathResultIndex);
+    XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode, unsigned xpathResultIndex);
     /// Copy-construct from another element.
     XMLElement(const XMLElement& rhs);
     /// Destruct.
@@ -76,8 +77,12 @@ public:
 
     /// Select an element/attribute using XPath query.
     XMLElement SelectSingle(const String& query, pugi::xpath_variable_set* variables = 0);
+    /// Select an element/attribute using XPath query.
+    XMLElement SelectSinglePrepared(const XPathQuery& query);
     /// Select elements/attributes using XPath query.
     XPathResultSet Select(const String& query, pugi::xpath_variable_set* variables = 0);
+    /// Select elements/attributes using XPath query.
+    XPathResultSet SelectPrepared(const XPathQuery& query);
 
     /// Set an attribute.
     bool SetAttribute(const String& name, const String& value);
@@ -133,11 +138,11 @@ public:
     bool SetVector4(const String& name, const Vector4& value);
 
     /// Return whether does not refer to an element or an XPath node.
-    bool IsNull() const { return !node_ && !xpathNode_; }
+    bool IsNull() const;
     /// Return whether refers to an element or an XPath node.
-    bool NotNull() const { return node_ || xpathNode_; }
+    bool NotNull() const;
     /// Return true if refers to an element or an XPath node.
-    operator bool () const { return node_ || xpathNode_; }
+    operator bool () const;
     /// Return element name (or attribute name if it is an attribute only XPath query result).
     String GetName() const;
     /// Return whether has a child element.
@@ -253,7 +258,7 @@ public:
     /// Construct empty result set.
     XPathResultSet();
     /// Construct with result set from XPath query.
-    XPathResultSet(pugi::xpath_node_set* resultSet);
+    XPathResultSet(XMLFile* file, pugi::xpath_node_set* resultSet);
     // Copy-construct.
     XPathResultSet(const XPathResultSet& rhs);
     /// Destruct.
@@ -272,6 +277,8 @@ public:
     pugi::xpath_node_set* GetXPathNodeSet() const { return resultSet_; }
 
 private:
+    /// XML file.
+    WeakPtr<XMLFile> file_;
     /// Pugixml xpath_node_set.
     pugi::xpath_node_set* resultSet_;
 };
@@ -282,8 +289,8 @@ class XPathQuery
 public:
     /// Construct empty.
     XPathQuery();
-    /// Construct XPath query object.
-    XPathQuery(const String& queryString);
+    /// Construct XPath query object with query string and variable string. The variable string format is "name1:type1,name2:type2,..." where type is one of "Bool", "Float", "String", "ResultSet".
+    XPathQuery(const String& queryString, const String& variableString = String::EMPTY);
     /// Destruct.
     ~XPathQuery();
     /// Bind query object with variable set.
@@ -296,10 +303,10 @@ public:
     bool SetVariable(const String& name, const String& value);
     /// Add/Set an XPath query result set variable. Return true if successful.
     bool SetVariable(const String& name, const XPathResultSet& value);
-    /// Remove all variables.
-    void RemoveVariables();
-    /// Set XPath query string.
-    void SetQuery(const String& queryString, bool bind = false);
+    /// Set XPath query string and variable string. The variable string format is "name1:type1,name2:type2,..." where type is one of "Bool", "Float", "String", "ResultSet".
+    bool SetQuery(const String& queryString, const String& variableString = String::EMPTY, bool bind = true);
+    /// Clear by removing all variables and XPath query object.
+    void Clear();
     /// Evaluate XPath query and expecting a boolean return value.
     bool EvaluateToBool(XMLElement element) const;
     /// Evaluate XPath query and expecting a float return value.

@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Object.h"
+#include "Cursor.h"
 #include "UIBatch.h"
 
 namespace Urho3D
@@ -36,8 +37,6 @@ class UIElement;
 class VertexBuffer;
 class XMLElement;
 class XMLFile;
-
-enum CursorShape;
 
 /// %UI subsystem. Manages the graphical user interface.
 class UI : public Object

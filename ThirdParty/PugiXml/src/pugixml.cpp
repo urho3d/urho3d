@@ -9014,6 +9014,11 @@ namespace pugi
 	{
 	}
 		
+	// Modified by YaoWT for Urho3D
+	xpath_node::xpath_node(const xpath_node& rhs): _node(rhs._node), _attribute(rhs._attribute)
+	{
+	}
+
 	xpath_node::xpath_node(const xml_node& node): _node(node)
 	{
 	}

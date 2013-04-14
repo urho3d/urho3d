@@ -106,6 +106,8 @@ template<> LayoutMode Variant::Get<LayoutMode>() const
 
 OBJECTTYPESTATIC(UIElement);
 
+XPathQuery UIElement::styleXPathQuery_("/elements/element[@type=$typeName]", "typeName:String");
+
 UIElement::UIElement(Context* context) :
     Serializable(context),
     parent_(0),
@@ -763,19 +765,11 @@ void UIElement::SetStyle(XMLFile* file, const String& typeName)
     if (!file)
         return;
 
-    XMLElement rootElem = file->GetRoot();
-    XMLElement childElem = rootElem.GetChild("element");
-    while (childElem)
-    {
-        if (typeName == childElem.GetAttribute("type"))
-        {
-            SetStyle(childElem);
-            return;
-        }
-        childElem = childElem.GetNext("element");
-    }
+    styleXPathQuery_.SetVariable("typeName", typeName);
+    XMLElement styleElem = file->GetRoot().SelectSinglePrepared(styleXPathQuery_);
+    if (styleElem)
+        SetStyle(styleElem);
 }
-
 
 void UIElement::SetStyle(const XMLElement& element)
 {
