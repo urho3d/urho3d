@@ -43,6 +43,7 @@ static const float DEFAULT_FOV = 30.0f;
 static const float DEFAULT_SPECULARINTENSITY = 1.0f;
 static const float DEFAULT_CONSTANTBIAS = 0.0001f;
 static const float DEFAULT_SLOPESCALEDBIAS = 0.5f;
+static const float DEFAULT_BIASAUTOADJUST = 1.0f;
 static const float DEFAULT_SHADOWFADESTART = 0.8f;
 static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
 static const float DEFAULT_SHADOWMINVIEW = 3.0f;
@@ -131,12 +132,9 @@ void Light::RegisterObject(Context* context)
     ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
-    #if !defined(ANDROID) && !defined(IOS)
-    ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
-    #else
-    ATTRIBUTE(Light, VAR_VECTOR2, "CSM Splits", shadowCascade_.splits_, Vector2(M_LARGE_VALUE, 0.0f), AM_DEFAULT);
-    #endif
+    ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(1000.0f, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Bias Auto Adjust", shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);

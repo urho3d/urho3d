@@ -51,7 +51,7 @@
 	</component>
 	<node id="3">
 		<attribute name="Name" value="" />
-		<attribute name="Position" value="0 -0.9 0" />
+		<attribute name="Position" value="0 -0.95 0" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />

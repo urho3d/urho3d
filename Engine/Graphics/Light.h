@@ -85,15 +85,14 @@ struct CascadeParameters
     }
     
     /// Construct with initial values.
-    CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart) :
-        fadeStart_(fadeStart)
+    CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f) :
+        fadeStart_(fadeStart),
+        biasAutoAdjust_(biasAutoAdjust)
     {
         splits_[0] = split1;
         splits_[1] = split2;
-        #if !defined(ANDROID) && !defined(IOS)
         splits_[2] = split3;
         splits_[3] = split4;
-        #endif
     }
     
     /// Validate parameters.
@@ -109,12 +108,12 @@ struct CascadeParameters
         return ret;
     }
     
-    /// Near clip of first split.
-    float start_;
     /// Far clip values of the splits.
-    float splits_[MAX_CASCADE_SPLITS];
+    float splits_[4];
     /// The point relative to final split far clip where fade out begins. (0.0 - 1.0)
     float fadeStart_;
+    /// Automatic depth bias adjustment strength.
+    float biasAutoAdjust_;
 };
 
 /// Shadow map focusing parameters.

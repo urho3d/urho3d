@@ -2101,6 +2101,7 @@ Properties:<br>
 - float split3
 - float split4
 - float fadeStart
+- float biasAutoAdjust
 
 
 FocusParameters

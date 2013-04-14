@@ -2456,20 +2456,21 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     graphics_->Clear(CLEAR_DEPTH);
     
     // Set shadow depth bias
-    BiasParameters parameters = queue.light_->GetShadowBias();
-    // Adjust the light's constant depth bias according to global shadow map resolution
-    /// \todo Should remove this adjustment and find a more flexible solution
-    unsigned shadowMapSize = renderer_->GetShadowMapSize();
-    if (shadowMapSize <= 512)
-        parameters.constantBias_ *= 2.0f;
-    else if (shadowMapSize >= 2048)
-        parameters.constantBias_ *= 0.5f;
-    
-    graphics_->SetDepthBias(parameters.constantBias_, parameters.slopeScaledBias_);
+    const BiasParameters& parameters = queue.light_->GetShadowBias();
     
     // Render each of the splits
     for (unsigned i = 0; i < queue.shadowSplits_.Size(); ++i)
     {
+        float multiplier = 1.0f;
+        // For directional light cascade splits, adjust depth bias according to the far clip ratio of the splits
+        if (i > 0 && queue.light_->GetLightType() == LIGHT_DIRECTIONAL)
+        {
+            multiplier = Max(queue.shadowSplits_[i].shadowCamera_->GetFarClip() / queue.shadowSplits_[0].shadowCamera_->GetFarClip(), 1.0f);
+            multiplier = 1.0f + (multiplier - 1.0f) * queue.light_->GetShadowCascade().biasAutoAdjust_;
+        }
+        
+        graphics_->SetDepthBias(multiplier * parameters.constantBias_, multiplier * parameters.slopeScaledBias_);
+        
         const ShadowBatchQueue& shadowQueue = queue.shadowSplits_[i];
         if (!shadowQueue.shadowBatches_.IsEmpty())
         {
