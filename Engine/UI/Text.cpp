@@ -544,7 +544,7 @@ void Text::UpdateText()
     // Set minimum and current size according to the text size, but respect fixed width if set
     if (GetMinWidth() != GetMaxWidth())
     {
-        SetMinWidth(width);
+        SetMinWidth(wordWrap_ ? 0 : width);
         SetWidth(width);
     }
     SetFixedHeight(height);

@@ -830,12 +830,14 @@ ResourcePicker@ resourcePicker = null;
 void InitResourcePicker()
 {
     // Fill resource picker data
+    Array<String> fontFilters = {"*.ttf", "*.fnt", "*.xml"};
     Array<String> imageFilters = {"*.png", "*.jpg"};
     Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.ktx", "*.pvr"};
     Array<String> soundFilters = {"*.wav","*.ogg"};
     Array<String> scriptFilters = {"*.as", "*.asc"};
     Array<String> materialFilters = {"*.xml", "*.material"};
     resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
+    resourcePickers.Push(ResourcePicker("Font", fontFilters));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
     resourcePickers.Push(ResourcePicker("Model", "*.mdl"));
     resourcePickers.Push(ResourcePicker("Material", materialFilters));

@@ -42,6 +42,9 @@
 namespace Urho3D
 {
 
+static const int MIN_POINT_SIZE = 1;
+static const int MAX_POINT_SIZE = 96;
+
 /// FreeType library subsystem.
 class FreeTypeLibrary : public Object
 {
@@ -52,7 +55,7 @@ public:
     FreeTypeLibrary(Context* context) :
         Object(context)
     {
-        FT_Error error = FT_Init_FreeType(&mLibrary);
+        FT_Error error = FT_Init_FreeType(&library_);
         if (error)
             LOGERROR("Could not initialize FreeType library");
     }
@@ -60,14 +63,14 @@ public:
     /// Destruct.
     virtual ~FreeTypeLibrary()
     {
-        FT_Done_FreeType(mLibrary);
+        FT_Done_FreeType(library_);
     }
     
-    FT_Library getLibrary() const { return mLibrary; }
+    FT_Library GetLibrary() const { return library_; }
     
 private:
     /// FreeType library.
-    FT_Library mLibrary;
+    FT_Library library_;
 };
 
 FontGlyph::FontGlyph() :
@@ -288,6 +291,8 @@ const FontFace* Font::GetFace(int pointSize)
     // For bitmap font type, always return the same font face provided by the font's bitmap file regardless of the actual requested point size
     if (fontType_ == FONT_BITMAP)
         pointSize = 0;
+    else
+        pointSize = Clamp(pointSize, MIN_POINT_SIZE, MAX_POINT_SIZE);
     
     HashMap<int, SharedPtr<FontFace> >::Iterator i = faces_.Find(pointSize);
     if (i != faces_.End())
@@ -325,7 +330,7 @@ const FontFace* Font::GetFaceTTF(int pointSize)
 
     FT_Face face;
     FT_Error error;
-    FT_Library library = freeType->getLibrary();
+    FT_Library library = freeType->GetLibrary();
     
     if (pointSize <= 0)
     {

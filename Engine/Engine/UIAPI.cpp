@@ -347,6 +347,8 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(Text3D, SetAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "Font@+ get_font() const", asMETHOD(Text3D, GetFont), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "int get_fontSize() const", asMETHOD(Text3D, GetFontSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_material(Material@+)", asMETHOD(Text3D, SetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Material@+ get_material() const", asMETHOD(Text3D, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_text(const String&in)", asMETHOD(Text3D, SetText), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "const String& get_text() const", asMETHOD(Text3D, GetText), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_textAlignment(HorizontalAlignment)", asMETHOD(Text3D, SetTextAlignment), asCALL_THISCALL);
@@ -359,8 +361,8 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "float get_rowSpacing() const", asMETHOD(Text3D, GetRowSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_wordwrap(bool)", asMETHOD(Text3D, SetWordwrap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "bool get_wordwrap() const", asMETHOD(Text3D, GetWordwrap), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "void set_maxWidth(int)", asMETHOD(Text3D, SetMaxWidth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_maxWidth() const", asMETHOD(Text3D, GetMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_width(int)", asMETHOD(Text3D, SetWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_width() const", asMETHOD(Text3D, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_color(const Color&in)", asMETHODPR(Text3D, SetColor, (const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_colors(Corner, const Color&in)", asMETHODPR(Text3D, SetColor, (Corner, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "const Color& get_colors(Corner) const", asMETHOD(Text3D, GetColor), asCALL_THISCALL);

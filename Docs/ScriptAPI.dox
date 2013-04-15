@@ -4561,13 +4561,14 @@ Properties:<br>
 - BoundingBox worldBoundingBox (readonly)
 - Font@ font (readonly)
 - int fontSize (readonly)
+- Material@ material
 - String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - float rowSpacing
 - bool wordwrap
-- int maxWidth
+- int width
 - Color color (writeonly)
 - Color[] colors
 - float opacity

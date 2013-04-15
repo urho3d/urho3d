@@ -36,6 +36,8 @@ class Text : public UIElement
 {
     OBJECT(Text);
     
+    friend class Text3D;
+    
 public:
     /// Construct.
     Text(Context* context);

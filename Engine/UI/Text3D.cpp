@@ -23,9 +23,12 @@
 #include "Precompiled.h"
 #include "Camera.h"
 #include "Context.h"
+#include "Font.h"
 #include "Geometry.h"
+#include "Log.h"
 #include "Material.h"
 #include "Node.h"
+#include "ResourceCache.h"
 #include "Technique.h"
 #include "Text.h"
 #include "Text3D.h"
@@ -34,13 +37,16 @@
 namespace Urho3D
 {
 
+extern const char* horizontalAlignments[];
+extern const char* verticalAlignments[];
+
 static const float TEXT_SCALING = 1.0f / 128.0f;
 
 OBJECTTYPESTATIC(Text3D);
 
 Text3D::Text3D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
-    text_(new Text(context)),
+    text_(context),
     vertexBuffer_(new VertexBuffer(context_)),
     faceCamera_(false),
     textDirty_(true),
@@ -55,6 +61,35 @@ Text3D::~Text3D()
 void Text3D::RegisterObject(Context* context)
 {
     context->RegisterFactory<Text3D>();
+    
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_INT, "Font Size", text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_STRING, "Text", text_.text_, String::EMPTY, AM_DEFAULT);
+    ENUM_ATTRIBUTE(Text3D, "Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_FLOAT, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_BOOL, "Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_INT, "Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(Text3D, VAR_COLOR, "Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_COLOR, "Top Left Color", text_.color_[0], Color::WHITE, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_COLOR, "Top Right Color", text_.color_[1], Color::WHITE, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_COLOR, "Bottom Left Color", text_.color_[2], Color::WHITE, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_COLOR, "Bottom Right Color", text_.color_[3], Color::WHITE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Face Camera", GetFaceCamera, SetFaceCamera, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(Text3D, Drawable);
+}
+
+void Text3D::ApplyAttributes()
+{
+    text_.ApplyAttributes();
+    MarkTextDirty();
+    UpdateTextBatches();
+    UpdateTextMaterials();
 }
 
 void Text3D::UpdateBatches(const FrameInfo& frame)
@@ -77,22 +112,25 @@ void Text3D::UpdateBatches(const FrameInfo& frame)
 
 void Text3D::UpdateGeometry(const FrameInfo& frame)
 {
-    for (unsigned i = 0; i < batches_.Size(); ++i)
+    if (geometryDirty_)
     {
-        Geometry* geometry = geometries_[i];
-        geometry->SetDrawRange(TRIANGLE_LIST, 0, 0, uiBatches_[i].vertexStart_, uiBatches_[i].vertexEnd_ - uiBatches_[i].vertexStart_);
-    }
-    
-    if (uiVertexData_.Size())
-    {
-        unsigned vertexCount = uiVertexData_.Size() / UI_VERTEX_SIZE;
-        if (vertexBuffer_->GetVertexCount() != vertexCount)
-            vertexBuffer_->SetSize(vertexCount, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1);
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+        {
+            Geometry* geometry = geometries_[i];
+            geometry->SetDrawRange(TRIANGLE_LIST, 0, 0, uiBatches_[i].vertexStart_, (uiBatches_[i].vertexEnd_ -
+                uiBatches_[i].vertexStart_) / UI_VERTEX_SIZE);
+        }
         
-        vertexBuffer_->SetData(&uiVertexData_[0]);
+        if (uiVertexData_.Size())
+        {
+            unsigned vertexCount = uiVertexData_.Size() / UI_VERTEX_SIZE;
+            if (vertexBuffer_->GetVertexCount() != vertexCount)
+                vertexBuffer_->SetSize(vertexCount, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1);
+            vertexBuffer_->SetData(&uiVertexData_[0]);
+        }
+        
+        geometryDirty_ = false;
     }
-    
-    geometryDirty_ = false;
 }
 
 UpdateGeometryType Text3D::GetUpdateGeometryType()
@@ -103,9 +141,16 @@ UpdateGeometryType Text3D::GetUpdateGeometryType()
         return UPDATE_NONE;
 }
 
+void Text3D::SetMaterial(Material* material)
+{
+    material_ = material;
+    
+    UpdateTextMaterials(true);
+}
+
 bool Text3D::SetFont(const String& fontName, int size)
 {
-    bool success = text_->SetFont(fontName, size);
+    bool success = text_.SetFont(fontName, size);
     
     // Changing font requires materials to be re-evaluated. Material evaluation can not be done in worker threads,
     // so UI batches must be brought up-to-date immediately
@@ -118,7 +163,7 @@ bool Text3D::SetFont(const String& fontName, int size)
 
 bool Text3D::SetFont(Font* font, int size)
 {
-    bool success = text_->SetFont(font, size);
+    bool success = text_.SetFont(font, size);
     
     MarkTextDirty();
     UpdateTextBatches();
@@ -129,7 +174,7 @@ bool Text3D::SetFont(Font* font, int size)
 
 void Text3D::SetText(const String& text)
 {
-    text_->SetText(text);
+    text_.SetText(text);
     
     // Changing text requires materials to be re-evaluated, in case the font is multi-page
     MarkTextDirty();
@@ -139,147 +184,159 @@ void Text3D::SetText(const String& text)
 
 void Text3D::SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
 {
-    text_->SetAlignment(hAlign, vAlign);
+    text_.SetAlignment(hAlign, vAlign);
     
     MarkTextDirty();
 }
 
 void Text3D::SetHorizontalAlignment(HorizontalAlignment align)
 {
-    text_->SetHorizontalAlignment(align);
+    text_.SetHorizontalAlignment(align);
     
     MarkTextDirty();
 }
 
 void Text3D::SetVerticalAlignment(VerticalAlignment align)
 {
-    text_->SetVerticalAlignment(align);
+    text_.SetVerticalAlignment(align);
     
     MarkTextDirty();
 }
 
 void Text3D::SetTextAlignment(HorizontalAlignment align)
 {
-    text_->SetTextAlignment(align);
+    text_.SetTextAlignment(align);
     
     MarkTextDirty();
 }
 
 void Text3D::SetRowSpacing(float spacing)
 {
-    text_->SetRowSpacing(spacing);
+    text_.SetRowSpacing(spacing);
     
     MarkTextDirty();
 }
 
 void Text3D::SetWordwrap(bool enable)
 {
-    text_->SetWordwrap(enable);
+    text_.SetWordwrap(enable);
     
     MarkTextDirty();
 }
 
-void Text3D::SetMaxWidth(int width)
+void Text3D::SetWidth(int width)
 {
-    text_->SetMaxWidth(width);
+    text_.SetMinWidth(width);
+    text_.SetWidth(width);
     
     MarkTextDirty();
 }
 
 void Text3D::SetColor(const Color& color)
 {
-    text_->SetColor(color);
+    text_.SetColor(color);
     
     MarkTextDirty();
 }
 
 void Text3D::SetColor(Corner corner, const Color& color)
 {
-    text_->SetColor(corner, color);
+    text_.SetColor(corner, color);
     
     MarkTextDirty();
 }
 
 void Text3D::SetOpacity(float opacity)
 {
-    text_->SetOpacity(opacity);
+    text_.SetOpacity(opacity);
     
     MarkTextDirty();
 }
 
 void Text3D::SetFaceCamera(bool enable)
 {
-    faceCamera_ = enable;
+    if (enable != faceCamera_)
+    {
+        faceCamera_ = enable;
+        
+        // Bounding box must be recalculated
+        OnMarkedDirty(node_);
+    }
+}
+
+Material* Text3D::GetMaterial() const
+{
+    return material_;
 }
 
 Font* Text3D::GetFont() const
 {
-    return text_->GetFont();
+    return text_.GetFont();
 }
 
 int Text3D::GetFontSize() const
 {
-    return text_->GetFontSize();
+    return text_.GetFontSize();
 }
 
 const String& Text3D::GetText() const
 {
-    return text_->GetText();
+    return text_.GetText();
 }
 
 HorizontalAlignment Text3D::GetHorizontalAlignment() const
 {
-    return text_->GetHorizontalAlignment();
+    return text_.GetHorizontalAlignment();
 }
 
 VerticalAlignment Text3D::GetVerticalAlignment() const
 {
-    return text_->GetVerticalAlignment();
+    return text_.GetVerticalAlignment();
 }
 
 HorizontalAlignment Text3D::GetTextAlignment() const
 {
-    return text_->GetTextAlignment();
+    return text_.GetTextAlignment();
 }
 
 float Text3D::GetRowSpacing() const
 {
-    return text_->GetRowSpacing();
+    return text_.GetRowSpacing();
 }
 
 bool Text3D::GetWordwrap() const
 {
-    return text_->GetWordwrap();
+    return text_.GetWordwrap();
 }
 
-int Text3D::GetMaxWidth() const
+int Text3D::GetWidth() const
 {
-    return text_->GetMaxWidth();
+    return text_.GetWidth();
 }
 
 int Text3D::GetRowHeight() const
 {
-    return text_->GetRowHeight();
+    return text_.GetRowHeight();
 }
 
 unsigned Text3D::GetNumRows() const
 {
-    return text_->GetNumRows();
+    return text_.GetNumRows();
 }
 
 const PODVector<int>& Text3D::GetRowWidths() const
 {
-    return text_->GetRowWidths();
+    return text_.GetRowWidths();
 }
 
 const Color& Text3D::GetColor(Corner corner) const
 {
-    return text_->GetColor(corner);
+    return text_.GetColor(corner);
 }
 
 float Text3D::GetOpacity() const
 {
-    return text_->GetOpacity();
+    return text_.GetOpacity();
 }
 
 void Text3D::OnNodeSet(Node* node)
@@ -307,40 +364,62 @@ void Text3D::MarkTextDirty()
     MarkNetworkUpdate();
 }
 
+void Text3D::SetMaterialAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetMaterial(cache->GetResource<Material>(value.id_));
+}
+
+void Text3D::SetFontAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    text_.font_ = cache->GetResource<Font>(value.id_);
+}
+
+ResourceRef Text3D::GetMaterialAttr() const
+{
+    return GetResourceRef(material_, Material::GetTypeStatic());
+}
+
+ResourceRef Text3D::GetFontAttr() const
+{
+    return GetResourceRef(text_.font_, Font::GetTypeStatic());
+}
+
 void Text3D::UpdateTextBatches()
 {
     uiBatches_.Clear();
     uiVertexData_.Clear();
     
-    text_->GetBatches(uiBatches_, uiVertexData_, IntRect::ZERO);
+    text_.GetBatches(uiBatches_, uiVertexData_, IntRect::ZERO);
     
     Vector3 offset(Vector3::ZERO);
     
-    switch (text_->GetHorizontalAlignment())
+    switch (text_.GetHorizontalAlignment())
     {
     case HA_LEFT:
         break;
         
     case HA_CENTER:
-        offset.x_ -= (float)text_->GetWidth() * 0.5f;
+        offset.x_ -= (float)text_.GetWidth() * 0.5f;
         break;
         
     case HA_RIGHT:
-        offset.x_ -= (float)text_->GetWidth();
+        offset.x_ -= (float)text_.GetWidth();
         break;
     }
     
-    switch (text_->GetVerticalAlignment())
+    switch (text_.GetVerticalAlignment())
     {
     case VA_TOP:
         break;
         
     case VA_CENTER:
-        offset.y_ -= (float)text_->GetHeight() * 0.5f;
+        offset.y_ -= (float)text_.GetHeight() * 0.5f;
         break;
         
     case VA_BOTTOM:
-        offset.y_ -= (float)text_->GetHeight();
+        offset.y_ -= (float)text_.GetHeight();
         break;
     }
     
@@ -360,7 +439,7 @@ void Text3D::UpdateTextBatches()
     geometryDirty_ = true;
 }
 
-void Text3D::UpdateTextMaterials()
+void Text3D::UpdateTextMaterials(bool forceUpdate)
 {
     batches_.Resize(uiBatches_.Size());
     geometries_.Resize(uiBatches_.Size());
@@ -374,22 +453,27 @@ void Text3D::UpdateTextMaterials()
             batches_[i].geometry_ = geometries_[i] = geometry;
         }
         
-        if (!batches_[i].material_)
+        if (!batches_[i].material_ || forceUpdate)
         {
-            Material* material = new Material(context_);
-            Technique* tech = new Technique(context_);
-            Pass* pass = tech->CreatePass(PASS_ALPHA);
-            pass->SetVertexShader("Basic_DiffVCol");
-            pass->SetPixelShader("Basic_AlphaVCol");
-            material->SetTechnique(0, tech);
-            material->SetCullMode(CULL_NONE);
-            batches_[i].material_ = material;
+            // If material not defined, create a reasonable default from scratch
+            if (!material_)
+            {
+                Material* material = new Material(context_);
+                Technique* tech = new Technique(context_);
+                Pass* pass = tech->CreatePass(PASS_ALPHA);
+                pass->SetVertexShader("Basic_DiffVCol");
+                pass->SetPixelShader("Basic_AlphaVCol");
+                pass->SetBlendMode(BLEND_ALPHA);
+                material->SetTechnique(0, tech);
+                material->SetCullMode(CULL_NONE);
+                batches_[i].material_ = material;
+            }
+            else
+                batches_[i].material_ = material_->Clone();
         }
         
         Material* material = batches_[i].material_;
         material->SetTexture(TU_DIFFUSE, uiBatches_[i].texture_);
-        Pass* pass = material->GetTechnique(0)->GetPass(PASS_ALPHA);
-        pass->SetBlendMode(uiBatches_[i].blendMode_);
     }
 }
 

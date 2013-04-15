@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Drawable.h"
-#include "UIBatch.h"
+#include "Text.h"
 
 namespace Urho3D
 {
@@ -43,6 +43,8 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
+    /// Apply attribute changes that can not be applied immediately.
+    virtual void ApplyAttributes();
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
@@ -50,10 +52,12 @@ public:
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType();
     
-    /// Set font and font size.
+    /// Set font and font size. Return true if successful.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size.
+    /// Set font and font size. Return true if successful.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    /// Set material.
+    void SetMaterial(Material* material);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
     /// Set horizontal and vertical alignment.
@@ -68,8 +72,8 @@ public:
     void SetRowSpacing(float spacing);
     /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
     void SetWordwrap(bool enable);
-    /// Set maximum width for wordwrap mode.
-    void SetMaxWidth(int width);
+    /// Set text width. Only has effect in word wrap mode.
+    void SetWidth(int width);
     /// Set color on all corners.
     void SetColor(const Color& color);
     /// Set color on one corner.
@@ -81,6 +85,8 @@ public:
     
     /// Return font.
     Font* GetFont() const;
+    /// Return material.
+    Material* GetMaterial() const;
     /// Return font size.
     int GetFontSize() const;
     /// Return text.
@@ -95,8 +101,8 @@ public:
     float GetRowSpacing() const;
     /// Return wordwrap mode.
     bool GetWordwrap() const;
-    /// Return maximum width.
-    int GetMaxWidth() const;
+    /// Return text width.
+    int GetWidth() const;
     /// Return row height.
     int GetRowHeight() const;
     /// Return number of rows.
@@ -114,6 +120,12 @@ public:
     void SetFontAttr(ResourceRef value);
     /// Return font attribute.
     ResourceRef GetFontAttr() const;
+    /// Set material attribute.
+    void SetMaterialAttr(ResourceRef value);
+    /// Return material attribute.
+    ResourceRef GetMaterialAttr() const;
+    /// Get color attribute. Uses just the top-left color.
+    const Color& GetColorAttr() const { return text_.color_[0]; }
     
 protected:
     /// Handle node being assigned.
@@ -124,17 +136,21 @@ protected:
 private:
     /// Mark text & geometry dirty.
     void MarkTextDirty();
+    /// Update text and font.
+    void UpdateText();
     /// Update text UI batches.
     void UpdateTextBatches();
     /// Create materials for text rendering. May only be called from the main thread. Text UI batches must be up-to-date.
-    void UpdateTextMaterials();
+    void UpdateTextMaterials(bool forceUpdate = false);
     
     /// Internally used text element.
-    SharedPtr<Text> text_;
+    Text text_;
     /// Geometries.
     Vector<SharedPtr<Geometry> > geometries_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
+    /// Material to use as a base for the text material(s).
+    SharedPtr<Material> material_;
     /// Text UI batches.
     PODVector<UIBatch> uiBatches_;
     /// Text vertex data.
