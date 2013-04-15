@@ -138,9 +138,9 @@ private:
     void MarkTextDirty();
     /// Update text and font.
     void UpdateText();
-    /// Update text UI batches.
+    /// Update text %UI batches.
     void UpdateTextBatches();
-    /// Create materials for text rendering. May only be called from the main thread. Text UI batches must be up-to-date.
+    /// Create materials for text rendering. May only be called from the main thread. Text %UI batches must be up-to-date.
     void UpdateTextMaterials(bool forceUpdate = false);
     
     /// Internally used text element.

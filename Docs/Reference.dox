@@ -519,7 +519,7 @@ In the default render paths, the rendering operations proceed in the following o
 
 \section Rendering_Drawable Rendering components
 
-The rendering-related components defined by the %Graphics library are:
+The rendering-related components defined by the %Graphics and %UI libraries are:
 
 - Octree: spatial partitioning of Drawables for accelerated visibility queries. Needs to be created to the Scene (root node.)
 - Camera: describes a viewpoint for rendering, including projection parameters (FOV, near/far distance, perspective/orthographic)
@@ -535,6 +535,7 @@ The rendering-related components defined by the %Graphics library are:
 - CustomGeometry: renders runtime-defined unindexed geometry. The geometry data is not serialized or replicated over the network.
 - DecalSet: renders decal geometry on top of objects.
 - Zone: defines ambient light and fog settings for objects inside the zone volume.
+- Text3D: text that is rendered into the 3D view.
 
 \section Rendering_Optimizations Optimizations
 
