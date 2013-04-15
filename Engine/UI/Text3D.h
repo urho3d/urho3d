@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Drawable.h"
+#include "UIBatch.h"
 
 namespace Urho3D
 {
@@ -42,20 +43,41 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
+    /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
+    virtual void UpdateBatches(const FrameInfo& frame);
+    /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
+    virtual void UpdateGeometry(const FrameInfo& frame);
+    /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
+    virtual UpdateGeometryType GetUpdateGeometryType();
+    
     /// Set font and font size.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
+    /// Set horizontal and vertical alignment.
+    void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
+    /// Set horizontal alignment.
+    void SetHorizontalAlignment(HorizontalAlignment align);
+    /// Set vertical alignment.
+    void SetVerticalAlignment(VerticalAlignment align);
     /// Set row alignment.
     void SetTextAlignment(HorizontalAlignment align);
     /// Set row spacing, 1.0 for original font spacing.
     void SetRowSpacing(float spacing);
     /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
     void SetWordwrap(bool enable);
-    /// Set material. To render fonts correctly, the material's pixel shader needs to read diffuse texture alpha as opacity.
-    void SetMaterial(Material* material);
+    /// Set maximum width for wordwrap mode.
+    void SetMaxWidth(int width);
+    /// Set color on all corners.
+    void SetColor(const Color& color);
+    /// Set color on one corner.
+    void SetColor(Corner corner, const Color& color);
+    /// Set opacity.
+    void SetOpacity(float opacity);
+    /// Set whether to face camera automatically.
+    void SetFaceCamera(bool enable);
     
     /// Return font.
     Font* GetFont() const;
@@ -65,18 +87,28 @@ public:
     const String& GetText() const;
     /// Return row alignment.
     HorizontalAlignment GetTextAlignment() const;
+    /// Return horizontal alignment.
+    HorizontalAlignment GetHorizontalAlignment() const;
+    /// Return vertical alignment.
+    VerticalAlignment GetVerticalAlignment() const;
     /// Return row spacing.
     float GetRowSpacing() const;
     /// Return wordwrap mode.
     bool GetWordwrap() const;
+    /// Return maximum width.
+    int GetMaxWidth() const;
     /// Return row height.
     int GetRowHeight() const;
     /// Return number of rows.
     unsigned GetNumRows() const;
     /// Return width of each row.
     const PODVector<int>& GetRowWidths() const;
-    /// Return material.
-    Material* GetMaterial() const;
+    /// Return corner color.
+    const Color& GetColor(Corner corner) const;
+    /// Return opacity.
+    float GetOpacity() const;
+    /// Return whether faces camera automatically.
+    bool GetFaceCamera() const { return faceCamera_; }
     
     /// Set font attribute.
     void SetFontAttr(ResourceRef value);
@@ -84,12 +116,39 @@ public:
     ResourceRef GetFontAttr() const;
     
 protected:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
+    /// Mark text & geometry dirty.
+    void MarkTextDirty();
+    /// Update text UI batches.
+    void UpdateTextBatches();
+    /// Create materials for text rendering. May only be called from the main thread. Text UI batches must be up-to-date.
+    void UpdateTextMaterials();
+    
     /// Internally used text element.
     SharedPtr<Text> text_;
+    /// Geometries.
+    Vector<SharedPtr<Geometry> > geometries_;
+    /// Vertex buffer.
+    SharedPtr<VertexBuffer> vertexBuffer_;
+    /// Text UI batches.
+    PODVector<UIBatch> uiBatches_;
+    /// Text vertex data.
+    PODVector<float> uiVertexData_;
+    /// Local-space bounding box.
+    BoundingBox boundingBox_;
+    /// Custom world transform.
+    Matrix3x4 customWorldTransform_;
+    /// Face camera flag.
+    bool faceCamera_;
+    /// Text needs update flag.
+    bool textDirty_;
+    /// Geometry dirty flag.
+    bool geometryDirty_;
 };
 
 }

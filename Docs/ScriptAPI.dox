@@ -4516,6 +4516,66 @@ Properties:<br>
 - int rowHeight (readonly)
 
 
+Text3D
+
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- bool SetFont(const String&, int)
+- bool SetFont(Font@, int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool inView (readonly)
+- bool castShadows
+- bool occluder
+- bool occludee
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- uint shadowMask
+- uint zoneMask
+- uint maxLights
+- BoundingBox worldBoundingBox (readonly)
+- Font@ font (readonly)
+- int fontSize (readonly)
+- String text
+- HorizontalAlignment textAlignment
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- float rowSpacing
+- bool wordwrap
+- int maxWidth
+- Color color (writeonly)
+- Color[] colors
+- float opacity
+- bool faceCamera
+- uint numRows (readonly)
+- int rowHeight (readonly)
+
+
 LineEdit
 
 Methods:<br>

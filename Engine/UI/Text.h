@@ -110,7 +110,7 @@ public:
     
 protected:
     /// Update text when text, font or spacing changed.
-    void UpdateText(bool inResize = false);
+    void UpdateText();
     /// Validate text selection to be within the text.
     void ValidateSelection();
     /// Return row start X position.

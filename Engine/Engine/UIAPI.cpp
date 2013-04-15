@@ -33,6 +33,7 @@
 #include "Slider.h"
 #include "Sprite.h"
 #include "Text.h"
+#include "Text3D.h"
 #include "UI.h"
 #include "Window.h"
 
@@ -338,6 +339,39 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "int get_rowHeight() const", asMETHOD(Text, GetRowHeight), asCALL_THISCALL);
 }
 
+static void RegisterText3D(asIScriptEngine* engine)
+{
+    RegisterDrawable<Text3D>(engine, "Text3D");
+    engine->RegisterObjectMethod("Text3D", "bool SetFont(const String&in, int)", asMETHODPR(Text3D, SetFont, (const String&, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool SetFont(Font@+, int)", asMETHODPR(Text3D, SetFont, (Font*, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(Text3D, SetAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Font@+ get_font() const", asMETHOD(Text3D, GetFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_fontSize() const", asMETHOD(Text3D, GetFontSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_text(const String&in)", asMETHOD(Text3D, SetText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const String& get_text() const", asMETHOD(Text3D, GetText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_textAlignment(HorizontalAlignment)", asMETHOD(Text3D, SetTextAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment get_textAlignment() const", asMETHOD(Text3D, GetTextAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_horizontalAlignment(HorizontalAlignment)", asMETHOD(Text3D, SetHorizontalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "HorizontalAlignment get_horizontalAlignment() const", asMETHOD(Text3D, GetHorizontalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_verticalAlignment(VerticalAlignment)", asMETHOD(Text3D, SetVerticalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "VerticalAlignment get_verticalAlignment() const", asMETHOD(Text3D, GetVerticalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_rowSpacing(float)", asMETHOD(Text3D, SetRowSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_rowSpacing() const", asMETHOD(Text3D, GetRowSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_wordwrap(bool)", asMETHOD(Text3D, SetWordwrap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_wordwrap() const", asMETHOD(Text3D, GetWordwrap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_maxWidth(int)", asMETHOD(Text3D, SetMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_maxWidth() const", asMETHOD(Text3D, GetMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_color(const Color&in)", asMETHODPR(Text3D, SetColor, (const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_colors(Corner, const Color&in)", asMETHODPR(Text3D, SetColor, (Corner, const Color&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const Color& get_colors(Corner) const", asMETHOD(Text3D, GetColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_opacity(float)", asMETHOD(Text3D, SetOpacity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_opacity() const", asMETHOD(Text3D, GetOpacity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_faceCamera(bool)", asMETHOD(Text3D, SetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_faceCamera() const", asMETHOD(Text3D, GetFaceCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "uint get_numRows() const", asMETHOD(Text3D, GetNumRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_rowHeight() const", asMETHOD(Text3D, GetRowHeight), asCALL_THISCALL);
+}
+
 static void RegisterLineEdit(asIScriptEngine* engine)
 {
     RegisterBorderImage<LineEdit>(engine, "LineEdit");
@@ -567,6 +601,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterScrollView(engine);
     RegisterListView(engine);
     RegisterText(engine);
+    RegisterText3D(engine);
     RegisterLineEdit(engine);
     RegisterMenu(engine);
     RegisterDropDownList(engine);

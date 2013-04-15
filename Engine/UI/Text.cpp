@@ -353,7 +353,7 @@ ResourceRef Text::GetFontAttr() const
     return GetResourceRef(font_, Font::GetTypeStatic());
 }
 
-void Text::UpdateText(bool inResize)
+void Text::UpdateText()
 {
     int width = 0;
     int height = 0;
