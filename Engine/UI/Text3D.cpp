@@ -109,9 +109,9 @@ bool Text3D::SetFont(const String& fontName, int size)
     
     // Changing font requires materials to be re-evaluated. Material evaluation can not be done in worker threads,
     // so UI batches must be brought up-to-date immediately
+    MarkTextDirty();
     UpdateTextBatches();
     UpdateTextMaterials();
-    MarkNetworkUpdate();
     
     return success;
 }
@@ -120,9 +120,9 @@ bool Text3D::SetFont(Font* font, int size)
 {
     bool success = text_->SetFont(font, size);
     
+    MarkTextDirty();
     UpdateTextBatches();
     UpdateTextMaterials();
-    MarkNetworkUpdate();
     
     return success;
 }
@@ -132,9 +132,9 @@ void Text3D::SetText(const String& text)
     text_->SetText(text);
     
     // Changing text requires materials to be re-evaluated, in case the font is multi-page
+    MarkTextDirty();
     UpdateTextBatches();
     UpdateTextMaterials();
-    MarkNetworkUpdate();
 }
 
 void Text3D::SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -302,6 +302,8 @@ void Text3D::OnWorldBoundingBoxUpdate()
 void Text3D::MarkTextDirty()
 {
     textDirty_ = true;
+    
+    OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
 
