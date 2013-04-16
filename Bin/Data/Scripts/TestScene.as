@@ -10,8 +10,6 @@ int drawDebug = 0;
 
 Text@ downloadsText;
 
-Array<Node@> hitObjects;
-
 void Start()
 {
     if (!engine.headless)
@@ -34,7 +32,6 @@ void Start()
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("SpawnBox", "HandleSpawnBox");
     SubscribeToEvent("PhysicsCollision", "HandlePhysicsCollision");
-    SubscribeToEvent("PhysicsPostStep", "HandlePhysicsPostStep");
 
     network.RegisterRemoteEvent("SpawnBox");
 
@@ -509,27 +506,17 @@ void HandlePhysicsCollision(StringHash eventType, VariantMap& eventData)
     Node@ nodeA = eventData["NodeA"].GetNode();
     Node@ nodeB = eventData["NodeB"].GetNode();
     if (nodeA.HasComponent("AnimatedModel"))
-        hitObjects.Push(nodeA);
+        HandleHit(nodeA);
     else if (nodeB.HasComponent("AnimatedModel"))
-        hitObjects.Push(nodeB);
+        HandleHit(nodeB);
 }
 
-void HandlePhysicsPostStep()
+void HandleHit(Node@ node)
 {
-    if (hitObjects.empty)
-        return;
-
-    for (uint i = 0; i < hitObjects.length; ++i)
-    {
-        Node@ node = hitObjects[i];
-
-        // Remove the trigger physics shape, and create the ragdoll
-        node.RemoveComponent("RigidBody");
-        node.RemoveComponent("CollisionShape");
-        CreateRagdoll(node.GetComponent("AnimatedModel"));
-    }
-
-    hitObjects.Clear();
+    // Remove the trigger physics shape, and create the ragdoll
+    node.RemoveComponent("RigidBody");
+    node.RemoveComponent("CollisionShape");
+    CreateRagdoll(node.GetComponent("AnimatedModel"));
 }
 
 void CreateRagdoll(AnimatedModel@ model)

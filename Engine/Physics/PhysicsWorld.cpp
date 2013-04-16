@@ -383,12 +383,13 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody
     
     result.Clear();
     
-    for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = currentCollisions_.Begin(); i != currentCollisions_.End(); ++i)
+    for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
+        i != currentCollisions_.End(); ++i)
     {
-        if (i->first_ == body)
-            result.Push(i->second_);
-        else if (i->second_ == body)
-            result.Push(i->first_);
+        if (i->first_.first_ == body)
+            result.Push(i->first_.second_);
+        else if (i->first_.second_ == body)
+            result.Push(i->first_.first_);
     }
 }
 
@@ -405,23 +406,6 @@ void PhysicsWorld::AddRigidBody(RigidBody* body)
 void PhysicsWorld::RemoveRigidBody(RigidBody* body)
 {
     rigidBodies_.Remove(body);
-    
-    // Erase from collision pairs so that they can be used to safely find overlapping bodies
-    for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = currentCollisions_.Begin(); i != currentCollisions_.End();)
-    {
-        if (i->first_ == body || i->second_ == body)
-            i = currentCollisions_.Erase(i);
-        else
-            ++i;
-    }
-    
-    for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End();)
-    {
-        if (i->first_ == body || i->second_ == body)
-            i = previousCollisions_.Erase(i);
-        else
-            ++i;
-    }
 }
 
 void PhysicsWorld::AddCollisionShape(CollisionShape* shape)
@@ -563,9 +547,6 @@ void PhysicsWorld::SendCollisionEvents()
             if (!bodyA || !bodyB)
                 continue;
             
-            WeakPtr<RigidBody> bodyWeakA(bodyA);
-            WeakPtr<RigidBody> bodyWeakB(bodyB);
-            
             // Skip collision event signaling if both objects are static, or if collision event mode does not match
             if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
                 continue;
@@ -575,19 +556,38 @@ void PhysicsWorld::SendCollisionEvents()
                 !bodyA->IsActive() && !bodyB->IsActive())
                 continue;
             
+            WeakPtr<RigidBody> bodyWeakA(bodyA);
+            WeakPtr<RigidBody> bodyWeakB(bodyB);
+            
+            Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> > bodyPair;
+            if (bodyA < bodyB)
+                bodyPair = MakePair(bodyWeakA, bodyWeakB);
+            else
+                bodyPair = MakePair(bodyWeakB, bodyWeakA);
+            
+            // First only store the collision pair as weak pointers and the manifold pointer, so user code can safely destroy
+            // objects during collision event handling
+            currentCollisions_[bodyPair] = contactManifold;
+        }
+        
+        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
+            i != currentCollisions_.End(); ++i)
+        {
+            RigidBody* bodyA = i->first_.first_;
+            RigidBody* bodyB = i->first_.second_;
+            if (!bodyA || !bodyB)
+                continue;
+            
+            btPersistentManifold* contactManifold = i->second_;
+            int numContacts = contactManifold->getNumContacts();
+            
             Node* nodeA = bodyA->GetNode();
             Node* nodeB = bodyB->GetNode();
             WeakPtr<Node> nodeWeakA(nodeA);
             WeakPtr<Node> nodeWeakB(nodeB);
             
-            Pair<RigidBody*, RigidBody*> bodyPair;
-            if (bodyA < bodyB)
-                bodyPair = MakePair(bodyA, bodyB);
-            else
-                bodyPair = MakePair(bodyB, bodyA);
-            currentCollisions_.Insert(bodyPair);
-            bool newCollision = !previousCollisions_.Contains(bodyPair);
             bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
+            bool newCollision = !previousCollisions_.Contains(i->first_);
             
             physicsCollisionData[PhysicsCollision::P_NODEA] = (void*)nodeA;
             physicsCollisionData[PhysicsCollision::P_NODEB] = (void*)nodeB;
@@ -613,13 +613,13 @@ void PhysicsWorld::SendCollisionEvents()
             {
                 SendEvent(E_PHYSICSCOLLISIONSTART, physicsCollisionData);
                 // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
-                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
             
             // Then send the ongoing collision event
             SendEvent(E_PHYSICSCOLLISION, physicsCollisionData);
-            if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+            if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                 continue;
             
             nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyA;
@@ -631,12 +631,12 @@ void PhysicsWorld::SendCollisionEvents()
             if (newCollision)
             {
                 nodeA->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData);
-                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
             
             nodeA->SendEvent(E_NODECOLLISION, nodeCollisionData);
-            if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+            if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                 continue;
             
             contacts.Clear();
@@ -657,7 +657,7 @@ void PhysicsWorld::SendCollisionEvents()
             if (newCollision)
             {
                 nodeB->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData);
-                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
             
@@ -672,14 +672,15 @@ void PhysicsWorld::SendCollisionEvents()
         
         physicsCollisionData[PhysicsCollisionEnd::P_WORLD] = (void*)this;
         
-        for (HashSet<Pair<RigidBody*, RigidBody*> >::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
+        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
         {
-            if (!currentCollisions_.Contains(*i))
+            if (!currentCollisions_.Contains(i->first_))
             {
-                RigidBody* bodyA = i->first_;
-                RigidBody* bodyB = i->second_;
-                WeakPtr<RigidBody> bodyWeakA(bodyA);
-                WeakPtr<RigidBody> bodyWeakB(bodyB);
+                RigidBody* bodyA = i->first_.first_;
+                RigidBody* bodyB = i->first_.second_;
+                if (!bodyA || !bodyB)
+                    continue;
+                
                 bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
                 
                 // Skip collision event signaling if both objects are static, or if collision event mode does not match
@@ -704,7 +705,7 @@ void PhysicsWorld::SendCollisionEvents()
                 
                 SendEvent(E_PHYSICSCOLLISIONEND, physicsCollisionData);
                 // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
-                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
                 
                 nodeCollisionData[NodeCollisionEnd::P_BODY] = (void*)bodyA;
@@ -713,7 +714,7 @@ void PhysicsWorld::SendCollisionEvents()
                 nodeCollisionData[NodeCollisionEnd::P_PHANTOM] = phantom;
                 
                 nodeA->SendEvent(E_NODECOLLISIONEND, nodeCollisionData);
-                if (!nodeWeakA || !nodeWeakB || !bodyWeakA || !bodyWeakB)
+                if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
                 
                 nodeCollisionData[NodeCollisionEnd::P_BODY] = (void*)bodyB;

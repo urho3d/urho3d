@@ -34,6 +34,7 @@ class btConstraintSolver;
 class btDiscreteDynamicsWorld;
 class btDispatcher;
 class btDynamicsWorld;
+class btPersistentManifold;
 
 namespace Urho3D
 {
@@ -214,9 +215,9 @@ private:
     /// Constraints in the world.
     PODVector<Constraint*> constraints_;
     /// Collision pairs on this frame.
-    HashSet<Pair<RigidBody*, RigidBody*> > currentCollisions_;
-    /// Collision pairs on the previous frame. Used to check if a collision is "new."
-    HashSet<Pair<RigidBody*, RigidBody*> > previousCollisions_;
+    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold* > currentCollisions_;
+    /// Collision pairs on the previous frame. Used to check if a collision is "new." Manifolds are not guaranteed to exist anymore.
+    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold* > previousCollisions_;
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
     /// Cache for collision geometry data.
