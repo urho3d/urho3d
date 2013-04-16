@@ -383,6 +383,18 @@ void SpawnPlayer(Connection@ connection)
         VariantMap eventData;
         eventData["NodeID"] = playerNode.id;
         connection.SendRemoteEvent("PlayerSpawned", true, eventData);
+        
+        // Create name tag (Text3D component) for players in multiplayer
+        Node@ textNode = playerNode.CreateChild("NameTag");
+        textNode.position = Vector3(0, 1.2, 0);
+        Text3D@ text3D = textNode.CreateComponent("Text3D");
+        Font@ font = cache.GetResource("Font", "Fonts/BlueHighway.ttf");
+        text3D.SetFont(font, 24);
+        text3D.color = Color(1, 1, 0);
+        text3D.text = players[playerIndex].name;
+        text3D.horizontalAlignment = HA_CENTER;
+        text3D.verticalAlignment = VA_CENTER;
+        text3D.faceCamera = true;
     }
 }
 
@@ -592,6 +604,10 @@ void HandlePlayerSpawned(StringHash eventType, VariantMap& eventData)
     {
         playerControls.yaw = playerNode.rotation.yaw;
         playerControls.pitch = 0;
+
+        // Disable the nametag from own character
+        Node@ nameTag = playerNode.GetChild("NameTag");
+        nameTag.enabled = false;
     }
 }
 

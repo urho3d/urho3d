@@ -161,6 +161,11 @@ bool Font::Load(Deserializer& source)
 {
     PROFILE(LoadFont);
     
+    // In headless mode, do not actually load, just return success
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (!graphics)
+        return true;
+        
     faces_.Clear();
     
     fontDataSize_ = source.GetSize();
@@ -288,6 +293,11 @@ bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs)
 
 const FontFace* Font::GetFace(int pointSize)
 {
+    // In headless mode, always return null
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (!graphics)
+        return 0;
+    
     // For bitmap font type, always return the same font face provided by the font's bitmap file regardless of the actual requested point size
     if (fontType_ == FONT_BITMAP)
         pointSize = 0;
@@ -618,7 +628,7 @@ const FontFace* Font::GetFaceBitmap(int pointSize)
         }
         SharedPtr<Texture> texture = LoadFaceTexture(fontImage);
         if (!texture)
-            return 0;        
+            return 0;
         newFace->textures_.Push(texture);
         totalTextureSize += fontImage->GetWidth() * fontImage->GetHeight() * fontImage->GetComponents();
         
@@ -793,7 +803,7 @@ SharedPtr<FontFace> Font::Pack(const FontFace* fontFace)
     
     return packedFontFace;
 }
-    
+
 SharedPtr<Texture> Font::LoadFaceTexture(SharedPtr<Image> image)
 {
     Texture2D* texture = new Texture2D(context_);
