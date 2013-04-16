@@ -44,7 +44,6 @@ void Start()
     SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp");
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("PhysicsCollision", "HandlePhysicsCollision");
-    SubscribeToEvent("PhysicsPostStep", "HandlePhysicsPostStep");
 }
 
 void InitScene()

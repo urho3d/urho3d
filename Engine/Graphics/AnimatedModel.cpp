@@ -191,7 +191,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
     // Update animation here
     if (!animationDirty_ && !animationOrderDirty_)
         return;
-
+    
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
     if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
@@ -251,6 +251,10 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
+    // If model was invisible and did not update animation in the meanwhile, update now
+    if (animationDirty_)
+        UpdateAnimation(frame);
+
     if (morphsDirty_)
         UpdateMorphs();
 
@@ -260,7 +264,7 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType AnimatedModel::GetUpdateGeometryType()
 {
-    if (morphsDirty_)
+    if (animationDirty_ || morphsDirty_)
         return UPDATE_MAIN_THREAD;
     else if (skinningDirty_)
         return UPDATE_WORKER_THREAD;
