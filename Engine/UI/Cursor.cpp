@@ -88,10 +88,22 @@ void Cursor::RegisterObject(Context* context)
 
 void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible)
 {
+    if (!image)
+        return;
+    
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     CursorShapeInfo& info = shapeInfos_[shape];
-    Texture2D* texture = new Texture2D(context_);
-    texture->Load(SharedPtr<Image>(image));
-    info.texture_ = texture;
+    
+    // Prefer to get the texture with same name from cache to prevent creating several copies of the texture
+    if (cache->Exists(image->GetName()))
+        info.texture_ = cache->GetResource<Texture2D>(image->GetName());
+    else
+    {
+        Texture2D* texture = new Texture2D(context_);
+        texture->Load(SharedPtr<Image>(image));
+        info.texture_ = texture;
+    }
+    
     info.imageRect_ = imageRect;
     info.hotSpot_ = hotSpot;
     if (info.osCursor_)
