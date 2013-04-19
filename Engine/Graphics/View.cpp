@@ -50,14 +50,14 @@
 namespace Urho3D
 {
 
-static const Vector3 directions[] =
+static const Vector3* directions[] =
 {
-    Vector3::RIGHT,
-    Vector3::LEFT,
-    Vector3::UP,
-    Vector3::DOWN,
-    Vector3::FORWARD,
-    Vector3::BACK
+    &Vector3::RIGHT,
+    &Vector3::LEFT,
+    &Vector3::UP,
+    &Vector3::DOWN,
+    &Vector3::FORWARD,
+    &Vector3::BACK
 };
 
 static const int CHECK_DRAWABLES_PER_WORK_ITEM = 64;
@@ -2005,7 +2005,7 @@ void View::SetupShadowCameras(LightQueryResult& query)
                 
                 // When making a shadowed point light, align the splits along X, Y and Z axes regardless of light rotation
                 cameraNode->SetPosition(light->GetNode()->GetWorldPosition());
-                cameraNode->SetDirection(directions[i]);
+                cameraNode->SetDirection(*directions[i]);
                 shadowCamera->SetNearClip(light->GetShadowNearFarRatio() * light->GetRange());
                 shadowCamera->SetFarClip(light->GetRange());
                 shadowCamera->SetFov(90.0f);
