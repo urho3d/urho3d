@@ -748,15 +748,6 @@ void BuildAndSaveModel(OutModel& model)
             center /= (float)validFaces * 3;
         }
         
-        // Define the model buffers
-        Vector<SharedPtr<VertexBuffer> > vbVector;
-        Vector<SharedPtr<IndexBuffer> > ibVector;
-        PODVector<unsigned> emptyMorphRange;
-        vbVector.Push(vb);
-        ibVector.Push(ib);
-        outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
-        outModel->SetIndexBuffers(ibVector);
-        
         // Define the geometry
         geom->SetIndexBuffer(ib);
         geom->SetVertexBuffer(0, vb);
@@ -772,6 +763,10 @@ void BuildAndSaveModel(OutModel& model)
         ++destGeomIndex;
     }
     
+    // Define the model buffers and bounding box
+    PODVector<unsigned> emptyMorphRange;
+    outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
+    outModel->SetIndexBuffers(ibVector);
     outModel->SetBoundingBox(box);
     
     // Build skeleton if necessary
