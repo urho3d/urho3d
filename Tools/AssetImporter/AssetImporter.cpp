@@ -327,6 +327,15 @@ void Run(const Vector<String>& arguments)
         if (!scene_)
             ErrorExit("Could not open or parse input file " + inFile);
         
+        // In model mode, if scene has no animations, can flatten the hierarchy to combine submeshes with same material
+        /// \todo It is slow to load scene twice just to know whether there are animations
+        if (command == "model" && (!scene_->HasAnimations() || noAnimations_))
+        {
+            aiReleaseImport(scene_);
+            flags |= aiProcess_OptimizeGraph | aiProcess_PreTransformVertices;
+            scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
+        }
+
         rootNode_ = scene_->mRootNode;
         if (!rootNodeName.Empty())
         {
@@ -638,8 +647,6 @@ void BuildAndSaveModel(OutModel& model)
         if (allUnder65k == true)
             combineBuffers = false;
     }
-    
-    /// \todo Skip empty submeshes (if no valid faces)
     
     SharedPtr<IndexBuffer> ib;
     SharedPtr<VertexBuffer> vb;
