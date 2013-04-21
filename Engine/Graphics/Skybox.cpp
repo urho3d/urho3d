@@ -53,7 +53,7 @@ void Skybox::RegisterObject(Context* context)
 
 void Skybox::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    // Return no ray hits, as camera rays practically always originate within the bounding box, blocking any other results
+    // Do not record a raycast result for a skybox, as it would block all other results
 }
 
 void Skybox::UpdateBatches(const FrameInfo& frame)

@@ -71,7 +71,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Return true if successful.
-    virtual bool Load(Deserializer& source);
+    virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Save to binary data. Return true if successful.
     virtual bool Save(Serializer& dest);
     /// Load from XML data. Return true if successful.

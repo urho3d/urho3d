@@ -102,7 +102,7 @@ void Scene::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Scene, VAR_BUFFER, "Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
 }
 
-bool Scene::Load(Deserializer& source)
+bool Scene::Load(Deserializer& source, bool setInstanceDefault)
 {
     PROFILE(LoadScene);
 
@@ -120,7 +120,7 @@ bool Scene::Load(Deserializer& source)
     Clear();
 
     // Load the whole scene, then perform post-load if successfully loaded
-    if (Node::Load(source))
+    if (Node::Load(source, setInstanceDefault))
     {
         FinishLoading(&source);
         return true;

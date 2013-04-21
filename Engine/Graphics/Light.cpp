@@ -159,7 +159,7 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 
 void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    // Do not record a raycast result for a directional light, as they would overwhelm all other results
+    // Do not record a raycast result for a directional light, as it would block all other results
     if (lightType_ == LIGHT_DIRECTIONAL)
         return;
     

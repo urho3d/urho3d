@@ -97,10 +97,10 @@ void AnimatedModel::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT | AM_NOEDIT);
 }
 
-bool AnimatedModel::Load(Deserializer& source)
+bool AnimatedModel::Load(Deserializer& source, bool setInstanceDefault)
 {
     loading_ = true;
-    bool success = Component::Load(source);
+    bool success = Component::Load(source, setInstanceDefault);
     loading_ = false;
 
     return success;

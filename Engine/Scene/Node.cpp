@@ -86,7 +86,7 @@ void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     MarkNetworkUpdate();
 }
 
-bool Node::Load(Deserializer& source)
+bool Node::Load(Deserializer& source, bool setInstanceDefault)
 {
     SceneResolver resolver;
 

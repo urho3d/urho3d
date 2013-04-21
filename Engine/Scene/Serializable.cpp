@@ -238,7 +238,7 @@ const Vector<AttributeInfo>* Serializable::GetNetworkAttributes() const
     return networkState_ ? networkState_->attributes_ : context_->GetNetworkAttributes(GetType());
 }
 
-bool Serializable::Load(Deserializer& source)
+bool Serializable::Load(Deserializer& source, bool setInstanceDefault)
 {
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
@@ -256,7 +256,16 @@ bool Serializable::Load(Deserializer& source)
             return false;
         }
 
-        OnSetAttribute(attr, source.ReadVariant(attr.type_));
+        Variant varValue = source.ReadVariant(attr.type_);
+        OnSetAttribute(attr, varValue);
+        
+        if (setInstanceDefault)
+        {
+            // Allocate the instance level default value
+            if (!instanceDefaultValues_)
+                instanceDefaultValues_ = new VariantMap();
+            instanceDefaultValues_->operator[] (attr.name_) = varValue;
+        }
     }
 
     return true;
