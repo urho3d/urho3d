@@ -78,6 +78,8 @@ public:
     float GetRepeatRate() const { return repeatRate_; }
 
 protected:
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(XMLElement& dest);
     /// Update slider knob position & size.
     void UpdateSlider();
     /// Send slider page event.

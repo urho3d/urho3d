@@ -33,7 +33,7 @@ class ListView;
 class DropDownList : public Menu
 {
     OBJECT(DropDownList)
-    
+
 public:
     /// Construct.
     DropDownList(Context* context);
@@ -41,14 +41,14 @@ public:
     ~DropDownList();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to the popup being shown.
     virtual void OnShowPopup();
-    
+
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
     /// Insert item to a specific position.
@@ -63,7 +63,7 @@ public:
     void SetSelection(unsigned index);
     /// Set whether popup should be automatically resized to match the dropdown button width.
     void SetResizePopup(bool enable);
-    
+
     /// Return number of items.
     unsigned GetNumItems() const;
     /// Return item at index.
@@ -80,22 +80,27 @@ public:
     UIElement* GetPlaceholder() const { return placeholder_; }
     /// Return whether popup should be automatically resized.
     bool GetResizePopup() const { return resizePopup_; }
-    
+
     /// Set selection attribute.
     void SetSelectionAttr(unsigned index);
-    
+
 protected:
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(XMLElement& dest);
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterPopupImplicitAttributes(XMLElement& dest);
+
     /// Listview element.
     SharedPtr<ListView> listView_;
     /// Selected item placeholder element.
     SharedPtr<UIElement> placeholder_;
     /// Resize popup flag.
     bool resizePopup_;
-    
+
 private:
     /// Handle listview item selected event.
     void HandleItemSelected(StringHash eventType, VariantMap& eventData);
-    
+
     /// Selected item index attribute.
     unsigned selectionAttr_;
 };

@@ -557,10 +557,7 @@ static UIElement* UILoadLayoutWithStyle(XMLFile* file, XMLFile* styleFile, UI* p
 
 static bool UISaveLayout(File* file, UIElement* element, UI* ptr)
 {
-    if (file)
-        return ptr->SaveLayout(*file, element);
-    else
-        return false;
+    return file && ptr->SaveLayout(*file, element);
 }
 
 static void RegisterUI(asIScriptEngine* engine)

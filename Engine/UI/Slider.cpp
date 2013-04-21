@@ -55,7 +55,7 @@ Slider::Slider(Context* context) :
     repeatRate_(0.0f)
 {
     enabled_ = true;
-    knob_ = CreateChild<BorderImage>();
+    knob_ = CreateChild<BorderImage>("S_Knob");
     knob_->SetInternal(true);
 
     UpdateSlider();
@@ -70,6 +70,7 @@ void Slider::RegisterObject(Context* context)
     context->RegisterFactory<Slider>();
 
     COPY_BASE_ATTRIBUTES(Slider, BorderImage);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Slider, "Is Enabled", true);
     ENUM_ACCESSOR_ATTRIBUTE(Slider, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
     ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(Slider, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
@@ -190,6 +191,24 @@ void Slider::ChangeValue(float delta)
 void Slider::SetRepeatRate(float rate)
 {
     repeatRate_ = Max(rate, 0.0f);
+}
+
+bool Slider::FilterImplicitAttributes(XMLElement& dest)
+{
+    if (!BorderImage::FilterImplicitAttributes(dest))
+        return false;
+
+    XMLElement childElem = dest.GetChild("element");
+    if (!childElem)
+        return false;
+    if (!RemoveChildXML(childElem, "Name", "S_Knob"))
+        return false;
+    if (!RemoveChildXML(childElem, "Position"))
+        return false;
+    if (!RemoveChildXML(childElem, "Size"))
+        return false;
+
+    return true;
 }
 
 void Slider::UpdateSlider()

@@ -277,7 +277,7 @@ void UI::Update(float timeStep)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    
+
     if (cursorVisible)
     {
         WeakPtr<UIElement> element(GetElementAt(cursorPos));
@@ -434,12 +434,12 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
         return root;
     }
 
-    if (styleFile)
-        // Set it as default for later use by children elements
-        root->SetDefaultStyle(styleFile);
-    else
-        // Use default style file of the root element if it has one
+    // Use default style file of the root element if it has one
+    if (!styleFile)
         styleFile = rootElement_->GetDefaultStyle(false);
+    // Set it as default for later use by children elements
+    if (styleFile)
+        root->SetDefaultStyle(styleFile);
 
     root->LoadXML(rootElem, styleFile);
     return root;
@@ -449,10 +449,7 @@ bool UI::SaveLayout(Serializer& dest, UIElement* element)
 {
     PROFILE(SaveUILayout);
 
-    if (element)
-        return element->SaveXML(dest);
-    else
-        return false;
+    return element && element->SaveXML(dest);
 }
 
 void UI::SetClipBoardText(const String& text)
@@ -805,7 +802,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    
+
     if (cursorVisible)
     {
         int button = eventData[MouseButtonDown::P_BUTTON].GetInt();
@@ -860,7 +857,7 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    
+
     if (cursorVisible || dragElement_)
     {
         if (dragElement_ && !mouseButtons_)
@@ -932,11 +929,11 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
             cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()));
         }
     }
-    
+
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    
+
     if (cursorVisible && dragElement_ && mouseButtons_)
     {
         if (dragElement_->IsEnabled() && dragElement_->IsVisible())
@@ -960,7 +957,7 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     IntVector2 cursorPos;
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
-    
+
     UIElement* element;
     if (!nonFocusedMouseWheel_&& (element = focusElement_))
         element->OnWheel(delta, mouseButtons_, qualifiers_);

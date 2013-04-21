@@ -334,11 +334,6 @@ static CScriptArray* VariantGetVariantVector(Variant* ptr)
     return VectorToArray<Variant>(ptr->GetVariantVector(), "Array<Variant>");
 }
 
-static bool IsVariantEmpty(Variant* ptr)
-{
-    return ptr->GetType() == VAR_NONE;
-}
-
 static void ConstructVariantMap(VariantMap* ptr)
 {
     new(ptr) VariantMap();
@@ -523,7 +518,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "void FromString(VariantType, const String&in)", asMETHODPR(Variant, FromString, (VariantType, const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "String ToString() const", asMETHOD(Variant, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool get_zero() const", asMETHOD(Variant, IsZero), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool get_empty() const", asFUNCTION(IsVariantEmpty), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "bool get_empty() const", asMETHOD(Variant, IsEmpty), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHOD(Variant, GetType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const String& get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, const String&), asCALL_THISCALL);
 

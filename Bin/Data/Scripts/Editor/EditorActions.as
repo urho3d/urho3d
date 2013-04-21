@@ -370,6 +370,7 @@ class CreateUIElementAction : EditAction
     Variant elementID;
     Variant parentID;
     XMLFile@ elementData;
+    XMLFile@ styleFile;
 
     void Define(UIElement@ element)
     {
@@ -380,6 +381,7 @@ class CreateUIElementAction : EditAction
         // Need another nested element tag otherwise the LoadXML() does not work as expected
         XMLElement childElem = rootElem.CreateChild("element");
         element.SaveXML(childElem);
+        styleFile = element.defaultStyle;
     }
 
     void Undo()
@@ -401,7 +403,7 @@ class CreateUIElementAction : EditAction
             // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
             suppressUIElementChanges = true;
 
-            if (parent.LoadXML(elementData.root))
+            if (parent.LoadXML(elementData.root, styleFile))
             {
                 UIElement@ element = parent.children[parent.numChildren - 1];
                 UpdateHierarchyItem(element);
@@ -419,6 +421,7 @@ class DeleteUIElementAction : EditAction
     Variant elementID;
     Variant parentID;
     XMLFile@ elementData;
+    XMLFile@ styleFile;
 
     void Define(UIElement@ element)
     {
@@ -430,6 +433,7 @@ class DeleteUIElementAction : EditAction
         element.SaveXML(childElem);
         childElem.SetUInt("index", element.parent.FindChild(element));
         childElem.SetUInt("listItemIndex", GetListIndex(element));
+        styleFile = element.defaultStyle;
     }
 
     void Undo()
@@ -440,7 +444,7 @@ class DeleteUIElementAction : EditAction
             // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
             suppressUIElementChanges = true;
 
-            if (parent.LoadXML(elementData.root))
+            if (parent.LoadXML(elementData.root, styleFile))
             {
                 XMLElement childElem = elementData.root.GetChild("element");
                 uint index = childElem.GetUInt("index");

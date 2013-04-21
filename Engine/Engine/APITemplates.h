@@ -372,14 +372,16 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     RegisterObject<T>(engine, className);
     engine->RegisterObjectMethod(className, "bool Load(File@+)", asFUNCTION(SerializableLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(File@+)", asFUNCTION(SerializableSave), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&)", asMETHODPR(T, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&, bool arg1 = false)", asMETHODPR(T, LoadXML, (const XMLElement&, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&)", asMETHODPR(T, SaveXML, (XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void ApplyAttributes()", asMETHODPR(T, ApplyAttributes, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(T, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant GetAttribute(const String&in)", asMETHODPR(T, GetAttribute, (const String&), Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Variant GetAttributeDefault(const String&in)", asMETHODPR(T, GetAttributeDefault, (const String&), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numAttributes() const", asMETHODPR(T, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool set_attributes(uint, const Variant&in) const", asMETHODPR(T, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant get_attributes(uint) const", asMETHODPR(T, GetAttribute, (unsigned), Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Variant get_attributeDefaults(uint) const", asMETHODPR(T, GetAttributeDefault, (unsigned), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(uint) const", asFUNCTION(SerializableGetAttributeInfo), asCALL_CDECL_OBJLAST);
     RegisterSubclass<Object, T>(engine, "Serializable", className);
 }
@@ -746,10 +748,7 @@ template <class T> void RegisterStaticModel(asIScriptEngine* engine, const char*
 
 static bool UIElementLoadXML(File* file, UIElement* ptr)
 {
-    if (file)
-        return ptr->LoadXML(*file);
-    else
-        return false;
+    return file && ptr->LoadXML(*file);
 }
 
 static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
@@ -757,10 +756,7 @@ static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
     if (file)
     {
         XMLElement rootElem = file->GetRoot("element");
-        if (rootElem)
-            return ptr->LoadXML(rootElem, styleFile);
-        else
-            return false;
+        return rootElem && ptr->LoadXML(rootElem, styleFile);
     }
     else
         return false;
@@ -768,10 +764,7 @@ static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
 
 static bool UIElementSaveXML(File* file, UIElement* ptr)
 {
-    if (file)
-        return ptr->SaveXML(*file);
-    else
-        return false;
+    return file && ptr->SaveXML(*file);
 }
 
 static UIElement* UIElementCreateChild(const String& typeName, const String& name, unsigned index, UIElement* ptr)
@@ -822,7 +815,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     RegisterObjectConstructor<T>(engine, className);
     RegisterNamedObjectConstructor<T>(engine, className);
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);
-    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+)", asMETHODPR(T, LoadXML, (const XMLElement&, XMLFile*), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+, bool arg2 = false)", asMETHODPR(T, LoadXML, (const XMLElement&, XMLFile*, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTIONPR(UIElementLoadXML, (File*, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(XMLFile@+, XMLFile@+)", asFUNCTIONPR(UIElementLoadXML, (XMLFile*, XMLFile*, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(File@+)", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);

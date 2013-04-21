@@ -47,9 +47,9 @@ enum CreateMode
 class Node : public Serializable
 {
     OBJECT(Node);
-    
+
     friend class Connection;
-    
+
 public:
     /// Construct.
     Node(Context* context);
@@ -57,13 +57,13 @@ public:
     virtual ~Node();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source);
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source);
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest);
     /// Save as XML data. Return true if successful.
@@ -74,7 +74,7 @@ public:
     virtual bool SaveDefaultAttributes() const { return true; }
     /// Add a replication state that is tracking this node.
     virtual void AddReplicationState(NodeReplicationState* state);
-    
+
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest);
     /// Set name.
@@ -171,7 +171,7 @@ public:
     template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     /// Template version of getting or creating a component.
     template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
-    
+
     /// Return ID.
     unsigned GetID() const { return id_; }
     /// Return name.
@@ -196,40 +196,40 @@ public:
     const Vector3& GetScale() const { return scale_; }
     /// Return transform matrix relative to parent node.
     Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
-    
+
     /// Return position in world space.
     Vector3 GetWorldPosition() const
     {
         return GetWorldTransform().Translation();
     }
-    
+
     /// Return rotation in world space.
     Quaternion GetWorldRotation() const
     {
         return GetWorldTransform().Rotation();
     }
-    
+
     /// Return direction in world space.
     Vector3 GetWorldDirection() const
     {
         return GetWorldTransform().RotationMatrix() * Vector3::FORWARD;
     }
-    
+
     /// Return scale in world space.
     Vector3 GetWorldScale() const
     {
         return GetWorldTransform().Scale();
     }
-    
+
     /// Return transform matrix in world space.
     const Matrix3x4& GetWorldTransform() const
     {
         if (dirty_)
             UpdateWorldTransform();
-        
+
         return worldTransform_;
     }
-    
+
     /// Convert a local space position to world space.
     Vector3 LocalToWorld(const Vector3& position) const;
     /// Convert a local space position or rotation to world space.
@@ -286,7 +286,7 @@ public:
     template <class T> void GetComponents(PODVector<T*>& dest, bool recursive = false) const;
     /// Template version of checking whether has a specific component.
     template <class T> bool HasComponent() const;
-    
+
     /// Set ID. Called by Scene.
     void SetID(unsigned id);
     /// Set scene. Called by Scene.
@@ -323,7 +323,7 @@ public:
     Node* CreateChild(unsigned id, CreateMode mode);
     /// Add a pre-created component.
     void AddComponent(Component* component, unsigned id, CreateMode mode);
-    
+
 protected:
     /// User variables.
     VariantMap vars_;
@@ -343,7 +343,7 @@ private:
     Node* CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode);
     /// Remove a component from this node with the specified iterator.
     void RemoveComponent(Vector<SharedPtr<Component> >::Iterator i);
-   
+
     /// World-space transform matrix.
     mutable Matrix3x4 worldTransform_;
     /// World transform needs update flag.
@@ -397,14 +397,14 @@ template <class T> T* Node::GetDerivedComponent() const
         if (component)
             return component;
     }
-    
+
     return 0;
 }
 
 template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest) const
 {
     dest.Clear();
-    
+
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         T* component = dynamic_cast<T*>(i->Get());

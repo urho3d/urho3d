@@ -117,21 +117,40 @@ void Menu::OnShowPopup()
 {
 }
 
-bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
+bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault)
 {
-    // Apply the style first, but only for non-internal elements
-    if (!internal_ && styleFile)
+    // Get style override if defined
+    String styleName = source.GetAttribute("style");
+
+    // Apply the style first, if the style file is available
+    if (styleFile)
     {
-        // Use style override if defined, otherwise type name
-        String styleName = source.GetAttribute("style");
+        // If not defined, use type name
         if (styleName.Empty())
             styleName = GetTypeName();
 
-        SetStyle(styleFile, styleName);
+        if (styleName.ToLower() == "none")
+            appliedStyle_ = styleName;
+        else
+            SetStyle(styleFile, styleName);
+    }
+    // The 'style' attribute value in the style file cannot be equals to original's applied style to prevent infinite loop
+    else if (!styleName.Empty() && styleName != appliedStyle_)
+    {
+        // Attempt to use the default style file
+        styleFile = GetDefaultStyle();
+
+        if (styleFile)
+        {
+            // Remember the original applied style
+            String appliedStyle(appliedStyle_);
+            SetStyle(styleFile, styleName);
+            appliedStyle_ = appliedStyle;
+        }
     }
 
     // Then load rest of the attributes from the source
-    if (!Serializable::LoadXML(source))
+    if (!Serializable::LoadXML(source, setInstanceDefault))
         return false;
 
     unsigned nextInternalChild = 0;
@@ -145,18 +164,19 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
+        unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
         UIElement* child = 0;
 
         if (!internalElem)
         {
             if (!popupElem)
-                child = CreateChild(typeName);
+                child = CreateChild(typeName, String::EMPTY, index);
             else
             {
                 // Do not add the popup element as a child even temporarily, as that can break layouts
                 SharedPtr<UIElement> popup = DynamicCast<UIElement>(context_->CreateObject(typeName));
                 if (!popup)
-                    LOGERROR("Could not create popup element type " + ShortStringHash(typeName).ToString());
+                    LOGERROR("Could not create popup element type " + typeName);
                 else
                 {
                     child = popup;
@@ -188,7 +208,15 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
 
         if (child)
         {
-            if (!child->LoadXML(childElem, styleFile))
+            if (!styleFile)
+                styleFile = GetDefaultStyle();
+
+            // As popup is not a child element in itself, the parental chain to acquire the default style file is broken for popup's child elements
+            // To recover from this, popup needs to have the default style set in its own instance so the popup's child elements can find it later
+            if (popupElem)
+                child->SetDefaultStyle(styleFile);
+
+            if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
                 return false;
         }
 
@@ -202,27 +230,8 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile)
 
 bool Menu::SaveXML(XMLElement& dest)
 {
-    // Write type and internal flag
-    if (!dest.SetString("type", GetTypeName()))
+    if (!Button::SaveXML(dest))
         return false;
-    if (internal_)
-    {
-        if (!dest.SetBool("internal", internal_))
-            return false;
-    }
-
-    // Write attributes
-    if (!Serializable::SaveXML(dest))
-        return false;
-
-    // Write child elements
-    for (unsigned i = 0; i < children_.Size(); ++i)
-    {
-        UIElement* element = children_[i];
-        XMLElement childElem = dest.CreateChild("element");
-        if (!element->SaveXML(childElem))
-            return false;
-    }
 
     // Save the popup element as a "virtual" child element
     if (popup_)
@@ -231,6 +240,13 @@ bool Menu::SaveXML(XMLElement& dest)
         childElem.SetBool("popup", true);
         if (!popup_->SaveXML(childElem))
             return false;
+
+        // Filter popup implicit attributes
+        if (!FilterPopupImplicitAttributes(childElem))
+        {
+            LOGERROR("Could not remove popup implicit attributes");
+            return false;
+        }
     }
 
     return true;
@@ -317,6 +333,16 @@ void Menu::SetAccelerator(int key, int qualifiers)
         SubscribeToEvent(E_KEYDOWN, HANDLER(Menu, HandleKeyDown));
     else
         UnsubscribeFromEvent(E_KEYDOWN);
+}
+
+bool Menu::FilterPopupImplicitAttributes(XMLElement& dest)
+{
+    if (!RemoveChildXML(dest, "Position"))
+        return false;
+    if (!RemoveChildXML(dest, "Is Visible"))
+        return false;
+
+    return true;
 }
 
 void Menu::HandlePressedReleased(StringHash eventType, VariantMap& eventData)

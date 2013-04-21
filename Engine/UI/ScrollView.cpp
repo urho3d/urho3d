@@ -51,15 +51,15 @@ ScrollView::ScrollView(Context* context) :
     enabled_ = true;
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
-    horizontalScrollBar_ = CreateChild<ScrollBar>();
+    horizontalScrollBar_ = CreateChild<ScrollBar>("SV_HorizontalScrollBar");
     horizontalScrollBar_->SetInternal(true);
     horizontalScrollBar_->SetAlignment(HA_LEFT, VA_BOTTOM);
     horizontalScrollBar_->SetOrientation(O_HORIZONTAL);
-    verticalScrollBar_ = CreateChild<ScrollBar>();
+    verticalScrollBar_ = CreateChild<ScrollBar>("SV_VerticalScrollBar");
     verticalScrollBar_->SetInternal(true);
     verticalScrollBar_->SetAlignment(HA_RIGHT, VA_TOP);
     verticalScrollBar_->SetOrientation(O_VERTICAL);
-    scrollPanel_ = CreateChild<BorderImage>();
+    scrollPanel_ = CreateChild<BorderImage>("SV_ScrollPanel");
     scrollPanel_->SetInternal(true);
     scrollPanel_->SetEnabled(true);
     scrollPanel_->SetClipChildren(true);
@@ -79,6 +79,9 @@ void ScrollView::RegisterObject(Context* context)
     context->RegisterFactory<ScrollView>();
 
     COPY_BASE_ATTRIBUTES(ScrollView, UIElement);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollView, "Clip Children", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollView, "Is Enabled", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollView, "Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     REF_ACCESSOR_ATTRIBUTE(ScrollView, VAR_INTVECTOR2, "View Position", GetViewPosition, SetViewPositionAttr, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Scroll Step", GetScrollStep, SetScrollStep, float, 0.1f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollView, VAR_FLOAT, "Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
@@ -239,6 +242,11 @@ void ScrollView::SetScrollBarsAutoVisible(bool enable)
         // Check whether scrollbars should be visible now
         if (enable)
             OnResize();
+        else
+        {
+            horizontalScrollBar_->SetVisible(true);
+            verticalScrollBar_->SetVisible(true);
+        }
     }
 }
 
@@ -262,6 +270,59 @@ void ScrollView::SetViewPositionAttr(const IntVector2& value)
 {
     viewPositionAttr_ = value;
     SetViewPosition(value);
+}
+
+bool ScrollView::FilterImplicitAttributes(XMLElement& dest)
+{
+    if (!UIElement::FilterImplicitAttributes(dest))
+        return false;
+
+    XMLElement childElem = dest.GetChild("element");
+    if (!FilterScrollBarImplicitAttributes(childElem, "SV_HorizontalScrollBar"))
+        return false;
+    if (!RemoveChildXML(childElem, "Vert Alignment", "Bottom"))
+        return false;
+
+    childElem = childElem.GetNext("element");
+    if (!FilterScrollBarImplicitAttributes(childElem, "SV_VerticalScrollBar"))
+        return false;
+    if (!RemoveChildXML(childElem, "Horiz Alignment", "Right"))
+        return false;
+
+    childElem = childElem.GetNext("element");
+    if (!childElem)
+        return false;
+    if (!RemoveChildXML(childElem, "Name", "SV_ScrollPanel"))
+        return false;
+    if (!RemoveChildXML(childElem, "Is Enabled", "true"))
+        return false;
+    if (!RemoveChildXML(childElem, "Clip Children", "true"))
+        return false;
+    if (!RemoveChildXML(childElem, "Size"))
+        return false;
+
+    return true;
+}
+
+bool ScrollView::FilterScrollBarImplicitAttributes(XMLElement& dest, const String& name)
+{
+    if (!dest)
+        return false;
+    if (!RemoveChildXML(dest, "Name", name))
+        return false;
+    if (!RemoveChildXML(dest, "Orientation"))
+        return false;
+    if (!RemoveChildXML(dest, "Range"))
+        return false;
+    if (!RemoveChildXML(dest, "Step Factor"))
+        return false;
+    if (scrollBarsAutoVisible_)
+    {
+        if (!RemoveChildXML(dest, "Is Visible"))
+            return false;
+    }
+
+    return true;
 }
 
 void ScrollView::UpdatePanelSize()

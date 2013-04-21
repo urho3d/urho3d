@@ -52,6 +52,8 @@ public:
     void RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr);
     /// Remove object attribute.
     void RemoveAttribute(ShortStringHash objectType, const char* name);
+    /// Update object attribute's default value.
+    void UpdateAttributeDefaultValue(ShortStringHash objectType, const char* name, const Variant& defaultValue);
     
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
@@ -65,6 +67,8 @@ public:
     template <class T> void RemoveAttribute(const char* name);
     /// Template version of copying base class attributes to derived class.
     template <class T, class U> void CopyBaseAttributes();
+    /// Template version of updating an object attribute's default value.
+    template <class T> void UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue);
     
     /// Return subsystem by type.
     Object* GetSubsystem(ShortStringHash type) const;
@@ -162,5 +166,6 @@ template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttri
 template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttributes(T::GetTypeStatic(), U::GetTypeStatic()); }
 template <class T> T* Context::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
 template <class T> AttributeInfo* Context::GetAttribute(const char* name) { return GetAttribute(T::GetTypeStatic(), name); }
+template <class T> void Context::UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue) { UpdateAttributeDefaultValue(T::GetTypeStatic(), name, defaultValue); }
 
 }

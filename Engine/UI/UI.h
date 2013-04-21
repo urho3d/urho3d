@@ -143,7 +143,7 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
-    
+
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Vertex shader for no texture.

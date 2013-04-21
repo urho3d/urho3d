@@ -85,6 +85,11 @@ public:
     Slider* GetSlider() const { return slider_; }
     
 protected:
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(XMLElement& dest);
+    /// Filter implicit attributes in serialization process for internal button.
+    bool FilterButtonImplicitAttributes(XMLElement& dest, const String& name);
+
     /// Back button.
     SharedPtr<Button> backButton_;
     /// Forward button.

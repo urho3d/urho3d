@@ -50,16 +50,21 @@ bool NewUIElement(const String&in typeName)
     UIElement@ element = parent.CreateChild(typeName);
     if (element !is null)
     {
+        // Use the predefined UI style if set, otherwise use editor's own UI style
+        XMLFile@ defaultStyle = uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle;
+
         if (editUIElement is null)
         {
             // If parented to root, set the internal variables
             element.vars[FILENAME_VAR] = "";
             element.vars[MODIFIED_VAR] = false;
+            // set a default UI style
+            element.defaultStyle = defaultStyle;
             // and position the newly created element at center
             CenterDialog(element);
         }
-        // Use the predefined UI style if set, otherwise use editor's own UI style
-        element.style = uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle;
+        // Apply the style
+        element.style = defaultStyle;
         // Do not allow UI subsystem to reorder children while editing the element in the editor
         element.sortChildren = false;
 
@@ -329,8 +334,17 @@ void FilterInternalVars(XMLElement source)
     {
         String name = GetVariableName(resultElem.GetUInt("hash"));
         if (name.empty)
+        {
+            XMLElement parent = resultElem.parent;
+
             // If variable name is empty (or unregistered) then it is an internal variable and should be removed
-            resultElem.parent.RemoveChild(resultElem);
+            if (parent.RemoveChild(resultElem))
+            {
+                // If parent does not have any children anymore then remove the parent also
+                if (!parent.HasChild("variant"))
+                    parent.parent.RemoveChild(parent);
+            }
+        }
         else
             // If it is registered then it is a user-defined variable, so 'enrich' the XMLElement to store the variable name in plaintext
             resultElem.SetAttribute("name", name);

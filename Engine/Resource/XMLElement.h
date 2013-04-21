@@ -74,15 +74,19 @@ public:
     bool RemoveChildren(const String& name = String::EMPTY);
     /// Remove child elements of certain name, or all child elements if name is empty. Return true if successful.
     bool RemoveChildren(const char* name);
+    /// Remove an attribute by name. Return true if successful.
+    bool RemoveAttribute(const String& name = String::EMPTY);
+    /// Remove an attribute by name. Return true if successful.
+    bool RemoveAttribute(const char* name);
 
     /// Select an element/attribute using XPath query.
-    XMLElement SelectSingle(const String& query, pugi::xpath_variable_set* variables = 0);
+    XMLElement SelectSingle(const String& query, pugi::xpath_variable_set* variables = 0) const;
     /// Select an element/attribute using XPath query.
-    XMLElement SelectSinglePrepared(const XPathQuery& query);
+    XMLElement SelectSinglePrepared(const XPathQuery& query) const;
     /// Select elements/attributes using XPath query.
-    XPathResultSet Select(const String& query, pugi::xpath_variable_set* variables = 0);
+    XPathResultSet Select(const String& query, pugi::xpath_variable_set* variables = 0) const;
     /// Select elements/attributes using XPath query.
-    XPathResultSet SelectPrepared(const XPathQuery& query);
+    XPathResultSet SelectPrepared(const XPathQuery& query) const;
 
     /// Set an attribute.
     bool SetAttribute(const String& name, const String& value);
@@ -168,7 +172,7 @@ public:
     /// Return attribute, or empty if missing.
     String GetAttribute(const String& name = String::EMPTY) const;
     /// Return attribute, or empty if missing.
-    const char* GetAttribute(const char* name) const;
+    String GetAttribute(const char* name) const;
     /// Return attribute in lowercase, or empty if missing.
     String GetAttributeLower(const String& name) const;
     /// Return attribute in lowercase, or empty if missing.
@@ -266,8 +270,10 @@ public:
     /// Assignment operator.
     XPathResultSet& operator = (const XPathResultSet& rhs);
     /// Return the n-th result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
+    /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
     XMLElement operator[](unsigned index) const;
     /// Return the first result in the set. Call XMLElement::GetNextResult() to get the subsequent result in the set.
+    /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
     XMLElement FirstResult();
     /// Return size of result set.
     unsigned Size() const;
@@ -301,6 +307,8 @@ public:
     bool SetVariable(const String& name, float value);
     /// Add/Set a string variable. Return true if successful.
     bool SetVariable(const String& name, const String& value);
+    /// Add/Set a string variable. Return true if successful.
+    bool SetVariable(const char* name, const char* value);
     /// Add/Set an XPath query result set variable. Return true if successful.
     bool SetVariable(const String& name, const XPathResultSet& value);
     /// Set XPath query string and variable string. The variable string format is "name1:type1,name2:type2,..." where type is one of "Bool", "Float", "String", "ResultSet".
@@ -314,6 +322,7 @@ public:
     /// Evaluate XPath query and expecting a string return value.
     String EvaluateToString(XMLElement element) const;
     /// Evaluate XPath query and expecting an XPath query result set as return value.
+    /// Note: The XPathResultSet return value must be stored in a lhs variable to ensure the underlying xpath_node_set* is still valid while performing XPathResultSet::FirstResult(), XPathResultSet::operator [], and XMLElement::NextResult().
     XPathResultSet Evaluate(XMLElement element) const;
     /// Return query string.
     String GetQuery() const { return queryString_; }

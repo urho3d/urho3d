@@ -68,7 +68,7 @@ Text::Text(Context* context) :
     rowHeight_(0)
 {
     // By default Text does not derive opacity from parent elements
-    SetUseDerivedOpacity(false);
+    useDerivedOpacity_ = false;
 }
 
 Text::~Text()
@@ -80,6 +80,7 @@ void Text::RegisterObject(Context* context)
     context->RegisterFactory<Text>();
 
     COPY_BASE_ATTRIBUTES(Text, UIElement);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Text, "Use Derived Opacity", false);
     ACCESSOR_ATTRIBUTE(Text, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     ATTRIBUTE(Text, VAR_INT, "Font Size", fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
     ATTRIBUTE(Text, VAR_STRING, "Text", text_, String::EMPTY, AM_FILE);
@@ -353,6 +354,24 @@ ResourceRef Text::GetFontAttr() const
     return GetResourceRef(font_, Font::GetTypeStatic());
 }
 
+bool Text::FilterImplicitAttributes(XMLElement& dest)
+{
+    if (!UIElement::FilterImplicitAttributes(dest))
+        return false;
+
+    if (!IsFixedWidth())
+    {
+        if (!RemoveChildXML(dest, "Size"))
+            return false;
+        if (!RemoveChildXML(dest, "Min Size"))
+            return false;
+        if (!RemoveChildXML(dest, "Max Size"))
+            return false;
+    }
+
+    return true;
+}
+
 void Text::UpdateText()
 {
     int width = 0;
@@ -542,7 +561,7 @@ void Text::UpdateText()
     }
 
     // Set minimum and current size according to the text size, but respect fixed width if set
-    if (GetMinWidth() != GetMaxWidth())
+    if (!IsFixedWidth())
     {
         SetMinWidth(wordWrap_ ? 0 : width);
         SetWidth(width);

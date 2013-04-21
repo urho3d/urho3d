@@ -83,6 +83,7 @@ void Cursor::RegisterObject(Context* context)
     context->RegisterFactory<Cursor>();
 
     COPY_BASE_ATTRIBUTES(Cursor, BorderImage);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Cursor, "Priority", M_MAX_INT);
     ACCESSOR_ATTRIBUTE(Cursor, VAR_VARIANTVECTOR, "Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
 }
 

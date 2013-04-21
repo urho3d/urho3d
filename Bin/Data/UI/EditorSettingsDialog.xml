@@ -174,10 +174,11 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element type="Window" internal="true" popup="true">
-                <element type="ListView" internal="true">
-                    <element type="BorderImage" internal="true">
-                        <element internal="true">
+            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
                             <element type="Text" style="FileSelectorFilterText">
                                 <attribute name="Text" value="Geometries" />
                             </element>
@@ -189,6 +190,9 @@
                             </element>
                             <element type="Text" style="FileSelectorFilterText">
                                 <attribute name="Text" value="Rigidbodies" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="UI-elements" />
                             </element>
                         </element>
                     </element>
@@ -252,10 +256,11 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element type="Window" internal="true" popup="true">
-                <element type="ListView" internal="true">
-                    <element type="BorderImage" internal="true">
-                        <element internal="true">
+            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
                             <element type="Text" style="FileSelectorFilterText">
                                 <attribute name="Text" value="Low" />
                             </element>
@@ -284,10 +289,11 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element type="Window" internal="true" popup="true">
-                <element type="ListView" internal="true">
-                    <element type="BorderImage" internal="true">
-                        <element internal="true">
+            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
                             <element type="Text" style="FileSelectorFilterText">
                                 <attribute name="Text" value="Low" />
                             </element>
@@ -316,10 +322,11 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element type="Window" internal="true" popup="true">
-                <element type="ListView" internal="true">
-                    <element type="BorderImage" internal="true">
-                        <element internal="true">
+            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
                             <element type="Text" style="FileSelectorFilterText">
                                 <attribute name="Text" value="Off" />
                             </element>
@@ -351,10 +358,11 @@
             <attribute name="Min Size" value="100 0" />
             <attribute name="Max Size" value="100 2147483647" />
             <attribute name="Resize Popup" value="true" />
-            <element type="Window" internal="true" popup="true">
-                <element type="ListView" internal="true">
-                    <element type="BorderImage" internal="true">
-                        <element internal="true">
+            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
                             <element type="Text" style="FileSelectorFilterText">
                                 <attribute name="Text" value="1-tap 16bit" />
                             </element>

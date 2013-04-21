@@ -111,6 +111,8 @@ public:
     ResourceRef GetFontAttr() const;
     
 protected:
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(XMLElement& dest);
     /// Update text when text, font or spacing changed.
     void UpdateText();
     /// Validate text selection to be within the text.

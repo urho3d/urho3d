@@ -36,9 +36,9 @@ class AnimationState;
 class AnimatedModel : public StaticModel
 {
     OBJECT(AnimatedModel);
-    
+
     friend class AnimationState;
-    
+
 public:
     /// Construct.
     AnimatedModel(Context* context);
@@ -46,11 +46,11 @@ public:
     virtual ~AnimatedModel();
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source);
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source);
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Process octree raycast. May be called from a worker thread.
@@ -65,7 +65,7 @@ public:
     virtual UpdateGeometryType GetUpdateGeometryType();
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Set model.
     void SetModel(Model* model, bool createBones = true);
     /// Add an animation.
@@ -94,7 +94,7 @@ public:
     void SetMorphWeight(StringHash nameHash, float weight);
     /// Reset all vertex morphs to zero.
     void ResetMorphWeights();
-    
+
     /// Return skeleton.
     Skeleton& GetSkeleton() { return skeleton_; }
     /// Return all animation states.
@@ -129,7 +129,7 @@ public:
     float GetMorphWeight(StringHash nameHash) const;
     /// Return whether is the master (first) animated model.
     bool IsMaster() const { return isMaster_; }
-    
+
     /// Set model attribute.
     void SetModelAttr(ResourceRef value);
     /// Set bones' animation enabled attribute.
@@ -150,7 +150,7 @@ public:
     const Vector<PODVector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
     /// Return per-geometry skin matrices. If empty, uses global skinning
     const Vector<PODVector<Matrix3x4> >& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
-    
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -158,7 +158,7 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    
+
 private:
     /// Assign skeleton and animation bone node references as a postprocess. Called by ApplyAttributes.
     void AssignBoneNodes();
@@ -186,7 +186,7 @@ private:
     void ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph, float weight);
     /// Handle model reload finished.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
-    
+
     /// Skeleton.
     Skeleton skeleton_;
     /// Morph vertex buffers.

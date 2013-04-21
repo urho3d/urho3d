@@ -42,16 +42,16 @@ DropDownList::DropDownList(Context* context) :
     Window* window = new Window(context_);
     window->SetInternal(true);
     SetPopup(window);
-    
+
     listView_ = new ListView(context_);
     listView_->SetInternal(true);
     listView_->SetScrollBarsVisible(false, false);
     listView_->SetFocusMode(FM_NOTFOCUSABLE);
     popup_->SetLayout(LM_VERTICAL);
     popup_->AddChild(listView_);
-    placeholder_ = CreateChild<UIElement>();
+    placeholder_ = CreateChild<UIElement>("DDL_PlaceHolder");
     placeholder_->SetInternal(true);
-    
+
     SubscribeToEvent(listView_, E_ITEMSELECTED, HANDLER(DropDownList, HandleItemSelected));
 }
 
@@ -62,7 +62,7 @@ DropDownList::~DropDownList()
 void DropDownList::RegisterObject(Context* context)
 {
     context->RegisterFactory<DropDownList>();
-    
+
     COPY_BASE_ATTRIBUTES(DropDownList, Menu);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_INT, "Selection", GetSelection, SetSelectionAttr, unsigned, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_BOOL, "Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
@@ -77,10 +77,10 @@ void DropDownList::ApplyAttributes()
 void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     Menu::GetBatches(batches, vertexData, currentScissor);
-    
+
     if (!placeholder_->IsVisible())
         return;
-    
+
     UIElement* selectedItem = GetSelectedItem();
     if (selectedItem)
     {
@@ -88,7 +88,7 @@ void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& ver
         const IntVector2& targetPos = placeholder_->GetScreenPosition();
         const IntVector2& originalPos = selectedItem->GetScreenPosition();
         IntVector2 offset = targetPos - originalPos;
-        
+
         // GetBatches() usually resets the hover flag. Therefore get its value and then reset it for the real rendering
         bool hover = selectedItem->IsHovering();
         selectedItem->SetHovering(false);
@@ -106,7 +106,7 @@ void DropDownList::OnShowPopup()
     const IntRect& border = popup_->GetLayoutBorder();
     popup_->SetSize(resizePopup_ ? GetWidth() : contentSize.x_ + border.left_ + border.right_, contentSize.y_ + border.top_ +
         border.bottom_);
-    
+
     // Check if popup fits below the button. If not, show above instead
     bool showAbove = false;
     UIElement* root = GetRoot();
@@ -127,7 +127,7 @@ void DropDownList::AddItem(UIElement* item)
 void DropDownList::InsertItem(unsigned index, UIElement* item)
 {
     listView_->InsertItem(index, item);
-    
+
     // If there was no selection, set to the first
     if (listView_->GetSelection() == M_MAX_UNSIGNED)
         listView_->SetSelection(0);
@@ -186,9 +186,81 @@ UIElement* DropDownList::GetSelectedItem() const
 void DropDownList::SetSelectionAttr(unsigned index)
 {
     selectionAttr_ = index;
-    
+
     // We may not have the list items yet. Apply the index again in ApplyAttributes().
     SetSelection(index);
+}
+
+bool DropDownList::FilterImplicitAttributes(XMLElement& dest)
+{
+    if (!Menu::FilterImplicitAttributes(dest))
+        return false;
+
+    if (!RemoveChildXML(dest, "Popup Offset"))
+        return false;
+
+    XMLElement childElem = dest.GetChild("element");
+    if (!childElem)
+        return false;
+    if (!RemoveChildXML(childElem, "Name", "DDL_PlaceHolder"))
+        return false;
+    if (!RemoveChildXML(childElem, "Size"))
+        return false;
+
+    return true;
+}
+
+bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest)
+{
+    if (!Menu::FilterPopupImplicitAttributes(dest))
+        return false;
+
+    // Window popup
+    if (dest.GetAttribute("style").Empty() && !dest.SetAttribute("style", "none"))
+        return false;
+    if (!RemoveChildXML(dest, "Layout Mode", "Vertical"))
+        return false;
+    if (!RemoveChildXML(dest, "Size"))
+        return false;
+
+    // ListView
+    XMLElement childElem = dest.GetChild("element");
+    if (!childElem)
+        return false;
+    if (!listView_->FilterAttributes(childElem))
+        return false;
+    if (childElem.GetAttribute("style").Empty() && !childElem.SetAttribute("style", "none"))
+        return false;
+    if (!RemoveChildXML(childElem, "Focus Mode", "NotFocusable"))
+        return false;
+    if (!RemoveChildXML(childElem, "Auto Show/Hide Scrollbars", "false"))
+        return false;
+
+    // Horizontal scroll bar
+    childElem = childElem.GetChild("element");
+    if (childElem && !childElem.GetParent().RemoveChild(childElem))
+        return false;
+
+    // Vertical scroll bar
+    childElem = childElem.GetNext("element");
+    if (childElem && !childElem.GetParent().RemoveChild(childElem))
+        return false;
+
+    // Scroll panel
+    childElem = childElem.GetNext("element");
+    if (!childElem)
+        return false;
+    if (childElem.GetAttribute("style").Empty() && !childElem.SetAttribute("style", "none"))
+        return false;
+
+    // Item container
+    childElem = childElem.GetChild("element");
+    if (!childElem)
+        return false;
+    if (childElem.GetAttribute("style").Empty() && !childElem.SetAttribute("style", "none"))
+        return false;
+
+    return true;
 }
 
 void DropDownList::HandleItemSelected(StringHash eventType, VariantMap& eventData)
@@ -197,14 +269,14 @@ void DropDownList::HandleItemSelected(StringHash eventType, VariantMap& eventDat
     UIElement* selectedItem = GetSelectedItem();
     if (selectedItem)
         placeholder_->SetSize(selectedItem->GetSize());
-    
+
     // Close the popup as the selection was made
     if (GetShowPopup())
         ShowPopup(false);
-    
+
     // Send the event forward
     using namespace ItemSelected;
-    
+
     VariantMap newEventData;
     newEventData[P_ELEMENT] = (void*)this;
     newEventData[P_SELECTION] = GetSelection();

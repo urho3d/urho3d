@@ -50,7 +50,8 @@ void CheckBox::RegisterObject(Context* context)
     context->RegisterFactory<CheckBox>();
 
     COPY_BASE_ATTRIBUTES(CheckBox, BorderImage);
-    ACCESSOR_ATTRIBUTE(CheckBox, VAR_BOOL,"Is Checked", IsChecked, SetChecked, bool, true, AM_FILE);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(CheckBox, "Is Enabled", true);
+    ACCESSOR_ATTRIBUTE(CheckBox, VAR_BOOL,"Is Checked", IsChecked, SetChecked, bool, false, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(CheckBox, VAR_INTVECTOR2,"Checked Image Offset", GetCheckedOffset, SetCheckedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 

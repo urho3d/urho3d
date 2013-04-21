@@ -185,6 +185,7 @@ void ListView::RegisterObject(Context* context)
 {
     context->RegisterFactory<ListView>();
 
+    COPY_BASE_ATTRIBUTES(HierarchyContainer, UIElement);
     COPY_BASE_ATTRIBUTES(ListView, ScrollView);
     ENUM_ACCESSOR_ATTRIBUTE(ListView, "Highlight Mode", GetHighlightMode, SetHighlightMode, HighlightMode, highlightModes, HM_FOCUS, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Multiselect", GetMultiselect, SetMultiselect, bool, false, AM_FILE);
@@ -667,9 +668,8 @@ void ListView::SetHierarchyMode(bool enable)
     UIElement* container;
     if (enable)
     {
-        overlayContainer_ = CreateChild<UIElement>();
+        overlayContainer_ = CreateChild<UIElement>("LV_OverlayContainer");
         overlayContainer_->SetInternal(true);
-        overlayContainer_->SetLayoutMode(LM_FREE);
         overlayContainer_->SetSortChildren(false);
         overlayContainer_->SetClipChildren(true);
 
@@ -688,6 +688,7 @@ void ListView::SetHierarchyMode(bool enable)
 
     SetContentElement(container);
     container->SetInternal(true);
+    container->SetName("LV_ItemContainer");
     container->SetEnabled(true);
     container->SetLayout(LM_VERTICAL);
     container->SetSortChildren(false);
@@ -844,6 +845,49 @@ bool ListView::IsExpanded(unsigned index) const
 float ListView::GetDoubleClickInterval() const
 {
     return (float)doubleClickInterval_ / 1000.0f;
+}
+
+bool ListView::FilterImplicitAttributes(XMLElement& dest)
+{
+    if (!ScrollView::FilterImplicitAttributes(dest))
+        return false;
+
+    XMLElement childElem = dest.GetChild("element");    // Horizontal scroll bar
+    if (!childElem)
+        return false;
+    childElem = childElem.GetNext("element");           // Vertical scroll bar
+    if (!childElem)
+        return false;
+    childElem = childElem.GetNext("element");           // Scroll panel
+    if (!childElem)
+        return false;
+
+    XMLElement containerElem = childElem.GetChild("element");   // Item container
+    if (!containerElem)
+        return false;
+    if (!RemoveChildXML(containerElem, "Name", "LV_ItemContainer"))
+        return false;
+    if (!RemoveChildXML(containerElem, "Is Enabled", "true"))
+        return false;
+    if (!RemoveChildXML(containerElem, "Layout Mode", "Vertical"))
+        return false;
+    if (!RemoveChildXML(containerElem, "Size"))
+        return false;
+
+    if (hierarchyMode_)
+    {
+        containerElem = childElem.GetNext("element");           // Overlay container
+        if (!containerElem)
+            return false;
+        if (!RemoveChildXML(containerElem, "Name", "LV_OverlayContainer"))
+            return false;
+        if (!RemoveChildXML(containerElem, "Clip Children", "true"))
+            return false;
+        if (!RemoveChildXML(containerElem, "Size"))
+            return false;
+    }
+
+    return true;
 }
 
 void ListView::UpdateSelectionEffect()

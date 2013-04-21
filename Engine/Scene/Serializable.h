@@ -43,13 +43,13 @@ struct ReplicationState;
 class Serializable : public Object
 {
     OBJECT(Serializable);
-    
+
 public:
     /// Construct.
     Serializable(Context* context);
     /// Destruct.
     virtual ~Serializable();
-    
+
     /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor.
@@ -62,15 +62,15 @@ public:
     virtual bool Load(Deserializer& source);
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest);
-    /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source);
+    /// Load from XML data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes() {}
     /// Return whether should save default-valued attributes into XML. Default false.
     virtual bool SaveDefaultAttributes() const { return false; }
-    
+
     /// Set attribute by index. Return true if successfully set.
     bool SetAttribute(unsigned index, const Variant& value);
     /// Set attribute by name. Return true if successfully set.
@@ -87,19 +87,27 @@ public:
     void ReadDeltaUpdate(Deserializer& source);
     /// Read and apply a network latest data update.
     void ReadLatestDataUpdate(Deserializer& source);
-    
+
     /// Return attribute value by index. Return empty if illegal index.
     Variant GetAttribute(unsigned index);
     /// Return attribute value by name. Return empty if not found.
     Variant GetAttribute(const String& name);
+    /// Return attribute default value by index. Return empty if illegal index.
+    Variant GetAttributeDefault(unsigned index);
+    /// Return attribute default value by name. Return empty if not found.
+    Variant GetAttributeDefault(const String& name);
     /// Return number of attributes.
     unsigned GetNumAttributes() const;
     /// Return number of network replication attributes.
     unsigned GetNumNetworkAttributes() const;
-    
+
 protected:
     /// Network attribute state.
     NetworkState* networkState_;
+
+private:
+    /// Attribute default value at each instance level.
+    VariantMap* instanceDefaultValues_;
 };
 
 /// Template implementation of the attribute accessor invoke helper class.
@@ -108,7 +116,7 @@ template <class T, class U> class AttributeAccessorImpl : public AttributeAccess
 public:
     typedef U (T::*GetFunctionPtr)() const;
     typedef void (T::*SetFunctionPtr)(U);
-    
+
     /// Construct with function pointers.
     AttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
         getFunction_(getFunction),
@@ -117,7 +125,7 @@ public:
         assert(getFunction_);
         assert(setFunction_);
     }
-    
+
     /// Invoke getter function.
     virtual void Get(Serializable* ptr, Variant& dest)
     {
@@ -125,7 +133,7 @@ public:
         T* classPtr = static_cast<T*>(ptr);
         dest = (classPtr->*getFunction_)();
     }
-    
+
     /// Invoke setter function.
     virtual void Set(Serializable* ptr, const Variant& value)
     {
@@ -133,7 +141,7 @@ public:
         T* classPtr = static_cast<T*>(ptr);
         (classPtr->*setFunction_)(value.Get<U>());
     }
-    
+
     /// Class-specific pointer to getter function.
     GetFunctionPtr getFunction_;
     /// Class-specific pointer to setter function.
@@ -146,7 +154,7 @@ template <class T, class U> class RefAttributeAccessorImpl : public AttributeAcc
 public:
     typedef const U& (T::*GetFunctionPtr)() const;
     typedef void (T::*SetFunctionPtr)(const U&);
-    
+
     /// Construct with function pointers.
     RefAttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
         getFunction_(getFunction),
@@ -155,7 +163,7 @@ public:
         assert(getFunction_);
         assert(setFunction_);
     }
-    
+
     /// Invoke getter function.
     virtual void Get(Serializable* ptr, Variant& dest)
     {
@@ -163,7 +171,7 @@ public:
         T* classPtr = static_cast<T*>(ptr);
         dest = (classPtr->*getFunction_)();
     }
-    
+
     /// Invoke setter function.
     virtual void Set(Serializable* ptr, const Variant& value)
     {
@@ -171,7 +179,7 @@ public:
         T* classPtr = static_cast<T*>(ptr);
         (classPtr->*setFunction_)(value.Get<U>());
     }
-    
+
     /// Class-specific pointer to getter function.
     GetFunctionPtr getFunction_;
     /// Class-specific pointer to setter function.
@@ -185,5 +193,6 @@ public:
 #define ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, new AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
 #define ENUM_ACCESSOR_ATTRIBUTE(className, name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(name, new AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), enumNames, defaultValue, mode))
 #define REF_ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, new RefAttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
+#define UPDATE_ATTRIBUTE_DEFAULT_VALUE(className, name, defaultValue) context->UpdateAttributeDefaultValue<className>(name, defaultValue)
 
 }

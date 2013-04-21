@@ -126,9 +126,9 @@ public:
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source);
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Load from XML data with style. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
+    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
 
@@ -171,6 +171,8 @@ public:
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest);
+    /// Filter attributes in serialization process.
+    bool FilterAttributes(XMLElement& dest);
 
     /// Set name.
     void SetName(const String& name);
@@ -453,6 +455,14 @@ public:
 protected:
     /// Mark screen position as needing an update.
     void MarkDirty();
+    /// Remove child XML element by matching attribute name.
+    bool RemoveChildXML(XMLElement& parent, const String& name);
+    /// Remove child XML element by matching attribute name and value.
+    bool RemoveChildXML(XMLElement& parent, const String& name, const String& value);
+    /// Filter UI-style attributes in serialization process.
+    bool FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem);
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(XMLElement& dest);
 
     /// Name.
     String name_;
@@ -514,6 +524,8 @@ protected:
     mutable IntVector2 screenPosition_;
     /// Screen position dirty flag.
     mutable bool positionDirty_;
+    /// Applied style.
+    String appliedStyle_;
 
 private:
     /// Return child elements recursively.

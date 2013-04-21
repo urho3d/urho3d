@@ -27,10 +27,14 @@
                 <attribute name="Name" value="NewVarDropDown" />
                 <attribute name="Min Size" value="50 17" />
                 <attribute name="Max Size" value="50 17" />
-                <element type="Window" internal="true" popup="true">
-                    <element type="ListView" internal="true">
-                        <element type="BorderImage" internal="true">
-                            <element internal="true">
+                <element internal="true">
+                    <attribute name="Is Visible" value="false" />
+                </element>
+                <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                <element type="Window" internal="true" popup="true" style="none">
+                    <element type="ListView" internal="true" style="none">
+                        <element type="BorderImage" internal="true" style="none">
+                            <element internal="true" style="none">
                                 <element type="Text" style="FileSelectorFilterText">
                                     <attribute name="Text" value="Int" />
                                 </element>
@@ -52,9 +56,6 @@
                             </element>
                         </element>
                     </element>
-                </element>
-                <element internal="true">
-                    <attribute name="Is Visible" value="false" />
                 </element>
                 <element type="Text">
                     <attribute name="Text" value="New" />

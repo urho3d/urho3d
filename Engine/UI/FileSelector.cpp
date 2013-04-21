@@ -154,7 +154,7 @@ void FileSelector::SetStyle(XMLFile* style)
     
     style_ = style;
     
-    window_->SetStyleAuto(style);
+    window_->SetDefaultStyle(style);
     window_->SetStyle(style, "FileSelector");
     
     titleText_->SetStyle(style, "FileSelectorTitleText");
@@ -167,15 +167,12 @@ void FileSelector::SetStyle(XMLFile* style)
     fileNameLayout_->SetStyle(style, "FileSelectorLayout");
     buttonLayout_->SetStyle(style, "FileSelectorLayout");
     
-    fileList_->SetStyleAuto(style);
-    fileNameEdit_->SetStyleAuto(style);
-    pathEdit_->SetStyleAuto(style);
+    fileList_->SetStyle(style, "FileSelectorListView");
+    fileNameEdit_->SetStyle(style, "FileSelectorLineEdit");
+    pathEdit_->SetStyle(style, "FileSelectorLineEdit");
     
-    filterList_->SetStyleAuto(style);
     filterList_->SetStyle(style, "FileSelectorFilterList");
     
-    okButton_->SetStyleAuto(style);
-    cancelButton_->SetStyleAuto(style);
     okButton_->SetStyle(style, "FileSelectorButton");
     cancelButton_->SetStyle(style, "FileSelectorButton");
     

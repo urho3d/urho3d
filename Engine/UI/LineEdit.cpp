@@ -74,6 +74,9 @@ void LineEdit::RegisterObject(Context* context)
     context->RegisterFactory<LineEdit>();
 
     COPY_BASE_ATTRIBUTES(LineEdit, BorderImage);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(LineEdit, "Clip Children", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(LineEdit, "Is Enabled", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(LineEdit, "Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_INT, "Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(LineEdit, VAR_BOOL, "Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
@@ -502,6 +505,34 @@ void LineEdit::SetDoubleClickInterval(float interval)
 float LineEdit::GetDoubleClickInterval() const
 {
     return (float)doubleClickInterval_ / 1000.0f;
+}
+
+bool LineEdit::FilterImplicitAttributes(XMLElement& dest)
+{
+    if (!BorderImage::FilterImplicitAttributes(dest))
+        return false;
+
+    XMLElement childElem = dest.GetChild("element");
+    if (!childElem)
+        return false;
+    if (!RemoveChildXML(childElem, "Name", "LE_Text"))
+        return false;
+    if (!RemoveChildXML(childElem, "Position"))
+        return false;
+
+    childElem = childElem.GetNext("element");
+    if (!childElem)
+        return false;
+    if (!RemoveChildXML(childElem, "Name", "LE_Cursor"))
+        return false;
+    if (!RemoveChildXML(childElem, "Priority", "1"))
+        return false;
+    if (!RemoveChildXML(childElem, "Position"))
+        return false;
+    if (!RemoveChildXML(childElem, "Is Visible"))
+        return false;
+
+    return true;
 }
 
 void LineEdit::UpdateText()

@@ -39,7 +39,8 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    networkState_(0)
+    networkState_(0),
+    instanceDefaultValues_(0)
 {
 }
 
@@ -47,6 +48,8 @@ Serializable::~Serializable()
 {
     delete networkState_;
     networkState_ = 0;
+    delete instanceDefaultValues_;
+    instanceDefaultValues_ = 0;
 }
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -57,10 +60,10 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         attr.accessor_->Set(this, src);
         return;
     }
-    
+
     // Calculate the destination address
     void* dest = attr.ptr_ ? attr.ptr_ : reinterpret_cast<unsigned char*>(this) + attr.offset_;
-    
+
     switch (attr.type_)
     {
     case VAR_INT:
@@ -70,63 +73,63 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         else
             *(reinterpret_cast<int*>(dest)) = src.GetInt();
         break;
-        
+
     case VAR_BOOL:
         *(reinterpret_cast<bool*>(dest)) = src.GetBool();
         break;
-        
+
     case VAR_FLOAT:
         *(reinterpret_cast<float*>(dest)) = src.GetFloat();
         break;
-        
+
     case VAR_VECTOR2:
         *(reinterpret_cast<Vector2*>(dest)) = src.GetVector2();
         break;
-        
+
     case VAR_VECTOR3:
         *(reinterpret_cast<Vector3*>(dest)) = src.GetVector3();
         break;
-        
+
     case VAR_VECTOR4:
         *(reinterpret_cast<Vector4*>(dest)) = src.GetVector4();
         break;
-        
+
     case VAR_QUATERNION:
         *(reinterpret_cast<Quaternion*>(dest)) = src.GetQuaternion();
         break;
-        
+
     case VAR_COLOR:
         *(reinterpret_cast<Color*>(dest)) = src.GetColor();
         break;
-        
+
     case VAR_STRING:
         *(reinterpret_cast<String*>(dest)) = src.GetString();
         break;
-        
+
     case VAR_BUFFER:
         *(reinterpret_cast<PODVector<unsigned char>*>(dest)) = src.GetBuffer();
         break;
-        
+
     case VAR_RESOURCEREF:
         *(reinterpret_cast<ResourceRef*>(dest)) = src.GetResourceRef();
         break;
-        
+
     case VAR_RESOURCEREFLIST:
         *(reinterpret_cast<ResourceRefList*>(dest)) = src.GetResourceRefList();
         break;
-        
+
     case VAR_VARIANTVECTOR:
         *(reinterpret_cast<VariantVector*>(dest)) = src.GetVariantVector();
         break;
-        
+
     case VAR_VARIANTMAP:
         *(reinterpret_cast<VariantMap*>(dest)) = src.GetVariantMap();
         break;
-        
+
     case VAR_INTRECT:
         *(reinterpret_cast<IntRect*>(dest)) = src.GetIntRect();
         break;
-        
+
     case VAR_INTVECTOR2:
         *(reinterpret_cast<IntVector2*>(dest)) = src.GetIntVector2();
         break;
@@ -145,10 +148,10 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
         attr.accessor_->Get(this, dest);
         return;
     }
-    
+
     // Calculate the source address
     void* src = attr.ptr_ ? attr.ptr_ : reinterpret_cast<unsigned char*>(this) + attr.offset_;
-    
+
     switch (attr.type_)
     {
     case VAR_INT:
@@ -158,67 +161,67 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
         else
             dest = *(reinterpret_cast<const int*>(src));
         break;
-        
+
     case VAR_BOOL:
         dest = *(reinterpret_cast<const bool*>(src));
         break;
-        
+
     case VAR_FLOAT:
         dest = *(reinterpret_cast<const float*>(src));
         break;
-        
+
     case VAR_VECTOR2:
         dest = *(reinterpret_cast<const Vector2*>(src));
         break;
-        
+
     case VAR_VECTOR3:
         dest = *(reinterpret_cast<const Vector3*>(src));
         break;
-        
+
     case VAR_VECTOR4:
         dest = *(reinterpret_cast<const Vector4*>(src));
         break;
-        
+
     case VAR_QUATERNION:
         dest = *(reinterpret_cast<const Quaternion*>(src));
         break;
-        
+
     case VAR_COLOR:
         dest = *(reinterpret_cast<const Color*>(src));
         break;
-        
+
     case VAR_STRING:
         dest = *(reinterpret_cast<const String*>(src));
         break;
-        
+
     case VAR_BUFFER:
         dest = *(reinterpret_cast<const PODVector<unsigned char>*>(src));
         break;
-        
+
     case VAR_RESOURCEREF:
         dest = *(reinterpret_cast<const ResourceRef*>(src));
         break;
-        
+
     case VAR_RESOURCEREFLIST:
         dest = *(reinterpret_cast<const ResourceRefList*>(src));
         break;
-        
+
     case VAR_VARIANTVECTOR:
         dest = *(reinterpret_cast<const VariantVector*>(src));
         break;
-        
+
     case VAR_VARIANTMAP:
         dest = *(reinterpret_cast<const VariantMap*>(src));
         break;
-        
+
     case VAR_INTRECT:
         dest = *(reinterpret_cast<const IntRect*>(src));
         break;
-        
+
     case VAR_INTVECTOR2:
         dest = *(reinterpret_cast<const IntVector2*>(src));
         break;
-    
+
     default:
         LOGERROR("Unsupported attribute type for OnGetAttribute()");
         return;
@@ -240,22 +243,22 @@ bool Serializable::Load(Deserializer& source)
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
-    
+
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_FILE))
             continue;
-        
+
         if (source.IsEof())
         {
             LOGERROR("Could not load " + GetTypeName() + ", stream not open or at end");
             return false;
         }
-        
+
         OnSetAttribute(attr, source.ReadVariant(attr.type_));
     }
-    
+
     return true;
 }
 
@@ -264,63 +267,65 @@ bool Serializable::Save(Serializer& dest)
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
-    
+
     Variant value;
-    
+
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_FILE))
             continue;
-        
+
         OnGetAttribute(attr, value);
-        
+
         if (!dest.WriteVariantData(value))
         {
             LOGERROR("Could not save " + GetTypeName() + ", writing to stream failed");
             return false;
         }
     }
-    
+
     return true;
 }
 
-bool Serializable::LoadXML(const XMLElement& source)
+bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
     if (source.IsNull())
     {
         LOGERROR("Could not load " + GetTypeName() + ", null source element");
         return false;
     }
-    
+
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
-    
+
     XMLElement attrElem = source.GetChild("attribute");
     unsigned startIndex = 0;
-    
+
     while (attrElem)
     {
-        const char* name = attrElem.GetAttribute("name");
+        String name = attrElem.GetAttribute("name");
         unsigned i = startIndex;
         unsigned attempts = attributes->Size();
-        
+
         while (attempts)
         {
             const AttributeInfo& attr = attributes->At(i);
             if ((attr.mode_ & AM_FILE) && !attr.name_.Compare(name, true))
             {
+                Variant varValue;
+
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
                 {
-                    const char* value = attrElem.GetAttribute("value");
+                    String value = attrElem.GetAttribute("value");
                     bool enumFound = false;
                     int enumValue = 0;
                     const char** enumPtr = attr.enumNames_;
                     while (*enumPtr)
                     {
-                        if (!String::Compare(*enumPtr, value, false))
+                        if (!value.Compare(*enumPtr, false))
                         {
                             enumFound = true;
                             break;
@@ -329,13 +334,26 @@ bool Serializable::LoadXML(const XMLElement& source)
                         ++enumValue;
                     }
                     if (enumFound)
-                        OnSetAttribute(attr, Variant(enumValue));
+                        varValue = enumValue;
                     else
-                        LOGWARNING("Unknown enum value " + String(value) + " in attribute " + String(attr.name_));
+                        LOGWARNING("Unknown enum value " + value + " in attribute " + attr.name_);
                 }
                 else
-                    OnSetAttribute(attr, attrElem.GetVariantValue(attr.type_));
-                
+                    varValue = attrElem.GetVariantValue(attr.type_);
+
+                if (!varValue.IsEmpty())
+                {
+                    OnSetAttribute(attr, varValue);
+
+                    if (setInstanceDefault)
+                    {
+                        // Allocate the instance level default value
+                        if (!instanceDefaultValues_)
+                            instanceDefaultValues_ = new VariantMap();
+                        instanceDefaultValues_->operator[] (attr.name_) = varValue;
+                    }
+                }
+
                 startIndex = (i + 1) % attributes->Size();
                 break;
             }
@@ -345,13 +363,13 @@ bool Serializable::LoadXML(const XMLElement& source)
                 --attempts;
             }
         }
-        
+
         if (!attempts)
-            LOGWARNING("Unknown attribute " + String(name) + " in XML data");
-        
+            LOGWARNING("Unknown attribute " + name + " in XML data");
+
         attrElem = attrElem.GetNext("attribute");
     }
-    
+
     return true;
 }
 
@@ -362,25 +380,26 @@ bool Serializable::SaveXML(XMLElement& dest)
         LOGERROR("Could not save " + GetTypeName() + ", null destination element");
         return false;
     }
-    
+
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
-    
+
     Variant value;
-    
+
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_FILE))
             continue;
-        
+
         OnGetAttribute(attr, value);
-        
+        Variant defaultValue(GetAttributeDefault(i));
+
         // In XML serialization default values can be skipped. This will make the file easier to read or edit manually
-        if (value == attr.defaultValue_ && !SaveDefaultAttributes())
+        if (value == defaultValue && !SaveDefaultAttributes())
             continue;
-        
+
         XMLElement attrElem = dest.CreateChild("attribute");
         attrElem.SetAttribute("name", attr.name_);
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
@@ -392,7 +411,7 @@ bool Serializable::SaveXML(XMLElement& dest)
         else
             attrElem.SetVariantValue(value);
     }
-    
+
     return true;
 }
 
@@ -409,9 +428,9 @@ bool Serializable::SetAttribute(unsigned index, const Variant& value)
         LOGERROR("Attribute index out of bounds");
         return false;
     }
-    
+
     const AttributeInfo& attr = attributes->At(index);
-    
+
     // Check that the new value's type matches the attribute type
     if (value.GetType() == attr.type_)
     {
@@ -434,7 +453,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
         LOGERROR(GetTypeName() + " has no attributes");
         return false;
     }
-    
+
     for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
         if (!i->name_.Compare(name, true))
@@ -453,7 +472,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
             }
         }
     }
-    
+
     LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
     return false;
 }
@@ -475,14 +494,14 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
         LOGERROR("WriteInitialDeltaUpdate called without allocated NetworkState");
         return;
     }
-    
+
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
-    
+
     unsigned numAttributes = attributes->Size();
     DirtyBits attributeBits;
-    
+
     // Compare against defaults
     for (unsigned i = 0; i < numAttributes; ++i)
     {
@@ -490,10 +509,10 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest)
         if (networkState_->currentValues_[i] != attr.defaultValue_)
             attributeBits.Set(i);
     }
-    
+
     // First write the change bitfield, then attribute data for non-default attributes
     dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
-    
+
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
@@ -508,17 +527,17 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, const DirtyBits& attribute
         LOGERROR("WriteDeltaUpdate called without allocated NetworkState");
         return;
     }
-    
+
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
-    
+
     unsigned numAttributes = attributes->Size();
-    
+
     // First write the change bitfield, then attribute data for changed attributes
     // Note: the attribute bits should not contain LATESTDATA attributes
     dest.Write(attributeBits.data_, (numAttributes + 7) >> 3);
-    
+
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributeBits.IsSet(i))
@@ -533,13 +552,13 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest)
         LOGERROR("WriteLatestDataUpdate called without allocated NetworkState");
         return;
     }
-    
+
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
-    
+
     unsigned numAttributes = attributes->Size();
-    
+
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         if (attributes->At(i).mode_ & AM_LATESTDATA)
@@ -552,12 +571,12 @@ void Serializable::ReadDeltaUpdate(Deserializer& source)
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
         return;
-    
+
     unsigned numAttributes = attributes->Size();
     DirtyBits attributeBits;
-    
+
     source.Read(attributeBits.data_, (numAttributes + 7) >> 3);
-    
+
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {
         if (attributeBits.IsSet(i))
@@ -573,9 +592,9 @@ void Serializable::ReadLatestDataUpdate(Deserializer& source)
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
         return;
-    
+
     unsigned numAttributes = attributes->Size();
-    
+
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
@@ -587,7 +606,7 @@ void Serializable::ReadLatestDataUpdate(Deserializer& source)
 Variant Serializable::GetAttribute(unsigned index)
 {
     Variant ret;
-    
+
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
     {
@@ -607,14 +626,14 @@ Variant Serializable::GetAttribute(unsigned index)
 Variant Serializable::GetAttribute(const String& name)
 {
     Variant ret;
-    
+
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
         return ret;
     }
-    
+
     for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
         if (!i->name_.Compare(name, true))
@@ -623,9 +642,60 @@ Variant Serializable::GetAttribute(const String& name)
             return ret;
         }
     }
-    
+
     LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
     return ret;
+}
+
+Variant Serializable::GetAttributeDefault(unsigned index)
+{
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    if (!attributes)
+    {
+        LOGERROR(GetTypeName() + " has no attributes");
+        return Variant::EMPTY;
+    }
+    if (index >= attributes->Size())
+    {
+        LOGERROR("Attribute index out of bounds");
+        return Variant::EMPTY;
+    }
+
+    AttributeInfo attr = attributes->At(index);
+    if (instanceDefaultValues_)
+    {
+        VariantMap::ConstIterator i = instanceDefaultValues_->Find(attr.name_);
+        if (i != instanceDefaultValues_->End())
+            return i->second_;
+    }
+
+    return attr.defaultValue_;
+}
+
+Variant Serializable::GetAttributeDefault(const String& name)
+{
+    if (instanceDefaultValues_)
+    {
+        VariantMap::ConstIterator i = instanceDefaultValues_->Find(name);
+        if (i != instanceDefaultValues_->End())
+            return i->second_;
+    }
+
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    if (!attributes)
+    {
+        LOGERROR(GetTypeName() + " has no attributes");
+        return Variant::EMPTY;
+    }
+
+    for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
+    {
+        if (!i->name_.Compare(name, true))
+            return i->defaultValue_;
+    }
+
+    LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
+    return Variant::EMPTY;
 }
 
 unsigned Serializable::GetNumAttributes() const

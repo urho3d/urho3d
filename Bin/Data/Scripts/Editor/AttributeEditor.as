@@ -101,10 +101,10 @@ UIElement@ CreateAttributeEditorParent(ListView@ list, const String&in name, uin
     list.AddItem(editorParent);
 
     Text@ attrNameText = Text();
+    editorParent.AddChild(attrNameText);
     attrNameText.SetStyle(uiStyle, "EditorAttributeText");
     attrNameText.text = name;
     attrNameText.SetFixedWidth(ATTRNAME_WIDTH);
-    editorParent.AddChild(attrNameText);
 
     return editorParent;
 }
@@ -112,12 +112,12 @@ UIElement@ CreateAttributeEditorParent(ListView@ list, const String&in name, uin
 LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ serializables, uint index, uint subIndex)
 {
     LineEdit@ attrEdit = LineEdit();
+    parent.AddChild(attrEdit);
     attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
     attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
-    parent.AddChild(attrEdit);
 
     return attrEdit;
 }
@@ -143,12 +143,12 @@ UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ seria
         parent = CreateAttributeEditorParent(list, info.name, index, subIndex);
 
     CheckBox@ attrEdit = CheckBox();
+    parent.AddChild(attrEdit);
     attrEdit.style = uiStyle;
     attrEdit.SetFixedSize(16, 16);
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
-    parent.AddChild(attrEdit);
     SubscribeToEvent(attrEdit, "Toggled", "EditAttribute");
 
     return parent;
@@ -191,6 +191,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     else
     {
         DropDownList@ attrEdit = DropDownList();
+        parent.AddChild(attrEdit);
         attrEdit.style = uiStyle;
         attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
         attrEdit.resizePopup = true;
@@ -202,11 +203,10 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         for (uint i = 0; i < info.enumNames.length; ++i)
         {
             Text@ choice = Text();
+            attrEdit.AddItem(choice);
             choice.SetStyle(uiStyle, "EditorEnumAttributeText");
             choice.text = info.enumNames[i];
-            attrEdit.AddItem(choice);
         }
-        parent.AddChild(attrEdit);
         SubscribeToEvent(attrEdit, "ItemSelected", "EditAttribute");
     }
 
@@ -741,6 +741,9 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool 
         AttributeInfo info = serializables[0].attributeInfos[i];
         if (!showNonEditableAttribute && info.mode & AM_NOEDIT != 0)
             continue;
+
+        // Use the default value (could be instance's default value) of the first serializable as the default for all
+        info.defaultValue = serializables[0].attributeDefaults[i];
 
         if (fullUpdate)
             CreateAttributeEditor(list, serializables, info, i, 0);

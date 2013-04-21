@@ -106,10 +106,10 @@ bool AnimatedModel::Load(Deserializer& source)
     return success;
 }
 
-bool AnimatedModel::LoadXML(const XMLElement& source)
+bool AnimatedModel::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
     loading_ = true;
-    bool success = Component::LoadXML(source);
+    bool success = Component::LoadXML(source, setInstanceDefault);
     loading_ = false;
 
     return success;
@@ -191,7 +191,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
     // Update animation here
     if (!animationDirty_ && !animationOrderDirty_)
         return;
-    
+
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
     if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)

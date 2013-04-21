@@ -62,6 +62,9 @@ void Window::RegisterObject(Context* context)
     context->RegisterFactory<Window>();
 
     COPY_BASE_ATTRIBUTES(Window, BorderImage);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Window, "Bring To Front", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Window, "Clip Children", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Window, "Is Enabled", true);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_INTRECT, "Resize Border", GetResizeBorder, SetResizeBorder, IntRect, IntRect(DEFAULT_RESIZE_BORDER, \
         DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER), AM_FILE);
     ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Movable", IsMovable, SetMovable, bool, false, AM_FILE);

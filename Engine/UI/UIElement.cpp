@@ -169,7 +169,7 @@ void UIElement::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTRECT, "Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
@@ -186,7 +186,7 @@ void UIElement::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Back", GetBringToBack, SetBringToBack, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Clip Children", GetClipChildren, SetClipChildren, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Focus Mode", GetFocusMode, SetFocusMode, FocusMode, focusModes, FM_NOTFOCUSABLE, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Drag And Drop Mode", GetDragDropMode, SetDragDropMode, unsigned, dragDropModes, DD_DISABLED, AM_FILE);
     ENUM_ACCESSOR_ATTRIBUTE(UIElement, "Layout Mode", GetLayoutMode, SetLayoutMode, LayoutMode, layoutModes, LM_FREE, AM_FILE);
@@ -209,26 +209,45 @@ void UIElement::ApplyAttributes()
     }
 }
 
-bool UIElement::LoadXML(const XMLElement& source)
+bool UIElement::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
-    return LoadXML(source, 0);
+    return LoadXML(source, 0, setInstanceDefault);
 }
 
-bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
+bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault)
 {
-    // Apply the style first, but only for non-internal elements
-    if (!internal_ && styleFile)
+    // Get style override if defined
+    String styleName = source.GetAttribute("style");
+
+    // Apply the style first, if the style file is available
+    if (styleFile)
     {
-        // Use style override if defined, otherwise type name
-        String styleName = source.GetAttribute("style");
+        // If not defined, use type name
         if (styleName.Empty())
             styleName = GetTypeName();
 
-        SetStyle(styleFile, styleName);
+        if (styleName.ToLower() == "none")
+            appliedStyle_ = styleName;
+        else
+            SetStyle(styleFile, styleName);
+    }
+    // The 'style' attribute value in the style file cannot be equals to original's applied style to prevent infinite loop
+    else if (!styleName.Empty() && styleName != appliedStyle_)
+    {
+        // Attempt to use the default style file
+        styleFile = GetDefaultStyle();
+
+        if (styleFile)
+        {
+            // Remember the original applied style
+            String appliedStyle(appliedStyle_);
+            SetStyle(styleFile, styleName);
+            appliedStyle_ = appliedStyle;
+        }
     }
 
     // Then load rest of the attributes from the source
-    if (!Serializable::LoadXML(source))
+    if (!Serializable::LoadXML(source, setInstanceDefault))
         return false;
 
     unsigned nextInternalChild = 0;
@@ -264,7 +283,9 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
 
         if (child)
         {
-            if (!child->LoadXML(childElem, styleFile))
+            if (!styleFile)
+                styleFile = GetDefaultStyle();
+            if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
                 return false;
         }
 
@@ -278,12 +299,24 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile)
 
 bool UIElement::SaveXML(XMLElement& dest)
 {
-    // Write type and internal flag
-    if (!dest.SetString("type", GetTypeName()))
-        return false;
+    // Write type
+    if (GetTypeName() != "UIElement")
+    {
+        if (!dest.SetString("type", GetTypeName()))
+            return false;
+    }
+
+    // Write internal flag
     if (internal_)
     {
         if (!dest.SetBool("internal", internal_))
+            return false;
+    }
+
+    // Write style
+    if (!appliedStyle_.Empty())
+    {
+        if (!dest.SetAttribute("style", appliedStyle_))
             return false;
     }
 
@@ -299,6 +332,12 @@ bool UIElement::SaveXML(XMLElement& dest)
         if (!element->SaveXML(childElem))
             return false;
     }
+
+    // Filter UI-style and implicit attributes
+    //\todo Fail the serialization when encountered error in filtering, for now let it passes until the filtering process is stable and fully tested in the field
+//    if (!FilterAttributes(dest))
+//        return false;
+    FilterAttributes(dest);
 
     return true;
 }
@@ -316,14 +355,35 @@ void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertex
 void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+
+    int horizontalThickness = 1;
+    int verticalThickness = 1;
+    if (parent_)
+    {
+        switch (parent_->layoutMode_)
+        {
+        case LM_HORIZONTAL:
+            verticalThickness +=2;
+            break;
+
+        case LM_VERTICAL:
+            horizontalThickness += 2;
+            break;
+
+        default:
+            break;
+        }
+    }
+
     // Left
-    batch.AddQuad(0, 0, 1, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, 0, horizontalThickness, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
     // Top
-    batch.AddQuad(0, 0, size_.x_, 1, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, 0, size_.x_, verticalThickness, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
     // Right
-    batch.AddQuad(size_.x_ - 1, 0, 1, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(size_.x_ - horizontalThickness, 0, horizontalThickness, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
     // Bottom
-    batch.AddQuad(0, size_.y_ - 1, size_.x_, 1, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, size_.y_ - verticalThickness, size_.x_, verticalThickness, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+
     UIBatch::AddOrMerge(batch, batches);
 }
 
@@ -443,20 +503,42 @@ void UIElement::OnPositionSet()
 bool UIElement::LoadXML(Deserializer& source)
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
-    if (!xml->Load(source))
-        return false;
-
-    return LoadXML(xml->GetRoot());
+    return xml->Load(source) && LoadXML(xml->GetRoot());
 }
 
 bool UIElement::SaveXML(Serializer& dest)
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("element");
-    if (!SaveXML(rootElem))
-        return false;
+    return SaveXML(rootElem) && xml->Save(dest);
+}
 
-    return xml->Save(dest);
+bool UIElement::FilterAttributes(XMLElement& dest)
+{
+    // Filter UI styling attributes
+    XMLFile* styleFile = GetDefaultStyle();
+    if (styleFile)
+    {
+        String style = dest.GetAttribute("style");
+        if (!style.Empty() && style != "none")
+        {
+            if (styleXPathQuery_.SetVariable("typeName", style))
+            {
+                XMLElement styleElem = GetDefaultStyle()->GetRoot().SelectSinglePrepared(styleXPathQuery_);
+                if (!styleElem || !FilterUIStyleAttributes(dest, styleElem))
+                    return false;
+            }
+        }
+    }
+
+    // Filter implicit attributes
+    if (!FilterImplicitAttributes(dest))
+    {
+        LOGERROR("Could not remove implicit attributes");
+        return false;
+    }
+
+    return true;
 }
 
 void UIElement::SetName(const String& name)
@@ -773,7 +855,8 @@ void UIElement::SetStyle(XMLFile* file, const String& typeName)
 
 void UIElement::SetStyle(const XMLElement& element)
 {
-    LoadXML(element);
+    appliedStyle_ = element.GetAttribute("type");
+    LoadXML(element, true);
 }
 
 void UIElement::SetStyleAuto(XMLFile* file)
@@ -1461,6 +1544,92 @@ void UIElement::MarkDirty()
 
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
         (*i)->MarkDirty();
+}
+
+bool UIElement::RemoveChildXML(XMLElement& parent, const String& name)
+{
+    static XPathQuery matchXPathQuery("./attribute[@name=$attributeName]", "attributeName:String");
+
+    if (!matchXPathQuery.SetVariable("attributeName", name))
+        return false;
+
+    XMLElement removeElem = parent.SelectSinglePrepared(matchXPathQuery);
+    return !removeElem || parent.RemoveChild(removeElem);
+}
+
+bool UIElement::RemoveChildXML(XMLElement& parent, const String& name, const String& value)
+{
+    static XPathQuery matchXPathQuery("./attribute[@name=$attributeName and @value=$attributeValue]", "attributeName:String, attributeValue:String");
+
+    if (!matchXPathQuery.SetVariable("attributeName", name))
+        return false;
+    if (!matchXPathQuery.SetVariable("attributeValue", value))
+        return false;
+
+    XMLElement removeElem = parent.SelectSinglePrepared(matchXPathQuery);
+    return !removeElem || parent.RemoveChild(removeElem);
+}
+
+bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem)
+{
+    // Remove style attribute only when its value is identical to the value stored in style file
+    String style = styleElem.GetAttribute("style");
+    if (!style.Empty())
+    {
+        if (style == dest.GetAttribute("style"))
+        {
+            if (!dest.RemoveAttribute("style"))
+            {
+                LOGWARNING("Could not remove style attribute");
+                return false;
+            }
+        }
+    }
+
+    // Perform the same action recursively for internal child elements stored in style file
+    XMLElement childDest = dest.GetChild("element");
+    XMLElement childElem = styleElem.GetChild("element");
+    while (childDest && childElem)
+    {
+        if (!childElem.GetBool("internal"))
+        {
+            LOGERROR("Invalid style style, style element can only contain internal child elements");
+            return false;
+        }
+        if (!FilterUIStyleAttributes(childDest, childElem))
+            return false;
+
+        childDest = childDest.GetNext("element");
+        childElem = childElem.GetNext("element");
+    }
+
+    return true;
+}
+
+bool UIElement::FilterImplicitAttributes(XMLElement& dest)
+{
+    // Remove style attribute when it is the same as its type
+    if (!dest.GetAttribute("style").Empty() && dest.GetAttribute("style") == dest.GetAttribute("type"))
+    {
+        if (!dest.RemoveAttribute("style"))
+            return false;
+    }
+
+    // Remove positioning and sizing attributes when they are under the influence of layout mode
+    if (layoutMode_ != LM_FREE && minSize_ != maxSize_)
+    {
+        if (!RemoveChildXML(dest, "Min Size"))
+            return false;
+    }
+    if (parent_ && parent_->layoutMode_ != LM_FREE)
+    {
+        if (!RemoveChildXML(dest, "Position"))
+            return false;
+        if (!RemoveChildXML(dest, "Size"))
+            return false;
+    }
+
+    return true;
 }
 
 void UIElement::GetChildrenRecursive(PODVector<UIElement*>& dest) const

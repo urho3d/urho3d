@@ -31,9 +31,9 @@ namespace Urho3D
 class Menu : public Button
 {
     OBJECT(Menu);
-    
+
     using UIElement::LoadXML;
-    
+
 public:
     /// Construct.
     Menu(Context* context);
@@ -41,19 +41,19 @@ public:
     virtual ~Menu();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Load from XML data with style. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
+    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
-    
+
     /// Perform UI element update.
     virtual void Update(float timeStep);
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to the popup being shown.
     virtual void OnShowPopup();
-    
+
     /// Set popup element to show on selection.
     void SetPopup(UIElement* element);
     /// Set popup element offset.
@@ -64,7 +64,7 @@ public:
     void ShowPopup(bool enable);
     /// Set accelerator key (set zero key code to disable.)
     void SetAccelerator(int key, int qualifiers);
-    
+
     /// Return popup element.
     UIElement* GetPopup() const { return popup_; }
     /// Return popup element offset.
@@ -75,8 +75,10 @@ public:
     int GetAcceleratorKey() const { return acceleratorKey_; }
     /// Return accelerator qualifiers.
     int GetAcceleratorQualifiers() const { return acceleratorQualifiers_; }
-    
+
 protected:
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterPopupImplicitAttributes(XMLElement& dest);
     /// Popup element.
     SharedPtr<UIElement> popup_;
     /// Popup element offset.
@@ -87,7 +89,7 @@ protected:
     int acceleratorKey_;
     /// Accelerator qualifiers.
     int acceleratorQualifiers_;
-    
+
 private:
     /// Handle press and release for selection and toggling popup visibility.
     void HandlePressedReleased(StringHash eventType, VariantMap& eventData);

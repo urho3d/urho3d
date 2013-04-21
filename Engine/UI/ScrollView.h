@@ -34,7 +34,7 @@ class ScrollBar;
 class ScrollView : public UIElement
 {
     OBJECT(ScrollView);
-    
+
 public:
     /// Construct.
     ScrollView(Context* context);
@@ -42,7 +42,7 @@ public:
     virtual ~ScrollView();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// React to mouse wheel.
@@ -51,7 +51,7 @@ public:
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to resize.
     virtual void OnResize();
-    
+
     /// Set content element.
     void SetContentElement(UIElement* element);
     /// Set view offset from the top-left corner.
@@ -66,7 +66,7 @@ public:
     void SetScrollStep(float step);
     /// Set arrow key page step.
     void SetPageStep(float step);
-    
+
     /// Return view offset from the top-left corner.
     const IntVector2& GetViewPosition() const { return viewPosition_; }
     /// Return content element.
@@ -83,11 +83,15 @@ public:
     float GetScrollStep() const;
     /// Return arrow key page step.
     float GetPageStep() const { return pageStep_; }
-    
-    /// Set view position attribut.
+
+    /// Set view position attribute.
     void SetViewPositionAttr(const IntVector2& value);
-    
+
 protected:
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(XMLElement& dest);
+    /// Filter implicit attributes in serialization process for internal scroll bar.
+    bool FilterScrollBarImplicitAttributes(XMLElement& dest, const String& name);
     /// Resize panel based on scrollbar visibility.
     void UpdatePanelSize();
     /// Recalculate view size, validate view position and update scrollbars.
@@ -96,7 +100,7 @@ protected:
     void UpdateScrollBars();
     /// Limit and update the view with a new position.
     void UpdateView(const IntVector2& position);
-    
+
     /// Content element.
     SharedPtr<UIElement> contentElement_;
     /// Horizontal scroll bar.
@@ -119,7 +123,7 @@ protected:
     bool ignoreEvents_;
     /// Resize content widget width to match panel. Internal flag, used by the ListView class.
     bool resizeContentWidth_;
-    
+
 private:
     /// Handle scrollbar value changed.
     void HandleScrollBarChanged(StringHash eventType, VariantMap& eventData);

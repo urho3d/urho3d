@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Context.h"
+#include "Log.h"
 #include "ResourceCache.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
@@ -164,7 +165,25 @@ bool XMLElement::RemoveChildren(const char* name)
     return true;
 }
 
-XMLElement XMLElement::SelectSingle(const String& query, pugi::xpath_variable_set* variables)
+bool XMLElement::RemoveAttribute(const String& name)
+{
+    return RemoveAttribute(name.CString());
+}
+
+bool XMLElement::RemoveAttribute(const char* name)
+{
+    if (!file_ || (!node_ && !xpathNode_))
+        return false;
+
+    // If xpath_node contains just attribute, remove it regardless of the specified name
+    if (xpathNode_ && xpathNode_->attribute())
+        return xpathNode_->parent().remove_attribute(xpathNode_->attribute());  // In attribute context, xpath_node's parent is the parent node of the attribute itself
+
+    const pugi::xml_node& node = xpathNode_ ? xpathNode_->node(): pugi::xml_node(node_);
+    return const_cast<pugi::xml_node&>(node).remove_attribute(node.attribute(name));
+}
+
+XMLElement XMLElement::SelectSingle(const String& query, pugi::xpath_variable_set* variables) const
 {
     if (!file_ || (!node_ && !xpathNode_))
         return XMLElement();
@@ -174,7 +193,7 @@ XMLElement XMLElement::SelectSingle(const String& query, pugi::xpath_variable_se
     return XMLElement(file_, 0, &result, 0);
 }
 
-XMLElement XMLElement::SelectSinglePrepared(const XPathQuery& query)
+XMLElement XMLElement::SelectSinglePrepared(const XPathQuery& query) const
 {
     if (!file_ || (!node_ && !xpathNode_ && !query.GetXPathQuery()))
         return XMLElement();
@@ -184,7 +203,7 @@ XMLElement XMLElement::SelectSinglePrepared(const XPathQuery& query)
     return XMLElement(file_, 0, &result, 0);
 }
 
-XPathResultSet XMLElement::Select(const String& query, pugi::xpath_variable_set* variables)
+XPathResultSet XMLElement::Select(const String& query, pugi::xpath_variable_set* variables) const
 {
     if (!file_ || (!node_ && !xpathNode_))
         return XPathResultSet();
@@ -194,7 +213,7 @@ XPathResultSet XMLElement::Select(const String& query, pugi::xpath_variable_set*
     return XPathResultSet(file_, &result);
 }
 
-XPathResultSet XMLElement::SelectPrepared(const XPathQuery& query)
+XPathResultSet XMLElement::SelectPrepared(const XPathQuery& query) const
 {
     if (!file_ || (!node_ && !xpathNode_ && query.GetXPathQuery()))
         return XPathResultSet();
@@ -547,10 +566,10 @@ String XMLElement::GetAttribute(const String& name) const
     return String(GetAttribute(name.CString()));
 }
 
-const char* XMLElement::GetAttribute(const char* name) const
+String XMLElement::GetAttribute(const char* name) const
 {
     if (!file_ || (!node_ && !xpathNode_))
-        return 0;
+        return String::EMPTY;
 
     // If xpath_node contains just attribute, return it regardless of the specified name
     if (xpathNode_ && xpathNode_->attribute())
@@ -705,7 +724,7 @@ ResourceRef XMLElement::GetResourceRef() const
 {
     ResourceRef ret;
 
-    Vector<String> values = String::Split(GetAttribute("value"), ';');
+    Vector<String> values = GetAttribute("value").Split(';');
     if (values.Size() == 2)
     {
         ret.type_ = values[0];
@@ -724,7 +743,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
 
-    Vector<String> values = String::Split(GetAttribute("value"), ';');
+    Vector<String> values = GetAttribute("value").Split(';');
     if (values.Size() >= 1)
     {
         // Whenever we encounter resource names read from a ResourceRefList XML element, store the reverse mapping to
@@ -841,12 +860,15 @@ XPathResultSet& XPathResultSet::operator = (const XPathResultSet& rhs)
 
 XMLElement XPathResultSet::operator[](unsigned index) const
 {
-    return resultSet_ && index >= Size() ? XMLElement() : XMLElement(file_, this, &resultSet_->operator [](index), index);
+    if (!resultSet_)
+        LOGERROR(ToString("Could not return result at index: %u. Most probably this is caused by the XPathResultSet is not stored in a lhs variable.", index));
+
+    return resultSet_ && index < Size() ? XMLElement(file_, this, &resultSet_->operator [](index), index) : XMLElement();
 }
 
 XMLElement XPathResultSet::FirstResult()
 {
-    return Empty() ? XMLElement() : XMLElement(file_, this, resultSet_->begin(), 0);
+    return operator [](0);
 }
 
 unsigned XPathResultSet::Size() const
@@ -903,9 +925,14 @@ bool XPathQuery::SetVariable(const String& name, float value)
 
 bool XPathQuery::SetVariable(const String& name, const String& value)
 {
+    return SetVariable(name.CString(), value.CString());
+}
+
+bool XPathQuery::SetVariable(const char* name, const char* value)
+{
     if (!variables_)
         variables_ = new pugi::xpath_variable_set();
-    return variables_->set(name.CString(), value.CString());
+    return variables_->set(name, value);
 }
 
 bool XPathQuery::SetVariable(const String& name, const XPathResultSet& value)

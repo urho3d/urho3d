@@ -205,9 +205,11 @@ void CreateMenuBar()
 
         childMenu = CreateMenuItem("New UI-element", null, SHOW_POPUP_INDICATOR);
         childPopup = CreatePopup(childMenu);
-        String[] typeNames = { "BorderImage", "Button", "CheckBox", "DropDownList", "LineEdit", "Menu", "ScrollBar", "ScrollView", "Slider", "Sprite", "Text", "Window" };
+        String[] typeNames = { "BorderImage", "Button", "CheckBox", "DropDownList", "LineEdit", "ListView", "Menu", "ScrollBar", "ScrollView", "Slider", "Sprite", "Text", "Window" };
         for (uint i = 0; i < typeNames.length; ++i)
             childPopup.AddChild(CreateIconizedMenuItem(typeNames[i], @PickUIElement));
+        childPopup.AddChild(CreateMenuDivider());
+        childPopup.AddChild(CreateIconizedMenuItem("UIElement", @PickUIElement));
         popup.AddChild(childMenu);
 
         FinalizedPopupMenu(popup);
@@ -445,6 +447,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0)
 {
     Menu@ menu = Menu(title);
+    menu.defaultStyle = uiStyle;
     menu.style = uiStyle;
     menu.SetLayout(LM_HORIZONTAL, 0, IntRect(8, 2, 8, 2));
     if (accelKey > 0)
@@ -456,9 +459,9 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
     }
 
     Text@ menuText = Text();
+    menu.AddChild(menuText);
     menuText.SetStyle(uiStyle, "EditorMenuText");
     menuText.text = title;
-    menu.AddChild(menuText);
 
     if (accelKey != 0)
     {
@@ -472,6 +475,7 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
 Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, const String&in iconType = "")
 {
     Menu@ menu = Menu(title);
+    menu.defaultStyle = uiStyle;
     menu.style = uiStyle;
     menu.SetLayout(LM_VERTICAL, 0, IntRect(8, 2, 8, 2));
     if (accelKey > 0)
@@ -483,11 +487,11 @@ Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = nu
     }
 
     Text@ menuText = Text();
+    menu.AddChild(menuText);
     menuText.SetStyle(uiStyle, "EditorMenuText");
     menuText.text = title;
     // If icon type is not provided, use the title instead
     IconizeUIElement(menuText, iconType.empty ? title : iconType);
-    menu.AddChild(menuText);
 
     if (accelKey != 0)
     {
@@ -529,6 +533,7 @@ Menu@ CreateMenu(const String&in title)
 Text@ CreateAccelKeyText(int accelKey, int accelQual)
 {
     Text@ accelKeyText = Text();
+    accelKeyText.defaultStyle = uiStyle;
     accelKeyText.SetStyle(uiStyle, "EditorMenuText");
     accelKeyText.horizontalAlignment = HA_RIGHT;
     accelKeyText.indent = 1;

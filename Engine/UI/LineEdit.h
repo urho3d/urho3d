@@ -106,6 +106,8 @@ public:
     float GetDoubleClickInterval() const;
 
 protected:
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(XMLElement& dest);
     /// Update displayed text.
     void UpdateText();
     /// Update cursor position and restart cursor blinking.

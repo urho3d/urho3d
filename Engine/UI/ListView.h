@@ -42,7 +42,7 @@ enum HighlightMode
 class ListView : public ScrollView
 {
     OBJECT(ListView);
-    
+
 public:
     /// Construct.
     ListView(Context* context);
@@ -50,7 +50,7 @@ public:
     virtual ~ListView();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to resize.
@@ -96,12 +96,12 @@ public:
     void SetClearSelectionOnDefocus(bool enable);
     /// Set item doubleclick interval in seconds.
     void SetDoubleClickInterval(float interval);
-    
+
     /// Expand item at index. Only has effect in hierarchy mode.
     void Expand(unsigned index, bool enable, bool recursive = false);
     /// Toggle item's expanded flag at index. Only has effect in hierarchy mode.
     void ToggleExpand(unsigned index, bool recursive = false);
-    
+
     /// Return number of items.
     unsigned GetNumItems() const;
     /// Return item at index.
@@ -134,15 +134,17 @@ public:
     int GetBaseIndent() const { return baseIndent_; }
     /// Return item doubleclick interval in seconds.
     float GetDoubleClickInterval() const;
-    
+
 protected:
+    /// Filter implicit attributes in serialization process.
+    virtual bool FilterImplicitAttributes(XMLElement& dest);
     /// Update selection effect when selection or focus changes.
     void UpdateSelectionEffect();
     /// Ensure full visibility of the item.
     void EnsureItemVisibility(unsigned index);
     /// Ensure full visibility of the item.
     void EnsureItemVisibility(UIElement* item);
-    
+
     /// Current selection.
     PODVector<unsigned> selections_;
     /// Highlight mode.
@@ -163,7 +165,7 @@ protected:
     Timer doubleClickTimer_;
     /// Last clicked item.
     unsigned lastClickedItem_;
-    
+
 private:
     /// Handle global UI mouseclick to check for selection change.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData);

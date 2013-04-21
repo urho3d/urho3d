@@ -60,7 +60,7 @@ void Sprite::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Position", GetPosition, SetPosition, Vector2, Vector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTVECTOR2, "Hotspot", GetHotSpot, SetHotSpot, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Scale", GetScale, SetScale, Vector2, Vector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Scale", GetScale, SetScale, Vector2, Vector2::ONE, AM_FILE);
     ACCESSOR_ATTRIBUTE(Sprite, VAR_FLOAT, "Rotation", GetRotation, SetRotation, float, 0.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(Sprite, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_INTRECT, "Image Rect", GetImageRect, SetImageRect, IntRect, IntRect::ZERO, AM_FILE);
@@ -75,7 +75,7 @@ void Sprite::RegisterObject(Context* context)
     ATTRIBUTE(Sprite, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
     ATTRIBUTE(Sprite, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
     ACCESSOR_ATTRIBUTE(Sprite, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE(Sprite, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Sprite, VAR_BOOL, "Use Derived Opacity", GetUseDerivedOpacity, SetUseDerivedOpacity, bool, true, AM_FILE);
     ATTRIBUTE(Sprite, VAR_VARIANTMAP, "Variables", vars_, Variant::emptyVariantMap, AM_FILE);
 }
 

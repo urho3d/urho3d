@@ -58,10 +58,10 @@ struct AsyncProgress
 class Scene : public Node
 {
     OBJECT(Scene);
-    
+
     using Node::GetComponent;
     using Node::SaveXML;
-    
+
 public:
     /// Construct.
     Scene(Context* context);
@@ -69,16 +69,16 @@ public:
     virtual ~Scene();
     /// Register object factory. Node must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source);
     /// Save to binary data. Return true if successful.
     virtual bool Save(Serializer& dest);
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source);
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Add a replication state that is tracking this scene.
     virtual void AddReplicationState(NodeReplicationState* state);
-    
+
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
@@ -117,7 +117,7 @@ public:
     void UnregisterVar(const String& name);
     /// Clear all registered node user variable hash reverse mappings.
     void UnregisterAllVars();
-    
+
     /// Return node from the whole scene by ID, or null if not found.
     Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
@@ -144,7 +144,7 @@ public:
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
     /// Return a node user variable name, or empty if not registered.
     const String& GetVarName(ShortStringHash hash) const;
-    
+
     /// Update scene. Called by HandleUpdate.
     void Update(float timeStep);
     /// Begin a threaded update. During threaded update components can choose to delay dirty processing.
@@ -181,7 +181,7 @@ public:
     void MarkNetworkUpdate(Component* component);
     /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
     void MarkReplicationDirty(Node* node);
-    
+
 private:
     /// Handle the logic update event to update the scene, if active.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
@@ -193,7 +193,7 @@ private:
     void FinishLoading(Deserializer* source);
     /// Finish saving. Sets the scene filename and checksum.
     void FinishSaving(Serializer* dest);
-    
+
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;
     /// Local scene nodes by ID.

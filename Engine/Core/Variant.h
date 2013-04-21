@@ -66,21 +66,21 @@ struct VariantValue
         float float_;
         void* ptr_;
     };
-    
+
     union
     {
         int int2_;
         float float2_;
         void* ptr2_;
     };
-    
+
     union
     {
         int int3_;
         float float3_;
         void* ptr3_;
     };
-    
+
     union
     {
         int int4_;
@@ -96,32 +96,32 @@ struct ResourceRef
     ResourceRef()
     {
     }
-    
+
     /// Construct with type only and empty id.
     ResourceRef(ShortStringHash type) :
         type_(type)
     {
     }
-    
+
     /// Construct with type and id.
     ResourceRef(ShortStringHash type, StringHash id) :
         type_(type),
         id_(id)
     {
     }
-    
+
     // Construct from another ResourceRef.
     ResourceRef(const ResourceRef& rhs) :
         type_(rhs.type_),
         id_(rhs.id_)
     {
     }
-    
+
     /// Object type.
     ShortStringHash type_;
     /// Object identifier (name hash.)
     StringHash id_;
-    
+
     /// Test for equality with another reference.
     bool operator == (const ResourceRef& rhs) const { return type_ == rhs.type_ && id_ == rhs.id_; }
     /// Test for inequality with another reference.
@@ -135,7 +135,7 @@ struct ResourceRefList
     ResourceRefList()
     {
     }
-    
+
     /// Construct with type only.
     ResourceRefList(ShortStringHash type) :
         type_(type)
@@ -147,12 +147,12 @@ struct ResourceRefList
         ids_(ids)
     {
     }
-    
+
     /// Object type.
     ShortStringHash type_;
     /// List of object identifiers (name hashes).
     Vector<StringHash> ids_;
-    
+
     /// Test for equality with another reference list.
     bool operator == (const ResourceRefList& rhs) const { return type_ == rhs.type_ && ids_ == rhs.ids_; }
     /// Test for inequality with another reference list.
@@ -176,204 +176,204 @@ public:
         type_(VAR_NONE)
     {
     }
-    
+
     /// Construct from integer.
     Variant(int value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from unsigned integer.
     Variant(unsigned value) :
         type_(VAR_NONE)
     {
         *this = (int)value;
     }
-    
+
     /// Construct from a string hash (convert to integer).
     Variant(const StringHash& value) :
         type_(VAR_NONE)
     {
         *this = (int)value.Value();
     }
-    
+
     /// Construct from a short string hash (convert to integer.)
     Variant(const ShortStringHash& value) :
         type_(VAR_NONE)
     {
         *this = (int)value.Value();
     }
-    
+
     /// Construct from a bool.
     Variant(bool value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a float.
     Variant(float value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a Vector2.
     Variant(const Vector2& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a Vector3.
     Variant(const Vector3& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a Vector4.
     Variant(const Vector4& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a quaternion.
     Variant(const Quaternion& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a color.
     Variant(const Color& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a string.
     Variant(const String& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a C string.
     Variant(const char* value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a buffer.
     Variant(const PODVector<unsigned char>& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a pointer.
     Variant(void* value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a resource reference.
     Variant(const ResourceRef& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a resource reference list.
     Variant(const ResourceRefList& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a variant vector.
     Variant(const VariantVector& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from a variant map.
     Variant(const VariantMap& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from an integer rect.
     Variant(const IntRect& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from an IntVector2.
     Variant(const IntVector2& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Construct from type and value.
     Variant(const String& type, const String& value) :
         type_(VAR_NONE)
     {
         FromString(type, value);
     }
-    
+
     /// Construct from type and value.
     Variant(VariantType type, const String& value) :
         type_(VAR_NONE)
     {
         FromString(type, value);
     }
-    
+
     /// Construct from type and value.
     Variant(const char* type, const char* value) :
         type_(VAR_NONE)
     {
         FromString(type, value);
     }
-    
+
     /// Construct from type and value.
     Variant(VariantType type, const char* value) :
         type_(VAR_NONE)
     {
         FromString(type, value);
     }
-    
+
     /// Copy-construct from another variant.
     Variant(const Variant& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
-    
+
     /// Destruct.
     ~Variant()
     {
         SetType(VAR_NONE);
     }
-    
+
     /// Reset to empty.
     void Clear()
     {
         SetType(VAR_NONE);
     }
-    
+
     /// Assign from another variant.
     Variant& operator = (const Variant& rhs);
-    
+
     /// Assign from an integer.
     Variant& operator = (int rhs)
     {
@@ -381,7 +381,7 @@ public:
         value_.int_ = rhs;
         return *this;
     }
-    
+
     /// Assign from an unsigned integer.
     Variant& operator = (unsigned rhs)
     {
@@ -389,7 +389,7 @@ public:
         value_.int_ = (int)rhs;
         return *this;
     }
-    
+
     /// Assign from a StringHash (convert to integer.)
     Variant& operator = (const StringHash& rhs)
     {
@@ -397,7 +397,7 @@ public:
         value_.int_ = (int)rhs.Value();
         return *this;
     }
-    
+
     /// Assign from a ShortStringHash (convert to integer)
     Variant& operator = (const ShortStringHash& rhs)
     {
@@ -405,7 +405,7 @@ public:
         value_.int_ = (int)rhs.Value();
         return *this;
     }
-    
+
     /// Assign from a bool.
     Variant& operator = (bool rhs)
     {
@@ -413,7 +413,7 @@ public:
         value_.bool_ = rhs;
         return *this;
     }
-    
+
     /// Assign from a float.
     Variant& operator = (float rhs)
     {
@@ -421,7 +421,7 @@ public:
         value_.float_ = rhs;
         return *this;
     }
-    
+
     /// Assign from a Vector2.
     Variant& operator = (const Vector2& rhs)
     {
@@ -429,7 +429,7 @@ public:
         *(reinterpret_cast<Vector2*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a Vector3.
     Variant& operator = (const Vector3& rhs)
     {
@@ -437,7 +437,7 @@ public:
         *(reinterpret_cast<Vector3*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a Vector4.
     Variant& operator = (const Vector4& rhs)
     {
@@ -445,7 +445,7 @@ public:
         *(reinterpret_cast<Vector4*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a quaternion.
     Variant& operator = (const Quaternion& rhs)
     {
@@ -453,7 +453,7 @@ public:
         *(reinterpret_cast<Quaternion*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a color.
     Variant& operator = (const Color& rhs)
     {
@@ -461,7 +461,7 @@ public:
         *(reinterpret_cast<Color*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a string.
     Variant& operator = (const String& rhs)
     {
@@ -469,7 +469,7 @@ public:
         *(reinterpret_cast<String*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a C string.
     Variant& operator = (const char* rhs)
     {
@@ -485,7 +485,7 @@ public:
         *(reinterpret_cast<PODVector<unsigned char>*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a pointer.
     Variant& operator = (void* rhs)
     {
@@ -493,7 +493,7 @@ public:
         value_.ptr_ = rhs;
         return *this;
     }
-    
+
     /// Assign from a resource reference.
     Variant& operator = (const ResourceRef& rhs)
     {
@@ -501,7 +501,7 @@ public:
         *(reinterpret_cast<ResourceRef*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a resource reference list.
     Variant& operator = (const ResourceRefList& rhs)
     {
@@ -509,7 +509,7 @@ public:
         *(reinterpret_cast<ResourceRefList*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a variant vector.
     Variant& operator = (const VariantVector& rhs)
     {
@@ -517,7 +517,7 @@ public:
         *(reinterpret_cast<VariantVector*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from a variant map.
     Variant& operator = (const VariantMap& rhs)
     {
@@ -525,7 +525,7 @@ public:
         *(reinterpret_cast<VariantMap*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from an integer rect.
     Variant& operator = (const IntRect& rhs)
     {
@@ -533,7 +533,7 @@ public:
         *(reinterpret_cast<IntRect*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Assign from an IntVector2.
     Variant& operator = (const IntVector2& rhs)
     {
@@ -541,7 +541,7 @@ public:
         *(reinterpret_cast<IntVector2*>(&value_)) = rhs;
         return *this;
     }
-    
+
     /// Test for equality with another variant.
     bool operator == (const Variant& rhs) const;
     /// Test for equality with an integer. To return true, both the type and value must match.
@@ -624,7 +624,7 @@ public:
     bool operator != (const StringHash& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a ShortStringHash.
     bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
-    
+
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
     /// Set from typename and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
@@ -635,7 +635,7 @@ public:
     void FromString(VariantType type, const char* value);
     /// Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
-    
+
     /// Return int or zero on type mismatch.
     int GetInt() const { return type_ == VAR_INT ? value_.int_ : 0; }
     /// Return unsigned int or zero on type mismatch.
@@ -676,14 +676,14 @@ public:
     const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? *reinterpret_cast<const IntRect*>(&value_) : IntRect::ZERO; }
     /// Return an IntVector2 or empty on type mismatch.
     const IntVector2& GetIntVector2() const { return type_ == VAR_INTVECTOR2 ? *reinterpret_cast<const IntVector2*>(&value_) : IntVector2::ZERO; }
-    
+
     /// Return a pointer to a modifiable buffer or null on type mismatch.
     PODVector<unsigned char>* GetBufferPtr() { return type_ == VAR_BUFFER ? reinterpret_cast<PODVector<unsigned char>*>(&value_) : 0; }
     /// Return a pointer to a modifiable variant vector or null on type mismatch.
     VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? reinterpret_cast<VariantVector*>(&value_) : 0; }
     /// Return a pointer to a modifiable variant map or null on type mismatch.
     VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? reinterpret_cast<VariantMap*>(&value_) : 0; }
-    
+
     /// Return the value, template version.
     template <class T> T Get() const;
     /// Return value's type.
@@ -692,16 +692,18 @@ public:
     const String& GetTypeName() const;
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;
-    /// Return true when the variant value is considered zero according to its actual type
+    /// Return true when the variant value is considered zero according to its actual type.
     bool IsZero() const;
-    
+    /// Return true when the variant is empty (i.e. not initialized yet).
+    bool IsEmpty() const { return GetType() == VAR_NONE; }
+
     /// Return name for variant type.
     static const String& GetTypeName(VariantType type);
     /// Return variant type from type name.
     static VariantType GetTypeFromName(const String& typeName);
     /// Return variant type from type name.
     static VariantType GetTypeFromName(const char* typeName);
-    
+
     /// Empty variant.
     static const Variant EMPTY;
     /// Empty buffer.
@@ -714,11 +716,11 @@ public:
     static const VariantMap emptyVariantMap;
     /// Empty variant vector.
     static const VariantVector emptyVariantVector;
-    
+
 private:
     /// Set new type and allocate/deallocate memory as necessary.
     void SetType(VariantType newType);
-    
+
     /// Variant type.
     VariantType type_;
     /// Variant value.

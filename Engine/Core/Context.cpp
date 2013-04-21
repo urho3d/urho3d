@@ -33,9 +33,9 @@ void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attr
     HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
     if (i == attributes.End())
         return;
-    
+
     Vector<AttributeInfo>& infos = i->second_;
-    
+
     for (Vector<AttributeInfo>::Iterator j = infos.Begin(); j != infos.End(); ++j)
     {
         if (!j->name_.Compare(name, true))
@@ -44,7 +44,7 @@ void RemoveNamedAttribute(HashMap<ShortStringHash, Vector<AttributeInfo> >& attr
             break;
         }
     }
-    
+
     // If the vector became empty, erase the object type from the map
     if (infos.Empty())
         attributes.Erase(i);
@@ -78,7 +78,7 @@ void Context::RegisterFactory(ObjectFactory* factory)
 {
     if (!factory)
         return;
-    
+
     factories_[factory->GetType()] = factory;
 }
 
@@ -86,7 +86,7 @@ void Context::RegisterSubsystem(Object* object)
 {
     if (!object)
         return;
-    
+
     subsystems_[object->GetType()] = object;
 }
 
@@ -102,9 +102,9 @@ void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo&
     // None or Pointer types can not be supported
     if (attr.type_ == VAR_NONE || attr.type_ == VAR_PTR)
         return;
-    
+
     attributes_[objectType].Push(attr);
-    
+
     if (attr.mode_ & AM_NET)
         networkAttributes_[objectType].Push(attr);
 }
@@ -113,6 +113,13 @@ void Context::RemoveAttribute(ShortStringHash objectType, const char* name)
 {
     RemoveNamedAttribute(attributes_, objectType, name);
     RemoveNamedAttribute(networkAttributes_, objectType, name);
+}
+
+void Context::UpdateAttributeDefaultValue(ShortStringHash objectType, const char* name, const Variant& defaultValue)
+{
+    AttributeInfo* info = GetAttribute(objectType, name);
+    if (info)
+        info->defaultValue_ = defaultValue;
 }
 
 void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType)
@@ -159,15 +166,15 @@ AttributeInfo* Context::GetAttribute(ShortStringHash objectType, const char* nam
     HashMap<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
     if (i == attributes_.End())
         return 0;
-    
+
     Vector<AttributeInfo>& infos = i->second_;
-    
+
     for (Vector<AttributeInfo>::Iterator j = infos.Begin(); j != infos.End(); ++j)
     {
         if (!j->name_.Compare(name, true))
             return &(*j);
     }
-    
+
     return 0;
 }
 

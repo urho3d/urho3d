@@ -50,13 +50,13 @@ ScrollBar::ScrollBar(Context* context) :
 {
     enabled_ = true;
 
-    backButton_ = CreateChild<Button>();
+    backButton_ = CreateChild<Button>("SB_Back");
     backButton_->SetInternal(true);
     backButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
-    slider_ = CreateChild<Slider>();
+    slider_ = CreateChild<Slider>("SB_Slider");
     slider_->SetInternal(true);
     slider_->SetRepeatRate(DEFAULT_REPEAT_RATE);
-    forwardButton_ = CreateChild<Button>();
+    forwardButton_ = CreateChild<Button>("SB_Forward");
     forwardButton_->SetInternal(true);
     forwardButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
 
@@ -78,6 +78,7 @@ void ScrollBar::RegisterObject(Context* context)
     context->RegisterFactory<ScrollBar>();
 
     COPY_BASE_ATTRIBUTES(ScrollBar, UIElement);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollBar, "Is Enabled", true);
     ENUM_ACCESSOR_ATTRIBUTE(ScrollBar, "Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Range", GetRange, SetRange, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScrollBar, VAR_FLOAT, "Value", GetValue, SetValue, float, 0.0f, AM_FILE);
@@ -202,6 +203,59 @@ float ScrollBar::GetValue() const
 float ScrollBar::GetEffectiveScrollStep() const
 {
     return scrollStep_ * stepFactor_;
+}
+
+bool ScrollBar::FilterImplicitAttributes(XMLElement& dest)
+{
+    if (!UIElement::FilterImplicitAttributes(dest))
+        return false;
+
+    if (!RemoveChildXML(dest, "Layout Mode"))
+        return false;
+
+    XMLElement childElem = dest.GetChild("element");
+    if (!FilterButtonImplicitAttributes(childElem, "SB_Back"))
+        return false;
+
+    childElem = childElem.GetNext("element");
+    if (!childElem)
+        return false;
+    if (!RemoveChildXML(childElem, "Name", "SB_Slider"))
+        return false;
+    if (!RemoveChildXML(childElem, "Repeat Rate", String(DEFAULT_REPEAT_RATE)))
+        return false;
+    if (!RemoveChildXML(childElem, "Orientation"))
+        return false;
+    if (!RemoveChildXML(childElem, "Range"))
+        return false;
+    if (!RemoveChildXML(childElem, "Value"))
+        return false;
+
+    childElem = childElem.GetNext("element");
+    if (!FilterButtonImplicitAttributes(childElem, "SB_Forward"))
+        return false;
+
+    return true;
+}
+
+bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& name)
+{
+    if (!dest)
+        return false;
+    if (!RemoveChildXML(dest, "Name", name))
+        return false;
+    if (!RemoveChildXML(dest, "Repeat Delay", String(DEFAULT_REPEAT_DELAY)))
+        return false;
+    if (!RemoveChildXML(dest, "Repeat Rate", String(DEFAULT_REPEAT_RATE)))
+        return false;
+    if (!RemoveChildXML(dest, "Image Rect"))
+        return false;
+    if (!RemoveChildXML(dest, "Min Size"))
+        return false;
+    if (!RemoveChildXML(dest, "Max Size"))
+        return false;
+
+    return true;
 }
 
 void ScrollBar::HandleBackButtonPressed(StringHash eventType, VariantMap& eventData)
