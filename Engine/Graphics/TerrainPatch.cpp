@@ -87,12 +87,12 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
         Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
         Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
         float distance = localRay.HitDistance(boundingBox_);
-        if (distance <= query.maxDistance_)
+        if (distance < query.maxDistance_)
         {
             if (level == RAY_TRIANGLE)
             {
                 distance = geometry_->GetHitDistance(localRay);
-                if (distance <= query.maxDistance_)
+                if (distance < query.maxDistance_)
                 {
                     RayQueryResult result;
                     result.drawable_ = this;

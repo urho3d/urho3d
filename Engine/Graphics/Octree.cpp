@@ -277,7 +277,7 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
 void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
 {
     float octantDist = query.ray_.HitDistance(cullingBox_);
-    if (octantDist > query.maxDistance_)
+    if (octantDist >= query.maxDistance_)
         return;
     
     if (drawables_.Size())
@@ -304,7 +304,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
 void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*>& drawables) const
 {
     float octantDist = query.ray_.HitDistance(cullingBox_);
-    if (octantDist > query.maxDistance_)
+    if (octantDist >= query.maxDistance_)
         return;
     
     if (drawables_.Size())
@@ -510,7 +510,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
     for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
     {
         Drawable* drawable = *i;
-        if (drawable->GetSortValue() <= Min(closestHit, query.maxDistance_))
+        if (drawable->GetSortValue() < Min(closestHit, query.maxDistance_))
         {
             unsigned oldSize = query.result_.Size();
             drawable->ProcessRayQuery(query, query.result_);

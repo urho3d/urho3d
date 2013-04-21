@@ -112,7 +112,7 @@ void Drawable::OnSetEnabled()
 void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
     float distance = query.ray_.HitDistance(GetWorldBoundingBox());
-    if (distance <= query.maxDistance_)
+    if (distance < query.maxDistance_)
     {
         RayQueryResult result;
         result.drawable_ = this;
