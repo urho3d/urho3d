@@ -106,6 +106,8 @@ successfully:
 - For Linux, the following development packages need to be installed:
   libx11-dev, libxrandr-dev, libasound2-dev. Also install the package
   libgl1-mesa-dev if your GPU driver does not include OpenGL headers & libs.
+  Because Urho3D is built as 32-bit, 64-bit systems require installing also 
+  32-bit versions of the development libraries.
 
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.
