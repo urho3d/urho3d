@@ -35,7 +35,8 @@ namespace Urho3D
 OBJECTTYPESTATIC(Skybox);
 
 Skybox::Skybox(Context* context) :
-    StaticModel(context)
+    StaticModel(context),
+    customWorldTransform_(Matrix3x4::IDENTITY)
 {
 }
 

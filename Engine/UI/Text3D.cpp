@@ -48,6 +48,7 @@ Text3D::Text3D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     text_(context),
     vertexBuffer_(new VertexBuffer(context_)),
+    customWorldTransform_(Matrix3x4::IDENTITY),
     faceCamera_(false),
     textDirty_(true),
     geometryDirty_(true)
@@ -352,8 +353,9 @@ void Text3D::OnWorldBoundingBoxUpdate()
     if (textDirty_)
         UpdateTextBatches();
     
-    worldBoundingBox_ = faceCamera_ ? boundingBox_.Transformed(customWorldTransform_) :
-        boundingBox_.Transformed(node_->GetWorldTransform());
+    // In face camera mode, use the last camera rotation to build the world bounding box
+    worldBoundingBox_ = boundingBox_.Transformed(faceCamera_ ? Matrix3x4(node_->GetWorldPosition(),
+        customWorldTransform_.Rotation(), node_->GetWorldScale()) : node_->GetWorldTransform());
 }
 
 void Text3D::MarkTextDirty()
