@@ -1,0 +1,10 @@
+<technique>
+    <pass name="base" vs="Vegetation" ps="Vegetation_DiffAlphaMask" alphamask="true" />
+    <pass name="litbase" vs="Vegetation" ps="Vegetation_DiffAlphaMaskAmbient" alphamask="true" />
+    <pass name="light" vs="Vegetation" ps="Vegetation_DiffAlphaMask"  depthtest="equal" depthwrite="false" blend="add" alphamask="true" />
+    <pass name="prepass" vs="Vegetation" ps="Vegetation_DiffAlphaMaskPrepass" alphamask="true" />
+    <pass name="material" vs="Vegetation" ps="Vegetation_DiffAlphaMaskMaterial" depthtest="equal" depthwrite="false" alphamask="true" />
+    <pass name="deferred" vs="Vegetation" ps="Vegetation_DiffAlphaMaskDeferred" alphamask="true" />
+    <pass name="depth" vs="VegetationDepth" ps="VegetationDepth_AlphaMask" alphamask="true" />
+    <pass name="shadow" vs="VegetationShadow" ps="VegetationShadow_AlphaMask" alphamask="true" />
+</technique>
