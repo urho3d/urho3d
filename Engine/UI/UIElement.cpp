@@ -1195,10 +1195,7 @@ float UIElement::GetDerivedOpacity() const
 bool UIElement::HasFocus() const
 {
     UI* ui = GetSubsystem<UI>();
-    if (!ui)
-        return false;
-    else
-        return ui->GetFocusElement() == this;
+    return ui ? ui->GetFocusElement() == this : false;
 }
 
 XMLFile* UIElement::GetDefaultStyle(bool recursiveUp) const

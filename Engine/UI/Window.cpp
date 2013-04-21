@@ -217,7 +217,8 @@ void Window::SetResizeBorder(const IntRect& rect)
 void Window::SetModal(bool modal)
 {
     UI* ui = GetSubsystem<UI>();
-    if (ui->SetModalElement(this, modal))
+    // UI may be null at shutdown if for example a script was holding a reference to this window
+    if (ui && ui->SetModalElement(this, modal))
         modal_ = modal;
 }
 
