@@ -133,58 +133,58 @@
     </element>
     <element type="BorderImage">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="48 32 62 46" />
     </element>
     <element type="Button">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="80 32 94 46" />
     </element>
     <element type="Menu">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="192 32 206 46" />
     </element>
     <element type="DropDownList">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="192 32 206 46" />
     </element>
     <element type="CheckBox">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="96 32 110 46" />
     </element>
     <element type="Cursor">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="224 32 238 46" />
     </element>
     <element type="LineEdit">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="240 32 254 46" />
     </element>
     <element type="Slider">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="112 32 126 46" />
     </element>
     <element type="Window">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="144 32 158 46" />
     </element>
     <element type="ScrollBar">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="128 32 142 46" />
     </element>
     <element type="ScrollView">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="160 32 174 46" />
     </element>
     <element type="ListView">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="176 32 190 46" />
     </element>
     <element type="Sprite">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="208 32 222 46" />
     </element>
     <element type="Text">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
-        <attribute name="Image Rect" value="32 32 46 46" />
+        <attribute name="Image Rect" value="64 32 78 46" />
     </element>
 </elements>
