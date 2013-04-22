@@ -73,7 +73,7 @@ public:
     /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Save to binary data. Return true if successful.
-    virtual bool Save(Serializer& dest);
+    virtual bool Save(Serializer& dest) const;
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Add a replication state that is tracking this scene.
@@ -82,7 +82,7 @@ public:
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
-    bool SaveXML(Serializer& dest);
+    bool SaveXML(Serializer& dest) const;
     /// Load from a binary file asynchronously. Return true if started successfully.
     bool LoadAsync(File* file);
     /// Load from an XML file asynchronously. Return true if started successfully.
@@ -192,7 +192,7 @@ private:
     /// Finish loading. Sets the scene filename and checksum.
     void FinishLoading(Deserializer* source);
     /// Finish saving. Sets the scene filename and checksum.
-    void FinishSaving(Serializer* dest);
+    void FinishSaving(Serializer* dest) const;
 
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;
@@ -207,7 +207,7 @@ private:
     /// Node and component ID resolver for asynchronous loading.
     SceneResolver resolver_;
     /// Source file name.
-    String fileName_;
+    mutable String fileName_;
     /// Required package files for networking.
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Registered node user variable reverse mappings.
@@ -229,7 +229,7 @@ private:
     /// Next free local component ID.
     unsigned localComponentID_;
     /// Scene source file checksum.
-    unsigned checksum_;
+    mutable unsigned checksum_;
     /// Scene update time scale.
     float timeScale_;
     /// Elapsed time accumulator.

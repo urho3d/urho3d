@@ -251,7 +251,7 @@ bool Model::Load(Deserializer& source)
     return true;
 }
 
-bool Model::Save(Serializer& dest)
+bool Model::Save(Serializer& dest) const
 {
     // Write ID
     if (!dest.WriteFileID("UMDL"))

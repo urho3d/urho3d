@@ -79,7 +79,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest);
+    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
     /// Update slider knob position & size.
     void UpdateSlider();
     /// Send slider page event.

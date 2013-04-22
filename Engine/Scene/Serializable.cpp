@@ -140,7 +140,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     }
 }
 
-void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
+void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
 {
     // Check for accessor function mode
     if (attr.accessor_)
@@ -150,7 +150,7 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
     }
 
     // Calculate the source address
-    void* src = attr.ptr_ ? attr.ptr_ : reinterpret_cast<unsigned char*>(this) + attr.offset_;
+    const void* src = attr.ptr_ ? attr.ptr_ : reinterpret_cast<const unsigned char*>(this) + attr.offset_;
 
     switch (attr.type_)
     {
@@ -260,18 +260,13 @@ bool Serializable::Load(Deserializer& source, bool setInstanceDefault)
         OnSetAttribute(attr, varValue);
         
         if (setInstanceDefault)
-        {
-            // Allocate the instance level default value
-            if (!instanceDefaultValues_)
-                instanceDefaultValues_ = new VariantMap();
-            instanceDefaultValues_->operator[] (attr.name_) = varValue;
-        }
+            SetInstanceDefault(attr.name_, varValue);
     }
 
     return true;
 }
 
-bool Serializable::Save(Serializer& dest)
+bool Serializable::Save(Serializer& dest) const
 {
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
@@ -355,12 +350,7 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
                     OnSetAttribute(attr, varValue);
 
                     if (setInstanceDefault)
-                    {
-                        // Allocate the instance level default value
-                        if (!instanceDefaultValues_)
-                            instanceDefaultValues_ = new VariantMap();
-                        instanceDefaultValues_->operator[] (attr.name_) = varValue;
-                    }
+                        SetInstanceDefault(attr.name_, varValue);
                 }
 
                 startIndex = (i + 1) % attributes->Size();
@@ -382,7 +372,7 @@ bool Serializable::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return true;
 }
 
-bool Serializable::SaveXML(XMLElement& dest)
+bool Serializable::SaveXML(XMLElement& dest) const
 {
     if (dest.IsNull())
     {
@@ -448,7 +438,7 @@ bool Serializable::SetAttribute(unsigned index, const Variant& value)
     }
     else
     {
-        LOGERROR("Could not set attribute " + String(attr.name_) + ": expected type " + Variant::GetTypeName(attr.type_) +
+        LOGERROR("Could not set attribute " + attr.name_ + ": expected type " + Variant::GetTypeName(attr.type_) +
             " but got " + value.GetTypeName());
         return false;
     }
@@ -475,15 +465,35 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
             }
             else
             {
-                LOGERROR("Could not set attribute " + String(i->name_) + ": expected type " + Variant::GetTypeName(i->type_)
+                LOGERROR("Could not set attribute " + i->name_ + ": expected type " + Variant::GetTypeName(i->type_)
                     + " but got " + value.GetTypeName());
                 return false;
             }
         }
     }
 
-    LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
+    LOGERROR("Could not find attribute " + name + " in " + GetTypeName());
     return false;
+}
+
+void Serializable::ResetToDefault()
+{
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    if (!attributes)
+        return;
+
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (attr.mode_ & AM_NOEDIT || attr.mode_ & AM_NODEID || attr.mode_ & AM_COMPONENTID)
+            continue;
+
+        Variant defaultValue = GetInstanceDefault(attr.name_);
+        if (defaultValue.IsEmpty())
+            defaultValue = attr.defaultValue_;
+
+        OnSetAttribute(attr, defaultValue);
+    }
 }
 
 void Serializable::AllocateNetworkState()
@@ -612,7 +622,7 @@ void Serializable::ReadLatestDataUpdate(Deserializer& source)
     }
 }
 
-Variant Serializable::GetAttribute(unsigned index)
+Variant Serializable::GetAttribute(unsigned index) const
 {
     Variant ret;
 
@@ -632,7 +642,7 @@ Variant Serializable::GetAttribute(unsigned index)
     return ret;
 }
 
-Variant Serializable::GetAttribute(const String& name)
+Variant Serializable::GetAttribute(const String& name) const
 {
     Variant ret;
 
@@ -652,11 +662,11 @@ Variant Serializable::GetAttribute(const String& name)
         }
     }
 
-    LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
+    LOGERROR("Could not find attribute " + name + " in " + GetTypeName());
     return ret;
 }
 
-Variant Serializable::GetAttributeDefault(unsigned index)
+Variant Serializable::GetAttributeDefault(unsigned index) const
 {
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
@@ -671,24 +681,15 @@ Variant Serializable::GetAttributeDefault(unsigned index)
     }
 
     AttributeInfo attr = attributes->At(index);
-    if (instanceDefaultValues_)
-    {
-        VariantMap::ConstIterator i = instanceDefaultValues_->Find(attr.name_);
-        if (i != instanceDefaultValues_->End())
-            return i->second_;
-    }
-
-    return attr.defaultValue_;
+    Variant defaultValue = GetInstanceDefault(attr.name_);
+    return defaultValue.IsEmpty() ? attr.defaultValue_ : defaultValue;
 }
 
-Variant Serializable::GetAttributeDefault(const String& name)
+Variant Serializable::GetAttributeDefault(const String& name) const
 {
-    if (instanceDefaultValues_)
-    {
-        VariantMap::ConstIterator i = instanceDefaultValues_->Find(name);
-        if (i != instanceDefaultValues_->End())
-            return i->second_;
-    }
+    Variant defaultValue = GetInstanceDefault(name);
+    if (!defaultValue.IsEmpty())
+        return defaultValue;
 
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
@@ -703,7 +704,7 @@ Variant Serializable::GetAttributeDefault(const String& name)
             return i->defaultValue_;
     }
 
-    LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
+    LOGERROR("Could not find attribute " + name + " in " + GetTypeName());
     return Variant::EMPTY;
 }
 
@@ -718,6 +719,26 @@ unsigned Serializable::GetNumNetworkAttributes() const
     const Vector<AttributeInfo>* attributes = networkState_ ? networkState_->attributes_ :
         context_->GetNetworkAttributes(GetType());
     return attributes ? attributes->Size() : 0;
+}
+
+void Serializable::SetInstanceDefault(const String& name, const Variant& defaultValue)
+{
+    // Allocate the instance level default value
+    if (!instanceDefaultValues_)
+        instanceDefaultValues_ = new VariantMap();
+    instanceDefaultValues_->operator[] (name) = defaultValue;
+}
+
+Variant Serializable::GetInstanceDefault(const String& name) const
+{
+    if (instanceDefaultValues_)
+    {
+        VariantMap::ConstIterator i = instanceDefaultValues_->Find(name);
+        if (i != instanceDefaultValues_->End())
+            return i->second_;
+    }
+
+    return Variant::EMPTY;
 }
 
 }

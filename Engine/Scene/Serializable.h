@@ -53,7 +53,7 @@ public:
     /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor.
-    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest);
+    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const;
     /// Return attribute descriptions, or null if none defined.
     virtual const Vector<AttributeInfo>* GetAttributes() const;
     /// Return network replication attribute descriptions, or null if none defined.
@@ -61,11 +61,11 @@ public:
     /// Load from binary data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Save as binary data. Return true if successful.
-    virtual bool Save(Serializer& dest);
+    virtual bool Save(Serializer& dest) const;
     /// Load from XML data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest);
+    virtual bool SaveXML(XMLElement& dest) const;
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes() {}
     /// Return whether should save default-valued attributes into XML. Default false.
@@ -75,6 +75,8 @@ public:
     bool SetAttribute(unsigned index, const Variant& value);
     /// Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
+    /// Reset all editable attributes to their default values.
+    void ResetToDefault();
     /// Allocate network attribute state.
     void AllocateNetworkState();
     /// Write initial delta network update.
@@ -89,13 +91,13 @@ public:
     void ReadLatestDataUpdate(Deserializer& source);
 
     /// Return attribute value by index. Return empty if illegal index.
-    Variant GetAttribute(unsigned index);
+    Variant GetAttribute(unsigned index) const;
     /// Return attribute value by name. Return empty if not found.
-    Variant GetAttribute(const String& name);
+    Variant GetAttribute(const String& name) const;
     /// Return attribute default value by index. Return empty if illegal index.
-    Variant GetAttributeDefault(unsigned index);
+    Variant GetAttributeDefault(unsigned index) const;
     /// Return attribute default value by name. Return empty if not found.
-    Variant GetAttributeDefault(const String& name);
+    Variant GetAttributeDefault(const String& name) const;
     /// Return number of attributes.
     unsigned GetNumAttributes() const;
     /// Return number of network replication attributes.
@@ -106,6 +108,10 @@ protected:
     NetworkState* networkState_;
 
 private:
+    /// Set instance-level default value. Allocate the internal data structure as necessary.
+    void SetInstanceDefault(const String& name, const Variant& defaultValue);
+    /// Get instance-level default value.
+    Variant GetInstanceDefault(const String& name) const;
     /// Attribute default value at each instance level.
     VariantMap* instanceDefaultValues_;
 };
@@ -127,10 +133,10 @@ public:
     }
 
     /// Invoke getter function.
-    virtual void Get(Serializable* ptr, Variant& dest)
+    virtual void Get(const Serializable* ptr, Variant& dest) const
     {
         assert(ptr);
-        T* classPtr = static_cast<T*>(ptr);
+        const T* classPtr = static_cast<const T*>(ptr);
         dest = (classPtr->*getFunction_)();
     }
 
@@ -165,10 +171,10 @@ public:
     }
 
     /// Invoke getter function.
-    virtual void Get(Serializable* ptr, Variant& dest)
+    virtual void Get(const Serializable* ptr, Variant& dest) const
     {
         assert(ptr);
-        T* classPtr = static_cast<T*>(ptr);
+        const T* classPtr = static_cast<const T*>(ptr);
         dest = (classPtr->*getFunction_)();
     }
 

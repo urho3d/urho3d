@@ -25,6 +25,7 @@
 #include "HashBase.h"
 #include "Pair.h"
 #include "Sort.h"
+#include "Vector.h"
 
 #include <cassert>
 
@@ -440,6 +441,16 @@ public:
         return FindNode(key, hashKey) != 0;
     }
     
+    /// Return all the keys.
+    Vector<T> Keys() const
+    {
+        Vector<T> result;
+        result.Reserve(Size());
+        for (ConstIterator i = Begin(); i != End(); ++i)
+            result.Push(i->first_);
+        return result;
+    }
+
     /// Return iterator to the beginning.
     Iterator Begin() { return Iterator(Head()); }
     /// Return iterator to the beginning.

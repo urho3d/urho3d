@@ -988,7 +988,7 @@ bool Copy()
     {
         bool ret = true;
         if (!selectedNodes.empty || !selectedComponents.empty)
-            ret = ret && selectedNodes.empty || selectedComponents.empty ? SceneCopy() : false;   // Node and component is mutually exclusive for copy action
+            ret = ret && (selectedNodes.empty || selectedComponents.empty ? SceneCopy() : false);   // Node and component is mutually exclusive for copy action
         // Not mutually exclusive
         if (!selectedUIElements.empty)
             ret = ret && UIElementCopy();
@@ -1040,6 +1040,22 @@ bool SelectAll()
             return UIElementSelectAll();
         else
             return SceneSelectAll();    // If nothing is selected yet, fall back to scene select all
+    }
+
+    return false;
+}
+
+bool ResetToDefault()
+{
+    if (CheckHierarchyWindowFocus())
+    {
+        bool ret = true;
+        if (!selectedNodes.empty || !selectedComponents.empty)
+            ret = ret && (selectedNodes.empty || selectedComponents.empty ? SceneResetToDefault() : false);   // Node and component is mutually exclusive for reset-to-default action
+        // Not mutually exclusive
+        if (!selectedUIElements.empty)
+            ret = ret && UIElementResetToDefault();
+        return ret;
     }
 
     return false;

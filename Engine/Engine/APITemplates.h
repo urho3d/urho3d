@@ -371,17 +371,18 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
 {
     RegisterObject<T>(engine, className);
     engine->RegisterObjectMethod(className, "bool Load(File@+, bool setInstanceDefault = false)", asFUNCTION(SerializableLoad), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool Save(File@+)", asFUNCTION(SerializableSave), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Save(File@+) const", asFUNCTION(SerializableSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&, bool setInstanceDefault = false)", asMETHODPR(T, LoadXML, (const XMLElement&, bool), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&)", asMETHODPR(T, SaveXML, (XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&) const", asMETHODPR(T, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void ApplyAttributes()", asMETHODPR(T, ApplyAttributes, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(T, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Variant GetAttribute(const String&in)", asMETHODPR(T, GetAttribute, (const String&), Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Variant GetAttributeDefault(const String&in)", asMETHODPR(T, GetAttributeDefault, (const String&), Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void ResetToDefault()", asMETHOD(T, ResetToDefault), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Variant GetAttribute(const String&in) const", asMETHODPR(T, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Variant GetAttributeDefault(const String&in) const", asMETHODPR(T, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numAttributes() const", asMETHODPR(T, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool set_attributes(uint, const Variant&in) const", asMETHODPR(T, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Variant get_attributes(uint) const", asMETHODPR(T, GetAttribute, (unsigned), Variant), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Variant get_attributeDefaults(uint) const", asMETHODPR(T, GetAttributeDefault, (unsigned), Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Variant get_attributes(uint) const", asMETHODPR(T, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Variant get_attributeDefaults(uint) const", asMETHODPR(T, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(uint) const", asFUNCTION(SerializableGetAttributeInfo), asCALL_CDECL_OBJLAST);
     RegisterSubclass<Object, T>(engine, "Serializable", className);
 }
@@ -602,18 +603,12 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
 
 static bool ResourceLoad(File* file, XMLFile* ptr)
 {
-    if (file)
-        return ptr->Load(*file);
-    else
-        return false;
+    return file && ptr->Load(*file);
 }
 
 static bool ResourceSave(File* file, XMLFile* ptr)
 {
-    if (file)
-        return ptr->Save(*file);
-    else
-        return false;
+    return file && ptr->Save(*file);
 }
 
 /// Template function for registering a class derived from Resource.
@@ -628,7 +623,7 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
         RegisterNamedObjectConstructor<T>(engine, className);
     }
     engine->RegisterObjectMethod(className, "bool Load(File@+)", asFUNCTION(ResourceLoad), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool Save(File@+)", asFUNCTION(ResourceSave), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Save(File@+) const", asFUNCTION(ResourceSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void set_name(const String&in) const", asMETHODPR(T, SetName, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHODPR(T, GetName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_memoryUse() const", asMETHODPR(T, GetMemoryUse, () const, unsigned), asCALL_THISCALL);

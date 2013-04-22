@@ -168,6 +168,8 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
         popup.AddChild(CreateMenuDivider());
+        popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
+        popup.AddChild(CreateMenuDivider());
         popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
         popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
         popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
@@ -203,7 +205,7 @@ void CreateMenuBar()
         popup.AddChild(childMenu);
         popup.AddChild(CreateMenuDivider());
 
-        childMenu = CreateMenuItem("New UI-element", null, SHOW_POPUP_INDICATOR);
+        childMenu = CreateMenuItem("UI-element", null, SHOW_POPUP_INDICATOR);
         childPopup = CreatePopup(childMenu);
         String[] typeNames = { "BorderImage", "Button", "CheckBox", "DropDownList", "LineEdit", "ListView", "Menu", "ScrollBar", "ScrollView", "Slider", "Sprite", "Text", "Window" };
         for (uint i = 0; i < typeNames.length; ++i)

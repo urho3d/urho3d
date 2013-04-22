@@ -507,7 +507,7 @@ float LineEdit::GetDoubleClickInterval() const
     return (float)doubleClickInterval_ / 1000.0f;
 }
 
-bool LineEdit::FilterImplicitAttributes(XMLElement& dest)
+bool LineEdit::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!BorderImage::FilterImplicitAttributes(dest))
         return false;

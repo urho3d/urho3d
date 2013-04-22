@@ -318,6 +318,8 @@ void SetSceneModified()
 
 bool SceneDelete()
 {
+    ui.cursor.shape = CS_BUSY;
+
     BeginSelectionModify();
 
     // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
@@ -407,7 +409,6 @@ bool SceneCopy()
             rootElem.SetBool("local", selectedComponents[i].id >= FIRST_LOCAL_ID);
             sceneCopyBuffer.Push(xml);
         }
-        return true;
     }
     // Copy nodes.
     else
@@ -424,9 +425,9 @@ bool SceneCopy()
             rootElem.SetBool("local", selectedNodes[i].id >= FIRST_LOCAL_ID);
             sceneCopyBuffer.Push(xml);
         }
-
-        return true;
     }
+
+    return true;
 }
 
 bool ScenePaste()
@@ -653,6 +654,53 @@ bool SceneSelectAll()
         indices.Push(GetListIndex(rootLevelNodes[i]));
     hierarchyList.SetSelections(indices);
     EndSelectionModify();
+
+    return true;
+}
+
+bool SceneResetToDefault()
+{
+    ui.cursor.shape = CS_BUSY;
+
+    // Group for storing undo actions
+    EditActionGroup group;
+
+    // Reset selected component to their default
+    if (!selectedComponents.empty)
+    {
+        for (uint i = 0; i < selectedComponents.length; ++i)
+        {
+            Component@ component = selectedComponents[i];
+
+            ResetAttributesAction action;
+            action.Define(component);
+            group.actions.Push(action);
+
+            component.ResetToDefault();
+            for (uint j = 0; j < component.numAttributes; ++j)
+                PostEditAttribute(component, j);
+        }
+    }
+    // OR reset selected nodes to their default
+    else
+    {
+        for (uint i = 0; i < selectedNodes.length; ++i)
+        {
+            Node@ node = selectedNodes[i];
+
+            ResetAttributesAction action;
+            action.Define(node);
+            group.actions.Push(action);
+
+            node.ResetToDefault();
+            for (uint j = 0; j < node.numAttributes; ++j)
+                PostEditAttribute(node, j);
+        }
+    }
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+    attributesFullDirty = true;
 
     return true;
 }

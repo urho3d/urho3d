@@ -136,6 +136,8 @@ namespace Urho3D
 - uint AM_DEFAULT
 - uint AM_LATESTDATA
 - uint AM_NOEDIT
+- uint AM_NODEID
+- uint AM_COMPONENTID
 - uint FIRST_REPLICATED_ID
 - uint LAST_REPLICATED_ID
 - uint FIRST_LOCAL_ID
@@ -1128,7 +1130,7 @@ Resource
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1182,7 +1184,7 @@ Image
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - void FlipVertical()
 - void SaveBMP(const String&)
 - void SavePNG(const String&)
@@ -1208,7 +1210,7 @@ XMLFile
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - XMLElement CreateRoot(const String&)
 - XMLElement GetRoot(const String& arg0 = String ( ))
 
@@ -1318,13 +1320,14 @@ Serializable
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1342,13 +1345,14 @@ Component
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -1373,13 +1377,14 @@ Node
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void SetScale(float)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
@@ -1465,13 +1470,14 @@ SmoothedTransform
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void Update(float, float)
@@ -1502,13 +1508,14 @@ Scene
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void SetScale(float)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
@@ -1640,13 +1647,14 @@ DebugRenderer
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
@@ -1678,13 +1686,14 @@ Camera
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -1805,7 +1814,7 @@ Texture
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - void SetNumLevels(uint)
 - void ClearDataLost()
 
@@ -1872,7 +1881,7 @@ Texture2D
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - void SetNumLevels(uint)
 - void ClearDataLost()
 - bool SetSize(int, int, uint, TextureUsage arg3 = TEXTURE_STATIC)
@@ -1908,7 +1917,7 @@ TextureCube
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - void SetNumLevels(uint)
 - void ClearDataLost()
 - bool SetSize(int, uint, TextureUsage arg2 = TEXTURE_STATIC)
@@ -1965,7 +1974,7 @@ Technique
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - Pass@ CreatePass(StringHash)
 - void RemovePass(StringHash)
 - bool HasPass(StringHash) const
@@ -1987,7 +1996,7 @@ Material
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - void SetTechnique(uint, Technique@, uint arg2 = 0, float arg3 = 0.0)
 - void SetUVTransform(const Vector2&, float, const Vector2&)
 - void SetUVTransform(const Vector2&, float, float)
@@ -2017,7 +2026,7 @@ Model
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -2046,7 +2055,7 @@ Animation
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - void AddTrigger(float, bool, const Variant&)
 - void RemoveTrigger(uint)
 - void RemoveAllTriggers()
@@ -2071,13 +2080,14 @@ Drawable
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2136,13 +2146,14 @@ Light
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2198,13 +2209,14 @@ Zone
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2253,13 +2265,14 @@ StaticModel
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2304,13 +2317,14 @@ Skybox
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2373,13 +2387,14 @@ AnimatedModel
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2442,13 +2457,14 @@ AnimationController
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2510,13 +2526,14 @@ BillboardSet
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2563,13 +2580,14 @@ ParticleEmitter
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2617,13 +2635,14 @@ CustomGeometry
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2674,13 +2693,14 @@ DecalSet
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2728,13 +2748,14 @@ TerrainPatch
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2772,13 +2793,14 @@ Terrain
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -2833,13 +2855,14 @@ Octree
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -3016,7 +3039,7 @@ Sound
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3040,13 +3063,14 @@ SoundListener
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -3071,13 +3095,14 @@ SoundSource
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -3116,13 +3141,14 @@ SoundSource3D
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -3188,7 +3214,7 @@ Font
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - bool SaveXML(File@, int, bool arg2 = false)
 - bool SaveXML(const String&, int, bool arg2 = false)
 
@@ -3207,13 +3233,14 @@ UIElement
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3323,13 +3350,14 @@ BorderImage
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3447,13 +3475,14 @@ Sprite
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3537,13 +3566,14 @@ Button
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3668,13 +3698,14 @@ CheckBox
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3795,13 +3826,14 @@ Cursor
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3921,13 +3953,14 @@ Slider
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -4051,13 +4084,14 @@ ScrollBar
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -4179,13 +4213,14 @@ ScrollView
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -4305,13 +4340,14 @@ ListView
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -4460,13 +4496,14 @@ Text
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -4592,13 +4629,14 @@ Text3D
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -4655,13 +4693,14 @@ LineEdit
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -4790,13 +4829,14 @@ Menu
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -4928,13 +4968,14 @@ DropDownList
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -5077,13 +5118,14 @@ Window
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -5282,13 +5324,14 @@ NetworkPriority
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -5377,13 +5420,14 @@ CollisionShape
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -5425,13 +5469,14 @@ RigidBody
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -5490,13 +5535,14 @@ Constraint
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -5543,13 +5589,14 @@ PhysicsWorld
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -5586,13 +5633,14 @@ Navigable
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -5618,13 +5666,14 @@ NavigationMesh
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
@@ -5673,7 +5722,7 @@ ScriptFile
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
-- bool Save(File@)
+- bool Save(File@) const
 - bool Execute(const String&, const Variant[]@)
 
 Properties:<br>
@@ -5695,13 +5744,14 @@ ScriptInstance
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
-- bool Save(File@)
+- bool Save(File@) const
 - bool LoadXML(const XMLElement&, bool arg1 = false)
-- bool SaveXML(XMLElement&)
+- bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- Variant GetAttributeDefault(const String&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)

@@ -193,7 +193,7 @@ void Slider::SetRepeatRate(float rate)
     repeatRate_ = Max(rate, 0.0f);
 }
 
-bool Slider::FilterImplicitAttributes(XMLElement& dest)
+bool Slider::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!BorderImage::FilterImplicitAttributes(dest))
         return false;

@@ -191,7 +191,7 @@ void DropDownList::SetSelectionAttr(unsigned index)
     SetSelection(index);
 }
 
-bool DropDownList::FilterImplicitAttributes(XMLElement& dest)
+bool DropDownList::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!Menu::FilterImplicitAttributes(dest))
         return false;
@@ -210,7 +210,7 @@ bool DropDownList::FilterImplicitAttributes(XMLElement& dest)
     return true;
 }
 
-bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest)
+bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
 {
     if (!Menu::FilterPopupImplicitAttributes(dest))
         return false;

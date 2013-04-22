@@ -205,7 +205,7 @@ float ScrollBar::GetEffectiveScrollStep() const
     return scrollStep_ * stepFactor_;
 }
 
-bool ScrollBar::FilterImplicitAttributes(XMLElement& dest)
+bool ScrollBar::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!UIElement::FilterImplicitAttributes(dest))
         return false;
@@ -238,7 +238,7 @@ bool ScrollBar::FilterImplicitAttributes(XMLElement& dest)
     return true;
 }
 
-bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& name)
+bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& name) const
 {
     if (!dest)
         return false;

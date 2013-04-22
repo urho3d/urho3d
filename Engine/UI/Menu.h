@@ -45,7 +45,7 @@ public:
     /// Load from XML data with style. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest);
+    virtual bool SaveXML(XMLElement& dest) const;
 
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -78,7 +78,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterPopupImplicitAttributes(XMLElement& dest);
+    virtual bool FilterPopupImplicitAttributes(XMLElement& dest) const;
     /// Popup element.
     SharedPtr<UIElement> popup_;
     /// Popup element offset.

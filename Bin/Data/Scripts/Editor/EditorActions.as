@@ -286,6 +286,112 @@ class EditAttributeAction : EditAction
     }
 }
 
+class ResetAttributesAction : EditAction
+{
+    int targetType;
+    uint targetID;
+    Array<Variant> undoValues;
+    VariantMap internalVars;    // UIElement specific
+
+    void Define(Serializable@ target)
+    {
+        for (uint i = 0; i < target.numAttributes; ++i)
+            undoValues.Push(target.attributes[i]);
+
+        targetType = GetType(target);
+        targetID = GetID(target, targetType);
+
+        if (targetType == ITEM_UI_ELEMENT)
+        {
+            // Special handling for UIElement to preserve the internal variables containing the element's generated ID among others
+            UIElement@ element = target;
+            Array<ShortStringHash> keys = element.vars.keys;
+            for (uint i = 0; i < keys.length; ++i)
+            {
+                // If variable name is empty (or unregistered) then it is an internal variable and should be preserved
+                String name = GetVariableName(keys[i]);
+                if (name.empty)
+                    internalVars[keys[i]] = element.vars[keys[i]];
+            }
+        }
+    }
+
+    Serializable@ GetTarget()
+    {
+        switch (targetType)
+        {
+        case ITEM_NODE:
+            return editorScene.GetNode(targetID);
+        case ITEM_COMPONENT:
+            return editorScene.GetComponent(targetID);
+        case ITEM_UI_ELEMENT:
+            return GetUIElementByID(targetID);
+        }
+
+        return null;
+    }
+
+    void SetInternalVars(UIElement@ element)
+    {
+        // Revert back internal variables
+        Array<ShortStringHash> keys = internalVars.keys;
+        for (uint i = 0; i < keys.length; ++i)
+            element.vars[keys[i]] = internalVars[keys[i]];
+
+        if (element.vars.Contains(FILENAME_VAR))
+            CenterDialog(element);
+    }
+
+    void Undo()
+    {
+        ui.cursor.shape = CS_BUSY;
+
+        Serializable@ target = GetTarget();
+        if (target !is null)
+        {
+            for (uint i = 0; i < target.numAttributes; ++i)
+            {
+                AttributeInfo info = target.attributeInfos[i];
+                if (info.mode & AM_NOEDIT != 0 || info.mode & AM_NODEID != 0 || info.mode & AM_COMPONENTID != 0)
+                    continue;
+
+                target.attributes[i] = undoValues[i];
+                // Apply side effects
+                PostEditAttribute(target, i);
+            }
+
+            target.ApplyAttributes();
+            attributesFullDirty = true;
+        }
+    }
+
+    void Redo()
+    {
+        ui.cursor.shape = CS_BUSY;
+
+        Serializable@ target = GetTarget();
+        if (target !is null)
+        {
+            for (uint i = 0; i < target.numAttributes; ++i)
+            {
+                AttributeInfo info = target.attributeInfos[i];
+                if (info.mode & AM_NOEDIT != 0 || info.mode & AM_NODEID != 0 || info.mode & AM_COMPONENTID != 0)
+                    continue;
+
+                target.attributes[i] = target.attributeDefaults[i];
+                // Apply side effects
+                PostEditAttribute(target, i);
+            }
+
+            if (targetType == ITEM_UI_ELEMENT)
+                SetInternalVars(target);
+
+            target.ApplyAttributes();
+            attributesFullDirty = true;
+        }
+    }
+}
+
 class ToggleNodeEnabledAction : EditAction
 {
     uint nodeID;

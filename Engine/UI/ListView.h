@@ -137,7 +137,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest);
+    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
     /// Update selection effect when selection or focus changes.
     void UpdateSelectionEffect();
     /// Ensure full visibility of the item.

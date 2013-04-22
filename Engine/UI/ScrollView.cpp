@@ -272,7 +272,7 @@ void ScrollView::SetViewPositionAttr(const IntVector2& value)
     SetViewPosition(value);
 }
 
-bool ScrollView::FilterImplicitAttributes(XMLElement& dest)
+bool ScrollView::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!UIElement::FilterImplicitAttributes(dest))
         return false;
@@ -304,7 +304,7 @@ bool ScrollView::FilterImplicitAttributes(XMLElement& dest)
     return true;
 }
 
-bool ScrollView::FilterScrollBarImplicitAttributes(XMLElement& dest, const String& name)
+bool ScrollView::FilterScrollBarImplicitAttributes(XMLElement& dest, const String& name) const
 {
     if (!dest)
         return false;

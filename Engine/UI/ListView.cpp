@@ -847,7 +847,7 @@ float ListView::GetDoubleClickInterval() const
     return (float)doubleClickInterval_ / 1000.0f;
 }
 
-bool ListView::FilterImplicitAttributes(XMLElement& dest)
+bool ListView::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!ScrollView::FilterImplicitAttributes(dest))
         return false;

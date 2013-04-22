@@ -49,7 +49,7 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     /// Save resource. Return true if successful. Only supports saving to a File.
-    virtual bool Save(Serializer& dest);
+    virtual bool Save(Serializer& dest) const;
     
     /// Clear the document and create a root element.
     XMLElement CreateRoot(const String& name);

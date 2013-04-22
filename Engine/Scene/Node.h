@@ -65,9 +65,9 @@ public:
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Save as binary data. Return true if successful.
-    virtual bool Save(Serializer& dest);
+    virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest);
+    virtual bool SaveXML(XMLElement& dest) const;
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
     virtual void ApplyAttributes();
     /// Return whether should save default-valued attributes into XML. Always save node transforms for readability, even if identity.
@@ -76,7 +76,7 @@ public:
     virtual void AddReplicationState(NodeReplicationState* state);
 
     /// Save to an XML file. Return true if successful.
-    bool SaveXML(Serializer& dest);
+    bool SaveXML(Serializer& dest) const;
     /// Set name.
     void SetName(const String& name);
     /// Set position relative to parent node.

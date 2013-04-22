@@ -76,7 +76,7 @@ bool Skeleton::Load(Deserializer& source)
     return true;
 }
 
-bool Skeleton::Save(Serializer& dest)
+bool Skeleton::Save(Serializer& dest) const
 {
     if (!dest.WriteUInt(bones_.Size()))
         return false;

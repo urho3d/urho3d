@@ -228,7 +228,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
     return true;
 }
 
-bool Menu::SaveXML(XMLElement& dest)
+bool Menu::SaveXML(XMLElement& dest) const
 {
     if (!Button::SaveXML(dest))
         return false;
@@ -335,7 +335,7 @@ void Menu::SetAccelerator(int key, int qualifiers)
         UnsubscribeFromEvent(E_KEYDOWN);
 }
 
-bool Menu::FilterPopupImplicitAttributes(XMLElement& dest)
+bool Menu::FilterPopupImplicitAttributes(XMLElement& dest) const
 {
     if (!RemoveChildXML(dest, "Position"))
         return false;

@@ -52,9 +52,9 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled() {}
     /// Save as binary data. Return true if successful.
-    virtual bool Save(Serializer& dest);
+    virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest);
+    virtual bool SaveXML(XMLElement& dest) const;
     /// Return the depended on nodes to order network updates.
     virtual void GetDependencyNodes(PODVector<Node*>& dest) {};
     /// Visualize the component as debug geometry.

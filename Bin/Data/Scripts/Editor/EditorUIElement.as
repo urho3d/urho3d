@@ -443,6 +443,8 @@ bool UIElementPaste()
 
 bool UIElementDelete()
 {
+    ui.cursor.shape = CS_BUSY;
+
     BeginSelectionModify();
 
     // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
@@ -493,6 +495,35 @@ bool UIElementSelectAll()
     }
     hierarchyList.SetSelections(indices);
     EndSelectionModify();
+
+    return true;
+}
+
+bool UIElementResetToDefault()
+{
+    ui.cursor.shape = CS_BUSY;
+
+    // Group for storing undo actions
+    EditActionGroup group;
+
+    // Reset selected elements to their default values
+    for (uint i = 0; i < selectedUIElements.length; ++i)
+    {
+        UIElement@ element = selectedUIElements[i];
+
+        ResetAttributesAction action;
+        action.Define(element);
+        group.actions.Push(action);
+
+        element.ResetToDefault();
+        action.SetInternalVars(element);
+        for (uint j = 0; j < element.numAttributes; ++j)
+            PostEditAttribute(element, j);
+    }
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+    attributesFullDirty = true;
 
     return true;
 }

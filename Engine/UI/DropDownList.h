@@ -86,9 +86,9 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest);
+    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterPopupImplicitAttributes(XMLElement& dest);
+    virtual bool FilterPopupImplicitAttributes(XMLElement& dest) const;
 
     /// Listview element.
     SharedPtr<ListView> listView_;

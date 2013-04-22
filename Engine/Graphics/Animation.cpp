@@ -153,7 +153,7 @@ bool Animation::Load(Deserializer& source)
     return true;
 }
 
-bool Animation::Save(Serializer& dest)
+bool Animation::Save(Serializer& dest) const
 {
     // Write ID, name and length
     dest.WriteFileID("UANI");

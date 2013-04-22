@@ -283,82 +283,95 @@ void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void AnimatedModel::SetModel(Model* model, bool createBones)
 {
-    if (!model || model == model_)
+    if (model == model_)
         return;
 
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
     if (model_)
         UnsubscribeFromEvent(model_, E_RELOADFINISHED);
-    if (model)
-        SubscribeToEvent(model, E_RELOADFINISHED, HANDLER(AnimatedModel, HandleModelReloadFinished));
 
     model_ = model;
 
-    // Copy the subgeometry & LOD level structure
-    SetNumGeometries(model->GetNumGeometries());
-    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
-    const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
-    for (unsigned i = 0; i < geometries.Size(); ++i)
+    if (model)
     {
-        geometries_[i] = geometries[i];
-        geometryData_[i].center_ = geometryCenters[i];
-    }
+        SubscribeToEvent(model, E_RELOADFINISHED, HANDLER(AnimatedModel, HandleModelReloadFinished));
 
-    // Copy geometry bone mappings
-    const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
-    geometryBoneMappings_.Clear();
-    geometryBoneMappings_.Reserve(geometryBoneMappings.Size());
-    for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
-        geometryBoneMappings_.Push(geometryBoneMappings[i]);
-
-    // Copy morphs. Note: morph vertex buffers will be created later on-demand
-    morphVertexBuffers_.Clear();
-    morphs_.Clear();
-    const Vector<ModelMorph>& morphs = model->GetMorphs();
-    morphs_.Reserve(morphs.Size());
-    morphElementMask_ = 0;
-    for (unsigned i = 0; i < morphs.Size(); ++i)
-    {
-        ModelMorph newMorph;
-        newMorph.name_ = morphs[i].name_;
-        newMorph.nameHash_ = morphs[i].nameHash_;
-        newMorph.weight_ = 0.0f;
-        newMorph.buffers_ = morphs[i].buffers_;
-        for (HashMap<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin(); j != morphs[i].buffers_.End(); ++j)
-            morphElementMask_ |= j->second_.elementMask_;
-        morphs_.Push(newMorph);
-    }
-
-    // Copy bounding box & skeleton
-    SetBoundingBox(model->GetBoundingBox());
-    SetSkeleton(model->GetSkeleton(), createBones);
-    ResetLodLevels();
-
-    // Enable skinning in batches
-    for (unsigned i = 0; i < batches_.Size(); ++i)
-    {
-        if (skinMatrices_.Size())
+        // Copy the subgeometry & LOD level structure
+        SetNumGeometries(model->GetNumGeometries());
+        const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
+        const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
+        for (unsigned i = 0; i < geometries.Size(); ++i)
         {
-            batches_[i].geometryType_ = GEOM_SKINNED;
-            // Check if model has per-geometry bone mappings
-            if (geometrySkinMatrices_.Size() && geometrySkinMatrices_[i].Size())
+            geometries_[i] = geometries[i];
+            geometryData_[i].center_ = geometryCenters[i];
+        }
+
+        // Copy geometry bone mappings
+        const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
+        geometryBoneMappings_.Clear();
+        geometryBoneMappings_.Reserve(geometryBoneMappings.Size());
+        for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
+            geometryBoneMappings_.Push(geometryBoneMappings[i]);
+
+        // Copy morphs. Note: morph vertex buffers will be created later on-demand
+        morphVertexBuffers_.Clear();
+        morphs_.Clear();
+        const Vector<ModelMorph>& morphs = model->GetMorphs();
+        morphs_.Reserve(morphs.Size());
+        morphElementMask_ = 0;
+        for (unsigned i = 0; i < morphs.Size(); ++i)
+        {
+            ModelMorph newMorph;
+            newMorph.name_ = morphs[i].name_;
+            newMorph.nameHash_ = morphs[i].nameHash_;
+            newMorph.weight_ = 0.0f;
+            newMorph.buffers_ = morphs[i].buffers_;
+            for (HashMap<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin(); j != morphs[i].buffers_.End(); ++j)
+                morphElementMask_ |= j->second_.elementMask_;
+            morphs_.Push(newMorph);
+        }
+
+        // Copy bounding box & skeleton
+        SetBoundingBox(model->GetBoundingBox());
+        SetSkeleton(model->GetSkeleton(), createBones);
+        ResetLodLevels();
+
+        // Enable skinning in batches
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+        {
+            if (skinMatrices_.Size())
             {
-                batches_[i].shaderData_ = geometrySkinMatrices_[i][0].Data();
-                batches_[i].shaderDataSize_ = geometrySkinMatrices_[i].Size() * 12;
+                batches_[i].geometryType_ = GEOM_SKINNED;
+                // Check if model has per-geometry bone mappings
+                if (geometrySkinMatrices_.Size() && geometrySkinMatrices_[i].Size())
+                {
+                    batches_[i].shaderData_ = geometrySkinMatrices_[i][0].Data();
+                    batches_[i].shaderDataSize_ = geometrySkinMatrices_[i].Size() * 12;
+                }
+                // If not, use the global skin matrices
+                else
+                {
+                    batches_[i].shaderData_ = skinMatrices_[0].Data();
+                    batches_[i].shaderDataSize_ = skinMatrices_.Size() * 12;
+                }
             }
-            // If not, use the global skin matrices
             else
             {
-                batches_[i].shaderData_ = skinMatrices_[0].Data();
-                batches_[i].shaderDataSize_ = skinMatrices_.Size() * 12;
+                batches_[i].geometryType_ = GEOM_STATIC;
+                batches_[i].shaderData_ = 0;
+                batches_[i].shaderDataSize_ = 0;
             }
         }
-        else
-        {
-            batches_[i].geometryType_ = GEOM_STATIC;
-            batches_[i].shaderData_ = 0;
-            batches_[i].shaderDataSize_ = 0;
-        }
+    }
+    else
+    {
+        SetNumGeometries(0);
+        geometryBoneMappings_.Clear();
+        morphVertexBuffers_.Clear();
+        morphs_.Clear();
+        morphElementMask_ = 0;
+        SetBoundingBox(BoundingBox());
+        SetSkeleton(Skeleton(), false);
     }
 
     MarkNetworkUpdate();

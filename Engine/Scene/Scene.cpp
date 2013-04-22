@@ -129,7 +129,7 @@ bool Scene::Load(Deserializer& source, bool setInstanceDefault)
         return false;
 }
 
-bool Scene::Save(Serializer& dest)
+bool Scene::Save(Serializer& dest) const
 {
     PROFILE(SaveScene);
 
@@ -202,7 +202,7 @@ bool Scene::LoadXML(Deserializer& source)
         return false;
 }
 
-bool Scene::SaveXML(Serializer& dest)
+bool Scene::SaveXML(Serializer& dest) const
 {
     PROFILE(SaveSceneXML);
 
@@ -900,7 +900,7 @@ void Scene::FinishLoading(Deserializer* source)
     }
 }
 
-void Scene::FinishSaving(Serializer* dest)
+void Scene::FinishSaving(Serializer* dest) const
 {
     Deserializer* ptr = dynamic_cast<Deserializer*>(dest);
     if (ptr)

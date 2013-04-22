@@ -130,7 +130,7 @@ public:
     /// Load from XML data with style. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest);
+    virtual bool SaveXML(XMLElement& dest) const;
 
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -170,9 +170,9 @@ public:
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful.
-    bool SaveXML(Serializer& dest);
+    bool SaveXML(Serializer& dest) const;
     /// Filter attributes in serialization process.
-    bool FilterAttributes(XMLElement& dest);
+    bool FilterAttributes(XMLElement& dest) const;
 
     /// Set name.
     void SetName(const String& name);
@@ -456,13 +456,13 @@ protected:
     /// Mark screen position as needing an update.
     void MarkDirty();
     /// Remove child XML element by matching attribute name.
-    bool RemoveChildXML(XMLElement& parent, const String& name);
+    bool RemoveChildXML(XMLElement& parent, const String& name) const;
     /// Remove child XML element by matching attribute name and value.
-    bool RemoveChildXML(XMLElement& parent, const String& name, const String& value);
+    bool RemoveChildXML(XMLElement& parent, const String& name, const String& value) const;
     /// Filter UI-style attributes in serialization process.
-    bool FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem);
+    bool FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem) const;
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest);
+    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
 
     /// Name.
     String name_;

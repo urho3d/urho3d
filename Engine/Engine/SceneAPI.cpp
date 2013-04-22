@@ -37,6 +37,8 @@ static void RegisterSerializable(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint AM_DEFAULT", (void*)&AM_DEFAULT);
     engine->RegisterGlobalProperty("const uint AM_LATESTDATA", (void*)&AM_LATESTDATA);
     engine->RegisterGlobalProperty("const uint AM_NOEDIT", (void*)&AM_NOEDIT);
+    engine->RegisterGlobalProperty("const uint AM_NODEID", (void*)&AM_NODEID);
+    engine->RegisterGlobalProperty("const uint AM_COMPONENTID", (void*)&AM_COMPONENTID);
     
     RegisterSerializable<Serializable>(engine, "Serializable");
 }

@@ -381,11 +381,7 @@ static bool VariantMapEraseHash(ShortStringHash key, VariantMap& map)
 
 static CScriptArray* VariantMapGetKeys(const VariantMap& map)
 {
-    Vector<ShortStringHash> result;
-    result.Reserve(map.Size());
-    for (VariantMap::ConstIterator i = map.Begin(); i != map.End(); ++i)
-        result.Push(i->first_);
-    return VectorToArray<ShortStringHash>(result, "Array<StringHash>");
+    return VectorToArray<ShortStringHash>(map.Keys(), "Array<ShortStringHash>");
 }
 
 static void RegisterVariant(asIScriptEngine* engine)

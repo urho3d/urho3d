@@ -226,7 +226,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
         if (styleName.Empty())
             styleName = GetTypeName();
 
-        if (styleName.ToLower() == "none")
+        if (styleName == "none")
             appliedStyle_ = styleName;
         else
             SetStyle(styleFile, styleName);
@@ -297,7 +297,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     return true;
 }
 
-bool UIElement::SaveXML(XMLElement& dest)
+bool UIElement::SaveXML(XMLElement& dest) const
 {
     // Write type
     if (GetTypeName() != "UIElement")
@@ -506,14 +506,14 @@ bool UIElement::LoadXML(Deserializer& source)
     return xml->Load(source) && LoadXML(xml->GetRoot());
 }
 
-bool UIElement::SaveXML(Serializer& dest)
+bool UIElement::SaveXML(Serializer& dest) const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("element");
     return SaveXML(rootElem) && xml->Save(dest);
 }
 
-bool UIElement::FilterAttributes(XMLElement& dest)
+bool UIElement::FilterAttributes(XMLElement& dest) const
 {
     // Filter UI styling attributes
     XMLFile* styleFile = GetDefaultStyle();
@@ -856,6 +856,8 @@ void UIElement::SetStyle(XMLFile* file, const String& typeName)
 void UIElement::SetStyle(const XMLElement& element)
 {
     appliedStyle_ = element.GetAttribute("type");
+
+    // Consider style attribute values as instance-level attribute default values
     LoadXML(element, true);
 }
 
@@ -1546,7 +1548,7 @@ void UIElement::MarkDirty()
         (*i)->MarkDirty();
 }
 
-bool UIElement::RemoveChildXML(XMLElement& parent, const String& name)
+bool UIElement::RemoveChildXML(XMLElement& parent, const String& name) const
 {
     static XPathQuery matchXPathQuery("./attribute[@name=$attributeName]", "attributeName:String");
 
@@ -1557,7 +1559,7 @@ bool UIElement::RemoveChildXML(XMLElement& parent, const String& name)
     return !removeElem || parent.RemoveChild(removeElem);
 }
 
-bool UIElement::RemoveChildXML(XMLElement& parent, const String& name, const String& value)
+bool UIElement::RemoveChildXML(XMLElement& parent, const String& name, const String& value) const
 {
     static XPathQuery matchXPathQuery("./attribute[@name=$attributeName and @value=$attributeValue]", "attributeName:String, attributeValue:String");
 
@@ -1570,7 +1572,7 @@ bool UIElement::RemoveChildXML(XMLElement& parent, const String& name, const Str
     return !removeElem || parent.RemoveChild(removeElem);
 }
 
-bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem)
+bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem) const
 {
     // Remove style attribute only when its value is identical to the value stored in style file
     String style = styleElem.GetAttribute("style");
@@ -1606,7 +1608,7 @@ bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styl
     return true;
 }
 
-bool UIElement::FilterImplicitAttributes(XMLElement& dest)
+bool UIElement::FilterImplicitAttributes(XMLElement& dest) const
 {
     // Remove style attribute when it is the same as its type
     if (!dest.GetAttribute("style").Empty() && dest.GetAttribute("style") == dest.GetAttribute("type"))

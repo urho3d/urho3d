@@ -53,7 +53,7 @@ void Component::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     MarkNetworkUpdate();
 }
 
-bool Component::Save(Serializer& dest)
+bool Component::Save(Serializer& dest) const
 {
     // Write type and ID
     if (!dest.WriteShortStringHash(GetType()))
@@ -65,7 +65,7 @@ bool Component::Save(Serializer& dest)
     return Serializable::Save(dest);
 }
 
-bool Component::SaveXML(XMLElement& dest)
+bool Component::SaveXML(XMLElement& dest) const
 {
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))

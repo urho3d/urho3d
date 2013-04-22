@@ -220,7 +220,7 @@ bool Material::Load(Deserializer& source)
     return true;
 }
 
-bool Material::Save(Serializer& dest)
+bool Material::Save(Serializer& dest) const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement materialElem = xml->CreateRoot("material");
@@ -228,7 +228,7 @@ bool Material::Save(Serializer& dest)
     // Write techniques
     for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
-        TechniqueEntry& entry = techniques_[i];
+        const TechniqueEntry& entry = techniques_[i];
         if (!entry.technique_)
             continue;
         

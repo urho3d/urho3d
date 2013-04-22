@@ -52,7 +52,7 @@ class AttributeAccessor : public RefCounted
 {
 public:
     /// Get the attribute.
-    virtual void Get(Serializable* ptr, Variant& dest) {}
+    virtual void Get(const Serializable* ptr, Variant& dest) const {}
     /// Set the attribute.
     virtual void Set(Serializable* ptr, const Variant& src) {}
 };

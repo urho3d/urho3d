@@ -89,7 +89,7 @@ public:
     /// Read from a stream. Return true if successful.
     bool Load(Deserializer& source);
     /// Write to a stream. Return true if successful.
-    bool Save(Serializer& dest);
+    bool Save(Serializer& dest) const;
     /// Define from another skeleton.
     void Define(const Skeleton& src);
     /// Clear bones.

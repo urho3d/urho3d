@@ -105,7 +105,7 @@ bool Node::Load(Deserializer& source, bool setInstanceDefault)
     return success;
 }
 
-bool Node::Save(Serializer& dest)
+bool Node::Save(Serializer& dest) const
 {
     // Write node ID
     if (!dest.WriteUInt(id_))
@@ -159,7 +159,7 @@ bool Node::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return success;
 }
 
-bool Node::SaveXML(XMLElement& dest)
+bool Node::SaveXML(XMLElement& dest) const
 {
     // Write node ID
     if (!dest.SetInt("id", id_))
@@ -207,7 +207,7 @@ void Node::AddReplicationState(NodeReplicationState* state)
     networkState_->replicationStates_.Push(state);
 }
 
-bool Node::SaveXML(Serializer& dest)
+bool Node::SaveXML(Serializer& dest) const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("node");

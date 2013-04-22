@@ -102,7 +102,7 @@ bool XMLFile::Load(Deserializer& source)
     return true;
 }
 
-bool XMLFile::Save(Serializer& dest)
+bool XMLFile::Save(Serializer& dest) const
 {
     XMLWriter writer(dest);
     document_->save(writer);

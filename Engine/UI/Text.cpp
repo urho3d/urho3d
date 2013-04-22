@@ -354,7 +354,7 @@ ResourceRef Text::GetFontAttr() const
     return GetResourceRef(font_, Font::GetTypeStatic());
 }
 
-bool Text::FilterImplicitAttributes(XMLElement& dest)
+bool Text::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!UIElement::FilterImplicitAttributes(dest))
         return false;

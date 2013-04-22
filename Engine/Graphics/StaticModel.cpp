@@ -228,7 +228,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
 
 void StaticModel::SetModel(Model* model)
 {
-    if (!model || model == model_)
+    if (model == model_)
         return;
     
     // If script erroneously calls StaticModel::SetModel on an AnimatedModel, warn and redirect
@@ -243,23 +243,32 @@ void StaticModel::SetModel(Model* model)
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
     if (model_)
         UnsubscribeFromEvent(model_, E_RELOADFINISHED);
-    if (model)
-        SubscribeToEvent(model, E_RELOADFINISHED, HANDLER(StaticModel, HandleModelReloadFinished));
     
     model_ = model;
     
-    // Copy the subgeometry & LOD level structure
-    SetNumGeometries(model->GetNumGeometries());
-    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
-    const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
-    for (unsigned i = 0; i < geometries.Size(); ++i)
+    if (model)
     {
-        geometries_[i] = geometries[i];
-        geometryData_[i].center_ = geometryCenters[i];
+        SubscribeToEvent(model, E_RELOADFINISHED, HANDLER(StaticModel, HandleModelReloadFinished));
+
+        // Copy the subgeometry & LOD level structure
+        SetNumGeometries(model->GetNumGeometries());
+        const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
+        const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
+        for (unsigned i = 0; i < geometries.Size(); ++i)
+        {
+            geometries_[i] = geometries[i];
+            geometryData_[i].center_ = geometryCenters[i];
+        }
+
+        SetBoundingBox(model->GetBoundingBox());
+        ResetLodLevels();
+    }
+    else
+    {
+        SetNumGeometries(0);
+        SetBoundingBox(BoundingBox());
     }
     
-    SetBoundingBox(model->GetBoundingBox());
-    ResetLodLevels();
     MarkNetworkUpdate();
 }
 
