@@ -13,6 +13,7 @@ Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com)
 - Wei Tjong Yao
 - Colin Barrett
+- Erik Beran
 - Carlo Carollo
 - Alex Fuller
 - Mika Heinonen

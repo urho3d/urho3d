@@ -1690,9 +1690,9 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void SetOrthoSize(const Vector2&)
 - Frustum GetSplitFrustum(float, float) const
-- Ray GetScreenRay(float, float)
-- Vector2 WorldToScreenPoint(const Vector3&)
-- Vector3 ScreenToWorldPoint(const Vector3&)
+- Ray GetScreenRay(float, float) const
+- Vector2 WorldToScreenPoint(const Vector3&) const
+- Vector3 ScreenToWorldPoint(const Vector3&) const
 - float GetDistance(const Vector3&) const
 - float GetDistanceSquared(const Vector3&) const
 

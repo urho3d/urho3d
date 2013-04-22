@@ -120,17 +120,17 @@ public:
     /// Return split frustum in view space.
     Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const;
     /// Return ray corresponding to normalized screen coordinates (0.0 to 1.0.)
-    Ray GetScreenRay(float x, float y);
+    Ray GetScreenRay(float x, float y) const;
     // Convert a world space point to normalized screen coordinates (0.0 - 1.0).
-    Vector2 WorldToScreenPoint(const Vector3& worldPos);
+    Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
     // Convert normalized screen coordinates (0.0 - 1.0) and depth to a world space point.
-    Vector3 ScreenToWorldPoint(const Vector3& screenPos);
+    Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
     /// Return forward vector.
-    Vector3 GetForwardVector();
+    Vector3 GetForwardVector() const;
     /// Return right vector.
-    Vector3 GetRightVector();
+    Vector3 GetRightVector() const;
     /// Return up vector.
-    Vector3 GetUpVector();
+    Vector3 GetUpVector() const;
     /// Return projection offset.
     const Vector2& GetProjectionOffset() const { return projectionOffset_; }
     /// Return vertical flipping mode.

@@ -266,7 +266,7 @@ Frustum Camera::GetViewSpaceSplitFrustum(float nearClip, float farClip) const
     return ret;
 }
 
-Ray Camera::GetScreenRay(float x, float y)
+Ray Camera::GetScreenRay(float x, float y) const
 {
     Ray ret;
     
@@ -291,7 +291,7 @@ Ray Camera::GetScreenRay(float x, float y)
     return ret;
 }
 
-Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos)
+Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos) const
 {
     Vector3 eyeSpacePos = GetInverseWorldTransform() * worldPos;
     Vector2 ret;
@@ -313,7 +313,7 @@ Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos)
     return ret;
 }
 
-Vector3 Camera::ScreenToWorldPoint(const Vector3& screenPos)
+Vector3 Camera::ScreenToWorldPoint(const Vector3& screenPos) const
 {
     Ray ray = GetScreenRay(screenPos.x_, screenPos.y_);
     return ray.origin_ + ray.direction_ * screenPos.z_;
@@ -454,17 +454,17 @@ float Camera::GetHalfViewSize() const
         return orthoSize_ * 0.5f / zoom_;
 }
 
-Vector3 Camera::GetForwardVector()
+Vector3 Camera::GetForwardVector() const
 {
     return node_ ? node_->GetWorldDirection() : Vector3::FORWARD;
 }
 
-Vector3 Camera::GetRightVector()
+Vector3 Camera::GetRightVector() const
 {
     return node_ ? node_->GetWorldTransform().RotationMatrix() * Vector3::RIGHT : Vector3::RIGHT;
 }
 
-Vector3 Camera::GetUpVector()
+Vector3 Camera::GetUpVector() const
 {
     return node_ ? node_->GetWorldTransform().RotationMatrix() * Vector3::UP : Vector3::UP;
 }

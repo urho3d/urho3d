@@ -71,9 +71,9 @@ static void RegisterCamera(asIScriptEngine* engine)
     RegisterComponent<Camera>(engine, "Camera");
     engine->RegisterObjectMethod("Camera", "void SetOrthoSize(const Vector2&in)", asMETHODPR(Camera, SetOrthoSize, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum GetSplitFrustum(float, float) const", asMETHOD(Camera, GetSplitFrustum), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Ray GetScreenRay(float, float)", asMETHOD(Camera, GetScreenRay), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Vector2 WorldToScreenPoint(const Vector3&in)", asMETHOD(Camera, WorldToScreenPoint), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Vector3 ScreenToWorldPoint(const Vector3&in)", asMETHOD(Camera, ScreenToWorldPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Ray GetScreenRay(float, float) const", asMETHOD(Camera, GetScreenRay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Vector2 WorldToScreenPoint(const Vector3&in) const", asMETHOD(Camera, WorldToScreenPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Vector3 ScreenToWorldPoint(const Vector3&in) const", asMETHOD(Camera, ScreenToWorldPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float GetDistance(const Vector3&in) const", asMETHOD(Camera, GetDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float GetDistanceSquared(const Vector3&in) const", asMETHOD(Camera, GetDistanceSquared), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_nearClip(float)", asMETHOD(Camera, SetNearClip), asCALL_THISCALL);
@@ -107,9 +107,9 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "const Matrix3x4& get_inverseWorldTransform() const", asMETHOD(Camera, GetInverseWorldTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum get_viewSpaceFrustum() const", asMETHOD(Camera, GetViewSpaceFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_halfViewSize() const", asMETHOD(Camera, GetHalfViewSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Vector3 get_forwardVector()", asMETHOD(Camera, GetForwardVector), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Vector3 get_rightVector()", asMETHOD(Camera, GetRightVector), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Vector3 get_upVector()", asMETHOD(Camera, GetUpVector), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Vector3 get_forwardVector() const", asMETHOD(Camera, GetForwardVector), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Vector3 get_rightVector() const", asMETHOD(Camera, GetRightVector), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "Vector3 get_upVector() const", asMETHOD(Camera, GetUpVector), asCALL_THISCALL);
 }
 
 static Node* BoneGetNode(Bone* ptr)
