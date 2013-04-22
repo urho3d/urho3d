@@ -560,7 +560,7 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     if (drawableUpdates_.Empty())
         return;
     
-    PROFILE(AnimateDrawables);
+    PROFILE(UpdateDrawables);
     
     Scene* scene = GetScene();
     WorkQueue* queue = GetSubsystem<WorkQueue>();

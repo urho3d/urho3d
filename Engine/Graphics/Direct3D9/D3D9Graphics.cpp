@@ -941,7 +941,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             if (!vs->IsFailed())
             {
                 PROFILE(CreateVertexShader);
-
+                
                 bool success = vs->Create();
                 if (success)
                     LOGDEBUG("Created vertex shader " + vs->GetName());

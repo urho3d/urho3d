@@ -91,6 +91,8 @@ bool Shader::Load(Deserializer& source)
     File* sourceFile = dynamic_cast<File*>(&source);
     if (sourceFile && !sourceFile->IsPackaged())
     {
+        PROFILE(CheckTimestamps);
+        
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
         
         if (fileSystem && !fileSystem->HasRegisteredPaths())
@@ -159,15 +161,19 @@ bool Shader::Load(Deserializer& source)
         globalDefineValues.Push("1");
     }
     
-    if (!vsParser_.Parse(VS, shaders, globalDefines, globalDefineValues))
     {
-        LOGERROR("VS: " + vsParser_.GetErrorMessage());
-        return false;
-    }
-    if (!psParser_.Parse(PS, shaders, globalDefines, globalDefineValues))
-    {
-        LOGERROR("PS: " + psParser_.GetErrorMessage());
-        return false;
+        PROFILE(ParseShaderDefinition);
+        
+        if (!vsParser_.Parse(VS, shaders, globalDefines, globalDefineValues))
+        {
+            LOGERROR("VS: " + vsParser_.GetErrorMessage());
+            return false;
+        }
+        if (!psParser_.Parse(PS, shaders, globalDefines, globalDefineValues))
+        {
+            LOGERROR("PS: " + psParser_.GetErrorMessage());
+            return false;
+        }
     }
     
     // If variations had already been created, clear their bytecode

@@ -80,24 +80,32 @@ bool Shader::Load(Deserializer& source)
         return false;
     }
     
-    if (!vsParser_.Parse(VS, shaders))
     {
-        LOGERROR("VS: " + vsParser_.GetErrorMessage());
-        return false;
-    }
-    if (!psParser_.Parse(PS, shaders))
-    {
-        LOGERROR("PS: " + psParser_.GetErrorMessage());
-        return false;
+        PROFILE(ParseShaderDefinition);
+        
+        if (!vsParser_.Parse(VS, shaders))
+        {
+            LOGERROR("VS: " + vsParser_.GetErrorMessage());
+            return false;
+        }
+        if (!psParser_.Parse(PS, shaders))
+        {
+            LOGERROR("PS: " + psParser_.GetErrorMessage());
+            return false;
+        }
     }
     
     String path, fileName, extension;
     SplitPath(GetName(), path, fileName, extension);
     
-    if (!ProcessSource(vsSourceCode_, vsSourceCodeLength_, path + fileName + ".vert"))
-        return false;
-    if (!ProcessSource(psSourceCode_, psSourceCodeLength_, path + fileName + ".frag"))
-        return false;
+    {
+        PROFILE(LoadShaderSource);
+        
+        if (!ProcessSource(vsSourceCode_, vsSourceCodeLength_, path + fileName + ".vert"))
+            return false;
+        if (!ProcessSource(psSourceCode_, psSourceCodeLength_, path + fileName + ".frag"))
+            return false;
+    }
     
     // If variations had already been created, release them and set new source code
     /// \todo Should also update defines

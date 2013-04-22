@@ -377,7 +377,7 @@ void Engine::Exit()
     exiting_ = true;
 }
 
-void Engine::DumpProfilingData()
+void Engine::DumpProfiler()
 {
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)

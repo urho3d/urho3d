@@ -5851,7 +5851,7 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void RunFrame()
 - void Exit()
-- void DumpProfilingData()
+- void DumpProfiler()
 - void DumpResources()
 - void DumpMemory()
 - Console@ CreateConsole()

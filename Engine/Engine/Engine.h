@@ -63,7 +63,7 @@ public:
     /// Close the application window and set the exit flag.
     void Exit();
     /// Dump profiling information to the log.
-    void DumpProfilingData();
+    void DumpProfiler();
     /// Dump information of all resources to the log.
     void DumpResources();
     /// Dump information of all memory allocations to the log. Supported in MSVC debug mode only.
