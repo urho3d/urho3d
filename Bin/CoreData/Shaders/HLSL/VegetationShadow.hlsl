@@ -30,16 +30,3 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
 }
-
-void PS(
-    float2 iTexCoord : TEXCOORD0,
-    out float4 oColor : COLOR0)
-{
-    #ifdef ALPHAMASK
-        float alpha = tex2D(sDiffMap, iTexCoord).a;
-        if (alpha < 0.5)
-            discard;
-    #endif
-
-    oColor = 1.0;
-}

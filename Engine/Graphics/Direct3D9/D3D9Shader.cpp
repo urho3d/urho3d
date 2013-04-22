@@ -143,6 +143,13 @@ bool Shader::Load(Deserializer& source)
     if (!xml->Load(source))
         return false;
     
+    XMLElement shaders = xml->GetRoot("shaders");
+    if (!shaders)
+    {
+        LOGERROR("No shaders element in " + source.GetName());
+        return false;
+    }
+    
     Vector<String> globalDefines;
     Vector<String> globalDefineValues;
     
@@ -152,12 +159,12 @@ bool Shader::Load(Deserializer& source)
         globalDefineValues.Push("1");
     }
     
-    if (!vsParser_.Parse(VS, xml->GetRoot("shaders"), globalDefines, globalDefineValues))
+    if (!vsParser_.Parse(VS, shaders, globalDefines, globalDefineValues))
     {
         LOGERROR("VS: " + vsParser_.GetErrorMessage());
         return false;
     }
-    if (!psParser_.Parse(PS, xml->GetRoot("shaders"), globalDefines, globalDefineValues))
+    if (!psParser_.Parse(PS, shaders, globalDefines, globalDefineValues))
     {
         LOGERROR("PS: " + psParser_.GetErrorMessage());
         return false;

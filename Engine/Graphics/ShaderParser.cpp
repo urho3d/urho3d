@@ -56,18 +56,7 @@ bool ShaderParser::Parse(ShaderType type, const XMLElement& element, const Vecto
         shader = shader.GetNext("shader");
     }
     
-    // If no shader sub-elements, check also the element itself
-    String typeName = String(element.GetAttribute("type")).ToLower();
-    if (typeName.Empty() || (type == VS && typeName == "vs") || (type == PS && typeName == "ps"))
-    {
-        if (!ParseOptions(element))
-            return false;
-        BuildCombinations();
-        return true;
-    }
-    
-    errorMessage_ = "No shader definitions";
-    return false;
+    return true;
 }
 
 bool ShaderParser::HasCombination(const String& name) const

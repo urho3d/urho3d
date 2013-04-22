@@ -1,8 +1,5 @@
 <shaders>
-    <shader type="vs">
-        <variation name="" />
-        <variation name="Skinned" define="SKINNED" />
-    </shader>
+    <shader type="vs" />
     <shader type="ps">
         <option name="AlphaMask" define="ALPHAMASK" />
     </shader>

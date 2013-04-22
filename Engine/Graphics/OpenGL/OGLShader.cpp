@@ -72,13 +72,20 @@ bool Shader::Load(Deserializer& source)
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
+
+    XMLElement shaders = xml->GetRoot("shaders");
+    if (!shaders)
+    {
+        LOGERROR("No shaders element in " + source.GetName());
+        return false;
+    }
     
-    if (!vsParser_.Parse(VS, xml->GetRoot("shaders")))
+    if (!vsParser_.Parse(VS, shaders))
     {
         LOGERROR("VS: " + vsParser_.GetErrorMessage());
         return false;
     }
-    if (!psParser_.Parse(PS, xml->GetRoot("shaders")))
+    if (!psParser_.Parse(PS, shaders))
     {
         LOGERROR("PS: " + psParser_.GetErrorMessage());
         return false;
@@ -182,6 +189,10 @@ bool Shader::ProcessSource(SharedArrayPtr<char>& dest, unsigned& length, const S
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     if (!cache)
         return false;
+    
+    // Allow to define only a vertex shader or only a pixel shader
+    if (!cache->Exists(fileName))
+        return true;
     
     cache->StoreResourceDependency(this, fileName);
     

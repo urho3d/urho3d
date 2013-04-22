@@ -19,9 +19,6 @@
         </variation>
         <option name="Spec" define="SPECULAR" require="PERPIXEL" />
         <option name="Shadow" define="SHADOW" require="PERPIXEL" />
-        <variation name="" />
-        <variation name="Skinned" define="SKINNED" />
-        <variation name="Billboard" define="BILLBOARD" />
     </shader>
     <shader type="ps">
         <option name="Ambient" define="AMBIENT" require="PERPIXEL" />

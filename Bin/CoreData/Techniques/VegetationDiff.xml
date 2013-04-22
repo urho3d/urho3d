@@ -1,10 +1,10 @@
 <technique>
-    <pass name="base" vs="Vegetation" ps="Vegetation_Diff" />
-    <pass name="litbase" vs="Vegetation" ps="Vegetation_DiffAmbient" />
-    <pass name="light" vs="Vegetation" ps="Vegetation_Diff" depthtest="equal" depthwrite="false" blend="add" />
-    <pass name="prepass" vs="Vegetation" ps="Vegetation_DiffPrepass" />
-    <pass name="material" vs="Vegetation" ps="Vegetation_DiffMaterial" depthtest="equal" depthwrite="false" />
-    <pass name="deferred" vs="Vegetation" ps="Vegetation_DiffDeferred" />
-    <pass name="depth" vs="VegetationDepth" ps="VegetationDepth" />
-    <pass name="shadow" vs="VegetationShadow" ps="VegetationShadow" />
+    <pass name="base" vs="Vegetation" ps="LitSolid_Diff" />
+    <pass name="litbase" vs="Vegetation" ps="LitSolid_DiffAmbient" />
+    <pass name="light" vs="Vegetation" ps="LitSolid_Diff" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vs="Vegetation" ps="LitSolid_DiffPrepass" />
+    <pass name="material" vs="Vegetation" ps="LitSolid_DiffMaterial" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vs="Vegetation" ps="LitSolid_DiffDeferred" />
+    <pass name="depth" vs="VegetationDepth" ps="Depth" />
+    <pass name="shadow" vs="VegetationShadow" ps="Shadow" />
 </technique>
