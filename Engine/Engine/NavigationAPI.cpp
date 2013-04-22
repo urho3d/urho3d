@@ -24,6 +24,7 @@
 #include "APITemplates.h"
 #include "Navigable.h"
 #include "NavigationMesh.h"
+#include "OffMeshConnection.h"
 
 namespace Urho3D
 {
@@ -84,10 +85,22 @@ void RegisterNavigationMesh(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NavigationMesh", "IntVector2 get_numTiles() const", asMETHOD(NavigationMesh, GetNumTiles), asCALL_THISCALL);
 }
 
+void RegisterOffMeshConnection(asIScriptEngine* engine)
+{
+    RegisterComponent<OffMeshConnection>(engine, "OffMeshConnection");
+    engine->RegisterObjectMethod("OffMeshConnection", "void set_endPoint(Node@+)", asMETHOD(OffMeshConnection, SetEndPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "Node@+ get_endPoint() const", asMETHOD(OffMeshConnection, GetEndPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "void set_radius(float)", asMETHOD(OffMeshConnection, SetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "float get_radius() const", asMETHOD(OffMeshConnection, GetRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "void set_bidirectional(bool)", asMETHOD(OffMeshConnection, SetBidirectional), asCALL_THISCALL);
+    engine->RegisterObjectMethod("OffMeshConnection", "bool get_bidirectional() const", asMETHOD(OffMeshConnection, IsBidirectional), asCALL_THISCALL);
+}
+
 void RegisterNavigationAPI(asIScriptEngine* engine)
 {
     RegisterNavigable(engine);
     RegisterNavigationMesh(engine);
+    RegisterOffMeshConnection(engine);
 }
 
 }

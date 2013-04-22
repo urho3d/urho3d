@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Navigable.h"
 #include "NavigationMesh.h"
+#include "OffMeshConnection.h"
 
 #include "DebugNew.h"
 
@@ -33,6 +34,7 @@ void RegisterNavigationLibrary(Context* context)
 {
     Navigable::RegisterObject(context);
     NavigationMesh::RegisterObject(context);
+    OffMeshConnection::RegisterObject(context);
 }
 
 }
