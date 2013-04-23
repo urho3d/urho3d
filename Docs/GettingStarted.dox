@@ -254,17 +254,18 @@ Urho3D consists of several static libraries that are independent where possible:
 The libraries are the following:
 
 - Container. Provides STL replacement classes and shared pointers.
-- Math. Provides vector & quaternion types and geometric shapes used in intersection tests.
+- Math. Provides vector, quaternion & matrix types and geometric shapes used in intersection tests.
 - Core. Provides the execution Context, the base class Object for typed objects, object factories, \ref Event "event handling", threading and profiling.
 - IO. Provides file system access, stream input/output and logging.
 - %Resource. Provides the ResourceCache and the base resource types, including XML documents.
 - %Scene. Provides Node and Component classes, from which Urho3D scenes are built.
 - %Graphics. Provides application window handling and 3D rendering capabilities.
-- %Input. Provides mouse & keyboard input in both polled and event-based mode.
+- %Input. Provides input device access in both polled and event-based mode.
 - %Network. Provides client-server networking functionality.
 - %Audio. Provides the audio subsystem and playback of .wav & .ogg sounds in either 2D or 3D.
 - %UI. Provides a 2D graphical user interface.
 - Physics. Provides physics simulation.
+- Navigation. Provides navigation mesh generation and pathfinding.
 - %Script. Provides scripting support using the AngelScript language.
 - %Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
 
@@ -280,9 +281,10 @@ The third-party libraries are used for the following functionality:
 - GLEW: OpenGL extensions handling
 - kNet: UDP networking
 - libcpuid: CPU properties detection
-- MojoShader: parsing HLSL bytecode after shader compilation
+- MojoShader: HLSL shader reflection after compiling
 - Open Asset Import Library: reading various 3D file formats
 - pugixml: parsing XML files
+- Recast/Detour: navigation mesh and pathfinding implementation
 - SDL: window and OpenGL context creation, input and sound output
 - StanHull: convex hull generation from triangle meshes, used for physics collision shapes
 - stb_image: image loading
