@@ -83,11 +83,10 @@ void OffMeshConnection::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     
     Vector3 start = node_->GetWorldPosition();
     Vector3 end = endPoint_->GetWorldPosition();
-    Vector3 halfWay = (start + end) * 0.5f;
-    halfWay.y_ += 1.0f;
     
-    debug->AddLine(start, halfWay, Color::WHITE, depthTest);
-    debug->AddLine(halfWay, end, Color::WHITE, depthTest);
+    debug->AddSphere(Sphere(start, radius_), Color::WHITE, depthTest);
+    debug->AddSphere(Sphere(end, radius_), Color::WHITE, depthTest);
+    debug->AddLine(start, end, Color::WHITE, depthTest);
 }
 
 void OffMeshConnection::SetRadius(float radius)

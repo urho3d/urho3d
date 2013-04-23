@@ -14,6 +14,10 @@ bool endPosSet = false;
 
 Array<Vector3> path;
 
+bool offMeshInProgress = false;
+Vector3 offMeshStart;
+Vector3 offMeshEnd;
+
 void Start()
 {
     if (!engine.headless)
@@ -41,7 +45,7 @@ void InitConsole()
     engine.CreateDebugHud();
     debugHud.style = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
-    debugHud.SetAppStats("Instructions:", "\nShift+LMB to set startpoint\nLMB to set endpoint\nMMB to create/delete object and rebuild partial navmesh");
+    debugHud.SetAppStats("Instructions:", "\nShift+LMB set startpoint\nLMB set endpoint\nMMB create/delete object\nCtrl+LMB set offmesh link start, then end");
 
     engine.CreateConsole();
     console.style = uiStyle;
@@ -327,6 +331,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     if (button == MOUSEB_LEFT && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
     {
         bool setStartPos = input.qualifierDown[QUAL_SHIFT];
+        bool setOffMesh = input.qualifierDown[QUAL_CTRL];
         IntVector2 pos = ui.cursorPosition;
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
         RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 1000.0, DRAWABLE_GEOMETRY);
@@ -336,15 +341,43 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
 
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
-            if (setStartPos)
+            
+            if (setOffMesh)
             {
-                startPos = rayHitPos;
-                startPosSet = true;
+                if (!offMeshInProgress)
+                {
+                    offMeshStart = rayHitPos;
+                    offMeshInProgress = true;
+                }
+                else
+                {
+                    offMeshEnd = rayHitPos;
+                    offMeshInProgress = false;
+                    
+                    Node@ start = testScene.CreateChild();
+                    Node@ end = testScene.CreateChild();
+                    start.position = offMeshStart;
+                    end.position = offMeshEnd;
+                    OffMeshConnection@ conn = start.CreateComponent("OffMeshConnection");
+                    conn.endPoint = end;
+
+                    BoundingBox buildBox(start.position - Vector3(1,1,1), start.position + Vector3(1,1,1));
+
+                    navMesh.Build(buildBox);
+                }
             }
             else
             {
-                endPos = rayHitPos;
-                endPosSet = true;
+                if (setStartPos)
+                {
+                    startPos = rayHitPos;
+                    startPosSet = true;
+                }
+                else
+                {
+                    endPos = rayHitPos;
+                    endPosSet = true;
+                }
             }
 
             if (startPosSet && endPosSet)

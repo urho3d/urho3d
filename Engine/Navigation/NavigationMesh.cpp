@@ -31,6 +31,7 @@
 #include "Model.h"
 #include "Navigable.h"
 #include "NavigationMesh.h"
+#include "OffMeshConnection.h"
 #include "Profiler.h"
 #include "Scene.h"
 #include "StaticModel.h"
@@ -102,6 +103,16 @@ struct NavigationBuildData
     PODVector<Vector3> vertices_;
     /// Triangle indices from geometries.
     PODVector<int> indices_;
+    /// Offmesh connection vertices.
+    PODVector<Vector3> offMeshVertices_;
+    /// Offmesh connection radii.
+    PODVector<float> offMeshRadii_;
+    /// Offmesh connection flags.
+    PODVector<unsigned short> offMeshFlags_;
+    /// Offmesh connection areas.
+    PODVector<unsigned char> offMeshAreas_;
+    /// Offmesh connection direction.
+    PODVector<unsigned char> offMeshDir_;
     /// Recast context.
     rcContext* ctx_;
     /// Recast heightfield.
@@ -689,6 +700,26 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
         if (navigables[i]->IsEnabledEffective())
             CollectGeometries(geometryList, navigables[i]->GetNode(), processedNodes, navigables[i]->IsRecursive());
     }
+    
+    // Get offmesh connections
+    Matrix3x4 inverse = node_->GetWorldTransform().Inverse();
+    PODVector<OffMeshConnection*> connections;
+    node_->GetComponents<OffMeshConnection>(connections, true);
+    
+    for (unsigned i = 0; i < connections.Size(); ++i)
+    {
+        OffMeshConnection* connection = connections[i];
+        if (connection->IsEnabledEffective() && connection->GetEndPoint())
+        {
+            const Matrix3x4& transform = connection->GetNode()->GetWorldTransform();
+            
+            NavigationGeometryInfo info;
+            info.component_ = connection;
+            info.boundingBox_ = BoundingBox(Sphere(transform.Translation(), connection->GetRadius())).Transformed(inverse);
+            
+            geometryList.Push(info);
+        }
+    }
 }
 
 void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive)
@@ -715,13 +746,11 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
         ShapeType type = shape->GetShapeType();
         if ((type == SHAPE_BOX || type == SHAPE_TRIANGLEMESH || type == SHAPE_CONVEXHULL) && shape->GetCollisionShape())
         {
+            Matrix3x4 shapeTransform(shape->GetPosition(), shape->GetRotation(), shape->GetSize());
+            
             NavigationGeometryInfo info;
-            
-            Matrix3x4 scaleMatrix(Matrix3x4::IDENTITY);
-            scaleMatrix.SetScale(shape->GetSize());
-            
             info.component_ = shape;
-            info.transform_ = inverse * node->GetWorldTransform() * scaleMatrix;
+            info.transform_ = inverse * node->GetWorldTransform() * shapeTransform;
             info.boundingBox_ = shape->GetWorldBoundingBox().Transformed(inverse);
             
             geometryList.Push(info);
@@ -768,11 +797,29 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
 
 void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<NavigationGeometryInfo>& geometryList, BoundingBox& box)
 {
+    Matrix3x4 inverse = node_->GetWorldTransform().Inverse();
+    
     for (unsigned i = 0; i < geometryList.Size(); ++i)
     {
         if (box.IsInsideFast(geometryList[i].boundingBox_) != OUTSIDE)
         {
             const Matrix3x4& transform = geometryList[i].transform_;
+            
+            if (geometryList[i].component_->GetType() == OffMeshConnection::GetTypeStatic())
+            {
+                OffMeshConnection* connection = static_cast<OffMeshConnection*>(geometryList[i].component_);
+                Vector3 start = inverse * connection->GetNode()->GetWorldPosition();
+                Vector3 end = inverse * connection->GetEndPoint()->GetWorldPosition();
+                
+                build.offMeshVertices_.Push(start);
+                build.offMeshVertices_.Push(end);
+                build.offMeshRadii_.Push(connection->GetRadius());
+                /// \todo Allow to define custom flags
+                build.offMeshFlags_.Push(0x1);
+                build.offMeshAreas_.Push(0);
+                build.offMeshDir_.Push(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0);
+                continue;
+            }
             
             CollisionShape* shape = dynamic_cast<CollisionShape*>(geometryList[i].component_);
             if (shape)
@@ -832,17 +879,17 @@ void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<Navigati
                     }
                     break;
                 }
+                
+                continue;
             }
-            else
+            
+            Drawable* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
+            if (drawable)
             {
-                Drawable* drawable = dynamic_cast<Drawable*>(geometryList[i].component_);
-                if (drawable)
-                {
-                    const Vector<SourceBatch>& batches = drawable->GetBatches();
-                    
-                    for (unsigned j = 0; j < batches.Size(); ++j)
-                        AddTriMeshGeometry(build, drawable->GetLodGeometry(j, geometryList[i].lodLevel_), transform);
-                }
+                const Vector<SourceBatch>& batches = drawable->GetBatches();
+                
+                for (unsigned j = 0; j < batches.Size(); ++j)
+                    AddTriMeshGeometry(build, drawable->GetLodGeometry(j, geometryList[i].lodLevel_), transform);
             }
         }
     }
@@ -1087,6 +1134,17 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     params.cs = cfg.cs;
     params.ch = cfg.ch;
     params.buildBvTree = true;
+    
+    // Add off-mesh connections if have them
+    if (build.offMeshRadii_.Size())
+    {
+        params.offMeshConCount = build.offMeshRadii_.Size();
+        params.offMeshConVerts = &build.offMeshVertices_[0].x_;
+        params.offMeshConRad = &build.offMeshRadii_[0];
+        params.offMeshConFlags = &build.offMeshFlags_[0];
+        params.offMeshConAreas = &build.offMeshAreas_[0];
+        params.offMeshConDir = &build.offMeshDir_[0];
+    }
     
     if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
     {

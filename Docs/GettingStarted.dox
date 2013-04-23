@@ -155,12 +155,13 @@ L           Toggle buoyant liquid volume
 
 \section Running_Navigation Navigation
 
-A test of navigation mesh generation and path queries. Generates the same static scene as TestScene. To start, run Navigation.bat in the Bin directory, or use the command Urho3D.exe Scripts\Navigation.as. Controls are like in TestScene, except:
+A test of navigation mesh generation and path queries. Generates the same static scene as TestScene. To start, run Navigation.bat in the Bin directory, or use the command Urho3D.exe Scripts\Navigation.as. %Controls are like in TestScene, except:
 
 \verbatim
 Left mouse   Set path query end point
 Shift+LMB    Set path query start point
-Middle mouse Create or delete object and rebuild navmesh partially
+Middle mouse Create or delete object, which changes the navmesh
+Ctrl+LMB     Set offmesh connection start point, press again to set end point
 \endverbatim
 
 \section Running_Physics Physics
