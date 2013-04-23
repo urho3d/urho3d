@@ -677,6 +677,7 @@ bool SceneResetToDefault()
             group.actions.Push(action);
 
             component.ResetToDefault();
+            component.ApplyAttributes();
             for (uint j = 0; j < component.numAttributes; ++j)
                 PostEditAttribute(component, j);
         }
@@ -693,6 +694,7 @@ bool SceneResetToDefault()
             group.actions.Push(action);
 
             node.ResetToDefault();
+            node.ApplyAttributes();
             for (uint j = 0; j < node.numAttributes; ++j)
                 PostEditAttribute(node, j);
         }

@@ -356,11 +356,13 @@ class ResetAttributesAction : EditAction
                     continue;
 
                 target.attributes[i] = undoValues[i];
-                // Apply side effects
-                PostEditAttribute(target, i);
             }
-
             target.ApplyAttributes();
+
+            // Apply side effects
+            for (uint i = 0; i < target.numAttributes; ++i)
+                PostEditAttribute(target, i);
+
             attributesFullDirty = true;
         }
     }
@@ -379,14 +381,15 @@ class ResetAttributesAction : EditAction
                     continue;
 
                 target.attributes[i] = target.attributeDefaults[i];
-                // Apply side effects
-                PostEditAttribute(target, i);
             }
-
             if (targetType == ITEM_UI_ELEMENT)
                 SetInternalVars(target);
-
             target.ApplyAttributes();
+
+            // Apply side effects
+            for (uint i = 0; i < target.numAttributes; ++i)
+                PostEditAttribute(target, i);
+
             attributesFullDirty = true;
         }
     }

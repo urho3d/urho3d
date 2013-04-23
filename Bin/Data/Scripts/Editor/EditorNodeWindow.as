@@ -41,6 +41,7 @@ UIElement@ GetNodeContainer()
     nodeContainerIndex = parentContainer.numChildren;
     parentContainer.LoadXML(nodeXMLResource, uiStyle);
     UIElement@ container = GetContainer(nodeContainerIndex);
+    SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNodeVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteNodeVariable");
     ++componentContainerStartIndex;
@@ -51,7 +52,9 @@ UIElement@ GetComponentContainer(uint index)
 {
     for (uint i = parentContainer.numChildren - componentContainerStartIndex; i <= index; ++i)
         parentContainer.LoadXML(componentXMLResource, uiStyle);
-    return parentContainer.children[componentContainerStartIndex + index];
+    UIElement@ container = parentContainer.children[componentContainerStartIndex + index];
+    SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
+    return container;
 }
 
 UIElement@ GetElementContainer()
@@ -62,6 +65,7 @@ UIElement@ GetElementContainer()
     elementContainerIndex = parentContainer.numChildren;
     parentContainer.LoadXML(nodeXMLResource, uiStyle);
     UIElement@ container = GetContainer(elementContainerIndex);
+    SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateUIElementVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteUIElementVariable");
     return container;
@@ -104,20 +108,34 @@ bool ShowAttributeInspectorWindow()
 
 void HandleWindowLayoutUpdated()
 {
+    // When window resize and so the list's width is changed, adjust the 'Is enabled' container width and icon panel width so that their children stay at the right most position
     for (uint i = 0; i < parentContainer.numChildren; ++i)
     {
-        ListView@ list = GetContainer(i).GetChild("AttributeList");
+        UIElement@ container = GetContainer(i);
+        ListView@ list = container.GetChild("AttributeList");
         if (list is null)
             continue;
 
-        // At the moment, only 'Is Enabled' container (place-holder + check box) is being created as child of the list view instead of as list item
-        // When window resize and so the list's width is changed, adjust the 'Is enabled' container width so that check box stays at the right most position
         int width = list.width;
-        for (uint i = 0; i < list.numChildren; ++i)
+
+        // Adjust the icon panel's width
+        UIElement@ panel = container.GetChild("IconsPanel", true);
+        if (panel !is null)
+            panel.width = width;
+
+        // At the moment, only 'Is Enabled' container (place-holder + check box) is being created as child of the list view instead of as list item
+        for (uint j = 0; j < list.numChildren; ++j)
         {
-            UIElement@ element = list.children[i];
+            UIElement@ element = list.children[j];
             if (!element.internal)
+            {
                 element.SetFixedWidth(width);
+
+                // Adjust icon panel's width one more time to cater for the space occupied by 'Is Enabled' check box
+                if (panel !is null)
+                    panel.width = width - element.children[1].width - panel.layoutSpacing;
+                break;
+            }
         }
     }
 }
@@ -165,16 +183,20 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         IconizeUIElement(nodeTitle, nodeType);
 
         ListView@ list = container.GetChild("AttributeList");
-        UpdateAttributes(ToSerializableArray(editNodes), list, fullUpdate);
+        Array<Serializable@> nodes = ToSerializableArray(editNodes);
+        UpdateAttributes(nodes, list, fullUpdate);
 
         if (fullUpdate)
         {
-            //\TODO Avoid hardcoding
+            //\todo Avoid hardcoding
             // Resize the node editor according to the number of variables, up to a certain maximum
             uint maxAttrs = Clamp(list.contentElement.numChildren, MIN_NODE_ATTRIBUTES, MAX_NODE_ATTRIBUTES);
             list.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 2);
             container.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 60);
         }
+
+        // Set icon's target in the icon panel
+        SetAttributeEditorID(container.GetChild("ResetToDefault", true), nodes);
     }
 
     if (!editComponents.empty)
@@ -186,7 +208,8 @@ void UpdateAttributeInspector(bool fullUpdate = true)
 
         for (uint j = 0; j < numEditableComponentsPerNode; ++j)
         {
-            Text@ componentTitle = GetComponentContainer(j).GetChild("TitleText");
+            UIElement@ container = GetComponentContainer(j);
+            Text@ componentTitle = container.GetChild("TitleText");
             componentTitle.text = GetComponentTitle(editComponents[j * numEditableComponents]) + multiplierText;
             IconizeUIElement(componentTitle, editComponents[j * numEditableComponents].typeName);
             SetIconEnabledColor(componentTitle, editComponents[j * numEditableComponents].enabledEffective);
@@ -195,7 +218,8 @@ void UpdateAttributeInspector(bool fullUpdate = true)
             for (uint i = 0; i < numEditableComponents; ++i)
                 components.Push(editComponents[j * numEditableComponents + i]);
 
-            UpdateAttributes(components, GetComponentContainer(j).GetChild("AttributeList"), fullUpdate);
+            UpdateAttributes(components, container.GetChild("AttributeList"), fullUpdate);
+            SetAttributeEditorID(container.GetChild("ResetToDefault", true), components);
         }
     }
 
@@ -231,6 +255,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         IconizeUIElement(titleText, elementType);
 
         UpdateAttributes(editUIElements, container.GetChild("AttributeList"), fullUpdate);
+        SetAttributeEditorID(container.GetChild("ResetToDefault", true), editUIElements);
     }
 
     if (parentContainer.numChildren > 0)
@@ -240,7 +265,14 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         // No editables, insert a dummy component container to show the information
         Text@ titleText = GetComponentContainer(0).GetChild("TitleText");
         titleText.text = "Select editable objects";
+        UIElement@ panel = titleText.GetChild("IconsPanel");
+        if (panel !is null)
+            panel.visible = false;
     }
+
+    // Adjust the icons panel's width
+    if (fullUpdate)
+        HandleWindowLayoutUpdated();
 }
 
 void UpdateNodeAttributes()
@@ -416,6 +448,40 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
     }
 
     return ret;
+}
+
+void HandleResetToDefault(StringHash eventType, VariantMap& eventData)
+{
+    ui.cursor.shape = CS_BUSY;
+
+    UIElement@ button = eventData["Element"].GetUIElement();
+    Array<Serializable@>@ serializables = GetAttributeEditorTargets(button);
+    if (serializables.empty)
+        return;
+
+    // Group for storing undo actions
+    EditActionGroup group;
+
+    // Reset target serializables to their default values
+    for (uint i = 0; i < serializables.length; ++i)
+    {
+        Serializable@ target = serializables[i];
+
+        ResetAttributesAction action;
+        action.Define(target);
+        group.actions.Push(action);
+
+        target.ResetToDefault();
+        if (action.targetType == ITEM_UI_ELEMENT)
+            action.SetInternalVars(target);
+        target.ApplyAttributes();
+        for (uint j = 0; j < target.numAttributes; ++j)
+            PostEditAttribute(target, j);
+    }
+
+    SaveEditActionGroup(group);
+    SetSceneModified();
+    attributesFullDirty = true;
 }
 
 void CreateNodeVariable(StringHash eventType, VariantMap& eventData)

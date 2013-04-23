@@ -5717,6 +5717,41 @@ Properties:<br>
 - IntVector2 numTiles (readonly)
 
 
+OffMeshConnection
+
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- bool Load(File@, bool arg1 = false)
+- bool Save(File@) const
+- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool SaveXML(XMLElement&) const
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- void ResetToDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- int refs (readonly)
+- int weakRefs (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- Variant[] attributeDefaults (readonly)
+- AttributeInfo[] attributeInfos (readonly)
+- bool enabled
+- bool enabledEffective (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- Node@ endPoint
+- float radius
+- bool bidirectional
+
+
 ScriptFile
 
 Methods:<br>

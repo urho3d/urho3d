@@ -7,8 +7,24 @@
         <element type="BorderImage" style="EditorDivider" />
         <element type="Text">
             <attribute name="Name" value="TitleText" />
-            <attribute name="Min Size" value="0 17" />
-            <attribute name="Max Size" value="2147483647 17" />
+            <element>
+                <attribute name="Name" value="IconsPanel" />
+                <attribute name="Layout Mode" value="Horizontal" />
+                <attribute name="Layout Spacing" value="2" />
+                <element>
+                    <attribute name="Name" value="Spacer" />
+                </element>
+                <element type="Button">
+                    <attribute name="Name" value="ResetToDefault" />
+                    <attribute name="Min Size" value="16 16" />
+                    <attribute name="Max Size" value="16 16" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <element type="BorderImage">
+                        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+                        <attribute name="Image Rect" value="128 32 144 48" />
+                    </element>
+                </element>
+            </element>
         </element>
         <element type="ListView">
             <attribute name="Name" value="AttributeList" />
@@ -16,7 +32,6 @@
             <attribute name="Clip Children" value="false" />
         </element>
         <element>
-            <attribute name="Min Size" value="0 17" />
             <attribute name="Max Size" value="2147483647 17" />
             <attribute name="Layout Mode" value="Horizontal" />
             <attribute name="Layout Spacing" value="4" />
@@ -29,6 +44,10 @@
                 <attribute name="Max Size" value="50 17" />
                 <element internal="true">
                     <attribute name="Is Visible" value="false" />
+                </element>
+                <element type="Text">
+                    <attribute name="Text" value="New" />
+                    <attribute name="Text Alignment" value="Center" />
                 </element>
                 <!-- Skip style processing as the purpose of below tags is to populate the content element -->
                 <element type="Window" internal="true" popup="true" style="none">
@@ -56,10 +75,6 @@
                             </element>
                         </element>
                     </element>
-                </element>
-                <element type="Text">
-                    <attribute name="Text" value="New" />
-                    <attribute name="Text Alignment" value="Center" />
                 </element>
             </element>
             <element type="Button">

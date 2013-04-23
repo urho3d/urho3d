@@ -517,6 +517,7 @@ bool UIElementResetToDefault()
 
         element.ResetToDefault();
         action.SetInternalVars(element);
+        element.ApplyAttributes();
         for (uint j = 0; j < element.numAttributes; ++j)
             PostEditAttribute(element, j);
     }

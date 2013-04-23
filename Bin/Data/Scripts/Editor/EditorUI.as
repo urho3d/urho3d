@@ -971,7 +971,7 @@ void IconizeUIElement(UIElement@ element, const String&in iconType)
         icon = BorderImage("Icon");
         icon.indent = element.indent - 1;
         icon.SetFixedSize(element.indentWidth - 2, 14);
-        element.AddChild(icon);
+        element.InsertChild(0, icon);   // Ensure icon is added as the first child
     }
 
     // Set the icon type

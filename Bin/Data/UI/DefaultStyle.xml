@@ -276,4 +276,8 @@
         <attribute name="Is Enabled" value="true" />
     </element>
     <element type="EditorAttributeEdit" style="LineEdit" />
+    <element type="EditorReset">
+        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Image Rect" value="128 32 144 48" />
+    </element>
 </elements>

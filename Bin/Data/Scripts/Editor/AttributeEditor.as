@@ -82,7 +82,7 @@ UIElement@ CreateAttributeEditorParentAsListChild(ListView@ list, const String&i
     editorParent.vars["SubIndex"] = subIndex;
     editorParent.SetLayout(LM_HORIZONTAL);
     editorParent.SetFixedSize(list.width, ATTR_HEIGHT);
-    editorParent.position = IntVector2(0, -ATTR_HEIGHT);
+    editorParent.position = IntVector2(0, -ATTR_HEIGHT - 1);
     list.AddChild(editorParent);
 
     UIElement@ placeHolder = UIElement(name);
