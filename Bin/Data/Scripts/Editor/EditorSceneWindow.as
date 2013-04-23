@@ -20,6 +20,7 @@ ListView@ hierarchyList;
 // UIElement does not have unique ID, so use a running number to generate a new ID each time an item is inserted into hierarchy list
 const uint UI_ELEMENT_BASE_ID = 1;
 uint uiElementNextID = UI_ELEMENT_BASE_ID;
+bool showInternalUIElement = false;
 
 Variant GetUIElementID(UIElement@ element)
 {
@@ -236,7 +237,8 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
             for (uint i = 0; i < element.numChildren; ++i)
             {
                 UIElement@ childElement = element.children[i];
-                itemIndex = UpdateHierarchyItem(itemIndex, childElement, text);
+                if (showInternalUIElement || !childElement.internal)
+                    itemIndex = UpdateHierarchyItem(itemIndex, childElement, text);
             }
 
             break;
@@ -788,7 +790,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
     if (sourceNode !is null && targetNode !is null)
     {
         itemType = ITEM_NODE;
-        
+
         if (sourceNode.parent is targetNode)
             return false;
         if (targetNode.parent is sourceNode)
@@ -797,7 +799,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
     else if (sourceElement !is null && targetElement !is null)
     {
         itemType = ITEM_UI_ELEMENT;
-        
+
         if (sourceElement.parent is targetElement)
             return false;
         if (targetElement.parent is sourceElement)
@@ -933,7 +935,8 @@ void HandleUIElementAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     UIElement@ element = eventData["Element"].GetUIElement();
-    UpdateHierarchyItem(element);
+    if (showInternalUIElement || !element.internal)
+        UpdateHierarchyItem(element);
 }
 
 void HandleUIElementRemoved(StringHash eventType, VariantMap& eventData)

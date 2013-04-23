@@ -1618,7 +1618,7 @@ bool UIElement::FilterImplicitAttributes(XMLElement& dest) const
     }
 
     // Remove positioning and sizing attributes when they are under the influence of layout mode
-    if (layoutMode_ != LM_FREE && minSize_ != maxSize_)
+    if (layoutMode_ != LM_FREE && !IsFixedWidth() && !IsFixedHeight())
     {
         if (!RemoveChildXML(dest, "Min Size"))
             return false;

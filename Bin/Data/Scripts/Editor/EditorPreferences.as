@@ -17,7 +17,7 @@ void CreateEditorPreferencesDialog()
 {
     if (preferencesDialog !is null)
         return;
-    
+
     preferencesDialog = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorPreferencesDialog.xml"));
     ui.root.AddChild(preferencesDialog);
     preferencesDialog.opacity = uiMaxOpacity;
@@ -44,29 +44,33 @@ void UpdateEditorPreferencesDialog()
 
     LineEdit@ uiMinOpacityEdit = preferencesDialog.GetChild("UIMinOpacity", true);
     uiMinOpacityEdit.text = String(uiMinOpacity);
-    
+
     LineEdit@ uiMaxOpacityEdit = preferencesDialog.GetChild("UIMaxOpacity", true);
     uiMaxOpacityEdit.text = String(uiMaxOpacity);
-    
+
+    CheckBox@ showInternalUIElementToggle = preferencesDialog.GetChild("ShowInternalUIElement", true);
+    showInternalUIElementToggle.checked = showInternalUIElement;
+
     CheckBox@ showNonEditableAttributeToggle = preferencesDialog.GetChild("ShowNonEditableAttribute", true);
     showNonEditableAttributeToggle.checked = showNonEditableAttribute;
-    
+
     originalAttributeTextColorEditR.text = String(normalTextColor.r);
     originalAttributeTextColorEditG.text = String(normalTextColor.g);
     originalAttributeTextColorEditB.text = String(normalTextColor.b);
-    
+
     modifiedAttributeTextColorEditR.text = String(modifiedTextColor.r);
     modifiedAttributeTextColorEditG.text = String(modifiedTextColor.g);
     modifiedAttributeTextColorEditB.text = String(modifiedTextColor.b);
-    
+
     nonEditableAttributeTextColorEditR.text = String(nonEditableTextColor.r);
     nonEditableAttributeTextColorEditG.text = String(nonEditableTextColor.g);
     nonEditableAttributeTextColorEditB.text = String(nonEditableTextColor.b);
-    
+
     if (!subscribedToEditorPreferences)
     {
         SubscribeToEvent(uiMinOpacityEdit, "TextFinished", "EditUIMinOpacity");
         SubscribeToEvent(uiMaxOpacityEdit, "TextFinished", "EditUIMaxOpacity");
+        SubscribeToEvent(showInternalUIElementToggle, "Toggled", "ToggleShowInternalUIElement");
         SubscribeToEvent(showNonEditableAttributeToggle, "Toggled", "ToggleShowNonEditableAttribute");
         SubscribeToEvent(originalAttributeTextColorEditR, "TextFinished", "EditOriginalAttributeTextColor");
         SubscribeToEvent(originalAttributeTextColorEditG, "TextFinished", "EditOriginalAttributeTextColor");
@@ -111,6 +115,12 @@ void EditUIMaxOpacity(StringHash eventType, VariantMap& eventData)
     edit.text = String(uiMaxOpacity);
     FadeUI();
     UnfadeUI();
+}
+
+void ToggleShowInternalUIElement(StringHash eventType, VariantMap& eventData)
+{
+    showInternalUIElement = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
+    UpdateHierarchyItem(editorUIElement, true);
 }
 
 void ToggleShowNonEditableAttribute(StringHash eventType, VariantMap& eventData)

@@ -9,7 +9,8 @@
         <attribute name="Label Offset" value="-1 1" />
     </element>
     <element type="CheckBox">
-        <attribute name="Size" value="16 16" />
+        <attribute name="Min Size" value="16 16" />
+        <attribute name="Max Size" value="16 16" />
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
         <attribute name="Image Rect" value="64 0 80 16" />
         <attribute name="Border" value="4 4 4 4" />

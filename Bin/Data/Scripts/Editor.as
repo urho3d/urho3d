@@ -25,7 +25,7 @@ void Start()
         // Unix-like platforms usually hide application configuration file
         configPath = ".Urho3D/Editor/";
     configFileName = fileSystem.userDocumentsDir + configPath + "Config.xml";
-    
+
     if (engine.headless)
     {
         ErrorDialog("Urho3D Editor", "Headless mode is not supported. The program will now exit.");
@@ -34,7 +34,7 @@ void Start()
     }
 
     SubscribeToEvent("Update", "HandleUpdate");
-    
+
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
     // Enable automatic resource reloading
@@ -73,7 +73,7 @@ void ParseArguments()
             break;
         }
     }
-    
+
     if (!loaded)
         ResetScene();
 }
@@ -105,6 +105,7 @@ void LoadConfig()
     XMLElement objectElem = configElem.GetChild("object");
     XMLElement renderingElem = configElem.GetChild("rendering");
     XMLElement uiElem = configElem.GetChild("ui");
+    XMLElement hierarchyElem = configElem.GetChild("hierarchy");
     XMLElement inspectorElem = configElem.GetChild("attributeinspector");
 
     if (!cameraElem.isNull)
@@ -141,11 +142,16 @@ void LoadConfig()
         if (renderingElem.HasAttribute("dynamicinstancing")) renderer.dynamicInstancing = instancingSetting = renderingElem.GetBool("dynamicinstancing");
         if (renderingElem.HasAttribute("framelimiter")) engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
     }
-    
+
     if (!uiElem.isNull)
     {
         if (uiElem.HasAttribute("minopacity")) uiMinOpacity = uiElem.GetFloat("minopacity");
         if (uiElem.HasAttribute("maxopacity")) uiMaxOpacity = uiElem.GetFloat("maxopacity");
+    }
+
+    if (!hierarchyElem.isNull)
+    {
+        if (hierarchyElem.HasAttribute("showinternaluielement")) showInternalUIElement = hierarchyElem.GetBool("showinternaluielement");
     }
 
     if (!inspectorElem.isNull)
@@ -167,6 +173,7 @@ void SaveConfig()
     XMLElement objectElem = configElem.CreateChild("object");
     XMLElement renderingElem = configElem.CreateChild("rendering");
     XMLElement uiElem = configElem.CreateChild("ui");
+    XMLElement hierarchyElem = configElem.CreateChild("hierarchy");
     XMLElement inspectorElem = configElem.CreateChild("attributeinspector");
 
     // The save config may be called on error exit so some of the objects below could still be null
@@ -199,14 +206,16 @@ void SaveConfig()
         renderingElem.SetInt("maxoccludertriangles", renderer.maxOccluderTriangles);
         renderingElem.SetBool("specularlighting", renderer.specularLighting);
     }
-    
+
     if (graphics !is null)
         renderingElem.SetBool("dynamicinstancing", graphics.sm3Support ? renderer.dynamicInstancing : instancingSetting);
-    
+
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
-    
+
     uiElem.SetFloat("minopacity", uiMinOpacity);
     uiElem.SetFloat("maxopacity", uiMaxOpacity);
+
+    hierarchyElem.SetBool("showinternaluielement", showInternalUIElement);
 
     inspectorElem.SetColor("originalcolor", normalTextColor);
     inspectorElem.SetColor("modifiedcolor", modifiedTextColor);

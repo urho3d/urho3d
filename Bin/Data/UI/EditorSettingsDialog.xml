@@ -99,8 +99,6 @@
         </element>
         <element type="CheckBox">
             <attribute name="Name" value="MoveSnapToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
             <attribute name="Min Size" value="34 0" />
@@ -123,8 +121,6 @@
         </element>
         <element type="CheckBox">
             <attribute name="Name" value="RotateSnapToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
             <attribute name="Min Size" value="34 0" />
@@ -147,8 +143,6 @@
         </element>
         <element type="CheckBox">
             <attribute name="Name" value="ScaleSnapToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
             <attribute name="Min Size" value="34 0" />
@@ -207,8 +201,6 @@
         <attribute name="Layout Spacing" value="8" />
         <element type="CheckBox">
             <attribute name="Name" value="LocalIDToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
             <attribute name="Text" value="Use local entity IDs on import" />
@@ -221,8 +213,6 @@
         <attribute name="Layout Spacing" value="8" />
         <element type="CheckBox">
             <attribute name="Name" value="ApplyMaterialListToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
             <attribute name="Text" value="Apply material list when model set" />
@@ -402,8 +392,6 @@
         <attribute name="Layout Spacing" value="8" />
         <element type="CheckBox">
             <attribute name="Name" value="SpecularLightingToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
             <attribute name="Text" value="Specular lighting" />
@@ -416,8 +404,6 @@
         <attribute name="Layout Spacing" value="8" />
         <element type="CheckBox">
             <attribute name="Name" value="DynamicInstancingToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
             <attribute name="Text" value="Dynamic instancing" />
@@ -430,8 +416,6 @@
         <attribute name="Layout Spacing" value="8" />
         <element type="CheckBox">
             <attribute name="Name" value="FrameLimiterToggle" />
-            <attribute name="Min Size" value="16 16" />
-            <attribute name="Max Size" value="16 16" />
         </element>
         <element type="Text">
             <attribute name="Text" value="Frame limiter" />

@@ -145,7 +145,6 @@ UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ seria
     CheckBox@ attrEdit = CheckBox();
     parent.AddChild(attrEdit);
     attrEdit.style = uiStyle;
-    attrEdit.SetFixedSize(16, 16);
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
