@@ -794,6 +794,11 @@ static unsigned UIElementGetNumChildrenRecursive(UIElement* ptr)
     return ptr->GetNumChildren(true);
 }
 
+static void UIElementSetParent(UIElement* parent, UIElement* ptr)
+{
+    ptr->SetParent(parent);
+}
+
 static VariantMap& UIElementGetVars(UIElement* ptr)
 {
     return const_cast<VariantMap&>(ptr->GetVars());
@@ -842,6 +847,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint FindChild(UIElement@+) const", asMETHOD(T, FindChild), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetParent(UIElement@+, uint index = M_MAX_UNSIGNED)", asMETHOD(T, SetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const ShortStringHash&in, const Variant&in value = Variant(), bool recursive = false) const", asMETHODPR(T, GetChild, (const ShortStringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren(bool recursive = false) const", asFUNCTION(UIElementGetChildren), asCALL_CDECL_OBJLAST);
@@ -965,7 +971,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(UIElementGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numChildren(bool) const", asMETHOD(T, GetNumChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_children(uint) const", asMETHODPR(T, GetChild, (unsigned) const, UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_parent(UIElement@+)", asMETHOD(T, SetParent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_parent(UIElement@+)", asFUNCTION(UIElementSetParent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "UIElement@+ get_parent() const", asMETHOD(T, GetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_root() const", asMETHOD(T, GetRoot), asCALL_THISCALL);
     if (!isSprite)

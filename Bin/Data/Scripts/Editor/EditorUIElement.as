@@ -528,3 +528,13 @@ bool UIElementResetToDefault()
 
     return true;
 }
+
+bool UIElementChangeParent(UIElement@ sourceElement, UIElement@ targetElement)
+{
+    ReparentUIElementAction action;
+    action.Define(sourceElement, targetElement);
+    SaveEditAction(action);
+
+    sourceElement.parent = targetElement;
+    return sourceElement.parent is targetElement;
+}

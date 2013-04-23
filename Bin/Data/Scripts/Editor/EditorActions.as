@@ -565,7 +565,6 @@ class DeleteUIElementAction : EditAction
             }
 
             suppressUIElementChanges = false;
-
         }
     }
 
@@ -578,5 +577,37 @@ class DeleteUIElementAction : EditAction
             parent.RemoveChild(element);
             hierarchyList.ClearSelection();
         }
+    }
+}
+
+class ReparentUIElementAction : EditAction
+{
+    Variant elementID;
+    Variant oldParentID;
+    uint oldChildIndex;
+    Variant newParentID;
+
+    void Define(UIElement@ element, UIElement@ newParent)
+    {
+        elementID = GetUIElementID(element);
+        oldParentID = GetUIElementID(element.parent);
+        oldChildIndex = element.parent.FindChild(element);
+        newParentID = GetUIElementID(newParent);
+    }
+
+    void Undo()
+    {
+        UIElement@ parent = GetUIElementByID(oldParentID);
+        UIElement@ element = GetUIElementByID(elementID);
+        if (parent !is null && element !is null)
+            element.SetParent(parent, oldChildIndex);
+    }
+
+    void Redo()
+    {
+        UIElement@ parent = GetUIElementByID(newParentID);
+        UIElement@ element = GetUIElementByID(elementID);
+        if (parent !is null && element !is null)
+            element.parent = parent;
     }
 }

@@ -3269,6 +3269,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -3386,6 +3387,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -3506,6 +3508,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -3602,6 +3605,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -3734,6 +3738,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -3862,6 +3867,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -3989,6 +3995,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -4120,6 +4127,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -4249,6 +4257,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -4376,6 +4385,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -4532,6 +4542,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -4729,6 +4740,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -4865,6 +4877,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -5004,6 +5017,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const
@@ -5154,6 +5168,7 @@ Methods:<br>
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
 - UIElement@ GetChild(const String&, bool arg1 = false) const
 - UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
 - UIElement@[]@ GetChildren(bool arg0 = false) const

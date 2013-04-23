@@ -170,11 +170,12 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
     Text@ text = Text();
     text.SetStyle(uiStyle, "FileSelectorListText");
 
-    // The root node (scene) and editor's root UIElement cannot be moved by drag and drop.
     if (serializable.type == SCENE_TYPE || serializable is editorUIElement)
+        // The root node (scene) and editor's root UIElement cannot be moved by drag and drop
         text.dragDropMode = DD_TARGET;
     else
-        text.dragDropMode = DD_SOURCE_AND_TARGET;
+        // Internal UIElement is not able to participate in drag and drop action
+        text.dragDropMode = itemType == ITEM_UI_ELEMENT && cast<UIElement>(serializable).internal ? DD_DISABLED : DD_SOURCE_AND_TARGET;
 
     hierarchyList.InsertItem(itemIndex, text, parentItem);
 
@@ -715,34 +716,55 @@ void HandleDragDropTest(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ source = eventData["Source"].GetUIElement();
     UIElement@ target = eventData["Target"].GetUIElement();
-    eventData["Accept"] = TestDragDrop(source, target);
+    int itemType;
+    eventData["Accept"] = TestDragDrop(source, target, itemType);
 }
 
 void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ source = eventData["Source"].GetUIElement();
     UIElement@ target = eventData["Target"].GetUIElement();
-    bool accept =  TestDragDrop(source, target);
+    int itemType;
+    bool accept =  TestDragDrop(source, target, itemType);
     eventData["Accept"] = accept;
     if (!accept)
         return;
 
-    Node@ sourceNode = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
-    Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetUInt());
+    if (itemType == ITEM_NODE)
+    {
+        Node@ sourceNode = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
+        Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetUInt());
 
-    // If target is null, parent to scene
-    if (targetNode is null)
-        targetNode = editorScene;
+        // If target is null, parent to scene
+        if (targetNode is null)
+            targetNode = editorScene;
 
-    // Perform the reparenting
-    if (!SceneChangeParent(sourceNode, targetNode))
-        return;
+        // Perform the reparenting
+        if (!SceneChangeParent(sourceNode, targetNode))
+            return;
 
-    // Focus the node at its new position in the list which in turn should trigger a refresh in attribute inspector
-    FocusNode(sourceNode);
+        // Focus the node at its new position in the list which in turn should trigger a refresh in attribute inspector
+        FocusNode(sourceNode);
+    }
+    else if (itemType == ITEM_UI_ELEMENT)
+    {
+        UIElement@ sourceElement = GetUIElementByID(source.vars[UI_ELEMENT_ID_VAR].GetUInt());
+        UIElement@ targetElement = GetUIElementByID(target.vars[UI_ELEMENT_ID_VAR].GetUInt());
+
+        // If target is null, cannot proceed
+        if (targetElement is null)
+            return;
+
+        // Perform the reparenting
+        if (!UIElementChangeParent(sourceElement, targetElement))
+            return;
+
+        // Focus the element at its new position in the list which in turn should trigger a refresh in attribute inspector
+        FocusUIElement(sourceElement);
+    }
 }
 
-bool TestDragDrop(UIElement@ source, UIElement@ target)
+bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
 {
     // Test for validity of reparenting by drag and drop
     Node@ sourceNode;
@@ -754,15 +776,31 @@ bool TestDragDrop(UIElement@ source, UIElement@ target)
     if (!variant.empty)
         targetNode = editorScene.GetNode(variant.GetUInt());
 
-    if (sourceNode is null)
-        return false;
-    if (sourceNode is editorScene)
-        return false;
-    if (targetNode !is null)
+    UIElement@ sourceElement;
+    UIElement@ targetElement;
+    variant = source.GetVar(UI_ELEMENT_ID_VAR);
+    if (!variant.empty)
+        sourceElement = GetUIElementByID(variant.GetUInt());
+    variant = target.GetVar(UI_ELEMENT_ID_VAR);
+    if (!variant.empty)
+        targetElement = GetUIElementByID(variant.GetUInt());
+
+    if (sourceNode !is null && targetNode !is null)
     {
+        itemType = ITEM_NODE;
+        
         if (sourceNode.parent is targetNode)
             return false;
         if (targetNode.parent is sourceNode)
+            return false;
+    }
+    else if (sourceElement !is null && targetElement !is null)
+    {
+        itemType = ITEM_UI_ELEMENT;
+        
+        if (sourceElement.parent is targetElement)
+            return false;
+        if (targetElement.parent is sourceElement)
             return false;
     }
 
