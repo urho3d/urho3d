@@ -193,20 +193,24 @@ void Run(const Vector<String>& arguments)
     if (arguments.Size() < 1)
     {
         ErrorExit(
-            "Usage: ShaderCompiler <definitionfile> <outputpath> [options]\n\n"
+            "Usage: ShaderCompiler <definitionfile> [outputpath] [options]\n\n"
             "Options:\n"
             "-tVS|PS Compile only vertex or pixel shaders, by default compile both\n"
             "-vX     Compile only the shader variation X\n"
             "-dX     Add a define. Add SM3 to compile for Shader Model 3\n\n"
-            "Shader binaries will be output into the same directory as the definition file.\n"
-            "Specify a wildcard to compile multiple shaders from the directory.\n"
+            "If output path is not specified, shader binaries will be output into the same\n"
+            "directory as the definition file. Specify a wildcard to compile multiple\n"
+            "shaders."
         );
     }
     
     String path, file, extension;
     SplitPath(arguments[0], path, file, extension);
     inDir_ = AddTrailingSlash(path);
-    outDir_ = AddTrailingSlash(arguments[1]);
+    if (arguments.Size() > 1 && arguments[1][0] != '-')
+        outDir_ = AddTrailingSlash(arguments[1]);
+    else
+        outDir_ = inDir_;
     
     for (unsigned i = 1; i < arguments.Size(); ++i)
     {

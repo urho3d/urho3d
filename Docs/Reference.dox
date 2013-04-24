@@ -1548,7 +1548,7 @@ The output consists of shader bytecode for each permutation, as well as informat
 Usage:
 
 \verbatim
-ShaderCompiler <definitionfile> [options]
+ShaderCompiler <definitionfile> <outputpath> [options]
 
 Options:
 -tVS|PS Compile only vertex or pixel shaders, by default compile both
@@ -1556,8 +1556,9 @@ Options:
 -dX     Add a define. Add SM3 to compile for Shader Model 3
 -dDefine Add an arbitrary define
 
-Shader binaries will be output into the same directory as the definition file.
-Specify a wildcard to compile multiple shaders from the directory.
+If output path is not specified, shader binaries will be output into the same
+directory as the definition file. Specify a wildcard to compile multiple
+shaders.
 \endverbatim
 
 The D3DX library from the DirectX runtime or SDK needs to be installed. Note that when running in Direct3D9 mode, the engine will automatically invoke ShaderCompiler if it can not find a shader in binary form. Depending on shader complexity this can take a substantial amount of time. To avoid this, execute the file CompileAllShaders.bat in the Bin directory to precompile all shader permutations. It is also highly recommended to not ship ShaderCompiler with Urho3D applications, but to instead precompile all shaders. After precompiling you can delete all .hlsl files from the CoreData directory of the shipping build.
