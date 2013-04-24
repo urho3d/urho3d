@@ -1793,7 +1793,7 @@ RenderPath
 
 Methods:<br>
 - RenderPath@ Clone()
-- bool LoadParameters(XMLFile@)
+- bool Load(XMLFile@)
 - bool Append(XMLFile@)
 - void SetEnabled(const String&, bool)
 - void ToggleEnabled(const String&)
@@ -2635,12 +2635,12 @@ Properties:<br>
 - uint zoneMask
 - uint maxLights
 - BoundingBox worldBoundingBox (readonly)
+- XMLFile@ parameters
 - Material@ material
 - bool relative
 - bool sorted
 - bool scaled
 - float animationLodBias
-- XMLFile@ parameters
 - bool emitting (readonly)
 - uint numParticles (readonly)
 - Zone@ zone (readonly)

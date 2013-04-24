@@ -320,7 +320,7 @@ void Renderer::SetDefaultRenderPath(RenderPath* renderPath)
 void Renderer::SetDefaultRenderPath(XMLFile* xmlFile)
 {
     SharedPtr<RenderPath> newRenderPath(new RenderPath());
-    if (newRenderPath->LoadParameters(xmlFile))
+    if (newRenderPath->Load(xmlFile))
         defaultRenderPath_ = newRenderPath;
 }
 
@@ -1455,7 +1455,7 @@ void Renderer::Initialize()
         defaultMaterial_ = new Material(context_);
     
     defaultRenderPath_ = new RenderPath();
-    defaultRenderPath_->LoadParameters(cache->GetResource<XMLFile>("RenderPaths/Forward.xml"));
+    defaultRenderPath_->Load(cache->GetResource<XMLFile>("RenderPaths/Forward.xml"));
     
     CreateGeometries();
     CreateInstancingBuffer();

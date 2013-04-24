@@ -708,7 +708,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ source = eventData["Source"].GetUIElement();
     UIElement@ target = eventData["Target"].GetUIElement();
-    int itemType;
+    int itemType = ITEM_NONE;
     bool accept =  TestDragDrop(source, target, itemType);
     eventData["Accept"] = accept;
     if (!accept)

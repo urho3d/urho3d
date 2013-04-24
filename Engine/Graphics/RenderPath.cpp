@@ -51,7 +51,7 @@ static const String sortModeNames[] =
 
 TextureUnit ParseTextureUnitName(const String& name);
 
-void RenderTargetInfo::LoadParameters(const XMLElement& element)
+void RenderTargetInfo::Load(const XMLElement& element)
 {
     name_ = element.GetAttribute("name");
     tag_ = element.GetAttribute("tag");
@@ -86,7 +86,7 @@ void RenderTargetInfo::LoadParameters(const XMLElement& element)
         size_.y_ = element.GetInt("height");
 }
 
-void RenderPathCommand::LoadParameters(const XMLElement& element)
+void RenderPathCommand::Load(const XMLElement& element)
 {
     type_ = (RenderCommandType)GetStringListIndex(element.GetAttributeLower("type"), commandTypeNames, CMD_NONE);
     tag_ = element.GetAttribute("tag");
@@ -257,7 +257,7 @@ SharedPtr<RenderPath> RenderPath::Clone()
     return newRenderPath;
 }
 
-bool RenderPath::LoadParameters(XMLFile* file)
+bool RenderPath::Load(XMLFile* file)
 {
     renderTargets_.Clear();
     commands_.Clear();
@@ -278,7 +278,7 @@ bool RenderPath::Append(XMLFile* file)
     while (rtElem)
     {
         RenderTargetInfo info;
-        info.LoadParameters(rtElem);
+        info.Load(rtElem);
         if (!info.name_.Trimmed().Empty())
             renderTargets_.Push(info);
         
@@ -289,7 +289,7 @@ bool RenderPath::Append(XMLFile* file)
     while (cmdElem)
     {
         RenderPathCommand cmd;
-        cmd.LoadParameters(cmdElem);
+        cmd.Load(cmdElem);
         if (cmd.type_ != CMD_NONE)
             commands_.Push(cmd);
         

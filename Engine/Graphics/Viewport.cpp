@@ -98,7 +98,7 @@ void Viewport::SetRenderPath(RenderPath* renderPath)
 void Viewport::SetRenderPath(XMLFile* file)
 {
     SharedPtr<RenderPath> newRenderPath(new RenderPath());
-    if (newRenderPath->LoadParameters(file))
+    if (newRenderPath->Load(file))
         renderPath_ = newRenderPath;
 }
 

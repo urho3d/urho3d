@@ -86,8 +86,8 @@ public:
     /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame);
     
-    /// Load emitter parameters from an XML file. Return true if successful.
-    bool LoadParameters(XMLFile* file);
+    /// Set emitter parameters from an XML file. Return true if successful.
+    bool SetParameters(XMLFile* file);
     /// Set whether should be emitting and optionally reset emission period.
     void SetEmitting(bool enable, bool resetPeriod = false);
     

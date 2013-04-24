@@ -327,7 +327,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     RegisterRefCounted<RenderPath>(engine, "RenderPath");
     engine->RegisterObjectBehaviour("RenderPath", asBEHAVE_FACTORY, "RenderPath@+ f()", asFUNCTION(ConstructRenderPath), asCALL_CDECL);
     engine->RegisterObjectMethod("RenderPath", "RenderPath@ Clone()", asFUNCTION(RenderPathClone), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("RenderPath", "bool LoadParameters(XMLFile@+)", asMETHOD(RenderPath, LoadParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "bool Load(XMLFile@+)", asMETHOD(RenderPath, Load), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "bool Append(XMLFile@+)", asMETHOD(RenderPath, Append), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "void SetEnabled(const String&in, bool)", asMETHOD(RenderPath, SetEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "void ToggleEnabled(const String&in)", asMETHOD(RenderPath, ToggleEnabled), asCALL_THISCALL);
@@ -848,7 +848,7 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     RegisterDrawable<BillboardSet>(engine, "BillboardSet");
     engine->RegisterObjectMethod("BillboardSet", "void Updated()", asMETHOD(BillboardSet, Updated), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_material(Material@+)", asMETHOD(BillboardSet, SetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "Material@+ get_material() const", asMETHOD(BillboardSet, SetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "Material@+ get_material() const", asMETHOD(BillboardSet, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_numBillboards(uint)", asMETHOD(BillboardSet, SetNumBillboards), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "uint get_numBillboards() const", asMETHOD(BillboardSet, GetNumBillboards), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_relative(bool)", asMETHOD(BillboardSet, SetRelative), asCALL_THISCALL);
@@ -867,8 +867,10 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
 {
     RegisterDrawable<ParticleEmitter>(engine, "ParticleEmitter");
     engine->RegisterObjectMethod("ParticleEmitter", "void SetEmitting(bool, bool)", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "bool set_parameters(XMLFile@+ file)", asMETHOD(ParticleEmitter, SetParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "XMLFile@+ get_parameters() const", asMETHOD(ParticleEmitter, GetParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_material(Material@+)", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "Material@+ get_material() const", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "Material@+ get_material() const", asMETHOD(ParticleEmitter, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_relative(bool)", asMETHOD(ParticleEmitter, SetRelative), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_relative() const", asMETHOD(ParticleEmitter, IsRelative), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_sorted(bool)", asMETHOD(ParticleEmitter, SetSorted), asCALL_THISCALL);
@@ -877,8 +879,6 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_scaled() const", asMETHOD(ParticleEmitter, IsScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_animationLodBias(float)", asMETHOD(ParticleEmitter, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "float get_animationLodBias() const", asMETHOD(ParticleEmitter, GetAnimationLodBias), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "bool set_parameters(XMLFile@+ file)", asMETHOD(ParticleEmitter, LoadParameters), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "XMLFile@+ get_parameters() const", asMETHOD(ParticleEmitter, GetParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_emitting() const", asMETHOD(ParticleEmitter, IsEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticles() const", asMETHOD(ParticleEmitter, GetNumParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Zone@+ get_zone() const", asMETHOD(ParticleEmitter, GetZone), asCALL_THISCALL);

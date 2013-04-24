@@ -231,7 +231,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         Updated();
 }
 
-bool ParticleEmitter::LoadParameters(XMLFile* file)
+bool ParticleEmitter::SetParameters(XMLFile* file)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     if (!file || !cache)
@@ -377,7 +377,7 @@ void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
 void ParticleEmitter::SetParameterSourceAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    LoadParameters(cache->GetResource<XMLFile>(value.id_));
+    SetParameters(cache->GetResource<XMLFile>(value.id_));
 }
 
 void ParticleEmitter::SetParticlesAttr(VariantVector value)

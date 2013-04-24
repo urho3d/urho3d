@@ -71,7 +71,7 @@ struct RenderTargetInfo
     }
     
     /// Read from an XML element.
-    void LoadParameters(const XMLElement& element);
+    void Load(const XMLElement& element);
     
     /// Name.
     String name_;
@@ -107,7 +107,7 @@ struct RenderPathCommand
     }
     
     /// Read from an XML element.
-    void LoadParameters(const XMLElement& element);
+    void Load(const XMLElement& element);
     /// Set a texture resource name. Can also refer to a rendertarget defined in the rendering path.
     void SetTextureName(TextureUnit unit, const String& name);
     /// Set a shader parameter.
@@ -179,8 +179,8 @@ public:
     
     /// Clone the rendering path.
     SharedPtr<RenderPath> Clone();
-    /// Read from an XML file. Return true if successful.
-    bool LoadParameters(XMLFile* file);
+    /// Clear existing data and load from an XML file. Return true if successful.
+    bool Load(XMLFile* file);
     /// Append data from an XML file. Return true if successful.
     bool Append(XMLFile* file);
     /// Enable/disable commands and rendertargets by tag.
