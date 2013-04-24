@@ -48,6 +48,7 @@ UIElement@ SetValue(CheckBox@ element, bool value, bool sameValue)
 UIElement@ SetValue(DropDownList@ element, int value, bool sameValue)
 {
     element.selection = sameValue ? value : M_MAX_UNSIGNED;
+    element.placeholder.children[0].visible = !sameValue;
     return element;
 }
 
@@ -194,6 +195,10 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         attrEdit.style = uiStyle;
         attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
         attrEdit.resizePopup = true;
+        Text@ placeHolderText = Text();
+        attrEdit.placeholder.AddChild(placeHolderText);
+        placeHolderText.style = uiStyle;
+        placeHolderText.text = STRIKED_OUT;
         attrEdit.vars["Index"] = index;
         attrEdit.vars["SubIndex"] = subIndex;
         attrEdit.SetLayout(LM_HORIZONTAL, 0, IntRect(4, 1, 4, 1));
