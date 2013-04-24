@@ -63,7 +63,7 @@ Zone::~Zone()
 void Zone::RegisterObject(Context* context)
 {
     context->RegisterFactory<Zone>();
-    
+
     ACCESSOR_ATTRIBUTE(Zone, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
@@ -71,8 +71,8 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, 0, AM_DEFAULT);
-    ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, 0, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, false, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Shadow Mask", shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
@@ -82,7 +82,7 @@ void Zone::RegisterObject(Context* context)
 void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Component::OnSetAttribute(attr, src);
-    
+
     // If bounding box or priority changes, dirty the drawable as applicable
     if ((attr.offset_ >= offsetof(Zone, boundingBox_) && attr.offset_ < (offsetof(Zone, boundingBox_) + sizeof(BoundingBox))) ||
         attr.offset_ == offsetof(Zone, priority_))
@@ -94,7 +94,7 @@ void Zone::OnSetEnabled()
     // When a Zone is disabled, clear the cached zone from all drawables inside bounding box before removing from octree
     if (!IsEnabledEffective())
         OnMarkedDirty(node_);
-    
+
     Drawable::OnSetEnabled();
 }
 
@@ -127,7 +127,7 @@ void Zone::SetFogStart(float start)
 {
     if (start < 0.0f)
         start = 0.0f;
-    
+
     fogStart_ = start;
     MarkNetworkUpdate();
 }
@@ -136,7 +136,7 @@ void Zone::SetFogEnd(float end)
 {
     if (end < 0.0f)
         end = 0.0f;
-    
+
     fogEnd_ = end;
     MarkNetworkUpdate();
 }
@@ -166,7 +166,7 @@ const Matrix3x4& Zone::GetInverseWorldTransform() const
         inverseWorld_ = node_ ? node_->GetWorldTransform().Inverse() : Matrix3x4::IDENTITY;
         inverseWorldDirty_ = false;
     }
-    
+
     return inverseWorld_;
 }
 
@@ -174,10 +174,10 @@ const Color& Zone::GetAmbientStartColor()
 {
     if (!ambientGradient_)
         return ambientColor_;
-    
+
     if (!lastAmbientStartZone_ || !lastAmbientEndZone_)
         UpdateAmbientGradient();
-    
+
     return ambientStartColor_;
 }
 
@@ -185,10 +185,10 @@ const Color& Zone::GetAmbientEndColor()
 {
     if (!ambientGradient_)
         return ambientColor_;
-    
+
     if (!lastAmbientStartZone_ || !lastAmbientEndZone_)
         UpdateAmbientGradient();
-    
+
     return ambientEndColor_;
 }
 
@@ -208,9 +208,9 @@ void Zone::OnMarkedDirty(Node* node)
         scene->DelayedMarkedDirty(this);
         return;
     }
-    
+
     Drawable::OnMarkedDirty(node);
-    
+
     // When marked dirty, clear the cached zone from all drawables inside the zone bounding box,
     // and mark gradient dirty in all neighbor zones
     if (octant_ && lastWorldBoundingBox_.defined_)
@@ -218,7 +218,7 @@ void Zone::OnMarkedDirty(Node* node)
         PODVector<Drawable*> result;
         BoxOctreeQuery query(result, lastWorldBoundingBox_, DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
         octant_->GetRoot()->GetDrawables(query);
-        
+
         for (PODVector<Drawable*>::Iterator i = result.Begin(); i != result.End(); ++i)
         {
             Drawable* drawable = *i;
@@ -233,7 +233,7 @@ void Zone::OnMarkedDirty(Node* node)
             }
         }
     }
-    
+
     lastWorldBoundingBox_ = GetWorldBoundingBox();
     lastAmbientStartZone_.Reset();
     lastAmbientEndZone_.Reset();
@@ -252,20 +252,20 @@ void Zone::UpdateAmbientGradient()
     ambientEndColor_ = ambientColor_;
     lastAmbientStartZone_ = this;
     lastAmbientEndZone_ = this;
-    
+
     if (octant_)
     {
         const Matrix3x4& worldTransform = node_->GetWorldTransform();
         Vector3 center = boundingBox_.Center();
         Vector3 minZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.min_.z_);
         Vector3 maxZPosition = worldTransform * Vector3(center.x_, center.y_, boundingBox_.max_.z_);
-        
+
         PODVector<Zone*> result;
         {
             PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), minZPosition, DRAWABLE_ZONE);
             octant_->GetRoot()->GetDrawables(query);
         }
-        
+
         // Gradient start position: get the highest priority zone that is not this zone
         int bestPriority = M_MIN_INT;
         Zone* bestZone = 0;
@@ -279,13 +279,13 @@ void Zone::UpdateAmbientGradient()
                 bestPriority = priority;
             }
         }
-        
+
         if (bestZone)
         {
             ambientStartColor_ = bestZone->GetAmbientColor();
             lastAmbientStartZone_ = bestZone;
         }
-        
+
         // Do the same for gradient end position
         {
             PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
@@ -293,7 +293,7 @@ void Zone::UpdateAmbientGradient()
         }
         bestPriority = M_MIN_INT;
         bestZone = 0;
-        
+
         for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
         {
             Zone* zone = *i;
@@ -304,7 +304,7 @@ void Zone::UpdateAmbientGradient()
                 bestPriority = priority;
             }
         }
-        
+
         if (bestZone)
         {
             ambientEndColor_ = bestZone->GetAmbientColor();
