@@ -668,6 +668,7 @@ Methods:<br>
 - Vector3 ClosestPoint(const Ray&) const
 - float HitDistance(const Sphere&) const
 - float HitDistance(const BoundingBox&) const
+- float HitDistance(const Frustum&, bool arg1 = true) const
 - float HitDistance(const Vector3&, const Vector3&, const Vector3&) const
 
 Properties:<br>

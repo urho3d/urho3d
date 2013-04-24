@@ -158,7 +158,7 @@ float Ray::HitDistance(const BoundingBox& box) const
     return dist;
 }
 
-float Ray::HitDistance(const Frustum& frustum) const
+float Ray::HitDistance(const Frustum& frustum, bool solidInside) const
 {
     float maxOutside = 0.0f;
     float minInside = M_INFINITY;
@@ -179,7 +179,7 @@ float Ray::HitDistance(const Frustum& frustum) const
     }
     
     if (allInside)
-        return 0.0f;
+        return solidInside ? 0.0f : minInside;
     else if (maxOutside <= minInside)
         return maxOutside;
     else
