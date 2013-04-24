@@ -1283,6 +1283,11 @@ bool UIElement::HasFocus() const
     return ui ? ui->GetFocusElement() == this : false;
 }
 
+const String& UIElement::GetAppliedStyle() const
+{
+    return appliedStyle_ == GetTypeName() ? String::EMPTY : appliedStyle_;
+}
+
 XMLFile* UIElement::GetDefaultStyle(bool recursiveUp) const
 {
     if (recursiveUp)

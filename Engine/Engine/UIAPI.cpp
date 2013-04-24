@@ -444,6 +444,8 @@ static void RegisterDropDownList(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DropDownList", "UIElement@+ get_selectedItem() const", asMETHOD(DropDownList, GetSelectedItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "ListView@+ get_listView() const", asMETHOD(DropDownList, GetListView), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "UIElement@+ get_placeholder() const", asMETHOD(DropDownList, GetPlaceholder), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void set_placeholderText(const String&in)", asMETHOD(DropDownList, SetPlaceholderText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "const String& get_placeholderText() const", asMETHOD(DropDownList, GetPlaceholderText), asCALL_THISCALL);
 }
 
 static void RegisterWindow(asIScriptEngine* engine)

@@ -17,7 +17,7 @@
         <attribute name="Checked Image Offset" value="16 0" />
         <attribute name="Hover Image Offset" value="0 16" />
     </element>
-    <element type="CloseButton" style="Button">
+    <element type="CloseButton" style="Button" auto="false">    <!-- non-auto style is shown explicitly in the Editor's style drop down list for user selection -->
         <attribute name="Min Size" value="16 16" />
         <attribute name="Max Size" value="16 16" />
         <attribute name="Image Rect" value="128 0 144 16" />
@@ -68,6 +68,9 @@
         <attribute name="Label Offset" value="-1 1" />
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Border" value="4 1 4 1" />
+        <element internal="true">
+            <element type="Text" internal="true" />
+        </element>
         <element type="Window" internal="true" popup="true">
             <attribute name="Layout Border" value="2 2 2 2" />
             <element type="ListView" internal="true">
@@ -178,22 +181,22 @@
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="11" />
     </element>
-    <element type="DebugHudText">
+    <element type="DebugHudText" auto="false">
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="11" />
     </element>
-    <element type="ConsoleBackground">
+    <element type="ConsoleBackground" auto="false">
         <attribute name="Top Left Color" value="0 0.25 0 0.75" />
         <attribute name="Top Right Color" value="0 0.25 0 0.75" />
         <attribute name="Bottom Left Color" value="0.25 0.75 0.25 0.75" />
         <attribute name="Bottom Right Color" value="0.25 0.75 0.25 0.75" />
         <attribute name="Layout Border" value="4 4 4 4" />
     </element>
-    <element type="ConsoleText">
+    <element type="ConsoleText" auto="false">
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="11" />
     </element>
-    <element type="ConsoleLineEdit">
+    <element type="ConsoleLineEdit" auto="false">
         <attribute name="Top Left Color" value="0 0 0 0.5" />
         <attribute name="Top Right Color" value="0 0 0 0.5" />
         <attribute name="Bottom Left Color" value="0 0 0 0.5" />
@@ -209,7 +212,7 @@
             <attribute name="Image Rect" value="12 0 16 16" />
         </element>
     </element>
-    <element type="FileSelector" style="Window">
+    <element type="FileSelector" style="Window" auto="false">
         <attribute name="Size" value="400 300" />
         <attribute name="Is Movable" value="true" />
         <attribute name="Is Resizable" value="true" />
@@ -222,39 +225,39 @@
         <attribute name="Modal Frame Color" value="0.45 0.70 0.45" />
         <attribute name="Modal Frame Size" value="2 2" />
     </element>
-    <element type="FileSelectorButton" style="Button">
+    <element type="FileSelectorButton" style="Button" auto="false">
         <attribute name="Min Size" value="80 22" />
         <attribute name="Max Size" value="80 22" />
     </element>
-    <element type="FileSelectorButtonText" style="Text" />
-    <element type="FileSelectorListView" style="ListView" />
-    <element type="FileSelectorLineEdit" style="LineEdit" />
-    <element type="FileSelectorFilterList" style="DropDownList">
+    <element type="FileSelectorButtonText" style="Text" auto="false" />
+    <element type="FileSelectorListView" style="ListView" auto="false" />
+    <element type="FileSelectorLineEdit" style="LineEdit" auto="false" />
+    <element type="FileSelectorFilterList" style="DropDownList" auto="false">
         <attribute name="Min Size" value="64 0" />
         <attribute name="Max Size" value="64 2147483647" />
         <attribute name="Resize Popup" value="true" />
     </element>
-    <element type="FileSelectorFilterText">
+    <element type="FileSelectorFilterText" auto="false">
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="11" />
         <attribute name="Hover Color" value="0.45 0.70 0.45" />
         <attribute name="Is Enabled" value="true" />
     </element>
-    <element type="FileSelectorTitleLayout">
+    <element type="FileSelectorTitleLayout" auto="false">
         <attribute name="Min Size" value="0 16" />
         <attribute name="Max Size" value="2147483647 16" />
         <attribute name="Layout Spacing" value="4" />
     </element>
-    <element type="FileSelectorLayout">
+    <element type="FileSelectorLayout" auto="false">
         <attribute name="Layout Spacing" value="4" />
     </element>
-    <element type="FileSelectorListText">
+    <element type="FileSelectorListText" auto="false">
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="11" />
         <attribute name="Hover Color" value="0.45 0.70 0.45" />
         <attribute name="Selection Color" value="0.70 0.70 0.70" />
     </element>
-    <element type="FileSelectorTitleText" style="Text" />
+    <element type="FileSelectorTitleText" style="Text" auto="false" />
     <element type="EditorDivider">
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
         <attribute name="Image Rect" value="144 32 160 43" />
@@ -262,23 +265,19 @@
         <attribute name="Min Size" value="0 11" />
         <attribute name="Max Size" value="2147483647 11" />
     </element>
-    <element type="EditorMenuBar">
+    <element type="EditorMenuBar" auto="false">
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
         <attribute name="Image Rect" value="96 0 112 16" />
         <attribute name="Border" value="2 2 2 2" />
     </element>
-    <element type="EditorMenuText" style="Text" />
-    <element type="EditorAttributeText">
+    <element type="EditorMenuText" style="Text" auto="false" />
+    <element type="EditorAttributeText" auto="false">
         <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
         <attribute name="Font Size" value="12" />
     </element>
-    <element type="EditorEnumAttributeText" style="EditorAttributeText">
+    <element type="EditorEnumAttributeText" style="EditorAttributeText" auto="false">
         <attribute name="Hover Color" value="0.45 0.70 0.45" />
         <attribute name="Is Enabled" value="true" />
     </element>
-    <element type="EditorAttributeEdit" style="LineEdit" />
-    <element type="EditorReset">
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-        <attribute name="Image Rect" value="128 32 144 48" />
-    </element>
+    <element type="EditorAttributeEdit" style="LineEdit" auto="false" />
 </elements>

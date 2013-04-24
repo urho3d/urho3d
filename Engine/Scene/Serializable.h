@@ -77,6 +77,8 @@ public:
     bool SetAttribute(const String& name, const Variant& value);
     /// Reset all editable attributes to their default values.
     void ResetToDefault();
+    /// Remove instance's default values if they are set previously.
+    void RemoveInstanceDefault();
     /// Allocate network attribute state.
     void AllocateNetworkState();
     /// Write initial delta network update.

@@ -377,6 +377,7 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "void ApplyAttributes()", asMETHODPR(T, ApplyAttributes, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(T, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void ResetToDefault()", asMETHOD(T, ResetToDefault), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveInstanceDefault()", asMETHOD(T, RemoveInstanceDefault), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant GetAttribute(const String&in) const", asMETHODPR(T, GetAttribute, (const String&) const, Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant GetAttributeDefault(const String&in) const", asMETHODPR(T, GetAttributeDefault, (const String&) const, Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numAttributes() const", asMETHODPR(T, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
@@ -948,6 +949,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "void set_traversalMode(TraversalMode)", asMETHOD(T, SetTraversalMode), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "TraversalMode get_traversalMode() const", asMETHOD(T, GetTraversalMode), asCALL_THISCALL);
     }
+    engine->RegisterObjectMethod(className, "const String& get_appliedStyle() const", asMETHOD(T, GetAppliedStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_defaultStyle(XMLFile@+)", asMETHOD(T, SetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "XMLFile@+ get_defaultStyle()", asMETHOD(T, GetDefaultStyle), asCALL_THISCALL);
     if (!isSprite)

@@ -380,6 +380,8 @@ public:
     FocusMode GetFocusMode() const { return focusMode_; }
     /// Return drag and drop flags.
     unsigned GetDragDropMode() const { return dragDropMode_; }
+    /// Return applied style name. Return an empty string when the applied style is an 'auto' style (i.e. style derived from instance's type).
+    const String& GetAppliedStyle() const;
     /// Return default style.
     XMLFile* GetDefaultStyle(bool recursiveUp = true) const;
     /// Return layout mode.

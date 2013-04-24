@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "DropDownList.h"
 #include "ListView.h"
+#include "Text.h"
 #include "UIEvents.h"
 #include "Window.h"
 
@@ -49,8 +50,11 @@ DropDownList::DropDownList(Context* context) :
     listView_->SetFocusMode(FM_NOTFOCUSABLE);
     popup_->SetLayout(LM_VERTICAL);
     popup_->AddChild(listView_);
-    placeholder_ = CreateChild<UIElement>("DDL_PlaceHolder");
+    placeholder_ = CreateChild<UIElement>("DDL_Placeholder");
     placeholder_->SetInternal(true);
+    Text* text = placeholder_->CreateChild<Text>("DDL_Placeholder_Text");
+    text->SetInternal(true);
+    text->SetVisible(false);
 
     SubscribeToEvent(listView_, E_ITEMSELECTED, HANDLER(DropDownList, HandleItemSelected));
 }
@@ -151,6 +155,14 @@ void DropDownList::RemoveAllItems()
 void DropDownList::SetSelection(unsigned index)
 {
     listView_->SetSelection(index);
+
+    // Display the place holder text when there is no selection, however, the place holder text is only visible when the place holder itself is set to visible
+    placeholder_->GetChild(0)->SetVisible(index == M_MAX_UNSIGNED);
+}
+
+void DropDownList::SetPlaceholderText(const String& text)
+{
+    static_cast<Text*>(placeholder_->GetChild(0))->SetText(text);
 }
 
 void DropDownList::SetResizePopup(bool enable)
@@ -183,6 +195,11 @@ UIElement* DropDownList::GetSelectedItem() const
     return listView_->GetSelectedItem();
 }
 
+const String& DropDownList::GetPlaceholderText() const
+{
+    return static_cast<Text*>(placeholder_->GetChild(0))->GetText();
+}
+
 void DropDownList::SetSelectionAttr(unsigned index)
 {
     selectionAttr_ = index;
@@ -202,9 +219,17 @@ bool DropDownList::FilterImplicitAttributes(XMLElement& dest) const
     XMLElement childElem = dest.GetChild("element");
     if (!childElem)
         return false;
-    if (!RemoveChildXML(childElem, "Name", "DDL_PlaceHolder"))
+    if (!RemoveChildXML(childElem, "Name", "DDL_Placeholder"))
         return false;
     if (!RemoveChildXML(childElem, "Size"))
+        return false;
+
+    childElem = childElem.GetChild("element");
+    if (!childElem)
+        return false;
+    if (!RemoveChildXML(childElem, "Name", "DDL_Placeholder_Text"))
+        return false;
+    if (!RemoveChildXML(childElem, "Is Visible"))
         return false;
 
     return true;

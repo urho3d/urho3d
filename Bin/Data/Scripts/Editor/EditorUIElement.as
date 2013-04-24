@@ -2,6 +2,7 @@
 
 UIElement@ editorUIElement;
 XMLFile@ uiElementDefaultStyle;
+Array<String> availableStyles;
 
 String childElementFileName;
 
@@ -321,6 +322,13 @@ void SetUIElementDefaultStyle(const String&in fileName)
 
     uiElementDefaultStyle = XMLFile();
     uiElementDefaultStyle.Load(file);
+
+    // Remove the existing style list to ensure it gets repopulated again with the new default style file
+    availableStyles.Clear();
+
+    // Refresh Attribute Inspector when it is currently showing attributes of UI-element item type as the existing styles in the style drop down list are not valid anymore
+    if (!editUIElements.empty)
+        attributesFullDirty = true;
 }
 
 // Prepare XPath query object only once and use it multiple times
@@ -372,6 +380,38 @@ UIElement@ GetTopLevelUIElement(UIElement@ element)
     while (element !is null && !element.vars.Contains(FILENAME_VAR))
         element = element.parent;
     return element;
+}
+
+XPathQuery availableStylesXPathQuery("/elements/element[@auto='false']/@type");
+
+void GetAvailableStyles()
+{
+    // Use the predefined UI style if set, otherwise use editor's own UI style
+    XMLFile@ defaultStyle = uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle;
+    XMLElement rootElem = defaultStyle.root;
+    XPathResultSet resultSet = availableStylesXPathQuery.Evaluate(rootElem);
+    XMLElement resultElem = resultSet.firstResult;
+    while (resultElem.notNull)
+    {
+        availableStyles.Push(resultElem.GetAttribute());
+        resultElem = resultElem.nextResult;
+    }
+
+    availableStyles.Sort();
+}
+
+void PopulateStyleList(DropDownList@ styleList)
+{
+    if (availableStyles.empty)
+        GetAvailableStyles();
+
+    for (uint i = 0; i < availableStyles.length; ++i)
+    {
+        Text@ choice = Text();
+        styleList.AddItem(choice);
+        choice.SetStyle(uiStyle, "EditorEnumAttributeText");
+        choice.text = availableStyles[i];
+    }
 }
 
 bool UIElementCut()

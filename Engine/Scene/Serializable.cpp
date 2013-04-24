@@ -496,6 +496,12 @@ void Serializable::ResetToDefault()
     }
 }
 
+void Serializable::RemoveInstanceDefault()
+{
+    delete instanceDefaultValues_;
+    instanceDefaultValues_ = 0;
+}
+
 void Serializable::AllocateNetworkState()
 {
     if (!networkState_)

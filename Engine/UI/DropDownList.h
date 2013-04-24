@@ -61,6 +61,8 @@ public:
     void RemoveAllItems();
     /// Set selection.
     void SetSelection(unsigned index);
+    /// Set place holder text. This is the text shown when there is no selection in drop down list.
+    void SetPlaceholderText(const String& text);
     /// Set whether popup should be automatically resized to match the dropdown button width.
     void SetResizePopup(bool enable);
 
@@ -78,6 +80,8 @@ public:
     ListView* GetListView() const { return listView_; }
     /// Return selected item placeholder element.
     UIElement* GetPlaceholder() const { return placeholder_; }
+    /// Return place holder text.
+    const String& GetPlaceholderText() const;
     /// Return whether popup should be automatically resized.
     bool GetResizePopup() const { return resizePopup_; }
 

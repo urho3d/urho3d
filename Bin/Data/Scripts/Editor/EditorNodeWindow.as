@@ -3,8 +3,6 @@
 
 Window@ attributeInspectorWindow;
 UIElement@ parentContainer;
-XMLFile@ nodeXMLResource;
-XMLFile@ componentXMLResource;
 
 bool applyMaterialList = true;
 bool attributesDirty = false;
@@ -15,10 +13,24 @@ const ShortStringHash NODE_IDS_VAR("NodeIDs");
 const ShortStringHash COMPONENT_IDS_VAR("ComponentIDs");
 const ShortStringHash UI_ELEMENT_IDS_VAR("UIElementIDs");
 const ShortStringHash NO_AUTO_REMOVE("NoAutoRemove");
+const int LABEL_WIDTH = 30;
+
+// Constants for accessing xmlResources
+Array<XMLFile@> xmlResources;
+const uint ATTRIBUTE_RES = 0;
+const uint VARIABLE_RES = 1;
+const uint STYLE_RES = 2;
 
 uint nodeContainerIndex = M_MAX_UNSIGNED;
 uint componentContainerStartIndex = 0;
 uint elementContainerIndex = M_MAX_UNSIGNED;
+
+void InitXMLResources()
+{
+    String[] resources = { "Attribute", "Variable", "Style" };
+    for (uint i = 0; i < resources.length; ++i)
+        xmlResources.Push(cache.GetResource("XMLFile", "UI/EditorInspector_" + resources[i] + ".xml"));
+}
 
 void DeleteAllContainers()
 {
@@ -39,8 +51,9 @@ UIElement@ GetNodeContainer()
         return GetContainer(nodeContainerIndex);
 
     nodeContainerIndex = parentContainer.numChildren;
-    parentContainer.LoadXML(nodeXMLResource, uiStyle);
+    parentContainer.LoadXML(xmlResources[ATTRIBUTE_RES], uiStyle);
     UIElement@ container = GetContainer(nodeContainerIndex);
+    container.LoadXML(xmlResources[VARIABLE_RES], uiStyle);
     SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNodeVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteNodeVariable");
@@ -51,7 +64,7 @@ UIElement@ GetNodeContainer()
 UIElement@ GetComponentContainer(uint index)
 {
     for (uint i = parentContainer.numChildren - componentContainerStartIndex; i <= index; ++i)
-        parentContainer.LoadXML(componentXMLResource, uiStyle);
+        parentContainer.LoadXML(xmlResources[ATTRIBUTE_RES], uiStyle);
     UIElement@ container = parentContainer.children[componentContainerStartIndex + index];
     SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
     return container;
@@ -63,8 +76,15 @@ UIElement@ GetElementContainer()
         return GetContainer(elementContainerIndex);
 
     elementContainerIndex = parentContainer.numChildren;
-    parentContainer.LoadXML(nodeXMLResource, uiStyle);
+    parentContainer.LoadXML(xmlResources[ATTRIBUTE_RES], uiStyle);
     UIElement@ container = GetContainer(elementContainerIndex);
+    container.LoadXML(xmlResources[VARIABLE_RES], uiStyle);
+    // Style child XML resource is always inserted at child index 2 because it is explicitly requested in the XML definition
+    container.LoadXML(xmlResources[STYLE_RES], uiStyle);
+    container.children[2].children[0].SetFixedWidth(LABEL_WIDTH);
+    DropDownList@ styleList = container.children[2].children[1];
+    styleList.placeholderText = STRIKED_OUT;
+    PopulateStyleList(styleList);
     SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateUIElementVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteUIElementVariable");
@@ -78,10 +98,9 @@ void CreateAttributeInspectorWindow()
 
     InitResourcePicker();
     InitVectorStructs();
+    InitXMLResources();
 
     attributeInspectorWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"));
-    nodeXMLResource = cache.GetResource("XMLFile", "UI/EditorNode.xml");
-    componentXMLResource = cache.GetResource("XMLFile", "UI/EditorComponent.xml");
     parentContainer = attributeInspectorWindow.GetChild("ParentContainer");
     ui.root.AddChild(attributeInspectorWindow);
     int height = Min(ui.root.height - 60, 500);
@@ -130,10 +149,13 @@ void HandleWindowLayoutUpdated()
             if (!element.internal)
             {
                 element.SetFixedWidth(width);
+                UIElement@ title = container.GetChild("TitleText");
+                element.position = IntVector2(0, (title.screenPosition - list.screenPosition).y);
 
                 // Adjust icon panel's width one more time to cater for the space occupied by 'Is Enabled' check box
                 if (panel !is null)
                     panel.width = width - element.children[1].width - panel.layoutSpacing;
+
                 break;
             }
         }

@@ -1,6 +1,6 @@
 <element>
     <element>
-        <attribute name="Name" value="ComponentContainer" />
+        <attribute name="Name" value="AttributeContainer" />
         <attribute name="Layout Mode" value="Vertical" />
         <attribute name="Layout Spacing" value="4" />
         <element type="BorderImage" style="EditorDivider" />

@@ -1326,6 +1326,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 
@@ -1351,6 +1352,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -1383,6 +1385,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void SetScale(float)
@@ -1476,6 +1479,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -1514,6 +1518,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void SetScale(float)
@@ -1653,6 +1658,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -1692,6 +1698,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2086,6 +2093,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2152,6 +2160,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2215,6 +2224,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2271,6 +2281,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2323,6 +2334,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2393,6 +2405,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2463,6 +2476,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2532,6 +2546,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2586,6 +2601,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2641,6 +2657,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2699,6 +2716,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2754,6 +2772,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2799,6 +2818,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -2861,6 +2881,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -3069,6 +3090,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -3101,6 +3123,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -3147,6 +3170,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -3239,6 +3263,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -3326,6 +3351,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3357,6 +3383,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -3446,6 +3473,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3483,6 +3511,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -3546,6 +3575,7 @@ Properties:<br>
 - bool useDerivedOpacity
 - bool visible
 - bool colorGradient (readonly)
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - bool elementEventSender
 - uint[] numChildren (readonly)
@@ -3575,6 +3605,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -3667,6 +3698,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3708,6 +3740,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -3798,6 +3831,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3837,6 +3871,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -3927,6 +3962,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3965,6 +4001,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -4055,6 +4092,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4097,6 +4135,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -4187,6 +4226,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4227,6 +4267,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -4316,6 +4357,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4355,6 +4397,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -4461,6 +4504,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4512,6 +4556,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -4603,6 +4648,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4646,6 +4692,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -4710,6 +4757,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -4799,6 +4847,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4847,6 +4896,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -4941,6 +4991,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4987,6 +5038,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -5087,6 +5139,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -5125,6 +5178,7 @@ Properties:<br>
 - UIElement@ selectedItem (readonly)
 - ListView@ listView (readonly)
 - UIElement@ placeholder (readonly)
+- String placeholderText
 
 
 Window
@@ -5138,6 +5192,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
@@ -5227,6 +5282,7 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
+- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -5345,6 +5401,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -5441,6 +5498,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -5490,6 +5548,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -5556,6 +5615,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -5610,6 +5670,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -5654,6 +5715,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -5687,6 +5749,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -5744,6 +5807,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
@@ -5801,6 +5865,7 @@ Methods:<br>
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
 - void ResetToDefault()
+- void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
