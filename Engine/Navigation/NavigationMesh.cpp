@@ -161,6 +161,7 @@ NavigationMesh::NavigationMesh(Context* context) :
     edgeMaxError_(DEFAULT_EDGE_MAX_ERROR),
     detailSampleDistance_(DEFAULT_DETAIL_SAMPLE_DISTANCE),
     detailSampleMaxError_(DEFAULT_DETAIL_SAMPLE_MAX_ERROR),
+    padding_(Vector3::ONE),
     numTilesX_(0),
     numTilesZ_(0)
 {
@@ -194,6 +195,7 @@ void NavigationMesh::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Edge Max Error", GetEdgeMaxError, SetEdgeMaxError, float, DEFAULT_EDGE_MAX_ERROR, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Detail Sample Distance", GetDetailSampleDistance, SetDetailSampleDistance, float, DEFAULT_DETAIL_SAMPLE_DISTANCE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Detail Sample Max Error", GetDetailSampleMaxError, SetDetailSampleMaxError, float, DEFAULT_DETAIL_SAMPLE_MAX_ERROR, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_VECTOR3, "Bounding Box Padding", GetPadding, SetPadding, Vector3, Vector3::ONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_BUFFER, "Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
 }
 
@@ -322,10 +324,18 @@ void NavigationMesh::SetDetailSampleMaxError(float error)
     MarkNetworkUpdate();
 }
 
+void NavigationMesh::SetPadding(const Vector3& padding)
+{
+    padding_ = padding;
+    
+    MarkNetworkUpdate();
+}
+
 bool NavigationMesh::Build()
 {
     PROFILE(BuildNavigationMesh);
     
+    // Release existing navigation data and zero the bounding box
     ReleaseNavigationMesh();
     
     if (!node_)
@@ -343,6 +353,10 @@ bool NavigationMesh::Build()
     // Build the combined bounding box
     for (unsigned i = 0; i < geometryList.Size(); ++i)
         boundingBox_.Merge(geometryList[i].boundingBox_);
+    
+    // Expand bounding box by padding
+    boundingBox_.min_ -= padding_;
+    boundingBox_.max_ += padding_;
     
     {
         PROFILE(BuildNavigationMesh);
@@ -408,7 +422,6 @@ bool NavigationMesh::Build(const BoundingBox& boundingBox)
 {
     PROFILE(BuildPartialNavigationMesh);
     
-    /// \todo Partial rebuild does not modify the bounding box. Modifying in Y-direction could be supported
     if (!node_)
         return false;
     

@@ -94,6 +94,8 @@ public:
     void SetDetailSampleDistance(float distance);
     /// Set detail sampling maximum error.
     void SetDetailSampleMaxError(float error);
+    /// Set padding of the navigation mesh bounding box. Having enough padding allows to add geometry on the extremities of the navigation mesh when doing partial rebuilds.
+    void SetPadding(const Vector3& padding);
     /// Rebuild the navigation mesh. Return true if successful.
     bool Build();
     /// Rebuild part of the navigation mesh contained by the world-space bounding box. Return true if successful.
@@ -135,6 +137,8 @@ public:
     float GetDetailSampleDistance() const { return detailSampleDistance_; }
     /// Return detail sampling maximum error.
     float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
+    /// Return navigation mesh bounding box padding.
+    const Vector3& GetPadding() const { return padding_; }
     /// Return whether has been initialized with valid navigation data.
     bool IsInitialized() const { return navMesh_ != 0; }
     /// Return local space bounding box of the navigation mesh.
@@ -199,6 +203,8 @@ private:
     float detailSampleDistance_;
     /// Detail sampling maximum error.
     float detailSampleMaxError_;
+    /// Bounding box padding.
+    Vector3 padding_;
     /// Number of tiles in X direction.
     int numTilesX_;
     /// Number of tiles in Z direction.

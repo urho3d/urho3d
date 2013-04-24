@@ -182,6 +182,8 @@ void InitScene()
     
     testScene.CreateComponent("Navigable");
     NavigationMesh@ navMesh = testScene.CreateComponent("NavigationMesh");
+    // Add bounding box padding in the Y-direction to be able to add objects on top of the boxes
+    navMesh.padding = Vector3(0, 10, 0);
     navMesh.Build();
 }
 
@@ -361,9 +363,9 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                     OffMeshConnection@ conn = start.CreateComponent("OffMeshConnection");
                     conn.endPoint = end;
 
-                    BoundingBox buildBox(start.position - Vector3(1,1,1), start.position + Vector3(1,1,1));
+                    BoundingBox rebuildBox(start.position - Vector3(1,1,1), start.position + Vector3(1,1,1));
 
-                    navMesh.Build(buildBox);
+                    navMesh.Build(rebuildBox);
                 }
             }
             else
