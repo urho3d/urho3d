@@ -1425,10 +1425,10 @@ void View::RenderQuad(RenderPathCommand& command)
     // If shader can not be found, clear it from the command to prevent redundant attempts
     ShaderVariation* vs = renderer_->GetVertexShader(command.vertexShaderName_);
     if (!vs)
-        command.vertexShaderName_ = String();
+        command.vertexShaderName_ = String::EMPTY;
     ShaderVariation* ps = renderer_->GetPixelShader(command.pixelShaderName_);
     if (!ps)
-        command.pixelShaderName_ = String();
+        command.pixelShaderName_ = String::EMPTY;
     
     // Set shaders & shader parameters and textures
     graphics_->SetShaders(vs, ps);
