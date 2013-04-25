@@ -1157,15 +1157,14 @@ void View::ExecuteRenderPathCommands()
         unsigned lastCommandIndex = 0;
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
-            const RenderPathCommand& command = renderPath_->commands_[i];
-            if (!command.enabled_)
+            if (!renderPath_->commands_[i].enabled_)
                 continue;
             lastCommandIndex = i;
         }
         
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
-            const RenderPathCommand& command = renderPath_->commands_[i];
+            RenderPathCommand& command = renderPath_->commands_[i];
             if (!command.enabled_)
                 continue;
             
@@ -1318,7 +1317,7 @@ void View::ExecuteRenderPathCommands()
     graphics_->SetFillMode(FILL_SOLID);
 }
 
-void View::SetRenderTargets(const RenderPathCommand& command)
+void View::SetRenderTargets(RenderPathCommand& command)
 {
     unsigned index = 0;
     IntRect viewPort = viewRect_;
@@ -1383,7 +1382,7 @@ void View::SetRenderTargets(const RenderPathCommand& command)
     graphics_->SetColorWrite(true);
 }
 
-void View::SetTextures(const RenderPathCommand& command)
+void View::SetTextures(RenderPathCommand& command)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -1414,16 +1413,23 @@ void View::SetTextures(const RenderPathCommand& command)
         else
         {
             // If requesting a texture fails, clear the texture name to prevent redundant attempts
-            RenderPathCommand& cmdWrite = const_cast<RenderPathCommand&>(command);
-            cmdWrite.textureNames_[i] = String::EMPTY;
+            command.textureNames_[i] = String::EMPTY;
         }
     }
 }
 
-void View::RenderQuad(const RenderPathCommand& command)
+void View::RenderQuad(RenderPathCommand& command)
 {
+    // If shader can not be found, clear it from the command to prevent redundant attempts
+    ShaderVariation* vs = renderer_->GetVertexShader(command.vertexShaderName_);
+    if (!vs)
+        command.vertexShaderName_ = String();
+    ShaderVariation* ps = renderer_->GetPixelShader(command.pixelShaderName_);
+    if (!ps)
+        command.pixelShaderName_ = String();
+    
     // Set shaders & shader parameters and textures
-    graphics_->SetShaders(renderer_->GetVertexShader(command.vertexShaderName_), renderer_->GetPixelShader(command.pixelShaderName_));
+    graphics_->SetShaders(vs, ps);
     
     const HashMap<StringHash, Vector4>& parameters = command.shaderParameters_;
     for (HashMap<StringHash, Vector4>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)

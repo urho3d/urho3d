@@ -142,11 +142,11 @@ private:
     /// Execute render commands.
     void ExecuteRenderPathCommands();
     /// Set rendertargets for current render command.
-    void SetRenderTargets(const RenderPathCommand& command);
+    void SetRenderTargets(RenderPathCommand& command);
     /// Set textures for current render command.
-    void SetTextures(const RenderPathCommand& command);
+    void SetTextures(RenderPathCommand& command);
     /// Perform a quad rendering command.
-    void RenderQuad(const RenderPathCommand& command);
+    void RenderQuad(RenderPathCommand& command);
     /// Check if a command reads the rendered scene.
     bool CheckViewportRead(const RenderPathCommand& command);
     /// Allocate needed screen buffers.
@@ -253,7 +253,7 @@ private:
     /// Deferred flag. Inferred from the existence of a light volume command in the renderpath.
     bool deferred_;
     /// Renderpath.
-    const RenderPath* renderPath_;
+    RenderPath* renderPath_;
     /// Intermediate screen buffers used in pingpong copies and OpenGL deferred framebuffer blit.
     PODVector<Texture2D*> screenBuffers_;
     /// Per-thread octree query results.

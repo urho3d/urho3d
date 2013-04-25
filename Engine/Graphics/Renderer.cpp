@@ -1021,6 +1021,9 @@ Camera* Renderer::GetShadowCamera()
 
 ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, bool checkExists) const
 {
+    if (name.Trimmed().Empty())
+        return 0;
+    
     String shaderName = shaderPath_;
     String variationName;
     
