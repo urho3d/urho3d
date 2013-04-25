@@ -1,4 +1,4 @@
-<element style="none">  <!-- Skip style processing for the root (parent) -->
+<element>
     <element>
         <attribute name="Name" value="AttributeContainer" />
         <attribute name="Layout Mode" value="Vertical" />
