@@ -487,6 +487,8 @@ class CreateUIElementAction : EditAction
         parentID = GetUIElementID(element.parent);
         elementData = XMLFile();
         XMLElement rootElem = elementData.CreateRoot("element");
+        // No style processing for the root element
+        rootElem.SetAttribute("style", "none");
         // Need another nested element tag otherwise the LoadXML() does not work as expected
         XMLElement childElem = rootElem.CreateChild("element");
         element.SaveXML(childElem);
@@ -538,6 +540,9 @@ class DeleteUIElementAction : EditAction
         parentID = GetUIElementID(element.parent);
         elementData = XMLFile();
         XMLElement rootElem = elementData.CreateRoot("element");
+        // No style processing for the root element
+        rootElem.SetAttribute("style", "none");
+        // Need another nested element tag otherwise the LoadXML() does not work as expected
         XMLElement childElem = rootElem.CreateChild("element");
         element.SaveXML(childElem);
         childElem.SetUInt("index", element.parent.FindChild(element));
@@ -609,5 +614,62 @@ class ReparentUIElementAction : EditAction
         UIElement@ element = GetUIElementByID(elementID);
         if (parent !is null && element !is null)
             element.parent = parent;
+    }
+}
+
+class ApplyUIElementStyleAction : EditAction
+{
+    Variant elementID;
+    Variant parentID;
+    XMLFile@ elementData;
+    XMLFile@ styleFile;
+    String style;
+
+    void Define(UIElement@ element, const String&in newStyle)
+    {
+        elementID = GetUIElementID(element);
+        parentID = GetUIElementID(element.parent);
+        elementData = XMLFile();
+        XMLElement rootElem = elementData.CreateRoot("element");
+        // No style processing for the root element
+        rootElem.SetAttribute("style", "none");
+        // Need another nested element tag otherwise the LoadXML() does not work as expected
+        XMLElement childElem = rootElem.CreateChild("element");
+        element.SaveXML(childElem);
+        childElem.SetUInt("index", element.parent.FindChild(element));
+        styleFile = element.defaultStyle;
+        style = newStyle;
+    }
+
+    void Undo()
+    {
+        UIElement@ parent = GetUIElementByID(parentID);
+        UIElement@ element = GetUIElementByID(elementID);
+        if (parent !is null && element !is null)
+        {
+            // Suppress updating hierarchy list as we are "just" reverting the attribute values of the whole structure without changing the structure itself
+            suppressUIElementChanges = true;
+
+            parent.RemoveChild(element);
+            parent.LoadXML(elementData.root, styleFile);
+
+            suppressUIElementChanges = false;
+
+            SetSceneModified();
+            // Although the selections are not changed, call to ensure attribute inspector notices reverted element
+            HandleHierarchyListSelectionChange();
+        }
+    }
+
+    void Redo()
+    {
+        UIElement@ element = GetUIElementByID(elementID);
+        if (element !is null)
+        {
+            element.SetStyle(styleFile, style);
+
+            SetSceneModified();
+            attributesDirty = true;
+        }
     }
 }

@@ -226,10 +226,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
         if (styleName.Empty())
             styleName = GetTypeName();
 
-        if (styleName == "none")
-            appliedStyle_ = styleName;
-        else
-            SetStyle(styleFile, styleName);
+        SetStyle(styleFile, styleName);
     }
     // The 'style' attribute value in the style file cannot be equals to original's applied style to prevent infinite loop
     else if (!styleName.Empty() && styleName != appliedStyle_)
@@ -844,6 +841,12 @@ void UIElement::SetDragDropMode(unsigned mode)
 
 void UIElement::SetStyle(XMLFile* file, const String& typeName)
 {
+    if (typeName == "none")
+    {
+        appliedStyle_ = typeName;
+        return;
+    }
+
     if (!file)
         return;
 

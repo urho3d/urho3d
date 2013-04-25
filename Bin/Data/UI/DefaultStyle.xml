@@ -74,6 +74,7 @@
         <element type="Window" internal="true" popup="true">
             <attribute name="Layout Border" value="2 2 2 2" />
             <element type="ListView" internal="true">
+                <attribute name="Highlight Mode" value="Always" />
                 <element type="BorderImage" internal="true">    <!-- Override scroll panel attributes from default ListView -->
                     <attribute name="Texture" value="Texture2D;Textures/UI.png" />
                     <attribute name="Image Rect" value="96 0 112 16" />
@@ -238,10 +239,11 @@
         <attribute name="Resize Popup" value="true" />
     </element>
     <element type="FileSelectorFilterText" auto="false">
+        <attribute name="Is Enabled" value="true" />
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="11" />
-        <attribute name="Hover Color" value="0.45 0.70 0.45" />
-        <attribute name="Is Enabled" value="true" />
+        <attribute name="Selection Color" value="0.7 0.7 0.7 1" />
+        <attribute name="Hover Color" value="0.45 0.7 0.45 1" />
     </element>
     <element type="FileSelectorTitleLayout" auto="false">
         <attribute name="Min Size" value="0 16" />
@@ -258,7 +260,7 @@
         <attribute name="Selection Color" value="0.70 0.70 0.70" />
     </element>
     <element type="FileSelectorTitleText" style="Text" auto="false" />
-    <element type="EditorDivider">
+    <element type="EditorDivider" auto="false">
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
         <attribute name="Image Rect" value="144 32 160 43" />
         <attribute name="Border" value="2 2 2 2" />
@@ -276,8 +278,9 @@
         <attribute name="Font Size" value="12" />
     </element>
     <element type="EditorEnumAttributeText" style="EditorAttributeText" auto="false">
-        <attribute name="Hover Color" value="0.45 0.70 0.45" />
         <attribute name="Is Enabled" value="true" />
+        <attribute name="Selection Color" value="0.7 0.7 0.7 1" />
+        <attribute name="Hover Color" value="0.45 0.7 0.45 1" />
     </element>
     <element type="EditorAttributeEdit" style="LineEdit" auto="false" />
 </elements>

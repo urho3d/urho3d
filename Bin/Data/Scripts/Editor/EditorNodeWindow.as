@@ -70,7 +70,7 @@ UIElement@ GetComponentContainer(uint index)
     return container;
 }
 
-UIElement@ GetElementContainer()
+UIElement@ GetUIElementContainer()
 {
     if (elementContainerIndex != M_MAX_UNSIGNED)
         return GetContainer(elementContainerIndex);
@@ -79,15 +79,15 @@ UIElement@ GetElementContainer()
     parentContainer.LoadXML(xmlResources[ATTRIBUTE_RES], uiStyle);
     UIElement@ container = GetContainer(elementContainerIndex);
     container.LoadXML(xmlResources[VARIABLE_RES], uiStyle);
-    // Style child XML resource is always inserted at child index 2 because it is explicitly requested in the XML definition
     container.LoadXML(xmlResources[STYLE_RES], uiStyle);
-    container.children[2].children[0].SetFixedWidth(LABEL_WIDTH);
-    DropDownList@ styleList = container.children[2].children[1];
+    DropDownList@ styleList = container.GetChild("StyleDropDown", true);
     styleList.placeholderText = STRIKED_OUT;
+    styleList.parent.GetChild("StyleDropDownLabel").SetFixedWidth(LABEL_WIDTH);
     PopulateStyleList(styleList);
     SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateUIElementVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteUIElementVariable");
+    SubscribeToEvent(styleList, "ItemSelected", "HandleStyleItemSelected");
     return container;
 }
 
@@ -214,7 +214,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
             // Resize the node editor according to the number of variables, up to a certain maximum
             uint maxAttrs = Clamp(list.contentElement.numChildren, MIN_NODE_ATTRIBUTES, MAX_NODE_ATTRIBUTES);
             list.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 2);
-            container.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 60);
+            container.SetFixedHeight(maxAttrs * ATTR_HEIGHT + 58);
         }
 
         // Set icon's target in the icon panel
@@ -247,30 +247,39 @@ void UpdateAttributeInspector(bool fullUpdate = true)
 
     if (!editUIElements.empty)
     {
-        UIElement@ container = GetElementContainer();
+        UIElement@ container = GetUIElementContainer();
 
         Text@ titleText = container.GetChild("TitleText");
+        DropDownList@ styleList = container.GetChild("StyleDropDown", true);
         String elementType;
 
         if (editUIElement !is null)
         {
             elementType = editUIElement.typeName;
             titleText.text = elementType + " [ID " + GetUIElementID(editUIElement).ToString() + "]";
+            SetStyleListSelection(styleList, editUIElement.appliedStyle);
         }
         else
         {
             elementType = editUIElements[0].typeName;
+            String appliedStyle = cast<UIElement>(editUIElements[0]).appliedStyle;
 
             bool sameType = true;
+            bool sameStyle = true;
             for (uint i = 1; i < editUIElements.length; ++i)
             {
                 if (editUIElements[i].typeName != elementType)
                 {
                     sameType = false;
+                    sameStyle = false;
                     break;
                 }
+
+                if (sameStyle && cast<UIElement>(editUIElements[i]).appliedStyle != appliedStyle)
+                    sameStyle = false;
             }
             titleText.text = (sameType ? elementType : "Mixed type") + " [ID " + STRIKED_OUT + " : " + editUIElements.length + "x]";
+            SetStyleListSelection(SetEditable(styleList, sameStyle), sameStyle ? appliedStyle : STRIKED_OUT);
             if (!sameType)
                 elementType = "";   // No icon
         }
@@ -292,7 +301,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
             panel.visible = false;
     }
 
-    // Adjust the icons panel's width
+    // Adjust size and position of manual-layout UI-elements, e.g. icons panel
     if (fullUpdate)
         HandleWindowLayoutUpdated();
 }
@@ -508,7 +517,7 @@ void HandleResetToDefault(StringHash eventType, VariantMap& eventData)
 
 void CreateNodeVariable(StringHash eventType, VariantMap& eventData)
 {
-    if (editNodes.length == 0)
+    if (editNodes.empty)
         return;
 
     String newName = ExtractVariableName(eventData);
@@ -535,7 +544,7 @@ void CreateNodeVariable(StringHash eventType, VariantMap& eventData)
 
 void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
 {
-    if (editNodes.length == 0)
+    if (editNodes.empty)
         return;
 
     String delName = ExtractVariableName(eventData);
@@ -556,7 +565,7 @@ void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
 
 void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
 {
-    if (editUIElements.length == 0)
+    if (editUIElements.empty)
         return;
 
     String newName = ExtractVariableName(eventData);
@@ -584,7 +593,7 @@ void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
 
 void DeleteUIElementVariable(StringHash eventType, VariantMap& eventData)
 {
-    if (editUIElements.length == 0)
+    if (editUIElements.empty)
         return;
 
     String delName = ExtractVariableName(eventData);
@@ -640,4 +649,63 @@ String GetVariableName(ShortStringHash hash)
     if (name.empty && uiElementVarNames.Contains(hash))
         name = uiElementVarNames[hash].ToString();
     return name;    // Since this is a reverse mapping, it does not really matter from which side the name is retrieved back
+}
+
+bool inSetStyleListSelection = false;
+
+void SetStyleListSelection(DropDownList@ styleList, const String&in style)
+{
+    // Prevent infinite loop upon initial style selection
+    inSetStyleListSelection = true;
+
+    uint selection = M_MAX_UNSIGNED;
+    String styleName = style.empty ? "auto" : style;
+    Array<UIElement@> items = styleList.GetItems();
+    for (uint i = 0; i < items.length; ++i)
+    {
+        Text@ element = cast<Text>(items[i]);
+        if (element is null)
+            continue;   // It may be a divider
+        if (element.text == styleName)
+        {
+            selection = i;
+            break;
+        }
+    }
+    styleList.selection = selection;
+
+    inSetStyleListSelection = false;
+}
+
+void HandleStyleItemSelected(StringHash eventType, VariantMap& eventData)
+{
+    if (inSetStyleListSelection || editUIElements.empty)
+        return;
+
+    ui.cursor.shape = CS_BUSY;
+
+    DropDownList@ styleList = eventData["Element"].GetUIElement();
+    Text@ text = cast<Text>(styleList.selectedItem);
+    if (text is null)
+        return;
+    String newStyle = text.text;
+    bool autoStyle = newStyle == "auto";
+
+    // Group for storing undo actions
+    EditActionGroup group;
+
+    // Apply new style to selected UI-elements
+    for (uint i = 0; i < editUIElements.length; ++i)
+    {
+        UIElement@ element = editUIElements[i];
+
+        ApplyUIElementStyleAction action;
+        action.Define(element, autoStyle ? element.typeName : newStyle);
+        group.actions.Push(action);
+        
+        // Use the Redo() to actually do the action 
+        action.Redo();
+    }
+
+    SaveEditActionGroup(group);
 }

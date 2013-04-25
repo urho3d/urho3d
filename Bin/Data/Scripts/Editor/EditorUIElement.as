@@ -290,6 +290,8 @@ bool SaveChildUIElement(const String&in fileName)
 
     XMLFile@ elementData = XMLFile();
     XMLElement rootElem = elementData.CreateRoot("element");
+    // No style processing for the root element
+    rootElem.SetAttribute("style", "none");
     // Need another nested element tag otherwise the LoadXML() does not work as expected
     XMLElement childElem = rootElem.CreateChild("element");
     bool success = editUIElement.SaveXML(childElem);
@@ -429,6 +431,9 @@ bool UIElementCopy()
     {
         XMLFile@ xml = XMLFile();
         XMLElement rootElem = xml.CreateRoot("element");
+        // No style processing for the root element
+        rootElem.SetAttribute("style", "none");
+        // Need another nested element tag otherwise the LoadXML() does not work as expected
         XMLElement childElem = rootElem.CreateChild("element");
         selectedUIElements[i].SaveXML(childElem);
         uiElementCopyBuffer.Push(xml);

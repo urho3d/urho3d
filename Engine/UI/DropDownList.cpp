@@ -94,9 +94,12 @@ void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& ver
         IntVector2 offset = targetPos - originalPos;
 
         // GetBatches() usually resets the hover flag. Therefore get its value and then reset it for the real rendering
+        // Render the selected item without its selection color, so temporarily reset the item's selected attribute
         bool hover = selectedItem->IsHovering();
+        selectedItem->SetSelected(false);
         selectedItem->SetHovering(false);
         selectedItem->GetBatchesWithOffset(offset, batches, vertexData, currentScissor);
+        selectedItem->SetSelected(true);
         selectedItem->SetHovering(hover);
     }
 }

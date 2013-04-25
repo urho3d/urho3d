@@ -5,6 +5,7 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="4" />
         <element type="Text" style="EditorAttributeText">
+            <attribute name="Name" value="StyleDropDownLabel" />
             <attribute name="Text" value="Style" />
         </element>
         <element type="DropDownList">
