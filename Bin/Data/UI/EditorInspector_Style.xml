@@ -1,4 +1,4 @@
-<element>
+<element style="none">  <!-- Skip style processing for the root (parent) -->
     <element index="2">
         <attribute name="Name" value="StyleContainer" />
         <attribute name="Max Size" value="2147483647 17" />
