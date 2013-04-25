@@ -522,10 +522,9 @@ void View::GetDrawables()
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
     
-    // Get zones and occluders first. Note: camera viewmask is intentionally disregarded here, to prevent the zone membership
-    // or occlusion depending from the used camera
+    // Get zones and occluders first
     {
-        ZoneOccluderOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_ZONE);
+        ZoneOccluderOctreeQuery query(tempDrawables, camera_->GetFrustum(), DRAWABLE_GEOMETRY | DRAWABLE_ZONE, camera_->GetViewMask());
         octree_->GetDrawables(query);
     }
     
@@ -635,7 +634,9 @@ void View::GetDrawables()
     sceneBox_.defined_ = false;
     minZ_ = M_INFINITY;
     maxZ_ = 0.0f;
-
+    
+    unsigned cameraViewMask = camera_->GetViewMask();
+    
     for (unsigned i = 0; i < tempDrawables.Size(); ++i)
     {
         Drawable* drawable = tempDrawables[i];
@@ -645,7 +646,8 @@ void View::GetDrawables()
         if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
         {
             // Find zone for the drawable if necessary
-            if ((drawable->IsZoneDirty() || !drawable->GetZone()) && !cameraZoneOverride_)
+            Zone* drawableZone = drawable->GetZone();
+            if ((drawable->IsZoneDirty() || !drawableZone || (drawableZone->GetViewMask() & cameraViewMask) == 0) && !cameraZoneOverride_)
                 FindZone(drawable);
             
             // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
@@ -2211,7 +2213,8 @@ void View::FindZone(Drawable* drawable)
     
     // First check if the last zone remains a conclusive result
     Zone* lastZone = drawable->GetLastZone();
-    if (lastZone && lastZone->GetPriority() >= highestZonePriority_ &&
+    
+    if (lastZone && (lastZone->GetViewMask() & camera_->GetViewMask()) && lastZone->GetPriority() >= highestZonePriority_ &&
         (drawable->GetZoneMask() & lastZone->GetZoneMask()) && lastZone->IsInside(center))
         newZone = lastZone;
     else
