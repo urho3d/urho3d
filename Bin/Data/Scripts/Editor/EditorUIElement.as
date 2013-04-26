@@ -259,7 +259,7 @@ void LoadChildUIElement(const String&in fileName)
 
     suppressUIElementChanges = true;
 
-    if (editUIElement.LoadXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle))
+    if (editUIElement.LoadChildXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle))
     {
         UIElement@ element = editUIElement.children[editUIElement.numChildren - 1];
         ResetSortChildren(element);
@@ -290,14 +290,10 @@ bool SaveChildUIElement(const String&in fileName)
 
     XMLFile@ elementData = XMLFile();
     XMLElement rootElem = elementData.CreateRoot("element");
-    // No style processing for the root element
-    rootElem.SetAttribute("style", "none");
-    // Need another nested element tag otherwise the LoadXML() does not work as expected
-    XMLElement childElem = rootElem.CreateChild("element");
-    bool success = editUIElement.SaveXML(childElem);
+    bool success = editUIElement.SaveXML(rootElem);
     if (success)
     {
-        FilterInternalVars(childElem);
+        FilterInternalVars(rootElem);
         success = elementData.Save(file);
     }
 
@@ -431,11 +427,7 @@ bool UIElementCopy()
     {
         XMLFile@ xml = XMLFile();
         XMLElement rootElem = xml.CreateRoot("element");
-        // No style processing for the root element
-        rootElem.SetAttribute("style", "none");
-        // Need another nested element tag otherwise the LoadXML() does not work as expected
-        XMLElement childElem = rootElem.CreateChild("element");
-        selectedUIElements[i].SaveXML(childElem);
+        selectedUIElements[i].SaveXML(rootElem);
         uiElementCopyBuffer.Push(xml);
     }
 
@@ -466,7 +458,7 @@ bool UIElementPaste()
     for (uint i = 0; i < uiElementCopyBuffer.length; ++i)
     {
         XMLElement rootElem = uiElementCopyBuffer[i].root;
-        if (editUIElement.LoadXML(rootElem))
+        if (editUIElement.LoadChildXML(rootElem, null))
         {
             UIElement@ element = editUIElement.children[editUIElement.numChildren - 1];
             ResetDuplicateID(element);

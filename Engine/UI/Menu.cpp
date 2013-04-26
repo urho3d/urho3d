@@ -129,10 +129,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
         if (styleName.Empty())
             styleName = GetTypeName();
 
-        if (styleName.ToLower() == "none")
-            appliedStyle_ = styleName;
-        else
-            SetStyle(styleFile, styleName);
+        SetStyle(styleFile, styleName);
     }
     // The 'style' attribute value in the style file cannot be equals to original's applied style to prevent infinite loop
     else if (!styleName.Empty() && styleName != appliedStyle_)

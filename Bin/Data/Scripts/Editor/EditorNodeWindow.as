@@ -51,9 +51,9 @@ UIElement@ GetNodeContainer()
         return GetContainer(nodeContainerIndex);
 
     nodeContainerIndex = parentContainer.numChildren;
-    parentContainer.LoadXML(xmlResources[ATTRIBUTE_RES], uiStyle);
+    parentContainer.LoadChildXML(xmlResources[ATTRIBUTE_RES], uiStyle);
     UIElement@ container = GetContainer(nodeContainerIndex);
-    container.LoadXML(xmlResources[VARIABLE_RES], uiStyle);
+    container.LoadChildXML(xmlResources[VARIABLE_RES], uiStyle);
     SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNodeVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteNodeVariable");
@@ -64,7 +64,7 @@ UIElement@ GetNodeContainer()
 UIElement@ GetComponentContainer(uint index)
 {
     for (uint i = parentContainer.numChildren - componentContainerStartIndex; i <= index; ++i)
-        parentContainer.LoadXML(xmlResources[ATTRIBUTE_RES], uiStyle);
+        parentContainer.LoadChildXML(xmlResources[ATTRIBUTE_RES], uiStyle);
     UIElement@ container = parentContainer.children[componentContainerStartIndex + index];
     SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
     return container;
@@ -76,10 +76,10 @@ UIElement@ GetUIElementContainer()
         return GetContainer(elementContainerIndex);
 
     elementContainerIndex = parentContainer.numChildren;
-    parentContainer.LoadXML(xmlResources[ATTRIBUTE_RES], uiStyle);
+    parentContainer.LoadChildXML(xmlResources[ATTRIBUTE_RES], uiStyle);
     UIElement@ container = GetContainer(elementContainerIndex);
-    container.LoadXML(xmlResources[VARIABLE_RES], uiStyle);
-    container.LoadXML(xmlResources[STYLE_RES], uiStyle);
+    container.LoadChildXML(xmlResources[VARIABLE_RES], uiStyle);
+    container.LoadChildXML(xmlResources[STYLE_RES], uiStyle);
     DropDownList@ styleList = container.GetChild("StyleDropDown", true);
     styleList.placeholderText = STRIKED_OUT;
     styleList.parent.GetChild("StyleDropDownLabel").SetFixedWidth(LABEL_WIDTH);

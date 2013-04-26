@@ -487,11 +487,7 @@ class CreateUIElementAction : EditAction
         parentID = GetUIElementID(element.parent);
         elementData = XMLFile();
         XMLElement rootElem = elementData.CreateRoot("element");
-        // No style processing for the root element
-        rootElem.SetAttribute("style", "none");
-        // Need another nested element tag otherwise the LoadXML() does not work as expected
-        XMLElement childElem = rootElem.CreateChild("element");
-        element.SaveXML(childElem);
+        element.SaveXML(rootElem);
         styleFile = element.defaultStyle;
     }
 
@@ -514,7 +510,7 @@ class CreateUIElementAction : EditAction
             // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
             suppressUIElementChanges = true;
 
-            if (parent.LoadXML(elementData.root, styleFile))
+            if (parent.LoadChildXML(elementData.root, styleFile))
             {
                 UIElement@ element = parent.children[parent.numChildren - 1];
                 UpdateHierarchyItem(element);
@@ -540,13 +536,9 @@ class DeleteUIElementAction : EditAction
         parentID = GetUIElementID(element.parent);
         elementData = XMLFile();
         XMLElement rootElem = elementData.CreateRoot("element");
-        // No style processing for the root element
-        rootElem.SetAttribute("style", "none");
-        // Need another nested element tag otherwise the LoadXML() does not work as expected
-        XMLElement childElem = rootElem.CreateChild("element");
-        element.SaveXML(childElem);
-        childElem.SetUInt("index", element.parent.FindChild(element));
-        childElem.SetUInt("listItemIndex", GetListIndex(element));
+        element.SaveXML(rootElem);
+        rootElem.SetUInt("index", element.parent.FindChild(element));
+        rootElem.SetUInt("listItemIndex", GetListIndex(element));
         styleFile = element.defaultStyle;
     }
 
@@ -558,11 +550,11 @@ class DeleteUIElementAction : EditAction
             // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
             suppressUIElementChanges = true;
 
-            if (parent.LoadXML(elementData.root, styleFile))
+            if (parent.LoadChildXML(elementData.root, styleFile))
             {
-                XMLElement childElem = elementData.root.GetChild("element");
-                uint index = childElem.GetUInt("index");
-                uint listItemIndex = childElem.GetUInt("listItemIndex");
+                XMLElement rootElem = elementData.root;
+                uint index = rootElem.GetUInt("index");
+                uint listItemIndex = rootElem.GetUInt("listItemIndex");
                 UIElement@ element = parent.children[index];
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
                 UpdateHierarchyItem(listItemIndex, element, parentItem);
@@ -631,12 +623,8 @@ class ApplyUIElementStyleAction : EditAction
         parentID = GetUIElementID(element.parent);
         elementData = XMLFile();
         XMLElement rootElem = elementData.CreateRoot("element");
-        // No style processing for the root element
-        rootElem.SetAttribute("style", "none");
-        // Need another nested element tag otherwise the LoadXML() does not work as expected
-        XMLElement childElem = rootElem.CreateChild("element");
-        element.SaveXML(childElem);
-        childElem.SetUInt("index", element.parent.FindChild(element));
+        element.SaveXML(rootElem);
+        rootElem.SetUInt("index", element.parent.FindChild(element));
         styleFile = element.defaultStyle;
         style = newStyle;
     }
@@ -651,7 +639,7 @@ class ApplyUIElementStyleAction : EditAction
             suppressUIElementChanges = true;
 
             parent.RemoveChild(element);
-            parent.LoadXML(elementData.root, styleFile);
+            parent.LoadChildXML(elementData.root, styleFile);
 
             suppressUIElementChanges = false;
 

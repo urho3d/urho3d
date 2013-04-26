@@ -294,6 +294,32 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     return true;
 }
 
+bool UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bool setInstanceDefault)
+{
+    bool internalElem = childElem.GetBool("internal");
+    if (internalElem)
+    {
+        LOGERROR("Loading internal child element is not supported");
+        return false;
+    }
+
+    String typeName = childElem.GetAttribute("type");
+    if (typeName.Empty())
+        typeName = "UIElement";
+    unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
+    UIElement* child = CreateChild(typeName, String::EMPTY, index);
+
+    if (child)
+    {
+        if (!styleFile)
+            styleFile = GetDefaultStyle();
+        if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
+            return false;
+    }
+
+    return true;
+}
+
 bool UIElement::SaveXML(XMLElement& dest) const
 {
     // Write type
