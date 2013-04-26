@@ -702,8 +702,8 @@ void HandleStyleItemSelected(StringHash eventType, VariantMap& eventData)
         ApplyUIElementStyleAction action;
         action.Define(element, autoStyle ? element.typeName : newStyle);
         group.actions.Push(action);
-        
-        // Use the Redo() to actually do the action 
+
+        // Use the Redo() to actually do the action
         action.Redo();
     }
 

@@ -998,6 +998,13 @@ void SetIconEnabledColor(UIElement@ element, bool enabled, bool partial = false)
 
 void UpdateDirtyUI()
 {
+    // Perform hierarchy selection latently after the new selections are finalized (used in undo/redo action)
+    if (!hierarchyUpdateSelections.empty)
+    {
+        hierarchyList.SetSelections(hierarchyUpdateSelections);
+        hierarchyUpdateSelections.Clear();
+    }
+
     // Perform some event-triggered updates latently in case a large hierarchy was changed
     if (attributesFullDirty || attributesDirty)
         UpdateAttributeInspector(attributesFullDirty);

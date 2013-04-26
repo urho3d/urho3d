@@ -342,6 +342,11 @@ bool UIElement::SaveXML(XMLElement& dest) const
         if (!dest.SetAttribute("style", appliedStyle_))
             return false;
     }
+    else if (internal_)
+    {
+        if (!dest.SetAttribute("style", "none"))
+            return false;
+    }
 
     // Write attributes
     if (!Serializable::SaveXML(dest))
@@ -867,11 +872,9 @@ void UIElement::SetDragDropMode(unsigned mode)
 
 void UIElement::SetStyle(XMLFile* file, const String& typeName)
 {
+    appliedStyle_ = typeName;
     if (typeName == "none")
-    {
-        appliedStyle_ = typeName;
         return;
-    }
 
     if (!file)
         return;
@@ -1639,18 +1642,26 @@ bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styl
         childElem = childElem.GetNext("element");
     }
 
+    // Remove style attribute when it is the same as its type, however, if it is an internal element then replace it to "none" instead
+    if (!dest.GetAttribute("style").Empty() && dest.GetAttribute("style") == dest.GetAttribute("type"))
+    {
+        if (internal_)
+        {
+            if (!dest.SetAttribute("style", "none"))
+                return false;
+        }
+        else
+        {
+            if (!dest.RemoveAttribute("style"))
+                return false;
+        }
+    }
+
     return true;
 }
 
 bool UIElement::FilterImplicitAttributes(XMLElement& dest) const
 {
-    // Remove style attribute when it is the same as its type
-    if (!dest.GetAttribute("style").Empty() && dest.GetAttribute("style") == dest.GetAttribute("type"))
-    {
-        if (!dest.RemoveAttribute("style"))
-            return false;
-    }
-
     // Remove positioning and sizing attributes when they are under the influence of layout mode
     if (layoutMode_ != LM_FREE && !IsFixedWidth() && !IsFixedHeight())
     {

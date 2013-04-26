@@ -615,7 +615,8 @@ class ApplyUIElementStyleAction : EditAction
     Variant parentID;
     XMLFile@ elementData;
     XMLFile@ styleFile;
-    String style;
+    String elementOldStyle;
+    String elementNewStyle;
 
     void Define(UIElement@ element, const String&in newStyle)
     {
@@ -625,39 +626,48 @@ class ApplyUIElementStyleAction : EditAction
         XMLElement rootElem = elementData.CreateRoot("element");
         element.SaveXML(rootElem);
         rootElem.SetUInt("index", element.parent.FindChild(element));
+        rootElem.SetUInt("listItemIndex", GetListIndex(element));
         styleFile = element.defaultStyle;
-        style = newStyle;
+        elementOldStyle = element.appliedStyle;
+        elementNewStyle = newStyle;
     }
 
-    void Undo()
+    void ApplyStyle(const String&in style)
     {
         UIElement@ parent = GetUIElementByID(parentID);
         UIElement@ element = GetUIElementByID(elementID);
         if (parent !is null && element !is null)
         {
-            // Suppress updating hierarchy list as we are "just" reverting the attribute values of the whole structure without changing the structure itself
+            // Apply the style in the XML data
+            elementData.root.SetAttribute("style", style);
+            
+            // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
             suppressUIElementChanges = true;
 
             parent.RemoveChild(element);
-            parent.LoadChildXML(elementData.root, styleFile);
+            if (parent.LoadChildXML(elementData.root, styleFile))
+            {
+                XMLElement rootElem = elementData.root;
+                uint index = rootElem.GetUInt("index");
+                uint listItemIndex = rootElem.GetUInt("listItemIndex");
+                UIElement@ element = parent.children[index];
+                UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
+                UpdateHierarchyItem(listItemIndex, element, parentItem);
+                hierarchyUpdateSelections.Push(listItemIndex);
+            }
 
             suppressUIElementChanges = false;
-
             SetSceneModified();
-            // Although the selections are not changed, call to ensure attribute inspector notices reverted element
-            HandleHierarchyListSelectionChange();
         }
+    }
+    
+    void Undo()
+    {
+        ApplyStyle(elementOldStyle);
     }
 
     void Redo()
     {
-        UIElement@ element = GetUIElementByID(elementID);
-        if (element !is null)
-        {
-            element.SetStyle(styleFile, style);
-
-            SetSceneModified();
-            attributesDirty = true;
-        }
+        ApplyStyle(elementNewStyle);
     }
 }

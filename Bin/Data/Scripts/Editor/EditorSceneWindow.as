@@ -21,6 +21,7 @@ ListView@ hierarchyList;
 const uint UI_ELEMENT_BASE_ID = 1;
 uint uiElementNextID = UI_ELEMENT_BASE_ID;
 bool showInternalUIElement = false;
+Array<uint> hierarchyUpdateSelections;
 
 Variant GetUIElementID(UIElement@ element)
 {
@@ -515,7 +516,7 @@ void SelectComponent(Component@ component, bool multiselect)
             }
             while (current !is null);
         }
-        
+
         // This causes an event to be sent, in response we set the node/component selections, and refresh editors
         if (!multiselect)
             hierarchyList.selection = componentIndex;
