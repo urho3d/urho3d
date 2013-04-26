@@ -420,7 +420,9 @@ uint GetComponentListIndex(Component@ component)
 
 String GetUIElementTitle(UIElement@ element)
 {
-    return (element.name.empty ? element.typeName : element.name) + " [" + GetUIElementID(element).ToString() + "]";
+    // Only top level UI-element has this variable
+    String modifiedStr = element.GetVar(MODIFIED_VAR).GetBool() ? "*" : "";
+    return (element.name.empty ? element.typeName : element.name) + modifiedStr + " [" + GetUIElementID(element).ToString() + "]";
 }
 
 String GetNodeTitle(Node@ node)
@@ -823,6 +825,7 @@ void CreateBuiltinObject(const String& name)
     CreateNodeAction action;
     action.Define(newNode);
     SaveEditAction(action);
+    SetSceneModified();
 
     FocusNode(newNode);
 }
@@ -1115,8 +1118,6 @@ void SaveEditActionGroup(EditActionGroup@ group)
         undoStack.Erase(0);
         --undoStackPos;
     }
-
-    SetSceneModified();
 }
 
 void BeginSelectionModify()

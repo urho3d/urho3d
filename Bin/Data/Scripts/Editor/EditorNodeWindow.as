@@ -378,7 +378,8 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
 
     // If a UI-element changing its 'Is Modal' attribute, clear the hierarchy list selection
     bool testModalElement = false;
-    if (GetType(serializables[0]) == ITEM_UI_ELEMENT && serializables[0].attributeInfos[index].name == "Is Modal")
+    int itemType = GetType(serializables[0]);
+    if (itemType == ITEM_UI_ELEMENT && serializables[0].attributeInfos[index].name == "Is Modal")
     {
         hierarchyList.ClearSelection();
         testModalElement = true;
@@ -392,7 +393,13 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
         // After losing the modal flag, the modal element should be reparented to its original parent automatically
         if (testModalElement)
             cast<UIElement>(serializables[i]).vars[NO_AUTO_REMOVE] = true;
+
+        if (itemType == ITEM_UI_ELEMENT)
+            SetUIElementModified(serializables[i]);
     }
+
+    if (itemType != ITEM_UI_ELEMENT)
+        SetSceneModified();
 }
 
 void PostEditAttribute(Serializable@ serializable, uint index)
@@ -504,14 +511,18 @@ void HandleResetToDefault(StringHash eventType, VariantMap& eventData)
 
         target.ResetToDefault();
         if (action.targetType == ITEM_UI_ELEMENT)
+        {
             action.SetInternalVars(target);
+            SetUIElementModified(target);
+        }
         target.ApplyAttributes();
         for (uint j = 0; j < target.numAttributes; ++j)
             PostEditAttribute(target, j);
     }
 
     SaveEditActionGroup(group);
-    SetSceneModified();
+    if (GetType(serializables[0]) != ITEM_UI_ELEMENT)
+        SetSceneModified();
     attributesFullDirty = true;
 }
 

@@ -73,6 +73,7 @@ bool NewUIElement(const String&in typeName)
         CreateUIElementAction action;
         action.Define(element);
         SaveEditAction(action);
+        SetUIElementModified(element);
 
         FocusUIElement(element);
     }
@@ -212,10 +213,7 @@ bool SaveUIElement(const String&in fileName)
         if (success)
         {
             element.vars[FILENAME_VAR] = fileName;
-            element.vars[MODIFIED_VAR] = false;
-
-            sceneModified = false;
-            UpdateWindowTitle();
+            SetUIElementModified(element, false);
         }
     }
 
@@ -265,6 +263,7 @@ void LoadChildUIElement(const String&in fileName)
         ResetSortChildren(element);
         RegisterUIElementVar(xmlFile.root);
         UpdateHierarchyItem(element);
+        SetUIElementModified(element);
 
         // Create an undo action for the load
         CreateUIElementAction action;
@@ -380,6 +379,16 @@ UIElement@ GetTopLevelUIElement(UIElement@ element)
     return element;
 }
 
+void SetUIElementModified(UIElement@ element, bool flag = true)
+{
+    element = GetTopLevelUIElement(element);
+    if (element.GetVar(MODIFIED_VAR).GetBool() != flag)
+    {
+        element.vars[MODIFIED_VAR] = flag;
+        UpdateHierarchyItemText(GetListIndex(element), element.visible, GetUIElementTitle(element));
+    }
+}
+
 XPathQuery availableStylesXPathQuery("/elements/element[@auto='false']/@type");
 
 void GetAvailableStyles()
@@ -463,6 +472,7 @@ bool UIElementPaste()
             UIElement@ element = editUIElement.children[editUIElement.numChildren - 1];
             ResetDuplicateID(element);
             UpdateHierarchyItem(element);
+            SetUIElementModified(editUIElement);
 
             // Create an undo action
             CreateUIElementAction action;
@@ -484,7 +494,7 @@ bool UIElementDelete()
 
     BeginSelectionModify();
 
-    // Clear the selection now to prevent repopulation of selectedNodes and selectedComponents combo
+    // Clear the selection now to prevent deleted elements from being reselected
     hierarchyList.ClearSelection();
 
     // Group for storing undo actions
@@ -503,10 +513,10 @@ bool UIElementDelete()
         action.Define(element);
         group.actions.Push(action);
 
+        SetUIElementModified(element);
         element.Remove();
-        SetSceneModified();
 
-        // If deleting only one node, select the next item in the same index
+        // If deleting only one element, select the next item in the same index
         if (selectedUIElements.length == 1)
             hierarchyList.selection = index;
     }
@@ -557,10 +567,10 @@ bool UIElementResetToDefault()
         element.ApplyAttributes();
         for (uint j = 0; j < element.numAttributes; ++j)
             PostEditAttribute(element, j);
+        SetUIElementModified(element);
     }
 
     SaveEditActionGroup(group);
-    SetSceneModified();
     attributesFullDirty = true;
 
     return true;
@@ -573,5 +583,6 @@ bool UIElementChangeParent(UIElement@ sourceElement, UIElement@ targetElement)
     SaveEditAction(action);
 
     sourceElement.parent = targetElement;
+    SetUIElementModified(targetElement);
     return sourceElement.parent is targetElement;
 }

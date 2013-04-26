@@ -461,6 +461,7 @@ void StoreGizmoEditActions()
         }
         
         SaveEditActionGroup(group);
+        SetSceneModified();
     }
 
     needGizmoUndo = false;

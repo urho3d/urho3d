@@ -49,6 +49,7 @@ void ImportModel(const String&in fileName)
         CreateNodeAction action;
         action.Define(newNode);
         SaveEditAction(action);
+        SetSceneModified();
 
         FocusNode(newNode);
     }

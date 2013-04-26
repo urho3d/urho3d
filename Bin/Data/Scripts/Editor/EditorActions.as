@@ -268,6 +268,11 @@ class EditAttributeAction : EditAction
             attributesFullDirty = true;
             // Apply side effects
             PostEditAttribute(target, attrIndex);
+
+            if (targetType == ITEM_UI_ELEMENT)
+                SetUIElementModified(target);
+            else
+                SetSceneModified();
         }
     }
 
@@ -282,6 +287,11 @@ class EditAttributeAction : EditAction
             attributesFullDirty = true;
             // Apply side effects
             PostEditAttribute(target, attrIndex);
+
+            if (targetType == ITEM_UI_ELEMENT)
+                SetUIElementModified(target);
+            else
+                SetSceneModified();
         }
     }
 }
@@ -363,6 +373,11 @@ class ResetAttributesAction : EditAction
             for (uint i = 0; i < target.numAttributes; ++i)
                 PostEditAttribute(target, i);
 
+            if (targetType == ITEM_UI_ELEMENT)
+                SetUIElementModified(target);
+            else
+                SetSceneModified();
+
             attributesFullDirty = true;
         }
     }
@@ -389,6 +404,11 @@ class ResetAttributesAction : EditAction
             // Apply side effects
             for (uint i = 0; i < target.numAttributes; ++i)
                 PostEditAttribute(target, i);
+
+            if (targetType == ITEM_UI_ELEMENT)
+                SetUIElementModified(target);
+            else
+                SetSceneModified();
 
             attributesFullDirty = true;
         }
@@ -499,6 +519,7 @@ class CreateUIElementAction : EditAction
         {
             parent.RemoveChild(element);
             hierarchyList.ClearSelection();
+            SetUIElementModified(parent);
         }
     }
 
@@ -515,6 +536,7 @@ class CreateUIElementAction : EditAction
                 UIElement@ element = parent.children[parent.numChildren - 1];
                 UpdateHierarchyItem(element);
                 FocusUIElement(element);
+                SetUIElementModified(parent);
             }
 
             suppressUIElementChanges = false;
@@ -559,6 +581,7 @@ class DeleteUIElementAction : EditAction
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
                 UpdateHierarchyItem(listItemIndex, element, parentItem);
                 FocusUIElement(element);
+                SetUIElementModified(parent);
             }
 
             suppressUIElementChanges = false;
@@ -573,6 +596,7 @@ class DeleteUIElementAction : EditAction
         {
             parent.RemoveChild(element);
             hierarchyList.ClearSelection();
+            SetUIElementModified(parent);
         }
     }
 }
@@ -597,7 +621,10 @@ class ReparentUIElementAction : EditAction
         UIElement@ parent = GetUIElementByID(oldParentID);
         UIElement@ element = GetUIElementByID(elementID);
         if (parent !is null && element !is null)
+        {
             element.SetParent(parent, oldChildIndex);
+            SetUIElementModified(parent);
+        }
     }
 
     void Redo()
@@ -605,7 +632,10 @@ class ReparentUIElementAction : EditAction
         UIElement@ parent = GetUIElementByID(newParentID);
         UIElement@ element = GetUIElementByID(elementID);
         if (parent !is null && element !is null)
+        {
             element.parent = parent;
+            SetUIElementModified(parent);
+        }
     }
 }
 
@@ -640,7 +670,7 @@ class ApplyUIElementStyleAction : EditAction
         {
             // Apply the style in the XML data
             elementData.root.SetAttribute("style", style);
-            
+
             // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
             suppressUIElementChanges = true;
 
@@ -653,14 +683,14 @@ class ApplyUIElementStyleAction : EditAction
                 UIElement@ element = parent.children[index];
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
                 UpdateHierarchyItem(listItemIndex, element, parentItem);
+                SetUIElementModified(element);
                 hierarchyUpdateSelections.Push(listItemIndex);
             }
 
             suppressUIElementChanges = false;
-            SetSceneModified();
         }
     }
-    
+
     void Undo()
     {
         ApplyStyle(elementOldStyle);

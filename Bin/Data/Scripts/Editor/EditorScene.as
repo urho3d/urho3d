@@ -203,6 +203,7 @@ void CreateNode(CreateMode mode)
     CreateNodeAction action;
     action.Define(newNode);
     SaveEditAction(action);
+    SetSceneModified();
 
     FocusNode(newNode);
 }
@@ -276,6 +277,7 @@ void LoadNode(const String&in fileName)
         CreateNodeAction action;
         action.Define(newNode);
         SaveEditAction(action);
+        SetSceneModified();
 
         FocusNode(newNode);
         instantiateFileName = fileName;
@@ -476,6 +478,7 @@ bool ScenePaste()
     }
 
     SaveEditActionGroup(group);
+    SetSceneModified();
     return true;
 }
 
@@ -511,6 +514,7 @@ bool SceneUnparent()
         hierarchyList.AddSelection(GetListIndex(changedNodes[i]));
 
     SaveEditActionGroup(group);
+    SetSceneModified();
 
     return true;
 }
@@ -556,6 +560,7 @@ bool SceneToggleEnable()
     }
 
     SaveEditActionGroup(group);
+    SetSceneModified();
 
     return true;
 }
@@ -571,6 +576,7 @@ bool SceneChangeParent(Node@ sourceNode, Node@ targetNode, bool createUndoAction
     }
 
     sourceNode.parent = targetNode;
+    SetSceneModified();
 
     // Return true if success
     if (sourceNode.parent is targetNode)
@@ -595,6 +601,7 @@ bool SceneResetPosition()
         EditNodeTransformAction action;
         action.Define(editNode, oldTransform);
         SaveEditAction(action);
+        SetSceneModified();
 
         UpdateNodeAttributes();
         return true;
@@ -616,6 +623,7 @@ bool SceneResetRotation()
         EditNodeTransformAction action;
         action.Define(editNode, oldTransform);
         SaveEditAction(action);
+        SetSceneModified();
 
         UpdateNodeAttributes();
         return true;
@@ -637,6 +645,7 @@ bool SceneResetScale()
         EditNodeTransformAction action;
         action.Define(editNode, oldTransform);
         SaveEditAction(action);
+        SetSceneModified();
 
         UpdateNodeAttributes();
         return true;
