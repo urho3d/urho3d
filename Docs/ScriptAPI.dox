@@ -758,6 +758,9 @@ Methods:<br>
 - Node@ GetNode() const
 - Component@ GetComponent() const
 - Scene@ GetScene() const
+- Camera@ GetCamera() const
+- RenderSurface@ GetRenderSurface() const
+- Texture@ GetTexture() const
 - UIElement@ GetUIElement() const
 - Connection@ GetConnection() const
 - CollisionShape@ GetCollisionShape() const

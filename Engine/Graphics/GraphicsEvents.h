@@ -51,7 +51,7 @@ EVENT(E_GRAPHICSFEATURES, GraphicsFeatures)
 {
 }
 
-/// Request for queuing autoupdated rendersurfaces
+/// Request for queuing autoupdated rendersurfaces.
 EVENT(E_RENDERSURFACEUPDATE, RenderSurfaceUpdate)
 {
 }
@@ -64,6 +64,42 @@ EVENT(E_BEGINRENDERING, BeginRendering)
 /// Frame rendering ended.
 EVENT(E_ENDRENDERING, EndRendering)
 {
+}
+
+/// Update of a view started.
+EVENT(E_BEGINVIEWUPDATE, BeginViewUpdate)
+{
+    PARAM(P_TEXTURE, Texture);              // Texture pointer
+    PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_CAMERA, Camera);                // Camera pointer
+}
+
+/// Update of a view ended.
+EVENT(E_ENDVIEWUPDATE, EndViewUpdate)
+{
+    PARAM(P_TEXTURE, Texture);              // Texture pointer
+    PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_CAMERA, Camera);                // Camera pointer
+}
+
+/// Render of a view started.
+EVENT(E_BEGINVIEWRENDER, BeginViewRender)
+{
+    PARAM(P_TEXTURE, Texture);              // Texture pointer
+    PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_CAMERA, Camera);                // Camera pointer
+}
+
+/// Render of a view ended.
+EVENT(E_ENDVIEWRENDER, EndViewRender)
+{
+    PARAM(P_TEXTURE, Texture);              // Texture pointer
+    PARAM(P_SURFACE, Surface);              // RenderSurface pointer
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
 }

@@ -620,8 +620,19 @@ void Renderer::Update(float timeStep)
         }
         
         // Update view. This may queue further views
+        using namespace BeginViewUpdate;
+        
+        VariantMap eventData;
+        eventData[P_SURFACE] = (void*)renderTarget.Get();
+        eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
+        eventData[P_SCENE] = (void*)scene;
+        eventData[P_CAMERA] = (void*)viewport->GetCamera();
+        SendEvent(E_BEGINVIEWUPDATE, eventData);
+        
         ResetShadowMapAllocations(); // Each view can reuse the same shadow maps
         view->Update(frame_);
+        
+        SendEvent(E_ENDVIEWUPDATE, eventData);
     }
     
     // Reset update flag from queued render surfaces. At this point no new views can be added on this frame
@@ -669,9 +680,22 @@ void Renderer::Render()
         // Render views from last to first (each main view is rendered after the auxiliary views it depends on)
         for (unsigned i = numViews_ - 1; i < numViews_; --i)
         {
+            using namespace BeginViewRender;
+            
+            RenderSurface* renderTarget = views_[i]->GetRenderTarget();
+            
+            VariantMap eventData;
+            eventData[P_SURFACE] = (void*)renderTarget;
+            eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
+            eventData[P_SCENE] = (void*)views_[i]->GetScene();
+            eventData[P_CAMERA] = (void*)views_[i]->GetCamera();
+            SendEvent(E_BEGINVIEWRENDER, eventData);
+            
             // Screen buffers can be reused between views, as each is rendered completely
             PrepareViewRender();
             views_[i]->Render();
+            
+            SendEvent(E_ENDVIEWRENDER, eventData);
         }
         
         // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only

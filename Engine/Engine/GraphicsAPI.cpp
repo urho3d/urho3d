@@ -110,6 +110,9 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "Vector3 get_forwardVector() const", asMETHOD(Camera, GetForwardVector), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Vector3 get_rightVector() const", asMETHOD(Camera, GetRightVector), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Vector3 get_upVector() const", asMETHOD(Camera, GetUpVector), asCALL_THISCALL);
+    
+    // Register Variant GetPtr() for Camera
+    engine->RegisterObjectMethod("Variant", "Camera@+ GetCamera() const", asFUNCTION(GetVariantPtr<Camera>), asCALL_CDECL_OBJLAST);
 }
 
 static Node* BoneGetNode(Bone* ptr)
@@ -424,6 +427,9 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedDepthStencil(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedDepthStencil), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthStencil() const", asMETHOD(RenderSurface, GetLinkedDepthStencil), asCALL_THISCALL);
     
+    // Register Variant GetPtr() for RenderSurface
+    engine->RegisterObjectMethod("Variant", "RenderSurface@+ GetRenderSurface() const", asFUNCTION(GetVariantPtr<RenderSurface>), asCALL_CDECL_OBJLAST);
+    
     RegisterTexture<Texture2D>(engine, "Texture2D");
     engine->RegisterObjectMethod("Texture2D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Texture2D", "bool Load(Image@+, bool useAlpha = false)", asFUNCTION(Texture2DLoad), asCALL_CDECL_OBJLAST);
@@ -433,6 +439,9 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TextureCube", "bool SetSize(int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("TextureCube", "bool Load(CubeMapFace, Image@+, bool useAlpha = false)", asFUNCTION(TextureCubeLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurfaces(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
+    
+    // Register Variant GetPtr() for Texture
+    engine->RegisterObjectMethod("Variant", "Texture@+ GetTexture() const", asFUNCTION(GetVariantPtr<Texture>), asCALL_CDECL_OBJLAST);
     
     engine->RegisterGlobalFunction("uint GetAlphaFormat()", asFUNCTION(Graphics::GetAlphaFormat), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetLuminanceFormat()", asFUNCTION(Graphics::GetLuminanceFormat), asCALL_CDECL);

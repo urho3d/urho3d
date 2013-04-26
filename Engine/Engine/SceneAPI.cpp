@@ -204,7 +204,7 @@ static void RegisterScene(asIScriptEngine* engine)
     
     // Register Variant GetPtr() for Scene
     engine->RegisterObjectMethod("Variant", "Scene@+ GetScene() const", asFUNCTION(GetVariantPtr<Scene>), asCALL_CDECL_OBJLAST);
-
+    
     engine->RegisterGlobalFunction("Array<String>@ GetAvailableComponents()", asFUNCTION(GetAvailableComponents), asCALL_CDECL);
 }
 
