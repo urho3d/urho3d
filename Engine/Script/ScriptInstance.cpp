@@ -42,7 +42,7 @@
 namespace Urho3D
 {
 
-static const String methodDeclarations[] = {
+static const char* methodDeclarations[] = {
     "void Start()",
     "void Stop()",
     "void DelayedStart()",

@@ -36,7 +36,7 @@ const ResourceRefList Variant::emptyResourceRefList;
 const VariantMap Variant::emptyVariantMap;
 const VariantVector Variant::emptyVariantVector;
 
-static const String typeNames[] =
+static const char* typeNames[] =
 {
     "None",
     "Int",
@@ -56,7 +56,7 @@ static const String typeNames[] =
     "VariantMap",
     "IntRect",
     "IntVector2",
-    ""
+    0
 };
 
 Variant& Variant::operator = (const Variant& rhs)
@@ -280,7 +280,7 @@ void Variant::SetBuffer(const void* data, unsigned size)
         memcpy(&buffer[0], data, size);
 }
 
-const String& Variant::GetTypeName() const
+String Variant::GetTypeName() const
 {
     return typeNames[type_];
 }
@@ -629,7 +629,7 @@ template<> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() co
     return GetBuffer();
 }
 
-const String& Variant::GetTypeName(VariantType type)
+String Variant::GetTypeName(VariantType type)
 {
     return typeNames[type];
 }
@@ -641,15 +641,7 @@ VariantType Variant::GetTypeFromName(const String& typeName)
 
 VariantType Variant::GetTypeFromName(const char* typeName)
 {
-    unsigned index = 0;
-    while (index < MAX_VAR_TYPES)
-    {
-        if (!typeNames[index].Compare(typeName, false))
-            return (VariantType)index;
-        ++index;
-    }
-
-    return VAR_NONE;
+    return (VariantType)GetStringListIndex(typeName, typeNames, VAR_NONE);
 }
 
 }

@@ -689,7 +689,7 @@ public:
     /// Return value's type.
     VariantType GetType() const { return type_; }
     /// Return value's type name.
-    const String& GetTypeName() const;
+    String GetTypeName() const;
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;
     /// Return true when the variant value is considered zero according to its actual type.
@@ -698,7 +698,7 @@ public:
     bool IsEmpty() const { return GetType() == VAR_NONE; }
 
     /// Return name for variant type.
-    static const String& GetTypeName(VariantType type);
+    static String GetTypeName(VariantType type);
     /// Return variant type from type name.
     static VariantType GetTypeFromName(const String& typeName);
     /// Return variant type from type name.

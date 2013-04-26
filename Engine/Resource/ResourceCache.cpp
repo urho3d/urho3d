@@ -37,7 +37,7 @@
 namespace Urho3D
 {
 
-static const String checkDirs[] = {
+static const char* checkDirs[] = {
     "Fonts",
     "Materials",
     "Models",
@@ -53,7 +53,7 @@ static const String checkDirs[] = {
     "Techniques",
     "Textures",
     "UI",
-    ""
+    0
 };
 
 static const SharedPtr<Resource> noResource;
@@ -548,7 +548,7 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
     if (!fileSystem)
         return fixedPath;
     
-    for (unsigned i = 0; !checkDirs[i].Empty(); ++i)
+    for (unsigned i = 0; checkDirs[i] != 0; ++i)
     {
         if (fileSystem->DirExists(fixedPath + checkDirs[i]))
         {
@@ -559,7 +559,7 @@ String ResourceCache::GetPreferredResourceDir(const String& path) const
     if (!pathHasKnownDirs)
     {
         String parentPath = GetParentPath(fixedPath);
-        for (unsigned i = 0; !checkDirs[i].Empty(); ++i)
+        for (unsigned i = 0; checkDirs[i] != 0; ++i)
         {
             if (fileSystem->DirExists(parentPath + checkDirs[i]))
             {

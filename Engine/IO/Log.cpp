@@ -43,7 +43,13 @@ extern "C" void SDL_IOS_LogMessage(const char* message);
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Log);
+const char* logLevelPrefixes[] =
+{
+    "DEBUG",
+    "INFO",
+    "WARNING",
+    "ERROR"
+};
 
 SharedPtr<File> Log::logFile_;
 String Log::lastMessage_;
@@ -57,6 +63,8 @@ bool Log::inWrite_ = false;
 bool Log::quiet_ = false;
 
 static PODVector<Log*> logInstances;
+
+OBJECTTYPESTATIC(Log);
 
 Log::Log(Context* context) :
     Object(context)
@@ -130,7 +138,8 @@ void Log::Write(int level, const String& message)
     {
         MutexLock lock(GetStaticMutex());
         
-        String formattedMessage = logLevelPrefixes[level] + ": " + message;
+        String formattedMessage = logLevelPrefixes[level];
+        formattedMessage += ": " + message;
         lastMessage_ = message;
         
         if (timeStamp_)

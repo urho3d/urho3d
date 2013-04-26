@@ -171,7 +171,7 @@ static const unsigned short spotLightIndexData[] =
     7, 6, 5
 };
 
-static const String shadowVariations[] =
+static const char* shadowVariations[] =
 {
     // No specific hardware shadow compare variation on OpenGL, it is always supported
     #ifdef USE_OPENGL
@@ -187,7 +187,7 @@ static const String shadowVariations[] =
     #endif
 };
 
-static const String geometryVSVariations[] =
+static const char* geometryVSVariations[] =
 {
     "",
     "Skinned",
@@ -195,7 +195,7 @@ static const String geometryVSVariations[] =
     "Billboard"
 };
 
-static const String lightVSVariations[] =
+static const char* lightVSVariations[] =
 {
     "Dir",
     "Spot",
@@ -211,7 +211,7 @@ static const String lightVSVariations[] =
     "PointSpecShadow"
 };
 
-static const String vertexLightVSVariations[] =
+static const char* vertexLightVSVariations[] =
 {
     "",
     "1VL",
@@ -222,7 +222,7 @@ static const String vertexLightVSVariations[] =
     "6VL"
 };
 
-static const String deferredLightVSVariations[] =
+static const char* deferredLightVSVariations[] =
 {
     "",
     "Dir",
@@ -230,7 +230,7 @@ static const String deferredLightVSVariations[] =
     "OrthoDir"
 };
 
-static const String lightPSVariations[] = 
+static const char* lightPSVariations[] = 
 {
     "Dir",
     "Spot",

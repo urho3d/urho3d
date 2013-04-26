@@ -101,23 +101,6 @@ const unsigned VertexBuffer::elementNormalize[] =
     GL_FALSE // Instancematrix3
 };
 
-const String VertexBuffer::elementName[] =
-{
-    "Position",
-    "Normal",
-    "Color",
-    "Texcoord1",
-    "Texcoord2",
-    "Cubetexcoord1",
-    "Cubetexcoord2",
-    "Tangent"
-    "Blendweights",
-    "Blendindices",
-    "Instancematrix1",
-    "Instancematrix2",
-    "Instancematrix3"
-};
-
 OBJECTTYPESTATIC(VertexBuffer);
 
 VertexBuffer::VertexBuffer(Context* context) :

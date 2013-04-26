@@ -36,23 +36,23 @@
 namespace Urho3D
 {
 
-static const String addressModeNames[] =
+static const char* addressModeNames[] =
 {
     "wrap",
     "mirror",
     "clamp",
     "border",
-    ""
+    0
 };
 
-static const String filterModeNames[] =
+static const char* filterModeNames[] =
 {
     "nearest",
     "bilinear",
     "trilinear",
     "anisotropic",
     "default",
-    ""
+    0
 };
 
 Texture::Texture(Context* context) :
@@ -236,7 +236,7 @@ void Texture::LoadParameters(const XMLElement& element)
             {
                 TextureCoordinate coordIndex = (TextureCoordinate)(coord[0] - 'u');
                 String mode = paramElem.GetAttributeLower("mode");
-                SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode, addressModeNames, ADDRESS_WRAP));
+                SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode.CString(), addressModeNames, ADDRESS_WRAP));
             }
         }
         
@@ -246,7 +246,7 @@ void Texture::LoadParameters(const XMLElement& element)
         if (name == "filter")
         {
             String mode = paramElem.GetAttributeLower("mode");
-            SetFilterMode((TextureFilterMode)GetStringListIndex(mode, filterModeNames, FILTER_DEFAULT));
+            SetFilterMode((TextureFilterMode)GetStringListIndex(mode.CString(), filterModeNames, FILTER_DEFAULT));
         }
         
         if (name == "mipmap")

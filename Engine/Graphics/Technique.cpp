@@ -47,7 +47,7 @@ const char* blendModeNames[] =
     0
 };
 
-static const String compareModeNames[] =
+static const char* compareModeNames[] =
 {
     "always",
     "equal",
@@ -56,15 +56,15 @@ static const String compareModeNames[] =
     "lessequal",
     "greater",
     "greaterequal",
-    ""
+    0
 };
 
-static const String lightingModeNames[] =
+static const char* lightingModeNames[] =
 {
     "unlit",
     "pervertex",
     "perpixel",
-    ""
+    0
 };
 
 Pass::Pass(StringHash type) :
@@ -181,7 +181,8 @@ bool Technique::Load(Deserializer& source)
             if (passElem.HasAttribute("lighting"))
             {
                 String lighting = passElem.GetAttributeLower("lighting");
-                newPass->SetLightingMode((PassLightingMode)GetStringListIndex(lighting, lightingModeNames, LIGHTING_UNLIT));
+                newPass->SetLightingMode((PassLightingMode)GetStringListIndex(lighting.CString(), lightingModeNames,
+                    LIGHTING_UNLIT));
             }
             
             if (passElem.HasAttribute("blend"))
@@ -196,7 +197,7 @@ bool Technique::Load(Deserializer& source)
                 if (depthTest == "false")
                     newPass->SetDepthTestMode(CMP_ALWAYS);
                 else
-                    newPass->SetDepthTestMode((CompareMode)GetStringListIndex(depthTest, compareModeNames, CMP_LESS));
+                    newPass->SetDepthTestMode((CompareMode)GetStringListIndex(depthTest.CString(), compareModeNames, CMP_LESS));
             }
             
             if (passElem.HasAttribute("depthwrite"))

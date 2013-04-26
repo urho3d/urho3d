@@ -88,9 +88,7 @@ public:
     static const unsigned elementComponents[];
     /// Vertex element OpenGL normalization.
     static const unsigned elementNormalize[];
-    /// Vertex element names.
-    static const String elementName[];
-    
+
 private:
     /// Update offsets of vertex elements.
     void UpdateOffsets();

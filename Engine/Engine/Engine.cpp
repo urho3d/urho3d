@@ -70,6 +70,8 @@ typedef struct _CrtMemBlockHeader
 namespace Urho3D
 {
 
+extern const char* logLevelPrefixes[];
+
 OBJECTTYPESTATIC(Engine);
 
 Engine::Engine(Context* context) :
@@ -545,7 +547,7 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             else if (argument.Substring(0, 3) == "log")
             {
                 argument = argument.Substring(3);
-                int logLevel = GetStringListIndex(argument, logLevelPrefixes, -1);
+                int logLevel = GetStringListIndex(argument.CString(), logLevelPrefixes, -1);
                 if (logLevel != -1)
                     ret["LogLevel"] = logLevel;
             }

@@ -140,7 +140,7 @@ public:
     bool GetSpecular() const { return specular_; }
     
     /// Return name for texture unit.
-    static const String& GetTextureUnitName(TextureUnit unit);
+    static String GetTextureUnitName(TextureUnit unit);
     
 private:
     /// Re-evaluate occlusion rendering.

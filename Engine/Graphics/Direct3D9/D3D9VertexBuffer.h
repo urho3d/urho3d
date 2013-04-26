@@ -86,8 +86,6 @@ public:
     
     /// Vertex element sizes.
     static const unsigned elementSize[];
-    /// Vertex element names.
-    static const String elementName[];
     
 private:
     /// Update offsets of vertex elements.

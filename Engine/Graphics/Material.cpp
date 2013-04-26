@@ -40,7 +40,7 @@
 namespace Urho3D
 {
 
-const String textureUnitNames[] =
+static const char* textureUnitNames[] =
 {
     "diffuse",
     "normal",
@@ -54,20 +54,20 @@ const String textureUnitNames[] =
     "indirection",
     "depth",
     "light",
-    ""
+    0
 };
 
-static const String cullModeNames[] =
+static const char* cullModeNames[] =
 {
     "none",
     "ccw",
     "cw",
-    ""
+    0
 };
 
 TextureUnit ParseTextureUnitName(const String& name)
 {
-    TextureUnit unit = (TextureUnit)GetStringListIndex(name, textureUnitNames, MAX_TEXTURE_UNITS);
+    TextureUnit unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
     if (name == "diff")
         unit = TU_DIFFUSE;
     else if (name == "albedo")
@@ -198,11 +198,11 @@ bool Material::Load(Deserializer& source)
     
     XMLElement cullElem = rootElem.GetChild("cull");
     if (cullElem)
-        SetCullMode((CullMode)GetStringListIndex(cullElem.GetAttribute("value"), cullModeNames, CULL_CCW));
+        SetCullMode((CullMode)GetStringListIndex(cullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
     
     XMLElement shadowCullElem = rootElem.GetChild("shadowcull");
     if (shadowCullElem)
-        SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetAttribute("value"), cullModeNames, CULL_CCW));
+        SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
     
     XMLElement depthBiasElem = rootElem.GetChild("depthbias");
     if (depthBiasElem)
@@ -425,7 +425,7 @@ const Vector4& Material::GetShaderParameter(const String& name) const
     return i != shaderParameters_.End() ? i->second_.value_ : Vector4::ZERO;
 }
 
-const String& Material::GetTextureUnitName(TextureUnit unit)
+String Material::GetTextureUnitName(TextureUnit unit)
 {
     return textureUnitNames[unit];
 }

@@ -31,7 +31,7 @@
 namespace Urho3D
 {
 
-static const String commandTypeNames[] =
+static const char* commandTypeNames[] =
 {
     "none",
     "clear",
@@ -39,14 +39,14 @@ static const String commandTypeNames[] =
     "quad",
     "forwardlights",
     "lightvolumes",
-    ""
+    0
 };
 
-static const String sortModeNames[] =
+static const char* sortModeNames[] =
 {
     "fronttoback",
     "backtofront",
-    ""
+    0
 };
 
 TextureUnit ParseTextureUnitName(const String& name);
@@ -88,7 +88,7 @@ void RenderTargetInfo::Load(const XMLElement& element)
 
 void RenderPathCommand::Load(const XMLElement& element)
 {
-    type_ = (RenderCommandType)GetStringListIndex(element.GetAttributeLower("type"), commandTypeNames, CMD_NONE);
+    type_ = (RenderCommandType)GetStringListIndex(element.GetAttributeLower("type").CString(), commandTypeNames, CMD_NONE);
     tag_ = element.GetAttribute("tag");
     if (element.HasAttribute("enabled"))
         enabled_ = element.GetBool("enabled");
@@ -119,7 +119,7 @@ void RenderPathCommand::Load(const XMLElement& element)
         
     case CMD_SCENEPASS:
         pass_ = element.GetAttribute("pass");
-        sortMode_ = (RenderCommandSortMode)GetStringListIndex(element.GetAttributeLower("sort"), sortModeNames, SORT_FRONTTOBACK);
+        sortMode_ = (RenderCommandSortMode)GetStringListIndex(element.GetAttributeLower("sort").CString(), sortModeNames, SORT_FRONTTOBACK);
         if (element.HasAttribute("marktostencil"))
             markToStencil_ = element.GetBool("marktostencil");
         if (element.HasAttribute("vertexlights"))
