@@ -141,7 +141,7 @@ TestScene also includes a network replication test, where clients can connect, m
 
 \section Running_Editor Editor
 
-%Scene editor application written in script. To start, run Editor.bat, or use the command Urho3D.exe Scripts/Editor.as
+%Scene and %UI layout editor application written in script. To start, run Editor.bat, or use the command Urho3D.exe Scripts/Editor.as
 
 For details on how to use the editor, see \ref EditorInstructions "Editor instructions."
 
@@ -671,14 +671,14 @@ For a more complex C++ example, check out CharacterDemo in the Extras directory,
 
 \page EditorInstructions Editor instructions
 
-The Urho3D scene editor is a script application that can be run with the Urho3D main executable. To start, execute either of these commands: (in the Bin directory) Editor.bat or Urho3D.exe Scripts/Editor.as
+The Urho3D editor is a script application that can be run with the Urho3D main executable. To start, execute either of these commands: (in the Bin directory) Editor.bat or Urho3D.exe Scripts/Editor.as
 
 Hint: to get some content to look at, run the TestScene example, and press F5. This saves a scene file called TestScene.xml into the Data/Scenes subdirectory, which can be loaded in the editor. The NinjaSnowWar scene also exists in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
 
 \section EditorInstructions_Controls Controls
 
 \verbatim
-Left mouse      - Select nodes or drag the node transform gizmo. Hold Shift to 
+Left mouse      - Select nodes or drag the node transform gizmo. Hold Shift to
                   select components instead. Hold Ctrl to multiselect.
 Right mouse     - Hold down and move mouse to rotate camera
 
@@ -704,7 +704,8 @@ Ctrl+H          - Open the scene hierarchy window
 Ctrl+I          - Open the attribute inspector window
 Ctrl+P          - Toggle scene update on/off
 Ctrl+W          - Cycle through solid, wireframe and point rendering
-Ctrl+R          - Reload scene resources
+Ctrl+Z          - Undo
+Ctrl+Y          - Redo
 ESC             - Close the file selector or editor settings window
 DEL             - Delete node or component
 F1              - Toggle console
@@ -727,9 +728,9 @@ The editor settings will be saved on exit to a file Urho3D\Editor\Config.xml in 
 
 \section EditorInstructions_Editing Editing
 
-New scene nodes and components are created with the buttons at the bottom of the hierarchy window. Their attributes can then be edited in the node / component edit window. Note that the node transform shown is the local transform (offset from parent.)
+New scene nodes and components are created from the Create menu at the top. Their attributes can then be edited in the attribute inspector window. Note that the node transform shown is the local transform (offset from parent.)
 
-%Scene nodes can also be moved/rotated/scaled by Ctrl + arrow keys and Page Up / Page Down. Press Ctrl+1,2,3 to change the manipulation mode, and Ctrl+4 to toggle between world relative and scene node relative movement.
+As an alternative to using the transform gizmo, scene nodes can be moved/rotated/scaled by Ctrl + arrow keys and Page Up / Page Down. Press Ctrl+1,2,3 to change the manipulation mode, and Ctrl+4 to toggle between world relative and scene node relative movement.
 
 To reparent scene nodes, drag and drop them onto the new parent scene node in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
 

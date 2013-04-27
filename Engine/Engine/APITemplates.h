@@ -816,6 +816,11 @@ static VariantMap& UIElementGetVars(UIElement* ptr)
     return const_cast<VariantMap&>(ptr->GetVars());
 }
 
+static XMLFile* UIElementGetDefaultStyle(UIElement* ptr)
+{
+    return ptr->GetDefaultStyle();
+}
+
 #if __clang__
 #pragma clang diagnostic pop
 #endif
@@ -964,7 +969,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     }
     engine->RegisterObjectMethod(className, "const String& get_appliedStyle() const", asMETHOD(T, GetAppliedStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_defaultStyle(XMLFile@+)", asMETHOD(T, SetDefaultStyle), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "XMLFile@+ get_defaultStyle()", asMETHOD(T, GetDefaultStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "XMLFile@+ get_defaultStyle() const", asFUNCTION(UIElementGetDefaultStyle), asCALL_CDECL_OBJLAST);
     if (!isSprite)
     {
         engine->RegisterObjectMethod(className, "void set_layoutMode(LayoutMode)", asMETHOD(T, SetLayoutMode), asCALL_THISCALL);
