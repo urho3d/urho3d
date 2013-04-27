@@ -107,7 +107,7 @@ successfully:
 - For Linux, the following development packages need to be installed:
   libx11-dev, libxrandr-dev, libasound2-dev. Also install the package
   libgl1-mesa-dev if your GPU driver does not include OpenGL headers & libs.
-  Because Urho3D is built as 32-bit, 64-bit systems require installing also 
+  Because Urho3D is built as 32-bit, 64-bit systems require installing also
   32-bit versions of the development libraries.
 
 - For Mac OS X, the Xcode developer tools package should include everything
@@ -247,62 +247,22 @@ to "Urho3D.app".
 History
 -------
 
-V1.0    - Original release.
-
-V1.1    - Object and scene model refactoring.
-        - Automatic serialization of scene objects via attributes.
-        - Added OpenGL and cross-platform support.
-        - Switched to kNet library for networking.
-
-V1.11   - Bugfixes and performance optimizations.
-        - Added GraphicsTest example from V1.0 (now called TestSceneOld.)
-        - Added fallback mode, which is used if multiple render targets or
-          hardware shadow maps are not available.
-
-V1.12   - Manipulator gizmo and multi-editing in the editor.
-        - Switched to forward rendering exclusively, which is optimized to do
-          more work in the vertex shader.
-        - Zone system refactoring. Objects check the zone they belong to for
-          per-zone light masking, ambient light and fog settings.
-        - Scripting API fixes and improvements.
-
-V1.13   - Task-based multithreading.
-        - Vertex lighting option.
-        - Forward and light pre-pass rendering pipelines.
-
-V1.14   - Object (partial scene) load/save.
-        - Post-processing.
-        - Switched to pugixml library, scene load/save optimizations.
-        - Bugfixes to rendertexture views and component attributes.
-
-V1.15   - New deferred rendering pipeline.
-        - Unicode support.
-        - Live resource reloading in the editor (Windows only so far.)
-        - More accurate frame timing.
-        - Bugfixes to physics jittering and FBO performance issue on Linux.
-
-V1.16   - Switched to Bullet physics library.
-        - More physics constraint types.
-        - Rendering and networking performance optimizations.
-        - Use Squish library to implement software DXT decompression when not
-          supported in hardware.
-
-V1.2    - Android and iOS support.
-        - Decal rendering.
-        - Terrain rendering.
-        - Joystick input support.
-        - Use SDL library for windowing and input on all platforms.
-        - KTX and PVR image loading (for ETC1 & PVRTC compressed textures.)
-        - Removed need for shader preprocessing; reorganized shaders to be more
-          friendly to base custom shaders on.
-        - Inbuilt geometry shapes in the editor.
-        
-V1.21   - Bugfixes and code cleanup.
-        - External window support (experimental.)
-        - UI elements refactored to use attributes for serialization.
-        - Animation state editing and animation trigger events.
-        - Scene update time scale can be modified.
-        - Improved the delayed method call system.
+V1.23   - UI editing support in the editor.
+        - Undo/redo in the editor.
+        - Recast/Detour library integration for navigation mesh generation and
+          pathfinding.
+        - Open Asset Import Library update, enables FBX file support.
+        - "Is Enabled" attribute in scene nodes and components for an uniform
+          mechanism to temporarily disable unneeded audiovisual, physics or
+          logic objects.
+        - Script object public variables editing and serialization.
+        - New components: Text3D and Sprite.
+        - UI library functionality improvements.
+        - sRGB texture and framebuffer support.
+        - Switched to GLEW library for OpenGL extension handling.
+        - Vegetation and lightmapping example shaders.
+        - Engine configuration through a parameter map.
+        - Lots of refactoring, code cleanup and bugfixes.
 
 V1.22   - Configurable render path replaces hardcoded forward/prepass/deferred
           modes. Render path system also used for postprocessing now.
@@ -317,3 +277,60 @@ V1.22   - Configurable render path replaces hardcoded forward/prepass/deferred
         - Visual Studio 2012, Eclipse & Xcode build support.
         - Many bugfixes, including iOS 6 orientation & shadow mapping bugfixes,
           skinning on some Android devices.
+
+V1.21   - Bugfixes and code cleanup.
+        - External window support (experimental.)
+        - UI elements refactored to use attributes for serialization.
+        - Animation state editing and animation trigger events.
+        - Scene update time scale can be modified.
+        - Improved the delayed method call system.
+
+V1.2    - Android and iOS support.
+        - Decal rendering.
+        - Terrain rendering.
+        - Joystick input support.
+        - Use SDL library for windowing and input on all platforms.
+        - KTX and PVR image loading (for ETC1 & PVRTC compressed textures.)
+        - Removed need for shader preprocessing; reorganized shaders to be more
+          friendly to base custom shaders on.
+        - Inbuilt geometry shapes in the editor.
+
+V1.16   - Switched to Bullet physics library.
+        - More physics constraint types.
+        - Rendering and networking performance optimizations.
+        - Use Squish library to implement software DXT decompression when not
+          supported in hardware.
+
+V1.15   - New deferred rendering pipeline.
+        - Unicode support.
+        - Live resource reloading in the editor (Windows only so far.)
+        - More accurate frame timing.
+        - Bugfixes to physics jittering and FBO performance issue on Linux.
+
+V1.14   - Object (partial scene) load/save.
+        - Post-processing.
+        - Switched to pugixml library, scene load/save optimizations.
+        - Bugfixes to rendertexture views and component attributes.
+
+V1.13   - Task-based multithreading.
+        - Vertex lighting option.
+        - Forward and light pre-pass rendering pipelines.
+
+V1.12   - Manipulator gizmo and multi-editing in the editor.
+        - Switched to forward rendering exclusively, which is optimized to do
+          more work in the vertex shader.
+        - Zone system refactoring. Objects check the zone they belong to for
+          per-zone light masking, ambient light and fog settings.
+        - Scripting API fixes and improvements.
+
+V1.11   - Bugfixes and performance optimizations.
+        - Added GraphicsTest example from V1.0 (now called TestSceneOld.)
+        - Added fallback mode, which is used if multiple render targets or
+          hardware shadow maps are not available.
+
+V1.1    - Object and scene model refactoring.
+        - Automatic serialization of scene objects via attributes.
+        - Added OpenGL and cross-platform support.
+        - Switched to kNet library for networking.
+
+V1.0    - Original release.
