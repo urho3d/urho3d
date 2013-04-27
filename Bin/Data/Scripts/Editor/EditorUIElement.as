@@ -4,8 +4,6 @@ UIElement@ editorUIElement;
 XMLFile@ uiElementDefaultStyle;
 Array<String> availableStyles;
 
-String childElementFileName;
-
 UIElement@ editUIElement;
 Array<Serializable@> selectedUIElements;
 Array<Serializable@> editUIElements;
@@ -17,8 +15,9 @@ bool suppressUIElementChanges = false;
 // Registered UIElement user variable reverse mappings
 VariantMap uiElementVarNames;
 
-const ShortStringHash FILENAME_VAR("__FileName");
-const ShortStringHash MODIFIED_VAR("__Modified");
+const ShortStringHash FILENAME_VAR("FileName");
+const ShortStringHash MODIFIED_VAR("Modified");
+const ShortStringHash CHILD_ELEMENT_FILENAME_VAR("ChildElemFileName");
 
 void ClearUIElementSelection()
 {
@@ -259,10 +258,17 @@ void LoadChildUIElement(const String&in fileName)
 
     if (editUIElement.LoadChildXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle))
     {
-        UIElement@ element = editUIElement.children[editUIElement.numChildren - 1];
+        XMLElement rootElem = xmlFile.root;
+        uint index = rootElem.HasAttribute("index") ? rootElem.GetUInt("index") : editUIElement.numChildren - 1;
+        UIElement@ element = editUIElement.children[index];
         ResetSortChildren(element);
         RegisterUIElementVar(xmlFile.root);
-        UpdateHierarchyItem(element);
+        element.vars[CHILD_ELEMENT_FILENAME_VAR] = fileName;
+        if (index == editUIElement.numChildren - 1)
+            UpdateHierarchyItem(element);
+        else
+            // If not last child, find the list index of the next sibling as the insertion index
+            UpdateHierarchyItem(GetListIndex(editUIElement.children[index + 1]), element, hierarchyList.items[GetListIndex(editUIElement)]);
         SetUIElementModified(element);
 
         // Create an undo action for the load
@@ -294,6 +300,8 @@ bool SaveChildUIElement(const String&in fileName)
     {
         FilterInternalVars(rootElem);
         success = elementData.Save(file);
+        if (success)
+            editUIElement.vars[CHILD_ELEMENT_FILENAME_VAR] = fileName;
     }
 
     return success;

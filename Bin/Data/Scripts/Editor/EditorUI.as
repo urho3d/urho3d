@@ -361,7 +361,7 @@ bool PickFile()
         if (editUIElement !is null)
         {
             CreateFileSelector("Save child element", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
-            uiFileSelector.fileName = GetFileNameAndExtension(childElementFileName);
+            uiFileSelector.fileName = GetFileNameAndExtension(editUIElement.GetVar(CHILD_ELEMENT_FILENAME_VAR).GetString());
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveChildUIElementFile");
         }
     }

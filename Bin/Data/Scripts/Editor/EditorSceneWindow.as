@@ -11,7 +11,7 @@ const String NO_CHANGE(uint8(0));
 const ShortStringHash TYPE_VAR("Type");
 const ShortStringHash NODE_ID_VAR("NodeID");
 const ShortStringHash COMPONENT_ID_VAR("ComponentID");
-const ShortStringHash UI_ELEMENT_ID_VAR("__UIElementID");
+const ShortStringHash UI_ELEMENT_ID_VAR("UIElementID");
 const ShortStringHash[] ID_VARS = { ShortStringHash(""), NODE_ID_VAR, COMPONENT_ID_VAR, UI_ELEMENT_ID_VAR };
 
 Window@ hierarchyWindow;
