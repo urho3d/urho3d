@@ -318,9 +318,9 @@ void SpawnPlayer(Connection@ connection)
 {
     Vector3 spawnPosition;
     if (singlePlayer)
-        spawnPosition = Vector3(0, 0.9, 0);
+        spawnPosition = Vector3(0, 0.97, 0);
     else
-        spawnPosition = Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 0.9, Random(spawnAreaSize) - spawnAreaSize);
+        spawnPosition = Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 0.97, Random(spawnAreaSize) - spawnAreaSize);
 
     Node@ playerNode = SpawnObject(spawnPosition, Quaternion(), "Ninja");
     // Set owner connection. Owned nodes are always updated to the owner at full frequency
