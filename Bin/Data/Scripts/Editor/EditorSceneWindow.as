@@ -486,7 +486,6 @@ void SelectNode(Node@ node, bool multiselect)
 
 void SelectComponent(Component@ component, bool multiselect)
 {
-    Print("Here", true);
     if (component is null && !multiselect)
     {
         hierarchyList.ClearSelection();
