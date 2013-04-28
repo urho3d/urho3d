@@ -10,7 +10,11 @@ file (GLOB H_FILES
     libcpuid/*.h
 )
 
-set (SOURCE_FILES ${C_FILES} ${H_FILES})
+if (MSVC AND ENABLE_64BIT)
+    set (ASM_FILES libcpuid/masm-x64.asm)
+endif ()
+
+set (SOURCE_FILES ${C_FILES} ${H_FILES} ${ASM_FILES})
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY libcpuid)

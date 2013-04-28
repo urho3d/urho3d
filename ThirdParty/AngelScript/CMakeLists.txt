@@ -13,6 +13,10 @@ if (IOS)
     set (ASM_FILES source/as_callfunc_arm_xcode.S)
 endif ()
 
+if (MSVC AND ENABLE_64BIT)
+    set (ASM_FILES source/as_callfunc_x64_msvc_asm.asm)
+endif ()
+
 set (SOURCE_FILES ${CPP_FILES} ${ASM_FILES} ${H_FILES})
 
 # Define dependency libs

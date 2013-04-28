@@ -142,7 +142,7 @@ struct DDSurfaceDesc2
     };
     unsigned dwAlphaBitDepth_;
     unsigned dwReserved_;
-    void* lpSurface_;
+    unsigned lpSurface_; // Do not define as a void pointer, as it is 8 bytes in a 64bit build
     union
     {
         DDColorKey ddckCKDestOverlay_;

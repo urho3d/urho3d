@@ -71,7 +71,7 @@ struct AttributeInfo
     }
     
     /// Construct offset attribute.
-    AttributeInfo(VariantType type, const char* name, unsigned offset, const Variant& defaultValue, unsigned mode) :
+    AttributeInfo(VariantType type, const char* name, size_t offset, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
         offset_(offset),

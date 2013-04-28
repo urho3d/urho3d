@@ -112,10 +112,14 @@ public:
     explicit String(int value);
     /// Construct from a short integer.
     explicit String(short value);
+    /// Construct from a long integer.
+    explicit String(long long value);
     /// Construct from an unsigned integer.
     explicit String(unsigned value);
     /// Construct from an unsigned short integer.
     explicit String(unsigned short value);
+    /// Construct from an unsigned long integer.
+    explicit String(unsigned long long value);
     /// Construct from a float.
     explicit String(float value);
     /// Construct from a double.

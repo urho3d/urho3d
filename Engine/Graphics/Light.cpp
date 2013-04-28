@@ -48,6 +48,7 @@ static const float DEFAULT_SHADOWFADESTART = 0.8f;
 static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
 static const float DEFAULT_SHADOWMINVIEW = 3.0f;
 static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
+static const float DEFAULT_SHADOWSPLIT = 1000.0f;
 
 static const char* typeNames[] =
 {
@@ -87,7 +88,7 @@ Light::Light(Context* context) :
     Drawable(context, DRAWABLE_LIGHT),
     lightType_(DEFAULT_LIGHTTYPE),
     shadowBias_(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
-    shadowCascade_(CascadeParameters(M_LARGE_VALUE, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
+    shadowCascade_(CascadeParameters(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
     shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     lightQueue_(0),
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
@@ -132,7 +133,7 @@ void Light::RegisterObject(Context* context)
     ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(1000.0f, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "CSM Bias Auto Adjust", shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);

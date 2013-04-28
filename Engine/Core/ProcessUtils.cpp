@@ -105,7 +105,7 @@ void GetCPUData(struct cpu_id_t* data)
 
 void InitFPU()
 {
-    #if !defined(ANDROID) && !defined(IOS)
+    #if !defined(ANDROID) && !defined(IOS) && !defined(__x86_64__) && !defined(_M_AMD64)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
     #ifdef _MSC_VER

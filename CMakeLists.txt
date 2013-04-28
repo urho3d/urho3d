@@ -11,19 +11,13 @@ if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
 endif ()
 
-if (IOS)
-    # IOS-specific setup
-    add_definitions (-DIOS)
-    enable_language (ASM)
-    set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
-    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos;-iphonesimulator")
-    set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
-    set (CMAKE_OSX_SYSROOT "iphoneos")	# Set to "Latest iOS"
-elseif (CMAKE_GENERATOR STREQUAL "Xcode")
-    # MacOSX-Xcode-specific setup
-    set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
-    set (CMAKE_OSX_SYSROOT "")		# Set to "Current OS X"
-    #set (CMAKE_OSX_SYSROOT "macosx")	# Set to "Latest OS X"
+# Enable 64-bit build. Disabled by default. On Visual Studio, depends on the generator used
+if (NOT MSVC)
+    # set (ENABLE_64BIT 1)
+else ()
+    if (CMAKE_GENERATOR MATCHES "Win64")
+        set (ENABLE_64BIT 1)
+    endif ()
 endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
@@ -59,16 +53,28 @@ if (NOT WIN32)
     add_definitions (-DUNIX)
 endif ()
 
-# Set static for GLEW.
-if (NOT IOS)
-    if (USE_OPENGL)
-        add_definitions(-DGLEW_STATIC)
-        add_definitions(-DGLEW_NO_GLU)
+# Platform and compiler specific options
+if (IOS)
+    # IOS-specific setup
+    add_definitions (-DIOS)
+    enable_language (ASM)
+    set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos;-iphonesimulator")
+    set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
+    set (CMAKE_OSX_SYSROOT "iphoneos")	# Set to "Latest iOS"
+elseif (CMAKE_GENERATOR STREQUAL "Xcode")
+    # MacOSX-Xcode-specific setup
+    if (NOT ENABLE_64BIT)
+        set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
     endif ()
+    set (CMAKE_OSX_SYSROOT "")		# Set to "Current OS X"
+    #set (CMAKE_OSX_SYSROOT "macosx")	# Set to "Latest OS X"
 endif ()
-
-# Compiler-specific options
 if (MSVC)
+    # Visual Studio-specific setup
+    if (ENABLE_64BIT)
+        enable_language (ASM_MASM)
+    endif ()
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
     set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} /MT /fp:fast /Zi /GS-")
@@ -83,9 +89,14 @@ if (MSVC)
     set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG")
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
 else ()
+    # GCC-specific setup
     if (NOT IOS)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -O2 -ffast-math")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -m32 -O2 -ffast-math")
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -ffast-math")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -O2 -ffast-math")
+        if (NOT ENABLE_64BIT)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+        endif ()
         if (ENABLE_SSE)
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
@@ -179,6 +190,8 @@ add_subdirectory (Urho3D)
 if (NOT IOS)
     if (USE_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
+        add_definitions(-DGLEW_STATIC)
+        add_definitions(-DGLEW_NO_GLU)
     endif ()
     add_subdirectory (ThirdParty/Assimp)
     add_subdirectory (ThirdParty/LibCpuId)
