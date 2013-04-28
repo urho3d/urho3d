@@ -116,6 +116,8 @@ bool Engine::Initialize(const VariantMap& parameters)
     RegisterObjects();
     RegisterSubsystems();
     
+    PROFILE(InitEngine);
+    
     // Start logging
     Log* log = GetSubsystem<Log>();
     if (log)
