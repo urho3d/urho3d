@@ -3,7 +3,7 @@
     <rendertarget name="normal" rtsizedivisor="1 1" format="rgba" />
     <rendertarget name="depth" rtsizedivisor="1 1"  format="lineardepth" />
     <command type="clear" color="fog" depth="1.0" stencil="0" />
-    <command type="scenepass" pass="prepass" marktostencil="true">
+    <command type="scenepass" pass="prepass" marktostencil="true" metadata="gbuffer">
         <output index="0" name="normal" />
         <output index="1" name="depth" />
     </command>
@@ -16,6 +16,6 @@
         <texture unit="light" name="light" />
     </command>
     <command type="scenepass" pass="prealpha"/>
-    <command type="scenepass" pass="alpha" usescissor="true" vertexlights="true" sort="backtofront" />
+    <command type="scenepass" pass="alpha" usescissor="true" vertexlights="true" sort="backtofront" metadata="alpha" />
     <command type="scenepass" pass="postalpha" sort="backtofront" />
 </renderpath>

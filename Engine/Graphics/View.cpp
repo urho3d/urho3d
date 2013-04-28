@@ -299,6 +299,13 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     renderTarget_ = renderTarget;
     renderPath_ = viewport->GetRenderPath();
     
+    gBufferPassName_ = StringHash();
+    basePassName_  = PASS_BASE;
+    alphaPassName_ = PASS_ALPHA;
+    lightPassName_ = PASS_LIGHT;
+    litBasePassName_ = PASS_LITBASE;
+    litAlphaPassName_ = PASS_LITALPHA;
+    
     // Make sure that all necessary batch queues exist
     scenePasses_.Clear();
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
@@ -316,12 +323,34 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             info.useScissor_ = command.useScissor_;
             info.vertexLights_ = command.vertexLights_;
             
+            // Check scenepass metadata for defining custom passes which interact with lighting
+            if (command.metadata_.Length())
+            {
+                if (!command.metadata_.Compare("gbuffer", false))
+                    gBufferPassName_ = command.pass_;
+                if (!command.metadata_.Compare("base", false))
+                {
+                    basePassName_ = command.pass_;
+                    litBasePassName_ = "lit" + command.pass_;
+                }
+                if (!command.metadata_.Compare("alpha", false))
+                {
+                    alphaPassName_ = command.pass_;
+                    litAlphaPassName_ = "lit" + command.pass_;
+                }
+            }
+            
             HashMap<StringHash, BatchQueue>::Iterator j = batchQueues_.Find(command.pass_);
             if (j == batchQueues_.End())
                 j = batchQueues_.Insert(Pair<StringHash, BatchQueue>(command.pass_, BatchQueue()));
             info.batchQueue_ = &j->second_;
             
             scenePasses_.Push(info);
+        }
+        else if (command.type_ == CMD_FORWARDLIGHTS)
+        {
+            if (!command.pass_.Trimmed().Empty())
+                lightPassName_ = command.pass_;
         }
     }
     
@@ -686,7 +715,7 @@ void View::GetBatches()
 {
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Light*> vertexLights;
-    BatchQueue* alphaQueue = batchQueues_.Contains(PASS_ALPHA) ? &batchQueues_[PASS_ALPHA] : (BatchQueue*)0;
+    BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassName_) ? &batchQueues_[alphaPassName_] : (BatchQueue*)0;
     
     // Check whether to use the lit base pass optimization
     bool useLitBase = true;
@@ -930,7 +959,7 @@ void View::GetBatches()
                         continue;
                     
                     // Skip forward base pass if the corresponding litbase pass already exists
-                    if (info.pass_ == PASS_BASE && j < 32 && drawable->HasBasePass(j))
+                    if (info.pass_ == basePassName_ && j < 32 && drawable->HasBasePass(j))
                         continue;
                     
                     if (info.vertexLights_ && !drawableVertexLights.Empty())
@@ -1089,7 +1118,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
             continue;
         
         // Do not create pixel lit forward passes for materials that render into the G-buffer
-        if (deferred_ && (tech->HasPass(PASS_PREPASS) || tech->HasPass(PASS_DEFERRED)))
+        if (gBufferPassName_.Value() && tech->HasPass(gBufferPassName_))
             continue;
         
         Batch destBatch(srcBatch);
@@ -1099,22 +1128,22 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
         // Also vertex lighting or ambient gradient require the non-lit base pass, so skip in those cases
         if (i < 32 && allowLitBase)
         {
-            destBatch.pass_ = tech->GetPass(PASS_LITBASE);
+            destBatch.pass_ = tech->GetPass(litBasePassName_);
             if (destBatch.pass_)
             {
                 destBatch.isBase_ = true;
                 drawable->SetBasePass(i);
             }
             else
-                destBatch.pass_ = tech->GetPass(PASS_LIGHT);
+                destBatch.pass_ = tech->GetPass(lightPassName_);
         }
         else
-            destBatch.pass_ = tech->GetPass(PASS_LIGHT);
+            destBatch.pass_ = tech->GetPass(lightPassName_);
         
         // If no lit pass, check for lit alpha
         if (!destBatch.pass_)
         {
-            destBatch.pass_ = tech->GetPass(PASS_LITALPHA);
+            destBatch.pass_ = tech->GetPass(litAlphaPassName_);
             isLitAlpha = true;
         }
         

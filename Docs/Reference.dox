@@ -851,7 +851,7 @@ The available commands are:
 - clear: Clear any of color, depth and stencil. Color clear can optionally use the fog color from the Zone visible at the far clip distance.
 - scenepass: Render scene objects whose \ref Materials "material technique" contains the specified pass. Will either be front-to-back ordered with state sorting, or back-to-front ordered with no state sorting. For deferred rendering, object lightmasks can be optionally marked to the stencil buffer. Vertex lights can optionally be handled during a pass, if it has the necessary shader combinations. Textures global to the pass can be bound to free texture units; these can either be the viewport, a named rendertarget, or a 2D texture resource identified with its pathname.
 - quad: Render a viewport-sized quad using the specified shaders. Textures can be bound and additionally Vector4 shader parameters can be specified.
-- forwardlights: Render per-pixel forward lighting for opaque objects. Shadow maps are also rendered as necessary.
+- forwardlights: Render per-pixel forward lighting for opaque objects with the specified pass name. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
 
 A render path can be loaded from a main XML file by calling \ref RenderPath::Load "Load()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be enabled or disabled by calling \ref RenderPath::SetEnabled "SetEnabled()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
@@ -865,7 +865,7 @@ The render path XML definition looks like this:
     <rendertarget name="RTName" tag="TagName" enabled="true|false" size="x y"|sizedivisor="x y"|rtsizedivisor="x y"
         format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth" filter="true|false" srgb="true|false" />
     <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" />
-    <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" usescissor="true|false" vertexlights="true|false">
+    <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" usescissor="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" >
         <output index="0" name="RTName1" />
         <output index="1" name="RTName2" />
         <output index="2" name="RTName3" />
@@ -875,7 +875,7 @@ The render path XML definition looks like this:
         <texture unit="unit" name="viewport|RTName|TextureName" />
         <shaderparameter name="ParameterName" value="x y z w" />
     </command>
-    <command type="forwardlights" uselitbase="true|false" output="viewport|RTName" />
+    <command type="forwardlights" pass="PassName" uselitbase="true|false" output="viewport|RTName" />
     <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
@@ -884,14 +884,16 @@ The render path XML definition looks like this:
 
 Note the special "lineardepth" format available for rendertargets. This is intended for storing scene depth in deferred rendering. It will be D3DFMT_R32F on Direct3D9, but RGBA on OpenGL, due to the limitation of all color buffers having to be the same format. The file Samplers.frag in Bin/CoreData/Shaders/GLSL provides functions to encode and decode linear depth to RGB.
 
-\section RenderPaths_HardCodedPasses Hardcoded scene passes
+\section RenderPaths_ForwardLighting Forward lighting special considerations
 
-Otherwise fully customized scene render passes can be specified, but there are a few exceptions related to forward per-pixel lighting.
+Otherwise fully customized scene render passes can be specified, but there are a few things to remember related to forward lighting:
 
-- The "light" and "litbase" passes will be automatically rendered by the forwardlights command, interleaved with shadow map rendering as necessary.
-- The "litalpha" pass for transparent objects is automatically merged with the "alpha" pass, if it exists in the render path definition. The idea is that all transparent objects are sorted back to front, and their base passes (the actual "alpha" pass) are rendered first, followed by their additive pixel-lit passes. The "usescissor" flag in the scenepass command should be set to true, so that scissor rectangles limit the effect of lights on transparent objects.
-- The forwardlights command can optionally disable the "litbase" pass optimization without having to touch the material techniques, if a separate opaque ambient-only base pass is needed. By default the optimization is enabled.
-
+- The opaque base pass must be tagged with metadata "base". When forward lighting logic does the lit base pass optimization, it will search for a pass with the word "lit" prepended, ie. if your custom opaque base pass is
+  called "custombase", the corresponding lit base pass would be "litcustombase".
+- The transparent base pass must be tagged with metadata "alpha". For lit transparent objects, the forward lighting logic will look for a pass with the word "lit" prepended, ie. if the custom alpha base pass is called "customalpha", the corresponding lit pass is "litcustomalpha". The lit drawcalls will be interleaved with the transparent base pass, and the scenepass command should have back-to-front sorting enabled.
+- If forward and deferred lighting are mixed, the G-buffer writing pass must be tagged with metadata "gbuffer" to prevent geometry being double-lit also with forward lights.
+- Remember to mark the lighting mode (per-vertex / per-pixel) into the techniques which define custom passes, as the lighting mode can be guessed automatically only for the known default passes.
+- The forwardlights command can optionally disable the lit base pass optimization without having to touch the material techniques, if a separate opaque ambient-only base pass is needed. By default the optimization is enabled.
 
 \page Lights Lights and shadows
 

@@ -290,6 +290,18 @@ private:
     HashMap<unsigned long long, LightBatchQueue> vertexLightQueues_;
     /// Batch queues.
     HashMap<StringHash, BatchQueue> batchQueues_;
+    /// Hash of the GBuffer pass, or null if none.
+    StringHash gBufferPassName_;
+    /// Hash of the opaque forward base pass.
+    StringHash basePassName_;
+    /// Hash of the alpha pass.
+    StringHash alphaPassName_;
+    /// Hash of the forward light pass.
+    StringHash lightPassName_;
+    /// Hash of the litbase pass.
+    StringHash litBasePassName_;
+    /// Hash of the litalpha pass.
+    StringHash litAlphaPassName_;
 };
 
 }

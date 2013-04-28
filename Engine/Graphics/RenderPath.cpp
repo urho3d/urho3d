@@ -92,6 +92,8 @@ void RenderPathCommand::Load(const XMLElement& element)
     tag_ = element.GetAttribute("tag");
     if (element.HasAttribute("enabled"))
         enabled_ = element.GetBool("enabled");
+    if (element.HasAttribute("metadata"))
+        metadata_ = element.GetAttribute("metadata");
     
     switch (type_)
     {
@@ -129,6 +131,7 @@ void RenderPathCommand::Load(const XMLElement& element)
         break;
         
     case CMD_FORWARDLIGHTS:
+        pass_ = element.GetAttribute("pass");
         if (element.HasAttribute("uselitbase"))
             useLitBase_ = element.GetBool("uselitbase");
         break;

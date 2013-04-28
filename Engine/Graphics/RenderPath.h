@@ -121,7 +121,7 @@ struct RenderPathCommand
     
     /// Return texture resource name.
     const String& GetTextureName(TextureUnit unit) const;
-    /// Return shader paramter.
+    /// Return shader parameter.
     const Vector4& GetShaderParameter(const String& name) const;
     /// Return number of output rendertargets.
     unsigned GetNumOutputs() const { return outputNames_.Size(); }
@@ -134,8 +134,10 @@ struct RenderPathCommand
     RenderCommandType type_;
     /// Sorting mode.
     RenderCommandSortMode sortMode_;
-    /// Scene pass hash.
-    StringHash pass_;
+    /// Scene pass name.
+    String pass_;
+    /// Command/pass metadata.
+    String metadata_;
     /// Clear flags.
     unsigned clearFlags_;
     /// Clear color.

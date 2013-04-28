@@ -1778,7 +1778,8 @@ Properties:<br>
 - String tag
 - RenderCommandType type
 - RenderCommandSortMode sortMode
-- StringHash pass
+- String pass
+- String metadata
 - uint clearFlags
 - Color clearColor
 - float clearDepth

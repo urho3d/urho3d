@@ -3,9 +3,9 @@
     <command type="clear" color="1 1 1 1" depth="1.0" output="depth" />
     <command type="scenepass" pass="depth" output="depth" />
     <command type="clear" color="fog" depth="1.0" stencil="0" />
-    <command type="scenepass" pass="base" vertexlights="true" />
-    <command type="forwardlights" />
+    <command type="scenepass" pass="base" vertexlights="true" metadata="base" />
+    <command type="forwardlights" pass="light" />
     <command type="scenepass" pass="prealpha" />
-    <command type="scenepass" pass="alpha" usescissor="true" vertexlights="true" sort="backtofront" />
+    <command type="scenepass" pass="alpha" usescissor="true" vertexlights="true" sort="backtofront" metadata="alpha" />
     <command type="scenepass" pass="postalpha" sort="backtofront" />
 </renderpath>
