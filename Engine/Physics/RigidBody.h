@@ -99,6 +99,8 @@ public:
     void SetFriction(float friction);
     /// Set restitution coefficient.
     void SetRestitution(float restitution);
+    /// Set contact processing threshold.
+    void SetContactProcessingThreshold(float threshold);
     /// Set continuous collision detection swept sphere radius.
     void SetCcdRadius(float radius);
     /// Set continuous collision detection motion-per-simulation-step threshold. 0 disables, which is the default.
@@ -172,6 +174,8 @@ public:
     float GetFriction() const;
     /// Return restitution coefficient.
     float GetRestitution() const;
+    /// Return contact processing threshold.
+    float GetContactProcessingThreshold() const;
     /// Return continuous collision detection swept sphere radius.
     float GetCcdRadius() const;
     /// Return continuous collision detection motion-per-simulation-step threshold.

@@ -111,6 +111,7 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_INT, "Collision Layer", collisionLayer_, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", collisionMask_, DEFAULT_COLLISION_MASK, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Contact Threshold", GetContactProcessingThreshold, SetContactProcessingThreshold, float, BT_LARGE_FLOAT, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "CCD Radius", GetCcdRadius, SetCcdRadius, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "CCD Motion Threshold", GetCcdMotionThreshold, SetCcdMotionThreshold, float, 0.0f, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_BUFFER, "Network Angular Velocity", GetNetAngularVelocityAttr, SetNetAngularVelocityAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
@@ -364,6 +365,15 @@ void RigidBody::SetRestitution(float restitution)
     if (body_)
     {
         body_->setRestitution(restitution);
+        MarkNetworkUpdate();
+    }
+}
+
+void RigidBody::SetContactProcessingThreshold(float threshold)
+{
+    if (body_)
+    {
+        body_->setContactProcessingThreshold(threshold);
         MarkNetworkUpdate();
     }
 }
@@ -623,6 +633,14 @@ float RigidBody::GetRestitution() const
 {
     if (body_)
         return body_->getRestitution();
+    else
+        return 0.0f;
+}
+
+float RigidBody::GetContactProcessingThreshold() const
+{
+    if (body_)
+        return body_->getContactProcessingThreshold();
     else
         return 0.0f;
 }

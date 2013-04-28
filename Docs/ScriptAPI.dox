@@ -5626,6 +5626,7 @@ Properties:<br>
 - float angularDamping
 - float friction
 - float restitution
+- float contactProcessingThreshold
 - float ccdRadius
 - float ccdMotionThreshold
 - bool useGravity

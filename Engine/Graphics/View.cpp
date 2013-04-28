@@ -324,16 +324,17 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             info.vertexLights_ = command.vertexLights_;
             
             // Check scenepass metadata for defining custom passes which interact with lighting
-            if (command.metadata_.Length())
+            String metadata = command.metadata_.Trimmed().ToLower();
+            if (!metadata.Empty())
             {
-                if (!command.metadata_.Compare("gbuffer", false))
+                if (metadata == "gbuffer")
                     gBufferPassName_ = command.pass_;
-                if (!command.metadata_.Compare("base", false))
+                else if (metadata == "base")
                 {
                     basePassName_ = command.pass_;
                     litBasePassName_ = "lit" + command.pass_;
                 }
-                if (!command.metadata_.Compare("alpha", false))
+                else if (metadata == "alpha")
                 {
                     alphaPassName_ = command.pass_;
                     litAlphaPassName_ = "lit" + command.pass_;
