@@ -151,7 +151,7 @@ bool Serializer::WriteString(const String& value)
 {
     const char* chars = value.CString();
     // Count length to the first zero, because ReadString() does the same
-    unsigned length = strlen(chars);
+    unsigned length = String::CStringLength(chars);
     return Write(chars, length + 1) == length + 1;
 }
 

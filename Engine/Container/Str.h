@@ -427,7 +427,7 @@ public:
         if (!str)
             return 0;
         #ifdef _MSC_VER
-        return strlen(str);
+        return (unsigned)strlen(str);
         #else
         const char* ptr = str;
         while (*ptr)

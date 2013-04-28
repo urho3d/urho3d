@@ -74,7 +74,7 @@ struct AttributeInfo
     AttributeInfo(VariantType type, const char* name, size_t offset, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
-        offset_(offset),
+        offset_((unsigned)offset),
         enumNames_(0),
         defaultValue_(defaultValue),
         mode_(mode),
@@ -83,10 +83,10 @@ struct AttributeInfo
     }
     
     /// Construct offset enum attribute.
-    AttributeInfo(const char* name, unsigned offset, const char** enumNames, const Variant& defaultValue, unsigned mode) :
+    AttributeInfo(const char* name, size_t offset, const char** enumNames, const Variant& defaultValue, unsigned mode) :
         type_(VAR_INT),
         name_(name),
-        offset_(offset),
+        offset_((unsigned)offset),
         enumNames_(enumNames),
         defaultValue_(defaultValue),
         mode_(mode),

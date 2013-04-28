@@ -63,7 +63,7 @@ template <class T> struct RandomAccessIterator
     /// Subtract an offset from the pointer.
     RandomAccessIterator<T> operator - (int value) const { return RandomAccessIterator<T>(ptr_ - value); }
     /// Calculate offset to another iterator.
-    int operator - (const RandomAccessIterator& rhs) const { return ptr_ - rhs.ptr_; }
+    int operator - (const RandomAccessIterator& rhs) const { return (int)(ptr_ - rhs.ptr_); }
     /// Test for equality with another iterator.
     bool operator == (const RandomAccessIterator& rhs) const { return ptr_ == rhs.ptr_; }
     /// Test for inequality with another iterator.
@@ -125,7 +125,7 @@ template <class T> struct RandomAccessConstIterator
     /// Subtract an offset from the pointer.
     RandomAccessConstIterator<T> operator - (int value) const { return RandomAccessConstIterator<T>(ptr_ - value); }
     /// Calculate offset to another iterator.
-    int operator - (const RandomAccessConstIterator& rhs) const { return ptr_ - rhs.ptr_; }
+    int operator - (const RandomAccessConstIterator& rhs) const { return (int)(ptr_ - rhs.ptr_); }
     /// Test for equality with another iterator.
     bool operator == (const RandomAccessConstIterator& rhs) const { return ptr_ == rhs.ptr_; }
     /// Test for inequality with another iterator.
