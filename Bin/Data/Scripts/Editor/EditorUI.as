@@ -975,7 +975,8 @@ void IconizeUIElement(UIElement@ element, const String&in iconType)
     }
 
     // Set the icon type
-    icon.SetStyle(iconStyle, iconType);
+    if (!icon.SetStyle(iconStyle, iconType))
+        icon.SetStyle(iconStyle, "Unknown");    // If fails then use an 'unknown' icon type
     icon.color = Color(1,1,1,1); // Reset to enabled color
 }
 

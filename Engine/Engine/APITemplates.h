@@ -838,9 +838,9 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool LoadChildXML(const XMLElement&in, XMLFile@+, bool arg2 = false)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool LoadChildXML(XMLFile@+, XMLFile@+)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(File@+)", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "void SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetStyle(XMLFile@+, const String&in)", asMETHODPR(T, SetStyle, (XMLFile*, const String&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetStyleAuto(XMLFile@+)", asMETHODPR(T, SetStyleAuto, (XMLFile*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SetStyle(XMLFile@+, const String&in)", asMETHODPR(T, SetStyle, (XMLFile*, const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SetStyleAuto(XMLFile@+)", asMETHOD(T, SetStyleAuto), asCALL_THISCALL);
     if (!isSprite)
         engine->RegisterObjectMethod(className, "void SetPosition(int, int)", asMETHODPR(UIElement, SetPosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetSize(int, int)", asMETHODPR(T, SetSize, (int, int), void), asCALL_THISCALL);
@@ -879,7 +879,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "bool IsInside(IntVector2, bool)", asMETHOD(T, IsInside), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool IsInsideCombined(IntVector2, bool)", asMETHOD(T, IsInsideCombined), asCALL_THISCALL);
     }
-    engine->RegisterObjectMethod(className, "void set_style(XMLFile@+)", asMETHODPR(T, SetStyleAuto, (XMLFile*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_style(XMLFile@+)", asMETHOD(T, SetStyleAuto), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_name(const String&in)", asMETHOD(T, SetName), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHOD(T, GetName), asCALL_THISCALL);
     if (!isSprite)

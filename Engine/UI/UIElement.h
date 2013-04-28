@@ -252,12 +252,12 @@ public:
     void SetFocusMode(FocusMode mode);
     /// Set drag and drop flags.
     void SetDragDropMode(unsigned mode);
-    /// Set style from an XML file. Find the style element by name.
-    void SetStyle(XMLFile* file, const String& typeName);
-    /// Set style from an XML element.
-    void SetStyle(const XMLElement& element);
-    /// Set style from an XML file. Find the style element automatically.
-    void SetStyleAuto(XMLFile* file);
+    /// Set style from an XML file. Find the style element by name. Return true if the style is applied successfully.
+    bool SetStyle(XMLFile* file, const String& styleName);
+    /// Set style from an XML element. Return true if the style is applied successfully.
+    bool SetStyle(const XMLElement& element);
+    /// Set style from an XML file. Find the style element automatically. Return true if the style is applied successfully.
+    bool SetStyleAuto(XMLFile* file);
     /// Set default style for later use by children elements.
     void SetDefaultStyle(XMLFile* style);
     /// Set layout.
