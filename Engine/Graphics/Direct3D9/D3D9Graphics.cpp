@@ -1170,7 +1170,7 @@ void Graphics::RegisterShaderParameter(StringHash param, const ShaderParameter& 
 
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
-    if ((unsigned)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
+    if ((unsigned)(size_t)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
     {
         shaderParameterSources_[group] = source;
         return true;
@@ -1945,7 +1945,7 @@ void Graphics::FreeScratchBuffer(void* buffer)
         }
     }
 
-    LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)buffer) + " not found");
+    LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)(size_t)buffer) + " not found");
 }
 
 void Graphics::CleanupScratchBuffers()
