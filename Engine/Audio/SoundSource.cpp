@@ -329,7 +329,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
         pos = end;
     
     position_ = pos;
-    timePosition_ = (float)((int)pos - (int)sound_->GetStart()) / (sound_->GetSampleSize() * sound_->GetFrequency());
+    timePosition_ = ((float)(int)(size_t)(pos - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
 
 void SoundSource::Update(float timeStep)
@@ -490,7 +490,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
     
     // Update the time position
     if (!sound_->IsCompressed())
-        timePosition_ = (float)((int)position_ - (int)sound_->GetStart()) / (sound_->GetSampleSize() * sound_->GetFrequency());
+        timePosition_ = ((float)(int)(size_t)(position_ - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
     else
         timePosition_ += ((float)samples / (float)mixRate) * frequency_ / sound_->GetFrequency();
 }

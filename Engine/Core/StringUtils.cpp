@@ -346,7 +346,7 @@ Vector4 ToVector4(const char* source, bool allowMissingCoords)
 
 String ToString(void* value)
 {
-    return ToStringHex((int)value);
+    return ToStringHex((unsigned)(size_t)value);
 }
 
 String ToStringHex(unsigned value)

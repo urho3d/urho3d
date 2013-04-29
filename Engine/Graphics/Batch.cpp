@@ -213,7 +213,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     }
     
     // Set camera shader parameters
-    unsigned cameraHash = overrideView_ ? (unsigned)camera_ + 4 : (unsigned)camera_;
+    unsigned cameraHash = overrideView_ ? (unsigned)(size_t)camera_ + 4 : (unsigned)(size_t)camera_;
     if (graphics->NeedParameterUpdate(SP_CAMERA, (void*)cameraHash))
     {
         // Calculate camera rotation just once
@@ -301,7 +301,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     // Set zone-related shader parameters
     BlendMode blend = graphics->GetBlendMode();
     Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
-    unsigned zoneHash = (unsigned)zone_ + (unsigned)fogColorZone;
+    unsigned zoneHash = (unsigned)(size_t)zone_ + (unsigned)(size_t)fogColorZone;
     if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, (void*)zoneHash))
     {
         graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
@@ -719,8 +719,11 @@ void BatchGroup::Draw(View* view) const
 
 unsigned BatchGroupKey::ToHash() const
 {
-    return ((unsigned)zone_) / sizeof(Zone) + ((unsigned)lightQueue_) / sizeof(LightBatchQueue) + ((unsigned)pass_) / sizeof(Pass)
-        + ((unsigned)material_) / sizeof(Material) + ((unsigned)geometry_) / sizeof(Geometry);
+    return ((unsigned)(size_t)zone_) / sizeof(Zone) +
+        ((unsigned)(size_t)lightQueue_) / sizeof(LightBatchQueue) +
+        ((unsigned)(size_t)pass_) / sizeof(Pass) +
+        ((unsigned)(size_t)material_) / sizeof(Material) +
+        ((unsigned)(size_t)geometry_) / sizeof(Geometry);
 }
 
 void BatchQueue::Clear(int maxSortedInstances)

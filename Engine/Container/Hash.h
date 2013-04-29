@@ -28,13 +28,13 @@ namespace Urho3D
 /// Pointer hash function.
 template <class T> unsigned MakeHash(T* value)
 {
-    return ((unsigned)value) / sizeof(T);
+    return ((unsigned)(size_t)value) / sizeof(T);
 }
 
 /// Const pointer hash function.
 template <class T> unsigned MakeHash(const T* value)
 {
-    return ((unsigned)value) / sizeof(T);
+    return ((unsigned)(size_t)value) / sizeof(T);
 }
 
 /// Generic hash function.
@@ -46,13 +46,13 @@ template <class T> unsigned MakeHash(const T& value)
 /// Void pointer hash function.
 template<> inline unsigned MakeHash(void* value)
 {
-    return (unsigned)value;
+    return (unsigned)(size_t)value;
 }
 
 /// Const void pointer hash function.
 template<> inline unsigned MakeHash(const void* value)
 {
-    return (unsigned)value;
+    return (unsigned)(size_t)value;
 }
 
 /// Long long hash function.

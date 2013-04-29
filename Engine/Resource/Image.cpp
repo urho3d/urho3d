@@ -126,7 +126,7 @@ struct DDSurfaceDesc2
     unsigned dwWidth_;
     union
     {
-        long lPitch_;
+        unsigned lPitch_;
         unsigned dwLinearSize_;
     };
     union

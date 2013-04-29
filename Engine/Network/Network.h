@@ -39,7 +39,7 @@ class Scene;
 /// MessageConnection hash function.
 template <class T> unsigned MakeHash(kNet::MessageConnection* value)
 {
-    return ((unsigned)value) >> 9;
+    return ((unsigned)(size_t)value) >> 9;
 }
 
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
