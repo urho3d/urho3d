@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 namespace Urho3D
 {
 

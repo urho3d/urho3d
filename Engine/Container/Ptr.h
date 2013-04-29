@@ -25,6 +25,7 @@
 #include "RefCounted.h"
 
 #include <cassert>
+#include <cstddef>
 
 namespace Urho3D
 {
