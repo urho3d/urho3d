@@ -48,6 +48,7 @@ namespace Urho3D
 {
 
 const char* PHYSICS_CATEGORY = "Physics";
+extern const char* SUBSYSTEM_CATEGORY;
 
 static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
@@ -154,7 +155,7 @@ PhysicsWorld::~PhysicsWorld()
 
 void PhysicsWorld::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<PhysicsWorld>(PHYSICS_CATEGORY);
+    context->RegisterComponentFactory<PhysicsWorld>(SUBSYSTEM_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);

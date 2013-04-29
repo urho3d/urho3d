@@ -30,8 +30,6 @@
 namespace Urho3D
 {
 
-extern const char* AUDIO_CATEGORY;
-
 class AudioImpl;
 class Sound;
 class SoundListener;

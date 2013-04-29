@@ -46,6 +46,8 @@ static const unsigned char CTRL_SETWEIGHT = 0x10;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
 static const float COMMAND_STAY_TIME = 0.25f;
 
+extern const char* ANIMATION_CATEGORY;
+
 OBJECTTYPESTATIC(AnimationController);
 
 AnimationController::AnimationController(Context* context) :

@@ -27,8 +27,6 @@
 namespace Urho3D
 {
 
-extern const char* TERRAIN_CATEGORY;
-
 class Image;
 class Material;
 class Node;

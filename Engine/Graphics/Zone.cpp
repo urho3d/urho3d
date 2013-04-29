@@ -40,6 +40,8 @@ static const Color DEFAULT_FOG_COLOR(0.0f, 0.0f, 0.0f);
 static const float DEFAULT_FOG_START = 250.0f;
 static const float DEFAULT_FOG_END = 1000.0f;
 
+extern const char* SCENE_CATEGORY;
+
 OBJECTTYPESTATIC(Zone);
 
 Zone::Zone(Context* context) :

@@ -32,7 +32,7 @@
 namespace Urho3D
 {
 
-static const char* SKY_CATEGORY = "Sky";
+const char* ENVIRONMENT_CATEGORY = "Environment";
 
 OBJECTTYPESTATIC(Skybox);
 
@@ -48,7 +48,7 @@ Skybox::~Skybox()
 
 void Skybox::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Skybox>(SKY_CATEGORY);
+    context->RegisterComponentFactory<Skybox>(ENVIRONMENT_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Skybox, StaticModel);
 }

@@ -41,7 +41,7 @@
 namespace Urho3D
 {
 
-extern const char* EFFECT_CATEGORY;
+const char* EFFECT_CATEGORY = "Effect";
 
 static const float INV_SQRT_TWO = 1.0f / sqrtf(2.0f);
 

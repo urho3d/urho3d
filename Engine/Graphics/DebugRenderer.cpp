@@ -41,7 +41,7 @@
 namespace Urho3D
 {
 
-extern const char* SCENE_CATEGORY;
+extern const char* SUBSYSTEM_CATEGORY;
 
 // Cap the amount of lines to prevent crash when eg. debug rendering large heightfields
 static const unsigned MAX_LINES = 1000000;
@@ -62,7 +62,7 @@ DebugRenderer::~DebugRenderer()
 
 void DebugRenderer::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<DebugRenderer>(SCENE_CATEGORY);
+    context->RegisterComponentFactory<DebugRenderer>(SUBSYSTEM_CATEGORY);
 }
 
 void DebugRenderer::SetView(Camera* camera)

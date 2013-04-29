@@ -41,6 +41,8 @@ namespace Urho3D
 
 static const float LOD_CONSTANT = 1.0f / 150.0f;
 
+extern const char* ENVIRONMENT_CATEGORY;
+
 OBJECTTYPESTATIC(TerrainPatch);
 
 TerrainPatch::TerrainPatch(Context* context) :
@@ -68,7 +70,7 @@ TerrainPatch::~TerrainPatch()
 
 void TerrainPatch::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<TerrainPatch>(TERRAIN_CATEGORY);
+    context->RegisterComponentFactory<TerrainPatch>(ENVIRONMENT_CATEGORY);
 }
 
 void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)

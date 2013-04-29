@@ -101,6 +101,8 @@ static const char* typeNames[] =
 
 static const float AUTOREMOVE_DELAY = 0.25f;
 
+extern const char* AUDIO_CATEGORY;
+
 OBJECTTYPESTATIC(SoundSource);
 
 SoundSource::SoundSource(Context* context) :

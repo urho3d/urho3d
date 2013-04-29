@@ -38,6 +38,8 @@ static const float DEFAULT_FARDISTANCE = 100.0f;
 static const float DEFAULT_ROLLOFF = 2.0f;
 static const float MIN_ROLLOFF = 0.1f;
 
+extern const char* AUDIO_CATEGORY;
+
 OBJECTTYPESTATIC(SoundSource3D);
 
 SoundSource3D::SoundSource3D(Context* context) :

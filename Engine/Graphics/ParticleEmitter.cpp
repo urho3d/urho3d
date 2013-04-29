@@ -36,6 +36,8 @@
 namespace Urho3D
 {
 
+extern const char* EFFECT_CATEGORY;
+
 OBJECTTYPESTATIC(ParticleEmitter);
 
 ParticleEmitter::ParticleEmitter(Context* context) :

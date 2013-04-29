@@ -55,6 +55,8 @@ static const unsigned STATIC_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_T
 static const unsigned SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT | MASK_BLENDWEIGHTS |
     MASK_BLENDINDICES;
 
+extern const char* EFFECT_CATEGORY;
+
 static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float d0, float d1, bool skinned)
 {
     DecalVertex ret;

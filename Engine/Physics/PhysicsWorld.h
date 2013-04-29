@@ -39,8 +39,6 @@ class btPersistentManifold;
 namespace Urho3D
 {
 
-extern const char* PHYSICS_CATEGORY;
-
 class CollisionShape;
 class Deserializer;
 class Constraint;

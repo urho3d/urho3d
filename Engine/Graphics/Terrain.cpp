@@ -44,7 +44,7 @@
 namespace Urho3D
 {
 
-const char* TERRAIN_CATEGORY = "Terrain";
+extern const char* ENVIRONMENT_CATEGORY;
 
 OBJECTTYPESTATIC(Terrain);
 
@@ -91,7 +91,7 @@ Terrain::~Terrain()
 
 void Terrain::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Terrain>(TERRAIN_CATEGORY);
+    context->RegisterComponentFactory<Terrain>(ENVIRONMENT_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()), AM_DEFAULT);

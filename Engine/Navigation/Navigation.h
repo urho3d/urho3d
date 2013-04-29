@@ -25,8 +25,6 @@
 namespace Urho3D
 {
 
-extern const char* NAVIGATION_CATEGORY;
-
 class Context;
 
 /// Register Navigation library objects.

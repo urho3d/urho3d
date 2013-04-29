@@ -72,6 +72,8 @@ static const char* typeNames[] =
     0
 };
 
+extern const char* PHYSICS_CATEGORY;
+
 TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
     meshData_(0),
     shape_(0)

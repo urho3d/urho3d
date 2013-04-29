@@ -47,6 +47,8 @@
 namespace Urho3D
 {
 
+extern const char* ANIMATION_CATEGORY;
+
 static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
 {
     return lhs->GetLayer() < rhs->GetLayer();

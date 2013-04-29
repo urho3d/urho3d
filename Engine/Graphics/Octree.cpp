@@ -45,6 +45,8 @@ static const float DEFAULT_OCTREE_SIZE = 1000.0f;
 static const int DEFAULT_OCTREE_LEVELS = 8;
 static const int RAYCASTS_PER_WORK_ITEM = 4;
 
+extern const char* SUBSYSTEM_CATEGORY;
+
 void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex)
 {
     Octree* octree = reinterpret_cast<Octree*>(item->aux_);
@@ -348,7 +350,7 @@ Octree::~Octree()
 
 void Octree::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Octree>(SCENE_CATEGORY);
+    context->RegisterComponentFactory<Octree>(SUBSYSTEM_CATEGORY);
 
     Vector3 defaultBoundsMin = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     Vector3 defaultBoundsMax = Vector3::ONE * DEFAULT_OCTREE_SIZE;
