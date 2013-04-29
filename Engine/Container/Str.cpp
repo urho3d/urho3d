@@ -62,6 +62,16 @@ String::String(short value) :
     *this = tempBuffer;
 }
 
+String::String(long value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%ld", value);
+    *this = tempBuffer;
+}
+    
 String::String(long long value) :
     length_(0),
     capacity_(0),
@@ -92,6 +102,16 @@ String::String(unsigned short value) :
     *this = tempBuffer;
 }
 
+String::String(unsigned long value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%lu", value);
+    *this = tempBuffer;
+}
+    
 String::String(unsigned long long value) :
     length_(0),
     capacity_(0),
