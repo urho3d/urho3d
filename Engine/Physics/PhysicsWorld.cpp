@@ -47,6 +47,8 @@
 namespace Urho3D
 {
 
+const char* PHYSICS_CATEGORY = "Physics";
+
 static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
 
@@ -72,7 +74,7 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
     PhysicsQueryCallback(PODVector<RigidBody*>& result) : result_(result)
     {
     }
-    
+
     /// Add a contact result.
     virtual btScalar addSingleResult(btManifoldPoint &, const btCollisionObject *colObj0, int, int, const btCollisionObject *colObj1, int, int)
     {
@@ -84,7 +86,7 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
             result_.Push(body);
         return 0.0f;
     }
-    
+
     /// Found rigid bodies.
     PODVector<RigidBody*>& result_;
 };
@@ -111,7 +113,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     broadphase_ = new btDbvtBroadphase();
     solver_ = new btSequentialImpulseConstraintSolver();
     world_ = new btDiscreteDynamicsWorld(collisionDispatcher_, broadphase_, solver_, collisionConfiguration_);
-    
+
     world_->setGravity(ToBtVector3(DEFAULT_GRAVITY));
     world_->getDispatchInfo().m_useContinuous = true;
     world_->setDebugDrawer(this);
@@ -126,34 +128,34 @@ PhysicsWorld::~PhysicsWorld()
         // Force all remaining constraints, rigid bodies and collision shapes to release themselves
         for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
             (*i)->ReleaseConstraint();
-        
+
         for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
             (*i)->ReleaseBody();
-        
+
         for (PODVector<CollisionShape*>::Iterator i = collisionShapes_.Begin(); i != collisionShapes_.End(); ++i)
             (*i)->ReleaseShape();
     }
-    
+
     delete world_;
     world_ = 0;
-    
+
     delete solver_;
     solver_ = 0;
-    
+
     delete broadphase_;
     broadphase_ = 0;
-    
+
     delete collisionDispatcher_;
     collisionDispatcher_ = 0;
-    
+
     delete collisionConfiguration_;
     collisionConfiguration_ = 0;
 }
 
 void PhysicsWorld::RegisterObject(Context* context)
 {
-    context->RegisterFactory<PhysicsWorld>();
-    
+    context->RegisterComponentFactory<PhysicsWorld>(PHYSICS_CATEGORY);
+
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Net Max Angular Vel.", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
@@ -179,7 +181,7 @@ void PhysicsWorld::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     if (debug)
     {
         PROFILE(PhysicsDrawDebug);
-        
+
         debugRenderer_ = debug;
         debugDepthTest_ = depthTest;
         world_->debugDrawWorld();
@@ -195,10 +197,10 @@ void PhysicsWorld::reportErrorWarning(const char* warningString)
 void PhysicsWorld::Update(float timeStep)
 {
     PROFILE(UpdatePhysics);
-    
+
     float internalTimeStep = 1.0f / fps_;
     delayedWorldTransforms_.Clear();
-    
+
     if (interpolation_)
     {
         int maxSubSteps = (int)(timeStep * fps_) + 1;
@@ -213,7 +215,7 @@ void PhysicsWorld::Update(float timeStep)
             timeAcc_ -= internalTimeStep;
         }
     }
-    
+
     // Apply delayed (parented) world transforms now
     while (!delayedWorldTransforms_.Empty())
     {
@@ -221,7 +223,7 @@ void PhysicsWorld::Update(float timeStep)
             i != delayedWorldTransforms_.End(); ++i)
         {
             const DelayedWorldTransform& transform = i->second_;
-            
+
             // If parent's transform has already been assigned, can proceed
             if (!delayedWorldTransforms_.Contains(transform.parentRigidBody_))
             {
@@ -260,14 +262,14 @@ void PhysicsWorld::SetMaxNetworkAngularVelocity(float velocity)
 void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     PROFILE(PhysicsRaycast);
-    
+
     btCollisionWorld::AllHitsRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
         maxDistance * ray.direction_));
     rayCallback.m_collisionFilterGroup = (short)0xffff;
     rayCallback.m_collisionFilterMask = collisionMask;
-    
+
     world_->rayTest(rayCallback.m_rayFromWorld, rayCallback.m_rayToWorld, rayCallback);
-    
+
     for (int i = 0; i < rayCallback.m_collisionObjects.size(); ++i)
     {
         PhysicsRaycastResult newResult;
@@ -277,21 +279,21 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
         newResult.distance_ = (newResult.position_ - ray.origin_).Length();
         result.Push(newResult);
     }
-    
+
     Sort(result.Begin(), result.End(), CompareRaycastResults);
 }
 
 void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     PROFILE(PhysicsRaycastSingle);
-    
+
     btCollisionWorld::ClosestRayResultCallback rayCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
         maxDistance * ray.direction_));
     rayCallback.m_collisionFilterGroup = (short)0xffff;
     rayCallback.m_collisionFilterMask = collisionMask;
-    
+
     world_->rayTest(rayCallback.m_rayFromWorld, rayCallback.m_rayToWorld, rayCallback);
-    
+
     if (rayCallback.hasHit())
     {
         result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
@@ -311,17 +313,17 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
 void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask)
 {
     PROFILE(PhysicsSphereCast);
-    
+
     btSphereShape shape(radius);
-    
+
     btCollisionWorld::ClosestConvexResultCallback convexCallback(ToBtVector3(ray.origin_), ToBtVector3(ray.origin_ +
         maxDistance * ray.direction_));
     convexCallback.m_collisionFilterGroup = (short)0xffff;
     convexCallback.m_collisionFilterMask = collisionMask;
-    
+
     world_->convexSweepTest(&shape, btTransform(btQuaternion::getIdentity(), convexCallback.m_convexFromWorld),
         btTransform(btQuaternion::getIdentity(), convexCallback.m_convexToWorld), convexCallback);
-    
+
     if (convexCallback.hasHit())
     {
         result.body_ = static_cast<RigidBody*>(convexCallback.m_hitCollisionObject->getUserPointer());
@@ -341,19 +343,19 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask)
 {
     PROFILE(PhysicsSphereQuery);
-    
+
     result.Clear();
-    
+
     btSphereShape sphereShape(sphere.radius_);
     btRigidBody* tempRigidBody = new btRigidBody(1.0f, 0, &sphereShape);
     tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(sphere.center_)));
     // Need to activate the temporary rigid body to get reliable results from static, sleeping objects
     tempRigidBody->activate();
     world_->addRigidBody(tempRigidBody, (short)0xffff, (short)collisionMask);
-    
+
     PhysicsQueryCallback callback(result);
     world_->contactTest(tempRigidBody, callback);
-    
+
     world_->removeRigidBody(tempRigidBody);
     delete tempRigidBody;
 }
@@ -361,18 +363,18 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& s
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask)
 {
     PROFILE(PhysicsBoxQuery);
-    
+
     result.Clear();
-    
+
     btBoxShape boxShape(ToBtVector3(box.HalfSize()));
     btRigidBody* tempRigidBody = new btRigidBody(1.0f, 0, &boxShape);
     tempRigidBody->setWorldTransform(btTransform(btQuaternion::getIdentity(), ToBtVector3(box.Center())));
     tempRigidBody->activate();
     world_->addRigidBody(tempRigidBody, (short)0xffff, (short)collisionMask);
-    
+
     PhysicsQueryCallback callback(result);
     world_->contactTest(tempRigidBody, callback);
-    
+
     world_->removeRigidBody(tempRigidBody);
     delete tempRigidBody;
 }
@@ -380,9 +382,9 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
 {
     PROFILE(GetCollidingBodies);
-    
+
     result.Clear();
-    
+
     for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
         i != currentCollisions_.End(); ++i)
     {
@@ -474,7 +476,7 @@ void PhysicsWorld::OnNodeSet(Node* node)
 void PhysicsWorld::HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace SceneSubsystemUpdate;
-    
+
     Update(eventData[P_TIMESTEP].GetFloat());
 }
 
@@ -482,12 +484,12 @@ void PhysicsWorld::PreStep(float timeStep)
 {
     // Send pre-step event
     using namespace PhysicsPreStep;
-    
+
     VariantMap eventData;
     eventData[P_WORLD] = (void*)this;
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP, eventData);
-    
+
     // Start profiling block for the actual simulation step
 #ifdef ENABLE_PROFILING
     Profiler* profiler = GetSubsystem<Profiler>();
@@ -503,12 +505,12 @@ void PhysicsWorld::PostStep(float timeStep)
     if (profiler)
         profiler->EndBlock();
 #endif
-    
+
     SendCollisionEvents();
-    
+
     // Send post-step event
     using namespace PhysicsPreStep;
-    
+
     VariantMap eventData;
     eventData[P_WORLD] = (void*)this;
     eventData[P_TIMESTEP] = timeStep;
@@ -518,18 +520,18 @@ void PhysicsWorld::PostStep(float timeStep)
 void PhysicsWorld::SendCollisionEvents()
 {
     PROFILE(SendCollisionEvents);
-    
+
     currentCollisions_.Clear();
     int numManifolds = collisionDispatcher_->getNumManifolds();
-    
+
     if (numManifolds)
     {
         VariantMap physicsCollisionData;
         VariantMap nodeCollisionData;
         VectorBuffer contacts;
-        
+
         physicsCollisionData[PhysicsCollision::P_WORLD] = (void*)this;
-        
+
         for (int i = 0; i < numManifolds; ++i)
         {
             btPersistentManifold* contactManifold = collisionDispatcher_->getManifoldByIndexInternal(i);
@@ -537,16 +539,16 @@ void PhysicsWorld::SendCollisionEvents()
             // First check that there are actual contacts, as the manifold exists also when objects are close but not touching
             if (!numContacts)
                 continue;
-            
+
             btCollisionObject* objectA = static_cast<btCollisionObject*>(contactManifold->getBody0());
             btCollisionObject* objectB = static_cast<btCollisionObject*>(contactManifold->getBody1());
-            
+
             RigidBody* bodyA = static_cast<RigidBody*>(objectA->getUserPointer());
             RigidBody* bodyB = static_cast<RigidBody*>(objectB->getUserPointer());
             // If it's not a rigidbody, maybe a ghost object
             if (!bodyA || !bodyB)
                 continue;
-            
+
             // Skip collision event signaling if both objects are static, or if collision event mode does not match
             if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
                 continue;
@@ -555,21 +557,21 @@ void PhysicsWorld::SendCollisionEvents()
             if (bodyA->GetCollisionEventMode() == COLLISION_ACTIVE && bodyB->GetCollisionEventMode() == COLLISION_ACTIVE &&
                 !bodyA->IsActive() && !bodyB->IsActive())
                 continue;
-            
+
             WeakPtr<RigidBody> bodyWeakA(bodyA);
             WeakPtr<RigidBody> bodyWeakB(bodyB);
-            
+
             Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> > bodyPair;
             if (bodyA < bodyB)
                 bodyPair = MakePair(bodyWeakA, bodyWeakB);
             else
                 bodyPair = MakePair(bodyWeakB, bodyWeakA);
-            
+
             // First only store the collision pair as weak pointers and the manifold pointer, so user code can safely destroy
             // objects during collision event handling
             currentCollisions_[bodyPair] = contactManifold;
         }
-        
+
         for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
             i != currentCollisions_.End(); ++i)
         {
@@ -577,26 +579,26 @@ void PhysicsWorld::SendCollisionEvents()
             RigidBody* bodyB = i->first_.second_;
             if (!bodyA || !bodyB)
                 continue;
-            
+
             btPersistentManifold* contactManifold = i->second_;
             int numContacts = contactManifold->getNumContacts();
-            
+
             Node* nodeA = bodyA->GetNode();
             Node* nodeB = bodyB->GetNode();
             WeakPtr<Node> nodeWeakA(nodeA);
             WeakPtr<Node> nodeWeakB(nodeB);
-            
+
             bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
             bool newCollision = !previousCollisions_.Contains(i->first_);
-            
+
             physicsCollisionData[PhysicsCollision::P_NODEA] = (void*)nodeA;
             physicsCollisionData[PhysicsCollision::P_NODEB] = (void*)nodeB;
             physicsCollisionData[PhysicsCollision::P_BODYA] = (void*)bodyA;
             physicsCollisionData[PhysicsCollision::P_BODYB] = (void*)bodyB;
             physicsCollisionData[PhysicsCollision::P_PHANTOM] = phantom;
-            
+
             contacts.Clear();
-            
+
             for (int j = 0; j < numContacts; ++j)
             {
                 btManifoldPoint& point = contactManifold->getContactPoint(j);
@@ -605,9 +607,9 @@ void PhysicsWorld::SendCollisionEvents()
                 contacts.WriteFloat(point.m_distance1);
                 contacts.WriteFloat(point.m_appliedImpulse);
             }
-            
+
             physicsCollisionData[PhysicsCollision::P_CONTACTS] = contacts.GetBuffer();
-            
+
             // Send separate collision start event if collision is new
             if (newCollision)
             {
@@ -616,29 +618,29 @@ void PhysicsWorld::SendCollisionEvents()
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
-            
+
             // Then send the ongoing collision event
             SendEvent(E_PHYSICSCOLLISION, physicsCollisionData);
             if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                 continue;
-            
+
             nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyA;
             nodeCollisionData[NodeCollision::P_OTHERNODE] = (void*)nodeB;
             nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyB;
             nodeCollisionData[NodeCollision::P_PHANTOM] = phantom;
             nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
-            
+
             if (newCollision)
             {
                 nodeA->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData);
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
-            
+
             nodeA->SendEvent(E_NODECOLLISION, nodeCollisionData);
             if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                 continue;
-            
+
             contacts.Clear();
             for (int j = 0; j < numContacts; ++j)
             {
@@ -648,30 +650,30 @@ void PhysicsWorld::SendCollisionEvents()
                 contacts.WriteFloat(point.m_distance1);
                 contacts.WriteFloat(point.m_appliedImpulse);
             }
-            
+
             nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyB;
             nodeCollisionData[NodeCollision::P_OTHERNODE] = (void*)nodeA;
             nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyA;
             nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
-            
+
             if (newCollision)
             {
                 nodeB->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData);
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
-            
+
             nodeB->SendEvent(E_NODECOLLISION, nodeCollisionData);
         }
     }
-    
+
     // Send collision end events as applicable
     {
         VariantMap physicsCollisionData;
         VariantMap nodeCollisionData;
-        
+
         physicsCollisionData[PhysicsCollisionEnd::P_WORLD] = (void*)this;
-        
+
         for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
         {
             if (!currentCollisions_.Contains(i->first_))
@@ -680,9 +682,9 @@ void PhysicsWorld::SendCollisionEvents()
                 RigidBody* bodyB = i->first_.second_;
                 if (!bodyA || !bodyB)
                     continue;
-                
+
                 bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
-                
+
                 // Skip collision event signaling if both objects are static, or if collision event mode does not match
                 if (bodyA->GetMass() == 0.0f && bodyB->GetMass() == 0.0f)
                     continue;
@@ -691,41 +693,41 @@ void PhysicsWorld::SendCollisionEvents()
                 if (bodyA->GetCollisionEventMode() == COLLISION_ACTIVE && bodyB->GetCollisionEventMode() == COLLISION_ACTIVE &&
                     !bodyA->IsActive() && !bodyB->IsActive())
                     continue;
-                
+
                 Node* nodeA = bodyA->GetNode();
                 Node* nodeB = bodyB->GetNode();
                 WeakPtr<Node> nodeWeakA(nodeA);
                 WeakPtr<Node> nodeWeakB(nodeB);
-                
+
                 physicsCollisionData[PhysicsCollisionEnd::P_BODYA] = (void*)bodyA;
                 physicsCollisionData[PhysicsCollisionEnd::P_BODYB] = (void*)bodyB;
                 physicsCollisionData[PhysicsCollisionEnd::P_NODEA] = (void*)nodeA;
                 physicsCollisionData[PhysicsCollisionEnd::P_NODEB] = (void*)nodeB;
                 physicsCollisionData[PhysicsCollisionEnd::P_PHANTOM] = phantom;
-                
+
                 SendEvent(E_PHYSICSCOLLISIONEND, physicsCollisionData);
                 // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
-                
+
                 nodeCollisionData[NodeCollisionEnd::P_BODY] = (void*)bodyA;
                 nodeCollisionData[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeB;
                 nodeCollisionData[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyB;
                 nodeCollisionData[NodeCollisionEnd::P_PHANTOM] = phantom;
-                
+
                 nodeA->SendEvent(E_NODECOLLISIONEND, nodeCollisionData);
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
-                
+
                 nodeCollisionData[NodeCollisionEnd::P_BODY] = (void*)bodyB;
                 nodeCollisionData[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeA;
                 nodeCollisionData[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyA;
-                
+
                 nodeB->SendEvent(E_NODECOLLISIONEND, nodeCollisionData);
             }
         }
     }
-    
+
     previousCollisions_ = currentCollisions_;
 }
 

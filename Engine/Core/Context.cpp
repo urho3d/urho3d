@@ -82,6 +82,12 @@ void Context::RegisterFactory(ObjectFactory* factory)
     factories_[factory->GetType()] = factory;
 }
 
+void Context::RegisterComponentFactory(ObjectFactory* factory, const char* category)
+{
+    RegisterFactory(factory);
+    componentCategories_[category].Push(factory->GetType());
+}
+
 void Context::RegisterSubsystem(Object* object)
 {
     if (!object)

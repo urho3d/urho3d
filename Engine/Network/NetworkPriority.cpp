@@ -29,6 +29,8 @@
 namespace Urho3D
 {
 
+const char* NETWORK_CATEGORY = "Network";
+
 static const float DEFAULT_BASE_PRIORITY = 100.0f;
 static const float DEFAULT_DISTANCE_FACTOR = 0.0f;
 static const float DEFAULT_MIN_PRIORITY = 0.0f;
@@ -51,7 +53,7 @@ NetworkPriority::~NetworkPriority()
 
 void NetworkPriority::RegisterObject(Context* context)
 {
-    context->RegisterFactory<NetworkPriority>();
+    context->RegisterComponentFactory<NetworkPriority>(NETWORK_CATEGORY);
     
     ATTRIBUTE(NetworkPriority, VAR_FLOAT, "Base Priority", basePriority_, DEFAULT_BASE_PRIORITY, AM_DEFAULT);
     ATTRIBUTE(NetworkPriority, VAR_FLOAT, "Distance Factor", distanceFactor_, DEFAULT_DISTANCE_FACTOR, AM_DEFAULT);

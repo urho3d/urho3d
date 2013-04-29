@@ -27,6 +27,8 @@
 namespace Urho3D
 {
 
+extern const char* TERRAIN_CATEGORY;
+
 class Image;
 class Material;
 class Node;
@@ -36,7 +38,7 @@ class TerrainPatch;
 class Terrain : public Component
 {
     OBJECT(Terrain);
-    
+
 public:
     /// Construct.
     Terrain(Context* context);
@@ -44,14 +46,14 @@ public:
     ~Terrain();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    
+
     /// Set patch quads per side. Must be a power of two.
     void SetPatchSize(int size);
     /// Set vertex (XZ) and height (Y) spacing.
@@ -82,7 +84,7 @@ public:
     void SetOccluder(bool enable);
     /// Set occludee flag for patches.
     void SetOccludee(bool enable);
-    
+
     /// Return patch quads per side.
     int GetPatchSize() const { return patchSize_; }
     /// Return vertex and height spacing.
@@ -129,7 +131,7 @@ public:
     bool IsOccluder() const { return occluder_; }
     /// Return occludee flag.
     bool IsOccludee() const { return occludee_; }
-    
+
     /// Regenerate patch geometry.
     void CreatePatchGeometry(TerrainPatch* patch);
     /// Update patch based on LOD and neighbor LOD.
@@ -144,7 +146,7 @@ public:
     ResourceRef GetHeightMapAttr() const;
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
-    
+
 private:
     /// Fully regenerate terrain geometry.
     void CreateGeometry();
@@ -164,7 +166,7 @@ private:
     bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.
     void HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData);
-    
+
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Heightmap image.

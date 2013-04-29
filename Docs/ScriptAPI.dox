@@ -66,7 +66,8 @@ namespace Urho3D
 - String RemoveTrailingSlash(const String&)
 - String GetParentPath(const String&)
 - String GetInternalPath(const String&)
-- String[]@ GetAvailableComponents()
+- String[]@ GetComponentCategories()
+- String[]@ GetComponentsByCategory(const String&)
 - uint GetAlphaFormat()
 - uint GetLuminanceFormat()
 - uint GetLuminanceAlphaFormat()
@@ -1375,6 +1376,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 
 
@@ -1503,6 +1505,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - Vector3 targetPosition
 - Quaternion targetRotation
@@ -1688,6 +1691,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 
 
@@ -1728,6 +1732,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - float nearClip
 - float farClip
@@ -2117,6 +2122,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2184,6 +2190,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2248,6 +2255,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2305,6 +2313,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2358,6 +2367,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2440,6 +2450,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2526,6 +2537,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 
 
@@ -2571,6 +2583,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2626,6 +2639,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2689,6 +2703,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2743,6 +2758,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2796,6 +2812,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2845,6 +2862,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - Material@ material
 - Image@ heightMap
@@ -2915,6 +2933,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - uint numLevels (readonly)
@@ -3114,6 +3133,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 
 
@@ -3152,6 +3172,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - SoundType soundType
 - float frequency
@@ -3200,6 +3221,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - SoundType soundType
 - float frequency
@@ -4741,6 +4763,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -5455,6 +5478,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - float basePriority
 - float distanceFactor
@@ -5561,6 +5585,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - ShapeType shapeType
 - Vector3 size
@@ -5612,6 +5637,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - float mass
 - Vector3 position
@@ -5670,6 +5696,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - ConstraintType constraintType
 - Vector3 position
@@ -5734,6 +5761,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - Vector3 gravity
 - int fps
@@ -5770,6 +5798,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - bool recursive
 
@@ -5811,6 +5840,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - int tileSize
 - float cellSize
@@ -5862,6 +5892,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - Node@ endPoint
 - float radius
@@ -5926,6 +5957,7 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
+- String category (readonly)
 - Node@ node (readonly)
 - int fixedUpdateFps
 - ScriptFile@ scriptFile

@@ -49,6 +49,8 @@
 namespace Urho3D
 {
 
+extern const char* NAVIGATION_CATEGORY;
+
 static const int DEFAULT_TILE_SIZE = 128;
 static const float DEFAULT_CELL_SIZE = 0.3f;
 static const float DEFAULT_CELL_HEIGHT = 0.2f;
@@ -180,7 +182,7 @@ NavigationMesh::~NavigationMesh()
 
 void NavigationMesh::RegisterObject(Context* context)
 {
-    context->RegisterFactory<NavigationMesh>();
+    context->RegisterComponentFactory<NavigationMesh>(NAVIGATION_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_INT, "Tile Size", GetTileSize, SetTileSize, int, DEFAULT_TILE_SIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Cell Size", GetCellSize, SetCellSize, float, DEFAULT_CELL_SIZE, AM_DEFAULT);

@@ -31,6 +31,9 @@
 namespace Urho3D
 {
 
+extern const char* SCENE_CATEGORY;
+extern const char* EFFECT_CATEGORY;
+
 class File;
 class PackageFile;
 

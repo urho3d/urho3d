@@ -33,17 +33,19 @@ namespace Urho3D
 class Context : public RefCounted
 {
     friend class Object;
-    
+
 public:
     /// Construct.
     Context();
     /// Destruct.
     ~Context();
-    
+
     /// Create an object by type hash. Return pointer to it or null if no factory found.
     SharedPtr<Object> CreateObject(ShortStringHash objectType);
     /// Register a factory for an object type.
     void RegisterFactory(ObjectFactory* factory);
+    /// Register a factory for a component type.
+    void RegisterComponentFactory(ObjectFactory* factory, const char* category);
     /// Register a subsystem.
     void RegisterSubsystem(Object* subsystem);
     /// Remove a subsystem.
@@ -54,11 +56,13 @@ public:
     void RemoveAttribute(ShortStringHash objectType, const char* name);
     /// Update object attribute's default value.
     void UpdateAttributeDefaultValue(ShortStringHash objectType, const char* name, const Variant& defaultValue);
-    
+
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
     /// Template version of registering an object factory.
     template <class T> void RegisterFactory();
+    /// Template version of registering a component factory.
+    template <class T> void RegisterComponentFactory(const char* category);
     /// Template version of removing a subsystem.
     template <class T> void RemoveSubsystem();
     /// Template version of registering an object attribute.
@@ -69,13 +73,15 @@ public:
     template <class T, class U> void CopyBaseAttributes();
     /// Template version of updating an object attribute's default value.
     template <class T> void UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue);
-    
+
     /// Return subsystem by type.
     Object* GetSubsystem(ShortStringHash type) const;
     /// Return all subsystems.
     const HashMap<ShortStringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
     /// Return all object factories.
     const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
+    /// Return all component categories.
+    const HashMap<String, Vector<ShortStringHash> >& GetComponentCategories() const { return componentCategories_; }
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
     /// Return active event handler. Set by Object. Null outside event handling.
@@ -88,21 +94,21 @@ public:
     template <class T> T* GetSubsystem() const;
     /// Template version of returning a specific attribute description.
     template <class T> AttributeInfo* GetAttribute(const char* name);
-    
+
     /// Return attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetAttributes(ShortStringHash type) const
     {
         HashMap<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
         return i != attributes_.End() ? &i->second_ : 0;
     }
-    
+
     /// Return network replication attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetNetworkAttributes(ShortStringHash type) const
     {
         HashMap<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
         return i != networkAttributes_.End() ? &i->second_ : 0;
     }
-    
+
     /// Return event receivers for a sender and event type, or null if they do not exist.
     HashSet<Object*>* GetEventReceivers(Object* sender, StringHash eventType)
     {
@@ -115,14 +121,14 @@ public:
         else
             return 0;
     }
-    
+
     /// Return event receivers for an event type, or null if they do not exist.
     HashSet<Object*>* GetEventReceivers(StringHash eventType)
     {
         HashMap<StringHash, HashSet<Object*> >::Iterator i = eventReceivers_.Find(eventType);
         return i != eventReceivers_.End() ? &i->second_ : 0;
     }
-    
+
 private:
     /// Add event receiver.
     void AddEventReceiver(Object* receiver, StringHash eventType);
@@ -157,9 +163,12 @@ private:
     PODVector<Object*> eventSenders_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.
     EventHandler* eventHandler_;
+    /// Component categories.
+    HashMap<String, Vector<ShortStringHash> > componentCategories_;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }
+template <class T> void Context::RegisterComponentFactory(const char* category) { RegisterComponentFactory(new ObjectFactoryImpl<T>(this), category); }
 template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
 template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { RegisterAttribute(T::GetTypeStatic(), attr); }
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }

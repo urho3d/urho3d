@@ -192,9 +192,17 @@ void CreateMenuBar()
 
         Menu@ childMenu = CreateMenuItem("Component", null, SHOW_POPUP_INDICATOR);
         Window@ childPopup = CreatePopup(childMenu);
-        String[] componentTypes = GetAvailableComponents();
-        for (uint i = 0; i < componentTypes.length; ++i)
-            childPopup.AddChild(CreateIconizedMenuItem(componentTypes[i], @PickComponent));
+        String[] componentCategories = GetComponentCategories();
+        for (uint i = 0; i < componentCategories.length; ++i)
+        {
+            Menu@ menu = CreateMenuItem(componentCategories[i], null, SHOW_POPUP_INDICATOR);
+            Window@ popup = CreatePopup(menu);
+            String[] componentTypes = GetComponentsByCategory(componentCategories[i]);
+            for (uint j = 0; j < componentTypes.length; ++j)
+                popup.AddChild(CreateIconizedMenuItem(componentTypes[j], @PickComponent));
+            childPopup.AddChild(menu);
+        }
+        FinalizedPopupMenu(childPopup);
         popup.AddChild(childMenu);
 
         childMenu = CreateMenuItem("Builtin object", null, SHOW_POPUP_INDICATOR);
@@ -467,8 +475,10 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
 
     if (accelKey != 0)
     {
+        int minWidth = menuText.minWidth;
         menuText.layoutMode = LM_HORIZONTAL;
         menuText.AddChild(CreateAccelKeyText(accelKey, accelQual));
+        menuText.minWidth = minWidth;
     }
 
     return menu;

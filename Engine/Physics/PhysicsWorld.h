@@ -39,6 +39,8 @@ class btPersistentManifold;
 namespace Urho3D
 {
 
+extern const char* PHYSICS_CATEGORY;
+
 class CollisionShape;
 class Deserializer;
 class Constraint;
@@ -58,7 +60,7 @@ struct PhysicsRaycastResult
         body_(0)
     {
     }
-    
+
     /// Hit position.
     Vector3 position_;
     /// Hit normal.
@@ -89,9 +91,9 @@ class PhysicsWorld : public Component, public btIDebugDraw
 {
     friend void InternalPreTickCallback(btDynamicsWorld *world, btScalar timeStep);
     friend void InternalTickCallback(btDynamicsWorld *world, btScalar timeStep);
-    
+
     OBJECT(PhysicsWorld);
-    
+
 public:
     /// Construct.
     PhysicsWorld(Context* scontext);
@@ -99,7 +101,7 @@ public:
     virtual ~PhysicsWorld();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Check if an AABB is visible for debug drawing.
     virtual bool isVisible(const btVector3& aabbMin, const btVector3& aabbMax);
     /// Draw a physics debug line.
@@ -116,7 +118,7 @@ public:
     virtual int getDebugMode() const { return debugMode_; }
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
-    
+
     /// Step the simulation forward.
     void Update(float timeStep);
     /// Refresh collisions only without updating dynamics.
@@ -149,7 +151,7 @@ public:
     int GetFps() const { return fps_; }
     /// Return maximum angular velocity for network replication.
     float GetMaxNetworkAngularVelocity() const { return maxNetworkAngularVelocity_; }
-    
+
     /// Add a rigid body to keep track of. Called by RigidBody.
     void AddRigidBody(RigidBody* body);
     /// Remove a rigid body. Called by RigidBody.
@@ -170,7 +172,7 @@ public:
     void SetDebugRenderer(DebugRenderer* debug);
     /// Set debug geometry depth test mode. Called both by PhysicsWorld itself and physics components.
     void SetDebugDepthTest(bool enable);
-    
+
     /// Return the Bullet physics world.
     btDiscreteDynamicsWorld* GetWorld() { return world_; }
     /// Clean up the geometry cache.
@@ -181,11 +183,11 @@ public:
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
     /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const { return applyingTransforms_; }
-    
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    
+
 private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
@@ -195,7 +197,7 @@ private:
     void PostStep(float timeStep);
     /// Send accumulated collision events.
     void SendCollisionEvents();
-    
+
     /// Bullet collision configuration.
     btCollisionConfiguration* collisionConfiguration_;
     /// Bullet collision dispatcher.

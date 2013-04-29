@@ -59,7 +59,7 @@ AnimationController::~AnimationController()
 
 void AnimationController::RegisterObject(Context* context)
 {
-    context->RegisterFactory<AnimationController>();
+    context->RegisterComponentFactory<AnimationController>(ANIMATION_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(AnimationController, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimationController, VAR_VARIANTVECTOR, "Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);

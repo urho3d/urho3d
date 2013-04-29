@@ -31,6 +31,8 @@
 namespace Urho3D
 {
 
+extern const char* NAVIGATION_CATEGORY;
+
 OBJECTTYPESTATIC(OffMeshConnection);
 
 static const float DEFAULT_RADIUS = 1.0f;
@@ -50,7 +52,7 @@ OffMeshConnection::~OffMeshConnection()
 
 void OffMeshConnection::RegisterObject(Context* context)
 {
-    context->RegisterFactory<OffMeshConnection>();
+    context->RegisterComponentFactory<OffMeshConnection>(NAVIGATION_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(OffMeshConnection, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(OffMeshConnection, VAR_INT, "Endpoint NodeID", endPointID_, 0, AM_DEFAULT | AM_NODEID);

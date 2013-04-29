@@ -30,6 +30,8 @@
 namespace Urho3D
 {
 
+extern const char* AUDIO_CATEGORY;
+
 class AudioImpl;
 class Sound;
 class SoundListener;
@@ -39,13 +41,13 @@ class SoundSource;
 class Audio : public Object
 {
     OBJECT(Audio);
-    
+
 public:
     /// Construct.
     Audio(Context* context);
     /// Destruct. Terminate the audio thread and free the audio buffer.
     virtual ~Audio();
-    
+
     /// Initialize sound output with specified buffer length and output mode.
     bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
     /// Run update on sound sources. Not required for continued playback, but frees unused sound sources & sounds and updates 3D positions.
@@ -60,7 +62,7 @@ public:
     void SetListener(SoundListener* listener);
     /// Stop any sound source playing a certain sound clip.
     void StopSound(Sound* sound);
-    
+
     /// Return byte size of one sample.
     unsigned GetSampleSize() const { return sampleSize_; }
     /// Return mixing rate.
@@ -79,7 +81,7 @@ public:
     SoundListener* GetListener() const;
     /// Return all sound sources.
     const PODVector<SoundSource*>& GetSoundSources() const { return soundSources_; }
-    
+
     /// Add a sound source to keep track of. Called by SoundSource.
     void AddSoundSource(SoundSource* soundSource);
     /// Remove a sound source. Called by SoundSource.
@@ -88,16 +90,16 @@ public:
     Mutex& GetMutex() { return audioMutex_; }
     /// Return sound type specific gain multiplied by master gain.
     float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
-    
+
     /// Mix sound sources into the buffer.
     void MixOutput(void *dest, unsigned samples);
-    
+
 private:
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Stop sound output and release the sound buffer.
     void Release();
-    
+
     /// Clipping buffer for mixing.
     SharedArrayPtr<int> clipBuffer_;
     /// Audio thread mutex.

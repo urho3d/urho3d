@@ -31,6 +31,8 @@
 namespace Urho3D
 {
 
+extern const char* SCENE_CATEGORY;
+
 static const float DEFAULT_NEARCLIP = 0.1f;
 static const float DEFAULT_FARCLIP = 1000.0f;
 static const float DEFAULT_FOV = 45.0f;
@@ -81,8 +83,8 @@ Camera::~Camera()
 
 void Camera::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Camera>();
-    
+    context->RegisterComponentFactory<Camera>(SCENE_CATEGORY);
+
     ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", GetNearClip, SetNearClip, float, DEFAULT_NEARCLIP, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", GetFarClip, SetFarClip, float, DEFAULT_FARCLIP, AM_DEFAULT);
@@ -222,54 +224,54 @@ float Camera::GetNearClip() const
 Frustum Camera::GetSplitFrustum(float nearClip, float farClip) const
 {
     Frustum ret;
-    
+
     const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
     nearClip = Max(nearClip, GetNearClip());
     farClip = Min(farClip, farClip_);
     if (farClip < nearClip)
         farClip = nearClip;
-    
+
     if (!orthographic_)
         ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip, worldTransform);
     else
         ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip, worldTransform);
-    
+
     return ret;
 }
 
 Frustum Camera::GetViewSpaceFrustum() const
 {
     Frustum ret;
-    
+
     if (!orthographic_)
         ret.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_);
     else
         ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_);
-    
+
     return ret;
 }
 
 Frustum Camera::GetViewSpaceSplitFrustum(float nearClip, float farClip) const
 {
     Frustum ret;
-    
+
     nearClip = Max(nearClip, GetNearClip());
     farClip = Min(farClip, farClip_);
     if (farClip < nearClip)
         farClip = nearClip;
-    
+
     if (!orthographic_)
         ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip);
     else
         ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip);
-    
+
     return ret;
 }
 
 Ray Camera::GetScreenRay(float x, float y) const
 {
     Ray ret;
-    
+
     // If projection is invalid, just return a ray pointing forward
     if (!IsProjectionValid())
     {
@@ -277,15 +279,15 @@ Ray Camera::GetScreenRay(float x, float y) const
         ret.direction_ = GetForwardVector();
         return ret;
     }
-    
+
     Matrix4 viewProjInverse = (GetProjection(false) * GetInverseWorldTransform()).Inverse();
-    
+
     // The parameters range from 0.0 to 1.0. Expand to normalized device coordinates (-1.0 to 1.0) & flip Y axis
     x = 2.0f * x - 1.0f;
     y = 1.0f - 2.0f * y;
     Vector3 near(x, y, 0.0f);
     Vector3 far(x, y, 1.0f);
-    
+
     ret.origin_ = viewProjInverse * near;
     ret.direction_ = ((viewProjInverse * far) - ret.origin_).Normalized();
     return ret;
@@ -295,7 +297,7 @@ Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos) const
 {
     Vector3 eyeSpacePos = GetInverseWorldTransform() * worldPos;
     Vector2 ret;
-    
+
     if(eyeSpacePos.z_ > 0.0f)
     {
         Vector3 screenSpacePos = GetProjection(false) * eyeSpacePos;
@@ -307,7 +309,7 @@ Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos) const
         ret.x_ = (-eyeSpacePos.x_ > 0.0f) ? -1.0f : 1.0f;
         ret.y_ = (-eyeSpacePos.y_ > 0.0f) ? -1.0f : 1.0f;
     }
-    
+
     ret.x_ = (ret.x_ / 2.0f) + 0.5f;
     ret.y_ = 1.0f - ((ret.y_ / 2.0f) + 0.5f);
     return ret;
@@ -328,10 +330,10 @@ const Frustum& Camera::GetFrustum() const
             frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
         else
             frustum_.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
-        
+
         frustumDirty_ = false;
     }
-    
+
     return frustum_;
 }
 
@@ -342,21 +344,21 @@ const Matrix4& Camera::GetProjection() const
         projection_ = GetProjection(true);
         projectionDirty_ = false;
     }
-    
+
     return projection_;
 }
 
 Matrix4 Camera::GetProjection(bool apiSpecific) const
 {
     Matrix4 ret(Matrix4::ZERO);
-    
+
     if (!orthographic_)
     {
         float nearClip = GetNearClip();
         float h = (1.0f / tanf(fov_ * M_DEGTORAD * 0.5f)) * zoom_;
         float w = h / aspectRatio_;
         float q, r;
-        
+
         if (apiSpecific)
         {
             #ifdef USE_OPENGL
@@ -372,7 +374,7 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
             q = farClip_ / (farClip_ - nearClip);
             r = -q * nearClip;
         }
-        
+
         ret.m00_ = w;
         ret.m02_ = projectionOffset_.x_ * 2.0f;
         ret.m11_ = h;
@@ -387,7 +389,7 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
         float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
         float w = h / aspectRatio_;
         float q, r;
-        
+
         if (apiSpecific)
         {
             #ifdef USE_OPENGL
@@ -403,7 +405,7 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
             q = 1.0f / farClip_;
             r = 0.0f;
         }
-        
+
         ret.m00_ = w;
         ret.m03_ = projectionOffset_.x_ * 2.0f;
         ret.m11_ = h;
@@ -412,10 +414,10 @@ Matrix4 Camera::GetProjection(bool apiSpecific) const
         ret.m23_ = r;
         ret.m33_ = 1.0f;
     }
-    
+
     if (flipVertical_)
         ret = flipMatrix * ret;
-    
+
     return ret;
 }
 
@@ -423,7 +425,7 @@ void Camera::GetFrustumSize(Vector3& near, Vector3& far) const
 {
     near.z_ = GetNearClip();
     far.z_ = farClip_;
-    
+
     if (!orthographic_)
     {
         float halfViewSize = tanf(fov_ * M_DEGTORAD * 0.5f) / zoom_;
@@ -438,7 +440,7 @@ void Camera::GetFrustumSize(Vector3& near, Vector3& far) const
         near.y_ = far.y_ = halfViewSize;
         near.x_ = far.x_ = near.y_ * aspectRatio_;
     }
-    
+
     if (flipVertical_)
     {
         near.y_ = -near.y_;
@@ -516,7 +518,7 @@ const Matrix3x4& Camera::GetInverseWorldTransform() const
         inverseWorld_ = worldTransform.Inverse();
         inverseWorldDirty_ = false;
     }
-    
+
     return inverseWorld_;
 }
 

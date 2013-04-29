@@ -37,6 +37,8 @@
 namespace Urho3D
 {
 
+const char* SCRIPT_CATEGORY = "Script";
+
 /// %Object property info for scripting API dump.
 struct PropertyInfo
 {
@@ -47,7 +49,7 @@ struct PropertyInfo
         indexed_(false)
     {
     }
-    
+
     /// Property name.
     String name_;
     /// Property data type.
@@ -96,7 +98,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
             info->indexed_ = true;
             info->type_ += "[]";
         }
-        
+
         // Sanitate the reference operator away
         info->type_.Replace("&", "");
     }
@@ -111,7 +113,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
                 begin = declaration.Find('(');
             else
                 info->indexed_ = true;
-            
+
             if (begin != String::NPOS)
             {
                 ++begin;
@@ -144,18 +146,18 @@ Script::Script(Context* context) :
         LOGERROR("Could not create AngelScript engine");
         return;
     }
-    
+
     scriptEngine_->SetUserData(this);
     scriptEngine_->SetEngineProperty(asEP_USE_CHARACTER_LITERALS, true);
     scriptEngine_->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, true);
     scriptEngine_->SetEngineProperty(asEP_ALLOW_IMPLICIT_HANDLE_TYPES, true);
     scriptEngine_->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
     scriptEngine_->SetMessageCallback(asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);
-    
+
     // Create the context for immediate execution
     immediateContext_ = scriptEngine_->CreateContext();
     immediateContext_->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
-    
+
     // Register the Array & String types
     RegisterArray(scriptEngine_);
     RegisterString(scriptEngine_);
@@ -168,10 +170,10 @@ Script::~Script()
         immediateContext_->Release();
         immediateContext_ = 0;
     }
-    
+
     for (unsigned i = 0 ; i < scriptFileContexts_.Size(); ++i)
         scriptFileContexts_[i]->Release();
-    
+
     if (scriptEngine_)
     {
         scriptEngine_->Release();
@@ -183,11 +185,11 @@ bool Script::Execute(const String& line)
 {
     // Note: compiling code each time is slow. Not to be used for performance-critical or repeating activity
     PROFILE(ExecuteImmediate);
-    
+
     ClearObjectTypeCache();
-    
+
     String wrappedLine = "void f(){\n" + line + ";\n}";
-    
+
     // If no immediate mode script file set, create a dummy module for compiling the line
     asIScriptModule* module = 0;
     if (defaultScriptFile_)
@@ -196,21 +198,21 @@ bool Script::Execute(const String& line)
         module = scriptEngine_->GetModule("ExecuteImmediate", asGM_CREATE_IF_NOT_EXISTS);
     if (!module)
         return false;
-    
+
     asIScriptFunction *function = 0;
     if (module->CompileFunction("", wrappedLine.CString(), -1, 0, &function) < 0)
         return false;
-    
+
     if (immediateContext_->Prepare(function) < 0)
     {
         function->Release();
         return false;
     }
-    
+
     bool success = immediateContext_->Execute() >= 0;
     immediateContext_->Unprepare();
     function->Release();
-    
+
     return success;
 }
 
@@ -238,35 +240,35 @@ void Script::DumpAPI()
 {
     // Does not use LOGRAW macro here to ensure the messages are always dumped regarless of ENABLE_LOGGING compiler directive and of Log subsystem availability
     Log::WriteRaw("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
-    
+
     Vector<PropertyInfo> globalPropertyInfos;
     Vector<String> globalFunctions;
-    
+
     unsigned functions = scriptEngine_->GetGlobalFunctionCount();
     for (unsigned i = 0; i < functions; ++i)
     {
         asIScriptFunction* function = scriptEngine_->GetGlobalFunctionByIndex(i);
         String functionName(function->GetName());
         String declaration(function->GetDeclaration());
-        
+
         if (functionName.Contains("set_") || functionName.Contains("get_"))
             ExtractPropertyInfo(functionName, declaration, globalPropertyInfos);
         else
             globalFunctions.Push(declaration);
     }
-    
+
     Log::WriteRaw("\\section ScriptAPI_GlobalFunctions Global functions\n");
-    
+
     for (unsigned i = 0; i < globalFunctions.Size(); ++i)
         OutputAPIRow(globalFunctions[i]);
-    
+
     Log::WriteRaw("\\section ScriptAPI_GlobalProperties Global properties\n");
-    
+
     for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
         OutputAPIRow(globalPropertyInfos[i].type_ + " " + globalPropertyInfos[i].name_, true);
-    
+
     Log::WriteRaw("\\section ScriptAPI_GlobalConstants Global constants\n");
-    
+
     unsigned properties = scriptEngine_->GetGlobalPropertyCount();
     for (unsigned i = 0; i < properties; ++i)
     {
@@ -275,13 +277,13 @@ void Script::DumpAPI()
         int typeId;
         scriptEngine_->GetGlobalPropertyByIndex(i, &propertyName, 0, &typeId);
         propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
-        
+
         String type(propertyDeclaration);
         OutputAPIRow(type + " " + String(propertyName), true);
     }
-    
+
     Log::WriteRaw("\\section ScriptAPI_Classes Classes\n");
-    
+
     unsigned types = scriptEngine_->GetObjectTypeCount();
     for (unsigned i = 0; i < types; ++i)
     {
@@ -291,9 +293,9 @@ void Script::DumpAPI()
             String typeName(type->GetName());
             Vector<String> methodDeclarations;
             Vector<PropertyInfo> propertyInfos;
-            
+
             Log::WriteRaw("\n" + typeName + "\n");
-            
+
             unsigned methods = type->GetMethodCount();
             for (unsigned j = 0; j < methods; ++j)
             {
@@ -313,7 +315,7 @@ void Script::DumpAPI()
                     }
                 }
             }
-            
+
             // Assume that the same property is never both an accessor property, and a direct one
             unsigned properties = type->GetPropertyCount();
             for (unsigned j = 0; j < properties; ++j)
@@ -321,24 +323,24 @@ void Script::DumpAPI()
                 const char* propertyName;
                 const char* propertyDeclaration;
                 int typeId;
-                
+
                 type->GetProperty(j, &propertyName, &typeId);
                 propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
-                
+
                 PropertyInfo newInfo;
                 newInfo.name_ = String(propertyName);
                 newInfo.type_ = String(propertyDeclaration);
                 newInfo.read_ = newInfo.write_ = true;
                 propertyInfos.Push(newInfo);
             }
-            
+
             if (!methodDeclarations.Empty())
             {
                 Log::WriteRaw("\nMethods:<br>\n");
                 for (unsigned j = 0; j < methodDeclarations.Size(); ++j)
                     OutputAPIRow(methodDeclarations[j]);
             }
-            
+
             if (!propertyInfos.Empty())
             {
                 Log::WriteRaw("\nProperties:<br>\n");
@@ -349,15 +351,15 @@ void Script::DumpAPI()
                         remark = " (readonly)";
                     else if (!propertyInfos[j].read_)
                         remark = " (writeonly)";
-                    
+
                     OutputAPIRow(propertyInfos[j].type_ + " " + propertyInfos[j].name_ + remark);
                 }
             }
-            
+
             Log::WriteRaw("\n");
         }
     }
-    
+
     Log::WriteRaw("*/\n\n}\n");
 }
 
@@ -365,7 +367,7 @@ void Script::MessageCallback(const asSMessageInfo* msg)
 {
     String message;
     message.AppendWithFormat("%s:%d,%d %s", msg->section, msg->row, msg->col, msg->message);
-    
+
     if (logMode_ == LOGMODE_IMMEDIATE)
     {
         switch (msg->type)
@@ -373,11 +375,11 @@ void Script::MessageCallback(const asSMessageInfo* msg)
         case asMSGTYPE_ERROR:
             LOGERROR(message);
             break;
-            
+
         case asMSGTYPE_WARNING:
             LOGWARNING(message);
             break;
-            
+
         default:
             LOGINFO(message);
             break;
@@ -395,12 +397,12 @@ void Script::ExceptionCallback(asIScriptContext* context)
 {
     String message;
     message.AppendWithFormat("- Exception '%s' in '%s'\n%s", context->GetExceptionString(), context->GetExceptionFunction()->GetDeclaration(), GetCallStack(context).CString());
-    
+
     asSMessageInfo msg;
     msg.row = context->GetExceptionLineNumber(&msg.col, &msg.section);
     msg.type = asMSGTYPE_ERROR;
     msg.message = message.CString();
-    
+
     MessageCallback(&msg);
 }
 
@@ -442,7 +444,7 @@ asIObjectType* Script::GetObjectType(const char* declaration)
     HashMap<const char*, asIObjectType*>::ConstIterator i = objectTypes_.Find(declaration);
     if (i != objectTypes_.End())
         return i->second_;
-    
+
     asIObjectType* type = scriptEngine_->GetObjectTypeById(scriptEngine_->GetTypeIdByDecl(declaration));
     objectTypes_[declaration] = type;
     return type;
@@ -456,7 +458,7 @@ asIScriptContext* Script::GetScriptFileContext()
         newContext->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
         scriptFileContexts_.Push(newContext);
     }
-    
+
     return scriptFileContexts_[scriptNestingLevel_];
 }
 
@@ -471,7 +473,7 @@ void Script::OutputAPIRow(const String& row, bool removeReference)
     out.Replace("&out", "&");
     if (removeReference)
         out.Replace("&", "");
-    
+
     Log::WriteRaw("- " + out + "\n");
 }
 

@@ -40,6 +40,8 @@
 namespace Urho3D
 {
 
+const char* STATIC_CATEGORY = "Static";
+
 OBJECTTYPESTATIC(StaticModel);
 
 StaticModel::StaticModel(Context* context) :
@@ -55,7 +57,7 @@ StaticModel::~StaticModel()
 
 void StaticModel::RegisterObject(Context* context)
 {
-    context->RegisterFactory<StaticModel>();
+    context->RegisterComponentFactory<StaticModel>(STATIC_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(StaticModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);

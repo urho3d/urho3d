@@ -60,7 +60,7 @@ bool Component::Save(Serializer& dest) const
         return false;
     if (!dest.WriteUInt(id_))
         return false;
-    
+
     // Write attributes
     return Serializable::Save(dest);
 }
@@ -72,7 +72,7 @@ bool Component::SaveXML(XMLElement& dest) const
         return false;
     if (!dest.SetInt("id", id_))
         return false;
-    
+
     // Write attributes
     return Serializable::SaveXML(dest);
 }
@@ -84,18 +84,18 @@ void Component::SetEnabled(bool enable)
         enabled_ = enable;
         OnSetEnabled();
         MarkNetworkUpdate();
-        
+
         // Send change event for the component
         Scene* scene = GetScene();
         if (scene)
         {
             using namespace ComponentEnabledChanged;
-            
+
             VariantMap eventData;
             eventData[P_SCENE] = (void*)scene;
             eventData[P_NODE] = (void*)node_;
             eventData[P_COMPONENT] = (void*)this;
-            
+
             scene->SendEvent(E_COMPONENTENABLEDCHANGED, eventData);
         }
     }
@@ -116,7 +116,7 @@ void Component::AddReplicationState(ComponentReplicationState* state)
 {
     if (!networkState_)
         AllocateNetworkState();
-    
+
     networkState_->replicationStates_.Push(state);
 }
 
@@ -124,40 +124,40 @@ void Component::PrepareNetworkUpdate()
 {
     if (!networkState_)
         AllocateNetworkState();
-    
+
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
-    
+
     unsigned numAttributes = attributes->Size();
-    
+
     if (networkState_->currentValues_.Size() != numAttributes)
     {
         networkState_->currentValues_.Resize(numAttributes);
         networkState_->previousValues_.Resize(numAttributes);
-        
+
         // Copy the default attribute values to the previous state as a starting point
         for (unsigned i = 0; i < numAttributes; ++i)
             networkState_->previousValues_[i] = attributes->At(i).defaultValue_;
     }
-    
+
     // Check for attribute changes
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
         OnGetAttribute(attr, networkState_->currentValues_[i]);
-        
+
         if (networkState_->currentValues_[i] != networkState_->previousValues_[i])
         {
             networkState_->previousValues_[i] = networkState_->currentValues_[i];
-            
+
             // Mark the attribute dirty in all replication states that are tracking this component
             for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin(); j !=
                 networkState_->replicationStates_.End(); ++j)
             {
                 ComponentReplicationState* compState = static_cast<ComponentReplicationState*>(*j);
                 compState->dirtyAttributes_.Set(i);
-                
+
                 // Add component's parent node to the dirty set if not added yet
                 NodeReplicationState* nodeState = compState->nodeState_;
                 if (!nodeState->markedDirty_)
@@ -168,7 +168,7 @@ void Component::PrepareNetworkUpdate()
             }
         }
     }
-    
+
     networkUpdate_ = false;
 }
 
@@ -195,6 +195,18 @@ void Component::MarkNetworkUpdate()
             networkUpdate_ = true;
         }
     }
+}
+
+const String& Component::GetCategory() const
+{
+    const HashMap<String, Vector<ShortStringHash> >& componentCategories = context_->GetComponentCategories();
+    for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = componentCategories.Begin(); i != componentCategories.End(); ++i)
+    {
+        if (i->second_.Contains(GetType()))
+            return i->first_;
+    }
+
+    return String::EMPTY;
 }
 
 void Component::SetID(unsigned id)

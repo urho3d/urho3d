@@ -119,7 +119,7 @@ SoundSource::SoundSource(Context* context) :
     decodePosition_(0)
 {
     audio_ = GetSubsystem<Audio>();
-    
+
     if (audio_)
         audio_->AddSoundSource(this);
 }
@@ -128,14 +128,14 @@ SoundSource::~SoundSource()
 {
     if (audio_)
         audio_->RemoveSoundSource(this);
-    
+
     FreeDecoder();
 }
 
 void SoundSource::RegisterObject(Context* context)
 {
-    context->RegisterFactory<SoundSource>();
-    
+    context->RegisterComponentFactory<SoundSource>(AUDIO_CATEGORY);
+
     ACCESSOR_ATTRIBUTE(SoundSource, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ATTRIBUTE(SoundSource, "Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Frequency", frequency_, 0.0f, AM_DEFAULT);
@@ -151,11 +151,11 @@ void SoundSource::Play(Sound* sound)
 {
     if (!audio_)
         return;
-    
+
     // If no frequency set yet, set from the sound's default
     if (frequency_ == 0.0f && sound)
         SetFrequency(sound->GetFrequency());
-    
+
     // If sound source is currently playing, have to lock the audio mutex
     if (position_)
     {
@@ -164,7 +164,7 @@ void SoundSource::Play(Sound* sound)
     }
     else
         PlayLockless(sound);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -193,18 +193,18 @@ void SoundSource::Stop()
 {
     if (!audio_)
         return;
-    
+
     // If sound source is currently playing, have to lock the audio mutex
     if (position_)
     {
         MutexLock lock(audio_->GetMutex());
         StopLockless();
     }
-    
+
     // Free the compressed sound decoder now if any
     FreeDecoder();
     sound_.Reset();
-    
+
     MarkNetworkUpdate();
 }
 
@@ -212,7 +212,7 @@ void SoundSource::SetSoundType(SoundType type)
 {
     if (type == SOUND_MASTER || type >= MAX_SOUND_TYPES)
         return;
-    
+
     soundType_ = type;
     MarkNetworkUpdate();
 }
@@ -255,7 +255,7 @@ void SoundSource::SetPlayPosition(signed char* pos)
 {
     if (!audio_ || !sound_)
         return;
-    
+
     MutexLock lock(audio_->GetMutex());
     SetPlayPositionLockless(pos);
 }
@@ -264,7 +264,7 @@ void SoundSource::PlayLockless(Sound* sound)
 {
     // Reset the time position in any case
     timePosition_ = 0.0f;
-    
+
     if (sound)
     {
         if (!sound->IsCompressed())
@@ -300,7 +300,7 @@ void SoundSource::PlayLockless(Sound* sound)
             }
         }
     }
-    
+
     // If sound pointer is null or if sound has no data, stop playback
     FreeDecoder();
     sound_.Reset();
@@ -318,7 +318,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
     // Setting position on a compressed sound is not supported
     if (!sound_ || sound_->IsCompressed())
         return;
-    
+
     signed char* start = sound_->GetStart();
     signed char* end = sound_->GetEnd();
     if (pos < start)
@@ -327,7 +327,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
         ++pos;
     if (pos > end)
         pos = end;
-    
+
     position_ = pos;
     timePosition_ = ((float)(int)(size_t)(pos - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
 }
@@ -336,18 +336,18 @@ void SoundSource::Update(float timeStep)
 {
     if (!audio_ || !IsEnabledEffective())
         return;
-    
+
     // If there is no actual audio output, perform fake mixing into a nonexistent buffer to check stopping/looping
     if (!audio_->IsInitialized())
         MixNull(timeStep);
-    
+
     // Free the sound if playback has stopped
     if (sound_ && !position_)
     {
         FreeDecoder();
         sound_.Reset();
     }
-    
+
     // Check for autoremove
     if (autoRemove_)
     {
@@ -370,7 +370,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
 {
     if (!position_ || !sound_ || !IsEnabledEffective())
         return;
-    
+
     if (sound_->IsCompressed())
     {
         if (decoder_)
@@ -404,13 +404,13 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
                         if (sound_->IsLooped())
                             eof = true;
                     }
-                    
+
                     // If wrote to buffer start, correct interpolation wraparound
                     if (!decodePosition_)
                         decodeBuffer_->FixInterpolation();
                 }
             }
-            
+
             // If end of stream encountered, check whether we should rewind or stop
             if (eof)
             {
@@ -422,7 +422,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
                 else
                     decodeBuffer_->SetLooped(false); // Stop after the current decode buffer has been played
             }
-            
+
             decodePosition_ = currentPos;
         }
         else
@@ -434,24 +434,24 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
             decodeBuffer_ = new Sound(context_);
             decodeBuffer_->SetSize(DecodeBufferSize);
             decodeBuffer_->SetFormat(sound_->GetIntFrequency(), true, sound_->IsStereo());
-            
+
             // Clear the decode buffer, then fill with initial audio data and set it to loop
             memset(decodeBuffer_->GetStart(), 0, DecodeBufferSize);
             sound_->Decode(decoder_, decodeBuffer_->GetStart(), DecodeBufferSize);
             decodeBuffer_->SetLooped(true);
             decodePosition_ = 0;
-            
+
             // Start playing the decode buffer
             position_ = decodeBuffer_->GetStart();
             fractPosition_ = 0;
         }
     }
-    
+
     // If compressed, play the decode buffer. Otherwise play the original sound
     Sound* sound = sound_->IsCompressed() ? decodeBuffer_ : sound_;
     if (!sound)
         return;
-    
+
     // Choose the correct mixing routine
     if (!sound->IsStereo())
     {
@@ -487,7 +487,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
                 MixStereoToMono(sound, dest, samples, mixRate);
         }
     }
-    
+
     // Update the time position
     if (!sound_->IsCompressed())
         timePosition_ = ((float)(int)(size_t)(position_ - sound_->GetStart())) / (sound_->GetSampleSize() * sound_->GetFrequency());
@@ -529,18 +529,18 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
-    
+
     float add = frequency_ / (float)mixRate;
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
-    
+
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
         short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -567,7 +567,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
         signed char* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -589,7 +589,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
             position_ = pos;
         }
     }
-    
+
     fractPosition_ = fractPos;
 }
 
@@ -603,18 +603,18 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
-    
+
     float add = frequency_ / (float)mixRate;
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
-    
+
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
         short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -645,7 +645,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
         signed char* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -671,7 +671,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
             position_ = pos;
         }
     }
-    
+
     fractPosition_ = fractPos;
 }
 
@@ -684,18 +684,18 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
-    
+
     float add = frequency_ / (float)mixRate;
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
-    
+
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
         short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -722,7 +722,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
         signed char* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -744,7 +744,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
             position_ = pos;
         }
     }
-    
+
     fractPosition_ = fractPos;
 }
 
@@ -758,18 +758,18 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
-    
+
     float add = frequency_ / (float)mixRate;
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
-    
+
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
         short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -802,7 +802,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
         signed char* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -830,7 +830,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
             position_ = pos;
         }
     }
-    
+
     fractPosition_ = fractPos;
 }
 
@@ -843,18 +843,18 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
-    
+
     float add = frequency_ / (float)mixRate;
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
-    
+
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
         short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -883,7 +883,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         signed char* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -907,7 +907,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
             position_ = pos;
         }
     }
-    
+
     fractPosition_ = fractPos;
 }
 
@@ -920,18 +920,18 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
-    
+
     float add = frequency_ / (float)mixRate;
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
-    
+
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
         short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -962,7 +962,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
         signed char* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -988,7 +988,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
             position_ = pos;
         }
     }
-    
+
     fractPosition_ = fractPos;
 }
 
@@ -1001,18 +1001,18 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
-    
+
     float add = frequency_ / (float)mixRate;
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
-    
+
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
         short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -1041,7 +1041,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
         signed char* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -1065,7 +1065,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
             position_ = pos;
         }
     }
-    
+
     fractPosition_ = fractPos;
 }
 
@@ -1078,18 +1078,18 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
         MixZeroVolume(sound, samples, mixRate);
         return;
     }
-    
+
     float add = frequency_ / (float)mixRate;
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     int fractPos = fractPosition_;
-    
+
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
         short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -1120,7 +1120,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
         signed char* pos = (signed char*)position_;
         signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
-        
+
         if (sound->IsLooped())
         {
             while (--samples)
@@ -1146,7 +1146,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
             position_ = pos;
         }
     }
-    
+
     fractPosition_ = fractPos;
 }
 
@@ -1156,7 +1156,7 @@ void SoundSource::MixZeroVolume(Sound* sound, unsigned samples, int mixRate)
     int intAdd = (int)add;
     int fractAdd = (int)((add - floorf(add)) * 65536.0f);
     unsigned sampleSize = sound->GetSampleSize();
-    
+
     fractPosition_ += fractAdd;
     if (fractPosition_ > 65535)
     {
@@ -1164,7 +1164,7 @@ void SoundSource::MixZeroVolume(Sound* sound, unsigned samples, int mixRate)
         position_ += sampleSize;
     }
     position_ += intAdd * sampleSize;
-    
+
     if (position_ > sound->GetEnd())
     {
         if (sound->IsLooped())
@@ -1183,10 +1183,10 @@ void SoundSource::MixNull(float timeStep)
 {
     if (!position_ || !sound_ || !IsEnabledEffective())
         return;
-    
+
     // Advance only the time position
     timePosition_ += timeStep * frequency_ / sound_->GetFrequency();
-    
+
     if (sound_->IsLooped())
     {
         // For simulated playback, simply reset the time position to zero when the sound loops
@@ -1210,7 +1210,7 @@ void SoundSource::FreeDecoder()
         sound_->FreeDecoder(decoder_);
         decoder_ = 0;
     }
-    
+
     decodeBuffer_.Reset();
 }
 

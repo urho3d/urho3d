@@ -30,6 +30,8 @@
 namespace Urho3D
 {
 
+const char* NAVIGATION_CATEGORY = "Navigation";
+
 void RegisterNavigationLibrary(Context* context)
 {
     Navigable::RegisterObject(context);

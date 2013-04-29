@@ -34,6 +34,8 @@ struct asSMessageInfo;
 namespace Urho3D
 {
 
+extern const char* SCRIPT_CATEGORY;
+
 class Scene;
 class ScriptFile;
 class ScriptInstance;
@@ -49,15 +51,15 @@ enum ScriptLogMode
 class Script : public Object
 {
     OBJECT(Script);
-    
+
     friend class ScriptFile;
-    
+
 public:
     /// Construct.
     Script(Context* context);
     /// Destruct. Release the AngelScript engine.
     ~Script();
-    
+
     /// Compile and execute a line of script in immediate mode.
     bool Execute(const String& line);
     /// Set immediate mode script file.
@@ -76,7 +78,7 @@ public:
     void ExceptionCallback(asIScriptContext* context);
     /// Get call stack.
     static String GetCallStack(asIScriptContext* context);
-    
+
     /// Return the AngelScript engine.
     asIScriptEngine* GetScriptEngine() const { return scriptEngine_; }
     /// Return immediate execution script context.
@@ -93,7 +95,7 @@ public:
     ScriptLogMode GetLogMode() const { return logMode_; }
     /// Return retained mode log messages.
     const String& GetLogMessages() const { return logMessages_; }
-    
+
 private:
     /// Increase script nesting level.
     void IncScriptNestingLevel() { ++scriptNestingLevel_; }
@@ -105,7 +107,7 @@ private:
     asIScriptContext* GetScriptFileContext();
     /// Output a sanitated row of script API. No-ops when ENABLE_LOGGING not defined.
     void OutputAPIRow(const String& row, bool removeReference = false);
-    
+
     /// AngelScript engine.
     asIScriptEngine* scriptEngine_;
     /// Immediate execution script context.

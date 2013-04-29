@@ -39,6 +39,8 @@
 namespace Urho3D
 {
 
+const char* AUDIO_CATEGORY = "Audio";
+
 static const int MIN_BUFFERLENGTH = 20;
 static const int MIN_MIXRATE = 11025;
 static const int MAX_MIXRATE = 48000;

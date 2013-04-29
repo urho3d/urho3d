@@ -49,7 +49,7 @@ static const float DEFAULT_RESTITUTION = 0.0f;
 static const unsigned DEFAULT_COLLISION_LAYER = 0x1;
 static const unsigned DEFAULT_COLLISION_MASK = M_MAX_UNSIGNED;
 
-static const char* collisionEventModeNames[] = 
+static const char* collisionEventModeNames[] =
 {
     "Never",
     "When Active",
@@ -83,18 +83,18 @@ RigidBody::RigidBody(Context* context) :
 RigidBody::~RigidBody()
 {
     ReleaseBody();
-    
+
     if (physicsWorld_)
         physicsWorld_->RemoveRigidBody(this);
-    
+
     delete compoundShape_;
     compoundShape_ = 0;
 }
 
 void RigidBody::RegisterObject(Context* context)
 {
-    context->RegisterFactory<RigidBody>();
-    
+    context->RegisterComponentFactory<RigidBody>(PHYSICS_CATEGORY);
+
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
@@ -106,9 +106,9 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Factor", GetLinearFactor, SetLinearFactor, Vector3, Vector3::ONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Factor", GetAngularFactor, SetAngularFactor, Vector3, Vector3::ONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.8f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 1.0f, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_INT, "Collision Layer", collisionLayer_, DEFAULT_COLLISION_LAYER, AM_DEFAULT);
     ATTRIBUTE(RigidBody, VAR_INT, "Collision Mask", collisionMask_, DEFAULT_COLLISION_MASK, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Contact Threshold", GetContactProcessingThreshold, SetContactProcessingThreshold, float, BT_LARGE_FLOAT, AM_DEFAULT);
@@ -125,7 +125,7 @@ void RigidBody::RegisterObject(Context* context)
 void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Component::OnSetAttribute(attr, src);
-    
+
     // Change of any non-accessor attribute requires the rigid body to be re-added to the physics world
     if (!attr.accessor_)
         readdBody_ = true;
@@ -140,7 +140,7 @@ void RigidBody::ApplyAttributes()
 void RigidBody::OnSetEnabled()
 {
     bool enabled = IsEnabledEffective();
-    
+
     if (enabled && !inWorld_)
         AddBodyToWorld();
     else if (!enabled && inWorld_)
@@ -165,7 +165,7 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
     Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin());
     Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
     RigidBody* parentRigidBody = 0;
-    
+
     // It is possible that the RigidBody component has been kept alive via a shared pointer,
     // while its scene node has already been destroyed
     if (node_)
@@ -175,7 +175,7 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
         Node* parent = node_->GetParent();
         if (parent && parent != GetScene())
             parentRigidBody = parent->GetComponent<RigidBody>();
-        
+
         if (!parentRigidBody)
             ApplyWorldTransform(newWorldPosition, newWorldRotation);
         else
@@ -187,7 +187,7 @@ void RigidBody::setWorldTransform(const btTransform &worldTrans)
             delayed.worldRotation_ = newWorldRotation;
             physicsWorld_->AddDelayedWorldTransform(delayed);
         }
-        
+
         MarkNetworkUpdate();
     }
 }
@@ -198,11 +198,11 @@ void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         physicsWorld_->SetDebugRenderer(debug);
         physicsWorld_->SetDebugDepthTest(depthTest);
-        
+
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->debugDrawObject(body_->getWorldTransform(), compoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) : 
+        world->debugDrawObject(body_->getWorldTransform(), compoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) :
             btVector3(0.0f, 1.0f, 0.0f));
-        
+
         physicsWorld_->SetDebugRenderer(0);
     }
 }
@@ -210,7 +210,7 @@ void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 void RigidBody::SetMass(float mass)
 {
     mass = Max(mass, 0.0f);
-    
+
     if (mass != mass_)
     {
         mass_ = mass;
@@ -225,13 +225,13 @@ void RigidBody::SetPosition(Vector3 position)
     {
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setOrigin(ToBtVector3(position));
-        
+
         // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
         body_->setInterpolationWorldTransform(interpTrans);
         body_->updateInertiaTensor();
-        
+
         Activate();
         MarkNetworkUpdate();
     }
@@ -243,13 +243,13 @@ void RigidBody::SetRotation(Quaternion rotation)
     {
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setRotation(ToBtQuaternion(rotation));
-        
+
         // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setRotation(worldTrans.getRotation());
         body_->setInterpolationWorldTransform(interpTrans);
         body_->updateInertiaTensor();
-        
+
         Activate();
         MarkNetworkUpdate();
     }
@@ -262,14 +262,14 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setOrigin(ToBtVector3(position));
         worldTrans.setRotation(ToBtQuaternion(rotation));
-        
+
         // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
         interpTrans.setRotation(worldTrans.getRotation());
         body_->setInterpolationWorldTransform(interpTrans);
         body_->updateInertiaTensor();
-        
+
         Activate();
         MarkNetworkUpdate();
     }
@@ -680,12 +680,12 @@ void RigidBody::GetCollidingBodies(PODVector<RigidBody*>& result) const
 void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
 {
     physicsWorld_->SetApplyingTransforms(true);
-    
+
     // Apply transform to the SmoothedTransform component instead of node transform if available
     SmoothedTransform* transform = 0;
     if (hasSmoothedTransform_)
         transform = GetComponent<SmoothedTransform>();
-    
+
     if (transform)
     {
         transform->SetTargetWorldPosition(newWorldPosition);
@@ -700,7 +700,7 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
         lastPosition_ = node_->GetWorldPosition();
         lastRotation_ = node_->GetWorldRotation();
     }
-    
+
     physicsWorld_->SetApplyingTransforms(false);
 }
 
@@ -721,14 +721,14 @@ void RigidBody::UpdateGravity()
     if (physicsWorld_ && body_)
     {
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        
+
         int flags = body_->getFlags();
         if (useGravity_ && gravityOverride_ == Vector3::ZERO)
             flags &= ~BT_DISABLE_WORLD_GRAVITY;
         else
             flags |= BT_DISABLE_WORLD_GRAVITY;
         body_->setFlags(flags);
-        
+
         if (useGravity_)
         {
             // If override vector is zero, use world's gravity
@@ -778,9 +778,9 @@ void RigidBody::ReleaseBody()
         PODVector<Constraint*> constraints = constraints_;
         for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->ReleaseConstraint();
-        
+
         RemoveBodyFromWorld();
-        
+
         delete body_;
         body_ = 0;
     }
@@ -800,11 +800,11 @@ void RigidBody::OnMarkedDirty(Node* node)
             scene->DelayedMarkedDirty(this);
             return;
         }
-        
+
         // Check if transform has changed from the last one set in ApplyWorldTransform()
         Vector3 newPosition = node_->GetWorldPosition();
         Quaternion newRotation = node_->GetWorldRotation();
-        
+
         if (!newPosition.Equals(lastPosition_))
         {
             lastPosition_ = newPosition;
@@ -827,13 +827,13 @@ void RigidBody::OnNodeSet(Node* node)
         {
             if (scene == node)
                 LOGWARNING(GetTypeName() + " should not be created to the root scene node");
-            
+
             physicsWorld_ = scene->GetComponent<PhysicsWorld>();
             if (physicsWorld_)
                 physicsWorld_->AddRigidBody(this);
             else
                 LOGERROR("No physics world component in scene, can not create rigid body");
-            
+
             AddBodyToWorld();
         }
         node->AddListener(this);
@@ -844,14 +844,14 @@ void RigidBody::AddBodyToWorld()
 {
     if (!physicsWorld_)
         return;
-    
+
     PROFILE(AddBodyToWorld);
-    
+
     if (mass_ < 0.0f)
         mass_ = 0.0f;
-    
+
     bool massUpdated = false;
-    
+
     if (body_)
         RemoveBodyFromWorld();
     else
@@ -860,7 +860,7 @@ void RigidBody::AddBodyToWorld()
         btVector3 localInertia(0.0f, 0.0f, 0.0f);
         body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
         body_->setUserPointer(this);
-        
+
         // Check for existence of the SmoothedTransform component, which should be created by now in network client mode.
         // If it exists, subscribe to its change events
         SmoothedTransform* transform = GetComponent<SmoothedTransform>();
@@ -870,7 +870,7 @@ void RigidBody::AddBodyToWorld()
             SubscribeToEvent(transform, E_TARGETPOSITION, HANDLER(RigidBody, HandleTargetPosition));
             SubscribeToEvent(transform, E_TARGETROTATION, HANDLER(RigidBody, HandleTargetRotation));
         }
-        
+
         // Check if CollisionShapes already exist in the node and add them to the compound shape.
         // Note: NotifyRigidBody() will cause mass to be updated
         PODVector<CollisionShape*> shapes;
@@ -880,7 +880,7 @@ void RigidBody::AddBodyToWorld()
             massUpdated = true;
             (*i)->NotifyRigidBody();
         }
-        
+
         // Check if this node contains Constraint components that were waiting for the rigid body to be created, and signal them
         // to create themselves now
         PODVector<Constraint*> constraints;
@@ -888,12 +888,12 @@ void RigidBody::AddBodyToWorld()
         for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
             (*i)->CreateConstraint();
     }
-    
+
     if (!massUpdated)
         UpdateMass();
-    
+
     UpdateGravity();
-    
+
     int flags = body_->getCollisionFlags();
     if (phantom_)
         flags |= btCollisionObject::CF_NO_CONTACT_RESPONSE;
@@ -904,15 +904,15 @@ void RigidBody::AddBodyToWorld()
     else
         flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
     body_->setCollisionFlags(flags);
-    
+
     if (!IsEnabledEffective())
         return;
-    
+
     btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
     world->addRigidBody(body_, collisionLayer_, collisionMask_);
     inWorld_ = true;
     readdBody_ = false;
-    
+
     if (mass_ > 0.0f)
         Activate();
     else

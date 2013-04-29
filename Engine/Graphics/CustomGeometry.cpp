@@ -39,6 +39,8 @@
 namespace Urho3D
 {
 
+extern const char* STATIC_CATEGORY;
+
 OBJECTTYPESTATIC(CustomGeometry);
 
 CustomGeometry::CustomGeometry(Context* context) :
@@ -57,7 +59,7 @@ CustomGeometry::~CustomGeometry()
 
 void CustomGeometry::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CustomGeometry>();
+    context->RegisterComponentFactory<CustomGeometry>(STATIC_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);

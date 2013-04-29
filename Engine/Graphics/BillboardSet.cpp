@@ -41,6 +41,8 @@
 namespace Urho3D
 {
 
+extern const char* EFFECT_CATEGORY;
+
 static const float INV_SQRT_TWO = 1.0f / sqrtf(2.0f);
 
 inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
@@ -80,7 +82,7 @@ BillboardSet::~BillboardSet()
 
 void BillboardSet::RegisterObject(Context* context)
 {
-    context->RegisterFactory<BillboardSet>();
+    context->RegisterComponentFactory<BillboardSet>(EFFECT_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);

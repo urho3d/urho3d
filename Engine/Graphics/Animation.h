@@ -30,6 +30,8 @@
 namespace Urho3D
 {
 
+extern const char* ANIMATION_CATEGORY;
+
 /// Skeletal animation keyframe.
 struct AnimationKeyFrame
 {

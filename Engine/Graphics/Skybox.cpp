@@ -32,6 +32,8 @@
 namespace Urho3D
 {
 
+static const char* SKY_CATEGORY = "Sky";
+
 OBJECTTYPESTATIC(Skybox);
 
 Skybox::Skybox(Context* context) :
@@ -46,8 +48,8 @@ Skybox::~Skybox()
 
 void Skybox::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Skybox>();
-    
+    context->RegisterComponentFactory<Skybox>(SKY_CATEGORY);
+
     COPY_BASE_ATTRIBUTES(Skybox, StaticModel);
 }
 
@@ -59,11 +61,11 @@ void Skybox::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResu
 void Skybox::UpdateBatches(const FrameInfo& frame)
 {
     distance_ = 0.0f;
-    
+
     // Follow only the camera rotation, not position
     Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetNode()->GetWorldRotation().Inverse(), Vector3::ONE);
     customWorldTransform_ = customView * node_->GetWorldTransform();
-    
+
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         batches_[i].worldTransform_ = &customWorldTransform_;

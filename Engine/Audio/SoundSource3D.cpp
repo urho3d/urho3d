@@ -52,9 +52,12 @@ SoundSource3D::SoundSource3D(Context* context) :
 
 void SoundSource3D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<SoundSource3D>();
-    
+    context->RegisterComponentFactory<SoundSource3D>(AUDIO_CATEGORY);
+
     COPY_BASE_ATTRIBUTES(SoundSource3D, SoundSource);
+    // Remove Attenuation and Panning as attribute as they are constantly being updated
+    REMOVE_ATTRIBUTE(SoundSource3D, "Attenuation");
+    REMOVE_ATTRIBUTE(SoundSource3D, "Panning");
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Near Distance", nearDistance_, DEFAULT_NEARDISTANCE, AM_DEFAULT);
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Far Distance", farDistance_, DEFAULT_FARDISTANCE, AM_DEFAULT);
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Rolloff Factor", rolloffFactor_, DEFAULT_ROLLOFF, AM_DEFAULT);
@@ -96,12 +99,12 @@ void SoundSource3D::CalculateAttenuation()
 {
     if (!audio_)
         return;
-    
+
     float interval = farDistance_ - nearDistance_;
     if (interval > 0.0f && node_)
     {
         SoundListener* listener = audio_->GetListener();
-        
+
         // Listener must either be sceneless or in the same scene, else attenuate sound to silence
         if (listener && listener->IsEnabledEffective() && (!listener->GetScene() || listener->GetScene() == GetScene()))
         {
@@ -110,7 +113,7 @@ void SoundSource3D::CalculateAttenuation()
             float distance = Clamp(relativePos.Length() - nearDistance_, 0.0f, interval);
             float attenuation = powf(1.0f - distance / interval, rolloffFactor_);
             float panning = relativePos.Normalized().x_;
-            
+
             attenuation_ = attenuation;
             panning_ = panning;
         }

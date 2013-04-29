@@ -68,7 +68,7 @@ TerrainPatch::~TerrainPatch()
 
 void TerrainPatch::RegisterObject(Context* context)
 {
-    context->RegisterFactory<TerrainPatch>();
+    context->RegisterComponentFactory<TerrainPatch>(TERRAIN_CATEGORY);
 }
 
 void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)

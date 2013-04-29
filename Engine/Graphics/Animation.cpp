@@ -36,6 +36,8 @@
 namespace Urho3D
 {
 
+const char* ANIMATION_CATEGORY = "Animation";
+
 inline bool CompareTriggers(AnimationTriggerPoint& lhs, AnimationTriggerPoint& rhs)
 {
     return lhs.time_ < rhs.time_;

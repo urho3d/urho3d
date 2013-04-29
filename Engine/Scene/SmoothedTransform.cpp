@@ -31,6 +31,8 @@
 namespace Urho3D
 {
 
+static const char* NETWORK_CATEGORY = "Network";
+
 OBJECTTYPESTATIC(SmoothedTransform);
 
 SmoothedTransform::SmoothedTransform(Context* context) :
@@ -48,7 +50,7 @@ SmoothedTransform::~SmoothedTransform()
 
 void SmoothedTransform::RegisterObject(Context* context)
 {
-    context->RegisterFactory<SmoothedTransform>();
+    context->RegisterComponentFactory<SmoothedTransform>(NETWORK_CATEGORY);
 }
 
 void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
@@ -57,14 +59,14 @@ void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
     {
         Vector3 position = node_->GetPosition();
         Quaternion rotation = node_->GetRotation();
-        
+
         if (smoothingMask_ & SMOOTH_POSITION)
         {
             // If position snaps, snap everything to the end
             float delta = (position - targetPosition_).LengthSquared();
             if (delta > squaredSnapThreshold)
                 constant = 1.0f;
-            
+
             if (delta < M_EPSILON || constant >= 1.0f)
             {
                 position = targetPosition_;
@@ -72,10 +74,10 @@ void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
             }
             else
                 position = position.Lerp(targetPosition_, constant);
-            
+
             node_->SetPosition(position);
         }
-        
+
         if (smoothingMask_ & SMOOTH_ROTATION)
         {
             float delta = (rotation - targetRotation_).LengthSquared();
@@ -86,11 +88,11 @@ void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
             }
             else
                 rotation = rotation.Slerp(targetRotation_, constant);
-            
+
             node_->SetRotation(rotation);
         }
     }
-    
+
     // If smoothing has completed, unsubscribe from the update event
     if (!smoothingMask_)
     {
@@ -103,14 +105,14 @@ void SmoothedTransform::SetTargetPosition(const Vector3& position)
 {
     targetPosition_ = position;
     smoothingMask_ |= SMOOTH_POSITION;
-    
+
     // Subscribe to smoothing update if not yet subscribed
     if (!subscribed_)
     {
         SubscribeToEvent(GetScene(), E_UPDATESMOOTHING, HANDLER(SmoothedTransform, HandleUpdateSmoothing));
         subscribed_ = true;
     }
-    
+
     SendEvent(E_TARGETPOSITION);
 }
 
@@ -118,13 +120,13 @@ void SmoothedTransform::SetTargetRotation(const Quaternion& rotation)
 {
     targetRotation_ = rotation;
     smoothingMask_ |= SMOOTH_ROTATION;
-    
+
     if (!subscribed_)
     {
         SubscribeToEvent(GetScene(), E_UPDATESMOOTHING, HANDLER(SmoothedTransform, HandleUpdateSmoothing));
         subscribed_ = true;
     }
-    
+
     SendEvent(E_TARGETROTATION);
 }
 
@@ -173,7 +175,7 @@ void SmoothedTransform::OnNodeSet(Node* node)
 void SmoothedTransform::HandleUpdateSmoothing(StringHash eventType, VariantMap& eventData)
 {
     using namespace UpdateSmoothing;
-    
+
     float constant = eventData[P_CONSTANT].GetFloat();
     float squaredSnapThreshold = eventData[P_SQUAREDSNAPTHRESHOLD].GetFloat();
     Update(constant, squaredSnapThreshold);

@@ -39,7 +39,7 @@ static void RegisterSerializable(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint AM_NOEDIT", (void*)&AM_NOEDIT);
     engine->RegisterGlobalProperty("const uint AM_NODEID", (void*)&AM_NODEID);
     engine->RegisterGlobalProperty("const uint AM_COMPONENTID", (void*)&AM_COMPONENTID);
-    
+
     RegisterSerializable<Serializable>(engine, "Serializable");
 }
 
@@ -56,7 +56,7 @@ static void RegisterNode(asIScriptEngine* engine)
     engine->RegisterEnum("CreateMode");
     engine->RegisterEnumValue("CreateMode", "REPLICATED", REPLICATED);
     engine->RegisterEnumValue("CreateMode", "LOCAL", LOCAL);
-    
+
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
     RegisterComponent<Component>(engine, "Component", false, false);
     RegisterNode<Node>(engine, "Node");
@@ -68,10 +68,10 @@ static void RegisterNode(asIScriptEngine* engine)
     RegisterObjectConstructor<Node>(engine, "Node");
     RegisterNamedObjectConstructor<Node>(engine, "Node");
     engine->RegisterGlobalFunction("Node@+ get_node()", asFUNCTION(GetScriptContextNode), asCALL_CDECL);
-    
+
     // Now GetNode can be registered
     engine->RegisterObjectMethod("Component", "Node@+ get_node() const", asMETHOD(Component, GetNode), asCALL_THISCALL);
-    
+
     // Register Variant GetPtr() for Node & Component
     engine->RegisterObjectMethod("Variant", "Node@+ GetNode() const", asFUNCTION(GetVariantPtr<Node>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Component@+ GetComponent() const", asFUNCTION(GetVariantPtr<Component>), asCALL_CDECL_OBJLAST);
@@ -122,20 +122,33 @@ static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
     return VectorToHandleArray<PackageFile>(ptr->GetRequiredPackageFiles(), "Array<PackageFile@>");
 }
 
-static CScriptArray* GetAvailableComponents(Scene* ptr)
+static CScriptArray* GetComponentCategories()
 {
-    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
+    Vector<String> categories = GetScriptContext()->GetComponentCategories().Keys();
+    Sort(categories.Begin(), categories.End());
+    return VectorToArray<String>(categories, "Array<String>");
+}
+
+static CScriptArray* GetComponentsByCategory(const String& category)
+{
+    const HashMap<String, Vector<ShortStringHash> >& categories = GetScriptContext()->GetComponentCategories();
     Vector<String> components;
-    
-    // Simply try to create each of the objects, and check which derive from Component.
-    // This assumes that creating any of them does not have harmful side-effects
-    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+
+    HashMap<String, Vector<ShortStringHash> >::ConstIterator i = categories.Find(category);
+    if (i != categories.End())
     {
-        SharedPtr<Object> object = i->second_->CreateObject();
-        if (dynamic_cast<Component*>(object.Get()))
-            components.Push(object->GetTypeName());
+        const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
+        const Vector<ShortStringHash>& factoryHashes = i->second_;
+        components.Reserve(factoryHashes.Size());
+
+        for (unsigned j = 0; j < factoryHashes.Size(); ++j)
+        {
+            HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator k = factories.Find(factoryHashes[j]);
+            if (k != factories.End())
+                components.Push(k->second_->GetTypeName());
+        }
     }
-    
+
     Sort(components.Begin(), components.End());
     return VectorToArray<String>(components, "Array<String>");
 }
@@ -161,7 +174,7 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
     engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
     engine->RegisterGlobalProperty("const uint LAST_LOCAL_ID", (void*)&LAST_LOCAL_ID);
-    
+
     RegisterNode<Scene>(engine, "Scene");
     RegisterObjectConstructor<Scene>(engine, "Scene");
     RegisterNamedObjectConstructor<Scene>(engine, "Scene");
@@ -201,11 +214,12 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "Array<PackageFile@>@ get_requiredPackageFiles() const", asFUNCTION(SceneGetRequiredPackageFiles), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "Scene@+ get_scene() const", asMETHOD(Node, GetScene), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Scene@+ get_scene()", asFUNCTION(GetScriptContextScene), asCALL_CDECL);
-    
+
     // Register Variant GetPtr() for Scene
     engine->RegisterObjectMethod("Variant", "Scene@+ GetScene() const", asFUNCTION(GetVariantPtr<Scene>), asCALL_CDECL_OBJLAST);
-    
-    engine->RegisterGlobalFunction("Array<String>@ GetAvailableComponents()", asFUNCTION(GetAvailableComponents), asCALL_CDECL);
+
+    engine->RegisterGlobalFunction("Array<String>@ GetComponentCategories()", asFUNCTION(GetComponentCategories), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Array<String>@ GetComponentsByCategory(const String&in)", asFUNCTION(GetComponentsByCategory), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)

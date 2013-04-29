@@ -31,7 +31,7 @@ namespace Urho3D
 class Navigable : public Component
 {
     OBJECT(Navigable);
-    
+
 public:
     /// Construct.
     Navigable(Context* context);
@@ -39,12 +39,12 @@ public:
     virtual ~Navigable();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Set whether geometry is automatically collected from child nodes. Default true.
     void SetRecursive(bool enable);
     /// Return whether geometry is automatically collected from child nodes.
     bool IsRecursive() const { return recursive_; }
-    
+
 private:
     /// Recursive flag.
     bool recursive_;

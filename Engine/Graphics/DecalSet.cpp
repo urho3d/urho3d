@@ -178,7 +178,7 @@ DecalSet::~DecalSet()
 
 void DecalSet::RegisterObject(Context* context)
 {
-    context->RegisterFactory<DecalSet>();
+    context->RegisterComponentFactory<DecalSet>(EFFECT_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);

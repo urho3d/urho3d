@@ -52,7 +52,7 @@ void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex)
     Drawable** end = reinterpret_cast<Drawable**>(item->end_);
     const RayOctreeQuery& query = *octree->rayQuery_;
     PODVector<RayQueryResult>& results = octree->rayQueryResults_[threadIndex];
-    
+
     while (start != end)
     {
         Drawable* drawable = *start;
@@ -66,7 +66,7 @@ void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
     WeakPtr<Drawable>* start = reinterpret_cast<WeakPtr<Drawable>*>(item->start_);
     WeakPtr<Drawable>* end = reinterpret_cast<WeakPtr<Drawable>*>(item->end_);
-    
+
     while (start != end)
     {
         Drawable* drawable = *start;
@@ -92,7 +92,7 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
     index_(index)
 {
     Initialize(box);
-    
+
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         children_[i] = 0;
 }
@@ -111,7 +111,7 @@ Octant::~Octant()
         drawables_.Clear();
         numDrawables_ = 0;
     }
-    
+
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         DeleteChild(i);
 }
@@ -120,26 +120,26 @@ Octant* Octant::GetOrCreateChild(unsigned index)
 {
     if (children_[index])
         return children_[index];
-    
+
     Vector3 newMin = worldBoundingBox_.min_;
     Vector3 newMax = worldBoundingBox_.max_;
     Vector3 oldCenter = worldBoundingBox_.Center();
-    
+
     if (index & 1)
         newMin.x_ = oldCenter.x_;
     else
         newMax.x_ = oldCenter.x_;
-    
+
     if (index & 2)
         newMin.y_ = oldCenter.y_;
     else
         newMax.y_ = oldCenter.y_;
-    
+
     if (index & 4)
         newMin.z_ = oldCenter.z_;
     else
         newMax.z_ = oldCenter.z_;
-    
+
     children_[index] = new Octant(BoundingBox(newMin, newMax), level_ + 1, this, root_, index);
     return children_[index];
 }
@@ -154,7 +154,7 @@ void Octant::DeleteChild(unsigned index)
 void Octant::InsertDrawable(Drawable* drawable)
 {
     const BoundingBox& box = drawable->GetWorldBoundingBox();
-    
+
     // If root octant, insert all non-occludees here, so that octant occlusion does not hide the drawable.
     // Also if drawable is outside the root octant bounds, insert to root
     bool insertHere;
@@ -162,7 +162,7 @@ void Octant::InsertDrawable(Drawable* drawable)
         insertHere = !drawable->IsOccludee() || cullingBox_.IsInside(box) != INSIDE || CheckDrawableFit(box);
     else
         insertHere = CheckDrawableFit(box);
-    
+
     if (insertHere)
     {
         Octant* oldOctant = drawable->octant_;
@@ -180,7 +180,7 @@ void Octant::InsertDrawable(Drawable* drawable)
         unsigned x = boxCenter.x_ < center_.x_ ? 0 : 1;
         unsigned y = boxCenter.y_ < center_.y_ ? 0 : 2;
         unsigned z = boxCenter.z_ < center_.z_ ? 0 : 4;
-        
+
         GetOrCreateChild(x + y + z)->InsertDrawable(drawable);
     }
 }
@@ -188,7 +188,7 @@ void Octant::InsertDrawable(Drawable* drawable)
 bool Octant::CheckDrawableFit(const BoundingBox& box) const
 {
     Vector3 boxSize = box.Size();
-    
+
     // If max split level, size always OK, otherwise check that box is at least half size of octant
     if (level_ >= root_->GetNumLevels() || boxSize.x_ >= halfSize_.x_ || boxSize.y_ >= halfSize_.y_ ||
         boxSize.z_ >= halfSize_.z_)
@@ -204,7 +204,7 @@ bool Octant::CheckDrawableFit(const BoundingBox& box) const
             box.max_.z_ >= worldBoundingBox_.max_.z_ + 0.5f * halfSize_.z_)
             return true;
     }
-    
+
     // Bounding box too small, should create a child octant
     return false;
 }
@@ -212,7 +212,7 @@ bool Octant::CheckDrawableFit(const BoundingBox& box) const
 void Octant::ResetRoot()
 {
     root_ = 0;
-    
+
     // The whole octree is being destroyed, just detach the drawables
     for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         (*i)->SetOctant(0);
@@ -229,7 +229,7 @@ void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     if (debug && debug->IsInside(worldBoundingBox_))
     {
         debug->AddBoundingBox(worldBoundingBox_, Color(0.25f, 0.25f, 0.25f), depthTest);
-        
+
         for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         {
             if (children_[i])
@@ -259,14 +259,14 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
             return;
         }
     }
-    
+
     if (drawables_.Size())
     {
         Drawable** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
         query.TestDrawables(start, end, inside);
     }
-    
+
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
     {
         if (children_[i])
@@ -279,21 +279,21 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     float octantDist = query.ray_.HitDistance(cullingBox_);
     if (octantDist >= query.maxDistance_)
         return;
-    
+
     if (drawables_.Size())
     {
         Drawable** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
-       
+
         while (start != end)
         {
             Drawable* drawable = *start++;
-            
+
             if ((drawable->GetDrawableFlags() & query.drawableFlags_) && (drawable->GetViewMask() & query.viewMask_))
                 drawable->ProcessRayQuery(query, query.result_);
         }
     }
-    
+
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
     {
         if (children_[i])
@@ -306,21 +306,21 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
     float octantDist = query.ray_.HitDistance(cullingBox_);
     if (octantDist >= query.maxDistance_)
         return;
-    
+
     if (drawables_.Size())
     {
         Drawable** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
-        
+
         while (start != end)
         {
             Drawable* drawable = *start++;
-            
+
             if ((drawable->GetDrawableFlags() & query.drawableFlags_) && (drawable->GetViewMask() & query.viewMask_))
                 drawables.Push(drawable);
         }
     }
-    
+
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
     {
         if (children_[i])
@@ -348,11 +348,11 @@ Octree::~Octree()
 
 void Octree::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Octree>();
-    
+    context->RegisterComponentFactory<Octree>(SCENE_CATEGORY);
+
     Vector3 defaultBoundsMin = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     Vector3 defaultBoundsMax = Vector3::ONE * DEFAULT_OCTREE_SIZE;
-    
+
     ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Min", worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
     ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Max", worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);
     ATTRIBUTE(Octree, VAR_INT, "Number of Levels", numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
@@ -370,7 +370,7 @@ void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     if (debug)
     {
         PROFILE(OctreeDrawDebug);
-        
+
         Octant::DrawDebugGeometry(debug, depthTest);
     }
 }
@@ -378,11 +378,11 @@ void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 void Octree::Resize(const BoundingBox& box, unsigned numLevels)
 {
     PROFILE(ResizeOctree);
-    
+
     // If drawables exist, they are temporarily moved to the root
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         DeleteChild(i);
-    
+
     Initialize(box);
     numDrawables_ = drawables_.Size();
     numLevels_ = Max((int)numLevels, 1);
@@ -391,19 +391,19 @@ void Octree::Resize(const BoundingBox& box, unsigned numLevels)
 void Octree::Update(const FrameInfo& frame)
 {
     UpdateDrawables(frame);
-    
+
     // Notify drawable update being finished. Custom animation (eg. IK) can be done at this point
     Scene* scene = GetScene();
     if (scene)
     {
         using namespace SceneDrawableUpdateFinished;
-        
+
         VariantMap eventData;
         eventData[P_SCENE] = (void*)scene;
         eventData[P_TIMESTEP] = frame.timeStep_;
         scene->SendEvent(E_SCENEDRAWABLEUPDATEFINISHED, eventData);
     }
-    
+
     ReinsertDrawables(frame);
 }
 
@@ -411,7 +411,7 @@ void Octree::AddManualDrawable(Drawable* drawable)
 {
     if (!drawable || drawable->GetOctant())
         return;
-    
+
     AddDrawable(drawable);
 }
 
@@ -419,7 +419,7 @@ void Octree::RemoveManualDrawable(Drawable* drawable)
 {
     if (!drawable)
         return;
-    
+
     Octant* octant = drawable->GetOctant();
     if (octant && octant->GetRoot() == this)
         octant->RemoveDrawable(drawable);
@@ -434,11 +434,11 @@ void Octree::GetDrawables(OctreeQuery& query) const
 void Octree::Raycast(RayOctreeQuery& query) const
 {
     PROFILE(Raycast);
-    
+
     query.result_.Clear();
-    
+
     WorkQueue* queue = GetSubsystem<WorkQueue>();
-    
+
     // If no worker threads or no triangle-level testing, do not create work items
     if (!queue->GetNumThreads() || query.level_ < RAY_TRIANGLE)
         GetDrawablesInternal(query);
@@ -448,31 +448,31 @@ void Octree::Raycast(RayOctreeQuery& query) const
         rayQuery_ = &query;
         rayQueryDrawables_.Clear();
         GetDrawablesOnlyInternal(query, rayQueryDrawables_);
-        
+
         // Check that amount of drawables is large enough to justify threading
         if (rayQueryDrawables_.Size() > RAYCASTS_PER_WORK_ITEM)
         {
             for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
                 rayQueryResults_[i].Clear();
-            
+
             WorkItem item;
             item.workFunction_ = RaycastDrawablesWork;
             item.aux_ = const_cast<Octree*>(this);
-            
+
             PODVector<Drawable*>::Iterator start = rayQueryDrawables_.Begin();
             while (start != rayQueryDrawables_.End())
             {
                 PODVector<Drawable*>::Iterator end = rayQueryDrawables_.End();
                 if (end - start > RAYCASTS_PER_WORK_ITEM)
                     end = start + RAYCASTS_PER_WORK_ITEM;
-                
+
                 item.start_ = &(*start);
                 item.end_ = &(*end);
                 queue->AddWorkItem(item);
-                
+
                 start = end;
             }
-            
+
             // Merge per-thread results
             queue->Complete(M_MAX_UNSIGNED);
             for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
@@ -484,27 +484,27 @@ void Octree::Raycast(RayOctreeQuery& query) const
                 (*i)->ProcessRayQuery(query, query.result_);
         }
     }
-    
+
     Sort(query.result_.Begin(), query.result_.End(), CompareRayQueryResults);
 }
 
 void Octree::RaycastSingle(RayOctreeQuery& query) const
 {
     PROFILE(Raycast);
-    
+
     query.result_.Clear();
     rayQueryDrawables_.Clear();
     GetDrawablesOnlyInternal(query, rayQueryDrawables_);
-    
+
     // Sort by increasing hit distance to AABB
     for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         drawable->SetSortValue(query.ray_.HitDistance(drawable->GetWorldBoundingBox()));
     }
-    
+
     Sort(rayQueryDrawables_.Begin(), rayQueryDrawables_.End(), CompareDrawables);
-    
+
     // Then do the actual test according to the query, and early-out as possible
     float closestHit = M_INFINITY;
     for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
@@ -520,7 +520,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
         else
             break;
     }
-    
+
     if (query.result_.Size() > 1)
     {
         Sort(query.result_.Begin(), query.result_.End(), CompareRayQueryResults);
@@ -544,7 +544,7 @@ void Octree::QueueReinsertion(Drawable* drawable)
     }
     else
         drawableReinsertions_.Push(WeakPtr<Drawable>(drawable));
-    
+
     drawable->reinsertionQueued_ = true;
 }
 
@@ -559,31 +559,31 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     // Let drawables update themselves before reinsertion. This can be used for animation
     if (drawableUpdates_.Empty())
         return;
-    
+
     PROFILE(UpdateDrawables);
-    
+
     Scene* scene = GetScene();
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     scene->BeginThreadedUpdate();
-    
+
     WorkItem item;
     item.workFunction_ = UpdateDrawablesWork;
     item.aux_ = const_cast<FrameInfo*>(&frame);
-    
+
     Vector<WeakPtr<Drawable> >::Iterator start = drawableUpdates_.Begin();
     while (start != drawableUpdates_.End())
     {
         Vector<WeakPtr<Drawable> >::Iterator end = drawableUpdates_.End();
         if (end - start > DRAWABLES_PER_WORK_ITEM)
             end = start + DRAWABLES_PER_WORK_ITEM;
-        
+
         item.start_ = &(*start);
         item.end_ = &(*end);
         queue->AddWorkItem(item);
-        
+
         start = end;
     }
-    
+
     queue->Complete(M_MAX_UNSIGNED);
     scene->EndThreadedUpdate();
     drawableUpdates_.Clear();
@@ -595,28 +595,28 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
     // the proper octant yet
     if (drawableReinsertions_.Empty())
         return;
-    
+
     PROFILE(ReinsertToOctree);
-    
+
     for (Vector<WeakPtr<Drawable> >::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
     {
         Drawable* drawable = *i;
         if (!drawable)
             continue;
-        
+
         drawable->reinsertionQueued_ = false;
         Octant* octant = drawable->GetOctant();
         const BoundingBox& box = drawable->GetWorldBoundingBox();
-        
+
         // Skip if no octant or does not belong to this octree anymore
         if (!octant || octant->GetRoot() != this)
             continue;
         // Skip if still fits the current octant
         if (drawable->IsOccludee() && octant->GetCullingBox().IsInside(box) == INSIDE && octant->CheckDrawableFit(box))
             continue;
-        
+
         InsertDrawable(drawable);
-        
+
         #ifdef _DEBUG
         // Verify that the drawable will be culled correctly
         octant = drawable->GetOctant();
@@ -625,7 +625,7 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
                 octant->GetCullingBox().ToString());
         #endif
     }
-    
+
     drawableReinsertions_.Clear();
 }
 
