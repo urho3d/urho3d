@@ -107,8 +107,8 @@ successfully:
 - For Linux, the following development packages need to be installed:
   libx11-dev, libxrandr-dev, libasound2-dev. Also install the package
   libgl1-mesa-dev if your GPU driver does not include OpenGL headers & libs.
-  Because Urho3D is built as 32-bit, 64-bit systems require installing also
-  32-bit versions of the development libraries.
+  Building as 32-bit on a 64-bit system requires installing also the 32-bit
+  versions of the development libraries.
 
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.
@@ -161,9 +161,7 @@ plugin to build C/C++ project.
 For GCC, execute make (by default, cmake_gcc.sh specifies to make a
 RelWithDebInfo build).
 
-For Xcode on Mac OS X, open Urho3D.xcodeproj and select the i386 architecture
-before building (CMake should already select this when generating the Xcode
-project). Compiling Urho3D as 64-bit is not supported.
+For Xcode on Mac OS X, open Urho3D.xcodeproj and build.
 
 After the build is complete, the programs can be run from the Bin directory.
 

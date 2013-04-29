@@ -80,15 +80,42 @@ int cpuid_exists_by_eflags(void)
  * are implemented in separate .asm files. Otherwise, use inline assembly
  */
 #ifdef INLINE_ASM_SUPPORTED
-// Modified by Lasse Oorni for Urho3D: fixed crash on Linux / recent GCC
 void exec_cpuid(uint32_t *regs)
 {
 #ifdef COMPILER_GCC
+#	ifdef PLATFORM_X64
 	__asm __volatile(
+		"	mov	%0,	%%rdi\n"
+
+		"	push	%%rbx\n"
+		"	push	%%rcx\n"
+		"	push	%%rdx\n"
+		
+		"	mov	(%%rdi),	%%eax\n"
+		"	mov	4(%%rdi),	%%ebx\n"
+		"	mov	8(%%rdi),	%%ecx\n"
+		"	mov	12(%%rdi),	%%edx\n"
+		
+		"	cpuid\n"
+		
+		"	movl	%%eax,	(%%rdi)\n"
+		"	movl	%%ebx,	4(%%rdi)\n"
+		"	movl	%%ecx,	8(%%rdi)\n"
+		"	movl	%%edx,	12(%%rdi)\n"
+		"	pop	%%rdx\n"
+		"	pop	%%rcx\n"
+		"	pop	%%rbx\n"
+		:
+		:"m"(regs)
+		:"memory", "eax", "rdi"
+	);
+#	else
+	__asm __volatile(
+		"	mov	%0,	%%edi\n"
+
 		"	push	%%ebx\n"
 		"	push	%%ecx\n"
 		"	push	%%edx\n"
-		"	push	%%edi\n"
 		
 		"	mov	(%%edi),	%%eax\n"
 		"	mov	4(%%edi),	%%ebx\n"
@@ -101,14 +128,14 @@ void exec_cpuid(uint32_t *regs)
 		"	mov	%%ebx,	4(%%edi)\n"
 		"	mov	%%ecx,	8(%%edi)\n"
 		"	mov	%%edx,	12(%%edi)\n"
-		"	pop	%%edi\n"
 		"	pop	%%edx\n"
 		"	pop	%%ecx\n"
 		"	pop	%%ebx\n"
 		:
-		:"D"(regs)
-		:"eax"
+		:"m"(regs)
+		:"memory", "eax", "edi"
 	);
+#	endif /* COMPILER_GCC */
 #else
 #  ifdef COMPILER_MICROSOFT
 	__asm {
