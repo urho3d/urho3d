@@ -63,7 +63,7 @@ Text3D::~Text3D()
 
 void Text3D::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Text3D>(EFFECT_CATEGORY);
+    context->RegisterFactory<Text3D>(EFFECT_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);

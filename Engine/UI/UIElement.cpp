@@ -79,6 +79,8 @@ static const char* layoutModes[] =
     0
 };
 
+extern const char* UI_CATEGORY;
+
 static bool CompareUIElements(const UIElement* lhs, const UIElement* rhs)
 {
     return lhs->GetPriority() < rhs->GetPriority();
@@ -163,7 +165,7 @@ UIElement::~UIElement()
 
 void UIElement::RegisterObject(Context* context)
 {
-    context->RegisterFactory<UIElement>();
+    context->RegisterFactory<UIElement>(UI_CATEGORY);
 
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(UIElement, VAR_INTVECTOR2, "Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);

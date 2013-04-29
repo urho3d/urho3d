@@ -50,7 +50,7 @@ SmoothedTransform::~SmoothedTransform()
 
 void SmoothedTransform::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<SmoothedTransform>(NETWORK_CATEGORY);
+    context->RegisterFactory<SmoothedTransform>(NETWORK_CATEGORY);
 }
 
 void SmoothedTransform::Update(float constant, float squaredSnapThreshold)

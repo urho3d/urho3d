@@ -343,6 +343,18 @@ bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
         return FindSpecificEventHandler(sender, eventType) != 0;
 }
 
+const String& Object::GetCategory() const
+{
+    const HashMap<String, Vector<ShortStringHash> >& objectCategories = context_->GetObjectCategories();
+    for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = objectCategories.Begin(); i != objectCategories.End(); ++i)
+    {
+        if (i->second_.Contains(GetType()))
+            return i->first_;
+    }
+
+    return String::EMPTY;
+}
+
 EventHandler* Object::FindEventHandler(StringHash eventType, EventHandler** previous) const
 {
     EventHandler* handler = eventHandlers_.First();

@@ -34,8 +34,10 @@
 namespace Urho3D
 {
 
-extern ShortStringHash VAR_ORIGIN;
 const ShortStringHash VAR_SHOW_POPUP("ShowPopup");
+extern ShortStringHash VAR_ORIGIN;
+
+extern const char* UI_CATEGORY;
 
 OBJECTTYPESTATIC(Menu);
 
@@ -61,7 +63,7 @@ Menu::~Menu()
 
 void Menu::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Menu>();
+    context->RegisterFactory<Menu>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Menu, Button);
     REF_ACCESSOR_ATTRIBUTE(Menu, VAR_INTVECTOR2, "Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);

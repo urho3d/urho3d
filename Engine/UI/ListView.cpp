@@ -50,6 +50,8 @@ template<> HighlightMode Variant::Get<HighlightMode>() const
 
 static const ShortStringHash expandedHash("Expanded");
 
+extern const char* UI_CATEGORY;
+
 bool GetItemExpanded(UIElement* item)
 {
     return item ? item->GetVar(expandedHash).GetBool() : false;
@@ -183,7 +185,7 @@ ListView::~ListView()
 
 void ListView::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ListView>();
+    context->RegisterFactory<ListView>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(HierarchyContainer, UIElement);
     COPY_BASE_ATTRIBUTES(ListView, ScrollView);

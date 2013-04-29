@@ -136,7 +136,7 @@ SoundSource::~SoundSource()
 
 void SoundSource::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<SoundSource>(AUDIO_CATEGORY);
+    context->RegisterFactory<SoundSource>(AUDIO_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(SoundSource, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ATTRIBUTE(SoundSource, "Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);

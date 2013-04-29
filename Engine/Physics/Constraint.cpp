@@ -82,7 +82,7 @@ Constraint::~Constraint()
 
 void Constraint::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Constraint>(PHYSICS_CATEGORY);
+    context->RegisterFactory<Constraint>(PHYSICS_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(Constraint, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);

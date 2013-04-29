@@ -47,6 +47,8 @@ static const char* shapeNames[] =
     0
 };
 
+extern const char* UI_CATEGORY;
+
 OBJECTTYPESTATIC(Cursor);
 
 Cursor::Cursor(Context* context) :
@@ -80,7 +82,7 @@ Cursor::~Cursor()
 
 void Cursor::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Cursor>();
+    context->RegisterFactory<Cursor>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Cursor, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Cursor, "Priority", M_MAX_INT);

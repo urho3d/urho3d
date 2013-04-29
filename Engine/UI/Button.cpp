@@ -31,6 +31,8 @@
 namespace Urho3D
 {
 
+extern const char* UI_CATEGORY;
+
 OBJECTTYPESTATIC(Button);
 
 Button::Button(Context* context) :
@@ -51,7 +53,7 @@ Button::~Button()
 
 void Button::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Button>();
+    context->RegisterFactory<Button>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Button, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Button, "Is Enabled", true);

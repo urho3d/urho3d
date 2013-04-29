@@ -32,6 +32,7 @@ namespace Urho3D
 {
 
 extern const char* blendModeNames[];
+extern const char* UI_CATEGORY;
 
 template<> BlendMode Variant::Get<BlendMode>() const
 {
@@ -56,7 +57,7 @@ BorderImage::~BorderImage()
 
 void BorderImage::RegisterObject(Context* context)
 {
-    context->RegisterFactory<BorderImage>();
+    context->RegisterFactory<BorderImage>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(BorderImage, UIElement);
     ACCESSOR_ATTRIBUTE(BorderImage, VAR_RESOURCEREF, "Texture", GetTextureAttr, SetTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_FILE);

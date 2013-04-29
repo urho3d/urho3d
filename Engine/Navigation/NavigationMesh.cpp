@@ -182,7 +182,7 @@ NavigationMesh::~NavigationMesh()
 
 void NavigationMesh::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<NavigationMesh>(NAVIGATION_CATEGORY);
+    context->RegisterFactory<NavigationMesh>(NAVIGATION_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_INT, "Tile Size", GetTileSize, SetTileSize, int, DEFAULT_TILE_SIZE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(NavigationMesh, VAR_FLOAT, "Cell Size", GetCellSize, SetCellSize, float, DEFAULT_CELL_SIZE, AM_DEFAULT);

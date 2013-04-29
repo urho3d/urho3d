@@ -82,14 +82,14 @@ void Context::RegisterFactory(ObjectFactory* factory)
     factories_[factory->GetType()] = factory;
 }
 
-void Context::RegisterComponentFactory(ObjectFactory* factory, const char* category)
+void Context::RegisterFactory(ObjectFactory* factory, const char* category)
 {
     if (!factory)
         return;
 
     RegisterFactory(factory);
     if (String::CStringLength(category))
-        componentCategories_[category].Push(factory->GetType());
+        objectCategories_[category].Push(factory->GetType());
 }
 
 void Context::RegisterSubsystem(Object* object)

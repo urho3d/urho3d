@@ -298,6 +298,7 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectBehaviour(className, asBEHAVE_RELEASE, "void f()", asMETHODPR(T, ReleaseRef, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "ShortStringHash get_type() const", asMETHODPR(T, GetType, () const, ShortStringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_refs() const", asMETHODPR(T, Refs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_weakRefs() const", asMETHODPR(T, WeakRefs, () const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(ObjectSendEvent<T>), asCALL_CDECL_OBJLAST);
@@ -399,7 +400,6 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHODPR(T, IsEnabled, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_enabledEffective() const", asMETHODPR(T, IsEnabledEffective, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHODPR(T, GetID, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     if (nodeRegistered)
         engine->RegisterObjectMethod(className, "Node@+ get_node() const", asMETHODPR(T, GetNode, () const, Node*), asCALL_THISCALL);
     if (debugRendererRegistered)

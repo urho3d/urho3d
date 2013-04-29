@@ -33,6 +33,8 @@
 namespace Urho3D
 {
 
+extern const char* UI_CATEGORY;
+
 OBJECTTYPESTATIC(DropDownList);
 
 DropDownList::DropDownList(Context* context) :
@@ -65,7 +67,7 @@ DropDownList::~DropDownList()
 
 void DropDownList::RegisterObject(Context* context)
 {
-    context->RegisterFactory<DropDownList>();
+    context->RegisterFactory<DropDownList>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(DropDownList, Menu);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_INT, "Selection", GetSelection, SetSelectionAttr, unsigned, 0, AM_FILE);

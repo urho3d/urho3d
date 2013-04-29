@@ -273,7 +273,7 @@ CollisionShape::~CollisionShape()
 
 void CollisionShape::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<CollisionShape>(PHYSICS_CATEGORY);
+    context->RegisterFactory<CollisionShape>(PHYSICS_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_BOX, AM_DEFAULT);

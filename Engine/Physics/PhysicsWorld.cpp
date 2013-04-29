@@ -155,7 +155,7 @@ PhysicsWorld::~PhysicsWorld()
 
 void PhysicsWorld::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<PhysicsWorld>(SUBSYSTEM_CATEGORY);
+    context->RegisterFactory<PhysicsWorld>(SUBSYSTEM_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);

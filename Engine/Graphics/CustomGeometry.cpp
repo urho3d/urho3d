@@ -59,7 +59,7 @@ CustomGeometry::~CustomGeometry()
 
 void CustomGeometry::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<CustomGeometry>(STATIC_CATEGORY);
+    context->RegisterFactory<CustomGeometry>(STATIC_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);

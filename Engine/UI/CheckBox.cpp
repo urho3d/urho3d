@@ -31,6 +31,8 @@
 namespace Urho3D
 {
 
+extern const char* UI_CATEGORY;
+
 OBJECTTYPESTATIC(CheckBox);
 
 CheckBox::CheckBox(Context* context) :
@@ -47,7 +49,7 @@ CheckBox::~CheckBox()
 
 void CheckBox::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CheckBox>();
+    context->RegisterFactory<CheckBox>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(CheckBox, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(CheckBox, "Is Enabled", true);

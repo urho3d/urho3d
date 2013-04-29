@@ -36,6 +36,7 @@ static const float DEFAULT_REPEAT_DELAY = 0.4f;
 static const float DEFAULT_REPEAT_RATE = 20.0f;
 
 extern const char* orientations[];
+extern const char* UI_CATEGORY;
 
 OBJECTTYPESTATIC(ScrollBar);
 
@@ -75,7 +76,7 @@ ScrollBar::~ScrollBar()
 
 void ScrollBar::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ScrollBar>();
+    context->RegisterFactory<ScrollBar>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(ScrollBar, UIElement);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollBar, "Is Enabled", true);

@@ -34,6 +34,7 @@ namespace Urho3D
 extern const char* blendModeNames[];
 extern const char* horizontalAlignments[];
 extern const char* verticalAlignments[];
+extern const char* UI_CATEGORY;
 
 OBJECTTYPESTATIC(Sprite);
 
@@ -54,7 +55,7 @@ Sprite::~Sprite()
 
 void Sprite::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Sprite>();
+    context->RegisterFactory<Sprite>(UI_CATEGORY);
     
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_STRING, "Name", GetName, SetName, String, String::EMPTY, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Sprite, VAR_VECTOR2, "Position", GetPosition, SetPosition, Vector2, Vector2::ZERO, AM_FILE);

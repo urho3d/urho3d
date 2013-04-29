@@ -48,7 +48,7 @@ Skybox::~Skybox()
 
 void Skybox::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Skybox>(ENVIRONMENT_CATEGORY);
+    context->RegisterFactory<Skybox>(ENVIRONMENT_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Skybox, StaticModel);
 }

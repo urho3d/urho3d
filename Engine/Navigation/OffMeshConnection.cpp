@@ -52,7 +52,7 @@ OffMeshConnection::~OffMeshConnection()
 
 void OffMeshConnection::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<OffMeshConnection>(NAVIGATION_CATEGORY);
+    context->RegisterFactory<OffMeshConnection>(NAVIGATION_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(OffMeshConnection, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(OffMeshConnection, VAR_INT, "Endpoint NodeID", endPointID_, 0, AM_DEFAULT | AM_NODEID);

@@ -197,18 +197,6 @@ void Component::MarkNetworkUpdate()
     }
 }
 
-const String& Component::GetCategory() const
-{
-    const HashMap<String, Vector<ShortStringHash> >& componentCategories = context_->GetComponentCategories();
-    for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = componentCategories.Begin(); i != componentCategories.End(); ++i)
-    {
-        if (i->second_.Contains(GetType()))
-            return i->first_;
-    }
-
-    return String::EMPTY;
-}
-
 void Component::SetID(unsigned id)
 {
     id_ = id;

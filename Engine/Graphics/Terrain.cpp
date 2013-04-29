@@ -91,7 +91,7 @@ Terrain::~Terrain()
 
 void Terrain::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Terrain>(ENVIRONMENT_CATEGORY);
+    context->RegisterFactory<Terrain>(ENVIRONMENT_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()), AM_DEFAULT);

@@ -122,16 +122,16 @@ static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
     return VectorToHandleArray<PackageFile>(ptr->GetRequiredPackageFiles(), "Array<PackageFile@>");
 }
 
-static CScriptArray* GetComponentCategories()
+static CScriptArray* GetObjectCategories()
 {
-    Vector<String> categories = GetScriptContext()->GetComponentCategories().Keys();
+    Vector<String> categories = GetScriptContext()->GetObjectCategories().Keys();
     Sort(categories.Begin(), categories.End());
     return VectorToArray<String>(categories, "Array<String>");
 }
 
-static CScriptArray* GetComponentsByCategory(const String& category)
+static CScriptArray* GetObjectsByCategory(const String& category)
 {
-    const HashMap<String, Vector<ShortStringHash> >& categories = GetScriptContext()->GetComponentCategories();
+    const HashMap<String, Vector<ShortStringHash> >& categories = GetScriptContext()->GetObjectCategories();
     Vector<String> components;
 
     HashMap<String, Vector<ShortStringHash> >::ConstIterator i = categories.Find(category);
@@ -218,8 +218,8 @@ static void RegisterScene(asIScriptEngine* engine)
     // Register Variant GetPtr() for Scene
     engine->RegisterObjectMethod("Variant", "Scene@+ GetScene() const", asFUNCTION(GetVariantPtr<Scene>), asCALL_CDECL_OBJLAST);
 
-    engine->RegisterGlobalFunction("Array<String>@ GetComponentCategories()", asFUNCTION(GetComponentCategories), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Array<String>@ GetComponentsByCategory(const String&in)", asFUNCTION(GetComponentsByCategory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)

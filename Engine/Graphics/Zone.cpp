@@ -64,7 +64,7 @@ Zone::~Zone()
 
 void Zone::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Zone>(SCENE_CATEGORY);
+    context->RegisterFactory<Zone>(SCENE_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(Zone, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);

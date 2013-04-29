@@ -81,7 +81,7 @@ ParticleEmitter::~ParticleEmitter()
 
 void ParticleEmitter::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<ParticleEmitter>(EFFECT_CATEGORY);
+    context->RegisterFactory<ParticleEmitter>(EFFECT_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", GetParameterSourceAttr, SetParameterSourceAttr, ResourceRef, ResourceRef(XMLFile::GetTypeStatic()), AM_DEFAULT);

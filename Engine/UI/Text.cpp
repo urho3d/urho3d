@@ -38,6 +38,7 @@ namespace Urho3D
 static const float MIN_ROW_SPACING = 0.5f;
 
 extern const char* horizontalAlignments[];
+extern const char* UI_CATEGORY;
 
 struct GlyphLocation
 {
@@ -77,7 +78,7 @@ Text::~Text()
 
 void Text::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Text>();
+    context->RegisterFactory<Text>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Text, UIElement);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Text, "Use Derived Opacity", false);

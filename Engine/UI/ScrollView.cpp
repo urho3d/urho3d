@@ -35,6 +35,8 @@ namespace Urho3D
 
 static const float STEP_FACTOR = 300.0f;
 
+extern const char* UI_CATEGORY;
+
 OBJECTTYPESTATIC(ScrollView);
 
 ScrollView::ScrollView(Context* context) :
@@ -76,7 +78,7 @@ ScrollView::~ScrollView()
 
 void ScrollView::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ScrollView>();
+    context->RegisterFactory<ScrollView>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(ScrollView, UIElement);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(ScrollView, "Clip Children", true);

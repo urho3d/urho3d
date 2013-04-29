@@ -95,7 +95,7 @@ RigidBody::~RigidBody()
 
 void RigidBody::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<RigidBody>(PHYSICS_CATEGORY);
+    context->RegisterFactory<RigidBody>(PHYSICS_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);

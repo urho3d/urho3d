@@ -54,7 +54,7 @@ SoundSource3D::SoundSource3D(Context* context) :
 
 void SoundSource3D::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<SoundSource3D>(AUDIO_CATEGORY);
+    context->RegisterFactory<SoundSource3D>(AUDIO_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(SoundSource3D, SoundSource);
     // Remove Attenuation and Panning as attribute as they are constantly being updated

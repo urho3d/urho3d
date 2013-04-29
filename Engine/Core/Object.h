@@ -83,6 +83,8 @@ public:
     bool HasSubscribedToEvent(Object* sender, StringHash eventType) const;
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
+    /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
+    const String& GetCategory() const;
     
 protected:
     /// Execution context.

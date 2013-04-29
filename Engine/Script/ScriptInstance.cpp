@@ -81,7 +81,7 @@ ScriptInstance::~ScriptInstance()
 
 void ScriptInstance::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<ScriptInstance>(SCRIPT_CATEGORY);
+    context->RegisterFactory<ScriptInstance>(SCRIPT_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);

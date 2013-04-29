@@ -350,7 +350,7 @@ Octree::~Octree()
 
 void Octree::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Octree>(SUBSYSTEM_CATEGORY);
+    context->RegisterFactory<Octree>(SUBSYSTEM_CATEGORY);
 
     Vector3 defaultBoundsMin = -Vector3::ONE * DEFAULT_OCTREE_SIZE;
     Vector3 defaultBoundsMax = Vector3::ONE * DEFAULT_OCTREE_SIZE;

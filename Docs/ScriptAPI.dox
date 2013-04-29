@@ -66,8 +66,8 @@ namespace Urho3D
 - String RemoveTrailingSlash(const String&)
 - String GetParentPath(const String&)
 - String GetInternalPath(const String&)
-- String[]@ GetComponentCategories()
-- String[]@ GetComponentsByCategory(const String&)
+- String[]@ GetObjectCategories()
+- String[]@ GetObjectsByCategory(const String&)
 - uint GetAlphaFormat()
 - uint GetLuminanceFormat()
 - uint GetLuminanceAlphaFormat()
@@ -807,6 +807,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 
@@ -837,6 +838,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint frameNumber (readonly)
@@ -859,6 +861,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - int level
@@ -1004,6 +1007,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - FileMode mode (readonly)
@@ -1105,6 +1109,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String currentDir
@@ -1122,6 +1127,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name (readonly)
@@ -1140,6 +1146,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -1174,6 +1181,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint[] memoryBudget
@@ -1199,6 +1207,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -1222,6 +1231,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -1338,6 +1348,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -1367,6 +1378,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -1376,7 +1388,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 
 
@@ -1443,6 +1454,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -1496,6 +1508,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -1505,7 +1518,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - Vector3 targetPosition
 - Quaternion targetRotation
@@ -1589,6 +1601,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -1682,6 +1695,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -1691,7 +1705,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 
 
@@ -1723,6 +1736,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -1732,7 +1746,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - float nearClip
 - float farClip
@@ -1838,6 +1851,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -1868,6 +1882,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - Scene@ scene
@@ -1907,6 +1922,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -1943,6 +1959,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -1999,6 +2016,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -2023,6 +2041,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -2048,6 +2067,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -2080,6 +2100,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -2113,6 +2134,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2122,7 +2144,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2181,6 +2202,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2190,7 +2212,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2246,6 +2267,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2255,7 +2277,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2304,6 +2325,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2313,7 +2335,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2358,6 +2379,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2367,7 +2389,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2441,6 +2462,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2450,7 +2472,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2528,6 +2549,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2537,7 +2559,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 
 
@@ -2574,6 +2595,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2583,7 +2605,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2630,6 +2651,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2639,7 +2661,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2694,6 +2715,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2703,7 +2725,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2749,6 +2770,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2758,7 +2780,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2803,6 +2824,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2812,7 +2834,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -2853,6 +2874,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2862,7 +2884,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - Material@ material
 - Image@ heightMap
@@ -2924,6 +2945,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -2933,7 +2955,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - uint numLevels (readonly)
@@ -2952,6 +2973,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String windowTitle
@@ -2989,6 +3011,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numViewports
@@ -3054,6 +3077,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - bool mouseVisible
@@ -3089,6 +3113,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -3124,6 +3149,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -3133,7 +3159,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 
 
@@ -3163,6 +3188,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -3172,7 +3198,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - SoundType soundType
 - float frequency
@@ -3212,6 +3237,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -3221,7 +3247,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - SoundType soundType
 - float frequency
@@ -3248,6 +3273,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - float[] masterGain
@@ -3272,6 +3298,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -3337,6 +3364,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -3461,6 +3489,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -3585,6 +3614,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -3690,6 +3720,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -3825,6 +3856,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -3958,6 +3990,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -4090,6 +4123,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -4226,6 +4260,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -4359,6 +4394,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -4508,6 +4544,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -4654,6 +4691,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -4754,6 +4792,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -4763,7 +4802,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool inView (readonly)
 - bool castShadows
@@ -4856,6 +4894,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5002,6 +5041,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5152,6 +5192,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5297,6 +5338,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5385,6 +5427,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String title
@@ -5422,6 +5465,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - Cursor@ cursor
@@ -5469,6 +5513,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5478,7 +5523,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - float basePriority
 - float distanceFactor
@@ -5499,6 +5543,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - Scene@ scene
@@ -5537,6 +5582,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - int updateFps
@@ -5576,6 +5622,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5585,7 +5632,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - ShapeType shapeType
 - Vector3 size
@@ -5628,6 +5674,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5637,7 +5684,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - float mass
 - Vector3 position
@@ -5687,6 +5733,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5696,7 +5743,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - ConstraintType constraintType
 - Vector3 position
@@ -5752,6 +5798,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5761,7 +5808,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - Vector3 gravity
 - int fps
@@ -5789,6 +5835,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5798,7 +5845,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - bool recursive
 
@@ -5831,6 +5877,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5840,7 +5887,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - int tileSize
 - float cellSize
@@ -5883,6 +5929,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5892,7 +5939,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - Node@ endPoint
 - float radius
@@ -5910,6 +5956,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name
@@ -5948,6 +5995,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numAttributes (readonly)
@@ -5957,7 +6005,6 @@ Properties:<br>
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
-- String category (readonly)
 - Node@ node (readonly)
 - int fixedUpdateFps
 - ScriptFile@ scriptFile
@@ -5975,6 +6022,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - ScriptFile@ defaultScriptFile
@@ -5991,6 +6039,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - XMLFile@ style
@@ -6017,6 +6066,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - XMLFile@ style
@@ -6044,6 +6094,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String typeName (readonly)
+- String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
 - int minFps

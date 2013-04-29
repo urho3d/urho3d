@@ -33,6 +33,8 @@
 namespace Urho3D
 {
 
+extern const char* UI_CATEGORY;
+
 OBJECTTYPESTATIC(LineEdit);
 
 LineEdit::LineEdit(Context* context) :
@@ -71,7 +73,7 @@ LineEdit::~LineEdit()
 
 void LineEdit::RegisterObject(Context* context)
 {
-    context->RegisterFactory<LineEdit>();
+    context->RegisterFactory<LineEdit>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(LineEdit, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(LineEdit, "Clip Children", true);

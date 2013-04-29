@@ -112,7 +112,7 @@ Light::~Light()
 
 void Light::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Light>(SCENE_CATEGORY);
+    context->RegisterFactory<Light>(SCENE_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(Light, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);

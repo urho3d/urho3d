@@ -192,12 +192,16 @@ void CreateMenuBar()
 
         Menu@ childMenu = CreateMenuItem("Component", null, SHOW_POPUP_INDICATOR);
         Window@ childPopup = CreatePopup(childMenu);
-        String[] componentCategories = GetComponentCategories();
-        for (uint i = 0; i < componentCategories.length; ++i)
+        String[] objectCategories = GetObjectCategories();
+        for (uint i = 0; i < objectCategories.length; ++i)
         {
-            Menu@ menu = CreateMenuItem(componentCategories[i], null, SHOW_POPUP_INDICATOR);
+            // Skip the UI category for the component menus
+            if (objectCategories[i] == "UI")
+                continue;
+
+            Menu@ menu = CreateMenuItem(objectCategories[i], null, SHOW_POPUP_INDICATOR);
             Window@ popup = CreatePopup(menu);
-            String[] componentTypes = GetComponentsByCategory(componentCategories[i]);
+            String[] componentTypes = GetObjectsByCategory(objectCategories[i]);
             for (uint j = 0; j < componentTypes.length; ++j)
                 popup.AddChild(CreateIconizedMenuItem(componentTypes[j], @PickComponent));
             childPopup.AddChild(menu);
@@ -215,9 +219,12 @@ void CreateMenuBar()
 
         childMenu = CreateMenuItem("UI-element", null, SHOW_POPUP_INDICATOR);
         childPopup = CreatePopup(childMenu);
-        String[] typeNames = { "BorderImage", "Button", "CheckBox", "DropDownList", "LineEdit", "ListView", "Menu", "ScrollBar", "ScrollView", "Slider", "Sprite", "Text", "Window" };
-        for (uint i = 0; i < typeNames.length; ++i)
-            childPopup.AddChild(CreateIconizedMenuItem(typeNames[i], @PickUIElement));
+        String[] uiElementTypes = GetObjectsByCategory("UI");
+        for (uint i = 0; i < uiElementTypes.length; ++i)
+        {
+            if (uiElementTypes[i] != "UIElement")
+                childPopup.AddChild(CreateIconizedMenuItem(uiElementTypes[i], @PickUIElement));
+        }
         childPopup.AddChild(CreateMenuDivider());
         childPopup.AddChild(CreateIconizedMenuItem("UIElement", @PickUIElement));
         popup.AddChild(childMenu);

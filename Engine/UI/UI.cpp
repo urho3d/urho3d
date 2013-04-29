@@ -63,6 +63,8 @@ const ShortStringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
 const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
 const ShortStringHash VAR_NO_AUTO_REMOVE("NoAutoRemove");
 
+const char* UI_CATEGORY = "UI";
+
 OBJECTTYPESTATIC(UI);
 
 UI::UI(Context* context) :

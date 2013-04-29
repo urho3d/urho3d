@@ -83,7 +83,7 @@ Camera::~Camera()
 
 void Camera::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<Camera>(SCENE_CATEGORY);
+    context->RegisterFactory<Camera>(SCENE_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", GetNearClip, SetNearClip, float, DEFAULT_NEARCLIP, AM_DEFAULT);

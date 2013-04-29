@@ -62,7 +62,7 @@ DebugRenderer::~DebugRenderer()
 
 void DebugRenderer::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<DebugRenderer>(SUBSYSTEM_CATEGORY);
+    context->RegisterFactory<DebugRenderer>(SUBSYSTEM_CATEGORY);
 }
 
 void DebugRenderer::SetView(Camera* camera)

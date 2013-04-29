@@ -44,8 +44,8 @@ public:
     SharedPtr<Object> CreateObject(ShortStringHash objectType);
     /// Register a factory for an object type.
     void RegisterFactory(ObjectFactory* factory);
-    /// Register a factory for a component type.
-    void RegisterComponentFactory(ObjectFactory* factory, const char* category);
+    /// Register a factory for an object type and specify the object category.
+    void RegisterFactory(ObjectFactory* factory, const char* category);
     /// Register a subsystem.
     void RegisterSubsystem(Object* subsystem);
     /// Remove a subsystem.
@@ -61,8 +61,8 @@ public:
     void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
     /// Template version of registering an object factory.
     template <class T> void RegisterFactory();
-    /// Template version of registering a component factory.
-    template <class T> void RegisterComponentFactory(const char* category);
+    /// Template version of registering an object factory with category.
+    template <class T> void RegisterFactory(const char* category);
     /// Template version of removing a subsystem.
     template <class T> void RemoveSubsystem();
     /// Template version of registering an object attribute.
@@ -80,8 +80,8 @@ public:
     const HashMap<ShortStringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
     /// Return all object factories.
     const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
-    /// Return all component categories.
-    const HashMap<String, Vector<ShortStringHash> >& GetComponentCategories() const { return componentCategories_; }
+    /// Return all object categories.
+    const HashMap<String, Vector<ShortStringHash> >& GetObjectCategories() const { return objectCategories_; }
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
     /// Return active event handler. Set by Object. Null outside event handling.
@@ -163,12 +163,12 @@ private:
     PODVector<Object*> eventSenders_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases.
     EventHandler* eventHandler_;
-    /// Component categories.
-    HashMap<String, Vector<ShortStringHash> > componentCategories_;
+    /// Object categories.
+    HashMap<String, Vector<ShortStringHash> > objectCategories_;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }
-template <class T> void Context::RegisterComponentFactory(const char* category) { RegisterComponentFactory(new ObjectFactoryImpl<T>(this), category); }
+template <class T> void Context::RegisterFactory(const char* category) { RegisterFactory(new ObjectFactoryImpl<T>(this), category); }
 template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
 template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { RegisterAttribute(T::GetTypeStatic(), attr); }
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }

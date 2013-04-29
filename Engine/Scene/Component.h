@@ -93,9 +93,6 @@ public:
     /// Mark for attribute check on the next network update.
     void MarkNetworkUpdate();
     
-    /// Return component category. Return an empty string if the component category is not registered.
-    const String& GetCategory() const;
-
 protected:
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node) {};

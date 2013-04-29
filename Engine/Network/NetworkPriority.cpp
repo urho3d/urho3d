@@ -53,7 +53,7 @@ NetworkPriority::~NetworkPriority()
 
 void NetworkPriority::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<NetworkPriority>(NETWORK_CATEGORY);
+    context->RegisterFactory<NetworkPriority>(NETWORK_CATEGORY);
     
     ATTRIBUTE(NetworkPriority, VAR_FLOAT, "Base Priority", basePriority_, DEFAULT_BASE_PRIORITY, AM_DEFAULT);
     ATTRIBUTE(NetworkPriority, VAR_FLOAT, "Distance Factor", distanceFactor_, DEFAULT_DISTANCE_FACTOR, AM_DEFAULT);

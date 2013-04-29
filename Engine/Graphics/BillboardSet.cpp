@@ -82,7 +82,7 @@ BillboardSet::~BillboardSet()
 
 void BillboardSet::RegisterObject(Context* context)
 {
-    context->RegisterComponentFactory<BillboardSet>(EFFECT_CATEGORY);
+    context->RegisterFactory<BillboardSet>(EFFECT_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);

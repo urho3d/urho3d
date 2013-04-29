@@ -44,6 +44,8 @@ template<> Orientation Variant::Get<Orientation>() const
     return (Orientation)GetInt();
 }
 
+extern const char* UI_CATEGORY;
+
 OBJECTTYPESTATIC(Slider);
 
 Slider::Slider(Context* context) :
@@ -67,7 +69,7 @@ Slider::~Slider()
 
 void Slider::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Slider>();
+    context->RegisterFactory<Slider>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Slider, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Slider, "Is Enabled", true);
