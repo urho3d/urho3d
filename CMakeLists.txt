@@ -1,3 +1,5 @@
+include (CheckIncludeFiles)
+
 # Disable unnecessary build types
 set (CMAKE_CONFIGURATION_TYPES "RelWithDebInfo;Debug;Release" CACHE STRING "Configurations" FORCE)
 
@@ -51,6 +53,18 @@ endif ()
 # If not on Windows, enable Unix mode for kNet library.
 if (NOT WIN32)
     add_definitions (-DUNIX)
+endif ()
+
+# Check existence of stdint.h for LibCpuId
+CHECK_INCLUDE_FILES (stdint.h HAVE_STDINT_H)
+if (HAVE_STDINT_H)
+    add_definitions(-DHAVE_STDINT_H)
+endif ()
+
+# Add definitions for GLEW
+if (NOT IOS AND USE_OPENGL)
+    add_definitions(-DGLEW_STATIC)
+    add_definitions(-DGLEW_NO_GLU)
 endif ()
 
 # Platform and compiler specific options
@@ -194,8 +208,6 @@ add_subdirectory (Urho3D)
 if (NOT IOS)
     if (USE_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
-        add_definitions(-DGLEW_STATIC)
-        add_definitions(-DGLEW_NO_GLU)
     endif ()
     add_subdirectory (ThirdParty/Assimp)
     add_subdirectory (ThirdParty/LibCpuId)
