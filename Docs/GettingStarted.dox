@@ -192,6 +192,7 @@ Pageup/down Add or remove 10 lights
 Right mouse Hold and move mouse to rotate view
 F1          Toggle AngelScript console
 1 to 8      Toggle rendering options
+P           Toggle renderpath (forward / prepass / deferred)
 T           Toggle profiling display
 O           Toggle orthographic camera
 V           Toggle vertex lighting

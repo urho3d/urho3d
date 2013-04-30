@@ -7,16 +7,19 @@ Node@ cameraNode;
 float yaw = 0.0;
 float pitch = 0.0;
 uint modelIndex = 0;
-uint maxLights = 100;
-uint maxObjects = 100;
-uint numLights = 0;
-uint numObjects = 1;
+uint renderPathIndex = 0;
+int maxLights = 100;
+int maxObjects = 100;
+int numLights = 0;
+int numObjects = 1;
 
 Array<String> modelNames = {"Models/Box.mdl", "Models/Mushroom.mdl", "Models/Jack.mdl"};
 Array<String> materialNames = {"Materials/Stone.xml", "Materials/Mushroom.xml", "Materials/Jack.xml"};
 Array<Vector3> modelScales = {Vector3(0.6, 0.6, 0.6), Vector3(1, 1, 1), Vector3(1, 1, 1)};
 Array<Light@> lights;
 Array<StaticModel@> objects;
+
+Array<String> renderPathNames = {"Forward", "Prepass", "Deferred"};
 
 void Start()
 {
@@ -44,9 +47,15 @@ void InitConsole()
     engine.CreateDebugHud();
     debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
+    UpdateInstructions();
 
     engine.CreateConsole();
     console.defaultStyle = uiStyle;
+}
+
+void UpdateInstructions()
+{
+    debugHud.SetAppStats("Instructions:", "\nLeft/Right Set num of objects (current: " + numObjects + ")\nUp/Down    Add/remove light (current: " + numLights + ")\nPgUp/PgDn  Add/Remove 10 lights\nZ/X        Select model\n1-8        Change render options\nR          Randomize object positions\nP          Change render path (current: " + renderPathNames[renderPathIndex] + ")\n");
 }
 
 void InitUI()
@@ -73,7 +82,7 @@ void InitScene()
     zone.fogEnd = 300.0;
     zone.boundingBox = BoundingBox(-1000.0, 1000.0);
 
-    for (uint i = 0; i < maxObjects; ++i)
+    for (int i = 0; i < maxObjects; ++i)
     {
         Node@ objectNode = testScene.CreateChild("Object");
         if (i >= 1)
@@ -84,7 +93,7 @@ void InitScene()
         objects.Push(object);
     }
 
-    for (uint i = 0; i < maxLights; ++i)
+    for (int i = 0; i < maxLights; ++i)
     {
         Node@ lightNode = testScene.CreateChild("Light");
         Light@ light = lightNode.CreateComponent("Light");
@@ -140,13 +149,13 @@ void LoadNewModel()
 
 void EnableLights()
 {
-    for (uint i = 0; i < lights.length; ++i)
+    for (int i = 0; i < int(lights.length); ++i)
         lights[i].enabled = i < numLights;
 }
 
 void EnableObjects()
 {
-    for (uint i = 0; i < objects.length; ++i)
+    for (int i = 0; i < int(objects.length); ++i)
         objects[i].enabled = i < numObjects;
 }
 
@@ -167,7 +176,7 @@ void ToggleVertexLighting()
 
 Vector3 GetRandomPosition()
 {
-    return Vector3(Random(4.0) - 2.0, Random(3.0) - 1.5, Random(4.0) - 2.0);
+    return Vector3(Random(5.0) - 2.5, Random(3.0) - 1.5, Random(5.0) - 2.5);
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -237,6 +246,14 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (input.keyPress['8'])
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
 
+        if (input.keyPress['P'])
+        {
+            renderPathIndex++;
+            renderPathIndex %= renderPathNames.length;
+            renderer.viewports[0].renderPath.Load(cache.GetResource("XMLFile", "RenderPaths/" + renderPathNames[renderPathIndex] + ".xml"));
+            UpdateInstructions();
+        }
+
         if (input.keyPress['O'])
             camera.orthographic = !camera.orthographic;
 
@@ -267,6 +284,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             if (numObjects > maxObjects)
                 numObjects = maxObjects;
             EnableObjects();
+            UpdateInstructions();
         }
 
         if (input.keyPress[KEY_LEFT])
@@ -275,6 +293,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             if (numObjects < 0)
                 numObjects = 0;
             EnableObjects();
+            UpdateInstructions();
         }
 
         if (input.keyPress[KEY_UP])
@@ -283,6 +302,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             if (numLights > maxLights)
                 numLights = maxLights;
             EnableLights();
+            UpdateInstructions();
         }
 
         if (input.keyPress[KEY_DOWN])
@@ -291,6 +311,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             if (numLights < 0)
                 numLights = 0;
             EnableLights();
+            UpdateInstructions();
         }
 
         if (input.keyPress[KEY_PAGEUP])
@@ -299,6 +320,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             if (numLights > maxLights)
                 numLights = maxLights;
             EnableLights();
+            UpdateInstructions();
         }
 
         if (input.keyPress[KEY_PAGEDOWN])
@@ -307,6 +329,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             if (numLights < 0)
                 numLights = 0;
             EnableLights();
+            UpdateInstructions();
         }
 
         if (input.keyPress['R'])
