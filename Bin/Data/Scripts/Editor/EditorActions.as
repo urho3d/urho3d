@@ -658,7 +658,7 @@ class ApplyUIElementStyleAction : EditAction
         rootElem.SetUInt("index", element.parent.FindChild(element));
         rootElem.SetUInt("listItemIndex", GetListIndex(element));
         styleFile = element.defaultStyle;
-        elementOldStyle = element.appliedStyle;
+        elementOldStyle = element.style;
         elementNewStyle = newStyle;
     }
 

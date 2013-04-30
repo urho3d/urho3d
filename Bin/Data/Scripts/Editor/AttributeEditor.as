@@ -67,9 +67,9 @@ UIElement@ CreateAttributeEditorParentWithSeparatedLabel(ListView@ list, const S
     else
     {
         Text@ attrNameText = Text();
-        attrNameText.SetStyle(uiStyle, "EditorAttributeText");
-        attrNameText.text = name;
         editorParent.AddChild(attrNameText);
+        attrNameText.style = "EditorAttributeText";
+        attrNameText.text = name;
     }
 
     return editorParent;
@@ -100,7 +100,7 @@ UIElement@ CreateAttributeEditorParent(ListView@ list, const String&in name, uin
 
     Text@ attrNameText = Text();
     editorParent.AddChild(attrNameText);
-    attrNameText.SetStyle(uiStyle, "EditorAttributeText");
+    attrNameText.style = "EditorAttributeText";
     attrNameText.text = name;
     attrNameText.SetFixedWidth(ATTRNAME_WIDTH);
 
@@ -111,7 +111,7 @@ LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Array<Serializable@>@ seria
 {
     LineEdit@ attrEdit = LineEdit();
     parent.AddChild(attrEdit);
-    attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
+    attrEdit.style = "EditorAttributeEdit";
     attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
@@ -142,7 +142,7 @@ UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ seria
 
     CheckBox@ attrEdit = CheckBox();
     parent.AddChild(attrEdit);
-    attrEdit.style = uiStyle;
+    attrEdit.style = "";    // Auto style
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
@@ -189,7 +189,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     {
         DropDownList@ attrEdit = DropDownList();
         parent.AddChild(attrEdit);
-        attrEdit.style = uiStyle;
+        attrEdit.style = "";    // Auto style
         attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
         attrEdit.resizePopup = true;
         attrEdit.placeholderText = STRIKED_OUT;
@@ -202,7 +202,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         {
             Text@ choice = Text();
             attrEdit.AddItem(choice);
-            choice.SetStyle(uiStyle, "EditorEnumAttributeText");
+            choice.style = "EditorEnumAttributeText";
             choice.text = info.enumNames[i];
         }
         SubscribeToEvent(attrEdit, "ItemSelected", "EditAttribute");
@@ -236,33 +236,33 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
     SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
 
     Button@ pickButton = Button();
-    pickButton.style = uiStyle;
+    container.AddChild(pickButton);
+    pickButton.style = "";    // Auto style
     pickButton.SetFixedSize(36, ATTR_HEIGHT - 2);
     pickButton.vars["Index"] = index;
     pickButton.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(pickButton, serializables);
 
     Text@ pickButtonText = Text();
-    pickButtonText.SetStyle(uiStyle, "EditorAttributeText");
+    pickButton.AddChild(pickButtonText);
+    pickButtonText.style = "EditorAttributeText";
     pickButtonText.SetAlignment(HA_CENTER, VA_CENTER);
     pickButtonText.text = "Pick";
-    pickButton.AddChild(pickButtonText);
-    container.AddChild(pickButton);
     SubscribeToEvent(pickButton, "Released", "PickResource");
 
     Button@ openButton = Button();
-    openButton.style = uiStyle;
+    container.AddChild(openButton);
+    openButton.style = "";    // Auto style
     openButton.SetFixedSize(36, ATTR_HEIGHT - 2);
     openButton.vars["Index"] = index;
     openButton.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(openButton, serializables);
 
     Text@ openButtonText = Text();
-    openButtonText.SetStyle(uiStyle, "EditorAttributeText");
+    openButton.AddChild(openButtonText);
+    openButtonText.style = "EditorAttributeText";
     openButtonText.SetAlignment(HA_CENTER, VA_CENTER);
     openButtonText.text = "Open";
-    openButton.AddChild(openButtonText);
-    container.AddChild(openButton);
     SubscribeToEvent(openButton, "Released", "OpenResource");
 
     return parent;

@@ -39,8 +39,8 @@ static void RegisterConsole(asIScriptEngine* engine)
     RegisterObject<Console>(engine, "Console");
     engine->RegisterObjectMethod("Console", "void Toggle()", asMETHOD(Console, Toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void UpdateElements()", asMETHOD(Console, UpdateElements), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "void set_style(XMLFile@+)", asMETHOD(Console, SetStyle), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "XMLFile@+ get_style() const", asMETHOD(Console, GetStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void set_defaultStyle(XMLFile@+)", asMETHOD(Console, SetDefaultStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "XMLFile@+ get_defaultStyle() const", asMETHOD(Console, GetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_visible(bool)", asMETHOD(Console, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "bool get_visible() const", asMETHOD(Console, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void set_numRows(uint)", asMETHOD(Console, SetNumRows), asCALL_THISCALL);
@@ -70,8 +70,8 @@ static void RegisterDebugHud(asIScriptEngine* engine)
     RegisterObject<Console>(engine, "DebugHud");
     engine->RegisterObjectMethod("DebugHud", "void Toggle(uint)", asMETHOD(DebugHud, Toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void ToggleAll()", asMETHOD(DebugHud, ToggleAll), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugHud", "void set_style(XMLFile@+)", asMETHOD(DebugHud, SetStyle), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugHud", "XMLFile@+ get_style() const", asMETHOD(DebugHud, GetStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "void set_defaultStyle(XMLFile@+)", asMETHOD(DebugHud, SetDefaultStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "XMLFile@+ get_defaultStyle() const", asMETHOD(DebugHud, GetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void set_mode(uint)", asMETHOD(DebugHud, SetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "uint get_mode() const", asMETHOD(DebugHud, GetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void set_profilerMaxDepth(uint)", asMETHOD(DebugHud, SetProfilerMaxDepth), asCALL_THISCALL);

@@ -39,15 +39,15 @@ class XMLFile;
 class Console : public Object
 {
     OBJECT(Console);
-    
+
 public:
     /// Construct.
     Console(Context* context);
     /// Destruct.
     ~Console();
-    
+
     /// Set UI elements' style from an XML file.
-    void SetStyle(XMLFile* style);
+    void SetDefaultStyle(XMLFile* style);
     /// Show or hide. Showing automatically focuses the line edit.
     void SetVisible(bool enable);
     /// Toggle visibility.
@@ -58,9 +58,9 @@ public:
     void SetNumHistoryRows(unsigned rows);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
-    
+
     /// Return the UI style file.
-    XMLFile* GetStyle() const { return style_; }
+    XMLFile* GetDefaultStyle() const;
     /// Return the background element.
     BorderImage* GetBackground() const { return background_; }
     /// Return the line edit element.
@@ -75,7 +75,7 @@ public:
     unsigned GetHistoryPosition() const { return historyPosition_; }
     /// Return history row at index.
     const String& GetHistoryRow(unsigned index) const;
-    
+
 private:
     /// Handle enter pressed on the line edit.
     void HandleTextFinished(StringHash eventType, VariantMap& eventData);
@@ -85,9 +85,7 @@ private:
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle a log message.
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
-    
-    /// UI style file.
-    SharedPtr<XMLFile> style_;
+
     /// Background.
     SharedPtr<BorderImage> background_;
     /// Container for text rows.

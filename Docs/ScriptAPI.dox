@@ -3323,12 +3323,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -3371,7 +3371,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -3408,7 +3408,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3446,12 +3445,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -3496,7 +3495,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -3533,7 +3532,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3577,12 +3575,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
@@ -3621,7 +3619,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 size
 - int width
@@ -3638,7 +3636,6 @@ Properties:<br>
 - bool useDerivedOpacity
 - bool visible
 - bool colorGradient (readonly)
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - bool elementEventSender
 - uint[] numChildren (readonly)
@@ -3674,12 +3671,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -3727,7 +3724,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -3764,7 +3761,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3812,12 +3808,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -3863,7 +3859,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -3900,7 +3896,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -3946,12 +3941,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -3997,7 +3992,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -4034,7 +4029,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4079,12 +4073,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4130,7 +4124,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -4167,7 +4161,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4216,12 +4209,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4267,7 +4260,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -4304,7 +4297,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4351,12 +4343,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4401,7 +4393,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -4438,7 +4430,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4484,12 +4475,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4551,7 +4542,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -4588,7 +4579,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4646,12 +4636,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4698,7 +4688,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -4735,7 +4725,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4851,12 +4840,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4901,7 +4890,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -4938,7 +4927,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4993,12 +4981,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5048,7 +5036,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -5085,7 +5073,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -5138,12 +5125,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5199,7 +5186,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -5236,7 +5223,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -5295,12 +5281,12 @@ Methods:<br>
 - bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(XMLFile@, const String&)
-- bool SetStyleAuto(XMLFile@)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5345,7 +5331,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
-- XMLFile@ style (writeonly)
+- String style
 - String name
 - IntVector2 position
 - IntVector2 size
@@ -5382,7 +5368,6 @@ Properties:<br>
 - FocusMode focusMode
 - uint dragDropMode
 - TraversalMode traversalMode
-- String appliedStyle (readonly)
 - XMLFile@ defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -5436,7 +5421,7 @@ Properties:<br>
 - bool directoryMode
 - String filter (readonly)
 - uint filterIndex (readonly)
-- XMLFile@ style
+- XMLFile@ defaultStyle
 - Window@ window (readonly)
 - Text@ titleText (readonly)
 - ListView@ fileList (readonly)
@@ -6042,7 +6027,7 @@ Properties:<br>
 - String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
-- XMLFile@ style
+- XMLFile@ defaultStyle
 - bool visible
 - uint numRows
 - uint numHistoryRows
@@ -6069,7 +6054,7 @@ Properties:<br>
 - String category (readonly)
 - int refs (readonly)
 - int weakRefs (readonly)
-- XMLFile@ style
+- XMLFile@ defaultStyle
 - uint mode
 - uint profilerMaxDepth
 - float profilerInterval

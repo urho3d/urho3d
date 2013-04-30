@@ -63,25 +63,25 @@ DebugHud::DebugHud(Context* context) :
 {
     UI* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
-    
+
     statsText_ = new Text(context_);
     statsText_->SetAlignment(HA_LEFT, VA_TOP);
     statsText_->SetPriority(100);
     statsText_->SetVisible(false);
     uiRoot->AddChild(statsText_);
-    
+
     modeText_ = new Text(context_);
     modeText_->SetAlignment(HA_LEFT, VA_BOTTOM);
     modeText_->SetPriority(100);
     modeText_->SetVisible(false);
     uiRoot->AddChild(modeText_);
-    
+
     profilerText_ = new Text(context_);
     profilerText_->SetAlignment(HA_RIGHT, VA_TOP);
     profilerText_->SetPriority(100);
     profilerText_->SetVisible(false);
     uiRoot->AddChild(profilerText_);
-    
+
     SubscribeToEvent(E_UPDATE, HANDLER(DebugHud, HandleUpdate));
 }
 
@@ -98,7 +98,7 @@ void DebugHud::Update()
     Renderer* renderer = GetSubsystem<Renderer>();
     if (!renderer || !graphics)
         return;
-    
+
     if (statsText_->IsVisible())
     {
         unsigned primitives, batches;
@@ -112,7 +112,7 @@ void DebugHud::Update()
             primitives = renderer->GetNumPrimitives();
             batches = renderer->GetNumBatches();
         }
-        
+
         String stats;
         stats.AppendWithFormat("Triangles %u\nBatches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
             primitives,
@@ -121,17 +121,17 @@ void DebugHud::Update()
             renderer->GetNumLights(true),
             renderer->GetNumShadowMaps(true),
             renderer->GetNumOccluders(true));
-        
+
         if (!appStats_.Empty())
         {
             stats.Append("\n");
             for (HashMap<String, String>::ConstIterator i = appStats_.Begin(); i != appStats_.End(); ++i)
                 stats.AppendWithFormat("\n%s %s", i->first_.CString(), i->second_.CString());
         }
-        
+
         statsText_->SetText(stats);
     }
-    
+
     if (modeText_->IsVisible())
     {
         String mode;
@@ -149,10 +149,10 @@ void DebugHud::Update()
             #else
             graphics->GetSM3Support() ? "SM3" : "SM2");
             #endif
-        
+
         modeText_->SetText(mode);
     }
-    
+
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
     {
@@ -171,15 +171,17 @@ void DebugHud::Update()
     }
 }
 
-void DebugHud::SetStyle(XMLFile* style)
+void DebugHud::SetDefaultStyle(XMLFile* style)
 {
     if (!style)
         return;
-    
-    style_ = style;
-    statsText_->SetStyle(style, "DebugHudText");
-    modeText_->SetStyle(style, "DebugHudText");
-    profilerText_->SetStyle(style, "DebugHudText");
+
+    statsText_->SetDefaultStyle(style);
+    statsText_->SetStyle("DebugHudText");
+    modeText_->SetDefaultStyle(style);
+    modeText_->SetStyle("DebugHudText");
+    profilerText_->SetDefaultStyle(style);
+    profilerText_->SetStyle("DebugHudText");
 }
 
 void DebugHud::SetMode(unsigned mode)
@@ -187,7 +189,7 @@ void DebugHud::SetMode(unsigned mode)
     statsText_->SetVisible((mode & DEBUGHUD_SHOW_STATS) != 0);
     modeText_->SetVisible((mode & DEBUGHUD_SHOW_MODE) != 0);
     profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
-    
+
     mode_ = mode;
 }
 
@@ -214,6 +216,11 @@ void DebugHud::Toggle(unsigned mode)
 void DebugHud::ToggleAll()
 {
     Toggle(DEBUGHUD_SHOW_ALL);
+}
+
+XMLFile* DebugHud::GetDefaultStyle() const
+{
+    return statsText_->GetDefaultStyle(false);
 }
 
 float DebugHud::GetProfilerInterval() const
@@ -243,11 +250,11 @@ void DebugHud::ClearAppStats()
 {
     appStats_.Clear();
 }
-    
+
 void DebugHud::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
-    
+
     Update();
 }
 

@@ -59,64 +59,64 @@ FileSelector::FileSelector(Context* context) :
 {
     window_ = new Window(context_);
     window_->SetLayout(LM_VERTICAL);
-    
+
     titleLayout = new UIElement(context_);
     titleLayout->SetLayout(LM_HORIZONTAL);
     window_->AddChild(titleLayout);
-    
+
     titleText_ = new Text(context_);
     titleLayout->AddChild(titleText_);
-    
+
     closeButton_ = new Button(context_);
     titleLayout->AddChild(closeButton_);
-    
+
     pathEdit_ = new LineEdit(context_);
     window_->AddChild(pathEdit_);
-    
+
     fileList_ = new ListView(context_);
     window_->AddChild(fileList_);
-    
+
     fileNameLayout_ = new UIElement(context_);
     fileNameLayout_->SetLayout(LM_HORIZONTAL);
-    
+
     fileNameEdit_ = new LineEdit(context_);
     fileNameLayout_->AddChild(fileNameEdit_);
-    
+
     filterList_ = new DropDownList(context_);
     fileNameLayout_->AddChild(filterList_);
-    
+
     window_->AddChild(fileNameLayout_);
-    
+
     buttonLayout_ = new UIElement(context_);
     buttonLayout_->SetLayout(LM_HORIZONTAL);
-    
+
     buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
-    
+
     okButton_ = new Button(context_);
     okButtonText_ = new Text(context_);
     okButtonText_->SetAlignment(HA_CENTER, VA_CENTER);
     okButton_->AddChild(okButtonText_);
     buttonLayout_->AddChild(okButton_);
-    
+
     buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
-    
+
     cancelButton_ = new Button(context_);
     cancelButtonText_ = new Text(context_);
     cancelButtonText_->SetAlignment(HA_CENTER, VA_CENTER);
     cancelButton_->AddChild(cancelButtonText_);
     buttonLayout_->AddChild(cancelButton_);
-    
+
     buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
-    
+
     window_->AddChild(buttonLayout_);
-    
+
     Vector<String> defaultFilters;
     defaultFilters.Push("*.*");
     SetFilters(defaultFilters, 0);
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem)
         SetPath(fileSystem->GetCurrentDir());
-    
+
     // Focus the fileselector's filelist initially when created, and bring to front
     UI* ui = GetSubsystem<UI>();
     if (ui)
@@ -125,7 +125,7 @@ FileSelector::FileSelector(Context* context) :
         ui->SetFocusElement(fileList_);
         window_->BringToFront();
     }
-    
+
     SubscribeToEvent(filterList_, E_ITEMSELECTED, HANDLER(FileSelector, HandleFilterChanged));
     SubscribeToEvent(pathEdit_, E_TEXTFINISHED, HANDLER(FileSelector, HandlePathChanged));
     SubscribeToEvent(fileNameEdit_, E_TEXTFINISHED, HANDLER(FileSelector, HandleOKPressed));
@@ -147,43 +147,41 @@ void FileSelector::RegisterObject(Context* context)
     context->RegisterFactory<FileSelector>();
 }
 
-void FileSelector::SetStyle(XMLFile* style)
+void FileSelector::SetDefaultStyle(XMLFile* style)
 {
     if (!style)
         return;
-    
-    style_ = style;
-    
+
     window_->SetDefaultStyle(style);
-    window_->SetStyle(style, "FileSelector");
-    
-    titleText_->SetStyle(style, "FileSelectorTitleText");
-    closeButton_->SetStyle(style, "CloseButton");
-    
-    okButtonText_->SetStyle(style, "FileSelectorButtonText");
-    cancelButtonText_->SetStyle(style, "FileSelectorButtonText");
-    
-    titleLayout->SetStyle(style, "FileSelectorTitleLayout");
-    fileNameLayout_->SetStyle(style, "FileSelectorLayout");
-    buttonLayout_->SetStyle(style, "FileSelectorLayout");
-    
-    fileList_->SetStyle(style, "FileSelectorListView");
-    fileNameEdit_->SetStyle(style, "FileSelectorLineEdit");
-    pathEdit_->SetStyle(style, "FileSelectorLineEdit");
-    
-    filterList_->SetStyle(style, "FileSelectorFilterList");
-    
-    okButton_->SetStyle(style, "FileSelectorButton");
-    cancelButton_->SetStyle(style, "FileSelectorButton");
-    
+    window_->SetStyle("FileSelector");
+
+    titleText_->SetStyle("FileSelectorTitleText");
+    closeButton_->SetStyle("CloseButton");
+
+    okButtonText_->SetStyle("FileSelectorButtonText");
+    cancelButtonText_->SetStyle("FileSelectorButtonText");
+
+    titleLayout->SetStyle("FileSelectorTitleLayout");
+    fileNameLayout_->SetStyle("FileSelectorLayout");
+    buttonLayout_->SetStyle("FileSelectorLayout");
+
+    fileList_->SetStyle("FileSelectorListView");
+    fileNameEdit_->SetStyle("FileSelectorLineEdit");
+    pathEdit_->SetStyle("FileSelectorLineEdit");
+
+    filterList_->SetStyle("FileSelectorFilterList");
+
+    okButton_->SetStyle("FileSelectorButton");
+    cancelButton_->SetStyle("FileSelectorButton");
+
     const Vector<SharedPtr<UIElement> >& filterTexts = filterList_->GetListView()->GetContentElement()->GetChildren();
     for (unsigned i = 0; i < filterTexts.Size(); ++i)
-        filterTexts[i]->SetStyle(style, "FileSelectorFilterText");
-    
+        filterTexts[i]->SetStyle("FileSelectorFilterText");
+
     const Vector<SharedPtr<UIElement> >& listTexts = fileList_->GetContentElement()->GetChildren();
     for (unsigned i = 0; i < listTexts.Size(); ++i)
-        listTexts[i]->SetStyle(style, "FileSelectorListText");
-    
+        listTexts[i]->SetStyle("FileSelectorListText");
+
     UpdateElements();
 }
 
@@ -203,7 +201,7 @@ void FileSelector::SetPath(const String& path)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem)
         return;
-    
+
     if (fileSystem->DirExists(path))
     {
         path_ = AddTrailingSlash(path);
@@ -227,24 +225,24 @@ void FileSelector::SetFilters(const Vector<String>& filters, unsigned defaultInd
 {
     if (filters.Empty())
         return;
-    
+
     ignoreEvents_ = true;
-    
+
     filters_ = filters;
     filterList_->RemoveAllItems();
     for (unsigned i = 0; i < filters_.Size(); ++i)
     {
         Text* filterText = new Text(context_);
-        filterText->SetText(filters_[i]);
-        filterText->SetStyle(style_, "FileSelectorFilterText");
         filterList_->AddItem(filterText);
+        filterText->SetText(filters_[i]);
+        filterText->SetStyle("FileSelectorFilterText");
     }
     if (defaultIndex > filters.Size())
         defaultIndex = 0;
     filterList_->SetSelection(defaultIndex);
-    
+
     ignoreEvents_ = false;
-    
+
     if (GetFilter() != lastUsedFilter_)
         RefreshFiles();
 }
@@ -260,7 +258,7 @@ void FileSelector::UpdateElements()
         const IntRect& clipBorder = pathEdit_->GetClipBorder();
         pathEdit_->SetFixedHeight(pathEdit_->GetTextElement()->GetRowHeight() + clipBorder.top_ + clipBorder.bottom_);
     }
-    
+
     {
         const IntRect& clipBorder = fileNameEdit_->GetClipBorder();
         int fileNameHeight = fileNameEdit_->GetTextElement()->GetRowHeight() + clipBorder.top_ + clipBorder.bottom_;
@@ -268,8 +266,13 @@ void FileSelector::UpdateElements()
         filterList_->SetFixedHeight(fileNameHeight);
         fileNameLayout_->SetFixedHeight(fileNameHeight);
     }
-    
+
     buttonLayout_->SetFixedHeight(Max(okButton_->GetHeight(), cancelButton_->GetHeight()));
+}
+
+XMLFile* FileSelector::GetDefaultStyle() const
+{
+    return window_->GetDefaultStyle(false);
 }
 
 const String& FileSelector::GetTitle() const
@@ -308,19 +311,19 @@ void FileSelector::RefreshFiles()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem)
         return;
-    
+
     ignoreEvents_ = true;
-    
+
     fileList_->RemoveAllItems();
     fileEntries_.Clear();
-    
+
     Vector<String> directories;
     Vector<String> files;
     fileSystem->ScanDir(directories, path_, "*", SCAN_DIRS, false);
     fileSystem->ScanDir(files, path_, GetFilter(), SCAN_FILES, false);
-    
+
     fileEntries_.Reserve(directories.Size() + files.Size());
-    
+
     for (unsigned i = 0; i < directories.Size(); ++i)
     {
         FileSelectorEntry newEntry;
@@ -328,7 +331,7 @@ void FileSelector::RefreshFiles()
         newEntry.directory_ = true;
         fileEntries_.Push(newEntry);
     }
-    
+
     for (unsigned i = 0; i < files.Size(); ++i)
     {
         FileSelectorEntry newEntry;
@@ -336,7 +339,7 @@ void FileSelector::RefreshFiles()
         newEntry.directory_ = false;
         fileEntries_.Push(newEntry);
     }
-    
+
     // Sort and add to the list view
     // While items are being added, disable layout update for performance optimization
     Sort(fileEntries_.Begin(), fileEntries_.End(), CompareEntries);
@@ -349,17 +352,17 @@ void FileSelector::RefreshFiles()
             displayName = "<DIR> " + fileEntries_[i].name_;
         else
             displayName = fileEntries_[i].name_;
-        
+
         Text* entryText = new Text(context_);
-        entryText->SetText(displayName);
-        entryText->SetStyle(style_, "FileSelectorListText");
         fileList_->AddItem(entryText);
+        entryText->SetText(displayName);
+        entryText->SetStyle("FileSelectorListText");
     }
     listContent->EnableLayoutUpdate();
     listContent->UpdateLayout();
-    
+
     ignoreEvents_ = false;
-    
+
     // Clear filename from the previous dir so that there is no confusion
     SetFileName(String::EMPTY);
     lastUsedFilter_ = GetFilter();
@@ -370,7 +373,7 @@ bool FileSelector::EnterFile()
     unsigned index = fileList_->GetSelection();
     if (index >= fileEntries_.Size())
         return false;
-    
+
     if (fileEntries_[index].directory_)
     {
         // If a directory doubleclicked, enter it. Recognize . and .. as a special case
@@ -382,7 +385,7 @@ bool FileSelector::EnterFile()
             String parentPath = GetParentPath(path_);
             SetPath(parentPath);
         }
-        
+
         return true;
     }
     else
@@ -391,14 +394,14 @@ bool FileSelector::EnterFile()
         if (!directoryMode_)
         {
             using namespace FileSelected;
-        
+
             VariantMap eventData;
             eventData[P_FILENAME] = path_ + fileEntries_[index].name_;
             eventData[P_OK] = true;
             SendEvent(E_FILESELECTED, eventData);
         }
     }
-    
+
     return false;
 }
 
@@ -406,7 +409,7 @@ void FileSelector::HandleFilterChanged(StringHash eventType, VariantMap& eventDa
 {
     if (ignoreEvents_)
         return;
-    
+
     if (GetFilter() != lastUsedFilter_)
         RefreshFiles();
 }
@@ -415,7 +418,7 @@ void FileSelector::HandlePathChanged(StringHash eventType, VariantMap& eventData
 {
     if (ignoreEvents_)
         return;
-    
+
     // Attempt to set path. Restores old if does not exist
     SetPath(pathEdit_->GetText());
 }
@@ -424,7 +427,7 @@ void FileSelector::HandleFileSelected(StringHash eventType, VariantMap& eventDat
 {
     if (ignoreEvents_)
         return;
-    
+
     unsigned index = fileList_->GetSelection();
     if (index >= fileEntries_.Size())
         return;
@@ -437,7 +440,7 @@ void FileSelector::HandleFileDoubleClicked(StringHash eventType, VariantMap& eve
 {
     if (ignoreEvents_)
         return;
-    
+
     EnterFile();
 }
 
@@ -445,9 +448,9 @@ void FileSelector::HandleFileListKey(StringHash eventType, VariantMap& eventData
 {
     if (ignoreEvents_)
         return;
-    
+
     using namespace UnhandledKey;
-    
+
     int key = eventData[P_KEY].GetInt();
     if (key == KEY_RETURN || key == KEY_RETURN2 || KEY_KP_ENTER)
     {
@@ -462,15 +465,15 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
 {
     if (ignoreEvents_)
         return;
-    
+
     const String& fileName = GetFileName();
-    
+
     if (!directoryMode_)
     {
         if (!fileName.Empty())
         {
             using namespace FileSelected;
-            
+
             VariantMap newEventData;
             newEventData[P_FILENAME] = path_ + GetFileName();
             newEventData[P_OK] = true;
@@ -480,7 +483,7 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
     else if (eventType == E_RELEASED && !path_.Empty())
     {
         using namespace FileSelected;
-        
+
         VariantMap newEventData;
         newEventData[P_FILENAME] = path_;
         newEventData[P_OK] = true;
@@ -492,9 +495,9 @@ void FileSelector::HandleCancelPressed(StringHash eventType, VariantMap& eventDa
 {
     if (ignoreEvents_)
         return;
-    
+
     using namespace FileSelected;
-    
+
     VariantMap newEventData;
     newEventData[P_FILENAME] = String::EMPTY;
     newEventData[P_OK] = false;

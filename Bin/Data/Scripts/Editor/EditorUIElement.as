@@ -63,8 +63,8 @@ bool NewUIElement(const String&in typeName)
             // and position the newly created element at center
             CenterDialog(element);
         }
-        // Apply the style
-        element.style = defaultStyle;
+        // Apply the auto style
+        element.style = "";
         // Do not allow UI subsystem to reorder children while editing the element in the editor
         element.sortChildren = false;
 
@@ -424,7 +424,7 @@ void PopulateStyleList(DropDownList@ styleList)
     {
         Text@ choice = Text();
         styleList.AddItem(choice);
-        choice.SetStyle(uiStyle, "EditorEnumAttributeText");
+        choice.style = "EditorEnumAttributeText";
         choice.text = availableStyles[i];
     }
 }

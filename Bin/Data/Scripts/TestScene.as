@@ -66,11 +66,11 @@ void InitConsole()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
 
     engine.CreateConsole();
-    console.style = uiStyle;
+    console.defaultStyle = uiStyle;
 }
 
 void InitUI()
@@ -78,7 +78,7 @@ void InitUI()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     Cursor@ newCursor = Cursor("Cursor");
-    newCursor.style = uiStyle;
+    newCursor.SetStyleAuto(uiStyle);
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = newCursor;
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
@@ -106,7 +106,7 @@ void InitScene()
     if (!engine.headless)
     {
         renderer.viewports[0] = Viewport(testScene, camera);
-        
+
         // Add bloom & FXAA effects to the renderpath. Clone the default renderpath so that we don't affect it
         RenderPath@ newRenderPath = renderer.viewports[0].renderPath.Clone();
         newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/Bloom.xml"));
@@ -279,7 +279,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else
             console.visible = false;
     }
-    
+
     if (key == KEY_F1)
         console.Toggle();
 
@@ -396,7 +396,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             VariantMap eventData;
             eventData["Pos"] = cameraNode.position;
             eventData["Rot"] = cameraNode.rotation;
-    
+
             // If we are the client, send the spawn command as a remote event, else send locally
             if (runClient)
             {

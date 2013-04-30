@@ -43,12 +43,12 @@ void InitConsole()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
     debugHud.SetAppStats("Instructions:", "\nShift+LMB set startpoint\nLMB set endpoint\nMMB create/delete object\nCtrl+LMB set offmesh link start, then end");
 
     engine.CreateConsole();
-    console.style = uiStyle;
+    console.defaultStyle = uiStyle;
 }
 
 void InitUI()
@@ -56,7 +56,7 @@ void InitUI()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     Cursor@ newCursor = Cursor("Cursor");
-    newCursor.style = uiStyle;
+    newCursor.SetStyleAuto(uiStyle);
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = newCursor;
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
@@ -79,7 +79,7 @@ void InitScene()
     if (!engine.headless)
     {
         renderer.viewports[0] = Viewport(testScene, camera);
-        
+
         // Add bloom & FXAA effects to the renderpath. Clone the default renderpath so that we don't affect it
         RenderPath@ newRenderPath = renderer.viewports[0].renderPath.Clone();
         newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/Bloom.xml"));
@@ -179,7 +179,7 @@ void InitScene()
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
         shape.SetTriangleMesh(object.model, 0);
     }
-    
+
     testScene.CreateComponent("Navigable");
     NavigationMesh@ navMesh = testScene.CreateComponent("NavigationMesh");
     // Add bounding box padding in the Y-direction to be able to add objects on top of the boxes
@@ -221,7 +221,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else
             console.visible = false;
     }
-    
+
     if (key == KEY_F1)
         console.Toggle();
 
@@ -343,7 +343,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
 
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
-            
+
             if (setOffMesh)
             {
                 if (!offMeshInProgress)
@@ -355,7 +355,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                 {
                     offMeshEnd = rayHitPos;
                     offMeshInProgress = false;
-                    
+
                     Node@ start = testScene.CreateChild();
                     Node@ end = testScene.CreateChild();
                     start.position = offMeshStart;
@@ -388,19 +388,19 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             }
         }
     }
-    
+
     if (button == MOUSEB_MIDDLE)
     {
         IntVector2 pos = ui.cursorPosition;
         if (ui.GetElementAt(pos, true) !is null)
             return;
-    
+
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
         RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 1000.0, DRAWABLE_GEOMETRY);
-    
+
         bool rebuild = false;
         BoundingBox rebuildBox;
-    
+
         if (result.drawable !is null)
         {
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
@@ -416,26 +416,26 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                 objectNode.position = rayHitPos;
                 objectNode.rotation = Quaternion(0, Random(360.0), 0);
                 objectNode.SetScale(5);
-    
+
                 StaticModel@ object = objectNode.CreateComponent("StaticModel");
                 object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
                 object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
                 object.castShadows = true;
-    
+
                 RigidBody@ body = objectNode.CreateComponent("RigidBody");
                 CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
                 shape.SetTriangleMesh(object.model, 0);
-                
+
                 rebuild = true;
                 rebuildBox = object.worldBoundingBox;
             }
         }
-        
+
         if (rebuild)
         {
             NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
             navMesh.Build(rebuildBox);
-            
+
             // Recalculate path if applicable
             if (startPosSet && endPosSet)
                 path = navMesh.FindPath(startPos, endPos);
@@ -477,7 +477,7 @@ void HandlePostRenderUpdate()
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
         }
     }
-    
+
     if (startPosSet)
     {
         testScene.debugRenderer.AddBoundingBox(BoundingBox(startPos + Vector3(-0.1, -0.1, -0.1), startPos +

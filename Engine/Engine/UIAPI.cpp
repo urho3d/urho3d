@@ -498,8 +498,8 @@ static void RegisterFileSelector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "bool get_directoryMode() const", asMETHOD(FileSelector, GetDirectoryMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "const String& get_filter() const", asMETHOD(FileSelector, GetFilter), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "uint get_filterIndex() const", asMETHOD(FileSelector, GetFilterIndex), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "void set_style(XMLFile@+)", asMETHOD(FileSelector, SetStyle), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSelector", "XMLFile@+ get_style() const", asMETHOD(FileSelector, GetStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void set_defaultStyle(XMLFile@+)", asMETHOD(FileSelector, SetDefaultStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "XMLFile@+ get_defaultStyle() const", asMETHOD(FileSelector, GetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "Window@+ get_window() const", asMETHOD(FileSelector, GetWindow), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "Text@+ get_titleText() const", asMETHOD(FileSelector, GetTitleText), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "ListView@+ get_fileList() const", asMETHOD(FileSelector, GetFileList), asCALL_THISCALL);

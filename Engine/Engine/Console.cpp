@@ -54,7 +54,7 @@ Console::Console(Context* context) :
 {
     UI* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
-    
+
     background_ = new BorderImage(context_);
     background_->SetBringToBack(false);
     background_->SetClipChildren(true);
@@ -62,20 +62,20 @@ Console::Console(Context* context) :
     background_->SetVisible(false); // Hide by default
     background_->SetPriority(200); // Show on top of the debug HUD
     background_->SetLayout(LM_VERTICAL);
-    
+
     rowContainer_ = new UIElement(context_);
     rowContainer_->SetClipChildren(true);
     rowContainer_->SetLayout(LM_VERTICAL);
     background_->AddChild(rowContainer_);
-    
+
     lineEdit_ = new LineEdit(context_);
     lineEdit_->SetFocusMode(FM_FOCUSABLE); // Do not allow defocus with ESC
     background_->AddChild(lineEdit_);
-    
+
     uiRoot->AddChild(background_);
-    
+
     SetNumRows(DEFAULT_CONSOLE_ROWS);
-    
+
     SubscribeToEvent(lineEdit_, E_TEXTFINISHED, HANDLER(Console, HandleTextFinished));
     SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, HANDLER(Console, HandleLineEditKey));
     SubscribeToEvent(E_SCREENMODE, HANDLER(Console, HandleScreenMode));
@@ -87,19 +87,19 @@ Console::~Console()
     background_->Remove();
 }
 
-void Console::SetStyle(XMLFile* style)
+void Console::SetDefaultStyle(XMLFile* style)
 {
     if (!style)
         return;
-    
-    style_ = style;
-    background_->SetStyle(style, "ConsoleBackground");
-    
+
+    background_->SetDefaultStyle(style);
+    background_->SetStyle("ConsoleBackground");
+
     for (unsigned i = 0; i < rows_.Size(); ++i)
-        rows_[i]->SetStyle(style, "ConsoleText");
-    
-    lineEdit_->SetStyle(style, "ConsoleLineEdit");
-    
+        rows_[i]->SetStyle("ConsoleText");
+
+    lineEdit_->SetStyle("ConsoleLineEdit");
+
     UpdateElements();
 }
 
@@ -121,20 +121,18 @@ void Console::SetNumRows(unsigned rows)
 {
     if (!rows)
         return;
-    
+
     rowContainer_->RemoveAllChildren();
-    
+
     rows_.Resize(rows);
     for (unsigned i = 0; i < rows_.Size(); ++i)
     {
         if (!rows_[i])
-        {
             rows_[i] = new Text(context_);
-            rows_[i]->SetStyle(style_, "ConsoleText");
-        }
         rowContainer_->AddChild(rows_[i]);
+        rows_[i]->SetStyle("ConsoleText");
     }
-    
+
     UpdateElements();
 }
 
@@ -156,6 +154,11 @@ void Console::UpdateElements()
     lineEdit_->SetFixedHeight(lineEdit_->GetTextElement()->GetRowHeight());
 }
 
+XMLFile* Console::GetDefaultStyle() const
+{
+    return background_->GetDefaultStyle(false);
+}
+
 bool Console::IsVisible() const
 {
     return background_ ? background_->IsVisible() : false;
@@ -169,20 +172,20 @@ const String& Console::GetHistoryRow(unsigned index) const
 void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
 {
     using namespace TextFinished;
-    
+
     String line = lineEdit_->GetText();
     if (!line.Empty())
     {
         Script* script = GetSubsystem<Script>();
         if (script)
             script->Execute(line);
-        
+
         // Store to history, then clear the lineedit
         history_.Push(line);
         if (history_.Size() > historyRows_)
             history_.Erase(history_.Begin());
         historyPosition_ = history_.Size();
-        
+
         currentRow_.Clear();
         lineEdit_->SetText(currentRow_);
     }
@@ -192,11 +195,11 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
 {
     if (!historyRows_)
         return;
-    
+
     using namespace UnhandledKey;
-    
+
     bool changed = false;
-    
+
     switch (eventData[P_KEY].GetInt())
     {
     case KEY_UP:
@@ -208,7 +211,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             changed = true;
         }
         break;
-    
+
     case KEY_DOWN:
         if (historyPosition_ < history_.Size())
         {
@@ -217,7 +220,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         }
         break;
     }
-    
+
     if (changed)
     {
         if (historyPosition_ < history_.Size())
@@ -237,11 +240,11 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     // If the rows are not fully initialized yet, or we are recursing here, do not write the message
     if (inLogMessage_ || rows_.Empty() || !rows_.Back())
         return;
-    
+
     inLogMessage_ = true;
-    
+
     using namespace LogMessage;
-    
+
     // Be prepared for possible multi-line messages
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
     for (unsigned i = 0; i < rows.Size(); ++i)
@@ -252,7 +255,7 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
         text->SetText(rows[i]);
         rowContainer_->AddChild(text);
     }
-    
+
     inLogMessage_ = false;
 }
 

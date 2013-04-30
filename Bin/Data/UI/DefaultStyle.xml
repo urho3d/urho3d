@@ -1,17 +1,18 @@
 <elements>
-    <element type="Button">
-        <attribute name="Size" value="16 16" />
+    <element type="BorderImage" >
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+    </element>
+    <element type="Button" style="BorderImage">
+        <attribute name="Size" value="16 16" />
         <attribute name="Image Rect" value="16 0 32 16" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Pressed Image Offset" value="16 0" />
         <attribute name="Hover Image Offset" value="0 16" />
         <attribute name="Label Offset" value="-1 1" />
     </element>
-    <element type="CheckBox">
+    <element type="CheckBox" style="BorderImage">
         <attribute name="Min Size" value="16 16" />
         <attribute name="Max Size" value="16 16" />
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
         <attribute name="Image Rect" value="64 0 80 16" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Checked Image Offset" value="16 0" />
@@ -59,8 +60,7 @@
             <variant type="IntVector2" value="9 9" />
         </attribute>
     </element>
-    <element type="DropDownList">
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+    <element type="DropDownList" style="BorderImage">
         <attribute name="Image Rect" value="16 0 32 16" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Pressed Image Offset" value="16 0" />
@@ -76,15 +76,13 @@
             <element type="ListView" internal="true">
                 <attribute name="Highlight Mode" value="Always" />
                 <element type="BorderImage" internal="true">    <!-- Override scroll panel attributes from default ListView -->
-                    <attribute name="Texture" value="Texture2D;Textures/UI.png" />
                     <attribute name="Image Rect" value="96 0 112 16" />
                     <attribute name="Border" value="2 2 2 2" />
                 </element>
             </element>
         </element>
     </element>
-    <element type="LineEdit">
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+    <element type="LineEdit" style="BorderImage">
         <attribute name="Image Rect" value="112 0 128 16" />
         <attribute name="Border" value="2 2 2 2" />
         <attribute name="Clip Border" value="1 1 1 1" />
@@ -94,21 +92,19 @@
         </element>
         <element type="BorderImage" internal="true">
             <attribute name="Size" value="4 16" />
-            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+            <attribute name="Priority" value="1" />
             <attribute name="Image Rect" value="12 0 16 16" />
         </element>
     </element>
     <element type="ListView" style="ScrollView" />  <!-- Shortcut to copy all the styles from ScrollView -->
-    <element type="ListViewHierarchyOverlay">
+    <element type="ListViewHierarchyOverlay" style="BorderImage">
         <attribute name="Min Size" value="16 16" />
         <attribute name="Max Size" value="16 16" />
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
         <attribute name="Image Rect" value="160 0 176 16" />
         <attribute name="Checked Image Offset" value="16 0" />
         <attribute name="Hover Image Offset" value="0 16" />
     </element>
-    <element type="Menu">
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+    <element type="Menu" style="BorderImage">
         <attribute name="Image Rect" value="96 0 112 16" />
         <attribute name="Border" value="2 2 2 2" />
         <attribute name="Pressed Image Offset" value="16 0" />
@@ -121,18 +117,15 @@
         <attribute name="Down Image Rect" value="16 32 32 48" />
         <element type="Button" internal="true">
             <attribute name="Size" value="12 12" />
-            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
             <attribute name="Border" value="3 3 3 3" />
             <attribute name="Pressed Image Offset" value="64 0" />
             <attribute name="Hover Image Offset" value="0 16" />
         </element>
         <element type="Slider" internal="true">
             <attribute name="Size" value="12 12" />
-            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
             <attribute name="Image Rect" value="112 0 128 16" />
             <attribute name="Border" value="3 3 3 3" />
             <element type="BorderImage" internal="true">
-                <attribute name="Texture" value="Texture2D;Textures/UI.png" />
                 <attribute name="Image Rect" value="48 0 64 16" />
                 <attribute name="Border" value="4 4 4 4" />
                 <attribute name="Hover Image Offset" value="0 16" />
@@ -140,7 +133,6 @@
         </element>
         <element type="Button" internal="true">
             <attribute name="Size" value="12 12" />
-            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
             <attribute name="Border" value="3 3 3 3" />
             <attribute name="Pressed Image Offset" value="64 0" />
             <attribute name="Hover Image Offset" value="0 16" />
@@ -154,26 +146,22 @@
             <attribute name="Size" value="12 0" />
         </element>
         <element type="BorderImage" internal="true">
-            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
             <attribute name="Image Rect" value="112 0 128 16" />
             <attribute name="Border" value="2 2 2 2" />
             <attribute name="Clip Border" value="1 1 1 1" />
         </element>
     </element>
-    <element type="Slider" internal="true">
+    <element type="Slider" style="BorderImage">
         <attribute name="Size" value="12 12" />
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
         <attribute name="Image Rect" value="112 0 128 16" />
         <attribute name="Border" value="3 3 3 3" />
         <element type="BorderImage" internal="true">
-            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
             <attribute name="Image Rect" value="48 0 64 16" />
             <attribute name="Border" value="4 4 4 4" />
             <attribute name="Hover Image Offset" value="0 16" />
         </element>
     </element>
-    <element type="Window">
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+    <element type="Window" style="BorderImage">
         <attribute name="Image Rect" value="48 0 64 16" />
         <attribute name="Border" value="3 3 3 3" />
         <attribute name="Resize Border" value="8 8 8 8" />
@@ -182,10 +170,7 @@
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
         <attribute name="Font Size" value="11" />
     </element>
-    <element type="DebugHudText" auto="false">
-        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
-        <attribute name="Font Size" value="11" />
-    </element>
+    <element type="DebugHudText" style="Text" auto="false" />
     <element type="ConsoleBackground" auto="false">
         <attribute name="Top Left Color" value="0 0.25 0 0.75" />
         <attribute name="Top Right Color" value="0 0.25 0 0.75" />
@@ -193,24 +178,14 @@
         <attribute name="Bottom Right Color" value="0.25 0.75 0.25 0.75" />
         <attribute name="Layout Border" value="4 4 4 4" />
     </element>
-    <element type="ConsoleText" auto="false">
-        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
-        <attribute name="Font Size" value="11" />
-    </element>
-    <element type="ConsoleLineEdit" auto="false">
+    <element type="ConsoleText" style="Text" auto="false" />
+    <element type="ConsoleLineEdit" style="LineEdit" auto="false">
         <attribute name="Top Left Color" value="0 0 0 0.5" />
         <attribute name="Top Right Color" value="0 0 0 0.5" />
         <attribute name="Bottom Left Color" value="0 0 0 0.5" />
         <attribute name="Bottom Right Color" value="0 0 0 0.5" />
-        <element type="Text" internal="true">
-            <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
-            <attribute name="Font Size" value="11" />
+        <element type="Text" internal="true" style="none">
             <attribute name="Selection Color" value="0 0.5 0 0.75" />
-        </element>
-        <element type="BorderImage" internal="true">
-            <attribute name="Size" value="4 16" />
-            <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-            <attribute name="Image Rect" value="12 0 16 16" />
         </element>
     </element>
     <element type="FileSelector" style="Window" auto="false">
@@ -238,10 +213,8 @@
         <attribute name="Max Size" value="64 2147483647" />
         <attribute name="Resize Popup" value="true" />
     </element>
-    <element type="FileSelectorFilterText" auto="false">
+    <element type="FileSelectorFilterText" style="Text" auto="false">
         <attribute name="Is Enabled" value="true" />
-        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
-        <attribute name="Font Size" value="11" />
         <attribute name="Selection Color" value="0.7 0.7 0.7 1" />
         <attribute name="Hover Color" value="0.45 0.7 0.45 1" />
     </element>
@@ -253,22 +226,18 @@
     <element type="FileSelectorLayout" auto="false">
         <attribute name="Layout Spacing" value="4" />
     </element>
-    <element type="FileSelectorListText" auto="false">
-        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
-        <attribute name="Font Size" value="11" />
-        <attribute name="Hover Color" value="0.45 0.70 0.45" />
-        <attribute name="Selection Color" value="0.70 0.70 0.70" />
+    <element type="FileSelectorListText" style="Text" auto="false">
+        <attribute name="Hover Color" value="0.45 0.7 0.45 1" />
+        <attribute name="Selection Color" value="0.7 0.7 0.7 1" />
     </element>
     <element type="FileSelectorTitleText" style="Text" auto="false" />
-    <element type="EditorDivider" auto="false">
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+    <element type="EditorDivider" style="BorderImage" auto="false">
         <attribute name="Image Rect" value="144 32 160 43" />
         <attribute name="Border" value="2 2 2 2" />
         <attribute name="Min Size" value="0 11" />
         <attribute name="Max Size" value="2147483647 11" />
     </element>
-    <element type="EditorMenuBar" auto="false">
-        <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+    <element type="EditorMenuBar" style="BorderImage" auto="false">
         <attribute name="Image Rect" value="96 0 112 16" />
         <attribute name="Border" value="2 2 2 2" />
     </element>

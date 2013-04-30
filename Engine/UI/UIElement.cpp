@@ -228,7 +228,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
         if (styleName.Empty())
             styleName = GetTypeName();
 
-        SetStyle(styleFile, styleName);
+        SetStyle(styleName, styleFile);
     }
     // The 'style' attribute value in the style file cannot be equals to original's applied style to prevent infinite loop
     else if (!styleName.Empty() && styleName != appliedStyle_)
@@ -240,7 +240,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
         {
             // Remember the original applied style
             String appliedStyle(appliedStyle_);
-            SetStyle(styleFile, styleName);
+            SetStyle(styleName, styleFile);
             appliedStyle_ = appliedStyle;
         }
     }
@@ -872,14 +872,18 @@ void UIElement::SetDragDropMode(unsigned mode)
     dragDropMode_ = mode;
 }
 
-bool UIElement::SetStyle(XMLFile* file, const String& styleName)
+bool UIElement::SetStyle(const String& styleName, XMLFile* file)
 {
     appliedStyle_ = styleName;
     if (styleName == "none")
         return true;
 
     if (!file)
-        return false;
+    {
+        file = GetDefaultStyle();
+        if (!file)
+            return false;
+    }
 
     styleXPathQuery_.SetVariable("typeName", styleName);
     XMLElement styleElem = file->GetRoot().SelectSinglePrepared(styleXPathQuery_);
@@ -896,7 +900,7 @@ bool UIElement::SetStyle(const XMLElement& element)
 
 bool UIElement::SetStyleAuto(XMLFile* file)
 {
-    return SetStyle(file, GetTypeName());
+    return SetStyle(GetTypeName(), file);
 }
 
 void UIElement::SetDefaultStyle(XMLFile* style)

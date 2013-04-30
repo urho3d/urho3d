@@ -43,17 +43,17 @@ static const unsigned DEBUGHUD_SHOW_ALL = 0x7;
 class DebugHud : public Object
 {
     OBJECT(DebugHud);
-    
+
 public:
     /// Construct.
     DebugHud(Context* context);
     /// Destruct.
     ~DebugHud();
-    
+
     /// Update. Called by HandleUpdate().
     void Update();
     /// Set UI elements' style from an XML file.
-    void SetStyle(XMLFile* style);
+    void SetDefaultStyle(XMLFile* style);
     /// Set elements to show.
     void SetMode(unsigned mode);
     /// Set maximum profiler block depth, default unlimited.
@@ -66,9 +66,9 @@ public:
     void Toggle(unsigned mode);
     /// Toggle all elements.
     void ToggleAll();
-    
+
     /// Return the UI style file.
-    XMLFile* GetStyle() const { return style_; }
+    XMLFile* GetDefaultStyle() const;
     /// Return rendering stats text.
     Text* GetStatsText() const { return statsText_; }
     /// Return rendering mode text.
@@ -81,7 +81,7 @@ public:
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
     /// Return profiler accumulation interval in seconds
     float GetProfilerInterval() const;
-    
+
     /// Return whether showing 3D geometry primitive/batch count only.
     bool GetUseRendererStats() const { return useRendererStats_; }
     /// Set application-specific stats.
@@ -92,13 +92,11 @@ public:
     bool ResetAppStats(const String& label);
     /// Clear all application-specific stats.
     void ClearAppStats();
-    
+
 private:
     /// Handle logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    
-    /// UI style file.
-    SharedPtr<XMLFile> style_;
+
     /// Rendering stats text.
     SharedPtr<Text> statsText_;
     /// Rendering mode text.

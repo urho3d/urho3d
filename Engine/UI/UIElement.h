@@ -130,7 +130,7 @@ public:
     /// Load from XML data with style. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
     /// Create a child by Loading from XML data with style. Return true if successful.
-    virtual bool LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bool setInstanceDefault = false);
+    virtual bool LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = 0, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
 
@@ -252,13 +252,13 @@ public:
     void SetFocusMode(FocusMode mode);
     /// Set drag and drop flags.
     void SetDragDropMode(unsigned mode);
-    /// Set style from an XML file. Find the style element by name. Return true if the style is applied successfully.
-    bool SetStyle(XMLFile* file, const String& styleName);
+    /// Set style from an XML file. Find the style element by name. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
+    bool SetStyle(const String& styleName, XMLFile* file = 0);
     /// Set style from an XML element. Return true if the style is applied successfully.
     bool SetStyle(const XMLElement& element);
-    /// Set style from an XML file. Find the style element automatically. Return true if the style is applied successfully.
-    bool SetStyleAuto(XMLFile* file);
-    /// Set default style for later use by children elements.
+    /// Set style from an XML file. Find the style element automatically. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
+    bool SetStyleAuto(XMLFile* file = 0);
+    /// Set default style file for later use by children elements.
     void SetDefaultStyle(XMLFile* style);
     /// Set layout.
     void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);

@@ -170,7 +170,8 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
         hierarchyList.RemoveItem(itemIndex);
 
     Text@ text = Text();
-    text.SetStyle(uiStyle, "FileSelectorListText");
+    hierarchyList.InsertItem(itemIndex, text, parentItem);
+    text.style = "FileSelectorListText";
 
     if (serializable.type == SCENE_TYPE || serializable is editorUIElement)
         // The root node (scene) and editor's root UIElement cannot be moved by drag and drop
@@ -178,8 +179,6 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
     else
         // Internal UIElement is not able to participate in drag and drop action
         text.dragDropMode = itemType == ITEM_UI_ELEMENT && cast<UIElement>(serializable).internal ? DD_DISABLED : DD_SOURCE_AND_TARGET;
-
-    hierarchyList.InsertItem(itemIndex, text, parentItem);
 
     // Advance the index for the child items
     if (itemIndex == M_MAX_UNSIGNED)
@@ -271,13 +270,13 @@ void UpdateHierarchyItemText(uint itemIndex, bool iconEnabled, const String&in t
 void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ parentItem)
 {
     Text@ text = Text();
-    text.SetStyle(uiStyle, "FileSelectorListText");
+    hierarchyList.InsertItem(compItemIndex, text, parentItem);
+    text.style = "FileSelectorListText";
     text.vars[TYPE_VAR] = ITEM_COMPONENT;
     text.vars[NODE_ID_VAR] = component.node.id;
     text.vars[COMPONENT_ID_VAR] = component.id;
     text.text = GetComponentTitle(component);
 
-    hierarchyList.InsertItem(compItemIndex, text, parentItem);
     IconizeUIElement(text, component.typeName);
     SetIconEnabledColor(text, component.enabledEffective);
 }

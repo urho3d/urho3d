@@ -23,6 +23,9 @@ void Start()
         OpenConsoleWindow();
     else
     {
+        // Use OS mouse without grabbing it
+        input.mouseVisible = true;
+
         InitUI();
 
         SubscribeToEvent("LogMessage", "HandleLogMessage");
@@ -33,7 +36,7 @@ void Start()
         SubscribeToEvent(disconnectButton, "Pressed", "HandleDisconnect");
         SubscribeToEvent(startServerButton, "Pressed", "HandleStartServer");
     }
-    
+
     ParseNetworkArguments();
     if (runServer)
         network.StartServer(serverPort);
@@ -44,15 +47,17 @@ void Start()
 void InitUI()
 {
     uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
+    ui.root.defaultStyle = uiStyle;
+
     font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
 
     engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_PROFILER;
     debugHud.profilerText.opacity = 0.5;
 
     Cursor@ newCursor = Cursor("Cursor");
-    newCursor.style = uiStyle;
+    newCursor.SetStyleAuto(uiStyle);
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = newCursor;
 
@@ -67,8 +72,8 @@ void InitUI()
     ui.root.AddChild(buttonLayout);
 
     textEdit = LineEdit();
-    textEdit.style = uiStyle;
     buttonLayout.AddChild(textEdit);
+    textEdit.style = "";    // Auto style
 
     sendButton = AddUIButton("Send", 70);
     connectButton = AddUIButton("Connect", 90);
@@ -76,7 +81,7 @@ void InitUI()
     startServerButton = AddUIButton("Start Server", 110);
 
     chatHistory.Resize((graphics.height - 20) / chatHistoryText.rowHeight);
-    
+
     // No viewports or scene is defined. However, the default zone's fog color controls the fill color
     renderer.defaultZone.fogColor = Color(0, 0, 0.1);
 }
@@ -84,17 +89,16 @@ void InitUI()
 Button@ AddUIButton(const String& text, int width)
 {
     Button@ button = Button();
-    button.style = uiStyle;
+    buttonLayout.AddChild(button);
+    button.style = "";  // Auto style
     button.SetFixedWidth(width);
 
     Text@ buttonText = Text();
+    button.AddChild(buttonText);
     buttonText.SetFont(font, 12);
     buttonText.horizontalAlignment = HA_CENTER;
     buttonText.verticalAlignment = VA_CENTER;
     buttonText.text = text;
-    
-    button.AddChild(buttonText);
-    buttonLayout.AddChild(button);
 
     return button;
 }
@@ -110,7 +114,7 @@ void AddChatRow(const String& row)
 
     chatHistory.Erase(0);
     chatHistory.Push(row);
-    
+
     String allRows;
     for (uint i = 0; i < chatHistory.length; ++i)
         allRows += chatHistory[i] + "\n";
@@ -130,7 +134,7 @@ void HandleSend()
 {
     String chatText = textEdit.text.Trimmed();
     Connection@ serverConnection = network.serverConnection;
-    
+
     if (!chatText.empty && serverConnection !is null)
     {
         VectorBuffer msg;

@@ -42,11 +42,11 @@ void InitConsole()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
 
     engine.CreateConsole();
-    console.style = uiStyle;
+    console.defaultStyle = uiStyle;
 }
 
 void InitUI()
@@ -54,7 +54,7 @@ void InitUI()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     Cursor@ newCursor = Cursor("Cursor");
-    newCursor.style = uiStyle;
+    newCursor.SetStyleAuto(uiStyle);
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = newCursor;
 }
@@ -83,7 +83,7 @@ void InitScene()
         object.enabled = false;
         objects.Push(object);
     }
-    
+
     for (uint i = 0; i < maxLights; ++i)
     {
         Node@ lightNode = testScene.CreateChild("Light");
@@ -100,7 +100,7 @@ void InitScene()
         light.specularIntensity = 1.0;
         lights.Push(light);
     }
-    
+
     LoadNewModel();
     EnableLights();
     EnableObjects();
@@ -260,7 +260,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
                 modelIndex = modelNames.length - 1;
             LoadNewModel();
         }
-        
+
         if (input.keyPress[KEY_RIGHT])
         {
             ++numObjects;
@@ -308,7 +308,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
                 numLights = 0;
             EnableLights();
         }
-        
+
         if (input.keyPress['R'])
             RandomizePositions();
 

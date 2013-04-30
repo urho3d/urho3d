@@ -23,14 +23,14 @@ void InitUI()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
 
     engine.CreateConsole();
-    console.style = uiStyle;
+    console.defaultStyle = uiStyle;
 
     Cursor@ cursor = Cursor("Cursor");
-    cursor.style = uiStyle;
+    cursor.SetStyleAuto(uiStyle);
     cursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = cursor;
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
@@ -93,10 +93,10 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else
             console.visible = false;
     }
-    
+
     if (key == KEY_F1)
         console.Toggle();
-        
+
     if (key == 'T')
         debugHud.Toggle(DEBUGHUD_SHOW_PROFILER);
 }

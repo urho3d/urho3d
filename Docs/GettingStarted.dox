@@ -107,8 +107,8 @@ WSAD        Move
 Left mouse  Attack
 Space       Jump
 F1          Toggle AngelScript console
-F2          Toggle physics debug geometry
-F3          Toggle profiling display
+F2          Toggle profiling display
+F3          Toggle physics debug geometry
 F4          Toggle octree debug geometry
 \endverbatim
 

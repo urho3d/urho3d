@@ -65,11 +65,11 @@ void InitConsole()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
 
     engine.CreateConsole();
-    console.style = uiStyle;
+    console.defaultStyle = uiStyle;
 }
 
 void InitUI()
@@ -77,7 +77,7 @@ void InitUI()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     Cursor@ newCursor = Cursor("Cursor");
-    newCursor.style = uiStyle;
+    newCursor.SetStyleAuto(uiStyle);
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = newCursor;
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
@@ -107,7 +107,7 @@ void InitScene()
     if (!engine.headless)
     {
         renderer.viewports[0] = Viewport(testScene, camera);
-        
+
         // Add bloom & FXAA effects to the renderpath. Clone the default renderpath so that we don't affect it
         RenderPath@ newRenderPath = renderer.viewports[0].renderPath.Clone();
         newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/Bloom.xml"));
@@ -461,7 +461,7 @@ void HandleClientConnected(StringHash eventType, VariantMap& eventData)
 void ToggleLiquid()
 {
     Node@ liquidNode = testScene.GetChild("Liquid");
-    
+
     if (liquidNode is null)
     {
         liquidNode = testScene.CreateChild("Liquid");
@@ -473,11 +473,11 @@ void ToggleLiquid()
 
         CollisionShape@ shape = liquidNode.CreateComponent("CollisionShape");
         shape.SetBox(Vector3(1, 1, 1));
-    
+
         StaticModel@ object = liquidNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Box.mdl");
         object.material = cache.GetResource("Material", "Materials/GreenTransparent.xml");
-        
+
         liquidNode.CreateScriptObject(scriptFile, "BuoyancyVolume");
     }
     else
@@ -520,7 +520,7 @@ class BuoyancyVolume : ScriptObject
             {
                 Node@ otherNode = otherBody.node;
                 CollisionShape@ otherShape = otherNode.GetComponent("CollisionShape");
-                
+
                 // Assume the colliding shape is also a box
                 float topLevel = otherNode.worldPosition.y + otherNode.worldScale.y * 0.5 * shape.size.y;
                 float bottomLevel = otherNode.worldPosition.y - otherNode.worldScale.y * 0.5 * shape.size.y;

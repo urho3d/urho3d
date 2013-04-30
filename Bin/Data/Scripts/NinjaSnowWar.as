@@ -131,11 +131,11 @@ void InitConsole()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     Console@ console = engine.CreateConsole();
-    console.style = uiStyle;
+    console.defaultStyle = uiStyle;
     console.numRows = 16;
 
     engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
 }
 
 void InitScene()
@@ -383,7 +383,7 @@ void SpawnPlayer(Connection@ connection)
         VariantMap eventData;
         eventData["NodeID"] = playerNode.id;
         connection.SendRemoteEvent("PlayerSpawned", true, eventData);
-        
+
         // Create name tag (Text3D component) for players in multiplayer
         Node@ textNode = playerNode.CreateChild("NameTag");
         textNode.position = Vector3(0, 1.2, 0);

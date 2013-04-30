@@ -141,13 +141,12 @@ public:
     void InsertChild(unsigned index, UIElement* element)
     {
         // Insert the overlay at the same index position to the overlay container
-        CheckBox* overlay = new CheckBox(context_);
-        overlay->SetStyle(overlayContainer_->GetDefaultStyle(), "ListViewHierarchyOverlay");
+        CheckBox* overlay = static_cast<CheckBox*>(overlayContainer_->CreateChild(CheckBox::GetTypeStatic(), String::EMPTY, index));
+        overlay->SetStyle("ListViewHierarchyOverlay");
         int baseIndent = static_cast<ListView*>(overlayContainer_->GetParent())->GetBaseIndent();
         int indent = element->GetIndent() - baseIndent - 1;
         overlay->SetIndent(indent);
         overlay->SetFixedWidth((indent + 1) * element->GetIndentSpacing());
-        overlayContainer_->InsertChild(index, overlay);
 
         // Then insert the element as child as per normal
         UIElement::InsertChild(index, element);

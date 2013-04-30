@@ -275,11 +275,11 @@ void InitConsole()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     Console@ console = engine.CreateConsole();
-    console.style = uiStyle;
+    console.defaultStyle = uiStyle;
     console.numRows = 16;
 
     DebugHud@ hud = engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_ALL;
 }
 
@@ -288,7 +288,7 @@ void InitUI()
     XMLFile@ uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     Cursor@ cursor = Cursor("Cursor");
-    cursor.style = uiStyle;
+    cursor.SetStyleAuto(uiStyle);
     cursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = cursor;
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
@@ -317,7 +317,7 @@ void CreateCamera()
     if (!engine.headless)
     {
         renderer.viewports[0] = Viewport(testScene, camera);
-        
+
         // Add bloom & FXAA effects to the renderpath. Clone the default renderpath so that we don't affect it
         RenderPath@ newRenderPath = renderer.viewports[0].renderPath.Clone();
         newRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/Bloom.xml"));
@@ -470,7 +470,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 camera = cameraNode.GetComponent("Camera");
                 cameraLightNode = cameraNode.GetChild("CameraLight");
                 renderer.viewports[0] = Viewport(testScene, camera);
-                audio.listener = cameraNode.GetComponent("SoundListener");                
+                audio.listener = cameraNode.GetComponent("SoundListener");
                 // Reacquire animating objects
                 animatingObjects.Clear();
                 billboards.Clear();

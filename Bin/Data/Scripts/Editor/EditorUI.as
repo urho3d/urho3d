@@ -106,7 +106,7 @@ void AdjustPosition(Window@ window)
 void CreateCursor()
 {
     Cursor@ cursor = Cursor("Cursor");
-    cursor.style = uiStyle;
+    cursor.SetStyleAuto(uiStyle);
     cursor.SetPosition(graphics.width / 2, graphics.height / 2);
     ui.cursor = cursor;
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
@@ -117,16 +117,16 @@ void CreateCursor()
 funcdef bool MENU_CALLBACK();
 Array<MENU_CALLBACK@> menuCallbacks;
 
+/// Create top menu bar.
 void CreateMenuBar()
 {
     uiMenuBar = BorderImage("MenuBar");
+    ui.root.AddChild(uiMenuBar);
     uiMenuBar.enabled = true;
-    uiMenuBar.SetStyle(uiStyle, "EditorMenuBar");
+    uiMenuBar.style = "EditorMenuBar";
     uiMenuBar.SetLayout(LM_HORIZONTAL);
     uiMenuBar.opacity = uiMaxOpacity;
     uiMenuBar.SetFixedWidth(graphics.width);
-
-    ui.root.AddChild(uiMenuBar);
 
     {
         Menu@ menu = CreateMenu("File");
@@ -135,7 +135,7 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Open scene...", @PickFile, 'O', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene", @SaveSceneWithExistingName, 'S', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene as...", @PickFile, 'S', QUAL_SHIFT | QUAL_CTRL));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
 
         Menu@ childMenu = CreateMenuItem("Load node", null, SHOW_POPUP_INDICATOR);
         Window@ childPopup = CreatePopup(childMenu);
@@ -144,13 +144,13 @@ void CreateMenuBar()
         popup.AddChild(childMenu);
 
         popup.AddChild(CreateMenuItem("Save node as...", @PickFile));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Import model...", @PickFile));
         popup.AddChild(CreateMenuItem("Import scene...", @PickFile));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Run script...", @PickFile));
         popup.AddChild(CreateMenuItem("Set resource path...", @PickFile));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Exit", @Exit));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
@@ -161,23 +161,23 @@ void CreateMenuBar()
         Window@ popup = menu.popup;
         popup.AddChild(CreateMenuItem("Undo", @Undo, 'Z', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Redo", @Redo, 'Y', QUAL_CTRL));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Cut", @Cut, 'X', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
         popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition));
         popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation));
         popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale));
         popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Toggle update", @ToggleUpdate, 'P', QUAL_CTRL));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
@@ -188,7 +188,7 @@ void CreateMenuBar()
         Window@ popup = menu.popup;
         popup.AddChild(CreateMenuItem("Replicated node", @PickNode));
         popup.AddChild(CreateMenuItem("Local node", @PickNode));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
 
         Menu@ childMenu = CreateMenuItem("Component", null, SHOW_POPUP_INDICATOR);
         Window@ childPopup = CreatePopup(childMenu);
@@ -215,7 +215,7 @@ void CreateMenuBar()
         for (uint i = 0; i < objects.length; ++i)
             childPopup.AddChild(CreateIconizedMenuItem(objects[i], @PickBuiltinObject, 0, 0, "Node"));
         popup.AddChild(childMenu);
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
 
         childMenu = CreateMenuItem("UI-element", null, SHOW_POPUP_INDICATOR);
         childPopup = CreatePopup(childMenu);
@@ -225,7 +225,7 @@ void CreateMenuBar()
             if (uiElementTypes[i] != "UIElement")
                 childPopup.AddChild(CreateIconizedMenuItem(uiElementTypes[i], @PickUIElement));
         }
-        childPopup.AddChild(CreateMenuDivider());
+        CreateChildDivider(childPopup);
         childPopup.AddChild(CreateIconizedMenuItem("UIElement", @PickUIElement));
         popup.AddChild(childMenu);
 
@@ -239,13 +239,13 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Open UI-element...", @PickFile, 'O', QUAL_ALT));
         popup.AddChild(CreateMenuItem("Save UI-element", @SaveUIElementWithExistingName, 'S', QUAL_ALT));
         popup.AddChild(CreateMenuItem("Save UI-element as...", @PickFile));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Close UI-element", @CloseUIElement, 'C', QUAL_ALT));
         popup.AddChild(CreateMenuItem("Close all UI-elements", @CloseAllUIElements));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Load child element...", @PickFile));
         popup.AddChild(CreateMenuItem("Save child element as...", @PickFile));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Set default style...", @PickFile));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
@@ -258,15 +258,15 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Attribute inspector", @ShowAttributeInspectorWindow, 'I', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Editor settings", @ShowEditorSettingsDialog));
         popup.AddChild(CreateMenuItem("Editor preferences", @ShowEditorPreferencesDialog));
-        popup.AddChild(CreateMenuDivider());
+        CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Hide editor", @ToggleUI, KEY_F12, QUAL_ANY));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
 
     BorderImage@ spacer = BorderImage("MenuBarSpacer");
-    spacer.SetStyle(uiStyle, "EditorMenuBar");
     uiMenuBar.AddChild(spacer);
+    spacer.style = "EditorMenuBar";
 
     BorderImage@ logo = BorderImage("Logo");
     logo.texture = cache.GetResource("Texture2D", "Textures/Logo.png");
@@ -465,7 +465,7 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
 {
     Menu@ menu = Menu(title);
     menu.defaultStyle = uiStyle;
-    menu.style = uiStyle;
+    menu.style = "";    // Auto style
     menu.SetLayout(LM_HORIZONTAL, 0, IntRect(8, 2, 8, 2));
     if (accelKey > 0)
         menu.SetAccelerator(accelKey, accelQual);
@@ -477,7 +477,7 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
 
     Text@ menuText = Text();
     menu.AddChild(menuText);
-    menuText.SetStyle(uiStyle, "EditorMenuText");
+    menuText.style = "EditorMenuText";
     menuText.text = title;
 
     if (accelKey != 0)
@@ -495,7 +495,7 @@ Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = nu
 {
     Menu@ menu = Menu(title);
     menu.defaultStyle = uiStyle;
-    menu.style = uiStyle;
+    menu.style = "";    // Auto style
     menu.SetLayout(LM_VERTICAL, 0, IntRect(8, 2, 8, 2));
     if (accelKey > 0)
         menu.SetAccelerator(accelKey, accelQual);
@@ -507,7 +507,7 @@ Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = nu
 
     Text@ menuText = Text();
     menu.AddChild(menuText);
-    menuText.SetStyle(uiStyle, "EditorMenuText");
+    menuText.style = "EditorMenuText";
     menuText.text = title;
     // If icon type is not provided, use the title instead
     IconizeUIElement(menuText, iconType.empty ? title : iconType);
@@ -521,18 +521,18 @@ Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = nu
     return menu;
 }
 
-BorderImage@ CreateMenuDivider()
+/// Create a child divider in parent with vertical layout mode. It works on other parent element as well, not just parent menu.
+void CreateChildDivider(UIElement@ parent)
 {
-    BorderImage@ divider = BorderImage();
-    divider.SetStyle(uiStyle, "EditorDivider");
-
-    return divider;
+    BorderImage@ divider = parent.CreateChild("BorderImage", "Divider");
+    divider.style = "EditorDivider";
 }
 
 Window@ CreatePopup(Menu@ baseMenu)
 {
     Window@ popup = Window();
-    popup.style = uiStyle;
+    popup.defaultStyle = uiStyle;
+    popup.style = "";    // Auto style
     popup.SetLayout(LM_VERTICAL, 1, IntRect(2, 6, 2, 6));
     baseMenu.popup = popup;
     baseMenu.popupOffset = IntVector2(0, baseMenu.height);
@@ -553,7 +553,7 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
 {
     Text@ accelKeyText = Text();
     accelKeyText.defaultStyle = uiStyle;
-    accelKeyText.SetStyle(uiStyle, "EditorMenuText");
+    accelKeyText.style = "EditorMenuText";
     accelKeyText.horizontalAlignment = HA_RIGHT;
     accelKeyText.indent = 1;
 
@@ -643,7 +643,7 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     // Within the editor UI, the file selector is a kind of a "singleton". When the previous one is overwritten, also
     // the events subscribed from it are disconnected, so new ones are safe to subscribe.
     uiFileSelector = FileSelector();
-    uiFileSelector.style = uiStyle;
+    uiFileSelector.defaultStyle = uiStyle;
     uiFileSelector.title = title;
     uiFileSelector.path = initialPath;
     uiFileSelector.SetButtonTexts(ok, cancel);
@@ -669,14 +669,14 @@ void CloseFileSelector()
 void CreateConsole()
 {
     Console@ console = engine.CreateConsole();
-    console.style = uiStyle;
+    console.defaultStyle = uiStyle;
     console.numRows = 16;
 }
 
 void CreateDebugHud()
 {
     engine.CreateDebugHud();
-    debugHud.style = uiStyle;
+    debugHud.defaultStyle = uiStyle;
     debugHud.mode = DEBUGHUD_SHOW_NONE;
 }
 
@@ -992,8 +992,8 @@ void IconizeUIElement(UIElement@ element, const String&in iconType)
     }
 
     // Set the icon type
-    if (!icon.SetStyle(iconStyle, iconType))
-        icon.SetStyle(iconStyle, "Unknown");    // If fails then use an 'unknown' icon type
+    if (!icon.SetStyle(iconType, iconStyle))
+        icon.SetStyle("Unknown", iconStyle);    // If fails then use an 'unknown' icon type
     icon.color = Color(1,1,1,1); // Reset to enabled color
 }
 

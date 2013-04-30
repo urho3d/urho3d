@@ -817,6 +817,14 @@ static VariantMap& UIElementGetVars(UIElement* ptr)
     return const_cast<VariantMap&>(ptr->GetVars());
 }
 
+static void UIElementSetStyle(const String& styleName, UIElement* ptr)
+{
+    if (styleName.Empty() || styleName == "auto")
+        ptr->SetStyleAuto();
+    else
+        ptr->SetStyle(styleName);
+}
+
 static XMLFile* UIElementGetDefaultStyle(UIElement* ptr)
 {
     return ptr->GetDefaultStyle();
@@ -836,12 +844,12 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+, bool arg2 = false)", asMETHODPR(T, LoadXML, (const XMLElement&, XMLFile*, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTIONPR(UIElementLoadXML, (File*, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(XMLFile@+, XMLFile@+)", asFUNCTIONPR(UIElementLoadXML, (XMLFile*, XMLFile*, UIElement*), bool), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool LoadChildXML(const XMLElement&in, XMLFile@+, bool arg2 = false)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool LoadChildXML(XMLFile@+, XMLFile@+)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool LoadChildXML(const XMLElement&in, XMLFile@+ arg1 = null, bool arg2 = false)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LoadChildXML(XMLFile@+, XMLFile@+ arg1 = null)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(File@+)", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool SetStyle(XMLFile@+, const String&in)", asMETHODPR(T, SetStyle, (XMLFile*, const String&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool SetStyleAuto(XMLFile@+)", asMETHOD(T, SetStyleAuto), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SetStyle(const String&in, XMLFile@+ arg1 = null)", asMETHODPR(T, SetStyle, (const String&, XMLFile*), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SetStyleAuto(XMLFile@+ arg0 = null)", asMETHOD(T, SetStyleAuto), asCALL_THISCALL);
     if (!isSprite)
         engine->RegisterObjectMethod(className, "void SetPosition(int, int)", asMETHODPR(UIElement, SetPosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetSize(int, int)", asMETHODPR(T, SetSize, (int, int), void), asCALL_THISCALL);
@@ -880,7 +888,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "bool IsInside(IntVector2, bool)", asMETHOD(T, IsInside), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool IsInsideCombined(IntVector2, bool)", asMETHOD(T, IsInsideCombined), asCALL_THISCALL);
     }
-    engine->RegisterObjectMethod(className, "void set_style(XMLFile@+)", asMETHOD(T, SetStyleAuto), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_style(const String&in)", asFUNCTION(UIElementSetStyle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "const String& get_style() const", asMETHOD(T, GetAppliedStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_name(const String&in)", asMETHOD(T, SetName), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHOD(T, GetName), asCALL_THISCALL);
     if (!isSprite)
@@ -968,7 +977,6 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "void set_traversalMode(TraversalMode)", asMETHOD(T, SetTraversalMode), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "TraversalMode get_traversalMode() const", asMETHOD(T, GetTraversalMode), asCALL_THISCALL);
     }
-    engine->RegisterObjectMethod(className, "const String& get_appliedStyle() const", asMETHOD(T, GetAppliedStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_defaultStyle(XMLFile@+)", asMETHOD(T, SetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "XMLFile@+ get_defaultStyle() const", asFUNCTION(UIElementGetDefaultStyle), asCALL_CDECL_OBJLAST);
     if (!isSprite)

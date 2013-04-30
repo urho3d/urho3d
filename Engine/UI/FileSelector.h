@@ -52,7 +52,7 @@ struct FileSelectorEntry
 class FileSelector : public Object
 {
     OBJECT(FileSelector);
-    
+
 public:
     /// Construct.
     FileSelector(Context* context);
@@ -60,9 +60,9 @@ public:
     virtual ~FileSelector();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Set fileselector UI style.
-    void SetStyle(XMLFile* style);
+    void SetDefaultStyle(XMLFile* style);
     /// Set title text.
     void SetTitle(const String& text);
     /// Set button texts.
@@ -77,9 +77,9 @@ public:
     void SetDirectoryMode(bool enable);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
-    
+
     /// Return the UI style file.
-    XMLFile* GetStyle() const { return style_; }
+    XMLFile* GetDefaultStyle() const;
     /// Return fileselector window.
     Window* GetWindow() const { return window_; }
     /// Return window title text element.
@@ -110,7 +110,7 @@ public:
     unsigned GetFilterIndex() const;
     /// Return directory mode flag.
     bool GetDirectoryMode() const { return directoryMode_; }
-    
+
 private:
     /// Set the text of an edit field and ignore the resulting event.
     void SetLineEditText(LineEdit* edit, const String& text);
@@ -132,11 +132,9 @@ private:
     void HandleOKPressed(StringHash eventType, VariantMap& eventData);
     /// Handle cancel button pressed.
     void HandleCancelPressed(StringHash eventType, VariantMap& eventData);
-    
+
     /// UI subsystem.
     SharedPtr<UI> ui_;
-    /// UI style file.
-    SharedPtr<XMLFile> style_;
     /// Fileselector window.
     SharedPtr<Window> window_;
     /// Title layout.

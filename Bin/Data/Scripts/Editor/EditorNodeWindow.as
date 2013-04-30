@@ -257,12 +257,12 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         {
             elementType = editUIElement.typeName;
             titleText.text = elementType + " [ID " + GetUIElementID(editUIElement).ToString() + "]";
-            SetStyleListSelection(styleList, editUIElement.appliedStyle);
+            SetStyleListSelection(styleList, editUIElement.style);
         }
         else
         {
             elementType = editUIElements[0].typeName;
-            String appliedStyle = cast<UIElement>(editUIElements[0]).appliedStyle;
+            String appliedStyle = cast<UIElement>(editUIElements[0]).style;
 
             bool sameType = true;
             bool sameStyle = true;
@@ -275,7 +275,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
                     break;
                 }
 
-                if (sameStyle && cast<UIElement>(editUIElements[i]).appliedStyle != appliedStyle)
+                if (sameStyle && cast<UIElement>(editUIElements[i]).style != appliedStyle)
                     sameStyle = false;
             }
             titleText.text = (sameType ? elementType : "Mixed type") + " [ID " + STRIKED_OUT + " : " + editUIElements.length + "x]";
