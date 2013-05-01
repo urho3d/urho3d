@@ -486,6 +486,7 @@ When setting the initial screen mode, Graphics does a few checks:
 
 - For Direct3D9, the supported shader model is checked. 2 is minimum, but 3 will be used if available. SM2 can be forced by calling \ref Graphics::SetForceSM2 "SetForceSM2()" before setting the initial screen mode.
 - For OpenGL, version 2.0 with EXT_framebuffer_object, EXT_packed_depth_stencil and EXT_texture_filter_anisotropic extensions is checked for.
+- Is hardware instancing supported? This requires shader model 3 on Direct3D9 and the ARB_instanced_arrays extension on OpenGL.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, no shadows will be rendered.
 - Are light pre-pass and deferred rendering modes supported? These require sufficient multiple rendertarget support, and R32F texture format support.
 
@@ -543,7 +544,7 @@ The following techniques will be used to reduce the amount of CPU and GPU work w
 
 - Software rasterized occlusion: after the octree has been queried for visible objects, the objects that are marked as occluders are rendered on the CPU to a small hierarchical-depth buffer, and it will be used to test the non-occluders for visibility. Use \ref Renderer::SetMaxOccluderTriangles "SetMaxOccluderTriangles()" and \ref Renderer::SetOccluderSizeThreshold "SetOccluderSizeThreshold()" to configure the occlusion rendering.
 
-- Hardware instancing (Direct3D9 SM3 only): rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
+- Hardware instancing: rendering operations with the same geometry, material and light will be grouped together and performed as one draw call. Objects with a large amount of triangles will not be rendered as instanced, as that could actually be detrimental to performance. Use \ref Renderer::SetMaxInstanceTriangles "SetMaxInstanceTriangles()" to set the threshold. Note that even when instancing is not available, or the triangle count of objects is too large, they still benefit from the grouping, as render state only needs to be set once before rendering each group, reducing the CPU cost.
 
 - %Light stencil masking: in forward rendering, before objects lit by a spot or point light are re-rendered additively, the light's bounding shape is rendered to the stencil buffer to ensure pixels outside the light range are not processed.
 
@@ -630,8 +631,6 @@ These differences need to be observed when using the low-level rendering functio
 - Modifying an index buffer on OpenGL will similarly cause the existing index buffer assignment to be lost. Therefore, always set the vertex and index buffers before rendering.
 
 - %Shader resources are stored in different locations depending on the API: Bin/CoreData/Shaders/HLSL for Direct3D9, and Bin/CoreData/Shaders/GLSL for OpenGL.
-
-- At least for now, instancing is not supported for OpenGL. It still benefits from the instance group rendering loop, which only changes the model transform for each object with the same material and light, instead of setting the whole renderstate.
 
 - To ensure similar UV addressing for render-to-texture viewports on both APIs, on OpenGL texture viewports will be rendered upside down.
 
@@ -794,7 +793,7 @@ For both variations and options, a name is required, and one or more defines to 
 </variation>
 \endcode
 
-A variation or option can "require" other defines, for example instancing requires the SM3 define which tells that we are compiling for %Shader %Model 3. Like defines, requires can be listed either as an attribute (if only one) or as a child element (if many.)
+A variation or option can "require" other defines, for example in HLSL shaders instancing requires the SM3 define which tells that we are compiling for %Shader %Model 3. Like defines, requires can be listed either as an attribute (if only one) or as a child element (if many.)
 
 Additionally, an option can "include" or "exclude" other options. Use this mechanism instead of variations if complex dependencies between options is required, instead of simple exclusion. Again, includes or excludes can be listed either as attributes or child elements.
 

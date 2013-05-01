@@ -1,6 +1,6 @@
 <shaders>
-    <shader type="vs" />
-    <shader type="ps">
-        <option name="AlphaMask" define="ALPHAMASK" />
+    <shader type="vs">
+        <variation name="" />
+        <variation name="Instanced" define="INSTANCED" />
     </shader>
 </shaders>

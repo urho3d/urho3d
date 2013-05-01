@@ -2990,6 +2990,7 @@ Properties:<br>
 - uint numPrimitives (readonly)
 - uint numBatches (readonly)
 - bool sm3Support (readonly)
+- bool instancingSupport (readonly)
 - bool lightPrepassSupport (readonly)
 - bool deferredSupport (readonly)
 - bool hardwareShadowSupport (readonly)

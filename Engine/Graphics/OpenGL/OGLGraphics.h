@@ -112,7 +112,7 @@ public:
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
     /// Draw indexed geometry.
     void Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
-    /// Draw indexed, instanced geometry. No-op on OpenGL.
+    /// Draw indexed, instanced geometry.
     void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     /// Set vertex buffer.
     void SetVertexBuffer(VertexBuffer* buffer);
@@ -247,6 +247,8 @@ public:
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL.
     bool GetSM3Support() const { return false; }
+    /// Return whether hardware instancing is supported.
+    bool GetInstancingSupport() const { return instancingSupport_; }
     /// Return whether light pre-pass rendering is supported.
     bool GetLightPrepassSupport() const { return lightPrepassSupport_; }
     /// Return whether deferred rendering is supported.
@@ -255,8 +257,8 @@ public:
     bool GetAnisotropySupport() const { return anisotropySupport_; }
     /// Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
     bool GetHardwareShadowSupport() const { return true; }
-    /// Return whether stream offset is supported. Always false on OpenGL.
-    bool GetStreamOffsetSupport() const { return false; }
+    /// Return whether stream offset is supported. Always true on OpenGL.
+    bool GetStreamOffsetSupport() const { return true; }
     /// Return whether sRGB conversion on texture sampling is supported.
     bool GetSRGBSupport() const { return sRGBSupport_; }
     /// Return whether sRGB conversion on rendertarget writing is supported.
@@ -428,6 +430,8 @@ private:
     bool tripleBuffer_;
     /// sRGB conversion on write flag for the main window.
     bool sRGB_;
+    /// Instancing support flag.
+    bool instancingSupport_;
     /// Light prepass support flag.
     bool lightPrepassSupport_;
     /// Deferred rendering support flag.
@@ -524,6 +528,8 @@ private:
     unsigned stencilCompareMask_;
     /// Stencil write bitmask.
     unsigned stencilWriteMask_;
+    /// Last used instance data offset.
+    unsigned lastInstanceOffset_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.

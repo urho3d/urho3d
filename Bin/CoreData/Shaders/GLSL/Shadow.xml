@@ -2,6 +2,7 @@
     <shader type="vs">
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
+        <variation name="Instanced" define="INSTANCED" />
     </shader>
     <shader type="ps">
         <option name="AlphaMask" define="ALPHAMASK" />

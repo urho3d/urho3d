@@ -162,6 +162,7 @@ Graphics::Graphics(Context* context_) :
     vsync_(false),
     tripleBuffer_(false),
     sRGB_(false),
+    instancingSupport_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     anisotropySupport_(false),
@@ -379,11 +380,21 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
                 Release(true, true);
                 return false;
             }
-        
+            
+            instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
             dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
             anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
             sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
             sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
+            
+            // Set up instancing divisors if supported
+            if (instancingSupport_)
+            {
+                glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
+                glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
+                glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
+            }
+            
             #else
             dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
             etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
@@ -677,6 +688,50 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount)
 {
+    #ifndef GL_ES_VERSION_2_0
+    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
+        return;
+    
+    if (impl_->fboDirty_)
+        CommitFramebuffer();
+    
+    unsigned primitiveCount = 0;
+    unsigned indexSize = indexBuffer_->GetIndexSize();
+    
+    switch (type)
+    {
+    case TRIANGLE_LIST:
+        primitiveCount = indexCount / 3;
+        if (indexSize == sizeof(unsigned short))
+        {
+            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, (const GLvoid*)(indexStart * indexSize),
+                instanceCount);
+        }
+        else
+        {
+            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (const GLvoid*)(indexStart * indexSize),
+                instanceCount);
+        }
+        break;
+        
+    case LINE_LIST:
+        primitiveCount = indexCount / 2;
+        if (indexSize == sizeof(unsigned short))
+        {
+            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_SHORT, (const GLvoid*)(indexStart * indexSize),
+                instanceCount);
+        }
+        else
+        {
+            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_INT, (const GLvoid*)(indexStart * indexSize),
+                instanceCount);
+        }
+        break;
+    }
+    
+    numPrimitives_ += instanceCount * primitiveCount;
+    ++numBatches_;
+    #endif
 }
 
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
@@ -720,7 +775,7 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         }
         
         // If buffer and element mask have stayed the same, skip to the next buffer
-        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && !changed)
+        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && instanceOffset == lastInstanceOffset_ && !changed)
         {
             newAttributes |= elementMask;
             continue;
@@ -754,15 +809,19 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
                     impl_->enabledAttributes_ |= elementBit;
                 }
                 
-                // Set the attribute pointer
+                // Set the attribute pointer. Add instance offset for the instance matrix pointers
+                unsigned offset = j >= ELEMENT_INSTANCEMATRIX1 ? instanceOffset * vertexSize : 0;
                 glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
-                    VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)));
+                    VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)
+                    + offset));
             }
         }
     }
     
     if (!changed)
         return true;
+    
+    lastInstanceOffset_ = instanceOffset;
     
     // Now check which vertex attributes should be disabled
     unsigned disableAttributes = impl_->enabledAttributes_ & (~newAttributes);
@@ -814,7 +873,7 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         }
         
         // If buffer and element mask have stayed the same, skip to the next buffer
-        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && !changed)
+        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && instanceOffset == lastInstanceOffset_ && !changed)
         {
             newAttributes |= elementMask;
             continue;
@@ -848,15 +907,19 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
                     impl_->enabledAttributes_ |= elementBit;
                 }
                 
-                // Set the attribute pointer
+                // Set the attribute pointer. Add instance offset for the instance matrix pointers
+                unsigned offset = j >= ELEMENT_INSTANCEMATRIX1 ? instanceOffset * vertexSize : 0;
                 glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
-                    VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)));
+                    VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)
+                    + offset));
             }
         }
     }
     
     if (!changed)
         return true;
+    
+    lastInstanceOffset_ = instanceOffset;
     
     // Now check which vertex attributes should be disabled
     unsigned disableAttributes = impl_->enabledAttributes_ & (~newAttributes);
@@ -2543,6 +2606,7 @@ void Graphics::ResetCachedState()
     stencilRef_ = 0;
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
+    lastInstanceOffset_ = 0;
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
     impl_->boundFbo_ = impl_->systemFbo_;

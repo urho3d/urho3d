@@ -45,10 +45,10 @@ add_definitions (-DENABLE_LOGGING)
 # If not on MSVC, enable use of OpenGL instead of Direct3D9 (either not compiling on Windows or
 # with a compiler that may not have an up-to-date DirectX SDK). This can also be unconditionally
 # set, but Windows graphics card drivers are usually better optimized for Direct3D.
-if (NOT MSVC)
+#if (NOT MSVC)
     set (USE_OPENGL 1)
     add_definitions (-DUSE_OPENGL)
-endif ()
+#endif ()
 
 # If not on Windows, enable Unix mode for kNet library.
 if (NOT WIN32)

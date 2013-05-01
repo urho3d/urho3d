@@ -1732,7 +1732,7 @@ void Renderer::SetIndirectionTextureData()
 void Renderer::CreateInstancingBuffer()
 {
     // Do not create buffer if instancing not supported
-    if (!graphics_->GetSM3Support())
+    if (!graphics_->GetInstancingSupport())
     {
         instancingBuffer_.Reset();
         dynamicInstancing_ = false;
