@@ -66,7 +66,6 @@ void CreateHierarchyWindow()
     SubscribeToEvent(hierarchyWindow.GetChild("ExpandButton", true), "Released", "ExpandCollapseHierarchy");
     SubscribeToEvent(hierarchyWindow.GetChild("CollapseButton", true), "Released", "ExpandCollapseHierarchy");
     SubscribeToEvent(hierarchyList, "SelectionChanged", "HandleHierarchyListSelectionChange");
-    SubscribeToEvent(hierarchyList, "ItemDoubleClicked", "HandleHierarchyListItemDoubleClick");
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
     SubscribeToEvent("DragDropFinish", "HandleDragDropFinish");
     SubscribeToEvent(editorScene, "NodeAdded", "HandleNodeAdded");
@@ -689,12 +688,6 @@ void HandleHierarchyListSelectionChange()
 
     PositionGizmo();
     UpdateAttributeInspector();
-}
-
-void HandleHierarchyListItemDoubleClick(StringHash eventType, VariantMap& eventData)
-{
-    uint index = eventData["Selection"].GetUInt();
-    hierarchyList.ToggleExpand(index);
 }
 
 void HandleDragDropTest(StringHash eventType, VariantMap& eventData)

@@ -64,7 +64,7 @@ bool NewUIElement(const String&in typeName)
             CenterDialog(element);
         }
         // Apply the auto style
-        element.style = "";
+        element.style = AUTO_STYLE;
         // Do not allow UI subsystem to reorder children while editing the element in the editor
         element.sortChildren = false;
 
@@ -88,7 +88,7 @@ void ResetSortChildren(UIElement@ element)
         ResetSortChildren(element.children[i]);
 }
 
-void OpenUIElement(const String&in fileName)
+void OpenUILayout(const String&in fileName)
 {
     if (fileName.empty)
         return;
@@ -144,7 +144,7 @@ void OpenUIElement(const String&in fileName)
     suppressUIElementChanges = false;
 }
 
-bool CloseUIElement()
+bool CloseUILayout()
 {
     ui.cursor.shape = CS_BUSY;
 
@@ -167,7 +167,7 @@ bool CloseUIElement()
     return true;
 }
 
-bool CloseAllUIElements()
+bool CloseAllUILayouts()
 {
     ui.cursor.shape = CS_BUSY;
 
@@ -187,7 +187,7 @@ bool CloseAllUIElements()
     return true;
 }
 
-bool SaveUIElement(const String&in fileName)
+bool SaveUILayout(const String&in fileName)
 {
     if (fileName.empty)
         return false;
@@ -219,7 +219,7 @@ bool SaveUIElement(const String&in fileName)
     return success;
 }
 
-bool SaveUIElementWithExistingName()
+bool SaveUILayoutWithExistingName()
 {
     ui.cursor.shape = CS_BUSY;
 
@@ -231,7 +231,7 @@ bool SaveUIElementWithExistingName()
     if (fileName.empty)
         return PickFile();  // No name yet, so pick one
     else
-        return SaveUIElement(fileName);
+        return SaveUILayout(fileName);
 }
 
 void LoadChildUIElement(const String&in fileName)
@@ -390,7 +390,7 @@ UIElement@ GetTopLevelUIElement(UIElement@ element)
 void SetUIElementModified(UIElement@ element, bool flag = true)
 {
     element = GetTopLevelUIElement(element);
-    if (element.GetVar(MODIFIED_VAR).GetBool() != flag)
+    if (element !is null && element.GetVar(MODIFIED_VAR).GetBool() != flag)
     {
         element.vars[MODIFIED_VAR] = flag;
         UpdateHierarchyItemText(GetListIndex(element), element.visible, GetUIElementTitle(element));

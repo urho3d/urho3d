@@ -281,7 +281,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
             titleText.text = (sameType ? elementType : "Mixed type") + " [ID " + STRIKED_OUT + " : " + editUIElements.length + "x]";
             SetStyleListSelection(SetEditable(styleList, sameStyle), sameStyle ? appliedStyle : STRIKED_OUT);
             if (!sameType)
-                elementType = "";   // No icon
+                elementType.Clear();   // No icon
         }
         IconizeUIElement(titleText, elementType);
 
@@ -701,7 +701,7 @@ void HandleStyleItemSelected(StringHash eventType, VariantMap& eventData)
         return;
     String newStyle = text.text;
     if (newStyle == "auto")
-        newStyle = "";
+        newStyle.Clear();
 
     // Group for storing undo actions
     EditActionGroup group;

@@ -11,6 +11,7 @@ const ShortStringHash MENU_TYPE("Menu");
 const ShortStringHash TEXT_TYPE("Text");
 const ShortStringHash CURSOR_TYPE("Cursor");
 
+const String AUTO_STYLE("");    // Empty string means auto style, i.e. applying style according to UI-element's type automatically
 const String TEMP_SCENE_NAME("_tempscene_.xml");
 const ShortStringHash CALLBACK_VAR("Callback");
 const ShortStringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
@@ -234,14 +235,14 @@ void CreateMenuBar()
     }
 
     {
-        Menu@ menu = CreateMenu("UI-element");
+        Menu@ menu = CreateMenu("UI-layout");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("Open UI-element...", @PickFile, 'O', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Save UI-element", @SaveUIElementWithExistingName, 'S', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Save UI-element as...", @PickFile));
+        popup.AddChild(CreateMenuItem("Open UI-layout...", @PickFile, 'O', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Save UI-layout", @SaveUILayoutWithExistingName, 'S', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Save UI-layout as...", @PickFile));
         CreateChildDivider(popup);
-        popup.AddChild(CreateMenuItem("Close UI-element", @CloseUIElement, 'C', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Close all UI-elements", @CloseAllUIElements));
+        popup.AddChild(CreateMenuItem("Close UI-layout", @CloseUILayout, 'C', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Close all UI-layouts", @CloseAllUILayouts));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Load child element...", @PickFile));
         popup.AddChild(CreateMenuItem("Save child element as...", @PickFile));
@@ -345,12 +346,12 @@ bool PickFile()
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
     }
     // UI-element
-    else if (action == "Open UI-element...")
+    else if (action == "Open UI-layout...")
     {
-        CreateFileSelector("Open UI-element", "Open", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
-        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenUIElementFile");
+        CreateFileSelector("Open UI-layout", "Open", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+        SubscribeToEvent(uiFileSelector, "FileSelected", "HandleOpenUILayoutFile");
     }
-    else if (action == "Save UI-element as..." || action == "Save UI-element")
+    else if (action == "Save UI-layout as..." || action == "Save UI-layout")
     {
         if (editUIElement !is null)
         {
@@ -358,9 +359,9 @@ bool PickFile()
             if (element is null)
                 return false;
 
-            CreateFileSelector("Save UI-element as", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
+            CreateFileSelector("Save UI-layout as", "Save", "Cancel", uiElementPath, uiElementFilters, uiElementFilter);
             uiFileSelector.fileName = GetFileNameAndExtension(element.GetVar(FILENAME_VAR).GetString());
-            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveUIElementFile");
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveUILayoutFile");
         }
     }
     else if (action == "Load child element...")
@@ -465,7 +466,7 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
 {
     Menu@ menu = Menu(title);
     menu.defaultStyle = uiStyle;
-    menu.style = "";    // Auto style
+    menu.style = AUTO_STYLE;
     menu.SetLayout(LM_HORIZONTAL, 0, IntRect(8, 2, 8, 2));
     if (accelKey > 0)
         menu.SetAccelerator(accelKey, accelQual);
@@ -495,7 +496,7 @@ Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = nu
 {
     Menu@ menu = Menu(title);
     menu.defaultStyle = uiStyle;
-    menu.style = "";    // Auto style
+    menu.style = AUTO_STYLE;
     menu.SetLayout(LM_VERTICAL, 0, IntRect(8, 2, 8, 2));
     if (accelKey > 0)
         menu.SetAccelerator(accelKey, accelQual);
@@ -532,7 +533,7 @@ Window@ CreatePopup(Menu@ baseMenu)
 {
     Window@ popup = Window();
     popup.defaultStyle = uiStyle;
-    popup.style = "";    // Auto style
+    popup.style = AUTO_STYLE;
     popup.SetLayout(LM_VERTICAL, 1, IntRect(2, 6, 2, 6));
     baseMenu.popup = popup;
     baseMenu.popupOffset = IntVector2(0, baseMenu.height);
@@ -796,16 +797,16 @@ void HandleResourcePath(StringHash eventType, VariantMap& eventData)
     SetResourcePath(ExtractFileName(eventData), false);
 }
 
-void HandleOpenUIElementFile(StringHash eventType, VariantMap& eventData)
+void HandleOpenUILayoutFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiElementFilter, uiElementPath);
-    OpenUIElement(ExtractFileName(eventData));
+    OpenUILayout(ExtractFileName(eventData));
 }
 
-void HandleSaveUIElementFile(StringHash eventType, VariantMap& eventData)
+void HandleSaveUILayoutFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiElementFilter, uiElementPath);
-    SaveUIElement(ExtractFileName(eventData));
+    SaveUILayout(ExtractFileName(eventData));
 }
 
 void HandleLoadChildUIElementFile(StringHash eventType, VariantMap& eventData)

@@ -142,7 +142,7 @@ UIElement@ CreateBoolAttributeEditor(ListView@ list, Array<Serializable@>@ seria
 
     CheckBox@ attrEdit = CheckBox();
     parent.AddChild(attrEdit);
-    attrEdit.style = "";    // Auto style
+    attrEdit.style = AUTO_STYLE;
     attrEdit.vars["Index"] = index;
     attrEdit.vars["SubIndex"] = subIndex;
     SetAttributeEditorID(attrEdit, serializables);
@@ -189,7 +189,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     {
         DropDownList@ attrEdit = DropDownList();
         parent.AddChild(attrEdit);
-        attrEdit.style = "";    // Auto style
+        attrEdit.style = AUTO_STYLE;
         attrEdit.SetFixedHeight(ATTR_HEIGHT - 2);
         attrEdit.resizePopup = true;
         attrEdit.placeholderText = STRIKED_OUT;
@@ -237,7 +237,7 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
 
     Button@ pickButton = Button();
     container.AddChild(pickButton);
-    pickButton.style = "";    // Auto style
+    pickButton.style = AUTO_STYLE;
     pickButton.SetFixedSize(36, ATTR_HEIGHT - 2);
     pickButton.vars["Index"] = index;
     pickButton.vars["SubIndex"] = subIndex;
@@ -252,7 +252,7 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
 
     Button@ openButton = Button();
     container.AddChild(openButton);
-    openButton.style = "";    // Auto style
+    openButton.style = AUTO_STYLE;
     openButton.SetFixedSize(36, ATTR_HEIGHT - 2);
     openButton.vars["Index"] = index;
     openButton.vars["SubIndex"] = subIndex;
