@@ -700,7 +700,8 @@ void HandleStyleItemSelected(StringHash eventType, VariantMap& eventData)
     if (text is null)
         return;
     String newStyle = text.text;
-    bool autoStyle = newStyle == "auto";
+    if (newStyle == "auto")
+        newStyle = "";
 
     // Group for storing undo actions
     EditActionGroup group;
@@ -711,7 +712,7 @@ void HandleStyleItemSelected(StringHash eventType, VariantMap& eventData)
         UIElement@ element = editUIElements[i];
 
         ApplyUIElementStyleAction action;
-        action.Define(element, autoStyle ? element.typeName : newStyle);
+        action.Define(element, newStyle);
         group.actions.Push(action);
 
         // Use the Redo() to actually do the action
