@@ -166,6 +166,12 @@ RelWithDebInfo build).
 
 For Xcode on Mac OS X, open Urho3D.xcodeproj and build.
 
+Currently CMake build configuration has been set to compile Urho3D as 32bit by
+default for non-MSVC/non-Windows platform. To enable 64bit build, pass the
+option "-DENABLE_64BIT=1" explicitly when invoking cmake_eclipse.sh/
+cmake_macosx.sh/cmake_gcc.sh. Alternatively, you can modify the main CMakeLists.txt
+to enable 64bit by default for non-MSVC/non-Windows platform.
+
 After the build is complete, the programs can be run from the Bin directory.
 
 To run from the Visual Studio debugger, set the Urho3D project as the startup
