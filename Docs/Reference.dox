@@ -1474,6 +1474,7 @@ lod   Combine several Urho3D models as LOD levels of the output model
 
 Options:
 -b    Save scene in binary format, default format is XML
+-h    Generate hard instead of smooth normals if input file has no normals
 -i    Use local ID's for scene nodes
 -na   Do not output animations
 -nm   Do not output materials
@@ -1482,7 +1483,9 @@ Options:
 -nf   Do not fix infacing normals
 -pX   Set path X for scene resources. Default is output file path
 -rX   Use scene node X as root node
--t    Generate tangents to model(s)
+-fX   Animation tick frequency to use if unspecified. Default 4800
+-o    Optimize scene hierarchy. Loses animations
+-t    Generate tangents
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, AnimatedModel or Skybox component. The list files can safely be deleted if not needed, and should not be included in production builds of Urho3D applications.

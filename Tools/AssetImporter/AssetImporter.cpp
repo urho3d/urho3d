@@ -198,6 +198,7 @@ void Run(const Vector<String>& arguments)
             "-pX   Set path X for scene resources. Default is output file path\n"
             "-rX   Use scene node X as root node\n"
             "-fX   Animation tick frequency to use if unspecified. Default 4800\n"
+            "-o    Optimize scene hierarchy. Loses animations\n"
             "-t    Generate tangents\n"
         );
     }
@@ -265,6 +266,10 @@ void Run(const Vector<String>& arguments)
                 defaultTicksPerSecond_ = ToFloat(parameter);
                 break;
                 
+            case 'o':
+                flags |= aiProcess_OptimizeGraph | aiProcess_PreTransformVertices;
+                break;
+                
             case 'n':
                 if (!parameter.Empty())
                 {
@@ -327,15 +332,6 @@ void Run(const Vector<String>& arguments)
         if (!scene_)
             ErrorExit("Could not open or parse input file " + inFile);
         
-        // In model mode, if scene has no animations, can flatten the hierarchy to combine submeshes with same material
-        /// \todo It is slow to load scene twice just to know whether there are animations
-        if (command == "model" && (!scene_->HasAnimations() || noAnimations_))
-        {
-            aiReleaseImport(scene_);
-            flags |= aiProcess_OptimizeGraph | aiProcess_PreTransformVertices;
-            scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
-        }
-
         rootNode_ = scene_->mRootNode;
         if (!rootNodeName.Empty())
         {
