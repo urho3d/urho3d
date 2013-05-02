@@ -1484,7 +1484,7 @@ Options:
 -pX   Set path X for scene resources. Default is output file path
 -rX   Use scene node X as root node
 -fX   Animation tick frequency to use if unspecified. Default 4800
--o    Optimize scene hierarchy. Loses animations
+-o    Optimize redundant submeshes. Loses scene hierarchy and animations
 -t    Generate tangents
 \endverbatim
 

@@ -198,7 +198,7 @@ void Run(const Vector<String>& arguments)
             "-pX   Set path X for scene resources. Default is output file path\n"
             "-rX   Use scene node X as root node\n"
             "-fX   Animation tick frequency to use if unspecified. Default 4800\n"
-            "-o    Optimize scene hierarchy. Loses animations\n"
+            "-o    Optimize redundant submeshes. Loses scene hierarchy and animations\n"
             "-t    Generate tangents\n"
         );
     }
@@ -267,7 +267,7 @@ void Run(const Vector<String>& arguments)
                 break;
                 
             case 'o':
-                flags |= aiProcess_OptimizeGraph | aiProcess_PreTransformVertices;
+                flags |= aiProcess_PreTransformVertices;
                 break;
                 
             case 'n':
