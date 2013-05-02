@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 /** @file  BlenderLoader.cpp
  *  @brief Implementation of the Blender3D importer class.
  */
@@ -642,6 +644,7 @@ void BlenderImporter::ConvertMesh(const Scene& /*in*/, const Object* /*obj*/, co
 		ThrowException("Number of vertices is larger than the corresponding array");
 	}
 
+	// Urho3D: track number of per material vertices
 	// collect per-submesh numbers
 	std::map<int,size_t> per_mat;
 	std::map<int,size_t> per_mat_verts;
