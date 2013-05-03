@@ -559,13 +559,18 @@ bool XMLElement::HasAttribute(const char* name) const
 
 String XMLElement::GetAttribute(const String& name) const
 {
-    return String(GetAttribute(name.CString()));
+    return String(GetAttributeCString(name.CString()));
 }
 
 String XMLElement::GetAttribute(const char* name) const
 {
+    return String(GetAttributeCString(name));
+}
+
+const char* XMLElement::GetAttributeCString(const char* name) const
+{
     if (!file_ || (!node_ && !xpathNode_))
-        return String::EMPTY;
+        return 0;
 
     // If xpath_node contains just attribute, return it regardless of the specified name
     if (xpathNode_ && xpathNode_->attribute())
@@ -707,7 +712,7 @@ Variant XMLElement::GetVariantValue(VariantType type) const
     else if (type == VAR_VARIANTMAP)
         ret = GetVariantMap();
     else
-        ret.FromString(type, GetAttribute("value"));
+        ret.FromString(type, GetAttributeCString("value"));
 
     return ret;
 }
@@ -931,7 +936,12 @@ bool XPathQuery::SetVariable(const String& name, const XPathResultSet& value)
 {
     if (!variables_)
         variables_ = new pugi::xpath_variable_set();
-    return variables_->set(name.CString(), value.GetXPathNodeSet());
+    
+    pugi::xpath_node_set* nodeSet = value.GetXPathNodeSet();
+    if (!nodeSet)
+        return false;
+    
+    return variables_->set(name.CString(), *nodeSet);
 }
 
 bool XPathQuery::SetQuery(const String& queryString, const String& variableString, bool bind)
@@ -999,7 +1009,7 @@ float XPathQuery::EvaluateToFloat(XMLElement element) const
         return 0.0f;
 
     const pugi::xml_node& node = element.GetXPathNode() ? element.GetXPathNode()->node(): pugi::xml_node(element.GetNode());
-    return query_->evaluate_number(node);
+    return (float)query_->evaluate_number(node);
 }
 
 String XPathQuery::EvaluateToString(XMLElement element) const

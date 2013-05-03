@@ -358,12 +358,49 @@ String ToStringHex(unsigned value)
 
 void BufferToString(String& dest, const void* data, unsigned size)
 {
-    /// \todo Optimize, resize the string only once
+    // Precalculate needed string size
     const unsigned char* bytes = (const unsigned char*)data;
-    dest.Clear();
-    
+    unsigned length = 0;
     for (unsigned i = 0; i < size; ++i)
-        dest += String((unsigned)bytes[i]) + " ";
+    {
+        // Room for separator
+        if (i)
+            ++length;
+        
+        // Room for the value
+        if (bytes[i] < 10)
+            ++length;
+        else if (bytes[i] < 100)
+            length += 2;
+        else
+            length += 3;
+    }
+    
+    dest.Resize(length);
+    unsigned index = 0;
+    
+    // Convert values
+    for (unsigned i = 0; i < size; ++i)
+    {
+        if (i)
+            dest[index++] = ' ';
+        
+        if (bytes[i] < 10)
+        {
+            dest[index++] = '0' + bytes[i];
+        }
+        else if (bytes[i] < 100)
+        {
+            dest[index++] = '0' + bytes[i] / 10;
+            dest[index++] = '0' + bytes[i] % 10;
+        }
+        else
+        {
+            dest[index++] = '0' + bytes[i] / 100;
+            dest[index++] = '0' + bytes[i] % 100 / 10;
+            dest[index++] = '0' + bytes[i] % 10;
+        }
+    }
 }
 
 void StringToBuffer(PODVector<unsigned char>& dest, const String& source)
@@ -373,12 +410,45 @@ void StringToBuffer(PODVector<unsigned char>& dest, const String& source)
 
 void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
 {
-    /// \todo Optimize, parse the string in-place without splitting
-    Vector<String> bytes = String::Split(source, ' ');
+    if (!source)
+    {
+        dest.Clear();
+        return;
+    }
     
-    dest.Resize(bytes.Size());
-    for (unsigned i = 0; i < bytes.Size(); ++i)
-        dest[i] = ToInt(bytes[i]);
+    unsigned size = CountElements(source, ' ');
+    dest.Resize(size);
+    
+    bool inSpace = true;
+    unsigned index = 0;
+    unsigned value = 0;
+    
+    // Parse values
+    const char* ptr = source;
+    while (*ptr)
+    {
+        if (inSpace && *ptr != ' ')
+        {
+            inSpace = false;
+            value = *ptr - '0';
+        }
+        else if (!inSpace && *ptr != ' ')
+        {
+            value *= 10;
+            value += *ptr - '0';
+        }
+        else if (!inSpace && *ptr == ' ')
+        {
+            dest[index++] = value;
+            inSpace = true;
+        }
+        
+        ++ptr;
+    }
+    
+    // Write the final value
+    if (!inSpace && index < size)
+        dest[index] = value;
 }
 
 unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive)

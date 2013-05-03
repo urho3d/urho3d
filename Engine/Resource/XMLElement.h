@@ -173,6 +173,8 @@ public:
     String GetAttribute(const String& name = String::EMPTY) const;
     /// Return attribute, or empty if missing.
     String GetAttribute(const char* name) const;
+    /// Return attribute as C string, or null if missing.
+    const char* GetAttributeCString(const char* name) const;
     /// Return attribute in lowercase, or empty if missing.
     String GetAttributeLower(const String& name) const;
     /// Return attribute in lowercase, or empty if missing.
@@ -239,6 +241,7 @@ public:
     unsigned GetXPathResultIndex() const { return xpathResultIndex_; }
     /// Return next XPath query result. Only valid when this instance of XMLElement is itself one of the query result in the result set.
     XMLElement NextResult() const;
+    
     /// Empty XMLElement.
     static const XMLElement EMPTY;
 
