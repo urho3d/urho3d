@@ -351,9 +351,9 @@ public:
     /// Return const iterator to the end.
     ConstIterator End() const { return ConstIterator(Buffer() + size_); }
     /// Return first element.
-    T& Front() { return Buffer()[0]; }
+    T& Front() { assert(size_); return Buffer()[0]; }
     /// Return const first element.
-    const T& Front() const { return Buffer()[0]; }
+    const T& Front() const { assert(size_); return Buffer()[0]; }
     /// Return last element.
     T& Back() { assert(size_); return Buffer()[size_ - 1]; }
     /// Return const last element.

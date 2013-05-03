@@ -270,11 +270,7 @@ bool XMLElement::SetBoundingBox(const BoundingBox& value)
 bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
 {
     String dataStr;
-    const unsigned char* bytes = (const unsigned char*)data;
-
-    for (unsigned i = 0; i < size; ++i)
-        dataStr += String((unsigned)bytes[i]) + " ";
-
+    BufferToString(dataStr, data, size);
     return SetAttribute(name, dataStr);
 }
 
@@ -635,11 +631,7 @@ BoundingBox XMLElement::GetBoundingBox() const
 PODVector<unsigned char> XMLElement::GetBuffer(const String& name) const
 {
     PODVector<unsigned char> ret;
-    Vector<String> bytes = GetAttribute(name).Split(' ');
-
-    ret.Resize(bytes.Size());
-    for (unsigned i = 0; i < bytes.Size(); ++i)
-        ret[i] = ToInt(bytes[i]);
+    StringToBuffer(ret, GetAttribute(name));
     return ret;
 }
 

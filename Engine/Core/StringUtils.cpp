@@ -356,6 +356,31 @@ String ToStringHex(unsigned value)
     return String(tempBuffer);
 }
 
+void BufferToString(String& dest, const void* data, unsigned size)
+{
+    /// \todo Optimize, resize the string only once
+    const unsigned char* bytes = (const unsigned char*)data;
+    dest.Clear();
+    
+    for (unsigned i = 0; i < size; ++i)
+        dest += String((unsigned)bytes[i]) + " ";
+}
+
+void StringToBuffer(PODVector<unsigned char>& dest, const String& source)
+{
+    StringToBuffer(dest, source.CString());
+}
+
+void StringToBuffer(PODVector<unsigned char>& dest, const char* source)
+{
+    /// \todo Optimize, parse the string in-place without splitting
+    Vector<String> bytes = String::Split(source, ' ');
+    
+    dest.Resize(bytes.Size());
+    for (unsigned i = 0; i < bytes.Size(); ++i)
+        dest[i] = ToInt(bytes[i]);
+}
+
 unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive)
 {
     return GetStringListIndex(value.CString(), strings, defaultIndex, caseSensitive);

@@ -216,10 +216,7 @@ void Variant::FromString(VariantType type, const char* value)
         {
             SetType(VAR_BUFFER);
             PODVector<unsigned char>& buffer = *(reinterpret_cast<PODVector<unsigned char>*>(&value_));
-            Vector<String> values = String::Split(value, ' ');
-            buffer.Resize(values.Size());
-            for (unsigned i = 0; i < values.Size(); ++i)
-                buffer[i] = ToInt(values[i]);
+            StringToBuffer(buffer, value);
         }
         break;
 
@@ -320,12 +317,7 @@ String Variant::ToString() const
         {
             const PODVector<unsigned char>& buffer = *(reinterpret_cast<const PODVector<unsigned char>*>(&value_));
             String ret;
-            for (PODVector<unsigned char>::ConstIterator i = buffer.Begin(); i != buffer.End(); ++i)
-            {
-                if (i != buffer.Begin())
-                    ret += " ";
-                ret += String((unsigned)*i);
-            }
+            BufferToString(ret, buffer.Begin().ptr_, buffer.Size());
             return ret;
         }
 
