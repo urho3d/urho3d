@@ -28,10 +28,13 @@
 #include "Geometry.h"
 #include "Log.h"
 #include "Material.h"
+#include "MemoryBuffer.h"
 #include "Node.h"
 #include "OcclusionBuffer.h"
 #include "OctreeQuery.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
+#include "VectorBuffer.h"
 #include "VertexBuffer.h"
 
 #include "DebugNew.h"
@@ -47,7 +50,8 @@ CustomGeometry::CustomGeometry(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     vertexBuffer_(new VertexBuffer(context)),
     elementMask_(MASK_POSITION),
-    geometryIndex_(0)
+    geometryIndex_(0),
+    materialsAttr_(Material::GetTypeStatic())
 {
     vertexBuffer_->SetShadowed(true);
     SetNumGeometries(1);
@@ -62,6 +66,8 @@ void CustomGeometry::RegisterObject(Context* context)
     context->RegisterFactory<CustomGeometry>(STATIC_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BUFFER, "Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE|AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_RESOURCEREFLIST, "Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(CustomGeometry, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
@@ -378,6 +384,87 @@ bool CustomGeometry::SetMaterial(unsigned index, Material* material)
 Material* CustomGeometry::GetMaterial(unsigned index) const
 {
     return index < batches_.Size() ? batches_[index].material_ : (Material*)0;
+}
+
+void CustomGeometry::SetGeometryDataAttr(PODVector<unsigned char> data)
+{
+    if (!data.Size())
+        return;
+    
+    MemoryBuffer buffer(data);
+    
+    SetNumGeometries(buffer.ReadVLE());
+    elementMask_ = buffer.ReadUInt();
+    
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
+    {
+        unsigned numVertices = buffer.ReadVLE();
+        vertices_[i].Resize(numVertices);
+        primitiveTypes_[i] = (PrimitiveType)buffer.ReadUByte();
+        
+        for (unsigned j = 0; j < numVertices; ++j)
+        {
+             if (elementMask_ & MASK_POSITION)
+                vertices_[i][j].position_ = buffer.ReadVector3();
+             if (elementMask_ & MASK_NORMAL)
+                vertices_[i][j].normal_ = buffer.ReadVector3();
+             if (elementMask_ & MASK_COLOR)
+                vertices_[i][j].color_ = buffer.ReadUInt();
+             if (elementMask_ & MASK_TEXCOORD1)
+                vertices_[i][j].texCoord_ = buffer.ReadVector2();
+             if (elementMask_ & MASK_TANGENT)
+                vertices_[i][j].tangent_ = buffer.ReadVector4();
+        }
+    }
+    
+    Commit();
+}
+
+void CustomGeometry::SetMaterialsAttr(const ResourceRefList& value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    for (unsigned i = 0; i < value.ids_.Size(); ++i)
+        SetMaterial(i, cache->GetResource<Material>(value.ids_[i]));
+}
+
+PODVector<unsigned char> CustomGeometry::GetGeometryDataAttr() const
+{
+    VectorBuffer ret;
+    
+    ret.WriteVLE(geometries_.Size());
+    ret.WriteUInt(elementMask_);
+    
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
+    {
+        unsigned numVertices = vertices_[i].Size();
+        ret.WriteVLE(numVertices);
+        ret.WriteUByte(primitiveTypes_[i]);
+        
+        for (unsigned j = 0; j < numVertices; ++j)
+        {
+             if (elementMask_ & MASK_POSITION)
+                ret.WriteVector3(vertices_[i][j].position_);
+             if (elementMask_ & MASK_NORMAL)
+                ret.WriteVector3(vertices_[i][j].normal_);
+             if (elementMask_ & MASK_COLOR)
+                ret.WriteUInt(vertices_[i][j].color_);
+             if (elementMask_ & MASK_TEXCOORD1)
+                ret.WriteVector2(vertices_[i][j].texCoord_);
+             if (elementMask_ & MASK_TANGENT)
+                ret.WriteVector4(vertices_[i][j].tangent_);
+        }
+    }
+    
+    return ret.GetBuffer();
+}
+
+const ResourceRefList& CustomGeometry::GetMaterialsAttr() const
+{
+    materialsAttr_.ids_.Resize(batches_.Size());
+    for (unsigned i = 0; i < batches_.Size(); ++i)
+        materialsAttr_.ids_[i] = batches_[i].material_ ? batches_[i].material_->GetNameHash() : StringHash();
+    
+    return materialsAttr_;
 }
 
 void CustomGeometry::OnWorldBoundingBoxUpdate()

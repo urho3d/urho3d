@@ -94,6 +94,15 @@ public:
     /// Return material by geometry index.
     Material* GetMaterial(unsigned index) const;
     
+    /// Set geometry data attribute.
+    void SetGeometryDataAttr(PODVector<unsigned char> data);
+    /// Set materials attribute.
+    void SetMaterialsAttr(const ResourceRefList& value);
+    /// Return geometry data attribute.
+    PODVector<unsigned char> GetGeometryDataAttr() const;
+    /// Return materials attribute.
+    const ResourceRefList& GetMaterialsAttr() const;
+    
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
@@ -113,6 +122,8 @@ private:
     unsigned elementMask_;
     /// Current geometry being updated.
     unsigned geometryIndex_;
+    /// Material list attribute.
+    mutable ResourceRefList materialsAttr_;
 };
 
 }

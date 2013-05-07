@@ -150,7 +150,7 @@ public:
     
     /// Set navigation data attribute.
     void SetNavigationDataAttr(PODVector<unsigned char> data);
-    /// Get navigation data attribute.
+    /// Return navigation data attribute.
     PODVector<unsigned char> GetNavigationDataAttr() const;
     
 private:
