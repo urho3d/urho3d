@@ -374,16 +374,20 @@ void UI::RenderUpdate()
 void UI::Render()
 {
     PROFILE(RenderUI);
+    
+    SetVertexData(vertexBuffer_, vertexData_);
+    SetVertexData(debugVertexBuffer_, debugVertexData_);
+    
     // Render non-modal batches
-    Render(batches_, vertexData_, 0, nonModalBatchSize_);
+    Render(vertexBuffer_, batches_, 0, nonModalBatchSize_);
     // Render debug draw
-    Render(debugDrawBatches_, debugDrawVertexData_, 0, debugDrawBatches_.Size());
+    Render(debugVertexBuffer_, debugDrawBatches_, 0, debugDrawBatches_.Size());
     // Render modal batches
-    Render(batches_, vertexData_, nonModalBatchSize_, batches_.Size());
-
+    Render(vertexBuffer_, batches_, nonModalBatchSize_, batches_.Size());
+    
     // Clear the debug draw batches and data
     debugDrawBatches_.Clear();
-    debugDrawVertexData_.Clear();
+    debugVertexData_.Clear();
 }
 
 void UI::DebugDraw(UIElement* element)
@@ -391,7 +395,7 @@ void UI::DebugDraw(UIElement* element)
     if (element)
     {
         const IntVector2& rootSize = rootElement_->GetSize();
-        element->GetDebugDrawBatches(debugDrawBatches_, debugDrawVertexData_, IntRect(0, 0, rootSize.x_, rootSize.y_));
+        element->GetDebugDrawBatches(debugDrawBatches_, debugVertexData_, IntRect(0, 0, rootSize.x_, rootSize.y_));
     }
 }
 
@@ -532,6 +536,7 @@ void UI::Initialize()
     alphaTexturePS_ = renderer->GetPixelShader("Basic_AlphaVCol");
 
     vertexBuffer_ = new VertexBuffer(context_);
+    debugVertexBuffer_ = new VertexBuffer(context_);
 
     initialized_ = true;
 
@@ -550,21 +555,27 @@ void UI::Update(float timeStep, UIElement* element)
         Update(timeStep, *i);
 }
 
-void UI::Render(const PODVector<UIBatch>& batches, const PODVector<float>& vertexData, unsigned batchStart, unsigned batchSize)
+void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
+{
+    if (vertexData.Empty())
+        return;
+    
+    // Update quad geometry into the vertex buffer
+    // Resize the vertex buffer first if too small or much too large
+    unsigned numVertices = vertexData.Size() / UI_VERTEX_SIZE;
+    if (dest->GetVertexCount() < numVertices || dest->GetVertexCount() > numVertices * 2)
+        dest->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
+    
+    dest->SetData(&vertexData[0]);
+}
+
+void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
 {
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
 
-    if (vertexData.Empty())
+    if (batches.Empty())
         return;
-
-    // Update quad geometry into the vertex buffer
-    unsigned numVertices = vertexData.Size() / UI_VERTEX_SIZE;
-    // Resize the vertex buffer if too small or much too large
-    if (vertexBuffer_->GetVertexCount() < numVertices || vertexBuffer_->GetVertexCount() > numVertices * 2)
-        vertexBuffer_->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
-
-    vertexBuffer_->SetData(&vertexData[0]);
 
     Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
     Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
@@ -585,13 +596,13 @@ void UI::Render(const PODVector<UIBatch>& batches, const PODVector<float>& verte
     graphics_->SetDepthWrite(false);
     graphics_->SetStencilTest(false);
     graphics_->ResetRenderTargets();
-
+    
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;
 
     unsigned alphaFormat = Graphics::GetAlphaFormat();
 
-    for (unsigned i = batchStart; i < batchSize; ++i)
+    for (unsigned i = batchStart; i < batchEnd; ++i)
     {
         const UIBatch& batch = batches[i];
         if (batch.vertexStart_ == batch.vertexEnd_)

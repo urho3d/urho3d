@@ -107,8 +107,10 @@ private:
     void Initialize();
     /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
-    /// Render the batches.
-    void Render(const PODVector<UIBatch>& batches, const PODVector<float>& vertexData, unsigned batchStart, unsigned batchSize);
+    /// Upload UI geometry into a vertex buffer.
+    void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
+    /// Render UI batches. Geometry must have been uploaded first.
+    void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
     /// Generate batches from an UI element recursively.
     void GetBatches(UIElement* element, IntRect currentScissor);
     /// Return UI element at screen position recursively.
@@ -175,9 +177,11 @@ private:
     /// UI rendering batches for debug draw.
     PODVector<UIBatch> debugDrawBatches_;
     /// UI rendering vertex data for debug draw.
-    PODVector<float> debugDrawVertexData_;
+    PODVector<float> debugVertexData_;
     /// UI vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
+    /// UI debug geometry vertex buffer.
+    SharedPtr<VertexBuffer> debugVertexBuffer_;
     /// UI element query vector.
     PODVector<UIElement*> tempElements_;
     /// Clipboard text.
