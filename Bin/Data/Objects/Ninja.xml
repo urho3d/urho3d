@@ -65,6 +65,7 @@
 			<attribute name="Shadow Distance" value="0" />
 			<attribute name="LOD Bias" value="1" />
 			<attribute name="Animation LOD Bias" value="1" />
+			<attribute name="Invisible Anim LOD" value="3" />
 			<attribute name="Max Lights" value="0" />
 			<attribute name="View Mask" value="-1" />
 			<attribute name="Light Mask" value="-1" />

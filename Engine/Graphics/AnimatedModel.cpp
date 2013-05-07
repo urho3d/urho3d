@@ -253,10 +253,6 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
-    // If model was invisible and did not update animation in the meanwhile, update now
-    if (animationDirty_)
-        UpdateAnimation(frame);
-
     if (morphsDirty_)
         UpdateMorphs();
 
@@ -266,7 +262,7 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType AnimatedModel::GetUpdateGeometryType()
 {
-    if (animationDirty_ || morphsDirty_)
+    if (morphsDirty_)
         return UPDATE_MAIN_THREAD;
     else if (skinningDirty_)
         return UPDATE_WORKER_THREAD;

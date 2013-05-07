@@ -189,7 +189,7 @@ void DecalSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(DecalSet, Drawable);
-    ACCESSOR_ATTRIBUTE(DecalSet, VAR_VARIANTVECTOR, "Decals", GetDecalsAttr, SetDecalsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(DecalSet, VAR_BUFFER, "Decals", GetDecalsAttr, SetDecalsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
 }
 
 void DecalSet::ApplyAttributes()
@@ -506,44 +506,46 @@ void DecalSet::SetMaterialAttr(ResourceRef value)
     SetMaterial(cache->GetResource<Material>(value.id_));
 }
 
-void DecalSet::SetDecalsAttr(VariantVector value)
+void DecalSet::SetDecalsAttr(PODVector<unsigned char> value)
 {
-    unsigned index = 0;
-    
     Scene* scene = GetScene();
     RemoveAllDecals();
     
-    skinned_ = value[index++].GetBool();
-    unsigned numDecals = value[index++].GetInt();
+    if (value.Empty())
+        return;
+    
+    MemoryBuffer buffer(value);
+    
+    skinned_ = buffer.ReadBool();
+    unsigned numDecals = buffer.ReadVLE();
     
     while (numDecals--)
     {
         decals_.Resize(decals_.Size() + 1);
         Decal& newDecal = decals_.Back();
         
-        newDecal.timer_ = value[index++].GetFloat();
-        newDecal.timeToLive_ = value[index++].GetFloat();
-        newDecal.vertices_.Resize(value[index++].GetInt());
-        newDecal.indices_.Resize(value[index++].GetInt());
-        MemoryBuffer geometry(value[index++].GetBuffer());
-        
+        newDecal.timer_ = buffer.ReadFloat();
+        newDecal.timeToLive_ = buffer.ReadFloat();
+        newDecal.vertices_.Resize(buffer.ReadVLE());
+        newDecal.indices_.Resize(buffer.ReadVLE());
+    
         for (PODVector<DecalVertex>::Iterator i = newDecal.vertices_.Begin(); i != newDecal.vertices_.End(); ++i)
         {
-            i->position_ = geometry.ReadVector3();
-            i->normal_ = geometry.ReadVector3();
-            i->texCoord_ = geometry.ReadVector2();
-            i->tangent_ = geometry.ReadVector4();
+            i->position_ = buffer.ReadVector3();
+            i->normal_ = buffer.ReadVector3();
+            i->texCoord_ = buffer.ReadVector2();
+            i->tangent_ = buffer.ReadVector4();
             if (skinned_)
             {
                 for (unsigned j = 0; j < 4; ++j)
-                    i->blendWeights_[j] = geometry.ReadFloat();
+                    i->blendWeights_[j] = buffer.ReadFloat();
                 for (unsigned j = 0; j < 4; ++j)
-                    i->blendIndices_[j] = geometry.ReadUByte();
+                    i->blendIndices_[j] = buffer.ReadUByte();
             }
         }
         
         for (PODVector<unsigned short>::Iterator i = newDecal.indices_.Begin(); i != newDecal.indices_.End(); ++i)
-            *i = geometry.ReadUShort();
+            *i = buffer.ReadUShort();
         
         newDecal.CalculateBoundingBox();
         numVertices_ += newDecal.vertices_.Size();
@@ -552,7 +554,7 @@ void DecalSet::SetDecalsAttr(VariantVector value)
     
     if (skinned_)
     {
-        unsigned numBones = value[index++].GetInt();
+        unsigned numBones = buffer.ReadVLE();
         skinMatrices_.Resize(numBones);
         bones_.Resize(numBones);
         
@@ -560,15 +562,13 @@ void DecalSet::SetDecalsAttr(VariantVector value)
         {
             Bone& newBone = bones_[i];
             
-            newBone.name_ = value[index++].GetString();
-            MemoryBuffer boneData(value[index++].GetBuffer());
-            
-            newBone.collisionMask_ = boneData.ReadUByte();
+            newBone.name_ = buffer.ReadString();
+            newBone.collisionMask_ = buffer.ReadUByte();
             if (newBone.collisionMask_ & BONECOLLISION_SPHERE)
-                newBone.radius_ = boneData.ReadFloat();
+                newBone.radius_ = buffer.ReadFloat();
             if (newBone.collisionMask_ & BONECOLLISION_BOX)
-                newBone.boundingBox_ = boneData.ReadBoundingBox();
-            boneData.Read(&newBone.offsetMatrix_.m00_, sizeof(Matrix3x4));
+                newBone.boundingBox_ = buffer.ReadBoundingBox();
+            buffer.Read(&newBone.offsetMatrix_.m00_, sizeof(Matrix3x4));
         }
         
         assignBonesPending_ = true;
@@ -586,63 +586,56 @@ ResourceRef DecalSet::GetMaterialAttr() const
     return GetResourceRef(batches_[0].material_, Material::GetTypeStatic());
 }
 
-VariantVector DecalSet::GetDecalsAttr() const
+PODVector<unsigned char> DecalSet::GetDecalsAttr() const
 {
-    VariantVector ret;
-    ret.Push(skinned_);
-    ret.Push(decals_.Size());
+    VectorBuffer ret;
+    
+    ret.WriteBool(skinned_);
+    ret.WriteVLE(decals_.Size());
     
     for (List<Decal>::ConstIterator i = decals_.Begin(); i != decals_.End(); ++i)
     {
-        ret.Push(i->timer_);
-        ret.Push(i->timeToLive_);
-        ret.Push(i->vertices_.Size());
-        ret.Push(i->indices_.Size());
-        
-        VectorBuffer geometry;
+        ret.WriteFloat(i->timer_);
+        ret.WriteFloat(i->timeToLive_);
+        ret.WriteVLE(i->vertices_.Size());
+        ret.WriteVLE(i->indices_.Size());
         
         for (PODVector<DecalVertex>::ConstIterator j = i->vertices_.Begin(); j != i->vertices_.End(); ++j)
         {
-            geometry.WriteVector3(j->position_);
-            geometry.WriteVector3(j->normal_);
-            geometry.WriteVector2(j->texCoord_);
-            geometry.WriteVector4(j->tangent_);
+            ret.WriteVector3(j->position_);
+            ret.WriteVector3(j->normal_);
+            ret.WriteVector2(j->texCoord_);
+            ret.WriteVector4(j->tangent_);
             if (skinned_)
             {
                 for (unsigned k = 0; k < 4; ++k)
-                    geometry.WriteFloat(j->blendWeights_[k]);
+                    ret.WriteFloat(j->blendWeights_[k]);
                 for (unsigned k = 0; k < 4; ++k)
-                    geometry.WriteUByte(j->blendIndices_[k]);
+                    ret.WriteUByte(j->blendIndices_[k]);
             }
         }
         
         for (PODVector<unsigned short>::ConstIterator j = i->indices_.Begin(); j != i->indices_.End(); ++j)
-            geometry.WriteUShort(*j);
-        
-        ret.Push(geometry.GetBuffer());
+            ret.WriteUShort(*j);
     }
     
     if (skinned_)
     {
-        ret.Push(bones_.Size());
+        ret.WriteVLE(bones_.Size());
         
         for (Vector<Bone>::ConstIterator i = bones_.Begin(); i != bones_.End(); ++i)
         {
-            ret.Push(i->name_);
-            VectorBuffer boneData;
-            
-            boneData.WriteUByte(i->collisionMask_);
+            ret.WriteString(i->name_);
+            ret.WriteUByte(i->collisionMask_);
             if (i->collisionMask_ & BONECOLLISION_SPHERE)
-                boneData.WriteFloat(i->radius_);
+                ret.WriteFloat(i->radius_);
             if (i->collisionMask_ & BONECOLLISION_BOX)
-                boneData.WriteBoundingBox(i->boundingBox_);
-            boneData.Write(i->offsetMatrix_.Data(), sizeof(Matrix3x4));
-            
-            ret.Push(boneData.GetBuffer());
+                ret.WriteBoundingBox(i->boundingBox_);
+            ret.Write(i->offsetMatrix_.Data(), sizeof(Matrix3x4));
         }
     }
     
-    return ret;
+    return ret.GetBuffer();
 }
 
 void DecalSet::OnMarkedDirty(Node* node)

@@ -95,7 +95,7 @@ public:
     Material* GetMaterial(unsigned index) const;
     
     /// Set geometry data attribute.
-    void SetGeometryDataAttr(PODVector<unsigned char> data);
+    void SetGeometryDataAttr(PODVector<unsigned char> value);
     /// Set materials attribute.
     void SetMaterialsAttr(const ResourceRefList& value);
     /// Return geometry data attribute.

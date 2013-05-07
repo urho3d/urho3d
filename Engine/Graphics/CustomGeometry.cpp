@@ -386,12 +386,12 @@ Material* CustomGeometry::GetMaterial(unsigned index) const
     return index < batches_.Size() ? batches_[index].material_ : (Material*)0;
 }
 
-void CustomGeometry::SetGeometryDataAttr(PODVector<unsigned char> data)
+void CustomGeometry::SetGeometryDataAttr(PODVector<unsigned char> value)
 {
-    if (!data.Size())
+    if (value.Empty())
         return;
     
-    MemoryBuffer buffer(data);
+    MemoryBuffer buffer(value);
     
     SetNumGeometries(buffer.ReadVLE());
     elementMask_ = buffer.ReadUInt();

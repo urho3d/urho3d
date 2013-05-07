@@ -598,14 +598,14 @@ BoundingBox NavigationMesh::GetWorldBoundingBox() const
     return node_ ? boundingBox_.Transformed(node_->GetWorldTransform()) : boundingBox_;
 }
 
-void NavigationMesh::SetNavigationDataAttr(PODVector<unsigned char> data)
+void NavigationMesh::SetNavigationDataAttr(PODVector<unsigned char> value)
 {
     ReleaseNavigationMesh();
     
-    if (!data.Size())
+    if (value.Empty())
         return;
     
-    MemoryBuffer buffer(data);
+    MemoryBuffer buffer(value);
     
     boundingBox_ = buffer.ReadBoundingBox();
     numTilesX_ = buffer.ReadInt();
