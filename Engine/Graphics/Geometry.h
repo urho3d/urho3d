@@ -91,9 +91,11 @@ public:
     /// Return buffers' combined hash value for state sorting.
     unsigned short GetBufferHash() const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available.
-    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask);
+    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask) const;
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set.
-    float GetHitDistance(const Ray& ray);
+    float GetHitDistance(const Ray& ray) const;
+    /// Return whether or not the ray is inside geometry.
+    bool IsInside(const Ray& ray) const;
     /// Return whether has empty draw range.
     bool IsEmpty() const { return indexCount_ == 0 && vertexCount_ == 0; }
     

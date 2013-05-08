@@ -1418,7 +1418,7 @@ Methods:<br>
 - void Pitch(float, bool arg1 = false)
 - void Yaw(float, bool arg1 = false)
 - void Roll(float, bool arg1 = false)
-- void LookAt(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 1 , 0 ), bool arg2 = false)
+- void LookAt(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 1 , 0 ))
 - void Scale(float)
 - void Scale(const Vector3&)
 - Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED, uint arg2 = 0)
@@ -1553,7 +1553,7 @@ Methods:<br>
 - void Pitch(float, bool arg1 = false)
 - void Yaw(float, bool arg1 = false)
 - void Roll(float, bool arg1 = false)
-- void LookAt(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 1 , 0 ), bool arg2 = false)
+- void LookAt(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 1 , 0 ))
 - void Scale(float)
 - void Scale(const Vector3&)
 - Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED, uint arg2 = 0)
@@ -2321,6 +2321,8 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- bool IsInside(const Vector3&) const
+- bool IsInsideLocal(const Vector3&) const
 
 Properties:<br>
 - ShortStringHash type (readonly)

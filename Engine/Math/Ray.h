@@ -91,10 +91,14 @@ public:
     float HitDistance(const Sphere& sphere) const;
     /// Return hit distance to a triangle, or infinity if no hit.
     float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
-    /// Return hit distance to a triangle mesh defined by vertex data, or infinity if no hit.
+    /// Return hit distance to non-indexed geometry data, or infinity if no hit.
     float HitDistance(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const;
-    /// Return hit distance to a triangle mesh defined by vertex and index data, or infinity if no hit.
+    /// Return hit distance to indexed geometry data, or infinity if no hit.
     float HitDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
+    /// Return whether ray is inside non-indexed geometry.
+    bool InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const;
+    /// Return whether ray is inside indexed geometry.
+    bool InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
     
     /// Ray origin.
     Vector3 origin_;

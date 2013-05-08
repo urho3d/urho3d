@@ -226,7 +226,8 @@ unsigned short Geometry::GetBufferHash() const
 }
 
 
-void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask)
+void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData,
+    unsigned& indexSize, unsigned& elementMask) const
 {
     if (rawVertexData_)
     {
@@ -281,7 +282,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
     }
 }
 
-float Geometry::GetHitDistance(const Ray& ray)
+float Geometry::GetHitDistance(const Ray& ray) const
 {
     const unsigned char* vertexData;
     const unsigned char* indexData;
@@ -297,6 +298,24 @@ float Geometry::GetHitDistance(const Ray& ray)
         return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_);
     else
         return M_INFINITY;
+}
+
+bool Geometry::IsInside(const Ray& ray) const
+{
+    const unsigned char* vertexData;
+    const unsigned char* indexData;
+    unsigned vertexSize;
+    unsigned indexSize;
+    unsigned elementMask;
+    
+    GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+    
+    if (vertexData && indexData)
+        return ray.InsideGeometry(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
+    else if (vertexData)
+        return ray.InsideGeometry(vertexData, vertexSize, vertexStart_, vertexCount_);
+    else
+        return false;
 }
 
 void Geometry::GetPositionBufferIndex()

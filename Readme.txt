@@ -20,6 +20,7 @@ Urho3D development, contributions and bugfixes by:
 - Jason Kinzer
 - Vladimir Pobedinsky
 - Miika Santala
+- Firegorilla
 - Magic.Lixin
 - primitivewaste
 - skaiware

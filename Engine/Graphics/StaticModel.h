@@ -81,6 +81,10 @@ public:
     Material* GetMaterial(unsigned index) const;
     /// Return occlusion LOD level.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
+    /// Determines if the given world space point is within the model geometry.
+    bool IsInside(const Vector3& point) const;
+    /// Determines if the given local space point is within the model geometry.
+    bool IsInsideLocal(const Vector3& point) const;
     
     /// Set model attribute.
     void SetModelAttr(ResourceRef value);

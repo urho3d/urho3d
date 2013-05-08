@@ -306,6 +306,36 @@ Material* StaticModel::GetMaterial(unsigned index) const
     return index < batches_.Size() ? batches_[index].material_ : (Material*)0;
 }
 
+bool StaticModel::IsInside(const Vector3& point) const
+{
+    if (!node_)
+        return false;
+    
+    Vector3 localPosition = node_->GetWorldTransform().Inverse() * point;
+    return IsInsideLocal(localPosition);
+}
+
+bool StaticModel::IsInsideLocal(const Vector3& point) const
+{
+    // Early-out if point is not inside bounding box
+    if (boundingBox_.IsInside(point) == OUTSIDE)
+        return false;
+    
+    Ray localRay(point, Vector3(1.0f, -1.0f, 1.0f));
+    
+    for (unsigned i = 0; i < batches_.Size(); ++i)
+    {
+        Geometry* geometry = batches_[i].geometry_;
+        if (geometry)
+        {
+            if (geometry->IsInside(localRay))
+                return true;
+        }
+    }
+    
+    return false;
+}
+
 void StaticModel::SetBoundingBox(const BoundingBox& box)
 {
     boundingBox_ = box;
