@@ -316,10 +316,10 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned v
         const Vector3& v0 = *((const Vector3*)(&vertices[index * vertexSize]));
         const Vector3& v1 = *((const Vector3*)(&vertices[(index + 1) * vertexSize]));
         const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexSize]));
-        currentFrontFace = Min(HitDistance(v0,v1,v2),currentFrontFace);
+        currentFrontFace = Min(HitDistance(v0, v1, v2) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentFrontFace);
         // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces by
         // checking reversed frontfaces
-        currentBackFace = Min(HitDistance(v2,v1,v0),currentBackFace);
+        currentBackFace = Min(HitDistance(v2, v1, v0) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentBackFace);
     }
     
     // If the closest face is a backface, that means that the ray originates from the inside of the geometry
@@ -351,10 +351,10 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
-            currentFrontFace = Min(HitDistance(v0,v1,v2)>0?HitDistance(v0,v1,v2):M_INFINITY,currentFrontFace);
+            currentFrontFace = Min(HitDistance(v0, v1, v2) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentFrontFace);
             // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces
             // by checking reversed frontfaces
-            currentBackFace = Min(HitDistance(v2,v1,v0)>0?HitDistance(v2,v1,v0):M_INFINITY,currentBackFace);
+            currentBackFace = Min(HitDistance(v2, v1, v0) > 0.0f ? HitDistance(v2, v1, v0) : M_INFINITY, currentBackFace);
             indices += 3;
         }
     }
@@ -369,11 +369,11 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
-            currentFrontFace = Min(HitDistance(v0,v1,v2),currentFrontFace);
+            currentFrontFace = Min(HitDistance(v0, v1, v2) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentFrontFace);
             // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces
             // by checking reversed frontfaces
-            currentBackFace = Min(HitDistance(v2,v1,v0),currentBackFace);
-            indices += 3;
+            currentBackFace = Min(HitDistance(v2, v1, v0) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentBackFace);
+            indices += 3; 
         }
     }
     
