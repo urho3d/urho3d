@@ -206,13 +206,14 @@ public:
     /// Return rotation in world space.
     Quaternion GetWorldRotation() const
     {
+        /// \todo This is potentially incorrect if parent has nonuniform scaling
         return GetWorldTransform().Rotation();
     }
 
     /// Return direction in world space.
     Vector3 GetWorldDirection() const
     {
-        return GetWorldTransform().RotationMatrix() * Vector3::FORWARD;
+        return GetWorldRotation() * Vector3::FORWARD;
     }
 
     /// Return scale in world space.

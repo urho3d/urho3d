@@ -70,7 +70,7 @@ void DebugRenderer::SetView(Camera* camera)
     if (!camera)
         return;
 
-    view_ = camera->GetInverseWorldTransform();
+    view_ = camera->GetView();
     projection_ = camera->GetProjection();
     frustum_ = camera->GetFrustum();
 }

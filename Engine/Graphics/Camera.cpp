@@ -57,7 +57,7 @@ OBJECTTYPESTATIC(Camera);
 
 Camera::Camera(Context* context) :
     Component(context),
-    inverseWorldDirty_(true),
+    viewDirty_(true),
     projectionDirty_(true),
     frustumDirty_(true),
     orthographic_(false),
@@ -280,7 +280,7 @@ Ray Camera::GetScreenRay(float x, float y) const
         return ret;
     }
 
-    Matrix4 viewProjInverse = (GetProjection(false) * GetInverseWorldTransform()).Inverse();
+    Matrix4 viewProjInverse = (GetProjection(false) * GetView()).Inverse();
 
     // The parameters range from 0.0 to 1.0. Expand to normalized device coordinates (-1.0 to 1.0) & flip Y axis
     x = 2.0f * x - 1.0f;
@@ -295,7 +295,7 @@ Ray Camera::GetScreenRay(float x, float y) const
 
 Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos) const
 {
-    Vector3 eyeSpacePos = GetInverseWorldTransform() * worldPos;
+    Vector3 eyeSpacePos = GetView() * worldPos;
     Vector2 ret;
 
     if(eyeSpacePos.z_ > 0.0f)
@@ -463,12 +463,12 @@ Vector3 Camera::GetForwardVector() const
 
 Vector3 Camera::GetRightVector() const
 {
-    return node_ ? node_->GetWorldTransform().RotationMatrix() * Vector3::RIGHT : Vector3::RIGHT;
+    return node_ ? node_->GetWorldRotation() * Vector3::RIGHT : Vector3::RIGHT;
 }
 
 Vector3 Camera::GetUpVector() const
 {
-    return node_ ? node_->GetWorldTransform().RotationMatrix() * Vector3::UP : Vector3::UP;
+    return node_ ? node_->GetWorldRotation() * Vector3::UP : Vector3::UP;
 }
 
 float Camera::GetDistance(const Vector3& worldPos) const
@@ -479,7 +479,7 @@ float Camera::GetDistance(const Vector3& worldPos) const
         return (worldPos - cameraPos).Length();
     }
     else
-        return Abs((GetInverseWorldTransform() * worldPos).z_);
+        return Abs((GetView() * worldPos).z_);
 }
 
 float Camera::GetDistanceSquared(const Vector3& worldPos) const
@@ -491,7 +491,7 @@ float Camera::GetDistanceSquared(const Vector3& worldPos) const
     }
     else
     {
-        float distance = (GetInverseWorldTransform() * worldPos).z_;
+        float distance = (GetView() * worldPos).z_;
         return distance * distance;
     }
 }
@@ -510,16 +510,16 @@ bool Camera::IsProjectionValid() const
     return farClip_ > GetNearClip();
 }
 
-const Matrix3x4& Camera::GetInverseWorldTransform() const
+const Matrix3x4& Camera::GetView() const
 {
-    if (inverseWorldDirty_)
+    if (viewDirty_)
     {
-        const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
-        inverseWorld_ = worldTransform.Inverse();
-        inverseWorldDirty_ = false;
+        // Note: view matrix is unaffected by node or parent scale
+        view_ = node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f).Inverse() : Matrix3x4::IDENTITY;
+        viewDirty_ = false;
     }
-
-    return inverseWorld_;
+    
+    return view_;
 }
 
 void Camera::OnNodeSet(Node* node)
@@ -531,7 +531,7 @@ void Camera::OnNodeSet(Node* node)
 void Camera::OnMarkedDirty(Node* node)
 {
     frustumDirty_ = true;
-    inverseWorldDirty_ = true;
+    viewDirty_ = true;
 }
 
 }

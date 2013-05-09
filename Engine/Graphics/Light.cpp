@@ -368,8 +368,9 @@ void Light::SetShapeTexture(Texture* texture)
 
 Frustum Light::GetFrustum() const
 {
-    const Matrix3x4& transform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
-    Matrix3x4 frustumTransform(transform.Translation(), transform.Rotation(), 1.0f);
+    // Note: frustum is unaffected by node or parent scale
+    Matrix3x4 frustumTransform(node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f) :
+        Matrix3x4::IDENTITY);
     Frustum ret;
     ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, frustumTransform);
     return ret;
@@ -400,8 +401,9 @@ Matrix3x4 Light::GetDirLightTransform(Camera* camera, bool getNearQuad)
 
 const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
 {
-    const Matrix3x4& transform = node_->GetWorldTransform();
-
+    if (!node_)
+        return Matrix3x4::IDENTITY;
+    
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
@@ -412,12 +414,12 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
         {
             float yScale = tanf(fov_ * M_DEGTORAD * 0.5f) * range_;
             float xScale = aspectRatio_ * yScale;
-            volumeTransform_ = Matrix3x4(transform.Translation(), transform.Rotation(), Vector3(xScale, yScale, range_));
+            volumeTransform_ = Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), Vector3(xScale, yScale, range_));
         }
         break;
 
     case LIGHT_POINT:
-        volumeTransform_ = Matrix3x4(transform.Translation(), Quaternion::IDENTITY, range_);
+        volumeTransform_ = Matrix3x4(node_->GetWorldPosition(), Quaternion::IDENTITY, range_);
         break;
     }
 

@@ -104,7 +104,7 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "FillMode get_fillMode() const", asMETHOD(Camera, GetFillMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Frustum& get_frustum() const", asMETHOD(Camera, GetFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Matrix4& get_projection() const", asMETHODPR(Camera, GetProjection, () const, const Matrix4&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "const Matrix3x4& get_inverseWorldTransform() const", asMETHOD(Camera, GetInverseWorldTransform), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "const Matrix3x4& get_view() const", asMETHOD(Camera, GetView), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum get_viewSpaceFrustum() const", asMETHOD(Camera, GetViewSpaceFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_halfViewSize() const", asMETHOD(Camera, GetHalfViewSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Vector3 get_forwardVector() const", asMETHOD(Camera, GetForwardVector), asCALL_THISCALL);

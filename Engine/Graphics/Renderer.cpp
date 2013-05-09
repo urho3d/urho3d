@@ -819,7 +819,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     // Automatically reduce shadow map size when far away
     if (parameters.autoSize_ && type != LIGHT_DIRECTIONAL)
     {
-        const Matrix3x4& view = camera->GetInverseWorldTransform();
+        const Matrix3x4& view = camera->GetView();
         const Matrix4& projection = camera->GetProjection();
         BoundingBox lightBox;
         float lightPixels;
@@ -1318,7 +1318,7 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
         }
         
         Geometry* geometry = GetLightGeometry(light);
-        const Matrix3x4& view = camera->GetInverseWorldTransform();
+        const Matrix3x4& view = camera->GetView();
         const Matrix4& projection = camera->GetProjection();
         Vector3 cameraPos = camera->GetNode()->GetWorldPosition();
         float lightDist;
@@ -1384,7 +1384,7 @@ const Rect& Renderer::GetLightScissor(Light* light, Camera* camera)
     if (i != lightScissorCache_.End())
         return i->second_;
     
-    const Matrix3x4& view = camera->GetInverseWorldTransform();
+    const Matrix3x4& view = camera->GetView();
     const Matrix4& projection = camera->GetProjection();
     
     assert(light->GetLightType() != LIGHT_DIRECTIONAL);

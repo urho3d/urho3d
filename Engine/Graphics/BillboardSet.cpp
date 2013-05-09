@@ -102,8 +102,7 @@ void BillboardSet::RegisterObject(Context* context)
 void BillboardSet::UpdateBatches(const FrameInfo& frame)
 {
     // Check if position relative to camera has changed, and re-sort in that case
-    const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    Vector3 worldPos = worldTransform.Translation();
+    Vector3 worldPos = node_->GetWorldPosition();
     Vector3 offset = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     if (offset != previousOffset_)
     {

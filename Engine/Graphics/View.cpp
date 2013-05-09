@@ -171,7 +171,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     Drawable** start = reinterpret_cast<Drawable**>(item->start_);
     Drawable** end = reinterpret_cast<Drawable**>(item->end_);
     OcclusionBuffer* buffer = view->occlusionBuffer_;
-    const Matrix3x4& viewMatrix = view->camera_->GetInverseWorldTransform();
+    const Matrix3x4& viewMatrix = view->camera_->GetView();
     Vector3 viewZ = Vector3(viewMatrix.m20_, viewMatrix.m21_, viewMatrix.m22_);
     Vector3 absViewZ = viewZ.Abs();
     
@@ -1841,7 +1841,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
     
     Camera* shadowCamera = query.shadowCameras_[splitIndex];
     const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
-    const Matrix3x4& lightView = shadowCamera->GetInverseWorldTransform();
+    const Matrix3x4& lightView = shadowCamera->GetView();
     const Matrix4& lightProj = shadowCamera->GetProjection();
     LightType type = light->GetLightType();
     
@@ -2107,7 +2107,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     }
     
     // Transform frustum volume to light space
-    const Matrix3x4& lightView = shadowCamera->GetInverseWorldTransform();
+    const Matrix3x4& lightView = shadowCamera->GetView();
     frustumVolume.Transform(lightView);
     
     // Fit the frustum volume inside a bounding box. If uniform size, use a sphere instead

@@ -78,7 +78,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
     
     Matrix3x4 posAdjust(translation, Quaternion::IDENTITY, 1.0f);
-    Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
+    Matrix3x4 shadowView(shadowCamera->GetView());
     Matrix4 shadowProj(shadowCamera->GetProjection());
     Matrix4 texAdjust(Matrix4::IDENTITY);
     
@@ -131,9 +131,7 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
 {
     Node* lightNode = light->GetNode();
     Matrix3x4 posAdjust(translation, Quaternion::IDENTITY, 1.0f);
-    Matrix3x4 spotView = lightNode->GetWorldTransform();
-    // Remove any scaling
-    spotView.SetRotation(spotView.RotationMatrix());
+    Matrix3x4 spotView = Matrix3x4(lightNode->GetWorldPosition(), lightNode->GetWorldRotation(), 1.0f).Inverse();
     Matrix4 spotProj(Matrix4::ZERO);
     Matrix4 texAdjust(Matrix4::IDENTITY);
     
@@ -153,7 +151,7 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
     texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
     #endif
     
-    dest = texAdjust * spotProj * spotView.Inverse() * posAdjust;
+    dest = texAdjust * spotProj * spotView * posAdjust;
 }
 
 void Batch::CalculateSortKey()
@@ -217,7 +215,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     if (graphics->NeedParameterUpdate(SP_CAMERA, (void*)cameraHash))
     {
         // Calculate camera rotation just once
-        Matrix3 cameraWorldRotation = cameraNode->GetWorldTransform().RotationMatrix();
+        Matrix3 cameraWorldRotation = cameraNode->GetWorldRotation().RotationMatrix();
         
         graphics->SetShaderParameter(VSP_CAMERAPOS, cameraNode->GetWorldPosition());
         graphics->SetShaderParameter(VSP_CAMERAROT, cameraWorldRotation);
@@ -258,7 +256,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         if (overrideView_)
             graphics->SetShaderParameter(VSP_VIEWPROJ, projection);
         else
-            graphics->SetShaderParameter(VSP_VIEWPROJ, projection * camera_->GetInverseWorldTransform());
+            graphics->SetShaderParameter(VSP_VIEWPROJ, projection * camera_->GetView());
         
         graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, cameraWorldRotation * Vector3::RIGHT);
         graphics->SetShaderParameter(VSP_VIEWUPVECTOR, cameraWorldRotation * Vector3::UP);
@@ -393,7 +391,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     if (light && graphics->NeedParameterUpdate(SP_LIGHT, light))
     {
         Node* lightNode = light->GetNode();
-        Matrix3 lightWorldRotation = lightNode->GetWorldTransform().RotationMatrix();
+        Matrix3 lightWorldRotation = lightNode->GetWorldRotation().RotationMatrix();
         
         graphics->SetShaderParameter(VSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
         
@@ -430,7 +428,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                 
             case LIGHT_POINT:
                 {
-                    Matrix4 lightVecRot(lightNode->GetWorldTransform().RotationMatrix());
+                    Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                     // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                     // the next parameter
                     #ifdef USE_OPENGL
@@ -485,7 +483,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                 
             case LIGHT_POINT:
                 {
-                    Matrix4 lightVecRot(lightNode->GetWorldTransform().RotationMatrix());
+                    Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                     // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                     // the next parameter
                     #ifdef USE_OPENGL

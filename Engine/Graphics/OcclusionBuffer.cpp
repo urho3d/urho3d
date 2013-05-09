@@ -109,7 +109,7 @@ void OcclusionBuffer::SetView(Camera* camera)
     if (!camera)
         return;
     
-    view_ = camera->GetInverseWorldTransform();
+    view_ = camera->GetView();
     projection_ = camera->GetProjection(false);
     viewProj_ = projection_ * view_;
     nearClip_ = camera->GetNearClip();
