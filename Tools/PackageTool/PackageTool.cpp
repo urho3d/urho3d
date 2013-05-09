@@ -86,6 +86,8 @@ void Run(const Vector<String>& arguments)
     if (arguments.Size() > 2)
         basePath_ = AddTrailingSlash(arguments[2]);
     
+    PrintLine("Scanning directory " + dirName + " for files");
+    
    // Get the file list recursively
     Vector<String> fileNames;
     fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
@@ -154,6 +156,8 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     // Write file data, calculate checksums & correct offsets
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
+        PrintLine("Writing file " + entries_[i].name_);
+        
         entries_[i].offset_ = dest.GetSize();
         String fileFullPath = rootDir + "/" + entries_[i].name_;
         
