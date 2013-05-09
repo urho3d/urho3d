@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "CollisionShape.h"
 #include "Context.h"
+#include "CustomGeometry.h"
 #include "DebugRenderer.h"
 #include "DrawableEvents.h"
 #include "Geometry.h"
@@ -152,7 +153,7 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
 {
     modelName_ = model->GetName();
     
-    PODVector<Vector3> originalVertices;
+    PODVector<Vector3> vertices;
     unsigned numGeometries = model->GetNumGeometries();
     
     for (unsigned i = 0; i < numGeometries; ++i)
@@ -184,17 +185,63 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         for (unsigned j = 0; j < vertexCount; ++j)
         {
             const Vector3& v = *((const Vector3*)(&vertexData[(vertexStart + j) * vertexSize]));
-            originalVertices.Push(v);
+            vertices.Push(v);
         }
     }
     
-    if (originalVertices.Size())
+    BuildHull(vertices);
+}
+
+ConvexData::ConvexData(CustomGeometry* custom)
+{
+    PODVector<Vector3> vertices;
+    unsigned numGeometries = custom->GetNumGeometries();
+    
+    for (unsigned i = 0; i < numGeometries; ++i)
+    {
+        Geometry* geom = custom->GetLodGeometry(i, 0);
+        if (!geom)
+        {
+            LOGWARNING("Skipping null geometry for convex hull collision");
+            continue;
+        }
+        
+        const unsigned char* vertexData;
+        const unsigned char* indexData;
+        unsigned vertexSize;
+        unsigned indexSize;
+        unsigned elementMask;
+        
+        geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+        if (!vertexData)
+        {
+            LOGWARNING("Skipping geometry with no CPU-side geometry data for convex hull collision - no vertex data");
+            continue;
+        }
+        
+        unsigned vertexStart = geom->GetVertexStart();
+        unsigned vertexCount = geom->GetVertexCount();
+        
+        // Copy vertex data
+        for (unsigned j = 0; j < vertexCount; ++j)
+        {
+            const Vector3& v = *((const Vector3*)(&vertexData[(vertexStart + j) * vertexSize]));
+            vertices.Push(v);
+        }
+    }
+    
+    BuildHull(vertices);
+}
+
+void ConvexData::BuildHull(const PODVector<Vector3>& vertices)
+{
+    if (vertices.Size())
     {
         // Build the convex hull from the raw geometry
         StanHull::HullDesc desc;
         desc.SetHullFlag(StanHull::QF_TRIANGLES);
-        desc.mVcount = originalVertices.Size();
-        desc.mVertices = originalVertices[0].Data();
+        desc.mVcount = vertices.Size();
+        desc.mVertices = vertices[0].Data();
         desc.mVertexStride = 3 * sizeof(float);
         desc.mSkinWidth = 0.0f;
         
@@ -215,8 +262,13 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         lib.ReleaseResult(result);
     }
     else
+    {
         vertexCount_ = 0;
+        indexCount_ = 0;
+    }
 }
+
+
 
 ConvexData::~ConvexData()
 {
@@ -258,6 +310,7 @@ CollisionShape::CollisionShape(Context* context) :
     size_(Vector3::ONE),
     cachedWorldScale_(Vector3::ONE),
     lodLevel_(0),
+    customGeometryID_(0),
     margin_(DEFAULT_COLLISION_MARGIN),
     recreateShape_(true)
 {
@@ -283,6 +336,7 @@ void CollisionShape::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "LOD Level", lodLevel_, 0, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_FLOAT, "Collision Margin", margin_, DEFAULT_COLLISION_MARGIN, AM_DEFAULT);
+    ATTRIBUTE(CollisionShape, VAR_INT, "CustomGeometry NodeID", customGeometryID_, 0, AM_DEFAULT | AM_NODEID);
 }
 
 void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -353,6 +407,7 @@ void CollisionShape::SetBox(const Vector3& size, const Vector3& position, const 
     position_ = position;
     rotation_ = rotation;
     model_.Reset();
+    customGeometryID_ = 0;
     
     UpdateShape();
     NotifyRigidBody();
@@ -366,6 +421,7 @@ void CollisionShape::SetSphere(float diameter, const Vector3& position, const Qu
     position_ = position;
     rotation_ = rotation;
     model_.Reset();
+    customGeometryID_ = 0;
     
     UpdateShape();
     NotifyRigidBody();
@@ -379,6 +435,7 @@ void CollisionShape::SetCylinder(float diameter, float height, const Vector3& po
     position_ = position;
     rotation_ = rotation;
     model_.Reset();
+    customGeometryID_ = 0;
     
     UpdateShape();
     NotifyRigidBody();
@@ -392,6 +449,7 @@ void CollisionShape::SetCapsule(float diameter, float height, const Vector3& pos
     position_ = position;
     rotation_ = rotation;
     model_.Reset();
+    customGeometryID_ = 0;
     
     UpdateShape();
     NotifyRigidBody();
@@ -405,6 +463,7 @@ void CollisionShape::SetCone(float diameter, float height, const Vector3& positi
     position_ = position;
     rotation_ = rotation;
     model_.Reset();
+    customGeometryID_ = 0;
     
     UpdateShape();
     NotifyRigidBody();
@@ -425,6 +484,7 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     size_ = scale;
     position_ = position;
     rotation_ = rotation;
+    customGeometryID_ = 0;
     
     UpdateShape();
     NotifyRigidBody();
@@ -445,11 +505,39 @@ void CollisionShape::SetConvexHull(Model* model, unsigned lodLevel, const Vector
     size_ = scale;
     position_ = position;
     rotation_ = rotation;
+    customGeometryID_ = 0;
     
     UpdateShape();
     NotifyRigidBody();
     MarkNetworkUpdate();
 }
+
+void CollisionShape::SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale, const Vector3& position, const Quaternion& rotation)
+{
+    if (!custom)
+    {
+        LOGERROR("Null custom geometry, can not set convex hull");
+        return;
+    }
+    if (!custom->GetNode())
+    {
+        LOGERROR("Custom geometry has null scene node, can not set convex hull");
+        return;
+    }
+    
+    shapeType_ = SHAPE_CONVEXHULL;
+    model_.Reset();
+    lodLevel_ = 0;
+    size_ = scale;
+    position_ = position;
+    rotation_ = rotation;
+    customGeometryID_ = custom->GetNode()->GetID();
+    
+    UpdateShape();
+    NotifyRigidBody();
+    MarkNetworkUpdate();
+}
+
 
 void CollisionShape::SetTerrain()
 {
@@ -790,7 +878,22 @@ void CollisionShape::UpdateShape()
             
         case SHAPE_CONVEXHULL:
             size_ = size_.Abs();
-            if (model_)
+            if (customGeometryID_ && GetScene())
+            {
+                Node* node = GetScene()->GetNode(customGeometryID_);
+                CustomGeometry* custom = node ? node->GetComponent<CustomGeometry>() : 0;
+                if (custom)
+                {
+                    geometry_ = new ConvexData(custom);
+                    ConvexData* convex = static_cast<ConvexData*>(geometry_.Get());
+                    shape_ = new btConvexHullShape((btScalar*)convex->vertexData_.Get(), convex->vertexCount_, sizeof(Vector3));
+                    shape_->setLocalScaling(ToBtVector3(newWorldScale * size_));
+                    LOGINFO("Set convexhull from customgeometry");
+                }
+                else
+                    LOGWARNING("Could not find custom geometry component from node ID " + String(customGeometryID_) + " for convex shape creation");
+            }
+            else if (model_)
             {
                 // Check the geometry cache
                 String id = "Convex_" + model_->GetName() + "_" + String(lodLevel_);

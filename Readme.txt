@@ -18,6 +18,7 @@ Urho3D development, contributions and bugfixes by:
 - Alex Fuller
 - Mika Heinonen
 - Jason Kinzer
+- Pete Leigh
 - Vladimir Pobedinsky
 - Miika Santala
 - Firegorilla

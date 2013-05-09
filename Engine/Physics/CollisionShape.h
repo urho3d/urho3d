@@ -35,6 +35,7 @@ class btTriangleMesh;
 namespace Urho3D
 {
 
+class CustomGeometry;
 class Geometry;
 class Model;
 class PhysicsWorld;
@@ -81,8 +82,13 @@ struct ConvexData : public CollisionGeometryData
 {
     /// Construct from a model.
     ConvexData(Model* model, unsigned lodLevel);
+    /// Construct from a custom geometry.
+    ConvexData(CustomGeometry* custom);
     /// Destruct. Free geometry data.
     ~ConvexData();
+    
+    /// Build the convex hull from vertices.
+    void BuildHull(const PODVector<Vector3>& vertices);
     
     /// Vertex data.
     SharedArrayPtr<Vector3> vertexData_;
@@ -144,12 +150,14 @@ public:
     void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a capsule.
     void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-   /// Set as a cone.
+    /// Set as a cone.
     void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a triangle mesh.
     void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    /// Set as a convex hull.
+    /// Set as a convex hull from Model.
     void SetConvexHull(Model* model, unsigned lodLevel, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    /// Set as a convex hull from CustomGeometry.
+    void SetCustomConvexHull(CustomGeometry* custom, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
     /// Set as a terrain. Only works if the same scene node contains a Terrain component.
     void SetTerrain();
     /// Set shape type.
@@ -237,6 +245,8 @@ private:
     Vector3 cachedWorldScale_;
     /// Model LOD level.
     unsigned lodLevel_;
+    /// CustomGeometry component ID for convex hull mode. 0 if not creating the convex hull from a CustomGeometry.
+    int customGeometryID_;
     /// Collision margin.
     float margin_;
     /// Recrease collision shape flag.

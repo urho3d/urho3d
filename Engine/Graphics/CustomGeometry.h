@@ -42,6 +42,8 @@ struct CustomGeometryVertex
     Vector4 tangent_;
 };
 
+class VertexBuffer;
+
 /// Custom geometry component.
 class CustomGeometry : public Drawable
 {
