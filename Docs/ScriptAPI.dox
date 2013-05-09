@@ -1762,7 +1762,7 @@ Properties:<br>
 - FillMode fillMode
 - Frustum frustum (readonly)
 - Matrix4 projection (readonly)
-- Matrix3x4 inverseWorldTransform (readonly)
+- Matrix3x4 view (readonly)
 - Frustum viewSpaceFrustum (readonly)
 - float halfViewSize (readonly)
 - Vector3 forwardVector (readonly)

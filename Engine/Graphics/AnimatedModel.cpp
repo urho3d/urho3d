@@ -47,7 +47,7 @@
 namespace Urho3D
 {
 
-extern const char* ANIMATION_CATEGORY;
+extern const char* GEOMETRY_CATEGORY;
 
 static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
 {
@@ -80,7 +80,7 @@ AnimatedModel::~AnimatedModel()
 
 void AnimatedModel::RegisterObject(Context* context)
 {
-    context->RegisterFactory<AnimatedModel>(ANIMATION_CATEGORY);
+    context->RegisterFactory<AnimatedModel>(GEOMETRY_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);

@@ -41,7 +41,7 @@
 namespace Urho3D
 {
 
-const char* EFFECT_CATEGORY = "Effect";
+extern const char* GEOMETRY_CATEGORY;
 
 static const float INV_SQRT_TWO = 1.0f / sqrtf(2.0f);
 
@@ -82,7 +82,7 @@ BillboardSet::~BillboardSet()
 
 void BillboardSet::RegisterObject(Context* context)
 {
-    context->RegisterFactory<BillboardSet>(EFFECT_CATEGORY);
+    context->RegisterFactory<BillboardSet>(GEOMETRY_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);

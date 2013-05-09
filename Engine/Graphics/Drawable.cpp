@@ -36,6 +36,8 @@
 namespace Urho3D
 {
 
+const char* GEOMETRY_CATEGORY = "Geometry";
+
 SourceBatch::SourceBatch() :
     distance_(0.0f),
     geometry_(0),

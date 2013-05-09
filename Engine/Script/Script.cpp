@@ -37,8 +37,6 @@
 namespace Urho3D
 {
 
-const char* SCRIPT_CATEGORY = "Script";
-
 /// %Object property info for scripting API dump.
 struct PropertyInfo
 {

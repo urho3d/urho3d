@@ -41,6 +41,7 @@ namespace Urho3D
 {
 
 const char* SCENE_CATEGORY = "Scene";
+const char* LOGIC_CATEGORY = "Logic";
 const char* SUBSYSTEM_CATEGORY = "Subsystem";
 
 static const int ASYNC_LOAD_MIN_FPS = 30;

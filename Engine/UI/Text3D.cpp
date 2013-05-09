@@ -37,10 +37,9 @@
 namespace Urho3D
 {
 
-static const char* EFFECT_CATEGORY = "Effect";
-
 extern const char* horizontalAlignments[];
 extern const char* verticalAlignments[];
+extern const char* GEOMETRY_CATEGORY;
 
 static const float TEXT_SCALING = 1.0f / 128.0f;
 
@@ -63,7 +62,7 @@ Text3D::~Text3D()
 
 void Text3D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Text3D>(EFFECT_CATEGORY);
+    context->RegisterFactory<Text3D>(GEOMETRY_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_RESOURCEREF, "Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);

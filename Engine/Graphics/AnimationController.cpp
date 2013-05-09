@@ -46,7 +46,7 @@ static const unsigned char CTRL_SETWEIGHT = 0x10;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
 static const float COMMAND_STAY_TIME = 0.25f;
 
-extern const char* ANIMATION_CATEGORY;
+extern const char* LOGIC_CATEGORY;
 
 OBJECTTYPESTATIC(AnimationController);
 
@@ -61,7 +61,7 @@ AnimationController::~AnimationController()
 
 void AnimationController::RegisterObject(Context* context)
 {
-    context->RegisterFactory<AnimationController>(ANIMATION_CATEGORY);
+    context->RegisterFactory<AnimationController>(LOGIC_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(AnimationController, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimationController, VAR_VARIANTVECTOR, "Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);

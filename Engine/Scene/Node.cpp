@@ -51,6 +51,8 @@ Node::Node(Context* context) :
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
+    worldRotation_(Quaternion::IDENTITY),
+    worldScale_(Vector3::ONE),
     owner_(0)
 {
 }
@@ -317,8 +319,8 @@ void Node::SetWorldDirection(const Vector3& direction)
     if (!parent_)
         localDirection = direction;
     else
-        localDirection = parent_->GetWorldTransform().Inverse() * direction;
-
+        localDirection = parent_->GetWorldRotation().Inverse() * direction;
+    
     SetRotation(Quaternion(Vector3::FORWARD, localDirection));
 }
 
@@ -674,13 +676,12 @@ void Node::SetParent(Node* parent)
 {
     if (parent)
     {
-        Vector3 worldPosition;
-        Quaternion worldRotation;
-        Vector3 worldScale;
-        GetWorldTransform().Decompose(worldPosition, worldRotation, worldScale);
-
+        Vector3 oldWorldPos = GetWorldPosition();
+        Quaternion oldWorldRot = GetWorldRotation();
+        Vector3 oldWorldScale = GetWorldScale();;
+        
         parent->AddChild(this);
-        SetWorldTransform(worldPosition, worldRotation, worldScale);
+        SetWorldTransform(oldWorldPos, oldWorldRot, oldWorldScale);
     }
 }
 
@@ -1269,10 +1270,18 @@ void Node::UpdateWorldTransform() const
 {
     Matrix3x4 transform = GetTransform();
     if (parent_)
+    {
         worldTransform_ = parent_->GetWorldTransform() * transform;
+        worldRotation_ = parent_->GetWorldRotation() * rotation_;
+        worldScale_ = parent_->GetWorldScale() * scale_;
+    }
     else
+    {
         worldTransform_ = transform;
-
+        worldRotation_ = rotation_;
+        worldScale_ = scale_;
+    }
+    
     dirty_ = false;
 }
 

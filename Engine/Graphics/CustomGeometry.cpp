@@ -42,7 +42,7 @@
 namespace Urho3D
 {
 
-extern const char* STATIC_CATEGORY;
+extern const char* GEOMETRY_CATEGORY;
 
 OBJECTTYPESTATIC(CustomGeometry);
 
@@ -63,7 +63,7 @@ CustomGeometry::~CustomGeometry()
 
 void CustomGeometry::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CustomGeometry>(STATIC_CATEGORY);
+    context->RegisterFactory<CustomGeometry>(GEOMETRY_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CustomGeometry, VAR_BUFFER, "Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE|AM_NOEDIT);

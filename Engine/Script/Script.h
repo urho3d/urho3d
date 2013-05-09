@@ -34,7 +34,7 @@ struct asSMessageInfo;
 namespace Urho3D
 {
 
-extern const char* SCRIPT_CATEGORY;
+extern const char* LOGIC_CATEGORY;
 
 class Scene;
 class ScriptFile;

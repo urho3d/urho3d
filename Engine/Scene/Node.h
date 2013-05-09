@@ -200,34 +200,45 @@ public:
     /// Return position in world space.
     Vector3 GetWorldPosition() const
     {
-        return GetWorldTransform().Translation();
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldTransform_.Translation();
     }
 
     /// Return rotation in world space.
     Quaternion GetWorldRotation() const
     {
-        /// \todo This is potentially incorrect if parent has nonuniform scaling
-        return GetWorldTransform().Rotation();
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldRotation_;
     }
 
     /// Return direction in world space.
     Vector3 GetWorldDirection() const
     {
-        return GetWorldRotation() * Vector3::FORWARD;
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldRotation_ * Vector3::FORWARD;
     }
 
-    /// Return scale in world space.
+    /// Return scale in world space. May not be correct when transform includes shearing (rotation + nonuniform scale).
     Vector3 GetWorldScale() const
     {
-        return GetWorldTransform().Scale();
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldScale_;
     }
 
-    /// Return transform matrix in world space.
+    /// Return transform matrix in world space. Note: to handle non-uniform parent scale correctly, do not extract rotation or scale from this.
     const Matrix3x4& GetWorldTransform() const
     {
         if (dirty_)
             UpdateWorldTransform();
-
+        
         return worldTransform_;
     }
 
@@ -365,6 +376,10 @@ private:
     Quaternion rotation_;
     /// Scale.
     Vector3 scale_;
+    /// World-space rotation.
+    mutable Quaternion worldRotation_;
+    /// World-space scale.
+    mutable Vector3 worldScale_;
     /// Components.
     Vector<SharedPtr<Component> > components_;
     /// Child scene nodes.
