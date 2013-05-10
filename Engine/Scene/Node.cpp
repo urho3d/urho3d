@@ -52,7 +52,6 @@ Node::Node(Context* context) :
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
     worldRotation_(Quaternion::IDENTITY),
-    worldScale_(Vector3::ONE),
     owner_(0)
 {
 }
@@ -299,28 +298,17 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, con
 
 void Node::SetWorldPosition(const Vector3& position)
 {
-    if (!parent_)
-        SetPosition(position);
-    else
-        SetPosition(parent_->GetWorldTransform().Inverse() * position);
+    SetPosition(parent_ ? parent_->GetWorldTransform().Inverse() * position : position);
 }
 
 void Node::SetWorldRotation(const Quaternion& rotation)
 {
-    if (!parent_)
-        SetRotation(rotation);
-    else
-        SetRotation(parent_->GetWorldRotation().Inverse() * rotation);
+    SetRotation(parent_ ? parent_->GetWorldRotation().Inverse() * rotation : rotation);
 }
 
 void Node::SetWorldDirection(const Vector3& direction)
 {
-    Vector3 localDirection;
-    if (!parent_)
-        localDirection = direction;
-    else
-        localDirection = parent_->GetWorldRotation().Inverse() * direction;
-    
+    Vector3 localDirection = parent_ ? parent_->GetWorldRotation().Inverse() * direction : direction;
     SetRotation(Quaternion(Vector3::FORWARD, localDirection));
 }
 
@@ -676,12 +664,12 @@ void Node::SetParent(Node* parent)
 {
     if (parent)
     {
-        Vector3 oldWorldPos = GetWorldPosition();
-        Quaternion oldWorldRot = GetWorldRotation();
-        Vector3 oldWorldScale = GetWorldScale();;
+        Matrix3x4 oldWorldTransform = GetWorldTransform();
         
         parent->AddChild(this);
-        SetWorldTransform(oldWorldPos, oldWorldRot, oldWorldScale);
+        
+        Matrix3x4 newTransform = parent->GetWorldTransform().Inverse() * oldWorldTransform;
+        SetTransform(newTransform.Translation(), newTransform.Rotation(), newTransform.Scale());
     }
 }
 
@@ -1273,13 +1261,11 @@ void Node::UpdateWorldTransform() const
     {
         worldTransform_ = parent_->GetWorldTransform() * transform;
         worldRotation_ = parent_->GetWorldRotation() * rotation_;
-        worldScale_ = parent_->GetWorldScale() * scale_;
     }
     else
     {
         worldTransform_ = transform;
         worldRotation_ = rotation_;
-        worldScale_ = scale_;
     }
     
     dirty_ = false;
