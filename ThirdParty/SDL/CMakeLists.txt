@@ -44,6 +44,13 @@ else ()
     if (HAVE_CONST_XEXT_ADDDISPLAY)
         add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY)
     endif ()
+    check_c_source_compiles("
+        #include <X11/Xlibint.h>
+        extern int _XData32(Display *dpy,register _Xconst long *data,unsigned len);
+        int main(int argc, char **argv) {}" HAVE_CONST_XDATA32)
+    if (HAVE_CONST_XDATA32)
+        add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XDATA32)
+    endif ()
     set(CMAKE_REQUIRED_LIBRARIES)
 
     file (GLOB SYS_C_FILES

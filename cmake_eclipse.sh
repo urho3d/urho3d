@@ -1,6 +1,9 @@
 rm -f CMakeCache.txt
 proj=`pwd`
 mkdir -p ../Urho3D-Eclipse-build/Release ../Urho3D-Eclipse-build/Debug ../Urho3D-Eclipse-build/RelWithDebInfo
+cmake -E chdir ../Urho3D-Eclipse-build/Release rm -f CMakeCache.txt
+cmake -E chdir ../Urho3D-Eclipse-build/Debug rm -f CMakeCache.txt
+cmake -E chdir ../Urho3D-Eclipse-build/RelWithDebInfo rm -f CMakeCache.txt
 cmake -E chdir ../Urho3D-Eclipse-build/Release cmake -G"Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Release $proj $@
 cmake -E chdir ../Urho3D-Eclipse-build/Debug cmake -G"Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug $proj $@
 cmake -E chdir ../Urho3D-Eclipse-build/RelWithDebInfo cmake -G"Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo $proj $@
