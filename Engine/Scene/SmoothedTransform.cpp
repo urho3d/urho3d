@@ -31,8 +31,6 @@
 namespace Urho3D
 {
 
-static const char* NETWORK_CATEGORY = "Network";
-
 OBJECTTYPESTATIC(SmoothedTransform);
 
 SmoothedTransform::SmoothedTransform(Context* context) :
@@ -50,7 +48,7 @@ SmoothedTransform::~SmoothedTransform()
 
 void SmoothedTransform::RegisterObject(Context* context)
 {
-    context->RegisterFactory<SmoothedTransform>(NETWORK_CATEGORY);
+    context->RegisterFactory<SmoothedTransform>();
 }
 
 void SmoothedTransform::Update(float constant, float squaredSnapThreshold)

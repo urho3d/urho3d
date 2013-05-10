@@ -70,7 +70,7 @@ TerrainPatch::~TerrainPatch()
 
 void TerrainPatch::RegisterObject(Context* context)
 {
-    context->RegisterFactory<TerrainPatch>(GEOMETRY_CATEGORY);
+    context->RegisterFactory<TerrainPatch>();
 }
 
 void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -205,8 +205,10 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     if (!vertexData || !indexData)
         return true;
     
-    Matrix3x4 occlusionTransform(node_->GetWorldPosition() + node_->GetWorldTransform() * Vector4(0.0f, occlusionOffset_, 0.0f,
-        0.0f), node_->GetWorldRotation(), node_->GetWorldScale());
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    
+    Matrix3x4 occlusionTransform(worldTransform.Translation() + worldTransform * Vector4(0.0f, occlusionOffset_, 0.0f,
+        0.0f), worldTransform.Rotation(), worldTransform.Scale());
     
     // Draw and check for running out of triangles
     return buffer->Draw(occlusionTransform, vertexData, vertexSize, indexData, indexSize, minLodGeometry_->GetIndexStart(),
