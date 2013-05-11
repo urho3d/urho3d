@@ -200,7 +200,7 @@ void InitScene()
             bb.rotation = Random() * 360;
             bb.enabled = true;
         }
-        billboard.Updated();
+        billboard.Commit();
 
         billboards.Push(newNode);
     }
@@ -266,7 +266,7 @@ void AnimateScene(float timeStep)
         BillboardSet@ billboard = billboards[i].GetComponent("BillboardSet");
         for (uint j = 0; j < billboard.numBillboards; ++j)
             billboard.billboards[j].rotation += 50 * timeStep;
-        billboard.Updated();
+        billboard.Commit();
     }
 }
 

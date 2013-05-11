@@ -84,8 +84,8 @@ public:
     void SetSorted(bool enable);
     /// Set animation LOD bias.
     void SetAnimationLodBias(float bias);
-    /// Call after changing the billboards.
-    void Updated();
+    /// Mark for bounding box and vertex buffer update. Call after modifying the billboards.
+    void Commit();
     
     /// Return material.
     Material* GetMaterial() const;

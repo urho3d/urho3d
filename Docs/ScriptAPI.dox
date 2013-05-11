@@ -2592,7 +2592,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- void Updated()
+- void Commit()
 
 Properties:<br>
 - ShortStringHash type (readonly)

@@ -82,7 +82,7 @@ public:
     void DefineColor(const Color& color);
     /// Define a vertex UV coordinate.
     void DefineTexCoord(const Vector2& texCoord);
-    /// Commit all geometries to the vertex buffer and calculate the bounding box.
+    /// Update vertex buffer and calculate the bounding box. Call after finishing defining geometry.
     void Commit();
     /// Set material on all geometries.
     void SetMaterial(Material* material);

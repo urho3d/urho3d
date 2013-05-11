@@ -117,7 +117,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     if (particles_.Size() != billboards_.Size())
         SetNumBillboards(particles_.Size());
     
-    bool needBillboardUpdate = false;
+    bool needCommit = false;
     
     // Check active/inactive period switching
     periodTimer_ += lastTimeStep_;
@@ -146,7 +146,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         {
             emissionTimer_ -= Lerp(intervalMin_, intervalMax_, Random(1.0f));
             if (EmitNewParticle())
-                needBillboardUpdate = true;
+                needCommit = true;
         }
     }
     
@@ -164,7 +164,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         
         if (billboard.enabled_)
         {
-            needBillboardUpdate = true;
+            needCommit = true;
             
             // Time to live
             if (particle.timer_ >= particle.timeToLive_)
@@ -229,8 +229,8 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         }
     }
     
-    if (needBillboardUpdate)
-        Updated();
+    if (needCommit)
+        Commit();
 }
 
 bool ParticleEmitter::SetParameters(XMLFile* file)

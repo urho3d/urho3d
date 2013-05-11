@@ -858,7 +858,7 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Billboard", "bool enabled", offsetof(Billboard, enabled_));
     
     RegisterDrawable<BillboardSet>(engine, "BillboardSet");
-    engine->RegisterObjectMethod("BillboardSet", "void Updated()", asMETHOD(BillboardSet, Updated), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void Commit()", asMETHOD(BillboardSet, Commit), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_material(Material@+)", asMETHOD(BillboardSet, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Material@+ get_material() const", asMETHOD(BillboardSet, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void set_numBillboards(uint)", asMETHOD(BillboardSet, SetNumBillboards), asCALL_THISCALL);

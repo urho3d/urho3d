@@ -174,25 +174,25 @@ void BillboardSet::SetNumBillboards(unsigned num)
     }
     
     bufferSizeDirty_ = true;
-    Updated();
+    Commit();
 }
 
 void BillboardSet::SetRelative(bool enable)
 {
     relative_ = enable;
-    Updated();
+    Commit();
 }
 
 void BillboardSet::SetScaled(bool enable)
 {
     scaled_ = enable;
-    Updated();
+    Commit();
 }
 
 void BillboardSet::SetSorted(bool enable)
 {
     sorted_ = enable;
-    Updated();
+    Commit();
 }
 
 void BillboardSet::SetAnimationLodBias(float bias)
@@ -201,7 +201,7 @@ void BillboardSet::SetAnimationLodBias(float bias)
     MarkNetworkUpdate();
 }
 
-void BillboardSet::Updated()
+void BillboardSet::Commit()
 {
     MarkPositionsDirty();
     MarkNetworkUpdate();
@@ -240,7 +240,7 @@ void BillboardSet::SetBillboardsAttr(VariantVector value)
         i->enabled_ = value[index++].GetBool();
     }
     
-    Updated();
+    Commit();
 }
 
 void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
@@ -259,7 +259,7 @@ void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
         i->enabled_ = buf.ReadBool();
     }
     
-    Updated();
+    Commit();
 }
 
 ResourceRef BillboardSet::GetMaterialAttr() const
