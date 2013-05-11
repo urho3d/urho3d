@@ -1090,15 +1090,14 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     // Make sure shaders are loaded now
     if (vertexShaders.Size() && pixelShaders.Size())
     {
-        GeometryType geomType = batch.geometryType_;
         // If instancing is not supported, but was requested, or the object is too large to be instanced,
         // choose static geometry vertex shader instead
-        if (geomType == GEOM_INSTANCED && (!GetDynamicInstancing() || batch.geometry_->GetIndexCount() >
+        if (batch.geometryType_ == GEOM_INSTANCED && (!GetDynamicInstancing() || batch.geometry_->GetIndexCount() >
             (unsigned)maxInstanceTriangles_ * 3))
-            geomType = GEOM_STATIC;
+            batch.geometryType_ = GEOM_STATIC;
         
-        if (geomType == GEOM_STATIC_NOINSTANCING)
-            geomType = GEOM_STATIC;
+        if (batch.geometryType_ == GEOM_STATIC_NOINSTANCING)
+            batch.geometryType_ = GEOM_STATIC;
         
         //  Check whether is a pixel lit forward pass. If not, there is only one pixel shader
         if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
@@ -1115,7 +1114,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             Light* light = lightQueue->light_;
             unsigned vsi = 0;
             unsigned psi = 0;
-            vsi = geomType * MAX_LIGHT_VS_VARIATIONS;
+            vsi = batch.geometryType_ * MAX_LIGHT_VS_VARIATIONS;
             
             bool materialHasSpecular = batch.material_ ? batch.material_->GetSpecular() : true;
             if (specularLighting_ && light->GetSpecularIntensity() > 0.0f && materialHasSpecular)
@@ -1177,18 +1176,18 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
                 if (batch.lightQueue_)
                     numVertexLights = batch.lightQueue_->vertexLights_.Size();
                 
-                unsigned vsi = geomType * MAX_VERTEXLIGHT_VS_VARIATIONS + numVertexLights;
+                unsigned vsi = batch.geometryType_ * MAX_VERTEXLIGHT_VS_VARIATIONS + numVertexLights;
                 batch.vertexShader_ = vertexShaders[vsi];
                 // If vertex lights variations do not exist, try without them
                 if (!batch.vertexShader_)
                 {
-                    unsigned vsi = geomType * MAX_VERTEXLIGHT_VS_VARIATIONS;
+                    unsigned vsi = batch.geometryType_ * MAX_VERTEXLIGHT_VS_VARIATIONS;
                     batch.vertexShader_ = vertexShaders[vsi];
                 }
             }
             else
             {
-                unsigned vsi = geomType;
+                unsigned vsi = batch.geometryType_;
                 batch.vertexShader_ = vertexShaders[vsi];
             }
             
