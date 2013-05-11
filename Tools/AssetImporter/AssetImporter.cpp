@@ -96,12 +96,16 @@ SharedPtr<Context> context_(new Context());
 const aiScene* scene_ = 0;
 aiNode* rootNode_ = 0;
 String resourcePath_;
+String outPath_;
 bool useSubdirs_ = true;
 bool localIDs_ = false;
 bool saveBinary_ = false;
 bool createZone_ = true;
 bool noAnimations_ = false;
 bool noMaterials_ = false;
+
+HashSet<aiAnimation*> allAnimations_;
+PODVector<aiAnimation*> sceneAnimations_;
 
 float defaultTicksPerSecond_ = 4800.0f;
 
@@ -113,10 +117,10 @@ void ExportModel(const String& outName);
 void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
-void CollectAnimations(OutModel& model);
+void CollectAnimations(OutModel* model = 0);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
-void BuildAndSaveAnimations(OutModel& model);
+void BuildAndSaveAnimations(OutModel* model = 0);
 
 void ExportScene(const String& outName);
 void CollectSceneModels(OutScene& scene, aiNode* node);
@@ -308,9 +312,11 @@ void Run(const Vector<String>& arguments)
         if (arguments.Size() > 2 && arguments[2][0] != '-')
             outFile = GetInternalPath(arguments[2]);
         
+        outPath_ = GetPath(outFile);
+        
         if (resourcePath_.Empty())
         {
-            resourcePath_ = GetPath(outFile);
+            resourcePath_ = outPath_;
             // If output file already has the Models/ path (model mode), do not take it into the resource path
             if (command == "model")
             {
@@ -439,8 +445,13 @@ void ExportModel(const String& outName)
     BuildAndSaveModel(model);
     if (!noAnimations_)
     {
-        CollectAnimations(model);
-        BuildAndSaveAnimations(model);
+        PrintLine("Scene has " + String(scene_->mNumAnimations) + " animations");
+        CollectAnimations(&model);
+        BuildAndSaveAnimations(&model);
+        
+        // Save scene-global animations
+        CollectAnimations();
+        BuildAndSaveAnimations();
     }
 }
 
@@ -547,25 +558,39 @@ void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessa
     }
 }
 
-void CollectAnimations(OutModel& model)
+void CollectAnimations(OutModel* model)
 {
     const aiScene* scene = scene_;
     for (unsigned i = 0; i < scene->mNumAnimations; ++i)
     {
         aiAnimation* anim = scene->mAnimations[i];
-        bool modelBoneFound = false;
-        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        if (allAnimations_.Contains(anim))
+            continue;
+        
+        if (model)
         {
-            aiNodeAnim* channel = anim->mChannels[j];
-            String channelName = FromAIString(channel->mNodeName);
-            if (GetBoneIndex(model, channelName) != M_MAX_UNSIGNED)
+            bool modelBoneFound = false;
+            for (unsigned j = 0; j < anim->mNumChannels; ++j)
             {
-                modelBoneFound = true;
-                break;
+                aiNodeAnim* channel = anim->mChannels[j];
+                String channelName = FromAIString(channel->mNodeName);
+                if (GetBoneIndex(*model, channelName) != M_MAX_UNSIGNED)
+                {
+                    modelBoneFound = true;
+                    break;
+                }
+            }
+            if (modelBoneFound)
+            {
+                model->animations_.Push(anim);
+                allAnimations_.Insert(anim);
             }
         }
-        if (modelBoneFound)
-            model.animations_.Push(anim);
+        else
+        {
+            sceneAnimations_.Push(anim);
+            allAnimations_.Insert(anim);
+        }
     }
     
     /// \todo Vertex morphs are ignored for now
@@ -843,16 +868,22 @@ void BuildAndSaveModel(OutModel& model)
     }
 }
 
-void BuildAndSaveAnimations(OutModel& model)
+void BuildAndSaveAnimations(OutModel* model)
 {
-    for (unsigned i = 0; i < model.animations_.Size(); ++i)
+    const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
+    
+    for (unsigned i = 0; i < animations.Size(); ++i)
     {
-        aiAnimation* anim = model.animations_[i];
+        aiAnimation* anim = animations[i];
         String animName = FromAIString(anim->mName);
         if (animName.Empty())
             animName = "Anim" + String(i + 1);
-        String animOutName = GetPath(model.outName_) + GetFileName(model.outName_) + "_" + SanitateAssetName(animName) + ".ani";
-        
+        String animOutName;
+        if (model)
+            animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
+        else
+            animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
+            
         SharedPtr<Animation> outAnim(new Animation(context_));
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
@@ -868,14 +899,29 @@ void BuildAndSaveAnimations(OutModel& model)
         {
             aiNodeAnim* channel = anim->mChannels[j];
             String channelName = FromAIString(channel->mNodeName);
-            unsigned boneIndex = GetBoneIndex(model, channelName);
-            if (boneIndex == M_MAX_UNSIGNED)
-            {
-                PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
-                continue;
-            }
+            aiNode* boneNode = 0;
+            bool isRootBone = false;
             
-            aiNode* boneNode = model.bones_[boneIndex];
+            if (model)
+            {
+                unsigned boneIndex = GetBoneIndex(*model, channelName);
+                if (boneIndex == M_MAX_UNSIGNED)
+                {
+                    PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
+                    continue;
+                }
+                boneNode = model->bones_[boneIndex];
+                isRootBone = boneIndex == 0;
+            }
+            else
+            {
+                boneNode = GetNode(channelName, scene_->mRootNode);
+                if (!boneNode)
+                {
+                    PrintLine("Warning: skipping animation track " + channelName + " whose scene node was not found");
+                    continue;
+                }
+            }
             
             AnimationTrack track;
             track.name_ = channelName;
@@ -957,14 +1003,14 @@ void BuildAndSaveAnimations(OutModel& model)
                     scale = channel->mScalingKeys[k].mValue;
                 
                 // If root bone, transform with the model root node transform
-                if (!boneIndex)
+                if (model && isRootBone)
                 {
                     aiMatrix4x4 transMat, scaleMat, rotMat;
                     aiMatrix4x4::Translation(pos, transMat);
                     aiMatrix4x4::Scaling(scale, scaleMat);
                     rotMat = aiMatrix4x4(rot.GetMatrix());
                     aiMatrix4x4 tform = transMat * rotMat * scaleMat;
-                    tform = GetDerivedTransform(tform, boneNode, model.rootNode_);
+                    tform = GetDerivedTransform(tform, boneNode, model->rootNode_);
                     tform.Decompose(scale, rot, pos);
                 }
                 
@@ -1001,9 +1047,16 @@ void ExportScene(const String& outName)
     
     CollectSceneModels(outScene, rootNode_);
     
-    // Save models and their material lists
+    // Save models, their material lists and animations
     for (unsigned i = 0; i < outScene.models_.Size(); ++i)
         BuildAndSaveModel(outScene.models_[i]);
+    
+    // Save scene-global animations
+    if (!noAnimations_)
+    {
+        CollectAnimations();
+        BuildAndSaveAnimations();
+    }
     
     // Save scene
     BuildAndSaveScene(outScene);
@@ -1051,8 +1104,8 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
             BuildBoneCollisionInfo(model);
             if (!noAnimations_)
             {
-                CollectAnimations(model);
-                BuildAndSaveAnimations(model);
+                CollectAnimations(&model);
+                BuildAndSaveAnimations(&model);
             }
             
             scene.models_.Push(model);

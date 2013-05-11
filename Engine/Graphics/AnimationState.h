@@ -36,16 +36,18 @@ class Skeleton;
 struct AnimationTrack;
 struct Bone;
 
-/// %Animation instance in an animated model.
+/// %Animation instance.
 class AnimationState : public RefCounted
 {
 public:
     /// Construct with animated model and animation pointers.
     AnimationState(AnimatedModel* model, Animation* animation);
+    /// Construct with root scene node and animation pointers.
+    AnimationState(Node* node, Animation* animation);
     /// Destruct.
     ~AnimationState();
     
-    /// Set start bone.
+    /// Set start bone. Not supported in node animation mode.
     void SetStartBone(Bone* bone);
     /// Set looping enabled/disabled.
     void SetLooped(bool looped);
@@ -77,18 +79,31 @@ public:
     /// Return blending layer.
     unsigned char GetLayer() const { return layer_; }
     
-    /// Apply to the animated model's skeleton. Called by AnimatedModel.
+    /// Apply the animation at the current time position.
     void Apply();
     
 private:
-    /// Animated model.
+    /// Apply animation to a skeleton.
+    void ApplyToModel();
+    /// Apply animation to a scene node hierarchy.
+    void ApplyToNodes();
+    /// Apply animation track to a scene node, full weight.
+    void ApplyTrackToNodeFullWeight(unsigned index, Node* node);
+    /// Apply animation track to a scene node, blended with current node transform.
+    void ApplyTrackToNodeBlended(unsigned index, Node* node);
+    
+    /// Animated model (model mode.)
     WeakPtr<AnimatedModel> model_;
+    /// Root scene node (node hierarchy mode.)
+    WeakPtr<Node> node_;
     /// Animation.
     SharedPtr<Animation> animation_;
     /// Start bone.
     Bone* startBone_;
     /// Mapping of animation track indices to bones.
     HashMap<unsigned, Bone*> trackToBoneMap_;
+    /// Mapping of animation track indices to scene nodes.
+    HashMap<unsigned, WeakPtr<Node> > trackToNodeMap_;
     /// Last keyframe on each animation track for optimized keyframe search.
     PODVector<unsigned> lastKeyFrame_;
     /// Looped flag.

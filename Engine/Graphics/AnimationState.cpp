@@ -54,6 +54,46 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
         lastKeyFrame_[i] = 0;
 }
 
+AnimationState::AnimationState(Node* node, Animation* animation) :
+    node_(node),
+    animation_(animation),
+    startBone_(0),
+    looped_(false),
+    weight_(0.0f),
+    time_(0.0f),
+    layer_(0)
+{
+    if (animation_)
+    {
+        // Setup a cache for last keyframe of each track
+        lastKeyFrame_.Resize(animation_->GetNumTracks());
+        
+        // Setup animation track to scene node mapping
+        if (node_)
+        {
+            const Vector<AnimationTrack>& tracks = animation_->GetTracks();
+            
+            for (unsigned i = 0; i < tracks.Size(); ++i)
+            {
+                const StringHash& nameHash = tracks[i].nameHash_;
+                
+                if (node_->GetNameHash() == nameHash)
+                    trackToNodeMap_[i] = node_;
+                else
+                {
+                    Node* targetNode = node_->GetChild(nameHash, true);
+                    if (targetNode)
+                        trackToNodeMap_[i] = targetNode;
+                }
+            }
+        }
+    }
+    
+    for (unsigned i = 0; i < lastKeyFrame_.Size(); ++i)
+        lastKeyFrame_[i] = 0;
+}
+
+
 AnimationState::~AnimationState()
 {
 }
@@ -146,7 +186,7 @@ void AnimationState::AddWeight(float delta)
 
 void AnimationState::AddTime(float delta)
 {
-    if (!animation_)
+    if (!animation_ || (!model_ && node_))
         return;
     
     float length = animation_->GetLength();
@@ -166,7 +206,7 @@ void AnimationState::AddTime(float delta)
     SetTime(time);
     
     // Process animation triggers
-    if (model_ && animation_->GetNumTriggers())
+    if (animation_->GetNumTriggers())
     {
         if (delta > 0.0f)
         {
@@ -188,12 +228,14 @@ void AnimationState::AddTime(float delta)
             {
                 using namespace AnimationTrigger;
                 
+                Node* senderNode = model_ ? model_->GetNode() : node_;
+                
                 VariantMap eventData;
-                eventData[P_NODE] = (void*)model_->GetNode();
+                eventData[P_NODE] = (void*)senderNode;
                 eventData[P_NAME] = animation_->GetAnimationName();
                 eventData[P_TIME] = i->time_;
                 eventData[P_DATA] = i->data_;
-                model_->GetNode()->SendEvent(E_ANIMATIONTRIGGER, eventData);
+                senderNode->SendEvent(E_ANIMATIONTRIGGER, eventData);
             }
         }
     }
@@ -224,132 +266,170 @@ void AnimationState::Apply()
     if (!animation_ || !IsEnabled())
         return;
     
+    if (model_)
+        ApplyToModel();
+    else
+        ApplyToNodes();
+}
+
+void AnimationState::ApplyToModel()
+{
     // Check first if full weight or blending
     if (Equals(weight_, 1.0f))
     {
         for (HashMap<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
         {
-            const AnimationTrack* track = animation_->GetTrack(i->first_);
             Bone* bone = i->second_;
             Node* boneNode = bone->node_;
-            if (!boneNode || !bone->animated_ || !track->keyFrames_.Size())
+            if (!boneNode || !bone->animated_)
                 continue;
             
-            unsigned& frame = lastKeyFrame_[i->first_];
-            track->GetKeyFrameIndex(time_, frame);
-            
-            // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
-            unsigned nextFrame = frame + 1;
-            bool interpolate = true;
-            if (nextFrame >= track->keyFrames_.Size())
-            {
-                if (!looped_)
-                {
-                    nextFrame = frame;
-                    interpolate = false;
-                }
-                else
-                    nextFrame = 0;
-            }
-            
-            const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
-            unsigned char channelMask = track->channelMask_;
-            
-            if (!interpolate)
-            {
-                // No interpolation, full weight
-                if (channelMask & CHANNEL_POSITION)
-                    boneNode->SetPosition(keyFrame->position_);
-                if (channelMask & CHANNEL_ROTATION)
-                    boneNode->SetRotation(keyFrame->rotation_);
-                if (channelMask & CHANNEL_SCALE)
-                    boneNode->SetScale(keyFrame->scale_);
-            }
-            else
-            {
-                const AnimationKeyFrame* nextKeyFrame = &track->keyFrames_[nextFrame];
-                float timeInterval = nextKeyFrame->time_ - keyFrame->time_;
-                if (timeInterval < 0.0f)
-                    timeInterval += animation_->GetLength();
-                float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
-                
-                // Interpolation, full weight
-                if (channelMask & CHANNEL_POSITION)
-                    boneNode->SetPosition(keyFrame->position_.Lerp(nextKeyFrame->position_, t));
-                if (channelMask & CHANNEL_ROTATION)
-                    boneNode->SetRotation(keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t));
-                if (channelMask & CHANNEL_SCALE)
-                    boneNode->SetScale(keyFrame->scale_.Lerp(nextKeyFrame->scale_, t));
-            }
+            ApplyTrackToNodeFullWeight(i->first_, boneNode);
         }
     }
     else
     {
         for (HashMap<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
         {
-            const AnimationTrack* track = animation_->GetTrack(i->first_);
             Bone* bone = i->second_;
             Node* boneNode = bone->node_;
-            if (!boneNode || !bone->animated_ || !track->keyFrames_.Size())
+            if (!boneNode || !bone->animated_)
                 continue;
             
-            unsigned& frame = lastKeyFrame_[i->first_];
-            track->GetKeyFrameIndex(time_, frame);
-            
-            // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
-            unsigned nextFrame = frame + 1;
-            bool interpolate = true;
-            if (nextFrame >= track->keyFrames_.Size())
-            {
-                if (!looped_)
-                {
-                    nextFrame = frame;
-                    interpolate = false;
-                }
-                else
-                    nextFrame = 0;
-            }
-            
-            const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
-            unsigned char channelMask = track->channelMask_;
-            
-            if (!interpolate)
-            {
-                // No interpolation, blend between old transform & animation
-                if (channelMask & CHANNEL_POSITION)
-                    boneNode->SetPosition(boneNode->GetPosition().Lerp(keyFrame->position_, weight_));
-                if (channelMask & CHANNEL_ROTATION)
-                    boneNode->SetRotation(boneNode->GetRotation().Slerp(keyFrame->rotation_, weight_));
-                if (channelMask & CHANNEL_SCALE)
-                    boneNode->SetScale(boneNode->GetScale().Lerp(keyFrame->scale_, weight_));
-            }
-            else
-            {
-                const AnimationKeyFrame* nextKeyFrame = &track->keyFrames_[nextFrame];
-                float timeInterval = nextKeyFrame->time_ - keyFrame->time_;
-                if (timeInterval < 0.0f)
-                    timeInterval += animation_->GetLength();
-                float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
-                
-                // Interpolation, blend between old transform & animation
-                if (channelMask & CHANNEL_POSITION)
-                {
-                    boneNode->SetPosition(boneNode->GetPosition().Lerp(
-                        keyFrame->position_.Lerp(nextKeyFrame->position_, t), weight_));
-                }
-                if (channelMask & CHANNEL_ROTATION)
-                {
-                    boneNode->SetRotation(boneNode->GetRotation().Slerp(
-                        keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t), weight_));
-                }
-                if (channelMask & CHANNEL_SCALE)
-                {
-                    boneNode->SetScale(boneNode->GetScale().Lerp(
-                        keyFrame->scale_.Lerp(nextKeyFrame->scale_, t), weight_));
-                }
-            }
+            ApplyTrackToNodeBlended(i->first_, boneNode);
         }
     }
 }
+
+void AnimationState::ApplyToNodes()
+{
+    // When applying to a node hierarchy, can only use full weight (nothing to blend to)
+    for (HashMap<unsigned, WeakPtr<Node> >::ConstIterator i = trackToNodeMap_.Begin(); i != trackToNodeMap_.End(); ++i)
+    {
+        Node* node = i->second_;
+        if (!node)
+            continue;
+        
+        ApplyTrackToNodeFullWeight(i->first_, node);
+    }
+}
+
+void AnimationState::ApplyTrackToNodeFullWeight(unsigned index, Node* node)
+{
+    const AnimationTrack* track = animation_->GetTrack(index);
+    if (track->keyFrames_.Empty())
+        return;
+    
+    unsigned& frame = lastKeyFrame_[index];
+    track->GetKeyFrameIndex(time_, frame);
+    
+    // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
+    unsigned nextFrame = frame + 1;
+    bool interpolate = true;
+    if (nextFrame >= track->keyFrames_.Size())
+    {
+        if (!looped_)
+        {
+            nextFrame = frame;
+            interpolate = false;
+        }
+        else
+            nextFrame = 0;
+    }
+    
+    const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
+    unsigned char channelMask = track->channelMask_;
+    
+    if (!interpolate)
+    {
+        // No interpolation, full weight
+        if (channelMask & CHANNEL_POSITION)
+            node->SetPosition(keyFrame->position_);
+        if (channelMask & CHANNEL_ROTATION)
+            node->SetRotation(keyFrame->rotation_);
+        if (channelMask & CHANNEL_SCALE)
+            node->SetScale(keyFrame->scale_);
+    }
+    else
+    {
+        const AnimationKeyFrame* nextKeyFrame = &track->keyFrames_[nextFrame];
+        float timeInterval = nextKeyFrame->time_ - keyFrame->time_;
+        if (timeInterval < 0.0f)
+            timeInterval += animation_->GetLength();
+        float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
+        
+        // Interpolation, full weight
+        if (channelMask & CHANNEL_POSITION)
+            node->SetPosition(keyFrame->position_.Lerp(nextKeyFrame->position_, t));
+        if (channelMask & CHANNEL_ROTATION)
+            node->SetRotation(keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t));
+        if (channelMask & CHANNEL_SCALE)
+            node->SetScale(keyFrame->scale_.Lerp(nextKeyFrame->scale_, t));
+    }
+}
+
+void AnimationState::ApplyTrackToNodeBlended(unsigned index, Node* node)
+{
+    const AnimationTrack* track = animation_->GetTrack(index);
+    if (track->keyFrames_.Empty())
+        return;
+    
+    unsigned& frame = lastKeyFrame_[index];
+    track->GetKeyFrameIndex(time_, frame);
+    
+    // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
+    unsigned nextFrame = frame + 1;
+    bool interpolate = true;
+    if (nextFrame >= track->keyFrames_.Size())
+    {
+        if (!looped_)
+        {
+            nextFrame = frame;
+            interpolate = false;
+        }
+        else
+            nextFrame = 0;
+    }
+    
+    const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
+    unsigned char channelMask = track->channelMask_;
+    
+    if (!interpolate)
+    {
+        // No interpolation, blend between old transform & animation
+        if (channelMask & CHANNEL_POSITION)
+            node->SetPosition(node->GetPosition().Lerp(keyFrame->position_, weight_));
+        if (channelMask & CHANNEL_ROTATION)
+            node->SetRotation(node->GetRotation().Slerp(keyFrame->rotation_, weight_));
+        if (channelMask & CHANNEL_SCALE)
+            node->SetScale(node->GetScale().Lerp(keyFrame->scale_, weight_));
+    }
+    else
+    {
+        const AnimationKeyFrame* nextKeyFrame = &track->keyFrames_[nextFrame];
+        float timeInterval = nextKeyFrame->time_ - keyFrame->time_;
+        if (timeInterval < 0.0f)
+            timeInterval += animation_->GetLength();
+        float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
+        
+        // Interpolation, blend between old transform & animation
+        if (channelMask & CHANNEL_POSITION)
+        {
+            node->SetPosition(node->GetPosition().Lerp(
+                keyFrame->position_.Lerp(nextKeyFrame->position_, t), weight_));
+        }
+        if (channelMask & CHANNEL_ROTATION)
+        {
+            node->SetRotation(node->GetRotation().Slerp(
+                keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t), weight_));
+        }
+        if (channelMask & CHANNEL_SCALE)
+        {
+            node->SetScale(node->GetScale().Lerp(
+                keyFrame->scale_.Lerp(nextKeyFrame->scale_, t), weight_));
+        }
+    }
+}
+
 
 }
