@@ -596,6 +596,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->SetDepthWrite(false);
     graphics_->SetStencilTest(false);
     graphics_->ResetRenderTargets();
+    graphics_->SetVertexBuffer(buffer);
     
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;
@@ -637,7 +638,6 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         graphics_->SetBlendMode(batch.blendMode_);
         graphics_->SetScissorTest(true, batch.scissor_);
         graphics_->SetTexture(0, batch.texture_);
-        graphics_->SetVertexBuffer(vertexBuffer_);
         graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE, (batch.vertexEnd_ - batch.vertexStart_) /
             UI_VERTEX_SIZE);
     }
