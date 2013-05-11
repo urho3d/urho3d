@@ -1,7 +1,7 @@
 // Urho3D editor scene handling
 
-#include "Scripts/Editor/EditorSceneWindow.as"
-#include "Scripts/Editor/EditorNodeWindow.as"
+#include "Scripts/Editor/EditorHierarchyWindow.as"
+#include "Scripts/Editor/EditorInspectorWindow.as"
 
 const int PICK_GEOMETRIES = 0;
 const int PICK_LIGHTS = 1;

@@ -100,7 +100,7 @@ void CreateAttributeInspectorWindow()
     InitVectorStructs();
     InitXMLResources();
 
-    attributeInspectorWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"));
+    attributeInspectorWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorInspectorWindow.xml"));
     parentContainer = attributeInspectorWindow.GetChild("ParentContainer");
     ui.root.AddChild(attributeInspectorWindow);
     int height = Min(ui.root.height - 60, 500);
