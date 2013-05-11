@@ -619,10 +619,10 @@ void Batch::Draw(View* view) const
     }
 }
 
-void BatchGroup::SetTransforms(View* view, void* lockedData, unsigned& freeIndex)
+void BatchGroup::SetTransforms(void* lockedData, unsigned& freeIndex)
 {
     // Do not use up buffer space if not going to draw as instanced
-    if (geometry_->GetIndexCount() > (unsigned)view->GetRenderer()->GetMaxInstanceTriangles() * 3)
+    if (geometryType_ != GEOM_INSTANCED)
         return;
     
     startIndex_ = freeIndex;
@@ -644,7 +644,7 @@ void BatchGroup::Draw(View* view) const
     {
         // Draw as individual objects if instancing not supported
         VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
-        if (!instanceBuffer || geometry_->GetIndexCount() > (unsigned)renderer->GetMaxInstanceTriangles() * 3)
+        if (!instanceBuffer || geometryType_ != GEOM_INSTANCED)
         {
             Batch::Prepare(view, false);
             
@@ -882,12 +882,12 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
     #endif
 }
 
-void BatchQueue::SetTransforms(View* view, void* lockedData, unsigned& freeIndex)
+void BatchQueue::SetTransforms(void* lockedData, unsigned& freeIndex)
 {
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = baseBatchGroups_.Begin(); i != baseBatchGroups_.End(); ++i)
-        i->second_.SetTransforms(view, lockedData, freeIndex);
+        i->second_.SetTransforms(lockedData, freeIndex);
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
-        i->second_.SetTransforms(view, lockedData, freeIndex);
+        i->second_.SetTransforms(lockedData, freeIndex);
 }
 
 void BatchQueue::Draw(View* view, bool useScissor, bool markToStencil) const

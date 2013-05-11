@@ -156,7 +156,7 @@ struct BatchGroup : public Batch
     }
     
     /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms.
-    void SetTransforms(View* view, void* lockedData, unsigned& freeIndex);
+    void SetTransforms(void* lockedData, unsigned& freeIndex);
     /// Prepare and draw.
     void Draw(View* view) const;
     
@@ -217,7 +217,7 @@ public:
     /// Sort batches front to back while also maintaining state sorting.
     void SortFrontToBack2Pass(PODVector<Batch*>& batches);
     /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms.
-    void SetTransforms(View* view, void* lockedData, unsigned& freeIndex);
+    void SetTransforms(void* lockedData, unsigned& freeIndex);
     /// Draw.
     void Draw(View* view, bool useScissor = false, bool markToStencil = false) const;
     /// Draw with forward light optimizations.

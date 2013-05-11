@@ -2379,14 +2379,26 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         if (i == groups->End())
         {
             // Create a new group based on the batch
-            renderer_->SetBatchShaders(batch, tech, allowShadows);
+            // In case the group remains as one batch only, do not enable instancing shaders yet
             BatchGroup newGroup(batch);
+            newGroup.geometryType_ = GEOM_STATIC;
+            renderer_->SetBatchShaders(newGroup, tech, allowShadows);
             newGroup.CalculateSortKey();
             newGroup.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
             groups->Insert(MakePair(key, newGroup));
         }
         else
+        {
             i->second_.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
+            
+            // Convert to instancing shaders when second batch is added
+            if (i->second_.instances_.Size() == 2)
+            {
+                i->second_.geometryType_ = GEOM_INSTANCED;
+                renderer_->SetBatchShaders(i->second_, tech, allowShadows);
+                i->second_.CalculateSortKey();
+            }
+        }
     }
     else
     {
@@ -2422,13 +2434,13 @@ void View::PrepareInstancingBuffer()
             return;
         
         for (HashMap<StringHash, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
-            i->second_.SetTransforms(this, dest, freeIndex);
+            i->second_.SetTransforms(dest, freeIndex);
         
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
             for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
-                i->shadowSplits_[j].shadowBatches_.SetTransforms(this, dest, freeIndex);
-            i->litBatches_.SetTransforms(this, dest, freeIndex);
+                i->shadowSplits_[j].shadowBatches_.SetTransforms(dest, freeIndex);
+            i->litBatches_.SetTransforms(dest, freeIndex);
         }
         
         instancingBuffer->Unlock();

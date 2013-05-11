@@ -769,11 +769,18 @@ static const String& AnimatedModelGetMorphName(unsigned index, AnimatedModel* pt
     return index < morphs.Size() ? morphs[index].name_ : String::EMPTY;
 }
 
+static AnimationState* ConstructAnimationState(Node* node, Animation* animation)
+{
+    return new AnimationState(node, animation);
+}
+
 static void RegisterAnimatedModel(asIScriptEngine* engine)
 {
     RegisterRefCounted<AnimationState>(engine, "AnimationState");
+    engine->RegisterObjectBehaviour("AnimationState", asBEHAVE_FACTORY, "AnimationState@+ f(Node@+, Animation@+)", asFUNCTION(ConstructAnimationState), asCALL_CDECL);
     engine->RegisterObjectMethod("AnimationState", "void AddWeight(float)", asMETHOD(AnimationState, AddWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void AddTime(float)", asMETHOD(AnimationState, AddTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "void Apply()", asMETHOD(AnimationState, Apply), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_startBone(Bone@+)", asMETHOD(AnimationState, SetStartBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "Bone@+ get_startBone() const", asMETHOD(AnimationState, GetStartBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_looped(bool)", asMETHOD(AnimationState, SetLooped), asCALL_THISCALL);
