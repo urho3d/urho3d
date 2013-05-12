@@ -316,17 +316,20 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned v
         const Vector3& v0 = *((const Vector3*)(&vertices[index * vertexSize]));
         const Vector3& v1 = *((const Vector3*)(&vertices[(index + 1) * vertexSize]));
         const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexSize]));
-        currentFrontFace = Min(HitDistance(v0, v1, v2) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentFrontFace);
+        float frontFaceDistance = HitDistance(v0, v1, v2);
+        float backFaceDistance = HitDistance(v2, v1, v0);
+        currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : M_INFINITY, currentFrontFace);
         // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces by
         // checking reversed frontfaces
-        currentBackFace = Min(HitDistance(v2, v1, v0) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentBackFace);
+        currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : M_INFINITY, currentBackFace);
+        index += 3;
     }
     
     // If the closest face is a backface, that means that the ray originates from the inside of the geometry
     // NOTE: there may be cases where both are equal, as in, no collision to either. This is prevented in the most likely case
     // (ray doesnt hit either) by this conditional
     if (currentFrontFace != M_INFINITY || currentBackFace != M_INFINITY)
-        return currentBackFace<currentFrontFace;
+        return currentBackFace < currentFrontFace;
     
     // It is still possible for two triangles to be equally distant from the triangle, however, this is extremely unlikely.
     // As such, it is safe to assume they are not
@@ -351,10 +354,12 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
-            currentFrontFace = Min(HitDistance(v0, v1, v2) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentFrontFace);
-            // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces
-            // by checking reversed frontfaces
-            currentBackFace = Min(HitDistance(v2, v1, v0) > 0.0f ? HitDistance(v2, v1, v0) : M_INFINITY, currentBackFace);
+            float frontFaceDistance = HitDistance(v0, v1, v2);
+            float backFaceDistance = HitDistance(v2, v1, v0);
+            currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : M_INFINITY, currentFrontFace);
+            // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces by
+            // checking reversed frontfaces
+            currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : M_INFINITY, currentBackFace);
             indices += 3;
         }
     }
@@ -369,10 +374,12 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
-            currentFrontFace = Min(HitDistance(v0, v1, v2) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentFrontFace);
-            // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces
-            // by checking reversed frontfaces
-            currentBackFace = Min(HitDistance(v2, v1, v0) > 0.0f ? HitDistance(v0, v1, v2) : M_INFINITY, currentBackFace);
+            float frontFaceDistance = HitDistance(v0, v1, v2);
+            float backFaceDistance = HitDistance(v2, v1, v0);
+            currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : M_INFINITY, currentFrontFace);
+            // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces by
+            // checking reversed frontfaces
+            currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : M_INFINITY, currentBackFace);
             indices += 3; 
         }
     }
@@ -381,7 +388,7 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
     // NOTE: there may be cases where both are equal, as in, no collision to either. This is prevented in the most likely case
     // (ray doesnt hit either) by this conditional
     if (currentFrontFace != M_INFINITY || currentBackFace != M_INFINITY)
-        return currentBackFace<currentFrontFace;
+        return currentBackFace < currentFrontFace;
     
     // It is still possible for two triangles to be equally distant from the triangle, however, this is extremely unlikely.
     // As such, it is safe to assume they are not
