@@ -26,6 +26,7 @@
 #include "AnimationState.h"
 #include "Deserializer.h"
 #include "DrawableEvents.h"
+#include "Log.h"
 #include "Serializer.h"
 
 #include "DebugNew.h"
@@ -84,6 +85,8 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
                     Node* targetNode = node_->GetChild(nameHash, true);
                     if (targetNode)
                         trackToNodeMap_[i] = targetNode;
+                    else
+                        LOGWARNING("Node " + tracks[i].name_ + " not found for node animation " + animation_->GetName());
                 }
             }
         }

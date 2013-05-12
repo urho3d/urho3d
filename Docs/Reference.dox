@@ -528,7 +528,7 @@ The rendering-related components defined by the %Graphics and %UI libraries are:
 - StaticModel: non-skinned geometry. Can LOD transition according to distance.
 - Skybox: a subclass of StaticModel that appears to always stay in place.
 - AnimatedModel: skinned geometry that can do skeletal and vertex morph animation.
-- AnimationController: drives AnimatedModel's animations forward automatically and controls animation fade-in/out.
+- AnimationController: drives animations forward automatically and controls animation fade-in/out.
 - BillboardSet: a group of camera-facing billboards, which can have varying sizes, rotations and texture coordinates.
 - ParticleEmitter: a subclass of BillboardSet that emits particle billboards.
 - Light: illuminates the scene. Can optionally cast shadows.
@@ -959,7 +959,10 @@ When reuse is disabled, all shadow maps are rendered before the actual scene ren
 
 The AnimatedModel component renders GPU-skinned geometry and is capable of skeletal animation. When a model is assigned to it using \ref AnimatedModel::SetModel "SetModel()", it creates a bone node hierarchy under its scene node, and these bone nodes can be moved and rotated to animate.
 
-There are two ways to play skeletal animations. Either manually, by adding or removing animation states to the AnimatedModel, and advancing their time positions & weights, see \ref AnimatedModel::AddAnimationState "AddAnimationState()", \ref AnimatedModel::RemoveAnimationState "RemoveAnimationState()", \ref AnimationState::AddTime "AddTime()" and \ref AnimationState::SetWeight "SetWeight()". Alternatively the helper component AnimationController can be used by creating it into the same scene node as the AnimatedModel, and using its functions, such as \ref AnimationController::Play "Play()" and \ref AnimationController::Stop "Stop()". AnimationController will advance the animations automatically during scene update. It also enables automatic network synchronization of animations, which the AnimatedModel does not do on its own.
+There are two ways to play skeletal animations:
+
+- Manually, by adding or removing animation states to the AnimatedModel, and advancing their time positions & weights, see \ref AnimatedModel::AddAnimationState "AddAnimationState()", \ref AnimatedModel::RemoveAnimationState "RemoveAnimationState()", \ref AnimationState::AddTime "AddTime()" and \ref AnimationState::SetWeight "SetWeight()".
+- Using the AnimationController helper component: create it into the same scene node as the AnimatedModel, and use its functions, such as \ref AnimationController::Play "Play()" and \ref AnimationController::Stop "Stop()". AnimationController will advance the animations automatically during scene update. It also enables automatic network synchronization of animations, which the AnimatedModel does not do on its own.
 
 Note that AnimationController does not by default stop non-looping animations automatically once they reach the end, so their final pose will stay in effect. Rather they must either be stopped manually, or the \ref AnimationController::SetAutoFade "SetAutoFade()" function can be used to make them automatically fade out once reaching the end.
 
@@ -995,6 +998,18 @@ if (headBone)
 \section SkeletalAnimation_CombinedModels Combined skinned models
 
 To create a combined skinned model from many parts (for example body + clothes), several AnimatedModel components can be created to the same scene node. These will then share the same bone nodes. The component that was first created will be the "master" model which drives the animations; the rest of the models will just skin themselves using the same bones. For this to work, all parts must have been authored from a compatible skeleton, with the same bone names. The master model should have all the bones required by the combined whole (for example a full biped), while the other models may omit unnecessary bones. Note that if the parts contain compatible vertex morphs (matching names), the vertex morph weights will also be controlled by the master model and copied to the rest.
+
+\section SkeletalAnimation_NodeAnimation Node animations
+
+Animations can also be applied outside of an AnimatedModel's bone hierarchy, to control the transforms of named nodes in the scene. The AssetImporter utility will automatically save node animations in both model or scene modes to the output file directory.
+
+Like with skeletal animations, there are two ways to play back node animations:
+
+- Instantiate an AnimationState yourself, using the constructor which takes a root scene node (animated nodes are searched for as children of this node) and an animation pointer. You need to manually advance its time position, and then call \ref AnimationState::Apply "Apply()" to apply to the scene nodes.
+- Create an AnimationController component to the root scene node of the animation. This node should not contain an AnimatedModel component. Use the AnimationController to play back the animation just like you would play back a skeletal animation.
+
+%Node animations do not support blending, as there is no initial pose to blend from. Instead they are always played back with full weight. Note that the scene node names in the animation and in the scene must match exactly, otherwise the animation will not play.
+
 
 \page Particles %Particle systems
 
@@ -1489,6 +1504,8 @@ Options:
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, AnimatedModel or Skybox component. The list files can safely be deleted if not needed, and should not be included in production builds of Urho3D applications.
+
+In model or scene mode, the AssetImporter utility will also automatically save non-skeletal node animations into the output file directory.
 
 \section Tools_OgreImporter OgreImporter
 
