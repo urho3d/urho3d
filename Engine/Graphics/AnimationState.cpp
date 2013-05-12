@@ -59,7 +59,7 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
     animation_(animation),
     startBone_(0),
     looped_(false),
-    weight_(0.0f),
+    weight_(1.0f),
     time_(0.0f),
     layer_(0)
 {
@@ -153,12 +153,15 @@ void AnimationState::SetLooped(bool looped)
 
 void AnimationState::SetWeight(float weight)
 {
-    weight = Clamp(weight, 0.0f, 1.0f);
-    if (weight != weight_)
+    // Weight can only be set in model mode. In node animation it is hardcoded to full
+    if (model_)
     {
-        weight_ = weight;
-        if (model_)
+        weight = Clamp(weight, 0.0f, 1.0f);
+        if (weight != weight_)
+        {
+            weight_ = weight;
             model_->MarkAnimationDirty();
+        }
     }
 }
 
@@ -186,7 +189,7 @@ void AnimationState::AddWeight(float delta)
 
 void AnimationState::AddTime(float delta)
 {
-    if (!animation_ || (!model_ && node_))
+    if (!animation_ || (!model_ && !node_))
         return;
     
     float length = animation_->GetLength();
