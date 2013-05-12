@@ -109,7 +109,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     x = best->left_;
     y = best->top_;
     
-    // Reserved the area by spliting up the remaining free area
+    // Reserve the area by splitting up the remaining free area
     best->left_ = reserved.right_;
     if (best->Height() > 2 * height)
     {

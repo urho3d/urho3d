@@ -267,6 +267,7 @@ Renderer::Renderer(Context* context) :
     shadowQuality_(SHADOWQUALITY_HIGH_16BIT),
     maxShadowMaps_(1),
     maxShadowCascades_(MAX_CASCADE_SPLITS),
+    minInstances_(2),
     maxInstanceTriangles_(500),
     maxSortedInstances_(1000),
     maxOccluderTriangles_(5000),
@@ -439,6 +440,11 @@ void Renderer::SetDynamicInstancing(bool enable)
         enable = false;
     
     dynamicInstancing_ = enable;
+}
+
+void Renderer::SetMinInstances(int instances)
+{
+    minInstances_ = Max(instances, 2);
 }
 
 void Renderer::SetMaxInstanceTriangles(int triangles)

@@ -405,6 +405,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     drawShadows_ = renderer_->GetDrawShadows();
     materialQuality_ = renderer_->GetMaterialQuality();
     maxOccluderTriangles_ = renderer_->GetMaxOccluderTriangles();
+    minInstances_ = renderer_->GetMinInstances();
     
     // Set possible quality overrides from the camera
     unsigned viewOverrideFlags = camera_->GetViewOverrideFlags();
@@ -2379,7 +2380,7 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         if (i == groups->End())
         {
             // Create a new group based on the batch
-            // In case the group remains as one batch only, do not enable instancing shaders yet
+            // In case the group remains below the instancing limit, do not enable instancing shaders yet
             BatchGroup newGroup(batch);
             newGroup.geometryType_ = GEOM_STATIC;
             renderer_->SetBatchShaders(newGroup, tech, allowShadows);
@@ -2391,8 +2392,8 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         {
             i->second_.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
             
-            // Convert to instancing shaders when second batch is added
-            if (i->second_.instances_.Size() == 2)
+            // Convert to using instancing shaders when the instancing limit is reached
+            if (i->second_.instances_.Size() == minInstances_)
             {
                 i->second_.geometryType_ = GEOM_INSTANCED;
                 renderer_->SetBatchShaders(i->second_, tech, allowShadows);

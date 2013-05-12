@@ -2418,6 +2418,7 @@ AnimationState
 Methods:<br>
 - void AddWeight(float)
 - void AddTime(float)
+- void Apply()
 
 Properties:<br>
 - int refs (readonly)
@@ -3033,6 +3034,7 @@ Properties:<br>
 - int maxShadowMaps
 - bool reuseShadowMaps
 - bool dynamicInstancing
+- int minInstances
 - int maxInstanceTriangles
 - int maxSortedInstances
 - int maxOccluderTriangles

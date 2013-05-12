@@ -195,6 +195,8 @@ public:
     void SetMaxShadowCascades(int cascades);
     /// Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
+    /// Set minimum number of instances required in a batch group to render as instanced.
+    void SetMinInstances(int instances);
     /// Set maximum number of triangles per object for instancing.
     void SetMaxInstanceTriangles(int triangles);
     /// Set maximum number of sorted instances per batch group. If exceeded, instances are rendered unsorted.
@@ -238,6 +240,8 @@ public:
     int GetMaxShadowCascades() const { return maxShadowCascades_; }
     /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
+    /// Return minimum number of instances required in a batch group to render as instanced.
+    int GetMinInstances() const { return minInstances_; }
     /// Return maximum number of triangles per object for instancing.
     int GetMaxInstanceTriangles() const { return maxInstanceTriangles_; }
     /// Return maximum number of sorted instances per batch group.
@@ -455,6 +459,8 @@ private:
     int maxShadowMaps_;
     /// Maximum number of directional light shadow cascades.
     int maxShadowCascades_;
+    /// Minimum number of instances required in a batch group to render as instanced.
+    int minInstances_;
     /// Maximum triangles per object for instancing.
     int maxInstanceTriangles_;
     /// Maximum sorted instances per batch group.

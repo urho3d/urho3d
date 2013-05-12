@@ -40,9 +40,9 @@ public:
     void Reset(int width, int height);
     /// Try to allocate an area. Return true if successful, with x & y coordinates filled.
     bool Allocate(int width, int height, int& x, int& y);
-    /// Return the final width (if it is allowed to grow).
+    /// Return the current width.
     int GetWidth() const { return size_.x_; }
-    /// Return the final height (if it is allowed to grow).
+    /// Return the current height.
     int GetHeight() const { return size_.y_; }
 
 private:

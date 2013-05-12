@@ -244,6 +244,8 @@ private:
     int materialQuality_;
     /// Maximum number of occluder triangles.
     int maxOccluderTriangles_;
+    /// Minimum number of instances required in a batch group to render as instanced.
+    int minInstances_;
     /// Highest zone priority currently visible.
     int highestZonePriority_;
     /// Camera zone's override flag.
