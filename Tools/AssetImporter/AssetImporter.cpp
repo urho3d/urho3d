@@ -445,7 +445,6 @@ void ExportModel(const String& outName)
     BuildAndSaveModel(model);
     if (!noAnimations_)
     {
-        PrintLine("Scene has " + String(scene_->mNumAnimations) + " animations");
         CollectAnimations(&model);
         BuildAndSaveAnimations(&model);
         
