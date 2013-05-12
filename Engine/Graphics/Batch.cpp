@@ -212,7 +212,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     
     // Set camera shader parameters
     unsigned cameraHash = overrideView_ ? (unsigned)(size_t)camera_ + 4 : (unsigned)(size_t)camera_;
-    if (graphics->NeedParameterUpdate(SP_CAMERA, (void*)cameraHash))
+    if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<void*>(cameraHash)))
     {
         // Calculate camera rotation just once
         Matrix3 cameraWorldRotation = cameraNode->GetWorldRotation().RotationMatrix();
@@ -267,7 +267,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     IntRect viewport = graphics->GetViewport();
     unsigned viewportHash = (viewport.left_) | (viewport.top_ << 8) | (viewport.right_ << 16) | (viewport.bottom_ << 24);
     
-    if (graphics->NeedParameterUpdate(SP_VIEWPORT, (void*)viewportHash))
+    if (graphics->NeedParameterUpdate(SP_VIEWPORT, reinterpret_cast<void*>(viewportHash)))
     {
         float rtWidth = (float)rtSize.x_;
         float rtHeight = (float)rtSize.y_;
@@ -300,7 +300,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     BlendMode blend = graphics->GetBlendMode();
     Zone* fogColorZone = (blend == BLEND_ADD || blend == BLEND_ADDALPHA) ? renderer->GetDefaultZone() : zone_;
     unsigned zoneHash = (unsigned)(size_t)zone_ + (unsigned)(size_t)fogColorZone;
-    if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, (void*)zoneHash))
+    if (zone_ && graphics->NeedParameterUpdate(SP_ZONE, reinterpret_cast<void*>(zoneHash)))
     {
         graphics->SetShaderParameter(VSP_AMBIENTSTARTCOLOR, zone_->GetAmbientStartColor());
         graphics->SetShaderParameter(VSP_AMBIENTENDCOLOR, zone_->GetAmbientEndColor().ToVector4() - zone_->GetAmbientStartColor().ToVector4());

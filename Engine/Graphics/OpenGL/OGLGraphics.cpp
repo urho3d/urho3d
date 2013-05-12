@@ -668,17 +668,17 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     case TRIANGLE_LIST:
         primitiveCount = indexCount / 3;
         if (indexSize == sizeof(unsigned short))
-            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, (const GLvoid*)(indexStart * indexSize));
+            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
         else
-            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (const GLvoid*)(indexStart * indexSize));
+            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
         break;
         
     case LINE_LIST:
         primitiveCount = indexCount / 2;
         if (indexSize == sizeof(unsigned short))
-            glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_SHORT, (const GLvoid*)(indexStart * indexSize));
+            glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
         else
-            glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_INT, (const GLvoid*)(indexStart * indexSize));
+            glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize));
         break;
     }
     
@@ -704,12 +704,12 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         primitiveCount = indexCount / 3;
         if (indexSize == sizeof(unsigned short))
         {
-            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, (const GLvoid*)(indexStart * indexSize),
+            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
                 instanceCount);
         }
         else
         {
-            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (const GLvoid*)(indexStart * indexSize),
+            glDrawElementsInstancedARB(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
                 instanceCount);
         }
         break;
@@ -718,12 +718,12 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         primitiveCount = indexCount / 2;
         if (indexSize == sizeof(unsigned short))
         {
-            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_SHORT, (const GLvoid*)(indexStart * indexSize),
+            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
                 instanceCount);
         }
         else
         {
-            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_INT, (const GLvoid*)(indexStart * indexSize),
+            glDrawElementsInstancedARB(GL_LINES, indexCount, GL_UNSIGNED_INT, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
                 instanceCount);
         }
         break;
@@ -812,7 +812,7 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
                 // Set the attribute pointer. Add instance offset for the instance matrix pointers
                 unsigned offset = j >= ELEMENT_INSTANCEMATRIX1 ? instanceOffset * vertexSize : 0;
                 glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
-                    VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)
+                    VertexBuffer::elementNormalize[j], vertexSize, reinterpret_cast<const GLvoid*>(buffer->GetElementOffset((VertexElement)j)
                     + offset));
             }
         }
@@ -910,7 +910,7 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
                 // Set the attribute pointer. Add instance offset for the instance matrix pointers
                 unsigned offset = j >= ELEMENT_INSTANCEMATRIX1 ? instanceOffset * vertexSize : 0;
                 glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
-                    VertexBuffer::elementNormalize[j], vertexSize, (const GLvoid*)(buffer->GetElementOffset((VertexElement)j)
+                    VertexBuffer::elementNormalize[j], vertexSize, reinterpret_cast<const GLvoid*>(buffer->GetElementOffset((VertexElement)j)
                     + offset));
             }
         }
