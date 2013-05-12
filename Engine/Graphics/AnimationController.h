@@ -166,15 +166,21 @@ protected:
     virtual void OnNodeSet(Node* node);
     
 private:
+    /// Add an animation state either to AnimatedModel or as a node animation.
+    AnimationState* AddAnimationState(Animation* animation);
+    /// Remove an animation state.
+    void RemoveAnimationState(AnimationState* state);
+    /// Find an animation state.
+    AnimationState* GetAnimationState(StringHash nameHash) const;
     /// Find the internal index and animation state of an animation.
     void FindAnimation(const String& name, unsigned& index, AnimationState*& state) const;
-    /// Find the animation state only.
-    AnimationState* FindAnimationState(const String& name) const;
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Controlled animations.
     Vector<AnimationControl> animations_;
+    /// Node hierarchy mode animation states.
+    Vector<SharedPtr<AnimationState> > nodeAnimationStates_;
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
 };
