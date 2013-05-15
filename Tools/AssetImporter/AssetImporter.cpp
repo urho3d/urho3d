@@ -1223,6 +1223,8 @@ void BuildAndSaveScene(OutScene& scene)
             outNode->SetPosition(lightWorldPosition);
             outLight->SetLightType(LIGHT_POINT);
             break;
+        default:
+            break;
         }
         
         // Calculate range from attenuation parameters so that light intensity has been reduced to 10% at that distance

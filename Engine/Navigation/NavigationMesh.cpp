@@ -636,9 +636,9 @@ void NavigationMesh::SetNavigationDataAttr(PODVector<unsigned char> value)
     
     while (!buffer.IsEof())
     {
-        int x = buffer.ReadInt();
-        int z = buffer.ReadInt();
-        dtTileRef tileRef = buffer.ReadUInt();
+        /*int x =*/ buffer.ReadInt();
+        /*int z =*/ buffer.ReadInt();
+        /*dtTileRef tileRef =*/ buffer.ReadUInt();
         unsigned navDataSize = buffer.ReadUInt();
         
         unsigned char* navData = (unsigned char*)dtAlloc(navDataSize, DT_ALLOC_PERM);
@@ -892,6 +892,9 @@ void NavigationMesh::GetTileGeometry(NavigationBuildData& build, Vector<Navigati
                         for (unsigned j = 0; j < 36; ++j)
                             build.indices_.Push(indices[j] + destVertexStart);
                     }
+                    break;
+                        
+                default:
                     break;
                 }
                 

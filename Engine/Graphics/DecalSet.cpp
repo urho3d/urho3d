@@ -508,7 +508,6 @@ void DecalSet::SetMaterialAttr(ResourceRef value)
 
 void DecalSet::SetDecalsAttr(PODVector<unsigned char> value)
 {
-    Scene* scene = GetScene();
     RemoveAllDecals();
     
     if (value.Empty())
