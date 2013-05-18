@@ -82,8 +82,6 @@ Input::Input(Context* context) :
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
     
-    // Delay SubscribeToEvent(E_BEGINFRAME, HANDLER(Input, HandleBeginFrame)) until input is initialized
-    
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
 }

@@ -94,10 +94,7 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
     SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
     SubscribeToEvent(E_CHAR, HANDLER(UI, HandleChar));
-
-    // Delay SubscribeToEvent(E_POSTUPDATE, HANDLER(UI, HandlePostUpdate)) and
-    // SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate)) until UI is initialized
-
+    
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
 }

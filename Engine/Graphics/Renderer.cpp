@@ -286,8 +286,6 @@ Renderer::Renderer(Context* context) :
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
-
-    // Delay SubscribeToEvent(E_RENDERUPDATE, HANDLER(Renderer, HandleRenderUpdate)) until renderer is initialized
     
     quadDirLight_->SetLightType(LIGHT_DIRECTIONAL);
     
