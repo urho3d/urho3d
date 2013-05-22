@@ -706,7 +706,7 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
     }
 }
 
-void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool fullUpdate)
+void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool& fullUpdate)
 {
     // If attributes have changed structurally, do a full update
     uint count = GetAttributeEditorCount(serializables);

@@ -176,7 +176,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
     if (fullUpdate)
         attributesFullDirty = false;
 
-    // If full update delete all containers and added them back as necessary
+    // If full update delete all containers and add them back as necessary
     if (fullUpdate)
         DeleteAllContainers();
 
@@ -308,7 +308,8 @@ void UpdateAttributeInspector(bool fullUpdate = true)
 
 void UpdateNodeAttributes()
 {
-    UpdateAttributes(ToSerializableArray(editNodes), GetNodeContainer().GetChild("AttributeList"), false);
+    bool fullUpdate = false;
+    UpdateAttributes(ToSerializableArray(editNodes), GetNodeContainer().GetChild("AttributeList"), fullUpdate);
 }
 
 void UpdateAttributeInspectorIcons()
