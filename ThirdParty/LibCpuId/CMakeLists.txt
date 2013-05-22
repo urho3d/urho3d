@@ -16,7 +16,7 @@ if (MSVC AND ENABLE_64BIT)
     #set (ASM_FILES libcpuid/masm-x64.asm)
     # As a temporary workaround
     add_custom_command(OUTPUT masm-x64.obj COMMAND ${CMAKE_ASM_MASM_COMPILER} -c libcpuid/masm-x64.asm DEPENDS libcpuid/masm-x64.asm COMMENT "Temporary workaround for MASM") 
-    set (ASM_FILES masm-x64.obj)
+    set (ASM_FILES masm-x64.obj libcpuid/masm-x64.asm)
 endif ()
 
 set (SOURCE_FILES ${C_FILES} ${H_FILES} ${ASM_FILES})

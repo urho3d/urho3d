@@ -19,7 +19,7 @@ if (MSVC AND ENABLE_64BIT)
     #set (ASM_FILES source/as_callfunc_x64_msvc_asm.asm)
     # As a temporary workaround
     add_custom_command(OUTPUT as_callfunc_x64_msvc_asm.obj COMMAND ${CMAKE_ASM_MASM_COMPILER} -c source/as_callfunc_x64_msvc_asm.asm DEPENDS source/as_callfunc_x64_msvc_asm.asm COMMENT "Temporary workaround for MASM") 
-    set (ASM_FILES as_callfunc_x64_msvc_asm.obj)
+    set (ASM_FILES as_callfunc_x64_msvc_asm.obj source/as_callfunc_x64_msvc_asm.asm)
 endif ()
 
 set (SOURCE_FILES ${CPP_FILES} ${ASM_FILES} ${H_FILES})
