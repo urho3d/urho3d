@@ -11,7 +11,12 @@ file (GLOB H_FILES
 )
 
 if (MSVC AND ENABLE_64BIT)
-    set (ASM_FILES libcpuid/masm-x64.asm)
+    # Commented out due to cmake bug
+    #enable_language(ASM_MASM)
+    #set (ASM_FILES libcpuid/masm-x64.asm)
+    # As a temporary workaround
+    add_custom_command(OUTPUT masm-x64.obj COMMAND ${CMAKE_ASM_MASM_COMPILER} -c libcpuid/masm-x64.asm DEPENDS libcpuid/masm-x64.asm COMMENT "Temporary workaround for MASM") 
+    set (ASM_FILES masm-x64.obj)
 endif ()
 
 set (SOURCE_FILES ${C_FILES} ${H_FILES} ${ASM_FILES})

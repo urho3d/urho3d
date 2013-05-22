@@ -14,7 +14,12 @@ if (IOS)
 endif ()
 
 if (MSVC AND ENABLE_64BIT)
-    set (ASM_FILES source/as_callfunc_x64_msvc_asm.asm)
+    # Commented out due to cmake bug
+    #enable_language(ASM_MASM)
+    #set (ASM_FILES source/as_callfunc_x64_msvc_asm.asm)
+    # As a temporary workaround
+    add_custom_command(OUTPUT as_callfunc_x64_msvc_asm.obj COMMAND ${CMAKE_ASM_MASM_COMPILER} -c source/as_callfunc_x64_msvc_asm.asm DEPENDS source/as_callfunc_x64_msvc_asm.asm COMMENT "Temporary workaround for MASM") 
+    set (ASM_FILES as_callfunc_x64_msvc_asm.obj)
 endif ()
 
 set (SOURCE_FILES ${CPP_FILES} ${ASM_FILES} ${H_FILES})

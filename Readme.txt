@@ -242,13 +242,12 @@ to "Urho3D.app".
 Desktop 64bit build
 -------------------
 
-To enable 64bit build for Visual Studio, run CMake using a 64bit solution
-generator, for example cmake -G "Visual Studio 9 2008 Win64". You will have to
-manually set the assembly source files (in AngelScript and LibCpuId projects)
-to compile using MASM. This is a CMake bug.
-
 Currently CMake build configuration has been set to compile Urho3D as 32bit by
-default for non-MSVC/non-Windows platform. To enable 64bit build, pass the
+default. To enable 64bit build for Visual Studio, run one of the cmake_vs20xx.bat
+by passing the option "Win64" explicitly. This will overrides CMake to use a
+64bit solution generator.
+
+To enable 64bit build for non-MSVC/non-Windows platform, pass the
 option "-DENABLE_64BIT=1" explicitly when invoking cmake_eclipse.sh/
 cmake_macosx.sh/cmake_gcc.sh. Alternatively, you can modify the main 
 CMakeLists.txt to enable 64bit by default for non-MSVC/non-Windows platform.

@@ -9,4 +9,4 @@
 ::   Start the server with "NinjaSnowWar -w server"
 ::   Start the client on the same host with "NinjaSnowWar -w -nobgm <put-your-host-name-here>"
 ::
-Urho3D.exe Scripts/NinjaSnowWar.as %1 %2 %3 %4 %5 %6 %7 %8
+Urho3D.exe Scripts/NinjaSnowWar.as %*
