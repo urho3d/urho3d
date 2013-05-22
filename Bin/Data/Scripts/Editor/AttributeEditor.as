@@ -862,9 +862,6 @@ ResourcePicker@ GetResourcePicker(const String&in resourceType)
 
 void PickResource(StringHash eventType, VariantMap& eventData)
 {
-    if (uiFileSelector !is null)
-        return;
-
     UIElement@ button = eventData["Element"].GetUIElement();
     LineEdit@ attrEdit = button.parent.children[0];
 

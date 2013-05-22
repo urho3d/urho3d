@@ -162,6 +162,8 @@ protected:
 private:
     /// Assign skeleton and animation bone node references as a postprocess. Called by ApplyAttributes.
     void AssignBoneNodes();
+    /// Remove (old) skeleton root bone.
+    void RemoveRootBone();
     /// Mark animation and skinning to require an update.
     void MarkAnimationDirty();
     /// Mark animation and skinning to require a forced update (blending order changed.)

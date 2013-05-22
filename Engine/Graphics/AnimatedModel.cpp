@@ -363,6 +363,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     }
     else
     {
+        RemoveRootBone(); // Remove existing root bone if any
         SetNumGeometries(0);
         geometryBoneMappings_.Clear();
         morphVertexBuffers_.Clear();
@@ -677,11 +678,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 
         // Detach the rootbone of the previous model if any
         if (createBones)
-        {
-            Bone* rootBone = skeleton_.GetRootBone();
-            if (rootBone)
-                node_->RemoveChild(rootBone->node_);
-        }
+            RemoveRootBone();
 
         skeleton_.Define(skeleton);
 
@@ -850,8 +847,17 @@ void AnimatedModel::OnNodeSet(Node* node)
 {
     Drawable::OnNodeSet(node);
 
-    // If this AnimatedModel is the first in the node, it is the master which controls animation & morphs
-    isMaster_ = GetComponent<AnimatedModel>() == this;
+    if (node)
+    {
+        // If this AnimatedModel is the first in the node, it is the master which controls animation & morphs
+        isMaster_ = GetComponent<AnimatedModel>() == this;
+    }
+    else
+    {
+        // When AnimatedModel parent node is cleared, we are being detached from the scene.
+        // Remove the bone hierarchy now
+        RemoveRootBone();
+    }
 }
 
 void AnimatedModel::OnMarkedDirty(Node* node)
@@ -921,6 +927,13 @@ void AnimatedModel::AssignBoneNodes()
     }
 
     MarkAnimationDirty();
+}
+
+void AnimatedModel::RemoveRootBone()
+{
+    Bone* rootBone = skeleton_.GetRootBone();
+    if (rootBone && rootBone->node_)
+        rootBone->node_->Remove();
 }
 
 void AnimatedModel::MarkAnimationDirty()
