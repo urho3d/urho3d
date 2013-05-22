@@ -876,10 +876,6 @@ void PickResource(StringHash eventType, VariantMap& eventData)
     if (info.type == VAR_RESOURCEREF)
     {
         String resourceType = GetTypeName(targets[0].attributes[resourcePickIndex].GetResourceRef().type);
-        // Hack: if the resource is a light's shape texture, change resource type according to light type
-        // (TextureCube for point light)
-        if (info.name == "Light Shape Texture" && cast<Light>(targets[0]).lightType == LIGHT_POINT)
-            resourceType = "TextureCube";
         @resourcePicker = GetResourcePicker(resourceType);
     }
     else if (info.type == VAR_RESOURCEREFLIST)

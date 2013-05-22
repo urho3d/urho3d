@@ -445,7 +445,7 @@ ResourceRef Light::GetRampTextureAttr() const
 
 ResourceRef Light::GetShapeTextureAttr() const
 {
-    return GetResourceRef(shapeTexture_, Texture2D::GetTypeStatic());
+    return GetResourceRef(shapeTexture_, lightType_ == LIGHT_POINT ? TextureCube::GetTypeStatic() : Texture2D::GetTypeStatic());
 }
 
 void Light::OnWorldBoundingBoxUpdate()
