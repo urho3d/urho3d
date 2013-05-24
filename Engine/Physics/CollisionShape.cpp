@@ -747,6 +747,8 @@ void CollisionShape::OnNodeSet(Node* node)
             else
                 LOGERROR("No physics world component in scene, can not create collision shape");
         }
+        else
+            LOGERROR("Node is detached from scene, can not create collision shape");
         
         node->AddListener(this);
         cachedWorldScale_ = node->GetWorldScale();

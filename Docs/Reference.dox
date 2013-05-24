@@ -230,7 +230,7 @@ Whenever there is some hierarchical composition, it is recommended (and in fact 
 
 %Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
 
-It is also legal to create a Node that does not belong to a scene. This is particularly useful with cameras, because then the camera will not be serialized along with the actual scene, which is perhaps not always wanted.
+It is also legal to create a Node that does not belong to a scene. This is useful with cameras, because then the camera will not be serialized along with the actual scene, which is perhaps not always wanted. However, note that creating geometry, physics or script components to an unattached node, and then moving it into a scene later will cause those components to not work correctly.
 
 \section SceneModel_Update Scene updates and serialization
 

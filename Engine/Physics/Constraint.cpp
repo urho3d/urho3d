@@ -374,6 +374,8 @@ void Constraint::OnNodeSet(Node* node)
             else
                 LOGERROR("No physics world component in scene, can not create constraint");
         }
+        else
+            LOGERROR("Node is detached from scene, can not create constraint");
         
         node->AddListener(this);
         cachedWorldScale_ = node->GetWorldScale();

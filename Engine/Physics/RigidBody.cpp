@@ -838,6 +838,9 @@ void RigidBody::OnNodeSet(Node* node)
 
             AddBodyToWorld();
         }
+        else
+            LOGERROR("Node is detached from scene, can not create rigid body");
+        
         node->AddListener(this);
     }
 }

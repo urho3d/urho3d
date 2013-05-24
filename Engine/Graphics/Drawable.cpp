@@ -25,6 +25,7 @@
 #include "Camera.h"
 #include "Context.h"
 #include "DebugRenderer.h"
+#include "Log.h"
 #include "Material.h"
 #include "Octree.h"
 #include "Scene.h"
@@ -382,6 +383,13 @@ void Drawable::AddToOctree()
         Octree* octree = scene->GetComponent<Octree>();
         if (octree)
             octree->InsertDrawable(this);
+        else
+            LOGERROR("No Octree component in scene, drawable will not render");
+    }
+    else
+    {
+        // We have a mechanism for adding detached nodes to an octree manually, so do not log this error
+        //LOGERROR("Node is detached from scene, drawable will not render");
     }
 }
 

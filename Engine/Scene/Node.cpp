@@ -529,7 +529,7 @@ void Node::AddChild(Node* node)
     node->Remove();
 
     // Add to the scene if not added yet
-    if (scene_ && !node->GetScene())
+    if (scene_ && node->GetScene() != scene_)
         scene_->NodeAdded(node);
 
     node->parent_ = this;

@@ -478,7 +478,10 @@ void ScriptInstance::UpdateEventSubscription()
 {
     Scene* scene = GetScene();
     if (!scene)
+    {
+        LOGERROR("Node is detached from scene, can not subscribe script object to update events");
         return;
+    }
     
     bool enabled = scriptObject_ && IsEnabledEffective();
     
@@ -503,6 +506,12 @@ void ScriptInstance::UpdateEventSubscription()
                 if (methods_[METHOD_FIXEDPOSTUPDATE])
                     SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
             }
+            else
+            {
+                if (methods_[METHOD_FIXEDUPDATE] || methods_[METHOD_FIXEDPOSTUPDATE])
+                    LOGERROR("No physics world, can not subscribe script object to fixed update events");
+            }
+            
             
             subscribedPostFixed_ = true;
         }

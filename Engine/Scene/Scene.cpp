@@ -647,9 +647,18 @@ unsigned Scene::GetFreeComponentID(CreateMode mode)
 
 void Scene::NodeAdded(Node* node)
 {
-    if (!node || node->GetScene())
+    if (!node || node->GetScene() == this)
         return;
 
+    // If node already exists in another scene, remove. This is unsupported, as components will not reinitialize themselves
+    // to use the new scene
+    Scene* oldScene = node->GetScene();
+    if (oldScene)
+    {
+        LOGERROR("Moving a node from one scene to another is unsupported");
+        oldScene->NodeRemoved(node);
+    }
+    
     node->SetScene(this);
 
     // If we already have an existing node with the same ID, must remove the scene reference from it
