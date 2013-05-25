@@ -104,71 +104,71 @@ static CScriptArray* ScriptArrayFactory(asIObjectType *ot)
 // i.e. no asOBJ_GC flag. 
 static bool ScriptArrayTemplateCallback(asIObjectType *ot, bool &dontGarbageCollect)
 {
-	// Urho3D: nothing is garbage collected
-	dontGarbageCollect = true;
+    // Urho3D: nothing is garbage collected
+    dontGarbageCollect = true;
 
-	// Make sure the subtype can be instanciated with a default factory/constructor, 
-	// otherwise we won't be able to instanciate the elements. 
-	int typeId = ot->GetSubTypeId();
-	if( typeId == asTYPEID_VOID )
-		return false;
-	if( (typeId & asTYPEID_MASK_OBJECT) && !(typeId & asTYPEID_OBJHANDLE) )
-	{
-		asIObjectType *subtype = ot->GetEngine()->GetObjectTypeById(typeId);
-		asDWORD flags = subtype->GetFlags();
-		if( (flags & asOBJ_VALUE) && !(flags & asOBJ_POD) )
-		{
-			// Verify that there is a default constructor
-			bool found = false;
-			for( asUINT n = 0; n < subtype->GetBehaviourCount(); n++ )
-			{
-				asEBehaviours beh;
-				asIScriptFunction *func = subtype->GetBehaviourByIndex(n, &beh);
-				if( beh != asBEHAVE_CONSTRUCT ) continue;
+    // Make sure the subtype can be instanciated with a default factory/constructor, 
+    // otherwise we won't be able to instanciate the elements. 
+    int typeId = ot->GetSubTypeId();
+    if( typeId == asTYPEID_VOID )
+        return false;
+    if( (typeId & asTYPEID_MASK_OBJECT) && !(typeId & asTYPEID_OBJHANDLE) )
+    {
+        asIObjectType *subtype = ot->GetEngine()->GetObjectTypeById(typeId);
+        asDWORD flags = subtype->GetFlags();
+        if( (flags & asOBJ_VALUE) && !(flags & asOBJ_POD) )
+        {
+            // Verify that there is a default constructor
+            bool found = false;
+            for( asUINT n = 0; n < subtype->GetBehaviourCount(); n++ )
+            {
+                asEBehaviours beh;
+                asIScriptFunction *func = subtype->GetBehaviourByIndex(n, &beh);
+                if( beh != asBEHAVE_CONSTRUCT ) continue;
 
-				if( func->GetParamCount() == 0 )
-				{
-					// Found the default constructor
-					found = true;
-					break;
-				}
-			}
+                if( func->GetParamCount() == 0 )
+                {
+                    // Found the default constructor
+                    found = true;
+                    break;
+                }
+            }
 
-			if( !found )
-			{
-				// There is no default constructor
-				return false;
-			}
-		}
-		else if( (flags & asOBJ_REF) )
-		{
-			// Verify that there is a default factory
-			bool found = false;
-			for( asUINT n = 0; n < subtype->GetFactoryCount(); n++ )
-			{
-				asIScriptFunction *func = subtype->GetFactoryByIndex(n);
-				if( func->GetParamCount() == 0 )
-				{
-					// Found the default factory
-					found = true;
-					break;
-				}
-			}	
+            if( !found )
+            {
+                // There is no default constructor
+                return false;
+            }
+        }
+        else if( (flags & asOBJ_REF) )
+        {
+            // Verify that there is a default factory
+            bool found = false;
+            for( asUINT n = 0; n < subtype->GetFactoryCount(); n++ )
+            {
+                asIScriptFunction *func = subtype->GetFactoryByIndex(n);
+                if( func->GetParamCount() == 0 )
+                {
+                    // Found the default factory
+                    found = true;
+                    break;
+                }
+            }    
 
-			if( !found )
-			{
-				// No default factory
-				return false;
-			}
-		}
+            if( !found )
+            {
+                // No default factory
+                return false;
+            }
+        }
 
-		// If the object type is not garbage collected then the array also doesn't need to be
-		if( !(flags & asOBJ_GC) )
-			dontGarbageCollect = true;
-	}
+        // If the object type is not garbage collected then the array also doesn't need to be
+        if( !(flags & asOBJ_GC) )
+            dontGarbageCollect = true;
+    }
 
-	// The type is ok
-	return true;
+    // The type is ok
+    return true;
 }
 
 CScriptArray &CScriptArray::operator=(const CScriptArray &other)
@@ -199,13 +199,9 @@ CScriptArray::CScriptArray(asUINT length, asIObjectType *ot)
 
     // Determine element size
     if( subTypeId & asTYPEID_MASK_OBJECT )
-    {
         elementSize = sizeof(asPWORD);
-    }
     else
-    {
         elementSize = objType->GetEngine()->GetSizeOfPrimitiveType(subTypeId);
-    }
 
     // Make sure the array size isn't too large for us to handle
     if( !CheckMaxSize(length) )
@@ -224,6 +220,27 @@ CScriptArray::CScriptArray(asUINT length, asIObjectType *ot)
     */
 }
 
+CScriptArray::CScriptArray(const CScriptArray &other)
+{
+    refCount = 1;
+    gcFlag = false;
+    objType = other.objType;
+    objType->AddRef();
+    buffer = 0;
+
+    Precache();
+
+    elementSize = other.elementSize;
+
+    if( objType->GetFlags() & asOBJ_GC )
+        objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
+
+    CreateBuffer(&buffer, 0);
+
+    // Copy the content
+    *this = other;
+}
+
 CScriptArray::CScriptArray(asUINT length, void *defVal, asIObjectType *ot)
 {
     refCount = 1;
@@ -236,13 +253,9 @@ CScriptArray::CScriptArray(asUINT length, void *defVal, asIObjectType *ot)
 
     // Determine element size
     if( subTypeId & asTYPEID_MASK_OBJECT )
-    {
         elementSize = sizeof(asPWORD);
-    }
     else
-    {
         elementSize = objType->GetEngine()->GetSizeOfPrimitiveType(subTypeId);
-    }
 
     // Make sure the array size isn't too large for us to handle
     if( !CheckMaxSize(length) )
@@ -253,12 +266,9 @@ CScriptArray::CScriptArray(asUINT length, void *defVal, asIObjectType *ot)
 
     CreateBuffer(&buffer, length);
 
-    // Urho3D: garbage collection disabled
-    /*
     // Notify the GC of the successful creation
     if( objType->GetFlags() & asOBJ_GC )
         objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
-    */
 
     // Initialize the elements with the default value
     for( asUINT n = 0; n < GetSize(); n++ )
@@ -280,7 +290,7 @@ void CScriptArray::SetValue(asUINT index, void *value)
         *(void**)ptr = *(void**)value;
         objType->GetEngine()->AddRefScriptObject(*(void**)value, objType->GetSubType());
         if( tmp )
-            objType->GetEngine()->ReleaseScriptObject(*(void**)value, objType->GetSubType());
+            objType->GetEngine()->ReleaseScriptObject(tmp, objType->GetSubType());
     }
     else if( subTypeId == asTYPEID_BOOL ||
              subTypeId == asTYPEID_INT8 ||
@@ -327,7 +337,7 @@ void CScriptArray::Reserve(asUINT maxElements)
 
     // Allocate memory for the buffer
     SArrayBuffer *newBuffer;
-    #if defined(AS_MARMALADE)
+    #if defined(__S3E__) // Marmalade doesn't understand (nothrow)
     newBuffer = (SArrayBuffer*)new asBYTE[sizeof(SArrayBuffer)-1 + elementSize*maxElements];
     #else
     newBuffer = (SArrayBuffer*)new (nothrow) asBYTE[sizeof(SArrayBuffer)-1 + elementSize*maxElements];
@@ -391,7 +401,7 @@ void CScriptArray::Resize(int delta, asUINT at)
     {
         // Allocate memory for the buffer
         SArrayBuffer *newBuffer;
-        #if defined(AS_MARMALADE)
+        #if defined(__S3E__) // Marmalade doesn't understand (nothrow)
         newBuffer = (SArrayBuffer*)new asBYTE[sizeof(SArrayBuffer)-1 + elementSize*(buffer->numElements + delta)];
         #else
         newBuffer = (SArrayBuffer*)new (nothrow) asBYTE[sizeof(SArrayBuffer)-1 + elementSize*(buffer->numElements + delta)];
@@ -550,7 +560,7 @@ void CScriptArray::CreateBuffer(SArrayBuffer **buf, asUINT numElements)
 {
     if( subTypeId & asTYPEID_MASK_OBJECT )
     {
-    #if defined( AS_MARMALADE )
+    #if defined(__S3E__) // Marmalade doesn't understand (nothrow)
         *buf = (SArrayBuffer*)new asBYTE[sizeof(SArrayBuffer)-1+sizeof(void*)*numElements];
     #else
         *buf = (SArrayBuffer*)new (nothrow) asBYTE[sizeof(SArrayBuffer)-1+sizeof(void*)*numElements];
@@ -558,7 +568,7 @@ void CScriptArray::CreateBuffer(SArrayBuffer **buf, asUINT numElements)
     }
     else
     {
-        #if defined( AS_MARMALADE )
+        #if defined(__S3E__)
         *buf = (SArrayBuffer*)new asBYTE[sizeof(SArrayBuffer)-1+elementSize*numElements];
         #else
         *buf = (SArrayBuffer*)new (nothrow) asBYTE[sizeof(SArrayBuffer)-1+elementSize*numElements];
@@ -746,12 +756,15 @@ bool CScriptArray::operator==(const CScriptArray &other) const
         }
 
     if( cmpContext )
-    {
         if( isNested )
+        {
+            asEContextState state = cmpContext->GetState();
             cmpContext->PopState();
+            if( state == asEXECUTION_ABORTED )
+                cmpContext->Abort();
+        }
         else
             cmpContext->Release();
-    }
 
     return isEqual;
 }
@@ -802,7 +815,7 @@ bool CScriptArray::Equals(const void *a, const void *b, asIScriptContext *ctx, S
         }
 
         // Execute object opCmp if available
-        if( cache && cache->cmpFunc >= 0 )
+        if( cache && cache->cmpFunc )
         {
             // TODO: Add proper error handling
             r = ctx->Prepare(cache->cmpFunc); assert(r >= 0);
@@ -842,7 +855,7 @@ int CScriptArray::Find(asUINT index, void *value) const
             if( ctx )
             {
                 char tmp[512];
-#if defined(_MSC_VER) && _MSC_VER >= 1500 && !defined(AS_MARMALADE)
+#if defined(_MSC_VER) && _MSC_VER >= 1500 && !defined(__S3E__)
                 sprintf_s(tmp, 512, "Type '%s' does not have opEquals / opCmp", subType->GetName());
 #else
                 sprintf(tmp, "Type '%s' does not have opEquals / opCmp", subType->GetName());
@@ -895,12 +908,15 @@ int CScriptArray::Find(asUINT index, void *value) const
     }
 
     if( cmpContext )
-    {
         if( isNested )
+        {
+            asEContextState state = cmpContext->GetState();
             cmpContext->PopState();
+            if( state == asEXECUTION_ABORTED )
+                cmpContext->Abort();
+        }
         else
             cmpContext->Release();
-    }
 
     return ret;
 }
@@ -980,7 +996,7 @@ void CScriptArray::Sort(asUINT index, asUINT count, bool asc)
             if( ctx )
             {
                 char tmp[512];
-#if defined(_MSC_VER) && _MSC_VER >= 1500 && !defined(AS_MARMALADE)
+#if defined(_MSC_VER) && _MSC_VER >= 1500 && !defined(__S3E__)
                 sprintf_s(tmp, 512, "Type '%s' does not have opCmp", subType->GetName());
 #else
                 sprintf(tmp, "Type '%s' does not have opCmp", subType->GetName());
@@ -1056,12 +1072,15 @@ void CScriptArray::Sort(asUINT index, asUINT count, bool asc)
     }
 
     if( cmpContext )
-    {
         if( isNested )
+        {
+            asEContextState state = cmpContext->GetState();
             cmpContext->PopState();
+            if( state == asEXECUTION_ABORTED )
+                cmpContext->Abort();
+        }
         else
             cmpContext->Release();
-    }
 }
 
 // internal
@@ -1214,15 +1233,17 @@ void CScriptArray::AddRef() const
 {
     // Clear the GC flag then increase the counter
     gcFlag = false;
-    refCount++;
+    asAtomicInc(refCount);
 }
 
 void CScriptArray::Release() const
 {
-    // Now do the actual releasing (clearing the flag set by GC)
+    // Clearing the GC flag then descrease the counter
     gcFlag = false;
-    if( --refCount == 0 )
+    if( asAtomicDec(refCount) == 0 )
     {
+        // When reaching 0 no more references to this instance 
+        // exists and the object should be destroyed
         delete this;
     }
 }

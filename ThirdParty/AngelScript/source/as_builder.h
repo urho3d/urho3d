@@ -175,6 +175,7 @@ protected:
 
 	asSNameSpace      *GetNameSpaceFromNode(asCScriptNode *node, asCScriptCode *script, asSNameSpace *implicitNs, asCScriptNode **next);
 	asCString          GetScopeFromNode(asCScriptNode *n, asCScriptCode *script, asCScriptNode **next = 0);
+	asSNameSpace      *GetParentNameSpace(asSNameSpace *ns);
 
 	bool               DoesTypeExist(const char *type);
 	asCObjectType     *GetObjectType(const char *type, asSNameSpace *ns);

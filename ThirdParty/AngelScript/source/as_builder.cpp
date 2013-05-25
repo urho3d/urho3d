@@ -699,7 +699,7 @@ void asCBuilder::CompileFunctions()
 		{
 			for( asUINT n = 0; n < classDeclarations.GetLength(); n++ )
 			{
-				if( classDeclarations[n]->name == current->name )
+				if( classDeclarations[n]->objType == current->objType )
 				{
 					classDecl = classDeclarations[n];
 					break;
@@ -3454,6 +3454,16 @@ void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *fi
 	{
 		returnType = CreateDataTypeFromNode(node, file, implicitNamespace);
 		returnType = ModifyDataTypeFromNode(returnType, node->next, file, 0, 0);
+
+		if( engine->ep.disallowValueAssignForRefType &&
+			returnType.GetObjectType() && 
+			(returnType.GetObjectType()->flags & asOBJ_REF) && 
+			!(returnType.GetObjectType()->flags & asOBJ_SCOPED) &&
+			!returnType.IsReference() && 
+			!returnType.IsObjectHandle() )
+		{
+			WriteError(TXT_REF_TYPE_CANT_BE_RETURNED_BY_VAL, file, node);
+		}
 	}
 	else
 		returnType = asCDataType::CreatePrimitive(ttVoid, false);
@@ -3508,6 +3518,16 @@ void asCBuilder::GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *fi
 		asETypeModifiers inOutFlag;
 		asCDataType type = CreateDataTypeFromNode(n, file, implicitNamespace);
 		type = ModifyDataTypeFromNode(type, n->next, file, &inOutFlag, 0);
+
+		if( engine->ep.disallowValueAssignForRefType &&
+			type.GetObjectType() && 
+			(type.GetObjectType()->flags & asOBJ_REF) && 
+			!(type.GetObjectType()->flags & asOBJ_SCOPED) &&
+			!type.IsReference() && 
+			!type.IsObjectHandle() )
+		{
+			WriteError(TXT_REF_TYPE_CANT_BE_PASSED_BY_VAL, file, node);
+		}
 
 		// Store the parameter type
 		parameterTypes.PushLast(type);
@@ -4282,6 +4302,22 @@ asSNameSpace *asCBuilder::GetNameSpaceFromNode(asCScriptNode *node, asCScriptCod
 	return ns;
 }
 
+asSNameSpace *asCBuilder::GetParentNameSpace(asSNameSpace *ns)
+{
+	if( ns == 0 ) return 0;
+	if( ns == engine->nameSpaces[0] ) return 0;
+
+	asCString scope = ns->name;
+	int pos = scope.FindLast("::");
+	if( pos >= 0 )
+	{
+		scope = scope.SubString(0, pos);
+		return engine->FindNameSpace(scope.AddressOf());
+	}
+
+	return engine->nameSpaces[0];
+}
+
 asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCode *file, asSNameSpace *implicitNamespace, bool acceptHandleForScope, asCObjectType *currentType)
 {
 	asASSERT(node->nodeType == snDataType);
@@ -4309,141 +4345,157 @@ asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCod
 
 	if( n->tokenType == ttIdentifier )
 	{
+		bool found = false;
+
 		asCScriptNode *nameToken = n;
 		asCString str;
 		str.Assign(&file->code[n->tokenPos], n->tokenLength);
 
-		asCObjectType *ot = 0;
-
-		// If this is for a template type, then we must first determine if the
-		// identifier matches any of the template subtypes
-		if( currentType && (currentType->flags & asOBJ_TEMPLATE))
+		// Recursively search parent namespaces for matching type
+		while( ns && !found )
 		{
-			for( asUINT subtypeIndex = 0; subtypeIndex < currentType->templateSubTypes.GetLength(); subtypeIndex++)
+			asCObjectType *ot = 0;
+
+			// If this is for a template type, then we must first determine if the
+			// identifier matches any of the template subtypes
+			if( currentType && (currentType->flags & asOBJ_TEMPLATE))
 			{
-				if(str == currentType->templateSubTypes[subtypeIndex].GetObjectType()->name )
+				for( asUINT subtypeIndex = 0; subtypeIndex < currentType->templateSubTypes.GetLength(); subtypeIndex++)
 				{
-					ot = currentType->templateSubTypes[subtypeIndex].GetObjectType();
-					break;
+					if(str == currentType->templateSubTypes[subtypeIndex].GetObjectType()->name )
+					{
+						ot = currentType->templateSubTypes[subtypeIndex].GetObjectType();
+						break;
+					}
 				}
 			}
-		}
 
-		if( ot == 0 )
-			ot = GetObjectType(str.AddressOf(), ns);
-		if( ot == 0 && !module && currentType )
-			ot = GetObjectTypeFromTypesKnownByObject(str.AddressOf(), currentType);
+			if( ot == 0 )
+				ot = GetObjectType(str.AddressOf(), ns);
+			if( ot == 0 && !module && currentType )
+				ot = GetObjectTypeFromTypesKnownByObject(str.AddressOf(), currentType);
 
-		if( ot )
-		{
-			if( ot->flags & asOBJ_IMPLICIT_HANDLE )
-				isImplicitHandle = true;
-
-			// Make sure the module has access to the object type
-			if( !module || (module->accessMask & ot->accessMask) )
+			if( ot )
 			{
-				if(asOBJ_TYPEDEF == (ot->flags & asOBJ_TYPEDEF))
+				found = true;
+
+				if( ot->flags & asOBJ_IMPLICIT_HANDLE )
+					isImplicitHandle = true;
+
+				// Make sure the module has access to the object type
+				if( !module || (module->accessMask & ot->accessMask) )
 				{
-					// TODO: typedef: A typedef should be considered different from the original type (though with implicit conversions between the two)
-					// Create primitive data type based on object flags
-					dt = ot->templateSubTypes[0];
-					dt.MakeReadOnly(isConst);
+					if(asOBJ_TYPEDEF == (ot->flags & asOBJ_TYPEDEF))
+					{
+						// TODO: typedef: A typedef should be considered different from the original type (though with implicit conversions between the two)
+						// Create primitive data type based on object flags
+						dt = ot->templateSubTypes[0];
+						dt.MakeReadOnly(isConst);
+					}
+					else
+					{
+						if( ot->flags & asOBJ_TEMPLATE )
+						{
+							// Check if the subtype is a type or the template's subtype
+							// if it is the template's subtype then this is the actual template type,
+							// orderwise it is a template instance.
+							// Only do this for application registered interface, as the
+							// scripts cannot implement templates.
+							// TODO: namespace: Use correct implicit namespace
+							asCArray<asCDataType> subTypes;
+							asUINT subtypeIndex;
+							while( n && n->next && n->next->nodeType == snDataType )
+							{
+								n = n->next;
+
+								asCDataType subType = CreateDataTypeFromNode(n, file, engine->nameSpaces[0], false, module ? 0 : ot);
+								subTypes.PushLast(subType);
+							}
+
+							if( subTypes.GetLength() != ot->templateSubTypes.GetLength() )
+							{
+								asCString msg;
+								msg.Format(TXT_TMPL_s_EXPECTS_d_SUBTYPES, ot->name.AddressOf(), int(ot->templateSubTypes.GetLength()));
+								WriteError(msg, file, nameToken);
+
+								// Return a dummy
+								return asCDataType::CreatePrimitive(ttInt, false);
+							}
+
+							asASSERT( subTypes.GetLength() == ot->templateSubTypes.GetLength() );
+
+							// Check if any of the given subtypes are different from the template's declared subtypes
+							bool isDifferent = false;
+							for( subtypeIndex = 0; subtypeIndex < subTypes.GetLength(); subtypeIndex++ )
+							{
+								if( subTypes[subtypeIndex].GetObjectType() != ot->templateSubTypes[subtypeIndex].GetObjectType() )
+								{
+									isDifferent = true;
+									break;
+								}
+							}
+
+							if( isDifferent )
+							{
+								// This is a template instance
+								// Need to find the correct object type
+								asCObjectType *otInstance = engine->GetTemplateInstanceType(ot, subTypes);
+
+								if( !otInstance )
+								{
+									asCString msg;
+									// TODO: Should name all subtypes
+									msg.Format(TXT_CANNOT_INSTANCIATE_TEMPLATE_s_WITH_s, ot->name.AddressOf(), subTypes[0].Format().AddressOf());
+									WriteError(msg, file, n);
+								}
+
+								ot = otInstance;
+							}
+						}
+
+						// Create object data type
+						if( ot )
+							dt = asCDataType::CreateObject(ot, isConst);
+						else
+							dt = asCDataType::CreatePrimitive(ttInt, isConst);
+					}
 				}
 				else
 				{
-					if( ot->flags & asOBJ_TEMPLATE )
-					{
-						// Check if the subtype is a type or the template's subtype
-						// if it is the template's subtype then this is the actual template type,
-						// orderwise it is a template instance.
-						// Only do this for application registered interface, as the
-						// scripts cannot implement templates.
-						// TODO: namespace: Use correct implicit namespace
-						asCArray<asCDataType> subTypes;
-						asUINT subtypeIndex;
-						while( n && n->next && n->next->nodeType == snDataType )
-						{
-							n = n->next;
+					asCString msg;
+					msg.Format(TXT_TYPE_s_NOT_AVAILABLE_FOR_MODULE, (const char *)str.AddressOf());
+					WriteError(msg, file, n);
 
-							asCDataType subType = CreateDataTypeFromNode(n, file, engine->nameSpaces[0], false, module ? 0 : ot);
-							subTypes.PushLast(subType);
-						}
-
-						if( subTypes.GetLength() != ot->templateSubTypes.GetLength() )
-						{
-							asCString msg;
-							msg.Format(TXT_TMPL_s_EXPECTS_d_SUBTYPES, ot->name.AddressOf(), int(ot->templateSubTypes.GetLength()));
-							WriteError(msg, file, nameToken);
-
-							// Return a dummy
-							return asCDataType::CreatePrimitive(ttInt, false);
-						}
-
-						asASSERT( subTypes.GetLength() == ot->templateSubTypes.GetLength() );
-
-						// Check if any of the given subtypes are different from the template's declared subtypes
-						bool isDifferent = false;
-						for( subtypeIndex = 0; subtypeIndex < subTypes.GetLength(); subtypeIndex++ )
-						{
-							if( subTypes[subtypeIndex].GetObjectType() != ot->templateSubTypes[subtypeIndex].GetObjectType() )
-							{
-								isDifferent = true;
-								break;
-							}
-						}
-
-						if( isDifferent )
-						{
-							// This is a template instance
-							// Need to find the correct object type
-							asCObjectType *otInstance = engine->GetTemplateInstanceType(ot, subTypes);
-
-							if( !otInstance )
-							{
-								asCString msg;
-								// TODO: Should name all subtypes
-								msg.Format(TXT_CANNOT_INSTANCIATE_TEMPLATE_s_WITH_s, ot->name.AddressOf(), subTypes[0].Format().AddressOf());
-								WriteError(msg, file, n);
-							}
-
-							ot = otInstance;
-						}
-					}
-
-					// Create object data type
-					if( ot )
-						dt = asCDataType::CreateObject(ot, isConst);
-					else
-						dt = asCDataType::CreatePrimitive(ttInt, isConst);
+					dt.SetTokenType(ttInt);
 				}
 			}
-			else
+			else if( ot == 0 )
 			{
-				asCString msg;
-				msg.Format(TXT_TYPE_s_NOT_AVAILABLE_FOR_MODULE, (const char *)str.AddressOf());
-				WriteError(msg, file, n);
+				// It can still be a function definition
+				asCScriptFunction *funcdef = GetFuncDef(str.AddressOf());
 
-				dt.SetTokenType(ttInt);
+				if( funcdef )
+				{
+					dt = asCDataType::CreateFuncDef(funcdef);
+					found = true;
+				}
+			}
+
+			if( !found )
+			{
+				// Try to find it in the parent namespace
+				ns = GetParentNameSpace(ns);
 			}
 		}
-		else if( ot == 0 )
+
+		if( !found )
 		{
-			// It can still be a function definition
-			asCScriptFunction *funcdef = GetFuncDef(str.AddressOf());
+			asCString msg;
+			msg.Format(TXT_IDENTIFIER_s_NOT_DATA_TYPE, (const char *)str.AddressOf());
+			WriteError(msg, file, n);
 
-			if( funcdef )
-			{
-				dt = asCDataType::CreateFuncDef(funcdef);
-			}
-			else if( funcdef == 0 )
-			{
-				asCString msg;
-				msg.Format(TXT_IDENTIFIER_s_NOT_DATA_TYPE, (const char *)str.AddressOf());
-				WriteError(msg, file, n);
-
-				dt = asCDataType::CreatePrimitive(ttInt, isConst);
-				return dt;
-			}
+			dt = asCDataType::CreatePrimitive(ttInt, isConst);
+			return dt;
 		}
 	}
 	else

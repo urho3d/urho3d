@@ -116,7 +116,7 @@ public:
 
 	void SetTokenType(eTokenType tt)         {tokenType = tt;}
 	void SetObjectType(asCObjectType *obj)   {objectType = obj;}
-	void SetFuncDef(asCScriptFunction *func) { asASSERT(funcDef); funcDef = func; }
+	void SetFuncDef(asCScriptFunction *func) {asASSERT(funcDef); funcDef = func; }
 
 	asCDataType &operator =(const asCDataType &);
 

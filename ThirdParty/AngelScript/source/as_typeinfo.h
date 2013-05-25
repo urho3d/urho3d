@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2011 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -41,6 +41,9 @@
 #define AS_TYPEINFO_H
 
 #include "as_config.h"
+
+#ifndef AS_NO_COMPILER
+
 #include "as_datatype.h"
 
 BEGIN_AS_NAMESPACE
@@ -82,5 +85,7 @@ struct asCTypeInfo
 };
 
 END_AS_NAMESPACE
+
+#endif AS_NO_COMPILER
 
 #endif

@@ -527,7 +527,7 @@
 	#endif
 
 	// Support native calling conventions on x86, but not 64bit yet
-	#if defined(i386) && !defined(__LP64__)
+	#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 		#define AS_X86
 	// PS3
 	#elif (defined(__PPC__) || defined(__ppc__)) && defined(__PPU__)
@@ -639,7 +639,7 @@
 			#define AS_SIZEOF_BOOL 1
 		#endif
 
-		#if defined(i386) && !defined(__LP64__)
+		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			// Support native calling conventions on Mac OS X + Intel 32bit CPU
 			#define AS_X86
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
@@ -717,7 +717,7 @@
 		#undef COMPLEX_RETURN_MASK
 		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 
-		#if defined(i386) && !defined(__LP64__)
+		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			// Support native calling conventions on Intel 32bit CPU
 			#define AS_X86
 
@@ -750,7 +750,7 @@
 		#undef COMPLEX_RETURN_MASK
 		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 
-		#if defined(i386) && !defined(__LP64__)
+		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
@@ -803,7 +803,7 @@
 	// Free BSD
 	#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
 		#define AS_BSD
-		#if defined(i386) && !defined(__LP64__)
+		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			#undef COMPLEX_MASK
 			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			#undef COMPLEX_RETURN_MASK
@@ -907,7 +907,7 @@
 		// Only x86-32 is currently supported by Haiku, but they do plan to support
 		// x86-64 and PowerPC in the future, so should go ahead and check the platform
 		// for future compatibility
-		#if defined(i386) && !defined(__LP64__)
+		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			#define AS_X86
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
@@ -925,7 +925,7 @@
 
 	// Illumos
 	#elif defined(__sun)
-		#if defined(__i386__) && !defined(__LP64__)
+		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY

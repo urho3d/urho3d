@@ -580,6 +580,27 @@ void asCReader::ReadFunctionSignature(asCScriptFunction *func)
 	int num;
 
 	ReadString(&func->name);
+	if( func->name == DELEGATE_FACTORY )
+	{
+		// It's not necessary to read anymore, everything is known 
+		for( asUINT n = 0; n < engine->registeredGlobalFuncs.GetLength(); n++ )
+		{
+			asCScriptFunction *f = engine->registeredGlobalFuncs[n];
+			if( f->name == DELEGATE_FACTORY )
+			{
+				func->returnType     = f->returnType;
+				func->parameterTypes = f->parameterTypes;
+				func->inOutFlags     = f->inOutFlags;
+				func->funcType       = f->funcType;
+				func->defaultArgs    = f->defaultArgs;
+				func->nameSpace      = f->nameSpace;
+				return;
+			}
+		}
+		asASSERT( false );
+		return;
+	}
+
 	ReadDataType(&func->returnType);
 
 	count = ReadEncodedUInt();
@@ -2902,6 +2923,12 @@ void asCWriter::WriteFunctionSignature(asCScriptFunction *func)
 	asUINT i, count;
 
 	WriteString(&func->name);
+	if( func->name == DELEGATE_FACTORY )
+	{
+		// It's not necessary to write anything else
+		return;
+	}
+
 	WriteDataType(&func->returnType);
 
 	count = (asUINT)func->parameterTypes.GetLength();

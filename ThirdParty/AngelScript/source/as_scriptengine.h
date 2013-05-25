@@ -453,6 +453,7 @@ public:
 		bool   disallowGlobalVars;
 		bool   alwaysImplDefaultConstruct;
 		int    compilerWarnings;
+		bool   disallowValueAssignForRefType;
 	} ep;
 };
 

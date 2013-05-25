@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -161,6 +161,9 @@ public:
 	bool      IsSignatureExceptNameEqual(const asCDataType &retType, const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &inOutFlags, const asCObjectType *type, bool isReadOnly) const;
 	bool      IsSignatureExceptNameAndReturnTypeEqual(const asCScriptFunction *fun) const;
 	bool      IsSignatureExceptNameAndReturnTypeEqual(const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &inOutFlags, const asCObjectType *type, bool isReadOnly) const;
+	bool      IsSignatureExceptNameAndObjectTypeEqual(const asCScriptFunction *func) const;
+
+	void      MakeDelegate(asCScriptFunction *func, void *obj);
 
 	bool      DoesReturnOnStack() const;
 
@@ -211,6 +214,10 @@ public:
 
 	asSNameSpace                *nameSpace;
 
+	// Used by asFUNC_DELEGATE
+	void              *objForDelegate;
+	asCScriptFunction *funcForDelegate;
+
 	// Used by asFUNC_SCRIPT
 	asCArray<asDWORD>               byteCode;
 	// The stack space needed for the local variables
@@ -246,6 +253,9 @@ public:
     // JIT compiled code of this function
     asJITFunction                jitFunction;
 };
+
+const char * const DELEGATE_FACTORY = "%delegate_factory";
+asCScriptFunction *CreateDelegate(asCScriptFunction *func, void *obj);
 
 END_AS_NAMESPACE
 
