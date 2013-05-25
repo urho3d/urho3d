@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Oorni for Urho3D
 
 //
 // as_typeinfo.h
@@ -86,6 +87,6 @@ struct asCTypeInfo
 
 END_AS_NAMESPACE
 
-#endif AS_NO_COMPILER
+#endif
 
 #endif

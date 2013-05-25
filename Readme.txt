@@ -211,13 +211,9 @@ For a release build, use the "ant release" command instead of "ant debug" and
 follow the Android SDK instructions on how to sign your APK properly.
 
 By default the Android package for Urho3D is com.googlecode.urho3d. For a real
-application you must replace this with your own package name. Unfortunately the
-name has to be replaced in several files:
-
-- Android/AndroidManifest.xml
-- Android/src/com/googlecode/urho3d/SDLActivity.java (rename directories also)
-- ThirdParty/SDL/include/SDL_config_android.h, look for the NATIVE_FUNCTION
-  macro
+application you must replace this with your own package name. The Urho3D
+activity subclasses the SDLActivity from org.libsdl.app package, whose name
+(or the JNI code from SDL library) does not have to be changed.
 
 
 iOS build process

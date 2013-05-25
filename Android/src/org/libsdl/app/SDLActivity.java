@@ -1,6 +1,6 @@
 // Modified by Lasse Oorni for Urho3D
 
-package com.googlecode.urho3d;
+package org.libsdl.app;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;

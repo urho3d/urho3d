@@ -147,7 +147,7 @@ extern "C" void SDL_Android_Init(JNIEnv* env, jclass cls, jstring filesDir)
 }
 
 // Resize
-extern "C" void NATIVE_FUNCTION(onNativeResize)(
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeResize(
                                     JNIEnv* env, jclass jcls,
                                     jint width, jint height, jint format)
 {
@@ -155,21 +155,21 @@ extern "C" void NATIVE_FUNCTION(onNativeResize)(
 }
 
 // Keydown
-extern "C" void NATIVE_FUNCTION(onNativeKeyDown)(
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeKeyDown(
                                     JNIEnv* env, jclass jcls, jint keycode)
 {
     Android_OnKeyDown(keycode);
 }
 
 // Keyup
-extern "C" void NATIVE_FUNCTION(onNativeKeyUp)(
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeKeyUp(
                                     JNIEnv* env, jclass jcls, jint keycode)
 {
     Android_OnKeyUp(keycode);
 }
 
 // Touch
-extern "C" void NATIVE_FUNCTION(onNativeTouch)(
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeTouch(
                                     JNIEnv* env, jclass jcls,
                                     jint touch_device_id_in, jint pointer_finger_id_in,
                                     jint action, jfloat x, jfloat y, jfloat p)
@@ -178,7 +178,7 @@ extern "C" void NATIVE_FUNCTION(onNativeTouch)(
 }
 
 // Accelerometer
-extern "C" void NATIVE_FUNCTION(onNativeAccel)(
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeAccel(
                                     JNIEnv* env, jclass jcls,
                                     jfloat x, jfloat y, jfloat z)
 {
@@ -189,7 +189,7 @@ extern "C" void NATIVE_FUNCTION(onNativeAccel)(
 }
 
 // Quit
-extern "C" void NATIVE_FUNCTION(nativeQuit)(
+extern "C" void Java_org_libsdl_app_SDLActivity_nativeQuit(
                                     JNIEnv* env, jclass cls)
 {    
     // Inject a SDL_QUIT event
@@ -202,7 +202,7 @@ extern "C" void NATIVE_FUNCTION(nativeQuit)(
 }
 
 // Pause
-extern "C" void NATIVE_FUNCTION(nativePause)(
+extern "C" void Java_org_libsdl_app_SDLActivity_nativePause(
                                     JNIEnv* env, jclass cls)
 {
     SDL_Event event;
@@ -221,7 +221,7 @@ extern "C" void NATIVE_FUNCTION(nativePause)(
 }
 
 // Resume
-extern "C" void NATIVE_FUNCTION(nativeResume)(
+extern "C" void Java_org_libsdl_app_SDLActivity_nativeResume(
                                     JNIEnv* env, jclass cls)
 {
     SDL_Event event;
@@ -239,7 +239,7 @@ extern "C" void NATIVE_FUNCTION(nativeResume)(
     }
 }
 
-extern "C" void NATIVE_FUNCTION(nativeRunAudioThread)(
+extern "C" void Java_org_libsdl_app_SDLActivity_nativeRunAudioThread(
                                     JNIEnv* env, jclass cls)
 {
     /* This is the audio thread, with a different environment */
@@ -249,7 +249,7 @@ extern "C" void NATIVE_FUNCTION(nativeRunAudioThread)(
 }
 
 // Surface destroyed
-extern "C" void NATIVE_FUNCTION(onNativeSurfaceDestroyed)(
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeSurfaceDestroyed(
                                     JNIEnv* env, jclass cls)
 {
     if (Android_Window) {
@@ -258,7 +258,7 @@ extern "C" void NATIVE_FUNCTION(onNativeSurfaceDestroyed)(
 }
 
 // Surface created
-extern "C" void NATIVE_FUNCTION(onNativeSurfaceCreated)(
+extern "C" void Java_org_libsdl_app_SDLActivity_onNativeSurfaceCreated(
                                     JNIEnv* env, jclass cls)
 {
     if (Android_Window) {

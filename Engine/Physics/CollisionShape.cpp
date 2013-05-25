@@ -119,7 +119,7 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
                 const Vector3& v0 = *((const Vector3*)(&vertexData[indices[j] * vertexSize]));
                 const Vector3& v1 = *((const Vector3*)(&vertexData[indices[j + 1] * vertexSize]));
                 const Vector3& v2 = *((const Vector3*)(&vertexData[indices[j + 2] * vertexSize]));
-                meshData_->addTriangle(ToBtVector3(v0), ToBtVector3(v1), ToBtVector3(v2), true);
+                meshData_->addTriangle(ToBtVector3(v0), ToBtVector3(v1), ToBtVector3(v2));
             }
         }
         // 32-bit indices
@@ -132,7 +132,7 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
                 const Vector3& v0 = *((const Vector3*)(&vertexData[indices[j] * vertexSize]));
                 const Vector3& v1 = *((const Vector3*)(&vertexData[indices[j + 1] * vertexSize]));
                 const Vector3& v2 = *((const Vector3*)(&vertexData[indices[j + 2] * vertexSize]));
-                meshData_->addTriangle(ToBtVector3(v0), ToBtVector3(v1), ToBtVector3(v2), true);
+                meshData_->addTriangle(ToBtVector3(v0), ToBtVector3(v1), ToBtVector3(v2));
             }
         }
     }
