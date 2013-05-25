@@ -103,12 +103,12 @@ void Geometry::SetIndexBuffer(IndexBuffer* buffer)
 
 bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange)
 {
-    if (!indexBuffer_)
+    if (!indexBuffer_ && !rawIndexData_)
     {
-        LOGERROR("Null index buffer, can not define indexed draw range");
+        LOGERROR("Null index buffer and no raw index data, can not define indexed draw range");
         return false;
     }
-    if (indexStart + indexCount > indexBuffer_->GetIndexCount())
+    if (indexBuffer_ && indexStart + indexCount > indexBuffer_->GetIndexCount())
     {
         LOGERROR("Illegal draw range " + String(indexStart) + " to " + String(indexStart + indexCount - 1) + ", index buffer has " +
             String(indexBuffer_->GetIndexCount()) + " indices");
@@ -123,9 +123,9 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     if (indexCount)
     {
         vertexStart_ = 0;
-        vertexCount_ = vertexBuffers_[0]->GetVertexCount();
+        vertexCount_ = vertexBuffers_[0] ? vertexBuffers_[0]->GetVertexCount() : 0;
         
-        if (getUsedVertexRange)
+        if (getUsedVertexRange && indexBuffer_)
             indexBuffer_->GetUsedVertexRange(indexStart_, indexCount_, vertexStart_, vertexCount_);
     }
     else
@@ -148,7 +148,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
             return false;
         }
     }
-    else
+    else if (!rawIndexData_)
     {
         indexStart = 0;
         indexCount = 0;

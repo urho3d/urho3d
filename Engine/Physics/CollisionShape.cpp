@@ -109,6 +109,7 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
         unsigned indexStart = geometry->GetIndexStart();
         unsigned indexCount = geometry->GetIndexCount();
         
+        /// \todo Use btTriangleIndexVertexArray interface for adding the vertices & indices
         // 16-bit indices
         if (indexSize == sizeof(unsigned short))
         {
