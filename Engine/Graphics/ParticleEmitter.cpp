@@ -27,6 +27,7 @@
 #include "ParticleEmitter.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "XMLFile.h"
@@ -36,7 +37,9 @@
 namespace Urho3D
 {
 
-extern const char* GEOMETRY_CATEGORY;
+const char* EFFECT_CATEGORY = "Effect";
+
+static const unsigned MAX_PARTICLES_IN_FRAME = 100;
 
 OBJECTTYPESTATIC(ParticleEmitter);
 
@@ -81,7 +84,7 @@ ParticleEmitter::~ParticleEmitter()
 
 void ParticleEmitter::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ParticleEmitter>(GEOMETRY_CATEGORY);
+    context->RegisterFactory<ParticleEmitter>(EFFECT_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", GetParameterSourceAttr, SetParameterSourceAttr, ResourceRef, ResourceRef(XMLFile::GetTypeStatic()), AM_DEFAULT);
@@ -136,17 +139,26 @@ void ParticleEmitter::Update(const FrameInfo& frame)
             emitting_ = true;
             periodTimer_ -= inactiveTime_;
         }
+        // If emitter has an indefinite stop interval, keep period timer reset to allow restarting emission in the editor
+        if (inactiveTime_ == 0.0f)
+            periodTimer_ = 0.0f;
     }
     
-    // Check for emitting a new particle
+    // Check for emitting new particles
     if (emitting_)
     {
         emissionTimer_ += lastTimeStep_;
-        if (emissionTimer_ > 0.0f)
+        unsigned counter = MAX_PARTICLES_IN_FRAME;
+        while (emissionTimer_ > 0.0f && counter)
         {
             emissionTimer_ -= Lerp(intervalMin_, intervalMax_, Random(1.0f));
             if (EmitNewParticle())
+            {
+                --counter;
                 needCommit = true;
+            }
+            else
+                break;
         }
     }
     
@@ -233,137 +245,27 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         Commit();
 }
 
-bool ParticleEmitter::SetParameters(XMLFile* file)
+void ParticleEmitter::SetParameters(XMLFile* file)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if (!file || !cache)
-        return false;
+    if (file == parameterSource_)
+        return;
     
-    XMLElement rootElem = file->GetRoot();
-    if (!rootElem)
-        return false;
+    if (parameterSource_)
+        UnsubscribeFromEvent(parameterSource_, E_RELOADFINISHED);
+    
+    if (file && !file->GetRoot())
+    {
+        LOGERROR("Particle emitter parameter file does not have a valid root element");
+        return;
+    }
     
     parameterSource_ = file;
     
-    if (rootElem.HasChild("material"))
-        SetMaterial(cache->GetResource<Material>(rootElem.GetChild("material").GetAttribute("name")));
+    if (parameterSource_)
+        SubscribeToEvent(parameterSource_, E_RELOADFINISHED, HANDLER(ParticleEmitter, HandleParametersReloadFinished));
     
-    if (rootElem.HasChild("numparticles"))
-        SetNumParticles(rootElem.GetChild("numparticles").GetInt("value"));
-    
-    if (rootElem.HasChild("updateinvisible"))
-        updateInvisible_ = rootElem.GetChild("updateinvisible").GetBool("enable");
-    
-    if (rootElem.HasChild("relative"))
-        relative_ = rootElem.GetChild("relative").GetBool("enable");
-    
-    if (rootElem.HasChild("scaled"))
-        scaled_ = rootElem.GetChild("scaled").GetBool("enable");
-    
-    if (rootElem.HasChild("sorted"))
-        sorted_ = rootElem.GetChild("sorted").GetBool("enable");
-    
-    if (rootElem.HasChild("animlodbias"))
-        SetAnimationLodBias(rootElem.GetChild("relative").GetFloat("value"));
-    
-    if (rootElem.HasChild("emittertype"))
-    {
-        String type = rootElem.GetChild("emittertype").GetAttributeLower("value");
-        if (type == "point")
-            emitterType_ = EMITTER_POINT;
-        else if (type == "box")
-            emitterType_ = EMITTER_BOX;
-        else if (type == "sphere")
-            emitterType_ = EMITTER_SPHERE;
-        else
-            LOGERROR("Unknown particle emitter type " + type);
-    }
-    
-    if (rootElem.HasChild("emittersize"))
-        emitterSize_ = rootElem.GetChild("emittersize").GetVector3("value");
-    
-    if (rootElem.HasChild("emitterradius"))
-        emitterSize_.x_ = rootElem.GetChild("emitterradius").GetFloat("value");
-    
-    if (rootElem.HasChild("direction"))
-        GetVector3MinMax(rootElem.GetChild("direction"), directionMin_, directionMax_);
-    
-    if (rootElem.HasChild("constantforce"))
-        constanceForce_ = rootElem.GetChild("constantforce").GetVector3("value");
-    
-    if (rootElem.HasChild("dampingforce"))
-        dampingForce_ = rootElem.GetChild("dampingforce").GetFloat("value");
-    
-    if (rootElem.HasChild("activetime"))
-        activeTime_ = rootElem.GetChild("activetime").GetFloat("value");
-    if (activeTime_ < 0.0f)
-        activeTime_ = M_INFINITY;
-    
-    if (rootElem.HasChild("inactivetime"))
-        inactiveTime_ = rootElem.GetChild("inactivetime").GetFloat("value");
-    if (inactiveTime_ < 0.0f)
-        inactiveTime_ = M_INFINITY;
-    
-    if (rootElem.HasChild("interval"))
-        GetFloatMinMax(rootElem.GetChild("interval"), intervalMin_, intervalMax_);
-    
-    if (rootElem.HasChild("particlesize"))
-        GetVector2MinMax(rootElem.GetChild("particlesize"), sizeMin_, sizeMax_);
-    
-    if (rootElem.HasChild("timetolive"))
-        GetFloatMinMax(rootElem.GetChild("timetolive"), timeToLiveMin_, timeToLiveMax_);
-    
-    if (rootElem.HasChild("velocity"))
-        GetFloatMinMax(rootElem.GetChild("velocity"), velocityMin_, velocityMax_);
-    
-    if (rootElem.HasChild("rotation"))
-        GetFloatMinMax(rootElem.GetChild("rotation"), rotationMin_, rotationMax_);
-    
-    if (rootElem.HasChild("rotationspeed"))
-        GetFloatMinMax(rootElem.GetChild("rotationspeed"), rotationSpeedMin_, rotationSpeedMax_);
-    
-    if (rootElem.HasChild("sizedelta"))
-    {
-        XMLElement deltaElem = rootElem.GetChild("sizedelta");
-        if (deltaElem.HasAttribute("add"))
-            sizeAdd_ = deltaElem.GetFloat("add");
-        if (deltaElem.HasAttribute("mul"))
-            sizeMul_ = deltaElem.GetFloat("mul");
-    }
-    
-    if (rootElem.HasChild("color"))
-        SetParticleColor(rootElem.GetChild("color").GetColor("value"));
-    
-    if (rootElem.HasChild("colorfade"))
-    {
-        Vector<ColorFade> fades;
-        XMLElement colorFadeElem = rootElem.GetChild("colorfade");
-        while (colorFadeElem)
-        {
-            fades.Push(ColorFade(colorFadeElem.GetColor("color"), colorFadeElem.GetFloat("time")));
-            
-            colorFadeElem = colorFadeElem.GetNext("colorfade");
-        }
-        SetParticleColors(fades);
-    }
-    
-    if (rootElem.HasChild("texanim"))
-    {
-        Vector<TextureAnimation> animations;
-        XMLElement animElem = rootElem.GetChild("texanim");
-        while (animElem)
-        {
-            TextureAnimation animation;
-            animation.uv_ = animElem.GetRect("uv");
-            animation.time_ = animElem.GetFloat("time");
-            animations.Push(animation);
-            animElem = animElem.GetNext("texanim");
-        }
-        textureAnimation_ = animations;
-    }
-    
+    ApplyParameters();
     MarkNetworkUpdate();
-    return true;
 }
 
 void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
@@ -432,6 +334,140 @@ void ParticleEmitter::OnNodeSet(Node* node)
         Scene* scene = GetScene();
         if (scene && IsEnabledEffective())
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
+    }
+}
+
+void ParticleEmitter::ApplyParameters()
+{
+    if (!parameterSource_)
+        return;
+    
+    XMLElement rootElem = parameterSource_->GetRoot();
+    
+    if (rootElem.HasChild("material"))
+        SetMaterial(GetSubsystem<ResourceCache>()->GetResource<Material>(rootElem.GetChild("material").GetAttribute("name")));
+    
+    if (rootElem.HasChild("numparticles"))
+        SetNumParticles(rootElem.GetChild("numparticles").GetInt("value"));
+    
+    if (rootElem.HasChild("updateinvisible"))
+        updateInvisible_ = rootElem.GetChild("updateinvisible").GetBool("enable");
+    
+    if (rootElem.HasChild("relative"))
+        relative_ = rootElem.GetChild("relative").GetBool("enable");
+    
+    if (rootElem.HasChild("scaled"))
+        scaled_ = rootElem.GetChild("scaled").GetBool("enable");
+    
+    if (rootElem.HasChild("sorted"))
+        sorted_ = rootElem.GetChild("sorted").GetBool("enable");
+    
+    if (rootElem.HasChild("animlodbias"))
+        SetAnimationLodBias(rootElem.GetChild("relative").GetFloat("value"));
+    
+    if (rootElem.HasChild("emittertype"))
+    {
+        String type = rootElem.GetChild("emittertype").GetAttributeLower("value");
+        if (type == "point")
+            emitterType_ = EMITTER_POINT;
+        else if (type == "box")
+            emitterType_ = EMITTER_BOX;
+        else if (type == "sphere")
+            emitterType_ = EMITTER_SPHERE;
+        else
+            LOGERROR("Unknown particle emitter type " + type);
+    }
+    
+    if (rootElem.HasChild("emittersize"))
+        emitterSize_ = rootElem.GetChild("emittersize").GetVector3("value");
+    
+    if (rootElem.HasChild("emitterradius"))
+        emitterSize_.x_ = rootElem.GetChild("emitterradius").GetFloat("value");
+    
+    if (rootElem.HasChild("direction"))
+        GetVector3MinMax(rootElem.GetChild("direction"), directionMin_, directionMax_);
+    
+    if (rootElem.HasChild("constantforce"))
+        constanceForce_ = rootElem.GetChild("constantforce").GetVector3("value");
+    
+    if (rootElem.HasChild("dampingforce"))
+        dampingForce_ = rootElem.GetChild("dampingforce").GetFloat("value");
+    
+    if (rootElem.HasChild("activetime"))
+        activeTime_ = rootElem.GetChild("activetime").GetFloat("value");
+    if (activeTime_ < 0.0f)
+        activeTime_ = M_INFINITY;
+    
+    if (rootElem.HasChild("inactivetime"))
+        inactiveTime_ = rootElem.GetChild("inactivetime").GetFloat("value");
+    if (inactiveTime_ < 0.0f)
+        inactiveTime_ = M_INFINITY;
+    
+    if (rootElem.HasChild("interval"))
+        GetFloatMinMax(rootElem.GetChild("interval"), intervalMin_, intervalMax_);
+    
+    if (rootElem.HasChild("emissionrate"))
+    {
+        float emissionRateMin = 0.0f;
+        float emissionRateMax = 0.0f;
+        GetFloatMinMax(rootElem.GetChild("emissionrate"), emissionRateMin, emissionRateMax);
+        intervalMax_ = 1.0f / emissionRateMin;
+        intervalMin_ = 1.0f / emissionRateMax;
+    }
+    
+    if (rootElem.HasChild("particlesize"))
+        GetVector2MinMax(rootElem.GetChild("particlesize"), sizeMin_, sizeMax_);
+    
+    if (rootElem.HasChild("timetolive"))
+        GetFloatMinMax(rootElem.GetChild("timetolive"), timeToLiveMin_, timeToLiveMax_);
+    
+    if (rootElem.HasChild("velocity"))
+        GetFloatMinMax(rootElem.GetChild("velocity"), velocityMin_, velocityMax_);
+    
+    if (rootElem.HasChild("rotation"))
+        GetFloatMinMax(rootElem.GetChild("rotation"), rotationMin_, rotationMax_);
+    
+    if (rootElem.HasChild("rotationspeed"))
+        GetFloatMinMax(rootElem.GetChild("rotationspeed"), rotationSpeedMin_, rotationSpeedMax_);
+    
+    if (rootElem.HasChild("sizedelta"))
+    {
+        XMLElement deltaElem = rootElem.GetChild("sizedelta");
+        if (deltaElem.HasAttribute("add"))
+            sizeAdd_ = deltaElem.GetFloat("add");
+        if (deltaElem.HasAttribute("mul"))
+            sizeMul_ = deltaElem.GetFloat("mul");
+    }
+    
+    if (rootElem.HasChild("color"))
+        SetParticleColor(rootElem.GetChild("color").GetColor("value"));
+    
+    if (rootElem.HasChild("colorfade"))
+    {
+        Vector<ColorFade> fades;
+        XMLElement colorFadeElem = rootElem.GetChild("colorfade");
+        while (colorFadeElem)
+        {
+            fades.Push(ColorFade(colorFadeElem.GetColor("color"), colorFadeElem.GetFloat("time")));
+            
+            colorFadeElem = colorFadeElem.GetNext("colorfade");
+        }
+        SetParticleColors(fades);
+    }
+    
+    if (rootElem.HasChild("texanim"))
+    {
+        Vector<TextureAnimation> animations;
+        XMLElement animElem = rootElem.GetChild("texanim");
+        while (animElem)
+        {
+            TextureAnimation animation;
+            animation.uv_ = animElem.GetRect("uv");
+            animation.time_ = animElem.GetFloat("time");
+            animations.Push(animation);
+            animElem = animElem.GetNext("texanim");
+        }
+        textureAnimation_ = animations;
     }
 }
 
@@ -596,6 +632,11 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         lastUpdateFrameNumber_ = viewFrameNumber_;
         MarkForUpdate();
     }
+}
+
+void ParticleEmitter::HandleParametersReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    ApplyParameters();
 }
 
 }

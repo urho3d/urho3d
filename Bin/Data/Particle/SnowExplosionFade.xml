@@ -4,7 +4,7 @@
     <numparticles value="5" />
     <activetime value="0.1" />
     <inactivetime value="0" />
-    <interval value="0.02" />
+    <emissionrate value="50" />
     <sorting enable="true" />
     <direction min="-1 0 -1" max="1 1 1" />
     <velocity min="0.5" max="1" />

@@ -886,7 +886,7 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
 {
     RegisterDrawable<ParticleEmitter>(engine, "ParticleEmitter");
     engine->RegisterObjectMethod("ParticleEmitter", "void SetEmitting(bool, bool)", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "bool set_parameters(XMLFile@+ file)", asMETHOD(ParticleEmitter, SetParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_parameters(XMLFile@+ file)", asMETHOD(ParticleEmitter, SetParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "XMLFile@+ get_parameters() const", asMETHOD(ParticleEmitter, GetParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_material(Material@+)", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Material@+ get_material() const", asMETHOD(ParticleEmitter, GetMaterial), asCALL_THISCALL);

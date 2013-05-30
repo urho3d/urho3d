@@ -86,8 +86,8 @@ public:
     /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame);
     
-    /// Set emitter parameters from an XML file. Return true if successful.
-    bool SetParameters(XMLFile* file);
+    /// Set emitter parameters from an XML file.
+    void SetParameters(XMLFile* file);
     /// Set whether should be emitting and optionally reset emission period.
     void SetEmitting(bool enable, bool resetPeriod = false);
     
@@ -111,6 +111,8 @@ protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     
+    /// Apply parameter file.
+    void ApplyParameters();
     /// Set number of particles.
     void SetNumParticles(int num);
     /// Set color of particles.
@@ -131,6 +133,8 @@ protected:
 private:
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle parameter file reload finished.
+    void HandleParametersReloadFinished(StringHash eventType, VariantMap& eventData);
     
     /// Parameter XML file.
     SharedPtr<XMLFile> parameterSource_;

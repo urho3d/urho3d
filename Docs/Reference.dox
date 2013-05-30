@@ -1035,6 +1035,7 @@ Most of the parameters can take either a single value, or minimum and maximum va
     <activetime value="t" />
     <inactivetime value="t" />
     <interval min="t1" max="t2" />
+    <emissionrate min="t1" max="t2" />
     <particlesize min="x1 y1" max="x2 y2" />
     <timetolive min="t1" max="t2" />
     <velocity min="x1" max="x2" />
@@ -1046,7 +1047,11 @@ Most of the parameters can take either a single value, or minimum and maximum va
 </particleemitter>
 \endcode
 
-Note: zero active or inactive time period means infinite. Instead of defining a single color element, several colorfade elements can be defined in time order to describe how the particles change color over time.
+Notes: 
+
+- Zero active or inactive time period means infinite.
+- Interval is the reciprocal of emission rate. Either can be used to define the rate at which new particles are emitted.
+- Instead of defining a single color element, several colorfade elements can be defined in time order to describe how the particles change color over time.
 
 
 \page Zones Zones
