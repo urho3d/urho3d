@@ -532,6 +532,7 @@ Methods:<br>
 - void Clip(const Rect&)
 - void Clear()
 - bool Equals(const Rect&) const
+- Vector4 ToVector4() const
 
 Properties:<br>
 - Vector2 center (readonly)
@@ -2357,7 +2358,6 @@ Properties:<br>
 - BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
 - uint occlusionLodLevel
-- Zone@ zone (readonly)
 
 
 Skybox
@@ -2632,6 +2632,20 @@ Properties:<br>
 - Zone@ zone (readonly)
 
 
+ColorFade
+
+Properties:<br>
+- Color color
+- float time
+
+
+TextureAnimation
+
+Properties:<br>
+- Rect uv
+- float time
+
+
 ParticleEmitter
 
 Methods:<br>
@@ -2649,7 +2663,9 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- bool Load(XMLFile@)
 - void SetEmitting(bool, bool)
+- void SetColor(const Color&)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -2678,14 +2694,45 @@ Properties:<br>
 - uint zoneMask
 - uint maxLights
 - BoundingBox worldBoundingBox (readonly)
-- XMLFile@ parameters
 - Material@ material
 - bool relative
 - bool sorted
 - bool scaled
 - float animationLodBias
-- bool emitting (readonly)
-- uint numParticles (readonly)
+- bool emitting
+- uint numParticles
+- float emissionRate (writeonly)
+- float minEmissionRate
+- float maxEmissionRate
+- EmitterType emitterType
+- Vector3 emitterSize
+- float activeTime
+- float inactiveTime
+- float timeToLive (writeonly)
+- float minTimeToLive
+- float maxTimeToLive
+- Vector2 particleSize (writeonly)
+- Vector2 minParticleSize
+- Vector3 maxParticleSize
+- Vector3 minDirection
+- Vector3 maxDirection
+- float velocity (writeonly)
+- float minVelocity
+- float maxVelocity
+- float rotation (writeonly)
+- float minRotation
+- float maxRotation
+- float rotationSpeed (writeonly)
+- float minRotationSpeed
+- float maxRotationSpeed
+- Vector3 constantForce
+- float dampingForce
+- float sizeAdd
+- float sizeMul
+- ColorFade@[] particleColors (readonly)
+- uint numParticleColors
+- TextureAnimation@[] textureAnimation (readonly)
+- uint numTextureAnimation
 - Zone@ zone (readonly)
 
 
