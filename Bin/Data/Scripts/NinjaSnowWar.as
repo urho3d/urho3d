@@ -163,6 +163,7 @@ void InitNetworking()
     network.RegisterRemoteEvent("PlayerSpawned");
     network.RegisterRemoteEvent("UpdateScore");
     network.RegisterRemoteEvent("UpdateHiscores");
+    network.RegisterRemoteEvent("ParticleEffect");
 
     if (runServer)
     {
@@ -186,6 +187,7 @@ void InitNetworking()
         SubscribeToEvent("UpdateScore", "HandleUpdateScore");
         SubscribeToEvent("UpdateHiscores", "HandleUpdateHiscores");
         SubscribeToEvent("NetworkUpdateSent", "HandleNetworkUpdateSent");
+        SubscribeToEvent("ParticleEffect", "HandleParticleEffect");
     }
 }
 
@@ -640,6 +642,14 @@ void HandleNetworkUpdateSent()
         network.serverConnection.controls.Set(CTRL_ALL, false);
 }
 
+void HandleParticleEffect(StringHash eventType, VariantMap& eventData)
+{
+    Vector3 position = eventData["Position"].GetVector3();
+    String effectName = eventData["EffectName"].GetString();
+    float duration = eventData["Duration"].GetFloat();
+    SpawnParticleEffect(position, effectName, duration, LOCAL);
+}
+
 int FindPlayerIndex(uint nodeID)
 {
     for (uint i = 0; i < players.length; ++i)
@@ -747,9 +757,16 @@ Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const
 
 Node@ SpawnParticleEffect(const Vector3&in position, const String&in effectName, float duration, CreateMode mode = REPLICATED)
 {
-    // \todo Should be refactored to use an RPC mechanism in networked mode, as a ParticleEmitter has a lot of attributes
-    // which cost network traffic
-    Node@ newNode = scene.CreateChild("", mode);
+    if (runServer && mode == REPLICATED)
+    {
+        VariantMap eventData;
+        eventData["Position"] = position;
+        eventData["EffectName"] = effectName;
+        eventData["Duration"] = duration;
+        network.BroadcastRemoteEvent(gameScene, "ParticleEffect", false, eventData);
+    }
+
+    Node@ newNode = scene.CreateChild("Effect", LOCAL);
     newNode.position = position;
 
     // Create the particle emitter
