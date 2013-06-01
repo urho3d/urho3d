@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Vector2.h"
+#include "Vector4.h"
 
 namespace Urho3D
 {
@@ -63,6 +63,14 @@ public:
     {
     }
     
+    /// Construct from a Vector4.
+    Rect(const Vector4& vector) :
+        min_(vector.x_, vector.y_),
+        max_(vector.z_, vector.w_),
+        defined_(true)
+    {
+    }
+
     /// Assign from another rect.
     Rect& operator = (const Rect& rhs)
     {
@@ -161,6 +169,8 @@ public:
     
     /// Return float data.
     const void* Data() const { return &min_.x_; }
+    /// Return as a vector.
+    Vector4 ToVector4() const { return Vector4(min_.x_, min_.y_, max_.x_, max_.y_); }
     /// Return as string.
     String ToString() const;
     

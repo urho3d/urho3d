@@ -747,12 +747,14 @@ Node@ SpawnObject(const Vector3&in position, const Quaternion&in rotation, const
 
 Node@ SpawnParticleEffect(const Vector3&in position, const String&in effectName, float duration, CreateMode mode = REPLICATED)
 {
+    // \todo Should be refactored to use an RPC mechanism in networked mode, as a ParticleEmitter has a lot of attributes
+    // which cost network traffic
     Node@ newNode = scene.CreateChild("", mode);
     newNode.position = position;
 
     // Create the particle emitter
     ParticleEmitter@ emitter = newNode.CreateComponent("ParticleEmitter");
-    emitter.parameters = cache.GetResource("XMLFile", effectName);
+    emitter.Load(cache.GetResource("XMLFile", effectName));
 
     // Create a GameObject for managing the effect lifetime
     GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));

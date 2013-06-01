@@ -52,6 +52,8 @@ struct Billboard
     float sortDistance_;
 };
 
+static const unsigned MAX_BILLBOARDS = 65536 / 4;
+
 /// %Billboard component.
 class BillboardSet : public Drawable
 {

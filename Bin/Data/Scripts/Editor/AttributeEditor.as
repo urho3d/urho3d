@@ -1057,6 +1057,20 @@ void InitVectorStructs()
         "   Layer"
     };
     vectorStructs.Push(VectorStruct("AnimatedModel", "Animation States", animationStateVariables, 1));
+
+    Array<String> particleColorVariables = {
+        "Color Animation Frames",
+        "   Color",
+        "   Time"
+    };
+    vectorStructs.Push(VectorStruct("ParticleEmitter", "Particle Colors", particleColorVariables, 1));
+
+    Array<String> particleUVAnimVariables = {
+        "UV Animation Frames",
+        "   UV Coords",
+        "   Time"
+    };
+    vectorStructs.Push(VectorStruct("ParticleEmitter", "UV Animation", particleUVAnimVariables, 1));
 }
 
 VectorStruct@ GetVectorStruct(Array<Serializable@>@ serializables, uint index)

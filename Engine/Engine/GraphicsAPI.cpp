@@ -750,7 +750,6 @@ static void RegisterStaticModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticModel", "uint get_numGeometries() const", asMETHOD(StaticModel, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "void set_occlusionLodLevel(uint) const", asMETHOD(StaticModel, SetOcclusionLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "uint get_occlusionLodLevel() const", asMETHOD(StaticModel, GetOcclusionLodLevel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticModel", "Zone@+ get_zone() const", asMETHOD(StaticModel, GetZone), asCALL_THISCALL);
 }
 
 static void RegisterSkybox(asIScriptEngine* engine)
@@ -882,12 +881,33 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "Zone@+ get_zone() const", asMETHOD(BillboardSet, GetZone), asCALL_THISCALL);
 }
 
+void ParticleEmitterSetEmitting(bool enable, ParticleEmitter* ptr)
+{
+    ptr->SetEmitting(enable);
+}
+
 static void RegisterParticleEmitter(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("EmitterType");
+    engine->RegisterEnumValue("EmitterType", "EMITTER_SPHERE", EMITTER_SPHERE);
+    engine->RegisterEnumValue("EmitterType", "EMITTER_BOX", EMITTER_BOX);
+    
+    engine->RegisterObjectType("ColorFade", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("ColorFade", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("ColorFade", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("ColorFade", "Color color", offsetof(ColorFade, color_));
+    engine->RegisterObjectProperty("ColorFade", "float time", offsetof(ColorFade, time_));
+    
+    engine->RegisterObjectType("TextureAnimation", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("TextureAnimation", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TextureAnimation", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("TextureAnimation", "Rect uv", offsetof(TextureAnimation, uv_));
+    engine->RegisterObjectProperty("TextureAnimation", "float time", offsetof(TextureAnimation, time_));
+    
     RegisterDrawable<ParticleEmitter>(engine, "ParticleEmitter");
+    engine->RegisterObjectMethod("ParticleEmitter", "bool Load(XMLFile@+ file)", asMETHOD(ParticleEmitter, Load), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void SetEmitting(bool, bool)", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void set_parameters(XMLFile@+ file)", asMETHOD(ParticleEmitter, SetParameters), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "XMLFile@+ get_parameters() const", asMETHOD(ParticleEmitter, GetParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void SetColor(const Color&in)", asMETHOD(ParticleEmitter, SetParticleColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_material(Material@+)", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Material@+ get_material() const", asMETHOD(ParticleEmitter, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_relative(bool)", asMETHOD(ParticleEmitter, SetRelative), asCALL_THISCALL);
@@ -898,8 +918,66 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_scaled() const", asMETHOD(ParticleEmitter, IsScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_animationLodBias(float)", asMETHOD(ParticleEmitter, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "float get_animationLodBias() const", asMETHOD(ParticleEmitter, GetAnimationLodBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_emitting() const", asFUNCTION(ParticleEmitterSetEmitting), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_emitting() const", asMETHOD(ParticleEmitter, IsEmitting), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_numParticles(uint) const", asMETHOD(ParticleEmitter, SetNumParticles), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticles() const", asMETHOD(ParticleEmitter, GetNumParticles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_emissionRate(float)", asMETHOD(ParticleEmitter, SetEmissionRate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_minEmissionRate(float)", asMETHOD(ParticleEmitter, SetMinEmissionRate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_maxEmissionRate(float)", asMETHOD(ParticleEmitter, SetMaxEmissionRate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_minEmissionRate() const", asMETHOD(ParticleEmitter, GetMinEmissionRate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_maxEmissionRate() const", asMETHOD(ParticleEmitter, GetMaxEmissionRate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_emitterType(EmitterType)", asMETHOD(ParticleEmitter, SetEmitterType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "EmitterType get_emitterType() const", asMETHOD(ParticleEmitter, GetEmitterType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_emitterSize(const Vector3&in)", asMETHOD(ParticleEmitter, SetEmitterSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_emitterSize() const", asMETHOD(ParticleEmitter, GetEmitterSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_activeTime(float) const", asMETHOD(ParticleEmitter, SetActiveTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_activeTime() const", asMETHOD(ParticleEmitter, GetActiveTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_inactiveTime(float) const", asMETHOD(ParticleEmitter, SetInactiveTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_inactiveTime() const", asMETHOD(ParticleEmitter, GetInactiveTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_timeToLive(float)", asMETHOD(ParticleEmitter, SetTimeToLive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_minTimeToLive(float)", asMETHOD(ParticleEmitter, SetMinTimeToLive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_maxTimeToLive(float)", asMETHOD(ParticleEmitter, SetMaxTimeToLive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_minTimeToLive() const", asMETHOD(ParticleEmitter, GetMinTimeToLive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_maxTimeToLive() const", asMETHOD(ParticleEmitter, GetMaxTimeToLive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_particleSize(const Vector2&in)", asMETHOD(ParticleEmitter, SetParticleSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_minParticleSize(const Vector2&in)", asMETHOD(ParticleEmitter, SetMinParticleSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_maxParticleSize(const Vector2&in)", asMETHOD(ParticleEmitter, SetMaxParticleSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "const Vector2& get_minParticleSize() const", asMETHOD(ParticleEmitter, GetMinParticleSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_maxParticleSize() const", asMETHOD(ParticleEmitter, GetMaxParticleSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_minDirection(const Vector3&in)", asMETHOD(ParticleEmitter, SetMinDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_minDirection() const", asMETHOD(ParticleEmitter, GetMinDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_maxDirection(const Vector3&in)", asMETHOD(ParticleEmitter, SetMaxDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_maxDirection() const", asMETHOD(ParticleEmitter, GetMaxDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_velocity(float)", asMETHOD(ParticleEmitter, SetVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_minVelocity(float)", asMETHOD(ParticleEmitter, SetMinVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_maxVelocity(float)", asMETHOD(ParticleEmitter, SetMaxVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_minVelocity() const", asMETHOD(ParticleEmitter, GetMinVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_maxVelocity() const", asMETHOD(ParticleEmitter, GetMaxVelocity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_rotation(float)", asMETHOD(ParticleEmitter, SetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_minRotation(float)", asMETHOD(ParticleEmitter, SetMinRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_maxRotation(float)", asMETHOD(ParticleEmitter, SetMaxRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_minRotation() const", asMETHOD(ParticleEmitter, GetMinRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_maxRotation() const", asMETHOD(ParticleEmitter, GetMaxRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_rotationSpeed(float)", asMETHOD(ParticleEmitter, SetRotationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_minRotationSpeed(float)", asMETHOD(ParticleEmitter, SetMinRotationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_maxRotationSpeed(float)", asMETHOD(ParticleEmitter, SetMaxRotationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_minRotationSpeed() const", asMETHOD(ParticleEmitter, GetMinRotationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_maxRotationSpeed() const", asMETHOD(ParticleEmitter, GetMaxRotationSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_constantForce(const Vector3&in)", asMETHOD(ParticleEmitter, SetConstantForce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "const Vector3& get_constantForce() const", asMETHOD(ParticleEmitter, GetConstantForce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_dampingForce(float)", asMETHOD(ParticleEmitter, SetDampingForce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_dampingForce() const", asMETHOD(ParticleEmitter, GetDampingForce), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_sizeAdd(float)", asMETHOD(ParticleEmitter, SetSizeAdd), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_sizeAdd() const", asMETHOD(ParticleEmitter, GetSizeAdd), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_sizeMul(float)", asMETHOD(ParticleEmitter, SetSizeMul), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "float get_sizeMul() const", asMETHOD(ParticleEmitter, GetSizeMul), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "ColorFade@+ get_particleColors(uint)", asMETHODPR(ParticleEmitter, GetParticleColors, (unsigned), ColorFade*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_numParticleColors(uint)", asMETHOD(ParticleEmitter, SetNumParticleColors), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticleColors() const", asMETHOD(ParticleEmitter, GetNumParticleColors), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "TextureAnimation@+ get_textureAnimation(uint)", asMETHODPR(ParticleEmitter, GetTextureAnimation, (unsigned), TextureAnimation*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_numTextureAnimation(uint)", asMETHOD(ParticleEmitter, SetNumTextureAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "uint get_numTextureAnimation() const", asMETHOD(ParticleEmitter, GetNumTextureAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Zone@+ get_zone() const", asMETHOD(ParticleEmitter, GetZone), asCALL_THISCALL);
 }
 

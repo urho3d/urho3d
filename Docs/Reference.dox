@@ -1015,7 +1015,7 @@ Like with skeletal animations, there are two ways to play back node animations:
 
 The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically.
 
-The particle system's properties can be set through a XML description file, see \ref ParticleEmitter::SetParameters "SetParameters()".
+The particle system's properties can be set through a XML description file, see \ref ParticleEmitter::Load "Load()".
 
 Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:
 
@@ -1026,7 +1026,7 @@ Most of the parameters can take either a single value, or minimum and maximum va
     <relative enable="true|false" />
     <scaled enable="true|false" />
     <sorted enable="true|false" />
-    <emittertype value="point|box|sphere" />
+    <emittertype value="sphere|box" />
     <emittersize value="x y z" />
     <emitterradius value="x" />
     <direction min="x1 y1 z1" max="x2 y2 z2" />
@@ -1044,6 +1044,7 @@ Most of the parameters can take either a single value, or minimum and maximum va
     <sizedelta add="x" mul="y" />
     <color value="r g b a" />
     <colorfade color="r g b a" time="t" />
+    <texanim uv="u1 v1 u2 v2" time="t" />
 </particleemitter>
 \endcode
 
@@ -1052,7 +1053,7 @@ Notes:
 - Zero active or inactive time period means infinite.
 - Interval is the reciprocal of emission rate. Either can be used to define the rate at which new particles are emitted.
 - Instead of defining a single color element, several colorfade elements can be defined in time order to describe how the particles change color over time.
-
+- Use several texanim elements to define a texture animation for the particles.
 
 \page Zones Zones
 

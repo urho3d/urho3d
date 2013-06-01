@@ -37,32 +37,52 @@
 namespace Urho3D
 {
 
+static const char* emitterTypeNames[] =
+{
+    "Sphere",
+    "Box",
+    0
+};
+
 const char* EFFECT_CATEGORY = "Effect";
 
 static const unsigned MAX_PARTICLES_IN_FRAME = 100;
+static const unsigned DEFAULT_NUM_PARTICLES = 10;
+static const Vector2 DEFAULT_PARTICLE_SIZE(0.1f, 0.1f);
+static const float DEFAULT_EMISSION_RATE = 10.0f;
+static const float MIN_EMISSION_RATE = 0.01f;
+static const float DEFAULT_TIME_TO_LIVE = 1.0f;
+static const float DEFAULT_VELOCITY = 1.0f;
+static const Vector3 DEFAULT_DIRECTION_MIN(-1.0f, -1.0f, -1.0f);
+static const Vector3 DEFAULT_DIRECTION_MAX(1.0f, 1.0f, 1.0f);
+
+template<> EmitterType Variant::Get<EmitterType>() const
+{
+    return (EmitterType)GetInt();
+}
 
 OBJECTTYPESTATIC(ParticleEmitter);
 
 ParticleEmitter::ParticleEmitter(Context* context) :
     BillboardSet(context),
-    emitterType_(EMITTER_POINT),
+    emitterType_(EMITTER_SPHERE),
     emitterSize_(Vector3::ZERO),
-    directionMin_(Vector3(-1.0f, -1.0f, -1.0f)),
-    directionMax_(Vector3(1.0f, 1.0f, 1.0f)),
-    constanceForce_(Vector3::ZERO),
-    sizeMin_(Vector2(0.1f, 0.1f)),
-    sizeMax_(Vector2(0.1f, 0.1f)),
+    directionMin_(DEFAULT_DIRECTION_MIN),
+    directionMax_(DEFAULT_DIRECTION_MAX),
+    constantForce_(Vector3::ZERO),
+    sizeMin_(DEFAULT_PARTICLE_SIZE),
+    sizeMax_(DEFAULT_PARTICLE_SIZE),
     dampingForce_(0.0f),
     periodTimer_(0.0f),
     emissionTimer_(0.0f),
     activeTime_(0.0f),
     inactiveTime_(0.0f),
-    intervalMin_(0.1f),
-    intervalMax_(0.1f),
-    timeToLiveMin_(1.0f),
-    timeToLiveMax_(1.0f),
-    velocityMin_(1.0f),
-    velocityMax_(1.0f),
+    emissionRateMin_(DEFAULT_EMISSION_RATE),
+    emissionRateMax_(DEFAULT_EMISSION_RATE),
+    timeToLiveMin_(DEFAULT_TIME_TO_LIVE),
+    timeToLiveMax_(DEFAULT_TIME_TO_LIVE),
+    velocityMin_(DEFAULT_VELOCITY),
+    velocityMax_(DEFAULT_VELOCITY),
     rotationMin_(0.0f),
     rotationMax_(0.0f),
     rotationSpeedMin_(0.0f),
@@ -74,8 +94,8 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     lastTimeStep_(0.0f),
     lastUpdateFrameNumber_(M_MAX_UNSIGNED)
 {
-    SetParticleColor(Color(1.0f, 1.0f, 1.0f));
-    SetNumParticles(10);
+    SetParticleColor(Color::WHITE);
+    SetNumParticles(DEFAULT_NUM_PARTICLES);
 }
 
 ParticleEmitter::~ParticleEmitter()
@@ -87,15 +107,43 @@ void ParticleEmitter::RegisterObject(Context* context)
     context->RegisterFactory<ParticleEmitter>(EFFECT_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", GetParameterSourceAttr, SetParameterSourceAttr, ResourceRef, ResourceRef(XMLFile::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_INT, "Max Particles", GetNumParticles, SetNumParticles, unsigned, DEFAULT_NUM_PARTICLES, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Rate Min", emissionRateMin_, DEFAULT_EMISSION_RATE, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Rate Max", emissionRateMax_, DEFAULT_EMISSION_RATE, AM_DEFAULT);
+    ENUM_ATTRIBUTE(ParticleEmitter, "Emitter Type", emitterType_, emitterTypeNames, EMITTER_SPHERE, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_VECTOR3, "Emitter Size", emitterSize_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Active Time", activeTime_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Inactive Time", inactiveTime_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Emitting", emitting_, true, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Time To Live Min", timeToLiveMin_, DEFAULT_TIME_TO_LIVE, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Time To Live Max", timeToLiveMax_, DEFAULT_TIME_TO_LIVE, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_VECTOR2, "Particle Size Min", sizeMin_, DEFAULT_PARTICLE_SIZE, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_VECTOR2, "Particle Size Max", sizeMax_, DEFAULT_PARTICLE_SIZE, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_VECTOR3, "Direction Min", directionMin_, DEFAULT_DIRECTION_MIN, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_VECTOR3, "Direction Max", directionMax_, DEFAULT_DIRECTION_MAX, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Velocity Min", velocityMin_, DEFAULT_VELOCITY, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Velocity Max", velocityMax_, DEFAULT_VELOCITY, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Rotation Min", rotationMin_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Rotation Max", rotationMax_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Rotation Speed Min", rotationSpeedMin_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Rotation Speed Max", rotationSpeedMax_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_VECTOR3, "Constant Force", constantForce_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Damping Force", dampingForce_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Size Add", sizeAdd_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Size Mul", sizeMul_, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particle Colors", GetParticleColorsAttr, SetParticleColorsAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "UV Animation", GetTextureAnimationAttr, SetTextureAnimationAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_DEFAULT | AM_NOEDIT);
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_DEFAULT | AM_NOEDIT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 }
@@ -148,10 +196,19 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     if (emitting_)
     {
         emissionTimer_ += lastTimeStep_;
+        
+        float intervalMin = 1.0f / Max(emissionRateMax_, MIN_EMISSION_RATE);
+        float intervalMax = 1.0f / Max(emissionRateMin_, MIN_EMISSION_RATE);
+        
+        // If emission timer has a longer delay than max. interval, clamp it
+        if (emissionTimer_ < -intervalMax)
+            emissionTimer_ = -intervalMax;
+        
         unsigned counter = MAX_PARTICLES_IN_FRAME;
+        
         while (emissionTimer_ > 0.0f && counter)
         {
-            emissionTimer_ -= Lerp(intervalMin_, intervalMax_, Random(1.0f));
+            emissionTimer_ -= Lerp(intervalMin, intervalMax, Random(1.0f));
             if (EmitNewParticle())
             {
                 --counter;
@@ -163,7 +220,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     }
     
     // Update existing particles
-    Vector3 relativeConstantForce = node_->GetWorldRotation().Inverse() * constanceForce_;
+    Vector3 relativeConstantForce = node_->GetWorldRotation().Inverse() * constantForce_;
     // If billboards are not relative, apply scaling to the position update
     Vector3 scaleVector = Vector3::ONE;
     if (scaled_ && !relative_)
@@ -187,12 +244,12 @@ void ParticleEmitter::Update(const FrameInfo& frame)
             particle.timer_ += lastTimeStep_;
             
             // Velocity & position
-            if (constanceForce_ != Vector3::ZERO)
+            if (constantForce_ != Vector3::ZERO)
             {
                 if (relative_)
                     particle.velocity_ += lastTimeStep_ * relativeConstantForce;
                 else
-                    particle.velocity_ += lastTimeStep_ * constanceForce_;
+                    particle.velocity_ += lastTimeStep_ * constantForce_;
             }
             if (dampingForce_ != 0.0f)
             {
@@ -245,104 +302,20 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         Commit();
 }
 
-void ParticleEmitter::SetParameters(XMLFile* file)
+bool ParticleEmitter::Load(XMLFile* file)
 {
-    if (file == parameterSource_)
-        return;
+    if (!file)
+    {
+        LOGERROR("Null particle emitter parameter file");
+        return false;
+    }
     
-    if (parameterSource_)
-        UnsubscribeFromEvent(parameterSource_, E_RELOADFINISHED);
-    
-    if (file && !file->GetRoot())
+    XMLElement rootElem = file->GetRoot();
+    if (!rootElem)
     {
         LOGERROR("Particle emitter parameter file does not have a valid root element");
-        return;
+        return false;
     }
-    
-    parameterSource_ = file;
-    
-    if (parameterSource_)
-        SubscribeToEvent(parameterSource_, E_RELOADFINISHED, HANDLER(ParticleEmitter, HandleParametersReloadFinished));
-    
-    ApplyParameters();
-    MarkNetworkUpdate();
-}
-
-void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
-{
-    if (enable != emitting_ || resetPeriod)
-    {
-        emitting_ = enable;
-        periodTimer_ = 0.0f;
-        MarkNetworkUpdate();
-    }
-}
-
-void ParticleEmitter::SetParameterSourceAttr(ResourceRef value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetParameters(cache->GetResource<XMLFile>(value.id_));
-}
-
-void ParticleEmitter::SetParticlesAttr(VariantVector value)
-{
-    unsigned index = 0;
-    SetNumParticles(value[index++].GetInt());
-    for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
-    {
-        i->velocity_ = value[index++].GetVector3();
-        i->size_ = value[index++].GetVector2();
-        i->timer_ = value[index++].GetFloat();
-        i->timeToLive_ = value[index++].GetFloat();
-        i->scale_ = value[index++].GetFloat();
-        i->rotationSpeed_ = value[index++].GetFloat();
-        i->colorIndex_ = value[index++].GetInt();
-        i->texIndex_ = value[index++].GetInt();
-    }
-}
-
-ResourceRef ParticleEmitter::GetParameterSourceAttr() const
-{
-    return GetResourceRef(parameterSource_, XMLFile::GetTypeStatic());
-}
-
-VariantVector ParticleEmitter::GetParticlesAttr() const
-{
-    VariantVector ret;
-    ret.Reserve(particles_.Size() * 8 + 1);
-    ret.Push(particles_.Size());
-    for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
-    {
-        ret.Push(i->velocity_);
-        ret.Push(i->size_);
-        ret.Push(i->timer_);
-        ret.Push(i->timeToLive_);
-        ret.Push(i->scale_);
-        ret.Push(i->rotationSpeed_);
-        ret.Push(i->colorIndex_);
-        ret.Push(i->texIndex_);
-    }
-    return ret;
-}
-
-void ParticleEmitter::OnNodeSet(Node* node)
-{
-    BillboardSet::OnNodeSet(node);
-    
-    if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene && IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
-    }
-}
-
-void ParticleEmitter::ApplyParameters()
-{
-    if (!parameterSource_)
-        return;
-    
-    XMLElement rootElem = parameterSource_->GetRoot();
     
     if (rootElem.HasChild("material"))
         SetMaterial(GetSubsystem<ResourceCache>()->GetResource<Material>(rootElem.GetChild("material").GetAttribute("name")));
@@ -369,7 +342,11 @@ void ParticleEmitter::ApplyParameters()
     {
         String type = rootElem.GetChild("emittertype").GetAttributeLower("value");
         if (type == "point")
-            emitterType_ = EMITTER_POINT;
+        {
+            // Point emitter type is deprecated, handled as zero sized sphere
+            emitterType_ = EMITTER_SPHERE;
+            emitterSize_ = Vector3::ZERO;
+        }
         else if (type == "box")
             emitterType_ = EMITTER_BOX;
         else if (type == "sphere")
@@ -382,13 +359,13 @@ void ParticleEmitter::ApplyParameters()
         emitterSize_ = rootElem.GetChild("emittersize").GetVector3("value");
     
     if (rootElem.HasChild("emitterradius"))
-        emitterSize_.x_ = rootElem.GetChild("emitterradius").GetFloat("value");
+        emitterSize_.x_ = emitterSize_.y_ = emitterSize_.z_ = rootElem.GetChild("emitterradius").GetFloat("value");
     
     if (rootElem.HasChild("direction"))
         GetVector3MinMax(rootElem.GetChild("direction"), directionMin_, directionMax_);
     
     if (rootElem.HasChild("constantforce"))
-        constanceForce_ = rootElem.GetChild("constantforce").GetVector3("value");
+        constantForce_ = rootElem.GetChild("constantforce").GetVector3("value");
     
     if (rootElem.HasChild("dampingforce"))
         dampingForce_ = rootElem.GetChild("dampingforce").GetFloat("value");
@@ -403,16 +380,16 @@ void ParticleEmitter::ApplyParameters()
     if (inactiveTime_ < 0.0f)
         inactiveTime_ = M_INFINITY;
     
-    if (rootElem.HasChild("interval"))
-        GetFloatMinMax(rootElem.GetChild("interval"), intervalMin_, intervalMax_);
-    
     if (rootElem.HasChild("emissionrate"))
+        GetFloatMinMax(rootElem.GetChild("emissionrate"), emissionRateMin_, emissionRateMax_);
+    
+    if (rootElem.HasChild("interval"))
     {
-        float emissionRateMin = 0.0f;
-        float emissionRateMax = 0.0f;
-        GetFloatMinMax(rootElem.GetChild("emissionrate"), emissionRateMin, emissionRateMax);
-        intervalMax_ = 1.0f / emissionRateMin;
-        intervalMin_ = 1.0f / emissionRateMax;
+        float intervalMin = 0.0f;
+        float intervalMax = 0.0f;
+        GetFloatMinMax(rootElem.GetChild("interval"), intervalMin, intervalMax);
+        emissionRateMax_ = 1.0f / intervalMin;
+        emissionRateMin_ = 1.0f / intervalMax;
     }
     
     if (rootElem.HasChild("particlesize"))
@@ -469,19 +446,206 @@ void ParticleEmitter::ApplyParameters()
         }
         textureAnimation_ = animations;
     }
+    
+    MarkNetworkUpdate();
+    return true;
 }
 
-void ParticleEmitter::SetNumParticles(int num)
+void ParticleEmitter::SetNumParticles(unsigned num)
 {
-    num = Max(num, 0);
+    // Prevent negative value being assigned from the editor
+    if (num > M_MAX_INT)
+        num = 0;
+    if (num > MAX_BILLBOARDS)
+        num = MAX_BILLBOARDS;
+    
     particles_.Resize(num);
     SetNumBillboards(num);
+}
+
+void ParticleEmitter::SetEmissionRate(float rate)
+{
+    SetMinEmissionRate(rate);
+    SetMaxEmissionRate(rate);
+}
+
+void ParticleEmitter::SetMinEmissionRate(float rate)
+{
+    emissionRateMin_ = Max(rate, MIN_EMISSION_RATE);
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetMaxEmissionRate(float rate)
+{
+    emissionRateMax_ = Max(rate, MIN_EMISSION_RATE);
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetEmitterType(EmitterType type)
+{
+    emitterType_ = type;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetEmitterSize(const Vector3& size)
+{
+    emitterSize_ = size;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetActiveTime(float time)
+{
+    activeTime_ = time;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetInactiveTime(float time)
+{
+    inactiveTime_ = time;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
+{
+    if (enable != emitting_ || resetPeriod)
+    {
+        emitting_ = enable;
+        periodTimer_ = 0.0f;
+        MarkNetworkUpdate();
+    }
+}
+
+void ParticleEmitter::SetTimeToLive(float time)
+{
+    SetMinTimeToLive(time);
+    SetMaxTimeToLive(time);
+}
+
+void ParticleEmitter::SetMinTimeToLive(float time)
+{
+    timeToLiveMin_ = Max(time, 0.0f);
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetMaxTimeToLive(float time)
+{
+    timeToLiveMax_ = Max(time, 0.0f);
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetParticleSize(const Vector2& size)
+{
+    SetMinParticleSize(size);
+    SetMaxParticleSize(size);
+}
+
+void ParticleEmitter::SetMinParticleSize(const Vector2& size)
+{
+    sizeMin_ = size;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetMaxParticleSize(const Vector2& size)
+{
+    sizeMax_ = size;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetMinDirection(const Vector3& direction)
+{
+    directionMin_ = direction;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetMaxDirection(const Vector3& direction)
+{
+    directionMin_ = direction;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetVelocity(float velocity)
+{
+    SetMinVelocity(velocity);
+    SetMaxVelocity(velocity);
+}
+
+void ParticleEmitter::SetMinVelocity(float velocity)
+{
+    velocityMin_ = velocity;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetMaxVelocity(float velocity)
+{
+    velocityMin_ = velocity;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetRotation(float rotation)
+{
+    SetMinRotation(rotation);
+    SetMaxRotation(rotation);
+}
+
+void ParticleEmitter::SetMinRotation(float rotation)
+{
+    rotationMin_ = rotation;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetMaxRotation(float rotation)
+{
+    rotationMax_ = rotation;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetRotationSpeed(float speed)
+{
+    SetMinRotationSpeed(speed);
+    SetMaxRotationSpeed(speed);
+}
+
+void ParticleEmitter::SetMinRotationSpeed(float speed)
+{
+    rotationSpeedMin_ = speed;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetMaxRotationSpeed(float speed)
+{
+    rotationSpeedMax_ = speed;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetConstantForce(const Vector3& force)
+{
+    constantForce_ = force;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetDampingForce(float force)
+{
+    dampingForce_ = force;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetSizeAdd(float sizeAdd)
+{
+    sizeAdd_ = sizeAdd;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetSizeMul(float sizeMul)
+{
+    sizeMul_ = sizeMul;
+    MarkNetworkUpdate();
 }
 
 void ParticleEmitter::SetParticleColor(const Color& color)
 {
     colors_.Clear();
     colors_.Push(ColorFade(color));
+    MarkNetworkUpdate();
 }
 
 void ParticleEmitter::SetParticleColors(const Vector<ColorFade>& colors)
@@ -490,6 +654,131 @@ void ParticleEmitter::SetParticleColors(const Vector<ColorFade>& colors)
         return;
     
     colors_ = colors;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetNumParticleColors(unsigned num)
+{
+    colors_.Resize(num);
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetTextureAnimation(const Vector<TextureAnimation>& animation)
+{
+    textureAnimation_ = animation;
+    MarkNetworkUpdate();
+}
+
+void ParticleEmitter::SetNumTextureAnimation(unsigned num)
+{
+    textureAnimation_.Resize(num);
+}
+
+void ParticleEmitter::SetParticlesAttr(VariantVector value)
+{
+    unsigned index = 0;
+    SetNumParticles(index < value.Size() ? value[index++].GetUInt() : 0);
+    
+    for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
+    {
+        i->velocity_ = value[index++].GetVector3();
+        i->size_ = value[index++].GetVector2();
+        i->timer_ = value[index++].GetFloat();
+        i->timeToLive_ = value[index++].GetFloat();
+        i->scale_ = value[index++].GetFloat();
+        i->rotationSpeed_ = value[index++].GetFloat();
+        i->colorIndex_ = value[index++].GetInt();
+        i->texIndex_ = value[index++].GetInt();
+    }
+}
+
+VariantVector ParticleEmitter::GetParticlesAttr() const
+{
+    VariantVector ret;
+    ret.Reserve(particles_.Size() * 8 + 1);
+    ret.Push(particles_.Size());
+    for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
+    {
+        ret.Push(i->velocity_);
+        ret.Push(i->size_);
+        ret.Push(i->timer_);
+        ret.Push(i->timeToLive_);
+        ret.Push(i->scale_);
+        ret.Push(i->rotationSpeed_);
+        ret.Push(i->colorIndex_);
+        ret.Push(i->texIndex_);
+    }
+    return ret;
+}
+
+void ParticleEmitter::SetParticleColorsAttr(VariantVector value)
+{
+    unsigned index = 0;
+    unsigned numColors = index < value.Size() ? value[index++].GetUInt() : 0;
+    // Prevent negative value being assigned from the editor
+    if (numColors > M_MAX_INT)
+        numColors = 0;
+    
+    colors_.Resize(numColors);
+    for (Vector<ColorFade>::Iterator i = colors_.Begin(); i < colors_.End() && index < value.Size(); ++i)
+    {
+        i->color_ = value[index++].GetColor();
+        i->time_ = value[index++].GetFloat();
+    }
+}
+
+VariantVector ParticleEmitter::GetParticleColorsAttr() const
+{
+    VariantVector ret;
+    ret.Reserve(colors_.Size() * 2 + 1);
+    ret.Push(colors_.Size());
+    for (Vector<ColorFade>::ConstIterator i = colors_.Begin(); i < colors_.End(); ++i)
+    {
+        ret.Push(i->color_);
+        ret.Push(i->time_);
+    }
+    return ret;
+}
+
+void ParticleEmitter::SetTextureAnimationAttr(VariantVector value)
+{
+    unsigned index = 0;
+    unsigned numFrames = index < value.Size() ? value[index++].GetUInt() : 0;
+    // Prevent negative value being assigned from the editor
+    if (numFrames > M_MAX_INT)
+        numFrames = 0;
+    
+    textureAnimation_.Resize(numFrames);
+    for (Vector<TextureAnimation>::Iterator i = textureAnimation_.Begin(); i < textureAnimation_.End() && index < value.Size(); ++i)
+    {
+        i->uv_ = value[index++].GetVector4();
+        i->time_ = value[index++].GetFloat();
+    }
+}
+
+VariantVector ParticleEmitter::GetTextureAnimationAttr() const
+{
+    VariantVector ret;
+    ret.Reserve(textureAnimation_.Size() * 2 + 1);
+    ret.Push(textureAnimation_.Size());
+    for (Vector<TextureAnimation>::ConstIterator i = textureAnimation_.Begin(); i < textureAnimation_.End(); ++i)
+    {
+        ret.Push(i->uv_.ToVector4());
+        ret.Push(i->time_);
+    }
+    return ret;
+}
+
+void ParticleEmitter::OnNodeSet(Node* node)
+{
+    BillboardSet::OnNodeSet(node);
+    
+    if (node)
+    {
+        Scene* scene = GetScene();
+        if (scene && IsEnabledEffective())
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
+    }
 }
 
 bool ParticleEmitter::EmitNewParticle()
@@ -506,18 +795,6 @@ bool ParticleEmitter::EmitNewParticle()
     
     switch (emitterType_)
     {
-    case EMITTER_POINT:
-        startPos = Vector3::ZERO;
-        break;
-        
-    case EMITTER_BOX:
-        startPos = Vector3(
-            Random(emitterSize_.x_) - emitterSize_.x_ * 0.5f,
-            Random(emitterSize_.y_) - emitterSize_.y_ * 0.5f,
-            Random(emitterSize_.z_) - emitterSize_.z_ * 0.5f
-        );
-        break;
-        
     case EMITTER_SPHERE:
         {
             Vector3 dir(
@@ -526,8 +803,16 @@ bool ParticleEmitter::EmitNewParticle()
                 Random(2.0f) - 1.0f
             );
             dir.Normalize();
-            startPos = Random(emitterSize_.x_) * dir;
+            startPos = emitterSize_ * dir * 0.5f;
         }
+        break;
+        
+    case EMITTER_BOX:
+        startPos = Vector3(
+            Random(emitterSize_.x_) - emitterSize_.x_ * 0.5f,
+            Random(emitterSize_.y_) - emitterSize_.y_ * 0.5f,
+            Random(emitterSize_.z_) - emitterSize_.z_ * 0.5f
+        );
         break;
     }
     
@@ -632,11 +917,6 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         lastUpdateFrameNumber_ = viewFrameNumber_;
         MarkForUpdate();
     }
-}
-
-void ParticleEmitter::HandleParametersReloadFinished(StringHash eventType, VariantMap& eventData)
-{
-    ApplyParameters();
 }
 
 }

@@ -54,6 +54,8 @@ static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const Sh
     return lhs->GetLayer() < rhs->GetLayer();
 }
 
+static const unsigned MAX_ANIMATION_STATES = 256;
+
 OBJECTTYPESTATIC(AnimatedModel);
 
 AnimatedModel::AnimatedModel(Context* context) :
@@ -766,6 +768,12 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
     RemoveAllAnimationStates();
     unsigned index = 0;
     unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
+    // Prevent negative or overly large value being assigned from the editor
+    if (numStates > M_MAX_INT)
+        numStates = 0;
+    if (numStates > MAX_ANIMATION_STATES)
+        numStates = MAX_ANIMATION_STATES;
+    
     animationStates_.Reserve(numStates);
     while (numStates--)
     {
