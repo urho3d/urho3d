@@ -39,6 +39,7 @@ typedef void (*ThreadEntryFunc)(void *threadStartData);
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
+#include "kNetBuildConfig.h"
 #include "SharedPtr.h"
 
 namespace kNet
