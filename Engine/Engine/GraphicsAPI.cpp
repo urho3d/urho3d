@@ -892,22 +892,22 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterEnumValue("EmitterType", "EMITTER_SPHERE", EMITTER_SPHERE);
     engine->RegisterEnumValue("EmitterType", "EMITTER_BOX", EMITTER_BOX);
     
-    engine->RegisterObjectType("ColorFade", 0, asOBJ_REF);
-    engine->RegisterObjectBehaviour("ColorFade", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("ColorFade", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("ColorFade", "Color color", offsetof(ColorFade, color_));
-    engine->RegisterObjectProperty("ColorFade", "float time", offsetof(ColorFade, time_));
+    engine->RegisterObjectType("ColorFrame", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("ColorFrame", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("ColorFrame", "Color color", offsetof(ColorFrame, color_));
+    engine->RegisterObjectProperty("ColorFrame", "float time", offsetof(ColorFrame, time_));
     
-    engine->RegisterObjectType("TextureAnimation", 0, asOBJ_REF);
-    engine->RegisterObjectBehaviour("TextureAnimation", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("TextureAnimation", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("TextureAnimation", "Rect uv", offsetof(TextureAnimation, uv_));
-    engine->RegisterObjectProperty("TextureAnimation", "float time", offsetof(TextureAnimation, time_));
+    engine->RegisterObjectType("TextureFrame", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TextureFrame", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("TextureFrame", "Rect uv", offsetof(TextureFrame, uv_));
+    engine->RegisterObjectProperty("TextureFrame", "float time", offsetof(TextureFrame, time_));
     
     RegisterDrawable<ParticleEmitter>(engine, "ParticleEmitter");
     engine->RegisterObjectMethod("ParticleEmitter", "bool Load(XMLFile@+ file)", asMETHOD(ParticleEmitter, Load), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void SetEmitting(bool, bool)", asMETHOD(ParticleEmitter, SetEmitting), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void SetColor(const Color&in)", asMETHOD(ParticleEmitter, SetParticleColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void SetColor(const Color&in)", asMETHOD(ParticleEmitter, SetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_material(Material@+)", asMETHOD(ParticleEmitter, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Material@+ get_material() const", asMETHOD(ParticleEmitter, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_relative(bool)", asMETHOD(ParticleEmitter, SetRelative), asCALL_THISCALL);
@@ -916,6 +916,8 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_sorted() const", asMETHOD(ParticleEmitter, IsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_scaled(bool)", asMETHOD(ParticleEmitter, SetScaled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool get_scaled() const", asMETHOD(ParticleEmitter, IsScaled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_updateInvisible(bool)", asMETHOD(ParticleEmitter, SetUpdateInvisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "bool get_updateInvisible() const", asMETHOD(ParticleEmitter, GetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_animationLodBias(float)", asMETHOD(ParticleEmitter, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "float get_animationLodBias() const", asMETHOD(ParticleEmitter, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_emitting() const", asFUNCTION(ParticleEmitterSetEmitting), asCALL_CDECL_OBJLAST);
@@ -972,12 +974,12 @@ static void RegisterParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "float get_sizeAdd() const", asMETHOD(ParticleEmitter, GetSizeAdd), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void set_sizeMul(float)", asMETHOD(ParticleEmitter, SetSizeMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "float get_sizeMul() const", asMETHOD(ParticleEmitter, GetSizeMul), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "ColorFade@+ get_particleColors(uint)", asMETHODPR(ParticleEmitter, GetParticleColors, (unsigned), ColorFade*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void set_numParticleColors(uint)", asMETHOD(ParticleEmitter, SetNumParticleColors), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "uint get_numParticleColors() const", asMETHOD(ParticleEmitter, GetNumParticleColors), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "TextureAnimation@+ get_textureAnimation(uint)", asMETHODPR(ParticleEmitter, GetTextureAnimation, (unsigned), TextureAnimation*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "void set_numTextureAnimation(uint)", asMETHOD(ParticleEmitter, SetNumTextureAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "uint get_numTextureAnimation() const", asMETHOD(ParticleEmitter, GetNumTextureAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "ColorFrame@+ get_colors(uint)", asMETHODPR(ParticleEmitter, GetColor, (unsigned), ColorFrame*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_numColors(uint)", asMETHOD(ParticleEmitter, SetNumColors), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "uint get_numColors() const", asMETHOD(ParticleEmitter, GetNumColors), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "TextureFrame@+ get_textureFrames(uint)", asMETHODPR(ParticleEmitter, GetTextureFrame, (unsigned), TextureFrame*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "void set_numTextureFrames(uint)", asMETHOD(ParticleEmitter, SetNumTextureFrames), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "uint get_numTextureFrames() const", asMETHOD(ParticleEmitter, GetNumTextureFrames), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "Zone@+ get_zone() const", asMETHOD(ParticleEmitter, GetZone), asCALL_THISCALL);
 }
 

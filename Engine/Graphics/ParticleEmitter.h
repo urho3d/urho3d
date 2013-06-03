@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-/// Determines the emitter shape.
+/// Particle emitter shapes.
 enum EmitterType
 {
     EMITTER_SPHERE,
@@ -49,15 +49,64 @@ struct Particle
     float scale_;
     /// Rotation speed.
     float rotationSpeed_;
-    /// Current color fade index.
+    /// Current color animation index.
     unsigned colorIndex_;
     /// Current texture animation index.
     unsigned texIndex_;
 };
 
-/// %Texture animation definition.
-struct TextureAnimation
+/// %Color animation frame definition.
+struct ColorFrame
 {
+    /// Construct with default values.
+    ColorFrame() :
+        time_(0.0f)
+    {
+    }
+    
+    /// Construct with a color and zero time.
+    ColorFrame(const Color& color) :
+        color_(color),
+        time_(0.0f)
+    {
+    }
+    
+    /// Construct from a color and time.
+    ColorFrame(const Color& color, float time) :
+        color_(color),
+        time_(time)
+    {
+    }
+    
+    /// Return interpolated value with another color-time pair at the time specified.
+    Color Interpolate(const ColorFrame& next, float time)
+    {
+        float timeInterval = next.time_ - time_;
+        if (timeInterval > 0.0f)
+        {
+            float t = (time - time_) / timeInterval;
+            return color_.Lerp(next.color_, t);
+        }
+        else
+            return next.color_;
+    }
+    
+    /// Color.
+    Color color_;
+    /// Time.
+    float time_;
+};
+
+/// %Texture animation frame definition.
+struct TextureFrame
+{
+    /// Construct with default values.
+    TextureFrame() :
+        uv_(0.0f, 0.0f, 1.0f, 1.0f),
+        time_(0.0f)
+    {
+    }
+    
     /// UV coordinates.
     Rect uv_;
     /// Time.
@@ -105,6 +154,8 @@ public:
     void SetInactiveTime(float time);
     /// Set whether should be emitting and optionally reset emission period.
     void SetEmitting(bool enable, bool resetPeriod = false);
+    /// Set whether to update when particles are not visible.
+    void SetUpdateInvisible(bool enable);
     /// Set particle time to live (both minimum and maximum.)
     void SetTimeToLive(float time);
     /// Set particle minimum time to live.
@@ -148,20 +199,22 @@ public:
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
     /// Set color of particles.
-    void SetParticleColor(const Color& color);
-    /// Set color fade of particles.
-    void SetParticleColors(const Vector<ColorFade>& colors);
-    /// Set number of color fade frames.
-    void SetNumParticleColors(unsigned num);
-    /// Set particle texture animations.
-    void SetTextureAnimation(const Vector<TextureAnimation>& animation);
-    /// Set number of particle texture animation frames.
-    void SetNumTextureAnimation(unsigned num);
+    void SetColor(const Color& color);
+    /// Set color animation of particles.
+    void SetColors(const Vector<ColorFrame>& colors);
+    /// Set number of color animation frames.
+    void SetNumColors(unsigned num);
+    /// Set particle texture animation.
+    void SetTextureFrames(const Vector<TextureFrame>& animation);
+    /// Set number of texture animation frames.
+    void SetNumTextureFrames(unsigned num);
     
     /// Return maximum number of particles.
     unsigned GetNumParticles() const { return particles_.Size(); }
     /// Return whether is currently emitting.
     bool IsEmitting() const { return emitting_; }
+    /// Return whether to update when particles are not visible.
+    bool GetUpdateInvisible() const { return updateInvisible_; }
     /// Return minimum emission rate.
     float GetMinEmissionRate() const { return emissionRateMin_; }
     /// Return maximum emission rate.
@@ -206,31 +259,31 @@ public:
     float GetSizeAdd() const { return sizeAdd_; }
     /// Return particle size multiplicative modifier.
     float GetSizeMul() const { return sizeMul_; }
-    /// Return all color fade frames.
-    Vector<ColorFade>& GetParticleColors() { return colors_; }
-    /// Return number of color fade frames.
-    unsigned GetNumParticleColors() const { return colors_.Size(); }
-    /// Return one color fade frame, or null if outside range.
-    ColorFade* GetParticleColors(unsigned index) { return index < colors_.Size() ? &colors_[index] : (ColorFade*)0; }
+    /// Return all color animation frames.
+    Vector<ColorFrame>& GetColors() { return colorFrames_; }
+    /// Return number of color animation frames.
+    unsigned GetNumColors() const { return colorFrames_.Size(); }
+    /// Return a color animation frame, or null if outside range.
+    ColorFrame* GetColor(unsigned index) { return index < colorFrames_.Size() ? &colorFrames_[index] : (ColorFrame*)0; }
     /// Return all texture animation frames.
-    Vector<TextureAnimation>& GetTextureAnimation() { return textureAnimation_; }
+    Vector<TextureFrame>& GetTextureFrame() { return textureFrames_; }
     /// Return number of texture animation frames.
-    unsigned GetNumTextureAnimation() const { return textureAnimation_.Size(); }
-    /// Return one texture animation frame, or null if outside range.
-    TextureAnimation* GetTextureAnimation(unsigned index) { return index < colors_.Size() ? &textureAnimation_[index] : (TextureAnimation*)0; }
+    unsigned GetNumTextureFrames() const { return textureFrames_.Size(); }
+    /// Return a texture animation frame, or null if outside range.
+    TextureFrame* GetTextureFrame(unsigned index) { return index < colorFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0; }
     
     /// Set particles attribute.
     void SetParticlesAttr(VariantVector value);
     /// Return particles attribute.
     VariantVector GetParticlesAttr() const;
     /// Set particle colors attribute.
-    void SetParticleColorsAttr(VariantVector value);
+    void SetColorsAttr(VariantVector value);
     /// Return particle colors attribute.
-    VariantVector GetParticleColorsAttr() const;
+    VariantVector GetColorsAttr() const;
     /// Set texture animation attribute.
-    void SetTextureAnimationAttr(VariantVector value);
+    void SetTextureFramesAttr(VariantVector value);
     /// Return texture animation attribute.
-    VariantVector GetTextureAnimationAttr() const;
+    VariantVector GetTextureFramesAttr() const;
     
 protected:
     /// Handle node being assigned.
@@ -253,10 +306,10 @@ private:
     
     /// Particles.
     PODVector<Particle> particles_;
-    /// Color fade range.
-    Vector<ColorFade> colors_;
-    /// Texture animation.
-    Vector<TextureAnimation> textureAnimation_;
+    /// Particle color animation frames.
+    Vector<ColorFrame> colorFrames_;
+    /// Texture animation frames.
+    Vector<TextureFrame> textureFrames_;
     /// Emitter shape.
     EmitterType emitterType_;
     /// Emitter size.
@@ -291,7 +344,7 @@ private:
     float timeToLiveMax_;
     /// Particle velocity minimum.
     float velocityMin_;
-    /// Particle velocityy maximum.
+    /// Particle velocity maximum.
     float velocityMax_;
     /// Particle rotation angle minimum.
     float rotationMin_;

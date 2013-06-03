@@ -172,47 +172,4 @@ public:
 /// Multiply Color with a scalar.
 inline Color operator * (float lhs, const Color& rhs) { return rhs * lhs; }
 
-/// Color-time pair for color interpolation.
-class ColorFade
-{
-public:
-    /// Construct with default color and zero time.
-    ColorFade() :
-        time_(0.0f)
-    {
-    }
-    
-    /// Construct with a color and zero time.
-    ColorFade(const Color& color) :
-        color_(color),
-        time_(0.0f)
-    {
-    }
-    
-    /// Construct from a color and time.
-    ColorFade(const Color& color, float time) :
-        color_(color),
-        time_(time)
-    {
-    }
-    
-    /// Return interpolated value with another color-time pair at the time specified.
-    Color Interpolate(const ColorFade& next, float time)
-    {
-        float timeInterval = next.time_ - time_;
-        if (timeInterval > 0.0f)
-        {
-            float t = (time - time_) / timeInterval;
-            return color_.Lerp(next.color_, t);
-        }
-        else
-            return next.color_;
-    }
-    
-    /// Color.
-    Color color_;
-    /// Time.
-    float time_;
-};
-
 }

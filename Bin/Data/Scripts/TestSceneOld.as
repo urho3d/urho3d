@@ -87,6 +87,7 @@ void InitScene()
             StaticModel@ object = newNode.CreateComponent("StaticModel");
             object.model = cache.GetResource("Model", "Models/Box.mdl");
             object.material = cache.GetResource("Material", "Materials/Stone.xml");
+            object.viewMask = 1;
         }
     }
 
@@ -107,6 +108,7 @@ void InitScene()
         object.material = cache.GetResource("Material", "Materials/StoneTiledH.xml");
         object.castShadows = true;
         object.occluder = true;
+        object.viewMask = 1;
     }
 
     // Create static mushroom with physics
@@ -120,6 +122,7 @@ void InitScene()
         object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
         object.castShadows = true;
         object.occluder = true;
+        object.viewMask = 1;
 
         RigidBody@ body = newNode.CreateComponent("RigidBody");
         CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
@@ -147,6 +150,7 @@ void InitScene()
             object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
             object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
             object.castShadows = true;
+            object.viewMask = 1;
         }
     }
 
@@ -164,6 +168,7 @@ void InitScene()
         object.drawDistance = 300;
         object.castShadows = true;
         object.maxLights = 2;
+        object.viewMask = 1;
 
         // Because there are many animated models in the scene, test reducing animation LOD for less CPU use
         object.animationLodBias = 0.75;
@@ -191,6 +196,7 @@ void InitScene()
         billboard.numBillboards = NUM_BILLBOARDS;
         billboard.material = cache.GetResource("Material", "Materials/LitSmoke.xml");
         billboard.sorted = true;
+        billboard.viewMask = 2;
 
         for (uint j = 0; j < NUM_BILLBOARDS; ++j)
         {
@@ -544,7 +550,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
             {
                 Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
-                RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
+                RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY, 1);
                 if (result.drawable !is null)
                 {
                     Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;
@@ -589,7 +595,7 @@ void HandlePostRenderUpdate()
     if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
     {
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
-        RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
+        RayQueryResult result = testScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY, 1);
         if (result.drawable !is null)
         {
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result.distance;

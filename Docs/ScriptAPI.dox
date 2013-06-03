@@ -2632,7 +2632,7 @@ Properties:<br>
 - Zone@ zone (readonly)
 
 
-ColorFade
+ColorAnimation
 
 Properties:<br>
 - Color color
@@ -2729,10 +2729,10 @@ Properties:<br>
 - float dampingForce
 - float sizeAdd
 - float sizeMul
-- ColorFade@[] particleColors (readonly)
-- uint numParticleColors
-- TextureAnimation@[] textureAnimation (readonly)
-- uint numTextureAnimation
+- ColorAnimation@[] colors (readonly)
+- uint numColors
+- TextureAnimation@[] textureAnimations (readonly)
+- uint numTextureAnimations
 - Zone@ zone (readonly)
 
 

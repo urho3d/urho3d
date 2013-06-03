@@ -94,7 +94,7 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     lastTimeStep_(0.0f),
     lastUpdateFrameNumber_(M_MAX_UNSIGNED)
 {
-    SetParticleColor(Color::WHITE);
+    SetColor(Color::WHITE);
     SetNumParticles(DEFAULT_NUM_PARTICLES);
 }
 
@@ -116,6 +116,10 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Active Time", activeTime_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Inactive Time", inactiveTime_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Emitting", emitting_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Time To Live Min", timeToLiveMin_, DEFAULT_TIME_TO_LIVE, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Time To Live Max", timeToLiveMax_, DEFAULT_TIME_TO_LIVE, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_VECTOR2, "Particle Size Min", sizeMin_, DEFAULT_PARTICLE_SIZE, AM_DEFAULT);
@@ -132,11 +136,8 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Damping Force", dampingForce_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Size Add", sizeAdd_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Size Mul", sizeMul_, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particle Colors", GetParticleColorsAttr, SetParticleColorsAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "UV Animation", GetTextureAnimationAttr, SetTextureAnimationAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particle Colors", GetColorsAttr, SetColorsAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "UV Animation", GetTextureFramesAttr, SetTextureFramesAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
@@ -272,26 +273,26 @@ void ParticleEmitter::Update(const FrameInfo& frame)
             
             // Color interpolation
             unsigned& index = particle.colorIndex_;
-            if (index < colors_.Size())
+            if (index < colorFrames_.Size())
             {
-                if (index < colors_.Size() - 1)
+                if (index < colorFrames_.Size() - 1)
                 {
-                    if (particle.timer_ >= colors_[index + 1].time_)
+                    if (particle.timer_ >= colorFrames_[index + 1].time_)
                         ++index;
                 }
-                if (index < colors_.Size() - 1)
-                    billboard.color_ = colors_[index].Interpolate(colors_[index + 1], particle.timer_);
+                if (index < colorFrames_.Size() - 1)
+                    billboard.color_ = colorFrames_[index].Interpolate(colorFrames_[index + 1], particle.timer_);
                 else
-                    billboard.color_ = colors_[index].color_;
+                    billboard.color_ = colorFrames_[index].color_;
             }
             
             // Texture animation
             unsigned& texIndex = particle.texIndex_;
-            if (textureAnimation_.Size() && texIndex < textureAnimation_.Size() - 1)
+            if (textureFrames_.Size() && texIndex < textureFrames_.Size() - 1)
             {
-                if (particle.timer_ >= textureAnimation_[texIndex + 1].time_)
+                if (particle.timer_ >= textureFrames_[texIndex + 1].time_)
                 {
-                    billboard.uv_ = textureAnimation_[texIndex + 1].uv_;
+                    billboard.uv_ = textureFrames_[texIndex + 1].uv_;
                     ++texIndex;
                 }
             }
@@ -417,34 +418,34 @@ bool ParticleEmitter::Load(XMLFile* file)
     }
     
     if (rootElem.HasChild("color"))
-        SetParticleColor(rootElem.GetChild("color").GetColor("value"));
+        SetColor(rootElem.GetChild("color").GetColor("value"));
     
     if (rootElem.HasChild("colorfade"))
     {
-        Vector<ColorFade> fades;
+        Vector<ColorFrame> fades;
         XMLElement colorFadeElem = rootElem.GetChild("colorfade");
         while (colorFadeElem)
         {
-            fades.Push(ColorFade(colorFadeElem.GetColor("color"), colorFadeElem.GetFloat("time")));
+            fades.Push(ColorFrame(colorFadeElem.GetColor("color"), colorFadeElem.GetFloat("time")));
             
             colorFadeElem = colorFadeElem.GetNext("colorfade");
         }
-        SetParticleColors(fades);
+        SetColors(fades);
     }
     
     if (rootElem.HasChild("texanim"))
     {
-        Vector<TextureAnimation> animations;
+        Vector<TextureFrame> animations;
         XMLElement animElem = rootElem.GetChild("texanim");
         while (animElem)
         {
-            TextureAnimation animation;
+            TextureFrame animation;
             animation.uv_ = animElem.GetRect("uv");
             animation.time_ = animElem.GetFloat("time");
             animations.Push(animation);
             animElem = animElem.GetNext("texanim");
         }
-        textureAnimation_ = animations;
+        textureFrames_ = animations;
     }
     
     MarkNetworkUpdate();
@@ -513,6 +514,11 @@ void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
         periodTimer_ = 0.0f;
         MarkNetworkUpdate();
     }
+}
+
+void ParticleEmitter::SetUpdateInvisible(bool enable)
+{
+    updateInvisible_ = enable;
 }
 
 void ParticleEmitter::SetTimeToLive(float time)
@@ -641,37 +647,37 @@ void ParticleEmitter::SetSizeMul(float sizeMul)
     MarkNetworkUpdate();
 }
 
-void ParticleEmitter::SetParticleColor(const Color& color)
+void ParticleEmitter::SetColor(const Color& color)
 {
-    colors_.Clear();
-    colors_.Push(ColorFade(color));
+    colorFrames_.Clear();
+    colorFrames_.Push(ColorFrame(color));
     MarkNetworkUpdate();
 }
 
-void ParticleEmitter::SetParticleColors(const Vector<ColorFade>& colors)
+void ParticleEmitter::SetColors(const Vector<ColorFrame>& colors)
 {
     if (!colors.Size())
         return;
     
-    colors_ = colors;
+    colorFrames_ = colors;
     MarkNetworkUpdate();
 }
 
-void ParticleEmitter::SetNumParticleColors(unsigned num)
+void ParticleEmitter::SetNumColors(unsigned num)
 {
-    colors_.Resize(num);
+    colorFrames_.Resize(num);
     MarkNetworkUpdate();
 }
 
-void ParticleEmitter::SetTextureAnimation(const Vector<TextureAnimation>& animation)
+void ParticleEmitter::SetTextureFrames(const Vector<TextureFrame>& animation)
 {
-    textureAnimation_ = animation;
+    textureFrames_ = animation;
     MarkNetworkUpdate();
 }
 
-void ParticleEmitter::SetNumTextureAnimation(unsigned num)
+void ParticleEmitter::SetNumTextureFrames(unsigned num)
 {
-    textureAnimation_.Resize(num);
+    textureFrames_.Resize(num);
 }
 
 void ParticleEmitter::SetParticlesAttr(VariantVector value)
@@ -711,7 +717,7 @@ VariantVector ParticleEmitter::GetParticlesAttr() const
     return ret;
 }
 
-void ParticleEmitter::SetParticleColorsAttr(VariantVector value)
+void ParticleEmitter::SetColorsAttr(VariantVector value)
 {
     unsigned index = 0;
     unsigned numColors = index < value.Size() ? value[index++].GetUInt() : 0;
@@ -719,20 +725,20 @@ void ParticleEmitter::SetParticleColorsAttr(VariantVector value)
     if (numColors > M_MAX_INT)
         numColors = 0;
     
-    colors_.Resize(numColors);
-    for (Vector<ColorFade>::Iterator i = colors_.Begin(); i < colors_.End() && index < value.Size(); ++i)
+    colorFrames_.Resize(numColors);
+    for (Vector<ColorFrame>::Iterator i = colorFrames_.Begin(); i < colorFrames_.End() && index < value.Size(); ++i)
     {
         i->color_ = value[index++].GetColor();
         i->time_ = value[index++].GetFloat();
     }
 }
 
-VariantVector ParticleEmitter::GetParticleColorsAttr() const
+VariantVector ParticleEmitter::GetColorsAttr() const
 {
     VariantVector ret;
-    ret.Reserve(colors_.Size() * 2 + 1);
-    ret.Push(colors_.Size());
-    for (Vector<ColorFade>::ConstIterator i = colors_.Begin(); i < colors_.End(); ++i)
+    ret.Reserve(colorFrames_.Size() * 2 + 1);
+    ret.Push(colorFrames_.Size());
+    for (Vector<ColorFrame>::ConstIterator i = colorFrames_.Begin(); i < colorFrames_.End(); ++i)
     {
         ret.Push(i->color_);
         ret.Push(i->time_);
@@ -740,7 +746,7 @@ VariantVector ParticleEmitter::GetParticleColorsAttr() const
     return ret;
 }
 
-void ParticleEmitter::SetTextureAnimationAttr(VariantVector value)
+void ParticleEmitter::SetTextureFramesAttr(VariantVector value)
 {
     unsigned index = 0;
     unsigned numFrames = index < value.Size() ? value[index++].GetUInt() : 0;
@@ -748,20 +754,20 @@ void ParticleEmitter::SetTextureAnimationAttr(VariantVector value)
     if (numFrames > M_MAX_INT)
         numFrames = 0;
     
-    textureAnimation_.Resize(numFrames);
-    for (Vector<TextureAnimation>::Iterator i = textureAnimation_.Begin(); i < textureAnimation_.End() && index < value.Size(); ++i)
+    textureFrames_.Resize(numFrames);
+    for (Vector<TextureFrame>::Iterator i = textureFrames_.Begin(); i < textureFrames_.End() && index < value.Size(); ++i)
     {
         i->uv_ = value[index++].GetVector4();
         i->time_ = value[index++].GetFloat();
     }
 }
 
-VariantVector ParticleEmitter::GetTextureAnimationAttr() const
+VariantVector ParticleEmitter::GetTextureFramesAttr() const
 {
     VariantVector ret;
-    ret.Reserve(textureAnimation_.Size() * 2 + 1);
-    ret.Push(textureAnimation_.Size());
-    for (Vector<TextureAnimation>::ConstIterator i = textureAnimation_.Begin(); i < textureAnimation_.End(); ++i)
+    ret.Reserve(textureFrames_.Size() * 2 + 1);
+    ret.Push(textureFrames_.Size());
+    for (Vector<TextureFrame>::ConstIterator i = textureFrames_.Begin(); i < textureFrames_.End(); ++i)
     {
         ret.Push(i->uv_.ToVector4());
         ret.Push(i->time_);
@@ -840,9 +846,9 @@ bool ParticleEmitter::EmitNewParticle()
     
     billboard.position_ = startPos;
     billboard.size_ = particles_[index].size_;
-    billboard.uv_ = textureAnimation_.Size() ? textureAnimation_[0].uv_ : Rect::POSITIVE;
+    billboard.uv_ = textureFrames_.Size() ? textureFrames_[0].uv_ : Rect::POSITIVE;
     billboard.rotation_ = Lerp(rotationMin_, rotationMax_, Random(1.0f));
-    billboard.color_ = colors_[0].color_;
+    billboard.color_ = colorFrames_[0].color_;
     billboard.enabled_ = true;
     
     return true;
