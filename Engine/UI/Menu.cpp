@@ -71,6 +71,8 @@ void Menu::RegisterObject(Context* context)
 
 void Menu::Update(float timeStep)
 {
+    Button::Update(timeStep);
+    
     if (popup_ && showPopup_)
     {
         const Vector<SharedPtr<UIElement> >& children = popup_->GetChildren();
