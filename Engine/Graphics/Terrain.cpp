@@ -304,7 +304,7 @@ void Terrain::SetOccluder(bool enable)
 
 void Terrain::SetOccludee(bool enable)
 {
-    occluder_ = enable;
+    occludee_ = enable;
     for (unsigned i = 0; i < patches_.Size(); ++i)
     {
         if (patches_[i])
