@@ -11,10 +11,5 @@ set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Eng
     ../../Engine/Network ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI)
 set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src)
 
-# Setup target
-if (WIN32)
-    set (EXE_TYPE WIN32)
-elseif (APPLE)
-    set (CMAKE_EXE_LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
-endif ()
-setup_executable ()
+# Setup target with resource copying
+setup_main_executable ()

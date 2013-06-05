@@ -495,13 +495,8 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 # Define dependency libs
 set (LIBS ../Engine/Container ../Engine/Core ../Engine/Engine ../Engine/Graphics ../Engine/Input ../Engine/IO ../Engine/Math ../Engine/Resource ../Engine/Scene ../Engine/UI)
 
-# Setup target
-if (WIN32)
-    set (EXE_TYPE WIN32)
-elseif (APPLE)
-    set (CMAKE_EXE_LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
-endif ()
-setup_executable ()
+# Setup target with resource copying
+setup_main_executable ()
 \endcode
 
 Before recreating the build files with CMake, create an empty HelloWorld.cpp into the HelloWorld directory. Now you can re-run CMake. If using Visual Studio, the HelloWorld project should now appear in the Urho3D solution, and you can start writing the actual application into HelloWorld.cpp.
