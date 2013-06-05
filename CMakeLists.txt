@@ -191,11 +191,11 @@ macro (setup_main_executable)
     if (IOS)
         get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
         string (REGEX REPLACE "/Contents/MacOS" "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
-        add_custom_target (RESOURCE_CHECK ALL
+        add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
             \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
             COMMENT "This is a dummy target to check for changes in the Resource folders"
         )
-        add_dependencies (${TARGET_NAME} RESOURCE_CHECK)
+        add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
     endif ()
 endmacro ()
 
