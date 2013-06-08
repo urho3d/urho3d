@@ -381,6 +381,13 @@ class Vehicle : ScriptObject
         frontLeftAxis.otherAxis = steeringRot * Vector3(-1, 0, 0);
         frontRightAxis.otherAxis = steeringRot * Vector3(1, 0, 0);
 
+        // When steering, wake up the wheel rigidbodies so that their orientation is updated
+        if (newSteering != 0.0)
+        {
+            frontLeftDrive.Activate();
+            frontRightDrive.Activate();
+        }
+
         if (accelerator != 0.0)
         {
             // Torques are applied in world space, so need to take the vehicle & wheel rotation into account
