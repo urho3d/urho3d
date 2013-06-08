@@ -65,6 +65,7 @@ Constraint::Constraint(Context* context) :
     otherRotation_(Quaternion::IDENTITY),
     highLimit_(Vector2::ZERO),
     lowLimit_(Vector2::ZERO),
+    softness_(0.0f),
     otherBodyNodeID_(0),
     disableCollision_(false),
     recreateConstraint_(true),
@@ -93,6 +94,7 @@ void Constraint::RegisterObject(Context* context)
     ATTRIBUTE(Constraint, VAR_INT, "Other Body NodeID", otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
     REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR2, "High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR2, "Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "Softness", GetSoftness, SetSoftness, float, 0.0f, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_BOOL, "Disable Collision", disableCollision_, false, AM_DEFAULT);
 }
 
@@ -320,6 +322,16 @@ void Constraint::SetLowLimit(const Vector2& limit)
     }
 }
 
+void Constraint::SetSoftness(float softness)
+{
+    if (softness != softness_)
+    {
+        softness_ = softness;
+        ApplyLimits();
+        MarkNetworkUpdate();
+    }
+}
+
 void Constraint::SetDisableCollision(bool disable)
 {
     if (disable != disableCollision_)
@@ -523,6 +535,8 @@ void Constraint::ApplyLimits()
 {
     if (!constraint_)
         return;
+    
+    constraint_->setParam(BT_CONSTRAINT_CFM, softness_);
     
     switch (constraint_->getConstraintType())
     {

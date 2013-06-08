@@ -205,6 +205,8 @@ static void RegisterConstraint(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Constraint", "const Vector2& get_highLimit() const", asMETHOD(Constraint, GetHighLimit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_lowLimit(const Vector2&in)", asMETHOD(Constraint, SetLowLimit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "const Vector2& get_lowLimit() const", asMETHOD(Constraint, GetLowLimit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "void set_softness(float)", asMETHOD(Constraint, SetSoftness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Constraint", "float get_softness() const", asMETHOD(Constraint, GetSoftness), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "void set_disableCollision(bool)", asMETHOD(Constraint, SetDisableCollision), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "bool get_disableCollision() const" ,asMETHOD(Constraint, GetDisableCollision), asCALL_THISCALL);
     engine->RegisterObjectMethod("Constraint", "RigidBody@+ get_ownBody() const", asMETHOD(Constraint, GetOwnBody), asCALL_THISCALL);

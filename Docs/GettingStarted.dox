@@ -112,7 +112,7 @@ The scripting language used is AngelScript (http://www.angelcode.com/angelscript
 
 On Android and iOS there are no command line options, so running the NinjaSnowWar example is hardcoded. This can be changed from the file Urho3D/Urho3D.cpp.
 
-Currently ten example application scripts exist:
+Currently eleven example application scripts exist:
 
 \section Running_NinjaSnowWar NinjaSnowWar
 
@@ -170,6 +170,21 @@ For details on how to use the editor, see \ref EditorInstructions "Editor instru
 
 \verbatim
 L           Toggle buoyant liquid volume
+\endverbatim
+
+\section Running_Vehicle Vehicle
+
+Simple vehicle physics example. To start, run Vehicle.bat, or use the command Urho3D.exe Scripts/Vehicle.as.
+
+Key and mouse controls:
+
+\verbatim
+WSAD        Steer vehicle
+Mouse       Rotate camera around vehicle
+Space       Toggle debug geometry
+F1          Toggle AngelScript console
+1 to 8      Toggle rendering options
+T           Toggle profiling display
 \endverbatim
 
 \section Running_Navigation Navigation

@@ -8,8 +8,6 @@ float yaw = 0.0;
 float pitch = 0.0;
 int drawDebug = 0;
 
-Text@ downloadsText;
-
 void Start()
 {
     if (!engine.headless)
@@ -41,21 +39,9 @@ void Start()
 
         // Disable physics interpolation to ensure clients get sent physically correct transforms
         testScene.physicsWorld.interpolation = false;
-
-        // Test package download by adding all package files in the cache as requirements for the scene
-        Array<PackageFile@> packages = cache.packageFiles;
-        for (uint i = 0; i < packages.length; ++i)
-            testScene.AddRequiredPackageFile(packages[i]);
     }
     if (runClient)
     {
-        // Test package download. Remove existing Data.pak from resource cache so that it will be downloaded
-        // However, be sure to add the Data directory so that resource requests do not fail in the meanwhile
-        String packageName = fileSystem.programDir + "Data.pak";
-        cache.RemovePackageFile(packageName, false);
-        cache.AddResourceDir(fileSystem.programDir + "Data");
-
-        network.packageCacheDir = fileSystem.programDir;
         network.Connect(serverAddress, serverPort, testScene);
     }
 }
@@ -82,11 +68,6 @@ void InitUI()
     ui.cursor = newCursor;
     if (GetPlatform() == "Android" || GetPlatform() == "iOS")
         ui.cursor.visible = false;
-
-    downloadsText = Text();
-    downloadsText.SetAlignment(HA_CENTER, VA_CENTER);
-    downloadsText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 20);
-    ui.root.AddChild(downloadsText);
 }
 
 void InitScene()
@@ -205,19 +186,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             cameraNode.TranslateRelative(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
         if (input.keyDown['D'])
             cameraNode.TranslateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
-    }
-
-    // Update package download status
-    if (network.serverConnection !is null)
-    {
-        Connection@ connection = network.serverConnection;
-        if (connection.numDownloads > 0)
-        {
-            downloadsText.text = "Downloads: " + connection.numDownloads + " Current download: " +
-                connection.downloadName + " (" + int(connection.downloadProgress * 100.0) + "%)";
-        }
-        else if (!downloadsText.text.empty)
-            downloadsText.text = "";
     }
 }
 

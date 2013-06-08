@@ -417,7 +417,7 @@ Methods:<br>
 - Quaternion Normalized() const
 - Quaternion Inverse() const
 - float DotProduct(const Quaternion&) const
-- Quaternion Slerp(const Quaternion&, float) const
+- Quaternion Slerp(Quaternion, float) const
 - bool Equals(const Quaternion&) const
 - String ToString() const
 
@@ -2632,14 +2632,14 @@ Properties:<br>
 - Zone@ zone (readonly)
 
 
-ColorAnimation
+ColorFrame
 
 Properties:<br>
 - Color color
 - float time
 
 
-TextureAnimation
+TextureFrame
 
 Properties:<br>
 - Rect uv
@@ -2698,6 +2698,7 @@ Properties:<br>
 - bool relative
 - bool sorted
 - bool scaled
+- bool updateInvisible
 - float animationLodBias
 - bool emitting
 - uint numParticles
@@ -2729,10 +2730,10 @@ Properties:<br>
 - float dampingForce
 - float sizeAdd
 - float sizeMul
-- ColorAnimation@[] colors (readonly)
+- ColorFrame@[] colors (readonly)
 - uint numColors
-- TextureAnimation@[] textureAnimations (readonly)
-- uint numTextureAnimations
+- TextureFrame@[] textureFrames (readonly)
+- uint numTextureFrames
 - Zone@ zone (readonly)
 
 
@@ -5792,6 +5793,7 @@ Properties:<br>
 - Vector3 worldPosition
 - Vector2 highLimit
 - Vector2 lowLimit
+- float softness
 - bool disableCollision
 - RigidBody@ ownBody (readonly)
 - RigidBody@ otherBody
