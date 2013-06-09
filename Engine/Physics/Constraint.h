@@ -90,8 +90,10 @@ public:
     void SetHighLimit(const Vector2& limit);
     /// Set low limit. Interpretation is constraint type specific.
     void SetLowLimit(const Vector2& limit);
-    /// Set constraint softness. Default 0 (hard).
-    void SetSoftness(float softness);
+    /// Set constraint error reduction parameter. Zero = leave to default.
+    void SetERP(float erp);
+    /// Set constraint force mixing parameter. Zero = leave to default.
+    void SetCFM(float cfm);
     /// Set whether to disable collisions between connected bodies.
     void SetDisableCollision(bool disable);
     
@@ -119,8 +121,10 @@ public:
     const Vector2& GetHighLimit() const { return highLimit_; }
     /// Return low limit.
     const Vector2& GetLowLimit() const { return lowLimit_; }
-    /// Return constraint softness.
-    float GetSoftness() const { return softness_; }
+    /// Return constraint error reduction parameter.
+    float GetERP() const { return erp_; }
+    /// Return constraint force mixing parameter.
+    float GetCFM() const { return cfm_; }
     /// Return whether collisions between connected bodies are disabled.
     bool GetDisableCollision() const { return disableCollision_; }
     
@@ -165,8 +169,10 @@ private:
     Vector2 highLimit_;
     /// Low limit.
     Vector2 lowLimit_;
-    /// Softness value.
-    float softness_;
+    /// Error reduction parameter.
+    float erp_;
+    /// Constraint force mixing parameter.
+    float cfm_;
     /// Other body node ID for pending constraint recreation.
     int otherBodyNodeID_;
     /// Disable collision between connected bodies flag.

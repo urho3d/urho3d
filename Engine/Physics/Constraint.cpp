@@ -65,7 +65,8 @@ Constraint::Constraint(Context* context) :
     otherRotation_(Quaternion::IDENTITY),
     highLimit_(Vector2::ZERO),
     lowLimit_(Vector2::ZERO),
-    softness_(0.0f),
+    erp_(0.0f),
+    cfm_(0.0f),
     otherBodyNodeID_(0),
     disableCollision_(false),
     recreateConstraint_(true),
@@ -94,7 +95,8 @@ void Constraint::RegisterObject(Context* context)
     ATTRIBUTE(Constraint, VAR_INT, "Other Body NodeID", otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
     REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR2, "High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Constraint, VAR_VECTOR2, "Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "Softness", GetSoftness, SetSoftness, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "ERP Parameter", GetERP, SetERP, float, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Constraint, VAR_FLOAT, "CFM Parameter", GetCFM, SetCFM, float, 0.0f, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_BOOL, "Disable Collision", disableCollision_, false, AM_DEFAULT);
 }
 
@@ -322,11 +324,25 @@ void Constraint::SetLowLimit(const Vector2& limit)
     }
 }
 
-void Constraint::SetSoftness(float softness)
+void Constraint::SetERP(float erp)
 {
-    if (softness != softness_)
+    erp = Max(erp, 0.0f);
+    
+    if (erp != erp_)
     {
-        softness_ = softness;
+        erp_ = erp;
+        ApplyLimits();
+        MarkNetworkUpdate();
+    }
+}
+
+void Constraint::SetCFM(float cfm)
+{
+    cfm = Max(cfm, 0.0f);
+    
+    if (cfm != cfm_)
+    {
+        cfm_ = cfm;
         ApplyLimits();
         MarkNetworkUpdate();
     }
@@ -536,8 +552,6 @@ void Constraint::ApplyLimits()
     if (!constraint_)
         return;
     
-    constraint_->setParam(BT_CONSTRAINT_CFM, softness_);
-    
     switch (constraint_->getConstraintType())
     {
     case HINGE_CONSTRAINT_TYPE:
@@ -567,6 +581,11 @@ void Constraint::ApplyLimits()
     default:
         break;
     }
+    
+    if (erp_ != 0.0f)
+        constraint_->setParam(BT_CONSTRAINT_STOP_ERP, erp_);
+    if (cfm_ != 0.0f)
+        constraint_->setParam(BT_CONSTRAINT_STOP_CFM, cfm_);
 }
 
 }

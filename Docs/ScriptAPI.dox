@@ -5793,7 +5793,8 @@ Properties:<br>
 - Vector3 worldPosition
 - Vector2 highLimit
 - Vector2 lowLimit
-- float softness
+- float erp
+- float cfm
 - bool disableCollision
 - RigidBody@ ownBody (readonly)
 - RigidBody@ otherBody
