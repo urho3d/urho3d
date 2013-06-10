@@ -406,6 +406,6 @@ class Vehicle : ScriptObject
 
         // Apply downforce proportional to velocity
         Vector3 localVelocity = node.worldRotation.Inverse() * hullBody.linearVelocity;
-        hullBody.ApplyForce(Vector3(0, -1, 0) * Abs(localVelocity.z) * downForce);
+        hullBody.ApplyForce(node.worldRotation * Vector3(0, -1, 0) * Abs(localVelocity.z) * downForce);
     }
 }
