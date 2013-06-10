@@ -248,8 +248,8 @@ void HandleMouseMove(StringHash eventType, VariantMap& eventData)
     int mousedy = eventData["DY"].GetInt();
     yaw += mousedx / 10.0;
     pitch += mousedy / 10.0;
-    if (pitch < -60.0)
-        pitch = -60.0;
+    if (pitch < 0.0)
+        pitch = 0.0;
     if (pitch > 60.0)
         pitch = 60.0;
 }
@@ -334,13 +334,15 @@ class Vehicle : ScriptObject
     Node@ rearRight;
     Constraint@ frontLeftAxis;
     Constraint@ frontRightAxis;
-    RigidBody@ frontLeftDrive;
-    RigidBody@ frontRightDrive;
-    RigidBody@ rearLeftDrive;
-    RigidBody@ rearRightDrive;
+    RigidBody@ hullBody;
+    RigidBody@ frontLeftBody;
+    RigidBody@ frontRightBody;
+    RigidBody@ rearLeftBody;
+    RigidBody@ rearRightBody;
 
     float steering = 0.0;
-    float enginePower = 5.0;
+    float enginePower = 8.0;
+    float downForce = 10.0;
     float maxWheelAngle = 22.5;
 
     void SetWheels(Node@ fl, Node@ fr, Node@ rl, Node@ rr)
@@ -350,12 +352,13 @@ class Vehicle : ScriptObject
         rearLeft = rl;
         rearRight = rr;
 
+        hullBody = node.GetComponent("RigidBody");
         frontLeftAxis = frontLeft.GetComponent("Constraint");
         frontRightAxis = frontRight.GetComponent("Constraint");
-        frontLeftDrive = frontLeft.GetComponent("RigidBody");
-        frontRightDrive = frontRight.GetComponent("RigidBody");
-        rearLeftDrive = rearLeft.GetComponent("RigidBody");
-        rearRightDrive = rearRight.GetComponent("RigidBody");
+        frontLeftBody = frontLeft.GetComponent("RigidBody");
+        frontRightBody = frontRight.GetComponent("RigidBody");
+        rearLeftBody = rearLeft.GetComponent("RigidBody");
+        rearRightBody = rearRight.GetComponent("RigidBody");
     }
 
     void FixedUpdate(float timeStep)
@@ -375,28 +378,34 @@ class Vehicle : ScriptObject
                 accelerator = -0.5f;
         }
 
-        steering = steering * 0.9 + newSteering * 0.1;
+        // When steering, wake up the wheel rigidbodies so that their orientation is updated
+        if (newSteering != 0.0)
+        {
+            frontLeftBody.Activate();
+            frontRightBody.Activate();
+            steering = steering * 0.95 + newSteering * 0.05;
+        }
+        else
+            steering = steering * 0.8 + newSteering * 0.2;
+
         Quaternion steeringRot(0, steering * maxWheelAngle, 0);
 
         frontLeftAxis.otherAxis = steeringRot * Vector3(-1, 0, 0);
         frontRightAxis.otherAxis = steeringRot * Vector3(1, 0, 0);
-
-        // When steering, wake up the wheel rigidbodies so that their orientation is updated
-        if (newSteering != 0.0)
-        {
-            frontLeftDrive.Activate();
-            frontRightDrive.Activate();
-        }
 
         if (accelerator != 0.0)
         {
             // Torques are applied in world space, so need to take the vehicle & wheel rotation into account
             Vector3 torqueVec = Vector3(enginePower * accelerator, 0, 0);
             
-            frontLeftDrive.ApplyTorque(node.rotation * steeringRot * torqueVec);
-            frontRightDrive.ApplyTorque(node.rotation * steeringRot * torqueVec);
-            rearLeftDrive.ApplyTorque(node.rotation * torqueVec);
-            rearRightDrive.ApplyTorque(node.rotation * torqueVec);
+            frontLeftBody.ApplyTorque(node.rotation * steeringRot * torqueVec);
+            frontRightBody.ApplyTorque(node.rotation * steeringRot * torqueVec);
+            rearLeftBody.ApplyTorque(node.rotation * torqueVec);
+            rearRightBody.ApplyTorque(node.rotation * torqueVec);
         }
+
+        // Apply downforce proportional to velocity
+        Vector3 localVelocity = node.worldRotation.Inverse() * hullBody.linearVelocity;
+        hullBody.ApplyForce(Vector3(0, -1, 0) * Abs(localVelocity.z) * downForce);
     }
 }
