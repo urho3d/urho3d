@@ -67,7 +67,7 @@ RigidBody::RigidBody(Context* context) :
     compoundShape_(0),
     shiftedCompoundShape_(0),
     gravityOverride_(Vector3::ZERO),
-    centerOfMassShift_(Vector3::ZERO),
+    centerOfMass_(Vector3::ZERO),
     mass_(DEFAULT_MASS),
     collisionLayer_(DEFAULT_COLLISION_LAYER),
     collisionMask_(DEFAULT_COLLISION_MASK),
@@ -162,7 +162,7 @@ void RigidBody::getWorldTransform(btTransform &worldTrans) const
     {
         lastPosition_ = node_->GetWorldPosition();
         lastRotation_ = node_->GetWorldRotation();
-        worldTrans.setOrigin(ToBtVector3(lastPosition_) + ToBtVector3(lastRotation_ * centerOfMassShift_));
+        worldTrans.setOrigin(ToBtVector3(lastPosition_ + lastRotation_ * centerOfMass_));
         worldTrans.setRotation(ToBtQuaternion(lastRotation_));
     }
 }
@@ -170,7 +170,7 @@ void RigidBody::getWorldTransform(btTransform &worldTrans) const
 void RigidBody::setWorldTransform(const btTransform &worldTrans)
 {
     Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
-    Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin()) - newWorldRotation * centerOfMassShift_;
+    Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin()) - newWorldRotation * centerOfMass_;
     RigidBody* parentRigidBody = 0;
 
     // It is possible that the RigidBody component has been kept alive via a shared pointer,
@@ -231,7 +231,7 @@ void RigidBody::SetPosition(Vector3 position)
     if (body_)
     {
         btTransform& worldTrans = body_->getWorldTransform();
-        worldTrans.setOrigin(ToBtVector3(position + ToQuaternion(worldTrans.getRotation()) * centerOfMassShift_));
+        worldTrans.setOrigin(ToBtVector3(position + ToQuaternion(worldTrans.getRotation()) * centerOfMass_));
         
         // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
@@ -268,7 +268,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
     {
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setRotation(ToBtQuaternion(rotation));
-        worldTrans.setOrigin(ToBtVector3(position) + ToBtVector3(rotation * centerOfMassShift_));
+        worldTrans.setOrigin(ToBtVector3(position + rotation * centerOfMass_));
         
         // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
@@ -553,7 +553,7 @@ Vector3 RigidBody::GetPosition() const
     if (body_)
     {
         const btTransform& transform = body_->getWorldTransform();
-        return ToVector3(transform.getOrigin()) - ToQuaternion(transform.getRotation()) * centerOfMassShift_;
+        return ToVector3(transform.getOrigin()) - ToQuaternion(transform.getRotation()) * centerOfMass_;
     }
     else
         return Vector3::ZERO;
@@ -749,7 +749,7 @@ void RigidBody::UpdateMass()
         
         // Reapply rigid body position with new center of mass shift
         Vector3 oldPosition = GetPosition();
-        centerOfMassShift_ = ToVector3(principal.getOrigin());
+        centerOfMass_ = ToVector3(principal.getOrigin());
         SetPosition(oldPosition);
         
         // Calculate final inertia
@@ -758,6 +758,15 @@ void RigidBody::UpdateMass()
             shiftedCompoundShape_->calculateLocalInertia(mass_, localInertia);
         body_->setMassProps(mass_, localInertia);
         body_->updateInertiaTensor();
+        
+        // Reapply constraint positions for new center of mass shift
+        if (node_)
+        {
+            PODVector<Constraint*> constraints;
+            node_->GetComponents<Constraint>(constraints);
+            for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
+                (*i)->ApplyFrames();
+        }
     }
 }
 
@@ -852,10 +861,12 @@ void RigidBody::OnMarkedDirty(Node* node)
 
         if (!newRotation.Equals(lastRotation_))
         {
+            // Due to possible center of mass offset, if rotation changes, update position also
             lastRotation_ = newRotation;
-            SetRotation(newRotation);
+            lastPosition_ = newPosition;
+            SetTransform(newPosition, newRotation);
         }
-        if (!newPosition.Equals(lastPosition_))
+        else if (!newPosition.Equals(lastPosition_))
         {
             lastPosition_ = newPosition;
             SetPosition(newPosition);
@@ -898,8 +909,6 @@ void RigidBody::AddBodyToWorld()
     if (mass_ < 0.0f)
         mass_ = 0.0f;
 
-    bool massUpdated = false;
-
     if (body_)
         RemoveBodyFromWorld();
     else
@@ -920,14 +929,11 @@ void RigidBody::AddBodyToWorld()
         }
 
         // Check if CollisionShapes already exist in the node and add them to the compound shape.
-        // Note: NotifyRigidBody() will cause mass to be updated
+        // Do not update mass yet, but do it once all shapes have been added
         PODVector<CollisionShape*> shapes;
         node_->GetComponents<CollisionShape>(shapes);
         for (PODVector<CollisionShape*>::Iterator i = shapes.Begin(); i != shapes.End(); ++i)
-        {
-            massUpdated = true;
-            (*i)->NotifyRigidBody();
-        }
+            (*i)->NotifyRigidBody(false);
 
         // Check if this node contains Constraint components that were waiting for the rigid body to be created, and signal them
         // to create themselves now
@@ -937,9 +943,7 @@ void RigidBody::AddBodyToWorld()
             (*i)->CreateConstraint();
     }
 
-    if (!massUpdated)
-        UpdateMass();
-
+    UpdateMass();
     UpdateGravity();
 
     int flags = body_->getCollisionFlags();

@@ -200,8 +200,8 @@ public:
     /// Return world-space bounding box.
     BoundingBox GetWorldBoundingBox() const;
     
-    /// Update the new collision shape to the RigidBody, and tell it to update its mass.
-    void NotifyRigidBody();
+    /// Update the new collision shape to the RigidBody.
+    void NotifyRigidBody(bool updateMass = true);
     /// Set model attribute.
     void SetModelAttr(ResourceRef value);
     /// Return model attribute.

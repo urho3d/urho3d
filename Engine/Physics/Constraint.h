@@ -130,6 +130,8 @@ public:
     
     /// Release the constraint.
     void ReleaseConstraint();
+    /// Apply constraint frames.
+    void ApplyFrames();
     
 protected:
     /// Handle node being assigned.
@@ -140,8 +142,6 @@ protected:
 private:
     /// Create the constraint.
     void CreateConstraint();
-    /// Apply constraint frames.
-    void ApplyFrames();
     /// Apply high and low constraint limits.
     void ApplyLimits();
     

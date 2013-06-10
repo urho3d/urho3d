@@ -184,6 +184,8 @@ public:
     bool GetUseGravity() const { return useGravity_; }
     /// Return gravity override. If zero (default), uses the physics world's gravity.
     const Vector3& GetGravityOverride() const { return gravityOverride_; }
+    /// Return center of mass offset.
+    const Vector3& GetCenterOfMass() const { return centerOfMass_; }
     /// Return kinematic mode flag.
     bool IsKinematic() const { return kinematic_; }
     /// Return phantom mode flag.
@@ -236,7 +238,7 @@ private:
     btRigidBody* body_;
     /// Bullet compound collision shape.
     btCompoundShape* compoundShape_;
-    /// Bullet shifted compound collision shape.
+    /// Compound collision shape with center of mass offset applied.
     btCompoundShape* shiftedCompoundShape_;
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
@@ -244,8 +246,8 @@ private:
     PODVector<Constraint*> constraints_;
     /// Gravity override vector.
     Vector3 gravityOverride_;
-    /// Center of mass shift vector.
-    Vector3 centerOfMassShift_;
+    /// Center of mass offset.
+    Vector3 centerOfMass_;
     /// Mass.
     float mass_;
     /// Attribute buffer for network replication.

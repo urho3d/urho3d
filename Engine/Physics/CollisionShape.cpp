@@ -671,7 +671,7 @@ BoundingBox CollisionShape::GetWorldBoundingBox() const
         return BoundingBox();
 }
 
-void CollisionShape::NotifyRigidBody()
+void CollisionShape::NotifyRigidBody(bool updateMass)
 {
     btCompoundShape* compound = GetParentCompoundShape();
     if (node_ && shape_ && compound)
@@ -697,7 +697,8 @@ void CollisionShape::NotifyRigidBody()
         }
         
         // Finally tell the rigid body to update its mass
-        rigidBody_->UpdateMass();
+        if (updateMass)
+            rigidBody_->UpdateMass();
     }
 }
 

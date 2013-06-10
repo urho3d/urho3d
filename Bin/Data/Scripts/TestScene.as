@@ -530,8 +530,8 @@ void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, con
     // any components, it is important that the LOCAL creation mode is specified.
     RigidBody@ body = boneNode.CreateComponent("RigidBody", LOCAL);
     body.mass = 1.0;
-    body.linearDamping = 0.2;
-    body.angularDamping = 0.9;
+    body.linearDamping = 0.05;
+    body.angularDamping = 0.85;
     body.linearRestThreshold = 1.5;
     body.angularRestThreshold = 2.5;
 
