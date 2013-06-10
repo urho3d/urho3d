@@ -51,4 +51,11 @@ inline Quaternion ToQuaternion(const btQuaternion& quaternion)
     return Quaternion(quaternion.w(), quaternion.x(), quaternion.y(), quaternion.z());
 }
 
+inline bool HasWorldScaleChanged(const Vector3& oldWorldScale, const Vector3& newWorldScale)
+{
+    Vector3 delta = newWorldScale - oldWorldScale;
+    float dot = delta.DotProduct(delta);
+    return dot > 0.01f;
+}
+
 }

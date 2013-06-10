@@ -65,7 +65,9 @@ RigidBody::RigidBody(Context* context) :
     Component(context),
     body_(0),
     compoundShape_(0),
+    shiftedCompoundShape_(0),
     gravityOverride_(Vector3::ZERO),
+    centerOfMassShift_(Vector3::ZERO),
     mass_(DEFAULT_MASS),
     collisionLayer_(DEFAULT_COLLISION_LAYER),
     collisionMask_(DEFAULT_COLLISION_MASK),
@@ -80,6 +82,7 @@ RigidBody::RigidBody(Context* context) :
     inWorld_(false)
 {
     compoundShape_ = new btCompoundShape();
+    shiftedCompoundShape_ = new btCompoundShape();
 }
 
 RigidBody::~RigidBody()
@@ -91,6 +94,8 @@ RigidBody::~RigidBody()
 
     delete compoundShape_;
     compoundShape_ = 0;
+    delete shiftedCompoundShape_;
+    shiftedCompoundShape_ = 0;
 }
 
 void RigidBody::RegisterObject(Context* context)
@@ -98,8 +103,8 @@ void RigidBody::RegisterObject(Context* context)
     context->RegisterFactory<RigidBody>(PHYSICS_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
@@ -157,15 +162,15 @@ void RigidBody::getWorldTransform(btTransform &worldTrans) const
     {
         lastPosition_ = node_->GetWorldPosition();
         lastRotation_ = node_->GetWorldRotation();
-        worldTrans.setOrigin(ToBtVector3(lastPosition_));
+        worldTrans.setOrigin(ToBtVector3(lastPosition_) + ToBtVector3(lastRotation_ * centerOfMassShift_));
         worldTrans.setRotation(ToBtQuaternion(lastRotation_));
     }
 }
 
 void RigidBody::setWorldTransform(const btTransform &worldTrans)
 {
-    Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin());
     Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
+    Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin()) - newWorldRotation * centerOfMassShift_;
     RigidBody* parentRigidBody = 0;
 
     // It is possible that the RigidBody component has been kept alive via a shared pointer,
@@ -202,7 +207,7 @@ void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         physicsWorld_->SetDebugDepthTest(depthTest);
 
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
-        world->debugDrawObject(body_->getWorldTransform(), compoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) :
+        world->debugDrawObject(body_->getWorldTransform(), shiftedCompoundShape_, IsActive() ? btVector3(1.0f, 1.0f, 1.0f) :
             btVector3(0.0f, 1.0f, 0.0f));
 
         physicsWorld_->SetDebugRenderer(0);
@@ -226,8 +231,8 @@ void RigidBody::SetPosition(Vector3 position)
     if (body_)
     {
         btTransform& worldTrans = body_->getWorldTransform();
-        worldTrans.setOrigin(ToBtVector3(position));
-
+        worldTrans.setOrigin(ToBtVector3(position + ToQuaternion(worldTrans.getRotation()) * centerOfMassShift_));
+        
         // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
@@ -262,9 +267,9 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
     if (body_)
     {
         btTransform& worldTrans = body_->getWorldTransform();
-        worldTrans.setOrigin(ToBtVector3(position));
         worldTrans.setRotation(ToBtQuaternion(rotation));
-
+        worldTrans.setOrigin(ToBtVector3(position) + ToBtVector3(rotation * centerOfMassShift_));
+        
         // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
@@ -546,7 +551,10 @@ void RigidBody::Activate()
 Vector3 RigidBody::GetPosition() const
 {
     if (body_)
-        return ToVector3(body_->getWorldTransform().getOrigin());
+    {
+        const btTransform& transform = body_->getWorldTransform();
+        return ToVector3(transform.getOrigin()) - ToQuaternion(transform.getRotation()) * centerOfMassShift_;
+    }
     else
         return Vector3::ZERO;
 }
@@ -710,9 +718,44 @@ void RigidBody::UpdateMass()
 {
     if (body_)
     {
+        btTransform principal;
+        principal.setRotation(btQuaternion::getIdentity());
+        principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
+        
+        // Calculate center of mass shift from all the collision shapes
+        unsigned numShapes = compoundShape_->getNumChildShapes();
+        if (numShapes)
+        {
+            PODVector<float> masses(numShapes);
+            for (unsigned i = 0; i < numShapes; ++i)
+            {
+                // The actual mass does not matter, divide evenly between child shapes
+                masses[i] = 1.0f;
+            }
+            
+            btVector3 inertia(0.0f, 0.0f, 0.0f);
+            compoundShape_->calculatePrincipalAxisTransform(&masses[0], principal, inertia);
+        }
+        
+        // Add child shapes to shifted compound shape with adjusted offset
+        while (shiftedCompoundShape_->getNumChildShapes())
+            shiftedCompoundShape_->removeChildShapeByIndex(0);
+        for (unsigned i = 0; i < numShapes; ++i)
+        {
+            btTransform adjusted = compoundShape_->getChildTransform(i);
+            adjusted.setOrigin(adjusted.getOrigin() - principal.getOrigin());
+            shiftedCompoundShape_->addChildShape(adjusted, compoundShape_->getChildShape(i));
+        }
+        
+        // Reapply rigid body position with new center of mass shift
+        Vector3 oldPosition = GetPosition();
+        centerOfMassShift_ = ToVector3(principal.getOrigin());
+        SetPosition(oldPosition);
+        
+        // Calculate final inertia
         btVector3 localInertia(0.0f, 0.0f, 0.0f);
         if (mass_ > 0.0f)
-            compoundShape_->calculateLocalInertia(mass_, localInertia);
+            shiftedCompoundShape_->calculateLocalInertia(mass_, localInertia);
         body_->setMassProps(mass_, localInertia);
         body_->updateInertiaTensor();
     }
@@ -807,15 +850,15 @@ void RigidBody::OnMarkedDirty(Node* node)
         Vector3 newPosition = node_->GetWorldPosition();
         Quaternion newRotation = node_->GetWorldRotation();
 
-        if (!newPosition.Equals(lastPosition_))
-        {
-            lastPosition_ = newPosition;
-            SetPosition(newPosition);
-        }
         if (!newRotation.Equals(lastRotation_))
         {
             lastRotation_ = newRotation;
             SetRotation(newRotation);
+        }
+        if (!newPosition.Equals(lastPosition_))
+        {
+            lastPosition_ = newPosition;
+            SetPosition(newPosition);
         }
     }
 }
@@ -863,7 +906,7 @@ void RigidBody::AddBodyToWorld()
     {
         // Correct inertia will be calculated below
         btVector3 localInertia(0.0f, 0.0f, 0.0f);
-        body_ = new btRigidBody(mass_, this, compoundShape_, localInertia);
+        body_ = new btRigidBody(mass_, this, shiftedCompoundShape_, localInertia);
         body_->setUserPointer(this);
 
         // Check for existence of the SmoothedTransform component, which should be created by now in network client mode.

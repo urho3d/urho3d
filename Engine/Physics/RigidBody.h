@@ -236,12 +236,16 @@ private:
     btRigidBody* body_;
     /// Bullet compound collision shape.
     btCompoundShape* compoundShape_;
+    /// Bullet shifted compound collision shape.
+    btCompoundShape* shiftedCompoundShape_;
     /// Physics world.
     WeakPtr<PhysicsWorld> physicsWorld_;
     /// Constraints that refer to this rigid body.
     PODVector<Constraint*> constraints_;
     /// Gravity override vector.
     Vector3 gravityOverride_;
+    /// Center of mass shift vector.
+    Vector3 centerOfMassShift_;
     /// Mass.
     float mass_;
     /// Attribute buffer for network replication.

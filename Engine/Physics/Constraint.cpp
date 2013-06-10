@@ -413,7 +413,7 @@ void Constraint::OnNodeSet(Node* node)
 void Constraint::OnMarkedDirty(Node* node)
 {
     /// \todo This does not catch the connected body node's scale changing
-    if (!node->GetWorldScale().Equals(cachedWorldScale_))
+    if (HasWorldScaleChanged(cachedWorldScale_, node->GetWorldScale()))
         ApplyFrames();
 }
 
