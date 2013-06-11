@@ -248,12 +248,15 @@ void RigidBody::SetRotation(Quaternion rotation)
 {
     if (body_)
     {
+        // Due to center of mass offset, we need to adjust position also
+        Vector3 oldPosition = GetPosition();
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setRotation(ToBtQuaternion(rotation));
+        worldTrans.setOrigin(ToBtVector3(oldPosition + rotation * centerOfMass_));
 
-        // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setRotation(worldTrans.getRotation());
+        interpTrans.setOrigin(worldTrans.getOrigin());
         body_->setInterpolationWorldTransform(interpTrans);
         body_->updateInertiaTensor();
 
@@ -270,7 +273,6 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         worldTrans.setRotation(ToBtQuaternion(rotation));
         worldTrans.setOrigin(ToBtVector3(position + rotation * centerOfMass_));
         
-        // When forcing the physics position, set also interpolated position so that there is no jitter
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setOrigin(worldTrans.getOrigin());
         interpTrans.setRotation(worldTrans.getRotation());
@@ -739,7 +741,7 @@ void RigidBody::UpdateMass()
         
         // Add child shapes to shifted compound shape with adjusted offset
         while (shiftedCompoundShape_->getNumChildShapes())
-            shiftedCompoundShape_->removeChildShapeByIndex(0);
+            shiftedCompoundShape_->removeChildShapeByIndex(shiftedCompoundShape_->getNumChildShapes() - 1);
         for (unsigned i = 0; i < numShapes; ++i)
         {
             btTransform adjusted = compoundShape_->getChildTransform(i);
