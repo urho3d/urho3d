@@ -123,13 +123,13 @@ public:
     void SetCollisionEventMode(CollisionEventMode mode);
     /// Apply force to center of mass.
     void ApplyForce(const Vector3& force);
-    /// Apply force at position.
+    /// Apply force at local position.
     void ApplyForce(const Vector3& force, const Vector3& position);
     /// Apply torque.
     void ApplyTorque(const Vector3& torque);
     /// Apply impulse to center of mass.
     void ApplyImpulse(const Vector3& impulse);
-    /// Apply impulse at position.
+    /// Apply impulse at local position.
     void ApplyImpulse(const Vector3& impulse, const Vector3& position);
     /// Apply torque impulse.
     void ApplyTorqueImpulse(const Vector3& torque);
@@ -154,6 +154,8 @@ public:
     Vector3 GetLinearVelocity() const;
     /// Return linear degrees of freedom.
     Vector3 GetLinearFactor() const;
+    /// Return linear velocity at local point.
+    Vector3 GetVelocityAtPoint(const Vector3& position) const;
     /// Return linear velocity deactivation threshold.
     float GetLinearRestThreshold() const;
     /// Return linear velocity damping threshold.

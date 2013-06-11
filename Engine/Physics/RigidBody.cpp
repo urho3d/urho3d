@@ -585,6 +585,14 @@ Vector3 RigidBody::GetLinearFactor() const
         return Vector3::ZERO;
 }
 
+Vector3 RigidBody::GetVelocityAtPoint(const Vector3& position) const
+{
+    if (body_)
+        return ToVector3(body_->getVelocityInLocalPoint(ToBtVector3(position)));
+    else
+        return Vector3::ZERO;
+}
+
 float RigidBody::GetLinearRestThreshold() const
 {
     if (body_)

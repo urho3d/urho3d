@@ -5709,6 +5709,7 @@ Methods:<br>
 - void ApplyTorqueImpulse(const Vector3&)
 - void ResetForces()
 - void Activate()
+- Vector3 GetVelocityAtPoint(const Vector3&) const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -5742,6 +5743,7 @@ Properties:<br>
 - float ccdMotionThreshold
 - bool useGravity
 - Vector3 gravityOverride
+- Vector3 centerOfMass (readonly)
 - bool phantom
 - bool kinematic
 - bool active (readonly)
