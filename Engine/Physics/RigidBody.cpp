@@ -550,6 +550,12 @@ void RigidBody::Activate()
         body_->activate(true);
 }
 
+void RigidBody::ReAddBodyToWorld()
+{
+    if (body_ && inWorld_)
+        AddBodyToWorld();
+}
+
 Vector3 RigidBody::GetPosition() const
 {
     if (body_)

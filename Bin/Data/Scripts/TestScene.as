@@ -186,7 +186,7 @@ void InitScene()
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(object.model, 0);
+        shape.SetTriangleMesh(object.model);
     }
 
     for (uint i = 0; i < 50; ++i)

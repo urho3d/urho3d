@@ -135,6 +135,7 @@ void InitScene()
         terrain = terrainNode.CreateComponent("Terrain");
         terrain.patchSize = 64;
         terrain.spacing = Vector3(2, 0.5, 2);
+        terrain.smoothing = true;
         terrain.heightMap = cache.GetResource("Image", "Textures/HeightMap.png");
         terrain.material = cache.GetResource("Material", "Materials/Terrain.xml");
         terrain.occluder = true;
@@ -162,7 +163,7 @@ void InitScene()
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
+        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"));
     }
 }
 

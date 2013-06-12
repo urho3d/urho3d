@@ -137,6 +137,8 @@ public:
     void ResetForces();
     /// Activate rigid body if it was resting.
     void Activate();
+    /// Readd rigid body to the physics world to clean up internal state like stale contacts.
+    void ReAddBodyToWorld();
     
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }

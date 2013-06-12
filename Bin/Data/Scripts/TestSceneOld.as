@@ -126,7 +126,7 @@ void InitScene()
 
         RigidBody@ body = newNode.CreateComponent("RigidBody");
         CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(object.model, 0);
+        shape.SetTriangleMesh(object.model);
     }
 
     // Create mushroom groups

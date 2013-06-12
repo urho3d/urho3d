@@ -173,7 +173,7 @@ void InitScene()
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
+        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"));
     }
 }
 

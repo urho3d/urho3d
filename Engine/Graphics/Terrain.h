@@ -56,6 +56,8 @@ public:
     void SetPatchSize(int size);
     /// Set vertex (XZ) and height (Y) spacing.
     void SetSpacing(const Vector3& spacing);
+    /// Set smoothing of heightmap.
+    void SetSmoothing(bool enable);
     /// Set heightmap image. Dimensions should be a power of two + 1. Uses 8-bit grayscale, or optionally red as MSB and green as LSB for 16-bit accuracy. Return true if successful.
     bool SetHeightMap(Image* image);
     /// Set material.
@@ -91,6 +93,8 @@ public:
     const IntVector2& GetNumVertices() const { return numVertices_; }
     /// Return heightmap size in patches.
     const IntVector2& GetNumPatches() const { return numPatches_; }
+    /// Return whether smoothing is in use.
+    bool GetSmoothing() const { return smoothing_; }
     /// Return heightmap image.
     Image* GetHeightMap() const;
     /// Return material.
@@ -148,6 +152,8 @@ public:
 private:
     /// Fully regenerate terrain geometry.
     void CreateGeometry();
+    /// Filter the heightmap.
+    void SmoothHeightMap();
     /// Create index data shared by all patches.
     void CreateIndexData();
     /// Return an uninterpolated terrain height value, clamping to edges.
@@ -191,6 +197,8 @@ private:
     int patchSize_;
     /// Number of terrain LOD levels.
     unsigned numLodLevels_;
+    /// Smoothing enable flag.
+    bool smoothing_;
     /// Visible flag.
     bool visible_;
     /// Shadowcaster flag.

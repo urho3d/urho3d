@@ -1,7 +1,7 @@
 Scene@ testScene;
 Camera@ camera;
 Node@ cameraNode;
-Node@ vehicleHullNode;
+Node@ vehicleNode;
 
 float yaw = 0.0;
 float pitch = 0.0;
@@ -18,7 +18,6 @@ void Start()
         OpenConsoleWindow();
 
     InitScene();
-    InitVehicle();
 
     SubscribeToEvent("Update", "HandleUpdate");
     SubscribeToEvent("PostUpdate", "HandlePostUpdate");
@@ -103,6 +102,7 @@ void InitScene()
         terrain = terrainNode.CreateComponent("Terrain");
         terrain.patchSize = 64;
         terrain.spacing = Vector3(2, 0.1, 2);
+        terrain.smoothing = true;
         terrain.heightMap = cache.GetResource("Image", "Textures/HeightMap.png");
         terrain.material = cache.GetResource("Material", "Materials/Terrain.xml");
         terrain.occluder = true;
@@ -111,7 +111,6 @@ void InitScene()
         body.collisionLayer = 2;
         CollisionShape@ shape = terrainNode.CreateComponent("CollisionShape");
         shape.SetTerrain();
-        shape.margin = 0.01;
     }
 
     for (uint i = 0; i < 1000; ++i)
@@ -132,8 +131,14 @@ void InitScene()
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         body.collisionLayer = 2;
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0);
+        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"));
     }
+
+    vehicleNode = testScene.CreateChild("VehicleHull");
+    vehicleNode.position = Vector3(0, 5, 0);
+
+    Vehicle@ vehicle = cast<Vehicle>(vehicleNode.CreateScriptObject(scriptFile, "Vehicle"));
+    vehicle.Init();
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -148,12 +153,12 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     float timeStep = eventData["TimeStep"].GetFloat();
 
     // Physics update has completed. Position camera behind vehicle
-    Quaternion dir(vehicleHullNode.rotation.yaw, Vector3(0, 1, 0));;
+    Quaternion dir(vehicleNode.rotation.yaw, Vector3(0, 1, 0));;
     dir = dir * Quaternion(yaw, Vector3(0, 1, 0));
     dir = dir * Quaternion(pitch, Vector3(1, 0, 0));
 
-    Vector3 cameraTargetPos = vehicleHullNode.position - dir * Vector3(0, 0, 10);
-    Vector3 cameraStartPos = vehicleHullNode.position;
+    Vector3 cameraTargetPos = vehicleNode.position - dir * Vector3(0, 0, 10);
+    Vector3 cameraStartPos = vehicleNode.position;
 
     // Raycast camera against static objects (physics collision mask 2)
     // and move it closer to the vehicle if something in between
@@ -266,66 +271,6 @@ void HandlePostRenderUpdate()
         testScene.physicsWorld.DrawDebugGeometry(true);
 }
 
-void InitVehicle()
-{
-    vehicleHullNode = testScene.CreateChild("VehicleHull");
-    StaticModel@ hullObject = vehicleHullNode.CreateComponent("StaticModel");
-    RigidBody@ hullBody = vehicleHullNode.CreateComponent("RigidBody");
-    CollisionShape@ hullShape = vehicleHullNode.CreateComponent("CollisionShape");
-
-    vehicleHullNode.position = Vector3(0, 5, 0);
-    vehicleHullNode.scale = Vector3(1.5, 1, 3);
-    hullObject.model = cache.GetResource("Model", "Models/Box.mdl");
-    hullObject.material = cache.GetResource("Material", "Materials/Stone.xml");
-    hullObject.castShadows = true;
-    hullShape.SetBox(Vector3(1, 1, 1));
-    hullBody.mass = 3;
-    hullBody.linearDamping = 0.2; // Some air resistance
-    hullBody.collisionLayer = 1;
-
-    Node@ fl = InitVehicleWheel("FrontLeft", vehicleHullNode, Vector3(-0.6, -0.4, 0.3));
-    Node@ fr = InitVehicleWheel("FrontRight", vehicleHullNode, Vector3(0.6, -0.4, 0.3));
-    Node@ rr = InitVehicleWheel("RearLeft", vehicleHullNode, Vector3(-0.6, -0.4, -0.3));
-    Node@ rl = InitVehicleWheel("RearRight", vehicleHullNode, Vector3(0.6, -0.4, -0.3));
-
-    Vehicle@ vehicle = cast<Vehicle>(vehicleHullNode.CreateScriptObject(scriptFile, "Vehicle"));
-    vehicle.SetWheels(fl, fr, rl, rr);
-}
-
-Node@ InitVehicleWheel(String name, Node@ vehicleHullNode, Vector3 offset)
-{
-    Node@ wheelNode = testScene.CreateChild(name);
-    wheelNode.position = vehicleHullNode.LocalToWorld(offset);
-    wheelNode.rotation = vehicleHullNode.worldRotation * (offset.x >= 0.0 ? Quaternion(0, 0, -90) : Quaternion(0, 0, 90));
-    wheelNode.scale = Vector3(0.75, 0.5, 0.75);
-
-    StaticModel@ wheelObject = wheelNode.CreateComponent("StaticModel");
-    RigidBody@ wheelBody = wheelNode.CreateComponent("RigidBody");
-    CollisionShape@ wheelShape = wheelNode.CreateComponent("CollisionShape");
-    Constraint@ wheelConstraint = wheelNode.CreateComponent("Constraint");
-
-    wheelObject.model = cache.GetResource("Model", "Models/Cylinder.mdl");
-    wheelObject.material = cache.GetResource("Material", "Materials/Stone.xml");
-    wheelObject.castShadows = true;
-    wheelShape.SetCylinder(1, 1);
-    wheelBody.friction = 1;
-    wheelBody.mass = 1;
-    wheelBody.linearDamping = 0.2; // Some air resistance
-    wheelBody.angularDamping = 0.75; // Current version of Bullet used by Urho doesn't have rolling friction, so mimic that with
-                                    // some angular damping on the wheels
-    wheelBody.collisionLayer = 1;
-    wheelConstraint.constraintType = CONSTRAINT_HINGE;
-    wheelConstraint.otherBody = vehicleHullNode.GetComponent("RigidBody");
-    wheelConstraint.worldPosition = wheelNode.worldPosition; // Set constraint's both ends at wheel's location
-    wheelConstraint.axis = Vector3(0, 1, 0); // Wheel rotates around its local Y-axis
-    wheelConstraint.otherAxis = offset.x >= 0.0 ? Vector3(1, 0, 0) : Vector3(-1, 0, 0); // Wheel's hull axis points either left or right
-    wheelConstraint.lowLimit = Vector2(-180, 0); // Let the wheel rotate freely around the axis
-    wheelConstraint.highLimit = Vector2(180, 0);
-    wheelConstraint.disableCollision = true; // Let the wheel intersect the vehicle hull
-
-    return wheelNode;
-}
-
 class Vehicle : ScriptObject
 {
     Node@ frontLeft;
@@ -341,24 +286,71 @@ class Vehicle : ScriptObject
     RigidBody@ rearRightBody;
 
     float steering = 0.0;
-    float enginePower = 8.0;
+    float enginePower = 10.0;
     float downForce = 10.0;
     float maxWheelAngle = 22.5;
 
-    void SetWheels(Node@ fl, Node@ fr, Node@ rl, Node@ rr)
+    void Init()
     {
-        frontLeft = fl;
-        frontRight = fr;
-        rearLeft = rl;
-        rearRight = rr;
+        StaticModel@ hullObject = node.CreateComponent("StaticModel");
+        hullBody = node.CreateComponent("RigidBody");
+        CollisionShape@ hullShape = node.CreateComponent("CollisionShape");
 
-        hullBody = node.GetComponent("RigidBody");
+        node.scale = Vector3(1.5, 1, 3);
+        hullObject.model = cache.GetResource("Model", "Models/Box.mdl");
+        hullObject.material = cache.GetResource("Material", "Materials/Stone.xml");
+        hullObject.castShadows = true;
+        hullShape.SetBox(Vector3(1, 1, 1));
+        hullBody.mass = 4;
+        hullBody.linearDamping = 0.2; // Some air resistance
+        hullBody.angularDamping = 0.5;
+        hullBody.collisionLayer = 1;
+    
+        frontLeft = InitWheel("FrontLeft", Vector3(-0.6, -0.4, 0.3));
+        frontRight = InitWheel("FrontRight", Vector3(0.6, -0.4, 0.3));
+        rearLeft = InitWheel("RearLeft", Vector3(-0.6, -0.4, -0.3));
+        rearRight = InitWheel("RearRight", Vector3(0.6, -0.4, -0.3));
+        
         frontLeftAxis = frontLeft.GetComponent("Constraint");
         frontRightAxis = frontRight.GetComponent("Constraint");
         frontLeftBody = frontLeft.GetComponent("RigidBody");
         frontRightBody = frontRight.GetComponent("RigidBody");
         rearLeftBody = rearLeft.GetComponent("RigidBody");
         rearRightBody = rearRight.GetComponent("RigidBody");
+    }
+
+    Node@ InitWheel(const String&in name, const Vector3&in offset)
+    {
+        Node@ wheelNode = testScene.CreateChild(name);
+        wheelNode.position = node.LocalToWorld(offset);
+        wheelNode.rotation = node.worldRotation * (offset.x >= 0.0 ? Quaternion(0, 0, -90) : Quaternion(0, 0, 90));
+        wheelNode.scale = Vector3(0.8, 0.5, 0.8);
+
+        StaticModel@ wheelObject = wheelNode.CreateComponent("StaticModel");
+        RigidBody@ wheelBody = wheelNode.CreateComponent("RigidBody");
+        CollisionShape@ wheelShape = wheelNode.CreateComponent("CollisionShape");
+        Constraint@ wheelConstraint = wheelNode.CreateComponent("Constraint");
+
+        wheelObject.model = cache.GetResource("Model", "Models/Cylinder.mdl");
+        wheelObject.material = cache.GetResource("Material", "Materials/Stone.xml");
+        wheelObject.castShadows = true;
+        wheelShape.SetSphere(1);
+        wheelBody.friction = 1;
+        wheelBody.mass = 1;
+        wheelBody.linearDamping = 0.2; // Some air resistance
+        wheelBody.angularDamping = 0.75; // Current version of Bullet used by Urho doesn't have rolling friction, so mimic that with
+                                        // some angular damping on the wheels
+        wheelBody.collisionLayer = 1;
+        wheelConstraint.constraintType = CONSTRAINT_HINGE;
+        wheelConstraint.otherBody = node.GetComponent("RigidBody");
+        wheelConstraint.worldPosition = wheelNode.worldPosition; // Set constraint's both ends at wheel's location
+        wheelConstraint.axis = Vector3(0, 1, 0); // Wheel rotates around its local Y-axis
+        wheelConstraint.otherAxis = offset.x >= 0.0 ? Vector3(1, 0, 0) : Vector3(-1, 0, 0); // Wheel's hull axis points either left or right
+        wheelConstraint.lowLimit = Vector2(-180, 0); // Let the wheel rotate freely around the axis
+        wheelConstraint.highLimit = Vector2(180, 0);
+        wheelConstraint.disableCollision = true; // Let the wheel intersect the vehicle hull
+    
+        return wheelNode;
     }
 
     void FixedUpdate(float timeStep)
@@ -405,7 +397,7 @@ class Vehicle : ScriptObject
         }
 
         // Apply downforce proportional to velocity
-        Vector3 localVelocity = node.worldRotation.Inverse() * hullBody.linearVelocity;
-        hullBody.ApplyForce(node.worldRotation * Vector3(0, -1, 0) * Abs(localVelocity.z) * downForce);
+        Vector3 localVelocity = hullBody.rotation.Inverse() * hullBody.linearVelocity;
+        hullBody.ApplyForce(hullBody.rotation * Vector3(0, -1, 0) * Abs(localVelocity.z) * downForce);
     }
 }

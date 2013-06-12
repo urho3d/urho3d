@@ -2937,6 +2937,7 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - Material@ material
+- bool smoothing
 - Image@ heightMap
 - int patchSize
 - Vector3 spacing
@@ -5653,8 +5654,8 @@ Methods:<br>
 - void SetCylinder(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
 - void SetCapsule(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
 - void SetCone(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
-- void SetTriangleMesh(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
-- void SetConvexHull(Model@, uint, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
+- void SetTriangleMesh(Model@, uint arg1 = 0, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
+- void SetConvexHull(Model@, uint arg1 = 0, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
 - void SetCustomConvexHull(CustomGeometry@, const Vector3& arg1 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
 - void SetTerrain()
 - void SetTransform(const Vector3&, const Quaternion&)
@@ -5710,6 +5711,7 @@ Methods:<br>
 - void ApplyTorqueImpulse(const Vector3&)
 - void ResetForces()
 - void Activate()
+- void ReAddBodyToWorld()
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 
 Properties:<br>

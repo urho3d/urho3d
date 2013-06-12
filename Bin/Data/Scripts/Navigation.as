@@ -177,7 +177,7 @@ void InitScene()
 
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(object.model, 0);
+        shape.SetTriangleMesh(object.model);
     }
 
     testScene.CreateComponent("Navigable");
@@ -424,7 +424,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
                 RigidBody@ body = objectNode.CreateComponent("RigidBody");
                 CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-                shape.SetTriangleMesh(object.model, 0);
+                shape.SetTriangleMesh(object.model);
 
                 rebuild = true;
                 rebuildBox = object.worldBoundingBox;

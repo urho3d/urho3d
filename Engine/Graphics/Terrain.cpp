@@ -68,6 +68,7 @@ Terrain::Terrain(Context* context) :
     numPatches_(IntVector2::ZERO),
     patchSize_(DEFAULT_PATCH_SIZE),
     numLodLevels_(1),
+    smoothing_(false),
     visible_(true),
     castShadows_(false),
     occluder_(false),
@@ -98,6 +99,7 @@ void Terrain::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Terrain, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(Terrain, VAR_VECTOR3, "Vertex Spacing", spacing_, DEFAULT_SPACING, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_INT, "Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
+    ATTRIBUTE(Terrain, VAR_BOOL, "Smooth Height Map", smoothing_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Is Occluder", IsOccluder, SetOccluder, bool,  false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Terrain, VAR_BOOL, "Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
@@ -137,6 +139,20 @@ void Terrain::OnSetEnabled()
     }
 }
 
+void Terrain::SetPatchSize(int size)
+{
+    if (size < MIN_PATCH_SIZE || size > MAX_PATCH_SIZE || !IsPowerOfTwo(size))
+        return;
+
+    if (size != patchSize_)
+    {
+        patchSize_ = size;
+
+        CreateGeometry();
+        MarkNetworkUpdate();
+    }
+}
+
 void Terrain::SetSpacing(const Vector3& spacing)
 {
     if (spacing != spacing_)
@@ -148,14 +164,11 @@ void Terrain::SetSpacing(const Vector3& spacing)
     }
 }
 
-void Terrain::SetPatchSize(int size)
+void Terrain::SetSmoothing(bool enable)
 {
-    if (size < MIN_PATCH_SIZE || size > MAX_PATCH_SIZE || !IsPowerOfTwo(size))
-        return;
-
-    if (size != patchSize_)
+    if (enable != smoothing_)
     {
-        patchSize_ = size;
+        smoothing_ = enable;
 
         CreateGeometry();
         MarkNetworkUpdate();
@@ -640,6 +653,9 @@ void Terrain::CreateGeometry()
             }
         }
 
+        if (smoothing_)
+            SmoothHeightMap();
+        
         patches_.Reserve(numPatches_.x_ * numPatches_.y_);
 
         bool enabled = IsEnabledEffective();
@@ -701,6 +717,29 @@ void Terrain::CreateGeometry()
         eventData[P_NODE] = (void*)node_;
         node_->SendEvent(E_TERRAINCREATED, eventData);
     }
+}
+
+void Terrain::SmoothHeightMap()
+{
+    PROFILE(SmoothHeightMap);
+    
+    SharedArrayPtr<float> newHeightData(new float[numVertices_.x_* numVertices_.y_]);
+    
+    for (int z = 0; z < numVertices_.y_; ++z)
+    {
+        for (int x = 0; x < numVertices_.x_; ++x)
+        {
+            float smoothedHeight = (
+                GetRawHeight(x - 1, z - 1) + GetRawHeight(x, z - 1) + GetRawHeight(x + 1, z - 1) +
+                GetRawHeight(x - 1, z) + GetRawHeight(x, z) + GetRawHeight(x + 1, z) +
+                GetRawHeight(x - 1, z + 1) + GetRawHeight(x, z + 1) + GetRawHeight(x + 1, z + 1)
+            ) / 9.0f;
+            
+            newHeightData[z * numVertices_.x_ + x] = smoothedHeight;
+        }
+    }
+    
+    heightData_ = newHeightData;
 }
 
 void Terrain::CreateIndexData()
