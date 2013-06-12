@@ -730,10 +730,10 @@ void Terrain::SmoothHeightMap()
         for (int x = 0; x < numVertices_.x_; ++x)
         {
             float smoothedHeight = (
-                GetRawHeight(x - 1, z - 1) + GetRawHeight(x, z - 1) + GetRawHeight(x + 1, z - 1) +
-                GetRawHeight(x - 1, z) + GetRawHeight(x, z) + GetRawHeight(x + 1, z) +
-                GetRawHeight(x - 1, z + 1) + GetRawHeight(x, z + 1) + GetRawHeight(x + 1, z + 1)
-            ) / 9.0f;
+                GetRawHeight(x - 1, z - 1) + GetRawHeight(x, z - 1) * 2.0f + GetRawHeight(x + 1, z - 1) +
+                GetRawHeight(x - 1, z) * 2.0f + GetRawHeight(x, z) * 4.0f + GetRawHeight(x + 1, z) * 2.0f +
+                GetRawHeight(x - 1, z + 1) + GetRawHeight(x, z + 1) * 2.0f + GetRawHeight(x + 1, z + 1)
+            ) / 16.0f;
             
             newHeightData[z * numVertices_.x_ + x] = smoothedHeight;
         }
