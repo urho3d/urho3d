@@ -5649,6 +5649,7 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void SetBox(const Vector3&, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
 - void SetSphere(float, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
+- void SetStaticPlane(const Vector3& arg0 = Vector3 ( ), const Quaternion& arg1 = Quaternion ( ))
 - void SetCylinder(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
 - void SetCapsule(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
 - void SetCone(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))

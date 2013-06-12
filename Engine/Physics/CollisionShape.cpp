@@ -429,6 +429,19 @@ void CollisionShape::SetSphere(float diameter, const Vector3& position, const Qu
     MarkNetworkUpdate();
 }
 
+void CollisionShape::SetStaticPlane(const Vector3& position, const Quaternion& rotation)
+{
+    shapeType_ = SHAPE_STATICPLANE;
+    position_ = position;
+    rotation_ = rotation;
+    model_.Reset();
+    customGeometryID_ = 0;
+    
+    UpdateShape();
+    NotifyRigidBody();
+    MarkNetworkUpdate();
+}
+
 void CollisionShape::SetCylinder(float diameter, float height, const Vector3& position, const Quaternion& rotation)
 {
     shapeType_ = SHAPE_CYLINDER;
