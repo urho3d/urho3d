@@ -763,6 +763,18 @@ void RigidBody::UpdateMass()
             shiftedCompoundShape_->addChildShape(adjusted, compoundShape_->getChildShape(i));
         }
         
+        // If shifted compound shape has only one child with no offset/rotation, use the child shape
+        // directly as the rigid body collision shape for better collision detection performance
+        bool useCompound = !numShapes || numShapes > 1;
+        if (!useCompound)
+        {
+            const btTransform& childTransform = shiftedCompoundShape_->getChildTransform(0);
+            if (!ToVector3(childTransform.getOrigin()).Equals(Vector3::ZERO) ||
+                !ToQuaternion(childTransform.getRotation()).Equals(Quaternion::IDENTITY))
+                useCompound = true;
+        }
+        body_->setCollisionShape(useCompound ? shiftedCompoundShape_ : shiftedCompoundShape_->getChildShape(0));
+        
         // Reapply rigid body position with new center of mass shift
         Vector3 oldPosition = GetPosition();
         centerOfMass_ = ToVector3(principal.getOrigin());
