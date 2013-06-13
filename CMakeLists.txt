@@ -208,6 +208,43 @@ endmacro ()
 # Add SDL as a global include directory
 include_directories (ThirdParty/SDL/include)
 
+# If using Windows and not OpenGL, find DirectX SDK include & library directories
+# Based on realXtend Tundra CMake build system (https://github.com/realXtend/naali)
+if (WIN32 AND NOT USE_OPENGL)
+    find_path(DirectX_INCLUDE_DIR d3dx9.h
+        "$ENV{DIRECTX_ROOT}/Include"
+        "$ENV{DXSDK_DIR}/Include"
+        "C:/apps_x86/Microsoft DirectX SDK*/Include"
+        "C:/Program Files (x86)/Microsoft DirectX SDK*/Include"
+        "C:/apps/Microsoft DirectX SDK*/Include"
+        "C:/Program Files/Microsoft DirectX SDK*/Include")
+
+    if (CMAKE_CL_64)
+        set (DirectX_LIBRARY_PATHS
+            "$ENV{DIRECTX_ROOT}/Lib/x64"
+            "$ENV{DXSDK_DIR}/Lib/x64"
+            "C:/Program Files (x86)/Microsoft DirectX SDK*/Lib/x64"
+            "C:/Program Files/Microsoft DirectX SDK*/Lib/x64")
+    else ()
+        set (DirectX_LIBRARY_PATHS
+            "$ENV{DIRECTX_ROOT}/Lib"
+            "$ENV{DIRECTX_ROOT}/Lib/x86"
+            "$ENV{DXSDK_DIR}/Lib"
+            "$ENV{DXSDK_DIR}/Lib/x86"
+            "C:/Program Files (x86)/Microsoft DirectX SDK*/Lib"
+            "C:/Program Files (x86)/Microsoft DirectX SDK*/Lib/x86"
+            "C:/Program Files/Microsoft DirectX SDK*/Lib"
+            "C:/Program Files/Microsoft DirectX SDK*/Lib/x86")
+    endif ()
+        
+    find_path (DirectX_LIBRARY_DIR d3d9.lib ${DirectX_LIBRARY_PATHS})
+
+    if (DirectX_INCLUDE_DIR AND DirectX_LIBRARY_DIR)
+        include_directories (${DirectX_INCLUDE_DIR})
+        link_directories (${DirectX_LIBRARY_DIR})
+    endif ()
+endif ()
+
 # Add projects
 add_subdirectory (Engine/Audio)
 add_subdirectory (Engine/Container)

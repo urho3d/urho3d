@@ -102,9 +102,7 @@ Although all required third-party libraries are included as source code, there
 are system-level dependencies that must be satisfied before Urho3D can be built
 successfully:
 
-- For Windows, the June 2010 DirectX SDK needs to be installed and its include 
-  and library directories set as Visual Studio global directories (Tools -> 
-  Options -> Projects and Solutions -> VC++ Directories in VS2008.)
+- For Windows, the June 2010 DirectX SDK needs to be installed.
 
 - For Linux, the following development packages need to be installed:
   libx11-dev, libxrandr-dev, libasound2-dev. Also install the package
