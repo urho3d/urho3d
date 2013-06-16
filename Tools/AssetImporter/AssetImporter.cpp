@@ -610,6 +610,7 @@ void BuildBoneCollisionInfo(OutModel& model)
             for (unsigned k = 0; k < bone->mNumWeights; ++k)
             {
                 float weight = bone->mWeights[k].mWeight;
+                // Require skinning weight to be sufficiently large before vertex contributes to bone hitbox
                 if (weight > 0.33f)
                 {
                     aiVector3D vertexBoneSpace = bone->mOffsetMatrix * mesh->mVertices[bone->mWeights[k].mVertexId];

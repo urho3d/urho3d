@@ -1015,7 +1015,7 @@ Like with skeletal animations, there are two ways to play back node animations:
 
 The ParticleEmitter class derives from BillboardSet to implement a particle system that updates automatically.
 
-The particle system's properties can be set through a XML description file, see \ref ParticleEmitter::Load "Load()".
+The particle system's properties can also be set through a XML description file, see \ref ParticleEmitter::Load "Load()".
 
 Most of the parameters can take either a single value, or minimum and maximum values to allow for random variation. See below for all supported parameters:
 

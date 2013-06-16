@@ -450,6 +450,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     {
                         subGeometryLodLevel.boneWeights_[vertex].Push(assign);
                         
+                        // Require skinning weight to be sufficiently large before vertex contributes to bone hitbox
                         if (assign.weight_ > 0.33f)
                         {
                             // Check distance of vertex from bone to get bone max. radius information

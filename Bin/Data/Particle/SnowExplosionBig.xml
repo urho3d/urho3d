@@ -7,7 +7,7 @@
     <activetime value="0.2" />
     <inactivetime value="0" />
     <emissionrate value="50" />
-    <sorting enable="true" />
+    <sorted enable="true" />
     <direction min="-1 0.5 -1" max="1 1 1" />
     <velocity min="2" max="3" />
     <particlesize value="0.6 0.6" />
