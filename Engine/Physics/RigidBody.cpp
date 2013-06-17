@@ -498,7 +498,7 @@ void RigidBody::ApplyForce(const Vector3& force, const Vector3& position)
     if (body_ && force != Vector3::ZERO)
     {
         Activate();
-        body_->applyForce(ToBtVector3(force), ToBtVector3(position));
+        body_->applyForce(ToBtVector3(force), ToBtVector3(position - centerOfMass_));
     }
 }
 
@@ -525,7 +525,7 @@ void RigidBody::ApplyImpulse(const Vector3& impulse, const Vector3& position)
     if (body_ && impulse != Vector3::ZERO)
     {
         Activate();
-        body_->applyImpulse(ToBtVector3(impulse), ToBtVector3(position));
+        body_->applyImpulse(ToBtVector3(impulse), ToBtVector3(position - centerOfMass_));
     }
 }
 
@@ -594,7 +594,7 @@ Vector3 RigidBody::GetLinearFactor() const
 Vector3 RigidBody::GetVelocityAtPoint(const Vector3& position) const
 {
     if (body_)
-        return ToVector3(body_->getVelocityInLocalPoint(ToBtVector3(position)));
+        return ToVector3(body_->getVelocityInLocalPoint(ToBtVector3(position - centerOfMass_)));
     else
         return Vector3::ZERO;
 }
