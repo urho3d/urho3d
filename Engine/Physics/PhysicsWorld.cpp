@@ -50,6 +50,7 @@ namespace Urho3D
 const char* PHYSICS_CATEGORY = "Physics";
 extern const char* SUBSYSTEM_CATEGORY;
 
+static const int MAX_SOLVER_ITERATIONS = 256;
 static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
 
@@ -77,12 +78,12 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
     }
 
     /// Add a contact result.
-    virtual btScalar addSingleResult(btManifoldPoint &, const btCollisionObject *colObj0, int, int, const btCollisionObject *colObj1, int, int)
+    virtual btScalar addSingleResult(btManifoldPoint &, const btCollisionObjectWrapper *colObj0Wrap, int, int, const btCollisionObjectWrapper *colObj1Wrap, int, int)
     {
-        RigidBody* body = reinterpret_cast<RigidBody*>(colObj0->getUserPointer());
+        RigidBody* body = reinterpret_cast<RigidBody*>(colObj0Wrap->getCollisionObject()->getUserPointer());
         if (body && !result_.Contains(body))
             result_.Push(body);
-        body = reinterpret_cast<RigidBody*>(colObj1->getUserPointer());
+        body = reinterpret_cast<RigidBody*>(colObj1Wrap->getCollisionObject()->getUserPointer());
         if (body && !result_.Contains(body))
             result_.Push(body);
         return 0.0f;
@@ -117,6 +118,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
 
     world_->setGravity(ToBtVector3(DEFAULT_GRAVITY));
     world_->getDispatchInfo().m_useContinuous = true;
+    world_->getSolverInfo().m_splitImpulse = false; // Disable by default for performance
     world_->setDebugDrawer(this);
     world_->setInternalTickCallback(InternalPreTickCallback, static_cast<void*>(this), true);
     world_->setInternalTickCallback(InternalTickCallback, static_cast<void*>(this), false);
@@ -159,8 +161,10 @@ void PhysicsWorld::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, DEFAULT_GRAVITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_INT, "Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Net Max Angular Vel.", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_BOOL, "Interpolation", interpolation_, true, AM_FILE);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_BOOL, "Split Impulse", GetSplitImpulse, SetSplitImpulse, bool, false, AM_DEFAULT);
 }
 
 bool PhysicsWorld::isVisible(const btVector3& aabbMin, const btVector3& aabbMax)
@@ -243,11 +247,23 @@ void PhysicsWorld::UpdateCollisions()
 void PhysicsWorld::SetFps(int fps)
 {
     fps_ = Clamp(fps, 1, 1000);
+    
+    MarkNetworkUpdate();
 }
 
 void PhysicsWorld::SetGravity(Vector3 gravity)
 {
     world_->setGravity(ToBtVector3(gravity));
+    
+    MarkNetworkUpdate();
+}
+
+void PhysicsWorld::SetNumIterations(int num)
+{
+    num = Clamp(num, 1, MAX_SOLVER_ITERATIONS);
+    world_->getSolverInfo().m_numIterations = num;
+    
+    MarkNetworkUpdate();
 }
 
 void PhysicsWorld::SetInterpolation(bool enable)
@@ -255,9 +271,18 @@ void PhysicsWorld::SetInterpolation(bool enable)
     interpolation_ = enable;
 }
 
+void PhysicsWorld::SetSplitImpulse(bool enable)
+{
+    world_->getSolverInfo().m_splitImpulse = enable;
+    
+    MarkNetworkUpdate();
+}
+
 void PhysicsWorld::SetMaxNetworkAngularVelocity(float velocity)
 {
     maxNetworkAngularVelocity_ = Clamp(velocity, 1.0f, 32767.0f);
+    
+    MarkNetworkUpdate();
 }
 
 void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
@@ -401,6 +426,16 @@ Vector3 PhysicsWorld::GetGravity() const
     return ToVector3(world_->getGravity());
 }
 
+int PhysicsWorld::GetNumIterations() const
+{
+    return world_->getSolverInfo().m_numIterations;
+}
+
+bool PhysicsWorld::GetSplitImpulse() const
+{
+    return world_->getSolverInfo().m_splitImpulse != 0;
+}
+
 void PhysicsWorld::AddRigidBody(RigidBody* body)
 {
     rigidBodies_.Push(body);
@@ -541,8 +576,8 @@ void PhysicsWorld::SendCollisionEvents()
             if (!numContacts)
                 continue;
 
-            btCollisionObject* objectA = static_cast<btCollisionObject*>(contactManifold->getBody0());
-            btCollisionObject* objectB = static_cast<btCollisionObject*>(contactManifold->getBody1());
+            const btCollisionObject* objectA = contactManifold->getBody0();
+            const btCollisionObject* objectB = contactManifold->getBody1();
 
             RigidBody* bodyA = static_cast<RigidBody*>(objectA->getUserPointer());
             RigidBody* bodyB = static_cast<RigidBody*>(objectB->getUserPointer());

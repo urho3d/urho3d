@@ -5856,8 +5856,10 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - Vector3 gravity
+- int numIterations
 - int fps
 - bool interpolation
+- bool splitImpulse
 
 
 Navigable

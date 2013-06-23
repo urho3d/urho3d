@@ -52,7 +52,7 @@ public:
 	int			m_curIter;
 	int			m_degenerateSimplex;
 	int			m_catchDegeneracies;
-
+	int			m_fixContactNormalDirection;
 
 	btGjkPairDetector(const btConvexShape* objectA,const btConvexShape* objectB,btSimplexSolverInterface* simplexSolver,btConvexPenetrationDepthSolver*	penetrationDepthSolver);
 	btGjkPairDetector(const btConvexShape* objectA,const btConvexShape* objectB,int shapeTypeA,int shapeTypeB,btScalar marginA, btScalar marginB, btSimplexSolverInterface* simplexSolver,btConvexPenetrationDepthSolver*	penetrationDepthSolver);
@@ -63,12 +63,12 @@ public:
 	void	getClosestPointsNonVirtual(const ClosestPointInput& input,Result& output,class btIDebugDraw* debugDraw);
 	
 
-	void setMinkowskiA(btConvexShape* minkA)
+	void setMinkowskiA(const btConvexShape* minkA)
 	{
 		m_minkowskiA = minkA;
 	}
 
-	void setMinkowskiB(btConvexShape* minkB)
+	void setMinkowskiB(const btConvexShape* minkB)
 	{
 		m_minkowskiB = minkB;
 	}

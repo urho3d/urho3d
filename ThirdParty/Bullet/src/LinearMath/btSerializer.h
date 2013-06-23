@@ -17,7 +17,6 @@ subject to the following restrictions:
 #define BT_SERIALIZER_H
 
 #include "btScalar.h" // has definitions like SIMD_FORCE_INLINE
-#include "btStackAlloc.h"
 #include "btHashMap.h"
 
 #if !defined( __CELLOS_LV2__) && !defined(__MWERKS__)
@@ -106,23 +105,24 @@ public:
 
 #define BT_HEADER_LENGTH 12
 #if defined(__sgi) || defined (__sparc) || defined (__sparc__) || defined (__PPC__) || defined (__ppc__) || defined (__BIG_ENDIAN__)
-#	define MAKE_ID(a,b,c,d) ( (int)(a)<<24 | (int)(b)<<16 | (c)<<8 | (d) )
+#	define BT_MAKE_ID(a,b,c,d) ( (int)(a)<<24 | (int)(b)<<16 | (c)<<8 | (d) )
 #else
-#	define MAKE_ID(a,b,c,d) ( (int)(d)<<24 | (int)(c)<<16 | (b)<<8 | (a) )
+#	define BT_MAKE_ID(a,b,c,d) ( (int)(d)<<24 | (int)(c)<<16 | (b)<<8 | (a) )
 #endif
 
-#define BT_SOFTBODY_CODE		MAKE_ID('S','B','D','Y')
-#define BT_COLLISIONOBJECT_CODE MAKE_ID('C','O','B','J')
-#define BT_RIGIDBODY_CODE		MAKE_ID('R','B','D','Y')
-#define BT_CONSTRAINT_CODE		MAKE_ID('C','O','N','S')
-#define BT_BOXSHAPE_CODE		MAKE_ID('B','O','X','S')
-#define BT_QUANTIZED_BVH_CODE	MAKE_ID('Q','B','V','H')
-#define BT_TRIANLGE_INFO_MAP	MAKE_ID('T','M','A','P')
-#define BT_SHAPE_CODE			MAKE_ID('S','H','A','P')
-#define BT_ARRAY_CODE			MAKE_ID('A','R','A','Y')
-#define BT_SBMATERIAL_CODE		MAKE_ID('S','B','M','T')
-#define BT_SBNODE_CODE			MAKE_ID('S','B','N','D')
-#define BT_DNA_CODE				MAKE_ID('D','N','A','1')
+#define BT_SOFTBODY_CODE		BT_MAKE_ID('S','B','D','Y')
+#define BT_COLLISIONOBJECT_CODE BT_MAKE_ID('C','O','B','J')
+#define BT_RIGIDBODY_CODE		BT_MAKE_ID('R','B','D','Y')
+#define BT_CONSTRAINT_CODE		BT_MAKE_ID('C','O','N','S')
+#define BT_BOXSHAPE_CODE		BT_MAKE_ID('B','O','X','S')
+#define BT_QUANTIZED_BVH_CODE	BT_MAKE_ID('Q','B','V','H')
+#define BT_TRIANLGE_INFO_MAP	BT_MAKE_ID('T','M','A','P')
+#define BT_SHAPE_CODE			BT_MAKE_ID('S','H','A','P')
+#define BT_ARRAY_CODE			BT_MAKE_ID('A','R','A','Y')
+#define BT_SBMATERIAL_CODE		BT_MAKE_ID('S','B','M','T')
+#define BT_SBNODE_CODE			BT_MAKE_ID('S','B','N','D')
+#define BT_DYNAMICSWORLD_CODE	BT_MAKE_ID('D','W','L','D')
+#define BT_DNA_CODE				BT_MAKE_ID('D','N','A','1')
 
 
 struct	btPointerUid
@@ -256,7 +256,7 @@ protected:
 			*/
 
 			intPtr = (int*)cp;
-			assert(strncmp(cp, "TYPE", 4)==0); intPtr++;
+			btAssert(strncmp(cp, "TYPE", 4)==0); intPtr++;
 
 			if (!littleEndian)
 				*intPtr =  btSwapEndian(*intPtr);
@@ -284,7 +284,7 @@ protected:
 
 			// Parse type lens
 			intPtr = (int*)cp;
-			assert(strncmp(cp, "TLEN", 4)==0); intPtr++;
+			btAssert(strncmp(cp, "TLEN", 4)==0); intPtr++;
 
 			dataLen = (int)mTypes.size();
 
@@ -311,7 +311,7 @@ protected:
 
 			intPtr = (int*)shtPtr;
 			cp = (char*)intPtr;
-			assert(strncmp(cp, "STRC", 4)==0); intPtr++;
+			btAssert(strncmp(cp, "STRC", 4)==0); intPtr++;
 
 			if (!littleEndian)
 				*intPtr = btSwapEndian(*intPtr);
@@ -438,7 +438,7 @@ public:
 
 			buffer[9] = '2';
 			buffer[10] = '8';
-			buffer[11] = '0';
+			buffer[11] = '1';
 
 		}
 

@@ -23,6 +23,7 @@ Urho3D development, contributions and bugfixes by:
 - Miika Santala
 - Firegorilla
 - Magic.Lixin
+- amadeus_osa
 - primitivewaste
 - skaiware
 
@@ -52,7 +53,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 
 Urho3D uses the following third-party libraries:
 - AngelScript 2.27.0 WIP (http://www.angelcode.com/angelscript/)
-- Bullet 2.80 (http://www.bulletphysics.org/)
+- Bullet 2.81 (http://www.bulletphysics.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLEW 1.9.0 (http://glew.sourceforge.net/)
 - kNet (https://github.com/juj/kNet)

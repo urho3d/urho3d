@@ -80,18 +80,23 @@ protected:
 	int				m_islandTag1;
 	int				m_companionId;
 
-	int				m_activationState1;
-	btScalar			m_deactivationTime;
+	mutable int				m_activationState1;
+	mutable btScalar			m_deactivationTime;
 
 	btScalar		m_friction;
 	btScalar		m_restitution;
+	btScalar		m_rollingFriction;
 
 	///m_internalType is reserved to distinguish Bullet's btCollisionObject, btRigidBody, btSoftBody, btGhostObject etc.
 	///do not assign your own m_internalType unless you write a new dynamics object class.
 	int				m_internalType;
 
 	///users can point to their objects, m_userPointer is not used by Bullet, see setUserPointer/getUserPointer
-	void*			m_userObjectPointer;
+	union
+	{
+		void*			m_userObjectPointer;
+		int	m_userIndex;
+	};
 
 	///time of impact calculation
 	btScalar		m_hitFraction; 
@@ -105,7 +110,10 @@ protected:
 	/// If some object should have elaborate collision filtering by sub-classes
 	int			m_checkCollideWith;
 
-	virtual bool	checkCollideWithOverride(btCollisionObject* /* co */)
+	///internal update revision number. It will be increased when the object changes. This allows some subsystems to perform lazy evaluation.
+	int			m_updateRevision;
+
+	virtual bool	checkCollideWithOverride(const btCollisionObject* /* co */) const
 	{
 		return true;
 	}
@@ -137,6 +145,13 @@ public:
 		CO_USER_TYPE=32
 	};
 
+	enum AnisotropicFrictionFlags
+	{
+		CF_ANISOTROPIC_FRICTION_DISABLED=0,
+		CF_ANISOTROPIC_FRICTION = 1,
+		CF_ANISOTROPIC_ROLLING_FRICTION = 2
+	};
+
 	SIMD_FORCE_INLINE bool mergesSimulationIslands() const
 	{
 		///static objects, kinematic and object without contact response don't merge islands
@@ -147,14 +162,15 @@ public:
 	{
 		return m_anisotropicFriction;
 	}
-	void	setAnisotropicFriction(const btVector3& anisotropicFriction)
+	void	setAnisotropicFriction(const btVector3& anisotropicFriction, int frictionMode = CF_ANISOTROPIC_FRICTION)
 	{
 		m_anisotropicFriction = anisotropicFriction;
-		m_hasAnisotropicFriction = (anisotropicFriction[0]!=1.f) || (anisotropicFriction[1]!=1.f) || (anisotropicFriction[2]!=1.f);
+		bool isUnity = (anisotropicFriction[0]!=1.f) || (anisotropicFriction[1]!=1.f) || (anisotropicFriction[2]!=1.f);
+		m_hasAnisotropicFriction = isUnity?frictionMode : 0;
 	}
-	bool	hasAnisotropicFriction() const
+	bool	hasAnisotropicFriction(int frictionMode = CF_ANISOTROPIC_FRICTION) const
 	{
-		return m_hasAnisotropicFriction!=0;
+		return (m_hasAnisotropicFriction&frictionMode)!=0;
 	}
 
 	///the constraint solver can discard solving contacts, if the distance is above this threshold. 0 by default.
@@ -193,6 +209,7 @@ public:
 
 	virtual void	setCollisionShape(btCollisionShape* collisionShape)
 	{
+		m_updateRevision++;
 		m_collisionShape = collisionShape;
 		m_rootCollisionShape = collisionShape;
 	}
@@ -207,22 +224,9 @@ public:
 		return m_collisionShape;
 	}
 
-	SIMD_FORCE_INLINE const btCollisionShape*	getRootCollisionShape() const
-	{
-		return m_rootCollisionShape;
-	}
+	
 
-	SIMD_FORCE_INLINE btCollisionShape*	getRootCollisionShape()
-	{
-		return m_rootCollisionShape;
-	}
-
-	///Avoid using this internal API call
-	///internalSetTemporaryCollisionShape is used to temporary replace the actual collision shape by a child collision shape.
-	void	internalSetTemporaryCollisionShape(btCollisionShape* collisionShape)
-	{
-		m_collisionShape = collisionShape;
-	}
+	
 
 	///Avoid using this internal API call, the extension pointer is used by some Bullet extensions. 
 	///If you need to store your own user pointer, use 'setUserPointer/getUserPointer' instead.
@@ -239,7 +243,7 @@ public:
 
 	SIMD_FORCE_INLINE	int	getActivationState() const { return m_activationState1;}
 	
-	void setActivationState(int newState);
+	void setActivationState(int newState) const;
 
 	void	setDeactivationTime(btScalar time)
 	{
@@ -250,9 +254,9 @@ public:
 		return m_deactivationTime;
 	}
 
-	void forceActivationState(int newState);
+	void forceActivationState(int newState) const;
 
-	void	activate(bool forceActivation = false);
+	void	activate(bool forceActivation = false) const;
 
 	SIMD_FORCE_INLINE bool isActive() const
 	{
@@ -261,6 +265,7 @@ public:
 
 	void	setRestitution(btScalar rest)
 	{
+		m_updateRevision++;
 		m_restitution = rest;
 	}
 	btScalar	getRestitution() const
@@ -269,12 +274,24 @@ public:
 	}
 	void	setFriction(btScalar frict)
 	{
+		m_updateRevision++;
 		m_friction = frict;
 	}
 	btScalar	getFriction() const
 	{
 		return m_friction;
 	}
+
+	void	setRollingFriction(btScalar frict)
+	{
+		m_updateRevision++;
+		m_rollingFriction = frict;
+	}
+	btScalar	getRollingFriction() const
+	{
+		return m_rollingFriction;
+	}
+
 
 	///reserved for Bullet internal usage
 	int	getInternalType() const
@@ -294,6 +311,7 @@ public:
 
 	void	setWorldTransform(const btTransform& worldTrans)
 	{
+		m_updateRevision++;
 		m_worldTransform = worldTrans;
 	}
 
@@ -326,16 +344,19 @@ public:
 
 	void	setInterpolationWorldTransform(const btTransform&	trans)
 	{
+		m_updateRevision++;
 		m_interpolationWorldTransform = trans;
 	}
 
 	void	setInterpolationLinearVelocity(const btVector3& linvel)
 	{
+		m_updateRevision++;
 		m_interpolationLinearVelocity = linvel;
 	}
 
 	void	setInterpolationAngularVelocity(const btVector3& angvel)
 	{
+		m_updateRevision++;
 		m_interpolationAngularVelocity = angvel;
 	}
 
@@ -425,15 +446,30 @@ public:
 	{
 		return m_userObjectPointer;
 	}
-	
+
+	int	getUserIndex() const
+	{
+		return m_userIndex;
+	}
 	///users can point to their objects, userPointer is not used by Bullet
 	void	setUserPointer(void* userPointer)
 	{
 		m_userObjectPointer = userPointer;
 	}
 
+	///users can point to their objects, userPointer is not used by Bullet
+	void	setUserIndex(int index)
+	{
+		m_userIndex = index;
+	}
 
-	inline bool checkCollideWith(btCollisionObject* co)
+	int	getUpdateRevisionInternal() const
+	{
+		return m_updateRevision;
+	}
+
+
+	inline bool checkCollideWith(const btCollisionObject* co) const
 	{
 		if (m_checkCollideWith)
 			return checkCollideWithOverride(co);
@@ -466,6 +502,7 @@ struct	btCollisionObjectDoubleData
 	double					m_contactProcessingThreshold;	
 	double					m_deactivationTime;
 	double					m_friction;
+	double					m_rollingFriction;
 	double					m_restitution;
 	double					m_hitFraction; 
 	double					m_ccdSweptSphereRadius;
@@ -498,6 +535,8 @@ struct	btCollisionObjectFloatData
 	float					m_contactProcessingThreshold;	
 	float					m_deactivationTime;
 	float					m_friction;
+	float					m_rollingFriction;
+
 	float					m_restitution;
 	float					m_hitFraction; 
 	float					m_ccdSweptSphereRadius;
@@ -510,6 +549,7 @@ struct	btCollisionObjectFloatData
 	int						m_activationState1;
 	int						m_internalType;
 	int						m_checkCollideWith;
+	char					m_padding[4];
 };
 
 

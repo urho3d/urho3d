@@ -58,7 +58,7 @@ struct	btSparseSdf
 		int					c[3];
 		int					puid;
 		unsigned			hash;
-		btCollisionShape*	pclient;
+		const btCollisionShape*	pclient;
 		Cell*				next;
 	};
 	//
@@ -69,6 +69,7 @@ struct	btSparseSdf
 	btScalar						voxelsz;
 	int								puid;
 	int								ncells;
+	int								m_clampCells;
 	int								nprobes;
 	int								nqueries;	
 
@@ -77,10 +78,13 @@ struct	btSparseSdf
 	//
 
 	//
-	void					Initialize(int hashsize=2383)
+	void					Initialize(int hashsize=2383, int clampCells = 256*1024)
 	{
+		//avoid a crash due to running out of memory, so clamp the maximum number of cells allocated
+		//if this limit is reached, the SDF is reset (at the cost of some performance during the reset)
+		m_clampCells = clampCells;
 		cells.resize(hashsize,0);
-		Reset();		
+		Reset();
 	}
 	//
 	void					Reset()
@@ -152,7 +156,7 @@ struct	btSparseSdf
 	}
 	//
 	btScalar				Evaluate(	const btVector3& x,
-		btCollisionShape* shape,
+		const btCollisionShape* shape,
 		btVector3& normal,
 		btScalar margin)
 	{
@@ -181,6 +185,15 @@ struct	btSparseSdf
 		{
 			++nprobes;		
 			++ncells;
+			int sz = sizeof(Cell);
+			if (ncells>m_clampCells)
+			{
+				static int numResets=0;
+				numResets++;
+//				printf("numResets=%d\n",numResets);
+				Reset();
+			}
+
 			c=new Cell();
 			c->next=root;root=c;
 			c->pclient=shape;
@@ -248,14 +261,14 @@ struct	btSparseSdf
 	}
 	//
 	static inline btScalar	DistanceToShape(const btVector3& x,
-		btCollisionShape* shape)
+		const btCollisionShape* shape)
 	{
 		btTransform	unit;
 		unit.setIdentity();
 		if(shape->isConvex())
 		{
 			btGjkEpaSolver2::sResults	res;
-			btConvexShape*				csh=static_cast<btConvexShape*>(shape);
+			const btConvexShape*				csh=static_cast<const btConvexShape*>(shape);
 			return(btGjkEpaSolver2::SignedDistance(x,0,csh,unit,res));
 		}
 		return(0);
@@ -282,7 +295,7 @@ struct	btSparseSdf
 
 
 	//
-	static inline unsigned int	Hash(int x,int y,int z,btCollisionShape* shape)
+	static inline unsigned int	Hash(int x,int y,int z,const btCollisionShape* shape)
 	{
 		struct btS
 		{ 
@@ -292,7 +305,7 @@ struct	btSparseSdf
 
 		btS myset;
 
-		myset.x=x;myset.y=y;myset.z=z;myset.p=shape;
+		myset.x=x;myset.y=y;myset.z=z;myset.p=(void*)shape;
 		const void* ptr = &myset;
 
 		unsigned int result = HsiehHash<sizeof(btS)/4> (ptr);

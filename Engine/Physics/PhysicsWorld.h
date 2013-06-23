@@ -125,8 +125,12 @@ public:
     void SetFps(int fps);
     /// Set gravity.
     void SetGravity(Vector3 gravity);
+    /// Set number of constraint solver iterations.
+    void SetNumIterations(int num);
     /// Set whether to interpolate between simulation steps.
     void SetInterpolation(bool enable);
+    /// Set split impulse collision mode. This is more accurate, but slower. Disabled by default.
+    void SetSplitImpulse(bool enable);
     /// Set maximum angular velocity for network replication.
     void SetMaxNetworkAngularVelocity(float velocity);
     /// Perform a physics world raycast and return all hits.
@@ -141,10 +145,15 @@ public:
     void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies that have been in collision with a specific body on the last simulation step.
     void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    
     /// Return gravity.
     Vector3 GetGravity() const;
+    /// Return number of constraint solver iterations.
+    int GetNumIterations() const;
     /// Return whether interpolation between simulation steps is enabled.
     bool GetInterpolation() const { return interpolation_; }
+    /// Return whether split impulse collision mode is enabled.
+    bool GetSplitImpulse() const;
     /// Return simulation steps per second.
     int GetFps() const { return fps_; }
     /// Return maximum angular velocity for network replication.

@@ -286,10 +286,14 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHODPR(PhysicsWorld, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_numIterations(int)", asMETHOD(PhysicsWorld, SetNumIterations), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "int get_numIterations() const", asMETHOD(PhysicsWorld, GetNumIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_fps(int)", asMETHOD(PhysicsWorld, SetFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "int get_fps() const", asMETHOD(PhysicsWorld, GetFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_interpolation(bool)", asMETHOD(PhysicsWorld, SetInterpolation), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "bool get_interpolation() const", asMETHOD(PhysicsWorld, GetInterpolation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_splitImpulse(bool)", asMETHOD(PhysicsWorld, SetSplitImpulse), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "bool get_splitImpulse() const", asMETHOD(PhysicsWorld, GetSplitImpulse), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
     

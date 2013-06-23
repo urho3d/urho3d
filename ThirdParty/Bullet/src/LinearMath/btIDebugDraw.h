@@ -52,7 +52,7 @@ class	btIDebugDraw
 	};
 
 	virtual ~btIDebugDraw() {};
-
+	
 	// Urho3D: added function to test visibility of an AABB
 	virtual bool    isVisible(const btVector3& aabbMin,const btVector3& aabbMax)=0;
 
@@ -284,6 +284,7 @@ class	btIDebugDraw
 		}
 	}
 	
+  
 	virtual void drawBox(const btVector3& bbMin, const btVector3& bbMax, const btVector3& color)
 	{
 		drawLine(btVector3(bbMin[0], bbMin[1], bbMin[2]), btVector3(bbMax[0], bbMin[1], bbMin[2]), color);
