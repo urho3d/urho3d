@@ -790,9 +790,7 @@ void RigidBody::UpdateMass()
         // Reapply constraint positions for new center of mass shift
         if (node_)
         {
-            PODVector<Constraint*> constraints;
-            node_->GetComponents<Constraint>(constraints);
-            for (PODVector<Constraint*>::Iterator i = constraints.Begin(); i != constraints.End(); ++i)
+            for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
                 (*i)->ApplyFrames();
         }
     }
