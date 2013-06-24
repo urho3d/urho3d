@@ -777,8 +777,10 @@ void RigidBody::UpdateMass()
         
         // If we have one shape and this is a triangle mesh, we use a custom material callback in order to adjust internal edges
         if (!useCompound && body_->getCollisionShape()->getShapeType() == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE)
-			body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-        
+            body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+        else
+            body_->setCollisionFlags(body_->getCollisionFlags() & ~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+
         // Reapply rigid body position with new center of mass shift
         Vector3 oldPosition = GetPosition();
         centerOfMass_ = ToVector3(principal.getOrigin());

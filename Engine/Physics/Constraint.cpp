@@ -37,8 +37,6 @@
 #include <BulletDynamics/ConstraintSolver/btSliderConstraint.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
-#include "DebugNew.h"
-
 namespace Urho3D
 {
 
