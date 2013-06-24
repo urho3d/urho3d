@@ -30,6 +30,7 @@
 class btBvhTriangleMeshShape;
 class btCollisionShape;
 class btCompoundShape;
+class btTriangleInfoMap;
 class btTriangleMesh;
 
 namespace Urho3D
@@ -75,6 +76,8 @@ struct TriangleMeshData : public CollisionGeometryData
     btTriangleMesh* meshData_;
     /// Bullet triangle mesh collision shape.
     btBvhTriangleMeshShape* shape_;
+    /// Bullet triangle info map.
+    btTriangleInfoMap* infoMap_;
 };
 
 /// Convex hull geometry data.

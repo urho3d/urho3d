@@ -37,6 +37,7 @@
 #include "Scene.h"
 #include "Terrain.h"
 
+#include <BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btCapsuleShape.h>
 #include <BulletCollision/CollisionShapes/btCompoundShape.h>
@@ -139,6 +140,9 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
     }
     
     shape_ = new btBvhTriangleMeshShape(meshData_, true, true);
+    
+    infoMap_ = new btTriangleInfoMap();
+    btGenerateInternalEdgeInfo(shape_, infoMap_);
 }
 
 TriangleMeshData::~TriangleMeshData()
@@ -148,6 +152,9 @@ TriangleMeshData::~TriangleMeshData()
     
     delete meshData_;
     meshData_ = 0;
+    
+    delete infoMap_;
+    infoMap_ = 0;
 }
 
 ConvexData::ConvexData(Model* model, unsigned lodLevel)
