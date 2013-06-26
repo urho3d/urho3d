@@ -129,10 +129,6 @@ protected:
     Color modalFrameColor_;
     /// Modal frame size, used when modal flag is set.
     IntVector2 modalFrameSize_;
-
-private:
-    /// Handle modal window being focused.
-    void HandleModalFocused(StringHash eventType, VariantMap& eventData);
 };
 
 }

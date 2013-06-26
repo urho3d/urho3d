@@ -239,8 +239,8 @@ Desktop 64bit build
 
 Currently CMake build configuration has been set to compile Urho3D as 32bit by
 default. To enable 64bit build for Visual Studio, run one of the cmake_vs20xx.bat
-by passing the option "Win64" explicitly. This will overrides CMake to use a
-64bit solution generator.
+by passing the option "Win64" explicitly. This overrides CMake to use a 64bit
+solution generator.
 
 To enable 64bit build for non-MSVC/non-Windows platform, pass the
 option "-DENABLE_64BIT=1" explicitly when invoking cmake_eclipse.sh/

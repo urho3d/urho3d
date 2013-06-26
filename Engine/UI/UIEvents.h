@@ -158,6 +158,13 @@ EVENT(E_VIEWCHANGED, ViewChanged)
     PARAM(P_Y, Y);                          // int
 }
 
+/// UI modal changed (currently only Window has modal flag).
+EVENT(E_MODALCHANGED, ModalChanged)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_MODAL, Modal);                  // bool
+}
+
 /// Editable text changed
 EVENT(E_TEXTCHANGED, TextChanged)
 {
@@ -221,7 +228,7 @@ EVENT(E_FILESELECTED, FileSelected)
     PARAM(P_OK, Ok);                        // bool
 }
 
-/// A child element has been added to an element. Sent by the UI root element.
+/// A child element has been added to an element. Sent by the UI root element, or element-event-sender if set.
 EVENT(E_ELEMENTADDED, ElementAdded)
 {
     PARAM(P_ROOT, Root);                    // UIElement pointer
@@ -229,7 +236,7 @@ EVENT(E_ELEMENTADDED, ElementAdded)
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
-/// A child element is about to be removed from an element. Sent by the UI root element.
+/// A child element is about to be removed from an element. Sent by the UI root element, or element-event-sender if set.
 EVENT(E_ELEMENTREMOVED, ElementRemoved)
 {
     PARAM(P_ROOT, Root);                    // UIElement pointer

@@ -61,7 +61,6 @@ ShortStringHash VAR_ORIGIN("Origin");
 const ShortStringHash VAR_ORIGINAL_PARENT("OriginalParent");
 const ShortStringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
 const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
-const ShortStringHash VAR_NO_AUTO_REMOVE("NoAutoRemove");
 
 const char* UI_CATEGORY = "UI";
 
@@ -83,10 +82,10 @@ UI::UI(Context* context) :
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
     rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);
-    
+
     // Register UI library object factories
     RegisterUILibrary(context_);
-    
+
     SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
     SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
@@ -97,7 +96,7 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
     SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
     SubscribeToEvent(E_CHAR, HANDLER(UI, HandleChar));
-    
+
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
 }
@@ -374,17 +373,17 @@ void UI::RenderUpdate()
 void UI::Render()
 {
     PROFILE(RenderUI);
-    
+
     SetVertexData(vertexBuffer_, vertexData_);
     SetVertexData(debugVertexBuffer_, debugVertexData_);
-    
+
     // Render non-modal batches
     Render(vertexBuffer_, batches_, 0, nonModalBatchSize_);
     // Render debug draw
     Render(debugVertexBuffer_, debugDrawBatches_, 0, debugDrawBatches_.Size());
     // Render modal batches
     Render(vertexBuffer_, batches_, nonModalBatchSize_, batches_.Size());
-    
+
     // Clear the debug draw batches and data
     debugDrawBatches_.Clear();
     debugVertexData_.Clear();
@@ -559,13 +558,13 @@ void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
 {
     if (vertexData.Empty())
         return;
-    
+
     // Update quad geometry into the vertex buffer
     // Resize the vertex buffer first if too small or much too large
     unsigned numVertices = vertexData.Size() / UI_VERTEX_SIZE;
     if (dest->GetVertexCount() < numVertices || dest->GetVertexCount() > numVertices * 2)
         dest->SetSize(numVertices, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
-    
+
     dest->SetData(&vertexData[0]);
 }
 
@@ -597,7 +596,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->SetStencilTest(false);
     graphics_->ResetRenderTargets();
     graphics_->SetVertexBuffer(buffer);
-    
+
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;
 
@@ -1126,16 +1125,10 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             SetFocusElement(0);
         else
         {
-            // If it is a modal window, by resetting its modal flag and auto-remove it
+            // If it is a modal window, by resetting its modal flag
             Window* window = dynamic_cast<Window*>(element);
             if (window)
-            {
                 window->SetModal(false);
-                if (window->GetVars().Contains(VAR_NO_AUTO_REMOVE))
-                    const_cast<VariantMap&>(window->GetVars()).Erase(VAR_NO_AUTO_REMOVE);
-                else
-                    window->Remove();
-            }
         }
 
         return;

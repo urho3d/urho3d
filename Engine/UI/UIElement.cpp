@@ -1192,20 +1192,18 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
 
 void UIElement::RemoveChild(UIElement* element, unsigned index)
 {
-    UIElement* root = GetRoot();
-    UIElement* sender = GetElementEventSender();
-
     for (unsigned i = index; i < children_.Size(); ++i)
     {
         if (children_[i] == element)
         {
             // Send change event if not already being destroyed
-            if (Refs() > 0 && sender)
+            UIElement* sender = Refs() > 0 ? GetElementEventSender() : 0;
+            if (sender)
             {
                 using namespace ElementRemoved;
 
                 VariantMap eventData;
-                eventData[P_ROOT] = (void*)root;
+                eventData[P_ROOT] = (void*)GetRoot();
                 eventData[P_PARENT] = (void*)this;
                 eventData[P_ELEMENT] = (void*)element;
 
@@ -1233,11 +1231,12 @@ void UIElement::RemoveChildAtIndex(unsigned index)
 void UIElement::RemoveAllChildren()
 {
     UIElement* root = GetRoot();
+    UIElement* sender = Refs() > 0 ? GetElementEventSender() : 0;
 
     for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i < children_.End(); )
     {
         // Send change event if not already being destroyed
-        if (Refs() > 0 && root)
+        if (sender)
         {
             using namespace ElementRemoved;
 
@@ -1246,12 +1245,13 @@ void UIElement::RemoveAllChildren()
             eventData[P_PARENT] = (void*)this;
             eventData[P_ELEMENT] = (void*)(*i).Get();
 
-            root->SendEvent(E_ELEMENTREMOVED, eventData);
+            sender->SendEvent(E_ELEMENTREMOVED, eventData);
         }
 
         (*i++)->Detach();
     }
     children_.Clear();
+    UpdateLayout();
 }
 
 void UIElement::Remove()

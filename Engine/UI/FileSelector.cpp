@@ -123,7 +123,7 @@ FileSelector::FileSelector(Context* context) :
     {
         ui->GetRoot()->AddChild(window_);
         ui->SetFocusElement(fileList_);
-        window_->BringToFront();
+        window_->SetModal(true);
     }
 
     SubscribeToEvent(filterList_, E_ITEMSELECTED, HANDLER(FileSelector, HandleFilterChanged));
@@ -135,6 +135,7 @@ FileSelector::FileSelector(Context* context) :
     SubscribeToEvent(okButton_, E_RELEASED, HANDLER(FileSelector, HandleOKPressed));
     SubscribeToEvent(cancelButton_, E_RELEASED, HANDLER(FileSelector, HandleCancelPressed));
     SubscribeToEvent(closeButton_, E_RELEASED, HANDLER(FileSelector, HandleCancelPressed));
+    SubscribeToEvent(window_, E_MODALCHANGED, HANDLER(FileSelector, HandleCancelPressed));
 }
 
 FileSelector::~FileSelector()
@@ -494,6 +495,9 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
 void FileSelector::HandleCancelPressed(StringHash eventType, VariantMap& eventData)
 {
     if (ignoreEvents_)
+        return;
+
+    if (eventType == E_MODALCHANGED && eventData[ModalChanged::P_MODAL].GetBool())
         return;
 
     using namespace FileSelected;

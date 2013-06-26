@@ -25,6 +25,7 @@
 #include "Cursor.h"
 #include "InputEvents.h"
 #include "UI.h"
+#include "UIEvents.h"
 #include "Window.h"
 
 #include "DebugNew.h"
@@ -221,10 +222,20 @@ void Window::SetResizeBorder(const IntRect& rect)
 
 void Window::SetModal(bool modal)
 {
-    UI* ui = GetSubsystem<UI>();
     // UI may be null at shutdown if for example a script was holding a reference to this window
-    if (ui && ui->SetModalElement(this, modal))
+    UI* ui = GetSubsystem<UI>();
+    if (!ui)
+        return;
+
+    if (ui->SetModalElement(this, modal))
         modal_ = modal;
+
+    using namespace ModalChanged;
+
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_MODAL] = modal;
+    SendEvent(E_MODALCHANGED, eventData);
 }
 
 void Window::SetModalShadeColor(const Color& color)

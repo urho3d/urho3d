@@ -12,7 +12,6 @@ const String STRIKED_OUT = "——";   // Two unicode EM DASH (U+2014)
 const ShortStringHash NODE_IDS_VAR("NodeIDs");
 const ShortStringHash COMPONENT_IDS_VAR("ComponentIDs");
 const ShortStringHash UI_ELEMENT_IDS_VAR("UIElementIDs");
-const ShortStringHash NO_AUTO_REMOVE("NoAutoRemove");
 const int LABEL_WIDTH = 30;
 
 // Constants for accessing xmlResources
@@ -378,23 +377,13 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
     SaveEditActionGroup(group);
 
     // If a UI-element changing its 'Is Modal' attribute, clear the hierarchy list selection
-    bool testModalElement = false;
     int itemType = GetType(serializables[0]);
     if (itemType == ITEM_UI_ELEMENT && serializables[0].attributeInfos[index].name == "Is Modal")
-    {
         hierarchyList.ClearSelection();
-        testModalElement = true;
-    }
 
     for (uint i = 0; i < serializables.length; ++i)
     {
         PostEditAttribute(serializables[i], index);
-
-        // Set a user-defined var to prevent auto-removal of the modal element being tested in the editor
-        // After losing the modal flag, the modal element should be reparented to its original parent automatically
-        if (testModalElement)
-            cast<UIElement>(serializables[i]).vars[NO_AUTO_REMOVE] = true;
-
         if (itemType == ITEM_UI_ELEMENT)
             SetUIElementModified(serializables[i]);
     }
