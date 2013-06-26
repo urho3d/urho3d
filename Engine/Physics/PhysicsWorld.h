@@ -129,6 +129,8 @@ public:
     void SetNumIterations(int num);
     /// Set whether to interpolate between simulation steps.
     void SetInterpolation(bool enable);
+    /// Set whether to use Bullet's internal edge utility for trimesh collisions. Disabled by default.
+    void SetInternalEdge(bool enable);
     /// Set split impulse collision mode. This is more accurate, but slower. Disabled by default.
     void SetSplitImpulse(bool enable);
     /// Set maximum angular velocity for network replication.
@@ -152,6 +154,8 @@ public:
     int GetNumIterations() const;
     /// Return whether interpolation between simulation steps is enabled.
     bool GetInterpolation() const { return interpolation_; }
+    /// Return whether Bullet's internal edge utility for trimesh collisions is enabled.
+    bool GetInternalEdge() const { return internalEdge_; }
     /// Return whether split impulse collision mode is enabled.
     bool GetSplitImpulse() const;
     /// Return simulation steps per second.
@@ -239,6 +243,8 @@ private:
     float maxNetworkAngularVelocity_;
     /// Interpolation flag.
     bool interpolation_;
+    /// Use internal edge utility flag.
+    bool internalEdge_;
     /// Applying transforms flag.
     bool applyingTransforms_;
     /// Debug renderer.

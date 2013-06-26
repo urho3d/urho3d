@@ -30,8 +30,9 @@
 class btBvhTriangleMeshShape;
 class btCollisionShape;
 class btCompoundShape;
-class btTriangleInfoMap;
 class btTriangleMesh;
+
+struct btTriangleInfoMap;
 
 namespace Urho3D
 {

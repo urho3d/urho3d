@@ -119,6 +119,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     timeAcc_(0.0f),
     maxNetworkAngularVelocity_(DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY),
     interpolation_(true),
+    internalEdge_(true),
     applyingTransforms_(false),
     debugRenderer_(0),
     debugMode_(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits)
@@ -179,6 +180,7 @@ void PhysicsWorld::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_INT, "Solver Iterations", GetNumIterations, SetNumIterations, int, 10, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Net Max Angular Vel.", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
     ATTRIBUTE(PhysicsWorld, VAR_BOOL, "Interpolation", interpolation_, true, AM_FILE);
+    ATTRIBUTE(PhysicsWorld, VAR_BOOL, "Internal Edge Utility", internalEdge_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_BOOL, "Split Impulse", GetSplitImpulse, SetSplitImpulse, bool, false, AM_DEFAULT);
 }
 
@@ -284,6 +286,13 @@ void PhysicsWorld::SetNumIterations(int num)
 void PhysicsWorld::SetInterpolation(bool enable)
 {
     interpolation_ = enable;
+}
+
+void PhysicsWorld::SetInternalEdge(bool enable)
+{
+    internalEdge_ = enable;
+    
+    MarkNetworkUpdate();
 }
 
 void PhysicsWorld::SetSplitImpulse(bool enable)

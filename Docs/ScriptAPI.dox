@@ -5859,6 +5859,7 @@ Properties:<br>
 - int numIterations
 - int fps
 - bool interpolation
+- bool internalEdge
 - bool splitImpulse
 
 

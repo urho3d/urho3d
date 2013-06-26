@@ -1782,6 +1782,8 @@ byte[4]    Identifier "ASBC"
 
 - Indent style is Allman (BSD) -like, ie. brace on the next line from a control statement, indented on the same level. In switch-case statements the cases are on the same indent level as the switch statement.
 
+- Indents use 4 spaces instead of tabs.
+
 - Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example DebugRenderer, FreeTypeLibrary, Graphics.
 
 - Functions are likewise in upper-camelcase. For example CreateComponent, SetLinearRestThreshold.
