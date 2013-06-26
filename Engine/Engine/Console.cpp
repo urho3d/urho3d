@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Console.h"
 #include "Context.h"
+#include "EngineEvents.h"
 #include "Font.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
@@ -31,7 +32,6 @@
 #include "LineEdit.h"
 #include "Log.h"
 #include "ResourceCache.h"
-#include "Script.h"
 #include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"
@@ -176,9 +176,12 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
     String line = lineEdit_->GetText();
     if (!line.Empty())
     {
-        Script* script = GetSubsystem<Script>();
-        if (script)
-            script->Execute(line);
+        // Send the command as an event for script subsystem
+        using namespace ConsoleCommand;
+
+        VariantMap eventData;
+        eventData[P_COMMAND] = line;
+        SendEvent(E_CONSOLECOMMAND, eventData);
 
         // Store to history, then clear the lineedit
         history_.Push(line);

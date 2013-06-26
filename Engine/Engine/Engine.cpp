@@ -41,8 +41,6 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
-#include "Script.h"
-#include "ScriptAPI.h"
 #include "StringUtils.h"
 #include "UI.h"
 #include "WorkQueue.h"
@@ -112,8 +110,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Set headless mode
     headless_ = GetParameter(parameters, "Headless", false).GetBool();
     
-    // Register object factories and attributes first, then subsystems
-    RegisterObjects();
+    // Register subsystems and object factories
     RegisterSubsystems();
     
     PROFILE(InitEngine);
@@ -246,38 +243,6 @@ bool Engine::Initialize(const VariantMap& parameters)
     frameTimer_.Reset();
     
     initialized_ = true;
-    return true;
-}
-
-bool Engine::InitializeScripting()
-{
-    // Check if scripting already initialized
-    if (GetSubsystem<Script>())
-        return true;
-    
-    RegisterScriptLibrary(context_);
-    context_->RegisterSubsystem(new Script(context_));
-   
-    {
-        PROFILE(RegisterScriptAPI);
-        
-        asIScriptEngine* engine = GetSubsystem<Script>()->GetScriptEngine();
-        RegisterMathAPI(engine);
-        RegisterCoreAPI(engine);
-        RegisterIOAPI(engine);
-        RegisterResourceAPI(engine);
-        RegisterSceneAPI(engine);
-        RegisterGraphicsAPI(engine);
-        RegisterInputAPI(engine);
-        RegisterAudioAPI(engine);
-        RegisterUIAPI(engine);
-        RegisterNetworkAPI(engine);
-        RegisterPhysicsAPI(engine);
-        RegisterNavigationAPI(engine);
-        RegisterScriptAPI(engine);
-        RegisterEngineAPI(engine);
-    }
-    
     return true;
 }
 
@@ -641,31 +606,12 @@ const Variant& Engine::GetParameter(const VariantMap& parameters, const String& 
     return i != parameters.End() ? i->second_ : defaultValue;
 }
 
-void Engine::RegisterObjects()
-{
-    RegisterResourceLibrary(context_);
-    RegisterSceneLibrary(context_);
-    RegisterNetworkLibrary(context_);
-    RegisterGraphicsLibrary(context_);
-    RegisterAudioLibrary(context_);
-    RegisterUILibrary(context_);
-    RegisterPhysicsLibrary(context_);
-    RegisterNavigationLibrary(context_);
-    
-    // In debug mode, check that all factory created objects can be created without crashing
-    #ifdef _DEBUG
-    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
-        SharedPtr<Object> object = i->second_->CreateObject();
-    #endif
-}
-
 void Engine::RegisterSubsystems()
 {
     // Register self as a subsystem
     context_->RegisterSubsystem(this);
     
-    // Create and register the rest of the subsystems
+    // Create and register the rest of the subsystems. They will register object factories for their own libraries
     context_->RegisterSubsystem(new Time(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
     #ifdef ENABLE_PROFILING
@@ -680,12 +626,31 @@ void Engine::RegisterSubsystems()
         context_->RegisterSubsystem(new Graphics(context_));
         context_->RegisterSubsystem(new Renderer(context_));
     }
+    else
+    {
+        // Register Graphics library object factories also in headless mode; the objects will function without allocating
+        // actual GPU resources
+        RegisterGraphicsLibrary(context_);
+    }
     
     context_->RegisterSubsystem(new Input(context_));
     context_->RegisterSubsystem(new UI(context_));
     context_->RegisterSubsystem(new Audio(context_));
     #ifdef ENABLE_LOGGING
     context_->RegisterSubsystem(new Log(context_));
+    #endif
+    
+    // Scene, Physics & Navigation libraries do not have a corresponding subsystem which would register their object factories.
+    // Register manually now
+    RegisterSceneLibrary(context_);
+    RegisterPhysicsLibrary(context_);
+    RegisterNavigationLibrary(context_);
+    
+    // In debug mode, check that all factory created objects can be created without crashing
+    #ifdef _DEBUG
+    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+        SharedPtr<Object> object = i->second_->CreateObject();
     #endif
 }
 

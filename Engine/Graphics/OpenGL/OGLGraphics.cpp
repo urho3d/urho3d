@@ -191,6 +191,9 @@ Graphics::Graphics(Context* context_) :
             SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
         ++numInstances;
     }
+    
+    // Register Graphics library object factories
+    RegisterGraphicsLibrary(context_);
 }
 
 Graphics::~Graphics()

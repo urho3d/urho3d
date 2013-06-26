@@ -207,12 +207,12 @@ void Run(const Vector<String>& arguments)
         );
     }
     
-    RegisterSceneLibrary(context_);
-    RegisterGraphicsLibrary(context_);
-    RegisterPhysicsLibrary(context_);
     context_->RegisterSubsystem(new FileSystem(context_));
     context_->RegisterSubsystem(new ResourceCache(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
+    RegisterSceneLibrary(context_);
+    RegisterGraphicsLibrary(context_);
+    RegisterPhysicsLibrary(context_);
     
     String command = arguments[0].ToLower();
     String rootNodeName;

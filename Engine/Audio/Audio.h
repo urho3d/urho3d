@@ -124,7 +124,7 @@ private:
     WeakPtr<SoundListener> listener_;
 };
 
-/// Register Sound library objects.
+/// Register Audio library objects.
 void RegisterAudioLibrary(Context* context);
 
 }

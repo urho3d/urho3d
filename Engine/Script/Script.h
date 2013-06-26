@@ -107,7 +107,9 @@ private:
     asIScriptContext* GetScriptFileContext();
     /// Output a sanitated row of script API. No-ops when ENABLE_LOGGING not defined.
     void OutputAPIRow(const String& row, bool removeReference = false);
-
+    /// Handle a console command event.
+    void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
+    
     /// AngelScript engine.
     asIScriptEngine* scriptEngine_;
     /// Immediate execution script context.

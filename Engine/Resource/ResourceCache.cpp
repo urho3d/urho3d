@@ -64,6 +64,8 @@ ResourceCache::ResourceCache(Context* context) :
     Object(context),
     autoReloadResources_(false)
 {
+    // Register Resource library object factories
+    RegisterResourceLibrary(context_);
 }
 
 ResourceCache::~ResourceCache()

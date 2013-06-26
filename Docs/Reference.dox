@@ -66,7 +66,7 @@ The following subsystems are optional, so GetSubsystem() may return null if they
 - Profiler: Provides hierarchical function execution time measurement using the operating system performance counter. Exists if profiling has been compiled in (configurable from the root CMakeLists.txt)
 - Graphics: Manages the application window, the rendering context and resources. Exists if not in headless mode.
 - Renderer: Renders scenes in 3D and manages rendering quality settings. Exists if not in headless mode.
-- Script: Provides the AngelScript execution environment. Created by calling \ref Engine::InitializeScripting "InitializeScripting()".
+- Script: Provides the AngelScript execution environment. Needs to be created and registered manually.
 - Console: provides an interactive AngelScript console and log display. Created by calling \ref Engine::CreateConsole "CreateConsole()".
 - DebugHud: displays rendering mode information and statistics and profiling data. Created by calling \ref Engine::CreateDebugHud "CreateDebugHud()".
 
@@ -86,7 +86,7 @@ When subscribing to an event, a handler function must be specified. In C++ these
 SubscribeToEvent(E_UPDATE, HANDLER(MyClass, MyEventHandler));
 \endcode
 
-In script events are identified by their string names instead of name hashes (though these are internally converted to hashes.) Script event handlers can either have the same signature as in C++, or a simplified signature void HandleEvent() when event type and parameters are not required. The same event subscription would look like:
+In script events are identified by their string names instead of name hashes (though these are internally converted to hashes.) %Script event handlers can either have the same signature as in C++, or a simplified signature void HandleEvent() when event type and parameters are not required. The same event subscription would look like:
 
 \code
 SubscribeToEvent("Update", "MyEventHandler");
@@ -285,6 +285,12 @@ Memory budgets can be set per resource type: if resources consume more memory th
 
 
 \page Scripting Scripting
+
+To enable AngelScript scripting support, the Script subsystem needs to be created and registered after initializing the Engine. This is accomplished by the following code, seen eg. in Urho3D/Urho3D.cpp:
+
+\code
+context_->RegisterSubsystem(new Script(context_));
+\endcode
 
 There are three ways the AngelScript language can be interacted with in Urho3D:
 

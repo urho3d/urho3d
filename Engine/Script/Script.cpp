@@ -23,10 +23,12 @@
 #include "Precompiled.h"
 #include "Addons.h"
 #include "Context.h"
+#include "EngineEvents.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "Scene.h"
 #include "Script.h"
+#include "ScriptAPI.h"
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
 
@@ -156,9 +158,31 @@ Script::Script(Context* context) :
     immediateContext_ = scriptEngine_->CreateContext();
     immediateContext_->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
 
-    // Register the Array & String types
+    // Register Script library object factories
+    RegisterScriptLibrary(context_);
+
+    // Register the Array & String API
     RegisterArray(scriptEngine_);
     RegisterString(scriptEngine_);
+
+    // Register the rest of the script API
+    RegisterMathAPI(scriptEngine_);
+    RegisterCoreAPI(scriptEngine_);
+    RegisterIOAPI(scriptEngine_);
+    RegisterResourceAPI(scriptEngine_);
+    RegisterSceneAPI(scriptEngine_);
+    RegisterGraphicsAPI(scriptEngine_);
+    RegisterInputAPI(scriptEngine_);
+    RegisterAudioAPI(scriptEngine_);
+    RegisterUIAPI(scriptEngine_);
+    RegisterNetworkAPI(scriptEngine_);
+    RegisterPhysicsAPI(scriptEngine_);
+    RegisterNavigationAPI(scriptEngine_);
+    RegisterScriptAPI(scriptEngine_);
+    RegisterEngineAPI(scriptEngine_);
+    
+    // Subscribe to console commands
+    SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(Script, HandleConsoleCommand));
 }
 
 Script::~Script()
@@ -473,6 +497,13 @@ void Script::OutputAPIRow(const String& row, bool removeReference)
         out.Replace("&", "");
 
     Log::WriteRaw("- " + out + "\n");
+}
+
+void Script::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ConsoleCommand;
+    
+    Execute(eventData[P_COMMAND].GetString());
 }
 
 void RegisterScriptLibrary(Context* context)

@@ -28,6 +28,7 @@
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
+#include "Script.h"
 #include "ScriptFile.h"
 
 #include <exception>
@@ -133,8 +134,10 @@ int Application::Run()
     SharedPtr<Engine> engine(new Engine(context_));
     if (engine->Initialize(Engine::ParseParameters(arguments)))
     {
+        // Instantiate and register the script subsystem
+        context_->RegisterSubsystem(new Script(context_));
+        
         // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
-        engine->InitializeScripting();
         SharedPtr<ScriptFile> scriptFile(context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
         
         // If script loading is successful, execute engine loop

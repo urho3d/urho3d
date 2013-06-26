@@ -67,7 +67,9 @@ int main(int argc, char** argv)
     }
     
     SharedPtr<Context> context(new Context());
+    
     SharedPtr<Engine> engine(new Engine(context));
+    context->RegisterSubsystem(new Script(context));
     context->RegisterSubsystem(new FileSystem(context));
     context->RegisterSubsystem(new ResourceCache(context));
     context->RegisterSubsystem(new Log(context));
@@ -75,9 +77,6 @@ int main(int argc, char** argv)
     Log* log = context->GetSubsystem<Log>();
     log->SetLevel(LOG_WARNING);
     log->SetTimeStamp(false);
-    
-    if (!engine->InitializeScripting())
-        ErrorExit("Unable to initialize script engine. The application will now exit.");
     
     if (!dumpApiMode)
     {

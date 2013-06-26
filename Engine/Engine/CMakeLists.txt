@@ -8,8 +8,8 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
 set (LIBS ../Audio ../Container ../Core ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource 
-    ../Scene ../Script ../UI)
-set (INCLUDE_DIRS_ONLY ../../ThirdParty/AngelScript/include ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include)
+    ../Scene ../UI)
+set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include)
 
 # Setup target
 enable_pch ()

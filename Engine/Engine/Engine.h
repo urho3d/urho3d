@@ -44,8 +44,6 @@ public:
     
     /// Initialize engine using parameters given and show the application window. Return true if successful.
     bool Initialize(const VariantMap& parameters);
-    /// Initialize script subsystem and register the script API. Return true if successful (engine must be initialized first.)
-    bool InitializeScripting();
     /// Run one frame.
     void RunFrame();
     /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
@@ -99,8 +97,6 @@ public:
     static const Variant& GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
     
 private:
-    /// Register object factories and attributes.
-    void RegisterObjects();
     /// Create and register subsystems. In headless mode graphics, input & UI are not created.
     void RegisterSubsystems();
     

@@ -55,10 +55,13 @@ Audio::Audio(Context* context) :
     sampleSize_(0),
     playing_(false)
 {
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Audio, HandleRenderUpdate));
-    
     for (unsigned i = 0; i < MAX_SOUND_TYPES; ++i)
         masterGain_[i] = 1.0f;
+    
+    // Register Audio library object factories
+    RegisterAudioLibrary(context_);
+    
+    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Audio, HandleRenderUpdate));
 }
 
 Audio::~Audio()

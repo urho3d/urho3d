@@ -302,13 +302,11 @@ The libraries are the following:
 - Physics. Provides physics simulation.
 - Navigation. Provides navigation mesh generation and pathfinding.
 - %Script. Provides scripting support using the AngelScript language.
-- %Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
+- %Engine. Instantiates the subsystems from the libraries above and manages the main loop iteration.
 
-Urho3D.exe uses the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however all of the libraries above get automatically linked as Engine library depends on all of them.
+Urho3D.exe uses the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line. It is also possible to use the engine through C++ only: when the scripting library is not used, the resulting executable will be significantly smaller.
 
-Although Urho3D.exe itself is geared towards running a scripted application, it is also possible to use the engine through C++ only. When the scripting subsystem initialization is completely skipped, the resulting executable will also be significantly smaller.
-
-The third-party libraries are used for the following functionality:
+Third-party libraries are used for the following functionality:
 
 - AngelScript: scripting language implementation
 - Bullet: physics simulation implementation

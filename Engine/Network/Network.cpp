@@ -53,6 +53,9 @@ Network::Network(Context* context) :
 {
     network_ = new kNet::Network();
     
+    // Register Network library object factories
+    RegisterNetworkLibrary(context_);
+    
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Network, HandleBeginFrame));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(Network, HandleRenderUpdate));
 }
