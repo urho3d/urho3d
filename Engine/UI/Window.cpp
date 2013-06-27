@@ -228,14 +228,16 @@ void Window::SetModal(bool modal)
         return;
 
     if (ui->SetModalElement(this, modal))
+    {
         modal_ = modal;
 
-    using namespace ModalChanged;
+        using namespace ModalChanged;
 
-    VariantMap eventData;
-    eventData[P_ELEMENT] = (void*)this;
-    eventData[P_MODAL] = modal;
-    SendEvent(E_MODALCHANGED, eventData);
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_MODAL] = modal;
+        SendEvent(E_MODALCHANGED, eventData);
+    }
 }
 
 void Window::SetModalShadeColor(const Color& color)
