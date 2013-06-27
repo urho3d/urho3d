@@ -190,20 +190,16 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
         return false;
 
     assert(rootModalElement_);
-    const Vector<SharedPtr<UIElement> >& children = rootModalElement_->GetChildren();
+    UIElement* currParent = modalElement->GetParent();
     if (enable)
     {
         // Make sure it is not already the child of the root modal element
-        for (unsigned i = 0; i < children.Size(); ++i)
-        {
-            if (children[i] == modalElement)
-                return false;
-        }
+        if (currParent == rootModalElement_)
+            return false;
 
         // Adopt modal root as parent
-        UIElement* oriParent = modalElement->GetParent();
-        modalElement->SetVar(VAR_ORIGINAL_PARENT, oriParent);
-        modalElement->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(modalElement) : M_MAX_UNSIGNED);
+        modalElement->SetVar(VAR_ORIGINAL_PARENT, currParent);
+        modalElement->SetVar(VAR_ORIGINAL_CHILD_INDEX, currParent ? currParent->FindChild(modalElement) : M_MAX_UNSIGNED);
         modalElement->SetParent(rootModalElement_);
 
         // If it is a popup element, bring along its top-level parent
@@ -216,7 +212,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
             if (element)
             {
                 originElement->SetVar(VAR_PARENT_CHANGED, element);
-                oriParent = element->GetParent();
+                UIElement* oriParent = element->GetParent();
                 element->SetVar(VAR_ORIGINAL_PARENT, oriParent);
                 element->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(element) : M_MAX_UNSIGNED);
                 element->SetParent(rootModalElement_);
@@ -228,36 +224,31 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
     else
     {
         // Only the modal element can disable itself
-        for (unsigned i = 0; i < children.Size(); ++i)
+        if (currParent != rootModalElement_)
+            return false;
+
+        // Revert back to original parent
+        modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()), modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
+        VariantMap& vars = const_cast<VariantMap&>(modalElement->GetVars());
+        vars.Erase(VAR_ORIGINAL_PARENT);
+        vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
+
+        // If it is a popup element, revert back its top-level parent
+        UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
+        if (originElement)
         {
-            if (children[i] == modalElement)
+            UIElement* element = static_cast<UIElement*>(originElement->GetVar(VAR_PARENT_CHANGED).GetPtr());
+            if (element)
             {
-                // Revert back to original parent
-                modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()), modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
-                VariantMap& vars = const_cast<VariantMap&>(modalElement->GetVars());
+                const_cast<VariantMap&>(originElement->GetVars()).Erase(VAR_PARENT_CHANGED);
+                element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()), element->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
+                vars = const_cast<VariantMap&>(element->GetVars());
                 vars.Erase(VAR_ORIGINAL_PARENT);
                 vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
-
-                // If it is a popup element, revert back its top-level parent to its original parent
-                UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
-                if (originElement)
-                {
-                    UIElement* element = static_cast<UIElement*>(originElement->GetVar(VAR_PARENT_CHANGED).GetPtr());
-                    if (element)
-                    {
-                        const_cast<VariantMap&>(originElement->GetVars()).Erase(VAR_PARENT_CHANGED);
-                        element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()), element->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
-                        vars = const_cast<VariantMap&>(element->GetVars());
-                        vars.Erase(VAR_ORIGINAL_PARENT);
-                        vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
-                    }
-                }
-
-                return true;
             }
         }
 
-        return false;
+        return true;
     }
 }
 
