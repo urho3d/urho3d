@@ -34,6 +34,10 @@ else ()
     include_directories (${ALSA_INCLUDE_DIRS})
 
     set(CMAKE_REQUIRED_LIBRARIES ${X11_LIB} ${X11_LIB})
+    message ("--")
+    message ("-- Following tests check whether X11 library installed in this system uses _Xconst in below functions")
+    message ("-- A failed test result simply means the installed X11 library does not use _Xconst")
+    message ("-- It is OK to proceed to build Urho3D regardless of the test result")
     check_c_source_compiles("
         #include <X11/Xlib.h>
         #include <X11/Xproto.h>
@@ -51,6 +55,7 @@ else ()
     if (HAVE_CONST_XDATA32)
         add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XDATA32)
     endif ()
+    message ("--")
     set(CMAKE_REQUIRED_LIBRARIES)
 
     file (GLOB SYS_C_FILES
