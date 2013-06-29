@@ -78,7 +78,7 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
             {
                 const StringHash& nameHash = tracks[i].nameHash_;
                 
-                if (node_->GetNameHash() == nameHash)
+                if (node_->GetNameHash() == nameHash || tracks.Size() == 1)
                     trackToNodeMap_[i] = node_;
                 else
                 {
