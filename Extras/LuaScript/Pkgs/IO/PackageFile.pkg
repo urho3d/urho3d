@@ -1,0 +1,34 @@
+$#include "PackageFile.h"
+
+/// %File entry within the package file.
+struct PackageEntry
+{
+    /// Offset from the beginning.
+    unsigned offset_;
+    /// File size.
+    unsigned size_;
+    /// File checksum.
+    unsigned checksum_;
+};
+
+/// Stores files of a directory tree sequentially for convenient access.
+class PackageFile : public Object
+{
+public:
+    /// Open the package file. Return true if successful.
+    bool Open(const String& fileName);
+    /// Check if a file exists within the package file.
+    bool Exists(const String& fileName) const;
+    /// Return the file entry corresponding to the name, or null if not found.
+    const PackageEntry* GetEntry(const String& fileName) const;
+    /// Return the package file name.
+    const String& GetName() const;
+    /// Return hash of the package file name.
+    StringHash GetNameHash() const;
+    /// Return number of files.
+    unsigned GetNumFiles() const;
+    /// Return total size of the package file.
+    unsigned GetTotalSize() const;
+    /// Return checksum of the package file contents.
+    unsigned GetChecksum() const;
+};

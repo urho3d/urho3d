@@ -1,0 +1,27 @@
+$#include "Controls.h"
+
+/// %Controls sent over the network.
+class Controls
+{
+public:
+    /// Reset to initial state.
+    void Reset();
+    
+    /// Set or release buttons.
+    void Set(unsigned buttons, bool down = true);
+    
+    /// Check if a button is held down.
+    bool IsDown(unsigned button) const;
+	
+    /// Check if a button was pressed on this frame. Requires previous frame's controls.
+    bool IsPressed(unsigned button, const Controls& previousControls) const;
+    
+    /// Button state.
+    unsigned buttons_ @ buttons;
+    /// Mouse yaw.
+    float yaw_ @ yaw;
+    /// Mouse pitch.
+    float pitch_ @ pitch;
+    /// Extra control data.
+    VariantMap extraData_ @ extraData;
+};

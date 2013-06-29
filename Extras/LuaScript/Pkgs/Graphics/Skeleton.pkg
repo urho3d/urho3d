@@ -1,0 +1,44 @@
+$#include "Skeleton.h"
+
+/// %Bone in a skeleton.
+struct Bone
+{
+    /// Construct with defaults.
+    Bone();    
+    /// Bone name.
+    String name_ @ name;
+    /// Bone name hash.
+    StringHash nameHash_ @ nameHash;
+    /// Parent bone index.
+    unsigned parentIndex_ @ parentIndex;
+    /// Reset position.
+    Vector3 initialPosition_ @ initialPosition;
+    /// Reset rotation.
+    Quaternion initialRotation_ @ initialRotation;
+    /// Reset scale.
+    Vector3 initialScale_ @ initialScale;
+    /// Offset matrix.
+    Matrix3x4 offsetMatrix_ @ offsetMatrix;
+    /// Animation enable flag.
+    bool animated_ @ animated;
+    /// Supported collision types.
+    unsigned char collisionMask_ @ collisionMask;
+    /// Radius.
+    float radius_ @ radius;
+    /// Local-space bounding box.
+    BoundingBox boundingBox_ @ boundingBox;
+    /// Scene node.
+    Node* node_ @ node;
+};
+
+/// Hierarchical collection of bones.
+class Skeleton
+{
+public:
+    /// Return number of bones.
+    unsigned GetNumBones() const;
+    /// Return root bone.
+    Bone* GetRootBone();
+    /// Return bone by index.
+    Bone* GetBone(unsigned index);    
+};

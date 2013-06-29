@@ -1,0 +1,88 @@
+$#include "Light.h"
+
+/// %Light types.
+enum LightType
+{
+    LIGHT_DIRECTIONAL = 0,
+    LIGHT_SPOT,
+    LIGHT_POINT
+};
+
+/// %Light component.
+class Light : public Drawable
+{
+    
+public:
+    /// Set light type.
+    void SetLightType(LightType type);
+    /// Set vertex lighting mode.
+    void SetPerVertex(bool enable);
+    /// Set color.
+    void SetColor(const Color& color);
+    /// Set specular intensity.
+    void SetSpecularIntensity(float intensity);
+    /// Set range.
+    void SetRange(float range);
+    /// Set spotlight field of view.
+    void SetFov(float fov);
+    /// Set spotlight aspect ratio.
+    void SetAspectRatio(float aspectRatio);
+    /// Set fade out start distance.
+    void SetFadeDistance(float distance);
+    /// Set shadow fade out start distance. Only has effect if shadow distance is also non-zero.
+    void SetShadowFadeDistance(float distance);
+    /// Set shadow depth bias parameters.
+    void SetShadowBias(const BiasParameters& parameters);
+    /// Set directional light cascaded shadow parameters.
+    void SetShadowCascade(const CascadeParameters& parameters);
+    /// Set shadow map focusing parameters.
+    void SetShadowFocus(const FocusParameters& parameters);
+    /// Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
+    void SetShadowIntensity(float intensity);
+    /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
+    void SetShadowResolution(float resolution);
+    /// Set shadow camera near/far clip distance ratio.
+    void SetShadowNearFarRatio(float nearFarRatio);
+    /// Set range attenuation texture.
+    void SetRampTexture(Texture* texture);
+    /// Set spotlight attenuation texture.
+    void SetShapeTexture(Texture* texture);
+    
+    /// Return light type.
+    LightType GetLightType() const;
+    /// Return vertex lighting mode.
+    bool GetPerVertex() const;
+    /// Return color.
+    const Color& GetColor() const;
+    /// Return specular intensity.
+    float GetSpecularIntensity() const;
+    /// Return range.
+    float GetRange() const;
+    /// Return spotlight field of view.
+    float GetFov() const;
+    /// Return spotlight aspect ratio.
+    float GetAspectRatio() const;
+    /// Return fade start distance.
+    float GetFadeDistance() const;
+    /// Return shadow fade start distance.
+    float GetShadowFadeDistance() const;
+    /// Return shadow depth bias parameters.
+    const BiasParameters& GetShadowBias() const;
+    /// Return directional light cascaded shadow parameters.
+    const CascadeParameters& GetShadowCascade() const;
+    /// Return shadow map focus parameters.
+    const FocusParameters& GetShadowFocus() const;
+    /// Return shadow intensity.
+    float GetShadowIntensity() const;
+    /// Return shadow resolution.
+    float GetShadowResolution() const;
+    /// Return shadow camera near/far clip distance ratio.
+    float GetShadowNearFarRatio() const;
+    /// Return range attenuation texture.
+    Texture* GetRampTexture() const;
+    /// Return spotlight attenuation texture.
+    Texture* GetShapeTexture() const;
+    /// Return spotlight frustum.
+    Frustum GetFrustum() const;
+};
+

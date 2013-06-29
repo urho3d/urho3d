@@ -1,0 +1,86 @@
+$#include "Connection.h"
+
+/// Queued remote event.
+struct RemoteEvent
+{
+    /// Remote sender node ID (0 if not a remote node event.)
+    unsigned senderID_ @ senderID;
+    /// Event type.
+    StringHash eventType_ @ eventType;
+    /// Event data.
+    VariantMap eventData_ @ eventData;
+    /// In order flag.
+    bool inOrder_ @ inOrder;
+};
+
+/// %Connection to a remote network host.
+class Connection : public Object
+{
+public:
+    /// Send a message.
+    void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
+    /// Send a message.
+    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
+    /// Send a remote event.
+    void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    /// Send a remote event with the specified node as sender.
+    void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    /// Assign scene. On the server, this will cause the client to load it.
+    void SetScene(Scene* newScene);
+    /// Assign identity. Called by Network.
+    void SetIdentity(const VariantMap& identity);
+    /// Set new controls.
+    void SetControls(const Controls& newControls);
+    /// Set the observer position for interest management.
+    void SetPosition(const Vector3& position);
+    /// Set the connection pending status. Called by Network.
+    void SetConnectPending(bool connectPending);
+    /// Set whether to log data in/out statistics.
+    void SetLogStatistics(bool enable);
+    /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish.
+    void Disconnect(int waitMSec = 0);
+    /// Send scene update messages. Called by Network.
+    void SendServerUpdate();
+    /// Send latest controls from the client. Called by Network.
+    void SendClientUpdate();
+    /// Send queued remote events. Called by Network.
+    void SendRemoteEvents();
+    /// Send package files to client. Called by network.
+    void SendPackages();
+    /// Process pending latest data for nodes and components.
+    void ProcessPendingLatestData();
+    /// Process a message from the server or client. Called by Network.
+    bool ProcessMessage(int msgID, MemoryBuffer& msg);
+    
+    /// Return client identity.
+    const VariantMap& GetIdentity() const;
+    /// Return the scene used by this connection.
+    Scene* GetScene() const;
+    /// Return the client controls of this connection.
+    const Controls& GetControls() const;
+    /// Return the observer position for interest management.
+    const Vector3& GetPosition() const;
+    /// Return whether is a client connection.
+    bool IsClient() const;
+    /// Return whether is fully connected.
+    bool IsConnected() const;
+    /// Return whether connection is pending.
+    bool IsConnectPending() const;
+    /// Return whether the scene is loaded and ready to receive server updates.
+    bool IsSceneLoaded() const;
+    /// Return whether to log data in/out statistics.
+    bool GetLogStatistics() const;
+    /// Return remote address.
+    String GetAddress() const;
+    /// Return remote port.
+    unsigned short GetPort() const;
+    /// Return an address:port string.
+    String ToString() const;
+    /// Return number of package downloads remaining.
+    unsigned GetNumDownloads() const;
+    /// Return name of current package download, or empty if no downloads.
+    const String& GetDownloadName() const;
+    /// Return progress of current package download, or 1.0 if no downloads.
+    float GetDownloadProgress() const;
+    
+};

@@ -1,0 +1,73 @@
+$#include "Matrix3.h"
+
+/// 3x3 matrix for rotation and scaling.
+class Matrix3
+{
+public:
+    /// Construct undefined.
+    Matrix3();
+    
+    /// Copy-construct from another matrix.
+    Matrix3(const Matrix3& matrix);
+    
+    /// Construct from values.
+    Matrix3(float v00, float v01, float v02,
+            float v10, float v11, float v12,
+            float v20, float v21, float v22);
+    
+    /// Test for equality with another matrix without epsilon.
+    bool operator == (const Matrix3& rhs) const;
+    
+    /// Multiply a Vector3.
+    Vector3 operator * (const Vector3& rhs) const;
+    
+    /// Add a matrix.
+    Matrix3 operator + (const Matrix3& rhs) const;
+    
+    /// Subtract a matrix.
+    Matrix3 operator - (const Matrix3& rhs) const;
+	
+    /// Multiply with a scalar.
+    Matrix3 operator * (float rhs) const;
+	
+    /// Multiply a matrix.
+    Matrix3 operator * (const Matrix3& rhs) const;
+    
+    /// Set scaling elements.
+    void SetScale(const Vector3& scale);
+    
+    /// Set uniform scaling elements.
+    void SetScale(float scale);
+    
+    /// Return the scaling part.
+    Vector3 Scale() const;
+    
+    /// Return transpose.
+    Matrix3 Transpose() const;
+    
+    /// Return scaled by a vector.
+    Matrix3 Scaled(const Vector3& scale) const;
+    
+    /// Test for equality with another matrix with epsilon.
+    bool Equals(const Matrix3& rhs) const;
+    
+    /// Return inverse.
+    Matrix3 Inverse() const;
+    
+    float m00_ @ m00;
+    float m01_ @ m01;
+    float m02_ @ m02;
+    float m10_ @ m10;
+    float m11_ @ m11;
+    float m12_ @ m12;
+    float m20_ @ m20;
+    float m21_ @ m21;
+    float m22_ @ m22;
+    
+    /// Bulk transpose matrices.
+    static void BulkTranspose(float* dest, const float* src, unsigned count);    
+    /// Zero matrix.
+    static const Matrix3 ZERO;
+    /// Identity matrix.
+    static const Matrix3 IDENTITY;
+};

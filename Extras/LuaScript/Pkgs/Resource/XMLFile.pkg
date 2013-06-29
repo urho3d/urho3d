@@ -1,0 +1,9 @@
+$#include "XMLFile.h"
+
+/// XML document resource.
+class XMLFile : public Resource
+{
+public:
+    /// Return the root element, with optionally specified name. Return null element if not found.
+    XMLElement GetRoot(const String& name = String::EMPTY);
+};

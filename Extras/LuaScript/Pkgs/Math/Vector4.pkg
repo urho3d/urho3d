@@ -1,0 +1,61 @@
+$#include "Vector4.h"
+
+/// Four-dimensional vector.
+class Vector4
+{
+public:
+    /// Construct undefined.
+    Vector4();
+    
+    /// Copy-construct from another vector.
+    Vector4(const Vector4& vector);
+    
+    /// Construct from a 3-dimensional vector and the W coordinate.
+    Vector4(const Vector3& vector, float w);
+    
+    /// Construct from coordinates.
+    Vector4(float x, float y, float z, float w);
+    
+    /// Test for equality with another vector without epsilon.
+    bool operator == (const Vector4& rhs) const;
+
+	/// Add a vector.
+    Vector4 operator + (const Vector4& rhs) const;
+    /// Return negation.
+    Vector4 operator - () const;
+    /// Subtract a vector.
+    Vector4 operator - (const Vector4& rhs) const;
+    /// Multiply with a scalar.
+    Vector4 operator * (float rhs) const;
+    /// Multiply with a vector.
+    Vector4 operator * (const Vector4& rhs) const;
+    /// Divide by a scalar.
+    Vector4 operator / (float rhs) const;
+    /// Divide by a vector.
+    Vector4 operator / (const Vector4& rhs) const;
+    
+    /// Calculate dot product.
+    float DotProduct(const Vector4& rhs) const;
+    /// Calculate absolute dot product.
+    float AbsDotProduct(const Vector4& rhs) const;
+    /// Return absolute vector.
+    Vector4 Abs() const;
+    /// Linear interpolation with another vector.
+    Vector4 Lerp(const Vector4& rhs, float t) const;
+    /// Test for equality with another vector with epsilon.
+    bool Equals(const Vector4& rhs) const;
+    
+    /// X coordinate.
+    float x_ @ x;
+    /// Y coordinate.
+    float y_ @ y;
+    /// Z coordinate.
+    float z_ @ z;
+    /// W coordinate.
+    float w_ @ w;
+    
+    /// Zero vector.
+    static const Vector4 ZERO;
+    /// (1,1,1) vector.
+    static const Vector4 ONE;
+};

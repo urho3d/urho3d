@@ -1,0 +1,29 @@
+$#include "Model.h"
+
+/// 3D model resource.
+class Model : public Resource
+{
+public:
+    /// Return bounding box.
+    const BoundingBox& GetBoundingBox() const;
+    /// Return skeleton.
+    Skeleton& GetSkeleton();
+    /// Return number of geometries.
+    unsigned GetNumGeometries() const;
+    /// Return number of LOD levels in geometry.
+    unsigned GetNumGeometryLodLevels(unsigned index) const;
+    /// Return geometry by index and LOD level. The LOD level is clamped if out of range.
+    Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
+    /// Return number of vertex morphs.
+    unsigned GetNumMorphs() const;
+    /// Return vertex morph by index.
+    const ModelMorph* GetMorph(unsigned index) const;
+    /// Return vertex morph by name.
+    const ModelMorph* GetMorph(const String& name) const;
+    /// Return vertex morph by name hash.
+    const ModelMorph* GetMorph(StringHash nameHash) const;
+    /// Return vertex buffer morph range start.
+    unsigned GetMorphRangeStart(unsigned bufferIndex) const;
+    /// Return vertex buffer morph range vertex count.
+    unsigned GetMorphRangeCount(unsigned bufferIndex) const;
+};

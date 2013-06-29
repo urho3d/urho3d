@@ -1,0 +1,51 @@
+$#include "Window.h"
+
+/// %Window movement and resizing modes.
+enum WindowDragMode
+{
+    DRAG_NONE,
+    DRAG_MOVE,
+    DRAG_RESIZE_TOPLEFT,
+    DRAG_RESIZE_TOP,
+    DRAG_RESIZE_TOPRIGHT,
+    DRAG_RESIZE_RIGHT,
+    DRAG_RESIZE_BOTTOMRIGHT,
+    DRAG_RESIZE_BOTTOM,
+    DRAG_RESIZE_BOTTOMLEFT,
+    DRAG_RESIZE_LEFT
+};
+
+/// %Window %UI element that can optionally by moved or resized.
+class Window : public BorderImage
+{
+public:
+    /// Set whether can be moved.
+    void SetMovable(bool enable);
+    /// Set whether can be resized.
+    void SetResizable(bool enable);
+    /// Set resize area width at edges.
+    void SetResizeBorder(const IntRect& rect);
+    /// Set modal flag. When the modal flag is set, the focused window needs to be dismissed first to allow other UI elements to gain focus.
+    void SetModal(bool modal);
+    /// Set modal shade color.
+    void SetModalShadeColor(const Color& color);
+    /// Set modal frame color.
+    void SetModalFrameColor(const Color& color);
+    /// Set modal frame size.
+    void SetModalFrameSize(const IntVector2& size);
+
+    /// Return whether is movable.
+    bool IsMovable() const;
+    /// Return whether is resizable.
+    bool IsResizable() const;
+    /// Return resize area width at edges.
+    const IntRect& GetResizeBorder() const;
+    /// Return modal flag.
+    bool IsModal() const;
+    /// Get modal shade color.
+    const Color& GetModalShadeColor() const;
+    /// Get modal frame color.
+    const Color& GetModalFrameColor() const;
+    /// Get modal frame size.
+    const IntVector2& GetModalFrameSize() const;
+};

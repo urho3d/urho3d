@@ -1,0 +1,10 @@
+$#define TOLUA_RELEASE
+
+$#include "SceneLuaAPI.h"
+
+$pfile "Scene/Component.pkg"
+$pfile "Scene/Node.pkg"
+$pfile "Scene/Scene.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)

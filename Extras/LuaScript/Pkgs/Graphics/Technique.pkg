@@ -1,0 +1,12 @@
+$#include "Technique.h"
+
+/// %Material technique. Consists of several passes.
+class Technique : public Resource
+{
+public:
+    /// Set whether requires %Shader %Model 3.
+    void SetIsSM3(bool enable);
+    /// Reset shader pointers in all passes.
+    void ReleaseShaders();    
+    bool IsSM3() const;
+};

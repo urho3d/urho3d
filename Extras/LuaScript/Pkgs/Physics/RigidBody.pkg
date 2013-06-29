@@ -1,0 +1,155 @@
+$#include "RigidBody.h"
+
+/// Rigid body collision event signaling mode.
+enum CollisionEventMode
+{
+    COLLISION_NEVER = 0,
+    COLLISION_ACTIVE,
+    COLLISION_ALWAYS
+};
+
+/// Physics rigid body component.
+class RigidBody : public Component
+{   
+public:
+    /// Set mass. Zero mass makes the body static.
+    void SetMass(float mass);
+    /// Set rigid body world-space position.
+    void SetPosition(Vector3 position);
+    /// Set rigid body world-space rotation.
+    void SetRotation(Quaternion rotation);
+    /// Set rigid body world-space position and rotation.
+    void SetTransform(const Vector3& position, const Quaternion& rotation);
+    /// Set linear velocity.
+    void SetLinearVelocity(Vector3 velocity);
+    /// Set linear degrees of freedom.
+    void SetLinearFactor(Vector3 factor);
+    /// Set linear velocity deactivation threshold.
+    void SetLinearRestThreshold(float threshold);
+    /// Set linear velocity damping factor.
+    void SetLinearDamping(float damping);
+    /// Set angular velocity.
+    void SetAngularVelocity(Vector3 angularVelocity);
+    /// Set angular degrees of freedom.
+    void SetAngularFactor(Vector3 factor);
+    /// Set angular velocity deactivation threshold.
+    void SetAngularRestThreshold(float threshold);
+    /// Set angular velocity damping factor.
+    void SetAngularDamping(float factor);
+    /// Set friction coefficient.
+    void SetFriction(float friction);
+    /// Set restitution coefficient.
+    void SetRestitution(float restitution);
+    /// Set contact processing threshold.
+    void SetContactProcessingThreshold(float threshold);
+    /// Set continuous collision detection swept sphere radius.
+    void SetCcdRadius(float radius);
+    /// Set continuous collision detection motion-per-simulation-step threshold. 0 disables, which is the default.
+    void SetCcdMotionThreshold(float threshold);
+    /// Set whether gravity is applied to rigid body.
+    void SetUseGravity(bool enable);
+    /// Set gravity override. If zero, uses physics world's gravity.
+    void SetGravityOverride(const Vector3& gravity);
+    /// Set rigid body kinematic mode. In kinematic mode forces are not applied to the rigid body.
+    void SetKinematic(bool enable);
+    /// Set rigid body phantom mode. In phantom mode collisions are reported but do not apply forces.
+    void SetPhantom(bool enable);
+    /// Set collision layer.
+    void SetCollisionLayer(unsigned layer);
+    /// Set collision mask.
+    void SetCollisionMask(unsigned mask);
+    /// Set collision group and mask.
+    void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
+    /// Set collision event signaling mode. Default is to signal when rigid bodies are active.
+    void SetCollisionEventMode(CollisionEventMode mode);
+    /// Apply force to center of mass.
+    void ApplyForce(const Vector3& force);
+    /// Apply force at local position.
+    void ApplyForce(const Vector3& force, const Vector3& position);
+    /// Apply torque.
+    void ApplyTorque(const Vector3& torque);
+    /// Apply impulse to center of mass.
+    void ApplyImpulse(const Vector3& impulse);
+    /// Apply impulse at local position.
+    void ApplyImpulse(const Vector3& impulse, const Vector3& position);
+    /// Apply torque impulse.
+    void ApplyTorqueImpulse(const Vector3& torque);
+    /// Reset accumulated forces.
+    void ResetForces();
+    /// Activate rigid body if it was resting.
+    void Activate();
+    /// Readd rigid body to the physics world to clean up internal state like stale contacts.
+    void ReAddBodyToWorld();
+    
+    /// Return physics world.
+    PhysicsWorld* GetPhysicsWorld() const;
+    /// Return mass.
+    float GetMass() const;
+    /// Return rigid body world-space position.
+    Vector3 GetPosition() const;
+    /// Return rigid body world-space rotation.
+    Quaternion GetRotation() const;
+    /// Return linear velocity.
+    Vector3 GetLinearVelocity() const;
+    /// Return linear degrees of freedom.
+    Vector3 GetLinearFactor() const;
+    /// Return linear velocity at local point.
+    Vector3 GetVelocityAtPoint(const Vector3& position) const;
+    /// Return linear velocity deactivation threshold.
+    float GetLinearRestThreshold() const;
+    /// Return linear velocity damping threshold.
+    // float GetLinearDamping() const;
+    /// Return linear velocity damping scale.
+    // float GetLinearDampingScale() const;
+    /// Return angular velocity.
+    Vector3 GetAngularVelocity() const;
+    /// Return angular degrees of freedom.
+    Vector3 GetAngularFactor() const;
+    /// Return angular velocity deactivation threshold.
+    float GetAngularRestThreshold() const;
+    /// Return angular velocity damping threshold.
+    // float GetAngularDamping() const;
+    /// Return angular velocity damping scale.
+    // float GetAngularDampingScale() const;
+    /// Return friction coefficient.
+    float GetFriction() const;
+    /// Return restitution coefficient.
+    float GetRestitution() const;
+    /// Return contact processing threshold.
+    float GetContactProcessingThreshold() const;
+    /// Return continuous collision detection swept sphere radius.
+    float GetCcdRadius() const;
+    /// Return continuous collision detection motion-per-simulation-step threshold.
+    float GetCcdMotionThreshold() const;
+    /// Return whether rigid body uses gravity.
+    bool GetUseGravity() const;
+    /// Return gravity override. If zero (default), uses the physics world's gravity.
+    const Vector3& GetGravityOverride() const;
+    /// Return center of mass offset.
+    const Vector3& GetCenterOfMass() const;
+    /// Return kinematic mode flag.
+    bool IsKinematic() const;
+    /// Return phantom mode flag.
+    bool IsPhantom() const;
+    /// Return whether rigid body is active (not sleeping.)
+    bool IsActive() const;
+    /// Return collision layer.
+    unsigned GetCollisionLayer() const;
+    /// Return collision mask.
+    unsigned GetCollisionMask() const;
+    /// Return collision event signaling mode.
+    CollisionEventMode GetCollisionEventMode() const;
+    
+    /// Apply new world transform after a simulation step. Called internally.
+    void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
+    /// Update mass and inertia to the Bullet rigid body.
+    void UpdateMass();
+    /// Update gravity parameters to the Bullet rigid body.
+    void UpdateGravity();
+    /// Add a constraint that refers to this rigid body.
+    void AddConstraint(Constraint* constraint);
+    /// Remove a constraint that refers to this rigid body.
+    void RemoveConstraint(Constraint* constraint);
+    /// Remove the rigid body.
+    void ReleaseBody();
+};

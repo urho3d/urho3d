@@ -1,0 +1,48 @@
+$#include "LineEdit.h"
+
+/// Single-line text editor %UI element.
+class LineEdit : public BorderImage
+{
+public:
+    /// Set text.
+    void SetText(const String& text);
+    /// Set cursor position.
+    void SetCursorPosition(unsigned position);
+    /// Set cursor blink rate. 0 disables blinking.
+    void SetCursorBlinkRate(float rate);
+    /// Set maximum text length. 0 for unlimited.
+    void SetMaxLength(unsigned length);
+    /// Set echo character for password entry and such. 0 (default) shows the actual text.
+    void SetEchoCharacter(unsigned c);
+    /// Set whether can move cursor with arrows or mouse, default true.
+    void SetCursorMovable(bool enable);
+    /// Set whether selections are allowed, default true.
+    void SetTextSelectable(bool enable);
+    /// Set whether copy-paste operations are allowed, default true.
+    void SetTextCopyable(bool enable);
+    /// Set text selection doubleclick interval in seconds.
+    void SetDoubleClickInterval(float interval);
+
+    /// Return text.
+    const String& GetText() const;
+    /// Return cursor position.
+    unsigned GetCursorPosition() const;
+    /// Return cursor blink rate.
+    float GetCursorBlinkRate() const;
+    /// Return maximum text length.
+    unsigned GetMaxLength() const;
+    /// Return echo character.
+    unsigned GetEchoCharacter() const;
+    /// Return whether can move cursor with arrows or mouse.
+    bool IsCursorMovable() const;
+    /// Return whether selections are allowed.
+    bool IsTextSelectable() const;
+    /// Return whether copy-paste operations are allowed.
+    bool IsTextCopyable() const;
+    /// Return text element.
+    Text* GetTextElement() const;
+    /// Return cursor element.
+    BorderImage* GetCursor() const;
+    /// Return text selection doubleclick interval in seconds.
+    float GetDoubleClickInterval() const;
+};

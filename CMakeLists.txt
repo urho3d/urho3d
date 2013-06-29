@@ -148,7 +148,7 @@ macro (setup_target)
     # Include directories
     include_directories (${LIBS} ${INCLUDE_DIRS_ONLY})
     # Link libraries
-    string (REGEX REPLACE "\\.\\./|ThirdParty/|Engine/|/Include|/include|/src" "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
+    string (REGEX REPLACE "\\.\\./|ThirdParty/|Engine/|Extras/|/Include|/include|/src" "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
     target_link_libraries (${TARGET_NAME} ${STRIP_LIBS})
 endmacro ()
 
@@ -272,7 +272,6 @@ add_subdirectory (ThirdParty/SDL)
 add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
 add_subdirectory (ThirdParty/JO)
-add_subdirectory (Urho3D)
 
 if (NOT IOS)
     if (USE_OPENGL)
@@ -293,6 +292,17 @@ if (NOT USE_OPENGL)
     add_subdirectory (Tools/ShaderCompiler)
 endif ()
 
+# Alternative Lua bindings. Uncomment the following line to enable
+# set (ENABLE_LUA 1)
+if (ENABLE_LUA)
+    add_definitions (-DENABLE_LUA)
+    add_subdirectory (ThirdParty/Lua)
+    add_subdirectory (ThirdParty/Tolua++)
+    add_subdirectory (Extras/LuaScript)
+endif ()
+
 # Urho3D extras. Uncomment to enable
 # add_subdirectory (Extras/OgreBatchConverter)
 # add_subdirectory (Extras/CharacterDemo)
+
+add_subdirectory (Urho3D)

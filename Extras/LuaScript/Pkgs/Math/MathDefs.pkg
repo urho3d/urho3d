@@ -1,0 +1,65 @@
+$#include "MathDefs.h"
+
+static const float M_PI;
+
+static const int M_MIN_INT;
+static const int M_MAX_INT;
+static const unsigned M_MIN_UNSIGNED;
+static const unsigned M_MAX_UNSIGNED;
+
+static const float M_EPSILON;
+static const float M_LARGE_EPSILON;
+static const float M_MIN_NEARCLIP;
+static const float M_MAX_FOV;
+static const float M_LARGE_VALUE;
+static const float M_INFINITY;
+static const float M_DEGTORAD;
+static const float M_DEGTORAD_2;
+static const float M_RADTODEG;
+
+/// Intersection test result.
+enum Intersection
+{
+    OUTSIDE,
+    INTERSECTS,
+    INSIDE
+};
+
+/// Linear interpolation between two float values.
+inline float Lerp(float lhs, float rhs, float t);
+/// Return the smaller of two floats.
+inline float Min(float lhs, float rhs);
+/// Return the larger of two floats.
+inline float Max(float lhs, float rhs);
+/// Return absolute value of a float.
+inline float Abs(float value);
+
+/// Clamp a float to a range.
+inline float Clamp(float value, float min, float max);
+
+/// Check whether two floating point values are equal within accuracy.
+inline bool Equals(float lhs, float rhs);
+/// Return the smaller of two integers.
+inline int Min(int lhs, int rhs);
+/// Return the larger of two integers.
+inline int Max(int lhs, int rhs);
+/// Return absolute value of an integer
+inline int Abs(int value);
+
+/// Clamp an integer to a range.
+inline int Clamp(int value, int min, int max);
+
+/// Check whether an unsigned integer is a power of two.
+inline bool IsPowerOfTwo(unsigned value);
+
+/// Round up to next power of two.
+inline unsigned NextPowerOfTwo(unsigned value);
+
+/// Update a hash with the given 8-bit value using the SDBM algorithm.
+inline unsigned SDBMHash(unsigned hash, unsigned char c);
+/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
+inline float Random();
+/// Return a random float between 0.0 and range, inclusive from both ends.
+inline float Random(float range);
+/// Return a random integer between 0 and range - 1.
+inline int Random @ RandomInt (int range);

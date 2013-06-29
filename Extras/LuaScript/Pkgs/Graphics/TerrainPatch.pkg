@@ -1,0 +1,49 @@
+$#include "TerrainPatch.h"
+
+/// Individually rendered part of a heightmap terrain.
+class TerrainPatch : public Drawable
+{
+public:
+    /// Set owner terrain.
+    void SetOwner(Terrain* terrain);
+    /// Set neighbor patches.
+    void SetNeighbors(TerrainPatch* north, TerrainPatch* south, TerrainPatch* west, TerrainPatch* east);
+    /// Set material.
+    void SetMaterial(Material* material);
+    /// Set local-space bounding box.
+    void SetBoundingBox(const BoundingBox& box);
+    /// Set patch coordinates.
+    void SetCoordinates(const IntVector2& coordinates);
+    /// Set vertical offset for occlusion geometry. Should be negative.
+    void SetOcclusionOffset(float offset);
+    /// Reset to LOD level 0.
+    void ResetLod();
+    
+    /// Return visible geometry.
+    Geometry* GetGeometry() const;
+    /// Return max LOD geometry.
+    Geometry* GetMaxLodGeometry() const;
+    /// Return min LOD geometry.
+    Geometry* GetMinLodGeometry() const;
+    /// Return vertex buffer.
+    VertexBuffer* GetVertexBuffer() const;
+    /// Return owner terrain.
+    Terrain* GetOwner() const;
+    /// Return north neighbor patch.
+    TerrainPatch* GetNorthPatch() const;
+    /// Return south neighbor patch.
+    TerrainPatch* GetSouthPatch() const;
+    /// Return west neighbor patch.
+    TerrainPatch* GetWestPatch() const;
+    /// Return east neighbor patch.
+    TerrainPatch* GetEastPatch() const;
+    /// Return geometrical error array.
+    /// Return local-space bounding box.
+    const BoundingBox& GetBoundingBox() const;
+    /// Return patch coordinates.
+    const IntVector2& GetCoordinates() const;
+    /// Return current LOD level.
+    unsigned GetLodLevel() const;
+    /// Return vertical offset for occlusion geometry..
+    float GetOcclusionOffset() const;
+};

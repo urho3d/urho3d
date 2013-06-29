@@ -1,0 +1,105 @@
+$#include "Drawable.h"
+
+/// Base class for visible components.
+class Drawable : public Component
+{
+public:
+	/// Set draw distance.
+    void SetDrawDistance(float distance);
+    /// Set shadow draw distance.
+    void SetShadowDistance(float distance);
+    /// Set LOD bias.
+    void SetLodBias(float bias);
+    /// Set view mask. Is and'ed with camera's view mask to see if the object should be rendered.
+    void SetViewMask(unsigned mask);
+    /// Set light mask. Is and'ed with light's and zone's light mask to see if the object should be lit.
+    void SetLightMask(unsigned mask);
+    /// Set shadow mask. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
+    void SetShadowMask(unsigned mask);
+    /// Set zone mask. Is and'ed with zone's zone mask to see if the object should belong to the zone.
+    void SetZoneMask(unsigned mask);
+    /// Set maximum number of per-pixel lights. Default 0 is unlimited.
+    void SetMaxLights(unsigned num);
+    /// Set shadowcaster flag.
+    void SetCastShadows(bool enable);
+    /// Set occlusion flag.
+    void SetOccluder(bool enable);
+    /// Set occludee flag.
+    void SetOccludee(bool enable);
+    /// Mark for update before octree reinsertion.
+    void MarkForUpdate();
+    
+    /// Return world-space bounding box.
+    const BoundingBox& GetWorldBoundingBox();
+    /// Return drawable flags.
+    unsigned char GetDrawableFlags() const;
+    /// Return draw distance.
+    float GetDrawDistance() const;
+    /// Return shadow draw distance.
+    float GetShadowDistance() const;
+    /// Return LOD bias.
+    float GetLodBias() const;
+    /// Return view mask.
+    unsigned GetViewMask() const;
+    /// Return light mask.
+    unsigned GetLightMask() const;
+    /// Return shadow mask.
+    unsigned GetShadowMask() const;
+    /// Return zone mask.
+    unsigned GetZoneMask() const;
+    /// Return maximum number of per-pixel lights.
+    unsigned GetMaxLights() const;
+    /// Return shadowcaster flag.
+    bool GetCastShadows() const;
+    /// Return occluder flag.
+    bool IsOccluder() const;
+    /// Return occludee flag.
+    bool IsOccludee() const;
+    
+    /// Set new zone.
+    void SetZone(Zone* zone, bool temporary = false);
+    /// Set sorting value.
+    void SetSortValue(float value);
+    /// Set view-space depth bounds.
+    void SetMinMaxZ(float minZ, float maxZ);
+    /// Mark in view (either the main camera, or a shadow camera view) this frame.
+    void MarkInView(const FrameInfo& frame, bool mainView = true);
+    /// Clear lights and base pass flags for a new frame.
+    void ClearLights();
+    /// Add a per-pixel light.
+    void AddLight(Light* light);
+    /// Add a per-vertex light.
+    void AddVertexLight(Light* light);
+    /// Sort and limit per-pixel lights to maximum allowed. Convert extra lights into vertex lights.
+    void LimitLights();
+    /// Sort and limit per-vertex lights to maximum allowed.
+    void LimitVertexLights();
+    /// Set base pass flag for a batch.
+    void SetBasePass(unsigned batchIndex);
+    /// Return octree octant.
+    Octant* GetOctant() const;
+    /// Return current zone.
+    Zone* GetZone() const;
+    /// Return previous zone.
+    Zone* GetLastZone() const;
+    /// Return if zone assignment needs re-evaluation.
+    bool IsZoneDirty() const;
+    /// Return distance from camera.
+    float GetDistance() const;
+    /// Return LOD scaled distance from camera.
+    float GetLodDistance() const;
+    /// Return sorting value.
+    float GetSortValue() const;
+    /// Return whether is in view this frame.
+    bool IsInView(unsigned frameNumber) const;
+    /// Return whether is visible in a specific view this frame.
+    bool IsInView(const FrameInfo& frame, bool mainView = true) const;
+    /// Return whether has a base pass.
+    bool HasBasePass(unsigned batchIndex) const;
+    /// Return the first added per-pixel light.
+    Light* GetFirstLight() const;
+    /// Return the minimum view-space depth.
+    float GetMinZ() const;
+    /// Return the maximum view-space depth.
+    float GetMaxZ() const;
+};

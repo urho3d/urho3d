@@ -1,0 +1,18 @@
+$#include "CheckBox.h"
+
+/// %UI element that can be toggled between unchecked and checked state.
+class CheckBox : public BorderImage
+{
+public:
+    /// Set checked state.
+    void SetChecked(bool enable);
+    /// Set checked image offset.
+    void SetCheckedOffset(const IntVector2& rect);
+    /// Set checked image offset.
+    void SetCheckedOffset(int x, int y);
+    
+    /// Return whether is checked.
+    bool IsChecked() const;
+    /// Return checked image offset.
+    const IntVector2& GetCheckedOffset() const;
+};

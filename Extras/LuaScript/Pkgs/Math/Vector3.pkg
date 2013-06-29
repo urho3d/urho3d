@@ -1,0 +1,84 @@
+$#include "Vector3.h"
+
+/// Three-dimensional vector.
+class Vector3
+{
+public:
+    /// Construct undefined.
+    Vector3();
+    
+    /// Copy-construct from another vector.
+    Vector3(const Vector3& vector);
+    
+    /// Construct from a two-dimensional vector and the Z coordinate.
+    Vector3(const Vector2& vector, float z);
+    
+    /// Construct from coordinates.
+    Vector3(float x, float y, float z);
+    
+    /// Test for equality with another vector without epsilon.
+    bool operator == (const Vector3& rhs) const;
+    /// Add a vector.
+    Vector3 operator + (const Vector3& rhs) const;
+    /// Return negation.
+    Vector3 operator - () const;
+    /// Subtract a vector.
+    Vector3 operator - (const Vector3& rhs) const;
+    /// Multiply with a scalar.
+    Vector3 operator * (float rhs) const;
+    /// Multiply with a vector.
+    Vector3 operator * (const Vector3& rhs) const;
+    /// Divide by a scalar.
+    Vector3 operator / (float rhs) const;
+    /// Divide by a vector.
+    Vector3 operator / (const Vector3& rhs) const;
+    
+    /// Normalize to unit length and return the previous length.
+    float Normalize();
+    
+    /// Return length.
+    float Length() const;
+    /// Return squared length.
+    float LengthSquared() const;
+    /// Calculate dot product.
+    float DotProduct(const Vector3& rhs) const;
+    /// Calculate absolute dot product.
+    float AbsDotProduct(const Vector3& rhs) const;
+    
+    /// Calculate cross product.
+    Vector3 CrossProduct(const Vector3& rhs) const;
+    
+    /// Return absolute vector.
+    Vector3 Abs() const;
+    /// Linear interpolation with another vector.
+    Vector3 Lerp(const Vector3& rhs, float t) const;
+    /// Test for equality with another vector with epsilon.
+    bool Equals(const Vector3& rhs) const;
+    
+    /// Return normalized to unit length.
+    Vector3 Normalized() const;
+    
+	/// X coordinate.
+    float x_ @ x;
+    /// Y coordinate.
+    float y_ @ y;
+    /// Z coordinate.
+    float z_ @ z;
+    
+    /// Zero vector.
+    static const Vector3 ZERO;
+    /// (-1,0,0) vector.
+    static const Vector3 LEFT;
+    /// (1,0,0) vector.
+    static const Vector3 RIGHT;
+    /// (0,1,0) vector.
+    static const Vector3 UP;
+    /// (0,-1,0) vector.
+    static const Vector3 DOWN;
+    /// (0,0,1) vector.
+    static const Vector3 FORWARD;
+    /// (0,0,-1) vector.
+    static const Vector3 BACK;
+    /// (1,1,1) vector.
+    static const Vector3 ONE;
+};

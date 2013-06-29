@@ -1,0 +1,42 @@
+$#include "ScrollBar.h"
+
+/// Scroll bar %UI element with forward and back buttons.
+class ScrollBar : public UIElement
+{
+public:
+    /// Set orientation type.
+    void SetOrientation(Orientation orientation);
+    /// Set slider range maximum value (minimum value is always 0.)
+    void SetRange(float range);
+    /// Set slider current value.
+    void SetValue(float value);
+    /// Change slider current value by a delta.
+    void ChangeValue(float delta);
+    /// Set button scroll step.
+    void SetScrollStep(float step);
+    /// Set button step factor, can be used to adjust the step for constant pixel size.
+    void SetStepFactor(float factor);
+    /// Scroll back one step.
+    void StepBack();
+    /// Scroll forward one step.
+    void StepForward();
+    
+    /// Return scrollbar orientation.
+    Orientation GetOrientation() const;
+    /// Return slider range.
+    float GetRange() const;
+    /// Return slider current value.
+    float GetValue() const;
+    /// Return button scroll step.
+    float GetScrollStep() const;
+    /// Return button step factor.
+    float GetStepFactor() const;
+    /// Return scroll step multiplied by factor.
+    float GetEffectiveScrollStep() const;
+    /// Return back button element.
+    Button* GetBackButton() const;
+    /// Return forward button element.
+    Button* GetForwardButton() const;
+    /// Return slider element.
+    Slider* GetSlider() const;
+};

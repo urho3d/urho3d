@@ -1,0 +1,8 @@
+$#define TOLUA_RELEASE
+
+$#include "LuaScript.h"
+
+void SubscribeToEvent(const char* eventType, const char* funcName);
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)

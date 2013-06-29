@@ -1,0 +1,45 @@
+$#include "ResourceCache.h"
+
+/// %Resource cache subsystem. Loads resources on demand and stores them for later access.
+class ResourceCache
+{    
+public:
+    /// Release all resources.
+    void ReleaseAllResources(bool force = false);
+    /// Reload a resource. Return false and release it if fails.
+    bool ReloadResource(Resource* resource);
+    /// Set memory budget for a specific resource type, default 0 is unlimited.
+    void SetMemoryBudget(ShortStringHash type, unsigned budget);
+    /// Enable or disable automatic reloading of resources as files are modified.
+    void SetAutoReloadResources(bool enable);
+    
+    /// Return whether a file exists by name.
+    bool Exists(const String& name) const;
+    /// Return whether a file exists by name hash.
+    bool Exists(StringHash nameHash) const;
+    /// Return memory budget for a resource type.
+    unsigned GetMemoryBudget(ShortStringHash type) const;
+    /// Return total memory use for a resource type.
+    unsigned GetMemoryUse(ShortStringHash type) const;
+    /// Return total memory use for all resources.
+    unsigned GetTotalMemoryUse() const;
+    /// Return resource name from hash, or empty if not found.
+    const String& GetResourceName(StringHash nameHash) const;
+    /// Return full absolute file name of resource if possible.
+    String GetResourceFileName(const String& name) const;
+    /// Return whether automatic resource reloading is enabled.
+    bool GetAutoReloadResources() const;
+	
+	tolua_outside Animation* ResourceCacheGetAnimation @ GetAnimation(const char* fileName);
+	tolua_outside Font* ResourceCacheGetFont@ GetFont (const char* fileName);
+	tolua_outside Image* ResourceCacheGetImage @ GetImage(const char* fileName);
+	tolua_outside Material* ResourceCacheGetMaterial@ GetMaterial (const char* fileName);
+	tolua_outside Model* ResourceCacheGetModel @ GetModel(const char* fileName);
+	tolua_outside Sound* ResourceCacheGetSound @ GetSound(const char* fileName);
+	tolua_outside Technique* ResourceCacheGetTechnique @ GetTechnique(const char* fileName);
+	tolua_outside Texture2D* ResourceCacheGetTexture2D @ GetTexture2D(const char* fileName);
+	tolua_outside TextureCube* ResourceCacheGetTextureCube @ GetTextureCube(const char* fileName);
+	tolua_outside XMLFile * ResourceCacheGetXMLFile @ GetXMLFile(const char* fileName);
+};
+
+ResourceCache* GetCache();

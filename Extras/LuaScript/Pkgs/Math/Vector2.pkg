@@ -1,0 +1,114 @@
+$#include "Vector2.h"
+
+/// Two-dimensional vector.
+class Vector2
+{
+public:
+    /// Construct undefined.
+    Vector2();
+    
+    /// Copy-construct from another vector.
+    Vector2(const Vector2& vector);
+    
+    /// Construct from coordinates.
+    Vector2(float x, float y);
+    
+    /// Construct from a float array.
+    Vector2(const float* data);
+    
+    /// Test for equality with another vector without epsilon.
+    bool operator == (const Vector2& rhs) const;
+    
+	/// Add a vector.
+    Vector2 operator + (const Vector2& rhs) const;
+    /// Return negation.
+    Vector2 operator - () const;
+    /// Subtract a vector.
+    Vector2 operator - (const Vector2& rhs) const;
+    /// Multiply with a scalar.
+    Vector2 operator * (float rhs) const;
+    /// Multiply with a vector.
+    Vector2 operator * (const Vector2& rhs) const;
+    /// Divide by a scalar.
+    Vector2 operator / (float rhs) const;
+    /// Divide by a vector.
+    Vector2 operator / (const Vector2& rhs) const;
+    
+    /// Normalize to unit length and return the previous length.
+    float Normalize();
+    
+    /// Return length.
+    float Length() const;
+    /// Return squared length.
+    float LengthSquared() const;
+    /// Calculate dot product.
+    float DotProduct(const Vector2& rhs) const;
+    /// Calculate absolute dot product.
+    float AbsDotProduct(const Vector2& rhs) const;
+    /// Return absolute vector.
+    Vector2 Abs() const;
+    /// Linear interpolation with another vector.
+    Vector2 Lerp(const Vector2& rhs, float t) const;
+    /// Test for equality with another vector with epsilon.
+    bool Equals(const Vector2& rhs) const;
+    
+    /// Return normalized to unit length.
+    Vector2 Normalized() const;
+    
+    /// X coordinate.
+    float x_ @ x;
+    /// Y coordinate.
+    float y_ @ y;
+    
+    /// Zero vector.
+    static const Vector2 ZERO;
+    /// (-1,0) vector.
+    static const Vector2 LEFT;
+    /// (1,0) vector.
+    static const Vector2 RIGHT;
+    /// (0,1) vector.
+    static const Vector2 UP;
+    /// (0,-1) vector.
+    static const Vector2 DOWN;
+    /// (1,1) vector.
+    static const Vector2 ONE;
+};
+
+/// Two-dimensional vector with integer values.
+class IntVector2
+{
+public:
+    /// Construct undefined.
+    IntVector2();
+    
+    /// Construct from coordinates.
+    IntVector2(int x, int y);
+    
+    /// Construct from an int array.
+    IntVector2(const int* data);
+    
+    /// Copy-construct from another vector.
+    IntVector2(const IntVector2& rhs);
+    
+    /// Test for equality with another vector.
+    bool operator == (const IntVector2& rhs) const;
+    /// Add a vector.
+    IntVector2 operator + (const IntVector2& rhs) const;
+    /// Return negation.
+    IntVector2 operator - () const;
+    /// Subtract a vector.
+    IntVector2 operator - (const IntVector2& rhs) const;
+    /// Multiply with a scalar.
+    IntVector2 operator * (int rhs) const;
+    /// Divide by a scalar.
+    IntVector2 operator / (int rhs) const;
+    
+    
+    /// X coordinate.
+    int x_ @ x;
+    /// Y coordinate.
+    int y_ @ y;
+    
+    /// Zero vector.
+    static const IntVector2 ZERO;
+};

@@ -1,0 +1,35 @@
+$#include "Sound.h"
+
+/// %Sound resource.
+class Sound : public Resource
+{
+public:
+    /// Set uncompressed sound data format.
+    void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
+    /// Set loop on/off. If loop is enabled, sets the full sound as loop range.
+    void SetLooped(bool enable);
+    /// Define loop.
+    void SetLoop(unsigned repeatOffset, unsigned endOffset);
+    /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.)
+    void FixInterpolation();
+    
+    /// Return length in seconds.
+    float GetLength() const;
+    /// Return total sound data size.
+    unsigned GetDataSize() const { return dataSize_; }
+    /// Return sample size.
+    unsigned GetSampleSize() const;
+    /// Return default frequency as a float.
+    float GetFrequency() { return (float)frequency_; }
+    /// Return default frequency as an integer.
+    unsigned GetIntFrequency() { return frequency_; }
+    /// Return whether is looped.
+    bool IsLooped() const { return looped_; }
+    /// Return whether data is sixteen bit.
+    bool IsSixteenBit() const { return sixteenBit_; }
+    /// Return whether data is stereo.
+    bool IsStereo() const { return stereo_; }
+    /// Return whether is compressed in Ogg Vorbis format.
+    bool IsCompressed() const { return compressed_; }    
+
+};

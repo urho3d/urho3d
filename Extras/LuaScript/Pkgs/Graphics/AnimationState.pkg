@@ -1,0 +1,48 @@
+$#include "AnimationState.h"
+
+/// %Animation instance.
+class AnimationState
+{
+public:
+    /// Construct with animated model and animation pointers.
+    AnimationState(AnimatedModel* model, Animation* animation);
+    /// Construct with root scene node and animation pointers.
+    AnimationState(Node* node, Animation* animation);
+    /// Destruct.
+    ~AnimationState();
+    
+    /// Set start bone. Not supported in node animation mode.
+    void SetStartBone(Bone* bone);
+    /// Set looping enabled/disabled.
+    void SetLooped(bool looped);
+    /// Set blending weight.
+    void SetWeight(float weight);
+    /// Set time position. Does not fire animation triggers.
+    void SetTime(float time);
+    /// Modify blending weight.
+    void AddWeight(float delta);
+    /// Modify time position. %Animation triggers will be fired.
+    void AddTime(float delta);
+    /// Set blending layer.
+    void SetLayer(unsigned char layer);
+    
+    /// Return animation.
+    Animation* GetAnimation() const;
+    /// Return start bone.
+    Bone* GetStartBone() const;
+    /// Return whether weight is nonzero.
+    bool IsEnabled() const;
+    /// Return whether looped.
+    bool IsLooped() const;
+    /// Return blending weight.
+    float GetWeight() const;
+    /// Return time position.
+    float GetTime() const;
+    /// Return animation length.
+    float GetLength() const;
+    /// Return blending layer.
+    unsigned char GetLayer() const;
+    
+    /// Apply the animation at the current time position.
+    void Apply();
+};

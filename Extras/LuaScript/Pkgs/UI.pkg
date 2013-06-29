@@ -1,0 +1,26 @@
+$#define TOLUA_RELEASE
+
+$#include "UILuaAPI.h"
+
+$pfile "UI/BorderImage.pkg"
+$pfile "UI/Button.pkg"
+$pfile "UI/CheckBox.pkg"
+$pfile "UI/Cursor.pkg"
+$pfile "UI/DropDownList.pkg"
+$pfile "UI/FileSelector.pkg"
+$pfile "UI/Font.pkg"
+$pfile "UI/LineEdit.pkg"
+$pfile "UI/ListView.pkg"
+$pfile "UI/Menu.pkg"
+$pfile "UI/ScrollBar.pkg"
+$pfile "UI/ScrollView.pkg"
+$pfile "UI/Slider.pkg"
+$pfile "UI/Sprite.pkg"
+$pfile "UI/Text.pkg"
+$pfile "UI/Text3D.pkg"
+$pfile "UI/UI.pkg"
+$pfile "UI/UIElement.pkg"
+$pfile "UI/Window.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)

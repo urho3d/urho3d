@@ -1,0 +1,78 @@
+$#include "Constraint.h"
+
+/// Supported constraint types.
+enum ConstraintType
+{
+    CONSTRAINT_POINT = 0,
+    CONSTRAINT_HINGE,
+    CONSTRAINT_SLIDER,
+    CONSTRAINT_CONETWIST
+};
+
+/// Physics constraint component. Connects two rigid bodies together, or one rigid body to a static point.
+class Constraint : public Component
+{
+public:
+    /// Set constraint type and recreate the constraint.
+    void SetConstraintType(ConstraintType type);
+    /// Set other body to connect to. Set to null to connect to the static world.
+    void SetOtherBody(RigidBody* body);
+    /// Set constraint position relative to own body.
+    void SetPosition(const Vector3& position);
+    /// Set constraint rotation relative to own body.
+    void SetRotation(const Quaternion& rotation);
+    /// Set constraint rotation relative to own body by specifying the axis.
+    void SetAxis(const Vector3& axis);
+    /// Set constraint position relative to the other body. If connected to the static world, is a world-space position.
+    void SetOtherPosition(const Vector3& position);
+    /// Set constraint rotation relative to the other body. If connected to the static world, is a world-space rotation.
+    void SetOtherRotation(const Quaternion& rotation);
+    /// Set constraint rotation relative to the other body by specifying the axis.
+    void SetOtherAxis(const Vector3& axis);
+    /// Set constraint world-space position. Resets both own and other body relative position, ie. zeroes the constraint error.
+    void SetWorldPosition(const Vector3& position);
+    /// Set high limit. Interpretation is constraint type specific.
+    void SetHighLimit(const Vector2& limit);
+    /// Set low limit. Interpretation is constraint type specific.
+    void SetLowLimit(const Vector2& limit);
+    /// Set constraint error reduction parameter. Zero = leave to default.
+    void SetERP(float erp);
+    /// Set constraint force mixing parameter. Zero = leave to default.
+    void SetCFM(float cfm);
+    /// Set whether to disable collisions between connected bodies.
+    void SetDisableCollision(bool disable);
+    
+    /// Return physics world.
+    PhysicsWorld* GetPhysicsWorld() const;
+    /// Return constraint type.
+    ConstraintType GetConstraintType() const;
+    /// Return rigid body in own scene node.
+    RigidBody* GetOwnBody() const;
+    /// Return the other rigid body. May be null if connected to the static world.
+    RigidBody* GetOtherBody() const;
+    /// Return constraint position relative to own body.
+    const Vector3& GetPosition() const;
+    /// Return constraint rotation relative to own body.
+    const Quaternion& GetRotation() const;
+    /// Return constraint position relative to other body.
+    const Vector3& GetOtherPosition() const;
+    /// Return constraint rotation relative to other body.
+    const Quaternion& GetOtherRotation() const;
+    /// Return constraint world position, calculated from own body.
+    Vector3 GetWorldPosition() const;
+    /// Return high limit.
+    const Vector2& GetHighLimit() const;
+    /// Return low limit.
+    const Vector2& GetLowLimit() const;
+    /// Return constraint error reduction parameter.
+    float GetERP() const;
+    /// Return constraint force mixing parameter.
+    float GetCFM() const;
+    /// Return whether collisions between connected bodies are disabled.
+    bool GetDisableCollision() const;
+    
+    /// Release the constraint.
+    void ReleaseConstraint();
+    /// Apply constraint frames.
+    void ApplyFrames();    
+};

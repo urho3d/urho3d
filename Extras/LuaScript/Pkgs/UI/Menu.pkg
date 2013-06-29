@@ -1,0 +1,28 @@
+$#include "Menu.h"
+
+/// %Menu %UI element that optionally shows a popup.
+class Menu : public Button
+{
+public:
+    /// Set popup element to show on selection.
+    void SetPopup(UIElement* element);
+    /// Set popup element offset.
+    void SetPopupOffset(const IntVector2& offset);
+    /// Set popup element offset.
+    void SetPopupOffset(int x, int y);
+    /// Force the popup to show or hide.
+    void ShowPopup(bool enable);
+    /// Set accelerator key (set zero key code to disable.)
+    void SetAccelerator(int key, int qualifiers);
+
+    /// Return popup element.
+    UIElement* GetPopup() const;
+    /// Return popup element offset.
+    const IntVector2& GetPopupOffset() const;
+    /// Return whether popup is open.
+    bool GetShowPopup() const;
+    /// Return accelerator key code, 0 if disabled.
+    int GetAcceleratorKey() const;
+    /// Return accelerator qualifiers.
+    int GetAcceleratorQualifiers() const;
+};

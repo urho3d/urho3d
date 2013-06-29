@@ -1,0 +1,6 @@
+$#include "SoundListener.h"
+
+/// %Sound listener component
+class SoundListener : public Component
+{
+};

@@ -1,0 +1,9 @@
+$#include "Texture2D.h"
+
+/// 2D texture resource.
+class Texture2D : public Texture
+{
+public:
+    /// Return render surface.
+    RenderSurface* GetRenderSurface() const;
+};

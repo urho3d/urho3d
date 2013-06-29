@@ -1,0 +1,105 @@
+$#include "Camera.h"
+
+/// %Camera component.
+class Camera : public Component
+{
+public:
+    /// Set near clip distance.
+    void SetNearClip(float nearClip);
+    /// Set far clip distance.
+    void SetFarClip(float farClip);
+    /// Set field of view.
+    void SetFov(float fov);
+    /// Set orthographic mode view uniform size.
+    void SetOrthoSize(float orthoSize);
+    /// Set orthographic mode view size.
+    void SetOrthoSize(const Vector2& orthoSize);
+    /// Set aspect ratio.
+    void SetAspectRatio(float aspectRatio);
+    /// Set polygon fill mode to use when rendering a scene.
+    void SetFillMode(FillMode mode);
+    /// Set zoom.
+    void SetZoom(float zoom);
+    /// Set LOD bias.
+    void SetLodBias(float bias);
+    /// Set view mask. Will be and'ed with object's view mask to see if the object should be rendered.
+    void SetViewMask(unsigned mask);
+    /// Set view override flags.
+    void SetViewOverrideFlags(unsigned flags);
+    /// Set orthographic mode enabled/disabled.
+    void SetOrthographic(bool enable);
+    /// Set automatic aspect ratio based on viewport dimensions.
+    void SetAutoAspectRatio(bool enable);
+    /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
+    void SetProjectionOffset(const Vector2& offset);
+    /// Set vertical flipping mode.
+    void SetFlipVertical(bool enable);
+    
+    /// Return far clip distance.
+    float GetFarClip() const;
+    /// Return near clip distance.
+    float GetNearClip() const;
+    /// Return field of view.
+    float GetFov() const;
+    /// Return orthographic mode size.
+    float GetOrthoSize() const;
+    /// Return aspect ratio.
+    float GetAspectRatio() const;
+    /// Return zoom.
+    float GetZoom() const;
+    /// Return LOD bias.
+    float GetLodBias() const;
+    /// Return view mask.
+    unsigned GetViewMask() const;
+    /// Return view override flags.
+    unsigned GetViewOverrideFlags() const;
+    /// Return fill mode.
+    FillMode GetFillMode() const;
+    /// Return orthographic flag.
+    bool IsOrthographic() const;
+    /// Return auto aspect ratio flag.
+    bool GetAutoAspectRatio() const;
+    /// Return frustum in world space.
+    const Frustum& GetFrustum() const;
+    /// Return API-specific projection matrix.
+    const Matrix4& GetProjection() const;
+    /// Return either API-specific or API-independent (D3D convention) projection matrix.
+    Matrix4 GetProjection(bool apiSpecific) const;
+    /// Return view matrix.
+    const Matrix3x4& GetView() const;
+    /// Return frustum near and far sizes.
+    void GetFrustumSize(Vector3& near, Vector3& far) const;
+    /// Return half view size.
+    float GetHalfViewSize() const;
+    /// Return frustum split by custom near and far clip distances.
+    Frustum GetSplitFrustum(float nearClip, float farClip) const;
+    /// Return frustum in view space.
+    Frustum GetViewSpaceFrustum() const;
+    /// Return split frustum in view space.
+    Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const;
+    /// Return ray corresponding to normalized screen coordinates (0.0 to 1.0.)
+    Ray GetScreenRay(float x, float y) const;
+    // Convert a world space point to normalized screen coordinates (0.0 - 1.0).
+    Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
+    // Convert normalized screen coordinates (0.0 - 1.0) and depth to a world space point.
+    Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
+    /// Return forward vector.
+    Vector3 GetForwardVector() const;
+    /// Return right vector.
+    Vector3 GetRightVector() const;
+    /// Return up vector.
+    Vector3 GetUpVector() const;
+    /// Return projection offset.
+    const Vector2& GetProjectionOffset() const;
+    /// Return vertical flipping mode.
+    bool GetFlipVertical() const;
+    /// Return distance to position. In orthographic mode uses only Z coordinate.
+    float GetDistance(const Vector3& worldPos) const;
+    /// Return squared distance to position. In orthographic mode uses only Z coordinate.
+    float GetDistanceSquared(const Vector3& worldPos) const;
+    /// Return a scene node's LOD scaled distance.
+    float GetLodDistance(float distance, float scale, float bias) const;
+    /// Return if projection parameters are valid for rendering and raycasting.
+    bool IsProjectionValid() const;
+};
+

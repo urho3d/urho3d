@@ -1,0 +1,20 @@
+$#include "Component.h"
+
+/// Base class for components. Components can be created to scene nodes.
+class Component
+{    
+public:
+    /// Set enabled/disabled state.
+    void SetEnabled(bool enable);
+    /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion.
+    void Remove();
+    
+    /// Return ID.
+    unsigned GetID() const;
+    /// Return scene node.
+    Node* GetNode() const;
+    /// Return the scene the node belongs to.
+    Scene* GetScene() const;
+    /// Return whether is enabled.
+    bool IsEnabled() const;    
+};

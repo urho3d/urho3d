@@ -1,0 +1,34 @@
+$#include "BillboardSet.h"
+
+/// %Billboard component.
+class BillboardSet : public Drawable
+{
+public:
+    /// Set material.
+    void SetMaterial(Material* material);
+    /// Set number of billboards.
+    void SetNumBillboards(unsigned num);
+    /// Set whether billboards are relative to the scene node.
+    void SetRelative(bool enable);
+    /// Set whether scene node scale affects billboards' size.
+    void SetScaled(bool enable);
+    /// Set whether billboards are sorted by distance.
+    void SetSorted(bool enable);
+    /// Set animation LOD bias.
+    void SetAnimationLodBias(float bias);
+    /// Mark for bounding box and vertex buffer update. Call after modifying the billboards.
+    void Commit();
+    
+    /// Return material.
+    Material* GetMaterial() const;
+    /// Return number of billboards.
+    unsigned GetNumBillboards() const;
+    /// Return whether billboards are relative to the scene node.
+    bool IsRelative() const;
+    /// Return whether scene node scale affects billboards' size.
+    bool IsScaled() const;
+    /// Return whether billboards are sorted.
+    bool IsSorted() const;
+    /// Return animation LOD bias.
+    float GetAnimationLodBias() const;
+};

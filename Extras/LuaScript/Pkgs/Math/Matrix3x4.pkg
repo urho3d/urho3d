@@ -1,0 +1,106 @@
+$#include "Matrix3x4.h"
+
+/// 3x4 matrix for scene node transform calculations.
+class Matrix3x4
+{
+public:
+    /// Construct undefined.
+    Matrix3x4();
+    
+    /// Copy-construct from another matrix.
+    Matrix3x4(const Matrix3x4& matrix);
+    
+    /// Copy-construct from a 3x3 matrix and set the extra elements to identity.
+    Matrix3x4(const Matrix3& matrix);
+    
+    /// Copy-construct from a 4x4 matrix which is assumed to contain no projection.
+    Matrix3x4(const Matrix4& matrix);
+    
+    // Construct from values.
+    Matrix3x4(float v00, float v01, float v02, float v03,
+            float v10, float v11, float v12, float v13,
+            float v20, float v21, float v22, float v23);
+    
+    /// Construct from translation, rotation and uniform scale.
+    Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale);
+    /// Construct from translation, rotation and nonuniform scale.
+    Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
+    
+    /// Test for equality with another matrix without epsilon.
+    bool operator == (const Matrix3x4& rhs) const;
+    
+    /// Multiply a Vector3 which is assumed to represent position.
+    Vector3 operator * (const Vector3& rhs) const;
+    
+    /// Multiply a Vector4.
+    Vector3 operator * (const Vector4& rhs) const;
+    
+    /// Add a matrix.
+    Matrix3x4 operator + (const Matrix3x4& rhs) const;
+    
+    /// Subtract a matrix.
+    Matrix3x4 operator - (const Matrix3x4& rhs) const;
+    
+    /// Multiply with a scalar.
+    Matrix3x4 operator * (float rhs) const;
+    
+    /// Multiply a matrix.
+    Matrix3x4 operator * (const Matrix3x4& rhs) const;
+    
+    /// Multiply a 4x4 matrix.
+    Matrix4 operator * (const Matrix4& rhs) const;
+    
+    /// Set translation elements.
+    void SetTranslation(const Vector3& translation);
+    
+    /// Set rotation elements from a 3x3 matrix.
+    void SetRotation(const Matrix3& rotation);
+    
+    /// Set scaling elements.
+    void SetScale(const Vector3& scale);
+    
+    /// Set uniform scaling elements.
+    void SetScale(float scale);
+    
+    /// Return the combined rotation and scaling matrix.
+    Matrix3 ToMatrix3() const;
+    
+    /// Return the rotation matrix with scaling removed.
+    Matrix3 RotationMatrix() const;
+    
+    /// Return the translation part.
+    Vector3 Translation() const;
+    
+    /// Return the rotation part.
+    Quaternion Rotation() const;
+    
+    /// Return the scaling part.
+    Vector3 Scale() const;
+    
+    /// Test for equality with another matrix with epsilon.
+    bool Equals(const Matrix3x4& rhs) const;
+    
+    /// Return decomposition to translation, rotation and scale.
+    void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+	
+    /// Return inverse.
+    Matrix3x4 Inverse() const;
+    
+    float m00_ @ m00;
+    float m01_ @ m01;
+    float m02_ @ m02;
+    float m03_ @ m03;
+    float m10_ @ m10;
+    float m11_ @ m11;
+    float m12_ @ m12;
+    float m13_ @ m13;
+    float m20_ @ m20;
+    float m21_ @ m21;
+    float m22_ @ m22;
+    float m23_ @ m23;
+    
+    /// Zero matrix.
+    static const Matrix3x4 ZERO;
+    /// Identity matrix.
+    static const Matrix3x4 IDENTITY;
+};

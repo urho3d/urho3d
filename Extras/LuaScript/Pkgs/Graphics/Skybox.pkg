@@ -1,0 +1,6 @@
+$#include "Skybox.h"
+
+/// Static model component with fixed position in relation to the camera.
+class Skybox : public StaticModel
+{
+};

@@ -1,0 +1,94 @@
+$#include "Scene.h"
+
+static const unsigned FIRST_REPLICATED_ID;
+static const unsigned LAST_REPLICATED_ID;
+static const unsigned FIRST_LOCAL_ID;
+static const unsigned LAST_LOCAL_ID;
+
+/// Root scene node, represents the whole scene.
+class Scene : public Node
+{
+public:
+    /// Load from a binary file asynchronously. Return true if started successfully.
+    bool LoadAsync(File* file);
+    /// Load from an XML file asynchronously. Return true if started successfully.
+    bool LoadAsyncXML(File* file);
+    /// Stop asynchronous loading.
+    void StopAsyncLoading();
+	/// Clear.
+    void Clear();
+    /// Enable or disable scene update.
+    void SetUpdateEnabled(bool enable);
+    /// Set update time scale. 1.0 = real time (default.)
+    void SetTimeScale(float scale);
+    /// Set elapsed time in seconds. This can be used to prevent inaccuracy in the timer if the scene runs for a long time.
+    void SetElapsedTime(float time);
+    /// Set network client motion smoothing constant.
+    void SetSmoothingConstant(float constant);
+    /// Set network client motion smoothing snap threshold.
+    void SetSnapThreshold(float threshold);
+    
+    /// Return node from the whole scene by ID, or null if not found.
+    Node* GetNode(unsigned id) const;
+    /// Return component from the whole scene by ID, or null if not found.
+    Component* GetComponent(unsigned id) const;
+    /// Return whether updates are enabled.
+    bool IsUpdateEnabled() const;
+    /// Return asynchronous loading flag.
+    bool IsAsyncLoading() const;
+    /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
+    float GetAsyncProgress() const;
+    /// Return source file name.
+    const String& GetFileName() const;
+    /// Return source file checksum.
+    unsigned GetChecksum() const;
+    /// Return update time scale.
+    float GetTimeScale() const;
+    /// Return elapsed time in seconds.
+    float GetElapsedTime() const;
+    /// Return motion smoothing constant.
+    float GetSmoothingConstant() const;
+    /// Return motion smoothing snap threshold.
+    float GetSnapThreshold() const;
+    /// Return a node user variable name, or empty if not registered.
+    const String& GetVarName(ShortStringHash hash) const;
+
+    /// Update scene. Called by HandleUpdate.
+    void Update(float timeStep);
+    /// Begin a threaded update. During threaded update components can choose to delay dirty processing.
+    void BeginThreadedUpdate();
+    /// End a threaded update. Notify components that marked themselves for delayed dirty processing.
+    void EndThreadedUpdate();
+    /// Add a component to the delayed dirty notify queue. Is thread-safe.
+    void DelayedMarkedDirty(Component* component);
+    /// Return threaded update flag.
+    bool IsThreadedUpdate() const;
+    /// Get free node ID, either non-local or local.
+    unsigned GetFreeNodeID(CreateMode mode);
+    /// Get free component ID, either non-local or local.
+    unsigned GetFreeComponentID(CreateMode mode);
+    /// Node added. Assign scene pointer and add to ID map.
+    void NodeAdded(Node* node);
+    /// Node removed. Remove from ID map.
+    void NodeRemoved(Node* node);
+    /// Component added. Add to ID map.
+    void ComponentAdded(Component* component);
+    /// Component removed. Remove from ID map.
+    void ComponentRemoved(Component* component);
+    /// Set node user variable reverse mappings.
+    void SetVarNamesAttr(String value);
+    /// Return node user variable reverse mappings.
+    String GetVarNamesAttr() const;
+    /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
+    void PrepareNetworkUpdate();
+    /// Clean up all references to a network connection that is about to be removed.
+    void CleanupConnection(Connection* connection);
+    /// Mark a node for attribute check on the next network update.
+    void MarkNetworkUpdate(Node* node);
+    /// Mark a comoponent for attribute check on the next network update.
+    void MarkNetworkUpdate(Component* component);
+    /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
+    void MarkReplicationDirty(Node* node);
+};
+
+Scene* GetScene();

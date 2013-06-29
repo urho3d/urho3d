@@ -1,0 +1,36 @@
+$#include "Plane.h"
+
+/// Surface in three-dimensional space.
+class Plane
+{
+public:
+    /// Construct undefined.
+    Plane();
+    
+    /// Copy-construct from another plane.
+    Plane(const Plane& plane);
+    
+    /// Construct from 3 vertices.
+    Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2);
+    
+    /// Construct from a normal vector and a point on the plane.
+    Plane(const Vector3& normal, const Vector3& point);
+    
+    /// Define from 3 vertices.
+    void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2);
+
+    /// Define from a normal and a point.
+    void Define(const Vector3& normal, const Vector3& point);
+    
+    /// Return signed distance to a point.
+    float Distance(const Vector3& point) const;
+    
+    /// Plane normal.
+    Vector3 normal_ @ normal;
+  
+	/// Plane absolute normal.
+    Vector3 absNormal_ @ absNormal;
+    
+	/// Plane intercept parameter.
+    float intercept_ @ intercept;
+};

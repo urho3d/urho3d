@@ -1,0 +1,65 @@
+$#include "AnimatedModel.h"
+
+/// Animated model component.
+class AnimatedModel : public StaticModel
+{
+public:
+    /// Set model.
+    void SetModel(Model* model, bool createBones = true);
+    /// Add an animation.
+    AnimationState* AddAnimationState(Animation* animation);
+    /// Remove an animation by animation pointer.
+    void RemoveAnimationState(Animation* animation);
+    /// Remove an animation by animation name.
+    void RemoveAnimationState(const String& animationName);
+    /// Remove an animation by animation name hash.
+    void RemoveAnimationState(StringHash animationNameHash);
+    /// Remove an animation by AnimationState pointer.
+    void RemoveAnimationState(AnimationState* state);
+    /// Remove an animation by index.
+    void RemoveAnimationState(unsigned index);
+    /// Remove all animations.
+    void RemoveAllAnimationStates();
+    /// Set animation LOD bias.
+	void SetAnimationLodBias(float bias);
+    /// Set animation LOD distance factor when not visible (default 0 = do not update at all when invisible.)
+    void SetInvisibleLodFactor(float factor);
+    /// Set vertex morph weight by index.
+    void SetMorphWeight(unsigned index, float weight);
+    /// Set vertex morph weight by name.
+    void SetMorphWeight(const String& name, float weight);
+    /// Set vertex morph weight by name hash.
+    void SetMorphWeight(StringHash nameHash, float weight);
+    /// Reset all vertex morphs to zero.
+    void ResetMorphWeights();
+
+    /// Return skeleton.
+    Skeleton& GetSkeleton() { return skeleton_; }
+    /// Return number of animation states.
+    unsigned GetNumAnimationStates() const { return animationStates_.Size(); }
+    /// Return animation state by animation pointer.
+    AnimationState* GetAnimationState(Animation* animation) const;
+    /// Return animation state by animation name.
+    AnimationState* GetAnimationState(const String& animationName) const;
+    /// Return animation state by animation name.
+    AnimationState* GetAnimationState(const char* animationName) const;
+    /// Return animation state by animation name hash.
+    AnimationState* GetAnimationState(const StringHash animationNameHash) const;
+    /// Return animation state by index.
+    AnimationState* GetAnimationState(unsigned index) const;
+    /// Return animation LOD bias.
+    float GetAnimationLodBias() const { return animationLodBias_; }
+    /// Return animation LOD distance factor when not visible.
+    float GetInvisibleLodFactor() const { return invisibleLodFactor_; }
+    /// Return number of vertex morphs.
+    unsigned GetNumMorphs() const { return morphs_.Size(); }
+    /// Return vertex morph weight by index.
+    float GetMorphWeight(unsigned index) const;
+    /// Return vertex morph weight by name.
+    float GetMorphWeight(const String& name) const;
+    /// Return vertex morph weight by name hash.
+    float GetMorphWeight(StringHash nameHash) const;
+    /// Return whether is the master (first) animated model.
+    bool IsMaster() const { return isMaster_; }
+};
+

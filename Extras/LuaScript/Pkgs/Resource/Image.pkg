@@ -1,0 +1,43 @@
+$#include "Image.h"
+
+/// Supported compressed image formats.
+enum CompressedFormat
+{
+    CF_NONE = 0,
+    CF_DXT1,
+    CF_DXT3,
+    CF_DXT5,
+    CF_ETC1,
+    CF_PVRTC_RGB_2BPP,
+    CF_PVRTC_RGBA_2BPP,
+    CF_PVRTC_RGB_4BPP,
+    CF_PVRTC_RGBA_4BPP,
+};
+
+/// %Image resource.
+class Image : public Resource
+{
+public:
+    /// Flip image vertically.
+    void FlipVertical();
+    /// Save in BMP format. Return true if successful.
+    bool SaveBMP(const char* fileName);
+    /// Save in PNG format. Return true if successful.
+    bool SavePNG(const char* fileName);
+    /// Save in TGA format. Return true if successful.
+    bool SaveTGA(const char* fileName);
+    /// Save in JPG format with compression quality. Return true if successful.
+    bool SaveJPG(const char* fileName, int quality);
+    
+    /// Return width.
+    int GetWidth() const;
+    /// Return height.
+    int GetHeight() const;
+    /// Return number of color components.
+    unsigned GetComponents() const;
+    /// Return whether is compressed.
+    bool IsCompressed() const;
+    /// Return compressed format.
+    CompressedFormat GetCompressedFormat() const;
+};
+

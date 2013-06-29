@@ -31,6 +31,10 @@
 #include "Script.h"
 #include "ScriptFile.h"
 
+#ifdef ENABLE_LUA
+#include "LuaScript.h"
+#endif
+
 #include <exception>
 
 #include "DebugNew.h"
@@ -134,30 +138,56 @@ int Application::Run()
     SharedPtr<Engine> engine(new Engine(context_));
     if (engine->Initialize(Engine::ParseParameters(arguments)))
     {
-        // Instantiate and register the script subsystem
-        context_->RegisterSubsystem(new Script(context_));
-        
-        // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
-        SharedPtr<ScriptFile> scriptFile(context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
-        
-        // If script loading is successful, execute engine loop
-        if (scriptFile && scriptFile->Execute("void Start()"))
+#ifdef ENABLE_LUA
+        String extension = GetExtension(scriptFileName).ToLower();
+        if (extension != ".lua")
         {
-            // Subscribe to script's reload event to allow live-reload of the application
-            SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(Application, HandleScriptReloadStarted));
-            SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(Application, HandleScriptReloadFinished));
-            SubscribeToEvent(scriptFile, E_RELOADFAILED, HANDLER(Application, HandleScriptReloadFailed));
-            
-            while (!engine->IsExiting())
-                engine->RunFrame();
-            
-            if (scriptFile->GetFunction("void Stop()"))
-                scriptFile->Execute("void Stop()");
-            
-            return exitCode_;
+#endif
+            // Instantiate and register the AngelScript subsystem
+            context_->RegisterSubsystem(new Script(context_));
+
+            // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
+            SharedPtr<ScriptFile> scriptFile(context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
+
+            // If script loading is successful, execute engine loop
+            if (scriptFile && scriptFile->Execute("void Start()"))
+            {
+                // Subscribe to script's reload event to allow live-reload of the application
+                SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(Application, HandleScriptReloadStarted));
+                SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(Application, HandleScriptReloadFinished));
+                SubscribeToEvent(scriptFile, E_RELOADFAILED, HANDLER(Application, HandleScriptReloadFailed));
+
+                while (!engine->IsExiting())
+                    engine->RunFrame();
+
+                if (scriptFile->GetFunction("void Stop()"))
+                    scriptFile->Execute("void Stop()");
+
+                return exitCode_;
+            }
+#ifdef ENABLE_LUA
         }
+        else
+        {
+            // Instantiate and register the Lua script subsystem
+            context_->RegisterSubsystem(new LuaScript(context_));
+            LuaScript* luaScript = GetSubsystem<LuaScript>();
+
+            if (luaScript->ExecuteFile(scriptFileName.CString()))
+            {
+                luaScript->ExecuteFunction("Start");
+
+                while (!engine->IsExiting())
+                    engine->RunFrame();
+
+                luaScript->ExecuteFunction("Stop");
+
+                return exitCode_;
+            }
+        }
+#endif
     }
-    
+
     ErrorExit();
     return exitCode_;
 }
@@ -172,7 +202,7 @@ void Application::ErrorExit()
     Log* log = context_->GetSubsystem<Log>();   // May be null if ENABLE_LOGGING is not defined during built
     ErrorDialog("Urho3D", log ? log->GetLastMessage() : "Application has been terminated due to unexpected error.");
     #endif
-    
+
     exitCode_ = EXIT_FAILURE;
 }
 

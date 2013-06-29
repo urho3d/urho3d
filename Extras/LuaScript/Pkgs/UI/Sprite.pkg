@@ -1,0 +1,58 @@
+$#include "Sprite.h"
+
+enum BlendMode{};
+
+/// %UI element which allows sub-pixel positioning and size, as well as rotation. Only other Sprites should be added as child elements.
+class Sprite : public UIElement
+{
+public:
+    /// Set floating point position.
+    void SetPosition(const Vector2& position);
+    /// Set floating point position.
+    void SetPosition(float x, float y);
+    /// Set hotspot for positioning and rotation.
+    void SetHotSpot(const IntVector2& hotSpot);
+    /// Set hotspot for positioning and rotation.
+    void SetHotSpot(int x, int y);
+    /// Set scale. Scale also affects child sprites.
+    void SetScale(const Vector2& scale);
+    /// Set scale. Scale also affects child sprites.
+    void SetScale(float x, float y);
+    /// Set uniform scale. Scale also affects child sprites.
+    void SetScale(float scale);
+    /// Set rotation angle.
+    void SetRotation(float angle);
+    /// Set texture.
+    void SetTexture(Texture* texture);
+    /// Set part of texture to use as the image.
+    void SetImageRect(const IntRect& rect);
+    /// Use whole texture as the image.
+    void SetFullImageRect();
+    /// Set blend mode.
+    void SetBlendMode(BlendMode mode);
+    
+    /// Return floating point position.
+    const Vector2& GetPosition() const;
+    /// Return hotspot.
+    const IntVector2& GetHotSpot() const;
+    /// Return scale.
+    const Vector2& GetScale() const;
+    /// Return rotation angle.
+    float GetRotation() const;
+    /// Return texture.
+    Texture* GetTexture() const;
+    /// Return image rectangle.
+    const IntRect& GetImageRect() const;
+    /// Return blend mode.
+    BlendMode GetBlendMode() const;
+    
+    /// Set texture attribute.
+    void SetTextureAttr(ResourceRef value);
+    /// Return texture attribute.
+    ResourceRef GetTextureAttr() const;
+    /// Update and return rendering transform, also used to transform child sprites.
+    const Matrix3x4& GetTransform() const;
+};
+
+Sprite* NewSprite @ Sprite();
+

@@ -1,0 +1,34 @@
+$#include "Material.h"
+
+/// Describes how to render 3D geometries.
+class Material : public Resource
+{
+public:
+    /// Return number of techniques.
+    unsigned GetNumTechniques() const;
+    /// Return technique entry by index.
+    const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
+    /// Return technique by index.
+    Technique* GetTechnique(unsigned index) const;
+    /// Return pass by technique index and pass type.
+    Pass* GetPass(unsigned index, StringHash passType) const;
+    /// Return texture by unit.
+    Texture* GetTexture(TextureUnit unit) const;
+    /// Return shader parameter.
+    const Vector4& GetShaderParameter(const String& name) const;
+    /// Return normal culling mode.
+    CullMode GetCullMode() const;
+    /// Return culling mode for shadows.
+    CullMode GetShadowCullMode() const;
+    /// Return depth bias.
+    const BiasParameters& GetDepthBias() const;
+    /// Return last auxiliary view rendered frame number.
+    unsigned GetAuxViewFrameNumber() const;
+    /// Return whether should render occlusion.
+    bool GetOcclusion() const;
+    /// Return whether should render specular.
+    bool GetSpecular() const;
+    
+    /// Return name for texture unit.
+    static String GetTextureUnitName(TextureUnit unit);
+};

@@ -1,0 +1,65 @@
+$#include "FileSelector.h"
+
+/// %File selector's list entry (file or directory.)
+struct FileSelectorEntry
+{
+    /// Name.
+    String name_;
+    /// Directory flag.
+    bool directory_;
+};
+
+/// %File selector dialog.
+class FileSelector : public Object
+{
+public:
+    /// Set fileselector UI style.
+    void SetDefaultStyle(XMLFile* style);
+    /// Set title text.
+    void SetTitle(const String& text);
+    /// Set button texts.
+    void SetButtonTexts(const String& okText, const String& cancelText);
+    /// Set current path.
+    void SetPath(const String& path);
+    /// Set current filename.
+    void SetFileName(const String& fileName);
+    /// Set filters.
+    void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
+    /// Set directory selection mode. Default false.
+    void SetDirectoryMode(bool enable);
+    /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
+    void UpdateElements();
+
+    /// Return the UI style file.
+    XMLFile* GetDefaultStyle() const;
+    /// Return fileselector window.
+    Window* GetWindow() const;
+    /// Return window title text element.
+    Text* GetTitleText() const;
+    /// Return file list.
+    ListView* GetFileList() const;
+    /// Return path editor.
+    LineEdit* GetPathEdit() const;
+    /// Return filename editor.
+    LineEdit* GetFileNameEdit() const;
+    /// Return filter dropdown.
+    DropDownList* GetFilterList() const;
+    /// Return OK button.
+    Button* GetOKButton() const;
+    /// Return cancel button.
+    Button* GetCancelButton() const;
+    /// Return close button.
+    Button* GetCloseButton() const;
+    /// Return window title.
+    const String& GetTitle() const;
+    /// Return current path.
+    const String& GetPath() const;
+    /// Return current filename.
+    const String& GetFileName() const;
+    /// Return current filter.
+    const String& GetFilter() const;
+    /// Return current filter index.
+    unsigned GetFilterIndex() const;
+    /// Return directory mode flag.
+    bool GetDirectoryMode() const;
+};

@@ -1,0 +1,51 @@
+$#include "Console.h"
+
+/// %Console window with log history and AngelScript prompt.
+class Console : public Object
+{
+public:
+    /// Set UI elements' style from an XML file.
+    void SetDefaultStyle(XMLFile* style);
+
+	/// Show or hide. Showing automatically focuses the line edit.
+    void SetVisible(bool enable);
+    
+	/// Toggle visibility.
+    void Toggle();
+    
+	/// Set number of displayed rows.
+    void SetNumRows(unsigned rows);
+    
+	/// Set command history maximum size, 0 disables history.
+    void SetNumHistoryRows(unsigned rows);
+    
+	/// Update elements to layout properly. Call this after manually adjusting the sub-elements.
+    void UpdateElements();
+
+    /// Return the UI style file.
+    XMLFile* GetDefaultStyle() const;
+    
+	/// Return the background element.
+    BorderImage* GetBackground() const { return background_; }
+    
+	/// Return the line edit element.
+    LineEdit* GetLineEdit() const { return lineEdit_; }
+    
+	/// Return whether is visible.
+    bool IsVisible() const;
+    
+	/// Return number of displayed rows.
+    unsigned GetNumRows() const { return rows_.Size(); }
+    
+	/// Return history maximum size.
+    unsigned GetNumHistoryRows() const { return historyRows_; }
+    
+	/// Return current history position.
+    unsigned GetHistoryPosition() const { return historyPosition_; }
+    
+	/// Return history row at index.
+    const String& GetHistoryRow(unsigned index) const;
+};
+
+Console* GetConsole();
+

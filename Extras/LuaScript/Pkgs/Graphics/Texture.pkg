@@ -1,0 +1,50 @@
+$#include "Texture.h"
+
+/// Base class for texture resources.
+class Texture : public Resource
+{
+public:
+    /// Set number of requested mip levels. Needs to be called before setting size.
+    void SetNumLevels(unsigned levels);
+    /// Set filtering mode.
+    void SetFilterMode(TextureFilterMode filter);
+    /// Set addressing mode by texture coordinate.
+    void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    /// Set border color for border addressing mode.
+    void SetBorderColor(const Color& color);
+    /// Set sRGB sampling and writing mode.
+    void SetSRGB(bool enable);
+    /// Set backup texture to use when rendering to this texture.
+    void SetBackupTexture(Texture* texture);
+    
+    /// Return texture format.
+    unsigned GetFormat() const;
+    /// Return whether the texture format is compressed.
+    bool IsCompressed() const;
+    /// Return number of mip levels.
+    unsigned GetLevels() const;
+    /// Return width.
+    int GetWidth() const;
+    /// Return height.
+    int GetHeight() const;
+    /// Return filtering mode.
+    TextureFilterMode GetFilterMode() const;
+    /// Return addressing mode by texture coordinate.
+    TextureAddressMode GetAddressMode(TextureCoordinate coord) const;
+    /// Return border color.
+    const Color& GetBorderColor() const;
+    /// Return whether is using sRGB sampling and writing.
+    bool GetSRGB() const;
+    /// Return backup texture.
+    Texture* GetBackupTexture() const;
+    /// Return mip level width, or 0 if level does not exist.
+    int GetLevelWidth(unsigned level) const;
+    /// Return mip level width, or 0 if level does not exist.
+    int GetLevelHeight(unsigned level) const;
+    /// Return texture usage type.
+    TextureUsage GetUsage() const;
+    /// Return data size in bytes for a rectangular region.
+    unsigned GetDataSize(int width, int height) const;
+    /// Return data size in bytes for a pixel or block row.
+    unsigned GetRowDataSize(int width) const;
+};

@@ -1,0 +1,20 @@
+$#include "OffMeshConnection.h"
+
+/// A link between otherwise unconnected regions of the navigation mesh.
+class OffMeshConnection : public Component
+{
+public:
+    /// Set endpoint node.
+    void SetEndPoint(Node* node);
+    /// Set radius.
+    void SetRadius(float radius);
+    /// Set bidirectional flag. Default true.
+    void SetBidirectional(bool enabled);
+    
+    /// Return endpoint node.
+    Node* GetEndPoint() const;
+    /// Return radius.
+    float GetRadius() const;
+    /// Return whether is bidirectional.
+    bool IsBidirectional() const;
+};

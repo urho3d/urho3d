@@ -1,0 +1,69 @@
+$#include "Color.h"
+
+/// RGBA color.
+class Color
+{
+public:
+  /// Construct with default values (opaque white.)
+    Color();
+    
+    /// Copy-construct from another color.
+    Color(const Color& color);
+    
+    /// Construct from another color and modify the alpha.
+    Color(const Color& color, float a);
+    
+    /// Construct from RGB values and set alpha fully opaque.
+    Color(float r, float g, float b);
+    
+    /// Construct from RGBA values.
+    Color(float r, float g, float b, float a);	
+	
+    /// Test for equality with another color.
+    bool operator == (const Color& rhs) const;
+    
+	/// Multiply with a scalar.
+    Color operator * (float rhs) const;
+    
+	/// Add a color.
+    Color operator + (const Color& rhs) const;
+        
+    /// Return RGB values as a Vector3.
+    Vector3 RGBValues() const;
+	
+    /// Return approximate intensity.
+    float Intensity() const;
+    
+    /// Linear interpolation with another color.
+    Color Lerp(const Color& rhs, float t) const;
+    
+    /// Return color packed to a 32-bit integer. Components are clamped to [0, 1] range.
+    unsigned ToUInt() const;
+    
+    /// Return as a four-dimensional vector.
+    Vector4 ToVector4() const;
+    
+    /// Red value.
+    float r_ @ r;
+    /// Green value.
+    float g_ @ g;
+    /// Blue value.
+    float b_ @ b;
+    /// Alpha value.
+    float a_ @ a;
+    
+    /// Opaque white color.
+    static const Color WHITE;
+    /// Opaque yellow color.
+    static const Color YELLOW;
+    /// Opaque red color.
+    static const Color RED;
+    /// Opaque green color.
+    static const Color GREEN;
+    /// Opaque green color.
+    static const Color BLUE;
+    /// Opaque black color.
+    static const Color BLACK;
+    /// Transparent color (black with no alpha).
+    static const Color TRANSPARENT;
+};

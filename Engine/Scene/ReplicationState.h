@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Attribute.h"
 #include "HashMap.h"
 #include "HashSet.h"
 #include "Ptr.h"

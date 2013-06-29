@@ -1,0 +1,28 @@
+$#include "Slider.h"
+
+/// %Slider bar %UI element.
+class Slider : public BorderImage
+{
+public:
+    /// Set orientation type.
+    void SetOrientation(Orientation orientation);
+    /// Set slider range maximum value (minimum value is always 0.)
+    void SetRange(float range);
+    /// Set slider current value.
+    void SetValue(float value);
+    /// Change value by a delta.
+    void ChangeValue(float delta);
+    /// Set paging minimum repeat rate (number of events per second).
+    void SetRepeatRate(float rate);
+
+    /// Return orientation type.
+    Orientation GetOrientation() const;
+    /// Return slider range.
+    float GetRange() const;
+    /// Return slider current value.
+    float GetValue() const;
+    /// Return knob element.
+    BorderImage* GetKnob() const;
+    /// Return paging minimum repeat rate (number of events per second).
+    float GetRepeatRate() const;
+};

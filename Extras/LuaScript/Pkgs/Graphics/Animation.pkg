@@ -1,0 +1,23 @@
+$#include "Animation.h"
+
+/// Skeletal animation resource.
+class Animation : public Resource
+{
+public:
+    /// Return animation name.
+    const String& GetAnimationName() const { return animationName_; }
+    /// Return animation name hash.
+    StringHash GetAnimationNameHash() const { return animationNameHash_; }
+    /// Return animation length.
+    float GetLength() const { return length_; }
+    /// Return number of animation tracks.
+    unsigned GetNumTracks() const { return tracks_.Size(); }
+    /// Return animation track by index.
+    const AnimationTrack* GetTrack(unsigned index) const;
+    /// Return animation track by bone name.
+    const AnimationTrack* GetTrack(const String& name) const;
+    /// Return animation track by bone name hash.
+    const AnimationTrack* GetTrack(StringHash nameHash) const;
+    /// Return number of animation trigger points.
+    unsigned GetNumTriggers() const {return triggers_.Size(); }
+};

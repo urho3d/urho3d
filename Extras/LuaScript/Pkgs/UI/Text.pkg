@@ -1,0 +1,52 @@
+$#include "Text.h"
+
+/// %Text %UI element.
+class Text : public UIElement
+{
+public:
+    /// Set font and font size.
+    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
+    /// Set font and font size.
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
+    void SetText(const String& text);
+    /// Set row alignment.
+    void SetTextAlignment(HorizontalAlignment align);
+    /// Set row spacing, 1.0 for original font spacing.
+    void SetRowSpacing(float spacing);
+    /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
+    void SetWordwrap(bool enable);
+    /// Set selection. When length is not provided, select until the text ends.
+    void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
+    /// Clear selection.
+    void ClearSelection();
+    /// Set selection background color. Color with 0 alpha (default) disables.
+    void SetSelectionColor(const Color& color);
+    /// Set hover background color. Color with 0 alpha (default) disables.
+    void SetHoverColor(const Color& color);
+    
+    /// Return font.
+    Font* GetFont() const;
+    /// Return font size.
+    int GetFontSize() const;
+    /// Return text.
+    const String& GetText() const;
+    /// Return row alignment.
+    HorizontalAlignment GetTextAlignment() const;
+    /// Return row spacing.
+    float GetRowSpacing() const;
+    /// Return wordwrap mode.
+    bool GetWordwrap() const;
+    /// Return selection start.
+    unsigned GetSelectionStart() const;
+    /// Return selection length.
+    unsigned GetSelectionLength() const;
+    /// Return selection background color.
+    const Color& GetSelectionColor() const;
+    /// Return hover background color.
+    const Color& GetHoverColor() const;
+    /// Return row height.
+    int GetRowHeight() const;
+    /// Return number of rows.
+    unsigned GetNumRows() const;
+};

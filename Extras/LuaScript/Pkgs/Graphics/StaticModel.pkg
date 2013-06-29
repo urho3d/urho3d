@@ -1,0 +1,30 @@
+$#include "StaticModel.h"
+
+/// Static model component.
+class StaticModel : public Drawable
+{
+public:
+    /// Set model.
+    void SetModel(Model* model);
+    /// Set material on all geometries.
+    void SetMaterial(Material* material);
+    /// Set material on one geometry. Return true if successful.
+    bool SetMaterial(unsigned index, Material* material);
+    /// Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
+    void SetOcclusionLodLevel(unsigned level);
+    
+    /// Return model.
+    Model* GetModel() const;
+    /// Return model's bounding box.
+    const BoundingBox& GetBoundingBox() const;
+    /// Return number of geometries.
+    unsigned GetNumGeometries() const;
+    /// Return material by geometry index.
+    Material* GetMaterial(unsigned index) const;
+    /// Return occlusion LOD level.
+    unsigned GetOcclusionLodLevel() const;
+    /// Determines if the given world space point is within the model geometry.
+    bool IsInside(const Vector3& point) const;
+    /// Determines if the given local space point is within the model geometry.
+    bool IsInsideLocal(const Vector3& point) const;
+};

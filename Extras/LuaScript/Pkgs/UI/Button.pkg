@@ -1,0 +1,30 @@
+$#include "Button.h"
+
+/// Pushbutton %UI element.
+class Button : public BorderImage
+{
+public:
+    /// Set offset to image rectangle used when pressed.
+    void SetPressedOffset(const IntVector2& offset);
+    /// Set offset to image rectangle used when pressed.
+    void SetPressedOffset(int x, int y);
+    /// Set pressed label offset.
+    void SetLabelOffset(const IntVector2& offset);
+    /// Set pressed label offset.
+    void SetLabelOffset(int x, int y);
+    /// Set repeat properties. Rate 0 (default) disables repeat.
+    void SetRepeat(float delay, float rate);
+    /// Set repeat delay.
+    void SetRepeatDelay(float delay);
+    /// Set repeat rate.
+    void SetRepeatRate(float rate);
+    
+    /// Return pressed image offset.
+    const IntVector2& GetPressedOffset() const;
+    /// Return pressed label offset.
+    const IntVector2& GetLabelOffset() const;
+    /// Return repeat delay.
+    float GetRepeatDelay() const;
+    /// Return repeat rate.
+    float GetRepeatRate() const;
+};

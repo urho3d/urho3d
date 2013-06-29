@@ -1,0 +1,33 @@
+$#include "RenderSurface.h"
+
+/// %Color or depth-stencil surface that can be rendered into.
+class RenderSurface
+{    
+public:
+    void SetNumViewports(unsigned num);
+    /// Set viewport.
+    void SetViewport(unsigned index, Viewport* viewport);
+    /// Set viewport update mode. Default is to update when visible.
+    void SetUpdateMode(RenderSurfaceUpdateMode mode);
+    /// Set linked color rendertarget.
+    void SetLinkedRenderTarget(RenderSurface* renderTarget);
+    /// Set linked depth-stencil surface.
+    void SetLinkedDepthStencil(RenderSurface* depthStencil);
+    /// Queue manual update of the viewport(s).
+    void QueueUpdate();
+    /// Release surface.
+    void Release();
+    
+    /// Return parent texture.
+    Texture* GetParentTexture() const;
+    /// Return width.
+    int GetWidth() const;
+    /// Return height.
+    int GetHeight() const;
+    /// Return usage.
+    TextureUsage GetUsage() const;    
+	/// Return linked color rendertarget.
+    RenderSurface* GetLinkedRenderTarget() const;
+    /// Return linked depth-stencil surface.
+    RenderSurface* GetLinkedDepthStencil() const;
+};

@@ -1,0 +1,49 @@
+$#include "Zone.h"
+
+/// %Component that describes global rendering properties
+class Zone : public Drawable
+{
+public:
+    /// Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
+    void SetBoundingBox(const BoundingBox& box);
+    /// Set ambient color
+    void SetAmbientColor(const Color& color);
+    /// Set fog color.
+    void SetFogColor(const Color& color);
+    /// Set fog start distance.
+    void SetFogStart(float start);
+    /// Set fog end distance.
+    void SetFogEnd(float end);
+    /// Set zone priority. If an object or camera is inside several zones, the one with highest priority is used.
+    void SetPriority(int priority);
+    /// Set override mode. If camera is inside an override zone, it will also be used for all drawables.
+    void SetOverride(bool enable);
+    /// Set ambient gradient mode. In gradient mode ambient color is interpolated from neighbor zones.
+    void SetAmbientGradient(bool enable);
+    
+    /// Return bounding box.
+    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
+    /// Return inverse world transform.
+    const Matrix3x4& GetInverseWorldTransform() const;
+    /// Return zone's own ambient color, disregarding gradient mode.
+    const Color& GetAmbientColor() const { return ambientColor_; }
+    /// Return ambient start color. Not safe to call from worker threads due to possible octree query.
+    const Color& GetAmbientStartColor();
+    /// Return ambient end color. Not safe to call from worker threads due to possible octree query.
+    const Color& GetAmbientEndColor();
+    /// Return fog color.
+    const Color& GetFogColor() const { return fogColor_; }
+    /// Return fog start distance.
+    float GetFogStart() const { return fogStart_; }
+    /// Return fog end distance.
+    float GetFogEnd() const { return fogEnd_; }
+    /// Return zone priority.
+    int GetPriority() const { return priority_; }
+    /// Return override mode.
+    bool GetOverride() const { return override_; }
+    /// Return whether ambient gradient mode is enabled.
+    bool GetAmbientGradient() const { return ambientGradient_; }
+    
+    /// Check whether a point is inside.
+    bool IsInside(const Vector3& point) const;
+};

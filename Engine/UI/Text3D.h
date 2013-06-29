@@ -24,6 +24,7 @@
 
 #include "Drawable.h"
 #include "Text.h"
+#include "VertexBuffer.h"
 
 namespace Urho3D
 {

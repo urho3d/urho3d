@@ -1,0 +1,85 @@
+$#include "StringUtils.h"
+
+/// Parse a bool from a string. Check for the first non-empty character (converted to lowercase) being either 't', 'y' or '1'.
+bool ToBool(const String& source);
+
+/// Parse a bool from a C string. Check for the first non-empty character (converted to lowercase) being either 't', 'y' or '1'.
+bool ToBool(const char* source);
+
+/// Parse a float from a string.
+float ToFloat(const String& source);
+
+/// Parse a float from a C string.
+float ToFloat(const char* source);
+
+/// Parse an integer from a string.
+int ToInt(const String& source);
+
+/// Parse an integer from a C string.
+int ToInt(const char* source);
+
+/// Parse an unsigned integer from a string.
+unsigned ToUInt(const String& source);
+
+/// Parse an unsigned integer from a C string.
+unsigned ToUInt(const char* source);
+
+/// Parse a Color from a string.
+Color ToColor(const String& source);
+
+/// Parse a Color from a C string.
+Color ToColor(const char* source);
+
+/// Parse an IntRect from a string.
+IntRect ToIntRect(const String& source);
+
+/// Parse an IntRect from a C string.
+IntRect ToIntRect(const char* source);
+
+/// Parse an IntVector2 from a string.
+IntVector2 ToIntVector2(const String& source);
+
+/// Parse an IntVector2 from a C string.
+IntVector2 ToIntVector2(const char* source);
+
+/// Parse a Quaternion from a string. If only 3 components specified, convert Euler angles (degrees) to quaternion.
+Quaternion ToQuaternion(const String& source);
+
+/// Parse a Quaternion from a C string. If only 3 components specified, convert Euler angles (degrees) to quaternion.
+Quaternion ToQuaternion(const char* source);
+
+/// Parse a Rect from a string.
+Rect ToRect(const String& source);
+
+/// Parse a Rect from a C string.
+Rect ToRect(const char* source);
+
+/// Parse a Vector2 from a string.
+Vector2 ToVector2(const String& source);
+
+/// Parse a Vector2 from a C string.
+Vector2 ToVector2(const char* source);
+
+/// Parse a Vector3 from a string.
+Vector3 ToVector3(const String& source);
+
+/// Parse a Vector3 from a C string.
+Vector3 ToVector3(const char* source);
+
+/// Parse a Vector4 from a string.
+Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
+
+/// Parse a Vector4 from a C string.
+Vector4 ToVector4(const char* source, bool allowMissingCoords = false);
+
+/// Convert a pointer to string (returns hexadecimal.)
+String ToString(void* value);
+
+/// Convert an unsigned integer to string as hexadecimal.
+String ToStringHex(unsigned value);
+
+/// Return whether a char is an alphabet letter.
+bool IsAlpha(unsigned ch);
+
+/// Return whether a char is a digit.
+bool IsDigit(unsigned ch);

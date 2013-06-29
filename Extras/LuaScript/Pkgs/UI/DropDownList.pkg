@@ -1,0 +1,40 @@
+$#include "DropDownList.h"
+
+/// %Menu %UI element that displays a popup list view.
+class DropDownList : public Menu
+{
+public:
+    /// Add item to the end of the list.
+    void AddItem(UIElement* item);
+    /// Insert item to a specific position.
+    void InsertItem(unsigned index, UIElement* item);
+    /// Remove specific item.
+    void RemoveItem(UIElement* item);
+    /// Remove item at index.
+    void RemoveItem(unsigned index);
+    /// Remove all items.
+    void RemoveAllItems();
+    /// Set selection.
+    void SetSelection(unsigned index);
+    /// Set place holder text. This is the text shown when there is no selection in drop down list.
+    void SetPlaceholderText(const String& text);
+    /// Set whether popup should be automatically resized to match the dropdown button width.
+    void SetResizePopup(bool enable);
+
+    /// Return number of items.
+    unsigned GetNumItems() const;
+    /// Return item at index.
+    UIElement* GetItem(unsigned index) const;
+    /// Return selection index, or M_MAX_UNSIGNED if none selected.
+    unsigned GetSelection() const;
+    /// Return selected item, or null if none selected.
+    UIElement* GetSelectedItem() const;
+    /// Return listview element.
+    ListView* GetListView() const;
+    /// Return selected item placeholder element.
+    UIElement* GetPlaceholder() const;
+    /// Return place holder text.
+    const String& GetPlaceholderText() const;
+    /// Return whether popup should be automatically resized.
+    bool GetResizePopup() const;
+};

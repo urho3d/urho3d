@@ -1,0 +1,213 @@
+$#include "Str.h"
+
+/// %String class.
+class String
+{
+public:
+    /// Construct empty.
+    String();
+    
+    /// Construct from another string.
+    String(const String& str);
+    
+    /// Construct from a C string.
+    String(const char* str);
+    
+    /// Construct from a char array and length.
+    String(const char* str, unsigned length);
+    
+    /// Construct from an integer.
+    explicit String(int value);
+    
+	/// Construct from a short integer.
+    explicit String(short value);
+    
+	/// Construct from a long integer.
+    explicit String(long value);
+    
+	/// Construct from a long long integer.
+    explicit String(long long value);
+    
+	/// Construct from an unsigned integer.
+    explicit String(unsigned value);
+    
+	/// Construct from an unsigned short integer.
+    explicit String(unsigned short value);
+    
+	/// Construct from an unsigned long integer.
+    explicit String(unsigned long value);
+    
+	/// Construct from an unsigned long long integer.
+    explicit String(unsigned long long value);
+	
+	/// Construct from a float.
+    explicit String(float value);
+    
+	/// Construct from a double.
+    explicit String(double value);
+    
+	/// Construct from a bool.
+    explicit String(bool value);
+    
+	/// Construct from a character.
+    explicit String(char value);
+    
+	/// Construct from a character and fill length.
+    explicit String(char value, unsigned length);
+    
+	/// Destruct.
+    ~String();
+  
+    /// Add a string.
+    String operator + (const String& rhs) const;
+    
+    /// Add a C string.
+    String operator + (const char* rhs) const;
+    
+    /// Add a character.
+    String operator + (char rhs) const;
+    
+    /// Test for equality with another string.
+    bool operator == (const String& rhs) const;
+    
+	/// Test if string is less than another string.
+    bool operator < (const String& rhs) const;
+    
+	/// Test for equality with a C string.
+    bool operator == (const char* rhs) const;
+    
+	/// Test if string is less than a C string.
+    bool operator < (const char* rhs) const;
+    
+	/// Return char at index.
+    char& At(unsigned index);
+	
+    /// Return const char at index.
+    const char& At(unsigned index) const;
+    
+    /// Replace all occurrences of a character.
+    void Replace(char replaceThis, char replaceWith);
+    
+	/// Replace all occurrences of a string.
+    void Replace(const String& replaceThis, const String& replaceWith);
+    
+	/// Replace a substring.
+    void Replace(unsigned pos, unsigned length, const String& replaceWith);
+    
+	/// Return a string with all occurrences of a character replaced.
+    String Replaced(char replaceThis, char replaceWith) const;
+    
+	/// Return a string with all occurrences of a string replaced.
+    String Replaced(const String& replaceThis, const String& replaceWith) const;
+    
+	/// Append a string.
+    String& Append(const String& str);
+    
+	/// Append a C string.
+    String& Append(const char* str);
+    
+	/// Append a character.
+    String& Append(char c);
+    
+	/// Append characters.
+    String& Append(const char* str, unsigned length);
+    
+	/// Insert a string.
+    void Insert(unsigned pos, const String& str);
+    
+	/// Insert a character.
+    void Insert(unsigned pos, char c);
+    
+	/// Erase a substring.
+    void Erase(unsigned pos, unsigned length = 1);
+    
+	/// Resize the string.
+    void Resize(unsigned newLength);
+    
+	/// Set new capacity.
+    void Reserve(unsigned newCapacity);
+    
+	/// Reallocate so that no extra memory is used.
+    void Compact();
+    
+	/// Clear the string.
+    void Clear();
+    
+	/// Swap with another string.
+    void Swap(String& str);
+    
+    /// Return first char, or 0 if empty.
+    char Front() const;
+    
+	/// Return last char, or 0 if empty.
+    char Back() const;
+    
+	/// Return a substring from position to end.
+    String Substring(unsigned pos) const;
+    
+	/// Return a substring with length from position.
+    String Substring(unsigned pos, unsigned length) const;
+    
+	/// Return string with whitespace trimmed from the beginning and the end.
+    String Trimmed() const;
+    
+	/// Return string in uppercase.
+    String ToUpper() const;
+    
+	/// Return string in lowercase.
+    String ToLower() const;
+    
+	/// Return index to the first occurrence of a string, or NPOS if not found.
+    unsigned Find(const String& str, unsigned startPos = 0) const;
+    
+	/// Return index to the first occurrence of a character, or NPOS if not found.
+    unsigned Find(char c, unsigned startPos = 0) const;
+    
+	/// Return index to the last occurrence of a string, or NPOS if not found.
+    unsigned FindLast(const String& str, unsigned startPos = String::NPOS) const;
+    
+	/// Return index to the last occurrence of a character, or NPOS if not found.
+    unsigned FindLast(char c, unsigned startPos = String::NPOS) const;
+    
+	/// Return whether starts with a string.
+    bool StartsWith(const String& str) const;
+    
+	/// Return whether ends with a string.
+    bool EndsWith(const String& str) const;
+    
+	/// Return the C string.
+    const char* CString() const;
+    
+	/// Return length.
+    unsigned Length() const;
+    
+	/// Return buffer capacity.
+    unsigned Capacity() const;
+    
+	/// Return whether the string is empty.
+    bool Empty() const;
+    
+	/// Return comparision result with a string.
+    int Compare(const String& str, bool caseSensitive = true) const;
+    
+	/// Return comparision result with a C string.
+    int Compare(const char* str, bool caseSensitive = true) const;
+    
+	/// Return whether contains a specific occurences of string.
+    bool Contains(const String& str) const;
+    
+	/// Return whether contains a specific character.
+    bool Contains(char c) const;
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const;
+    
+    /// Return length of a C string.
+    static unsigned CStringLength(const char* str);
+    
+    /// Compare two C strings.
+    static int Compare(const char* str1, const char* str2, bool caseSensitive);
+    
+    /// Empty string.
+    static const String EMPTY;
+};

@@ -1,0 +1,38 @@
+$#include "BorderImage.h"
+
+enum BlendMode{};
+
+/// %Image %UI element with optional border.
+class BorderImage : public UIElement
+{
+public:
+    /// Set texture.
+    void SetTexture(Texture* texture);
+    /// Set part of texture to use as the image.
+    void SetImageRect(const IntRect& rect);
+    /// Use whole texture as the image.
+    void SetFullImageRect();
+    /// Set image border dimensions.
+    void SetBorder(const IntRect& rect);
+    /// Set offset to image rectangle used on hover.
+    void SetHoverOffset(const IntVector2& offset);
+    /// Set offset to image rectangle used on hover.
+    void SetHoverOffset(int x, int y);
+    /// Set blend mode.
+    void SetBlendMode(BlendMode mode);
+    /// Set tiled mode.
+    void SetTiled(bool enable);
+    
+    /// Return texture.
+    Texture* GetTexture() const;
+    /// Return image rectangle.
+    const IntRect& GetImageRect() const;
+	/// Return image border dimensions.
+    const IntRect& GetBorder() const;
+	/// Return offset to image rectangle used on hover.
+    const IntVector2& GetHoverOffset() const;
+	/// Return blend mode.
+    BlendMode GetBlendMode() const;
+    /// Return whether is tiled.
+    bool IsTiled() const;
+};

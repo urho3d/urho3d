@@ -1,0 +1,15 @@
+$#include "Resource.h"
+
+/// Base class for resources.
+class Resource
+{    
+public:
+    /// Set name.
+    void SetName(const String& name);
+    /// Return name.
+    const String& GetName() const;
+    /// Return name hash.
+    StringHash GetNameHash() const;
+    /// Return memory use in bytes, possibly approximate.
+    unsigned GetMemoryUse() const;
+};

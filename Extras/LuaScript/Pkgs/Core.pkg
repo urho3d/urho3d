@@ -1,0 +1,11 @@
+$#define TOLUA_RELEASE
+
+$#include "CoreLuaAPI.h"
+
+$pfile "Core/ProcessUtils.pkg"
+$pfile "Core/StringUtils.pkg"
+$pfile "Core/Variant.pkg"
+$pfile "Core/Timer.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)

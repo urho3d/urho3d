@@ -1,0 +1,30 @@
+$#include "Cursor.h"
+
+/// %Cursor shapes recognized by the UI subsystem.
+enum CursorShape
+{
+    CS_NORMAL = 0,
+    CS_RESIZEVERTICAL,
+    CS_RESIZEDIAGONAL_TOPRIGHT,
+    CS_RESIZEHORIZONTAL,
+    CS_RESIZEDIAGONAL_TOPLEFT,
+    CS_ACCEPTDROP,
+    CS_REJECTDROP,
+    CS_BUSY,
+    CS_MAX_SHAPES
+};
+
+/// Mouse cursor %UI element.
+class Cursor : public BorderImage
+{
+public:
+    /// Define a shape.
+    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
+    /// Set current shape.
+    void SetShape(CursorShape shape);    
+    /// Get current shape.
+    CursorShape GetShape() const;
+};
+
+Cursor* NewCursor @ Cursor();
+

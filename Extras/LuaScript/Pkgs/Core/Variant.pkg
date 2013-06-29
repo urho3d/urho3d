@@ -1,0 +1,262 @@
+$#include "Variant.h"
+
+/// Variant's supported types.
+enum VariantType
+{
+    VAR_NONE = 0,
+    VAR_INT,
+    VAR_BOOL,
+    VAR_FLOAT,
+    VAR_VECTOR2,
+    VAR_VECTOR3,
+    VAR_VECTOR4,
+    VAR_QUATERNION,
+    VAR_COLOR,
+    VAR_STRING,
+    VAR_BUFFER,
+    VAR_PTR,
+    VAR_RESOURCEREF,
+    VAR_RESOURCEREFLIST,
+    VAR_VARIANTVECTOR,
+    VAR_VARIANTMAP,
+    VAR_INTRECT,
+    VAR_INTVECTOR2,
+    MAX_VAR_TYPES
+};
+
+/// Typed resource reference.
+struct ResourceRef
+{
+    /// Construct.
+    ResourceRef();
+
+    /// Construct with type only and empty id.
+    ResourceRef(ShortStringHash type);
+
+    /// Construct with type and id.
+    ResourceRef(ShortStringHash type, StringHash id);
+
+    // Construct from another ResourceRef.
+    ResourceRef(const ResourceRef& rhs);
+
+    /// Object type.
+    ShortStringHash type_ @ type;
+    StringHash id_ @ id;
+
+    /// Test for equality with another reference.
+    bool operator == (const ResourceRef& rhs) const;
+};
+
+/// %List of typed resource references.
+struct ResourceRefList
+{
+    /// Construct.
+    ResourceRefList();
+
+    /// Construct with type only.
+    ResourceRefList(ShortStringHash type);
+	
+	/// Object type.
+    ShortStringHash type_ @ type;
+    
+	/// Test for equality with another reference list.
+    bool operator == (const ResourceRefList& rhs) const;
+};
+
+/// Variable that supports a fixed set of types.
+class Variant
+{
+public:
+    /// Construct empty.
+    Variant();
+
+    /// Construct from integer.
+    Variant(int value);
+
+    /// Construct from unsigned integer.
+    Variant(unsigned value);
+
+    /// Construct from a string hash (convert to integer).
+    Variant(const StringHash& value);
+
+    /// Construct from a short string hash (convert to integer.)
+    Variant(const ShortStringHash& value);
+
+    /// Construct from a bool.
+    Variant(bool value);
+
+    /// Construct from a float.
+    Variant(float value);
+
+    /// Construct from a Vector2.
+    Variant(const Vector2& value);
+
+    /// Construct from a Vector3.
+    Variant(const Vector3& value);
+
+    /// Construct from a Vector4.
+    Variant(const Vector4& value);
+
+    /// Construct from a quaternion.
+    Variant(const Quaternion& value);
+	
+    /// Construct from a color.
+    Variant(const Color& value);
+
+    /// Construct from a string.
+    Variant(const String& value);
+
+    /// Construct from a C string.
+    Variant(const char* value);
+
+    /// Construct from a pointer.
+    Variant(void* value);
+
+    /// Construct from a resource reference.
+    Variant(const ResourceRef& value);
+
+    /// Construct from a resource reference list.
+    Variant(const ResourceRefList& value);
+
+    /// Construct from an integer rect.
+    Variant(const IntRect& value);
+
+    /// Construct from an IntVector2.
+    Variant(const IntVector2& value);
+
+    /// Construct from type and value.
+    Variant(const String& type, const String& value);
+
+    /// Construct from type and value.
+    Variant(VariantType type, const String& value) ;
+
+    /// Construct from type and value.
+    Variant(VariantType type, const char* value);
+
+    /// Copy-construct from another variant.
+    Variant(const Variant& value);
+
+    /// Destruct.
+    ~Variant();
+
+    /// Reset to empty.
+    void Clear();
+
+	/// Test for equality with another variant.
+    bool operator == (const Variant& rhs) const;
+    /// Test for equality with an integer. To return true, both the type and value must match.
+    bool operator == (int rhs) const;
+    /// Test for equality with an unsigned integer. To return true, both the type and value must match.
+    bool operator == (unsigned rhs) const;
+    /// Test for equality with a bool. To return true, both the type and value must match.
+    bool operator == (bool rhs) const;
+    /// Test for equality with a float. To return true, both the type and value must match.
+    bool operator == (float rhs) const;
+    /// Test for equality with a Vector2. To return true, both the type and value must match.
+    bool operator == (const Vector2& rhs);
+    /// Test for equality with a Vector3. To return true, both the type and value must match.
+    bool operator == (const Vector3& rhs) const;
+    /// Test for equality with a Vector4. To return true, both the type and value must match.
+    bool operator == (const Vector4& rhs) const;
+    /// Test for equality with a quaternion. To return true, both the type and value must match.
+    bool operator == (const Quaternion& rhs) const;
+    /// Test for equality with a color. To return true, both the type and value must match.
+    bool operator == (const Color& rhs) const;
+    /// Test for equality with a string. To return true, both the type and value must match.
+    bool operator == (const String& rhs) const;
+    /// Test for equality with a pointer. To return true, both the type and value must match.
+    bool operator == (void* rhs) const;
+    /// Test for equality with a resource reference. To return true, both the type and value must match.
+    bool operator == (const ResourceRef& rhs) const;
+    /// Test for equality with a resource reference list. To return true, both the type and value must match.
+    bool operator == (const ResourceRefList& rhs) const;
+    /// Test for equality with an integer rect. To return true, both the type and value must match.
+    bool operator == (const IntRect& rhs) const;
+    /// Test for equality with an IntVector2. To return true, both the type and value must match.
+    bool operator == (const IntVector2& rhs) const;
+    /// Test for equality with a StringHash. To return true, both the type and value must match.
+    bool operator == (const StringHash& rhs) const;
+    /// Test for equality with a ShortStringHash. To return true, both the type and value must match.
+    bool operator == (const ShortStringHash& rhs) const;
+    
+	
+	/// Return int or zero on type mismatch.
+    int GetInt() const;
+    /// Return unsigned int or zero on type mismatch.
+    int GetUInt() const;
+    /// Return StringHash or zero on type mismatch.
+    StringHash GetStringHash();
+    /// Return ShortStringHash or zero on type mismatch.
+    ShortStringHash GetShortStringHash();
+    /// Return bool or false on type mismatch.
+    bool GetBool() const;
+    /// Return float or zero on type mismatch.
+    float GetFloat() const;
+    /// Return Vector2 or zero on type mismatch.
+    const Vector2& GetVector2() const;
+    /// Return Vector3 or zero on type mismatch.
+    const Vector3& GetVector3() const;
+    /// Return Vector4 or zero on type mismatch.
+    const Vector4& GetVector4() const;
+    /// Return quaternion or identity on type mismatch.
+    const Quaternion& GetQuaternion() const;
+    /// Return color or default on type mismatch.
+    const Color& GetColor() const;
+    /// Return string or empty on type mismatch.
+    const String& GetString() const;
+    /// Return pointer or null on type mismatch.
+    void* GetPtr() const;
+    /// Return a resource reference or empty on type mismatch.
+    const ResourceRef& GetResourceRef() const;
+    /// Return a resource reference list or empty on type mismatch.
+    const ResourceRefList& GetResourceRefList() const;
+    /// Return an integer rect or empty on type mismatch.
+    const IntRect& GetIntRect() const;
+    /// Return an IntVector2 or empty on type mismatch.
+    const IntVector2& GetIntVector2() const;
+
+    /// Return value's type.
+    VariantType GetType() const;
+    /// Return value's type name.
+    String GetTypeName() const;
+    /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
+    String ToString() const;
+    /// Return true when the variant value is considered zero according to its actual type.
+    bool IsZero() const;
+    /// Return true when the variant is empty (i.e. not initialized yet).
+    bool IsEmpty() const;
+};
+
+class VariantMap
+{
+public:
+	tolua_outside int VariantMapGetInt @ GetInt(const char* key);
+	tolua_outside bool VariantMapGetBool @ GetBool(const char* key);
+	tolua_outside float VariantMapGetFloat @ GetFloat(const char* key);
+	tolua_outside const Vector2& VariantMapGetVector2 @ GetVector2(const char* key);
+	tolua_outside const Vector3& VariantMapGetVector3 @ GetVector3(const char* key);
+	tolua_outside const Vector4& VariantMapGetVector4 @ GetVector4(const char* key);
+	tolua_outside const Quaternion& VariantMapGetQuaternion @ GetQuaternion(const char* key);
+	tolua_outside const Color& VariantMapGetColor @ GetColor(const char* key);
+	tolua_outside const String& VariantMapGetString @ GetString(const char* key);
+	tolua_outside const void* VariantMapGetPtr @ GetPtr(const char* key);
+	tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const char* key);
+	tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const char* key);
+	tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const char* key);
+	tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const char* key);
+
+	tolua_outside void VariantMapSetInt @ SetInt(const char* key, int value);
+	tolua_outside void VariantMapSetBool @ SetBool(const char* key, bool value);
+	tolua_outside void VariantMapSetFloat @ SetFloat(const char* key, float value);
+	tolua_outside void VariantMapSetVector2 @ SetVector2(const char* key, const Vector2& value);
+	tolua_outside void VariantMapSetVector3 @ SetVector3(const char* key, const Vector3& value);
+	tolua_outside void VariantMapSetVector4 @ SetVector4(const char* key, const Vector4& value);
+	tolua_outside void VariantMapSetQuaternion @ SetQuaternion(const char* key, const Quaternion& value);
+	tolua_outside void VariantMapSetColor @ SetColor(const char* key, const Color& value);
+	tolua_outside void VariantMapSetString @ SetString(const char* key, const String& value);
+	tolua_outside void VariantMapSetPtr @ SetPtr(const char* key, const void*& value);
+	tolua_outside void VariantMapSetResourceRef @ SetResourceRef(const char* key, const ResourceRef& value);
+	tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const char* key, const ResourceRefList& value); 
+	tolua_outside void VariantMapSetIntRect @ SetIntRect(const char* key, const IntRect& value);
+	tolua_outside void VariantMapSetIntVector2 @ SetIntVector2(const char* key, const IntVector2& value);
+};

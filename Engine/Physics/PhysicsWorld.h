@@ -22,8 +22,10 @@
 
 #pragma once
 
+#include "BoundingBox.h"
 #include "Component.h"
 #include "HashSet.h"
+#include "Sphere.h"
 #include "Vector3.h"
 
 #include <LinearMath/btIDebugDraw.h>
