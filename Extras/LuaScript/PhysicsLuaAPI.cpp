@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Physics
-** Generated automatically by tolua++-1.0.92 on 06/29/13 19:40:27.
+** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:51.
 */
 
 //
@@ -47,36 +47,36 @@ using namespace Urho3D;
 static int tolua_collect_Quaternion (lua_State* tolua_S)
 {
  Quaternion* self = (Quaternion*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_PhysicsRaycastResult (lua_State* tolua_S)
 {
  PhysicsRaycastResult* self = (PhysicsRaycastResult*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_ResourceRef (lua_State* tolua_S)
 {
  ResourceRef* self = (ResourceRef*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Vector3 (lua_State* tolua_S)
 {
  Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_BoundingBox (lua_State* tolua_S)
 {
  BoundingBox* self = (BoundingBox*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 #endif
 

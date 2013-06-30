@@ -1,6 +1,6 @@
 /*
 ** Lua binding: IO
-** Generated automatically by tolua++-1.0.92 on 06/29/13 19:40:26.
+** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:50.
 */
 
 //
@@ -47,15 +47,15 @@ using namespace Urho3D;
 static int tolua_collect_StringHash (lua_State* tolua_S)
 {
  StringHash* self = (StringHash*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_String (lua_State* tolua_S)
 {
  String* self = (String*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 #endif
 

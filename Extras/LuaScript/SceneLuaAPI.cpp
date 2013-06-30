@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Scene
-** Generated automatically by tolua++-1.0.92 on 06/29/13 19:40:28.
+** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:52.
 */
 
 //
@@ -46,36 +46,36 @@ using namespace Urho3D;
 static int tolua_collect_Matrix3x4 (lua_State* tolua_S)
 {
  Matrix3x4* self = (Matrix3x4*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_String (lua_State* tolua_S)
 {
  String* self = (String*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Quaternion (lua_State* tolua_S)
 {
  Quaternion* self = (Quaternion*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Vector3 (lua_State* tolua_S)
 {
  Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_StringHash (lua_State* tolua_S)
 {
  StringHash* self = (StringHash*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 #endif
 

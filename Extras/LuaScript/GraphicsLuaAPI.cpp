@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Graphics
-** Generated automatically by tolua++-1.0.92 on 06/29/13 19:40:26.
+** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:49.
 */
 
 //
@@ -71,85 +71,85 @@ using namespace Urho3D;
 static int tolua_collect_ColorFrame (lua_State* tolua_S)
 {
  ColorFrame* self = (ColorFrame*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_String (lua_State* tolua_S)
 {
  String* self = (String*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Color (lua_State* tolua_S)
 {
  Color* self = (Color*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_AnimationState (lua_State* tolua_S)
 {
  AnimationState* self = (AnimationState*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_StringHash (lua_State* tolua_S)
 {
  StringHash* self = (StringHash*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Ray (lua_State* tolua_S)
 {
  Ray* self = (Ray*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Frustum (lua_State* tolua_S)
 {
  Frustum* self = (Frustum*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Vector2 (lua_State* tolua_S)
 {
  Vector2* self = (Vector2*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_TextureFrame (lua_State* tolua_S)
 {
  TextureFrame* self = (TextureFrame*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Bone (lua_State* tolua_S)
 {
  Bone* self = (Bone*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Matrix4 (lua_State* tolua_S)
 {
  Matrix4* self = (Matrix4*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Vector3 (lua_State* tolua_S)
 {
  Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 #endif
 

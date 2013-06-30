@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Resource
-** Generated automatically by tolua++-1.0.92 on 06/29/13 19:40:27.
+** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:51.
 */
 
 //
@@ -48,99 +48,99 @@ using namespace Urho3D;
 static int tolua_collect_String (lua_State* tolua_S)
 {
  String* self = (String*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_IntRect (lua_State* tolua_S)
 {
  IntRect* self = (IntRect*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Color (lua_State* tolua_S)
 {
  Color* self = (Color*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Vector4 (lua_State* tolua_S)
 {
  Vector4* self = (Vector4*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Vector3 (lua_State* tolua_S)
 {
  Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_StringHash (lua_State* tolua_S)
 {
  StringHash* self = (StringHash*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_ResourceRef (lua_State* tolua_S)
 {
  ResourceRef* self = (ResourceRef*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Rect (lua_State* tolua_S)
 {
  Rect* self = (Rect*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_ResourceRefList (lua_State* tolua_S)
 {
  ResourceRefList* self = (ResourceRefList*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Vector2 (lua_State* tolua_S)
 {
  Vector2* self = (Vector2*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_Quaternion (lua_State* tolua_S)
 {
  Quaternion* self = (Quaternion*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_IntVector2 (lua_State* tolua_S)
 {
  IntVector2* self = (IntVector2*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_BoundingBox (lua_State* tolua_S)
 {
  BoundingBox* self = (BoundingBox*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_XMLElement (lua_State* tolua_S)
 {
  XMLElement* self = (XMLElement*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 #endif
 

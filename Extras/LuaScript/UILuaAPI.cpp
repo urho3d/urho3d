@@ -1,6 +1,6 @@
 /*
 ** Lua binding: UI
-** Generated automatically by tolua++-1.0.92 on 06/29/13 19:40:28.
+** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:52.
 */
 
 //
@@ -62,22 +62,22 @@ using namespace Urho3D;
 static int tolua_collect_IntVector2 (lua_State* tolua_S)
 {
  IntVector2* self = (IntVector2*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_IntRect (lua_State* tolua_S)
 {
  IntRect* self = (IntRect*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 
 static int tolua_collect_ResourceRef (lua_State* tolua_S)
 {
  ResourceRef* self = (ResourceRef*) tolua_tousertype(tolua_S,1,0);
-    Mtolua_delete(self);
-    return 0;
+  Mtolua_delete(self);
+  return 0;
 }
 #endif
 
