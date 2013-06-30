@@ -94,7 +94,7 @@ bool FileSystem::SetCurrentDir(const String& pathName)
         return false;
     }
     #endif
-    
+
     return true;
 }
 
@@ -105,19 +105,19 @@ bool FileSystem::CreateDir(const String& pathName)
         LOGERROR("Access denied to " + pathName);
         return false;
     }
-    
+
     #ifdef WIN32
     bool success = (CreateDirectoryW(GetWideNativePath(RemoveTrailingSlash(pathName)).CString(), 0) == TRUE) ||
         (GetLastError() == ERROR_ALREADY_EXISTS);
     #else
     bool success = mkdir(GetNativePath(RemoveTrailingSlash(pathName)).CString(), S_IRWXU) == 0 || errno == EEXIST;
     #endif
-    
+
     if (success)
         LOGDEBUG("Created directory " + pathName);
     else
         LOGERROR("Failed to create directory " + pathName);
-    
+
     return success;
 }
 
@@ -137,35 +137,35 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
     if (allowedPaths_.Empty())
     {
         String fixedFileName = GetNativePath(fileName);
-        
+
         #ifdef WIN32
         // Add .exe extension if no extension defined
         if (GetExtension(fixedFileName).Empty())
             fixedFileName += ".exe";
-        
+
         String commandLine = "\"" + fixedFileName + "\"";
         for (unsigned i = 0; i < arguments.Size(); ++i)
             commandLine += " " + arguments[i];
-        
+
         STARTUPINFOW startupInfo;
         PROCESS_INFORMATION processInfo;
         memset(&startupInfo, 0, sizeof startupInfo);
         memset(&processInfo, 0, sizeof processInfo);
-        
+
         WString commandLineW(commandLine);
         if (!CreateProcessW(NULL, (wchar_t*)commandLineW.CString(), 0, 0, 0, CREATE_NO_WINDOW, 0, 0, &startupInfo, &processInfo))
         {
             LOGERROR("Failed to execute command " + commandLine);
             return -1;
         }
-        
+
         WaitForSingleObject(processInfo.hProcess, INFINITE);
         DWORD exitCode;
         GetExitCodeProcess(processInfo.hProcess, &exitCode);
-        
+
         CloseHandle(processInfo.hProcess);
         CloseHandle(processInfo.hThread);
-        
+
         return exitCode;
         #else
         pid_t pid = fork();
@@ -176,7 +176,7 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
             for (unsigned i = 0; i < arguments.Size(); ++i)
                 argPtrs.Push(arguments[i].CString());
             argPtrs.Push(0);
-            
+
             execvp(argPtrs[0], (char**)&argPtrs[0]);
             return -1; // Return -1 if we could not spawn the process
         }
@@ -209,7 +209,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
             LOGERROR("File or directory " + fileName + " not found");
             return false;
         }
-        
+
         #ifdef WIN32
         bool success = (int)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
             GetWideNativePath(fileName).CString(), 0, 0, SW_SHOW) > 32;
@@ -221,9 +221,9 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
         arguments.Push(fileName);
         return SystemRun("open", arguments) == 0;
         #else
-        /// \todo Implement on Unix-like systems
-        LOGERROR("SystemOpen not implemented");
-        return false;
+        Vector<String> arguments;
+        arguments.Push(fileName);
+        return SystemRun("xdg-open", arguments) == 0;
         #endif
     }
     else
@@ -245,15 +245,15 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
         LOGERROR("Access denied to " + destFileName);
         return false;
     }
-    
+
     SharedPtr<File> srcFile(new File(context_, srcFileName, FILE_READ));
     SharedPtr<File> destFile(new File(context_, destFileName, FILE_WRITE));
     if (!srcFile->IsOpen() || !destFile->IsOpen())
         return false;
-    
+
     unsigned fileSize = srcFile->GetSize();
     SharedArrayPtr<unsigned char> buffer(new unsigned char[fileSize]);
-    
+
     unsigned bytesRead = srcFile->Read(buffer.Get(), fileSize);
     unsigned bytesWritten = destFile->Write(buffer.Get(), fileSize);
     return bytesRead == fileSize && bytesWritten == fileSize;
@@ -271,7 +271,7 @@ bool FileSystem::Rename(const String& srcFileName, const String& destFileName)
         LOGERROR("Access denied to " + destFileName);
         return false;
     }
-    
+
     #ifdef WIN32
     return MoveFileW(GetWideNativePath(srcFileName).CString(), GetWideNativePath(destFileName).CString()) != 0;
     #else
@@ -286,7 +286,7 @@ bool FileSystem::Delete(const String& fileName)
         LOGERROR("Access denied to " + fileName);
         return false;
     }
-    
+
     #ifdef WIN32
     return DeleteFileW(GetWideNativePath(fileName).CString()) != 0;
     #else
@@ -312,22 +312,22 @@ String FileSystem::GetCurrentDir() const
 bool FileSystem::CheckAccess(const String& pathName) const
 {
     String fixedPath = AddTrailingSlash(pathName);
-    
+
     // If no allowed directories defined, succeed always
     if (allowedPaths_.Empty())
         return true;
-    
+
     // If there is any attempt to go to a parent directory, disallow
     if (fixedPath.Contains(".."))
         return false;
-    
+
     // Check if the path is a partial match of any of the allowed directories
     for (HashSet<String>::ConstIterator i = allowedPaths_.Begin(); i != allowedPaths_.End(); ++i)
     {
         if (fixedPath.Find(*i) == 0)
             return true;
     }
-    
+
     // Not found, so disallow
     return false;
 }
@@ -336,7 +336,7 @@ unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
 {
     if (fileName.Empty() || !CheckAccess(fileName))
         return 0;
-    
+
     #ifdef WIN32
     WIN32_FILE_ATTRIBUTE_DATA fileAttrData;
     memset(&fileAttrData, 0, sizeof fileAttrData);
@@ -362,9 +362,9 @@ bool FileSystem::FileExists(const String& fileName) const
 {
     if (!CheckAccess(GetPath(fileName)))
         return false;
-    
+
     String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
-    
+
     #ifdef ANDROID
     if (fixedName.StartsWith("/apk/"))
     {
@@ -378,7 +378,7 @@ bool FileSystem::FileExists(const String& fileName) const
             return false;
     }
     #endif
-    
+
     #ifdef WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -388,7 +388,7 @@ bool FileSystem::FileExists(const String& fileName) const
     if (stat(fixedName.CString(), &st) || st.st_mode & S_IFDIR)
         return false;
     #endif
-    
+
     return true;
 }
 
@@ -396,7 +396,7 @@ bool FileSystem::DirExists(const String& pathName) const
 {
     if (!CheckAccess(pathName))
         return false;
-    
+
     #ifndef WIN32
     // Always return true for the root directory
     if (pathName == "/")
@@ -410,7 +410,7 @@ bool FileSystem::DirExists(const String& pathName) const
     if (fixedName.StartsWith("/apk/"))
         return true;
     #endif
-    
+
     #ifdef WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
@@ -420,14 +420,14 @@ bool FileSystem::DirExists(const String& pathName) const
     if (stat(fixedName.CString(), &st) || !(st.st_mode & S_IFDIR))
         return false;
     #endif
-    
+
     return true;
 }
 
 void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const
 {
     result.Clear();
-    
+
     if (CheckAccess(pathName))
     {
         String initialPath = AddTrailingSlash(pathName);
@@ -489,7 +489,7 @@ void FileSystem::RegisterPath(const String& pathName)
 {
     if (pathName.Empty())
         return;
-    
+
     allowedPaths_.Insert(AddTrailingSlash(pathName));
 }
 
@@ -500,11 +500,11 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     String deltaPath;
     if (path.Length() > startPath.Length())
         deltaPath = path.Substring(startPath.Length());
-    
+
     String filterExtension = filter.Substring(filter.Find('.'));
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
-    
+
     #ifdef WIN32
     WIN32_FIND_DATAW info;
     HANDLE handle = FindFirstFileW(WString(path + "*").CString(), &info);
@@ -530,9 +530,9 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                         result.Push(deltaPath + fileName);
                 }
             }
-        } 
+        }
         while (FindNextFileW(handle, &info));
-        
+
         FindClose(handle);
     }
     #else
@@ -574,10 +574,10 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension)
 {
     String fullPathCopy = GetInternalPath(fullPath);
-    
+
     unsigned extPos = fullPathCopy.FindLast('.');
     unsigned pathPos = fullPathCopy.FindLast('/');
-    
+
     if (extPos != String::NPOS && (pathPos == String::NPOS || extPos > pathPos))
     {
         extension = fullPathCopy.Substring(extPos).ToLower();
@@ -585,7 +585,7 @@ void SplitPath(const String& fullPath, String& pathName, String& fileName, Strin
     }
     else
         extension.Clear();
-    
+
     pathPos = fullPathCopy.FindLast('/');
     if (pathPos != String::NPOS)
     {
