@@ -38,6 +38,8 @@ function post_output_hook(package)
         if k == 0 then print('Pattern not replaced', pattern) end
     end
 
+	replace("\t", "  ")
+	
     replace([[#ifndef __cplusplus
 #include "stdlib.h"
 #endif
