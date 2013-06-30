@@ -184,7 +184,7 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
         {
             int exitCode;
             wait(&exitCode);
-            return exitCode ? 1 : 0;
+            return exitCode;
         }
         else
         {
@@ -213,18 +213,20 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
         #ifdef WIN32
         bool success = (int)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
             GetWideNativePath(fileName).CString(), 0, 0, SW_SHOW) > 32;
-        if (!success)
-            LOGERROR("Failed to open " + fileName + " externally");
-        return success;
-        #elif defined(__APPLE__)
-        Vector<String> arguments;
-        arguments.Push(fileName);
-        return SystemRun("open", arguments) == 0;
         #else
         Vector<String> arguments;
         arguments.Push(fileName);
-        return SystemRun("xdg-open", arguments) == 0;
+        bool success = SystemRun(
+        #if defined(__APPLE__)
+                "open",
+        #else
+                "xdg-open",
         #endif
+                arguments) == 0;
+        #endif
+        if (!success)
+            LOGERROR("Failed to open " + fileName + " externally");
+        return success;
     }
     else
     {
