@@ -23,7 +23,7 @@
 #pragma once
 
 #include "Context.h"
-#include "scene.h"
+#include "Scene.h"
 
 namespace Urho3D
 {
