@@ -53,23 +53,23 @@ public:
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
     
     /// Return client identity.
-    const VariantMap& GetIdentity() const;
+    const VariantMap& GetIdentity() const { return identity_; }
     /// Return the scene used by this connection.
     Scene* GetScene() const;
     /// Return the client controls of this connection.
-    const Controls& GetControls() const;
+    const Controls& GetControls() const { return controls_; }
     /// Return the observer position for interest management.
-    const Vector3& GetPosition() const;
+    const Vector3& GetPosition() const { return position_; }
     /// Return whether is a client connection.
-    bool IsClient() const;
+    bool IsClient() const { return isClient_; }
     /// Return whether is fully connected.
     bool IsConnected() const;
     /// Return whether connection is pending.
-    bool IsConnectPending() const;
+    bool IsConnectPending() const { return connectPending_; }
     /// Return whether the scene is loaded and ready to receive server updates.
-    bool IsSceneLoaded() const;
+    bool IsSceneLoaded() const { return sceneLoaded_; }
     /// Return whether to log data in/out statistics.
-    bool GetLogStatistics() const;
+    bool GetLogStatistics() const { return logStatistics_; }
     /// Return remote address.
     String GetAddress() const;
     /// Return remote port.

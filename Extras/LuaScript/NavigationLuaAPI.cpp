@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Navigation
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:51.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:50.
 */
 
 //
@@ -60,6 +60,13 @@ static int tolua_collect_BoundingBox (lua_State* tolua_S)
 static int tolua_collect_Vector3 (lua_State* tolua_S)
 {
  Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
+  Mtolua_delete(self);
+  return 0;
+}
+
+static int tolua_collect_PODVector_Vector3_ (lua_State* tolua_S)
+{
+ PODVector<Vector3>* self = (PODVector<Vector3>*) tolua_tousertype(tolua_S,1,0);
   Mtolua_delete(self);
   return 0;
 }
@@ -790,7 +797,7 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: FindPath of class  NavigationMesh */
+/* method: NavigationMeshFindPath of class  NavigationMesh */
 #ifndef TOLUA_DISABLE_tolua_Navigation_NavigationMesh_FindPath00
 static int tolua_Navigation_NavigationMesh_FindPath00(lua_State* tolua_S)
 {
@@ -798,27 +805,36 @@ static int tolua_Navigation_NavigationMesh_FindPath00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"NavigationMesh",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"PODVector<Vector3>",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3",0,&tolua_err)) ||
      (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3",0,&tolua_err)) ||
-     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const Vector3",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   NavigationMesh* self = (NavigationMesh*)  tolua_tousertype(tolua_S,1,0);
-  PODVector<Vector3>* dest = ((PODVector<Vector3>*)  tolua_tousertype(tolua_S,2,0));
-  const Vector3* start = ((const Vector3*)  tolua_tousertype(tolua_S,3,0));
-  const Vector3* end = ((const Vector3*)  tolua_tousertype(tolua_S,4,0));
+  const Vector3* start = ((const Vector3*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3* end = ((const Vector3*)  tolua_tousertype(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FindPath'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'NavigationMeshFindPath'", NULL);
 #endif
   {
-   self->FindPath(*dest,*start,*end);
+   tolua_outside PODVector<Vector3> tolua_ret = (tolua_outside PODVector<Vector3>)  NavigationMeshFindPath(self,*start,*end);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((PODVector<Vector3>)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"PODVector<Vector3>");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(PODVector<Vector3>));
+     tolua_pushusertype(tolua_S,tolua_obj,"PODVector<Vector3>");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'FindPath'.",&tolua_err);
@@ -827,35 +843,44 @@ static int tolua_Navigation_NavigationMesh_FindPath00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: FindPath of class  NavigationMesh */
+/* method: NavigationMeshFindPath of class  NavigationMesh */
 #ifndef TOLUA_DISABLE_tolua_Navigation_NavigationMesh_FindPath01
 static int tolua_Navigation_NavigationMesh_FindPath01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"NavigationMesh",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"PODVector<Vector3>",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3",0,&tolua_err)) ||
      (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3",0,&tolua_err)) ||
      (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const Vector3",0,&tolua_err)) ||
-     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const Vector3",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
   NavigationMesh* self = (NavigationMesh*)  tolua_tousertype(tolua_S,1,0);
-  PODVector<Vector3>* dest = ((PODVector<Vector3>*)  tolua_tousertype(tolua_S,2,0));
-  const Vector3* start = ((const Vector3*)  tolua_tousertype(tolua_S,3,0));
-  const Vector3* end = ((const Vector3*)  tolua_tousertype(tolua_S,4,0));
-  const Vector3* extents = ((const Vector3*)  tolua_tousertype(tolua_S,5,0));
+  const Vector3* start = ((const Vector3*)  tolua_tousertype(tolua_S,2,0));
+  const Vector3* end = ((const Vector3*)  tolua_tousertype(tolua_S,3,0));
+  const Vector3* extents = ((const Vector3*)  tolua_tousertype(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FindPath'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'NavigationMeshFindPath'", NULL);
 #endif
   {
-   self->FindPath(*dest,*start,*end,*extents);
+   tolua_outside PODVector<Vector3> tolua_ret = (tolua_outside PODVector<Vector3>)  NavigationMeshFindPath(self,*start,*end,*extents);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((PODVector<Vector3>)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"PODVector<Vector3>");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(PODVector<Vector3>));
+     tolua_pushusertype(tolua_S,tolua_obj,"PODVector<Vector3>");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
   }
  }
- return 0;
+ return 1;
 tolua_lerror:
  return tolua_Navigation_NavigationMesh_FindPath00(tolua_S);
 }

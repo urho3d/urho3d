@@ -33,23 +33,23 @@ public:
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
     /// Return whether updates are enabled.
-    bool IsUpdateEnabled() const;
+    bool IsUpdateEnabled() const { return updateEnabled_; }
     /// Return asynchronous loading flag.
-    bool IsAsyncLoading() const;
+    bool IsAsyncLoading() const { return asyncLoading_; }
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
     float GetAsyncProgress() const;
     /// Return source file name.
-    const String& GetFileName() const;
+    const String& GetFileName() const { return fileName_; }
     /// Return source file checksum.
-    unsigned GetChecksum() const;
+    unsigned GetChecksum() const { return checksum_; }
     /// Return update time scale.
-    float GetTimeScale() const;
+    float GetTimeScale() const { return timeScale_; }
     /// Return elapsed time in seconds.
-    float GetElapsedTime() const;
+    float GetElapsedTime() const { return elapsedTime_; }
     /// Return motion smoothing constant.
-    float GetSmoothingConstant() const;
+    float GetSmoothingConstant() const { return smoothingConstant_; }
     /// Return motion smoothing snap threshold.
-    float GetSnapThreshold() const;
+    float GetSnapThreshold() const { return snapThreshold_; }
     /// Return a node user variable name, or empty if not registered.
     const String& GetVarName(ShortStringHash hash) const;
 
@@ -62,7 +62,7 @@ public:
     /// Add a component to the delayed dirty notify queue. Is thread-safe.
     void DelayedMarkedDirty(Component* component);
     /// Return threaded update flag.
-    bool IsThreadedUpdate() const;
+    bool IsThreadedUpdate() const { return threadedUpdate_; }
     /// Get free node ID, either non-local or local.
     unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local.

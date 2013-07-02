@@ -10,11 +10,15 @@ public:
     void Remove();
     
     /// Return ID.
-    unsigned GetID() const;
+    unsigned GetID() const { return id_; }
     /// Return scene node.
-    Node* GetNode() const;
+    Node* GetNode() const { return node_; }
     /// Return the scene the node belongs to.
     Scene* GetScene() const;
     /// Return whether is enabled.
-    bool IsEnabled() const;    
+    bool IsEnabled() const { return enabled_; }
+    /// Return whether is effectively enabled (node is also enabled.)
+    bool IsEnabledEffective() const;
+    /// Return component in the same scene node by type. If there are several, returns the first.
+    Component* GetComponent(ShortStringHash type) const;
 };

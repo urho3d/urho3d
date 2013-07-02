@@ -4,12 +4,11 @@ $#include "Resource.h"
 class Resource
 {    
 public:
-    /// Set name.
-    void SetName(const String& name);
+
     /// Return name.
-    const String& GetName() const;
+    const String& GetName() const { return name_; }
     /// Return name hash.
-    StringHash GetNameHash() const;
+    StringHash GetNameHash() const { return nameHash_; }
     /// Return memory use in bytes, possibly approximate.
-    unsigned GetMemoryUse() const;
+    unsigned GetMemoryUse() const { return memoryUse_; }
 };

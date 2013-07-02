@@ -14,7 +14,8 @@ public:
     /// Return endpoint node.
     Node* GetEndPoint() const;
     /// Return radius.
-    float GetRadius() const;
+    float GetRadius() const { return radius_; }
     /// Return whether is bidirectional.
-    bool IsBidirectional() const;
+    bool IsBidirectional() const { return bidirectional_; }
+
 };

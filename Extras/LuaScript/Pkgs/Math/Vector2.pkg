@@ -5,56 +5,90 @@ class Vector2
 {
 public:
     /// Construct undefined.
-    Vector2();
+    Vector2()
+    {
+    }
     
     /// Copy-construct from another vector.
-    Vector2(const Vector2& vector);
+    Vector2(const Vector2& vector) :
+        x_(vector.x_),
+        y_(vector.y_)
+    {
+    }
     
     /// Construct from coordinates.
-    Vector2(float x, float y);
+    Vector2(float x, float y) :
+        x_(x),
+        y_(y)
+    {
+    }
     
     /// Construct from a float array.
-    Vector2(const float* data);
+    Vector2(const float* data) :
+        x_(data[0]),
+        y_(data[1])
+    {
+    }
     
     /// Test for equality with another vector without epsilon.
-    bool operator == (const Vector2& rhs) const;
-    
-	/// Add a vector.
-    Vector2 operator + (const Vector2& rhs) const;
+    bool operator == (const Vector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
+    /// Add a vector.
+    Vector2 operator + (const Vector2& rhs) const { return Vector2(x_ + rhs.x_, y_ + rhs.y_); }
     /// Return negation.
-    Vector2 operator - () const;
+    Vector2 operator - () const { return Vector2(-x_, -y_); }
     /// Subtract a vector.
-    Vector2 operator - (const Vector2& rhs) const;
+    Vector2 operator - (const Vector2& rhs) const { return Vector2(x_ - rhs.x_, y_ - rhs.y_); }
     /// Multiply with a scalar.
-    Vector2 operator * (float rhs) const;
+    Vector2 operator * (float rhs) const { return Vector2(x_ * rhs, y_ * rhs); }
     /// Multiply with a vector.
-    Vector2 operator * (const Vector2& rhs) const;
+    Vector2 operator * (const Vector2& rhs) const { return Vector2(x_ * rhs.x_, y_ * rhs.y_); }
     /// Divide by a scalar.
-    Vector2 operator / (float rhs) const;
+    Vector2 operator / (float rhs) const { return Vector2(x_ / rhs, y_ / rhs); }
     /// Divide by a vector.
+    Vector2 operator / (const Vector2& rhs) const { return Vector2(x_ / rhs.x_, y_ / rhs.y_); }
     Vector2 operator / (const Vector2& rhs) const;
     
     /// Normalize to unit length and return the previous length.
-    float Normalize();
+    float Normalize()
+    {
+        float len = Length();
+        if (len >= M_EPSILON)
+        {
+            float invLen = 1.0f / len;
+            x_ *= invLen;
+            y_ *= invLen;
+        }
+        
+        return len;
+    }
     
     /// Return length.
-    float Length() const;
+    float Length() const { return sqrtf(x_ * x_ + y_ * y_); }
     /// Return squared length.
-    float LengthSquared() const;
+    float LengthSquared() const { return x_ * x_ + y_ * y_; }
     /// Calculate dot product.
-    float DotProduct(const Vector2& rhs) const;
+    float DotProduct(const Vector2& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_; }
     /// Calculate absolute dot product.
-    float AbsDotProduct(const Vector2& rhs) const;
+    float AbsDotProduct(const Vector2& rhs) const { return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_); }
     /// Return absolute vector.
-    Vector2 Abs() const;
+    Vector2 Abs() const { return Vector2(Urho3D::Abs(x_), Urho3D::Abs(y_)); }
     /// Linear interpolation with another vector.
-    Vector2 Lerp(const Vector2& rhs, float t) const;
+    Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     /// Test for equality with another vector with epsilon.
-    bool Equals(const Vector2& rhs) const;
+    bool Equals(const Vector2& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_); }
     
     /// Return normalized to unit length.
-    Vector2 Normalized() const;
-    
+    Vector2 Normalized() const
+    {
+        float len = Length();
+        if (len >= M_EPSILON)
+            return *this * (1.0f / len);
+        else
+            return *this;
+    }
+	    
+    /// Return as string.
+    String ToString() const;
     /// X coordinate.
     float x_ @ x;
     /// Y coordinate.
@@ -79,30 +113,47 @@ class IntVector2
 {
 public:
     /// Construct undefined.
-    IntVector2();
+    IntVector2()
+    {
+    }
     
     /// Construct from coordinates.
-    IntVector2(int x, int y);
+    IntVector2(int x, int y) :
+        x_(x),
+        y_(y)
+    {
+    }
     
     /// Construct from an int array.
-    IntVector2(const int* data);
+    IntVector2(const int* data) :
+        x_(data[0]),
+        y_(data[1])
+    {
+    }
     
     /// Copy-construct from another vector.
-    IntVector2(const IntVector2& rhs);
+    IntVector2(const IntVector2& rhs) :
+        x_(rhs.x_),
+        y_(rhs.y_)
+    {
+    }
     
     /// Test for equality with another vector.
-    bool operator == (const IntVector2& rhs) const;
+    bool operator == (const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
     /// Add a vector.
-    IntVector2 operator + (const IntVector2& rhs) const;
+    IntVector2 operator + (const IntVector2& rhs) const { return IntVector2(x_ + rhs.x_, y_ + rhs.y_); }
     /// Return negation.
-    IntVector2 operator - () const;
+    IntVector2 operator - () const { return IntVector2(-x_, -y_); }
     /// Subtract a vector.
-    IntVector2 operator - (const IntVector2& rhs) const;
+    IntVector2 operator - (const IntVector2& rhs) const { return IntVector2(x_ - rhs.x_, y_ - rhs.y_); }
     /// Multiply with a scalar.
-    IntVector2 operator * (int rhs) const;
+    IntVector2 operator * (int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
     /// Divide by a scalar.
+    IntVector2 operator / (int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
     IntVector2 operator / (int rhs) const;
     
+    /// Return as string.
+    String ToString() const;
     
     /// X coordinate.
     int x_ @ x;

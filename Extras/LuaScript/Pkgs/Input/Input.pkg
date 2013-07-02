@@ -19,23 +19,47 @@ struct TouchState
 struct JoystickState
 {
     /// Return number of buttons.
-    unsigned GetNumButtons() const;
+    unsigned GetNumButtons() const { return buttons_.Size(); }
     /// Return number of axes.
-    unsigned GetNumAxes() const;
+    unsigned GetNumAxes() const { return axes_.Size(); }
     /// Return number of hats.
-    unsigned GetNumHats() const;
+    unsigned GetNumHats() const { return hats_.Size(); }
     
     /// Check if a button is held down.
-    bool GetButtonDown(unsigned index) const;
+    bool GetButtonDown(unsigned index) const
+    {
+        if (index < buttons_.Size())
+            return buttons_[index];
+        else
+            return false;
+    }
     
     /// Check if a button has been pressed on this frame.
-    bool GetButtonPress(unsigned index) const;
+    bool GetButtonPress(unsigned index) const
+    {
+        if (index < buttons_.Size())
+            return buttonPress_[index];
+        else
+            return false;
+    }
     
     /// Return axis position.
-    float GetAxisPosition(unsigned index) const;
+    float GetAxisPosition(unsigned index) const
+    {
+        if (index < axes_.Size())
+            return axes_[index];
+        else
+            return 0.0f;
+    }
     
     /// Return hat position.
-    int GetHatPosition(unsigned index) const;    
+    int GetHatPosition(unsigned index) const
+    {
+        if (index < hats_.Size())
+            return hats_[index];
+        else
+            return HAT_CENTER;
+    }
 };
 
 /// %Input subsystem. Converts operating system window messages to input state and events.
@@ -68,29 +92,29 @@ public:
     /// Return mouse position within window. Should only be used with a visible mouse cursor.
     IntVector2 GetMousePosition() const;
     /// Return mouse movement since last frame.
-    const IntVector2& GetMouseMove() const;
+    const IntVector2& GetMouseMove() const { return mouseMove_; }
     /// Return horizontal mouse movement since last frame.
-    int GetMouseMoveX() const;
+    int GetMouseMoveX() const { return mouseMove_.x_; }
     /// Return vertical mouse movement since last frame.
-    int GetMouseMoveY() const;
+    int GetMouseMoveY() const { return mouseMove_.y_; }
     /// Return mouse wheel movement since last frame.
-    int GetMouseMoveWheel() const;
+    int GetMouseMoveWheel() const { return mouseMoveWheel_; }
     /// Return number of active finger touches.
-    unsigned GetNumTouches() const;
+    unsigned GetNumTouches() const { return touches_.Size(); }
     /// Return active finger touch by index.
     TouchState* GetTouch(unsigned index) const;
     /// Return number of connected joysticks.
-    unsigned GetNumJoysticks() const;
+    unsigned GetNumJoysticks() const { return joysticks_.Size(); }
     /// Return joystick name by index.
     const String& GetJoystickName(unsigned index) const;
     /// Return joystick state by index. Automatically open if not opened yet.
     JoystickState* GetJoystick(unsigned index);
     /// Return whether fullscreen toggle is enabled.
-    bool GetToggleFullscreen() const;
+    bool GetToggleFullscreen() const { return toggleFullscreen_; }
     /// Return whether the operating system mouse cursor is visible.
-    bool IsMouseVisible() const;
+    bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether application window has input focus.
-    bool HasFocus();
+    bool HasFocus() { return inputFocus_; }
     /// Return whether application window is minimized.
     bool IsMinimized() const;
 };

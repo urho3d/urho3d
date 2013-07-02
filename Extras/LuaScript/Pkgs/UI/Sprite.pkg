@@ -32,19 +32,19 @@ public:
     void SetBlendMode(BlendMode mode);
     
     /// Return floating point position.
-    const Vector2& GetPosition() const;
+    const Vector2& GetPosition() const { return floatPosition_; }
     /// Return hotspot.
-    const IntVector2& GetHotSpot() const;
+    const IntVector2& GetHotSpot() const { return hotSpot_; }
     /// Return scale.
-    const Vector2& GetScale() const;
+    const Vector2& GetScale() const { return scale_; }
     /// Return rotation angle.
-    float GetRotation() const;
+    float GetRotation() const { return rotation_; }
     /// Return texture.
-    Texture* GetTexture() const;
+    Texture* GetTexture() const { return texture_; }
     /// Return image rectangle.
-    const IntRect& GetImageRect() const;
+    const IntRect& GetImageRect() const { return imageRect_; }
     /// Return blend mode.
-    BlendMode GetBlendMode() const;
+    BlendMode GetBlendMode() const { return blendMode_; }
     
     /// Set texture attribute.
     void SetTextureAttr(ResourceRef value);
@@ -55,4 +55,3 @@ public:
 };
 
 Sprite* NewSprite @ Sprite();
-

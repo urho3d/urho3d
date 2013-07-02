@@ -23,12 +23,12 @@ public:
     void SetQuiet(bool quiet);
     
     /// Return logging level.
-    int GetLevel() const;
+    int GetLevel() const { return level_; }
     /// Return whether log messages are timestamped.
-    bool GetTimeStamp() const;
+    bool GetTimeStamp() const { return timeStamp_; }
     /// Return last log message.
     /// Return whether log is in quiet mode (only errors printed to standard error stream).
-    bool IsQuiet() const;
+    bool IsQuiet() const { return quiet_; }
     
     /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
     static void Write(int level, const char* message);

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Container
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:48.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:48.
 */
 
 //
@@ -41,6 +41,13 @@ using namespace Urho3D;
 /* function to release collected object via destructor */
 #ifdef __cplusplus
 
+static int tolua_collect_Vector_String_ (lua_State* tolua_S)
+{
+ Vector<String>* self = (Vector<String>*) tolua_tousertype(tolua_S,1,0);
+  Mtolua_delete(self);
+  return 0;
+}
+
 static int tolua_collect_String (lua_State* tolua_S)
 {
  String* self = (String*) tolua_tousertype(tolua_S,1,0);
@@ -53,6 +60,7 @@ static int tolua_collect_String (lua_State* tolua_S)
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
+ tolua_usertype(tolua_S,"Vector<String>");
  tolua_usertype(tolua_S,"String");
 }
 
@@ -223,16 +231,14 @@ static int tolua_Container_String_new03(lua_State* tolua_S)
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
      !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,2,0));
-  unsigned length = ((unsigned)  tolua_tonumber(tolua_S,3,0));
+  char* str = ((char*)  tolua_tostring(tolua_S,2,0));
   {
-   String* tolua_ret = (String*)  Mtolua_new((String)(str,length));
+   String* tolua_ret = (String*)  Mtolua_new((String)(str));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
   }
  }
@@ -250,16 +256,14 @@ static int tolua_Container_String_new03_local(lua_State* tolua_S)
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
      !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,2,0));
-  unsigned length = ((unsigned)  tolua_tonumber(tolua_S,3,0));
+  char* str = ((char*)  tolua_tostring(tolua_S,2,0));
   {
-   String* tolua_ret = (String*)  Mtolua_new((String)(str,length));
+   String* tolua_ret = (String*)  Mtolua_new((String)(str));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
@@ -277,15 +281,17 @@ static int tolua_Container_String_new04(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
-  int value = ((int)  tolua_tonumber(tolua_S,2,0));
+  const char* str = ((const char*)  tolua_tostring(tolua_S,2,0));
+  unsigned length = ((unsigned)  tolua_tonumber(tolua_S,3,0));
   {
-   String* tolua_ret = (String*)  Mtolua_new((String)(value));
+   String* tolua_ret = (String*)  Mtolua_new((String)(str,length));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
   }
  }
@@ -302,15 +308,17 @@ static int tolua_Container_String_new04_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
-  int value = ((int)  tolua_tonumber(tolua_S,2,0));
+  const char* str = ((const char*)  tolua_tostring(tolua_S,2,0));
+  unsigned length = ((unsigned)  tolua_tonumber(tolua_S,3,0));
   {
-   String* tolua_ret = (String*)  Mtolua_new((String)(value));
+   String* tolua_ret = (String*)  Mtolua_new((String)(str,length));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
@@ -334,7 +342,7 @@ static int tolua_Container_String_new05(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  short value = ((short)  tolua_tonumber(tolua_S,2,0));
+  int value = ((int)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -359,7 +367,7 @@ static int tolua_Container_String_new05_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  short value = ((short)  tolua_tonumber(tolua_S,2,0));
+  int value = ((int)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -385,7 +393,7 @@ static int tolua_Container_String_new06(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  long value = ((long)  tolua_tonumber(tolua_S,2,0));
+  short value = ((short)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -410,7 +418,7 @@ static int tolua_Container_String_new06_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  long value = ((long)  tolua_tonumber(tolua_S,2,0));
+  short value = ((short)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -436,7 +444,7 @@ static int tolua_Container_String_new07(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  long long value = ((long long)  tolua_tonumber(tolua_S,2,0));
+  long value = ((long)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -461,7 +469,7 @@ static int tolua_Container_String_new07_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  long long value = ((long long)  tolua_tonumber(tolua_S,2,0));
+  long value = ((long)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -487,7 +495,7 @@ static int tolua_Container_String_new08(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  unsigned value = ((unsigned)  tolua_tonumber(tolua_S,2,0));
+  long long value = ((long long)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -512,7 +520,7 @@ static int tolua_Container_String_new08_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  unsigned value = ((unsigned)  tolua_tonumber(tolua_S,2,0));
+  long long value = ((long long)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -538,7 +546,7 @@ static int tolua_Container_String_new09(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  unsigned short value = ((unsigned short)  tolua_tonumber(tolua_S,2,0));
+  unsigned value = ((unsigned)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -563,7 +571,7 @@ static int tolua_Container_String_new09_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  unsigned short value = ((unsigned short)  tolua_tonumber(tolua_S,2,0));
+  unsigned value = ((unsigned)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -589,7 +597,7 @@ static int tolua_Container_String_new10(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  unsigned long value = ((unsigned long)  tolua_tonumber(tolua_S,2,0));
+  unsigned short value = ((unsigned short)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -614,7 +622,7 @@ static int tolua_Container_String_new10_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  unsigned long value = ((unsigned long)  tolua_tonumber(tolua_S,2,0));
+  unsigned short value = ((unsigned short)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -640,7 +648,7 @@ static int tolua_Container_String_new11(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  unsigned long long value = ((unsigned long long)  tolua_tonumber(tolua_S,2,0));
+  unsigned long value = ((unsigned long)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -665,7 +673,7 @@ static int tolua_Container_String_new11_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  unsigned long long value = ((unsigned long long)  tolua_tonumber(tolua_S,2,0));
+  unsigned long value = ((unsigned long)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -691,7 +699,7 @@ static int tolua_Container_String_new12(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  float value = ((float)  tolua_tonumber(tolua_S,2,0));
+  unsigned long long value = ((unsigned long long)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -716,7 +724,7 @@ static int tolua_Container_String_new12_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  float value = ((float)  tolua_tonumber(tolua_S,2,0));
+  unsigned long long value = ((unsigned long long)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -742,7 +750,7 @@ static int tolua_Container_String_new13(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  double value = ((double)  tolua_tonumber(tolua_S,2,0));
+  float value = ((float)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -767,7 +775,7 @@ static int tolua_Container_String_new13_local(lua_State* tolua_S)
   goto tolua_lerror;
  else
  {
-  double value = ((double)  tolua_tonumber(tolua_S,2,0));
+  float value = ((float)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -787,13 +795,13 @@ static int tolua_Container_String_new14(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
-     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
-  bool value = ((bool)  tolua_toboolean(tolua_S,2,0));
+  double value = ((double)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -812,13 +820,13 @@ static int tolua_Container_String_new14_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
-     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
-  bool value = ((bool)  tolua_toboolean(tolua_S,2,0));
+  double value = ((double)  tolua_tonumber(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -838,13 +846,13 @@ static int tolua_Container_String_new15(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
-  char value = ((char)  tolua_tonumber(tolua_S,2,0));
+  bool value = ((bool)  tolua_toboolean(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -863,13 +871,13 @@ static int tolua_Container_String_new15_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
-  char value = ((char)  tolua_tonumber(tolua_S,2,0));
+  bool value = ((bool)  tolua_toboolean(tolua_S,2,0));
   {
    String* tolua_ret = (String*)  Mtolua_new((String)(value));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
@@ -890,6 +898,57 @@ static int tolua_Container_String_new16(lua_State* tolua_S)
  if (
      !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  char value = ((char)  tolua_tonumber(tolua_S,2,0));
+  {
+   String* tolua_ret = (String*)  Mtolua_new((String)(value));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Container_String_new15(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  String */
+#ifndef TOLUA_DISABLE_tolua_Container_String_new16_local
+static int tolua_Container_String_new16_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  char value = ((char)  tolua_tonumber(tolua_S,2,0));
+  {
+   String* tolua_ret = (String*)  Mtolua_new((String)(value));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Container_String_new15_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  String */
+#ifndef TOLUA_DISABLE_tolua_Container_String_new17
+static int tolua_Container_String_new17(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
@@ -905,13 +964,13 @@ static int tolua_Container_String_new16(lua_State* tolua_S)
  }
  return 1;
 tolua_lerror:
- return tolua_Container_String_new15(tolua_S);
+ return tolua_Container_String_new16(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: new_local of class  String */
-#ifndef TOLUA_DISABLE_tolua_Container_String_new16_local
-static int tolua_Container_String_new16_local(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_Container_String_new17_local
+static int tolua_Container_String_new17_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -933,7 +992,7 @@ static int tolua_Container_String_new16_local(lua_State* tolua_S)
  }
  return 1;
 tolua_lerror:
- return tolua_Container_String_new15_local(tolua_S);
+ return tolua_Container_String_new16_local(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -1211,6 +1270,102 @@ static int tolua_Container_String__lt01(lua_State* tolua_S)
  return 1;
 tolua_lerror:
  return tolua_Container_String__lt00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator&[] of class  String */
+#ifndef TOLUA_DISABLE_tolua_Container_String__seti00
+static int tolua_Container_String__seti00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"String",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  String* self = (String*)  tolua_tousertype(tolua_S,1,0);
+  unsigned index = ((unsigned)  tolua_tonumber(tolua_S,2,0));
+  char tolua_value = ((char)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator&[]'", NULL);
+#endif
+  self->operator[](index) =  tolua_value;
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function '.seti'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator[] of class  String */
+#ifndef TOLUA_DISABLE_tolua_Container_String__geti00
+static int tolua_Container_String__geti00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"String",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  String* self = (String*)  tolua_tousertype(tolua_S,1,0);
+  unsigned index = ((unsigned)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator[]'", NULL);
+#endif
+  {
+   char tolua_ret = (char)  self->operator[](index);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function '.geti'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator[] of class  String */
+#ifndef TOLUA_DISABLE_tolua_Container_String__geti01
+static int tolua_Container_String__geti01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const String",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const String* self = (const String*)  tolua_tousertype(tolua_S,1,0);
+  unsigned index = ((unsigned)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator[]'", NULL);
+#endif
+  {
+   const char tolua_ret = (const char)  self->operator[](index);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Container_String__geti00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -2120,6 +2275,85 @@ static int tolua_Container_String_ToLower00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: Split of class  String */
+#ifndef TOLUA_DISABLE_tolua_Container_String_Split00
+static int tolua_Container_String_Split00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const String",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const String* self = (const String*)  tolua_tousertype(tolua_S,1,0);
+  char separator = ((char)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Split'", NULL);
+#endif
+  {
+   Vector<String> tolua_ret = (Vector<String>)  self->Split(separator);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((Vector<String>)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector<String>");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector<String>));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector<String>");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Split'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Join of class  String */
+#ifndef TOLUA_DISABLE_tolua_Container_String_Join00
+static int tolua_Container_String_Join00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"String",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector<String>",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"String",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  String* self = (String*)  tolua_tousertype(tolua_S,1,0);
+  const Vector<String>* subStrings = ((const Vector<String>*)  tolua_tousertype(tolua_S,2,0));
+  String glue = *((String*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Join'", NULL);
+#endif
+  {
+   self->Join(*subStrings,glue);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Join'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Find of class  String */
 #ifndef TOLUA_DISABLE_tolua_Container_String_Find00
 static int tolua_Container_String_Find00(lua_State* tolua_S)
@@ -2612,36 +2846,6 @@ static int tolua_Container_String_ToHash00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: CStringLength of class  String */
-#ifndef TOLUA_DISABLE_tolua_Container_String_CStringLength00
-static int tolua_Container_String_CStringLength00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"String",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const char* str = ((const char*)  tolua_tostring(tolua_S,2,0));
-  {
-   unsigned tolua_ret = (unsigned)  String::CStringLength(str);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'CStringLength'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: Compare of class  String */
 #ifndef TOLUA_DISABLE_tolua_Container_String_Compare02
 static int tolua_Container_String_Compare02(lua_State* tolua_S)
@@ -2668,6 +2872,24 @@ static int tolua_Container_String_Compare02(lua_State* tolua_S)
  return 1;
 tolua_lerror:
  return tolua_Container_String_Compare01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: NPOS of class  String */
+#ifndef TOLUA_DISABLE_tolua_get_String_NPOS
+static int tolua_get_String_NPOS(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)String::NPOS);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: MIN_CAPACITY of class  String */
+#ifndef TOLUA_DISABLE_tolua_get_String_MIN_CAPACITY
+static int tolua_get_String_MIN_CAPACITY(lua_State* tolua_S)
+{
+  tolua_pushnumber(tolua_S,(lua_Number)String::MIN_CAPACITY);
+ return 1;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -2744,6 +2966,9 @@ TOLUA_API int tolua_Container_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_Container_String_new16);
    tolua_function(tolua_S,"new_local",tolua_Container_String_new16_local);
    tolua_function(tolua_S,".call",tolua_Container_String_new16_local);
+   tolua_function(tolua_S,"new",tolua_Container_String_new17);
+   tolua_function(tolua_S,"new_local",tolua_Container_String_new17_local);
+   tolua_function(tolua_S,".call",tolua_Container_String_new17_local);
    tolua_function(tolua_S,"delete",tolua_Container_String_delete00);
    tolua_function(tolua_S,".add",tolua_Container_String__add00);
    tolua_function(tolua_S,".add",tolua_Container_String__add01);
@@ -2752,6 +2977,9 @@ TOLUA_API int tolua_Container_open (lua_State* tolua_S)
    tolua_function(tolua_S,".lt",tolua_Container_String__lt00);
    tolua_function(tolua_S,".eq",tolua_Container_String__eq01);
    tolua_function(tolua_S,".lt",tolua_Container_String__lt01);
+   tolua_function(tolua_S,".seti",tolua_Container_String__seti00);
+   tolua_function(tolua_S,".geti",tolua_Container_String__geti00);
+   tolua_function(tolua_S,".geti",tolua_Container_String__geti01);
    tolua_function(tolua_S,"At",tolua_Container_String_At00);
    tolua_function(tolua_S,"At",tolua_Container_String_At01);
    tolua_function(tolua_S,"Replace",tolua_Container_String_Replace00);
@@ -2778,6 +3006,8 @@ TOLUA_API int tolua_Container_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Trimmed",tolua_Container_String_Trimmed00);
    tolua_function(tolua_S,"ToUpper",tolua_Container_String_ToUpper00);
    tolua_function(tolua_S,"ToLower",tolua_Container_String_ToLower00);
+   tolua_function(tolua_S,"Split",tolua_Container_String_Split00);
+   tolua_function(tolua_S,"Join",tolua_Container_String_Join00);
    tolua_function(tolua_S,"Find",tolua_Container_String_Find00);
    tolua_function(tolua_S,"Find",tolua_Container_String_Find01);
    tolua_function(tolua_S,"FindLast",tolua_Container_String_FindLast00);
@@ -2793,8 +3023,9 @@ TOLUA_API int tolua_Container_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Contains",tolua_Container_String_Contains00);
    tolua_function(tolua_S,"Contains",tolua_Container_String_Contains01);
    tolua_function(tolua_S,"ToHash",tolua_Container_String_ToHash00);
-   tolua_function(tolua_S,"CStringLength",tolua_Container_String_CStringLength00);
    tolua_function(tolua_S,"Compare",tolua_Container_String_Compare02);
+   tolua_variable(tolua_S,"NPOS",tolua_get_String_NPOS,NULL);
+   tolua_variable(tolua_S,"MIN_CAPACITY",tolua_get_String_MIN_CAPACITY,NULL);
    tolua_variable(tolua_S,"EMPTY",tolua_get_String_EMPTY,NULL);
   tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);

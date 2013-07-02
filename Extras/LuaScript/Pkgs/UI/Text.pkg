@@ -26,27 +26,29 @@ public:
     void SetHoverColor(const Color& color);
     
     /// Return font.
-    Font* GetFont() const;
+    Font* GetFont() const { return font_; }
     /// Return font size.
-    int GetFontSize() const;
+    int GetFontSize() const { return fontSize_; }
     /// Return text.
-    const String& GetText() const;
+    const String& GetText() const { return text_; }
     /// Return row alignment.
-    HorizontalAlignment GetTextAlignment() const;
+    HorizontalAlignment GetTextAlignment() const { return textAlignment_; }
     /// Return row spacing.
-    float GetRowSpacing() const;
+    float GetRowSpacing() const { return rowSpacing_; }
     /// Return wordwrap mode.
-    bool GetWordwrap() const;
+    bool GetWordwrap() const { return wordWrap_; }
     /// Return selection start.
-    unsigned GetSelectionStart() const;
+    unsigned GetSelectionStart() const { return selectionStart_; }
     /// Return selection length.
-    unsigned GetSelectionLength() const;
+    unsigned GetSelectionLength() const { return selectionLength_; }
     /// Return selection background color.
-    const Color& GetSelectionColor() const;
+    const Color& GetSelectionColor() const { return selectionColor_; }
     /// Return hover background color.
-    const Color& GetHoverColor() const;
+    const Color& GetHoverColor() const { return hoverColor_; }
     /// Return row height.
-    int GetRowHeight() const;
+    int GetRowHeight() const { return rowHeight_; }
     /// Return number of rows.
-    unsigned GetNumRows() const;
+    unsigned GetNumRows() const { return rowWidths_.Size(); }
 };
+
+Text* NewText @ Text();

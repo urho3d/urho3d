@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Graphics
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:49.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:49.
 */
 
 //
@@ -160,6 +160,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"ColorFrame");
  tolua_usertype(tolua_S,"Octant");
  tolua_usertype(tolua_S,"Component");
+ tolua_usertype(tolua_S,"SharedPtr<Texture>");
  tolua_usertype(tolua_S,"Node");
  tolua_usertype(tolua_S,"Light");
  tolua_usertype(tolua_S,"Pass");
@@ -189,6 +190,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Bone");
  tolua_usertype(tolua_S,"Renderer");
  tolua_usertype(tolua_S,"Vector3");
+ tolua_usertype(tolua_S,"Billboard");
  tolua_usertype(tolua_S,"Terrain");
  tolua_usertype(tolua_S,"AnimationState");
  tolua_usertype(tolua_S,"ModelMorph");
@@ -197,32 +199,32 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"TextureFrame");
  tolua_usertype(tolua_S,"Geometry");
  tolua_usertype(tolua_S,"Quaternion");
- tolua_usertype(tolua_S,"Resource");
+ tolua_usertype(tolua_S,"AnimatedModel");
  tolua_usertype(tolua_S,"OctreeQuery");
  tolua_usertype(tolua_S,"Zone");
  tolua_usertype(tolua_S,"RenderSurface");
  tolua_usertype(tolua_S,"TextureCube");
  tolua_usertype(tolua_S,"Texture");
  tolua_usertype(tolua_S,"Drawable");
- tolua_usertype(tolua_S,"BiasParameters");
- tolua_usertype(tolua_S,"DebugRenderer");
  tolua_usertype(tolua_S,"TerrainPatch");
+ tolua_usertype(tolua_S,"DebugRenderer");
+ tolua_usertype(tolua_S,"BiasParameters");
  tolua_usertype(tolua_S,"ShaderVariation");
  tolua_usertype(tolua_S,"BoundingBox");
- tolua_usertype(tolua_S,"Rect");
- tolua_usertype(tolua_S,"AnimationTrack");
  tolua_usertype(tolua_S,"Viewport");
+ tolua_usertype(tolua_S,"AnimationTrack");
  tolua_usertype(tolua_S,"Technique");
  tolua_usertype(tolua_S,"Skybox");
- tolua_usertype(tolua_S,"AnimatedModel");
+ tolua_usertype(tolua_S,"Octree");
+ tolua_usertype(tolua_S,"StringHash");
  tolua_usertype(tolua_S,"BillboardSet");
  tolua_usertype(tolua_S,"Polyhedron");
  tolua_usertype(tolua_S,"RayOctreeQuery");
- tolua_usertype(tolua_S,"Octree");
- tolua_usertype(tolua_S,"StringHash");
- tolua_usertype(tolua_S,"FocusParameters");
+ tolua_usertype(tolua_S,"Rect");
  tolua_usertype(tolua_S,"XMLFile");
+ tolua_usertype(tolua_S,"FocusParameters");
  tolua_usertype(tolua_S,"Matrix4");
+ tolua_usertype(tolua_S,"Resource");
  tolua_usertype(tolua_S,"RenderPath");
  tolua_usertype(tolua_S,"Model");
 }
@@ -3308,6 +3310,40 @@ static int tolua_Graphics_BillboardSet_GetNumBillboards00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetBillboard of class  BillboardSet */
+#ifndef TOLUA_DISABLE_tolua_Graphics_BillboardSet_GetBillboard00
+static int tolua_Graphics_BillboardSet_GetBillboard00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"BillboardSet",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  BillboardSet* self = (BillboardSet*)  tolua_tousertype(tolua_S,1,0);
+  unsigned index = ((unsigned)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBillboard'", NULL);
+#endif
+  {
+   Billboard* tolua_ret = (Billboard*)  self->GetBillboard(index);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Billboard");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetBillboard'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: IsRelative of class  BillboardSet */
 #ifndef TOLUA_DISABLE_tolua_Graphics_BillboardSet_IsRelative00
 static int tolua_Graphics_BillboardSet_IsRelative00(lua_State* tolua_S)
@@ -3433,6 +3469,33 @@ static int tolua_Graphics_BillboardSet_GetAnimationLodBias00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'GetAnimationLodBias'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetAnimationLodBias of class  BillboardSet */
+#ifndef TOLUA_DISABLE_tolua_Graphics_BillboardSet_GetAnimationLodBias01
+static int tolua_Graphics_BillboardSet_GetAnimationLodBias01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const BillboardSet",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const BillboardSet* self = (const BillboardSet*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetAnimationLodBias'", NULL);
+#endif
+  {
+   float tolua_ret = (float)  self->GetAnimationLodBias();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Graphics_BillboardSet_GetAnimationLodBias00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -5108,6 +5171,39 @@ static int tolua_Graphics_Camera_IsProjectionValid00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SetView of class  DebugRenderer */
+#ifndef TOLUA_DISABLE_tolua_Graphics_DebugRenderer_SetView00
+static int tolua_Graphics_DebugRenderer_SetView00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"DebugRenderer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"Camera",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  DebugRenderer* self = (DebugRenderer*)  tolua_tousertype(tolua_S,1,0);
+  Camera* camera = ((Camera*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetView'", NULL);
+#endif
+  {
+   self->SetView(camera);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetView'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: AddLine of class  DebugRenderer */
 #ifndef TOLUA_DISABLE_tolua_Graphics_DebugRenderer_AddLine00
 static int tolua_Graphics_DebugRenderer_AddLine00(lua_State* tolua_S)
@@ -5432,6 +5528,136 @@ static int tolua_Graphics_DebugRenderer_AddSkeleton00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'AddSkeleton'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetView of class  DebugRenderer */
+#ifndef TOLUA_DISABLE_tolua_Graphics_DebugRenderer_GetView00
+static int tolua_Graphics_DebugRenderer_GetView00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const DebugRenderer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const DebugRenderer* self = (const DebugRenderer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetView'", NULL);
+#endif
+  {
+   const Matrix3x4& tolua_ret = (const Matrix3x4&)  self->GetView();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Matrix3x4");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetView'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetProjection of class  DebugRenderer */
+#ifndef TOLUA_DISABLE_tolua_Graphics_DebugRenderer_GetProjection00
+static int tolua_Graphics_DebugRenderer_GetProjection00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const DebugRenderer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const DebugRenderer* self = (const DebugRenderer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetProjection'", NULL);
+#endif
+  {
+   const Matrix4& tolua_ret = (const Matrix4&)  self->GetProjection();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Matrix4");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetProjection'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetFrustum of class  DebugRenderer */
+#ifndef TOLUA_DISABLE_tolua_Graphics_DebugRenderer_GetFrustum00
+static int tolua_Graphics_DebugRenderer_GetFrustum00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const DebugRenderer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const DebugRenderer* self = (const DebugRenderer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFrustum'", NULL);
+#endif
+  {
+   const Frustum& tolua_ret = (const Frustum&)  self->GetFrustum();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Frustum");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetFrustum'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsInside of class  DebugRenderer */
+#ifndef TOLUA_DISABLE_tolua_Graphics_DebugRenderer_IsInside00
+static int tolua_Graphics_DebugRenderer_IsInside00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const DebugRenderer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const BoundingBox",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const DebugRenderer* self = (const DebugRenderer*)  tolua_tousertype(tolua_S,1,0);
+  const BoundingBox* box = ((const BoundingBox*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsInside(*box);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsInside'.",&tolua_err);
  return 0;
 #endif
 }
@@ -9295,6 +9521,38 @@ static int tolua_Graphics_Material_GetTexture00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetTextures of class  Material */
+#ifndef TOLUA_DISABLE_tolua_Graphics_Material_GetTextures00
+static int tolua_Graphics_Material_GetTextures00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Material",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Material* self = (const Material*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetTextures'", NULL);
+#endif
+  {
+   const SharedPtr<Texture>* tolua_ret = (const SharedPtr<Texture>*)  self->GetTextures();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"const SharedPtr<Texture>");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetTextures'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetShaderParameter of class  Material */
 #ifndef TOLUA_DISABLE_tolua_Graphics_Material_GetShaderParameter00
 static int tolua_Graphics_Material_GetShaderParameter00(lua_State* tolua_S)
@@ -12783,6 +13041,35 @@ static int tolua_Graphics_ParticleEmitter_GetTextureFrame00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'GetTextureFrame'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetTextureFrame of class  ParticleEmitter */
+#ifndef TOLUA_DISABLE_tolua_Graphics_ParticleEmitter_GetTextureFrame01
+static int tolua_Graphics_ParticleEmitter_GetTextureFrame01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"ParticleEmitter",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  ParticleEmitter* self = (ParticleEmitter*)  tolua_tousertype(tolua_S,1,0);
+  unsigned index = ((unsigned)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetTextureFrame'", NULL);
+#endif
+  {
+   TextureFrame* tolua_ret = (TextureFrame*)  self->GetTextureFrame(index);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"TextureFrame");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Graphics_ParticleEmitter_GetTextureFrame00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -18220,6 +18507,33 @@ static int tolua_Graphics_TerrainPatch_GetOcclusionOffset00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetOcclusionOffset of class  TerrainPatch */
+#ifndef TOLUA_DISABLE_tolua_Graphics_TerrainPatch_GetOcclusionOffset01
+static int tolua_Graphics_TerrainPatch_GetOcclusionOffset01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const TerrainPatch",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const TerrainPatch* self = (const TerrainPatch*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetOcclusionOffset'", NULL);
+#endif
+  {
+   float tolua_ret = (float)  self->GetOcclusionOffset();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Graphics_TerrainPatch_GetOcclusionOffset00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetNumLevels of class  Texture */
 #ifndef TOLUA_DISABLE_tolua_Graphics_Texture_SetNumLevels00
 static int tolua_Graphics_Texture_SetNumLevels00(lua_State* tolua_S)
@@ -19749,10 +20063,12 @@ TOLUA_API int tolua_Graphics_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Commit",tolua_Graphics_BillboardSet_Commit00);
    tolua_function(tolua_S,"GetMaterial",tolua_Graphics_BillboardSet_GetMaterial00);
    tolua_function(tolua_S,"GetNumBillboards",tolua_Graphics_BillboardSet_GetNumBillboards00);
+   tolua_function(tolua_S,"GetBillboard",tolua_Graphics_BillboardSet_GetBillboard00);
    tolua_function(tolua_S,"IsRelative",tolua_Graphics_BillboardSet_IsRelative00);
    tolua_function(tolua_S,"IsScaled",tolua_Graphics_BillboardSet_IsScaled00);
    tolua_function(tolua_S,"IsSorted",tolua_Graphics_BillboardSet_IsSorted00);
    tolua_function(tolua_S,"GetAnimationLodBias",tolua_Graphics_BillboardSet_GetAnimationLodBias00);
+   tolua_function(tolua_S,"GetAnimationLodBias",tolua_Graphics_BillboardSet_GetAnimationLodBias01);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Camera","Camera","Component",NULL);
   tolua_beginmodule(tolua_S,"Camera");
@@ -19807,6 +20123,7 @@ TOLUA_API int tolua_Graphics_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"DebugRenderer","DebugRenderer","Component",NULL);
   tolua_beginmodule(tolua_S,"DebugRenderer");
+   tolua_function(tolua_S,"SetView",tolua_Graphics_DebugRenderer_SetView00);
    tolua_function(tolua_S,"AddLine",tolua_Graphics_DebugRenderer_AddLine00);
    tolua_function(tolua_S,"AddLine",tolua_Graphics_DebugRenderer_AddLine01);
    tolua_function(tolua_S,"AddNode",tolua_Graphics_DebugRenderer_AddNode00);
@@ -19816,6 +20133,10 @@ TOLUA_API int tolua_Graphics_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddPolyhedron",tolua_Graphics_DebugRenderer_AddPolyhedron00);
    tolua_function(tolua_S,"AddSphere",tolua_Graphics_DebugRenderer_AddSphere00);
    tolua_function(tolua_S,"AddSkeleton",tolua_Graphics_DebugRenderer_AddSkeleton00);
+   tolua_function(tolua_S,"GetView",tolua_Graphics_DebugRenderer_GetView00);
+   tolua_function(tolua_S,"GetProjection",tolua_Graphics_DebugRenderer_GetProjection00);
+   tolua_function(tolua_S,"GetFrustum",tolua_Graphics_DebugRenderer_GetFrustum00);
+   tolua_function(tolua_S,"IsInside",tolua_Graphics_DebugRenderer_IsInside00);
   tolua_endmodule(tolua_S);
   tolua_function(tolua_S,"GetDebugRenderer",tolua_Graphics_GetDebugRenderer00);
   tolua_cclass(tolua_S,"DecalSet","DecalSet","Drawable",NULL);
@@ -20074,6 +20395,7 @@ TOLUA_API int tolua_Graphics_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetTechnique",tolua_Graphics_Material_GetTechnique00);
    tolua_function(tolua_S,"GetPass",tolua_Graphics_Material_GetPass00);
    tolua_function(tolua_S,"GetTexture",tolua_Graphics_Material_GetTexture00);
+   tolua_function(tolua_S,"GetTextures",tolua_Graphics_Material_GetTextures00);
    tolua_function(tolua_S,"GetShaderParameter",tolua_Graphics_Material_GetShaderParameter00);
    tolua_function(tolua_S,"GetCullMode",tolua_Graphics_Material_GetCullMode00);
    tolua_function(tolua_S,"GetShadowCullMode",tolua_Graphics_Material_GetShadowCullMode00);
@@ -20211,6 +20533,7 @@ TOLUA_API int tolua_Graphics_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetColor",tolua_Graphics_ParticleEmitter_GetColor00);
    tolua_function(tolua_S,"GetNumTextureFrames",tolua_Graphics_ParticleEmitter_GetNumTextureFrames00);
    tolua_function(tolua_S,"GetTextureFrame",tolua_Graphics_ParticleEmitter_GetTextureFrame00);
+   tolua_function(tolua_S,"GetTextureFrame",tolua_Graphics_ParticleEmitter_GetTextureFrame01);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Renderer","Renderer","",NULL);
   tolua_beginmodule(tolua_S,"Renderer");
@@ -20411,6 +20734,7 @@ TOLUA_API int tolua_Graphics_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetCoordinates",tolua_Graphics_TerrainPatch_GetCoordinates00);
    tolua_function(tolua_S,"GetLodLevel",tolua_Graphics_TerrainPatch_GetLodLevel00);
    tolua_function(tolua_S,"GetOcclusionOffset",tolua_Graphics_TerrainPatch_GetOcclusionOffset00);
+   tolua_function(tolua_S,"GetOcclusionOffset",tolua_Graphics_TerrainPatch_GetOcclusionOffset01);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Texture","Texture","Resource",NULL);
   tolua_beginmodule(tolua_S,"Texture");

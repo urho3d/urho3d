@@ -20,22 +20,24 @@ public:
     void SetPageStep(float step);
 
     /// Return view offset from the top-left corner.
-    const IntVector2& GetViewPosition() const;
+    const IntVector2& GetViewPosition() const { return viewPosition_; }
     /// Return content element.
-    UIElement* GetContentElement() const;
+    UIElement* GetContentElement() const { return contentElement_; }
     /// Return horizontal scroll bar.
-    ScrollBar* GetHorizontalScrollBar() const;
+    ScrollBar* GetHorizontalScrollBar() const { return horizontalScrollBar_; }
     /// Return vertical scroll bar.
-    ScrollBar* GetVerticalScrollBar() const;
+    ScrollBar* GetVerticalScrollBar() const { return verticalScrollBar_; }
     /// Return scroll panel.
-    BorderImage* GetScrollPanel() const;
+    BorderImage* GetScrollPanel() const { return scrollPanel_; }
     /// Return whether scrollbars are automatically shown/hidden.
-    bool GetScrollBarsAutoVisible() const;
+    bool GetScrollBarsAutoVisible() const { return scrollBarsAutoVisible_; }
     /// Return arrow key scroll step.
     float GetScrollStep() const;
     /// Return arrow key page step.
-    float GetPageStep() const;
+    float GetPageStep() const { return pageStep_; }
 
     /// Set view position attribute.
     void SetViewPositionAttr(const IntVector2& value);
 };
+
+ScrollView* NewScrollView @ ScrollView();

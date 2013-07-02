@@ -38,15 +38,15 @@ public:
     void SetOccludee(bool enable);
 
     /// Return patch quads per side.
-    int GetPatchSize() const;
+    int GetPatchSize() const { return patchSize_; }
     /// Return vertex and height spacing.
-    const Vector3& GetSpacing() const;
+    const Vector3& GetSpacing() const { return spacing_; }
     /// Return heightmap size in vertices.
-    const IntVector2& GetNumVertices() const;
+    const IntVector2& GetNumVertices() const { return numVertices_; }
     /// Return heightmap size in patches.
-    const IntVector2& GetNumPatches() const;
+    const IntVector2& GetNumPatches() const { return numPatches_; }
     /// Return whether smoothing is in use.
-    bool GetSmoothing() const;
+    bool GetSmoothing() const { return smoothing_; }
     /// Return heightmap image.
     Image* GetHeightMap() const;
     /// Return material.
@@ -60,27 +60,27 @@ public:
     /// Return normal at world coordinates.
     Vector3 GetNormal(const Vector3& worldPosition) const;
     /// Return draw distance.
-    float GetDrawDistance() const;
+    float GetDrawDistance() const { return drawDistance_; }
     /// Return shadow draw distance.
-    float GetShadowDistance() const;
+    float GetShadowDistance() const { return shadowDistance_; }
     /// Return LOD bias.
-    float GetLodBias() const;
+    float GetLodBias() const { return lodBias_; }
     /// Return view mask.
-    unsigned GetViewMask() const;
+    unsigned GetViewMask() const { return viewMask_; }
     /// Return light mask.
-    unsigned GetLightMask() const;
+    unsigned GetLightMask() const { return lightMask_; }
     /// Return shadow mask.
-    unsigned GetShadowMask() const;
+    unsigned GetShadowMask() const { return shadowMask_; }
     /// Return zone mask.
-    unsigned GetZoneMask() const;
+    unsigned GetZoneMask() const { return zoneMask_; }
     /// Return maximum number of per-pixel lights.
-    unsigned GetMaxLights() const;
+    unsigned GetMaxLights() const { return maxLights_; }
     /// Return visible flag.
-    bool IsVisible() const;
+    bool IsVisible() const { return visible_; }
     /// Return shadowcaster flag.
-    bool GetCastShadows() const;
+    bool GetCastShadows() const { return castShadows_; }
     /// Return occluder flag.
-    bool IsOccluder() const;
+    bool IsOccluder() const { return occluder_; }
     /// Return occludee flag.
-    bool IsOccludee() const;
+    bool IsOccludee() const { return occludee_; }
 };

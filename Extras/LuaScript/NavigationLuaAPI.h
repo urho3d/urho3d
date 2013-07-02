@@ -22,7 +22,14 @@
 
 #pragma once
 
+#include "NavigationMesh.h"
+
 namespace Urho3D
 {
-
+	PODVector<Vector3> NavigationMeshFindPath(NavigationMesh* navMesh, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
+	{
+		PODVector<Vector3> dest;
+		navMesh->FindPath(dest, start, end, extents);
+		return dest;
+	}
 }

@@ -49,8 +49,11 @@ public:
     bool Build();
     /// Rebuild part of the navigation mesh contained by the world-space bounding box. Return true if successful.
     bool Build(const BoundingBox& boundingBox);
+    
     /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
-    void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    // void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    tolua_outside PODVector<Vector3> NavigationMeshFindPath @ FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    
     /// Return a random point on the navigation mesh.
     Vector3 GetRandomPoint();
     /// Return a random point on the navigation mesh within a circle. The circle radius is only a guideline and in practice the returned point may be further away.
@@ -61,39 +64,40 @@ public:
     Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
 
     /// Return tile size.
-    int GetTileSize() const;
+    int GetTileSize() const { return tileSize_; }
     /// Return cell size.
-    float GetCellSize() const;
+    float GetCellSize() const { return cellSize_; }
     /// Return cell height.
-    float GetCellHeight() const;
+    float GetCellHeight() const { return cellHeight_; }
     /// Return navigation agent height.
-    float GetAgentHeight() const;
+    float GetAgentHeight() const { return agentHeight_; }
     /// Return navigation agent radius.
-    float GetAgentRadius() const;
+    float GetAgentRadius() const { return agentRadius_; }
     /// Return navigation agent max vertical climb.
-    float GetAgentMaxClimb() const;
+    float GetAgentMaxClimb() const { return agentMaxClimb_; }
     /// Return navigation agent max slope.
-    float GetAgentMaxSlope() const;
+    float GetAgentMaxSlope() const { return agentMaxSlope_; }
     /// Return region minimum size.
-    float GetRegionMinSize() const;
+    float GetRegionMinSize() const { return regionMinSize_; }
     /// Return region merge size.
-    float GetRegionMergeSize() const;
+    float GetRegionMergeSize() const { return regionMergeSize_; }
     /// Return edge max length.
-    float GetEdgeMaxLength() const;
+    float GetEdgeMaxLength() const { return edgeMaxLength_; }
     /// Return edge max error.
-    float GetEdgeMaxError() const;
+    float GetEdgeMaxError() const { return edgeMaxError_; }
     /// Return detail sampling distance.
-    float GetDetailSampleDistance() const;
+    float GetDetailSampleDistance() const { return detailSampleDistance_; }
     /// Return detail sampling maximum error.
-    float GetDetailSampleMaxError() const;
+    float GetDetailSampleMaxError() const { return detailSampleMaxError_; }
     /// Return navigation mesh bounding box padding.
-    const Vector3& GetPadding() const;
+    const Vector3& GetPadding() const { return padding_; }
     /// Return whether has been initialized with valid navigation data.
-    bool IsInitialized() const;
+    bool IsInitialized() const { return navMesh_ != 0; }
     /// Return local space bounding box of the navigation mesh.
-    const BoundingBox& GetBoundingBox() const;
+    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return world space bounding box of the navigation mesh.
     BoundingBox GetWorldBoundingBox() const;
     /// Return number of tiles.
-    IntVector2 GetNumTiles() const;    
+    IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
+
 };

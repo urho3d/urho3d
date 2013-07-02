@@ -54,21 +54,21 @@ public:
     void SetLodLevel(unsigned lodLevel);
     
     /// Return physics world.
-    PhysicsWorld* GetPhysicsWorld() const;
+    PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return shape type.
-    ShapeType GetShapeType() const;
+    ShapeType GetShapeType() const { return shapeType_; }
     /// Return shape size.
-    const Vector3& GetSize() const;
+    const Vector3& GetSize() const { return size_; }
     /// Return offset position.
-    const Vector3& GetPosition() const;
+    const Vector3& GetPosition() const { return position_; }
     /// Return offset rotation.
-    const Quaternion& GetRotation() const;
+    const Quaternion& GetRotation() const { return rotation_; }
     /// Return collision margin.
-    float GetMargin() const;
+    float GetMargin() const { return margin_; }
     /// Return triangle mesh / convex hull model.
-    Model* GetModel() const;
+    Model* GetModel() const { return model_; }
     /// Return model LOD level.
-    unsigned GetLodLevel() const;
+    unsigned GetLodLevel() const { return lodLevel_; }
     /// Return world-space bounding box.
     BoundingBox GetWorldBoundingBox() const;
     

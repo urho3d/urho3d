@@ -1,6 +1,6 @@
 /*
 ** Lua binding: UI
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:52.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:51.
 */
 
 //
@@ -99,24 +99,21 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"IntVector2");
  tolua_usertype(tolua_S,"String");
  tolua_usertype(tolua_S,"Resource");
- tolua_usertype(tolua_S,"PODVector<float>");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"Window");
  tolua_usertype(tolua_S,"Cursor");
- tolua_usertype(tolua_S,"PODVector<UIBatch>");
- tolua_usertype(tolua_S,"Variant");
  tolua_usertype(tolua_S,"Image");
  tolua_usertype(tolua_S,"Drawable");
- tolua_usertype(tolua_S,"ShortStringHash");
+ tolua_usertype(tolua_S,"Variant");
  tolua_usertype(tolua_S,"Button");
  tolua_usertype(tolua_S,"Material");
- tolua_usertype(tolua_S,"XMLElement");
+ tolua_usertype(tolua_S,"ShortStringHash");
  tolua_usertype(tolua_S,"ScrollView");
+ tolua_usertype(tolua_S,"XMLElement");
  tolua_usertype(tolua_S,"Slider");
  tolua_usertype(tolua_S,"UIElement");
  tolua_usertype(tolua_S,"Serializer");
  tolua_usertype(tolua_S,"UI");
- tolua_usertype(tolua_S,"PODVector<int>");
  tolua_usertype(tolua_S,"Text");
  tolua_usertype(tolua_S,"XMLFile");
  tolua_usertype(tolua_S,"Text3D");
@@ -581,6 +578,33 @@ static int tolua_UI_BorderImage_IsTiled00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NewBorderImage */
+#ifndef TOLUA_DISABLE_tolua_UI_BorderImage00
+static int tolua_UI_BorderImage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   BorderImage* tolua_ret = (BorderImage*)  NewBorderImage();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"BorderImage");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'BorderImage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetPressedOffset of class  Button */
 #ifndef TOLUA_DISABLE_tolua_UI_Button_SetPressedOffset00
 static int tolua_UI_Button_SetPressedOffset00(lua_State* tolua_S)
@@ -936,6 +960,33 @@ static int tolua_UI_Button_GetRepeatRate00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NewButton */
+#ifndef TOLUA_DISABLE_tolua_UI_Button00
+static int tolua_UI_Button00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   Button* tolua_ret = (Button*)  NewButton();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Button");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Button'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetChecked of class  CheckBox */
 #ifndef TOLUA_DISABLE_tolua_UI_CheckBox_SetChecked00
 static int tolua_UI_CheckBox_SetChecked00(lua_State* tolua_S)
@@ -1091,6 +1142,33 @@ static int tolua_UI_CheckBox_GetCheckedOffset00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetCheckedOffset'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NewCheckBox */
+#ifndef TOLUA_DISABLE_tolua_UI_CheckBox00
+static int tolua_UI_CheckBox00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   CheckBox* tolua_ret = (CheckBox*)  NewCheckBox();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"CheckBox");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CheckBox'.",&tolua_err);
  return 0;
 #endif
 }
@@ -1741,6 +1819,33 @@ static int tolua_UI_DropDownList_GetResizePopup00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetResizePopup'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NewDropDownList */
+#ifndef TOLUA_DISABLE_tolua_UI_DropDownList00
+static int tolua_UI_DropDownList00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   DropDownList* tolua_ret = (DropDownList*)  NewDropDownList();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"DropDownList");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DropDownList'.",&tolua_err);
  return 0;
 #endif
 }
@@ -2584,6 +2689,60 @@ static int tolua_UI_FileSelector_GetDirectoryMode00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NewFileSelector */
+#ifndef TOLUA_DISABLE_tolua_UI_FileSelector00
+static int tolua_UI_FileSelector00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   FileSelector* tolua_ret = (FileSelector*)  NewFileSelector();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"FileSelector");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'FileSelector'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NewFont */
+#ifndef TOLUA_DISABLE_tolua_UI_Font00
+static int tolua_UI_Font00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   Font* tolua_ret = (Font*)  NewFont();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Font");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Font'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetText of class  LineEdit */
 #ifndef TOLUA_DISABLE_tolua_UI_LineEdit_SetText00
 static int tolua_UI_LineEdit_SetText00(lua_State* tolua_S)
@@ -3228,6 +3387,33 @@ static int tolua_UI_LineEdit_GetDoubleClickInterval00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetDoubleClickInterval'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NewLineEdit */
+#ifndef TOLUA_DISABLE_tolua_UI_LineEdit00
+static int tolua_UI_LineEdit00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   LineEdit* tolua_ret = (LineEdit*)  NewLineEdit();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"LineEdit");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'LineEdit'.",&tolua_err);
  return 0;
 #endif
 }
@@ -4289,6 +4475,33 @@ static int tolua_UI_ListView_GetDoubleClickInterval00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NewListView */
+#ifndef TOLUA_DISABLE_tolua_UI_ListView00
+static int tolua_UI_ListView00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   ListView* tolua_ret = (ListView*)  NewListView();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"ListView");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ListView'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetPopup of class  Menu */
 #ifndef TOLUA_DISABLE_tolua_UI_Menu_SetPopup00
 static int tolua_UI_Menu_SetPopup00(lua_State* tolua_S)
@@ -4608,6 +4821,60 @@ static int tolua_UI_Menu_GetAcceleratorQualifiers00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetAcceleratorQualifiers'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetAcceleratorQualifiers of class  Menu */
+#ifndef TOLUA_DISABLE_tolua_UI_Menu_GetAcceleratorQualifiers01
+static int tolua_UI_Menu_GetAcceleratorQualifiers01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Menu",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Menu* self = (const Menu*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetAcceleratorQualifiers'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetAcceleratorQualifiers();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_UI_Menu_GetAcceleratorQualifiers00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NewMenu */
+#ifndef TOLUA_DISABLE_tolua_UI_Menu00
+static int tolua_UI_Menu00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   Menu* tolua_ret = (Menu*)  NewMenu();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Menu");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Menu'.",&tolua_err);
  return 0;
 #endif
 }
@@ -5161,6 +5428,33 @@ static int tolua_UI_ScrollBar_GetSlider00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NewScrollBar */
+#ifndef TOLUA_DISABLE_tolua_UI_ScrollBar00
+static int tolua_UI_ScrollBar00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   ScrollBar* tolua_ret = (ScrollBar*)  NewScrollBar();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"ScrollBar");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ScrollBar'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetContentElement of class  ScrollView */
 #ifndef TOLUA_DISABLE_tolua_UI_ScrollView_SetContentElement00
 static int tolua_UI_ScrollView_SetContentElement00(lua_State* tolua_S)
@@ -5680,6 +5974,33 @@ static int tolua_UI_ScrollView_SetViewPositionAttr00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NewScrollView */
+#ifndef TOLUA_DISABLE_tolua_UI_ScrollView00
+static int tolua_UI_ScrollView00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   ScrollView* tolua_ret = (ScrollView*)  NewScrollView();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"ScrollView");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ScrollView'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetOrientation of class  Slider */
 #ifndef TOLUA_DISABLE_tolua_UI_Slider_SetOrientation00
 static int tolua_UI_Slider_SetOrientation00(lua_State* tolua_S)
@@ -6000,6 +6321,33 @@ static int tolua_UI_Slider_GetRepeatRate00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetRepeatRate'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NewSlider */
+#ifndef TOLUA_DISABLE_tolua_UI_Slider00
+static int tolua_UI_Slider00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   Slider* tolua_ret = (Slider*)  NewSlider();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Slider");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Slider'.",&tolua_err);
  return 0;
 #endif
 }
@@ -7458,6 +7806,33 @@ static int tolua_UI_Text_GetNumRows00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NewText */
+#ifndef TOLUA_DISABLE_tolua_UI_Text00
+static int tolua_UI_Text00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   Text* tolua_ret = (Text*)  NewText();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Text");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Text'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetFont of class  Text3D */
 #ifndef TOLUA_DISABLE_tolua_UI_Text3D_SetFont00
 static int tolua_UI_Text3D_SetFont00(lua_State* tolua_S)
@@ -8337,38 +8712,6 @@ static int tolua_UI_Text3D_GetNumRows00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetRowWidths of class  Text3D */
-#ifndef TOLUA_DISABLE_tolua_UI_Text3D_GetRowWidths00
-static int tolua_UI_Text3D_GetRowWidths00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const Text3D",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const Text3D* self = (const Text3D*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRowWidths'", NULL);
-#endif
-  {
-   const PODVector<int>& tolua_ret = (const PODVector<int>&)  self->GetRowWidths();
-    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const PODVector<int>");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetRowWidths'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetColor of class  Text3D */
 #ifndef TOLUA_DISABLE_tolua_UI_Text3D_GetColor00
 static int tolua_UI_Text3D_GetColor00(lua_State* tolua_S)
@@ -8462,6 +8805,33 @@ static int tolua_UI_Text3D_GetFaceCamera00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetFaceCamera'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NewText3D */
+#ifndef TOLUA_DISABLE_tolua_UI_Text3D00
+static int tolua_UI_Text3D00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   Text3D* tolua_ret = (Text3D*)  NewText3D();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Text3D");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Text3D'.",&tolua_err);
  return 0;
 #endif
 }
@@ -13520,45 +13890,6 @@ static int tolua_UI_UIElement_AdjustScissor00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetBatchesWithOffset of class  UIElement */
-#ifndef TOLUA_DISABLE_tolua_UI_UIElement_GetBatchesWithOffset00
-static int tolua_UI_UIElement_GetBatchesWithOffset00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"UIElement",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"IntVector2",0,&tolua_err)) ||
-     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"PODVector<UIBatch>",0,&tolua_err)) ||
-     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"PODVector<float>",0,&tolua_err)) ||
-     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"IntRect",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  UIElement* self = (UIElement*)  tolua_tousertype(tolua_S,1,0);
-  IntVector2* offset = ((IntVector2*)  tolua_tousertype(tolua_S,2,0));
-  PODVector<UIBatch>* batches = ((PODVector<UIBatch>*)  tolua_tousertype(tolua_S,3,0));
-  PODVector<float>* vertexData = ((PODVector<float>*)  tolua_tousertype(tolua_S,4,0));
-  IntRect currentScissor = *((IntRect*)  tolua_tousertype(tolua_S,5,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBatchesWithOffset'", NULL);
-#endif
-  {
-   self->GetBatchesWithOffset(*offset,*batches,*vertexData,currentScissor);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetBatchesWithOffset'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetColorAttr of class  UIElement */
 #ifndef TOLUA_DISABLE_tolua_UI_UIElement_GetColorAttr00
 static int tolua_UI_UIElement_GetColorAttr00(lua_State* tolua_S)
@@ -13682,6 +14013,33 @@ static int tolua_UI_UIElement_GetElementEventSender00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetElementEventSender'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NewUIElement */
+#ifndef TOLUA_DISABLE_tolua_UI_UIElement00
+static int tolua_UI_UIElement00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   UIElement* tolua_ret = (UIElement*)  NewUIElement();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"UIElement");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'UIElement'.",&tolua_err);
  return 0;
 #endif
 }
@@ -14142,6 +14500,33 @@ static int tolua_UI_Window_GetModalFrameSize00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: NewWindow */
+#ifndef TOLUA_DISABLE_tolua_UI_Window00
+static int tolua_UI_Window00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   Window* tolua_ret = (Window*)  NewWindow();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Window");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Window'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_UI_open (lua_State* tolua_S)
 {
@@ -14166,6 +14551,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetBlendMode",tolua_UI_BorderImage_GetBlendMode00);
    tolua_function(tolua_S,"IsTiled",tolua_UI_BorderImage_IsTiled00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"BorderImage",tolua_UI_BorderImage00);
   tolua_cclass(tolua_S,"Button","Button","BorderImage",NULL);
   tolua_beginmodule(tolua_S,"Button");
    tolua_function(tolua_S,"SetPressedOffset",tolua_UI_Button_SetPressedOffset00);
@@ -14180,6 +14566,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetRepeatDelay",tolua_UI_Button_GetRepeatDelay00);
    tolua_function(tolua_S,"GetRepeatRate",tolua_UI_Button_GetRepeatRate00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"Button",tolua_UI_Button00);
   tolua_cclass(tolua_S,"CheckBox","CheckBox","BorderImage",NULL);
   tolua_beginmodule(tolua_S,"CheckBox");
    tolua_function(tolua_S,"SetChecked",tolua_UI_CheckBox_SetChecked00);
@@ -14188,6 +14575,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsChecked",tolua_UI_CheckBox_IsChecked00);
    tolua_function(tolua_S,"GetCheckedOffset",tolua_UI_CheckBox_GetCheckedOffset00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"CheckBox",tolua_UI_CheckBox00);
   tolua_constant(tolua_S,"CS_NORMAL",CS_NORMAL);
   tolua_constant(tolua_S,"CS_RESIZEVERTICAL",CS_RESIZEVERTICAL);
   tolua_constant(tolua_S,"CS_RESIZEDIAGONAL_TOPRIGHT",CS_RESIZEDIAGONAL_TOPRIGHT);
@@ -14223,6 +14611,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetPlaceholderText",tolua_UI_DropDownList_GetPlaceholderText00);
    tolua_function(tolua_S,"GetResizePopup",tolua_UI_DropDownList_GetResizePopup00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"DropDownList",tolua_UI_DropDownList00);
   tolua_cclass(tolua_S,"FileSelectorEntry","FileSelectorEntry","",NULL);
   tolua_beginmodule(tolua_S,"FileSelectorEntry");
    tolua_variable(tolua_S,"name_",tolua_get_FileSelectorEntry_name_,tolua_set_FileSelectorEntry_name_);
@@ -14255,9 +14644,11 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetFilterIndex",tolua_UI_FileSelector_GetFilterIndex00);
    tolua_function(tolua_S,"GetDirectoryMode",tolua_UI_FileSelector_GetDirectoryMode00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"FileSelector",tolua_UI_FileSelector00);
   tolua_cclass(tolua_S,"Font","Font","Resource",NULL);
   tolua_beginmodule(tolua_S,"Font");
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"Font",tolua_UI_Font00);
   tolua_cclass(tolua_S,"LineEdit","LineEdit","BorderImage",NULL);
   tolua_beginmodule(tolua_S,"LineEdit");
    tolua_function(tolua_S,"SetText",tolua_UI_LineEdit_SetText00);
@@ -14281,6 +14672,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetCursor",tolua_UI_LineEdit_GetCursor00);
    tolua_function(tolua_S,"GetDoubleClickInterval",tolua_UI_LineEdit_GetDoubleClickInterval00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"LineEdit",tolua_UI_LineEdit00);
   tolua_constant(tolua_S,"HM_NEVER",HM_NEVER);
   tolua_constant(tolua_S,"HM_FOCUS",HM_FOCUS);
   tolua_constant(tolua_S,"HM_ALWAYS",HM_ALWAYS);
@@ -14319,6 +14711,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetBaseIndent",tolua_UI_ListView_GetBaseIndent00);
    tolua_function(tolua_S,"GetDoubleClickInterval",tolua_UI_ListView_GetDoubleClickInterval00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"ListView",tolua_UI_ListView00);
   tolua_cclass(tolua_S,"Menu","Menu","Button",NULL);
   tolua_beginmodule(tolua_S,"Menu");
    tolua_function(tolua_S,"SetPopup",tolua_UI_Menu_SetPopup00);
@@ -14331,7 +14724,9 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetShowPopup",tolua_UI_Menu_GetShowPopup00);
    tolua_function(tolua_S,"GetAcceleratorKey",tolua_UI_Menu_GetAcceleratorKey00);
    tolua_function(tolua_S,"GetAcceleratorQualifiers",tolua_UI_Menu_GetAcceleratorQualifiers00);
+   tolua_function(tolua_S,"GetAcceleratorQualifiers",tolua_UI_Menu_GetAcceleratorQualifiers01);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"Menu",tolua_UI_Menu00);
   tolua_cclass(tolua_S,"ScrollBar","ScrollBar","UIElement",NULL);
   tolua_beginmodule(tolua_S,"ScrollBar");
    tolua_function(tolua_S,"SetOrientation",tolua_UI_ScrollBar_SetOrientation00);
@@ -14352,6 +14747,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetForwardButton",tolua_UI_ScrollBar_GetForwardButton00);
    tolua_function(tolua_S,"GetSlider",tolua_UI_ScrollBar_GetSlider00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"ScrollBar",tolua_UI_ScrollBar00);
   tolua_cclass(tolua_S,"ScrollView","ScrollView","UIElement",NULL);
   tolua_beginmodule(tolua_S,"ScrollView");
    tolua_function(tolua_S,"SetContentElement",tolua_UI_ScrollView_SetContentElement00);
@@ -14371,6 +14767,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetPageStep",tolua_UI_ScrollView_GetPageStep00);
    tolua_function(tolua_S,"SetViewPositionAttr",tolua_UI_ScrollView_SetViewPositionAttr00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"ScrollView",tolua_UI_ScrollView00);
   tolua_cclass(tolua_S,"Slider","Slider","BorderImage",NULL);
   tolua_beginmodule(tolua_S,"Slider");
    tolua_function(tolua_S,"SetOrientation",tolua_UI_Slider_SetOrientation00);
@@ -14384,6 +14781,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetKnob",tolua_UI_Slider_GetKnob00);
    tolua_function(tolua_S,"GetRepeatRate",tolua_UI_Slider_GetRepeatRate00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"Slider",tolua_UI_Slider00);
   tolua_cclass(tolua_S,"Sprite","Sprite","UIElement",NULL);
   tolua_beginmodule(tolua_S,"Sprite");
    tolua_function(tolua_S,"SetPosition",tolua_UI_Sprite_SetPosition00);
@@ -14435,6 +14833,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetRowHeight",tolua_UI_Text_GetRowHeight00);
    tolua_function(tolua_S,"GetNumRows",tolua_UI_Text_GetNumRows00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"Text",tolua_UI_Text00);
   tolua_cclass(tolua_S,"Text3D","Text3D","Drawable",NULL);
   tolua_beginmodule(tolua_S,"Text3D");
    tolua_function(tolua_S,"SetFont",tolua_UI_Text3D_SetFont00);
@@ -14464,11 +14863,11 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetWidth",tolua_UI_Text3D_GetWidth00);
    tolua_function(tolua_S,"GetRowHeight",tolua_UI_Text3D_GetRowHeight00);
    tolua_function(tolua_S,"GetNumRows",tolua_UI_Text3D_GetNumRows00);
-   tolua_function(tolua_S,"GetRowWidths",tolua_UI_Text3D_GetRowWidths00);
    tolua_function(tolua_S,"GetColor",tolua_UI_Text3D_GetColor00);
    tolua_function(tolua_S,"GetOpacity",tolua_UI_Text3D_GetOpacity00);
    tolua_function(tolua_S,"GetFaceCamera",tolua_UI_Text3D_GetFaceCamera00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"Text3D",tolua_UI_Text3D00);
   tolua_cclass(tolua_S,"UI","UI","Object",NULL);
   tolua_beginmodule(tolua_S,"UI");
    tolua_function(tolua_S,"SetCursor",tolua_UI_UI_SetCursor00);
@@ -14653,12 +15052,12 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetHovering",tolua_UI_UIElement_SetHovering00);
    tolua_function(tolua_S,"SetTempVisible",tolua_UI_UIElement_SetTempVisible00);
    tolua_function(tolua_S,"AdjustScissor",tolua_UI_UIElement_AdjustScissor00);
-   tolua_function(tolua_S,"GetBatchesWithOffset",tolua_UI_UIElement_GetBatchesWithOffset00);
    tolua_function(tolua_S,"GetColorAttr",tolua_UI_UIElement_GetColorAttr00);
    tolua_function(tolua_S,"GetTraversalMode",tolua_UI_UIElement_GetTraversalMode00);
    tolua_function(tolua_S,"IsElementEventSender",tolua_UI_UIElement_IsElementEventSender00);
    tolua_function(tolua_S,"GetElementEventSender",tolua_UI_UIElement_GetElementEventSender00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"UIElement",tolua_UI_UIElement00);
   tolua_constant(tolua_S,"DRAG_NONE",DRAG_NONE);
   tolua_constant(tolua_S,"DRAG_MOVE",DRAG_MOVE);
   tolua_constant(tolua_S,"DRAG_RESIZE_TOPLEFT",DRAG_RESIZE_TOPLEFT);
@@ -14686,6 +15085,7 @@ TOLUA_API int tolua_UI_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetModalFrameColor",tolua_UI_Window_GetModalFrameColor00);
    tolua_function(tolua_S,"GetModalFrameSize",tolua_UI_Window_GetModalFrameSize00);
   tolua_endmodule(tolua_S);
+  tolua_function(tolua_S,"Window",tolua_UI_Window00);
  tolua_endmodule(tolua_S);
  return 1;
 }

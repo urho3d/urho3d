@@ -102,45 +102,75 @@ public:
     /// Remove listener component.
     void RemoveListener(Component* component);
     
-	/// Return ID.
-    unsigned GetID() const;
+    /// Return ID.
+    unsigned GetID() const { return id_; }
     /// Return name.
-    const String& GetName() const;
+    const String& GetName() const { return name_; }
     /// Return name hash.
-    StringHash GetNameHash() const;
+    StringHash GetNameHash() const { return nameHash_; }
     /// Return parent scene node.
-    Node* GetParent() const;
+    Node* GetParent() const { return parent_; }
     /// Return scene.
-    Scene* GetScene() const;
+    Scene* GetScene() const { return scene_; }
     /// Return whether is enabled. Disables nodes effectively disable all their components.
-    bool IsEnabled() const;
+    bool IsEnabled() const { return enabled_; }
     /// Return owner connection in networking.
-    Connection* GetOwner() const;
+    Connection* GetOwner() const { return owner_; }
     /// Return position relative to parent node.
-    const Vector3& GetPosition() const;
+    const Vector3& GetPosition() const { return position_; }
     /// Return rotation relative to parent node.
-    const Quaternion& GetRotation() const;
+    const Quaternion& GetRotation() const { return rotation_; }
     /// Return direction relative to parent node. Identity rotation equals positive Z.
-    Vector3 GetDirection() const;
+    Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
     /// Return scale relative to parent node.
-    const Vector3& GetScale() const;
+    const Vector3& GetScale() const { return scale_; }
     /// Return transform matrix relative to parent node.
-    Matrix3x4 GetTransform() const;
+    Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
 
     /// Return position in world space.
-    Vector3 GetWorldPosition() const;
+    Vector3 GetWorldPosition() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldTransform_.Translation();
+    }
 
     /// Return rotation in world space.
-    Quaternion GetWorldRotation() const;
+    Quaternion GetWorldRotation() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldRotation_;
+    }
 
     /// Return direction in world space.
-    Vector3 GetWorldDirection() const;
-	
+    Vector3 GetWorldDirection() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldRotation_ * Vector3::FORWARD;
+    }
+
     /// Return scale in world space.
-    Vector3 GetWorldScale() const;
+    Vector3 GetWorldScale() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldTransform_.Scale();
+    }
 
     /// Return transform matrix in world space.
-    const Matrix3x4& GetWorldTransform() const;
+    const Matrix3x4& GetWorldTransform() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldTransform_;
+    }
 
     /// Convert a local space position to world space.
     Vector3 LocalToWorld(const Vector3& position) const;
@@ -151,7 +181,7 @@ public:
     /// Convert a world space position or rotation to local space.
     Vector3 WorldToLocal(const Vector4& vector) const;
     /// Return whether transform has changed and world transform needs recalculation.
-    bool IsDirty() const;
+    bool IsDirty() const { return dirty_; }
     /// Return number of child scene nodes.
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return child scene node by index.
@@ -163,7 +193,7 @@ public:
     /// Return child scene node by name hash.
     Node* GetChild(StringHash nameHash, bool recursive = false) const;
     /// Return number of components.
-    unsigned GetNumComponents() const;
+    unsigned GetNumComponents() const { return components_.Size(); }
     /// Return number of non-local components.
     unsigned GetNumNetworkComponents() const;
     /// Return component by type. If there are several, returns the first.

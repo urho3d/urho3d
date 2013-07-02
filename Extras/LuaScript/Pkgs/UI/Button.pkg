@@ -20,11 +20,13 @@ public:
     void SetRepeatRate(float rate);
     
     /// Return pressed image offset.
-    const IntVector2& GetPressedOffset() const;
+    const IntVector2& GetPressedOffset() const { return pressedOffset_; }
     /// Return pressed label offset.
-    const IntVector2& GetLabelOffset() const;
+    const IntVector2& GetLabelOffset() const { return labelOffset_; }
     /// Return repeat delay.
-    float GetRepeatDelay() const;
+    float GetRepeatDelay() const { return repeatDelay_; }
     /// Return repeat rate.
-    float GetRepeatRate() const;
+    float GetRepeatRate() const { return repeatRate_; }
 };
+
+Button* NewButton @ Button();

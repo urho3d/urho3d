@@ -32,7 +32,7 @@ public:
     /// Return the absolute current working directory.
     String GetCurrentDir() const;
     /// Return whether paths have been registered.
-    bool HasRegisteredPaths() const;
+    bool HasRegisteredPaths() const { return allowedPaths_.Size() > 0; }
     /// Check if a path is allowed to be accessed. If no paths are registered, all are allowed.
     bool CheckAccess(const String& pathName) const;
     /// Returns the file's last modified time as seconds since 1.1.1970, or 0 if can not be accessed.

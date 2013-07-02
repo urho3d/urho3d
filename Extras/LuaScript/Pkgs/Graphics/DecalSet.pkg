@@ -20,13 +20,13 @@ public:
     /// Return material.
     Material* GetMaterial() const;
     /// Return number of decals.
-    unsigned GetNumDecals() const;
+    unsigned GetNumDecals() const { return decals_.Size(); }
     /// Retur number of vertices in the decals.
-    unsigned GetNumVertices() const;
+    unsigned GetNumVertices() const { return numVertices_; }
     /// Retur number of vertex indices in the decals.
-    unsigned GetNumIndices() const;
+    unsigned GetNumIndices() const { return numIndices_; }
     /// Return maximum number of decal vertices.
-    unsigned GetMaxVertices() const;
+    unsigned GetMaxVertices() const { return maxVertices_; }
     /// Return maximum number of decal vertex indices.
-    unsigned GetMaxIndices() const;
+    unsigned GetMaxIndices() const { return maxIndices_; }
 };

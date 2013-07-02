@@ -74,15 +74,17 @@ public:
     /// Return whether an item at index has its children expanded (in hierachy mode only).
     bool IsExpanded(unsigned index) const;
     /// Return highlight mode.
-    HighlightMode GetHighlightMode() const;
+    HighlightMode GetHighlightMode() const { return highlightMode_; }
     /// Return whether multiselect enabled.
-    bool GetMultiselect() const;
+    bool GetMultiselect() const { return multiselect_; }
     /// Return whether selection is cleared on defocus.
-    bool GetClearSelectionOnDefocus() const;
+    bool GetClearSelectionOnDefocus() const { return clearSelectionOnDefocus_; }
     /// Return whether hierarchy mode enabled.
-    bool GetHierarchyMode() const;
+    bool GetHierarchyMode() const { return hierarchyMode_; }
     /// Return base indent.
-    int GetBaseIndent() const;
+    int GetBaseIndent() const { return baseIndent_; }
     /// Return item doubleclick interval in seconds.
     float GetDoubleClickInterval() const;
 };
+
+ListView* NewListView @ ListView();

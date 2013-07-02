@@ -22,26 +22,123 @@
 
 #pragma once
 
+#include "BorderImage.h"
+#include "Button.h"
+#include "CheckBox.h"
 #include "Context.h"
 #include "Cursor.h"
+#include "DropDownList.h"
+#include "FileSelector.h"
+#include "Font.h"
+#include "LineEdit.h"
+#include "ListView.h"
 #include "LuaScript.h"
+#include "Menu.h"
+#include "ScrollBar.h"
+#include "ScrollView.h"
+#include "Slider.h"
 #include "Sprite.h"
+#include "Text.h"
+#include "Text3D.h"
 #include "UI.h"
+#include "UIElement.h"
+#include "Window.h"
+
 
 namespace Urho3D
 {
-    UI* GetUI()
-    {
-        return GetLuaScriptContext()->GetSubsystem<UI>();
-    }
+    BorderImage* NewBorderImage()
+	{
+		return new BorderImage(GetLuaScriptContext());
+	}
+	
+	Button* NewButton()
+	{
+		return new Button(GetLuaScriptContext());
+	}
 
-    Cursor* NewCursor()
-    {
-        return new Cursor(GetLuaScriptContext());
-    }
+	CheckBox* NewCheckBox()
+	{
+		return new CheckBox(GetLuaScriptContext());
+	}
+	
+	Cursor* NewCursor()
+	{
+		return new Cursor(GetLuaScriptContext());
+	}
+	
+	DropDownList* NewDropDownList()
+	{
+		return new DropDownList(GetLuaScriptContext());
+	}
+	
+	FileSelector* NewFileSelector()
+	{
+		return new FileSelector(GetLuaScriptContext());
+	}
+	
+	Font* NewFont()
+	{
+		return new Font(GetLuaScriptContext());
+	}
+	
+	LineEdit* NewLineEdit()
+	{
+		return new LineEdit(GetLuaScriptContext());
+	}
+	
+	ListView* NewListView()
+	{
+		return new ListView(GetLuaScriptContext());
+	}
+	
+	Menu* NewMenu()
+	{
+		return new Menu(GetLuaScriptContext());
+	}
+	
+	ScrollBar* NewScrollBar()
+	{
+		return new ScrollBar(GetLuaScriptContext());
+	}
+	
+	ScrollView* NewScrollView()
+	{
+		return new ScrollView(GetLuaScriptContext());
+	}
+	
+	Slider* NewSlider()
+	{
+		return new Slider(GetLuaScriptContext());
+	}
 
-    Sprite* NewSprite()
-    {
-        return new Sprite(GetLuaScriptContext());
-    }
+	Sprite* NewSprite()
+	{
+		return new Sprite(GetLuaScriptContext());
+	}
+	
+	Text* NewText()
+	{
+		return new Text(GetLuaScriptContext());
+	}
+	
+	Text3D* NewText3D()
+	{
+		return new Text3D(GetLuaScriptContext());
+	}
+
+	UI* GetUI()
+	{
+		return GetLuaScriptContext()->GetSubsystem<UI>();
+	}
+	
+	UIElement* NewUIElement()
+	{
+		return new UIElement(GetLuaScriptContext());
+	}
+	
+	Window* NewWindow()
+	{
+		return new Window(GetLuaScriptContext());
+	}
 }

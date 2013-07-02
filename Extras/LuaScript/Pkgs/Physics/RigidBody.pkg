@@ -82,9 +82,9 @@ public:
     void ReAddBodyToWorld();
     
     /// Return physics world.
-    PhysicsWorld* GetPhysicsWorld() const;
+    PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
     /// Return mass.
-    float GetMass() const;
+    float GetMass() const { return mass_; }
     /// Return rigid body world-space position.
     Vector3 GetPosition() const;
     /// Return rigid body world-space rotation.
@@ -98,7 +98,7 @@ public:
     /// Return linear velocity deactivation threshold.
     float GetLinearRestThreshold() const;
     /// Return linear velocity damping threshold.
-    // float GetLinearDamping() const;
+    float GetLinearDamping() const;
     /// Return linear velocity damping scale.
     // float GetLinearDampingScale() const;
     /// Return angular velocity.
@@ -108,7 +108,7 @@ public:
     /// Return angular velocity deactivation threshold.
     float GetAngularRestThreshold() const;
     /// Return angular velocity damping threshold.
-    // float GetAngularDamping() const;
+    float GetAngularDamping() const;
     /// Return angular velocity damping scale.
     // float GetAngularDampingScale() const;
     /// Return friction coefficient.
@@ -122,23 +122,23 @@ public:
     /// Return continuous collision detection motion-per-simulation-step threshold.
     float GetCcdMotionThreshold() const;
     /// Return whether rigid body uses gravity.
-    bool GetUseGravity() const;
+    bool GetUseGravity() const { return useGravity_; }
     /// Return gravity override. If zero (default), uses the physics world's gravity.
-    const Vector3& GetGravityOverride() const;
+    const Vector3& GetGravityOverride() const { return gravityOverride_; }
     /// Return center of mass offset.
-    const Vector3& GetCenterOfMass() const;
+    const Vector3& GetCenterOfMass() const { return centerOfMass_; }
     /// Return kinematic mode flag.
-    bool IsKinematic() const;
+    bool IsKinematic() const { return kinematic_; }
     /// Return phantom mode flag.
-    bool IsPhantom() const;
+    bool IsPhantom() const { return phantom_; }
     /// Return whether rigid body is active (not sleeping.)
     bool IsActive() const;
     /// Return collision layer.
-    unsigned GetCollisionLayer() const;
+    unsigned GetCollisionLayer() const { return collisionLayer_; }
     /// Return collision mask.
-    unsigned GetCollisionMask() const;
+    unsigned GetCollisionMask() const { return collisionMask_; }
     /// Return collision event signaling mode.
-    CollisionEventMode GetCollisionEventMode() const;
+    CollisionEventMode GetCollisionEventMode() const { return collisionEventMode_; }
     
     /// Apply new world transform after a simulation step. Called internally.
     void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);

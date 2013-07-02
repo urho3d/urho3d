@@ -33,11 +33,11 @@ public:
     void SetName(const String& name);
     
     /// Return the open mode.
-    FileMode GetMode() const;
+    FileMode GetMode() const { return mode_; }
     /// Return whether is open.
-    bool IsOpen() const;
+    bool IsOpen() const { return handle_ != 0; }
     /// Return the file handle.
-    void* GetHandle() const;
+    void* GetHandle() const { return handle_; }
     /// Return whether the file originates from a package.
-    bool IsPackaged() const;
+    bool IsPackaged() const { return offset_ != 0; }
 };

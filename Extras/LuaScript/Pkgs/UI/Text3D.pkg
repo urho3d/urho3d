@@ -59,12 +59,12 @@ public:
     int GetRowHeight() const;
     /// Return number of rows.
     unsigned GetNumRows() const;
-    /// Return width of each row.
-    const PODVector<int>& GetRowWidths() const;
     /// Return corner color.
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
     float GetOpacity() const;
     /// Return whether faces camera automatically.
-    bool GetFaceCamera() const;
+    bool GetFaceCamera() const { return faceCamera_; }
 };
+
+Text3D* NewText3D @ Text3D();

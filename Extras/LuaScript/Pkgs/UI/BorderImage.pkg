@@ -24,15 +24,17 @@ public:
     void SetTiled(bool enable);
     
     /// Return texture.
-    Texture* GetTexture() const;
+    Texture* GetTexture() const { return texture_; }
     /// Return image rectangle.
-    const IntRect& GetImageRect() const;
-	/// Return image border dimensions.
-    const IntRect& GetBorder() const;
-	/// Return offset to image rectangle used on hover.
-    const IntVector2& GetHoverOffset() const;
-	/// Return blend mode.
-    BlendMode GetBlendMode() const;
+    const IntRect& GetImageRect() const { return imageRect_; }
+    /// Return image border dimensions.
+    const IntRect& GetBorder() const { return border_; }
+    /// Return offset to image rectangle used on hover.
+    const IntVector2& GetHoverOffset() const { return hoverOffset_; }
+    /// Return blend mode.
+    BlendMode GetBlendMode() const { return blendMode_; }
     /// Return whether is tiled.
-    bool IsTiled() const;
+    bool IsTiled() const { return tiled_; }
 };
+
+BorderImage* NewBorderImage @ BorderImage();

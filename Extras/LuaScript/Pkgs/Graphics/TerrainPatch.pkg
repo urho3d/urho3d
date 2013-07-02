@@ -30,20 +30,20 @@ public:
     /// Return owner terrain.
     Terrain* GetOwner() const;
     /// Return north neighbor patch.
-    TerrainPatch* GetNorthPatch() const;
+    TerrainPatch* GetNorthPatch() const { return north_; }
     /// Return south neighbor patch.
-    TerrainPatch* GetSouthPatch() const;
+    TerrainPatch* GetSouthPatch() const { return south_; }
     /// Return west neighbor patch.
-    TerrainPatch* GetWestPatch() const;
+    TerrainPatch* GetWestPatch() const { return west_; }
     /// Return east neighbor patch.
-    TerrainPatch* GetEastPatch() const;
-    /// Return geometrical error array.
+    TerrainPatch* GetEastPatch() const { return east_; }
     /// Return local-space bounding box.
-    const BoundingBox& GetBoundingBox() const;
+    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return patch coordinates.
-    const IntVector2& GetCoordinates() const;
+    const IntVector2& GetCoordinates() const { return coordinates_; }
     /// Return current LOD level.
-    unsigned GetLodLevel() const;
+    unsigned GetLodLevel() const { return lodLevel_; }
     /// Return vertical offset for occlusion geometry..
+    float GetOcclusionOffset() const { return occlusionOffset_; }
     float GetOcclusionOffset() const;
 };

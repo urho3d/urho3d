@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Physics
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:51.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:50.
 */
 
 //
@@ -5454,6 +5454,38 @@ static int tolua_Physics_RigidBody_GetLinearRestThreshold00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetLinearDamping of class  RigidBody */
+#ifndef TOLUA_DISABLE_tolua_Physics_RigidBody_GetLinearDamping00
+static int tolua_Physics_RigidBody_GetLinearDamping00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const RigidBody",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const RigidBody* self = (const RigidBody*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetLinearDamping'", NULL);
+#endif
+  {
+   float tolua_ret = (float)  self->GetLinearDamping();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetLinearDamping'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetAngularVelocity of class  RigidBody */
 #ifndef TOLUA_DISABLE_tolua_Physics_RigidBody_GetAngularVelocity00
 static int tolua_Physics_RigidBody_GetAngularVelocity00(lua_State* tolua_S)
@@ -5565,6 +5597,38 @@ static int tolua_Physics_RigidBody_GetAngularRestThreshold00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetAngularRestThreshold'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetAngularDamping of class  RigidBody */
+#ifndef TOLUA_DISABLE_tolua_Physics_RigidBody_GetAngularDamping00
+static int tolua_Physics_RigidBody_GetAngularDamping00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const RigidBody",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const RigidBody* self = (const RigidBody*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetAngularDamping'", NULL);
+#endif
+  {
+   float tolua_ret = (float)  self->GetAngularDamping();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetAngularDamping'.",&tolua_err);
  return 0;
 #endif
 }
@@ -6419,9 +6483,11 @@ TOLUA_API int tolua_Physics_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetLinearFactor",tolua_Physics_RigidBody_GetLinearFactor00);
    tolua_function(tolua_S,"GetVelocityAtPoint",tolua_Physics_RigidBody_GetVelocityAtPoint00);
    tolua_function(tolua_S,"GetLinearRestThreshold",tolua_Physics_RigidBody_GetLinearRestThreshold00);
+   tolua_function(tolua_S,"GetLinearDamping",tolua_Physics_RigidBody_GetLinearDamping00);
    tolua_function(tolua_S,"GetAngularVelocity",tolua_Physics_RigidBody_GetAngularVelocity00);
    tolua_function(tolua_S,"GetAngularFactor",tolua_Physics_RigidBody_GetAngularFactor00);
    tolua_function(tolua_S,"GetAngularRestThreshold",tolua_Physics_RigidBody_GetAngularRestThreshold00);
+   tolua_function(tolua_S,"GetAngularDamping",tolua_Physics_RigidBody_GetAngularDamping00);
    tolua_function(tolua_S,"GetFriction",tolua_Physics_RigidBody_GetFriction00);
    tolua_function(tolua_S,"GetRestitution",tolua_Physics_RigidBody_GetRestitution00);
    tolua_function(tolua_S,"GetContactProcessingThreshold",tolua_Physics_RigidBody_GetContactProcessingThreshold00);

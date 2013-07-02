@@ -14,13 +14,13 @@ public:
     void SetAlwaysUpdateOwner(bool enable);
     
     /// Return base priority.
-    float GetBasePriority() const;
+    float GetBasePriority() const { return basePriority_; }
     /// Return priority reduction distance factor.
-    float GetDistanceFactor() const;
+    float GetDistanceFactor() const { return distanceFactor_; }
     /// Return minimum priority.
-    float GetMinPriority() const;
+    float GetMinPriority() const { return minPriority_; }
     /// Return whether updates to owner should be sent always at full rate.
-    bool GetAlwaysUpdateOwner() const;
+    bool GetAlwaysUpdateOwner() const { return alwaysUpdateOwner_; }
     
     /// Increment and check priority accumulator. Return true if should update. Called by Connection.
     bool CheckUpdate(float distance, float& accumulator);

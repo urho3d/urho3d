@@ -24,25 +24,27 @@ public:
     void SetDoubleClickInterval(float interval);
 
     /// Return text.
-    const String& GetText() const;
+    const String& GetText() const { return line_; }
     /// Return cursor position.
-    unsigned GetCursorPosition() const;
+    unsigned GetCursorPosition() const { return cursorPosition_; }
     /// Return cursor blink rate.
-    float GetCursorBlinkRate() const;
+    float GetCursorBlinkRate() const { return cursorBlinkRate_; }
     /// Return maximum text length.
-    unsigned GetMaxLength() const;
+    unsigned GetMaxLength() const { return maxLength_; }
     /// Return echo character.
-    unsigned GetEchoCharacter() const;
+    unsigned GetEchoCharacter() const { return echoCharacter_; }
     /// Return whether can move cursor with arrows or mouse.
-    bool IsCursorMovable() const;
+    bool IsCursorMovable() const { return cursorMovable_; }
     /// Return whether selections are allowed.
-    bool IsTextSelectable() const;
+    bool IsTextSelectable() const { return textSelectable_; }
     /// Return whether copy-paste operations are allowed.
-    bool IsTextCopyable() const;
+    bool IsTextCopyable() const { return textCopyable_; }
     /// Return text element.
-    Text* GetTextElement() const;
+    Text* GetTextElement() const { return text_; }
     /// Return cursor element.
-    BorderImage* GetCursor() const;
+    BorderImage* GetCursor() const { return cursor_; }
     /// Return text selection doubleclick interval in seconds.
     float GetDoubleClickInterval() const;
 };
+
+LineEdit* NewLineEdit @ LineEdit();

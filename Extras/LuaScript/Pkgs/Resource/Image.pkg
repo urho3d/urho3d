@@ -30,14 +30,17 @@ public:
     bool SaveJPG(const char* fileName, int quality);
     
     /// Return width.
-    int GetWidth() const;
+    int GetWidth() const { return width_; }
     /// Return height.
-    int GetHeight() const;
+    int GetHeight() const { return height_; }
     /// Return number of color components.
-    unsigned GetComponents() const;
+    unsigned GetComponents() const { return components_; }
     /// Return whether is compressed.
-    bool IsCompressed() const;
+    bool IsCompressed() const { return compressedFormat_ != CF_NONE; }
     /// Return compressed format.
-    CompressedFormat GetCompressedFormat() const;
+    CompressedFormat GetCompressedFormat() const { return compressedFormat_; }
+    /// Return number of compressed mip levels.
+    unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
+
 };
 

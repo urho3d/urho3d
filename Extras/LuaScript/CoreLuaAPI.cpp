@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Core
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:49.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:48.
 */
 
 //
@@ -58,9 +58,9 @@ static int tolua_collect_IntRect (lua_State* tolua_S)
   return 0;
 }
 
-static int tolua_collect_String (lua_State* tolua_S)
+static int tolua_collect_Vector4 (lua_State* tolua_S)
 {
- String* self = (String*) tolua_tousertype(tolua_S,1,0);
+ Vector4* self = (Vector4*) tolua_tousertype(tolua_S,1,0);
   Mtolua_delete(self);
   return 0;
 }
@@ -128,16 +128,16 @@ static int tolua_collect_Timer (lua_State* tolua_S)
   return 0;
 }
 
-static int tolua_collect_Vector4 (lua_State* tolua_S)
+static int tolua_collect_Vector3 (lua_State* tolua_S)
 {
- Vector4* self = (Vector4*) tolua_tousertype(tolua_S,1,0);
+ Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
   Mtolua_delete(self);
   return 0;
 }
 
-static int tolua_collect_Vector3 (lua_State* tolua_S)
+static int tolua_collect_String (lua_State* tolua_S)
 {
- Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
+ String* self = (String*) tolua_tousertype(tolua_S,1,0);
   Mtolua_delete(self);
   return 0;
 }
@@ -157,22 +157,49 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"VariantMap");
  tolua_usertype(tolua_S,"String");
  tolua_usertype(tolua_S,"Color");
+ tolua_usertype(tolua_S,"Vector<String>");
  tolua_usertype(tolua_S,"Time");
  tolua_usertype(tolua_S,"Variant");
  tolua_usertype(tolua_S,"Vector3");
  tolua_usertype(tolua_S,"IntRect");
  tolua_usertype(tolua_S,"Object");
- tolua_usertype(tolua_S,"Quaternion");
+ tolua_usertype(tolua_S,"ResourceRef");
  tolua_usertype(tolua_S,"StringHash");
- tolua_usertype(tolua_S,"Vector4");
+ tolua_usertype(tolua_S,"Quaternion");
  tolua_usertype(tolua_S,"Rect");
  tolua_usertype(tolua_S,"ResourceRefList");
  tolua_usertype(tolua_S,"Vector2");
  tolua_usertype(tolua_S,"Timer");
- tolua_usertype(tolua_S,"ResourceRef");
  tolua_usertype(tolua_S,"ShortStringHash");
+ tolua_usertype(tolua_S,"Vector4");
  tolua_usertype(tolua_S,"IntVector2");
 }
+
+/* function: InitFPU */
+#ifndef TOLUA_DISABLE_tolua_Core_InitFPU00
+static int tolua_Core_InitFPU00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   InitFPU();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'InitFPU'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
 
 /* function: ErrorDialog */
 #ifndef TOLUA_DISABLE_tolua_Core_ErrorDialog00
@@ -290,7 +317,71 @@ static int tolua_Core_PrintLine00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: GetPlatformCString */
+/* function: GetArguments */
+#ifndef TOLUA_DISABLE_tolua_Core_GetArguments00
+static int tolua_Core_GetArguments00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   const Vector<String>& tolua_ret = (const Vector<String>&)  GetArguments();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector<String>");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetArguments'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: GetConsoleInput */
+#ifndef TOLUA_DISABLE_tolua_Core_GetConsoleInput00
+static int tolua_Core_GetConsoleInput00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   String tolua_ret = (String)  GetConsoleInput();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetConsoleInput'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: GetPlatform */
 #ifndef TOLUA_DISABLE_tolua_Core_GetPlatform00
 static int tolua_Core_GetPlatform00(lua_State* tolua_S)
 {
@@ -304,8 +395,18 @@ static int tolua_Core_GetPlatform00(lua_State* tolua_S)
 #endif
  {
   {
-   const char* tolua_ret = (const char*)  GetPlatformCString();
-   tolua_pushstring(tolua_S,(const char*)tolua_ret);
+   String tolua_ret = (String)  GetPlatform();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
   }
  }
  return 1;
@@ -5118,16 +5219,15 @@ static int tolua_Core_VariantMap_SetPtr00(lua_State* tolua_S)
  {
   VariantMap* self = (VariantMap*)  tolua_tousertype(tolua_S,1,0);
   const char* key = ((const char*)  tolua_tostring(tolua_S,2,0));
-  const void* value = ((const void*)  tolua_touserdata(tolua_S,3,0));
+  void* value = ((void*)  tolua_touserdata(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'VariantMapSetPtr'", NULL);
 #endif
   {
    VariantMapSetPtr(self,key,value);
-   tolua_pushuserdata(tolua_S,(void*)value);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetPtr'.",&tolua_err);
@@ -5560,10 +5660,13 @@ TOLUA_API int tolua_Core_open (lua_State* tolua_S)
  tolua_reg_types(tolua_S);
  tolua_module(tolua_S,NULL,0);
  tolua_beginmodule(tolua_S,NULL);
+  tolua_function(tolua_S,"InitFPU",tolua_Core_InitFPU00);
   tolua_function(tolua_S,"ErrorDialog",tolua_Core_ErrorDialog00);
   tolua_function(tolua_S,"ErrorExit",tolua_Core_ErrorExit00);
   tolua_function(tolua_S,"OpenConsoleWindow",tolua_Core_OpenConsoleWindow00);
   tolua_function(tolua_S,"PrintLine",tolua_Core_PrintLine00);
+  tolua_function(tolua_S,"GetArguments",tolua_Core_GetArguments00);
+  tolua_function(tolua_S,"GetConsoleInput",tolua_Core_GetConsoleInput00);
   tolua_function(tolua_S,"GetPlatform",tolua_Core_GetPlatform00);
   tolua_function(tolua_S,"GetNumPhysicalCPUs",tolua_Core_GetNumPhysicalCPUs00);
   tolua_function(tolua_S,"GetNumLogicalCPUs",tolua_Core_GetNumLogicalCPUs00);

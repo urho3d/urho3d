@@ -5,7 +5,7 @@ class Material : public Resource
 {
 public:
     /// Return number of techniques.
-    unsigned GetNumTechniques() const;
+    unsigned GetNumTechniques() const { return techniques_.Size(); }
     /// Return technique entry by index.
     const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
     /// Return technique by index.
@@ -14,20 +14,22 @@ public:
     Pass* GetPass(unsigned index, StringHash passType) const;
     /// Return texture by unit.
     Texture* GetTexture(TextureUnit unit) const;
+   /// Return all textures.
+    const SharedPtr<Texture>* GetTextures() const { return &textures_[0]; }
     /// Return shader parameter.
     const Vector4& GetShaderParameter(const String& name) const;
     /// Return normal culling mode.
-    CullMode GetCullMode() const;
+    CullMode GetCullMode() const { return cullMode_; }
     /// Return culling mode for shadows.
-    CullMode GetShadowCullMode() const;
+    CullMode GetShadowCullMode() const { return shadowCullMode_; }
     /// Return depth bias.
-    const BiasParameters& GetDepthBias() const;
+    const BiasParameters& GetDepthBias() const { return depthBias_; }
     /// Return last auxiliary view rendered frame number.
-    unsigned GetAuxViewFrameNumber() const;
+    unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
     /// Return whether should render occlusion.
-    bool GetOcclusion() const;
+    bool GetOcclusion() const { return occlusion_; }
     /// Return whether should render specular.
-    bool GetSpecular() const;
+    bool GetSpecular() const { return specular_; }
     
     /// Return name for texture unit.
     static String GetTextureUnitName(TextureUnit unit);

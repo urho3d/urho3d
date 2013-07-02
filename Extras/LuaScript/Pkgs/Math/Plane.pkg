@@ -5,32 +5,54 @@ class Plane
 {
 public:
     /// Construct undefined.
-    Plane();
+    Plane()
+    {
+    }
     
     /// Copy-construct from another plane.
-    Plane(const Plane& plane);
+    Plane(const Plane& plane) :
+        normal_(plane.normal_),
+        absNormal_(plane.absNormal_),
+        intercept_(plane.intercept_)
+    {
+    }
     
     /// Construct from 3 vertices.
-    Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2);
+    Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2)
+    {
+        Define(v0, v1, v2);
+    }
     
     /// Construct from a normal vector and a point on the plane.
-    Plane(const Vector3& normal, const Vector3& point);
+    Plane(const Vector3& normal, const Vector3& point)
+    {
+        Define(normal, point);
+    }
     
     /// Define from 3 vertices.
-    void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2);
+    void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
+    {
+        Vector3 dist1 = v1 - v0;
+        Vector3 dist2 = v2 - v0;
+        
+        Define(dist1.CrossProduct(dist2).Normalized(), v0);
+    }
 
     /// Define from a normal and a point.
-    void Define(const Vector3& normal, const Vector3& point);
+    void Define(const Vector3& normal, const Vector3& point)
+    {
+        normal_ = normal;
+        absNormal_ = normal.Abs();
+        intercept_ = normal.DotProduct(point);
+    }
     
     /// Return signed distance to a point.
-    float Distance(const Vector3& point) const;
+    float Distance(const Vector3& point) const { return normal_.DotProduct(point) - intercept_; }
     
     /// Plane normal.
     Vector3 normal_ @ normal;
-  
 	/// Plane absolute normal.
     Vector3 absNormal_ @ absNormal;
-    
 	/// Plane intercept parameter.
     float intercept_ @ intercept;
 };

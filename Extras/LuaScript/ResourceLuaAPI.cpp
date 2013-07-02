@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Resource
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:51.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:50.
 */
 
 //
@@ -506,34 +506,33 @@ static int tolua_Resource_Image_GetCompressedFormat00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetName of class  Resource */
-#ifndef TOLUA_DISABLE_tolua_Resource_Resource_SetName00
-static int tolua_Resource_Resource_SetName00(lua_State* tolua_S)
+/* method: GetNumCompressedLevels of class  Image */
+#ifndef TOLUA_DISABLE_tolua_Resource_Image_GetNumCompressedLevels00
+static int tolua_Resource_Image_GetNumCompressedLevels00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Resource",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const String",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Image",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  Resource* self = (Resource*)  tolua_tousertype(tolua_S,1,0);
-  const String* name = ((const String*)  tolua_tousertype(tolua_S,2,0));
+  const Image* self = (const Image*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetName'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetNumCompressedLevels'", NULL);
 #endif
   {
-   self->SetName(*name);
+   unsigned tolua_ret = (unsigned)  self->GetNumCompressedLevels();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetName'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetNumCompressedLevels'.",&tolua_err);
  return 0;
 #endif
 }
@@ -2732,10 +2731,10 @@ TOLUA_API int tolua_Resource_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetComponents",tolua_Resource_Image_GetComponents00);
    tolua_function(tolua_S,"IsCompressed",tolua_Resource_Image_IsCompressed00);
    tolua_function(tolua_S,"GetCompressedFormat",tolua_Resource_Image_GetCompressedFormat00);
+   tolua_function(tolua_S,"GetNumCompressedLevels",tolua_Resource_Image_GetNumCompressedLevels00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Resource","Resource","",NULL);
   tolua_beginmodule(tolua_S,"Resource");
-   tolua_function(tolua_S,"SetName",tolua_Resource_Resource_SetName00);
    tolua_function(tolua_S,"GetName",tolua_Resource_Resource_GetName00);
    tolua_function(tolua_S,"GetNameHash",tolua_Resource_Resource_GetNameHash00);
    tolua_function(tolua_S,"GetMemoryUse",tolua_Resource_Resource_GetMemoryUse00);

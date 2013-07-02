@@ -21,9 +21,10 @@ public:
     /// Define a shape.
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
     /// Set current shape.
-    void SetShape(CursorShape shape);    
+    void SetShape(CursorShape shape);
+    
     /// Get current shape.
-    CursorShape GetShape() const;
+    CursorShape GetShape() const { return shape_; }
 };
 
 Cursor* NewCursor @ Cursor();

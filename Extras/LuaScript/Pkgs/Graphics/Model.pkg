@@ -5,17 +5,17 @@ class Model : public Resource
 {
 public:
     /// Return bounding box.
-    const BoundingBox& GetBoundingBox() const;
+    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return skeleton.
-    Skeleton& GetSkeleton();
+    Skeleton& GetSkeleton() { return skeleton_; }
     /// Return number of geometries.
-    unsigned GetNumGeometries() const;
+    unsigned GetNumGeometries() const { return geometries_.Size(); }
     /// Return number of LOD levels in geometry.
     unsigned GetNumGeometryLodLevels(unsigned index) const;
     /// Return geometry by index and LOD level. The LOD level is clamped if out of range.
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
     /// Return number of vertex morphs.
-    unsigned GetNumMorphs() const;
+    unsigned GetNumMorphs() const { return morphs_.Size(); }
     /// Return vertex morph by index.
     const ModelMorph* GetMorph(unsigned index) const;
     /// Return vertex morph by name.

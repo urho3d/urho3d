@@ -254,7 +254,7 @@ public:
 	tolua_outside void VariantMapSetQuaternion @ SetQuaternion(const char* key, const Quaternion& value);
 	tolua_outside void VariantMapSetColor @ SetColor(const char* key, const Color& value);
 	tolua_outside void VariantMapSetString @ SetString(const char* key, const String& value);
-	tolua_outside void VariantMapSetPtr @ SetPtr(const char* key, const void*& value);
+	tolua_outside void VariantMapSetPtr @ SetPtr(const char* key, void* value);
 	tolua_outside void VariantMapSetResourceRef @ SetResourceRef(const char* key, const ResourceRef& value);
 	tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const char* key, const ResourceRefList& value); 
 	tolua_outside void VariantMapSetIntRect @ SetIntRect(const char* key, const IntRect& value);

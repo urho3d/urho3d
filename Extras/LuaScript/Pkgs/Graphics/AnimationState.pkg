@@ -27,21 +27,21 @@ public:
     void SetLayer(unsigned char layer);
     
     /// Return animation.
-    Animation* GetAnimation() const;
+    Animation* GetAnimation() const { return animation_; }
     /// Return start bone.
     Bone* GetStartBone() const;
     /// Return whether weight is nonzero.
-    bool IsEnabled() const;
+    bool IsEnabled() const { return weight_ > 0.0f; }
     /// Return whether looped.
-    bool IsLooped() const;
+    bool IsLooped() const { return looped_; }
     /// Return blending weight.
-    float GetWeight() const;
+    float GetWeight() const { return weight_; }
     /// Return time position.
-    float GetTime() const;
+    float GetTime() const { return time_; }
     /// Return animation length.
     float GetLength() const;
     /// Return blending layer.
-    unsigned char GetLayer() const;
+    unsigned char GetLayer() const { return layer_; }
     
     /// Apply the animation at the current time position.
     void Apply();

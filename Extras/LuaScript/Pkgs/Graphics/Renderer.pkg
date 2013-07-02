@@ -52,53 +52,53 @@ public:
     void ReloadShaders();
     
     /// Return number of backbuffer viewports.
-    unsigned GetNumViewports() const;
+    unsigned GetNumViewports() const { return viewports_.Size(); }
     /// Return backbuffer viewport by index.
     Viewport* GetViewport(unsigned index) const;
     /// Return default renderpath.
     RenderPath* GetDefaultRenderPath() const;
     /// Return whether specular lighting is enabled.
-    bool GetSpecularLighting() const;
+    bool GetSpecularLighting() const { return specularLighting_; }
     /// Return whether drawing shadows is enabled.
-    bool GetDrawShadows() const;
+    bool GetDrawShadows() const { return drawShadows_; }
     /// Return texture anisotropy.
-    int GetTextureAnisotropy() const;
+    int GetTextureAnisotropy() const { return textureAnisotropy_; }
     /// Return texture filtering.
-    TextureFilterMode GetTextureFilterMode() const;
+    TextureFilterMode GetTextureFilterMode() const { return textureFilterMode_; }
     /// Return texture quality level.
-    int GetTextureQuality() const;
+    int GetTextureQuality() const { return textureQuality_; }
     /// Return material quality level.
-    int GetMaterialQuality() const;
+    int GetMaterialQuality() const { return materialQuality_; }
     /// Return shadow map resolution.
-    int GetShadowMapSize() const;
+    int GetShadowMapSize() const { return shadowMapSize_; }
     /// Return shadow quality.
-    int GetShadowQuality() const;
+    int GetShadowQuality() const { return shadowQuality_; }
     /// Return whether shadow maps are reused.
-    bool GetReuseShadowMaps() const;
+    bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
     /// Return maximum number of shadow maps per resolution.
-    int GetMaxShadowMaps() const;
+    int GetMaxShadowMaps() const { return maxShadowMaps_; }
     /// Return maximum number of directional light shadow map cascades.
-    int GetMaxShadowCascades() const;
+    int GetMaxShadowCascades() const { return maxShadowCascades_; }
     /// Return whether dynamic instancing is in use.
-    bool GetDynamicInstancing() const;
+    bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return minimum number of instances required in a batch group to render as instanced.
-    int GetMinInstances() const;
+    int GetMinInstances() const { return minInstances_; }
     /// Return maximum number of triangles per object for instancing.
-    int GetMaxInstanceTriangles() const;
+    int GetMaxInstanceTriangles() const { return maxInstanceTriangles_; }
     /// Return maximum number of sorted instances per batch group.
-    int GetMaxSortedInstances() const;
+    int GetMaxSortedInstances() const { return maxSortedInstances_; }
     /// Return maximum number of occluder triangles.
-    int GetMaxOccluderTriangles() const;
+    int GetMaxOccluderTriangles() const { return maxOccluderTriangles_; }
     /// Return occlusion buffer width.
-    int GetOcclusionBufferSize() const;
+    int GetOcclusionBufferSize() const { return occlusionBufferSize_; }
     /// Return occluder screen size threshold.
-    float GetOccluderSizeThreshold() const;
+    float GetOccluderSizeThreshold() const { return occluderSizeThreshold_; }
     /// Return number of views rendered.
-    unsigned GetNumViews() const;
+    unsigned GetNumViews() const { return numViews_; }
     /// Return number of primitives rendered.
-    unsigned GetNumPrimitives() const;
+    unsigned GetNumPrimitives() const { return numPrimitives_; }
     /// Return number of batches rendered.
-    unsigned GetNumBatches() const;
+    unsigned GetNumBatches() const { return numBatches_; }
     /// Return number of geometries rendered.
     unsigned GetNumGeometries(bool allViews = false) const;
     /// Return number of lights rendered.
@@ -108,31 +108,31 @@ public:
     /// Return number of occluders rendered.
     unsigned GetNumOccluders(bool allViews = false) const;
     /// Return the default zone.
-    Zone* GetDefaultZone() const;
+    Zone* GetDefaultZone() const { return defaultZone_; }
     /// Return the directional light for fullscreen quad rendering.
-    Light* GetQuadDirLight() const;
+    Light* GetQuadDirLight() const { return quadDirLight_; }
     /// Return the default material.
-    Material* GetDefaultMaterial() const;
+    Material* GetDefaultMaterial() const { return defaultMaterial_; }
     /// Return the default range attenuation texture.
-    Texture2D* GetDefaultLightRamp() const;
+    Texture2D* GetDefaultLightRamp() const { return defaultLightRamp_; }
     /// Return the default spotlight attenuation texture.
-    Texture2D* GetDefaultLightSpot() const;
+    Texture2D* GetDefaultLightSpot() const { return defaultLightSpot_; }
     /// Return the shadowed pointlight face selection cube map.
-    TextureCube* GetFaceSelectCubeMap() const;
+    TextureCube* GetFaceSelectCubeMap() const { return faceSelectCubeMap_; }
     /// Return the shadowed pointlight indirection cube map.
-    TextureCube* GetIndirectionCubeMap() const;
+    TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
     /// Return the instancing vertex buffer
-    VertexBuffer* GetInstancingBuffer() const;
+    VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
     /// Return a vertex shader by name.
     ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
     /// Return a pixel shader by name.
     ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const;
     /// Return the stencil vertex shader.
-    ShaderVariation* GetStencilVS() const;
+    ShaderVariation* GetStencilVS() const { return stencilVS_; }
     /// Return the stencil pixel shader.
-    ShaderVariation* GetStencilPS() const;
+    ShaderVariation* GetStencilPS() const { return stencilPS_; }
     /// Return the frame update parameters.
-    const FrameInfo& GetFrameInfo();
+    const FrameInfo& GetFrameInfo() { return frame_; }
 };
 
 Renderer* GetRenderer();

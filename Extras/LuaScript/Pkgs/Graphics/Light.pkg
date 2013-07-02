@@ -49,39 +49,39 @@ public:
     void SetShapeTexture(Texture* texture);
     
     /// Return light type.
-    LightType GetLightType() const;
+    LightType GetLightType() const { return lightType_; }
     /// Return vertex lighting mode.
-    bool GetPerVertex() const;
+    bool GetPerVertex() const { return perVertex_; }
     /// Return color.
-    const Color& GetColor() const;
+    const Color& GetColor() const { return color_; }
     /// Return specular intensity.
-    float GetSpecularIntensity() const;
+    float GetSpecularIntensity() const { return specularIntensity_; }
     /// Return range.
-    float GetRange() const;
+    float GetRange() const { return range_; }
     /// Return spotlight field of view.
-    float GetFov() const;
+    float GetFov() const { return fov_; }
     /// Return spotlight aspect ratio.
-    float GetAspectRatio() const;
+    float GetAspectRatio() const { return aspectRatio_; }
     /// Return fade start distance.
-    float GetFadeDistance() const;
+    float GetFadeDistance() const { return fadeDistance_; }
     /// Return shadow fade start distance.
-    float GetShadowFadeDistance() const;
+    float GetShadowFadeDistance() const { return shadowFadeDistance_; }
     /// Return shadow depth bias parameters.
-    const BiasParameters& GetShadowBias() const;
+    const BiasParameters& GetShadowBias() const { return shadowBias_; }
     /// Return directional light cascaded shadow parameters.
-    const CascadeParameters& GetShadowCascade() const;
+    const CascadeParameters& GetShadowCascade() const { return shadowCascade_; }
     /// Return shadow map focus parameters.
-    const FocusParameters& GetShadowFocus() const;
+    const FocusParameters& GetShadowFocus() const { return shadowFocus_; }
     /// Return shadow intensity.
-    float GetShadowIntensity() const;
+    float GetShadowIntensity() const { return shadowIntensity_; }
     /// Return shadow resolution.
-    float GetShadowResolution() const;
+    float GetShadowResolution() const { return shadowResolution_; }
     /// Return shadow camera near/far clip distance ratio.
-    float GetShadowNearFarRatio() const;
+    float GetShadowNearFarRatio() const { return shadowNearFarRatio_; }
     /// Return range attenuation texture.
-    Texture* GetRampTexture() const;
+    Texture* GetRampTexture() const { return rampTexture_; }
     /// Return spotlight attenuation texture.
-    Texture* GetShapeTexture() const;
+    Texture* GetShapeTexture() const { return shapeTexture_; }
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
 };

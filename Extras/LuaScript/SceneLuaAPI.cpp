@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Scene
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:52.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:50.
 */
 
 //
@@ -86,7 +86,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Connection");
  tolua_usertype(tolua_S,"Quaternion");
  tolua_usertype(tolua_S,"Scene");
- tolua_usertype(tolua_S,"ShortStringHash");
+ tolua_usertype(tolua_S,"Vector3");
  tolua_usertype(tolua_S,"StringHash");
  tolua_usertype(tolua_S,"Component");
  tolua_usertype(tolua_S,"Vector4");
@@ -95,7 +95,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"String");
  tolua_usertype(tolua_S,"File");
  tolua_usertype(tolua_S,"Node");
- tolua_usertype(tolua_S,"Vector3");
+ tolua_usertype(tolua_S,"ShortStringHash");
 }
 
 /* method: SetEnabled of class  Component */
@@ -285,6 +285,72 @@ static int tolua_Scene_Component_IsEnabled00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsEnabledEffective of class  Component */
+#ifndef TOLUA_DISABLE_tolua_Scene_Component_IsEnabledEffective00
+static int tolua_Scene_Component_IsEnabledEffective00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Component",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Component* self = (const Component*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsEnabledEffective'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsEnabledEffective();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsEnabledEffective'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetComponent of class  Component */
+#ifndef TOLUA_DISABLE_tolua_Scene_Component_GetComponent00
+static int tolua_Scene_Component_GetComponent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Component",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"ShortStringHash",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Component* self = (const Component*)  tolua_tousertype(tolua_S,1,0);
+  ShortStringHash type = *((ShortStringHash*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetComponent'", NULL);
+#endif
+  {
+   Component* tolua_ret = (Component*)  self->GetComponent(type);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Component");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetComponent'.",&tolua_err);
  return 0;
 #endif
 }
@@ -4288,6 +4354,8 @@ TOLUA_API int tolua_Scene_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetNode",tolua_Scene_Component_GetNode00);
    tolua_function(tolua_S,"GetScene",tolua_Scene_Component_GetScene00);
    tolua_function(tolua_S,"IsEnabled",tolua_Scene_Component_IsEnabled00);
+   tolua_function(tolua_S,"IsEnabledEffective",tolua_Scene_Component_IsEnabledEffective00);
+   tolua_function(tolua_S,"GetComponent",tolua_Scene_Component_GetComponent00);
   tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"REPLICATED",REPLICATED);
   tolua_constant(tolua_S,"LOCAL",LOCAL);

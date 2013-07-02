@@ -35,17 +35,19 @@ public:
     void SetModalFrameSize(const IntVector2& size);
 
     /// Return whether is movable.
-    bool IsMovable() const;
+    bool IsMovable() const { return movable_; }
     /// Return whether is resizable.
-    bool IsResizable() const;
+    bool IsResizable() const { return resizable_; }
     /// Return resize area width at edges.
-    const IntRect& GetResizeBorder() const;
+    const IntRect& GetResizeBorder() const { return resizeBorder_; }
     /// Return modal flag.
-    bool IsModal() const;
+    bool IsModal() const { return modal_; }
     /// Get modal shade color.
-    const Color& GetModalShadeColor() const;
+    const Color& GetModalShadeColor() const { return modalShadeColor_; }
     /// Get modal frame color.
-    const Color& GetModalFrameColor() const;
+    const Color& GetModalFrameColor() const { return modalFrameColor_; }
     /// Get modal frame size.
-    const IntVector2& GetModalFrameSize() const;
+    const IntVector2& GetModalFrameSize() const { return modalFrameSize_; }
 };
+
+Window* NewWindow @ Window();

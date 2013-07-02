@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Input
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:50.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:49.
 */
 
 //

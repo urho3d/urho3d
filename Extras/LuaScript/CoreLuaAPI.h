@@ -139,7 +139,7 @@ namespace Urho3D
     {
         (*vmap)[ShortStringHash(key)] = value;
     }
-    void VariantMapSetPtr(VariantMap* vmap, const char* key, const void* value)
+    void VariantMapSetPtr(VariantMap* vmap, const char* key, void* value)
     {
         (*vmap)[ShortStringHash(key)] = value;
     }

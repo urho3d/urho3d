@@ -36,29 +36,29 @@ public:
     void SetFlipVertical(bool enable);
     
     /// Return far clip distance.
-    float GetFarClip() const;
+    float GetFarClip() const { return farClip_; }
     /// Return near clip distance.
     float GetNearClip() const;
     /// Return field of view.
-    float GetFov() const;
+    float GetFov() const { return fov_; }
     /// Return orthographic mode size.
-    float GetOrthoSize() const;
+    float GetOrthoSize() const { return orthoSize_; } 
     /// Return aspect ratio.
-    float GetAspectRatio() const;
+    float GetAspectRatio() const { return aspectRatio_; }
     /// Return zoom.
-    float GetZoom() const;
+    float GetZoom() const { return zoom_; }
     /// Return LOD bias.
-    float GetLodBias() const;
+    float GetLodBias() const { return lodBias_; }
     /// Return view mask.
-    unsigned GetViewMask() const;
+    unsigned GetViewMask() const { return viewMask_; }
     /// Return view override flags.
-    unsigned GetViewOverrideFlags() const;
+    unsigned GetViewOverrideFlags() const { return viewOverrideFlags_; }
     /// Return fill mode.
-    FillMode GetFillMode() const;
+    FillMode GetFillMode() const { return fillMode_; }
     /// Return orthographic flag.
-    bool IsOrthographic() const;
+    bool IsOrthographic() const { return orthographic_; }
     /// Return auto aspect ratio flag.
-    bool GetAutoAspectRatio() const;
+    bool GetAutoAspectRatio() const { return autoAspectRatio_; }
     /// Return frustum in world space.
     const Frustum& GetFrustum() const;
     /// Return API-specific projection matrix.
@@ -90,9 +90,9 @@ public:
     /// Return up vector.
     Vector3 GetUpVector() const;
     /// Return projection offset.
-    const Vector2& GetProjectionOffset() const;
+    const Vector2& GetProjectionOffset() const { return projectionOffset_; }
     /// Return vertical flipping mode.
-    bool GetFlipVertical() const;
+    bool GetFlipVertical() const { return flipVertical_; }
     /// Return distance to position. In orthographic mode uses only Z coordinate.
     float GetDistance(const Vector3& worldPos) const;
     /// Return squared distance to position. In orthographic mode uses only Z coordinate.

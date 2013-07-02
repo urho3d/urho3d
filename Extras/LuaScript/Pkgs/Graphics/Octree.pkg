@@ -20,7 +20,7 @@ public:
     /// Return the closest drawable object by a ray query.
     void RaycastSingle(RayOctreeQuery& query) const;
     /// Return subdivision levels.
-    unsigned GetNumLevels() const;
+    unsigned GetNumLevels() const { return numLevels_; }
     
     /// Mark drawable object as requiring an update.
     void QueueUpdate(Drawable* drawable);

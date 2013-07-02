@@ -22,13 +22,13 @@ public:
     /// Return the file entry corresponding to the name, or null if not found.
     const PackageEntry* GetEntry(const String& fileName) const;
     /// Return the package file name.
-    const String& GetName() const;
+    const String& GetName() const { return fileName_; }
     /// Return hash of the package file name.
-    StringHash GetNameHash() const;
+    StringHash GetNameHash() const { return nameHash_; }
     /// Return number of files.
-    unsigned GetNumFiles() const;
+    unsigned GetNumFiles() const { return entries_.Size(); }
     /// Return total size of the package file.
-    unsigned GetTotalSize() const;
+    unsigned GetTotalSize() const { return totalSize_; }
     /// Return checksum of the package file contents.
-    unsigned GetChecksum() const;
+    unsigned GetChecksum() const { return checksum_; }
 };

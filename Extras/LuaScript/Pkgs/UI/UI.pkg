@@ -32,25 +32,25 @@ public:
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
 
     /// Return root UI element.
-    UIElement* GetRoot() const;
+    UIElement* GetRoot() const { return rootElement_; }
     /// Return root modal element.
-    UIElement* GetRootModalElement() const;
+    UIElement* GetRootModalElement() const { return rootModalElement_; }
     /// Return cursor.
-    Cursor* GetCursor() const;
+    Cursor* GetCursor() const { return cursor_; }
     /// Return UI element at screen coordinates.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
     /// Return UI element at screen coordinates.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Return focused element.
-    UIElement* GetFocusElement() const;
+    UIElement* GetFocusElement() const { return focusElement_; }
     /// Return topmost enabled root-level non-modal element.
     UIElement* GetFrontElement() const;
     /// Return cursor position.
     IntVector2 GetCursorPosition() const;
     /// Return clipboard text.
-    const String& GetClipBoardText() const;
+    const String& GetClipBoardText() const { return clipBoard_; }
     /// Return mouse wheel handling flag.
-    bool IsNonFocusedMouseWheel() const;
+    bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
 };

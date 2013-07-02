@@ -22,13 +22,16 @@ public:
     /// Return material.
     Material* GetMaterial() const;
     /// Return number of billboards.
-    unsigned GetNumBillboards() const;
+    unsigned GetNumBillboards() const { return billboards_.Size(); }
+    /// Return billboard by index.
+    Billboard* GetBillboard(unsigned index);
     /// Return whether billboards are relative to the scene node.
-    bool IsRelative() const;
+    bool IsRelative() const { return relative_; }
     /// Return whether scene node scale affects billboards' size.
-    bool IsScaled() const;
+    bool IsScaled() const { return scaled_; }
     /// Return whether billboards are sorted.
-    bool IsSorted() const;
+    bool IsSorted() const { return sorted_; }
     /// Return animation LOD bias.
+    float GetAnimationLodBias() const { return animationLodBias_; }
     float GetAnimationLodBias() const;
 };

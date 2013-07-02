@@ -211,87 +211,87 @@ public:
     void SetElementEventSender(bool flag);
 	
     /// Return name.
-    const String& GetName() const;
+    const String& GetName() const { return name_; }
     /// Return position.
-    const IntVector2& GetPosition() const;
+    const IntVector2& GetPosition() const { return position_; }
     /// Return size.
-    const IntVector2& GetSize() const;
+    const IntVector2& GetSize() const { return size_; }
     /// Return width.
-    int GetWidth() const;
+    int GetWidth() const { return size_.x_; }
     /// Return height.
-    int GetHeight() const;
+    int GetHeight() const { return size_.y_; }
     /// Return minimum size.
-    const IntVector2& GetMinSize() const;
+    const IntVector2& GetMinSize() const { return minSize_; }
     /// Return minimum width.
-    int GetMinWidth() const;
+    int GetMinWidth() const { return minSize_.x_; }
     /// Return minimum height.
-    int GetMinHeight() const;
+    int GetMinHeight() const { return minSize_.y_; }
     /// Return maximum size.
-    const IntVector2& GetMaxSize() const;
+    const IntVector2& GetMaxSize() const { return maxSize_; }
     /// Return minimum width.
-    int GetMaxWidth() const;
+    int GetMaxWidth() const { return maxSize_.x_; }
     /// Return minimum height.
-    int GetMaxHeight() const;
+    int GetMaxHeight() const { return maxSize_.y_; }
     /// Return true if size is fixed.
-    bool IsFixedSize() const;
+    bool IsFixedSize() const { return minSize_ == maxSize_; }
     /// Return true if width is fixed.
-    bool IsFixedWidth() const;
+    bool IsFixedWidth() const { return minSize_.x_ == maxSize_.x_; }
     /// Return true if height is fixed.
-    bool IsFixedHeight() const;
+    bool IsFixedHeight() const { return minSize_.y_ == maxSize_.y_; }
     /// Return child element offset.
-    const IntVector2& GetChildOffset() const;
+    const IntVector2& GetChildOffset() const { return childOffset_; }
     /// Return horizontal alignment.
-    HorizontalAlignment GetHorizontalAlignment() const;
+    HorizontalAlignment GetHorizontalAlignment() const { return horizontalAlignment_; }
     /// Return vertical alignment.
-    VerticalAlignment GetVerticalAlignment() const;
+    VerticalAlignment GetVerticalAlignment() const { return verticalAlignment_; }
     /// Return child element clipping border.
-    const IntRect& GetClipBorder() const;
+    const IntRect& GetClipBorder() const { return clipBorder_; }
     /// Return corner color.
-    const Color& GetColor(Corner corner) const;
+    const Color& GetColor(Corner corner) const { return color_[corner]; }
     /// Return priority.
-    int GetPriority() const;
+    int GetPriority() const { return priority_; }
     /// Return opacity.
-    float GetOpacity() const;
+    float GetOpacity() const { return opacity_; }
     /// Return derived opacity (affected by parent elements.) If UseDerivedOpacity is false, returns same as element's own opacity.
     float GetDerivedOpacity() const;
     /// Return whether should be brought to front when focused.
-    bool GetBringToFront() const;
+    bool GetBringToFront() const { return bringToFront_; }
     /// Return whether should be put to background when another element is focused.
-    bool GetBringToBack() const;
+    bool GetBringToBack() const { return bringToBack_; }
     /// Return whether should clip child elements.
-    bool GetClipChildren() const;
+    bool GetClipChildren() const { return clipChildren_; }
     /// Return whether should sort child elements according to priority.
-    bool GetSortChildren() const;
+    bool GetSortChildren() const { return sortChildren_; }
     /// Return whether parent elements' opacity affects opacity.
-    bool GetUseDerivedOpacity() const;
+    bool GetUseDerivedOpacity() const { return useDerivedOpacity_; }
     /// Return whether has focus.
     bool HasFocus() const;
     /// Return whether reacts to input.
-    bool IsEnabled() const;
+    bool IsEnabled() const { return enabled_; }
     /// Return whether is selected. Actual meaning is element dependent.
-    bool IsSelected() const;
+    bool IsSelected() const { return selected_; }
     /// Return whether is visible.
-    bool IsVisible() const;
+    bool IsVisible() const { return visible_; }
     /// Return whether the cursor is hovering on this element.
-    bool IsHovering() const;
+    bool IsHovering() const { return hovering_; }
     /// Return whether is internally created.
-    bool IsInternal() const;
+    bool IsInternal() const { return internal_; }
     /// Return whether has different color in at least one corner.
-    bool HasColorGradient() const;
+    bool HasColorGradient() const { return colorGradient_; }
     /// Return focus mode.
-    FocusMode GetFocusMode() const;
+    FocusMode GetFocusMode() const { return focusMode_; }
     /// Return drag and drop flags.
-    unsigned GetDragDropMode() const;
+    unsigned GetDragDropMode() const { return dragDropMode_; }
     /// Return applied style name. Return an empty string when the applied style is an 'auto' style (i.e. style derived from instance's type).
     const String& GetAppliedStyle() const;
     /// Return default style.
     XMLFile* GetDefaultStyle(bool recursiveUp = true) const;
     /// Return layout mode.
-    LayoutMode GetLayoutMode() const;
+    LayoutMode GetLayoutMode() const { return layoutMode_; }
     /// Return layout spacing.
-    int GetLayoutSpacing() const;
+    int GetLayoutSpacing() const { return layoutSpacing_; }
     /// Return layout border.
-    const IntRect& GetLayoutBorder() const;
+    const IntRect& GetLayoutBorder() const { return layoutBorder_; }
     /// Return number of child elements.
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return child element by index.
@@ -301,7 +301,7 @@ public:
     /// Return child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
     UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
     /// Return parent element.
-    UIElement* GetParent() const;
+    UIElement* GetParent() const { return parent_; }
     /// Return root element.
     UIElement* GetRoot() const;
     /// Return derived color. Only valid when no gradient.
@@ -319,13 +319,13 @@ public:
     /// Sort child elements if sorting enabled and order dirty. Called by UI.
     void SortChildren();
     /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated.
-    int GetLayoutMinSize() const;
+    int GetLayoutMinSize() const { return layoutMinSize_; }
     /// Return horizontal indentation.
-    int GetIndent() const;
+    int GetIndent() const { return indent_; }
     /// Return indent spacing (number of pixels per indentation level).
-    int GetIndentSpacing() const;
+    int GetIndentSpacing() const { return indentSpacing_; }
     /// Return indent width in pixels.
-    int GetIndentWidth() const;
+    int GetIndentWidth() const { return indent_ * indentSpacing_; }
 
     /// Set child offset.
     void SetChildOffset(const IntVector2& offset);
@@ -335,16 +335,15 @@ public:
     void SetTempVisible(bool enable);
     /// Adjust scissor for rendering.
     void AdjustScissor(IntRect& currentScissor);
-    /// Get UI rendering batches with a specified offset. Also recurses to child elements.
-    void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect
-        currentScissor);
     /// Get color attribute. Uses just the top-left color.
-    const Color& GetColorAttr() const;
+    const Color& GetColorAttr() const { return color_[0]; }
     /// Get traversal mode.
-    TraversalMode GetTraversalMode() const;
+    TraversalMode GetTraversalMode() const { return traversalMode_; }
     /// Get element event sender flag.
-    bool IsElementEventSender() const;
+    bool IsElementEventSender() const { return elementEventSender_; }
     /// Get element event sender.
     UIElement* GetElementEventSender() const;
-
 };
+
+UIElement* NewUIElement @ UIElement();
+

@@ -12,7 +12,9 @@ public:
     void SetCheckedOffset(int x, int y);
     
     /// Return whether is checked.
-    bool IsChecked() const;
+    bool IsChecked() const { return checked_; }
     /// Return checked image offset.
-    const IntVector2& GetCheckedOffset() const;
+    const IntVector2& GetCheckedOffset() const { return checkedOffset_; }
 };
+
+CheckBox* NewCheckBox @ CheckBox();

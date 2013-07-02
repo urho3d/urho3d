@@ -34,7 +34,7 @@ public:
     void SetPackageCacheDir(const String& path);
     
     /// Return network update FPS.
-    int GetUpdateFps() const;
+    int GetUpdateFps() const { return updateFps_; }
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return whether the server is running.
@@ -42,7 +42,7 @@ public:
     /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed.
     bool CheckRemoteEvent(StringHash eventType) const;
     /// Return the package download cache directory.
-    const String& GetPackageCacheDir() const;
+    const String& GetPackageCacheDir() const { return packageCacheDir_; }
 };
 
 Network* GetNetwork();

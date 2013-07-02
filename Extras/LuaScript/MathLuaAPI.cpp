@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Math
-** Generated automatically by tolua++-1.0.92 on 06/30/13 11:31:50.
+** Generated automatically by tolua++-1.0.92 on 07/02/13 20:27:49.
 */
 
 //
@@ -80,16 +80,16 @@ static int tolua_collect_ShortStringHash (lua_State* tolua_S)
   return 0;
 }
 
-static int tolua_collect_Vector3 (lua_State* tolua_S)
+static int tolua_collect_StringHash (lua_State* tolua_S)
 {
- Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
+ StringHash* self = (StringHash*) tolua_tousertype(tolua_S,1,0);
   Mtolua_delete(self);
   return 0;
 }
 
-static int tolua_collect_StringHash (lua_State* tolua_S)
+static int tolua_collect_Vector3 (lua_State* tolua_S)
 {
- StringHash* self = (StringHash*) tolua_tousertype(tolua_S,1,0);
+ Vector3* self = (Vector3*) tolua_tousertype(tolua_S,1,0);
   Mtolua_delete(self);
   return 0;
 }
@@ -101,13 +101,6 @@ static int tolua_collect_Sphere (lua_State* tolua_S)
   return 0;
 }
 
-static int tolua_collect_IntRect (lua_State* tolua_S)
-{
- IntRect* self = (IntRect*) tolua_tousertype(tolua_S,1,0);
-  Mtolua_delete(self);
-  return 0;
-}
-
 static int tolua_collect_Vector4 (lua_State* tolua_S)
 {
  Vector4* self = (Vector4*) tolua_tousertype(tolua_S,1,0);
@@ -115,9 +108,23 @@ static int tolua_collect_Vector4 (lua_State* tolua_S)
   return 0;
 }
 
+static int tolua_collect_IntRect (lua_State* tolua_S)
+{
+ IntRect* self = (IntRect*) tolua_tousertype(tolua_S,1,0);
+  Mtolua_delete(self);
+  return 0;
+}
+
 static int tolua_collect_Matrix3x4 (lua_State* tolua_S)
 {
  Matrix3x4* self = (Matrix3x4*) tolua_tousertype(tolua_S,1,0);
+  Mtolua_delete(self);
+  return 0;
+}
+
+static int tolua_collect_String (lua_State* tolua_S)
+{
+ String* self = (String*) tolua_tousertype(tolua_S,1,0);
   Mtolua_delete(self);
   return 0;
 }
@@ -204,7 +211,7 @@ static int tolua_collect_IntVector2 (lua_State* tolua_S)
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
- tolua_usertype(tolua_S,"Quaternion");
+ tolua_usertype(tolua_S,"String");
  tolua_usertype(tolua_S,"AreaAllocator");
  tolua_usertype(tolua_S,"Vector4");
  tolua_usertype(tolua_S,"Vector3");
@@ -212,16 +219,16 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"IntVector2");
  tolua_usertype(tolua_S,"Matrix3x4");
  tolua_usertype(tolua_S,"IntRect");
- tolua_usertype(tolua_S,"Rect");
- tolua_usertype(tolua_S,"String");
+ tolua_usertype(tolua_S,"Quaternion");
+ tolua_usertype(tolua_S,"StringHash");
  tolua_usertype(tolua_S,"Matrix3");
  tolua_usertype(tolua_S,"Plane");
  tolua_usertype(tolua_S,"Polyhedron");
  tolua_usertype(tolua_S,"Ray");
- tolua_usertype(tolua_S,"Sphere");
+ tolua_usertype(tolua_S,"Rect");
  tolua_usertype(tolua_S,"Frustum");
  tolua_usertype(tolua_S,"Vector2");
- tolua_usertype(tolua_S,"StringHash");
+ tolua_usertype(tolua_S,"Sphere");
  tolua_usertype(tolua_S,"Color");
  tolua_usertype(tolua_S,"Matrix4");
  tolua_usertype(tolua_S,"ShortStringHash");
@@ -1978,6 +1985,48 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: ToString of class  BoundingBox */
+#ifndef TOLUA_DISABLE_tolua_Math_BoundingBox_ToString00
+static int tolua_Math_BoundingBox_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const BoundingBox",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const BoundingBox* self = (const BoundingBox*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: min_ of class  BoundingBox */
 #ifndef TOLUA_DISABLE_tolua_get_BoundingBox_min
 static int tolua_get_BoundingBox_min(lua_State* tolua_S)
@@ -2634,6 +2683,48 @@ static int tolua_Math_Color_ToVector400(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ToVector4'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  Color */
+#ifndef TOLUA_DISABLE_tolua_Math_Color_ToString00
+static int tolua_Math_Color_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Color",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Color* self = (const Color*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
  return 0;
 #endif
 }
@@ -7121,6 +7212,35 @@ static int tolua_Math_Matrix4__eq00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: operator== of class  Matrix4 */
+#ifndef TOLUA_DISABLE_tolua_Math_Matrix4__eq01
+static int tolua_Math_Matrix4__eq01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Matrix4",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Matrix4",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Matrix4* self = (const Matrix4*)  tolua_tousertype(tolua_S,1,0);
+  const Matrix4* rhs = ((const Matrix4*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator=='", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->operator==(*rhs);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Math_Matrix4__eq00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: operator* of class  Matrix4 */
 #ifndef TOLUA_DISABLE_tolua_Math_Matrix4__mul00
 static int tolua_Math_Matrix4__mul00(lua_State* tolua_S)
@@ -10045,6 +10165,111 @@ static int tolua_Math_Quaternion__sub00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: operator== of class  Quaternion */
+#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__eq01
+static int tolua_Math_Quaternion__eq01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Quaternion",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Quaternion",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Quaternion* self = (const Quaternion*)  tolua_tousertype(tolua_S,1,0);
+  const Quaternion* rhs = ((const Quaternion*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator=='", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->operator==(*rhs);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Math_Quaternion__eq00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator* of class  Quaternion */
+#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__mul01
+static int tolua_Math_Quaternion__mul01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Quaternion",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Quaternion* self = (const Quaternion*)  tolua_tousertype(tolua_S,1,0);
+  float rhs = ((float)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator*'", NULL);
+#endif
+  {
+   Quaternion tolua_ret = (Quaternion)  self->operator*(rhs);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((Quaternion)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Quaternion");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Quaternion));
+     tolua_pushusertype(tolua_S,tolua_obj,"Quaternion");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Math_Quaternion__mul00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator- of class  Quaternion */
+#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__sub01
+static int tolua_Math_Quaternion__sub01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Quaternion",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Quaternion* self = (const Quaternion*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator-'", NULL);
+#endif
+  {
+   Quaternion tolua_ret = (Quaternion)  self->operator-();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((Quaternion)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Quaternion");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Quaternion));
+     tolua_pushusertype(tolua_S,tolua_obj,"Quaternion");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Math_Quaternion__sub00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: operator+ of class  Quaternion */
 #ifndef TOLUA_DISABLE_tolua_Math_Quaternion__add00
 static int tolua_Math_Quaternion__add00(lua_State* tolua_S)
@@ -10090,8 +10315,8 @@ static int tolua_Math_Quaternion__add00(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: operator- of class  Quaternion */
-#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__sub01
-static int tolua_Math_Quaternion__sub01(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__sub02
+static int tolua_Math_Quaternion__sub02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -10124,13 +10349,13 @@ static int tolua_Math_Quaternion__sub01(lua_State* tolua_S)
  }
  return 1;
 tolua_lerror:
- return tolua_Math_Quaternion__sub00(tolua_S);
+ return tolua_Math_Quaternion__sub01(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: operator* of class  Quaternion */
-#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__mul01
-static int tolua_Math_Quaternion__mul01(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__mul02
+static int tolua_Math_Quaternion__mul02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -10163,13 +10388,13 @@ static int tolua_Math_Quaternion__mul01(lua_State* tolua_S)
  }
  return 1;
 tolua_lerror:
- return tolua_Math_Quaternion__mul00(tolua_S);
+ return tolua_Math_Quaternion__mul01(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: operator* of class  Quaternion */
-#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__mul02
-static int tolua_Math_Quaternion__mul02(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_Math_Quaternion__mul03
+static int tolua_Math_Quaternion__mul03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -10202,7 +10427,7 @@ static int tolua_Math_Quaternion__mul02(lua_State* tolua_S)
  }
  return 1;
 tolua_lerror:
- return tolua_Math_Quaternion__mul01(tolua_S);
+ return tolua_Math_Quaternion__mul02(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -10862,6 +11087,48 @@ static int tolua_Math_Quaternion_Slerp00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Slerp'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  Quaternion */
+#ifndef TOLUA_DISABLE_tolua_Math_Quaternion_ToString00
+static int tolua_Math_Quaternion_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Quaternion",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Quaternion* self = (const Quaternion*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
  return 0;
 #endif
 }
@@ -12525,6 +12792,48 @@ static int tolua_Math_Rect_ToVector400(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ToVector4'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  Rect */
+#ifndef TOLUA_DISABLE_tolua_Math_Rect_ToString00
+static int tolua_Math_Rect_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Rect",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Rect* self = (const Rect*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
  return 0;
 #endif
 }
@@ -14416,6 +14725,38 @@ static int tolua_Math_StringHash__lt00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: operatorbool of class  StringHash */
+#ifndef TOLUA_DISABLE_tolua_Math_StringHash__bool00
+static int tolua_Math_StringHash__bool00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const StringHash",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const StringHash* self = (const StringHash*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operatorbool'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->operator  bool();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function '.bool'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Value of class  StringHash */
 #ifndef TOLUA_DISABLE_tolua_Math_StringHash_Value00
 static int tolua_Math_StringHash_Value00(lua_State* tolua_S)
@@ -14443,6 +14784,80 @@ static int tolua_Math_StringHash_Value00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Value'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  StringHash */
+#ifndef TOLUA_DISABLE_tolua_Math_StringHash_ToString00
+static int tolua_Math_StringHash_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const StringHash",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const StringHash* self = (const StringHash*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToHash of class  StringHash */
+#ifndef TOLUA_DISABLE_tolua_Math_StringHash_ToHash00
+static int tolua_Math_StringHash_ToHash00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const StringHash",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const StringHash* self = (const StringHash*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToHash'", NULL);
+#endif
+  {
+   unsigned tolua_ret = (unsigned)  self->ToHash();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToHash'.",&tolua_err);
  return 0;
 #endif
 }
@@ -15523,6 +15938,45 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: operator/ of class  Vector2 */
+#ifndef TOLUA_DISABLE_tolua_Math_Vector2__div02
+static int tolua_Math_Vector2__div02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector2",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector2",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector2* self = (const Vector2*)  tolua_tousertype(tolua_S,1,0);
+  const Vector2* rhs = ((const Vector2*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator/'", NULL);
+#endif
+  {
+   Vector2 tolua_ret = (Vector2)  self->operator/(*rhs);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((Vector2)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector2");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector2));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector2");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Math_Vector2__div01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Normalize of class  Vector2 */
 #ifndef TOLUA_DISABLE_tolua_Math_Vector2_Normalize00
 static int tolua_Math_Vector2_Normalize00(lua_State* tolua_S)
@@ -15846,6 +16300,48 @@ static int tolua_Math_Vector2_Normalized00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Normalized'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  Vector2 */
+#ifndef TOLUA_DISABLE_tolua_Math_Vector2_ToString00
+static int tolua_Math_Vector2_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector2",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Vector2* self = (const Vector2*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
  return 0;
 #endif
 }
@@ -16423,6 +16919,87 @@ static int tolua_Math_IntVector2__div00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function '.div'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: operator/ of class  IntVector2 */
+#ifndef TOLUA_DISABLE_tolua_Math_IntVector2__div01
+static int tolua_Math_IntVector2__div01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const IntVector2",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const IntVector2* self = (const IntVector2*)  tolua_tousertype(tolua_S,1,0);
+  int rhs = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator/'", NULL);
+#endif
+  {
+   IntVector2 tolua_ret = (IntVector2)  self->operator/(rhs);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((IntVector2)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"IntVector2");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(IntVector2));
+     tolua_pushusertype(tolua_S,tolua_obj,"IntVector2");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Math_IntVector2__div00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  IntVector2 */
+#ifndef TOLUA_DISABLE_tolua_Math_IntVector2_ToString00
+static int tolua_Math_IntVector2_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const IntVector2",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const IntVector2* self = (const IntVector2*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
  return 0;
 #endif
 }
@@ -17044,6 +17621,45 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: operator/ of class  Vector3 */
+#ifndef TOLUA_DISABLE_tolua_Math_Vector3__div02
+static int tolua_Math_Vector3__div02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector3",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector3* self = (const Vector3*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3* rhs = ((const Vector3*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator/'", NULL);
+#endif
+  {
+   Vector3 tolua_ret = (Vector3)  self->operator/(*rhs);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((Vector3)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Math_Vector3__div01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Normalize of class  Vector3 */
 #ifndef TOLUA_DISABLE_tolua_Math_Vector3_Normalize00
 static int tolua_Math_Vector3_Normalize00(lua_State* tolua_S)
@@ -17411,6 +18027,48 @@ static int tolua_Math_Vector3_Normalized00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Normalized'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  Vector3 */
+#ifndef TOLUA_DISABLE_tolua_Math_Vector3_ToString00
+static int tolua_Math_Vector3_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector3",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Vector3* self = (const Vector3*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
  return 0;
 #endif
 }
@@ -18129,6 +18787,45 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: operator/ of class  Vector4 */
+#ifndef TOLUA_DISABLE_tolua_Math_Vector4__div02
+static int tolua_Math_Vector4__div02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector4",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector4",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const Vector4* self = (const Vector4*)  tolua_tousertype(tolua_S,1,0);
+  const Vector4* rhs = ((const Vector4*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator/'", NULL);
+#endif
+  {
+   Vector4 tolua_ret = (Vector4)  self->operator/(*rhs);
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((Vector4)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector4");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector4));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector4");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_Math_Vector4__div01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: DotProduct of class  Vector4 */
 #ifndef TOLUA_DISABLE_tolua_Math_Vector4_DotProduct00
 static int tolua_Math_Vector4_DotProduct00(lua_State* tolua_S)
@@ -18314,6 +19011,48 @@ static int tolua_Math_Vector4_Equals00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Equals'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  Vector4 */
+#ifndef TOLUA_DISABLE_tolua_Math_Vector4_ToString00
+static int tolua_Math_Vector4_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector4",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Vector4* self = (const Vector4*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   String tolua_ret = (String)  self->ToString();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((String)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(String));
+     tolua_pushusertype(tolua_S,tolua_obj,"String");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
  return 0;
 #endif
 }
@@ -18545,6 +19284,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsInsideFast",tolua_Math_BoundingBox_IsInsideFast00);
    tolua_function(tolua_S,"IsInside",tolua_Math_BoundingBox_IsInside02);
    tolua_function(tolua_S,"IsInsideFast",tolua_Math_BoundingBox_IsInsideFast01);
+   tolua_function(tolua_S,"ToString",tolua_Math_BoundingBox_ToString00);
    tolua_variable(tolua_S,"min",tolua_get_BoundingBox_min,tolua_set_BoundingBox_min);
    tolua_variable(tolua_S,"max",tolua_get_BoundingBox_max,tolua_set_BoundingBox_max);
   tolua_endmodule(tolua_S);
@@ -18577,6 +19317,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Lerp",tolua_Math_Color_Lerp00);
    tolua_function(tolua_S,"ToUInt",tolua_Math_Color_ToUInt00);
    tolua_function(tolua_S,"ToVector4",tolua_Math_Color_ToVector400);
+   tolua_function(tolua_S,"ToString",tolua_Math_Color_ToString00);
    tolua_variable(tolua_S,"r",tolua_get_Color_r,tolua_set_Color_r);
    tolua_variable(tolua_S,"g",tolua_get_Color_g,tolua_set_Color_g);
    tolua_variable(tolua_S,"b",tolua_get_Color_b,tolua_set_Color_b);
@@ -18785,6 +19526,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new_local",tolua_Math_Matrix4_new03_local);
    tolua_function(tolua_S,".call",tolua_Math_Matrix4_new03_local);
    tolua_function(tolua_S,".eq",tolua_Math_Matrix4__eq00);
+   tolua_function(tolua_S,".eq",tolua_Math_Matrix4__eq01);
    tolua_function(tolua_S,".mul",tolua_Math_Matrix4__mul00);
    tolua_function(tolua_S,".mul",tolua_Math_Matrix4__mul01);
    tolua_function(tolua_S,".add",tolua_Math_Matrix4__add00);
@@ -18915,10 +19657,13 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,".eq",tolua_Math_Quaternion__eq00);
    tolua_function(tolua_S,".mul",tolua_Math_Quaternion__mul00);
    tolua_function(tolua_S,".sub",tolua_Math_Quaternion__sub00);
-   tolua_function(tolua_S,".add",tolua_Math_Quaternion__add00);
-   tolua_function(tolua_S,".sub",tolua_Math_Quaternion__sub01);
+   tolua_function(tolua_S,".eq",tolua_Math_Quaternion__eq01);
    tolua_function(tolua_S,".mul",tolua_Math_Quaternion__mul01);
+   tolua_function(tolua_S,".sub",tolua_Math_Quaternion__sub01);
+   tolua_function(tolua_S,".add",tolua_Math_Quaternion__add00);
+   tolua_function(tolua_S,".sub",tolua_Math_Quaternion__sub02);
    tolua_function(tolua_S,".mul",tolua_Math_Quaternion__mul02);
+   tolua_function(tolua_S,".mul",tolua_Math_Quaternion__mul03);
    tolua_function(tolua_S,"FromAngleAxis",tolua_Math_Quaternion_FromAngleAxis00);
    tolua_function(tolua_S,"FromEulerAngles",tolua_Math_Quaternion_FromEulerAngles00);
    tolua_function(tolua_S,"FromRotationTo",tolua_Math_Quaternion_FromRotationTo00);
@@ -18937,6 +19682,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,"RollAngle",tolua_Math_Quaternion_RollAngle00);
    tolua_function(tolua_S,"RotationMatrix",tolua_Math_Quaternion_RotationMatrix00);
    tolua_function(tolua_S,"Slerp",tolua_Math_Quaternion_Slerp00);
+   tolua_function(tolua_S,"ToString",tolua_Math_Quaternion_ToString00);
    tolua_variable(tolua_S,"w",tolua_get_Quaternion_w,tolua_set_Quaternion_w);
    tolua_variable(tolua_S,"x",tolua_get_Quaternion_x,tolua_set_Quaternion_x);
    tolua_variable(tolua_S,"y",tolua_get_Quaternion_y,tolua_set_Quaternion_y);
@@ -19012,6 +19758,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,"HalfSize",tolua_Math_Rect_HalfSize00);
    tolua_function(tolua_S,"Equals",tolua_Math_Rect_Equals00);
    tolua_function(tolua_S,"ToVector4",tolua_Math_Rect_ToVector400);
+   tolua_function(tolua_S,"ToString",tolua_Math_Rect_ToString00);
    tolua_variable(tolua_S,"min",tolua_get_Rect_min,tolua_set_Rect_min);
    tolua_variable(tolua_S,"max",tolua_get_Rect_max,tolua_set_Rect_max);
    tolua_variable(tolua_S,"FULL",tolua_get_Rect_FULL,NULL);
@@ -19114,7 +19861,10 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,".add",tolua_Math_StringHash__add00);
    tolua_function(tolua_S,".eq",tolua_Math_StringHash__eq00);
    tolua_function(tolua_S,".lt",tolua_Math_StringHash__lt00);
+   tolua_function(tolua_S,".bool",tolua_Math_StringHash__bool00);
    tolua_function(tolua_S,"Value",tolua_Math_StringHash_Value00);
+   tolua_function(tolua_S,"ToString",tolua_Math_StringHash_ToString00);
+   tolua_function(tolua_S,"ToHash",tolua_Math_StringHash_ToHash00);
    tolua_function(tolua_S,"Calculate",tolua_Math_StringHash_Calculate00);
    tolua_variable(tolua_S,"ZERO",tolua_get_StringHash_ZERO,NULL);
   tolua_endmodule(tolua_S);
@@ -19175,6 +19925,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,".mul",tolua_Math_Vector2__mul01);
    tolua_function(tolua_S,".div",tolua_Math_Vector2__div00);
    tolua_function(tolua_S,".div",tolua_Math_Vector2__div01);
+   tolua_function(tolua_S,".div",tolua_Math_Vector2__div02);
    tolua_function(tolua_S,"Normalize",tolua_Math_Vector2_Normalize00);
    tolua_function(tolua_S,"Length",tolua_Math_Vector2_Length00);
    tolua_function(tolua_S,"LengthSquared",tolua_Math_Vector2_LengthSquared00);
@@ -19184,6 +19935,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Lerp",tolua_Math_Vector2_Lerp00);
    tolua_function(tolua_S,"Equals",tolua_Math_Vector2_Equals00);
    tolua_function(tolua_S,"Normalized",tolua_Math_Vector2_Normalized00);
+   tolua_function(tolua_S,"ToString",tolua_Math_Vector2_ToString00);
    tolua_variable(tolua_S,"x",tolua_get_Vector2_x,tolua_set_Vector2_x);
    tolua_variable(tolua_S,"y",tolua_get_Vector2_y,tolua_set_Vector2_y);
    tolua_variable(tolua_S,"ZERO",tolua_get_Vector2_ZERO,NULL);
@@ -19217,6 +19969,8 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,".sub",tolua_Math_IntVector2__sub01);
    tolua_function(tolua_S,".mul",tolua_Math_IntVector2__mul00);
    tolua_function(tolua_S,".div",tolua_Math_IntVector2__div00);
+   tolua_function(tolua_S,".div",tolua_Math_IntVector2__div01);
+   tolua_function(tolua_S,"ToString",tolua_Math_IntVector2_ToString00);
    tolua_variable(tolua_S,"x",tolua_get_IntVector2_x,tolua_set_IntVector2_x);
    tolua_variable(tolua_S,"y",tolua_get_IntVector2_y,tolua_set_IntVector2_y);
    tolua_variable(tolua_S,"ZERO",tolua_get_IntVector2_ZERO,NULL);
@@ -19247,6 +20001,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,".mul",tolua_Math_Vector3__mul01);
    tolua_function(tolua_S,".div",tolua_Math_Vector3__div00);
    tolua_function(tolua_S,".div",tolua_Math_Vector3__div01);
+   tolua_function(tolua_S,".div",tolua_Math_Vector3__div02);
    tolua_function(tolua_S,"Normalize",tolua_Math_Vector3_Normalize00);
    tolua_function(tolua_S,"Length",tolua_Math_Vector3_Length00);
    tolua_function(tolua_S,"LengthSquared",tolua_Math_Vector3_LengthSquared00);
@@ -19257,6 +20012,7 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Lerp",tolua_Math_Vector3_Lerp00);
    tolua_function(tolua_S,"Equals",tolua_Math_Vector3_Equals00);
    tolua_function(tolua_S,"Normalized",tolua_Math_Vector3_Normalized00);
+   tolua_function(tolua_S,"ToString",tolua_Math_Vector3_ToString00);
    tolua_variable(tolua_S,"x",tolua_get_Vector3_x,tolua_set_Vector3_x);
    tolua_variable(tolua_S,"y",tolua_get_Vector3_y,tolua_set_Vector3_y);
    tolua_variable(tolua_S,"z",tolua_get_Vector3_z,tolua_set_Vector3_z);
@@ -19295,11 +20051,13 @@ TOLUA_API int tolua_Math_open (lua_State* tolua_S)
    tolua_function(tolua_S,".mul",tolua_Math_Vector4__mul01);
    tolua_function(tolua_S,".div",tolua_Math_Vector4__div00);
    tolua_function(tolua_S,".div",tolua_Math_Vector4__div01);
+   tolua_function(tolua_S,".div",tolua_Math_Vector4__div02);
    tolua_function(tolua_S,"DotProduct",tolua_Math_Vector4_DotProduct00);
    tolua_function(tolua_S,"AbsDotProduct",tolua_Math_Vector4_AbsDotProduct00);
    tolua_function(tolua_S,"Abs",tolua_Math_Vector4_Abs00);
    tolua_function(tolua_S,"Lerp",tolua_Math_Vector4_Lerp00);
    tolua_function(tolua_S,"Equals",tolua_Math_Vector4_Equals00);
+   tolua_function(tolua_S,"ToString",tolua_Math_Vector4_ToString00);
    tolua_variable(tolua_S,"x",tolua_get_Vector4_x,tolua_set_Vector4_x);
    tolua_variable(tolua_S,"y",tolua_get_Vector4_y,tolua_set_Vector4_y);
    tolua_variable(tolua_S,"z",tolua_get_Vector4_z,tolua_set_Vector4_z);
