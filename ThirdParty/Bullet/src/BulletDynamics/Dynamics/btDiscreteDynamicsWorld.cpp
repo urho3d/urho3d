@@ -438,15 +438,12 @@ int	btDiscreteDynamicsWorld::stepSimulation( btScalar timeStep,int maxSubSteps, 
 
 		saveKinematicState(fixedTimeStep*clampedSimulationSteps);
 
-		applyGravity();
-
-		
-
 		for (int i=0;i<clampedSimulationSteps;i++)
 		{
+            // Urho3D: apply gravity and clear forces on each substep
+            applyGravity();
 			internalSingleStepSimulation(fixedTimeStep);
 			synchronizeMotionStates();
-            // Urho3D: clear forces after each substep
             clearForces();
 		}
 
