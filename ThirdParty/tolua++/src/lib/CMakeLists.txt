@@ -7,7 +7,7 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY ../../include)
+set (INCLUDE_DIRS_ONLY ../../include ../../../Lua/Src)
 
 # Setup target
 setup_library ()
