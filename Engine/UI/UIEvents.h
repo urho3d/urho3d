@@ -244,4 +244,34 @@ EVENT(E_ELEMENTREMOVED, ElementRemoved)
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
+/// Drag behavior of a UI Element has started
+EVENT(E_DRAGBEGIN, DragBegin)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_ELEMENTX, ElementX);            // int
+    PARAM(P_ELEMENTY, ElementY);            // int
+}
+
+/// Drag behavior of a UI Element when the input device has moved
+EVENT(E_DRAGMOVE, DragMove)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_ELEMENTX, ElementX);            // int
+    PARAM(P_ELEMENTY, ElementY);            // int
+}
+
+/// Drag behavior of a UI Element has finished
+EVENT(E_DRAGEND, DragEnd)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_ELEMENTX, ElementX);            // int
+    PARAM(P_ELEMENTY, ElementY);            // int
+}
+
 }

@@ -15,6 +15,7 @@ Urho3D development, contributions and bugfixes by:
 - Colin Barrett
 - Erik Beran
 - Carlo Carollo
+- Chris Friesen
 - Alex Fuller
 - Mika Heinonen
 - Aster Jian
@@ -57,8 +58,10 @@ Urho3D uses the following third-party libraries:
 - Bullet 2.81 (http://www.bulletphysics.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLEW 1.9.0 (http://glew.sourceforge.net/)
+- jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
+- Lua 5.1 (http://www.lua.org)
 - MojoShader (http://icculus.org/mojoshader/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
@@ -68,8 +71,6 @@ Urho3D uses the following third-party libraries:
   john-ratcliffs-code-suppository-blog.html)
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
-- jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
-- Lua 5.1 (http://www.lua.org)
 - tolua++ 1.0.93 (http://www.codenix.com/~tolua)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong

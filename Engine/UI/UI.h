@@ -121,6 +121,8 @@ private:
     void GetCursorPositionAndVisible(IntVector2& pos, bool& visible);
     /// Set cursor shape if it exists.
     void SetCursorShape(CursorShape shape);
+    /// Send a UI element drag event.
+    void SendDragEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos);
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.
@@ -145,7 +147,7 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
-
+    
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Vertex shader for no texture.
