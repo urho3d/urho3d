@@ -8,7 +8,6 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
 set (LIBS ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene)
-set (INCLUDE_DIRS_ONLY ../Engine)
 set (LINK_LIBS_ONLY SDL)
 
 if (USE_OPENGL)

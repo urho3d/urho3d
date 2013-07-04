@@ -31,7 +31,6 @@
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "StringUtils.h"
-#include "Engine.h"
 
 #include <cstring>
 
@@ -196,7 +195,7 @@ void Input::SetMouseVisible(bool enable)
         if (initialized_)
         {
             // External windows can only support visible mouse cursor
-            if (graphics_ && graphics_->GetExternalWindow())
+            if (graphics_->GetExternalWindow())
             {
                 mouseVisible_ = true;
                 return;
@@ -794,7 +793,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             switch (evt.window.event)
             {
             case SDL_WINDOWEVENT_CLOSE:
-                GetSubsystem<Graphics>()->Close();
+                graphics_->Close();
                 break;
                 
             case SDL_WINDOWEVENT_MINIMIZED:

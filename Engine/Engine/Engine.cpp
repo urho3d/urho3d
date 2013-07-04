@@ -248,7 +248,15 @@ bool Engine::Initialize(const VariantMap& parameters)
 
 void Engine::RunFrame()
 {
-    assert(initialized_ && !exiting_);
+    assert(initialized_);
+    
+    // If graphics subsystem exists, but does not have a window open, assume we should exit
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (graphics && !graphics->IsInitialized())
+        exiting_ = true;
+    
+    if (exiting_)
+        return;
     
     // Note: there is a minimal performance cost to looking up subsystems (uses a hashmap); if they would be looked up several
     // times per frame it would be better to cache the pointers
