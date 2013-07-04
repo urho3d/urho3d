@@ -1,0 +1,45 @@
+$#define TOLUA_RELEASE
+
+$#include "LuaScript.h"
+
+$pfile "Input/Input.pkg"
+$pfile "Input/InputEvents.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)
+
+${
+
+static const int KEY_A = 'A';
+static const int KEY_B = 'B';
+static const int KEY_C = 'C';
+static const int KEY_D = 'D';
+static const int KEY_E = 'E';
+static const int KEY_F = 'F';
+static const int KEY_G = 'G';
+static const int KEY_H = 'H';
+static const int KEY_I = 'I';
+static const int KEY_J = 'J';
+static const int KEY_K = 'K';
+static const int KEY_L = 'L';
+static const int KEY_M = 'M';
+static const int KEY_N = 'N';
+static const int KEY_O = 'O';
+static const int KEY_P = 'P';
+static const int KEY_Q = 'Q';
+static const int KEY_R = 'R';
+static const int KEY_S = 'S';
+static const int KEY_T = 'T';
+static const int KEY_U = 'U';
+static const int KEY_V = 'V';
+static const int KEY_W = 'W';
+static const int KEY_X = 'X';
+static const int KEY_Y = 'Y';
+static const int KEY_Z = 'Z';
+
+Input* GetInput()
+{
+    return GetLuaScriptContext()->GetSubsystem<Input>();
+}
+
+$}

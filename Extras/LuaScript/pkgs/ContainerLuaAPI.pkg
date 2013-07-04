@@ -1,0 +1,6 @@
+$#define TOLUA_RELEASE
+
+$pfile "Container/Str.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)

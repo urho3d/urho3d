@@ -1,0 +1,17 @@
+$#define TOLUA_RELEASE
+
+$pfile "Scene/Component.pkg"
+$pfile "Scene/Node.pkg"
+$pfile "Scene/Scene.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)
+
+${
+
+Scene* GetScene()
+{
+    return 0;
+}
+
+$}

@@ -1,0 +1,125 @@
+$#define TOLUA_RELEASE
+
+$#include "LuaScript.h"
+
+$pfile "UI/BorderImage.pkg"
+$pfile "UI/Button.pkg"
+$pfile "UI/CheckBox.pkg"
+$pfile "UI/Cursor.pkg"
+$pfile "UI/DropDownList.pkg"
+$pfile "UI/FileSelector.pkg"
+$pfile "UI/Font.pkg"
+$pfile "UI/LineEdit.pkg"
+$pfile "UI/ListView.pkg"
+$pfile "UI/Menu.pkg"
+$pfile "UI/ScrollBar.pkg"
+$pfile "UI/ScrollView.pkg"
+$pfile "UI/Slider.pkg"
+$pfile "UI/Sprite.pkg"
+$pfile "UI/Text.pkg"
+$pfile "UI/Text3D.pkg"
+$pfile "UI/UI.pkg"
+$pfile "UI/UIElement.pkg"
+$pfile "UI/Window.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)
+
+${
+
+BorderImage* NewBorderImage()
+{
+    return new BorderImage(GetLuaScriptContext());
+}
+
+Button* NewButton()
+{
+    return new Button(GetLuaScriptContext());
+}
+
+CheckBox* NewCheckBox()
+{
+    return new CheckBox(GetLuaScriptContext());
+}
+
+Cursor* NewCursor()
+{
+    return new Cursor(GetLuaScriptContext());
+}
+
+DropDownList* NewDropDownList()
+{
+    return new DropDownList(GetLuaScriptContext());
+}
+
+FileSelector* NewFileSelector()
+{
+    return new FileSelector(GetLuaScriptContext());
+}
+
+Font* NewFont()
+{
+    return new Font(GetLuaScriptContext());
+}
+
+LineEdit* NewLineEdit()
+{
+    return new LineEdit(GetLuaScriptContext());
+}
+
+ListView* NewListView()
+{
+    return new ListView(GetLuaScriptContext());
+}
+
+Menu* NewMenu()
+{
+    return new Menu(GetLuaScriptContext());
+}
+
+ScrollBar* NewScrollBar()
+{
+    return new ScrollBar(GetLuaScriptContext());
+}
+
+ScrollView* NewScrollView()
+{
+    return new ScrollView(GetLuaScriptContext());
+}
+
+Slider* NewSlider()
+{
+    return new Slider(GetLuaScriptContext());
+}
+
+Sprite* NewSprite()
+{
+    return new Sprite(GetLuaScriptContext());
+}
+
+Text* NewText()
+{
+    return new Text(GetLuaScriptContext());
+}
+
+Text3D* NewText3D()
+{
+    return new Text3D(GetLuaScriptContext());
+}
+
+UI* GetUI()
+{
+    return GetLuaScriptContext()->GetSubsystem<UI>();
+}
+
+UIElement* NewUIElement()
+{
+    return new UIElement(GetLuaScriptContext());
+}
+
+Window* NewWindow()
+{
+    return new Window(GetLuaScriptContext());
+}
+
+$}

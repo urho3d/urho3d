@@ -19,7 +19,6 @@ function Start()
 	
 	SubscribeToEvent("Update", "HandleUpdate")
 	SubscribeToEvent("KeyDown", "HandleKeyDown")
-	
 end
 
 function Stop()
@@ -119,5 +118,3 @@ function HandleKeyDown(eventType, eventData)
 		GetDebugHud():Toggle(DEBUGHUD_SHOW_PROFILER)
 	end
 end
-
-

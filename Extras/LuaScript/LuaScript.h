@@ -22,14 +22,13 @@
 
 #pragma once
 
+#include "Context.h"
 #include "Object.h"
 
 struct lua_State;
 
 namespace Urho3D
 {
-
-extern const char* LOGIC_CATEGORY;
 
 class Scene;
 
@@ -42,11 +41,11 @@ public:
     /// Construct.
     LuaScript(Context* context);
     /// Destruct. Release the AngelLuna engine.
-    ~LuaScript();    
+    ~LuaScript();
 
     /// Execute lua script file.
     bool ExecuteFile(const char* fileName);
-    
+
     /// Execute lua string.
     bool ExecuteString(const char* string);
 
@@ -58,7 +57,7 @@ public:
 
     /// Scene default scene.
     void SetDefaultScene(Scene* scene);
-    
+
     /// Return default scene.
     Scene* GetDefaultScene() const;
 
@@ -71,13 +70,13 @@ private:
 
     /// Print function.
     static int Print(lua_State* L);
-    
+
     /// PCall callback.
     static int PCallCallback(lua_State* L);
 
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
-    
+
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
 
@@ -92,6 +91,5 @@ private:
 
 Context* GetLuaScriptContext();
 void SubscribeToEvent(const char* eventType, const char* funcName);
-
 
 }

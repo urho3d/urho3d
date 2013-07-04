@@ -1,0 +1,18 @@
+$#define TOLUA_RELEASE
+
+$pfile "Physics/CollisionShape.pkg"
+$pfile "Physics/Constraint.pkg"
+$pfile "Physics/PhysicsWorld.pkg"
+$pfile "Physics/RigidBody.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)
+
+${
+
+PhysicsWorld* GetPhysicsWorld()
+{
+    return 0;
+}
+
+$}

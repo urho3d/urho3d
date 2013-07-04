@@ -1,0 +1,79 @@
+$#define TOLUA_RELEASE
+
+$#include "Animation.h"
+$#include "Font.h"
+$#include "LuaScript.h"
+$#include "Material.h"
+$#include "Model.h"
+$#include "Sound.h"
+$#include "Technique.h"
+$#include "Texture2D.h"
+$#include "TextureCube.h"
+
+$pfile "Resource/Image.pkg"
+$pfile "Resource/Resource.pkg"
+$pfile "Resource/ResourceCache.pkg"
+$pfile "Resource/XMLElement.pkg"
+$pfile "Resource/XMLFile.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)
+
+${
+
+ResourceCache* GetCache()
+{
+    return GetLuaScriptContext()->GetSubsystem<ResourceCache>();
+}
+
+Animation* ResourceCacheGetAnimation(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<Animation>(fileName);
+}
+
+Font* ResourceCacheGetFont(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<Font>(fileName);
+}
+
+Image* ResourceCacheGetImage(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<Image>(fileName);
+}
+
+Material* ResourceCacheGetMaterial(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<Material>(fileName);
+}
+
+Model* ResourceCacheGetModel(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<Model>(fileName);
+}
+
+Sound* ResourceCacheGetSound(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<Sound>(fileName);
+}
+
+Technique* ResourceCacheGetTechnique(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<Technique>(fileName);
+}
+
+Texture2D* ResourceCacheGetTexture2D(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<Texture2D>(fileName);
+}
+
+TextureCube* ResourceCacheGetTextureCube(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<TextureCube>(fileName);
+}
+
+XMLFile * ResourceCacheGetXMLFile(ResourceCache* cache, const char* fileName)
+{
+    return cache->GetResource<XMLFile>(fileName);
+}
+
+$}

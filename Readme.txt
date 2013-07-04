@@ -69,6 +69,8 @@ Urho3D uses the following third-party libraries:
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
+- Lua 5.1 (http://www.lua.org)
+- tolua++ 1.0.93 (http://www.codenix.com/~tolua)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
 Engine.

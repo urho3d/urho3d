@@ -1,0 +1,25 @@
+$#define TOLUA_RELEASE
+
+$#include "LuaScript.h"
+
+$pfile "IO/File.pkg"
+$pfile "IO/FileSystem.pkg"
+$pfile "IO/Log.pkg"
+$pfile "IO/PackageFile.pkg"
+
+$using namespace Urho3D;
+$#pragma warning(disable:4800)
+
+${
+
+FileSystem* GetFileSystem()
+{
+    return GetLuaScriptContext()->GetSubsystem<FileSystem>();
+}
+
+Log* GetLog()
+{
+    return GetLuaScriptContext()->GetSubsystem<Log>();
+}
+
+$}
