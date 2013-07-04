@@ -34,8 +34,8 @@ set (SOURCE_FILES ${SOURCE_FILES} generated/AudioLuaAPI.cpp generated/ContainerL
 
 # Define dependency libs
 set (LIBS ../../Engine/Audio ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Engine/Graphics ../../Engine/Input ../../Engine/IO ../../Engine/Math ../../Engine/Navigation ../../Engine/Network
-    ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI ../../ThirdParty/Lua ../../ThirdParty/tolua++_static)
-set (INCLUDE_DIRS_ONLY . ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/Lua/src ../../ThirdParty/tolua++/include)
+    ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI ../../ThirdParty/Lua/src ../../ThirdParty/tolua++_static)
+set (INCLUDE_DIRS_ONLY . ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
 
 # Setup target
 enable_pch ()
