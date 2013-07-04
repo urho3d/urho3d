@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,6 +33,7 @@
 #include "../../events/SDL_windowevents_c.h"
 
 #include "SDL_androidvideo.h"
+#include "SDL_androidclipboard.h"
 #include "SDL_androidevents.h"
 #include "SDL_androidkeyboard.h"
 #include "SDL_androidwindow.h"
@@ -47,7 +48,6 @@ static void Android_VideoQuit(_THIS);
 extern int Android_GL_LoadLibrary(_THIS, const char *path);
 extern void *Android_GL_GetProcAddress(_THIS, const char *proc);
 extern void Android_GL_UnloadLibrary(_THIS);
-//extern int *Android_GL_GetVisual(_THIS, Display * display, int screen);
 extern SDL_GLContext Android_GL_CreateContext(_THIS, SDL_Window * window);
 extern int Android_GL_MakeCurrent(_THIS, SDL_Window * window,
                               SDL_GLContext context);
@@ -59,11 +59,11 @@ extern void Android_GL_DeleteContext(_THIS, SDL_GLContext context);
 /* Android driver bootstrap functions */
 
 
-// These are filled in with real values in Android_SetScreenResolution on 
-// init (before SDL_main())
+/* These are filled in with real values in Android_SetScreenResolution on init (before SDL_main()) */
 int Android_ScreenWidth = 0;
 int Android_ScreenHeight = 0;
 Uint32 Android_ScreenFormat = SDL_PIXELFORMAT_UNKNOWN;
+SDL_sem *Android_PauseSem = NULL, *Android_ResumeSem = NULL;
 
 /* Currently only one window */
 SDL_Window *Android_Window = NULL;
@@ -83,18 +83,24 @@ Android_DeleteDevice(SDL_VideoDevice * device)
 static SDL_VideoDevice *
 Android_CreateDevice(int devindex)
 {
-    printf("Creating video device\n");
     SDL_VideoDevice *device;
+    SDL_VideoData *data;
 
     /* Initialize all variables that we clean on shutdown */
     device = (SDL_VideoDevice *) SDL_calloc(1, sizeof(SDL_VideoDevice));
     if (!device) {
         SDL_OutOfMemory();
-        if (device) {
-            SDL_free(device);
-        }
-        return (0);
+        return NULL;
     }
+
+    data = (SDL_VideoData*) SDL_calloc(1, sizeof(SDL_VideoData));
+    if (!data) {
+        SDL_OutOfMemory();
+        SDL_free(device);
+        return NULL;
+    }
+
+    device->driverdata = data;
 
     /* Set the function pointers */
     device->VideoInit = Android_VideoInit;
@@ -117,6 +123,20 @@ Android_CreateDevice(int devindex)
     device->GL_GetSwapInterval = Android_GL_GetSwapInterval;
     device->GL_SwapWindow = Android_GL_SwapWindow;
     device->GL_DeleteContext = Android_GL_DeleteContext;
+
+    /* Text input */
+    device->StartTextInput = Android_StartTextInput;
+    device->StopTextInput = Android_StopTextInput;
+    device->SetTextInputRect = Android_SetTextInputRect;
+
+    /* Screen keyboard */
+    device->HasScreenKeyboardSupport = Android_HasScreenKeyboardSupport;
+    device->IsScreenKeyboardShown = Android_IsScreenKeyboardShown;
+
+    /* Clipboard */
+    device->SetClipboardText = Android_SetClipboardText;
+    device->GetClipboardText = Android_GetClipboardText;
+    device->HasClipboardText = Android_HasClipboardText;
 
     return device;
 }
@@ -141,7 +161,6 @@ Android_VideoInit(_THIS)
         return -1;
     }
 
-    SDL_zero(mode);
     SDL_AddDisplayMode(&_this->displays[0], &mode);
 
     Android_InitKeyboard();
@@ -160,7 +179,7 @@ void
 Android_SetScreenResolution(int width, int height, Uint32 format)
 {
     Android_ScreenWidth = width;
-    Android_ScreenHeight = height;   
+    Android_ScreenHeight = height;
     Android_ScreenFormat = format;
 
     if (Android_Window) {

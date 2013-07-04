@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
 #include "SDL_config.h"
 
 #include "SDL_video.h"
@@ -240,9 +239,11 @@ SDL_CalculateBlit(SDL_Surface * surface)
     /* Choose a standard blit function */
     if (map->identity && !(map->info.flags & ~SDL_COPY_RLE_DESIRED)) {
         blit = SDL_BlitCopy;
-    } else if (surface->format->BitsPerPixel < 8) {
+    } else if (surface->format->BitsPerPixel < 8 &&
+               SDL_ISPIXELFORMAT_INDEXED(surface->format->format)) {
         blit = SDL_CalculateBlit0(surface);
-    } else if (surface->format->BytesPerPixel == 1) {
+    } else if (surface->format->BytesPerPixel == 1 &&
+               SDL_ISPIXELFORMAT_INDEXED(surface->format->format)) {
         blit = SDL_CalculateBlit1(surface);
     } else if (map->info.flags & SDL_COPY_BLEND) {
         blit = SDL_CalculateBlitA(surface);
@@ -261,8 +262,13 @@ SDL_CalculateBlit(SDL_Surface * surface)
     if (blit == NULL)
 #endif
     {
-        if (surface->format->BytesPerPixel > 1
-            && dst->format->BytesPerPixel > 1) {
+        Uint32 src_format = surface->format->format;
+        Uint32 dst_format = dst->format->format;
+
+        if (!SDL_ISPIXELFORMAT_INDEXED(src_format) &&
+            !SDL_ISPIXELFORMAT_FOURCC(src_format) &&
+            !SDL_ISPIXELFORMAT_INDEXED(dst_format) &&
+            !SDL_ISPIXELFORMAT_FOURCC(dst_format)) {
             blit = SDL_Blit_Slow;
         }
     }
@@ -271,11 +277,10 @@ SDL_CalculateBlit(SDL_Surface * surface)
     /* Make sure we have a blit function */
     if (blit == NULL) {
         SDL_InvalidateMap(map);
-        SDL_SetError("Blit combination not supported");
-        return (-1);
+        return SDL_SetError("Blit combination not supported");
     }
 
-    return (0);
+    return 0;
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

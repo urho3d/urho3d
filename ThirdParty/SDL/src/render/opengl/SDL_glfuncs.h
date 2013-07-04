@@ -1,6 +1,6 @@
 /* list of OpenGL functions sorted alphabetically
    If you need to use a GL function from the SDL video subsystem,
-   change it's entry from SDL_PROC_UNUSED to SDL_PROC and rebuild.
+   change its entry from SDL_PROC_UNUSED to SDL_PROC and rebuild.
 */
 #define SDL_PROC_UNUSED(ret,func,params)
 
@@ -152,7 +152,7 @@ SDL_PROC_UNUSED(void, glGetMaterialiv,
 SDL_PROC_UNUSED(void, glGetPixelMapfv, (GLenum map, GLfloat * values))
 SDL_PROC_UNUSED(void, glGetPixelMapuiv, (GLenum map, GLuint * values))
 SDL_PROC_UNUSED(void, glGetPixelMapusv, (GLenum map, GLushort * values))
-SDL_PROC_UNUSED(void, glGetPointerv, (GLenum pname, GLvoid * *params))
+SDL_PROC(void, glGetPointerv, (GLenum pname, GLvoid * *params))
 SDL_PROC_UNUSED(void, glGetPolygonStipple, (GLubyte * mask))
 SDL_PROC(const GLubyte *, glGetString, (GLenum name))
 SDL_PROC_UNUSED(void, glGetTexEnvfv,
@@ -279,14 +279,14 @@ SDL_PROC_UNUSED(void, glPolygonOffset, (GLfloat factor, GLfloat units))
 SDL_PROC_UNUSED(void, glPolygonStipple, (const GLubyte * mask))
 SDL_PROC_UNUSED(void, glPopAttrib, (void))
 SDL_PROC_UNUSED(void, glPopClientAttrib, (void))
-SDL_PROC_UNUSED(void, glPopMatrix, (void))
+SDL_PROC(void, glPopMatrix, (void))
 SDL_PROC_UNUSED(void, glPopName, (void))
 SDL_PROC_UNUSED(void, glPrioritizeTextures,
                 (GLsizei n, const GLuint * textures,
                  const GLclampf * priorities))
 SDL_PROC_UNUSED(void, glPushAttrib, (GLbitfield mask))
 SDL_PROC_UNUSED(void, glPushClientAttrib, (GLbitfield mask))
-SDL_PROC_UNUSED(void, glPushMatrix, (void))
+SDL_PROC(void, glPushMatrix, (void))
 SDL_PROC_UNUSED(void, glPushName, (GLuint name))
 SDL_PROC_UNUSED(void, glRasterPos2d, (GLdouble x, GLdouble y))
 SDL_PROC_UNUSED(void, glRasterPos2dv, (const GLdouble * v))
@@ -322,16 +322,16 @@ SDL_PROC(void, glReadPixels,
 SDL_PROC_UNUSED(void, glRectd,
                 (GLdouble x1, GLdouble y1, GLdouble x2, GLdouble y2))
 SDL_PROC_UNUSED(void, glRectdv, (const GLdouble * v1, const GLdouble * v2))
-SDL_PROC_UNUSED(void, glRectf,
+SDL_PROC(void, glRectf,
                 (GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2))
 SDL_PROC_UNUSED(void, glRectfv, (const GLfloat * v1, const GLfloat * v2))
-SDL_PROC(void, glRecti, (GLint x1, GLint y1, GLint x2, GLint y2))
+SDL_PROC_UNUSED(void, glRecti, (GLint x1, GLint y1, GLint x2, GLint y2))
 SDL_PROC_UNUSED(void, glRectiv, (const GLint * v1, const GLint * v2))
 SDL_PROC_UNUSED(void, glRects,
                 (GLshort x1, GLshort y1, GLshort x2, GLshort y2))
 SDL_PROC_UNUSED(void, glRectsv, (const GLshort * v1, const GLshort * v2))
 SDL_PROC_UNUSED(GLint, glRenderMode, (GLenum mode))
-SDL_PROC_UNUSED(void, glRotated,
+SDL_PROC(void, glRotated,
                 (GLdouble angle, GLdouble x, GLdouble y, GLdouble z))
 SDL_PROC_UNUSED(void, glRotatef,
                 (GLfloat angle, GLfloat x, GLfloat y, GLfloat z))
@@ -419,7 +419,7 @@ SDL_PROC(void, glTexSubImage2D,
           GLsizei width, GLsizei height, GLenum format, GLenum type,
           const GLvoid * pixels))
 SDL_PROC_UNUSED(void, glTranslated, (GLdouble x, GLdouble y, GLdouble z))
-SDL_PROC_UNUSED(void, glTranslatef, (GLfloat x, GLfloat y, GLfloat z))
+SDL_PROC(void, glTranslatef, (GLfloat x, GLfloat y, GLfloat z))
 SDL_PROC_UNUSED(void, glVertex2d, (GLdouble x, GLdouble y))
 SDL_PROC_UNUSED(void, glVertex2dv, (const GLdouble * v))
 SDL_PROC(void, glVertex2f, (GLfloat x, GLfloat y))

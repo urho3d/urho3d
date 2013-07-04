@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,12 +23,13 @@
 /* This is the system specific header for the SDL joystick API */
 
 #include "SDL_joystick.h"
+#include "SDL_joystick_c.h"
 
 /* The SDL joystick structure */
 struct _SDL_Joystick
 {
-    Uint8 index;                /* Device index */
-    const char *name;           /* Joystick name - system dependent */
+    SDL_JoystickID instance_id; /* Device instance, monotonically increasing from 0 */
+    char *name;                 /* Joystick name - system dependent */
 
     int naxes;                  /* Number of axis controls on the joystick */
     Sint16 *axes;               /* Current axis states */
@@ -37,8 +38,7 @@ struct _SDL_Joystick
     Uint8 *hats;                /* Current hat states */
 
     int nballs;                 /* Number of trackballs on the joystick */
-    struct balldelta
-    {
+    struct balldelta {
         int dx;
         int dy;
     } *balls;                   /* Current ball motion deltas */
@@ -49,6 +49,10 @@ struct _SDL_Joystick
     struct joystick_hwdata *hwdata;     /* Driver dependent information */
 
     int ref_count;              /* Reference count for multiple opens */
+
+    Uint8 closed;               /* 1 if this device is no longer valid */
+    Uint8 uncentered;           /* 1 if this device needs to have its state reset to 0 */
+    struct _SDL_Joystick *next; /* pointer to next joystick we have allocated */
 };
 
 /* Function to scan the system for joysticks.
@@ -58,15 +62,32 @@ struct _SDL_Joystick
  */
 extern int SDL_SYS_JoystickInit(void);
 
+/* Function to return the number of joystick devices plugged in right now */
+extern int SDL_SYS_NumJoysticks();
+
+/* Function to cause any queued joystick insertions to be processed */
+extern void SDL_SYS_JoystickDetect();
+
+/* Function to determine if the joystick loop needs to run right now */
+extern SDL_bool SDL_SYS_JoystickNeedsPolling();
+
 /* Function to get the device-dependent name of a joystick */
-extern const char *SDL_SYS_JoystickName(int index);
+extern const char *SDL_SYS_JoystickNameForDeviceIndex(int device_index);
+
+/* Function to get the current instance id of the joystick located at device_index */
+extern SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index);
 
 /* Function to open a joystick for use.
    The joystick to open is specified by the index field of the joystick.
    This should fill the nbuttons and naxes fields of the joystick structure.
    It returns 0, or -1 if there is an error.
  */
-extern int SDL_SYS_JoystickOpen(SDL_Joystick * joystick);
+extern int SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index);
+
+/* Function to query if the joystick is currently attached
+ *   It returns 1 if attached, 0 otherwise.
+ */
+extern SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick * joystick);
 
 /* Function to update the state of a joystick - called as a device poll.
  * This function shouldn't update the joystick structure directly,
@@ -80,5 +101,16 @@ extern void SDL_SYS_JoystickClose(SDL_Joystick * joystick);
 
 /* Function to perform any system-specific joystick related cleanup */
 extern void SDL_SYS_JoystickQuit(void);
+
+/* Function to return the stable GUID for a plugged in device */
+extern SDL_JoystickGUID SDL_SYS_JoystickGetDeviceGUID(int device_index);
+
+/* Function to return the stable GUID for a opened joystick */
+extern SDL_JoystickGUID SDL_SYS_JoystickGetGUID(SDL_Joystick * joystick);
+
+#ifdef SDL_JOYSTICK_DINPUT
+/* Function to get the current instance id of the joystick located at device_index */
+extern SDL_bool SDL_SYS_IsXInputDeviceIndex( int device_index );
+#endif
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,21 +22,6 @@
 
 #ifndef _SDL_x11mouse_h
 #define _SDL_x11mouse_h
-
-#if SDL_VIDEO_DRIVER_X11_XINPUT
-typedef struct X11_MouseData
-{
-    Display *display;
-    XDevice *device;
-    int motion;
-    int button_pressed;
-    int button_released;
-    int proximity_in;
-    int proximity_out;
-    int num_xevents;
-    XEventClass xevents[5];
-} X11_MouseData;
-#endif
 
 extern void X11_InitMouse(_THIS);
 extern void X11_QuitMouse(_THIS);

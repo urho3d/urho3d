@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,13 +19,13 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * A default blank 8x8 cursor                                                */
 
-#define BLANK_CWIDTH	8
-#define BLANK_CHEIGHT	8
-#define BLANK_CHOTX	0
-#define BLANK_CHOTY	0
+#define BLANK_CWIDTH    8
+#define BLANK_CHEIGHT   8
+#define BLANK_CHOTX 0
+#define BLANK_CHOTY 0
 
 static const unsigned char blank_cdata[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 static const unsigned char blank_cmask[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };

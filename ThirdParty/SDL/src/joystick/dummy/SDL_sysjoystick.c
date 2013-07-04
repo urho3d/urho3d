@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,23 +29,40 @@
 #include "../SDL_joystick_c.h"
 
 /* Function to scan the system for joysticks.
- * This function should set SDL_numjoysticks to the number of available
- * joysticks.  Joystick 0 should be the system default joystick.
  * It should return 0, or -1 on an unrecoverable fatal error.
  */
 int
 SDL_SYS_JoystickInit(void)
 {
-    SDL_numjoysticks = 0;
     return (0);
+}
+
+int SDL_SYS_NumJoysticks()
+{
+    return 0;
+}
+
+void SDL_SYS_JoystickDetect()
+{
+}
+
+SDL_bool SDL_SYS_JoystickNeedsPolling()
+{
+    return SDL_FALSE;
 }
 
 /* Function to get the device-dependent name of a joystick */
 const char *
-SDL_SYS_JoystickName(int index)
+SDL_SYS_JoystickNameForDeviceIndex(int device_index)
 {
     SDL_SetError("Logic error: No joysticks available");
     return (NULL);
+}
+
+/* Function to perform the mapping from device index to the instance id for this index */
+SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index)
+{
+    return device_index;
 }
 
 /* Function to open a joystick for use.
@@ -54,10 +71,15 @@ SDL_SYS_JoystickName(int index)
    It returns 0, or -1 if there is an error.
  */
 int
-SDL_SYS_JoystickOpen(SDL_Joystick * joystick)
+SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
 {
-    SDL_SetError("Logic error: No joysticks available");
-    return (-1);
+    return SDL_SetError("Logic error: No joysticks available");
+}
+
+/* Function to determine is this joystick is attached to the system right now */
+SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
+{
+    return SDL_TRUE;
 }
 
 /* Function to update the state of a joystick - called as a device poll.
@@ -83,6 +105,27 @@ void
 SDL_SYS_JoystickQuit(void)
 {
     return;
+}
+
+SDL_JoystickGUID SDL_SYS_JoystickGetDeviceGUID( int device_index )
+{
+    SDL_JoystickGUID guid;
+    /* the GUID is just the first 16 chars of the name for now */
+    const char *name = SDL_SYS_JoystickNameForDeviceIndex( device_index );
+    SDL_zero( guid );
+    SDL_memcpy( &guid, name, SDL_min( sizeof(guid), SDL_strlen( name ) ) );
+    return guid;
+}
+
+
+SDL_JoystickGUID SDL_SYS_JoystickGetGUID(SDL_Joystick * joystick)
+{
+    SDL_JoystickGUID guid;
+    /* the GUID is just the first 16 chars of the name for now */
+    const char *name = joystick->name;
+    SDL_zero( guid );
+    SDL_memcpy( &guid, name, SDL_min( sizeof(guid), SDL_strlen( name ) ) );
+    return guid;
 }
 
 #endif /* SDL_JOYSTICK_DUMMY || SDL_JOYSTICK_DISABLED */

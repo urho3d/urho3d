@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,19 +30,11 @@
 SDL_bool
 SDL_GetPowerInfo_Windows(SDL_PowerState * state, int *seconds, int *percent)
 {
-#ifdef _WIN32_WCE
-    SYSTEM_POWER_STATUS_EX status;
-#else
     SYSTEM_POWER_STATUS status;
-#endif
     SDL_bool need_details = SDL_FALSE;
 
-    /* This API should exist back to Win95 and Windows CE. */
-#ifdef _WIN32_WCE
-    if (!GetSystemPowerStatusEx(&status, FALSE))
-#else
+    /* This API should exist back to Win95. */
     if (!GetSystemPowerStatus(&status))
-#endif
     {
         /* !!! FIXME: push GetLastError() into SDL_GetError() */
         *state = SDL_POWERSTATE_UNKNOWN;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@
 #include "../SDL_sysvideo.h"
 
 #ifndef __IPHONE_6_0
-// This enum isn't available in older SDKs, but we use it for our own purposes on iOS 5.1 and for the system on iOS 6.0
+/* This enum isn't available in older SDKs, but we use it for our own purposes on iOS 5.1 and for the system on iOS 6.0 */
 enum UIInterfaceOrientationMask
 {
     UIInterfaceOrientationMaskPortrait = (1 << UIInterfaceOrientationPortrait),
@@ -37,7 +37,7 @@ enum UIInterfaceOrientationMask
     UIInterfaceOrientationMaskAll = (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight | UIInterfaceOrientationMaskPortraitUpsideDown),
     UIInterfaceOrientationMaskAllButUpsideDown = (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight),
 };
-#endif // !__IPHONE_6_0
+#endif /* !__IPHONE_6_0 */
 
 
 #endif /* _SDL_uikitvideo_h */

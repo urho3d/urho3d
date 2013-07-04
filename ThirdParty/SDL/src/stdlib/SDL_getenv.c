@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,18 +22,19 @@
 
 #include "SDL_stdinc.h"
 
-#ifndef HAVE_GETENV
-
-#if defined(__WIN32__) && !defined(_WIN32_WCE)
-
+#if !defined(SDL_setenv) && defined(__WIN32__)
 #include "../core/windows/SDL_windows.h"
-
 /* Note this isn't thread-safe! */
-
 static char *SDL_envmem = NULL; /* Ugh, memory leak */
 static size_t SDL_envmemlen = 0;
+#endif
+
 
 /* Put a variable into the environment */
+#ifdef SDL_setenv
+#undef SDL_setenv
+int SDL_setenv(const char *name, const char *value, int overwrite) { return SDL_setenv_inline(name, value, overwrite); }
+#elif defined(__WIN32__)
 int
 SDL_setenv(const char *name, const char *value, int overwrite)
 {
@@ -49,35 +50,34 @@ SDL_setenv(const char *name, const char *value, int overwrite)
     }
     return 0;
 }
-
-/* Retrieve a variable named "name" from the environment */
-char *
-SDL_getenv(const char *name)
+/* We have a real environment table, but no real setenv? Fake it w/ putenv. */
+#elif (defined(HAVE_GETENV) && defined(HAVE_PUTENV) && !defined(HAVE_SETENV))
+int
+SDL_setenv(const char *name, const char *value, int overwrite)
 {
-    size_t bufferlen;
+    size_t len;
+    char *new_variable;
 
-    bufferlen =
-        GetEnvironmentVariableA(name, SDL_envmem, (DWORD) SDL_envmemlen);
-    if (bufferlen == 0) {
-        return NULL;
-    }
-    if (bufferlen > SDL_envmemlen) {
-        char *newmem = (char *) SDL_realloc(SDL_envmem, bufferlen);
-        if (newmem == NULL) {
-            return NULL;
+    if (getenv(name) != NULL) {
+        if (overwrite) {
+            unsetenv(name);
+        } else {
+            return 0;  /* leave the existing one there. */
         }
-        SDL_envmem = newmem;
-        SDL_envmemlen = bufferlen;
-        GetEnvironmentVariableA(name, SDL_envmem, (DWORD) SDL_envmemlen);
     }
-    return SDL_envmem;
+
+    /* This leaks. Sorry. Get a better OS so we don't have to do this. */
+    len = SDL_strlen(name) + SDL_strlen(value) + 2;
+    new_variable = (char *) SDL_malloc(len);
+    if (!new_variable) {
+        return (-1);
+    }
+
+    SDL_snprintf(new_variable, len, "%s=%s", name, value);
+    return putenv(new_variable);
 }
-
 #else /* roll our own */
-
 static char **SDL_env = (char **) 0;
-
-/* Put a variable into the environment */
 int
 SDL_setenv(const char *name, const char *value, int overwrite)
 {
@@ -140,8 +140,35 @@ SDL_setenv(const char *name, const char *value, int overwrite)
     }
     return (added ? 0 : -1);
 }
+#endif
 
 /* Retrieve a variable named "name" from the environment */
+#ifdef SDL_getenv
+#undef SDL_getenv
+char *SDL_getenv(const char *name) { return SDL_getenv_inline(name); }
+#elif defined(__WIN32__)
+char *
+SDL_getenv(const char *name)
+{
+    size_t bufferlen;
+
+    bufferlen =
+        GetEnvironmentVariableA(name, SDL_envmem, (DWORD) SDL_envmemlen);
+    if (bufferlen == 0) {
+        return NULL;
+    }
+    if (bufferlen > SDL_envmemlen) {
+        char *newmem = (char *) SDL_realloc(SDL_envmem, bufferlen);
+        if (newmem == NULL) {
+            return NULL;
+        }
+        SDL_envmem = newmem;
+        SDL_envmemlen = bufferlen;
+        GetEnvironmentVariableA(name, SDL_envmem, (DWORD) SDL_envmemlen);
+    }
+    return SDL_envmem;
+}
+#else
 char *
 SDL_getenv(const char *name)
 {
@@ -159,38 +186,6 @@ SDL_getenv(const char *name)
         }
     }
     return value;
-}
-
-#endif /* __WIN32__ */
-
-#endif /* !HAVE_GETENV */
-
-
-/* We have a real environment table, but no real setenv? Fake it w/ putenv. */
-#if (defined(HAVE_GETENV) && defined(HAVE_PUTENV) && !defined(HAVE_SETENV))
-int
-SDL_setenv(const char *name, const char *value, int overwrite)
-{
-    size_t len;
-    char *new_variable;
-
-    if (getenv(name) != NULL) {
-        if (overwrite) {
-            unsetenv(name);
-        } else {
-            return 0;  /* leave the existing one there. */
-        }
-    }
-
-    /* This leaks. Sorry. Get a better OS so we don't have to do this. */
-    len = SDL_strlen(name) + SDL_strlen(value) + 2;
-    new_variable = (char *) SDL_malloc(len);
-    if (!new_variable) {
-        return (-1);
-    }
-
-    SDL_snprintf(new_variable, len, "%s=%s", name, value);
-    return putenv(new_variable);
 }
 #endif
 

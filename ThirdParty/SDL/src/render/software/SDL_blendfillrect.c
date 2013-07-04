@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -159,8 +159,7 @@ SDL_BlendFillRect_RGB(SDL_Surface * dst, const SDL_Rect * rect,
         }
         return 0;
     default:
-        SDL_Unsupported();
-        return -1;
+        return SDL_Unsupported();
     }
 }
 
@@ -189,8 +188,7 @@ SDL_BlendFillRect_RGBA(SDL_Surface * dst, const SDL_Rect * rect,
         }
         return 0;
     default:
-        SDL_Unsupported();
-        return -1;
+        return SDL_Unsupported();
     }
 }
 
@@ -201,14 +199,12 @@ SDL_BlendFillRect(SDL_Surface * dst, const SDL_Rect * rect,
     SDL_Rect clipped;
 
     if (!dst) {
-        SDL_SetError("Passed NULL destination surface");
-        return -1;
+        return SDL_SetError("Passed NULL destination surface");
     }
 
     /* This function doesn't work on surfaces < 8 bpp */
     if (dst->format->BitsPerPixel < 8) {
-        SDL_SetError("SDL_BlendFillRect(): Unsupported surface format");
-        return -1;
+        return SDL_SetError("SDL_BlendFillRect(): Unsupported surface format");
     }
 
     /* If 'rect' == NULL, then fill the whole surface */
@@ -274,14 +270,12 @@ SDL_BlendFillRects(SDL_Surface * dst, const SDL_Rect * rects, int count,
     int status = 0;
 
     if (!dst) {
-        SDL_SetError("Passed NULL destination surface");
-        return -1;
+        return SDL_SetError("Passed NULL destination surface");
     }
 
     /* This function doesn't work on surfaces < 8 bpp */
     if (dst->format->BitsPerPixel < 8) {
-        SDL_SetError("SDL_BlendFillRects(): Unsupported surface format");
-        return -1;
+        return SDL_SetError("SDL_BlendFillRects(): Unsupported surface format");
     }
 
     if (blendMode == SDL_BLENDMODE_BLEND || blendMode == SDL_BLENDMODE_ADD) {

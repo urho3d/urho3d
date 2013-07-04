@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,11 +23,11 @@
 #ifndef _SDL_gesture_c_h
 #define _SDL_gesture_c_h
 
+extern int SDL_GestureAddTouch(SDL_TouchID touchId);
+
 extern void SDL_GestureProcessEvent(SDL_Event* event);
 
 extern int SDL_RecordGesture(SDL_TouchID touchId);
-
-extern int SDL_GestureAddTouch(SDL_Touch* touch);
 
 #endif /* _SDL_gesture_c_h */
 

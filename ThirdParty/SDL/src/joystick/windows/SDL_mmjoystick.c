@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,14 +33,14 @@
 #include "../SDL_sysjoystick.h"
 #include "../SDL_joystick_c.h"
 
-#define MAX_JOYSTICKS	16
-#define MAX_AXES	6       /* each joystick can have up to 6 axes */
-#define MAX_BUTTONS	32      /* and 32 buttons                      */
-#define AXIS_MIN	-32768  /* minimum value for axis coordinate */
-#define AXIS_MAX	32767   /* maximum value for axis coordinate */
+#define MAX_JOYSTICKS   16
+#define MAX_AXES    6       /* each joystick can have up to 6 axes */
+#define MAX_BUTTONS 32      /* and 32 buttons                      */
+#define AXIS_MIN    -32768  /* minimum value for axis coordinate */
+#define AXIS_MAX    32767   /* maximum value for axis coordinate */
 /* limit axis to 256 possible positions to filter out noise */
 #define JOY_AXIS_THRESHOLD      (((AXIS_MAX)-(AXIS_MIN))/256)
-#define JOY_BUTTON_FLAG(n)	(1<<n)
+#define JOY_BUTTON_FLAG(n)  (1<<n)
 
 
 /* array to hold joystick ID values */
@@ -135,6 +135,8 @@ GetJoystickName(int index, const char *szRegKey)
     return (name);
 }
 
+static int SDL_SYS_numjoysticks = 0;
+
 /* Function to scan the system for joysticks.
  * This function should set SDL_numjoysticks to the number of available
  * joysticks.  Joystick 0 should be the system default joystick.
@@ -145,7 +147,6 @@ SDL_SYS_JoystickInit(void)
 {
     int i;
     int maxdevs;
-    int numdevs;
     JOYINFOEX joyinfo;
     JOYCAPS joycaps;
     MMRESULT result;
@@ -157,9 +158,9 @@ SDL_SYS_JoystickInit(void)
     }
 
     /* Loop over all potential joystick devices */
-    numdevs = 0;
+    SDL_SYS_numjoysticks = 0;
     maxdevs = joyGetNumDevs();
-    for (i = JOYSTICKID1; i < maxdevs && numdevs < MAX_JOYSTICKS; ++i) {
+    for (i = JOYSTICKID1; i < maxdevs && SDL_SYS_numjoysticks < MAX_JOYSTICKS; ++i) {
 
         joyinfo.dwSize = sizeof(joyinfo);
         joyinfo.dwFlags = JOY_RETURNALL;
@@ -167,26 +168,46 @@ SDL_SYS_JoystickInit(void)
         if (result == JOYERR_NOERROR) {
             result = joyGetDevCaps(i, &joycaps, sizeof(joycaps));
             if (result == JOYERR_NOERROR) {
-                SYS_JoystickID[numdevs] = i;
-                SYS_Joystick[numdevs] = joycaps;
-                SYS_JoystickName[numdevs] =
+                SYS_JoystickID[SDL_SYS_numjoysticks] = i;
+                SYS_Joystick[SDL_SYS_numjoysticks] = joycaps;
+                SYS_JoystickName[SDL_SYS_numjoysticks] =
                     GetJoystickName(i, joycaps.szRegKey);
-                numdevs++;
+                SDL_SYS_numjoysticks++;
             }
         }
     }
-    return (numdevs);
+    return (SDL_SYS_numjoysticks);
+}
+
+int SDL_SYS_NumJoysticks()
+{
+    return SDL_SYS_numjoysticks;
+}
+
+void SDL_SYS_JoystickDetect()
+{
+}
+
+SDL_bool SDL_SYS_JoystickNeedsPolling()
+{
+    return SDL_FALSE;
 }
 
 /* Function to get the device-dependent name of a joystick */
 const char *
-SDL_SYS_JoystickName(int index)
+SDL_SYS_JoystickNameForDeviceIndex(int device_index)
 {
-    if (SYS_JoystickName[index] != NULL) {
-        return (SYS_JoystickName[index]);
+    if (SYS_JoystickName[device_index] != NULL) {
+        return (SYS_JoystickName[device_index]);
     } else {
-        return (SYS_Joystick[index].szPname);
+        return (SYS_Joystick[device_index].szPname);
     }
+}
+
+/* Function to perform the mapping from device index to the instance id for this index */
+SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index)
+{
+    return device_index;
 }
 
 /* Function to open a joystick for use.
@@ -195,7 +216,7 @@ SDL_SYS_JoystickName(int index)
    It returns 0, or -1 if there is an error.
  */
 int
-SDL_SYS_JoystickOpen(SDL_Joystick * joystick)
+SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
 {
     int index, i;
     int caps_flags[MAX_AXES - 2] =
@@ -204,7 +225,7 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick)
 
 
     /* shortcut */
-    index = joystick->index;
+    index = device_index;
     axis_min[0] = SYS_Joystick[index].wXmin;
     axis_max[0] = SYS_Joystick[index].wXmax;
     axis_min[1] = SYS_Joystick[index].wYmin;
@@ -219,11 +240,11 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick)
     axis_max[5] = SYS_Joystick[index].wVmax;
 
     /* allocate memory for system specific hardware data */
+    joystick->instance_id = device_index;
     joystick->hwdata =
         (struct joystick_hwdata *) SDL_malloc(sizeof(*joystick->hwdata));
     if (joystick->hwdata == NULL) {
-        SDL_OutOfMemory();
-        return (-1);
+        return SDL_OutOfMemory();
     }
     SDL_memset(joystick->hwdata, 0, sizeof(*joystick->hwdata));
 
@@ -249,6 +270,12 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick)
         joystick->nhats = 0;
     }
     return (0);
+}
+
+/* Function to determine is this joystick is attached to the system right now */
+SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
+{
+    return SDL_TRUE;
 }
 
 static Uint8
@@ -377,6 +404,26 @@ SDL_SYS_JoystickQuit(void)
     }
 }
 
+SDL_JoystickGUID SDL_SYS_JoystickGetDeviceGUID( int device_index )
+{
+    SDL_JoystickGUID guid;
+    /* the GUID is just the first 16 chars of the name for now */
+    const char *name = SDL_SYS_JoystickNameForDeviceIndex( device_index );
+    SDL_zero( guid );
+    SDL_memcpy( &guid, name, SDL_min( sizeof(guid), SDL_strlen( name ) ) );
+    return guid;
+}
+
+SDL_JoystickGUID SDL_SYS_JoystickGetGUID(SDL_Joystick * joystick)
+{
+    SDL_JoystickGUID guid;
+    /* the GUID is just the first 16 chars of the name for now */
+    const char *name = joystick->name;
+    SDL_zero( guid );
+    SDL_memcpy( &guid, name, SDL_min( sizeof(guid), SDL_strlen( name ) ) );
+    return guid;
+}
+
 
 /* implementation functions */
 void
@@ -423,4 +470,5 @@ SetMMerror(char *function, int code)
 }
 
 #endif /* SDL_JOYSTICK_WINMM */
+
 /* vi: set ts=4 sw=4 expandtab: */

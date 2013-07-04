@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 
 /**
  *  \file SDL_rwops.h
- *  
+ *
  *  This file provides a general interface for SDL to read and write
  *  data streams.  It can easily be extended to files, memory, etc.
  */
@@ -35,10 +35,16 @@
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
-/* *INDENT-OFF* */
 extern "C" {
-/* *INDENT-ON* */
 #endif
+
+/* RWops Types */
+#define SDL_RWOPS_UNKNOWN   0   /* Unknown stream type */
+#define SDL_RWOPS_WINFILE   1   /* Win32 file */
+#define SDL_RWOPS_STDFILE   2   /* Stdio file */
+#define SDL_RWOPS_JNIFILE   3   /* Android asset */
+#define SDL_RWOPS_MEMORY    4   /* Memory stream */
+#define SDL_RWOPS_MEMORY_RO 5   /* Read-Only memory stream */
 
 /**
  * This is the read/write operation structure -- very basic.
@@ -46,35 +52,40 @@ extern "C" {
 typedef struct SDL_RWops
 {
     /**
+     *  Return the size of the file in this rwops, or -1 if unknown
+     */
+    Sint64 (SDLCALL * size) (struct SDL_RWops * context);
+
+    /**
      *  Seek to \c offset relative to \c whence, one of stdio's whence values:
      *  RW_SEEK_SET, RW_SEEK_CUR, RW_SEEK_END
-     *  
-     *  \return the final offset in the data stream.
+     *
+     *  \return the final offset in the data stream, or -1 on error.
      */
-    long (SDLCALL * seek) (struct SDL_RWops * context, long offset,
-                           int whence);
+    Sint64 (SDLCALL * seek) (struct SDL_RWops * context, Sint64 offset,
+                             int whence);
 
     /**
      *  Read up to \c maxnum objects each of size \c size from the data
      *  stream to the area pointed at by \c ptr.
-     *  
+     *
      *  \return the number of objects read, or 0 at error or end of file.
      */
-    size_t(SDLCALL * read) (struct SDL_RWops * context, void *ptr,
-                            size_t size, size_t maxnum);
+    size_t (SDLCALL * read) (struct SDL_RWops * context, void *ptr,
+                             size_t size, size_t maxnum);
 
     /**
      *  Write exactly \c num objects each of size \c size from the area
      *  pointed at by \c ptr to data stream.
-     *  
+     *
      *  \return the number of objects written, or 0 at error or end of file.
      */
-    size_t(SDLCALL * write) (struct SDL_RWops * context, const void *ptr,
-                             size_t size, size_t num);
+    size_t (SDLCALL * write) (struct SDL_RWops * context, const void *ptr,
+                              size_t size, size_t num);
 
     /**
      *  Close and free an allocated SDL_RWops structure.
-     *  
+     *
      *  \return 0 if successful or -1 on write error when flushing data.
      */
     int (SDLCALL * close) (struct SDL_RWops * context);
@@ -89,8 +100,11 @@ typedef struct SDL_RWops
             void *inputStreamRef;
             void *readableByteChannelRef;
             void *readMethod;
+            void *assetFileDescriptorRef;
             long position;
-            int size;
+            long size;
+            long offset;
+            int fd;
         } androidio;
 #elif defined(__WIN32__)
         struct
@@ -122,6 +136,7 @@ typedef struct SDL_RWops
         struct
         {
             void *data1;
+            void *data2;
         } unknown;
     } hidden;
 
@@ -130,7 +145,7 @@ typedef struct SDL_RWops
 
 /**
  *  \name RWFrom functions
- *  
+ *
  *  Functions to create SDL_RWops structures from various data streams.
  */
 /*@{*/
@@ -156,30 +171,32 @@ extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromConstMem(const void *mem,
 extern DECLSPEC SDL_RWops *SDLCALL SDL_AllocRW(void);
 extern DECLSPEC void SDLCALL SDL_FreeRW(SDL_RWops * area);
 
-#define RW_SEEK_SET	0       /**< Seek from the beginning of data */
-#define RW_SEEK_CUR	1       /**< Seek relative to current read point */
-#define RW_SEEK_END	2       /**< Seek relative to the end of data */
+#define RW_SEEK_SET 0       /**< Seek from the beginning of data */
+#define RW_SEEK_CUR 1       /**< Seek relative to current read point */
+#define RW_SEEK_END 2       /**< Seek relative to the end of data */
 
 /**
  *  \name Read/write macros
- *  
+ *
  *  Macros to easily read and write from an SDL_RWops structure.
  */
 /*@{*/
-#define SDL_RWseek(ctx, offset, whence)	(ctx)->seek(ctx, offset, whence)
-#define SDL_RWtell(ctx)			(ctx)->seek(ctx, 0, RW_SEEK_CUR)
-#define SDL_RWread(ctx, ptr, size, n)	(ctx)->read(ctx, ptr, size, n)
-#define SDL_RWwrite(ctx, ptr, size, n)	(ctx)->write(ctx, ptr, size, n)
-#define SDL_RWclose(ctx)		(ctx)->close(ctx)
+#define SDL_RWsize(ctx)         (ctx)->size(ctx)
+#define SDL_RWseek(ctx, offset, whence) (ctx)->seek(ctx, offset, whence)
+#define SDL_RWtell(ctx)         (ctx)->seek(ctx, 0, RW_SEEK_CUR)
+#define SDL_RWread(ctx, ptr, size, n)   (ctx)->read(ctx, ptr, size, n)
+#define SDL_RWwrite(ctx, ptr, size, n)  (ctx)->write(ctx, ptr, size, n)
+#define SDL_RWclose(ctx)        (ctx)->close(ctx)
 /*@}*//*Read/write macros*/
 
 
-/** 
+/**
  *  \name Read endian functions
- *  
+ *
  *  Read an item of the specified endianness and return in native format.
  */
 /*@{*/
+extern DECLSPEC Uint8 SDLCALL SDL_ReadU8(SDL_RWops * src);
 extern DECLSPEC Uint16 SDLCALL SDL_ReadLE16(SDL_RWops * src);
 extern DECLSPEC Uint16 SDLCALL SDL_ReadBE16(SDL_RWops * src);
 extern DECLSPEC Uint32 SDLCALL SDL_ReadLE32(SDL_RWops * src);
@@ -188,12 +205,13 @@ extern DECLSPEC Uint64 SDLCALL SDL_ReadLE64(SDL_RWops * src);
 extern DECLSPEC Uint64 SDLCALL SDL_ReadBE64(SDL_RWops * src);
 /*@}*//*Read endian functions*/
 
-/** 
+/**
  *  \name Write endian functions
- *  
+ *
  *  Write an item of native format to the specified endianness.
  */
 /*@{*/
+extern DECLSPEC size_t SDLCALL SDL_WriteU8(SDL_RWops * dst, Uint8 value);
 extern DECLSPEC size_t SDLCALL SDL_WriteLE16(SDL_RWops * dst, Uint16 value);
 extern DECLSPEC size_t SDLCALL SDL_WriteBE16(SDL_RWops * dst, Uint16 value);
 extern DECLSPEC size_t SDLCALL SDL_WriteLE32(SDL_RWops * dst, Uint32 value);
@@ -205,9 +223,7 @@ extern DECLSPEC size_t SDLCALL SDL_WriteBE64(SDL_RWops * dst, Uint64 value);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
-/* *INDENT-OFF* */
 }
-/* *INDENT-ON* */
 #endif
 #include "close_code.h"
 

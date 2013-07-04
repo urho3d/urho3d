@@ -1,7 +1,7 @@
 
 Please distribute this file with the SDL runtime environment:
 
-The Simple DirectMedia Layer (SDL for short) is a cross-platfrom library
+The Simple DirectMedia Layer (SDL for short) is a cross-platform library
 designed to make it easy to write multi-media software, such as games and
 emulators.
 

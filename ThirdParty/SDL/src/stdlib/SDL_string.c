@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,11 +18,25 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 /* This file contains portable string manipulation functions for SDL */
 
 #include "SDL_stdinc.h"
+
+/* these are always #defined, make them real symbol in the library, too... */
+#undef SDL_itoa
+#undef SDL_uitoa
+#undef SDL_atoi
+#undef SDL_atof
+char *SDL_itoa(int value, char *str, int radix) { return SDL_itoa_inline(value, str, radix); }
+char *SDL_uitoa(unsigned int value, char *str, int radix) { return SDL_uitoa_inline(value, str, radix); }
+int SDL_atoi(const char *str) { return SDL_atoi_inline(str); }
+double SDL_atof(const char *str) { return SDL_atof_inline(str); }
+
 
 
 #define SDL_isupperhex(X)   (((X) >= 'A') && ((X) <= 'F'))
@@ -43,7 +57,7 @@ static int UTF8_TrailingBytes(unsigned char c)
         return 0;
 }
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOL)
+#if !defined(SDL_sscanf) || !defined(SDL_strtol)
 static size_t
 SDL_ScanLong(const char *text, int radix, long *valuep)
 {
@@ -84,7 +98,7 @@ SDL_ScanLong(const char *text, int radix, long *valuep)
 }
 #endif
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOUL) || !defined(HAVE_STRTOD)
+#if !defined(SDL_sscanf) || !defined(SDL_strtoul) || !defined(SDL_strtod)
 static size_t
 SDL_ScanUnsignedLong(const char *text, int radix, unsigned long *valuep)
 {
@@ -116,7 +130,7 @@ SDL_ScanUnsignedLong(const char *text, int radix, unsigned long *valuep)
 }
 #endif
 
-#ifndef HAVE_SSCANF
+#ifndef SDL_sscanf
 static size_t
 SDL_ScanUintPtrT(const char *text, int radix, uintptr_t * valuep)
 {
@@ -148,7 +162,7 @@ SDL_ScanUintPtrT(const char *text, int radix, uintptr_t * valuep)
 }
 #endif
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOLL)
+#if !defined(SDL_sscanf) || !defined(SDL_strtoll)
 static size_t
 SDL_ScanLongLong(const char *text, int radix, Sint64 * valuep)
 {
@@ -189,7 +203,7 @@ SDL_ScanLongLong(const char *text, int radix, Sint64 * valuep)
 }
 #endif
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOULL)
+#if !defined(SDL_sscanf) || !defined(SDL_strtoull)
 static size_t
 SDL_ScanUnsignedLongLong(const char *text, int radix, Uint64 * valuep)
 {
@@ -221,7 +235,7 @@ SDL_ScanUnsignedLongLong(const char *text, int radix, Uint64 * valuep)
 }
 #endif
 
-#if !defined(HAVE_SSCANF) || !defined(HAVE_STRTOD)
+#if !defined(SDL_sscanf) || !defined(SDL_strtod)
 static size_t
 SDL_ScanFloat(const char *text, double *valuep)
 {
@@ -257,7 +271,11 @@ SDL_ScanFloat(const char *text, double *valuep)
 }
 #endif
 
-#ifndef SDL_memset
+
+#ifdef SDL_memset
+#undef SDL_memset
+void *SDL_memset(void *dst, int c, size_t len) { return SDL_memset_inline(dst, c, len); }
+#else
 void *
 SDL_memset(void *dst, int c, size_t len)
 {
@@ -287,37 +305,65 @@ SDL_memset(void *dst, int c, size_t len)
 }
 #endif
 
-#ifndef SDL_memcpy
+
+#ifdef SDL_memcpy
+#undef SDL_memcpy
+void *SDL_memcpy(void *dst, const void *src, size_t len) { return SDL_memcpy_inline(dst, src, len); }
+#else
 void *
 SDL_memcpy(void *dst, const void *src, size_t len)
 {
-    size_t left = (len % 4);
-    Uint32 *srcp4, *dstp4;
-    Uint8 *srcp1, *dstp1;
+#ifdef __GNUC__
+    /* Presumably this is well tuned for speed.
+       On my machine this is twice as fast as the C code below.
+     */
+    return __builtin_memcpy(dst, src, len);
+#else
+    /* GCC 4.9.0 with -O3 will generate movaps instructions with the loop
+       using Uint32* pointers, so we need to make sure the pointers are
+       aligned before we loop using them.
+     */
+    if (((intptr_t)src & 0x3) || ((intptr_t)dst & 0x3)) {
+        /* Do an unaligned byte copy */
+        Uint8 *srcp1 = (Uint8 *)src;
+        Uint8 *dstp1 = (Uint8 *)dst;
 
-    srcp4 = (Uint32 *) src;
-    dstp4 = (Uint32 *) dst;
-    len /= 4;
-    while (len--) {
-        *dstp4++ = *srcp4++;
+        while (len--) {
+            *dstp1++ = *srcp1++;
+        }
+    } else {
+        size_t left = (len % 4);
+        Uint32 *srcp4, *dstp4;
+        Uint8 *srcp1, *dstp1;
+
+        srcp4 = (Uint32 *) src;
+        dstp4 = (Uint32 *) dst;
+        len /= 4;
+        while (len--) {
+            *dstp4++ = *srcp4++;
+        }
+
+        srcp1 = (Uint8 *) srcp4;
+        dstp1 = (Uint8 *) dstp4;
+        switch (left) {
+        case 3:
+            *dstp1++ = *srcp1++;
+        case 2:
+            *dstp1++ = *srcp1++;
+        case 1:
+            *dstp1++ = *srcp1++;
+        }
     }
-
-    srcp1 = (Uint8 *) srcp4;
-    dstp1 = (Uint8 *) dstp4;
-    switch (left) {
-    case 3:
-        *dstp1++ = *srcp1++;
-    case 2:
-        *dstp1++ = *srcp1++;
-    case 1:
-        *dstp1++ = *srcp1++;
-    }
-
     return dst;
+#endif /* __GNUC__ */
 }
 #endif
 
-#ifndef SDL_memmove
+
+#ifdef SDL_memmove
+#undef SDL_memmove
+void *SDL_memmove(void *dst, const void *src, size_t len) { return SDL_memmove_inline(dst, src, len); }
+#else
 void *
 SDL_memmove(void *dst, const void *src, size_t len)
 {
@@ -339,7 +385,10 @@ SDL_memmove(void *dst, const void *src, size_t len)
 }
 #endif
 
-#ifndef SDL_memcmp
+#ifdef SDL_memcmp
+#undef SDL_memcmp
+int SDL_memcmp(const void *s1, const void *s2, size_t len) { return SDL_memcmp_inline(s1, s2, len); }
+#else
 int
 SDL_memcmp(const void *s1, const void *s2, size_t len)
 {
@@ -356,7 +405,10 @@ SDL_memcmp(const void *s1, const void *s2, size_t len)
 }
 #endif
 
-#ifndef HAVE_STRLEN
+#ifdef SDL_strlen
+#undef SDL_strlen
+size_t SDL_strlen(const char *string) { return SDL_strlen_inline(string); }
+#else
 size_t
 SDL_strlen(const char *string)
 {
@@ -368,7 +420,10 @@ SDL_strlen(const char *string)
 }
 #endif
 
-#ifndef HAVE_WCSLEN
+#ifdef SDL_wcslen
+#undef SDL_wcslen
+size_t SDL_wcslen(const wchar_t * string) { return SDL_wcslen_inline(string); }
+#else
 size_t
 SDL_wcslen(const wchar_t * string)
 {
@@ -380,7 +435,10 @@ SDL_wcslen(const wchar_t * string)
 }
 #endif
 
-#ifndef HAVE_WCSLCPY
+#ifdef SDL_wcslcpy
+#undef SDL_wcslcpy
+size_t SDL_wcslcpy(wchar_t *dst, const wchar_t *src, size_t maxlen) { return SDL_wcslcpy_inline(dst, src, maxlen); }
+#else
 size_t
 SDL_wcslcpy(wchar_t *dst, const wchar_t *src, size_t maxlen)
 {
@@ -394,7 +452,10 @@ SDL_wcslcpy(wchar_t *dst, const wchar_t *src, size_t maxlen)
 }
 #endif
 
-#ifndef HAVE_WCSLCAT
+#ifdef SDL_wcslcat
+#undef SDL_wcslcat
+size_t SDL_wcslcat(wchar_t *dst, const wchar_t *src, size_t maxlen) { return SDL_wcslcat_inline(dst, src, maxlen); }
+#else
 size_t
 SDL_wcslcat(wchar_t *dst, const wchar_t *src, size_t maxlen)
 {
@@ -407,7 +468,10 @@ SDL_wcslcat(wchar_t *dst, const wchar_t *src, size_t maxlen)
 }
 #endif
 
-#ifndef HAVE_STRLCPY
+#ifdef SDL_strlcpy
+#undef SDL_strlcpy
+size_t SDL_strlcpy(char *dst, const char *src, size_t maxlen) { return SDL_strlcpy_inline(dst, src, maxlen); }
+#else
 size_t
 SDL_strlcpy(char *dst, const char *src, size_t maxlen)
 {
@@ -453,7 +517,10 @@ size_t SDL_utf8strlcpy(char *dst, const char *src, size_t dst_bytes)
     return bytes;
 }
 
-#ifndef HAVE_STRLCAT
+#ifdef SDL_strlcat
+#undef SDL_strlcat
+size_t SDL_strlcat(char *dst, const char *src, size_t maxlen) { return SDL_strlcat_inline(dst, src, maxlen); }
+#else
 size_t
 SDL_strlcat(char *dst, const char *src, size_t maxlen)
 {
@@ -466,7 +533,10 @@ SDL_strlcat(char *dst, const char *src, size_t maxlen)
 }
 #endif
 
-#ifndef HAVE_STRDUP
+#ifdef SDL_strdup
+#undef SDL_strdup
+char *SDL_strdup(const char *string) { return SDL_strdup_inline(string); }
+#else
 char *
 SDL_strdup(const char *string)
 {
@@ -479,7 +549,10 @@ SDL_strdup(const char *string)
 }
 #endif
 
-#ifndef HAVE__STRREV
+#ifdef SDL_strrev
+#undef SDL_strrev
+char *SDL_strrev(char *string) { return SDL_strrev_inline(string); }
+#else
 char *
 SDL_strrev(char *string)
 {
@@ -496,7 +569,10 @@ SDL_strrev(char *string)
 }
 #endif
 
-#ifndef HAVE__STRUPR
+#ifdef SDL_strupr
+#undef SDL_strupr
+char *SDL_strupr(char *string) { return SDL_strupr_inline(string); }
+#else
 char *
 SDL_strupr(char *string)
 {
@@ -509,7 +585,10 @@ SDL_strupr(char *string)
 }
 #endif
 
-#ifndef HAVE__STRLWR
+#ifdef SDL_strlwr
+#undef SDL_strlwr
+char *SDL_strlwr(char *string) { return SDL_strlwr_inline(string); }
+#else
 char *
 SDL_strlwr(char *string)
 {
@@ -522,7 +601,10 @@ SDL_strlwr(char *string)
 }
 #endif
 
-#ifndef HAVE_STRCHR
+#ifdef SDL_strchr
+#undef SDL_strchr
+char *SDL_strchr(const char *string, int c) { return SDL_strchr_inline(string, c); }
+#else
 char *
 SDL_strchr(const char *string, int c)
 {
@@ -536,7 +618,10 @@ SDL_strchr(const char *string, int c)
 }
 #endif
 
-#ifndef HAVE_STRRCHR
+#ifdef SDL_strrchr
+#undef SDL_strrchr
+char *SDL_strrchr(const char *string, int c) { return SDL_strrchr_inline(string, c); }
+#else
 char *
 SDL_strrchr(const char *string, int c)
 {
@@ -551,7 +636,10 @@ SDL_strrchr(const char *string, int c)
 }
 #endif
 
-#ifndef HAVE_STRSTR
+#ifdef SDL_strstr
+#undef SDL_strstr
+char *SDL_strstr(const char *haystack, const char *needle) { return SDL_strstr_inline(haystack, needle); }
+#else
 char *
 SDL_strstr(const char *haystack, const char *needle)
 {
@@ -566,8 +654,8 @@ SDL_strstr(const char *haystack, const char *needle)
 }
 #endif
 
-#if !defined(HAVE__LTOA)  || !defined(HAVE__I64TOA) || \
-    !defined(HAVE__ULTOA) || !defined(HAVE__UI64TOA)
+#if !defined(SDL_ltoa) || !defined(SDL_lltoa) || \
+    !defined(SDL_ultoa) || !defined(SDL_ulltoa)
 static const char ntoa_table[] = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
@@ -576,7 +664,10 @@ static const char ntoa_table[] = {
 };
 #endif /* ntoa() conversion table */
 
-#ifndef HAVE__LTOA
+#ifdef SDL_ltoa
+#undef SDL_ltoa
+char *SDL_ltoa(long value, char *string, int radix) { return SDL_ltoa_inline(value, string, radix); }
+#else
 char *
 SDL_ltoa(long value, char *string, int radix)
 {
@@ -607,7 +698,10 @@ SDL_ltoa(long value, char *string, int radix)
 }
 #endif
 
-#ifndef HAVE__ULTOA
+#ifdef SDL_ultoa
+#undef SDL_ultoa
+char *SDL_ultoa(unsigned long value, char *string, int radix) { return SDL_ultoa_inline(value, string, radix); }
+#else
 char *
 SDL_ultoa(unsigned long value, char *string, int radix)
 {
@@ -630,7 +724,10 @@ SDL_ultoa(unsigned long value, char *string, int radix)
 }
 #endif
 
-#ifndef HAVE_STRTOL
+#ifdef SDL_strtol
+#undef SDL_strtol
+long SDL_strtol(const char *string, char **endp, int base) { return SDL_strtol_inline(string, endp, base); }
+#else
 long
 SDL_strtol(const char *string, char **endp, int base)
 {
@@ -653,7 +750,10 @@ SDL_strtol(const char *string, char **endp, int base)
 }
 #endif
 
-#ifndef HAVE_STRTOUL
+#ifdef SDL_strtoul
+#undef SDL_strtoul
+unsigned long SDL_strtoul(const char *string, char **endp, int base) { return SDL_strtoul_inline(string, endp, base); }
+#else
 unsigned long
 SDL_strtoul(const char *string, char **endp, int base)
 {
@@ -676,7 +776,10 @@ SDL_strtoul(const char *string, char **endp, int base)
 }
 #endif
 
-#ifndef HAVE__I64TOA
+#ifdef SDL_lltoa
+#undef SDL_lltoa
+char *SDL_lltoa(Sint64 value, char *string, int radix) { return SDL_lltoa_inline(value, string, radix); }
+#else
 char *
 SDL_lltoa(Sint64 value, char *string, int radix)
 {
@@ -707,7 +810,10 @@ SDL_lltoa(Sint64 value, char *string, int radix)
 }
 #endif
 
-#ifndef HAVE__UI64TOA
+#ifdef SDL_ulltoa
+#undef SDL_ulltoa
+char *SDL_ulltoa(Uint64 value, char *string, int radix) { return SDL_ulltoa_inline(value, string, radix); }
+#else
 char *
 SDL_ulltoa(Uint64 value, char *string, int radix)
 {
@@ -730,7 +836,10 @@ SDL_ulltoa(Uint64 value, char *string, int radix)
 }
 #endif
 
-#ifndef HAVE_STRTOLL
+#ifdef SDL_strtoll
+#undef SDL_strtoll
+Sint64 SDL_strtoll(const char *string, char **endp, int base) { return SDL_strtoll_inline(string, endp, base); }
+#else
 Sint64
 SDL_strtoll(const char *string, char **endp, int base)
 {
@@ -753,7 +862,10 @@ SDL_strtoll(const char *string, char **endp, int base)
 }
 #endif
 
-#ifndef HAVE_STRTOULL
+#ifdef SDL_strtoull
+#undef SDL_strtoull
+Uint64 SDL_strtoull(const char *string, char **endp, int base) { return SDL_strtoull_inline(string, endp, base); }
+#else
 Uint64
 SDL_strtoull(const char *string, char **endp, int base)
 {
@@ -776,7 +888,10 @@ SDL_strtoull(const char *string, char **endp, int base)
 }
 #endif
 
-#ifndef HAVE_STRTOD
+#ifdef SDL_strtod
+#undef SDL_strtod
+double SDL_strtod(const char *string, char **endp) { return SDL_strtod_inline(string, endp); }
+#else
 double
 SDL_strtod(const char *string, char **endp)
 {
@@ -791,7 +906,10 @@ SDL_strtod(const char *string, char **endp)
 }
 #endif
 
-#ifndef HAVE_STRCMP
+#ifdef SDL_strcmp
+#undef SDL_strcmp
+int SDL_strcmp(const char *str1, const char *str2) { return SDL_strcmp_inline(str1, str2); }
+#else
 int
 SDL_strcmp(const char *str1, const char *str2)
 {
@@ -805,7 +923,10 @@ SDL_strcmp(const char *str1, const char *str2)
 }
 #endif
 
-#ifndef HAVE_STRNCMP
+#ifdef SDL_strncmp
+#undef SDL_strncmp
+int SDL_strncmp(const char *str1, const char *str2, size_t maxlen) { return SDL_strncmp_inline(str1, str2, maxlen); }
+#else
 int
 SDL_strncmp(const char *str1, const char *str2, size_t maxlen)
 {
@@ -823,7 +944,10 @@ SDL_strncmp(const char *str1, const char *str2, size_t maxlen)
 }
 #endif
 
-#if !defined(HAVE_STRCASECMP) && !defined(HAVE__STRICMP)
+#ifdef SDL_strcasecmp
+#undef SDL_strcasecmp
+int SDL_strcasecmp(const char *str1, const char *str2) { return SDL_strcasecmp_inline(str1, str2); }
+#else
 int
 SDL_strcasecmp(const char *str1, const char *str2)
 {
@@ -843,7 +967,10 @@ SDL_strcasecmp(const char *str1, const char *str2)
 }
 #endif
 
-#if !defined(HAVE_STRNCASECMP) && !defined(HAVE__STRNICMP)
+#ifdef SDL_strncasecmp
+#undef SDL_strncasecmp
+int SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen) { return SDL_strncasecmp_inline(str1, str2, maxlen); }
+#else
 int
 SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen)
 {
@@ -858,13 +985,31 @@ SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen)
         ++str2;
         --maxlen;
     }
-    a = SDL_tolower((unsigned char) *str1);
-    b = SDL_tolower((unsigned char) *str2);
-    return (int) ((unsigned char) a - (unsigned char) b);
+    if (maxlen == 0) {
+        return 0;
+    } else {
+        a = SDL_tolower((unsigned char) *str1);
+        b = SDL_tolower((unsigned char) *str2);
+        return (int) ((unsigned char) a - (unsigned char) b);
+    }
 }
 #endif
 
-#ifndef HAVE_SSCANF
+#ifdef SDL_sscanf
+#undef SDL_sscanf
+// Urho3D: removed function, as vsscanf is not available on Visual Studio
+/*
+SDL_sscanf(const char *text, const char *fmt, ...)
+{
+    int rc;
+    va_list ap;
+    va_start(ap, fmt);
+    rc = vsscanf(text, fmt, ap);
+    va_end(ap);
+    return rc;
+}
+*/
+#else
 int
 SDL_sscanf(const char *text, const char *fmt, ...)
 {
@@ -959,8 +1104,7 @@ SDL_sscanf(const char *text, const char *fmt, ...)
                             ++index;
                         }
                         if (text[index] == '0') {
-                            if (SDL_tolower((unsigned char) text[index + 1])
-                                == 'x') {
+                            if (SDL_tolower((unsigned char) text[index + 1]) == 'x') {
                                 radix = 16;
                             } else {
                                 radix = 8;
@@ -1132,7 +1276,10 @@ SDL_sscanf(const char *text, const char *fmt, ...)
 }
 #endif
 
-#ifndef HAVE_SNPRINTF
+/* just undef; the headers only define this to snprintf because of varargs. */
+#ifdef SDL_snprintf
+#undef SDL_snprintf
+#endif
 int
 SDL_snprintf(char *text, size_t maxlen, const char *fmt, ...)
 {
@@ -1145,136 +1292,182 @@ SDL_snprintf(char *text, size_t maxlen, const char *fmt, ...)
 
     return retval;
 }
-#endif
 
-#ifndef HAVE_VSNPRINTF
-static size_t
-SDL_PrintLong(char *text, long value, int radix, size_t maxlen)
+#ifdef SDL_vsnprintf
+#undef SDL_vsnprintf
+int SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap) { return SDL_vsnprintf_inline(text, maxlen, fmt, ap); }
+#else
+ /* FIXME: implement more of the format specifiers */
+typedef struct
 {
-    char num[130];
-    size_t size;
+    SDL_bool left_justify;
+    SDL_bool force_sign;
+    SDL_bool force_type;
+    SDL_bool pad_zeroes;
+    SDL_bool do_lowercase;
+    int width;
+    int radix;
+    int precision;
+} SDL_FormatInfo;
 
-    SDL_ltoa(value, num, radix);
-    size = SDL_strlen(num);
-    if (size >= maxlen) {
-        size = maxlen - 1;
-    }
-    SDL_strlcpy(text, num, size + 1);
-
-    return size;
+static size_t
+SDL_PrintString(char *text, size_t maxlen, SDL_FormatInfo *info, const char *string)
+{
+    return SDL_strlcpy(text, string, maxlen);
 }
 
 static size_t
-SDL_PrintUnsignedLong(char *text, unsigned long value, int radix,
-                      size_t maxlen)
+SDL_PrintLong(char *text, size_t maxlen, SDL_FormatInfo *info, long value)
 {
     char num[130];
-    size_t size;
 
-    SDL_ultoa(value, num, radix);
-    size = SDL_strlen(num);
-    if (size >= maxlen) {
-        size = maxlen - 1;
-    }
-    SDL_strlcpy(text, num, size + 1);
-
-    return size;
+    SDL_ltoa(value, num, info ? info->radix : 10);
+    return SDL_PrintString(text, maxlen, info, num);
 }
 
 static size_t
-SDL_PrintLongLong(char *text, Sint64 value, int radix, size_t maxlen)
+SDL_PrintUnsignedLong(char *text, size_t maxlen, SDL_FormatInfo *info, unsigned long value)
 {
     char num[130];
-    size_t size;
 
-    SDL_lltoa(value, num, radix);
-    size = SDL_strlen(num);
-    if (size >= maxlen) {
-        size = maxlen - 1;
-    }
-    SDL_strlcpy(text, num, size + 1);
-
-    return size;
+    SDL_ultoa(value, num, info ? info->radix : 10);
+    return SDL_PrintString(text, maxlen, info, num);
 }
 
 static size_t
-SDL_PrintUnsignedLongLong(char *text, Uint64 value, int radix, size_t maxlen)
+SDL_PrintLongLong(char *text, size_t maxlen, SDL_FormatInfo *info, Sint64 value)
 {
     char num[130];
-    size_t size;
 
-    SDL_ulltoa(value, num, radix);
-    size = SDL_strlen(num);
-    if (size >= maxlen) {
-        size = maxlen - 1;
-    }
-    SDL_strlcpy(text, num, size + 1);
-
-    return size;
+    SDL_lltoa(value, num, info ? info->radix : 10);
+    return SDL_PrintString(text, maxlen, info, num);
 }
 
 static size_t
-SDL_PrintFloat(char *text, double arg, size_t maxlen)
+SDL_PrintUnsignedLongLong(char *text, size_t maxlen, SDL_FormatInfo *info, Uint64 value)
 {
+    char num[130];
+
+    SDL_ulltoa(value, num, info ? info->radix : 10);
+    return SDL_PrintString(text, maxlen, info, num);
+}
+
+static size_t
+SDL_PrintFloat(char *text, size_t maxlen, SDL_FormatInfo *info, double arg)
+{
+    int i, width;
+    size_t len;
+    size_t left = maxlen;
     char *textstart = text;
+
     if (arg) {
         /* This isn't especially accurate, but hey, it's easy. :) */
-        const double precision = 0.00000001;
-        size_t len;
+        double precision = 1.0;
         unsigned long value;
 
         if (arg < 0) {
-            *text++ = '-';
-            --maxlen;
+            if (left > 1) {
+                *text = '-';
+                --left;
+            }
+            ++text;
             arg = -arg;
+        } else if (info->force_sign) {
+            if (left > 1) {
+                *text = '+';
+                --left;
+            }
+            ++text;
         }
         value = (unsigned long) arg;
-        len = SDL_PrintUnsignedLong(text, value, 10, maxlen);
+        len = SDL_PrintUnsignedLong(text, left, NULL, value);
         text += len;
-        maxlen -= len;
+        if (len >= left) {
+            left = SDL_min(left, 1);
+        } else {
+            left -= len;
+        }
         arg -= value;
-        if (arg > precision && maxlen) {
+        if (info->precision < 0) {
+            info->precision = 6;
+        }
+        for (i = 0; i < info->precision; ++i) {
+            precision *= 0.1;
+        }
+        if (info->force_type || info->precision > 0) {
             int mult = 10;
-            *text++ = '.';
-            while ((arg > precision) && maxlen) {
+            if (left > 1) {
+                *text = '.';
+                --left;
+            }
+            ++text;
+            while (info->precision-- > 0) {
                 value = (unsigned long) (arg * mult);
-                len = SDL_PrintUnsignedLong(text, value, 10, maxlen);
+                len = SDL_PrintUnsignedLong(text, left, NULL, value);
                 text += len;
-                maxlen -= len;
+                if (len >= left) {
+                    left = SDL_min(left, 1);
+                } else {
+                    left -= len;
+                }
                 arg -= (double) value / mult;
                 mult *= 10;
             }
         }
     } else {
-        *text++ = '0';
+        if (left > 1) {
+            *text = '0';
+            --left;
+        }
+        ++text;
+        if (info->force_type) {
+            if (left > 1) {
+                *text = '.';
+                --left;
+            }
+            ++text;
+        }
     }
-    return (text - textstart);
-}
 
-static size_t
-SDL_PrintString(char *text, const char *string, size_t maxlen)
-{
-    char *textstart = text;
-    while (*string && maxlen--) {
-        *text++ = *string++;
+    width = info->width - (int)(text - textstart);
+    if (width > 0) {
+        char fill = info->pad_zeroes ? '0' : ' ';
+        char *end = text+left-1;
+        len = (text - textstart);
+        for (len = (text - textstart); len--; ) {
+            if ((textstart+len+width) < end) {
+                *(textstart+len+width) = *(textstart+len);
+            }
+        }
+        len = (size_t)width;
+        text += len;
+        if (len >= left) {
+            left = SDL_min(left, 1);
+        } else {
+            left -= len;
+        }
+        while (len--) {
+            if (textstart+len < end) {
+                textstart[len] = fill;
+            }
+        }
     }
+
     return (text - textstart);
 }
 
 int
 SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap)
 {
+    size_t left = maxlen;
     char *textstart = text;
-    if (maxlen <= 0) {
-        return 0;
-    }
-    --maxlen;                   /* For the trailing '\0' */
-    while (*fmt && maxlen) {
+
+    while (*fmt) {
         if (*fmt == '%') {
             SDL_bool done = SDL_FALSE;
             size_t len = 0;
-            SDL_bool do_lowercase = SDL_FALSE;
-            int radix = 10;
+            SDL_bool check_flag;
+            SDL_FormatInfo info;
             enum
             {
                 DO_INT,
@@ -1282,21 +1475,59 @@ SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap)
                 DO_LONGLONG
             } inttype = DO_INT;
 
-            ++fmt;
-            /* FIXME: implement more of the format specifiers */
-            while (*fmt == '.' || (*fmt >= '0' && *fmt <= '9')) {
+            SDL_zero(info);
+            info.radix = 10;
+            info.precision = -1;
+
+            check_flag = SDL_TRUE;
+            while (check_flag) {
                 ++fmt;
+                switch (*fmt) {
+                case '-':
+                    info.left_justify = SDL_TRUE;
+                    break;
+                case '+':
+                    info.force_sign = SDL_TRUE;
+                    break;
+                case '#':
+                    info.force_type = SDL_TRUE;
+                    break;
+                case '0':
+                    info.pad_zeroes = SDL_TRUE;
+                    break;
+                default:
+                    check_flag = SDL_FALSE;
+                    break;
+                }
             }
+
+            if (*fmt >= '0' && *fmt <= '9') {
+                info.width = SDL_strtol(fmt, (char **)&fmt, 0);
+            }
+
+            if (*fmt == '.') {
+                ++fmt;
+                if (*fmt >= '0' && *fmt <= '9') {
+                    info.precision = SDL_strtol(fmt, (char **)&fmt, 0);
+                } else {
+                    info.precision = 0;
+                }
+            }
+
             while (!done) {
                 switch (*fmt) {
                 case '%':
-                    *text = '%';
+                    if (left > 1) {
+                        *text = '%';
+                    }
                     len = 1;
                     done = SDL_TRUE;
                     break;
                 case 'c':
                     /* char is promoted to int when passed through (...) */
-                    *text = (char) va_arg(ap, int);
+                    if (left > 1) {
+                        *text = (char) va_arg(ap, int);
+                    }
                     len = 1;
                     done = SDL_TRUE;
                     break;
@@ -1318,78 +1549,67 @@ SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap)
                 case 'd':
                     switch (inttype) {
                     case DO_INT:
-                        len =
-                            SDL_PrintLong(text,
-                                          (long) va_arg(ap, int),
-                                          radix, maxlen);
+                        len = SDL_PrintLong(text, left, &info,
+                                            (long) va_arg(ap, int));
                         break;
                     case DO_LONG:
-                        len =
-                            SDL_PrintLong(text, va_arg(ap, long),
-                                          radix, maxlen);
+                        len = SDL_PrintLong(text, left, &info,
+                                            va_arg(ap, long));
                         break;
                     case DO_LONGLONG:
-                        len =
-                            SDL_PrintLongLong(text,
-                                              va_arg(ap, Sint64),
-                                              radix, maxlen);
+                        len = SDL_PrintLongLong(text, left, &info,
+                                                va_arg(ap, Sint64));
                         break;
                     }
                     done = SDL_TRUE;
                     break;
                 case 'p':
                 case 'x':
-                    do_lowercase = SDL_TRUE;
+                    info.do_lowercase = SDL_TRUE;
                     /* Fall through to 'X' handling */
                 case 'X':
-                    if (radix == 10) {
-                        radix = 16;
+                    if (info.radix == 10) {
+                        info.radix = 16;
                     }
                     if (*fmt == 'p') {
                         inttype = DO_LONG;
                     }
                     /* Fall through to unsigned handling */
                 case 'o':
-                    if (radix == 10) {
-                        radix = 8;
+                    if (info.radix == 10) {
+                        info.radix = 8;
                     }
                     /* Fall through to unsigned handling */
                 case 'u':
                     switch (inttype) {
                     case DO_INT:
-                        len = SDL_PrintUnsignedLong(text, (unsigned long)
-                                                    va_arg(ap,
-                                                           unsigned
-                                                           int),
-                                                    radix, maxlen);
+                        len = SDL_PrintUnsignedLong(text, left, &info,
+                                                    (unsigned long)
+                                                    va_arg(ap, unsigned int));
                         break;
                     case DO_LONG:
-                        len =
-                            SDL_PrintUnsignedLong(text,
-                                                  va_arg(ap,
-                                                         unsigned
-                                                         long),
-                                                  radix, maxlen);
+                        len = SDL_PrintUnsignedLong(text, left, &info,
+                                                    va_arg(ap, unsigned long));
                         break;
                     case DO_LONGLONG:
-                        len =
-                            SDL_PrintUnsignedLongLong(text,
-                                                      va_arg(ap,
-                                                             Uint64),
-                                                      radix, maxlen);
+                        len = SDL_PrintUnsignedLongLong(text, left, &info,
+                                                        va_arg(ap, Uint64));
                         break;
                     }
-                    if (do_lowercase) {
-                        SDL_strlwr(text);
+                    if (info.do_lowercase) {
+                        size_t i;
+                        for (i = 0; i < len && i < left; ++i) {
+                            text[i] = SDL_tolower((unsigned char)text[i]);
+                        }
                     }
                     done = SDL_TRUE;
                     break;
                 case 'f':
-                    len = SDL_PrintFloat(text, va_arg(ap, double), maxlen);
+                    len = SDL_PrintFloat(text, left, &info, va_arg(ap, double));
                     done = SDL_TRUE;
                     break;
                 case 's':
-                    len = SDL_PrintString(text, va_arg(ap, char *), maxlen);
+                    len = SDL_PrintString(text, left, &info, va_arg(ap, char *));
                     done = SDL_TRUE;
                     break;
                 default:
@@ -1399,15 +1619,25 @@ SDL_vsnprintf(char *text, size_t maxlen, const char *fmt, va_list ap)
                 ++fmt;
             }
             text += len;
-            maxlen -= len;
+            if (len >= left) {
+                left = SDL_min(left, 1);
+            } else {
+                left -= len;
+            }
         } else {
-            *text++ = *fmt++;
-            --maxlen;
+            if (left > 1) {
+                *text = *fmt;
+                --left;
+            }
+            ++fmt;
+            ++text;
         }
     }
-    *text = '\0';
-
+    if (left > 0) {
+        *text = '\0';
+    }
     return (int)(text - textstart);
 }
 #endif
+
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,6 +22,8 @@
 
 #include "SDL.h"
 #include "SDL_atomic.h"
+#include "SDL_messagebox.h"
+#include "SDL_video.h"
 #include "SDL_assert.h"
 #include "SDL_assert_c.h"
 #include "video/SDL_sysvideo.h"
@@ -59,158 +61,11 @@ debug_print(const char *fmt, ...) __attribute__((format (printf, 1, 2)));
 static void
 debug_print(const char *fmt, ...)
 {
-#ifdef __WIN32__
-    /* Format into a buffer for OutputDebugStringA(). */
-    char buf[1024];
-    char *startptr;
-    char *ptr;
-    LPTSTR tstr;
-    int len;
     va_list ap;
     va_start(ap, fmt);
-    len = (int) SDL_vsnprintf(buf, sizeof (buf), fmt, ap);
+    SDL_LogMessageV(SDL_LOG_CATEGORY_ASSERT, SDL_LOG_PRIORITY_WARN, fmt, ap);
     va_end(ap);
-
-    /* Visual C's vsnprintf() may not null-terminate the buffer. */
-    if ((len >= sizeof (buf)) || (len < 0)) {
-        buf[sizeof (buf) - 1] = '\0';
-    }
-
-    /* Write it, sorting out the Unix newlines... */
-    startptr = buf;
-    for (ptr = startptr; *ptr; ptr++) {
-        if (*ptr == '\n') {
-            *ptr = '\0';
-            tstr = WIN_UTF8ToString(startptr);
-            OutputDebugString(tstr);
-            SDL_free(tstr);
-            OutputDebugString(TEXT("\r\n"));
-            startptr = ptr+1;
-        }
-    }
-
-    /* catch that last piece if it didn't have a newline... */
-    if (startptr != ptr) {
-        tstr = WIN_UTF8ToString(startptr);
-        OutputDebugString(tstr);
-        SDL_free(tstr);
-    }
-#else
-    /* Unix has it easy. Just dump it to stderr. */
-    va_list ap;
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    fflush(stderr);
-#endif
 }
-
-
-#ifdef __WIN32__
-static SDL_assert_state SDL_Windows_AssertChoice = SDL_ASSERTION_ABORT;
-static const SDL_assert_data *SDL_Windows_AssertData = NULL;
-
-static LRESULT CALLBACK
-SDL_Assertion_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    switch (msg)
-    {
-        case WM_CREATE:
-        {
-            /* !!! FIXME: all this code stinks. */
-            const SDL_assert_data *data = SDL_Windows_AssertData;
-            char buf[1024];
-            LPTSTR tstr;
-            const int w = 100;
-            const int h = 25;
-            const int gap = 10;
-            int x = gap;
-            int y = 50;
-            int len;
-            int i;
-            static const struct { 
-                LPCTSTR name;
-                SDL_assert_state state;
-            } buttons[] = {
-                {TEXT("Abort"), SDL_ASSERTION_ABORT },
-                {TEXT("Break"), SDL_ASSERTION_BREAK },
-                {TEXT("Retry"), SDL_ASSERTION_RETRY },
-                {TEXT("Ignore"), SDL_ASSERTION_IGNORE },
-                {TEXT("Always Ignore"), SDL_ASSERTION_ALWAYS_IGNORE },
-            };
-
-            len = (int) SDL_snprintf(buf, sizeof (buf), 
-                         "Assertion failure at %s (%s:%d), triggered %u time%s:\r\n  '%s'",
-                         data->function, data->filename, data->linenum,
-                         data->trigger_count, (data->trigger_count == 1) ? "" : "s",
-                         data->condition);
-            if ((len < 0) || (len >= sizeof (buf))) {
-                buf[sizeof (buf) - 1] = '\0';
-            }
-
-            tstr = WIN_UTF8ToString(buf);
-            CreateWindow(TEXT("STATIC"), tstr,
-                         WS_VISIBLE | WS_CHILD | SS_LEFT,
-                         x, y, 550, 100,
-                         hwnd, (HMENU) 1, NULL, NULL);
-            SDL_free(tstr);
-            y += 110;
-
-            for (i = 0; i < (sizeof (buttons) / sizeof (buttons[0])); i++) {
-                CreateWindow(TEXT("BUTTON"), buttons[i].name,
-                         WS_VISIBLE | WS_CHILD,
-                         x, y, w, h,
-                         hwnd, (HMENU) buttons[i].state, NULL, NULL);
-                x += w + gap;
-            }
-            break;
-        }
-
-        case WM_COMMAND:
-            SDL_Windows_AssertChoice = ((SDL_assert_state) (LOWORD(wParam)));
-            SDL_Windows_AssertData = NULL;
-            break;
-
-        case WM_DESTROY:
-            SDL_Windows_AssertData = NULL;
-            break;
-    }
-
-    return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
-static SDL_assert_state
-SDL_PromptAssertion_windows(const SDL_assert_data *data)
-{
-    HINSTANCE hInstance = 0;  /* !!! FIXME? */
-    HWND hwnd;
-    MSG msg;
-    WNDCLASS wc = {0};
-
-    SDL_Windows_AssertChoice = SDL_ASSERTION_ABORT;
-    SDL_Windows_AssertData = data;
-
-    wc.lpszClassName = TEXT("SDL_assert");
-    wc.hInstance = hInstance ;
-    wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);
-    wc.lpfnWndProc = SDL_Assertion_WndProc;
-    wc.hCursor = LoadCursor(0, IDC_ARROW);
-  
-    RegisterClass(&wc);
-    hwnd = CreateWindow(wc.lpszClassName, TEXT("SDL assertion failure"),
-                 WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                 150, 150, 570, 260, 0, 0, hInstance, 0);  
-
-    while (GetMessage(&msg, NULL, 0, 0) && (SDL_Windows_AssertData != NULL)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
-    DestroyWindow(hwnd);
-    UnregisterClass(wc.lpszClassName, hInstance);
-    return SDL_Windows_AssertChoice;
-}
-#endif
 
 
 static void SDL_AddAssertionToReport(SDL_assert_data *data)
@@ -271,23 +126,49 @@ static void SDL_AbortAssertion(void)
 static SDL_assert_state
 SDL_PromptAssertion(const SDL_assert_data *data, void *userdata)
 {
+#ifdef __WIN32__
+    #define ENDLINE "\r\n"
+#else
+    #define ENDLINE "\n"
+#endif
+
     const char *envr;
     SDL_assert_state state = SDL_ASSERTION_ABORT;
     SDL_Window *window;
+    SDL_MessageBoxData messagebox;
+    SDL_MessageBoxButtonData buttons[] = {
+        {   0,  SDL_ASSERTION_RETRY,            "Retry" },
+        {   0,  SDL_ASSERTION_BREAK,            "Break" },
+        {   0,  SDL_ASSERTION_ABORT,            "Abort" },
+        {   SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,
+                SDL_ASSERTION_IGNORE,           "Ignore" },
+        {   SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT,
+                SDL_ASSERTION_ALWAYS_IGNORE,    "Always Ignore" }
+    };
+    char *message;
+    int selected;
 
     (void) userdata;  /* unused in default handler. */
 
-    debug_print("\n\n"
-                "Assertion failure at %s (%s:%d), triggered %u time%s:\n"
-                "  '%s'\n"
-                "\n",
-                data->function, data->filename, data->linenum,
-                data->trigger_count, (data->trigger_count == 1) ? "" : "s",
-                data->condition);
+    message = SDL_stack_alloc(char, SDL_MAX_LOG_MESSAGE);
+    if (!message) {
+        /* Uh oh, we're in real trouble now... */
+        return SDL_ASSERTION_ABORT;
+    }
+    SDL_snprintf(message, SDL_MAX_LOG_MESSAGE,
+                 "Assertion failure at %s (%s:%d), triggered %u %s:" ENDLINE
+                    "  '%s'",
+                 data->function, data->filename, data->linenum,
+                 data->trigger_count, (data->trigger_count == 1) ? "time" : "times",
+                 data->condition);
+
+    debug_print("\n\n%s\n\n", message);
 
     /* let env. variable override, so unit tests won't block in a GUI. */
     envr = SDL_getenv("SDL_ASSERT");
     if (envr != NULL) {
+        SDL_stack_free(message);
+
         if (SDL_strcmp(envr, "abort") == 0) {
             return SDL_ASSERTION_ABORT;
         } else if (SDL_strcmp(envr, "break") == 0) {
@@ -311,53 +192,64 @@ SDL_PromptAssertion(const SDL_assert_data *data, void *userdata)
         } else {
             /* !!! FIXME: ungrab the input if we're not fullscreen? */
             /* No need to mess with the window */
-            window = 0;
+            window = NULL;
         }
     }
 
-    /* platform-specific UI... */
+    /* Show a messagebox if we can, otherwise fall back to stdio */
+    SDL_zero(messagebox);
+    messagebox.flags = SDL_MESSAGEBOX_WARNING;
+    messagebox.window = window;
+    messagebox.title = "Assertion Failed";
+    messagebox.message = message;
+    messagebox.numbuttons = SDL_arraysize(buttons);
+    messagebox.buttons = buttons;
 
-#ifdef __WIN32__
-    state = SDL_PromptAssertion_windows(data);
-
-#elif defined __MACOSX__ && defined SDL_VIDEO_DRIVER_COCOA
-    /* This has to be done in an Objective-C (*.m) file, so we call out. */
-    extern SDL_assert_state SDL_PromptAssertion_cocoa(const SDL_assert_data *);
-    state = SDL_PromptAssertion_cocoa(data);
-
-#else
-    /* this is a little hacky. */
-    for ( ; ; ) {
-        char buf[32];
-        fprintf(stderr, "Abort/Break/Retry/Ignore/AlwaysIgnore? [abriA] : ");
-        fflush(stderr);
-        if (fgets(buf, sizeof (buf), stdin) == NULL) {
-            break;
-        }
-
-        if (SDL_strcmp(buf, "a") == 0) {
-            state = SDL_ASSERTION_ABORT;
-            break;
-        } else if (SDL_strcmp(buf, "b") == 0) {
-            state = SDL_ASSERTION_BREAK;
-            break;
-        } else if (SDL_strcmp(buf, "r") == 0) {
-            state = SDL_ASSERTION_RETRY;
-            break;
-        } else if (SDL_strcmp(buf, "i") == 0) {
+    if (SDL_ShowMessageBox(&messagebox, &selected) == 0) {
+        if (selected == -1) {
             state = SDL_ASSERTION_IGNORE;
-            break;
-        } else if (SDL_strcmp(buf, "A") == 0) {
-            state = SDL_ASSERTION_ALWAYS_IGNORE;
-            break;
+        } else {
+            state = (SDL_assert_state)selected;
         }
     }
-#endif
+#ifdef HAVE_STDIO_H
+    else
+    {
+        /* this is a little hacky. */
+        for ( ; ; ) {
+            char buf[32];
+            fprintf(stderr, "Abort/Break/Retry/Ignore/AlwaysIgnore? [abriA] : ");
+            fflush(stderr);
+            if (fgets(buf, sizeof (buf), stdin) == NULL) {
+                break;
+            }
+
+            if (SDL_strcmp(buf, "a") == 0) {
+                state = SDL_ASSERTION_ABORT;
+                break;
+            } else if (SDL_strcmp(buf, "b") == 0) {
+                state = SDL_ASSERTION_BREAK;
+                break;
+            } else if (SDL_strcmp(buf, "r") == 0) {
+                state = SDL_ASSERTION_RETRY;
+                break;
+            } else if (SDL_strcmp(buf, "i") == 0) {
+                state = SDL_ASSERTION_IGNORE;
+                break;
+            } else if (SDL_strcmp(buf, "A") == 0) {
+                state = SDL_ASSERTION_ALWAYS_IGNORE;
+                break;
+            }
+        }
+    }
+#endif /* HAVE_STDIO_H */
 
     /* Re-enter fullscreen mode */
     if (window) {
         SDL_RestoreWindow(window);
     }
+
+    SDL_stack_free(message);
 
     return state;
 }

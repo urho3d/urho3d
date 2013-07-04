@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -102,8 +102,9 @@ DirectFB_CreateDevice(int devindex)
 {
     SDL_VideoDevice *device;
 
-    if (!SDL_DirectFB_LoadLibrary())
+    if (!SDL_DirectFB_LoadLibrary()) {
         return NULL;
+    }
 
     /* Initialize all variables that we clean on shutdown */
     SDL_DFB_ALLOC_CLEAR(device, sizeof(SDL_VideoDevice));
@@ -132,6 +133,8 @@ DirectFB_CreateDevice(int devindex)
     device->DestroyWindow = DirectFB_DestroyWindow;
     device->GetWindowWMInfo = DirectFB_GetWindowWMInfo;
 
+    /* !!! FIXME: implement SetWindowBordered */
+
 #if SDL_DIRECTFB_OPENGL
     device->GL_LoadLibrary = DirectFB_GL_LoadLibrary;
     device->GL_GetProcAddress = DirectFB_GL_GetProcAddress;
@@ -145,13 +148,13 @@ DirectFB_CreateDevice(int devindex)
 
 #endif
 
-	/* Shaped window support */
-	device->shape_driver.CreateShaper = DirectFB_CreateShaper;
-	device->shape_driver.SetWindowShape = DirectFB_SetWindowShape;
-	device->shape_driver.ResizeWindowShape = DirectFB_ResizeWindowShape;
-	
+    /* Shaped window support */
+    device->shape_driver.CreateShaper = DirectFB_CreateShaper;
+    device->shape_driver.SetWindowShape = DirectFB_SetWindowShape;
+    device->shape_driver.ResizeWindowShape = DirectFB_ResizeWindowShape;
+
     device->free = DirectFB_DeleteDevice;
-    
+
     return device;
   error:
     if (device)
@@ -232,19 +235,19 @@ DirectFB_VideoInit(_THIS)
             DirectFBSetOption("disable-module", "x11input");
     }
 
-	/* FIXME: Reenable as default once multi kbd/mouse interface is sorted out */
-	devdata->use_linux_input = readBoolEnv(DFBENV_USE_LINUX_INPUT, 0);       /* default: on */
+    /* FIXME: Reenable as default once multi kbd/mouse interface is sorted out */
+    devdata->use_linux_input = readBoolEnv(DFBENV_USE_LINUX_INPUT, 0);       /* default: on */
 
     if (!devdata->use_linux_input)
     {
-		SDL_DFB_LOG("Disabling linxu input\n");    
+        SDL_DFB_LOG("Disabling linxu input\n");
         DirectFBSetOption("disable-module", "linux_input");
     }
-    
+
     SDL_DFB_CHECKERR(DirectFBCreate(&dfb));
 
     DirectFB_DeviceInformation(dfb);
-    
+
     devdata->use_yuv_underlays = readBoolEnv(DFBENV_USE_YUV_UNDERLAY, 0);     /* default: off */
     devdata->use_yuv_direct = readBoolEnv(DFBENV_USE_YUV_DIRECT, 0);      /* default is off! */
 
@@ -314,7 +317,7 @@ DirectFB_VideoQuit(_THIS)
 static const struct {
     DFBSurfacePixelFormat dfb;
     Uint32 sdl;
-} pixelformat_tab[] = 
+} pixelformat_tab[] =
 {
     { DSPF_RGB32, SDL_PIXELFORMAT_RGB888 },             /* 24 bit RGB (4 byte, nothing@24, red 8@16, green 8@8, blue 8@0) */
     { DSPF_ARGB, SDL_PIXELFORMAT_ARGB8888 },            /* 32 bit ARGB (4 byte, alpha 8@24, red 8@16, green 8@8, blue 8@0) */
@@ -339,38 +342,38 @@ static const struct {
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_BGR555 },
 #endif
 
-    /* Pfff ... nonmatching formats follow */    
-    
+    /* Pfff ... nonmatching formats follow */
+
     { DSPF_ALUT44, SDL_PIXELFORMAT_UNKNOWN },           /* 8 bit ALUT (1 byte, alpha 4@4, color lookup 4@0) */
- 	{ DSPF_A8, SDL_PIXELFORMAT_UNKNOWN },               /* 	8 bit alpha (1 byte, alpha 8@0), e.g. anti-aliased glyphs */
- 	{ DSPF_AiRGB, SDL_PIXELFORMAT_UNKNOWN },            /* 	32 bit ARGB (4 byte, inv. alpha 8@24, red 8@16, green 8@8, blue 8@0) */
- 	{ DSPF_A1, SDL_PIXELFORMAT_UNKNOWN },               /* 	1 bit alpha (1 byte/ 8 pixel, most significant bit used first) */
- 	{ DSPF_NV12, SDL_PIXELFORMAT_UNKNOWN },             /* 	12 bit YUV (8 bit Y plane followed by one 16 bit quarter size CbCr [15:0] plane) */
- 	{ DSPF_NV16, SDL_PIXELFORMAT_UNKNOWN },             /* 	16 bit YUV (8 bit Y plane followed by one 16 bit half width CbCr [15:0] plane) */
- 	{ DSPF_ARGB2554, SDL_PIXELFORMAT_UNKNOWN },         /* 	16 bit ARGB (2 byte, alpha 2@14, red 5@9, green 5@4, blue 4@0) */
- 	{ DSPF_NV21, SDL_PIXELFORMAT_UNKNOWN },             /* 	12 bit YUV (8 bit Y plane followed by one 16 bit quarter size CrCb [15:0] plane) */
- 	{ DSPF_AYUV, SDL_PIXELFORMAT_UNKNOWN },             /* 	32 bit AYUV (4 byte, alpha 8@24, Y 8@16, Cb 8@8, Cr 8@0) */
- 	{ DSPF_A4, SDL_PIXELFORMAT_UNKNOWN },               /* 	4 bit alpha (1 byte/ 2 pixel, more significant nibble used first) */
- 	{ DSPF_ARGB1666, SDL_PIXELFORMAT_UNKNOWN },         /* 	1 bit alpha (3 byte/ alpha 1@18, red 6@16, green 6@6, blue 6@0) */
- 	{ DSPF_ARGB6666, SDL_PIXELFORMAT_UNKNOWN },         /* 	6 bit alpha (3 byte/ alpha 6@18, red 6@16, green 6@6, blue 6@0) */
- 	{ DSPF_RGB18, SDL_PIXELFORMAT_UNKNOWN },            /* 	6 bit RGB (3 byte/ red 6@16, green 6@6, blue 6@0) */
- 	{ DSPF_LUT2, SDL_PIXELFORMAT_UNKNOWN },             /* 	2 bit LUT (1 byte/ 4 pixel, 2 bit color and alpha lookup from palette) */
+    { DSPF_A8, SDL_PIXELFORMAT_UNKNOWN },               /*  8 bit alpha (1 byte, alpha 8@0), e.g. anti-aliased glyphs */
+    { DSPF_AiRGB, SDL_PIXELFORMAT_UNKNOWN },            /*  32 bit ARGB (4 byte, inv. alpha 8@24, red 8@16, green 8@8, blue 8@0) */
+    { DSPF_A1, SDL_PIXELFORMAT_UNKNOWN },               /*  1 bit alpha (1 byte/ 8 pixel, most significant bit used first) */
+    { DSPF_NV12, SDL_PIXELFORMAT_UNKNOWN },             /*  12 bit YUV (8 bit Y plane followed by one 16 bit quarter size CbCr [15:0] plane) */
+    { DSPF_NV16, SDL_PIXELFORMAT_UNKNOWN },             /*  16 bit YUV (8 bit Y plane followed by one 16 bit half width CbCr [15:0] plane) */
+    { DSPF_ARGB2554, SDL_PIXELFORMAT_UNKNOWN },         /*  16 bit ARGB (2 byte, alpha 2@14, red 5@9, green 5@4, blue 4@0) */
+    { DSPF_NV21, SDL_PIXELFORMAT_UNKNOWN },             /*  12 bit YUV (8 bit Y plane followed by one 16 bit quarter size CrCb [15:0] plane) */
+    { DSPF_AYUV, SDL_PIXELFORMAT_UNKNOWN },             /*  32 bit AYUV (4 byte, alpha 8@24, Y 8@16, Cb 8@8, Cr 8@0) */
+    { DSPF_A4, SDL_PIXELFORMAT_UNKNOWN },               /*  4 bit alpha (1 byte/ 2 pixel, more significant nibble used first) */
+    { DSPF_ARGB1666, SDL_PIXELFORMAT_UNKNOWN },         /*  1 bit alpha (3 byte/ alpha 1@18, red 6@16, green 6@6, blue 6@0) */
+    { DSPF_ARGB6666, SDL_PIXELFORMAT_UNKNOWN },         /*  6 bit alpha (3 byte/ alpha 6@18, red 6@16, green 6@6, blue 6@0) */
+    { DSPF_RGB18, SDL_PIXELFORMAT_UNKNOWN },            /*  6 bit RGB (3 byte/ red 6@16, green 6@6, blue 6@0) */
+    { DSPF_LUT2, SDL_PIXELFORMAT_UNKNOWN },             /*  2 bit LUT (1 byte/ 4 pixel, 2 bit color and alpha lookup from palette) */
 
 #if (DFB_VERSION_ATLEAST(1,3,0))
- 	{ DSPF_RGBA4444, SDL_PIXELFORMAT_UNKNOWN },         /* 16 bit RGBA (2 byte, red 4@12, green 4@8, blue 4@4, alpha 4@0) */
+    { DSPF_RGBA4444, SDL_PIXELFORMAT_UNKNOWN },         /* 16 bit RGBA (2 byte, red 4@12, green 4@8, blue 4@4, alpha 4@0) */
 #endif
 
 #if (DFB_VERSION_ATLEAST(1,4,3))
- 	{ DSPF_RGBA5551, SDL_PIXELFORMAT_UNKNOWN },         /* 	16 bit RGBA (2 byte, red 5@11, green 5@6, blue 5@1, alpha 1@0) */
- 	{ DSPF_YUV444P, SDL_PIXELFORMAT_UNKNOWN },          /* 	24 bit full YUV planar (8 bit Y plane followed by an 8 bit Cb and an 8 bit Cr plane) */
- 	{ DSPF_ARGB8565, SDL_PIXELFORMAT_UNKNOWN },         /* 	24 bit ARGB (3 byte, alpha 8@16, red 5@11, green 6@5, blue 5@0) */
- 	{ DSPF_AVYU, SDL_PIXELFORMAT_UNKNOWN },             /* 	32 bit AVYU 4:4:4 (4 byte, alpha 8@24, Cr 8@16, Y 8@8, Cb 8@0) */
- 	{ DSPF_VYU, SDL_PIXELFORMAT_UNKNOWN },              /* 	24 bit VYU 4:4:4 (3 byte, Cr 8@16, Y 8@8, Cb 8@0)  */
+    { DSPF_RGBA5551, SDL_PIXELFORMAT_UNKNOWN },         /*  16 bit RGBA (2 byte, red 5@11, green 5@6, blue 5@1, alpha 1@0) */
+    { DSPF_YUV444P, SDL_PIXELFORMAT_UNKNOWN },          /*  24 bit full YUV planar (8 bit Y plane followed by an 8 bit Cb and an 8 bit Cr plane) */
+    { DSPF_ARGB8565, SDL_PIXELFORMAT_UNKNOWN },         /*  24 bit ARGB (3 byte, alpha 8@16, red 5@11, green 6@5, blue 5@0) */
+    { DSPF_AVYU, SDL_PIXELFORMAT_UNKNOWN },             /*  32 bit AVYU 4:4:4 (4 byte, alpha 8@24, Cr 8@16, Y 8@8, Cb 8@0) */
+    { DSPF_VYU, SDL_PIXELFORMAT_UNKNOWN },              /*  24 bit VYU 4:4:4 (3 byte, Cr 8@16, Y 8@8, Cb 8@0)  */
 #endif
- 	
+
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_INDEX1LSB },
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_INDEX1MSB },
-    { DSPF_UNKNOWN, SDL_PIXELFORMAT_INDEX4LSB }, 
+    { DSPF_UNKNOWN, SDL_PIXELFORMAT_INDEX4LSB },
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_INDEX4MSB },
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_BGR24 },
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_BGR888 },
@@ -381,14 +384,14 @@ static const struct {
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_ABGR4444 },
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_ABGR1555 },
     { DSPF_UNKNOWN, SDL_PIXELFORMAT_BGR565 },
-    { DSPF_UNKNOWN, SDL_PIXELFORMAT_YVYU },                        /**< Packed mode: Y0+V0+Y1+U0 (1 pla	*/
+    { DSPF_UNKNOWN, SDL_PIXELFORMAT_YVYU },                        /**< Packed mode: Y0+V0+Y1+U0 (1 pla */
 };
 
 Uint32
 DirectFB_DFBToSDLPixelFormat(DFBSurfacePixelFormat pixelformat)
 {
     int i;
-    
+
     for (i=0; pixelformat_tab[i].dfb != DSPF_UNKNOWN; i++)
         if (pixelformat_tab[i].dfb == pixelformat)
         {
@@ -401,7 +404,7 @@ DFBSurfacePixelFormat
 DirectFB_SDLToDFBPixelFormat(Uint32 format)
 {
     int i;
-    
+
     for (i=0; pixelformat_tab[i].dfb != DSPF_UNKNOWN; i++)
         if (pixelformat_tab[i].sdl == format)
         {
@@ -412,11 +415,11 @@ DirectFB_SDLToDFBPixelFormat(Uint32 format)
 
 void DirectFB_SetSupportedPixelFormats(SDL_RendererInfo* ri)
 {
-	int i, j;
+    int i, j;
 
     for (i=0, j=0; pixelformat_tab[i].dfb != DSPF_UNKNOWN; i++)
-    	if (pixelformat_tab[i].sdl != SDL_PIXELFORMAT_UNKNOWN)
-    		ri->texture_formats[j++] = pixelformat_tab[i].sdl;
+        if (pixelformat_tab[i].sdl != SDL_PIXELFORMAT_UNKNOWN)
+            ri->texture_formats[j++] = pixelformat_tab[i].sdl;
     ri->num_texture_formats = j;
 }
 

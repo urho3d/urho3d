@@ -18,15 +18,8 @@
 #include "SDL_main.h"
 
 #ifdef main
-# ifndef _WIN32_WCE_EMULATION
 #  undef main
-# endif /* _WIN32_WCE_EMULATION */
 #endif /* main */
-
-#if defined(_WIN32_WCE) && _WIN32_WCE < 300
-/* seems to be undefined in Win CE although in online help */
-#define isspace(a) (((CHAR)a == ' ') || ((CHAR)a == '\t'))
-#endif /* _WIN32_WCE < 300 */
 
 static void
 UnEscapeQuotes(char *arg)
@@ -34,7 +27,7 @@ UnEscapeQuotes(char *arg)
     char *last = NULL;
 
     while (*arg) {
-        if (*arg == '"' && *last == '\\') {
+        if (*arg == '"' && (last != NULL && *last == '\\')) {
             char *c_curr = arg;
             char *c_last = last;
 
@@ -130,7 +123,7 @@ OutOfMemory(void)
     return FALSE;
 }
 
-#if defined(_MSC_VER) && !defined(_WIN32_WCE)
+#if defined(_MSC_VER)
 /* The VC++ compiler needs main defined */
 #define console_main main
 #endif
@@ -140,6 +133,8 @@ int
 console_main(int argc, char *argv[])
 {
     int status;
+
+    SDL_SetMainReady();
 
     /* Run the application main() code */
     status = SDL_main(argc, argv);
@@ -153,42 +148,22 @@ console_main(int argc, char *argv[])
 
 /* This is where execution begins [windowed apps] */
 int WINAPI
-WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR szCmdLine, int sw)
+WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
     char **argv;
     int argc;
     char *cmdline;
-#ifdef _WIN32_WCE
-    wchar_t *bufp;
-    int nLen;
-#else
-    char *bufp;
-    size_t nLen;
-#endif
 
-#ifdef _WIN32_WCE
-    nLen = wcslen(szCmdLine) + 128 + 1;
-    bufp = SDL_stack_alloc(wchar_t, nLen * 2);
-    wcscpy(bufp, TEXT("\""));
-    GetModuleFileName(NULL, bufp + 1, 128 - 3);
-    wcscpy(bufp + wcslen(bufp), TEXT("\" "));
-    wcsncpy(bufp + wcslen(bufp), szCmdLine, nLen - wcslen(bufp));
-    nLen = wcslen(bufp) + 1;
-    cmdline = SDL_stack_alloc(char, nLen);
-    if (cmdline == NULL) {
-        return OutOfMemory();
-    }
-    WideCharToMultiByte(CP_ACP, 0, bufp, -1, cmdline, nLen, NULL, NULL);
-#else
     /* Grab the command line */
-    bufp = GetCommandLine();
-    nLen = SDL_strlen(bufp) + 1;
-    cmdline = SDL_stack_alloc(char, nLen);
+    TCHAR *text = GetCommandLine();
+#if UNICODE
+    cmdline = SDL_iconv_string("UTF-8", "UCS-2-INTERNAL", (char *)(text), (SDL_wcslen(text)+1)*sizeof(WCHAR));
+#else
+    cmdline = SDL_strdup(text);
+#endif
     if (cmdline == NULL) {
         return OutOfMemory();
     }
-    SDL_strlcpy(cmdline, bufp, nLen);
-#endif
 
     /* Parse it into argv and argc */
     argc = ParseCommandLine(cmdline, NULL);
@@ -200,6 +175,8 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR szCmdLine, int sw)
 
     /* Run the main program */
     console_main(argc, argv);
+
+    SDL_free(cmdline);
 
     /* Hush little compiler, don't you cry... */
     return 0;

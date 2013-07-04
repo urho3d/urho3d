@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,22 +30,21 @@
 #define UNICODE 1
 #endif
 #undef _WIN32_WINNT
-#define _WIN32_WINNT  0x500   /* Need 0x410 for AlphaBlend() and 0x500 for EnumDisplayDevices() */
+#define _WIN32_WINNT  0x501   /* Need 0x410 for AlphaBlend() and 0x500 for EnumDisplayDevices(), 0x501 for raw input */
 
 #include <windows.h>
 
-
 /* Routines to convert from UTF8 to native Windows text */
 #if UNICODE
-#define WIN_StringToUTF8(S) SDL_iconv_string("UTF-8", "UCS-2", (char *)(S), (SDL_wcslen(S)+1)*sizeof(WCHAR))
-#define WIN_UTF8ToString(S) (WCHAR *)SDL_iconv_string("UCS-2", "UTF-8", (char *)(S), SDL_strlen(S)+1)
+#define WIN_StringToUTF8(S) SDL_iconv_string("UTF-8", "UCS-2-INTERNAL", (char *)(S), (SDL_wcslen(S)+1)*sizeof(WCHAR))
+#define WIN_UTF8ToString(S) (WCHAR *)SDL_iconv_string("UCS-2-INTERNAL", "UTF-8", (char *)(S), SDL_strlen(S)+1)
 #else
 #define WIN_StringToUTF8(S) SDL_iconv_string("UTF-8", "ASCII", (char *)(S), (SDL_strlen(S)+1))
 #define WIN_UTF8ToString(S) SDL_iconv_string("ASCII", "UTF-8", (char *)(S), SDL_strlen(S)+1)
 #endif
 
-/* Sets an error message based on GetLastError() */
-extern void WIN_SetError(const char *prefix);
+/* Sets an error message based on GetLastError(). Always return -1. */
+extern int WIN_SetError(const char *prefix);
 
 /* Wrap up the oddities of CoInitialize() into a common function. */
 extern HRESULT WIN_CoInitialize(void);

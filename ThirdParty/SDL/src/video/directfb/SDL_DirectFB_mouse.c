@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -115,12 +115,12 @@ DirectFB_CreateDefaultCursor(void)
     {
         for (j = 0; j < 32; j++)
         {
-        	switch (arrow[i][j])
-        	{
-        	case ' ': dest[j] = 0x00000000; break;
-        	case '.': dest[j] = 0xffffffff; break;
-        	case 'X': dest[j] = 0xff000000; break;
-        	}
+            switch (arrow[i][j])
+            {
+            case ' ': dest[j] = 0x00000000; break;
+            case '.': dest[j] = 0xffffffff; break;
+            case 'X': dest[j] = 0xff000000; break;
+            }
         }
         dest += (pitch >> 2);
     }

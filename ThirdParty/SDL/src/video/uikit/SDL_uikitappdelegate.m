@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,25 +25,28 @@
 
 #if SDL_VIDEO_DRIVER_UIKIT
 
-#import "../SDL_sysvideo.h"
-#import "SDL_assert.h"
-#import "SDL_hints.h"
-#import "../../SDL_hints_c.h"
+#include "../SDL_sysvideo.h"
+#include "SDL_assert.h"
+#include "SDL_hints.h"
+#include "../../SDL_hints_c.h"
+#include "SDL_system.h"
+#include "SDL_main.h"
 
-#import "SDL_uikitappdelegate.h"
-#import "SDL_uikitopenglview.h"
-#import "../../events/SDL_events_c.h"
-#import "jumphack.h"
+#include "SDL_uikitappdelegate.h"
+#include "SDL_uikitmodes.h"
+#include "../../events/SDL_events_c.h"
 
 #ifdef main
 #undef main
 #endif
 
-extern int SDL_main(int argc, char *argv[]);
 static int forward_argc;
 static char **forward_argv;
 static int exit_status;
-static char *resource_dir = 0;
+static UIWindow *launch_window;
+
+// Urho3D: added variable
+const char* resource_dir = 0;
 
 int main(int argc, char **argv)
 {
@@ -101,6 +104,91 @@ static void SDL_IdleTimerDisabledChanged(const char *name, const char *oldValue,
     [UIApplication sharedApplication].idleTimerDisabled = disable;
 }
 
+@interface SDL_splashviewcontroller : UIViewController {
+    UIImageView *splash;
+    UIImage *splashPortrait;
+    UIImage *splashLandscape;
+}
+
+- (void)updateSplashImage:(UIInterfaceOrientation)interfaceOrientation;
+@end
+
+@implementation SDL_splashviewcontroller
+
+- (id)init
+{
+    self = [super init];
+    if (self == nil) {
+        return nil;
+    }
+
+    self->splash = [[UIImageView alloc] init];
+    [self setView:self->splash];
+
+    CGSize size = [UIScreen mainScreen].bounds.size;
+    float height = SDL_max(size.width, size.height);
+    self->splashPortrait = [UIImage imageNamed:[NSString stringWithFormat:@"Default-%dh.png", (int)height]];
+    if (!self->splashPortrait) {
+        self->splashPortrait = [UIImage imageNamed:@"Default.png"];
+    }
+    self->splashLandscape = [UIImage imageNamed:@"Default-Landscape.png"];
+    if (!self->splashLandscape && self->splashPortrait) {
+        self->splashLandscape = [[UIImage alloc] initWithCGImage: self->splashPortrait.CGImage
+                                                           scale: 1.0
+                                                     orientation: UIImageOrientationRight];
+    }
+    if (self->splashPortrait) {
+        [self->splashPortrait retain];
+    }
+    if (self->splashLandscape) {
+        [self->splashLandscape retain];
+    }
+
+    [self updateSplashImage:[[UIApplication sharedApplication] statusBarOrientation]];
+
+    return self;
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    NSUInteger orientationMask = UIInterfaceOrientationMaskAll;
+
+    /* Don't allow upside-down orientation on the phone, so answering calls is in the natural orientation */
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        orientationMask &= ~UIInterfaceOrientationMaskPortraitUpsideDown;
+    }
+    return orientationMask;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orient
+{
+    NSUInteger orientationMask = [self supportedInterfaceOrientations];
+    return (orientationMask & (1 << orient));
+}
+
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
+{
+    [self updateSplashImage:interfaceOrientation];
+}
+
+- (void)updateSplashImage:(UIInterfaceOrientation)interfaceOrientation
+{
+    UIImage *image;
+
+    if (UIInterfaceOrientationIsLandscape(interfaceOrientation)) {
+        image = self->splashLandscape;
+    } else {
+        image = self->splashPortrait;
+    }
+    if (image)
+    {
+        splash.image = image;
+    }
+}
+
+@end
+
+
 @implementation SDLUIKitDelegate
 
 /* convenience method */
@@ -125,21 +213,42 @@ static void SDL_IdleTimerDisabledChanged(const char *name, const char *oldValue,
 
 - (void)postFinishLaunch
 {
-    /* register a callback for the idletimer hint */
-    SDL_SetHint(SDL_HINT_IDLE_TIMER_DISABLED, "0");
-    SDL_RegisterHintChangedCb(SDL_HINT_IDLE_TIMER_DISABLED, &SDL_IdleTimerDisabledChanged);
+    SDL_SetMainReady();
 
     /* run the user's application, passing argc and argv */
+    SDL_iPhoneSetEventPump(SDL_TRUE);
     exit_status = SDL_main(forward_argc, forward_argv);
+    SDL_iPhoneSetEventPump(SDL_FALSE);
+
+    /* If we showed a splash image, clean it up */
+    if (launch_window) {
+        [launch_window release];
+        launch_window = NULL;
+    }
 
     /* exit, passing the return status from the user's application */
-    // exit(exit_status);
+    /* We don't actually exit to support applications that do setup in
+     * their main function and then allow the Cocoa event loop to run.
+     */
+    /* exit(exit_status); */
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    /* Keep the launch image up until we set a video mode */
+    launch_window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+
+    UIViewController *splashViewController = [[SDL_splashviewcontroller alloc] init];
+    launch_window.rootViewController = splashViewController;
+    [launch_window addSubview:splashViewController.view];
+    [launch_window makeKeyAndVisible];
+
     /* Set working directory to resource path */
     [[NSFileManager defaultManager] changeCurrentDirectoryPath: [[NSBundle mainBundle] resourcePath]];
+
+    /* register a callback for the idletimer hint */
+    SDL_SetHint(SDL_HINT_IDLE_TIMER_DISABLED, "0");
+    SDL_RegisterHintChangedCb(SDL_HINT_IDLE_TIMER_DISABLED, &SDL_IdleTimerDisabledChanged);
 
     [self performSelector:@selector(postFinishLaunch) withObject:nil afterDelay:0.0];
 
@@ -148,76 +257,43 @@ static void SDL_IdleTimerDisabledChanged(const char *name, const char *oldValue,
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
-    SDL_Event event;
-    event.type=SDL_SYSEVENT_TERMINATE;
-    event.sysevent.data=NULL;
-    if (SDL_SysEventHandler)
-        SDL_SysEventHandler(&event);
-    else 
-        SDL_SendQuit();
+    SDL_SendAppEvent(SDL_APP_TERMINATING);
+}
+
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
+{
+    SDL_SendAppEvent(SDL_APP_LOWMEMORY);
 }
 
 - (void) applicationWillResignActive:(UIApplication*)application
 {
-    //NSLog(@"%@", NSStringFromSelector(_cmd));
-    SDL_Event event;
-    event.type=SDL_SYSEVENT_WILL_SUSPEND;
-    event.sysevent.data=NULL;
-    if (SDL_SysEventHandler)
-        SDL_SysEventHandler(&event);
-    else {
-    // Send every window on every screen a MINIMIZED event.
-        SDL_VideoDevice *_this = SDL_GetVideoDevice();
-        if (!_this) {
-            return;
-        }
-
+    SDL_VideoDevice *_this = SDL_GetVideoDevice();
+    if (_this) {
         SDL_Window *window;
         for (window = _this->windows; window != nil; window = window->next) {
             SDL_SendWindowEvent(window, SDL_WINDOWEVENT_FOCUS_LOST, 0, 0);
             SDL_SendWindowEvent(window, SDL_WINDOWEVENT_MINIMIZED, 0, 0);
         }
     }
+    SDL_SendAppEvent(SDL_APP_WILLENTERBACKGROUND);
 }
 
-- (void)applicationDidEnterBackground:(UIApplication*)application
+- (void) applicationDidEnterBackground:(UIApplication*)application
 {
-    //NSLog(@"%@", NSStringFromSelector(_cmd));
-	
-    SDL_Event event;
-    event.type=SDL_SYSEVENT_SUSPEND;
-    event.sysevent.data=NULL;
-    if (SDL_SysEventHandler)
-        SDL_SysEventHandler(&event);
+    SDL_SendAppEvent(SDL_APP_DIDENTERBACKGROUND);
 }
 
-- (void)applicationWillEnterForeground:(UIApplication*)application
+- (void) applicationWillEnterForeground:(UIApplication*)application
 {
-    //NSLog(@"%@", NSStringFromSelector(_cmd));
-	
-    SDL_Event event;
-    event.type=SDL_SYSEVENT_WILL_RESUME;
-    event.sysevent.data=NULL;
-    if (SDL_SysEventHandler)
-        SDL_SysEventHandler(&event);
+    SDL_SendAppEvent(SDL_APP_WILLENTERFOREGROUND);
 }
 
 - (void) applicationDidBecomeActive:(UIApplication*)application
 {
-    //NSLog(@"%@", NSStringFromSelector(_cmd));
+    SDL_SendAppEvent(SDL_APP_DIDENTERFOREGROUND);
 
-    SDL_Event event;
-    event.type=SDL_SYSEVENT_RESUME;
-    event.sysevent.data=NULL;
-    if (SDL_SysEventHandler)
-        SDL_SysEventHandler(&event);
-    else {
-        // Send every window on every screen a RESTORED event.
-        SDL_VideoDevice *_this = SDL_GetVideoDevice();
-        if (!_this) {
-            return;
-        }
-
+    SDL_VideoDevice *_this = SDL_GetVideoDevice();
+    if (_this) {
         SDL_Window *window;
         for (window = _this->windows; window != nil; window = window->next) {
             SDL_SendWindowEvent(window, SDL_WINDOWEVENT_FOCUS_GAINED, 0, 0);
@@ -226,16 +302,17 @@ static void SDL_IdleTimerDisabledChanged(const char *name, const char *oldValue,
     }
 }
 
-- (void)applicationDidReceiveMemoryWarning:(UIApplication*)application
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
-    //NSLog(@"%@", NSStringFromSelector(_cmd));
-	
-    SDL_Event event;
-    event.type=SDL_SYSEVENT_LOWMEMORY;
-    event.sysevent.data=NULL;
-    if (SDL_SysEventHandler)
-        SDL_SysEventHandler(&event);
+    NSURL *fileURL = [url filePathURL];
+    if (fileURL != nil) {
+        SDL_SendDropFile([[fileURL path] UTF8String]);
+    } else {
+        SDL_SendDropFile([[url absoluteString] UTF8String]);
+    }
+    return YES;
 }
+
 @end
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,8 +29,13 @@ SDL_HasIntersection(const SDL_Rect * A, const SDL_Rect * B)
 {
     int Amin, Amax, Bmin, Bmax;
 
-    if (!A || !B) {
-        // TODO error message
+    if (!A) {
+        SDL_InvalidParamError("A");
+        return SDL_FALSE;
+    }
+
+    if (!B) {
+        SDL_InvalidParamError("B");
         return SDL_FALSE;
     }
 
@@ -71,16 +76,28 @@ SDL_IntersectRect(const SDL_Rect * A, const SDL_Rect * B, SDL_Rect * result)
 {
     int Amin, Amax, Bmin, Bmax;
 
-    if (!A || !B || !result) {
-        // TODO error message
+    if (!A) {
+        SDL_InvalidParamError("A");
+        return SDL_FALSE;
+    }
+
+    if (!B) {
+        SDL_InvalidParamError("B");
+        return SDL_FALSE;
+    }
+
+    if (!result) {
+        SDL_InvalidParamError("result");
         return SDL_FALSE;
     }
 
     /* Special cases for empty rects */
     if (SDL_RectEmpty(A) || SDL_RectEmpty(B)) {
+        result->w = 0;
+        result->h = 0;
         return SDL_FALSE;
     }
-    
+
     /* Horizontal intersection */
     Amin = A->x;
     Amax = Amin + A->w;
@@ -113,7 +130,18 @@ SDL_UnionRect(const SDL_Rect * A, const SDL_Rect * B, SDL_Rect * result)
 {
     int Amin, Amax, Bmin, Bmax;
 
-    if (!A || !B || !result) {
+    if (!A) {
+        SDL_InvalidParamError("A");
+        return;
+    }
+
+    if (!B) {
+        SDL_InvalidParamError("B");
+        return;
+    }
+
+    if (!result) {
+        SDL_InvalidParamError("result");
         return;
     }
 
@@ -127,14 +155,14 @@ SDL_UnionRect(const SDL_Rect * A, const SDL_Rect * B, SDL_Rect * result)
        *result = *B;
        return;
       }
-    } else {      
+    } else {
       if (SDL_RectEmpty(B)) {
        /* A not empty, B empty */
        *result = *A;
        return;
-      } 
+      }
     }
-    
+
     /* Horizontal union */
     Amin = A->x;
     Amax = Amin + A->w;
@@ -171,12 +199,12 @@ SDL_EnclosePoints(const SDL_Point * points, int count, const SDL_Rect * clip,
     int x, y, i;
 
     if (!points) {
-        /* TODO error message */
+        SDL_InvalidParamError("points");
         return SDL_FALSE;
     }
 
     if (count < 1) {
-        /* TODO error message */
+        SDL_InvalidParamError("count");
         return SDL_FALSE;
     }
 
@@ -191,7 +219,7 @@ SDL_EnclosePoints(const SDL_Point * points, int count, const SDL_Rect * clip,
         if (SDL_RectEmpty(clip)) {
             return SDL_FALSE;
         }
-        
+
         for (i = 0; i < count; ++i) {
             x = points[i].x;
             y = points[i].y;
@@ -231,7 +259,7 @@ SDL_EnclosePoints(const SDL_Point * points, int count, const SDL_Rect * clip,
         if (result == NULL) {
             return SDL_TRUE;
         }
-        
+
         /* No clipping, always add the first point */
         minx = maxx = points[0].x;
         miny = maxy = points[0].y;
@@ -298,8 +326,28 @@ SDL_IntersectRectAndLine(const SDL_Rect * rect, int *X1, int *Y1, int *X2,
     int recty2;
     int outcode1, outcode2;
 
-    if (!rect || !X1 || !Y1 || !X2 || !Y2) {
-        // TODO error message
+    if (!rect) {
+        SDL_InvalidParamError("rect");
+        return SDL_FALSE;
+    }
+
+    if (!X1) {
+        SDL_InvalidParamError("X1");
+        return SDL_FALSE;
+    }
+
+    if (!Y1) {
+        SDL_InvalidParamError("Y1");
+        return SDL_FALSE;
+    }
+
+    if (!X2) {
+        SDL_InvalidParamError("X2");
+        return SDL_FALSE;
+    }
+
+    if (!Y2) {
+        SDL_InvalidParamError("Y2");
         return SDL_FALSE;
     }
 
@@ -307,7 +355,7 @@ SDL_IntersectRectAndLine(const SDL_Rect * rect, int *X1, int *Y1, int *X2,
     if (SDL_RectEmpty(rect)) {
         return SDL_FALSE;
     }
-    
+
     x1 = *X1;
     y1 = *Y1;
     x2 = *X2;
@@ -412,24 +460,34 @@ SDL_IntersectRectAndLine(const SDL_Rect * rect, int *X1, int *Y1, int *X2,
 
 SDL_bool
 SDL_GetSpanEnclosingRect(int width, int height,
-                         int numrects, SDL_Rect * rects, SDL_Rect *span)
+                         int numrects, const SDL_Rect * rects, SDL_Rect *span)
 {
     int i;
     int span_y1, span_y2;
     int rect_y1, rect_y2;
 
-    if (width < 1 || height < 1) {
-        // TODO error message
+    if (width < 1) {
+        SDL_InvalidParamError("width");
         return SDL_FALSE;
     }
 
-    if (!rects || !span) {
-        // TODO error message
+    if (height < 1) {
+        SDL_InvalidParamError("height");
+        return SDL_FALSE;
+    }
+
+    if (!rects) {
+        SDL_InvalidParamError("rects");
+        return SDL_FALSE;
+    }
+
+    if (!span) {
+        SDL_InvalidParamError("span");
         return SDL_FALSE;
     }
 
     if (numrects < 1) {
-        // TODO error message
+        SDL_InvalidParamError("numrects");
         return SDL_FALSE;
     }
 

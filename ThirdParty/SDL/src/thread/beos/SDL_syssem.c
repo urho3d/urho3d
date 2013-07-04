@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -73,8 +73,7 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
     int retval;
 
     if (!sem) {
-        SDL_SetError("Passed a NULL semaphore");
-        return -1;
+        return SDL_SetError("Passed a NULL semaphore");
     }
 
   tryagain:
@@ -97,8 +96,7 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
         retval = SDL_MUTEX_TIMEDOUT;
         break;
     default:
-        SDL_SetError("acquire_sem() failed");
-        retval = -1;
+        retval = SDL_SetError("acquire_sem() failed");
         break;
     }
 
@@ -139,13 +137,11 @@ int
 SDL_SemPost(SDL_sem * sem)
 {
     if (!sem) {
-        SDL_SetError("Passed a NULL semaphore");
-        return -1;
+        return SDL_SetError("Passed a NULL semaphore");
     }
 
     if (release_sem(sem->id) != B_NO_ERROR) {
-        SDL_SetError("release_sem() failed");
-        return -1;
+        return SDL_SetError("release_sem() failed");
     }
     return 0;
 }

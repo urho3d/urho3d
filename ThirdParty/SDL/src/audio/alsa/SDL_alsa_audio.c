@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -155,7 +155,7 @@ static void
 UnloadALSALibrary(void)
 {
     if (alsa_handle != NULL) {
-		SDL_UnloadObject(alsa_handle);
+        SDL_UnloadObject(alsa_handle);
         alsa_handle = NULL;
     }
 }
@@ -482,8 +482,7 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden = (struct SDL_PrivateAudioData *)
         SDL_malloc((sizeof *this->hidden));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, (sizeof *this->hidden));
 
@@ -495,9 +494,8 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("ALSA: Couldn't open audio device: %s",
-                     ALSA_snd_strerror(status));
-        return 0;
+        return SDL_SetError("ALSA: Couldn't open audio device: %s",
+                            ALSA_snd_strerror(status));
     }
 
     this->hidden->pcm_handle = pcm_handle;
@@ -507,9 +505,8 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
     status = ALSA_snd_pcm_hw_params_any(pcm_handle, hwparams);
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("ALSA: Couldn't get hardware config: %s",
-                     ALSA_snd_strerror(status));
-        return 0;
+        return SDL_SetError("ALSA: Couldn't get hardware config: %s",
+                            ALSA_snd_strerror(status));
     }
 
     /* SDL only uses interleaved sample output */
@@ -517,9 +514,8 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
                                                SND_PCM_ACCESS_RW_INTERLEAVED);
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("ALSA: Couldn't set interleaved access: %s",
+        return SDL_SetError("ALSA: Couldn't set interleaved access: %s",
                      ALSA_snd_strerror(status));
-        return 0;
     }
 
     /* Try for a closest match on audio format */
@@ -572,8 +568,7 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
     }
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("ALSA: Couldn't find any hardware audio formats");
-        return 0;
+        return SDL_SetError("ALSA: Couldn't find any hardware audio formats");
     }
     this->spec.format = test_format;
 
@@ -585,8 +580,7 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
         status = ALSA_snd_pcm_hw_params_get_channels(hwparams, &channels);
         if (status < 0) {
             ALSA_CloseDevice(this);
-            SDL_SetError("ALSA: Couldn't set audio channels");
-            return 0;
+            return SDL_SetError("ALSA: Couldn't set audio channels");
         }
         this->spec.channels = channels;
     }
@@ -597,9 +591,8 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
                                                   &rate, NULL);
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("ALSA: Couldn't set audio frequency: %s",
-                     ALSA_snd_strerror(status));
-        return 0;
+        return SDL_SetError("ALSA: Couldn't set audio frequency: %s",
+                            ALSA_snd_strerror(status));
     }
     this->spec.freq = rate;
 
@@ -609,8 +602,7 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
         /* Failed to set desired buffer size, do the best you can... */
         if ( ALSA_set_period_size(this, hwparams, 1) < 0 ) {
             ALSA_CloseDevice(this);
-            SDL_SetError("Couldn't set hardware audio parameters: %s", ALSA_snd_strerror(status));
-            return(-1);
+            return SDL_SetError("Couldn't set hardware audio parameters: %s", ALSA_snd_strerror(status));
         }
     }
     /* Set the software parameters */
@@ -618,31 +610,27 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
     status = ALSA_snd_pcm_sw_params_current(pcm_handle, swparams);
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("ALSA: Couldn't get software config: %s",
-                     ALSA_snd_strerror(status));
-        return 0;
+        return SDL_SetError("ALSA: Couldn't get software config: %s",
+                            ALSA_snd_strerror(status));
     }
     status = ALSA_snd_pcm_sw_params_set_avail_min(pcm_handle, swparams, this->spec.samples);
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("Couldn't set minimum available samples: %s",
-                     ALSA_snd_strerror(status));
-        return 0;
+        return SDL_SetError("Couldn't set minimum available samples: %s",
+                            ALSA_snd_strerror(status));
     }
     status =
         ALSA_snd_pcm_sw_params_set_start_threshold(pcm_handle, swparams, 1);
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("ALSA: Couldn't set start threshold: %s",
-                     ALSA_snd_strerror(status));
-        return 0;
+        return SDL_SetError("ALSA: Couldn't set start threshold: %s",
+                            ALSA_snd_strerror(status));
     }
     status = ALSA_snd_pcm_sw_params(pcm_handle, swparams);
     if (status < 0) {
         ALSA_CloseDevice(this);
-        SDL_SetError("Couldn't set software audio parameters: %s",
-                     ALSA_snd_strerror(status));
-        return 0;
+        return SDL_SetError("Couldn't set software audio parameters: %s",
+                            ALSA_snd_strerror(status));
     }
 
     /* Calculate the final parameters for this audio specification */
@@ -653,8 +641,7 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->hidden->mixlen);
     if (this->hidden->mixbuf == NULL) {
         ALSA_CloseDevice(this);
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
 
@@ -662,7 +649,7 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
     ALSA_snd_pcm_nonblock(pcm_handle, 0);
 
     /* We're ready to rock and roll. :-) */
-    return 1;
+    return 0;
 }
 
 static void

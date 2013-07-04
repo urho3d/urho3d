@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,6 +27,7 @@
 #include "SDL_events.h"
 #include "../../events/SDL_mouse_c.h"
 #include "../../events/SDL_touch_c.h"
+#include "SDL_log.h"
 
 #include "SDL_androidtouch.h"
 
@@ -36,55 +37,75 @@
 #define ACTION_MOVE 2
 #define ACTION_CANCEL 3
 #define ACTION_OUTSIDE 4
-// The following two are deprecated but it seems they are still emitted (instead the corresponding ACTION_UP/DOWN) as of Android 3.2
+/* The following two are deprecated but it seems they are still emitted (instead the corresponding ACTION_UP/DOWN) as of Android 3.2 */
 #define ACTION_POINTER_1_DOWN 5
 #define ACTION_POINTER_1_UP 6
 
-void Android_OnTouch(int touch_device_id_in, int pointer_finger_id_in, int action, float x, float y, float p) 
+static SDL_FingerID leftFingerDown = 0;
+
+static void Android_GetWindowCoordinates(float x, float y,
+                                         int *window_x, int *window_y)
+{
+    int window_w, window_h;
+
+    SDL_GetWindowSize(Android_Window, &window_w, &window_h);
+    *window_x = (int)(x * window_w);
+    *window_y = (int)(y * window_h);
+}
+
+void Android_OnTouch(int touch_device_id_in, int pointer_finger_id_in, int action, float x, float y, float p)
 {
     SDL_TouchID touchDeviceId = 0;
     SDL_FingerID fingerId = 0;
-    
+    int window_x, window_y;
+
     if (!Android_Window) {
         return;
     }
-    
+
     touchDeviceId = (SDL_TouchID)touch_device_id_in;
-    if (!SDL_GetTouch(touchDeviceId)) {
-        SDL_Touch touch;
-        memset( &touch, 0, sizeof(touch) );
-        touch.id = touchDeviceId;
-        touch.x_min = 0.0f;
-        touch.x_max = (float)Android_ScreenWidth;
-        touch.native_xres = touch.x_max - touch.x_min;
-        touch.y_min = 0.0f;
-        touch.y_max = (float)Android_ScreenHeight;
-        touch.native_yres = touch.y_max - touch.y_min;
-        touch.pressure_min = 0.0f;
-        touch.pressure_max = 1.0f;
-        touch.native_pressureres = touch.pressure_max - touch.pressure_min;
-        if (SDL_AddTouch(&touch, "") < 0) {
-             SDL_Log("error: can't add touch %s, %d", __FILE__, __LINE__);
-        }
+    if (SDL_AddTouch(touchDeviceId, "") < 0) {
+        SDL_Log("error: can't add touch %s, %d", __FILE__, __LINE__);
     }
 
-    
     fingerId = (SDL_FingerID)pointer_finger_id_in;
     switch (action) {
         case ACTION_DOWN:
         case ACTION_POINTER_1_DOWN:
-            SDL_SendFingerDown(touchDeviceId, fingerId, SDL_TRUE, x, y, p);
+            if (!leftFingerDown) {
+                Android_GetWindowCoordinates(x, y, &window_x, &window_y);
+
+                /* send moved event */
+                SDL_SendMouseMotion(NULL, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
+
+                /* send mouse down event */
+                SDL_SendMouseButton(NULL, SDL_TOUCH_MOUSEID, SDL_PRESSED, SDL_BUTTON_LEFT);
+
+                leftFingerDown = fingerId;
+            }
+            SDL_SendTouch(touchDeviceId, fingerId, SDL_TRUE, x, y, p);
             break;
         case ACTION_MOVE:
-            SDL_SendTouchMotion(touchDeviceId, fingerId, SDL_FALSE, x, y, p);
+            if (!leftFingerDown) {
+                Android_GetWindowCoordinates(x, y, &window_x, &window_y);
+
+                /* send moved event */
+                SDL_SendMouseMotion(NULL, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
+            }
+            SDL_SendTouchMotion(touchDeviceId, fingerId, x, y, p);
             break;
         case ACTION_UP:
         case ACTION_POINTER_1_UP:
-            SDL_SendFingerDown(touchDeviceId, fingerId, SDL_FALSE, x, y, p);
+            if (fingerId == leftFingerDown) {
+                /* send mouse up */
+                SDL_SendMouseButton(NULL, SDL_TOUCH_MOUSEID, SDL_RELEASED, SDL_BUTTON_LEFT);
+                leftFingerDown = 0;
+            }
+            SDL_SendTouch(touchDeviceId, fingerId, SDL_FALSE, x, y, p);
             break;
         default:
             break;
-    } 
+    }
 }
 
 #endif /* SDL_VIDEO_DRIVER_ANDROID */

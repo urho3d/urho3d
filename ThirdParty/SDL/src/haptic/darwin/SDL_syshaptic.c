@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,7 +35,7 @@
 #include <ForceFeedback/ForceFeedbackConstants.h>
 
 #ifndef IO_OBJECT_NULL
-#define IO_OBJECT_NULL	((io_service_t)0)
+#define IO_OBJECT_NULL  ((io_service_t)0)
 #endif
 
 #define MAX_HAPTICS  32
@@ -49,7 +49,7 @@ static struct
     char name[256];             /* Name of the device. */
 
     io_service_t dev;           /* Node we use to create the device. */
-    SDL_Haptic *haptic;         /* Haptic currently assosciated with it. */
+    SDL_Haptic *haptic;         /* Haptic currently associated with it. */
 
     /* Usage pages for determining if it's a mouse or not. */
     long usage;
@@ -83,7 +83,7 @@ static void SDL_SYS_HapticFreeFFEFFECT(FFEFFECT * effect, int type);
 static int HIDGetDeviceProduct(io_service_t dev, char *name);
 
 
-/* 
+/*
  * Like strerror but for force feedback errors.
  */
 static const char *
@@ -160,20 +160,17 @@ SDL_SYS_HapticInit(void)
     /* Get HID devices. */
     match = IOServiceMatching(kIOHIDDeviceKey);
     if (match == NULL) {
-        SDL_SetError("Haptic: Failed to get IOServiceMatching.");
-        return -1;
+        return SDL_SetError("Haptic: Failed to get IOServiceMatching.");
     }
 
     /* Now search I/O Registry for matching devices. */
     result = IOServiceGetMatchingServices(kIOMasterPortDefault, match, &iter);
     if (result != kIOReturnSuccess) {
-        SDL_SetError("Haptic: Couldn't create a HID object iterator.");
-        return -1;
+        return SDL_SetError("Haptic: Couldn't create a HID object iterator.");
     }
     /* IOServiceGetMatchingServices consumes dictionary. */
 
     if (!IOIteratorIsValid(iter)) {     /* No iterator. */
-        numhaptics = 0;
         return 0;
     }
 
@@ -258,12 +255,11 @@ HIDGetDeviceProduct(io_service_t dev, char *name)
     ret = IORegistryEntryCreateCFProperties(dev, &hidProperties,
                                             kCFAllocatorDefault, kNilOptions);
     if ((ret != KERN_SUCCESS) || !hidProperties) {
-        SDL_SetError("Haptic: Unable to create CFProperties.");
-        return -1;
+        return SDL_SetError("Haptic: Unable to create CFProperties.");
     }
 
     /* Mac OS X currently is not mirroring all USB properties to HID page so need to look at USB device page also
-     * get dictionary for usb properties: step up two levels and get CF dictionary for USB properties
+     * get dictionary for USB properties: step up two levels and get CF dictionary for USB properties
      */
     if ((KERN_SUCCESS ==
          IORegistryEntryGetParentEntry(dev, kIOServicePlane, &parent1))
@@ -276,7 +272,7 @@ HIDGetDeviceProduct(io_service_t dev, char *name)
         if (usbProperties) {
             CFTypeRef refCF = 0;
             /* get device info
-             * try hid dictionary first, if fail then go to usb dictionary
+             * try hid dictionary first, if fail then go to USB dictionary
              */
 
 
@@ -290,17 +286,15 @@ HIDGetDeviceProduct(io_service_t dev, char *name)
             if (refCF) {
                 if (!CFStringGetCString(refCF, name, 256,
                                         CFStringGetSystemEncoding())) {
-                    SDL_SetError
+                    return SDL_SetError
                         ("Haptic: CFStringGetCString error retrieving pDevice->product.");
-                    return -1;
                 }
             }
 
             CFRelease(usbProperties);
         } else {
-            SDL_SetError
+            return SDL_SetError
                 ("Haptic: IORegistryEntryCreateCFProperties failed to create usbProperties.");
-            return -1;
         }
 
         /* Release stuff. */
@@ -311,8 +305,7 @@ HIDGetDeviceProduct(io_service_t dev, char *name)
             SDL_SetError("Haptic: IOObjectRelease error with parent1.");
         }
     } else {
-        SDL_SetError("Haptic: Error getting registry entries.");
-        return -1;
+        return SDL_SetError("Haptic: Error getting registry entries.");
     }
 
     return 0;
@@ -337,8 +330,7 @@ GetSupportedFeatures(SDL_Haptic * haptic)
 
     ret = FFDeviceGetForceFeedbackCapabilities(device, &features);
     if (ret != FF_OK) {
-        SDL_SetError("Haptic: Unable to get device's supported features.");
-        return -1;
+        return SDL_SetError("Haptic: Unable to get device's supported features.");
     }
 
     supported = 0;
@@ -367,9 +359,8 @@ GetSupportedFeatures(SDL_Haptic * haptic)
     if (ret == FF_OK)
         supported |= SDL_HAPTIC_GAIN;
     else if (ret != FFERR_UNSUPPORTED) {
-        SDL_SetError("Haptic: Unable to get if device supports gain: %s.",
-                     FFStrError(ret));
-        return -1;
+        return SDL_SetError("Haptic: Unable to get if device supports gain: %s.",
+                            FFStrError(ret));
     }
 
     /* Checks if supports autocenter. */
@@ -378,10 +369,9 @@ GetSupportedFeatures(SDL_Haptic * haptic)
     if (ret == FF_OK)
         supported |= SDL_HAPTIC_AUTOCENTER;
     else if (ret != FFERR_UNSUPPORTED) {
-        SDL_SetError
+        return SDL_SetError
             ("Haptic: Unable to get if device supports autocenter: %s.",
              FFStrError(ret));
-        return -1;
     }
 
     /* Check for axes, we have an artificial limit on axes */
@@ -572,7 +562,7 @@ SDL_SYS_HapticClose(SDL_Haptic * haptic)
 }
 
 
-/* 
+/*
  * Clean up after system specific haptic stuff
  */
 void
@@ -626,8 +616,7 @@ SDL_SYS_SetDirection(FFEFFECT * effect, SDL_HapticDirection * dir, int naxes)
     /* Has axes. */
     rglDir = SDL_malloc(sizeof(LONG) * naxes);
     if (rglDir == NULL) {
-        SDL_OutOfMemory();
-        return -1;
+        return SDL_OutOfMemory();
     }
     SDL_memset(rglDir, 0, sizeof(LONG) * naxes);
     effect->rglDirection = rglDir;
@@ -655,8 +644,7 @@ SDL_SYS_SetDirection(FFEFFECT * effect, SDL_HapticDirection * dir, int naxes)
         return 0;
 
     default:
-        SDL_SetError("Haptic: Unknown direction type.");
-        return -1;
+        return SDL_SetError("Haptic: Unknown direction type.");
     }
 }
 
@@ -696,8 +684,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest,
     /* Envelope. */
     envelope = SDL_malloc(sizeof(FFENVELOPE));
     if (envelope == NULL) {
-        SDL_OutOfMemory();
-        return -1;
+        return SDL_OutOfMemory();
     }
     SDL_memset(envelope, 0, sizeof(FFENVELOPE));
     dest->lpEnvelope = envelope;
@@ -708,8 +695,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest,
     if (dest->cAxes > 0) {
         axes = SDL_malloc(sizeof(DWORD) * dest->cAxes);
         if (axes == NULL) {
-            SDL_OutOfMemory();
-            return -1;
+            return SDL_OutOfMemory();
         }
         axes[0] = haptic->hwdata->axes[0];      /* Always at least one axis. */
         if (dest->cAxes > 1) {
@@ -722,14 +708,13 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest,
     }
 
 
-    /* The big type handling switch, even bigger then linux's version. */
+    /* The big type handling switch, even bigger then Linux's version. */
     switch (src->type) {
     case SDL_HAPTIC_CONSTANT:
         hap_constant = &src->constant;
         constant = SDL_malloc(sizeof(FFCONSTANTFORCE));
         if (constant == NULL) {
-            SDL_OutOfMemory();
-            return -1;
+            return SDL_OutOfMemory();
         }
         SDL_memset(constant, 0, sizeof(FFCONSTANTFORCE));
 
@@ -772,8 +757,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest,
         hap_periodic = &src->periodic;
         periodic = SDL_malloc(sizeof(FFPERIODIC));
         if (periodic == NULL) {
-            SDL_OutOfMemory();
-            return -1;
+            return SDL_OutOfMemory();
         }
         SDL_memset(periodic, 0, sizeof(FFPERIODIC));
 
@@ -818,8 +802,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest,
         hap_condition = &src->condition;
         condition = SDL_malloc(sizeof(FFCONDITION) * dest->cAxes);
         if (condition == NULL) {
-            SDL_OutOfMemory();
-            return -1;
+            return SDL_OutOfMemory();
         }
         SDL_memset(condition, 0, sizeof(FFCONDITION));
 
@@ -861,8 +844,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest,
         hap_ramp = &src->ramp;
         ramp = SDL_malloc(sizeof(FFRAMPFORCE));
         if (ramp == NULL) {
-            SDL_OutOfMemory();
-            return -1;
+            return SDL_OutOfMemory();
         }
         SDL_memset(ramp, 0, sizeof(FFRAMPFORCE));
 
@@ -900,8 +882,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest,
         hap_custom = &src->custom;
         custom = SDL_malloc(sizeof(FFCUSTOMFORCE));
         if (custom == NULL) {
-            SDL_OutOfMemory();
-            return -1;
+            return SDL_OutOfMemory();
         }
         SDL_memset(custom, 0, sizeof(FFCUSTOMFORCE));
 
@@ -945,8 +926,7 @@ SDL_SYS_ToFFEFFECT(SDL_Haptic * haptic, FFEFFECT * dest,
 
 
     default:
-        SDL_SetError("Haptic: Unknown effect type.");
-        return -1;
+        return SDL_SetError("Haptic: Unknown effect type.");
     }
 
     return 0;
@@ -1151,9 +1131,8 @@ SDL_SYS_HapticRunEffect(SDL_Haptic * haptic, struct haptic_effect *effect,
     /* Run the effect. */
     ret = FFEffectStart(effect->hweffect->ref, iter, 0);
     if (ret != FF_OK) {
-        SDL_SetError("Haptic: Unable to run the effect: %s.",
-                     FFStrError(ret));
-        return -1;
+        return SDL_SetError("Haptic: Unable to run the effect: %s.",
+                            FFStrError(ret));
     }
 
     return 0;
@@ -1170,9 +1149,8 @@ SDL_SYS_HapticStopEffect(SDL_Haptic * haptic, struct haptic_effect *effect)
 
     ret = FFEffectStop(effect->hweffect->ref);
     if (ret != FF_OK) {
-        SDL_SetError("Haptic: Unable to stop the effect: %s.",
-                     FFStrError(ret));
-        return -1;
+        return SDL_SetError("Haptic: Unable to stop the effect: %s.",
+                            FFStrError(ret));
     }
 
     return 0;
@@ -1237,8 +1215,7 @@ SDL_SYS_HapticSetGain(SDL_Haptic * haptic, int gain)
         FFDeviceSetForceFeedbackProperty(haptic->hwdata->device,
                                          FFPROP_FFGAIN, &val);
     if (ret != FF_OK) {
-        SDL_SetError("Haptic: Error setting gain: %s.", FFStrError(ret));
-        return -1;
+        return SDL_SetError("Haptic: Error setting gain: %s.", FFStrError(ret));
     }
 
     return 0;
@@ -1263,9 +1240,8 @@ SDL_SYS_HapticSetAutocenter(SDL_Haptic * haptic, int autocenter)
     ret = FFDeviceSetForceFeedbackProperty(haptic->hwdata->device,
                                            FFPROP_AUTOCENTER, &val);
     if (ret != FF_OK) {
-        SDL_SetError("Haptic: Error setting autocenter: %s.",
-                     FFStrError(ret));
-        return -1;
+        return SDL_SetError("Haptic: Error setting autocenter: %s.",
+                            FFStrError(ret));
     }
 
     return 0;
@@ -1283,8 +1259,7 @@ SDL_SYS_HapticPause(SDL_Haptic * haptic)
     ret = FFDeviceSendForceFeedbackCommand(haptic->hwdata->device,
                                            FFSFFC_PAUSE);
     if (ret != FF_OK) {
-        SDL_SetError("Haptic: Error pausing device: %s.", FFStrError(ret));
-        return -1;
+        return SDL_SetError("Haptic: Error pausing device: %s.", FFStrError(ret));
     }
 
     return 0;
@@ -1302,8 +1277,7 @@ SDL_SYS_HapticUnpause(SDL_Haptic * haptic)
     ret = FFDeviceSendForceFeedbackCommand(haptic->hwdata->device,
                                            FFSFFC_CONTINUE);
     if (ret != FF_OK) {
-        SDL_SetError("Haptic: Error pausing device: %s.", FFStrError(ret));
-        return -1;
+        return SDL_SetError("Haptic: Error pausing device: %s.", FFStrError(ret));
     }
 
     return 0;
@@ -1321,8 +1295,7 @@ SDL_SYS_HapticStopAll(SDL_Haptic * haptic)
     ret = FFDeviceSendForceFeedbackCommand(haptic->hwdata->device,
                                            FFSFFC_STOPALL);
     if (ret != FF_OK) {
-        SDL_SetError("Haptic: Error stopping device: %s.", FFStrError(ret));
-        return -1;
+        return SDL_SetError("Haptic: Error stopping device: %s.", FFStrError(ret));
     }
 
     return 0;

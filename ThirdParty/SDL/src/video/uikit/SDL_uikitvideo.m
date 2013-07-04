@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_UIKIT
@@ -66,10 +63,10 @@ UIKit_CreateDevice(int devindex)
     /* Initialize all variables that we clean on shutdown */
     device = (SDL_VideoDevice *) SDL_calloc(1, sizeof(SDL_VideoDevice));
     if (!device) {
-        SDL_OutOfMemory();
         if (device) {
             SDL_free(device);
         }
+        SDL_OutOfMemory();
         return (0);
     }
 
@@ -88,6 +85,13 @@ UIKit_CreateDevice(int devindex)
     device->GetWindowWMInfo = UIKit_GetWindowWMInfo;
 
     /* !!! FIXME: implement SetWindowBordered */
+
+#if SDL_IPHONE_KEYBOARD
+    device->HasScreenKeyboardSupport = UIKit_HasScreenKeyboardSupport;
+    device->ShowScreenKeyboard = UIKit_ShowScreenKeyboard;
+    device->HideScreenKeyboard = UIKit_HideScreenKeyboard;
+    device->IsScreenKeyboardShown = UIKit_IsScreenKeyboardShown;
+#endif
 
     /* OpenGL (ES) functions */
     device->GL_MakeCurrent        = UIKit_GL_MakeCurrent;
@@ -124,6 +128,18 @@ void
 UIKit_VideoQuit(_THIS)
 {
     UIKit_QuitModes(_this);
+}
+
+/*
+ * iOS log support.
+ *
+ * This doesn't really have aything to do with the interfaces of the SDL video
+ *  subsystem, but we need to stuff this into an Objective-C source code file.
+ */
+
+void SDL_NSLog(const char *text)
+{
+    NSLog(@"%s", text);
 }
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */

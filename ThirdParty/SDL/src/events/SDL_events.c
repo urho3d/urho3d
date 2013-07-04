@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,10 +33,12 @@
 #endif
 #include "../video/SDL_sysvideo.h"
 
+/* An arbitrary limit so we don't have unbounded growth */
+#define SDL_MAX_QUEUED_EVENTS   65535
+
 /* Public data -- the event filter */
 SDL_EventFilter SDL_EventOK = NULL;
 void *SDL_EventOKParam;
-SDL_SystemEventHandler SDL_SysEventHandler = NULL;
 
 typedef struct SDL_EventWatcher {
     SDL_EventFilter callback;
@@ -54,26 +56,40 @@ static SDL_DisabledEventBlock *SDL_disabled_events[256];
 static Uint32 SDL_userevents = SDL_USEREVENT;
 
 /* Private data -- event queue */
-#define MAXEVENTS	128
+typedef struct _SDL_EventEntry
+{
+    SDL_Event event;
+    SDL_SysWMmsg msg;
+    struct _SDL_EventEntry *prev;
+    struct _SDL_EventEntry *next;
+} SDL_EventEntry;
+
+typedef struct _SDL_SysWMEntry
+{
+    SDL_SysWMmsg msg;
+    struct _SDL_SysWMEntry *next;
+} SDL_SysWMEntry;
+
 static struct
 {
     SDL_mutex *lock;
-    int active;
-    int head;
-    int tail;
-    SDL_Event event[MAXEVENTS];
-    int wmmsg_next;
-    struct SDL_SysWMmsg wmmsg[MAXEVENTS];
-} SDL_EventQ;
+    volatile SDL_bool active;
+    volatile int count;
+    SDL_EventEntry *head;
+    SDL_EventEntry *tail;
+    SDL_EventEntry *free;
+    SDL_SysWMEntry *wmmsg_used;
+    SDL_SysWMEntry *wmmsg_free;
+} SDL_EventQ = { NULL, SDL_TRUE };
 
 
 static __inline__ SDL_bool
 SDL_ShouldPollJoystick()
 {
 #if !SDL_JOYSTICK_DISABLED
-    if (SDL_numjoysticks &&
-        (!SDL_disabled_events[SDL_JOYAXISMOTION >> 8] ||
-         SDL_JoystickEventState(SDL_QUERY))) {
+    if ((!SDL_disabled_events[SDL_JOYAXISMOTION >> 8] ||
+         SDL_JoystickEventState(SDL_QUERY)) &&
+        SDL_PrivateJoystickNeedsPolling()) {
         return SDL_TRUE;
     }
 #endif
@@ -86,16 +102,42 @@ void
 SDL_StopEventLoop(void)
 {
     int i;
+    SDL_EventEntry *entry;
+    SDL_SysWMEntry *wmmsg;
 
     if (SDL_EventQ.lock) {
-        SDL_DestroyMutex(SDL_EventQ.lock);
-        SDL_EventQ.lock = NULL;
+        SDL_LockMutex(SDL_EventQ.lock);
     }
 
+    SDL_EventQ.active = SDL_FALSE;
+
     /* Clean out EventQ */
-    SDL_EventQ.head = 0;
-    SDL_EventQ.tail = 0;
-    SDL_EventQ.wmmsg_next = 0;
+    for (entry = SDL_EventQ.head; entry; ) {
+        SDL_EventEntry *next = entry->next;
+        SDL_free(entry);
+        entry = next;
+    }
+    for (entry = SDL_EventQ.free; entry; ) {
+        SDL_EventEntry *next = entry->next;
+        SDL_free(entry);
+        entry = next;
+    }
+    for (wmmsg = SDL_EventQ.wmmsg_used; wmmsg; ) {
+        SDL_SysWMEntry *next = wmmsg->next;
+        SDL_free(wmmsg);
+        wmmsg = next;
+    }
+    for (wmmsg = SDL_EventQ.wmmsg_free; wmmsg; ) {
+        SDL_SysWMEntry *next = wmmsg->next;
+        SDL_free(wmmsg);
+        wmmsg = next;
+    }
+    SDL_EventQ.count = 0;
+    SDL_EventQ.head = NULL;
+    SDL_EventQ.tail = NULL;
+    SDL_EventQ.free = NULL;
+    SDL_EventQ.wmmsg_used = NULL;
+    SDL_EventQ.wmmsg_free = NULL;
 
     /* Clear disabled event state */
     for (i = 0; i < SDL_arraysize(SDL_disabled_events); ++i) {
@@ -110,29 +152,41 @@ SDL_StopEventLoop(void)
         SDL_event_watchers = tmp->next;
         SDL_free(tmp);
     }
+    SDL_EventOK = NULL;
+
+    if (SDL_EventQ.lock) {
+        SDL_UnlockMutex(SDL_EventQ.lock);
+        SDL_DestroyMutex(SDL_EventQ.lock);
+        SDL_EventQ.lock = NULL;
+    }
 }
 
 /* This function (and associated calls) may be called more than once */
 int
 SDL_StartEventLoop(void)
 {
-    /* Clean out the event queue */
-    SDL_EventQ.lock = NULL;
-    SDL_StopEventLoop();
+    /* We'll leave the event queue alone, since we might have gotten
+       some important events at launch (like SDL_DROPFILE)
 
-    /* No filter to start with, process most event types */
-    SDL_EventOK = NULL;
-    SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
-    SDL_EventState(SDL_SYSWMEVENT, SDL_DISABLE);
+       FIXME: Does this introduce any other bugs with events at startup?
+     */
 
     /* Create the lock and set ourselves active */
 #if !SDL_THREADS_DISABLED
-    SDL_EventQ.lock = SDL_CreateMutex();
+    if (!SDL_EventQ.lock) {
+        SDL_EventQ.lock = SDL_CreateMutex();
+    }
     if (SDL_EventQ.lock == NULL) {
         return (-1);
     }
 #endif /* !SDL_THREADS_DISABLED */
-    SDL_EventQ.active = 1;
+
+    /* Process most event types */
+    SDL_EventState(SDL_TEXTINPUT, SDL_DISABLE);
+    SDL_EventState(SDL_TEXTEDITING, SDL_DISABLE);
+    SDL_EventState(SDL_SYSWMEVENT, SDL_DISABLE);
+
+    SDL_EventQ.active = SDL_TRUE;
 
     return (0);
 }
@@ -142,55 +196,70 @@ SDL_StartEventLoop(void)
 static int
 SDL_AddEvent(SDL_Event * event)
 {
-    int tail, added;
+    SDL_EventEntry *entry;
 
-    tail = (SDL_EventQ.tail + 1) % MAXEVENTS;
-    if (tail == SDL_EventQ.head) {
-        /* Overflow, drop event */
-        added = 0;
-    } else {
-        SDL_EventQ.event[SDL_EventQ.tail] = *event;
-        if (event->type == SDL_SYSWMEVENT) {
-            /* Note that it's possible to lose an event */
-            int next = SDL_EventQ.wmmsg_next;
-            SDL_EventQ.wmmsg[next] = *event->syswm.msg;
-            SDL_EventQ.event[SDL_EventQ.tail].syswm.msg =
-                &SDL_EventQ.wmmsg[next];
-            SDL_EventQ.wmmsg_next = (next + 1) % MAXEVENTS;
-        }
-        SDL_EventQ.tail = tail;
-        added = 1;
+    if (SDL_EventQ.count >= SDL_MAX_QUEUED_EVENTS) {
+        SDL_SetError("Event queue is full (%d events)", SDL_EventQ.count);
+        return 0;
     }
-    return (added);
+
+    if (SDL_EventQ.free == NULL) {
+        entry = (SDL_EventEntry *)SDL_malloc(sizeof(*entry));
+        if (!entry) {
+            return 0;
+        }
+    } else {
+        entry = SDL_EventQ.free;
+        SDL_EventQ.free = entry->next;
+    }
+
+    entry->event = *event;
+    if (event->type == SDL_SYSWMEVENT) {
+        entry->msg = *event->syswm.msg;
+        entry->event.syswm.msg = &entry->msg;
+    }
+
+    if (SDL_EventQ.tail) {
+        SDL_EventQ.tail->next = entry;
+        entry->prev = SDL_EventQ.tail;
+        SDL_EventQ.tail = entry;
+        entry->next = NULL;
+    } else {
+        SDL_assert(!SDL_EventQ.head);
+        SDL_EventQ.head = entry;
+        SDL_EventQ.tail = entry;
+        entry->prev = NULL;
+        entry->next = NULL;
+    }
+    ++SDL_EventQ.count;
+
+    return 1;
 }
 
-/* Cut an event, and return the next valid spot, or the tail */
-/*                           -- called with the queue locked */
-static int
-SDL_CutEvent(int spot)
+/* Remove an event from the queue -- called with the queue locked */
+static void
+SDL_CutEvent(SDL_EventEntry *entry)
 {
-    if (spot == SDL_EventQ.head) {
-        SDL_EventQ.head = (SDL_EventQ.head + 1) % MAXEVENTS;
-        return (SDL_EventQ.head);
-    } else if ((spot + 1) % MAXEVENTS == SDL_EventQ.tail) {
-        SDL_EventQ.tail = spot;
-        return (SDL_EventQ.tail);
-    } else
-        /* We cut the middle -- shift everything over */
-    {
-        int here, next;
-
-        /* This can probably be optimized with SDL_memcpy() -- careful! */
-        if (--SDL_EventQ.tail < 0) {
-            SDL_EventQ.tail = MAXEVENTS - 1;
-        }
-        for (here = spot; here != SDL_EventQ.tail; here = next) {
-            next = (here + 1) % MAXEVENTS;
-            SDL_EventQ.event[here] = SDL_EventQ.event[next];
-        }
-        return (spot);
+    if (entry->prev) {
+        entry->prev->next = entry->next;
     }
-    /* NOTREACHED */
+    if (entry->next) {
+        entry->next->prev = entry->prev;
+    }
+
+    if (entry == SDL_EventQ.head) {
+        SDL_assert(entry->prev == NULL);
+        SDL_EventQ.head = entry->next;
+    }
+    if (entry == SDL_EventQ.tail) {
+        SDL_assert(entry->next == NULL);
+        SDL_EventQ.tail = entry->prev;
+    }
+
+    entry->next = SDL_EventQ.free;
+    SDL_EventQ.free = entry;
+    SDL_assert(SDL_EventQ.count > 0);
+    --SDL_EventQ.count;
 }
 
 /* Lock the event queue, take a peep at it, and unlock it */
@@ -202,18 +271,24 @@ SDL_PeepEvents(SDL_Event * events, int numevents, SDL_eventaction action,
 
     /* Don't look after we've quit */
     if (!SDL_EventQ.active) {
+        /* We get a few spurious events at shutdown, so don't warn then */
+        if (action != SDL_ADDEVENT) {
+            SDL_SetError("The event system has been shut down");
+        }
         return (-1);
     }
     /* Lock the event queue */
     used = 0;
-    if (SDL_mutexP(SDL_EventQ.lock) == 0) {
+    if (!SDL_EventQ.lock || SDL_LockMutex(SDL_EventQ.lock) == 0) {
         if (action == SDL_ADDEVENT) {
             for (i = 0; i < numevents; ++i) {
                 used += SDL_AddEvent(&events[i]);
             }
         } else {
+            SDL_EventEntry *entry, *next;
+            SDL_SysWMEntry *wmmsg, *wmmsg_next;
             SDL_Event tmpevent;
-            int spot;
+            Uint32 type;
 
             /* If 'events' is NULL, just see if they exist */
             if (events == NULL) {
@@ -221,25 +296,50 @@ SDL_PeepEvents(SDL_Event * events, int numevents, SDL_eventaction action,
                 numevents = 1;
                 events = &tmpevent;
             }
-            spot = SDL_EventQ.head;
-            while ((used < numevents) && (spot != SDL_EventQ.tail)) {
-                Uint32 type = SDL_EventQ.event[spot].type;
+
+            /* Clean out any used wmmsg data
+               FIXME: Do we want to retain the data for some period of time?
+             */
+            for (wmmsg = SDL_EventQ.wmmsg_used; wmmsg; wmmsg = wmmsg_next) {
+                wmmsg_next = wmmsg->next;
+                wmmsg->next = SDL_EventQ.wmmsg_free;
+                SDL_EventQ.wmmsg_free = wmmsg;
+            }
+            SDL_EventQ.wmmsg_used = NULL;
+
+            for (entry = SDL_EventQ.head; entry && used < numevents; entry = next) {
+                next = entry->next;
+                type = entry->event.type;
                 if (minType <= type && type <= maxType) {
-                    events[used++] = SDL_EventQ.event[spot];
-                    if (action == SDL_GETEVENT) {
-                        spot = SDL_CutEvent(spot);
-                    } else {
-                        spot = (spot + 1) % MAXEVENTS;
+                    events[used] = entry->event;
+                    if (entry->event.type == SDL_SYSWMEVENT) {
+                        /* We need to copy the wmmsg somewhere safe.
+                           For now we'll guarantee it's valid at least until
+                           the next call to SDL_PeepEvents()
+                         */
+                        SDL_SysWMEntry *wmmsg;
+                        if (SDL_EventQ.wmmsg_free) {
+                            wmmsg = SDL_EventQ.wmmsg_free;
+                            SDL_EventQ.wmmsg_free = wmmsg->next;
+                        } else {
+                            wmmsg = (SDL_SysWMEntry *)SDL_malloc(sizeof(*wmmsg));
+                        }
+                        wmmsg->msg = *entry->event.syswm.msg;
+                        wmmsg->next = SDL_EventQ.wmmsg_used;
+                        SDL_EventQ.wmmsg_used = wmmsg;
+                        events[used].syswm.msg = &wmmsg->msg;
                     }
-                } else {
-                    spot = (spot + 1) % MAXEVENTS;
+                    ++used;
+
+                    if (action == SDL_GETEVENT) {
+                        SDL_CutEvent(entry);
+                    }
                 }
             }
         }
-        SDL_mutexV(SDL_EventQ.lock);
+        SDL_UnlockMutex(SDL_EventQ.lock);
     } else {
-        SDL_SetError("Couldn't lock event queue");
-        used = -1;
+        return SDL_SetError("Couldn't lock event queue");
     }
     return (used);
 }
@@ -279,17 +379,17 @@ SDL_FlushEvents(Uint32 minType, Uint32 maxType)
 #endif
 
     /* Lock the event queue */
-    if (SDL_mutexP(SDL_EventQ.lock) == 0) {
-        int spot = SDL_EventQ.head;
-        while (spot != SDL_EventQ.tail) {
-            Uint32 type = SDL_EventQ.event[spot].type;
+    if (SDL_LockMutex(SDL_EventQ.lock) == 0) {
+        SDL_EventEntry *entry, *next;
+        Uint32 type;
+        for (entry = SDL_EventQ.head; entry; entry = next) {
+            next = entry->next;
+            type = entry->event.type;
             if (minType <= type && type <= maxType) {
-                spot = SDL_CutEvent(spot);
-            } else {
-                spot = (spot + 1) % MAXEVENTS;
+                SDL_CutEvent(entry);
             }
         }
-        SDL_mutexV(SDL_EventQ.lock);
+        SDL_UnlockMutex(SDL_EventQ.lock);
     }
 }
 
@@ -359,7 +459,9 @@ int
 SDL_PushEvent(SDL_Event * event)
 {
     SDL_EventWatcher *curr;
-    event->window.timestamp = SDL_GetTicks();
+
+    event->common.timestamp = SDL_GetTicks();
+
     if (SDL_EventOK && !SDL_EventOK(SDL_EventOKParam, event)) {
         return 0;
     }
@@ -373,7 +475,6 @@ SDL_PushEvent(SDL_Event * event)
     }
 
     SDL_GestureProcessEvent(event);
-    
 
     return 1;
 }
@@ -381,12 +482,11 @@ SDL_PushEvent(SDL_Event * event)
 void
 SDL_SetEventFilter(SDL_EventFilter filter, void *userdata)
 {
-    SDL_Event bitbucket;
-
     /* Set filter and discard pending events */
-    SDL_EventOK = filter;
+    SDL_EventOK = NULL;
+    SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
     SDL_EventOKParam = userdata;
-    while (SDL_PollEvent(&bitbucket) > 0);
+    SDL_EventOK = filter;
 }
 
 SDL_bool
@@ -441,19 +541,16 @@ SDL_DelEventWatch(SDL_EventFilter filter, void *userdata)
 void
 SDL_FilterEvents(SDL_EventFilter filter, void *userdata)
 {
-    if (SDL_mutexP(SDL_EventQ.lock) == 0) {
-        int spot;
-
-        spot = SDL_EventQ.head;
-        while (spot != SDL_EventQ.tail) {
-            if (filter(userdata, &SDL_EventQ.event[spot])) {
-                spot = (spot + 1) % MAXEVENTS;
-            } else {
-                spot = SDL_CutEvent(spot);
+    if (SDL_LockMutex(SDL_EventQ.lock) == 0) {
+        SDL_EventEntry *entry, *next;
+        for (entry = SDL_EventQ.head; entry; entry = next) {
+            next = entry->next;
+            if (!filter(userdata, &entry->event)) {
+                SDL_CutEvent(entry);
             }
         }
+        SDL_UnlockMutex(SDL_EventQ.lock);
     }
-    SDL_mutexV(SDL_EventQ.lock);
 }
 
 Uint8
@@ -511,8 +608,20 @@ SDL_RegisterEvents(int numevents)
     return event_base;
 }
 
-/* This is a generic event handler.
- */
+int
+SDL_SendAppEvent(SDL_EventType eventType)
+{
+    int posted;
+
+    posted = 0;
+    if (SDL_GetEventState(eventType) == SDL_ENABLE) {
+        SDL_Event event;
+        event.type = eventType;
+        posted = (SDL_PushEvent(&event) > 0);
+    }
+    return (posted);
+}
+
 int
 SDL_SendSysWMEvent(SDL_SysWMmsg * message)
 {
@@ -528,15 +637,6 @@ SDL_SendSysWMEvent(SDL_SysWMmsg * message)
     }
     /* Update internal event state */
     return (posted);
-}
-
-void
-SDL_SetSystemEventHook(SDL_SystemEventHandler handler)
-{
-    if (handler)
-    {
-        SDL_SysEventHandler=handler;
-    }
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

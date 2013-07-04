@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -41,6 +41,8 @@ static inline SDL_BApp *_GetBeApp() {
 
 static int _InitWindow(_THIS, SDL_Window *window) {
 	uint32 flags = 0;
+	window_look look = B_BORDERED_WINDOW_LOOK;
+
 	BRect bounds(
         window->x,
         window->y,
@@ -59,10 +61,10 @@ static int _InitWindow(_THIS, SDL_Window *window) {
     	flags |= B_NOT_RESIZABLE | B_NOT_ZOOMABLE;
     }
     if(window->flags & SDL_WINDOW_BORDERLESS) {
-    	/* TODO: Add support for this flag */
+    	look = B_NO_BORDER_WINDOW_LOOK;
     }
 
-    SDL_BWin *bwin = new(std::nothrow) SDL_BWin(bounds, flags);
+    SDL_BWin *bwin = new(std::nothrow) SDL_BWin(bounds, look, flags);
     if(bwin == NULL)
     	return ENOMEM;
 
@@ -137,6 +139,12 @@ void BE_SetWindowSize(_THIS, SDL_Window * window) {
 	_ToBeWin(window)->PostMessage(&msg);
 }
 
+void BE_SetWindowBordered(_THIS, SDL_Window * window, SDL_bool bordered) {
+	BMessage msg(BWIN_SET_BORDERED);
+	msg.AddBool("window-border", bordered != SDL_FALSE);
+	_ToBeWin(window)->PostMessage(&msg);
+}
+
 void BE_ShowWindow(_THIS, SDL_Window * window) {
 	BMessage msg(BWIN_SHOW_WINDOW);
 	_ToBeWin(window)->PostMessage(&msg);
@@ -187,7 +195,7 @@ int BE_GetWindowGammaRamp(_THIS, SDL_Window * window, Uint16 * ramp) {
 }
 
 
-void BE_SetWindowGrab(_THIS, SDL_Window * window) {
+void BE_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed) {
 	/* TODO: Implement this! */
 }
 

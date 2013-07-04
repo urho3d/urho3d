@@ -187,6 +187,8 @@ LOCAL_SRC_FILES := \
     $(wildcard $(LOCAL_PATH)/src/cpuinfo/*.c) \
     $(wildcard $(LOCAL_PATH)/src/events/*.c) \
     $(wildcard $(LOCAL_PATH)/src/file/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/haptic/*.c) \
+    $(wildcard $(LOCAL_PATH)/src/haptic/dummy/*.c) \
     $(wildcard $(LOCAL_PATH)/src/joystick/*.c) \
     $(wildcard $(LOCAL_PATH)/src/joystick/android/*.c) \
     $(wildcard $(LOCAL_PATH)/src/loadso/dlopen/*.c) \

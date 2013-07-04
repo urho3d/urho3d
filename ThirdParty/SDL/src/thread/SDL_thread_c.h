@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,8 +34,8 @@
 #include "pthread/SDL_systhread_c.h"
 #elif SDL_THREAD_WINDOWS
 #include "windows/SDL_systhread_c.h"
-#elif SDL_THREAD_NDS
-#include "nds/SDL_systhread_c.h"
+#elif SDL_THREAD_PSP
+#include "psp/SDL_systhread_c.h"
 #else
 #error Need thread implementation for this platform
 #include "generic/SDL_systhread_c.h"

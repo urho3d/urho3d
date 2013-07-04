@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,14 +20,14 @@
 */
 #include "SDL_config.h"
 
-/* 
+/*
    Code to load and save surfaces in Windows BMP format.
 
    Why support BMP format?  Well, it's a native format for Windows, and
    most image processing programs can read and write it.  It would be nice
    to be able to have at least one image format that we can natively load
    and save, and since PNG is so complex that it would bloat the library,
-   BMP is a good alternative. 
+   BMP is a good alternative.
 
    This code currently supports Win32 DIBs in uncompressed 8 and 24 bpp.
 */
@@ -40,10 +40,10 @@
 
 /* Compression encodings for BMP files */
 #ifndef BI_RGB
-#define BI_RGB		0
-#define BI_RLE8		1
-#define BI_RLE4		2
-#define BI_BITFIELDS	3
+#define BI_RGB      0
+#define BI_RLE8     1
+#define BI_RLE4     2
+#define BI_BITFIELDS    3
 #endif
 
 
@@ -51,7 +51,7 @@ SDL_Surface *
 SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
 {
     SDL_bool was_error;
-    long fp_offset = 0;
+    Sint64 fp_offset = 0;
     int bmpPitch;
     int i, pad;
     SDL_Surface *surface;
@@ -67,23 +67,23 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
 
     /* The Win32 BMP file header (14 bytes) */
     char magic[2];
-    Uint32 bfSize;
-    Uint16 bfReserved1;
-    Uint16 bfReserved2;
-    Uint32 bfOffBits;
+    /*Uint32 bfSize = 0;*/
+    /*Uint16 bfReserved1 = 0;*/
+    /*Uint16 bfReserved2 = 0;*/
+    Uint32 bfOffBits = 0;
 
     /* The Win32 BITMAPINFOHEADER struct (40 bytes) */
-    Uint32 biSize;
-    Sint32 biWidth;
-    Sint32 biHeight;
-    Uint16 biPlanes;
-    Uint16 biBitCount;
-    Uint32 biCompression;
-    Uint32 biSizeImage;
-    Sint32 biXPelsPerMeter;
-    Sint32 biYPelsPerMeter;
-    Uint32 biClrUsed;
-    Uint32 biClrImportant;
+    Uint32 biSize = 0;
+    Sint32 biWidth = 0;
+    Sint32 biHeight = 0;
+    /*Uint16 biPlanes = 0;*/
+    Uint16 biBitCount = 0;
+    Uint32 biCompression = 0;
+    /*Uint32 biSizeImage = 0;*/
+    /*Sint32 biXPelsPerMeter = 0;*/
+    /*Sint32 biYPelsPerMeter = 0;*/
+    Uint32 biClrUsed = 0;
+    /*Uint32 biClrImportant = 0;*/
 
     /* Make sure we are passed a valid data source */
     surface = NULL;
@@ -106,9 +106,9 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
         was_error = SDL_TRUE;
         goto done;
     }
-    bfSize = SDL_ReadLE32(src);
-    bfReserved1 = SDL_ReadLE16(src);
-    bfReserved2 = SDL_ReadLE16(src);
+    /*bfSize =*/ SDL_ReadLE32(src);
+    /*bfReserved1 =*/ SDL_ReadLE16(src);
+    /*bfReserved2 =*/ SDL_ReadLE16(src);
     bfOffBits = SDL_ReadLE32(src);
 
     /* Read the Win32 BITMAPINFOHEADER */
@@ -116,25 +116,20 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
     if (biSize == 12) {
         biWidth = (Uint32) SDL_ReadLE16(src);
         biHeight = (Uint32) SDL_ReadLE16(src);
-        biPlanes = SDL_ReadLE16(src);
+        /*biPlanes =*/ SDL_ReadLE16(src);
         biBitCount = SDL_ReadLE16(src);
         biCompression = BI_RGB;
-        biSizeImage = 0;
-        biXPelsPerMeter = 0;
-        biYPelsPerMeter = 0;
-        biClrUsed = 0;
-        biClrImportant = 0;
     } else {
         biWidth = SDL_ReadLE32(src);
         biHeight = SDL_ReadLE32(src);
-        biPlanes = SDL_ReadLE16(src);
+        /*biPlanes =*/ SDL_ReadLE16(src);
         biBitCount = SDL_ReadLE16(src);
         biCompression = SDL_ReadLE32(src);
-        biSizeImage = SDL_ReadLE32(src);
-        biXPelsPerMeter = SDL_ReadLE32(src);
-        biYPelsPerMeter = SDL_ReadLE32(src);
+        /*biSizeImage =*/ SDL_ReadLE32(src);
+        /*biXPelsPerMeter =*/ SDL_ReadLE32(src);
+        /*biYPelsPerMeter =*/ SDL_ReadLE32(src);
         biClrUsed = SDL_ReadLE32(src);
-        biClrImportant = SDL_ReadLE32(src);
+        /*biClrImportant =*/ SDL_ReadLE32(src);
     }
     if (biHeight < 0) {
         topDown = SDL_TRUE;
@@ -257,14 +252,20 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
                 SDL_RWread(src, &palette->colors[i].b, 1, 1);
                 SDL_RWread(src, &palette->colors[i].g, 1, 1);
                 SDL_RWread(src, &palette->colors[i].r, 1, 1);
-                palette->colors[i].unused = SDL_ALPHA_OPAQUE;
+                palette->colors[i].a = SDL_ALPHA_OPAQUE;
             }
         } else {
             for (i = 0; i < (int) biClrUsed; ++i) {
                 SDL_RWread(src, &palette->colors[i].b, 1, 1);
                 SDL_RWread(src, &palette->colors[i].g, 1, 1);
                 SDL_RWread(src, &palette->colors[i].r, 1, 1);
-                SDL_RWread(src, &palette->colors[i].unused, 1, 1);
+                SDL_RWread(src, &palette->colors[i].a, 1, 1);
+
+                /* According to Microsoft documentation, the fourth element
+                   is reserved and must be zero, so we shouldn't treat it as
+                   alpha.
+                */
+                palette->colors[i].a = SDL_ALPHA_OPAQUE;
             }
         }
     }
@@ -376,7 +377,7 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
 int
 SDL_SaveBMP_RW(SDL_Surface * saveme, SDL_RWops * dst, int freedst)
 {
-    long fp_offset;
+    Sint64 fp_offset;
     int i, pad;
     SDL_Surface *surface;
     Uint8 *bits;
@@ -438,7 +439,7 @@ SDL_SaveBMP_RW(SDL_Surface * saveme, SDL_RWops * dst, int freedst)
             /* If the surface has a colorkey or alpha channel we'll save a
                32-bit BMP with alpha channel, otherwise save a 24-bit BMP. */
             if (save32bit) {
-                SDL_InitFormat(&format, 
+                SDL_InitFormat(&format,
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
                                SDL_PIXELFORMAT_ARGB8888
 #else
@@ -515,12 +516,12 @@ SDL_SaveBMP_RW(SDL_Surface * saveme, SDL_RWops * dst, int freedst)
                 SDL_RWwrite(dst, &colors[i].b, 1, 1);
                 SDL_RWwrite(dst, &colors[i].g, 1, 1);
                 SDL_RWwrite(dst, &colors[i].r, 1, 1);
-                SDL_RWwrite(dst, &colors[i].unused, 1, 1);
+                SDL_RWwrite(dst, &colors[i].a, 1, 1);
             }
         }
 
         /* Write the bitmap offset */
-        bfOffBits = SDL_RWtell(dst) - fp_offset;
+        bfOffBits = (Uint32)(SDL_RWtell(dst) - fp_offset);
         if (SDL_RWseek(dst, fp_offset + 10, RW_SEEK_SET) < 0) {
             SDL_Error(SDL_EFSEEK);
         }
@@ -547,7 +548,7 @@ SDL_SaveBMP_RW(SDL_Surface * saveme, SDL_RWops * dst, int freedst)
         }
 
         /* Write the BMP file size */
-        bfSize = SDL_RWtell(dst) - fp_offset;
+        bfSize = (Uint32)(SDL_RWtell(dst) - fp_offset);
         if (SDL_RWseek(dst, fp_offset + 2, RW_SEEK_SET) < 0) {
             SDL_Error(SDL_EFSEEK);
         }

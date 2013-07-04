@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,27 +48,24 @@ FillSound(void *device, void *stream, size_t len,
 {
     SDL_AudioDevice *audio = (SDL_AudioDevice *) device;
 
-    /* Silence the buffer, since it's ours */
-    SDL_memset(stream, audio->spec.silence, len);
-
     /* Only do soemthing if audio is enabled */
     if (!audio->enabled)
         return;
 
     if (!audio->paused) {
         if (audio->convert.needed) {
-            SDL_mutexP(audio->mixer_lock);
+            SDL_LockMutex(audio->mixer_lock);
             (*audio->spec.callback) (audio->spec.userdata,
                                      (Uint8 *) audio->convert.buf,
                                      audio->convert.len);
-            SDL_mutexV(audio->mixer_lock);
+            SDL_UnlockMutex(audio->mixer_lock);
             SDL_ConvertAudio(&audio->convert);
             SDL_memcpy(stream, audio->convert.buf, audio->convert.len_cvt);
         } else {
-            SDL_mutexP(audio->mixer_lock);
+            SDL_LockMutex(audio->mixer_lock);
             (*audio->spec.callback) (audio->spec.userdata,
                                      (Uint8 *) stream, len);
-            SDL_mutexV(audio->mixer_lock);
+            SDL_UnlockMutex(audio->mixer_lock);
         }
     }
 }
@@ -98,8 +95,7 @@ BEOSAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     /* Initialize all variables that we clean on shutdown */
     _this->hidden = new SDL_PrivateAudioData;
     if (_this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(_this->hidden, 0, (sizeof *_this->hidden));
 
@@ -154,16 +150,15 @@ BEOSAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
         }
     }
 
-    format.buffer_size = _this->spec.samples;
-
     if (!valid_datatype) {      /* shouldn't happen, but just in case... */
         BEOSAUDIO_CloseDevice(_this);
-        SDL_SetError("Unsupported audio format");
-        return 0;
+        return SDL_SetError("Unsupported audio format");
     }
 
     /* Calculate the final parameters for this audio specification */
     SDL_CalculateAudioSpec(&_this->spec);
+
+    format.buffer_size = _this->spec.size;
 
     /* Subscribe to the audio stream (creates a new thread) */
     sigset_t omask;
@@ -176,12 +171,11 @@ BEOSAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
         _this->hidden->audio_obj->SetHasData(true);
     } else {
         BEOSAUDIO_CloseDevice(_this);
-        SDL_SetError("Unable to start Be audio");
-        return 0;
+        return SDL_SetError("Unable to start Be audio");
     }
 
     /* We're running! */
-    return 1;
+    return 0;
 }
 
 static void

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -31,19 +31,19 @@
 typedef struct _DFB_DisplayData DFB_DisplayData;
 struct _DFB_DisplayData
 {
-    IDirectFBDisplayLayer 	*layer;
-    DFBSurfacePixelFormat 	pixelformat;
-    /* FIXME: support for multiple video layer. 
-     * However, I do not know any card supporting 
+    IDirectFBDisplayLayer   *layer;
+    DFBSurfacePixelFormat   pixelformat;
+    /* FIXME: support for multiple video layer.
+     * However, I do not know any card supporting
      * more than one
      */
-    DFBDisplayLayerID 		vidID;
-    IDirectFBDisplayLayer 	*vidlayer;
+    DFBDisplayLayerID       vidID;
+    IDirectFBDisplayLayer   *vidlayer;
 
-    int 					vidIDinuse;
+    int                     vidIDinuse;
 
-    int 					cw;
-    int 					ch;
+    int                     cw;
+    int                     ch;
 };
 
 

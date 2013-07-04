@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -137,7 +137,7 @@ DirectFB_SetContext(_THIS, SDL_Window *window)
     SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
     DFB_DisplayData *dispdata = (DFB_DisplayData *) display->driverdata;
 
-	/* FIXME: should we handle the error */
+    /* FIXME: should we handle the error */
     if (dispdata->vidIDinuse)
         SDL_DFB_CHECK(dispdata->vidlayer->SwitchContext(dispdata->vidlayer,
                                                            DFB_TRUE));
@@ -220,7 +220,7 @@ DirectFB_InitModes(_THIS)
         SDL_DFB_CHECKERR(layer->GetConfiguration(layer, &dlc));
 
         mode.format = DirectFB_DFBToSDLPixelFormat(dlc.pixelformat);
-        
+
         if (mode.format == SDL_PIXELFORMAT_UNKNOWN) {
             SDL_DFB_ERR("Unknown dfb pixelformat %x !\n", dlc.pixelformat);
             goto error;
@@ -309,7 +309,7 @@ DirectFB_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mod
 {
     /*
      * FIXME: video mode switch is currently broken for 1.2.0
-     * 
+     *
      */
 
     SDL_DFB_DEVICEDATA(_this);

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -47,6 +47,7 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
     int bshaped = 0;
 
     SDL_DFB_ALLOC_CLEAR(window->driverdata, sizeof(DFB_WindowData));
+    SDL_memset(&desc, 0, sizeof(DFBWindowDescription));
     windata = (DFB_WindowData *) window->driverdata;
 
     windata->is_managed = devdata->has_own_wm;
@@ -56,10 +57,10 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
     SDL_DFB_CHECKERR(dispdata->layer->SetCooperativeLevel(dispdata->layer,
                                                           DLSCL_ADMINISTRATIVE));
 #endif
-	/* FIXME ... ughh, ugly */
-	if (window->x == -1000 && window->y == -1000)
-		bshaped = 1;
-	
+    /* FIXME ... ughh, ugly */
+    if (window->x == -1000 && window->y == -1000)
+        bshaped = 1;
+
     /* Fill the window description. */
     x = window->x;
     y = window->y;
@@ -67,21 +68,21 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
     DirectFB_WM_AdjustWindowLayout(window, window->flags, window->w, window->h);
 
     /* Create Window */
-	desc.caps = 0;
+    desc.caps = 0;
     desc.flags =
         DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_POSX | DWDESC_POSY | DWDESC_SURFACE_CAPS;
 
     if (bshaped) {
-    	desc.flags |= DWDESC_CAPS;
-    	desc.caps |= DWCAPS_ALPHACHANNEL;
+        desc.flags |= DWDESC_CAPS;
+        desc.caps |= DWCAPS_ALPHACHANNEL;
     }
     else
     {
-    	desc.flags |= DWDESC_PIXELFORMAT;
+        desc.flags |= DWDESC_PIXELFORMAT;
     }
 
     if (!(window->flags & SDL_WINDOW_BORDERLESS))
-		desc.caps |= DWCAPS_NODECORATION;
+        desc.caps |= DWCAPS_NODECORATION;
 
     desc.posx = x;
     desc.posy = y;
@@ -89,7 +90,12 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
     desc.height = windata->size.h;
     desc.pixelformat = dispdata->pixelformat;
     desc.surface_caps = DSCAPS_PREMULTIPLIED;
-    
+#if DIRECTFB_MAJOR_VERSION == 1 && DIRECTFB_MINOR_VERSION >= 4
+    if (window->flags & SDL_WINDOW_OPENGL) {
+        desc.surface_caps |= DSCAPS_GL;
+    }
+#endif
+
     /* Create the window. */
     SDL_DFB_CHECKERR(dispdata->layer->CreateWindow(dispdata->layer, &desc,
                                                    &windata->dfbwin));
@@ -110,7 +116,7 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
         wopts |= DWOP_KEEP_POSITION | DWOP_KEEP_STACKING | DWOP_KEEP_SIZE;
         SDL_DFB_CHECK(windata->dfbwin->SetStackingClass(windata->dfbwin, DWSC_UPPER));
     }
-    
+
     if (bshaped) {
         wopts |= DWOP_SHAPED | DWOP_ALPHACHANNEL;
         wopts &= ~DWOP_OPAQUE_REGION;
@@ -149,7 +155,7 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
     SDL_DFB_CHECK(windata->dfbwin->RaiseToTop(windata->dfbwin));
 
     /* remember parent */
-    //windata->sdlwin = window;
+    /*windata->sdlwin = window; */
 
     /* Add to list ... */
 
@@ -162,7 +168,7 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
 
     return 0;
   error:
-	SDL_DFB_RELEASE(windata->surface);
+    SDL_DFB_RELEASE(windata->surface);
     SDL_DFB_RELEASE(windata->dfbwin);
     return -1;
 }
@@ -170,8 +176,7 @@ DirectFB_CreateWindow(_THIS, SDL_Window * window)
 int
 DirectFB_CreateWindowFrom(_THIS, SDL_Window * window, const void *data)
 {
-    SDL_Unsupported();
-    return -1;
+    return SDL_Unsupported();
 }
 
 void
@@ -182,8 +187,9 @@ DirectFB_SetWindowTitle(_THIS, SDL_Window * window)
     if (windata->is_managed) {
         windata->wm_needs_redraw = 1;
         DirectFB_WM_RedrawLayout(_this, window);
-    } else
+    } else {
         SDL_Unsupported();
+    }
 }
 
 void
@@ -269,7 +275,7 @@ DirectFB_SetWindowSize(_THIS, SDL_Window * window)
 
         if (cw != window->w || ch != window->h) {
 
-		    DirectFB_WM_AdjustWindowLayout(window, window->flags, window->w, window->h);
+            DirectFB_WM_AdjustWindowLayout(window, window->flags, window->w, window->h);
             SDL_DFB_CHECKERR(windata->dfbwin->Resize(windata->dfbwin,
                                                      windata->size.w,
                                                      windata->size.h));
@@ -361,7 +367,7 @@ DirectFB_RestoreWindow(_THIS, SDL_Window * window)
 
     /* Window layout */
     DirectFB_WM_AdjustWindowLayout(window, window->flags & ~(SDL_WINDOW_MAXIMIZED | SDL_WINDOW_MINIMIZED),
-    	windata->restore.w, windata->restore.h);
+        windata->restore.w, windata->restore.h);
     SDL_DFB_CHECK(windata->dfbwin->Resize(windata->dfbwin, windata->restore.w,
                             windata->restore.h));
     SDL_DFB_CHECK(windata->dfbwin->MoveTo(windata->dfbwin, windata->restore.x,
@@ -378,7 +384,7 @@ DirectFB_RestoreWindow(_THIS, SDL_Window * window)
 }
 
 void
-DirectFB_SetWindowGrab(_THIS, SDL_Window * window)
+DirectFB_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
 {
     SDL_DFB_DEVICEDATA(_this);
     SDL_DFB_WINDOWDATA(window);
@@ -387,8 +393,8 @@ DirectFB_SetWindowGrab(_THIS, SDL_Window * window)
     if ((window->flags & SDL_WINDOW_INPUT_GRABBED)) {
         if (gwindata != NULL)
         {
-		    SDL_DFB_CHECK(gwindata->dfbwin->UngrabPointer(gwindata->dfbwin));
-		    SDL_DFB_CHECK(gwindata->dfbwin->UngrabKeyboard(gwindata->dfbwin));
+            SDL_DFB_CHECK(gwindata->dfbwin->UngrabPointer(gwindata->dfbwin));
+            SDL_DFB_CHECK(gwindata->dfbwin->UngrabKeyboard(gwindata->dfbwin));
         }
         SDL_DFB_CHECK(windata->dfbwin->GrabPointer(windata->dfbwin));
         SDL_DFB_CHECK(windata->dfbwin->GrabKeyboard(windata->dfbwin));
@@ -412,22 +418,22 @@ DirectFB_DestroyWindow(_THIS, SDL_Window * window)
     SDL_DFB_CHECK(windata->dfbwin->UngrabKeyboard(windata->dfbwin));
 
 #if SDL_DIRECTFB_OPENGL
-	DirectFB_GL_DestroyWindowContexts(_this, window);
+    DirectFB_GL_DestroyWindowContexts(_this, window);
 #endif
 
-	if (window->shaper)
-	{
-	    SDL_ShapeData *data = window->shaper->driverdata;
-	    SDL_DFB_CHECK(data->surface->ReleaseSource(data->surface));
-    	SDL_DFB_RELEASE(data->surface);
-    	SDL_DFB_FREE(data);
-    	SDL_DFB_FREE(window->shaper);
-	}
+    if (window->shaper)
+    {
+        SDL_ShapeData *data = window->shaper->driverdata;
+        SDL_DFB_CHECK(data->surface->ReleaseSource(data->surface));
+        SDL_DFB_RELEASE(data->surface);
+        SDL_DFB_FREE(data);
+        SDL_DFB_FREE(window->shaper);
+    }
 
     SDL_DFB_CHECK(windata->window_surface->SetFont(windata->window_surface, NULL));
     SDL_DFB_CHECK(windata->surface->ReleaseSource(windata->surface));
     SDL_DFB_CHECK(windata->window_surface->ReleaseSource(windata->window_surface));
-  	SDL_DFB_RELEASE(windata->icon);
+    SDL_DFB_RELEASE(windata->icon);
     SDL_DFB_RELEASE(windata->font);
     SDL_DFB_RELEASE(windata->eventbuffer);
     SDL_DFB_RELEASE(windata->surface);
@@ -488,7 +494,7 @@ DirectFB_AdjustWindowSurface(SDL_Window * window)
 
     if (adjust) {
 #if SDL_DIRECTFB_OPENGL
-		DirectFB_GL_FreeWindowContexts(SDL_GetVideoDevice(), window);
+        DirectFB_GL_FreeWindowContexts(SDL_GetVideoDevice(), window);
 #endif
 
 #if (DFB_VERSION_ATLEAST(1,2,1))
@@ -515,9 +521,9 @@ DirectFB_AdjustWindowSurface(SDL_Window * window)
                                        &windata->client, &windata->surface));
 #endif
         DirectFB_WM_RedrawLayout(SDL_GetVideoDevice(), window);
-        
+
 #if SDL_DIRECTFB_OPENGL
-		DirectFB_GL_ReAllocWindowContexts(SDL_GetVideoDevice(), window);
+        DirectFB_GL_ReAllocWindowContexts(SDL_GetVideoDevice(), window);
 #endif
    }
   error:

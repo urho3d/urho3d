@@ -205,7 +205,7 @@ private:
     /// Handle frame start event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle SDL event.
-    static void HandleSDLEvent(void* sdlEvent);
+    void HandleSDLEvent(void* sdlEvent);
     
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;

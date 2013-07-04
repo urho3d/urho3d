@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -49,14 +49,7 @@ SDL_LoadObject(const char *sofile)
 void *
 SDL_LoadFunction(void *handle, const char *name)
 {
-#ifdef _WIN32_WCE
-    LPTSTR tstr = WIN_UTF8ToString(name);
-    void *symbol = (void *) GetProcAddress((HMODULE) handle, tstr);
-    SDL_free(tstr);
-#else
     void *symbol = (void *) GetProcAddress((HMODULE) handle, name);
-#endif
-
     if (symbol == NULL) {
         char errbuf[512];
         SDL_strlcpy(errbuf, "Failed loading ", SDL_arraysize(errbuf));

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -110,8 +110,7 @@ DISKAUD_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden = (struct SDL_PrivateAudioData *)
         SDL_malloc(sizeof(*this->hidden));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, sizeof(*this->hidden));
 
@@ -119,14 +118,14 @@ DISKAUD_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden->output = SDL_RWFromFile(fname, "wb");
     if (this->hidden->output == NULL) {
         DISKAUD_CloseDevice(this);
-        return 0;
+        return -1;
     }
 
     /* Allocate mixing buffer */
     this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->hidden->mixlen);
     if (this->hidden->mixbuf == NULL) {
         DISKAUD_CloseDevice(this);
-        return 0;
+        return -1;
     }
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
 
@@ -141,7 +140,7 @@ DISKAUD_OpenDevice(_THIS, const char *devname, int iscapture)
 #endif
 
     /* We're ready to rock and roll. :-) */
-    return 1;
+    return 0;
 }
 
 static int

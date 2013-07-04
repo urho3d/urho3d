@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,6 +24,25 @@
 
 #include "SDL_stdinc.h"
 
+/* these are always #defined, make them real symbol in the library, too... */
+#undef SDL_ceil
+#undef SDL_abs
+#undef SDL_sinf
+#undef SDL_cosf
+#undef SDL_isdigit
+#undef SDL_isspace
+#undef SDL_toupper
+#undef SDL_tolower
+double SDL_ceil(double x) { return SDL_ceil_inline(x); }
+float SDL_cosf(float x) { return SDL_cosf_inline(x); }
+float SDL_sinf(float x) { return SDL_sinf_inline(x); }
+int SDL_abs(int x) { return SDL_abs_inline(x); }
+int SDL_isdigit(int x) { return SDL_isdigit_inline(x); }
+int SDL_isspace(int x) { return SDL_isspace_inline(x); }
+int SDL_toupper(int x) { return SDL_toupper_inline(x); }
+int SDL_tolower(int x) { return SDL_tolower_inline(x); }
+
+
 #ifndef HAVE_LIBC
 /* These are some C runtime intrinsics that need to be defined */
 
@@ -34,8 +53,8 @@
 __declspec(selectany) int _fltused = 1;
 #endif
 
-/* The optimizer on Visual Studio 2010 generates memcpy() calls */
-#if _MSC_VER == 1600 && defined(_WIN64) && !defined(_DEBUG)
+/* The optimizer on Visual Studio 2010/2012 generates memcpy() calls */
+#if _MSC_VER >= 1600 && defined(_WIN64) && !defined(_DEBUG)
 #include <intrin.h>
 
 #pragma function(memcpy)
@@ -172,7 +191,7 @@ _allmul()
         pop         esi
         pop         edi
         pop         ebp
-        ret
+        ret         10h
     }
     /* *INDENT-ON* */
 }

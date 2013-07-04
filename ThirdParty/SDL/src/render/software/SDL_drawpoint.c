@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,14 +30,12 @@ int
 SDL_DrawPoint(SDL_Surface * dst, int x, int y, Uint32 color)
 {
     if (!dst) {
-        SDL_SetError("Passed NULL destination surface");
-        return -1;
+        return SDL_SetError("Passed NULL destination surface");
     }
 
     /* This function doesn't work on surfaces < 8 bpp */
     if (dst->format->BitsPerPixel < 8) {
-        SDL_SetError("SDL_DrawPoint(): Unsupported surface format");
-        return -1;
+        return SDL_SetError("SDL_DrawPoint(): Unsupported surface format");
     }
 
     /* Perform clipping */
@@ -55,8 +53,7 @@ SDL_DrawPoint(SDL_Surface * dst, int x, int y, Uint32 color)
         DRAW_FASTSETPIXELXY2(x, y);
         break;
     case 3:
-        SDL_Unsupported();
-        return -1;
+        return SDL_Unsupported();
     case 4:
         DRAW_FASTSETPIXELXY4(x, y);
         break;
@@ -74,14 +71,12 @@ SDL_DrawPoints(SDL_Surface * dst, const SDL_Point * points, int count,
     int x, y;
 
     if (!dst) {
-        SDL_SetError("Passed NULL destination surface");
-        return -1;
+        return SDL_SetError("Passed NULL destination surface");
     }
 
     /* This function doesn't work on surfaces < 8 bpp */
     if (dst->format->BitsPerPixel < 8) {
-        SDL_SetError("SDL_DrawPoints(): Unsupported surface format");
-        return -1;
+        return SDL_SetError("SDL_DrawPoints(): Unsupported surface format");
     }
 
     minx = dst->clip_rect.x;
@@ -105,8 +100,7 @@ SDL_DrawPoints(SDL_Surface * dst, const SDL_Point * points, int count,
             DRAW_FASTSETPIXELXY2(x, y);
             break;
         case 3:
-            SDL_Unsupported();
-            return -1;
+            return SDL_Unsupported();
         case 4:
             DRAW_FASTSETPIXELXY4(x, y);
             break;

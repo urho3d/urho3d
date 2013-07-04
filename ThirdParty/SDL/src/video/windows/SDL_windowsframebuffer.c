@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,18 +24,12 @@
 
 #include "SDL_windowsvideo.h"
 
-#ifndef _WIN32_WCE
-#define HAVE_GETDIBITS
-#endif
-
 int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, void ** pixels, int *pitch)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
     size_t size;
     LPBITMAPINFO info;
-#ifdef HAVE_GETDIBITS
     HBITMAP hbm;
-#endif
 
     /* Free the old framebuffer surface */
     if (data->mdc) {
@@ -49,7 +43,6 @@ int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, voi
     size = sizeof(BITMAPINFOHEADER) + 256 * sizeof (RGBQUAD);
     info = (LPBITMAPINFO)SDL_stack_alloc(Uint8, size);
 
-#ifdef HAVE_GETDIBITS
     SDL_memset(info, 0, size);
     info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 
@@ -69,7 +62,6 @@ int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, voi
         *format = SDL_MasksToPixelFormatEnum(bpp, masks[0], masks[1], masks[2], 0);
     }
     if (*format == SDL_PIXELFORMAT_UNKNOWN)
-#endif
     {
         /* We'll use RGB format for now */
         *format = SDL_PIXELFORMAT_RGB888;
@@ -85,7 +77,7 @@ int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, voi
     /* Fill in the size information */
     *pitch = (((window->w * SDL_BYTESPERPIXEL(*format)) + 3) & ~3);
     info->bmiHeader.biWidth = window->w;
-    info->bmiHeader.biHeight = -window->h;	/* negative for topdown bitmap */
+    info->bmiHeader.biHeight = -window->h;  /* negative for topdown bitmap */
     info->bmiHeader.biSizeImage = window->h * (*pitch);
 
     data->mdc = CreateCompatibleDC(data->hdc);
@@ -93,15 +85,14 @@ int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, voi
     SDL_stack_free(info);
 
     if (!data->hbm) {
-        WIN_SetError("Unable to create DIB");
-        return -1;
+        return WIN_SetError("Unable to create DIB");
     }
     SelectObject(data->mdc, data->hbm);
 
     return 0;
 }
 
-int WIN_UpdateWindowFramebuffer(_THIS, SDL_Window * window, SDL_Rect * rects, int numrects)
+int WIN_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rect * rects, int numrects)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
 

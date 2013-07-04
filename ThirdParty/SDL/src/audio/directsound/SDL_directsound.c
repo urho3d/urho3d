@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -95,7 +95,7 @@ utf16_to_utf8(const WCHAR *S)
                             (SDL_wcslen(S)+1)*sizeof(WCHAR));
 }
 
-static void
+static int
 SetDSerror(const char *function, int code)
 {
     static const char *error;
@@ -145,8 +145,7 @@ SetDSerror(const char *function, int code)
         SDL_snprintf(errbuf, SDL_arraysize(errbuf), "%s: %s", function,
                      error);
     }
-    SDL_SetError("%s", errbuf);
-    return;
+    return SDL_SetError("%s", errbuf);
 }
 
 
@@ -364,8 +363,7 @@ CreateSecondary(_THIS, HWND focus, WAVEFORMATEX * wavefmt)
                                                   DSSCL_NORMAL);
     }
     if (result != DS_OK) {
-        SetDSerror("DirectSound SetCooperativeLevel", result);
-        return (-1);
+        return SetDSerror("DirectSound SetCooperativeLevel", result);
     }
 
     /* Try to create the secondary buffer */
@@ -380,16 +378,14 @@ CreateSecondary(_THIS, HWND focus, WAVEFORMATEX * wavefmt)
     format.dwBufferBytes = numchunks * chunksize;
     if ((format.dwBufferBytes < DSBSIZE_MIN) ||
         (format.dwBufferBytes > DSBSIZE_MAX)) {
-        SDL_SetError("Sound buffer size must be between %d and %d",
-                     DSBSIZE_MIN / numchunks, DSBSIZE_MAX / numchunks);
-        return (-1);
+        return SDL_SetError("Sound buffer size must be between %d and %d",
+                            DSBSIZE_MIN / numchunks, DSBSIZE_MAX / numchunks);
     }
     format.dwReserved = 0;
     format.lpwfxFormat = wavefmt;
     result = IDirectSound_CreateSoundBuffer(sndObj, &format, sndbuf, NULL);
     if (result != DS_OK) {
-        SetDSerror("DirectSound CreateSoundBuffer", result);
-        return (-1);
+        return SetDSerror("DirectSound CreateSoundBuffer", result);
     }
     IDirectSoundBuffer_SetFormat(*sndbuf, wavefmt);
 
@@ -452,8 +448,7 @@ DSOUND_OpenDevice(_THIS, const char *devname, int iscapture)
             pDirectSoundEnumerateW(FindDevGUID, &devguid);
 
         if (!devguid.found) {
-            SDL_SetError("DirectSound: Requested device not found");
-            return 0;
+            return SDL_SetError("DirectSound: Requested device not found");
         }
         guid = &devguid.guid;
     }
@@ -462,8 +457,7 @@ DSOUND_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden = (struct SDL_PrivateAudioData *)
         SDL_malloc((sizeof *this->hidden));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, (sizeof *this->hidden));
 
@@ -481,8 +475,7 @@ DSOUND_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (!valid_format) {
         DSOUND_CloseDevice(this);
-        SDL_SetError("DirectSound: Unsupported audio format");
-        return 0;
+        return SDL_SetError("DirectSound: Unsupported audio format");
     }
 
     SDL_memset(&waveformat, 0, sizeof(waveformat));
@@ -502,21 +495,20 @@ DSOUND_OpenDevice(_THIS, const char *devname, int iscapture)
     result = pDirectSoundCreate8(guid, &this->hidden->sound, NULL);
     if (result != DS_OK) {
         DSOUND_CloseDevice(this);
-        SetDSerror("DirectSoundCreate", result);
-        return 0;
+        return SetDSerror("DirectSoundCreate", result);
     }
 
     /* Create the audio buffer to which we write */
     this->hidden->num_buffers = CreateSecondary(this, NULL, &waveformat);
     if (this->hidden->num_buffers < 0) {
         DSOUND_CloseDevice(this);
-        return 0;
+        return -1;
     }
 
     /* The buffer will auto-start playing in DSOUND_WaitDevice() */
     this->hidden->mixlen = this->spec.size;
 
-    return 1;                   /* good to go. */
+    return 0;                   /* good to go. */
 }
 
 

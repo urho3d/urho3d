@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,18 +27,10 @@
 #include "../../core/windows/SDL_windows.h"
 
 #include "SDL_thread.h"
-#if defined(_WIN32_WCE) && (_WIN32_WCE < 300)
-#include "win_ce_semaphore.h"
-#endif
-
 
 struct SDL_semaphore
 {
-#if defined(_WIN32_WCE) && (_WIN32_WCE < 300)
-    SYNCHHANDLE id;
-#else
     HANDLE id;
-#endif
     LONG count;
 };
 
@@ -53,11 +45,7 @@ SDL_CreateSemaphore(Uint32 initial_value)
     sem = (SDL_sem *) SDL_malloc(sizeof(*sem));
     if (sem) {
         /* Create the semaphore, with max value 32K */
-#if defined(_WIN32_WCE) && (_WIN32_WCE < 300)
-        sem->id = CreateSemaphoreCE(NULL, initial_value, 32 * 1024, NULL);
-#else
         sem->id = CreateSemaphore(NULL, initial_value, 32 * 1024, NULL);
-#endif
         sem->count = initial_value;
         if (!sem->id) {
             SDL_SetError("Couldn't create semaphore");
@@ -76,11 +64,7 @@ SDL_DestroySemaphore(SDL_sem * sem)
 {
     if (sem) {
         if (sem->id) {
-#if defined(_WIN32_WCE) && (_WIN32_WCE < 300)
-            CloseSynchHandle(sem->id);
-#else
             CloseHandle(sem->id);
-#endif
             sem->id = 0;
         }
         SDL_free(sem);
@@ -94,8 +78,7 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
     DWORD dwMilliseconds;
 
     if (!sem) {
-        SDL_SetError("Passed a NULL sem");
-        return -1;
+        return SDL_SetError("Passed a NULL sem");
     }
 
     if (timeout == SDL_MUTEX_MAXWAIT) {
@@ -103,11 +86,7 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
     } else {
         dwMilliseconds = (DWORD) timeout;
     }
-#if defined(_WIN32_WCE) && (_WIN32_WCE < 300)
-    switch (WaitForSemaphoreCE(sem->id, dwMilliseconds)) {
-#else
     switch (WaitForSingleObject(sem->id, dwMilliseconds)) {
-#endif
     case WAIT_OBJECT_0:
         InterlockedDecrement(&sem->count);
         retval = 0;
@@ -116,8 +95,7 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
         retval = SDL_MUTEX_TIMEDOUT;
         break;
     default:
-        SDL_SetError("WaitForSingleObject() failed");
-        retval = -1;
+        retval = SDL_SetError("WaitForSingleObject() failed");
         break;
     }
     return retval;
@@ -150,8 +128,7 @@ int
 SDL_SemPost(SDL_sem * sem)
 {
     if (!sem) {
-        SDL_SetError("Passed a NULL sem");
-        return -1;
+        return SDL_SetError("Passed a NULL sem");
     }
     /* Increase the counter in the first place, because
      * after a successful release the semaphore may
@@ -159,14 +136,9 @@ SDL_SemPost(SDL_sem * sem)
      * is waiting for this semaphore.
      */
     InterlockedIncrement(&sem->count);
-#if defined(_WIN32_WCE) && (_WIN32_WCE < 300)
-    if (ReleaseSemaphoreCE(sem->id, 1, NULL) == FALSE) {
-#else
     if (ReleaseSemaphore(sem->id, 1, NULL) == FALSE) {
-#endif
         InterlockedDecrement(&sem->count);      /* restore */
-        SDL_SetError("ReleaseSemaphore() failed");
-        return -1;
+        return SDL_SetError("ReleaseSemaphore() failed");
     }
     return 0;
 }

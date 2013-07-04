@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,29 +18,28 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
 
 #include "../SDL_sysvideo.h"
+#include "../../events/SDL_keyboard_c.h"
+#include "../../events/SDL_mouse_c.h"
 
 #include "SDL_androidvideo.h"
 #include "SDL_androidwindow.h"
 
+#include "../../core/android/SDL_android.h"
+
 int
 Android_CreateWindow(_THIS, SDL_Window * window)
 {
-    // Urho3D: this is a static variable that may not be cleared between runs of the program. Skip the check
-    /*
     if (Android_Window) {
-        SDL_SetError("Android only supports one window");
-        return -1;
+        return SDL_SetError("Android only supports one window");
     }
-    */
     Android_Window = window;
+    Android_PauseSem = SDL_CreateSemaphore(0);
+    Android_ResumeSem = SDL_CreateSemaphore(0);
 
     /* Adjust the window data to match the screen */
     window->x = 0;
@@ -52,7 +51,11 @@ Android_CreateWindow(_THIS, SDL_Window * window)
     window->flags |= SDL_WINDOW_FULLSCREEN;     /* window is always fullscreen */
     window->flags &= ~SDL_WINDOW_HIDDEN;
     window->flags |= SDL_WINDOW_SHOWN;          /* only one window on Android */
-    window->flags |= SDL_WINDOW_INPUT_FOCUS;    /* always has input focus */    
+    window->flags |= SDL_WINDOW_INPUT_FOCUS;    /* always has input focus */
+
+    /* One window, it always has focus */
+    SDL_SetMouseFocus(window);
+    SDL_SetKeyboardFocus(window);
 
     return 0;
 }
@@ -68,6 +71,10 @@ Android_DestroyWindow(_THIS, SDL_Window * window)
 {
     if (window == Android_Window) {
         Android_Window = NULL;
+        if (Android_PauseSem) SDL_DestroySemaphore(Android_PauseSem);
+        if (Android_ResumeSem) SDL_DestroySemaphore(Android_ResumeSem);
+        Android_PauseSem = NULL;
+        Android_ResumeSem = NULL;
     }
 }
 

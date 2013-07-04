@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,13 +29,26 @@
 
 
 static int
-RemovePendingSizeEvents(void * userdata, SDL_Event *event)
+RemovePendingResizedEvents(void * userdata, SDL_Event *event)
 {
     SDL_Event *new_event = (SDL_Event *)userdata;
 
     if (event->type == SDL_WINDOWEVENT &&
-        (event->window.event == SDL_WINDOWEVENT_RESIZED ||
-         event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) &&
+        event->window.event == SDL_WINDOWEVENT_RESIZED &&
+        event->window.windowID == new_event->window.windowID) {
+        /* We're about to post a new size event, drop the old one */
+        return 0;
+    }
+    return 1;
+}
+
+static int
+RemovePendingSizeChangedEvents(void * userdata, SDL_Event *event)
+{
+    SDL_Event *new_event = (SDL_Event *)userdata;
+
+    if (event->type == SDL_WINDOWEVENT &&
+        event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED &&
         event->window.windowID == new_event->window.windowID) {
         /* We're about to post a new size event, drop the old one */
         return 0;
@@ -135,12 +148,14 @@ SDL_SendWindowEvent(SDL_Window * window, Uint8 windowevent, int data1,
             return 0;
         }
         window->flags |= SDL_WINDOW_MOUSE_FOCUS;
+        SDL_OnWindowEnter(window);
         break;
     case SDL_WINDOWEVENT_LEAVE:
         if (!(window->flags & SDL_WINDOW_MOUSE_FOCUS)) {
             return 0;
         }
         window->flags &= ~SDL_WINDOW_MOUSE_FOCUS;
+        SDL_OnWindowLeave(window);
         break;
     case SDL_WINDOWEVENT_FOCUS_GAINED:
         if (window->flags & SDL_WINDOW_INPUT_FOCUS) {
@@ -169,9 +184,11 @@ SDL_SendWindowEvent(SDL_Window * window, Uint8 windowevent, int data1,
         event.window.windowID = window->id;
 
         /* Fixes queue overflow with resize events that aren't processed */
-        if (windowevent == SDL_WINDOWEVENT_RESIZED ||
-            windowevent == SDL_WINDOWEVENT_SIZE_CHANGED) {
-            SDL_FilterEvents(RemovePendingSizeEvents, &event);
+        if (windowevent == SDL_WINDOWEVENT_RESIZED) {
+            SDL_FilterEvents(RemovePendingResizedEvents, &event);
+        }
+        if (windowevent == SDL_WINDOWEVENT_SIZE_CHANGED) {
+            SDL_FilterEvents(RemovePendingSizeChangedEvents, &event);
         }
         if (windowevent == SDL_WINDOWEVENT_MOVED) {
             SDL_FilterEvents(RemovePendingMoveEvents, &event);
@@ -179,13 +196,13 @@ SDL_SendWindowEvent(SDL_Window * window, Uint8 windowevent, int data1,
 
         posted = (SDL_PushEvent(&event) > 0);
     }
-	
-	if (windowevent == SDL_WINDOWEVENT_CLOSE) {
-		if ( !window->prev && !window->next ) {
-			// This is the last window in the list so send the SDL_QUIT event
-			SDL_SendQuit();
-		}
-	}
+
+    if (windowevent == SDL_WINDOWEVENT_CLOSE) {
+        if ( !window->prev && !window->next ) {
+            /* This is the last window in the list so send the SDL_QUIT event */
+            SDL_SendQuit();
+        }
+    }
 
     return (posted);
 }

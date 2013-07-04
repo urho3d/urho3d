@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -36,6 +36,7 @@ extern int SDL_StartEventLoop(void);
 extern void SDL_StopEventLoop(void);
 extern void SDL_QuitInterrupt(void);
 
+extern int SDL_SendAppEvent(SDL_EventType eventType);
 extern int SDL_SendSysWMEvent(SDL_SysWMmsg * message);
 
 extern int SDL_QuitInit(void);
@@ -45,8 +46,5 @@ extern void SDL_QuitQuit(void);
 /* The event filter function */
 extern SDL_EventFilter SDL_EventOK;
 extern void *SDL_EventOKParam;
-
-/* The system event hook function */
-extern SDL_SystemEventHandler SDL_SysEventHandler;
 
 /* vi: set ts=4 sw=4 expandtab: */

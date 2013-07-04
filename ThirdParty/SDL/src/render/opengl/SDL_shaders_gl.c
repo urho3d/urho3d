@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -216,7 +216,7 @@ CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
 
     /* Make sure we use the correct sampler type for our texture type */
     if (ctx->GL_ARB_texture_rectangle_supported) {
-        frag_defines = 
+        frag_defines =
 "#define sampler2D sampler2DRect\n"
 "#define texture2D texture2DRect\n";
     }
@@ -244,7 +244,7 @@ CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
     /* Set up some uniform variables */
     ctx->glUseProgramObjectARB(data->program);
     for (i = 0; i < num_tmus_bound; ++i) {
-        char tex_name[5];
+        char tex_name[10];
         SDL_snprintf(tex_name, SDL_arraysize(tex_name), "tex%d", i);
         location = ctx->glGetUniformLocationARB(data->program, tex_name);
         if (location >= 0) {
@@ -252,7 +252,7 @@ CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
         }
     }
     ctx->glUseProgramObjectARB(0);
-    
+
     return (ctx->glGetError() == GL_NO_ERROR);
 }
 

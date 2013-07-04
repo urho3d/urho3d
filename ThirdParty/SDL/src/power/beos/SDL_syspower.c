@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -50,8 +50,8 @@ SDL_GetPowerInfo_BeOS(SDL_PowerState * state, int *seconds, int *percent)
     uint8 battery_flags;
     uint8 battery_life;
     uint32 battery_time;
-	int rc;
-	
+    int rc;
+
     if (fd == -1) {
         return SDL_FALSE;       /* maybe some other method will work? */
     }

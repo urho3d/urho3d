@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -61,7 +61,7 @@ int
 X11_ResizeWindowShape(SDL_Window* window) {
     SDL_ShapeData* data = window->shaper->driverdata;
     SDL_assert(data != NULL);
-    
+
     unsigned int bitmapsize = window->w / 8;
     if(window->w % 8 > 0)
         bitmapsize += 1;
@@ -72,19 +72,18 @@ X11_ResizeWindowShape(SDL_Window* window) {
             free(data->bitmap);
         data->bitmap = malloc(data->bitmapsize);
         if(data->bitmap == NULL) {
-            SDL_SetError("Could not allocate memory for shaped-window bitmap.");
-            return -1;
+            return SDL_SetError("Could not allocate memory for shaped-window bitmap.");
         }
     }
     memset(data->bitmap,0,data->bitmapsize);
-    
+
     window->shaper->userx = window->x;
     window->shaper->usery = window->y;
     SDL_SetWindowPosition(window,-1000,-1000);
-    
+
     return 0;
 }
-    
+
 int
 X11_SetWindowShape(SDL_WindowShaper *shaper,SDL_Surface *shape,SDL_WindowShapeMode *shape_mode) {
     if(shaper == NULL || shape == NULL || shaper->driverdata == NULL)
@@ -96,13 +95,13 @@ X11_SetWindowShape(SDL_WindowShaper *shaper,SDL_Surface *shape,SDL_WindowShapeMo
     if(shape->w != shaper->window->w || shape->h != shaper->window->h)
         return -3;
     SDL_ShapeData *data = shaper->driverdata;
-    
+
     /* Assume that shaper->alphacutoff already has a value, because SDL_SetWindowShape() should have given it one. */
     SDL_CalculateShapeBitmap(shaper->mode,shape,data->bitmap,8);
-        
+
     SDL_WindowData *windowdata = (SDL_WindowData*)(shaper->window->driverdata);
     Pixmap shapemask = XCreateBitmapFromData(windowdata->videodata->display,windowdata->xwindow,data->bitmap,shaper->window->w,shaper->window->h);
-    
+
     XShapeCombineMask(windowdata->videodata->display,windowdata->xwindow, ShapeBounding, 0, 0,shapemask, ShapeSet);
     XSync(windowdata->videodata->display,False);
 

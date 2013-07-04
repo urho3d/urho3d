@@ -30,11 +30,7 @@
  *  \file SDL_config.h
  */
 
-#define SDL_POWER_DISABLED 1
-#define SDL_RENDER_DISABLED 1
-#define SDL_HAPTIC_DISABLED 1
-
-/* Add any platform that doesn't build using the configure system. */
+// Urho3D: choose from prebuilt config files on all OSes
 #if defined(__WIN32__)
 #include "SDL_config_windows.h"
 #elif defined(__MACOSX__)

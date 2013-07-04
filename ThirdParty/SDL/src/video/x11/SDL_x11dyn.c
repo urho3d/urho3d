@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -53,8 +53,8 @@ typedef struct
 #ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XINERAMA
 #define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINERAMA NULL
 #endif
-#ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT NULL
+#ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2
+#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2 NULL
 #endif
 #ifndef SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR
 #define SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR NULL
@@ -71,42 +71,45 @@ static x11dynlib x11libs[] = {
     {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XEXT},
     {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XCURSOR},
     {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XINERAMA},
-    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT},
+    {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2},
     {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR},
     {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS},
     {NULL, SDL_VIDEO_DRIVER_X11_DYNAMIC_XVIDMODE}
 };
 
-static void
-X11_GetSym(const char *fnname, int *rc, void **fn)
+static void *
+X11_GetSym(const char *fnname, int *pHasModule)
 {
     int i;
+    void *fn = NULL;
     for (i = 0; i < SDL_TABLESIZE(x11libs); i++) {
         if (x11libs[i].lib != NULL) {
-            *fn = SDL_LoadFunction(x11libs[i].lib, fnname);
-            if (*fn != NULL)
+            fn = SDL_LoadFunction(x11libs[i].lib, fnname);
+            if (fn != NULL)
                 break;
         }
     }
 
 #if DEBUG_DYNAMIC_X11
-    if (*fn != NULL)
-        printf("X11: Found '%s' in %s (%p)\n", fnname, x11libs[i].libname,
-               *fn);
+    if (fn != NULL)
+        printf("X11: Found '%s' in %s (%p)\n", fnname, x11libs[i].libname, fn);
     else
         printf("X11: Symbol '%s' NOT FOUND!\n", fnname);
 #endif
 
-    if (*fn == NULL)
-        *rc = 0;                /* kill this module. */
+    if (fn == NULL)
+        *pHasModule = 0;  /* kill this module. */
+
+    return fn;
 }
 
 
 /* Define all the function pointers and wrappers... */
 #define SDL_X11_MODULE(modname)
 #define SDL_X11_SYM(rc,fn,params,args,ret) \
-	static rc (*p##fn) params = NULL; \
-	rc fn params { ret p##fn args ; }
+    typedef rc (*SDL_DYNX11FN_##fn) params; \
+    static SDL_DYNX11FN_##fn p##fn = NULL; \
+    rc fn params { ret p##fn args ; }
 #include "SDL_x11sym.h"
 #undef SDL_X11_MODULE
 #undef SDL_X11_SYM
@@ -114,8 +117,10 @@ X11_GetSym(const char *fnname, int *rc, void **fn)
 
 /* Annoying varargs entry point... */
 #ifdef X_HAVE_UTF8_STRING
-XIC(*pXCreateIC) (XIM,...) = NULL;
-char *(*pXGetICValues) (XIC, ...) = NULL;
+typedef XIC(*SDL_DYNX11FN_XCreateIC) (XIM,...);
+SDL_DYNX11FN_XCreateIC pXCreateIC = NULL;
+typedef char *(*SDL_DYNX11FN_XGetICValues) (XIC, ...);
+SDL_DYNX11FN_XGetICValues pXGetICValues = NULL;
 #endif
 
 /* These SDL_X11_HAVE_* flags are here whether you have dynamic X11 or not. */
@@ -184,15 +189,16 @@ SDL_X11_LoadSymbols(void)
 #undef SDL_X11_SYM
 
 #define SDL_X11_MODULE(modname) thismod = &SDL_X11_HAVE_##modname;
-#define SDL_X11_SYM(a,fn,x,y,z) X11_GetSym(#fn,thismod,(void**)&p##fn);
+#define SDL_X11_SYM(a,fn,x,y,z) p##fn = (SDL_DYNX11FN_##fn) X11_GetSym(#fn,thismod);
 #include "SDL_x11sym.h"
 #undef SDL_X11_MODULE
 #undef SDL_X11_SYM
 
 #ifdef X_HAVE_UTF8_STRING
-        X11_GetSym("XCreateIC", &SDL_X11_HAVE_UTF8, (void **) &pXCreateIC);
-        X11_GetSym("XGetICValues", &SDL_X11_HAVE_UTF8,
-                   (void **) &pXGetICValues);
+        pXCreateIC = (SDL_DYNX11FN_XCreateIC)
+                        X11_GetSym("XCreateIC", &SDL_X11_HAVE_UTF8);
+        pXGetICValues = (SDL_DYNX11FN_XGetICValues)
+                        X11_GetSym("XGetICValues", &SDL_X11_HAVE_UTF8);
 #endif
 
         if (SDL_X11_HAVE_BASEXLIB) {
@@ -205,6 +211,12 @@ SDL_X11_LoadSymbols(void)
         }
     }
 #else
+#define SDL_X11_MODULE(modname) SDL_X11_HAVE_##modname = 1; /* default yes */
+#define SDL_X11_SYM(a,fn,x,y,z)
+#include "SDL_x11sym.h"
+#undef SDL_X11_MODULE
+#undef SDL_X11_SYM
+
 #ifdef X_HAVE_UTF8_STRING
     pXCreateIC = XCreateIC;
     pXGetICValues = XGetICValues;

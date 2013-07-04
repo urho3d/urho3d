@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,6 @@ SDL_DrawLine1(SDL_Surface * dst, int x1, int y1, int x2, int y2, Uint32 color,
               SDL_bool draw_end)
 {
     if (y1 == y2) {
-        //HLINE(Uint8, DRAW_FASTSETPIXEL1, draw_end);
         int length;
         int pitch = (dst->pitch / dst->format->BytesPerPixel);
         Uint8 *pixel;
@@ -145,14 +144,12 @@ SDL_DrawLine(SDL_Surface * dst, int x1, int y1, int x2, int y2, Uint32 color)
     DrawLineFunc func;
 
     if (!dst) {
-        SDL_SetError("SDL_DrawLine(): Passed NULL destination surface");
-        return -1;
+        return SDL_SetError("SDL_DrawLine(): Passed NULL destination surface");
     }
 
     func = SDL_CalculateDrawLineFunc(dst->format);
     if (!func) {
-        SDL_SetError("SDL_DrawLine(): Unsupported surface format");
-        return -1;
+        return SDL_SetError("SDL_DrawLine(): Unsupported surface format");
     }
 
     /* Perform clipping */
@@ -176,14 +173,12 @@ SDL_DrawLines(SDL_Surface * dst, const SDL_Point * points, int count,
     DrawLineFunc func;
 
     if (!dst) {
-        SDL_SetError("SDL_DrawLines(): Passed NULL destination surface");
-        return -1;
+        return SDL_SetError("SDL_DrawLines(): Passed NULL destination surface");
     }
 
     func = SDL_CalculateDrawLineFunc(dst->format);
     if (!func) {
-        SDL_SetError("SDL_DrawLines(): Unsupported surface format");
-        return -1;
+        return SDL_SetError("SDL_DrawLines(): Unsupported surface format");
     }
 
     for (i = 1; i < count; ++i) {

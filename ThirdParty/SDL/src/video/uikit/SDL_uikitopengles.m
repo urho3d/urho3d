@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,7 +27,6 @@
 #include "SDL_uikitappdelegate.h"
 #include "SDL_uikitmodes.h"
 #include "SDL_uikitwindow.h"
-#include "jumphack.h"
 #include "../SDL_sysvideo.h"
 #include "../../events/SDL_keyboard_c.h"
 #include "../../events/SDL_mouse_c.h"
@@ -72,8 +71,7 @@ UIKit_GL_LoadLibrary(_THIS, const char *path)
         and because the SDK forbids loading an external SO
     */
     if (path != NULL) {
-        SDL_SetError("iPhone GL Load Library just here for compatibility");
-        return -1;
+        return SDL_SetError("iPhone GL Load Library just here for compatibility");
     }
     return 0;
 }
@@ -81,7 +79,7 @@ UIKit_GL_LoadLibrary(_THIS, const char *path)
 void UIKit_GL_SwapWindow(_THIS, SDL_Window * window)
 {
 #if SDL_POWER_UIKIT
-    // Check once a frame to see if we should turn off the battery monitor.
+    /* Check once a frame to see if we should turn off the battery monitor. */
     SDL_UIKit_UpdateBatteryMonitoring();
 #endif
 
@@ -92,8 +90,10 @@ void UIKit_GL_SwapWindow(_THIS, SDL_Window * window)
     }
     [data->view swapBuffers];
 
-    /* we need to let the event cycle run, or the OS won't update the OpenGL view! */
-    SDL_PumpEvents();
+    /* You need to pump events in order for the OS to make changes visible.
+       We don't pump events here because we don't want iOS application events
+       (low memory, terminate, etc.) to happen inside low level rendering.
+     */
 }
 
 SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
@@ -133,8 +133,8 @@ SDL_GLContext UIKit_GL_CreateContext(_THIS, SDL_Window * window)
         [view->viewcontroller retain];
     }
     [uiwindow addSubview: view];
-    
-    // The view controller needs to be the root in order to control rotation on iOS 6.0
+
+    /* The view controller needs to be the root in order to control rotation on iOS 6.0 */
     if (uiwindow.rootViewController == nil) {
         uiwindow.rootViewController = view->viewcontroller;
     }

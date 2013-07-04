@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,8 +32,19 @@
 #include "SDL_loadso.h"
 #include "SDL_opengl.h"
 
-
 #define DEFAULT_OPENGL  "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
+
+
+#ifndef kCGLPFAOpenGLProfile
+#define kCGLPFAOpenGLProfile 99
+#endif
+#ifndef kCGLOGLPVersion_Legacy
+#define kCGLOGLPVersion_Legacy 0x1000
+#endif
+#ifndef kCGLOGLPVersion_3_2_Core
+#define kCGLOGLPVersion_3_2_Core 0x3200
+#endif
+
 
 int
 Cocoa_GL_LoadLibrary(_THIS, const char *path)
@@ -70,15 +81,43 @@ Cocoa_GL_UnloadLibrary(_THIS)
 SDL_GLContext
 Cocoa_GL_CreateContext(_THIS, SDL_Window * window)
 {
+    const int wantver = (_this->gl_config.major_version << 8) |
+                        (_this->gl_config.minor_version);
+    SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
     NSAutoreleasePool *pool;
     SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
     SDL_DisplayData *displaydata = (SDL_DisplayData *)display->driverdata;
     NSOpenGLPixelFormatAttribute attr[32];
     NSOpenGLPixelFormat *fmt;
     NSOpenGLContext *context;
+    NSOpenGLContext *share_context = nil;
     int i = 0;
 
+    if (_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES) {
+        SDL_SetError ("OpenGL ES not supported on this platform");
+        return NULL;
+    }
+
+    /* Sadly, we'll have to update this as life progresses, since we need to
+       set an enum for context profiles, not a context version number */
+    if (wantver > 0x0302) {
+        SDL_SetError ("OpenGL > 3.2 is not supported on this platform");
+        return NULL;
+    }
+
     pool = [[NSAutoreleasePool alloc] init];
+
+    /* specify a profile if we're on Lion (10.7) or later. */
+    if (data->osversion >= 0x1070) {
+        NSOpenGLPixelFormatAttribute profile = kCGLOGLPVersion_Legacy;
+        if (_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_CORE) {
+            if (wantver == 0x0302) {
+                profile = kCGLOGLPVersion_3_2_Core;
+            }
+        }
+        attr[i++] = kCGLPFAOpenGLProfile;
+        attr[i++] = profile;
+    }
 
 #ifndef FULLSCREEN_TOGGLEABLE
     if (window->flags & SDL_WINDOW_FULLSCREEN) {
@@ -144,7 +183,11 @@ Cocoa_GL_CreateContext(_THIS, SDL_Window * window)
         return NULL;
     }
 
-    context = [[NSOpenGLContext alloc] initWithFormat:fmt shareContext:nil];
+    if (_this->gl_config.share_with_current_context) {
+        share_context = (NSOpenGLContext*)(_this->current_glctx);
+    }
+
+    context = [[NSOpenGLContext alloc] initWithFormat:fmt shareContext:share_context];
 
     [fmt release];
 
@@ -153,31 +196,6 @@ Cocoa_GL_CreateContext(_THIS, SDL_Window * window)
         [pool release];
         return NULL;
     }
-
-    /*
-     * Wisdom from Apple engineer in reference to UT2003's OpenGL performance:
-     *  "You are blowing a couple of the internal OpenGL function caches. This
-     *  appears to be happening in the VAO case.  You can tell OpenGL to up
-     *  the cache size by issuing the following calls right after you create
-     *  the OpenGL context.  The default cache size is 16."    --ryan.
-     */
-
-    #ifndef GLI_ARRAY_FUNC_CACHE_MAX
-    #define GLI_ARRAY_FUNC_CACHE_MAX 284
-    #endif
-
-    #ifndef GLI_SUBMIT_FUNC_CACHE_MAX
-    #define GLI_SUBMIT_FUNC_CACHE_MAX 280
-    #endif
-
-    {
-        GLint cache_max = 64;
-        CGLContextObj ctx = [context CGLContextObj];
-        CGLSetParameter (ctx, GLI_SUBMIT_FUNC_CACHE_MAX, &cache_max);
-        CGLSetParameter (ctx, GLI_ARRAY_FUNC_CACHE_MAX, &cache_max);
-    }
-
-    /* End Wisdom from Apple Engineer section. --ryan. */
 
     [pool release];
 
@@ -200,16 +218,14 @@ Cocoa_GL_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context)
         SDL_WindowData *windowdata = (SDL_WindowData *)window->driverdata;
         NSOpenGLContext *nscontext = (NSOpenGLContext *)context;
 
-        if (window->flags & SDL_WINDOW_SHOWN) {
 #ifndef FULLSCREEN_TOGGLEABLE
-            if (window->flags & SDL_WINDOW_FULLSCREEN) {
-                [nscontext setFullScreen];
-            } else
+        if (window->flags & SDL_WINDOW_FULLSCREEN) {
+            [nscontext setFullScreen];
+        } else
 #endif
-            {
-                [nscontext setView:[windowdata->nswindow contentView]];
-                [nscontext update];
-            }
+        {
+            [nscontext setView:[windowdata->nswindow contentView]];
+            [nscontext update];
         }
         [nscontext makeCurrentContext];
     } else {
@@ -236,8 +252,7 @@ Cocoa_GL_SetSwapInterval(_THIS, int interval)
         [nscontext setValues:&value forParameter:NSOpenGLCPSwapInterval];
         status = 0;
     } else {
-        SDL_SetError("No current OpenGL context");
-        status = -1;
+        status = SDL_SetError("No current OpenGL context");
     }
 
     [pool release];
@@ -250,7 +265,7 @@ Cocoa_GL_GetSwapInterval(_THIS)
     NSAutoreleasePool *pool;
     NSOpenGLContext *nscontext;
     GLint value;
-    int status;
+    int status = 0;
 
     pool = [[NSAutoreleasePool alloc] init];
 
@@ -258,9 +273,6 @@ Cocoa_GL_GetSwapInterval(_THIS)
     if (nscontext != nil) {
         [nscontext getValues:&value forParameter:NSOpenGLCPSwapInterval];
         status = (int)value;
-    } else {
-        SDL_SetError("No current OpenGL context");
-        status = -1;
     }
 
     [pool release];
@@ -276,10 +288,7 @@ Cocoa_GL_SwapWindow(_THIS, SDL_Window * window)
     pool = [[NSAutoreleasePool alloc] init];
 
     /* FIXME: Do we need to get the context for the window? */
-    nscontext = [NSOpenGLContext currentContext];
-    if (nscontext != nil) {
-        [nscontext flushBuffer];
-    }
+    [[NSOpenGLContext currentContext] flushBuffer];
 
     [pool release];
 }

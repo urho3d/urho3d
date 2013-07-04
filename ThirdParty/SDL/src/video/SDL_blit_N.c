@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -275,7 +275,7 @@ Blit_RGB565_32Altivec(SDL_BlitInfo * info)
     vector unsigned int v16 = vec_add(v8, v8);
     vector unsigned short v2 = vec_splat_u16(2);
     vector unsigned short v3 = vec_splat_u16(3);
-    /* 
+    /*
        0x10 - 0x1f is the alpha
        0x00 - 0x0e evens are the red
        0x01 - 0x0f odds are zero
@@ -422,7 +422,7 @@ Blit_RGB555_32Altivec(SDL_BlitInfo * info)
     vector unsigned int v16 = vec_add(v8, v8);
     vector unsigned short v1 = vec_splat_u16(1);
     vector unsigned short v3 = vec_splat_u16(3);
-    /* 
+    /*
        0x10 - 0x1f is the alpha
        0x00 - 0x0e evens are the red
        0x01 - 0x0f odds are zero
@@ -876,18 +876,18 @@ GetBlitFeatures(void)
 
 /* This is now endian dependent */
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-#define HI	1
-#define LO	0
+#define HI  1
+#define LO  0
 #else /* SDL_BYTEORDER == SDL_BIG_ENDIAN */
-#define HI	0
-#define LO	1
+#define HI  0
+#define LO  1
 #endif
 
 /* Special optimized blit for RGB 8-8-8 --> RGB 3-3-2 */
 #define RGB888_RGB332(dst, src) { \
-	dst = (Uint8)((((src)&0x00E00000)>>16)| \
-	              (((src)&0x0000E000)>>11)| \
-	              (((src)&0x000000C0)>>6)); \
+    dst = (Uint8)((((src)&0x00E00000)>>16)| \
+                  (((src)&0x0000E000)>>11)| \
+                  (((src)&0x000000C0)>>6)); \
 }
 static void
 Blit_RGB888_index8(SDL_BlitInfo * info)
@@ -913,11 +913,11 @@ Blit_RGB888_index8(SDL_BlitInfo * info)
     if (map == NULL) {
         while (height--) {
 #ifdef USE_DUFFS_LOOP
-			/* *INDENT-OFF* */
-			DUFFS_LOOP(
-				RGB888_RGB332(*dst++, *src);
-			, width);
-			/* *INDENT-ON* */
+            /* *INDENT-OFF* */
+            DUFFS_LOOP(
+                RGB888_RGB332(*dst++, *src);
+            , width);
+            /* *INDENT-ON* */
 #else
             for (c = width / 4; c; --c) {
                 /* Pack RGB into 8bit pixel */
@@ -949,13 +949,13 @@ Blit_RGB888_index8(SDL_BlitInfo * info)
 
         while (height--) {
 #ifdef USE_DUFFS_LOOP
-			/* *INDENT-OFF* */
-			DUFFS_LOOP(
-				RGB888_RGB332(Pixel, *src);
-				*dst++ = map[Pixel];
-				++src;
-			, width);
-			/* *INDENT-ON* */
+            /* *INDENT-OFF* */
+            DUFFS_LOOP(
+                RGB888_RGB332(Pixel, *src);
+                *dst++ = map[Pixel];
+                ++src;
+            , width);
+            /* *INDENT-ON* */
 #else
             for (c = width / 4; c; --c) {
                 /* Pack RGB into 8bit pixel */
@@ -995,17 +995,17 @@ Blit_RGB888_index8(SDL_BlitInfo * info)
 
 /* Special optimized blit for RGB 8-8-8 --> RGB 5-5-5 */
 #define RGB888_RGB555(dst, src) { \
-	*(Uint16 *)(dst) = (Uint16)((((*src)&0x00F80000)>>9)| \
-	                            (((*src)&0x0000F800)>>6)| \
-	                            (((*src)&0x000000F8)>>3)); \
+    *(Uint16 *)(dst) = (Uint16)((((*src)&0x00F80000)>>9)| \
+                                (((*src)&0x0000F800)>>6)| \
+                                (((*src)&0x000000F8)>>3)); \
 }
 #define RGB888_RGB555_TWO(dst, src) { \
-	*(Uint32 *)(dst) = (((((src[HI])&0x00F80000)>>9)| \
-	                     (((src[HI])&0x0000F800)>>6)| \
-	                     (((src[HI])&0x000000F8)>>3))<<16)| \
-	                     (((src[LO])&0x00F80000)>>9)| \
-	                     (((src[LO])&0x0000F800)>>6)| \
-	                     (((src[LO])&0x000000F8)>>3); \
+    *(Uint32 *)(dst) = (((((src[HI])&0x00F80000)>>9)| \
+                         (((src[HI])&0x0000F800)>>6)| \
+                         (((src[HI])&0x000000F8)>>3))<<16)| \
+                         (((src[LO])&0x00F80000)>>9)| \
+                         (((src[LO])&0x0000F800)>>6)| \
+                         (((src[LO])&0x000000F8)>>3); \
 }
 static void
 Blit_RGB888_RGB555(SDL_BlitInfo * info)
@@ -1028,13 +1028,13 @@ Blit_RGB888_RGB555(SDL_BlitInfo * info)
 
 #ifdef USE_DUFFS_LOOP
     while (height--) {
-		/* *INDENT-OFF* */
-		DUFFS_LOOP(
-			RGB888_RGB555(dst, src);
-			++src;
-			++dst;
-		, width);
-		/* *INDENT-ON* */
+        /* *INDENT-OFF* */
+        DUFFS_LOOP(
+            RGB888_RGB555(dst, src);
+            ++src;
+            ++dst;
+        , width);
+        /* *INDENT-ON* */
         src += srcskip;
         dst += dstskip;
     }
@@ -1119,17 +1119,17 @@ Blit_RGB888_RGB555(SDL_BlitInfo * info)
 
 /* Special optimized blit for RGB 8-8-8 --> RGB 5-6-5 */
 #define RGB888_RGB565(dst, src) { \
-	*(Uint16 *)(dst) = (Uint16)((((*src)&0x00F80000)>>8)| \
-	                            (((*src)&0x0000FC00)>>5)| \
-	                            (((*src)&0x000000F8)>>3)); \
+    *(Uint16 *)(dst) = (Uint16)((((*src)&0x00F80000)>>8)| \
+                                (((*src)&0x0000FC00)>>5)| \
+                                (((*src)&0x000000F8)>>3)); \
 }
 #define RGB888_RGB565_TWO(dst, src) { \
-	*(Uint32 *)(dst) = (((((src[HI])&0x00F80000)>>8)| \
-	                     (((src[HI])&0x0000FC00)>>5)| \
-	                     (((src[HI])&0x000000F8)>>3))<<16)| \
-	                     (((src[LO])&0x00F80000)>>8)| \
-	                     (((src[LO])&0x0000FC00)>>5)| \
-	                     (((src[LO])&0x000000F8)>>3); \
+    *(Uint32 *)(dst) = (((((src[HI])&0x00F80000)>>8)| \
+                         (((src[HI])&0x0000FC00)>>5)| \
+                         (((src[HI])&0x000000F8)>>3))<<16)| \
+                         (((src[LO])&0x00F80000)>>8)| \
+                         (((src[LO])&0x0000FC00)>>5)| \
+                         (((src[LO])&0x000000F8)>>3); \
 }
 static void
 Blit_RGB888_RGB565(SDL_BlitInfo * info)
@@ -1152,13 +1152,13 @@ Blit_RGB888_RGB565(SDL_BlitInfo * info)
 
 #ifdef USE_DUFFS_LOOP
     while (height--) {
-		/* *INDENT-OFF* */
-		DUFFS_LOOP(
-			RGB888_RGB565(dst, src);
-			++src;
-			++dst;
-		, width);
-		/* *INDENT-ON* */
+        /* *INDENT-OFF* */
+        DUFFS_LOOP(
+            RGB888_RGB565(dst, src);
+            ++src;
+            ++dst;
+        , width);
+        /* *INDENT-ON* */
         src += srcskip;
         dst += dstskip;
     }
@@ -1265,14 +1265,14 @@ Blit_RGB565_32(SDL_BlitInfo * info, const Uint32 * map)
 
 #ifdef USE_DUFFS_LOOP
     while (height--) {
-		/* *INDENT-OFF* */
-		DUFFS_LOOP(
-		{
-			*dst++ = RGB565_32(dst, src, map);
-			src += 2;
-		},
-		width);
-		/* *INDENT-ON* */
+        /* *INDENT-OFF* */
+        DUFFS_LOOP(
+        {
+            *dst++ = RGB565_32(dst, src, map);
+            src += 2;
+        },
+        width);
+        /* *INDENT-ON* */
         src += srcskip;
         dst += dstskip;
     }
@@ -1863,9 +1863,9 @@ Blit_RGB565_BGRA8888(SDL_BlitInfo * info)
 /* Special optimized blit for RGB 8-8-8 --> RGB 3-3-2 */
 #ifndef RGB888_RGB332
 #define RGB888_RGB332(dst, src) { \
-	dst = (((src)&0x00E00000)>>16)| \
-	      (((src)&0x0000E000)>>11)| \
-	      (((src)&0x000000C0)>>6); \
+    dst = (((src)&0x00E00000)>>16)| \
+          (((src)&0x0000E000)>>11)| \
+          (((src)&0x000000C0)>>6); \
 }
 #endif
 static void
@@ -1892,13 +1892,13 @@ Blit_RGB888_index8_map(SDL_BlitInfo * info)
 
 #ifdef USE_DUFFS_LOOP
     while (height--) {
-		/* *INDENT-OFF* */
-		DUFFS_LOOP(
-			RGB888_RGB332(Pixel, *src);
-			*dst++ = map[Pixel];
-			++src;
-		, width);
-		/* *INDENT-ON* */
+        /* *INDENT-OFF* */
+        DUFFS_LOOP(
+            RGB888_RGB332(Pixel, *src);
+            *dst++ = map[Pixel];
+            ++src;
+        , width);
+        /* *INDENT-ON* */
         src += srcskip;
         dst += dstskip;
     }
@@ -1969,20 +1969,20 @@ BlitNto1(SDL_BlitInfo * info)
     if (map == NULL) {
         while (height--) {
 #ifdef USE_DUFFS_LOOP
-			/* *INDENT-OFF* */
-			DUFFS_LOOP(
-				DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel,
-								sR, sG, sB);
-				if ( 1 ) {
-				  	/* Pack RGB into 8bit pixel */
-				  	*dst = ((sR>>5)<<(3+2))|
-					        ((sG>>5)<<(2)) |
-					        ((sB>>6)<<(0)) ;
-				}
-				dst++;
-				src += srcbpp;
-			, width);
-			/* *INDENT-ON* */
+            /* *INDENT-OFF* */
+            DUFFS_LOOP(
+                DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel,
+                                sR, sG, sB);
+                if ( 1 ) {
+                    /* Pack RGB into 8bit pixel */
+                    *dst = ((sR>>5)<<(3+2))|
+                            ((sG>>5)<<(2)) |
+                            ((sB>>6)<<(0)) ;
+                }
+                dst++;
+                src += srcbpp;
+            , width);
+            /* *INDENT-ON* */
 #else
             for (c = width; c; --c) {
                 DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel, sR, sG, sB);
@@ -2001,20 +2001,20 @@ BlitNto1(SDL_BlitInfo * info)
     } else {
         while (height--) {
 #ifdef USE_DUFFS_LOOP
-			/* *INDENT-OFF* */
-			DUFFS_LOOP(
-				DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel,
-								sR, sG, sB);
-				if ( 1 ) {
-				  	/* Pack RGB into 8bit pixel */
-				  	*dst = map[((sR>>5)<<(3+2))|
-						   ((sG>>5)<<(2))  |
-						   ((sB>>6)<<(0))  ];
-				}
-				dst++;
-				src += srcbpp;
-			, width);
-			/* *INDENT-ON* */
+            /* *INDENT-OFF* */
+            DUFFS_LOOP(
+                DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel,
+                                sR, sG, sB);
+                if ( 1 ) {
+                    /* Pack RGB into 8bit pixel */
+                    *dst = map[((sR>>5)<<(3+2))|
+                           ((sG>>5)<<(2))  |
+                           ((sB>>6)<<(0))  ];
+                }
+                dst++;
+                src += srcbpp;
+            , width);
+            /* *INDENT-ON* */
 #else
             for (c = width; c; --c) {
                 DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel, sR, sG, sB);
@@ -2051,15 +2051,15 @@ Blit4to4MaskAlpha(SDL_BlitInfo * info)
         Uint32 mask = (info->a >> dstfmt->Aloss) << dstfmt->Ashift;
 
         while (height--) {
-			/* *INDENT-OFF* */
-			DUFFS_LOOP(
-			{
-				*dst = *src | mask;
-				++dst;
-				++src;
-			},
-			width);
-			/* *INDENT-ON* */
+            /* *INDENT-OFF* */
+            DUFFS_LOOP(
+            {
+                *dst = *src | mask;
+                ++dst;
+                ++src;
+            },
+            width);
+            /* *INDENT-ON* */
             src = (Uint32 *) ((Uint8 *) src + srcskip);
             dst = (Uint32 *) ((Uint8 *) dst + dstskip);
         }
@@ -2068,15 +2068,15 @@ Blit4to4MaskAlpha(SDL_BlitInfo * info)
         Uint32 mask = srcfmt->Rmask | srcfmt->Gmask | srcfmt->Bmask;
 
         while (height--) {
-			/* *INDENT-OFF* */
-			DUFFS_LOOP(
-			{
-				*dst = *src & mask;
-				++dst;
-				++src;
-			},
-			width);
-			/* *INDENT-ON* */
+            /* *INDENT-OFF* */
+            DUFFS_LOOP(
+            {
+                *dst = *src & mask;
+                ++dst;
+                ++src;
+            },
+            width);
+            /* *INDENT-ON* */
             src = (Uint32 *) ((Uint8 *) src + srcskip);
             dst = (Uint32 *) ((Uint8 *) dst + dstskip);
         }
@@ -2099,20 +2099,20 @@ BlitNtoN(SDL_BlitInfo * info)
     unsigned alpha = dstfmt->Amask ? info->a : 0;
 
     while (height--) {
-		/* *INDENT-OFF* */
-		DUFFS_LOOP(
-		{
+        /* *INDENT-OFF* */
+        DUFFS_LOOP(
+        {
             Uint32 Pixel;
-			unsigned sR;
-			unsigned sG;
-			unsigned sB;
-			DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel, sR, sG, sB);
-			ASSEMBLE_RGBA(dst, dstbpp, dstfmt, sR, sG, sB, alpha);
-			dst += dstbpp;
-			src += srcbpp;
-		},
-		width);
-		/* *INDENT-ON* */
+            unsigned sR;
+            unsigned sG;
+            unsigned sB;
+            DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel, sR, sG, sB);
+            ASSEMBLE_RGBA(dst, dstbpp, dstfmt, sR, sG, sB, alpha);
+            dst += dstbpp;
+            src += srcbpp;
+        },
+        width);
+        /* *INDENT-ON* */
         src += srcskip;
         dst += dstskip;
     }
@@ -2170,43 +2170,43 @@ BlitNto1Key(SDL_BlitInfo * info)
 
     if (palmap == NULL) {
         while (height--) {
-			/* *INDENT-OFF* */
-			DUFFS_LOOP(
-			{
-				DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel,
-								sR, sG, sB);
-				if ( (Pixel & rgbmask) != ckey ) {
-				  	/* Pack RGB into 8bit pixel */
-				  	*dst = (Uint8)(((sR>>5)<<(3+2))|
-						           ((sG>>5)<<(2)) |
-						           ((sB>>6)<<(0)));
-				}
-				dst++;
-				src += srcbpp;
-			},
-			width);
-			/* *INDENT-ON* */
+            /* *INDENT-OFF* */
+            DUFFS_LOOP(
+            {
+                DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel,
+                                sR, sG, sB);
+                if ( (Pixel & rgbmask) != ckey ) {
+                    /* Pack RGB into 8bit pixel */
+                    *dst = (Uint8)(((sR>>5)<<(3+2))|
+                                   ((sG>>5)<<(2)) |
+                                   ((sB>>6)<<(0)));
+                }
+                dst++;
+                src += srcbpp;
+            },
+            width);
+            /* *INDENT-ON* */
             src += srcskip;
             dst += dstskip;
         }
     } else {
         while (height--) {
-			/* *INDENT-OFF* */
-			DUFFS_LOOP(
-			{
-				DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel,
-								sR, sG, sB);
-				if ( (Pixel & rgbmask) != ckey ) {
-				  	/* Pack RGB into 8bit pixel */
-				  	*dst = (Uint8)palmap[((sR>>5)<<(3+2))|
-							             ((sG>>5)<<(2))  |
-							             ((sB>>6)<<(0))  ];
-				}
-				dst++;
-				src += srcbpp;
-			},
-			width);
-			/* *INDENT-ON* */
+            /* *INDENT-OFF* */
+            DUFFS_LOOP(
+            {
+                DISEMBLE_RGB(src, srcbpp, srcfmt, Pixel,
+                                sR, sG, sB);
+                if ( (Pixel & rgbmask) != ckey ) {
+                    /* Pack RGB into 8bit pixel */
+                    *dst = (Uint8)palmap[((sR>>5)<<(3+2))|
+                                         ((sG>>5)<<(2))  |
+                                         ((sB>>6)<<(0))  ];
+                }
+                dst++;
+                src += srcbpp;
+            },
+            width);
+            /* *INDENT-ON* */
             src += srcskip;
             dst += dstskip;
         }
@@ -2231,17 +2231,17 @@ Blit2to2Key(SDL_BlitInfo * info)
     ckey &= rgbmask;
 
     while (height--) {
-		/* *INDENT-OFF* */
-		DUFFS_LOOP(
-		{
-			if ( (*srcp & rgbmask) != ckey ) {
-				*dstp = *srcp;
-			}
-			dstp++;
-			srcp++;
-		},
-		width);
-		/* *INDENT-ON* */
+        /* *INDENT-OFF* */
+        DUFFS_LOOP(
+        {
+            if ( (*srcp & rgbmask) != ckey ) {
+                *dstp = *srcp;
+            }
+            dstp++;
+            srcp++;
+        },
+        width);
+        /* *INDENT-ON* */
         srcp += srcskip;
         dstp += dstskip;
     }
@@ -2268,23 +2268,23 @@ BlitNtoNKey(SDL_BlitInfo * info)
     ckey &= rgbmask;
 
     while (height--) {
-		/* *INDENT-OFF* */
-		DUFFS_LOOP(
-		{
+        /* *INDENT-OFF* */
+        DUFFS_LOOP(
+        {
             Uint32 Pixel;
-			unsigned sR;
-			unsigned sG;
-			unsigned sB;
-			RETRIEVE_RGB_PIXEL(src, srcbpp, Pixel);
-			if ( (Pixel & rgbmask) != ckey ) {
+            unsigned sR;
+            unsigned sG;
+            unsigned sB;
+            RETRIEVE_RGB_PIXEL(src, srcbpp, Pixel);
+            if ( (Pixel & rgbmask) != ckey ) {
                 RGB_FROM_PIXEL(Pixel, srcfmt, sR, sG, sB);
-				ASSEMBLE_RGBA(dst, dstbpp, dstfmt, sR, sG, sB, alpha);
-			}
-			dst += dstbpp;
-			src += srcbpp;
-		},
-		width);
-		/* *INDENT-ON* */
+                ASSEMBLE_RGBA(dst, dstbpp, dstfmt, sR, sG, sB, alpha);
+            }
+            dst += dstbpp;
+            src += srcbpp;
+        },
+        width);
+        /* *INDENT-ON* */
         src += srcskip;
         dst += dstskip;
     }
@@ -2315,18 +2315,18 @@ BlitNtoNKeyCopyAlpha(SDL_BlitInfo * info)
     ckey &= rgbmask;
 
     while (height--) {
-		/* *INDENT-OFF* */
-		DUFFS_LOOP(
-		{
-			DISEMBLE_RGBA(src, srcbpp, srcfmt, Pixel, sR, sG, sB, sA);
-			if ( (Pixel & rgbmask) != ckey ) {
-				  ASSEMBLE_RGBA(dst, dstbpp, dstfmt, sR, sG, sB, sA);
-			}
-			dst += dstbpp;
-			src += srcbpp;
-		},
-		width);
-		/* *INDENT-ON* */
+        /* *INDENT-OFF* */
+        DUFFS_LOOP(
+        {
+            DISEMBLE_RGBA(src, srcbpp, srcfmt, Pixel, sR, sG, sB, sA);
+            if ( (Pixel & rgbmask) != ckey ) {
+                  ASSEMBLE_RGBA(dst, dstbpp, dstfmt, sR, sG, sB, sA);
+            }
+            dst += dstbpp;
+            src += srcbpp;
+        },
+        width);
+        /* *INDENT-ON* */
         src += srcskip;
         dst += dstskip;
     }
@@ -2360,16 +2360,16 @@ static const struct blit_table normal_blit_2[] = {
 #endif
     {0x0000F800, 0x000007E0, 0x0000001F, 4, 0x00FF0000, 0x0000FF00,
      0x000000FF,
-     0, Blit_RGB565_ARGB8888, SET_ALPHA},
+     0, Blit_RGB565_ARGB8888, NO_ALPHA | COPY_ALPHA | SET_ALPHA},
     {0x0000F800, 0x000007E0, 0x0000001F, 4, 0x000000FF, 0x0000FF00,
      0x00FF0000,
-     0, Blit_RGB565_ABGR8888, SET_ALPHA},
+     0, Blit_RGB565_ABGR8888, NO_ALPHA | COPY_ALPHA | SET_ALPHA},
     {0x0000F800, 0x000007E0, 0x0000001F, 4, 0xFF000000, 0x00FF0000,
      0x0000FF00,
-     0, Blit_RGB565_RGBA8888, SET_ALPHA},
+     0, Blit_RGB565_RGBA8888, NO_ALPHA | COPY_ALPHA | SET_ALPHA},
     {0x0000F800, 0x000007E0, 0x0000001F, 4, 0x0000FF00, 0x00FF0000,
      0xFF000000,
-     0, Blit_RGB565_BGRA8888, SET_ALPHA},
+     0, Blit_RGB565_BGRA8888, NO_ALPHA | COPY_ALPHA | SET_ALPHA},
 
     /* Default for 16-bit RGB source, used if no other blitter matches */
     {0, 0, 0, 0, 0, 0, 0, 0, BlitNtoN, 0}
@@ -2436,7 +2436,6 @@ SDL_CalculateBlitN(SDL_Surface * surface)
     case 0:
         blitfun = NULL;
         if (dstfmt->BitsPerPixel == 8) {
-            /* We assume 8-bit destinations are palettized */
             if ((srcfmt->BytesPerPixel == 4) &&
                 (srcfmt->Rmask == 0x00FF0000) &&
                 (srcfmt->Gmask == 0x0000FF00) &&

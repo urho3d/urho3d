@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,23 +40,23 @@
 #include "SDL_DirectFB_events.h"
 
 #if USE_MULTI_API
-#define SDL_SendMouseMotion_ex(w, id, relative, x, y, p) SDL_SendMouseMotion(id, relative, x, y, p)
-#define SDL_SendMouseButton_ex(w, id, state, button) SDL_SendMouseButton(id, state, button)
+#define SDL_SendMouseMotion_ex(w, id, relative, x, y, p) SDL_SendMouseMotion(w, id, relative, x, y, p)
+#define SDL_SendMouseButton_ex(w, id, state, button) SDL_SendMouseButton(w, id, state, button)
 #define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(id, state, scancode)
 #define SDL_SendKeyboardText_ex(id, text) SDL_SendKeyboardText(id, text)
 #else
-#define SDL_SendMouseMotion_ex(w, id, relative, x, y, p) SDL_SendMouseMotion(w, relative, x, y)
-#define SDL_SendMouseButton_ex(w, id, state, button) SDL_SendMouseButton(w, state, button)
+#define SDL_SendMouseMotion_ex(w, id, relative, x, y, p) SDL_SendMouseMotion(w, id, relative, x, y)
+#define SDL_SendMouseButton_ex(w, id, state, button) SDL_SendMouseButton(w, id, state, button)
 #define SDL_SendKeyboardKey_ex(id, state, scancode) SDL_SendKeyboardKey(state, scancode)
 #define SDL_SendKeyboardText_ex(id, text) SDL_SendKeyboardText(text)
 #endif
 
 typedef struct _cb_data cb_data;
-struct _cb_data 
+struct _cb_data
 {
-	DFB_DeviceData *devdata;	
-	int sys_ids;
-	int sys_kbd;
+    DFB_DeviceData *devdata;
+    int sys_ids;
+    int sys_kbd;
 };
 
 /* The translation tables from a DirectFB keycode to a SDL keysym */
@@ -64,9 +64,9 @@ static SDL_Scancode oskeymap[256];
 
 
 static SDL_Keysym *DirectFB_TranslateKey(_THIS, DFBWindowEvent * evt,
-                                         SDL_Keysym * keysym);
+                                         SDL_Keysym * keysym, Uint32 *unicode);
 static SDL_Keysym *DirectFB_TranslateKeyInputEvent(_THIS, DFBInputEvent * evt,
-                                                   SDL_Keysym * keysym);
+                                                   SDL_Keysym * keysym, Uint32 *unicode);
 
 static void DirectFB_InitOSKeymap(_THIS, SDL_Scancode * keypmap, int numkeys);
 static int DirectFB_TranslateButton(DFBInputDeviceButtonIdentifier button);
@@ -74,7 +74,7 @@ static int DirectFB_TranslateButton(DFBInputDeviceButtonIdentifier button);
 static void UnicodeToUtf8( Uint16 w , char *utf8buf)
 {
         unsigned char *utf8s = (unsigned char *) utf8buf;
-        
+
     if ( w < 0x0080 ) {
         utf8s[0] = ( unsigned char ) w;
         utf8s[1] = 0;
@@ -82,14 +82,14 @@ static void UnicodeToUtf8( Uint16 w , char *utf8buf)
     else if ( w < 0x0800 ) {
         utf8s[0] = 0xc0 | (( w ) >> 6 );
         utf8s[1] = 0x80 | (( w ) & 0x3f );
-        utf8s[2] = 0;  
+        utf8s[2] = 0;
     }
     else {
         utf8s[0] = 0xe0 | (( w ) >> 12 );
         utf8s[1] = 0x80 | (( ( w ) >> 6 ) & 0x3f );
         utf8s[2] = 0x80 | (( w ) & 0x3f );
         utf8s[3] = 0;
-    }    
+    }
 }
 
 static void
@@ -132,7 +132,7 @@ MotionAllMice(_THIS, int x, int y)
         SDL_Mouse *mouse = SDL_GetMouse(index);
         mouse->x = mouse->last_x = x;
         mouse->y = mouse->last_y = y;
-        //SDL_SendMouseMotion(devdata->mouse_id[index], 0, x, y, 0);
+        /*SDL_SendMouseMotion(devdata->mouse_id[index], 0, x, y, 0);*/
     }
 #endif
 }
@@ -176,6 +176,7 @@ ProcessWindowEvent(_THIS, SDL_Window *sdlwin, DFBWindowEvent * evt)
     SDL_DFB_DEVICEDATA(_this);
     SDL_DFB_WINDOWDATA(sdlwin);
     SDL_Keysym keysym;
+    Uint32 unicode;
     char text[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
     if (evt->clazz == DFEC_WINDOW) {
@@ -215,7 +216,7 @@ ProcessWindowEvent(_THIS, SDL_Window *sdlwin, DFBWindowEvent * evt)
                         SDL_SendMouseMotion_ex(sdlwin, devdata->mouse_id[0], 0,
                                             evt->x, evt->y, 0);
                 } else {
-                    /* relative movements are not exact! 
+                    /* relative movements are not exact!
                      * This code should limit the number of events sent.
                      * However it kills MAME axis recognition ... */
                     static int cnt = 0;
@@ -231,12 +232,12 @@ ProcessWindowEvent(_THIS, SDL_Window *sdlwin, DFBWindowEvent * evt)
             break;
         case DWET_KEYDOWN:
             if (!devdata->use_linux_input) {
-                DirectFB_TranslateKey(_this, evt, &keysym);
-                //printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id);
+                DirectFB_TranslateKey(_this, evt, &keysym, &unicode);
+                /*printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id);*/
                 SDL_SendKeyboardKey_ex(0, SDL_PRESSED, keysym.scancode);
                 if (SDL_EventState(SDL_TEXTINPUT, SDL_QUERY)) {
-	                SDL_zero(text);
-                    UnicodeToUtf8(keysym.unicode, text);
+                    SDL_zero(text);
+                    UnicodeToUtf8(unicode, text);
                     if (*text) {
                         SDL_SendKeyboardText_ex(0, text);
                     }
@@ -245,7 +246,7 @@ ProcessWindowEvent(_THIS, SDL_Window *sdlwin, DFBWindowEvent * evt)
             break;
         case DWET_KEYUP:
             if (!devdata->use_linux_input) {
-                DirectFB_TranslateKey(_this, evt, &keysym);
+                DirectFB_TranslateKey(_this, evt, &keysym, &unicode);
                 SDL_SendKeyboardKey_ex(0, SDL_RELEASED, keysym.scancode);
             }
             break;
@@ -262,7 +263,7 @@ ProcessWindowEvent(_THIS, SDL_Window *sdlwin, DFBWindowEvent * evt)
             }
             /* fall throught */
         case DWET_SIZE:
-            // FIXME: what about < 0
+            /* FIXME: what about < 0 */
             evt->w -= (windata->theme.right_size + windata->theme.left_size);
             evt->h -=
                 (windata->theme.top_size + windata->theme.bottom_size +
@@ -286,7 +287,7 @@ ProcessWindowEvent(_THIS, SDL_Window *sdlwin, DFBWindowEvent * evt)
         case DWET_ENTER:
             /* SDL_DirectFB_ReshowCursor(_this, 0); */
             FocusAllMice(_this, sdlwin);
-            // FIXME: when do we really enter ?
+            /* FIXME: when do we really enter ? */
             if (ClientXY(windata, &evt->x, &evt->y))
                 MotionAllMice(_this, evt->x, evt->y);
             SDL_SendWindowEvent(sdlwin, SDL_WINDOWEVENT_ENTER, 0, 0);
@@ -309,6 +310,7 @@ ProcessInputEvent(_THIS, DFBInputEvent * ievt)
     SDL_DFB_DEVICEDATA(_this);
     SDL_Keysym keysym;
     int kbd_idx;
+    Uint32 unicode;
     char text[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
     if (!devdata->use_linux_input) {
@@ -366,12 +368,12 @@ ProcessInputEvent(_THIS, DFBInputEvent * ievt)
             break;
         case DIET_KEYPRESS:
             kbd_idx = KbdIndex(_this, ievt->device_id);
-            DirectFB_TranslateKeyInputEvent(_this, ievt, &keysym);
-            //printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id);
+            DirectFB_TranslateKeyInputEvent(_this, ievt, &keysym, &unicode);
+            /*printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id); */
             SDL_SendKeyboardKey_ex(kbd_idx, SDL_PRESSED, keysym.scancode);
             if (SDL_EventState(SDL_TEXTINPUT, SDL_QUERY)) {
                 SDL_zero(text);
-                UnicodeToUtf8(keysym.unicode, text);
+                UnicodeToUtf8(unicode, text);
                 if (*text) {
                     SDL_SendKeyboardText_ex(kbd_idx, text);
                 }
@@ -379,7 +381,7 @@ ProcessInputEvent(_THIS, DFBInputEvent * ievt)
             break;
         case DIET_KEYRELEASE:
             kbd_idx = KbdIndex(_this, ievt->device_id);
-            DirectFB_TranslateKeyInputEvent(_this, ievt, &keysym);
+            DirectFB_TranslateKeyInputEvent(_this, ievt, &keysym, &unicode);
             SDL_SendKeyboardKey_ex(kbd_idx, SDL_RELEASED, keysym.scancode);
             break;
         case DIET_BUTTONPRESS:
@@ -435,7 +437,7 @@ DirectFB_PumpEventsWindow(_THIS)
     while (devdata->events->GetEvent(devdata->events,
                                      DFB_EVENT(&ievt)) == DFB_OK) {
 
-    	if (SDL_GetEventState(SDL_SYSWMEVENT) == SDL_ENABLE) {
+        if (SDL_GetEventState(SDL_SYSWMEVENT) == SDL_ENABLE) {
             SDL_SysWMmsg wmmsg;
             SDL_VERSION(&wmmsg.version);
             wmmsg.subsystem = SDL_SYSWM_DIRECTFB;
@@ -575,7 +577,7 @@ DirectFB_InitOSKeymap(_THIS, SDL_Scancode * keymap, int numkeys)
 }
 
 static SDL_Keysym *
-DirectFB_TranslateKey(_THIS, DFBWindowEvent * evt, SDL_Keysym * keysym)
+DirectFB_TranslateKey(_THIS, DFBWindowEvent * evt, SDL_Keysym * keysym, Uint32 *unicode)
 {
     SDL_DFB_DEVICEDATA(_this);
     int kbd_idx = 0; /* Window events lag the device source KbdIndex(_this, evt->device_id); */
@@ -584,8 +586,8 @@ DirectFB_TranslateKey(_THIS, DFBWindowEvent * evt, SDL_Keysym * keysym)
     keysym->scancode = SDL_SCANCODE_UNKNOWN;
 
     if (kbd->map && evt->key_code >= kbd->map_adjust &&
-	    evt->key_code < kbd->map_size + kbd->map_adjust)
-	    keysym->scancode = kbd->map[evt->key_code - kbd->map_adjust];
+        evt->key_code < kbd->map_size + kbd->map_adjust)
+        keysym->scancode = kbd->map[evt->key_code - kbd->map_adjust];
 
     if (keysym->scancode == SDL_SCANCODE_UNKNOWN ||
         devdata->keyboard[kbd_idx].is_generic) {
@@ -595,18 +597,18 @@ DirectFB_TranslateKey(_THIS, DFBWindowEvent * evt, SDL_Keysym * keysym)
             keysym->scancode = SDL_SCANCODE_UNKNOWN;
     }
 
-    keysym->unicode =
+    *unicode =
         (DFB_KEY_TYPE(evt->key_symbol) == DIKT_UNICODE) ? evt->key_symbol : 0;
-    if (keysym->unicode == 0 &&
+    if (*unicode == 0 &&
         (evt->key_symbol > 0 && evt->key_symbol < 255))
-        keysym->unicode = evt->key_symbol;
+        *unicode = evt->key_symbol;
 
     return keysym;
 }
 
 static SDL_Keysym *
 DirectFB_TranslateKeyInputEvent(_THIS, DFBInputEvent * evt,
-                                SDL_Keysym * keysym)
+                                SDL_Keysym * keysym, Uint32 *unicode)
 {
     SDL_DFB_DEVICEDATA(_this);
     int kbd_idx = KbdIndex(_this, evt->device_id);
@@ -615,8 +617,8 @@ DirectFB_TranslateKeyInputEvent(_THIS, DFBInputEvent * evt,
     keysym->scancode = SDL_SCANCODE_UNKNOWN;
 
     if (kbd->map && evt->key_code >= kbd->map_adjust &&
-	    evt->key_code < kbd->map_size + kbd->map_adjust)
-	    keysym->scancode = kbd->map[evt->key_code - kbd->map_adjust];
+        evt->key_code < kbd->map_size + kbd->map_adjust)
+        keysym->scancode = kbd->map[evt->key_code - kbd->map_adjust];
 
     if (keysym->scancode == SDL_SCANCODE_UNKNOWN || devdata->keyboard[kbd_idx].is_generic) {
         if (evt->key_id - DIKI_UNKNOWN < SDL_arraysize(oskeymap))
@@ -625,11 +627,11 @@ DirectFB_TranslateKeyInputEvent(_THIS, DFBInputEvent * evt,
             keysym->scancode = SDL_SCANCODE_UNKNOWN;
     }
 
-    keysym->unicode =
+    *unicode =
         (DFB_KEY_TYPE(evt->key_symbol) == DIKT_UNICODE) ? evt->key_symbol : 0;
-    if (keysym->unicode == 0 &&
+    if (*unicode == 0 &&
         (evt->key_symbol > 0 && evt->key_symbol < 255))
-        keysym->unicode = evt->key_symbol;
+        *unicode = evt->key_symbol;
 
     return keysym;
 }
@@ -653,26 +655,26 @@ static DFBEnumerationResult
 EnumKeyboards(DFBInputDeviceID device_id,
                 DFBInputDeviceDescription desc, void *callbackdata)
 {
-	cb_data *cb = callbackdata;
+    cb_data *cb = callbackdata;
     DFB_DeviceData *devdata = cb->devdata;
 #if USE_MULTI_API
     SDL_Keyboard keyboard;
 #endif
     SDL_Keycode keymap[SDL_NUM_SCANCODES];
 
-	if (!cb->sys_kbd) {
-		if (cb->sys_ids) {
-		    if (device_id >= 0x10)
-		        return DFENUM_OK;
-		} else {
-		    if (device_id < 0x10)
-		        return DFENUM_OK;
-		}
-	} else {
-		if (device_id != DIDID_KEYBOARD)
-		    return DFENUM_OK;
-	}
-	
+    if (!cb->sys_kbd) {
+        if (cb->sys_ids) {
+            if (device_id >= 0x10)
+                return DFENUM_OK;
+        } else {
+            if (device_id < 0x10)
+                return DFENUM_OK;
+        }
+    } else {
+        if (device_id != DIDID_KEYBOARD)
+            return DFENUM_OK;
+    }
+
     if ((desc.caps & DIDTF_KEYBOARD)) {
 #if USE_MULTI_API
         SDL_zero(keyboard);
@@ -682,17 +684,17 @@ EnumKeyboards(DFBInputDeviceID device_id,
         devdata->keyboard[devdata->num_keyboard].is_generic = 0;
         if (!strncmp("X11", desc.name, 3))
         {
-        	devdata->keyboard[devdata->num_keyboard].map = xfree86_scancode_table2;
-        	devdata->keyboard[devdata->num_keyboard].map_size = SDL_arraysize(xfree86_scancode_table2);
-			devdata->keyboard[devdata->num_keyboard].map_adjust = 8;
+            devdata->keyboard[devdata->num_keyboard].map = xfree86_scancode_table2;
+            devdata->keyboard[devdata->num_keyboard].map_size = SDL_arraysize(xfree86_scancode_table2);
+            devdata->keyboard[devdata->num_keyboard].map_adjust = 8;
         } else {
-        	devdata->keyboard[devdata->num_keyboard].map = linux_scancode_table;
-        	devdata->keyboard[devdata->num_keyboard].map_size = SDL_arraysize(linux_scancode_table);
-			devdata->keyboard[devdata->num_keyboard].map_adjust = 0;
+            devdata->keyboard[devdata->num_keyboard].map = linux_scancode_table;
+            devdata->keyboard[devdata->num_keyboard].map_size = SDL_arraysize(linux_scancode_table);
+            devdata->keyboard[devdata->num_keyboard].map_adjust = 0;
         }
 
-		SDL_DFB_LOG("Keyboard %d - %s\n", device_id, desc.name);
-		
+        SDL_DFB_LOG("Keyboard %d - %s\n", device_id, desc.name);
+
         SDL_GetDefaultKeymap(keymap);
 #if USE_MULTI_API
         SDL_SetKeymap(devdata->num_keyboard, 0, keymap, SDL_NUM_SCANCODES);
@@ -701,8 +703,8 @@ EnumKeyboards(DFBInputDeviceID device_id,
 #endif
         devdata->num_keyboard++;
 
-		if (cb->sys_kbd)
-	        return DFENUM_CANCEL;
+        if (cb->sys_kbd)
+            return DFENUM_CANCEL;
     }
     return DFENUM_OK;
 }
@@ -711,15 +713,15 @@ void
 DirectFB_InitKeyboard(_THIS)
 {
     SDL_DFB_DEVICEDATA(_this);
-	cb_data cb;    
-	
+    cb_data cb;
+
     DirectFB_InitOSKeymap(_this, &oskeymap[0], SDL_arraysize(oskeymap));
 
     devdata->num_keyboard = 0;
     cb.devdata = devdata;
-    
+
     if (devdata->use_linux_input) {
-    	cb.sys_kbd = 0;
+        cb.sys_kbd = 0;
         cb.sys_ids = 0;
         SDL_DFB_CHECK(devdata->dfb->
                       EnumInputDevices(devdata->dfb, EnumKeyboards, &cb));
@@ -730,7 +732,7 @@ DirectFB_InitKeyboard(_THIS)
                                                          &cb));
         }
     } else {
-    	cb.sys_kbd = 1;
+        cb.sys_kbd = 1;
         SDL_DFB_CHECK(devdata->dfb->EnumInputDevices(devdata->dfb,
                                                      EnumKeyboards,
                                                      &cb));
@@ -740,7 +742,7 @@ DirectFB_InitKeyboard(_THIS)
 void
 DirectFB_QuitKeyboard(_THIS)
 {
-    //SDL_DFB_DEVICEDATA(_this);
+    /*SDL_DFB_DEVICEDATA(_this); */
 
     SDL_KeyboardQuit();
 

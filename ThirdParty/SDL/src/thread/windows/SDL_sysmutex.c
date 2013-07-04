@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,12 +44,8 @@ SDL_CreateMutex(void)
     mutex = (SDL_mutex *) SDL_malloc(sizeof(*mutex));
     if (mutex) {
         /* Initialize */
-#ifdef _WIN32_WCE
-        InitializeCriticalSection(&mutex->cs);
-#else
         /* On SMP systems, a non-zero spin count generally helps performance */
         InitializeCriticalSectionAndSpinCount(&mutex->cs, 2000);
-#endif
     } else {
         SDL_OutOfMemory();
     }
@@ -68,24 +64,37 @@ SDL_DestroyMutex(SDL_mutex * mutex)
 
 /* Lock the mutex */
 int
-SDL_mutexP(SDL_mutex * mutex)
+SDL_LockMutex(SDL_mutex * mutex)
 {
     if (mutex == NULL) {
-        SDL_SetError("Passed a NULL mutex");
-        return -1;
+        return SDL_SetError("Passed a NULL mutex");
     }
 
     EnterCriticalSection(&mutex->cs);
     return (0);
 }
 
+/* TryLock the mutex */
+int
+SDL_TryLockMutex(SDL_mutex * mutex)
+{
+    int retval = 0;
+    if (mutex == NULL) {
+        return SDL_SetError("Passed a NULL mutex");
+    }
+
+    if (TryEnterCriticalSection(&mutex->cs) == 0) {
+        retval = SDL_MUTEX_TIMEDOUT;
+    }
+    return retval;
+}
+
 /* Unlock the mutex */
 int
-SDL_mutexV(SDL_mutex * mutex)
+SDL_UnlockMutex(SDL_mutex * mutex)
 {
     if (mutex == NULL) {
-        SDL_SetError("Passed a NULL mutex");
-        return -1;
+        return SDL_SetError("Passed a NULL mutex");
     }
 
     LeaveCriticalSection(&mutex->cs);

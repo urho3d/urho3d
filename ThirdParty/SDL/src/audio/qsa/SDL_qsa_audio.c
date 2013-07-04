@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -83,10 +83,10 @@ uint32_t qsa_playback_devices;
 QSA_Device qsa_capture_device[QSA_MAX_DEVICES];
 uint32_t qsa_capture_devices;
 
-static inline void
+static inline int
 QSA_SetError(const char *fn, int status)
 {
-    SDL_SetError("QSA: %s() failed: %s", fn, snd_strerror(status));
+    return SDL_SetError("QSA: %s() failed: %s", fn, snd_strerror(status));
 }
 
 /* card names check to apply the workarounds */
@@ -183,13 +183,13 @@ QSA_WaitDevice(_THIS)
         switch (selectret) {
         case -1:
             {
-                SDL_SetError("QSA: select() failed: %s\n", strerror(errno));
+                SDL_SetError("QSA: select() failed: %s", strerror(errno));
                 return;
             }
             break;
         case 0:
             {
-                SDL_SetError("QSA: timeout on buffer waiting occured\n");
+                SDL_SetError("QSA: timeout on buffer waiting occured");
                 this->hidden->timeout_on_wait = 1;
                 return;
             }
@@ -237,7 +237,7 @@ QSA_PlayDevice(_THIS)
             /* the audio device driver */
             if ((errno == EAGAIN) && (written == 0)) {
                 if (this->hidden->timeout_on_wait != 0) {
-                    SDL_SetError("QSA: buffer playback timeout\n");
+                    SDL_SetError("QSA: buffer playback timeout");
                     return;
                 }
             }
@@ -355,8 +355,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
                                                     (struct
                                                      SDL_PrivateAudioData)));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, sizeof(struct SDL_PrivateAudioData));
 
@@ -384,8 +383,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
             device++;
             if (device >= qsa_playback_devices) {
                 QSA_CloseDevice(this);
-                SDL_SetError("No such playback device");
-                return 0;
+                return SDL_SetError("No such playback device");
             }
         } while (1);
     }
@@ -409,8 +407,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
             device++;
             if (device >= qsa_capture_devices) {
                 QSA_CloseDevice(this);
-                SDL_SetError("No such capture device");
-                return 0;
+                return SDL_SetError("No such capture device");
             }
         } while (1);
     }
@@ -448,8 +445,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
     if (status < 0) {
         this->hidden->audio_handle = NULL;
         QSA_CloseDevice(this);
-        QSA_SetError("snd_pcm_open", status);
-        return 0;
+        return QSA_SetError("snd_pcm_open", status);
     }
 
     if (!QSA_CheckBuggyCards(this, QSA_MMAP_WORKAROUND)) {
@@ -459,8 +455,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
                                        PLUGIN_DISABLE_MMAP);
         if (status < 0) {
             QSA_CloseDevice(this);
-            QSA_SetError("snd_pcm_plugin_set_disable", status);
-            return 0;
+            return QSA_SetError("snd_pcm_plugin_set_disable", status);
         }
     }
 
@@ -546,8 +541,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
     /* assumes test_format not 0 on success */
     if (test_format == 0) {
         QSA_CloseDevice(this);
-        SDL_SetError("QSA: Couldn't find any hardware audio formats");
-        return 0;
+        return SDL_SetError("QSA: Couldn't find any hardware audio formats");
     }
 
     this->spec.format = test_format;
@@ -565,12 +559,11 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
     status = snd_pcm_plugin_params(this->hidden->audio_handle, &cparams);
     if (status < 0) {
         QSA_CloseDevice(this);
-        QSA_SetError("snd_pcm_channel_params", status);
-        return 0;
+        return QSA_SetError("snd_pcm_channel_params", status);
     }
 
     /* Make sure channel is setup right one last time */
-    SDL_memset(&csetup, '\0', sizeof(csetup));
+    SDL_memset(&csetup, 0, sizeof(csetup));
     if (!this->hidden->iscapture) {
         csetup.channel = SND_PCM_CHANNEL_PLAYBACK;
     } else {
@@ -580,8 +573,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
     /* Setup an audio channel */
     if (snd_pcm_plugin_setup(this->hidden->audio_handle, &csetup) < 0) {
         QSA_CloseDevice(this);
-        SDL_SetError("QSA: Unable to setup channel\n");
-        return 0;
+        return SDL_SetError("QSA: Unable to setup channel");
     }
 
     /* Calculate the final parameters for this audio specification */
@@ -604,8 +596,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
         (Uint8 *) SDL_AllocAudioMem(this->hidden->pcm_len);
     if (this->hidden->pcm_buf == NULL) {
         QSA_CloseDevice(this);
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden->pcm_buf, this->spec.silence,
                this->hidden->pcm_len);
@@ -623,8 +614,7 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (this->hidden->audio_fd < 0) {
         QSA_CloseDevice(this);
-        QSA_SetError("snd_pcm_file_descriptor", status);
-        return 0;
+        return QSA_SetError("snd_pcm_file_descriptor", status);
     }
 
     /* Prepare an audio channel */
@@ -642,12 +632,11 @@ QSA_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (status < 0) {
         QSA_CloseDevice(this);
-        QSA_SetError("snd_pcm_plugin_prepare", status);
-        return 0;
+        return QSA_SetError("snd_pcm_plugin_prepare", status);
     }
 
     /* We're really ready to rock and roll. :-) */
-    return 1;
+    return 0;
 }
 
 static void

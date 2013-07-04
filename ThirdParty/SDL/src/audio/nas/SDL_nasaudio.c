@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -288,8 +288,7 @@ NAS_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden = (struct SDL_PrivateAudioData *)
         SDL_malloc((sizeof *this->hidden));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, (sizeof *this->hidden));
 
@@ -304,24 +303,21 @@ NAS_OpenDevice(_THIS, const char *devname, int iscapture)
     }
     if (format == 0) {
         NAS_CloseDevice(this);
-        SDL_SetError("NAS: Couldn't find any hardware audio formats");
-        return 0;
+        return SDL_SetError("NAS: Couldn't find any hardware audio formats");
     }
     this->spec.format = test_format;
 
     this->hidden->aud = NAS_AuOpenServer("", 0, NULL, 0, NULL, NULL);
     if (this->hidden->aud == 0) {
         NAS_CloseDevice(this);
-        SDL_SetError("NAS: Couldn't open connection to NAS server");
-        return 0;
+        return SDL_SetError("NAS: Couldn't open connection to NAS server");
     }
 
     this->hidden->dev = find_device(this, this->spec.channels);
     if ((this->hidden->dev == AuNone)
         || (!(this->hidden->flow = NAS_AuCreateFlow(this->hidden->aud, 0)))) {
         NAS_CloseDevice(this);
-        SDL_SetError("NAS: Couldn't find a fitting device on NAS server");
-        return 0;
+        return SDL_SetError("NAS: Couldn't find a fitting device on NAS server");
     }
 
     buffer_size = this->spec.freq;
@@ -354,13 +350,12 @@ NAS_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->hidden->mixlen);
     if (this->hidden->mixbuf == NULL) {
         NAS_CloseDevice(this);
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
 
     /* We're ready to rock and roll. :-) */
-    return 1;
+    return 0;
 }
 
 static void

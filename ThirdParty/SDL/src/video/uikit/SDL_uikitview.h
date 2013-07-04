@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,14 +19,12 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #import <UIKit/UIKit.h>
 #import "SDL_uikitviewcontroller.h"
 
 #include "SDL_touch.h"
 
-//#define IPHONE_TOUCH_EFFICIENT_DANGEROUS
+#define IPHONE_TOUCH_EFFICIENT_DANGEROUS
 
 #ifndef IPHONE_TOUCH_EFFICIENT_DANGEROUS
 #define MAX_SIMULTANEOUS_TOUCHES 5
@@ -39,7 +37,7 @@
 #endif
 
     SDL_TouchID touchId;
-    SDL_FingerID leftFingerDown;
+    UITouch *leftFingerDown;
 #ifndef IPHONE_TOUCH_EFFICIENT_DANGEROUS
     UITouch *finger[MAX_SIMULTANEOUS_TOUCHES];
 #endif
@@ -63,10 +61,9 @@
 - (void)initializeKeyboard;
 @property (readonly) BOOL keyboardVisible;
 
-SDL_bool UIKit_HasScreenKeyboardSupport(_THIS, SDL_Window *window);
-int UIKit_ShowScreenKeyboard(_THIS, SDL_Window *window);
-int UIKit_HideScreenKeyboard(_THIS, SDL_Window *window);
-int UIKit_ToggleScreenKeyboard(_THIS, SDL_Window *window);
+SDL_bool UIKit_HasScreenKeyboardSupport(_THIS);
+void UIKit_ShowScreenKeyboard(_THIS, SDL_Window *window);
+void UIKit_HideScreenKeyboard(_THIS, SDL_Window *window);
 SDL_bool UIKit_IsScreenKeyboardShown(_THIS, SDL_Window *window);
 
 #endif

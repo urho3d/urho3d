@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,85 +34,115 @@
    for __USE_POSIX199309
    Tommi Kyntola (tommi.kyntola@ray.fi) 27/09/2005
 */
+/* Reworked monotonic clock to not assume the current system has one
+   as not all linux kernels provide a monotonic clock (yeah recent ones
+   probably do)
+   Also added OS X Monotonic clock support
+   Based on work in https://github.com/ThomasHabets/monotonic_clock
+ */
 #if HAVE_NANOSLEEP || HAVE_CLOCK_GETTIME
 #include <time.h>
 #endif
+#ifdef __APPLE__
+#include <mach/mach_time.h>
+#endif
 
 /* The first ticks value of the application */
-#ifdef HAVE_CLOCK_GETTIME
-static struct timespec start;
-#else
-static struct timeval start;
-#endif /* HAVE_CLOCK_GETTIME */
-
+#if HAVE_CLOCK_GETTIME
+static struct timespec start_ts;
+#elif defined(__APPLE__)
+static uint64_t start_mach;
+mach_timebase_info_data_t mach_base_info;
+#endif
+static SDL_bool has_monotonic_time = SDL_FALSE;
+static struct timeval start_tv;
 
 void
 SDL_StartTicks(void)
 {
     /* Set first ticks value */
 #if HAVE_CLOCK_GETTIME
-    clock_gettime(CLOCK_MONOTONIC, &start);
-#else
-    gettimeofday(&start, NULL);
+    if (clock_gettime(CLOCK_MONOTONIC, &start_ts) == 0) {
+        has_monotonic_time = SDL_TRUE;
+    } else
+#elif defined(__APPLE__)
+    kern_return_t ret = mach_timebase_info(&mach_base_info);
+    if (ret == 0) {
+        has_monotonic_time = SDL_TRUE;
+        start_mach = mach_absolute_time();
+    } else
 #endif
+    {
+        gettimeofday(&start_tv, NULL);
+    }
 }
 
 Uint32
 SDL_GetTicks(void)
 {
+    Uint32 ticks;
+    if (has_monotonic_time) {
 #if HAVE_CLOCK_GETTIME
-    Uint32 ticks;
-    struct timespec now;
-
-    clock_gettime(CLOCK_MONOTONIC, &now);
-    ticks =
-        (now.tv_sec - start.tv_sec) * 1000 + (now.tv_nsec -
-                                              start.tv_nsec) / 1000000;
-    return (ticks);
-#else
-    Uint32 ticks;
-    struct timeval now;
-
-    gettimeofday(&now, NULL);
-    ticks =
-        (now.tv_sec - start.tv_sec) * 1000 + (now.tv_usec -
-                                              start.tv_usec) / 1000;
-    return (ticks);
+        struct timespec now;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        ticks = (now.tv_sec - start_ts.tv_sec) * 1000 + (now.tv_nsec -
+                                                 start_ts.tv_nsec) / 1000000;
+#elif defined(__APPLE__)
+        uint64_t now = mach_absolute_time();
+        ticks = (((now - start_mach) * mach_base_info.numer) / mach_base_info.denom) / 1000000;
 #endif
+    } else {
+        struct timeval now;
+
+        gettimeofday(&now, NULL);
+        ticks =
+            (now.tv_sec - start_tv.tv_sec) * 1000 + (now.tv_usec -
+                                                  start_tv.tv_usec) / 1000;
+    }
+    return (ticks);
 }
 
 Uint64
 SDL_GetPerformanceCounter(void)
 {
+    Uint64 ticks;
+    if (has_monotonic_time) {
 #if HAVE_CLOCK_GETTIME
-    Uint64 ticks;
-    struct timespec now;
+        struct timespec now;
 
-    clock_gettime(CLOCK_MONOTONIC, &now);
-    ticks = now.tv_sec;
-    ticks *= 1000000000;
-    ticks += now.tv_nsec;
-    return (ticks);
-#else
-    Uint64 ticks;
-    struct timeval now;
-
-    gettimeofday(&now, NULL);
-    ticks = now.tv_sec;
-    ticks *= 1000000;
-    ticks += now.tv_usec;
-    return (ticks);
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        ticks = now.tv_sec;
+        ticks *= 1000000000;
+        ticks += now.tv_nsec;
+#elif defined(__APPLE__)
+        ticks = mach_absolute_time();
 #endif
+    } else {
+        struct timeval now;
+
+        gettimeofday(&now, NULL);
+        ticks = now.tv_sec;
+        ticks *= 1000000;
+        ticks += now.tv_usec;
+    }
+    return (ticks);
 }
 
 Uint64
 SDL_GetPerformanceFrequency(void)
 {
+    if (has_monotonic_time) {
 #if HAVE_CLOCK_GETTIME
-    return 1000000000;
-#else
-    return 1000000;
+        return 1000000000;
+#elif defined(__APPLE__)
+        Uint64 freq = mach_base_info.numer;
+        freq *= 1000000000;
+        freq /= mach_base_info.denom;
+        return freq;
 #endif
+    } else {
+        return 1000000;
+    }
 }
 
 void

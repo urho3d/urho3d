@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -51,7 +51,7 @@
 
 - (void)loadView
 {
-    // do nothing.
+    /* do nothing. */
 }
 
 - (void)viewDidLayoutSubviews
@@ -62,10 +62,10 @@
         SDL_DisplayModeData *displaymodedata = (SDL_DisplayModeData *) display->current_mode.driverdata;
         const CGSize size = data->view.bounds.size;
         int w, h;
-        
+
         w = (int)(size.width * displaymodedata->scale);
         h = (int)(size.height * displaymodedata->scale);
-        
+
         SDL_SendWindowEvent(self->window, SDL_WINDOWEVENT_RESIZED, w, h);
     }
 }
@@ -73,7 +73,7 @@
 - (NSUInteger)supportedInterfaceOrientations
 {
     NSUInteger orientationMask = 0;
-    
+
     const char *orientationsCString;
     if ((orientationsCString = SDL_GetHint(SDL_HINT_ORIENTATIONS)) != NULL) {
         BOOL rotate = NO;
@@ -81,7 +81,7 @@
                                                             encoding:NSUTF8StringEncoding];
         NSArray *orientations = [orientationsNSString componentsSeparatedByCharactersInSet:
                                  [NSCharacterSet characterSetWithCharactersInString:@" "]];
-        
+
         if ([orientations containsObject:@"LandscapeLeft"]) {
             orientationMask |= UIInterfaceOrientationMaskLandscapeLeft;
         }
@@ -94,9 +94,9 @@
         if ([orientations containsObject:@"PortraitUpsideDown"]) {
             orientationMask |= UIInterfaceOrientationMaskPortraitUpsideDown;
         }
-        
+
     } else if (self->window->flags & SDL_WINDOW_RESIZABLE) {
-        orientationMask = UIInterfaceOrientationMaskAll;  // any orientation is okay.
+        orientationMask = UIInterfaceOrientationMaskAll;  /* any orientation is okay. */
     } else {
         if (self->window->w >= self->window->h) {
             orientationMask |= UIInterfaceOrientationMaskLandscape;
@@ -105,8 +105,8 @@
             orientationMask |= (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown);
         }
     }
-    
-    // Don't allow upside-down orientation on the phone, so answering calls is in the natural orientation
+
+    /* Don't allow upside-down orientation on the phone, so answering calls is in the natural orientation */
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         orientationMask &= ~UIInterfaceOrientationMaskPortraitUpsideDown;
     }

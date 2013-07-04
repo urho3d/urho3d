@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,28 +30,28 @@
 typedef struct _DFB_WindowData DFB_WindowData;
 struct _DFB_WindowData
 {
-    IDirectFBSurface 		*window_surface;	/* window surface */
-    IDirectFBSurface 		*surface;			/* client drawing surface */
-    IDirectFBWindow 		*dfbwin;
-    IDirectFBEventBuffer 	*eventbuffer;
-    //SDL_Window 				*sdlwin;
-    SDL_Window	 			*next;
-    Uint8 					opacity;
-    DFBRectangle 			client;
-    DFBDimension 			size;
-    DFBRectangle 			restore;
+    IDirectFBSurface        *window_surface;    /* window surface */
+    IDirectFBSurface        *surface;           /* client drawing surface */
+    IDirectFBWindow         *dfbwin;
+    IDirectFBEventBuffer    *eventbuffer;
+    /*SDL_Window                *sdlwin; */
+    SDL_Window              *next;
+    Uint8                   opacity;
+    DFBRectangle            client;
+    DFBDimension            size;
+    DFBRectangle            restore;
 
     /* WM extras */
-    int 					is_managed;
-    int 					wm_needs_redraw;
-    IDirectFBSurface 		*icon;
-    IDirectFBFont 			*font;
-    DFB_Theme 				theme;
+    int                     is_managed;
+    int                     wm_needs_redraw;
+    IDirectFBSurface        *icon;
+    IDirectFBFont           *font;
+    DFB_Theme               theme;
 
     /* WM moving and sizing */
-    int 					wm_grab;
-    int 					wm_lastx;
-    int 					wm_lasty;
+    int                     wm_grab;
+    int                     wm_lastx;
+    int                     wm_lasty;
 };
 
 extern int DirectFB_CreateWindow(_THIS, SDL_Window * window);
@@ -69,7 +69,7 @@ extern void DirectFB_RaiseWindow(_THIS, SDL_Window * window);
 extern void DirectFB_MaximizeWindow(_THIS, SDL_Window * window);
 extern void DirectFB_MinimizeWindow(_THIS, SDL_Window * window);
 extern void DirectFB_RestoreWindow(_THIS, SDL_Window * window);
-extern void DirectFB_SetWindowGrab(_THIS, SDL_Window * window);
+extern void DirectFB_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void DirectFB_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool DirectFB_GetWindowWMInfo(_THIS, SDL_Window * window,
                                          struct SDL_SysWMinfo *info);

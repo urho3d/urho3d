@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -43,21 +43,34 @@ static const char *accelerometerName = "Android accelerometer";
 int
 SDL_SYS_JoystickInit(void)
 {
-    SDL_numjoysticks = 1;
-    
     return (1);
+}
+
+int SDL_SYS_NumJoysticks()
+{
+    return 1;
+}
+
+void SDL_SYS_JoystickDetect()
+{
+}
+
+SDL_bool SDL_SYS_JoystickNeedsPolling()
+{
+    return SDL_FALSE;
 }
 
 /* Function to get the device-dependent name of a joystick */
 const char *
-SDL_SYS_JoystickName(int index)
+SDL_SYS_JoystickNameForDeviceIndex(int device_index)
 {
-    if (index == 0) {
-        return accelerometerName;
-    } else {
-        SDL_SetError("No joystick available with that index");
-        return (NULL);
-    }
+    return accelerometerName;
+}
+
+/* Function to perform the mapping from device index to the instance id for this index */
+SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index)
+{
+    return device_index;
 }
 
 /* Function to open a joystick for use.
@@ -66,16 +79,25 @@ SDL_SYS_JoystickName(int index)
    It returns 0, or -1 if there is an error.
  */
 int
-SDL_SYS_JoystickOpen(SDL_Joystick * joystick)
+SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
 {
-    joystick->nbuttons = 0;
-    joystick->nhats = 0;
-    joystick->nballs = 0;
-    joystick->naxes = 3;
-    joystick->name = accelerometerName;
-    return 0;
+    if (device_index == 0) {
+        joystick->nbuttons = 0;
+        joystick->nhats = 0;
+        joystick->nballs = 0;
+        joystick->naxes = 3;
+        return 0;
+    } else {
+        SDL_SetError("No joystick available with that index");
+        return (-1);
+    }
 }
 
+/* Function to determine is this joystick is attached to the system right now */
+SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
+{
+    return SDL_TRUE;
+}
 
 /* Function to update the state of a joystick - called as a device poll.
  * This function shouldn't update the joystick structure directly,
@@ -109,6 +131,26 @@ SDL_SYS_JoystickQuit(void)
 {
 }
 
-#endif /* SDL_JOYSTICK_NDS */
+SDL_JoystickGUID SDL_SYS_JoystickGetDeviceGUID( int device_index )
+{
+    SDL_JoystickGUID guid;
+    /* the GUID is just the first 16 chars of the name for now */
+    const char *name = SDL_SYS_JoystickNameForDeviceIndex( device_index );
+    SDL_zero( guid );
+    SDL_memcpy( &guid, name, SDL_min( sizeof(guid), SDL_strlen( name ) ) );
+    return guid;
+}
+
+SDL_JoystickGUID SDL_SYS_JoystickGetGUID(SDL_Joystick * joystick)
+{
+    SDL_JoystickGUID guid;
+    /* the GUID is just the first 16 chars of the name for now */
+    const char *name = joystick->name;
+    SDL_zero( guid );
+    SDL_memcpy( &guid, name, SDL_min( sizeof(guid), SDL_strlen( name ) ) );
+    return guid;
+}
+
+#endif /* SDL_JOYSTICK_ANDROID */
 
 /* vi: set ts=4 sw=4 expandtab: */

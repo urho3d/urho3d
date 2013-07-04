@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,15 +30,13 @@
 #include "SDL_systhread_c.h"
 
 #ifndef SDL_PASSED_BEGINTHREAD_ENDTHREAD
-#ifndef _WIN32_WCE
 /* We'll use the C library from this DLL */
 #include <process.h>
-#endif
 
 /* Cygwin gcc-3 ... MingW64 (even with a i386 host) does this like MSVC. */
 #if (defined(__MINGW32__) && (__GNUC__ < 4))
 typedef unsigned long (__cdecl *pfnSDL_CurrentBeginThread) (void *, unsigned,
-        unsigned (__stdcall *func)(void *), void *arg, 
+        unsigned (__stdcall *func)(void *), void *arg,
         unsigned, unsigned *threadID);
 typedef void (__cdecl *pfnSDL_CurrentEndThread)(unsigned code);
 
@@ -112,23 +110,17 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args,
 int
 SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
 {
-#ifdef _WIN32_WCE
-    pfnSDL_CurrentBeginThread pfnBeginThread = NULL;
-    pfnSDL_CurrentEndThread pfnEndThread = NULL;
-#else
     pfnSDL_CurrentBeginThread pfnBeginThread = _beginthreadex;
     pfnSDL_CurrentEndThread pfnEndThread = _endthreadex;
-#endif
 #endif /* SDL_PASSED_BEGINTHREAD_ENDTHREAD */
     pThreadStartParms pThreadParms =
         (pThreadStartParms) SDL_malloc(sizeof(tThreadStartParms));
     if (!pThreadParms) {
-        SDL_OutOfMemory();
-        return (-1);
+        return SDL_OutOfMemory();
     }
-    // Save the function which we will have to call to clear the RTL of calling app!
+    /* Save the function which we will have to call to clear the RTL of calling app! */
     pThreadParms->pfnCurrentEndThread = pfnEndThread;
-    // Also save the real parameters we have to pass to thread function
+    /* Also save the real parameters we have to pass to thread function */
     pThreadParms->args = args;
 
     if (pfnBeginThread) {
@@ -142,10 +134,9 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
                                       pThreadParms, 0, &threadid);
     }
     if (thread->handle == NULL) {
-        SDL_SetError("Not enough resources to create thread");
-        return (-1);
+        return SDL_SetError("Not enough resources to create thread");
     }
-    return (0);
+    return 0;
 }
 
 #ifdef _MSC_VER
@@ -205,8 +196,7 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
         value = THREAD_PRIORITY_NORMAL;
     }
     if (!SetThreadPriority(GetCurrentThread(), value)) {
-        WIN_SetError("SetThreadPriority()");
-        return -1;
+        return WIN_SetError("SetThreadPriority()");
     }
     return 0;
 }

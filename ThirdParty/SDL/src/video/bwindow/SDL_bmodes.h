@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,10 +34,10 @@ extern int32 BE_BPPToSDLPxFormat(int32 bpp);
 extern int BE_InitModes(_THIS);
 extern int BE_QuitModes(_THIS);
 extern int BE_GetDisplayBounds(_THIS, SDL_VideoDisplay *display,
-	SDL_Rect *rect);
+    SDL_Rect *rect);
 extern void BE_GetDisplayModes(_THIS, SDL_VideoDisplay *display);
 extern int BE_SetDisplayMode(_THIS, SDL_VideoDisplay *display,
-	SDL_DisplayMode *mode);
+    SDL_DisplayMode *mode);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -77,33 +77,29 @@ WIN_SetClipboardText(_THIS, const char *text)
         hMem = GlobalAlloc(GMEM_MOVEABLE, size);
         if (hMem) {
             LPTSTR dst = (LPTSTR)GlobalLock(hMem);
-            /* Copy the text over, adding carriage returns as necessary */
-            for (i = 0; tstr[i]; ++i) {
-                if (tstr[i] == '\n' && (i == 0 || tstr[i-1] != '\r')) {
-                    *dst++ = '\r';
+            if (dst) {
+                /* Copy the text over, adding carriage returns as necessary */
+                for (i = 0; tstr[i]; ++i) {
+                    if (tstr[i] == '\n' && (i == 0 || tstr[i-1] != '\r')) {
+                        *dst++ = '\r';
+                    }
+                    *dst++ = tstr[i];
                 }
-                *dst++ = tstr[i];
+                *dst = 0;
+                GlobalUnlock(hMem);
             }
-            *dst = 0;
-            GlobalUnlock(hMem);
 
             EmptyClipboard();
             if (!SetClipboardData(TEXT_FORMAT, hMem)) {
-                WIN_SetError("Couldn't set clipboard data");
-                result = -1;
+                result = WIN_SetError("Couldn't set clipboard data");
             }
-#ifdef _WIN32_WCE
-            data->clipboard_count = 0;
-#else
             data->clipboard_count = GetClipboardSequenceNumber();
-#endif
         }
         SDL_free(tstr);
 
         CloseClipboard();
     } else {
-        WIN_SetError("Couldn't open clipboard");
-        result = -1;
+        result = WIN_SetError("Couldn't open clipboard");
     }
     return result;
 }
@@ -143,20 +139,14 @@ WIN_HasClipboardText(_THIS)
     if (text) {
         result = (SDL_strlen(text)>0) ? SDL_TRUE : SDL_FALSE;
         SDL_free(text);
-    } 
+    }
     return result;
 }
 
 void
 WIN_CheckClipboardUpdate(struct SDL_VideoData * data)
 {
-    DWORD count;
-
-#ifdef _WIN32_WCE
-    count = 0;
-#else
-    count = GetClipboardSequenceNumber();
-#endif
+    const DWORD count = GetClipboardSequenceNumber();
     if (count != data->clipboard_count) {
         if (data->clipboard_count) {
             SDL_SendClipboardUpdate();

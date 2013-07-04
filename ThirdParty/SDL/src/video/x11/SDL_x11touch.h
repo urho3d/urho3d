@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,22 +22,6 @@
 
 #ifndef _SDL_x11touch_h
 #define _SDL_x11touch_h
-
-/*
-!!! FIXME: remove the evdev code;
-!!! FIXME: this should be using XInput 2.1's new multitouch API.
-*/
-
-/* What should this be? */
-#ifdef SDL_INPUT_LINUXEV
-typedef struct EventTouchData
-{
-    int x,y,pressure,finger; /* Temporary Variables until sync */
-    int eventStream;
-    SDL_bool up;
-    SDL_bool down;
-} EventTouchData;
-#endif
 
 extern void X11_InitTouch(_THIS);
 extern void X11_QuitTouch(_THIS);

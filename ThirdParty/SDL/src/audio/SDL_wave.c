@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -49,7 +49,6 @@ static int
 InitMS_ADPCM(WaveFMT * format)
 {
     Uint8 *rogue_feel;
-    Uint16 extra_info;
     int i;
 
     /* Set the rogue pointer to the MS_ADPCM specific data */
@@ -62,7 +61,7 @@ InitMS_ADPCM(WaveFMT * format)
         SDL_SwapLE16(format->bitspersample);
     rogue_feel = (Uint8 *) format + sizeof(*format);
     if (sizeof(*format) == 16) {
-        extra_info = ((rogue_feel[1] << 8) | rogue_feel[0]);
+        /*const Uint16 extra_info = ((rogue_feel[1] << 8) | rogue_feel[0]);*/
         rogue_feel += sizeof(Uint16);
     }
     MS_ADPCM_state.wSamplesPerBlock = ((rogue_feel[1] << 8) | rogue_feel[0]);
@@ -135,8 +134,7 @@ MS_ADPCM_decode(Uint8 ** audio_buf, Uint32 * audio_len)
         MS_ADPCM_state.wavefmt.channels * sizeof(Sint16);
     *audio_buf = (Uint8 *) SDL_malloc(*audio_len);
     if (*audio_buf == NULL) {
-        SDL_Error(SDL_ENOMEM);
-        return (-1);
+        return SDL_OutOfMemory();
     }
     decoded = *audio_buf;
 
@@ -233,7 +231,6 @@ static int
 InitIMA_ADPCM(WaveFMT * format)
 {
     Uint8 *rogue_feel;
-    Uint16 extra_info;
 
     /* Set the rogue pointer to the IMA_ADPCM specific data */
     IMA_ADPCM_state.wavefmt.encoding = SDL_SwapLE16(format->encoding);
@@ -245,7 +242,7 @@ InitIMA_ADPCM(WaveFMT * format)
         SDL_SwapLE16(format->bitspersample);
     rogue_feel = (Uint8 *) format + sizeof(*format);
     if (sizeof(*format) == 16) {
-        extra_info = ((rogue_feel[1] << 8) | rogue_feel[0]);
+        /*const Uint16 extra_info = ((rogue_feel[1] << 8) | rogue_feel[0]);*/
         rogue_feel += sizeof(Uint16);
     }
     IMA_ADPCM_state.wSamplesPerBlock = ((rogue_feel[1] << 8) | rogue_feel[0]);
@@ -276,6 +273,11 @@ IMA_ADPCM_nibble(struct IMA_ADPCM_decodestate *state, Uint8 nybble)
     Sint32 delta, step;
 
     /* Compute difference and new sample value */
+    if (state->index > 88) {
+        state->index = 88;
+    } else if (state->index < 0) {
+        state->index = 0;
+    }
     step = step_table[state->index];
     delta = step >> 3;
     if (nybble & 0x04)
@@ -290,11 +292,6 @@ IMA_ADPCM_nibble(struct IMA_ADPCM_decodestate *state, Uint8 nybble)
 
     /* Update index value */
     state->index += index_table[nybble];
-    if (state->index > 88) {
-        state->index = 88;
-    } else if (state->index < 0) {
-        state->index = 0;
-    }
 
     /* Clamp output sample */
     if (state->sample > max_audioval) {
@@ -361,8 +358,7 @@ IMA_ADPCM_decode(Uint8 ** audio_buf, Uint32 * audio_len)
         IMA_ADPCM_state.wavefmt.channels * sizeof(Sint16);
     *audio_buf = (Uint8 *) SDL_malloc(*audio_len);
     if (*audio_buf == NULL) {
-        SDL_Error(SDL_ENOMEM);
-        return (-1);
+        return SDL_OutOfMemory();
     }
     decoded = *audio_buf;
 
@@ -423,6 +419,8 @@ SDL_LoadWAV_RW(SDL_RWops * src, int freesrc,
 
     /* FMT chunk */
     WaveFMT *format = NULL;
+
+    SDL_zero(chunk);
 
     /* Make sure we are passed a valid data source */
     was_error = 0;
@@ -620,14 +618,12 @@ ReadChunk(SDL_RWops * src, Chunk * chunk)
     chunk->length = SDL_ReadLE32(src);
     chunk->data = (Uint8 *) SDL_malloc(chunk->length);
     if (chunk->data == NULL) {
-        SDL_Error(SDL_ENOMEM);
-        return (-1);
+        return SDL_OutOfMemory();
     }
     if (SDL_RWread(src, chunk->data, chunk->length, 1) != 1) {
-        SDL_Error(SDL_EFREAD);
         SDL_free(chunk->data);
         chunk->data = NULL;
-        return (-1);
+        return SDL_Error(SDL_EFREAD);
     }
     return (chunk->length);
 }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,15 +23,6 @@
 #ifndef _SDL_windowswindow_h
 #define _SDL_windowswindow_h
 
-#ifdef _WIN32_WCE
-#define SHFS_SHOWTASKBAR        0x0001
-#define SHFS_HIDETASKBAR        0x0002
-#define SHFS_SHOWSIPBUTTON      0x0004
-#define SHFS_HIDESIPBUTTON      0x0008
-#define SHFS_SHOWSTARTICON      0x0010
-#define SHFS_HIDESTARTICON      0x0020
-#endif
-
 typedef struct
 {
     SDL_Window *window;
@@ -41,7 +32,7 @@ typedef struct
     HBITMAP hbm;
     WNDPROC wndproc;
     SDL_bool created;
-    int mouse_pressed;
+    WPARAM mouse_button_flags;
     struct SDL_VideoData *videodata;
 } SDL_WindowData;
 
@@ -57,13 +48,15 @@ extern void WIN_RaiseWindow(_THIS, SDL_Window * window);
 extern void WIN_MaximizeWindow(_THIS, SDL_Window * window);
 extern void WIN_MinimizeWindow(_THIS, SDL_Window * window);
 extern void WIN_RestoreWindow(_THIS, SDL_Window * window);
+extern void WIN_SetWindowBordered(_THIS, SDL_Window * window, SDL_bool bordered);
 extern void WIN_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * display, SDL_bool fullscreen);
 extern int WIN_SetWindowGammaRamp(_THIS, SDL_Window * window, const Uint16 * ramp);
 extern int WIN_GetWindowGammaRamp(_THIS, SDL_Window * window, Uint16 * ramp);
-extern void WIN_SetWindowGrab(_THIS, SDL_Window * window);
+extern void WIN_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void WIN_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool WIN_GetWindowWMInfo(_THIS, SDL_Window * window,
                                     struct SDL_SysWMinfo *info);
+extern void WIN_OnWindowEnter(_THIS, SDL_Window * window);
 
 #endif /* _SDL_windowswindow_h */
 

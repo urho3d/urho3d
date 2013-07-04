@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,10 +21,6 @@
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
-
-#ifdef _WIN32_WCE
-#define SDL_DISABLE_WINDOWS_IME
-#endif
 
 #include "SDL_windowsvideo.h"
 
@@ -52,49 +48,10 @@ static void IME_Quit(SDL_VideoData *videodata);
 #endif
 
 /* Alphabetic scancodes for PC keyboards */
-BYTE alpha_scancodes[26] = {
-    30, 48, 46, 32, 18, 33, 34, 35, 23, 36, 37, 38, 50, 49, 24,
-    25, 16, 19, 31, 20, 22, 47, 17, 45, 21, 44
-};
-
-BYTE keypad_scancodes[10] = {
-    82, 79, 80, 81, 75, 76, 77, 71, 72, 73
-};
-
 void
 WIN_InitKeyboard(_THIS)
 {
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
-    int i;
-
-    /* Make sure the alpha scancodes are correct.  T isn't usually remapped */
-    if (MapVirtualKey('T', MAPVK_VK_TO_VSC) != alpha_scancodes['T' - 'A']) {
-#if 0
-        printf
-            ("Fixing alpha scancode map, assuming US QWERTY layout!\nPlease send the following 26 lines of output to the SDL mailing list <sdl@libsdl.org>, including a description of your keyboard hardware.\n");
-#endif
-        for (i = 0; i < SDL_arraysize(alpha_scancodes); ++i) {
-            alpha_scancodes[i] = MapVirtualKey('A' + i, MAPVK_VK_TO_VSC);
-#if 0
-            printf("%d = %d\n", i, alpha_scancodes[i]);
-#endif
-        }
-    }
-    if (MapVirtualKey(VK_NUMPAD0, MAPVK_VK_TO_VSC) != keypad_scancodes[0]) {
-#if 0
-        printf
-            ("Fixing keypad scancode map!\nPlease send the following 10 lines of output to the SDL mailing list <sdl@libsdl.org>, including a description of your keyboard hardware.\n");
-#endif
-        for (i = 0; i < SDL_arraysize(keypad_scancodes); ++i) {
-            keypad_scancodes[i] =
-                MapVirtualKey(VK_NUMPAD0 + i, MAPVK_VK_TO_VSC);
-#if 0
-            printf("%d = %d\n", i, keypad_scancodes[i]);
-#endif
-        }
-    }
-
-    data->key_layout = windows_scancode_table;
 
     data->ime_com_initialized = SDL_FALSE;
     data->ime_threadmgr = 0;
@@ -157,21 +114,35 @@ WIN_UpdateKeymap()
     SDL_GetDefaultKeymap(keymap);
 
     for (i = 0; i < SDL_arraysize(windows_scancode_table); i++) {
-
+        int vk;
         /* Make sure this scancode is a valid character scancode */
         scancode = windows_scancode_table[i];
-        if (scancode == SDL_SCANCODE_UNKNOWN || keymap[scancode] >= 127) {
+        if (scancode == SDL_SCANCODE_UNKNOWN ) {
             continue;
         }
 
-        /* Alphabetic keys are handled specially, since Windows remaps them */
-        if (i >= 'A' && i <= 'Z') {
-            BYTE vsc = alpha_scancodes[i - 'A'];
-            keymap[scancode] = MapVirtualKey(vsc, MAPVK_VSC_TO_VK) + 0x20;
-        } else {
-            keymap[scancode] = (MapVirtualKey(i, MAPVK_VK_TO_CHAR) & 0x7FFF);
+        /* If this key is one of the non-mappable keys, ignore it */
+        /* Don't allow the number keys right above the qwerty row to translate or the top left key (grave/backquote) */
+        /* Not mapping numbers fixes the French layout, giving numeric keycodes for the number keys, which is the expected behavior */
+        if ((keymap[scancode] & SDLK_SCANCODE_MASK) ||
+            scancode == SDL_SCANCODE_GRAVE ||
+            (scancode >= SDL_SCANCODE_1 && scancode <= SDL_SCANCODE_0) ) {
+            continue;
+        }
+
+        vk =  MapVirtualKey(i, MAPVK_VSC_TO_VK);
+        if ( vk ) {
+            int ch = (MapVirtualKey( vk, MAPVK_VK_TO_CHAR ) & 0x7FFF);
+            if ( ch ) {
+                if ( ch >= 'A' && ch <= 'Z' ) {
+                    keymap[scancode] =  SDLK_a + ( ch - 'A' );
+                } else {
+                    keymap[scancode] = ch;
+                }
+            }
         }
     }
+
     SDL_SetKeymap(0, keymap, SDL_NUM_SCANCODES);
 }
 
@@ -216,6 +187,12 @@ void
 WIN_SetTextInputRect(_THIS, SDL_Rect *rect)
 {
     SDL_VideoData *videodata = (SDL_VideoData *)_this->driverdata;
+
+    if (!rect) {
+        SDL_InvalidParamError("rect");
+        return;
+    }
+
     videodata->ime_rect = *rect;
 }
 
@@ -572,20 +549,20 @@ IME_GetId(SDL_VideoData *videodata, UINT uIndex)
                         #define pVerFixedInfo   ((VS_FIXEDFILEINFO FAR*)lpVerData)
                         DWORD dwVer = pVerFixedInfo->dwFileVersionMS;
                         dwVer = (dwVer & 0x00ff0000) << 8 | (dwVer & 0x000000ff) << 16;
-                        if (videodata->GetReadingString ||
-                            dwLang == LANG_CHT && (
+                        if ((videodata->GetReadingString) ||
+                            ((dwLang == LANG_CHT) && (
                             dwVer == MAKEIMEVERSION(4, 2) ||
                             dwVer == MAKEIMEVERSION(4, 3) ||
                             dwVer == MAKEIMEVERSION(4, 4) ||
                             dwVer == MAKEIMEVERSION(5, 0) ||
                             dwVer == MAKEIMEVERSION(5, 1) ||
                             dwVer == MAKEIMEVERSION(5, 2) ||
-                            dwVer == MAKEIMEVERSION(6, 0))
+                            dwVer == MAKEIMEVERSION(6, 0)))
                             ||
-                            dwLang == LANG_CHS && (
+                            ((dwLang == LANG_CHS) && (
                             dwVer == MAKEIMEVERSION(4, 1) ||
                             dwVer == MAKEIMEVERSION(4, 2) ||
-                            dwVer == MAKEIMEVERSION(5, 3))) {
+                            dwVer == MAKEIMEVERSION(5, 3)))) {
                             dwRet[0] = dwVer | dwLang;
                             dwRet[1] = pVerFixedInfo->dwFileVersionLS;
                             SDL_free(lpVerBuffer);
@@ -1050,12 +1027,11 @@ STDMETHODIMP UIElementSink_BeginUIElement(TSFSink *sink, DWORD dwUIElementId, BO
     if (SUCCEEDED(element->lpVtbl->QueryInterface(element, &IID_ITfReadingInformationUIElement, (LPVOID *)&preading))) {
         BSTR bstr;
         if (SUCCEEDED(preading->lpVtbl->GetString(preading, &bstr)) && bstr) {
-            WCHAR *s = (WCHAR *)bstr;
             SysFreeString(bstr);
         }
         preading->lpVtbl->Release(preading);
     }
-    else if (SUCCEEDED(element->lpVtbl->QueryInterface(element, &IID_ITfCandidateListUIElement, (LPVOID *)&pcandlist)))	{
+    else if (SUCCEEDED(element->lpVtbl->QueryInterface(element, &IID_ITfCandidateListUIElement, (LPVOID *)&pcandlist))) {
         videodata->ime_candref++;
         UILess_GetCandidateList(videodata, pcandlist);
         pcandlist->lpVtbl->Release(pcandlist);
@@ -1082,7 +1058,7 @@ STDMETHODIMP UIElementSink_UpdateUIElement(TSFSink *sink, DWORD dwUIElementId)
         }
         preading->lpVtbl->Release(preading);
     }
-    else if (SUCCEEDED(element->lpVtbl->QueryInterface(element, &IID_ITfCandidateListUIElement, (LPVOID *)&pcandlist)))	{
+    else if (SUCCEEDED(element->lpVtbl->QueryInterface(element, &IID_ITfCandidateListUIElement, (LPVOID *)&pcandlist))) {
         UILess_GetCandidateList(videodata, pcandlist);
         pcandlist->lpVtbl->Release(pcandlist);
     }
@@ -1133,7 +1109,7 @@ STDMETHODIMP IPPASink_QueryInterface(TSFSink *sink, REFIID riid, PVOID *ppv)
 
 STDMETHODIMP IPPASink_OnActivated(TSFSink *sink, DWORD dwProfileType, LANGID langid, REFCLSID clsid, REFGUID catid, REFGUID guidProfile, HKL hkl, DWORD dwFlags)
 {
-    static GUID TF_PROFILE_DAYI = {0x037B2C25, 0x480C, 0x4D7F, 0xB0, 0x27, 0xD6, 0xCA, 0x6B, 0x69, 0x78, 0x8A};
+    static const GUID TF_PROFILE_DAYI = { 0x037B2C25, 0x480C, 0x4D7F, { 0xB0, 0x27, 0xD6, 0xCA, 0x6B, 0x69, 0x78, 0x8A } };
     SDL_VideoData *videodata = (SDL_VideoData *)sink->data;
     videodata->ime_candlistindexbase = SDL_IsEqualGUID(&TF_PROFILE_DAYI, guidProfile) ? 0 : 1;
     if (SDL_IsEqualIID(catid, &GUID_TFCAT_TIP_KEYBOARD) && (dwFlags & TF_IPSINK_FLAG_ACTIVE))
@@ -1375,7 +1351,6 @@ IME_RenderCandidateList(SDL_VideoData *videodata, HDC hdc)
     SIZE candsizes[MAX_CANDLIST];
     SIZE maxcandsize = {0};
     HBITMAP hbm = NULL;
-    BYTE *bits = NULL;
     const int candcount = SDL_min(SDL_min(MAX_CANDLIST, videodata->ime_candcount), videodata->ime_candpgsize);
     SDL_bool vertical = videodata->ime_candvertical;
 
@@ -1457,7 +1432,7 @@ IME_RenderCandidateList(SDL_VideoData *videodata, HDC hdc)
             ;
     }
 
-    bits = StartDrawToBitmap(hdc, &hbm, size.cx, size.cy);
+    StartDrawToBitmap(hdc, &hbm, size.cx, size.cy);
 
     SelectObject(hdc, listpen);
     SelectObject(hdc, listbrush);
@@ -1536,7 +1511,7 @@ void IME_Present(SDL_VideoData *videodata)
     if (videodata->ime_dirty)
         IME_Render(videodata);
 
-    // FIXME: Need to show the IME bitmap
+    /* FIXME: Need to show the IME bitmap */
 }
 
 #endif /* SDL_DISABLE_WINDOWS_IME */

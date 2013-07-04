@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -114,15 +114,7 @@ SDL_QuitQuit(void)
 int
 SDL_SendQuit(void)
 {
-    int posted;
-
-    posted = 0;
-    if (SDL_GetEventState(SDL_QUIT) == SDL_ENABLE) {
-        SDL_Event event;
-        event.type = SDL_QUIT;
-        posted = (SDL_PushEvent(&event) > 0);
-    }
-    return (posted);
+    return SDL_SendAppEvent(SDL_QUIT);
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

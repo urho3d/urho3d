@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,8 +27,8 @@
 #ifndef _SDL_error_c_h
 #define _SDL_error_c_h
 
-#define ERR_MAX_STRLEN	128
-#define ERR_MAX_ARGS	5
+#define ERR_MAX_STRLEN  128
+#define ERR_MAX_ARGS    5
 
 typedef struct SDL_error
 {

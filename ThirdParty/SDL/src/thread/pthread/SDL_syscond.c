@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -67,14 +67,12 @@ SDL_CondSignal(SDL_cond * cond)
     int retval;
 
     if (!cond) {
-        SDL_SetError("Passed a NULL condition variable");
-        return -1;
+        return SDL_SetError("Passed a NULL condition variable");
     }
 
     retval = 0;
     if (pthread_cond_signal(&cond->cond) != 0) {
-        SDL_SetError("pthread_cond_signal() failed");
-        retval = -1;
+        return SDL_SetError("pthread_cond_signal() failed");
     }
     return retval;
 }
@@ -86,14 +84,12 @@ SDL_CondBroadcast(SDL_cond * cond)
     int retval;
 
     if (!cond) {
-        SDL_SetError("Passed a NULL condition variable");
-        return -1;
+        return SDL_SetError("Passed a NULL condition variable");
     }
 
     retval = 0;
     if (pthread_cond_broadcast(&cond->cond) != 0) {
-        SDL_SetError("pthread_cond_broadcast() failed");
-        retval = -1;
+        return SDL_SetError("pthread_cond_broadcast() failed");
     }
     return retval;
 }
@@ -106,8 +102,7 @@ SDL_CondWaitTimeout(SDL_cond * cond, SDL_mutex * mutex, Uint32 ms)
     struct timespec abstime;
 
     if (!cond) {
-        SDL_SetError("Passed a NULL condition variable");
-        return -1;
+        return SDL_SetError("Passed a NULL condition variable");
     }
 
     gettimeofday(&delta, NULL);
@@ -131,9 +126,7 @@ SDL_CondWaitTimeout(SDL_cond * cond, SDL_mutex * mutex, Uint32 ms)
     case 0:
         break;
     default:
-        SDL_SetError("pthread_cond_timedwait() failed");
-        retval = -1;
-        break;
+        retval = SDL_SetError("pthread_cond_timedwait() failed");
     }
     return retval;
 }
@@ -144,19 +137,12 @@ SDL_CondWaitTimeout(SDL_cond * cond, SDL_mutex * mutex, Uint32 ms)
 int
 SDL_CondWait(SDL_cond * cond, SDL_mutex * mutex)
 {
-    int retval;
-
     if (!cond) {
-        SDL_SetError("Passed a NULL condition variable");
-        return -1;
+        return SDL_SetError("Passed a NULL condition variable");
+    } else if (pthread_cond_wait(&cond->cond, &mutex->id) != 0) {
+        return SDL_SetError("pthread_cond_wait() failed");
     }
-
-    retval = 0;
-    if (pthread_cond_wait(&cond->cond, &mutex->id) != 0) {
-        SDL_SetError("pthread_cond_wait() failed");
-        retval = -1;
-    }
-    return retval;
+    return 0;
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

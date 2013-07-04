@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -275,7 +275,7 @@ void BE_GetDisplayModes(_THIS, SDL_VideoDisplay *display) {
 	bscreen.GetMode(&this_bmode);
 	
 	for(i = 0; i < count; ++i) {
-		//FIXME: Apparently there are errors with colorspace changes
+		// FIXME: Apparently there are errors with colorspace changes
 		if (bmodes[i].space == this_bmode.space) {
 			_BDisplayModeToSdlDisplayMode(&bmodes[i], &mode);
 			SDL_AddDisplayMode(display, &mode);
@@ -310,8 +310,7 @@ int BE_SetDisplayMode(_THIS, SDL_VideoDisplay *display, SDL_DisplayMode *mode){
 	}
 
 	if(bscreen.SetMode(bmode) != B_OK) {
-		SDL_SetError("Bad video mode\n");
-		return -1;
+		return SDL_SetError("Bad video mode\n");
 	}
 	
 	free(bmode_list);

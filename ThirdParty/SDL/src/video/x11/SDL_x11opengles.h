@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,12 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+#include "SDL_config.h"
 
+#ifndef _SDL_x11opengles_h
+#define _SDL_x11opengles_h
+
+#if SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2
 #include <GLES/gl.h>
 #include <GLES/egl.h>
 #include <dlfcn.h>
@@ -30,7 +35,6 @@
 
 typedef struct SDL_PrivateGLESData
 {
-    int egl_active;             /* to stop switching drivers while we have a valid context */
     XVisualInfo *egl_visualinfo;
     void *egl_dll_handle;
     EGLDisplay egl_display;
@@ -92,3 +96,9 @@ extern int X11_GLES_SetSwapInterval(_THIS, int interval);
 extern int X11_GLES_GetSwapInterval(_THIS);
 extern void X11_GLES_SwapWindow(_THIS, SDL_Window * window);
 extern void X11_GLES_DeleteContext(_THIS, SDL_GLContext context);
+
+#endif /* SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2 */
+
+#endif /* _SDL_x11opengles_h */
+
+/* vi: set ts=4 sw=4 expandtab: */

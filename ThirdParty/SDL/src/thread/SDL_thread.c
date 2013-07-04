@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 #include "SDL_systhread.h"
 #include "../SDL_error_c.h"
 
-#define ARRAY_CHUNKSIZE	32
+#define ARRAY_CHUNKSIZE 32
 /* The array of threads currently active in the application
    (except the main thread)
    The manipulation of an array here is safer than using a linked list.
@@ -51,8 +51,13 @@ SDL_ThreadsInit(void)
     return (retval);
 }
 
-// Urho3D: SDL_ThreadsQuit() will be called in SDL_Quit() to clean up
-void
+/* This should never be called...
+   If this is called by SDL_Quit(), we don't know whether or not we should
+   clean up threads here.  If any threads are still running after this call,
+   they will no longer have access to any per-thread data.
+ */
+#if 0
+static void
 SDL_ThreadsQuit(void)
 {
     SDL_mutex *mutex;
@@ -63,6 +68,7 @@ SDL_ThreadsQuit(void)
         SDL_DestroyMutex(mutex);
     }
 }
+#endif
 
 /* Routines for manipulating the thread list */
 static void
@@ -79,7 +85,7 @@ SDL_AddThread(SDL_Thread * thread)
             return;
         }
     }
-    SDL_mutexP(thread_lock);
+    SDL_LockMutex(thread_lock);
 
     /* Expand the list of threads, if necessary */
 #ifdef DEBUG_THREADS
@@ -112,7 +118,7 @@ SDL_DelThread(SDL_Thread * thread)
     if (!thread_lock) {
         return;
     }
-    SDL_mutexP(thread_lock);
+    SDL_LockMutex(thread_lock);
     for (i = 0; i < SDL_numthreads; ++i) {
         if (thread == SDL_Threads[i]) {
             break;
@@ -158,7 +164,7 @@ SDL_GetErrBuf(void)
         SDL_threadID this_thread;
 
         this_thread = SDL_ThreadID();
-        SDL_mutexP(thread_lock);
+        SDL_LockMutex(thread_lock);
         for (i = 0; i < SDL_numthreads; ++i) {
             if (this_thread == SDL_Threads[i]->threadid) {
                 errbuf = &SDL_Threads[i]->errbuf;

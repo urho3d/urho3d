@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -68,9 +68,9 @@ SDL_DestroyMutex(SDL_mutex * mutex)
     }
 }
 
-/* Lock the semaphore */
+/* Lock the mutex */
 int
-SDL_mutexP(SDL_mutex * mutex)
+SDL_LockMutex(SDL_mutex * mutex)
 {
 #if SDL_THREADS_DISABLED
     return 0;
@@ -78,8 +78,7 @@ SDL_mutexP(SDL_mutex * mutex)
     SDL_threadID this_thread;
 
     if (mutex == NULL) {
-        SDL_SetError("Passed a NULL mutex");
-        return -1;
+        return SDL_SetError("Passed a NULL mutex");
     }
 
     this_thread = SDL_ThreadID();
@@ -99,6 +98,39 @@ SDL_mutexP(SDL_mutex * mutex)
 #endif /* SDL_THREADS_DISABLED */
 }
 
+/* try Lock the mutex */
+int
+SDL_TryLockMutex(SDL_mutex * mutex)
+{
+#if SDL_THREADS_DISABLED
+    return 0;
+#else
+    int retval = 0;
+    SDL_threadID this_thread;
+
+    if (mutex == NULL) {
+        return SDL_SetError("Passed a NULL mutex");
+    }
+
+    this_thread = SDL_ThreadID();
+    if (mutex->owner == this_thread) {
+        ++mutex->recursive;
+    } else {
+        /* The order of operations is important.
+         We set the locking thread id after we obtain the lock
+         so unlocks from other threads will fail.
+         */
+        retval = SDL_SemWait(mutex->sem);
+        if (retval == 0) {
+            mutex->owner = this_thread;
+            mutex->recursive = 0;
+        }
+    }
+
+    return retval;
+#endif /* SDL_THREADS_DISABLED */
+}
+
 /* Unlock the mutex */
 int
 SDL_mutexV(SDL_mutex * mutex)
@@ -107,14 +139,12 @@ SDL_mutexV(SDL_mutex * mutex)
     return 0;
 #else
     if (mutex == NULL) {
-        SDL_SetError("Passed a NULL mutex");
-        return -1;
+        return SDL_SetError("Passed a NULL mutex");
     }
 
     /* If we don't own the mutex, we can't unlock it */
     if (SDL_ThreadID() != mutex->owner) {
-        SDL_SetError("mutex not owned by this thread");
-        return -1;
+        return SDL_SetError("mutex not owned by this thread");
     }
 
     if (mutex->recursive) {

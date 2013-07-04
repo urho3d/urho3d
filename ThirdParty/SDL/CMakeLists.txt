@@ -3,20 +3,25 @@ set (TARGET_NAME SDL)
 
 # Define source files
 file (GLOB C_FILES
-    src/*.c src/atomic/*.c src/audio/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c src/joystick/*.c src/libm/*.c src/stdlib/*.c src/thread/*.c src/timer/*.c src/video/*.c src/video/dummy/*.c
+    src/*.c src/atomic/*.c src/audio/*.c src/audio/disk/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c 
+    src/haptic/*.c src/joystick/*.c src/libm/*.c src/power/*.c src/stdlib/*.c src/thread/*.c src/timer/*.c src/video/*.c 
+    src/video/dummy/*.c
 )
 
 if (WIN32)
     file (GLOB SYS_C_FILES
-        src/audio/directsound/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c src/thread/windows/*.c src/timer/windows/*.c src/video/windows/*.c
+        src/audio/directsound/*.c src/haptic/windows/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c 
+        src/power/windows/*.c src/thread/windows/*.c src/thread/generic/SDL_syscond.c src/timer/windows/*.c src/video/windows/*.c
     )
 elseif (IOS)
     file (GLOB SYS_C_FILES
-        src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c
+        src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/power/uikit/*.m 
+        src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c
     )
 elseif (APPLE)
     file (GLOB SYS_C_FILES
-        src/audio/coreaudio/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m
+        src/audio/coreaudio/*.c src/file/cocoa/*.m src/haptic/darwin/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c 
+        src/power/macosx/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m
     )
 else ()
     include(CheckCSourceCompiles)
@@ -59,7 +64,8 @@ else ()
     set(CMAKE_REQUIRED_LIBRARIES)
 
     file (GLOB SYS_C_FILES
-        src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/x11/*.c
+        src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/haptic/linux/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c
+        src/power/linux/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/x11/*.c
     )
 endif ()
 
@@ -73,13 +79,9 @@ set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
 
 if (WIN32)
-    if (USE_OPENGL)
-        target_link_libraries (${TARGET_NAME} winmm.lib opengl32.lib)
-    else ()
-        target_link_libraries (${TARGET_NAME} winmm.lib)
-    endif ()
+    target_link_libraries (${TARGET_NAME} user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
 elseif (APPLE)
     target_link_libraries (${TARGET_NAME} dl pthread)
 else ()
-    target_link_libraries (${TARGET_NAME} dl pthread GL)
+    target_link_libraries (${TARGET_NAME} dl pthread rt GL)
 endif ()

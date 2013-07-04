@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,18 +28,30 @@
 #endif
 
 #include <signal.h>
+
 #ifdef __LINUX__
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-extern int pthread_setname_np (pthread_t __target_thread, __const char *__name) __THROW __nonnull ((2));
+#endif /* __LINUX__ */
+
+#if defined(__LINUX__) || defined(__MACOSX__) || defined(__IPHONEOS__)
+#include <dlfcn.h>
+#ifndef RTLD_DEFAULT
+#define RTLD_DEFAULT NULL
+#endif
 #endif
 
 #include "SDL_platform.h"
 #include "SDL_thread.h"
 #include "../SDL_thread_c.h"
 #include "../SDL_systhread.h"
+#ifdef __ANDROID__
+#include "../../core/android/SDL_android.h"
+#endif
+
+#include "SDL_assert.h"
 
 /* List of signals to mask in the subthreads */
 static const int sig_list[] = {
@@ -51,29 +63,50 @@ static const int sig_list[] = {
 static void *
 RunThread(void *data)
 {
+#ifdef __ANDROID__
+    Android_JNI_SetupThread();
+#endif
     SDL_RunThread(data);
     return NULL;
 }
 
+#if defined(__MACOSX__) || defined(__IPHONEOS__)
+static SDL_bool checked_setname = SDL_FALSE;
+static int (*ppthread_setname_np)(const char*) = NULL;
+#elif defined(__LINUX__)
+static SDL_bool checked_setname = SDL_FALSE;
+static int (*ppthread_setname_np)(pthread_t, const char*) = NULL;
+#endif
 int
 SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
 {
     pthread_attr_t type;
 
+    /* do this here before any threads exist, so there's no race condition. */
+    #if defined(__MACOSX__) || defined(__IPHONEOS__) || defined(__LINUX__)
+    if (!checked_setname) {
+        void *fn = dlsym(RTLD_DEFAULT, "pthread_setname_np");
+        #if defined(__MACOSX__) || defined(__IPHONEOS__)
+        ppthread_setname_np = (int(*)(const char*)) fn;
+        #elif defined(__LINUX__)
+        ppthread_setname_np = (int(*)(pthread_t, const char*)) fn;
+        #endif
+        checked_setname = SDL_TRUE;
+    }
+    #endif
+
     /* Set the thread attributes */
     if (pthread_attr_init(&type) != 0) {
-        SDL_SetError("Couldn't initialize pthread attributes");
-        return (-1);
+        return SDL_SetError("Couldn't initialize pthread attributes");
     }
     pthread_attr_setdetachstate(&type, PTHREAD_CREATE_JOINABLE);
 
     /* Create the thread and go! */
     if (pthread_create(&thread->handle, &type, RunThread, args) != 0) {
-        SDL_SetError("Not enough resources to create thread");
-        return (-1);
+        return SDL_SetError("Not enough resources to create thread");
     }
 
-    return (0);
+    return 0;
 }
 
 void
@@ -83,14 +116,20 @@ SDL_SYS_SetupThread(const char *name)
     sigset_t mask;
 
     if (name != NULL) {
-#if ( (__MACOSX__ && (MAC_OS_X_VERSION_MAX_ALLOWED >= 1060)) || \
-      (__IPHONEOS__ && (__IPHONE_OS_VERSION_MAX_ALLOWED >= 30200)) )
-        if (pthread_setname_np != NULL) { pthread_setname_np(name); }
-#elif HAVE_PTHREAD_SETNAME_NP
-        pthread_setname_np(pthread_self(), name);
-#elif HAVE_PTHREAD_SET_NAME_NP
-        pthread_set_name_np(pthread_self(), name);
-#endif
+        #if defined(__MACOSX__) || defined(__IPHONEOS__) || defined(__LINUX__)
+        SDL_assert(checked_setname);
+        if (ppthread_setname_np != NULL) {
+            #if defined(__MACOSX__) || defined(__IPHONEOS__)
+            ppthread_setname_np(name);
+            #elif defined(__LINUX__)
+            ppthread_setname_np(pthread_self(), name);
+            #endif
+        }
+        #elif HAVE_PTHREAD_SETNAME_NP
+            pthread_setname_np(pthread_self(), name);
+        #elif HAVE_PTHREAD_SET_NAME_NP
+            pthread_set_name_np(pthread_self(), name);
+        #endif
     }
 
     /* Mask asynchronous signals for this thread */
@@ -132,8 +171,7 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
         /* Note that this fails if you're trying to set high priority
            and you don't have root permission. BUT DON'T RUN AS ROOT!
          */
-        SDL_SetError("setpriority() failed");
-        return -1;
+        return SDL_SetError("setpriority() failed");
     }
     return 0;
 #else
@@ -142,8 +180,7 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
     pthread_t thread = pthread_self();
 
     if (pthread_getschedparam(thread, &policy, &sched) < 0) {
-        SDL_SetError("pthread_getschedparam() failed");
-        return -1;
+        return SDL_SetError("pthread_getschedparam() failed");
     }
     if (priority == SDL_THREAD_PRIORITY_LOW) {
         sched.sched_priority = sched_get_priority_min(policy);
@@ -155,8 +192,7 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
         sched.sched_priority = (min_priority + (max_priority - min_priority) / 2);
     }
     if (pthread_setschedparam(thread, policy, &sched) < 0) {
-        SDL_SetError("pthread_setschedparam() failed");
-        return -1;
+        return SDL_SetError("pthread_setschedparam() failed");
     }
     return 0;
 #endif /* linux */

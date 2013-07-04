@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,6 +25,8 @@
 #include "SDL_atomic.h"
 #include "SDL_cpuinfo.h"
 #include "SDL_thread.h"
+
+extern void SDL_StartTicks(void);
 
 /* #define DEBUG_TIMERS */
 
@@ -70,6 +72,16 @@ typedef struct {
 
 static SDL_TimerData SDL_timer_data;
 
+static Uint32 ticks_started = 0;
+
+void
+SDL_InitTicks(void)
+{
+    if (!ticks_started) {
+        SDL_StartTicks();
+        ticks_started = 1;
+    }
+}
 
 /* The idea here is that any thread might add a timer, but a single
  * thread manages the active timer queue, sorted by scheduling time.
@@ -223,7 +235,7 @@ SDL_TimerInit(void)
 
         data->active = SDL_TRUE;
         /* !!! FIXME: this is nasty. */
-#if (defined(__WIN32__) && !defined(_WIN32_WCE)) && !defined(HAVE_LIBC)
+#if defined(__WIN32__) && !defined(HAVE_LIBC)
 #undef SDL_CreateThread
         data->thread = SDL_CreateThread(SDL_TimerThread, name, data, NULL, NULL);
 #else
@@ -324,7 +336,7 @@ SDL_AddTimer(Uint32 interval, SDL_TimerCallback callback, void *param)
     timer->interval = interval;
     timer->scheduled = SDL_GetTicks() + interval;
     timer->canceled = SDL_FALSE;
- 
+
     entry = (SDL_TimerMap *)SDL_malloc(sizeof(*entry));
     if (!entry) {
         SDL_free(timer);
@@ -334,10 +346,10 @@ SDL_AddTimer(Uint32 interval, SDL_TimerCallback callback, void *param)
     entry->timer = timer;
     entry->timerID = timer->timerID;
 
-    SDL_mutexP(data->timermap_lock);
+    SDL_LockMutex(data->timermap_lock);
     entry->next = data->timermap;
     data->timermap = entry;
-    SDL_mutexV(data->timermap_lock);
+    SDL_UnlockMutex(data->timermap_lock);
 
     /* Add the timer to the pending list for the timer thread */
     SDL_AtomicLock(&data->lock);
@@ -359,7 +371,7 @@ SDL_RemoveTimer(SDL_TimerID id)
     SDL_bool canceled = SDL_FALSE;
 
     /* Find the timer */
-    SDL_mutexP(data->timermap_lock);
+    SDL_LockMutex(data->timermap_lock);
     prev = NULL;
     for (entry = data->timermap; entry; prev = entry, entry = entry->next) {
         if (entry->timerID == id) {
@@ -371,7 +383,7 @@ SDL_RemoveTimer(SDL_TimerID id)
             break;
         }
     }
-    SDL_mutexV(data->timermap_lock);
+    SDL_UnlockMutex(data->timermap_lock);
 
     if (entry) {
         if (!entry->timer->canceled) {

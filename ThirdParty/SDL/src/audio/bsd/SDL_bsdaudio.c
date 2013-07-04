@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -239,8 +239,7 @@ BSDAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     if (devname == NULL) {
         devname = SDL_GetAudioDeviceName(0, iscapture);
         if (devname == NULL) {
-            SDL_SetError("No such audio device");
-            return 0;
+            return SDL_SetError("No such audio device");
         }
     }
 
@@ -248,16 +247,14 @@ BSDAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden = (struct SDL_PrivateAudioData *)
         SDL_malloc((sizeof *this->hidden));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, (sizeof *this->hidden));
 
     /* Open the audio device */
     this->hidden->audio_fd = open(devname, flags, 0);
     if (this->hidden->audio_fd < 0) {
-        SDL_SetError("Couldn't open %s: %s", devname, strerror(errno));
-        return 0;
+        return SDL_SetError("Couldn't open %s: %s", devname, strerror(errno));
     }
 
     AUDIO_INITINFO(&info);
@@ -269,8 +266,7 @@ BSDAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     info.mode = AUMODE_PLAY;
     if (ioctl(this->hidden->audio_fd, AUDIO_SETINFO, &info) < 0) {
         BSDAUDIO_CloseDevice(this);
-        SDL_SetError("Couldn't put device into play mode");
-        return 0;
+        return SDL_SetError("Couldn't put device into play mode");
     }
 
     AUDIO_INITINFO(&info);
@@ -312,8 +308,7 @@ BSDAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (!format) {
         BSDAUDIO_CloseDevice(this);
-        SDL_SetError("No supported encoding for 0x%x", this->spec.format);
-        return 0;
+        return SDL_SetError("No supported encoding for 0x%x", this->spec.format);
     }
 
     this->spec.format = format;
@@ -336,15 +331,14 @@ BSDAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->hidden->mixlen);
     if (this->hidden->mixbuf == NULL) {
         BSDAUDIO_CloseDevice(this);
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
 
     BSDAUDIO_Status(this);
 
     /* We're ready to rock and roll. :-) */
-    return (0);
+    return 0;
 }
 
 static int

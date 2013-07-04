@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,6 +33,10 @@
 #endif
 #if defined(__MACOSX__) && (defined(__ppc__) || defined(__ppc64__))
 #include <sys/sysctl.h>         /* For AltiVec check */
+#elif defined(__OpenBSD__) && defined(__powerpc__)
+#include <sys/param.h>
+#include <sys/sysctl.h> /* For AltiVec check */
+#include <machine/cpu.h>
 #elif SDL_ALTIVEC_BLITTERS && HAVE_SETJMP
 #include <signal.h>
 #include <setjmp.h>
@@ -51,7 +55,7 @@
 #define CPU_HAS_SSE41   0x00000100
 #define CPU_HAS_SSE42   0x00000200
 
-#if SDL_ALTIVEC_BLITTERS && HAVE_SETJMP && !__MACOSX__
+#if SDL_ALTIVEC_BLITTERS && HAVE_SETJMP && !__MACOSX__ && !__OpenBSD__
 /* This is the brute force way of detecting instruction sets...
    the idea is borrowed from the libmpeg2 library - thanks!
  */
@@ -214,8 +218,12 @@ static __inline__ int
 CPU_haveAltiVec(void)
 {
     volatile int altivec = 0;
-#if defined(__MACOSX__) && (defined(__ppc__) || defined(__ppc64__))
+#if (defined(__MACOSX__) && (defined(__ppc__) || defined(__ppc64__))) || (defined(__OpenBSD__) && defined(__powerpc__))
+#ifdef __OpenBSD__
+    int selectors[2] = { CTL_MACHDEP, CPU_ALTIVEC };
+#else
     int selectors[2] = { CTL_HW, HW_VECTORUNIT };
+#endif
     int hasVectorUnit = 0;
     size_t length = sizeof(hasVectorUnit);
     int error = sysctl(selectors, 2, &hasVectorUnit, &length, NULL, 0);

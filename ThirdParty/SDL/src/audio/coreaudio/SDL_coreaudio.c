@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -280,12 +280,10 @@ outputCallback(void *inRefCon,
         while (remaining > 0) {
             if (this->hidden->bufferOffset >= this->hidden->bufferSize) {
                 /* Generate the data */
-                SDL_memset(this->hidden->buffer, this->spec.silence,
-                           this->hidden->bufferSize);
-                SDL_mutexP(this->mixer_lock);
+                SDL_LockMutex(this->mixer_lock);
                 (*this->spec.callback)(this->spec.userdata,
                             this->hidden->buffer, this->hidden->bufferSize);
-                SDL_mutexV(this->mixer_lock);
+                SDL_UnlockMutex(this->mixer_lock);
                 this->hidden->bufferOffset = 0;
             }
 
@@ -310,8 +308,8 @@ inputCallback(void *inRefCon,
               UInt32 inBusNumber, UInt32 inNumberFrames,
               AudioBufferList * ioData)
 {
-    //err = AudioUnitRender(afr->fAudioUnit, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, afr->fAudioBuffer);
-    // !!! FIXME: write me!
+    /* err = AudioUnitRender(afr->fAudioUnit, ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, afr->fAudioBuffer); */
+    /* !!! FIXME: write me! */
     return noErr;
 }
 
@@ -336,15 +334,16 @@ COREAUDIO_CloseDevice(_THIS)
             result = AudioOutputUnitStop(this->hidden->audioUnit);
 
             /* Remove the input callback */
-            SDL_memset(&callback, '\0', sizeof(AURenderCallbackStruct));
+            SDL_memset(&callback, 0, sizeof(AURenderCallbackStruct));
             result = AudioUnitSetProperty(this->hidden->audioUnit,
                                           kAudioUnitProperty_SetRenderCallback,
                                           scope, bus, &callback,
                                           sizeof(callback));
 
-            /* !!! FIXME: how does iOS free this? */
             #if MACOSX_COREAUDIO
             CloseComponent(this->hidden->audioUnit);
+            #else
+            AudioComponentInstanceDispose(this->hidden->audioUnit);
             #endif
 
             this->hidden->audioUnitOpened = 0;
@@ -381,7 +380,7 @@ prepare_audiounit(_THIS, const char *devname, int iscapture,
         return 0;
     }
 #endif
-    
+
     SDL_zero(desc);
     desc.componentType = kAudioUnitType_Output;
     desc.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -390,7 +389,7 @@ prepare_audiounit(_THIS, const char *devname, int iscapture,
     desc.componentSubType = kAudioUnitSubType_DefaultOutput;
     comp = FindNextComponent(NULL, &desc);
 #else
-    desc.componentSubType = kAudioUnitSubType_RemoteIO;  /* !!! FIXME: ? */
+    desc.componentSubType = kAudioUnitSubType_RemoteIO;
     comp = AudioComponentFindNext(NULL, &desc);
 #endif
 
@@ -431,7 +430,7 @@ prepare_audiounit(_THIS, const char *devname, int iscapture,
     CHECK_RESULT("AudioUnitSetProperty (kAudioUnitProperty_StreamFormat)");
 
     /* Set the audio callback */
-    SDL_memset(&callback, '\0', sizeof(AURenderCallbackStruct));
+    SDL_memset(&callback, 0, sizeof(AURenderCallbackStruct));
     callback.inputProc = ((iscapture) ? inputCallback : outputCallback);
     callback.inputProcRefCon = this;
     result = AudioUnitSetProperty(this->hidden->audioUnit,
@@ -470,8 +469,7 @@ COREAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden = (struct SDL_PrivateAudioData *)
         SDL_malloc((sizeof *this->hidden));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return (0);
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, (sizeof *this->hidden));
 
@@ -512,8 +510,7 @@ COREAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (!valid_datatype) {      /* shouldn't happen, but just in case... */
         COREAUDIO_CloseDevice(this);
-        SDL_SetError("Unsupported audio format");
-        return 0;
+        return SDL_SetError("Unsupported audio format");
     }
 
     strdesc.mBytesPerFrame =
@@ -523,10 +520,10 @@ COREAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (!prepare_audiounit(this, devname, iscapture, &strdesc)) {
         COREAUDIO_CloseDevice(this);
-        return 0;               /* prepare_audiounit() will call SDL_SetError()... */
+        return -1;      /* prepare_audiounit() will call SDL_SetError()... */
     }
 
-    return 1;                   /* good to go. */
+    return 0;   /* good to go. */
 }
 
 static int
@@ -540,8 +537,16 @@ COREAUDIO_Init(SDL_AudioDriverImpl * impl)
     impl->DetectDevices = COREAUDIO_DetectDevices;
 #else
     impl->OnlyHasDefaultOutputDevice = 1;
+
+    /* Set category to ambient sound so that other music continues playing.
+       You can change this at runtime in your own code if you need different
+       behavior.  If this is common, we can add an SDL hint for this.
+    */
+    AudioSessionInitialize(NULL, NULL, NULL, nil);
+    UInt32 category = kAudioSessionCategory_AmbientSound;
+    AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(UInt32), &category);
 #endif
-    
+
     impl->ProvidesOwnCallbackThread = 1;
 
     return 1;   /* this audio target is available. */

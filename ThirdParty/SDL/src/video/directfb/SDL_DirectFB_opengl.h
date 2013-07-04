@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,11 +32,11 @@
 typedef struct _DirectFB_GLContext DirectFB_GLContext;
 struct _DirectFB_GLContext
 {
-    IDirectFBGL 		*context;
-    DirectFB_GLContext 	*next;
-    
-    SDL_Window 			*sdl_window;
-    int 				is_locked;
+    IDirectFBGL         *context;
+    DirectFB_GLContext  *next;
+
+    SDL_Window          *sdl_window;
+    int                 is_locked;
 };
 
 /* OpenGL functions */

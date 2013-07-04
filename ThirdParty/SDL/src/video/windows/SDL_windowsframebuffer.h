@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 #include "SDL_config.h"
 
 extern int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, void ** pixels, int *pitch);
-extern int WIN_UpdateWindowFramebuffer(_THIS, SDL_Window * window, SDL_Rect * rects, int numrects);
+extern int WIN_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rect * rects, int numrects);
 extern void WIN_DestroyWindowFramebuffer(_THIS, SDL_Window * window);
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,12 +24,12 @@
 
 #include "SDL_error.h"
 #include "SDL_windows.h"
+#include "SDL_assert.h"
 
 #include <objbase.h>  /* for CoInitialize/CoUninitialize */
 
-
 /* Sets an error message based on GetLastError() */
-void
+int
 WIN_SetError(const char *prefix)
 {
     TCHAR buffer[1024];
@@ -39,6 +39,7 @@ WIN_SetError(const char *prefix)
     message = WIN_StringToUTF8(buffer);
     SDL_SetError("%s%s%s", prefix ? prefix : "", prefix ? ": " : "", message);
     SDL_free(message);
+    return -1;
 }
 
 HRESULT

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,7 +40,7 @@
 #include "SDL_name.h"
 #include "SDL_loadso.h"
 #else
-#define SDL_NAME(X)	X
+#define SDL_NAME(X) X
 #endif
 
 #ifdef SDL_AUDIO_DRIVER_ESD_DYNAMIC
@@ -123,7 +123,7 @@ ESD_WaitDevice(_THIS)
     /* Check to see if the thread-parent process is still alive */
     {
         static int cnt = 0;
-        /* Note that this only works with thread implementations 
+        /* Note that this only works with thread implementations
            that use a different process id for each thread.
          */
         /* Check every 10 loops */
@@ -228,8 +228,7 @@ ESD_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden = (struct SDL_PrivateAudioData *)
         SDL_malloc((sizeof *this->hidden));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, (sizeof *this->hidden));
     this->hidden->audio_fd = -1;
@@ -257,8 +256,7 @@ ESD_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (!found) {
         ESD_CloseDevice(this);
-        SDL_SetError("Couldn't find any hardware audio formats");
-        return 0;
+        return SDL_SetError("Couldn't find any hardware audio formats");
     }
 
     if (this->spec.channels == 1) {
@@ -277,8 +275,7 @@ ESD_OpenDevice(_THIS, const char *devname, int iscapture)
 
     if (this->hidden->audio_fd < 0) {
         ESD_CloseDevice(this);
-        SDL_SetError("Couldn't open ESD connection");
-        return 0;
+        return SDL_SetError("Couldn't open ESD connection");
     }
 
     /* Calculate the final parameters for this audio specification */
@@ -292,8 +289,7 @@ ESD_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->hidden->mixlen);
     if (this->hidden->mixbuf == NULL) {
         ESD_CloseDevice(this);
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
 
@@ -301,7 +297,7 @@ ESD_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden->parent = getpid();
 
     /* We're ready to rock and roll. :-) */
-    return 1;
+    return 0;
 }
 
 static void

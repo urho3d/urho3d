@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -42,13 +42,13 @@ Cocoa_CreateShaper(SDL_Window* window) {
     result->mode.parameters.binarizationCutoff = 1;
     result->userx = result->usery = 0;
     window->shaper = result;
-    
+
     SDL_ShapeData* data = malloc(sizeof(SDL_ShapeData));
     result->driverdata = data;
     data->context = [windata->nswindow graphicsContext];
     data->saved = SDL_FALSE;
     data->shape = NULL;
-    
+
     int resized_properly = Cocoa_ResizeWindowShape(window);
     SDL_assert(resized_properly == 0);
     return result;
@@ -72,26 +72,26 @@ ConvertRects(SDL_ShapeTree* tree,void* closure) {
 int
 Cocoa_SetWindowShape(SDL_WindowShaper *shaper,SDL_Surface *shape,SDL_WindowShapeMode *shape_mode) {
     SDL_ShapeData* data = (SDL_ShapeData*)shaper->driverdata;
-	SDL_WindowData* windata = (SDL_WindowData*)shaper->window->driverdata;
-	SDL_CocoaClosure closure;
-	NSAutoreleasePool *pool = NULL;
+    SDL_WindowData* windata = (SDL_WindowData*)shaper->window->driverdata;
+    SDL_CocoaClosure closure;
+    NSAutoreleasePool *pool = NULL;
     if(data->saved == SDL_TRUE) {
         [data->context restoreGraphicsState];
         data->saved = SDL_FALSE;
     }
-        
+
     //[data->context saveGraphicsState];
     //data->saved = SDL_TRUE;
-	[NSGraphicsContext setCurrentContext:data->context];
-    
+    [NSGraphicsContext setCurrentContext:data->context];
+
     [[NSColor clearColor] set];
     NSRectFill([[windata->nswindow contentView] frame]);
     data->shape = SDL_CalculateShapeTree(*shape_mode,shape);
-	
-	pool = [[NSAutoreleasePool alloc] init];
+
+    pool = [[NSAutoreleasePool alloc] init];
     closure.view = [windata->nswindow contentView];
     closure.path = [[NSBezierPath bezierPath] autorelease];
-	closure.window = shaper->window;
+    closure.window = shaper->window;
     SDL_TraverseShapeTree(data->shape,&ConvertRects,&closure);
     [closure.path addClip];
 

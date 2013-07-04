@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,6 +21,13 @@
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
+
+#if defined(__APPLE__) && defined(__POWERPC__) && !defined(__APPLE_ALTIVEC__)
+#include <altivec.h>
+#undef bool
+#undef vector
+#undef pixel
+#endif
 
 #include "SDL.h"
 #include "SDL_endian.h"
@@ -88,23 +95,26 @@ Cocoa_CreateDevice(int devindex)
     device->SetWindowIcon = Cocoa_SetWindowIcon;
     device->SetWindowPosition = Cocoa_SetWindowPosition;
     device->SetWindowSize = Cocoa_SetWindowSize;
+    device->SetWindowMinimumSize = Cocoa_SetWindowMinimumSize;
+    device->SetWindowMaximumSize = Cocoa_SetWindowMaximumSize;
     device->ShowWindow = Cocoa_ShowWindow;
     device->HideWindow = Cocoa_HideWindow;
     device->RaiseWindow = Cocoa_RaiseWindow;
     device->MaximizeWindow = Cocoa_MaximizeWindow;
     device->MinimizeWindow = Cocoa_MinimizeWindow;
     device->RestoreWindow = Cocoa_RestoreWindow;
+    device->SetWindowBordered = Cocoa_SetWindowBordered;
     device->SetWindowFullscreen = Cocoa_SetWindowFullscreen;
     device->SetWindowGammaRamp = Cocoa_SetWindowGammaRamp;
     device->GetWindowGammaRamp = Cocoa_GetWindowGammaRamp;
     device->SetWindowGrab = Cocoa_SetWindowGrab;
     device->DestroyWindow = Cocoa_DestroyWindow;
     device->GetWindowWMInfo = Cocoa_GetWindowWMInfo;
-    
+
     device->shape_driver.CreateShaper = Cocoa_CreateShaper;
     device->shape_driver.SetWindowShape = Cocoa_SetWindowShape;
     device->shape_driver.ResizeWindowShape = Cocoa_ResizeWindowShape;
-    
+
 #if SDL_VIDEO_OPENGL_CGL
     device->GL_LoadLibrary = Cocoa_GL_LoadLibrary;
     device->GL_GetProcAddress = Cocoa_GL_GetProcAddress;
@@ -163,7 +173,7 @@ Cocoa_CreateImage(SDL_Surface * surface)
     int i;
     NSImage *img;
 
-    converted = SDL_ConvertSurfaceFormat(surface, 
+    converted = SDL_ConvertSurfaceFormat(surface,
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
                                          SDL_PIXELFORMAT_RGBA8888,
 #else
@@ -211,6 +221,18 @@ Cocoa_CreateImage(SDL_Surface * surface)
 }
 
 /*
+ * Mac OS X log support.
+ *
+ * This doesn't really have aything to do with the interfaces of the SDL video
+ *  subsystem, but we need to stuff this into an Objective-C source code file.
+ */
+
+void SDL_NSLog(const char *text)
+{
+    NSLog(@"%s", text);
+}
+
+/*
  * Mac OS X assertion support.
  *
  * This doesn't really have aything to do with the interfaces of the SDL video
@@ -252,6 +274,8 @@ SDL_PromptAssertion_cocoa(const SDL_assert_data *data)
     [alert addButtonWithTitle:@"Ignore"];
     [alert addButtonWithTitle:@"Always Ignore"];
     const NSInteger clicked = [alert runModal];
+    [alert release];
+
     [pool release];
 
     if (!initialized) {

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,8 +30,8 @@ typedef struct _DFB_CursorData DFB_CursorData;
 struct _DFB_CursorData
 {
     IDirectFBSurface *surf;
-    int 			hotx;
-    int 			hoty;
+    int             hotx;
+    int             hoty;
 };
 
 #define SDL_DFB_CURSORDATA(curs)  DFB_CursorData *curdata = (DFB_CursorData *) ((curs) ? (curs)->driverdata : NULL)

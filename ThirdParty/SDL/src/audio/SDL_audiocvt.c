@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -968,20 +968,25 @@ SDL_BuildAudioCVT(SDL_AudioCVT * cvt,
      * !!! FIXME: good in practice as it sounds in theory, though.
      */
 
+    /* Sanity check target pointer */
+    if (cvt == NULL) {
+        return SDL_InvalidParamError("cvt");
+    }
+
     /* there are no unsigned types over 16 bits, so catch this up front. */
     if ((SDL_AUDIO_BITSIZE(src_fmt) > 16) && (!SDL_AUDIO_ISSIGNED(src_fmt))) {
-        SDL_SetError("Invalid source format");
-        return -1;
+        return SDL_SetError("Invalid source format");
     }
     if ((SDL_AUDIO_BITSIZE(dst_fmt) > 16) && (!SDL_AUDIO_ISSIGNED(dst_fmt))) {
-        SDL_SetError("Invalid destination format");
-        return -1;
+        return SDL_SetError("Invalid destination format");
     }
 
     /* prevent possible divisions by zero, etc. */
+    if ((src_channels == 0) || (dst_channels == 0)) {
+        return SDL_SetError("Source or destination channels is zero");
+    }
     if ((src_rate == 0) || (dst_rate == 0)) {
-        SDL_SetError("Source or destination rate is zero");
-        return -1;
+        return SDL_SetError("Source or destination rate is zero");
     }
 #ifdef DEBUG_CONVERT
     printf("Build format %04x->%04x, channels %u->%u, rate %d->%d\n",

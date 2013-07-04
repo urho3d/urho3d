@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -38,6 +38,20 @@
 
 #include <errno.h>
 
+SDL_COMPILE_TIME_ASSERT(iconv_t, sizeof (iconv_t) <= sizeof (SDL_iconv_t));
+
+SDL_iconv_t
+SDL_iconv_open(const char *tocode, const char *fromcode)
+{
+    return (SDL_iconv_t) ((size_t) iconv_open(tocode, fromcode));
+}
+
+int
+SDL_iconv_close(SDL_iconv_t cd)
+{
+    return iconv_close((iconv_t) ((size_t) cd));
+}
+
 size_t
 SDL_iconv(SDL_iconv_t cd,
           const char **inbuf, size_t * inbytesleft,
@@ -45,9 +59,9 @@ SDL_iconv(SDL_iconv_t cd,
 {
     size_t retCode;
 #ifdef ICONV_INBUF_NONCONST
-    retCode = iconv(cd, (char **) inbuf, inbytesleft, outbuf, outbytesleft);
+    retCode = iconv((iconv_t) ((size_t) cd), (char **) inbuf, inbytesleft, outbuf, outbytesleft);
 #else
-    retCode = iconv(cd, inbuf, inbytesleft, outbuf, outbytesleft);
+    retCode = iconv((iconv_t) ((size_t) cd), inbuf, inbytesleft, outbuf, outbytesleft);
 #endif
     if (retCode == (size_t) - 1) {
         switch (errno) {
@@ -87,15 +101,21 @@ enum
     ENCODING_UTF32,             /* Needs byte order marker */
     ENCODING_UTF32BE,
     ENCODING_UTF32LE,
-    ENCODING_UCS2,              /* Native byte order assumed */
-    ENCODING_UCS4,              /* Native byte order assumed */
+    ENCODING_UCS2BE,
+    ENCODING_UCS2LE,
+    ENCODING_UCS4BE,
+    ENCODING_UCS4LE,
 };
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 #define ENCODING_UTF16NATIVE	ENCODING_UTF16BE
 #define ENCODING_UTF32NATIVE	ENCODING_UTF32BE
+#define ENCODING_UCS2NATIVE     ENCODING_UCS2BE
+#define ENCODING_UCS4NATIVE     ENCODING_UCS4BE
 #else
 #define ENCODING_UTF16NATIVE	ENCODING_UTF16LE
 #define ENCODING_UTF32NATIVE	ENCODING_UTF32LE
+#define ENCODING_UCS2NATIVE     ENCODING_UCS2LE
+#define ENCODING_UCS4NATIVE     ENCODING_UCS4LE
 #endif
 
 struct _SDL_iconv_t
@@ -128,10 +148,16 @@ static struct
     { "UTF-32BE", ENCODING_UTF32BE },
     { "UTF32LE", ENCODING_UTF32LE },
     { "UTF-32LE", ENCODING_UTF32LE },
-    { "UCS2", ENCODING_UCS2 },
-    { "UCS-2", ENCODING_UCS2 },
-    { "UCS4", ENCODING_UCS4 },
-    { "UCS-4", ENCODING_UCS4 },
+    { "UCS2", ENCODING_UCS2BE },
+    { "UCS-2", ENCODING_UCS2BE },
+    { "UCS-2LE", ENCODING_UCS2LE },
+    { "UCS-2BE", ENCODING_UCS2BE },
+    { "UCS-2-INTERNAL", ENCODING_UCS2NATIVE },
+    { "UCS4", ENCODING_UCS4BE },
+    { "UCS-4", ENCODING_UCS4BE },
+    { "UCS-4LE", ENCODING_UCS4LE },
+    { "UCS-4BE", ENCODING_UCS4BE },
+    { "UCS-4-INTERNAL", ENCODING_UCS4NATIVE },
 /* *INDENT-ON* */
 };
 
@@ -518,6 +544,29 @@ SDL_iconv(SDL_iconv_t cd,
                       (Uint32) (W2 & 0x3FF)) + 0x10000;
             }
             break;
+        case ENCODING_UCS2LE:
+            {
+                Uint8 *p = (Uint8 *) src;
+                if (srclen < 2) {
+                    return SDL_ICONV_EINVAL;
+                }
+                ch = ((Uint32) p[1] << 8) | (Uint32) p[0];
+                src += 2;
+                srclen -= 2;
+            }
+            break;
+        case ENCODING_UCS2BE:
+            {
+                Uint8 *p = (Uint8 *) src;
+                if (srclen < 2) {
+                    return SDL_ICONV_EINVAL;
+                }
+                ch = ((Uint32) p[0] << 8) | (Uint32) p[1];
+                src += 2;
+                srclen -= 2;
+            }
+            break;
+        case ENCODING_UCS4BE:
         case ENCODING_UTF32BE:
             {
                 Uint8 *p = (Uint8 *) src;
@@ -531,6 +580,7 @@ SDL_iconv(SDL_iconv_t cd,
                 srclen -= 4;
             }
             break;
+        case ENCODING_UCS4LE:
         case ENCODING_UTF32LE:
             {
                 Uint8 *p = (Uint8 *) src;
@@ -540,28 +590,6 @@ SDL_iconv(SDL_iconv_t cd,
                 ch = ((Uint32) p[3] << 24) |
                     ((Uint32) p[2] << 16) |
                     ((Uint32) p[1] << 8) | (Uint32) p[0];
-                src += 4;
-                srclen -= 4;
-            }
-            break;
-        case ENCODING_UCS2:
-            {
-                Uint16 *p = (Uint16 *) src;
-                if (srclen < 2) {
-                    return SDL_ICONV_EINVAL;
-                }
-                ch = *p;
-                src += 2;
-                srclen -= 2;
-            }
-            break;
-        case ENCODING_UCS4:
-            {
-                Uint32 *p = (Uint32 *) src;
-                if (srclen < 4) {
-                    return SDL_ICONV_EINVAL;
-                }
-                ch = *p;
                 src += 4;
                 srclen -= 4;
             }
@@ -728,12 +756,46 @@ SDL_iconv(SDL_iconv_t cd,
                 }
             }
             break;
-        case ENCODING_UTF32BE:
+        case ENCODING_UCS2BE:
             {
                 Uint8 *p = (Uint8 *) dst;
-                if (ch > 0x10FFFF) {
+                if (ch > 0xFFFF) {
                     ch = UNKNOWN_UNICODE;
                 }
+                if (dstlen < 2) {
+                    return SDL_ICONV_E2BIG;
+                }
+                p[0] = (Uint8) (ch >> 8);
+                p[1] = (Uint8) ch;
+                dst += 2;
+                dstlen -= 2;
+            }
+            break;
+        case ENCODING_UCS2LE:
+            {
+                Uint8 *p = (Uint8 *) dst;
+                if (ch > 0xFFFF) {
+                    ch = UNKNOWN_UNICODE;
+                }
+                if (dstlen < 2) {
+                    return SDL_ICONV_E2BIG;
+                }
+                p[1] = (Uint8) (ch >> 8);
+                p[0] = (Uint8) ch;
+                dst += 2;
+                dstlen -= 2;
+            }
+            break;
+        case ENCODING_UTF32BE:
+            if (ch > 0x10FFFF) {
+                ch = UNKNOWN_UNICODE;
+            }
+        case ENCODING_UCS4BE:
+            if (ch > 0x7FFFFFFF) {
+                ch = UNKNOWN_UNICODE;
+            }
+            {
+                Uint8 *p = (Uint8 *) dst;
                 if (dstlen < 4) {
                     return SDL_ICONV_E2BIG;
                 }
@@ -746,11 +808,15 @@ SDL_iconv(SDL_iconv_t cd,
             }
             break;
         case ENCODING_UTF32LE:
+            if (ch > 0x10FFFF) {
+                ch = UNKNOWN_UNICODE;
+            }
+        case ENCODING_UCS4LE:
+            if (ch > 0x7FFFFFFF) {
+                ch = UNKNOWN_UNICODE;
+            }
             {
                 Uint8 *p = (Uint8 *) dst;
-                if (ch > 0x10FFFF) {
-                    ch = UNKNOWN_UNICODE;
-                }
                 if (dstlen < 4) {
                     return SDL_ICONV_E2BIG;
                 }
@@ -758,34 +824,6 @@ SDL_iconv(SDL_iconv_t cd,
                 p[2] = (Uint8) (ch >> 16);
                 p[1] = (Uint8) (ch >> 8);
                 p[0] = (Uint8) ch;
-                dst += 4;
-                dstlen -= 4;
-            }
-            break;
-        case ENCODING_UCS2:
-            {
-                Uint16 *p = (Uint16 *) dst;
-                if (ch > 0xFFFF) {
-                    ch = UNKNOWN_UNICODE;
-                }
-                if (dstlen < 2) {
-                    return SDL_ICONV_E2BIG;
-                }
-                *p = (Uint16) ch;
-                dst += 2;
-                dstlen -= 2;
-            }
-            break;
-        case ENCODING_UCS4:
-            {
-                Uint32 *p = (Uint32 *) dst;
-                if (ch > 0x7FFFFFFF) {
-                    ch = UNKNOWN_UNICODE;
-                }
-                if (dstlen < 4) {
-                    return SDL_ICONV_E2BIG;
-                }
-                *p = ch;
                 dst += 4;
                 dstlen -= 4;
             }

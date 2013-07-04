@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -41,13 +41,13 @@ SDL_AtomicTryLock(SDL_SpinLock *lock)
         /* Race condition on first lock... */
         _spinlock_mutex = SDL_CreateMutex();
     }
-    SDL_mutexP(_spinlock_mutex);
+    SDL_LockMutex(_spinlock_mutex);
     if (*lock == 0) {
         *lock = 1;
-        SDL_mutexV(_spinlock_mutex);
+        SDL_UnlockMutex(_spinlock_mutex);
         return SDL_TRUE;
     } else {
-        SDL_mutexV(_spinlock_mutex);
+        SDL_UnlockMutex(_spinlock_mutex);
         return SDL_FALSE;
     }
 
@@ -76,11 +76,11 @@ SDL_AtomicTryLock(SDL_SpinLock *lock)
     return (result == 0);
 
 #elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
-	int result;
-	__asm__ __volatile__(
+    int result;
+    __asm__ __volatile__(
         "lock ; xchgl %0, (%1)\n"
         : "=r" (result) : "r" (lock), "0" (1) : "cc", "memory");
-	return (result == 0);
+    return (result == 0);
 
 #elif defined(__MACOSX__) || defined(__IPHONEOS__)
     /* Maybe used for PowerPC, but the Intel asm or gcc atomics are favored. */
@@ -114,10 +114,10 @@ SDL_AtomicUnlock(SDL_SpinLock *lock)
 
 #elif HAVE_GCC_ATOMICS || HAVE_GCC_SYNC_LOCK_TEST_AND_SET
     __sync_lock_release(lock);
-    
+
 #elif HAVE_PTHREAD_SPINLOCK
     pthread_spin_unlock(lock);
-	
+
 #else
     *lock = 0;
 #endif

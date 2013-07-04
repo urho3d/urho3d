@@ -51,6 +51,15 @@
 #include "SDL_stdinc.h"
 #include "SDL_assert.h"
 
+#ifdef SDL_qsort
+#undef SDL_qsort
+void
+SDL_qsort(void *base, size_t nmemb, size_t size, int (*compare) (const void *, const void *))
+{
+    SDL_qsort_inline(base, nmemb, size, compare);
+}
+#else
+
 #ifdef assert
 #undef assert
 #endif
@@ -75,9 +84,6 @@
 #undef qsort
 #endif
 #define qsort	SDL_qsort
-
-
-#ifndef HAVE_QSORT
 
 static const char _ID[] = "<qsort.c gjm 1.12 1998-03-19>";
 
@@ -466,5 +472,6 @@ qsort(void *base, size_t nmemb, size_t size,
         qsort_words(base, nmemb, compare);
 }
 
-#endif /* !HAVE_QSORT */
+#endif /* !SDL_qsort */
+
 /* vi: set ts=4 sw=4 expandtab: */

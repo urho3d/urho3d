@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 
 /* The SDL audio driver */
 typedef struct SDL_AudioDevice SDL_AudioDevice;
-#define _THIS	SDL_AudioDevice *_this
+#define _THIS   SDL_AudioDevice *_this
 
 /* Used by audio targets during DetectDevices() */
 typedef void (*SDL_AddAudioDevice)(const char *name);

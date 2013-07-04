@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,7 +27,7 @@
 
 #include "../../core/windows/SDL_windows.h"
 
-#if defined(_MSC_VER) && !defined(_WIN32_WCE)
+#if defined(_MSC_VER)
 #include <msctf.h>
 #else
 #include "SDL_msctf.h"
@@ -51,8 +51,8 @@
 
 #if WINVER < 0x0601
 /* Touch input definitions */
-#define TWF_FINETOUCH	1
-#define TWF_WANTPALM	2
+#define TWF_FINETOUCH   1
+#define TWF_WANTPALM    2
 
 #define TOUCHEVENTF_MOVE 0x0001
 #define TOUCHEVENTF_DOWN 0x0002
@@ -61,16 +61,16 @@
 DECLARE_HANDLE(HTOUCHINPUT);
 
 typedef struct _TOUCHINPUT {
-	LONG      x;
-	LONG      y;
-	HANDLE    hSource;
-	DWORD     dwID;
-	DWORD     dwFlags;
-	DWORD     dwMask;
-	DWORD     dwTime;
-	ULONG_PTR dwExtraInfo;
-	DWORD     cxContact;
-	DWORD     cyContact;
+    LONG      x;
+    LONG      y;
+    HANDLE    hSource;
+    DWORD     dwID;
+    DWORD     dwFlags;
+    DWORD     dwMask;
+    DWORD     dwTime;
+    ULONG_PTR dwExtraInfo;
+    DWORD     cxContact;
+    DWORD     cyContact;
 } TOUCHINPUT, *PTOUCHINPUT;
 
 #endif /* WINVER < 0x0601 */
@@ -78,7 +78,7 @@ typedef struct _TOUCHINPUT {
 typedef BOOL  (*PFNSHFullScreen)(HWND, DWORD);
 typedef void  (*PFCoordTransform)(SDL_Window*, POINT*);
 
-typedef struct  
+typedef struct
 {
     void **lpVtbl;
     int refcount;
@@ -115,20 +115,13 @@ typedef struct SDL_VideoData
 {
     int render;
 
-#ifdef _WIN32_WCE
-    void* hAygShell;
-    PFNSHFullScreen SHFullScreen;
-    PFCoordTransform CoordTransform;
-#endif
+    DWORD clipboard_count;
 
-    const SDL_Scancode *key_layout;
-	DWORD clipboard_count;
-
-	/* Touch input functions */
-	void* userDLL;
-	BOOL (WINAPI *CloseTouchInputHandle)( HTOUCHINPUT );
-	BOOL (WINAPI *GetTouchInputInfo)( HTOUCHINPUT, UINT, PTOUCHINPUT, int );
-	BOOL (WINAPI *RegisterTouchWindow)( HWND, ULONG );
+    /* Touch input functions */
+    void* userDLL;
+    BOOL (WINAPI *CloseTouchInputHandle)( HTOUCHINPUT );
+    BOOL (WINAPI *GetTouchInputInfo)( HTOUCHINPUT, UINT, PTOUCHINPUT, int );
+    BOOL (WINAPI *RegisterTouchWindow)( HWND, ULONG );
 
     SDL_bool ime_com_initialized;
     struct ITfThreadMgr *ime_threadmgr;

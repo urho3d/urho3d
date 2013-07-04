@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,7 +30,7 @@
 #include "SDL_assert.h"
 #include "SDL_syspower.h"
 
-// turn off the battery monitor if it's been more than X ms since last check.
+/* turn off the battery monitor if it's been more than X ms since last check. */
 static const int BATTERY_MONITORING_TIMEOUT = 3000;
 static Uint32 SDL_UIKitLastPowerInfoQuery = 0;
 
@@ -41,7 +41,7 @@ SDL_UIKit_UpdateBatteryMonitoring(void)
         const Uint32 prev = SDL_UIKitLastPowerInfoQuery;
         const UInt32 now = SDL_GetTicks();
         const UInt32 ticks = now - prev;
-        // if timer wrapped (now < prev), shut down, too.
+        /* if timer wrapped (now < prev), shut down, too. */
         if ((now < prev) || (ticks >= BATTERY_MONITORING_TIMEOUT)) {
             UIDevice *uidev = [UIDevice currentDevice];
             SDL_assert([uidev isBatteryMonitoringEnabled] == YES);
@@ -61,13 +61,14 @@ SDL_GetPowerInfo_UIKit(SDL_PowerState * state, int *seconds, int *percent)
         [uidev setBatteryMonitoringEnabled:YES];
     }
 
-    // UIKit_GL_SwapWindow() (etc) will check this and disable the battery
-    //  monitoring if the app hasn't queried it in the last X seconds.
-    //  Apparently monitoring the battery burns battery life.  :)
-    //  Apple's docs say not to monitor the battery unless you need it.
+    /* UIKit_GL_SwapWindow() (etc) will check this and disable the battery
+     *  monitoring if the app hasn't queried it in the last X seconds.
+     *  Apparently monitoring the battery burns battery life.  :)
+     *  Apple's docs say not to monitor the battery unless you need it.
+     */
     SDL_UIKitLastPowerInfoQuery = SDL_GetTicks();
 
-    *seconds = -1;   // no API to estimate this in UIKit.
+    *seconds = -1;   /* no API to estimate this in UIKit. */
 
     switch ([uidev batteryState])
     {

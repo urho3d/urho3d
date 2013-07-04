@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,11 +27,7 @@
 
 #include "SDL_timer.h"
 
-#ifdef _WIN32_WCE
-#error This is WinCE. Please use src/timer/wince/SDL_systimer.c instead.
-#endif
-
-#define TIME_WRAP_VALUE	(~(DWORD)0)
+#define TIME_WRAP_VALUE (~(DWORD)0)
 
 /* The first (low-resolution) ticks value of the application */
 static DWORD start;
@@ -52,13 +48,13 @@ SDL_StartTicks(void)
 #ifdef USE_GETTICKCOUNT
     start = GetTickCount();
 #else
-#if 0                           /* Apparently there are problems with QPC on Win2K */
+    /* QueryPerformanceCounter has had problems in the past, but lots of games
+       use it, so we'll rely on it here.
+     */
     if (QueryPerformanceFrequency(&hires_ticks_per_second) == TRUE) {
         hires_timer_available = TRUE;
         QueryPerformanceCounter(&hires_start_ticks);
-    } else
-#endif
-    {
+    } else {
         hires_timer_available = FALSE;
         timeBeginPeriod(1);     /* use 1 ms timer precision */
         start = timeGetTime();

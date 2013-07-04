@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -241,8 +241,7 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden = (struct SDL_PrivateAudioData *)
         SDL_malloc((sizeof *this->hidden));
     if (this->hidden == NULL) {
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden, 0, (sizeof *this->hidden));
 
@@ -271,22 +270,19 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
     }
     if (format == 0) {
         ARTS_CloseDevice(this);
-        SDL_SetError("Couldn't find any hardware audio formats");
-        return 0;
+        return SDL_SetError("Couldn't find any hardware audio formats");
     }
     this->spec.format = test_format;
 
     if ((rc = SDL_NAME(arts_init) ()) != 0) {
         ARTS_CloseDevice(this);
-        SDL_SetError("Unable to initialize ARTS: %s",
-                     SDL_NAME(arts_error_text) (rc));
-        return 0;
+        return SDL_SetError("Unable to initialize ARTS: %s",
+                            SDL_NAME(arts_error_text) (rc));
     }
 
     if (!ARTS_Suspend()) {
         ARTS_CloseDevice(this);
-        SDL_SetError("ARTS can not open audio device");
-        return 0;
+        return SDL_SetError("ARTS can not open audio device");
     }
 
     this->hidden->stream = SDL_NAME(arts_play_stream) (this->spec.freq,
@@ -304,8 +300,7 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
     for (frag_spec = 0; (0x01 << frag_spec) < this->spec.size; ++frag_spec);
     if ((0x01 << frag_spec) != this->spec.size) {
         ARTS_CloseDevice(this);
-        SDL_SetError("Fragment size must be a power of two");
-        return 0;
+        return SDL_SetError("Fragment size must be a power of two");
     }
     frag_spec |= 0x00020000;    /* two fragments, for low latency */
 
@@ -326,8 +321,7 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->hidden->mixlen);
     if (this->hidden->mixbuf == NULL) {
         ARTS_CloseDevice(this);
-        SDL_OutOfMemory();
-        return 0;
+        return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
 
@@ -335,7 +329,7 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
     this->hidden->parent = getpid();
 
     /* We're ready to rock and roll. :-) */
-    return 1;
+    return 0;
 }
 
 

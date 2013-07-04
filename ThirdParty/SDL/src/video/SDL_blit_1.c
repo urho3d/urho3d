@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -511,11 +511,11 @@ Blit1toNAlphaKey(SDL_BlitInfo * info)
 }
 
 static const SDL_BlitFunc one_blit[] = {
-    NULL, Blit1to1, Blit1to2, Blit1to3, Blit1to4
+    (SDL_BlitFunc) NULL, Blit1to1, Blit1to2, Blit1to3, Blit1to4
 };
 
 static const SDL_BlitFunc one_blitkey[] = {
-    NULL, Blit1to1Key, Blit1to2Key, Blit1to3Key, Blit1to4Key
+    (SDL_BlitFunc) NULL, Blit1to1Key, Blit1to2Key, Blit1to3Key, Blit1to4Key
 };
 
 SDL_BlitFunc
@@ -541,12 +541,12 @@ SDL_CalculateBlit1(SDL_Surface * surface)
         /* Supporting 8bpp->8bpp alpha is doable but requires lots of
            tables which consume space and takes time to precompute,
            so is better left to the user */
-        return which >= 2 ? Blit1toNAlpha : NULL;
+        return which >= 2 ? Blit1toNAlpha : (SDL_BlitFunc) NULL;
 
     case SDL_COPY_COLORKEY | SDL_COPY_MODULATE_ALPHA | SDL_COPY_BLEND:
-        return which >= 2 ? Blit1toNAlphaKey : NULL;
+        return which >= 2 ? Blit1toNAlphaKey : (SDL_BlitFunc) NULL;
     }
-    return NULL;
+    return (SDL_BlitFunc) NULL;
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -76,8 +76,7 @@ int BE_CreateWindowFramebuffer(_THIS, SDL_Window * window,
 			true);	/* Contiguous memory required */
 			
 	if(bitmap->InitCheck() != B_OK) {
-		SDL_SetError("Could not initialize back buffer!\n");
-		return -1;
+		return SDL_SetError("Could not initialize back buffer!\n");
 	}
 
 
@@ -98,7 +97,7 @@ int BE_CreateWindowFramebuffer(_THIS, SDL_Window * window,
 
 
 int BE_UpdateWindowFramebuffer(_THIS, SDL_Window * window,
-                                      SDL_Rect * rects, int numrects) {
+                                      const SDL_Rect * rects, int numrects) {
 	if(!window)
 		return 0;
 

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -68,20 +68,17 @@ X11_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format,
     gcv.graphics_exposures = False;
     data->gc = XCreateGC(display, data->xwindow, GCGraphicsExposures, &gcv);
     if (!data->gc) {
-        SDL_SetError("Couldn't create graphics context");
-        return -1;
+        return SDL_SetError("Couldn't create graphics context");
     }
 
     /* Find out the pixel format and depth */
     if (X11_GetVisualInfoFromVisual(display, data->visual, &vinfo) < 0) {
-        SDL_SetError("Couldn't get window visual information");
-        return -1;
+        return SDL_SetError("Couldn't get window visual information");
     }
 
     *format = X11_GetPixelFormatFromVisualInfo(display, &vinfo);
     if (*format == SDL_PIXELFORMAT_UNKNOWN) {
-        SDL_SetError("Unknown window pixel format");
-        return -1;
+        return SDL_SetError("Unknown window pixel format");
     }
 
     /* Calculate pitch */
@@ -114,7 +111,7 @@ X11_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format,
         if (!shm_error) {
             data->ximage = XShmCreateImage(display, data->visual,
                              vinfo.depth, ZPixmap,
-                             shminfo->shmaddr, shminfo, 
+                             shminfo->shmaddr, shminfo,
                              window->w, window->h);
             if (!data->ximage) {
                 XShmDetach(display, shminfo);
@@ -132,55 +129,88 @@ X11_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format,
 
     *pixels = SDL_malloc(window->h*(*pitch));
     if (*pixels == NULL) {
-        SDL_OutOfMemory();
-        return -1;
+        return SDL_OutOfMemory();
     }
 
     data->ximage = XCreateImage(display, data->visual,
-                      vinfo.depth, ZPixmap, 0, (char *)(*pixels), 
+                      vinfo.depth, ZPixmap, 0, (char *)(*pixels),
                       window->w, window->h, 32, 0);
     if (!data->ximage) {
         SDL_free(*pixels);
-        SDL_SetError("Couldn't create XImage");
-        return -1;
+        return SDL_SetError("Couldn't create XImage");
     }
     return 0;
 }
 
 int
-X11_UpdateWindowFramebuffer(_THIS, SDL_Window * window, SDL_Rect * rects,
+X11_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rect * rects,
                             int numrects)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
     Display *display = data->videodata->display;
     int i;
-    SDL_Rect *rect;
-
+    int x, y, w ,h;
 #ifndef NO_SHARED_MEMORY
     if (data->use_mitshm) {
         for (i = 0; i < numrects; ++i) {
-            rect = &rects[i];
+            x = rects[i].x;
+            y = rects[i].y;
+            w = rects[i].w;
+            h = rects[i].h;
 
-            if (rect->w == 0 || rect->h == 0) { /* Clipped? */
+            if (w <= 0 || h <= 0 || (x + w) <= 0 || (y + h) <= 0) {
+                /* Clipped? */
                 continue;
             }
+            if (x < 0)
+            {
+                x += w;
+                w += rects[i].x;
+            }
+            if (y < 0)
+            {
+                y += h;
+                h += rects[i].y;
+            }
+            if (x + w > window->w)
+                w = window->w - x;
+            if (y + h > window->h)
+                h = window->h - y;
+
             XShmPutImage(display, data->xwindow, data->gc, data->ximage,
-                    rect->x, rect->y,
-                    rect->x, rect->y, rect->w, rect->h, False);
+                x, y, x, y, w, h, False);
         }
     }
     else
 #endif /* !NO_SHARED_MEMORY */
     {
         for (i = 0; i < numrects; ++i) {
-            rect = &rects[i];
+            x = rects[i].x;
+            y = rects[i].y;
+            w = rects[i].w;
+            h = rects[i].h;
 
-            if (rect->w == 0 || rect->h == 0) { /* Clipped? */
+            if (w <= 0 || h <= 0 || (x + w) <= 0 || (y + h) <= 0) {
+                /* Clipped? */
                 continue;
             }
+            if (x < 0)
+            {
+                x += w;
+                w += rects[i].x;
+            }
+            if (y < 0)
+            {
+                y += h;
+                h += rects[i].y;
+            }
+            if (x + w > window->w)
+                w = window->w - x;
+            if (y + h > window->h)
+                h = window->h - y;
+
             XPutImage(display, data->xwindow, data->gc, data->ximage,
-                  rect->x, rect->y,
-                  rect->x, rect->y, rect->w, rect->h);
+                x, y, x, y, w, h);
         }
     }
 

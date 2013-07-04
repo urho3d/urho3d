@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -258,7 +258,7 @@ static void
 BlitRGBtoRGBSurfaceAlphaMMX(SDL_BlitInfo * info)
 {
     SDL_PixelFormat *df = info->dst_fmt;
-    Uint32 chanmask = df->Rmask | df->Gmask | df->Bmask;
+    Uint32 chanmask;
     unsigned alpha = info->a;
 
     if (alpha == 128 && (df->Rmask | df->Gmask | df->Bmask) == 0x00FFFFFF) {
