@@ -564,6 +564,8 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
 
     PROFILE(UpdateDrawables);
 
+    // Perform updates in worker threads. Notify the scene that a threaded update is going on and components 
+    // (for example physics objects) should not perform non-threadsafe work when marked dirty
     Scene* scene = GetScene();
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     scene->BeginThreadedUpdate();
