@@ -70,6 +70,10 @@ Log::Log(Context* context) :
     Object(context)
 {
     MutexLock lock(GetStaticMutex());
+#ifdef ANDROID
+    // On Android we may have instances from a previous run
+    logInstances.Clear();
+#endif
     logInstances.Push(this);
 }
 

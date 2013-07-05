@@ -54,10 +54,13 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
+static PODVector<Input*> inputInstances;
+
 OBJECTTYPESTATIC(Input);
 
 Input::Input(Context* context) :
     Object(context),
+    eventQueue_(new PODVector<SDL_Event>()),
     mouseButtonDown_(0),
     mouseButtonPress_(0),
     mouseMoveWheel_(0),
@@ -70,6 +73,15 @@ Input::Input(Context* context) :
     suppressNextMouseMove_(false),
     initialized_(false)
 {
+    {
+        MutexLock lock(GetStaticMutex());
+#ifdef ANDROID
+        // On Android we may have instances from a previous run
+        inputInstances.Clear();
+#endif
+        inputInstances.Push(this);
+    }
+    
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
     
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -78,6 +90,12 @@ Input::Input(Context* context) :
 
 Input::~Input()
 {
+    PODVector<SDL_Event>* eventQueue = reinterpret_cast<PODVector<SDL_Event>* >(eventQueue_);
+    delete eventQueue;
+    eventQueue_ = 0;
+    
+    MutexLock lock(GetStaticMutex());
+    inputInstances.Remove(this);
 }
 
 void Input::Update()
@@ -105,24 +123,88 @@ void Input::Update()
         state.delta_ = IntVector2::ZERO;
     }
     
+    // Check for SDL events
     {
         MutexLock lock(GetStaticMutex());
         
-        // Pump SDL events
-        /// \todo This does not handle multiple input instances properly. Each instance will need its own event queue,
-        /// where SDL events are copied and which it handles in its own main thread
         SDL_Event evt;
-        SDL_PumpEvents();
         while (SDL_PollEvent(&evt))
-            HandleSDLEvent(&evt);
+        {
+            // If only one instance, can handle event directly. Otherwise put to the correct input instance's event queue
+            if (inputInstances.Size() > 1)
+            {
+                for (PODVector<Input*>::Iterator i = inputInstances.Begin(); i != inputInstances.End(); ++i)
+                {
+                    bool storeEvent = false;
+                    
+                    switch (evt.type)
+                    {
+                    case SDL_KEYDOWN:
+                    case SDL_KEYUP:
+                        storeEvent = evt.key.windowID == (*i)->windowID_;
+                        break;
+                        
+                    case SDL_TEXTINPUT:
+                        storeEvent = evt.text.windowID == (*i)->windowID_;
+                    
+                    case SDL_MOUSEBUTTONDOWN:
+                    case SDL_MOUSEBUTTONUP:
+                        storeEvent = evt.button.windowID == (*i)->windowID_;
+                        break;
+                        
+                    case SDL_MOUSEWHEEL:
+                        storeEvent = evt.wheel.windowID == (*i)->windowID_;
+                        break;
+                        
+                    // Joystick and touch events do not have a windowID. Store depending on input focus
+                    case SDL_JOYBUTTONDOWN:
+                    case SDL_JOYBUTTONUP:
+                    case SDL_JOYAXISMOTION:
+                    case SDL_JOYHATMOTION:
+                    case SDL_FINGERDOWN:
+                    case SDL_FINGERUP:
+                    case SDL_FINGERMOTION:
+                        storeEvent = (*i)->inputFocus_;
+                        break;
+                        
+                    case SDL_WINDOWEVENT:
+                        storeEvent = evt.window.windowID == (*i)->windowID_;
+                        break;
+                    }
+                    
+                    if (storeEvent)
+                    {
+                        (*i)->eventQueueMutex_.Acquire();
+                        PODVector<SDL_Event>* eventQueue = reinterpret_cast<PODVector<SDL_Event>* >((*i)->eventQueue_);
+                        eventQueue->Push(evt);
+                        (*i)->eventQueueMutex_.Release();
+                    }
+                }
+            }
+            else
+                HandleSDLEvent(&evt);
+        }
+    }
+    
+    // Handle own event queue now if necessary
+    if (inputInstances.Size() > 1)
+    {
+        eventQueueMutex_.Acquire();
+        
+        PODVector<SDL_Event>* eventQueue = reinterpret_cast<PODVector<SDL_Event>* >(eventQueue_);
+        for (PODVector<SDL_Event>::Iterator i = eventQueue->Begin(); i != eventQueue->End(); ++i)
+            HandleSDLEvent(&(*i));
+        eventQueue->Clear();
+        
+        eventQueueMutex_.Release();
     }
     
     // Check for activation and inactivation from SDL window flags. Must nullcheck the window pointer because it may have
     // been closed due to input events
     SDL_Window* window = graphics_->GetImpl()->GetWindow();
+    unsigned flags = window ? SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS) : 0;
     if (window)
     {
-        unsigned flags = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
 #ifdef REQUIRE_CLICK_TO_FOCUS
         if (!inputFocus_ && (graphics_->GetFullscreen() || mouseVisible_) && flags == (SDL_WINDOW_INPUT_FOCUS |
             SDL_WINDOW_MOUSE_FOCUS))
@@ -130,12 +212,12 @@ void Input::Update()
         if (!inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS))
 #endif
             focusedThisFrame_ = true;
-        else if (inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
-            LoseFocus();
         
-        // Activate input now if necessary
         if (focusedThisFrame_)
             GainFocus();
+        
+        if (inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS) == 0)
+            LoseFocus();
     }
     else
         return;

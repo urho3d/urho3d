@@ -24,6 +24,7 @@
 
 #include "HashSet.h"
 #include "InputEvents.h"
+#include "Mutex.h"
 #include "Object.h"
 
 namespace Urho3D
@@ -217,6 +218,10 @@ private:
     HashMap<int, TouchState> touches_;
     /// Opened joysticks.
     Vector<JoystickState> joysticks_;
+    /// Per-instance SDL event queue.
+    void* eventQueue_;
+    /// Per-instance SDL event queue mutex.
+    Mutex eventQueueMutex_;
     /// Mouse buttons' down state.
     unsigned mouseButtonDown_;
     /// Mouse buttons' pressed state.
