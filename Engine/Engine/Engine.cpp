@@ -30,6 +30,7 @@
 #include "FileSystem.h"
 #include "Graphics.h"
 #include "Input.h"
+#include "InputEvents.h"
 #include "Log.h"
 #include "Navigation.h"
 #include "Network.h"
@@ -84,12 +85,14 @@ Engine::Engine(Context* context) :
     maxFps_(200),
     maxInactiveFps_(60),
     pauseMinimized_(false),
+    autoExit_(true),
     #endif
     initialized_(false),
     exiting_(false),
     headless_(false),
     audioPaused_(false)
 {
+    SubscribeToEvent(E_EXITREQUESTED, HANDLER(Engine, HandleExitRequested));
 }
 
 Engine::~Engine()
@@ -343,6 +346,11 @@ void Engine::SetMaxInactiveFps(int fps)
 void Engine::SetPauseMinimized(bool enable)
 {
     pauseMinimized_ = enable;
+}
+
+void Engine::SetAutoExit(bool enable)
+{
+    autoExit_ = enable;
 }
 
 void Engine::Exit()
@@ -660,6 +668,12 @@ void Engine::RegisterSubsystems()
     for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
         SharedPtr<Object> object = i->second_->CreateObject();
     #endif
+}
+
+void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
+{
+    if (autoExit_)
+        Exit();
 }
 
 }

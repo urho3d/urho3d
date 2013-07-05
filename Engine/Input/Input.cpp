@@ -38,6 +38,8 @@
 
 #include "DebugNew.h"
 
+// Require a click inside window before re-hiding mouse cursor on OSX, otherwise dragging the window
+// can be incorrectly interpreted as mouse movement inside the window
 #if defined(__APPLE__) && !defined(IOS)
     #define REQUIRE_CLICK_TO_FOCUS
 #endif
@@ -124,11 +126,13 @@ void Input::Update()
     }
     
     // Check for SDL events
+    SDL_PumpEvents();
+    
     {
         MutexLock lock(GetStaticMutex());
         
         SDL_Event evt;
-        while (SDL_PollEvent(&evt))
+        while (SDL_PeepEvents(&evt, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) > 0)
         {
             // If only one instance, can handle event directly. Otherwise put to the correct input instance's event queue
             if (inputInstances.Size() > 1)
@@ -169,6 +173,10 @@ void Input::Update()
                         
                     case SDL_WINDOWEVENT:
                         storeEvent = evt.window.windowID == (*i)->windowID_;
+                        break;
+                        
+                    case SDL_QUIT:
+                        storeEvent = true;
                         break;
                     }
                     
@@ -587,8 +595,6 @@ void Input::SendInputFocusEvent()
 void Input::SetMouseButton(int button, bool newState)
 {
 #ifdef REQUIRE_CLICK_TO_FOCUS
-    // OSX only: after losing focus in windowed hidden mouse mode, regain focus only after a left-click inside the window.
-    // This allows glitchfree window dragging
     if (!mouseVisible_ && !graphics_->GetFullscreen())
     {
         if (!inputFocus_ && newState && button == MOUSEB_LEFT)
@@ -875,7 +881,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             switch (evt.window.event)
             {
             case SDL_WINDOWEVENT_CLOSE:
-                graphics_->Close();
+                SendEvent(E_EXITREQUESTED);
                 break;
                 
             case SDL_WINDOWEVENT_MINIMIZED:
@@ -913,6 +919,10 @@ void Input::HandleSDLEvent(void* sdlEvent)
             #endif
             }
         }
+        break;
+        
+    case SDL_QUIT:
+        SendEvent(E_EXITREQUESTED);
         break;
     }
 }

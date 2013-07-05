@@ -155,6 +155,11 @@ EVENT(E_INPUTFOCUS, InputFocus)
     PARAM(P_MINIMIZED, Minimized);          // bool
 }
 
+/// Application exit requested.
+EVENT(E_EXITREQUESTED, ExitRequested)
+{
+}
+
 static const int MOUSEB_LEFT = 1;
 static const int MOUSEB_MIDDLE = 2;
 static const int MOUSEB_RIGHT = 4;

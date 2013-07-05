@@ -58,6 +58,8 @@ public:
     void SetMaxInactiveFps(int fps);
     /// Set whether to pause update events and audio when minimized.
     void SetPauseMinimized(bool enable);
+    /// Set whether to exit automatically on exit request (window close button.)
+    void SetAutoExit(bool enable);
     /// Close the application window and set the exit flag.
     void Exit();
     /// Dump profiling information to the log.
@@ -75,6 +77,8 @@ public:
     int GetMaxInactiveFps() const { return maxInactiveFps_; }
     /// Return whether to pause update events and audio when minimized.
     bool GetPauseMinimized() const { return pauseMinimized_; }
+    /// Return whether to exit automatically on exit request.
+    bool GetAutoExit() const { return autoExit_; }
     /// Return whether engine has been initialized.
     bool IsInitialized() const { return initialized_; }
     /// Return whether exit has been requested.
@@ -99,6 +103,8 @@ public:
 private:
     /// Create and register subsystems. In headless mode graphics, input & UI are not created.
     void RegisterSubsystems();
+    /// Handle exit requested event.
+    void HandleExitRequested(StringHash eventType, VariantMap& eventData);
     
     /// Frame update timer.
     HiresTimer frameTimer_;
@@ -112,6 +118,8 @@ private:
     unsigned maxInactiveFps_;
     /// Pause when minimized flag.
     bool pauseMinimized_;
+    /// Auto-exit flag.
+    bool autoExit_;
     /// Initialized flag.
     bool initialized_;
     /// Exiting flag.
