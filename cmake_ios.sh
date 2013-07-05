@@ -1,5 +1,5 @@
 rm -f CMakeCache.txt
-cmake -G "Xcode" -DIOS=1
+cmake -G "Xcode" -DIOS=1 $@
 sed -i.bak 's/OpenGL/Direct3D9/g' Doxyfile
 #
 # Below fix may no longer be required for newer version of CMake.
