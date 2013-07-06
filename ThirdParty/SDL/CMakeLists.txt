@@ -3,16 +3,26 @@ set (TARGET_NAME SDL)
 
 # Define source files
 file (GLOB C_FILES
-    src/*.c src/atomic/*.c src/audio/*.c src/audio/disk/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c 
-    src/haptic/*.c src/joystick/*.c src/libm/*.c src/power/*.c src/stdlib/*.c src/thread/*.c src/timer/*.c src/video/*.c 
-    src/video/dummy/*.c
+    src/*.c src/atomic/*.c src/audio/*.c src/audio/disk/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c
+    src/haptic/*.c src/haptic/dummy/*.c src/joystick/*.c src/joystick/dummy/*.c src/libm/*.c src/power/*.c src/stdlib/*.c 
+    src/thread/*.c src/timer/*.c src/video/*.c src/video/dummy/*.c
 )
 
 if (WIN32)
     file (GLOB SYS_C_FILES
-        src/audio/directsound/*.c src/haptic/windows/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c 
+        src/audio/directsound/*.c src/haptic/windows/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c
         src/power/windows/*.c src/thread/windows/*.c src/thread/generic/SDL_syscond.c src/timer/windows/*.c src/video/windows/*.c
     )
+    CHECK_INCLUDE_FILES (wbemcli.h HAVE_WBEMCLI_H)
+    if (HAVE_WBEMCLI_H)
+        add_definitions (-DSDL_JOYSTICK_DINPUT)
+        add_definitions (-DSDL_HAPTIC_DINPUT)
+    else ()
+        message ("-- Building SDL without joystick support due to missing include file wbemcli.h")
+        message ("-- For MinGW, try installing it from eg. wine sources or from MinGW-w64")
+        add_definitions (-DSDL_JOYSTICK_DUMMY)
+        add_definitions (-DSDL_HAPTIC_DUMMY)
+    endif ()
 elseif (IOS)
     file (GLOB SYS_C_FILES
         src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/power/uikit/*.m 

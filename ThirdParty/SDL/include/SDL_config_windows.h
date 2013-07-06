@@ -152,8 +152,9 @@ typedef unsigned int uintptr_t;
 #define SDL_AUDIO_DRIVER_DUMMY  1
 
 /* Enable various input drivers */
-#define SDL_JOYSTICK_DINPUT 1
-#define SDL_HAPTIC_DINPUT   1
+// Urho3D: do not enable joystick & force feedback support by default, requires certain include files
+//#define SDL_JOYSTICK_DINPUT 1
+//#define SDL_HAPTIC_DINPUT   1
 
 /* Enable various shared object loading systems */
 #define SDL_LOADSO_WINDOWS  1
