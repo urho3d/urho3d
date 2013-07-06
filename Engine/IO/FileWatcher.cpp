@@ -46,8 +46,6 @@ namespace Urho3D
 
 static const unsigned BUFFERSIZE = 4096;
 
-OBJECTTYPESTATIC(FileWatcher);
-
 FileWatcher::FileWatcher(Context* context) :
     Object(context),
     fileSystem_(GetSubsystem<FileSystem>()),

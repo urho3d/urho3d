@@ -50,8 +50,6 @@ static bool CompareEntries(const FileSelectorEntry& lhs, const FileSelectorEntry
     return lhs.name_.Compare(rhs.name_, false) < 0;
 }
 
-OBJECTTYPESTATIC(FileSelector);
-
 FileSelector::FileSelector(Context* context) :
     Object(context),
     directoryMode_(false),

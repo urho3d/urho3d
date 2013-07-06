@@ -33,8 +33,6 @@ namespace Urho3D
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(Button);
-
 Button::Button(Context* context) :
     BorderImage(context),
     pressedOffset_(IntVector2::ZERO),

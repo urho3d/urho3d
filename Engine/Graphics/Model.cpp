@@ -59,8 +59,6 @@ unsigned LookupIndexBuffer(IndexBuffer* buffer, const Vector<SharedPtr<IndexBuff
     return 0;
 }
 
-OBJECTTYPESTATIC(Model);
-
 Model::Model(Context* context) :
     Resource(context)
 {

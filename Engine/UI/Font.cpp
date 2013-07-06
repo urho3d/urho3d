@@ -138,9 +138,6 @@ bool FontFace::IsDataLost() const
     return false;
 }
 
-OBJECTTYPESTATIC(FreeTypeLibrary);
-OBJECTTYPESTATIC(Font);
-
 Font::Font(Context* context) :
     Resource(context),
     fontDataSize_(0),

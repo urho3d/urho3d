@@ -35,8 +35,6 @@ namespace Urho3D
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(LineEdit);
-
 LineEdit::LineEdit(Context* context) :
     BorderImage(context),
     lastFont_(0),

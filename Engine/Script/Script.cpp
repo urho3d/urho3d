@@ -131,8 +131,6 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
     }
 }
 
-OBJECTTYPESTATIC(Script);
-
 Script::Script(Context* context) :
     Object(context),
     scriptEngine_(0),

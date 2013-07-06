@@ -71,8 +71,6 @@ namespace Urho3D
 
 extern const char* logLevelPrefixes[];
 
-OBJECTTYPESTATIC(Engine);
-
 Engine::Engine(Context* context) :
     Object(context),
     timeStep_(0.0f),

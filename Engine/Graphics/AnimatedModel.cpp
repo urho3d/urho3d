@@ -56,8 +56,6 @@ static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const Sh
 
 static const unsigned MAX_ANIMATION_STATES = 256;
 
-OBJECTTYPESTATIC(AnimatedModel);
-
 AnimatedModel::AnimatedModel(Context* context) :
     StaticModel(context),
     animationLodFrameNumber_(0),

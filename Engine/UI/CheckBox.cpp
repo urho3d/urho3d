@@ -33,8 +33,6 @@ namespace Urho3D
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(CheckBox);
-
 CheckBox::CheckBox(Context* context) :
     BorderImage(context),
     checkedOffset_(IntVector2::ZERO),

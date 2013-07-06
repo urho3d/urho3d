@@ -56,13 +56,8 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
-static PODVector<Input*> inputInstances;
-
-OBJECTTYPESTATIC(Input);
-
 Input::Input(Context* context) :
     Object(context),
-    eventQueue_(new PODVector<SDL_Event>()),
     mouseButtonDown_(0),
     mouseButtonPress_(0),
     mouseMoveWheel_(0),
@@ -75,15 +70,6 @@ Input::Input(Context* context) :
     suppressNextMouseMove_(false),
     initialized_(false)
 {
-    {
-        MutexLock lock(GetStaticMutex());
-#ifdef ANDROID
-        // On Android we may have instances from a previous run
-        inputInstances.Clear();
-#endif
-        inputInstances.Push(this);
-    }
-    
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
     
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -92,12 +78,6 @@ Input::Input(Context* context) :
 
 Input::~Input()
 {
-    PODVector<SDL_Event>* eventQueue = reinterpret_cast<PODVector<SDL_Event>* >(eventQueue_);
-    delete eventQueue;
-    eventQueue_ = 0;
-    
-    MutexLock lock(GetStaticMutex());
-    inputInstances.Remove(this);
 }
 
 void Input::Update()
@@ -125,87 +105,11 @@ void Input::Update()
         state.delta_ = IntVector2::ZERO;
     }
     
-    // Check for SDL events
+    // Check and handle SDL events
     SDL_PumpEvents();
-    
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        SDL_Event evt;
-        while (SDL_PeepEvents(&evt, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) > 0)
-        {
-            // If only one instance, can handle event directly. Otherwise put to the correct input instance's event queue
-            if (inputInstances.Size() > 1)
-            {
-                for (PODVector<Input*>::Iterator i = inputInstances.Begin(); i != inputInstances.End(); ++i)
-                {
-                    bool storeEvent = false;
-                    
-                    switch (evt.type)
-                    {
-                    case SDL_KEYDOWN:
-                    case SDL_KEYUP:
-                        storeEvent = evt.key.windowID == (*i)->windowID_;
-                        break;
-                        
-                    case SDL_TEXTINPUT:
-                        storeEvent = evt.text.windowID == (*i)->windowID_;
-                    
-                    case SDL_MOUSEBUTTONDOWN:
-                    case SDL_MOUSEBUTTONUP:
-                        storeEvent = evt.button.windowID == (*i)->windowID_;
-                        break;
-                        
-                    case SDL_MOUSEWHEEL:
-                        storeEvent = evt.wheel.windowID == (*i)->windowID_;
-                        break;
-                        
-                    // Joystick and touch events do not have a windowID. Store depending on input focus
-                    case SDL_JOYBUTTONDOWN:
-                    case SDL_JOYBUTTONUP:
-                    case SDL_JOYAXISMOTION:
-                    case SDL_JOYHATMOTION:
-                    case SDL_FINGERDOWN:
-                    case SDL_FINGERUP:
-                    case SDL_FINGERMOTION:
-                        storeEvent = (*i)->inputFocus_;
-                        break;
-                        
-                    case SDL_WINDOWEVENT:
-                        storeEvent = evt.window.windowID == (*i)->windowID_;
-                        break;
-                        
-                    case SDL_QUIT:
-                        storeEvent = true;
-                        break;
-                    }
-                    
-                    if (storeEvent)
-                    {
-                        (*i)->eventQueueMutex_.Acquire();
-                        PODVector<SDL_Event>* eventQueue = reinterpret_cast<PODVector<SDL_Event>* >((*i)->eventQueue_);
-                        eventQueue->Push(evt);
-                        (*i)->eventQueueMutex_.Release();
-                    }
-                }
-            }
-            else
-                HandleSDLEvent(&evt);
-        }
-    }
-    
-    // Handle own event queue now if necessary
-    if (inputInstances.Size() > 1)
-    {
-        eventQueueMutex_.Acquire();
-        
-        PODVector<SDL_Event>* eventQueue = reinterpret_cast<PODVector<SDL_Event>* >(eventQueue_);
-        for (PODVector<SDL_Event>::Iterator i = eventQueue->Begin(); i != eventQueue->End(); ++i)
-            HandleSDLEvent(&(*i));
-        eventQueue->Clear();
-        
-        eventQueueMutex_.Release();
-    }
+    SDL_Event evt;
+    while (SDL_PeepEvents(&evt, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) > 0)
+        HandleSDLEvent(&evt);
     
     // Check for activation and inactivation from SDL window flags. Must nullcheck the window pointer because it may have
     // been closed due to input events
@@ -232,7 +136,7 @@ void Input::Update()
     
 #if !defined(ANDROID) && !defined(IOS)
     // Check for mouse move
-    if (inputFocus_)
+    if (inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))
     {
         IntVector2 mousePosition = GetMousePosition();
         mouseMove_ = mousePosition - lastMousePosition_;
@@ -306,14 +210,10 @@ void Input::SetToggleFullscreen(bool enable)
 
 bool Input::DetectJoysticks()
 {
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-        SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-        ResetJoysticks();
-        return true;
-    }
+    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+    ResetJoysticks();
+    return true;
 }
 
 bool Input::OpenJoystick(unsigned index)
@@ -324,8 +224,6 @@ bool Input::OpenJoystick(unsigned index)
     // Check if already opened
     if (joysticks_[index].joystick_)
         return true;
-    
-    MutexLock lock(GetStaticMutex());
     
     SDL_Joystick* joystick = SDL_JoystickOpen(index);
     if (joystick)
@@ -354,8 +252,6 @@ bool Input::OpenJoystick(unsigned index)
 
 void Input::CloseJoystick(unsigned index)
 {
-    MutexLock lock(GetStaticMutex());
-    
     if (index < joysticks_.Size() && joysticks_[index].joystick_)
     {
         JoystickState& state = joysticks_[index];

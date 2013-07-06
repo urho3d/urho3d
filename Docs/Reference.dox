@@ -29,8 +29,6 @@ Classes that derive from Object contain type-identification, they can be created
 
 The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 16-bit hash of the type name (GetType() or GetTypeStatic()).
 
-In addition the OBJECTTYPESTATIC(className) macro must appear in a .cpp file to actually define the type identification data. The reason for this instead of defining the data directly inside the OBJECT macro as function-static data is thread safety: function-static data is initialized on the first use, and if the first call to an object's GetTypeStatic() or GetTypeNameStatic() happened on several threads simultaneously, the results would be undefined.
-
 To register an object factory for a specific type, call the \ref Context::RegisterFactory "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext "GetContext()". An example:
 
 \code

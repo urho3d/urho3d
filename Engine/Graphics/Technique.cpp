@@ -135,8 +135,6 @@ void Pass::MarkShadersLoaded(unsigned frameNumber)
     shadersLoadedFrameNumber_ = frameNumber;
 }
 
-OBJECTTYPESTATIC(Technique);
-
 Technique::Technique(Context* context) :
     Resource(context),
     isSM3_(false)

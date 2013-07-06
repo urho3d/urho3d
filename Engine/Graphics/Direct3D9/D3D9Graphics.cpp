@@ -163,11 +163,7 @@ static unsigned GetD3DColor(const Color& color)
     return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
 }
 
-static unsigned numInstances = 0;
-
 static unsigned depthStencilFormat = D3DFMT_D24S8;
-
-OBJECTTYPESTATIC(Graphics);
 
 Graphics::Graphics(Context* context) :
     Object(context),
@@ -199,15 +195,8 @@ Graphics::Graphics(Context* context) :
 {
     SetTextureUnitMappings();
     
-    // If first instance in this process, initialize SDL under static mutex. Note that Graphics subsystem will also be in charge
-    // of shutting down SDL as a whole, so it should be the last SDL-using subsystem (Audio and Input also use SDL) alive
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        if (!numInstances)
-            SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
-        ++numInstances;
-    }
+    // Initialize SDL now. Graphics should be the first SDL-using subsystem to be created
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
     
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
@@ -244,8 +233,6 @@ Graphics::~Graphics()
     }
     if (impl_->window_)
     {
-        MutexLock lock(GetStaticMutex());
-        
         SDL_ShowCursor(SDL_TRUE);
         SDL_DestroyWindow(impl_->window_);
         impl_->window_ = 0;
@@ -254,14 +241,8 @@ Graphics::~Graphics()
     delete impl_;
     impl_ = 0;
     
-    // If last instance in this process, shut down SDL under static mutex
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        --numInstances;
-        if (!numInstances)
-            SDL_Quit();
-    }
+    // Shut down SDL now. Graphics should be the last SDL-using subsystem to be destroyed
+    SDL_Quit();
 }
 
 void Graphics::SetExternalWindow(void* window)
@@ -463,8 +444,6 @@ void Graphics::Close()
 {
     if (impl_->window_)
     {
-        MutexLock lock(GetStaticMutex());
-        
         SDL_ShowCursor(SDL_TRUE);
         SDL_DestroyWindow(impl_->window_);
         impl_->window_ = 0;

@@ -52,8 +52,6 @@ static const char* shadowQualityTexts[] =
     "24bit High"
 };
 
-OBJECTTYPESTATIC(DebugHud);
-
 DebugHud::DebugHud(Context* context) :
     Object(context),
     profilerMaxDepth_(M_MAX_UNSIGNED),

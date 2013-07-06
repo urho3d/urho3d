@@ -101,8 +101,6 @@ TechniqueEntry::~TechniqueEntry()
 {
 }
 
-OBJECTTYPESTATIC(Material);
-
 Material::Material(Context* context) :
     Resource(context),
     auxViewFrameNumber_(0),

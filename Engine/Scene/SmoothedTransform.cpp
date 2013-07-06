@@ -31,8 +31,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(SmoothedTransform);
-
 SmoothedTransform::SmoothedTransform(Context* context) :
     Component(context),
     targetPosition_(Vector3::ZERO),

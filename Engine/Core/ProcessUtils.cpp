@@ -83,7 +83,6 @@ static bool consoleOpened = false;
 #endif
 static String currentLine;
 static Vector<String> arguments;
-static Mutex staticMutex;
 
 #if defined(IOS)
 void GetCPUData(host_basic_info_data_t* data)
@@ -390,11 +389,6 @@ unsigned GetNumLogicalCPUs()
     /// \todo Implement properly
     return 1;
     #endif
-}
-
-Mutex& GetStaticMutex()
-{
-    return staticMutex;
 }
 
 }

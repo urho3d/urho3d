@@ -34,8 +34,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(IndexBuffer);
-
 IndexBuffer::IndexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),

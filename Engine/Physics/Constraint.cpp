@@ -51,8 +51,6 @@ static const char* typeNames[] =
 
 extern const char* PHYSICS_CATEGORY;
 
-OBJECTTYPESTATIC(Constraint);
-
 Constraint::Constraint(Context* context) :
     Component(context),
     constraint_(0),

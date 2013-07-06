@@ -53,8 +53,6 @@ static const Matrix4 flipMatrix(
     0.0f, 0.0f, 0.0f, 1.0f
 );
 
-OBJECTTYPESTATIC(Camera);
-
 Camera::Camera(Context* context) :
     Component(context),
     viewDirty_(true),

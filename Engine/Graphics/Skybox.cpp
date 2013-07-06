@@ -34,8 +34,6 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 
-OBJECTTYPESTATIC(Skybox);
-
 Skybox::Skybox(Context* context) :
     StaticModel(context),
     customWorldTransform_(Matrix3x4::IDENTITY)

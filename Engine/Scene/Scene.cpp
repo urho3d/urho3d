@@ -49,8 +49,6 @@ static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
 static const float DEFAULT_SNAP_THRESHOLD = 5.0f;
 
-OBJECTTYPESTATIC(Scene);
-
 Scene::Scene(Context* context) :
     Node(context),
     replicatedNodeID_(FIRST_REPLICATED_ID),

@@ -39,8 +39,6 @@ static const unsigned CLIPMASK_Y_NEG = 0x8;
 static const unsigned CLIPMASK_Z_POS = 0x10;
 static const unsigned CLIPMASK_Z_NEG = 0x20;
 
-OBJECTTYPESTATIC(OcclusionBuffer);
-
 OcclusionBuffer::OcclusionBuffer(Context* context) :
     Object(context),
     buffer_(0),

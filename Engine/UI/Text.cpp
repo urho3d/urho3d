@@ -54,8 +54,6 @@ struct GlyphLocation
     }
 };
 
-OBJECTTYPESTATIC(Text);
-
 Text::Text(Context* context) :
     UIElement(context),
     fontSize_(DEFAULT_FONT_SIZE),

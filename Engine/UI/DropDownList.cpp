@@ -35,8 +35,6 @@ namespace Urho3D
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(DropDownList);
-
 DropDownList::DropDownList(Context* context) :
     Menu(context),
     resizePopup_(false),

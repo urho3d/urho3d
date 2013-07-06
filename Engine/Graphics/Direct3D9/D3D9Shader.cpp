@@ -39,8 +39,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Shader);
-
 Shader::Shader(Context* context) :
     Resource(context),
     sourceModifiedTime_(0)

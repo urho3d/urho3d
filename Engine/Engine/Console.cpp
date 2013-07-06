@@ -44,8 +44,6 @@ namespace Urho3D
 static const int DEFAULT_CONSOLE_ROWS = 16;
 static const int DEFAULT_HISTORY_SIZE = 16;
 
-OBJECTTYPESTATIC(Console);
-
 Console::Console(Context* context) :
     Object(context),
     historyRows_(DEFAULT_HISTORY_SIZE),

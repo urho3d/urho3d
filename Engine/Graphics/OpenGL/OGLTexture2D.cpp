@@ -36,8 +36,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Texture2D);
-
 Texture2D::Texture2D(Context* context) :
     Texture(context)
 {

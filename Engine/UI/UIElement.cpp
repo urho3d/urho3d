@@ -106,8 +106,6 @@ template<> LayoutMode Variant::Get<LayoutMode>() const
     return (LayoutMode)GetInt();
 }
 
-OBJECTTYPESTATIC(UIElement);
-
 XPathQuery UIElement::styleXPathQuery_("/elements/element[@type=$typeName]", "typeName:String");
 
 UIElement::UIElement(Context* context) :

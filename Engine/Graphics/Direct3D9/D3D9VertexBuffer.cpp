@@ -48,8 +48,6 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(float) // Instancematrix3
 };
 
-OBJECTTYPESTATIC(VertexBuffer);
-
 VertexBuffer::VertexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),

@@ -27,8 +27,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Resource);
-
 Resource::Resource(Context* context) :
     Object(context),
     memoryUse_(0)

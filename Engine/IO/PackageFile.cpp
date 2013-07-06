@@ -28,8 +28,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(PackageFile);
-
 PackageFile::PackageFile(Context* context) :
     Object(context),
     totalSize_(0),

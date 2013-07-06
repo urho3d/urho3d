@@ -92,8 +92,6 @@ private:
     Deserializer& source_;
 };
 
-OBJECTTYPESTATIC(ScriptFile);
-
 ScriptFile::ScriptFile(Context* context) :
     Resource(context),
     script_(GetSubsystem<Script>()),

@@ -7,8 +7,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 
-OBJECTTYPESTATIC(Character);
-
 Character::Character(Context* context) :
     Component(context),
     onGround_(false),

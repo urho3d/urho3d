@@ -35,8 +35,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Serializable);
-
 Serializable::Serializable(Context* context) :
     Object(context),
     networkState_(0),

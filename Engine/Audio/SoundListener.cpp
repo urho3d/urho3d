@@ -31,8 +31,6 @@ namespace Urho3D
 
 extern const char* AUDIO_CATEGORY;
 
-OBJECTTYPESTATIC(SoundListener);
-
 SoundListener::SoundListener(Context* context) :
     Component(context)
 {

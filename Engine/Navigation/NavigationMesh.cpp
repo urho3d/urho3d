@@ -142,8 +142,6 @@ struct FindPathData
     unsigned char pathFlags_[MAX_POLYS];
 };
 
-OBJECTTYPESTATIC(NavigationMesh);
-
 NavigationMesh::NavigationMesh(Context* context) :
     Component(context),
     navMesh_(0),

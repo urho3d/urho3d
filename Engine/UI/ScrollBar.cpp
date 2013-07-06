@@ -38,8 +38,6 @@ static const float DEFAULT_REPEAT_RATE = 20.0f;
 extern const char* orientations[];
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(ScrollBar);
-
 ScrollBar::ScrollBar(Context* context) :
     UIElement(context),
     scrollStep_(DEFAULT_SCROLL_STEP),

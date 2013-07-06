@@ -43,8 +43,6 @@ namespace Urho3D
 bool HiresTimer::supported(false);
 long long HiresTimer::frequency(1000);
 
-OBJECTTYPESTATIC(Time);
-
 Time::Time(Context* context) :
     Object(context),
     frameNumber_(0),

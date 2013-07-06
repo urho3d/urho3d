@@ -59,8 +59,6 @@ static const char* collisionEventModeNames[] =
 
 extern const char* PHYSICS_CATEGORY;
 
-OBJECTTYPESTATIC(RigidBody);
-
 RigidBody::RigidBody(Context* context) :
     Component(context),
     body_(0),

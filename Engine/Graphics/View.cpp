@@ -251,8 +251,6 @@ void SortShadowQueueWork(const WorkItem* item, unsigned threadIndex)
         start->shadowSplits_[i].shadowBatches_.SortFrontToBack();
 }
 
-OBJECTTYPESTATIC(View);
-
 View::View(Context* context) :
     Object(context),
     graphics_(GetSubsystem<Graphics>()),

@@ -64,8 +64,6 @@ const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
 
 const char* UI_CATEGORY = "UI";
 
-OBJECTTYPESTATIC(UI);
-
 UI::UI(Context* context) :
     Object(context),
     rootElement_(new UIElement(context)),

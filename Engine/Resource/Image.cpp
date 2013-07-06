@@ -190,8 +190,6 @@ bool CompressedLevel::Decompress(unsigned char* dest)
     }    
 }
 
-OBJECTTYPESTATIC(Image);
-
 Image::Image(Context* context) :
     Resource(context),
     width_(0),

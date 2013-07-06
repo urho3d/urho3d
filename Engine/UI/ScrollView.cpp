@@ -37,8 +37,6 @@ static const float STEP_FACTOR = 300.0f;
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(ScrollView);
-
 ScrollView::ScrollView(Context* context) :
     UIElement(context),
     viewPosition_(IntVector2::ZERO),

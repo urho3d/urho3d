@@ -63,8 +63,6 @@ extern "C" const char* SDL_IOS_GetResourceDir();
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(FileSystem);
-
 FileSystem::FileSystem(Context* context) :
     Object(context)
 {

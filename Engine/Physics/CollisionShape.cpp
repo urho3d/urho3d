@@ -307,8 +307,6 @@ HeightfieldData::~HeightfieldData()
 {
 }
 
-OBJECTTYPESTATIC(CollisionShape);
-
 CollisionShape::CollisionShape(Context* context) :
     Component(context),
     shape_(0),

@@ -65,7 +65,5 @@ String GetPlatform();
 unsigned GetNumPhysicalCPUs();
 /// Return the number of logical CPUs (different from physical if hyperthreading is used.)
 unsigned GetNumLogicalCPUs();
-/// Return the static library init/shutdown mutex.
-Mutex& GetStaticMutex();
 
 }

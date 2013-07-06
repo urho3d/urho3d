@@ -139,10 +139,6 @@ static const unsigned glVertexAttrIndex[] =
 
 static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
 
-static unsigned numInstances = 0;
-
-OBJECTTYPESTATIC(Graphics);
-
 bool CheckExtension(String& extensions, const String& name)
 {
     if (extensions.Empty())
@@ -182,15 +178,8 @@ Graphics::Graphics(Context* context_) :
     SetTextureUnitMappings();
     ResetCachedState();
     
-    // If first instance in this process, initialize SDL under static mutex. Note that Graphics subsystem will also be in charge
-    // of shutting down SDL as a whole, so it should be the last SDL-using subsystem (Audio and Input also use SDL) alive
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        if (!numInstances)
-            SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
-        ++numInstances;
-    }
+    // Initialize SDL now. Graphics should be the first SDL-using subsystem to be created
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
     
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
@@ -203,14 +192,8 @@ Graphics::~Graphics()
     delete impl_;
     impl_ = 0;
     
-    // If last instance in this process, shut down SDL under static mutex
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        --numInstances;
-        if (!numInstances)
-            SDL_Quit();
-    }
+    // Shut down SDL now. Graphics should be the last SDL-using subsystem to be destroyed
+    SDL_Quit();
 }
 
 void Graphics::SetExternalWindow(void* window)
@@ -275,135 +258,130 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     {
         // Close the existing window and OpenGL context, mark GPU objects as lost
         Release(false, true);
-    
-        {
-            // SDL window parameters are static, so need to operate under static lock
-            MutexLock lock(GetStaticMutex());
+
+        #ifdef IOS
+        SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+
+        // On iOS window needs to be resizable to handle orientation changes properly
+        resizable = true;
+        #endif
+
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+        #ifndef GL_ES_VERSION_2_0
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+        #else
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
+        #endif
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
         
-            #ifdef IOS
-            SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+        if (multiSample > 1)
+        {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
+        }
+        else
+        {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+        }
+        
+        int x = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
+        int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
 
-            // On iOS window needs to be resizable to handle orientation changes properly
-            resizable = true;
-            #endif
-
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-            SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-            SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-            SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-            #ifndef GL_ES_VERSION_2_0
-            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-            #else
-            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
-            #endif
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-            
-            if (multiSample > 1)
-            {
-                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
-            }
+        unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+        if (fullscreen)
+            flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
+        if (resizable)
+            flags |= SDL_WINDOW_RESIZABLE;
+        
+        for (;;)
+        {
+            if (!externalWindow_)
+                impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
             else
             {
-                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+                if (!impl_->window_)
+                    impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
+                fullscreen = false;
             }
             
-            int x = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
-            int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
-
-            unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-            if (fullscreen)
-                flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
-            if (resizable)
-                flags |= SDL_WINDOW_RESIZABLE;
-            
-            for (;;)
+            if (impl_->window_)
+                break;
+            else
             {
-                if (!externalWindow_)
-                    impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
+                if (multiSample > 1)
+                {
+                    // If failed with multisampling, retry first without
+                    multiSample = 1;
+                    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+                    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+                }
                 else
                 {
-                    if (!impl_->window_)
-                        impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
-                    fullscreen = false;
-                }
-                
-                if (impl_->window_)
-                    break;
-                else
-                {
-                    if (multiSample > 1)
-                    {
-                        // If failed with multisampling, retry first without
-                        multiSample = 1;
-                        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-                        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-                    }
-                    else
-                    {
-                        LOGERROR("Could not open window");
-                        return false;
-                    }
+                    LOGERROR("Could not open window");
+                    return false;
                 }
             }
-            
-            // Create/restore context and GPU objects and set initial renderstate
-            Restore();
-            
-            if (!impl_->context_)
-            {
-                LOGERROR("Could not create OpenGL context");
-                return false;
-            }
-            
-            // If OpenGL extensions not yet initialized, initialize now
-            #ifndef GL_ES_VERSION_2_0
-            GLenum err = glewInit();
-            if (GLEW_OK != err)
-            {
-                LOGERROR("Cannot initialize OpenGL");
-                Release(true, true);
-                return false;
-            }
-            
-            if (!GLEW_VERSION_2_0)
-            {
-                LOGERROR("OpenGL 2.0 is required");
-                Release(true, true);
-                return false;
-            }
-            
-            if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
-            {
-                LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
-                Release(true, true);
-                return false;
-            }
-            
-            instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
-            dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
-            anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
-            sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
-            sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
-            
-            // Set up instancing divisors if supported
-            if (instancingSupport_)
-            {
-                glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
-                glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
-                glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
-            }
-            
-            #else
-            dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
-            etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
-            pvrtcTextureSupport_ = CheckExtension(extensions, "IMG_texture_compression_pvrtc");
-            #endif
         }
+        
+        // Create/restore context and GPU objects and set initial renderstate
+        Restore();
+        
+        if (!impl_->context_)
+        {
+            LOGERROR("Could not create OpenGL context");
+            return false;
+        }
+        
+        // If OpenGL extensions not yet initialized, initialize now
+        #ifndef GL_ES_VERSION_2_0
+        GLenum err = glewInit();
+        if (GLEW_OK != err)
+        {
+            LOGERROR("Cannot initialize OpenGL");
+            Release(true, true);
+            return false;
+        }
+        
+        if (!GLEW_VERSION_2_0)
+        {
+            LOGERROR("OpenGL 2.0 is required");
+            Release(true, true);
+            return false;
+        }
+        
+        if (!GLEW_EXT_framebuffer_object || !GLEW_EXT_packed_depth_stencil)
+        {
+            LOGERROR("EXT_framebuffer_object and EXT_packed_depth_stencil OpenGL extensions are required");
+            Release(true, true);
+            return false;
+        }
+        
+        instancingSupport_ = GLEW_ARB_instanced_arrays != 0;
+        dxtTextureSupport_ = GLEW_EXT_texture_compression_s3tc != 0;
+        anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
+        sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
+        sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
+        
+        // Set up instancing divisors if supported
+        if (instancingSupport_)
+        {
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
+            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
+        }
+        
+        #else
+        dxtTextureSupport_ = CheckExtension(extensions, "EXT_texture_compression_dxt1");
+        etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
+        pvrtcTextureSupport_ = CheckExtension(extensions, "IMG_texture_compression_pvrtc");
+        #endif
     }
     
     // Set vsync
@@ -2041,16 +2019,12 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         if (!clearGPUObjects)
             LOGINFO("OpenGL context lost");
         
-        MutexLock lock(GetStaticMutex());
-        
         SDL_GL_DeleteContext(impl_->context_);
         impl_->context_ = 0;
     }
     
     if (closeWindow)
     {
-        MutexLock lock(GetStaticMutex());
-        
         SDL_ShowCursor(SDL_TRUE);
         
         // Do not destroy external window except when shutting down

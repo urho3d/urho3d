@@ -58,8 +58,6 @@ static const char* checkDirs[] = {
 
 static const SharedPtr<Resource> noResource;
 
-OBJECTTYPESTATIC(ResourceCache);
-
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
     autoReloadResources_(false)

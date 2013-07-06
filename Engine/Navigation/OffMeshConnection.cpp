@@ -33,8 +33,6 @@ namespace Urho3D
 
 extern const char* NAVIGATION_CATEGORY;
 
-OBJECTTYPESTATIC(OffMeshConnection);
-
 static const float DEFAULT_RADIUS = 1.0f;
 
 OffMeshConnection::OffMeshConnection(Context* context) :

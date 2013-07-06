@@ -242,18 +242,11 @@ private:
 };
 
 #define OBJECT(typeName) \
-    private: \
-        static const ShortStringHash typeStatic; \
-        static const String typeNameStatic; \
     public: \
         virtual ShortStringHash GetType() const { return GetTypeStatic(); } \
         virtual const String& GetTypeName() const { return GetTypeNameStatic(); } \
-        static ShortStringHash GetTypeStatic() { return typeStatic; } \
-        static const String& GetTypeNameStatic() { return typeNameStatic; } \
-
-#define OBJECTTYPESTATIC(typeName) \
-    const ShortStringHash typeName::typeStatic(#typeName); \
-    const String typeName::typeNameStatic(#typeName); \
+        static ShortStringHash GetTypeStatic() { static const ShortStringHash typeStatic(#typeName); return typeStatic; } \
+        static const String& GetTypeNameStatic() { static const String typeNameStatic(#typeName); return typeNameStatic; } \
 
 #define EVENT(eventID, eventName) static const StringHash eventID(#eventName); namespace eventName
 #define PARAM(paramID, paramName) static const ShortStringHash paramID(#paramName)

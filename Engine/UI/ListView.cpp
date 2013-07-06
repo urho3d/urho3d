@@ -156,9 +156,6 @@ private:
     UIElement* overlayContainer_;
 };
 
-OBJECTTYPESTATIC(HierarchyContainer);
-OBJECTTYPESTATIC(ListView);
-
 ListView::ListView(Context* context) :
     ScrollView(context),
     highlightMode_(HM_FOCUS),

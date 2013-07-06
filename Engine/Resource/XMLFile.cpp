@@ -60,8 +60,6 @@ public:
     bool success_;
 };
 
-OBJECTTYPESTATIC(XMLFile);
-
 XMLFile::XMLFile(Context* context) :
     Resource(context),
     document_(new pugi::xml_document())

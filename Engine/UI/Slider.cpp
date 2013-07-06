@@ -46,8 +46,6 @@ template<> Orientation Variant::Get<Orientation>() const
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(Slider);
-
 Slider::Slider(Context* context) :
     BorderImage(context),
     orientation_(O_HORIZONTAL),

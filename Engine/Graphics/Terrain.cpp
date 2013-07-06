@@ -46,8 +46,6 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 
-OBJECTTYPESTATIC(Terrain);
-
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
 static const unsigned MAX_LOD_LEVELS = 4;
 static const int DEFAULT_PATCH_SIZE = 32;

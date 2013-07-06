@@ -36,8 +36,6 @@ static const float DEFAULT_DISTANCE_FACTOR = 0.0f;
 static const float DEFAULT_MIN_PRIORITY = 0.0f;
 static const float UPDATE_THRESHOLD = 100.0f;
 
-OBJECTTYPESTATIC(NetworkPriority);
-
 NetworkPriority::NetworkPriority(Context* context) :
     Component(context),
     basePriority_(DEFAULT_BASE_PRIORITY),

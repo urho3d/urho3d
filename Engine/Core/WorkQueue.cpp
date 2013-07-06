@@ -62,8 +62,6 @@ private:
     unsigned index_;
 };
 
-OBJECTTYPESTATIC(WorkQueue);
-
 WorkQueue::WorkQueue(Context* context) :
     Object(context),
     shutDown_(false),

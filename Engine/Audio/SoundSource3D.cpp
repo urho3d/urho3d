@@ -40,8 +40,6 @@ static const float MIN_ROLLOFF = 0.1f;
 
 extern const char* AUDIO_CATEGORY;
 
-OBJECTTYPESTATIC(SoundSource3D);
-
 SoundSource3D::SoundSource3D(Context* context) :
     SoundSource(context),
     nearDistance_(DEFAULT_NEARDISTANCE),

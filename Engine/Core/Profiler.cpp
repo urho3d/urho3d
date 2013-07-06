@@ -35,8 +35,6 @@ namespace Urho3D
 static const int LINE_MAX_LENGTH = 256;
 static const int NAME_MAX_LENGTH = 30;
 
-OBJECTTYPESTATIC(Profiler);
-
 Profiler::Profiler(Context* context) :
     Object(context),
     current_(0),

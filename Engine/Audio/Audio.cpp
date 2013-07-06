@@ -47,8 +47,6 @@ static const int MAX_MIXRATE = 48000;
 
 static void SDLAudioCallback(void *userdata, Uint8 *stream, int len);
 
-OBJECTTYPESTATIC(Audio);
-
 Audio::Audio(Context* context) :
     Object(context),
     deviceID_(0),
@@ -99,23 +97,19 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     desired.callback = SDLAudioCallback;
     desired.userdata = this;
     
+    deviceID_ = SDL_OpenAudioDevice(0, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
+    if (!deviceID_)
     {
-        MutexLock lock(GetStaticMutex());
-        
-        deviceID_ = SDL_OpenAudioDevice(0, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
-        if (!deviceID_)
-        {
-            LOGERROR("Could not initialize audio output");
-            return false;
-        }
-        
-        if (obtained.format != AUDIO_S16SYS && obtained.format != AUDIO_S16LSB && obtained.format != AUDIO_S16MSB)
-        {
-            LOGERROR("Could not initialize audio output, 16-bit buffer format not supported");
-            SDL_CloseAudioDevice(deviceID_);
-            deviceID_ = 0;
-            return false;
-        }
+        LOGERROR("Could not initialize audio output");
+        return false;
+    }
+    
+    if (obtained.format != AUDIO_S16SYS && obtained.format != AUDIO_S16LSB && obtained.format != AUDIO_S16MSB)
+    {
+        LOGERROR("Could not initialize audio output, 16-bit buffer format not supported");
+        SDL_CloseAudioDevice(deviceID_);
+        deviceID_ = 0;
+        return false;
     }
     
     stereo_ = obtained.channels == 2;
@@ -270,8 +264,6 @@ void Audio::Release()
     
     if (deviceID_)
     {
-        MutexLock lock(GetStaticMutex());
-        
         SDL_CloseAudioDevice(deviceID_);
         deviceID_ = 0;
         clipBuffer_.Reset();

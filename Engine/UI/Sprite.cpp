@@ -36,8 +36,6 @@ extern const char* horizontalAlignments[];
 extern const char* verticalAlignments[];
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(Sprite);
-
 Sprite::Sprite(Context* context) :
     UIElement(context),
     floatPosition_(Vector2::ZERO),

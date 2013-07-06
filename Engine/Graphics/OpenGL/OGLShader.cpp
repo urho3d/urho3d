@@ -37,8 +37,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Shader);
-
 Shader::Shader(Context* context) :
     Resource(context),
     vsSourceCodeLength_(0),

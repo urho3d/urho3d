@@ -101,8 +101,6 @@ const unsigned VertexBuffer::elementNormalize[] =
     GL_FALSE // Instancematrix3
 };
 
-OBJECTTYPESTATIC(VertexBuffer);
-
 VertexBuffer::VertexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),

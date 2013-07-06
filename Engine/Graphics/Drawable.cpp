@@ -54,8 +54,6 @@ SourceBatch::~SourceBatch()
 {
 }
 
-OBJECTTYPESTATIC(Drawable);
-
 Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     Component(context),
     drawableFlags_(drawableFlags),

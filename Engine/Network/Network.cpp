@@ -43,8 +43,6 @@ namespace Urho3D
 
 static const int DEFAULT_UPDATE_FPS = 30;
 
-OBJECTTYPESTATIC(Network);
-
 Network::Network(Context* context) :
     Object(context),
     updateFps_(DEFAULT_UPDATE_FPS),

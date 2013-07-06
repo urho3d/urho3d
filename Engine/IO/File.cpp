@@ -54,8 +54,6 @@ static const char* openMode[] =
 static const unsigned READ_BUFFER_SIZE = 1024;
 #endif
 
-OBJECTTYPESTATIC(File);
-
 File::File(Context* context) :
     Object(context),
     mode_(FILE_READ),

@@ -42,8 +42,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(TextureCube);
-
 TextureCube::TextureCube(Context* context) :
     Texture(context),
     lockedLevel_(-1)

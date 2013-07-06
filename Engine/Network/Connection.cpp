@@ -61,8 +61,6 @@ PackageUpload::PackageUpload() :
 {
 }
 
-OBJECTTYPESTATIC(Connection);
-
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
     position_(Vector3::ZERO),

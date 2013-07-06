@@ -37,8 +37,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Viewport);
-
 Viewport::Viewport(Context* context) :
     Object(context),
     rect_(IntRect::ZERO)

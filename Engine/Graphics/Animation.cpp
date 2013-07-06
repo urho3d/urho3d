@@ -58,8 +58,6 @@ void AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
         ++index;
 }
 
-OBJECTTYPESTATIC(Animation);
-
 Animation::Animation(Context* context) :
     Resource(context),
     length_(0.f)

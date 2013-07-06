@@ -106,8 +106,6 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
     PODVector<RigidBody*>& result_;
 };
 
-OBJECTTYPESTATIC(PhysicsWorld);
-
 PhysicsWorld::PhysicsWorld(Context* context) :
     Component(context),
     collisionConfiguration_(0),

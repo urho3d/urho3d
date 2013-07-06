@@ -51,49 +51,26 @@ const char* logLevelPrefixes[] =
     "ERROR"
 };
 
-SharedPtr<File> Log::logFile_;
-String Log::lastMessage_;
-#ifdef _DEBUG
-int Log::level_ = LOG_DEBUG;
-#else
-int Log::level_ = LOG_INFO;
-#endif
-bool Log::timeStamp_ = true;
-bool Log::inWrite_ = false;
-bool Log::quiet_ = false;
-
-static PODVector<Log*> logInstances;
-
-OBJECTTYPESTATIC(Log);
+static Log* logInstance = 0;
 
 Log::Log(Context* context) :
-    Object(context)
+    Object(context),
+    level_(LOG_INFO),
+    timeStamp_(true),
+    inWrite_(false),
+    quiet_(false)
 {
-    MutexLock lock(GetStaticMutex());
-#ifdef ANDROID
-    // On Android we may have instances from a previous run
-    logInstances.Clear();
-#endif
-    logInstances.Push(this);
+    logInstance = this;
 }
 
 Log::~Log()
 {
-    MutexLock lock(GetStaticMutex());
-    
-    logInstances.Remove(this);
-    
-    // Close log file if was last instance
-    if (logInstances.Empty())
-        logFile_.Reset();
+    logInstance = 0;
 }
 
 void Log::Open(const String& fileName)
 {
     #if !defined(ANDROID) && !defined(IOS)
-    MutexLock lock(GetStaticMutex());
-    
-    // Only the first log instance actually opens the file, the rest are routed to it
     if ((logFile_ && logFile_->IsOpen()) || fileName.Empty())
         return;
     
@@ -125,114 +102,92 @@ void Log::SetQuiet(bool quiet)
     quiet_ = quiet;
 }
 
-String Log::GetLastMessage() const
-{
-    MutexLock lock(GetStaticMutex());
-    return lastMessage_;
-}
-
 void Log::Write(int level, const String& message)
 {
     assert(level >= LOG_DEBUG && level < LOG_NONE);
     
     // Do not log if message level excluded or if currently sending a log event
-    if (level_ > level || inWrite_)
+    if (!logInstance || logInstance->level_ > level || logInstance->inWrite_)
         return;
     
+    String formattedMessage = logLevelPrefixes[level];
+    formattedMessage += ": " + message;
+    logInstance->lastMessage_ = message;
+    
+    if (logInstance->timeStamp_)
+        formattedMessage = "[" + Time::GetTimeStamp() + "] " + formattedMessage;
+    
+    #if defined(ANDROID)
+    int androidLevel = ANDROID_LOG_DEBUG + level;
+    __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
+    #elif defined(IOS)
+    SDL_IOS_LogMessage(message.CString());
+    #else
+    if (logInstance->quiet_)
     {
-        MutexLock lock(GetStaticMutex());
-        
-        String formattedMessage = logLevelPrefixes[level];
-        formattedMessage += ": " + message;
-        lastMessage_ = message;
-        
-        if (timeStamp_)
-            formattedMessage = "[" + Time::GetTimeStamp() + "] " + formattedMessage;
-        
-        #if defined(ANDROID)
-        int androidLevel = ANDROID_LOG_DEBUG + level;
-        __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
-        #elif defined(IOS)
-        SDL_IOS_LogMessage(message.CString());
-        #else
-        if (quiet_)
-        {
-            // If in quiet mode, still print the error message to the standard error stream
-            if (level == LOG_ERROR)
-                PrintUnicodeLine(formattedMessage, true);
-        }
-        else
-            PrintUnicodeLine(formattedMessage, level == LOG_ERROR);
-        #endif
-        
-        if (logFile_)
-        {
-            logFile_->WriteLine(formattedMessage);
-            logFile_->Flush();
-        }
-        
-        // Log messages can be safely sent as an event only in single-instance mode
-        if (logInstances.Size() == 1)
-        {
-            inWrite_ = true;
-            
-            using namespace LogMessage;
-            
-            VariantMap eventData;
-            eventData[P_MESSAGE] = formattedMessage;
-            logInstances[0]->SendEvent(E_LOGMESSAGE, eventData);
-            
-            inWrite_ = false;
-        }
+        // If in quiet mode, still print the error message to the standard error stream
+        if (level == LOG_ERROR)
+            PrintUnicodeLine(formattedMessage, true);
     }
+    else
+        PrintUnicodeLine(formattedMessage, level == LOG_ERROR);
+    #endif
+    
+    if (logInstance->logFile_)
+    {
+        logInstance->logFile_->WriteLine(formattedMessage);
+        logInstance->logFile_->Flush();
+    }
+    
+    logInstance->inWrite_ = true;
+    
+    using namespace LogMessage;
+    
+    VariantMap eventData;
+    eventData[P_MESSAGE] = formattedMessage;
+    logInstance->SendEvent(E_LOGMESSAGE, eventData);
+    
+    logInstance->inWrite_ = false;
 }
 
 void Log::WriteRaw(const String& message, bool error)
 {
     // Prevent recursion during log event
-    if (inWrite_)
+    if (!logInstance || logInstance->inWrite_)
         return;
     
+    logInstance->lastMessage_ = message;
+    
+    #if defined(ANDROID)
+    __android_log_print(ANDROID_LOG_INFO, "Urho3D", message.CString());
+    #elif defined(IOS)
+    SDL_IOS_LogMessage(message.CString());
+    #else
+    if (logInstance->quiet_)
     {
-        MutexLock lock(GetStaticMutex());
-        
-        lastMessage_ = message;
-        
-        #if defined(ANDROID)
-        __android_log_print(ANDROID_LOG_INFO, "Urho3D", message.CString());
-        #elif defined(IOS)
-        SDL_IOS_LogMessage(message.CString());
-        #else
-        if (quiet_)
-        {
-            // If in quiet mode, still print the error message to the standard error stream
-            if (error)
-                PrintUnicode(message, true);
-        }
-        else
-        	PrintUnicode(message, error);
-        #endif
-        
-        if (logFile_)
-        {
-            logFile_->Write(message.CString(), message.Length());
-            logFile_->Flush();
-        }
-        
-        // Log messages can be safely sent as an event only in single-instance mode
-        if (logInstances.Size() == 1)
-        {
-            inWrite_ = true;
-            
-            using namespace LogMessage;
-            
-            VariantMap eventData;
-            eventData[P_MESSAGE] = message;
-            logInstances[0]->SendEvent(E_LOGMESSAGE, eventData);
-            
-            inWrite_ = false;
-        }
+        // If in quiet mode, still print the error message to the standard error stream
+        if (error)
+            PrintUnicode(message, true);
     }
+    else
+        PrintUnicode(message, error);
+    #endif
+    
+    if (logInstance->logFile_)
+    {
+        logInstance->logFile_->Write(message.CString(), message.Length());
+        logInstance->logFile_->Flush();
+    }
+    
+    logInstance->inWrite_ = true;
+    
+    using namespace LogMessage;
+    
+    VariantMap eventData;
+    eventData[P_MESSAGE] = message;
+    logInstance->SendEvent(E_LOGMESSAGE, eventData);
+    
+    logInstance->inWrite_ = false;
 }
 
 }

@@ -39,8 +39,6 @@ extern ShortStringHash VAR_ORIGIN;
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(Menu);
-
 Menu::Menu(Context* context) :
     Button(context),
     popupOffset_(IntVector2::ZERO),

@@ -31,8 +31,6 @@ namespace Urho3D
 
 extern const char* NAVIGATION_CATEGORY;
 
-OBJECTTYPESTATIC(Navigable);
-
 Navigable::Navigable(Context* context) :
     Component(context),
     recursive_(true)

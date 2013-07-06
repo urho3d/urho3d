@@ -37,8 +37,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Node);
-
 Node::Node(Context* context) :
     Serializable(context),
     worldTransform_(Matrix3x4::IDENTITY),

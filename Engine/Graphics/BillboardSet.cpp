@@ -50,8 +50,6 @@ inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
     return lhs->sortDistance_ > rhs->sortDistance_;
 }
 
-OBJECTTYPESTATIC(BillboardSet);
-
 BillboardSet::BillboardSet(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     animationLodBias_(1.0f),

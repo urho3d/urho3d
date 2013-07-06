@@ -39,8 +39,6 @@ template<> BlendMode Variant::Get<BlendMode>() const
     return (BlendMode)GetInt();
 }
 
-OBJECTTYPESTATIC(BorderImage);
-
 BorderImage::BorderImage(Context* context) :
     UIElement(context),
     imageRect_(IntRect::ZERO),

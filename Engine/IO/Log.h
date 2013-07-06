@@ -65,7 +65,7 @@ public:
     /// Return whether log messages are timestamped.
     bool GetTimeStamp() const { return timeStamp_; }
     /// Return last log message.
-    String GetLastMessage() const;
+    String GetLastMessage() const { return lastMessage_; }
     /// Return whether log is in quiet mode (only errors printed to standard error stream).
     bool IsQuiet() const { return quiet_; }
     
@@ -76,17 +76,17 @@ public:
     
 private:
     /// Log file.
-    static SharedPtr<File> logFile_;
+    SharedPtr<File> logFile_;
     /// Last log message.
-    static String lastMessage_;
+    String lastMessage_;
     /// Logging level.
-    static int level_;
+    int level_;
     /// Timestamp log messages flag.
-    static bool timeStamp_;
+    bool timeStamp_;
     /// In write flag to prevent recursion.
-    static bool inWrite_;
+    bool inWrite_;
     /// Quiet mode flag.
-    static bool quiet_;
+    bool quiet_;
 };
 
 #ifdef ENABLE_LOGGING

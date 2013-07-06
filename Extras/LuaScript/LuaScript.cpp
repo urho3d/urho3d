@@ -57,8 +57,6 @@ extern int tolua_LuaScriptLuaAPI_open(lua_State*);
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(LuaScript);
-
 static Context* scriptContext_ = 0;
 
 LuaScript::LuaScript(Context* context) :

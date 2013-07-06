@@ -49,8 +49,6 @@ static const char* shapeNames[] =
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(Cursor);
-
 Cursor::Cursor(Context* context) :
     BorderImage(context),
     shape_(CS_NORMAL)

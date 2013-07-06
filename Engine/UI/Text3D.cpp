@@ -43,8 +43,6 @@ extern const char* GEOMETRY_CATEGORY;
 
 static const float TEXT_SCALING = 1.0f / 128.0f;
 
-OBJECTTYPESTATIC(Text3D);
-
 Text3D::Text3D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     text_(context),

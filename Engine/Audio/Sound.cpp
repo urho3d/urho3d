@@ -57,8 +57,6 @@ struct WavHeader
 
 static const unsigned IP_SAFETY = 4;
 
-OBJECTTYPESTATIC(Sound);
-
 Sound::Sound(Context* context) :
     Resource(context),
     repeat_(0),

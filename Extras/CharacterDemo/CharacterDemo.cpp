@@ -53,8 +53,6 @@ int Run()
 
 DEFINE_MAIN(Run())
 
-OBJECTTYPESTATIC(CharacterDemo);
-
 CharacterDemo::CharacterDemo(Context* context) :
     Object(context),
     cache_(GetSubsystem<ResourceCache>()),

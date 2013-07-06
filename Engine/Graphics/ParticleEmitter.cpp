@@ -61,8 +61,6 @@ template<> EmitterType Variant::Get<EmitterType>() const
     return (EmitterType)GetInt();
 }
 
-OBJECTTYPESTATIC(ParticleEmitter);
-
 ParticleEmitter::ParticleEmitter(Context* context) :
     BillboardSet(context),
     emitterType_(EMITTER_SPHERE),

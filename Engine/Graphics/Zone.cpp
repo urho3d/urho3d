@@ -42,8 +42,6 @@ static const float DEFAULT_FOG_END = 1000.0f;
 
 extern const char* SCENE_CATEGORY;
 
-OBJECTTYPESTATIC(Zone);
-
 Zone::Zone(Context* context) :
     Drawable(context, DRAWABLE_ZONE),
     inverseWorldDirty_(true),

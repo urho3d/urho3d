@@ -57,8 +57,6 @@ static const char* methodDeclarations[] = {
     "void ApplyAttributes()"
 };
 
-OBJECTTYPESTATIC(ScriptInstance);
-
 ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
     script_(GetSubsystem<Script>()),

@@ -32,8 +32,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Component);
-
 Component::Component(Context* context) :
     Serializable(context),
     node_(0),

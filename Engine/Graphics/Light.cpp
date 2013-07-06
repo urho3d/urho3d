@@ -84,8 +84,6 @@ template<> LightType Variant::Get<LightType>() const
     return (LightType)GetInt();
 }
 
-OBJECTTYPESTATIC(Light);
-
 Light::Light(Context* context) :
     Drawable(context, DRAWABLE_LIGHT),
     lightType_(DEFAULT_LIGHTTYPE),

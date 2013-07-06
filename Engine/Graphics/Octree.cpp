@@ -330,8 +330,6 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
     }
 }
 
-OBJECTTYPESTATIC(Octree);
-
 Octree::Octree(Context* context) :
     Component(context),
     Octant(BoundingBox(-DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE), 0, 0, this),

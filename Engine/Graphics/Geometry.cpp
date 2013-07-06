@@ -33,8 +33,6 @@
 namespace Urho3D
 {
 
-OBJECTTYPESTATIC(Geometry);
-
 Geometry::Geometry(Context* context) :
     Object(context),
     primitiveType_(TRIANGLE_LIST),

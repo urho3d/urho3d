@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 /* System independent thread management routines for SDL */
@@ -56,7 +59,7 @@ SDL_ThreadsInit(void)
    clean up threads here.  If any threads are still running after this call,
    they will no longer have access to any per-thread data.
  */
-#if 0
+// Urho3D: enabled function
 static void
 SDL_ThreadsQuit(void)
 {
@@ -68,7 +71,6 @@ SDL_ThreadsQuit(void)
         SDL_DestroyMutex(mutex);
     }
 }
-#endif
 
 /* Routines for manipulating the thread list */
 static void
@@ -142,11 +144,10 @@ SDL_DelThread(SDL_Thread * thread)
     }
     SDL_mutexV(thread_lock);
 
-#if 0   /* There could be memory corruption if another thread is starting */
+    // Urho3D: enable cleanup to prevent memory leak at exit
     if (SDL_Threads == NULL) {
         SDL_ThreadsQuit();
     }
-#endif
 }
 
 /* The default (non-thread-safe) global error variable */

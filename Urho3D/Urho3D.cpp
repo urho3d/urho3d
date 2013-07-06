@@ -74,8 +74,6 @@ int Run()
     }
 }
 
-OBJECTTYPESTATIC(Application);
-
 Application::Application(Context* context) :
     Object(context),
     exitCode_(EXIT_SUCCESS)

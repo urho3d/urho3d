@@ -37,8 +37,6 @@ static const int DEFAULT_RESIZE_BORDER = 4;
 
 extern const char* UI_CATEGORY;
 
-OBJECTTYPESTATIC(Window);
-
 Window::Window(Context* context) :
     BorderImage(context),
     movable_(false),

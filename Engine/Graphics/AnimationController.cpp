@@ -48,8 +48,6 @@ static const float COMMAND_STAY_TIME = 0.25f;
 
 extern const char* LOGIC_CATEGORY;
 
-OBJECTTYPESTATIC(AnimationController);
-
 AnimationController::AnimationController(Context* context) :
     Component(context)
 {

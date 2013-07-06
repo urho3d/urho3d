@@ -148,8 +148,6 @@ void Decal::CalculateBoundingBox()
         boundingBox_.Merge(vertices_[i].position_);
 }
 
-OBJECTTYPESTATIC(DecalSet);
-
 DecalSet::DecalSet(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     geometry_(new Geometry(context)),

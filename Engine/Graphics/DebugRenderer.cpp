@@ -46,8 +46,6 @@ extern const char* SUBSYSTEM_CATEGORY;
 // Cap the amount of lines to prevent crash when eg. debug rendering large heightfields
 static const unsigned MAX_LINES = 1000000;
 
-OBJECTTYPESTATIC(DebugRenderer);
-
 DebugRenderer::DebugRenderer(Context* context) :
     Component(context)
 {

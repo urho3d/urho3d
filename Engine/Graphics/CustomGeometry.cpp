@@ -44,8 +44,6 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 
-OBJECTTYPESTATIC(CustomGeometry);
-
 CustomGeometry::CustomGeometry(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     vertexBuffer_(new VertexBuffer(context)),
