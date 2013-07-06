@@ -880,10 +880,6 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             switch (evt.window.event)
             {
-            case SDL_WINDOWEVENT_CLOSE:
-                SendEvent(E_EXITREQUESTED);
-                break;
-                
             case SDL_WINDOWEVENT_MINIMIZED:
                 minimized_ = true;
                 SendInputFocusEvent();
