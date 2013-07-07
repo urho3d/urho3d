@@ -4,6 +4,10 @@ $#include "Text3D.h"
 class Text3D : public Drawable
 {
 public:
+    /// Construct.
+    Text3D(Context* context);
+    /// Destruct.
+    ~Text3D();
     /// Set font and font size. Return true if successful.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size. Return true if successful.

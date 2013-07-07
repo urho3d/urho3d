@@ -5,7 +5,9 @@ class RenderPath
 {
 public:
     /// Clone the rendering path.
-    SharedPtr<RenderPath> Clone();
+    // SharedPtr<RenderPath> Clone();
+    tolua_outside RenderPath* RenderPathClone @ Clone();
+    
     /// Clear existing data and load from an XML file. Return true if successful.
     bool Load(XMLFile* file);
     /// Append data from an XML file. Return true if successful.
@@ -44,3 +46,18 @@ public:
     /// Return a shader parameter (first appearance in any command.)
     const Vector4& GetShaderParameter(const char* name) const;
 };
+
+${
+
+RenderPath* RenderPathClone(RenderPath* renderPath)
+{
+    if (renderPath == 0)
+        return 0;
+    
+    RenderPath* newRenderPath = new RenderPath();
+    newRenderPath->renderTargets_ = renderPath->renderTargets_;
+    newRenderPath->commands_ = renderPath->commands_;
+    return newRenderPath;
+}
+
+$}

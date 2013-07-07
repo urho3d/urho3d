@@ -61,6 +61,6 @@ public:
     /// Ray origin.
     Vector3 origin_ @ origin;
     
-	/// Ray direction.
+    /// Ray direction.
     Vector3 direction_ @ direction;
 };

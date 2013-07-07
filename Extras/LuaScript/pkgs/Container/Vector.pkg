@@ -124,7 +124,7 @@ public:
         Resize(size_ - length, 0);
     }
        
-	/// Erase an element if found.
+    /// Erase an element if found.
     bool Remove(const T& value)
     {
         Iterator i = Find(value);
@@ -192,7 +192,7 @@ public:
 /// %Vector template class for POD types. Does not call constructors or destructors and uses block move.
 class PODVector
 {
-	TOLUA_TEMPLATE_BIND(T, Vector3)
+    TOLUA_TEMPLATE_BIND(T, Vector3)
 public:   
     /// Construct empty.
     PODVector()

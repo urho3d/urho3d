@@ -9,35 +9,17 @@ $#include "Graphics.h"
 $#include "Input.h"
 $#include "Log.h"
 $#include "Network.h"
-$#include "Network.h"
 $#include "LuaScript.h"
 $#include "PhysicsWorld.h"
 $#include "Renderer.h"
 $#include "ResourceCache.h"
+$#include "Timer.h"
 $#include "UI.h"
 
 
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class Context
 {
-public:
-    /// Template version of returning a subsystem.
-    // template <class T> T* GetSubsystem() const;
-	Audio* GetSubsystem<Audio> @ GetAudio() const;
-	Console* GetSubsystem<Console> @ GetConsole() const;
-	DebugHud* GetSubsystem<DebugHud> @ GetDebugHud() const;
-	DebugRenderer* GetSubsystem<DebugRenderer> @ GetDebugRenderer() const;
-	Engine* GetSubsystem<Engine> @ GetEngine() const;
-	FileSystem* GetSubsystem<FileSystem> @ GetFileSystem() const;
-	Graphics* GetSubsystem<Graphics> @ GetGraphics() const;
-	Input* GetSubsystem<Input> @ GetInput() const;
-	Log* GetSubsystem<Log> @ GetLog() const;
-	Network* GetSubsystem<Network> @ GetNetwork() const;
-	PhysicsWorld* GetSubsystem<PhysicsWorld> @ GetPhysicsWorld() const;	
-	Renderer* GetSubsystem<Renderer> @ GetRenderer() const;	
-	ResourceCache* GetSubsystem<ResourceCache> @ GetCache() const;
-	Time* GetSubsystem<Time> @ GetTime() const;	
-	UI* GetSubsystem<UI> @ GetUI() const;
 };
 
 Context* GetContext();
@@ -55,7 +37,7 @@ Network* GetNetwork();
 PhysicsWorld* GetPhysicsWorld();
 Renderer* GetRenderer();
 ResourceCache* GetCache();
-Time* GetTime();	
+Time* GetTime();
 UI* GetUI();
 
 ${

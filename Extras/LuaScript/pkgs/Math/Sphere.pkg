@@ -167,7 +167,7 @@ public:
     
     /// Sphere center.
     Vector3 center_ @ center;
-	
+
     /// Sphere radius.
     float radius_ @ radius;
 };

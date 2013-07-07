@@ -4,6 +4,10 @@ $#include "Slider.h"
 class Slider : public BorderImage
 {
 public:
+    /// Construct.
+    Slider(Context* context);
+    /// Destruct.
+    virtual ~Slider();
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
     /// Set slider range maximum value (minimum value is always 0.)

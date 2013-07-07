@@ -73,23 +73,23 @@ public:
 
     /// Construct from a C string case-insensitively.
     ShortStringHash(const char* str);
-	
+    
     /// Construct from a string case-insensitively.
     ShortStringHash(const String& str);
     
     /// Add a hash.
     ShortStringHash operator + (const ShortStringHash& rhs) const;
     
-	/// Test for equality with another hash.
+    /// Test for equality with another hash.
     bool operator == (const ShortStringHash& rhs) const;
     
-	/// Test if less than another hash.
+    /// Test if less than another hash.
     bool operator < (const ShortStringHash& rhs) const;
     
-	/// Return hash value.
+    /// Return hash value.
     unsigned short Value() const { return value_; }
     
-	/// Calculate hash value case-insensitively from a C string.
+    /// Calculate hash value case-insensitively from a C string.
     static unsigned short Calculate(const char* str);
     
     /// Zero hash.

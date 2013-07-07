@@ -4,6 +4,10 @@ $#include "ScrollView.h"
 class ScrollView : public UIElement
 {
 public:
+    /// Construct.
+    ScrollView(Context* context);
+    /// Destruct.
+    virtual ~ScrollView();
     /// Set content element.
     void SetContentElement(UIElement* element);
     /// Set view offset from the top-left corner.

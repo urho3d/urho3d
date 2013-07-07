@@ -1,10 +1,22 @@
 $#include "Drawable.h"
 
+static const unsigned DRAWABLE_GEOMETRY;
+static const unsigned DRAWABLE_LIGHT;
+static const unsigned DRAWABLE_ZONE;
+static const unsigned DRAWABLE_ANY;
+static const unsigned DEFAULT_VIEWMASK;
+static const unsigned DEFAULT_LIGHTMASK;
+static const unsigned DEFAULT_SHADOWMASK;
+static const unsigned DEFAULT_ZONEMASK;
+static const int DRAWABLES_PER_WORK_ITEM;
+static const int MAX_VERTEX_LIGHTS;
+static const float ANIMATION_LOD_BASESCALE;
+
 /// Base class for visible components.
 class Drawable : public Component
 {
 public:
-	/// Set draw distance.
+    /// Set draw distance.
     void SetDrawDistance(float distance);
     /// Set shadow draw distance.
     void SetShadowDistance(float distance);

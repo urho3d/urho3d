@@ -6,19 +6,19 @@ class AnimationController : public Component
 public:
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success.
     bool Play(const char* name, unsigned char layer, bool looped);
-	bool Play(const char* name, unsigned char layer, bool looped, float fadeInTime = 0.0f);
+    bool Play(const char* name, unsigned char layer, bool looped, float fadeInTime = 0.0f);
     /// Play an animation, set full target weight and fade out all other animations on the same layer. Name must be the full resource name. Return true on success.
     bool PlayExclusive(const char* name, unsigned char layer, bool looped);
-	bool PlayExclusive(const char* name, unsigned char layer, bool looped, float fadeTime = 0.0f);
+    bool PlayExclusive(const char* name, unsigned char layer, bool looped, float fadeTime = 0.0f);
     /// Stop an animation. Zero fadetime is instant. Return true on success.
     bool Stop(const char* name);
-	bool Stop(const char* name, float fadeOutTime = 0.0f);
+    bool Stop(const char* name, float fadeOutTime = 0.0f);
     /// Stop all animations on a specific layer. Zero fadetime is instant.
     void StopLayer(unsigned char layer);
-	void StopLayer(unsigned char layer, float fadeOutTime = 0.0f);
+    void StopLayer(unsigned char layer, float fadeOutTime = 0.0f);
     /// Stop all animations. Zero fadetime is instant.
     void StopAll();
-	void StopAll(float fadeTime = 0.0f);
+    void StopAll(float fadeTime = 0.0f);
     /// Fade animation to target weight. Return true on success.
     bool Fade(const char* name, float targetWeight, float fadeTime);
     /// Fade other animations on the same layer to target weight. Return true on success.

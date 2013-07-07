@@ -4,6 +4,7 @@ $#include "Camera.h"
 $#include "CollisionShape.h"
 $#include "Constraint.h"
 $#include "DebugRenderer.h"
+$#include "DecalSet.h"
 $#include "Drawable.h"
 $#include "Light.h"
 $#include "Navigable.h"
@@ -131,51 +132,53 @@ public:
     
     /// Template version of creating a component.
     // template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
-	AnimationController* CreateComponent<AnimationController> @ CreateAnimationController();
-	AnimatedModel* CreateComponent<AnimatedModel> @ CreateAnimatedModel();
-	Camera* CreateComponent<Camera> @ CreateCamera();
-	CollisionShape* CreateComponent<CollisionShape> @ CreateCollisionShape();
-	Constraint* CreateComponent<Constraint> @ CreateConstraint();
-	DebugRenderer* CreateComponent<DebugRenderer> @ CreateDebugRenderer();
-	Drawable* CreateComponent<Drawable> @ CreateDrawable();
-	Light* CreateComponent<Light> @ CreateLight();
-	Navigable* CreateComponent<Navigable> @ CreateNavigable();
-	NavigationMesh* CreateComponent<NavigationMesh> @ CreateNavigationMesh();
-	NetworkPriority* CreateComponent<NetworkPriority> @ CreateNetworkPriority();
-	Octree* CreateComponent<Octree> @ CreateOctree();
-	OffMeshConnection* CreateComponent<OffMeshConnection> @ CreateOffMeshConnection();
-	PhysicsWorld* CreateComponent<PhysicsWorld> @ CreatePhysicsWorld();
-	RigidBody* CreateComponent<RigidBody> @ CreateRigidBody();
-	SmoothedTransform* CreateComponent<SmoothedTransform> @ CreateSmoothedTransform();
-	SoundListener* CreateComponent<SoundListener> @ CreateSoundListener();
-	SoundSource* CreateComponent<SoundSource> @ CreateSoundSource();
-	StaticModel* CreateComponent<StaticModel> @ CreateStaticModel();
-	Terrain* CreateComponent<Terrain> @ CreateTerrain();
-	Zone* CreateComponent<Zone> @ CreateZone();
+    AnimationController* CreateComponent<AnimationController> @ CreateAnimationController();
+    AnimatedModel* CreateComponent<AnimatedModel> @ CreateAnimatedModel();
+    Camera* CreateComponent<Camera> @ CreateCamera();
+    CollisionShape* CreateComponent<CollisionShape> @ CreateCollisionShape();
+    Constraint* CreateComponent<Constraint> @ CreateConstraint();
+    DebugRenderer* CreateComponent<DebugRenderer> @ CreateDebugRenderer();
+    DecalSet* CreateComponent<DecalSet> @ CreateDecalSet();
+    Drawable* CreateComponent<Drawable> @ CreateDrawable();
+    Light* CreateComponent<Light> @ CreateLight();
+    Navigable* CreateComponent<Navigable> @ CreateNavigable();
+    NavigationMesh* CreateComponent<NavigationMesh> @ CreateNavigationMesh();
+    NetworkPriority* CreateComponent<NetworkPriority> @ CreateNetworkPriority();
+    Octree* CreateComponent<Octree> @ CreateOctree();
+    OffMeshConnection* CreateComponent<OffMeshConnection> @ CreateOffMeshConnection();
+    PhysicsWorld* CreateComponent<PhysicsWorld> @ CreatePhysicsWorld();
+    RigidBody* CreateComponent<RigidBody> @ CreateRigidBody();
+    SmoothedTransform* CreateComponent<SmoothedTransform> @ CreateSmoothedTransform();
+    SoundListener* CreateComponent<SoundListener> @ CreateSoundListener();
+    SoundSource* CreateComponent<SoundSource> @ CreateSoundSource();
+    StaticModel* CreateComponent<StaticModel> @ CreateStaticModel();
+    Terrain* CreateComponent<Terrain> @ CreateTerrain();
+    Zone* CreateComponent<Zone> @ CreateZone();
 
     /// Template version of getting or creating a component.
     // template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
-    AnimationController* GetOrCreateComponent<AnimationController> @ CreateAnimationController();
-	AnimatedModel* GetOrCreateComponent<AnimatedModel> @ CreateAnimatedModel();
-	Camera* GetOrCreateComponent<Camera> @ CreateCamera();
-	CollisionShape* GetOrCreateComponent<CollisionShape> @ CreateCollisionShape();
-	Constraint* GetOrCreateComponent<Constraint> @ CreateConstraint();
-	DebugRenderer* GetOrCreateComponent<DebugRenderer> @ CreateDebugRenderer();
-	Drawable* GetOrCreateComponent<Drawable> @ CreateDrawable();
-	Light* GetOrCreateComponent<Light> @ CreateLight();
-	Navigable* GetOrCreateComponent<Navigable> @ CreateNavigable();
-	NavigationMesh* GetOrCreateComponent<NavigationMesh> @ CreateNavigationMesh();
-	NetworkPriority* GetOrCreateComponent<NetworkPriority> @ CreateNetworkPriority();
-	Octree* GetOrCreateComponent<Octree> @ CreateOctree();
-	OffMeshConnection* GetOrCreateComponent<OffMeshConnection> @ CreateOffMeshConnection();
-	PhysicsWorld* GetOrCreateComponent<PhysicsWorld> @ CreatePhysicsWorld();
-	RigidBody* GetOrCreateComponent<RigidBody> @ CreateRigidBody();
-	SmoothedTransform* GetOrCreateComponent<SmoothedTransform> @ CreateSmoothedTransform();
-	SoundListener* GetOrCreateComponent<SoundListener> @ CreateSoundListener();
-	SoundSource* GetOrCreateComponent<SoundSource> @ CreateSoundSource();
-	StaticModel* GetOrCreateComponent<StaticModel> @ CreateStaticModel();
-	Terrain* GetOrCreateComponent<Terrain> @ CreateTerrain();
-	Zone* GetOrCreateComponent<Zone> @ CreateZone();
+    AnimationController* GetOrCreateComponent<AnimationController> @ GetOrCreateAnimationController();
+    AnimatedModel* GetOrCreateComponent<AnimatedModel> @ GetOrCreateAnimatedModel();
+    Camera* GetOrCreateComponent<Camera> @ GetOrCreateCamera();
+    CollisionShape* GetOrCreateComponent<CollisionShape> @ GetOrCreateCollisionShape();
+    Constraint* GetOrCreateComponent<Constraint> @ GetOrCreateConstraint();
+    DebugRenderer* GetOrCreateComponent<DebugRenderer> @ GetOrCreateDebugRenderer();
+    DecalSet* GetOrCreateComponent<DecalSet> @ GetOrCreateDecalSet();
+    Drawable* GetOrCreateComponent<Drawable> @ GetOrCreateDrawable();
+    Light* GetOrCreateComponent<Light> @ GetOrCreateLight();
+    Navigable* GetOrCreateComponent<Navigable> @ GetOrCreateNavigable();
+    NavigationMesh* GetOrCreateComponent<NavigationMesh> @ GetOrCreateNavigationMesh();
+    NetworkPriority* GetOrCreateComponent<NetworkPriority> @ GetOrCreateNetworkPriority();
+    Octree* GetOrCreateComponent<Octree> @ GetOrCreateOctree();
+    OffMeshConnection* GetOrCreateComponent<OffMeshConnection> @ GetOrCreateOffMeshConnection();
+    PhysicsWorld* GetOrCreateComponent<PhysicsWorld> @ GetOrCreatePhysicsWorld();
+    RigidBody* GetOrCreateComponent<RigidBody> @ GetOrCreateRigidBody();
+    SmoothedTransform* GetOrCreateComponent<SmoothedTransform> @ GetOrCreateSmoothedTransform();
+    SoundListener* GetOrCreateComponent<SoundListener> @ GetOrCreateSoundListener();
+    SoundSource* GetOrCreateComponent<SoundSource> @ GetOrCreateSoundSource();
+    StaticModel* GetOrCreateComponent<StaticModel> @ GetOrCreateStaticModel();
+    Terrain* GetOrCreateComponent<Terrain> @ GetOrCreateTerrain();
+    Zone* GetOrCreateComponent<Zone> @ GetOrCreateZone();
 
     /// Return ID.
     unsigned GetID() const { return id_; }
@@ -275,45 +278,29 @@ public:
     // Component* GetComponent(ShortStringHash type) const;
     /// Return whether has a specific component.
     // bool HasComponent(ShortStringHash type) const;
-	
-	/// Template version of returning a component by type.
+    
+    /// Template version of returning a component by type.
     // template <class T> T* GetComponent() const;
-	AnimationController* GetComponent<AnimationController> @ GetAnimationController() const;
-	AnimatedModel* GetComponent<AnimatedModel> @ GetAnimatedModel() const;
-	Camera* GetComponent<Camera> @ GetCamera() const;
-	CollisionShape* GetComponent<CollisionShape> @ GetCollisionShape() const;
-	Constraint* GetComponent<Constraint> @ GetConstraint() const;
-	DebugRenderer* GetComponent<DebugRenderer> @ GetDebugRenderer() const;
-	Drawable* GetComponent<Drawable> @ GetDrawable() const;
-	Light* GetComponent<Light> @ GetLight() const;
-	Navigable* GetComponent<Navigable> @ GetNavigable() const;
-	NavigationMesh* GetComponent<NavigationMesh> @ GetNavigationMesh() const;
-	NetworkPriority* GetComponent<NetworkPriority> @ GetNetworkPriority() const;
-	Octree* GetComponent<Octree> @ GetOctree() const;
-	OffMeshConnection* GetComponent<OffMeshConnection> @ GetOffMeshConnection() const;
-	PhysicsWorld* GetComponent<PhysicsWorld> @ GetPhysicsWorld() const;
-	RigidBody* GetComponent<RigidBody> @ GetRigidBody() const;
-	SmoothedTransform* GetComponent<SmoothedTransform> @ GetSmoothedTransform() const;
-	SoundListener* GetComponent<SoundListener> @ GetSoundListener() const;
-	SoundSource* GetComponent<SoundSource> @ GetSoundSource() const;
-	StaticModel* GetComponent<StaticModel> @ GetStaticModel() const;
-	Terrain* GetComponent<Terrain> @ GetTerrain() const;
-	Zone* GetComponent<Zone> @ GetZone() const;
+    AnimationController* GetComponent<AnimationController> @ GetAnimationController() const;
+    AnimatedModel* GetComponent<AnimatedModel> @ GetAnimatedModel() const;
+    Camera* GetComponent<Camera> @ GetCamera() const;
+    CollisionShape* GetComponent<CollisionShape> @ GetCollisionShape() const;
+    Constraint* GetComponent<Constraint> @ GetConstraint() const;
+    DebugRenderer* GetComponent<DebugRenderer> @ GetDebugRenderer() const;
+    DecalSet* GetComponent<DecalSet> @ GetDecalSet() const;
+    Drawable* GetComponent<Drawable> @ GetDrawable() const;
+    Light* GetComponent<Light> @ GetLight() const;
+    Navigable* GetComponent<Navigable> @ GetNavigable() const;
+    NavigationMesh* GetComponent<NavigationMesh> @ GetNavigationMesh() const;
+    NetworkPriority* GetComponent<NetworkPriority> @ GetNetworkPriority() const;
+    Octree* GetComponent<Octree> @ GetOctree() const;
+    OffMeshConnection* GetComponent<OffMeshConnection> @ GetOffMeshConnection() const;
+    PhysicsWorld* GetComponent<PhysicsWorld> @ GetPhysicsWorld() const;
+    RigidBody* GetComponent<RigidBody> @ GetRigidBody() const;
+    SmoothedTransform* GetComponent<SmoothedTransform> @ GetSmoothedTransform() const;
+    SoundListener* GetComponent<SoundListener> @ GetSoundListener() const;
+    SoundSource* GetComponent<SoundSource> @ GetSoundSource() const;
+    StaticModel* GetComponent<StaticModel> @ GetStaticModel() const;
+    Terrain* GetComponent<Terrain> @ GetTerrain() const;
+    Zone* GetComponent<Zone> @ GetZone() const;
 };
-
-Node* NewNode(Context* context);
-void Delete(Node* node);
-
-${
-
-static Node* NewNode(Context* context)
-{
-    return new Node(context);
-}
-
-static void Delete(Node* node)
-{
-    delete node;
-}
-
-$}

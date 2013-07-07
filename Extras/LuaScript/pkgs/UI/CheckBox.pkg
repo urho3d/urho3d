@@ -4,6 +4,10 @@ $#include "CheckBox.h"
 class CheckBox : public BorderImage
 {
 public:
+    /// Construct.
+    CheckBox(Context* context);
+    /// Destruct.
+    virtual ~CheckBox();
     /// Set checked state.
     void SetChecked(bool enable);
     /// Set checked image offset.

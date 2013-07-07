@@ -40,10 +40,10 @@ struct ColorFrame
     
     /// Construct from a color and time.
     ColorFrame(const Color& color, float time);
-	
+    
     /// Return interpolated value with another color-time pair at the time specified.
     Color Interpolate(const ColorFrame& next, float time);
-	
+    
     /// Color.
     Color color_ @ color;
     /// Time.
@@ -56,7 +56,7 @@ struct TextureFrame
     /// Construct with default values.
     TextureFrame();
     
-	/// UV coordinates.
+    /// UV coordinates.
     Rect uv_ @ uv;
     /// Time.
     float time_ @ time;

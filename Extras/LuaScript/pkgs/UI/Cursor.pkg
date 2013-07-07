@@ -31,23 +31,3 @@ public:
     /// Get current shape.
     CursorShape GetShape() const { return shape_; }
 };
-
-/// Create sprite without lua GC.
-Cursor* NewCursor(Context* context);
-
-/// Delete sprite.
-void Delete(Cursor* cursor);
-
-${
-
-static Cursor* NewCursor(Context* context)
-{
-	return new Cursor(context);
-}
-
-static void Delete(Cursor* cursor)
-{
-    delete cursor;
-}
-
-$}

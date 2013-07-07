@@ -4,6 +4,10 @@ $#include "Text.h"
 class Text : public UIElement
 {
 public:
+    /// Construct.
+    Text(Context* context);
+    /// Destruct.
+    virtual ~Text();
     /// Set font and font size.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size.

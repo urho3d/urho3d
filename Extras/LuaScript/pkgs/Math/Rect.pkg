@@ -46,7 +46,7 @@ public:
 
     /// Test for equality with another rect.
     bool operator == (const Rect& rhs) const { return min_ == rhs.min_ && max_ == rhs.max_; }
-	
+
     /// Define from another rect.
     void Define(const Rect& rect)
     {
@@ -133,11 +133,11 @@ public:
     Vector4 ToVector4() const { return Vector4(min_.x_, min_.y_, max_.x_, max_.y_); }
     /// Return as string.
     String ToString() const;
-	
+
     /// Minimum vector.
     Vector2 min_ @ min;
     
-	/// Maximum vector.
+    /// Maximum vector.
     Vector2 max_ @ max;
     
     /// Rect in the range (-1, -1) - (1, 1)
@@ -160,26 +160,26 @@ public:
     
     /// Test for equality with another rect.
     bool operator == (const IntRect& rhs) const;
-	
+    
     /// Return size.
     IntVector2 Size() const;
     
-	/// Return width.
+    /// Return width.
     int Width() const;
-	
+    
     /// Return height.
     int Height() const;
-	
+    
     /// Left coordinate.
     int left_ @ left;
     
-	/// Top coordinate.
+    /// Top coordinate.
     int top_ @ top;
     
-	/// Right coordinate.
+    /// Right coordinate.
     int right_ @ right;
     
-	/// Bottom coordinate.
+    /// Bottom coordinate.
     int bottom_ @ bottom;
     
     /// Zero-sized rect.

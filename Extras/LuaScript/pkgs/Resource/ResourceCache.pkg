@@ -23,20 +23,20 @@ public:
     /// Enable or disable automatic reloading of resources as files are modified.
     void SetAutoReloadResources(bool enable);
     
-	/// Template version of returning a resource by name.
-    // template <class T> T* GetResource(const char* name);	
-	Animation* GetResource<Animation> @ GetAnimation(const char* name);
-	Font* GetResource<Font> @ GetFont(const char* name);
-	Image* GetResource<Image> @ GetImage(const char* name);
-	Material* GetResource<Material> @ GetMaterial(const char* name);
-	Model* GetResource<Model> @ GetModel(const char* name);
-	Sound* GetResource<Sound> @ GetSound(const char* name);
-	Technique* GetResource<Technique> @ GetTechnique(const char* name);
-	Texture2D* GetResource<Texture2D> @ GetTexture2D(const char* name);
-	TextureCube* GetResource<TextureCube> @ GetTextureCube(const char* name);
-	XMLFile* GetResource<XMLFile> @ GetXMLFile(const char* name);
-	
-	/// Return whether a file exists by name.
+    /// Template version of returning a resource by name.
+    // template <class T> T* GetResource(const char* name);    
+    Animation* GetResource<Animation> @ GetAnimation(const char* name);
+    Font* GetResource<Font> @ GetFont(const char* name);
+    Image* GetResource<Image> @ GetImage(const char* name);
+    Material* GetResource<Material> @ GetMaterial(const char* name);
+    Model* GetResource<Model> @ GetModel(const char* name);
+    Sound* GetResource<Sound> @ GetSound(const char* name);
+    Technique* GetResource<Technique> @ GetTechnique(const char* name);
+    Texture2D* GetResource<Texture2D> @ GetTexture2D(const char* name);
+    TextureCube* GetResource<TextureCube> @ GetTextureCube(const char* name);
+    XMLFile* GetResource<XMLFile> @ GetXMLFile(const char* name);
+    
+    /// Return whether a file exists by name.
     bool Exists(const String& name) const;
     /// Return whether a file exists by name hash.
     bool Exists(StringHash nameHash) const;

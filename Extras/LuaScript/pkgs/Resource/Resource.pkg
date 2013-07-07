@@ -4,7 +4,6 @@ $#include "Resource.h"
 class Resource
 {    
 public:
-
     /// Return name.
     const String& GetName() const { return name_; }
     /// Return name hash.

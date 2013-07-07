@@ -14,13 +14,17 @@ public:
     /// Destruct.
     virtual ~Scene();
     
+    /// Load from an XML file. Return true if successful.
+    bool LoadXML(Deserializer& source);
+    /// Save to an XML file. Return true if successful.
+    bool SaveXML(Serializer& dest) const;
     /// Load from a binary file asynchronously. Return true if started successfully.
     bool LoadAsync(File* file);
     /// Load from an XML file asynchronously. Return true if started successfully.
     bool LoadAsyncXML(File* file);
     /// Stop asynchronous loading.
     void StopAsyncLoading();
-	/// Clear.
+    /// Clear.
     void Clear();
     /// Enable or disable scene update.
     void SetUpdateEnabled(bool enable);
@@ -95,20 +99,3 @@ public:
     /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
     void MarkReplicationDirty(Node* node);
 };
-
-Scene* NewScene(Context* context);
-void Delete(Scene* scene);
-
-${
-
-static Scene* NewScene(Context* context)
-{
-    return new Scene(context);
-}
-
-static void Delete(Scene* scene)
-{
-    delete scene;
-}
-
-$}

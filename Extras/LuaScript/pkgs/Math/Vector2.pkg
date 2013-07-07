@@ -86,7 +86,7 @@ public:
         else
             return *this;
     }
-	    
+    
     /// Return as string.
     String ToString() const;
     /// X coordinate.

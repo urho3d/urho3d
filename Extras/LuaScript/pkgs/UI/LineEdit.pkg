@@ -4,6 +4,10 @@ $#include "LineEdit.h"
 class LineEdit : public BorderImage
 {
 public:
+    /// Construct.
+    LineEdit(Context* context);
+    /// Destruct.
+    virtual ~LineEdit();
     /// Set text.
     void SetText(const String& text);
     /// Set cursor position.

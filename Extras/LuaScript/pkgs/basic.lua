@@ -38,8 +38,8 @@ function post_output_hook(package)
         if k == 0 then print('Pattern not replaced', pattern) end
     end
 
-	replace("\t", "  ")
-	
+    replace("\t", "  ")
+
     replace([[#ifndef __cplusplus
 #include "stdlib.h"
 #endif
@@ -67,6 +67,6 @@ function post_output_hook(package)
 
 #include "Precompiled.h"]]
       )
-	  
+
     WRITE(result)
 end

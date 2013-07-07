@@ -12,6 +12,15 @@ enum FileMode
 class File : public Deserializer
 {
 public:
+    /// Construct.
+    File(Context* context);
+    /// Construct and open a filesystem file.
+    File(Context* context, const String& fileName, FileMode mode = FILE_READ);
+    /// Construct and open from a package file.
+    File(Context* context, PackageFile* package, const String& fileName);
+    /// Destruct. Close the file if open.
+    virtual ~File();
+    
     /// Read bytes from the file. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size);
     /// Set position from the beginning of the file.

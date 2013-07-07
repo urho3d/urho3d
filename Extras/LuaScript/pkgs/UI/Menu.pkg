@@ -4,6 +4,10 @@ $#include "Menu.h"
 class Menu : public Button
 {
 public:
+    /// Construct.
+    Menu(Context* context);
+    /// Destruct.
+    virtual ~Menu();
     /// Set popup element to show on selection.
     void SetPopup(UIElement* element);
     /// Set popup element offset.

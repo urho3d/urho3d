@@ -1,0 +1,23 @@
+$#include "OctreeQuery.h"
+
+/// Graphics raycast detail level.
+enum RayQueryLevel
+{
+    RAY_AABB_NOSUBOBJECTS = 0,
+    RAY_AABB,
+    RAY_OBB,
+    RAY_TRIANGLE
+};
+
+/// Raycast result.
+struct RayQueryResult
+{
+    /// Drawable.
+    Drawable* drawable_ @ drawable;
+    /// Scene node.
+    Node* node_ @ node;
+    /// Distance from ray origin.
+    float distance_ @ distance;
+    /// Drawable specific subobject if applicable.
+    unsigned subObject_ @ subObject;
+};

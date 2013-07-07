@@ -41,6 +41,4 @@ public:
     CompressedFormat GetCompressedFormat() const { return compressedFormat_; }
     /// Return number of compressed mip levels.
     unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
-
 };
-

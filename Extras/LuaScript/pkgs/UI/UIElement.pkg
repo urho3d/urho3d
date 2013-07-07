@@ -79,6 +79,10 @@ static const unsigned DD_SOURCE_AND_TARGET;
 class UIElement : public Serializable
 {
 public:
+    /// Construct.
+    UIElement(Context* context);
+    /// Destruct.
+    virtual ~UIElement();
     /// Set name.
     void SetName(const String& name);
     /// Set position.

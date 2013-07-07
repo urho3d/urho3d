@@ -19,6 +19,10 @@ enum WindowDragMode
 class Window : public BorderImage
 {
 public:
+    /// Construct.
+    Window(Context* context);
+    /// Destruct.
+    virtual ~Window();
     /// Set whether can be moved.
     void SetMovable(bool enable);
     /// Set whether can be resized.

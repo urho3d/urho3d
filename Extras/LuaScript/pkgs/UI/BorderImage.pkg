@@ -6,6 +6,11 @@ enum BlendMode{};
 class BorderImage : public UIElement
 {
 public:
+    /// Construct.
+    BorderImage(Context* context);
+    /// Destruct.
+    virtual ~BorderImage();
+	
     /// Set texture.
     void SetTexture(Texture* texture);
     /// Set part of texture to use as the image.

@@ -21,7 +21,7 @@ public:
     /// Remove all animations.
     void RemoveAllAnimationStates();
     /// Set animation LOD bias.
-	void SetAnimationLodBias(float bias);
+    void SetAnimationLodBias(float bias);
     /// Set animation LOD distance factor when not visible (default 0 = do not update at all when invisible.)
     void SetInvisibleLodFactor(float factor);
     /// Set vertex morph weight by index.

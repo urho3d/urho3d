@@ -105,7 +105,7 @@ public:
     /// Return as string.
     String ToString() const;
     
-	/// X coordinate.
+    /// X coordinate.
     float x_ @ x;
     /// Y coordinate.
     float y_ @ y;

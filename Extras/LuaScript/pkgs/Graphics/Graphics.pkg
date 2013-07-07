@@ -4,42 +4,42 @@ $#include "Graphics.h"
 class Graphics : public Object
 {    
 public:    
-	/// Set window title.
+    /// Set window title.
     void SetWindowTitle(const char* windowTitle);
     
-	/// Set whether the main window uses sRGB conversion on write.
+    /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
     
-	/// Toggle between full screen and windowed mode. Return true if successful.
+    /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     
-	/// Take a screenshot. Return true if successful.
+    /// Take a screenshot. Return true if successful.
     bool TakeScreenShot(Image& destImage);
     
-	/// Return whether rendering initialized.
+    /// Return whether rendering initialized.
     bool IsInitialized() const;
     
-	/// Return window width.
+    /// Return window width.
     int GetWidth() const;
     
-	/// Return window height.
+    /// Return window height.
     int GetHeight() const;
     
-	/// Return multisample mode (1 = no multisampling.)
+    /// Return multisample mode (1 = no multisampling.)
     int GetMultiSample() const;
     
-	/// Return whether window is fullscreen.
+    /// Return whether window is fullscreen.
     bool GetFullscreen() const;
     
-	/// Return whether window is resizable.
+    /// Return whether window is resizable.
     bool GetResizable() const;
     
-	/// Return whether vertical sync is on.
+    /// Return whether vertical sync is on.
     bool GetVSync() const;
     
-	/// Return whether triple buffering is enabled.
+    /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const;
     
-	/// Return whether the main window is using sRGB conversion on write.
+    /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const;
 };

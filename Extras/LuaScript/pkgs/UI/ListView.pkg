@@ -15,6 +15,10 @@ enum HighlightMode
 class ListView : public ScrollView
 {
 public:
+    /// Construct.
+    ListView(Context* context);
+    /// Destruct.
+    virtual ~ListView();
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
     /// \brief Insert item at a specific index. In hierarchy mode, the optional parameter will be used to determine the child's indent level in respect to its parent.

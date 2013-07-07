@@ -55,5 +55,3 @@ public:
     /// Stop sound without locking the audio mutex. Called internally.
     void StopLockless();
 };
-
-	

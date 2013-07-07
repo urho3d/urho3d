@@ -18,7 +18,9 @@ public:
     /// Return drawable objects by a ray query.
     void Raycast(RayOctreeQuery& query) const;
     /// Return the closest drawable object by a ray query.
-    void RaycastSingle(RayOctreeQuery& query) const;
+    // void RaycastSingle(RayOctreeQuery& query) const;
+    tolua_outside RayQueryResult OctreeRaycastSingle @ RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags);
+    
     /// Return subdivision levels.
     unsigned GetNumLevels() const { return numLevels_; }
     
@@ -29,3 +31,25 @@ public:
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(bool depthTest);
 };
+
+${
+
+static RayQueryResult OctreeRaycastSingle(Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
+{
+    PODVector<RayQueryResult> result;
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags);
+    octree->RaycastSingle(query);
+    if (!query.result_.Empty())
+        return query.result_[0];
+    else
+    {
+        RayQueryResult empty;
+        empty.drawable_ = 0;
+        empty.node_ = 0;
+        empty.distance_ = M_INFINITY;
+        empty.subObject_ = 0;
+        return empty;
+    }
+}
+
+$}

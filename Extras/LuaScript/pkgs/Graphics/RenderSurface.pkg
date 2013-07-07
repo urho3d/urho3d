@@ -26,7 +26,7 @@ public:
     int GetHeight() const;
     /// Return usage.
     TextureUsage GetUsage() const;    
-	/// Return linked color rendertarget.
+    /// Return linked color rendertarget.
     RenderSurface* GetLinkedRenderTarget() const;
     /// Return linked depth-stencil surface.
     RenderSurface* GetLinkedDepthStencil() const;

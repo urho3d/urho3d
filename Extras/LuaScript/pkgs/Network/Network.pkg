@@ -5,6 +5,7 @@ class Network
 {
 public:
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
+    bool Connect(const String& address, unsigned short port, Scene* scene);
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
@@ -25,9 +26,11 @@ public:
     /// Set network update FPS.
     void SetUpdateFps(int fps);
     /// Register a remote event as allowed to be sent and received. If no events are registered, all are allowed.
-    void RegisterRemoteEvent(StringHash eventType);
+    // void RegisterRemoteEvent(StringHash eventType);
+    tolua_outside void NetworkRegisterRemoteEvent @ RegisterRemoteEvent(const char* eventType);
     /// Unregister a remote event as allowed to be sent and received.
-    void UnregisterRemoteEvent(StringHash eventType);
+    // void UnregisterRemoteEvent(StringHash eventType);
+    tolua_outside void NetworkUnregisterRemoteEvent @ UnregisterRemoteEvent(const char* eventType);
     /// Unregister all remote events. This results in all being allowed.
     void UnregisterAllRemoteEvents();
     /// Set the package download cache directory.
@@ -44,3 +47,17 @@ public:
     /// Return the package download cache directory.
     const String& GetPackageCacheDir() const { return packageCacheDir_; }
 };
+
+${
+
+static void NetworkRegisterRemoteEvent(Network* network, const char* eventType)
+{
+    network->RegisterRemoteEvent(StringHash(eventType));
+}
+
+static void NetworkUnregisterRemoteEvent(Network* network, const char* eventType)
+{
+    network->UnregisterRemoteEvent(StringHash(eventType));
+}
+
+$}

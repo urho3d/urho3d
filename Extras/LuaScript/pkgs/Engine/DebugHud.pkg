@@ -10,63 +10,63 @@ static const unsigned DEBUGHUD_SHOW_ALL;
 class DebugHud : public Object
 {
 public:
-	/// Update. Called by HandleUpdate().
+    /// Update. Called by HandleUpdate().
     void Update();
     
-	/// Set UI elements' style from an XML file.
+    /// Set UI elements' style from an XML file.
     void SetDefaultStyle(XMLFile* style);
     
-	/// Set elements to show.
+    /// Set elements to show.
     void SetMode(unsigned mode);
     
-	/// Set maximum profiler block depth, default unlimited.
+    /// Set maximum profiler block depth, default unlimited.
     void SetProfilerMaxDepth(unsigned depth);
     
-	/// Set profiler accumulation interval in seconds.
+    /// Set profiler accumulation interval in seconds.
     void SetProfilerInterval(float interval);
     
-	/// Set whether to show 3D geometry primitive/batch count only. Default false.
+    /// Set whether to show 3D geometry primitive/batch count only. Default false.
     void SetUseRendererStats(bool enable);
     
-	/// Toggle elements.
+    /// Toggle elements.
     void Toggle(unsigned mode);
     
-	/// Toggle all elements.
+    /// Toggle all elements.
     void ToggleAll();
 
     /// Return the UI style file.
     XMLFile* GetDefaultStyle() const;
     
-	/// Return rendering stats text.
+    /// Return rendering stats text.
     Text* GetStatsText() const;
     
-	/// Return rendering mode text.
+    /// Return rendering mode text.
     Text* GetModeText() const;
     
-	/// Return profiler text.
+    /// Return profiler text.
     Text* GetProfilerText() const;
     
-	/// Return currently shown elements.
+    /// Return currently shown elements.
     unsigned GetMode() const;
     
-	/// Return maximum profiler block depth.
+    /// Return maximum profiler block depth.
     unsigned GetProfilerMaxDepth() const;
     
-	/// Return profiler accumulation interval in seconds
+    /// Return profiler accumulation interval in seconds
     float GetProfilerInterval() const;
 
     /// Return whether showing 3D geometry primitive/batch count only.
     bool GetUseRendererStats() const;
     
-	/// Set application-specific stats.
+    /// Set application-specific stats.
     void SetAppStats(const String& label, const Variant& stats);
     
-	/// Set application-specific stats.
+    /// Set application-specific stats.
     void SetAppStats(const String& label, const String& stats);
     
-	/// Reset application-specific stats. Return true if it was erased successfully.
+    /// Reset application-specific stats. Return true if it was erased successfully.
     bool ResetAppStats(const String& label);
     
-	/// Clear all application-specific stats.
+    /// Clear all application-specific stats.
     void ClearAppStats();
 };

@@ -4,6 +4,10 @@ $#include "ScrollBar.h"
 class ScrollBar : public UIElement
 {
 public:
+    /// Construct.
+    ScrollBar(Context* context);
+    /// Destruct.
+    virtual ~ScrollBar();
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
     /// Set slider range maximum value (minimum value is always 0.)

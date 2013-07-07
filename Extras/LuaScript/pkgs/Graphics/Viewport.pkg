@@ -33,32 +33,3 @@ public:
     /// Return rendering path.
     RenderPath* GetRenderPath() const;
 };
-
-Viewport* NewViewport(Context* context);
-Viewport* NewViewport(Context* context, Scene* scene, Camera* camera);
-Viewport* NewViewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect);
-void Delete(Viewport* viewport);
-
-${
-
-Viewport* NewViewport(Context* context)
-{
-    return new Viewport(context);
-}
-
-Viewport* NewViewport(Context* context, Scene* scene, Camera* camera)
-{
-    return new Viewport(context, scene, camera);
-}
-
-Viewport* NewViewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect)
-{
-    return new Viewport(context, scene, camera, rect);
-}
-
-void Delete(Viewport* viewport)
-{
-    delete viewport;
-}
-
-$}

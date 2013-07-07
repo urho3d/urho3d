@@ -3,7 +3,7 @@ $#include "SoundSource3D.h"
 /// %Sound source component with three-dimensional position.
 class SoundSource3D : public SoundSource
 {
-public:    
+public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     /// Set attenuation parameters.

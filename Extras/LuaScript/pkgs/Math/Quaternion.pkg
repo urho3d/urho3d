@@ -169,7 +169,7 @@ public:
     /// Return as string.
     String ToString() const;
     
-	/// W coordinate.
+    /// W coordinate.
     float w_ @ w;
     /// X coordinate.
     float x_ @ x;

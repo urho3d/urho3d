@@ -3,5 +3,5 @@ $#include "Font.h"
 /// %Font resource.
 class Font : public Resource
 {
-public:    
+public:
 };

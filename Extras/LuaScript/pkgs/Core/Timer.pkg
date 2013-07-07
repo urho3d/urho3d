@@ -9,7 +9,7 @@ public:
     
     /// Return elapsed milliseconds and optionally reset.
     unsigned GetMSec(bool reset);
-	
+    
     /// Reset the timer.
     void Reset();
 };
@@ -21,12 +21,12 @@ public:
     /// Return frame number, starting from 1 once BeginFrame() is called for the first time.
     unsigned GetFrameNumber() const;
     
-	/// Return current frame timestep as seconds.
+    /// Return current frame timestep as seconds.
     float GetTimeStep() const;
     
-	/// Return current low-resolution timer period in milliseconds.
+    /// Return current low-resolution timer period in milliseconds.
     unsigned GetTimerPeriod();
-	
+    
     /// Return elapsed time from program start as seconds.
     float GetElapsedTime();    
 };

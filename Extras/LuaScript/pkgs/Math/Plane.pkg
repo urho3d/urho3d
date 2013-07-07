@@ -51,8 +51,8 @@ public:
     
     /// Plane normal.
     Vector3 normal_ @ normal;
-	/// Plane absolute normal.
+    /// Plane absolute normal.
     Vector3 absNormal_ @ absNormal;
-	/// Plane intercept parameter.
+    /// Plane intercept parameter.
     float intercept_ @ intercept;
 };

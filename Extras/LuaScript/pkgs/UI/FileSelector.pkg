@@ -13,6 +13,10 @@ struct FileSelectorEntry
 class FileSelector : public Object
 {
 public:
+    /// Construct.
+    FileSelector(Context* context);
+    /// Destruct.
+    virtual ~FileSelector();
     /// Set fileselector UI style.
     void SetDefaultStyle(XMLFile* style);
     /// Set title text.

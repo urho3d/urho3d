@@ -82,5 +82,4 @@ public:
     const String& GetDownloadName() const;
     /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
-    
 };

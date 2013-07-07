@@ -4,6 +4,10 @@ $#include "Button.h"
 class Button : public BorderImage
 {
 public:
+    /// Construct.
+    Button(Context* context);
+    /// Destruct.
+    virtual ~Button();
     /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(const IntVector2& offset);
     /// Set offset to image rectangle used when pressed.

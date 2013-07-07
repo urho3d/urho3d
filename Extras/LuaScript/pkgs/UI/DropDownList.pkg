@@ -4,6 +4,10 @@ $#include "DropDownList.h"
 class DropDownList : public Menu
 {
 public:
+    /// Construct.
+    DropDownList(Context* context);
+    /// Destruct.
+    ~DropDownList();
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
     /// Insert item to a specific position.
