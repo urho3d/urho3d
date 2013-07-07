@@ -134,5 +134,3 @@ public:
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() { return frame_; }
 };
-
-Renderer* GetRenderer();

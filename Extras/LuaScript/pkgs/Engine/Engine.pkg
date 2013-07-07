@@ -58,5 +58,3 @@ public:
 	/// Return whether the engine has been created in headless mode.
     bool IsHeadless() const;
 };
-
-Engine* GetEngine();

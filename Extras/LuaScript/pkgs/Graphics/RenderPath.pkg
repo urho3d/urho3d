@@ -1,0 +1,46 @@
+$#include "RenderPath.h"
+
+/// Rendering path definition.
+class RenderPath
+{
+public:
+    /// Clone the rendering path.
+    SharedPtr<RenderPath> Clone();
+    /// Clear existing data and load from an XML file. Return true if successful.
+    bool Load(XMLFile* file);
+    /// Append data from an XML file. Return true if successful.
+    bool Append(XMLFile* file);
+    /// Enable/disable commands and rendertargets by tag.
+    void SetEnabled(const char* tag, bool active);
+    /// Toggle enabled state of commands and rendertargets by tag.
+    void ToggleEnabled(const char* tag);
+    /// Assign rendertarget at index.
+    void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
+    /// Add a rendertarget.
+    void AddRenderTarget(const RenderTargetInfo& info);
+    /// Remove a rendertarget by index.
+    void RemoveRenderTarget(unsigned index);
+    /// Remove a rendertarget by name.
+    void RemoveRenderTarget(const char* name);
+    /// Remove rendertargets by tag name.
+    void RemoveRenderTargets(const char* tag);
+    /// Assign command at index.
+    void SetCommand(unsigned index, const RenderPathCommand& command);
+    /// Add a command to the end of the list.
+    void AddCommand(const RenderPathCommand& command);
+    /// Insert a command at a position.
+    void InsertCommand(unsigned index, const RenderPathCommand& command);
+    /// Remove a command by index.
+    void RemoveCommand(unsigned index);
+    /// Remove commands by tag name.
+    void RemoveCommands(const char* tag);
+    /// Set a shader parameter in all commands that define it.
+    void SetShaderParameter(const char* name, const Vector4& value);
+    
+    /// Return number of rendertargets.
+    unsigned GetNumRenderTargets() const { return renderTargets_.Size(); }
+    /// Return number of commands.
+    unsigned GetNumCommands() const { return commands_.Size(); }
+    /// Return a shader parameter (first appearance in any command.)
+    const Vector4& GetShaderParameter(const char* name) const;
+};

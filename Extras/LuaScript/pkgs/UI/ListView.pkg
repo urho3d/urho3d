@@ -86,5 +86,3 @@ public:
     /// Return item doubleclick interval in seconds.
     float GetDoubleClickInterval() const;
 };
-
-ListView* NewListView @ ListView();

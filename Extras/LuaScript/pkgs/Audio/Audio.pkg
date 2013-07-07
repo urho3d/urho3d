@@ -44,5 +44,3 @@ public:
     /// Return sound type specific gain multiplied by master gain.
     float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
 };
-
-Audio* GetAudio();

@@ -26,5 +26,3 @@ public:
     /// Return paging minimum repeat rate (number of events per second).
     float GetRepeatRate() const { return repeatRate_; }
 };
-
-Slider* NewSlider @ Slider();

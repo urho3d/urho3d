@@ -1,7 +1,7 @@
 $#include "Console.h"
 
 /// %Console window with log history and AngelScript prompt.
-class Console : public Object
+class Console
 {
 public:
     /// Set UI elements' style from an XML file.
@@ -46,6 +46,3 @@ public:
 	/// Return history row at index.
     const String& GetHistoryRow(unsigned index) const;
 };
-
-Console* GetConsole();
-

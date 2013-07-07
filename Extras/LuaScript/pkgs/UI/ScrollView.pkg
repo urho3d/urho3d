@@ -39,5 +39,3 @@ public:
     /// Set view position attribute.
     void SetViewPositionAttr(const IntVector2& value);
 };
-
-ScrollView* NewScrollView @ ScrollView();

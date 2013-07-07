@@ -1,7 +1,5 @@
 $#define TOLUA_RELEASE
 
-$#include "LuaScript.h"
-
 $pfile "Graphics/AnimatedModel.pkg"
 $pfile "Graphics/Animation.pkg"
 $pfile "Graphics/AnimationController.pkg"
@@ -19,6 +17,7 @@ $pfile "Graphics/Model.pkg"
 $pfile "Graphics/Octree.pkg"
 $pfile "Graphics/ParticleEmitter.pkg"
 $pfile "Graphics/Renderer.pkg"
+$pfile "Graphics/RenderPath.pkg"
 $pfile "Graphics/RenderSurface.pkg"
 $pfile "Graphics/Skeleton.pkg"
 $pfile "Graphics/Skybox.pkg"
@@ -29,31 +28,8 @@ $pfile "Graphics/TerrainPatch.pkg"
 $pfile "Graphics/Texture.pkg"
 $pfile "Graphics/Texture2D.pkg"
 $pfile "Graphics/TextureCube.pkg"
+$pfile "Graphics/Viewport.pkg"
 $pfile "Graphics/Zone.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)
-
-${
-
-DebugRenderer* GetDebugRenderer()
-{
-    return GetLuaScriptContext()->GetSubsystem<DebugRenderer>();
-}
-
-Graphics* GetGraphics()
-{
-    return GetLuaScriptContext()->GetSubsystem<Graphics>();
-}
-
-Renderer* GetRenderer()
-{
-    return GetLuaScriptContext()->GetSubsystem<Renderer>();
-}
-
-Octree* GetOctree()
-{
-    return 0;
-}
-
-$}

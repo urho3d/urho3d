@@ -43,5 +43,3 @@ public:
 	/// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const;
 };
-
-Graphics* GetGraphics();

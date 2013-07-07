@@ -9,6 +9,17 @@ static const int QUAL_CTRL; // 2;
 static const int QUAL_ALT; // 4;
 static const int QUAL_ANY; // 8;
 
+static const int KEY_1;
+static const int KEY_2;
+static const int KEY_3;
+static const int KEY_4;
+static const int KEY_5;
+static const int KEY_6;
+static const int KEY_7;
+static const int KEY_8;
+static const int KEY_9;
+static const int KEY_0;
+
 static const int KEY_A;
 static const int KEY_B;
 static const int KEY_C;
@@ -116,3 +127,45 @@ static const int HAT_UP; // SDL_HAT_UP;
 static const int HAT_RIGHT; // SDL_HAT_RIGHT;
 static const int HAT_DOWN; // SDL_HAT_DOWN;
 static const int HAT_LEFT; // SDL_HAT_LEFT;
+
+${
+
+static const int KEY_1 = '1';
+static const int KEY_2 = '2';
+static const int KEY_3 = '3';
+static const int KEY_4 = '4';
+static const int KEY_5 = '5';
+static const int KEY_6 = '6';
+static const int KEY_7 = '7';
+static const int KEY_8 = '8';
+static const int KEY_9 = '9';
+static const int KEY_0 = '0';
+
+static const int KEY_A = 'A';
+static const int KEY_B = 'B';
+static const int KEY_C = 'C';
+static const int KEY_D = 'D';
+static const int KEY_E = 'E';
+static const int KEY_F = 'F';
+static const int KEY_G = 'G';
+static const int KEY_H = 'H';
+static const int KEY_I = 'I';
+static const int KEY_J = 'J';
+static const int KEY_K = 'K';
+static const int KEY_L = 'L';
+static const int KEY_M = 'M';
+static const int KEY_N = 'N';
+static const int KEY_O = 'O';
+static const int KEY_P = 'P';
+static const int KEY_Q = 'Q';
+static const int KEY_R = 'R';
+static const int KEY_S = 'S';
+static const int KEY_T = 'T';
+static const int KEY_U = 'U';
+static const int KEY_V = 'V';
+static const int KEY_W = 'W';
+static const int KEY_X = 'X';
+static const int KEY_Y = 'Y';
+static const int KEY_Z = 'Z';
+
+$}

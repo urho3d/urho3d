@@ -63,5 +63,3 @@ public:
     /// Return directory mode flag.
     bool GetDirectoryMode() const { return directoryMode_; }
 };
-
-FileSelector* NewFileSelector @ FileSelector();

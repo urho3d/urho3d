@@ -1,0 +1,139 @@
+$#include "Audio.h"
+$#include "Console.h"
+$#include "Context.h"
+$#include "DebugHud.h"
+$#include "DebugRenderer.h"
+$#include "Engine.h"
+$#include "FileSystem.h"
+$#include "Graphics.h"
+$#include "Input.h"
+$#include "Log.h"
+$#include "Network.h"
+$#include "Network.h"
+$#include "LuaScript.h"
+$#include "PhysicsWorld.h"
+$#include "Renderer.h"
+$#include "ResourceCache.h"
+$#include "Time.h"
+$#include "UI.h"
+
+
+/// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
+class Context
+{
+public:
+    /// Template version of returning a subsystem.
+    // template <class T> T* GetSubsystem() const;
+	Audio* GetSubsystem<Audio> @ GetAudio() const;
+	Console* GetSubsystem<Console> @ GetConsole() const;
+	DebugHud* GetSubsystem<DebugHud> @ GetDebugHud() const;
+	DebugRenderer* GetSubsystem<DebugRenderer> @ GetDebugRenderer() const;
+	Engine* GetSubsystem<Engine> @ GetEngine() const;
+	FileSystem* GetSubsystem<FileSystem> @ GetFileSystem() const;
+	Graphics* GetSubsystem<Graphics> @ GetGraphics() const;
+	Input* GetSubsystem<Input> @ GetInput() const;
+	Log* GetSubsystem<Log> @ GetLog() const;
+	Network* GetSubsystem<Network> @ GetNetwork() const;
+	PhysicsWorld* GetSubsystem<PhysicsWorld> @ GetPhysicsWorld() const;	
+	Renderer* GetSubsystem<Renderer> @ GetRenderer() const;	
+	ResourceCache* GetSubsystem<ResourceCache> @ GetCache() const;
+	Time* GetSubsystem<Time> @ GetTime() const;	
+	UI* GetSubsystem<UI> @ GetUI() const;
+};
+
+Context* GetContext();
+
+Audio* GetAudio();
+Console* GetConsole();
+DebugHud* GetDebugHud();
+DebugRenderer* GetDebugRenderer();
+Engine* GetEngine();
+FileSystem* GetFileSystem();
+Graphics* GetGraphics();
+Input* GetInput();
+Log* GetLog();
+Network* GetNetwork();
+PhysicsWorld* GetPhysicsWorld();
+Renderer* GetRenderer();
+ResourceCache* GetCache();
+Time* GetTime();	
+UI* GetUI();
+
+${
+
+static Audio* GetAudio()
+{
+    return GetContext()->GetSubsystem<Audio>();
+}
+
+static Console* GetConsole()
+{
+    return GetContext()->GetSubsystem<Console>();
+}
+
+static DebugHud* GetDebugHud()
+{
+    return GetContext()->GetSubsystem<DebugHud>();
+}
+
+static DebugRenderer* GetDebugRenderer()
+{
+    return GetContext()->GetSubsystem<DebugRenderer>();
+}
+
+static Engine* GetEngine()
+{
+    return GetContext()->GetSubsystem<Engine>();
+}
+
+static FileSystem* GetFileSystem()
+{
+    return GetContext()->GetSubsystem<FileSystem>();
+}
+
+static Graphics* GetGraphics()
+{
+    return GetContext()->GetSubsystem<Graphics>();
+}
+
+static Input* GetInput()
+{
+    return GetContext()->GetSubsystem<Input>();
+}
+
+static Log* GetLog()
+{
+    return GetContext()->GetSubsystem<Log>();
+}
+
+static Network* GetNetwork()
+{
+    return GetContext()->GetSubsystem<Network>();
+}
+
+static PhysicsWorld* GetPhysicsWorld()
+{
+    return GetContext()->GetSubsystem<PhysicsWorld>();
+}
+
+static Renderer* GetRenderer()
+{
+    return GetContext()->GetSubsystem<Renderer>();
+}
+
+static ResourceCache* GetCache()
+{
+    return GetContext()->GetSubsystem<ResourceCache>();
+}
+
+static Time* GetTime()
+{
+    return GetContext()->GetSubsystem<Time>();
+}
+
+static UI* GetUI()
+{
+    return GetContext()->GetSubsystem<UI>();
+}
+
+$}

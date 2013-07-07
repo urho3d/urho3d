@@ -8,6 +8,60 @@ enum LightType
     LIGHT_POINT
 };
 
+/// Shadow depth bias parameters.
+struct BiasParameters
+{
+    /// Construct undefined.
+    BiasParameters()
+    {
+    }
+    
+    /// Construct with initial values.
+    BiasParameters(float constantBias, float slopeScaledBias) :
+        constantBias_(constantBias),
+        slopeScaledBias_(slopeScaledBias)
+    {
+    }
+};
+
+/// Cascaded shadow map parameters.
+struct CascadeParameters
+{
+    /// Construct undefined.
+    CascadeParameters()
+    {
+    }
+    
+    /// Construct with initial values.
+    CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f) :
+        fadeStart_(fadeStart),
+        biasAutoAdjust_(biasAutoAdjust)
+    {
+        splits_[0] = split1;
+        splits_[1] = split2;
+        splits_[2] = split3;
+        splits_[3] = split4;
+    }
+};
+
+/// Shadow map focusing parameters.
+struct FocusParameters
+{
+    /// Construct undefined.
+    FocusParameters()
+    {
+    }
+    
+    /// Construct with initial values.
+    FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) :
+        focus_(focus),
+        nonUniform_(nonUniform),
+        autoSize_(autoSize),
+        quantize_(quantize),
+        minView_(minView)
+    {
+    }
+};
 /// %Light component.
 class Light : public Drawable
 {

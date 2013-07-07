@@ -18,6 +18,11 @@ enum CursorShape
 class Cursor : public BorderImage
 {
 public:
+    /// Construct.
+    Cursor(Context* context);
+    /// Destruct.
+    virtual ~Cursor();
+    
     /// Define a shape.
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
     /// Set current shape.
@@ -27,5 +32,22 @@ public:
     CursorShape GetShape() const { return shape_; }
 };
 
-Cursor* NewCursor @ Cursor();
+/// Create sprite without lua GC.
+Cursor* NewCursor(Context* context);
 
+/// Delete sprite.
+void Delete(Cursor* cursor);
+
+${
+
+static Cursor* NewCursor(Context* context)
+{
+	return new Cursor(context);
+}
+
+static void Delete(Cursor* cursor)
+{
+    delete cursor;
+}
+
+$}

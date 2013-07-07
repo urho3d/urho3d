@@ -118,5 +118,3 @@ public:
     /// Return whether application window is minimized.
     bool IsMinimized() const;
 };
-
-Input* GetInput();

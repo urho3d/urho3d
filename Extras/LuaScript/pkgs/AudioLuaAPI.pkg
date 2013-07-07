@@ -1,7 +1,5 @@
 $#define TOLUA_RELEASE
 
-$#include "LuaScript.h"
-
 $pfile "Audio/Audio.pkg"
 $pfile "Audio/Sound.pkg"
 $pfile "Audio/SoundListener.pkg"
@@ -10,12 +8,3 @@ $pfile "Audio/SoundSource3D.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)
-
-${
-
-Audio* GetAudio()
-{
-    return GetLuaScriptContext()->GetSubsystem<Audio>();
-}
-
-$}

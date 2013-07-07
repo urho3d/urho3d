@@ -344,6 +344,3 @@ public:
     /// Get element event sender.
     UIElement* GetElementEventSender() const;
 };
-
-UIElement* NewUIElement @ UIElement();
-

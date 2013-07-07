@@ -30,5 +30,3 @@ public:
     /// Return elapsed time from program start as seconds.
     float GetElapsedTime();    
 };
-
-Time* GetTime();

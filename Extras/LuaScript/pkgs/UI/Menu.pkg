@@ -27,5 +27,3 @@ public:
     int GetAcceleratorQualifiers() const { return acceleratorQualifiers_; }
     int GetAcceleratorQualifiers() const;
 };
-
-Menu* NewMenu @ Menu();

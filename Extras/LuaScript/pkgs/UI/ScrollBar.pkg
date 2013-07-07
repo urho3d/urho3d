@@ -40,5 +40,3 @@ public:
     /// Return slider element.
     Slider* GetSlider() const { return slider_; }
 };
-
-ScrollBar* NewScrollBar @ ScrollBar();

@@ -117,9 +117,11 @@ public:
     
     /// Test for equality with another string.
     bool operator == (const String& rhs) const { return strcmp(CString(), rhs.CString()) == 0; }
+    tolua_outside bool StringEq @ Eq(const String& rhs) const;
     /// Test if string is less than another string.
     bool operator < (const String& rhs) const { return strcmp(CString(), rhs.CString()) < 0; }
     bool operator == (const char* rhs) const { return strcmp(CString(), rhs) == 0; }
+    tolua_outside bool StringEq @ Eq(const char* rhs) const;
     /// Test if string is less than a C string.
     bool operator < (const char* rhs) const { return strcmp(CString(), rhs) < 0; }
     /// Return char at index.
@@ -236,3 +238,17 @@ public:
     /// Empty string.
     static const String EMPTY;
 };
+
+${
+
+static bool StringEq(const String* lhs, const char* rhs)
+{
+    return (*lhs) == rhs;
+}
+
+static bool StringEq(const String* lhs, const String& rhs)
+{
+    return (*lhs) == rhs;
+}
+
+$}

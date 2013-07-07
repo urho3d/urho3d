@@ -9,6 +9,11 @@ static const unsigned LAST_LOCAL_ID;
 class Scene : public Node
 {
 public:
+    /// Construct.
+    Scene(Context* context);
+    /// Destruct.
+    virtual ~Scene();
+    
     /// Load from a binary file asynchronously. Return true if started successfully.
     bool LoadAsync(File* file);
     /// Load from an XML file asynchronously. Return true if started successfully.
@@ -91,4 +96,19 @@ public:
     void MarkReplicationDirty(Node* node);
 };
 
-Scene* GetScene();
+Scene* NewScene(Context* context);
+void Delete(Scene* scene);
+
+${
+
+static Scene* NewScene(Context* context)
+{
+    return new Scene(context);
+}
+
+static void Delete(Scene* scene)
+{
+    delete scene;
+}
+
+$}

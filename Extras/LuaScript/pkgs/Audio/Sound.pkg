@@ -13,6 +13,12 @@ public:
     /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.)
     void FixInterpolation();
     
+    /// Return sound data start.
+    signed char* GetStart() const { return data_.Get(); }
+    /// Return loop start.
+    signed char* GetRepeat() const { return repeat_; }
+    /// Return sound data end.
+    signed char* GetEnd() const { return end_; }
     /// Return length in seconds.
     float GetLength() const;
     /// Return total sound data size.
@@ -30,6 +36,5 @@ public:
     /// Return whether data is stereo.
     bool IsStereo() const { return stereo_; }
     /// Return whether is compressed in Ogg Vorbis format.
-    bool IsCompressed() const { return compressed_; }    
-
+    bool IsCompressed() const { return compressed_; }
 };

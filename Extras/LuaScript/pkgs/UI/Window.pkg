@@ -49,5 +49,3 @@ public:
     /// Get modal frame size.
     const IntVector2& GetModalFrameSize() const { return modalFrameSize_; }
 };
-
-Window* NewWindow @ Window();

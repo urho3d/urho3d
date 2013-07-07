@@ -44,5 +44,3 @@ public:
     /// Return the package download cache directory.
     const String& GetPackageCacheDir() const { return packageCacheDir_; }
 };
-
-Network* GetNetwork();

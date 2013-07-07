@@ -29,5 +29,3 @@ public:
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(bool depthTest);
 };
-
-Octree* GetOctree();

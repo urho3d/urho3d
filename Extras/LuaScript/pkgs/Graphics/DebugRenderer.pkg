@@ -33,5 +33,3 @@ public:
     /// Check whether a bounding box is inside the view frustum.
     bool IsInside(const BoundingBox& box) const;
 };
-
-DebugRenderer* GetDebugRenderer();

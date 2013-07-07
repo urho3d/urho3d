@@ -1,29 +1,8 @@
 $#define TOLUA_RELEASE
 
-$#include "LuaScript.h"
-
 $pfile "Engine/Console.pkg"
 $pfile "Engine/DebugHud.pkg"
 $pfile "Engine/Engine.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)
-
-${
-
-Console* GetConsole()
-{
-    return GetLuaScriptContext()->GetSubsystem<Console>();
-}
-
-DebugHud* GetDebugHud()
-{
-    return GetLuaScriptContext()->GetSubsystem<DebugHud>();
-}
-
-Engine* GetEngine()
-{
-    return GetLuaScriptContext()->GetSubsystem<Engine>();
-}
-
-$}

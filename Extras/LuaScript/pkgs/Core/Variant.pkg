@@ -55,11 +55,11 @@ struct ResourceRefList
 
     /// Construct with type only.
     ResourceRefList(ShortStringHash type);
-	
-	/// Object type.
+
+    /// Object type.
     ShortStringHash type_ @ type;
-    
-	/// Test for equality with another reference list.
+
+    /// Test for equality with another reference list.
     bool operator == (const ResourceRefList& rhs) const;
 };
 
@@ -99,7 +99,7 @@ public:
 
     /// Construct from a quaternion.
     Variant(const Quaternion& value);
-	
+
     /// Construct from a color.
     Variant(const Color& value);
 
@@ -142,7 +142,7 @@ public:
     /// Reset to empty.
     void Clear();
 
-	/// Test for equality with another variant.
+    /// Test for equality with another variant.
     bool operator == (const Variant& rhs) const;
     /// Test for equality with an integer. To return true, both the type and value must match.
     bool operator == (int rhs) const;
@@ -178,9 +178,8 @@ public:
     bool operator == (const StringHash& rhs) const;
     /// Test for equality with a ShortStringHash. To return true, both the type and value must match.
     bool operator == (const ShortStringHash& rhs) const;
-    
-	
-	/// Return int or zero on type mismatch.
+
+    /// Return int or zero on type mismatch.
     int GetInt() const;
     /// Return unsigned int or zero on type mismatch.
     int GetUInt() const;
@@ -230,33 +229,185 @@ public:
 class VariantMap
 {
 public:
-	tolua_outside int VariantMapGetInt @ GetInt(const char* key);
-	tolua_outside bool VariantMapGetBool @ GetBool(const char* key);
-	tolua_outside float VariantMapGetFloat @ GetFloat(const char* key);
-	tolua_outside const Vector2& VariantMapGetVector2 @ GetVector2(const char* key);
-	tolua_outside const Vector3& VariantMapGetVector3 @ GetVector3(const char* key);
-	tolua_outside const Vector4& VariantMapGetVector4 @ GetVector4(const char* key);
-	tolua_outside const Quaternion& VariantMapGetQuaternion @ GetQuaternion(const char* key);
-	tolua_outside const Color& VariantMapGetColor @ GetColor(const char* key);
-	tolua_outside const String& VariantMapGetString @ GetString(const char* key);
-	tolua_outside const void* VariantMapGetPtr @ GetPtr(const char* key);
-	tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const char* key);
-	tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const char* key);
-	tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const char* key);
-	tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const char* key);
+    VariantMap();
 
-	tolua_outside void VariantMapSetInt @ SetInt(const char* key, int value);
-	tolua_outside void VariantMapSetBool @ SetBool(const char* key, bool value);
-	tolua_outside void VariantMapSetFloat @ SetFloat(const char* key, float value);
-	tolua_outside void VariantMapSetVector2 @ SetVector2(const char* key, const Vector2& value);
-	tolua_outside void VariantMapSetVector3 @ SetVector3(const char* key, const Vector3& value);
-	tolua_outside void VariantMapSetVector4 @ SetVector4(const char* key, const Vector4& value);
-	tolua_outside void VariantMapSetQuaternion @ SetQuaternion(const char* key, const Quaternion& value);
-	tolua_outside void VariantMapSetColor @ SetColor(const char* key, const Color& value);
-	tolua_outside void VariantMapSetString @ SetString(const char* key, const String& value);
-	tolua_outside void VariantMapSetPtr @ SetPtr(const char* key, void* value);
-	tolua_outside void VariantMapSetResourceRef @ SetResourceRef(const char* key, const ResourceRef& value);
-	tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const char* key, const ResourceRefList& value); 
-	tolua_outside void VariantMapSetIntRect @ SetIntRect(const char* key, const IntRect& value);
-	tolua_outside void VariantMapSetIntVector2 @ SetIntVector2(const char* key, const IntVector2& value);
+    tolua_outside int VariantMapGetInt @ GetInt(const char* key);
+    tolua_outside bool VariantMapGetBool @ GetBool(const char* key);
+    tolua_outside float VariantMapGetFloat @ GetFloat(const char* key);
+    tolua_outside const Vector2& VariantMapGetVector2 @ GetVector2(const char* key);
+    tolua_outside const Vector3& VariantMapGetVector3 @ GetVector3(const char* key);
+    tolua_outside const Vector4& VariantMapGetVector4 @ GetVector4(const char* key);
+    tolua_outside const Quaternion& VariantMapGetQuaternion @ GetQuaternion(const char* key);
+    tolua_outside const Color& VariantMapGetColor @ GetColor(const char* key);
+    tolua_outside const String& VariantMapGetString @ GetString(const char* key);
+    tolua_outside const void* VariantMapGetPtr @ GetPtr(const char* key);
+    tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const char* key);
+    tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const char* key);
+    tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const char* key);
+    tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const char* key);
+
+    tolua_outside void VariantMapSetInt @ SetInt(const char* key, int value);
+    tolua_outside void VariantMapSetBool @ SetBool(const char* key, bool value);
+    tolua_outside void VariantMapSetFloat @ SetFloat(const char* key, float value);
+    tolua_outside void VariantMapSetVector2 @ SetVector2(const char* key, const Vector2& value);
+    tolua_outside void VariantMapSetVector3 @ SetVector3(const char* key, const Vector3& value);
+    tolua_outside void VariantMapSetVector4 @ SetVector4(const char* key, const Vector4& value);
+    tolua_outside void VariantMapSetQuaternion @ SetQuaternion(const char* key, const Quaternion& value);
+    tolua_outside void VariantMapSetColor @ SetColor(const char* key, const Color& value);
+    tolua_outside void VariantMapSetString @ SetString(const char* key, const String& value);
+    tolua_outside void VariantMapSetPtr @ SetPtr(const char* key, void* value);
+    tolua_outside void VariantMapSetResourceRef @ SetResourceRef(const char* key, const ResourceRef& value);
+    tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const char* key, const ResourceRefList& value); 
+    tolua_outside void VariantMapSetIntRect @ SetIntRect(const char* key, const IntRect& value);
+    tolua_outside void VariantMapSetIntVector2 @ SetIntVector2(const char* key, const IntVector2& value);
 };
+
+${
+
+const Variant& FindVariant(const VariantMap* vmap, const char* key)
+{
+    VariantMap::ConstIterator i = vmap->Find(ShortStringHash(key));
+    return i != vmap->End() ? i->second_ : Variant::EMPTY;
+}
+
+int VariantMapGetInt(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetInt();
+}
+
+bool VariantMapGetBool(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetBool();
+}
+
+float VariantMapGetFloat(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetFloat();
+}
+
+const Vector2& VariantMapGetVector2(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetVector2();
+}
+
+const Vector3& VariantMapGetVector3(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetVector3();
+}
+
+const Vector4& VariantMapGetVector4(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetVector4();
+}
+
+const Quaternion& VariantMapGetQuaternion(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetQuaternion();
+}
+
+const Color& VariantMapGetColor(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetColor();
+}
+
+const String& VariantMapGetString(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetString();
+}
+
+const void* VariantMapGetPtr(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetPtr();
+}
+
+const ResourceRef& VariantMapGetResourceRef(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetResourceRef();
+}
+
+const ResourceRefList& VariantMapGetResourceRefList(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetResourceRefList();
+}
+
+const IntRect& VariantMapGetIntRect(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetIntRect();
+}
+
+const IntVector2& VariantMapGetIntVector2(const VariantMap* vmap, const char* key)
+{
+    return FindVariant(vmap, key).GetIntVector2();
+}
+
+void VariantMapSetInt(VariantMap* vmap, const char* key, int value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetBool(VariantMap* vmap, const char* key, bool value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetFloat(VariantMap* vmap, const char* key, float value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetVector2(VariantMap* vmap, const char* key, const Vector2& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetVector3(VariantMap* vmap, const char* key, const Vector3& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetVector4(VariantMap* vmap, const char* key, const Vector4& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetQuaternion(VariantMap* vmap, const char* key, const Quaternion& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetColor(VariantMap* vmap, const char* key, const Color& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetString(VariantMap* vmap, const char* key, const String& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetPtr(VariantMap* vmap, const char* key, void* value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetResourceRef(VariantMap* vmap, const char* key, const ResourceRef& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetResourceRefList(VariantMap* vmap, const char* key, const ResourceRefList& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetIntRect(VariantMap* vmap, const char* key, const IntRect& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetIntVector2(VariantMap* vmap, const char* key, const IntVector2& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+$}

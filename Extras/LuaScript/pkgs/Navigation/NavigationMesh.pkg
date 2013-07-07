@@ -99,5 +99,15 @@ public:
     BoundingBox GetWorldBoundingBox() const;
     /// Return number of tiles.
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
-
 };
+
+${
+
+PODVector<Vector3> NavigationMeshFindPath(NavigationMesh* navMesh, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
+{
+    PODVector<Vector3> dest;
+    navMesh->FindPath(dest, start, end, extents);
+    return dest;
+}
+
+$}

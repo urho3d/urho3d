@@ -38,5 +38,3 @@ public:
     /// Return whether popup should be automatically resized.
     bool GetResizePopup() const { return resizePopup_; }
 };
-
-DropDownList* NewDropDownList @ DropDownList();

@@ -28,5 +28,3 @@ public:
     /// Return repeat rate.
     float GetRepeatRate() const { return repeatRate_; }
 };
-
-Button* NewButton @ Button();

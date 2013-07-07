@@ -47,8 +47,6 @@ public:
     String GetUserDocumentsDir() const;
 };
 
-FileSystem* GetFileSystem();
-
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase.
 void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension);
 /// Return the path from a full path.

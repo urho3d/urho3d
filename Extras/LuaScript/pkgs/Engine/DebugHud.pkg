@@ -70,5 +70,3 @@ public:
 	/// Clear all application-specific stats.
     void ClearAppStats();
 };
-
-DebugHud* GetDebugHud();

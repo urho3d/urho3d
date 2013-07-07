@@ -2,6 +2,7 @@ $#define TOLUA_RELEASE
 
 $#include "LuaScript.h"
 
+void SendEvent(const char* eventType, VariantMap& eventData);
 void SubscribeToEvent(const char* eventType, const char* funcName);
 
 $using namespace Urho3D;

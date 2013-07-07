@@ -1,9 +1,11 @@
+$#include "String.h"
 $#include "Vector.h"
+$#include "Vector3.h"
 
 /// %Vector template class.
 class Vector : public VectorBase
 {
-	TOLUA_TEMMPLATE_BIND(T, String)
+    TOLUA_TEMPLATE_BIND(T, String)
 public:
     /// Construct empty.
     Vector()

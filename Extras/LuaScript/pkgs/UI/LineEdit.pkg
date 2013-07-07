@@ -46,5 +46,3 @@ public:
     /// Return text selection doubleclick interval in seconds.
     float GetDoubleClickInterval() const;
 };
-
-LineEdit* NewLineEdit @ LineEdit();

@@ -50,5 +50,3 @@ public:
     /// Return number of rows.
     unsigned GetNumRows() const { return rowWidths_.Size(); }
 };
-
-Text* NewText @ Text();

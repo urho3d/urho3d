@@ -35,5 +35,3 @@ public:
     /// Write raw output to the log.
     static void WriteRaw(const char* message, bool error = false);
 };
-
-Log* GetLog();

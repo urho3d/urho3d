@@ -54,5 +54,3 @@ public:
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
 };
-
-UI* GetUI();

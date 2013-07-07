@@ -16,5 +16,3 @@ public:
     /// Return checked image offset.
     const IntVector2& GetCheckedOffset() const { return checkedOffset_; }
 };
-
-CheckBox* NewCheckBox @ CheckBox();

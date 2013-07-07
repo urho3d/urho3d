@@ -36,5 +36,3 @@ public:
     /// Return whether is tiled.
     bool IsTiled() const { return tiled_; }
 };
-
-BorderImage* NewBorderImage @ BorderImage();

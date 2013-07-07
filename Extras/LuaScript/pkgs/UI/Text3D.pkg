@@ -66,5 +66,3 @@ public:
     /// Return whether faces camera automatically.
     bool GetFaceCamera() const { return faceCamera_; }
 };
-
-Text3D* NewText3D @ Text3D();

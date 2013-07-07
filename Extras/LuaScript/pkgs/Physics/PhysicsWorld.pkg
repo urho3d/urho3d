@@ -100,7 +100,3 @@ public:
     /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const;
 };
-
-PhysicsWorld* GetPhysicsWorld();
-
-

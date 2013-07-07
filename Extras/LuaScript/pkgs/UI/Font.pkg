@@ -5,5 +5,3 @@ class Font : public Resource
 {
 public:    
 };
-
-Font* NewFont @ Font();
