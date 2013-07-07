@@ -39,6 +39,13 @@
 
 #include "DebugNew.h"
 
+#ifdef ANDROID
+// Hack: when compiling with the Android toolchain, the nativeInit function may be optimized out
+// Define a function pointer to it to ensure it stays linked
+extern "C" void Java_org_libsdl_app_SDLActivity_nativeInit();
+void (*ptr)(void) = &Java_org_libsdl_app_SDLActivity_nativeInit;
+#endif
+
 using namespace Urho3D;
 
 class Application : public Object

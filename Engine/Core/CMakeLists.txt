@@ -9,7 +9,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 # Define dependency libs
 set (LIBS ../Container ../Math)
 
-if (NOT IOS)
+if (NOT IOS AND NOT ANDROID)
     set (INCLUDE_DIRS_ONLY ../../ThirdParty/LibCpuId/libcpuid)
     set (LINK_LIBS_ONLY LibCpuId)
 endif ()
@@ -19,7 +19,7 @@ if (WIN32)
     if (ENABLE_MINIDUMPS)
         set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dbghelp.lib)
     endif ()
-else ()
+elseif (NOT ANDROID)
     set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} pthread)
 endif ()
 

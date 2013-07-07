@@ -33,6 +33,11 @@ elseif (APPLE)
         src/audio/coreaudio/*.c src/file/cocoa/*.m src/haptic/darwin/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c 
         src/power/macosx/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m
     )
+elseif (ANDROID)
+    file (GLOB SYS_C_FILES
+        src/audio/android/*.c src/core/android/*.cpp src/joystick/android/*.c src/loadso/dlopen/*.c src/main/android/*.cpp
+        src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c
+    )
 else ()
     include(CheckCSourceCompiles)
 
@@ -92,6 +97,8 @@ if (WIN32)
     target_link_libraries (${TARGET_NAME} user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
 elseif (APPLE)
     target_link_libraries (${TARGET_NAME} dl pthread)
+elseif (ANDROID)
+    target_link_libraries (${TARGET_NAME} dl log)
 else ()
-    target_link_libraries (${TARGET_NAME} dl pthread rt GL)
+    target_link_libraries (${TARGET_NAME} dl pthread rt)
 endif ()

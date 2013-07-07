@@ -16,6 +16,11 @@
 /** @file EventArray.h
 	@brief The class \ref kNet::EventArray EventArray. Allows listening to multiple events at once.*/
 
+// Urho3D: added include file
+#ifdef UNIX
+#include <sys/select.h>
+#endif
+
 #include <vector>
 
 #include "Event.h"

@@ -9,8 +9,13 @@ file (GLOB H_FILES
     include/*.h source/*.h
 )
 
-if (IOS)
-    set (ASM_FILES source/as_callfunc_arm_xcode.S)
+if (IOS OR ANDROID)
+    enable_language (ASM)
+    if (IOS)
+        set (ASM_FILES source/as_callfunc_arm_xcode.S)
+    else ()
+        set (ASM_FILES source/as_callfunc_arm_gcc.S)
+    endif ()
 endif ()
 
 if (MSVC AND ENABLE_64BIT)

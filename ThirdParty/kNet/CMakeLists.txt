@@ -40,7 +40,7 @@ elseif (UNIX)
 
    if (USE_BOOST)
       list(REMOVE_ITEM kNetUnixSourceFiles ${PROJECT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
-   else()
+   elseif (NOT ANDROID)
       set(kNetLinkLibraries ${kNetLinkLibraries} pthread)
    endif()
 
