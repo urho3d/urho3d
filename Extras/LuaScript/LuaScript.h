@@ -55,12 +55,6 @@ public:
     /// Return the lua state.
     lua_State* GetLuaState() const { return luaState_; }
 
-    /// Scene default scene.
-    void SetDefaultScene(Scene* scene);
-
-    /// Return default scene.
-    Scene* GetDefaultScene() const;
-
     /// Subscribe lua event.
     void SubscribeLuaEvent(const char* event, const char* function);
 
@@ -83,13 +77,15 @@ private:
 private:
     /// Lua state.
     lua_State* luaState_;
-    /// Default scene.
-    WeakPtr<Scene> defaultScene_;
     /// Event type to Lua function name map.
     HashMap<StringHash, Vector<String> > eventFunctionMap_;
 };
 
-Context* GetLuaScriptContext();
+/// Return context.
+Context* GetContext();
+///  Send event function for Lua script.
+void SendEvent(const char* eventType, VariantMap& eventData);
+/// Subscribe event function for Lua script.
 void SubscribeToEvent(const char* eventType, const char* funcName);
 
 }

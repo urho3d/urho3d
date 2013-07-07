@@ -126,19 +126,19 @@ bool LuaScript::ExecuteFile(const char* fileName)
 
     if (error)
     {
-        String message = lua_tostring(luaState_, -1);
+        const char* message = lua_tostring(luaState_, -1);
         lua_settop(luaState_, top);
         LOGRAW(String("Lua: Unable to execute Lua file '") + fileName + "'. ");
-        LOGRAW("Lua: " + message);
+        LOGRAW(String("Lua: ") + message);
         return false;
     }
 
     if (lua_pcall(luaState_, 0, 0, 0))
     {
-        String message = lua_tostring(luaState_, -1);
+        const char* message = lua_tostring(luaState_, -1);
         lua_settop(luaState_, top);
         LOGRAW(String("Lua: Unable to execute Lua script file '") + fileName + "'.");
-        LOGRAW("Lua: " + message);
+        LOGRAW(String("Lua: ") + message);
         return false;
     }
 
@@ -157,10 +157,10 @@ bool LuaScript::ExecuteString(const char* string)
     int top = lua_gettop(luaState_);
     if (luaL_dostring(luaState_, string) != 0)
     {
-        String message = lua_tostring(luaState_, -1);
+        const char* message = lua_tostring(luaState_, -1);
         lua_settop(luaState_, top);
         LOGRAW(String("Lua: Unable to execute Lua string '") + string + "'.");
-        LOGRAW("Lua: " + message);
+        LOGRAW(String("Lua: ") + message);
         return false;
     }
 
@@ -187,24 +187,14 @@ bool LuaScript::ExecuteFunction(const char* funcName)
 
     if (lua_pcall(luaState_, 0, 0, 0))
     {
-        String message = lua_tostring(luaState_, -1);
+        const char* message = lua_tostring(luaState_, -1);
         lua_settop(luaState_, top);
         LOGRAW(String("Lua: Unable to execute function '") + funcName + "'.");
-        LOGRAW("Lua: " + message);
+        LOGRAW(String("Lua: ") + message);
         return false;
     }
 
     return true;
-}
-
-void LuaScript::SetDefaultScene( Scene* scene )
-{
-    defaultScene_ = scene;
-}
-
-Scene* LuaScript::GetDefaultScene() const
-{
-    return defaultScene_;
 }
 
 void LuaScript::SubscribeLuaEvent(const char* event, const char* funcName)
@@ -299,9 +289,15 @@ void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData
     ExecuteString(eventData[P_COMMAND].GetString().CString());
 }
 
-Context* GetLuaScriptContext()
+Context* GetContext()
 {
     return scriptContext_;
+}
+
+void SendEvent(const char* eventType, VariantMap& eventData)
+{
+    LuaScript* luaScript = scriptContext_->GetSubsystem<LuaScript>();
+    luaScript->SendEvent(StringHash(eventType), eventData);
 }
 
 void SubscribeToEvent(const char* eventType, const char* funcName)
