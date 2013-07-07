@@ -19,8 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #ifndef _SDL_config_android_h
 #define _SDL_config_android_h
 
@@ -134,8 +132,5 @@
 
 /* Enable system power support */
 #define SDL_POWER_ANDROID 1
-
-// Urho3D: disable atomic functions
-#define SDL_ATOMIC_DISABLED
 
 #endif /* _SDL_config_android_h */

@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "SDL_config.h"
 
 #include "SDL_atomic.h"
@@ -36,8 +33,7 @@
 SDL_bool
 SDL_AtomicTryLock(SDL_SpinLock *lock)
 {
-// Urho3D: modified check
-#ifdef SDL_ATOMIC_DISABLED
+#if SDL_ATOMIC_DISABLED
     /* Terrible terrible damage */
     static SDL_mutex *_spinlock_mutex;
 

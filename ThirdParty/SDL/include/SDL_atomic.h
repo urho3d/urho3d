@@ -19,8 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /**
  * \file SDL_atomic.h
  *
@@ -140,8 +138,7 @@ void _ReadWriteBarrier(void);
 /* Platform specific optimized versions of the atomic functions,
  * you can disable these by defining SDL_DISABLE_ATOMIC_INLINE
  */
-// Urho3D: modified check
-#ifdef SDL_ATOMIC_DISABLED
+#if defined(SDL_ATOMIC_DISABLED) && SDL_ATOMIC_DISABLED
 #define SDL_DISABLE_ATOMIC_INLINE
 #endif
 #ifndef SDL_DISABLE_ATOMIC_INLINE

@@ -35,7 +35,7 @@ elseif (APPLE)
     )
 elseif (ANDROID)
     file (GLOB SYS_C_FILES
-        src/audio/android/*.c src/core/android/*.cpp src/joystick/android/*.c src/loadso/dlopen/*.c src/main/android/*.cpp
+        src/audio/android/*.c src/core/android/*.cpp src/joystick/android/*.c src/loadso/dlopen/*.c
         src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c
     )
 else ()

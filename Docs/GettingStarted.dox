@@ -66,6 +66,8 @@ For a release build, use the "ant release" command instead of "ant debug" and fo
 
 By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. The Urho3D activity subclasses the SDLActivity from org.libsdl.app package, whose name (or the JNI code from SDL library) does not have to be changed.
 
+There is also a CMake-based, work-in-progress method to build the Urho3D native code. To use, run cmake_android.bat or cmake_android.sh, then run make. After the native code build is finished, proceed to ant debug like above.
+
 \section Building_Ios iOS build process
 
 Run cmake_ios.sh. This generates an Xcode project named Urho3D.xcodeproj.
