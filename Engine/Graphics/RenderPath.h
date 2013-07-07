@@ -22,8 +22,11 @@
 
 #pragma once
 
+#include "Color.h"
 #include "GraphicsDefs.h"
+#include "Ptr.h"
 #include "RefCounted.h"
+#include "Vector4.h"
 
 namespace Urho3D
 {
