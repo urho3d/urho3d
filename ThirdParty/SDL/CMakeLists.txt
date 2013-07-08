@@ -18,19 +18,19 @@ if (WIN32)
         add_definitions (-DSDL_JOYSTICK_DINPUT)
         add_definitions (-DSDL_HAPTIC_DINPUT)
     else ()
-        message ("-- Building SDL without DirectX joystick support due to missing include file wbemcli.h")
-        message ("-- For MSVC, get it from Windows 7 SDK. For MinGW, get it from eg. wine sources or from MinGW-w64")
+        message ("-- Building SDL without DX joystick support due to missing wbemcli.h")
+        message ("-- For MSVC, get it from Windows 7 SDK. For MinGW, get it from eg. Wine sources or from MinGW-w64")
         add_definitions (-DSDL_JOYSTICK_WINMM)
         add_definitions (-DSDL_HAPTIC_DUMMY)
     endif ()
 elseif (IOS)
     file (GLOB SYS_C_FILES
-        src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/power/uikit/*.m 
+        src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/power/uikit/*.m
         src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c
     )
 elseif (APPLE)
     file (GLOB SYS_C_FILES
-        src/audio/coreaudio/*.c src/file/cocoa/*.m src/haptic/darwin/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c 
+        src/audio/coreaudio/*.c src/file/cocoa/*.m src/haptic/darwin/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c
         src/power/macosx/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m
     )
 elseif (ANDROID)
