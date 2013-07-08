@@ -8,7 +8,7 @@ namespace Urho3D
 Urho3D implements its own string type and template containers instead of using STL. The rationale for this consists of the following:
 
 - Increased performance in some cases, for example when using the PODVector class.
-- Reduced size of each string or vector instance compared to the MSVC STL implementations.
+- Guaranteed binary size of strings and containers, to allow eg. embedding inside the Variant object.
 - Reduced compile time.
 - Straightforward naming and implementation that aids in debugging and profiling.
 - Convenient member functions can be added, for example String::Split() or Vector::Compact().
