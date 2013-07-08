@@ -6150,6 +6150,7 @@ Properties:<br>
 - int maxFps
 - int maxInactiveFps
 - bool pauseMinimized
+- bool autoExit
 - bool initialized (readonly)
 - bool exiting (readonly)
 - bool headless (readonly)
