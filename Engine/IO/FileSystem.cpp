@@ -141,6 +141,10 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
         if (GetExtension(fixedFileName).Empty())
             fixedFileName += ".exe";
 
+        // If executable is not found, try cwd-relative path as a fallback
+        if (!FileExists(fixedFileName))
+            fixedFileName = GetNativePath(GetCurrentDir() + GetFileNameAndExtension(fixedFileName));
+
         String commandLine = "\"" + fixedFileName + "\"";
         for (unsigned i = 0; i < arguments.Size(); ++i)
             commandLine += " " + arguments[i];
@@ -166,6 +170,10 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
 
         return exitCode;
         #else
+        // If executable is not found, try cwd-relative path as a fallback
+        if (!FileExists(fixedFileName))
+            fixedFileName = GetNativePath(GetCurrentDir() + GetFileNameAndExtension(fixedFileName));
+        
         pid_t pid = fork();
         if (!pid)
         {

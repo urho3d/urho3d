@@ -147,6 +147,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     String exePath = fileSystem->GetProgramDir();
+    String cwdPath = fileSystem->GetCurrentDir();
     
     Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "CoreData;Data").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
@@ -155,7 +156,11 @@ bool Engine::Initialize(const VariantMap& parameters)
     for (unsigned i = 0; i < resourcePaths.Size(); ++i)
     {
         bool success = false;
+        
         String packageName = exePath + resourcePaths[i] + ".pak";
+        // Try cwd-relative path if not found next to executable
+        if (!fileSystem->FileExists(packageName))
+            packageName = cwdPath + resourcePaths[i] + ".pak";
         
         if (fileSystem->FileExists(packageName))
         {
@@ -167,8 +172,16 @@ bool Engine::Initialize(const VariantMap& parameters)
             }
         }
         
-        if (!success && fileSystem->DirExists(exePath + resourcePaths[i]))
-            success = cache->AddResourceDir(exePath + resourcePaths[i]);
+        if (!success)
+        {
+            String pathName = exePath + resourcePaths[i];
+            // Try cwd-relative path if not found next to executable
+            if (!fileSystem->DirExists(pathName))
+                pathName = cwdPath + resourcePaths[i];
+            
+            if (fileSystem->DirExists(pathName))
+                success = cache->AddResourceDir(pathName);
+        }
         
         if (!success)
         {
@@ -182,10 +195,15 @@ bool Engine::Initialize(const VariantMap& parameters)
     {
         bool success = false;
         
-        if (fileSystem->FileExists(exePath + resourcePackages[i]))
+        String packageName = exePath + resourcePackages[i];
+        // Try cwd-relative path if not found next to executable
+        if (!fileSystem->FileExists(packageName))
+            packageName = cwdPath + resourcePackages[i];
+        
+        if (fileSystem->FileExists(packageName))
         {
             SharedPtr<PackageFile> package(new PackageFile(context_));
-            if (package->Open(exePath + resourcePackages[i]))
+            if (package->Open(packageName))
             {
                 cache->AddPackageFile(package);
                 success = true;
