@@ -71,7 +71,6 @@ function InitConsole()
 
     local console = engine:CreateConsole()
     console:SetDefaultStyle(uiStyle)
-    console:Toggle()
 end
 
 function InitUI()
