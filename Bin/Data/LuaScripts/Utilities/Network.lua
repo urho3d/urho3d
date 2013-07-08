@@ -10,7 +10,7 @@ function ParseNetworkArguments()
     local arguments = GetArguments()
     for i = 1, arguments:Size() do
         local argument = arguments[i-1]
-        if argument[0] ~= '-' then
+        if argument:Substring(0,1):CString() ~= '-' then
             if argument:Eq("server") then
                 runServer = true
                 runClient = false

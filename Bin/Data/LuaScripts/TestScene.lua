@@ -30,22 +30,16 @@ function Start()
     
     ParseNetworkArguments()
 
-    print('runServer = ', runServer)
-    print('runClient = ', runClient)
-    print('serverAddress = ', serverAddress)
-    print('serverPort = ', serverPort)
-    print('userName = ', userName)
-    print('nobgm = ', nobgm)    
     InitScene()
     
     SubscribeToEvent("Update", "HandleUpdate")
     SubscribeToEvent("KeyDown", "HandleKeyDown")
     SubscribeToEvent("MouseMove", "HandleMouseMove")
     SubscribeToEvent("MouseButtonDown", "HandleMouseButtonDown")
-    --SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp")
+    SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp")
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate")
     SubscribeToEvent("SpawnBox", "HandleSpawnBox")
-    --SubscribeToEvent("PhysicsCollision", "HandlePhysicsCollision")
+    SubscribeToEvent("PhysicsCollision", "HandlePhysicsCollision")
     
     network:RegisterRemoteEvent("SpawnBox")
     
@@ -94,7 +88,6 @@ function InitUI()
 end
 
 function InitScene()
-    print("InitScene")
     testScene = Scene(context)
     
     -- Create the camera outside the scene so it is unaffected by scene load/save
@@ -230,7 +223,6 @@ function InitScene()
         local ctrl = objectNode:CreateAnimationController()
         ctrl:Play("Models/Jack_Walk.ani", 0, true, 0.0)
     end
-    print("InitScene OK!")
 end
 
 function HandleUpdate(eventType, eventData)
@@ -334,7 +326,6 @@ function HandleKeyDown(eventType, eventData)
         end
 
         if key == KEY_SPACE then
-            print('KEY_SPACE down')
             drawDebug = drawDebug + 1
             if drawDebug > 2 then
                 drawDebug = 0
@@ -362,14 +353,12 @@ function HandleKeyDown(eventType, eventData)
         if key == KEY_F5  then
             local xmlFile = File(context, fileSystem:GetProgramDir() + "Data/Scenes/LuaTestScene.xml", FILE_WRITE)
             testScene:SaveXML(xmlFile)
-            print('testScene:SaveXML(xmlFile)')
         end
         
         if key == KEY_F7 then
             local xmlFile = File(context, fileSystem:GetProgramDir() + "Data/Scenes/LuaTestScene.xml", FILE_READ)
             if xmlFile:IsOpen() then
                 testScene:LoadXML(xmlFile)
-                print('testScene:LoadXML(xmlFile)')
             end
         end
         --]]
@@ -415,7 +404,6 @@ function HandleMouseButtonDown(eventType, eventData)
                 end
             else
                 SendEvent("SpawnBox", eventData)
-                print('SendEvent("SpawnBox", eventData)')
             end
         else
             local pos = ui:GetCursorPosition()
@@ -500,37 +488,33 @@ function HandlePostRenderUpdate()
     end
 end
 
---[[
-void HandleClientConnected(StringHash eventType, VariantMap& eventData)
-{
-    Connection@ connection = eventData["Connection"].GetConnection()
-    connection.scene = testScene -- Begin scene replication to the client
-    connection.logStatistics = true
-}
+function HandleClientConnected(eventType, eventData)
+    local connection = eventData:GetConnection("Connection")
+    connection:SetScene(testScene) -- Begin scene replication to the client
+    connection:SetLogStatistics(true)
+end
 
-void HandlePhysicsCollision(StringHash eventType, VariantMap& eventData)
-{
+
+function HandlePhysicsCollision(eventType, eventData)
     -- Check if either of the nodes has an AnimatedModel component
-    Node@ nodeA = eventData["NodeA"].GetNode()
-    Node@ nodeB = eventData["NodeB"].GetNode()
-    if (nodeA.HasComponent("AnimatedModel"))
+    local nodeA = eventData:GetNode("NodeA")
+    local nodeB = eventData:GetNode("NodeB")
+    if nodeA:HasComponent("AnimatedModel") then
         HandleHit(nodeA)
-    else if (nodeB.HasComponent("AnimatedModel"))
+    elseif nodeB:HasComponent("AnimatedModel") then
         HandleHit(nodeB)
-}
+    end
+end
 
-void HandleHit(Node@ node)
-{
+function HandleHit(node)
     -- Remove the trigger physics shape, and create the ragdoll
-    node.RemoveComponent("RigidBody")
-    node.RemoveComponent("CollisionShape")
-    CreateRagdoll(node.GetComponent("AnimatedModel"))
-}
+    node:RemoveComponent("RigidBody")
+    node:RemoveComponent("CollisionShape")
+    CreateRagdoll(node:GetAnimatedModel())
+end
 
-void CreateRagdoll(AnimatedModel@ model)
-{
-    Node@ root = model.node
-
+function CreateRagdoll(model)
+    local root = model:GetNode()
     CreateRagdollBone(root, "Bip01_Pelvis", SHAPE_BOX, Vector3(0.3, 0.2, 0.25), Vector3(0, 0, 0), Quaternion(0, 0, 0))
     CreateRagdollBone(root, "Bip01_Spine1", SHAPE_BOX, Vector3(0.35, 0.2, 0.3), Vector3(0.15, 0, 0), Quaternion(0, 0, 0))
     CreateRagdollBone(root, "Bip01_L_Thigh", SHAPE_CAPSULE, Vector3(0.175, 0.45, 0.175), Vector3(0.25, 0, 0), Quaternion(0, 0, 90))
@@ -543,65 +527,62 @@ void CreateRagdoll(AnimatedModel@ model)
     CreateRagdollBone(root, "Bip01_L_Forearm", SHAPE_CAPSULE, Vector3(0.125, 0.4, 0.125), Vector3(0.2, 0, 0), Quaternion(0, 0, 90))
     CreateRagdollBone(root, "Bip01_R_Forearm", SHAPE_CAPSULE, Vector3(0.125, 0.4, 0.125), Vector3(0.2, 0, 0), Quaternion(0, 0, 90))
     
-    CreateRagdollConstraint(root, "Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 45), Vector2(0, 0))
-    CreateRagdollConstraint(root, "Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 45), Vector2(0, 0))
-    CreateRagdollConstraint(root, "Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0))
-    CreateRagdollConstraint(root, "Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0))
-    CreateRagdollConstraint(root, "Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_HINGE, Vector3(0, 0, 1), Vector3(0, 0, 1), Vector2(45, 0), Vector2(-10, 0))
-    CreateRagdollConstraint(root, "Bip01_Head", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(1, 0, 0), Vector3(1, 0, 0), Vector2(0, 30), Vector2(0, 0))
+    CreateRagdollConstraint(root, "Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 45), Vector2(0, 0), true)
+    CreateRagdollConstraint(root, "Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0, 0, -1), Vector3(0, 0, 1), Vector2(45, 45), Vector2(0, 0), true)
+    CreateRagdollConstraint(root, "Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0), true)
+    CreateRagdollConstraint(root, "Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0), true)
+    CreateRagdollConstraint(root, "Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_HINGE, Vector3(0, 0, 1), Vector3(0, 0, 1), Vector2(45, 0), Vector2(-10, 0), true)
+    CreateRagdollConstraint(root, "Bip01_Head", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(1, 0, 0), Vector3(1, 0, 0), Vector2(0, 30), Vector2(0, 0), true)
     CreateRagdollConstraint(root, "Bip01_L_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0, -1, 0), Vector3(0, 1, 0), Vector2(45, 45), Vector2(0, 0), false)
     CreateRagdollConstraint(root, "Bip01_R_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0, -1, 0), Vector3(0, 1, 0), Vector2(45, 45), Vector2(0, 0), false)
-    CreateRagdollConstraint(root, "Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0))
-    CreateRagdollConstraint(root, "Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0))
+    CreateRagdollConstraint(root, "Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0), true)
+    CreateRagdollConstraint(root, "Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_HINGE, Vector3(0, 0, -1), Vector3(0, 0, -1), Vector2(90, 0), Vector2(0, 0), true)
 
     -- Disable animation from all bones (both physical and non-physical) to not interfere
-    Skeleton@ skel = model.skeleton
-    for (uint i = 0 i < skel.numBones ++i)
-        skel.bones[i].animated = false
-}
+    local skel = model:GetSkeleton()
+    for i = 1, skel:GetNumBones() do
+        skel:GetBone(i-1).animated = false
+    end
+end
 
-void CreateRagdollBone(Node@ root, const String&in boneName, ShapeType type, const Vector3&in size, const Vector3&in position,
-    const Quaternion&in rotation)
-{
-    Node@ boneNode = root.GetChild(boneName, true)
-    if (boneNode is null || boneNode.HasComponent("RigidBody"))
+function CreateRagdollBone(root, boneName, type, size, position, rotation)
+    local boneNode = root:GetChild(boneName, true)
+    if boneNode == nil or boneNode:HasComponent("RigidBody") then
         return
+    end
 
     -- In networked operation both client and server detect collisions separately, and create ragdolls on their own
     -- (bones are not synced over network.) To prevent replicated component ID range clashes when the client creates
     -- any components, it is important that the LOCAL creation mode is specified.
-    RigidBody@ body = boneNode.CreateComponent("RigidBody", LOCAL)
-    body.mass = 1.0
-    body.linearDamping = 0.05
-    body.angularDamping = 0.85
-    body.linearRestThreshold = 1.5
-    body.angularRestThreshold = 2.5
+    local body = boneNode:CreateRigidBody(LOCAL)
+    body:SetMass(1.0)
+    body:SetLinearDamping(0.05)
+    body:SetAngularDamping(0.85)
+    body:SetLinearRestThreshold(1.5)
+    body:SetAngularRestThreshold(2.5)
 
-    CollisionShape@ shape = boneNode.CreateComponent("CollisionShape", LOCAL)
-    shape.shapeType = type
-    shape.size = size
-    shape.position = position
-    shape.rotation = rotation
-}
+    local shape = boneNode:CreateCollisionShape(LOCAL)
+    shape:SetShapeType(type)
+    shape:SetSize(size)
+    shape:SetPosition(position)
+    shape:SetRotation(rotation)
+end
 
-void CreateRagdollConstraint(Node@ root, const String&in boneName, const String&in parentName, ConstraintType type,
-    const Vector3&in axis, const Vector3&in parentAxis, const Vector2&in highLimit, const Vector2&in lowLimit,
-    bool disableCollision = true)
-{
-    Node@ boneNode = root.GetChild(boneName, true)
-    Node@ parentNode = root.GetChild(parentName, true)
-    if (boneNode is null || parentNode is null || boneNode.HasComponent("Constraint"))
+function CreateRagdollConstraint(root, boneName, parentName, type, axis, parentAxis, highLimit, lowLimit, disableCollision)
+    local boneNode = root:GetChild(boneName, true)
+    local parentNode = root:GetChild(parentName, true)
+    if boneNode == nil or parentNode == nil or boneNode:HasComponent("Constraint") then
         return
+    end
 
-    Constraint@ constraint = boneNode.CreateComponent("Constraint", LOCAL)
-    constraint.constraintType = type
-    constraint.disableCollision = disableCollision
+    local constraint = boneNode:CreateConstraint(LOCAL)
+    constraint:SetConstraintType(type)
+    constraint:SetDisableCollision(disableCollision)
     -- The connected body must be specified before setting the world position
-    constraint.otherBody = parentNode.GetComponent("RigidBody")
-    constraint.worldPosition = boneNode.worldPosition
-    constraint.axis = axis
-    constraint.otherAxis = parentAxis
-    constraint.highLimit = highLimit
-    constraint.lowLimit = lowLimit
-}
---]]
+    constraint:SetOtherBody(parentNode:GetRigidBody())
+    constraint:SetWorldPosition(boneNode:GetWorldPosition())
+    constraint:SetAxis(axis)
+    constraint:SetOtherAxis(parentAxis)
+    constraint:SetHighLimit(highLimit)
+    constraint:SetLowLimit(lowLimit)
+end
