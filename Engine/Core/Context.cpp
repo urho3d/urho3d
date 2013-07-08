@@ -61,6 +61,14 @@ Context::Context() :
 
 Context::~Context()
 {
+    // Remove subsystems that use SDL in reverse order of construction, so that Graphics can shut down SDL last
+    /// \todo Context should not need to know about subsystems
+    RemoveSubsystem("Audio");
+    RemoveSubsystem("UI");
+    RemoveSubsystem("Input");
+    RemoveSubsystem("Renderer");
+    RemoveSubsystem("Graphics");
+    
     subsystems_.Clear();
     factories_.Clear();
 }

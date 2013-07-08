@@ -35,6 +35,7 @@ GraphicsImpl::GraphicsImpl() :
     interface_(0),
     device_(0),
     defaultColorSurface_(0),
+    defaultDepthStencilSurface_(0),
     adapter_(D3DADAPTER_DEFAULT),
     deviceType_(D3DDEVTYPE_HAL)
 {
