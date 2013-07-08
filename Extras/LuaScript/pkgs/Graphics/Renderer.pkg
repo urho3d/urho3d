@@ -133,4 +133,7 @@ public:
     ShaderVariation* GetStencilPS() const { return stencilPS_; }
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() { return frame_; }
+    
+    /// Add debug geometry to the debug renderer.
+    void DrawDebugGeometry(bool depthTest);
 };

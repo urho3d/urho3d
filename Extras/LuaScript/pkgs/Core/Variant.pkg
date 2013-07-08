@@ -231,21 +231,6 @@ class VariantMap
 public:
     VariantMap();
 
-    tolua_outside int VariantMapGetInt @ GetInt(const char* key);
-    tolua_outside bool VariantMapGetBool @ GetBool(const char* key);
-    tolua_outside float VariantMapGetFloat @ GetFloat(const char* key);
-    tolua_outside const Vector2& VariantMapGetVector2 @ GetVector2(const char* key);
-    tolua_outside const Vector3& VariantMapGetVector3 @ GetVector3(const char* key);
-    tolua_outside const Vector4& VariantMapGetVector4 @ GetVector4(const char* key);
-    tolua_outside const Quaternion& VariantMapGetQuaternion @ GetQuaternion(const char* key);
-    tolua_outside const Color& VariantMapGetColor @ GetColor(const char* key);
-    tolua_outside const String& VariantMapGetString @ GetString(const char* key);
-    tolua_outside const void* VariantMapGetPtr @ GetPtr(const char* key);
-    tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const char* key);
-    tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const char* key);
-    tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const char* key);
-    tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const char* key);
-
     tolua_outside void VariantMapSetInt @ SetInt(const char* key, int value);
     tolua_outside void VariantMapSetBool @ SetBool(const char* key, bool value);
     tolua_outside void VariantMapSetFloat @ SetFloat(const char* key, float value);
@@ -260,9 +245,146 @@ public:
     tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const char* key, const ResourceRefList& value); 
     tolua_outside void VariantMapSetIntRect @ SetIntRect(const char* key, const IntRect& value);
     tolua_outside void VariantMapSetIntVector2 @ SetIntVector2(const char* key, const IntVector2& value);
+    
+    tolua_outside void VariantMapSetCamera @ SetCamera(const char* key, Camera* camera);
+    tolua_outside void VariantMapSetConnection @ SetConnection(const char* key, Connection* connection);
+    tolua_outside void VariantMapSetNode @ SetNode(const char* key, Node* node);
+    tolua_outside void VariantMapSetPhysicsWorld @ SetPhysicsWorld(const char* key, PhysicsWorld* physicsworld);
+    tolua_outside void VariantMapSetRigidBody @ SetRigidBody(const char* key, RigidBody* rigidbody);
+    tolua_outside void VariantMapSetScene @ SetScene(const char* key, Scene* scene);
+    tolua_outside void VariantMapSetUIElement @ SetUIElement(const char* key, UIElement* element);
+    
+    tolua_outside int VariantMapGetInt @ GetInt(const char* key);
+    tolua_outside bool VariantMapGetBool @ GetBool(const char* key);
+    tolua_outside float VariantMapGetFloat @ GetFloat(const char* key);
+    tolua_outside const Vector2& VariantMapGetVector2 @ GetVector2(const char* key);
+    tolua_outside const Vector3& VariantMapGetVector3 @ GetVector3(const char* key);
+    tolua_outside const Vector4& VariantMapGetVector4 @ GetVector4(const char* key);
+    tolua_outside const Quaternion& VariantMapGetQuaternion @ GetQuaternion(const char* key);
+    tolua_outside const Color& VariantMapGetColor @ GetColor(const char* key);
+    tolua_outside const String& VariantMapGetString @ GetString(const char* key);
+    tolua_outside const void* VariantMapGetPtr @ GetPtr(const char* key);
+    tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const char* key);
+    tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const char* key);
+    tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const char* key);
+    tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const char* key);
+    
+    tolua_outside Camera* VariantMapGetCamera @ GetCamera(const char* key);
+    tolua_outside Connection* VariantMapGetConnection @ GetConnection(const char* key);
+    tolua_outside Node* VariantMapGetNode @ GetNode(const char* key);
+    tolua_outside PhysicsWorld* VariantMapGetPhysicsWorld @ GetPhysicsWorld(const char* key);
+    tolua_outside RigidBody* VariantMapGetRigidBody @ GetRigidBody(const char* key);
+    tolua_outside Scene* VariantMapGetScene @ GetScene(const char* key);
+    tolua_outside UIElement* VariantMapGetUIElement @ GetUIElement(const char* key);
 };
 
 ${
+
+void VariantMapSetInt(VariantMap* vmap, const char* key, int value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetBool(VariantMap* vmap, const char* key, bool value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetFloat(VariantMap* vmap, const char* key, float value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetVector2(VariantMap* vmap, const char* key, const Vector2& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetVector3(VariantMap* vmap, const char* key, const Vector3& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetVector4(VariantMap* vmap, const char* key, const Vector4& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetQuaternion(VariantMap* vmap, const char* key, const Quaternion& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetColor(VariantMap* vmap, const char* key, const Color& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetString(VariantMap* vmap, const char* key, const String& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetPtr(VariantMap* vmap, const char* key, void* value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetResourceRef(VariantMap* vmap, const char* key, const ResourceRef& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetResourceRefList(VariantMap* vmap, const char* key, const ResourceRefList& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetIntRect(VariantMap* vmap, const char* key, const IntRect& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetIntVector2(VariantMap* vmap, const char* key, const IntVector2& value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+
+void VariantMapSetCamera(VariantMap* vmap, const char* key, Camera* pointer)
+{
+	(*vmap)[ShortStringHash(key)] = (void*)pointer;
+}
+
+void VariantMapSetConnection(VariantMap* vmap, const char* key, Connection* pointer)
+{
+	(*vmap)[ShortStringHash(key)] = (void*)pointer;
+}
+
+void VariantMapSetNode(VariantMap* vmap, const char* key, Node* pointer)
+{
+	(*vmap)[ShortStringHash(key)] = (void*)pointer;
+}
+
+void VariantMapSetPhysicsWorld(VariantMap* vmap, const char* key, PhysicsWorld* pointer)
+{
+	(*vmap)[ShortStringHash(key)] = (void*)pointer;
+}
+
+void VariantMapSetRigidBody(VariantMap* vmap, const char* key, RigidBody* pointer)
+{
+	(*vmap)[ShortStringHash(key)] = (void*)pointer;
+}
+
+void VariantMapSetScene(VariantMap* vmap, const char* key, Scene* pointer)
+{
+	(*vmap)[ShortStringHash(key)] = (void*)pointer;
+}
+
+void VariantMapSetUIElement(VariantMap* vmap, const char* key, UIElement* pointer)
+{
+	(*vmap)[ShortStringHash(key)] = (void*)pointer;
+}
 
 const Variant& FindVariant(const VariantMap* vmap, const char* key)
 {
@@ -340,74 +462,39 @@ const IntVector2& VariantMapGetIntVector2(const VariantMap* vmap, const char* ke
     return FindVariant(vmap, key).GetIntVector2();
 }
 
-void VariantMapSetInt(VariantMap* vmap, const char* key, int value)
+Camera* VariantMapGetCamera(const VariantMap* vmap, const char* key)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+	return (Camera*)FindVariant(vmap, key).GetPtr();
 }
 
-void VariantMapSetBool(VariantMap* vmap, const char* key, bool value)
+Connection* VariantMapGetConnection(const VariantMap* vmap, const char* key)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+	return (Connection*)FindVariant(vmap, key).GetPtr();
 }
 
-void VariantMapSetFloat(VariantMap* vmap, const char* key, float value)
+Node* VariantMapGetNode(const VariantMap* vmap, const char* key)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+	return (Node*)FindVariant(vmap, key).GetPtr();
 }
 
-void VariantMapSetVector2(VariantMap* vmap, const char* key, const Vector2& value)
+PhysicsWorld* VariantMapGetPhysicsWorld(const VariantMap* vmap, const char* key)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+	return (PhysicsWorld*)FindVariant(vmap, key).GetPtr();
 }
 
-void VariantMapSetVector3(VariantMap* vmap, const char* key, const Vector3& value)
+RigidBody* VariantMapGetRigidBody(const VariantMap* vmap, const char* key)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+	return (RigidBody*)FindVariant(vmap, key).GetPtr();
 }
 
-void VariantMapSetVector4(VariantMap* vmap, const char* key, const Vector4& value)
+Scene* VariantMapGetScene(const VariantMap* vmap, const char* key)
 {
-    (*vmap)[ShortStringHash(key)] = value;
+	return (Scene*)FindVariant(vmap, key).GetPtr();
 }
 
-void VariantMapSetQuaternion(VariantMap* vmap, const char* key, const Quaternion& value)
+UIElement* VariantMapGetUIElement(const VariantMap* vmap, const char* key)
 {
-    (*vmap)[ShortStringHash(key)] = value;
-}
-
-void VariantMapSetColor(VariantMap* vmap, const char* key, const Color& value)
-{
-    (*vmap)[ShortStringHash(key)] = value;
-}
-
-void VariantMapSetString(VariantMap* vmap, const char* key, const String& value)
-{
-    (*vmap)[ShortStringHash(key)] = value;
-}
-
-void VariantMapSetPtr(VariantMap* vmap, const char* key, void* value)
-{
-    (*vmap)[ShortStringHash(key)] = value;
-}
-
-void VariantMapSetResourceRef(VariantMap* vmap, const char* key, const ResourceRef& value)
-{
-    (*vmap)[ShortStringHash(key)] = value;
-}
-
-void VariantMapSetResourceRefList(VariantMap* vmap, const char* key, const ResourceRefList& value)
-{
-    (*vmap)[ShortStringHash(key)] = value;
-}
-
-void VariantMapSetIntRect(VariantMap* vmap, const char* key, const IntRect& value)
-{
-    (*vmap)[ShortStringHash(key)] = value;
-}
-
-void VariantMapSetIntVector2(VariantMap* vmap, const char* key, const IntVector2& value)
-{
-    (*vmap)[ShortStringHash(key)] = value;
+	return (UIElement*)FindVariant(vmap, key).GetPtr();
 }
 
 $}

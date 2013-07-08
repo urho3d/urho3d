@@ -114,7 +114,8 @@ public:
     /// Remove a component from this node.
     void RemoveComponent(Component* component);
     /// Remove the first component of specific type from this node.
-    void RemoveComponent(ShortStringHash type);
+    // void RemoveComponent(ShortStringHash type);
+    tolua_outside void NodeRemoveComponent @ RemoveComponent(const char* type);
     /// Remove all components from this node.
     void RemoveAllComponents();
     /// Clone scene node, components and child nodes. Return the clone.
@@ -278,6 +279,7 @@ public:
     // Component* GetComponent(ShortStringHash type) const;
     /// Return whether has a specific component.
     // bool HasComponent(ShortStringHash type) const;
+    tolua_outside bool NodeHasComponent @ HasComponent(const char* type) const;
     
     /// Template version of returning a component by type.
     // template <class T> T* GetComponent() const;
@@ -304,3 +306,17 @@ public:
     Terrain* GetComponent<Terrain> @ GetTerrain() const;
     Zone* GetComponent<Zone> @ GetZone() const;
 };
+
+${
+
+void NodeRemoveComponent(Node* node, const char* type)
+{
+	return node->RemoveComponent(ShortStringHash(type));
+}
+
+bool NodeHasComponent(const Node* node, const char* type)
+{
+	return node->HasComponent(ShortStringHash(type));
+}
+
+$}

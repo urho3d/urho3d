@@ -22,9 +22,12 @@ public:
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
     /// Send a remote event.
-    void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    // void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    tolua_outside void ConnectionSendRemoteEvent @ SendRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    
     /// Send a remote event with the specified node as sender.
     void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    tolua_outside void ConnectSendRemoteEvent @ SendRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     /// Assign scene. On the server, this will cause the client to load it.
     void SetScene(Scene* newScene);
     /// Assign identity. Called by Network.
@@ -83,3 +86,17 @@ public:
     /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
 };
+
+${
+
+static void ConnectionSendRemoteEvent(Connection* connection, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+{
+	connection->SendRemoteEvent(StringHash(eventType), inOrder, eventData);
+}
+
+static void ConnectSendRemoteEvent(Connection* connection, Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+{
+	connection->SendRemoteEvent(node, StringHash(eventType), inOrder, eventData);
+}
+
+$}
