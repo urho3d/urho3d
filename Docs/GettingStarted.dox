@@ -56,7 +56,7 @@ To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting to e
 
 First copy Bin/Data and Bin/CoreData directories to the Android/assets directory (you can use the provided batch file CopyData.bat.) Next, execute the following commands in the Android directory:
 
-- android update project -p . (only needed on the first time)
+- android update project -p . -t 1 (only needed on the first time, replace '-t 1' with desired target-id)
 - ndk-build
 - ant debug
 
@@ -66,7 +66,12 @@ For a release build, use the "ant release" command instead of "ant debug" and fo
 
 By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. The Urho3D activity subclasses the SDLActivity from org.libsdl.app package, whose name (or the JNI code from SDL library) does not have to be changed.
 
-There is also a CMake-based, work-in-progress method to build the Urho3D native code. To use, run cmake_android.bat or cmake_android.sh, then run make. After the native code build is finished, proceed to ant debug like above.
+There is also a CMake-based, work-in-progress method to build the Urho3D native code. To use, run cmake_android.bat or cmake_android.sh, then run make. After the native code build is finished, proceed to ant debug like above. In Linux, typically:
+
+- cd Android && android update project -p . -t 1
+- cd .. && ./cmake_android.sh
+- make -j8 install/strip (replace '-j 8' with the number of logical CPU cores of the host/build system)
+- cd Android && ant debug && ant installd (for deploying the debug apk)
 
 \section Building_Ios iOS build process
 

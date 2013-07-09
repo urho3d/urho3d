@@ -201,7 +201,8 @@ First copy Bin/Data and Bin/CoreData directories to the Android/assets directory
 (you can use the provided batch file CopyData.bat.) Next, execute the following
 commands in the Android directory:
 
-- android update project -p . (only needed on the first time)
+- android update project -p . -t 1 (only needed on the first time,
+                                    replace '-t 1' with desired target-id)
 - ndk-build
 - ant debug
 
@@ -220,7 +221,14 @@ activity subclasses the SDLActivity from org.libsdl.app package, whose name
 
 There is also a CMake-based, work-in-progress method to build the Urho3D native
 code. To use, run cmake_android.bat or cmake_android.sh, then run make. After 
-the native code build is finished, proceed to ant debug like above.
+the native code build is finished, proceed to ant debug like above.  In Linux,
+typically:
+
+- cd Android && android update project -p . -t 1
+- cd .. && ./cmake_android.sh
+- make -j8 install/strip (replace '-j 8' with the number of logical CPU cores of
+                          the host/build system)
+- cd Android && ant debug && ant installd (for deploying the debug apk)
 
 
 iOS build process
