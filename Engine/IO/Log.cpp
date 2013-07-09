@@ -55,7 +55,11 @@ static Log* logInstance = 0;
 
 Log::Log(Context* context) :
     Object(context),
+#ifdef _DEBUG
+    level_(LOG_DEBUG)
+#else
     level_(LOG_INFO),
+#endif
     timeStamp_(true),
     inWrite_(false),
     quiet_(false)
