@@ -130,4 +130,12 @@ PODVector<Vector3> NavigationMeshFindPath(NavigationMesh* navMesh, const Vector3
     return dest;
 }
 
+// Patch for NavigationMesh.worldBoundingBox property.
+#define TOLUA_DISABLE_tolua_get_NavigationMesh_worldBoundingBox
+#define tolua_get_NavigationMesh_worldBoundingBox tolua_NavigationLuaAPI_NavigationMesh_GetWorldBoundingBox00
+
+// Patch for NavigationMesh.numTiles property.
+#define TOLUA_DISABLE_tolua_get_NavigationMesh_numTiles
+#define tolua_get_NavigationMesh_numTiles tolua_NavigationLuaAPI_NavigationMesh_GetNumTiles00
+
 $}
