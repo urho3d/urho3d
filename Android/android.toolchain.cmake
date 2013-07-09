@@ -296,7 +296,7 @@
 #     [~] fixed stl include path for standalone toolchain made by NDK >= r8c
 # ------------------------------------------------------------------------------
 
-# Modified by Lasse Oorni for Urho3D
+# Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 cmake_minimum_required( VERSION 2.6.3 )
 
@@ -1457,10 +1457,12 @@ if( ANDROID_COMPILER_IS_CLANG )
 endif()
 
 # cache flags
-set( CMAKE_CXX_FLAGS           ""                        CACHE STRING "c++ flags" )
-set( CMAKE_C_FLAGS             ""                        CACHE STRING "c flags" )
-set( CMAKE_CXX_FLAGS_RELEASE   "-O3 -DNDEBUG"            CACHE STRING "c++ Release flags" )
-set( CMAKE_C_FLAGS_RELEASE     "-O3 -DNDEBUG"            CACHE STRING "c Release flags" )
+# Urho3D: buffer overflow protection
+set( CMAKE_CXX_FLAGS           "-fstack-protector"       CACHE STRING "c++ flags" )
+set( CMAKE_C_FLAGS             "-fstack-protector"       CACHE STRING "c flags" )
+# Urho3D: optimise for size
+set( CMAKE_CXX_FLAGS_RELEASE   "-Os -g -DNDEBUG"         CACHE STRING "c++ Release flags" )
+set( CMAKE_C_FLAGS_RELEASE     "-Os -g -DNDEBUG"         CACHE STRING "c Release flags" )
 set( CMAKE_CXX_FLAGS_DEBUG     "-O0 -g -DDEBUG -D_DEBUG" CACHE STRING "c++ Debug flags" )
 set( CMAKE_C_FLAGS_DEBUG       "-O0 -g -DDEBUG -D_DEBUG" CACHE STRING "c Debug flags" )
 set( CMAKE_SHARED_LINKER_FLAGS ""                        CACHE STRING "shared linker flags" )
@@ -1561,7 +1563,9 @@ if(NOT _CMAKE_IN_TRY_COMPILE)
  else()
   set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin" CACHE PATH "Output directory for applications" )
  endif()
- set( LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" )
+ # Urho3D: differentiate between non-stripped (local) and stripped (installed) library folder
+ set( LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/local/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for local android libs" )
+ set( INSTALLED_LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for installed/stripped android libs" )
 endif()
 
 # set these global flags for cmake client scripts to change behavior
