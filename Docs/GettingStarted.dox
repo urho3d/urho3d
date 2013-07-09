@@ -601,19 +601,15 @@ With the context at hand, we create the Engine and initialize it. The engine acc
 
 After this, we instantiate the HelloWorld object, call its Start() function, and run the main loop until Engine tells that we should exit. The shared pointers will take care of deleting the objects in the correct order; the Context will be the last to be destroyed.
 
-Now we can start implementing HelloWorld. 
+Now we can start implementing HelloWorld.
 
 \code
-OBJECTTYPESTATIC(HelloWorld);
-
 HelloWorld::HelloWorld(Context* context) :
     Object(context),
     cache_(GetSubsystem<ResourceCache>())
 {
 }
 \endcode
-
-Note the OBJECTTYPESTATIC(className) macro, which creates the static type name and type name hash for object type identification. For each OBJECT macro, a matching OBJECTTYPESTATIC must appear in a .cpp file. 
 
 During construction, we only store the ResourceCache subsystem pointer for later access.
 
