@@ -8,4 +8,7 @@ public:
     void SetRecursive(bool enable);
     /// Return whether geometry is automatically collected from child nodes.
     bool IsRecursive() const { return recursive_; }
+    
+    // Properties:
+    tolua_property__is_set bool recursive;
 };

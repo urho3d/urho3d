@@ -152,4 +152,31 @@ public:
     void RemoveConstraint(Constraint* constraint);
     /// Remove the rigid body.
     void ReleaseBody();
+    
+    // Properties:
+    tolua_property__get_set float mass;
+    tolua_property__get_set const Vector3& position;
+    tolua_property__get_set const Quaternion& rotation;
+    tolua_property__get_set const Vector3& linearVelocity;
+    tolua_property__get_set const Vector3& linearFactor;
+    tolua_property__get_set float linearRestThreshold;
+    tolua_property__get_set float linearDamping;
+    tolua_property__get_set const Vector3& angularVelocity;
+    tolua_property__get_set const Vector3& angularFactor;
+    tolua_property__get_set float angularRestThreshold;
+    tolua_property__get_set float angularDamping;
+    tolua_property__get_set float friction;
+    tolua_property__get_set float restitution;
+    tolua_property__get_set float contactProcessingThreshold;
+    tolua_property__get_set float ccdRadius;
+    tolua_property__get_set float ccdMotionThreshold;
+    tolua_property__get_set bool useGravity;
+    tolua_property__get_set const Vector3& gravityOverride;
+    tolua_readonly tolua_property__get_set const Vector3& centerOfMass;
+    tolua_property__is_set bool kinematic;
+    tolua_property__is_set bool phantom;
+    tolua_readonly tolua_property__is_set bool active;
+    tolua_property__get_set unsigned collisionLayer;
+    tolua_property__get_set unsigned collisionMask;
+    tolua_property__get_set CollisionEventMode collisionEventMode;
 };

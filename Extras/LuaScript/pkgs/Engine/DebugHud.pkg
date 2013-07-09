@@ -69,4 +69,14 @@ public:
     
     /// Clear all application-specific stats.
     void ClearAppStats();
+    
+    // Properties:
+    tolua_property__get_set XMLFile* defaultStyle;
+    tolua_property__get_set unsigned mode;
+    tolua_property__get_set unsigned profilerMaxDepth;
+    tolua_property__get_set float profilerInterval;
+    tolua_property__get_set bool useRendererStats;
+    tolua_readonly tolua_property__get_set Text* statsText;
+    tolua_readonly tolua_property__get_set Text* modeText;
+    tolua_readonly tolua_property__get_set Text* profilerText;
 };

@@ -99,6 +99,26 @@ public:
     BoundingBox GetWorldBoundingBox() const;
     /// Return number of tiles.
     IntVector2 GetNumTiles() const { return IntVector2(numTilesX_, numTilesZ_); }
+    
+    // Properties:
+    tolua_property__get_set int tileSize;
+    tolua_property__get_set float cellSize;
+    tolua_property__get_set float cellHeight;
+    tolua_property__get_set float agentHeight;
+    tolua_property__get_set float agentRadius;
+    tolua_property__get_set float agentMaxClimb;
+    tolua_property__get_set float agentMaxSlope;
+    tolua_property__get_set float regionMinSize;
+    tolua_property__get_set float regionMergeSize;
+    tolua_property__get_set float edgeMaxLength;
+    tolua_property__get_set float edgeMaxError;
+    tolua_property__get_set float detailSampleDistance;
+    tolua_property__get_set float detailSampleMaxError;
+    tolua_property__get_set const Vector3& padding;
+    tolua_readonly tolua_property__is_set bool initialized;
+    tolua_readonly tolua_property__get_set const BoundingBox& boundingBox;
+    tolua_readonly tolua_property__get_set BoundingBox worldBoundingBox;
+    tolua_readonly tolua_property__get_set IntVector2 numTiles;
 };
 
 ${

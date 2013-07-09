@@ -63,4 +63,14 @@ public:
     
     /// Return whether the engine has been created in headless mode.
     bool IsHeadless() const;
+    
+    // Properties:
+    tolua_property__get_set int minFps;
+    tolua_property__get_set int maxFps;
+    tolua_property__get_set int maxInactiveFps;
+    tolua_property__get_set bool pauseMinimized;
+    tolua_property__get_set bool autoExit;
+    tolua_readonly tolua_property__is_set bool initialized;
+    tolua_readonly tolua_property__is_set bool exiting;
+    tolua_readonly tolua_property__is_set bool headless;
 };

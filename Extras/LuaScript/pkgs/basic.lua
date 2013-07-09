@@ -21,6 +21,19 @@ function write(a)
     end
 end
 
+
+function get_property_methods_hook(ptype, name)
+    if ptype == "get_set" then
+        local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
+        return "Get"..Name, "Set"..Name
+    end
+    
+    if ptype == "is_set" then
+        local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
+        return "Is"..Name, "Set"..Name
+    end
+end
+
 function post_output_hook(package)
     local result = table.concat(toWrite)
     local function replace(pattern, replacement)

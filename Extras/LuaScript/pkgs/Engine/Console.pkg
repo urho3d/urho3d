@@ -4,6 +4,7 @@ $#include "Console.h"
 class Console
 {
 public:
+    // Methods:
     /// Set UI elements' style from an XML file.
     void SetDefaultStyle(XMLFile* style);
 
@@ -45,4 +46,13 @@ public:
     
     /// Return history row at index.
     const String& GetHistoryRow(unsigned index) const;
+    
+    // Properties:
+    tolua_property__get_set XMLFile* defaultStyle;
+    tolua_property__is_set bool visible;
+    tolua_property__get_set unsigned numRows;
+    tolua_property__get_set unsigned numHistoryRows;
+    tolua_readonly tolua_property__get_set unsigned historyPosition;
+    tolua_readonly tolua_property__get_set BorderImage* background;
+    tolua_readonly tolua_property__get_set LineEdit* lineEdit;
 };

@@ -4,7 +4,7 @@ $#include "PhysicsWorld.h"
 struct PhysicsRaycastResult
 {
     PhysicsRaycastResult();
-	
+    
     /// Hit position.
     Vector3 position_ @ position;
     /// Hit normal.
@@ -99,4 +99,12 @@ public:
     void SetApplyingTransforms(bool enable);
     /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const;
+    
+    // Properties:
+    tolua_property__get_set Vector3 gravity;
+    tolua_property__get_set int numIterations;
+    tolua_property__get_set int fps;
+    tolua_property__get_set bool interpolation;
+    tolua_property__get_set bool internalEdge;
+    tolua_property__get_set bool splitImpulse;
 };

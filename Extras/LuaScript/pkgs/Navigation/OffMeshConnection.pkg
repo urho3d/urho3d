@@ -17,4 +17,9 @@ public:
     float GetRadius() const { return radius_; }
     /// Return whether is bidirectional.
     bool IsBidirectional() const { return bidirectional_; }
+    
+    // Properties:
+    tolua_property__get_set Node* endPoint;
+    tolua_property__get_set float radius;
+    tolua_property__is_set bool bidirectional;
 };

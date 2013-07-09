@@ -80,4 +80,14 @@ public:
     ResourceRef GetModelAttr() const;
     /// Release the collision shape.
     void ReleaseShape();
+    
+    // Properties:
+    tolua_property__get_set ShapeType shapeType;
+    tolua_property__get_set const Vector3& size;
+    tolua_property__get_set const Vector3& position;
+    tolua_property__get_set const Quaternion& rotation;
+    tolua_property__get_set float margin;
+    tolua_property__get_set Model* model;
+    tolua_property__get_set unsigned lodLevel;
+    tolua_readonly tolua_property__get_set BoundingBox worldBoundingBox;
 };
