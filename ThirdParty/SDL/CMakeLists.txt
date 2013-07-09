@@ -38,7 +38,6 @@ elseif (ANDROID)
         src/audio/android/*.c src/core/android/*.cpp src/joystick/android/*.c src/loadso/dlopen/*.c
         src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c
     )
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-mimplicit-it=thumb")
 else ()
     include(CheckCSourceCompiles)
 
