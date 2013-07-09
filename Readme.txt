@@ -226,7 +226,7 @@ typically:
 
 - cd Android && android update project -p . -t 1
 - cd .. && ./cmake_android.sh
-- make -j8 install/strip (replace '-j 8' with the number of logical CPU cores of
+- make -j8 install/strip (replace '-j8' with the number of logical CPU cores of
                           the host/build system)
 - cd Android && ant debug && ant installd (for deploying the debug apk)
 
