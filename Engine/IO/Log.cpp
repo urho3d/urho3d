@@ -56,7 +56,7 @@ static Log* logInstance = 0;
 Log::Log(Context* context) :
     Object(context),
 #ifdef _DEBUG
-    level_(LOG_DEBUG)
+    level_(LOG_DEBUG),
 #else
     level_(LOG_INFO),
 #endif
@@ -77,7 +77,7 @@ void Log::Open(const String& fileName)
     #if !defined(ANDROID) && !defined(IOS)
     if ((logFile_ && logFile_->IsOpen()) || fileName.Empty())
         return;
-    
+
     logFile_ = new File(context_);
     if (logFile_->Open(fileName, FILE_WRITE))
         Write(LOG_INFO, "Opened log file " + fileName);
@@ -92,7 +92,7 @@ void Log::Open(const String& fileName)
 void Log::SetLevel(int level)
 {
     assert(level >= LOG_DEBUG && level < LOG_NONE);
-    
+
     level_ = level;
 }
 
@@ -109,18 +109,18 @@ void Log::SetQuiet(bool quiet)
 void Log::Write(int level, const String& message)
 {
     assert(level >= LOG_DEBUG && level < LOG_NONE);
-    
+
     // Do not log if message level excluded or if currently sending a log event
     if (!logInstance || logInstance->level_ > level || logInstance->inWrite_)
         return;
-    
+
     String formattedMessage = logLevelPrefixes[level];
     formattedMessage += ": " + message;
     logInstance->lastMessage_ = message;
-    
+
     if (logInstance->timeStamp_)
         formattedMessage = "[" + Time::GetTimeStamp() + "] " + formattedMessage;
-    
+
     #if defined(ANDROID)
     int androidLevel = ANDROID_LOG_DEBUG + level;
     __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
@@ -136,21 +136,21 @@ void Log::Write(int level, const String& message)
     else
         PrintUnicodeLine(formattedMessage, level == LOG_ERROR);
     #endif
-    
+
     if (logInstance->logFile_)
     {
         logInstance->logFile_->WriteLine(formattedMessage);
         logInstance->logFile_->Flush();
     }
-    
+
     logInstance->inWrite_ = true;
-    
+
     using namespace LogMessage;
-    
+
     VariantMap eventData;
     eventData[P_MESSAGE] = formattedMessage;
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
-    
+
     logInstance->inWrite_ = false;
 }
 
@@ -159,9 +159,9 @@ void Log::WriteRaw(const String& message, bool error)
     // Prevent recursion during log event
     if (!logInstance || logInstance->inWrite_)
         return;
-    
+
     logInstance->lastMessage_ = message;
-    
+
     #if defined(ANDROID)
     __android_log_print(ANDROID_LOG_INFO, "Urho3D", message.CString());
     #elif defined(IOS)
@@ -176,21 +176,21 @@ void Log::WriteRaw(const String& message, bool error)
     else
         PrintUnicode(message, error);
     #endif
-    
+
     if (logInstance->logFile_)
     {
         logInstance->logFile_->Write(message.CString(), message.Length());
         logInstance->logFile_->Flush();
     }
-    
+
     logInstance->inWrite_ = true;
-    
+
     using namespace LogMessage;
-    
+
     VariantMap eventData;
     eventData[P_MESSAGE] = message;
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
-    
+
     logInstance->inWrite_ = false;
 }
 
