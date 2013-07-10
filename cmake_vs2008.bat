@@ -1,9 +1,4 @@
 @del /F CMakeCache.txt
-@if /I "%1" == "ENABLE_64BIT" (set "arch= Win64") else (set "arch=")
-@set "DEFINE="
-@for %%n in (%*) do @call :concat %%n
-cmake -G "Visual Studio 9 2008%arch%" %DEFINE%
-@goto :eof
-:concat
-@set "DEFINE=%DEFINE% -D%1=1"
-@goto :eof
+@set "arch="
+@for %%n in (%*) do @if "%%n" == "-DENABLE_64BIT" (set "arch= Win64")
+cmake -G "Visual Studio 9 2008%arch%" %*

@@ -278,7 +278,7 @@ add_subdirectory (ThirdParty/STB)
 add_subdirectory (ThirdParty/JO)
 
 # Alternative Lua bindings. Uncomment the following line to enable
-set (ENABLE_LUA 1)
+# set (ENABLE_LUA 1)
 if (ENABLE_LUA)
     add_definitions (-DENABLE_LUA)
     add_subdirectory (ThirdParty/Lua)
@@ -309,7 +309,7 @@ if (NOT USE_OPENGL)
 endif ()
 
 # Urho3D extras. Uncomment to enable
-set (ENABLE_EXTRAS 1)
+# set (ENABLE_EXTRAS 1)
 if (ENABLE_EXTRAS)
     add_subdirectory (Extras/OgreBatchConverter)
     add_subdirectory (Extras/CharacterDemo)

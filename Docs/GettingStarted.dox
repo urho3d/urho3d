@@ -85,9 +85,7 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 \section Building_64bit Desktop 64bit build
 
-Currently CMake build configuration has been set to compile Urho3D as 32bit by default. To enable 64bit build for Visual Studio, run one of the cmake_vs20xx.bat by passing the option "ENABLE_64BIT" explicitly. This overrides CMake to use a 64bit solution generator.
-
-To enable 64bit build for non-MSVC/non-Windows platform, pass the option "-DENABLE_64BIT=1" explicitly when invoking cmake_eclipse.sh/cmake_macosx.sh/cmake_gcc.sh. Alternatively, you can modify the main CMakeLists.txt to enable 64bit by default for non-MSVC/non-Windows platform.
+Currently CMake build configuration has been set to compile Urho3D as 32bit by default. To enable 64bit build, run the provided cmake_xxxx.bat or cmake_xxxx.sh by passing the option "-DENABLE_64BIT=1" explicitly. For Visual Studio on Windows platform, this option also overrides CMake to use a 64bit solution generator. Alternatively, you can modify the main CMakeLists.txt to enable 64bit by default.
 
 \section Building_Shaders Compiling Direct3D shaders
 
