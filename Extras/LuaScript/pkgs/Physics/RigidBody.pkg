@@ -155,14 +155,14 @@ public:
     
     // Properties:
     tolua_property__get_set float mass;
-    tolua_property__get_set const Vector3& position;
-    tolua_property__get_set const Quaternion& rotation;
-    tolua_property__get_set const Vector3& linearVelocity;
-    tolua_property__get_set const Vector3& linearFactor;
+    tolua_property__get_set Vector3 position;
+    tolua_property__get_set Quaternion rotation;
+    tolua_property__get_set Vector3 linearVelocity;
+    tolua_property__get_set Vector3 linearFactor;
     tolua_property__get_set float linearRestThreshold;
     tolua_property__get_set float linearDamping;
-    tolua_property__get_set const Vector3& angularVelocity;
-    tolua_property__get_set const Vector3& angularFactor;
+    tolua_property__get_set Vector3 angularVelocity;
+    tolua_property__get_set Vector3 angularFactor;
     tolua_property__get_set float angularRestThreshold;
     tolua_property__get_set float angularDamping;
     tolua_property__get_set float friction;
@@ -180,3 +180,26 @@ public:
     tolua_property__get_set unsigned collisionMask;
     tolua_property__get_set CollisionEventMode collisionEventMode;
 };
+
+${
+
+#define TOLUA_DISABLE_tolua_get_RigidBody_position
+#define tolua_get_RigidBody_position tolua_PhysicsLuaAPI_RigidBody_GetPosition00
+
+
+#define TOLUA_DISABLE_tolua_get_RigidBody_rotation
+#define tolua_get_RigidBody_rotation tolua_PhysicsLuaAPI_RigidBody_GetRotation00
+
+#define TOLUA_DISABLE_tolua_get_RigidBody_linearVelocity
+#define tolua_get_RigidBody_linearVelocity tolua_PhysicsLuaAPI_RigidBody_GetLinearVelocity00
+
+#define TOLUA_DISABLE_tolua_get_RigidBody_linearFactor
+#define tolua_get_RigidBody_linearFactor tolua_PhysicsLuaAPI_RigidBody_GetLinearFactor00
+
+#define TOLUA_DISABLE_tolua_get_RigidBody_angularVelocity
+#define tolua_get_RigidBody_angularVelocity tolua_PhysicsLuaAPI_RigidBody_GetAngularVelocity00
+
+#define TOLUA_DISABLE_tolua_get_RigidBody_angularFactor
+#define tolua_get_RigidBody_angularFactor tolua_PhysicsLuaAPI_RigidBody_GetAngularFactor00
+
+$}

@@ -1,4 +1,4 @@
-require "Data/LuaScripts/Utilities/Network"
+ExecuteFile("LuaScripts/Utilities/Network.lua")
 
 local testScene
 local camera

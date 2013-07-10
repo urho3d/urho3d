@@ -82,7 +82,7 @@ public:
     tolua_property__get_set const Quaternion& rotation;
     tolua_property__get_set const Vector3& otherPosition;
     tolua_property__get_set const Quaternion& otherRotation;
-    tolua_property__get_set const Vector3& worldPosition;
+    tolua_property__get_set Vector3 worldPosition;
     tolua_property__get_set const Vector2& highLimit;
     tolua_property__get_set const Vector2& lowLimit;
     tolua_property__get_set float ERP;
@@ -91,3 +91,10 @@ public:
     tolua_readonly tolua_property__get_set RigidBody* ownBody;
     tolua_property__get_set RigidBody* otherBody;
 };
+
+${
+
+#define TOLUA_DISABLE_tolua_get_Constraint_worldPosition
+#define tolua_get_Constraint_worldPosition tolua_PhysicsLuaAPI_Constraint_GetWorldPosition00
+
+$}

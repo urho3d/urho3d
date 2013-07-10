@@ -57,13 +57,13 @@ extern int tolua_LuaScriptLuaAPI_open(lua_State*);
 namespace Urho3D
 {
 
-static Context* scriptContext_ = 0;
+static Context* currentContext_ = 0;
 
 LuaScript::LuaScript(Context* context) :
     Object(context),
     luaState_(0)
 {
-    scriptContext_ = context_;
+    currentContext_ = context_;
 
     luaState_ = luaL_newstate();
     if (!luaState_)
@@ -197,10 +197,15 @@ bool LuaScript::ExecuteFunction(const char* funcName)
     return true;
 }
 
-void LuaScript::SubscribeLuaEvent(const char* event, const char* funcName)
+void LuaScript::ScriptSendEvent(const char* eventName, VariantMap& eventData)
 {
-    StringHash eventType(event);
-    eventFunctionMap_[eventType].Push(String(funcName));
+	SendEvent(StringHash(eventName), eventData);
+}
+
+void LuaScript::ScriptSubscribeToEvent(const char* eventName, const char* functionName)
+{
+    StringHash eventType(eventName);
+    eventTypeToFunctionNameMap_[eventType].Push(String(functionName));
 
     SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
 }
@@ -254,19 +259,20 @@ int LuaScript::PCallCallback(lua_State* L)
 
 void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
-    HashMap<StringHash, Vector<String> >::ConstIterator it = eventFunctionMap_.Find(eventType);
-    if (it == eventFunctionMap_.End())
+    HashMap<StringHash, Vector<String> >::ConstIterator it = eventTypeToFunctionNameMap_.Find(eventType);
+    if (it == eventTypeToFunctionNameMap_.End())
         return;
 
     for (unsigned i = 0; i < it->second_.Size(); ++i)
     {
-        const String& funcName = it->second_[i];
-        int top = lua_gettop(luaState_);
-        lua_getglobal(luaState_, funcName.CString());
+        const String& functionName = it->second_[i];
+        
+		int top = lua_gettop(luaState_);
+        lua_getglobal(luaState_, functionName.CString());
         if (!lua_isfunction(luaState_, -1))
         {
             lua_settop(luaState_, top);
-            LOGRAW(String("Lua: Unable to get lua global: '") + funcName + "'.");
+            LOGRAW(String("Lua: Unable to get lua global: '") + functionName + "'.");
             return;
         }
 
@@ -274,10 +280,10 @@ void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
         tolua_pushusertype(luaState_, (void*)&eventData, "VariantMap");
         if (lua_pcall(luaState_, 2, 0, 0))
         {
-            String message = lua_tostring(luaState_, -1);
+            const char* message = lua_tostring(luaState_, -1);
             lua_settop(luaState_, top);
-            LOGRAW(String("Lua: Unable to execute function '") + funcName + "'.");
-            LOGRAW("Lua: " + message);
+            LOGRAW(String("Lua: Unable to execute function '") + functionName + "'.");
+            LOGRAW(String("Lua: ") + message);
             return;
         }
     }
@@ -291,19 +297,7 @@ void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData
 
 Context* GetContext()
 {
-    return scriptContext_;
-}
-
-void SendEvent(const char* eventType, VariantMap& eventData)
-{
-    LuaScript* luaScript = scriptContext_->GetSubsystem<LuaScript>();
-    luaScript->SendEvent(StringHash(eventType), eventData);
-}
-
-void SubscribeToEvent(const char* eventType, const char* funcName)
-{
-    LuaScript* luaScript = scriptContext_->GetSubsystem<LuaScript>();
-    luaScript->SubscribeLuaEvent(eventType, funcName);
+    return currentContext_;
 }
 
 }

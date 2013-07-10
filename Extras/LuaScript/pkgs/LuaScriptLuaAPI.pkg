@@ -2,8 +2,33 @@ $#define TOLUA_RELEASE
 
 $#include "LuaScript.h"
 
-void SendEvent(const char* eventType, VariantMap& eventData);
-void SubscribeToEvent(const char* eventType, const char* funcName);
+void ExecuteFile(const char* fileName);
+void SendEvent(const char* eventName, VariantMap& eventData);
+void SubscribeToEvent(const char* eventName, const char* functionName);
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)
+
+${
+
+static LuaScript* GetLuaScript()
+{
+    return GetContext()->GetSubsystem<LuaScript>();
+}
+
+static bool ExecuteFile(const char* fileName)
+{
+    return GetLuaScript()->ExecuteFile(fileName);
+}
+
+static void SendEvent(const char* eventName, VariantMap& eventData)
+{
+    GetLuaScript()->ScriptSendEvent(eventName, eventData);
+}
+
+static void SubscribeToEvent(const char* eventName, const char* functionName)
+{
+    GetLuaScript()->ScriptSubscribeToEvent(eventName, functionName);
+}
+
+$}

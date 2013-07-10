@@ -133,6 +133,7 @@ public:
     
     /// Template version of creating a component.
     // template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
+    
     AnimationController* CreateComponent<AnimationController> @ CreateAnimationController();
     AnimatedModel* CreateComponent<AnimatedModel> @ CreateAnimatedModel();
     Camera* CreateComponent<Camera> @ CreateCamera();
@@ -155,32 +156,56 @@ public:
     StaticModel* CreateComponent<StaticModel> @ CreateStaticModel();
     Terrain* CreateComponent<Terrain> @ CreateTerrain();
     Zone* CreateComponent<Zone> @ CreateZone();
+    
+    AnimationController* CreateComponent<AnimationController> @ CreateAnimationController(CreateMode mode);
+    AnimatedModel* CreateComponent<AnimatedModel> @ CreateAnimatedModel(CreateMode mode);
+    Camera* CreateComponent<Camera> @ CreateCamera(CreateMode mode);
+    CollisionShape* CreateComponent<CollisionShape> @ CreateCollisionShape(CreateMode mode);
+    Constraint* CreateComponent<Constraint> @ CreateConstraint(CreateMode mode);
+    DebugRenderer* CreateComponent<DebugRenderer> @ CreateDebugRenderer(CreateMode mode);
+    DecalSet* CreateComponent<DecalSet> @ CreateDecalSet(CreateMode mode);
+    Drawable* CreateComponent<Drawable> @ CreateDrawable(CreateMode mode);
+    Light* CreateComponent<Light> @ CreateLight(CreateMode mode);
+    Navigable* CreateComponent<Navigable> @ CreateNavigable(CreateMode mode);
+    NavigationMesh* CreateComponent<NavigationMesh> @ CreateNavigationMesh(CreateMode mode);
+    NetworkPriority* CreateComponent<NetworkPriority> @ CreateNetworkPriority(CreateMode mode);
+    Octree* CreateComponent<Octree> @ CreateOctree(CreateMode mode);
+    OffMeshConnection* CreateComponent<OffMeshConnection> @ CreateOffMeshConnection(CreateMode mode);
+    PhysicsWorld* CreateComponent<PhysicsWorld> @ CreatePhysicsWorld(CreateMode mode);
+    RigidBody* CreateComponent<RigidBody> @ CreateRigidBody(CreateMode mode);
+    SmoothedTransform* CreateComponent<SmoothedTransform> @ CreateSmoothedTransform(CreateMode mode);
+    SoundListener* CreateComponent<SoundListener> @ CreateSoundListener(CreateMode mode);
+    SoundSource* CreateComponent<SoundSource> @ CreateSoundSource(CreateMode mode);
+    StaticModel* CreateComponent<StaticModel> @ CreateStaticModel(CreateMode mode);
+    Terrain* CreateComponent<Terrain> @ CreateTerrain(CreateMode mode);
+    Zone* CreateComponent<Zone> @ CreateZone(CreateMode mode);
+    
+    AnimationController* CreateComponent<AnimationController> @ CreateAnimationController(CreateMode mode, unsigned id);
+    AnimatedModel* CreateComponent<AnimatedModel> @ CreateAnimatedModel(CreateMode mode, unsigned id);
+    Camera* CreateComponent<Camera> @ CreateCamera(CreateMode mode, unsigned id);
+    CollisionShape* CreateComponent<CollisionShape> @ CreateCollisionShape(CreateMode mode, unsigned id);
+    Constraint* CreateComponent<Constraint> @ CreateConstraint(CreateMode mode, unsigned id);
+    DebugRenderer* CreateComponent<DebugRenderer> @ CreateDebugRenderer(CreateMode mode, unsigned id);
+    DecalSet* CreateComponent<DecalSet> @ CreateDecalSet(CreateMode mode, unsigned id);
+    Drawable* CreateComponent<Drawable> @ CreateDrawable(CreateMode mode, unsigned id);
+    Light* CreateComponent<Light> @ CreateLight(CreateMode mode, unsigned id);
+    Navigable* CreateComponent<Navigable> @ CreateNavigable(CreateMode mode, unsigned id);
+    NavigationMesh* CreateComponent<NavigationMesh> @ CreateNavigationMesh(CreateMode mode, unsigned id);
+    NetworkPriority* CreateComponent<NetworkPriority> @ CreateNetworkPriority(CreateMode mode, unsigned id);
+    Octree* CreateComponent<Octree> @ CreateOctree(CreateMode mode, unsigned id);
+    OffMeshConnection* CreateComponent<OffMeshConnection> @ CreateOffMeshConnection(CreateMode mode, unsigned id);
+    PhysicsWorld* CreateComponent<PhysicsWorld> @ CreatePhysicsWorld(CreateMode mode, unsigned id);
+    RigidBody* CreateComponent<RigidBody> @ CreateRigidBody(CreateMode mode, unsigned id);
+    SmoothedTransform* CreateComponent<SmoothedTransform> @ CreateSmoothedTransform(CreateMode mode, unsigned id);
+    SoundListener* CreateComponent<SoundListener> @ CreateSoundListener(CreateMode mode, unsigned id);
+    SoundSource* CreateComponent<SoundSource> @ CreateSoundSource(CreateMode mode, unsigned id);
+    StaticModel* CreateComponent<StaticModel> @ CreateStaticModel(CreateMode mode, unsigned id);
+    Terrain* CreateComponent<Terrain> @ CreateTerrain(CreateMode mode, unsigned id);
+    Zone* CreateComponent<Zone> @ CreateZone(CreateMode mode, unsigned id);
 
     /// Template version of getting or creating a component.
     // template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
-    AnimationController* GetOrCreateComponent<AnimationController> @ GetOrCreateAnimationController();
-    AnimatedModel* GetOrCreateComponent<AnimatedModel> @ GetOrCreateAnimatedModel();
-    Camera* GetOrCreateComponent<Camera> @ GetOrCreateCamera();
-    CollisionShape* GetOrCreateComponent<CollisionShape> @ GetOrCreateCollisionShape();
-    Constraint* GetOrCreateComponent<Constraint> @ GetOrCreateConstraint();
-    DebugRenderer* GetOrCreateComponent<DebugRenderer> @ GetOrCreateDebugRenderer();
-    DecalSet* GetOrCreateComponent<DecalSet> @ GetOrCreateDecalSet();
-    Drawable* GetOrCreateComponent<Drawable> @ GetOrCreateDrawable();
-    Light* GetOrCreateComponent<Light> @ GetOrCreateLight();
-    Navigable* GetOrCreateComponent<Navigable> @ GetOrCreateNavigable();
-    NavigationMesh* GetOrCreateComponent<NavigationMesh> @ GetOrCreateNavigationMesh();
-    NetworkPriority* GetOrCreateComponent<NetworkPriority> @ GetOrCreateNetworkPriority();
-    Octree* GetOrCreateComponent<Octree> @ GetOrCreateOctree();
-    OffMeshConnection* GetOrCreateComponent<OffMeshConnection> @ GetOrCreateOffMeshConnection();
-    PhysicsWorld* GetOrCreateComponent<PhysicsWorld> @ GetOrCreatePhysicsWorld();
-    RigidBody* GetOrCreateComponent<RigidBody> @ GetOrCreateRigidBody();
-    SmoothedTransform* GetOrCreateComponent<SmoothedTransform> @ GetOrCreateSmoothedTransform();
-    SoundListener* GetOrCreateComponent<SoundListener> @ GetOrCreateSoundListener();
-    SoundSource* GetOrCreateComponent<SoundSource> @ GetOrCreateSoundSource();
-    StaticModel* GetOrCreateComponent<StaticModel> @ GetOrCreateStaticModel();
-    Terrain* GetOrCreateComponent<Terrain> @ GetOrCreateTerrain();
-    Zone* GetOrCreateComponent<Zone> @ GetOrCreateZone();
-
+    
     /// Return ID.
     unsigned GetID() const { return id_; }
     /// Return name.

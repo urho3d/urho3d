@@ -52,11 +52,14 @@ public:
     /// Execute lua function.
     bool ExecuteFunction(const char* funcName);
 
-    /// Return the lua state.
-    lua_State* GetLuaState() const { return luaState_; }
+    /// Script send event.
+	void ScriptSendEvent(const char* eventName, VariantMap& eventData);
 
-    /// Subscribe lua event.
-    void SubscribeLuaEvent(const char* event, const char* function);
+    /// Script subscribe event.
+    void ScriptSubscribeToEvent(const char* eventName, const char* functionName);
+
+	/// Return the lua state.
+	lua_State* GetLuaState() const { return luaState_; }
 
 private:
     /// Replace print function.
@@ -77,15 +80,11 @@ private:
 private:
     /// Lua state.
     lua_State* luaState_;
-    /// Event type to Lua function name map.
-    HashMap<StringHash, Vector<String> > eventFunctionMap_;
+    /// Event type to function name map.
+    HashMap<StringHash, Vector<String> > eventTypeToFunctionNameMap_;
 };
 
 /// Return context.
 Context* GetContext();
-///  Send event function for Lua script.
-void SendEvent(const char* eventType, VariantMap& eventData);
-/// Subscribe event function for Lua script.
-void SubscribeToEvent(const char* eventType, const char* funcName);
 
 }
