@@ -1,0 +1,28 @@
+$#include "Object.h"
+
+class Object : public RefCounted
+{
+public:
+    tolua_outside const char* ObjectGetTypeName @ GetTypeName() const;
+    tolua_outside void ObjectSendEvent @ SendEvent(const char* eventName);
+    tolua_outside void ObjectSendEvent @ SendEvent(const char* eventName, VariantMap& eventData);
+};
+
+${
+
+static const char* ObjectGetTypeName(const Object* object)
+{
+    return object->GetTypeName().CString();
+}
+
+static void ObjectSendEvent(Object* object, const char* eventName)
+{
+    object->SendEvent(StringHash(eventName));
+}
+
+static void ObjectSendEvent(Object* object, const char* eventName, VariantMap& eventData)
+{
+    object->SendEvent(StringHash(eventName), eventData);
+}
+
+$}

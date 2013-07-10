@@ -416,13 +416,10 @@ function HandleMouseButtonDown(eventType, eventData)
                         decal = result.drawable:GetNode():CreateDecalSet()
                         decal:SetMaterial(cache:GetMaterial("Materials/UrhoDecal.xml"))
                         -- Increase max. vertices/indices if the target is skinned
-                        --[[
-                        if result.drawable:GetTypeName() == "AnimatedModel")
-                        {
+                        if result.drawable:GetTypeName() == "AnimatedModel" then
                             decal.maxVertices = 2048
                             decal.maxIndices = 4096
-                        }
-                        --]]
+                        end
                     end
                     decal:AddDecal(result.drawable, rayHitPos, cameraNode:GetWorldRotation(), 0.5, 1.0, 1.0, Vector2(0, 0), Vector2(1, 1))
                 end

@@ -1,7 +1,7 @@
 $#include "Component.h"
 
 /// Base class for components. Components can be created to scene nodes.
-class Component
+class Component : public Serializable
 {    
 public:
     /// Set enabled/disabled state.
