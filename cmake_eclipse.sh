@@ -1,18 +1,15 @@
-rm -f CMakeCache.txt
-proj=`pwd`
-mkdir -p ../Urho3D-Eclipse-build/{Release,Debug,RelWithDebInfo}
-rm -f ../Urho3D-Eclipse-build/{Release,Debug,RelWithDebInfo}/CMakeCache.txt
-cmake -E chdir ../Urho3D-Eclipse-build/Release cmake -G"Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Release $proj $@
-cmake -E chdir ../Urho3D-Eclipse-build/Debug cmake -G"Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug $proj $@
-cmake -E chdir ../Urho3D-Eclipse-build/RelWithDebInfo cmake -G"Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo $proj $@
+# Create out-of-source build directory
+cmake -E make_directory build
+# Remove existing CMake cache and rules
+rm -rf {.,build}/CMakeCache.txt CMakeFiles
+# Create the Cmake generators
+cmake -E chdir build cmake -G "Eclipse CDT4 - Unix Makefiles" .. $@
+[ $ANDROID_NDK ] && cmake -E chdir Android cmake -G "Eclipse CDT4 - Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. .. $@ \
+                 && sed -i.bak 's/<value>all<\/value>/<value>install\/strip<\/value>/g' Android/.project
+# Assume Eclipse user uses OpenGL, comment out below sed if this is not true
 sed -i.bak 's/OpenGL/Direct3D9/g' Doxyfile
-#
-# Create symbolic links in the respective Eclipse configuration subdir to allow running Urho3D within the Eclipse itself
-cd ../Urho3D-Eclipse-build
-for conf in Debug RelWithDebInfo Release; do
-if [ ! -d $conf/Urho3D/CoreData ]
-then
-    ln -s $proj/Bin/CoreData $conf/Urho3D/.
-    ln -s $proj/Bin/Data $conf/Urho3D/.
-fi
+# Create symbolic links in the build and Android directories
+for dir in CoreData Data; do
+    cmake -E create_symlink ../../Bin/$dir build/Urho3D/$dir
+    [ $ANDROID_NDK ] && cmake -E create_symlink ../../Bin/$dir Android/assets/$dir
 done

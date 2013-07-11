@@ -42,9 +42,9 @@ set (INCLUDE_DIRS_ONLY . ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/inclu
 enable_pch ()
 setup_library ()
 
-# For IOS build to be successful, the "tolua++" tool must be present in the "Bin" folder.
-# One way to achieve this is to first build Urho3D for Mac OS X desktop build where all the tools would be generated, then switch to IOS build.
-if (NOT IOS) 
+# For IOS and Android build to be successful, the "tolua++" tool must be present in the "Bin" folder.
+# One way to achieve this is to first do a desktop build where all the tools would be generated, then switch to IOS/Android build.
+if (NOT IOS AND NOT ANDROID)
     # Add dependency to the "tolua++" bin tool
     add_dependencies(${TARGET_NAME} tolua++)
 endif ()

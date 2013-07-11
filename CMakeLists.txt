@@ -3,6 +3,11 @@ include (CheckIncludeFiles)
 # Disable unnecessary build types
 set (CMAKE_CONFIGURATION_TYPES "RelWithDebInfo;Debug;Release" CACHE STRING "Configurations" FORCE)
 
+# Set the build type if not explicitly set, for single-configuration generator only
+if (NOT MSVC AND NOT CMAKE_GENERATOR STREQUAL "Xcode" AND NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif ()
+
 # Set project name
 project (Urho3D)
 
@@ -311,8 +316,10 @@ endif ()
 # Urho3D extras. Uncomment to enable
 # set (ENABLE_EXTRAS 1)
 if (ENABLE_EXTRAS)
-    add_subdirectory (Extras/OgreBatchConverter)
-    add_subdirectory (Extras/CharacterDemo)
+    if (NOT IOS AND NOT ANDROID)
+        add_subdirectory (Extras/OgreBatchConverter)
+        add_subdirectory (Extras/CharacterDemo)
+    endif ()
 endif ()
 
 add_subdirectory (Urho3D)
