@@ -180,7 +180,7 @@ endmacro ()
 macro (setup_main_executable)
     # Define resource files
     if (APPLE)
-        set (RESOURCE_FILES ${PROJECT_BINARY_DIR}/Bin/CoreData ${PROJECT_BINARY_DIR}/Bin/Data)
+        set (RESOURCE_FILES ${PROJECT_SOURCE_DIR}/Bin/CoreData ${PROJECT_SOURCE_DIR}/Bin/Data)
         set_source_files_properties(${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
         set (SOURCE_FILES ${SOURCE_FILES} ${RESOURCE_FILES})
     endif ()
