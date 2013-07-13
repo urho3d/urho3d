@@ -199,7 +199,9 @@ macro (setup_main_executable)
     else ()
         add_library (${TARGET_NAME} SHARED ${SOURCE_FILES})
         setup_target ()
-        install (TARGETS ${TARGET_NAME} LIBRARY DESTINATION ${INSTALLED_LIBRARY_OUTPUT_PATH})
+        # Strip the output shared library
+        get_target_property (EXECUTABLE_NAME ${TARGET_NAME} LOCATION)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} ${EXECUTABLE_NAME})
     endif ()
 
     # Define a custom target to check for resource modification

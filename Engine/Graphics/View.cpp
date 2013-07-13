@@ -1541,7 +1541,9 @@ void View::AllocateScreenBuffers()
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
         neededBuffers = 1;
     
-    unsigned format = Graphics::GetRGBFormat();
+    // Follow final rendertarget format, or use RGB to match the backbuffer format
+    unsigned format = renderTarget_ ? renderTarget_->GetParentTexture()->GetFormat() : Graphics::GetRGBFormat();
+    
     #ifdef USE_OPENGL
     if (deferred_)
         format = Graphics::GetRGBAFormat();

@@ -495,11 +495,6 @@ endif()
 # see if we have path to Android NDK
 __INIT_VARIABLE( ANDROID_NDK PATH ENV_ANDROID_NDK )
 
-# Urho3D: allow also ANDROID_NDK_ROOT
-if( NOT ANDROID_NDK )
- __INIT_VARIABLE( ANDROID_NDK PATH ENV_ANDROID_NDK_ROOT )
-endif()
-
 if( NOT ANDROID_NDK )
  # see if we have path to Android standalone toolchain
  __INIT_VARIABLE( ANDROID_STANDALONE_TOOLCHAIN PATH ENV_ANDROID_STANDALONE_TOOLCHAIN OBSOLETE_ANDROID_NDK_TOOLCHAIN_ROOT OBSOLETE_ENV_ANDROID_NDK_TOOLCHAIN_ROOT )
@@ -1563,9 +1558,7 @@ if(NOT _CMAKE_IN_TRY_COMPILE)
  else()
   set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin" CACHE PATH "Output directory for applications" )
  endif()
- # Urho3D: differentiate between non-stripped (local) and stripped (installed) library folder
- set( LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/local/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for local android libs" )
- set( INSTALLED_LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for installed/stripped android libs" )
+ set( LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" )
 endif()
 
 # set these global flags for cmake client scripts to change behavior

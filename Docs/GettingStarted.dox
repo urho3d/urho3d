@@ -54,27 +54,27 @@ To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting to e
 
 \section Building_Android Android build process
 
-First, if you are building under Windows platform, copy Bin/Data and Bin/CoreData directories to the Android/assets directory (you can use the provided batch file CopyData.bat). This step is not necessary for non-Windows platform because the build script uses symbolic links for platforms that support it. Next, execute the following commands in the Android directory:
+First, if you are building under Windows platform, copy Bin/Data and Bin/CoreData directories to the Android/assets directory (you can use the provided batch file CopyData.bat). This step is not necessary for non-Windows platform because the build script uses symbolic links for platforms that support it.
 
-- android update project -p . -t 1 (only needed on the first time, replace '-t 1' with desired target-id)
-- ndk-build
+Set the ANDROID_NDK environment variable to point to your Android NDK. On Windows, ensure that make.exe from the Android NDK is included in the path and is executable from the command line.
+
+On Windows, execute cmake_android.bat. On OS X or Linux, execute cmake_gcc.sh (the ANDROID_NDK environment variable distinguishes from a normal desktop build.) Then go to the Android directory and execute the following commands
+
+- android update project -p . -t 1 (only needed on the first time,
+                                    replace '-t 1' with desired target-id)
+- make -j8 (replace '-j8' with the number of logical CPU cores of the 
+            host/build system)
 - ant debug
 
-Note that ndk-build builds Urho3D twice, once without hardware floating point instructions, and once with them. After the commands finish successfully, the APK should have been generated to the Android/bin directory, from where it can be installed on a device or an emulator.
+After the commands finish successfully, the APK should have been generated to the Android/bin directory, from where it can be installed on a device or an emulator. The command "ant installd" can be used for this.
 
 For a release build, use the "ant release" command instead of "ant debug" and follow the Android SDK instructions on how to sign your APK properly.
 
 By default the Android package for Urho3D is com.googlecode.urho3d. For a real application you must replace this with your own package name. The Urho3D activity subclasses the SDLActivity from org.libsdl.app package, whose name (or the JNI code from SDL library) does not have to be changed.
 
-There is also a CMake-based, work-in-progress method to build the Urho3D native code. To use, first set "ANDROID_NDK" environment variable to point to where your NDK is being installed, then run cmake_android.bat or cmake_gcc.sh, then run make in the Android directory. After the native code build is finished, proceed to ant debug like above. In Linux, typically:
+Note that the native code is built by default for armeabi-v7a ABI. To make your program compatible also with old Android devices, build also an armeabi version by executing the CMake batch file again with the parameter -DANDROID_ABI=armeabi added, then execute make again in the Android directory.
 
-- ./cmake_gcc.sh
-- cd Android
-- android update project -p . -t 1
-- make -j8 install/strip (replace '-j8' with the number of logical CPU cores of the host/build system)
-- ant debug && ant installd (for deploying the debug apk)
-
-You can also build and deploy using Eclipse IDE with ADT plugin. To do that, after setting the "ANDROID_NDK" environment variable then run cmake_eclipse.sh. Import "Existing Android Code into Workspace" from the CMake generated Eclipse's project found in the Android directory. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target and that's it. Just choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
+You can also build and deploy using Eclipse IDE with ADT plugin. To do that, after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh. Import "Existing Android Code into Workspace" from the CMake generated Eclipse's project found in the Android directory. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target and that's it. Just choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
 
 \section Building_Ios iOS build process
 
