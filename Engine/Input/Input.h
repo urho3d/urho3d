@@ -161,8 +161,6 @@ public:
     int GetMouseMoveY() const { return mouseMove_.y_; }
     /// Return mouse wheel movement since last frame.
     int GetMouseMoveWheel() const { return mouseMoveWheel_; }
-    /// Return if has touch input.
-    bool IsTouchEnabled() const;
     /// Return number of active finger touches.
     unsigned GetNumTouches() const { return touches_.Size(); }
     /// Return active finger touch by index.

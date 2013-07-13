@@ -87,12 +87,8 @@ void Start()
     SubscribeToEvent("Points", "HandlePoints");
     SubscribeToEvent("Kill", "HandleKill");
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
-
-    if (touchEnabled)
-    {
-        SubscribeToEvent("TouchBegin", "HandleTouchBegin");
-        SubscribeToEvent("TouchEnd", "HandleTouchEnd");
-    }
+    SubscribeToEvent("TouchBegin", "HandleTouchBegin");
+    SubscribeToEvent("TouchEnd", "HandleTouchEnd");
 
     if (singlePlayer)
     {
@@ -191,6 +187,26 @@ void InitNetworking()
     }
 }
 
+void InitTouchInput()
+{
+    touchEnabled = true;
+
+    moveButton = BorderImage();
+    moveButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
+    moveButton.imageRect = IntRect(0, 0, 96, 96);
+    moveButton.SetPosition(touchButtonBorder, graphics.height - touchButtonSize - touchButtonBorder);
+    moveButton.SetSize(touchButtonSize, touchButtonSize);
+    ui.root.AddChild(moveButton);
+
+    fireButton = BorderImage();
+    fireButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
+    fireButton.imageRect = IntRect(96, 0, 192, 96);
+    fireButton.SetPosition(graphics.width - touchButtonSize - touchButtonBorder, graphics.height - touchButtonSize -
+        touchButtonBorder);
+    fireButton.SetSize(touchButtonSize, touchButtonSize);
+    ui.root.AddChild(fireButton);
+}
+
 void CreateCamera()
 {
     // Note: the camera is not in the scene
@@ -261,25 +277,8 @@ void CreateOverlays()
     healthBar.SetSize(116, 16);
     healthBorder.AddChild(healthBar);
 
-    if (input.touchEnabled)
-    {
-        touchEnabled = true;
-
-        moveButton = BorderImage();
-        moveButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
-        moveButton.imageRect = IntRect(0, 0, 96, 96);
-        moveButton.SetPosition(touchButtonBorder, graphics.height - touchButtonSize - touchButtonBorder);
-        moveButton.SetSize(touchButtonSize, touchButtonSize);
-        ui.root.AddChild(moveButton);
-
-        fireButton = BorderImage();
-        fireButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
-        fireButton.imageRect = IntRect(96, 0, 192, 96);
-        fireButton.SetPosition(graphics.width - touchButtonSize - touchButtonBorder, graphics.height - touchButtonSize -
-            touchButtonBorder);
-        fireButton.SetSize(touchButtonSize, touchButtonSize);
-        ui.root.AddChild(fireButton);
-    }
+    if (GetPlatform() == "Android" || GetPlatform() == "iOS")
+        InitTouchInput();
 }
 
 void SetMessage(const String&in message)
@@ -457,6 +456,10 @@ void HandlePostRenderUpdate()
 
 void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
+    // On some platforms like Windows the presence of touch input can only be detected dynamically
+    if (!touchEnabled)
+        InitTouchInput();
+
     int touchID = eventData["TouchID"].GetInt();
     IntVector2 pos(eventData["X"].GetInt(), eventData["Y"].GetInt());
     UIElement@ element = ui.GetElementAt(pos, false);

@@ -3148,7 +3148,6 @@ Properties:<br>
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)
 - int mouseMoveWheel (readonly)
-- bool touchEnabled (readonly)
 - uint numTouches (readonly)
 - TouchState@[] touches (readonly)
 - uint numJoysticks (readonly)
