@@ -133,12 +133,6 @@ private:
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
     /// Handle mouse wheel event.
     void HandleMouseWheel(StringHash eventType, VariantMap& eventData);
-    /// Handle touch begin event.
-    void HandleTouchBegin(StringHash eventType, VariantMap& eventData);
-    /// Handle touch end event.
-    void HandleTouchEnd(StringHash eventType, VariantMap& eventData);
-    /// Handle touch move event.
-    void HandleTouchMove(StringHash eventType, VariantMap& eventData);
     /// Handle keypress event.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
     /// Handle character event.

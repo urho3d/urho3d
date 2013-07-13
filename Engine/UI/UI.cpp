@@ -89,9 +89,6 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(UI, HandleMouseMove));
     SubscribeToEvent(E_MOUSEWHEEL, HANDLER(UI, HandleMouseWheel));
-    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(UI, HandleTouchBegin));
-    SubscribeToEvent(E_TOUCHEND, HANDLER(UI, HandleTouchEnd));
-    SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
     SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
     SubscribeToEvent(E_CHAR, HANDLER(UI, HandleChar));
 
@@ -493,7 +490,8 @@ UIElement* UI::GetFrontElement() const
 
 IntVector2 UI::GetCursorPosition() const
 {
-    return cursor_ ? cursor_->GetPosition() : GetSubsystem<Input>()->GetMousePosition();
+    Input* input = GetSubsystem<Input>();
+    return (input->IsMouseVisible() || !cursor_) ? input->GetMousePosition() : cursor_->GetPosition();
 }
 
 bool UI::HasModalElement() const
@@ -763,16 +761,17 @@ UIElement* UI::GetFocusableElement(UIElement* element)
 
 void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
 {
-    if (cursor_)
+    Input* input = GetSubsystem<Input>();
+    
+    if (input->IsMouseVisible() || !cursor_)
     {
-        pos = cursor_->GetPosition();
-        visible = cursor_->IsVisible();
+        pos = input->GetMousePosition();
+        visible = input->IsMouseVisible();
     }
     else
     {
-        Input* input = GetSubsystem<Input>();
-        pos = input->GetMousePosition();
-        visible = input->IsMouseVisible();
+        pos = cursor_->GetPosition();
+        visible = cursor_->IsVisible();
     }
 }
 
@@ -1009,117 +1008,6 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
             if (element && (nonFocusedMouseWheel_ || element->GetFocusMode() >= FM_FOCUSABLE))
                 element->OnWheel(delta, mouseButtons_, qualifiers_);
-        }
-    }
-}
-
-void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
-{
-    using namespace TouchBegin;
-
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    WeakPtr<UIElement> element(GetElementAt(pos));
-
-    if (element)
-    {
-        // Handle focusing & bringing to front
-        SetFocusElement(element);
-        element->BringToFront();
-
-        // Handle click
-        element->OnClick(element->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
-
-        // Handle start of drag. OnClick() may have caused destruction of the element, so check the pointer again
-        if (element && !dragElement_ )
-        {
-            dragElement_ = element;
-            element->OnDragBegin(element->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
-            SendDragEvent(E_DRAGBEGIN, element, pos);
-        }
-    }
-    else
-    {
-        // If clicked over no element, or a disabled element, lose focus
-        SetFocusElement(0);
-    }
-
-    VariantMap clickEventData;
-    clickEventData[UIMouseClick::P_ELEMENT] = (void*)element.Get();
-    clickEventData[UIMouseClick::P_X] = pos.x_;
-    clickEventData[UIMouseClick::P_Y] = pos.y_;
-    clickEventData[UIMouseClick::P_BUTTON] = MOUSEB_LEFT;
-    clickEventData[UIMouseClick::P_BUTTONS] = MOUSEB_LEFT;
-    clickEventData[UIMouseClick::P_QUALIFIERS] = 0;
-    SendEvent(E_UIMOUSECLICK, clickEventData);
-}
-
-void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
-{
-    using namespace TouchEnd;
-
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-
-    // Transmit hover end to the position where the finger was lifted
-    UIElement* element = GetElementAt(pos);
-    if (element && element->IsEnabled())
-        element->OnHover(element->ScreenToElement(pos), pos, 0, 0, 0);
-
-    if (dragElement_)
-    {
-        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
-        {
-            dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, cursor_);
-            SendDragEvent(E_DRAGEND, dragElement_, pos);
-            
-            // Drag and drop finish
-            bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
-            if (dragSource)
-            {
-                WeakPtr<UIElement> target(GetElementAt(pos));
-                bool dragTarget = target && (target->GetDragDropMode() & DD_TARGET) != 0;
-                bool dragDropFinish = dragSource && dragTarget && target != dragElement_;
-
-                if (dragDropFinish)
-                {
-                    bool accept = target->OnDragDropFinish(dragElement_);
-
-                    // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
-                    if (accept && dragElement_ && target)
-                    {
-                        using namespace DragDropFinish;
-
-                        VariantMap eventData;
-                        eventData[P_SOURCE] = (void*)dragElement_.Get();
-                        eventData[P_TARGET] = (void*)target.Get();
-                        eventData[P_ACCEPT] = accept;
-                        SendEvent(E_DRAGDROPFINISH, eventData);
-                    }
-                }
-            }
-        }
-
-        dragElement_.Reset();
-    }
-}
-
-void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
-{
-    using namespace TouchMove;
-
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-
-    if (dragElement_)
-    {
-        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
-        {
-            dragElement_->OnDragMove(dragElement_->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
-            SendDragEvent(E_DRAGMOVE, dragElement_, pos);
-        }
-        else
-        {
-            dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, 0);
-            SendDragEvent(E_DRAGEND, dragElement_, pos);
-            dragElement_.Reset();
         }
     }
 }

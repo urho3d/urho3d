@@ -53,6 +53,7 @@ uint clientNodeID = 0;
 int clientScore = 0;
 
 bool touchEnabled = false;
+float timeSinceLastTouch = 1.0;
 int touchButtonSize = 96;
 int touchButtonBorder = 12;
 int moveTouchID = -1;
@@ -88,6 +89,7 @@ void Start()
     SubscribeToEvent("Kill", "HandleKill");
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
     SubscribeToEvent("TouchBegin", "HandleTouchBegin");
+    SubscribeToEvent("TouchMove", "HandleTouchMove");
     SubscribeToEvent("TouchEnd", "HandleTouchEnd");
 
     if (singlePlayer)
@@ -402,6 +404,7 @@ void SpawnPlayer(Connection@ connection)
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
+    timeSinceLastTouch += timeStep;
 
     UpdateControls();
     CheckEndAndRestart();
@@ -460,6 +463,8 @@ void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     if (!touchEnabled)
         InitTouchInput();
 
+    timeSinceLastTouch = 0.0;
+
     int touchID = eventData["TouchID"].GetInt();
     IntVector2 pos(eventData["X"].GetInt(), eventData["Y"].GetInt());
     UIElement@ element = ui.GetElementAt(pos, false);
@@ -470,6 +475,11 @@ void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
         fireTouchID = touchID;
     else
         rotateTouchID = touchID;
+}
+
+void HandleTouchMove(StringHash eventType, VariantMap& eventData)
+{
+    timeSinceLastTouch = 0.0;
 }
 
 void HandleTouchEnd(StringHash eventType, VariantMap& eventData)
@@ -994,10 +1004,14 @@ void UpdateControls()
                 playerControls.Set(CTRL_JUMP, true);
         }
 
-        if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonPress[MOUSEB_LEFT])
-            playerControls.Set(CTRL_FIRE, true);
-        if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonPress[MOUSEB_RIGHT])
-            playerControls.Set(CTRL_JUMP, true);
+        // Touch is also emulated as mouse. Before using mouse for actions, make sure there has been some time since last touch
+        if (timeSinceLastTouch > 0.5)
+        {
+            if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonPress[MOUSEB_LEFT])
+                playerControls.Set(CTRL_FIRE, true);
+            if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonPress[MOUSEB_RIGHT])
+                playerControls.Set(CTRL_JUMP, true);
+        }
 
         playerControls.yaw += mouseSensitivity * input.mouseMoveX;
         playerControls.pitch += mouseSensitivity * input.mouseMoveY;

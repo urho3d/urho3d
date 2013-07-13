@@ -1112,10 +1112,11 @@ The input polling API differentiates between the initiation of a key/mouse butto
 
 In script, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
 
-To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime. 
+To get joystick input, the joystick(s) must first be explicitly opened using \ref Input::OpenJoystick "OpenJoystick()". Accessing the polled joystick state using \ref Input::GetJoystick "GetJoystick()" also automatically opens the joystick. The plugged in joysticks are detected on application start and must be manually redetected using \ref Input::DetectJoysticks "DetectJoysticks()" if they are plugged in or disconnected during runtime.
 
 From the input subsystem you can also query whether the application window has input focus, or is minimized.
 
+Note that touch events also create emulated mouse events. This can not be prevented on the Windows platform, so the SDL library also emulates it on other platforms for consistency. Refer to the NinjaSnowWar example on how to prevent unwanted control in case you want to support both mouse and touch.
 
 \page Audio %Audio
 

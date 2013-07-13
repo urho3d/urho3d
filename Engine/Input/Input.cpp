@@ -134,50 +134,49 @@ void Input::Update()
     else
         return;
     
-#if !defined(ANDROID) && !defined(IOS)
-    // Check for mouse move
-    if (inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))
+    // Check for relative mode mouse move
+    if (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))
     {
-        IntVector2 mousePosition = GetMousePosition();
-        mouseMove_ = mousePosition - lastMousePosition_;
-        
-        // Recenter the mouse cursor manually
-        if (!mouseVisible_)
+        // Make sure the mouse move is not an emulated touch
+        if (!GetNumTouches())
         {
+            IntVector2 mousePosition = GetMousePosition();
+            mouseMove_ = mousePosition - lastMousePosition_;
+            
+            // Recenter the mouse cursor manually
             IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             SetMousePosition(center);
             lastMousePosition_ = center;
+            
+            // Send mouse move event if necessary
+            if (mouseMove_ != IntVector2::ZERO)
+            {
+                if (suppressNextMouseMove_)
+                {
+                    mouseMove_ = IntVector2::ZERO;
+                    suppressNextMouseMove_ = false;
+                }
+                else
+                {
+                    using namespace MouseMove;
+                
+                    VariantMap eventData;
+                    if (mouseVisible_)
+                    {
+                        eventData[P_X] = mousePosition.x_;
+                        eventData[P_Y] = mousePosition.y_;
+                    }
+                    eventData[P_DX] = mouseMove_.x_;
+                    eventData[P_DY] = mouseMove_.y_;
+                    eventData[P_BUTTONS] = mouseButtonDown_;
+                    eventData[P_QUALIFIERS] = GetQualifiers();
+                    SendEvent(E_MOUSEMOVE, eventData);
+                }
+            }
         }
         else
-            lastMousePosition_ = mousePosition;
-        
-        // Send mouse move event if necessary
-        if (mouseMove_ != IntVector2::ZERO)
-        {
-            if (suppressNextMouseMove_)
-            {
-                mouseMove_ = IntVector2::ZERO;
-                suppressNextMouseMove_ = false;
-            }
-            else
-            {
-                using namespace MouseMove;
-                
-                VariantMap eventData;
-                if (mouseVisible_)
-                {
-                    eventData[P_X] = mousePosition.x_;
-                    eventData[P_Y] = mousePosition.y_;
-                }
-                eventData[P_DX] = mouseMove_.x_;
-                eventData[P_DY] = mouseMove_.y_;
-                eventData[P_BUTTONS] = mouseButtonDown_;
-                eventData[P_QUALIFIERS] = GetQualifiers();
-                SendEvent(E_MOUSEMOVE, eventData);
-            }
-        }
+            suppressNextMouseMove_ = true;
     }
-#endif
 }
 
 void Input::SetMouseVisible(bool enable)
@@ -625,7 +624,6 @@ void Input::HandleSDLEvent(void* sdlEvent)
         }
         break;
         
-#if !defined(ANDROID) && !defined(IOS)
     case SDL_MOUSEBUTTONDOWN:
         SetMouseButton(1 << (evt.button.button - 1), true);
         break;
@@ -634,10 +632,31 @@ void Input::HandleSDLEvent(void* sdlEvent)
         SetMouseButton(1 << (evt.button.button - 1), false);
         break;
         
+    case SDL_MOUSEMOTION:
+        if (mouseVisible_)
+        {
+            mouseMove_.x_ += evt.motion.xrel;
+            mouseMove_.y_ += evt.motion.yrel;
+
+            using namespace MouseMove;
+            
+            VariantMap eventData;
+            if (mouseVisible_)
+            {
+                eventData[P_X] = evt.motion.x;
+                eventData[P_Y] = evt.motion.y;
+            }
+            eventData[P_DX] = evt.motion.xrel;
+            eventData[P_DY] = evt.motion.yrel;
+            eventData[P_BUTTONS] = mouseButtonDown_;
+            eventData[P_QUALIFIERS] = GetQualifiers();
+            SendEvent(E_MOUSEMOVE, eventData);
+        }
+        break;
+        
     case SDL_MOUSEWHEEL:
         SetMouseWheel(evt.wheel.y);
         break;
-#endif
         
     case SDL_FINGERDOWN:
         {
