@@ -332,6 +332,11 @@ IntVector2 Input::GetMousePosition() const
     return ret;
 }
 
+bool Input::IsTouchEnabled() const
+{
+    return SDL_GetNumTouchDevices() > 0;
+}
+
 TouchState* Input::GetTouch(unsigned index) const
 {
     if (index >= touches_.Size())
