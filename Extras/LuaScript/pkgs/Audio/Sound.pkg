@@ -1,40 +1,27 @@
 $#include "Sound.h"
 
-/// %Sound resource.
 class Sound : public Resource
 {
 public:
-    /// Set uncompressed sound data format.
-    void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
-    /// Set loop on/off. If loop is enabled, sets the full sound as loop range.
-    void SetLooped(bool enable);
-    /// Define loop.
-    void SetLoop(unsigned repeatOffset, unsigned endOffset);
-    /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.)
-    void FixInterpolation();
-    
-    /// Return sound data start.
-    signed char* GetStart() const { return data_.Get(); }
-    /// Return loop start.
-    signed char* GetRepeat() const { return repeat_; }
-    /// Return sound data end.
-    signed char* GetEnd() const { return end_; }
-    /// Return length in seconds.
+    // Methods:
     float GetLength() const;
-    /// Return total sound data size.
-    unsigned GetDataSize() const { return dataSize_; }
-    /// Return sample size.
     unsigned GetSampleSize() const;
-    /// Return default frequency as a float.
-    float GetFrequency() { return (float)frequency_; }
-    /// Return default frequency as an integer.
-    unsigned GetIntFrequency() { return frequency_; }
-    /// Return whether is looped.
-    bool IsLooped() const { return looped_; }
-    /// Return whether data is sixteen bit.
-    bool IsSixteenBit() const { return sixteenBit_; }
-    /// Return whether data is stereo.
-    bool IsStereo() const { return stereo_; }
-    /// Return whether is compressed in Ogg Vorbis format.
-    bool IsCompressed() const { return compressed_; }
+    float GetFrequency();
+    
+    void SetLooped(bool enable);
+    bool IsLooped() const;
+    
+    bool IsSixteenBit() const;
+    bool IsStereo() const;
+    bool IsCompressed() const;
+
+    // Properties:
+    tolua_readonly tolua_property__get_set float length;
+    tolua_readonly tolua_property__get_set unsigned sampleSize;
+    tolua_readonly tolua_property__get_set float frequency;
+    tolua_property__is_set bool looped;
+    tolua_readonly tolua_property__is_set bool sixteenBit;
+    tolua_readonly tolua_property__is_set bool stereo;
+    tolua_readonly tolua_property__is_set bool compressed;
+
 };

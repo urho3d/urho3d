@@ -1,46 +1,45 @@
 $#include "Audio.h"
 
-/// %Audio subsystem.
+enum SoundType
+{
+    SOUND_EFFECT,
+    SOUND_AMBIENT,
+    SOUND_VOICE,
+    SOUND_MUSIC,
+    SOUND_MASTER,
+    MAX_SOUND_TYPES
+};
+
 class Audio : public Object
 {
 public:
-    /// Initialize sound output with specified buffer length and output mode.
+    // Methods:
     bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
-    /// Run update on sound sources. Not required for continued playback, but frees unused sound sources & sounds and updates 3D positions.
-    void Update(float timeStep);
-    /// Restart sound output.
+    bool SetMode(int bufferLengthMSec, int mixRate, bool stereo/*, bool interpolation = true*/);
     bool Play();
-    /// Suspend sound output.
     void Stop();
-    /// Set master gain on a specific sound type such as sound effects, music or voice.
-    void SetMasterGain(SoundType type, float gain);
-    /// Set active sound listener for 3D sounds.
-    void SetListener(SoundListener* listener);
-    /// Stop any sound source playing a certain sound clip.
-    void StopSound(Sound* sound);
 
-    /// Return byte size of one sample.
-    unsigned GetSampleSize() const { return sampleSize_; }
-    /// Return mixing rate.
-    int GetMixRate() const { return mixRate_; }
-    /// Return whether output is interpolated.
-    bool GetInterpolation() const { return interpolation_; }
-    /// Return whether output is stereo.
-    bool IsStereo() const { return stereo_; }
-    /// Return whether audio is being output.
-    bool IsPlaying() const { return playing_; }
-    /// Return whether an audio stream has been reserved.
-    bool IsInitialized() const { return deviceID_ != 0; }
-    /// Return master gain for a specific sound source type.
+    void SetMasterGain(SoundType type, float gain);
     float GetMasterGain(SoundType type) const;
-    /// Return active sound listener.
+    
+    void SetListener(SoundListener* listener);
     SoundListener* GetListener() const;
     
-    /// Add a sound source to keep track of. Called by SoundSource.
-    void AddSoundSource(SoundSource* soundSource);
-    /// Remove a sound source. Called by SoundSource.
-    void RemoveSoundSource(SoundSource* soundSource);
-    
-    /// Return sound type specific gain multiplied by master gain.
-    float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
+    unsigned GetSampleSize() const;
+    int GetMixRate() const;
+    bool GetInterpolation() const;
+
+    bool IsStereo() const;
+    bool IsPlaying() const;
+    bool IsInitialized() const;  
+
+    // Properties:
+    tolua_property__get_set SoundListener* listener;
+    tolua_readonly tolua_property__get_set unsigned sampleSize;
+    tolua_readonly tolua_property__get_set int mixRate;
+    tolua_readonly tolua_property__get_set bool interpolation;
+
+    tolua_readonly tolua_property__is_set bool stereo;    
+    tolua_readonly tolua_property__is_set bool playing;
+    tolua_readonly tolua_property__is_set bool initialized;
 };

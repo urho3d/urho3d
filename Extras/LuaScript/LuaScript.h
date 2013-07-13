@@ -43,13 +43,13 @@ public:
     /// Destruct. Release the AngelLuna engine.
     ~LuaScript();
 
-    /// Execute lua script file.
+    /// Execute script file.
     bool ExecuteFile(const char* fileName);
 
-    /// Execute lua string.
+    /// Execute script string.
     bool ExecuteString(const char* string);
 
-    /// Execute lua function.
+    /// Execute script function.
     bool ExecuteFunction(const char* funcName);
 
     /// Script send event.
@@ -58,18 +58,12 @@ public:
     /// Script subscribe event.
     void ScriptSubscribeToEvent(const char* eventName, const char* functionName);
 
-	/// Return the lua state.
-	lua_State* GetLuaState() const { return luaState_; }
-
 private:
     /// Replace print function.
     void ReplacePrintFunction();
 
     /// Print function.
     static int Print(lua_State* L);
-
-    /// PCall callback.
-    static int PCallCallback(lua_State* L);
 
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);

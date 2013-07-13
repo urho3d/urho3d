@@ -1,26 +1,24 @@
 $#include "SoundSource3D.h"
 
-/// %Sound source component with three-dimensional position.
 class SoundSource3D : public SoundSource
 {
 public:
-    /// Register object factory.
-    static void RegisterObject(Context* context);
-    /// Set attenuation parameters.
+    // Methods:
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
-    /// Set near distance. Distances closer than this do not have an effect.
+        
     void SetNearDistance(float distance);
-    /// Set far distance. Beyond this sound will be completely attenuated.
-    void SetFarDistance(float distance);
-    /// Set rolloff power factor, defines attenuation function shape.
-    void SetRolloffFactor(float factor);
-    /// Calculate attenuation and panning based on current position and listener position.
-    void CalculateAttenuation();
+    float GetNearDistance() const;
     
-    /// Return near distance.
-    float GetNearDistance() const { return nearDistance_; }
-    /// Return far distance.
-    float GetFarDistance() const { return farDistance_; }
-    /// Return rolloff power factor.
-    float RollAngleoffFactor() const { return rolloffFactor_; }
+    void SetFarDistance(float distance);
+    float GetFarDistance() const;
+
+    void SetRolloffFactor(float factor);
+    float RollAngleoffFactor() const;
+
+    // Properties:
+    tolua_property__get_set float nearDistance;
+    tolua_property__get_set float farDistance;
+    tolua_property__get_set float rolloffFactor;
 };
+
+$#define GetRolloffFactor RollAngleoffFactor

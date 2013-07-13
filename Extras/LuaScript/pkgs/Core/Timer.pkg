@@ -1,32 +1,25 @@
 $#include "Timer.h"
 
-/// Low-resolution operating system timer.
 class Timer
 {
 public:
-    /// Construct. Get the starting clock value.
-    Timer();
-    
-    /// Return elapsed milliseconds and optionally reset.
     unsigned GetMSec(bool reset);
-    
-    /// Reset the timer.
     void Reset();
 };
 
-/// %Time and frame counter subsystem.
 class Time : public Object
 {
 public:
-    /// Return frame number, starting from 1 once BeginFrame() is called for the first time.
+    // Methods:
     unsigned GetFrameNumber() const;
-    
-    /// Return current frame timestep as seconds.
     float GetTimeStep() const;
+    float GetElapsedTime();
     
-    /// Return current low-resolution timer period in milliseconds.
-    unsigned GetTimerPeriod();
+    static unsigned GetSystemTime();
+    static String GetTimeStamp();
     
-    /// Return elapsed time from program start as seconds.
-    float GetElapsedTime();    
+    // Properties:
+    tolua_readonly tolua_property__get_set unsigned frameNumber;
+    tolua_readonly tolua_property__get_set float timeStep;
+    tolua_readonly tolua_property__get_set float elapsedTime;
 };

@@ -1,12 +1,10 @@
 $#include "MathDefs.h"
 
 static const float M_PI;
-
 static const int M_MIN_INT;
 static const int M_MAX_INT;
 static const unsigned M_MIN_UNSIGNED;
 static const unsigned M_MAX_UNSIGNED;
-
 static const float M_EPSILON;
 static const float M_LARGE_EPSILON;
 static const float M_MIN_NEARCLIP;
@@ -17,7 +15,6 @@ static const float M_DEGTORAD;
 static const float M_DEGTORAD_2;
 static const float M_RADTODEG;
 
-/// Intersection test result.
 enum Intersection
 {
     OUTSIDE,
@@ -25,71 +22,13 @@ enum Intersection
     INSIDE
 };
 
-/// Linear interpolation between two float values.
-inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
-/// Return the smaller of two floats.
-inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
-/// Return the larger of two floats.
-inline float Max(float lhs, float rhs) { return lhs > rhs ? lhs : rhs; }
-/// Return absolute value of a float.
-inline float Abs(float value) { return value >= 0.0f ? value : -value; }
+float Lerp(float lhs, float rhs, float t);
+float Min(float lhs, float rhs);
+float Max(float lhs, float rhs);
+float Abs(float value);
+float Clamp(float value, float min, float max);
+bool Equals(float lhs, float rhs);
 
-/// Clamp a float to a range.
-inline float Clamp(float value, float min, float max)
-{
-    if (value < min)
-        return min;
-    else if (value > max)
-        return max;
-    else
-        return value;
-}
-
-/// Check whether two floating point values are equal within accuracy.
-inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs; }
-/// Return the smaller of two integers.
-inline int Min(int lhs, int rhs) { return lhs < rhs ? lhs : rhs; }
-/// Return the larger of two integers.
-inline int Max(int lhs, int rhs) { return lhs > rhs ? lhs : rhs; }
-/// Return absolute value of an integer
-inline int Abs(int value) { return value >= 0 ? value : -value; }
-
-/// Clamp an integer to a range.
-inline int Clamp(int value, int min, int max)
-{
-    if (value < min)
-        return min;
-    else if (value > max)
-        return max;
-    else
-        return value;
-}
-
-/// Check whether an unsigned integer is a power of two.
-inline bool IsPowerOfTwo(unsigned value)
-{
-    if (!value)
-        return true;
-    while (!(value & 1))
-        value >>= 1;
-    return value == 1;
-}
-
-/// Round up to next power of two.
-inline unsigned NextPowerOfTwo(unsigned value)
-{
-    unsigned ret = 1;
-    while (ret < value && ret < 0x80000000)
-        ret <<= 1;
-    return ret;
-}
-
-/// Update a hash with the given 8-bit value using the SDBM algorithm.
-inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6) + (hash << 16) - hash; }
-/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
-inline float Random() { return Rand() / 32768.0f; }
-/// Return a random float between 0.0 and range, inclusive from both ends.
-inline float Random(float range) { return Rand() * range / 32767.0f; }
-/// Return a random integer between 0 and range - 1.
-inline int Random @ RandomInt(int range) { return (Rand() * (range - 1) + 16384) / 32767; }
-
+float Random();
+float Random(float range);
+int Random @ RandomInt(int range);

@@ -54,6 +54,7 @@ extern int tolua_ResourceLuaAPI_open(lua_State*);
 extern int tolua_SceneLuaAPI_open(lua_State*);
 extern int tolua_UILuaAPI_open(lua_State*);
 extern int tolua_LuaScriptLuaAPI_open(lua_State*);
+
 namespace Urho3D
 {
 
@@ -68,7 +69,7 @@ LuaScript::LuaScript(Context* context) :
     luaState_ = luaL_newstate();
     if (!luaState_)
     {
-        LOGERROR("Could not create Lua state");
+        LOGERROR("Could not create Lua state.");
         return;
     }
 
@@ -155,6 +156,7 @@ bool LuaScript::ExecuteString(const char* string)
     PROFILE(ExecuteString);
 
     int top = lua_gettop(luaState_);
+
     if (luaL_dostring(luaState_, string) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
@@ -177,11 +179,12 @@ bool LuaScript::ExecuteFunction(const char* funcName)
     PROFILE(ExecuteFunction);
 
     int top = lua_gettop(luaState_);
+
     lua_getglobal(luaState_, funcName);
     if (!lua_isfunction(luaState_, -1))
     {
         lua_settop(luaState_, top);
-        LOGRAW(String("Lua: Unable to get lua global: '") + funcName + "'.");
+        LOGRAW(String("Lua: Unable to get Lua global: '") + funcName + "'.");
         return false;
     }
 
@@ -189,7 +192,7 @@ bool LuaScript::ExecuteFunction(const char* funcName)
     {
         const char* message = lua_tostring(luaState_, -1);
         lua_settop(luaState_, top);
-        LOGRAW(String("Lua: Unable to execute function '") + funcName + "'.");
+        LOGRAW(String("Lua: Unable to execute Lua function '") + funcName + "'.");
         LOGRAW(String("Lua: ") + message);
         return false;
     }
@@ -205,21 +208,23 @@ void LuaScript::ScriptSendEvent(const char* eventName, VariantMap& eventData)
 void LuaScript::ScriptSubscribeToEvent(const char* eventName, const char* functionName)
 {
     StringHash eventType(eventName);
-    eventTypeToFunctionNameMap_[eventType].Push(String(functionName));
 
-    SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
+	if (!eventTypeToFunctionNameMap_.Contains(eventType))
+		SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
+
+    eventTypeToFunctionNameMap_[eventType].Push(String(functionName));
 }
 
 void LuaScript::ReplacePrintFunction()
 {
-    static const struct luaL_reg printlib[] =
+    static const struct luaL_reg reg[] =
     {
         {"print", &LuaScript::Print},
         { NULL, NULL}
     };
 
     lua_getglobal(luaState_, "_G");
-    luaL_register(luaState_, NULL, printlib);
+    luaL_register(luaState_, NULL, reg);
     lua_pop(luaState_, 1);
 }
 
@@ -250,39 +255,35 @@ int LuaScript::Print(lua_State *L)
     return 0;
 }
 
-int LuaScript::PCallCallback(lua_State* L)
-{
-    String message = lua_tostring(L, -1);
-    LOGRAW("Lua pcall error: " + message);
-    return 0;
-}
-
 void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
     HashMap<StringHash, Vector<String> >::ConstIterator it = eventTypeToFunctionNameMap_.Find(eventType);
     if (it == eventTypeToFunctionNameMap_.End())
         return;
-
-    for (unsigned i = 0; i < it->second_.Size(); ++i)
+	
+	const Vector<String>& functionNames = it->second_;
+    for (unsigned i = 0; i < functionNames.Size(); ++i)
     {
-        const String& functionName = it->second_[i];
-        
+        const String& functionName = functionNames[i];
+
 		int top = lua_gettop(luaState_);
+
         lua_getglobal(luaState_, functionName.CString());
         if (!lua_isfunction(luaState_, -1))
         {
             lua_settop(luaState_, top);
-            LOGRAW(String("Lua: Unable to get lua global: '") + functionName + "'.");
+            LOGRAW(String("Lua: Unable to get Lua global: '") + functionName + "'.");
             return;
         }
 
         tolua_pushusertype(luaState_, (void*)&eventType, "StringHash");
         tolua_pushusertype(luaState_, (void*)&eventData, "VariantMap");
-        if (lua_pcall(luaState_, 2, 0, 0))
+
+        if (lua_pcall(luaState_, 2, 0, 0) != 0)
         {
             const char* message = lua_tostring(luaState_, -1);
             lua_settop(luaState_, top);
-            LOGRAW(String("Lua: Unable to execute function '") + functionName + "'.");
+            LOGRAW(String("Lua: Unable to execute Lua function '") + functionName + "'.");
             LOGRAW(String("Lua: ") + message);
             return;
         }

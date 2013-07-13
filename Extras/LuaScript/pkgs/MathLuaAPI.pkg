@@ -1,10 +1,9 @@
 $#define TOLUA_RELEASE
 
-$pfile "Math/AreaAllocator.pkg"
+$pfile "Math/MathDefs.pkg"
 $pfile "Math/BoundingBox.pkg"
 $pfile "Math/Color.pkg"
 $pfile "Math/Frustum.pkg"
-$pfile "Math/MathDefs.pkg"
 $pfile "Math/Matrix3.pkg"
 $pfile "Math/Matrix3x4.pkg"
 $pfile "Math/Matrix4.pkg"

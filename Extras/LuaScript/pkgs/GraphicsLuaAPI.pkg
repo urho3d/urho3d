@@ -1,5 +1,6 @@
 $#define TOLUA_RELEASE
 
+$pfile "Graphics/GraphicsDefs.pkg"
 $pfile "Graphics/AnimatedModel.pkg"
 $pfile "Graphics/Animation.pkg"
 $pfile "Graphics/AnimationController.pkg"
@@ -10,7 +11,6 @@ $pfile "Graphics/DebugRenderer.pkg"
 $pfile "Graphics/DecalSet.pkg"
 $pfile "Graphics/Drawable.pkg"
 $pfile "Graphics/Graphics.pkg"
-$pfile "Graphics/GraphicsDefs.pkg"
 $pfile "Graphics/Light.pkg"
 $pfile "Graphics/Material.pkg"
 $pfile "Graphics/Model.pkg"
