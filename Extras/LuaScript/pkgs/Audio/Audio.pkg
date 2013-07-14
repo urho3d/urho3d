@@ -15,7 +15,7 @@ class Audio : public Object
 public:
     // Methods:
     bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
-    bool SetMode(int bufferLengthMSec, int mixRate, bool stereo/*, bool interpolation = true*/);
+    bool SetMode(int bufferLengthMSec, int mixRate, bool stereo);
     bool Play();
     void Stop();
 

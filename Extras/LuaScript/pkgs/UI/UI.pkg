@@ -1,56 +1,47 @@
 $#include "UI.h"
 
-/// %UI subsystem. Manages the graphical user interface.
 class UI : public Object
 {
-
 public:
-    /// Set cursor UI element.
+    // Methods:
     void SetCursor(Cursor* cursor);
-    /// Set focused UI element.
     void SetFocusElement(UIElement* element);
-    /// Set modal element. Until all the modal elements are dismissed, all the inputs and events are only sent to them. Return true when successful.
-    /// Only the modal element can clear its modal status or when it is being destructed.
-    /// UI subystem auto-removes modal element when an ESC key is pressed, however if this is not desirable, setting a user-defined variable "NoAutoRemove" in the modal element would prevent this.
-    /// In that case, the modal element will only have its modal flag reset and reparented back to its original parent.
     bool SetModalElement(UIElement* modalElement, bool enable);
-    /// Clear the UI (excluding the cursor.)
     void Clear();
-    /// Update the UI logic. Called by HandlePostUpdate().
     void Update(float timeStep);
-    /// Update the UI for rendering. Called by HandleRenderUpdate().
     void RenderUpdate();
-    /// Render the UI.
     void Render();
-    /// Debug draw a UI element.
     void DebugDraw(UIElement* element);
-    /// Save a UI layout to an XML file. Return true if successful.
     bool SaveLayout(Serializer& dest, UIElement* element);
-    /// Set clipboard text.
     void SetClipBoardText(const String& text);
-    /// Set mouse wheel handling flag.
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
-
-    /// Return root UI element.
-    UIElement* GetRoot() const { return rootElement_; }
-    /// Return root modal element.
-    UIElement* GetRootModalElement() const { return rootModalElement_; }
-    /// Return cursor.
-    Cursor* GetCursor() const { return cursor_; }
-    /// Return UI element at screen coordinates.
+    
+    UIElement* GetRoot() const;
+    UIElement* GetRootModalElement() const;
+    
+    Cursor* GetCursor() const;
+    
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
-    /// Return UI element at screen coordinates.
+    UIElement* GetElementAt(const IntVector2& position);
+    
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
-    /// Return focused element.
-    UIElement* GetFocusElement() const { return focusElement_; }
-    /// Return topmost enabled root-level non-modal element.
+    UIElement* GetElementAt(int x, int y);
+    
+    UIElement* GetFocusElement() const;
     UIElement* GetFrontElement() const;
-    /// Return cursor position.
+    
     IntVector2 GetCursorPosition() const;
-    /// Return clipboard text.
-    const String& GetClipBoardText() const { return clipBoard_; }
-    /// Return mouse wheel handling flag.
-    bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
-    /// Return true when UI has modal element(s).
+    const String& GetClipBoardText() const;
+    bool IsNonFocusedMouseWheel() const;
     bool HasModalElement() const;
+    
+    // Properties:
+    tolua_readonly tolua_property__get_set UIElement* root;
+    tolua_readonly tolua_property__get_set UIElement* rootModalElement;
+    tolua_readonly tolua_property__get_set Cursor* cursor;
+    tolua_readonly tolua_property__get_set UIElement* focusElement;
+    tolua_readonly tolua_property__get_set UIElement* frontElement;
+    tolua_property__get_set const String& clipBoardText;
+    tolua_readonly tolua_property__is_set bool nonFocusedMouseWheel;
+    tolua_readonly tolua_property__has_set bool modalElement;
 };

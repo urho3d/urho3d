@@ -1,6 +1,5 @@
 $#include "UIElement.h"
 
-/// %UI element horizontal alignment.
 enum HorizontalAlignment
 {
     HA_LEFT = 0,
@@ -8,7 +7,6 @@ enum HorizontalAlignment
     HA_RIGHT
 };
 
-/// %UI element vertical alignment.
 enum VerticalAlignment
 {
     VA_TOP = 0,
@@ -16,7 +14,6 @@ enum VerticalAlignment
     VA_BOTTOM
 };
 
-/// %UI element corners.
 enum Corner
 {
     C_TOPLEFT = 0,
@@ -26,325 +23,284 @@ enum Corner
     MAX_UIELEMENT_CORNERS
 };
 
-/// %UI element orientation.
 enum Orientation
 {
     O_HORIZONTAL = 0,
     O_VERTICAL
 };
 
-/// %UI element focus mode.
 enum FocusMode
 {
-    /// Is not focusable and does not affect existing focus.
     FM_NOTFOCUSABLE = 0,
-    /// Resets focus when clicked.
     FM_RESETFOCUS,
-    /// Is focusable.
     FM_FOCUSABLE,
-    /// Is focusable and also defocusable by pressing ESC.
     FM_FOCUSABLE_DEFOCUSABLE
 };
 
-/// Layout operation mode.
 enum LayoutMode
 {
-    /// No layout operations will be performed.
     LM_FREE = 0,
-    /// Layout child elements horizontally and resize them to fit. Resize element if necessary.
     LM_HORIZONTAL,
-    /// Layout child elements vertically and resize them to fit. Resize element if necessary.
     LM_VERTICAL
 };
 
-/// Traversal mode.
 enum TraversalMode
 {
-    /// Traverse thru children having same priority first and recurse into their children before traversing children having higher priority.
     TM_BREADTH_FIRST = 0,
-    /// Traverse thru each child and its children immediately after in sequence.
     TM_DEPTH_FIRST
 };
 
-/// Drag and drop disabled.
 static const unsigned DD_DISABLED;
-/// Drag and drop source flag.
 static const unsigned DD_SOURCE;
-/// Drag and drop target flag.
 static const unsigned DD_TARGET;
-/// Drag and drop source and target.
 static const unsigned DD_SOURCE_AND_TARGET;
 
-/// Base class for %UI elements.
 class UIElement : public Serializable
 {
 public:
-    /// Construct.
+    // Methods:
     UIElement(Context* context);
-    /// Destruct.
     virtual ~UIElement();
-    /// Set name.
-    void SetName(const String& name);
-    /// Set position.
-    void SetPosition(const IntVector2& position);
-    /// Set position.
-    void SetPosition(int x, int y);
-    /// Set size.
-    void SetSize(const IntVector2& size);
-    /// Set size.
-    void SetSize(int width, int height);
-    /// Set width only.
-    void SetWidth(int width);
-    /// Set height only.
-    void SetHeight(int height);
-    /// Set minimum size.
-    void SetMinSize(const IntVector2& minSize);
-    /// Set minimum size.
-    void SetMinSize(int width, int height);
-    /// Set minimum width.
-    void SetMinWidth(int width);
-    /// Set minimum height.
-    void SetMinHeight(int height);
-    /// Set maximum size.
-    void SetMaxSize(const IntVector2& maxSize);
-    /// Set maximum size.
-    void SetMaxSize(int width, int height);
-    /// Set maximum width.
-    void SetMaxWidth(int width);
-    /// Set maximum height.
-    void SetMaxHeight(int height);
-    /// Set fixed size.
-    void SetFixedSize(const IntVector2& size);
-    /// Set fixed size.
-    void SetFixedSize(int width, int height);
-    /// Set fixed width.
-    void SetFixedWidth(int width);
-    /// Set fixed height.
-    void SetFixedHeight(int height);
-    /// Set horizontal and vertical alignment.
-    void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
-    /// Set horizontal alignment.
-    void SetHorizontalAlignment(HorizontalAlignment align);
-    /// Set vertical alignment.
-    void SetVerticalAlignment(VerticalAlignment align);
-    /// Set child element clipping border.
-    void SetClipBorder(const IntRect& rect);
-    /// Set color on all corners.
-    void SetColor(const Color& color);
-    /// Set color on one corner.
-    void SetColor(Corner corner, const Color& color);
-    /// Set priority.
-    void SetPriority(int priority);
-    /// Set opacity.
-    void SetOpacity(float opacity);
-    /// Set whether should be brought to front when focused.
-    void SetBringToFront(bool enable);
-    /// Set whether should be put to background when another element is focused.
-    void SetBringToBack(bool enable);
-    /// Set whether should clip child elements. Default false.
-    void SetClipChildren(bool enable);
-    /// Set whether should sort child elements according to priority. Default true.
-    void SetSortChildren(bool enable);
-    /// Set whether parent elements' opacity affects opacity. Default true.
-    void SetUseDerivedOpacity(bool enable);
-    /// Set whether reacts to input.
-    void SetEnabled(bool enable);
-    /// Set whether is focused. Only one element can be focused at a time.
-    void SetFocus(bool enable);
-    /// Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
-    void SetSelected(bool enable);
-    /// Set whether is visible.
-    void SetVisible(bool enable);
-    /// Set focus mode.
-    void SetFocusMode(FocusMode mode);
-    /// Set drag and drop flags.
-    void SetDragDropMode(unsigned mode);
-    /// Set style from an XML file. Find the style element by name. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
-    bool SetStyle(const String& styleName, XMLFile* file = 0);
-    /// Set style from an XML element. Return true if the style is applied successfully.
-    bool SetStyle(const XMLElement& element);
-    /// Set style from an XML file. Find the style element automatically. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
-    bool SetStyleAuto(XMLFile* file = 0);
-    /// Set default style file for later use by children elements.
-    void SetDefaultStyle(XMLFile* style);
-    /// Set layout.
-    void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);
-    /// Set layout mode only.
-    void SetLayoutMode(LayoutMode mode);
-    /// Set layout spacing.
-    void SetLayoutSpacing(int spacing);
-    /// Set layout border.
-    void SetLayoutBorder(const IntRect& border);
-    /// Set horizontal indentation.
-    void SetIndent(int indent);
-    /// Set indent spacing (number of pixels per indentation level).
-    void SetIndentSpacing(int indentSpacing);
-    /// Manually update layout. Should not be necessary in most cases, but is provided for completeness.
-    void UpdateLayout();
-    /// Disable automatic layout update. Should only be used if there are performance problems.
-    void DisableLayoutUpdate();
-    /// Enable automatic layout update.
-    void EnableLayoutUpdate();
-    /// Bring UI element to front.
-    void BringToFront();
-    /// Create and add a child element and return it.
-    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
-    /// Add a child element.
-    void AddChild(UIElement* element);
-    /// Insert a child element into a specific position in the child list.
-    void InsertChild(unsigned index, UIElement* element);
-    /// Remove a child element. Starting search at specified index if provided.
-    void RemoveChild(UIElement* element, unsigned index = 0);
-    /// Remove a child element at index.
-    void RemoveChildAtIndex(unsigned index);
-    /// Remove all child elements.
-    void RemoveAllChildren();
-    /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
-    void Remove();
-    /// Find child index. Return M_MAX_UNSIGNED if not found.
-    unsigned FindChild(UIElement* element) const;
-    /// Set parent element. Same as parent->InsertChild(index, this).
-    void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
-    /// Set a user variable.
-    void SetVar(ShortStringHash key, const Variant& value);
-    /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
-    void SetInternal(bool enable);
-    /// Set traversal mode. The default traversal mode is TM_BREADTH_FIRST for non-root element. Root element should be set to TM_DEPTH_FIRST to avoid artifacts during rendering.
-    void SetTraversalMode(TraversalMode traversalMode);
-    /// Set element event sender flag. When child element is added or deleted, the event would be sent using UIElement found in the parental chain having this flag set. If not set, the event is sent using UI's root as per normal.
-    void SetElementEventSender(bool flag);
-	
-    /// Return name.
-    const String& GetName() const { return name_; }
-    /// Return position.
-    const IntVector2& GetPosition() const { return position_; }
-    /// Return size.
-    const IntVector2& GetSize() const { return size_; }
-    /// Return width.
-    int GetWidth() const { return size_.x_; }
-    /// Return height.
-    int GetHeight() const { return size_.y_; }
-    /// Return minimum size.
-    const IntVector2& GetMinSize() const { return minSize_; }
-    /// Return minimum width.
-    int GetMinWidth() const { return minSize_.x_; }
-    /// Return minimum height.
-    int GetMinHeight() const { return minSize_.y_; }
-    /// Return maximum size.
-    const IntVector2& GetMaxSize() const { return maxSize_; }
-    /// Return minimum width.
-    int GetMaxWidth() const { return maxSize_.x_; }
-    /// Return minimum height.
-    int GetMaxHeight() const { return maxSize_.y_; }
-    /// Return true if size is fixed.
-    bool IsFixedSize() const { return minSize_ == maxSize_; }
-    /// Return true if width is fixed.
-    bool IsFixedWidth() const { return minSize_.x_ == maxSize_.x_; }
-    /// Return true if height is fixed.
-    bool IsFixedHeight() const { return minSize_.y_ == maxSize_.y_; }
-    /// Return child element offset.
-    const IntVector2& GetChildOffset() const { return childOffset_; }
-    /// Return horizontal alignment.
-    HorizontalAlignment GetHorizontalAlignment() const { return horizontalAlignment_; }
-    /// Return vertical alignment.
-    VerticalAlignment GetVerticalAlignment() const { return verticalAlignment_; }
-    /// Return child element clipping border.
-    const IntRect& GetClipBorder() const { return clipBorder_; }
-    /// Return corner color.
-    const Color& GetColor(Corner corner) const { return color_[corner]; }
-    /// Return priority.
-    int GetPriority() const { return priority_; }
-    /// Return opacity.
-    float GetOpacity() const { return opacity_; }
-    /// Return derived opacity (affected by parent elements.) If UseDerivedOpacity is false, returns same as element's own opacity.
-    float GetDerivedOpacity() const;
-    /// Return whether should be brought to front when focused.
-    bool GetBringToFront() const { return bringToFront_; }
-    /// Return whether should be put to background when another element is focused.
-    bool GetBringToBack() const { return bringToBack_; }
-    /// Return whether should clip child elements.
-    bool GetClipChildren() const { return clipChildren_; }
-    /// Return whether should sort child elements according to priority.
-    bool GetSortChildren() const { return sortChildren_; }
-    /// Return whether parent elements' opacity affects opacity.
-    bool GetUseDerivedOpacity() const { return useDerivedOpacity_; }
-    /// Return whether has focus.
-    bool HasFocus() const;
-    /// Return whether reacts to input.
-    bool IsEnabled() const { return enabled_; }
-    /// Return whether is selected. Actual meaning is element dependent.
-    bool IsSelected() const { return selected_; }
-    /// Return whether is visible.
-    bool IsVisible() const { return visible_; }
-    /// Return whether the cursor is hovering on this element.
-    bool IsHovering() const { return hovering_; }
-    /// Return whether is internally created.
-    bool IsInternal() const { return internal_; }
-    /// Return whether has different color in at least one corner.
-    bool HasColorGradient() const { return colorGradient_; }
-    /// Return focus mode.
-    FocusMode GetFocusMode() const { return focusMode_; }
-    /// Return drag and drop flags.
-    unsigned GetDragDropMode() const { return dragDropMode_; }
-    /// Return applied style name. Return an empty string when the applied style is an 'auto' style (i.e. style derived from instance's type).
-    const String& GetAppliedStyle() const;
-    /// Return default style.
-    XMLFile* GetDefaultStyle(bool recursiveUp = true) const;
-    /// Return layout mode.
-    LayoutMode GetLayoutMode() const { return layoutMode_; }
-    /// Return layout spacing.
-    int GetLayoutSpacing() const { return layoutSpacing_; }
-    /// Return layout border.
-    const IntRect& GetLayoutBorder() const { return layoutBorder_; }
-    /// Return number of child elements.
-    unsigned GetNumChildren(bool recursive = false) const;
-    /// Return child element by index.
-    UIElement* GetChild(unsigned index) const;
-    /// Return child element by name.
-    UIElement* GetChild(const String& name, bool recursive = false) const;
-    /// Return child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
-    UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
-    /// Return parent element.
-    UIElement* GetParent() const { return parent_; }
-    /// Return root element.
-    UIElement* GetRoot() const;
-    /// Return derived color. Only valid when no gradient.
-    const Color& GetDerivedColor() const;
-    /// Convert screen coordinates to element coordinates.
-    IntVector2 ScreenToElement(const IntVector2& screenPosition);
-    /// Convert element coordinates to screen coordinates.
-    IntVector2 ElementToScreen(const IntVector2& position);
-    /// Return whether a point (either in element or screen coordinates) is inside the element.
-    bool IsInside(IntVector2 position, bool isScreen);
-    /// Return whether a point (either in element or screen coordinates) is inside the combined rect of the element and its children.
-    bool IsInsideCombined(IntVector2 position, bool isScreen);
-    /// Return combined screen coordinate rect of element and its children.
-    IntRect GetCombinedScreenRect();
-    /// Sort child elements if sorting enabled and order dirty. Called by UI.
-    void SortChildren();
-    /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated.
-    int GetLayoutMinSize() const { return layoutMinSize_; }
-    /// Return horizontal indentation.
-    int GetIndent() const { return indent_; }
-    /// Return indent spacing (number of pixels per indentation level).
-    int GetIndentSpacing() const { return indentSpacing_; }
-    /// Return indent width in pixels.
-    int GetIndentWidth() const { return indent_ * indentSpacing_; }
 
-    /// Set child offset.
+    virtual const IntVector2& GetScreenPosition() const;
+
+    void SetName(const String& name);
+    
+    void SetPosition(const IntVector2& position);
+    void SetPosition(int x, int y);
+    
+    void SetSize(const IntVector2& size);
+    void SetSize(int width, int height);
+    void SetWidth(int width);
+    void SetHeight(int height);
+    
+    void SetMinSize(const IntVector2& minSize);
+    void SetMinSize(int width, int height);
+    void SetMinWidth(int width);
+    void SetMinHeight(int height);
+    
+    void SetMaxSize(const IntVector2& maxSize);
+    void SetMaxSize(int width, int height);
+    void SetMaxWidth(int width);
+    void SetMaxHeight(int height);
+    
+    void SetFixedSize(const IntVector2& size);
+    void SetFixedSize(int width, int height);
+    void SetFixedWidth(int width);
+    void SetFixedHeight(int height);
+    
+    void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
+    void SetHorizontalAlignment(HorizontalAlignment align);
+    void SetVerticalAlignment(VerticalAlignment align);
+    
+    void SetClipBorder(const IntRect& rect);
+    
+    void SetColor(const Color& color);
+    void SetColor(Corner corner, const Color& color);
+    
+    void SetPriority(int priority);
+    void SetOpacity(float opacity);
+    
+    void SetBringToFront(bool enable);
+    void SetBringToBack(bool enable);
+    
+    void SetClipChildren(bool enable);
+    void SetSortChildren(bool enable);
+    void SetUseDerivedOpacity(bool enable);
+    void SetEnabled(bool enable);
+    void SetFocus(bool enable);
+    void SetSelected(bool enable);
+    void SetVisible(bool enable);
+    void SetFocusMode(FocusMode mode);
+    void SetDragDropMode(unsigned mode);
+
+    bool SetStyle(const String& styleName, XMLFile* file = 0);
+    bool SetStyle(const String& styleName);
+    
+    bool SetStyle(const XMLElement& element);
+    bool SetStyleAuto(XMLFile* file = 0);
+    bool SetStyleAuto();
+    void SetDefaultStyle(XMLFile* style);
+    
+    void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);
+    void SetLayout(LayoutMode mode, int spacing = 0);
+    void SetLayout(LayoutMode mode);
+    
+    void SetLayoutMode(LayoutMode mode);
+    void SetLayoutSpacing(int spacing);
+    void SetLayoutBorder(const IntRect& border);
+    void SetIndent(int indent);
+    void SetIndentSpacing(int indentSpacing);
+    void UpdateLayout();
+    void DisableLayoutUpdate();
+    void EnableLayoutUpdate();
+    void BringToFront();
+    
+    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY);
+    UIElement* CreateChild(ShortStringHash type);
+    
+    void AddChild(UIElement* element);
+    void InsertChild(unsigned index, UIElement* element);
+    void RemoveChild(UIElement* element, unsigned index = 0);
+    void RemoveChild(UIElement* element);
+    void RemoveChildAtIndex @ RemoveChild(unsigned index);
+    void RemoveAllChildren();
+    void Remove();
+    unsigned FindChild(UIElement* element) const;
+    void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
+    void SetParent(UIElement* parent);
+    
+    void SetInternal(bool enable);
+    void SetTraversalMode(TraversalMode traversalMode);
+    void SetElementEventSender(bool flag);
+    
+    const String& GetName() const;
+    const IntVector2& GetPosition() const;
+    const IntVector2& GetSize() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    const IntVector2& GetMinSize() const;
+    int GetMinWidth() const;
+    int GetMinHeight() const;
+    const IntVector2& GetMaxSize() const;
+    int GetMaxWidth() const;
+    int GetMaxHeight() const;
+    
+    bool IsFixedSize() const;
+    bool IsFixedWidth() const;
+    bool IsFixedHeight() const;
+    
+    const IntVector2& GetChildOffset() const;
+    HorizontalAlignment GetHorizontalAlignment() const;
+    VerticalAlignment GetVerticalAlignment() const;
+    const IntRect& GetClipBorder() const;
+    const Color& GetColor(Corner corner) const;
+    int GetPriority() const;
+    float GetOpacity() const;
+    float GetDerivedOpacity() const;
+    bool GetBringToFront() const;
+    bool GetBringToBack() const;
+    bool GetClipChildren() const;
+    bool GetSortChildren() const;
+    bool GetUseDerivedOpacity() const;
+    bool HasFocus() const;
+    bool IsEnabled() const;
+    bool IsSelected() const;
+    bool IsVisible() const;
+    bool IsHovering() const;
+    bool IsInternal() const;
+    bool HasColorGradient() const;
+    FocusMode GetFocusMode() const;
+    unsigned GetDragDropMode() const;
+    const String& GetAppliedStyle() const;
+    
+    XMLFile* GetDefaultStyle(bool recursiveUp = true) const;
+    XMLFile* GetDefaultStyle() const;
+    
+    LayoutMode GetLayoutMode() const;
+    int GetLayoutSpacing() const;
+    const IntRect& GetLayoutBorder() const;
+    
+    unsigned GetNumChildren(bool recursive = false) const;
+    unsigned GetNumChildren() const;
+    
+    UIElement* GetChild(unsigned index) const;
+    
+    UIElement* GetChild(const String& name, bool recursive = false) const;
+    UIElement* GetChild(const String& name) const;
+    tolua_outside UIElement* UIElementGetChild @ GetChild(const char* name, bool recursive = false) const;
+    tolua_outside UIElement* UIElementGetChild @ GetChild(const char* name) const;
+    
+    UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
+    UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY) const;
+    UIElement* GetChild(const ShortStringHash& key) const;
+    
+    UIElement* GetParent() const;
+    UIElement* GetRoot() const;
+    const Color& GetDerivedColor() const;
+    
+    IntVector2 ScreenToElement(const IntVector2& screenPosition);
+    IntVector2 ElementToScreen(const IntVector2& position);
+    
+    bool IsInside(IntVector2 position, bool isScreen);
+    bool IsInsideCombined(IntVector2 position, bool isScreen);
+    
+    IntRect GetCombinedScreenRect();
+    void SortChildren();
+    int GetLayoutMinSize() const;
+    
+    int GetIndent() const;
+    int GetIndentSpacing() const;
+    int GetIndentWidth() const;
     void SetChildOffset(const IntVector2& offset);
-    /// Set hovering state.
     void SetHovering(bool enable);
-    /// Set temporary visibility status without updating layout or sending events. Used internally.
-    void SetTempVisible(bool enable);
-    /// Adjust scissor for rendering.
-    void AdjustScissor(IntRect& currentScissor);
-    /// Get color attribute. Uses just the top-left color.
-    const Color& GetColorAttr() const { return color_[0]; }
-    /// Get traversal mode.
-    TraversalMode GetTraversalMode() const { return traversalMode_; }
-    /// Get element event sender flag.
-    bool IsElementEventSender() const { return elementEventSender_; }
-    /// Get element event sender.
+    TraversalMode GetTraversalMode() const;
+    bool IsElementEventSender() const;
     UIElement* GetElementEventSender() const;
+    
+    // Properties:
+    tolua_property__get_set const String& style;
+    tolua_property__get_set const String& name;
+    tolua_property__get_set const IntVector2& position;
+    tolua_property__get_set const IntVector2 size;
+    tolua_property__get_set int width;
+    tolua_property__get_set const int height;
+    tolua_property__get_set const IntVector2 minSize;
+    tolua_property__get_set const int minWidth;
+    tolua_property__get_set const int minHeight;
+    tolua_property__get_set IntVector2 maxSize;
+    tolua_property__get_set int maxWidth;
+    tolua_property__get_set int maxHeight;
+    
+    tolua_readonly tolua_property__is_set bool fixedSize;
+    tolua_readonly tolua_property__is_set bool fixedWidth;
+    tolua_readonly tolua_property__is_set bool fixedHeight;
+    
+    tolua_property__get_set HorizontalAlignment horizontalAlignment;
+    tolua_property__get_set VerticalAlignment verticalAlignment;
+    tolua_property__get_set IntRect clipBorder;
+    tolua_property__get_set int priority;
+    tolua_property__get_set float opacity;
+    tolua_property__get_set bool bringToFront;
+    tolua_property__get_set bool bringToBack;
+    tolua_property__get_set bool clipChildren;
+    tolua_property__get_set bool sortChildren;
+    tolua_property__get_set bool useDerivedOpacity;
+    tolua_property__is_set bool enabled;
+    tolua_property__has_set bool focus;
+    tolua_property__is_set bool selected;
+    tolua_property__is_set bool visible;
+    tolua_property__is_set bool hovering;
+    tolua_property__is_set bool internal;
+    tolua_readonly tolua_property__has_set bool colorGradient;
+    tolua_property__get_set FocusMode focusMode;
+    tolua_property__get_set unsigned dragDropMode;
+    tolua_property__get_set TraversalMode traversalMode;
+    tolua_property__get_set XMLFile* defaultStyle;
+    tolua_property__get_set LayoutMode layoutMode;
+    tolua_property__get_set int layoutSpacing;
+    tolua_property__get_set const IntRect& layoutBorder;
+    
+    tolua_property__get_set int indent;
+    tolua_property__get_set int indentSpacing;
+    tolua_readonly tolua_property__get_set int indentWidth;
+    tolua_property__get_set const IntVector2& childOffset;
+    tolua_property__is_set bool elementEventSender;
+    tolua_readonly tolua_property__get_set unsigned numChildren;
+    tolua_property__get_set UIElement* parent;
+    tolua_readonly tolua_property__get_set UIElement* root;
+    tolua_readonly tolua_property__get_set const IntVector2& screenPosition;
+    tolua_readonly tolua_property__get_set const IntRect& combinedScreenRect;
+    tolua_readonly tolua_property__get_set float derivedOpacity;
 };
+
+${
+
+UIElement* UIElementGetChild(const UIElement* uiElement, const char* name, bool recursive = false)
+{
+    return uiElement->GetChild(String(name), recursive);
+}
+#define GetStyle GetAppliedStyle
+
+$}

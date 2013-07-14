@@ -1,34 +1,28 @@
 $#include "Button.h"
 
-/// Pushbutton %UI element.
 class Button : public BorderImage
 {
 public:
-    /// Construct.
+    // Methods:
     Button(Context* context);
-    /// Destruct.
     virtual ~Button();
-    /// Set offset to image rectangle used when pressed.
+    
     void SetPressedOffset(const IntVector2& offset);
-    /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(int x, int y);
-    /// Set pressed label offset.
     void SetLabelOffset(const IntVector2& offset);
-    /// Set pressed label offset.
     void SetLabelOffset(int x, int y);
-    /// Set repeat properties. Rate 0 (default) disables repeat.
     void SetRepeat(float delay, float rate);
-    /// Set repeat delay.
     void SetRepeatDelay(float delay);
-    /// Set repeat rate.
     void SetRepeatRate(float rate);
     
-    /// Return pressed image offset.
-    const IntVector2& GetPressedOffset() const { return pressedOffset_; }
-    /// Return pressed label offset.
-    const IntVector2& GetLabelOffset() const { return labelOffset_; }
-    /// Return repeat delay.
-    float GetRepeatDelay() const { return repeatDelay_; }
-    /// Return repeat rate.
-    float GetRepeatRate() const { return repeatRate_; }
+    const IntVector2& GetPressedOffset() const;
+    const IntVector2& GetLabelOffset() const;
+    float GetRepeatDelay() const;
+    float GetRepeatRate() const;
+    
+    // Properties:
+    tolua_property__get_set const IntVector2& pressedOffset;
+    tolua_property__get_set const IntVector2& labelOffset;
+    tolua_property__get_set const float repeatDelay;
+    tolua_property__get_set const float repeatRate;
 };

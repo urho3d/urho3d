@@ -1,56 +1,54 @@
 $#include "Text.h"
 
-/// %Text %UI element.
 class Text : public UIElement
 {
 public:
-    /// Construct.
+    // Methods:
     Text(Context* context);
-    /// Destruct.
     virtual ~Text();
-    /// Set font and font size.
+
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size.
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
-    void SetText(const String& text);
-    /// Set row alignment.
-    void SetTextAlignment(HorizontalAlignment align);
-    /// Set row spacing, 1.0 for original font spacing.
-    void SetRowSpacing(float spacing);
-    /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
-    void SetWordwrap(bool enable);
-    /// Set selection. When length is not provided, select until the text ends.
-    void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
-    /// Clear selection.
-    void ClearSelection();
-    /// Set selection background color. Color with 0 alpha (default) disables.
-    void SetSelectionColor(const Color& color);
-    /// Set hover background color. Color with 0 alpha (default) disables.
-    void SetHoverColor(const Color& color);
+    bool SetFont(const String& fontName);
     
-    /// Return font.
-    Font* GetFont() const { return font_; }
-    /// Return font size.
-    int GetFontSize() const { return fontSize_; }
-    /// Return text.
-    const String& GetText() const { return text_; }
-    /// Return row alignment.
-    HorizontalAlignment GetTextAlignment() const { return textAlignment_; }
-    /// Return row spacing.
-    float GetRowSpacing() const { return rowSpacing_; }
-    /// Return wordwrap mode.
-    bool GetWordwrap() const { return wordWrap_; }
-    /// Return selection start.
-    unsigned GetSelectionStart() const { return selectionStart_; }
-    /// Return selection length.
-    unsigned GetSelectionLength() const { return selectionLength_; }
-    /// Return selection background color.
-    const Color& GetSelectionColor() const { return selectionColor_; }
-    /// Return hover background color.
-    const Color& GetHoverColor() const { return hoverColor_; }
-    /// Return row height.
-    int GetRowHeight() const { return rowHeight_; }
-    /// Return number of rows.
-    unsigned GetNumRows() const { return rowWidths_.Size(); }
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font);
+    
+    void SetText(const String& text);
+    void SetTextAlignment(HorizontalAlignment align);
+    void SetRowSpacing(float spacing);
+    void SetWordwrap(bool enable);
+    
+    void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
+    void SetSelection(unsigned start);
+    
+    void ClearSelection();
+    void SetSelectionColor(const Color& color);
+    void SetHoverColor(const Color& color);
+
+    Font* GetFont() const;
+    int GetFontSize() const;
+    const String& GetText() const;
+    HorizontalAlignment GetTextAlignment() const;
+    float GetRowSpacing() const;
+    bool GetWordwrap() const;
+    unsigned GetSelectionStart() const;
+    unsigned GetSelectionLength() const;
+    const Color& GetSelectionColor() const;
+    const Color& GetHoverColor() const;
+    int GetRowHeight() const;
+    unsigned GetNumRows() const;
+    
+    // Properties:
+    tolua_property__get_set Font* font;
+    tolua_readonly tolua_property__get_set int fontSize;
+    tolua_property__get_set const String& text;
+    tolua_property__get_set HorizontalAlignment textAlignment;
+    tolua_property__get_set float rowSpacing;
+    tolua_property__get_set bool wordwrap;
+    tolua_readonly tolua_property__get_set unsigned selectionStart;
+    tolua_readonly tolua_property__get_set unsigned selectionLength;
+    tolua_property__get_set const Color& selectionColor;
+    tolua_property__get_set const Color& hoverColor;
+    tolua_readonly tolua_property__get_set int rowHeight;
+    tolua_readonly tolua_property__get_set unsigned numRows;
 };

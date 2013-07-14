@@ -1,6 +1,5 @@
 $#include "Window.h"
 
-/// %Window movement and resizing modes.
 enum WindowDragMode
 {
     DRAG_NONE,
@@ -15,41 +14,34 @@ enum WindowDragMode
     DRAG_RESIZE_LEFT
 };
 
-/// %Window %UI element that can optionally by moved or resized.
 class Window : public BorderImage
 {
 public:
-    /// Construct.
     Window(Context* context);
-    /// Destruct.
     virtual ~Window();
-    /// Set whether can be moved.
+    
     void SetMovable(bool enable);
-    /// Set whether can be resized.
     void SetResizable(bool enable);
-    /// Set resize area width at edges.
     void SetResizeBorder(const IntRect& rect);
-    /// Set modal flag. When the modal flag is set, the focused window needs to be dismissed first to allow other UI elements to gain focus.
     void SetModal(bool modal);
-    /// Set modal shade color.
     void SetModalShadeColor(const Color& color);
-    /// Set modal frame color.
     void SetModalFrameColor(const Color& color);
-    /// Set modal frame size.
     void SetModalFrameSize(const IntVector2& size);
 
-    /// Return whether is movable.
-    bool IsMovable() const { return movable_; }
-    /// Return whether is resizable.
-    bool IsResizable() const { return resizable_; }
-    /// Return resize area width at edges.
-    const IntRect& GetResizeBorder() const { return resizeBorder_; }
-    /// Return modal flag.
-    bool IsModal() const { return modal_; }
-    /// Get modal shade color.
-    const Color& GetModalShadeColor() const { return modalShadeColor_; }
-    /// Get modal frame color.
-    const Color& GetModalFrameColor() const { return modalFrameColor_; }
-    /// Get modal frame size.
-    const IntVector2& GetModalFrameSize() const { return modalFrameSize_; }
+    bool IsMovable() const;
+    bool IsResizable() const;
+    const IntRect& GetResizeBorder() const;
+    bool IsModal() const;
+    const Color& GetModalShadeColor() const;
+    const Color& GetModalFrameColor() const;
+    const IntVector2& GetModalFrameSize() const;
+    
+    // Properties:
+    tolua_property__is_set bool movable;
+    tolua_property__is_set bool resizable;
+    tolua_property__get_set const IntRect& resizeBorder;
+    tolua_property__is_set bool modal;
+    tolua_property__get_set const Color& modalShadeColor;
+    tolua_property__get_set const Color& modalFrameColor;
+    tolua_property__get_set const IntVector2& modalFrameSize;
 };

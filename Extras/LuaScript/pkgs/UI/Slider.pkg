@@ -1,32 +1,28 @@
 $#include "Slider.h"
 
-/// %Slider bar %UI element.
 class Slider : public BorderImage
 {
 public:
-    /// Construct.
+    // Methods:
     Slider(Context* context);
-    /// Destruct.
     virtual ~Slider();
-    /// Set orientation type.
+    
     void SetOrientation(Orientation orientation);
-    /// Set slider range maximum value (minimum value is always 0.)
     void SetRange(float range);
-    /// Set slider current value.
     void SetValue(float value);
-    /// Change value by a delta.
     void ChangeValue(float delta);
-    /// Set paging minimum repeat rate (number of events per second).
     void SetRepeatRate(float rate);
-
-    /// Return orientation type.
-    Orientation GetOrientation() const { return orientation_; }
-    /// Return slider range.
-    float GetRange() const { return range_; }
-    /// Return slider current value.
-    float GetValue() const { return value_; }
-    /// Return knob element.
-    BorderImage* GetKnob() const { return knob_; }
-    /// Return paging minimum repeat rate (number of events per second).
-    float GetRepeatRate() const { return repeatRate_; }
+    
+    Orientation GetOrientation() const;
+    float GetRange() const;
+    float GetValue() const;
+    BorderImage* GetKnob() const;
+    float GetRepeatRate() const;
+    
+    // Properties:
+    tolua_property__get_set Orientation orientation;
+    tolua_property__get_set float range;
+    tolua_property__get_set float value;
+    tolua_readonly tolua_property__get_set BorderImage* knob;
+    tolua_property__get_set float repeatRate;
 };

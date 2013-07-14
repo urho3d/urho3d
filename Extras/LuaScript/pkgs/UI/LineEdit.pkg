@@ -1,52 +1,44 @@
 $#include "LineEdit.h"
 
-/// Single-line text editor %UI element.
 class LineEdit : public BorderImage
 {
 public:
-    /// Construct.
+    // Methods:
     LineEdit(Context* context);
-    /// Destruct.
     virtual ~LineEdit();
-    /// Set text.
+    
     void SetText(const String& text);
-    /// Set cursor position.
     void SetCursorPosition(unsigned position);
-    /// Set cursor blink rate. 0 disables blinking.
     void SetCursorBlinkRate(float rate);
-    /// Set maximum text length. 0 for unlimited.
     void SetMaxLength(unsigned length);
-    /// Set echo character for password entry and such. 0 (default) shows the actual text.
     void SetEchoCharacter(unsigned c);
-    /// Set whether can move cursor with arrows or mouse, default true.
     void SetCursorMovable(bool enable);
-    /// Set whether selections are allowed, default true.
     void SetTextSelectable(bool enable);
-    /// Set whether copy-paste operations are allowed, default true.
     void SetTextCopyable(bool enable);
-    /// Set text selection doubleclick interval in seconds.
     void SetDoubleClickInterval(float interval);
 
-    /// Return text.
-    const String& GetText() const { return line_; }
-    /// Return cursor position.
-    unsigned GetCursorPosition() const { return cursorPosition_; }
-    /// Return cursor blink rate.
-    float GetCursorBlinkRate() const { return cursorBlinkRate_; }
-    /// Return maximum text length.
-    unsigned GetMaxLength() const { return maxLength_; }
-    /// Return echo character.
-    unsigned GetEchoCharacter() const { return echoCharacter_; }
-    /// Return whether can move cursor with arrows or mouse.
-    bool IsCursorMovable() const { return cursorMovable_; }
-    /// Return whether selections are allowed.
-    bool IsTextSelectable() const { return textSelectable_; }
-    /// Return whether copy-paste operations are allowed.
-    bool IsTextCopyable() const { return textCopyable_; }
-    /// Return text element.
-    Text* GetTextElement() const { return text_; }
-    /// Return cursor element.
-    BorderImage* GetCursor() const { return cursor_; }
-    /// Return text selection doubleclick interval in seconds.
+    const String& GetText() const;
+    unsigned GetCursorPosition() const;
+    float GetCursorBlinkRate() const;
+    unsigned GetMaxLength() const;
+    unsigned GetEchoCharacter() const;
+    bool IsCursorMovable() const;
+    bool IsTextSelectable() const;
+    bool IsTextCopyable() const;
+    Text* GetTextElement() const;
+    BorderImage* GetCursor() const;
     float GetDoubleClickInterval() const;
+    
+    // Properties:
+    tolua_property__get_set const String& text;
+    tolua_property__get_set unsigned cursorPosition;
+    tolua_property__get_set float cursorBlinkRate;
+    tolua_property__get_set unsigned maxLength;
+    tolua_property__get_set unsigned echoCharacter;
+    tolua_property__is_set bool cursorMovable;
+    tolua_property__is_set bool textSelectable;
+    tolua_property__is_set bool textCopyable;
+    tolua_readonly tolua_property__get_set Text* textElement;
+    tolua_readonly tolua_property__get_set BorderImage* cursor;
+    tolua_property__get_set float doubleClickInterval;
 };

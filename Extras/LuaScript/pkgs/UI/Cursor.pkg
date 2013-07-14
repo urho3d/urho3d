@@ -1,6 +1,5 @@
 $#include "Cursor.h"
 
-/// %Cursor shapes recognized by the UI subsystem.
 enum CursorShape
 {
     CS_NORMAL = 0,
@@ -14,20 +13,19 @@ enum CursorShape
     CS_MAX_SHAPES
 };
 
-/// Mouse cursor %UI element.
 class Cursor : public BorderImage
 {
 public:
-    /// Construct.
+    // Methods:
     Cursor(Context* context);
-    /// Destruct.
     virtual ~Cursor();
     
-    /// Define a shape.
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
-    /// Set current shape.
-    void SetShape(CursorShape shape);
+    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     
-    /// Get current shape.
-    CursorShape GetShape() const { return shape_; }
+    void SetShape(CursorShape shape);
+    CursorShape GetShape() const;
+    
+    // Properties:
+    tolua_property__get_set CursorShape shape;
 };

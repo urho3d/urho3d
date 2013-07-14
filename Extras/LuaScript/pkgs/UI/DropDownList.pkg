@@ -1,44 +1,36 @@
 $#include "DropDownList.h"
 
-/// %Menu %UI element that displays a popup list view.
 class DropDownList : public Menu
 {
 public:
-    /// Construct.
+    // Methods:
     DropDownList(Context* context);
-    /// Destruct.
     ~DropDownList();
-    /// Add item to the end of the list.
+    
     void AddItem(UIElement* item);
-    /// Insert item to a specific position.
     void InsertItem(unsigned index, UIElement* item);
-    /// Remove specific item.
     void RemoveItem(UIElement* item);
-    /// Remove item at index.
     void RemoveItem(unsigned index);
-    /// Remove all items.
     void RemoveAllItems();
-    /// Set selection.
     void SetSelection(unsigned index);
-    /// Set place holder text. This is the text shown when there is no selection in drop down list.
     void SetPlaceholderText(const String& text);
-    /// Set whether popup should be automatically resized to match the dropdown button width.
     void SetResizePopup(bool enable);
-
-    /// Return number of items.
+   
     unsigned GetNumItems() const;
-    /// Return item at index.
     UIElement* GetItem(unsigned index) const;
-    /// Return selection index, or M_MAX_UNSIGNED if none selected.
     unsigned GetSelection() const;
-    /// Return selected item, or null if none selected.
     UIElement* GetSelectedItem() const;
-    /// Return listview element.
-    ListView* GetListView() const { return listView_; }
-    /// Return selected item placeholder element.
-    UIElement* GetPlaceholder() const { return placeholder_; }
-    /// Return place holder text.
+    ListView* GetListView() const;
+    UIElement* GetPlaceholder() const;
     const String& GetPlaceholderText() const;
-    /// Return whether popup should be automatically resized.
-    bool GetResizePopup() const { return resizePopup_; }
+    bool GetResizePopup() const;
+    
+    // Properties:
+    tolua_readonly tolua_property__get_set unsigned numItems;
+    tolua_property__get_set unsigned selection;
+    tolua_readonly tolua_property__get_set UIElement* selectedItem;
+    tolua_readonly tolua_property__get_set ListView* listView;
+    tolua_readonly tolua_property__get_set UIElement* placeholder;
+    tolua_property__get_set const String& placeholderText;
+    tolua_property__get_set bool resizePopup;
 };

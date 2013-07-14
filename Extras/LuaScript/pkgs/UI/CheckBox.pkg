@@ -1,22 +1,20 @@
 $#include "CheckBox.h"
 
-/// %UI element that can be toggled between unchecked and checked state.
 class CheckBox : public BorderImage
 {
 public:
-    /// Construct.
+    // Methods:
     CheckBox(Context* context);
-    /// Destruct.
     virtual ~CheckBox();
-    /// Set checked state.
+    
     void SetChecked(bool enable);
-    /// Set checked image offset.
     void SetCheckedOffset(const IntVector2& rect);
-    /// Set checked image offset.
     void SetCheckedOffset(int x, int y);
     
-    /// Return whether is checked.
-    bool IsChecked() const { return checked_; }
-    /// Return checked image offset.
-    const IntVector2& GetCheckedOffset() const { return checkedOffset_; }
+    bool IsChecked() const;
+    const IntVector2& GetCheckedOffset() const;
+    
+    // Properties:
+    tolua_property__is_set bool checked;
+    tolua_property__get_set const IntVector2& checkedOffset;
 };

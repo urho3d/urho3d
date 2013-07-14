@@ -1,69 +1,60 @@
 $#include "FileSelector.h"
 
-/// %File selector's list entry (file or directory.)
 struct FileSelectorEntry
 {
-    /// Name.
-    String name_;
-    /// Directory flag.
-    bool directory_;
+    String name_ @ name;
+    bool directory_ @ directory;
 };
 
-/// %File selector dialog.
 class FileSelector : public Object
 {
 public:
-    /// Construct.
+    // Methods:
     FileSelector(Context* context);
-    /// Destruct.
     virtual ~FileSelector();
-    /// Set fileselector UI style.
+
     void SetDefaultStyle(XMLFile* style);
-    /// Set title text.
     void SetTitle(const String& text);
-    /// Set button texts.
     void SetButtonTexts(const String& okText, const String& cancelText);
-    /// Set current path.
     void SetPath(const String& path);
-    /// Set current filename.
     void SetFileName(const String& fileName);
-    /// Set filters.
     void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
-    /// Set directory selection mode. Default false.
     void SetDirectoryMode(bool enable);
-    /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
 
-    /// Return the UI style file.
     XMLFile* GetDefaultStyle() const;
-    /// Return fileselector window.
-    Window* GetWindow() const { return window_; }
-    /// Return window title text element.
-    Text* GetTitleText() const { return titleText_; }
-    /// Return file list.
-    ListView* GetFileList() const { return fileList_; }
-    /// Return path editor.
-    LineEdit* GetPathEdit() const { return pathEdit_; }
-    /// Return filename editor.
-    LineEdit* GetFileNameEdit() const { return fileNameEdit_; }
-    /// Return filter dropdown.
-    DropDownList* GetFilterList() const { return filterList_; }
-    /// Return OK button.
-    Button* GetOKButton() const { return okButton_; }
-    /// Return cancel button.
-    Button* GetCancelButton() const { return cancelButton_; }
-    /// Return close button.
-    Button* GetCloseButton() const { return closeButton_; }
-    /// Return window title.
+    Window* GetWindow() const;
+    Text* GetTitleText() const;
+    ListView* GetFileList() const;
+    LineEdit* GetPathEdit() const;
+    LineEdit* GetFileNameEdit() const;
+    DropDownList* GetFilterList() const;
+    Button* GetOKButton() const;
+    Button* GetCancelButton() const;
+    Button* GetCloseButton() const;
     const String& GetTitle() const;
-    /// Return current path.
-    const String& GetPath() const { return path_; }
-    /// Return current filename.
+    const String& GetPath() const;
     const String& GetFileName() const;
-    /// Return current filter.
     const String& GetFilter() const;
-    /// Return current filter index.
     unsigned GetFilterIndex() const;
-    /// Return directory mode flag.
-    bool GetDirectoryMode() const { return directoryMode_; }
+    bool GetDirectoryMode() const;
+    
+    // Properties:
+    tolua_property__get_set XMLFile* defaultStyle;
+    tolua_readonly tolua_property__get_set Window* window;
+    tolua_readonly tolua_property__get_set Text* titleText;
+    tolua_readonly tolua_property__get_set ListView* fileList;
+    tolua_readonly tolua_property__get_set LineEdit* pathEdit;
+    tolua_readonly tolua_property__get_set LineEdit* fileNameEdit;
+    tolua_readonly tolua_property__get_set DropDownList* filterList;
+    tolua_readonly tolua_property__get_set Button* OKButton;
+    tolua_readonly tolua_property__get_set Button* cancelButton;
+    tolua_readonly tolua_property__get_set Button* closeButton;
+    
+    tolua_property__get_set const String& title;
+    tolua_property__get_set const String& path;
+    tolua_property__get_set const String& fileName;
+    tolua_readonly tolua_property__get_set const String& filter;
+    tolua_readonly tolua_property__get_set unsigned filterIndex;
+    tolua_property__get_set bool directoryMode;
 };

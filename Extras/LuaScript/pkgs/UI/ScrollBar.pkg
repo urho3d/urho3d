@@ -1,46 +1,39 @@
 $#include "ScrollBar.h"
 
-/// Scroll bar %UI element with forward and back buttons.
 class ScrollBar : public UIElement
 {
 public:
-    /// Construct.
+    // Methods:
     ScrollBar(Context* context);
-    /// Destruct.
     virtual ~ScrollBar();
-    /// Set orientation type.
+    
     void SetOrientation(Orientation orientation);
-    /// Set slider range maximum value (minimum value is always 0.)
     void SetRange(float range);
-    /// Set slider current value.
     void SetValue(float value);
-    /// Change slider current value by a delta.
     void ChangeValue(float delta);
-    /// Set button scroll step.
     void SetScrollStep(float step);
-    /// Set button step factor, can be used to adjust the step for constant pixel size.
     void SetStepFactor(float factor);
-    /// Scroll back one step.
     void StepBack();
-    /// Scroll forward one step.
     void StepForward();
     
-    /// Return scrollbar orientation.
     Orientation GetOrientation() const;
-    /// Return slider range.
     float GetRange() const;
-    /// Return slider current value.
     float GetValue() const;
-    /// Return button scroll step.
-    float GetScrollStep() const { return scrollStep_; }
-    /// Return button step factor.
-    float GetStepFactor() const { return stepFactor_; }
-    /// Return scroll step multiplied by factor.
+    float GetScrollStep() const;
+    float GetStepFactor() const;
     float GetEffectiveScrollStep() const;
-    /// Return back button element.
-    Button* GetBackButton() const { return backButton_; }
-    /// Return forward button element.
-    Button* GetForwardButton() const { return forwardButton_; }
-    /// Return slider element.
-    Slider* GetSlider() const { return slider_; }
+    Button* GetBackButton() const;
+    Button* GetForwardButton() const;
+    Slider* GetSlider() const;
+    
+    // Properties:
+    tolua_property__get_set Orientation orientation;
+    tolua_property__get_set float range;
+    tolua_property__get_set float value;
+    tolua_property__get_set float scrollStep;
+    tolua_property__get_set float stepFactor;
+    tolua_readonly tolua_property__get_set float effectiveScrollStep;
+    tolua_readonly tolua_property__get_set Button* backButton;
+    tolua_readonly tolua_property__get_set Button* forwardButton;
+    tolua_readonly tolua_property__get_set Slider* slider;
 };

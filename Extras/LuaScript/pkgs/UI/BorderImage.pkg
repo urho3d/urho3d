@@ -2,42 +2,34 @@ $#include "BorderImage.h"
 
 enum BlendMode{};
 
-/// %Image %UI element with optional border.
 class BorderImage : public UIElement
 {
 public:
-    /// Construct.
+    // Method:
     BorderImage(Context* context);
-    /// Destruct.
     virtual ~BorderImage();
-	
-    /// Set texture.
+    
     void SetTexture(Texture* texture);
-    /// Set part of texture to use as the image.
     void SetImageRect(const IntRect& rect);
-    /// Use whole texture as the image.
     void SetFullImageRect();
-    /// Set image border dimensions.
     void SetBorder(const IntRect& rect);
-    /// Set offset to image rectangle used on hover.
     void SetHoverOffset(const IntVector2& offset);
-    /// Set offset to image rectangle used on hover.
     void SetHoverOffset(int x, int y);
-    /// Set blend mode.
     void SetBlendMode(BlendMode mode);
-    /// Set tiled mode.
     void SetTiled(bool enable);
     
-    /// Return texture.
-    Texture* GetTexture() const { return texture_; }
-    /// Return image rectangle.
-    const IntRect& GetImageRect() const { return imageRect_; }
-    /// Return image border dimensions.
-    const IntRect& GetBorder() const { return border_; }
-    /// Return offset to image rectangle used on hover.
-    const IntVector2& GetHoverOffset() const { return hoverOffset_; }
-    /// Return blend mode.
-    BlendMode GetBlendMode() const { return blendMode_; }
-    /// Return whether is tiled.
-    bool IsTiled() const { return tiled_; }
+    Texture* GetTexture() const;
+    const IntRect& GetImageRect() const;
+    const IntRect& GetBorder() const;
+    const IntVector2& GetHoverOffset() const;
+    BlendMode GetBlendMode() const;
+    bool IsTiled() const;
+    
+    // Properties:
+    tolua_property__get_set Texture* texture;
+    tolua_property__get_set const IntRect& imageRect;
+    tolua_property__get_set const IntRect& border;
+    tolua_property__get_set const IntVector2& hoverOffset;
+    tolua_property__get_set BlendMode blendMode;
+    tolua_property__is_set bool tiled;
 };

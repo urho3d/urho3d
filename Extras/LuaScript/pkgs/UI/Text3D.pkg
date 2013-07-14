@@ -1,72 +1,61 @@
 $#include "Text3D.h"
 
-/// 3D text component.
 class Text3D : public Drawable
 {
 public:
-    /// Construct.
+    // Methods:
     Text3D(Context* context);
-    /// Destruct.
     ~Text3D();
-    /// Set font and font size. Return true if successful.
+    
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size. Return true if successful.
+    bool SetFont(const String& fontName);
+    
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    /// Set material.
+    bool SetFont(Font* font);
+    
     void SetMaterial(Material* material);
-    /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
-    /// Set horizontal and vertical alignment.
     void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
-    /// Set horizontal alignment.
     void SetHorizontalAlignment(HorizontalAlignment align);
-    /// Set vertical alignment.
     void SetVerticalAlignment(VerticalAlignment align);
-    /// Set row alignment.
     void SetTextAlignment(HorizontalAlignment align);
-    /// Set row spacing, 1.0 for original font spacing.
     void SetRowSpacing(float spacing);
-    /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
     void SetWordwrap(bool enable);
-    /// Set text width. Only has effect in word wrap mode.
     void SetWidth(int width);
-    /// Set color on all corners.
     void SetColor(const Color& color);
-    /// Set color on one corner.
     void SetColor(Corner corner, const Color& color);
-    /// Set opacity.
     void SetOpacity(float opacity);
-    /// Set whether to face camera automatically.
     void SetFaceCamera(bool enable);
     
-    /// Return font.
     Font* GetFont() const;
-    /// Return material.
     Material* GetMaterial() const;
-    /// Return font size.
     int GetFontSize() const;
-    /// Return text.
     const String& GetText() const;
-    /// Return row alignment.
     HorizontalAlignment GetTextAlignment() const;
-    /// Return horizontal alignment.
     HorizontalAlignment GetHorizontalAlignment() const;
-    /// Return vertical alignment.
     VerticalAlignment GetVerticalAlignment() const;
-    /// Return row spacing.
     float GetRowSpacing() const;
-    /// Return wordwrap mode.
     bool GetWordwrap() const;
-    /// Return text width.
     int GetWidth() const;
-    /// Return row height.
     int GetRowHeight() const;
-    /// Return number of rows.
     unsigned GetNumRows() const;
-    /// Return corner color.
     const Color& GetColor(Corner corner) const;
-    /// Return opacity.
     float GetOpacity() const;
-    /// Return whether faces camera automatically.
-    bool GetFaceCamera() const { return faceCamera_; }
+    bool GetFaceCamera() const;
+    
+    // Properties:
+    tolua_property__get_set Font* font;
+    tolua_property__get_set Material* material;
+    tolua_readonly tolua_property__get_set int fontSize;
+    tolua_property__get_set const String& text;
+    tolua_property__get_set HorizontalAlignment textAlignment;
+    tolua_property__get_set HorizontalAlignment horizontalAlignment;
+    tolua_property__get_set VerticalAlignment verticalAlignment;
+    tolua_property__get_set float rowSpacing;
+    tolua_property__get_set bool wordwrap;
+    tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int rowHeight;
+    tolua_readonly tolua_property__get_set unsigned numRows;
+    tolua_property__get_set float opacity;
+    tolua_property__get_set bool faceCamera;
 };
