@@ -3843,6 +3843,7 @@ Properties:<br>
 - IntVector2 labelOffset
 - float repeatDelay
 - float repeatRate
+- bool pressed (readonly)
 
 
 CheckBox
@@ -5155,6 +5156,7 @@ Properties:<br>
 - IntVector2 labelOffset
 - float repeatDelay
 - float repeatRate
+- bool pressed (readonly)
 - UIElement@ popup
 - IntVector2 popupOffset
 - bool showPopup
@@ -5305,6 +5307,7 @@ Properties:<br>
 - IntVector2 labelOffset
 - float repeatDelay
 - float repeatRate
+- bool pressed (readonly)
 - bool showPopup
 - uint selection
 - bool resizePopup
