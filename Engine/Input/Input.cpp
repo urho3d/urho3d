@@ -137,45 +137,42 @@ void Input::Update()
     // Check for relative mode mouse move
     if (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))
     {
-        // Make sure the mouse move is not an emulated touch
-        if (!GetNumTouches())
+        IntVector2 mousePosition = GetMousePosition();
+        mouseMove_ = mousePosition - lastMousePosition_;
+        
+        // Recenter the mouse cursor manually
+        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+        if (mousePosition != center)
         {
-            IntVector2 mousePosition = GetMousePosition();
-            mouseMove_ = mousePosition - lastMousePosition_;
-            
-            // Recenter the mouse cursor manually
-            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             SetMousePosition(center);
             lastMousePosition_ = center;
-            
-            // Send mouse move event if necessary
-            if (mouseMove_ != IntVector2::ZERO)
+        }
+        
+        // Send mouse move event if necessary
+        if (mouseMove_ != IntVector2::ZERO)
+        {
+            if (suppressNextMouseMove_)
             {
-                if (suppressNextMouseMove_)
-                {
-                    mouseMove_ = IntVector2::ZERO;
-                    suppressNextMouseMove_ = false;
-                }
-                else
-                {
-                    using namespace MouseMove;
+                mouseMove_ = IntVector2::ZERO;
+                suppressNextMouseMove_ = false;
+            }
+            else
+            {
+                using namespace MouseMove;
                 
-                    VariantMap eventData;
-                    if (mouseVisible_)
-                    {
-                        eventData[P_X] = mousePosition.x_;
-                        eventData[P_Y] = mousePosition.y_;
-                    }
-                    eventData[P_DX] = mouseMove_.x_;
-                    eventData[P_DY] = mouseMove_.y_;
-                    eventData[P_BUTTONS] = mouseButtonDown_;
-                    eventData[P_QUALIFIERS] = GetQualifiers();
-                    SendEvent(E_MOUSEMOVE, eventData);
+                VariantMap eventData;
+                if (mouseVisible_)
+                {
+                    eventData[P_X] = mousePosition.x_;
+                    eventData[P_Y] = mousePosition.y_;
                 }
+                eventData[P_DX] = mouseMove_.x_;
+                eventData[P_DY] = mouseMove_.y_;
+                eventData[P_BUTTONS] = mouseButtonDown_;
+                eventData[P_QUALIFIERS] = GetQualifiers();
+                SendEvent(E_MOUSEMOVE, eventData);
             }
         }
-        else
-            suppressNextMouseMove_ = true;
     }
 }
 
@@ -683,15 +680,19 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_FINGERUP:
         {
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
-            touches_.Erase(touchID);
+            TouchState& state = touches_[touchID];
             
             using namespace TouchEnd;
             
             VariantMap eventData;
             
+            // Do not trust the position in the finger up event. Instead use the last position stored in the
+            // touch structure
             eventData[P_TOUCHID] = touchID;
-            eventData[P_X] = evt.tfinger.x * graphics_->GetWidth();
-            eventData[P_Y] = evt.tfinger.y * graphics_->GetHeight();
+            eventData[P_X] = state.position_.x_;
+            eventData[P_Y] = state.position_.y_;
+            
+            touches_.Erase(touchID);
             SendEvent(E_TOUCHEND, eventData);
         }
         break;

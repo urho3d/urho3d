@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
@@ -75,11 +78,12 @@ void Android_OnTouch(int touch_device_id_in, int pointer_finger_id_in, int actio
             if (!leftFingerDown) {
                 Android_GetWindowCoordinates(x, y, &window_x, &window_y);
 
+                // Urho3D: do not send emulated mouse events
                 /* send moved event */
-                SDL_SendMouseMotion(NULL, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
+                //SDL_SendMouseMotion(NULL, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
 
                 /* send mouse down event */
-                SDL_SendMouseButton(NULL, SDL_TOUCH_MOUSEID, SDL_PRESSED, SDL_BUTTON_LEFT);
+                //SDL_SendMouseButton(NULL, SDL_TOUCH_MOUSEID, SDL_PRESSED, SDL_BUTTON_LEFT);
 
                 leftFingerDown = fingerId;
             }
@@ -90,7 +94,7 @@ void Android_OnTouch(int touch_device_id_in, int pointer_finger_id_in, int actio
                 Android_GetWindowCoordinates(x, y, &window_x, &window_y);
 
                 /* send moved event */
-                SDL_SendMouseMotion(NULL, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
+                //SDL_SendMouseMotion(NULL, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
             }
             SDL_SendTouchMotion(touchDeviceId, fingerId, x, y, p);
             break;
@@ -98,7 +102,7 @@ void Android_OnTouch(int touch_device_id_in, int pointer_finger_id_in, int actio
         case ACTION_POINTER_1_UP:
             if (fingerId == leftFingerDown) {
                 /* send mouse up */
-                SDL_SendMouseButton(NULL, SDL_TOUCH_MOUSEID, SDL_RELEASED, SDL_BUTTON_LEFT);
+                //SDL_SendMouseButton(NULL, SDL_TOUCH_MOUSEID, SDL_RELEASED, SDL_BUTTON_LEFT);
                 leftFingerDown = 0;
             }
             SDL_SendTouch(touchDeviceId, fingerId, SDL_FALSE, x, y, p);

@@ -74,7 +74,9 @@ public:
     float GetRepeatDelay() const { return repeatDelay_; }
     /// Return repeat rate.
     float GetRepeatRate() const { return repeatRate_; }
-    
+    /// Return whether is currently pressed.
+    bool IsPressed() const { return pressed_; }
+
 protected:
     /// Set new pressed state.
     void SetPressed(bool enable);

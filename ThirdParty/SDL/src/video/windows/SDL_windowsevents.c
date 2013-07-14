@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_WINDOWS
@@ -261,7 +264,12 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     SDL_WindowData *data;
     LRESULT returnCode = -1;
-
+    
+    // Urho3D: detect emulated mouse events
+    // Note: if we move mouse cursor manually (relative mouse motion with hidden cursor) we may get emulated mouse
+    // events with zero extra info, so we should only center the cursor when it has actually moved
+    BOOL emulatedMouse = (GetMessageExtraInfo() & 0xffffff00) == 0xff515700;
+    
     /* Send a SDL_SYSWMEVENT if the application wants them */
     if (SDL_GetEventState(SDL_SYSWMEVENT) == SDL_ENABLE) {
         SDL_SysWMmsg wmmsg;
@@ -382,7 +390,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_MOUSEMOVE:
-        if( !SDL_GetMouse()->relative_mode )
+        if( !emulatedMouse && !SDL_GetMouse()->relative_mode )
             SDL_SendMouseMotion(data->window, 0, 0, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         /* don't break here, fall through to check the wParam like the button presses */
     case WM_LBUTTONUP:
@@ -393,7 +401,7 @@ WIN_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_RBUTTONDOWN:
     case WM_MBUTTONDOWN:
     case WM_XBUTTONDOWN:
-        if( !SDL_GetMouse()->relative_mode )
+        if( !emulatedMouse && !SDL_GetMouse()->relative_mode )
             WIN_CheckWParamMouseButtons( wParam, data );
         break;
 

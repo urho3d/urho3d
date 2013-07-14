@@ -97,18 +97,15 @@ void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
 void Button::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     BorderImage::OnHover(position, screenPosition, buttons, qualifiers, cursor);
-    if (pressed_)
+    if (pressed_ && !(buttons & MOUSEB_LEFT))
     {
-        if (!(buttons & MOUSEB_LEFT))
-        {
-            SetPressed(false);
+        SetPressed(false);
 
-            using namespace Released;
+        using namespace Released;
 
-            VariantMap eventData;
-            eventData[P_ELEMENT] = (void*)this;
-            SendEvent(E_RELEASED, eventData);
-        }
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        SendEvent(E_RELEASED, eventData);
     }
 }
 

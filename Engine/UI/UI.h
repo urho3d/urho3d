@@ -133,6 +133,12 @@ private:
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
     /// Handle mouse wheel event.
     void HandleMouseWheel(StringHash eventType, VariantMap& eventData);
+    /// Handle touch begin event.
+    void HandleTouchBegin(StringHash eventType, VariantMap& eventData);
+    /// Handle touch end event.
+    void HandleTouchEnd(StringHash eventType, VariantMap& eventData);
+    /// Handle touch move event.
+    void HandleTouchMove(StringHash eventType, VariantMap& eventData);
     /// Handle keypress event.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
     /// Handle character event.
@@ -188,6 +194,8 @@ private:
     int qualifiers_;
     /// Initialized flag.
     bool initialized_;
+    /// Touch used flag.
+    bool usingTouchInput_;
     /// Flag to switch mouse wheel event to be sent to non-focused element at cursor.
     bool nonFocusedMouseWheel_;
     /// Non-modal batch size (used internally for rendering).
