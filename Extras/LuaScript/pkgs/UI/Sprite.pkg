@@ -44,3 +44,11 @@ public:
     tolua_property__get_set ResourceRef textureAttr;
     tolua_property__get_set const Matrix3x4& transform;
 };
+
+${
+
+// Fixed textureAttr property.
+#define TOLUA_DISABLE_tolua_get_Sprite_textureAttr
+#define tolua_get_Sprite_textureAttr tolua_UILuaAPI_Sprite_GetTextureAttr00
+
+$}
