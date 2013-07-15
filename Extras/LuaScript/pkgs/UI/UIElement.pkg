@@ -303,4 +303,8 @@ UIElement* UIElementGetChild(const UIElement* uiElement, const char* name, bool 
 }
 #define GetStyle GetAppliedStyle
 
+// Fixed combinedScreenRect property.
+#define TOLUA_DISABLE_tolua_get_UIElement_combinedScreenRect_ref
+#define tolua_get_UIElement_combinedScreenRect_ref tolua_UILuaAPI_UIElement_GetCombinedScreenRect00
+
 $}
