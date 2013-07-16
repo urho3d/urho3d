@@ -253,7 +253,11 @@ function classVariable:supcode ()
 				output(' = ')
 			end
 			if not t and ptr=='' then output('*') end
-			output('((',self.mod,self.type)
+			if self.ptr ~= '&' then
+				output('((',self.mod,self.type)
+			else
+				output('(*(',self.mod,self.type)
+			end
 			if not t then
 				output('*')
 			end
