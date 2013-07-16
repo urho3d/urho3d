@@ -105,11 +105,12 @@ function classVariable:supcode ()
 
  local class = self:inclass()
 
-	local prop_get,prop_set
+	local prop_type,prop_get,prop_set
 	if string.find(self.mod, 'tolua_property') then
 
 		local _,_,type = string.find(self.mod, "tolua_property__([^%s]*)")
 		type = type or "default"
+		prop_type = type
 		prop_get,prop_set = get_property_methods(type, self.name)
 		self.mod = string.gsub(self.mod, "tolua_property[^%s]*", "")
 	end
@@ -159,8 +160,23 @@ function classVariable:supcode ()
 	else
 		local push_func = get_push_function(self.type)
 		t = self.type
-		if self.ptr == '&' or self.ptr == '' then
+		if self.ptr == '&'then
 			output('  ',push_func,'(tolua_S,(void*)&'..self:getvalue(class,static,prop_get)..',"',t,'");')
+		elseif self.ptr == '' then
+			if prop_type == nil then
+				output('  ',push_func,'(tolua_S,(void*)&'..self:getvalue(class,static,prop_get)..',"',t,'");')
+			else
+				output('  '..self.type..' tolua_ret = ('..self.type..')'..self:getvalue(class,static,prop_get)..';\n')
+				output('  #ifdef __cplusplus\n')
+				output('    void* tolua_obj = (void*)Mtolua_new(('..self.type..')(tolua_ret));\n')
+				output('    tolua_pushusertype(tolua_S,tolua_obj,"'..self.type..'");\n')
+				output('    tolua_register_gc(tolua_S,lua_gettop(tolua_S));\n')
+				output('  #else\n')
+				output('    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof('..self.type..'));\n')
+				output('    tolua_pushusertype(tolua_S,tolua_obj,"'..self.type..'");\n')
+				output('    tolua_register_gc(tolua_S,lua_gettop(tolua_S));\n')
+				output('  #endif\n')
+			end
 		else
 			output('  ',push_func,'(tolua_S,(void*)'..self:getvalue(class,static,prop_get)..',"',t,'");')
 		end
