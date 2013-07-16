@@ -160,20 +160,16 @@ public:
     Vector3 GetVelocityAtPoint(const Vector3& position) const;
     /// Return linear velocity deactivation threshold.
     float GetLinearRestThreshold() const;
-    /// Return linear velocity damping threshold.
+    /// Return linear velocity damping factor.
     float GetLinearDamping() const;
-    /// Return linear velocity damping scale.
-    float GetLinearDampingScale() const;
     /// Return angular velocity.
     Vector3 GetAngularVelocity() const;
     /// Return angular degrees of freedom.
     Vector3 GetAngularFactor() const;
     /// Return angular velocity deactivation threshold.
     float GetAngularRestThreshold() const;
-    /// Return angular velocity damping threshold.
+    /// Return angular velocity damping factor.
     float GetAngularDamping() const;
-    /// Return angular velocity damping scale.
-    float GetAngularDampingScale() const;
     /// Return friction coefficient.
     float GetFriction() const;
     /// Return restitution coefficient.
