@@ -86,4 +86,9 @@ function get_property_methods_hook(ptype, name)
         local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
         return "Has"..Name, "Set"..Name
     end
+    
+    if ptype == "no_prefix" then
+        local Name = string.upper(string.sub(name, 1, 1))..string.sub(name, 2)
+        return Name, "Set"..Name
+    end
 end

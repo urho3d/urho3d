@@ -91,11 +91,3 @@ public:
     tolua_property__get_set unsigned lodLevel;
     tolua_readonly tolua_property__get_set BoundingBox worldBoundingBox;
 };
-
-${
-
-// Patch for CollisionShape.worldBoundingBox property.
-#define TOLUA_DISABLE_tolua_get_CollisionShape_worldBoundingBox
-#define tolua_get_CollisionShape_worldBoundingBox tolua_PhysicsLuaAPI_CollisionShape_GetWorldBoundingBox00
-
-$}

@@ -180,26 +180,3 @@ public:
     tolua_property__get_set unsigned collisionMask;
     tolua_property__get_set CollisionEventMode collisionEventMode;
 };
-
-${
-
-#define TOLUA_DISABLE_tolua_get_RigidBody_position
-#define tolua_get_RigidBody_position tolua_PhysicsLuaAPI_RigidBody_GetPosition00
-
-
-#define TOLUA_DISABLE_tolua_get_RigidBody_rotation
-#define tolua_get_RigidBody_rotation tolua_PhysicsLuaAPI_RigidBody_GetRotation00
-
-#define TOLUA_DISABLE_tolua_get_RigidBody_linearVelocity
-#define tolua_get_RigidBody_linearVelocity tolua_PhysicsLuaAPI_RigidBody_GetLinearVelocity00
-
-#define TOLUA_DISABLE_tolua_get_RigidBody_linearFactor
-#define tolua_get_RigidBody_linearFactor tolua_PhysicsLuaAPI_RigidBody_GetLinearFactor00
-
-#define TOLUA_DISABLE_tolua_get_RigidBody_angularVelocity
-#define tolua_get_RigidBody_angularVelocity tolua_PhysicsLuaAPI_RigidBody_GetAngularVelocity00
-
-#define TOLUA_DISABLE_tolua_get_RigidBody_angularFactor
-#define tolua_get_RigidBody_angularFactor tolua_PhysicsLuaAPI_RigidBody_GetAngularFactor00
-
-$}

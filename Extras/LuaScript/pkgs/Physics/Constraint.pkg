@@ -91,10 +91,3 @@ public:
     tolua_readonly tolua_property__get_set RigidBody* ownBody;
     tolua_property__get_set RigidBody* otherBody;
 };
-
-${
-
-#define TOLUA_DISABLE_tolua_get_Constraint_worldPosition
-#define tolua_get_Constraint_worldPosition tolua_PhysicsLuaAPI_Constraint_GetWorldPosition00
-
-$}

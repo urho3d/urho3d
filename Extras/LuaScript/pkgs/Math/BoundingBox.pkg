@@ -54,20 +54,7 @@ public:
     Vector3 max_ @ max;
     bool defined_ @ defined;
     
-    tolua_readonly tolua_property__get_set Vector3 center;
-    tolua_readonly tolua_property__get_set Vector3 size;
-    tolua_readonly tolua_property__get_set Vector3 halfSize;
+    tolua_readonly tolua_property__no_prefix Vector3 center;
+    tolua_readonly tolua_property__no_prefix Vector3 size;
+    tolua_readonly tolua_property__no_prefix Vector3 halfSize;
 };
-
-${
-
-#define TOLUA_DISABLE_tolua_get_BoundingBox_center
-#define tolua_get_BoundingBox_center tolua_MathLuaAPI_BoundingBox_Center00
-
-#define TOLUA_DISABLE_tolua_get_BoundingBox_size
-#define tolua_get_BoundingBox_size tolua_MathLuaAPI_BoundingBox_Size00
-
-#define TOLUA_DISABLE_tolua_get_BoundingBox_halfSize
-#define tolua_get_BoundingBox_halfSize tolua_MathLuaAPI_BoundingBox_HalfSize00
-
-$}

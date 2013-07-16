@@ -108,11 +108,3 @@ public:
     tolua_property__get_set bool internalEdge;
     tolua_property__get_set bool splitImpulse;
 };
-
-${
-
-// Patch for PhysicsWorld.gravity property.
-#define TOLUA_DISABLE_tolua_get_PhysicsWorld_gravity
-#define tolua_get_PhysicsWorld_gravity tolua_PhysicsLuaAPI_PhysicsWorld_GetGravity00
-
-$}

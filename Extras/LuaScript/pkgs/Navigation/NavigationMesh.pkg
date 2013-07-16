@@ -51,8 +51,8 @@ public:
     bool Build(const BoundingBox& boundingBox);
     
     /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
-    // void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     tolua_outside PODVector<Vector3> NavigationMeshFindPath @ FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
+    tolua_outside PODVector<Vector3> NavigationMeshFindPath @ FindPath(const Vector3& start, const Vector3& end);
     
     /// Return a random point on the navigation mesh.
     Vector3 GetRandomPoint();
@@ -129,13 +129,5 @@ PODVector<Vector3> NavigationMeshFindPath(NavigationMesh* navMesh, const Vector3
     navMesh->FindPath(dest, start, end, extents);
     return dest;
 }
-
-// Patch for NavigationMesh.worldBoundingBox property.
-#define TOLUA_DISABLE_tolua_get_NavigationMesh_worldBoundingBox
-#define tolua_get_NavigationMesh_worldBoundingBox tolua_NavigationLuaAPI_NavigationMesh_GetWorldBoundingBox00
-
-// Patch for NavigationMesh.numTiles property.
-#define TOLUA_DISABLE_tolua_get_NavigationMesh_numTiles
-#define tolua_get_NavigationMesh_numTiles tolua_NavigationLuaAPI_NavigationMesh_GetNumTiles00
 
 $}
