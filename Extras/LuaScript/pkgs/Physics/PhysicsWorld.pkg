@@ -1,110 +1,70 @@
 $#include "PhysicsWorld.h"
 
-/// Physics raycast hit.
 struct PhysicsRaycastResult
 {
     PhysicsRaycastResult();
-    
-    /// Hit position.
     Vector3 position_ @ position;
-    /// Hit normal.
     Vector3 normal_ @ normal;
-    /// Hit distance from ray origin.
     float distance_ @ distance;
-    /// Rigid body that was hit.
     RigidBody* body_ @ body;
 };
 
-/// Delayed world transform assignment for parented rigidbodies.
 struct DelayedWorldTransform
 {
-    /// Rigid body.
     RigidBody* rigidBody_ @ rigidBody;
-    /// Parent rigid body.
     RigidBody* parentRigidBody_ @ parentRigidBody;
-    /// New world position.
     Vector3 worldPosition_ @ worldPosition;
-    /// New world rotation.
     Quaternion worldRotation_ @ worldRotation;
 };
 
-
-/// Physics simulation world component. Should be added only to the root scene node.
 class PhysicsWorld : public Component
 {
-public:
-    /// Step the simulation forward.
     void Update(float timeStep);
-    /// Refresh collisions only without updating dynamics.
     void UpdateCollisions();
-    /// Set simulation steps per second.
     void SetFps(int fps);
-    /// Set gravity.
     void SetGravity(Vector3 gravity);
-    /// Set number of constraint solver iterations.
     void SetNumIterations(int num);
-    /// Set whether to interpolate between simulation steps.
     void SetInterpolation(bool enable);
-    /// Set whether to use Bullet's internal edge utility for trimesh collisions. Disabled by default.
     void SetInternalEdge(bool enable);
-    /// Set split impulse collision mode. This is more accurate, but slower. Disabled by default.
     void SetSplitImpulse(bool enable);
-    /// Set maximum angular velocity for network replication.
     void SetMaxNetworkAngularVelocity(float velocity);
-    /// Perform a physics world raycast and return all hits.
-    /// Perform a physics world raycast and return the closest hit.
+
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    /// Perform a physics world swept sphere test and return the closest hit.
-    void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance);
     
-    /// Return gravity.
+    void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance);
+    
     Vector3 GetGravity() const;
-    /// Return number of constraint solver iterations.
     int GetNumIterations() const;
-    /// Return whether interpolation between simulation steps is enabled.
-    bool GetInterpolation() const { return interpolation_; }
-    /// Return whether Bullet's internal edge utility for trimesh collisions is enabled.
-    bool GetInternalEdge() const { return internalEdge_; }
-    /// Return whether split impulse collision mode is enabled.
+    bool GetInterpolation() const;
+    bool GetInternalEdge() const;
     bool GetSplitImpulse() const;
-    /// Return simulation steps per second.
-    int GetFps() const { return fps_; }
-    /// Return maximum angular velocity for network replication.
-    float GetMaxNetworkAngularVelocity() const { return maxNetworkAngularVelocity_; }
+    int GetFps() const;
+    float GetMaxNetworkAngularVelocity() const;
 
-    /// Add a rigid body to keep track of. Called by RigidBody.
     void AddRigidBody(RigidBody* body);
-    /// Remove a rigid body. Called by RigidBody.
     void RemoveRigidBody(RigidBody* body);
-    /// Add a collision shape to keep track of. Called by CollisionShape.
     void AddCollisionShape(CollisionShape* shape);
-    /// Remove a collision shape. Called by CollisionShape.
     void RemoveCollisionShape(CollisionShape* shape);
-    /// Add a constraint to keep track of. Called by Constraint.
     void AddConstraint(Constraint* joint);
-    /// Remove a constraint. Called by Constraint.
     void RemoveConstraint(Constraint* joint);
-    /// Add a delayed world transform assignment. Called by RigidBody.
     void AddDelayedWorldTransform(const DelayedWorldTransform& transform);
-    /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
-    /// Set debug renderer to use. Called both by PhysicsWorld itself and physics components.
     void SetDebugRenderer(DebugRenderer* debug);
-    /// Set debug geometry depth test mode. Called both by PhysicsWorld itself and physics components.
     void SetDebugDepthTest(bool enable);
-
-    /// Clean up the geometry cache.
+    
     void CleanupGeometryCache();
-    /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable);
-    /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const;
     
     // Properties:
     tolua_property__get_set Vector3 gravity;
     tolua_property__get_set int numIterations;
-    tolua_property__get_set int fps;
     tolua_property__get_set bool interpolation;
     tolua_property__get_set bool internalEdge;
     tolua_property__get_set bool splitImpulse;
+    tolua_property__get_set int fps;
+    tolua_property__get_set float maxNetworkAngularVelocity;
+    tolua_property__is_set bool applyingTransforms;
 };

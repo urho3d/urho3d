@@ -114,9 +114,9 @@ public:
     tolua_property__get_set float edgeMaxError;
     tolua_property__get_set float detailSampleDistance;
     tolua_property__get_set float detailSampleMaxError;
-    tolua_property__get_set const Vector3& padding;
+    tolua_property__get_set Vector3& padding;
     tolua_readonly tolua_property__is_set bool initialized;
-    tolua_readonly tolua_property__get_set const BoundingBox& boundingBox;
+    tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
     tolua_readonly tolua_property__get_set BoundingBox worldBoundingBox;
     tolua_readonly tolua_property__get_set IntVector2 numTiles;
 };

@@ -57,8 +57,6 @@ static const unsigned DD_SOURCE_AND_TARGET;
 
 class UIElement : public Serializable
 {
-public:
-    // Methods:
     UIElement(Context* context);
     virtual ~UIElement();
 
@@ -239,16 +237,15 @@ public:
     bool IsElementEventSender() const;
     UIElement* GetElementEventSender() const;
     
-    // Properties:
-    tolua_property__get_set const String& style;
-    tolua_property__get_set const String& name;
-    tolua_property__get_set const IntVector2& position;
-    tolua_property__get_set const IntVector2 size;
+    tolua_property__get_set String& style;
+    tolua_property__get_set String& name;
+    tolua_property__get_set IntVector2& position;
+    tolua_property__get_set IntVector2 size;
     tolua_property__get_set int width;
-    tolua_property__get_set const int height;
-    tolua_property__get_set const IntVector2 minSize;
-    tolua_property__get_set const int minWidth;
-    tolua_property__get_set const int minHeight;
+    tolua_property__get_set int height;
+    tolua_property__get_set IntVector2 minSize;
+    tolua_property__get_set int minWidth;
+    tolua_property__get_set int minHeight;
     tolua_property__get_set IntVector2 maxSize;
     tolua_property__get_set int maxWidth;
     tolua_property__get_set int maxHeight;
@@ -280,18 +277,18 @@ public:
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_property__get_set LayoutMode layoutMode;
     tolua_property__get_set int layoutSpacing;
-    tolua_property__get_set const IntRect& layoutBorder;
+    tolua_property__get_set IntRect& layoutBorder;
     
     tolua_property__get_set int indent;
     tolua_property__get_set int indentSpacing;
     tolua_readonly tolua_property__get_set int indentWidth;
-    tolua_property__get_set const IntVector2& childOffset;
+    tolua_property__get_set IntVector2& childOffset;
     tolua_property__is_set bool elementEventSender;
     tolua_readonly tolua_property__get_set unsigned numChildren;
     tolua_property__get_set UIElement* parent;
     tolua_readonly tolua_property__get_set UIElement* root;
-    tolua_readonly tolua_property__get_set const IntVector2& screenPosition;
-    tolua_readonly tolua_property__get_set const IntRect& combinedScreenRect;
+    tolua_readonly tolua_property__get_set IntVector2& screenPosition;
+    tolua_readonly tolua_property__get_set IntRect combinedScreenRect;
     tolua_readonly tolua_property__get_set float derivedOpacity;
 };
 

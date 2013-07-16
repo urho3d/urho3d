@@ -1,45 +1,30 @@
 $#include "Graphics.h"
 
-/// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class Graphics : public Object
-{    
-public:    
-    /// Set window title.
+{
     void SetWindowTitle(const char* windowTitle);
-    
-    /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
-    
-    /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
-    
-    /// Take a screenshot. Return true if successful.
     bool TakeScreenShot(Image& destImage);
     
-    /// Return whether rendering initialized.
     bool IsInitialized() const;
     
-    /// Return window width.
     int GetWidth() const;
-    
-    /// Return window height.
     int GetHeight() const;
-    
-    /// Return multisample mode (1 = no multisampling.)
     int GetMultiSample() const;
-    
-    /// Return whether window is fullscreen.
     bool GetFullscreen() const;
-    
-    /// Return whether window is resizable.
     bool GetResizable() const;
-    
-    /// Return whether vertical sync is on.
     bool GetVSync() const;
-    
-    /// Return whether triple buffering is enabled.
     bool GetTripleBuffer() const;
-    
-    /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const;
+    
+    tolua_readonly tolua_property__is_set bool initialized;
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set int multiSample;
+    tolua_readonly tolua_property__get_set bool fullscreen;
+    tolua_readonly tolua_property__get_set bool resizable;
+    tolua_readonly tolua_property__get_set bool vSync;
+    tolua_readonly tolua_property__get_set bool tripleBuffer;
+    tolua_property__get_set bool sRGB;
 };

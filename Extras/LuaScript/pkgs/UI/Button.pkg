@@ -21,8 +21,8 @@ public:
     float GetRepeatRate() const;
     
     // Properties:
-    tolua_property__get_set const IntVector2& pressedOffset;
-    tolua_property__get_set const IntVector2& labelOffset;
-    tolua_property__get_set const float repeatDelay;
-    tolua_property__get_set const float repeatRate;
+    tolua_property__get_set IntVector2& pressedOffset;
+    tolua_property__get_set IntVector2& labelOffset;
+    tolua_property__get_set float repeatDelay;
+    tolua_property__get_set float repeatRate;
 };

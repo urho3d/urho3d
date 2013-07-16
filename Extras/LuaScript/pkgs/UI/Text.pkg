@@ -41,14 +41,14 @@ public:
     // Properties:
     tolua_property__get_set Font* font;
     tolua_readonly tolua_property__get_set int fontSize;
-    tolua_property__get_set const String& text;
+    tolua_property__get_set String& text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set float rowSpacing;
     tolua_property__get_set bool wordwrap;
     tolua_readonly tolua_property__get_set unsigned selectionStart;
     tolua_readonly tolua_property__get_set unsigned selectionLength;
-    tolua_property__get_set const Color& selectionColor;
-    tolua_property__get_set const Color& hoverColor;
+    tolua_property__get_set Color& selectionColor;
+    tolua_property__get_set Color& hoverColor;
     tolua_readonly tolua_property__get_set int rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
 };

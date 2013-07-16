@@ -31,6 +31,6 @@ public:
     tolua_readonly tolua_property__get_set UIElement* selectedItem;
     tolua_readonly tolua_property__get_set ListView* listView;
     tolua_readonly tolua_property__get_set UIElement* placeholder;
-    tolua_property__get_set const String& placeholderText;
+    tolua_property__get_set String& placeholderText;
     tolua_property__get_set bool resizePopup;
 };

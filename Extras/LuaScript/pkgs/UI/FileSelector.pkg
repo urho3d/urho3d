@@ -51,10 +51,10 @@ public:
     tolua_readonly tolua_property__get_set Button* cancelButton;
     tolua_readonly tolua_property__get_set Button* closeButton;
     
-    tolua_property__get_set const String& title;
-    tolua_property__get_set const String& path;
-    tolua_property__get_set const String& fileName;
-    tolua_readonly tolua_property__get_set const String& filter;
+    tolua_property__get_set String& title;
+    tolua_property__get_set String& path;
+    tolua_property__get_set String& fileName;
+    tolua_readonly tolua_property__get_set String& filter;
     tolua_readonly tolua_property__get_set unsigned filterIndex;
     tolua_property__get_set bool directoryMode;
 };

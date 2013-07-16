@@ -27,7 +27,7 @@ public:
     void SetViewPositionAttr(const IntVector2& value);
     
     // Properties:
-    tolua_property__get_set const IntVector2& viewPosition;
+    tolua_property__get_set IntVector2& viewPosition;
     tolua_property__get_set UIElement* contentElement;
     tolua_readonly tolua_property__get_set ScrollBar* horizontalScrollBar;
     tolua_readonly tolua_property__get_set ScrollBar* verticalScrollBar;

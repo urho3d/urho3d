@@ -1,70 +1,29 @@
 $#include "Engine.h"
 
-/// Urho3D engine. Creates the other subsystems.
 class Engine : public Object
 {
-public:
-    /// Run one frame.
     void RunFrame();
-    
-    /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
     Console* CreateConsole();
-    
-    /// Create the debug hud.
     DebugHud* CreateDebugHud();
-    
-    /// Set minimum frames per second. If FPS goes lower than this, time will appear to slow down.
     void SetMinFps(int fps);
-    
-    /// Set maximum frames per second. The engine will sleep if FPS is higher than this.
     void SetMaxFps(int fps);
-    
-    /// Set maximum frames per second when the application does not have input focus.
     void SetMaxInactiveFps(int fps);
-    
-    /// Set whether to pause update events and audio when minimized.
     void SetPauseMinimized(bool enable);
-    
-    /// Set whether to exit automatically on exit request (window close button.)
     void SetAutoExit(bool enable);
-
-    /// Close the application window and set the exit flag.
     void Exit();
-    
-    /// Dump profiling information to the log.
     void DumpProfiler();
-    
-    /// Dump information of all resources to the log.
     void DumpResources();
-    
-    /// Dump information of all memory allocations to the log. Supported in MSVC debug mode only.
     void DumpMemory();
-    
-    /// Return the minimum frames per second.
-    int GetMinFps() const;
-    
-    /// Return the maximum frames per second.
-    int GetMaxFps() const;
-    
-    /// Return the maximum frames per second when the application does not have input focus.
-    int GetMaxInactiveFps() const;
-    
-    /// Return whether to pause update events and audio when minimized.
-    bool GetPauseMinimized() const;
-    
-    /// Return whether to exit automatically on exit request.
-    bool GetAutoExit() const;
 
-    /// Return whether engine has been initialized.
+    int GetMinFps() const;
+    int GetMaxFps() const;
+    int GetMaxInactiveFps() const;
+    bool GetPauseMinimized() const;
+    bool GetAutoExit() const;
     bool IsInitialized() const;
-    
-    /// Return whether exit has been requested.
     bool IsExiting() const;
-    
-    /// Return whether the engine has been created in headless mode.
     bool IsHeadless() const;
     
-    // Properties:
     tolua_property__get_set int minFps;
     tolua_property__get_set int maxFps;
     tolua_property__get_set int maxInactiveFps;

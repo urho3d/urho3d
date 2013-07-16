@@ -15,8 +15,6 @@ enum CursorShape
 
 class Cursor : public BorderImage
 {
-public:
-    // Methods:
     Cursor(Context* context);
     virtual ~Cursor();
     
@@ -26,6 +24,5 @@ public:
     void SetShape(CursorShape shape);
     CursorShape GetShape() const;
     
-    // Properties:
     tolua_property__get_set CursorShape shape;
 };

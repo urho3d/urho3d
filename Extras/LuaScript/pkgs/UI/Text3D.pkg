@@ -47,7 +47,7 @@ public:
     tolua_property__get_set Font* font;
     tolua_property__get_set Material* material;
     tolua_readonly tolua_property__get_set int fontSize;
-    tolua_property__get_set const String& text;
+    tolua_property__get_set String& text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set HorizontalAlignment horizontalAlignment;
     tolua_property__get_set VerticalAlignment verticalAlignment;

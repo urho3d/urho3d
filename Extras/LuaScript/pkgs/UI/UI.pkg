@@ -2,8 +2,6 @@ $#include "UI.h"
 
 class UI : public Object
 {
-public:
-    // Methods:
     void SetCursor(Cursor* cursor);
     void SetFocusElement(UIElement* element);
     bool SetModalElement(UIElement* modalElement, bool enable);
@@ -18,30 +16,27 @@ public:
     
     UIElement* GetRoot() const;
     UIElement* GetRootModalElement() const;
-    
     Cursor* GetCursor() const;
     
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
     UIElement* GetElementAt(const IntVector2& position);
-    
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     UIElement* GetElementAt(int x, int y);
     
     UIElement* GetFocusElement() const;
     UIElement* GetFrontElement() const;
-    
     IntVector2 GetCursorPosition() const;
     const String& GetClipBoardText() const;
     bool IsNonFocusedMouseWheel() const;
     bool HasModalElement() const;
     
-    // Properties:
     tolua_readonly tolua_property__get_set UIElement* root;
     tolua_readonly tolua_property__get_set UIElement* rootModalElement;
-    tolua_readonly tolua_property__get_set Cursor* cursor;
+    tolua_property__get_set Cursor* cursor;
     tolua_readonly tolua_property__get_set UIElement* focusElement;
     tolua_readonly tolua_property__get_set UIElement* frontElement;
-    tolua_property__get_set const String& clipBoardText;
+    tolua_readonly tolua_property__get_set IntVector2 cursorPosition;
+    tolua_property__get_set String& clipBoardText;
     tolua_readonly tolua_property__is_set bool nonFocusedMouseWheel;
     tolua_readonly tolua_property__has_set bool modalElement;
 };

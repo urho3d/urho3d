@@ -21,7 +21,7 @@ public:
     
     // Properties:
     tolua_property__get_set UIElement* popup;
-    tolua_property__get_set const IntVector2& popupOffset;
+    tolua_property__get_set IntVector2& popupOffset;
     tolua_property__get_set bool showPopup;
     tolua_readonly tolua_property__get_set int acceleratorKey;
     tolua_readonly tolua_property__get_set int acceleratorQualifiers;
