@@ -1,102 +1,73 @@
 $#include "Connection.h"
 
-/// Queued remote event.
 struct RemoteEvent
 {
-    /// Remote sender node ID (0 if not a remote node event.)
     unsigned senderID_ @ senderID;
-    /// Event type.
     StringHash eventType_ @ eventType;
-    /// Event data.
     VariantMap eventData_ @ eventData;
-    /// In order flag.
     bool inOrder_ @ inOrder;
 };
 
-/// %Connection to a remote network host.
 class Connection : public Object
 {
-public:
-    /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
-    /// Send a message.
-    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
-    /// Send a remote event.
-    // void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    tolua_outside void ConnectionSendRemoteEvent @ SendRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg);
     
-    /// Send a remote event with the specified node as sender.
+    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
+    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
+
+    void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void SendRemoteEvent(StringHash eventType, bool inOrder);
+    void SendRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void SendRemoteEvent(const char* eventType, bool inOrder);
+    
     void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    tolua_outside void ConnectSendRemoteEvent @ SendRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    /// Assign scene. On the server, this will cause the client to load it.
+    void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder);
+    void SendRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void SendRemoteEvent(Node* node, const char* eventType, bool inOrder);
+    
     void SetScene(Scene* newScene);
-    /// Assign identity. Called by Network.
     void SetIdentity(const VariantMap& identity);
-    /// Set new controls.
     void SetControls(const Controls& newControls);
-    /// Set the observer position for interest management.
     void SetPosition(const Vector3& position);
-    /// Set the connection pending status. Called by Network.
     void SetConnectPending(bool connectPending);
-    /// Set whether to log data in/out statistics.
     void SetLogStatistics(bool enable);
-    /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
-    /// Send scene update messages. Called by Network.
     void SendServerUpdate();
-    /// Send latest controls from the client. Called by Network.
     void SendClientUpdate();
-    /// Send queued remote events. Called by Network.
     void SendRemoteEvents();
-    /// Send package files to client. Called by network.
     void SendPackages();
-    /// Process pending latest data for nodes and components.
     void ProcessPendingLatestData();
-    /// Process a message from the server or client. Called by Network.
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
     
-    /// Return client identity.
-    const VariantMap& GetIdentity() const { return identity_; }
-    /// Return the scene used by this connection.
+    const VariantMap& GetIdentity() const;
     Scene* GetScene() const;
-    /// Return the client controls of this connection.
-    const Controls& GetControls() const { return controls_; }
-    /// Return the observer position for interest management.
-    const Vector3& GetPosition() const { return position_; }
-    /// Return whether is a client connection.
-    bool IsClient() const { return isClient_; }
-    /// Return whether is fully connected.
+    const Controls& GetControls() const;
+    const Vector3& GetPosition() const;
+    bool IsClient() const;
     bool IsConnected() const;
-    /// Return whether connection is pending.
-    bool IsConnectPending() const { return connectPending_; }
-    /// Return whether the scene is loaded and ready to receive server updates.
-    bool IsSceneLoaded() const { return sceneLoaded_; }
-    /// Return whether to log data in/out statistics.
-    bool GetLogStatistics() const { return logStatistics_; }
-    /// Return remote address.
+    bool IsConnectPending() const;
+    bool IsSceneLoaded() const;
+    bool GetLogStatistics() const;
     String GetAddress() const;
-    /// Return remote port.
     unsigned short GetPort() const;
-    /// Return an address:port string.
     String ToString() const;
-    /// Return number of package downloads remaining.
     unsigned GetNumDownloads() const;
-    /// Return name of current package download, or empty if no downloads.
     const String& GetDownloadName() const;
-    /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
+    
+    tolua_property__get_set VariantMap& identity;
+    tolua_property__get_set Scene* scene;
+    tolua_property__get_set Controls& controls;
+    tolua_property__get_set Vector3& position;
+    tolua_readonly tolua_property__is_set bool client;
+    tolua_readonly tolua_property__is_set bool connected;
+    tolua_property__is_set bool connectPending;
+    tolua_readonly tolua_property__is_set bool sceneLoaded;
+    tolua_property__get_set bool logStatistics;
+    tolua_readonly tolua_property__get_set String address;
+    tolua_readonly tolua_property__get_set unsigned short port;
+    tolua_readonly tolua_property__get_set unsigned numDownloads;
+    tolua_readonly tolua_property__get_set String& downloadName;
+    tolua_readonly tolua_property__get_set float downloadProgress;
 };
-
-${
-
-static void ConnectionSendRemoteEvent(Connection* connection, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
-{
-	connection->SendRemoteEvent(StringHash(eventType), inOrder, eventData);
-}
-
-static void ConnectSendRemoteEvent(Connection* connection, Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
-{
-	connection->SendRemoteEvent(node, StringHash(eventType), inOrder, eventData);
-}
-
-$}
