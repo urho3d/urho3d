@@ -2,19 +2,19 @@ $#include "Text3D.h"
 
 class Text3D : public Drawable
 {
-public:
-    // Methods:
     Text3D(Context* context);
     ~Text3D();
     
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    bool SetFont(const String& fontName);
-    
+    bool SetFont(const char* fontName, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font);
     
     void SetMaterial(Material* material);
+    
     void SetText(const String& text);
+    void SetText(const char* text);
+    
     void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
     void SetHorizontalAlignment(HorizontalAlignment align);
     void SetVerticalAlignment(VerticalAlignment align);
@@ -43,7 +43,12 @@ public:
     float GetOpacity() const;
     bool GetFaceCamera() const;
     
-    // Properties:
+    void SetFontAttr(ResourceRef value);
+    ResourceRef GetFontAttr() const;
+    void SetMaterialAttr(ResourceRef value);
+    ResourceRef GetMaterialAttr() const;
+    const Color& GetColorAttr() const;
+    
     tolua_property__get_set Font* font;
     tolua_property__get_set Material* material;
     tolua_readonly tolua_property__get_set int fontSize;
@@ -58,4 +63,9 @@ public:
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_property__get_set float opacity;
     tolua_property__get_set bool faceCamera;
+    tolua_property__get_set ResourceRef fontAttr;
+    tolua_property__get_set ResourceRef materialAttr;
+    tolua_readonly tolua_property__get_set Color& colorAttr;
 };
+
+$#define SetColorAttr SetColor

@@ -1,13 +1,13 @@
 $#include "Resource.h"
 
-/// Base class for resources.
 class Resource
 {    
 public:
-    /// Return name.
-    const String& GetName() const { return name_; }
-    /// Return name hash.
-    StringHash GetNameHash() const { return nameHash_; }
-    /// Return memory use in bytes, possibly approximate.
-    unsigned GetMemoryUse() const { return memoryUse_; }
+    const String& GetName() const;
+    StringHash GetNameHash() const;
+    unsigned GetMemoryUse() const;
+    
+    tolua_readonly tolua_property__get_set String& name;
+    tolua_readonly tolua_property__get_set StringHash nameHash;
+    tolua_readonly tolua_property__get_set unsigned memoryUse;
 };

@@ -3,34 +3,24 @@ $#include "Network.h"
 class Network
 {
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
-    bool Connect(const String& address, unsigned short port, Scene* scene);
     bool Connect(const char* address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
-    bool Connect(const char* address, unsigned short port, Scene* scene);
     
     void Disconnect(int waitMSec = 0);
-    void Disconnect();
     bool StartServer(unsigned short port);
     void StopServer();
     
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
-    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg);
-    
+
     // void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
     
     void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    void BroadcastRemoteEvent(StringHash eventType, bool inOrder);
     void BroadcastRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    void BroadcastRemoteEvent(const char* eventType, bool inOrder);
     
     void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder);
     void BroadcastRemoteEvent(Scene* scene, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    void BroadcastRemoteEvent(Scene* scene, const char* eventType, bool inOrder);
     
     void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder);
     void BroadcastRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    void BroadcastRemoteEvent(Node* node, const char* eventType, bool inOrder);
     
     void SetUpdateFps(int fps);
     

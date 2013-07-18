@@ -2,8 +2,6 @@ $#include "CheckBox.h"
 
 class CheckBox : public BorderImage
 {
-public:
-    // Methods:
     CheckBox(Context* context);
     virtual ~CheckBox();
     
@@ -14,7 +12,6 @@ public:
     bool IsChecked() const;
     const IntVector2& GetCheckedOffset() const;
     
-    // Properties:
     tolua_property__is_set bool checked;
     tolua_property__get_set IntVector2& checkedOffset;
 };

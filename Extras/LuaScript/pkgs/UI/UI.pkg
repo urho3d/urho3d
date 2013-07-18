@@ -11,7 +11,10 @@ class UI : public Object
     void Render();
     void DebugDraw(UIElement* element);
     bool SaveLayout(Serializer& dest, UIElement* element);
+    
     void SetClipBoardText(const String& text);
+    void SetClipBoardText(const char* text);
+    
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
     
     UIElement* GetRoot() const;
@@ -19,9 +22,7 @@ class UI : public Object
     Cursor* GetCursor() const;
     
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
-    UIElement* GetElementAt(const IntVector2& position);
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
-    UIElement* GetElementAt(int x, int y);
     
     UIElement* GetFocusElement() const;
     UIElement* GetFrontElement() const;

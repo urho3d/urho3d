@@ -2,8 +2,6 @@ $#include "Slider.h"
 
 class Slider : public BorderImage
 {
-public:
-    // Methods:
     Slider(Context* context);
     virtual ~Slider();
     
@@ -19,7 +17,6 @@ public:
     BorderImage* GetKnob() const;
     float GetRepeatRate() const;
     
-    // Properties:
     tolua_property__get_set Orientation orientation;
     tolua_property__get_set float range;
     tolua_property__get_set float value;

@@ -16,41 +16,13 @@ enum ShapeType
 class CollisionShape : public Component
 {
     void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO);
-    void SetBox(const Vector3& size);
-    
     void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetSphere(float diameter, const Vector3& position = Vector3::ZERO);
-    void SetSphere(float diameter);
-    
     void SetStaticPlane(const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetStaticPlane(const Vector3& position = Vector3::ZERO);
-    void SetStaticPlane();
-    
     void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO);
-    void SetCylinder(float diameter, float height);
-    
     void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO);
-    void SetCapsule(float diameter, float height);
-    
     void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO);
-    void SetCone(float diameter, float height);
-    
     void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO);
-    void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE);
-    void SetTriangleMesh(Model* model, unsigned lodLevel = 0);
-    void SetTriangleMesh(Model* model);
-    
     void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
-    void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO);
-    void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE);
-    void SetConvexHull(Model* model, unsigned lodLevel = 0);
-    void SetConvexHull(Model* model);
-    
     void SetTerrain();
     void SetShapeType(ShapeType type);
     void SetSize(const Vector3& size);
@@ -72,14 +44,12 @@ class CollisionShape : public Component
     BoundingBox GetWorldBoundingBox() const;
     
     void NotifyRigidBody(bool updateMass = true);
-    void NotifyRigidBody();
     
     void SetModelAttr(ResourceRef value);
     ResourceRef GetModelAttr() const;
     
     void ReleaseShape();
     
-    // Properties:
     tolua_readonly tolua_property__get_set PhysicsWorld* physicsWorld;
     tolua_property__get_set ShapeType shapeType;
     tolua_property__get_set Vector3& size;

@@ -2,8 +2,6 @@ $#include "ScrollBar.h"
 
 class ScrollBar : public UIElement
 {
-public:
-    // Methods:
     ScrollBar(Context* context);
     virtual ~ScrollBar();
     
@@ -26,7 +24,6 @@ public:
     Button* GetForwardButton() const;
     Slider* GetSlider() const;
     
-    // Properties:
     tolua_property__get_set Orientation orientation;
     tolua_property__get_set float range;
     tolua_property__get_set float value;

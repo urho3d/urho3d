@@ -2,8 +2,6 @@ $#include "DropDownList.h"
 
 class DropDownList : public Menu
 {
-public:
-    // Methods:
     DropDownList(Context* context);
     ~DropDownList();
     
@@ -13,7 +11,10 @@ public:
     void RemoveItem(unsigned index);
     void RemoveAllItems();
     void SetSelection(unsigned index);
+    
     void SetPlaceholderText(const String& text);
+    void SetPlaceholderText(const const char* text);
+    
     void SetResizePopup(bool enable);
    
     unsigned GetNumItems() const;
@@ -25,7 +26,8 @@ public:
     const String& GetPlaceholderText() const;
     bool GetResizePopup() const;
     
-    // Properties:
+    void SetSelectionAttr(unsigned index);
+    
     tolua_readonly tolua_property__get_set unsigned numItems;
     tolua_property__get_set unsigned selection;
     tolua_readonly tolua_property__get_set UIElement* selectedItem;

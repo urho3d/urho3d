@@ -10,21 +10,29 @@ $#include "Texture2D.h"
 $#include "TextureCube.h"
 $#include "XMLFile.h"
 
-/// %Resource cache subsystem. Loads resources on demand and stores them for later access.
 class ResourceCache
 {    
-public:
-    /// Release all resources.
     void ReleaseAllResources(bool force = false);
-    /// Reload a resource. Return false and release it if fails.
     bool ReloadResource(Resource* resource);
-    /// Set memory budget for a specific resource type, default 0 is unlimited.
+    
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
-    /// Enable or disable automatic reloading of resources as files are modified.
+    void SetMemoryBudget(const char* type, unsigned budget);
+    
     void SetAutoReloadResources(bool enable);
     
-    /// Template version of returning a resource by name.
-    // template <class T> T* GetResource(const char* name);    
+    // template <class T> T* GetResource(const String& name);
+    Animation* GetResource<Animation> @ GetAnimation(const String& name);
+    Font* GetResource<Font> @ GetFont(const String& name);
+    Image* GetResource<Image> @ GetImage(const String& name);
+    Material* GetResource<Material> @ GetMaterial(const String& name);
+    Model* GetResource<Model> @ GetModel(const String& name);
+    Sound* GetResource<Sound> @ GetSound(const String& name);
+    Technique* GetResource<Technique> @ GetTechnique(const String& name);
+    Texture2D* GetResource<Texture2D> @ GetTexture2D(const String& name);
+    TextureCube* GetResource<TextureCube> @ GetTextureCube(const String& name);
+    XMLFile* GetResource<XMLFile> @ GetXMLFile(const String& name);
+    
+    // template <class T> T* GetResource(const char* name);
     Animation* GetResource<Animation> @ GetAnimation(const char* name);
     Font* GetResource<Font> @ GetFont(const char* name);
     Image* GetResource<Image> @ GetImage(const char* name);
@@ -36,20 +44,16 @@ public:
     TextureCube* GetResource<TextureCube> @ GetTextureCube(const char* name);
     XMLFile* GetResource<XMLFile> @ GetXMLFile(const char* name);
     
-    /// Return whether a file exists by name.
     bool Exists(const String& name) const;
-    /// Return whether a file exists by name hash.
     bool Exists(StringHash nameHash) const;
-    /// Return memory budget for a resource type.
     unsigned GetMemoryBudget(ShortStringHash type) const;
-    /// Return total memory use for a resource type.
     unsigned GetMemoryUse(ShortStringHash type) const;
-    /// Return total memory use for all resources.
     unsigned GetTotalMemoryUse() const;
-    /// Return resource name from hash, or empty if not found.
     const String& GetResourceName(StringHash nameHash) const;
-    /// Return full absolute file name of resource if possible.
     String GetResourceFileName(const String& name) const;
-    /// Return whether automatic resource reloading is enabled.
+    
     bool GetAutoReloadResources() const;
+    
+    tolua_readonly tolua_property__get_set unsigned totalMemoryUse;
+    tolua_readonly tolua_property__get_set bool autoReloadResources;
 };

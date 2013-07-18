@@ -9,18 +9,13 @@ enum HighlightMode
 
 class ListView : public ScrollView
 {
-public:
-    // Methods:
     ListView(Context* context);
     virtual ~ListView();
     
     void AddItem(UIElement* item);
     
     void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0);
-    void InsertItem(unsigned index, UIElement* item);
-    
     void RemoveItem(UIElement* item, unsigned index = 0);
-    void RemoveItem(UIElement* item);
     
     void RemoveItem(unsigned index);
     void RemoveAllItems();
@@ -30,8 +25,6 @@ public:
     void ToggleSelection(unsigned index);
     
     void ChangeSelection(int delta, bool additive = false);
-    void ChangeSelection(int delta);
-    
     void ClearSelection();
     void SetHighlightMode(HighlightMode mode);
     void SetMultiselect(bool enable);
@@ -41,10 +34,7 @@ public:
     void SetDoubleClickInterval(float interval);
 
     void Expand(unsigned index, bool enable, bool recursive = false);
-    void Expand(unsigned index, bool enable);
-    
     void ToggleExpand(unsigned index, bool recursive = false);
-    void ToggleExpand(unsigned index);
     
     unsigned GetNumItems() const;
     UIElement* GetItem(unsigned index) const;
@@ -60,7 +50,6 @@ public:
     int GetBaseIndent() const;
     float GetDoubleClickInterval() const;
     
-    // Properties:
     tolua_readonly tolua_property__get_set unsigned numItems;
     tolua_property__get_set unsigned selection;
     tolua_readonly tolua_property__get_set UIElement* selectedItem;

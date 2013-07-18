@@ -62,46 +62,41 @@ class UIElement : public Serializable
 
     virtual const IntVector2& GetScreenPosition() const;
 
+    bool LoadXML(Deserializer& source);
+    bool SaveXML(Serializer& dest) const;
+    bool FilterAttributes(XMLElement& dest) const;
+
     void SetName(const String& name);
+    void SetName(const char* name);
     
     void SetPosition(const IntVector2& position);
     void SetPosition(int x, int y);
-    
     void SetSize(const IntVector2& size);
     void SetSize(int width, int height);
     void SetWidth(int width);
     void SetHeight(int height);
-    
     void SetMinSize(const IntVector2& minSize);
     void SetMinSize(int width, int height);
     void SetMinWidth(int width);
     void SetMinHeight(int height);
-    
     void SetMaxSize(const IntVector2& maxSize);
     void SetMaxSize(int width, int height);
     void SetMaxWidth(int width);
     void SetMaxHeight(int height);
-    
     void SetFixedSize(const IntVector2& size);
     void SetFixedSize(int width, int height);
     void SetFixedWidth(int width);
     void SetFixedHeight(int height);
-    
     void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
     void SetHorizontalAlignment(HorizontalAlignment align);
     void SetVerticalAlignment(VerticalAlignment align);
-    
     void SetClipBorder(const IntRect& rect);
-    
     void SetColor(const Color& color);
     void SetColor(Corner corner, const Color& color);
-    
     void SetPriority(int priority);
     void SetOpacity(float opacity);
-    
     void SetBringToFront(bool enable);
     void SetBringToBack(bool enable);
-    
     void SetClipChildren(bool enable);
     void SetSortChildren(bool enable);
     void SetUseDerivedOpacity(bool enable);
@@ -113,16 +108,13 @@ class UIElement : public Serializable
     void SetDragDropMode(unsigned mode);
 
     bool SetStyle(const String& styleName, XMLFile* file = 0);
-    bool SetStyle(const String& styleName);
+    bool SetStyle(const char* styleName, XMLFile* file = 0);
     
     bool SetStyle(const XMLElement& element);
     bool SetStyleAuto(XMLFile* file = 0);
-    bool SetStyleAuto();
     void SetDefaultStyle(XMLFile* style);
     
     void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);
-    void SetLayout(LayoutMode mode, int spacing = 0);
-    void SetLayout(LayoutMode mode);
     
     void SetLayoutMode(LayoutMode mode);
     void SetLayoutSpacing(int spacing);
@@ -135,24 +127,22 @@ class UIElement : public Serializable
     void BringToFront();
     
     UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
-    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY);
-    UIElement* CreateChild(ShortStringHash type);
+    UIElement* CreateChild(const char* type, const char* name = 0, unsigned index = M_MAX_UNSIGNED);
     
     void AddChild(UIElement* element);
     void InsertChild(unsigned index, UIElement* element);
     void RemoveChild(UIElement* element, unsigned index = 0);
-    void RemoveChild(UIElement* element);
     void RemoveChildAtIndex @ RemoveChild(unsigned index);
     void RemoveAllChildren();
     void Remove();
     unsigned FindChild(UIElement* element) const;
     void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
-    void SetParent(UIElement* parent);
-    
     void SetInternal(bool enable);
     void SetTraversalMode(TraversalMode traversalMode);
     void SetElementEventSender(bool flag);
-    
+
+    // template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+
     const String& GetName() const;
     const IntVector2& GetPosition() const;
     const IntVector2& GetSize() const;
@@ -164,11 +154,9 @@ class UIElement : public Serializable
     const IntVector2& GetMaxSize() const;
     int GetMaxWidth() const;
     int GetMaxHeight() const;
-    
     bool IsFixedSize() const;
     bool IsFixedWidth() const;
     bool IsFixedHeight() const;
-    
     const IntVector2& GetChildOffset() const;
     HorizontalAlignment GetHorizontalAlignment() const;
     VerticalAlignment GetVerticalAlignment() const;
@@ -192,52 +180,41 @@ class UIElement : public Serializable
     FocusMode GetFocusMode() const;
     unsigned GetDragDropMode() const;
     const String& GetAppliedStyle() const;
-    
     XMLFile* GetDefaultStyle(bool recursiveUp = true) const;
-    XMLFile* GetDefaultStyle() const;
-    
     LayoutMode GetLayoutMode() const;
     int GetLayoutSpacing() const;
     const IntRect& GetLayoutBorder() const;
-    
     unsigned GetNumChildren(bool recursive = false) const;
-    unsigned GetNumChildren() const;
-    
     UIElement* GetChild(unsigned index) const;
     
     UIElement* GetChild(const String& name, bool recursive = false) const;
-    UIElement* GetChild(const String& name) const;
     tolua_outside UIElement* UIElementGetChild @ GetChild(const char* name, bool recursive = false) const;
-    tolua_outside UIElement* UIElementGetChild @ GetChild(const char* name) const;
     
     UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
-    UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY) const;
-    UIElement* GetChild(const ShortStringHash& key) const;
+    tolua_outside UIElement* UIElementGetChild2 @ GetChild(const char* key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
     
     UIElement* GetParent() const;
     UIElement* GetRoot() const;
     const Color& GetDerivedColor() const;
-    
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
     IntVector2 ElementToScreen(const IntVector2& position);
-    
     bool IsInside(IntVector2 position, bool isScreen);
     bool IsInsideCombined(IntVector2 position, bool isScreen);
-    
+
     IntRect GetCombinedScreenRect();
     void SortChildren();
     int GetLayoutMinSize() const;
-    
     int GetIndent() const;
     int GetIndentSpacing() const;
     int GetIndentWidth() const;
     void SetChildOffset(const IntVector2& offset);
     void SetHovering(bool enable);
+    const Color& GetColorAttr() const;
     TraversalMode GetTraversalMode() const;
     bool IsElementEventSender() const;
     UIElement* GetElementEventSender() const;
     
-    tolua_property__get_set String& style;
+    tolua_readonly tolua_property__get_set IntVector2& screenPosition;
     tolua_property__get_set String& name;
     tolua_property__get_set IntVector2& position;
     tolua_property__get_set IntVector2 size;
@@ -249,23 +226,23 @@ class UIElement : public Serializable
     tolua_property__get_set IntVector2 maxSize;
     tolua_property__get_set int maxWidth;
     tolua_property__get_set int maxHeight;
-    
     tolua_readonly tolua_property__is_set bool fixedSize;
     tolua_readonly tolua_property__is_set bool fixedWidth;
     tolua_readonly tolua_property__is_set bool fixedHeight;
-    
+    tolua_property__get_set IntVector2& childOffset;
     tolua_property__get_set HorizontalAlignment horizontalAlignment;
     tolua_property__get_set VerticalAlignment verticalAlignment;
     tolua_property__get_set IntRect clipBorder;
     tolua_property__get_set int priority;
     tolua_property__get_set float opacity;
+    tolua_readonly tolua_property__get_set float derivedOpacity;
     tolua_property__get_set bool bringToFront;
     tolua_property__get_set bool bringToBack;
     tolua_property__get_set bool clipChildren;
     tolua_property__get_set bool sortChildren;
     tolua_property__get_set bool useDerivedOpacity;
-    tolua_property__is_set bool enabled;
     tolua_property__has_set bool focus;
+    tolua_property__is_set bool enabled;
     tolua_property__is_set bool selected;
     tolua_property__is_set bool visible;
     tolua_property__is_set bool hovering;
@@ -273,30 +250,35 @@ class UIElement : public Serializable
     tolua_readonly tolua_property__has_set bool colorGradient;
     tolua_property__get_set FocusMode focusMode;
     tolua_property__get_set unsigned dragDropMode;
-    tolua_property__get_set TraversalMode traversalMode;
+    tolua_property__get_set String& style;
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_property__get_set LayoutMode layoutMode;
     tolua_property__get_set int layoutSpacing;
     tolua_property__get_set IntRect& layoutBorder;
-    
-    tolua_property__get_set int indent;
-    tolua_property__get_set int indentSpacing;
-    tolua_readonly tolua_property__get_set int indentWidth;
-    tolua_property__get_set IntVector2& childOffset;
-    tolua_property__is_set bool elementEventSender;
     tolua_readonly tolua_property__get_set unsigned numChildren;
     tolua_property__get_set UIElement* parent;
     tolua_readonly tolua_property__get_set UIElement* root;
-    tolua_readonly tolua_property__get_set IntVector2& screenPosition;
+    tolua_readonly tolua_property__get_set Color& derivedColor;
     tolua_readonly tolua_property__get_set IntRect combinedScreenRect;
-    tolua_readonly tolua_property__get_set float derivedOpacity;
+    tolua_readonly tolua_property__get_set int layoutMinSize;
+    tolua_property__get_set int indent;
+    tolua_property__get_set int indentSpacing;
+    tolua_readonly tolua_property__get_set int indentWidth;
+    tolua_property__get_set Color& colorAttr;
+    tolua_property__get_set TraversalMode traversalMode;
+    tolua_property__is_set bool elementEventSender;
 };
 
 ${
 
-UIElement* UIElementGetChild(const UIElement* uiElement, const char* name, bool recursive = false)
+static UIElement* UIElementGetChild(const UIElement* element, const char* name, bool recursive = false)
 {
-    return uiElement->GetChild(String(name), recursive);
+    return element->GetChild(String(name), recursive);
+}
+
+static UIElement* UIElementGetChild2(const UIElement* element, const char* key, const Variant& value = Variant::EMPTY, bool recursive = false)
+{
+    return element->GetChild(ShortStringHash(key), value, recursive);
 }
 
 #define GetStyle GetAppliedStyle

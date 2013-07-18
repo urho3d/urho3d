@@ -4,8 +4,6 @@ enum BlendMode{};
 
 class Sprite : public UIElement
 {
-public:
-    // Methods:
     Sprite(Context* context);
     virtual ~Sprite();
     
@@ -33,7 +31,6 @@ public:
     ResourceRef GetTextureAttr() const;
     const Matrix3x4& GetTransform() const;
     
-    // Properties:
     tolua_property__get_set Vector2& position;
     tolua_property__get_set IntVector2& hotSpot;
     tolua_property__get_set Vector2& scale;

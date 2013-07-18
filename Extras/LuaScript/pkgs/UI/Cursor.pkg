@@ -19,7 +19,6 @@ class Cursor : public BorderImage
     virtual ~Cursor();
     
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
-    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     
     void SetShape(CursorShape shape);
     CursorShape GetShape() const;

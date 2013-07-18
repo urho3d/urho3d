@@ -2,12 +2,12 @@ $#include "LineEdit.h"
 
 class LineEdit : public BorderImage
 {
-public:
-    // Methods:
     LineEdit(Context* context);
     virtual ~LineEdit();
     
     void SetText(const String& text);
+    void SetText(const char* text);
+    
     void SetCursorPosition(unsigned position);
     void SetCursorBlinkRate(float rate);
     void SetMaxLength(unsigned length);
@@ -29,7 +29,6 @@ public:
     BorderImage* GetCursor() const;
     float GetDoubleClickInterval() const;
     
-    // Properties:
     tolua_property__get_set String& text;
     tolua_property__get_set unsigned cursorPosition;
     tolua_property__get_set float cursorBlinkRate;

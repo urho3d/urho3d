@@ -1,71 +1,82 @@
 $#include "XMLElement.h"
 
-/// Element in an XML file.
 class XMLElement
 {
-public:
-    /// Return whether does not refer to an element or an XPath node.
     bool IsNull() const;
-    /// Return whether refers to an element or an XPath node.
     bool NotNull() const;
-    /// Return true if refers to an element or an XPath node.
     operator bool () const;
-    /// Return element name (or attribute name if it is an attribute only XPath query result).
     String GetName() const;
-    /// Return whether has a child element.
+    
+    bool HasChild(const String& name) const;
     bool HasChild(const char* name) const;
-    /// Return whether has a child element.
-    bool HasChild(const char* name) const;
-    /// Return child element, or null if missing.
+    
+    XMLElement GetChild(const String& name = String::EMPTY) const;
     XMLElement GetChild(const char* name) const;
-    /// Return child element, or null if missing.
-    XMLElement GetChild(const char* name) const;
-    /// Return next sibling element.
+    
+    XMLElement GetNext(const String& name = String::EMPTY) const;
     XMLElement GetNext(const char* name) const;
-    /// Return next sibling element.
-    XMLElement GetNext(const char* name) const;
-    /// Return parent element.
+    
     XMLElement GetParent() const;
-    /// Return number of attributes.
+    
     unsigned GetNumAttributes() const;
-    /// Return whether has an attribute.
+    bool HasAttribute(const String& name) const;
     bool HasAttribute(const char* name) const;
-    /// Return whether has an attribute.
-    bool HasAttribute(const char* name) const;
-    /// Return bool attribute, or false if missing.
+    
     bool GetBool(const char* name) const;
-    /// Return bounding box attribute, or empty if missing.
+    
     BoundingBox GetBoundingBox() const;
-    /// Return a color attribute, or default if missing.
+    
+    Color GetColor(const String& name) const;
     Color GetColor(const char* name) const;
-    /// Return a float attribute, or zero if missing.
+    
+    float GetFloat(const String& name) const;
     float GetFloat(const char* name) const;
-    /// Return an unsigned integer attribute, or zero if missing.
+    
+    unsigned GetUInt(const String& name) const;
     unsigned GetUInt(const char* name) const;
-    /// Return an integer attribute, or zero if missing.
+    
+    int GetInt(const String& name) const;
     int GetInt(const char* name) const;
-    /// Return an IntRect attribute, or default if missing.
+    
+    IntRect GetIntRect(const String& name) const;
     IntRect GetIntRect(const char* name) const;
-    /// Return an IntVector2 attribute, or default if missing.
+    
+    IntVector2 GetIntVector2(const String& name) const;
     IntVector2 GetIntVector2(const char* name) const;
-    /// Return a Rect attribute, or default if missing.
+    
+    Rect GetRect(const String& name) const;
     Rect GetRect(const char* name) const;
-    /// Return a quaternion attribute, or default if missing.
+    
+    Quaternion GetQuaternion(const String& name) const;
     Quaternion GetQuaternion(const char* name) const;
-    /// Return a resource reference attribute, or empty if missing.
+    
+    Variant GetVariant() const;
+    Variant GetVariantValue(VariantType type) const;
+    
     ResourceRef GetResourceRef() const;
-    /// Return a resource reference list attribute, or empty if missing.
     ResourceRefList GetResourceRefList() const;
-    /// Return a Vector2 attribute, or default if missing.
+    
+    VariantMap GetVariantMap() const;
+    
+    Vector2 GetVector2(const String& name) const;
     Vector2 GetVector2(const char* name) const;
-    /// Return a Vector3 attribute, or default if missing.
+    
+    Vector3 GetVector3(const String& name) const;
     Vector3 GetVector3(const char* name) const;
-    /// Return a Vector4 attribute, or default if missing.
+    
+    Vector4 GetVector4(const String& name) const;
     Vector4 GetVector4(const char* name) const;
-    /// Return any Vector attribute as Vector4. Missing coordinates will be zero.
+    
+    Vector4 GetVector(const String& name) const;
     Vector4 GetVector(const char* name) const;
-    /// Return XML file.
-    XMLFile* GetFile() const;    
-    /// Empty XMLElement.
+    
+    XMLFile* GetFile() const;
+    
     static const XMLElement EMPTY;
+    
+    tolua_readonly tolua_property__is_set bool null;
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__get_set XMLElement parent;
+    tolua_readonly tolua_property__get_set unsigned numAttributes;
+    tolua_readonly tolua_property__get_set XMLFile* file;
 };

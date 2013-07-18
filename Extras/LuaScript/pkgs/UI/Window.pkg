@@ -16,7 +16,6 @@ enum WindowDragMode
 
 class Window : public BorderImage
 {
-public:
     Window(Context* context);
     virtual ~Window();
     
@@ -36,7 +35,6 @@ public:
     const Color& GetModalFrameColor() const;
     const IntVector2& GetModalFrameSize() const;
     
-    // Properties:
     tolua_property__is_set bool movable;
     tolua_property__is_set bool resizable;
     tolua_property__get_set IntRect& resizeBorder;

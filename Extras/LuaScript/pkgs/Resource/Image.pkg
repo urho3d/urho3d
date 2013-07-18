@@ -1,6 +1,5 @@
 $#include "Image.h"
 
-/// Supported compressed image formats.
 enum CompressedFormat
 {
     CF_NONE = 0,
@@ -14,31 +13,26 @@ enum CompressedFormat
     CF_PVRTC_RGBA_4BPP,
 };
 
-/// %Image resource.
 class Image : public Resource
 {
-public:
-    /// Flip image vertically.
     void FlipVertical();
-    /// Save in BMP format. Return true if successful.
     bool SaveBMP(const char* fileName);
-    /// Save in PNG format. Return true if successful.
     bool SavePNG(const char* fileName);
-    /// Save in TGA format. Return true if successful.
     bool SaveTGA(const char* fileName);
-    /// Save in JPG format with compression quality. Return true if successful.
     bool SaveJPG(const char* fileName, int quality);
     
-    /// Return width.
-    int GetWidth() const { return width_; }
-    /// Return height.
-    int GetHeight() const { return height_; }
-    /// Return number of color components.
-    unsigned GetComponents() const { return components_; }
-    /// Return whether is compressed.
-    bool IsCompressed() const { return compressedFormat_ != CF_NONE; }
-    /// Return compressed format.
-    CompressedFormat GetCompressedFormat() const { return compressedFormat_; }
-    /// Return number of compressed mip levels.
-    unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
+    int GetWidth() const;
+    int GetHeight() const;
+    unsigned GetComponents() const;
+    bool IsCompressed() const;
+    CompressedFormat GetCompressedFormat() const;
+    unsigned GetNumCompressedLevels() const;
+    CompressedLevel GetCompressedLevel(unsigned index) const;
+    
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set unsigned components;
+    tolua_readonly tolua_property__is_set bool compressed;
+    tolua_readonly tolua_property__get_set CompressedFormat compressedFormat;
+    tolua_readonly tolua_property__get_set unsigned numCompressedLevels;
 };

@@ -2,8 +2,6 @@ $#include "Menu.h"
 
 class Menu : public Button
 {
-public:
-    // Methods:
     Menu(Context* context);
     virtual ~Menu();
     
@@ -19,7 +17,6 @@ public:
     int GetAcceleratorKey() const;
     int GetAcceleratorQualifiers() const;
     
-    // Properties:
     tolua_property__get_set UIElement* popup;
     tolua_property__get_set IntVector2& popupOffset;
     tolua_property__get_set bool showPopup;

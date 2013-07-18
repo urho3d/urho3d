@@ -54,12 +54,10 @@ class RigidBody : public Component
     Vector3 GetVelocityAtPoint(const Vector3& position) const;
     float GetLinearRestThreshold() const;
     float GetLinearDamping() const;
-    // float GetLinearDampingScale() const;
     Vector3 GetAngularVelocity() const;
     Vector3 GetAngularFactor() const;
     float GetAngularRestThreshold() const;
     float GetAngularDamping() const;
-    // float GetAngularDampingScale() const;
     float GetFriction() const;
     float GetRestitution() const;
     float GetContactProcessingThreshold() const;
@@ -90,12 +88,10 @@ class RigidBody : public Component
     tolua_property__get_set Vector3 linearFactor;
     tolua_property__get_set float linearRestThreshold;
     tolua_property__get_set float linearDamping;
-    // tolua_readonly tolua_property__get_set float linearDampingScale;
     tolua_property__get_set Vector3 angularVelocity;
     tolua_property__get_set Vector3 angularFactor;
     tolua_property__get_set float angularRestThreshold;
     tolua_property__get_set float angularDamping;
-    // tolua_readonly tolua_property__get_set float angularDampingScale;
     tolua_property__get_set float friction;
     tolua_property__get_set float restitution;
     tolua_property__get_set float contactProcessingThreshold;

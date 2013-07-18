@@ -2,25 +2,20 @@ $#include "Text.h"
 
 class Text : public UIElement
 {
-public:
-    // Methods:
     Text(Context* context);
     virtual ~Text();
 
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    bool SetFont(const String& fontName);
-    
+    bool SetFont(const char* fontName, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    bool SetFont(Font* font);
     
     void SetText(const String& text);
+    void SetText(const char* text);
+    
     void SetTextAlignment(HorizontalAlignment align);
     void SetRowSpacing(float spacing);
     void SetWordwrap(bool enable);
-    
     void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
-    void SetSelection(unsigned start);
-    
     void ClearSelection();
     void SetSelectionColor(const Color& color);
     void SetHoverColor(const Color& color);
@@ -38,7 +33,9 @@ public:
     int GetRowHeight() const;
     unsigned GetNumRows() const;
     
-    // Properties:
+    void SetFontAttr(ResourceRef value);
+    ResourceRef GetFontAttr() const;
+    
     tolua_property__get_set Font* font;
     tolua_readonly tolua_property__get_set int fontSize;
     tolua_property__get_set String& text;
@@ -51,4 +48,5 @@ public:
     tolua_property__get_set Color& hoverColor;
     tolua_readonly tolua_property__get_set int rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
+    tolua_property__get_set ResourceRef fontAttr;
 };
