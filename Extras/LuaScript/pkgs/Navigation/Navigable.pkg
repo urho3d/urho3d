@@ -1,14 +1,9 @@
 $#include "Navigable.h"
 
-/// Component which tags geometry for inclusion in the navigation mesh. Optionally auto-includes geometry from child nodes.
 class Navigable : public Component
 {
-public:
-    /// Set whether geometry is automatically collected from child nodes. Default true.
     void SetRecursive(bool enable);
-    /// Return whether geometry is automatically collected from child nodes.
-    bool IsRecursive() const { return recursive_; }
+    bool IsRecursive() const;
     
-    // Properties:
     tolua_property__is_set bool recursive;
 };
