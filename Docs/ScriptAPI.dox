@@ -318,6 +318,7 @@ Methods:<br>
 - Vector2 ToVector2() const
 - Vector3 ToVector3() const
 - Vector4 ToVector4(bool arg0 = false) const
+- Variant ToVectorVariant() const
 
 Properties:<br>
 - uint utf8Length (readonly)
@@ -1269,7 +1270,8 @@ Methods:<br>
 - bool SetVariantMap(const VariantMap&)
 - bool SetVector2(const String&, const Vector2&)
 - bool SetVector3(const String&, const Vector3&)
-- bool SetVector4(const String&, const Vector3&)
+- bool SetVector4(const String&, const Vector4&)
+- bool SetVectorVariant(const String&, const Variant&)
 - bool HasAttribute(const String&) const
 - String GetAttribute(const String& arg0 = String ( )) const
 - String GetAttributeLower(const String&) const
@@ -1293,6 +1295,7 @@ Methods:<br>
 - Vector2 GetVector2(const String&) const
 - Vector3 GetVector3(const String&) const
 - Vector4 GetVector4(const String&) const
+- Variant GetVectorVariant(const String&) const
 
 Properties:<br>
 - String name (readonly)
@@ -1791,7 +1794,7 @@ Methods:<br>
 
 Properties:<br>
 - String[] textureNames
-- Vector4[] shaderParameters
+- Variant[] shaderParameters
 - uint numOutputs
 - String[] outputNames
 - String tag
@@ -1837,7 +1840,7 @@ Properties:<br>
 - RenderTargetInfo[] renderTargets
 - uint numCommands (readonly)
 - RenderPathCommand[] commands
-- Vector4[] shaderParameters
+- Variant[] shaderParameters
 
 
 Texture
@@ -2050,7 +2053,7 @@ Properties:<br>
 - uint useTimer (readonly)
 - uint numTechniques
 - Technique@[] techniques (readonly)
-- Vector4[] shaderParameters
+- Variant[] shaderParameters
 - Texture@[] textures
 - bool occlusion (readonly)
 - CullMode cullMode
@@ -4671,7 +4674,6 @@ Properties:<br>
 - bool hierarchyMode
 - int baseIndent
 - bool clearSelectionOnDefocus
-- float doubleClickInterval
 
 
 Text
@@ -5016,7 +5018,6 @@ Properties:<br>
 - bool textCopyable
 - Text@ textElement (readonly)
 - BorderImage@ cursor (readonly)
-- float doubleClickInterval
 
 
 Menu
@@ -5516,6 +5517,8 @@ Properties:<br>
 - UIElement@ frontElement (readonly)
 - UIElement@ root (readonly)
 - UIElement@ modalRoot (readonly)
+- String clipBoardText
+- float doubleClickInterval
 - bool nonFocusedMouseWheel
 
 

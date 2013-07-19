@@ -436,6 +436,15 @@ bool XMLElement::SetVector4(const String& name, const Vector4& value)
     return SetAttribute(name, value.ToString());
 }
 
+bool XMLElement::SetVectorVariant(const String& name, const Variant& value)
+{
+    VariantType type = value.GetType();
+    if (type == VAR_FLOAT || type == VAR_VECTOR2 || type == VAR_VECTOR3 || type == VAR_VECTOR4)
+        return SetAttribute(name, value.ToString());
+    else
+        return false;
+}
+
 bool XMLElement::IsNull() const
 {
     return !NotNull();
@@ -807,6 +816,11 @@ Vector4 XMLElement::GetVector4(const String& name) const
 Vector4 XMLElement::GetVector(const String& name) const
 {
     return ToVector4(GetAttribute(name), true);
+}
+
+Variant XMLElement::GetVectorVariant(const String& name) const
+{
+    return ToVectorVariant(GetAttribute(name));
 }
 
 XMLFile* XMLElement::GetFile() const

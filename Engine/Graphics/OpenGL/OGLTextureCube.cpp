@@ -145,7 +145,10 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     if (usage == TEXTURE_RENDERTARGET)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
-            renderSurfaces_[i] = new RenderSurface(this, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
+        {
+            renderSurfaces_[i] = new RenderSurface(this);
+            renderSurfaces_[i]->SetTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
+        }
         
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
         addressMode_[COORD_U] = ADDRESS_CLAMP;

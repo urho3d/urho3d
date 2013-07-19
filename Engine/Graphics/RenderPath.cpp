@@ -146,7 +146,7 @@ void RenderPathCommand::Load(const XMLElement& element)
             while (parameterElem)
             {
                 String name = parameterElem.GetAttribute("name");
-                Vector4 value = parameterElem.GetVector("value");
+                Variant value = parameterElem.GetVectorVariant("value");
                 shaderParameters_[name] = value;
                 
                 parameterElem = parameterElem.GetNext("parameter");
@@ -204,7 +204,7 @@ void RenderPathCommand::SetTextureName(TextureUnit unit, const String& name)
         textureNames_[unit] = name;
 }
 
-void RenderPathCommand::SetShaderParameter(const String& name, const Vector4& value)
+void RenderPathCommand::SetShaderParameter(const String& name, const Variant& value)
 {
     shaderParameters_[name] = value;
 }
@@ -233,10 +233,10 @@ const String& RenderPathCommand::GetTextureName(TextureUnit unit) const
     return unit < MAX_TEXTURE_UNITS ? textureNames_[unit] : String::EMPTY;
 }
 
-const Vector4& RenderPathCommand::GetShaderParameter(const String& name) const
+const Variant& RenderPathCommand::GetShaderParameter(const String& name) const
 {
-    HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters_.Find(name);
-    return i != shaderParameters_.End() ? i->second_ : Vector4::ZERO;
+    HashMap<StringHash, Variant>::ConstIterator i = shaderParameters_.Find(name);
+    return i != shaderParameters_.End() ? i->second_ : Variant::EMPTY;
 }
 
 const String& RenderPathCommand::GetOutputName(unsigned index) const
@@ -403,30 +403,30 @@ void RenderPath::RemoveCommands(const String& tag)
     }
 }
 
-void RenderPath::SetShaderParameter(const String& name, const Vector4& value)
+void RenderPath::SetShaderParameter(const String& name, const Variant& value)
 {
     StringHash nameHash(name);
     
     for (unsigned i = 0; i < commands_.Size(); ++i)
     {
-        HashMap<StringHash, Vector4>::Iterator j = commands_[i].shaderParameters_.Find(nameHash);
+        HashMap<StringHash, Variant>::Iterator j = commands_[i].shaderParameters_.Find(nameHash);
         if (j != commands_[i].shaderParameters_.End())
             j->second_ = value;
     }
 }
 
-const Vector4& RenderPath::GetShaderParameter(const String& name) const
+const Variant& RenderPath::GetShaderParameter(const String& name) const
 {
     StringHash nameHash(name);
     
     for (unsigned i = 0; i < commands_.Size(); ++i)
     {
-        HashMap<StringHash, Vector4>::ConstIterator j = commands_[i].shaderParameters_.Find(nameHash);
+        HashMap<StringHash, Variant>::ConstIterator j = commands_[i].shaderParameters_.Find(nameHash);
         if (j != commands_[i].shaderParameters_.End())
             return j->second_;
     }
     
-    return Vector4::ZERO;
+    return Variant::EMPTY;
 }
 
 }

@@ -188,7 +188,7 @@ bool Material::Load(Deserializer& source)
     while (parameterElem)
     {
         String name = parameterElem.GetAttribute("name");
-        Vector4 value = parameterElem.GetVector("value");
+        Variant value = parameterElem.GetVectorVariant("value");
         SetShaderParameter(name, value);
         
         parameterElem = parameterElem.GetNext("parameter");
@@ -253,7 +253,7 @@ bool Material::Save(Serializer& dest) const
     {
         XMLElement parameterElem = materialElem.CreateChild("parameter");
         parameterElem.SetString("name", j->second_.name_);
-        parameterElem.SetVector4("value", j->second_.value_);
+        parameterElem.SetVectorVariant("value", j->second_.value_);
     }
     
     // Write culling modes
@@ -288,7 +288,7 @@ void Material::SetTechnique(unsigned index, Technique* tech, unsigned qualityLev
     CheckOcclusion();
 }
 
-void Material::SetShaderParameter(const String& name, const Vector4& value)
+void Material::SetShaderParameter(const String& name, const Variant& value)
 {
     MaterialShaderParameter newParam;
     newParam.name_ = name;
@@ -297,7 +297,19 @@ void Material::SetShaderParameter(const String& name, const Vector4& value)
     shaderParameters_[nameHash] = newParam;
     
     if (nameHash == PSP_MATSPECCOLOR)
-        specular_ = value.x_ > 0.0f || value.y_ > 0.0f || value.z_ > 0.0f;
+    {
+        VariantType type = value.GetType();
+        if (type == VAR_VECTOR3)
+        {
+            const Vector3& vec = value.GetVector3();
+            specular_ = vec.x_ > 0.0f || vec.y_ > 0.0f || vec.z_ > 0.0f;
+        }
+        else if (type == VAR_VECTOR4)
+        {
+            const Vector4& vec = value.GetVector4();
+            specular_ = vec.x_ > 0.0f || vec.y_ > 0.0f || vec.z_ > 0.0f;
+        }
+    }
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -417,10 +429,10 @@ Texture* Material::GetTexture(TextureUnit unit) const
     return unit < MAX_MATERIAL_TEXTURE_UNITS ? textures_[unit] : (Texture*)0;
 }
 
-const Vector4& Material::GetShaderParameter(const String& name) const
+const Variant& Material::GetShaderParameter(const String& name) const
 {
     HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = shaderParameters_.Find(name);
-    return i != shaderParameters_.End() ? i->second_.value_ : Vector4::ZERO;
+    return i != shaderParameters_.End() ? i->second_.value_ : Variant::EMPTY;
 }
 
 String Material::GetTextureUnitName(TextureUnit unit)

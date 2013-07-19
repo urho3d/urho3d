@@ -14,7 +14,6 @@ class RenderSurface
     void Release();
     
     Texture* GetParentTexture() const;
-    void* GetSurface() const;
     int GetWidth() const;
     int GetHeight() const;
     TextureUsage GetUsage() const;

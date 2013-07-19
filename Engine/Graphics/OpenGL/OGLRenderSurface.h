@@ -39,8 +39,8 @@ class RenderSurface : public RefCounted
     friend class TextureCube;
     
 public:
-    /// Construct with parent texture and target.
-    RenderSurface(Texture* parentTexture, unsigned target);
+    /// Construct with parent texture.
+    RenderSurface(Texture* parentTexture);
     /// Destruct.
     ~RenderSurface();
     
@@ -65,8 +65,6 @@ public:
     
     /// Return parent texture.
     Texture* GetParentTexture() const { return parentTexture_; }
-    /// Return surface's OpenGL target.
-    unsigned GetTarget() const { return target_; }
     /// Return renderbuffer if created.
     unsigned GetRenderBuffer() const { return renderBuffer_; }
     /// Return width.
@@ -86,6 +84,10 @@ public:
     /// Return linked depth buffer.
     RenderSurface* GetLinkedDepthStencil() const { return linkedDepthStencil_; }
     
+    /// Set surface's OpenGL target.
+    void SetTarget(unsigned target);
+    /// Return surface's OpenGL target.
+    unsigned GetTarget() const { return target_; }
     /// Clear update flag. Called by Renderer.
     void WasUpdated();
     

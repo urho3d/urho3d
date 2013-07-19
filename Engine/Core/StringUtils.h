@@ -22,11 +22,7 @@
 
 #pragma once
 
-#include "Color.h"
-#include "Quaternion.h"
-#include "Rect.h"
-#include "StringHash.h"
-#include "Vector4.h"
+#include "Variant.h"
 
 namespace Urho3D
 {
@@ -79,6 +75,10 @@ Vector3 ToVector3(const char* source);
 Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
 /// Parse a Vector4 from a C string.
 Vector4 ToVector4(const char* source, bool allowMissingCoords = false);
+/// Parse a float or Vector variant from a string.
+Variant ToVectorVariant(const String& source);
+/// Parse a float or Vector variant from a string.
+Variant ToVectorVariant(const char* source);
 /// Convert a pointer to string (returns hexadecimal.)
 String ToString(void* value);
 /// Convert an unsigned integer to string as hexadecimal.

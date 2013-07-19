@@ -1046,25 +1046,25 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
             case GL_FLOAT:
                 glUniform1fv(info->location_, count, data);
                 break;
-                
+
             case GL_FLOAT_VEC2:
                 glUniform2fv(info->location_, count / 2, data);
                 break;
-                
+
             case GL_FLOAT_VEC3:
                 glUniform3fv(info->location_, count / 3, data);
                 break;
-                
+
             case GL_FLOAT_VEC4:
                 glUniform4fv(info->location_, count / 4, data);
                 break;
-                
+
             case GL_FLOAT_MAT3:
                 count = Min((int)count, (int)NUM_TEMP_MATRICES * 9);
                 Matrix3::BulkTranspose(&tempMatrices3_[0].m00_, data, count / 9);
                 glUniformMatrix3fv(info->location_, count / 9, GL_FALSE, tempMatrices3_[0].Data());
                 break;
-                
+
             case GL_FLOAT_MAT4:
                 count = Min((int)count, (int)NUM_TEMP_MATRICES * 16);
                 Matrix4::BulkTranspose(&tempMatrices4_[0].m00_, data, count / 16);
@@ -1090,6 +1090,28 @@ void Graphics::SetShaderParameter(StringHash param, const Color& color)
     SetShaderParameter(param, color.Data(), 4);
 }
 
+void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
+{
+    if (shaderProgram_)
+    {
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        if (info)
+        {
+            // Check the uniform type to avoid mismatch
+            switch (info->type_)
+            {
+            case GL_FLOAT:
+                glUniform1fv(info->location_, 1, vector.Data());
+                break;
+
+            case GL_FLOAT_VEC2:
+                glUniform2fv(info->location_, 1, vector.Data());
+                break;
+            }
+        }
+    }
+}
+
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 {
     if (shaderProgram_)
@@ -1113,11 +1135,11 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
             case GL_FLOAT:
                 glUniform1fv(info->location_, 1, vector.Data());
                 break;
-                
+
             case GL_FLOAT_VEC2:
                 glUniform2fv(info->location_, 1, vector.Data());
                 break;
-                
+
             case GL_FLOAT_VEC3:
                 glUniform3fv(info->location_, 1, vector.Data());
                 break;
@@ -1149,15 +1171,15 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
             case GL_FLOAT:
                 glUniform1fv(info->location_, 1, vector.Data());
                 break;
-                
+
             case GL_FLOAT_VEC2:
                 glUniform2fv(info->location_, 1, vector.Data());
                 break;
-                
+
             case GL_FLOAT_VEC3:
                 glUniform3fv(info->location_, 1, vector.Data());
                 break;
-                
+
             case GL_FLOAT_VEC4:
                 glUniform4fv(info->location_, 1, vector.Data());
                 break;
@@ -1190,9 +1212,35 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
             data[13] = matrix.m13_;
             data[14] = matrix.m23_;
             data[15] = 1.0f;
-            
+
             glUniformMatrix4fv(info->location_, 1, GL_FALSE, data);
         }
+    }
+}
+
+void Graphics::SetShaderParameter(StringHash param, const Variant& value)
+{
+    switch (value.GetType())
+    {
+    case VAR_FLOAT:
+        SetShaderParameter(param, value.GetFloat());
+        break;
+        
+    case VAR_VECTOR2:
+        SetShaderParameter(param, value.GetVector2());
+        break;
+        
+    case VAR_VECTOR3:
+        SetShaderParameter(param, value.GetVector3());
+        break;
+        
+    case VAR_VECTOR4:
+        SetShaderParameter(param, value.GetVector4());
+        break;
+        
+    default:
+        // Unsupported parameter type, do nothing
+        break;
     }
 }
 
@@ -1210,7 +1258,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
 bool Graphics::HasShaderParameter(ShaderType type, StringHash param)
 {
     return shaderProgram_ && shaderProgram_->HasParameter(param);
-    
+
 }
 
 bool Graphics::HasTextureUnit(TextureUnit unit)

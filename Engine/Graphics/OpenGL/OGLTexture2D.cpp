@@ -149,7 +149,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     
     if (usage >= TEXTURE_RENDERTARGET)
     {
-        renderSurface_ = new RenderSurface(this, GL_TEXTURE_2D);
+        renderSurface_ = new RenderSurface(this);
         
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
         addressMode_[COORD_U] = ADDRESS_CLAMP;

@@ -344,6 +344,38 @@ Vector4 ToVector4(const char* source, bool allowMissingCoords)
     }
 }
 
+Variant ToVectorVariant(const String& source)
+{
+    return ToVectorVariant(source.CString());
+}
+
+Variant ToVectorVariant(const char* source)
+{
+    Variant ret;
+    unsigned elements = CountElements(source, ' ');
+    
+    switch (elements)
+    {
+    case 1:
+        ret.FromString(VAR_FLOAT, source);
+        break;
+        
+    case 2:
+        ret.FromString(VAR_VECTOR2, source);
+        break;
+        
+    case 3:
+        ret.FromString(VAR_VECTOR3, source);
+        break;
+        
+    case 4:
+        ret.FromString(VAR_VECTOR4, source);
+        break;
+    }
+    
+    return ret;
+}
+
 String ToString(void* value)
 {
     return ToStringHex((unsigned)(size_t)value);

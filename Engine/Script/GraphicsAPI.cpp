@@ -304,8 +304,8 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderPathCommand", "RenderPathCommand& opAssign(const RenderPathCommand&in)", asMETHOD(RenderPathCommand, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_textureNames(TextureUnit, const String&in)", asMETHOD(RenderPathCommand, SetTextureName), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "const String& get_textureNames(TextureUnit) const", asMETHOD(RenderPathCommand, GetTextureName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPathCommand", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(RenderPathCommand, SetShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPathCommand", "const Vector4& get_shaderParameters(const String&in) const", asMETHOD(RenderPathCommand, GetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(RenderPathCommand, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPathCommand", "const Variant& get_shaderParameters(const String&in) const", asMETHOD(RenderPathCommand, GetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_numOutputs(uint)", asMETHOD(RenderPathCommand, SetNumOutputs), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "uint get_numOutputs() const", asMETHOD(RenderPathCommand, GetNumOutputs), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPathCommand", "void set_outputNames(uint, const String&in)", asMETHOD(RenderPathCommand, SetOutputName), asCALL_THISCALL);
@@ -349,8 +349,8 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderPath", "uint get_numCommands() const", asMETHOD(RenderPath, GetNumCommands), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "void set_commands(uint, const RenderPathCommand&in)", asMETHOD(RenderPath, SetCommand), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderPath", "const RenderPathCommand& get_commands(uint) const", asFUNCTION(RenderPathGetCommand), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("RenderPath", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(RenderPath, SetShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderPath", "const Vector4& get_shaderParameters(const String&in) const", asMETHOD(RenderPath, GetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(RenderPath, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderPath", "const Variant& get_shaderParameters(const String&in) const", asMETHOD(RenderPath, GetShaderParameter), asCALL_THISCALL);
 }
 
 static void RegisterTextures(asIScriptEngine* engine)
@@ -555,8 +555,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_techniques(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "void set_shaderParameters(const String&in, const Vector4&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "const Vector4& get_shaderParameters(const String&in) const", asMETHOD(Material, GetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "const Variant& get_shaderParameters(const String&in) const", asMETHOD(Material, GetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_textures(uint, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_textures(uint) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_occlusion()", asMETHOD(Material, GetOcclusion), asCALL_THISCALL);

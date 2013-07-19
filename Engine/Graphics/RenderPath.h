@@ -114,7 +114,7 @@ struct RenderPathCommand
     /// Set a texture resource name. Can also refer to a rendertarget defined in the rendering path.
     void SetTextureName(TextureUnit unit, const String& name);
     /// Set a shader parameter.
-    void SetShaderParameter(const String& name, const Vector4& value);
+    void SetShaderParameter(const String& name, const Variant& value);
     /// Remove a shader parameter.
     void RemoveShaderParameter(const String& name);
     /// Set number of output rendertargets.
@@ -125,7 +125,7 @@ struct RenderPathCommand
     /// Return texture resource name.
     const String& GetTextureName(TextureUnit unit) const;
     /// Return shader parameter.
-    const Vector4& GetShaderParameter(const String& name) const;
+    const Variant& GetShaderParameter(const String& name) const;
     /// Return number of output rendertargets.
     unsigned GetNumOutputs() const { return outputNames_.Size(); }
     /// Return output rendertarget name.
@@ -168,7 +168,7 @@ struct RenderPathCommand
     /// Textures.
     String textureNames_[MAX_TEXTURE_UNITS];
     /// %Shader parameters.
-    HashMap<StringHash, Vector4> shaderParameters_;
+    HashMap<StringHash, Variant> shaderParameters_;
     /// Output rendertarget names.
     Vector<String> outputNames_;
 };
@@ -213,14 +213,14 @@ public:
     /// Remove commands by tag name.
     void RemoveCommands(const String& tag);
     /// Set a shader parameter in all commands that define it.
-    void SetShaderParameter(const String& name, const Vector4& value);
+    void SetShaderParameter(const String& name, const Variant& value);
     
     /// Return number of rendertargets.
     unsigned GetNumRenderTargets() const { return renderTargets_.Size(); }
     /// Return number of commands.
     unsigned GetNumCommands() const { return commands_.Size(); }
     /// Return a shader parameter (first appearance in any command.)
-    const Vector4& GetShaderParameter(const String& name) const;
+    const Variant& GetShaderParameter(const String& name) const;
     
     /// Rendertargets.
     Vector<RenderTargetInfo> renderTargets_;

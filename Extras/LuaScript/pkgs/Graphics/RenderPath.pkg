@@ -4,40 +4,40 @@ class RenderPath
 {
     // SharedPtr<RenderPath> Clone();
     tolua_outside RenderPath* RenderPathClone @ Clone();
-    
+
     bool Load(XMLFile* file);
     bool Append(XMLFile* file);
-    
+
     void SetEnabled(const String& tag, bool active);
     void SetEnabled(const char* tag, bool active);
-    
+
     void ToggleEnabled(const String& tag);
     void ToggleEnabled(const char* tag);
-    
+
     void SetRenderTarget(unsigned index, const RenderTargetInfo& info);
     void AddRenderTarget(const RenderTargetInfo& info);
     void RemoveRenderTarget(unsigned index);
-    
+
     void RemoveRenderTarget(const String& name);
     void RemoveRenderTarget(const char* name);
-    
+
     void RemoveRenderTargets(const String& tag);
     void RemoveRenderTargets(const char* tag);
-    
+
     void SetCommand(unsigned index, const RenderPathCommand& command);
     void AddCommand(const RenderPathCommand& command);
     void InsertCommand(unsigned index, const RenderPathCommand& command);
     void RemoveCommand(unsigned index);
-    
+
     void RemoveCommands(const String& tag);
     void RemoveCommands(const char* tag);
-    
-    void SetShaderParameter(const String& name, const Vector4& value);
-    void SetShaderParameter(const char* name, const Vector4& value);
-    
+
+    void SetShaderParameter(const String& name, const Variant& value);
+    void SetShaderParameter(const char* name, const Variant& value);
+
     unsigned GetNumRenderTargets() const;
     unsigned GetNumCommands() const;
-    const Vector4& GetShaderParameter(const String& name) const;
+    const Variant& GetShaderParameter(const String& name) const;
 };
 
 ${
@@ -46,7 +46,7 @@ RenderPath* RenderPathClone(RenderPath* renderPath)
 {
     if (renderPath == 0)
         return 0;
-    
+
     RenderPath* newRenderPath = new RenderPath();
     newRenderPath->renderTargets_ = renderPath->renderTargets_;
     newRenderPath->commands_ = renderPath->commands_;

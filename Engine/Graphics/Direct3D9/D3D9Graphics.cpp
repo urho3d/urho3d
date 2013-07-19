@@ -1043,6 +1043,25 @@ void Graphics::SetShaderParameter(StringHash param, const Color& color)
         impl_->device_->SetPixelShaderConstantF(i->second_.register_, color.Data(), 1);
 }
 
+void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
+{
+    HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
+    if (i == shaderParameters_.End() || i->second_.register_ >= MAX_CONSTANT_REGISTERS)
+        return;
+    
+    float data[4];
+    
+    data[0] = vector.x_;
+    data[1] = vector.y_;
+    data[2] = 0.0f;
+    data[3] = 0.0f;
+    
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data[0], 1);
+    else
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data[0], 1);
+}
+
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
@@ -1123,6 +1142,32 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 3);
     else
         impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 3);
+}
+
+void Graphics::SetShaderParameter(StringHash param, const Variant& value)
+{
+    switch (value.GetType())
+    {
+    case VAR_FLOAT:
+        SetShaderParameter(param, value.GetFloat());
+        break;
+        
+    case VAR_VECTOR2:
+        SetShaderParameter(param, value.GetVector2());
+        break;
+        
+    case VAR_VECTOR3:
+        SetShaderParameter(param, value.GetVector3());
+        break;
+        
+    case VAR_VECTOR4:
+        SetShaderParameter(param, value.GetVector4());
+        break;
+        
+    default:
+        // Unsupported parameter type, do nothing
+        break;
+    }
 }
 
 void Graphics::RegisterShaderParameter(StringHash param, const ShaderParameter& definition)

@@ -1462,8 +1462,8 @@ void View::RenderQuad(RenderPathCommand& command)
     // Set shaders & shader parameters and textures
     graphics_->SetShaders(vs, ps);
     
-    const HashMap<StringHash, Vector4>& parameters = command.shaderParameters_;
-    for (HashMap<StringHash, Vector4>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
+    const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
+    for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
         graphics_->SetShaderParameter(k->first_, k->second_);
     
     float rtWidth = (float)rtSize_.x_;

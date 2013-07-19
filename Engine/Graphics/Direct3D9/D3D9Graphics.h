@@ -125,6 +125,8 @@ public:
     void SetShaderParameter(StringHash param, float value);
     /// Set shader color constant.
     void SetShaderParameter(StringHash param, const Color& color);
+    /// Set shader 2D vector constant.
+    void SetShaderParameter(StringHash param, const Vector2& vector);
     /// Set shader 3x3 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3& matrix);
     /// Set shader 3D vector constant.
@@ -135,6 +137,8 @@ public:
     void SetShaderParameter(StringHash param, const Vector4& vector);
     /// Set shader 3x4 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
+    /// Set shader constant from a variant.
+    void SetShaderParameter(StringHash param, const Variant& value);
     /// Register a shader parameter globally. Called by Shader.
     void RegisterShaderParameter(StringHash param, const ShaderParameter& definition);
     /// Check whether a shader parameter group needs update. Does not actually check whether parameters exist in the shaders.

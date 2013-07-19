@@ -43,9 +43,9 @@
 namespace Urho3D
 {
 
-RenderSurface::RenderSurface(Texture* parentTexture, unsigned target) :
+RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
-    target_(target),
+    target_(GL_TEXTURE_2D),
     renderBuffer_(0),
     updateMode_(SURFACE_UPDATEVISIBLE),
     updateQueued_(false)
@@ -194,6 +194,11 @@ TextureUsage RenderSurface::GetUsage() const
 Viewport* RenderSurface::GetViewport(unsigned index) const
 {
     return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
+}
+
+void RenderSurface::SetTarget(unsigned target)
+{
+    target_ = target;
 }
 
 void RenderSurface::WasUpdated()

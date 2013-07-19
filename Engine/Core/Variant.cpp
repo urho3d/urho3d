@@ -22,7 +22,6 @@
 
 #include "Precompiled.h"
 #include "StringUtils.h"
-#include "Variant.h"
 
 #include <cstring>
 

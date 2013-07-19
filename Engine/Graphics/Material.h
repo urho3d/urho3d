@@ -42,7 +42,7 @@ struct MaterialShaderParameter
     /// Name.
     String name_;
     /// Value.
-    Vector4 value_;
+    Variant value_;
 };
 
 /// %Material's technique list entry.
@@ -86,7 +86,7 @@ public:
     /// Set technique.
     void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
     /// Set shader parameter.
-    void SetShaderParameter(const String& name, const Vector4& value);
+    void SetShaderParameter(const String& name, const Variant& value);
     /// Set texture.
     void SetTexture(TextureUnit unit, Texture* texture);
     /// Set texture coordinate transform.
@@ -123,7 +123,7 @@ public:
    /// Return all textures.
     const SharedPtr<Texture>* GetTextures() const { return &textures_[0]; }
     /// Return shader parameter.
-    const Vector4& GetShaderParameter(const String& name) const;
+    const Variant& GetShaderParameter(const String& name) const;
     /// Return all shader parameters.
     const HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() const { return shaderParameters_; }
     /// Return normal culling mode.

@@ -140,6 +140,8 @@ public:
     bool SetVector3(const String& name, const Vector3& value);
     /// Set a Vector4 attribute.
     bool SetVector4(const String& name, const Vector4& value);
+    /// Set a float or Vector attribute stored in a variant.
+    bool SetVectorVariant(const String& name, const Variant& value);
 
     /// Return whether does not refer to an element or an XPath node.
     bool IsNull() const;
@@ -229,6 +231,8 @@ public:
     Vector4 GetVector4(const String& name) const;
     /// Return any Vector attribute as Vector4. Missing coordinates will be zero.
     Vector4 GetVector(const String& name) const;
+    /// Return a float or Vector attribute as Variant.
+    Variant GetVectorVariant(const String& name) const;
     /// Return XML file.
     XMLFile* GetFile() const;
     /// Return pugixml xml_node_struct.
