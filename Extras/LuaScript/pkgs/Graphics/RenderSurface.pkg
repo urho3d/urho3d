@@ -1,33 +1,35 @@
 $#include "RenderSurface.h"
 
-/// %Color or depth-stencil surface that can be rendered into.
 class RenderSurface
 {    
-public:
+    RenderSurface(Texture* parentTexture);
+    ~RenderSurface();
+
     void SetNumViewports(unsigned num);
-    /// Set viewport.
     void SetViewport(unsigned index, Viewport* viewport);
-    /// Set viewport update mode. Default is to update when visible.
     void SetUpdateMode(RenderSurfaceUpdateMode mode);
-    /// Set linked color rendertarget.
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
-    /// Set linked depth-stencil surface.
     void SetLinkedDepthStencil(RenderSurface* depthStencil);
-    /// Queue manual update of the viewport(s).
     void QueueUpdate();
-    /// Release surface.
     void Release();
     
-    /// Return parent texture.
     Texture* GetParentTexture() const;
-    /// Return width.
+    void* GetSurface() const;
     int GetWidth() const;
-    /// Return height.
     int GetHeight() const;
-    /// Return usage.
-    TextureUsage GetUsage() const;    
-    /// Return linked color rendertarget.
+    TextureUsage GetUsage() const;
+    unsigned GetNumViewports() const;
+    Viewport* GetViewport(unsigned index) const;
+    RenderSurfaceUpdateMode GetUpdateMode() const;
     RenderSurface* GetLinkedRenderTarget() const;
-    /// Return linked depth-stencil surface.
     RenderSurface* GetLinkedDepthStencil() const;
+    
+    tolua_readonly tolua_property__get_set Texture* parentTexture;
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set TextureUsage usage;
+    tolua_property__get_set unsigned numViewports;
+    tolua_property__get_set RenderSurfaceUpdateMode updateMode;
+    tolua_property__get_set RenderSurface* linkedRenderTarget;
+    tolua_property__get_set RenderSurface* linkedDepthStencil;
 };

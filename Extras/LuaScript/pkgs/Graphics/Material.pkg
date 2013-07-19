@@ -1,36 +1,28 @@
 $#include "Material.h"
 
-/// Describes how to render 3D geometries.
+enum CullMode{};
+
 class Material : public Resource
 {
-public:
-    /// Return number of techniques.
-    unsigned GetNumTechniques() const { return techniques_.Size(); }
-    /// Return technique entry by index.
-    const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
-    /// Return technique by index.
+    unsigned GetNumTechniques() const;
     Technique* GetTechnique(unsigned index) const;
-    /// Return pass by technique index and pass type.
-    Pass* GetPass(unsigned index, StringHash passType) const;
-    /// Return texture by unit.
-    Texture* GetTexture(TextureUnit unit) const;
-   /// Return all textures.
-    const SharedPtr<Texture>* GetTextures() const { return &textures_[0]; }
-    /// Return shader parameter.
-    const Vector4& GetShaderParameter(const String& name) const;
-    /// Return normal culling mode.
-    CullMode GetCullMode() const { return cullMode_; }
-    /// Return culling mode for shadows.
-    CullMode GetShadowCullMode() const { return shadowCullMode_; }
-    /// Return depth bias.
-    const BiasParameters& GetDepthBias() const { return depthBias_; }
-    /// Return last auxiliary view rendered frame number.
-    unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
-    /// Return whether should render occlusion.
-    bool GetOcclusion() const { return occlusion_; }
-    /// Return whether should render specular.
-    bool GetSpecular() const { return specular_; }
     
-    /// Return name for texture unit.
-    static String GetTextureUnitName(TextureUnit unit);
+    Pass* GetPass(unsigned index, StringHash passType) const;
+    Pass* GetPass(unsigned index, const char* passType) const;
+    
+    Texture* GetTexture(TextureUnit unit) const;
+    
+    CullMode GetCullMode() const;
+    CullMode GetShadowCullMode() const;
+    const BiasParameters& GetDepthBias() const;
+    unsigned GetAuxViewFrameNumber() const;
+    bool GetOcclusion() const;
+    bool GetSpecular() const;
+    
+    tolua_readonly tolua_property__get_set CullMode cullMode;
+    tolua_readonly tolua_property__get_set CullMode shadowCullMode;
+    tolua_readonly tolua_property__get_set unsigned auxViewFrameNumber;
+    tolua_readonly tolua_property__get_set bool occlusion;
+    tolua_readonly tolua_property__get_set bool specular;
 };
+

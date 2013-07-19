@@ -1,49 +1,40 @@
 $#include "TerrainPatch.h"
 
-/// Individually rendered part of a heightmap terrain.
 class TerrainPatch : public Drawable
 {
-public:
-    /// Set owner terrain.
     void SetOwner(Terrain* terrain);
-    /// Set neighbor patches.
     void SetNeighbors(TerrainPatch* north, TerrainPatch* south, TerrainPatch* west, TerrainPatch* east);
-    /// Set material.
     void SetMaterial(Material* material);
-    /// Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
-    /// Set patch coordinates.
     void SetCoordinates(const IntVector2& coordinates);
-    /// Set vertical offset for occlusion geometry. Should be negative.
     void SetOcclusionOffset(float offset);
-    /// Reset to LOD level 0.
     void ResetLod();
     
-    /// Return visible geometry.
     Geometry* GetGeometry() const;
-    /// Return max LOD geometry.
     Geometry* GetMaxLodGeometry() const;
-    /// Return min LOD geometry.
     Geometry* GetMinLodGeometry() const;
-    /// Return vertex buffer.
     VertexBuffer* GetVertexBuffer() const;
-    /// Return owner terrain.
     Terrain* GetOwner() const;
-    /// Return north neighbor patch.
-    TerrainPatch* GetNorthPatch() const { return north_; }
-    /// Return south neighbor patch.
-    TerrainPatch* GetSouthPatch() const { return south_; }
-    /// Return west neighbor patch.
-    TerrainPatch* GetWestPatch() const { return west_; }
-    /// Return east neighbor patch.
-    TerrainPatch* GetEastPatch() const { return east_; }
-    /// Return local-space bounding box.
-    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
-    /// Return patch coordinates.
-    const IntVector2& GetCoordinates() const { return coordinates_; }
-    /// Return current LOD level.
-    unsigned GetLodLevel() const { return lodLevel_; }
-    /// Return vertical offset for occlusion geometry..
-    float GetOcclusionOffset() const { return occlusionOffset_; }
+    TerrainPatch* GetNorthPatch() const;
+    TerrainPatch* GetSouthPatch() const;
+    TerrainPatch* GetWestPatch() const;
+    TerrainPatch* GetEastPatch() const;
+    const BoundingBox& GetBoundingBox() const;
+    const IntVector2& GetCoordinates() const;
+    unsigned GetLodLevel() const;
     float GetOcclusionOffset() const;
+    
+    tolua_readonly tolua_property__get_set Geometry* geometry;
+    tolua_readonly tolua_property__get_set Geometry* maxLodGeometry;
+    tolua_readonly tolua_property__get_set Geometry* minLodGeometry;
+    tolua_readonly tolua_property__get_set VertexBuffer* vertexBuffer;
+    tolua_property__get_set Terrain* owner;
+    tolua_readonly tolua_property__get_set TerrainPatch* northPatch;
+    tolua_readonly tolua_property__get_set TerrainPatch* southPatch;
+    tolua_readonly tolua_property__get_set TerrainPatch* westPatch;
+    tolua_readonly tolua_property__get_set TerrainPatch* eastPatch;
+    tolua_property__get_set BoundingBox& boundingBox;
+    tolua_property__get_set IntVector2& coordinates;
+    tolua_readonly tolua_property__get_set unsigned lodLevel;
+    tolua_property__get_set float occlusionOffset;
 };

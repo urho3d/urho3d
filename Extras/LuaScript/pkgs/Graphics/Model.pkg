@@ -1,29 +1,21 @@
 $#include "Model.h"
 
-/// 3D model resource.
 class Model : public Resource
 {
-public:
-    /// Return bounding box.
-    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
-    /// Return skeleton.
-    Skeleton& GetSkeleton() { return skeleton_; }
-    /// Return number of geometries.
-    unsigned GetNumGeometries() const { return geometries_.Size(); }
-    /// Return number of LOD levels in geometry.
+    const BoundingBox& GetBoundingBox() const;
+    Skeleton& GetSkeleton();
+    unsigned GetNumGeometries() const;
     unsigned GetNumGeometryLodLevels(unsigned index) const;
-    /// Return geometry by index and LOD level. The LOD level is clamped if out of range.
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
-    /// Return number of vertex morphs.
-    unsigned GetNumMorphs() const { return morphs_.Size(); }
-    /// Return vertex morph by index.
+    unsigned GetNumMorphs() const;
     const ModelMorph* GetMorph(unsigned index) const;
-    /// Return vertex morph by name.
     const ModelMorph* GetMorph(const String& name) const;
-    /// Return vertex morph by name hash.
     const ModelMorph* GetMorph(StringHash nameHash) const;
-    /// Return vertex buffer morph range start.
     unsigned GetMorphRangeStart(unsigned bufferIndex) const;
-    /// Return vertex buffer morph range vertex count.
     unsigned GetMorphRangeCount(unsigned bufferIndex) const;
+    
+    tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
+    tolua_readonly tolua_property__get_set Skeleton skeleton;
+    tolua_readonly tolua_property__get_set unsigned numGeometries;
+    tolua_readonly tolua_property__get_set unsigned numMorphs;
 };

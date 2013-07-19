@@ -1,6 +1,5 @@
 $#include "Light.h"
 
-/// %Light types.
 enum LightType
 {
     LIGHT_DIRECTIONAL = 0,
@@ -8,135 +7,79 @@ enum LightType
     LIGHT_POINT
 };
 
-/// Shadow depth bias parameters.
 struct BiasParameters
 {
-    /// Construct undefined.
-    BiasParameters()
-    {
-    }
-    
-    /// Construct with initial values.
-    BiasParameters(float constantBias, float slopeScaledBias) :
-        constantBias_(constantBias),
-        slopeScaledBias_(slopeScaledBias)
-    {
-    }
+    BiasParameters();
+    BiasParameters(float constantBias, float slopeScaledBias);
 };
 
-/// Cascaded shadow map parameters.
 struct CascadeParameters
 {
-    /// Construct undefined.
-    CascadeParameters()
-    {
-    }
-    
-    /// Construct with initial values.
-    CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f) :
-        fadeStart_(fadeStart),
-        biasAutoAdjust_(biasAutoAdjust)
-    {
-        splits_[0] = split1;
-        splits_[1] = split2;
-        splits_[2] = split3;
-        splits_[3] = split4;
-    }
+    CascadeParameters();
+    CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f);
 };
 
-/// Shadow map focusing parameters.
 struct FocusParameters
 {
-    /// Construct undefined.
-    FocusParameters()
-    {
-    }
-    
-    /// Construct with initial values.
-    FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) :
-        focus_(focus),
-        nonUniform_(nonUniform),
-        autoSize_(autoSize),
-        quantize_(quantize),
-        minView_(minView)
-    {
-    }
-};
-/// %Light component.
-class Light : public Drawable
-{
-    
-public:
-    /// Set light type.
-    void SetLightType(LightType type);
-    /// Set vertex lighting mode.
-    void SetPerVertex(bool enable);
-    /// Set color.
-    void SetColor(const Color& color);
-    /// Set specular intensity.
-    void SetSpecularIntensity(float intensity);
-    /// Set range.
-    void SetRange(float range);
-    /// Set spotlight field of view.
-    void SetFov(float fov);
-    /// Set spotlight aspect ratio.
-    void SetAspectRatio(float aspectRatio);
-    /// Set fade out start distance.
-    void SetFadeDistance(float distance);
-    /// Set shadow fade out start distance. Only has effect if shadow distance is also non-zero.
-    void SetShadowFadeDistance(float distance);
-    /// Set shadow depth bias parameters.
-    void SetShadowBias(const BiasParameters& parameters);
-    /// Set directional light cascaded shadow parameters.
-    void SetShadowCascade(const CascadeParameters& parameters);
-    /// Set shadow map focusing parameters.
-    void SetShadowFocus(const FocusParameters& parameters);
-    /// Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
-    void SetShadowIntensity(float intensity);
-    /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
-    void SetShadowResolution(float resolution);
-    /// Set shadow camera near/far clip distance ratio.
-    void SetShadowNearFarRatio(float nearFarRatio);
-    /// Set range attenuation texture.
-    void SetRampTexture(Texture* texture);
-    /// Set spotlight attenuation texture.
-    void SetShapeTexture(Texture* texture);
-    
-    /// Return light type.
-    LightType GetLightType() const { return lightType_; }
-    /// Return vertex lighting mode.
-    bool GetPerVertex() const { return perVertex_; }
-    /// Return color.
-    const Color& GetColor() const { return color_; }
-    /// Return specular intensity.
-    float GetSpecularIntensity() const { return specularIntensity_; }
-    /// Return range.
-    float GetRange() const { return range_; }
-    /// Return spotlight field of view.
-    float GetFov() const { return fov_; }
-    /// Return spotlight aspect ratio.
-    float GetAspectRatio() const { return aspectRatio_; }
-    /// Return fade start distance.
-    float GetFadeDistance() const { return fadeDistance_; }
-    /// Return shadow fade start distance.
-    float GetShadowFadeDistance() const { return shadowFadeDistance_; }
-    /// Return shadow depth bias parameters.
-    const BiasParameters& GetShadowBias() const { return shadowBias_; }
-    /// Return directional light cascaded shadow parameters.
-    const CascadeParameters& GetShadowCascade() const { return shadowCascade_; }
-    /// Return shadow map focus parameters.
-    const FocusParameters& GetShadowFocus() const { return shadowFocus_; }
-    /// Return shadow intensity.
-    float GetShadowIntensity() const { return shadowIntensity_; }
-    /// Return shadow resolution.
-    float GetShadowResolution() const { return shadowResolution_; }
-    /// Return shadow camera near/far clip distance ratio.
-    float GetShadowNearFarRatio() const { return shadowNearFarRatio_; }
-    /// Return range attenuation texture.
-    Texture* GetRampTexture() const { return rampTexture_; }
-    /// Return spotlight attenuation texture.
-    Texture* GetShapeTexture() const { return shapeTexture_; }
-    /// Return spotlight frustum.
-    Frustum GetFrustum() const;
+    FocusParameters();
+    FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView);
 };
 
+class Light : public Drawable
+{
+    void SetLightType(LightType type);
+    void SetPerVertex(bool enable);
+    void SetColor(const Color& color);
+    void SetSpecularIntensity(float intensity);
+    void SetRange(float range);
+    void SetFov(float fov);
+    void SetAspectRatio(float aspectRatio);
+    void SetFadeDistance(float distance);
+    void SetShadowFadeDistance(float distance);
+    void SetShadowBias(const BiasParameters& parameters);
+    void SetShadowCascade(const CascadeParameters& parameters);
+    void SetShadowFocus(const FocusParameters& parameters);
+    void SetShadowIntensity(float intensity);
+    void SetShadowResolution(float resolution);
+    void SetShadowNearFarRatio(float nearFarRatio);
+    void SetRampTexture(Texture* texture);
+    void SetShapeTexture(Texture* texture);
+    
+    LightType GetLightType() const;
+    bool GetPerVertex() const;
+    const Color& GetColor() const;
+    float GetSpecularIntensity() const;
+    float GetRange() const;
+    float GetFov() const;
+    float GetAspectRatio() const;
+    float GetFadeDistance() const;
+    float GetShadowFadeDistance() const;
+    const BiasParameters& GetShadowBias() const;
+    const CascadeParameters& GetShadowCascade() const;
+    const FocusParameters& GetShadowFocus() const;
+    float GetShadowIntensity() const;
+    float GetShadowResolution() const;
+    float GetShadowNearFarRatio() const;
+    Texture* GetRampTexture() const;
+    Texture* GetShapeTexture() const;
+    Frustum GetFrustum() const;
+    
+    tolua_property__get_set LightType lightType;
+    tolua_property__get_set bool perVertex;
+    tolua_property__get_set Color& color;
+    tolua_property__get_set float specularIntensity;
+    tolua_property__get_set float range;
+    tolua_property__get_set float fov;
+    tolua_property__get_set float aspectRatio;
+    tolua_property__get_set float fadeDistance;
+    tolua_property__get_set float shadowFadeDistance;
+    tolua_property__get_set BiasParameters& shadowBias;
+    tolua_property__get_set CascadeParameters& shadowCascade;
+    tolua_property__get_set FocusParameters& shadowFocus;
+    tolua_property__get_set float shadowIntensity;
+    tolua_property__get_set float shadowResolution;
+    tolua_property__get_set float shadowNearFarRatio;
+    tolua_property__get_set Texture* rampTexture;
+    tolua_property__get_set Texture* shapeTexture;
+    tolua_readonly tolua_property__get_set Frustum frustum;
+};

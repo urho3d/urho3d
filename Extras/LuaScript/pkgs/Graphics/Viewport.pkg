@@ -1,35 +1,26 @@
 $#include "Viewport.h"
 
-/// %Viewport definition either for a render surface or the backbuffer.
 class Viewport
 {    
 public:
-    /// Construct with defaults.
     Viewport(Context* context);
-    /// Construct with a full rectangle.
     Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* renderPath = 0);
-    /// Construct with a specified rectangle.
     Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0);
-    /// Destruct.
     ~Viewport();
     
-    /// Set scene.
     void SetScene(Scene* scene);
-    /// Set camera.
     void SetCamera(Camera* camera);
-    /// Set rectangle.
     void SetRect(const IntRect& rect);
-    /// Set rendering path.
     void SetRenderPath(RenderPath* path);
-    /// Set rendering path from an XML file.
     void SetRenderPath(XMLFile* file);
     
-    /// Return scene.
     Scene* GetScene() const;
-    /// Return camera.
     Camera* GetCamera() const;
-    /// Return rectangle.
-    const IntRect& GetRect() const { return rect_; }
-    /// Return rendering path.
+    const IntRect& GetRect() const;
     RenderPath* GetRenderPath() const;
+    
+    tolua_property__get_set Scene* scene;
+    tolua_property__get_set Camera* camera;
+    tolua_property__get_set IntRect& rect;
+    tolua_property__get_set RenderPath* renderPath;
 };

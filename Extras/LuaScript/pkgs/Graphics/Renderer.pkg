@@ -1,139 +1,201 @@
 $#include "Renderer.h"
 
-/// High-level rendering subsystem. Manages drawing of 3D views.
+static const int SHADOW_MIN_PIXELS;
+static const int INSTANCING_BUFFER_DEFAULT_SIZE;
+
+enum LightVSVariation
+{
+    LVS_DIR = 0,
+    LVS_SPOT,
+    LVS_POINT,
+    LVS_SPEC,
+    LVS_SPOTSPEC,
+    LVS_POINTSPEC,
+    LVS_SHADOW,
+    LVS_SPOTSHADOW,
+    LVS_POINTSHADOW,
+    LVS_DIRSPECSHADOW,
+    LVS_SPOTSPECSHADOW,
+    LVS_POINTSPECSHADOW,
+    MAX_LIGHT_VS_VARIATIONS
+};
+
+enum VertexLightVSVariation
+{
+    VLVS_NOLIGHTS = 0,
+    VLVS_1LIGHT,
+    VLVS_2LIGHTS,
+    VLVS_3LIGHTS,
+    VLVS_4LIGHTS,
+    MAX_VERTEXLIGHT_VS_VARIATIONS
+};
+
+enum LightPSVariation
+{
+    LPS_NONE = 0,
+    LPS_SPOT,
+    LPS_POINT,
+    LPS_POINTMASK,
+    LPS_SPEC,
+    LPS_SPOTSPEC,
+    LPS_POINTSPEC,
+    LPS_POINTMASKSPEC,
+    LPS_SHADOW,
+    LPS_SPOTSHADOW,
+    LPS_POINTSHADOW,
+    LPS_POINTMASKSHADOW,
+    LPS_SHADOWSPEC,
+    LPS_SPOTSHADOWSPEC,
+    LPS_POINTSHADOWSPEC,
+    LPS_POINTMASKSHADOWSPEC,
+    MAX_LIGHT_PS_VARIATIONS
+};
+
+enum DeferredLightVSVariation
+{
+    DLVS_NONE = 0,
+    DLVS_DIR,
+    DLVS_ORTHO,
+    DLVS_ORTHODIR,
+    MAX_DEFERRED_LIGHT_VS_VARIATIONS
+};
+
+enum DeferredLightPSVariation
+{
+    DLPS_NONE = 0,
+    DLPS_SPOT,
+    DLPS_POINT,
+    DLPS_POINTMASK,
+    DLPS_SPEC,
+    DLPS_SPOTSPEC,
+    DLPS_POINTSPEC,
+    DLPS_POINTMASKSPEC,
+    DLPS_SHADOW,
+    DLPS_SPOTSHADOW,
+    DLPS_POINTSHADOW,
+    DLPS_POINTMASKSHADOW,
+    DLPS_SHADOWSPEC,
+    DLPS_SPOTSHADOWSPEC,
+    DLPS_POINTSHADOWSPEC,
+    DLPS_POINTMASKSHADOWSPEC,
+    DLPS_ORTHO,
+    DLPS_ORTHOSPOT,
+    DLPS_ORTHOPOINT,
+    DLPS_ORTHOPOINTMASK,
+    DLPS_ORTHOSPEC,
+    DLPS_ORTHOSPOTSPEC,
+    DLPS_ORTHOPOINTSPEC,
+    DLPS_ORTHOPOINTMASKSPEC,
+    DLPS_ORTHOSHADOW,
+    DLPS_ORTHOSPOTSHADOW,
+    DLPS_ORTHOPOINTSHADOW,
+    DLPS_ORTHOPOINTMASKSHADOW,
+    DLPS_ORTHOSHADOWSPEC,
+    DLPS_ORTHOSPOTSHADOWSPEC,
+    DLPS_ORTHOPOINTSHADOWSPEC,
+    DLPS_ORTHOPOINTMASKSHADOWSPEC,
+    MAX_DEFERRED_LIGHT_PS_VARIATIONS
+};
+
 class Renderer
 {
-public:
-    /// Set number of backbuffer viewports to render.
     void SetNumViewports(unsigned num);
-    /// Set a backbuffer viewport.
     void SetViewport(unsigned index, Viewport* viewport);
-    /// Set default renderpath.
     void SetDefaultRenderPath(RenderPath* renderPath);
-    /// Set default renderpath from an XML file.
     void SetDefaultRenderPath(XMLFile* file);
-    /// Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
-    /// Set texture anisotropy.
     void SetTextureAnisotropy(int level);
-    /// Set texture filtering.
     void SetTextureFilterMode(TextureFilterMode mode);
-    /// Set texture quality level.
     void SetTextureQuality(int quality);
-    /// Set material quality level.
     void SetMaterialQuality(int quality);
-    /// Set shadows on/off.
     void SetDrawShadows(bool enable);
-    /// Set shadow map resolution.
     void SetShadowMapSize(int size);
-    /// Set shadow quality (amount of samples and bit depth.)
     void SetShadowQuality(int quality);
-    /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);
-    /// Set maximum number of shadow maps created for one resolution. Only has effect if reuse of shadow maps is disabled.
     void SetMaxShadowMaps(int shadowMaps);
-    /// Set maximum number of directional light shadow map cascades. Affects the size of directional light shadow maps.
     void SetMaxShadowCascades(int cascades);
-    /// Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
-    /// Set minimum number of instances required in a batch group to render as instanced.
     void SetMinInstances(int instances);
-    /// Set maximum number of triangles per object for instancing.
     void SetMaxInstanceTriangles(int triangles);
-    /// Set maximum number of sorted instances per batch group. If exceeded, instances are rendered unsorted.
     void SetMaxSortedInstances(int instances);
-    /// Set maximum number of occluder trianges.
     void SetMaxOccluderTriangles(int triangles);
-    /// Set occluder buffer width.
     void SetOcclusionBufferSize(int size);
-    /// Set required screen size (1.0 = full screen) for occluders.
     void SetOccluderSizeThreshold(float screenSize);
-    /// Force reload of shaders.
     void ReloadShaders();
     
-    /// Return number of backbuffer viewports.
-    unsigned GetNumViewports() const { return viewports_.Size(); }
-    /// Return backbuffer viewport by index.
+    unsigned GetNumViewports() const;
     Viewport* GetViewport(unsigned index) const;
-    /// Return default renderpath.
     RenderPath* GetDefaultRenderPath() const;
-    /// Return whether specular lighting is enabled.
-    bool GetSpecularLighting() const { return specularLighting_; }
-    /// Return whether drawing shadows is enabled.
-    bool GetDrawShadows() const { return drawShadows_; }
-    /// Return texture anisotropy.
-    int GetTextureAnisotropy() const { return textureAnisotropy_; }
-    /// Return texture filtering.
-    TextureFilterMode GetTextureFilterMode() const { return textureFilterMode_; }
-    /// Return texture quality level.
-    int GetTextureQuality() const { return textureQuality_; }
-    /// Return material quality level.
-    int GetMaterialQuality() const { return materialQuality_; }
-    /// Return shadow map resolution.
-    int GetShadowMapSize() const { return shadowMapSize_; }
-    /// Return shadow quality.
-    int GetShadowQuality() const { return shadowQuality_; }
-    /// Return whether shadow maps are reused.
-    bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
-    /// Return maximum number of shadow maps per resolution.
-    int GetMaxShadowMaps() const { return maxShadowMaps_; }
-    /// Return maximum number of directional light shadow map cascades.
-    int GetMaxShadowCascades() const { return maxShadowCascades_; }
-    /// Return whether dynamic instancing is in use.
-    bool GetDynamicInstancing() const { return dynamicInstancing_; }
-    /// Return minimum number of instances required in a batch group to render as instanced.
-    int GetMinInstances() const { return minInstances_; }
-    /// Return maximum number of triangles per object for instancing.
-    int GetMaxInstanceTriangles() const { return maxInstanceTriangles_; }
-    /// Return maximum number of sorted instances per batch group.
-    int GetMaxSortedInstances() const { return maxSortedInstances_; }
-    /// Return maximum number of occluder triangles.
-    int GetMaxOccluderTriangles() const { return maxOccluderTriangles_; }
-    /// Return occlusion buffer width.
-    int GetOcclusionBufferSize() const { return occlusionBufferSize_; }
-    /// Return occluder screen size threshold.
-    float GetOccluderSizeThreshold() const { return occluderSizeThreshold_; }
-    /// Return number of views rendered.
-    unsigned GetNumViews() const { return numViews_; }
-    /// Return number of primitives rendered.
-    unsigned GetNumPrimitives() const { return numPrimitives_; }
-    /// Return number of batches rendered.
-    unsigned GetNumBatches() const { return numBatches_; }
-    /// Return number of geometries rendered.
+    bool GetSpecularLighting() const;
+    bool GetDrawShadows() const;
+    int GetTextureAnisotropy() const;
+    TextureFilterMode GetTextureFilterMode() const;
+    int GetTextureQuality() const;
+    int GetMaterialQuality() const;
+    int GetShadowMapSize() const;
+    int GetShadowQuality() const;
+    bool GetReuseShadowMaps() const;
+    int GetMaxShadowMaps() const;
+    int GetMaxShadowCascades() const;
+    bool GetDynamicInstancing() const;
+    int GetMinInstances() const;
+    int GetMaxInstanceTriangles() const;
+    int GetMaxSortedInstances() const;
+    int GetMaxOccluderTriangles() const;
+    int GetOcclusionBufferSize() const;
+    float GetOccluderSizeThreshold() const;
+    unsigned GetNumViews() const;
+    unsigned GetNumPrimitives() const;
+    unsigned GetNumBatches() const;
     unsigned GetNumGeometries(bool allViews = false) const;
-    /// Return number of lights rendered.
     unsigned GetNumLights(bool allViews = false) const;
-    /// Return number of shadow maps rendered.
     unsigned GetNumShadowMaps(bool allViews = false) const;
-    /// Return number of occluders rendered.
     unsigned GetNumOccluders(bool allViews = false) const;
-    /// Return the default zone.
-    Zone* GetDefaultZone() const { return defaultZone_; }
-    /// Return the directional light for fullscreen quad rendering.
-    Light* GetQuadDirLight() const { return quadDirLight_; }
-    /// Return the default material.
-    Material* GetDefaultMaterial() const { return defaultMaterial_; }
-    /// Return the default range attenuation texture.
-    Texture2D* GetDefaultLightRamp() const { return defaultLightRamp_; }
-    /// Return the default spotlight attenuation texture.
-    Texture2D* GetDefaultLightSpot() const { return defaultLightSpot_; }
-    /// Return the shadowed pointlight face selection cube map.
-    TextureCube* GetFaceSelectCubeMap() const { return faceSelectCubeMap_; }
-    /// Return the shadowed pointlight indirection cube map.
-    TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
-    /// Return the instancing vertex buffer
-    VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
-    /// Return a vertex shader by name.
+    Zone* GetDefaultZone() const;
+    Light* GetQuadDirLight() const;
+    Material* GetDefaultMaterial() const;
+    Texture2D* GetDefaultLightRamp() const;
+    Texture2D* GetDefaultLightSpot() const;
+    TextureCube* GetFaceSelectCubeMap() const;
+    TextureCube* GetIndirectionCubeMap() const;
+    VertexBuffer* GetInstancingBuffer() const;
     ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
-    /// Return a pixel shader by name.
     ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const;
-    /// Return the stencil vertex shader.
-    ShaderVariation* GetStencilVS() const { return stencilVS_; }
-    /// Return the stencil pixel shader.
-    ShaderVariation* GetStencilPS() const { return stencilPS_; }
-    /// Return the frame update parameters.
-    const FrameInfo& GetFrameInfo() { return frame_; }
+    ShaderVariation* GetStencilVS() const;
+    ShaderVariation* GetStencilPS() const;
+    const FrameInfo& GetFrameInfo();
     
-    /// Add debug geometry to the debug renderer.
-    void DrawDebugGeometry(bool depthTest);
+    tolua_property__get_set unsigned numViewports;
+    tolua_property__get_set RenderPath* defaultRenderPath;
+    tolua_property__get_set bool specularLighting;
+    tolua_property__get_set bool drawShadows;
+    tolua_property__get_set int textureAnisotropy;
+    tolua_property__get_set TextureFilterMode textureFilterMode;
+    tolua_property__get_set int textureQuality;
+    tolua_property__get_set int materialQuality;
+    tolua_property__get_set int shadowMapSize;
+    tolua_property__get_set int shadowQuality;
+    tolua_property__get_set bool reuseShadowMaps;
+    tolua_property__get_set int maxShadowMaps;
+    tolua_property__get_set int maxShadowCascades;
+    tolua_property__get_set bool dynamicInstancing;
+    tolua_property__get_set int minInstances;
+    tolua_property__get_set int maxInstanceTriangles;
+    tolua_property__get_set int maxSortedInstances;
+    tolua_property__get_set int maxOccluderTriangles;
+    tolua_property__get_set int occlusionBufferSize;
+    tolua_property__get_set float occluderSizeThreshold;
+    tolua_readonly tolua_property__get_set unsigned numViews;
+    tolua_readonly tolua_property__get_set unsigned numPrimitives;
+    tolua_readonly tolua_property__get_set unsigned numBatches;
+    tolua_readonly tolua_property__get_set Zone* defaultZone;
+    tolua_readonly tolua_property__get_set Light* quadDirLight;
+    tolua_readonly tolua_property__get_set Material* defaultMaterial;
+    tolua_readonly tolua_property__get_set Texture2D* defaultLightRamp;
+    tolua_readonly tolua_property__get_set Texture2D* defaultLightSpot;
+    tolua_readonly tolua_property__get_set TextureCube* faceSelectCubeMap;
+    tolua_readonly tolua_property__get_set TextureCube* indirectionCubeMap;
+    tolua_readonly tolua_property__get_set VertexBuffer* instancingBuffer;
+    tolua_readonly tolua_property__get_set ShaderVariation* stencilVS;
+    tolua_readonly tolua_property__get_set ShaderVariation* stencilPS;
 };

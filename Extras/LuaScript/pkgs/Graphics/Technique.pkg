@@ -1,12 +1,20 @@
 $#include "Technique.h"
 
-/// %Material technique. Consists of several passes.
+enum PassLightingMode
+{
+    LIGHTING_UNLIT,
+    LIGHTING_PERVERTEX,
+    LIGHTING_PERPIXEL
+};
+
+class Pass : public RefCounted
+{
+};
+
 class Technique : public Resource
 {
-public:
-    /// Set whether requires %Shader %Model 3.
-    void SetIsSM3(bool enable);
-    /// Reset shader pointers in all passes.
-    void ReleaseShaders();    
+    bool HasPass(const char* type) const;
+    Pass* GetPass(const char*  type) const;
     bool IsSM3() const;
+    tolua_readonly tolua_property__is_set bool SM3;
 };

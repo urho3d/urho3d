@@ -1,9 +1,6 @@
 $#include "TextureCube.h"
 
-/// Cube texture resource.
 class TextureCube : public Texture
 {
-public:
-    /// Return render surface for one face.
-    RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
+    RenderSurface* GetRenderSurface(CubeMapFace face) const;
 };

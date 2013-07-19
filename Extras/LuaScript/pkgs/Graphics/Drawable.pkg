@@ -12,106 +12,90 @@ static const int DRAWABLES_PER_WORK_ITEM;
 static const int MAX_VERTEX_LIGHTS;
 static const float ANIMATION_LOD_BASESCALE;
 
-/// Base class for visible components.
+enum UpdateGeometryType
+{
+    UPDATE_NONE = 0,
+    UPDATE_MAIN_THREAD,
+    UPDATE_WORKER_THREAD
+};
+
 class Drawable : public Component
 {
-public:
-    /// Set draw distance.
     void SetDrawDistance(float distance);
-    /// Set shadow draw distance.
     void SetShadowDistance(float distance);
-    /// Set LOD bias.
     void SetLodBias(float bias);
-    /// Set view mask. Is and'ed with camera's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
-    /// Set light mask. Is and'ed with light's and zone's light mask to see if the object should be lit.
     void SetLightMask(unsigned mask);
-    /// Set shadow mask. Is and'ed with light's light mask and zone's shadow mask to see if the object should be rendered to a shadow map.
     void SetShadowMask(unsigned mask);
-    /// Set zone mask. Is and'ed with zone's zone mask to see if the object should belong to the zone.
     void SetZoneMask(unsigned mask);
-    /// Set maximum number of per-pixel lights. Default 0 is unlimited.
     void SetMaxLights(unsigned num);
-    /// Set shadowcaster flag.
     void SetCastShadows(bool enable);
-    /// Set occlusion flag.
     void SetOccluder(bool enable);
-    /// Set occludee flag.
     void SetOccludee(bool enable);
-    /// Mark for update before octree reinsertion.
     void MarkForUpdate();
     
-    /// Return world-space bounding box.
     const BoundingBox& GetWorldBoundingBox();
-    /// Return drawable flags.
-    unsigned char GetDrawableFlags() const { return drawableFlags_; }
-    /// Return draw distance.
-    float GetDrawDistance() const { return drawDistance_; }
-    /// Return shadow draw distance.
-    float GetShadowDistance() const { return shadowDistance_; }
-    /// Return LOD bias.
-    float GetLodBias() const { return lodBias_; }
-    /// Return view mask.
-    unsigned GetViewMask() const { return viewMask_; }
-    /// Return light mask.
-    unsigned GetLightMask() const { return lightMask_; }
-    /// Return shadow mask.
-    unsigned GetShadowMask() const { return shadowMask_; }
-    /// Return zone mask.
-    unsigned GetZoneMask() const { return zoneMask_; }
-    /// Return maximum number of per-pixel lights.
-    unsigned GetMaxLights() const { return maxLights_; }
-    /// Return shadowcaster flag.
-    bool GetCastShadows() const { return castShadows_; }
-    /// Return occluder flag.
-    bool IsOccluder() const { return occluder_; }
-    /// Return occludee flag.
-    bool IsOccludee() const { return occludee_; }
+    unsigned char GetDrawableFlags() const;
+    float GetDrawDistance() const;
+    float GetShadowDistance() const;
+    float GetLodBias() const;
+    unsigned GetViewMask() const;
+    unsigned GetLightMask() const;
+    unsigned GetShadowMask() const;
+    unsigned GetZoneMask() const;
+    unsigned GetMaxLights() const;
+    bool GetCastShadows() const;
+    bool IsOccluder() const;
+    bool IsOccludee() const;
+    const Vector<SourceBatch>& GetBatches() const;
     
-    /// Set new zone.
     void SetZone(Zone* zone, bool temporary = false);
-    /// Set sorting value.
     void SetSortValue(float value);
-    /// Set view-space depth bounds.
     void SetMinMaxZ(float minZ, float maxZ);
-    /// Mark in view (either the main camera, or a shadow camera view) this frame.
     void MarkInView(const FrameInfo& frame, bool mainView = true);
-    /// Clear lights and base pass flags for a new frame.
     void ClearLights();
-    /// Add a per-pixel light.
     void AddLight(Light* light);
-    /// Add a per-vertex light.
     void AddVertexLight(Light* light);
-    /// Sort and limit per-pixel lights to maximum allowed. Convert extra lights into vertex lights.
     void LimitLights();
-    /// Sort and limit per-vertex lights to maximum allowed.
     void LimitVertexLights();
-    /// Set base pass flag for a batch.
-    void SetBasePass(unsigned batchIndex) { basePassFlags_ |= (1 << batchIndex); }
-    /// Return octree octant.
-    Octant* GetOctant() const { return octant_; }
-    /// Return current zone.
+    void SetBasePass(unsigned batchIndex);
+    Octant* GetOctant() const;
     Zone* GetZone() const;
-    /// Return previous zone.
     Zone* GetLastZone() const;
-    /// Return if zone assignment needs re-evaluation.
-    bool IsZoneDirty() const { return zoneDirty_; }
-    /// Return distance from camera.
-    float GetDistance() const { return distance_; }
-    /// Return LOD scaled distance from camera.
-    float GetLodDistance() const { return lodDistance_; }
-    /// Return sorting value.
-    float GetSortValue() const { return sortValue_; }
-    /// Return whether is in view this frame.
-    bool IsInView(unsigned frameNumber) const { return viewFrameNumber_ == frameNumber; }
-    /// Return whether is visible in a specific view this frame.
-    bool IsInView(const FrameInfo& frame, bool mainView = true) const { return viewFrameNumber_ == frame.frameNumber_ && viewFrame_ == &frame && (!mainView || viewCamera_ == frame.camera_); }
-    /// Return whether has a base pass.
-    bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
-    /// Return the first added per-pixel light.
-    Light* GetFirstLight() const { return firstLight_; }
-    /// Return the minimum view-space depth.
-    float GetMinZ() const { return minZ_; }
-    /// Return the maximum view-space depth.
-    float GetMaxZ() const { return maxZ_; }
+    bool IsZoneDirty() const;
+    float GetDistance() const;
+    float GetLodDistance() const;
+    float GetSortValue() const;
+    bool IsInView(unsigned frameNumber) const;
+    bool IsInView(const FrameInfo& frame, bool mainView = true) const;
+    bool HasBasePass(unsigned batchIndex) const;
+    const PODVector<Light*>& GetLights() const;
+    const PODVector<Light*>& GetVertexLights() const;
+    Light* GetFirstLight() const;
+    float GetMinZ() const;
+    float GetMaxZ() const;
+    
+    tolua_readonly tolua_property__get_set BoundingBox& worldBoundingBox;
+    tolua_readonly tolua_property__get_set unsigned char drawableFlags;
+    tolua_property__get_set float drawDistance;
+    tolua_property__get_set float shadowDistance;
+    tolua_property__get_set float lodBias;
+    tolua_property__get_set unsigned viewMask;
+    tolua_property__get_set unsigned lightMask;
+    tolua_property__get_set unsigned shadowMask;
+    tolua_property__get_set unsigned zoneMask;
+    tolua_property__get_set unsigned maxLights;
+    tolua_property__get_set bool castShadows;
+    tolua_property__is_set bool occluder;
+    tolua_property__is_set bool occludee;
+    tolua_readonly tolua_property__get_set Octant* octant;
+    tolua_property__get_set Zone* zone;
+    tolua_readonly tolua_property__get_set Zone* lastZone;
+    tolua_readonly tolua_property__is_set bool zoneDirty;
+    tolua_readonly tolua_property__get_set float distance;
+    tolua_readonly tolua_property__get_set float lodDistance;
+    tolua_property__get_set float sortValue;
+    tolua_readonly tolua_property__get_set Light* firstLight;
+    tolua_readonly tolua_property__get_set float minZ;
+    tolua_readonly tolua_property__get_set float maxZ;
 };

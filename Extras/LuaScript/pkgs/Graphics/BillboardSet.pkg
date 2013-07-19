@@ -1,37 +1,40 @@
 $#include "BillboardSet.h"
 
-/// %Billboard component.
+struct Billboard
+{
+    Vector3 position_ @ position;
+    Vector2 size_ @ size;
+    Rect uv_ @ uv;
+    Color color_ @ color;
+    float rotation_ @ rotation;
+    bool enabled_ @ enabled;
+    float sortDistance_ @ sortDistance;
+};
+
 class BillboardSet : public Drawable
 {
 public:
-    /// Set material.
     void SetMaterial(Material* material);
-    /// Set number of billboards.
     void SetNumBillboards(unsigned num);
-    /// Set whether billboards are relative to the scene node.
     void SetRelative(bool enable);
-    /// Set whether scene node scale affects billboards' size.
     void SetScaled(bool enable);
-    /// Set whether billboards are sorted by distance.
     void SetSorted(bool enable);
-    /// Set animation LOD bias.
     void SetAnimationLodBias(float bias);
-    /// Mark for bounding box and vertex buffer update. Call after modifying the billboards.
+    
     void Commit();
     
-    /// Return material.
     Material* GetMaterial() const;
-    /// Return number of billboards.
-    unsigned GetNumBillboards() const { return billboards_.Size(); }
-    /// Return billboard by index.
+    unsigned GetNumBillboards() const;
     Billboard* GetBillboard(unsigned index);
-    /// Return whether billboards are relative to the scene node.
-    bool IsRelative() const { return relative_; }
-    /// Return whether scene node scale affects billboards' size.
-    bool IsScaled() const { return scaled_; }
-    /// Return whether billboards are sorted.
-    bool IsSorted() const { return sorted_; }
-    /// Return animation LOD bias.
-    float GetAnimationLodBias() const { return animationLodBias_; }
+    bool IsRelative() const;
+    bool IsScaled() const;
+    bool IsSorted() const;
     float GetAnimationLodBias() const;
+    
+    tolua_property__get_set Material* material;
+    tolua_property__get_set unsigned numBillboards;
+    tolua_property__is_set bool relative;
+    tolua_property__is_set bool scaled;
+    tolua_property__is_set bool sorted;
+    tolua_property__get_set float animationLodBias;
 };

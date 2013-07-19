@@ -1,30 +1,28 @@
 $#include "StaticModel.h"
 
-/// Static model component.
+struct StaticModelGeometryData
+{
+    Vector3 center_ @ center;
+    unsigned lodLevel_ @ lodLevel;
+};
+
 class StaticModel : public Drawable
 {
-public:
-    /// Set model.
     void SetModel(Model* model);
-    /// Set material on all geometries.
     void SetMaterial(Material* material);
-    /// Set material on one geometry. Return true if successful.
     bool SetMaterial(unsigned index, Material* material);
-    /// Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
     void SetOcclusionLodLevel(unsigned level);
     
-    /// Return model.
-    Model* GetModel() const { return model_; }
-    /// Return model's bounding box.
-    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
-    /// Return number of geometries.
-    unsigned GetNumGeometries() const { return geometries_.Size(); }
-    /// Return material by geometry index.
+    Model* GetModel() const;
+    const BoundingBox& GetBoundingBox() const;
+    unsigned GetNumGeometries() const;
     Material* GetMaterial(unsigned index) const;
-    /// Return occlusion LOD level.
-    unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
-    /// Determines if the given world space point is within the model geometry.
+    unsigned GetOcclusionLodLevel() const;
     bool IsInside(const Vector3& point) const;
-    /// Determines if the given local space point is within the model geometry.
     bool IsInsideLocal(const Vector3& point) const;
+    
+    tolua_property__get_set Model* model;
+    tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
+    tolua_readonly tolua_property__get_set unsigned numGeometries;
+    tolua_property__get_set unsigned occlusionLodLevel;
 };

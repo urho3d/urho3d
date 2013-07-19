@@ -1,40 +1,29 @@
 $#include "Octree.h"
 
-/// %Octree component. Should be added only to the root scene node
 class Octree : public Component
 {    
-public:
-    /// Resize octree. If octree is not empty, drawable objects will be temporarily moved to the root.
     void Resize(const BoundingBox& box, unsigned numLevels);
-    /// Update and reinsert drawable objects.
     void Update(const FrameInfo& frame);
-    /// Add a drawable manually.
     void AddManualDrawable(Drawable* drawable);
-    /// Remove a manually added drawable.
     void RemoveManualDrawable(Drawable* drawable);
     
-    /// Return drawable objects by a query.
-    void GetDrawables(OctreeQuery& query) const;
-    /// Return drawable objects by a ray query.
-    void Raycast(RayOctreeQuery& query) const;
-    /// Return the closest drawable object by a ray query.
+    // void GetDrawables(OctreeQuery& query) const;
+    // void Raycast(RayOctreeQuery& query) const;
     // void RaycastSingle(RayOctreeQuery& query) const;
-    tolua_outside RayQueryResult OctreeRaycastSingle @ RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags);
+    tolua_outside RayQueryResult OctreeRaycastSingle @ RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const;
     
-    /// Return subdivision levels.
-    unsigned GetNumLevels() const { return numLevels_; }
+    unsigned GetNumLevels() const;
     
-    /// Mark drawable object as requiring an update.
     void QueueUpdate(Drawable* drawable);
-    /// Mark drawable object as requiring a reinsertion. Is thread-safe.
     void QueueReinsertion(Drawable* drawable);
-    /// Visualize the component as debug geometry.
     void DrawDebugGeometry(bool depthTest);
+    
+    tolua_readonly tolua_property__get_set unsigned numLevels;
 };
 
 ${
 
-static RayQueryResult OctreeRaycastSingle(Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
+static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
 {
     PODVector<RayQueryResult> result;
     RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags);

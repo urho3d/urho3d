@@ -1,32 +1,25 @@
 $#include "DecalSet.h"
 
-/// %Decal renderer component.
 class DecalSet : public Drawable
 {
-public:
-    /// Set material. The material should use a small negative depth bias to avoid Z-fighting.
     void SetMaterial(Material* material);
-    /// Set maximum number of decal vertices.
     void SetMaxVertices(unsigned num);
-    /// Set maximum number of decal vertex indices.
     void SetMaxIndices(unsigned num);
-    /// Add a decal at world coordinates, using a target drawable's geometry for reference. If the decal needs to move with the target, the decal component should be created to the target's node. Return true if successful.
     bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED);
-    /// Remove n oldest decals.
     void RemoveDecals(unsigned num);
-    /// Remove all decals.
     void RemoveAllDecals();
     
-    /// Return material.
     Material* GetMaterial() const;
-    /// Return number of decals.
-    unsigned GetNumDecals() const { return decals_.Size(); }
-    /// Retur number of vertices in the decals.
-    unsigned GetNumVertices() const { return numVertices_; }
-    /// Retur number of vertex indices in the decals.
-    unsigned GetNumIndices() const { return numIndices_; }
-    /// Return maximum number of decal vertices.
-    unsigned GetMaxVertices() const { return maxVertices_; }
-    /// Return maximum number of decal vertex indices.
-    unsigned GetMaxIndices() const { return maxIndices_; }
+    unsigned GetNumDecals() const;
+    unsigned GetNumVertices() const;
+    unsigned GetNumIndices() const;
+    unsigned GetMaxVertices() const;
+    unsigned GetMaxIndices() const;
+    
+    tolua_property__get_set Material* material;
+    tolua_readonly tolua_property__get_set unsigned numDecals;
+    tolua_readonly tolua_property__get_set unsigned numVertices;
+    tolua_readonly tolua_property__get_set unsigned numIndices;
+    tolua_property__get_set unsigned maxVertices;
+    tolua_property__get_set unsigned maxIndices;
 };
