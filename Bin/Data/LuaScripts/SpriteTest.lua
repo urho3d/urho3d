@@ -41,7 +41,7 @@ function InitUI()
     cursor.position = IntVector2(graphics:GetWidth() / 2, graphics:GetHeight() / 2)
     ui.cursor = cursor
     
-    if GetPlatform():Eq("Android") or GetPlatform():Eq("iOS") then
+    if GetPlatform() == "Android" or GetPlatform() == "iOS" then
         ui.cursor.visible = false
     end
 end

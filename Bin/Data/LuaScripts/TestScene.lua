@@ -66,23 +66,23 @@ function InitConsole()
     local uiStyle = cache:GetXMLFile("UI/DefaultStyle.xml")
 
     local debugHud = engine:CreateDebugHud()
-    debugHud:SetDefaultStyle(uiStyle)
-    debugHud:SetMode(DEBUGHUD_SHOW_ALL)
+    debugHud.defaultStyle = uiStyle
+    debugHud.mode = DEBUGHUD_SHOW_ALL
 
     local console = engine:CreateConsole()
-    console:SetDefaultStyle(uiStyle)
+    console.defaultStyle = uiStyle
 end
 
 function InitUI()
     local uiStyle = cache:GetXMLFile("UI/DefaultStyle.xml")
     
     local newCursor = Cursor:new(context)
-    newCursor:SetStyleAuto(uiStyle)
-    newCursor:SetPosition(graphics:GetWidth()/ 2, graphics:GetHeight() / 2)
-    ui:SetCursor(newCursor)
+    newCursor.styleAuto = uiStyle
+    newCursor.position = IntVector2(graphics:GetWidth()/ 2, graphics:GetHeight() / 2)
+    ui.cursor = newCursor
     
-    if GetPlatform():Eq("Android") or GetPlatform():Eq("iOS") then
-        ui:GetCursor():SetVisible(false)
+    if GetPlatform() == "Android" or GetPlatform() == "iOS" then
+        ui.cursor.visible = false
     end
 end
 
@@ -119,33 +119,33 @@ function InitScene()
 
     local zoneNode = testScene:CreateChild("Zone")
     local zone = zoneNode:CreateZone()
-    zone:SetAmbientColor(Color(0.15, 0.15, 0.15))
-    zone:SetFogColor(Color(0.5, 0.5, 0.7))
-    zone:SetFogStart(100.0)
-    zone:SetFogEnd(300.0)
-    zone:SetBoundingBox(BoundingBox(-1000, 1000))
+    zone.ambientColor = Color(0.15, 0.15, 0.15)
+    zone.fogColor = Color(0.5, 0.5, 0.7)
+    zone.fogStart = 100.0
+    zone.fogEnd = 300.0
+    zone.boundingBox = BoundingBox(-1000, 1000)
     
     if true then
         local lightNode = testScene:CreateChild("GlobalLight")
-        lightNode:SetDirection(Vector3(0.3, -0.5, 0.425))
-
+        lightNode.direction = Vector3(0.3, -0.5, 0.425)
+        
         local light = lightNode:CreateLight()
-        light:SetLightType(LIGHT_DIRECTIONAL)
-        light:SetCastShadows(true)
-        light:SetShadowBias(BiasParameters(0.0001, 0.5))
-        light:SetShadowCascade(CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8))
-        light:SetSpecularIntensity(0.5)
+        light.lightType = LIGHT_DIRECTIONAL
+        light.castShadows = true
+        light.shadowBias = BiasParameters(0.0001, 0.5)
+        light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
+        light.specularIntensity = 0.5
     end
 
     if true then
         local objectNode = testScene:CreateChild("Floor")
-        objectNode:SetPosition(Vector3(0, -0.5, 0))
-        objectNode:SetScale(Vector3(200, 1, 200))
+        objectNode.position = Vector3(0, -0.5, 0)
+        objectNode.scale = Vector3(200, 1, 200)
         
         local object = objectNode:CreateStaticModel()
-        object:SetModel(cache:GetModel("Models/Box.mdl"))
-        object:SetMaterial(cache:GetMaterial("Materials/StoneTiled.xml"))
-        object:SetOccluder(true)
+        object.model = cache:GetModel("Models/Box.mdl")
+        object.material = cache:GetMaterial("Materials/StoneTiled.xml")
+        object.occluder = true
 
         local body = objectNode:CreateRigidBody()
         local shape = objectNode:CreateCollisionShape()
@@ -154,13 +154,13 @@ function InitScene()
 
     for i = 1, 50 do
         local objectNode = testScene:CreateChild("Box")
-        objectNode:SetPosition(Vector3(Random() * 180 - 90, 1, Random() * 180 - 90))
+        objectNode.position = Vector3(Random() * 180 - 90, 1, Random() * 180 - 90)
         objectNode:SetScale(2)
 
         local object = objectNode:CreateStaticModel()
-        object:SetModel(cache:GetModel("Models/Box.mdl"))
-        object:SetMaterial(cache:GetMaterial("Materials/Stone.xml"))
-        object:SetCastShadows(true)
+        object.model = cache:GetModel("Models/Box.mdl")
+        object.material = cache:GetMaterial("Materials/Stone.xml")
+        object.castShadows = true
 
         local body = objectNode:CreateRigidBody()
         local shape = objectNode:CreateCollisionShape()
@@ -169,14 +169,14 @@ function InitScene()
 
     for i = 1, 10 do
         local objectNode = testScene:CreateChild("Box")
-        objectNode:SetPosition(Vector3(Random() * 180 - 90, 10, Random() * 180 - 90))
+        objectNode.position = Vector3(Random() * 180 - 90, 10, Random() * 180 - 90)
         objectNode:SetScale(20)
 
         local object = objectNode:CreateStaticModel()
-        object:SetModel(cache:GetModel("Models/Box.mdl"))
-        object:SetMaterial(cache:GetMaterial("Materials/Stone.xml"))
-        object:SetCastShadows(true)
-        object:SetOccluder(true)
+        object.model = cache:GetModel("Models/Box.mdl")
+        object.material = cache:GetMaterial("Materials/Stone.xml")
+        object.castShadows = true
+        object.occluder = true
 
         local body = objectNode:CreateRigidBody()
         local shape = objectNode:CreateCollisionShape()
@@ -187,14 +187,14 @@ function InitScene()
     
     for i = 1, 50 do
         local objectNode = testScene:CreateChild("Mushroom")
-        objectNode:SetPosition(Vector3(Random() * 180 - 90, 0, Random() * 180 - 90))
-        objectNode:SetRotation(Quaternion(0, Random(360.0), 0))
+        objectNode.position = Vector3(Random() * 180 - 90, 0, Random() * 180 - 90)
+        objectNode.rotation = Quaternion(0, Random(360.0), 0)
         objectNode:SetScale(5)
 
         local object = objectNode:CreateStaticModel()
-        object:SetModel(cache:GetModel("Models/Mushroom.mdl"))
-        object:SetMaterial(cache:GetMaterial("Materials/Mushroom.xml"))
-        object:SetCastShadows(true)
+        object.model = cache:GetModel("Models/Mushroom.mdl")
+        object.material = cache:GetMaterial("Materials/Mushroom.xml")
+        object.castShadows = true
 
         local body = objectNode:CreateRigidBody()
         local shape = objectNode:CreateCollisionShape()
@@ -208,14 +208,13 @@ function InitScene()
         objectNode:SetRotation(Quaternion(0, Random() * 360, 0))
 
         local object = objectNode:CreateAnimatedModel()
-        object:SetModel(cache:GetModel("Models/Jack.mdl"))
-        object:SetMaterial(cache:GetMaterial("Materials/Jack.xml"))
-        object:SetCastShadows(true)
-
+        object.model = cache:GetModel("Models/Jack.mdl")
+        object.material = cache:GetMaterial("Materials/Jack.xml")
+        object.castShadows = true
         
         -- Create a capsule shape for detecting collisions
         local body = objectNode:CreateRigidBody()
-        body:SetPhantom(true)
+        body.phantom = true
         
         local shape = objectNode:CreateCollisionShape()
         shape:SetCapsule(0.7, 1.8, Vector3(0.0, 0.9, 0.0))
@@ -414,7 +413,7 @@ function HandleMouseButtonDown(eventType, eventData)
                     local decal = result.drawable:GetNode():GetDecalSet()
                     if decal == nil then
                         decal = result.drawable:GetNode():CreateDecalSet()
-                        decal:SetMaterial(cache:GetMaterial("Materials/UrhoDecal.xml"))
+                        decal.material = cache:GetMaterial("Materials/UrhoDecal.xml")
                         -- Increase max. vertices/indices if the target is skinned
                         if result.drawable:GetTypeName() == "AnimatedModel" then
                             decal.maxVertices = 2048
@@ -433,24 +432,24 @@ function HandleSpawnBox(eventType, eventData)
     local rotation = eventData:GetQuaternion("Rot")
     
     local newNode = testScene:CreateChild("")
-    newNode:SetPosition(position)
-    newNode:SetRotation(rotation)
+    newNode.position = position
+    newNode.rotation =rotation
     newNode:SetScale(0.2)
     
     local body = newNode:CreateRigidBody()
-    body:SetMass(1.0)
-    body:SetFriction(1.0)
-    body:SetLinearVelocity(rotation * Vector3(0.0, 1.0, 10.0))
+    body.mass = 1.0
+    body.friction = 1.0
+    body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0)
 
     local shape = newNode:CreateCollisionShape()
     shape:SetBox(Vector3(1, 1, 1))
 
     local object = newNode:CreateStaticModel()
-    object:SetModel(cache:GetModel("Models/Box.mdl"))
-    object:SetMaterial(cache:GetMaterial("Materials/StoneSmall.xml"))
-    object:SetCastShadows(true)
-    object:SetShadowDistance(150.0)
-    object:SetDrawDistance(200.0)
+    object.model = cache:GetModel("Models/Box.mdl")
+    object.material = cache:GetMaterial("Materials/StoneSmall.xml")
+    object.castShadows = true
+    object.shadowDistance = 150.0
+    object.drawDistance = 200.0
 end
 
 function HandleMouseButtonUp(eventType, eventData)
