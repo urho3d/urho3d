@@ -31,7 +31,6 @@ class ListView : public ScrollView
     void SetHierarchyMode(bool enable);
     void SetBaseIndent(int baseIndent);
     void SetClearSelectionOnDefocus(bool enable);
-    void SetDoubleClickInterval(float interval);
 
     void Expand(unsigned index, bool enable, bool recursive = false);
     void ToggleExpand(unsigned index, bool recursive = false);
@@ -48,8 +47,7 @@ class ListView : public ScrollView
     bool GetClearSelectionOnDefocus() const;
     bool GetHierarchyMode() const;
     int GetBaseIndent() const;
-    float GetDoubleClickInterval() const;
-    
+
     tolua_readonly tolua_property__get_set unsigned numItems;
     tolua_property__get_set unsigned selection;
     tolua_readonly tolua_property__get_set UIElement* selectedItem;
@@ -58,5 +56,4 @@ class ListView : public ScrollView
     tolua_property__get_set bool clearSelectionOnDefocus;
     tolua_property__get_set bool hierarchyMode;
     tolua_property__get_set int baseIndent;
-    tolua_property__get_set float doubleClickInterval;
 };

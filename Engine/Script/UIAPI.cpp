@@ -308,8 +308,6 @@ static void RegisterListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "int get_baseIndent() const", asMETHOD(ListView, GetBaseIndent), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void set_clearSelectionOnDefocus(bool)", asMETHOD(ListView, SetClearSelectionOnDefocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool get_clearSelectionOnDefocus() const", asMETHOD(ListView, GetClearSelectionOnDefocus), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void set_doubleClickInterval(float)", asMETHOD(ListView, SetDoubleClickInterval), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "float get_doubleClickInterval() const", asMETHOD(ListView, GetDoubleClickInterval), asCALL_THISCALL);
 }
 
 static void RegisterText(asIScriptEngine* engine)
@@ -395,8 +393,6 @@ static void RegisterLineEdit(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "bool get_textCopyable() const", asMETHOD(LineEdit, IsTextCopyable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "Text@+ get_textElement() const", asMETHOD(LineEdit, GetTextElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "BorderImage@+ get_cursor() const", asMETHOD(LineEdit, GetCursor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "void set_doubleClickInterval(float)", asMETHOD(LineEdit, SetDoubleClickInterval), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "float get_doubleClickInterval() const", asMETHOD(LineEdit, GetDoubleClickInterval), asCALL_THISCALL);
 }
 
 static void RegisterMenu(asIScriptEngine* engine)
@@ -583,9 +579,13 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHOD(UI, GetFrontElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHOD(UI, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_modalRoot() const", asMETHOD(UI, GetRootModalElement), asCALL_THISCALL);
-    engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
+    engine->RegisterObjectMethod("UI", "void set_clipBoardText(const String&in)", asMETHOD(UI, SetClipBoardText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const String& get_clipBoardText() const", asMETHOD(UI, GetClipBoardText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_doubleClickInterval(float)", asMETHOD(UI, SetDoubleClickInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_doubleClickInterval() const", asMETHOD(UI, GetDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHOD(UI, SetNonFocusedMouseWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHOD(UI, IsNonFocusedMouseWheel), asCALL_THISCALL);
+    engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
 }
 
 void RegisterUIAPI(asIScriptEngine* engine)

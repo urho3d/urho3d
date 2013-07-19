@@ -375,7 +375,7 @@ bool FileSelector::EnterFile()
 
     if (fileEntries_[index].directory_)
     {
-        // If a directory doubleclicked, enter it. Recognize . and .. as a special case
+        // If a directory double clicked, enter it. Recognize . and .. as a special case
         const String& newPath = fileEntries_[index].name_;
         if ((newPath != ".") &&  (newPath != ".."))
             SetPath(path_ + newPath);
@@ -389,7 +389,7 @@ bool FileSelector::EnterFile()
     }
     else
     {
-        // Doubleclicking a file is the same as pressing OK
+        // Double clicking a file is the same as pressing OK
         if (!directoryMode_)
         {
             using namespace FileSelected;

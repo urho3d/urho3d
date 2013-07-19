@@ -15,7 +15,7 @@ class LineEdit : public BorderImage
     void SetCursorMovable(bool enable);
     void SetTextSelectable(bool enable);
     void SetTextCopyable(bool enable);
-    void SetDoubleClickInterval(float interval);
+
 
     const String& GetText() const;
     unsigned GetCursorPosition() const;
@@ -27,8 +27,7 @@ class LineEdit : public BorderImage
     bool IsTextCopyable() const;
     Text* GetTextElement() const;
     BorderImage* GetCursor() const;
-    float GetDoubleClickInterval() const;
-    
+
     tolua_property__get_set String& text;
     tolua_property__get_set unsigned cursorPosition;
     tolua_property__get_set float cursorBlinkRate;
@@ -39,5 +38,4 @@ class LineEdit : public BorderImage
     tolua_property__is_set bool textCopyable;
     tolua_readonly tolua_property__get_set Text* textElement;
     tolua_readonly tolua_property__get_set BorderImage* cursor;
-    tolua_property__get_set float doubleClickInterval;
 };

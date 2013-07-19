@@ -486,6 +486,10 @@ void UIElement::OnClick(const IntVector2& position, const IntVector2& screenPosi
 {
 }
 
+void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+{
+}
+
 void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
 }

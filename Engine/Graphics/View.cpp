@@ -1183,7 +1183,7 @@ void View::ExecuteRenderPathCommands()
     bool needResolve = !deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1 && screenBuffers_.Size();
     
     {
-        PROFILE(RenderCommands);
+        PROFILE(ExecuteRenderPath);
         
         unsigned lastCommandIndex = 0;
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)

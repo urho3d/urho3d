@@ -76,6 +76,8 @@ public:
     bool SaveLayout(Serializer& dest, UIElement* element);
     /// Set clipboard text.
     void SetClipBoardText(const String& text);
+    /// Set UI element double click interval in seconds.
+    void SetDoubleClickInterval(float interval);
     /// Set mouse wheel handling flag.
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
 
@@ -97,6 +99,8 @@ public:
     IntVector2 GetCursorPosition() const;
     /// Return clipboard text.
     const String& GetClipBoardText() const { return clipBoard_; }
+    /// Return UI element double click interval in seconds.
+    float GetDoubleClickInterval() const { return doubleClickInterval_; }
     /// Return mouse wheel handling flag.
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
     /// Return true when UI has modal element(s).
@@ -200,6 +204,14 @@ private:
     bool nonFocusedMouseWheel_;
     /// Non-modal batch size (used internally for rendering).
     unsigned nonModalBatchSize_;
+    /// Timer used to trigger double click.
+    Timer* clickTimer_;
+    /// UI element last clicked for tracking double clicks.
+    WeakPtr<UIElement> doubleClickElement_;
+    /// Last mouse button pressed.
+    int lastMouseButtons_;
+    /// Seconds between clicks to register a double click.
+    float doubleClickInterval_;
 };
 
 /// Register UI library objects.

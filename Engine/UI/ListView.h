@@ -94,8 +94,6 @@ public:
     void SetBaseIndent(int baseIndent);
     /// Enable clearing of selection on defocus.
     void SetClearSelectionOnDefocus(bool enable);
-    /// Set item doubleclick interval in seconds.
-    void SetDoubleClickInterval(float interval);
 
     /// Expand item at index. Only has effect in hierarchy mode.
     void Expand(unsigned index, bool enable, bool recursive = false);
@@ -132,8 +130,6 @@ public:
     bool GetHierarchyMode() const { return hierarchyMode_; }
     /// Return base indent.
     int GetBaseIndent() const { return baseIndent_; }
-    /// Return item doubleclick interval in seconds.
-    float GetDoubleClickInterval() const;
 
 protected:
     /// Filter implicit attributes in serialization process.
@@ -159,16 +155,12 @@ protected:
     SharedPtr<UIElement> overlayContainer_;
     /// Clear selection on defocus flag.
     bool clearSelectionOnDefocus_;
-    /// Doubleclick interval.
-    unsigned doubleClickInterval_;
-    /// Doubleclick timer.
-    Timer doubleClickTimer_;
-    /// Last clicked item.
-    unsigned lastClickedItem_;
 
 private:
     /// Handle global UI mouseclick to check for selection change.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData);
+    /// Handle global UI mouse doubleclick.
+    void HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventData);
     /// Handle global focus change to check whether an invisible item was focused.
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
     /// Handle being defocused.

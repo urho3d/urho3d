@@ -1066,7 +1066,7 @@ void UpdateCamera()
     Vector3 pos = playerNode.position;
     Quaternion dir;
 
-    // Make controls seem more immediate by forcing the current mouse yaw into player ninja's Y-axis rotation
+    // Make controls seem more immediate by forcing the current mouse yaw to player ninja's Y-axis rotation
     if (playerNode.vars["Health"].GetInt() > 0)
         playerNode.rotation = Quaternion(0, playerControls.yaw, 0);
 
@@ -1098,13 +1098,13 @@ void UpdateFreelookCamera()
         speedMultiplier = 0.1;
 
     if (input.keyDown['W'])
-        gameCameraNode.TranslateRelative(Vector3(0, 0, 1000) * timeStep * speedMultiplier);
+        gameCameraNode.TranslateRelative(Vector3(0, 0, 10) * timeStep * speedMultiplier);
     if (input.keyDown['S'])
-        gameCameraNode.TranslateRelative(Vector3(0, 0, -1000) * timeStep * speedMultiplier);
+        gameCameraNode.TranslateRelative(Vector3(0, 0, -10) * timeStep * speedMultiplier);
     if (input.keyDown['A'])
-        gameCameraNode.TranslateRelative(Vector3(-1000, 0, 0) * timeStep * speedMultiplier);
+        gameCameraNode.TranslateRelative(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
     if (input.keyDown['D'])
-        gameCameraNode.TranslateRelative(Vector3(1000, 0, 0) * timeStep * speedMultiplier);
+        gameCameraNode.TranslateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
 
     playerControls.yaw += mouseSensitivity * input.mouseMoveX;
     playerControls.pitch += mouseSensitivity * input.mouseMoveY;

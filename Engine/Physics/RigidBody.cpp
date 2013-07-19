@@ -246,15 +246,17 @@ void RigidBody::SetRotation(Quaternion rotation)
 {
     if (body_)
     {
-        // Due to center of mass offset, we need to adjust position also
+        // Due to center of mass offset, we may need to adjust position also
         Vector3 oldPosition = GetPosition();
         btTransform& worldTrans = body_->getWorldTransform();
         worldTrans.setRotation(ToBtQuaternion(rotation));
-        worldTrans.setOrigin(ToBtVector3(oldPosition + rotation * centerOfMass_));
+        if (!centerOfMass_.Equals(Vector3::ZERO))
+            worldTrans.setOrigin(ToBtVector3(oldPosition + rotation * centerOfMass_));
 
         btTransform interpTrans = body_->getInterpolationWorldTransform();
         interpTrans.setRotation(worldTrans.getRotation());
-        interpTrans.setOrigin(worldTrans.getOrigin());
+        if (!centerOfMass_.Equals(Vector3::ZERO))
+            interpTrans.setOrigin(worldTrans.getOrigin());
         body_->setInterpolationWorldTransform(interpTrans);
         body_->updateInertiaTensor();
 
@@ -892,12 +894,10 @@ void RigidBody::OnMarkedDirty(Node* node)
 
         if (!newRotation.Equals(lastRotation_))
         {
-            // Due to possible center of mass offset, if rotation changes, update position also
             lastRotation_ = newRotation;
-            lastPosition_ = newPosition;
-            SetTransform(newPosition, newRotation);
+            SetRotation(newRotation);
         }
-        else if (!newPosition.Equals(lastPosition_))
+        if (!newPosition.Equals(lastPosition_))
         {
             lastPosition_ = newPosition;
             SetPosition(newPosition);

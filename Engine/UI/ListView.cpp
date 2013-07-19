@@ -162,9 +162,7 @@ ListView::ListView(Context* context) :
     multiselect_(false),
     hierarchyMode_(true),    // Init to true here so that the setter below takes effect
     baseIndent_(0),
-    clearSelectionOnDefocus_(false),
-    doubleClickInterval_(500),
-    lastClickedItem_(M_MAX_UNSIGNED)
+    clearSelectionOnDefocus_(false)
 {
     resizeContentWidth_ = true;
 
@@ -172,6 +170,7 @@ ListView::ListView(Context* context) :
     SetHierarchyMode(false);
 
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
+    SubscribeToEvent(E_UIMOUSEDOUBLECLICK, HANDLER(ListView, HandleUIMouseDoubleClick));
     SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleFocusChanged));
 }
 
@@ -190,7 +189,6 @@ void ListView::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Hierarchy Mode", GetHierarchyMode, SetHierarchyMode, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_INT, "Base Indent", GetBaseIndent, SetBaseIndent, int, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(ListView, VAR_BOOL, "Clear Sel. On Defocus", GetClearSelectionOnDefocus, SetClearSelectionOnDefocus, bool, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ListView, VAR_FLOAT, "Double Click Interval", GetDoubleClickInterval, SetDoubleClickInterval, float, 0.5f, AM_FILE);
 }
 
 void ListView::OnKey(int key, int buttons, int qualifiers)
@@ -716,11 +714,6 @@ void ListView::SetClearSelectionOnDefocus(bool enable)
     }
 }
 
-void ListView::SetDoubleClickInterval(float interval)
-{
-    doubleClickInterval_ = Max((int)(interval * 1000.0f), 0);
-}
-
 void ListView::Expand(unsigned index, bool enable, bool recursive)
 {
     if (!hierarchyMode_)
@@ -840,11 +833,6 @@ bool ListView::IsExpanded(unsigned index) const
     return GetItemExpanded(contentElement_->GetChild(index));
 }
 
-float ListView::GetDoubleClickInterval() const
-{
-    return (float)doubleClickInterval_ / 1000.0f;
-}
-
 bool ListView::FilterImplicitAttributes(XMLElement& dest) const
 {
     if (!ScrollView::FilterImplicitAttributes(dest))
@@ -940,14 +928,9 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
     {
         if (element == GetItem(i))
         {
-            // Check doubleclick
-            bool isDoubleClick = false;
+            // Single selection
             if (!multiselect_ || !qualifiers)
-            {
-                if (!(isDoubleClick = doubleClickTimer_.GetMSec(true) < doubleClickInterval_ && lastClickedItem_ == i))
-                    lastClickedItem_ = i;
                 SetSelection(i);
-            }
 
             // Check multiselect with shift & ctrl
             if (multiselect_)
@@ -996,18 +979,31 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                     ToggleSelection(i);
             }
 
-            if (isDoubleClick)
-            {
-                VariantMap eventData;
-                eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
-                eventData[ItemDoubleClicked::P_SELECTION] = i;
-                SendEvent(E_ITEMDOUBLECLICKED, eventData);
-            }
-
             return;
         }
     }
 }
+
+void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventData)
+{
+    if (eventData[UIMouseClick::P_BUTTON].GetInt() != MOUSEB_LEFT)
+        return;
+    UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+
+    unsigned numItems = GetNumItems();
+    for (unsigned i = 0; i < numItems; ++i)
+    {
+        if (element == GetItem(i))
+        {
+            VariantMap eventData;
+            eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
+            eventData[ItemDoubleClicked::P_SELECTION] = i;
+            SendEvent(E_ITEMDOUBLECLICKED, eventData);
+            return;
+        }
+    }
+}
+
 
 void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
 {

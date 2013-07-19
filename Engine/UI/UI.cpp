@@ -62,6 +62,8 @@ const ShortStringHash VAR_ORIGINAL_PARENT("OriginalParent");
 const ShortStringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
 const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
 
+const float DEFAULT_DOUBLECLICK_INTERVAL = 0.5f;
+
 const char* UI_CATEGORY = "UI";
 
 UI::UI(Context* context) :
@@ -70,6 +72,7 @@ UI::UI(Context* context) :
     rootModalElement_(new UIElement(context)),
     mouseButtons_(0),
     qualifiers_(0),
+    doubleClickInterval_(DEFAULT_DOUBLECLICK_INTERVAL),
     initialized_(false),
     usingTouchInput_(false),
     #ifdef WIN32
@@ -81,7 +84,8 @@ UI::UI(Context* context) :
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
     rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);
-
+    clickTimer_ = new Timer();
+    
     // Register UI library object factories
     RegisterUILibrary(context_);
 
@@ -102,6 +106,7 @@ UI::UI(Context* context) :
 
 UI::~UI()
 {
+    delete clickTimer_;
 }
 
 void UI::SetCursor(Cursor* cursor)
@@ -449,6 +454,11 @@ bool UI::SaveLayout(Serializer& dest, UIElement* element)
 void UI::SetClipBoardText(const String& text)
 {
     clipBoard_ = text;
+}
+
+void UI::SetDoubleClickInterval(float interval)
+{
+    doubleClickInterval_ = Max(interval, 0.0f);
 }
 
 void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
@@ -849,6 +859,30 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                 element->OnDragBegin(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
                 SendDragEvent(E_DRAGBEGIN, element, cursorPos);
             }
+
+            // Fire double click event if element matches and is in time
+            if (doubleClickElement_ && element == doubleClickElement_ && clickTimer_->GetMSec(true) <
+                (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == mouseButtons_)
+            {
+                element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
+                doubleClickElement_.Reset();
+                
+                using namespace UIMouseDoubleClick;
+                
+                VariantMap eventData;
+                eventData[P_ELEMENT] = (void*)element.Get();
+                eventData[P_X] = cursorPos.x_;
+                eventData[P_Y] = cursorPos.y_;
+                eventData[P_BUTTON] = button;
+                eventData[P_BUTTONS] = mouseButtons_;
+                eventData[P_QUALIFIERS] = qualifiers_;
+                element->SendEvent(E_UIMOUSEDOUBLECLICK, eventData);
+            } 
+            else 
+            {
+                doubleClickElement_ = element;
+                clickTimer_->Reset();
+            }
         }
         else
         {
@@ -864,6 +898,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         eventData[UIMouseClick::P_BUTTONS] = mouseButtons_;
         eventData[UIMouseClick::P_QUALIFIERS] = qualifiers_;
         SendEvent(E_UIMOUSECLICK, eventData);
+        lastMouseButtons_ = mouseButtons_;
     }
 }
 

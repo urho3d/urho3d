@@ -50,6 +50,8 @@ public:
 
     /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    /// React to mouse doubleclick.
+    virtual void OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag begin.
     virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
@@ -79,9 +81,7 @@ public:
     void SetTextSelectable(bool enable);
     /// Set whether copy-paste operations are allowed, default true.
     void SetTextCopyable(bool enable);
-    /// Set text selection doubleclick interval in seconds.
-    void SetDoubleClickInterval(float interval);
-
+    
     /// Return text.
     const String& GetText() const { return line_; }
     /// Return cursor position.
@@ -102,9 +102,7 @@ public:
     Text* GetTextElement() const { return text_; }
     /// Return cursor element.
     BorderImage* GetCursor() const { return cursor_; }
-    /// Return text selection doubleclick interval in seconds.
-    float GetDoubleClickInterval() const;
-
+    
 protected:
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
@@ -143,10 +141,6 @@ protected:
     bool textSelectable_;
     /// Copy-paste enable flag.
     bool textCopyable_;
-    /// Doubleclick interval.
-    unsigned doubleClickInterval_;
-    /// Doubleclick timer.
-    Timer doubleClickTimer_;
 
 private:
     /// Handle being focused.

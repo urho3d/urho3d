@@ -38,6 +38,17 @@ EVENT(E_UIMOUSECLICK, UIMouseClick)
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
+/// Mouse double click in the UI.
+EVENT(E_UIMOUSEDOUBLECLICK, UIMouseDoubleClick)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
 /// Drag and drop test.
 EVENT(E_DRAGDROPTEST, DragDropTest)
 {
@@ -205,7 +216,7 @@ EVENT(E_SELECTIONCHANGED, SelectionChanged)
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
-/// Listview item doubleclicked.
+/// Listview item double clicked.
 EVENT(E_ITEMDOUBLECLICKED, ItemDoubleClicked)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
