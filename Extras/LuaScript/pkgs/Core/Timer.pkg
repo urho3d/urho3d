@@ -1,25 +1,19 @@
 $#include "Timer.h"
 
-class Timer
-{
-public:
-    unsigned GetMSec(bool reset);
-    void Reset();
-};
 
 class Time : public Object
 {
-public:
-    // Methods:
     unsigned GetFrameNumber() const;
     float GetTimeStep() const;
+    unsigned GetTimerPeriod() const;
     float GetElapsedTime();
     
     static unsigned GetSystemTime();
     static String GetTimeStamp();
+    static void Sleep(unsigned mSec);
     
-    // Properties:
     tolua_readonly tolua_property__get_set unsigned frameNumber;
     tolua_readonly tolua_property__get_set float timeStep;
+    tolua_readonly tolua_property__get_set unsigned timerPeriod;
     tolua_readonly tolua_property__get_set float elapsedTime;
 };

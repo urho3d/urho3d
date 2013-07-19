@@ -1,97 +1,45 @@
 $#include "StringHash.h"
 
-/// 32-bit hash value for a string.
 class StringHash
 {
-public:
-    /// Construct with zero value.
-    StringHash() :
-        value_(0)
-    {
-    }
-    
-    /// Copy-construct from another hash.
-    StringHash(const StringHash& rhs) :
-        value_(rhs.value_)
-    {
-    }
-    
-    /// Construct with an initial value.
-    explicit StringHash(unsigned value) :
-        value_(value)
-    {
-    }
-    
-    /// Construct from a C string case-insensitively.
+    StringHash();
+    StringHash(const StringHash& rhs);
+    explicit StringHash(unsigned value);
     StringHash(const char* str);
-    /// Construct from a string case-insensitively.
     StringHash(const String& str);
-    
-    /// Add a hash.
-    StringHash operator + (const StringHash& rhs) const
-    {
-        StringHash ret;
-        ret.value_ = value_ + rhs.value_;
-        return ret;
-    }
-    
-    // Test for equality with another hash.
-    bool operator == (const StringHash& rhs) const { return value_ == rhs.value_; }
-    /// Test if less than another hash.
-    bool operator < (const StringHash& rhs) const { return value_ < rhs.value_; }
-    /// Return true if nonzero hash value.
-    operator bool () const { return value_ != 0; }
-    /// Return hash value.
-    unsigned Value() const { return value_; }
-    /// Return as string.
+
+    StringHash operator + (const StringHash& rhs) const;
+    bool operator == (const StringHash& rhs) const;
+    bool operator < (const StringHash& rhs) const;
+    operator bool () const;
+    unsigned Value() const;
     String ToString() const;
-    /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return value_; }
+    unsigned ToHash() const;
     
-    /// Calculate hash value case-insensitively from a C string.
     static unsigned Calculate(const char* str);
-    
-    /// Zero hash.
     static const StringHash ZERO;
+    
+    tolua_readonly tolua_property__no_prefix unsigned value;
 };
 
-/// 16-bit hash value for a string.
+
 class ShortStringHash
 {
 public:
-    /// Construct with zero hash value.
     ShortStringHash();
-    
-    /// Copy-construct from another hash value.
     ShortStringHash(const ShortStringHash& rhs);
-    
-    /// Copy-construct from another 32-bit hash value (ignore the high bits.)
     explicit ShortStringHash(const StringHash& rhs);
-    
-    /// Construct with an initial value.
     explicit ShortStringHash(unsigned short value);
-
-    /// Construct from a C string case-insensitively.
     ShortStringHash(const char* str);
-    
-    /// Construct from a string case-insensitively.
     ShortStringHash(const String& str);
-    
-    /// Add a hash.
+
     ShortStringHash operator + (const ShortStringHash& rhs) const;
-    
-    /// Test for equality with another hash.
     bool operator == (const ShortStringHash& rhs) const;
-    
-    /// Test if less than another hash.
     bool operator < (const ShortStringHash& rhs) const;
-    
-    /// Return hash value.
-    unsigned short Value() const { return value_; }
-    
-    /// Calculate hash value case-insensitively from a C string.
+    unsigned short Value() const;
+
     static unsigned short Calculate(const char* str);
-    
-    /// Zero hash.
     static const ShortStringHash ZERO;
+    
+    tolua_readonly tolua_property__no_prefix unsigned short value;
 };

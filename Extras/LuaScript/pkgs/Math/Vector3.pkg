@@ -1,131 +1,45 @@
 $#include "Vector3.h"
 
-/// Three-dimensional vector.
+
 class Vector3
 {
-public:
-    /// Construct undefined.
-    Vector3()
-    {
-    }
+    Vector3();
+    Vector3(const Vector3& vector);
+    Vector3(const Vector2& vector, float z);
+    Vector3(float x, float y, float z);
     
-    /// Copy-construct from another vector.
-    Vector3(const Vector3& vector) :
-        x_(vector.x_),
-        y_(vector.y_),
-        z_(vector.z_)
-    {
-    }
-    
-    /// Construct from a two-dimensional vector and the Z coordinate.
-    Vector3(const Vector2& vector, float z) :
-        x_(vector.x_),
-        y_(vector.y_),
-        z_(z)
-    {
-    }
-    
-    /// Construct from coordinates.
-    Vector3(float x, float y, float z) :
-        x_(x),
-        y_(y),
-        z_(z)
-    {
-    }
-    
-    /// Test for equality with another vector without epsilon.
-    bool operator == (const Vector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
-    /// Add a vector.
-    Vector3 operator + (const Vector3& rhs) const { return Vector3(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_); }
-    /// Return negation.
-    Vector3 operator - () const { return Vector3(-x_, -y_, -z_); }
-    /// Subtract a vector.
-    Vector3 operator - (const Vector3& rhs) const { return Vector3(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_); }
-    /// Multiply with a scalar.
-    Vector3 operator * (float rhs) const { return Vector3(x_ * rhs, y_ * rhs, z_ * rhs); }
-    /// Multiply with a vector.
-    Vector3 operator * (const Vector3& rhs) const { return Vector3(x_ * rhs.x_, y_ * rhs.y_, z_ * rhs.z_); }
-    /// Divide by a scalar.
-    Vector3 operator / (float rhs) const { return Vector3(x_ / rhs, y_ / rhs, z_ / rhs); }
-    /// Divide by a vector.
-    Vector3 operator / (const Vector3& rhs) const { return Vector3(x_ / rhs.x_, y_ / rhs.y_, z_ / rhs.z_); }
+    bool operator == (const Vector3& rhs) const;
+    Vector3 operator + (const Vector3& rhs) const;
+    Vector3 operator - () const;
+    Vector3 operator - (const Vector3& rhs) const;
+    Vector3 operator * (float rhs) const;
+    Vector3 operator * (const Vector3& rhs) const;
+    Vector3 operator / (float rhs) const;
     Vector3 operator / (const Vector3& rhs) const;
+    Vector3 operator / (const Vector3& rhs) const;
+    float Normalize();
+    float Length() const;
+    float LengthSquared() const;
+    float DotProduct(const Vector3& rhs) const;
+    float AbsDotProduct(const Vector3& rhs) const;
+    Vector3 CrossProduct(const Vector3& rhs) const;
+    Vector3 Abs() const;
+    Vector3 Lerp(const Vector3& rhs, float t) const;
+    bool Equals(const Vector3& rhs) const;
+    Vector3 Normalized() const;
     
-    /// Normalize to unit length and return the previous length.
-    float Normalize()
-    {
-        float len = Length();
-        if (len >= M_EPSILON)
-        {
-            float invLen = 1.0f / len;
-            x_ *= invLen;
-            y_ *= invLen;
-            z_ *= invLen;
-        }
-        
-        return len;
-    }
-    
-    /// Return length.
-    float Length() const { return sqrtf(x_ * x_ + y_ * y_ + z_ * z_); }
-    /// Return squared length.
-    float LengthSquared() const { return x_ * x_ + y_ * y_ + z_ * z_; }
-    /// Calculate dot product.
-    float DotProduct(const Vector3& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
-    /// Calculate absolute dot product.
-    float AbsDotProduct(const Vector3& rhs) const { return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_) + Urho3D::Abs(z_ * rhs.z_); }
-    
-    /// Calculate cross product.
-    Vector3 CrossProduct(const Vector3& rhs) const
-    {
-        return Vector3(
-            y_ * rhs.z_ - z_ * rhs.y_,
-            z_ * rhs.x_ - x_ * rhs.z_,
-            x_ * rhs.y_ - y_ * rhs.x_
-        );
-    }
-    
-    /// Return absolute vector.
-    Vector3 Abs() const { return Vector3(Urho3D::Abs(x_), Urho3D::Abs(y_), Urho3D::Abs(z_)); }
-    /// Linear interpolation with another vector.
-    Vector3 Lerp(const Vector3& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
-    /// Test for equality with another vector with epsilon.
-    bool Equals(const Vector3& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_); }
-    
-    /// Return normalized to unit length.
-    Vector3 Normalized() const
-    {
-        float len = Length();
-        if (len >= M_EPSILON)
-            return *this * (1.0f / len);
-        else
-            return *this;
-    }
-    
-    /// Return as string.
     String ToString() const;
     
-    /// X coordinate.
     float x_ @ x;
-    /// Y coordinate.
     float y_ @ y;
-    /// Z coordinate.
     float z_ @ z;
     
-    /// Zero vector.
     static const Vector3 ZERO;
-    /// (-1,0,0) vector.
     static const Vector3 LEFT;
-    /// (1,0,0) vector.
     static const Vector3 RIGHT;
-    /// (0,1,0) vector.
     static const Vector3 UP;
-    /// (0,-1,0) vector.
     static const Vector3 DOWN;
-    /// (0,0,1) vector.
     static const Vector3 FORWARD;
-    /// (0,0,-1) vector.
     static const Vector3 BACK;
-    /// (1,1,1) vector.
     static const Vector3 ONE;
 };

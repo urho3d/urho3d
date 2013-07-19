@@ -1,22 +1,41 @@
 $#include "ProcessUtils.h"
 
-/// Initialize the FPU to round-to-nearest, single precision mode.
-void InitFPU();
-/// Display an error dialog with the specified title and message.
+void ErrorDialog(const String& title, const String& message);
 void ErrorDialog(const char* title, const char* message);
-/// Exit the application with an error message to the console.
+
+void ErrorExit(const String& message = String::EMPTY, int exitCode = EXIT_FAILURE);
 void ErrorExit(const char* message, int exitCode = EXIT_FAILURE);
-/// Open a console window.
+
 void OpenConsoleWindow();
-/// Print ASCII text to the console with a newline appended. Uses printf() to allow printing into the MSVC output window.
+
+void PrintLine(const String& str, bool error = false);
 void PrintLine(const char* str, bool error = false);
-/// Return previously parsed arguments.
+
 const Vector<String>& GetArguments();
-/// Read input from the console window. Return empty if no input.
-String GetConsoleInput();
-/// Return the runtime platform identifier. Currently either "Windows", "Linux", "Mac OS X" or "Android".
-String GetPlatform();
-/// Return the number of physical CPU cores.
+
+// String GetConsoleInput();
+const char* GetConsoleInputCString @ GetConsoleInput();
+
+// String GetPlatform();
+const char* GetPlatformCString @ GetPlatform();
+
 unsigned GetNumPhysicalCPUs();
-/// Return the number of logical CPUs (different from physical if hyperthreading is used.)
 unsigned GetNumLogicalCPUs();
+
+${
+
+static const char* GetConsoleInputCString()
+{
+    static String string;
+    string = GetConsoleInput();
+    return string.CString();
+}
+
+static const char* GetPlatformCString()
+{
+    static String string;
+    string = GetPlatform();
+    return string.CString();
+}
+
+$}

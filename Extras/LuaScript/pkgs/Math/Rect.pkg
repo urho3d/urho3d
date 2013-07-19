@@ -1,187 +1,60 @@
 $#include "Rect.h"
 
-/// Two-dimensional bounding rectangle.
 class Rect
 {
-public:
-    /// Construct an undefined rect.
-    Rect() :
-        min_(Vector2::ZERO),
-        max_(Vector2::ZERO),
-        defined_(false)
-    {
-    }
-    
-    /// Copy-construct from another rect.
-    Rect(const Rect& rect) :
-        min_(rect.min_),
-        max_(rect.max_),
-        defined_(rect.defined_)
-    {
-    }
-    
-    /// Construct from minimum and maximum vectors.
-    Rect(const Vector2& min, const Vector2& max) :
-        min_(min),
-        max_(max),
-        defined_(true)
-    {
-    }
-    
-    /// Construct from coordinates.
-    Rect(float left, float top, float right, float bottom) :
-        min_(left, top),
-        max_(right, bottom),
-        defined_(true)
-    {
-    }
-    
-    /// Construct from a Vector4.
-    Rect(const Vector4& vector) :
-        min_(vector.x_, vector.y_),
-        max_(vector.z_, vector.w_),
-        defined_(true)
-    {
-    }
+    Rect();
+    Rect(const Rect& rect);
+    Rect(const Vector2& min, const Vector2& max);
+    Rect(float left, float top, float right, float bottom);
+    Rect(const Vector4& vector);
 
-    /// Test for equality with another rect.
-    bool operator == (const Rect& rhs) const { return min_ == rhs.min_ && max_ == rhs.max_; }
-
-    /// Define from another rect.
-    void Define(const Rect& rect)
-    {
-        min_ = rect.min_;
-        max_ = rect.max_;
-        defined_ = true;
-    }
+    bool operator == (const Rect& rhs) const;
     
-    /// Define from minimum and maximum vectors.
-    void Define(const Vector2& min, const Vector2& max)
-    {
-        min_ = min;
-        max_ = max;
-        defined_ = true;
-    }
-    
-    /// Define from a point.
-    void Define(const Vector2& point)
-    {
-        min_ = max_ = point;
-        defined_ = true;
-    }
-    
-    /// Merge a point.
-    void Merge(const Vector2& point)
-    {
-        if (!defined_)
-        {
-            min_ = max_ = point;
-            defined_ = true;
-        }
-        
-        if (point.x_ < min_.x_)
-            min_.x_ = point.x_;
-        if (point.x_ > max_.x_)
-            max_.x_ = point.x_;
-        if (point.y_ < min_.y_)
-            min_.y_ = point.y_;
-        if (point.y_ > max_.y_)
-            max_.y_ = point.y_;
-    }
-    
-    /// Merge a rect.
-    void Merge(const Rect& rect)
-    {
-        if (!defined_)
-        {
-            min_ = rect.min_;
-            max_ = rect.max_;
-            defined_ = true;
-        }
-        
-        if (rect.min_.x_ < min_.x_)
-            min_.x_ = rect.min_.x_;
-        if (rect.min_.y_ < min_.y_)
-            min_.y_ = rect.min_.y_;
-        if (rect.max_.x_ > max_.x_)
-            max_.x_ = rect.max_.x_;
-        if (rect.max_.y_ > max_.y_)
-            max_.y_ = rect.max_.y_;
-    }
-    
-    /// Clear to undefined state.
-    void Clear()
-    {
-        min_ = Vector2::ZERO;
-        max_ = Vector2::ZERO;
-        defined_ = false;
-    }
-    
-    /// Clip with another rect.
+    void Define(const Rect& rect);
+    void Define(const Vector2& min, const Vector2& max);
+    void Define(const Vector2& point);
+    void Merge(const Vector2& point);
+    void Merge(const Rect& rect);
+    void Clear();
     void Clip(const Rect& rect);
+    Vector2 Center() const;
+    Vector2 Size() const;
+    Vector2 HalfSize() const;
+    bool Equals(const Rect& rhs) const;
+    Vector4 ToVector4() const;
     
-    /// Return center.
-    Vector2 Center() const { return (max_ + min_) * 0.5f; }
-    /// Return size.
-    Vector2 Size() const { return max_ - min_; }
-    /// Return half-size.
-    Vector2 HalfSize() const { return (max_ - min_) * 0.5f; }
-    /// Test for equality with another rect with epsilon.
-    bool Equals(const Rect& rhs) const { return min_.Equals(rhs.min_) && max_.Equals(rhs.max_); }
-    
-    /// Return as a vector.
-    Vector4 ToVector4() const { return Vector4(min_.x_, min_.y_, max_.x_, max_.y_); }
-    /// Return as string.
     String ToString() const;
-
-    /// Minimum vector.
+    
     Vector2 min_ @ min;
-    
-    /// Maximum vector.
     Vector2 max_ @ max;
-    
-    /// Rect in the range (-1, -1) - (1, 1)
     static const Rect FULL;
-    /// Rect in the range (0, 0) - (1, 1)
     static const Rect POSITIVE;
-    /// Zero-sized rect.
     static const Rect ZERO;
+    
+    tolua_readonly tolua_property__no_prefix Vector2 center;
+    tolua_readonly tolua_property__no_prefix Vector2 size;
+    tolua_readonly tolua_property__no_prefix Vector2 halfSize;
 };
 
-/// Two-dimensional bounding rectangle with integer values.
 class IntRect
 {
-public:
-    /// Construct an undefined rect.
     IntRect();
-    
-    /// Construct from coordinates.
     IntRect(int left, int top, int right, int bottom);
-    
-    /// Test for equality with another rect.
+
     bool operator == (const IntRect& rhs) const;
     
-    /// Return size.
     IntVector2 Size() const;
-    
-    /// Return width.
     int Width() const;
-    
-    /// Return height.
     int Height() const;
     
-    /// Left coordinate.
     int left_ @ left;
-    
-    /// Top coordinate.
     int top_ @ top;
-    
-    /// Right coordinate.
     int right_ @ right;
-    
-    /// Bottom coordinate.
     int bottom_ @ bottom;
     
-    /// Zero-sized rect.
     static const IntRect ZERO;
+    
+    tolua_readonly tolua_property__no_prefix IntVector2 size;
+    tolua_readonly tolua_property__no_prefix int width;
+    tolua_readonly tolua_property__no_prefix int height;
 };

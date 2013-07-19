@@ -27,7 +27,6 @@ class Serializer
     bool WriteFileID(const String& value);
     bool WriteStringHash(const StringHash& value);
     bool WriteShortStringHash(const ShortStringHash& value);
-    bool WriteBuffer(const PODVector<unsigned char>& buffer);
     bool WriteResourceRef(const ResourceRef& value);
     bool WriteResourceRefList(const ResourceRefList& value);
     bool WriteVariant(const Variant& value);

@@ -18,7 +18,6 @@ public:
     float HitDistance(const Plane& plane) const;
     float HitDistance(const BoundingBox& box) const;
     
-    float HitDistance(const Frustum& frustum) const;
     float HitDistance(const Frustum& frustum, bool solidInside = true) const;
     
     float HitDistance(const Sphere& sphere) const;

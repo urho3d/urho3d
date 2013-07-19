@@ -16,10 +16,11 @@ $#include "ResourceCache.h"
 $#include "Timer.h"
 $#include "UI.h"
 
-
-/// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class Context
 {
+    Object* GetEventSender() const;
+    EventHandler* GetEventHandler() const;
+    const String& GetTypeName(ShortStringHash type) const;
 };
 
 Context* GetContext();

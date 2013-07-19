@@ -3,9 +3,26 @@ $#include "Object.h"
 class Object : public RefCounted
 {
 public:
+    virtual ShortStringHash GetType() const;
+    
+    // virtual const String& GetTypeName() const;
     tolua_outside const char* ObjectGetTypeName @ GetTypeName() const;
+    
+    // void SendEvent(StringHash eventType);
     tolua_outside void ObjectSendEvent @ SendEvent(const char* eventName);
+
+    // void SendEvent(StringHash eventType, VariantMap& eventData);
     tolua_outside void ObjectSendEvent @ SendEvent(const char* eventName, VariantMap& eventData);
+    
+    Context* GetContext() const;
+    Object* GetEventSender() const;
+    EventHandler* GetEventHandler() const;
+    const String& GetCategory() const;
+    
+    tolua_readonly tolua_property__get_set Context* context;
+    tolua_readonly tolua_property__get_set Object* eventSender;
+    tolua_readonly tolua_property__get_set EventHandler* eventHandler;
+    tolua_readonly tolua_property__get_set String& category;
 };
 
 ${

@@ -47,7 +47,6 @@ class Drawable : public Component
     bool GetCastShadows() const;
     bool IsOccluder() const;
     bool IsOccludee() const;
-    const Vector<SourceBatch>& GetBatches() const;
     
     void SetZone(Zone* zone, bool temporary = false);
     void SetSortValue(float value);
@@ -69,8 +68,6 @@ class Drawable : public Component
     bool IsInView(unsigned frameNumber) const;
     bool IsInView(const FrameInfo& frame, bool mainView = true) const;
     bool HasBasePass(unsigned batchIndex) const;
-    const PODVector<Light*>& GetLights() const;
-    const PODVector<Light*>& GetVertexLights() const;
     Light* GetFirstLight() const;
     float GetMinZ() const;
     float GetMaxZ() const;

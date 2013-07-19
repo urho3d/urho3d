@@ -39,7 +39,7 @@ public:
     tolua_readonly tolua_property__get_set int mixRate;
     tolua_readonly tolua_property__get_set bool interpolation;
 
-tolua_property__get_set SoundListener* listener;
+    tolua_property__get_set SoundListener* listener;
     tolua_readonly tolua_property__is_set bool stereo;    
     tolua_readonly tolua_property__is_set bool playing;
     tolua_readonly tolua_property__is_set bool initialized;

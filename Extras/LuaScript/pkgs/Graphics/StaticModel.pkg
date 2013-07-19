@@ -16,12 +16,13 @@ class StaticModel : public Drawable
     Model* GetModel() const;
     const BoundingBox& GetBoundingBox() const;
     unsigned GetNumGeometries() const;
-    Material* GetMaterial(unsigned index) const;
+    Material* GetMaterial(unsigned index = 0) const;
     unsigned GetOcclusionLodLevel() const;
     bool IsInside(const Vector3& point) const;
     bool IsInsideLocal(const Vector3& point) const;
     
     tolua_property__get_set Model* model;
+    tolua_property__get_set Material* material;
     tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
     tolua_readonly tolua_property__get_set unsigned numGeometries;
     tolua_property__get_set unsigned occlusionLodLevel;

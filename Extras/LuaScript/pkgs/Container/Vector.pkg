@@ -1,408 +1,100 @@
 $#include "Vector.h"
 $#include "Vector3.h"
 
-/// %Vector template class.
 class Vector : public VectorBase
 {
     TOLUA_TEMPLATE_BIND(T, String)
-public:
-    /// Construct empty.
-    Vector()
-    {
-    }
-    
-    /// Construct with initial size.
-    explicit Vector(unsigned size)
-    {
-        Resize(size, 0);
-    }
-    
-    /// Construct with initial data.
-    Vector(const T* data, unsigned size)
-    {
-        Resize(size, data);
-    }
-    
-    /// Construct from another vector.
-    Vector(const Vector<T>& vector)
-    {
-        *this = vector;
-    }
-    
-    /// Destruct.
-    ~Vector()
-    {
-        Clear();
-        delete[] buffer_;
-    }
-    
-    /// Add an element.
-    Vector<T> operator + (const T& rhs) const
-    {
-        Vector<T> ret(*this);
-        ret.Push(rhs);
-        return ret;
-    }
-    
-    /// Add another vector.
-    Vector<T> operator + (const Vector<T>& rhs) const
-    {
-        Vector<T> ret(*this);
-        ret.Push(rhs);
-        return ret;
-    }
-    
-    /// Test for equality with another vector.
-    bool operator == (const Vector<T>& rhs) const
-    {
-        if (rhs.size_ != size_)
-            return false;
-        
-        T* buffer = Buffer();
-        T* rhsBuffer = rhs.Buffer();
-        for (unsigned i = 0; i < size_; ++i)
-        {
-            if (buffer[i] != rhsBuffer[i])
-                return false;
-        }
-        
-        return true;
-    }
-    
-    /// Return element at index.
-    T& operator [] (unsigned index) { assert(index < size_); return Buffer()[index]; }
-    /// Return const element at index.
-    const T& operator [] (unsigned index) const { assert(index < size_); return Buffer()[index]; }
-    /// Return element at index.
-    T& At(unsigned index) { assert(index < size_); return Buffer()[index]; }
-    /// Return const element at index.
-    const T& At(unsigned index) const { assert(index < size_); return Buffer()[index]; }
 
-    /// Add an element at the end.
-    void Push(const T& value) { Resize(size_ + 1, &value); }
-    /// Add another vector at the end.
-    void Push(const Vector<T>& vector) { Resize(size_ + vector.size_, vector.Buffer()); }
+    Vector();
+    Vector(const Vector<T>& vector);
+    ~Vector();
     
-    /// Remove the last element.
-    void Pop()
-    {
-        if (size_)
-            Resize(size_ - 1, 0);
-    }
+    Vector<T> operator + (const T& rhs) const;
+    Vector<T> operator + (const Vector<T>& rhs) const;
     
-    /// Insert an element at position.
-    void Insert(unsigned pos, const T& value)
-    {
-        if (pos > size_)
-            pos = size_;
-        
-        unsigned oldSize = size_;
-        Resize(size_ + 1, 0);
-        MoveRange(pos + 1, pos, oldSize - pos);
-        Buffer()[pos] = value;
-    }
+    bool operator == (const Vector<T>& rhs) const;
     
-    /// Insert another vector at position.
-    void Insert(unsigned pos, const Vector<T>& vector)
-    {
-        if (pos > size_)
-            pos = size_;
-        
-        unsigned oldSize = size_;
-        Resize(size_ + vector.size_, 0);
-        MoveRange(pos + vector.size_, pos, oldSize - pos);
-        CopyElements(Buffer() + pos, vector.Buffer(), vector.size_);
-    }
-    /// Erase a range of elements.
-    void Erase(unsigned pos, unsigned length = 1)
-    {
-        // Return if the range is illegal
-        if (pos + length > size_ || !length)
-            return;
-        
-        MoveRange(pos, pos + length, size_ - pos - length);
-        Resize(size_ - length, 0);
-    }
-       
-    /// Erase an element if found.
-    bool Remove(const T& value)
-    {
-        Iterator i = Find(value);
-        if (i != End())
-        {
-            Erase(i);
-            return true;
-        }
-        else
-            return false;
-    }
+    T& operator [] (unsigned index);
+    const T& operator [] (unsigned index) const;
+    T& At(unsigned index);
+    const T& At(unsigned index) const;
     
-    /// Clear the vector.
-    void Clear() { Resize(0); }
-    /// Resize the vector.
-    void Resize(unsigned newSize) { Resize(newSize, 0); }
+    void Push(const T& value);
+    void Push(const Vector<T>& vector);
+    void Pop();
     
-    /// Set new capacity.
-    void Reserve(unsigned newCapacity)
-    {
-        if (newCapacity < size_)
-            newCapacity = size_;
-        
-        if (newCapacity != capacity_)
-        {
-            T* newBuffer = 0;
-            capacity_ = newCapacity;
-            
-            if (capacity_)
-            {
-                newBuffer = reinterpret_cast<T*>(AllocateBuffer(capacity_ * sizeof(T)));
-                // Move the data into the new buffer
-                ConstructElements(newBuffer, Buffer(), size_);
-            }
-            
-            // Delete the old buffer
-            DestructElements(Buffer(), size_);
-            delete[] buffer_;
-            buffer_ = reinterpret_cast<unsigned char*>(newBuffer);
-        }
-    }
+    void Insert(unsigned pos, const T& value);
+    void Insert(unsigned pos, const Vector<T>& vector);
+    void Erase(unsigned pos, unsigned length = 1);
     
-    /// Reallocate so that no extra memory is used.
-    void Compact() { Reserve(size_); }
+    bool Remove(const T& value);
+    void Clear();
     
-    /// Return whether contains a specific value.
-    bool Contains(const T& value) const { return Find(value) != End(); }
+    void Resize(unsigned newSize);
+    void Reserve(unsigned newCapacity);
+    void Compact();
     
-    /// Return first element.
-    T& Front() { assert(size_); return Buffer()[0]; }
-    /// Return const first element.
-    const T& Front() const { assert(size_); return Buffer()[0]; }
-    /// Return last element.
-    T& Back() { assert(size_); return Buffer()[size_ - 1]; }
-    /// Return const last element.
-    const T& Back() const { assert(size_); return Buffer()[size_ - 1]; }
-    /// Return size of vector.
-    unsigned Size() const { return size_; }
-    /// Return capacity of vector.
-    unsigned Capacity() const { return capacity_; }
-    /// Return whether vector is empty.
-    bool Empty() const { return size_ == 0; }    
+    bool Contains(const T& value) const;
+    
+    T& Front();
+    const T& Front() const;
+    T& Back();
+    const T& Back() const;
+    
+    unsigned Size() const;
+    unsigned Capacity() const;
+    bool Empty() const;
+    
+    tolua_readonly tolua_property__no_prefix unsigned size;
+    tolua_readonly tolua_property__no_prefix unsigned capacity;
+    tolua_readonly tolua_property__no_prefix bool empty;
 };
 
-/// %Vector template class for POD types. Does not call constructors or destructors and uses block move.
 class PODVector
 {
     TOLUA_TEMPLATE_BIND(T, Vector3)
-public:   
-    /// Construct empty.
-    PODVector()
-    {
-    }
     
-    /// Construct with initial size.
-    explicit PODVector(unsigned size)
-    {
-        Resize(size);
-    }
+    PODVector();
+    PODVector(const PODVector<T>& vector);
+    ~PODVector();
     
-    /// Construct with initial data.
-    PODVector(const T* data, unsigned size)
-    {
-        Resize(size);
-        CopyElements(Buffer(), data, size);
-    }
+    PODVector<T> operator + (const T& rhs) const;
+    PODVector<T> operator + (const PODVector<T>& rhs) const;
     
-    /// Destruct.
-    ~PODVector()
-    {
-        delete[] buffer_;
-    }
+    bool operator == (const PODVector<T>& rhs) const;
     
-    /// Add an element.
-    PODVector<T> operator + (const T& rhs) const
-    {
-        PODVector<T> ret(*this);
-        ret.Push(rhs);
-        return ret;
-    }
+    T& operator [] (unsigned index);
+    const T& operator [] (unsigned index) const;
+    T& At(unsigned index);
+    const T& At(unsigned index) const;
     
-    /// Add another vector.
-    PODVector<T> operator + (const PODVector<T>& rhs) const
-    {
-        PODVector<T> ret(*this);
-        ret.Push(rhs);
-        return ret;
-    }
+    void Push(const T& value);
+    void Push(const PODVector<T>& vector);
+    void Pop();
     
-    /// Test for equality with another vector.
-    bool operator == (const PODVector<T>& rhs) const
-    {
-        if (rhs.size_ != size_)
-            return false;
-        
-        T* buffer = Buffer();
-        T* rhsBuffer = rhs.Buffer();
-        for (unsigned i = 0; i < size_; ++i)
-        {
-            if (buffer[i] != rhsBuffer[i])
-                return false;
-        }
-        
-        return true;
-    }
+    void Insert(unsigned pos, const T& value);
+    void Insert(unsigned pos, const PODVector<T>& vector);
+    void Erase(unsigned pos, unsigned length = 1);
     
-    /// Return element at index.
-    T& operator [] (unsigned index) { assert(index < size_); return Buffer()[index]; }
-    /// Return const element at index.
-    const T& operator [] (unsigned index) const { assert(index < size_); return Buffer()[index]; }
-    /// Return element at index.
-    T& At(unsigned index) { assert(index < size_); return Buffer()[index]; }
-    /// Return const element at index.
-    const T& At(unsigned index) const { assert(index < size_); return Buffer()[index]; }
+    bool Remove(const T& value);
+    void Clear();
     
-    /// Add an element at the end.
-    void Push(const T& value)
-    {
-        if (size_ < capacity_)
-            ++size_;
-        else
-            Resize(size_ + 1);
-        Back() = value;
-    }
+    void Resize(unsigned newSize);
+    void Reserve(unsigned newCapacity);
+    void Compact();
     
-    /// Add another vector at the end.
-    void Push(const PODVector<T>& vector)
-    {
-        unsigned oldSize = size_;
-        Resize(size_ + vector.size_);
-        CopyElements(Buffer() + oldSize, vector.Buffer(), vector.size_);
-    }
+    bool Contains(const T& value) const;
     
-    /// Remove the last element.
-    void Pop()
-    {
-        if (size_)
-            Resize(size_ - 1);
-    }
+    T& Front();
+    const T& Front() const;
+    T& Back();
+    const T& Back() const;
     
-    /// Insert an element at position.
-    void Insert(unsigned pos, const T& value)
-    {
-        if (pos > size_)
-            pos = size_;
-        
-        unsigned oldSize = size_;
-        Resize(size_ + 1);
-        MoveRange(pos + 1, pos, oldSize - pos);
-        Buffer()[pos] = value;
-    }
+    unsigned Size() const;
+    unsigned Capacity() const;
+    bool Empty() const;
     
-    /// Insert another vector at position.
-    void Insert(unsigned pos, const PODVector<T>& vector)
-    {
-        if (pos > size_)
-            pos = size_;
-        
-        unsigned oldSize = size_;
-        Resize(size_ + vector.size_);
-        MoveRange(pos + vector.size_, pos, oldSize - pos);
-        CopyElements(Buffer() + pos, vector.Buffer(), vector.size_);
-    }
-    
-    /// Erase a range of elements.
-    void Erase(unsigned pos, unsigned length = 1)
-    {
-        // Return if the range is illegal
-        if (!length || pos + length > size_)
-            return;
-        
-        MoveRange(pos, pos + length, size_ - pos - length);
-        Resize(size_ - length);
-    }
-    
-    /// Erase an element if found.
-    bool Remove(const T& value)
-    {
-        Iterator i = Find(value);
-        if (i != End())
-        {
-            Erase(i);
-            return true;
-        }
-        else
-            return false;
-    }
-    
-    /// Clear the vector.
-    void Clear() { Resize(0); }
-    
-    /// Resize the vector.
-    void Resize(unsigned newSize)
-    {
-        if (newSize > capacity_)
-        {
-            if (!capacity_)
-                capacity_ = newSize;
-            else
-            {
-                while (capacity_ < newSize)
-                    capacity_ += (capacity_ + 1) >> 1;
-            }
-            
-            unsigned char* newBuffer = AllocateBuffer(capacity_ * sizeof(T));
-            // Move the data into the new buffer and delete the old
-            if (buffer_)
-            {
-                CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
-                delete[] buffer_;
-            }
-            buffer_ = newBuffer;
-        }
-        
-        size_ = newSize;
-    }
-    
-    /// Set new capacity.
-    void Reserve(unsigned newCapacity)
-    {
-        if (newCapacity < size_)
-            newCapacity = size_;
-        
-        if (newCapacity != capacity_)
-        {
-            unsigned char* newBuffer = 0;
-            capacity_ = newCapacity;
-            
-            if (capacity_)
-            {
-                newBuffer = AllocateBuffer(capacity_ * sizeof(T));
-                // Move the data into the new buffer
-                CopyElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
-            }
-            
-            // Delete the old buffer
-            delete[] buffer_;
-            buffer_ = newBuffer;
-        }
-    }
-    
-    /// Reallocate so that no extra memory is used.
-    void Compact() { Reserve(size_); }
-    
-    /// Return whether contains a specific value.
-    bool Contains(const T& value) const { return Find(value) != End(); }
-    /// Return first element.
-    T& Front() { return Buffer()[0]; }
-    /// Return const first element.
-    const T& Front() const { return Buffer()[0]; }
-    /// Return last element.
-    T& Back() { assert(size_); return Buffer()[size_ - 1]; }
-    /// Return const last element.
-    const T& Back() const { assert(size_); return Buffer()[size_ - 1]; }
-    /// Return number of elements.
-    unsigned Size() const { return size_; }
-    /// Return capacity of vector.
-    unsigned Capacity() const { return capacity_; }
-    /// Return whether vector is empty.
-    bool Empty() const { return size_ == 0; }
+    tolua_readonly tolua_property__no_prefix unsigned size;
+    tolua_readonly tolua_property__no_prefix unsigned capacity;
+    tolua_readonly tolua_property__no_prefix bool empty;
 };

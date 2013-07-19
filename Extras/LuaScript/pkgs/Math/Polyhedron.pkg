@@ -1,60 +1,26 @@
 $#include "Polyhedron.h"
 
-/// A convex volume built from polygon faces.
 class Polyhedron
 {
-public:
-    /// Construct empty.
-    Polyhedron()
-    {
-    }
-    
-    /// Copy-construct from another polyhedron.
-    Polyhedron(const Polyhedron& polyhedron) :
-        faces_(polyhedron.faces_)
-    {
-    }
-    
-    /// Construct from a bounding box.
-    Polyhedron(const BoundingBox& box)
-    {
-        Define(box);
-    }
-    
-    /// Construct from a frustum.
-    Polyhedron(const Frustum& frustum)
-    {
-        Define(frustum);
-    }
-    
-    /// Destruct.
+    Polyhedron();
+    Polyhedron(const Polyhedron& polyhedron);
+    Polyhedron(const BoundingBox& box);
+    Polyhedron(const Frustum& frustum);
     ~Polyhedron();
-    
-    /// Define from a bounding box.
+
     void Define(const BoundingBox& box);
-    /// Define from a frustum.
     void Define(const Frustum& frustum);
-    /// Add a triangle face.
     void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2);
-    /// Add a quadrilateral face.
     void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
-    /// Clip with a plane.
     void Clip(const Plane& plane);
-    /// Clip with a bounding box.
     void Clip(const BoundingBox& box);
-    /// Clip with a frustum.
     void Clip(const Frustum& box);
-    /// Clear all faces.
     void Clear();
-    /// Transform with a 3x3 matrix.
     void Transform(const Matrix3& transform);
-    /// Transform with a 3x4 matrix.
     void Transform(const Matrix3x4& transform);
-    
-    /// Return transformed with a 3x3 matrix.
     Polyhedron Transformed(const Matrix3& transform) const;
-    /// Return transformed with a 3x4 matrix.
     Polyhedron Transformed(const Matrix3x4& transform) const;
-    /// Return whether is empty.
-    bool Empty() const { return faces_.Empty(); }
+    bool Empty() const;
+    
+    tolua_readonly tolua_property__no_prefix bool empty;
 };

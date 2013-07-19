@@ -1,6 +1,5 @@
 $#define TOLUA_RELEASE
 
-$pfile "Container/Ptr.pkg"
 $pfile "Container/Str.pkg"
 $pfile "Container/Vector.pkg"
 
