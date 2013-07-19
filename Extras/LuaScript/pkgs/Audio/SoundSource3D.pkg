@@ -3,19 +3,16 @@ $#include "SoundSource3D.h"
 class SoundSource3D : public SoundSource
 {
 public:
-    // Methods:
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
-        
     void SetNearDistance(float distance);
-    float GetNearDistance() const;
-    
     void SetFarDistance(float distance);
-    float GetFarDistance() const;
-
     void SetRolloffFactor(float factor);
+    void CalculateAttenuation();
+    
+    float GetNearDistance() const;
+    float GetFarDistance() const;
     float RollAngleoffFactor() const;
-
-    // Properties:
+    
     tolua_property__get_set float nearDistance;
     tolua_property__get_set float farDistance;
     tolua_property__get_set float rolloffFactor;

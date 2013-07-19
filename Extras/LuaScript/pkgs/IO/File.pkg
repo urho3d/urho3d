@@ -1,6 +1,5 @@
 $#include "File.h"
 
-/// File open mode.
 enum FileMode
 {
     FILE_READ = 0,
@@ -8,45 +7,33 @@ enum FileMode
     FILE_READWRITE
 };
 
-/// %File opened either through the filesystem or from within a package file.
 class File : public Deserializer
 {
-public:
-    /// Construct.
     File(Context* context);
-    /// Construct and open a filesystem file.
     File(Context* context, const String& fileName, FileMode mode = FILE_READ);
-    /// Construct and open from a package file.
     File(Context* context, PackageFile* package, const String& fileName);
-    /// Destruct. Close the file if open.
     virtual ~File();
     
-    /// Read bytes from the file. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size);
-    /// Set position from the beginning of the file.
     virtual unsigned Seek(unsigned position);
-    /// Return the file name.
+    virtual unsigned Write(const void* data, unsigned size);
     virtual const String& GetName() const;
-    /// Return a checksum of the file contents using the SDBM hash algorithm.
     virtual unsigned GetChecksum();
     
-    /// Open a filesystem file. Return true if successful.
     bool Open(const String& fileName, FileMode mode = FILE_READ);
-    /// Open from within a package file. Return true if successful.
     bool Open(PackageFile* package, const String& fileName);
-    /// Close the file.
     void Close();
-    /// Flush any buffered output to the file.
     void Flush();
-    /// Change the file name. Used by the resource system.
     void SetName(const String& name);
     
-    /// Return the open mode.
-    FileMode GetMode() const { return mode_; }
-    /// Return whether is open.
-    bool IsOpen() const { return handle_ != 0; }
-    /// Return the file handle.
-    void* GetHandle() const { return handle_; }
-    /// Return whether the file originates from a package.
-    bool IsPackaged() const { return offset_ != 0; }
+    FileMode GetMode() const;
+    bool IsOpen() const;
+    void* GetHandle() const;
+    bool IsPackaged() const;
+    
+    tolua_readonly tolua_property__get_set String& name;
+    tolua_readonly tolua_property__get_set unsigned checksum;
+    tolua_readonly tolua_property__get_set FileMode mode;
+    tolua_readonly tolua_property__is_set bool open;
+    tolua_readonly tolua_property__is_set bool packaged;
 };

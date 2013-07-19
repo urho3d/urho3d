@@ -1,45 +1,46 @@
 $#include "SoundSource.h"
 
+enum SoundType{};
+
 class SoundSource : public Component
 {
 public:
-    // Methods:
     void Play(Sound* sound);
     void Play(Sound* sound, float frequency);
     void Play(Sound* sound, float frequency, float gain);
     void Play(Sound* sound, float frequency, float gain, float panning);
     void Stop();
-
     void SetSoundType(SoundType type);
-    SoundType GetSoundType() const;
-    
     void SetFrequency(float frequency);
-    float GetFrequency() const;
-    
     void SetGain(float gain);
-    float GetGain() const;
-    
     void SetAttenuation(float attenuation);
-    float GetAttenuation() const;
-    
     void SetPanning(float panning);
-    float GetPanning() const;
-    
     void SetAutoRemove(bool enable);
-    bool GetAutoRemove() const;
+    // void SetPlayPosition(signed char* pos);
     
     Sound* GetSound() const;
+    // volatile signed char* GetPlayPosition() const;
+    SoundType GetSoundType() const;
     float GetTimePosition() const;
+    float GetFrequency() const;
+    float GetGain() const;
+    float GetAttenuation() const;
+    float GetPanning() const;
+    bool GetAutoRemove() const;
     bool IsPlaying() const;
     
-    // Properties:
+    void PlayLockless(Sound* sound);
+    void StopLockless();
+    void SetPlayPositionLockless(signed char* position);
+    void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation);
+    
+    tolua_readonly tolua_property__get_set Sound* sound;
     tolua_property__get_set SoundType soundType;
+    tolua_readonly tolua_property__get_set float timePosition;
     tolua_property__get_set float frequency;
     tolua_property__get_set float gain;
     tolua_property__get_set float attenuation;
     tolua_property__get_set float panning;
     tolua_property__get_set bool autoRemove;
-    tolua_readonly tolua_property__get_set Sound* sound;
-    tolua_readonly tolua_property__get_set float timePosition;
     tolua_readonly tolua_property__is_set bool playing;
 };

@@ -3,25 +3,23 @@ $#include "Sound.h"
 class Sound : public Resource
 {
 public:
-    // Methods:
     float GetLength() const;
+    unsigned GetDataSize() const;
     unsigned GetSampleSize() const;
     float GetFrequency();
-    
-    void SetLooped(bool enable);
+    unsigned GetIntFrequency();
     bool IsLooped() const;
-    
     bool IsSixteenBit() const;
     bool IsStereo() const;
     bool IsCompressed() const;
 
-    // Properties:
     tolua_readonly tolua_property__get_set float length;
+    tolua_readonly tolua_property__get_set unsigned dataSize;
     tolua_readonly tolua_property__get_set unsigned sampleSize;
     tolua_readonly tolua_property__get_set float frequency;
+    tolua_readonly tolua_property__get_set int intFrequency;
     tolua_property__is_set bool looped;
     tolua_readonly tolua_property__is_set bool sixteenBit;
     tolua_readonly tolua_property__is_set bool stereo;
     tolua_readonly tolua_property__is_set bool compressed;
-
 };

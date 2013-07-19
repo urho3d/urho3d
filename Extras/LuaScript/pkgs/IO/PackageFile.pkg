@@ -1,34 +1,32 @@
 $#include "PackageFile.h"
 
-/// %File entry within the package file.
 struct PackageEntry
 {
-    /// Offset from the beginning.
-    unsigned offset_;
-    /// File size.
-    unsigned size_;
-    /// File checksum.
-    unsigned checksum_;
+    unsigned offset_ @ offset;
+    unsigned size_ @ size;
+    unsigned checksum_ @ checksum;
 };
 
-/// Stores files of a directory tree sequentially for convenient access.
 class PackageFile : public Object
 {
-public:
-    /// Open the package file. Return true if successful.
+    PackageFile(Context* context);
+    PackageFile(Context* context, const String& fileName);
+    virtual ~PackageFile();
+    
     bool Open(const String& fileName);
-    /// Check if a file exists within the package file.
     bool Exists(const String& fileName) const;
-    /// Return the file entry corresponding to the name, or null if not found.
     const PackageEntry* GetEntry(const String& fileName) const;
-    /// Return the package file name.
-    const String& GetName() const { return fileName_; }
-    /// Return hash of the package file name.
-    StringHash GetNameHash() const { return nameHash_; }
-    /// Return number of files.
-    unsigned GetNumFiles() const { return entries_.Size(); }
-    /// Return total size of the package file.
-    unsigned GetTotalSize() const { return totalSize_; }
-    /// Return checksum of the package file contents.
-    unsigned GetChecksum() const { return checksum_; }
+    const HashMap<String, PackageEntry>& GetEntries() const;
+    
+    const String& GetName() const;
+    StringHash GetNameHash() const;
+    unsigned GetNumFiles() const;
+    unsigned GetTotalSize() const;
+    unsigned GetChecksum() const;
+    
+    tolua_readonly tolua_property__get_set String& name;
+    tolua_readonly tolua_property__get_set StringHash nameHash;
+    tolua_readonly tolua_property__get_set unsigned numFiles;
+    tolua_readonly tolua_property__get_set unsigned totalSize;
+    tolua_readonly tolua_property__get_set unsigned checksum;
 };

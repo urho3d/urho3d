@@ -1,120 +1,69 @@
 $#include "Input.h"
 
-/// %Input state for a finger touch.
 struct TouchState
 {
-    /// Touch (finger) ID.
     int touchID_ @ touchID;
-    /// Position in screen coordinates.
     IntVector2 position_ @ position;
-    /// Last position in screen coordinates.
     IntVector2 lastPosition_ @ lastPosition;
-    /// Movement since last frame.
     IntVector2 delta_ @ delta;
-    /// Finger pressure.
     float pressure_ @ pressure;
 };
 
-/// %Input state for a joystick.
 struct JoystickState
 {
-    /// Return number of buttons.
-    unsigned GetNumButtons() const { return buttons_.Size(); }
-    /// Return number of axes.
-    unsigned GetNumAxes() const { return axes_.Size(); }
-    /// Return number of hats.
-    unsigned GetNumHats() const { return hats_.Size(); }
+    unsigned GetNumButtons() const;
+    unsigned GetNumAxes() const;
+    unsigned GetNumHats() const;
     
-    /// Check if a button is held down.
-    bool GetButtonDown(unsigned index) const
-    {
-        if (index < buttons_.Size())
-            return buttons_[index];
-        else
-            return false;
-    }
+    bool GetButtonDown(unsigned index) const;
+    bool GetButtonPress(unsigned index) const;
+    float GetAxisPosition(unsigned index) const;
+    int GetHatPosition(unsigned index) const;
     
-    /// Check if a button has been pressed on this frame.
-    bool GetButtonPress(unsigned index) const
-    {
-        if (index < buttons_.Size())
-            return buttonPress_[index];
-        else
-            return false;
-    }
-    
-    /// Return axis position.
-    float GetAxisPosition(unsigned index) const
-    {
-        if (index < axes_.Size())
-            return axes_[index];
-        else
-            return 0.0f;
-    }
-    
-    /// Return hat position.
-    int GetHatPosition(unsigned index) const
-    {
-        if (index < hats_.Size())
-            return hats_[index];
-        else
-            return HAT_CENTER;
-    }
+    tolua_readonly tolua_property__get_set unsigned numButtons;
+    tolua_readonly tolua_property__get_set unsigned numAxes;
+    tolua_readonly tolua_property__get_set unsigned numHats;
 };
 
-/// %Input subsystem. Converts operating system window messages to input state and events.
 class Input : public Object
 {
-public:
-    /// Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window.
     void SetMouseVisible(bool enable);
-    /// Open a joystick. Return true if successful.
     bool OpenJoystick(unsigned index);
-    /// Close a joystick.
     void CloseJoystick(unsigned index);
-    /// Redetect joysticks. Return true if successful.
     bool DetectJoysticks();
     
-    /// Check if a key is held down.
     bool GetKeyDown(int key) const;
-    /// Check if a key has been pressed on this frame.
     bool GetKeyPress(int key) const;
-    /// Check if a mouse button is held down.
     bool GetMouseButtonDown(int button) const;
-    /// Check if a mouse button has been pressed on this frame.
     bool GetMouseButtonPress(int button) const;
-    /// Check if a qualifier key is held down.
     bool GetQualifierDown(int qualifier) const;
-    /// Check if a qualifier key has been pressed on this frame.
     bool GetQualifierPress(int qualifier) const;
-    /// Return the currently held down qualifiers.
     int GetQualifiers() const;
-    /// Return mouse position within window. Should only be used with a visible mouse cursor.
     IntVector2 GetMousePosition() const;
-    /// Return mouse movement since last frame.
-    const IntVector2& GetMouseMove() const { return mouseMove_; }
-    /// Return horizontal mouse movement since last frame.
-    int GetMouseMoveX() const { return mouseMove_.x_; }
-    /// Return vertical mouse movement since last frame.
-    int GetMouseMoveY() const { return mouseMove_.y_; }
-    /// Return mouse wheel movement since last frame.
-    int GetMouseMoveWheel() const { return mouseMoveWheel_; }
-    /// Return number of active finger touches.
-    unsigned GetNumTouches() const { return touches_.Size(); }
-    /// Return active finger touch by index.
+    const IntVector2& GetMouseMove() const;
+    int GetMouseMoveX() const;
+    int GetMouseMoveY() const;
+    int GetMouseMoveWheel() const;
+    unsigned GetNumTouches() const;
     TouchState* GetTouch(unsigned index) const;
-    /// Return number of connected joysticks.
-    unsigned GetNumJoysticks() const { return joysticks_.Size(); }
-    /// Return joystick name by index.
+    unsigned GetNumJoysticks() const;
     const String& GetJoystickName(unsigned index) const;
-    /// Return joystick state by index. Automatically open if not opened yet.
     JoystickState* GetJoystick(unsigned index);
-    /// Return whether fullscreen toggle is enabled.
-    bool GetToggleFullscreen() const { return toggleFullscreen_; }
-    /// Return whether the operating system mouse cursor is visible.
-    bool IsMouseVisible() const { return mouseVisible_; }
-    /// Return whether application window has input focus.
-    bool HasFocus() { return inputFocus_; }
-    /// Return whether application window is minimized.
+    bool GetToggleFullscreen() const;
+    bool IsMouseVisible() const;
+    bool HasFocus();
     bool IsMinimized() const;
+    
+    tolua_readonly tolua_property__get_set int qualifiers;
+    tolua_readonly tolua_property__get_set IntVector2 mousePosition;
+    tolua_readonly tolua_property__get_set IntVector2& mouseMove;
+    tolua_readonly tolua_property__get_set int mouseMoveX;
+    tolua_readonly tolua_property__get_set int mouseMoveY;
+    tolua_readonly tolua_property__get_set int mouseMoveWheel;
+    tolua_readonly tolua_property__get_set unsigned numTouches;
+    tolua_readonly tolua_property__get_set unsigned numJoysticks;
+    tolua_readonly tolua_property__get_set bool toggleFullscreen;
+    tolua_property__is_set bool mouseVisible;
+    tolua_readonly tolua_property__has_set bool focus;
+    tolua_readonly tolua_property__is_set bool minimized;
 };

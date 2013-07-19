@@ -1,37 +1,28 @@
 $#include "Log.h"
 
-/// Debug message level. By default only shown in debug mode.
 static const int LOG_DEBUG;
-/// Informative message level.
 static const int LOG_INFO;
-/// Warning message level.
 static const int LOG_WARNING;
-/// Error message level.
 static const int LOG_ERROR;
-/// Disable all log messages.
 static const int LOG_NONE;
 
-/// Logging subsystem.
 class Log : public Object
 {
-public:
-    /// Set logging level.
     void SetLevel(int level);
-    /// Set whether to timestamp log messages.
     void SetTimeStamp(bool enable);
-    /// Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
     void SetQuiet(bool quiet);
     
-    /// Return logging level.
-    int GetLevel() const { return level_; }
-    /// Return whether log messages are timestamped.
-    bool GetTimeStamp() const { return timeStamp_; }
-    /// Return last log message.
-    /// Return whether log is in quiet mode (only errors printed to standard error stream).
-    bool IsQuiet() const { return quiet_; }
+    int GetLevel() const;
+    bool GetTimeStamp() const;
+    String GetLastMessage() const;
+    bool IsQuiet() const;
     
-    /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
+    static void Write(int level, const String& message);
     static void Write(int level, const char* message);
-    /// Write raw output to the log.
+    static void WriteRaw(const String& message, bool error = false);
     static void WriteRaw(const char* message, bool error = false);
+    
+    tolua_property__get_set int level;
+    tolua_property__get_set bool timeStamp;
+    tolua_property__is_set bool quiet;
 };
