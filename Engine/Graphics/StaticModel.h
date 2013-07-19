@@ -78,7 +78,7 @@ public:
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
     /// Return material by geometry index.
-    Material* GetMaterial(unsigned index) const;
+    Material* GetMaterial(unsigned index = 0) const;
     /// Return occlusion LOD level.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
     /// Determines if the given world space point is within the model geometry.
