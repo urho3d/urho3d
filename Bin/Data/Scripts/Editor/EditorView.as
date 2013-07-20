@@ -553,3 +553,9 @@ bool ToggleUpdate()
     runUpdate = !runUpdate;
     return true;
 }
+
+bool StopTestAnimation()
+{
+    testAnimState = null;
+    return true;
+}

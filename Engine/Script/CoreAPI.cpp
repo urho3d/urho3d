@@ -732,24 +732,24 @@ static const String& GetTypeName(ShortStringHash type)
     return GetScriptContext()->GetTypeName(type);
 }
 
-static void ConstructWeakHandle(WeakPtr<Object>* ptr)
+static void ConstructWeakHandle(WeakPtr<RefCounted>* ptr)
 {
-    new(ptr) WeakPtr<Object>();
+    new(ptr) WeakPtr<RefCounted>();
 }
 
-static void ConstructWeakHandleCopy(const WeakPtr<Object>& src, WeakPtr<Object>* ptr)
+static void ConstructWeakHandleCopy(const WeakPtr<RefCounted>& src, WeakPtr<RefCounted>* ptr)
 {
-    new(ptr) WeakPtr<Object>(src);
+    new(ptr) WeakPtr<RefCounted>(src);
 }
 
-static void ConstructWeakHandlePtr(Object* object, WeakPtr<Object>* ptr)
+static void ConstructWeakHandlePtr(RefCounted* object, WeakPtr<RefCounted>* ptr)
 {
-    new(ptr) WeakPtr<Object>(object);
+    new(ptr) WeakPtr<RefCounted>(object);
 }
 
-static void DestructWeakHandle(WeakPtr<Object>* ptr)
+static void DestructWeakHandle(WeakPtr<RefCounted>* ptr)
 {
-    ptr->~WeakPtr<Object>();
+    ptr->~WeakPtr<RefCounted>();
 }
 
 void RegisterObject(asIScriptEngine* engine)
@@ -765,6 +765,7 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterObjectProperty("AttributeInfo", "Variant defaultValue", offsetof(AttributeInfo, defaultValue_));
     engine->RegisterObjectProperty("AttributeInfo", "uint mode", offsetof(AttributeInfo, mode_));
 
+    RegisterRefCounted<RefCounted>(engine, "RefCounted");
     RegisterObject<Object>(engine, "Object");
 
     engine->RegisterGlobalFunction("void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(SendEvent), asCALL_CDECL);
@@ -778,14 +779,14 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("Object@+ GetEventSender()", asFUNCTION(GetEventSender), asCALL_CDECL);
     engine->RegisterGlobalFunction("const String& GetTypeName(ShortStringHash)", asFUNCTION(GetTypeName), asCALL_CDECL);
 
-    engine->RegisterObjectType("WeakHandle", sizeof(WeakPtr<Object>), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+    engine->RegisterObjectType("WeakHandle", sizeof(WeakPtr<RefCounted>), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructWeakHandle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f(const WeakHandle&in)", asFUNCTION(ConstructWeakHandleCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f(Object@+)", asFUNCTION(ConstructWeakHandlePtr), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f(RefCounted@+)", asFUNCTION(ConstructWeakHandlePtr), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructWeakHandle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("WeakHandle", "WeakHandle& opAssign(const WeakHandle&in)", asMETHODPR(WeakPtr<Object>, operator =, (const WeakPtr<Object>&), WeakPtr<Object>&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WeakHandle", "WeakHandle& opAssign(Object@+)", asMETHODPR(WeakPtr<Object>, operator =, (Object*), WeakPtr<Object>&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("WeakHandle", "Object@+ Get() const", asMETHODPR(WeakPtr<Object>, Get, () const, Object*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WeakHandle", "WeakHandle& opAssign(RefCounted@+)", asMETHODPR(WeakPtr<Object>, operator =, (Object*), WeakPtr<Object>&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("WeakHandle", "RefCounted@+ Get() const", asMETHODPR(WeakPtr<Object>, Get, () const, Object*), asCALL_THISCALL);
     engine->RegisterObjectMethod("WeakHandle", "int get_refs() const", asMETHOD(WeakPtr<Object>, Refs), asCALL_THISCALL);
     engine->RegisterObjectMethod("WeakHandle", "int get_weakRefs() const", asMETHOD(WeakPtr<Object>, WeakRefs), asCALL_THISCALL);
     engine->RegisterObjectMethod("WeakHandle", "bool get_expired() const", asMETHOD(WeakPtr<Object>, Expired), asCALL_THISCALL);

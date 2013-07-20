@@ -85,6 +85,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateView(timeStep);
     UpdateStats(timeStep);
     UpdateScene(timeStep);
+    UpdateTestAnimation(timeStep);
     UpdateGizmo();
     UpdateDirtyUI();
 }

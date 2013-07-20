@@ -801,23 +801,30 @@ Properties:<br>
 - uint mode
 
 
+RefCounted
+
+Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
+
+
 Object
 
 Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 
 
 WeakHandle
 
 Methods:<br>
-- Object@ Get() const
+- RefCounted@ Get() const
 
 Properties:<br>
 - int refs (readonly)
@@ -838,11 +845,11 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint frameNumber (readonly)
 - float timeStep (readonly)
 - float elapsedTime (readonly)
@@ -861,11 +868,11 @@ Methods:<br>
 - void Error(const String&)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - int level
 - bool timeStamp
 - String lastMessage (readonly)
@@ -1007,11 +1014,11 @@ Methods:<br>
 - uint Seek(uint)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - FileMode mode (readonly)
 - bool open (readonly)
 - bool packaged (readonly)
@@ -1109,11 +1116,11 @@ Methods:<br>
 - bool Delete(const String&)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String currentDir
 - String programDir (readonly)
 - String userDocumentsDir (readonly)
@@ -1127,11 +1134,11 @@ Methods:<br>
 - bool Exists(const String&) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name (readonly)
 - uint numFiles (readonly)
 - uint totalSize (readonly)
@@ -1146,11 +1153,11 @@ Methods:<br>
 - bool Save(File@) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1181,11 +1188,11 @@ Methods:<br>
 - Resource@ GetResource(ShortStringHash, StringHash)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint[] memoryBudget
 - uint[] memoryUse (readonly)
 - uint totalMemoryUse (readonly)
@@ -1207,11 +1214,11 @@ Methods:<br>
 - void SaveJPG(const String&, int)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1231,11 +1238,11 @@ Methods:<br>
 - XMLElement GetRoot(const String& arg0 = String ( ))
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1350,11 +1357,11 @@ Methods:<br>
 - Variant GetAttributeDefault(const String&) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -1380,11 +1387,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -1456,11 +1463,11 @@ Methods:<br>
 - ScriptObject@ GetScriptObject(const String&) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -1510,11 +1517,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -1603,11 +1610,11 @@ Methods:<br>
 - void Update(float)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -1697,11 +1704,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -1738,11 +1745,11 @@ Methods:<br>
 - float GetDistanceSquared(const Vector3&) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -1853,11 +1860,11 @@ Methods:<br>
 - void ClearDataLost()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1884,11 +1891,11 @@ Methods:<br>
 - void SetRenderPath(XMLFile@)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - Scene@ scene
 - Camera@ camera
 - RenderPath@ renderPath
@@ -1924,11 +1931,11 @@ Methods:<br>
 - bool Load(Image@, bool arg1 = false)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -1961,11 +1968,11 @@ Methods:<br>
 - bool Load(CubeMapFace, Image@, bool arg2 = false)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -2018,11 +2025,11 @@ Methods:<br>
 - bool HasPass(StringHash) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -2043,11 +2050,11 @@ Methods:<br>
 - Material@ Clone(const String& arg0 = String ( )) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -2069,11 +2076,11 @@ Methods:<br>
 - bool Save(File@) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -2102,11 +2109,11 @@ Methods:<br>
 - void RemoveAllTriggers()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -2136,11 +2143,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2204,11 +2211,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2269,11 +2276,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2329,11 +2336,11 @@ Methods:<br>
 - bool IsInsideLocal(const Vector3&) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2382,11 +2389,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2466,11 +2473,11 @@ Methods:<br>
 - AnimationState@ GetAnimationState(uint) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2553,11 +2560,11 @@ Methods:<br>
 - float GetFadeTarget(const String&) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2599,11 +2606,11 @@ Methods:<br>
 - void Commit()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2671,11 +2678,11 @@ Methods:<br>
 - void SetColor(const Color&)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2767,11 +2774,11 @@ Methods:<br>
 - void Commit()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2822,11 +2829,11 @@ Methods:<br>
 - void RemoveAllDecals()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2876,11 +2883,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2926,11 +2933,11 @@ Methods:<br>
 - TerrainPatch@ GetPatch(int, int) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -2998,11 +3005,11 @@ Methods:<br>
 - Node@[]@ GetDrawables(const Sphere&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -3026,11 +3033,11 @@ Methods:<br>
 - bool TakeScreenShot(Image@)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String windowTitle
 - bool sRGB
 - int width (readonly)
@@ -3065,11 +3072,11 @@ Methods:<br>
 - void SetDefaultRenderPath(XMLFile@)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numViewports
 - Viewport@[] viewports
 - RenderPath@ defaultRenderPath
@@ -3132,11 +3139,11 @@ Methods:<br>
 - bool DetectJoysticks()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - bool mouseVisible
 - bool toggleFullscreen
 - bool[] keyDown (readonly)
@@ -3168,11 +3175,11 @@ Methods:<br>
 - bool Save(File@) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -3204,11 +3211,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -3243,11 +3250,11 @@ Methods:<br>
 - void Stop()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -3292,11 +3299,11 @@ Methods:<br>
 - void SetDistanceAttenuation(float, float, float)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -3328,11 +3335,11 @@ Methods:<br>
 - void Stop()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - float[] masterGain
 - SoundListener@ listener
 - uint sampleSize (readonly)
@@ -3353,11 +3360,11 @@ Methods:<br>
 - bool SaveXML(const String&, int, bool arg2 = false)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -3419,11 +3426,11 @@ Methods:<br>
 - bool IsInsideCombined(IntVector2, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -3543,11 +3550,11 @@ Methods:<br>
 - void SetHoverOffset(int, int)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -3667,11 +3674,11 @@ Methods:<br>
 - void SetFullImageRect()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -3772,11 +3779,11 @@ Methods:<br>
 - void SetRepeat(float, float)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -3908,11 +3915,11 @@ Methods:<br>
 - void SetCheckedOffset(int, int)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -4041,11 +4048,11 @@ Methods:<br>
 - void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&, bool arg4 = false)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -4173,11 +4180,11 @@ Methods:<br>
 - void ChangeValue(float)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -4309,11 +4316,11 @@ Methods:<br>
 - void StepForward()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -4442,11 +4449,11 @@ Methods:<br>
 - void SetScrollBarsVisible(bool, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -4591,11 +4598,11 @@ Methods:<br>
 - uint FindItem(UIElement@)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -4736,11 +4743,11 @@ Methods:<br>
 - void ClearSelection()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -4836,11 +4843,11 @@ Methods:<br>
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -4938,11 +4945,11 @@ Methods:<br>
 - void SetHoverOffset(int, int)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5083,11 +5090,11 @@ Methods:<br>
 - void SetAccelerator(int, int)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5234,11 +5241,11 @@ Methods:<br>
 - UIElement@ getPopup() const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5380,11 +5387,11 @@ Methods:<br>
 - void SetHoverOffset(int, int)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5468,11 +5475,11 @@ Methods:<br>
 - void UpdateElements()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String title
 - String path
 - String fileName
@@ -5506,11 +5513,11 @@ Methods:<br>
 - bool HasModalElement() const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - Cursor@ cursor
 - IntVector2 cursorPosition (readonly)
 - UIElement@ focusElement
@@ -5556,11 +5563,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5586,11 +5593,11 @@ Methods:<br>
 - String ToString() const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - Scene@ scene
 - bool logStatistics
 - bool client (readonly)
@@ -5625,11 +5632,11 @@ Methods:<br>
 - bool CheckRemoteEvent(const String&) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - int updateFps
 - String packageCacheDir
 - bool serverRunning (readonly)
@@ -5667,11 +5674,11 @@ Methods:<br>
 - void SetTransform(const Vector3&, const Quaternion&)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5721,11 +5728,11 @@ Methods:<br>
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5781,11 +5788,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5848,11 +5855,11 @@ Methods:<br>
 - void DrawDebugGeometry(bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5888,11 +5895,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5930,11 +5937,11 @@ Methods:<br>
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -5982,11 +5989,11 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -6009,11 +6016,11 @@ Methods:<br>
 - bool Execute(const String&, const Variant[]@)
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - String name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
@@ -6048,11 +6055,11 @@ Methods:<br>
 - void ClearDelayedExecute(const String& arg0 = String ( ))
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - uint numAttributes (readonly)
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
@@ -6075,11 +6082,11 @@ Methods:<br>
 - void DumpAPI()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - ScriptFile@ defaultScriptFile
 - Scene@ defaultScene
 
@@ -6092,11 +6099,11 @@ Methods:<br>
 - void UpdateElements()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - XMLFile@ defaultStyle
 - bool visible
 - uint numRows
@@ -6119,11 +6126,11 @@ Methods:<br>
 - void ClearAppStats()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - XMLFile@ defaultStyle
 - uint mode
 - uint profilerMaxDepth
@@ -6147,11 +6154,11 @@ Methods:<br>
 - DebugHud@ CreateDebugHud()
 
 Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
 - ShortStringHash type (readonly)
 - String typeName (readonly)
 - String category (readonly)
-- int refs (readonly)
-- int weakRefs (readonly)
 - int minFps
 - int maxFps
 - int maxInactiveFps

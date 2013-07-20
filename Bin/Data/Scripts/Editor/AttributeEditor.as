@@ -23,8 +23,13 @@ Color nonEditableTextColor(0.7f, 0.7f, 0.7f);
 
 String sceneResourcePath;
 
+WeakHandle testAnimState;
+
 UIElement@ SetEditable(UIElement@ element, bool editable)
 {
+    if (element is null)
+        return element;
+
     element.enabled = editable;
     element.colors[C_TOPLEFT] = editable ? element.colors[C_BOTTOMRIGHT] : nonEditableTextColor;
     element.colors[C_BOTTOMLEFT] = element.colors[C_TOPLEFT];
@@ -215,15 +220,19 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
 {
     UIElement@ parent;
     ShortStringHash resourceType;
-    VariantType attrType = info.type;
-    if (attrType == VAR_RESOURCEREF)
+
+    // Get the real attribute info from the serializable for the correct resource type
+    AttributeInfo attrInfo = serializables[0].attributeInfos[index];
+    if (attrInfo.type == VAR_RESOURCEREF)
         resourceType = serializables[0].attributes[index].GetResourceRef().type;
-    else if (attrType == VAR_RESOURCEREFLIST)
+    else if (attrInfo.type == VAR_RESOURCEREFLIST)
         resourceType = serializables[0].attributes[index].GetResourceRefList().type;
-    else if (attrType == VAR_VARIANTVECTOR)
+    else if (attrInfo.type == VAR_VARIANTVECTOR)
         resourceType = serializables[0].attributes[index].GetVariantVector()[subIndex].GetResourceRef().type;
 
-     // Create the attribute name on a separate non-interactive line to allow for more space
+    ResourcePicker@ picker = GetResourcePicker(resourceType);
+
+    // Create the attribute name on a separate non-interactive line to allow for more space
     parent = CreateAttributeEditorParentWithSeparatedLabel(list, info.name, index, subIndex, suppressedSeparatedLabel);
 
     UIElement@ container = UIElement();
@@ -235,37 +244,47 @@ UIElement@ CreateResourceRefAttributeEditor(ListView@ list, Array<Serializable@>
     attrEdit.vars[TYPE_VAR] = resourceType.value;
     SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
 
-    Button@ pickButton = Button();
-    container.AddChild(pickButton);
-    pickButton.style = AUTO_STYLE;
-    pickButton.SetFixedSize(36, ATTR_HEIGHT - 2);
-    pickButton.vars["Index"] = index;
-    pickButton.vars["SubIndex"] = subIndex;
-    SetAttributeEditorID(pickButton, serializables);
-
-    Text@ pickButtonText = Text();
-    pickButton.AddChild(pickButtonText);
-    pickButtonText.style = "EditorAttributeText";
-    pickButtonText.SetAlignment(HA_CENTER, VA_CENTER);
-    pickButtonText.text = "Pick";
-    SubscribeToEvent(pickButton, "Released", "PickResource");
-
-    Button@ openButton = Button();
-    container.AddChild(openButton);
-    openButton.style = AUTO_STYLE;
-    openButton.SetFixedSize(36, ATTR_HEIGHT - 2);
-    openButton.vars["Index"] = index;
-    openButton.vars["SubIndex"] = subIndex;
-    SetAttributeEditorID(openButton, serializables);
-
-    Text@ openButtonText = Text();
-    openButton.AddChild(openButtonText);
-    openButtonText.style = "EditorAttributeText";
-    openButtonText.SetAlignment(HA_CENTER, VA_CENTER);
-    openButtonText.text = "Open";
-    SubscribeToEvent(openButton, "Released", "OpenResource");
+    if ((picker.actions & ACTION_PICK) != 0)
+    {
+        Button@ pickButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Pick");
+        SubscribeToEvent(pickButton, "Released", "PickResource");
+    }
+    if ((picker.actions & ACTION_OPEN) != 0)
+    {
+        Button@ openButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Open");
+        SubscribeToEvent(openButton, "Released", "OpenResource");
+    }
+    if ((picker.actions & ACTION_EDIT) != 0)
+    {
+        Button@ editButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Edit");
+        SubscribeToEvent(editButton, "Released", "EditResource");
+    }
+    if ((picker.actions & ACTION_TEST) != 0)
+    {
+        Button@ testButton = CreateResourcePickerButton(container, serializables, index, subIndex, "Test");
+        SubscribeToEvent(testButton, "Released", "TestResource");
+    }
 
     return parent;
+}
+
+Button@ CreateResourcePickerButton(UIElement@ container, Array<Serializable@>@ serializables, uint index, uint subIndex, const String&in text)
+{
+    Button@ button = Button();
+    container.AddChild(button);
+    button.style = AUTO_STYLE;
+    button.SetFixedSize(36, ATTR_HEIGHT - 2);
+    button.vars["Index"] = index;
+    button.vars["SubIndex"] = subIndex;
+    SetAttributeEditorID(button, serializables);
+
+    Text@ buttonText = Text();
+    button.AddChild(buttonText);
+    buttonText.style = "EditorAttributeText";
+    buttonText.SetAlignment(HA_CENTER, VA_CENTER);
+    buttonText.text = text;
+
+    return button;
 }
 
 UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializables, const AttributeInfo&in info, uint index, uint subIndex, bool suppressedSeparatedLabel = false)
@@ -447,7 +466,8 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
     {
         SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(value.GetResourceRef().id), sameValue), editable && sameValue);
         SetEditable(parent.children[1].children[1], editable && sameValue);  // If editable then can pick
-        SetEditable(parent.children[1].children[2], sameValue); // If same value then can open
+        for (uint i = 2; i < parent.children[1].numChildren; ++i)
+            SetEditable(parent.children[1].children[i], sameValue); // If same value then can open/edit/test
     }
     else if (type == VAR_RESOURCEREFLIST)
     {
@@ -797,26 +817,36 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
 }
 
 // Resource picker functionality
+const uint ACTION_PICK = 1;
+const uint ACTION_OPEN = 2;
+const uint ACTION_EDIT = 4;
+const uint ACTION_TEST = 8;
 
 class ResourcePicker
 {
-    String resourceType;
+    String typeName;
+    ShortStringHash type;
     String lastPath;
     uint lastFilter;
     Array<String> filters;
+    uint actions;
 
-    ResourcePicker(const String&in resourceType_, const String&in filter_)
+    ResourcePicker(const String&in typeName_, const String&in filter_, uint actions_ = ACTION_PICK | ACTION_OPEN)
     {
-        resourceType = resourceType_;
+        typeName = typeName_;
+        type = ShortStringHash(typeName_);
+        actions = actions_;
         filters.Push(filter_);
         filters.Push("*.*");
         lastFilter = 0;
     }
 
-    ResourcePicker(const String&in resourceType_, const Array<String>@ filters_)
+    ResourcePicker(const String&in typeName_, const Array<String>@ filters_, uint actions_ = ACTION_PICK | ACTION_OPEN)
     {
-        resourceType = resourceType_;
+        typeName = typeName_;
+        type = ShortStringHash(typeName_);
         filters = filters_;
+        actions = actions_;
         filters.Push("*.*");
         lastFilter = 0;
     }
@@ -837,10 +867,10 @@ void InitResourcePicker()
     Array<String> soundFilters = {"*.wav","*.ogg"};
     Array<String> scriptFilters = {"*.as", "*.asc"};
     Array<String> materialFilters = {"*.xml", "*.material"};
-    resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
+    resourcePickers.Push(ResourcePicker("Animation", "*.ani", ACTION_PICK | ACTION_TEST));
     resourcePickers.Push(ResourcePicker("Font", fontFilters));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
-    resourcePickers.Push(ResourcePicker("Model", "*.mdl"));
+    resourcePickers.Push(ResourcePicker("Model", "*.mdl", ACTION_PICK));
     resourcePickers.Push(ResourcePicker("Material", materialFilters));
     resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
@@ -850,11 +880,11 @@ void InitResourcePicker()
     sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
 }
 
-ResourcePicker@ GetResourcePicker(const String&in resourceType)
+ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)
 {
     for (uint i = 0; i < resourcePickers.length; ++i)
     {
-        if (resourcePickers[i].resourceType.Compare(resourceType, false) == 0)
+        if (resourcePickers[i].type == resourceType)
             return resourcePickers[i];
     }
     return null;
@@ -873,25 +903,15 @@ void PickResource(StringHash eventType, VariantMap& eventData)
     resourcePickSubIndex = attrEdit.vars["SubIndex"].GetUInt();
     AttributeInfo info = targets[0].attributeInfos[resourcePickIndex];
 
+    ShortStringHash resourceType;
     if (info.type == VAR_RESOURCEREF)
-    {
-        String resourceType = GetTypeName(targets[0].attributes[resourcePickIndex].GetResourceRef().type);
-        @resourcePicker = GetResourcePicker(resourceType);
-    }
+        resourceType = targets[0].attributes[resourcePickIndex].GetResourceRef().type;
     else if (info.type == VAR_RESOURCEREFLIST)
-    {
-        String resourceType = GetTypeName(targets[0].attributes[resourcePickIndex].GetResourceRefList().type);
-        @resourcePicker = GetResourcePicker(resourceType);
-    }
+        resourceType = targets[0].attributes[resourcePickIndex].GetResourceRefList().type;
     else if (info.type == VAR_VARIANTVECTOR)
-    {
-        String resourceType = GetTypeName(targets[0].attributes[resourcePickIndex].GetVariantVector()
-            [resourcePickSubIndex].GetResourceRef().type);
-        @resourcePicker = GetResourcePicker(resourceType);
-    }
-    else
-        @resourcePicker = null;
+        resourceType = targets[0].attributes[resourcePickIndex].GetVariantVector()[resourcePickSubIndex].GetResourceRef().type;
 
+    @resourcePicker = GetResourcePicker(resourceType);
     if (resourcePicker is null)
         return;
 
@@ -902,7 +922,7 @@ void PickResource(StringHash eventType, VariantMap& eventData)
     String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Pick " + resourcePicker.resourceType, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
     SubscribeToEvent(uiFileSelector, "FileSelected", "PickResourceDone");
 }
 
@@ -937,11 +957,11 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         if (!resourceName.ToLower().StartsWith(resourceDirs[i].ToLower()))
             continue;
         resourceName = resourceName.Substring(resourceDirs[i].length);
-        res = cache.GetResource(resourcePicker.resourceType, resourceName);
+        res = cache.GetResource(resourcePicker.typeName, resourceName);
         break;
     }
     if (res is null) {
-        log.Warning("Cannot find resource type: " + resourcePicker.resourceType + " Name:" +resourceName);
+        log.Warning("Cannot find resource type: " + resourcePicker.typeName + " Name:" + resourceName);
         return;
     }
 
@@ -958,7 +978,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         if (info.type == VAR_RESOURCEREF)
         {
             ResourceRef ref = target.attributes[resourcePickIndex].GetResourceRef();
-            ref.type = ShortStringHash(resourcePicker.resourceType);
+            ref.type = resourcePicker.type;
             ref.id = StringHash(resourceName);
             target.attributes[resourcePickIndex] = Variant(ref);
             target.ApplyAttributes();
@@ -977,7 +997,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         {
             Array<Variant>@ attrs = target.attributes[resourcePickIndex].GetVariantVector();
             ResourceRef ref = attrs[resourcePickSubIndex].GetResourceRef();
-            ref.type = ShortStringHash(resourcePicker.resourceType);
+            ref.type = resourcePicker.type;
             ref.id = StringHash(resourceName);
             attrs[resourcePickSubIndex] = ref;
             target.attributes[resourcePickIndex] = Variant(attrs);
@@ -1010,6 +1030,64 @@ void OpenResource(StringHash eventType, VariantMap& eventData)
             fileSystem.SystemOpen(fullPath, "");
             return;
         }
+    }
+}
+
+void EditResource(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ button = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = button.parent.children[0];
+
+    String fileName = attrEdit.text.Trimmed();
+    if (fileName.empty)
+        return;
+
+    /// \todo Implement
+}
+
+void TestResource(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ button = eventData["Element"].GetUIElement();
+    LineEdit@ attrEdit = button.parent.children[0];
+
+    ShortStringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
+    ShortStringHash animType("Animation");
+    if (resourceType == animType)
+        TestAnimation(attrEdit);
+}
+
+void TestAnimation(UIElement@ attrEdit)
+{
+    // Note: only supports the AnimationState array in AnimatedModel, and if only 1 model selected
+    Array<Serializable@>@ targets = GetAttributeEditorTargets(attrEdit);
+    if (targets.length != 1)
+        return;
+    AnimatedModel@ model = cast<AnimatedModel>(targets[0]);
+    if (model is null)
+        return;
+
+    uint animStateIndex = (attrEdit.vars["SubIndex"].GetUInt() - 1) / 6;
+    if (testAnimState.Get() is null)
+    {
+        testAnimState = model.GetAnimationState(animStateIndex);
+        AnimationState@ animState = testAnimState.Get();
+        if (animState !is null)
+        {
+            animState.time = 0; // Start from beginning
+            UpdateAttributeInspector(false);
+        }
+    }
+    else
+        testAnimState = null;
+}
+
+void UpdateTestAnimation(float timeStep)
+{
+    AnimationState@ animState = testAnimState.Get();
+    if (animState !is null)
+    {
+        animState.AddTime(timeStep);
+        UpdateAttributeInspector(false);
     }
 }
 
