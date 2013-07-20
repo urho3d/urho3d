@@ -13,8 +13,8 @@ class String
     
     bool operator == (const String& rhs) const;
     bool operator == (const char* rhs) const;
-    tolua_outside bool StringEq @ Eq(const String& rhs) const;
-    tolua_outside bool StringEq @ Eq(const char*& rhs) const;
+    tolua_outside bool StringEquals @ Equals(const String& rhs) const;
+    tolua_outside bool StringEquals @ Equals(const char*& rhs) const;
     
     void Replace(const String& replaceThis, const String& replaceWith);
     void Replace(const char* replaceThis, const char* replaceWith);
@@ -77,12 +77,12 @@ class String
 
 ${
 
-static bool StringEq(const String* lhs, const char* rhs)
+static bool StringEquals(const String* lhs, const char* rhs)
 {
     return (*lhs) == rhs;
 }
 
-static bool StringEq(const String* lhs, const String& rhs)
+static bool StringEquals(const String* lhs, const String& rhs)
 {
     return (*lhs) == rhs;
 }
