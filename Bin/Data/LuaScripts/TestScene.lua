@@ -459,7 +459,7 @@ function HandleMouseButtonUp(eventType, eventData)
 end
 
 function HandlePostRenderUpdate()
-    if engine:IsHeadless() then
+    if engine.headless then
         return
     end
     
@@ -471,7 +471,7 @@ function HandlePostRenderUpdate()
         testScene:GetPhysicsWorld():DrawDebugGeometry(true)
     end
     
-    local pos = ui:GetCursorPosition()
+    local pos = ui.cursorPosition
     if ui:GetElementAt(pos, true) == nil and testScene:GetOctree() ~= nil then
         local cameraRay = camera:GetScreenRay(pos.x / graphics:GetWidth(), pos.y / graphics:GetHeight())
         local result = testScene:GetOctree():RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY)
@@ -485,8 +485,8 @@ end
 
 function HandleClientConnected(eventType, eventData)
     local connection = eventData:GetConnection("Connection")
-    connection:SetScene(testScene) -- Begin scene replication to the client
-    connection:SetLogStatistics(true)
+    connection.scene = testScene -- Begin scene replication to the client
+    connection.logStatistics = true
 end
 
 
@@ -550,17 +550,17 @@ function CreateRagdollBone(root, boneName, type, size, position, rotation)
     -- (bones are not synced over network.) To prevent replicated component ID range clashes when the client creates
     -- any components, it is important that the LOCAL creation mode is specified.
     local body = boneNode:CreateRigidBody(LOCAL)
-    body:SetMass(1.0)
-    body:SetLinearDamping(0.05)
-    body:SetAngularDamping(0.85)
-    body:SetLinearRestThreshold(1.5)
-    body:SetAngularRestThreshold(2.5)
+    body.mass = 1.0
+    body.linearDamping = 0.05
+    body.angularDamping = 0.85
+    body.linearRestThreshold = 1.5
+    body.angularRestThreshold = 2.5
 
     local shape = boneNode:CreateCollisionShape(LOCAL)
-    shape:SetShapeType(type)
-    shape:SetSize(size)
-    shape:SetPosition(position)
-    shape:SetRotation(rotation)
+    shape.shapeType = type
+    shape.size = size
+    shape.position = position
+    shape.rotation = rotation
 end
 
 function CreateRagdollConstraint(root, boneName, parentName, type, axis, parentAxis, highLimit, lowLimit, disableCollision)
@@ -571,13 +571,13 @@ function CreateRagdollConstraint(root, boneName, parentName, type, axis, parentA
     end
 
     local constraint = boneNode:CreateConstraint(LOCAL)
-    constraint:SetConstraintType(type)
-    constraint:SetDisableCollision(disableCollision)
+    constraint.constraintType = type
+    constraint.disableCollision = disableCollision
     -- The connected body must be specified before setting the world position
-    constraint:SetOtherBody(parentNode:GetRigidBody())
-    constraint:SetWorldPosition(boneNode:GetWorldPosition())
+    constraint.otherBody = parentNode:GetRigidBody()
+    constraint.worldPosition = boneNode.worldPosition
     constraint:SetAxis(axis)
     constraint:SetOtherAxis(parentAxis)
-    constraint:SetHighLimit(highLimit)
-    constraint:SetLowLimit(lowLimit)
+    constraint.highLimit = highLimit
+    constraint.lowLimit = lowLimit
 end
