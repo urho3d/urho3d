@@ -776,6 +776,8 @@ static AnimationState* ConstructAnimationState(Node* node, Animation* animation)
 static void RegisterAnimatedModel(asIScriptEngine* engine)
 {
     RegisterRefCounted<AnimationState>(engine, "AnimationState");
+    RegisterStaticModel<AnimatedModel>(engine, "AnimatedModel", false);
+    
     engine->RegisterObjectBehaviour("AnimationState", asBEHAVE_FACTORY, "AnimationState@+ f(Node@+, Animation@+)", asFUNCTION(ConstructAnimationState), asCALL_CDECL);
     engine->RegisterObjectMethod("AnimationState", "void AddWeight(float)", asMETHOD(AnimationState, AddWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void AddTime(float)", asMETHOD(AnimationState, AddTime), asCALL_THISCALL);
@@ -791,10 +793,11 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "void set_layer(uint8)", asMETHOD(AnimationState, SetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "uint8 get_layer() const", asMETHOD(AnimationState, GetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "Animation@+ get_animation() const", asMETHOD(AnimationState, GetAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "AnimatedModel@+ get_model() const", asMETHOD(AnimationState, GetModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "Node@+ get_node() const", asMETHOD(AnimationState, GetNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "bool get_enabled() const", asMETHOD(AnimationState, IsEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float get_length() const", asMETHOD(AnimationState, GetLength), asCALL_THISCALL);
     
-    RegisterStaticModel<AnimatedModel>(engine, "AnimatedModel", false);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ AddAnimationState(Animation@+)", asMETHOD(AnimatedModel, AddAnimationState), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(Animation@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (Animation*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String&in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const String&), void), asCALL_THISCALL);

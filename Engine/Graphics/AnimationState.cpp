@@ -257,6 +257,16 @@ void AnimationState::SetLayer(unsigned char layer)
     }
 }
 
+AnimatedModel* AnimationState::GetModel() const
+{
+    return model_;
+}
+
+Node* AnimationState::GetNode() const
+{
+    return node_;
+}
+
 Bone* AnimationState::GetStartBone() const
 {
     return model_ ? startBone_ : 0;

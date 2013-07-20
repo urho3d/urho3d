@@ -1072,10 +1072,7 @@ void TestAnimation(UIElement@ attrEdit)
         testAnimState = model.GetAnimationState(animStateIndex);
         AnimationState@ animState = testAnimState.Get();
         if (animState !is null)
-        {
             animState.time = 0; // Start from beginning
-            UpdateAttributeInspector(false);
-        }
     }
     else
         testAnimState = null;
@@ -1086,8 +1083,28 @@ void UpdateTestAnimation(float timeStep)
     AnimationState@ animState = testAnimState.Get();
     if (animState !is null)
     {
+        // If has also an AnimationController, and scene update is enabled, check if it is also driving the animation
+        // and skip in that case (avoid double speed animation)
+        if (runUpdate)
+        {
+            AnimatedModel@ model = animState.model;
+            if (model !is null)
+            {
+                Node@ node = model.node;
+                if (node !is null)
+                {
+                    AnimationController@ ctrl = node.GetComponent("AnimationController");
+                    Animation@ anim = animState.animation;
+                    if (ctrl !is null && anim !is null)
+                    {
+                        if (ctrl.IsPlaying(anim.name))
+                            return;
+                    }
+                }
+            }
+        }
+
         animState.AddTime(timeStep);
-        UpdateAttributeInspector(false);
     }
 }
 

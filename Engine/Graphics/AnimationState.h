@@ -64,6 +64,10 @@ public:
     
     /// Return animation.
     Animation* GetAnimation() const { return animation_; }
+    /// Return animated model this state belongs to (model mode.)
+    AnimatedModel* GetModel() const;
+    /// Return root scene node this state controls (node hierarchy mode.)
+    Node* GetNode() const;
     /// Return start bone.
     Bone* GetStartBone() const;
     /// Return whether weight is nonzero.
