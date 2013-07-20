@@ -12,7 +12,6 @@ enum SoundType
 
 class Audio : public Object
 {
-public:
     bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);
     bool Play();
     void Stop();

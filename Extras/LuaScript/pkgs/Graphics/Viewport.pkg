@@ -1,8 +1,7 @@
 $#include "Viewport.h"
 
 class Viewport
-{    
-public:
+{
     Viewport(Context* context);
     Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* renderPath = 0);
     Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0);

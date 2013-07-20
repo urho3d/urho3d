@@ -1,7 +1,7 @@
 $#include "RenderSurface.h"
 
 class RenderSurface
-{    
+{
     RenderSurface(Texture* parentTexture);
     ~RenderSurface();
 

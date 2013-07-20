@@ -11,7 +11,6 @@ struct NavigationGeometryInfo
 
 class NavigationMesh : public Component
 {
-public:
     void SetTileSize(int size);
     void SetCellSize(float size);
     void SetCellHeight(float height);

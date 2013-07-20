@@ -2,7 +2,6 @@ $#include "Sphere.h"
 
 class Sphere
 {
-public:
     Sphere();
     Sphere(const Sphere& sphere);
     Sphere(const Vector3& center, float radius);

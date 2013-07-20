@@ -2,7 +2,6 @@ $#include "SoundSource3D.h"
 
 class SoundSource3D : public SoundSource
 {
-public:
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
     void SetNearDistance(float distance);
     void SetFarDistance(float distance);

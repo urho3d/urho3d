@@ -2,8 +2,6 @@ $#include "Serializer.h"
 
 class Serializer
 {
-    // virtual unsigned Write(const void* data, unsigned size);
-    
     bool WriteInt(int value);
     bool WriteShort(short value);
     bool WriteByte(signed char value);

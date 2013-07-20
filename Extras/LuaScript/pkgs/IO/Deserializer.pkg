@@ -2,7 +2,6 @@ $#include "Deserializer.h"
 
 class Deserializer
 {
-    // virtual unsigned Read(void* dest, unsigned size);
     virtual unsigned Seek(unsigned position);
     
     virtual const String& GetName() const;

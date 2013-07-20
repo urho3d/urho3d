@@ -3,6 +3,7 @@ $#include "Skeleton.h"
 struct Bone
 {
     Bone();
+    
     String name_ @ name;
     StringHash nameHash_ @ nameHash;
     unsigned parentIndex_ @ parentIndex;

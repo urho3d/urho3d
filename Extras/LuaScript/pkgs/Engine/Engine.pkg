@@ -3,8 +3,10 @@ $#include "Engine.h"
 class Engine : public Object
 {
     void RunFrame();
+    
     Console* CreateConsole();
     DebugHud* CreateDebugHud();
+    
     void SetMinFps(int fps);
     void SetMaxFps(int fps);
     void SetMaxInactiveFps(int fps);

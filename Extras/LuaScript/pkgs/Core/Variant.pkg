@@ -53,7 +53,6 @@ struct ResourceRefList
 
 class Variant
 {
-public:
     Variant();
     Variant(int value);
     Variant(unsigned value);
@@ -131,8 +130,8 @@ public:
 
 class VariantMap
 {
-public:
     VariantMap();
+    ~VariantMap();
     
     tolua_outside void VariantMapSetInt @ SetInt(const char* key, int value);
     tolua_outside void VariantMapSetBool @ SetBool(const char* key, bool value);

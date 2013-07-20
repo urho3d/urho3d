@@ -2,7 +2,6 @@ $#include "Sound.h"
 
 class Sound : public Resource
 {
-public:
     float GetLength() const;
     unsigned GetDataSize() const;
     unsigned GetSampleSize() const;

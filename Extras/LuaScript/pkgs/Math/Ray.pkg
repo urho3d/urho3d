@@ -2,7 +2,6 @@ $#include "Ray.h"
 
 class Ray
 {
-public:
     Ray();
     Ray(const Vector3& origin, const Vector3& direction);
     Ray(const Ray& ray);

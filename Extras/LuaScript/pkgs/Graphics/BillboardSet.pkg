@@ -13,7 +13,6 @@ struct Billboard
 
 class BillboardSet : public Drawable
 {
-public:
     void SetMaterial(Material* material);
     void SetNumBillboards(unsigned num);
     void SetRelative(bool enable);

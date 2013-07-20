@@ -2,8 +2,6 @@ $#include "ScrollView.h"
 
 class ScrollView : public UIElement
 {
-public:
-    // Methods:
     ScrollView(Context* context);
     virtual ~ScrollView();
     

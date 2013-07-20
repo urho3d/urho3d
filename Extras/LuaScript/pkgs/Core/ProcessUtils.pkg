@@ -26,16 +26,16 @@ ${
 
 static const char* GetConsoleInputCString()
 {
-    static String string;
-    string = GetConsoleInput();
-    return string.CString();
+    static String input;
+    input = GetConsoleInput();
+    return input.CString();
 }
 
 static const char* GetPlatformCString()
 {
-    static String string;
-    string = GetPlatform();
-    return string.CString();
+    static String platform;
+    platform = GetPlatform();
+    return platform.CString();
 }
 
 $}

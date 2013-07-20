@@ -58,7 +58,6 @@ class PhysicsWorld : public Component
     void SetApplyingTransforms(bool enable);
     bool IsApplyingTransforms() const;
     
-    // Properties:
     tolua_property__get_set Vector3 gravity;
     tolua_property__get_set int numIterations;
     tolua_property__get_set bool interpolation;

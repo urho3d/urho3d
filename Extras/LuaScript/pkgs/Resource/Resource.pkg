@@ -1,8 +1,7 @@
 $#include "Resource.h"
 
 class Resource
-{    
-public:
+{
     const String& GetName() const;
     StringHash GetNameHash() const;
     unsigned GetMemoryUse() const;

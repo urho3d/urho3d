@@ -2,7 +2,6 @@ $#include "OffMeshConnection.h"
 
 class OffMeshConnection : public Component
 {
-public:
     void SetEndPoint(Node* node);
     void SetRadius(float radius);
     void SetBidirectional(bool enabled);

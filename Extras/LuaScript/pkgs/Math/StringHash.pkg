@@ -22,10 +22,8 @@ class StringHash
     tolua_readonly tolua_property__no_prefix unsigned value;
 };
 
-
 class ShortStringHash
 {
-public:
     ShortStringHash();
     ShortStringHash(const ShortStringHash& rhs);
     explicit ShortStringHash(const StringHash& rhs);

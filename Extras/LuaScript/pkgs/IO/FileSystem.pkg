@@ -56,7 +56,6 @@ class FileSystem : public Object
     String GetUserDocumentsDir() const;
 };
 
-// void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension);
 String GetPath(const String& fullPath);
 String GetFileName(const String& fullPath);
 String GetExtension(const String& fullPath);

@@ -2,7 +2,6 @@ $#include "BoundingBox.h"
 
 class BoundingBox
 {
-public:
     BoundingBox();
     BoundingBox(const BoundingBox& box);
     BoundingBox(const Rect& rect);

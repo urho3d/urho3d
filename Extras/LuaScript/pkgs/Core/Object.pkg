@@ -2,7 +2,6 @@ $#include "Object.h"
 
 class Object : public RefCounted
 {
-public:
     virtual ShortStringHash GetType() const;
     
     // virtual const String& GetTypeName() const;

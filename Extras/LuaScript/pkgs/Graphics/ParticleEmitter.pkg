@@ -132,4 +132,4 @@ class ParticleEmitter : public BillboardSet
     tolua_property__get_set float sizeMul;
     tolua_property__get_set unsigned numColors;
     tolua_property__get_set unsigned numTextureFrames;
-    };
+};
