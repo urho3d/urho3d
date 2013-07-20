@@ -45,6 +45,7 @@ static const unsigned char CTRL_SETTIME = 0x08;
 static const unsigned char CTRL_SETWEIGHT = 0x10;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
 static const float COMMAND_STAY_TIME = 0.25f;
+static const unsigned MAX_NODE_ANIMATION_STATES = 256;
 
 extern const char* LOGIC_CATEGORY;
 
@@ -64,6 +65,7 @@ void AnimationController::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimationController, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimationController, VAR_VARIANTVECTOR, "Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimationController, VAR_VARIANTVECTOR, "Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 }
 
 void AnimationController::OnSetEnabled()
@@ -595,6 +597,41 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
     }
 }
 
+
+void AnimationController::SetNodeAnimationStatesAttr(VariantVector value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    nodeAnimationStates_.Clear();
+    unsigned index = 0;
+    unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
+    // Prevent negative or overly large value being assigned from the editor
+    if (numStates > M_MAX_INT)
+        numStates = 0;
+    if (numStates > MAX_NODE_ANIMATION_STATES)
+        numStates = MAX_NODE_ANIMATION_STATES;
+    
+    nodeAnimationStates_.Reserve(numStates);
+    while (numStates--)
+    {
+        if (index + 2 < value.Size())
+        {
+            // Note: null animation is allowed here for editing
+            const ResourceRef& animRef = value[index++].GetResourceRef();
+            SharedPtr<AnimationState> newState(new AnimationState(GetNode(), cache->GetResource<Animation>(animRef.id_)));
+            nodeAnimationStates_.Push(newState);
+
+            newState->SetLooped(value[index++].GetBool());
+            newState->SetTime(value[index++].GetFloat());
+        }
+        else
+        {
+            // If not enough data, just add an empty animation state
+            SharedPtr<AnimationState> newState(new AnimationState(GetNode(), 0));
+            nodeAnimationStates_.Push(newState);
+        }
+    }
+}
+
 VariantVector AnimationController::GetAnimationsAttr() const
 {
     VariantVector ret;
@@ -666,6 +703,22 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
     }
     
     return attrBuffer_.GetBuffer();
+}
+
+VariantVector AnimationController::GetNodeAnimationStatesAttr() const
+{
+    VariantVector ret;
+    ret.Reserve(nodeAnimationStates_.Size() * 3 + 1);
+    ret.Push(nodeAnimationStates_.Size());
+    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = nodeAnimationStates_.Begin(); i != nodeAnimationStates_.End(); ++i)
+    {
+        AnimationState* state = *i;
+        Animation* animation = state->GetAnimation();
+        ret.Push(ResourceRef(Animation::GetTypeStatic(), animation ? animation->GetNameHash() : StringHash()));
+        ret.Push(state->IsLooped());
+        ret.Push(state->GetTime());
+    }
+    return ret;
 }
 
 void AnimationController::OnNodeSet(Node* node)

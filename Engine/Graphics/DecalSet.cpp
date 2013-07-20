@@ -46,6 +46,8 @@
 namespace Urho3D
 {
 
+extern const char* GEOMETRY_CATEGORY;
+
 static const unsigned MIN_VERTICES = 4;
 static const unsigned MIN_INDICES = 6;
 static const unsigned MAX_VERTICES = 65536;
@@ -54,8 +56,6 @@ static const unsigned DEFAULT_MAX_INDICES = 1024;
 static const unsigned STATIC_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT;
 static const unsigned SKINNED_ELEMENT_MASK = MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT | MASK_BLENDWEIGHTS |
     MASK_BLENDINDICES;
-
-extern const char* EFFECT_CATEGORY;
 
 static DecalVertex ClipEdge(const DecalVertex& v0, const DecalVertex& v1, float d0, float d1, bool skinned)
 {
@@ -178,7 +178,7 @@ DecalSet::~DecalSet()
 
 void DecalSet::RegisterObject(Context* context)
 {
-    context->RegisterFactory<DecalSet>(EFFECT_CATEGORY);
+    context->RegisterFactory<DecalSet>(GEOMETRY_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(DecalSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);

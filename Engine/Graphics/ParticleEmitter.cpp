@@ -37,14 +37,14 @@
 namespace Urho3D
 {
 
+extern const char* GEOMETRY_CATEGORY;
+
 static const char* emitterTypeNames[] =
 {
     "Sphere",
     "Box",
     0
 };
-
-const char* EFFECT_CATEGORY = "Effect";
 
 static const unsigned MAX_PARTICLES_IN_FRAME = 100;
 static const unsigned DEFAULT_NUM_PARTICLES = 10;
@@ -102,7 +102,7 @@ ParticleEmitter::~ParticleEmitter()
 
 void ParticleEmitter::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ParticleEmitter>(EFFECT_CATEGORY);
+    context->RegisterFactory<ParticleEmitter>(GEOMETRY_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);

@@ -152,14 +152,18 @@ public:
     /// Return animation autofade time.
     float GetAutoFade(const String& name) const;
     
-    /// Set animations attribute.
+    /// Set animation control structures attribute.
     void SetAnimationsAttr(VariantVector value);
     /// Set animations attribute for network replication.
     void SetNetAnimationsAttr(const PODVector<unsigned char>& value);
-    /// Return animations attribute.
+    /// Set node animation states attribute.
+    void SetNodeAnimationStatesAttr(VariantVector value);
+    /// Return animation control structures attribute.
     VariantVector GetAnimationsAttr() const;
     /// Return animations attribute for network replication.
     const PODVector<unsigned char>& GetNetAnimationsAttr() const;
+    /// Return node animation states attribute.
+    VariantVector GetNodeAnimationStatesAttr() const;
     
 protected:
     /// Handle node being assigned.
@@ -177,7 +181,7 @@ private:
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// Controlled animations.
+    /// Animation control structures.
     Vector<AnimationControl> animations_;
     /// Node hierarchy mode animation states.
     Vector<SharedPtr<AnimationState> > nodeAnimationStates_;
