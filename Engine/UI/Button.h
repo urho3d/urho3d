@@ -55,10 +55,10 @@ public:
     void SetPressedOffset(const IntVector2& offset);
     /// Set offset to image rectangle used when pressed.
     void SetPressedOffset(int x, int y);
-    /// Set pressed label offset.
-    void SetLabelOffset(const IntVector2& offset);
-    /// Set pressed label offset.
-    void SetLabelOffset(int x, int y);
+    /// Set offset of child elements when pressed.
+    void SetPressedChildOffset(const IntVector2& offset);
+    /// Set offset of child elements when pressed.
+    void SetPressedChildOffset(int x, int y);
     /// Set repeat properties. Rate 0 (default) disables repeat.
     void SetRepeat(float delay, float rate);
     /// Set repeat delay.
@@ -68,8 +68,8 @@ public:
     
     /// Return pressed image offset.
     const IntVector2& GetPressedOffset() const { return pressedOffset_; }
-    /// Return pressed label offset.
-    const IntVector2& GetLabelOffset() const { return labelOffset_; }
+    /// Return offset of child elements when pressed.
+    const IntVector2& GetPressedChildOffset() const { return pressedChildOffset_; }
     /// Return repeat delay.
     float GetRepeatDelay() const { return repeatDelay_; }
     /// Return repeat rate.
@@ -84,7 +84,7 @@ protected:
     /// Pressed image offset.
     IntVector2 pressedOffset_;
     /// Pressed label offset.
-    IntVector2 labelOffset_;
+    IntVector2 pressedChildOffset_;
     /// Repeat delay.
     float repeatDelay_;
     /// Repeat rate.

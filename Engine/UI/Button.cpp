@@ -36,7 +36,7 @@ extern const char* UI_CATEGORY;
 Button::Button(Context* context) :
     BorderImage(context),
     pressedOffset_(IntVector2::ZERO),
-    labelOffset_(IntVector2::ZERO),
+    pressedChildOffset_(IntVector2::ZERO),
     repeatDelay_(1.0f),
     repeatRate_(0.0f),
     repeatTimer_(0.0f),
@@ -56,7 +56,7 @@ void Button::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(Button, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Button, "Is Enabled", true);
     REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Label Offset", GetLabelOffset, SetLabelOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Child Offset", GetPressedChildOffset, SetPressedChildOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(Button, VAR_FLOAT, "Repeat Delay", GetRepeatDelay, SetRepeatDelay, float, 1.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(Button, VAR_FLOAT, "Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
 }
@@ -140,14 +140,14 @@ void Button::SetPressedOffset(int x, int y)
     pressedOffset_ = IntVector2(x, y);
 }
 
-void Button::SetLabelOffset(const IntVector2& offset)
+void Button::SetPressedChildOffset(const IntVector2& offset)
 {
-    labelOffset_ = offset;
+    pressedChildOffset_ = offset;
 }
 
-void Button::SetLabelOffset(int x, int y)
+void Button::SetPressedChildOffset(int x, int y)
 {
-    labelOffset_ = IntVector2(x, y);
+    pressedChildOffset_ = IntVector2(x, y);
 }
 
 void Button::SetRepeat(float delay, float rate)
@@ -169,7 +169,7 @@ void Button::SetRepeatRate(float rate)
 void Button::SetPressed(bool enable)
 {
     pressed_ = enable;
-    SetChildOffset(pressed_ ? labelOffset_ : IntVector2::ZERO);
+    SetChildOffset(pressed_ ? pressedChildOffset_ : IntVector2::ZERO);
 }
 
 }

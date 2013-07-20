@@ -3768,7 +3768,7 @@ Methods:<br>
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
-- void SetLabelOffset(int, int)
+- void SetPressedChildOffset(int, int)
 - void SetRepeat(float, float)
 
 Properties:<br>
@@ -3843,7 +3843,7 @@ Properties:<br>
 - BlendMode blendMode
 - bool tiled
 - IntVector2 pressedOffset
-- IntVector2 labelOffset
+- IntVector2 pressedChildOffset
 - float repeatDelay
 - float repeatRate
 - bool pressed (readonly)
@@ -5077,7 +5077,7 @@ Methods:<br>
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
-- void SetLabelOffset(int, int)
+- void SetPressedChildOffset(int, int)
 - void SetRepeat(float, float)
 - void SetPopupOffset(int, int)
 - void SetAccelerator(int, int)
@@ -5154,7 +5154,7 @@ Properties:<br>
 - BlendMode blendMode
 - bool tiled
 - IntVector2 pressedOffset
-- IntVector2 labelOffset
+- IntVector2 pressedChildOffset
 - float repeatDelay
 - float repeatRate
 - bool pressed (readonly)
@@ -5222,7 +5222,7 @@ Methods:<br>
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 - void SetPressedOffset(int, int)
-- void SetLabelOffset(int, int)
+- void SetPressedChildOffset(int, int)
 - void SetRepeat(float, float)
 - void SetAccelerator(int, int)
 - void AddItem(UIElement@)
@@ -5305,7 +5305,7 @@ Properties:<br>
 - BlendMode blendMode
 - bool tiled
 - IntVector2 pressedOffset
-- IntVector2 labelOffset
+- IntVector2 pressedChildOffset
 - float repeatDelay
 - float repeatRate
 - bool pressed (readonly)

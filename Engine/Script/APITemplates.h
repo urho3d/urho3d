@@ -1037,12 +1037,12 @@ template <class T> void RegisterButton(asIScriptEngine* engine, const char* clas
 {
     RegisterBorderImage<T>(engine, className);
     engine->RegisterObjectMethod(className, "void SetPressedOffset(int, int)", asMETHODPR(T, SetPressedOffset, (int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetLabelOffset(int, int)", asMETHODPR(T, SetLabelOffset, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetPressedChildOffset(int, int)", asMETHODPR(T, SetPressedChildOffset, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetRepeat(float, float)", asMETHOD(T, SetRepeat), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_pressedOffset(const IntVector2&in)", asMETHODPR(T, SetPressedOffset, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& get_pressedOffset() const", asMETHOD(T, GetPressedOffset), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_labelOffset(const IntVector2&in)", asMETHODPR(T, SetLabelOffset, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const IntVector2& get_labelOffset() const", asMETHOD(T, GetLabelOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_pressedChildOffset(const IntVector2&in)", asMETHODPR(T, SetPressedChildOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_pressedChildOffset() const", asMETHOD(T, GetPressedChildOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_repeatDelay(float)", asMETHOD(T, SetRepeatDelay), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_repeatDelay() const", asMETHOD(T, GetRepeatDelay), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_repeatRate(float)", asMETHOD(T, SetRepeatRate), asCALL_THISCALL);

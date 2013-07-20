@@ -8,7 +8,7 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Pressed Image Offset" value="16 0" />
         <attribute name="Hover Image Offset" value="0 16" />
-        <attribute name="Label Offset" value="-1 1" />
+        <attribute name="Pressed Child Offset" value="-1 1" />
     </element>
     <element type="CheckBox" style="BorderImage">
         <attribute name="Min Size" value="16 16" />
@@ -65,7 +65,7 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Pressed Image Offset" value="16 0" />
         <attribute name="Hover Image Offset" value="0 16" />
-        <attribute name="Label Offset" value="-1 1" />
+        <attribute name="Pressed Child Offset" value="-1 1" />
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Border" value="4 1 4 1" />
         <element internal="true">
