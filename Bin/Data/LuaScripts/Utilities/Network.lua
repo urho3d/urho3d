@@ -11,7 +11,7 @@ function ParseNetworkArguments()
     for i = 1, arguments:Size() do
         local argument = arguments[i-1]
         if argument:Substring(0,1):CString() ~= '-' then
-            if argument:Eq("server") then
+            if argument:Equals("server") then
                 runServer = true
                 runClient = false
                 return
@@ -24,7 +24,7 @@ function ParseNetworkArguments()
             index = index + 1
         else
             argument = argument:Substring(1):ToLower()
-            if argument:Eq("nobgm") then
+            if argument:Equals("nobgm") then
                 nobgm = true
             end
         end
