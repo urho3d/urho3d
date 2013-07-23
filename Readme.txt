@@ -21,6 +21,7 @@ Urho3D development, contributions and bugfixes by:
 - Aster Jian
 - Jason Kinzer
 - Pete Leigh
+- Paul Noome
 - Vladimir Pobedinsky
 - Miika Santala
 - Firegorilla

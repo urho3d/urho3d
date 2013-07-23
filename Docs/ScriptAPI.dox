@@ -5522,6 +5522,7 @@ Properties:<br>
 - String category (readonly)
 - Cursor@ cursor
 - IntVector2 cursorPosition (readonly)
+- CursorShape cursorShape (writeonly)
 - UIElement@ focusElement
 - UIElement@ frontElement (readonly)
 - UIElement@ root (readonly)

@@ -304,39 +304,38 @@ WindowDragMode Window::GetDragMode(const IntVector2& position) const
 
 void Window::SetCursorShape(WindowDragMode mode, Cursor* cursor) const
 {
-    if (!cursor)
-        return;
+    CursorShape shape = CS_NORMAL;
 
     switch (mode)
     {
-    case DRAG_NONE:
-    case DRAG_MOVE:
-        cursor->SetShape(CS_NORMAL);
-        break;
-
     case DRAG_RESIZE_TOP:
     case DRAG_RESIZE_BOTTOM:
-        cursor->SetShape(CS_RESIZEVERTICAL);
+        shape = CS_RESIZEVERTICAL;
         break;
 
     case DRAG_RESIZE_LEFT:
     case DRAG_RESIZE_RIGHT:
-        cursor->SetShape(CS_RESIZEHORIZONTAL);
+        shape = CS_RESIZEHORIZONTAL;
         break;
 
     case DRAG_RESIZE_TOPRIGHT:
     case DRAG_RESIZE_BOTTOMLEFT:
-        cursor->SetShape(CS_RESIZEDIAGONAL_TOPRIGHT);
+        shape = CS_RESIZEDIAGONAL_TOPRIGHT;
         break;
 
     case DRAG_RESIZE_TOPLEFT:
     case DRAG_RESIZE_BOTTOMRIGHT:
-        cursor->SetShape(CS_RESIZEDIAGONAL_TOPLEFT);
+        shape = CS_RESIZEDIAGONAL_TOPLEFT;
         break;
 
     default:
         break;
     }
+
+    if (cursor)
+        cursor->SetShape(shape);
+    else
+        GetSubsystem<UI>()->SetCursorShape(shape);
 }
 
 void Window::ValidatePosition()

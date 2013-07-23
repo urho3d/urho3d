@@ -51,6 +51,8 @@ public:
 
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
+    /// Set active cursor's shape if it exists, system OS cursor shape otherwise.
+    void SetCursorShape(CursorShape shape);
     /// Set focused UI element.
     void SetFocusElement(UIElement* element);
     /// Set modal element. Until all the modal elements are dismissed, all the inputs and events are only sent to them. Return true when successful.
@@ -87,6 +89,8 @@ public:
     UIElement* GetRootModalElement() const { return rootModalElement_; }
     /// Return cursor.
     Cursor* GetCursor() const { return cursor_; }
+    /// Return cursor position.
+    IntVector2 GetCursorPosition() const;
     /// Return UI element at screen coordinates.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
     /// Return UI element at screen coordinates.
@@ -95,8 +99,6 @@ public:
     UIElement* GetFocusElement() const { return focusElement_; }
     /// Return topmost enabled root-level non-modal element.
     UIElement* GetFrontElement() const;
-    /// Return cursor position.
-    IntVector2 GetCursorPosition() const;
     /// Return clipboard text.
     const String& GetClipBoardText() const { return clipBoard_; }
     /// Return UI element double click interval in seconds.
@@ -123,8 +125,6 @@ private:
     UIElement* GetFocusableElement(UIElement* element);
     /// Return cursor position and visibility either from the cursor element, or the Input subsystem.
     void GetCursorPositionAndVisible(IntVector2& pos, bool& visible);
-    /// Set cursor shape if it exists.
-    void SetCursorShape(CursorShape shape);
     /// Send a UI element drag event.
     void SendDragEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos);
     /// Handle screen mode event.
@@ -172,6 +172,8 @@ private:
     SharedPtr<UIElement> rootModalElement_;
     /// Cursor.
     SharedPtr<Cursor> cursor_;
+    /// OS cursor shapes.
+    SDL_Cursor* osCursorShapes_[CS_MAX_SHAPES];
     /// UI element being dragged.
     WeakPtr<UIElement> dragElement_;
     /// Currently focused element

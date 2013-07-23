@@ -77,7 +77,6 @@ public:
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
     /// Set current shape.
     void SetShape(CursorShape shape);
-    
     /// Get current shape.
     CursorShape GetShape() const { return shape_; }
     
@@ -85,7 +84,7 @@ public:
     void SetShapesAttr(VariantVector value);
     /// Return shapes attribute.
     VariantVector GetShapesAttr() const;
-    
+
 protected:
     /// Current shape index.
     CursorShape shape_;
