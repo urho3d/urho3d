@@ -20,5 +20,9 @@ uniform mat4 cZone;
 #else
     uniform mat4 cLightMatrices[2];
 #endif
-uniform vec4 cSkinMatrices[64*3];
-uniform vec4 cVertexLights[4*3];
+#ifdef SKINNED
+    uniform vec4 cSkinMatrices[64*3];
+#endif
+#ifdef NUMVERTEXLIGHTS
+    uniform vec4 cVertexLights[4*3];
+#endif

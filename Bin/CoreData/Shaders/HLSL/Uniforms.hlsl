@@ -17,8 +17,12 @@ uniform float3 cViewRightVector;
 uniform float3 cViewUpVector;
 uniform float4x3 cZone;
 uniform float4x4 cLightMatrices[4];
-uniform float4x3 cSkinMatrices[64];
-uniform float4 cVertexLights[4*3];
+#ifdef SKINNED
+    uniform float4x3 cSkinMatrices[64];
+#endif
+#ifdef NUMVERTEXLIGHTS
+    uniform float4 cVertexLights[4*3];
+#endif
 
 // Pixel shader uniforms
 uniform float3 cAmbientColor;
