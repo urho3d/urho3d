@@ -23,7 +23,6 @@
 #pragma once
 
 #include "Object.h"
-#include "Scene.h"
 #include "ResourceCache.h"
 
 // All Urho3D classes reside in namespace Urho3D
@@ -54,6 +53,6 @@ private:
     /// Callback method invoked when a logic update event is dispatched.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Handle to ResourceCache instance for loading the used Font.
+    /// Pointer to ResourceCache instance for loading the used Font.
     SharedPtr<ResourceCache> cache_;
 };

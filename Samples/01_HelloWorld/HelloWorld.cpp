@@ -22,7 +22,6 @@
 
 #include "Context.h"
 #include "Engine.h"
-#include "Camera.h"
 #include "CoreEvents.h"
 #include "Font.h"
 #include "Input.h"
