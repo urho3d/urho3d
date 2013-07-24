@@ -315,7 +315,14 @@ if (NOT USE_OPENGL)
     add_subdirectory (Tools/ShaderCompiler)
 endif ()
 
+# Urho3D samples. Uncomment to enable
+# set (ENABLE_SAMPLES 1)
+if (ENABLE_SAMPLES AND NOT IOS AND NOT ANDROID)
+    add_subdirectory (Samples)
+endif ()   
+
 # Urho3D extras. Uncomment to enable
+# Todo: CharacterDemo will be moved to Samples
 # set (ENABLE_EXTRAS 1)
 if (ENABLE_EXTRAS)
     if (NOT IOS AND NOT ANDROID)
