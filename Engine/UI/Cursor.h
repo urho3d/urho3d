@@ -24,6 +24,7 @@
 
 #include "BorderImage.h"
 #include "Image.h"
+#include "Texture.h"
 
 #include <SDL_mouse.h>
 
@@ -47,6 +48,17 @@ enum CursorShape
 /// %Cursor image and hotspot information.
 struct CursorShapeInfo
 {
+    /// Construct with defaults.
+    CursorShapeInfo() :
+        imageRect_(IntRect::ZERO),
+        hotSpot_(IntVector2::ZERO),
+        osCursor_(0),
+        systemDefined_(false)
+    {
+    }
+    
+    /// Image.
+    SharedPtr<Image> image_;
     /// Texture.
     SharedPtr<Texture> texture_;
     /// Image rectangle.
@@ -55,6 +67,8 @@ struct CursorShapeInfo
     IntVector2 hotSpot_;
     /// OS cursor.
     SDL_Cursor* osCursor_;
+    /// Whether the OS cursor is system defined.
+    bool systemDefined_;
 };
 
 /// Mouse cursor %UI element.
@@ -74,11 +88,15 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     
     /// Define a shape.
-    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
+    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     /// Set current shape.
     void SetShape(CursorShape shape);
+    /// Set whether to use system default shapes. Is only possible when the OS mouse cursor has been set visible from the Input subsystem.
+    void SetUseSystemShapes(bool enable);
     /// Get current shape.
     CursorShape GetShape() const { return shape_; }
+    /// Return whether is using system default shapes.
+    bool GetUseSystemShapes() const { return useSystemShapes_; }
     
     /// Set shapes attribute.
     void SetShapesAttr(VariantVector value);
@@ -86,10 +104,17 @@ public:
     VariantVector GetShapesAttr() const;
 
 protected:
+    /// Apply the current shape.
+    void ApplyShape();
+    /// Handle operating system mouse cursor visibility change event.
+    void HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData);
+    
     /// Current shape index.
     CursorShape shape_;
     /// Shape definitions.
     CursorShapeInfo shapeInfos_[CS_MAX_SHAPES];
+    /// Use system default shapes flag.
+    bool useSystemShapes_;
 };
 
 }

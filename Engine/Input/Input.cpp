@@ -196,6 +196,12 @@ void Input::SetMouseVisible(bool enable)
             else
                 SDL_ShowCursor(SDL_TRUE);
         }
+        
+        using namespace MouseVisibleChanged;
+        
+        VariantMap eventData;
+        eventData[P_VISIBLE] = mouseVisible_;
+        SendEvent(E_MOUSEVISIBLECHANGED, eventData);
     }
 }
 

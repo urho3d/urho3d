@@ -4047,7 +4047,7 @@ Methods:<br>
 - bool IsInsideCombined(IntVector2, bool)
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
-- void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&, bool arg4 = false)
+- void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&)
 
 Properties:<br>
 - int refs (readonly)
@@ -4121,6 +4121,7 @@ Properties:<br>
 - BlendMode blendMode
 - bool tiled
 - CursorShape shape
+- bool useSystemShapes
 
 
 Slider
@@ -5522,7 +5523,6 @@ Properties:<br>
 - String category (readonly)
 - Cursor@ cursor
 - IntVector2 cursorPosition (readonly)
-- CursorShape cursorShape (writeonly)
 - UIElement@ focusElement
 - UIElement@ frontElement (readonly)
 - UIElement@ root (readonly)

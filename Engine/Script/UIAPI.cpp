@@ -146,9 +146,11 @@ static void RegisterCursor(asIScriptEngine* engine)
     engine->RegisterEnumValue("CursorShape", "CS_BUSY", CS_BUSY);
 
     RegisterBorderImage<Cursor>(engine, "Cursor");
-    engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in, bool arg4 = false)", asMETHOD(Cursor, DefineShape), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void DefineShape(CursorShape, Texture@+, const IntRect&in, const IntVector2&in)", asMETHOD(Cursor, DefineShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void set_shape(CursorShape)", asMETHOD(Cursor, SetShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "CursorShape get_shape() const", asMETHOD(Cursor, GetShape), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void set_useSystemShapes(bool)", asMETHOD(Cursor, SetUseSystemShapes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "bool get_useSystemShapes() const", asMETHOD(Cursor, GetUseSystemShapes), asCALL_THISCALL);
 }
 
 static void RegisterButton(asIScriptEngine* engine)
@@ -574,7 +576,6 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "void set_cursor(Cursor@+)", asMETHOD(UI, SetCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "Cursor@+ get_cursor() const", asMETHOD(UI, GetCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "IntVector2 get_cursorPosition() const", asMETHOD(UI, GetCursorPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_cursorShape(CursorShape)", asMETHOD(UI, SetCursorShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_focusElement(UIElement@+)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_focusElement() const", asMETHOD(UI, GetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHOD(UI, GetFrontElement), asCALL_THISCALL);

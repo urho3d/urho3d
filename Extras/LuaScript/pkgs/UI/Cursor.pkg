@@ -18,10 +18,13 @@ class Cursor : public BorderImage
     Cursor(Context* context);
     virtual ~Cursor();
     
-    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot, bool osMouseVisible = false);
+    void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
     
     void SetShape(CursorShape shape);
+    void SetUseSystemShapes(bool enable);
     CursorShape GetShape() const;
-    
+    bool GetUseSystemShapes() const;
+
     tolua_property__get_set CursorShape shape;
+    tolua_property__get_set bool useSystemShapes;
 };

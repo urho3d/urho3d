@@ -155,6 +155,12 @@ EVENT(E_INPUTFOCUS, InputFocus)
     PARAM(P_MINIMIZED, Minimized);          // bool
 }
 
+/// OS mouse cursor visibility changed.
+EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
+{
+    PARAM(P_VISIBLE, Visible);              // bool
+}
+
 /// Application exit requested.
 EVENT(E_EXITREQUESTED, ExitRequested)
 {

@@ -334,8 +334,6 @@ void Window::SetCursorShape(WindowDragMode mode, Cursor* cursor) const
 
     if (cursor)
         cursor->SetShape(shape);
-    else
-        GetSubsystem<UI>()->SetCursorShape(shape);
 }
 
 void Window::ValidatePosition()

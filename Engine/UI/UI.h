@@ -51,8 +51,6 @@ public:
 
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
-    /// Set active cursor's shape if it exists, system OS cursor shape otherwise.
-    void SetCursorShape(CursorShape shape);
     /// Set focused UI element.
     void SetFocusElement(UIElement* element);
     /// Set modal element. Until all the modal elements are dismissed, all the inputs and events are only sent to them. Return true when successful.
@@ -125,6 +123,8 @@ private:
     UIElement* GetFocusableElement(UIElement* element);
     /// Return cursor position and visibility either from the cursor element, or the Input subsystem.
     void GetCursorPositionAndVisible(IntVector2& pos, bool& visible);
+    /// Set active cursor's shape.
+    void SetCursorShape(CursorShape shape);
     /// Send a UI element drag event.
     void SendDragEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos);
     /// Handle screen mode event.

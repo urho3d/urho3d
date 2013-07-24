@@ -57,19 +57,6 @@
 namespace Urho3D
 {
 
-/// OS cursor shape lookup table matching the %Cursor CursorShape enumeration
-static const int osCursorLookup[CS_MAX_SHAPES] =
-{
-    SDL_SYSTEM_CURSOR_ARROW,    // CS_NORMAL
-    SDL_SYSTEM_CURSOR_SIZENS,   // CS_RESIZEVERTICAL
-    SDL_SYSTEM_CURSOR_SIZENESW, // CS_RESIZEDIAGONAL_TOPRIGHT
-    SDL_SYSTEM_CURSOR_SIZEWE,   // CS_RESIZEHORIZONTAL
-    SDL_SYSTEM_CURSOR_SIZENWSE, // CS_RESIZEDIAGONAL_TOPLEFT
-    SDL_SYSTEM_CURSOR_HAND,     // CS_ACCEPTDROP
-    SDL_SYSTEM_CURSOR_NO,       // CS_REJECTDROP
-    SDL_SYSTEM_CURSOR_WAIT      // CS_BUSY
-};
-
 ShortStringHash VAR_ORIGIN("Origin");
 const ShortStringHash VAR_ORIGINAL_PARENT("OriginalParent");
 const ShortStringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
@@ -819,22 +806,6 @@ void UI::SetCursorShape(CursorShape shape)
 {
     if (cursor_)
         cursor_->SetShape(shape);
-    else
-    {
-        // Check now: Cursor's SetShape does this check too, so avoids checking twice.
-        if (shape < CS_NORMAL || shape >= CS_MAX_SHAPES)
-            return;
-        
-        if (!osCursorShapes_[shape])
-        {
-            // Create OS cursor corresponding to specified CursorShape
-            osCursorShapes_[shape] = SDL_CreateSystemCursor((SDL_SystemCursor)osCursorLookup[shape]);
-            if (!osCursorShapes_[shape])
-                LOGERROR("Could not create system cursor!");
-        }
-        
-        SDL_SetCursor(osCursorShapes_[shape]);
-    }
 }
 
 void UI::SendDragEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos)
