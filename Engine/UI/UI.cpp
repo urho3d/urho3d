@@ -86,12 +86,6 @@ UI::UI(Context* context) :
     rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);
     clickTimer_ = new Timer();
 
-    // Nullify OS cursor shapes
-    for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
-    {
-        osCursorShapes_[i] = 0;
-    }
-    
     // Register UI library object factories
     RegisterUILibrary(context_);
 
@@ -113,16 +107,6 @@ UI::UI(Context* context) :
 UI::~UI()
 {
     delete clickTimer_;
-
-    for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
-    {
-        if (osCursorShapes_[i]) 
-        {
-            // Free OS cursor and nullify
-            SDL_FreeCursor(osCursorShapes_[i]);
-            osCursorShapes_[i] = 0;
-        }
-    }
 }
 
 void UI::SetCursor(Cursor* cursor)
@@ -812,18 +796,18 @@ void UI::SendDragEvent(StringHash eventType, UIElement* element, const IntVector
 {
     if (!element)
         return;
-    
+
     IntVector2 relativePos = element->ScreenToElement(screenPos);
-    
+
     using namespace DragBegin;
-    
+
     VariantMap eventData;
     eventData[P_ELEMENT] = (void*)element;
     eventData[P_X] = screenPos.x_;
     eventData[P_Y] = screenPos.y_;
     eventData[P_ELEMENTX] = relativePos.x_;
     eventData[P_ELEMENTY] = relativePos.y_;
-    
+
     element->SendEvent(eventType, eventData);
 }
 
@@ -882,9 +866,9 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
                 doubleClickElement_.Reset();
-                
+
                 using namespace UIMouseDoubleClick;
-                
+
                 VariantMap eventData;
                 eventData[P_ELEMENT] = (void*)element.Get();
                 eventData[P_X] = cursorPos.x_;
@@ -893,8 +877,8 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                 eventData[P_BUTTONS] = mouseButtons_;
                 eventData[P_QUALIFIERS] = qualifiers_;
                 element->SendEvent(E_UIMOUSEDOUBLECLICK, eventData);
-            } 
-            else 
+            }
+            else
             {
                 doubleClickElement_ = element;
                 clickTimer_->Reset();
@@ -937,7 +921,7 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
             {
                 dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor_);
                 SendDragEvent(E_DRAGEND, dragElement_, cursorPos);
-                
+
                 // Drag and drop finish
                 bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
                 if (dragSource)
@@ -1125,7 +1109,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
         {
             dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, cursor_);
             SendDragEvent(E_DRAGEND, dragElement_, pos);
-            
+
             // Drag and drop finish
             bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
             if (dragSource)

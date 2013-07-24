@@ -151,7 +151,7 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
-    
+
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Vertex shader for no texture.
@@ -172,8 +172,6 @@ private:
     SharedPtr<UIElement> rootModalElement_;
     /// Cursor.
     SharedPtr<Cursor> cursor_;
-    /// OS cursor shapes.
-    SDL_Cursor* osCursorShapes_[CS_MAX_SHAPES];
     /// UI element being dragged.
     WeakPtr<UIElement> dragElement_;
     /// Currently focused element
