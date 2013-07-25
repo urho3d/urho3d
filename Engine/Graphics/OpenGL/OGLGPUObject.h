@@ -49,12 +49,12 @@ public:
     void ClearDataLost();
     
     /// Return the graphics subsystem.
-    Graphics* GetGraphics() const { return graphics_; }
+    Graphics* GetGraphics() const;
     /// Return the object's OpenGL handle.
     unsigned GetGPUObject() const { return object_; }
     /// Return whether data is lost due to context loss.
     bool IsDataLost() const { return dataLost_; }
-    /// Return whether has pending data assigned while device was lost.
+    /// Return whether has pending data assigned while context was lost.
     bool HasPendingData() const { return dataPending_; }
     
 protected:

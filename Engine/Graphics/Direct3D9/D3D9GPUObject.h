@@ -49,7 +49,7 @@ public:
     void ClearDataLost();
     
     /// Return the graphics subsystem.
-    Graphics* GetGraphics() const { return graphics_; }
+    Graphics* GetGraphics() const;
     /// Return Direct3D object.
     void* GetGPUObject() const { return object_; }
     /// Return whether data is lost due to device loss.
