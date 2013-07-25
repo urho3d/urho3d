@@ -45,7 +45,7 @@ setup_library ()
 
 # For IOS and Android build to be successful, the "tolua++" tool must be present in the "Bin" folder.
 # One way to achieve this is to first do a desktop build where all the tools would be generated, then switch to IOS/Android build.
-if (NOT IOS AND NOT ANDROID AND NOT RASPI)
+if (NOT IOS AND NOT ANDROID)
     # Add dependency to the "tolua++" bin tool
     add_dependencies(${TARGET_NAME} tolua++)
 endif ()
