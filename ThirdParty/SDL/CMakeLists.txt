@@ -39,49 +39,57 @@ elseif (ANDROID)
         src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c
     )
 else ()
-    include(CheckCSourceCompiles)
-
     # On Linux, make sure development libraries exist, and use their include file directories  
-    find_package (OpenGL REQUIRED)
-    find_package (X11 REQUIRED)
-    if (NOT X11_Xrandr_FOUND)
-        message (FATAL_ERROR "Could not find XRandR (libxrandr-dev)")
+    if (RASPI)
+        #TODO: find_package (BCM_VC REQUIRED)
+        set (LINK_LIBS_ONLY bcm_host)
+        file (GLOB VIDEO_DRIVER_C_FILES src/video/raspi/*.c)
+    else ()
+        find_package (OpenGL REQUIRED)
+        include_directories (${OpenGL_INCLUDE_DIRS})
+        
+        find_package (X11 REQUIRED)
+        if (NOT X11_Xrandr_FOUND)
+            message (FATAL_ERROR "Could not find XRandR (libxrandr-dev)")
+        endif ()
+        include_directories (${X11_INCLUDE_DIRS})  
+
+        message ("--")
+        message ("-- Following tests check whether X11 library installed in this system uses _Xconst in below functions")
+        message ("-- A failed test result simply means the installed X11 library does not use _Xconst")
+        message ("-- It is OK to proceed to build Urho3D regardless of the test result")
+        include (CheckCSourceCompiles)
+        set  (CMAKE_REQUIRED_LIBRARIES ${X11_LIB} ${X11_LIB})
+        check_c_source_compiles ("
+            #include <X11/Xlib.h>
+            #include <X11/Xproto.h>
+            #include <X11/extensions/Xext.h>
+            #include <X11/extensions/extutil.h>
+            extern XExtDisplayInfo* XextAddDisplay(XExtensionInfo* a,Display* b,_Xconst char* c,XExtensionHooks* d,int e,XPointer f);
+            int main(int argc, char **argv) {}" HAVE_CONST_XEXT_ADDDISPLAY)
+        if (HAVE_CONST_XEXT_ADDDISPLAY)
+            add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY)
+        endif ()
+        check_c_source_compiles ("
+            #include <X11/Xlibint.h>
+            extern int _XData32(Display *dpy,register _Xconst long *data,unsigned len);
+            int main(int argc, char **argv) {}" HAVE_CONST_XDATA32)
+        if (HAVE_CONST_XDATA32)
+            add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XDATA32)
+        endif ()
+        set (CMAKE_REQUIRED_LIBRARIES)
+        message ("--")
+        
+        file (GLOB VIDEO_DRIVER_C_FILES src/video/x11/*.c)
     endif ()
     find_package (ALSA REQUIRED)
-
-    include_directories (${OpenGL_INCLUDE_DIRS})
-    include_directories (${X11_INCLUDE_DIRS})  
     include_directories (${ALSA_INCLUDE_DIRS})
-
-    set(CMAKE_REQUIRED_LIBRARIES ${X11_LIB} ${X11_LIB})
-    message ("--")
-    message ("-- Following tests check whether X11 library installed in this system uses _Xconst in below functions")
-    message ("-- A failed test result simply means the installed X11 library does not use _Xconst")
-    message ("-- It is OK to proceed to build Urho3D regardless of the test result")
-    check_c_source_compiles("
-        #include <X11/Xlib.h>
-        #include <X11/Xproto.h>
-        #include <X11/extensions/Xext.h>
-        #include <X11/extensions/extutil.h>
-        extern XExtDisplayInfo* XextAddDisplay(XExtensionInfo* a,Display* b,_Xconst char* c,XExtensionHooks* d,int e,XPointer f);
-        int main(int argc, char **argv) {}" HAVE_CONST_XEXT_ADDDISPLAY)
-    if (HAVE_CONST_XEXT_ADDDISPLAY)
-        add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY)
-    endif ()
-    check_c_source_compiles("
-        #include <X11/Xlibint.h>
-        extern int _XData32(Display *dpy,register _Xconst long *data,unsigned len);
-        int main(int argc, char **argv) {}" HAVE_CONST_XDATA32)
-    if (HAVE_CONST_XDATA32)
-        add_definitions (-DSDL_VIDEO_DRIVER_X11_CONST_PARAM_XDATA32)
-    endif ()
-    message ("--")
-    set(CMAKE_REQUIRED_LIBRARIES)
 
     file (GLOB SYS_C_FILES
         src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/haptic/linux/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c
-        src/power/linux/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/x11/*.c
+        src/power/linux/*.c src/thread/pthread/*.c src/timer/unix/*.c
     )
+    set (SYS_C_FILES ${SYS_C_FILES} ${VIDEO_DRIVER_C_FILES})
 endif ()
 
 file (GLOB H_FILES include/*.h)
@@ -100,5 +108,5 @@ elseif (APPLE)
 elseif (ANDROID)
     target_link_libraries (${TARGET_NAME} dl log)
 else ()
-    target_link_libraries (${TARGET_NAME} dl pthread rt)
+    target_link_libraries (${TARGET_NAME} dl pthread rt ${LINK_LIBS_ONLY})
 endif ()

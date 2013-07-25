@@ -35,7 +35,8 @@ set (SOURCE_FILES ${SOURCE_FILES} generated/AudioLuaAPI.cpp generated/ContainerL
 
 # Define dependency libs
 set (LIBS ../../Engine/Audio ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Engine/Graphics ../../Engine/Input ../../Engine/IO ../../Engine/Math ../../Engine/Navigation ../../Engine/Network
-    ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI ../../ThirdParty/Lua/src ../../ThirdParty/tolua++_static)
+    ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI ../../ThirdParty/Lua/src)
+set (LINK_LIBS_ONLY tolua++_static)
 set (INCLUDE_DIRS_ONLY . ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
 
 # Setup target
@@ -44,7 +45,7 @@ setup_library ()
 
 # For IOS and Android build to be successful, the "tolua++" tool must be present in the "Bin" folder.
 # One way to achieve this is to first do a desktop build where all the tools would be generated, then switch to IOS/Android build.
-if (NOT IOS AND NOT ANDROID)
+if (NOT IOS AND NOT ANDROID AND NOT RASPI)
     # Add dependency to the "tolua++" bin tool
     add_dependencies(${TARGET_NAME} tolua++)
 endif ()

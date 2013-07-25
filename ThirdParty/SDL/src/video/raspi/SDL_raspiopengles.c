@@ -19,16 +19,16 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Yao Wei Tjong for Urho3D
+// Created by Yao Wei Tjong for Urho3D
 
 #include "SDL_config.h"
 
-// Urho3D: fix compiler directive to include OpenGL ES 2
-#if SDL_VIDEO_DRIVER_X11 && (SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2)
+#if SDL_VIDEO_DRIVER_RASPI
 
-#include "SDL_x11video.h"
-#include "SDL_x11opengles.h"
-#include "SDL_x11opengl.h"
+#include "SDL_raspiopengles.h"
+#include "SDL_raspivideo.h"
+
+#include <dlfcn.h>
 
 #define DEFAULT_EGL "libEGL.so"
 #define DEFAULT_OGL_ES2 "libGLESv2.so"
@@ -45,7 +45,7 @@
 /* GLES implementation of SDL OpenGL support */
 
 void *
-X11_GLES_GetProcAddress(_THIS, const char *proc)
+RASPI_GLES_GetProcAddress(_THIS, const char *proc)
 {
     static char procname[1024];
     void *handle;
@@ -60,9 +60,6 @@ X11_GLES_GetProcAddress(_THIS, const char *proc)
     }
 
     handle = _this->gl_config.dll_handle;
-#if defined(__OpenBSD__) && !defined(__ELF__)
-#undef dlsym(x,y);
-#endif
     retval = dlsym(handle, proc);
     if (!retval && strlen(proc) <= 1022) {
         procname[0] = '_';
@@ -72,25 +69,8 @@ X11_GLES_GetProcAddress(_THIS, const char *proc)
     return retval;
 }
 
-void
-X11_GLES_UnloadLibrary(_THIS)
-{
-    if ((_this->gles_data) && (_this->gl_config.driver_loaded)) {
-        _this->gles_data->eglTerminate(_this->gles_data->egl_display);
-
-        dlclose(_this->gl_config.dll_handle);
-        dlclose(_this->gles_data->egl_dll_handle);
-
-        SDL_free(_this->gles_data);
-        _this->gles_data = NULL;
-
-        _this->gl_config.dll_handle = NULL;
-        _this->gl_config.driver_loaded = 0;
-    }
-}
-
 int
-X11_GLES_LoadLibrary(_THIS, const char *path)
+RASPI_GLES_LoadLibrary(_THIS, const char *path)
 {
     void *handle;
     int dlopen_flags;
@@ -101,22 +81,8 @@ X11_GLES_LoadLibrary(_THIS, const char *path)
         return SDL_SetError("OpenGL ES context already created");
     }
 
-    /* If SDL_GL_CONTEXT_EGL has been changed to 0, switch over to X11_GL functions  */
     if (_this->gl_config.use_egl == 0) {
-#if SDL_VIDEO_OPENGL_GLX
-        _this->GL_LoadLibrary = X11_GL_LoadLibrary;
-        _this->GL_GetProcAddress = X11_GL_GetProcAddress;
-        _this->GL_UnloadLibrary = X11_GL_UnloadLibrary;
-        _this->GL_CreateContext = X11_GL_CreateContext;
-        _this->GL_MakeCurrent = X11_GL_MakeCurrent;
-        _this->GL_SetSwapInterval = X11_GL_SetSwapInterval;
-        _this->GL_GetSwapInterval = X11_GL_GetSwapInterval;
-        _this->GL_SwapWindow = X11_GL_SwapWindow;
-        _this->GL_DeleteContext = X11_GL_DeleteContext;
-        return X11_GL_LoadLibrary(_this, path);
-#else
         return SDL_SetError("SDL not configured with OpenGL/GLX support");
-#endif
     }
 
 #ifdef RTLD_GLOBAL
@@ -141,7 +107,7 @@ X11_GLES_LoadLibrary(_THIS, const char *path)
     }
 
     /* Unload the old driver and reset the pointers */
-    X11_GLES_UnloadLibrary(_this);
+    RASPI_GLES_UnloadLibrary(_this);
 
     _this->gles_data = (struct SDL_PrivateGLESData *) SDL_calloc(1, sizeof(SDL_PrivateGLESData));
     if (!_this->gles_data) {
@@ -163,8 +129,7 @@ X11_GLES_LoadLibrary(_THIS, const char *path)
     LOAD_FUNC(eglSwapBuffers);
     LOAD_FUNC(eglSwapInterval);
 
-    _this->gles_data->egl_display =
-        _this->gles_data->eglGetDisplay((NativeDisplayType) data->display);
+    _this->gles_data->egl_display = _this->gles_data->eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
     if (!_this->gles_data->egl_display) {
         return SDL_SetError("Could not get EGL display");
@@ -210,18 +175,34 @@ X11_GLES_LoadLibrary(_THIS, const char *path)
     return 0;
 }
 
-XVisualInfo *
-X11_GLES_GetVisual(_THIS, Display * display, int screen)
+void
+RASPI_GLES_UnloadLibrary(_THIS)
+{
+    if ((_this->gles_data) && (_this->gl_config.driver_loaded)) {
+        _this->gles_data->eglTerminate(_this->gles_data->egl_display);
+
+        dlclose(_this->gl_config.dll_handle);
+        dlclose(_this->gles_data->egl_dll_handle);
+
+        SDL_free(_this->gles_data);
+        _this->gles_data = NULL;
+
+        _this->gl_config.dll_handle = NULL;
+        _this->gl_config.driver_loaded = 0;
+    }
+}
+
+int
+RASPI_GLES_ChooseConfig(_THIS)
 {
     /* 64 seems nice. */
     EGLint attribs[64];
     EGLint found_configs = 0;
-    VisualID visual_id;
     int i;
 
     if (!_this->gles_data) {
         /* The EGL library wasn't loaded, SDL_GetError() should have info */
-        return NULL;
+        return -1;
     }
 
     i = 0;
@@ -274,56 +255,20 @@ X11_GLES_GetVisual(_THIS, Display * display, int screen)
                                           &_this->gles_data->egl_config, 1,
                                           &found_configs) == EGL_FALSE ||
         found_configs == 0) {
-        SDL_SetError("Couldn't find matching EGL config");
-        return NULL;
+        return SDL_SetError("Couldn't find matching EGL config");
     }
 
-    // Urho3D: fix the fallback to handle case where visual id is available but vinfo still returns null
-    XVisualInfo *vinfo = 0;
-    if (_this->gles_data->eglGetConfigAttrib(_this->gles_data->egl_display,
-                                             _this->gles_data->egl_config,
-                                             EGL_NATIVE_VISUAL_ID,
-                                             (EGLint *) &visual_id) ==
-        EGL_TRUE && visual_id) {
-        XVisualInfo vi_in;
-        int out_count;
-
-        vi_in.screen = screen;
-        vi_in.visualid = visual_id;
-        vinfo = XGetVisualInfo(display,
-                               VisualScreenMask |
-                               VisualIDMask,
-                               &vi_in, &out_count);
-    }
-
-    if (!vinfo) {
-        /* Use the default visual when all else fails */
-        XVisualInfo vi_in;
-        int out_count;
-        vi_in.screen = screen;
-
-        vinfo = XGetVisualInfo(display,
-                               VisualScreenMask,
-                               &vi_in, &out_count);
-    }
-
-    return _this->gles_data->egl_visualinfo = vinfo;
+    return 0;
 }
 
 SDL_GLContext
-X11_GLES_CreateContext(_THIS, SDL_Window * window)
+RASPI_GLES_CreateContext(_THIS, SDL_Window *window)
 {
     EGLint context_attrib_list[] = {
         EGL_CONTEXT_CLIENT_VERSION,
         1,
         EGL_NONE
     };
-
-    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
-    Display *display = data->videodata->display;
-    SDL_GLContext context = (SDL_GLContext)1;
-
-    XSync(display, False);
 
     if (_this->gl_config.major_version) {
         context_attrib_list[1] = _this->gl_config.major_version;
@@ -333,7 +278,6 @@ X11_GLES_CreateContext(_THIS, SDL_Window * window)
         _this->gles_data->eglCreateContext(_this->gles_data->egl_display,
                                            _this->gles_data->egl_config,
                                            EGL_NO_CONTEXT, context_attrib_list);
-    XSync(display, False);
 
     if (_this->gles_data->egl_context == EGL_NO_CONTEXT) {
         SDL_SetError("Could not create EGL context");
@@ -342,8 +286,9 @@ X11_GLES_CreateContext(_THIS, SDL_Window * window)
 
     _this->gles_data->egl_swapinterval = 0;
 
-    if (X11_GLES_MakeCurrent(_this, window, context) < 0) {
-        X11_GLES_DeleteContext(_this, context);
+    SDL_GLContext context = (SDL_GLContext)1;
+    if (RASPI_GLES_MakeCurrent(_this, window, context) < 0) {
+        RASPI_GLES_DeleteContext(_this, context);
         return NULL;
     }
 
@@ -351,13 +296,8 @@ X11_GLES_CreateContext(_THIS, SDL_Window * window)
 }
 
 int
-X11_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context)
+RASPI_GLES_MakeCurrent(_THIS, SDL_Window *window, SDL_GLContext context)
 {
-/*
-    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
-    Display *display = data->videodata->display;
-*/
-
     if (!_this->gles_data) {
         return SDL_SetError("OpenGL not initialized");
     }
@@ -369,17 +309,12 @@ X11_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context)
         return SDL_SetError("Unable to make EGL context current");
     }
 
-/*
-    XSync(display, False);
-*/
-
     return 1;
 }
 
 int
-X11_GLES_SetSwapInterval(_THIS, int interval)
+RASPI_GLES_SetSwapInterval(_THIS, int interval)
 {
-    // Urho3D: bug fix on pointer check
     if (!_this->gles_data) {
         return SDL_SetError("OpenGL ES context not active");
     }
@@ -395,9 +330,8 @@ X11_GLES_SetSwapInterval(_THIS, int interval)
 }
 
 int
-X11_GLES_GetSwapInterval(_THIS)
+RASPI_GLES_GetSwapInterval(_THIS)
 {
-    // Urho3D: bug fix on pointer check
     if (!_this->gles_data) {
         return SDL_SetError("OpenGL ES context not active");
     }
@@ -406,14 +340,14 @@ X11_GLES_GetSwapInterval(_THIS)
 }
 
 void
-X11_GLES_SwapWindow(_THIS, SDL_Window * window)
+RASPI_GLES_SwapWindow(_THIS, SDL_Window * window)
 {
     _this->gles_data->eglSwapBuffers(_this->gles_data->egl_display,
                                      _this->gles_data->egl_surface);
 }
 
 void
-X11_GLES_DeleteContext(_THIS, SDL_GLContext context)
+RASPI_GLES_DeleteContext(_THIS, SDL_GLContext context)
 {
     /* Clean up GLES and EGL */
     if (!_this->gles_data) {
@@ -441,10 +375,10 @@ X11_GLES_DeleteContext(_THIS, SDL_GLContext context)
         }
     }
 
-    /* crappy fix */
-    X11_GLES_UnloadLibrary(_this);
+    /* Inherited the crappy fix from SDL_x11opengles.c */
+    RASPI_GLES_UnloadLibrary(_this);
 }
 
-#endif /* SDL_VIDEO_DRIVER_X11 && (SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2) */
+#endif /* SDL_VIDEO_DRIVER_RASPI */
 
 /* vi: set ts=4 sw=4 expandtab: */

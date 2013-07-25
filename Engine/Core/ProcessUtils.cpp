@@ -34,7 +34,7 @@
 
 #if defined(IOS)
 #include <mach/mach_host.h>
-#elif !defined(ANDROID)
+#elif !defined(ANDROID) && !defined(RASPI)
 #include <libcpuid.h>
 #endif
 
@@ -47,7 +47,7 @@
 
 #if defined(_MSC_VER)
 #include <float.h>
-#elif !defined(ANDROID) && !defined(IOS)
+#elif !defined(ANDROID) && !defined(IOS) && !defined(RASPI)
 // From http://stereopsis.com/FPU.html
 
 #define FPU_CW_PREC_MASK        0x0300
@@ -91,7 +91,7 @@ void GetCPUData(host_basic_info_data_t* data)
     infoCount = HOST_BASIC_INFO_COUNT;
     host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
 }
-#elif !defined(ANDROID)
+#elif !defined(ANDROID) && !defined(RASPI)
 void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
@@ -104,7 +104,7 @@ void GetCPUData(struct cpu_id_t* data)
 
 void InitFPU()
 {
-    #if !defined(ANDROID) && !defined(IOS) && !defined(__x86_64__) && !defined(_M_AMD64)
+    #if !defined(ANDROID) && !defined(IOS) && !defined(RASPI) && !defined(__x86_64__) && !defined(_M_AMD64)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
     #ifdef _MSC_VER
@@ -345,6 +345,8 @@ String GetPlatform()
     return "Mac OS X";
     #elif defined(__linux__)
     return "Linux";
+    #elif defined(RASPI)
+    return "Raspberry Pi";
     #else
     return String::EMPTY;
     #endif
@@ -361,7 +363,7 @@ unsigned GetNumPhysicalCPUs()
     #else
     return data.physical_cpu;
     #endif
-    #elif !defined(ANDROID)
+    #elif !defined(ANDROID) && !defined(RASPI)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_cores;
@@ -381,7 +383,7 @@ unsigned GetNumLogicalCPUs()
     #else
     return data.logical_cpu;
     #endif
-    #elif !defined(ANDROID)
+    #elif !defined(ANDROID) && !defined(RASPI)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_logical_cpus;

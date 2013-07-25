@@ -9,7 +9,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 # Define dependency libs
 set (LIBS ../Container ../Math)
 
-if (NOT IOS AND NOT ANDROID)
+if (NOT IOS AND NOT ANDROID AND NOT RASPI)
     set (INCLUDE_DIRS_ONLY ../../ThirdParty/LibCpuId/libcpuid)
     set (LINK_LIBS_ONLY LibCpuId)
 endif ()

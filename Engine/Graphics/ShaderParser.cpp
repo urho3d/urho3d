@@ -175,6 +175,11 @@ bool ShaderParser::ParseOptions(const XMLElement& element)
                 require = require.GetNext("require");
             }
             
+            #ifdef RASPI
+            newOption.defines_.Push("RASPI");
+            newOption.defineValues_.Push("1");
+            #endif
+
             options_.Push(newOption);
             if (options_.Size() > 31)
             {

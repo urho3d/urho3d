@@ -1,1 +1,1 @@
-./Urho3D Scripts/Navigation.as $@
+$( dirname $0 )/Urho3D Scripts/Navigation.as $@

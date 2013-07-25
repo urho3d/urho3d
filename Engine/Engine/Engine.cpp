@@ -75,7 +75,7 @@ Engine::Engine(Context* context) :
     Object(context),
     timeStep_(0.0f),
     minFps_(10),
-    #if defined(ANDROID) || defined(IOS)
+    #if defined(ANDROID) || defined(IOS) || defined(RASPI)
     maxFps_(60),
     maxInactiveFps_(10),
     pauseMinimized_(true),
@@ -83,8 +83,8 @@ Engine::Engine(Context* context) :
     maxFps_(200),
     maxInactiveFps_(60),
     pauseMinimized_(false),
-    autoExit_(true),
     #endif
+    autoExit_(true),
     initialized_(false),
     exiting_(false),
     headless_(false),

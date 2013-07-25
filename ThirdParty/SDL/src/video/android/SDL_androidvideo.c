@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
@@ -77,6 +80,8 @@ Android_Available(void)
 static void
 Android_DeleteDevice(SDL_VideoDevice * device)
 {
+	// Urho3D: bug fix
+	SDL_free(device->driverdata);
     SDL_free(device);
 }
 

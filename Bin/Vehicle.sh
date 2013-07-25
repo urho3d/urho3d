@@ -1,1 +1,1 @@
-./Urho3D Scripts/Vehicle.as $@
+$( dirname $0 )/Urho3D Scripts/Vehicle.as $@

@@ -20,6 +20,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef _SDL_config_linux_h
 #define _SDL_config_linux_h
 
@@ -127,7 +129,7 @@
 #define HAVE_SSCANF 1
 #define HAVE_SNPRINTF 1
 #define HAVE_VSNPRINTF 1
-#define HAVE_M_PI /**/
+#define HAVE_M_PI 1
 #define HAVE_ATAN 1
 #define HAVE_ATAN2 1
 #define HAVE_CEIL 1
@@ -272,6 +274,18 @@
 #define SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS 1
 #define SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM 1
 
+// Urho3D: Use OpenGL ES 2 implementation from Broadcom VideoCore for Raspberry Pi
+#ifdef RASPI
+#undef SDL_VIDEO_DRIVER_X11			/* No X */
+#define SDL_VIDEO_DRIVER_RASPI 1
+
+/* Enable OpenGL ES 2 */
+#define SDL_VIDEO_OPENGL_ES2 1
+#define SDL_VIDEO_RENDER_OGL_ES 1
+#define SDL_VIDEO_RENDER_OGL_ES2 1
+
+#else
+
 /* #undef SDL_VIDEO_RENDER_D3D */
 #define SDL_VIDEO_RENDER_OGL 1
 /* #undef SDL_VIDEO_RENDER_OGL_ES */
@@ -287,6 +301,8 @@
 /* #undef SDL_VIDEO_OPENGL_WGL */
 /* #undef SDL_VIDEO_OPENGL_OSMESA */
 /* #undef SDL_VIDEO_OPENGL_OSMESA_DYNAMIC */
+
+#endif
 
 /* Enable system power support */
 #define SDL_POWER_LINUX 1

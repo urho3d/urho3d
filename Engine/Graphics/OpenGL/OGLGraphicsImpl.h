@@ -26,7 +26,7 @@
 #include "HashMap.h"
 #include "Timer.h"
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined (RASPI)
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #elif defined(IOS)
@@ -74,7 +74,7 @@ struct FrameBufferObject
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
             colorAttachments_[i] = 0;
     }
-    
+
     /// Frame buffer handle.
     unsigned fbo_;
     /// Bound color attachment textures.
@@ -93,13 +93,13 @@ struct FrameBufferObject
 class GraphicsImpl
 {
     friend class Graphics;
-    
+
 public:
     /// Construct.
     GraphicsImpl();
     /// Return the SDL window.
     SDL_Window* GetWindow() const { return window_; }
-    
+
 private:
     /// SDL window.
     SDL_Window* window_;

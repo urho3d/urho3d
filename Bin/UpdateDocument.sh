@@ -1,3 +1,4 @@
+cd $( dirname $0 )
 echo "Dumping Script API..."
 ./ScriptCompiler -dumpapi ../Docs/ScriptAPI.dox
 if [ $? -ne 0 ]; then exit 1; fi

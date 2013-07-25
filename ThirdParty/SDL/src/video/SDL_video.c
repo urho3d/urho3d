@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 #include "SDL_config.h"
 
@@ -82,6 +82,10 @@ static VideoBootStrap *bootstrap[] = {
 #if SDL_VIDEO_DRIVER_PSP
     &PSP_bootstrap,
 #endif
+// Urho3D: add Raspberry Pi support
+#if SDL_VIDEO_DRIVER_RASPI
+    &RASPI_bootstrap,
+#endif
 #if SDL_VIDEO_DRIVER_DUMMY
     &DUMMY_bootstrap,
 #endif
@@ -123,25 +127,22 @@ typedef struct {
     int bytes_per_pixel;
 } SDL_WindowTextureData;
 
+// Urho3D: renderer disabled
+/*
 static SDL_bool
 ShouldUseTextureFramebuffer()
 {
     const char *hint;
 
-    /* If there's no native framebuffer support then there's no option */
     if (!_this->CreateWindowFramebuffer) {
         return SDL_TRUE;
     }
 
-    /* If the user has specified a software renderer we can't use a
-       texture framebuffer, or renderer creation will go recursive.
-     */
     hint = SDL_GetHint(SDL_HINT_RENDER_DRIVER);
     if (hint && SDL_strcasecmp(hint, "software") == 0) {
         return SDL_FALSE;
     }
 
-    /* See if the user or application wants a specific behavior */
     hint = SDL_GetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION);
     if (hint) {
         if (*hint == '0') {
@@ -151,20 +152,14 @@ ShouldUseTextureFramebuffer()
         }
     }
 
-    /* Each platform has different performance characteristics */
 #if defined(__WIN32__)
-    /* GDI BitBlt() is way faster than Direct3D dynamic textures right now.
-     */
     return SDL_FALSE;
 
 #elif defined(__MACOSX__)
-    /* Mac OS X uses OpenGL as the native fast path */
     return SDL_TRUE;
 
 #elif defined(__LINUX__)
-    /* Properly configured OpenGL drivers are faster than MIT-SHM */
 #if SDL_VIDEO_OPENGL
-    /* Ugh, find a way to cache this value! */
     {
         SDL_Window *window;
         SDL_GLContext context;
@@ -181,7 +176,6 @@ ShouldUseTextureFramebuffer()
                 if (glGetStringFunc) {
                     vendor = (const char *) glGetStringFunc(GL_VENDOR);
                 }
-                /* Add more vendors here at will... */
                 if (vendor &&
                     (SDL_strstr(vendor, "ATI Technologies") ||
                      SDL_strstr(vendor, "NVIDIA"))) {
@@ -194,22 +188,16 @@ ShouldUseTextureFramebuffer()
         return hasAcceleratedOpenGL;
     }
 #elif SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2
-    /* Let's be optimistic about this! */
     return SDL_TRUE;
 #else
     return SDL_FALSE;
 #endif
 
 #else
-    /* Play it safe, assume that if there is a framebuffer driver that it's
-       optimized for the current platform.
-    */
     return SDL_FALSE;
 #endif
 }
 
-// Urho3D: renderer disabled
-/*
 static int
 SDL_CreateWindowTexture(_THIS, SDL_Window * window, Uint32 * format, void ** pixels, int *pitch)
 {
@@ -1288,7 +1276,7 @@ SDL_CreateWindowFrom(const void *data, Uint32 flags)
         SDL_GL_LoadLibrary(NULL);
         window->flags |= SDL_WINDOW_OPENGL;
     }
-    
+
     if (!_this->CreateWindowFrom ||
         _this->CreateWindowFrom(_this, window, data) < 0) {
         SDL_DestroyWindow(window);
@@ -2127,6 +2115,7 @@ SDL_DestroyWindow(SDL_Window * window)
 
     CHECK_WINDOW_MAGIC(window, );
 
+#if !SDL_VIDEO_OPENGL_ES && !SDL_VIDEO_OPENGL_ES2
     // Urho3D: make context uncurrent first
     /* make no context current if this is the current context window. */
     if (window->flags & SDL_WINDOW_OPENGL) {
@@ -2134,6 +2123,7 @@ SDL_DestroyWindow(SDL_Window * window)
             SDL_GL_MakeCurrent(window, NULL);
         }
     }
+#endif
 
     /* Restore video mode, etc. */
     SDL_HideWindow(window);

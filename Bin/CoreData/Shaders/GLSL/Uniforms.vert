@@ -21,7 +21,11 @@ uniform mat4 cZone;
     uniform mat4 cLightMatrices[2];
 #endif
 #ifdef SKINNED
-    uniform vec4 cSkinMatrices[64*3];
+    #ifdef RASPI
+        uniform vec4 cSkinMatrices[32*3];
+    #else
+        uniform vec4 cSkinMatrices[64*3];
+    #endif
 #endif
 #ifdef NUMVERTEXLIGHTS
     uniform vec4 cVertexLights[4*3];

@@ -10,7 +10,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 set (LIBS ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene)
 set (LINK_LIBS_ONLY SDL)
 
-if (USE_OPENGL)
+if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
     set (INCLUDE_DIRS_ONLY ${INCLUDE_DIRS_ONLY} ../../ThirdParty/GLEW)
 endif ()
 
