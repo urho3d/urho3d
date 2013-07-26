@@ -107,8 +107,6 @@ public:
     bool operator != (const SharedArrayPtr<T>& rhs) const { return ptr_ != rhs.ptr_; }
     /// Test for less than with another array pointer.
     bool operator < (const SharedArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
-    /// Return true if points to an array.
-    operator bool () const { return ptr_ != 0; }
     /// Convert to a raw pointer.
     operator T* () const { return ptr_; }
     
@@ -320,8 +318,6 @@ public:
     bool operator != (const WeakArrayPtr<T>& rhs) const { return ptr_ != rhs.ptr_ || refCount_ != rhs.refCount_; }
     /// Test for less than with another weak array pointer.
     bool operator < (const WeakArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
-    /// Return true if points to an array which is not expired.
-    operator bool () const { return !Expired(); }
     /// Convert to a raw pointer, null if array is expired.
     operator T* () const { return Get(); }
     

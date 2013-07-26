@@ -98,8 +98,6 @@ public:
     bool operator == (const SharedPtr<T>& rhs) const { return ptr_ == rhs.ptr_; }
     /// Test for inequality with another shared pointer.
     bool operator != (const SharedPtr<T>& rhs) const { return ptr_ != rhs.ptr_; }
-    /// Return true if the pointer is not null.
-    operator bool () const { return ptr_ != 0; }
     /// Convert to a raw pointer.
     operator T* () const { return ptr_; }
     
@@ -311,8 +309,6 @@ public:
     bool operator != (const WeakPtr<T>& rhs) const { return ptr_ != rhs.ptr_ || refCount_ != rhs.refCount_; }
     /// Test for less than with another weak pointer.
     bool operator < (const SharedPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
-    /// Return true if points to an object which is not expired.
-    operator bool () const { return !Expired(); }
     /// Convert to a raw pointer, null if the object is expired.
     operator T* () const { return Get(); }
     

@@ -641,8 +641,6 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
 
 void UI::GetBatches(UIElement* element, IntRect currentScissor)
 {
-    UIElement* cursorElement = cursor_;
-    
     // Set clipping scissor for child elements. No need to draw if zero size
     element->AdjustScissor(currentScissor);
     if (currentScissor.left_ == currentScissor.right_ || currentScissor.top_ == currentScissor.bottom_)
@@ -664,14 +662,14 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
             int currentPriority = (*i)->GetPriority();
             while (j != children.End() && (*j)->GetPriority() == currentPriority)
             {
-                if ((*j)->IsWithinScissor(currentScissor) && (*j) != cursorElement)
+                if ((*j)->IsWithinScissor(currentScissor) && (*j) != cursor_)
                     (*j)->GetBatches(batches_, vertexData_, currentScissor);
                 ++j;
             }
             // Now recurse into the children
             while (i != j)
             {
-                if ((*i)->IsVisible() && (*i) != cursorElement)
+                if ((*i)->IsVisible() && (*i) != cursor_)
                     GetBatches(*i, currentScissor);
                 ++i;
             }
@@ -682,7 +680,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     {
         while (i != children.End())
         {
-            if ((*i) != cursorElement)
+            if ((*i) != cursor_)
             {
                 if ((*i)->IsWithinScissor(currentScissor))
                     (*i)->GetBatches(batches_, vertexData_, currentScissor);
