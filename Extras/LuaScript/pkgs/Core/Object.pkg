@@ -7,20 +7,17 @@ class Object : public RefCounted
     // virtual const String& GetTypeName() const;
     tolua_outside const char* ObjectGetTypeName @ GetTypeName() const;
     
+    const String& GetCategory() const;
+    tolua_outside const char* ObjectGetCategory @ GetCategory() const;
+    
     // void SendEvent(StringHash eventType);
     tolua_outside void ObjectSendEvent @ SendEvent(const char* eventName);
-
+    
     // void SendEvent(StringHash eventType, VariantMap& eventData);
     tolua_outside void ObjectSendEvent @ SendEvent(const char* eventName, VariantMap& eventData);
     
-    Context* GetContext() const;
-    Object* GetEventSender() const;
-    EventHandler* GetEventHandler() const;
-    const String& GetCategory() const;
-    
-    tolua_readonly tolua_property__get_set Context* context;
-    tolua_readonly tolua_property__get_set Object* eventSender;
-    tolua_readonly tolua_property__get_set EventHandler* eventHandler;
+    tolua_readonly tolua_property__get_set ShortStringHash type;
+    tolua_readonly tolua_property__get_set String& typeName;
     tolua_readonly tolua_property__get_set String& category;
 };
 
@@ -29,6 +26,11 @@ ${
 static const char* ObjectGetTypeName(const Object* object)
 {
     return object->GetTypeName().CString();
+}
+
+static const char* ObjectGetCategory(const Object* object)
+{
+    return object->GetCategory().CString();
 }
 
 static void ObjectSendEvent(Object* object, const char* eventName)
