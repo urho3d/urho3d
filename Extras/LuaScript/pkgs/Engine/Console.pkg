@@ -1,6 +1,6 @@
 $#include "Console.h"
 
-class Console
+class Console : public Object
 {
     void SetDefaultStyle(XMLFile* style);
     void SetVisible(bool enable);
