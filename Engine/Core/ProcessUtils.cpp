@@ -131,7 +131,7 @@ void ErrorExit(const String& message, int exitCode)
 {
     if (!message.Empty())
         PrintLine(message, true);
-    
+
     exit(exitCode);
 }
 
@@ -140,21 +140,21 @@ void OpenConsoleWindow()
     #ifdef WIN32
     if (consoleOpened)
         return;
-    
+
     AllocConsole();
-    
+
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     int hCrt = _open_osfhandle((long)hOut, _O_TEXT);
     FILE* outFile = _fdopen(hCrt, "w");
     setvbuf(outFile, NULL, _IONBF, 1);
     *stdout = *outFile;
-    
+
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
     hCrt = _open_osfhandle((long)hIn, _O_TEXT);
     FILE* inFile = _fdopen(hCrt, "r");
     setvbuf(inFile, NULL, _IONBF, 128);
     *stdin = *inFile;
-    
+
     consoleOpened = true;
     #endif
 }
@@ -190,11 +190,11 @@ void PrintLine(const String& str, bool error)
 const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgument)
 {
     arguments.Clear();
-    
+
     unsigned cmdStart = 0, cmdEnd = 0;
     bool inCmd = false;
     bool inQuote = false;
-    
+
     for (unsigned i = 0; i < cmdLine.Length(); ++i)
     {
         if (cmdLine[i] == '\"')
@@ -226,11 +226,11 @@ const Vector<String>& ParseArguments(const String& cmdLine, bool skipFirstArgume
         if (!skipFirstArgument)
             arguments.Push(cmdLine.Substring(cmdStart, cmdEnd - cmdStart));
     }
-    
+
     // Strip double quotes from the arguments
     for (unsigned i = 0; i < arguments.Size(); ++i)
         arguments[i].Replace("\"", "");
-    
+
     return arguments;
 }
 
@@ -252,10 +252,10 @@ const Vector<String>& ParseArguments(const wchar_t* cmdLine)
 const Vector<String>& ParseArguments(int argc, char** argv)
 {
     String cmdLine;
-    
+
     for (int i = 0; i < argc; ++i)
         cmdLine.AppendWithFormat("\"%s\" ", (const char*)argv[i]);
-    
+
     return ParseArguments(cmdLine);
 }
 
@@ -267,23 +267,23 @@ const Vector<String>& GetArguments()
 String GetConsoleInput()
 {
     String ret;
-    
+
     #ifdef WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
     if (input == INVALID_HANDLE_VALUE || output == INVALID_HANDLE_VALUE)
         return ret;
-    
+
     // Use char-based input
     SetConsoleMode(input, ENABLE_PROCESSED_INPUT);
-    
+
     INPUT_RECORD record;
     DWORD events = 0;
     DWORD readEvents = 0;
-    
+
     if (!GetNumberOfConsoleInputEvents(input, &events))
         return ret;
-    
+
     while (events--)
     {
         ReadConsoleInputW(input, &record, 1, &readEvents);
@@ -329,7 +329,7 @@ String GetConsoleInput()
             break;
     }
     #endif
-    
+
     return ret;
 }
 
@@ -343,10 +343,10 @@ String GetPlatform()
     return "Windows";
     #elif defined(__APPLE__)
     return "Mac OS X";
-    #elif defined(__linux__)
-    return "Linux";
     #elif defined(RASPI)
     return "Raspberry Pi";
+    #elif defined(__linux__)
+    return "Linux";
     #else
     return String::EMPTY;
     #endif

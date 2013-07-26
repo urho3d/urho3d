@@ -35,7 +35,7 @@ if (RASPI)
         /opt/vc/include
     )
 
-    set(BCM_VC_LIB_SEARCH_PATH
+    set (BCM_VC_LIB_SEARCH_PATH
         /usr/lib
         /opt/vc/lib
     )
@@ -47,7 +47,7 @@ if (RASPI)
     find_library (BCM_VC_LIBRARIES bcm_host ${BCM_VC_LIB_SEARCH_PATH})
 
     if (BCM_VC_INCLUDE_DIR AND BCM_VC_LIBRARIES)
-        set(BCM_VC_FOUND 1)
+        set (BCM_VC_FOUND 1)
     endif ()
 
     if (BCM_VC_FOUND)
