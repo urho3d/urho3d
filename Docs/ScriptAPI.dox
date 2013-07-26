@@ -1186,6 +1186,7 @@ Methods:<br>
 - String GetResourceFileName(const String&) const
 - Resource@ GetResource(const String&, const String&)
 - Resource@ GetResource(ShortStringHash, StringHash)
+- Resource@ GetResource(ShortStringHash, const String&)
 
 Properties:<br>
 - int refs (readonly)

@@ -871,7 +871,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("Font", fontFilters));
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
     resourcePickers.Push(ResourcePicker("Model", "*.mdl", ACTION_PICK));
-    resourcePickers.Push(ResourcePicker("Material", materialFilters));
+    resourcePickers.Push(ResourcePicker("Material", materialFilters, ACTION_PICK | ACTION_OPEN | ACTION_EDIT));
     resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
     resourcePickers.Push(ResourcePicker("ScriptFile", scriptFilters));
@@ -1042,7 +1042,15 @@ void EditResource(StringHash eventType, VariantMap& eventData)
     if (fileName.empty)
         return;
 
-    /// \todo Implement
+    ShortStringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
+    Resource@ resource = cache.GetResource(resourceType, fileName);
+
+    if (resource !is null)
+    {
+        // For now only Materials can be edited
+        if (resource.typeName == "Material")
+            EditMaterial(cast<Material>(resource));
+    }
 }
 
 void TestResource(StringHash eventType, VariantMap& eventData)
@@ -1051,6 +1059,8 @@ void TestResource(StringHash eventType, VariantMap& eventData)
     LineEdit@ attrEdit = button.parent.children[0];
 
     ShortStringHash resourceType(attrEdit.vars[TYPE_VAR].GetUInt());
+    
+    // For now only Animations can be tested
     ShortStringHash animType("Animation");
     if (resourceType == animType)
         TestAnimation(attrEdit);
