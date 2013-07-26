@@ -382,6 +382,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
         etcTextureSupport_ = CheckExtension(extensions, "OES_compressed_ETC1_RGB8_texture");
         pvrtcTextureSupport_ = CheckExtension(extensions, "IMG_texture_compression_pvrtc");
         #endif
+        
+        // Set up texture data read/write alignment
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     }
     
     // Set vsync
