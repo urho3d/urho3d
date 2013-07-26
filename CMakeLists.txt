@@ -18,6 +18,9 @@ if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
 endif ()
 
+# Add cmake modules search path
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
 # Enable 64-bit build. Disabled by default. On Visual Studio, depends on the generator used
 if (NOT MSVC)
     # set (ENABLE_64BIT 1)
