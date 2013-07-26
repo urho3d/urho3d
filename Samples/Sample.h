@@ -22,36 +22,49 @@
 
 #pragma once
 
-#include "Sample.h"
+#include "Application.h"
+#include "Sprite.h"
 
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// This first example, maintaining tradition, prints a "Hello World" message.
-/// Furthermore it shows:
-///     - Initialization of the Urho3D engine;
-///     - Adding a Text element to the graphical user interface;
-///     - Subscribing to and handling of update events;
-class HelloWorld : public Sample
+/// Sample class, as framework for all samples.
+///    - Initialization of the Urho3D engine (in Application class)
+///    - Modify engine parameters for windowed mode and to show the class name as title
+///    - Create Urho3D logo at screen;
+///    - Create Console and Debug HUD, and use F1 and F2 key to toggle them;
+///    - Handle Esc key down to hide Console or exit application;
+class Sample : public Application
 {
     // Mandatory when deriving from Object, enables type information
-    OBJECT(HelloWorld)
+    OBJECT(Sample)
 
 public:
     /// Construct.
-    HelloWorld(Context* context);
+    Sample(Context* context);
 
-    /// Setup after engine initialization and before running the main loop.
+    /// Setup before engine initialization. Modifies the engine parameters.
+    virtual int Setup();
+
+    /// Setup after engine initialization. Creates the logo, console & debug HUD.
     virtual int Start();
 
+    /// Control logo visibility.
+    void SetLogoVisible(bool enable);
+
+protected:
+    /// Logo sprite.
+    SharedPtr<Sprite> logoSprite_;
+
 private:
-    /// Constructs a new Text instance, containing the 'Hello World' String, and
-    /// adds it to the UI root element.
-    void CreateText();
+    /// Create logo.
+    void CreateLogo();
 
-    /// Subscribe to application-wide logic update events.
-    void SubscribeToEvents();
+    /// Create console and debug HUD.
+    void CreateConsoleAndDebugHud();
 
-    /// Callback method invoked when a logic update event is dispatched.
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle key down event.
+    void HandleKeyDown(StringHash eventType, VariantMap& eventData);
 };
+
+#include "Sample.inl"

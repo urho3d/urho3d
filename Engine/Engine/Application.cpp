@@ -34,7 +34,7 @@ Application::Application(Context* context) :
 {
     engineParameters_ = Engine::ParseParameters(GetArguments());
 
-    // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point.
+    // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point
     engine_ = new Engine(context);
 }
 

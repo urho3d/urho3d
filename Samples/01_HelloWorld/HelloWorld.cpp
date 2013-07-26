@@ -36,17 +36,15 @@
 DEFINE_APPLICATION_MAIN(HelloWorld)
 
 HelloWorld::HelloWorld(Context* context) :
-    Application(context),
-    cache_(GetSubsystem<ResourceCache>())
+    Sample(context)
 {
-    // Modify engine startup parameters
-    engineParameters_["WindowTitle"] = GetTypeName();
-    engineParameters_["LogName"]     = GetTypeName() + ".log";
-    engineParameters_["FullScreen"]  = false;
 }
 
 int HelloWorld::Start()
 {
+    // Execute base class startup
+    Sample::Start();
+
     // Create "Hello World" Text
     CreateText();
 
@@ -59,6 +57,8 @@ int HelloWorld::Start()
 
 void HelloWorld::CreateText()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
     // Construct new Text object
     SharedPtr<Text> helloText(new Text(context_));
 
@@ -66,7 +66,7 @@ void HelloWorld::CreateText()
     helloText->SetText("Hello World from Urho3D!");
 
     // Set font and text color
-    helloText->SetFont(cache_->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 30);
+    helloText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 30);
     helloText->SetColor(Color(0.0f, 1.0f, 0.0f));
 
     // Align Text center-screen
@@ -85,10 +85,5 @@ void HelloWorld::SubscribeToEvents()
 
 void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Determine whether the escape key was pressed...
-    if (GetSubsystem<Input>()->GetKeyPress(KEY_ESC))
-    {
-        // ...if so, request Engine exit
-        engine_->Exit();
-    }
+    // Do nothing for now, could be extended to eg. animate the display
 }

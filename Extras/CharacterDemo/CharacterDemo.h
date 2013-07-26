@@ -43,7 +43,7 @@ public:
     /// Construct.
     CharacterDemo(Context* context);
     
-    /// Startup after engine initialization and before running the main loop.
+    /// Setup after engine initialization and before running the main loop.
     virtual int Start();
     
 private:

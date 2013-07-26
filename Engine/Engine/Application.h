@@ -46,7 +46,7 @@ public:
     /// Setup before engine initialization. This is a chance to eg. modify the engine parameters. Return nonzero to terminate with an error exit code without initializing the engine.
     virtual int Setup() { return 0; }
 
-    /// Startup after engine initialization and before running the main loop. Return nonzero to terminate with an error exit code without running the main loop.
+    /// Setup after engine initialization and before running the main loop. Return nonzero to terminate with an error exit code without running the main loop.
     virtual int Start() { return 0; }
 
     /// Cleanup after the main loop. Return the exit code for the application.
