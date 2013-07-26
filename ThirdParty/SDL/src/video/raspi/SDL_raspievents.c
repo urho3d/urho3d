@@ -36,7 +36,7 @@ struct input_event event[64];
 #define NUM_INPUT_DEVICE sizeof(event_fd) / sizeof(int)
 
 static SDL_Keycode keymap[] = {
-    0,
+    0/*KEY_RESERVED*/,
     SDLK_ESCAPE,'1','2','3','4','5','6','7','8','9','0','-','=',SDLK_BACKSPACE,
     SDLK_TAB,'q','w','e','r','t','y','u','i','o','p','[',']',SDLK_RETURN,
     SDLK_LCTRL,'a','s','d','f','g','h','j','k','l',';','\'','`',
@@ -46,10 +46,12 @@ static SDL_Keycode keymap[] = {
     SDLK_NUMLOCKCLEAR,SDLK_SCROLLLOCK,
     SDLK_KP_7,SDLK_KP_8,SDLK_KP_9,SDLK_KP_MINUS,SDLK_KP_4,SDLK_KP_5,SDLK_KP_6,
     SDLK_KP_PLUS,SDLK_KP_1,SDLK_KP_2,SDLK_KP_3,SDLK_KP_0,SDLK_KP_PERIOD,
-    0,0,0,SDLK_F11,SDLK_F12,0,0,0,0,0,0,0,
-    SDLK_KP_ENTER,SDLK_RCTRL,SDLK_KP_DIVIDE,SDLK_PRINTSCREEN,SDLK_RALT,0,
+    0/*UNKNOWN*/,0/*KEY_ZENKAKUHANKAKU*/,0/*KEY_102ND*/,SDLK_F11,SDLK_F12,0/*KEY_RO*/,
+    0/*KEY_KATAKANA*/,0/*KEY_HIRAGANA*/,0/*KEY_HENKAN*/,0/*KEY_KATAKANAHIRAGANA*/,0/*KEY_MUHENKAN*/,
+    0/*KEY_KPJPCOMMA*/,SDLK_KP_ENTER,SDLK_RCTRL,SDLK_KP_DIVIDE,SDLK_PRINTSCREEN,SDLK_RALT,0/*KEY_LINEFEED*/,
     SDLK_HOME,SDLK_UP,SDLK_PAGEUP,SDLK_LEFT,SDLK_RIGHT,SDLK_END,SDLK_DOWN,SDLK_PAGEDOWN,SDLK_INSERT,SDLK_DELETE,
-    0,0,0,0,0,0,0,SDL_SCANCODE_PAUSE,0,0,0,0,0,SDLK_LGUI,SDLK_RGUI,
+    0/*KEY_MACRO*/,SDLK_MUTE,SDLK_VOLUMEDOWN,SDLK_VOLUMEUP,SDLK_POWER,SDLK_KP_EQUALS,SDLK_KP_PLUSMINUS,SDL_SCANCODE_PAUSE,
+    0/*KEY_SCALE*/,SDLK_KP_COMMA,0/*KEY_HANGEUL*/,0/*KEY_HANJA*/,0/*KEY_YEN*/,SDLK_LGUI,SDLK_RGUI,0/*KEY_COMPOSE*/,
 };
 
 static int
@@ -66,12 +68,20 @@ TranslateMouseButton(__u16 code) {
     }
 }
 
+typedef enum
+{
+    NONE,
+    MOTION,
+    WHEEL
+} RelativeEvent;
+
 static void
 PropagateEvents(_THIS, int index)
 {
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
 
-    int i, count, button, x, y, relevent;
+    int i, count, button, x, y;
+    RelativeEvent relevent;
     if ((count = read(event_fd[index], event, sizeof(event))) < 0) {
         return;
     }
@@ -92,24 +102,24 @@ PropagateEvents(_THIS, int index)
             case REL_X:
             case REL_HWHEEL:
                 x = event[i].value;
-                relevent = event[i].code == REL_X ? 1 : 2;
+                relevent = event[i].code == REL_X ? MOTION : WHEEL;
                 break;
             case REL_Y:
             case REL_WHEEL:
                 y = event[i].value;
-                relevent = event[i].code == REL_Y ? 1 : 2;
+                relevent = event[i].code == REL_Y ? MOTION : WHEEL;
                 break;
             default:
-                relevent = 0;
+                relevent = NONE;
             }
             break;
 
         case EV_SYN:
             switch (relevent) {
-            case 1:
-                SDL_SendMouseMotion(data->window, index, 1, x, y);
+            case MOTION:
+                SDL_SendMouseMotion(data->window, index, 1/*relative*/, x, y);
                 break;
-            case 2:
+            case WHEEL:
                 SDL_SendMouseWheel(data->window, index, x, y);
                 break;
             default: ;
