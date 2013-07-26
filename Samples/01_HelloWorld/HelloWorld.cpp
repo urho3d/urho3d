@@ -30,21 +30,30 @@
 #include "UI.h"
 
 #include "HelloWorld.h"
-#include "Run.h"
 
 // Expands to this example's entry-point
-DEFINE_MAIN(Run<HelloWorld>())
-
+DEFINE_APPLICATION_MAIN(HelloWorld)
 
 HelloWorld::HelloWorld(Context* context) :
-    Object(context),
+    Application(context),
     cache_(GetSubsystem<ResourceCache>())
+{
+    // Modify engine startup parameters
+    engineParameters_["WindowTitle"] = GetTypeName();
+    engineParameters_["LogName"]     = GetTypeName() + ".log";
+    engineParameters_["FullScreen"]  = false;
+}
+
+int HelloWorld::Start()
 {
     // Create "Hello World" Text
     CreateText();
 
     // Finally, hook-up this HelloWorld instance to handle update events
     SubscribeToEvents();
+
+    // Go on to the main loop
+    return EXIT_SUCCESS;
 }
 
 void HelloWorld::CreateText()
@@ -79,6 +88,6 @@ void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (GetSubsystem<Input>()->GetKeyPress(KEY_ESC))
     {
         // ...if so, request Engine exit
-        GetSubsystem<Engine>()->Exit();
+        engine_->Exit();
     }
 }

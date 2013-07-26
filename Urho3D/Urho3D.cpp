@@ -30,57 +30,23 @@
 #include "ResourceEvents.h"
 #include "Script.h"
 #include "ScriptFile.h"
+#include "Urho3D.h"
 
 #ifdef ENABLE_LUA
 #include "LuaScript.h"
 #endif
 
-#include <exception>
-
 #include "DebugNew.h"
 
-using namespace Urho3D;
+DEFINE_APPLICATION_MAIN(Urho);
 
-class Application : public Object
-{
-    OBJECT(Application);
-    
-public:
-    Application(Context* context);
-    int Run();
-    
-private:
-    void ErrorExit();
-    void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
-    void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
-    void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
-    int exitCode_;
-};
-
-int Run()
-{
-    try
-    {
-        // Create the execution context and the application object. The application object is needed to subscribe to events
-        // which allow to live-reload the script.
-        SharedPtr<Context> context(new Context());
-        SharedPtr<Application> application(new Application(context));
-        return application->Run();
-    }
-    catch (std::bad_alloc&)
-    {
-        ErrorDialog("Urho3D", "An out-of-memory error occurred. The application will now exit.");
-        return EXIT_FAILURE;
-    }
-}
-
-Application::Application(Context* context) :
-    Object(context),
+Urho::Urho(Context* context) :
+    Application(context),
     exitCode_(EXIT_SUCCESS)
 {
 }
 
-int Application::Run()
+int Urho::Setup()
 {
     // Check for script file name
     const Vector<String>& arguments = GetArguments();
@@ -89,18 +55,18 @@ int Application::Run()
     {
         if (arguments[i][0] != '-')
         {
-            scriptFileName = GetInternalPath(arguments[i]);
+            scriptFileName_ = GetInternalPath(arguments[i]);
             break;
         }
     }
     
     #if defined(ANDROID) || defined(IOS)
     // Can not pass script name on mobile devices, so choose a hardcoded default
-    scriptFileName = "Scripts/NinjaSnowWar.as";
+    scriptFileName_ = "Scripts/NinjaSnowWar.as";
     #endif
     
     // Show usage if not found
-    if (scriptFileName.Empty())
+    if (scriptFileName_.Empty())
     {
         ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
             "The script file should implement the function void Start() for initializing the "
@@ -130,98 +96,109 @@ int Application::Run()
             "-sm2        Force SM2.0 rendering\n"
             #endif
         );
-        return EXIT_FAILURE;
+        exitCode_ = EXIT_FAILURE;
     }
     
-    SharedPtr<Engine> engine(new Engine(context_));
-    if (engine->Initialize(Engine::ParseParameters(arguments)))
+    return exitCode_;
+}
+
+int Urho::Start()
+{
+#ifdef ENABLE_LUA
+    String extension = GetExtension(scriptFileName_).ToLower();
+    if (extension != ".lua")
     {
-#ifdef ENABLE_LUA
-        String extension = GetExtension(scriptFileName).ToLower();
-        if (extension != ".lua")
-        {
 #endif
-            // Instantiate and register the AngelScript subsystem
-            context_->RegisterSubsystem(new Script(context_));
+        // Instantiate and register the AngelScript subsystem
+        context_->RegisterSubsystem(new Script(context_));
 
-            // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
-            SharedPtr<ScriptFile> scriptFile(context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
+        // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
+        scriptFile_ = context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName_);
 
-            // If script loading is successful, execute engine loop
-            if (scriptFile && scriptFile->Execute("void Start()"))
-            {
-                // Subscribe to script's reload event to allow live-reload of the application
-                SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(Application, HandleScriptReloadStarted));
-                SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(Application, HandleScriptReloadFinished));
-                SubscribeToEvent(scriptFile, E_RELOADFAILED, HANDLER(Application, HandleScriptReloadFailed));
-
-                while (!engine->IsExiting())
-                    engine->RunFrame();
-
-                if (scriptFile->GetFunction("void Stop()"))
-                    scriptFile->Execute("void Stop()");
-
-                return exitCode_;
-            }
-#ifdef ENABLE_LUA
-        }
-        else
+        // If script loading is successful, proceed to main loop
+        if (scriptFile_ && scriptFile_->Execute("void Start()"))
         {
-            // Instantiate and register the Lua script subsystem
-            context_->RegisterSubsystem(new LuaScript(context_));
-            LuaScript* luaScript = GetSubsystem<LuaScript>();
+            // Subscribe to script's reload event to allow live-reload of the application
+            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, HANDLER(Urho, HandleScriptReloadStarted));
+            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, HANDLER(Urho, HandleScriptReloadFinished));
+            SubscribeToEvent(scriptFile_, E_RELOADFAILED, HANDLER(Urho, HandleScriptReloadFailed));
 
-            if (luaScript->ExecuteFile(scriptFileName.CString()))
-            {
-                luaScript->ExecuteFunction("Start");
-
-                while (!engine->IsExiting())
-                    engine->RunFrame();
-
-                luaScript->ExecuteFunction("Stop");
-
-                return exitCode_;
-            }
+            return exitCode_;
         }
-#endif
+#ifdef ENABLE_LUA
     }
+    else
+    {
+        // Instantiate and register the Lua script subsystem
+        context_->RegisterSubsystem(new LuaScript(context_));
+        LuaScript* luaScript = GetSubsystem<LuaScript>();
 
+        // If script loading is successful, proceed to main loop
+        if (luaScript->ExecuteFile(scriptFileName_.CString()))
+        {
+            luaScript->ExecuteFunction("Start");
+            return exitCode_;
+        }
+    }
+#endif
+
+    // The script was not successfully loaded. Show the last error message and do not run the main loop
     ErrorExit();
     return exitCode_;
 }
 
-void Application::ErrorExit()
+int Urho::Stop()
 {
-    Engine* engine = context_->GetSubsystem<Engine>();
-    engine->Exit(); // Close the rendering window
+    if (scriptFile_)
+    {
+        // Execute the optional stop function
+        if (scriptFile_->GetFunction("void Stop()"))
+            scriptFile_->Execute("void Stop()");
+    }
+#ifdef ENABLE_LUA
+    else
+    {
+        LuaScript* luaScript = GetSubsystem<LuaScript>();
+        if (luaScript)
+            luaScript->ExecuteFunction("Stop");
+    }
+#endif
+
+    return exitCode_;
+}
+
+void Urho::ErrorExit()
+{
+    engine_->Exit(); // Close the rendering window
 
     // Only for WIN32, otherwise the last message would be double posted on Mac OS X and Linux platforms
     #ifdef WIN32
-    Log* log = context_->GetSubsystem<Log>();   // May be null if ENABLE_LOGGING is not defined during built
+    Log* log = context_->GetSubsystem<Log>();   // May be null if ENABLE_LOGGING is not defined during build
     ErrorDialog("Urho3D", log ? log->GetLastMessage() : "Application has been terminated due to unexpected error.");
     #endif
 
     exitCode_ = EXIT_FAILURE;
 }
 
-void Application::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
+void Urho::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
 {
-    ScriptFile* scriptFile = static_cast<ScriptFile*>(GetEventSender());
-    if (scriptFile->GetFunction("void Stop()"))
-        scriptFile->Execute("void Stop()");
+    if (scriptFile_->GetFunction("void Stop()"))
+        scriptFile_->Execute("void Stop()");
 }
 
-void Application::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
+void Urho::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
 {
-    ScriptFile* scriptFile = static_cast<ScriptFile*>(GetEventSender());
     // Restart the script application after reload
-    if (!scriptFile->Execute("void Start()"))
+    if (!scriptFile_->Execute("void Start()"))
+    {
+        scriptFile_.Reset();
         ErrorExit();
+    }
 }
 
-void Application::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
+void Urho::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
 {
+    scriptFile_.Reset();
     ErrorExit();
 }
 
-DEFINE_MAIN(Run());

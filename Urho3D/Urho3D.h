@@ -28,44 +28,39 @@ using namespace Urho3D;
 
 namespace Urho3D
 {
-    class Node;
-    class ResourceCache;
-    class Scene;
+    class ScriptFile;
 }
 
-class Character;
-
-class CharacterDemo : public Application
+/// Urho3D script shell application, which runs a script specified on the command line.
+class Urho : public Application
 {
-    OBJECT(CharacterDemo);
-
+    OBJECT(Urho);
+    
 public:
     /// Construct.
-    CharacterDemo(Context* context);
+    Urho(Context* context);
     
-    /// Startup after engine initialization and before running the main loop.
+    /// Setup before engine initialization. Verify that a script file has been specified.
+    virtual int Setup();
+    /// Startup after engine initialization. Load the script and execute its start function.
     virtual int Start();
+    /// Cleanup after the main loop. Run the script's stop function if it exists.
+    virtual int Stop();
     
 private:
-    /// Create static scene content.
-    void CreateScene();
-    /// Create controllable character.
-    void CreateCharacter();
-    /// Subscribe to necessary events.
-    void SubscribeToEvents();
-    /// Handle application update. Set controls to character & check global keys.
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Handle application post-update. Update camera position after character has moved.
-    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
+    /// Show last error message and set the exit code for error exit.
+    void ErrorExit();
+    /// Handle reload start of the script file.
+    void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
+    /// Handle reload success of the script file.
+    void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
+    /// Handle reload failure of the script file.
+    void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
     
-    /// Scene.
-    SharedPtr<Scene> scene_;
-    /// Resource cache subsystem, stored here for convenience.
-    SharedPtr<ResourceCache> cache_;
-    /// Camera scene node.
-    SharedPtr<Node> cameraNode_;
-    /// The controllable character.
-    WeakPtr<Character> character_;
-    /// First person camera flag.
-    bool firstPerson_;
+    /// Script file name.
+    String scriptFileName_;
+    /// Script file.
+    SharedPtr<ScriptFile> scriptFile_;
+    /// Application exit code.
+    int exitCode_;
 };

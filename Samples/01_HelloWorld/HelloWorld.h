@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Object.h"
+#include "Application.h"
 #include "ResourceCache.h"
 
 // All Urho3D classes reside in namespace Urho3D
@@ -33,14 +33,17 @@ using namespace Urho3D;
 ///     - Initialization of the Urho3D engine;
 ///     - Adding a Text element to the graphical user interface;
 ///     - Subscribing to and handling of update events;
-class HelloWorld : public Object
+class HelloWorld : public Application
 {
     // Mandatory when deriving from Object, enables type information
     OBJECT(HelloWorld)
 
 public:
-    /// Construct.
+    /// Construct. Note that Engine is not yet initialized at this point, so must defer actual startup for later.
     HelloWorld(Context* context);
+
+    /// Startup after engine initialization.
+    virtual int Start();
 
 private:
     /// Constructs a new Text instance, containing the 'Hello World' String, and

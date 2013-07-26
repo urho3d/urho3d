@@ -282,6 +282,12 @@ Renderer::Renderer(Context* context) :
     shadersDirty_(true),
     initialized_(false)
 {
+    #ifndef USE_OPENGL
+    shaderPath_ = "Shaders/HLSL/";
+    #else
+    shaderPath_ = "Shaders/GLSL/";
+    #endif
+
     SubscribeToEvent(E_SCREENMODE, HANDLER(Renderer, HandleScreenMode));
     SubscribeToEvent(E_GRAPHICSFEATURES, HANDLER(Renderer, HandleGraphicsFeatures));
     
@@ -1050,6 +1056,7 @@ ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, bool c
     if (name.Trimmed().Empty())
         return 0;
     
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     String shaderName = shaderPath_;
     String variationName;
     
@@ -1064,11 +1071,11 @@ ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, bool c
     
     if (checkExists)
     {
-        if (!cache_->Exists(shaderName))
+        if (!cache->Exists(shaderName))
             return 0;
     }
     
-    Shader* shader = cache_->GetResource<Shader>(shaderName);
+    Shader* shader = cache->GetResource<Shader>(shaderName);
     if (shader)
         return shader->GetVariation(type, variationName);
     else
@@ -1463,13 +1470,6 @@ void Renderer::Initialize()
     PROFILE(InitRenderer);
     
     graphics_ = graphics;
-    cache_ = cache;
-    
-    #ifndef USE_OPENGL
-    shaderPath_ = "Shaders/HLSL/";
-    #else
-    shaderPath_ = "Shaders/GLSL/";
-    #endif
     
     if (!graphics_->GetShadowMapFormat())
         drawShadows_ = false;
@@ -1598,8 +1598,10 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
 
 void Renderer::ReleaseMaterialShaders()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     PODVector<Material*> materials;
-    cache_->GetResources<Material>(materials);
+    
+    cache->GetResources<Material>(materials);
     
     for (unsigned i = 0; i < materials.Size(); ++i)
         materials[i]->ReleaseShaders();
@@ -1607,15 +1609,16 @@ void Renderer::ReleaseMaterialShaders()
 
 void Renderer::ReloadTextures()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     PODVector<Resource*> textures;
     
-    cache_->GetResources(textures, Texture2D::GetTypeStatic());
+    cache->GetResources(textures, Texture2D::GetTypeStatic());
     for (unsigned i = 0; i < textures.Size(); ++i)
-        cache_->ReloadResource(textures[i]);
+        cache->ReloadResource(textures[i]);
     
-    cache_->GetResources(textures, TextureCube::GetTypeStatic());
+    cache->GetResources(textures, TextureCube::GetTypeStatic());
     for (unsigned i = 0; i < textures.Size(); ++i)
-        cache_->ReloadResource(textures[i]);
+        cache->ReloadResource(textures[i]);
 }
 
 void Renderer::CreateGeometries()

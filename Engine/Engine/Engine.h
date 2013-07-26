@@ -101,8 +101,6 @@ public:
     static const Variant& GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
     
 private:
-    /// Create and register subsystems. In headless mode graphics, input & UI are not created.
-    void RegisterSubsystems();
     /// Handle exit requested event.
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
     

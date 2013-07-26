@@ -32,29 +32,10 @@
 const float CAMERA_MIN_DIST = 1.0f;
 const float CAMERA_MAX_DIST = 5.0f;
 
-int Run()
-{
-    SharedPtr<Context> context(new Context());
-    SharedPtr<Engine> engine(new Engine(context));
-    
-    VariantMap engineParameters = Engine::ParseParameters(GetArguments());
-    engineParameters["WindowTitle"] = "CharacterDemo";
-    engineParameters["LogName"] = "CharacterDemo.log";
-    
-    engine->Initialize(engineParameters);
-    
-    SharedPtr<CharacterDemo> characterDemo(new CharacterDemo(context));
-    characterDemo->Start();
-    while (!engine->IsExiting())
-        engine->RunFrame();
-    
-    return 0;
-}
-
-DEFINE_MAIN(Run())
+DEFINE_APPLICATION_MAIN(CharacterDemo)
 
 CharacterDemo::CharacterDemo(Context* context) :
-    Object(context),
+    Application(context),
     cache_(GetSubsystem<ResourceCache>()),
     firstPerson_(false)
 {
@@ -62,11 +43,14 @@ CharacterDemo::CharacterDemo(Context* context) :
     context_->RegisterFactory<Character>();
 }
 
-void CharacterDemo::Start()
+int CharacterDemo::Start()
 {
     CreateScene();
     CreateCharacter();
     SubscribeToEvents();
+
+    // Go on to the main loop
+    return EXIT_SUCCESS;
 }
 
 void CharacterDemo::CreateScene()
@@ -222,7 +206,7 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
     Input* input = GetSubsystem<Input>();
 
     if (input->GetKeyDown(KEY_ESC))
-        GetSubsystem<Engine>()->Exit();
+        engine_->Exit();
     
     if (input->GetKeyPress('F'))
         firstPerson_ = !firstPerson_;

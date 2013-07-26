@@ -379,8 +379,6 @@ private:
     
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Resource cache subsystem.
-    WeakPtr<ResourceCache> cache_;
     /// Default renderpath.
     SharedPtr<RenderPath> defaultRenderPath_;
     /// Default zone.

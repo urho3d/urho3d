@@ -90,6 +90,30 @@ Engine::Engine(Context* context) :
     headless_(false),
     audioPaused_(false)
 {
+    // Register self as a subsystem
+    context_->RegisterSubsystem(this);
+    
+    // Create subsystems which do not depend on engine initialization or startup parameters
+    context_->RegisterSubsystem(new Time(context_));
+    context_->RegisterSubsystem(new WorkQueue(context_));
+    #ifdef ENABLE_PROFILING
+    context_->RegisterSubsystem(new Profiler(context_));
+    #endif
+    context_->RegisterSubsystem(new FileSystem(context_));
+    #ifdef ENABLE_LOGGING
+    context_->RegisterSubsystem(new Log(context_));
+    #endif
+    context_->RegisterSubsystem(new ResourceCache(context_));
+    context_->RegisterSubsystem(new Network(context_));
+    context_->RegisterSubsystem(new Input(context_));
+    context_->RegisterSubsystem(new Audio(context_));
+    context_->RegisterSubsystem(new UI(context_));
+    
+    // Register object factories for libraries which are not automatically registered along with subsystem creation
+    RegisterSceneLibrary(context_);
+    RegisterPhysicsLibrary(context_);
+    RegisterNavigationLibrary(context_);
+    
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(Engine, HandleExitRequested));
 }
 
@@ -102,13 +126,29 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (initialized_)
         return true;
     
+    PROFILE(InitEngine);
+    
     // Set headless mode
     headless_ = GetParameter(parameters, "Headless", false).GetBool();
     
-    // Register subsystems and object factories
-    RegisterSubsystems();
+    // Register the rest of the subsystems
+    if (!headless_)
+    {
+        context_->RegisterSubsystem(new Graphics(context_));
+        context_->RegisterSubsystem(new Renderer(context_));
+    }
+    else
+    {
+        // Register graphics library objects explicitly in headless mode to allow them to work without using actual GPU resources
+        RegisterGraphicsLibrary(context_);
+    }
     
-    PROFILE(InitEngine);
+    // In debug mode, check now that all factory created objects can be created without crashing
+    #ifdef _DEBUG
+    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+        SharedPtr<Object> object = i->second_->CreateObject();
+    #endif
     
     // Start logging
     Log* log = GetSubsystem<Log>();
@@ -630,54 +670,6 @@ const Variant& Engine::GetParameter(const VariantMap& parameters, const String& 
     ShortStringHash nameHash(parameter);
     VariantMap::ConstIterator i = parameters.Find(nameHash);
     return i != parameters.End() ? i->second_ : defaultValue;
-}
-
-void Engine::RegisterSubsystems()
-{
-    // Register self as a subsystem
-    context_->RegisterSubsystem(this);
-    
-    // Create and register the rest of the subsystems. They will register object factories for their own libraries
-    context_->RegisterSubsystem(new Time(context_));
-    context_->RegisterSubsystem(new WorkQueue(context_));
-    #ifdef ENABLE_PROFILING
-    context_->RegisterSubsystem(new Profiler(context_));
-    #endif
-    context_->RegisterSubsystem(new FileSystem(context_));
-    context_->RegisterSubsystem(new ResourceCache(context_));
-    context_->RegisterSubsystem(new Network(context_));
-    
-    if (!headless_)
-    {
-        context_->RegisterSubsystem(new Graphics(context_));
-        context_->RegisterSubsystem(new Renderer(context_));
-    }
-    else
-    {
-        // Register Graphics library object factories also in headless mode; the objects will function without allocating
-        // actual GPU resources
-        RegisterGraphicsLibrary(context_);
-    }
-    
-    context_->RegisterSubsystem(new Input(context_));
-    context_->RegisterSubsystem(new UI(context_));
-    context_->RegisterSubsystem(new Audio(context_));
-    #ifdef ENABLE_LOGGING
-    context_->RegisterSubsystem(new Log(context_));
-    #endif
-    
-    // Scene, Physics & Navigation libraries do not have a corresponding subsystem which would register their object factories.
-    // Register manually now
-    RegisterSceneLibrary(context_);
-    RegisterPhysicsLibrary(context_);
-    RegisterNavigationLibrary(context_);
-    
-    // In debug mode, check that all factory created objects can be created without crashing
-    #ifdef _DEBUG
-    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
-        SharedPtr<Object> object = i->second_->CreateObject();
-    #endif
 }
 
 void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
