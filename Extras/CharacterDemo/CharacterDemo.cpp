@@ -2,9 +2,7 @@
 #include "AnimationController.h"
 #include "Camera.h"
 #include "Character.h"
-#include "CharacterDemo.h"
 #include "CollisionShape.h"
-#include "Context.h"
 #include "Controls.h"
 #include "CoreEvents.h"
 #include "DebugRenderer.h"
@@ -26,7 +24,8 @@
 #include "UI.h"
 #include "Zone.h"
 
-#include "Main.h"
+#include "CharacterDemo.h"
+
 #include "DebugNew.h"
 
 const float CAMERA_MIN_DIST = 1.0f;

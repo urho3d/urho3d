@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Context.h"
 #include "Engine.h"
 #include "CoreEvents.h"
 #include "Font.h"
@@ -30,6 +29,8 @@
 #include "UI.h"
 
 #include "HelloWorld.h"
+
+#include "DebugNew.h"
 
 // Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(HelloWorld)
