@@ -115,7 +115,7 @@ private:
     void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
     /// Render UI batches. Geometry must have been uploaded first.
     void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
-    /// Generate batches from an UI element recursively.
+    /// Generate batches from an UI element recursively. Skip the cursor element.
     void GetBatches(UIElement* element, IntRect currentScissor);
     /// Return UI element at screen position recursively.
     void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly);

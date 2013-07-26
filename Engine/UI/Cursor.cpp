@@ -70,9 +70,6 @@ Cursor::Cursor(Context* context) :
     shape_(CS_NORMAL),
     useSystemShapes_(false)
 {
-    // Show on top of all other UI elements
-    priority_ = M_MAX_INT;
-    
     // Subscribe to OS mouse cursor visibility changes to be able to reapply the cursor shape
     SubscribeToEvent(E_MOUSEVISIBLECHANGED, HANDLER(Cursor, HandleMouseVisibleChanged));
 }

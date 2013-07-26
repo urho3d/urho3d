@@ -1522,11 +1522,6 @@ void UIElement::SetHovering(bool enable)
     hovering_ = enable;
 }
 
-void UIElement::SetTempVisible(bool enable)
-{
-    visible_ = enable;
-}
-
 void UIElement::AdjustScissor(IntRect& currentScissor)
 {
     if (clipChildren_)

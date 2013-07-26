@@ -339,13 +339,7 @@ void UI::RenderUpdate()
 
     // If the OS cursor is visible, do not render the UI's own cursor
     bool osCursorVisible = GetSubsystem<Input>()->IsMouseVisible();
-    bool uiCursorVisible = false;
-    if (osCursorVisible && cursor_)
-    {
-        uiCursorVisible = cursor_->IsVisible();
-        cursor_->SetTempVisible(false);
-    }
-
+    
     // Get rendering batches from the non-modal UI elements
     batches_.Clear();
     vertexData_.Clear();
@@ -359,9 +353,13 @@ void UI::RenderUpdate()
     // Get rendering batches from the modal UI elements
     GetBatches(rootModalElement_, currentScissor);
 
-    // Restore UI cursor visibility state
-    if (osCursorVisible && cursor_)
-        cursor_->SetTempVisible(uiCursorVisible);
+    // Get batches from the cursor (and its possible children) last to draw it on top of everything
+    if (cursor_ && cursor_->IsVisible() && !osCursorVisible)
+    {
+        currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
+        cursor_->GetBatches(batches_, vertexData_, currentScissor);
+        GetBatches(cursor_, currentScissor);
+    }
 }
 
 void UI::Render()
@@ -643,6 +641,8 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
 
 void UI::GetBatches(UIElement* element, IntRect currentScissor)
 {
+    UIElement* cursorElement = cursor_;
+    
     // Set clipping scissor for child elements. No need to draw if zero size
     element->AdjustScissor(currentScissor);
     if (currentScissor.left_ == currentScissor.right_ || currentScissor.top_ == currentScissor.bottom_)
@@ -664,14 +664,14 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
             int currentPriority = (*i)->GetPriority();
             while (j != children.End() && (*j)->GetPriority() == currentPriority)
             {
-                if ((*j)->IsWithinScissor(currentScissor))
+                if ((*j)->IsWithinScissor(currentScissor) && (*j) != cursorElement)
                     (*j)->GetBatches(batches_, vertexData_, currentScissor);
                 ++j;
             }
             // Now recurse into the children
             while (i != j)
             {
-                if ((*i)->IsVisible())
+                if ((*i)->IsVisible() && (*i) != cursorElement)
                     GetBatches(*i, currentScissor);
                 ++i;
             }
@@ -682,10 +682,13 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     {
         while (i != children.End())
         {
-            if ((*i)->IsWithinScissor(currentScissor))
-                (*i)->GetBatches(batches_, vertexData_, currentScissor);
-            if ((*i)->IsVisible())
-                GetBatches(*i, currentScissor);
+            if ((*i) != cursorElement)
+            {
+                if ((*i)->IsWithinScissor(currentScissor))
+                    (*i)->GetBatches(batches_, vertexData_, currentScissor);
+                if ((*i)->IsVisible())
+                    GetBatches(*i, currentScissor);
+            }
             ++i;
         }
     }
