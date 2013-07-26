@@ -306,9 +306,9 @@ if (ENABLE_LUA)
     add_subdirectory (Extras/LuaScript)
 endif ()
 
-# Assuming cross compiling is used to target embedded system, and hence it does not make sense to build the tools (except when it is explicitly enabled)
+# Do not build tools for embedded system unless it is explicitly enabled
 if (NOT ENABLE_TOOLS)
-    if (CMAKE_CROSSCOMPILING)
+    if (RASPI)
         set (ENABLE_TOOLS 0)
     else ()
         set (ENABLE_TOOLS 1)
