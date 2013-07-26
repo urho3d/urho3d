@@ -24,25 +24,23 @@
 
 #include "Application.h"
 
-using namespace Urho3D;
-
 namespace Urho3D
 {
-    class ScriptFile;
-}
+
+class ScriptFile;
 
 /// Urho3D script shell application, which runs a script specified on the command line.
-class Urho : public Application
+class Urho3D : public Application
 {
-    OBJECT(Urho);
+    OBJECT(Urho3D);
     
 public:
     /// Construct.
-    Urho(Context* context);
+    Urho3D(Context* context);
     
     /// Setup before engine initialization. Verify that a script file has been specified.
     virtual void Setup();
-    /// Startup after engine initialization. Load the script and execute its start function.
+    /// Setup after engine initialization. Load the script and execute its start function.
     virtual void Start();
     /// Cleanup after the main loop. Run the script's stop function if it exists.
     virtual void Stop();
@@ -60,3 +58,5 @@ private:
     /// Script file.
     SharedPtr<ScriptFile> scriptFile_;
 };
+
+}

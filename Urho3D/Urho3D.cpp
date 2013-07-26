@@ -37,14 +37,18 @@
 
 #include "DebugNew.h"
 
-DEFINE_APPLICATION_MAIN(Urho);
+// Resolve ambiguity as namespace and class have the same name
+DEFINE_APPLICATION_MAIN(::Urho3D::Urho3D);
 
-Urho::Urho(Context* context) :
+namespace Urho3D
+{
+
+Urho3D::Urho3D(Context* context) :
     Application(context)
 {
 }
 
-void Urho::Setup()
+void Urho3D::Setup()
 {
     // Check for script file name
     const Vector<String>& arguments = GetArguments();
@@ -97,7 +101,7 @@ void Urho::Setup()
     }
 }
 
-void Urho::Start()
+void Urho3D::Start()
 {
 #ifdef ENABLE_LUA
     String extension = GetExtension(scriptFileName_).ToLower();
@@ -114,9 +118,9 @@ void Urho::Start()
         if (scriptFile_ && scriptFile_->Execute("void Start()"))
         {
             // Subscribe to script's reload event to allow live-reload of the application
-            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, HANDLER(Urho, HandleScriptReloadStarted));
-            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, HANDLER(Urho, HandleScriptReloadFinished));
-            SubscribeToEvent(scriptFile_, E_RELOADFAILED, HANDLER(Urho, HandleScriptReloadFailed));
+            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, HANDLER(Urho3D, HandleScriptReloadStarted));
+            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, HANDLER(Urho3D, HandleScriptReloadFinished));
+            SubscribeToEvent(scriptFile_, E_RELOADFAILED, HANDLER(Urho3D, HandleScriptReloadFailed));
             return;
         }
 #ifdef ENABLE_LUA
@@ -140,7 +144,7 @@ void Urho::Start()
     ErrorExit();
 }
 
-void Urho::Stop()
+void Urho3D::Stop()
 {
     if (scriptFile_)
     {
@@ -158,13 +162,13 @@ void Urho::Stop()
 #endif
 }
 
-void Urho::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
+void Urho3D::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
 {
     if (scriptFile_->GetFunction("void Stop()"))
         scriptFile_->Execute("void Stop()");
 }
 
-void Urho::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
+void Urho3D::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     // Restart the script application after reload
     if (!scriptFile_->Execute("void Start()"))
@@ -174,9 +178,11 @@ void Urho::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventDat
     }
 }
 
-void Urho::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
+void Urho3D::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
 {
     scriptFile_.Reset();
     ErrorExit();
+}
+
 }
 
