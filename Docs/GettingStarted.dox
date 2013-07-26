@@ -492,6 +492,8 @@ The last command resets the launch service database and rebuilds it, so the chan
 
 \page CppQuickstart Quickstart in C++
 
+Note: this page is deprecated. A set of sample C++ applications is being developed into the Samples directory.
+
 This example shows how to create an Urho3D C++ application from the ground up. The actual functionality will be the same as in \ref ScriptQuickstart "Quickstart in script"; it is strongly recommended that you familiarize yourself with it first.
 
 To start with, create a subdirectory "HelloWorld" into the Urho3D root directory, and add the following line to the end of the root directory's CMakeLists.txt %file:

@@ -68,13 +68,18 @@ int main(int argc, char** argv)
     
     SharedPtr<Context> context(new Context());
     
+    // Note: creating the Engine registers most subsystems which don't require engine initialization
     SharedPtr<Engine> engine(new Engine(context));
     context->RegisterSubsystem(new Script(context));
-    context->RegisterSubsystem(new FileSystem(context));
-    context->RegisterSubsystem(new ResourceCache(context));
-    context->RegisterSubsystem(new Log(context));
     
     Log* log = context->GetSubsystem<Log>();
+    // Register Log subsystem manually if compiled without logging support
+    if (!log)
+    {
+        context->RegisterSubsystem(new Log(context));
+        log = context->GetSubsystem<Log>();
+    }
+    
     log->SetLevel(LOG_WARNING);
     log->SetTimeStamp(false);
     
