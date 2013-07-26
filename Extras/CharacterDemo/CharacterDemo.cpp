@@ -42,14 +42,11 @@ CharacterDemo::CharacterDemo(Context* context) :
     context_->RegisterFactory<Character>();
 }
 
-int CharacterDemo::Start()
+void CharacterDemo::Start()
 {
     CreateScene();
     CreateCharacter();
     SubscribeToEvents();
-
-    // Go on to the main loop
-    return EXIT_SUCCESS;
 }
 
 void CharacterDemo::CreateScene()

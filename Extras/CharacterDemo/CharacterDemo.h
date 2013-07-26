@@ -44,7 +44,7 @@ public:
     CharacterDemo(Context* context);
     
     /// Setup after engine initialization and before running the main loop.
-    virtual int Start();
+    virtual void Start();
     
 private:
     /// Create static scene content.

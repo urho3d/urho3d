@@ -40,12 +40,11 @@
 DEFINE_APPLICATION_MAIN(Urho);
 
 Urho::Urho(Context* context) :
-    Application(context),
-    exitCode_(EXIT_SUCCESS)
+    Application(context)
 {
 }
 
-int Urho::Setup()
+void Urho::Setup()
 {
     // Check for script file name
     const Vector<String>& arguments = GetArguments();
@@ -67,7 +66,7 @@ int Urho::Setup()
     // Show usage if not found
     if (scriptFileName_.Empty())
     {
-        ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
+        ErrorExit("Usage: Urho3D <scriptfile> [options]\n\n"
             "The script file should implement the function void Start() for initializing the "
             "application and subscribing to all necessary events, such as the frame update.\n"
             #ifndef WIN32
@@ -95,13 +94,10 @@ int Urho::Setup()
             "-sm2        Force SM2.0 rendering\n"
             #endif
         );
-        exitCode_ = EXIT_FAILURE;
     }
-    
-    return exitCode_;
 }
 
-int Urho::Start()
+void Urho::Start()
 {
 #ifdef ENABLE_LUA
     String extension = GetExtension(scriptFileName_).ToLower();
@@ -121,8 +117,7 @@ int Urho::Start()
             SubscribeToEvent(scriptFile_, E_RELOADSTARTED, HANDLER(Urho, HandleScriptReloadStarted));
             SubscribeToEvent(scriptFile_, E_RELOADFINISHED, HANDLER(Urho, HandleScriptReloadFinished));
             SubscribeToEvent(scriptFile_, E_RELOADFAILED, HANDLER(Urho, HandleScriptReloadFailed));
-
-            return exitCode_;
+            return;
         }
 #ifdef ENABLE_LUA
     }
@@ -136,17 +131,16 @@ int Urho::Start()
         if (luaScript->ExecuteFile(scriptFileName_.CString()))
         {
             luaScript->ExecuteFunction("Start");
-            return exitCode_;
+            return;
         }
     }
 #endif
 
     // The script was not successfully loaded. Show the last error message and do not run the main loop
     ErrorExit();
-    return exitCode_;
 }
 
-int Urho::Stop()
+void Urho::Stop()
 {
     if (scriptFile_)
     {
@@ -162,21 +156,6 @@ int Urho::Stop()
             luaScript->ExecuteFunction("Stop");
     }
 #endif
-
-    return exitCode_;
-}
-
-void Urho::ErrorExit()
-{
-    engine_->Exit(); // Close the rendering window
-
-    // Only for WIN32, otherwise the last message would be double posted on Mac OS X and Linux platforms
-    #ifdef WIN32
-    Log* log = context_->GetSubsystem<Log>();   // May be null if ENABLE_LOGGING is not defined during build
-    ErrorDialog("Urho3D", log ? log->GetLastMessage() : "Application has been terminated due to unexpected error.");
-    #endif
-
-    exitCode_ = EXIT_FAILURE;
 }
 
 void Urho::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)

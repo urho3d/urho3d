@@ -43,23 +43,28 @@ public:
     /// Destruct.
     ~Application();
 
-    /// Setup before engine initialization. This is a chance to eg. modify the engine parameters. Return nonzero to terminate with an error exit code without initializing the engine.
-    virtual int Setup() { return 0; }
+    /// Setup before engine initialization. This is a chance to eg. modify the engine parameters. Call ErrorExit() to terminate without initializing the engine.
+    virtual void Setup() {}
 
-    /// Setup after engine initialization and before running the main loop. Return nonzero to terminate with an error exit code without running the main loop.
-    virtual int Start() { return 0; }
+    /// Setup after engine initialization and before running the main loop. Call ErrorExit() to terminate without running the main loop.
+    virtual void Start() {}
 
-    /// Cleanup after the main loop. Return the exit code for the application.
-    virtual int Stop() { return 0; }
+    /// Cleanup after the main loop.
+    virtual void Stop() {}
 
     /// Initialize the engine and run the main loop, then return the application exit code. Catch out-of-memory exceptions while running.
     int Run();
+
+    /// Show an error message (last log message if empty), terminate the main loop, and set failure exit code.
+    void ErrorExit(const String& message = String::EMPTY);
 
 protected:
     /// Urho3D engine.
     SharedPtr<Engine> engine_;
     /// Engine parameters map.
     VariantMap engineParameters_;
+    /// Application exit code.
+    int exitCode_;
 };
 
 // Macro for defining a main function which creates a Context and the application, then runs it

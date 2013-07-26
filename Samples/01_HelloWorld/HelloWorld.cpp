@@ -40,7 +40,7 @@ HelloWorld::HelloWorld(Context* context) :
 {
 }
 
-int HelloWorld::Start()
+void HelloWorld::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -50,9 +50,6 @@ int HelloWorld::Start()
 
     // Finally, hook-up this HelloWorld instance to handle update events
     SubscribeToEvents();
-
-    // Go on to the main loop
-    return EXIT_SUCCESS;
 }
 
 void HelloWorld::CreateText()

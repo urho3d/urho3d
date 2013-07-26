@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Application.h"
 #include "Engine.h"
+#include "Log.h"
 #include "ProcessUtils.h"
 
 #include <exception>
@@ -30,7 +31,8 @@
 #include "DebugNew.h"
 
 Application::Application(Context* context) :
-    Object(context)
+    Object(context),
+    exitCode_(EXIT_SUCCESS)
 {
     engineParameters_ = Engine::ParseParameters(GetArguments());
 
@@ -46,26 +48,47 @@ int Application::Run()
 {
     try
     {
-        int exitCode = Setup();
-        if (exitCode)
-            return exitCode;
+        Setup();
+        if (exitCode_)
+            return exitCode_;
 
         if (!engine_->Initialize(engineParameters_))
-            return EXIT_FAILURE;
+        {
+            ErrorExit();
+            return exitCode_;
+        }
 
-        exitCode = Start();
-        if (exitCode)
-            return exitCode;
+        Start();
+        if (exitCode_)
+            return exitCode_;
 
         while (!engine_->IsExiting())
             engine_->RunFrame();
 
-        exitCode = Stop();
-        return exitCode;
+        Stop();
+
+        return exitCode_;
     }
     catch (std::bad_alloc&)
     {
         ErrorDialog(GetTypeName(), "An out-of-memory error occurred. The application will now exit.");
         return EXIT_FAILURE;
     }
+}
+
+void Application::ErrorExit(const String& message)
+{
+    engine_->Exit(); // Close the rendering window
+    exitCode_ = EXIT_FAILURE;
+
+    // Only for WIN32, otherwise the last message would be double posted on Mac OS X and Linux platforms
+    if (!message.Length())
+    {
+        #ifdef WIN32
+        Log* log = GetSubsystem<Log>();   // May be null if ENABLE_LOGGING is not defined during build
+        ErrorDialog(GetTypeName(), log ? log->GetLastMessage() : "Application has been terminated due to unexpected error.");
+        #endif
+    }
+    else
+        ErrorDialog(GetTypeName(), message);
 }

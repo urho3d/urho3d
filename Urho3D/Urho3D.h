@@ -41,15 +41,13 @@ public:
     Urho(Context* context);
     
     /// Setup before engine initialization. Verify that a script file has been specified.
-    virtual int Setup();
+    virtual void Setup();
     /// Startup after engine initialization. Load the script and execute its start function.
-    virtual int Start();
+    virtual void Start();
     /// Cleanup after the main loop. Run the script's stop function if it exists.
-    virtual int Stop();
+    virtual void Stop();
     
 private:
-    /// Show last error message and set the exit code for error exit.
-    void ErrorExit();
     /// Handle reload start of the script file.
     void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
     /// Handle reload success of the script file.
@@ -61,6 +59,4 @@ private:
     String scriptFileName_;
     /// Script file.
     SharedPtr<ScriptFile> scriptFile_;
-    /// Application exit code.
-    int exitCode_;
 };

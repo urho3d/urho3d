@@ -258,7 +258,7 @@ void Script::ClearLogMessages()
 
 void Script::DumpAPI()
 {
-    // Does not use LOGRAW macro here to ensure the messages are always dumped regarless of ENABLE_LOGGING compiler directive and of Log subsystem availability
+    // Does not use LOGRAW macro here to ensure the messages are always dumped regardless of ENABLE_LOGGING compiler directive and of Log subsystem availability
     Log::WriteRaw("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
 
     Vector<PropertyInfo> globalPropertyInfos;

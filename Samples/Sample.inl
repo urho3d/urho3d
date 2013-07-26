@@ -35,18 +35,15 @@ Sample::Sample(Context* context) :
 {
 }
 
-int Sample::Setup()
+void Sample::Setup()
 {
     // Modify engine startup parameters
     engineParameters_["WindowTitle"] = GetTypeName();
     engineParameters_["LogName"]     = GetTypeName() + ".log";
     engineParameters_["FullScreen"]  = false;
-
-    // Go on to engine initialization
-    return EXIT_SUCCESS;
 }
 
-int Sample::Start()
+void Sample::Start()
 {
     // Create logo
     CreateLogo();
@@ -56,9 +53,6 @@ int Sample::Start()
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, HANDLER(Sample, HandleKeyDown));
-
-    // Go on to main loop
-    return EXIT_SUCCESS;
 }
 
 void Sample::SetLogoVisible(bool enable)

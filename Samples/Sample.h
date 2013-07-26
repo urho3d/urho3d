@@ -44,10 +44,10 @@ public:
     Sample(Context* context);
 
     /// Setup before engine initialization. Modifies the engine parameters.
-    virtual int Setup();
+    virtual void Setup();
 
     /// Setup after engine initialization. Creates the logo, console & debug HUD.
-    virtual int Start();
+    virtual void Start();
 
     /// Control logo visibility.
     void SetLogoVisible(bool enable);
