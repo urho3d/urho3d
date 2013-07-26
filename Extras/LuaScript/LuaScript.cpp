@@ -101,11 +101,8 @@ LuaScript::~LuaScript()
     lua_close(luaState_);
 }
 
-bool LuaScript::ExecuteFile(const char* fileName)
+bool LuaScript::ExecuteFile(const String& fileName)
 {
-    if (!fileName)
-        return false;
-
     PROFILE(ExecuteFile);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -122,7 +119,7 @@ bool LuaScript::ExecuteFile(const char* fileName)
 
     int top = lua_gettop(luaState_);
 
-    int error = luaL_loadbuffer(luaState_, buffer, size, fileName);
+    int error = luaL_loadbuffer(luaState_, buffer, size, fileName.CString());
     delete [] buffer;
 
     if (error)
@@ -148,16 +145,13 @@ bool LuaScript::ExecuteFile(const char* fileName)
     return true;
 }
 
-bool LuaScript::ExecuteString(const char* string)
+bool LuaScript::ExecuteString(const String& string)
 {
-    if (string == 0)
-        return false;
-
     PROFILE(ExecuteString);
 
     int top = lua_gettop(luaState_);
 
-    if (luaL_dostring(luaState_, string) != 0)
+    if (luaL_dostring(luaState_, string.CString()) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
         lua_settop(luaState_, top);
@@ -171,20 +165,15 @@ bool LuaScript::ExecuteString(const char* string)
     return true;
 }
 
-bool LuaScript::ExecuteFunction(const char* funcName)
+bool LuaScript::ExecuteFunction(const String& functionName)
 {
-    if (funcName == 0)
-        return false;
-
     PROFILE(ExecuteFunction);
 
     int top = lua_gettop(luaState_);
 
-    lua_getglobal(luaState_, funcName);
-    if (!lua_isfunction(luaState_, -1))
+    if (!FindFunction(functionName))
     {
         lua_settop(luaState_, top);
-        LOGRAW(String("Lua: Unable to get Lua global: '") + funcName + "'.");
         return false;
     }
 
@@ -192,7 +181,7 @@ bool LuaScript::ExecuteFunction(const char* funcName)
     {
         const char* message = lua_tostring(luaState_, -1);
         lua_settop(luaState_, top);
-        LOGRAW(String("Lua: Unable to execute Lua function '") + funcName + "'.");
+        LOGRAW(String("Lua: Unable to execute Lua function '") + functionName + "'.");
         LOGRAW(String("Lua: ") + message);
         return false;
     }
@@ -200,19 +189,19 @@ bool LuaScript::ExecuteFunction(const char* funcName)
     return true;
 }
 
-void LuaScript::ScriptSendEvent(const char* eventName, VariantMap& eventData)
+void LuaScript::ScriptSendEvent(const String& eventName, VariantMap& eventData)
 {
 	SendEvent(StringHash(eventName), eventData);
 }
 
-void LuaScript::ScriptSubscribeToEvent(const char* eventName, const char* functionName)
+void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& functionName)
 {
     StringHash eventType(eventName);
 
 	if (!eventTypeToFunctionNameMap_.Contains(eventType))
 		SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
 
-    eventTypeToFunctionNameMap_[eventType].Push(String(functionName));
+    eventTypeToFunctionNameMap_[eventType].Push(functionName);
 }
 
 void LuaScript::ReplacePrintFunction()
@@ -255,6 +244,44 @@ int LuaScript::Print(lua_State *L)
     return 0;
 }
 
+bool LuaScript::FindFunction(const String& functionName)
+{
+    Vector<String> splitedNames = functionName.Split('.');
+    
+    String currentName = splitedNames.Front();
+    lua_getglobal(luaState_, currentName.CString());
+
+    if (splitedNames.Size() > 1)
+    {       
+        if (!lua_istable(luaState_, -1))
+        {
+            LOGRAW(String("Lua: Unable to find Lua table: '") + currentName + "'.");
+            return false;
+        }
+
+        for (unsigned i = 1; i < splitedNames.Size() - 1; ++i)
+        {
+            currentName = currentName + "." + splitedNames[i];
+            lua_getfield(luaState_, -1, splitedNames[i].CString());
+            if (!lua_istable(luaState_, -1))
+            {
+                LOGRAW(String("Lua: Unable to find Lua table: '") + currentName + "'.");
+                return false;
+            }
+        }
+
+        lua_getfield(luaState_, -1, splitedNames.Back().CString());
+    }
+
+    if (!lua_isfunction(luaState_, -1))
+    {
+        LOGRAW(String("Lua: Unable to find Lua function: '") + currentName + "'.");
+        return false;
+    }
+
+    return true;
+}
+
 void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
     HashMap<StringHash, Vector<String> >::ConstIterator it = eventTypeToFunctionNameMap_.Find(eventType);
@@ -268,11 +295,9 @@ void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 
 		int top = lua_gettop(luaState_);
 
-        lua_getglobal(luaState_, functionName.CString());
-        if (!lua_isfunction(luaState_, -1))
+        if (!FindFunction(functionName))
         {
             lua_settop(luaState_, top);
-            LOGRAW(String("Lua: Unable to get Lua global: '") + functionName + "'.");
             return;
         }
 
@@ -295,6 +320,7 @@ void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData
     using namespace ConsoleCommand;
     ExecuteString(eventData[P_COMMAND].GetString().CString());
 }
+
 
 Context* GetContext()
 {

@@ -44,19 +44,19 @@ public:
     ~LuaScript();
 
     /// Execute script file.
-    bool ExecuteFile(const char* fileName);
+    bool ExecuteFile(const String& fileName);
 
     /// Execute script string.
-    bool ExecuteString(const char* string);
+    bool ExecuteString(const String& string);
 
     /// Execute script function.
-    bool ExecuteFunction(const char* funcName);
+    bool ExecuteFunction(const String& functionName);
 
     /// Script send event.
-	void ScriptSendEvent(const char* eventName, VariantMap& eventData);
+	void ScriptSendEvent(const String& eventName, VariantMap& eventData);
 
     /// Script subscribe event.
-    void ScriptSubscribeToEvent(const char* eventName, const char* functionName);
+    void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
 
 private:
     /// Replace print function.
@@ -64,6 +64,9 @@ private:
 
     /// Print function.
     static int Print(lua_State* L);
+
+    /// Find Lua function.
+    bool FindFunction(const String& functionName);
 
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);

@@ -126,8 +126,8 @@ class UIElement : public Serializable
     void EnableLayoutUpdate();
     void BringToFront();
     
-    UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
-    UIElement* CreateChild(const char* type, const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    // UIElement* CreateChild(ShortStringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    // UIElement* CreateChild(const char* type, const char* name = 0, unsigned index = M_MAX_UNSIGNED);
     
     void AddChild(UIElement* element);
     void InsertChild(unsigned index, UIElement* element);
@@ -142,6 +142,21 @@ class UIElement : public Serializable
     void SetElementEventSender(bool flag);
 
     // template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    BorderImage* CreateChild<BorderImage> @ CreateBorderImage(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    Button* CreateChild<Button> @ CreateButton(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    CheckBox* CreateChild<CheckBox> @ CreateCheckBox(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    Cursor* CreateChild<Cursor> @ CreateCursor(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    DropDownList* CreateChild<DropDownList> @ CreateDropDownList(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    LineEdit* CreateChild<LineEdit> @ CreateLineEdit(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    ListView* CreateChild<ListView> @ CreateListView(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    Menu* CreateChild<Menu> @ CreateMenu(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    ScrollBar* CreateChild<ScrollBar> @ CreateScrollBar(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    ScrollView* CreateChild<ScrollView> @ CreateScrollView(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    Slider* CreateChild<Slider> @ CreateSlider(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    Sprite* CreateChild<Sprite> @ CreateSprite(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    Text* CreateChild<Text> @ CreateText(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    UIElement* CreateChild<UIElement> @ CreateUIElement(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
+    Window* CreateChild<Window> @ CreateWindow(const char* name = 0, unsigned index = M_MAX_UNSIGNED);
 
     const String& GetName() const;
     const IntVector2& GetPosition() const;
