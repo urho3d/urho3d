@@ -40,7 +40,7 @@ class LuaScript : public Object
 public:
     /// Construct.
     LuaScript(Context* context);
-    /// Destruct. Release the AngelLuna engine.
+    /// Destruct.
     ~LuaScript();
 
     /// Execute script file.

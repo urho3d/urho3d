@@ -248,6 +248,7 @@ class UIElement : public Serializable
     tolua_property__get_set HorizontalAlignment horizontalAlignment;
     tolua_property__get_set VerticalAlignment verticalAlignment;
     tolua_property__get_set IntRect clipBorder;
+    tolua_property__get_set Color& color; // Write only property.
     tolua_property__get_set int priority;
     tolua_property__get_set float opacity;
     tolua_readonly tolua_property__get_set float derivedOpacity;
@@ -297,5 +298,8 @@ static UIElement* UIElementGetChild2(const UIElement* element, const char* key, 
 }
 
 #define GetStyle GetAppliedStyle
+
+#define TOLUA_DISABLE_tolua_get_UIElement_color_ref
+#define tolua_get_UIElement_color_ref NULL
 
 $}

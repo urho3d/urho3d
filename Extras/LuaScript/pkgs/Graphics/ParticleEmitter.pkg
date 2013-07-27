@@ -106,6 +106,7 @@ class ParticleEmitter : public BillboardSet
     TextureFrame* GetTextureFrame(unsigned index);
     
     tolua_property__get_set unsigned numParticles;
+    tolua_property__get_set float emissionRate; // Write only property.
     tolua_property__is_set bool emitting;
     tolua_property__get_set bool updateInvisible;
     tolua_property__get_set float minEmissionRate;
@@ -114,16 +115,21 @@ class ParticleEmitter : public BillboardSet
     tolua_property__get_set Vector3& emitterSize;
     tolua_property__get_set float activeTime;
     tolua_property__get_set float inactiveTime;
+    tolua_property__get_set float timeToLive; // Write only property.
     tolua_property__get_set float minTimeToLive;
     tolua_property__get_set float maxTimeToLive;
+    tolua_property__get_set Vector2& particleSize; // Write only property.
     tolua_property__get_set Vector2& minParticleSize;
     tolua_property__get_set Vector2& maxParticleSize;
     tolua_property__get_set Vector3& minDirection;
     tolua_property__get_set Vector3& maxDirection;
+    tolua_property__get_set float velocity; // Write only property.
     tolua_property__get_set float minVelocity;
     tolua_property__get_set float maxVelocity;
+    tolua_property__get_set float rotation; // Write only property.
     tolua_property__get_set float minRotation;
     tolua_property__get_set float maxRotation;
+    tolua_property__get_set float rotationSpeed; // Write only property.
     tolua_property__get_set float minRotationSpeed;
     tolua_property__get_set float maxRotationSpeed;
     tolua_property__get_set Vector3& constantForce;
@@ -133,3 +139,25 @@ class ParticleEmitter : public BillboardSet
     tolua_property__get_set unsigned numColors;
     tolua_property__get_set unsigned numTextureFrames;
 };
+
+${
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_emissionRate
+#define tolua_get_ParticleEmitter_emissionRate NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_timeToLive
+#define tolua_get_ParticleEmitter_timeToLive NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_particleSize_ref
+#define tolua_get_ParticleEmitter_particleSize_ref NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_velocity
+#define tolua_get_ParticleEmitter_velocity NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_rotation
+#define tolua_get_ParticleEmitter_rotation NULL
+
+#define TOLUA_DISABLE_tolua_get_ParticleEmitter_rotationSpeed
+#define tolua_get_ParticleEmitter_rotationSpeed NULL
+
+$}

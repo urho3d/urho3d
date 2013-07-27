@@ -49,8 +49,10 @@ class Constraint : public Component
     tolua_property__get_set RigidBody* otherBody;
     tolua_property__get_set Vector3& position;
     tolua_property__get_set Quaternion& rotation;
+    tolua_property__get_set Vector3& axis; // Write only property.
     tolua_property__get_set Vector3& otherPosition;
     tolua_property__get_set Quaternion& otherRotation;
+    tolua_property__get_set Vector3& otherAxis; // Write only property.
     tolua_property__get_set Vector3 worldPosition;
     tolua_property__get_set Vector2& highLimit;
     tolua_property__get_set Vector2& lowLimit;
@@ -58,3 +60,13 @@ class Constraint : public Component
     tolua_property__get_set float CFM;
     tolua_property__get_set bool disableCollision;
 };
+
+${
+
+#define TOLUA_DISABLE_tolua_get_Constraint_axis_ref
+#define tolua_get_Constraint_axis_ref NULL
+
+#define TOLUA_DISABLE_tolua_get_Constraint_otherAxis_ref
+#define tolua_get_Constraint_otherAxis_ref NULL
+
+$}

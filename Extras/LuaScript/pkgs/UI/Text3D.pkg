@@ -59,6 +59,7 @@ class Text3D : public Drawable
     tolua_property__get_set float rowSpacing;
     tolua_property__get_set bool wordwrap;
     tolua_property__get_set int width;
+    tolua_property__get_set Color& color; // Write only property.
     tolua_readonly tolua_property__get_set int rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_property__get_set float opacity;
@@ -68,4 +69,10 @@ class Text3D : public Drawable
     tolua_readonly tolua_property__get_set Color& colorAttr;
 };
 
-$#define SetColorAttr SetColor
+${
+
+#define SetColorAttr SetColor
+#define TOLUA_DISABLE_tolua_get_Text3D_color_ref
+#define tolua_get_Text3D_color_ref NULL
+
+$}

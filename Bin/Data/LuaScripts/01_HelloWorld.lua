@@ -23,7 +23,8 @@ function HelloWorld:CreateText()
 
     local cache = GetCache()
     helloText:SetFont(cache:GetFont("Fonts/Anonymous Pro.ttf"), 30)
-    helloText:SetColor(Color(0.0, 1.0, 0.0))
+    
+    helloText.color = Color(0.0, 1.0, 0.0)
     
     helloText.horizontalAlignment = HA_CENTER;
     helloText.verticalAlignment = VA_CENTER;

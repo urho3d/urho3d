@@ -98,7 +98,8 @@ LuaScript::LuaScript(Context* context) :
 
 LuaScript::~LuaScript()
 {
-    lua_close(luaState_);
+    if (luaState_)
+        lua_close(luaState_);
 }
 
 bool LuaScript::ExecuteFile(const String& fileName)
@@ -320,7 +321,6 @@ void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData
     using namespace ConsoleCommand;
     ExecuteString(eventData[P_COMMAND].GetString().CString());
 }
-
 
 Context* GetContext()
 {
