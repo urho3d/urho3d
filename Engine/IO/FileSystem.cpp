@@ -224,9 +224,9 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
         arguments.Push(fileName);
         bool success = SystemRun(
         #if defined(__APPLE__)
-                "open",
+                "/usr/bin/open",
         #else
-                "xdg-open",
+                "/usr/bin/xdg-open",
         #endif
                 arguments) == 0;
         #endif
