@@ -92,7 +92,7 @@ function InitScene()
     -- Create the camera outside the scene so it is unaffected by scene load/save
     cameraNode = Node(context)
     camera = cameraNode:CreateCamera()
-    cameraNode:SetPosition(Vector3(0, 2, 0))
+    cameraNode.position = Vector3(0, 2, 0)
 
     if not engine:IsHeadless() then
         renderer:SetViewport(0, Viewport:new(context, testScene, camera))

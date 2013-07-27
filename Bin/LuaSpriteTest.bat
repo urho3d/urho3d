@@ -1,0 +1,1 @@
+Urho3D.exe LuaScripts/SpriteTest.lua %*
