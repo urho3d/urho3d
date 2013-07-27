@@ -1,56 +1,63 @@
-local logoSprite = nil
+Sample = {}
 
-local cache = GetCache()
-local engine = GetEngine()
-local ui = GetUI()
-
-function SampleStart()
-    CreateLogo()
-    CreateConsoleAndDebugHud()
+function Sample:Start()
+    self.logoSprite = nil
+    self:CreateLogo()
+    self:CreateConsoleAndDebugHud()
 end
 
-function SampleStop()
-    logoSprite = nil
+function Sample:Stop()
+    self.logoSprite = nil
 end
 
-function CreateLogo()
+function Sample:CreateLogo()
+    local cache = GetCache()
     local logoTexture = cache:GetTexture2D("Textures/LogoLarge.png")
     if logoTexture == nil then
         return
-    end    
+    end
     
-    logoSprite = ui.root:CreateSprite()
-    logoSprite.texture = logoTexture
+    local ui = GetUI()
+    self.logoSprite = ui.root:CreateSprite()
+    --self.logoSprite.texture = logoTexture
+    self.logoSprite:SetTexture(logoTexture)
+    
+    
     local textureWidth = logoTexture.width
     local textureHeight = logoTexture.height
     
-    logoSprite:SetScale(256 / textureWidth)
-    logoSprite.size = IntVector2(textureWidth, textureHeight)
-    logoSprite.hotSpot = IntVector2(0, textureHeight)
-
-    logoSprite:SetAlignment(HA_LEFT, VA_BOTTOM);
+    self.logoSprite:SetScale(256 / textureWidth)
+    --self.logoSprite.size = IntVector2(textureWidth, textureHeight)
+    self.logoSprite:SetSize(textureWidth, textureHeight)
+    self.logoSprite.hotSpot = IntVector2(0, textureHeight)
+    
+    self.logoSprite:SetAlignment(HA_LEFT, VA_BOTTOM);
 end
 
-function CreateConsoleAndDebugHud()
+function Sample:CreateConsoleAndDebugHud()
+    local cache = GetCache()
     local uiStyle = cache:GetXMLFile("UI/DefaultStyle.xml")
     if uiStyle == nil then
         return
     end
     
+    local engine = GetEngine()
     local console = engine:CreateConsole()
     console.defaultStyle = uiStyle
     
     local debugHud = engine:CreateDebugHud()
     debugHud.defaultStyle = uiStyle
     
-    SubscribeToEvent("KeyDown", "HandleKeyDownEventForSample")
+    SubscribeToEvent("KeyDown", "Sample.HandleKeyDownEvent")
 end
 
-function HandleKeyDownEventForSample(eventType, eventData)
+function Sample.HandleKeyDownEvent(eventType, eventData)
     local key = eventData:GetInt("Key")
     
     if key == KEY_ESC then
+        local ui = GetUI()
         if ui:GetFocusElement() == nil then
+            local engine = GetEngine()
             engine:Exit()
         else
             local console = GetConsole()
