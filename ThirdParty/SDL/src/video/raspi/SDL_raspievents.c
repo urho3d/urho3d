@@ -147,9 +147,12 @@ RASPI_InitInput(_THIS)
     char device[32];
     for (i = 0; i < NUM_INPUT_DEVICE; ++i) {
         sprintf(device, "/dev/input/event%i", i);
-        event_fd[i] = open(device, O_RDONLY | O_NONBLOCK);
+        event_fd[i] = open(device, O_RDWR | O_NONBLOCK);
         if (event_fd[i] < 0) {
             return SDL_SetError("Couldn't open %s", device);
+        }
+        if (ioctl(event_fd[i], EVIOCGRAB, 1/*grab*/) < 0) {
+            return SDL_SetError("Couldn't grab %s", device);
         }
     }
 
@@ -164,6 +167,7 @@ RASPI_QuitInput(_THIS)
 {
     int i;
     for (i = 0; i < NUM_INPUT_DEVICE; ++i) {
+        ioctl(event_fd[i], EVIOCGRAB, 0/*release*/);
         close(event_fd[i]);
         event_fd[i] = -1;
     }
