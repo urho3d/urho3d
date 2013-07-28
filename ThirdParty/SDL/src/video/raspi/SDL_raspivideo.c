@@ -89,7 +89,7 @@ RASPI_CreateDevice(int devindex)
     device->CreateWindow = RASPI_CreateWindow;
     device->DestroyWindow = RASPI_DestroyWindow;
 
-    /* OpenGLES functiion pointers */
+    /* OpenGLES function pointers */
     device->GL_GetProcAddress = RASPI_GLES_GetProcAddress;
     device->GL_LoadLibrary = RASPI_GLES_LoadLibrary;
     device->GL_UnloadLibrary = RASPI_GLES_UnloadLibrary;
