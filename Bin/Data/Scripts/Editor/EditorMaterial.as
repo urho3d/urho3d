@@ -125,6 +125,7 @@ void PickEditMaterial()
 
 void PickEditMaterialDone(StringHash eventType, VariantMap& eventData)
 {
+    StoreResourcePickerPath();
     CloseFileSelector();
 
     if (!eventData["OK"].GetBool())
@@ -174,20 +175,22 @@ void SaveMaterialAs()
     if (editMaterial is null)
         return;
 
-    ResourcePicker@ picker = GetResourcePicker(ShortStringHash("Material"));
-    if (picker is null)
+    @resourcePicker = GetResourcePicker(ShortStringHash("Material"));
+    if (resourcePicker is null)
         return;
 
-    String lastPath = picker.lastPath;
+    String lastPath = resourcePicker.lastPath;
     if (lastPath.empty)
         lastPath = sceneResourcePath;
-    CreateFileSelector("Save material as", "Save", "Cancel", lastPath, picker.filters, picker.lastFilter);
+    CreateFileSelector("Save material as", "Save", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
     SubscribeToEvent(uiFileSelector, "FileSelected", "SaveMaterialAsDone");
 }
 
 void SaveMaterialAsDone(StringHash eventType, VariantMap& eventData)
 {
+    StoreResourcePickerPath();
     CloseFileSelector();
+    @resourcePicker = null;
 
     if (editMaterial is null)
         return;

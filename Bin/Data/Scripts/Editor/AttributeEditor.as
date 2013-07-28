@@ -928,13 +928,7 @@ void PickResource(StringHash eventType, VariantMap& eventData)
 
 void PickResourceDone(StringHash eventType, VariantMap& eventData)
 {
-    // Store filter and directory for next time
-    if (resourcePicker !is null)
-    {
-        resourcePicker.lastPath = uiFileSelector.path;
-        resourcePicker.lastFilter = uiFileSelector.filterIndex;
-    }
-
+    StoreResourcePickerPath();
     CloseFileSelector();
 
     if (!eventData["OK"].GetBool())
@@ -1001,6 +995,16 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
 
     resourceTargets.Clear();
     @resourcePicker = null;
+}
+
+void StoreResourcePickerPath()
+{
+    // Store filter and directory for next time
+    if (resourcePicker !is null && uiFileSelector !is null)
+    {
+        resourcePicker.lastPath = uiFileSelector.path;
+        resourcePicker.lastFilter = uiFileSelector.filterIndex;
+    }
 }
 
 Resource@ GetPickedResource(String resourceName)
