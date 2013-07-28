@@ -100,14 +100,22 @@ PropagateEvents(_THIS, int index)
         case EV_REL:
             switch (event[i].code) {
             case REL_X:
-            case REL_HWHEEL:
                 x = event[i].value;
-                relevent = event[i].code == REL_X ? MOTION : WHEEL;
+                relevent = MOTION;
                 break;
             case REL_Y:
-            case REL_WHEEL:
                 y = event[i].value;
-                relevent = event[i].code == REL_Y ? MOTION : WHEEL;
+                relevent = MOTION;
+                break;
+            case REL_HWHEEL:
+                x = event[i].value;
+                y = 0;
+                relevent = WHEEL;
+                break;
+            case REL_WHEEL:
+                x = 0;
+                y = event[i].value;
+                relevent = WHEEL;
                 break;
             default:
                 relevent = NONE;
