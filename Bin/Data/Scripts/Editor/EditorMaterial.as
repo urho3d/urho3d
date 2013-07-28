@@ -264,7 +264,7 @@ void EditShaderParameter(StringHash eventType, VariantMap& eventData)
 
     Variant oldValue = editMaterial.shaderParameters[name];
     Array<String> coordValues = oldValue.ToString().Split(' ');
-    coordValues[coordinate] = attrEdit.text;
+    coordValues[coordinate] = String(attrEdit.text.ToFloat());
 
     String valueString;
     for (uint i = 0; i < coordValues.length; ++i)
