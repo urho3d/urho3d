@@ -160,8 +160,14 @@ void ProcessFile(const String& fileName)
             line.Replace("&ouml;", "\x0c3\x0b6");
             line.Replace("&Auml;", "\x0c3\x084");
             line.Replace("&Ouml;", "\x0c3\x096");
+            line.Replace("\\n\\n", "<br>");
             line.Replace("\\n", "<br>");
             
+            // Handle tables
+            if (line.StartsWith("|---"))
+                continue;
+            line.Replace("|", "||");
+
             // Replace links
             for (;;)
             {
