@@ -485,6 +485,18 @@ static void ConstructBiasParametersInit(float constantBias, float slopeScaledBia
     new(ptr) BiasParameters(constantBias, slopeScaledBias);
 }
 
+static CScriptArray* MaterialGetShaderParameterNames(Material* material)
+{
+    Vector<String> result;
+
+    const HashMap<StringHash, MaterialShaderParameter>& parameters = material->GetShaderParameters();
+    for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        result.Push(i->second_.name_);
+
+    Sort(result.Begin(), result.End());
+    return VectorToArray<String>(result, "Array<String>");
+}
+
 static void RegisterMaterial(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
@@ -557,6 +569,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "Technique@+ get_techniques(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const Variant& get_shaderParameters(const String&in) const", asMETHOD(Material, GetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Array<String>@ get_shaderParameterNames() const", asFUNCTION(MaterialGetShaderParameterNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_textures(uint, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_textures(uint) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_occlusion()", asMETHOD(Material, GetOcclusion), asCALL_THISCALL);

@@ -83,8 +83,11 @@ bool XMLFile::Load(Deserializer& source)
     
     unsigned dataSize = source.GetSize();
     if (!dataSize)
+    {
+        LOGERROR("Zero sized XML data in " + source.GetName());
         return false;
-    
+    }
+
     SharedArrayPtr<char> buffer(new char[dataSize]);
     if (source.Read(buffer.Get(), dataSize) != dataSize)
         return false;

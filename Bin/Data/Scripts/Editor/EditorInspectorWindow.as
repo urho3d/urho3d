@@ -405,6 +405,9 @@ void PostEditAttribute(Serializable@ serializable, uint index)
 
 void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializables)
 {
+    if (serializables is null || serializables.length == 0)
+        return;
+
     // All target serializables must be either nodes, ui-elements, or components
     Array<Variant> ids;
     switch (GetType(serializables[0]))

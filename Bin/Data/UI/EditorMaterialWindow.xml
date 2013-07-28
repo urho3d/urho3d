@@ -1,5 +1,5 @@
 <element type="Window">
-    <attribute name="Name" value="MaterialSWindow" />
+    <attribute name="Name" value="MaterialWindow" />
     <attribute name="Is Movable" value="true" />
     <attribute name="Is Resizable" value="true" />
     <attribute name="Resize Border" value="6 6 6 6" />
@@ -16,6 +16,13 @@
         <element type="Button" style="CloseButton">
             <attribute name="Name" value="CloseButton" />
         </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Name" value="NameContainer" />
     </element>
     <element type="BorderImage" style="EditorDivider" />
     <element type="Text">
@@ -37,5 +44,101 @@
     </element>
     <element type="ListView">
         <attribute name="Name" value="ShaderParameterList" />
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="LineEdit">
+            <attribute name="Name" value="ParameterNameEdit" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="NewParameterDropDown" />
+            <attribute name="Min Size" value="50 17" />
+            <attribute name="Max Size" value="50 17" />
+            <attribute name="Resize Popup" value="true" />
+            <element internal="true">
+                <attribute name="Is Visible" value="false" />
+            </element>
+            <element type="Text">
+                <attribute name="Text" value="New" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
+                            <element type="Text" style="EditorEnumAttributeText">
+                                <attribute name="Text" value="Float" />
+                            </element>
+                            <element type="Text" style="EditorEnumAttributeText">
+                                <attribute name="Text" value="Vector2" />
+                            </element>
+                            <element type="Text" style="EditorEnumAttributeText">
+                                <attribute name="Text" value="Vector3" />
+                            </element>
+                            <element type="Text" style="EditorEnumAttributeText">
+                                <attribute name="Text" value="Vector4" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="DeleteParameterButton" />
+            <attribute name="Min Size" value="50 17" />
+            <attribute name="Max Size" value="50 17" />
+            <attribute name="Layout Mode" value="Vertical" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Del" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element>
+        <attribute name="Name" value="ButtonContainer" />
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Button">
+            <attribute name="Name" value="NewButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="New" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="RevertButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Revert" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="SaveButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Save" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="SaveAsButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Save as" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
     </element>
 </element>

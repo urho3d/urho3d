@@ -949,19 +949,10 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
 
     // Validate the resource. It must come from within a registered resource directory, and be loaded successfully
     String resourceName = eventData["FileName"].GetString();
-    Array<String>@ resourceDirs = cache.resourceDirs;
-    Resource@ res;
-
-    for (uint i = 0; i < resourceDirs.length; ++i)
+    Resource@ res = GetPickedResource(resourceName);
+    if (res is null)
     {
-        if (!resourceName.ToLower().StartsWith(resourceDirs[i].ToLower()))
-            continue;
-        resourceName = resourceName.Substring(resourceDirs[i].length);
-        res = cache.GetResource(resourcePicker.typeName, resourceName);
-        break;
-    }
-    if (res is null) {
-        log.Warning("Cannot find resource type: " + resourcePicker.typeName + " Name:" + resourceName);
+        @resourcePicker = null;
         return;
     }
 
@@ -1010,6 +1001,31 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
 
     resourceTargets.Clear();
     @resourcePicker = null;
+}
+
+Resource@ GetPickedResource(String resourceName)
+{
+    resourceName = GetResourceNameFromFullName(resourceName);
+    Resource@ res = cache.GetResource(resourcePicker.typeName, resourceName);
+
+    if (res is null)
+        log.Warning("Cannot find resource type: " + resourcePicker.typeName + " Name:" + resourceName);
+
+    return res;
+}
+
+String GetResourceNameFromFullName(const String&in resourceName)
+{
+    Array<String>@ resourceDirs = cache.resourceDirs;
+
+    for (uint i = 0; i < resourceDirs.length; ++i)
+    {
+        if (!resourceName.ToLower().StartsWith(resourceDirs[i].ToLower()))
+            continue;
+        return resourceName.Substring(resourceDirs[i].length);
+    }
+    
+    return ""; // Not found
 }
 
 void OpenResource(StringHash eventType, VariantMap& eventData)

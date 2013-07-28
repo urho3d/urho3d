@@ -2062,6 +2062,7 @@ Properties:<br>
 - uint numTechniques
 - Technique@[] techniques (readonly)
 - Variant[] shaderParameters
+- String[]@ shaderParameterNames (readonly)
 - Texture@[] textures
 - bool occlusion (readonly)
 - CullMode cullMode

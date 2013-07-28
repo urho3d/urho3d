@@ -427,8 +427,11 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
     // Attempt to load the resource
     SharedPtr<File> file = GetFile(name);
     if (!file)
+    {
+        LOGERROR("Could not open the file for resource " + name);
         return 0;
-    
+    }
+
     LOGDEBUG("Loading resource " + name);
     resource->SetName(file->GetName());
     if (!resource->Load(*(file.Get())))
