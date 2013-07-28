@@ -127,6 +127,8 @@ private:
     void SetCursorShape(CursorShape shape);
     /// Send a UI element drag event.
     void SendDragEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos);
+    /// Send a UI click or double click event.
+    void SendClickEvent(StringHash eventType, UIElement* element, const IntVector2& pos, int button, int buttons, int qualifiers);
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle mouse button down event.

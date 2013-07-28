@@ -31,7 +31,8 @@ void CreateMaterialEditor()
 
 bool ShowMaterialEditor()
 {
-    materialWindow.visible = true;
+    materialWindow.visible = true;       
+    materialWindow.BringToFront();
     return true;
 }
 
