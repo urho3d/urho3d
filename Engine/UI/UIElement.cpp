@@ -886,6 +886,11 @@ bool UIElement::SetStyle(const String& styleName, XMLFile* file)
         if (!file)
             return false;
     }
+    else
+    {
+        // If a custom style file specified, remember it
+        defaultStyle_ = file;
+    }
 
     styleXPathQuery_.SetVariable("typeName", styleName);
     XMLElement styleElem = file->GetRoot().SelectSinglePrepared(styleXPathQuery_);
@@ -1167,6 +1172,8 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     else
         children_.Insert(children_.Begin() + index, SharedPtr<UIElement>(element));
 
+    XMLFile* previousStyleFile = element->GetDefaultStyle();
+
     element->Remove();
 
     if (sortChildren_)
@@ -1174,6 +1181,11 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
 
     element->parent_ = this;
     element->MarkDirty();
+
+    // If child element did not already have a style file, but has specified a style name, apply it now
+    if (!previousStyleFile && !element->appliedStyle_.Empty() && GetDefaultStyle())
+        element->SetStyle(element->appliedStyle_);
+
     UpdateLayout();
 
     // Send change event
