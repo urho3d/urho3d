@@ -63,6 +63,7 @@ void RefreshMaterialName()
     LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, 0, 0);
     if (editMaterial !is null)
         nameEdit.text = editMaterial.name;
+    SubscribeToEvent(nameEdit, "TextFinished", "EditMaterialName");
 
     Button@ pickButton = CreateResourcePickerButton(container, null, 0, 0, "Pick");
     SubscribeToEvent(pickButton, "Released", "PickEditMaterial");
@@ -78,6 +79,31 @@ void RefreshMaterialTextures()
 {
     ListView@ list = materialWindow.GetChild("TextureList");
     list.RemoveAllItems();
+
+    for (uint i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+    {
+        UIElement@ parent = CreateAttributeEditorParentWithSeparatedLabel(list, GetTextureUnitName(TextureUnit(i)), i, 0, false);
+        
+        UIElement@ container = UIElement();
+        container.SetLayout(LM_HORIZONTAL, 4, IntRect(10, 0, 4, 0));
+        container.SetFixedHeight(ATTR_HEIGHT);
+        parent.AddChild(container);
+
+        LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
+        Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+        SubscribeToEvent(pickButton, "Released", "PickMaterialTexture");
+        Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
+        SubscribeToEvent(openButton, "Released", "OpenResource");
+
+        if (editMaterial !is null)
+        {
+            Texture@ texture = editMaterial.textures[i];
+            if (texture !is null)
+                nameEdit.text = texture.name;
+        }
+        
+        SubscribeToEvent(nameEdit, "TextFinished", "EditMaterialTexture");
+    }
 }
 
 void RefreshMaterialShaderParameters()
@@ -105,8 +131,20 @@ void RefreshMaterialShaderParameters()
             attrEdit.vars["Name"] = parameterNames[i];
             attrEdit.text = coordValues[j];
             SubscribeToEvent(attrEdit, "TextChanged", "EditShaderParameter");
-            SubscribeToEvent(attrEdit, "TextChanged", "EditShaderParameter");
+            SubscribeToEvent(attrEdit, "TextFinished", "EditShaderParameter");
         }
+    }
+}
+
+void EditMaterialName(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ nameEdit = eventData["Element"].GetUIElement();
+    String newMaterialName = nameEdit.text.Trimmed();
+    if (!newMaterialName.empty)
+    {
+        Material@ newMaterial = cache.GetResource("Material", newMaterialName);
+        if (newMaterial !is null)
+            EditMaterial(newMaterial);
     }
 }
 
@@ -221,7 +259,7 @@ void EditShaderParameter(StringHash eventType, VariantMap& eventData)
 
     LineEdit@ attrEdit = eventData["Element"].GetUIElement();
     uint coordinate = attrEdit.vars["Coordinate"].GetUInt();
-    
+
     String name = attrEdit.vars["Name"].GetString();
 
     Variant oldValue = editMaterial.shaderParameters[name];
@@ -287,3 +325,65 @@ void DeleteShaderParameter()
     editMaterial.RemoveShaderParameter(name);
     RefreshMaterialShaderParameters();
 }
+
+void PickMaterialTexture(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null)
+        return;
+
+    UIElement@ button = eventData["Element"].GetUIElement();
+    resourcePickIndex = button.vars["Index"].GetUInt();
+
+    @resourcePicker = GetResourcePicker(ShortStringHash("Texture2D"));
+    if (resourcePicker is null)
+        return;
+
+    String lastPath = resourcePicker.lastPath;
+    if (lastPath.empty)
+        lastPath = sceneResourcePath;
+    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    SubscribeToEvent(uiFileSelector, "FileSelected", "PickMaterialTextureDone");
+}
+
+void PickMaterialTextureDone(StringHash eventType, VariantMap& eventData)
+{
+    StoreResourcePickerPath();
+    CloseFileSelector();
+
+    if (!eventData["OK"].GetBool())
+    {
+        @resourcePicker = null;
+        return;
+    }
+
+    String resourceName = eventData["FileName"].GetString();
+    Resource@ res = GetPickedResource(resourceName);
+
+    if (res !is null && editMaterial !is null)
+    {
+        editMaterial.textures[resourcePickIndex] = res;
+        RefreshMaterialTextures();
+    }
+
+    @resourcePicker = null;
+}
+
+void EditMaterialTexture(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null)
+        return;
+
+    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    String textureName = attrEdit.text.Trimmed();
+    uint index = attrEdit.vars["Index"].GetUInt();
+    
+    if (!textureName.empty)
+    {
+        Texture@ texture = cache.GetResource(GetExtension(textureName) == ".xml" ? "TextureCube" : "Texture2D", textureName);
+        editMaterial.textures[index] = texture;
+    }
+    else
+        editMaterial.textures[index] =null;
+
+}
+

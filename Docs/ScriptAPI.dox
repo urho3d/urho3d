@@ -83,6 +83,7 @@ namespace Urho3D
 - uint GetFloat32Format()
 - uint GetDepthStencilFormat()
 - uint GetFormat(const String&)
+- String GetTextureUnitName(TextureUnit)
 - void MarkNetworkUpdate()
 - void DelayedExecute(float, bool, const String&, const Variant[]@)
 - void DelayedExecute(float, bool, const String&)
