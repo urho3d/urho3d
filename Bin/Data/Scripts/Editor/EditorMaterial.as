@@ -76,34 +76,58 @@ void RefreshMaterialTechniques()
     list.RemoveAllItems();
 }
 
-void RefreshMaterialTextures()
+void RefreshMaterialTextures(bool fullUpdate = true)
 {
-    ListView@ list = materialWindow.GetChild("TextureList");
-    list.RemoveAllItems();
-
-    for (uint i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+    if (fullUpdate)
     {
-        UIElement@ parent = CreateAttributeEditorParentWithSeparatedLabel(list, GetTextureUnitName(TextureUnit(i)), i, 0, false);
-        
-        UIElement@ container = UIElement();
-        container.SetLayout(LM_HORIZONTAL, 4, IntRect(10, 0, 4, 0));
-        container.SetFixedHeight(ATTR_HEIGHT);
-        parent.AddChild(container);
-
-        LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
-        Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
-        SubscribeToEvent(pickButton, "Released", "PickMaterialTexture");
-        Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
-        SubscribeToEvent(openButton, "Released", "OpenResource");
-
-        if (editMaterial !is null)
+        ListView@ list = materialWindow.GetChild("TextureList");
+        list.RemoveAllItems();
+    
+        for (uint i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         {
-            Texture@ texture = editMaterial.textures[i];
-            if (texture !is null)
-                nameEdit.text = texture.name;
+            UIElement@ parent = CreateAttributeEditorParentWithSeparatedLabel(list, GetTextureUnitName(TextureUnit(i)), i, 0, false);
+            
+            UIElement@ container = UIElement();
+            container.SetLayout(LM_HORIZONTAL, 4, IntRect(10, 0, 4, 0));
+            container.SetFixedHeight(ATTR_HEIGHT);
+            parent.AddChild(container);
+    
+            LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
+            nameEdit.name = "TextureNameEdit" + String(i);
+    
+            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+            SubscribeToEvent(pickButton, "Released", "PickMaterialTexture");
+            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
+            SubscribeToEvent(openButton, "Released", "OpenResource");
+    
+            if (editMaterial !is null)
+            {
+                Texture@ texture = editMaterial.textures[i];
+                if (texture !is null)
+                    nameEdit.text = texture.name;
+            }
+            
+            SubscribeToEvent(nameEdit, "TextFinished", "EditMaterialTexture");
         }
-        
-        SubscribeToEvent(nameEdit, "TextFinished", "EditMaterialTexture");
+    }
+    else
+    {
+        for (uint i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
+        {
+            LineEdit@ nameEdit = materialWindow.GetChild("TextureNameEdit" + String(i), true);
+            if (nameEdit is null)
+                continue;
+    
+            String textureName;
+            if (editMaterial !is null)
+            {
+                Texture@ texture = editMaterial.textures[i];
+                if (texture !is null)
+                    textureName = texture.name;
+            }
+            
+            nameEdit.text = textureName;
+        }
     }
 }
 
@@ -363,7 +387,7 @@ void PickMaterialTextureDone(StringHash eventType, VariantMap& eventData)
     if (res !is null && editMaterial !is null)
     {
         editMaterial.textures[resourcePickIndex] = res;
-        RefreshMaterialTextures();
+        RefreshMaterialTextures(false);
     }
 
     @resourcePicker = null;
