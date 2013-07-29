@@ -2045,6 +2045,8 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
+- bool Load(const XMLElement&)
+- bool Save(XMLElement&) const
 - void SetTechnique(uint, Technique@, uint arg2 = 0, float arg3 = 0.0)
 - void SetUVTransform(const Vector2&, float, const Vector2&)
 - void SetUVTransform(const Vector2&, float, float)

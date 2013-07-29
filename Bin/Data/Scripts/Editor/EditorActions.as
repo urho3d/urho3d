@@ -701,3 +701,40 @@ class ApplyUIElementStyleAction : EditAction
         ApplyStyle(elementNewStyle);
     }
 }
+
+class EditMaterialAction : EditAction
+{
+    XMLFile@ oldState;
+    XMLFile@ newState;
+    WeakHandle material;
+    
+    void Define(Material@ material_, XMLFile@ oldState_)
+    {
+        material = material_;
+        oldState = oldState_;
+        newState = XMLFile();
+        
+        XMLElement materialElem = newState.CreateRoot("material");
+        material_.Save(materialElem);
+    }
+
+    void Undo()
+    {
+        Material@ mat = material.Get();
+        if (mat !is null)
+        {
+            mat.Load(oldState.root);
+            RefreshMaterialEditor();
+        }
+    }
+
+    void Redo()
+    {
+        Material@ mat = material.Get();
+        if (mat !is null)
+        {
+            mat.Load(newState.root);
+            RefreshMaterialEditor();
+        }
+    }
+}

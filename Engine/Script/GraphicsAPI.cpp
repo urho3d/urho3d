@@ -559,6 +559,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Technique", "Pass@+ get_passes(StringHash)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
     
     RegisterResource<Material>(engine, "Material");
+    engine->RegisterObjectMethod("Material", "bool Load(const XMLElement&in)", asMETHODPR(Material, Load, (const XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "bool Save(XMLElement&in) const", asMETHODPR(Material, Save, (XMLElement&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetTechnique(uint, Technique@+, uint qualityLevel = 0, float lodDistance = 0.0)", asMETHOD(Material, SetTechnique), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, const Vector2&in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, float)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, float), void), asCALL_THISCALL);

@@ -2,6 +2,7 @@
 
 Window@ materialWindow;
 Material@ editMaterial;
+XMLFile@ oldMaterialState;
 
 void CreateMaterialEditor()
 {
@@ -31,7 +32,7 @@ void CreateMaterialEditor()
 
 bool ShowMaterialEditor()
 {
-    materialWindow.visible = true;       
+    materialWindow.visible = true;
     materialWindow.BringToFront();
     return true;
 }
@@ -301,7 +302,9 @@ void EditShaderParameter(StringHash eventType, VariantMap& eventData)
     Variant newValue;
     newValue.FromString(oldValue.type, valueString);
     
+    BeginMaterialEdit();
     editMaterial.shaderParameters[name] = newValue;
+    EndMaterialEdit();
 }
 
 void CreateShaderParameter(StringHash eventType, VariantMap& eventData)
@@ -333,7 +336,10 @@ void CreateShaderParameter(StringHash eventType, VariantMap& eventData)
         break;
     }
 
+    BeginMaterialEdit();
     editMaterial.shaderParameters[newName] = newValue;
+    EndMaterialEdit();
+
     RefreshMaterialShaderParameters();
 }
 
@@ -347,7 +353,10 @@ void DeleteShaderParameter()
     if (name.empty)
         return;
 
+    BeginMaterialEdit();
     editMaterial.RemoveShaderParameter(name);
+    EndMaterialEdit();
+
     RefreshMaterialShaderParameters();
 }
 
@@ -386,7 +395,10 @@ void PickMaterialTextureDone(StringHash eventType, VariantMap& eventData)
 
     if (res !is null && editMaterial !is null)
     {
+        BeginMaterialEdit();
         editMaterial.textures[resourcePickIndex] = res;
+        EndMaterialEdit();
+
         RefreshMaterialTextures(false);
     }
 
@@ -402,6 +414,8 @@ void EditMaterialTexture(StringHash eventType, VariantMap& eventData)
     String textureName = attrEdit.text.Trimmed();
     uint index = attrEdit.vars["Index"].GetUInt();
     
+    BeginMaterialEdit();
+
     if (!textureName.empty)
     {
         Texture@ texture = cache.GetResource(GetExtension(textureName) == ".xml" ? "TextureCube" : "Texture2D", textureName);
@@ -410,5 +424,26 @@ void EditMaterialTexture(StringHash eventType, VariantMap& eventData)
     else
         editMaterial.textures[index] =null;
 
+    EndMaterialEdit();
+
 }
 
+void BeginMaterialEdit()
+{
+    if (editMaterial is null)
+        return;
+
+    oldMaterialState = XMLFile();
+    XMLElement materialElem = oldMaterialState.CreateRoot("material");
+    editMaterial.Save(materialElem);
+}
+
+void EndMaterialEdit()
+{
+    if (editMaterial is null)
+        return;
+
+    EditMaterialAction@ action = EditMaterialAction();
+    action.Define(editMaterial, oldMaterialState);
+    SaveEditAction(action);
+}

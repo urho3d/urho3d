@@ -129,16 +129,36 @@ bool Material::Load(Deserializer& source)
     if (!graphics)
         return true;
     
-    ResetToDefaults();
-    
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
     
     XMLElement rootElem = xml->GetRoot();
-    XMLElement techniqueElem = rootElem.GetChild("technique");
+    return Load(rootElem);
+}
+
+bool Material::Save(Serializer& dest) const
+{
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+    XMLElement materialElem = xml->CreateRoot("material");
+    
+    Save(materialElem);
+    return xml->Save(dest);
+}
+
+bool Material::Load(const XMLElement& source)
+{
+    ResetToDefaults();
+    
+    if (source.IsNull())
+    {
+        LOGERROR("Can not load material from null XML element");
+        return false;
+    }
+    
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    XMLElement techniqueElem = source.GetChild("technique");
     techniques_.Clear();
     while (techniqueElem)
     {
@@ -156,7 +176,7 @@ bool Material::Load(Deserializer& source)
         techniqueElem = techniqueElem.GetNext("technique");
     }
     
-    XMLElement textureElem = rootElem.GetChild("texture");
+    XMLElement textureElem = source.GetChild("texture");
     while (textureElem)
     {
         TextureUnit unit = TU_DIFFUSE;
@@ -184,7 +204,7 @@ bool Material::Load(Deserializer& source)
         textureElem = textureElem.GetNext("texture");
     }
     
-    XMLElement parameterElem = rootElem.GetChild("parameter");
+    XMLElement parameterElem = source.GetChild("parameter");
     while (parameterElem)
     {
         String name = parameterElem.GetAttribute("name");
@@ -194,15 +214,15 @@ bool Material::Load(Deserializer& source)
         parameterElem = parameterElem.GetNext("parameter");
     }
     
-    XMLElement cullElem = rootElem.GetChild("cull");
+    XMLElement cullElem = source.GetChild("cull");
     if (cullElem)
         SetCullMode((CullMode)GetStringListIndex(cullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
     
-    XMLElement shadowCullElem = rootElem.GetChild("shadowcull");
+    XMLElement shadowCullElem = source.GetChild("shadowcull");
     if (shadowCullElem)
         SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
     
-    XMLElement depthBiasElem = rootElem.GetChild("depthbias");
+    XMLElement depthBiasElem = source.GetChild("depthbias");
     if (depthBiasElem)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
     
@@ -218,10 +238,13 @@ bool Material::Load(Deserializer& source)
     return true;
 }
 
-bool Material::Save(Serializer& dest) const
+bool Material::Save(XMLElement& dest) const
 {
-    SharedPtr<XMLFile> xml(new XMLFile(context_));
-    XMLElement materialElem = xml->CreateRoot("material");
+    if (dest.IsNull())
+    {
+        LOGERROR("Can not save material to null XML element");
+        return false;
+    }
     
     // Write techniques
     for (unsigned i = 0; i < techniques_.Size(); ++i)
@@ -230,7 +253,7 @@ bool Material::Save(Serializer& dest) const
         if (!entry.technique_)
             continue;
         
-        XMLElement techniqueElem = materialElem.CreateChild("technique");
+        XMLElement techniqueElem = dest.CreateChild("technique");
         techniqueElem.SetString("name", entry.technique_->GetName());
         techniqueElem.SetInt("quality", entry.qualityLevel_);
         techniqueElem.SetFloat("loddistance", entry.lodDistance_);
@@ -242,7 +265,7 @@ bool Material::Save(Serializer& dest) const
         Texture* texture = GetTexture((TextureUnit)j);
         if (texture)
         {
-            XMLElement textureElem = materialElem.CreateChild("texture");
+            XMLElement textureElem = dest.CreateChild("texture");
             textureElem.SetString("unit", textureUnitNames[j]);
             textureElem.SetString("name", texture->GetName());
         }
@@ -251,24 +274,24 @@ bool Material::Save(Serializer& dest) const
     // Write shader parameters
     for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin(); j != shaderParameters_.End(); ++j)
     {
-        XMLElement parameterElem = materialElem.CreateChild("parameter");
+        XMLElement parameterElem = dest.CreateChild("parameter");
         parameterElem.SetString("name", j->second_.name_);
         parameterElem.SetVectorVariant("value", j->second_.value_);
     }
     
     // Write culling modes
-    XMLElement cullElem = materialElem.CreateChild("cull");
+    XMLElement cullElem = dest.CreateChild("cull");
     cullElem.SetString("value", cullModeNames[cullMode_]);
     
-    XMLElement shadowCullElem = materialElem.CreateChild("shadowcull");
+    XMLElement shadowCullElem = dest.CreateChild("shadowcull");
     shadowCullElem.SetString("value", cullModeNames[shadowCullMode_]);
     
     // Write depth bias
-    XMLElement depthBiasElem = materialElem.CreateChild("depthbias");
+    XMLElement depthBiasElem = dest.CreateChild("depthbias");
     depthBiasElem.SetFloat("constant", depthBias_.constantBias_);
     depthBiasElem.SetFloat("slopescaled", depthBias_.slopeScaledBias_);
     
-    return xml->Save(dest);
+    return true;
 }
 
 void Material::SetNumTechniques(unsigned num)

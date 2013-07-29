@@ -81,6 +81,10 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     
+    /// Load from an XML element. Return true if successful.
+    bool Load(const XMLElement& source);
+    /// Save to an XML element. Return true if successful.
+    bool Save(XMLElement& dest) const;
     /// Set number of techniques.
     void SetNumTechniques(unsigned num);
     /// Set technique.
