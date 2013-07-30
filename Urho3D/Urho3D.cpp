@@ -64,8 +64,7 @@ void Urho3D::Setup()
     
     #if defined(ANDROID) || defined(IOS)
     // Can not pass script name on mobile devices, so choose a hardcoded default
-    // scriptFileName_ = "Scripts/NinjaSnowWar.as";
-    scriptFileName_ = "LuaScripts/TestSceneAndroid.lua";
+    scriptFileName_ = "Scripts/NinjaSnowWar.as";
     #endif
     
     // Show usage if not found
