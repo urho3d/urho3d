@@ -61,7 +61,7 @@ static const Vector3* directions[] =
 };
 
 static const int CHECK_DRAWABLES_PER_WORK_ITEM = 64;
-static const float LIGHT_INTENSITY_THRESHOLD = 0.001f;
+static const float LIGHT_INTENSITY_THRESHOLD = 0.003f;
 
 /// %Frustum octree query for shadowcasters.
 class ShadowCasterOctreeQuery : public FrustumOctreeQuery
@@ -692,7 +692,7 @@ void View::GetDrawables()
         {
             Light* light = static_cast<Light*>(drawable);
             // Skip lights which are so dim that they can not contribute to a rendertarget
-            if (light->GetColor().Intensity() > LIGHT_INTENSITY_THRESHOLD)
+            if (light->GetColor().SumRGB() > LIGHT_INTENSITY_THRESHOLD)
                 lights_.Push(light);
         }
     }

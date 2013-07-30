@@ -449,7 +449,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         if (light->GetLightType() != LIGHT_DIRECTIONAL && fadeEnd > 0.0f && fadeStart > 0.0f && fadeStart < fadeEnd)
             fade = Min(1.0f - (light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
         
-        graphics->SetShaderParameter(PSP_LIGHTCOLOR, Vector4(light->GetColor().RGBValues(), light->GetSpecularIntensity()) * fade);
+        graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetColor(), light->GetSpecularIntensity()) * fade);
         graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
         graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() - cameraNode->GetWorldPosition(), atten));
         

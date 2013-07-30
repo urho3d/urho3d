@@ -1089,6 +1089,21 @@ static CScriptArray* ColorData(Color* ptr)
     return BufferToArray<float>(ptr->Data(), 4, "float[]");
 }
 
+static float ColorHue(Color* ptr)
+{
+    return ptr->Hue();
+}
+
+static float ColorSaturationHSL(Color* ptr)
+{
+    return ptr->SaturationHSL();
+}
+
+static float ColorSaturationHSV(Color* ptr)
+{
+    return ptr->SaturationHSV();
+}
+
 static void RegisterColor(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Color", sizeof(Color), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
@@ -1097,16 +1112,36 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructColorRGBA), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(ConstructColorRGB), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Color", asBEHAVE_CONSTRUCT, "void f(float[]&)", asFUNCTION(ConstructColorArrayInit), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Color", "float[]& get_data() const", asFUNCTION(ColorData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Color", "Color& opAssign(const Color&in)", asMETHOD(Color, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color& opAddAssign(const Color&in)", asMETHOD(Color, operator +=), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "bool opEquals(const Color&in) const", asMETHOD(Color, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color opMul(float) const", asMETHOD(Color, operator *), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color opAdd(const Color&in) const", asMETHOD(Color, operator +), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float[]& get_data() const", asFUNCTION(ColorData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Color", "uint ToUInt() const", asMETHOD(Color, ToUInt), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "Vector3 ToHSL() const", asMETHOD(Color, ToHSL), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "Vector3 ToHSV() const", asMETHOD(Color, ToHSV), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "void FromHSL(float, float, float, float)", asMETHOD(Color, FromHSL), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "void FromHSV(float, float, float, float)", asMETHOD(Color, FromHSV), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "Vector3 get_rgb() const", asMETHOD(Color, ToVector3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "Vector4 get_rgba() const", asMETHOD(Color, ToVector4), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float SumRGB() const", asMETHOD(Color, SumRGB), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float Average() const", asMETHOD(Color, Average), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float Luma() const", asMETHOD(Color, Luma), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float Chroma() const", asMETHOD(Color, Chroma), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float Hue() const", asFUNCTION(ColorHue), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Color", "float SaturationHSL() const", asFUNCTION(ColorSaturationHSL), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Color", "float SaturationHSV() const", asFUNCTION(ColorSaturationHSV), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Color", "float Value(void) const", asMETHOD(Color, Value), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float Lightness() const", asMETHOD(Color, Lightness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float MaxRGB() const", asMETHOD(Color, MaxRGB), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float MinRGB() const", asMETHOD(Color, MinRGB), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float Range() const", asMETHOD(Color, Range), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "void Clip(bool)", asMETHOD(Color, Clip), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "void Invert(bool)", asMETHOD(Color, Invert), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color Lerp(const Color&in, float) const", asMETHOD(Color, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "String ToString() const", asMETHOD(Color, ToString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Color", "Vector3 get_rgb() const", asMETHOD(Color, RGBValues), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Color", "float get_intensity() const", asMETHOD(Color, Intensity), asCALL_THISCALL);
+
     engine->RegisterObjectProperty("Color", "float r", offsetof(Color, r_));
     engine->RegisterObjectProperty("Color", "float g", offsetof(Color, g_));
     engine->RegisterObjectProperty("Color", "float b", offsetof(Color, b_));
