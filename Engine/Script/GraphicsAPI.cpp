@@ -485,6 +485,31 @@ static void ConstructBiasParametersInit(float constantBias, float slopeScaledBia
     new(ptr) BiasParameters(constantBias, slopeScaledBias);
 }
 
+static void ConstructTechniqueEntry(TechniqueEntry* ptr)
+{
+    new(ptr) TechniqueEntry();
+}
+
+static void ConstructTechniqueEntryCopy(const TechniqueEntry& entry, TechniqueEntry* ptr)
+{
+    new(ptr) TechniqueEntry(entry);
+}
+
+static void DestructTechniqueEntry(TechniqueEntry* ptr)
+{
+    ptr->~TechniqueEntry();
+}
+
+static void TechniqueEntrySetTechnique(Technique* technique, TechniqueEntry* ptr)
+{
+    ptr->technique_ = technique;
+}
+
+static Technique* TechniqueEntryGetTechnique(TechniqueEntry* ptr)
+{
+    return ptr->technique_;
+}
+
 static CScriptArray* MaterialGetShaderParameterNames(Material* material)
 {
     Vector<String> result;
@@ -495,6 +520,19 @@ static CScriptArray* MaterialGetShaderParameterNames(Material* material)
 
     Sort(result.Begin(), result.End());
     return VectorToArray<String>(result, "Array<String>");
+}
+
+static TechniqueEntry noTechniqueEntry;
+
+static const TechniqueEntry& MaterialGetTechniqueEntry(unsigned index, Material* ptr)
+{
+    if (index >= ptr->GetNumTechniques())
+    {
+        asGetActiveContext()->SetException("Index out of bounds");
+        return noTechniqueEntry;
+    }
+    
+    return ptr->GetTechniqueEntry(index);
 }
 
 static void RegisterMaterial(asIScriptEngine* engine)
@@ -558,6 +596,15 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Technique", "bool get_sm3() const", asMETHOD(Technique, IsSM3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "Pass@+ get_passes(StringHash)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
     
+    engine->RegisterObjectType("TechniqueEntry", sizeof(TechniqueEntry), asOBJ_VALUE | asOBJ_APP_CLASS_CD);
+    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructTechniqueEntry), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f(const TechniqueEntry&in)", asFUNCTION(ConstructTechniqueEntry), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructTechniqueEntry), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("TechniqueEntry", "void set_technique(Technique@+)", asFUNCTION(TechniqueEntrySetTechnique), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("TechniqueEntry", "Technique@+ get_technique() const", asFUNCTION(TechniqueEntryGetTechnique), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("TechniqueEntry", "int qualityLevel", offsetof(TechniqueEntry, qualityLevel_));
+    engine->RegisterObjectProperty("TechniqueEntry", "float lodDistance", offsetof(TechniqueEntry, lodDistance_));
+
     RegisterResource<Material>(engine, "Material");
     engine->RegisterObjectMethod("Material", "bool Load(const XMLElement&in)", asMETHODPR(Material, Load, (const XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool Save(XMLElement&in) const", asMETHODPR(Material, Save, (XMLElement&) const, bool), asCALL_THISCALL);
@@ -569,6 +616,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_techniques(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "const TechniqueEntry& get_techniqueEntries(uint) const", asFUNCTION(MaterialGetTechniqueEntry), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_shaderParameters(const String&in, const Variant&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "const Variant& get_shaderParameters(const String&in) const", asMETHOD(Material, GetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Array<String>@ get_shaderParameterNames() const", asFUNCTION(MaterialGetShaderParameterNames), asCALL_CDECL_OBJLAST);

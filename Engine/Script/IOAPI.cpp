@@ -287,7 +287,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     RegisterSerializer<File>(engine, "File");
     RegisterDeserializer<File>(engine, "File");
 
-    engine->RegisterObjectType("VectorBuffer", sizeof(VectorBuffer), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
+    engine->RegisterObjectType("VectorBuffer", sizeof(VectorBuffer), asOBJ_VALUE | asOBJ_APP_CLASS_CDK);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVectorBufferCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer@+, uint)", asFUNCTION(ConstructVectorBufferFromStream), asCALL_CDECL_OBJLAST);

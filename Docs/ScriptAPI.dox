@@ -683,13 +683,32 @@ Properties:<br>
 Color
 
 Methods:<br>
+- uint ToUInt() const
+- Vector3 ToHSL() const
+- Vector3 ToHSV() const
+- void FromHSL(float, float, float, float)
+- void FromHSV(float, float, float, float)
+- float SumRGB() const
+- float Average() const
+- float Luma() const
+- float Chroma() const
+- float Hue() const
+- float SaturationHSL() const
+- float SaturationHSV() const
+- float Value() const
+- float Lightness() const
+- float MaxRGB() const
+- float MinRGB() const
+- float Range() const
+- void Clip(bool)
+- void Invert(bool)
 - Color Lerp(const Color&, float) const
 - String ToString() const
 
 Properties:<br>
 - float[] data (readonly)
 - Vector3 rgb (readonly)
-- float intensity (readonly)
+- Vector4 rgba (readonly)
 - float r
 - float g
 - float b
@@ -2039,6 +2058,14 @@ Properties:<br>
 - Pass@[] passes (readonly)
 
 
+TechniqueEntry
+
+Properties:<br>
+- Technique@ technique
+- int qualityLevel
+- float lodDistance
+
+
 Material
 
 Methods:<br>
@@ -2064,6 +2091,7 @@ Properties:<br>
 - uint useTimer (readonly)
 - uint numTechniques
 - Technique@[] techniques (readonly)
+- TechniqueEntry[] techniqueEntries (readonly)
 - Variant[] shaderParameters
 - String[]@ shaderParameterNames (readonly)
 - Texture@[] textures
