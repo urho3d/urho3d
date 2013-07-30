@@ -217,7 +217,10 @@ void RevertMaterial()
     if (editMaterial is null)
         return;
 
+    BeginMaterialEdit();
     cache.ReloadResource(editMaterial);
+    EndMaterialEdit();
+    
     RefreshMaterialEditor();
 }
 
