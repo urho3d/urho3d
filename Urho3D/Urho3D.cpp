@@ -64,7 +64,8 @@ void Urho3D::Setup()
     
     #if defined(ANDROID) || defined(IOS)
     // Can not pass script name on mobile devices, so choose a hardcoded default
-    scriptFileName_ = "Scripts/NinjaSnowWar.as";
+    // scriptFileName_ = "Scripts/NinjaSnowWar.as";
+    scriptFileName_ = "LuaScripts/TestSceneAndroid.lua";
     #endif
     
     // Show usage if not found
@@ -132,7 +133,7 @@ void Urho3D::Start()
         LuaScript* luaScript = GetSubsystem<LuaScript>();
 
         // If script loading is successful, proceed to main loop
-        if (luaScript->ExecuteFile(scriptFileName_.CString()))
+        if (luaScript->ExecuteFile(scriptFileName_))
         {
             luaScript->ExecuteFunction("Start");
             return;

@@ -319,7 +319,7 @@ void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
-    ExecuteString(eventData[P_COMMAND].GetString().CString());
+    ExecuteString(eventData[P_COMMAND].GetString());
 }
 
 Context* GetContext()
