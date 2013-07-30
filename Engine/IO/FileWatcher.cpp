@@ -98,7 +98,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     {
         path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
-        Start();
+        Run();
         
         LOGDEBUG("Started watching path " + pathName);
         return true;
@@ -147,7 +147,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
                 }
             }
         }
-        Start();
+        Run();
 
         LOGDEBUG("Started watching path " + pathName);
         return true;
@@ -156,7 +156,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     if (!supported_)
     {
         LOGERROR("Individual file watching not supported by this OS version, can not start watching path " + pathName);
-        return false;        
+        return false;
     }
     
     watcher_ = CreateFileWatcher(pathName.CString(), watchSubDirs);
@@ -164,7 +164,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     {
         path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
-        Start();
+        Run();
         
         LOGDEBUG("Started watching path " + pathName);
         return true;

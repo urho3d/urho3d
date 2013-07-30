@@ -38,7 +38,7 @@ public:
     virtual void ThreadFunction() = 0;
     
     /// Start running the thread. Return true if successful, or false if already running or if can not create the thread.
-    bool Start();
+    bool Run();
     /// Set the running flag to false and wait for the thread to finish.
     void Stop();
     /// Set thread priority. The thread must have been started first.

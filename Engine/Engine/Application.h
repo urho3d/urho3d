@@ -39,26 +39,23 @@ class Application : public Object
 public:
     /// Construct. Parse default engine parameters from the command line, and create the engine in an uninitialized state.
     Application(Context* context);
-
     /// Destruct.
     ~Application();
-
-    /// Setup before engine initialization. This is a chance to eg. modify the engine parameters. Call ErrorExit() to terminate without initializing the engine.
-    virtual void Setup() {}
-
-    /// Setup after engine initialization and before running the main loop. Call ErrorExit() to terminate without running the main loop.
-    virtual void Start() {}
-
-    /// Cleanup after the main loop.
-    virtual void Stop() {}
 
     /// Initialize the engine and run the main loop, then return the application exit code. Catch out-of-memory exceptions while running.
     int Run();
 
+protected:
+    /// Setup before engine initialization. This is a chance to eg. modify the engine parameters. Call ErrorExit() to terminate without initializing the engine.
+    virtual void Setup() {}
+    /// Setup after engine initialization and before running the main loop. Call ErrorExit() to terminate without running the main loop.
+    virtual void Start() {}
+    /// Cleanup after the main loop.
+    virtual void Stop() {}
+
     /// Show an error message (last log message if empty), terminate the main loop, and set failure exit code.
     void ErrorExit(const String& message = String::EMPTY);
 
-protected:
     /// Urho3D engine.
     SharedPtr<Engine> engine_;
     /// Engine parameters map.

@@ -62,7 +62,7 @@ Thread::~Thread()
     Stop();
 }
 
-bool Thread::Start()
+bool Thread::Run()
 {
     // Check if already running
     if (handle_)

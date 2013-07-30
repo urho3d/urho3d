@@ -234,21 +234,21 @@ void asCGlobalProperty::RegisterGCBehaviours(asCScriptEngine *engine)
 	engine->globalPropertyBehaviours.flags = asOBJ_REF | asOBJ_GC;
 	engine->globalPropertyBehaviours.name = "_builtin_globalprop_";
 #ifndef AS_MAX_PORTABILITY
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_ADDREF, "void f()", asMETHOD(asCGlobalProperty,AddRef), asCALL_THISCALL); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_RELEASE, "void f()", asMETHOD(asCGlobalProperty,Release), asCALL_THISCALL); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_GETREFCOUNT, "int f()", asMETHOD(asCGlobalProperty,GetRefCount), asCALL_THISCALL); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_SETGCFLAG, "void f()", asMETHOD(asCGlobalProperty,SetGCFlag), asCALL_THISCALL); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_GETGCFLAG, "bool f()", asMETHOD(asCGlobalProperty,GetGCFlag), asCALL_THISCALL); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_ENUMREFS, "void f(int&in)", asMETHOD(asCGlobalProperty,EnumReferences), asCALL_THISCALL); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_RELEASEREFS, "void f(int&in)", asMETHOD(asCGlobalProperty,ReleaseAllHandles), asCALL_THISCALL); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_ADDREF, "void f()", asMETHOD(asCGlobalProperty,AddRef), asCALL_THISCALL, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_RELEASE, "void f()", asMETHOD(asCGlobalProperty,Release), asCALL_THISCALL, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_GETREFCOUNT, "int f()", asMETHOD(asCGlobalProperty,GetRefCount), asCALL_THISCALL, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_SETGCFLAG, "void f()", asMETHOD(asCGlobalProperty,SetGCFlag), asCALL_THISCALL, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_GETGCFLAG, "bool f()", asMETHOD(asCGlobalProperty,GetGCFlag), asCALL_THISCALL, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_ENUMREFS, "void f(int&in)", asMETHOD(asCGlobalProperty,EnumReferences), asCALL_THISCALL, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_RELEASEREFS, "void f(int&in)", asMETHOD(asCGlobalProperty,ReleaseAllHandles), asCALL_THISCALL, 0); asASSERT( r >= 0 );
 #else
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_ADDREF, "void f()", asFUNCTION(GlobalProperty_AddRef_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_RELEASE, "void f()", asFUNCTION(GlobalProperty_Release_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_GETREFCOUNT, "int f()", asFUNCTION(GlobalProperty_GetRefCount_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_SETGCFLAG, "void f()", asFUNCTION(GlobalProperty_SetGCFlag_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_GETGCFLAG, "bool f()", asFUNCTION(GlobalProperty_GetGCFlag_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_ENUMREFS, "void f(int&in)", asFUNCTION(GlobalProperty_EnumReferences_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
-	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_RELEASEREFS, "void f(int&in)", asFUNCTION(GlobalProperty_ReleaseAllHandles_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_ADDREF, "void f()", asFUNCTION(GlobalProperty_AddRef_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_RELEASE, "void f()", asFUNCTION(GlobalProperty_Release_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_GETREFCOUNT, "int f()", asFUNCTION(GlobalProperty_GetRefCount_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_SETGCFLAG, "void f()", asFUNCTION(GlobalProperty_SetGCFlag_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_GETGCFLAG, "bool f()", asFUNCTION(GlobalProperty_GetGCFlag_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_ENUMREFS, "void f(int&in)", asFUNCTION(GlobalProperty_EnumReferences_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
+	r = engine->RegisterBehaviourToObjectType(&engine->globalPropertyBehaviours, asBEHAVE_RELEASEREFS, "void f(int&in)", asFUNCTION(GlobalProperty_ReleaseAllHandles_Generic), asCALL_GENERIC, 0); asASSERT( r >= 0 );
 #endif
 }
 

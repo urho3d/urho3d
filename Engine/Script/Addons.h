@@ -92,7 +92,7 @@ protected:
     int elementSize;
     int subTypeId;
 
-    bool Less(const void *a, const void *b, bool asc, asIScriptContext *ctx);
+    bool Less(const void *a, const void *b, bool asc, asIScriptContext *ctx, SArrayCache *cache);
     void *GetArrayItemPointer(int index);
     void *GetDataPointer(void *buffer);
     void Copy(void *dst, void *src);

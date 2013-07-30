@@ -551,6 +551,10 @@ int asCDataType::GetSizeInMemoryDWords() const
 	if( s == 0 ) return 0;
 	if( s <= 4 ) return 1;
 	
+	// Pad the size to 4 bytes
+	if( s & 0x3 )
+		s += 4 - (s & 0x3);
+
 	return s/4;
 }
 

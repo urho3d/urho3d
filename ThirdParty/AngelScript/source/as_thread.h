@@ -70,12 +70,8 @@ protected:
 	int refCount;
 
 #ifndef AS_NO_THREADS
+	asDWORD tlsKey;
 	DECLARECRITICALSECTION(criticalSection);
-
-	asCThreadLocalData *GetLocalData(asPWORD threadId);
-	void SetLocalData(asPWORD threadId, asCThreadLocalData *tld);
-
-	asCMap<asPWORD,asCThreadLocalData*> tldMap;
 #else
 	asCThreadLocalData *tld;
 #endif

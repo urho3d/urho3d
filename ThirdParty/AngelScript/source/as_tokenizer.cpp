@@ -255,13 +255,16 @@ bool asCTokenizer::IsConstant(const char *source, size_t sourceLength, size_t &t
 				break;
 		}
 
-		if( n < sourceLength && source[n] == '.' )
+		if( n < sourceLength && (source[n] == '.' || source[n] == 'e' || source[n] == 'E') )
 		{
-			n++;
-			for( ; n < sourceLength; n++ )
+			if( source[n] == '.' )
 			{
-				if( source[n] < '0' || source[n] > '9' )
-					break;
+				n++;
+				for( ; n < sourceLength; n++ )
+				{
+					if( source[n] < '0' || source[n] > '9' )
+						break;
+				}
 			}
 
 			if( n < sourceLength && (source[n] == 'e' || source[n] == 'E') )

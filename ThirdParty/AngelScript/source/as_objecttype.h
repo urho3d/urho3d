@@ -92,6 +92,7 @@ struct asSTypeBehaviour
 		gcEnumReferences = 0; 
 		gcReleaseAllReferences = 0;
 		templateCallback = 0;
+		getWeakRefFlag = 0;
 	}
 
 	int factory;
@@ -104,14 +105,17 @@ struct asSTypeBehaviour
 	int addref;
 	int release;
 	int templateCallback;
-	
+
 	// GC behaviours
 	int gcGetRefCount;
 	int gcSetFlag;
 	int gcGetFlag;
 	int gcEnumReferences;
 	int gcReleaseAllReferences;
-	
+
+	// Weakref behaviours
+	int getWeakRefFlag;
+
 	asCArray<int> factories;
 	asCArray<int> constructors;
 	asCArray<int> operators;
@@ -137,6 +141,7 @@ public:
 	asIScriptEngine *GetEngine() const;
 	const char      *GetConfigGroup() const;
 	asDWORD          GetAccessMask() const;
+	asIScriptModule *GetModule() const;
 
 	// Memory management
 	int AddRef() const;
@@ -161,22 +166,11 @@ public:
 
 	// Factories
 	asUINT             GetFactoryCount() const;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-25
-	int                GetFactoryIdByIndex(asUINT index) const;
-	int                GetFactoryIdByDecl(const char *decl) const;
-#endif
 	asIScriptFunction *GetFactoryByIndex(asUINT index) const;
 	asIScriptFunction *GetFactoryByDecl(const char *decl) const;
 
 	// Methods
 	asUINT             GetMethodCount() const;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-25
-	int                GetMethodIdByIndex(asUINT index, bool getVirtual) const;
-	int                GetMethodIdByName(const char *name, bool getVirtual) const;
-	int                GetMethodIdByDecl(const char *decl, bool getVirtual) const;
-#endif
 	asIScriptFunction *GetMethodByIndex(asUINT index, bool getVirtual) const;
 	asIScriptFunction *GetMethodByName(const char *name, bool getVirtual) const;
 	asIScriptFunction *GetMethodByDecl(const char *decl, bool getVirtual) const;

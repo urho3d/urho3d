@@ -58,8 +58,8 @@ BEGIN_AS_NAMESPACE
 // We need at least 1 PTR reserved for calling system functions
 const int RESERVE_STACK = 2*AS_PTR_SIZE;
 
-// For each script function call we push 5 PTRs on the call stack
-const int CALLSTACK_FRAME_SIZE = 5;
+// For each script function call we push 9 PTRs on the call stack
+const int CALLSTACK_FRAME_SIZE = 9;
 
 
 #if defined(AS_DEBUG)
@@ -143,21 +143,11 @@ AS_API asIScriptContext *asGetActiveContext()
 	return tld->activeContexts[tld->activeContexts.GetLength()-1];
 }
 
-void asPushActiveContext(asIScriptContext *ctx)
+asCThreadLocalData *asPushActiveContext(asIScriptContext *ctx)
 {
 	asCThreadLocalData *tld = asCThreadManager::GetLocalData();
 	tld->activeContexts.PushLast(ctx);
-}
-
-void asPopActiveContext(asIScriptContext *ctx)
-{
-	asCThreadLocalData *tld = asCThreadManager::GetLocalData();
-
-	asASSERT(tld->activeContexts.GetLength() > 0);
-	asASSERT(tld->activeContexts[tld->activeContexts.GetLength()-1] == ctx);
-	UNUSED_VAR(ctx);
-
-	tld->activeContexts.PopLast();
+	return tld;
 }
 
 asCContext::asCContext(asCScriptEngine *engine, bool holdRef)
@@ -296,22 +286,6 @@ void *asCContext::GetUserData() const
 {
 	return m_userData;
 }
-
-#ifdef AS_DEPRECATED
-// Deprecated since 2.24.0 - 2012-05-25
-// interface
-int asCContext::Prepare(int funcId)
-{
-	if( funcId == -1 )
-	{
-		if( m_initialFunction == 0 )
-			return asNO_FUNCTION;
-
-		funcId = m_initialFunction->GetId();
-	}
-	return Prepare(m_engine->GetFunctionById(funcId));
-}
-#endif
 
 // interface
 asIScriptFunction *asCContext::GetSystemFunction()
@@ -967,7 +941,7 @@ int asCContext::SetArgObject(asUINT arg, void *obj)
 		}
 		else
 		{
-			obj = m_engine->CreateScriptObjectCopy(obj, m_engine->GetTypeIdFromDataType(*dt));
+			obj = m_engine->CreateScriptObjectCopy(obj, dt->GetObjectType());
 		}
 	}
 
@@ -1069,7 +1043,7 @@ int asCContext::Execute()
 
 	m_status = asEXECUTION_ACTIVE;
 
-	asPushActiveContext((asIScriptContext *)this);
+	asCThreadLocalData *tld = asPushActiveContext((asIScriptContext *)this);
 
 	if( m_regs.programPointer == 0 )
 	{
@@ -1174,7 +1148,12 @@ int asCContext::Execute()
 		// Call the line callback one last time before leaving
 		// so anyone listening can catch the state change
 		CallLineCallback();
+		m_regs.doProcessSuspend = true;
 	}
+	else
+		m_regs.doProcessSuspend = false;
+
+	m_doSuspend = false;
 
 	if( m_engine->ep.autoGarbageCollect )
 	{
@@ -1193,10 +1172,9 @@ int asCContext::Execute()
 		}
 	}
 
-	m_doSuspend = false;
-	m_regs.doProcessSuspend = m_lineCallback;
-
-	asPopActiveContext((asIScriptContext *)this);
+	// Pop the active context
+	asASSERT(tld->activeContexts[tld->activeContexts.GetLength()-1] == this);
+	tld->activeContexts.PopLast();
 
 	if( m_status == asEXECUTION_FINISHED )
 	{
@@ -1252,6 +1230,12 @@ int asCContext::PushState()
 	tmp[3] = (asPWORD)m_originalStackPointer;
 	tmp[4] = (asPWORD)m_argumentsSize;
 
+	// Need to push the value of registers so they can be restored
+	tmp[5] = (asPWORD)asDWORD(m_regs.valueRegister);
+	tmp[6] = (asPWORD)asDWORD(m_regs.valueRegister>>32);
+	tmp[7] = (asPWORD)m_regs.objectRegister;
+	tmp[8] = (asPWORD)m_regs.objectType;
+
 	// Decrease stackpointer to prevent the top value from being overwritten
 	m_regs.stackPointer -= 2;
 
@@ -1261,7 +1245,8 @@ int asCContext::PushState()
 	// After this the state should appear as if uninitialized
 	m_callingSystemFunction = 0;
 
-	asASSERT(m_regs.objectRegister == 0);
+	m_regs.objectRegister = 0;
+	m_regs.objectType = 0;
 
 	// Set the status to uninitialized as application
 	// should call Prepare() after this to reuse the context
@@ -1290,6 +1275,11 @@ int asCContext::PopState()
 	m_initialFunction      = reinterpret_cast<asCScriptFunction*>(tmp[2]);
 	m_originalStackPointer = (asDWORD*)tmp[3];
 	m_argumentsSize        = (int)tmp[4];
+
+	m_regs.valueRegister   = asQWORD(asDWORD(tmp[5]));
+	m_regs.valueRegister  |= asQWORD(tmp[6])<<32;
+	m_regs.objectRegister  = (void*)tmp[7];
+	m_regs.objectType      = (asIObjectType*)tmp[8];
 
 	// Calculate the returnValueSize
 	if( m_initialFunction->DoesReturnOnStack() )
@@ -4472,7 +4462,14 @@ int asCContext::GetExceptionLineNumber(int *column, const char **sectionName)
 
 	if( column ) *column = m_exceptionColumn;
 
-	if( sectionName ) *sectionName = m_engine->scriptSectionNames[m_exceptionSectionIdx]->AddressOf();
+	if( sectionName ) 
+	{
+		// The section index can be -1 if the exception was raised in a generated function, e.g. factstub for templates
+		if( m_exceptionSectionIdx >= 0 )
+			*sectionName = m_engine->scriptSectionNames[m_exceptionSectionIdx]->AddressOf();
+		else
+			*sectionName = 0;
+	}
 
 	return m_exceptionLine;
 }

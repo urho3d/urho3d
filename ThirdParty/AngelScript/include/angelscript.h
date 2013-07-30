@@ -52,15 +52,15 @@
 #else
  #define BEGIN_AS_NAMESPACE
  #define END_AS_NAMESPACE
- #define AS_NAMESPACE_QUALIFIER
+ #define AS_NAMESPACE_QUALIFIER ::
 #endif
 
 BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22603
-#define ANGELSCRIPT_VERSION_STRING "2.26.3 WIP"
+#define ANGELSCRIPT_VERSION        22700
+#define ANGELSCRIPT_VERSION_STRING "2.27.0"
 
 // Data types
 
@@ -74,6 +74,7 @@ class asIScriptFunction;
 class asIBinaryStream;
 class asIJITCompiler;
 class asIThreadManager;
+class asILockableSharedBool;
 
 // Enumerations and constants
 
@@ -170,6 +171,7 @@ enum asEBehaviours
 	asBEHAVE_LIST_FACTORY,
 	asBEHAVE_ADDREF,
 	asBEHAVE_RELEASE,
+	asBEHAVE_GET_WEAKREF_FLAG,
 
 	// Object operators
 	asBEHAVE_VALUE_CAST,
@@ -264,12 +266,6 @@ enum asETokenClass
 	asTC_WHITESPACE = 5
 };
 
-#ifdef AS_DEPRECATED
-// Deprecated since 2.24.0 - 2012-05-25
-// Prepare flags
-const int asPREPARE_PREVIOUS = -1;
-#endif
-
 // Type id flags
 enum asETypeIdFlags
 {
@@ -300,7 +296,8 @@ enum asETypeModifiers
 	asTM_NONE     = 0,
 	asTM_INREF    = 1,
 	asTM_OUTREF   = 2,
-	asTM_INOUTREF = 3
+	asTM_INOUTREF = 3,
+	asTM_CONST    = 4
 };
 
 // GetModule flags
@@ -532,6 +529,9 @@ extern "C"
 	// Memory management
 	AS_API int asSetGlobalMemoryFunctions(asALLOCFUNC_t allocFunc, asFREEFUNC_t freeFunc);
 	AS_API int asResetGlobalMemoryFunctions();
+
+	// Auxiliary
+	AS_API asILockableSharedBool *asCreateLockableSharedBool();
 }
 #endif // ANGELSCRIPT_DLL_MANUAL_IMPORT
 
@@ -560,10 +560,6 @@ public:
 	// Global functions
 	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0) = 0;
 	virtual asUINT             GetGlobalFunctionCount() const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-20
-	virtual int                GetGlobalFunctionIdByIndex(asUINT index) const = 0;
-#endif
 	virtual asIScriptFunction *GetGlobalFunctionByIndex(asUINT index) const = 0;
 	virtual asIScriptFunction *GetGlobalFunctionByDecl(const char *declaration) const = 0;
 
@@ -578,7 +574,7 @@ public:
 	virtual int            RegisterObjectType(const char *obj, int byteSize, asDWORD flags) = 0;
 	virtual int            RegisterObjectProperty(const char *obj, const char *declaration, int byteOffset) = 0;
 	virtual int            RegisterObjectMethod(const char *obj, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv) = 0;
-	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv) = 0;
+	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0) = 0;
 	virtual int            RegisterInterface(const char *name) = 0;
 	virtual int            RegisterInterfaceMethod(const char *intf, const char *declaration) = 0;
 	virtual asUINT         GetObjectTypeCount() const = 0;
@@ -586,7 +582,7 @@ public:
 	virtual asIObjectType *GetObjectTypeByName(const char *name) const = 0;
 
 	// String factory
-	virtual int RegisterStringFactory(const char *datatype, const asSFuncPtr &factoryFunc, asDWORD callConv) = 0;
+	virtual int RegisterStringFactory(const char *datatype, const asSFuncPtr &factoryFunc, asDWORD callConv, void *objForThiscall = 0) = 0;
 	virtual int GetStringFactoryReturnTypeId() const = 0;
 
 	// Default array type
@@ -625,6 +621,7 @@ public:
 
 	// Script functions
 	virtual asIScriptFunction *GetFunctionById(int funcId) const = 0;
+    virtual asIScriptFunction *GetFuncDefFromTypeId(int typeId) const = 0;
 
 	// Type identification
 	virtual asIObjectType *GetObjectTypeById(int typeId) const = 0;
@@ -633,20 +630,25 @@ public:
 	virtual int            GetSizeOfPrimitiveType(int typeId) const = 0;
 
 	// Script execution
-	virtual asIScriptContext *CreateContext() = 0;
-	virtual void             *CreateScriptObject(int typeId) = 0;
-	virtual void             *CreateScriptObjectCopy(void *obj, int typeId) = 0;
-	virtual void             *CreateUninitializedScriptObject(int typeId) = 0;
+	virtual asIScriptContext      *CreateContext() = 0;
 #ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-06-07
-	virtual void              CopyScriptObject(void *dstObj, void *srcObj, int typeId) = 0;
+	// Deprecated since 2.27.0, 2013-07-18
+	virtual void                  *CreateScriptObject(int typeId) = 0;
+	virtual void                  *CreateScriptObjectCopy(void *obj, int typeId) = 0;
+	virtual void                  *CreateUninitializedScriptObject(int typeId) = 0;
+	virtual void                   AssignScriptObject(void *dstObj, void *srcObj, int typeId) = 0;
+	virtual void                   ReleaseScriptObject(void *obj, int typeId) = 0;
+	virtual void                   AddRefScriptObject(void *obj, int typeId) = 0;
 #endif
-	virtual void              AssignScriptObject(void *dstObj, void *srcObj, int typeId) = 0;
-	virtual void              ReleaseScriptObject(void *obj, int typeId) = 0;
-	virtual void              ReleaseScriptObject(void *obj, const asIObjectType *type) = 0;
-	virtual void              AddRefScriptObject(void *obj, int typeId) = 0;
-	virtual void              AddRefScriptObject(void *obj, const asIObjectType *type) = 0;
-	virtual bool              IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const = 0;
+	virtual void                  *CreateScriptObject(const asIObjectType *type) = 0;
+	virtual void                  *CreateScriptObjectCopy(void *obj, const asIObjectType *type) = 0;
+	virtual void                  *CreateUninitializedScriptObject(const asIObjectType *type) = 0;
+	virtual asIScriptFunction     *CreateDelegate(asIScriptFunction *func, void *obj) = 0;
+	virtual void                   AssignScriptObject(void *dstObj, void *srcObj, const asIObjectType *type) = 0;
+	virtual void                   ReleaseScriptObject(void *obj, const asIObjectType *type) = 0;
+	virtual void                   AddRefScriptObject(void *obj, const asIObjectType *type) = 0;
+	virtual bool                   IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const = 0;
+	virtual asILockableSharedBool *GetWeakRefFlagOfScriptObject(void *obj, const asIObjectType *type) const = 0;
 
 	// String interpretation
 	virtual asETokenClass ParseToken(const char *string, size_t stringLength = 0, int *tokenLength = 0) const = 0;
@@ -654,7 +656,8 @@ public:
 	// Garbage collection
 	virtual int  GarbageCollect(asDWORD flags = asGC_FULL_CYCLE) = 0;
 	virtual void GetGCStatistics(asUINT *currentSize, asUINT *totalDestroyed = 0, asUINT *totalDetected = 0, asUINT *newObjects = 0, asUINT *totalNewDestroyed = 0) const = 0;
-	virtual void NotifyGarbageCollectorOfNewObject(void *obj, asIObjectType *type) = 0;
+	virtual int  NotifyGarbageCollectorOfNewObject(void *obj, asIObjectType *type) = 0;
+	virtual int  GetObjectInGC(asUINT idx, asUINT *seqNbr = 0, void **obj = 0, asIObjectType **type = 0) = 0;
 	virtual void GCEnumCallback(void *reference) = 0;
 
 	// User data
@@ -682,6 +685,7 @@ public:
 	virtual asIScriptEngine *GetEngine() const = 0;
 	virtual void             SetName(const char *name) = 0;
 	virtual const char      *GetName() const = 0;
+	virtual void             Discard() = 0;
 
 	// Compilation
 	virtual int         AddScriptSection(const char *name, const char *code, size_t codeLength = 0, int lineOffset = 0) = 0;
@@ -694,19 +698,9 @@ public:
 
 	// Functions
 	virtual asUINT             GetFunctionCount() const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-20
-	virtual int                GetFunctionIdByIndex(asUINT index) const = 0;
-	virtual int                GetFunctionIdByName(const char *name) const = 0;
-	virtual int                GetFunctionIdByDecl(const char *decl) const = 0;
-#endif
 	virtual asIScriptFunction *GetFunctionByIndex(asUINT index) const = 0;
 	virtual asIScriptFunction *GetFunctionByDecl(const char *decl) const = 0;
 	virtual asIScriptFunction *GetFunctionByName(const char *name) const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-20
-	virtual int                RemoveFunction(int funcId) = 0;
-#endif
 	virtual int                RemoveFunction(asIScriptFunction *func) = 0;
 
 	// Global variables
@@ -769,10 +763,6 @@ public:
 
 	// Execution
 	virtual int             Prepare(asIScriptFunction *func) = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-25
-	virtual int             Prepare(int funcId) = 0;
-#endif
 	virtual int             Unprepare() = 0;
 	virtual int             Execute() = 0;
 	virtual int             Abort() = 0;
@@ -844,11 +834,6 @@ class asIScriptGeneric
 public:
 	// Miscellaneous
 	virtual asIScriptEngine   *GetEngine() const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-25
-	virtual int                GetFunctionId() const = 0;
-	virtual void              *GetFunctionUserData() const = 0;
-#endif
 	virtual asIScriptFunction *GetFunction() const = 0;
 
 	// Object
@@ -857,7 +842,7 @@ public:
 
 	// Arguments
 	virtual int     GetArgCount() const = 0;
-	virtual int     GetArgTypeId(asUINT arg) const = 0;
+	virtual int     GetArgTypeId(asUINT arg, asDWORD *flags = 0) const = 0;
 	virtual asBYTE  GetArgByte(asUINT arg) = 0;
 	virtual asWORD  GetArgWord(asUINT arg) = 0;
 	virtual asDWORD GetArgDWord(asUINT arg) = 0;
@@ -869,7 +854,7 @@ public:
 	virtual void   *GetAddressOfArg(asUINT arg) = 0;
 
 	// Return value
-	virtual int     GetReturnTypeId() const = 0;
+	virtual int     GetReturnTypeId(asDWORD *flags = 0) const = 0;
 	virtual int     SetReturnByte(asBYTE val) = 0;
 	virtual int     SetReturnWord(asWORD val) = 0;
 	virtual int     SetReturnDWord(asDWORD val) = 0;
@@ -918,6 +903,7 @@ public:
 	virtual asIScriptEngine *GetEngine() const = 0;
 	virtual const char      *GetConfigGroup() const = 0;
 	virtual asDWORD          GetAccessMask() const = 0;
+	virtual asIScriptModule *GetModule() const = 0;
 
 	// Memory management
 	virtual int AddRef() const = 0;
@@ -942,22 +928,11 @@ public:
 
 	// Factories
 	virtual asUINT             GetFactoryCount() const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-25
-	virtual int                GetFactoryIdByIndex(asUINT index) const = 0;
-	virtual int                GetFactoryIdByDecl(const char *decl) const = 0;
-#endif
 	virtual asIScriptFunction *GetFactoryByIndex(asUINT index) const = 0;
 	virtual asIScriptFunction *GetFactoryByDecl(const char *decl) const = 0;
 
 	// Methods
 	virtual asUINT             GetMethodCount() const = 0;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-25
-	virtual int                GetMethodIdByIndex(asUINT index, bool getVirtual = true) const = 0;
-	virtual int                GetMethodIdByName(const char *name, bool getVirtual = true) const = 0;
-	virtual int                GetMethodIdByDecl(const char *decl, bool getVirtual = true) const = 0;
-#endif
 	virtual asIScriptFunction *GetMethodByIndex(asUINT index, bool getVirtual = true) const = 0;
 	virtual asIScriptFunction *GetMethodByName(const char *name, bool getVirtual = true) const = 0;
 	virtual asIScriptFunction *GetMethodByDecl(const char *decl, bool getVirtual = true) const = 0;
@@ -992,6 +967,7 @@ public:
 	virtual int              GetId() const = 0;
 	virtual asEFuncType      GetFuncType() const = 0;
 	virtual const char      *GetModuleName() const = 0;
+	virtual asIScriptModule *GetModule() const = 0;
 	virtual const char      *GetScriptSectionName() const = 0;
 	virtual const char      *GetConfigGroup() const = 0;
 	virtual asDWORD          GetAccessMask() const = 0;
@@ -1009,16 +985,21 @@ public:
 	virtual bool             IsShared() const = 0;
 	virtual asUINT           GetParamCount() const = 0;
 	virtual int              GetParamTypeId(asUINT index, asDWORD *flags = 0) const = 0;
-	virtual int              GetReturnTypeId() const = 0;
+	virtual int              GetReturnTypeId(asDWORD *flags = 0) const = 0;
 
 	// Type id for function pointers 
 	virtual int              GetTypeId() const = 0;
 	virtual bool             IsCompatibleWithTypeId(int typeId) const = 0;
 
+	// Delegates
+	virtual void              *GetDelegateObject() const = 0;
+	virtual asIObjectType     *GetDelegateObjectType() const = 0;
+	virtual asIScriptFunction *GetDelegateFunction() const = 0;
+
 	// Debug information
 	virtual asUINT           GetVarCount() const = 0;
 	virtual int              GetVar(asUINT index, const char **name, int *typeId = 0) const = 0;
-	virtual const char *     GetVarDecl(asUINT index) const = 0;
+	virtual const char      *GetVarDecl(asUINT index) const = 0;
 	virtual int              FindNextLineWithCode(int line) const = 0;
 
 	// For JIT compilation
@@ -1040,6 +1021,25 @@ public:
 
 public:
 	virtual ~asIBinaryStream() {}
+};
+
+class asILockableSharedBool
+{
+public:
+	// Memory management
+	virtual int AddRef() const = 0;
+	virtual int Release() const = 0;
+
+	// Value
+	virtual bool Get() const = 0;
+	virtual void Set(bool val) = 0;
+	
+	// Thread management
+	virtual void Lock() const = 0;
+	virtual void Unlock() const = 0;
+
+protected:
+	virtual ~asILockableSharedBool() {}
 };
 
 //-----------------------------------------------------------------

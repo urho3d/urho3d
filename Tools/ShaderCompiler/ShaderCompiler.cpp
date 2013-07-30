@@ -381,7 +381,7 @@ void CompileShader(const String& fileName)
         for (unsigned i = 0; i < workerThreads.Size(); ++i)
         {
             workerThreads[i] = new WorkerThread();
-            workerThreads[i]->Start();
+            workerThreads[i]->Run();
         }
         // This will wait until the thread functions have stopped
         for (unsigned i = 0; i < workerThreads.Size(); ++i)

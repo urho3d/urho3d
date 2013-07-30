@@ -63,10 +63,6 @@ public:
 
 	// Execution
 	int             Prepare(asIScriptFunction *func);
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-25
-	int             Prepare(int functionId);
-#endif
 	int             Unprepare();
 	int             Execute();
 	int             Abort();

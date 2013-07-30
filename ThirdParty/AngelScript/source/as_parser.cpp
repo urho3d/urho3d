@@ -2279,10 +2279,21 @@ bool asCParser::IsFuncDecl(bool isMethod)
 	GetToken(&t2);
 	if( t2.type == ttOpenParanthesis ) 
 	{	
-		// If the closing paranthesis is not followed by a  
+		// If the closing parenthesis is not followed by a  
 		// statement block then it is not a function. 
-		while( t2.type != ttCloseParanthesis && t2.type != ttEnd )
+		// It's possible that there are nested parenthesis due to default
+		// arguments so this should be checked for.
+		int nest = 0;
+		GetToken(&t2);
+		while( (nest || t2.type != ttCloseParanthesis) && t2.type != ttEnd )
+		{
+			if( t2.type == ttOpenParanthesis )
+				nest++;
+			if( t2.type == ttCloseParanthesis )
+				nest--;
+
 			GetToken(&t2);
+		}
 
 		if( t2.type == ttEnd ) 
 			return false;

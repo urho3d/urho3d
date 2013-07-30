@@ -115,6 +115,15 @@ asCThreadManager::asCThreadManager()
 
 #ifdef AS_NO_THREADS
 	tld = 0;
+#else
+	// Allocate the thread local storage
+	#if defined AS_POSIX_THREADS
+		pthread_key_t pKey;
+		pthread_key_create(&pKey, 0);
+		tlsKey = (asDWORD)pKey;
+	#elif defined AS_WINDOWS_THREADS
+		tlsKey = (asDWORD)TlsAlloc();
+	#endif
 #endif
 	refCount = 1;
 }
@@ -169,6 +178,9 @@ void asCThreadManager::Unprepare()
 	ENTERCRITICALSECTION(threadManager->criticalSection);
 	if( --threadManager->refCount == 0 )
 	{
+		// Make sure the local data is destroyed, at least for the current thread
+		CleanupLocalData();
+
 		// As the critical section will be destroyed together 
 		// with the thread manager we must first clear the global
 		// variable in case a new thread manager needs to be created;
@@ -187,18 +199,12 @@ void asCThreadManager::Unprepare()
 asCThreadManager::~asCThreadManager()
 {
 #ifndef AS_NO_THREADS
-	// Delete all thread local datas
-	asSMapNode<asPWORD,asCThreadLocalData*> *cursor = 0;
-	if( tldMap.MoveFirst(&cursor) )
-	{
-		do
-		{
-			if( tldMap.GetValue(cursor) ) 
-			{
-				asDELETE(tldMap.GetValue(cursor),asCThreadLocalData);
-			}
-		} while( tldMap.MoveNext(&cursor, cursor) );
-	}
+	// Deallocate the thread local storage
+	#if defined AS_POSIX_THREADS
+		pthread_key_delete((pthread_key_t)tlsKey);
+	#elif defined AS_WINDOWS_THREADS
+		TlsFree((DWORD)tlsKey);
+	#endif
 #else
 	if( tld ) 
 	{
@@ -214,34 +220,28 @@ int asCThreadManager::CleanupLocalData()
 		return 0;
 
 #ifndef AS_NO_THREADS
-	int r = 0;
 #if defined AS_POSIX_THREADS
-	asPWORD id = (asPWORD)pthread_self();
+	asCThreadLocalData *tld = (asCThreadLocalData*)pthread_getspecific((pthread_key_t)threadManager->tlsKey);
 #elif defined AS_WINDOWS_THREADS
-	asPWORD id = (asPWORD)GetCurrentThreadId();
+	asCThreadLocalData *tld = (asCThreadLocalData*)TlsGetValue((DWORD)threadManager->tlsKey);
 #endif
 
-	ENTERCRITICALSECTION(threadManager->criticalSection);
+	if( tld == 0 ) 
+		return 0;
 
-	asSMapNode<asPWORD,asCThreadLocalData*> *cursor = 0;
-	if( threadManager->tldMap.MoveTo(&cursor, id) )
+	if( tld->activeContexts.GetLength() == 0 ) 
 	{
-		asCThreadLocalData *tld = threadManager->tldMap.GetValue(cursor);
-		
-		// Can we really remove it at this time?
-		if( tld->activeContexts.GetLength() == 0 )
-		{
-			asDELETE(tld,asCThreadLocalData);
-			threadManager->tldMap.Erase(cursor);
-			r = 0;
-		}
-		else
-			r = asCONTEXT_ACTIVE;
+		asDELETE(tld,asCThreadLocalData);
+		#if defined AS_POSIX_THREADS
+			pthread_setspecific((pthread_key_t)threadManager->tlsKey, 0);
+		#elif defined AS_WINDOWS_THREADS
+			TlsSetValue((DWORD)threadManager->tlsKey, 0);
+		#endif
+		return 0;
 	}
+	else 
+		return asCONTEXT_ACTIVE;
 
-	LEAVECRITICALSECTION(threadManager->criticalSection);
-
-	return r;
 #else
 	if( threadManager->tld )
 	{
@@ -257,28 +257,6 @@ int asCThreadManager::CleanupLocalData()
 #endif
 }
 
-#ifndef AS_NO_THREADS
-asCThreadLocalData *asCThreadManager::GetLocalData(asPWORD threadId)
-{
-	// We're already in the critical section when this function is called
-
-	asCThreadLocalData *tld = 0;
-
-	asSMapNode<asPWORD,asCThreadLocalData*> *cursor = 0;
-	if( threadManager->tldMap.MoveTo(&cursor, threadId) )
-		tld = threadManager->tldMap.GetValue(cursor);
-
-	return tld;
-}
-
-void asCThreadManager::SetLocalData(asPWORD threadId, asCThreadLocalData *tld)
-{
-	// We're already in the critical section when this function is called
-
-	tldMap.Insert(threadId, tld);
-}
-#endif
-
 asCThreadLocalData *asCThreadManager::GetLocalData()
 {
 	if( threadManager == 0 )
@@ -286,23 +264,20 @@ asCThreadLocalData *asCThreadManager::GetLocalData()
 
 #ifndef AS_NO_THREADS
 #if defined AS_POSIX_THREADS
-	asPWORD id = (asPWORD)pthread_self();
-#elif defined AS_WINDOWS_THREADS
-	asPWORD id = (asPWORD)GetCurrentThreadId();
-#endif
-
-	ENTERCRITICALSECTION(threadManager->criticalSection);
-
-	asCThreadLocalData *tld = threadManager->GetLocalData(id);
+	asCThreadLocalData *tld = (asCThreadLocalData*)pthread_getspecific((pthread_key_t)threadManager->tlsKey);
 	if( tld == 0 )
 	{
-		// Create a new tld
 		tld = asNEW(asCThreadLocalData)();
-		if( tld )
-			threadManager->SetLocalData(id, tld);
+		pthread_setspecific((pthread_key_t)threadManager->tlsKey, tld);
 	}
-
-	LEAVECRITICALSECTION(threadManager->criticalSection);
+#elif defined AS_WINDOWS_THREADS
+	asCThreadLocalData *tld = (asCThreadLocalData*)TlsGetValue((DWORD)threadManager->tlsKey);
+	if( tld == 0 ) 
+	{
+ 		tld = asNEW(asCThreadLocalData)();
+		TlsSetValue((DWORD)threadManager->tlsKey, tld);
+ 	}
+#endif
 
 	return tld;
 #else

@@ -2288,9 +2288,9 @@ bool asCCompiler::CompileInitialization(asCScriptNode *node, asCByteCode *bc, as
 					lctx.type.Set(type);
 					lctx.type.dataType.MakeReference(true);
 
-					// If it is an enum value that is being compiled then we skip this
-					// as the bytecode won't be used anyway, only the constant value
-					if( asUINT(offset) < engine->globalProperties.GetLength() )
+					// If it is an enum value, i.e. offset is negative, that is being compiled then
+					// we skip this as the bytecode won't be used anyway, only the constant value
+					if( offset >= 0 )
 						lctx.bc.InstrPTR(asBC_LDG, engine->globalProperties[offset]->GetAddressOfValue());
 				}
 				else
@@ -4266,7 +4266,17 @@ int asCCompiler::PerformAssignment(asCTypeInfo *lvalue, asCTypeInfo *rvalue, asC
 		if( beh->copy )
 		{
 			// Call the copy operator
-			bc->Call(asBC_CALLSYS, (asDWORD)beh->copy, 2*AS_PTR_SIZE);
+			asCScriptFunction *descr = builder->GetFunctionDescription(beh->copy);
+			if( descr->funcType == asFUNC_VIRTUAL )
+				bc->Call(asBC_CALLINTF, beh->copy, 2*AS_PTR_SIZE);
+			else if( descr->funcType == asFUNC_SCRIPT )
+				bc->Call(asBC_CALL, beh->copy, 2*AS_PTR_SIZE);
+			else
+			{
+				asASSERT( descr->funcType == asFUNC_SYSTEM );
+				bc->Call(asBC_CALLSYS, beh->copy, 2*AS_PTR_SIZE);
+			}
+			asASSERT( descr->returnType.IsReference() );
 			bc->Instr(asBC_PshRPtr);
 		}
 		else
@@ -5099,6 +5109,9 @@ asUINT asCCompiler::ImplicitConvObjectRef(asSExprContext *ctx, const asCDataType
 			if( pos >= 0 )
 			{
 				asCString nsName = ctx->methodName.SubString(0, pos+2);
+				// Trim off the last ::
+				if( nsName.GetLength() > 2 ) 
+					nsName.SetLength(nsName.GetLength()-2);
 				ns = DetermineNameSpace(nsName);
 				name = ctx->methodName.SubString(pos+2);
 			}
@@ -5671,7 +5684,7 @@ asUINT asCCompiler::ImplicitConvPrimitiveToObject(asSExprContext *ctx, const asC
 		return cost;
 	}
 
-	// TODO: clean up: This part is similar to CompileCosntructCall(). It should be put in a common function
+	// TODO: clean up: This part is similar to CompileConstructCall(). It should be put in a common function
 
 	bool onHeap = true;
 
@@ -7100,11 +7113,16 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 		}
 	}
 
-	// Is it a global property?
-	if( !found && !objType && !noGlobal )
+	// Recursively search parent namespaces for global entities
+	asCString currScope = scope;
+	if( scope == "" )
+		currScope = outFunc->nameSpace->name;
+	while( !found && !noGlobal && !objType )
 	{
-		asSNameSpace *ns = DetermineNameSpace(scope);
-		if( ns )
+		asSNameSpace *ns = DetermineNameSpace(currScope);
+
+		// Is it a global property?
+		if( !found && ns )
 		{
 			// See if there are any matching global property accessors
 			asSExprContext access(engine);
@@ -7225,83 +7243,107 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 				}
 			}
 		}
-	}
 
-	// Is it the name of a global function?
-	if( !noFunction && !found && !objType && !noGlobal )
-	{
-		asCArray<int> funcs;
+		// Is it the name of a global function?
+		if( !noFunction && !found && ns )
+		{
+			asCArray<int> funcs;
 
-		asSNameSpace *ns = DetermineNameSpace(scope);
-		if( ns )
 			builder->GetFunctionDescriptions(name.AddressOf(), funcs, ns);
 
-		if( funcs.GetLength() > 0 )
-		{
-			found = true;
-
-			// Defer the evaluation of which function until it is actually used
-			// Store the namespace and name of the function for later
-			ctx->type.SetNullConstant();
-			// Clear the explicit handle so that the script writer is allowed to explicitly set it
-			ctx->type.isExplicitHandle = false;
-			ctx->methodName = ns ? ns->name + "::" + name : name;
-		}
-	}
-
-	// Is it an enum value?
-	if( !found && !objType && !noGlobal )
-	{
-		// The enum type may be declared in a namespace too
-		asCObjectType *scopeType = 0;
-		if( scope != "" && scope != "::" )
-		{
-			// Use the last scope name as the enum type
-			asCString enumType = scope;
-			asCString nsScope;
-			int p = scope.FindLast("::");
-			if( p != -1 )
-			{
-				enumType = scope.SubString(p+2);
-				nsScope = scope.SubString(0, p);
-			}
-
-			asSNameSpace *ns = engine->FindNameSpace(nsScope.AddressOf());
-			if( ns )
-				scopeType = builder->GetObjectType(enumType.AddressOf(), ns);
-		}
-
-		asDWORD value = 0;
-		asCDataType dt;
-		if( scopeType && builder->GetEnumValueFromObjectType(scopeType, name.AddressOf(), dt, value) )
-		{
-			// scoped enum value found
-			found = true;
-		}
-		else if( !engine->ep.requireEnumScope )
-		{
-			// Look for the enum value without explicitly informing the enum type
-			asSNameSpace *ns = DetermineNameSpace(scope);
-			int e = 0;
-			if( ns )
-				e = builder->GetEnumValue(name.AddressOf(), dt, value, ns);
-			if( e )
+			if( funcs.GetLength() > 0 )
 			{
 				found = true;
-				if( e == 2 )
+
+				// Defer the evaluation of which function until it is actually used
+				// Store the namespace and name of the function for later
+				ctx->type.SetNullConstant();
+				// Clear the explicit handle so that the script writer is allowed to explicitly set it
+				ctx->type.isExplicitHandle = false;
+				ctx->methodName = ns ? ns->name + "::" + name : name;
+			}
+		}
+
+		// Is it an enum value?
+		if( !found )
+		{
+			// The enum type may be declared in a namespace too
+			asCObjectType *scopeType = 0;
+			if( currScope != "" && currScope != "::" )
+			{
+				// Use the last scope name as the enum type
+				asCString enumType = currScope;
+				asCString nsScope;
+				int p = currScope.FindLast("::");
+				if( p != -1 )
 				{
-					Error(TXT_FOUND_MULTIPLE_ENUM_VALUES, errNode);
+					enumType = currScope.SubString(p+2);
+					nsScope = currScope.SubString(0, p);
+				}
+
+				asSNameSpace *ns = engine->FindNameSpace(nsScope.AddressOf());
+				if( ns )
+					scopeType = builder->GetObjectType(enumType.AddressOf(), ns);
+			}
+
+			asDWORD value = 0;
+			asCDataType dt;
+			if( scopeType && builder->GetEnumValueFromObjectType(scopeType, name.AddressOf(), dt, value) )
+			{
+				// scoped enum value found
+				found = true;
+			}
+			else if( !engine->ep.requireEnumScope )
+			{
+				// Look for the enum value without explicitly informing the enum type
+				asSNameSpace *ns = DetermineNameSpace(currScope);
+				int e = 0;
+				if( ns )
+					e = builder->GetEnumValue(name.AddressOf(), dt, value, ns);
+				if( e )
+				{
+					found = true;
+					if( e == 2 )
+					{
+						Error(TXT_FOUND_MULTIPLE_ENUM_VALUES, errNode);
+					}
+				}
+			}
+
+			if( found )
+			{
+				// Even if the enum type is not shared, and we're compiling a shared object,
+				// the use of the values are still allowed, since they are treated as constants.
+
+				// an enum value was resolved
+				ctx->type.SetConstantDW(dt, value);
+			}
+			else
+			{
+				// If nothing was found because the scope doesn't match a namespace or an enum 
+				// then this should be reported as an error and the search interrupted
+				if( !ns && !scopeType )
+				{
+					ctx->type.SetDummy();
+					asCString str;
+					str.Format(TXT_UNKNOWN_SCOPE_s, currScope.AddressOf());
+					Error(str, errNode);
+					return -1;
 				}
 			}
 		}
 
-		if( found )
+		if( !found )
 		{
-			// Even if the enum type is not shared, and we're compiling a shared object,
-			// the use of the values are still allowed, since they are treated as constants.
+			if( currScope == "" || currScope == "::" )
+				break;
 
-			// an enum value was resolved
-			ctx->type.SetConstantDW(dt, value);
+			// Move up to parent namespace
+			int pos = currScope.FindLast("::");
+			if( pos >= 0 )
+				currScope = currScope.SubString(0, pos);
+			else
+				currScope = "::";
 		}
 	}
 
@@ -8477,18 +8519,24 @@ int asCCompiler::CompileFunctionCall(asCScriptNode *node, asSExprContext *ctx, a
 			asSNameSpace *ns = DetermineNameSpace(scope);
 			if( ns )
 			{
-				builder->GetFunctionDescriptions(name.AddressOf(), funcs, ns);
-				if( funcs.GetLength() == 0 )
+				// Search recursively in parent namespaces
+				while( ns && funcs.GetLength() == 0 && funcPtr.type.dataType.GetFuncDef() == 0 )
 				{
-					int r = CompileVariableAccess(name, scope, &funcPtr, node, true, true);
-					if( r >= 0 && !funcPtr.type.dataType.GetFuncDef() )
+					builder->GetFunctionDescriptions(name.AddressOf(), funcs, ns);
+					if( funcs.GetLength() == 0 )
 					{
-						// The variable is not a function
-						asCString msg;
-						msg.Format(TXT_NOT_A_FUNC_s_IS_VAR, name.AddressOf());
-						Error(msg, node);
-						return -1;
+						int r = CompileVariableAccess(name, scope, &funcPtr, node, true, true);
+						if( r >= 0 && !funcPtr.type.dataType.GetFuncDef() )
+						{
+							// The variable is not a function
+							asCString msg;
+							msg.Format(TXT_NOT_A_FUNC_s_IS_VAR, name.AddressOf());
+							Error(msg, node);
+							return -1;
+						}
 					}
+
+					ns = builder->GetParentNameSpace(ns);
 				}
 			}
 			else
@@ -10843,13 +10891,17 @@ void asCCompiler::CompileMathOperator(asCScriptNode *node, asSExprContext *lctx,
 			// Merge the operands in the different order so that they are evaluated correctly
 			MergeExprBytecode(ctx, rctx);
 			MergeExprBytecode(ctx, lctx);
+
+			// We must not process the deferred parameters yet, as
+			// it may overwrite the lvalue kept in the register
 		}
 		else
 		{
 			MergeExprBytecode(ctx, lctx);
 			MergeExprBytecode(ctx, rctx);
+
+			ProcessDeferredParams(ctx);
 		}
-		ProcessDeferredParams(ctx);
 
 		asEBCInstr instruction = asBC_ADDi;
 		if( lctx->type.dataType.IsIntegerType() ||

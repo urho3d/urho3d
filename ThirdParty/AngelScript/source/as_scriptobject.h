@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -50,6 +50,25 @@ class asCObjectType;
 
 // TODO: Add const overload for GetAddressOfProperty
 
+// TODO: weak: Should move to its own file
+class asCLockableSharedBool : public asILockableSharedBool
+{
+public:
+	asCLockableSharedBool();
+	int AddRef() const;
+	int Release() const;
+
+	bool Get() const;
+	void Set(bool);
+	
+	void Lock() const;
+	void Unlock() const;
+
+protected:
+	mutable asCAtomic refCount;
+	bool      value;
+	DECLARECRITICALSECTION(mutable lock);
+};
 
 class asCScriptObject : public asIScriptObject
 {
@@ -95,6 +114,9 @@ public:
 	void EnumReferences(asIScriptEngine *engine);
 	void ReleaseAllHandles(asIScriptEngine *engine);
 
+	// Weakref methods
+	asILockableSharedBool *GetWeakRefFlag() const;
+
 	// Used for properties
 	void *AllocateUninitializedObject(asCObjectType *objType, asCScriptEngine *engine);
 	void FreeObject(void *ptr, asCObjectType *objType, asCScriptEngine *engine);
@@ -108,6 +130,7 @@ public:
 protected:
 	mutable asCAtomic refCount;
 	mutable bool gcFlag;
+	mutable asCLockableSharedBool *weakRefFlag;
 	bool isDestructCalled;
 	
 	// Urho3D: added userdata

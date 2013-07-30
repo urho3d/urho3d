@@ -103,6 +103,7 @@ public:
 	int                  GetId() const;
 	asEFuncType          GetFuncType() const;
 	const char          *GetModuleName() const;
+	asIScriptModule     *GetModule() const;
 	const char          *GetScriptSectionName() const;
 	const char          *GetConfigGroup() const;
 	asDWORD              GetAccessMask() const;
@@ -120,11 +121,16 @@ public:
 	bool                 IsShared() const;
 	asUINT               GetParamCount() const;
 	int                  GetParamTypeId(asUINT index, asDWORD *flags = 0) const;
-	int                  GetReturnTypeId() const;
+	int                  GetReturnTypeId(asDWORD *flags = 0) const;
 
 	// Type id for function pointers 
 	int                  GetTypeId() const;
 	bool                 IsCompatibleWithTypeId(int typeId) const;
+
+	// Delegates
+	void                *GetDelegateObject() const;
+	asIObjectType       *GetDelegateObjectType() const;
+	asIScriptFunction   *GetDelegateFunction() const;
 
 	// Debug information
 	asUINT               GetVarCount() const;

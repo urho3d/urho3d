@@ -99,7 +99,7 @@ public:
 	virtual asIScriptEngine *GetEngine() const;
 	virtual void             SetName(const char *name);
 	virtual const char      *GetName() const;
-	// TODO: interface: Should have a method Discard(); which will replace the engine's DiscardModule() method
+	virtual void             Discard();
 
 	// Compilation
 	virtual int         AddScriptSection(const char *name, const char *code, size_t codeLength, int lineOffset);
@@ -112,19 +112,9 @@ public:
 
 	// Script functions
 	virtual asUINT             GetFunctionCount() const;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-20
-	virtual int                GetFunctionIdByIndex(asUINT index) const;
-	virtual int                GetFunctionIdByName(const char *name) const;
-	virtual int                GetFunctionIdByDecl(const char *decl) const;
-#endif
 	virtual asIScriptFunction *GetFunctionByIndex(asUINT index) const;
 	virtual asIScriptFunction *GetFunctionByDecl(const char *decl) const;
 	virtual asIScriptFunction *GetFunctionByName(const char *name) const;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-20
-	virtual int                RemoveFunction(int funcId);
-#endif
 	virtual int                RemoveFunction(asIScriptFunction *func);
 
 	// Script global variables

@@ -95,10 +95,6 @@ public:
 	// Global functions
 	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0);
 	virtual asUINT             GetGlobalFunctionCount() const;
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-05-20
-	virtual int                GetGlobalFunctionIdByIndex(asUINT index) const;
-#endif
 	virtual asIScriptFunction *GetGlobalFunctionByIndex(asUINT index) const;
 	virtual asIScriptFunction *GetGlobalFunctionByDecl(const char *declaration) const;
 
@@ -113,7 +109,7 @@ public:
 	virtual int            RegisterObjectType(const char *obj, int byteSize, asDWORD flags);
 	virtual int            RegisterObjectProperty(const char *obj, const char *declaration, int byteOffset);
 	virtual int            RegisterObjectMethod(const char *obj, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
-	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
+	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0);
 	virtual int            RegisterInterface(const char *name);
 	virtual int            RegisterInterfaceMethod(const char *intf, const char *declaration);
 	virtual asUINT         GetObjectTypeCount() const;
@@ -121,7 +117,7 @@ public:
 	virtual asIObjectType *GetObjectTypeByName(const char *name) const;
 
 	// String factory
-	virtual int RegisterStringFactory(const char *datatype, const asSFuncPtr &factoryFunc, asDWORD callConv);
+	virtual int RegisterStringFactory(const char *datatype, const asSFuncPtr &factoryFunc, asDWORD callConv, void *objForThiscall = 0);
 	virtual int GetStringFactoryReturnTypeId() const;
 
 	// Default array type
@@ -161,6 +157,7 @@ public:
 
 	// Script functions
 	virtual asIScriptFunction *GetFunctionById(int funcId) const;
+    virtual asIScriptFunction *GetFuncDefFromTypeId(int typeId) const;
 
 	// Type identification
 	virtual asIObjectType *GetObjectTypeById(int typeId) const;
@@ -169,30 +166,29 @@ public:
 	virtual int            GetSizeOfPrimitiveType(int typeId) const;
 
 	// Script execution
-	virtual asIScriptContext *CreateContext();
-	// TODO: interface: Deprecate this, add a method that takes the asIObjectType instead
-	virtual void             *CreateScriptObject(int typeId);
-	// TODO: interface: Deprecate this, add a method that takes the asIObjectType instead
-	virtual void             *CreateScriptObjectCopy(void *obj, int typeId);
-	// TODO: interface: Deprecate this, add a method that takes the asIObjectType instead
-	virtual void             *CreateUninitializedScriptObject(int typeId);
+	virtual asIScriptContext  *CreateContext();
 #ifdef AS_DEPRECATED
-	// Deprecated since 2.24.0 - 2012-06-07
-	virtual void              CopyScriptObject(void *dstObj, void *srcObj, int typeId);
+// Deprecated since 2.27.0, 2013-07-18
+	virtual void              *CreateScriptObject(int typeId);
+	virtual void              *CreateScriptObjectCopy(void *obj, int typeId);
+	virtual void              *CreateUninitializedScriptObject(int typeId);
+	virtual void               AssignScriptObject(void *dstObj, void *srcObj, int typeId);
+	virtual void               ReleaseScriptObject(void *obj, int typeId);
+	virtual void               AddRefScriptObject(void *obj, int typeId);
 #endif
-	// TODO: interface: Deprecate this, add a method that takes the asIObjectType instead
-	virtual void              AssignScriptObject(void *dstObj, void *srcObj, int typeId);
-	// TODO: interface: Deprecate this
-	virtual void              ReleaseScriptObject(void *obj, int typeId);
-	virtual void              ReleaseScriptObject(void *obj, const asIObjectType *type);
-	// TODO: interface: Deprecate this
-	virtual void              AddRefScriptObject(void *obj, int typeId);
-	virtual void              AddRefScriptObject(void *obj, const asIObjectType *type);
+	virtual void              *CreateScriptObject(const asIObjectType *type);
+	virtual void              *CreateScriptObjectCopy(void *obj, const asIObjectType *type);
+	virtual void              *CreateUninitializedScriptObject(const asIObjectType *type);
+	virtual asIScriptFunction *CreateDelegate(asIScriptFunction *func, void *obj);
+	virtual void               AssignScriptObject(void *dstObj, void *srcObj, const asIObjectType *type);
+	virtual void               ReleaseScriptObject(void *obj, const asIObjectType *type);
+	virtual void               AddRefScriptObject(void *obj, const asIObjectType *type);
 	// TODO: interface: Should have a method void *CastObject(void *obj, asIObjectType *fromType, asIObjectType *toType); 
 	//                  For script objects it should simply check if the object implements or derives from the toType
 	//                  For application objects it should look for ref cast behaviours and call the matching one
 	//                  Once implemented the IsHandleCompatibleWithObject should be removed from the engine
-	virtual bool              IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const;
+	virtual bool               IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const;
+	asILockableSharedBool     *GetWeakRefFlagOfScriptObject(void *obj, const asIObjectType *type) const;
 
 	// String interpretation
 	virtual asETokenClass ParseToken(const char *string, size_t stringLength = 0, int *tokenLength = 0) const;
@@ -200,7 +196,8 @@ public:
 	// Garbage collection
 	virtual int  GarbageCollect(asDWORD flags = asGC_FULL_CYCLE);
 	virtual void GetGCStatistics(asUINT *currentSize, asUINT *totalDestroyed, asUINT *totalDetected, asUINT *newObjects, asUINT *totalNewDestroyed) const;
-	virtual void NotifyGarbageCollectorOfNewObject(void *obj, asIObjectType *type);
+	virtual int  NotifyGarbageCollectorOfNewObject(void *obj, asIObjectType *type);
+	virtual int  GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj = 0, asIObjectType **type = 0);
 	virtual void GCEnumCallback(void *reference);
 
 	// User data
@@ -230,27 +227,30 @@ public:
 	friend int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *internal, asCScriptEngine *engine);
 
 	int RegisterMethodToObjectType(asCObjectType *objectType, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
-	int RegisterBehaviourToObjectType(asCObjectType *objectType, asEBehaviours behaviour, const char *decl, const asSFuncPtr &funcPointer, asDWORD callConv);
+	int RegisterBehaviourToObjectType(asCObjectType *objectType, asEBehaviours behaviour, const char *decl, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall);
 
 	int VerifyVarTypeNotInFunction(asCScriptFunction *func);
 
 	void *CallAlloc(asCObjectType *objType) const;
 	void  CallFree(void *obj) const;
 
-	void *CallGlobalFunctionRetPtr(int func);
-	void *CallGlobalFunctionRetPtr(int func, void *param1);
-	void *CallGlobalFunctionRetPtr(asSSystemFunctionInterface *func, asCScriptFunction *desc);
-	void *CallGlobalFunctionRetPtr(asSSystemFunctionInterface *i, asCScriptFunction *s, void *param1);
-	void  CallObjectMethod(void *obj, int func);
-	void  CallObjectMethod(void *obj, void *param, int func);
-	void  CallObjectMethod(void *obj, asSSystemFunctionInterface *func, asCScriptFunction *desc);
-	void  CallObjectMethod(void *obj, void *param, asSSystemFunctionInterface *func, asCScriptFunction *desc);
-	bool  CallObjectMethodRetBool(void *obj, int func);
-	int   CallObjectMethodRetInt(void *obj, int func);
-	void  CallGlobalFunction(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc);
-	bool  CallGlobalFunctionRetBool(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc);
+	void *CallGlobalFunctionRetPtr(int func) const;
+	void *CallGlobalFunctionRetPtr(int func, void *param1) const;
+	void *CallGlobalFunctionRetPtr(asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
+	void *CallGlobalFunctionRetPtr(asSSystemFunctionInterface *i, asCScriptFunction *s, void *param1) const;
+	void  CallObjectMethod(void *obj, int func) const;
+	void  CallObjectMethod(void *obj, void *param, int func) const;
+	void  CallObjectMethod(void *obj, asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
+	void  CallObjectMethod(void *obj, void *param, asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
+	bool  CallObjectMethodRetBool(void *obj, int func) const;
+	int   CallObjectMethodRetInt(void *obj, int func) const;
+	void *CallObjectMethodRetPtr(void *obj, int func) const;
+	void  CallGlobalFunction(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
+	bool  CallGlobalFunctionRetBool(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
 
 	void ConstructScriptObjectCopy(void *mem, void *obj, asCObjectType *type);
+
+	void CleanupAfterDiscardModule();
 
 	int  ClearUnusedTypes();
 	void RemoveTemplateInstanceType(asCObjectType *t);
@@ -455,6 +455,9 @@ public:
 		int    compilerWarnings;
 		bool   disallowValueAssignForRefType;
 	} ep;
+
+	// This flag is to allow a quicker shutdown when releasing the engine
+	bool shuttingDown;
 };
 
 END_AS_NAMESPACE

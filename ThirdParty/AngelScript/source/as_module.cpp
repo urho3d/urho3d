@@ -80,9 +80,17 @@ asCModule::~asCModule()
 		// Remove the module from the engine
 		if( engine->lastModule == this )
 			engine->lastModule = 0;
-
 		engine->scriptModules.RemoveValue(this);
+
+		// Allow the engine to clean up what is not used
+		engine->CleanupAfterDiscardModule();
 	}
+}
+
+// interface
+void asCModule::Discard()
+{
+	asDELETE(this,asCModule);
 }
 
 // interface
@@ -264,18 +272,6 @@ int asCModule::ResetGlobalVars(asIScriptContext *ctx)
 
 	return CallInit(ctx);
 }
-
-#ifdef AS_DEPRECATED
-// Deprecated since 2.24.0 - 2012-05-20
-// interface
-int asCModule::GetFunctionIdByIndex(asUINT index) const
-{
-	if( index >= globalFunctions.GetLength() )
-		return asNO_FUNCTION;
-
-	return globalFunctions[index]->id;
-}
-#endif
 
 // interface
 asIScriptFunction *asCModule::GetFunctionByIndex(asUINT index) const
@@ -472,32 +468,6 @@ void asCModule::InternalReset()
 	funcDefs.SetLength(0);
 }
 
-#ifdef AS_DEPRECATED
-// Deprecated since 2.24.0 - 2012-05-20
-// interface
-int asCModule::GetFunctionIdByName(const char *name) const
-{
-	// TODO: optimize: Improve linear search
-	// Find the function id
-	int id = -1;
-	for( size_t n = 0; n < globalFunctions.GetLength(); n++ )
-	{
-		if( globalFunctions[n]->name == name &&
-			globalFunctions[n]->nameSpace == defaultNamespace )
-		{
-			if( id == -1 )
-				id = globalFunctions[n]->id;
-			else
-				return asMULTIPLE_FUNCTIONS;
-		}
-	}
-
-	if( id == -1 ) return asNO_FUNCTION;
-
-	return id;
-}
-#endif
-
 // interface
 asIScriptFunction *asCModule::GetFunctionByName(const char *name) const
 {
@@ -562,58 +532,6 @@ asUINT asCModule::GetFunctionCount() const
 {
 	return (asUINT)globalFunctions.GetSize();
 }
-
-#ifdef AS_DEPRECATED
-// Deprecated since 2.24.0 - 2012-05-20
-// interface
-int asCModule::GetFunctionIdByDecl(const char *decl) const
-{
-	asCBuilder bld(engine, const_cast<asCModule*>(this));
-
-	asCScriptFunction func(engine, const_cast<asCModule*>(this), asFUNC_DUMMY);
-	int r = bld.ParseFunctionDeclaration(0, decl, &func, false, 0, 0, defaultNamespace);
-	if( r < 0 )
-		return asINVALID_DECLARATION;
-
-	// Use the defaultNamespace implicitly unless an explicit namespace has been provided
-	asCString ns = func.nameSpace == "" ? defaultNamespace : func.nameSpace;
-
-	// TODO: optimize: Improve linear search
-	// Search script functions for matching interface
-	int id = -1;
-	for( size_t n = 0; n < globalFunctions.GetLength(); ++n )
-	{
-		if( globalFunctions[n]->objectType == 0 && 
-			func.name == globalFunctions[n]->name && 
-			func.returnType == globalFunctions[n]->returnType &&
-			func.parameterTypes.GetLength() == globalFunctions[n]->parameterTypes.GetLength() &&
-			ns == globalFunctions[n]->nameSpace )
-		{
-			bool match = true;
-			for( size_t p = 0; p < func.parameterTypes.GetLength(); ++p )
-			{
-				if( func.parameterTypes[p] != globalFunctions[n]->parameterTypes[p] )
-				{
-					match = false;
-					break;
-				}
-			}
-
-			if( match )
-			{
-				if( id == -1 )
-					id = globalFunctions[n]->id;
-				else
-					return asMULTIPLE_FUNCTIONS;
-			}
-		}
-	}
-
-	if( id == -1 ) return asNO_FUNCTION;
-
-	return id;
-}
-#endif
 
 // interface
 asIScriptFunction *asCModule::GetFunctionByDecl(const char *decl) const
@@ -1336,18 +1254,6 @@ int asCModule::CompileFunction(const char *sectionName, const char *code, int li
 	return r;
 #endif
 }
-
-#ifdef AS_DEPRECATED
-// Deprecated since 2.24.0 - 2012-05-20
-// interface
-int asCModule::RemoveFunction(int funcId)
-{
-	if( funcId >= 0 && funcId < (int)engine->scriptFunctions.GetLength() )
-		return RemoveFunction(engine->scriptFunctions[funcId]);
-
-	return asNO_FUNCTION;
-}
-#endif
 
 // interface
 int asCModule::RemoveFunction(asIScriptFunction *func)
