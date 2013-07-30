@@ -2078,6 +2078,7 @@ Methods:<br>
 - void SetUVTransform(const Vector2&, float, const Vector2&)
 - void SetUVTransform(const Vector2&, float, float)
 - void RemoveShaderParameter(const String&)
+- void SortTechniques()
 - Material@ Clone(const String& arg0 = String ( )) const
 
 Properties:<br>

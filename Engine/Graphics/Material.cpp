@@ -84,6 +84,14 @@ TextureUnit ParseTextureUnitName(const String& name)
 
 static TechniqueEntry noEntry;
 
+bool CompareTechniqueEntries(const TechniqueEntry& lhs, const TechniqueEntry& rhs)
+{
+    if (lhs.lodDistance_ != rhs.lodDistance_)
+        return lhs.lodDistance_ > rhs.lodDistance_;
+    else
+        return lhs.qualityLevel_ > rhs.qualityLevel_;
+}
+
 TechniqueEntry::TechniqueEntry() :
     qualityLevel_(0),
     lodDistance_(0.0f)
@@ -175,6 +183,8 @@ bool Material::Load(const XMLElement& source)
         }
         techniqueElem = techniqueElem.GetNext("technique");
     }
+    
+    SortTechniques();
     
     XMLElement textureElem = source.GetChild("texture");
     while (textureElem)
@@ -424,6 +434,11 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->shadowCullMode_ = shadowCullMode_;
     
     return ret;
+}
+
+void Material::SortTechniques()
+{
+    Sort(techniques_.Begin(), techniques_.End(), CompareTechniqueEntries);
 }
 
 void Material::MarkForAuxView(unsigned frameNumber)

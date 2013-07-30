@@ -28,6 +28,9 @@ void CreateMaterialEditor()
     SubscribeToEvent(materialWindow.GetChild("CloseButton", true), "Released", "HideMaterialEditor");
     SubscribeToEvent(materialWindow.GetChild("NewParameterDropDown", true), "ItemSelected", "CreateShaderParameter");
     SubscribeToEvent(materialWindow.GetChild("DeleteParameterButton", true), "Released", "DeleteShaderParameter");
+    SubscribeToEvent(materialWindow.GetChild("NewTechniqueButton", true), "Released", "NewTechnique");
+    SubscribeToEvent(materialWindow.GetChild("DeleteTechniqueButton", true), "Released", "DeleteTechnique");
+    SubscribeToEvent(materialWindow.GetChild("SortTechniquesButton", true), "Released", "SortTechniques");
 }
 
 bool ShowMaterialEditor()
@@ -71,10 +74,74 @@ void RefreshMaterialName()
     SubscribeToEvent(pickButton, "Released", "PickEditMaterial");
 }
 
-void RefreshMaterialTechniques()
+void RefreshMaterialTechniques(bool fullUpdate = true)
 {
     ListView@ list = materialWindow.GetChild("TechniqueList");
-    list.RemoveAllItems();
+
+    if (editMaterial is null)
+        return;
+
+    if (fullUpdate == true)
+    {
+        list.RemoveAllItems();
+
+        for (uint i = 0; i < editMaterial.numTechniques; ++i)
+        {
+            TechniqueEntry entry = editMaterial.techniqueEntries[i];
+    
+            UIElement@ container = UIElement();
+            container.SetLayout(LM_HORIZONTAL, 4);
+            container.SetFixedHeight(ATTR_HEIGHT);
+            list.AddItem(container);
+        
+            LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
+            nameEdit.name = "TechniqueNameEdit" + String(i);
+
+            Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
+            SubscribeToEvent(pickButton, "Released", "PickMaterialTechnique");
+            Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
+            SubscribeToEvent(openButton, "Released", "OpenResource");
+    
+            if (entry.technique !is null)
+                nameEdit.text = entry.technique.name;
+
+            SubscribeToEvent(nameEdit, "TextFinished", "EditMaterialTechnique");
+
+            UIElement@ container2 = UIElement();
+            container2.SetLayout(LM_HORIZONTAL, 4);
+            container2.SetFixedHeight(ATTR_HEIGHT);
+            list.AddItem(container2);
+    
+            Text@ text = container2.CreateChild("Text");
+            text.style = "EditorAttributeText";
+            text.text = "Quality";
+            LineEdit@ attrEdit = CreateAttributeLineEdit(container2, null, i, 0);
+            attrEdit.text = String(entry.qualityLevel);
+            SubscribeToEvent(attrEdit, "TextChanged", "EditTechniqueQuality");
+            SubscribeToEvent(attrEdit, "TextFinished", "EditTechniqueQuality");
+    
+            text = container2.CreateChild("Text");
+            text.style = "EditorAttributeText";
+            text.text = "LOD Distance";
+            attrEdit = CreateAttributeLineEdit(container2, null, i, 0);
+            attrEdit.text = String(entry.lodDistance);
+            SubscribeToEvent(attrEdit, "TextChanged", "EditTechniqueLodDistance");
+            SubscribeToEvent(attrEdit, "TextFinished", "EditTechniqueLodDistance");
+        }
+    }
+    else
+    {
+        for (uint i = 0; i < editMaterial.numTechniques; ++i)
+        {
+            TechniqueEntry entry = editMaterial.techniqueEntries[i];
+
+            LineEdit@ nameEdit = materialWindow.GetChild("TechniqueNameEdit" + String(i), true);
+            if (nameEdit is null)
+                continue;
+
+            nameEdit.text = entry.technique !is null ? entry.technique.name : "";
+        }
+    }
 }
 
 void RefreshMaterialTextures(bool fullUpdate = true)
@@ -95,19 +162,19 @@ void RefreshMaterialTextures(bool fullUpdate = true)
     
             LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, i, 0);
             nameEdit.name = "TextureNameEdit" + String(i);
-    
+
             Button@ pickButton = CreateResourcePickerButton(container, null, i, 0, "Pick");
             SubscribeToEvent(pickButton, "Released", "PickMaterialTexture");
             Button@ openButton = CreateResourcePickerButton(container, null, i, 0, "Open");
             SubscribeToEvent(openButton, "Released", "OpenResource");
-    
+
             if (editMaterial !is null)
             {
                 Texture@ texture = editMaterial.textures[i];
                 if (texture !is null)
                     nameEdit.text = texture.name;
             }
-            
+
             SubscribeToEvent(nameEdit, "TextFinished", "EditMaterialTexture");
         }
     }
@@ -118,7 +185,7 @@ void RefreshMaterialTextures(bool fullUpdate = true)
             LineEdit@ nameEdit = materialWindow.GetChild("TextureNameEdit" + String(i), true);
             if (nameEdit is null)
                 continue;
-    
+
             String textureName;
             if (editMaterial !is null)
             {
@@ -425,10 +492,142 @@ void EditMaterialTexture(StringHash eventType, VariantMap& eventData)
         editMaterial.textures[index] = texture;
     }
     else
-        editMaterial.textures[index] =null;
+        editMaterial.textures[index] = null;
 
     EndMaterialEdit();
+}
 
+void NewTechnique()
+{
+    if (editMaterial is null)
+        return;
+        
+    BeginMaterialEdit();
+    editMaterial.numTechniques = editMaterial.numTechniques + 1;
+    EndMaterialEdit();
+    
+    RefreshMaterialTechniques();
+}
+
+void DeleteTechnique()
+{
+    if (editMaterial is null || editMaterial.numTechniques < 2)
+        return;
+
+    BeginMaterialEdit();
+    editMaterial.numTechniques = editMaterial.numTechniques - 1;
+    EndMaterialEdit();
+    
+    RefreshMaterialTechniques();
+}
+
+void PickMaterialTechnique(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null)
+        return;
+
+    UIElement@ button = eventData["Element"].GetUIElement();
+    resourcePickIndex = button.vars["Index"].GetUInt();
+
+    @resourcePicker = GetResourcePicker(ShortStringHash("Technique"));
+    if (resourcePicker is null)
+        return;
+
+    String lastPath = resourcePicker.lastPath;
+    if (lastPath.empty)
+        lastPath = sceneResourcePath;
+    CreateFileSelector("Pick " + resourcePicker.typeName, "OK", "Cancel", lastPath, resourcePicker.filters, resourcePicker.lastFilter);
+    SubscribeToEvent(uiFileSelector, "FileSelected", "PickMaterialTechniqueDone");
+}
+
+void PickMaterialTechniqueDone(StringHash eventType, VariantMap& eventData)
+{
+    StoreResourcePickerPath();
+    CloseFileSelector();
+
+    if (!eventData["OK"].GetBool())
+    {
+        @resourcePicker = null;
+        return;
+    }
+
+    String resourceName = eventData["FileName"].GetString();
+    Resource@ res = GetPickedResource(resourceName);
+
+    if (res !is null && editMaterial !is null)
+    {
+        BeginMaterialEdit();
+        TechniqueEntry entry = editMaterial.techniqueEntries[resourcePickIndex];
+        editMaterial.SetTechnique(resourcePickIndex, res, entry.qualityLevel, entry.lodDistance);
+        EndMaterialEdit();
+
+        RefreshMaterialTechniques(false);
+    }
+
+    @resourcePicker = null;
+}
+
+void EditMaterialTechnique(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null)
+        return;
+
+    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    String techniqueName = attrEdit.text.Trimmed();
+    uint index = attrEdit.vars["Index"].GetUInt();
+
+    BeginMaterialEdit();
+
+    Technique@ newTech;
+    if (!techniqueName.empty)
+        newTech = cache.GetResource("Technique", techniqueName);
+
+    TechniqueEntry entry = editMaterial.techniqueEntries[index];
+    editMaterial.SetTechnique(index, newTech, entry.qualityLevel, entry.lodDistance);
+
+    EndMaterialEdit();
+}
+
+void EditTechniqueQuality(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null)
+        return;
+
+    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    uint newQualityLevel = attrEdit.text.ToUInt();
+    uint index = attrEdit.vars["Index"].GetUInt();
+
+    BeginMaterialEdit();
+    TechniqueEntry entry = editMaterial.techniqueEntries[index];
+    editMaterial.SetTechnique(index, entry.technique, newQualityLevel, entry.lodDistance);
+    EndMaterialEdit();
+}
+
+void EditTechniqueLodDistance(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null)
+        return;
+
+    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    float newLodDistance = attrEdit.text.ToFloat();
+    uint index = attrEdit.vars["Index"].GetUInt();
+
+    BeginMaterialEdit();
+    TechniqueEntry entry = editMaterial.techniqueEntries[index];
+    editMaterial.SetTechnique(index, entry.technique, entry.qualityLevel, newLodDistance);
+    EndMaterialEdit();
+}
+
+void SortTechniques()
+{
+    if (editMaterial is null)
+        return;
+        
+    BeginMaterialEdit();
+    editMaterial.SortTechniques();
+    EndMaterialEdit();
+    
+    RefreshMaterialTechniques();
 }
 
 void BeginMaterialEdit()

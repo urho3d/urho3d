@@ -872,6 +872,7 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("Image", imageFilters));
     resourcePickers.Push(ResourcePicker("Model", "*.mdl", ACTION_PICK));
     resourcePickers.Push(ResourcePicker("Material", materialFilters, ACTION_PICK | ACTION_OPEN | ACTION_EDIT));
+    resourcePickers.Push(ResourcePicker("Technique", "*.xml"));
     resourcePickers.Push(ResourcePicker("Texture2D", textureFilters));
     resourcePickers.Push(ResourcePicker("TextureCube", "*.xml"));
     resourcePickers.Push(ResourcePicker("ScriptFile", scriptFilters));

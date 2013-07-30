@@ -600,6 +600,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructTechniqueEntry), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_CONSTRUCT, "void f(const TechniqueEntry&in)", asFUNCTION(ConstructTechniqueEntry), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("TechniqueEntry", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructTechniqueEntry), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("TechniqueEntry", "TechniqueEntry& opAssign(const TechniqueEntry&in)", asMETHOD(TechniqueEntry, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("TechniqueEntry", "void set_technique(Technique@+)", asFUNCTION(TechniqueEntrySetTechnique), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TechniqueEntry", "Technique@+ get_technique() const", asFUNCTION(TechniqueEntryGetTechnique), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("TechniqueEntry", "int qualityLevel", offsetof(TechniqueEntry, qualityLevel_));
@@ -612,6 +613,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, const Vector2&in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, float)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void RemoveShaderParameter(const String&in)", asMETHOD(Material, RemoveShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void SortTechniques()", asMETHOD(Material, SortTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Material@ Clone(const String&in cloneName = String()) const", asFUNCTION(MaterialClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);

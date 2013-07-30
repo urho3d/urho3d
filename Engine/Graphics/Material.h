@@ -109,6 +109,8 @@ public:
     void ReleaseShaders();
     /// Clone material.
     SharedPtr<Material> Clone(const String& cloneName = String::EMPTY) const;
+    /// Ensure that material techniques are listed in correct order.
+    void SortTechniques();
     /// Mark material for auxiliary view rendering.
     void MarkForAuxView(unsigned frameNumber);
     

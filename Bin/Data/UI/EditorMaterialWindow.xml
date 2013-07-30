@@ -31,6 +31,39 @@
     <element type="ListView">
         <attribute name="Name" value="TechniqueList" />
     </element>
+    <element>
+        <attribute name="Name" value="TechniqueButtonContainer" />
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Button">
+            <attribute name="Name" value="NewTechniqueButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="New" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="DeleteTechniqueButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Del" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="SortTechniquesButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Sort" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+    </element>
     <element type="BorderImage" style="EditorDivider" />
     <element type="Text">
         <attribute name="Text" value="Textures" />
