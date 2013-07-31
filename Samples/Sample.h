@@ -45,7 +45,6 @@ public:
 
     /// Setup before engine initialization. Modifies the engine parameters.
     virtual void Setup();
-
     /// Setup after engine initialization. Creates the logo, console & debug HUD.
     virtual void Start();
 
@@ -59,10 +58,8 @@ protected:
 private:
     /// Create logo.
     void CreateLogo();
-
     /// Create console and debug HUD.
     void CreateConsoleAndDebugHud();
-
     /// Handle key down event.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
 };

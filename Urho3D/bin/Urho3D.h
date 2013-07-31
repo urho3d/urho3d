@@ -29,7 +29,7 @@ namespace Urho3D
 
 class ScriptFile;
 
-/// Urho3D script shell application, which runs a script specified on the command line.
+/// Urho3D main application, which runs a script specified on the command line.
 class Urho3D : public Application
 {
     OBJECT(Urho3D);
