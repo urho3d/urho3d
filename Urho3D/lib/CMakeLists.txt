@@ -27,14 +27,14 @@ if (ENABLE_LIBRARY MATCHES "SHARED|shared")
 endif ()
 
 # Define generated source files
-if (MSVC)
+if (WIN32)
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
         COMMAND for /F %%v in ('svnversion -n ${PROJECT_SOURCE_DIR}') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h DEPENDS Urho3D
-        COMMENT "Generate subversion revision number")
+        COMMENT "Generating subversion revision number")
 else ()
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
         COMMAND for v in `svnversion -n ${PROJECT_SOURCE_DIR}`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h\; done DEPENDS Urho3D
-        COMMENT "Generate subversion revision number")
+        COMMENT "Generating subversion revision number")
 endif ()
 
 # Define source files
@@ -49,13 +49,32 @@ set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR})
 setup_library ()
 adjust_library_name ()
 
-# Archive all the objects into this target
-if (MSVC)
-# todo: lib.exe /OUT:Urho3D.lib lib1.lib lib2.lib
-elseif (APPLE)
-# todo: find ../.. -type f -regex [\./]*Engine.*\\.o -o -regex [\./]*ThirdParty.*\\.o -o -regex [\./]*Extras/LuaScript.*\\.o 
+# This is a CMake hack, please FIXME if there is a better way
+# WARNING!!! The custom command below will pick up remnant objects from previous/other build in the build directory
+if (LIB_TYPE STREQUAL SHARED)
+    # Link all the objects into this target
+    if (MSVC)
+    # todo
+    elseif (APPLE)
+    # todo 
+    else ()
+        add_custom_command (TARGET ${TARGET_NAME} PRE_BUILD COMMAND
+            [ CMakeFiles/Urho3D_lib.dir/link.txt -nt CMakeFiles/Urho3D_lib.dir/link-all-objects.txt ] &&
+            sed -z 's/\\n//g' CMakeFiles/Urho3D_lib.dir/link.txt >CMakeFiles/Urho3D_lib.dir/link-all-objects.txt &&
+            find ../.. -type f -regextype posix-egrep -regex [\\./]*\\\(Engine\\|ThirdParty\\|Extras/LuaScript\\\).*\\.o -a \\\( ! -regex [\\./]*ThirdParty/Assimp.*\\.o \\\) |xargs >>CMakeFiles/Urho3D_lib.dir/link-all-objects.txt &&
+            cp -p CMakeFiles/Urho3D_lib.dir/link-all-objects.txt CMakeFiles/Urho3D_lib.dir/link.txt || exit 0
+            COMMENT "Adjusting linker source to include all objects")
+    endif ()
 else ()
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_AR} r ${CMAKE_STATIC_LIBRARY_PREFIX}${LIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} `find ../.. -type f -regextype posix-egrep -regex [\\./]*\\\(Engine\\|ThirdParty\\|Extras/LuaScript\\\).*\\.o`
-        COMMAND ${CMAKE_RANLIB} ${CMAKE_STATIC_LIBRARY_PREFIX}${LIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX})
+    # Archive all the objects into this target
+    if (MSVC)
+    # todo: lib.exe /OUT:Urho3D.lib lib1.lib lib2.lib
+    elseif (APPLE)
+    # todo: find ../.. -type f -regex [\./]*Engine.*\\.o -o -regex [\./]*ThirdParty.*\\.o -o -regex [\./]*Extras/LuaScript.*\\.o
+    else ()
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_AR} r ${CMAKE_STATIC_LIBRARY_PREFIX}${LIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} `find ../.. -type f -regextype posix-egrep -regex [\\./]*\\\(Engine\\|ThirdParty\\|Extras/LuaScript\\\).*\\.o -a \\\( ! -regex [\\./]*ThirdParty/Assimp.*\\.o \\\)`
+            COMMAND ${CMAKE_RANLIB} ${CMAKE_STATIC_LIBRARY_PREFIX}${LIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
+            COMMENT "Archiving all objects")
+    endif ()
 endif ()

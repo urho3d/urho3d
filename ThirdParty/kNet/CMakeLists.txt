@@ -1,4 +1,4 @@
-# Copyright 2010 Jukka Jylänki
+# Copyright 2010 Jukka Jylï¿½nki
 
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-# Modified by Lasse Oorni for Urho3D
+# Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 file(GLOB kNetSourceFiles ./src/*.cpp)
 file(GLOB kNetHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/*.inl)
@@ -22,7 +22,7 @@ if (WIN32)
    file(GLOB kNetWin32HeaderFiles ./include/kNet/win32/*.h)
 
    if (USE_BOOST)
-      list(REMOVE_ITEM kNetWin32SourceFiles ${PROJECT_SOURCE_DIR}/./src/win32/W32Thread.cpp)
+      list(REMOVE_ITEM kNetWin32SourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/win32/W32Thread.cpp)
    endif()
 
    set(kNetSourceFiles ${kNetSourceFiles} ${kNetWin32SourceFiles})
@@ -35,11 +35,12 @@ if (WIN32)
    set(kNetLinkLibraries ${kNetLinkLibraries} ws2_32.lib)
 
 elseif (UNIX)
+   list (REMOVE_ITEM kNetSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/Clock.cpp)
    file(GLOB kNetUnixSourceFiles ./src/unix/*.cpp)
    file(GLOB kNetUnixHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/unix/*.h)
 
    if (USE_BOOST)
-      list(REMOVE_ITEM kNetUnixSourceFiles ${PROJECT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
+      list(REMOVE_ITEM kNetUnixSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
    elseif (NOT ANDROID)
       set(kNetLinkLibraries ${kNetLinkLibraries} pthread)
    endif()

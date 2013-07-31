@@ -26,6 +26,8 @@ set (SOURCE_FILES
     src/base/ftwinfnt.c
     src/bdf/bdf.c
     src/cache/ftccache.c
+    src/cache/ftcmanag.c
+    src/cache/ftcmru.c
     src/cff/cff.c
     src/cid/type1cid.c
     src/gzip/ftgzip.c
