@@ -133,6 +133,81 @@
     </element>
     <element type="BorderImage" style="EditorDivider" />
     <element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="10" />
+        <element type="Text" style="EditorAttributeText">
+            <attribute name="Text" value="Constant bias" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="ConstantBiasEdit" />
+        </element>
+        <element type="Text" style="EditorAttributeText">
+            <attribute name="Text" value="Slope bias" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="SlopeBiasEdit" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
+        <element type="Text" style="EditorAttributeText">
+            <attribute name="Text" value="Cull mode" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="CullModeEdit" />
+            <attribute name="Resize Popup" value="true" />
+            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="None" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="CCW" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="CW" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+        <element type="Text" style="EditorAttributeText">
+            <attribute name="Text" value="Shadow cull" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="ShadowCullModeEdit" />
+            <attribute name="Resize Popup" value="true" />
+            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="None" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="CCW" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="CW" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element>
         <attribute name="Name" value="ButtonContainer" />
         <attribute name="Min Size" value="0 16" />
         <attribute name="Max Size" value="2147483647 16" />

@@ -1514,7 +1514,9 @@ void UIElement::SortChildren()
 {
     if (sortChildren_ && sortOrderDirty_)
     {
-        Sort(children_.Begin(), children_.End(), CompareUIElements);
+        // Only sort when there is no layout
+        if (layoutMode_ == LM_FREE)
+            Sort(children_.Begin(), children_.End(), CompareUIElements);
         sortOrderDirty_ = false;
     }
 }

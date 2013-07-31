@@ -3,6 +3,7 @@
 Window@ materialWindow;
 Material@ editMaterial;
 XMLFile@ oldMaterialState;
+bool inMaterialRefresh = true;
 
 void CreateMaterialEditor()
 {
@@ -14,7 +15,7 @@ void CreateMaterialEditor()
     materialWindow.opacity = uiMaxOpacity;
 
     RefreshMaterialEditor();
-    
+
     int height = Min(ui.root.height - 60, 500);
     materialWindow.SetSize(300, height);
     CenterDialog(materialWindow);
@@ -31,10 +32,17 @@ void CreateMaterialEditor()
     SubscribeToEvent(materialWindow.GetChild("NewTechniqueButton", true), "Released", "NewTechnique");
     SubscribeToEvent(materialWindow.GetChild("DeleteTechniqueButton", true), "Released", "DeleteTechnique");
     SubscribeToEvent(materialWindow.GetChild("SortTechniquesButton", true), "Released", "SortTechniques");
+    SubscribeToEvent(materialWindow.GetChild("ConstantBiasEdit", true), "TextChanged", "EditConstantBias");
+    SubscribeToEvent(materialWindow.GetChild("ConstantBiasEdit", true), "TextFinished", "EditConstantBias");
+    SubscribeToEvent(materialWindow.GetChild("SlopeBiasEdit", true), "TextChanged", "EditSlopeBias");
+    SubscribeToEvent(materialWindow.GetChild("SlopeBiasEdit", true), "TextFinished", "EditSlopeBias");
+    SubscribeToEvent(materialWindow.GetChild("CullModeEdit", true), "ItemSelected", "EditCullMode");
+    SubscribeToEvent(materialWindow.GetChild("ShadowCullModeEdit", true), "ItemSelected", "EditShadowCullMode");
 }
 
 bool ShowMaterialEditor()
 {
+    RefreshMaterialEditor();
     materialWindow.visible = true;
     materialWindow.BringToFront();
     return true;
@@ -47,8 +55,14 @@ void HideMaterialEditor()
 
 void EditMaterial(Material@ mat)
 {
+    if (editMaterial !is null)
+        UnsubscribeFromEvent(editMaterial, "ReloadFinished");
+
     editMaterial = mat;
-    RefreshMaterialEditor();
+
+    if (editMaterial !is null)
+        SubscribeToEvent(editMaterial, "ReloadFinished", "RefreshMaterialEditor");
+
     ShowMaterialEditor();
 }
 
@@ -58,6 +72,7 @@ void RefreshMaterialEditor()
     RefreshMaterialTechniques();
     RefreshMaterialTextures();
     RefreshMaterialShaderParameters();
+    RefreshMaterialMiscParameters();
 }
 
 void RefreshMaterialName()
@@ -227,6 +242,28 @@ void RefreshMaterialShaderParameters()
             SubscribeToEvent(attrEdit, "TextFinished", "EditShaderParameter");
         }
     }
+}
+
+void RefreshMaterialMiscParameters()
+{
+    if (editMaterial is null)
+        return;
+        
+    BiasParameters bias = editMaterial.depthBias;
+
+    inMaterialRefresh = true;
+
+    LineEdit@ attrEdit = materialWindow.GetChild("ConstantBiasEdit", true);
+    attrEdit.text = String(bias.constantBias);
+    attrEdit = materialWindow.GetChild("SlopeBiasEdit", true);
+    attrEdit.text = String(bias.slopeScaledBias);
+    
+    DropDownList@ attrList = materialWindow.GetChild("CullModeEdit", true);
+    attrList.selection = editMaterial.cullMode;
+    attrList = materialWindow.GetChild("ShadowCullModeEdit", true);
+    attrList.selection = editMaterial.shadowCullMode;
+    
+    inMaterialRefresh = false;
 }
 
 void EditMaterialName(StringHash eventType, VariantMap& eventData)
@@ -628,6 +665,62 @@ void SortTechniques()
     EndMaterialEdit();
     
     RefreshMaterialTechniques();
+}
+
+void EditConstantBias(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null || inMaterialRefresh)
+        return;
+        
+    BeginMaterialEdit();
+ 
+    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    BiasParameters bias = editMaterial.depthBias;
+    bias.constantBias = attrEdit.text.ToFloat();
+    editMaterial.depthBias = bias;
+
+    EndMaterialEdit();
+}
+
+void EditSlopeBias(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null || inMaterialRefresh)
+        return;
+        
+    BeginMaterialEdit();
+ 
+    LineEdit@ attrEdit = eventData["Element"].GetUIElement();
+    BiasParameters bias = editMaterial.depthBias;
+    bias.slopeScaledBias = attrEdit.text.ToFloat();
+    editMaterial.depthBias = bias;
+
+    EndMaterialEdit();
+}
+
+void EditCullMode(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null || inMaterialRefresh)
+        return;
+        
+    BeginMaterialEdit();
+    
+    DropDownList@ attrEdit = eventData["Element"].GetUIElement();
+    editMaterial.cullMode = CullMode(attrEdit.selection);
+
+    EndMaterialEdit();
+}
+
+void EditShadowCullMode(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null || inMaterialRefresh)
+        return;
+        
+    BeginMaterialEdit();
+    
+    DropDownList@ attrEdit = eventData["Element"].GetUIElement();
+    editMaterial.shadowCullMode = CullMode(attrEdit.selection);
+
+    EndMaterialEdit();
 }
 
 void BeginMaterialEdit()
