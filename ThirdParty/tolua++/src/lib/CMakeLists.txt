@@ -11,3 +11,4 @@ set (INCLUDE_DIRS_ONLY ../../include ../../../Lua/src)
 
 # Setup target
 setup_library ()
+adjust_library_name ()

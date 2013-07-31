@@ -24,21 +24,16 @@
 #
 #  BCM_VC_FOUND
 #  BCM_VC_INCLUDE_DIR
+#  BCM_VC_LIBRARY_DIR
 #  BCM_VC_LIBRARIES
 #
 
 if (RASPI)
     set (BCM_VC_FOUND 0)
-  
-    set (BCM_VC_INC_SEARCH_PATH
-        /usr/include
-        /opt/vc/include
-    )
-
-    set (BCM_VC_LIB_SEARCH_PATH
-        /usr/lib
-        /opt/vc/lib
-    )
+    
+    # Only need to cater for raspbian as they are not in CMAKE_SYSTEM_PATH
+    set (BCM_VC_INC_SEARCH_PATH /opt/vc/include)
+    set (BCM_VC_LIB_SEARCH_PATH /opt/vc/lib)
 
     # Assume all the other headers are installed at same relative path as bcm_host.h
     find_path (BCM_VC_INCLUDE_DIR bcm_host.h ${BCM_VC_INC_SEARCH_PATH})
@@ -48,6 +43,7 @@ if (RASPI)
 
     if (BCM_VC_INCLUDE_DIR AND BCM_VC_LIBRARIES)
         set (BCM_VC_FOUND 1)
+        get_filename_component (BCM_VC_LIBRARY_DIR ${BCM_VC_LIBRARIES} PATH)
     endif ()
 
     if (BCM_VC_FOUND)

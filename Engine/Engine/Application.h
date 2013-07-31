@@ -39,9 +39,6 @@ class Application : public Object
 public:
     /// Construct. Parse default engine parameters from the command line, and create the engine in an uninitialized state.
     Application(Context* context);
-    /// Destruct.
-    ~Application();
-
     /// Initialize the engine and run the main loop, then return the application exit code. Catch out-of-memory exceptions while running.
     int Run();
 

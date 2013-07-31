@@ -41,10 +41,7 @@ elseif (ANDROID)
 else ()
     # On Linux, make sure development libraries exist, and use their include file directories  
     if (RASPI)
-        find_package (BCM_VC REQUIRED)
         include_directories (${BCM_VC_INCLUDE_DIR})
-        link_directories (${BCM_VC_LIBRARIES})
-        set (LINK_LIBS_ONLY bcm_host)
         file (GLOB VIDEO_DRIVER_C_FILES src/video/raspi/*.c)
     else ()
         find_package (OpenGL REQUIRED)
@@ -96,19 +93,10 @@ endif ()
 
 file (GLOB H_FILES include/*.h)
 
+# Define source files
 set_source_files_properties (${C_FILES} PROPERTIES LANGUAGE C)
 set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 
-# Define target & libraries to link
-add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-
-if (WIN32)
-    target_link_libraries (${TARGET_NAME} user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
-elseif (APPLE)
-    target_link_libraries (${TARGET_NAME} dl pthread)
-elseif (ANDROID)
-    target_link_libraries (${TARGET_NAME} dl log)
-else ()
-    target_link_libraries (${TARGET_NAME} dl pthread rt ${LINK_LIBS_ONLY})
-endif ()
+# Setup target
+setup_library ()

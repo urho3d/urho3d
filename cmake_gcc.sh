@@ -37,7 +37,7 @@ sed -i.bak 's/OpenGL/Direct3D9/g' Doxyfile
 
 # Create symbolic links in the build directories
 for dir in CoreData Data; do
-    [ $ECLIPSE ] && cmake -E create_symlink $PROJ/Bin/$dir ../build/Urho3D/$dir
+    [ $ECLIPSE ] && cmake -E create_symlink $PROJ/Bin/$dir ../build/Urho3D/bin/$dir
     if [ $ANDROID_NDK ]; then
         cmake -E create_symlink ../../Bin/$dir Android/assets/$dir
         for f in AndroidManifest.xml build.xml project.properties src res assets; do

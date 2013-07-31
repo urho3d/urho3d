@@ -40,10 +40,6 @@ Application::Application(Context* context) :
     engine_ = new Engine(context);
 }
 
-Application::~Application()
-{
-}
-
 int Application::Run()
 {
     try

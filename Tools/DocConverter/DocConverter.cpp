@@ -162,6 +162,7 @@ void ProcessFile(const String& fileName)
             line.Replace("&Ouml;", "\x0c3\x096");
             line.Replace("\\n\\n", "<br>");
             line.Replace("\\n", "<br>");
+            line.Replace("\\@", "@");
             
             // Handle tables
             if (line.StartsWith("|---"))

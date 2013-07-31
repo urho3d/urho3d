@@ -1452,9 +1452,8 @@ if( ANDROID_COMPILER_IS_CLANG )
 endif()
 
 # cache flags
-# Urho3D: buffer overflow protection
-set( CMAKE_CXX_FLAGS           "-fstack-protector"       CACHE STRING "c++ flags" )
-set( CMAKE_C_FLAGS             "-fstack-protector"       CACHE STRING "c flags" )
+set( CMAKE_CXX_FLAGS           ""                        CACHE STRING "c++ flags" )
+set( CMAKE_C_FLAGS             ""                        CACHE STRING "c flags" )
 # Urho3D: optimise for size
 set( CMAKE_CXX_FLAGS_RELEASE   "-Os -g -DNDEBUG"         CACHE STRING "c++ Release flags" )
 set( CMAKE_C_FLAGS_RELEASE     "-Os -g -DNDEBUG"         CACHE STRING "c Release flags" )
