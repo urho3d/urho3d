@@ -1,4 +1,4 @@
-ExecuteFile("LuaScripts/Utilities/Sample.lua")
+require "LuaScripts/Utilities/Sample"
 
 HelloWorld = {}
 
