@@ -153,6 +153,9 @@ else ()
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 endif ()
 
+# Create custom script output directory
+file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeScriptOutput)
+
 # Macro for precompiled headers
 macro (enable_pch)
     if (MSVC)
@@ -182,6 +185,15 @@ endmacro ()
 macro (setup_library)
     add_library (${TARGET_NAME} ${LIB_TYPE} ${SOURCE_FILES})
     setup_target ()
+    
+    if (NOT LIB_TYPE STREQUAL SHARED AND NOT TARGET_NAME MATCHES "Urho3D_lib|Assimp")   # Exclude Assimp explicitly here just to be safe though Assimp does not use this macro
+        set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+        if (NOT WIN32)
+            # Specific to GCC build, locate the location of the objects that are used to link to this target to be used later by Urho3D_lib target
+            set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
+                "${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.sh ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR} <OBJECTS>\n")
+        endif ()
+    endif ()
 endmacro ()
 
 # Macro for setting up an executable target
@@ -253,9 +265,10 @@ macro (adjust_library_name)
     set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${LIB_NAME})
 endmacro ()
 
-# Macro for defining external dependency libraries
+# Macro for defining external library dependencies
+# The purpose of this macro is emulate CMake way to set the external library dependencies transitively to a Main target (in other CMake build script) that uses Urho3D static/shared library 
 macro (define_dependency_libs TARGET)
-    # SDL external dependency
+    # ThirdParty/SDL external dependency
     if (${TARGET} MATCHES "SDL|MAIN|Main|main")
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
@@ -268,6 +281,15 @@ macro (define_dependency_libs TARGET)
             if (RASPI)
                 set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} bcm_host)
             endif ()
+        endif ()
+    endif ()
+
+    # ThirdParty/kNet external dependency
+    if (${TARGET} MATCHES "kNet|MAIN|Main|main")
+        if (WIN32)
+            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} ws2_32.lib)
+        elseif (NOT ANDROID)
+            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} pthread)
         endif ()
     endif ()
     

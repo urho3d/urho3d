@@ -1,22 +1,13 @@
-SET(detour_SRCS
-	Source/DetourAlloc.cpp
-	Source/DetourCommon.cpp
-	Source/DetourNavMesh.cpp
-	Source/DetourNavMeshBuilder.cpp
-	Source/DetourNavMeshQuery.cpp
-	Source/DetourNode.cpp
-)
+# Define target name
+set (TARGET_NAME Detour)
 
-SET(detour_HDRS
-	Include/DetourAlloc.h
-	Include/DetourAssert.h
-	Include/DetourCommon.h
-	Include/DetourNavMesh.h
-	Include/DetourNavMeshBuilder.h
-	Include/DetourNavMeshQuery.h
-	Include/DetourNode.h
-)
+# Define source files
+file (GLOB CPP_FILES Source/*.cpp)
+file (GLOB H_FILES Include/*.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
-INCLUDE_DIRECTORIES(Include)
+# Define dependency libs
+set (INCLUDE_DIRS_ONLY Include)
 
-ADD_LIBRARY(Detour ${detour_SRCS} ${detour_HDRS})
+# Setup target
+setup_library ()

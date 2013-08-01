@@ -1,4 +1,4 @@
-# Copyright 2010 Jukka Jyl�nki
+# Copyright 2010 Jukka Jylänki
 
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
 #  limitations under the License.
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
+
+set (TARGET_NAME kNet)
 
 file(GLOB kNetSourceFiles ./src/*.cpp)
 file(GLOB kNetHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/*.inl)
@@ -32,7 +34,8 @@ if (WIN32)
    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
    add_definitions(-DKNET_MEMORY_LEAK_CHECK)
    
-   set(kNetLinkLibraries ${kNetLinkLibraries} ws2_32.lib)
+   #Moved to define_dependency_libs() macro
+   #set(kNetLinkLibraries ${kNetLinkLibraries} ws2_32.lib)
 
 elseif (UNIX)
    list (REMOVE_ITEM kNetSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/Clock.cpp)
@@ -41,8 +44,9 @@ elseif (UNIX)
 
    if (USE_BOOST)
       list(REMOVE_ITEM kNetUnixSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
-   elseif (NOT ANDROID)
-      set(kNetLinkLibraries ${kNetLinkLibraries} pthread)
+   #elseif (NOT ANDROID)
+   #Moved to define_dependency_libs() macro
+   #  set(kNetLinkLibraries ${kNetLinkLibraries} pthread)
    endif()
 
    set(kNetSourceFiles ${kNetSourceFiles} ${kNetUnixSourceFiles})
@@ -59,9 +63,9 @@ if (WIN32)
     endforeach()
 endif ()
 
-add_library(kNet STATIC ${kNetSourceFiles} ${kNetHeaderFiles})
+# Define source files
+set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
+set (INCLUDE_DIRS_ONLY include)
 
-# Add the main kNet include directory root folder to all projects.
-include_directories(./include)
-
-target_link_libraries(kNet ${kNetLinkLibraries})
+# Setup target
+setup_library ()

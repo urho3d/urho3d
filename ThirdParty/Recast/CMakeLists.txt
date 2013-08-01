@@ -1,22 +1,13 @@
-SET(recast_SRCS
-	Source/Recast.cpp
-	Source/RecastArea.cpp
-	Source/RecastAlloc.cpp
-	Source/RecastContour.cpp
-	Source/RecastFilter.cpp
-	Source/RecastLayers.cpp
-	Source/RecastMesh.cpp
-	Source/RecastMeshDetail.cpp
-	Source/RecastRasterization.cpp
-	Source/RecastRegion.cpp
-)
+# Define target name
+set (TARGET_NAME Recast)
 
-SET(recast_HDRS
-	Include/Recast.h
-	Include/RecastAlloc.h
-	Include/RecastAssert.h
-)
+# Define source files
+file (GLOB CPP_FILES Source/*.cpp)
+file (GLOB H_FILES Include/*.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
-INCLUDE_DIRECTORIES(Include)
+# Define dependency libs
+set (INCLUDE_DIRS_ONLY Include)
 
-ADD_LIBRARY(Recast ${recast_SRCS} ${recast_HDRS})
+# Setup target
+setup_library ()
