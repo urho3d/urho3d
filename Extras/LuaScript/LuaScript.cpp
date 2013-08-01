@@ -75,7 +75,8 @@ LuaScript::LuaScript(Context* context) :
     }
 
     luaL_openlibs(luaState_);
-    ReplacePrintFunction();
+    RegisterLoader();
+    ReplacePrint();
 
     tolua_AudioLuaAPI_open(luaState_);
     tolua_ContainerLuaAPI_open(luaState_);
@@ -120,14 +121,12 @@ bool LuaScript::ExecuteFile(const String& fileName)
     file->Read(buffer, size);
 
     int top = lua_gettop(luaState_);
-
     int error = luaL_loadbuffer(luaState_, buffer, size, fileName.CString());
     delete [] buffer;
 
     if (error)
     {
         const char* message = lua_tostring(luaState_, -1);
-
         ErrorDialog("Execute Lua File Failed", message);
         lua_settop(luaState_, top);
         return false;
@@ -140,8 +139,6 @@ bool LuaScript::ExecuteFile(const String& fileName)
         lua_settop(luaState_, top);
         return false;
     }
-
-    lua_settop(luaState_, top);
 
     return true;
 }
@@ -159,8 +156,6 @@ bool LuaScript::ExecuteString(const String& string)
         lua_settop(luaState_, top);
         return false;
     }
-
-    lua_settop(luaState_, top);
 
     return true;
 }
@@ -203,7 +198,49 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
     eventTypeToFunctionNameMap_[eventType].Push(functionName);
 }
 
-void LuaScript::ReplacePrintFunction()
+void LuaScript::RegisterLoader()
+{
+    lua_getglobal(luaState_, "package");
+
+    lua_getfield(luaState_, -1, "loaders");
+
+    // Replace first loader.
+    lua_pushnumber(luaState_, 1);
+    lua_pushcfunction(luaState_, &LuaScript::Loader);
+    lua_settable(luaState_, -3);
+}
+
+int LuaScript::Loader(lua_State* L)
+{
+    ResourceCache* cache = currentContext_->GetSubsystem<ResourceCache>();
+    if (!cache)
+        return 0;
+
+    const char* name = luaL_checkstring(L, 1);
+    SharedPtr<File> file = cache->GetFile(String(name) + ".lua");
+    if (!file)
+        return 0;
+
+    unsigned size = file->GetSize();
+    char* buffer = new char[size];
+    file->Read(buffer, size);
+
+    int top = lua_gettop(L);
+    int error = luaL_loadbuffer(L, buffer, size, name);
+    delete [] buffer;
+
+    if (error)
+    {
+        const char* message = lua_tostring(L, -1);
+        ErrorDialog("Execute Lua File Failed", message);
+        lua_settop(L, top);
+        return 0;
+    }
+
+    return 1;
+}
+
+void LuaScript::ReplacePrint()
 {
     static const struct luaL_reg reg[] =
     {
@@ -246,12 +283,12 @@ int LuaScript::Print(lua_State *L)
 bool LuaScript::FindFunction(const String& functionName)
 {
     Vector<String> splitedNames = functionName.Split('.');
-    
+
     String currentName = splitedNames.Front();
     lua_getglobal(luaState_, currentName.CString());
 
     if (splitedNames.Size() > 1)
-    {       
+    {
         if (!lua_istable(luaState_, -1))
         {
             ErrorDialog("Can Not Find Lua Table", String("Table Name = '") + currentName + "'.");

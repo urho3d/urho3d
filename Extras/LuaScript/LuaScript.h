@@ -59,8 +59,14 @@ public:
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
 
 private:
-    /// Replace print function.
-    void ReplacePrintFunction();
+    /// Register loader.
+    void RegisterLoader();
+
+    /// Loader.
+    static int Loader(lua_State* L);
+    
+    /// Replace print.
+    void ReplacePrint();
 
     /// Print function.
     static int Print(lua_State* L);
