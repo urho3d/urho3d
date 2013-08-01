@@ -11,7 +11,7 @@
 extern void exit OF((int));
 #endif
 
-#ifdef _DEBUG
+#ifdef DEBUG
 
 #  ifndef verbose
 #    define verbose 0
