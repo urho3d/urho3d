@@ -53,10 +53,13 @@ public:
     bool ExecuteFunction(const String& functionName);
 
     /// Script send event.
-	void ScriptSendEvent(const String& eventName, VariantMap& eventData);
+    void ScriptSendEvent(const String& eventName, VariantMap& eventData);
 
     /// Script subscribe event.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
+
+    /// Script subscribe object's event.
+    void ScriptSubscribeToEvent(Object* object, const String& eventName, const String& functionName);
 
 private:
     /// Register loader.
@@ -77,14 +80,23 @@ private:
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
 
+    /// Handle object event.
+    void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
+
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
 
 private:
+    /// Call Lua event handler.
+    void CallEventHandler(const String& functionName, StringHash eventType, VariantMap& eventData);
+
     /// Lua state.
     lua_State* luaState_;
     /// Event type to function name map.
-    HashMap<StringHash, Vector<String> > eventTypeToFunctionNameMap_;
+    HashMap<StringHash, HashSet<String> > eventTypeToFunctionNameMap_;
+    /// Object to event type to function name map.
+    HashMap<Object*, HashMap<StringHash, HashSet<String> > > objectToEventTypeToFunctionNameMap_;
+
 };
 
 /// Return context.

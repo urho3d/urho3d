@@ -11,6 +11,9 @@ void SendEvent(const char* eventName, VariantMap& eventData);
 void SubscribeToEvent(const String& eventName, const char* functionName);
 void SubscribeToEvent(const char* eventName, const char* functionName);
 
+void SubscribeToEvent(void* object, const String& eventName, const char* functionName);
+void SubscribeToEvent(void* object, const char* eventName, const char* functionName);
+
 $using namespace Urho3D;
 $#pragma warning(disable:4800)
 
@@ -34,6 +37,11 @@ static void SendEvent(const String& eventName, VariantMap& eventData)
 static void SubscribeToEvent(const String& eventName, const char* functionName)
 {
     GetLuaScript()->ScriptSubscribeToEvent(eventName, functionName);
+}
+
+static void SubscribeToEvent(void* object, const String& eventName, const char* functionName)
+{
+    GetLuaScript()->ScriptSubscribeToEvent((Object*)object, eventName, functionName);
 }
 
 $}

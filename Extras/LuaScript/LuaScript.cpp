@@ -192,10 +192,22 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
 {
     StringHash eventType(eventName);
 
-    if (!eventTypeToFunctionNameMap_.Contains(eventType))
+    HashSet<Object*>* receivers = context_->GetEventReceivers(eventType);
+    if (!receivers || !receivers->Contains(this))
         SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
 
-    eventTypeToFunctionNameMap_[eventType].Push(functionName);
+    eventTypeToFunctionNameMap_[eventType].Insert(functionName);
+}
+
+void LuaScript::ScriptSubscribeToEvent(Object* object, const String& eventName, const String& functionName)
+{
+    StringHash eventType(eventName);
+
+    HashSet<Object*>* receivers = context_->GetEventReceivers(object, eventType);
+    if (!receivers || !receivers->Contains(this))
+        SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
+
+    objectToEventTypeToFunctionNameMap_[object][eventType].Insert(functionName);
 }
 
 void LuaScript::RegisterLoader()
@@ -321,40 +333,44 @@ bool LuaScript::FindFunction(const String& functionName)
 
 void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
-    HashMap<StringHash, Vector<String> >::ConstIterator it = eventTypeToFunctionNameMap_.Find(eventType);
-    if (it == eventTypeToFunctionNameMap_.End())
-        return;
+    const HashSet<String>& functionNames = eventTypeToFunctionNameMap_[eventType];
+    for (HashSet<String>::ConstIterator i = functionNames.Begin(); i != functionNames.End(); ++i)
+        CallEventHandler(*i, eventType, eventData);
+}
 
-    const Vector<String>& functionNames = it->second_;
-    for (unsigned i = 0; i < functionNames.Size(); ++i)
-    {
-        const String& functionName = functionNames[i];
-
-        int top = lua_gettop(luaState_);
-
-        if (!FindFunction(functionName))
-        {
-            lua_settop(luaState_, top);
-            return;
-        }
-
-        tolua_pushusertype(luaState_, (void*)&eventType, "StringHash");
-        tolua_pushusertype(luaState_, (void*)&eventData, "VariantMap");
-
-        if (lua_pcall(luaState_, 2, 0, 0) != 0)
-        {
-            const char* message = lua_tostring(luaState_, -1);
-            ErrorDialog("Execute Lua Function Failed", message);
-            lua_settop(luaState_, top);
-            return;
-        }
-    }
+void LuaScript::HandleObjectEvent(StringHash eventType, VariantMap& eventData)
+{
+    Object* object = GetEventSender();
+    const HashSet<String>& functionNames = objectToEventTypeToFunctionNameMap_[object][eventType];
+    for (HashSet<String>::ConstIterator i = functionNames.Begin(); i != functionNames.End(); ++i)
+        CallEventHandler(*i, eventType, eventData);
 }
 
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
 {
     using namespace ConsoleCommand;
     ExecuteString(eventData[P_COMMAND].GetString());
+}
+
+void LuaScript::CallEventHandler(const String& functionName, StringHash eventType, VariantMap& eventData )
+{
+    int top = lua_gettop(luaState_);
+    if (!FindFunction(functionName))
+    {
+        lua_settop(luaState_, top);
+        return;
+    }
+
+    tolua_pushusertype(luaState_, (void*)&eventType, "StringHash");
+    tolua_pushusertype(luaState_, (void*)&eventData, "VariantMap");
+
+    if (lua_pcall(luaState_, 2, 0, 0) != 0)
+    {
+        const char* message = lua_tostring(luaState_, -1);
+        ErrorDialog("Execute Lua Function Failed", message);
+        lua_settop(luaState_, top);
+        return;
+    }
 }
 
 Context* GetContext()
