@@ -101,7 +101,7 @@ void HelloGUI::InitWindow()
     this->window_ = SharedPtr<Window>(new Window(context_));
     this->uiRoot_->AddChild(window_);
 
-    // Set Window to be resizable and movable
+    // Set Window size and layout settings
     window_->SetMinSize(384, 192);
     window_->SetLayout(LM_VERTICAL, 6, IntRect(6, 6, 6, 6));
     window_->SetAlignment(HA_CENTER, VA_CENTER);
@@ -140,7 +140,7 @@ void HelloGUI::InitWindow()
 
 void HelloGUI::SubscribeToEvents()
 {
-    // Subscribe handler; invoked whenever a mouse-button 'release' event is dispatched
+    // Subscribe handler; invoked whenever a mouse click event is dispatched
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HelloGUI, HandleControlClicked));
 
     // Subscribe to logic update events
