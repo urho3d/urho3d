@@ -22,10 +22,12 @@
 
 # This script is being called by CMake during GCC build
 # PLEASE DO NOT EDIT unless you know what you are doing
-target=$1; shift
+[ $1 == "STATIC_LIBRARY" ] && shift || exit 0 
+archiver=$1; shift
+libname=$1; shift
 outdir=$1; shift
-objdir=$1; shift
-(( $# )) && rm -f $outdir/$target.obj
-for object in $@; do
-    echo -n "$objdir/$object;" >>$outdir/$target.obj
-done
+[ $1 == "OBJECTS" ] && shift || exit 1  # Consider that as an error
+[ $1 == "TARGETS" ] && shift || exit 0
+IFS=\;
+$archiver r $libname $( for target in $@; do cat $outdir/$target.obj; done )
+unset IFS

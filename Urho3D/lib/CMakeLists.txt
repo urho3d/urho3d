@@ -49,20 +49,18 @@ set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR})
 setup_library ()
 adjust_library_name ()
 
-# This is a CMake hack, please FIXME if there is a better way
 if (MSVC)
 # todo
 elseif (APPLE)
 # todo
 else ()
-    add_custom_command (TARGET ${TARGET_NAME} PRE_BUILD COMMAND
-        [ CMakeFiles/Urho3D_lib.dir/link.txt -nt CMakeFiles/Urho3D_lib.dir/link-all-objects.txt ] &&
-        head -1 CMakeFiles/Urho3D_lib.dir/link.txt >/tmp/link-head.txt &&
-        tail -n +2 CMakeFiles/Urho3D_lib.dir/link.txt >/tmp/link-tail.txt &&
-        sed -z 's/\\n/ /g' /tmp/link-head.txt >CMakeFiles/Urho3D_lib.dir/link-all-objects.txt &&
-        cat ${CMAKE_BINARY_DIR}/CMakeScriptOutput/*.obj >>CMakeFiles/Urho3D_lib.dir/link-all-objects.txt &&
-        echo >>CMakeFiles/Urho3D_lib.dir/link-all-objects.txt &&
-        cat /tmp/link-tail.txt >>CMakeFiles/Urho3D_lib.dir/link-all-objects.txt &&
-        cp -p CMakeFiles/Urho3D_lib.dir/link-all-objects.txt CMakeFiles/Urho3D_lib.dir/link.txt || exit 0
-        COMMENT "Adjusting linker source to include all objects")
+    # GCC specific
+    # Linker adjustment for shared library
+    foreach (TARGET ${STATIC_LIBRARY_TARGETS})
+        set (ARCHIVES ${ARCHIVES} $<TARGET_FILE:${TARGET}>)
+    endforeach ()
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive ${ARCHIVES} -Wl,--no-whole-archive)
+    # Archiver adjustment for static library
+    set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
+        "${CMAKE_SOURCE_DIR}/cmake/Scripts/ExternalObjectArchiver.sh <TARGET_TYPE> <CMAKE_AR> <TARGET> ${CMAKE_BINARY_DIR}/CMakeScriptOutput OBJECTS <OBJECTS> TARGETS ${STATIC_LIBRARY_TARGETS}\n")
 endif ()
