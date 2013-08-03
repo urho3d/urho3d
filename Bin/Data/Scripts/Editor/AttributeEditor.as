@@ -964,8 +964,8 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         if (info.type == VAR_RESOURCEREF)
         {
             ResourceRef ref = target.attributes[resourcePickIndex].GetResourceRef();
-            ref.type = resourcePicker.type;
-            ref.id = StringHash(resourceName);
+            ref.type = res.type;
+            ref.id = StringHash(res.name);
             target.attributes[resourcePickIndex] = Variant(ref);
             target.ApplyAttributes();
         }
@@ -974,7 +974,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             ResourceRefList refList = target.attributes[resourcePickIndex].GetResourceRefList();
             if (resourcePickSubIndex < refList.length)
             {
-                refList.ids[resourcePickSubIndex] = StringHash(resourceName);
+                refList.ids[resourcePickSubIndex] = StringHash(res.name);
                 target.attributes[resourcePickIndex] = Variant(refList);
                 target.ApplyAttributes();
             }
@@ -983,8 +983,8 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         {
             Array<Variant>@ attrs = target.attributes[resourcePickIndex].GetVariantVector();
             ResourceRef ref = attrs[resourcePickSubIndex].GetResourceRef();
-            ref.type = resourcePicker.type;
-            ref.id = StringHash(resourceName);
+            ref.type = res.type;
+            ref.id = StringHash(res.name);
             attrs[resourcePickSubIndex] = ref;
             target.attributes[resourcePickIndex] = Variant(attrs);
             target.ApplyAttributes();

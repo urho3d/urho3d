@@ -38,7 +38,7 @@ void RegisterResource(asIScriptEngine* engine)
 
 static Resource* ResourceCacheGetResource(const String& type, const String& name, ResourceCache* ptr)
 {
-    return ptr->GetResource(type, name);
+    return ptr->GetResource(ShortStringHash(type), name);
 }
 
 static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)

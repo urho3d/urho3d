@@ -36,6 +36,7 @@ class Drawable;
 class Light;
 class Matrix3x4;
 class Renderer;
+class ShaderVariation;
 class Skeleton;
 class Sphere;
 class VertexBuffer;
@@ -115,6 +116,10 @@ private:
     /// Handle end of frame. Clear debug geometry.
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
     
+    /// Vertex shader.
+    SharedPtr<ShaderVariation> vs_;
+    /// Pixel shader.
+    SharedPtr<ShaderVariation> ps_;
     /// Lines rendered with depth test.
     PODVector<DebugLine> lines_;
     /// Lines rendered without depth test.
