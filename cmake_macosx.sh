@@ -14,3 +14,5 @@ then
     ln -s ../../Bin/Data $conf/.
 fi
 done
+
+# vi: set ts=4 sw=4 expandtab:

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright (c) 2008-2013 the Urho3D project.
 #
@@ -22,12 +23,15 @@
 
 # This script is being called by CMake during GCC build
 # PLEASE DO NOT EDIT unless you know what you are doing
-[ $1 == "STATIC_LIBRARY" ] && shift || exit 0 
-archiver=$1; shift
-libname=$1; shift
+[ "$1" == "OUTDIR" ] && shift || exit 1
 outdir=$1; shift
-[ $1 == "OBJECTS" ] && shift || exit 1  # Consider that as an error
-[ $1 == "TARGETS" ] && shift || exit 0
-IFS=\;
-$archiver r $libname $( for target in $@; do cat $outdir/$target.obj; done )
-unset IFS
+[ "$1" == "OBJECTS" ] && shift || exit 1
+while [ "$1" != "TARGETS" ]; do hasobjects=1; shift; done
+[ "$1" == "TARGETS" ] && shift || exit 1
+IFS=\;; for target in $1; do externalobjects="$externalobjects $(cat $outdir/$target.obj)"; done; unset IFS; shift
+[ "$1" == "FRAMEWORKS" ] && shift || exit 1
+while [ "$1" != "COMMAND" ]; do frameworks="$frameworks $1"; shift; done
+[ "$1" == "COMMAND" ] && shift || exit 1
+command=$@
+[ $hasobjects ] && command="$command $externalobjects $frameworks"
+$command

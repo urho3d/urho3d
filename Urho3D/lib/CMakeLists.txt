@@ -51,16 +51,13 @@ adjust_library_name ()
 
 if (MSVC)
 # todo
-elseif (APPLE)
-# todo
 else ()
-    # GCC specific
-    # Linker adjustment for shared library
-    foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-        set (ARCHIVES ${ARCHIVES} $<TARGET_FILE:${TARGET}>)
-    endforeach ()
-    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive ${ARCHIVES} -Wl,--no-whole-archive)
-    # Archiver adjustment for static library
+    # Setting up the frameworks for Mac OS X platform
+    if (APPLE AND LIB_TYPE STREQUAL SHARED)
+        setup_macosx_framework (FRAMEWORKS)
+    endif ()
+
+    # Linker/Archiver adjustment to include all objects on the fly (works for GCC and Clang)
     set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
-        "${CMAKE_SOURCE_DIR}/cmake/Scripts/ExternalObjectArchiver.sh <TARGET_TYPE> <CMAKE_AR> <TARGET> ${CMAKE_BINARY_DIR}/CMakeScriptOutput OBJECTS <OBJECTS> TARGETS ${STATIC_LIBRARY_TARGETS}\n")
+        "${CMAKE_SOURCE_DIR}/cmake/Scripts/ExternalObjectLinker.sh OUTDIR ${CMAKE_BINARY_DIR}/CMakeScriptOutput OBJECTS <OBJECTS> TARGETS ${STATIC_LIBRARY_TARGETS} FRAMEWORKS ${FRAMEWORKS} COMMAND")
 endif ()

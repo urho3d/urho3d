@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright (c) 2008-2013 the Urho3D project.
 #
@@ -27,5 +28,5 @@ outdir=$1; shift
 objdir=$1; shift
 (( $# )) && rm -f $outdir/$target.obj
 for object in $@; do
-    echo -n "$objdir/$object;" >>$outdir/$target.obj
+    echo -n "$objdir/$object " >>$outdir/$target.obj
 done

@@ -219,6 +219,11 @@ macro (setup_executable)
     endif ()
 endmacro ()
 
+# Macro for setting up linker flags to link aginst the framework for Mac OS X desktop build
+macro (setup_macosx_framework FRAMEWORKS)
+    set (FRAMEWORKS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+endmacro ()
+
 # Macro for setting up an executable target with resources to copy
 macro (setup_main_executable)
     # Define resource files
@@ -235,7 +240,8 @@ macro (setup_main_executable)
         set (CMAKE_EXE_LINKER_FLAGS "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
         set (EXE_TYPE MACOSX_BUNDLE)
     elseif (APPLE)
-        set (CMAKE_EXE_LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+        setup_macosx_framework (FRAMEWORKS)
+        set (CMAKE_EXE_LINKER_FLAGS ${FRAMEWORKS})
     endif ()
     if (ANDROID)
         add_library (${TARGET_NAME} SHARED ${SOURCE_FILES})
