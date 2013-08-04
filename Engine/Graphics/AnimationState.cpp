@@ -198,7 +198,14 @@ void AnimationState::SetBoneWeight(unsigned index, float weight)
     if (index >= stateTracks_.Size())
         return;
     
-    stateTracks_[index].weight_ = Clamp(weight, 0.0f, 1.0f);
+    weight = Clamp(weight, 0.0f, 1.0f);
+    
+    if (weight != stateTracks_[index].weight_)
+    {
+        stateTracks_[index].weight_ = weight;
+        if (model_)
+            model_->MarkAnimationDirty();
+    }
 }
 
 void AnimationState::SetBoneWeight(const String& name, float weight)
