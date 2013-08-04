@@ -849,6 +849,12 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "void AddWeight(float)", asMETHOD(AnimationState, AddWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void AddTime(float)", asMETHOD(AnimationState, AddTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void Apply()", asMETHOD(AnimationState, Apply), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "void SetBoneWeight(uint, float)", asMETHODPR(AnimationState, SetBoneWeight, (unsigned, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "void SetBoneWeight(StringHash, float)", asMETHODPR(AnimationState, SetBoneWeight, (StringHash, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "float GetBoneWeight(uint) const", asMETHODPR(AnimationState, GetBoneWeight, (unsigned) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "float GetBoneWeight(StringHash) const", asMETHODPR(AnimationState, GetBoneWeight, (StringHash) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "uint GetTrackIndex(const String&in) const", asMETHODPR(AnimationState, GetTrackIndex, (const String&) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "uint GetTrackIndex(StringHash) const", asMETHODPR(AnimationState, GetTrackIndex, (StringHash) const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_startBone(Bone@+)", asMETHOD(AnimationState, SetStartBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "Bone@+ get_startBone() const", asMETHOD(AnimationState, GetStartBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_looped(bool)", asMETHOD(AnimationState, SetLooped), asCALL_THISCALL);
@@ -864,7 +870,8 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "Node@+ get_node() const", asMETHOD(AnimationState, GetNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "bool get_enabled() const", asMETHOD(AnimationState, IsEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float get_length() const", asMETHOD(AnimationState, GetLength), asCALL_THISCALL);
-    
+    engine->RegisterObjectMethod("AnimationState", "void set_boneWeights(const String&in, float)", asMETHODPR(AnimationState, SetBoneWeight, (const String&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "float get_boneWeights(const String&in)", asMETHODPR(AnimationState, GetBoneWeight, (const String&) const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ AddAnimationState(Animation@+)", asMETHOD(AnimatedModel, AddAnimationState), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(Animation@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (Animation*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String&in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const String&), void), asCALL_THISCALL);

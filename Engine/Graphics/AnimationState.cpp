@@ -34,6 +34,18 @@
 namespace Urho3D
 {
 
+AnimationStateTrack::AnimationStateTrack() :
+    track_(0),
+    bone_(0),
+    weight_(1.0f),
+    keyFrame_(0)
+{
+}
+
+AnimationStateTrack::~AnimationStateTrack()
+{
+}
+
 AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     model_(model),
     animation_(animation),
@@ -43,16 +55,8 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     time_(0.0f),
     layer_(0)
 {
+    // Set default start bone (use all tracks.)
     SetStartBone(0);
-    
-    if (animation_)
-    {
-        // Setup a cache for last keyframe of each track
-        lastKeyFrame_.Resize(animation_->GetNumTracks());
-    }
-    
-    for (unsigned i = 0; i < lastKeyFrame_.Size(); ++i)
-        lastKeyFrame_[i] = 0;
 }
 
 AnimationState::AnimationState(Node* node, Animation* animation) :
@@ -66,34 +70,34 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
 {
     if (animation_)
     {
-        // Setup a cache for last keyframe of each track
-        lastKeyFrame_.Resize(animation_->GetNumTracks());
-        
         // Setup animation track to scene node mapping
         if (node_)
         {
             const Vector<AnimationTrack>& tracks = animation_->GetTracks();
+            stateTracks_.Clear();
             
             for (unsigned i = 0; i < tracks.Size(); ++i)
             {
                 const StringHash& nameHash = tracks[i].nameHash_;
-                
+                AnimationStateTrack stateTrack;
+                stateTrack.track_ = &tracks[i];
+
                 if (node_->GetNameHash() == nameHash || tracks.Size() == 1)
-                    trackToNodeMap_[i] = node_;
+                    stateTrack.node_ = node_;
                 else
                 {
                     Node* targetNode = node_->GetChild(nameHash, true);
                     if (targetNode)
-                        trackToNodeMap_[i] = targetNode;
+                        stateTrack.node_ = targetNode;
                     else
                         LOGWARNING("Node " + tracks[i].name_ + " not found for node animation " + animation_->GetName());
                 }
+
+                if (stateTrack.node_)
+                    stateTracks_.Push(stateTrack);
             }
         }
     }
-    
-    for (unsigned i = 0; i < lastKeyFrame_.Size(); ++i)
-        lastKeyFrame_[i] = 0;
 }
 
 
@@ -116,19 +120,22 @@ void AnimationState::SetStartBone(Bone* startBone)
     }
     
     // Do not reassign if the start bone did not actually change, and we already have valid bone nodes
-    if (startBone == startBone_ && !trackToBoneMap_.Empty())
+    if (startBone == startBone_ && !stateTracks_.Empty())
         return;
     
     startBone_ = startBone;
     
-    trackToBoneMap_.Clear();
+    const Vector<AnimationTrack>& tracks = animation_->GetTracks();
+    stateTracks_.Clear();
+    
     if (!startBone->node_)
         return;
     
-    const Vector<AnimationTrack>& tracks = animation_->GetTracks();
-    
     for (unsigned i = 0; i < tracks.Size(); ++i)
     {
+        AnimationStateTrack stateTrack;
+        stateTrack.track_ = &tracks[i];
+        
         // Include those tracks that are either the start bone itself, or its children
         Bone* trackBone = 0;
         const StringHash& nameHash = tracks[i].nameHash_;
@@ -142,8 +149,12 @@ void AnimationState::SetStartBone(Bone* startBone)
                 trackBone = skeleton.GetBone(nameHash);
         }
         
-        if (trackBone)
-            trackToBoneMap_[i] = trackBone;
+        if (trackBone && trackBone->node_)
+        {
+            stateTrack.bone_ = trackBone;
+            stateTrack.node_ = trackBone->node_;
+            stateTracks_.Push(stateTrack);
+        }
     }
     
     model_->MarkAnimationDirty();
@@ -180,6 +191,24 @@ void AnimationState::SetTime(float time)
         if (model_)
             model_->MarkAnimationDirty();
     }
+}
+
+void AnimationState::SetBoneWeight(unsigned index, float weight)
+{
+    if (index >= stateTracks_.Size())
+        return;
+    
+    stateTracks_[index].weight_ = Clamp(weight, 0.0f, 1.0f);
+}
+
+void AnimationState::SetBoneWeight(const String& name, float weight)
+{
+    SetBoneWeight(GetTrackIndex(name), weight);
+}
+
+void AnimationState::SetBoneWeight(StringHash nameHash, float weight)
+{
+    SetBoneWeight(GetTrackIndex(nameHash), weight);
 }
 
 void AnimationState::AddWeight(float delta)
@@ -272,6 +301,45 @@ Bone* AnimationState::GetStartBone() const
     return model_ ? startBone_ : 0;
 }
 
+float AnimationState::GetBoneWeight(unsigned index) const
+{
+    return index < stateTracks_.Size() ? stateTracks_[index].weight_ : 0.0f;
+}
+
+float AnimationState::GetBoneWeight(const String& name) const
+{
+    return GetBoneWeight(GetTrackIndex(name));
+}
+
+float AnimationState::GetBoneWeight(StringHash nameHash) const
+{
+    return GetBoneWeight(GetTrackIndex(nameHash));
+}
+
+unsigned AnimationState::GetTrackIndex(const String& name) const
+{
+    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    {
+        Node* node = stateTracks_[i].node_;
+        if (node && node->GetName() == name)
+            return i;
+    }
+    
+    return M_MAX_UNSIGNED;
+}
+
+unsigned AnimationState::GetTrackIndex(StringHash nameHash) const
+{
+    for (unsigned i = 0; i < stateTracks_.Size(); ++i)
+    {
+        Node* node = stateTracks_[i].node_;
+        if (node && node->GetNameHash() == nameHash)
+            return i;
+    }
+
+    return M_MAX_UNSIGNED;
+}
+
 float AnimationState::GetLength() const
 {
     return animation_ ? animation_->GetLength() : 0.0f;
@@ -290,53 +358,38 @@ void AnimationState::Apply()
 
 void AnimationState::ApplyToModel()
 {
-    // Check first if full weight or blending
-    if (Equals(weight_, 1.0f))
+    for (Vector<AnimationStateTrack>::Iterator i = stateTracks_.Begin(); i != stateTracks_.End(); ++i)
     {
-        for (HashMap<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
-        {
-            Bone* bone = i->second_;
-            Node* boneNode = bone->node_;
-            if (!boneNode || !bone->animated_)
-                continue;
-            
-            ApplyTrackToNodeFullWeight(i->first_, boneNode);
-        }
-    }
-    else
-    {
-        for (HashMap<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
-        {
-            Bone* bone = i->second_;
-            Node* boneNode = bone->node_;
-            if (!boneNode || !bone->animated_)
-                continue;
-            
-            ApplyTrackToNodeBlended(i->first_, boneNode);
-        }
+        AnimationStateTrack& stateTrack = *i;
+        float finalWeight = weight_ * stateTrack.weight_;
+        
+        // Do not apply if zero effective weight or the bone has animation disabled
+        if (Equals(finalWeight, 0.0f) || !stateTrack.bone_->animated_)
+            continue;
+        
+        if (Equals(finalWeight, 1.0f))
+            ApplyTrackFullWeight(stateTrack);
+        else
+            ApplyTrackBlended(stateTrack, finalWeight);
     }
 }
 
 void AnimationState::ApplyToNodes()
 {
     // When applying to a node hierarchy, can only use full weight (nothing to blend to)
-    for (HashMap<unsigned, WeakPtr<Node> >::ConstIterator i = trackToNodeMap_.Begin(); i != trackToNodeMap_.End(); ++i)
-    {
-        Node* node = i->second_;
-        if (!node)
-            continue;
-        
-        ApplyTrackToNodeFullWeight(i->first_, node);
-    }
+    for (Vector<AnimationStateTrack>::Iterator i = stateTracks_.Begin(); i != stateTracks_.End(); ++i)
+        ApplyTrackFullWeight(*i);
 }
 
-void AnimationState::ApplyTrackToNodeFullWeight(unsigned index, Node* node)
+void AnimationState::ApplyTrackFullWeight(AnimationStateTrack& stateTrack)
 {
-    const AnimationTrack* track = animation_->GetTrack(index);
-    if (track->keyFrames_.Empty())
+    const AnimationTrack* track = stateTrack.track_;
+    Node* node = stateTrack.node_;
+    
+    if (track->keyFrames_.Empty() || !node)
         return;
     
-    unsigned& frame = lastKeyFrame_[index];
+    unsigned& frame = stateTrack.keyFrame_;
     track->GetKeyFrameIndex(time_, frame);
     
     // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
@@ -384,13 +437,15 @@ void AnimationState::ApplyTrackToNodeFullWeight(unsigned index, Node* node)
     }
 }
 
-void AnimationState::ApplyTrackToNodeBlended(unsigned index, Node* node)
+void AnimationState::ApplyTrackBlended(AnimationStateTrack& stateTrack, float weight)
 {
-    const AnimationTrack* track = animation_->GetTrack(index);
-    if (track->keyFrames_.Empty())
+    const AnimationTrack* track = stateTrack.track_;
+    Node* node = stateTrack.node_;
+    
+    if (track->keyFrames_.Empty() || !node)
         return;
     
-    unsigned& frame = lastKeyFrame_[index];
+    unsigned& frame = stateTrack.keyFrame_;
     track->GetKeyFrameIndex(time_, frame);
     
     // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
@@ -414,11 +469,11 @@ void AnimationState::ApplyTrackToNodeBlended(unsigned index, Node* node)
     {
         // No interpolation, blend between old transform & animation
         if (channelMask & CHANNEL_POSITION)
-            node->SetPosition(node->GetPosition().Lerp(keyFrame->position_, weight_));
+            node->SetPosition(node->GetPosition().Lerp(keyFrame->position_, weight));
         if (channelMask & CHANNEL_ROTATION)
-            node->SetRotation(node->GetRotation().Slerp(keyFrame->rotation_, weight_));
+            node->SetRotation(node->GetRotation().Slerp(keyFrame->rotation_, weight));
         if (channelMask & CHANNEL_SCALE)
-            node->SetScale(node->GetScale().Lerp(keyFrame->scale_, weight_));
+            node->SetScale(node->GetScale().Lerp(keyFrame->scale_, weight));
     }
     else
     {
@@ -432,20 +487,19 @@ void AnimationState::ApplyTrackToNodeBlended(unsigned index, Node* node)
         if (channelMask & CHANNEL_POSITION)
         {
             node->SetPosition(node->GetPosition().Lerp(
-                keyFrame->position_.Lerp(nextKeyFrame->position_, t), weight_));
+                keyFrame->position_.Lerp(nextKeyFrame->position_, t), weight));
         }
         if (channelMask & CHANNEL_ROTATION)
         {
             node->SetRotation(node->GetRotation().Slerp(
-                keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t), weight_));
+                keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t), weight));
         }
         if (channelMask & CHANNEL_SCALE)
         {
             node->SetScale(node->GetScale().Lerp(
-                keyFrame->scale_.Lerp(nextKeyFrame->scale_, t), weight_));
+                keyFrame->scale_.Lerp(nextKeyFrame->scale_, t), weight));
         }
     }
 }
-
 
 }

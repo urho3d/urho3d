@@ -2463,6 +2463,12 @@ Methods:<br>
 - void AddWeight(float)
 - void AddTime(float)
 - void Apply()
+- void SetBoneWeight(uint, float)
+- void SetBoneWeight(StringHash, float)
+- uint GetTrackIndex(const String&) const
+- uint GetTrackIndex(StringHash) const
+- float GetBoneWeight(uint) const
+- float GetBoneWeight(StringHash) const
 
 Properties:<br>
 - int refs (readonly)
@@ -2477,6 +2483,7 @@ Properties:<br>
 - Node@ node (readonly)
 - bool enabled (readonly)
 - float length (readonly)
+- float[] boneWeights
 
 
 AnimatedModel
