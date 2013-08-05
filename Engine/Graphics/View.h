@@ -89,7 +89,7 @@ struct ScenePassInfo
 };
 
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
-class View : public Object
+class URHO3D_API View : public Object
 {
     friend void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex);
     friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);

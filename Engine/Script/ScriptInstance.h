@@ -68,7 +68,7 @@ struct DelayedMethodCall
 };
 
 /// %Script object component.
-class ScriptInstance : public Component, public ScriptEventListener
+class URHO3D_API ScriptInstance : public Component, public ScriptEventListener
 {
     OBJECT(ScriptInstance);
     
@@ -197,16 +197,16 @@ private:
 };
 
 /// Return the Urho3D context of the active script context.
-Context* GetScriptContext();
+URHO3D_API Context* GetScriptContext();
 /// Return the ScriptInstance of the active script context.
-ScriptInstance* GetScriptContextInstance();
+URHO3D_API ScriptInstance* GetScriptContextInstance();
 /// Return the scene node of the active script context.
-Node* GetScriptContextNode();
+URHO3D_API Node* GetScriptContextNode();
 /// Return the scene of the active script context.
-Scene* GetScriptContextScene();
+URHO3D_API Scene* GetScriptContextScene();
 /// Return the event listener of the active script context.
-ScriptEventListener* GetScriptContextEventListener();
+URHO3D_API ScriptEventListener* GetScriptContextEventListener();
 /// Return the event listener of the active script context as an Object pointer.
-Object* GetScriptContextEventListenerObject();
+URHO3D_API Object* GetScriptContextEventListenerObject();
 
 }

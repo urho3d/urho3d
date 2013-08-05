@@ -35,7 +35,7 @@ class Sound;
 static const int DECODE_BUFFER_LENGTH = 100;
 
 /// %Sound source component with stereo position.
-class SoundSource : public Component
+class URHO3D_API SoundSource : public Component
 {
     OBJECT(SoundSource);
     

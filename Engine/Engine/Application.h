@@ -32,7 +32,7 @@ namespace Urho3D
 class Engine;
 
 /// Base class for creating applications which initialize the Urho3D engine and run a main loop until exited.
-class Application : public Object
+class URHO3D_API Application : public Object
 {
     OBJECT(Application);
     

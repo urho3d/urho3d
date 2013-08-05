@@ -21,7 +21,7 @@
 #
 
 # Find Urho3D library and include directories in the build tree or installed location
-# For build tree detection, Urho3D must be already built with ENABLE_LIBRARY turned on
+# For build tree detection to work, Urho3D library must be already been built
 #
 #  URHO3D_FOUND
 #  URHO3D_INCLUDE_DIR
@@ -36,39 +36,37 @@ if (URHO3D_HOME)
     file (TO_CMAKE_PATH ${URHO3D_HOME} URHO3D_HOME)
     
     # Construct build tree paths from URHO3D_HOME environment variable
-    find_file (BUILD_TREE_PATH Engine.h ${URHO3D_HOME}/Engine/Engine NO_DEFAULT_PATH)
+    find_file (BUILD_TREE_PATH Urho3D.h.in ${URHO3D_HOME} NO_DEFAULT_PATH)
     if (NOT BUILD_TREE_PATH)
-        find_file (BUILD_TREE_PATH Engine.h ${URHO3D_HOME}/trunk/Engine/Engine NO_DEFAULT_PATH)
+        find_file (BUILD_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/trunk NO_DEFAULT_PATH)
     endif ()
     if (BUILD_TREE_PATH)
-        string (REPLACE "/Engine/Engine.h" "" BUILD_TREE_PATH ${BUILD_TREE_PATH})
+        string (REPLACE "/Urho3D.h.in" "" BUILD_TREE_PATH ${BUILD_TREE_PATH})
         set (URHO3D_INCLUDE_DIR
-            ${BUILD_TREE_PATH}/Audio
-            ${BUILD_TREE_PATH}/Container
-            ${BUILD_TREE_PATH}/Core
-            ${BUILD_TREE_PATH}/Engine
-            ${BUILD_TREE_PATH}/Graphics
-            ${BUILD_TREE_PATH}/Input
-            ${BUILD_TREE_PATH}/IO
-            ${BUILD_TREE_PATH}/Math
-            ${BUILD_TREE_PATH}/Navigation
-            ${BUILD_TREE_PATH}/Network
-            ${BUILD_TREE_PATH}/Physics
-            ${BUILD_TREE_PATH}/Resource
-            ${BUILD_TREE_PATH}/Scene
-            ${BUILD_TREE_PATH}/Script
-            ${BUILD_TREE_PATH}/UI
-            ${BUILD_TREE_PATH}/../Extras/LuaScript
-            ${BUILD_TREE_PATH}/../Urho3D/lib)
+            ${BUILD_TREE_PATH}/Engine/Audio
+            ${BUILD_TREE_PATH}/Engine/Container
+            ${BUILD_TREE_PATH}/Engine/Core
+            ${BUILD_TREE_PATH}/Engine/Engine
+            ${BUILD_TREE_PATH}/Engine/Graphics
+            ${BUILD_TREE_PATH}/Engine/Input
+            ${BUILD_TREE_PATH}/Engine/IO
+            ${BUILD_TREE_PATH}/Engine/Math
+            ${BUILD_TREE_PATH}/Engine/Navigation
+            ${BUILD_TREE_PATH}/Engine/Network
+            ${BUILD_TREE_PATH}/Engine/Physics
+            ${BUILD_TREE_PATH}/Engine/Resource
+            ${BUILD_TREE_PATH}/Engine/Scene
+            ${BUILD_TREE_PATH}/Engine/Script
+            ${BUILD_TREE_PATH}/Engine/UI
+            ${BUILD_TREE_PATH}/Extras/LuaScript
+            ${BUILD_TREE_PATH}/Urho3D/lib)
 
         if (RASPI)            
-            set (URHO3D_LIB_SEARCH_PATH
-                ${BUILD_TREE_PATH}/../raspi-build/Urho3D/lib
-                ${BUILD_TREE_PATH}/../../raspi-build/Urho3D/lib)
+            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${BUILD_TREE_PATH}/../raspi-build)
+            set (URHO3D_LIB_SEARCH_PATH ${BUILD_TREE_PATH}/../raspi-build/Urho3D/lib)
         else ()
-            set (URHO3D_LIB_SEARCH_PATH
-                ${BUILD_TREE_PATH}/../build/Urho3D/lib
-                ${BUILD_TREE_PATH}/../../build/Urho3D/lib)
+            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${BUILD_TREE_PATH}/../build)
+            set (URHO3D_LIB_SEARCH_PATH ${BUILD_TREE_PATH}/../build/Urho3D/lib)
         endif ()
         find_library (URHO3D_LIBRARIES Urho3D ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH)
     endif ()

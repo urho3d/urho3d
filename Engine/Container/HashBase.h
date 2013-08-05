@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Urho3D.h"
 #include "Allocator.h"
 #include "Hash.h"
 #include "Swap.h"
@@ -87,7 +88,7 @@ struct HashIteratorBase
 };
 
 /// Hash set/map base class.
-class HashBase
+class URHO3D_API HashBase
 {
 public:
     /// Initial amount of buckets.

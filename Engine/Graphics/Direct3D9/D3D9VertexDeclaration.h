@@ -46,7 +46,7 @@ struct VertexDeclarationElement
 };
 
 /// Vertex declaration.
-class VertexDeclaration : public RefCounted
+class URHO3D_API VertexDeclaration : public RefCounted
 {
 public:
     /// Construct with vertex element mask.

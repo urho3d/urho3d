@@ -79,7 +79,7 @@ static const unsigned char CHANNEL_ROTATION = 0x2;
 static const unsigned char CHANNEL_SCALE = 0x4;
 
 /// Skeletal animation resource.
-class Animation : public Resource
+class URHO3D_API Animation : public Resource
 {
     OBJECT(Animation);
     

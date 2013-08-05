@@ -125,10 +125,6 @@ else ()
     elseif (NOT IOS)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -ffast-math")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -O2 -ffast-math")
-        if (ENABLE_LIBRARY MATCHES "SHARED|shared") 
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-        endif ()
         if (RASPI)
             add_definitions (-DRASPI)
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard")
@@ -151,6 +147,72 @@ else ()
     endif ()
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+endif ()
+
+# Include CMake builtin module for building shared library support
+include (GenerateExportHeader)
+
+# Override builtin macro to suit our need, always generate header file regardless of library type
+macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
+    set (DEFINE_DEPRECATED)
+    set (DEFINE_EXPORT)
+    set (DEFINE_IMPORT)
+    set (DEFINE_NO_EXPORT)
+
+    if (COMPILER_HAS_DEPRECATED_ATTR)
+        set (DEFINE_DEPRECATED "__attribute__ ((__deprecated__))")
+    elseif (COMPILER_HAS_DEPRECATED)
+        set (DEFINE_DEPRECATED "__declspec(deprecated)")
+    endif ()
+
+    if (WIN32)
+        set (DEFINE_EXPORT "__declspec(dllexport)")
+        set (DEFINE_IMPORT "__declspec(dllimport)")
+    elseif (COMPILER_HAS_HIDDEN_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY)
+      set (DEFINE_EXPORT "__attribute__((visibility(\"default\")))")
+      set (DEFINE_IMPORT "__attribute__((visibility(\"default\")))")
+      set (DEFINE_NO_EXPORT "__attribute__((visibility(\"hidden\")))")
+    endif ()
+endmacro ()
+
+# Override builtin function to suit our need, takes care of C flags as well as CXX flags
+function (add_compiler_export_flags)
+    _test_compiler_hidden_visibility ()
+    _test_compiler_has_deprecated ()
+
+    if (NOT (USE_COMPILER_HIDDEN_VISIBILITY AND COMPILER_HAS_HIDDEN_VISIBILITY))
+        # Just return if there are no flags to add.
+        return ()
+    endif ()
+
+    set (EXTRA_FLAGS "-fvisibility=hidden")
+    # Either return the extra flags needed in the supplied argument, or to the
+    # CMAKE_C_FLAGS if no argument is supplied.
+    if (ARGV1)
+        set (${ARGV1} "${EXTRA_FLAGS}" PARENT_SCOPE)
+    else ()
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_FLAGS}" PARENT_SCOPE)
+    endif ()
+
+    if (COMPILER_HAS_HIDDEN_INLINE_VISIBILITY)
+        set (EXTRA_FLAGS "${EXTRA_FLAGS} -fvisibility-inlines-hidden")
+    endif ()
+
+    # Either return the extra flags needed in the supplied argument, or to the
+    # CMAKE_CXX_FLAGS if no argument is supplied.
+    if (ARGV0)
+        set (${ARGV0} "${EXTRA_FLAGS}" PARENT_SCOPE)
+    else ()
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" PARENT_SCOPE)
+    endif ()
+endfunction ()
+
+# Setup the compiler flags for building shared library
+if (URHO3D_BUILD_TYPE STREQUAL SHARED AND NOT ANDROID AND NOT IOS)
+    # Hide the symbols that are not explicitly marked for export
+    add_compiler_export_flags ()
+    # Use PIC on platforms that support it 
+    set (CMAKE_POSITION_INDEPENDENT_CODE true)
 endif ()
 
 # Create custom script output directory
@@ -186,10 +248,15 @@ macro (setup_library)
     add_library (${TARGET_NAME} ${LIB_TYPE} ${SOURCE_FILES})
     setup_target ()
     
-    if (NOT LIB_TYPE STREQUAL SHARED AND NOT TARGET_NAME MATCHES "Urho3D_lib|Assimp")   # Exclude Assimp explicitly here just to be safe though Assimp does not use this macro
+    if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED AND NOT TARGET_NAME MATCHES "Urho3D|Assimp")   # Exclude Assimp explicitly here just to be safe though Assimp does not use this macro
         set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+        if (URHO3D_BUILD_TYPE STREQUAL SHARED)
+            set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
+        elseif (URHO3D_BUILD_TYPE STREQUAL STATIC)
+            set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_STATIC_DEFINE)
+        endif ()
         if (NOT WIN32)
-            # Specific to GCC build, locate the location of the objects that are used to link to this target to be used later by Urho3D_lib target
+            # Specific to GCC build, locate the location of the objects that are used to link to this target to be used later by Urho3D library target
             set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
                 "${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.sh ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR} <OBJECTS>\n")
         endif ()
@@ -219,9 +286,14 @@ macro (setup_executable)
     endif ()
 endmacro ()
 
-# Macro for setting up linker flags to link aginst the framework for Mac OS X desktop build
+# Macro for setting up linker flags to link against the framework for Mac OS X desktop build
 macro (setup_macosx_framework FRAMEWORKS)
-    set (FRAMEWORKS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+    set (${FRAMEWORKS} "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+endmacro ()
+
+# Macro for setting up linker flags to link against the framework for IOS build
+macro (setup_ios_framework FRAMEWORKS)
+    set (${FRAMEWORKS} "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
 endmacro ()
 
 # Macro for setting up an executable target with resources to copy
@@ -233,23 +305,27 @@ macro (setup_main_executable)
         set (SOURCE_FILES ${SOURCE_FILES} ${RESOURCE_FILES})
     endif ()
 
-    # Setup target
-    if (WIN32)
-        set (EXE_TYPE WIN32)
-    elseif (IOS)
-        set (CMAKE_EXE_LINKER_FLAGS "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
-        set (EXE_TYPE MACOSX_BUNDLE)
-    elseif (APPLE)
-        setup_macosx_framework (FRAMEWORKS)
-        set (CMAKE_EXE_LINKER_FLAGS ${FRAMEWORKS})
+    # Define external dependency libraries, for the convenience of other main target (not in Urho3D project) referencing Urho3D as external library
+    if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT TARGET_NAME STREQUAL Main)
+        define_dependency_libs (Main)
     endif ()
+
+    # Setup target
     if (ANDROID)
-        add_library (${TARGET_NAME} SHARED ${SOURCE_FILES})
-        setup_target ()
+        set (LIB_TYPE SHARED)
+        setup_library ()
         # Strip the output shared library
-        get_target_property (EXECUTABLE_NAME ${TARGET_NAME} LOCATION)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} ${EXECUTABLE_NAME})
+        get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} ${TARGET_LOC})
     else ()
+        if (WIN32)
+            set (EXE_TYPE WIN32)
+        elseif (IOS)
+            set (EXE_TYPE MACOSX_BUNDLE)
+            setup_ios_framework (CMAKE_EXE_LINKER_FLAGS)
+        elseif (APPLE)
+            setup_macosx_framework (CMAKE_EXE_LINKER_FLAGS)
+        endif ()
         setup_executable ()
     endif ()
 
@@ -259,8 +335,7 @@ macro (setup_main_executable)
         string (REGEX REPLACE "/Contents/MacOS" "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
         add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
             \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
-            COMMENT "This is a dummy target to check for changes in the Resource folders"
-        )
+            COMMENT "This is a dummy target to check for changes in the Resource folders")
         add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
     endif ()
 endmacro ()
@@ -275,7 +350,7 @@ endmacro ()
 # The purpose of this macro is emulate CMake way to set the external library dependencies transitively to a Main target (in other CMake build script) that uses Urho3D static/shared library 
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
-    if (${TARGET} MATCHES "SDL|MAIN|Main|main")
+    if (${TARGET} MATCHES "SDL|Main")
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
         elseif (APPLE)
@@ -291,7 +366,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # ThirdParty/kNet external dependency
-    if (${TARGET} MATCHES "kNet|MAIN|Main|main")
+    if (${TARGET} MATCHES "kNet|Main")
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} ws2_32.lib)
         elseif (NOT ANDROID)
@@ -300,7 +375,7 @@ macro (define_dependency_libs TARGET)
     endif ()
     
     # Engine/Core external dependency
-    if (${TARGET} MATCHES "Core|MAIN|Main|main")
+    if (${TARGET} MATCHES "Core|Main")
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} winmm.lib)
             if (ENABLE_MINIDUMPS)
@@ -312,7 +387,7 @@ macro (define_dependency_libs TARGET)
     endif ()
     
     # Engine/Graphics external dependency
-    if (${TARGET} MATCHES "Graphics|MAIN|Main|main")
+    if (${TARGET} MATCHES "Graphics|Main")
         if (USE_OPENGL)
             if (WIN32)
                 set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} opengl32)
@@ -327,7 +402,7 @@ macro (define_dependency_libs TARGET)
     endif ()
     
     # Main external dependency
-    if (${TARGET} MATCHES "MAIN|Main|main")
+    if (${TARGET} MATCHES "Main")
         set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} Urho3D)
     endif ()
     

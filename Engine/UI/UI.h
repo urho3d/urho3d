@@ -39,7 +39,7 @@ class XMLElement;
 class XMLFile;
 
 /// %UI subsystem. Manages the graphical user interface.
-class UI : public Object
+class URHO3D_API UI : public Object
 {
     OBJECT(UI);
 

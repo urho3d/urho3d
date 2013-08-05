@@ -50,7 +50,7 @@ struct ResourceGroup
 };
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
-class ResourceCache : public Object
+class URHO3D_API ResourceCache : public Object
 {
     OBJECT(ResourceCache);
     

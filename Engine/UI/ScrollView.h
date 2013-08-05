@@ -31,7 +31,7 @@ class BorderImage;
 class ScrollBar;
 
 /// Scrollable %UI element for showing a (possibly large) child element.
-class ScrollView : public UIElement
+class URHO3D_API ScrollView : public UIElement
 {
     OBJECT(ScrollView);
 

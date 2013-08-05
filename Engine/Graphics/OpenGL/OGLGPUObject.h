@@ -30,7 +30,7 @@ namespace Urho3D
 class Graphics;
 
 /// Base class for GPU resources.
-class GPUObject
+class URHO3D_API GPUObject
 {
 public:
     /// Construct with graphics subsystem pointer.

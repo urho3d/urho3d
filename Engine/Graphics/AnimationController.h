@@ -76,7 +76,7 @@ struct AnimationControl
 };
 
 /// %Component that drives an AnimatedModel's animations.
-class AnimationController : public Component
+class URHO3D_API AnimationController : public Component
 {
     OBJECT(AnimationController);
 

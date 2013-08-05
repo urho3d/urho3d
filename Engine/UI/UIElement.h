@@ -111,7 +111,7 @@ class Cursor;
 class ResourceCache;
 
 /// Base class for %UI elements.
-class UIElement : public Serializable
+class URHO3D_API UIElement : public Serializable
 {
     OBJECT(UIElement);
 
@@ -579,7 +579,7 @@ private:
     static XPathQuery styleXPathQuery_;
 };
 
-template <class T> T* UIElement::CreateChild(const String& name, unsigned index) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index)); }
+template <class T> URHO3D_API T* UIElement::CreateChild(const String& name, unsigned index) { return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index)); }
 
 }
 

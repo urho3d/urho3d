@@ -33,7 +33,7 @@ class Plane;
 class Sphere;
 
 /// Infinite straight line in three-dimensional space.
-class Ray
+class URHO3D_API Ray
 {
 public:
     /// Construct undefined.

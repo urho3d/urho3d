@@ -31,7 +31,7 @@ class Font;
 class Text;
 
 /// Single-line text editor %UI element.
-class LineEdit : public BorderImage
+class URHO3D_API LineEdit : public BorderImage
 {
     OBJECT(LineEdit);
 

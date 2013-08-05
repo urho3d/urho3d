@@ -36,7 +36,7 @@ class Matrix3x4;
 class Sphere;
 
 /// Three-dimensional axis-aligned bounding box.
-class BoundingBox
+class URHO3D_API BoundingBox
 {
 public:
     /// Construct with zero size.

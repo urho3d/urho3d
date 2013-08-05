@@ -32,7 +32,7 @@ class Component;
 class Node;
 
 /// Utility class that resolves node & component IDs after a scene or partial scene load.
-class SceneResolver
+class URHO3D_API SceneResolver
 {
 public:
     /// Construct.

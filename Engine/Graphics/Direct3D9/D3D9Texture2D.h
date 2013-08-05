@@ -32,7 +32,7 @@ namespace Urho3D
 class Image;
 
 /// 2D texture resource.
-class Texture2D : public Texture
+class URHO3D_API Texture2D : public Texture
 {
     OBJECT(Texture2D);
     

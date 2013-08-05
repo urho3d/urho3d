@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "Urho3D.h"
+
 #include <angelscript.h>
 
 // Adapted from Angelscript's scriptarray & scriptstdstring add-ons, but with garbage collection disabled
@@ -33,7 +35,7 @@ struct SArrayBuffer;
 struct SArrayCache;
 
 /// %Script array class.
-class CScriptArray
+class URHO3D_API CScriptArray
 {
 public:
     CScriptArray(asUINT length, asIObjectType *ot);

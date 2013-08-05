@@ -36,7 +36,7 @@ static const int CONVERSION_BUFFER_LENGTH = 128;
 class WString;
 
 /// %String class.
-class String
+class URHO3D_API String
 {
 public:
     typedef RandomAccessIterator<char> Iterator;
@@ -503,7 +503,7 @@ inline String operator + (const char* lhs, const String& rhs)
 }
 
 /// Wide character string. Only meant for converting from String and passing to the operating system where necessary.
-class WString
+class URHO3D_API WString
 {
 public:
     /// Construct empty.

@@ -33,7 +33,7 @@ namespace Urho3D
 class Scene;
 
 /// Lua script subsystem.
-class LuaScript : public Object
+class URHO3D_API LuaScript : public Object
 {
     OBJECT(LuaScript);
 

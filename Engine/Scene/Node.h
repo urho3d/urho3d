@@ -44,7 +44,7 @@ enum CreateMode
 };
 
 /// %Scene node that may contain components and child nodes.
-class Node : public Serializable
+class URHO3D_API Node : public Serializable
 {
     OBJECT(Node);
 

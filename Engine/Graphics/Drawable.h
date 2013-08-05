@@ -100,7 +100,7 @@ struct SourceBatch
 };
 
 /// Base class for visible components.
-class Drawable : public Component
+class URHO3D_API Drawable : public Component
 {
     OBJECT(Drawable);
     

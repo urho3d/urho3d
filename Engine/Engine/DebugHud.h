@@ -40,7 +40,7 @@ static const unsigned DEBUGHUD_SHOW_PROFILER = 0x4;
 static const unsigned DEBUGHUD_SHOW_ALL = 0x7;
 
 /// Displays rendering stats and profiling information.
-class DebugHud : public Object
+class URHO3D_API DebugHud : public Object
 {
     OBJECT(DebugHud);
 

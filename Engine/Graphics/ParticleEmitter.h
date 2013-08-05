@@ -117,7 +117,7 @@ class XMLFile;
 class XMLElement;
 
 /// %Particle emitter component.
-class ParticleEmitter : public BillboardSet
+class URHO3D_API ParticleEmitter : public BillboardSet
 {
     OBJECT(ParticleEmitter);
     

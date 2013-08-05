@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// Interface class for event listeners that forward events to script.
-class ScriptEventListener
+class URHO3D_API ScriptEventListener
 {
 public:
     /// Destruct

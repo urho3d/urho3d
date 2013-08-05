@@ -21,19 +21,19 @@
 #
 
 # Define target name
-set (TARGET_NAME Urho3D_lib)
-if (ENABLE_LIBRARY MATCHES "SHARED|shared") 
+set (TARGET_NAME Urho3D)
+if (URHO3D_BUILD_TYPE STREQUAL SHARED) 
     set (LIB_TYPE SHARED)
 endif ()
 
 # Define generated source files
 if (WIN32)
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
-        COMMAND for /F %%v in ('svnversion -n ${PROJECT_SOURCE_DIR}') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h DEPENDS Urho3D
+        COMMAND for /F %%v in ('svnversion -n ${PROJECT_SOURCE_DIR}') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
         COMMENT "Generating subversion revision number")
 else ()
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
-        COMMAND for v in `svnversion -n ${PROJECT_SOURCE_DIR}`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h\; break\; done DEPENDS Urho3D
+        COMMAND for v in `svnversion -n ${PROJECT_SOURCE_DIR}`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h\; break\; done DEPENDS ${STATIC_LIBRARY_TARGETS}
         COMMENT "Generating subversion revision number")
 endif ()
 
@@ -47,10 +47,14 @@ set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR})
 
 # Setup target
 setup_library ()
-adjust_library_name ()
+add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 
-if (MSVC)
-# todo
+# Generate platform specific export header file automatically 
+set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
+generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME ../../Urho3D.h)
+
+if (WIN32)
+#todo
 else ()
     # Setting up the frameworks for Mac OS X platform
     if (APPLE AND LIB_TYPE STREQUAL SHARED)

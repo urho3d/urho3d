@@ -41,7 +41,7 @@ class ScriptInstance;
 class Variant;
 
 /// %Script file resource.
-class ScriptFile : public Resource, public ScriptEventListener
+class URHO3D_API ScriptFile : public Resource, public ScriptEventListener
 {
     OBJECT(ScriptFile);
     
@@ -109,6 +109,6 @@ private:
 };
 
 /// Get currently executing script file.
-ScriptFile* GetScriptContextFile();
+URHO3D_API ScriptFile* GetScriptContextFile();
 
 }

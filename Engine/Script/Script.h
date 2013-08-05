@@ -48,7 +48,7 @@ enum ScriptLogMode
 };
 
 /// Scripting subsystem. Allows execution of AngelScript.
-class Script : public Object
+class URHO3D_API Script : public Object
 {
     OBJECT(Script);
 

@@ -150,7 +150,7 @@ struct FocusParameters
 };
 
 /// %Light component.
-class Light : public Drawable
+class URHO3D_API Light : public Drawable
 {
     OBJECT(Light);
     

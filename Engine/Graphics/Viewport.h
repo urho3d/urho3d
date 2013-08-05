@@ -34,7 +34,7 @@ class Scene;
 class XMLFile;
 
 /// %Viewport definition either for a render surface or the backbuffer.
-class Viewport : public Object
+class URHO3D_API Viewport : public Object
 {
     OBJECT(Viewport);
     

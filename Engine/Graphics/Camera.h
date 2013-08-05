@@ -36,7 +36,7 @@ static const unsigned VO_DISABLE_SHADOWS = 0x2;
 static const unsigned VO_DISABLE_OCCLUSION = 0x4;
 
 /// %Camera component.
-class Camera : public Component
+class URHO3D_API Camera : public Component
 {
     OBJECT(Camera);
     

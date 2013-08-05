@@ -29,7 +29,7 @@ namespace Urho3D
 {
 
 /// %Sound resource.
-class Sound : public Resource
+class URHO3D_API Sound : public Resource
 {
     OBJECT(Sound);
     

@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// A link between otherwise unconnected regions of the navigation mesh.
-class OffMeshConnection : public Component
+class URHO3D_API OffMeshConnection : public Component
 {
     OBJECT(OffMeshConnection);
     

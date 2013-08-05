@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 /// Hardware vertex buffer.
-class VertexBuffer : public Object, public GPUObject
+class URHO3D_API VertexBuffer : public Object, public GPUObject
 {
     OBJECT(VertexBuffer);
     

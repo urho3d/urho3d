@@ -29,7 +29,7 @@ namespace Urho3D
 {
 
 /// Two-dimensional vector.
-class Vector2
+class URHO3D_API Vector2
 {
 public:
     /// Construct undefined.
@@ -201,7 +201,7 @@ public:
 inline Vector2 operator * (float lhs, const Vector2& rhs) { return rhs * lhs; }
 
 /// Two-dimensional vector with integer values.
-class IntVector2
+class URHO3D_API IntVector2
 {
 public:
     /// Construct undefined.

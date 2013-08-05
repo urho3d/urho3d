@@ -29,7 +29,7 @@ namespace Urho3D
 {
 
 /// %Component that describes global rendering properties
-class Zone : public Drawable
+class URHO3D_API Zone : public Drawable
 {
     OBJECT(Zone);
     

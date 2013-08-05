@@ -61,7 +61,7 @@ struct ModelMorph
 };
 
 /// 3D model resource.
-class Model : public Resource
+class URHO3D_API Model : public Resource
 {
     OBJECT(Model);
     

@@ -36,7 +36,7 @@ static const unsigned SCAN_DIRS = 0x2;
 static const unsigned SCAN_HIDDEN = 0x4;
 
 /// Subsystem for file and directory operations and access control.
-class FileSystem : public Object
+class URHO3D_API FileSystem : public Object
 {
     OBJECT(FileSystem);
     
@@ -93,28 +93,28 @@ private:
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase.
-void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension);
+URHO3D_API void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension);
 /// Return the path from a full path.
-String GetPath(const String& fullPath);
+URHO3D_API String GetPath(const String& fullPath);
 /// Return the filename from a full path.
-String GetFileName(const String& fullPath);
+URHO3D_API String GetFileName(const String& fullPath);
 /// Return the extension from a full path, converted to lowercase.
-String GetExtension(const String& fullPath);
+URHO3D_API String GetExtension(const String& fullPath);
 /// Return the filename and extension from a full path. The extension will be converted to lowercase.
-String GetFileNameAndExtension(const String& fullPath);
+URHO3D_API String GetFileNameAndExtension(const String& fullPath);
 /// Replace the extension of a file name with another.
-String ReplaceExtension(const String& fullPath, const String& newExtension);
+URHO3D_API String ReplaceExtension(const String& fullPath, const String& newExtension);
 /// Add a slash at the end of the path if missing and convert to internal format (use slashes.)
-String AddTrailingSlash(const String& pathName);
+URHO3D_API String AddTrailingSlash(const String& pathName);
 /// Remove the slash from the end of a path if exists and convert to internal format (use slashes.)
-String RemoveTrailingSlash(const String& pathName);
+URHO3D_API String RemoveTrailingSlash(const String& pathName);
 /// Return the parent path, or the path itself if not available.
-String GetParentPath(const String& pathName);
+URHO3D_API String GetParentPath(const String& pathName);
 /// Convert a path to internal format (use slashes.)
-String GetInternalPath(const String& pathName);
+URHO3D_API String GetInternalPath(const String& pathName);
 /// Convert a path to the format required by the operating system.
-String GetNativePath(const String& pathName);
+URHO3D_API String GetNativePath(const String& pathName);
 /// Convert a path to the format required by the operating system in wide characters.
-WString GetWideNativePath(const String& pathName);
+URHO3D_API WString GetWideNativePath(const String& pathName);
 
 }

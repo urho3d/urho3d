@@ -41,7 +41,7 @@ static const int LOG_NONE = 4;
 class File;
 
 /// Logging subsystem.
-class Log : public Object
+class URHO3D_API Log : public Object
 {
     OBJECT(Log);
     

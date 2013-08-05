@@ -65,9 +65,10 @@ set (INCLUDE_DIRS_ONLY . ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/inclu
 enable_pch ()
 setup_library ()
 
-# For IOS and Android build to be successful, the "tolua++" tool must be present in the "Bin" folder.
-# One way to achieve this is to first do a desktop build where all the tools would be generated, then switch to IOS/Android build.
+# For IOS, Android, and Raspberry-Pi cross-compiling build to be successful, the "tolua++" tool must be already present in the "Bin" folder
+# One way to achieve this is to first do a native desktop build where all the tools would be generated, then switch to IOS/Android/Raspberry-Pi cross-compiling build
+# Intentionally do not include NOT RASPI in the condition below because the dependency is still required for Raspberry Pi native build
 if (NOT IOS AND NOT ANDROID)
     # Add dependency to the "tolua++" bin tool
-    add_dependencies(${TARGET_NAME} tolua++)
+    add_dependencies (${TARGET_NAME} tolua++)
 endif ()

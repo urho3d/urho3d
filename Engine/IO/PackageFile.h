@@ -39,7 +39,7 @@ struct PackageEntry
 };
 
 /// Stores files of a directory tree sequentially for convenient access.
-class PackageFile : public Object
+class URHO3D_API PackageFile : public Object
 {
     OBJECT(PackageFile);
     

@@ -55,7 +55,7 @@ struct Billboard
 static const unsigned MAX_BILLBOARDS = 65536 / 4;
 
 /// %Billboard component.
-class BillboardSet : public Drawable
+class URHO3D_API BillboardSet : public Drawable
 {
     OBJECT(BillboardSet);
     

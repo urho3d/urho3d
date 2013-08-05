@@ -39,7 +39,7 @@ class UIElement;
 static const unsigned UI_VERTEX_SIZE = 6;
 
 /// %UI rendering draw call.
-class UIBatch
+class URHO3D_API UIBatch
 {
 public:
     /// Construct with defaults.

@@ -2465,10 +2465,10 @@ Methods:<br>
 - void Apply()
 - void SetBoneWeight(uint, float)
 - void SetBoneWeight(StringHash, float)
-- uint GetTrackIndex(const String&) const
-- uint GetTrackIndex(StringHash) const
 - float GetBoneWeight(uint) const
 - float GetBoneWeight(StringHash) const
+- uint GetTrackIndex(const String&) const
+- uint GetTrackIndex(StringHash) const
 
 Properties:<br>
 - int refs (readonly)

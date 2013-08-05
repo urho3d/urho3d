@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// Rectangular area allocator.
-class AreaAllocator
+class URHO3D_API AreaAllocator
 {
 public:
     /// Construct with given width and height.

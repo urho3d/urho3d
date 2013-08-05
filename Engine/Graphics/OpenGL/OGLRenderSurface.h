@@ -33,7 +33,7 @@ class Scene;
 class Texture;
 
 /// %Color or depth-stencil surface that can be rendered into.
-class RenderSurface : public RefCounted
+class URHO3D_API RenderSurface : public RefCounted
 {
     friend class Texture2D;
     friend class TextureCube;

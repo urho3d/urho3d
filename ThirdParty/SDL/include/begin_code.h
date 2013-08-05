@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 /**
  *  \file begin_code.h
  *
@@ -34,6 +36,8 @@
 #define _begin_code_h
 
 /* Some compilers use a special export keyword */
+// Urho3D: Only export when it is being requested
+#ifdef SDL_EXPORTS
 #ifndef DECLSPEC
 # if defined(__BEOS__) || defined(__HAIKU__)
 #  if defined(__GNUC__)
@@ -58,6 +62,9 @@
 #   define DECLSPEC
 #  endif
 # endif
+#endif
+#else
+# define DECLSPEC
 #endif
 
 /* By default SDL uses the C calling convention */

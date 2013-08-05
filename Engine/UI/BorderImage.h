@@ -32,7 +32,7 @@ class Texture;
 class Texture2D;
 
 /// %Image %UI element with optional border.
-class BorderImage : public UIElement
+class URHO3D_API BorderImage : public UIElement
 {
     OBJECT(BorderImage);
     

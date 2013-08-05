@@ -33,7 +33,7 @@ class Context;
 class EventHandler;
 
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
-class Object : public RefCounted
+class URHO3D_API Object : public RefCounted
 {
     friend class Context;
     
@@ -107,7 +107,7 @@ private:
 template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
 
 /// Base class for object factories.
-class ObjectFactory : public RefCounted
+class URHO3D_API ObjectFactory : public RefCounted
 {
 public:
     /// Construct.
@@ -153,7 +153,7 @@ public:
 };
 
 /// Internal helper class for invoking event handler functions.
-class EventHandler : public LinkedListNode
+class URHO3D_API EventHandler : public LinkedListNode
 {
 public:
     /// Construct with specified receiver.

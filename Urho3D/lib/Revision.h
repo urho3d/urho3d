@@ -22,10 +22,12 @@
 
 #pragma once
 
+#include "Urho3D.h"
+
 namespace Urho3D
 {
 
 /// Return subversion revision number as of the library build time.
-const char* GetRevision();
+URHO3D_API const char* GetRevision();
 
 }

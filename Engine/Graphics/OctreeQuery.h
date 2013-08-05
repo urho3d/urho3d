@@ -35,7 +35,7 @@ class Drawable;
 class Node;
 
 /// Base class for octree queries.
-class OctreeQuery
+class URHO3D_API OctreeQuery
 {
 public:
     /// Construct with query parameters.
@@ -65,7 +65,7 @@ public:
 };
 
 /// Point octree query.
-class PointOctreeQuery : public OctreeQuery
+class URHO3D_API PointOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with point and query parameters.
@@ -86,7 +86,7 @@ public:
 };
 
 /// %Sphere octree query.
-class SphereOctreeQuery : public OctreeQuery
+class URHO3D_API SphereOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with sphere and query parameters.
@@ -107,7 +107,7 @@ public:
 };
 
 /// Bounding box octree query.
-class BoxOctreeQuery : public OctreeQuery
+class URHO3D_API BoxOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with bounding box and query parameters.
@@ -128,7 +128,7 @@ public:
 };
 
 /// %Frustum octree query.
-class FrustumOctreeQuery : public OctreeQuery
+class URHO3D_API FrustumOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
@@ -171,7 +171,7 @@ struct RayQueryResult
 };
 
 /// Raycast octree query.
-class RayOctreeQuery
+class URHO3D_API RayOctreeQuery
 {
 public:
     /// Construct with ray and query parameters.

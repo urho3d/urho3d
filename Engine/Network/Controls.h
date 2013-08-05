@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// %Controls sent over the network.
-class Controls
+class URHO3D_API Controls
 {
 public:
     /// Construct.

@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// %Sound listener component
-class SoundListener : public Component
+class URHO3D_API SoundListener : public Component
 {
     OBJECT(SoundListener);
     

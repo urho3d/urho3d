@@ -174,7 +174,7 @@ struct RenderPathCommand
 };
 
 /// Rendering path definition.
-class RenderPath : public RefCounted
+class URHO3D_API RenderPath : public RefCounted
 {
 public:
     /// Construct.

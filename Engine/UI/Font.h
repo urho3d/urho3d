@@ -74,7 +74,7 @@ enum FONT_TYPE
 };
 
 /// %Font face description.
-class FontFace : public RefCounted
+class URHO3D_API FontFace : public RefCounted
 {
 public:
     /// Construct.
@@ -104,7 +104,7 @@ public:
 };
 
 /// %Font resource.
-class Font : public Resource
+class URHO3D_API Font : public Resource
 {
     OBJECT(Font);
     

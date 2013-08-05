@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Urho3D.h"
 #include "Allocator.h"
 #include "Swap.h"
 
@@ -83,7 +84,7 @@ struct ListIteratorBase
 };
 
 /// Doubly-linked list base class.
-class ListBase
+class URHO3D_API ListBase
 {
 public:
     /// Construct.

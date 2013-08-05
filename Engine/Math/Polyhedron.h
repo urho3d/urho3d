@@ -34,7 +34,7 @@ class Matrix3x4;
 class Plane;
 
 /// A convex volume built from polygon faces.
-class Polyhedron
+class URHO3D_API Polyhedron
 {
 public:
     /// Construct empty.

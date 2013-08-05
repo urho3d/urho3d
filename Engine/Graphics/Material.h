@@ -64,7 +64,7 @@ struct TechniqueEntry
 };
 
 /// Describes how to render 3D geometries.
-class Material : public Resource
+class URHO3D_API Material : public Resource
 {
     OBJECT(Material);
     

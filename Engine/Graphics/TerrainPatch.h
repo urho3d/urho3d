@@ -32,7 +32,7 @@ class Terrain;
 class VertexBuffer;
 
 /// Individually rendered part of a heightmap terrain.
-class TerrainPatch : public Drawable
+class URHO3D_API TerrainPatch : public Drawable
 {
     OBJECT(TerrainPatch);
     

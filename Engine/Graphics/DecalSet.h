@@ -99,7 +99,7 @@ struct Decal
 };
 
 /// %Decal renderer component.
-class DecalSet : public Drawable
+class URHO3D_API DecalSet : public Drawable
 {
     OBJECT(DecalSet);
     

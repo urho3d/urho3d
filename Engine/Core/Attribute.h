@@ -48,7 +48,7 @@ static const unsigned AM_COMPONENTID = 0x20;
 class Serializable;
 
 /// Internal helper class for invoking attribute accessors.
-class AttributeAccessor : public RefCounted
+class URHO3D_API AttributeAccessor : public RefCounted
 {
 public:
     /// Get the attribute.

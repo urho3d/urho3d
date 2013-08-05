@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Urho3D.h"
 #include "Swap.h"
 
 namespace Urho3D
@@ -144,7 +145,7 @@ template <class T> struct RandomAccessConstIterator
 };
 
 /// %Vector base class.
-class VectorBase
+class URHO3D_API VectorBase
 {
 public:
     /// Construct.

@@ -44,7 +44,7 @@ class XPathQuery;
 class XPathResultSet;
 
 /// Element in an XML file.
-class XMLElement
+class URHO3D_API XMLElement
 {
 public:
     /// Construct null element.
@@ -263,7 +263,7 @@ private:
 };
 
 /// XPath query result set.
-class XPathResultSet
+class URHO3D_API XPathResultSet
 {
 public:
     /// Construct empty result set.
@@ -297,7 +297,7 @@ private:
 };
 
 /// XPath query.
-class XPathQuery
+class URHO3D_API XPathQuery
 {
 public:
     /// Construct empty.

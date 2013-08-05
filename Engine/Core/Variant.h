@@ -168,7 +168,7 @@ typedef Vector<Variant> VariantVector;
 typedef HashMap<ShortStringHash, Variant> VariantMap;
 
 /// Variable that supports a fixed set of types.
-class Variant
+class URHO3D_API Variant
 {
 public:
     /// Construct empty.

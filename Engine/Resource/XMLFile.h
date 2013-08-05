@@ -34,7 +34,7 @@ namespace Urho3D
 {
 
 /// XML document resource.
-class XMLFile : public Resource
+class URHO3D_API XMLFile : public Resource
 {
     OBJECT(XMLFile);
     

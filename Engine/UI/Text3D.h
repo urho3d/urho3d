@@ -33,7 +33,7 @@ namespace Urho3D
 class Text;
 
 /// 3D text component.
-class Text3D : public Drawable
+class URHO3D_API Text3D : public Drawable
 {
     OBJECT(Text3D);
     

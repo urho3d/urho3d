@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// %Menu %UI element that optionally shows a popup.
-class Menu : public Button
+class URHO3D_API Menu : public Button
 {
     OBJECT(Menu);
 

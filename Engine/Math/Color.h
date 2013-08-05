@@ -33,7 +33,7 @@ namespace Urho3D
 class String;
 
 /// RGBA color.
-class Color
+class URHO3D_API Color
 {
 public:
     /// Construct with default values (opaque white.)

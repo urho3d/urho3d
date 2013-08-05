@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// 3x3 matrix for rotation and scaling.
-class Matrix3
+class URHO3D_API Matrix3
 {
 public:
     /// Construct undefined.

@@ -34,7 +34,7 @@ class Scene;
 struct ComponentReplicationState;
 
 /// Base class for components. Components can be created to scene nodes.
-class Component : public Serializable
+class URHO3D_API Component : public Serializable
 {
     OBJECT(Component);
     

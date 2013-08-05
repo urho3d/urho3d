@@ -46,7 +46,7 @@ enum FileMode
 class PackageFile;
 
 /// %File opened either through the filesystem or from within a package file.
-class File : public Object, public Deserializer, public Serializer
+class URHO3D_API File : public Object, public Deserializer, public Serializer
 {
     OBJECT(File);
     

@@ -46,7 +46,7 @@ static const unsigned NUM_FRUSTUM_PLANES = 6;
 static const unsigned NUM_FRUSTUM_VERTICES = 8;
 
 /// Convex constructed of 6 planes.
-class Frustum
+class URHO3D_API Frustum
 {
 public:
     /// Construct undefined.

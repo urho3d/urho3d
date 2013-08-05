@@ -93,7 +93,7 @@ struct PackageUpload
 };
 
 /// %Connection to a remote network host.
-class Connection : public Object
+class URHO3D_API Connection : public Object
 {
     OBJECT(Connection);
     

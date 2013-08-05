@@ -65,7 +65,7 @@ struct WorkItem
 };
 
 /// Work queue subsystem for multithreading.
-class WorkQueue : public Object
+class URHO3D_API WorkQueue : public Object
 {
     OBJECT(WorkQueue);
     

@@ -67,7 +67,7 @@ struct ShaderCombination
 };
 
 /// %Shader definition parser. Constructs a list of shader variations from the definition.
-class ShaderParser
+class URHO3D_API ShaderParser
 {
 public:
     /// Parse from an XML element. Return true if successful.

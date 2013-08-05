@@ -22,11 +22,13 @@
 
 #pragma once
 
+#include "Urho3D.h"
+
 namespace Urho3D
 {
 
 /// %Condition on which a thread can wait.
-class Condition
+class URHO3D_API Condition
 {
 public:
     /// Construct.

@@ -29,7 +29,7 @@ namespace Urho3D
 {
 
 /// Profiling data for one block in the profiling tree.
-class ProfilerBlock
+class URHO3D_API ProfilerBlock
 {
 public:
     /// Construct with the specified parent block and name.
@@ -167,7 +167,7 @@ public:
 };
 
 /// Hierarchical performance profiler subsystem.
-class Profiler : public Object
+class URHO3D_API Profiler : public Object
 {
     OBJECT(Profiler);
     
@@ -223,7 +223,7 @@ private:
 };
 
 /// Helper class for automatically beginning and ending a profiling block
-class AutoProfileBlock
+class URHO3D_API AutoProfileBlock
 {
 public:
     /// Construct. Begin a profiling block with the specified name and optional call count.

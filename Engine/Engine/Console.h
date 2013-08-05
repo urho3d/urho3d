@@ -36,7 +36,7 @@ class UIElement;
 class XMLFile;
 
 /// %Console window with log history and AngelScript prompt.
-class Console : public Object
+class URHO3D_API Console : public Object
 {
     OBJECT(Console);
 

@@ -32,7 +32,7 @@ class Deserializer;
 class Serializer;
 
 /// Base class for resources.
-class Resource : public Object
+class URHO3D_API Resource : public Object
 {
     OBJECT(Resource);
     

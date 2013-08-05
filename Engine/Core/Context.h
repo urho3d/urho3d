@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
-class Context : public RefCounted
+class URHO3D_API Context : public RefCounted
 {
     friend class Object;
 

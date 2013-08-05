@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// Surface in three-dimensional space.
-class Plane
+class URHO3D_API Plane
 {
 public:
     /// Construct undefined.

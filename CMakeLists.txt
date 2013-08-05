@@ -24,7 +24,7 @@
 project (Urho3D)
 
 # Set minimum version
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8.6)
 
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
@@ -40,17 +40,17 @@ include (Urho3D-CMake-magic)
 include (CheckIncludeFiles)
 CHECK_INCLUDE_FILES (stdint.h HAVE_STDINT_H)
 if (HAVE_STDINT_H)
-    add_definitions(-DHAVE_STDINT_H)
+    add_definitions (-DHAVE_STDINT_H)
 endif ()
 
 # Add definitions for GLEW
 if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
-    add_definitions(-DGLEW_STATIC)
-    add_definitions(-DGLEW_NO_GLU)
+    add_definitions (-DGLEW_STATIC)
+    add_definitions (-DGLEW_NO_GLU)
 endif ()
 
-# Add SDL as a global include directory
-include_directories (ThirdParty/SDL/include)
+# Add global include directories for export header and SDL header
+include_directories (${CMAKE_BINARY_DIR} ThirdParty/SDL/include)
 
 # Add targets
 add_subdirectory (Engine/Audio)
@@ -80,21 +80,12 @@ add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
 add_subdirectory (ThirdParty/JO)
 
-# Alternative Lua bindings
+# Alternative Lua bindings target
 if (ENABLE_LUA)
     add_definitions (-DENABLE_LUA)
     add_subdirectory (ThirdParty/Lua)
     add_subdirectory (ThirdParty/tolua++/src/lib)
     add_subdirectory (Extras/LuaScript)
-endif ()
-
-# Do not build tools for embedded system unless it is explicitly enabled
-if (NOT ENABLE_TOOLS)
-    if (RASPI)
-        set (ENABLE_TOOLS 0)
-    else ()
-        set (ENABLE_TOOLS 1)
-    endif ()
 endif ()
 
 if (NOT IOS AND NOT ANDROID)
@@ -107,41 +98,56 @@ if (NOT IOS AND NOT ANDROID)
         endif ()
         add_subdirectory (ThirdParty/LibCpuId)
     endif ()
-    
-    # Urho3D tools
-    if (ENABLE_TOOLS)
-        add_subdirectory (ThirdParty/Assimp)
-        add_subdirectory (Tools/AssetImporter)
-        add_subdirectory (Tools/OgreImporter)
-        add_subdirectory (Tools/PackageTool)
-        add_subdirectory (Tools/RampGenerator)
-        add_subdirectory (Tools/ScriptCompiler)
-        add_subdirectory (Tools/DocConverter)
-    endif ()
+endif ()    
 
+# Urho3D build type is mutually exclusive due to potential different visibility (export) attribute
+if (URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT IOS AND NOT ANDROID)
     # Urho3D library
-    if (ENABLE_LIBRARY)
-        add_subdirectory (Urho3D/lib)
+    add_subdirectory (Urho3D/lib)
+else ()
+    # Urho3D main app
+    add_subdirectory (Urho3D/bin)
+    
+    # Create a dummy export header file as it is being included by all the Engine's header files
+    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h COPYONLY) 
+
+    # Do not build tools for embedded system unless it is explicitly enabled
+    if (NOT ENABLE_TOOLS)
+        if (RASPI)
+            set (ENABLE_TOOLS 0)
+        else ()
+            set (ENABLE_TOOLS 1)
+        endif ()
     endif ()
     
-    # Urho3D samples
-    if (ENABLE_SAMPLES)
-        add_subdirectory (Samples)
+    if (NOT IOS AND NOT ANDROID)
+        # Urho3D tools
+        if (ENABLE_TOOLS)
+            add_subdirectory (ThirdParty/Assimp)
+            add_subdirectory (Tools/AssetImporter)
+            add_subdirectory (Tools/OgreImporter)
+            add_subdirectory (Tools/PackageTool)
+            add_subdirectory (Tools/RampGenerator)
+            add_subdirectory (Tools/ScriptCompiler)
+            add_subdirectory (Tools/DocConverter)
+        endif ()
+    
+        # Urho3D samples
+        if (ENABLE_SAMPLES)
+            add_subdirectory (Samples)
+        endif ()
+        
+        # Urho3D extras
+        # Todo: CharacterDemo will be moved to Samples
+        if (ENABLE_EXTRAS)
+            add_subdirectory (Extras/OgreBatchConverter)
+            add_subdirectory (Extras/CharacterDemo)
+        endif ()
     endif ()
     
-    # Urho3D extras
-    # Todo: CharacterDemo will be moved to Samples
-    if (ENABLE_EXTRAS)
-        add_subdirectory (Extras/OgreBatchConverter)
-        add_subdirectory (Extras/CharacterDemo)
+    # Urho3D non-GL tools
+    if (NOT USE_OPENGL AND ENABLE_TOOLS)
+        add_subdirectory (ThirdParty/MojoShader)
+        add_subdirectory (Tools/ShaderCompiler)
     endif ()
 endif ()
-
-# Urho3D non-GL tools
-if (NOT USE_OPENGL AND ENABLE_TOOLS)
-    add_subdirectory (ThirdParty/MojoShader)
-    add_subdirectory (Tools/ShaderCompiler)
-endif ()
-
-# Urho3D main app
-add_subdirectory (Urho3D/bin)

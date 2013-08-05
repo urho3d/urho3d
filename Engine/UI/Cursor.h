@@ -72,7 +72,7 @@ struct CursorShapeInfo
 };
 
 /// Mouse cursor %UI element.
-class Cursor : public BorderImage
+class URHO3D_API Cursor : public BorderImage
 {
     OBJECT(Cursor);
     
