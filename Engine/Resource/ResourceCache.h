@@ -23,6 +23,7 @@
 #pragma once
 
 #include "File.h"
+#include "HashSet.h"
 #include "Resource.h"
 
 namespace Urho3D

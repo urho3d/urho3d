@@ -39,3 +39,4 @@ set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR})
 # Add samples
 add_subdirectory (01_HelloWorld)
 add_subdirectory (02_HelloGUI)
+add_subdirectory (03_Sprites)

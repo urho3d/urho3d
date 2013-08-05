@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Application.h"
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Log.h"
@@ -37,11 +38,38 @@
 
 #include "DebugNew.h"
 
-// Resolve ambiguity as namespace and class have the same name
-DEFINE_APPLICATION_MAIN(::Urho3D::Urho3D);
-
 namespace Urho3D
 {
+
+/// Urho3D main application, which runs a script specified on the command line.
+class Urho3D : public Application
+{
+    OBJECT(Urho3D);
+    
+public:
+    /// Construct.
+    Urho3D(Context* context);
+    
+    /// Setup before engine initialization. Verify that a script file has been specified.
+    virtual void Setup();
+    /// Setup after engine initialization. Load the script and execute its start function.
+    virtual void Start();
+    /// Cleanup after the main loop. Run the script's stop function if it exists.
+    virtual void Stop();
+    
+private:
+    /// Handle reload start of the script file.
+    void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
+    /// Handle reload success of the script file.
+    void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
+    /// Handle reload failure of the script file.
+    void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
+    
+    /// Script file name.
+    String scriptFileName_;
+    /// Script file.
+    SharedPtr<ScriptFile> scriptFile_;
+};
 
 Urho3D::Urho3D(Context* context) :
     Application(context)
@@ -185,4 +213,7 @@ void Urho3D::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventDat
 }
 
 }
+
+// Resolve ambiguity as namespace and class have the same name
+DEFINE_APPLICATION_MAIN(::Urho3D::Urho3D);
 

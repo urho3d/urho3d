@@ -21,7 +21,7 @@
 #
 
 # Define target name
-set (TARGET_NAME 01_HelloWorld)
+set (TARGET_NAME 03_Sprites)
 
 # Define source files
 file (GLOB CPP_FILES *.cpp)
