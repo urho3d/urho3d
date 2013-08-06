@@ -135,7 +135,8 @@ else ()
         else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-            if (ENABLE_SSE)
+            # MinGW-w64 may fail when specifying the SSE instruction set, so only enable when not compiling on Windows
+            if (ENABLE_SSE AND NOT WIN32)
                 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
                 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
             endif ()
@@ -271,7 +272,7 @@ macro (setup_library)
         elseif (URHO3D_BUILD_TYPE STREQUAL STATIC)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_STATIC_DEFINE)
         endif ()
-        
+
         # Locate the location of the objects that are used to link to this target to be used later by Urho3D library target
         if (MSVC)
             # Specific to VS generator
