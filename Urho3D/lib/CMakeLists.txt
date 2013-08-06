@@ -47,7 +47,6 @@ set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR})
 
 # Setup target
 setup_library ()
-add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 
 # Generate platform specific export header file automatically 
 set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
