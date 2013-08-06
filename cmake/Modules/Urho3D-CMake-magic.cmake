@@ -152,7 +152,7 @@ endif ()
 # Include CMake builtin module for building shared library support
 include (GenerateExportHeader)
 
-# Override builtin macro to suit our need, always generate header file regardless of library type
+# Override builtin macro and function to suit our need, always generate header file regardless of target type...
 macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
     set (DEFINE_DEPRECATED)
     set (DEFINE_EXPORT)
@@ -165,15 +165,31 @@ macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
         set (DEFINE_DEPRECATED "__declspec(deprecated)")
     endif ()
 
-    if (WIN32)
-        set (DEFINE_EXPORT "__declspec(dllexport)")
-        set (DEFINE_IMPORT "__declspec(dllimport)")
-    elseif (COMPILER_HAS_HIDDEN_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY)
-        set (DEFINE_EXPORT "__attribute__((visibility(\"default\")))")
-        set (DEFINE_IMPORT "__attribute__((visibility(\"default\")))")
-        set (DEFINE_NO_EXPORT "__attribute__((visibility(\"hidden\")))")
+    get_property (type TARGET ${TARGET_LIBRARY} PROPERTY TYPE)
+    
+    if (type MATCHES "STATIC|SHARED")
+        if (WIN32)
+            set (DEFINE_EXPORT "__declspec(dllexport)")
+            set (DEFINE_IMPORT "__declspec(dllimport)")
+        elseif (COMPILER_HAS_HIDDEN_VISIBILITY AND USE_COMPILER_HIDDEN_VISIBILITY)
+            set (DEFINE_EXPORT "__attribute__((visibility(\"default\")))")
+            set (DEFINE_IMPORT "__attribute__((visibility(\"default\")))")
+            set (DEFINE_NO_EXPORT "__attribute__((visibility(\"hidden\")))")
+        endif ()
     endif ()
 endmacro ()
+# ... except, when target is a module library type
+function (GENERATE_EXPORT_HEADER TARGET_LIBRARY)
+    get_property (type TARGET ${TARGET_LIBRARY} PROPERTY TYPE)
+    if (${type} MATCHES MODULE)
+        message (WARNING "This macro should not be used with libraries of type MODULE")
+        return ()
+    endif ()
+    _test_compiler_hidden_visibility()
+    _test_compiler_has_deprecated()
+    _do_set_macro_values(${TARGET_LIBRARY})
+    _do_generate_export_header(${TARGET_LIBRARY} ${ARGN})
+endfunction ()
 
 # Override builtin function to suit our need, takes care of C flags as well as CXX flags
 function (add_compiler_export_flags)
@@ -255,8 +271,15 @@ macro (setup_library)
         elseif (URHO3D_BUILD_TYPE STREQUAL STATIC)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_STATIC_DEFINE)
         endif ()
-        if (NOT WIN32)
-            # Specific to GCC build, locate the location of the objects that are used to link to this target to be used later by Urho3D library target
+        
+        # Locate the location of the objects that are used to link to this target to be used later by Urho3D library target
+        if (MSVC)
+            # Specific to VS generator
+            add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
+                COMMAND ${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.dir/$<CONFIGURATION> $<TARGET_PROPERTY:${TARGET_NAME},SOURCES>
+                COMMENT "Locating object files")
+        else ()
+            # Specific to Makefile generator
             set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
                 "${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.sh ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR} <OBJECTS>\n")
         endif ()
@@ -407,7 +430,7 @@ macro (define_dependency_libs TARGET)
     endif ()
     
     if (LINK_LIBS_ONLY)
-        list (REMOVE_DUPLICATES LINK_LIBS_ONLY)
         list (SORT LINK_LIBS_ONLY)
+        list (REMOVE_DUPLICATES LINK_LIBS_ONLY)
     endif ()
 endmacro ()

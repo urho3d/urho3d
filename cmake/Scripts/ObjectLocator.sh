@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-# This script is being called by CMake during GCC build
+# This script is being called by CMake during Makefile build
 # PLEASE DO NOT EDIT unless you know what you are doing
 target=$1; shift
 outdir=$1; shift

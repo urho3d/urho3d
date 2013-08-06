@@ -48,10 +48,6 @@ set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR})
 # Setup target
 setup_library ()
 
-# Generate platform specific export header file automatically 
-set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
-generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME ../../Urho3D.h)
-
 if (WIN32)
 #todo
 else ()

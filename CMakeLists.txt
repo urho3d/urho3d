@@ -105,9 +105,6 @@ if (URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT IOS AND NOT ANDROID)
     # Urho3D library
     add_subdirectory (Urho3D/lib)
 else ()
-    # Create a dummy export header file as it is being included by all the Engine's header files
-    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h COPYONLY)
-
     # Urho3D script host application
     add_subdirectory (Tools/Urho3D)
 
@@ -151,3 +148,12 @@ else ()
         add_subdirectory (Tools/ShaderCompiler)
     endif ()
 endif ()
+
+# Generate platform specific export header file automatically
+set_target_properties (Urho3D PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
+generate_export_header (Urho3D EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
+
+# Append Urho3D license notice to the export header file
+file (READ ${CMAKE_SOURCE_DIR}/Urho3D.h.in LICENSE)
+file (READ ${CMAKE_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)
+file (WRITE ${CMAKE_BINARY_DIR}/Urho3D.h ${LICENSE}${EXPORT_DEFINE})
