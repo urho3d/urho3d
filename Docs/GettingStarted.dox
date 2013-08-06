@@ -137,7 +137,7 @@ The scripting language supported by default is AngelScript (http://www.angelcode
 
 Lua language support can be alternatively be built in, see \ref Build_Options "Build options".
 
-On Android and iOS there are no command line options, so running the NinjaSnowWar script example is hardcoded. This can be changed from the file Tools/Urho3D/Urho3D.cpp.
+On Android and iOS the command line can not be entered, so it is instead read from the file Bin/Data/CommandLine.txt. By default the NinjaSnowWar example will be run.
 
 Currently eleven example application scripts exist:
 

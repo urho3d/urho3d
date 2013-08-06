@@ -78,6 +78,15 @@ Urho3D::Urho3D(Context* context) :
 
 void Urho3D::Setup()
 {
+    // On Android and iOS, read command line from a file as parameters can not otherwise be easily given
+    #if defined(ANDROID) || defined(IOS)
+    SharedPtr<File> commandFile(new File(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/CommandLine.txt",
+        FILE_READ));
+    String commandLine = commandFile->ReadLine();
+    ParseArguments(commandLine, false);
+    commandFile->Close();
+    #endif
+    
     // Check for script file name
     const Vector<String>& arguments = GetArguments();
     String scriptFileName;
@@ -89,11 +98,6 @@ void Urho3D::Setup()
             break;
         }
     }
-    
-    #if defined(ANDROID) || defined(IOS)
-    // Can not pass script name on mobile devices, so choose a hardcoded default
-    scriptFileName_ = "Scripts/NinjaSnowWar.as";
-    #endif
     
     // Show usage if not found
     if (scriptFileName_.Empty())
