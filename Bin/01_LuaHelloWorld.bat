@@ -1,1 +1,1 @@
-Urho3D.exe Data/LuaScripts/01_HelloWorld.lua %*
+Urho3D.exe LuaScripts/01_HelloWorld.lua %*
