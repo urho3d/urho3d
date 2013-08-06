@@ -217,7 +217,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
         }
 
         #ifdef WIN32
-        bool success = (int)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
+        bool success = (size_t)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
             GetWideNativePath(fileName).CString(), 0, 0, SW_SHOW) > 32;
         #else
         Vector<String> arguments;
