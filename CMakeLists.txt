@@ -50,7 +50,7 @@ if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
 endif ()
 
 # Add global include directories for export header and SDL header
-include_directories (${CMAKE_BINARY_DIR} ThirdParty/SDL/include)
+include_directories (${CMAKE_BINARY_DIR}/Engine ThirdParty/SDL/include)
 
 # Add targets
 add_subdirectory (Engine/Audio)
@@ -103,7 +103,7 @@ endif ()
 # Urho3D build type is mutually exclusive due to potential different visibility (export) attribute
 if (URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT IOS AND NOT ANDROID)
     # Urho3D library
-    add_subdirectory (Urho3D/lib)
+    add_subdirectory (Engine)
 else ()
     # Urho3D script host application
     add_subdirectory (Tools/Urho3D)
@@ -151,9 +151,9 @@ endif ()
 
 # Generate platform specific export header file automatically
 set_target_properties (Urho3D PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
-generate_export_header (Urho3D EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
+generate_export_header (Urho3D EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Engine/Urho3D.h)
 
 # Append Urho3D license notice to the export header file
-file (READ ${CMAKE_SOURCE_DIR}/Urho3D.h.in LICENSE)
-file (READ ${CMAKE_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)
-file (WRITE ${CMAKE_BINARY_DIR}/Urho3D.h ${LICENSE}${EXPORT_DEFINE})
+file (READ ${CMAKE_SOURCE_DIR}/Engine/Urho3D.h.in LICENSE)
+file (READ ${CMAKE_BINARY_DIR}/Engine/Urho3D.h EXPORT_DEFINE)
+file (WRITE ${CMAKE_BINARY_DIR}/Engine/Urho3D.h ${LICENSE}${EXPORT_DEFINE})
