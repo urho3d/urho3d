@@ -109,16 +109,7 @@ When building with the Windows 8 SDK, copy d3dcompiler_46.dll from C:/Program Fi
 
 To make the Urho3D examples start faster on Windows & Direct3D9 mode, run CompileAllShaders.bat from the Bin directory first.
 
-Note that you can also enable OpenGL build on Visual Studio by modifying a section in the root CMakeLists.txt to read as follows:
-
-\verbatim
-#if (NOT MSVC)
-    set (USE_OPENGL 1)
-    add_definitions (-DUSE_OPENGL)
-#endif ()
-\endverbatim
-
-OpenGL does not need a separate shader compilation step or utility.
+Note that you can also force an OpenGL mode build on Windows by using the CMake option in the table below; OpenGL does not need a separate shader compilation step or utility.
 
 \section Build_Options Build options
 
