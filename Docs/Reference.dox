@@ -331,7 +331,7 @@ Memory budgets can be set per resource type: if resources consume more memory th
 
 \page Scripting Scripting
 
-To enable AngelScript scripting support, the Script subsystem needs to be created and registered after initializing the Engine. This is accomplished by the following code, seen eg. in Urho3D/Urho3D.cpp:
+To enable AngelScript scripting support, the Script subsystem needs to be created and registered after initializing the Engine. This is accomplished by the following code, seen eg. in Tools/Urho3D/Urho3D.cpp:
 
 \code
 context_->RegisterSubsystem(new Script(context_));

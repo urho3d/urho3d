@@ -105,11 +105,11 @@ if (URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT IOS AND NOT ANDROID)
     # Urho3D library
     add_subdirectory (Urho3D/lib)
 else ()
-    # Urho3D main app
-    add_subdirectory (Urho3D/bin)
-    
     # Create a dummy export header file as it is being included by all the Engine's header files
-    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h COPYONLY) 
+    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h COPYONLY)
+
+    # Urho3D script host application
+    add_subdirectory (Tools/Urho3D)
 
     # Do not build tools for embedded system unless it is explicitly enabled
     if (NOT ENABLE_TOOLS)

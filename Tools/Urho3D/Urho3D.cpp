@@ -41,7 +41,7 @@
 namespace Urho3D
 {
 
-/// Urho3D main application, which runs a script specified on the command line.
+/// Urho3D script host application, which runs a script specified on the command line.
 class Urho3D : public Application
 {
     OBJECT(Urho3D);

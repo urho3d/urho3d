@@ -47,9 +47,9 @@ For Xcode, open Urho3D.xcodeproj and build.
 
 On Windows, using other compilers than Visual Studio is not officially supported. MinGW may work (cmake -G "MinGW Makefiles"), but may lack required DirectX headers. They can be copied to a MinGW installation from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz.\n
 
-After the build is complete, the programs can be run from the Bin directory.
+After the build is complete, the programs can be run from the Bin directory. These include the Urho3D script host application, which can run application scripts, the tools, and C++ sample applications if they have been enabled.
 
-To run from the Visual Studio debugger, set the Urho3D project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\\Bin\\Urho3D.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: `Scripts/NinjaSnowWar.as -w`. To make the Urho3D examples start faster on Windows & Direct3D9 mode, run CompileAllShaders.bat from the Bin directory first.
+To run the Urho3D application from the Visual Studio debugger, set the Urho3D project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\..\Bin\Urho3D.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make the Urho3D application do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/NinjaSnowWar.as -w
 
 To run from Eclipse on Linux, locate and select the Urho3D executable in the Project Explorer. From the menu, choose "Run Configurations" to create a new launch configuration for "C/C++ Application". Switch to "Arguments" tab, specify the argument required by Urho3D executable.
 
@@ -127,7 +127,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |---------------------------------------------|---------------------|
 |-DENABLE_64BIT=1                             |to enable 64bit build|
 |-DENABLE_LUA=1                               |to enable additional Lua scripting support|
-|-DENABLE_SAMPLES=1                           |to build the sample applications|
+|-DENABLE_SAMPLES=1                           |to build the C++ sample applications|
 |-DENABLE_TOOLS=1                             |to build the tools (only useful for Raspberry Pi build because this option is already enabled by default for other Desktop platforms)|
 |-DUSE_OPENGL=1                               |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)| 
 |-DSCP_TO_TARGET=user\@target:remote-location |to automatically scp executables to target system (only applicable for cross compiling Raspberry Pi on a build/host machine), SSH digital key must be setup first for this to work|
@@ -136,21 +136,23 @@ A number of build options can be defined explicitly when invoking the above cmak
 
 \page Running Running Urho3D
 
-The main executable Urho3D.exe in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic or application, and therefore must be supplied with the name of the application script file it should run:
+The Urho3D script host application in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
 
 \verbatim
-Urho3D.exe <scriptfilename> [options]
+Urho3D <scriptfilename> [options]
 \endverbatim
 
-The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Bin/Data or Bin/CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
+The scripting language supported by default is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Bin/Data or Bin/CoreData subdirectories so that Urho3D can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame. 
 
-On Android and iOS there are no command line options, so running the NinjaSnowWar example is hardcoded. This can be changed from the file Urho3D/Urho3D.cpp.
+Lua language support can be alternatively be built in, see \ref Build_Options "Build options".
+
+On Android and iOS there are no command line options, so running the NinjaSnowWar script example is hardcoded. This can be changed from the file Tools/Urho3D/Urho3D.cpp.
 
 Currently eleven example application scripts exist:
 
 \section Running_NinjaSnowWar NinjaSnowWar
 
-A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory, or use the command Urho3D.exe Scripts/NinjaSnowWar.as
+A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory, or use the command Urho3D Scripts/NinjaSnowWar.as
 
 Key and mouse controls:
 
@@ -170,7 +172,7 @@ NinjaSnowWar also supports client/server multiplayer. To start the server, run t
 
 \section Running_TestScene TestScene
 
-Rendering, physics and serialization test. To start, run TestScene.bat in the Bin directory, or use the command Urho3D.exe Scripts/TestScene.as
+Rendering, physics and serialization test. To start, run TestScene.bat in the Bin directory, or use the command Urho3D Scripts/TestScene.as
 
 Key and mouse controls:
 
@@ -194,13 +196,13 @@ TestScene also includes a network replication test, where clients can connect, m
 
 \section Running_Editor Editor
 
-%Scene and %UI layout editor application written in script. To start, run Editor.bat, or use the command Urho3D.exe Scripts/Editor.as
+%Scene and %UI layout editor application written in script. To start, run Editor.bat, or use the command Urho3D Scripts/Editor.as
 
 For details on how to use the editor, see \ref EditorInstructions "Editor instructions."
 
 \section Running_Terrain Terrain
 
-%Terrain rendering example. To start, run Terrain.bat, or use the command Urho3D.exe Scripts/Terrain.as. %Controls are the same as in TestScene, and additionally:
+%Terrain rendering example. To start, run Terrain.bat, or use the command Urho3D Scripts/Terrain.as. %Controls are the same as in TestScene, and additionally:
 
 \verbatim
 L           Toggle buoyant liquid volume
@@ -208,7 +210,7 @@ L           Toggle buoyant liquid volume
 
 \section Running_Vehicle Vehicle
 
-Simple vehicle physics example. To start, run Vehicle.bat, or use the command Urho3D.exe Scripts/Vehicle.as.
+Simple vehicle physics example. To start, run Vehicle.bat, or use the command Urho3D Scripts/Vehicle.as.
 
 Key and mouse controls:
 
@@ -223,7 +225,7 @@ T           Toggle profiling display
 
 \section Running_Navigation Navigation
 
-A test of navigation mesh generation and path queries. Generates the same static scene as TestScene. To start, run Navigation.bat in the Bin directory, or use the command Urho3D.exe Scripts\Navigation.as. %Controls are like in TestScene, except:
+A test of navigation mesh generation and path queries. Generates the same static scene as TestScene. To start, run Navigation.bat in the Bin directory, or use the command Urho3D Scripts\Navigation.as. %Controls are like in TestScene, except:
 
 \verbatim
 Left mouse   Set path query end point
@@ -234,11 +236,11 @@ Ctrl+LMB     Set offmesh connection start point, press again to set end point
 
 \section Running_Physics Physics
 
-A stress test of 1000 moving physics objects, which also showcases the performance difference instancing can make. Run with Physics.bat, or use the command Urho3D.exe Scripts/Physics.as. %Controls as in TestScene.
+A stress test of 1000 moving physics objects, which also showcases the performance difference instancing can make. Run with Physics.bat, or use the command Urho3D Scripts/Physics.as. %Controls as in TestScene.
 
 \section Running_TestSceneOld TestSceneOld
 
-A variation of TestScene ported from Urho3D 1.0. It lacks networking features, but is provided for examining backward compatibility and performance. Run with TestSceneOld.bat or by using the command Urho3D.exe Scripts/TestSceneOld.as. %Controls are like in TestScene, and additionally:
+A variation of TestScene ported from Urho3D 1.0. It lacks networking features, but is provided for examining backward compatibility and performance. Run with TestSceneOld.bat or by using the command Urho3D Scripts/TestSceneOld.as. %Controls are like in TestScene, and additionally:
 
 \verbatim
 P           Toggle scene animation
@@ -247,7 +249,7 @@ L           Toggle camera light detached/attached
 
 \section Running_LightTest LightTest
 
-%Light rendering performance test. To start, run LightTest.bat in the Bin directory, or use the command Urho3D.exe Scripts\LightTest.as
+%Light rendering performance test. To start, run LightTest.bat in the Bin directory, or use the command Urho3D Scripts\LightTest.as
 
 Key and mouse controls:
 
@@ -269,7 +271,7 @@ R           Re-randomize light and object positions
 
 \section Running_Chat Chat
 
-Simple client-server chat test application. To start, run Chat.bat or ChatServer.bat in the Bin directory, or use the command Urho3D.exe Scripts/Chat.as
+Simple client-server chat test application. To start, run Chat.bat or ChatServer.bat in the Bin directory, or use the command Urho3D Scripts/Chat.as
 
 On the client, first type the server address to the text edit box and click "Connect." After connecting successfully you can start typing messages;
 either press return or click "Send" to send them. Press ESC to exit.
@@ -278,7 +280,7 @@ To connect automatically, the server address can also be given on the command li
 
 \section Running_SpriteTest SpriteTest
 
-Simple example of using sprites in the user interface. To start, run SpriteTest.bat in the Bin directory, or use the command Urho3D.exe Scripts\SpriteTest.as
+Simple example of using sprites in the user interface. To start, run SpriteTest.bat in the Bin directory, or use the command Urho3D Scripts\SpriteTest.as
 
 Key controls:
 
@@ -289,7 +291,7 @@ T           Toggle profiling display
 
 \section Running_Commandline Command line options
 
-Urho3D.exe understands the following command line options:
+The engine can be configured using the following command line options:
 
 \verbatim
 -x<res>     Horizontal resolution
@@ -336,9 +338,7 @@ The libraries are the following:
 - Physics. Provides physics simulation.
 - Navigation. Provides navigation mesh generation and pathfinding.
 - %Script. Provides scripting support using the AngelScript language.
-- %Engine. Instantiates the subsystems from the libraries above and manages the main loop iteration.
-
-Urho3D.exe uses the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line. It is also possible to use the engine through C++ only: when the scripting library is not used, the resulting executable will be significantly smaller.
+- %Engine. Instantiates the subsystems from the libraries above (except Script, which needs to be instantiated by the application) and manages the main loop iteration.
 
 Third-party libraries are used for the following functionality:
 
@@ -389,7 +389,7 @@ For more details related to the C++ coding style, see also \ref CodingConvention
 
 In the following example, a minimal "Hello World" application with both 3D and user interface content will be built.
 
-We start by defining the Start() function required in all Urho3D script applications. When Urho3D.exe executes it, all the engine subsystems are already in place, so any initialization that needs to be done is specific to the application itself.
+We start by defining the Start() function required in all Urho3D script applications. When the Urho3D application executes it, all the engine subsystems are already in place, so any initialization that needs to be done is specific to the application itself.
 
 \code
 Scene@ helloScene;
@@ -491,11 +491,11 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 }
 \endcode
 
-The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, it calls the Engine subsystem's \ref Engine::Exit "Exit()" function. This closes the application window and causes Urho3D.exe to exit after the current main loop iteration finishes.
+The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, it calls the Engine subsystem's \ref Engine::Exit "Exit()" function. This closes the Urho3D application window and causes an exit after the current main loop iteration finishes.
 
 Note that to get the ESC keypress without having to poll it for each frame, we could also subscribe to the "KeyDown" event sent by the Input subsystem.
 
-The example application is now complete. To try it out, save it as HelloWorld.as in the Bin/Data/Scripts directory, then change working directory to Bin where the Urho3D executable resides and run `Urho3D.exe Scripts/HelloWorld.as` on Windows platform or `./Urho3D Scripts/HelloWorld.as` on Mac OS X and Linux platforms.
+The example application is now complete. To try it out, save it as HelloWorld.as in the Bin/Data/Scripts directory, then change working directory to Bin where the Urho3D application resides and run `Urho3D.exe Scripts/HelloWorld.as` on Windows platform or `./Urho3D Scripts/HelloWorld.as` on Mac OS X and Linux platforms.
 
 \section Xcode_AngleScript_Info Mac OS X specific - How to view/edit AngelScript within Xcode
 
@@ -528,7 +528,7 @@ To start with, create a subdirectory "HelloWorld" into the Urho3D root directory
 add_subdirectory (HelloWorld)
 \endcode
 
-Then, create the following CMakeLists.txt file into the HelloWorld directory (mostly copied from CMakeLists.txt of Urho3D.exe):
+Then, create the following CMakeLists.txt file into the HelloWorld directory (mostly copied from CMakeLists.txt of the Urho3D application):
 
 \code
 # Define target name
@@ -626,7 +626,7 @@ DEFINE_MAIN(Run())
 
 In our function, we first create the Context object, which holds all subsystems and object factories, and keeps track of event senders and receivers. All Object subclasses need to be supplied a pointer to that context. When using an object factory (such as when creating components) that is automatic, but when creating objects manually, the pointer also needs to be passed manually.
 
-With the context at hand, we create the Engine and initialize it. The engine accepts startup parameters in a VariantMap; these can be parsed from the command line arguments using the static helper function Engine::ParseParameters. Here we customize the window title and log file name to differentiate from Urho3D.exe.
+With the context at hand, we create the Engine and initialize it. The engine accepts startup parameters in a VariantMap; these can be parsed from the command line arguments using the static helper function Engine::ParseParameters. Here we customize the window title and log file name to differentiate from the Urho3D application.
 
 After this, we instantiate the HelloWorld object, call its Start() function, and run the main loop until Engine tells that we should exit. The shared pointers will take care of deleting the objects in the correct order; the Context will be the last to be destroyed.
 
@@ -722,14 +722,14 @@ void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)
 }
 \endcode
 
-Now you should be ready to compile HelloWorld.cpp. The resulting executable will be placed in the Bin directory. It should be substantially smaller than Urho3D.exe due to leaving out the scripting functionality.
+Now you should be ready to compile HelloWorld.cpp. The resulting executable will be placed in the Bin directory. It should be substantially smaller than the Urho3D application due to leaving out the scripting functionality.
 
 For a more complex C++ example, check out CharacterDemo in the Extras directory, which creates the same static scene as the TestScene script example, and demonstrates a 1st/3rd person controllable character. To enable it in the build, uncomment from the bottom of the root CMakeLists.txt.
 
 
 \page EditorInstructions Editor instructions
 
-The Urho3D editor is a script application that can be run with the Urho3D main executable. To start, execute either of these commands: (in the Bin directory) Editor.bat or Urho3D.exe Scripts/Editor.as
+The Urho3D editor is a script application that can be run with the Urho3D main executable. To start, execute either of these commands: (in the Bin directory) Editor.bat or Urho3D Scripts/Editor.as
 
 Hint: to get some content to look at, run the TestScene example, and press F5. This saves a scene file called TestScene.xml into the Data/Scenes subdirectory, which can be loaded in the editor. The NinjaSnowWar scene also exists in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
 
@@ -812,7 +812,7 @@ The editor can import models or scenes from all the formats that the Open Asset 
 
 When a model is imported, it will also be instantiated into the scene as a new scene node with a StaticModel component.
 
-To do the actual importing, the editor will invoke AssetImporter.exe from the same directory as where Urho3D.exe resides, so be sure both are built.
+To do the actual importing, the editor will invoke AssetImporter from the same directory where the Urho3D application was run from, so be sure both are built.
 
 If the imported scene has no lights, a single directional light is created, so that you can at least see something.
 

@@ -182,17 +182,18 @@ DirectX headers. They can be copied to a MinGW installation from the following
 package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
 
 After the build is complete, the programs can be run from the Bin directory.
+These include the Urho3D script host application, which can run application
+scripts, the tools, and C++ sample applications if they have been enabled.
 
-To run from the Visual Studio debugger, set the Urho3D project as the startup
-project, set it as a startup project and enter its relative path and filename
-into Properties -> Debugging -> Command: ..\Bin\Urho3D.exe. Additionally,
-entering -w into Debugging -> Command Arguments is highly recommended. This
-enables startup in windowed mode: without it running into an exception or
-breakpoint will be obnoxious as the mouse cursor will likely be hidden.
-
-To actually make Urho3D.exe do something useful, it must be supplied with the
-name of the script file it should load and run. You can try for example the
-following arguments: Scripts/NinjaSnowWar.as -w
+To run the Urho3D application from the Visual Studio debugger, set the Urho3D
+project as the startup project and enter its relative path and filename into
+Properties -> Debugging -> Command: ..\..\Bin\Urho3D.exe. Additionally, entering
+-w into Debugging -> Command Arguments is highly recommended. This enables
+startup in windowed mode: without it running into an exception or breakpoint
+will be obnoxious as the mouse cursor will likely be hidden. To actually make
+the Urho3D application do something useful, it must be supplied with the name of
+the script file it should load and run. You can try for example the following 
+arguments: Scripts/NinjaSnowWar.as -w
 
 To run from Eclipse on Linux, locate and select the Urho3D executable in the
 Project Explorer. From the menu, choose "Run Configurations" to create a new
@@ -342,7 +343,7 @@ cmake_xxxx batch files or shell scripts.
 |----------------------|-------------------------------------------------------|
 |-DENABLE_64BIT=1      |to enable 64bit build                                  |
 |-DENABLE_LUA=1        |to enable additional Lua scripting support             |
-|-DENABLE_SAMPLES=1    |to build the sample applications                       |
+|-DENABLE_SAMPLES=1    |to build the C++ sample applications                   |
 |-DENABLE_TOOLS=1      |to build the tools (only useful for Raspberry Pi build |
 |                      | because this option is already enabled by default for |
 |                      | other Desktop platforms)                              |
