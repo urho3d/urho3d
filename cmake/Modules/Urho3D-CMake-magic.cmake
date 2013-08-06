@@ -264,7 +264,7 @@ macro (setup_library)
     add_library (${TARGET_NAME} ${LIB_TYPE} ${SOURCE_FILES})
     setup_target ()
     
-    if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED AND NOT IOS AND NOT ANDROID)
+    if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED)
         set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
         if (URHO3D_BUILD_TYPE STREQUAL SHARED)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
@@ -278,7 +278,7 @@ macro (setup_library)
             add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
                 COMMAND ${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.dir/$<CONFIGURATION> $<TARGET_PROPERTY:${TARGET_NAME},SOURCES>
                 COMMENT "Locating object files")
-        else ()
+        elseif (NOT WIN32)
             # Specific to Makefile generator
             set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
                 "${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.sh ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR} <OBJECTS>\n")
