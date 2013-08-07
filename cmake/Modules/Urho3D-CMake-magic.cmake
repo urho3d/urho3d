@@ -270,7 +270,7 @@ macro (setup_library)
             if (MSVC)
                 # Specific to VS generator
                 add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                    COMMAND ${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.dir/$<CONFIGURATION> ${SOURCE_FILES}>
+                    COMMAND ${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.dir/$<CONFIGURATION> ${SOURCE_FILES}
                     COMMENT "Locating object files")
             elseif (CMAKE_GENERATOR MATCHES MinGW) 
                 # Specific to MinGW Makefile generator
