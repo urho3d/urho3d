@@ -90,6 +90,9 @@ void Sample::CreateLogo()
 
     // Set logo sprite alignment
     logoSprite_->SetAlignment(HA_LEFT, VA_BOTTOM);
+    
+    // Set a low priority for the logo so that other UI elements can be drawn on top
+    logoSprite_->SetPriority(-100);
 }
 
 void Sample::CreateConsoleAndDebugHud()

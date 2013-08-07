@@ -20,24 +20,13 @@
 # THE SOFTWARE.
 #
 
-# Include common to all samples
-set (COMMON_SAMPLE_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Sample.h" "${CMAKE_CURRENT_SOURCE_DIR}/Sample.inl")
+# Define target name
+set (TARGET_NAME 04_StaticScene)
 
-# Define dependency libs
-set (LIBS ../../Engine/Container
-          ../../Engine/Core
-          ../../Engine/Engine
-          ../../Engine/Graphics
-          ../../Engine/Input
-          ../../Engine/IO
-          ../../Engine/Math
-          ../../Engine/Resource
-          ../../Engine/Scene
-          ../../Engine/UI)
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR})
+# Define source files
+file (GLOB CPP_FILES *.cpp)
+file (GLOB H_FILES *.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${COMMON_SAMPLE_H_FILES})
 
-# Add samples
-add_subdirectory (01_HelloWorld)
-add_subdirectory (02_HelloGUI)
-add_subdirectory (03_Sprites)
-add_subdirectory (04_StaticScene)
+# Setup target with resource copying
+setup_main_executable ()
