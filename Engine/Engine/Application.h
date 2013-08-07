@@ -65,8 +65,8 @@ protected:
 #define DEFINE_APPLICATION_MAIN(className) \
 int RunApplication() \
 { \
-    SharedPtr<Context> context(new Context()); \
-    SharedPtr<className> application(new className(context)); \
+    Urho3D::SharedPtr<Urho3D::Context> context(new Context()); \
+    Urho3D::SharedPtr<className> application(new className(context)); \
     return application->Run(); \
 } \
 DEFINE_MAIN(RunApplication());

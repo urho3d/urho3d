@@ -196,11 +196,11 @@ public:
 
 #define COPY_BASE_ATTRIBUTES(className, sourceClassName) context->CopyBaseAttributes<sourceClassName, className>()
 #define REMOVE_ATTRIBUTE(className, name) context->RemoveAttribute<className>(name)
-#define ATTRIBUTE(className, type, name, variable, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, offsetof(className, variable), defaultValue, mode))
-#define ENUM_ATTRIBUTE(className, name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(name, offsetof(className, variable), enumNames, defaultValue, mode))
-#define ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, new AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
-#define ENUM_ACCESSOR_ATTRIBUTE(className, name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(name, new AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), enumNames, defaultValue, mode))
-#define REF_ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, new RefAttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
+#define ATTRIBUTE(className, type, name, variable, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(type, name, offsetof(className, variable), defaultValue, mode))
+#define ENUM_ATTRIBUTE(className, name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(name, offsetof(className, variable), enumNames, defaultValue, mode))
+#define ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(type, name, new Urho3D::AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
+#define ENUM_ACCESSOR_ATTRIBUTE(className, name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(name, new Urho3D::AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), enumNames, defaultValue, mode))
+#define REF_ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(Urho3D::AttributeInfo(type, name, new Urho3D::RefAttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
 #define UPDATE_ATTRIBUTE_DEFAULT_VALUE(className, name, defaultValue) context->UpdateAttributeDefaultValue<className>(name, defaultValue)
 
 }

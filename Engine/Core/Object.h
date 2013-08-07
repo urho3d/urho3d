@@ -243,14 +243,14 @@ private:
 
 #define OBJECT(typeName) \
     public: \
-        virtual ShortStringHash GetType() const { return GetTypeStatic(); } \
-        virtual const String& GetTypeName() const { return GetTypeNameStatic(); } \
-        static ShortStringHash GetTypeStatic() { static const ShortStringHash typeStatic(#typeName); return typeStatic; } \
-        static const String& GetTypeNameStatic() { static const String typeNameStatic(#typeName); return typeNameStatic; } \
+        virtual Urho3D::ShortStringHash GetType() const { return GetTypeStatic(); } \
+        virtual const Urho3D::String& GetTypeName() const { return GetTypeNameStatic(); } \
+        static Urho3D::ShortStringHash GetTypeStatic() { static const Urho3D::ShortStringHash typeStatic(#typeName); return typeStatic; } \
+        static const Urho3D::String& GetTypeNameStatic() { static const Urho3D::String typeNameStatic(#typeName); return typeNameStatic; } \
 
-#define EVENT(eventID, eventName) static const StringHash eventID(#eventName); namespace eventName
-#define PARAM(paramID, paramName) static const ShortStringHash paramID(#paramName)
-#define HANDLER(className, function) (new EventHandlerImpl<className>(this, &className::function))
-#define HANDLER_USERDATA(className, function, userData) (new EventHandlerImpl<className>(this, &className::function, userData))
+#define EVENT(eventID, eventName) static const Urho3D::StringHash eventID(#eventName); namespace eventName
+#define PARAM(paramID, paramName) static const Urho3D::ShortStringHash paramID(#paramName)
+#define HANDLER(className, function) (new Urho3D::EventHandlerImpl<className>(this, &className::function))
+#define HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandlerImpl<className>(this, &className::function, userData))
 
 }
