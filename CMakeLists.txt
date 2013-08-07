@@ -52,6 +52,14 @@ endif ()
 # Add global include directories for export header and SDL header
 include_directories (${CMAKE_BINARY_DIR}/Engine ThirdParty/SDL/include)
 
+# Setup the compiler flags for building shared library
+if (URHO3D_BUILD_TYPE STREQUAL SHARED AND NOT IOS AND NOT ANDROID)
+    # Hide the symbols that are not explicitly marked for export
+    add_compiler_export_flags ()
+    # Use PIC on platforms that support it 
+    set (CMAKE_POSITION_INDEPENDENT_CODE true)
+endif ()
+
 # Add targets
 add_subdirectory (Engine/Audio)
 add_subdirectory (Engine/Container)

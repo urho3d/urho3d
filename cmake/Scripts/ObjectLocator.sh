@@ -26,7 +26,7 @@
 target=$1; shift
 outdir=$1; shift
 objdir=$1; shift
-(( $# )) && rm -f $outdir/$target.obj
+(( $# )) && rm -f $outdir/$target.objects.txt
 for object in $@; do
-    echo -n "$objdir/$object " >>$outdir/$target.obj
+    echo -n "$objdir/$object " >>$outdir/$target.objects.txt
 done

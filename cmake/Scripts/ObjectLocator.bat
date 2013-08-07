@@ -26,9 +26,10 @@
 set "target=%1"
 set "outdir=%2"
 set "objdir=%3"
-echo |set /p=>%outdir%/%target%.obj
+if not "%4" == "SENTINEL" echo |set /p=>%outdir%/%target%.objects.txt
 for %%o in (%*) do call :append %%o
 exit /B 0
 :append
-if not "%~x1" == ".cpp" if not "%~x1" == ".c" goto :eof
-echo |set /p=%objdir%/%~n1.obj >>%outdir%/%target%.obj
+if not "%~x1" == ".cpp" if not "%~x1" == ".c" if not "%~x1" == ".o" goto :eof
+if "%~x1" == ".o" (set "object=%~nx1") else (set "object=%~n1.obj")
+echo |set /p=%objdir%/%object% >>%outdir%/%target%.objects.txt

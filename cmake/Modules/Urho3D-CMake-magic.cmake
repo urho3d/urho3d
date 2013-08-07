@@ -224,17 +224,6 @@ function (add_compiler_export_flags)
     endif ()
 endfunction ()
 
-# Setup the compiler flags for building shared library
-if (URHO3D_BUILD_TYPE STREQUAL SHARED AND NOT ANDROID AND NOT IOS)
-    # Hide the symbols that are not explicitly marked for export
-    add_compiler_export_flags ()
-    # Use PIC on platforms that support it 
-    set (CMAKE_POSITION_INDEPENDENT_CODE true)
-endif ()
-
-# Create custom script output directory
-file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeScriptOutput)
-
 # Macro for precompiled headers
 macro (enable_pch)
     if (MSVC)
@@ -265,7 +254,7 @@ macro (setup_library)
     add_library (${TARGET_NAME} ${LIB_TYPE} ${SOURCE_FILES})
     setup_target ()
     
-    if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED)
+    if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED AND URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT IOS AND NOT ANDROID)
         set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
         if (URHO3D_BUILD_TYPE STREQUAL SHARED)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
@@ -273,13 +262,22 @@ macro (setup_library)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_STATIC_DEFINE)
         endif ()
 
+        # Create custom script output directory, if not exist yet
+        file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeScriptOutput)
+
         # Locate the location of the objects that are used to link to this target to be used later by Urho3D library target
-        if (MSVC)
-            # Specific to VS generator
-            add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                COMMAND ${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.dir/$<CONFIGURATION> $<TARGET_PROPERTY:${TARGET_NAME},SOURCES>
-                COMMENT "Locating object files")
-        elseif (NOT WIN32)
+        if (WIN32)
+            if (MSVC)
+                # Specific to VS generator
+                add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
+                    COMMAND ${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.dir/$<CONFIGURATION> ${SOURCE_FILES}>
+                    COMMENT "Locating object files")
+            elseif (CMAKE_GENERATOR MATCHES MinGW) 
+                # Specific to MinGW Makefile generator
+                set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
+                    "${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR} <OBJECTS> SENTINEL\n")
+            endif ()
+        else ()
             # Specific to Makefile generator
             set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
                 "${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.sh ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR} <OBJECTS>\n")

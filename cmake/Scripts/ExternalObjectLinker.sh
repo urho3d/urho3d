@@ -21,14 +21,14 @@
 # THE SOFTWARE.
 #
 
-# This script is being called by CMake during GCC build
+# This script is being called by CMake during Makefile build
 # PLEASE DO NOT EDIT unless you know what you are doing
 [ "$1" == "OUTDIR" ] && shift || exit 1
 outdir=$1; shift
 [ "$1" == "OBJECTS" ] && shift || exit 1
 while [ "$1" != "TARGETS" ]; do hasobjects=1; shift; done
 [ "$1" == "TARGETS" ] && shift || exit 1
-IFS=\;; for target in $1; do externalobjects="$externalobjects $(cat $outdir/$target.obj)"; done; unset IFS; shift
+IFS=\;; for target in $1; do externalobjects="$externalobjects $(cat $outdir/$target.objects.txt)"; done; unset IFS; shift
 [ "$1" == "FRAMEWORKS" ] && shift || exit 1
 while [ "$1" != "COMMAND" ]; do frameworks="$frameworks $1"; shift; done
 [ "$1" == "COMMAND" ] && shift || exit 1
