@@ -30,7 +30,7 @@ To run Urho3D, the minimum system requirements are:
 
 - iOS: OpenGL ES 2.0 capable GPU.
 
-SSE requirement can be eliminated by commenting out lines that enable it from the root CMakeLists.txt.
+SSE requirement can be eliminated by disabling the use of SSE instruction set, see \ref Build_Options "Build options" below.
 
 \section Building_Desktop Desktop build process
 
@@ -93,7 +93,7 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 For native build on Raspberry Pi itself, use the similar process for Linux Desktop build described above.
 
-For cross-compiling build on another build/host machine, set the RASPI_TOOL environment variable to point to your Raspberry Pi Cross-Compiling tool where all the arm-linux-gnueabihf-* executables are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. The RASPI_TOOL environment variable tells build script to generate additional build directory for cross-compiling. 
+For cross-compiling build on another build/host machine, set the RASPI_TOOL environment variable to point to your Raspberry Pi Cross-Compiling tool where all the arm-linux-gnueabihf-* executables are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. The RASPI_TOOL environment variable tells build script to generate additional build directory for cross-compiling.
 
 Run cmake_gcc.sh then go to the raspi-build directory and proceed to execute make. After the build is complete, the ARM executables can be found in Bin-CC directory. 
 
@@ -101,7 +101,7 @@ You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclip
 
 \section Building_64bit Desktop 64bit build
 
-Currently CMake build configuration has been set to compile Urho3D as 32bit by default. To enable 64bit build, run the provided cmake_xxxx.bat or cmake_xxxx.sh by passing the option "-DENABLE_64BIT=1" explicitly. For Visual Studio on Windows platform, this option also overrides CMake to use a 64bit solution generator. Alternatively, you can modify the main CMakeLists.txt to enable 64bit by default.
+Currently CMake build configuration has been set to compile Urho3D as 32bit by default. To enable 64bit build, run the provided cmake_xxxx.bat or cmake_xxxx.sh by passing the option "-DENABLE_64BIT=1" explicitly. For Visual Studio on Windows platform, this option also overrides CMake to use a 64bit solution generator.
 
 \section Building_Shaders Compiling Direct3D shaders
 
@@ -120,7 +120,9 @@ A number of build options can be defined explicitly when invoking the above cmak
 |-DENABLE_LUA=1                               |to enable additional Lua scripting support|
 |-DENABLE_SAMPLES=1                           |to build the C++ sample applications|
 |-DENABLE_TOOLS=1                             |to build the tools (only useful for Raspberry Pi build because this option is already enabled by default for other Desktop platforms)|
-|-DUSE_OPENGL=1                               |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)| 
+|-DENABLE_SSE=0                               |to disable SSE instruction set|
+|-DENABLE_MINIDUMPS=0                         |to disable minidumps on crash (VS only)|
+|-DUSE_OPENGL=1                               |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)|
 |-DSCP_TO_TARGET=user\@target:remote-location |to automatically scp executables to target system (only applicable for cross compiling Raspberry Pi on a build/host machine), SSH digital key must be setup first for this to work|
 |-DCMAKE_BUILD_TYPE=Debug or Release          |to tell CMake which build configuration to be generated, default is RelWithDebInfo (only applicable for cmake_gcc.sh and cmake_eclipse.sh)|
 
@@ -133,7 +135,7 @@ The Urho3D script host application in the Bin directory contains all the engine 
 Urho3D <scriptfilename> [options]
 \endverbatim
 
-The scripting language supported by default is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Bin/Data or Bin/CoreData subdirectories so that Urho3D can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame. 
+The scripting language supported by default is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Bin/Data or Bin/CoreData subdirectories so that Urho3D can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
 Lua language support can be alternatively be built in, see \ref Build_Options "Build options".
 

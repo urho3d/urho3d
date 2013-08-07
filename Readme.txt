@@ -145,8 +145,7 @@ To run Urho3D, the minimum system requirements are:
 
 - iOS: OpenGL ES 2.0 capable GPU.
 
-SSE requirement can be eliminated by commenting out lines that enable it from
-the root CMakeLists.txt.
+SSE requirement can be eliminated by disabling the use of SSE instruction set, see "Build options" below.
 
 
 Desktop build process
@@ -309,7 +308,6 @@ Currently CMake build configuration has been set to compile Urho3D as 32bit by
 default. To enable 64bit build, run the provided cmake_xxxx.bat or cmake_xxxx.sh
 by passing the option "-DENABLE_64BIT=1" explicitly. For Visual Studio on Windows
 platform, this option also overrides CMake to use a 64bit solution generator.
-Alternatively, you can modify the main CMakeLists.txt to enable 64bit by default.
 
 
 Compiling Direct3D shaders
@@ -322,18 +320,13 @@ the ShaderCompiler program will run correctly.
 To make the Urho3D examples start faster on Windows & Direct3D9 mode, run
 CompileAllShaders.bat from the Bin directory first.
 
-Note that you can also enable OpenGL build on Visual Studio by modifying a
-section in the root CMakeLists.txt to read as follows:
-
-#if (NOT MSVC)
-    set (USE_OPENGL 1)
-    add_definitions (-DUSE_OPENGL)
-#endif ()
-
-OpenGL does not need a separate shader compilation step or utility.
+Note that you can also force an OpenGL mode build on Windows by using the CMake 
+option in the table below; OpenGL does not need a separate shader compilation 
+step or utility.
 
 
-Build options
+Build options     
+-------------
 
 A number of build options can be defined explicitly when invoking the above
 cmake_xxxx batch files or shell scripts.
@@ -347,6 +340,8 @@ cmake_xxxx batch files or shell scripts.
 |-DENABLE_TOOLS=1      |to build the tools (only useful for Raspberry Pi build |
 |                      | because this option is already enabled by default for |
 |                      | other Desktop platforms)                              |
+|-DENABLE_SSE=0        |to disable SSE instruction set                         |
+|-DENABLE_MINIDUMPS=0  |to disable minidumps on crash (VS only)                |
 |-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS  |
 |                      | on Windows platform because this option is enabled by |
 |                      | default for other platforms)                          | 
