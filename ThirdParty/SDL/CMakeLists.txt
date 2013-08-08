@@ -4,7 +4,7 @@ set (TARGET_NAME SDL)
 # Define source files
 file (GLOB C_FILES
     src/*.c src/atomic/*.c src/audio/*.c src/audio/disk/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c
-    src/haptic/*.c src/haptic/dummy/*.c src/joystick/*.c src/joystick/dummy/*.c src/libm/*.c src/power/*.c src/stdlib/*.c 
+    src/haptic/*.c src/joystick/*.c src/joystick/dummy/*.c src/libm/*.c src/power/*.c src/stdlib/*.c 
     src/thread/*.c src/timer/*.c src/video/*.c src/video/dummy/*.c
 )
 
@@ -26,7 +26,7 @@ if (WIN32)
 elseif (IOS)
     file (GLOB SYS_C_FILES
         src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/power/uikit/*.m
-        src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c
+        src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c src/haptic/dummy/*.c
     )
 elseif (APPLE)
     file (GLOB SYS_C_FILES
@@ -36,7 +36,7 @@ elseif (APPLE)
 elseif (ANDROID)
     file (GLOB SYS_C_FILES
         src/audio/android/*.c src/core/android/*.cpp src/joystick/android/*.c src/loadso/dlopen/*.c
-        src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c
+        src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c src/haptic/dummy/*.c
     )
 else ()
     # On Linux, make sure development libraries exist, and use their include file directories  

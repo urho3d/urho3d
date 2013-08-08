@@ -37,26 +37,70 @@ else ()
         COMMENT "Generating subversion revision number")
 endif ()
 
+# Define generated object files
+# This is a hack as it relies on internal working of CMake
+if (MSVC)
+    set (OBJ_EXT .obj)
+else ()
+    set (OBJ_EXT .o)
+endif ()
+
+foreach (TARGET ${STATIC_LIBRARY_TARGETS})
+    get_target_property (SOURCES ${TARGET} SOURCES)
+    get_target_property (INT_DIR ${TARGET} LOCATION)
+    get_filename_component (INT_DIR ${INT_DIR} PATH)
+    if (MSVC)
+        string (REPLACE /$(Configuration) "" INT_DIR ${INT_DIR})
+    endif ()
+    set (INT_DIR ${INT_DIR}/CMakeFiles/${TARGET}.dir)
+    
+    foreach (SOURCE ${SOURCES})
+        get_filename_component (NAME ${SOURCE} NAME)
+        if (NAME MATCHES \\.c.*$)
+            if (MSVC)
+                string (REGEX REPLACE \\.c.*$ "" NAME ${NAME}) 
+            endif ()
+            set (SYS_DIR "")
+            if (NOT MSVC)
+                get_filename_component (PATH ${SOURCE} PATH)
+                foreach (DIR OpenGL Direct3D9 Source source src generated)
+                    if (PATH MATCHES /${DIR}$)
+                        set (SYS_DIR /${DIR})
+                        break ()
+                    elseif (PATH MATCHES /${DIR}/)
+                        string (REGEX REPLACE .*/${DIR}/ "" SYS_DIR ${PATH})
+                        set (SYS_DIR /${DIR}/${SYS_DIR})
+                        break ()
+                    elseif (PATH MATCHES ^${DIR}/)
+                        set (SYS_DIR /${PATH})
+                        break ()
+                    endif ()
+                endforeach ()
+            endif ()
+            set (OBJ_FILES ${OBJ_FILES} ${INT_DIR}${SYS_DIR}/${NAME}${OBJ_EXT})
+        elseif (NAME MATCHES \\.o.*$)
+            set (OBJ_FILES ${OBJ_FILES} ${SOURCE})
+        endif ()
+    endforeach ()
+endforeach ()
+
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES} svnversion.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${OBJ_FILES} svnversion.h)
+set_source_files_properties (${OBJ_FILES} PROPERTIES GENERATED TRUE)
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR})
+if (MSVC)
+    define_dependency_libs (Main)
+endif ()
 
 # Setup target
 setup_library ()
 
-if (WIN32)
-#todo
-else ()
-    # Setting up the frameworks for Mac OS X platform
-    if (APPLE AND LIB_TYPE STREQUAL SHARED)
-        setup_macosx_framework (FRAMEWORKS)
-    endif ()
-
-    # Linker/Archiver adjustment to include all objects on the fly (works for GCC and Clang)
-    set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
-        "${CMAKE_SOURCE_DIR}/cmake/Scripts/ExternalObjectLinker.sh OUTDIR ${CMAKE_BINARY_DIR}/CMakeScriptOutput OBJECTS <OBJECTS> TARGETS ${STATIC_LIBRARY_TARGETS} FRAMEWORKS ${FRAMEWORKS} COMMAND")
+# Setting up the frameworks for Mac OS X platform
+if (APPLE AND LIB_TYPE STREQUAL SHARED)
+    setup_macosx_framework (FRAMEWORKS)
+    set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${FRAMEWORKS})
 endif ()

@@ -1,7 +1,8 @@
+; Modified by Yao Wei Tjong for Urho3D
 
 .code
 ; procedure exec_cpuid
-; Signature: void exec_cpiud(uint32_t *regs)
+; Signature: void exec_cpuid(uint32_t *regs)
 exec_cpuid Proc
 	push	rbx
 	push	rcx
@@ -38,5 +39,12 @@ cpu_rdtsc Proc
 	pop	rdx
 	ret
 cpu_rdtsc endp
+
+; Urho3D: FIXME dummy implementation
+; procedure busy_sse_loop
+; Signature: void busy_sse_loop(int cycles)
+busy_sse_loop Proc
+    ret
+busy_sse_loop endp
 
 END

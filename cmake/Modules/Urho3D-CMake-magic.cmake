@@ -272,25 +272,12 @@ macro (setup_library)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_STATIC_DEFINE)
         endif ()
 
-        # Create custom script output directory, if not exist yet
-        file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeScriptOutput)
-
-        # Locate the location of the objects that are used to link to this target to be used later by Urho3D library target
-        if (WIN32)
-            if (MSVC)
-                # Specific to VS generator
-                add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                    COMMAND ${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}.dir/$<CONFIGURATION> ${SOURCE_FILES}
-                    COMMENT "Locating object files")
-            elseif (CMAKE_GENERATOR MATCHES MinGW) 
-                # Specific to MinGW Makefile generator
-                set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
-                    "${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.bat ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR} <OBJECTS> SENTINEL\n")
-            endif ()
-        else ()
-            # Specific to Makefile generator
-            set_target_properties (${TARGET_NAME} PROPERTIES RULE_LAUNCH_LINK
-                "${CMAKE_SOURCE_DIR}/cmake/Scripts/ObjectLocator.sh ${TARGET_NAME} ${CMAKE_BINARY_DIR}/CMakeScriptOutput ${CMAKE_CURRENT_BINARY_DIR} <OBJECTS>\n")
+        # Specific to VS generator
+        if (MSVC)
+            file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
+            add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
+                COMMAND copy /B \"$(ProjectDir)$(IntDir)*.obj\" \"$(ProjectDir)CMakeFiles\\${TARGET_NAME}.dir\"
+                COMMENT "Copying object files to a common location used by Makefile generator")
         endif ()
     endif ()
 endmacro ()
@@ -338,7 +325,7 @@ macro (setup_main_executable)
     endif ()
 
     # Define external dependency libraries, for the convenience of other main target (not in Urho3D project) referencing Urho3D as external library
-    if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT TARGET_NAME STREQUAL Main)
+    if (NOT TARGET_NAME STREQUAL Main)
         define_dependency_libs (Main)
     endif ()
 
@@ -434,7 +421,7 @@ macro (define_dependency_libs TARGET)
     endif ()
     
     # Main external dependency
-    if (${TARGET} MATCHES "Main")
+    if (${TARGET} STREQUAL Main AND NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} Urho3D)
     endif ()
     
