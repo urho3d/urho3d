@@ -99,6 +99,13 @@ Run cmake_gcc.sh then go to the raspi-build directory and proceed to execute mak
 
 You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclipse IDE, if you run cmake_eclipse.sh to generate the project file. Import the CMake generated Eclipse project in the raspi-build directory into Eclipse's workspace. Build the project as usual. Use the SCP_TO_TARGET build option to automatically deploy the ARM executables to target Raspberry Pi as part of every project build or configure Eclipse to perform a "download to target path" in the Run/Debug configuration for C/C++ Remote %Application. Either way, you have to configure the Run/Debug configuration how to reach your target Raspberry Pi.
 
+\section Building_Library Library build
+
+CMake build configuration has been scripted to generate Urho3D executable as the default build target. This default target builds the Urho3D script host application (a tool to execute AngelScript and Lua script). To change it to generate an Urho3D static or shared (dynamic) library build target instead, specify the build option "-DURHO3D_BUILD_TYPE=STATIC" or "-DURHO3D_BUILD_TYPE=SHARED", respectively. When this option is set, the other build options to generate sample and tool targets are ignored. Due to the way the Urho3D project is being structured and the potential conflict of different visibility (export) attribute settings, when building the Urho3D library target then no other runtime targets can be built at the same time.
+
+Refer to \ref Using_Library "Using Urho3D as external library" on how to setup your own project to use Urho3D as external library.
+    
+
 \section Building_64bit Desktop 64bit build
 
 Currently CMake build configuration has been set to compile Urho3D as 32bit by default. To enable 64bit build, run the provided cmake_xxxx.bat or cmake_xxxx.sh by passing the option "-DENABLE_64BIT=1" explicitly. For Visual Studio on Windows platform, this option also overrides CMake to use a 64bit solution generator.
@@ -125,9 +132,10 @@ A number of build options can be defined explicitly when invoking the above cmak
 |-DUSE_OPENGL=1                               |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)|
 |-DSCP_TO_TARGET=user\@target:remote-location |to automatically scp executables to target system (only applicable for cross compiling Raspberry Pi on a build/host machine), SSH digital key must be setup first for this to work|
 |-DCMAKE_BUILD_TYPE=Debug or Release          |to tell CMake which build configuration to be generated, default is RelWithDebInfo (only applicable for cmake_gcc.sh and cmake_eclipse.sh)|
+|-DURHO3D_BUILD_TYPE=STATIC or SHARED         |to tell CMake which Urho3D target to be built, default is EXE (Urho3D script host application)|
 
 
-\page Running Running Urho3D
+\page Running Running Urho3D script host application
 
 The Urho3D script host application in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
 
@@ -309,6 +317,53 @@ The engine can be configured using the following command line options:
 -noip       Disable sound mixing interpolation
 -sm2        Force SM2.0 rendering
 \endverbatim
+
+
+\page Using_Library Using Urho3D as external library
+
+This page shows how to create a new C++ project using Urho3D library as external library. This page assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find the external library in the Urho3D project build tree, specify an environment variable called "URHO3D_HOME" which points to the root directory of the Urho3D project.  
+
+In your own project root directory, create a new CMakeLists.txt file and add the following lines:
+
+\code
+# Set project name
+project (MySuperDuperGame)
+
+# Set minimum version
+cmake_minimum_required (VERSION 2.8.6)
+
+if (COMMAND cmake_policy)
+    cmake_policy (SET CMP0003 NEW)
+endif ()
+
+# Add cmake modules search path
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+# Include Urho3D cmake module
+include (Urho3D-CMake-magic)
+
+# Find Urho3D library
+find_package (Urho3D REQUIRED)
+include_directories (${URHO3D_INCLUDE_DIR})
+link_directories (${URHO3D_LIBRARY_DIR})
+
+# Define target name
+set (TARGET_NAME Main)
+
+# Define source files
+file (GLOB CPP_FILES *.cpp)
+file (GLOB H_FILES *.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+
+# Setup target with resource copying
+setup_main_executable ()
+\endcode
+
+Copy the "cmake" sub-directory from Urho3D project to your own project so that CMake can find the Urho3D-specific CMake modules in your project. Instead of copying, for platform that supports symbolic link, you can also create "cmake" symbolic link in your project build tree to point to "cmake" sub-directory from Urho3D project. Alternatively, you can just modify the CMAKE_MODULE_PATH search path above to "$ENV{URHO3D_HOME}/Source/cmake/Modules/".       
+
+Since your CMake build script include the Urho3D-Cmake-magic module, your project also now has the cross-platform build capability.  
+
+When both Urho3D static and shared library are both built and available in the Urho3D project build tree, the Urho3D shared library takes precedence over static library to be linked against your own project. You can modify the CMAKE_FIND_LIBRARY_SUFFIXES global variable to change this behaviour. When linking statically against Urho3D static library, you must remember to additionally define "-DURHO3D_STATIC_DEFINE=1" in your compiler flag, especially on MSVC.
 
 
 \page Structure Overall structure

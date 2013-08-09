@@ -9,7 +9,8 @@ Urho3D (http://urho3d.googlecode.com) is a lightweight, cross-platform rendering
 For getting started, see:
 
 \ref Building "Building Urho3D" <br>
-\ref Running "Running Urho3D" <br>
+\ref Running "Running Urho3D script host application" <br>
+\ref Using_Library "Using Urho3D as external library" <br>
 \ref Structure "Overall structure" <br>
 \ref Conventions "Conventions" <br>
 \ref ScriptQuickstart "Quickstart in script" <br>

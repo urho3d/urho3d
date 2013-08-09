@@ -145,7 +145,8 @@ To run Urho3D, the minimum system requirements are:
 
 - iOS: OpenGL ES 2.0 capable GPU.
 
-SSE requirement can be eliminated by disabling the use of SSE instruction set, see "Build options" below.
+SSE requirement can be eliminated by disabling the use of SSE instruction set,
+see "Build options" below.
 
 
 Desktop build process
@@ -310,6 +311,23 @@ by passing the option "-DENABLE_64BIT=1" explicitly. For Visual Studio on Window
 platform, this option also overrides CMake to use a 64bit solution generator.
 
 
+Library build
+-------------
+
+CMake build configuration has been scripted to generate Urho3D executable as the
+default build target. This default target builds the Urho3D script host application
+(a tool to execute AngelScript and Lua script). To change it to generate an Urho3D
+static or shared (dynamic) library build target instead, specify the build option
+"-DURHO3D_BUILD_TYPE=STATIC" or "-DURHO3D_BUILD_TYPE=SHARED", respectively. When
+this option is set, the other build options to generate sample and tool targets are
+ignored. Due to the way the Urho3D project is being structured and the potential
+conflict of different visibility (export) attribute settings, when building the
+Urho3D library target then no other runtime targets can be built at the same time.    
+
+Refer to "Using Urho3D as external library" on how to setup your own project to use
+Urho3D as external library.
+
+
 Compiling Direct3D shaders
 --------------------------
 
@@ -352,6 +370,8 @@ cmake_xxxx batch files or shell scripts.
 |-DCMAKE_BUILD_TYPE=   |to tell CMake which build configuration to be          |
 |  Debug or Release    | generated, default is RelWithDebInfo (only applicable |
 |                      | for cmake_gcc.sh and cmake_eclipse.sh)                |
+|-DURHO3D_BUILD_TYPE=  |to tell CMake which Urho3D target to be built, default |
+|  STATIC or SHARED    | is EXE (Urho3D script host)                           |          
 |----------------------|-------------------------------------------------------|
 
 

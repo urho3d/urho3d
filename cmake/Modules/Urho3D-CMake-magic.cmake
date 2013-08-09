@@ -160,6 +160,10 @@ else ()
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 endif ()
 
+if (URHO3D_BUILD_TYPE)
+    string (TOUPPER ${URHO3D_BUILD_TYPE} URHO3D_BUILD_TYPE)
+endif ()
+
 # Include CMake builtin module for building shared library support
 include (GenerateExportHeader)
 

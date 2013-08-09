@@ -92,14 +92,14 @@ set_source_files_properties (${OBJ_FILES} PROPERTIES GENERATED TRUE)
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR})
-if (MSVC)
+if (MSVC AND LIB_TYPE STREQUAL SHARED)
     define_dependency_libs (Main)
 endif ()
 
 # Setup target
 setup_library ()
 
-# Setting up the frameworks for Mac OS X platform
+# Setup the frameworks for Mac OS X platform
 if (APPLE AND LIB_TYPE STREQUAL SHARED)
     setup_macosx_framework (FRAMEWORKS)
     set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${FRAMEWORKS})
