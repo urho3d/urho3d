@@ -103,7 +103,7 @@ You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclip
 
 CMake build configuration has been scripted to generate Urho3D executable as the default build target. This default target builds the Urho3D script host application (a tool to execute AngelScript and Lua script). To change it to generate an Urho3D static or shared (dynamic) library build target instead, specify the build option "-DURHO3D_BUILD_TYPE=STATIC" or "-DURHO3D_BUILD_TYPE=SHARED", respectively. When this option is set, the other build options to generate sample and tool targets are ignored. Due to the way the Urho3D project is being structured and the potential conflict of different visibility (export) attribute settings, when building the Urho3D library target then no other runtime targets can be built at the same time.
 
-Refer to \ref Using_Library "Using Urho3D as external library" on how to setup your own project to use Urho3D as external library.
+Refer to \ref UsingLibrary "Using Urho3D as external library" on how to setup your own project to use Urho3D as external library.
     
 
 \section Building_64bit Desktop 64bit build
@@ -319,7 +319,7 @@ The engine can be configured using the following command line options:
 \endverbatim
 
 
-\page Using_Library Using Urho3D as external library
+\page UsingLibrary Using Urho3D as external library
 
 This page shows how to create a new C++ project using Urho3D library as external library. This page assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find the external library in the Urho3D project build tree, specify an environment variable called "URHO3D_HOME" which points to the root directory of the Urho3D project.  
 
