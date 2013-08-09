@@ -280,7 +280,7 @@ macro (setup_library)
         if (MSVC)
             file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
             add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(ProjectDir)$(IntDir)*.obj\" \"$(ProjectDir)CMakeFiles\\${TARGET_NAME}.dir\"
+                COMMAND copy /B \"$(ProjectDir)$(IntDir)*.obj\" \"$(ProjectDir)CMakeFiles\\${TARGET_NAME}.dir\"
                 COMMENT "Copying object files to a common location also used by Makefile generator")
         endif ()
     endif ()
