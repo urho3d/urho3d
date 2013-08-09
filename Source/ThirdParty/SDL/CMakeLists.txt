@@ -4,14 +4,14 @@ set (TARGET_NAME SDL)
 # Define source files
 file (GLOB C_FILES
     src/*.c src/atomic/*.c src/audio/*.c src/audio/disk/*.c src/audio/dummy/*.c src/cpuinfo/*.c src/events/*.c src/file/*.c
-    src/haptic/*.c src/joystick/*.c src/joystick/dummy/*.c src/libm/*.c src/power/*.c src/stdlib/*.c 
+    src/haptic/*.c src/joystick/*.c src/libm/*.c src/power/*.c src/stdlib/*.c 
     src/thread/*.c src/timer/*.c src/video/*.c src/video/dummy/*.c
 )
 
 if (WIN32)
     file (GLOB SYS_C_FILES
         src/audio/directsound/*.c src/haptic/windows/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c
-        src/power/windows/*.c src/thread/windows/*.c src/thread/generic/SDL_syscond.c src/timer/windows/*.c src/video/windows/*.c
+        src/power/windows/*.c src/thread/windows/*.c src/thread/generic/SDL_syscond.c src/timer/windows/*.c src/video/windows/*.c src/joystick/dummy/*.c
     )
     CHECK_INCLUDE_FILES (wbemcli.h HAVE_WBEMCLI_H)
     if (HAVE_WBEMCLI_H)
@@ -26,7 +26,7 @@ if (WIN32)
 elseif (IOS)
     file (GLOB SYS_C_FILES
         src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/power/uikit/*.m
-        src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c src/haptic/dummy/*.c
+        src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c src/haptic/dummy/*.c src/joystick/dummy/*.c
     )
 elseif (APPLE)
     file (GLOB SYS_C_FILES

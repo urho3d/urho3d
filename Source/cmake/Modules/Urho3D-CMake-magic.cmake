@@ -24,7 +24,10 @@
 set (CMAKE_CONFIGURATION_TYPES "RelWithDebInfo;Debug;Release" CACHE STRING "Configurations" FORCE)
 
 # Set the build type if not explicitly set, for single-configuration generator only
-if (NOT MSVC AND NOT CMAKE_GENERATOR STREQUAL "Xcode" AND NOT CMAKE_BUILD_TYPE)
+if (CMAKE_GENERATOR STREQUAL Xcode)
+    set (XCODE TRUE)
+endif ()
+if (NOT MSVC AND NOT XCODE AND NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif ()
 
@@ -97,7 +100,7 @@ if (IOS)
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos;-iphonesimulator")
     set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
     set (CMAKE_OSX_SYSROOT "iphoneos")    # Set to "Latest iOS"
-elseif (CMAKE_GENERATOR STREQUAL "Xcode")
+elseif (XCODE)
     # MacOSX-Xcode-specific setup
     if (NOT ENABLE_64BIT)
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
@@ -276,11 +279,17 @@ macro (setup_library)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_STATIC_DEFINE)
         endif ()
 
-        # Specific to VS generator
         if (MSVC)
+            # Specific to VS generator
             file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
             add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
                 COMMAND copy /B \"$(ProjectDir)$(IntDir)*.obj\" \"$(ProjectDir)CMakeFiles\\${TARGET_NAME}.dir\"
+                COMMENT "Copying object files to a common location also used by Makefile generator")
+        elseif (XCODE)
+            # Specific to Xcode generator
+            file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
+            add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
+                COMMAND cp -p "$(OBJECT_FILE_DIR)-$(CURRENT_VARIANT)/$(CURRENT_ARCH)/*.o" ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir
                 COMMENT "Copying object files to a common location also used by Makefile generator")
         endif ()
     endif ()

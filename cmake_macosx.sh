@@ -27,6 +27,7 @@ then
     echo -e "\tsed -i.bak 's/\/Contents\/MacOS//g' CMakeScripts/XCODE_DEPEND_HELPER.make" >> Build/CMakeScripts/ReRunCMake.make
 else
     # Create symbolic links in the respective Xcode configuration subdir to allow running Urho3D within the xcode itself
+    mkdir -p Build/Tools/Urho3D
     cd Build/Tools/Urho3D
     for conf in Debug RelWithDebInfo Release; do
         if [ ! -d $conf ]; then mkdir $conf; fi
