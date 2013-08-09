@@ -29,7 +29,7 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../Graphics ../IO ../Math ../Physics ../Resource ../Scene ../../ThirdParty/Recast/Include ../../ThirdParty/Detour/Include)
+set (LIBS ../Container ../Core ../Graphics ../IO ../Math ../Physics ../Resource ../Scene ../../ThirdParty/Recast/include ../../ThirdParty/Detour/include)
 
 # Setup target
 enable_pch ()

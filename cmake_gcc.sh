@@ -3,47 +3,47 @@ msg() {
     echo -e "\n$1\n================================================================================================="
 }
 
-# Ensure we are in project source root directory
+# Ensure we are in project root directory
 cd $( dirname $0 )
-PROJ=`pwd`
+SOURCE=`pwd`/Source
 
 # Create out-of-source build directory
-cmake -E make_directory ../build
-[ $RASPI_TOOL ] && cmake -E make_directory ../raspi-build
-[ $ANDROID_NDK ] && cmake -E make_directory ../android-build
+cmake -E make_directory Build
+[ $RASPI_TOOL ] && cmake -E make_directory raspi-Build
+[ $ANDROID_NDK ] && cmake -E make_directory android-Build
 
 # Remove existing CMake cache and rules
-rm -rf {../build,../raspi-build,../android-build}/CMakeCache.txt {../build,../raspi-build,../android-build}/CMakeFiles
-# Do cleanup one more time for old build directory created by previous version of cmake_gcc.sh, just in case
+rm -rf {Build,raspi-Build,android-Build}/CMakeCache.txt {Build,raspi-Build,android-Build}/CMakeFiles
+# Do cleanup a few more times for old build directory created by previous version of cmake_gcc.sh, just in case
 rm -rf {.,build,Android}/CMakeCache.txt {.,build,Android}/CMakeFiles
+rm -rf {../build,../raspi-build,../android-build}/CMakeCache.txt {../build,../raspi-build,../android-build}/CMakeFiles
 
 # Add support for Eclipse IDE
 IFS=#
 GENERATOR="Unix Makefiles"
-[[ $1 =~ ^eclipse$ ]] && GENERATOR="Eclipse CDT4 - Unix Makefiles" && ECLIPSE=1 && shift
+[[ $1 =~ ^eclipse$ ]] && GENERATOR="Eclipse CDT4 - Unix Makefiles" && shift
 
 # Add support for both native and cross-compiling build for Raspberry Pi
 [[ $( uname -p ) =~ ^armv6 ]] && PLATFORM="-DRASPI=1"
 
 # Create project with the respective Cmake generators
 OPT=--no-warn-unused-cli
-msg "Native build" && cmake -E chdir ../build cmake $OPT -G $GENERATOR $PLATFORM $PROJ $@
-[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir ../raspi-build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$PROJ/cmake/Toolchains/raspberrypi.toolchain.cmake $PROJ $@
-[ $ANDROID_NDK ] && msg "Android build" && cmake -E chdir ../android-build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$PROJ/cmake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $PROJ $@
+msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $SOURCE $@
+[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/cmake/Toolchains/raspberrypi.toolchain.cmake $SOURCE $@
+[ $ANDROID_NDK ] && msg "Android build" && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/cmake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $SOURCE $@
 unset IFS
 
 # Assume GCC user uses OpenGL, comment out below sed if this is not true
-sed -i.bak 's/OpenGL/Direct3D9/g' Doxyfile
+sed 's/OpenGL/Direct3D9/g' Docs/Doxyfile.in >Doxyfile
 
 # Create symbolic links in the build directories
-for dir in CoreData Data; do
-    [ $ECLIPSE ] && cmake -E create_symlink $PROJ/Bin/$dir ../build/Urho3D/bin/$dir
-    if [ $ANDROID_NDK ]; then
-        cmake -E create_symlink ../../Bin/$dir Android/assets/$dir
-        for f in AndroidManifest.xml build.xml project.properties src res assets; do
-            cmake -E create_symlink $PROJ/Android/$f ../android-build/$f
-        done
-    fi
-done
+if [ $ANDROID_NDK ]; then
+    for dir in CoreData Data; do
+        cmake -E create_symlink ../../../Bin/$dir Source/Android/assets/$dir
+    done
+    for f in AndroidManifest.xml build.xml project.properties src res assets; do
+        cmake -E create_symlink ../Source/Android/$f android-Build/$f
+    done
+fi
 
 # vi: set ts=4 sw=4 expandtab:

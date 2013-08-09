@@ -37,10 +37,6 @@ if (URHO3D_HOME)
     
     # Construct build tree paths from URHO3D_HOME environment variable
     find_file (BUILD_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/Source/Engine NO_DEFAULT_PATH)
-      #todo: Remove this after source tree move is completed
-      if (NOT BUILD_TREE_PATH)
-          find_file (BUILD_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/Engine NO_DEFAULT_PATH)
-      endif ()
     if (BUILD_TREE_PATH)
         string (REPLACE "/Urho3D.h.in" "" BUILD_TREE_PATH ${BUILD_TREE_PATH})
         set (URHO3D_INCLUDE_DIR
@@ -62,12 +58,12 @@ if (URHO3D_HOME)
             ${BUILD_TREE_PATH}/UI
             ${BUILD_TREE_PATH}/../Extras/LuaScript)
 
-        if (RASPI)
-            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${BUILD_TREE_PATH}/../../raspi-build/Engine)
-            set (URHO3D_LIB_SEARCH_PATH ${BUILD_TREE_PATH}/../../raspi-build/Engine)
+        if (RASPI AND CMAKE_CROSSCOMPILING)
+            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/raspi-Build/Engine)
+            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/Lib-CC)
         else ()
-            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${BUILD_TREE_PATH}/../../build/Engine)
-            set (URHO3D_LIB_SEARCH_PATH ${BUILD_TREE_PATH}/../../build/Engine)
+            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/Build/Engine)
+            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/Lib)
         endif ()
         find_library (URHO3D_LIBRARIES Urho3D ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH)
     endif ()
