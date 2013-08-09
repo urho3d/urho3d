@@ -29,7 +29,7 @@ else
     # Create symbolic links in the respective Xcode configuration subdir to allow running Urho3D within the xcode itself
     cd Build/Tools/Urho3D
     for conf in Debug RelWithDebInfo Release; do
-        if [ ! -d $conf ] then mkdir $conf; fi
+        if [ ! -d $conf ]; then mkdir $conf; fi
         for dir in CoreData Data; do
             cmake -E create_symlink ../../../../Bin/$dir $conf/$dir
         done
