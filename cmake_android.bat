@@ -15,9 +15,9 @@ if not "%1" == "" (
 if "%use_mklink%" == "1" (
     cmake -E make_directory android-Build
     del /F android-Build\CMakeCache.txt
-    rd /S /Q android-Build\CMakeFiles CMakeFiles
-	set "build=android-Build"
-	set "source=..\Source"
+    rd /S /Q android-Build\CMakeFiles
+    set "build=android-Build"
+    set "source=..\Source"
     for %%d in (CoreData Data) do mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
     for %%f in (src res assets) do mklink /D "android-Build/%%f" "..\Source\Android\%%f"
     for %%f in (AndroidManifest.xml build.xml project.properties) do mklink "android-Build/%%f" "..\Source\Android\%%f"
