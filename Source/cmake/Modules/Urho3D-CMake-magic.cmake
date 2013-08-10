@@ -28,7 +28,7 @@ if (CMAKE_GENERATOR STREQUAL Xcode)
     set (XCODE TRUE)
 endif ()
 if (NOT MSVC AND NOT XCODE AND NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "RelWithDebInfo")
+    set (CMAKE_BUILD_TYPE "Release")
 endif ()
 
 # On Visual Studio, whether to enable 64-bit build depends on the generator used

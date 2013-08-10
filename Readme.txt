@@ -363,6 +363,8 @@ cmake_xxxx batch files or shell scripts.
 |-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS  |
 |                      | on Windows platform because this option is enabled by |
 |                      | default for other platforms)                          | 
+|-DUSE_MKLINK=1        |to use mklink command to create symbolic links (Windows|
+|                      |  Vista and above only)                                |
 |-DSCP_TO_TARGET=      |to automatically scp executables to target system (only|
 |  usr\@tgt:remote-loc | applicable for cross compiling Raspberry Pi on a      |
 |                      | build/host machine), SSH digital key must be setup    |

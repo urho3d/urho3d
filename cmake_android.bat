@@ -1,9 +1,26 @@
 @echo off
-cd Source/Android
-del /F CMakeCache.txt
-rd /S /Q CMakeFiles
-cd ../..
-del /F CMakeCache.txt
-rd /S /Q CMakeFiles
+:: Define USE_MKLINK to 1 to enable out-of-source build
+del /F Source\Android\CMakeCache.txt CMakeCache.txt
+rd /S /Q Source\Android\CMakeFiles CMakeFiles
+set "build=Source\Android"
+set "source=Source"
+set "use_mklink="
+:loop
+if not "%1" == "" (
+    if "%1" == "-DUSE_MKLINK" set "use_mklink=%~2"
+    shift
+	shift
+    goto loop
+)
+if "%use_mklink%" == "1" (
+    cmake -E make_directory android-Build
+    del /F android-Build\CMakeCache.txt
+    rd /S /Q android-Build\CMakeFiles CMakeFiles
+	set "build=android-Build"
+	set "source=..\Source"
+    for %%d in (CoreData Data) do mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
+    for %%f in (src res assets) do mklink /D "android-Build/%%f" "..\Source\Android\%%f"
+    for %%f in (AndroidManifest.xml build.xml project.properties) do mklink "android-Build/%%f" "..\Source\Android\%%f"
+)
 echo on
-cmake -E chdir Source/Android cmake -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. -DCMAKE_BUILD_TYPE=Release .. %*
+cmake -E chdir %build% cmake -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\cmake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. %source% %*
