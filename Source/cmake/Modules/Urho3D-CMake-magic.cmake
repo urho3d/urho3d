@@ -287,10 +287,10 @@ macro (setup_library)
                 COMMENT "Copying object files to a common location also used by Makefile generator")
         elseif (XCODE)
             # Specific to Xcode generator
-            file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
+            set (SYMLINK ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.lnk)
             add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                COMMAND cp -p "$(OBJECT_FILE_DIR)-$(CURRENT_VARIANT)/$(CURRENT_ARCH)/*.o" ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir
-                COMMENT "Copying object files to a common location also used by Makefile generator")
+                COMMAND rm -f ${SYMLINK} && ln -s "$(OBJECT_FILE_DIR)-$(CURRENT_VARIANT)/$(CURRENT_ARCH)" ${SYMLINK}
+                COMMENT "Creating a symbolic link pointing to object file directory")
         endif ()
     endif ()
 endmacro ()
