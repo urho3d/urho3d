@@ -285,7 +285,7 @@ macro (setup_library)
                 set (SYMLINK ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.lnk)
                 add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
                     COMMAND rd \"${SYMLINK}\"
-					COMMAND mklink /D \"${SYMLINK}\" \"$(ProjectDir)$(IntDir)\"
+                    COMMAND mklink /D \"${SYMLINK}\" \"$(ProjectDir)$(IntDir)\"
                     COMMENT "Creating a symbolic link pointing to object file directory")
             else ()
                 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
