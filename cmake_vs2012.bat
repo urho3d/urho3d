@@ -12,6 +12,6 @@ if not "%1" == "" (
     shift
     goto loop
 )
-cmake -E copy_if_different Docs/Doxyfile.in Doxyfile
+cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
 echo on
-cmake -E chdir Build cmake -G "Visual Studio %version%%arch%" ../Source %*
+cmake -E chdir Build cmake -G "Visual Studio %version%%arch%" ..\Source %*

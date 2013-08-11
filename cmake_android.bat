@@ -22,6 +22,6 @@ if "%use_mklink%" == "1" (
     for %%d in (src res assets) do mklink /D "android-Build\%%d" "..\Source\Android\%%d"
     for %%f in (AndroidManifest.xml build.xml project.properties) do mklink "android-Build\%%f" "..\Source\Android\%%f"
 )
-cmake -E copy_if_different Docs/Doxyfile.in Doxyfile
+cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
 echo on
 cmake -E chdir %build% cmake -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\cmake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. %source% %*
