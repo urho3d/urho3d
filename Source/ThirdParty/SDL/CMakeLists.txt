@@ -9,20 +9,22 @@ file (GLOB C_FILES
 )
 
 if (WIN32)
-    file (GLOB SYS_C_FILES
-        src/audio/directsound/*.c src/haptic/windows/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c
-        src/power/windows/*.c src/thread/windows/*.c src/thread/generic/SDL_syscond.c src/timer/windows/*.c src/video/windows/*.c src/joystick/dummy/*.c
-    )
     CHECK_INCLUDE_FILES (wbemcli.h HAVE_WBEMCLI_H)
     if (HAVE_WBEMCLI_H)
         add_definitions (-DSDL_JOYSTICK_DINPUT)
         add_definitions (-DSDL_HAPTIC_DINPUT)
+        set (HAPTIC_DRIVER windows)
     else ()
         message ("-- Building SDL without DX joystick support due to missing wbemcli.h")
         message ("-- For MSVC, get it from Windows 7 SDK. For MinGW, get it from eg. Wine sources or from MinGW-w64")
         add_definitions (-DSDL_JOYSTICK_WINMM)
         add_definitions (-DSDL_HAPTIC_DUMMY)
+        set (HAPTIC_DRIVER dummy)
     endif ()
+    file (GLOB SYS_C_FILES
+        src/audio/directsound/*.c src/haptic/${HAPTIC_DRIVER}/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c
+        src/power/windows/*.c src/thread/windows/*.c src/thread/generic/SDL_syscond.c src/timer/windows/*.c src/video/windows/*.c src/joystick/dummy/*.c
+    )
 elseif (IOS)
     file (GLOB SYS_C_FILES
         src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/power/uikit/*.m
