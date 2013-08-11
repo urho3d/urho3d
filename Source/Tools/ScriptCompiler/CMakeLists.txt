@@ -33,6 +33,6 @@ set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Eng
 
 # Setup target
 if (APPLE)
-    set (CMAKE_EXE_LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL")
+    setup_macosx_framework (CMAKE_EXE_LINKER_FLAGS)
 endif ()
 setup_executable ()

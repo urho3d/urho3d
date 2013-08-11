@@ -34,6 +34,6 @@ set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src)
 
 # Setup target
 if (APPLE)
-    set (CMAKE_EXE_LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+    setup_macosx_framework (CMAKE_EXE_LINKER_FLAGS)
 endif ()
 setup_executable ()
