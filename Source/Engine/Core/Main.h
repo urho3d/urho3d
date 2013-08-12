@@ -32,8 +32,6 @@
 #endif
 #endif
 
-using namespace Urho3D;
-
 // Define a platform-specific main function, which in turn executes the user-defined function
 
 // MSVC debug mode: use memory leak reporting

@@ -30,6 +30,9 @@
 
 #include "DebugNew.h"
 
+namespace Urho3D
+{
+
 Application::Application(Context* context) :
     Object(context),
     exitCode_(EXIT_SUCCESS)
@@ -87,4 +90,6 @@ void Application::ErrorExit(const String& message)
     }
     else
         ErrorDialog(GetTypeName(), message);
+}
+
 }
