@@ -56,7 +56,8 @@ if (URHO3D_HOME)
             ${BUILD_TREE_PATH}/Scene
             ${BUILD_TREE_PATH}/Script
             ${BUILD_TREE_PATH}/UI
-            ${BUILD_TREE_PATH}/../Extras/LuaScript)
+            ${BUILD_TREE_PATH}/../Extras/LuaScript
+            ${BUILD_TREE_PATH}/../ThirdParty/SDL/include)
 
         if (RASPI AND CMAKE_CROSSCOMPILING)
             set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/raspi-Build/Engine)
