@@ -91,7 +91,7 @@ static const SDL_Scancode darwin_scancode_table[] = {
     /*  61 */   SDL_SCANCODE_RALT,
     /*  62 */   SDL_SCANCODE_RCTRL,
     /*  63 */   SDL_SCANCODE_RGUI, /* fn on portables, acts as a hardware-level modifier already, so we don't generate events for it, also XK_Meta_R */
-    /*  64 */   SDL_SCANCODE_UNKNOWN, /* unknown (unused?) */
+    /*  64 */   SDL_SCANCODE_F17,
     /*  65 */   SDL_SCANCODE_KP_PERIOD,
     /*  66 */   SDL_SCANCODE_UNKNOWN, /* unknown (unused?) */
     /*  67 */   SDL_SCANCODE_KP_MULTIPLY,
@@ -106,8 +106,8 @@ static const SDL_Scancode darwin_scancode_table[] = {
     /*  76 */   SDL_SCANCODE_KP_ENTER, /* keypad enter on external keyboards, fn-return on portables */
     /*  77 */   SDL_SCANCODE_UNKNOWN, /* unknown (unused?) */
     /*  78 */   SDL_SCANCODE_KP_MINUS,
-    /*  79 */   SDL_SCANCODE_UNKNOWN, /* unknown (unused?) */
-    /*  80 */   SDL_SCANCODE_UNKNOWN, /* unknown (unused?) */
+    /*  79 */   SDL_SCANCODE_F18,
+    /*  80 */   SDL_SCANCODE_F19,
     /*  81 */   SDL_SCANCODE_KP_EQUALS,
     /*  82 */   SDL_SCANCODE_KP_0,
     /*  83 */   SDL_SCANCODE_KP_1,

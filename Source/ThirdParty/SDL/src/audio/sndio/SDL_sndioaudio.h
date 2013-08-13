@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,47 +18,28 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+#include "SDL_config.h"
 
-#ifdef SAVE_RCSID
-static char rcsid =
-    "@(#) $Id: SDL_systhread.c,v 1.2 2001/04/26 16:50:18 hercules Exp $";
-#endif
+#ifndef _SDL_sndioaudio_h
+#define _SDL_sndioaudio_h
 
-/* Thread management routines for SDL */
+#include <sndio.h>
 
-#include "SDL_error.h"
-#include "SDL_thread.h"
-#include "../SDL_systhread.h"
+#include "../SDL_sysaudio.h"
 
-int
-SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
+/* Hidden "this" pointer for the audio functions */
+#define _THIS   SDL_AudioDevice *this
+
+struct SDL_PrivateAudioData
 {
-    SDL_SetError("Threads are not supported on this platform");
-    return (-1);
-}
+    /* The audio device handle */
+    struct sio_hdl *dev;
 
-void
-SDL_SYS_SetupThread(const char *name)
-{
-    return;
-}
+    /* Raw mixing buffer */
+    Uint8 *mixbuf;
+    int mixlen;
+};
 
-SDL_threadID
-SDL_ThreadID(void)
-{
-    return (0);
-}
-
-void
-SDL_SYS_WaitThread(SDL_Thread * thread)
-{
-    return;
-}
-
-int
-SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
-{
-    return (0);
-}
+#endif /* _SDL_sndioaudio_h */
 
 /* vi: set ts=4 sw=4 expandtab: */

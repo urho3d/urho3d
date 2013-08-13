@@ -28,6 +28,7 @@
 #include "SDL_assert.h"
 #include "SDL_events.h"
 #include "SDL_cocoamouse.h"
+#include "SDL_cocoamousetap.h"
 
 #include "../../events/SDL_mouse_c.h"
 
@@ -97,6 +98,8 @@ Cocoa_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
         cursor = SDL_calloc(1, sizeof(*cursor));
         if (cursor) {
             cursor->driverdata = nscursor;
+        } else {
+            [nscursor release];
         }
     }
 
@@ -204,10 +207,13 @@ static void
 Cocoa_WarpMouse(SDL_Window * window, int x, int y)
 {
     SDL_Mouse *mouse = SDL_GetMouse();
-    CGPoint point;
+    CGPoint point = CGPointMake(x, y);
 
-    point.x = (float)window->x + x;
-    point.y = (float)window->y + y;
+    if (!(window->flags & SDL_WINDOW_FULLSCREEN))
+    {
+        point.x += window->x;
+        point.y += window->y;
+    }
 
     {
         /* This makes Cocoa_HandleMouseEvent ignore this delta in the next
@@ -266,7 +272,9 @@ Cocoa_InitMouse(_THIS)
     mouse->SetRelativeMouseMode = Cocoa_SetRelativeMouseMode;
 
     SDL_SetDefaultCursor(Cocoa_CreateDefaultCursor());
-    
+
+    Cocoa_InitMouseEventTap(mouse->driverdata);
+
     // Urho3D: disable event suppression interval, otherwise mouse moves will be disabled for some time
     CGSetLocalEventsSuppressionInterval(0.0);
 }
@@ -316,6 +324,10 @@ Cocoa_QuitMouse(_THIS)
 {
     SDL_Mouse *mouse = SDL_GetMouse();
     if (mouse) {
+        if (mouse->driverdata) {
+            Cocoa_QuitMouseEventTap(((SDL_MouseData*)mouse->driverdata));
+        }
+
         SDL_free(mouse->driverdata);
     }
 }

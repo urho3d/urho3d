@@ -32,6 +32,8 @@ struct SDL_PrivateAudioData
 {
 };
 
+static void AndroidAUD_CloseDevice(_THIS);
+
 #endif /* _SDL_androidaudio_h */
 
 /* vi: set ts=4 sw=4 expandtab: */

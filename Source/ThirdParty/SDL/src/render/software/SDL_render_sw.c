@@ -114,8 +114,6 @@ SW_ActivateRenderer(SDL_Renderer * renderer)
         SDL_Surface *surface = SDL_GetWindowSurface(renderer->window);
         if (surface) {
             data->surface = data->window = surface;
-            renderer->viewport.w = surface->w;
-            renderer->viewport.h = surface->h;
 
             SW_UpdateViewport(renderer);
             SW_UpdateClipRect(renderer);

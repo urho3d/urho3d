@@ -643,7 +643,7 @@ ALSA_OpenDevice(_THIS, const char *devname, int iscapture)
         ALSA_CloseDevice(this);
         return SDL_OutOfMemory();
     }
-    SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
+    SDL_memset(this->hidden->mixbuf, this->spec.silence, this->hidden->mixlen);
 
     /* Switch to blocking mode for playback */
     ALSA_snd_pcm_nonblock(pcm_handle, 0);

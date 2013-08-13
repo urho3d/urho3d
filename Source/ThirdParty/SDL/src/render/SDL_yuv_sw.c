@@ -82,6 +82,7 @@
  * SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
+#include "SDL_assert.h"
 #include "SDL_video.h"
 #include "SDL_cpuinfo.h"
 #include "SDL_yuv_sw_c.h"
@@ -1029,12 +1030,6 @@ SDL_SW_CreateYUVTexture(Uint32 format, int w, int h)
     int i;
     int CR, CB;
 
-    swdata = (SDL_SW_YUVTexture *) SDL_calloc(1, sizeof(*swdata));
-    if (!swdata) {
-        SDL_OutOfMemory();
-        return NULL;
-    }
-
     switch (format) {
     case SDL_PIXELFORMAT_YV12:
     case SDL_PIXELFORMAT_IYUV:
@@ -1043,8 +1038,13 @@ SDL_SW_CreateYUVTexture(Uint32 format, int w, int h)
     case SDL_PIXELFORMAT_YVYU:
         break;
     default:
-        SDL_SW_DestroyYUVTexture(swdata);
         SDL_SetError("Unsupported YUV format");
+        return NULL;
+    }
+
+    swdata = (SDL_SW_YUVTexture *) SDL_calloc(1, sizeof(*swdata));
+    if (!swdata) {
+        SDL_OutOfMemory();
         return NULL;
     }
 
@@ -1095,7 +1095,7 @@ SDL_SW_CreateYUVTexture(Uint32 format, int w, int h)
         swdata->planes[0] = swdata->pixels;
         break;
     default:
-        /* We should never get here (caught above) */
+        SDL_assert(0 && "We should never get here (caught above)");
         break;
     }
 

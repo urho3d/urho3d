@@ -29,21 +29,33 @@
 #undef pixel
 #endif
 
+#include "SDL_events.h"
+#include "SDL_timer.h"
 #include "SDL_messagebox.h"
 #include "SDL_cocoavideo.h"
 
 @interface SDLMessageBoxPresenter : NSObject {
 @public
     NSInteger clicked;
+    NSWindow *nswindow;
 }
+- (id) initWithParentWindow:(SDL_Window *)window;
+- (void) alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 @end
 
 @implementation SDLMessageBoxPresenter
-- (id)init
+- (id) initWithParentWindow:(SDL_Window *)window
 {
     self = [super init];
     if (self) {
         clicked = -1;
+
+        /* Retain the NSWindow because we'll show the alert later on the main thread */
+        if (window) {
+            nswindow = [((SDL_WindowData *) window->driverdata)->nswindow retain];
+        } else {
+            nswindow = NULL;
+        }
     }
 
     return self;
@@ -51,8 +63,23 @@
 
 - (void)showAlert:(NSAlert*)alert
 {
-    clicked = [alert runModal];
+    if (nswindow) {
+        [alert beginSheetModalForWindow:nswindow modalDelegate:self didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:) contextInfo:nil];
+        while (clicked < 0) {
+            SDL_PumpEvents();
+            SDL_Delay(100);
+        }
+        [nswindow release];
+    } else {
+        clicked = [alert runModal];
+    }
 }
+
+- (void) alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+{
+    clicked = returnCode;
+}
+
 @end
 
 
@@ -90,7 +117,7 @@ Cocoa_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
         }
     }
 
-    SDLMessageBoxPresenter* presenter = [[[SDLMessageBoxPresenter alloc] init] autorelease];
+    SDLMessageBoxPresenter* presenter = [[[SDLMessageBoxPresenter alloc] initWithParentWindow:messageboxdata->window] autorelease];
 
     [presenter performSelectorOnMainThread:@selector(showAlert:)
                                 withObject:alert

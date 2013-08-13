@@ -41,15 +41,68 @@
 - (void)setAppleMenu:(NSMenu *)menu;
 @end
 
-@interface SDLAppDelegate : NSObject
+@interface SDLAppDelegate : NSObject {
+    BOOL seenFirstActivate;
+}
+
+- (id)init;
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
+- (void)applicationDidBecomeActive:(NSNotification *)aNotification;
 @end
 
 @implementation SDLAppDelegate : NSObject
+- (id)init
+{
+    self = [super init];
+
+    if (self) {
+        seenFirstActivate = NO;
+    }
+
+    return self;
+}
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
     SDL_SendQuit();
     return NSTerminateCancel;
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)aNotification
+{
+    /* HACK: Ignore the first call. The application gets a
+     * applicationDidBecomeActive: a little bit after the first window is
+     * created, and if we don't ignore it, a window that has been created with
+     * SDL_WINDOW_MINIZED will ~immediately be restored.
+     */
+    if (!seenFirstActivate) {
+        seenFirstActivate = YES;
+        return;
+    }
+
+    SDL_VideoDevice *device = SDL_GetVideoDevice();
+    if (device && device->windows)
+    {
+        SDL_Window *window = device->windows;
+        int i;
+        for (i = 0; i < device->num_displays; ++i)
+        {
+            SDL_Window *fullscreen_window = device->displays[i].fullscreen_window;
+            if (fullscreen_window)
+            {
+                if (fullscreen_window->flags & SDL_WINDOW_MINIMIZED) {
+                    SDL_RestoreWindow(fullscreen_window);
+                }
+                return;
+            }
+        }
+
+        if (window->flags & SDL_WINDOW_MINIMIZED) {
+            SDL_RestoreWindow(window);
+        } else {
+            SDL_RaiseWindow(window);
+        }
+    }
 }
 
 - (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename
@@ -85,6 +138,10 @@ CreateApplicationMenus(void)
     NSMenu *windowMenu;
     NSMenuItem *menuItem;
 
+    if (NSApp == nil) {
+        return;
+    }
+    
     /* Create the main menu bar */
     [NSApp setMainMenu:[[NSMenu alloc] init]];
 
@@ -175,7 +232,7 @@ Cocoa_RegisterApp(void)
         }
         [NSApp finishLaunching];
     }
-    if ([NSApp delegate] == nil) {
+    if (NSApp && ![NSApp delegate]) {
         [NSApp setDelegate:[[SDLAppDelegate alloc] init]];
     }
     [pool release];

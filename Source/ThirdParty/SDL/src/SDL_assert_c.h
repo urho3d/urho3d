@@ -19,7 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-extern int SDL_AssertionsInit(void);
 extern void SDL_AssertionsQuit(void);
 
 /* vi: set ts=4 sw=4 expandtab: */

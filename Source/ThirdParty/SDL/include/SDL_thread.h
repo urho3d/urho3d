@@ -32,6 +32,7 @@
 #include "SDL_error.h"
 
 /* Thread synchronization primitives */
+#include "SDL_atomic.h"
 #include "SDL_mutex.h"
 
 #include "begin_code.h"
@@ -46,6 +47,9 @@ typedef struct SDL_Thread SDL_Thread;
 
 /* The SDL thread ID */
 typedef unsigned long SDL_threadID;
+
+/* Thread local storage ID, 0 is the invalid ID */
+typedef unsigned int SDL_TLSID;
 
 /* The SDL thread priority
  *
@@ -105,7 +109,7 @@ SDL_CreateThread(SDL_ThreadFunction fn, const char *name, void *data,
 /**
  *  Create a thread.
  */
-#define SDL_CreateThread(fn, name, data) SDL_CreateThread(fn, name, data, _beginthreadex, _endthreadex)
+#define SDL_CreateThread(fn, name, data) SDL_CreateThread(fn, name, data, (pfnSDL_CurrentBeginThread)_beginthreadex, (pfnSDL_CurrentEndThread)_endthreadex)
 
 #else
 
@@ -165,6 +169,64 @@ extern DECLSPEC int SDLCALL SDL_SetThreadPriority(SDL_ThreadPriority priority);
  *  pointed to by \c status, if \c status is not NULL.
  */
 extern DECLSPEC void SDLCALL SDL_WaitThread(SDL_Thread * thread, int *status);
+
+/**
+ *  \brief Create an identifier that is globally visible to all threads but refers to data that is thread-specific.
+ *
+ *  \return The newly created thread local storage identifier, or 0 on error
+ *
+ *  \code
+ *  static SDL_SpinLock tls_lock;
+ *  static SDL_TLSID thread_local_storage;
+ * 
+ *  void SetMyThreadData(void *value)
+ *  {
+ *      if (!thread_local_storage) {
+ *          SDL_AtomicLock(&tls_lock);
+ *          if (!thread_local_storage) {
+ *              thread_local_storage = SDL_TLSCreate();
+ *          }
+ *          SDL_AtomicUnLock(&tls_lock);
+ *      }
+ *      SDL_TLSSet(thread_local_storage, value);
+ *  }
+ *  
+ *  void *GetMyThreadData(void)
+ *  {
+ *      return SDL_TLSGet(thread_local_storage);
+ *  }
+ *  \endcode
+ *
+ *  \sa SDL_TLSGet()
+ *  \sa SDL_TLSSet()
+ */
+extern DECLSPEC SDL_TLSID SDLCALL SDL_TLSCreate(void);
+
+/**
+ *  \brief Get the value associated with a thread local storage ID for the current thread.
+ *
+ *  \param id The thread local storage ID
+ *
+ *  \return The value associated with the ID for the current thread, or NULL if no value has been set.
+ *
+ *  \sa SDL_TLSCreate()
+ *  \sa SDL_TLSSet()
+ */
+extern DECLSPEC void * SDLCALL SDL_TLSGet(SDL_TLSID id);
+
+/**
+ *  \brief Set the value associated with a thread local storage ID for the current thread.
+ *
+ *  \param id The thread local storage ID
+ *  \param value The value to associate with the ID for the current thread
+ *  \param destructor A function called when the thread exits, to free the value.
+ *
+ *  \return 0 on success, -1 on error
+ *
+ *  \sa SDL_TLSCreate()
+ *  \sa SDL_TLSGet()
+ */
+extern DECLSPEC int SDLCALL SDL_TLSSet(SDL_TLSID id, const void *value, void (*destructor)(void*));
 
 
 /* Ends C function definitions when using C++ */

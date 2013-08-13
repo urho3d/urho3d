@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,10 +18,16 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+#include "SDL_config.h"
 
-/* Stub until we implement threads on this platform */
-typedef int SYS_ThreadHandle;
+#ifndef _SDL_cocoamousetap_h
+#define _SDL_cocoamousetap_h
 
-#ifndef DISABLE_THREADS
-#define DISABLE_THREADS
-#endif
+#include "SDL_cocoamouse.h"
+
+extern void Cocoa_InitMouseEventTap(SDL_MouseData *driverdata);
+extern void Cocoa_QuitMouseEventTap(SDL_MouseData *driverdata);
+
+#endif /* _SDL_cocoamousetap_h */
+
+/* vi: set ts=4 sw=4 expandtab: */

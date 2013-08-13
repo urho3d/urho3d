@@ -31,9 +31,12 @@ static size_t SDL_envmemlen = 0;
 
 
 /* Put a variable into the environment */
-#ifdef SDL_setenv
-#undef SDL_setenv
-int SDL_setenv(const char *name, const char *value, int overwrite) { return SDL_setenv_inline(name, value, overwrite); }
+#if defined(HAVE_SETENV)
+int
+SDL_setenv(const char *name, const char *value, int overwrite)
+{
+    return setenv(name, value, overwrite);
+}
 #elif defined(__WIN32__)
 int
 SDL_setenv(const char *name, const char *value, int overwrite)
@@ -143,9 +146,12 @@ SDL_setenv(const char *name, const char *value, int overwrite)
 #endif
 
 /* Retrieve a variable named "name" from the environment */
-#ifdef SDL_getenv
-#undef SDL_getenv
-char *SDL_getenv(const char *name) { return SDL_getenv_inline(name); }
+#if defined(HAVE_GETENV)
+char *
+SDL_getenv(const char *name)
+{
+    return getenv(name);
+}
 #elif defined(__WIN32__)
 char *
 SDL_getenv(const char *name)

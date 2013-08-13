@@ -51,12 +51,11 @@
 #include "SDL_stdinc.h"
 #include "SDL_assert.h"
 
-#ifdef SDL_qsort
-#undef SDL_qsort
+#if defined(HAVE_QSORT)
 void
 SDL_qsort(void *base, size_t nmemb, size_t size, int (*compare) (const void *, const void *))
 {
-    SDL_qsort_inline(base, nmemb, size, compare);
+    qsort(base, nmemb, size, compare);
 }
 #else
 

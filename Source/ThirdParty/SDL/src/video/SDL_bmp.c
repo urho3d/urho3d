@@ -47,6 +47,35 @@
 #endif
 
 
+static void CorrectAlphaChannel(SDL_Surface *surface)
+{
+    /* Check to see if there is any alpha channel data */
+    SDL_bool hasAlpha = SDL_FALSE;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    int alphaChannelOffset = 0;
+#else
+    int alphaChannelOffset = 3;
+#endif
+    Uint8 *alpha = ((Uint8*)surface->pixels) + alphaChannelOffset;
+    Uint8 *end = alpha + surface->h * surface->pitch;
+
+    while (alpha < end) {
+        if (*alpha != 0) {
+            hasAlpha = SDL_TRUE;
+            break;
+        }
+        alpha += 4;
+    }
+
+    if (!hasAlpha) {
+        alpha = ((Uint8*)surface->pixels) + alphaChannelOffset;
+        while (alpha < end) {
+            *alpha = SDL_ALPHA_OPAQUE;
+            alpha += 4;
+        }
+    }
+}
+
 SDL_Surface *
 SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
 {
@@ -64,6 +93,7 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
     Uint8 *top, *end;
     SDL_bool topDown;
     int ExpandBMP;
+    SDL_bool correctAlpha = SDL_FALSE;
 
     /* The Win32 BMP file header (14 bytes) */
     char magic[2];
@@ -182,6 +212,8 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
 #endif
                 break;
             case 32:
+                /* We don't know if this has alpha channel or not */
+                correctAlpha = SDL_TRUE;
                 Amask = 0xFF000000;
                 Rmask = 0x00FF0000;
                 Gmask = 0x0000FF00;
@@ -357,6 +389,9 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
         } else {
             bits -= surface->pitch;
         }
+    }
+    if (correctAlpha) {
+        CorrectAlphaChannel(surface);
     }
   done:
     if (was_error) {

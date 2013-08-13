@@ -25,7 +25,21 @@
 #define libm_hidden_proto(x)
 #define libm_hidden_def(x)
 
+#ifndef __HAIKU__ /* already defined in a system header. */
 typedef unsigned int u_int32_t;
+#endif
+
+#define atan            SDL_uclibc_atan
+#define __ieee754_atan2 SDL_uclibc_atan2
+#define copysign        SDL_uclibc_copysign
+#define cos             SDL_uclibc_cos
+#define fabs            SDL_uclibc_fabs
+#define floor           SDL_uclibc_floor
+#define __ieee754_log   SDL_uclibc_log
+#define __ieee754_pow   SDL_uclibc_pow
+#define scalbn          SDL_uclibc_scalbn
+#define sin             SDL_uclibc_sin
+#define __ieee754_sqrt  SDL_uclibc_sqrt
 
 /* The original fdlibm code used statements like:
 	n0 = ((*(int*)&one)>>29)^1;		* index of high word *

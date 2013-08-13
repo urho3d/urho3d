@@ -49,7 +49,7 @@
 
 #if (PA_API_VERSION < 12)
 /** Return non-zero if the passed state is one of the connected states */
-static inline int PA_CONTEXT_IS_GOOD(pa_context_state_t x) {
+static __inline__ int PA_CONTEXT_IS_GOOD(pa_context_state_t x) {
     return
         x == PA_CONTEXT_CONNECTING ||
         x == PA_CONTEXT_AUTHORIZING ||
@@ -57,7 +57,7 @@ static inline int PA_CONTEXT_IS_GOOD(pa_context_state_t x) {
         x == PA_CONTEXT_READY;
 }
 /** Return non-zero if the passed state is one of the connected states */
-static inline int PA_STREAM_IS_GOOD(pa_stream_state_t x) {
+static __inline__ int PA_STREAM_IS_GOOD(pa_stream_state_t x) {
     return
         x == PA_STREAM_CREATING ||
         x == PA_STREAM_READY;
@@ -65,6 +65,7 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state_t x) {
 #endif /* pulseaudio <= 0.9.10 */
 
 
+static const char *(*PULSEAUDIO_pa_get_library_version) (void);
 static pa_simple *(*PULSEAUDIO_pa_simple_new) (const char *, const char *,
     pa_stream_direction_t, const char *, const char *, const pa_sample_spec *,
     const pa_channel_map *, const pa_buffer_attr *, int *);
@@ -177,6 +178,7 @@ LoadPulseAudioLibrary(void)
 static int
 load_pulseaudio_syms(void)
 {
+    SDL_PULSEAUDIO_SYM(pa_get_library_version);
     SDL_PULSEAUDIO_SYM(pa_simple_new);
     SDL_PULSEAUDIO_SYM(pa_simple_free);
     SDL_PULSEAUDIO_SYM(pa_mainloop_new);
@@ -322,6 +324,28 @@ PULSEAUDIO_CloseDevice(_THIS)
 }
 
 
+static __inline__ int
+squashVersion(const int major, const int minor, const int patch)
+{
+    return ((major & 0xFF) << 16) | ((minor & 0xFF) << 8) | (patch & 0xFF);
+}
+
+/* Workaround for older pulse: pa_context_new() must have non-NULL appname */
+static const char *
+getAppName(void)
+{
+    const char *verstr = PULSEAUDIO_pa_get_library_version();
+    if (verstr != NULL) {
+        int maj, min, patch;
+        if (SDL_sscanf(verstr, "%d.%d.%d", &maj, &min, &patch) == 3) {
+            if (squashVersion(maj, min, patch) >= squashVersion(0, 9, 15)) {
+                return NULL;  /* 0.9.15+ handles NULL correctly. */
+            }
+        }
+    }
+    return "SDL Application";  /* oh well. */
+}
+
 static int
 PULSEAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
 {
@@ -359,6 +383,18 @@ PULSEAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
             break;
         case AUDIO_S16MSB:
             paspec.format = PA_SAMPLE_S16BE;
+            break;
+        case AUDIO_S32LSB:
+            paspec.format = PA_SAMPLE_S32LE;
+            break;
+        case AUDIO_S32MSB:
+            paspec.format = PA_SAMPLE_S32BE;
+            break;
+        case AUDIO_F32LSB:
+            paspec.format = PA_SAMPLE_FLOAT32LE;
+            break;
+        case AUDIO_F32MSB:
+            paspec.format = PA_SAMPLE_FLOAT32BE;
             break;
         default:
             paspec.format = PA_SAMPLE_INVALID;
@@ -420,7 +456,7 @@ PULSEAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     }
 
     h->mainloop_api = PULSEAUDIO_pa_mainloop_get_api(h->mainloop);
-    h->context = PULSEAUDIO_pa_context_new(h->mainloop_api, NULL);
+    h->context = PULSEAUDIO_pa_context_new(h->mainloop_api, getAppName());
     if (!h->context) {
         PULSEAUDIO_CloseDevice(this);
         return SDL_SetError("pa_context_new() failed");

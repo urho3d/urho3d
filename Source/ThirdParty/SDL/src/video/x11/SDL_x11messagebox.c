@@ -78,11 +78,11 @@ typedef struct TextLineData {
     const char *text;                   /* Text for this line */
 } TextLineData;
 
-typedef struct SDL_MessageBoxDataX11 {
-    XFontSet font_set;                  /* for UTF-8 systems */
-    XFontStruct *font_struct;            /* Latin1 (ASCII) fallback. */
-    Window window;
+typedef struct SDL_MessageBoxDataX11
+{
     Display *display;
+    int screen;
+    Window window;
     long event_mask;
     Atom wm_protocols;
     Atom wm_delete_message;
@@ -90,6 +90,8 @@ typedef struct SDL_MessageBoxDataX11 {
     int dialog_width;                   /* Dialog box width. */
     int dialog_height;                  /* Dialog box height. */
 
+    XFontSet font_set;                  /* for UTF-8 systems */
+    XFontStruct *font_struct;           /* Latin1 (ASCII) fallback. */
     int xtext, ytext;                   /* Text position to start drawing at. */
     int numlines;                       /* Count of Text lines. */
     int text_height;                    /* Height for text lines. */
@@ -347,7 +349,7 @@ X11_MessageBoxShutdown( SDL_MessageBoxDataX11 *data )
 
     if ( data->display ) {
         if ( data->window != None ) {
-            XUnmapWindow( data->display, data->window );
+            XWithdrawWindow( data->display, data->window, data->screen );
             XDestroyWindow( data->display, data->window );
             data->window = None;
         }
@@ -369,7 +371,12 @@ X11_MessageBoxCreateWindow( SDL_MessageBoxDataX11 *data )
     const SDL_MessageBoxData *messageboxdata = data->messageboxdata;
 
     if ( messageboxdata->window ) {
+        SDL_DisplayData *displaydata =
+            (SDL_DisplayData *) SDL_GetDisplayForWindow(messageboxdata->window)->driverdata;
         windowdata = (SDL_WindowData *)messageboxdata->window->driverdata;
+        data->screen = displaydata->screen;
+    } else {
+        data->screen = DefaultScreen( display );
     }
 
     data->event_mask = ExposureMask |
@@ -378,7 +385,7 @@ X11_MessageBoxCreateWindow( SDL_MessageBoxDataX11 *data )
     wnd_attr.event_mask = data->event_mask;
 
     data->window = XCreateWindow(
-                       display, DefaultRootWindow( display ),
+                       display, RootWindow(display, data->screen),
                        0, 0,
                        data->dialog_width, data->dialog_height,
                        0, CopyFromParent, InputOutput, CopyFromParent,
@@ -406,11 +413,10 @@ X11_MessageBoxCreateWindow( SDL_MessageBoxDataX11 *data )
         XGetWindowAttributes(display, windowdata->xwindow, &attrib);
         x = attrib.x + ( attrib.width - data->dialog_width ) / 2;
         y = attrib.y + ( attrib.height - data->dialog_height ) / 3 ;
-        XTranslateCoordinates(display, windowdata->xwindow, DefaultRootWindow( display ), x, y, &x, &y, &dummy);
+        XTranslateCoordinates(display, windowdata->xwindow, RootWindow(display, data->screen), x, y, &x, &y, &dummy);
     } else {
-        int screen = DefaultScreen( display );
-        x = ( DisplayWidth( display, screen ) - data->dialog_width ) / 2;
-        y = ( DisplayHeight( display, screen ) - data->dialog_height ) / 3 ;
+        x = ( DisplayWidth( display, data->screen ) - data->dialog_width ) / 2;
+        y = ( DisplayHeight( display, data->screen ) - data->dialog_height ) / 3 ;
     }
     XMoveWindow( display, data->window, x, y );
 

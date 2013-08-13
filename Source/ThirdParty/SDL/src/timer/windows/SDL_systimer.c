@@ -26,8 +26,8 @@
 #include <mmsystem.h>
 
 #include "SDL_timer.h"
+#include "SDL_hints.h"
 
-#define TIME_WRAP_VALUE (~(DWORD)0)
 
 /* The first (low-resolution) ticks value of the application */
 static DWORD start;
@@ -40,6 +40,40 @@ static LARGE_INTEGER hires_start_ticks;
 /* The number of ticks per second of the high-resolution performance counter */
 static LARGE_INTEGER hires_ticks_per_second;
 #endif
+
+static void
+timeSetPeriod(UINT uPeriod)
+{
+    static UINT timer_period = 0;
+
+    if (uPeriod != timer_period) {
+        if (timer_period) {
+            timeEndPeriod(timer_period);
+        }
+
+        timer_period = uPeriod;
+
+        if (timer_period) {
+            timeBeginPeriod(timer_period);
+        }
+    }
+}
+
+static void
+SDL_TimerResolutionChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
+{
+    UINT uPeriod;
+
+    /* Unless the hint says otherwise, let's have good sleep precision */
+    if (hint && *hint) {
+        uPeriod = SDL_atoi(hint);
+    } else {
+        uPeriod = 1;
+    }
+    if (uPeriod || oldValue != hint) {
+        timeSetPeriod(uPeriod);
+    }
+}
 
 void
 SDL_StartTicks(void)
@@ -56,16 +90,19 @@ SDL_StartTicks(void)
         QueryPerformanceCounter(&hires_start_ticks);
     } else {
         hires_timer_available = FALSE;
-        timeBeginPeriod(1);     /* use 1 ms timer precision */
+        timeSetPeriod(1);     /* use 1 ms timer precision */
         start = timeGetTime();
     }
 #endif
+
+    SDL_AddHintCallback(SDL_HINT_TIMER_RESOLUTION,
+                        SDL_TimerResolutionChanged, NULL);
 }
 
 Uint32
 SDL_GetTicks(void)
 {
-    DWORD now, ticks;
+    DWORD now;
 #ifndef USE_GETTICKCOUNT
     LARGE_INTEGER hires_now;
 #endif
@@ -86,12 +123,7 @@ SDL_GetTicks(void)
     }
 #endif
 
-    if (now < start) {
-        ticks = (TIME_WRAP_VALUE - start) + now;
-    } else {
-        ticks = (now - start);
-    }
-    return (ticks);
+    return (now - start);
 }
 
 Uint64

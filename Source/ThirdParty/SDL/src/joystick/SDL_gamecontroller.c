@@ -26,6 +26,7 @@
 #include "SDL_assert.h"
 #include "SDL_sysjoystick.h"
 #include "SDL_hints.h"
+#include "SDL_gamecontrollerdb.h"
 
 #if !SDL_EVENTS_DISABLED
 #include "../events/SDL_events_c.h"
@@ -84,43 +85,6 @@ typedef struct _ControllerMapping_t
     char *mapping;
     struct _ControllerMapping_t *next;
 } ControllerMapping_t;
-
-
-/* default mappings we support */
-const char *s_ControllerMappings [] =
-{
-#ifdef SDL_JOYSTICK_DINPUT
-    "xinput,X360 Controller,a:b10,b:b11,y:b13,x:b12,start:b4,guide:b14,back:b5,dpup:b0,dpleft:b2,dpdown:b1,dpright:b3,leftshoulder:b8,rightshoulder:b9,leftstick:b6,rightstick:b7,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:a4,righttrigger:a5",
-    "341a3608000000000000504944564944,Afterglow PS3 Controller,a:b1,b:b2,y:b3,x:b0,start:b9,guide:b12,back:b8,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftshoulder:b4,rightshoulder:b5,leftstick:b10,rightstick:b11,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7",
-    "88880803000000000000504944564944,PS3 Controller,a:b2,b:b1,x:b0,y:b3,start:b11,back:b8,leftstick:b9,rightstick:b10,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.4,dpdown:h0.8,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:b6,righttrigger:b7,guide:b12",
-    "4c056802000000000000504944564944,PS3 Controller,a:b14,b:b13,y:b12,x:b15,start:b3,guide:b16,back:b0,leftstick:b1,rightstick:b2,leftshoulder:b10,rightshoulder:b11,dpup:b4,dpleft:b7,dpdown:b6,dpright:b5,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b8,righttrigger:b9,",
-    "25090500000000000000504944564944,PS3 DualShock,a:b2,b:b1,x:b0,y:b3,start:b8,guide:,back:b9,leftstick:b10,rightstick:b11,leftshoulder:b6,rightshoulder:b7,dpup:h0.1,dpleft:h0.4,dpdown:h0.8,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b4,righttrigger:b5",
-    "ffff0000000000000000504944564944,GameStop Gamepad,a:b0,b:b1,y:b3,x:b2,start:b9,guide:,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,",
-	"6d0419c2000000000000504944564944,Logitech F710 Gamepad,a:b1,b:b2,y:b3,x:b0,start:b9,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,", /* Guide button doesn't seem to be sent in DInput mode. */
-    "6d0416c2000000000000504944564944,Generic DirectInput Controller,a:b1,b:b2,y:b3,x:b0,start:b9,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,",
-#elif defined(__MACOSX__)
-    "5e040000000000008e02000000000000,X360 Controller,a:b0,b:b1,y:b3,x:b2,start:b8,guide:b10,back:b9,dpup:b11,dpleft:b13,dpdown:b12,dpright:b14,leftshoulder:b4,rightshoulder:b5,leftstick:b6,rightstick:b7,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5",
-    "4c050000000000006802000000000000,PS3 Controller,a:b14,b:b13,x:b15,y:b12,start:b3,guide:b16,back:b0,leftstick:b1,rightstick:b2,leftshoulder:b10,rightshoulder:b11,dpup:b4,dpleft:b7,dpdown:b6,dpright:b5,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b8,righttrigger:b9",
-    "0500000047532047616d657061640000,GameStop Gamepad,a:b0,b:b1,y:b3,x:b2,start:b9,guide:,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,",
-    "6d040000000000001fc2000000000000,Logitech F710 Gamepad (XInput),a:b0,b:b1,y:b3,x:b2,start:b8,guide:b10,back:b9,leftstick:b6,rightstick:b7,leftshoulder:b4,rightshoulder:b5,dpup:b11,dpleft:b13,dpdown:b12,dpright:b14,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,",
-    "6d0400000000000016c2000000000000,Logitech F310 Gamepad (DInput),a:b1,b:b2,y:b3,x:b0,start:b9,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,", /* Guide button doesn't seem to be sent in DInput mode. */
-    "6d0400000000000019c2000000000000,Logitech Wireless Gamepad (DInput),a:b1,b:b2,y:b3,x:b0,start:b9,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,", /* This includes F710 in DInput mode and the "Logitech Cordless RumblePad 2", at the very least. */
-    "6d0400000000000018c2000000000000,Logitech Rumble Gamepad F510(DInput),a:b1,b:b2,y:b3,x:b0,start:b9,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,rightx:a2,lefty:a1,righty:a3,lefttrigger:b6,righttrigger:b7,",
-#elif defined(__LINUX__)
-    "030000005e0400008e02000014010000,X360 Controller,a:b0,b:b1,y:b3,x:b2,start:b7,guide:b8,back:b6,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftshoulder:b4,rightshoulder:b5,leftstick:b9,rightstick:b10,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5",
-    "030000005e0400008e02000010010000,X360 Controller,a:b0,b:b1,y:b3,x:b2,start:b7,guide:b8,back:b6,leftstick:b9,rightstick:b10,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,",
-    "030000005e0400001907000000010000,X360 Wireless Controller,a:b0,b:b1,y:b3,x:b2,start:b7,guide:b8,back:b6,leftstick:b9,rightstick:b10,leftshoulder:b4,rightshoulder:b5,dpup:b13,dpleft:b11,dpdown:b14,dpright:b12,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,",
-    "030000004c0500006802000011010000,PS3 Controller,a:b14,b:b13,x:b15,y:b12,start:b3,guide:b16,back:b0,leftstick:b1,rightstick:b2,leftshoulder:b10,rightshoulder:b11,dpup:b4,dpleft:b7,dpdown:b6,dpright:b5,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b8,righttrigger:b9",
-    "030000006d0400001fc2000005030000,Logitech F710 Gamepad (XInput),a:b0,b:b1,y:b3,x:b2,start:b7,guide:b8,back:b6,leftstick:b9,rightstick:b10,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,",
-    "030000006d04000019c2000011010000,Logitech F710 Gamepad (DInput),a:b1,b:b2,y:b3,x:b0,start:b9,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,", /* Guide button doesn't seem to be sent in DInput mode. */
-    "030000006d0400001dc2000014400000,Logitech F310 Gamepad (XInput),a:b0,b:b1,y:b3,x:b2,start:b7,guide:b8,back:b6,leftstick:b9,rightstick:b10,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,",
-    "030000006d04000019c2000010010000,Logitech Cordless RumblePad 2,a:b1,b:b2,y:b3,x:b0,start:b9,guide:,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,",
-    "0500000047532047616d657061640000,GameStop Gamepad,a:b0,b:b1,y:b3,x:b2,start:b9,guide:,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,",
-    "03000000ba2200002010000001010000,Jess Technology USB Game Controller,start:b9,a:b2,b:b1,x:b3,y:b0,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a2,lefttrigger:b6,righttrigger:b7,leftshoulder:b4,rightshoulder:b5,guide:,back:b8",
-    "030000006d0400001ec2000020200000,Logitech Rumble Gamepad F510 (XInput),a:b0,b:b1,x:b2,y:b3,start:b7,back:b6,guide:b8,leftstick:b9,rightstick:b10,leftshoulder:b4,rightshoulder:b5,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a4,lefttrigger:a2,righttrigger:a5,",
-#endif
-    NULL
-};
 
 static ControllerMapping_t *s_pSupportedControllers = NULL;
 #ifdef SDL_JOYSTICK_DINPUT

@@ -364,7 +364,7 @@ SDL_iconv(SDL_iconv_t cd,
                          */
                         ch = UNKNOWN_UNICODE;
                     } else {
-                        if (p[0] == 0xFC) {
+                        if (p[0] == 0xFC && srclen > 1 && (p[1] & 0xFC) == 0x80) {
                             overlong = SDL_TRUE;
                         }
                         ch = (Uint32) (p[0] & 0x01);
@@ -377,7 +377,7 @@ SDL_iconv(SDL_iconv_t cd,
                          */
                         ch = UNKNOWN_UNICODE;
                     } else {
-                        if (p[0] == 0xF8) {
+                        if (p[0] == 0xF8 && srclen > 1 && (p[1] & 0xF8) == 0x80) {
                             overlong = SDL_TRUE;
                         }
                         ch = (Uint32) (p[0] & 0x03);
@@ -390,7 +390,7 @@ SDL_iconv(SDL_iconv_t cd,
                          */
                         ch = UNKNOWN_UNICODE;
                     } else {
-                        if (p[0] == 0xF0) {
+                        if (p[0] == 0xF0 && srclen > 1 && (p[1] & 0xF0) == 0x80) {
                             overlong = SDL_TRUE;
                         }
                         ch = (Uint32) (p[0] & 0x07);
@@ -403,7 +403,7 @@ SDL_iconv(SDL_iconv_t cd,
                          */
                         ch = UNKNOWN_UNICODE;
                     } else {
-                        if (p[0] == 0xE0) {
+                        if (p[0] == 0xE0 && srclen > 1 && (p[1] & 0xE0) == 0x80) {
                             overlong = SDL_TRUE;
                         }
                         ch = (Uint32) (p[0] & 0x0F);

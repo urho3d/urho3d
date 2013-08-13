@@ -33,7 +33,7 @@
 void *
 SDL_LoadObject(const char *sofile)
 {
-    void *handle = dlopen(sofile, RTLD_NOW);
+    void *handle = dlopen(sofile, RTLD_NOW|RTLD_LOCAL);
     const char *loaderror = (char *) dlerror();
     if (handle == NULL) {
         SDL_SetError("Failed loading %s: %s", sofile, loaderror);

@@ -151,6 +151,16 @@ SDL_RendererEventWatch(void *userdata, SDL_Event *event)
             event->motion.y -= renderer->viewport.y;
             event->motion.x = (int)(event->motion.x / renderer->scale.x);
             event->motion.y = (int)(event->motion.y / renderer->scale.y);
+            if (event->motion.xrel > 0) {
+                event->motion.xrel = SDL_max(1, (int)(event->motion.xrel / renderer->scale.x));
+            } else if (event->motion.xrel < 0) {
+                event->motion.xrel = SDL_min(-1, (int)(event->motion.xrel / renderer->scale.x));
+            }
+            if (event->motion.yrel > 0) {
+                event->motion.yrel = SDL_max(1, (int)(event->motion.yrel / renderer->scale.y));
+            } else if (event->motion.yrel < 0) {
+                event->motion.yrel = SDL_min(-1, (int)(event->motion.yrel / renderer->scale.y));
+            }
         }
     } else if (event->type == SDL_MOUSEBUTTONDOWN ||
                event->type == SDL_MOUSEBUTTONUP) {
@@ -763,6 +773,13 @@ SDL_UpdateTexture(SDL_Texture * texture, const SDL_Rect * rect,
     SDL_Rect full_rect;
 
     CHECK_TEXTURE_MAGIC(texture, -1);
+
+    if (!pixels) {
+        return SDL_InvalidParamError("pixels");
+    }
+    if (!pitch) {
+        return SDL_InvalidParamError("pitch");
+    }
 
     if (!rect) {
         full_rect.x = 0;
@@ -1450,7 +1467,7 @@ SDL_RenderDrawRects(SDL_Renderer * renderer,
 int
 SDL_RenderFillRect(SDL_Renderer * renderer, const SDL_Rect * rect)
 {
-    SDL_Rect full_rect;
+    SDL_Rect full_rect = { 0, 0, 0, 0 };
 
     CHECK_RENDERER_MAGIC(renderer, -1);
 
@@ -1532,22 +1549,10 @@ SDL_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture,
     real_dstrect.x = 0;
     real_dstrect.y = 0;
     if (dstrect) {
-        if (!SDL_IntersectRect(dstrect, &real_dstrect, &real_dstrect)) {
+        if (!SDL_HasIntersection(dstrect, &real_dstrect)) {
             return 0;
         }
-        /* Clip srcrect by the same amount as dstrect was clipped */
-        if (dstrect->w != real_dstrect.w) {
-            int deltax = (real_dstrect.x - dstrect->x);
-            int deltaw = (real_dstrect.w - dstrect->w);
-            real_srcrect.x += (deltax * real_srcrect.w) / dstrect->w;
-            real_srcrect.w += (deltaw * real_srcrect.w) / dstrect->w;
-        }
-        if (dstrect->h != real_dstrect.h) {
-            int deltay = (real_dstrect.y - dstrect->y);
-            int deltah = (real_dstrect.h - dstrect->h);
-            real_srcrect.y += (deltay * real_srcrect.h) / dstrect->h;
-            real_srcrect.h += (deltah * real_srcrect.h) / dstrect->h;
-        }
+        real_dstrect = *dstrect;
     }
 
     if (texture->native) {
@@ -1684,9 +1689,14 @@ SDL_DestroyTexture(SDL_Texture * texture)
     SDL_Renderer *renderer;
 
     CHECK_TEXTURE_MAGIC(texture, );
-    texture->magic = NULL;
 
     renderer = texture->renderer;
+    if (texture == renderer->target) {
+        SDL_SetRenderTarget(renderer, NULL);
+    }
+
+    texture->magic = NULL;
+
     if (texture->next) {
         texture->next->prev = texture->prev;
     }

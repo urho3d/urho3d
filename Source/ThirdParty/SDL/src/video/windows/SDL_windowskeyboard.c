@@ -466,8 +466,10 @@ IME_GetReadingString(SDL_VideoData *videodata, HWND hwnd)
             s = (WCHAR *)(p + 1*4 + (16*2+2*4) + 5*4);
             break;
         }
-        if (s)
-            SDL_wcslcpy(videodata->ime_readingstring, s, len + 1);
+        if (s) {
+            size_t size = SDL_min((size_t)(len + 1), SDL_arraysize(videodata->ime_readingstring));
+            SDL_wcslcpy(videodata->ime_readingstring, s, size);
+        }
 
         videodata->ImmUnlockIMCC(lpimc->hPrivate);
         videodata->ImmUnlockIMC(himc);
@@ -673,13 +675,13 @@ IME_ClearComposition(SDL_VideoData *videodata)
 static void
 IME_GetCompositionString(SDL_VideoData *videodata, HIMC himc, DWORD string)
 {
-    LONG length = ImmGetCompositionStringW(himc, string, videodata->ime_composition, sizeof(videodata->ime_composition));
+    LONG length = ImmGetCompositionStringW(himc, string, videodata->ime_composition, sizeof(videodata->ime_composition) - sizeof(videodata->ime_composition[0]));
     if (length < 0)
         length = 0;
 
     length /= sizeof(videodata->ime_composition[0]);
     videodata->ime_cursor = LOWORD(ImmGetCompositionStringW(himc, GCS_CURSORPOS, 0, 0));
-    if (videodata->ime_composition[videodata->ime_cursor] == 0x3000) {
+    if (videodata->ime_cursor < SDL_arraysize(videodata->ime_composition) && videodata->ime_composition[videodata->ime_cursor] == 0x3000) {
         int i;
         for (i = videodata->ime_cursor + 1; i < length; ++i)
             videodata->ime_composition[i - 1] = videodata->ime_composition[i];
@@ -707,15 +709,16 @@ IME_SendEditingEvent(SDL_VideoData *videodata)
 {
     char *s = 0;
     WCHAR buffer[SDL_TEXTEDITINGEVENT_TEXT_SIZE];
+    const size_t size = SDL_arraysize(buffer);
     buffer[0] = 0;
     if (videodata->ime_readingstring[0]) {
         size_t len = SDL_min(SDL_wcslen(videodata->ime_composition), (size_t)videodata->ime_cursor);
         SDL_wcslcpy(buffer, videodata->ime_composition, len + 1);
-        SDL_wcslcat(buffer, videodata->ime_readingstring, sizeof(buffer));
-        SDL_wcslcat(buffer, &videodata->ime_composition[len], sizeof(buffer) - len);
+        SDL_wcslcat(buffer, videodata->ime_readingstring, size);
+        SDL_wcslcat(buffer, &videodata->ime_composition[len], size);
     }
     else {
-        SDL_wcslcpy(buffer, videodata->ime_composition, sizeof(videodata->ime_composition));
+        SDL_wcslcpy(buffer, videodata->ime_composition, size);
     }
     s = WIN_StringToUTF8(buffer);
     SDL_SendEditingText(s, videodata->ime_cursor + SDL_wcslen(videodata->ime_readingstring), 0);
@@ -1052,7 +1055,7 @@ STDMETHODIMP UIElementSink_UpdateUIElement(TSFSink *sink, DWORD dwUIElementId)
         BSTR bstr;
         if (SUCCEEDED(preading->lpVtbl->GetString(preading, &bstr)) && bstr) {
             WCHAR *s = (WCHAR *)bstr;
-            SDL_wcslcpy(videodata->ime_readingstring, s, sizeof(videodata->ime_readingstring));
+            SDL_wcslcpy(videodata->ime_readingstring, s, SDL_arraysize(videodata->ime_readingstring));
             IME_SendEditingEvent(videodata);
             SysFreeString(bstr);
         }

@@ -26,6 +26,7 @@
 
 #include "SDL_events.h"
 #include "SDL_x11video.h"
+#include "SDL_timer.h"
 
 
 /* If you don't support UTF-8, you might use XA_STRING here */
@@ -94,10 +95,12 @@ X11_GetClipboardText(_THIS)
     unsigned long overflow;
     unsigned char *src;
     char *text;
+    Uint32 waitStart;
+    Uint32 waitElapsed;
     Atom XA_CLIPBOARD = XInternAtom(display, "CLIPBOARD", 0);
     if (XA_CLIPBOARD == None) {
         SDL_SetError("Couldn't access X clipboard");
-        return NULL;
+        return SDL_strdup("");
     }
 
     text = NULL;
@@ -116,10 +119,23 @@ X11_GetClipboardText(_THIS)
         XConvertSelection(display, XA_CLIPBOARD, format, selection, owner,
             CurrentTime);
 
-        /* FIXME: Should we have a timeout here? */
+        /* When using synergy on Linux and when data has been put in the clipboard
+           on the remote (Windows anyway) machine then selection_waiting may never
+           be set to False. Time out after a while. */
+        waitStart = SDL_GetTicks();
         videodata->selection_waiting = SDL_TRUE;
         while (videodata->selection_waiting) {
             SDL_PumpEvents();
+            waitElapsed = SDL_GetTicks() - waitStart;
+            /* Wait one second for a clipboard response. */
+            if (waitElapsed > 1000) {
+                videodata->selection_waiting = SDL_FALSE;
+                SDL_SetError("Clipboard timeout");
+                /* We need to set the clipboard text so that next time we won't
+                   timeout, otherwise we will hang on every call to this function. */
+                X11_SetClipboardText(_this, "");
+                return SDL_strdup("");
+            }
         }
     }
 

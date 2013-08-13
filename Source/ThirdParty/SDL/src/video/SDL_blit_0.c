@@ -363,7 +363,10 @@ BlitBtoNAlpha(SDL_BlitInfo * info)
     SDL_PixelFormat *dstfmt = info->dst_fmt;
     int dstbpp;
     int c;
-    const int A = info->a;
+    Uint32 pixel;
+    unsigned sR, sG, sB;
+    unsigned dR, dG, dB, dA;
+    const unsigned A = info->a;
 
     /* Set up some basic variables */
     dstbpp = dstfmt->BytesPerPixel;
@@ -377,15 +380,12 @@ BlitBtoNAlpha(SDL_BlitInfo * info)
             }
             bit = (byte & 0x80) >> 7;
             if (1) {
-                Uint32 pixel;
-                unsigned sR, sG, sB;
-                unsigned dR, dG, dB;
                 sR = srcpal[bit].r;
                 sG = srcpal[bit].g;
                 sB = srcpal[bit].b;
-                DISEMBLE_RGB(dst, dstbpp, dstfmt, pixel, dR, dG, dB);
-                ALPHA_BLEND(sR, sG, sB, A, dR, dG, dB);
-                ASSEMBLE_RGB(dst, dstbpp, dstfmt, dR, dG, dB);
+                DISEMBLE_RGBA(dst, dstbpp, dstfmt, pixel, dR, dG, dB, dA);
+                ALPHA_BLEND_RGBA(sR, sG, sB, A, dR, dG, dB, dA);
+                ASSEMBLE_RGBA(dst, dstbpp, dstfmt, dR, dG, dB, dA);
             }
             byte <<= 1;
             dst += dstbpp;
@@ -409,7 +409,10 @@ BlitBtoNAlphaKey(SDL_BlitInfo * info)
     const SDL_Color *srcpal = srcfmt->palette->colors;
     int dstbpp;
     int c;
-    const int A = info->a;
+    Uint32 pixel;
+    unsigned sR, sG, sB;
+    unsigned dR, dG, dB, dA;
+    const unsigned A = info->a;
     Uint32 ckey = info->colorkey;
 
     /* Set up some basic variables */
@@ -424,15 +427,12 @@ BlitBtoNAlphaKey(SDL_BlitInfo * info)
             }
             bit = (byte & 0x80) >> 7;
             if (bit != ckey) {
-                int sR, sG, sB;
-                int dR, dG, dB;
-                Uint32 pixel;
                 sR = srcpal[bit].r;
                 sG = srcpal[bit].g;
                 sB = srcpal[bit].b;
-                DISEMBLE_RGB(dst, dstbpp, dstfmt, pixel, dR, dG, dB);
-                ALPHA_BLEND(sR, sG, sB, A, dR, dG, dB);
-                ASSEMBLE_RGB(dst, dstbpp, dstfmt, dR, dG, dB);
+                DISEMBLE_RGBA(dst, dstbpp, dstfmt, pixel, dR, dG, dB, dA);
+                ALPHA_BLEND_RGBA(sR, sG, sB, A, dR, dG, dB, dA);
+                ASSEMBLE_RGBA(dst, dstbpp, dstfmt, dR, dG, dB, dA);
             }
             byte <<= 1;
             dst += dstbpp;

@@ -219,7 +219,7 @@ typedef struct SDL_SysWMinfo SDL_SysWMinfo;
  *  \code
  *  SDL_SysWMinfo info;
  *  SDL_VERSION(&info.version);
- *  if ( SDL_GetWindowWMInfo(&info) ) { ... }
+ *  if ( SDL_GetWindowWMInfo(window, &info) ) { ... }
  *  \endcode
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_GetWindowWMInfo(SDL_Window * window,

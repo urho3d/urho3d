@@ -362,6 +362,8 @@ X11_CreateDevice(int devindex)
     device->SetWindowIcon = X11_SetWindowIcon;
     device->SetWindowPosition = X11_SetWindowPosition;
     device->SetWindowSize = X11_SetWindowSize;
+    device->SetWindowMinimumSize = X11_SetWindowMinimumSize;
+    device->SetWindowMaximumSize = X11_SetWindowMaximumSize;
     device->ShowWindow = X11_ShowWindow;
     device->HideWindow = X11_HideWindow;
     device->RaiseWindow = X11_RaiseWindow;

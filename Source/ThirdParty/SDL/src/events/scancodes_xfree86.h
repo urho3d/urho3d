@@ -141,8 +141,8 @@ static const SDL_Scancode xfree86_scancode_table[] = {
     /*  112 */  SDL_SCANCODE_F15,
     /*  113 */  SDL_SCANCODE_F16,
     /*  114 */  SDL_SCANCODE_F17,
-    /*  115 */	SDL_SCANCODE_UNKNOWN,
-    /*	116 */  SDL_SCANCODE_UNKNOWN, /* is translated to XK_ISO_Level3_Shift by my X server, but I have no keyboard that generates this code, so I don't know what the correct SDL_SCANCODE_* for it is */
+    /*  115 */  SDL_SCANCODE_UNKNOWN,
+    /*  116 */  SDL_SCANCODE_UNKNOWN, /* is translated to XK_ISO_Level3_Shift by my X server, but I have no keyboard that generates this code, so I don't know what the correct SDL_SCANCODE_* for it is */
     /*  117 */  SDL_SCANCODE_UNKNOWN,
     /*  118 */  SDL_SCANCODE_KP_EQUALS,
     /*  119 */  SDL_SCANCODE_UNKNOWN,
@@ -298,7 +298,7 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /* 118 */   SDL_SCANCODE_UNKNOWN,   /* plusminus */
     /* 119 */   SDL_SCANCODE_PAUSE,
     /* 120 */   SDL_SCANCODE_UNKNOWN,   /* XF86LaunchA */
-    /* 121 */   SDL_SCANCODE_UNKNOWN,	/* KP_Decimal */
+    /* 121 */   SDL_SCANCODE_UNKNOWN,   /* KP_Decimal */
     /* 122 */   SDL_SCANCODE_UNKNOWN,   /* Hangul */
     /* 123 */   SDL_SCANCODE_UNKNOWN,   /* Hangul_Hanja */
     /* 124 */   SDL_SCANCODE_UNKNOWN,
@@ -325,15 +325,15 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /* 145 */   SDL_SCANCODE_UNKNOWN,   /* XF86Send */
     /* 146 */   SDL_SCANCODE_UNKNOWN,
     /* 147 */   SDL_SCANCODE_UNKNOWN,   /* XF86Xfer */
-    /* 148 */   SDL_SCANCODE_UNKNOWN,   /* XF86Launch1 */
-    /* 149 */   SDL_SCANCODE_UNKNOWN,   /* XF86Launch2 */
+    /* 148 */   SDL_SCANCODE_APP1,      /* XF86Launch1 */
+    /* 149 */   SDL_SCANCODE_APP2,      /* XF86Launch2 */
     /* 150 */   SDL_SCANCODE_WWW,
     /* 151 */   SDL_SCANCODE_UNKNOWN,   /* XF86DOS */
     /* 152 */   SDL_SCANCODE_UNKNOWN,   /* XF86ScreenSaver */
     /* 153 */   SDL_SCANCODE_UNKNOWN,
     /* 154 */   SDL_SCANCODE_UNKNOWN,   /* XF86RotateWindows */
     /* 155 */   SDL_SCANCODE_MAIL,
-    /* 156 */   SDL_SCANCODE_UNKNOWN,   /* XF86Favorites */
+    /* 156 */   SDL_SCANCODE_AC_BOOKMARKS,   /* XF86Favorites */
     /* 157 */   SDL_SCANCODE_COMPUTER,
     /* 158 */   SDL_SCANCODE_AC_BACK,
     /* 159 */   SDL_SCANCODE_AC_FORWARD,
@@ -348,7 +348,7 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /* 168 */   SDL_SCANCODE_UNKNOWN,   /* XF86AudioRewind */
     /* 169 */   SDL_SCANCODE_UNKNOWN,   /* XF86Phone */
     /* 170 */   SDL_SCANCODE_UNKNOWN,
-    /* 171 */   SDL_SCANCODE_UNKNOWN,   /* XF86Tools */
+    /* 171 */   SDL_SCANCODE_F13,       /* XF86Tools */
     /* 172 */   SDL_SCANCODE_AC_HOME,
     /* 173 */   SDL_SCANCODE_AC_REFRESH,
     /* 174 */   SDL_SCANCODE_UNKNOWN,   /* XF86Close */
@@ -360,13 +360,13 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /* 180 */   SDL_SCANCODE_UNKNOWN,   /* parenright */
     /* 181 */   SDL_SCANCODE_UNKNOWN,   /* XF86New */
     /* 182 */   SDL_SCANCODE_AGAIN,
-    /* 183 */   SDL_SCANCODE_UNKNOWN,   /* XF86Tools */
-    /* 184 */   SDL_SCANCODE_UNKNOWN,   /* XF86Launch5 */
-    /* 185 */   SDL_SCANCODE_UNKNOWN,   /* XF86MenuKB */
-    /* 186 */   SDL_SCANCODE_UNKNOWN,
-    /* 187 */   SDL_SCANCODE_UNKNOWN,
-    /* 188 */   SDL_SCANCODE_UNKNOWN,
-    /* 189 */   SDL_SCANCODE_UNKNOWN,
+    /* 183 */   SDL_SCANCODE_F13,       /* XF86Tools */
+    /* 184 */   SDL_SCANCODE_F14,       /* XF86Launch5 */
+    /* 185 */   SDL_SCANCODE_F15,       /* XF86Launch6 */
+    /* 186 */   SDL_SCANCODE_F16,       /* XF86Launch7 */
+    /* 187 */   SDL_SCANCODE_F17,       /* XF86Launch8 */
+    /* 188 */   SDL_SCANCODE_F18,       /* XF86Launch9 */
+    /* 189 */   SDL_SCANCODE_F19,       /* null keysym */
     /* 190 */   SDL_SCANCODE_UNKNOWN,
     /* 191 */   SDL_SCANCODE_UNKNOWN,
     /* 192 */   SDL_SCANCODE_UNKNOWN,   /* XF86TouchpadToggle */

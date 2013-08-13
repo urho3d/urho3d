@@ -599,7 +599,7 @@ SDL_RegisterEvents(int numevents)
 {
     Uint32 event_base;
 
-    if (SDL_userevents+numevents <= SDL_LASTEVENT) {
+    if ((numevents > 0) && (SDL_userevents+numevents <= SDL_LASTEVENT)) {
         event_base = SDL_userevents;
         SDL_userevents += numevents;
     } else {

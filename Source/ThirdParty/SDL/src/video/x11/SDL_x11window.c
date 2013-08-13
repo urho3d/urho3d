@@ -22,6 +22,7 @@
 
 #if SDL_VIDEO_DRIVER_X11
 
+#include "SDL_assert.h"
 #include "SDL_hints.h"
 #include "../SDL_sysvideo.h"
 #include "../SDL_pixels_c.h"
@@ -57,6 +58,21 @@ static Bool isConfigureNotify(Display *dpy, XEvent *ev, XPointer win)
 {
     return ev->type == ConfigureNotify && ev->xconfigure.window == *((Window*)win);
 }
+
+/*
+static Bool
+XIfEventTimeout(Display *display, XEvent *event_return, Bool (*predicate)(), XPointer arg, int timeoutMS)
+{
+    Uint32 start = SDL_GetTicks();
+
+    while (!XCheckIfEvent(display, event_return, predicate, arg)) {
+        if ((SDL_GetTicks() - start) >= timeoutMS) {
+            return False;
+        }
+    }
+    return True;
+}
+*/
 
 static SDL_bool
 X11_IsWindowLegacyFullscreen(_THIS, SDL_Window * window)
@@ -339,6 +355,8 @@ X11_CreateWindow(_THIS, SDL_Window * window)
     XSizeHints *sizehints;
     XWMHints *wmhints;
     XClassHint *classhints;
+    const long _NET_WM_BYPASS_COMPOSITOR_HINT_ON = 1;
+    Atom _NET_WM_BYPASS_COMPOSITOR;
     Atom _NET_WM_WINDOW_TYPE;
     Atom _NET_WM_WINDOW_TYPE_NORMAL;
     Atom _NET_WM_PID;
@@ -532,6 +550,10 @@ X11_CreateWindow(_THIS, SDL_Window * window)
                     PropModeReplace,
                     (unsigned char *)&_NET_WM_WINDOW_TYPE_NORMAL, 1);
 
+    _NET_WM_BYPASS_COMPOSITOR = XInternAtom(display, "_NET_WM_BYPASS_COMPOSITOR", False);
+    XChangeProperty(display, w, _NET_WM_BYPASS_COMPOSITOR, XA_CARDINAL, 32,
+                    PropModeReplace,
+                    (unsigned char *)&_NET_WM_BYPASS_COMPOSITOR_HINT_ON, 1);
 
     {
         Atom protocols[] = {
@@ -692,19 +714,11 @@ X11_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon)
     Atom _NET_WM_ICON = data->videodata->_NET_WM_ICON;
 
     if (icon) {
-        SDL_PixelFormat format;
-        SDL_Surface *surface;
         int propsize;
         long *propdata;
 
-        /* Convert the icon to ARGB for modern window managers */
-        SDL_InitFormat(&format, SDL_PIXELFORMAT_ARGB8888);
-        surface = SDL_ConvertSurface(icon, &format, 0);
-        if (!surface) {
-            return;
-        }
-
         /* Set the _NET_WM_ICON property */
+        SDL_assert(icon->format->format == SDL_PIXELFORMAT_ARGB8888);
         propsize = 2 + (icon->w * icon->h);
         propdata = SDL_malloc(propsize * sizeof(long));
         if (propdata) {
@@ -716,7 +730,7 @@ X11_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon)
             propdata[1] = icon->h;
             dst = &propdata[2];
             for (y = 0; y < icon->h; ++y) {
-                src = (Uint32*)((Uint8*)surface->pixels + y * surface->pitch);
+                src = (Uint32*)((Uint8*)icon->pixels + y * icon->pitch);
                 for (x = 0; x < icon->w; ++x) {
                     *dst++ = *src++;
                 }
@@ -726,7 +740,6 @@ X11_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon)
                             propsize);
         }
         SDL_free(propdata);
-        SDL_FreeSurface(surface);
     } else {
         XDeleteProperty(display, data->xwindow, _NET_WM_ICON);
     }
@@ -740,6 +753,64 @@ X11_SetWindowPosition(_THIS, SDL_Window * window)
     Display *display = data->videodata->display;
 
     XMoveWindow(display, data->xwindow, window->x, window->y);
+    XFlush(display);
+}
+
+void
+X11_SetWindowMinimumSize(_THIS, SDL_Window * window)
+{
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    Display *display = data->videodata->display;
+
+    if (window->flags & SDL_WINDOW_RESIZABLE) {
+         XSizeHints *sizehints = XAllocSizeHints();
+         long userhints;
+
+         XGetWMNormalHints(display, data->xwindow, sizehints, &userhints);
+
+         sizehints->min_width = window->min_w;
+         sizehints->min_height = window->min_h;
+         sizehints->flags |= PMinSize;
+
+         XSetWMNormalHints(display, data->xwindow, sizehints);
+
+         XFree(sizehints);
+
+        /* See comment in X11_SetWindowSize. */
+        XResizeWindow(display, data->xwindow, window->w, window->h);
+        XMoveWindow(display, data->xwindow, window->x, window->y);
+        XRaiseWindow(display, data->xwindow);
+    }
+
+    XFlush(display);
+}
+
+void
+X11_SetWindowMaximumSize(_THIS, SDL_Window * window)
+{
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    Display *display = data->videodata->display;
+
+    if (window->flags & SDL_WINDOW_RESIZABLE) {
+         XSizeHints *sizehints = XAllocSizeHints();
+         long userhints;
+
+         XGetWMNormalHints(display, data->xwindow, sizehints, &userhints);
+
+         sizehints->max_width = window->max_w;
+         sizehints->max_height = window->max_h;
+         sizehints->flags |= PMaxSize;
+
+         XSetWMNormalHints(display, data->xwindow, sizehints);
+
+         XFree(sizehints);
+
+        /* See comment in X11_SetWindowSize. */
+        XResizeWindow(display, data->xwindow, window->w, window->h);
+        XMoveWindow(display, data->xwindow, window->x, window->y);
+        XRaiseWindow(display, data->xwindow);
+    }
+
     XFlush(display);
 }
 
@@ -762,6 +833,7 @@ X11_SetWindowSize(_THIS, SDL_Window * window)
 
          sizehints->min_width = sizehints->max_width = window->w;
          sizehints->min_height = sizehints->max_height = window->h;
+         sizehints->flags |= PMinSize | PMaxSize;
 
          XSetWMNormalHints(display, data->xwindow, sizehints);
 
@@ -847,11 +919,12 @@ void
 X11_HideWindow(_THIS, SDL_Window * window)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    SDL_DisplayData *displaydata = (SDL_DisplayData *) SDL_GetDisplayForWindow(window)->driverdata;
     Display *display = data->videodata->display;
     XEvent event;
 
     if (X11_IsWindowMapped(_this, window)) {
-        XUnmapWindow(display, data->xwindow);
+        XWithdrawWindow(display, data->xwindow, displaydata->screen);
         /* Blocking wait for "UnmapNotify" event */
         XIfEvent(display, &event, &isUnmapNotify, (XPointer)&data->xwindow);
         XFlush(display);
@@ -879,6 +952,12 @@ SetWindowMaximized(_THIS, SDL_Window * window, SDL_bool maximized)
     Atom _NET_WM_STATE_MAXIMIZED_VERT = data->videodata->_NET_WM_STATE_MAXIMIZED_VERT;
     Atom _NET_WM_STATE_MAXIMIZED_HORZ = data->videodata->_NET_WM_STATE_MAXIMIZED_HORZ;
 
+    if (maximized) {
+        window->flags |= SDL_WINDOW_MAXIMIZED;
+    } else {
+        window->flags &= ~SDL_WINDOW_MAXIMIZED;
+    }
+
     if (X11_IsWindowMapped(_this, window)) {
         XEvent e;
 
@@ -896,15 +975,7 @@ SetWindowMaximized(_THIS, SDL_Window * window, SDL_bool maximized)
         XSendEvent(display, RootWindow(display, displaydata->screen), 0,
                    SubstructureNotifyMask | SubstructureRedirectMask, &e);
     } else {
-        Uint32 flags;
-
-        flags = window->flags;
-        if (maximized) {
-            flags |= SDL_WINDOW_MAXIMIZED;
-        } else {
-            flags &= ~SDL_WINDOW_MAXIMIZED;
-        }
-        X11_SetNetWMState(_this, data->xwindow, flags);
+        X11_SetNetWMState(_this, data->xwindow, window->flags);
     }
     XFlush(display);
 }
@@ -1031,13 +1102,6 @@ X11_SetWindowFullscreenViaWM(_THIS, SDL_Window * window, SDL_VideoDisplay * _dis
     XFlush(display);
 }
 
-static __inline__ int
-maxint(const int a, const int b)
-{
-    return (a > b ? a : b);
-}
-
-
 /* This handles fullscreen itself, outside the Window Manager. */
 static void
 X11_BeginWindowFullscreenLegacy(_THIS, SDL_Window * window, SDL_VideoDisplay * _display)
@@ -1101,6 +1165,9 @@ X11_BeginWindowFullscreenLegacy(_THIS, SDL_Window * window, SDL_VideoDisplay * _
     XReparentWindow(display, data->xwindow, data->fswindow,
                     (rect.w - window->w) / 2, (rect.h - window->h) / 2);
 
+    /* Move the mouse to the upper left to make sure it's on-screen */
+    XWarpPointer(display, None, root, 0, 0, 0, 0, rect.x, rect.y);
+
     /* Center mouse in the fullscreen window. */
     rect.x += (rect.w / 2);
     rect.y += (rect.h / 2);
@@ -1141,13 +1208,14 @@ X11_EndWindowFullscreenLegacy(_THIS, SDL_Window * window, SDL_VideoDisplay * _di
     XReparentWindow(display, data->xwindow, root, window->x, window->y);
 
     /* flush these events so they don't confuse normal event handling */
-    XIfEvent(display, &ev, &isUnmapNotify, (XPointer)&data->xwindow);
-    XIfEvent(display, &ev, &isMapNotify, (XPointer)&data->xwindow);
+    XSync(display, False);
+    XCheckIfEvent(display, &ev, &isMapNotify, (XPointer)&data->xwindow);
+    XCheckIfEvent(display, &ev, &isUnmapNotify, (XPointer)&data->xwindow);
 
     SetWindowBordered(display, screen, data->xwindow,
                       (window->flags & SDL_WINDOW_BORDERLESS) == 0);
 
-    XUnmapWindow(display, fswindow);
+    XWithdrawWindow(display, fswindow, screen);
 
     /* Wait to be unmapped. */
     XIfEvent(display, &ev, &isUnmapNotify, (XPointer)&fswindow);

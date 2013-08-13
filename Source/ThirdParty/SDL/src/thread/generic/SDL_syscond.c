@@ -187,7 +187,7 @@ SDL_CondWaitTimeout(SDL_cond * cond, SDL_mutex * mutex, Uint32 ms)
        the signaler can race ahead and get the condition semaphore
        if we are stopped between the mutex unlock and semaphore wait,
        giving a deadlock.  See the following URL for details:
-       http://www-classic.be.com/aboutbe/benewsletter/volume_III/Issue40.html
+       http://web.archive.org/web/20010914175514/http://www-classic.be.com/aboutbe/benewsletter/volume_III/Issue40.html#Workshop
      */
     SDL_LockMutex(cond->lock);
     if (cond->signals > 0) {

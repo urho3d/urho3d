@@ -45,15 +45,18 @@ extern "C" {
  *  with 0. This operation can also be stated as "count leading zeroes" and
  *  "log base 2".
  *
- *  \return Index of the most significant bit.
+ *  \return Index of the most significant bit, or -1 if the value is 0.
  */
-SDL_FORCE_INLINE Sint8
+SDL_FORCE_INLINE int
 SDL_MostSignificantBitIndex32(Uint32 x)
 {
 #if defined(__GNUC__) && __GNUC__ >= 4
     /* Count Leading Zeroes builtin in GCC.
      * http://gcc.gnu.org/onlinedocs/gcc-4.3.4/gcc/Other-Builtins.html
      */
+    if (x == 0) {
+        return -1;
+    }
     return 31 - __builtin_clz(x);
 #else
     /* Based off of Bit Twiddling Hacks by Sean Eron Anderson
@@ -61,10 +64,14 @@ SDL_MostSignificantBitIndex32(Uint32 x)
      * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
      */
     const Uint32 b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
-    const Uint8  S[] = {1, 2, 4, 8, 16};
+    const int    S[] = {1, 2, 4, 8, 16};
 
-    Uint8 msbIndex = 0;
+    int msbIndex = 0;
     int i;
+
+    if (x == 0) {
+        return -1;
+    }
 
     for (i = 4; i >= 0; i--)
     {

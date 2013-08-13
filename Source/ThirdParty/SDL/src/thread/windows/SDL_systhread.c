@@ -106,6 +106,12 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args,
                      pfnSDL_CurrentBeginThread pfnBeginThread,
                      pfnSDL_CurrentEndThread pfnEndThread)
 {
+#elif defined(__CYGWIN__)
+int
+SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
+{
+    pfnSDL_CurrentBeginThread pfnBeginThread = NULL;
+    pfnSDL_CurrentEndThread pfnEndThread = NULL;
 #else
 int
 SDL_SYS_CreateThread(SDL_Thread * thread, void *args)

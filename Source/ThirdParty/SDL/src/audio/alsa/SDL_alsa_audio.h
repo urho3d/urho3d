@@ -20,8 +20,8 @@
 */
 #include "SDL_config.h"
 
-#ifndef _ALSA_PCM_audio_h
-#define _ALSA_PCM_audio_h
+#ifndef _SDL_ALSA_audio_h
+#define _SDL_ALSA_audio_h
 
 #include <alsa/asoundlib.h>
 
@@ -40,6 +40,6 @@ struct SDL_PrivateAudioData
     int mixlen;
 };
 
-#endif /* _ALSA_PCM_audio_h */
+#endif /* _SDL_ALSA_audio_h */
 
 /* vi: set ts=4 sw=4 expandtab: */

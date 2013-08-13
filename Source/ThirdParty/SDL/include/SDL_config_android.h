@@ -19,8 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #ifndef _SDL_config_android_h
 #define _SDL_config_android_h
 
@@ -33,6 +31,8 @@
  */
 
 #include <stdarg.h>
+
+#define HAVE_GCC_ATOMICS    1
 
 #define HAVE_ALLOCA_H       1
 #define HAVE_SYS_TYPES_H    1
@@ -103,8 +103,6 @@
 #define HAVE_SETJMP 1
 #define HAVE_NANOSLEEP  1
 #define HAVE_SYSCONF    1
-// Urho3D: enable use of GCC atomics
-#define HAVE_GCC_ATOMICS 1
 
 #define SIZEOF_VOIDP 4
 

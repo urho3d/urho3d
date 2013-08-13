@@ -83,6 +83,12 @@
 /* if not compiling for iPhone */
 #undef __MACOSX__
 #define __MACOSX__  1
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 1050
+# error SDL for Mac OS X only supports deploying on 10.5 and above.
+#endif /* MAC_OS_X_VERSION_MIN_REQUIRED < 1050 */
+#if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
+# error SDL for Mac OS X must be built with a 10.6 SDK or above.
+#endif /* MAC_OS_X_VERSION_MAX_ALLOWED < 1060 */
 #endif /* TARGET_OS_IPHONE */
 #endif /* defined(__APPLE__) */
 
@@ -114,7 +120,7 @@
 #undef __SOLARIS__
 #define __SOLARIS__ 1
 #endif
-#if defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)
 #undef __WIN32__
 #define __WIN32__   1
 #endif

@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Yao Wei Tjong for Urho3D
-
 #include "SDL_config.h"
 
 #ifndef _SDL_sysvideo_h
@@ -28,6 +25,7 @@
 
 #include "SDL_messagebox.h"
 #include "SDL_shape.h"
+#include "SDL_thread.h"
 
 /* The SDL video driver */
 
@@ -75,6 +73,7 @@ struct SDL_Window
     const void *magic;
     Uint32 id;
     char *title;
+    SDL_Surface *icon;
     int x, y;
     int w, h;
     int min_w, min_h;
@@ -302,8 +301,13 @@ struct SDL_VideoDevice
 
     /* * * */
     /* Cache current GL context; don't call the OS when it hasn't changed. */
+    /* We have the global pointers here so Cocoa continues to work the way
+       it always has, and the thread-local storage for the general case.
+     */
     SDL_Window *current_glwin;
     SDL_GLContext current_glctx;
+    SDL_TLSID current_glwin_tls;
+    SDL_TLSID current_glctx_tls;
 
     /* * * */
     /* Data private to this driver */
@@ -353,10 +357,6 @@ extern VideoBootStrap Android_bootstrap;
 #endif
 #if SDL_VIDEO_DRIVER_PSP
 extern VideoBootStrap PSP_bootstrap;
-#endif
-// Urho3D: add Raspberry Pi support
-#if SDL_VIDEO_DRIVER_RASPI
-extern VideoBootStrap RASPI_bootstrap;
 #endif
 #if SDL_VIDEO_DRIVER_DUMMY
 extern VideoBootStrap DUMMY_bootstrap;

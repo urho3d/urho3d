@@ -61,7 +61,7 @@ SDL_SoftBlit(SDL_Surface * src, SDL_Rect * srcrect,
     }
 
     /* Set up source and destination buffer pointers, and BLIT! */
-    if (okay && srcrect->w && srcrect->h) {
+    if (okay && !SDL_RectEmpty(srcrect)) {
         SDL_BlitFunc RunBlit;
         SDL_BlitInfo *info = &src->map->info;
 

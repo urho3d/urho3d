@@ -325,12 +325,6 @@ SDL_ReportAssertion(SDL_assert_data *data, const char *func, const char *file,
 }
 
 
-int SDL_AssertionsInit(void)
-{
-    /* this is a no-op at the moment. */
-    return 0;
-}
-
 void SDL_AssertionsQuit(void)
 {
     SDL_GenerateAssertionReport();

@@ -45,6 +45,7 @@
  *
  * There's also lots of good information here:
  * http://www.1024cores.net/home/lock-free-algorithms
+ * http://preshing.com/
  *
  * These operations may or may not actually be implemented using
  * processor specific atomic operations. When possible they are
@@ -134,6 +135,52 @@ void _ReadWriteBarrier(void);
 #define SDL_CompilerBarrier()   \
 { SDL_SpinLock _tmp = 0; SDL_AtomicLock(&_tmp); SDL_AtomicUnlock(&_tmp); }
 #endif
+
+/**
+ * Memory barriers are designed to prevent reads and writes from being
+ * reordered by the compiler and being seen out of order on multi-core CPUs.
+ *
+ * A typical pattern would be for thread A to write some data and a flag,
+ * and for thread B to read the flag and get the data. In this case you
+ * would insert a release barrier between writing the data and the flag,
+ * guaranteeing that the data write completes no later than the flag is
+ * written, and you would insert an acquire barrier between reading the
+ * flag and reading the data, to ensure that all the reads associated
+ * with the flag have completed.
+ *
+ * In this pattern you should always see a release barrier paired with
+ * an acquire barrier and you should gate the data reads/writes with a
+ * single flag variable.
+ *
+ * For more information on these semantics, take a look at the blog post:
+ * http://preshing.com/20120913/acquire-and-release-semantics
+ */
+#if defined(__GNUC__) && (defined(__powerpc__) || defined(__ppc__))
+#define SDL_MemoryBarrierRelease()   __asm__ __volatile__ ("lwsync" : : : "memory")
+#define SDL_MemoryBarrierAcquire()   __asm__ __volatile__ ("lwsync" : : : "memory")
+#elif defined(__GNUC__) && defined(__arm__)
+#if defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__)
+#define SDL_MemoryBarrierRelease()   __asm__ __volatile__ ("dmb ish" : : : "memory")
+#define SDL_MemoryBarrierAcquire()   __asm__ __volatile__ ("dmb ish" : : : "memory")
+#elif defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6T2__) || defined(__ARM_ARCH_6Z__) || defined(__ARM_ARCH_6ZK__)
+#ifdef __thumb__
+/* The mcr instruction isn't available in thumb mode, use real functions */
+extern DECLSPEC void SDLCALL SDL_MemoryBarrierRelease();
+extern DECLSPEC void SDLCALL SDL_MemoryBarrierAcquire();
+#else
+#define SDL_MemoryBarrierRelease()   __asm__ __volatile__ ("mcr p15, 0, %0, c7, c10, 5" : : "r"(0) : "memory")
+#define SDL_MemoryBarrierAcquire()   __asm__ __volatile__ ("mcr p15, 0, %0, c7, c10, 5" : : "r"(0) : "memory")
+#endif /* __thumb__ */
+#else
+#define SDL_MemoryBarrierRelease()   __asm__ __volatile__ ("" : : : "memory")
+#define SDL_MemoryBarrierAcquire()   __asm__ __volatile__ ("" : : : "memory")
+#endif /* __GNUC__ && __arm__ */
+#else
+/* This is correct for the x86 and x64 CPUs, and we'll expand this over time. */
+#define SDL_MemoryBarrierRelease()  SDL_CompilerBarrier()
+#define SDL_MemoryBarrierAcquire()  SDL_CompilerBarrier()
+#endif
+
 
 /* Platform specific optimized versions of the atomic functions,
  * you can disable these by defining SDL_DISABLE_ATOMIC_INLINE

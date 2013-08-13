@@ -98,13 +98,7 @@
 #endif
 
 #define PIXEL_COPY(to, from, len, bpp)          \
-do {                            \
-    if(bpp == 4) {                  \
-    SDL_memcpy4(to, from, (size_t)(len));       \
-    } else {                        \
-    SDL_memcpy(to, from, (size_t)(len) * (bpp));    \
-    }                           \
-} while(0)
+    SDL_memcpy(to, from, (size_t)(len) * (bpp))
 
 /*
  * Various colorkey blit methods, for opaque and per-surface alpha

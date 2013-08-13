@@ -37,9 +37,12 @@
  *  them, and may also be stretched with linear interpolation.
  *
  *  This API is designed to accelerate simple 2D operations. You may
- *  want more functionality such as rotation and particle effects and
+ *  want more functionality such as polygons and particle effects and
  *  in that case you should use SDL's OpenGL/Direct3D support or one
  *  of the many good 3D engines.
+ *
+ *  These functions must be called from the main thread.
+ *  See this bug for details: http://bugzilla.libsdl.org/show_bug.cgi?id=1995
  */
 
 #ifndef _SDL_render_h

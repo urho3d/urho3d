@@ -364,6 +364,23 @@ SDL_SendMouseWheel(SDL_Window * window, SDL_MouseID mouseID, int x, int y)
 void
 SDL_MouseQuit(void)
 {
+    SDL_Cursor *cursor, *next;
+    SDL_Mouse *mouse = SDL_GetMouse();
+
+    SDL_ShowCursor(1);
+
+    cursor = mouse->cursors;
+    while (cursor) {
+        next = cursor->next;
+        SDL_FreeCursor(cursor);
+        cursor = next;
+    }
+
+    if (mouse->def_cursor && mouse->FreeCursor) {
+        mouse->FreeCursor(mouse->def_cursor);
+    }
+
+    SDL_zerop(mouse);
 }
 
 Uint32

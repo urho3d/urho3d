@@ -47,6 +47,7 @@
       depthBits:(int)depthBits
       stencilBits:(int)stencilBits
       majorVersion:(int)majorVersion
+      shareGroup:(EAGLSharegroup*)shareGroup
 {
     depthBufferFormat = 0;
 
@@ -71,9 +72,9 @@
                                         [NSNumber numberWithBool: retained], kEAGLDrawablePropertyRetainedBacking, colorFormat, kEAGLDrawablePropertyColorFormat, nil];
 
         if (majorVersion > 1) {
-            context = [[EAGLContext alloc] initWithAPI: kEAGLRenderingAPIOpenGLES2];
+            context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:shareGroup];
         } else {
-            context = [[EAGLContext alloc] initWithAPI: kEAGLRenderingAPIOpenGLES1];
+            context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1 sharegroup:shareGroup];
         }
         if (!context || ![EAGLContext setCurrentContext:context]) {
             [self release];

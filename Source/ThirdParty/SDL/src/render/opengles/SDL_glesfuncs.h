@@ -1,5 +1,6 @@
 SDL_PROC(void, glBindTexture, (GLenum, GLuint))
 SDL_PROC(void, glBlendFunc, (GLenum, GLenum))
+SDL_PROC(void, glBlendFuncSeparateOES, (GLenum, GLenum, GLenum, GLenum))
 SDL_PROC(void, glClear, (GLbitfield))
 SDL_PROC(void, glClearColor, (GLclampf, GLclampf, GLclampf, GLclampf))
 SDL_PROC(void, glColor4f, (GLfloat, GLfloat, GLfloat, GLfloat))

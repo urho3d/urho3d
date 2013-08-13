@@ -266,6 +266,7 @@ void
 SDL_LogMessageV(int category, SDL_LogPriority priority, const char *fmt, va_list ap)
 {
     char *message;
+    size_t len;
 
     /* Nothing to do if we don't have an output function */
     if (!SDL_log_function) {
@@ -286,7 +287,18 @@ SDL_LogMessageV(int category, SDL_LogPriority priority, const char *fmt, va_list
     if (!message) {
         return;
     }
+
     SDL_vsnprintf(message, SDL_MAX_LOG_MESSAGE, fmt, ap);
+
+    /* Chop off final endline. */
+    len = SDL_strlen(message);
+    if ((len > 0) && (message[len-1] == '\n')) {
+        message[--len] = '\0';
+        if ((len > 0) && (message[len-1] == '\r')) {  /* catch "\r\n", too. */
+            message[--len] = '\0';
+        }
+    }
+
     SDL_log_function(SDL_log_userdata, category, priority, message);
     SDL_stack_free(message);
 }
@@ -305,6 +317,7 @@ SDL_LogOutput(void *userdata, int category, SDL_LogPriority priority,
 {
 #if defined(__WIN32__)
     /* Way too many allocations here, urgh */
+    /* Note: One can't call SDL_SetError here, since that function itself logs. */
     {
         char *output;
         size_t length;
@@ -319,16 +332,16 @@ SDL_LogOutput(void *userdata, int category, SDL_LogPriority priority,
             if (!attachResult) {
                     attachError = GetLastError();
                     if (attachError == ERROR_INVALID_HANDLE) {
-                        SDL_SetError("Parent process has no console");
+                        OutputDebugString(TEXT("Parent process has no console"));
                         consoleAttached = -1;
                     } else if (attachError == ERROR_GEN_FAILURE) {
-                         SDL_SetError("Could not attach to console of parent process");
+                         OutputDebugString(TEXT("Could not attach to console of parent process"));
                          consoleAttached = -1;
                     } else if (attachError == ERROR_ACCESS_DENIED) {  
                          /* Already attached */
                         consoleAttached = 1;
                     } else {
-                        SDL_SetError("Error %d attaching console", attachError);
+                        OutputDebugString(TEXT("Error attaching console"));
                         consoleAttached = -1;
                     }
                 } else {
@@ -352,10 +365,10 @@ SDL_LogOutput(void *userdata, int category, SDL_LogPriority priority,
         /* Screen output to stderr, if console was attached. */
         if (consoleAttached == 1) {
                 if (!WriteConsole(stderrHandle, tstr, lstrlen(tstr), &charsWritten, NULL)) {
-                    SDL_SetError("Error %d calling WriteConsole", GetLastError());
+                    OutputDebugString(TEXT("Error calling WriteConsole"));
                 }
                 if (charsWritten == ERROR_NOT_ENOUGH_MEMORY) {
-                    SDL_SetError("Insufficient heap memory to write message of size %d", length);
+                    OutputDebugString(TEXT("Insufficient heap memory to write message"));
                 }
         }
 
@@ -386,15 +399,9 @@ SDL_LogOutput(void *userdata, int category, SDL_LogPriority priority,
     }
 #elif defined(__PSP__)
     {
-        unsigned int length;
-        char*        output;
         FILE*        pFile;
-        length = SDL_strlen(SDL_priority_prefixes[priority]) + 2 + SDL_strlen(message) + 1;
-        output = SDL_stack_alloc(char, length);
-        SDL_snprintf(output, length, "%s: %s", SDL_priority_prefixes[priority], message);
         pFile = fopen ("SDL_Log.txt", "a");
-        fwrite (output, strlen (output), 1, pFile);
-        SDL_stack_free(output);
+        fprintf(pFile, "%s: %s\n", SDL_priority_prefixes[priority], message);
         fclose (pFile);
     }
 #endif

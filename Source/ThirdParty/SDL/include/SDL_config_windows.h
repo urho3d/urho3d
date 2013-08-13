@@ -78,9 +78,8 @@ typedef unsigned int uintptr_t;
 # define SIZEOF_VOIDP 4
 #endif
 
-/* Enabled for SDL 1.2 (binary compatibility) */
-// Urho3D: enable libc
-#define HAVE_LIBC     1
+/* This is disabled by default to avoid C runtime dependencies and manifest requirements */
+//#define HAVE_LIBC     1
 #ifdef HAVE_LIBC
 /* Useful headers */
 #define HAVE_STDIO_H 1

@@ -119,7 +119,9 @@ Android_GL_SwapWindow(_THIS, SDL_Window * window)
 void
 Android_GL_DeleteContext(_THIS, SDL_GLContext context)
 {
-    __android_log_print(ANDROID_LOG_INFO, "SDL", "[STUB] GL_DeleteContext\n");
+    if (context) {
+        Android_JNI_DeleteContext();
+    }
 }
 
 #endif /* SDL_VIDEO_DRIVER_ANDROID */

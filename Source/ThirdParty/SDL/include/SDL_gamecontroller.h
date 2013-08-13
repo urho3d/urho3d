@@ -44,6 +44,10 @@ extern "C" {
  *  In order to use these functions, SDL_Init() must have been called
  *  with the ::SDL_INIT_JOYSTICK flag.  This causes SDL to scan the system
  *  for game controllers, and load appropriate drivers.
+ *
+ *  If you would like to receive controller updates while the application
+ *  is in the background, you should set the following hint before calling
+ *  SDL_Init(): SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
  */
 
 /* The gamecontroller structure used to identify an SDL game controller */

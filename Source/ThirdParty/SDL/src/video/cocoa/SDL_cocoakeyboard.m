@@ -172,14 +172,9 @@
     return nil;
 }
 
-/* Needs long instead of NSInteger for compilation on Mac OS X 10.4 */
-#if MAC_OS_X_VERSION_MIN_REQUIRED < 1050
-- (long) conversationIdentifier
-#else
 - (NSInteger) conversationIdentifier
-#endif
 {
-    return (long) self;
+    return (NSInteger) self;
 }
 
 /* This method returns the index for character that is
@@ -395,14 +390,6 @@ HandleCapsLock(unsigned short scancode,
         SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_CAPSLOCK);
         SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_CAPSLOCK);
     }
-
-    oldMask = oldMods & NSNumericPadKeyMask;
-    newMask = newMods & NSNumericPadKeyMask;
-
-    if (oldMask != newMask) {
-        SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_NUMLOCKCLEAR);
-        SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_NUMLOCKCLEAR);
-    }
 }
 
 /* This function will handle the modifier keys and also determine the
@@ -486,22 +473,14 @@ HandleModifiers(_THIS, unsigned short scancode, unsigned int modifierFlags)
 static void
 UpdateKeymap(SDL_VideoData *data)
 {
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
     TISInputSourceRef key_layout;
-#else
-    KeyboardLayoutRef key_layout;
-#endif
     const void *chr_data;
     int i;
     SDL_Scancode scancode;
     SDL_Keycode keymap[SDL_NUM_SCANCODES];
 
     /* See if the keymap needs to be updated */
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
     key_layout = TISCopyCurrentKeyboardLayoutInputSource();
-#else
-    KLGetCurrentKeyboardLayout(&key_layout);
-#endif
     if (key_layout == data->key_layout) {
         return;
     }
@@ -509,16 +488,13 @@ UpdateKeymap(SDL_VideoData *data)
 
     SDL_GetDefaultKeymap(keymap);
 
-    /* Try Unicode data first (preferred as of Mac OS X 10.5) */
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
+    /* Try Unicode data first */
     CFDataRef uchrDataRef = TISGetInputSourceProperty(key_layout, kTISPropertyUnicodeKeyLayoutData);
     if (uchrDataRef)
         chr_data = CFDataGetBytePtr(uchrDataRef);
     else
         goto cleanup;
-#else
-    KLGetKeyboardLayoutProperty(key_layout, kKLuchrData, &chr_data);
-#endif
+
     if (chr_data) {
         UInt32 keyboard_type = LMGetKbdType();
         OSStatus err;
@@ -552,60 +528,8 @@ UpdateKeymap(SDL_VideoData *data)
         return;
     }
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
 cleanup:
     CFRelease(key_layout);
-#else
-    /* Fall back to older style key map data */
-    KLGetKeyboardLayoutProperty(key_layout, kKLKCHRData, &chr_data);
-    if (chr_data) {
-        for (i = 0; i < 128; i++) {
-            UInt32 c, state = 0;
-
-            /* Make sure this scancode is a valid character scancode */
-            scancode = darwin_scancode_table[i];
-            if (scancode == SDL_SCANCODE_UNKNOWN ||
-                (keymap[scancode] & SDLK_SCANCODE_MASK)) {
-                continue;
-            }
-
-            c = KeyTranslate (chr_data, i, &state) & 255;
-            if (state) {
-                /* Dead key, process key up */
-                c = KeyTranslate (chr_data, i | 128, &state) & 255;
-            }
-
-            if (c != 0 && c != 0x10) {
-                /* MacRoman to Unicode table, taken from X.org sources */
-                static const unsigned short macroman_table[128] = {
-                    0xc4, 0xc5, 0xc7, 0xc9, 0xd1, 0xd6, 0xdc, 0xe1,
-                    0xe0, 0xe2, 0xe4, 0xe3, 0xe5, 0xe7, 0xe9, 0xe8,
-                    0xea, 0xeb, 0xed, 0xec, 0xee, 0xef, 0xf1, 0xf3,
-                    0xf2, 0xf4, 0xf6, 0xf5, 0xfa, 0xf9, 0xfb, 0xfc,
-                    0x2020, 0xb0, 0xa2, 0xa3, 0xa7, 0x2022, 0xb6, 0xdf,
-                    0xae, 0xa9, 0x2122, 0xb4, 0xa8, 0x2260, 0xc6, 0xd8,
-                    0x221e, 0xb1, 0x2264, 0x2265, 0xa5, 0xb5, 0x2202, 0x2211,
-                    0x220f, 0x3c0, 0x222b, 0xaa, 0xba, 0x3a9, 0xe6, 0xf8,
-                    0xbf, 0xa1, 0xac, 0x221a, 0x192, 0x2248, 0x2206, 0xab,
-                    0xbb, 0x2026, 0xa0, 0xc0, 0xc3, 0xd5, 0x152, 0x153,
-                    0x2013, 0x2014, 0x201c, 0x201d, 0x2018, 0x2019, 0xf7, 0x25ca,
-                    0xff, 0x178, 0x2044, 0x20ac, 0x2039, 0x203a, 0xfb01, 0xfb02,
-                    0x2021, 0xb7, 0x201a, 0x201e, 0x2030, 0xc2, 0xca, 0xc1,
-                    0xcb, 0xc8, 0xcd, 0xce, 0xcf, 0xcc, 0xd3, 0xd4,
-                    0xf8ff, 0xd2, 0xda, 0xdb, 0xd9, 0x131, 0x2c6, 0x2dc,
-                    0xaf, 0x2d8, 0x2d9, 0x2da, 0xb8, 0x2dd, 0x2db, 0x2c7,
-                };
-
-                if (c >= 128) {
-                    c = macroman_table[c - 128];
-                }
-                keymap[scancode] = c;
-            }
-        }
-        SDL_SetKeymap(0, keymap, SDL_NUM_SCANCODES);
-        return;
-    }
-#endif
 }
 
 void

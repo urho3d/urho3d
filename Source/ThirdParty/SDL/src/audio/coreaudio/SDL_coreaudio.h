@@ -32,9 +32,6 @@
 #if MACOSX_COREAUDIO
 #include <CoreAudio/CoreAudio.h>
 #include <CoreServices/CoreServices.h>
-#if MAC_OS_X_VERSION_MAX_ALLOWED <= 1050
-#include <AudioUnit/AUNTComponent.h>
-#endif
 #else
 #include <AudioToolbox/AudioToolbox.h>
 #endif

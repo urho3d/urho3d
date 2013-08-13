@@ -54,7 +54,7 @@ ParseCommandLine(char *cmdline, char **argv)
     argc = last_argc = 0;
     for (bufp = cmdline; *bufp;) {
         /* Skip leading whitespace */
-        while (isspace(*bufp)) {
+        while (SDL_isspace(*bufp)) {
             ++bufp;
         }
         /* Skip over argument */
@@ -80,7 +80,7 @@ ParseCommandLine(char *cmdline, char **argv)
                 ++argc;
             }
             /* Skip over word */
-            while (*bufp && !isspace(*bufp)) {
+            while (*bufp && !SDL_isspace(*bufp)) {
                 ++bufp;
             }
         }
@@ -175,6 +175,8 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
     /* Run the main program */
     console_main(argc, argv);
+
+    SDL_stack_free(argv);
 
     SDL_free(cmdline);
 

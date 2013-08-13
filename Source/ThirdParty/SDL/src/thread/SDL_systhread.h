@@ -50,6 +50,12 @@ extern int SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority);
  */
 extern void SDL_SYS_WaitThread(SDL_Thread * thread);
 
+/* Get the thread local storage for this thread */
+extern SDL_TLSData *SDL_SYS_GetTLSData();
+
+/* Set the thread local storage for this thread */
+extern int SDL_SYS_SetTLSData(SDL_TLSData *data);
+
 #endif /* _SDL_systhread_h */
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -67,7 +67,8 @@
     aBits:(int)aBits
     depthBits:(int)depthBits
     stencilBits:(int)stencilBits
-    majorVersion:(int)majorVersion;
+    majorVersion:(int)majorVersion
+    shareGroup:(EAGLSharegroup*)shareGroup;
 
 - (void)updateFrame;
 

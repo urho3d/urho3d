@@ -33,9 +33,11 @@ SDL_WindowShaper*
 Cocoa_CreateShaper(SDL_Window* window) {
     SDL_WindowData* windata = (SDL_WindowData*)window->driverdata;
     [windata->nswindow setOpaque:NO];
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
-    [windata->nswindow setStyleMask:NSBorderlessWindowMask];
-#endif
+
+    if ([windata->nswindow respondsToSelector:@selector(setStyleMask:)]) {
+        [windata->nswindow setStyleMask:NSBorderlessWindowMask];
+    }
+
     SDL_WindowShaper* result = result = malloc(sizeof(SDL_WindowShaper));
     result->window = window;
     result->mode.mode = ShapeModeDefault;
@@ -94,6 +96,7 @@ Cocoa_SetWindowShape(SDL_WindowShaper *shaper,SDL_Surface *shape,SDL_WindowShape
     closure.window = shaper->window;
     SDL_TraverseShapeTree(data->shape,&ConvertRects,&closure);
     [closure.path addClip];
+    [pool release];
 
     return 0;
 }

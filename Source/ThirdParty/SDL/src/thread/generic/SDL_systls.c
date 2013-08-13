@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2012 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,20 +18,21 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
 #include "SDL_config.h"
-
-#if SDL_VIDEO_DRIVER_NDS
-
-#include "SDL_ndsvideo.h"
+#include "../SDL_thread_c.h"
 
 
-int NDS_CreateWindow(_THIS, SDL_Window * window)
+SDL_TLSData *
+SDL_SYS_GetTLSData()
 {
-    /* Nintendo DS windows are always fullscreen */
-    window->flags |= SDL_WINDOW_FULLSCREEN;
-    return 0;
+    return SDL_Generic_GetTLSData();
 }
 
-#endif /* SDL_VIDEO_DRIVER_NDS */
+int
+SDL_SYS_SetTLSData(SDL_TLSData *data)
+{
+    return SDL_Generic_SetTLSData(data);
+}
 
 /* vi: set ts=4 sw=4 expandtab: */

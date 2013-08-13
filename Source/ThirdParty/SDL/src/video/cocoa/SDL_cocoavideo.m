@@ -232,59 +232,6 @@ void SDL_NSLog(const char *text)
     NSLog(@"%s", text);
 }
 
-/*
- * Mac OS X assertion support.
- *
- * This doesn't really have aything to do with the interfaces of the SDL video
- *  subsystem, but we need to stuff this into an Objective-C source code file.
- */
-
-SDL_assert_state
-SDL_PromptAssertion_cocoa(const SDL_assert_data *data)
-{
-    const int initialized = (SDL_WasInit(SDL_INIT_VIDEO) != 0);
-    if (!initialized) {
-        if (SDL_InitSubSystem(SDL_INIT_VIDEO) == -1) {
-            fprintf(stderr, "Assertion failed AND couldn't init video mode!\n");
-            return SDL_ASSERTION_BREAK;  /* oh well, crash hard. */
-        }
-    }
-
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-    NSString *msg = [NSString stringWithFormat:
-            @"Assertion failure at %s (%s:%d), triggered %u time%s:\n  '%s'",
-                data->function, data->filename, data->linenum,
-                data->trigger_count, (data->trigger_count == 1) ? "" : "s",
-                data->condition];
-
-    NSLog(@"%@", msg);
-
-    /*
-     * !!! FIXME: this code needs to deal with fullscreen modes:
-     * !!! FIXME:  reset to default desktop, runModal, reset to current?
-     */
-
-    NSAlert* alert = [[NSAlert alloc] init];
-    [alert setAlertStyle:NSCriticalAlertStyle];
-    [alert setMessageText:msg];
-    [alert addButtonWithTitle:@"Retry"];
-    [alert addButtonWithTitle:@"Break"];
-    [alert addButtonWithTitle:@"Abort"];
-    [alert addButtonWithTitle:@"Ignore"];
-    [alert addButtonWithTitle:@"Always Ignore"];
-    const NSInteger clicked = [alert runModal];
-    [alert release];
-
-    [pool release];
-
-    if (!initialized) {
-        SDL_QuitSubSystem(SDL_INIT_VIDEO);
-    }
-
-    return (SDL_assert_state) (clicked - NSAlertFirstButtonReturn);
-}
-
 #endif /* SDL_VIDEO_DRIVER_COCOA */
 
 /* vim: set ts=4 sw=4 expandtab: */

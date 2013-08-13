@@ -135,9 +135,9 @@ SDL_GetPerformanceFrequency(void)
 #if HAVE_CLOCK_GETTIME
         return 1000000000;
 #elif defined(__APPLE__)
-        Uint64 freq = mach_base_info.numer;
+        Uint64 freq = mach_base_info.denom;
         freq *= 1000000000;
-        freq /= mach_base_info.denom;
+        freq /= mach_base_info.numer;
         return freq;
 #endif
     } else {
