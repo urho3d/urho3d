@@ -338,7 +338,7 @@ if (COMMAND cmake_policy)
 endif ()
 
 # Add cmake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 
 # Include Urho3D cmake module
 include (Urho3D-CMake-magic)
@@ -360,7 +360,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 setup_main_executable ()
 \endcode
 
-Copy the "cmake" sub-directory from Urho3D project to your own project so that CMake can find the Urho3D-specific CMake modules in your project. Instead of copying, for platform that supports symbolic link, you can also create "cmake" symbolic link in your project build tree to point to "cmake" sub-directory from Urho3D project. Alternatively, you can just modify the CMAKE_MODULE_PATH search path above to "$ENV{URHO3D_HOME}/Source/cmake/Modules/".       
+Copy the "cmake" sub-directory from Urho3D project to your own project so that CMake can find the Urho3D-specific CMake modules in your project. Instead of copying, for platform that supports symbolic link, you can also create "cmake" symbolic link in your project build tree to point to "cmake" sub-directory from Urho3D project. Alternatively, you can just modify the CMAKE_MODULE_PATH search path above to "$ENV{URHO3D_HOME}/Source/CMake/Modules/".       
 
 Since your CMake build script include the Urho3D-Cmake-magic module, your project also now has the cross-platform build capability.  
 

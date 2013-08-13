@@ -24,4 +24,4 @@ if "%use_mklink%" == "1" (
 )
 cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
 echo on
-cmake -E chdir %build% cmake -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\cmake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. %source% %*
+cmake -E chdir %build% cmake -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\CMake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. %source% %*
