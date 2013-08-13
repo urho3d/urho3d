@@ -717,9 +717,34 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         if (targetNode is null)
             targetNode = editorScene;
 
-        // Perform the reparenting
-        if (!SceneChangeParent(sourceNode, targetNode))
-            return;
+        // Handle multiple selected children from a ListView
+        if (source.parent !is null && source.parent.typeName == "HierarchyContainer")
+        {
+            ListView@ listView_ = cast<ListView>(source.parent.parent.parent);
+
+            if (listView_ is null)
+                return;
+
+            Array<Node@> nodeList;
+            for (uint i=0; i < listView_.selectedItems.length; i++)
+            {
+                UIElement@ item_ = listView_.selectedItems[i];
+                if (item_.vars[TYPE_VAR] == ITEM_NODE)
+                {
+                    Node@ node = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
+                    if (node !is null)
+                        nodeList.Push(node);
+                }
+            }
+            if (!SceneChangeParent(sourceNode, nodeList, targetNode))
+                return;
+        }
+        else
+        {
+            // Perform the reparenting
+            if (!SceneChangeParent(sourceNode, targetNode))
+                return;
+        }
 
         // Focus the node at its new position in the list which in turn should trigger a refresh in attribute inspector
         FocusNode(sourceNode);

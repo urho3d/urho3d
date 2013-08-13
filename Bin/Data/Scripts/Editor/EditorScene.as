@@ -588,6 +588,33 @@ bool SceneChangeParent(Node@ sourceNode, Node@ targetNode, bool createUndoAction
         return false;
 }
 
+bool SceneChangeParent(Node@ sourceNode, Array<Node@> sourceNodes, Node@ targetNode, bool createUndoAction = true)
+{
+    // Create undo action if requested
+    if (createUndoAction)
+    {
+        ReparentNodeAction action;
+        action.Define(sourceNodes, targetNode);
+        SaveEditAction(action);
+    }
+
+    for (uint i = 0; i < sourceNodes.length; i++)
+    {
+        Node@ node = sourceNodes[i];
+        node.parent = targetNode;
+    }
+    SetSceneModified();
+
+    // Return true if success
+    if (sourceNode.parent is targetNode)
+    {
+        UpdateNodeAttributes(); // Parent change may have changed local transform
+        return true;
+    }
+    else
+        return false;
+}
+
 bool SceneResetPosition()
 {
     if (editNode !is null)

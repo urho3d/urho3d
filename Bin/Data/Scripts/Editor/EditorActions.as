@@ -106,28 +106,75 @@ class ReparentNodeAction : EditAction
     uint nodeID;
     uint oldParentID;
     uint newParentID;
+    Array<uint> nodeList; // 2 uints get inserted per node (node, node.parent)
+    bool multiple;
 
     void Define(Node@ node, Node@ newParent)
     {
+        multiple = false;
         nodeID = node.id;
         oldParentID = node.parent.id;
         newParentID = newParent.id;
     }
 
+    void Define(Array<Node@> nodes, Node@ newParent)
+    {
+        multiple = true;
+        newParentID = newParent.id;
+        for(uint i = 0; i < nodes.length; i++)
+        {
+            Node@ node = nodes[i];
+            nodeList.Push(node.id);
+            nodeList.Push(node.parent.id);
+        }
+    }
+
     void Undo()
     {
-        Node@ parent = editorScene.GetNode(oldParentID);
-        Node@ node = editorScene.GetNode(nodeID);
-        if (parent !is null && node !is null)
-            node.parent = parent;
+        if (multiple)
+        {
+            for (uint i = 0; i < nodeList.length; i+=2)
+            {
+                uint nodeID_ = nodeList[i];
+                uint oldParentID_ = nodeList[i+1];
+                Node@ parent = editorScene.GetNode(oldParentID_);
+                Node@ node = editorScene.GetNode(nodeID_);
+                if (parent !is null && node !is null)
+                    node.parent = parent;
+            }
+        }
+        else
+        {
+            Node@ parent = editorScene.GetNode(oldParentID);
+            Node@ node = editorScene.GetNode(nodeID);
+            if (parent !is null && node !is null)
+                node.parent = parent;
+        }
     }
 
     void Redo()
     {
-        Node@ parent = editorScene.GetNode(newParentID);
-        Node@ node = editorScene.GetNode(nodeID);
-        if (parent !is null && node !is null)
-            node.parent = parent;
+        if (multiple)
+        {
+            Node@ parent = editorScene.GetNode(newParentID);
+            if (parent is null)
+                return;
+
+            for (uint i = 0; i < nodeList.length; i+=2)
+            {
+                uint nodeID_ = nodeList[i];
+                Node@ node = editorScene.GetNode(nodeID_);
+                if (node !is null)
+                    node.parent = parent;
+            }
+        }
+        else
+        {
+            Node@ parent = editorScene.GetNode(newParentID);
+            Node@ node = editorScene.GetNode(nodeID);
+            if (parent !is null && node !is null)
+                node.parent = parent;
+        }
     }
 }
 
