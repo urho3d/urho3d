@@ -3,7 +3,7 @@
 del /F Source\Android\CMakeCache.txt CMakeCache.txt
 rd /S /Q Source\Android\CMakeFiles CMakeFiles
 set "build=Source\Android"
-set "source=Source"
+set "source=.."
 set "use_mklink="
 :loop
 if not "%1" == "" (
