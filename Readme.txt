@@ -370,10 +370,10 @@ cmake_xxxx batch files or shell scripts.
 |                      | build/host machine), SSH digital key must be setup    |
 |                      | first for this to work                                |
 |-DCMAKE_BUILD_TYPE=   |to tell CMake which build configuration to be          |
-|  Debug or Release    | generated, default is RelWithDebInfo (only applicable |
-|                      | for cmake_gcc.sh and cmake_eclipse.sh)                |
+|  Release/Debug/      | generated, default is Release (only applicable for    |
+|  RelWithDebInfo      | cmake_gcc.sh and cmake_eclipse.sh)                    |
 |-DURHO3D_BUILD_TYPE=  |to tell CMake which Urho3D target to be built, default |
-|  STATIC or SHARED    | is EXE (Urho3D script host)                           |          
+|  EXE/STATIC/SHARED   | is EXE (Urho3D script host)                           |          
 |----------------------|-------------------------------------------------------|
 
 
