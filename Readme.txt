@@ -67,7 +67,7 @@ Urho3D uses the following third-party libraries:
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
 - Recast/Detour (http://code.google.com/p/recastnavigation/)
-- SDL 2.0 (http://www.libsdl.org/)
+- SDL 2.0.0 (http://www.libsdl.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/
   john-ratcliffs-code-suppository-blog.html)
 - stb_image 1.29 (http://nothings.org/)
