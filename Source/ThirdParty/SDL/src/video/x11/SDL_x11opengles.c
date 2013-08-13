@@ -303,7 +303,7 @@ X11_GLES_GetVisual(_THIS, Display * display, int screen)
 
         vinfo = XGetVisualInfo(display,
                                VisualScreenMask,
-                                                          &vi_in, &out_count);
+                               &vi_in, &out_count);
     }
 
     return _this->gles_data->egl_visualinfo = vinfo;

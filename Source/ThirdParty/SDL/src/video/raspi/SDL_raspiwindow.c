@@ -82,7 +82,7 @@ RASPI_CreateWindow(_THIS, SDL_Window *window)
     src_rect.width = mode.w << 16;
     src_rect.height = mode.h << 16;
 
-    /* Through trial and error, these combination seems to work well for Urho3D engine */
+    /* Through trial and error, this combination seems to work well for Urho3D engine */
     alpha.flags = DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS;
     alpha.opacity = 255;
     alpha.mask = 0;

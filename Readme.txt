@@ -366,7 +366,7 @@ cmake_xxxx batch files or shell scripts.
 |-DUSE_MKLINK=1        |to use mklink command to create symbolic links (Windows|
 |                      |  Vista and above only)                                |
 |-DSCP_TO_TARGET=      |to automatically scp executables to target system (only|
-|  usr\@tgt:remote-loc | applicable for cross compiling Raspberry Pi on a      |
+|  usr@tgt:remote-loc  | applicable for cross compiling Raspberry Pi on a      |
 |                      | build/host machine), SSH digital key must be setup    |
 |                      | first for this to work                                |
 |-DCMAKE_BUILD_TYPE=   |to tell CMake which build configuration to be          |
