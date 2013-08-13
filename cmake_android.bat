@@ -9,7 +9,7 @@ set "use_mklink="
 if not "%1" == "" (
     if "%1" == "-DUSE_MKLINK" set "use_mklink=%~2"
     shift
-	shift
+    shift
     goto loop
 )
 if "%use_mklink%" == "1" (
