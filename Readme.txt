@@ -159,7 +159,7 @@ process has two steps:
    generate the build files. You can use the provided batch files or shell
    scripts on the respective platform.
    
-    Windows: cmake_vs2008.bat, cmake_vs2010.bat or cmake_vs2012.bat,
+    Windows: cmake_vs2008.bat, cmake_vs2010.bat, cmake_vs2012.bat or cmake_mingw.bat,
     Linux: cmake_gcc.sh or cmake_eclipse.sh,
     Mac OS X: cmake_gcc.sh or cmake_macosx.sh.
 
@@ -174,10 +174,9 @@ process has two steps:
 
    For Xcode, open Urho3D.xcodeproj and build.
 
-On Windows, using other compilers than Visual Studio is not officially
-supported. MinGW may work (cmake -G "MinGW Makefiles"), but may lack required
-DirectX headers. They can be copied to a MinGW installation from the following
-package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
+If using MinGW to compile, DirectX headers may need to be acquired separately.
+They can be copied to the MinGW installation eg. from the following package:
+http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
 
 After the build is complete, the programs can be run from the Bin directory.
 These include the Urho3D script host application, which can run application
