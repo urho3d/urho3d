@@ -80,13 +80,17 @@ if (NOT WIN32)
 endif ()
 
 # If using Windows and not OpenGL, find DirectX SDK include & library directories
+# Note: if a recent Windows SDK is installed instead, it will be possible to compile without;
+# therefore do not log a fatal error in that case
 if (WIN32 AND NOT USE_OPENGL)
-    find_package (Direct3D REQUIRED)
-    include_directories (${DIRECT3D_INCLUDE_DIR})
-    link_directories (${DIRECT3D_LIBRARY_DIR})
+    find_package (Direct3D)
+    if (DIRECT3D_FOUND)
+        include_directories (${DIRECT3D_INCLUDE_DIR})
+        link_directories (${DIRECT3D_LIBRARY_DIR})
+    endif ()
 endif ()
 
-# For Raspbery Pi, find Broadcom VideoCore IV firmware 
+# For Raspbery Pi, find Broadcom VideoCore IV firmware
 if (RASPI)
     find_package (BCM_VC REQUIRED)
     link_directories (${BCM_VC_LIBRARY_DIR})

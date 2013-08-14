@@ -67,12 +67,10 @@ if (WIN32)
 
     if (DIRECT3D_FOUND)
         include (FindPackageMessage)
-        FIND_PACKAGE_MESSAGE (Direct3D "Found Microsoft Direct3D: ${DIRECT3D_LIBRARIES} ${DIRECT3D_INCLUDE_DIR}" "[${DIRECT3D_LIBRARIES}][${DIRECT3D_INCLUDE_DIR}]")
+        FIND_PACKAGE_MESSAGE (Direct3D "Found DirectX SDK: ${DIRECT3D_LIBRARIES} ${DIRECT3D_INCLUDE_DIR}" "[${DIRECT3D_LIBRARIES}][${DIRECT3D_INCLUDE_DIR}]")
     else ()
-        if (Direct3D_FIND_REQUIRED)
-            message (FATAL_ERROR "Could not find Microsoft Direct3D")
-        endif ()
+        message ("-- DirectX SDK not found. This is not fatal if a recent Windows SDK is installed")
     endif ()
- 
+
     mark_as_advanced (DIRECT3D_INCLUDE_DIR DIRECT3D_LIBRARIES)
 endif ()
