@@ -19,8 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
@@ -274,9 +272,6 @@ Cocoa_InitMouse(_THIS)
     SDL_SetDefaultCursor(Cocoa_CreateDefaultCursor());
 
     Cocoa_InitMouseEventTap(mouse->driverdata);
-
-    // Urho3D: disable event suppression interval, otherwise mouse moves will be disabled for some time
-    CGSetLocalEventsSuppressionInterval(0.0);
 }
 
 void

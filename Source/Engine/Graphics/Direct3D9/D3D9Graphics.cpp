@@ -1877,16 +1877,22 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     return IntVector2(width, height);
 }
 
-void Graphics::WindowResized(int width, int height)
+void Graphics::WindowResized()
 {
-    if (!impl_->device_ || (width == width_ && height == height_))
+    if (!impl_->device_ || !impl_->window_)
         return;
     
-    width_ = width;
-    height_ = height;
+    int newWidth, newHeight;
     
-    impl_->presentParams_.BackBufferWidth            = width;
-    impl_->presentParams_.BackBufferHeight           = height;
+    SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+    if (newWidth == width_ && newHeight == height_)
+        return;
+
+    width_ = newWidth;
+    height_ = newHeight;
+    
+    impl_->presentParams_.BackBufferWidth            = width_;
+    impl_->presentParams_.BackBufferHeight           = height_;
     ResetDevice();
     
     // Reset rendertargets and viewport for the new screen size

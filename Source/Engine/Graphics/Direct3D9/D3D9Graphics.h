@@ -330,7 +330,7 @@ public:
     bool GetForceSM2() const { return forceSM2_; }
     
     /// Window was resized through user interaction. Called by Input subsystem.
-    void WindowResized(int width, int height);
+    void WindowResized();
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.

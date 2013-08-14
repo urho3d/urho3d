@@ -1928,13 +1928,19 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     return IntVector2(width, height);
 }
 
-void Graphics::WindowResized(int width, int height)
+void Graphics::WindowResized()
 {
-    if (width == width_ && height == height_)
+    if (!impl_->window_)
         return;
+
+    int newWidth, newHeight;
     
-    width_ = width;
-    height_ = height;
+    SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+    if (newWidth == width_ && newHeight == height_)
+        return;
+
+    width_ = newWidth;
+    height_ = newHeight;
     
     // Reset rendertargets and viewport for the new screen size
     ResetRenderTargets();

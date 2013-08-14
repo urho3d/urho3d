@@ -20,6 +20,7 @@
 */
 
 // Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
