@@ -2071,6 +2071,12 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     depthTextures_.Clear();
     shaderPrograms_.Clear();
     
+    // End fullscreen mode first to counteract transition and getting stuck problems on OS X
+#if defined(__APPLE__) && !defined(IOS)
+    if (closeWindow && fullscreen_ && !externalWindow_)
+        SDL_SetWindowFullscreen(impl_->window_, SDL_FALSE);
+#endif
+        
     if (impl_->context_)
     {
         // Do not log this message if we are exiting
@@ -2088,7 +2094,6 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         // Do not destroy external window except when shutting down
         if (!externalWindow_ || clearGPUObjects)
         {
-            SDL_SetWindowFullscreen(impl_->window_, SDL_FALSE);
             SDL_DestroyWindow(impl_->window_);
             impl_->window_ = 0;
         }
