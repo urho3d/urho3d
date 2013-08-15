@@ -2088,6 +2088,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         // Do not destroy external window except when shutting down
         if (!externalWindow_ || clearGPUObjects)
         {
+            SDL_SetWindowFullscreen(impl_->window_, SDL_FALSE);
             SDL_DestroyWindow(impl_->window_);
             impl_->window_ = 0;
         }

@@ -1927,16 +1927,6 @@ SDL_DestroyWindow(SDL_Window * window)
 
     CHECK_WINDOW_MAGIC(window, );
 
-#if !SDL_VIDEO_OPENGL_ES && !SDL_VIDEO_OPENGL_ES2
-    // Urho3D: make context uncurrent first
-    /* make no context current if this is the current context window. */
-    if (window->flags & SDL_WINDOW_OPENGL) {
-        if (_this->current_glwin == window) {
-            SDL_GL_MakeCurrent(window, NULL);
-        }
-    }
-#endif
-
     /* Restore video mode, etc. */
     SDL_HideWindow(window);
 
@@ -1948,6 +1938,15 @@ SDL_DestroyWindow(SDL_Window * window)
         SDL_SetMouseFocus(NULL);
     }
 
+#if !SDL_VIDEO_OPENGL_ES && !SDL_VIDEO_OPENGL_ES2
+    /* make no context current if this is the current context window. */
+    if (window->flags & SDL_WINDOW_OPENGL) {
+        if (_this->current_glwin == window) {
+            SDL_GL_MakeCurrent(window, NULL);
+        }
+    }
+#endif
+    
     if (window->surface) {
         window->surface->flags &= ~SDL_DONTFREE;
         SDL_FreeSurface(window->surface);
