@@ -54,6 +54,18 @@ if (MSVC)
     endif ()
 endif ()
 
+# By default use the MSVC dynamic runtime. To eliminate the need to distribute the runtime installer,
+# this can be switched off if not using Urho3D as a shared library.
+if (MSVC)
+    if (USE_STATIC_RUNTIME)
+        set (RELEASE_RUNTIME "/MT")
+        set (DEBUG_RUNTIME "/MTd")
+    else ()
+        set (RELEASE_RUNTIME "")
+        set (DEBUG_RUNTIME "")
+    endif ()
+endif ()
+
 # Enable file watcher support for automatic resource reloads.
 add_definitions (-DENABLE_FILEWATCHER)
 
@@ -115,11 +127,11 @@ endif ()
 if (MSVC)
     # Visual Studio-specific setup
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
-    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
-    set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} /MT /fp:fast /Zi /GS-")
+    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
+    set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS-")
     set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
-    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-    set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /MT /fp:fast /Zi /GS- /D _SECURE_SCL=0")
+    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
+    set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS- /D _SECURE_SCL=0")
     set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
     # SSE flag is redundant if already compiling as 64bit
     if (ENABLE_SSE AND NOT ENABLE_64BIT)
@@ -294,6 +306,12 @@ macro (setup_library)
 
         if (MSVC)
             # Specific to VS generator
+            # On VS2008 we need to add a backslash to the IntDir, on later VS it already exists
+            if (CMAKE_GENERATOR MATCHES "2008")
+                set (INTDIR_SLASH "\\")
+            else ()
+                set (INTDIR_SLASH "")
+            endif ()
             if (USE_MKLINK)
                 set (SYMLINK ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.lnk)
                 add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
@@ -303,7 +321,7 @@ macro (setup_library)
             else ()
                 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
                 add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                    COMMAND copy /B \"$(ProjectDir)$(IntDir)\\*.obj\" \"$(ProjectDir)CMakeFiles\\${TARGET_NAME}.dir\"
+                    COMMAND copy /B \"$(ProjectDir)$(IntDir)${INTDIR_SLASH}*.obj\" \"$(ProjectDir)CMakeFiles\\${TARGET_NAME}.dir\"
                     COMMENT "Copying object files to a common location also used by Makefile generator")
             endif ()
         elseif (XCODE)

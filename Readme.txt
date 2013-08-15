@@ -362,6 +362,8 @@ cmake_xxxx batch files or shell scripts.
 |                      | default for other platforms)                          | 
 |-DUSE_MKLINK=1        |to use mklink command to create symbolic links (Windows|
 |                      |  Vista and above only)                                |
+|-DUSE_STATIC_RUNTIME=1|to use static C/C++ runtime libraries and eliminate the|
+|                      |  need for runtime DLLs installation (VS only)         |
 |-DSCP_TO_TARGET=      |to automatically scp executables to target system (only|
 |  usr@tgt:remote-loc  | applicable for cross compiling Raspberry Pi on a      |
 |                      | build/host machine), SSH digital key must be setup    |
