@@ -392,9 +392,9 @@ macro (setup_main_executable)
             add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
         else ()
             # Create symbolic links to allow debugging/running the main executable within Xcode itself
-            string (REGEX REPLACE "\\)/.*$" ")" TARGET_LOC ${TARGET_LOC})
+            get_filename_component (PATH ${TARGET_LOC} PATH)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-                COMMAND for dir in CoreData Data\; do cmake -E create_symlink ../../../../Bin/$$dir ${TARGET_LOC}/$$dir\; done
+                COMMAND for dir in CoreData Data\; do cmake -E create_symlink ../../../../Bin/$$dir ${PATH}/$$dir\; done
                 COMMENT "Create symbolic links to allow debugging/running the main executable within Xcode itself")
         endif ()
     endif ()
