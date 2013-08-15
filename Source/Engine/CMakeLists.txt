@@ -112,21 +112,21 @@ if (APPLE AND LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Define post build steps
-file (MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/../Lib)
+file (MAKE_DIRECTORY ${PROJECT_ROOT_DIR}/Lib)
 if (MSVC)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_SOURCE_DIR}/../Lib\"
-        COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" \"${PROJECT_SOURCE_DIR}/../Lib\"
+        COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Lib\"
+        COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" \"${PROJECT_ROOT_DIR}/Lib\"
         COMMENT "Copying library and debug files to Lib directory")
 else ()
     get_target_property (LOCATION ${TARGET_NAME} LOCATION)
     if (CMAKE_CROSSCOMPILING)
-        file (MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/../Lib-CC)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${LOCATION} ${PROJECT_SOURCE_DIR}/../Lib-CC)
+        file (MAKE_DIRECTORY ${PROJECT_ROOT_DIR}/Lib-CC)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${LOCATION} ${PROJECT_ROOT_DIR}/Lib-CC)
         if (SCP_TO_TARGET)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp ${LOCATION} ${SCP_TO_TARGET} || exit 0)
         endif ()
     else ()   
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${LOCATION} ${PROJECT_SOURCE_DIR}/../Lib)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${LOCATION} ${PROJECT_ROOT_DIR}/Lib)
     endif ()
 endif ()

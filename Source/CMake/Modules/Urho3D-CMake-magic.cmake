@@ -180,6 +180,9 @@ endif ()
 # Include CMake builtin module for building shared library support
 include (GenerateExportHeader)
 
+# Determine the project root directory
+get_filename_component (PROJECT_ROOT_DIR ${PROJECT_SOURCE_DIR} PATH)
+
 # Override builtin macro and function to suit our need, always generate header file regardless of target type...
 macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
     set (DEFINE_DEPRECATED)
@@ -319,21 +322,21 @@ macro (setup_executable)
     setup_target ()
     if (MSVC)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_SOURCE_DIR}/../Bin\"
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" \"${PROJECT_SOURCE_DIR}/../Bin\"
+            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Bin\"
+            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" \"${PROJECT_ROOT_DIR}/Bin\"
             COMMENT "Copying executable and debug files to Bin directory")
     elseif (IOS)
         set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
     else ()
         get_target_property (EXECUTABLE_NAME ${TARGET_NAME} LOCATION)
         if (CMAKE_CROSSCOMPILING)
-            file (MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/../Bin-CC)
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${EXECUTABLE_NAME} ${PROJECT_SOURCE_DIR}/../Bin-CC)
+            file (MAKE_DIRECTORY ${PROJECT_ROOT_DIR}/Bin-CC)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${EXECUTABLE_NAME} ${PROJECT_ROOT_DIR}/Bin-CC)
             if (SCP_TO_TARGET)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp ${EXECUTABLE_NAME} ${SCP_TO_TARGET} || exit 0)
             endif ()
         else ()
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${EXECUTABLE_NAME} ${PROJECT_SOURCE_DIR}/../Bin)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${EXECUTABLE_NAME} ${PROJECT_ROOT_DIR}/Bin)
         endif ()
     endif ()
 endmacro ()
@@ -352,7 +355,7 @@ endmacro ()
 macro (setup_main_executable)
     # Define resource files
     if (APPLE)
-        set (RESOURCE_FILES ${PROJECT_SOURCE_DIR}/../Bin/CoreData ${PROJECT_SOURCE_DIR}/../Bin/Data)
+        set (RESOURCE_FILES ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data)
         set_source_files_properties(${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
         set (SOURCE_FILES ${SOURCE_FILES} ${RESOURCE_FILES})
     endif ()
@@ -393,8 +396,9 @@ macro (setup_main_executable)
         else ()
             # Create symbolic links to allow debugging/running the main executable within Xcode itself
             get_filename_component (PATH ${TARGET_LOC} PATH)
+            file (RELATIVE_PATH REL_PATH ${PATH} ${PROJECT_ROOT_DIR}/Bin)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-                COMMAND for dir in CoreData Data\; do cmake -E create_symlink ../../../../Bin/$$dir ${PATH}/$$dir\; done
+                COMMAND for dir in CoreData Data\; do cmake -E create_symlink ${REL_PATH}/$$dir ${PATH}/$$dir\; done
                 COMMENT "Create symbolic links to allow debugging/running the main executable within Xcode itself")
         endif ()
     endif ()
