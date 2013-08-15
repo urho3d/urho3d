@@ -381,14 +381,22 @@ macro (setup_main_executable)
         setup_executable ()
     endif ()
 
-    # Define a custom target to check for resource modification
-    if (IOS)
+    if (APPLE)
         get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
-        string (REGEX REPLACE "/Contents/MacOS" "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
-        add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
-            \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
-            COMMENT "This is a dummy target to check for changes in the Resource folders")
-        add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
+        if (IOS)
+            # Define a custom target to check for resource modification
+            string (REGEX REPLACE "/Contents/MacOS" "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
+            add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
+                \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
+                COMMENT "This is a dummy target to check for changes in the Resource folders")
+            add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
+        else ()
+            # Create symbolic links to allow debugging/running the main executable within Xcode itself
+            string (REGEX REPLACE "\\)/.*$" ")" TARGET_LOC ${TARGET_LOC})
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND for dir in CoreData Data\; do cmake -E create_symlink ../../../../Bin/$$dir ${TARGET_LOC}/$$dir\; done
+                COMMENT "Create symbolic links to allow debugging/running the main executable within Xcode itself")
+        endif ()
     endif ()
 endmacro ()
 
