@@ -26,7 +26,7 @@ namespace Urho3D
 {
 
 /// Singly-linked list node base class.
-struct LinkedListNode
+struct URHO3D_API LinkedListNode
 {
     /// Construct.
     LinkedListNode() :
@@ -39,7 +39,7 @@ struct LinkedListNode
 };
 
 /// Singly-linked list template class. Elements must inherit from LinkedListNode.
-template <class T> class LinkedList
+template <class T> class URHO3D_API LinkedList
 {
 public:
     /// Construct empty.

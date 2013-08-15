@@ -31,7 +31,7 @@ namespace Urho3D
 {
 
 /// Shared array pointer template class. Uses non-intrusive reference counting.
-template <class T> class SharedArrayPtr
+template <class T> class URHO3D_API SharedArrayPtr
 {
 public:
     /// Construct a null shared array pointer.
@@ -210,7 +210,7 @@ template <class T, class U> SharedArrayPtr<T> DynamicCast(const SharedArrayPtr<U
 }
 
 /// Weak array pointer template class. Uses non-intrusive reference counting.
-template <class T> class WeakArrayPtr
+template <class T> class URHO3D_API WeakArrayPtr
 {
 public:
     /// Construct a null weak array pointer.

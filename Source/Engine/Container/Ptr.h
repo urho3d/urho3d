@@ -31,7 +31,7 @@ namespace Urho3D
 {
 
 /// Shared pointer template class with intrusive reference counting.
-template <class T> class SharedPtr
+template <class T> class URHO3D_API SharedPtr
 {
 public:
     /// Construct a null shared pointer.
@@ -177,7 +177,7 @@ template <class T, class U> SharedPtr<T> DynamicCast(const SharedPtr<U>& ptr)
 }
 
 /// Weak pointer template class with intrusive reference counting. Does not keep the object pointed to alive.
-template <class T> class WeakPtr
+template <class T> class URHO3D_API WeakPtr
 {
 public:
     /// Construct a null weak pointer.

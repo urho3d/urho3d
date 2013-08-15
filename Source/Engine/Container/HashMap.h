@@ -33,7 +33,7 @@ namespace Urho3D
 {
 
 /// Hash map template class.
-template <class T, class U> class HashMap : public HashBase
+template <class T, class U> class URHO3D_API HashMap : public HashBase
 {
 public:
     /// Hash map key-value pair with const key.

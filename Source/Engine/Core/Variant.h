@@ -90,7 +90,7 @@ struct VariantValue
 };
 
 /// Typed resource reference.
-struct ResourceRef
+struct URHO3D_API ResourceRef
 {
     /// Construct.
     ResourceRef()
@@ -129,7 +129,7 @@ struct ResourceRef
 };
 
 /// %List of typed resource references.
-struct ResourceRefList
+struct URHO3D_API ResourceRefList
 {
     /// Construct.
     ResourceRefList()

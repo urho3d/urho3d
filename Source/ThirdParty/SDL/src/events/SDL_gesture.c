@@ -19,14 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #include "SDL_config.h"
-
-// Urho3D: Windows requires _USE_MATH_DEFINES
-#ifdef WIN32
-#define _USE_MATH_DEFINES
-#endif
 
 /* General mouse handling code for SDL */
 

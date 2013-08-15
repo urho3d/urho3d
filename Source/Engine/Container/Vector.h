@@ -32,7 +32,7 @@ namespace Urho3D
 {
 
 /// %Vector template class.
-template <class T> class Vector : public VectorBase
+template <class T> class URHO3D_API Vector : public VectorBase
 {
 public:
     typedef RandomAccessIterator<T> Iterator;
@@ -452,7 +452,7 @@ private:
 };
 
 /// %Vector template class for POD types. Does not call constructors or destructors and uses block move.
-template <class T> class PODVector : public VectorBase
+template <class T> class URHO3D_API PODVector : public VectorBase
 {
 public:
     typedef RandomAccessIterator<T> Iterator;

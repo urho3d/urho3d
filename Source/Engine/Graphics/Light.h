@@ -53,7 +53,7 @@ static const int MAX_CASCADE_SPLITS = 2;
 #endif
 
 /// Shadow depth bias parameters.
-struct BiasParameters
+struct URHO3D_API BiasParameters
 {
     /// Construct undefined.
     BiasParameters()
@@ -77,7 +77,7 @@ struct BiasParameters
 };
 
 /// Cascaded shadow map parameters.
-struct CascadeParameters
+struct URHO3D_API CascadeParameters
 {
     /// Construct undefined.
     CascadeParameters()
@@ -117,7 +117,7 @@ struct CascadeParameters
 };
 
 /// Shadow map focusing parameters.
-struct FocusParameters
+struct URHO3D_API FocusParameters
 {
     /// Construct undefined.
     FocusParameters()
