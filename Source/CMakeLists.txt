@@ -109,7 +109,7 @@ if (NOT IOS AND NOT ANDROID)
 endif ()    
 
 # Urho3D build type is mutually exclusive due to potential different visibility (export) attribute
-if (URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT IOS AND NOT ANDROID)
+if (URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT ANDROID)
     # Urho3D library
     add_subdirectory (Engine)
 else ()
