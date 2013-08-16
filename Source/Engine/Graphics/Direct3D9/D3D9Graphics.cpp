@@ -2143,7 +2143,7 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen)
 
 bool Graphics::CreateInterface()
 {
-    impl_->interface_ = Direct3DCreate9(D3D9b_SDK_VERSION);
+    impl_->interface_ = Direct3DCreate9(D3D_SDK_VERSION);
     if (!impl_->interface_)
     {
         LOGERROR("Could not create Direct3D9 interface");
