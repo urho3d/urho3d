@@ -39,7 +39,7 @@ endif ()
 
 # Define generated object files
 # This is a hack as it relies on internal working of CMake
-if (MSVC)
+if (WIN32)
     set (OBJ_EXT .obj)
 else ()
     set (OBJ_EXT .o)
