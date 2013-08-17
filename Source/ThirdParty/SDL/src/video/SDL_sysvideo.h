@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "SDL_config.h"
 
 #ifndef _SDL_sysvideo_h
@@ -357,6 +360,10 @@ extern VideoBootStrap Android_bootstrap;
 #endif
 #if SDL_VIDEO_DRIVER_PSP
 extern VideoBootStrap PSP_bootstrap;
+#endif
+// Urho3D: add Raspberry Pi support
+#if SDL_VIDEO_DRIVER_RASPI
+extern VideoBootStrap RASPI_bootstrap;
 #endif
 #if SDL_VIDEO_DRIVER_DUMMY
 extern VideoBootStrap DUMMY_bootstrap;

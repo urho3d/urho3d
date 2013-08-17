@@ -25,6 +25,37 @@ msg() {
     echo -e "\n$1\n================================================================================================="
 }
 
+post_cmake() {
+    # Check if xmlstarlet software package is available for fixing the generated Eclipse project setting to get source code versioning to work
+    if [ $HAS_XMLSTARLET ]; then
+        # Move the Eclipse project setting files back to Source folder
+        echo -- Eclipse project setting files have been relocated to: $( pwd )/Source
+        for f in .project .cproject; do mv $1/$f Source; done
+
+        #
+        # Remove build type from project name
+        # Replace [Source directory] linked resource to [Build] instead
+        # Modify build argument to first change directory to Build folder
+        #
+        xmlstarlet ed -P -L \
+            -u "/projectDescription/name/text()" -x "concat(substring-before(/projectDescription/name/text(), '-Release'), substring-before(/projectDescription/name/text(), '-Debug'), substring-before(/projectDescription/name/text(), '-RelWithDebInfo'))" \
+            -u "/projectDescription/linkedResources/link/name/text()[. = '[Source directory]']" -v "[Build]" \
+            -u "/projectDescription/linkedResources/link/location[../name/text() = '[Build]']" -v "$( pwd )/$1" \
+            -u "/projectDescription/buildSpec/buildCommand/arguments/dictionary/value[../key/text() = 'org.eclipse.cdt.make.core.build.arguments']" -x "concat('-C ../$1 ', .)" \
+            Source/.project
+        #
+        # Fix source path entry to Source folder and modify its filter condition
+        # Fix output path entry to [Build] linked resource and modify its filter condition
+        #
+        xmlstarlet ed -P -L \
+            -u "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'src']/@path" -v "" \
+            -s "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'src']" -t attr -n "excluding" -v "[Subprojects]/|[Targets]/" \
+            -u "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'out']/@path" -v "[Build]" \
+            -u "/cproject/storageModule/cconfiguration/storageModule/pathentry[@kind = 'out']/@excluding" -x "substring-after(., '[Source directory]/|')" \
+            Source/.cproject
+    fi
+}
+
 # Ensure we are in project root directory
 cd $( dirname $0 )
 SOURCE=`pwd`/Source
@@ -43,15 +74,15 @@ rm -rf {../build,../raspi-build,../android-build}/CMakeCache.txt {../build,../ra
 # Add support for Eclipse IDE
 IFS=#
 GENERATOR="Unix Makefiles"
-[[ $1 =~ ^eclipse$ ]] && GENERATOR="Eclipse CDT4 - Unix Makefiles" && shift
+[[ $1 =~ ^eclipse$ ]] && GENERATOR="Eclipse CDT4 - Unix Makefiles" && shift && xmlstarlet --version >/dev/null 2>&1 && HAS_XMLSTARLET=1
 
 # Add support for both native and cross-compiling build for Raspberry Pi
 [[ $( uname -p ) =~ ^armv6 ]] && PLATFORM="-DRASPI=1"
 
 # Create project with the respective Cmake generators
 OPT=
-msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $SOURCE $@
-[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/raspberrypi.toolchain.cmake $SOURCE $@
+msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $SOURCE $@ && post_cmake Build
+[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/raspberrypi.toolchain.cmake $SOURCE $@ #&& post_cmake raspi-Build # Can only fix either native or raspi build, but not both as there is only one Source folder
 [ $ANDROID_NDK ] && msg "Android build" && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $SOURCE $@
 unset IFS
 

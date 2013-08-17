@@ -364,15 +364,15 @@ cmake_xxxx batch files or shell scripts.
 |                      |  Vista and above only)                                |
 |-DUSE_STATIC_RUNTIME=1|to use static C/C++ runtime libraries and eliminate the|
 |                      |  need for runtime DLLs installation (VS only)         |
-|-DSCP_TO_TARGET=      |to automatically scp executables to target system (only|
-|  usr@tgt:remote-loc  | applicable for cross compiling Raspberry Pi on a      |
-|                      | build/host machine), SSH digital key must be setup    |
-|                      | first for this to work                                |
+|-DSCP_TO_TARGET=      |to automatically scp executables to target system      |
+|  usr@tgt:remote-loc  | (Raspberry Pi cross-compiling build only), SSH digital|
+|                      | key must be setup first for this to work              | 
 |-DCMAKE_BUILD_TYPE=   |to tell CMake which build configuration to be          |
-|  Release/Debug/      | generated, default is Release (only applicable for    |
-|  RelWithDebInfo      | cmake_gcc.sh and cmake_eclipse.sh)                    |
+|  Release/Debug/      | generated, default is Release (cmake_gcc.sh and       |
+|  RelWithDebInfo      | cmake_eclipse.sh only)                                |
 |-DURHO3D_BUILD_TYPE=  |to tell CMake which Urho3D target to be built, default |
 |  EXE/STATIC/SHARED   | is EXE (Urho3D script host)                           |          
+|-DANDROID_ABI=armeabi |to build armeabi native code (Android build only)      |
 |----------------------|-------------------------------------------------------|
 
 

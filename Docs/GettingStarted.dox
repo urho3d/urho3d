@@ -132,9 +132,10 @@ A number of build options can be defined explicitly when invoking the above cmak
 |-DUSE_OPENGL=1                               |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)|
 |-DUSE_MKLINK=1                               |to use mklink command to create symbolic links (Windows Vista and above only)|
 |-DUSE_STATIC_RUNTIME=1                       |to use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
-|-DSCP_TO_TARGET=user\@target:remote-location |to automatically scp executables to target system (only applicable for cross compiling Raspberry Pi on a build/host machine), SSH digital key must be setup first for this to work|
-|-DCMAKE_BUILD_TYPE=Release/Debug/RelWithDebInfo |to tell CMake which build configuration to be generated, default is Release (only applicable for cmake_gcc.sh and cmake_eclipse.sh)|
+|-DSCP_TO_TARGET=user\@target:remote-location |to automatically scp executables to target system (Raspberry Pi cross-compiling build only), SSH digital key must be setup first for this to work|
+|-DCMAKE_BUILD_TYPE=Release/Debug/RelWithDebInfo |to tell CMake which build configuration to be generated, default is Release (cmake_gcc.sh and cmake_eclipse.sh only)|
 |-DURHO3D_BUILD_TYPE=EXE/STATIC/SHARED        |to tell CMake which Urho3D target to be built, default is EXE (Urho3D script host application)|
+|-DANDROID_ABI=armeabi                        |to build armeabi native code (Android build only)|
 
 
 \page Running Running Urho3D script host application
