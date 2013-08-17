@@ -140,11 +140,7 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
         // Add .exe extension if no extension defined
         if (GetExtension(fixedFileName).Empty())
             fixedFileName += ".exe";
-
-        // If executable is not found, try cwd-relative path as a fallback
-        if (!FileExists(fixedFileName))
-            fixedFileName = GetNativePath(GetCurrentDir() + GetFileNameAndExtension(fixedFileName));
-
+        
         String commandLine = "\"" + fixedFileName + "\"";
         for (unsigned i = 0; i < arguments.Size(); ++i)
             commandLine += " " + arguments[i];
@@ -170,10 +166,6 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
 
         return exitCode;
         #else
-        // If executable is not found, try cwd-relative path as a fallback
-        if (!FileExists(fixedFileName))
-            fixedFileName = GetNativePath(GetCurrentDir() + GetFileNameAndExtension(fixedFileName));
-        
         pid_t pid = fork();
         if (!pid)
         {
@@ -445,33 +437,47 @@ void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const S
 
 String FileSystem::GetProgramDir() const
 {
+    // Return cached value if possible
+    if (!programDir_.Empty())
+        return programDir_;
+    
     #if defined(ANDROID)
     // This is an internal directory specifier pointing to the assets in the .apk
     // Files from this directory will be opened using special handling
-    return "/apk/";
+    programDir_ = "/apk/";
+    return programDir_;
     #elif defined(IOS)
-    return AddTrailingSlash(SDL_IOS_GetResourceDir());
+    programDir_ = AddTrailingSlash(SDL_IOS_GetResourceDir());
+    return programDir_;
     #elif defined(WIN32)
     wchar_t exeName[MAX_PATH];
     exeName[0] = 0;
     GetModuleFileNameW(0, exeName, MAX_PATH);
-    return GetPath(String(exeName));
+    programDir_ = GetPath(String(exeName));
     #elif defined(__APPLE__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
     unsigned size = MAX_PATH;
     _NSGetExecutablePath(exeName, &size);
-    return GetPath(String(exeName));
+    programDir_ = GetPath(String(exeName));
     #elif defined(__linux__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
     pid_t pid = getpid();
     String link = "/proc/" + String(pid) + "/exe";
     readlink(link.CString(), exeName, MAX_PATH);
-    return GetPath(String(exeName));
-    #else
-    return String();
+    programDir_ = GetPath(String(exeName));
     #endif
+    
+    // If the executable directory does not contain CoreData & Data directories, but the current working directory does, use the
+    // current working directory instead
+    /// \todo Should not rely on such fixed convention
+    String currentDir = GetCurrentDir();
+    if (!DirExists(programDir_ + "CoreData") && !DirExists(programDir_ + "Data") && (DirExists(currentDir + "CoreData") ||
+        DirExists(currentDir + "Data")))
+        programDir_ = currentDir;
+    
+    return programDir_;
 }
 
 String FileSystem::GetUserDocumentsDir() const

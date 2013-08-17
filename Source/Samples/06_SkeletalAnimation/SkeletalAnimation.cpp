@@ -95,7 +95,6 @@ void SkeletalAnimation::CreateScene()
     // Create a Zone component for ambient lighting & fog color control
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
-    // Set same volume as the Octree, set a close bluish fog and some ambient light
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
     zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
@@ -129,7 +128,7 @@ void SkeletalAnimation::CreateScene()
         // but we need to update the model's position manually in any case
         Animation* walkAnimation = cache->GetResource<Animation>("Models/Jack_Walk.ani");
         AnimationState* state = modelObject->AddAnimationState(walkAnimation);
-        // Enable looping and full blending weight
+        // Enable full blending weight and looping
         state->SetWeight(1.0f);
         state->SetLooped(true);
     }

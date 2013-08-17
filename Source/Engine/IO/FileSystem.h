@@ -79,7 +79,7 @@ public:
     bool DirExists(const String& pathName) const;
     /// Scan a directory for specified files.
     void ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const;
-    /// Return the program's directory.
+    /// Return the program's directory. If it does not contain the Urho3D default CoreData and Data directories, and the current working directory does, return the working directory instead.
     String GetProgramDir() const;
     /// Return the user documents directory.
     String GetUserDocumentsDir() const;
@@ -90,6 +90,8 @@ private:
     
     /// Allowed directories.
     HashSet<String> allowedPaths_;
+    /// Cached program directory.
+    mutable String programDir_;
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase.
