@@ -32,6 +32,7 @@ namespace Urho3D
 class Cursor;
 class Graphics;
 class ResourceCache;
+class Timer;
 class UIBatch;
 class UIElement;
 class VertexBuffer;

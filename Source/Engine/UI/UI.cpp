@@ -1067,6 +1067,20 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
         element->OnClick(element->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
         SendClickEvent(E_UIMOUSECLICK, element, pos, MOUSEB_LEFT, MOUSEB_LEFT, 0);
         
+        // Fire double click event if element matches and is in time
+        if (doubleClickElement_ && element == doubleClickElement_ && clickTimer_->GetMSec(true) <
+            (unsigned)(doubleClickInterval_ * 1000))
+        {
+            element->OnDoubleClick(element->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
+            doubleClickElement_.Reset();
+            SendClickEvent(E_UIMOUSEDOUBLECLICK, element, pos, MOUSEB_LEFT, MOUSEB_LEFT, 0);
+        }
+        else
+        {
+            doubleClickElement_ = element;
+            clickTimer_->Reset();
+        }
+        
         // Handle start of drag. Click handling may have caused destruction of the element, so check the pointer again
         if (element && !dragElement_ )
         {
