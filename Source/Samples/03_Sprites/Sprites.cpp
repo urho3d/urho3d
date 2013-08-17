@@ -20,8 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Engine.h"
 #include "CoreEvents.h"
+#include "Engine.h"
 #include "Graphics.h"
 #include "ResourceCache.h"
 #include "Texture2D.h"

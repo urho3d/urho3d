@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Engine.h"
 #include "Camera.h"
 #include "CoreEvents.h"
+#include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
 #include "Input.h"
@@ -110,9 +110,8 @@ void AnimatingScene::CreateScene()
         rotator->SetRotationSpeed(Vector3(10.0f, 20.0f, 30.0f));
     }
     
-    // Create a scene node for the camera, which we will move around. Let the starting position be at the world origin.
-    // As the fog limits maximum visible distance, we can bring the far clip plane closer for more effective culling
-    // of distant objects
+    // Create the camera. Let the starting position be at the world origin. As the fog limits maximum visible distance, we can
+    // bring the far clip plane closer for more effective culling of distant objects
     cameraNode_ = scene_->CreateChild("Camera");
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(100.0f);

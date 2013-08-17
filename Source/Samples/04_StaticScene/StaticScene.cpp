@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Engine.h"
 #include "Camera.h"
 #include "CoreEvents.h"
+#include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
 #include "Input.h"

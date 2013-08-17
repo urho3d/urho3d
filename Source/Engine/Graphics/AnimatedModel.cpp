@@ -609,11 +609,6 @@ AnimationState* AnimatedModel::GetAnimationState(const String& animationName) co
     return GetAnimationState(StringHash(animationName));
 }
 
-AnimationState* AnimatedModel::GetAnimationState(const char* animationName) const
-{
-    return GetAnimationState(StringHash(animationName));
-}
-
 AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const
 {
     for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)

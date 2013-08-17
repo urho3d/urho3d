@@ -21,7 +21,6 @@ class AnimatedModel : public StaticModel
     unsigned GetNumAnimationStates() const;
     AnimationState* GetAnimationState(Animation* animation) const;
     AnimationState* GetAnimationState(const String& animationName) const;
-    AnimationState* GetAnimationState(const char* animationName) const;
     AnimationState* GetAnimationState(const StringHash animationNameHash) const;
     AnimationState* GetAnimationState(unsigned index) const;
     float GetAnimationLodBias() const;

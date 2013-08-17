@@ -20,9 +20,6 @@
 # THE SOFTWARE.
 #
 
-# Disable unnecessary build types
-set (CMAKE_CONFIGURATION_TYPES "RelWithDebInfo;Debug;Release" CACHE STRING "Configurations" FORCE)
-
 # Set the build type if not explicitly set, for single-configuration generator only
 if (CMAKE_GENERATOR STREQUAL Xcode)
     set (XCODE TRUE)
