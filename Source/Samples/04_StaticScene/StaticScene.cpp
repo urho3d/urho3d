@@ -83,8 +83,8 @@ void StaticScene::CreateScene()
     // plane mesh with a "stone" material. Note that naming the scene nodes is optional. Scale the scene node larger
     // (100 x 100 world units)
     Node* planeNode = scene_->CreateChild("Plane");
-    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
+    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
     
@@ -106,10 +106,10 @@ void StaticScene::CreateScene()
     for (unsigned i = 0; i < NUM_OBJECTS; ++i)
     {
         Node* mushroomNode = scene_->CreateChild("Mushroom");
-        StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
         mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
         mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
         mushroomNode->SetScale(1.0f + Random(1.0f));
+        StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
         mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
     }

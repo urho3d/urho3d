@@ -30,7 +30,7 @@
 #include "Font.h"
 #include "Graphics.h"
 #include "Input.h"
-#include "Log.h"
+#include "Light.h"
 #include "Material.h"
 #include "Model.h"
 #include "Octree.h"
@@ -87,8 +87,8 @@ void SkeletalAnimation::CreateScene()
     
     // Create scene node & StaticModel component for showing a static plane
     Node* planeNode = scene_->CreateChild("Plane");
-    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
+    StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
     
@@ -116,9 +116,9 @@ void SkeletalAnimation::CreateScene()
     for (unsigned i = 0; i < NUM_OBJECTS; ++i)
     {
         Node* modelNode = scene_->CreateChild("Jack");
-        AnimatedModel* modelObject = modelNode->CreateComponent<AnimatedModel>();
         modelNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
         modelNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
+        AnimatedModel* modelObject = modelNode->CreateComponent<AnimatedModel>();
         modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
         modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
         modelObject->SetCastShadows(true);

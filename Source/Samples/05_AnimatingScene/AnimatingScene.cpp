@@ -98,12 +98,13 @@ void AnimatingScene::CreateScene()
     for (unsigned i = 0; i < NUM_OBJECTS; ++i)
     {
         Node* boxNode = scene_->CreateChild("Box");
-        StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
         boxNode->SetPosition(Vector3(Random(200.0f) - 100.0f, Random(200.0f) - 100.0f, Random(200.0f) - 100.0f));
         // Orient using random pitch, yaw and roll Euler angles
         boxNode->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
+        StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
         boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+        
         // Add our custom Rotator component which will rotate the scene node each frame, when the scene sends its update event.
         // Simply set same rotation speed for all objects
         Rotator* rotator = boxNode->CreateComponent<Rotator>();

@@ -28,21 +28,19 @@
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// Skeletal animation example.
+/// Billboard example.
 /// This sample demonstrates:
-///     - Populating a 3D scene with skeletally animated AnimatedModel components;
-///     - Moving the animated models and advancing their animation;
-///     - Enabling a cascaded shadow map on a directional light, which allows high-quality shadows from
-///       over a large area (typically used in outdoor scenes for shadows cast by sunlight);
-///     - Displaying renderer debug geometry;
-class SkeletalAnimation : public Sample
+///     - Populating a 3D scene with billboard sets and several shadow casting spotlights;
+///     - Parenting scene nodes to allow more intuitive creation of groups of objects;
+///     - Examining rendering performance with a somewhat large object and light count;
+class Billboards : public Sample
 {
     // Mandatory when deriving from Object, enables type information
-    OBJECT(SkeletalAnimation)
+    OBJECT(Billboards)
 
 public:
     /// Construct.
-    SkeletalAnimation(Context* context);
+    Billboards(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
@@ -56,8 +54,8 @@ private:
     void SetupViewport();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
-    /// Moves the animated models that have been created.
-    void MoveModels(float timeStep);
+    /// Animates the scene.
+    void AnimateScene(float timeStep);
     /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
     /// Callback method invoked when a logic update event is dispatched.

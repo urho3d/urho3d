@@ -34,7 +34,7 @@
 // Number of sprites to draw
 static const unsigned NUM_SPRITES = 100;
 
-// User variable identifier for storing sprite velocity within the UI element
+// Custom variable identifier for storing sprite velocity within the UI element
 static const ShortStringHash VAR_VELOCITY("Velocity");
 
 // Expands to this example's entry-point
