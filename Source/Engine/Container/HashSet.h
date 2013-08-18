@@ -31,7 +31,7 @@ namespace Urho3D
 {
 
 /// Hash set template class.
-template <class T> class URHO3D_API HashSet : public HashBase
+template <class T> class HashSet : public HashBase
 {
 public:
     /// Hash set node.

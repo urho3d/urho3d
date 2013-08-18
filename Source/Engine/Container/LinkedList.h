@@ -41,7 +41,7 @@ struct URHO3D_API LinkedListNode
 };
 
 /// Singly-linked list template class. Elements must inherit from LinkedListNode.
-template <class T> class URHO3D_API LinkedList
+template <class T> class LinkedList
 {
 public:
     /// Construct empty.

@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 /// Doubly-linked list template class.
-template <class T> class URHO3D_API List : public ListBase
+template <class T> class List : public ListBase
 {
 public:
     /// %List node.
