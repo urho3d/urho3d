@@ -51,6 +51,9 @@ void UpdateEditorPreferencesDialog()
     CheckBox@ showInternalUIElementToggle = preferencesDialog.GetChild("ShowInternalUIElement", true);
     showInternalUIElementToggle.checked = showInternalUIElement;
 
+    CheckBox@ showTemporaryObjectToggle = preferencesDialog.GetChild("ShowTemporaryObject", true);
+    showTemporaryObjectToggle.checked = showTemporaryObject;
+
     CheckBox@ showNonEditableAttributeToggle = preferencesDialog.GetChild("ShowNonEditableAttribute", true);
     showNonEditableAttributeToggle.checked = showNonEditableAttribute;
 
@@ -71,6 +74,7 @@ void UpdateEditorPreferencesDialog()
         SubscribeToEvent(uiMinOpacityEdit, "TextFinished", "EditUIMinOpacity");
         SubscribeToEvent(uiMaxOpacityEdit, "TextFinished", "EditUIMaxOpacity");
         SubscribeToEvent(showInternalUIElementToggle, "Toggled", "ToggleShowInternalUIElement");
+        SubscribeToEvent(showTemporaryObjectToggle, "Toggled", "ToggleShowTemporaryObject");
         SubscribeToEvent(showNonEditableAttributeToggle, "Toggled", "ToggleShowNonEditableAttribute");
         SubscribeToEvent(originalAttributeTextColorEditR, "TextFinished", "EditOriginalAttributeTextColor");
         SubscribeToEvent(originalAttributeTextColorEditG, "TextFinished", "EditOriginalAttributeTextColor");
@@ -120,6 +124,13 @@ void EditUIMaxOpacity(StringHash eventType, VariantMap& eventData)
 void ToggleShowInternalUIElement(StringHash eventType, VariantMap& eventData)
 {
     showInternalUIElement = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
+    UpdateHierarchyItem(editorUIElement, true);
+}
+
+void ToggleShowTemporaryObject(StringHash eventType, VariantMap& eventData)
+{
+    showTemporaryObject = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
+    UpdateHierarchyItem(editorScene, true);
     UpdateHierarchyItem(editorUIElement, true);
 }
 

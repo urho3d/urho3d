@@ -335,7 +335,11 @@ public:
     Node* CreateChild(unsigned id, CreateMode mode);
     /// Add a pre-created component.
     void AddComponent(Component* component, unsigned id, CreateMode mode);
-
+    /// Calculate number of non-temporary child nodes.
+    unsigned GetNumPersistentChildren() const;
+    /// Calculate number of non-temporary components.
+    unsigned GetNumPersistentComponents() const;
+    
 protected:
     /// User variables.
     VariantMap vars_;

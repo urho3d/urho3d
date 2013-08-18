@@ -154,6 +154,7 @@ void LoadConfig()
     if (!hierarchyElem.isNull)
     {
         if (hierarchyElem.HasAttribute("showinternaluielement")) showInternalUIElement = hierarchyElem.GetBool("showinternaluielement");
+        if (hierarchyElem.HasAttribute("showtemporaryobject")) showTemporaryObject = hierarchyElem.GetBool("showtemporaryobject");
     }
 
     if (!inspectorElem.isNull)
@@ -218,6 +219,7 @@ void SaveConfig()
     uiElem.SetFloat("maxopacity", uiMaxOpacity);
 
     hierarchyElem.SetBool("showinternaluielement", showInternalUIElement);
+    hierarchyElem.SetBool("showtemporaryobject", showTemporaryObject);
 
     inspectorElem.SetColor("originalcolor", normalTextColor);
     inspectorElem.SetColor("modifiedcolor", modifiedTextColor);

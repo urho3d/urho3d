@@ -32,41 +32,6 @@
 namespace Urho3D
 {
 
-static float Sin(float angle)
-{
-    return sinf(angle * M_DEGTORAD);
-}
-
-static float Cos(float angle)
-{
-    return cosf(angle * M_DEGTORAD);
-}
-
-static float Tan(float angle)
-{
-    return tanf(angle * M_DEGTORAD);
-}
-
-static float Asin(float x)
-{
-    return M_RADTODEG * asinf(Clamp(x, -1.0f, 1.0f));
-}
-
-static float Acos(float x)
-{
-    return M_RADTODEG * acosf(Clamp(x, -1.0f, 1.0f));
-}
-
-static float Atan(float x)
-{
-    return M_RADTODEG * atanf(x);
-}
-
-static float Atan2(float y, float x)
-{
-    return M_RADTODEG * atan2f(y, x);
-}
-
 static void RegisterMathFunctions(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_INFINITY);

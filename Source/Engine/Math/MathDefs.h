@@ -56,6 +56,8 @@ enum Intersection
     INSIDE
 };
 
+/// Check whether two floating point values are equal within accuracy.
+inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs; }
 /// Linear interpolation between two float values.
 inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
 /// Return the smaller of two floats.
@@ -76,8 +78,21 @@ inline float Clamp(float value, float min, float max)
         return value;
 }
 
-/// Check whether two floating point values are equal within accuracy.
-inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs; }
+/// Return sine of an angle in degrees.
+inline float Sin(float angle) { return sinf(angle * M_DEGTORAD); }
+/// Return cosine of an angle in degrees.
+inline float Cos(float angle) { return cosf(angle * M_DEGTORAD); }
+/// Return tangent of an angle in degrees.
+inline float Tan(float angle) { return tanf(angle * M_DEGTORAD); }
+/// Return arc sine in degrees.
+inline float Asin(float x) { return M_RADTODEG * asinf(Clamp(x, -1.0f, 1.0f)); }
+/// Return arc cosine in degrees.
+inline float Acos(float x) { return M_RADTODEG * acosf(Clamp(x, -1.0f, 1.0f)); }
+/// Return arc tangent in degrees.
+inline float Atan(float x) { return M_RADTODEG * atanf(x); }
+/// Return arc tangent of y/x in degrees.
+inline float Atan2(float y, float x) { return M_RADTODEG * atan2f(y, x); }
+
 /// Return the smaller of two integers.
 inline int Min(int lhs, int rhs) { return lhs < rhs ? lhs : rhs; }
 /// Return the larger of two integers.

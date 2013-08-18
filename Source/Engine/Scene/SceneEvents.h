@@ -141,4 +141,10 @@ EVENT(E_COMPONENTENABLEDCHANGED, ComponentEnabledChanged)
     PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
+/// A serializable's temporary state has changed.
+EVENT(E_TEMPORARYCHANGED, TemporaryChanged)
+{
+    PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+}
+
 }

@@ -43,9 +43,6 @@
 
 #include "DebugNew.h"
 
-// Custom variable identifier for storing light angle into the light scene nodes
-static const ShortStringHash VAR_ANGLE("Angle");
-
 // Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(Billboards)
 
@@ -117,22 +114,22 @@ void Billboards::CreateScene()
         }
     }
     
-    // Create groups of mushrooms, which act as shadows casters
-    const unsigned NUM_MUSHROOMGROUPS = 20;
-    const unsigned NUM_MUSHROOMS = 50;
+    // Create groups of mushrooms, which act as shadow casters
+    const unsigned NUM_MUSHROOMGROUPS = 25;
+    const unsigned NUM_MUSHROOMS = 25;
     
     for (unsigned i = 0; i < NUM_MUSHROOMGROUPS; ++i)
     {
         // First create a scene node for the group. The individual mushrooms nodes will be created as children
         Node* groupNode = scene_->CreateChild("MushroomGroup");
-        groupNode->SetPosition(Vector3(Random(180.0f) - 90.0f, 0.0f, Random(180.0f) - 90.0f));
+        groupNode->SetPosition(Vector3(Random(190.0f) - 95.0f, 0.0f, Random(190.0f) - 95.0f));
         
         for (unsigned j = 0; j < NUM_MUSHROOMS; ++j)
         {
             Node* mushroomNode = groupNode->CreateChild("Mushroom");
-            mushroomNode->SetPosition(Vector3(Random(20.0f) - 10.0f, 0.0f, Random(20.0f) - 10.0f));
+            mushroomNode->SetPosition(Vector3(Random(25.0f) - 12.5f, 0.0f, Random(25.0f) - 12.5f));
             mushroomNode->SetRotation(Quaternion(0.0f, Random() * 360.0f, 0.0f));
-            mushroomNode->SetScale(1.0f + Random() * 2.0f);
+            mushroomNode->SetScale(1.0f + Random() * 4.0f);
             StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
             mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
             mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
@@ -141,13 +138,13 @@ void Billboards::CreateScene()
     }
     
     // Create billboard sets (floating smoke)
-    const unsigned NUM_BILLBOARDNODES = 30;
+    const unsigned NUM_BILLBOARDNODES = 40;
     const unsigned NUM_BILLBOARDS = 15;
 
     for (unsigned i = 0; i < NUM_BILLBOARDNODES; ++i)
     {
         Node* smokeNode = scene_->CreateChild("Smoke");
-        smokeNode->SetPosition(Vector3(Random(200.0f) - 100.0f, Random(15.0f) + 10.0f, Random(200.0f) - 100.0f));
+        smokeNode->SetPosition(Vector3(Random(200.0f) - 100.0f, Random(20.0f) + 10.0f, Random(200.0f) - 100.0f));
         
         BillboardSet* billboardObject = smokeNode->CreateComponent<BillboardSet>();
         billboardObject->SetNumBillboards(NUM_BILLBOARDS);
@@ -168,30 +165,25 @@ void Billboards::CreateScene()
     }
     
     // Create shadow casting spotlights
-    const unsigned NUM_LIGHTS = 20;
+    const unsigned NUM_LIGHTS = 9;
     
     for (unsigned i = 0; i < NUM_LIGHTS; ++i)
     {
         Node* lightNode = scene_->CreateChild("Light");
         Light* light = lightNode->CreateComponent<Light>();
-
-        Vector3 position(Random(150.0f) - 75.0f, Random(30.f) + 30.0f, Random(150.0f) - 75.0f);
-        Color color((Rand() & 1) * 0.5f + 0.5f, (Rand() & 1) * 0.5f + 0.5f, (Rand() & 1) * 0.5f + 0.5f);
-        // If color is dark grey, use white instead
-        if (color.r_ == 0.5f && color.g_ == 0.5f && color.b_ == 0.5f)
-            color = Color(1.0f, 1.0f, 1.0f);
-
-        float angle = Random() * 360.0f;
-
+        
+        float angle = 0.0f;
+        
+        Vector3 position((i % 3) * 60.0f - 60.0f, 45.0f, (i / 3) * 60.0f - 60.0f);
+        Color color(((i + 1) & 1) * 0.5f + 0.5f, (((i + 1) >> 1) & 1) * 0.5f + 0.5f, (((i + 1) >> 2) & 1) * 0.5f + 0.5f);
+        
         lightNode->SetPosition(position);
-        lightNode->SetDirection(Vector3(sinf(angle * M_DEGTORAD), -1.0f, cosf(angle * M_DEGTORAD)));
-        // Store the original angle as a custom variable of the node
-        lightNode->SetVar(VAR_ANGLE, angle);
+        lightNode->SetDirection(Vector3(Sin(angle), -1.5f, Cos(angle)));
         
         light->SetLightType(LIGHT_SPOT);
-        light->SetRange(75.0f);
+        light->SetRange(90.0f);
         light->SetRampTexture(cache->GetResource<Texture2D>("Textures/RampExtreme.png"));
-        light->SetFov(15.0f);
+        light->SetFov(45.0f);
         light->SetColor(color);
         light->SetSpecularIntensity(1.0f);
         light->SetCastShadows(true);
@@ -284,19 +276,12 @@ void Billboards::AnimateScene(float timeStep)
     scene_->GetChildrenWithComponent<Light>(lightNodes);
     scene_->GetChildrenWithComponent<BillboardSet>(billboardNodes);
     
-    const float LIGHT_ROTATION_SPEED = 10.0f;
+    const float LIGHT_ROTATION_SPEED = 20.0f;
     const float BILLBOARD_ROTATION_SPEED = 50.0f;
     
-    // Rotate the lights
+    // Rotate the lights around the world Y-axis
     for (unsigned i = 0; i < lightNodes.Size(); ++i)
-    {
-        Node* lightNode = lightNodes[i];
-        
-        float angle = lightNode->GetVar(VAR_ANGLE).GetFloat();
-        angle += LIGHT_ROTATION_SPEED * timeStep;
-        lightNode->SetDirection(Vector3(sinf(angle * M_DEGTORAD), -1.0f, cosf(angle * M_DEGTORAD)));
-        lightNode->SetVar(VAR_ANGLE, angle);
-    }
+        lightNodes[i]->Rotate(Quaternion(0.0f, LIGHT_ROTATION_SPEED * timeStep, 0.0f), true);
     
     // Rotate the individual billboards within the billboard sets, then recommit to make the changes visible
     for (unsigned i = 0; i < billboardNodes.Size(); ++i)

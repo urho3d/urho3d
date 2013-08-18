@@ -433,11 +433,10 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         
         Vector2 size(billboard.size_.x_ * billboardScale.x_, billboard.size_.y_ * billboardScale.y_);
         unsigned color = billboard.color_.ToUInt();
-        float angleRad = billboard.rotation_ * M_DEGTORAD;
         
         float rotationMatrix[2][2];
-        rotationMatrix[0][0] = cosf(angleRad);
-        rotationMatrix[0][1] = sinf(angleRad);
+        rotationMatrix[0][0] = Cos(billboard.rotation_);
+        rotationMatrix[0][1] = Sin(billboard.rotation_);
         rotationMatrix[1][0] = -rotationMatrix[0][1];
         rotationMatrix[1][1] = rotationMatrix[0][0];
         

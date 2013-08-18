@@ -355,7 +355,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     invRange = 1.0f / Max(vertexLight->GetRange(), M_EPSILON);
                 if (type == LIGHT_SPOT)
                 {
-                    cutoff = cosf(vertexLight->GetFov() * 0.5f * M_DEGTORAD);
+                    cutoff = Cos(vertexLight->GetFov() * 0.5f);
                     invCutoff = 1.0f / (1.0f - cutoff);
                 }
                 else

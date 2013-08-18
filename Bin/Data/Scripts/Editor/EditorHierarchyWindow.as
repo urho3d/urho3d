@@ -21,6 +21,7 @@ ListView@ hierarchyList;
 const uint UI_ELEMENT_BASE_ID = 1;
 uint uiElementNextID = UI_ELEMENT_BASE_ID;
 bool showInternalUIElement = false;
+bool showTemporaryObject = false;
 Array<uint> hierarchyUpdateSelections;
 
 Variant GetUIElementID(UIElement@ element)
@@ -75,6 +76,7 @@ void CreateHierarchyWindow()
     SubscribeToEvent(editorScene, "NodeNameChanged", "HandleNodeNameChanged");
     SubscribeToEvent(editorScene, "NodeEnabledChanged", "HandleNodeEnabledChanged");
     SubscribeToEvent(editorScene, "ComponentEnabledChanged", "HandleComponentEnabledChanged");
+    SubscribeToEvent("TemporaryChanged", "HandleTemporaryChanged");
 }
 
 bool ShowHierarchyWindow()
@@ -204,14 +206,16 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
             for (uint i = 0; i < node.numComponents; ++i)
             {
                 Component@ component = node.components[i];
-                AddComponentItem(itemIndex++, component, text);
+                if (showTemporaryObject || !component.temporary)
+                    AddComponentItem(itemIndex++, component, text);
             }
 
             // Then update child nodes recursively
             for (uint i = 0; i < node.numChildren; ++i)
             {
                 Node@ childNode = node.children[i];
-                itemIndex = UpdateHierarchyItem(itemIndex, childNode, text);
+                if (showTemporaryObject || !childNode.temporary)
+                    itemIndex = UpdateHierarchyItem(itemIndex, childNode, text);
             }
 
             break;
@@ -232,11 +236,11 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
             text.text = GetUIElementTitle(element);
             SetIconEnabledColor(text, element.visible);
 
-            // update child elements recursively
+            // Update child elements recursively
             for (uint i = 0; i < element.numChildren; ++i)
             {
                 UIElement@ childElement = element.children[i];
-                if (showInternalUIElement || !childElement.internal)
+                if ((showInternalUIElement || !childElement.internal) && (showTemporaryObject || !childElement.temporary))
                     itemIndex = UpdateHierarchyItem(itemIndex, childElement, text);
             }
 
@@ -418,32 +422,49 @@ uint GetComponentListIndex(Component@ component)
 
 String GetUIElementTitle(UIElement@ element)
 {
+    String ret;
+
     // Only top level UI-element has this variable
     String modifiedStr = element.GetVar(MODIFIED_VAR).GetBool() ? "*" : "";
-    return (element.name.empty ? element.typeName : element.name) + modifiedStr + " [" + GetUIElementID(element).ToString() + "]";
+    ret = (element.name.empty ? element.typeName : element.name) + modifiedStr + " [" + GetUIElementID(element).ToString() + "]";
+
+    if (element.temporary)
+        ret += " (Temp)";
+
+    return ret;
 }
 
 String GetNodeTitle(Node@ node)
 {
-    String idStr;
-    if (node.id >= FIRST_LOCAL_ID)
-        idStr = "Local " + String(node.id - FIRST_LOCAL_ID);
-    else
-        idStr = String(node.id);
+    String ret;
 
     if (node.name.empty)
-        return node.typeName + " (" + idStr + ")";
+        ret = node.typeName;
     else
-        return node.name + " (" + idStr + ")";
+        ret = node.name;
+
+    if (node.id >= FIRST_LOCAL_ID)
+        ret += " (Local " + String(node.id - FIRST_LOCAL_ID) + ")";
+    else
+        ret += " (" + String(node.id) + ")";
+
+    if (node.temporary)
+        ret += " (Temp)";
+
+    return ret;
 }
 
 String GetComponentTitle(Component@ component)
 {
-    String localStr;
-    if (component.id >= FIRST_LOCAL_ID)
-        localStr = " (Local)";
+    String ret = component.typeName;
 
-    return component.typeName + localStr;
+    if (component.id >= FIRST_LOCAL_ID)
+        ret += " (Local)";
+
+    if (component.temporary)
+        ret += " (Temp)";
+
+    return ret;
 }
 
 void SelectNode(Node@ node, bool multiselect)
@@ -866,7 +887,8 @@ void HandleNodeAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetNode();
-    UpdateHierarchyItem(node);
+    if (showTemporaryObject || !node.temporary)
+        UpdateHierarchyItem(node);
 }
 
 void HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
@@ -887,8 +909,15 @@ void HandleComponentAdded(StringHash eventType, VariantMap& eventData)
     // Insert the newly added component at last component position but before the first child node position of the parent node
     Node@ node = eventData["Node"].GetNode();
     Component@ component = eventData["Component"].GetComponent();
-    uint index = node.numChildren > 0 ? GetListIndex(node.children[0]) : M_MAX_UNSIGNED;
-    UpdateHierarchyItem(index, component, hierarchyList.items[GetListIndex(node)]);
+    if (showTemporaryObject || !component.temporary)
+    {
+        uint nodeIndex = GetListIndex(node);
+        if (nodeIndex != NO_ITEM)
+        {
+            uint index = node.numChildren > 0 ? GetListIndex(node.children[0]) : M_MAX_UNSIGNED;
+            UpdateHierarchyItem(index, component, hierarchyList.items[nodeIndex]);
+        }
+    }
 }
 
 void HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
@@ -937,7 +966,7 @@ void HandleUIElementAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     UIElement@ element = eventData["Element"].GetUIElement();
-    if (showInternalUIElement || !element.internal)
+    if ((showInternalUIElement || !element.internal) && (showTemporaryObject || !element.temporary))
         UpdateHierarchyItem(element);
 }
 
@@ -979,6 +1008,64 @@ void HandleElementAttributeChanged(StringHash eventType, VariantMap& eventData)
     {
         if (editUIElements[i] is element)
             attributesDirty = true;
+    }
+}
+
+void HandleTemporaryChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (suppressSceneChanges || suppressUIElementChanges)
+        return;
+
+    Serializable@ serializable = cast<Serializable>(GetEventSender());
+
+    Node@ node = cast<Node>(serializable);
+    if (node !is null && node.scene is editorScene)
+    {
+        if (showTemporaryObject)
+            UpdateHierarchyItemText(GetListIndex(node), node.enabled);
+        else if (!node.temporary && GetListIndex(node) == NO_ITEM)
+            UpdateHierarchyItem(node);
+        else if (node.temporary)
+            UpdateHierarchyItem(GetListIndex(node), null, null);
+
+        return;
+    }
+
+    Component@ component = cast<Component>(serializable);
+    if (component !is null && component.node !is null && component.node.scene is editorScene)
+    {
+        if (showTemporaryObject)
+            UpdateHierarchyItemText(GetComponentListIndex(component), node.enabled);
+        else if (!component.temporary && GetComponentListIndex(component) == NO_ITEM)
+        {
+            uint nodeIndex = GetListIndex(node);
+            if (nodeIndex != NO_ITEM)
+            {
+                uint index = node.numChildren > 0 ? GetListIndex(node.children[0]) : M_MAX_UNSIGNED;
+                UpdateHierarchyItem(index, component, hierarchyList.items[nodeIndex]);
+            }
+        }
+        else if (component.temporary)
+        {
+            uint index = GetComponentListIndex(component);
+            if (index != NO_ITEM)
+                hierarchyList.RemoveItem(index);
+        }
+
+        return;
+    }
+
+    UIElement@ element = cast<UIElement>(serializable);
+    if (element !is null)
+    {
+        if (showTemporaryObject)
+            UpdateHierarchyItemText(GetListIndex(element), element.visible);
+        else if (!element.temporary && GetListIndex(element) == NO_ITEM)
+            UpdateHierarchyItem(element);
+        else if (element.temporary)
+            UpdateHierarchyItem(GetListIndex(element), null, null);
+
+        return;
     }
 }
 

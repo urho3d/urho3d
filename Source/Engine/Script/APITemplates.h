@@ -383,6 +383,8 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "Variant get_attributes(uint) const", asMETHODPR(T, GetAttribute, (unsigned) const, Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant get_attributeDefaults(uint) const", asMETHODPR(T, GetAttributeDefault, (unsigned) const, Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(uint) const", asFUNCTION(SerializableGetAttributeInfo), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void set_temporary(bool)", asMETHODPR(T, SetTemporary, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_temporary() const", asMETHODPR(T, IsTemporary, () const, bool), asCALL_THISCALL);
     RegisterSubclass<Object, T>(engine, "Serializable", className);
 }
 

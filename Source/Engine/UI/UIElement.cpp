@@ -356,6 +356,9 @@ bool UIElement::SaveXML(XMLElement& dest) const
     for (unsigned i = 0; i < children_.Size(); ++i)
     {
         UIElement* element = children_[i];
+        if (element->IsTemporary())
+            continue;
+        
         XMLElement childElem = dest.CreateChild("element");
         if (!element->SaveXML(childElem))
             return false;

@@ -2,4 +2,8 @@ $#include "Serializable.h"
 
 class Serializable : public Object
 {
+    void SetTemporary(bool enable);
+    bool IsTemporary() const;
+    
+    tolua_property__is_set bool temporary;
 };

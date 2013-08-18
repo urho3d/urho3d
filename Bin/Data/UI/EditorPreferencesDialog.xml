@@ -73,6 +73,18 @@
             <attribute name="Name" value="ShowInternalUIElement" />
         </element>
     </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Border" value="20 0 0 0" />
+        <element type="Text">
+            <attribute name="Text" value="Show temporary objects" />
+        </element>
+        <element type="CheckBox">
+            <attribute name="Name" value="ShowTemporaryObject" />
+        </element>
+    </element>
     <element type="BorderImage" style="EditorDivider" />
     <element>
         <attribute name="Min Size" value="0 17" />

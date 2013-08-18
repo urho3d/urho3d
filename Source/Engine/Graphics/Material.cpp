@@ -360,9 +360,8 @@ void Material::SetUVTransform(const Vector2& offset, float rotation, const Vecto
     transform.m13_ = -0.5f * transform.m11_ + 0.5f;
     
     Matrix3x4 rotationMatrix(Matrix3x4::IDENTITY);
-    float angleRad = rotation * M_DEGTORAD;
-    rotationMatrix.m00_ = cosf(angleRad);
-    rotationMatrix.m01_ = sinf(angleRad);
+    rotationMatrix.m00_ = Cos(rotation);
+    rotationMatrix.m01_ = Sin(rotation);
     rotationMatrix.m10_ = -rotationMatrix.m01_;
     rotationMatrix.m11_ = rotationMatrix.m00_;
     rotationMatrix.m03_ = 0.5f - 0.5f * (rotationMatrix.m00_ + rotationMatrix.m01_);

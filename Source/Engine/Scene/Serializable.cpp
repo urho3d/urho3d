@@ -25,6 +25,7 @@
 #include "Deserializer.h"
 #include "Log.h"
 #include "ReplicationState.h"
+#include "SceneEvents.h"
 #include "Serializable.h"
 #include "Serializer.h"
 #include "StringUtils.h"
@@ -38,7 +39,8 @@ namespace Urho3D
 Serializable::Serializable(Context* context) :
     Object(context),
     networkState_(0),
-    instanceDefaultValues_(0)
+    instanceDefaultValues_(0),
+    temporary_(false)
 {
 }
 
@@ -498,6 +500,21 @@ void Serializable::RemoveInstanceDefault()
 {
     delete instanceDefaultValues_;
     instanceDefaultValues_ = 0;
+}
+
+void Serializable::SetTemporary(bool enable)
+{
+    if (enable != temporary_)
+    {
+        temporary_ = enable;
+        
+        using namespace TemporaryChanged;
+        
+        VariantMap eventData;
+        eventData[P_SERIALIZABLE] = (void*)this;
+        
+        SendEvent(E_TEMPORARYCHANGED, eventData);
+    }
 }
 
 void Serializable::AllocateNetworkState()

@@ -79,6 +79,8 @@ public:
     void ResetToDefault();
     /// Remove instance's default values if they are set previously.
     void RemoveInstanceDefault();
+    /// Set temporary flag. Temporary objects will not be saved.
+    void SetTemporary(bool enable);
     /// Allocate network attribute state.
     void AllocateNetworkState();
     /// Write initial delta network update.
@@ -104,6 +106,8 @@ public:
     unsigned GetNumAttributes() const;
     /// Return number of network replication attributes.
     unsigned GetNumNetworkAttributes() const;
+    /// Return whether is temporary.
+    bool IsTemporary() const { return temporary_; }
 
 protected:
     /// Network attribute state.
@@ -114,8 +118,11 @@ private:
     void SetInstanceDefault(const String& name, const Variant& defaultValue);
     /// Get instance-level default value.
     Variant GetInstanceDefault(const String& name) const;
+    
     /// Attribute default value at each instance level.
     VariantMap* instanceDefaultValues_;
+    /// Temporary flag.
+    bool temporary_;
 };
 
 /// Template implementation of the attribute accessor invoke helper class.

@@ -115,10 +115,13 @@ bool Node::Save(Serializer& dest) const
         return false;
 
     // Write components
-    dest.WriteVLE(components_.Size());
+    dest.WriteVLE(GetNumPersistentComponents());
     for (unsigned i = 0; i < components_.Size(); ++i)
     {
         Component* component = components_[i];
+        if (component->IsTemporary())
+            continue;
+        
         // Create a separate buffer to be able to skip unknown components during deserialization
         VectorBuffer compBuffer;
         if (!component->Save(compBuffer))
@@ -128,10 +131,13 @@ bool Node::Save(Serializer& dest) const
     }
 
     // Write child nodes
-    dest.WriteVLE(children_.Size());
+    dest.WriteVLE(GetNumPersistentChildren());
     for (unsigned i = 0; i < children_.Size(); ++i)
     {
         Node* node = children_[i];
+        if (node->IsTemporary())
+            continue;
+        
         if (!node->Save(dest))
             return false;
     }
@@ -172,6 +178,9 @@ bool Node::SaveXML(XMLElement& dest) const
     for (unsigned i = 0; i < components_.Size(); ++i)
     {
         Component* component = components_[i];
+        if (component->IsTemporary())
+            continue;
+        
         XMLElement compElem = dest.CreateChild("component");
         if (!component->SaveXML(compElem))
             return false;
@@ -181,6 +190,9 @@ bool Node::SaveXML(XMLElement& dest) const
     for (unsigned i = 0; i < children_.Size(); ++i)
     {
         Node* node = children_[i];
+        if (node->IsTemporary())
+            continue;
+        
         XMLElement childElem = dest.CreateChild("node");
         if (!node->SaveXML(childElem))
             return false;
@@ -1250,6 +1262,32 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
 
         scene_->SendEvent(E_COMPONENTADDED, eventData);
     }
+}
+
+unsigned Node::GetNumPersistentChildren() const
+{
+    unsigned ret = 0;
+    
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        if (!(*i)->IsTemporary())
+            ++ret;
+    }
+    
+    return ret;
+}
+
+unsigned Node::GetNumPersistentComponents() const
+{
+    unsigned ret = 0;
+    
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if (!(*i)->IsTemporary())
+            ++ret;
+    }
+    
+    return ret;
 }
 
 void Node::UpdateWorldTransform() const
