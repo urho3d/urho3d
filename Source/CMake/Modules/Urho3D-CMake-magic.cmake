@@ -28,11 +28,6 @@ if (NOT MSVC AND NOT XCODE AND NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE "Release")
 endif ()
 
-# On Visual Studio, whether to enable 64-bit build depends on the generator used
-if (MSVC AND CMAKE_GENERATOR MATCHES "Win64")
-    set (ENABLE_64BIT 1)
-endif ()
-
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
 if (NOT DEFINED ENABLE_SSE)
     set (ENABLE_SSE 1)
@@ -426,7 +421,7 @@ macro (adjust_library_name)
 endmacro ()
 
 # Macro for defining external library dependencies
-# The purpose of this macro is emulate CMake way to set the external library dependencies transitively to a Main target (in other CMake build script) that uses Urho3D static/shared library 
+# The purpose of this macro is emulate CMake to set the external library dependencies transitively to a main target setup but in other project's CMake build script that uses Urho3D static/shared library 
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
     if (${TARGET} MATCHES "SDL|Main")

@@ -117,7 +117,7 @@ else ()
     add_subdirectory (Tools/Urho3D)
 
     # Do not build tools for embedded system unless it is explicitly enabled
-    if (NOT ENABLE_TOOLS)
+    if (NOT DEFINED ENABLE_TOOLS)
         if (RASPI)
             set (ENABLE_TOOLS 0)
         else ()

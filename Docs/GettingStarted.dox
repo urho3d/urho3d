@@ -135,7 +135,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |-DSCP_TO_TARGET=user\@target:remote-location |to automatically scp executables to target system (Raspberry Pi cross-compiling build only), SSH digital key must be setup first for this to work|
 |-DCMAKE_BUILD_TYPE=Release/Debug/RelWithDebInfo |to tell CMake which build configuration to be generated, default is Release (cmake_gcc.sh and cmake_eclipse.sh only)|
 |-DURHO3D_BUILD_TYPE=EXE/STATIC/SHARED        |to tell CMake which Urho3D target to be built, default is EXE (Urho3D script host application)|
-|-DANDROID_ABI=armeabi                        |to build armeabi native code (Android build only)|
+|-DANDROID_ABI=armeabi                        |to build armeabi native code (Android build only), default is armeabi-v7a|
 
 
 \page Running Running Urho3D script host application

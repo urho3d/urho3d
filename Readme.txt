@@ -372,7 +372,8 @@ cmake_xxxx batch files or shell scripts.
 |  RelWithDebInfo      | cmake_eclipse.sh only)                                |
 |-DURHO3D_BUILD_TYPE=  |to tell CMake which Urho3D target to be built, default |
 |  EXE/STATIC/SHARED   | is EXE (Urho3D script host)                           |          
-|-DANDROID_ABI=armeabi |to build armeabi native code (Android build only)      |
+|-DANDROID_ABI=armeabi |to build armeabi native code (Android build only),     |
+|                      | default is armeabi-v7a                                |
 |----------------------|-------------------------------------------------------|
 
 
