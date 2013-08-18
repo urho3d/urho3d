@@ -26,7 +26,8 @@
 namespace Urho3D
 {
 
-const char* GetRevision() {
+const char* GetRevision()
+{
     return revision;
 }
 
