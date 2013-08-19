@@ -28,21 +28,19 @@
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// Skeletal animation example.
+/// Decals example.
 /// This sample demonstrates:
-///     - Populating a 3D scene with skeletally animated AnimatedModel components;
-///     - Moving the animated models and advancing their animation;
-///     - Enabling a cascaded shadow map on a directional light, which allows high-quality shadows from
-///       over a large area (typically used in outdoor scenes for shadows cast by sunlight);
-///     - Displaying renderer debug geometry;
-class SkeletalAnimation : public Sample
+///     - Performing a raycast to the octree and adding a decal to the hit location;
+///     - Marking suitable (large) objects as occluders for occlusion culling;
+///     - Displaying renderer debug geometry to see the effect of occlusion;
+class Decals : public Sample
 {
     // Mandatory when deriving from Object, enables type information
-    OBJECT(SkeletalAnimation)
+    OBJECT(Decals)
 
 public:
     /// Construct.
-    SkeletalAnimation(Context* context);
+    Decals(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
@@ -50,12 +48,14 @@ public:
 private:
     /// Constructs the scene content.
     void CreateScene();
-    /// Constructs an instruction text to the UI.
-    void CreateInstructions();
+    /// Constructs user interface elements.
+    void CreateUI();
     /// Sets up a viewport for displaying the scene.
     void SetupViewport();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
+    /// Paint a decal using a ray cast from the mouse cursor.
+    void PaintDecal();
     /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
     /// Callback method invoked when a logic update event is dispatched.

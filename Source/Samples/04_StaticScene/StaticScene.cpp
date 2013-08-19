@@ -86,13 +86,13 @@ void StaticScene::CreateScene()
     planeNode->SetScale(Vector3(100.0f, 1.0f, 100.0f));
     StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
-    planeObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+    planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
     
     // Create a directional light to the world so that we can see something. The light scene node's orientation controls the
     // light direction; we will use the SetDirection() function which calculates the orientation from a forward direction vector.
     // The light will use default settings (white light, no shadows)
     Node* lightNode = scene_->CreateChild("Directional light");
-    lightNode->SetDirection(Vector3(-1.0f, -1.0f, -1.0f)); // The direction vector does not need to be normalized
+    lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
     
@@ -108,7 +108,7 @@ void StaticScene::CreateScene()
         Node* mushroomNode = scene_->CreateChild("Mushroom");
         mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
         mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
-        mushroomNode->SetScale(1.0f + Random(1.0f));
+        mushroomNode->SetScale(0.5f + Random(2.0f));
         StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
         mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));

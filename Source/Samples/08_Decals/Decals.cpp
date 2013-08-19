@@ -20,12 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Animation.h"
-#include "AnimatedModel.h"
-#include "AnimationState.h"
 #include "Camera.h"
 #include "CoreEvents.h"
+#include "Cursor.h"
 #include "DebugRenderer.h"
+#include "DecalSet.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
@@ -33,32 +32,31 @@
 #include "Light.h"
 #include "Material.h"
 #include "Model.h"
-#include "Mover.h"
 #include "Octree.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
+#include "StaticModel.h"
 #include "Text.h"
 #include "UI.h"
+#include "XMLFile.h"
 #include "Zone.h"
 
-#include "SkeletalAnimation.h"
+#include "Decals.h"
 
 #include "DebugNew.h"
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(SkeletalAnimation)
+DEFINE_APPLICATION_MAIN(Decals)
 
-SkeletalAnimation::SkeletalAnimation(Context* context) :
+Decals::Decals(Context* context) :
     Sample(context),
     yaw_(0.0f),
     pitch_(0.0f),
     drawDebug_(false)
 {
-    // Register an object factory for our custom Mover component so that we can create them to scene nodes
-    context->RegisterFactory<Mover>();
 }
 
-void SkeletalAnimation::Start()
+void Decals::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -67,7 +65,7 @@ void SkeletalAnimation::Start()
     CreateScene();
     
     // Create the UI content
-    CreateInstructions();
+    CreateUI();
     
     // Setup the viewport for displaying the scene
     SetupViewport();
@@ -76,7 +74,7 @@ void SkeletalAnimation::Start()
     SubscribeToEvents();
 }
 
-void SkeletalAnimation::CreateScene()
+void Decals::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -113,35 +111,36 @@ void SkeletalAnimation::CreateScene()
     light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
-    
-    // Create animated models
-    const unsigned NUM_OBJECTS = 100;
-    const float MODEL_MOVE_SPEED = 2.0f;
-    const float MODEL_ROTATE_SPEED = 100.0f;
-    const BoundingBox bounds(Vector3(-47.0f, 0.0f, -47.0f), Vector3(47.0f, 0.0f, 47.0f));
-    
-    for (unsigned i = 0; i < NUM_OBJECTS; ++i)
+
+    // Create some mushrooms
+    const unsigned NUM_MUSHROOMS = 240;
+    for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
     {
-        Node* modelNode = scene_->CreateChild("Jack");
-        modelNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
-        modelNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
-        AnimatedModel* modelObject = modelNode->CreateComponent<AnimatedModel>();
-        modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
-        modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
-        modelObject->SetCastShadows(true);
-        
-        // Create an AnimationState for a walk animation. Its time position will need to be manually updated to advance the
-        // animation, The alternative would be to use an AnimationController component which updates the animation automatically,
-        // but we need to update the model's position manually in any case
-        Animation* walkAnimation = cache->GetResource<Animation>("Models/Jack_Walk.ani");
-        AnimationState* state = modelObject->AddAnimationState(walkAnimation);
-        // Enable full blending weight and looping
-        state->SetWeight(1.0f);
-        state->SetLooped(true);
-        
-        // Create our custom Mover component that will move & animate the model during each frame's update
-        Mover* mover = modelNode->CreateComponent<Mover>();
-        mover->SetParameters(MODEL_MOVE_SPEED, MODEL_ROTATE_SPEED, bounds);
+        Node* mushroomNode = scene_->CreateChild("Mushroom");
+        mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
+        mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
+        mushroomNode->SetScale(0.5f + Random(2.0f));
+        StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+        mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
+        mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
+        mushroomObject->SetCastShadows(true);
+    }
+    
+    // Create randomly sized boxes. If boxes are big enough, make them occluders. Occluders will be software rasterized before
+    // rendering to a low-resolution depth-only buffer to test the objects in the view frustum for visibility
+    const unsigned NUM_BOXES = 20;
+    for (unsigned i = 0; i < NUM_BOXES; ++i)
+    {
+        Node* boxNode = scene_->CreateChild("Box");
+        float size = 1.0f + Random(10.0f);
+        boxNode->SetPosition(Vector3(Random(80.0f) - 40.0f, size * 0.5f, Random(80.0f) - 40.0f));
+        boxNode->SetScale(size);
+        StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+        boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+        boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+        boxObject->SetCastShadows(true);
+        if (size >= 5.0f)
+            boxObject->SetOccluder(true);
     }
     
     // Create the camera. Limit far clip distance to match the fog
@@ -153,26 +152,39 @@ void SkeletalAnimation::CreateScene()
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
 }
 
-void SkeletalAnimation::CreateInstructions()
+void Decals::CreateUI()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
     
+    // Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
+    // control the camera, and when visible, it will point the raycast target
+    XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    SharedPtr<Cursor> cursor(new Cursor(context_));
+    cursor->SetStyleAuto(style);
+    ui->SetCursor(cursor);
+
+    // Set starting position of the cursor at the rendering window center
+    Graphics* graphics = GetSubsystem<Graphics>();
+    cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
+    
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-        "Use WASD keys and mouse to move\n"
-        "Space to toggle debug geometry"
+        "Use WASD keys to move\n"
+        "LMB = paint decal, RMB = rotate view\n"
+        "Space to toggle debug geometry\n"
+        "O to toggle occlusion culling"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
-    
+
     // Position the text relative to the screen center
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void SkeletalAnimation::SetupViewport()
+void Decals::SetupViewport()
 {
     Renderer* renderer = GetSubsystem<Renderer>();
     
@@ -181,7 +193,7 @@ void SkeletalAnimation::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
-void SkeletalAnimation::MoveCamera(float timeStep)
+void Decals::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
     UI* ui = GetSubsystem<UI>();
@@ -196,13 +208,17 @@ void SkeletalAnimation::MoveCamera(float timeStep)
     const float MOUSE_SENSITIVITY = 0.1f;
     
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
-    IntVector2 mouseMove = input->GetMouseMove();
-    yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
-    pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
-    pitch_ = Clamp(pitch_, -90.0f, 90.0f);
-    
-    // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+    // Only move the camera when the cursor is hidden
+    if (!ui->GetCursor()->IsVisible())
+    {
+        IntVector2 mouseMove = input->GetMouseMove();
+        yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
+        pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
+        pitch_ = Clamp(pitch_, -90.0f, 90.0f);
+        
+        // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
+        cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+    }
     
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))
@@ -215,17 +231,59 @@ void SkeletalAnimation::MoveCamera(float timeStep)
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
-void SkeletalAnimation::SubscribeToEvents()
+void Decals::PaintDecal()
+{
+    UI* ui = GetSubsystem<UI>();
+    Graphics* graphics = GetSubsystem<Graphics>();
+    IntVector2 pos = ui->GetCursorPosition();
+    
+    // Make sure no UI element in front of the cursor
+    if (ui->GetElementAt(pos, true))
+        return;
+    
+    Camera* camera = cameraNode_->GetComponent<Camera>();
+    Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
+    // Raycast up to 250 world units distance, pick only geometry objects, not eg. zones or lights, only get the first
+    // (closest) hit
+    PODVector<RayQueryResult> results;
+    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, 250.0f, DRAWABLE_GEOMETRY);
+    scene_->GetComponent<Octree>()->RaycastSingle(query);
+    if (results.Size())
+    {
+        RayQueryResult& result = results[0];
+        
+        // Calculate hit position in world space
+        Vector3 rayHitPos = cameraRay.origin_ + cameraRay.direction_ * result.distance_;
+        // Check if target scene node already has a DecalSet component. If not, create now
+        Node* targetNode = result.drawable_->GetNode();
+        DecalSet* decal = targetNode->GetComponent<DecalSet>();
+        if (!decal)
+        {
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            
+            decal = targetNode->CreateComponent<DecalSet>();
+            decal->SetMaterial(cache->GetResource<Material>("Materials/UrhoDecal.xml"));
+        }
+        // Add a square decal to the decal set using the geometry of the drawable that was hit, orient it to face the camera,
+        // use full texture UV's (0,0) to (1,1). Note that if we create several decals to a large object (such as the ground
+        // plane) over a large area using just one DecalSet component, the decals will all be culled as one unit. If that is
+        // undesirable, it may be necessary to create more than one DecalSet based on the distance
+        decal->AddDecal(result.drawable_, rayHitPos, cameraNode_->GetWorldRotation(), 0.5f, 1.0f, 1.0f, Vector2::ZERO,
+            Vector2::ONE);
+    }
+}
+
+void Decals::SubscribeToEvents()
 {
     // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(SkeletalAnimation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, HANDLER(Decals, HandleUpdate));
     
     // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, sent after Renderer subsystem is
     // done with defining the draw calls for the viewports (but before actually executing them)
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SkeletalAnimation, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Decals, HandlePostRenderUpdate));
 }
 
-void SkeletalAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void Decals::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Event parameters are always defined inside a namespace corresponding to the event's name
     using namespace Update;
@@ -233,18 +291,37 @@ void SkeletalAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData
     // Take the frame time step, which is stored as a float
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     
-    // Move the camera, scale movement with time step
-    MoveCamera(timeStep);
+    Input* input = GetSubsystem<Input>();
+    
+    // Right mouse button controls mouse cursor visibility: hide when pressed
+    UI* ui = GetSubsystem<UI>();
+    ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
+    
+    // Paint a decal when the left mouse button is pressed
+    if (input->GetMouseButtonPress(MOUSEB_LEFT))
+        PaintDecal();
     
     // Check for space pressed and toggle debug geometry
-    if (GetSubsystem<Input>()->GetKeyPress(KEY_SPACE))
+    if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
+    
+    // Check for toggling of occlusion
+    if (input->GetKeyPress('O'))
+    {
+        Renderer* renderer = GetSubsystem<Renderer>();
+        // 5000 is the default amount of maximum triangles to software-rasterize for occlusion, so EORing acts as a toggle
+        renderer->SetMaxOccluderTriangles(renderer->GetMaxOccluderTriangles() ^ 5000);
+    }
+    
+    
+    // Move the camera, scale movement with time step
+    MoveCamera(timeStep);
 }
 
-void SkeletalAnimation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+void Decals::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
-    // bones. Disable depth test so that we can see the bones properly
+    // bones. Disable depth test so that we can see the effect of occlusion
     if (drawDebug_)
         GetSubsystem<Renderer>()->DrawDebugGeometry(false);
 }

@@ -27,18 +27,22 @@
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// Custom component for rotating a scene node.
-class Rotator : public Component
+/// Custom component for moving the animated model and rotating at area edges.
+class Mover : public Component
 {
 public:
     /// Construct.
-    Rotator(Context* context);
+    Mover(Context* context);
     
-    /// Set rotation speed about the Euler axes. Will be scaled with scene update time step.
-    void SetRotationSpeed(const Vector3& speed);
+    /// Set motion parameters: forward movement speed, rotation speed, and movement boundaries.
+    void SetParameters(float moveSpeed, float rotateSpeed, const BoundingBox& bounds);
     
+    /// Return forward movement speed.
+    float GetMoveSpeed() const { return moveSpeed_; }
     /// Return rotation speed.
-    const Vector3& GetRotationSpeed() const { return rotationSpeed_; }
+    float GetRotationSpeed() const { return rotationSpeed_; }
+    /// Return movement boundaries.
+    const BoundingBox& GetBounds() const { return bounds_; }
     
 protected:
     /// Handle node being assigned.
@@ -48,6 +52,10 @@ private:
     /// Handle scene update event.
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     
+    /// Forward movement speed.
+    float moveSpeed_;
     /// Rotation speed.
-    Vector3 rotationSpeed_;
+    float rotationSpeed_;
+    /// Movement boundaries.
+    BoundingBox bounds_;
 };

@@ -138,8 +138,8 @@ void Billboards::CreateScene()
     }
     
     // Create billboard sets (floating smoke)
-    const unsigned NUM_BILLBOARDNODES = 40;
-    const unsigned NUM_BILLBOARDS = 15;
+    const unsigned NUM_BILLBOARDNODES = 25;
+    const unsigned NUM_BILLBOARDS = 10;
 
     for (unsigned i = 0; i < NUM_BILLBOARDNODES; ++i)
     {
@@ -154,7 +154,7 @@ void Billboards::CreateScene()
         for (unsigned j = 0; j < NUM_BILLBOARDS; ++j)
         {
             Billboard* bb = billboardObject->GetBillboard(j);
-            bb->position_ = Vector3(Random(15.0f) - 7.5f, Random(8.0f) - 4.0f, Random(15.0f) - 7.5f);
+            bb->position_ = Vector3(Random(12.0f) - 6.0f, Random(8.0f) - 4.0f, Random(12.0f) - 6.0f);
             bb->size_ = Vector2(Random(2.0f) + 3.0f, Random(2.0f) + 3.0f);
             bb->rotation_ = Random() * 360.0f;
             bb->enabled_ = true;
@@ -190,9 +190,9 @@ void Billboards::CreateScene()
         light->SetShadowBias(BiasParameters(0.00002f, 0.0f));
         
         // Configure shadow fading for the lights. When they are far away enough, the lights eventually become unshadowed for
-        // better CPU performance
-        light->SetShadowDistance(200.0f);
-        light->SetShadowFadeDistance(150.0f);
+        // better GPU performance. Note that we could also set the maximum distance for each object to cast shadows
+        light->SetShadowFadeDistance(100.0f); // Fade start distance
+        light->SetShadowDistance(125.0f); // Fade end distance, shadows are disabled
         // Set half resolution for the shadow maps for increased performance
         light->SetShadowResolution(0.5f);
         // The spot lights will not have anything near them, so move the near plane of the shadow camera farther
@@ -216,7 +216,10 @@ void Billboards::CreateInstructions()
     
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Use WASD keys and mouse to move\nSpace to toggle debug geometry\n");
+    instructionText->SetText(
+        "Use WASD keys and mouse to move\n"
+        "Space to toggle debug geometry"
+    );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     
     // Position the text relative to the screen center

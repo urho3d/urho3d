@@ -30,6 +30,9 @@
 namespace Urho3D
 {
 
+class IndexBuffer;
+class VertexBuffer;
+
 /// %Decal vertex.
 struct DecalVertex
 {
