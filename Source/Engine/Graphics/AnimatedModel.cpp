@@ -68,6 +68,7 @@ AnimatedModel::AnimatedModel(Context* context) :
     animationOrderDirty_(false),
     morphsDirty_(false),
     skinningDirty_(true),
+    boneBoundingBoxDirty_(true),
     isMaster_(true),
     loading_(false),
     assignBonesPending_(false)
@@ -255,7 +256,10 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
     if (morphsDirty_)
         UpdateMorphs();
-
+    
+    if (boneBoundingBoxDirty_)
+        UpdateBoneBoundingBox();
+    
     if (skinningDirty_)
         UpdateSkinning();
 }
@@ -333,6 +337,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         SetBoundingBox(model->GetBoundingBox());
         // Initial bone bounding box is just the one stored in the model
         boneBoundingBox_ = boundingBox_;
+        boneBoundingBoxDirty_ = true;
         SetSkeleton(model->GetSkeleton(), createBones);
         ResetLodLevels();
 
@@ -867,12 +872,14 @@ void AnimatedModel::OnMarkedDirty(Node* node)
 {
     Drawable::OnMarkedDirty(node);
 
-    // If the scene node or any of the bone nodes move, mark skinning dirty
+    // If the scene node or any of the bone nodes move, mark skinning and the bone bounding box dirty
     skinningDirty_ = true;
+    boneBoundingBoxDirty_ = true;
 }
 
 void AnimatedModel::OnWorldBoundingBoxUpdate()
 {
+    // Note: do not update bone bounding box here, instead do it in either of the threaded updates
     worldBoundingBox_ = boneBoundingBox_.Transformed(node_->GetWorldTransform());
 }
 
@@ -1120,7 +1127,7 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
         (*i)->Apply();
 
-    // Calculate new local bounding box from the bone positions, then mark for octree reinsertion
+    // Calculate new bone bounding box, then mark for octree reinsertion
     UpdateBoneBoundingBox();
     Drawable::OnMarkedDirty(node_);
     
@@ -1150,6 +1157,9 @@ void AnimatedModel::UpdateBoneBoundingBox()
                 boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), i->radius_ * 0.5f));
         }
     }
+    
+    boneBoundingBoxDirty_ = false;
+    worldBoundingBoxDirty_ = true;
 }
 
 void AnimatedModel::UpdateSkinning()

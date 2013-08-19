@@ -229,6 +229,8 @@ private:
     bool morphsDirty_;
     /// Skinning dirty flag.
     bool skinningDirty_;
+    /// Bone bounding box dirty flag.
+    bool boneBoundingBoxDirty_;
     /// Master model flag.
     bool isMaster_;
     /// Loading flag. During loading bone nodes are not created, as they will be serialized as child nodes.
