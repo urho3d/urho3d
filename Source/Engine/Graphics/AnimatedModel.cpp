@@ -331,6 +331,8 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
 
         // Copy bounding box & skeleton
         SetBoundingBox(model->GetBoundingBox());
+        // Initial bone bounding box is just the one stored in the model
+        boneBoundingBox_ = boundingBox_;
         SetSkeleton(model->GetSkeleton(), createBones);
         ResetLodLevels();
 
@@ -871,27 +873,7 @@ void AnimatedModel::OnMarkedDirty(Node* node)
 
 void AnimatedModel::OnWorldBoundingBoxUpdate()
 {
-    if (!skeleton_.GetNumBones())
-        worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
-    else
-    {
-        // If has bones, update world bounding box based on them
-        worldBoundingBox_.defined_ = false;
-
-        const Vector<Bone>& bones = skeleton_.GetBones();
-        for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
-        {
-            Node* boneNode = i->node_;
-            if (!boneNode)
-                continue;
-
-            // Use hitbox if available. If not, use only half of the sphere radius
-            if (i->collisionMask_ & BONECOLLISION_BOX)
-                worldBoundingBox_.Merge(i->boundingBox_.Transformed(boneNode->GetWorldTransform()));
-            else if (i->collisionMask_ & BONECOLLISION_SPHERE)
-                worldBoundingBox_.Merge(Sphere(boneNode->GetWorldPosition(), i->radius_ * 0.5f));
-        }
-    }
+    worldBoundingBox_ = boneBoundingBox_.Transformed(node_->GetWorldTransform());
 }
 
 void AnimatedModel::AssignBoneNodes()
@@ -1138,11 +1120,36 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
         (*i)->Apply();
 
-    // Animation has changed the bounding box: mark node for octree reinsertion
+    // Calculate new local bounding box from the bone positions, then mark for octree reinsertion
+    UpdateBoneBoundingBox();
     Drawable::OnMarkedDirty(node_);
-    // For optimization, recalculate world bounding box already here (during the threaded update)
-    GetWorldBoundingBox();
+    
     animationDirty_ = false;
+}
+
+void AnimatedModel::UpdateBoneBoundingBox()
+{
+    if (skeleton_.GetNumBones())
+    {
+        // The bone bounding box is in local space, so need the node's inverse transform
+        boneBoundingBox_.defined_ = false;
+        Matrix3x4 inverseNodeTransform = node_->GetWorldTransform().Inverse();
+        
+        const Vector<Bone>& bones = skeleton_.GetBones();
+        for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
+        {
+            Node* boneNode = i->node_;
+            if (!boneNode)
+                continue;
+
+            // Use hitbox if available. If not, use only half of the sphere radius
+            /// \todo The sphere radius should be multiplied with bone scale
+            if (i->collisionMask_ & BONECOLLISION_BOX)
+                boneBoundingBox_.Merge(i->boundingBox_.Transformed(inverseNodeTransform * boneNode->GetWorldTransform()));
+            else if (i->collisionMask_ & BONECOLLISION_SPHERE)
+                boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), i->radius_ * 0.5f));
+        }
+    }
 }
 
 void AnimatedModel::UpdateSkinning()

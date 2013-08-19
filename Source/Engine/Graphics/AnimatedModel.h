@@ -178,6 +178,8 @@ private:
     void CopyMorphVertices(void* dest, void* src, unsigned vertexCount, VertexBuffer* clone, VertexBuffer* original);
     /// Recalculate animations. Called from Update().
     void UpdateAnimation(const FrameInfo& frame);
+    /// Recalculate the bone bounding box.
+    void UpdateBoneBoundingBox();
     /// Recalculate skinning.
     void UpdateSkinning();
     /// Reapply all vertex morphs.
@@ -203,7 +205,9 @@ private:
     Vector<PODVector<Matrix3x4> > geometrySkinMatrices_;
     /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage.
     Vector<PODVector<Matrix3x4*> > geometrySkinMatrixPtrs_;
-   /// Attribute buffer.
+    /// Bounding box calculated from bones.
+    BoundingBox boneBoundingBox_;
+    /// Attribute buffer.
     mutable VectorBuffer attrBuffer_;
     /// The frame number animation LOD distance was last calculated on.
     unsigned animationLodFrameNumber_;

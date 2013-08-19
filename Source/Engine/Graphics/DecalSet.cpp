@@ -667,6 +667,7 @@ void DecalSet::OnWorldBoundingBoxUpdate()
                 continue;
             
             // Use hitbox if available. If not, use only half of the sphere radius
+            /// \todo The sphere radius should be multiplied with bone scale
             if (i->collisionMask_ & BONECOLLISION_BOX)
                 worldBoundingBox_.Merge(i->boundingBox_.Transformed(boneNode->GetWorldTransform()));
             else if (i->collisionMask_ & BONECOLLISION_SPHERE)
