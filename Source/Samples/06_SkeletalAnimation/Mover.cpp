@@ -70,6 +70,10 @@ void Mover::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
     
     // Get the model's first (only) animation state and advance its time. Note the convenience accessor to other components
     // in the same scene node
-    AnimationState* state = GetComponent<AnimatedModel>()->GetAnimationStates()[0];
-    state->AddTime(timeStep);
+    AnimatedModel* model = GetComponent<AnimatedModel>();
+    if (model->GetNumAnimationStates())
+    {
+        AnimationState* state = model->GetAnimationStates()[0];
+        state->AddTime(timeStep);
+    }
 }
