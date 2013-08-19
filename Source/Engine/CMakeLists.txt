@@ -22,7 +22,7 @@
 
 # Define target name
 set (TARGET_NAME Urho3D)
-if (URHO3D_BUILD_TYPE STREQUAL SHARED) 
+if (URHO3D_BUILD_TYPE STREQUAL SHARED)
     set (LIB_TYPE SHARED)
 endif ()
 
@@ -123,6 +123,11 @@ if (MSVC)
         COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Lib\"
         COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" \"${PROJECT_ROOT_DIR}/Lib\"
         COMMENT "Copying library and debug files to Lib directory")
+    if (LIB_TYPE STREQUAL SHARED)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).lib\" \"${PROJECT_ROOT_DIR}/Lib\"
+            COMMENT "Copying import library to Lib directory")
+    endif ()
 else ()
     get_target_property (LOCATION ${TARGET_NAME} LOCATION)
     if (CMAKE_CROSSCOMPILING)
