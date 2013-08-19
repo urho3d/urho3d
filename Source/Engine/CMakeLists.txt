@@ -40,6 +40,7 @@ endif ()
 # Define generated object files
 # This is a hack as it relies on internal working of CMake
 if (WIN32)
+    set (CMAKE_DEBUG_POSTFIX _d)
     set (OBJ_EXT .obj)
 else ()
     set (OBJ_EXT .o)
