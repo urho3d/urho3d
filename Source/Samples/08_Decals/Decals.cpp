@@ -174,7 +174,7 @@ void Decals::CreateUI()
         "Use WASD keys to move\n"
         "LMB = paint decal, RMB = rotate view\n"
         "Space to toggle debug geometry\n"
-        "O to toggle occlusion culling"
+        "7 to toggle occlusion culling"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
 
@@ -195,12 +195,14 @@ void Decals::SetupViewport()
 
 void Decals::MoveCamera(float timeStep)
 {
-    // Do not move if the UI has a focused element (the console)
+    // Right mouse button controls mouse cursor visibility: hide when pressed
     UI* ui = GetSubsystem<UI>();
+    Input* input = GetSubsystem<Input>();
+    ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
+    
+    // Do not move if the UI has a focused element (the console)
     if (ui->GetFocusElement())
         return;
-    
-    Input* input = GetSubsystem<Input>();
     
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
@@ -229,6 +231,14 @@ void Decals::MoveCamera(float timeStep)
         cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
+    
+    // Toggle debug geometry with space
+    if (input->GetKeyPress(KEY_SPACE))
+        drawDebug_ = !drawDebug_;
+    
+    // Paint decal with the left mousebutton; cursor must be visible
+    if (ui->GetCursor()->IsVisible() && input->GetMouseButtonPress(MOUSEB_LEFT))
+        PaintDecal();
 }
 
 void Decals::PaintDecal()
@@ -290,29 +300,6 @@ void Decals::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Take the frame time step, which is stored as a float
     float timeStep = eventData[P_TIMESTEP].GetFloat();
-    
-    Input* input = GetSubsystem<Input>();
-    
-    // Right mouse button controls mouse cursor visibility: hide when pressed
-    UI* ui = GetSubsystem<UI>();
-    ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
-    
-    // Paint a decal when the left mouse button is pressed
-    if (input->GetMouseButtonPress(MOUSEB_LEFT))
-        PaintDecal();
-    
-    // Check for space pressed and toggle debug geometry
-    if (input->GetKeyPress(KEY_SPACE))
-        drawDebug_ = !drawDebug_;
-    
-    // Check for toggling of occlusion
-    if (input->GetKeyPress('O'))
-    {
-        Renderer* renderer = GetSubsystem<Renderer>();
-        // 5000 is the default amount of maximum triangles to software-rasterize for occlusion, so EORing acts as a toggle
-        renderer->SetMaxOccluderTriangles(renderer->GetMaxOccluderTriangles() ^ 5000);
-    }
-    
     
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);

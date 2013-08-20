@@ -151,8 +151,7 @@ void AnimatingScene::SetupViewport()
 void AnimatingScene::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
-    UI* ui = GetSubsystem<UI>();
-    if (ui->GetFocusElement())
+    if (GetSubsystem<UI>()->GetFocusElement())
         return;
     
     Input* input = GetSubsystem<Input>();

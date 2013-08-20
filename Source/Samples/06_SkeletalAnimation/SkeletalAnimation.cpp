@@ -184,8 +184,7 @@ void SkeletalAnimation::SetupViewport()
 void SkeletalAnimation::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
-    UI* ui = GetSubsystem<UI>();
-    if (ui->GetFocusElement())
+    if (GetSubsystem<UI>()->GetFocusElement())
         return;
     
     Input* input = GetSubsystem<Input>();
@@ -213,6 +212,10 @@ void SkeletalAnimation::MoveCamera(float timeStep)
         cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
+    
+    // Toggle debug geometry with space
+    if (input->GetKeyPress(KEY_SPACE))
+        drawDebug_ = !drawDebug_;
 }
 
 void SkeletalAnimation::SubscribeToEvents()
@@ -235,16 +238,13 @@ void SkeletalAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData
     
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
-    
-    // Check for space pressed and toggle debug geometry
-    if (GetSubsystem<Input>()->GetKeyPress(KEY_SPACE))
-        drawDebug_ = !drawDebug_;
 }
 
 void SkeletalAnimation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
-    // bones. Disable depth test so that we can see the bones properly
+    // bones. Note that debug geometry has to be separately requested each frame. Disable depth test so that we can see the
+    // bones properly
     if (drawDebug_)
         GetSubsystem<Renderer>()->DrawDebugGeometry(false);
 }

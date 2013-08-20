@@ -240,8 +240,7 @@ void Billboards::SetupViewport()
 void Billboards::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
-    UI* ui = GetSubsystem<UI>();
-    if (ui->GetFocusElement())
+    if (GetSubsystem<UI>()->GetFocusElement())
         return;
     
     Input* input = GetSubsystem<Input>();
@@ -269,6 +268,10 @@ void Billboards::MoveCamera(float timeStep)
         cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
+    
+    // Toggle debug geometry with space
+    if (input->GetKeyPress(KEY_SPACE))
+        drawDebug_ = !drawDebug_;
 }
 
 void Billboards::AnimateScene(float timeStep)
@@ -322,10 +325,6 @@ void Billboards::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Move the camera and animate the scene, scale movement with time step
     MoveCamera(timeStep);
     AnimateScene(timeStep);
-    
-    // Check for space pressed and toggle debug geometry
-    if (GetSubsystem<Input>()->GetKeyPress(KEY_SPACE))
-        drawDebug_ = !drawDebug_;
 }
 
 void Billboards::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)

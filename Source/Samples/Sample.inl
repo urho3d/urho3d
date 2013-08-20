@@ -25,6 +25,7 @@
 #include "DebugHud.h"
 #include "Engine.h"
 #include "InputEvents.h"
+#include "Renderer.h"
 #include "ResourceCache.h"
 #include "Texture2D.h"
 #include "UI.h"
@@ -120,19 +121,89 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     using namespace KeyDown;
 
     int key = eventData[P_KEY].GetInt();
+
+    // Close console (if open) or when ESC is pressed
     if (key == KEY_ESC)
     {
-        if (!GetSubsystem<UI>()->GetFocusElement())
+        Console* console = GetSubsystem<Console>();
+        if (!console->IsVisible())
             engine_->Exit();
         else
-            GetSubsystem<Console>()->SetVisible(false);
+            console->SetVisible(false);
     }
 
-    // Toggle console when F1 down.
+    // Toggle console with F1
     if (key == KEY_F1)
         GetSubsystem<Console>()->Toggle();
     
-    // Toggle debug HUD when F2 down.
+    // Toggle debug HUD with F2
     if (key == KEY_F2)
         GetSubsystem<DebugHud>()->ToggleAll();
+    
+    // Common rendering quality controls, only when UI has no focused element
+    UIElement* focusElement = GetSubsystem<UI>()->GetFocusElement();
+    if (!focusElement)
+    {
+        Renderer* renderer = GetSubsystem<Renderer>();
+        
+        // Texture quality
+        if (key == '1')
+        {
+            int quality = renderer->GetTextureQuality();
+            ++quality;
+            if (quality > QUALITY_HIGH)
+                quality = QUALITY_LOW;
+            renderer->SetTextureQuality(quality);
+        }
+        
+        // Material quality
+        if (key == '2')
+        {
+            int quality = renderer->GetMaterialQuality();
+            ++quality;
+            if (quality > QUALITY_HIGH)
+                quality = QUALITY_LOW;
+            renderer->SetMaterialQuality(quality);
+        }
+        
+        // Specular lighting
+        if (key == '3')
+            renderer->SetSpecularLighting(!renderer->GetSpecularLighting());
+        
+        // Shadow rendering
+        if (key == '4')
+            renderer->SetDrawShadows(!renderer->GetDrawShadows());
+        
+        // Shadow map resolution
+        if (key == '5')
+        {
+            int shadowMapSize = renderer->GetShadowMapSize();
+            shadowMapSize *= 2;
+            if (shadowMapSize > 2048)
+                shadowMapSize = 512;
+            renderer->SetShadowMapSize(shadowMapSize);
+        }
+        
+        // Shadow depth and filtering quality
+        if (key == '6')
+        {
+            int quality = renderer->GetShadowQuality();
+            ++quality;
+            if (quality > SHADOWQUALITY_HIGH_24BIT)
+                quality = SHADOWQUALITY_LOW_16BIT;
+            renderer->SetShadowQuality(quality);
+        }
+        
+        // Occlusion culling
+        if (key == '7')
+        {
+            bool occlusion = renderer->GetMaxOccluderTriangles() > 0;
+            occlusion = !occlusion;
+            renderer->SetMaxOccluderTriangles(occlusion ? 5000 : 0);
+        }
+        
+        // Instancing
+        if (key == '8')
+            renderer->SetDynamicInstancing(!renderer->GetDynamicInstancing());
+    }
 }
