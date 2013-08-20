@@ -80,9 +80,8 @@ void Decals::CreateScene()
     
     scene_ = new Scene(context_);
     
-    // Create the Octree component to the scene so that drawable objects can be rendered. Use default volume
-    // (-1000, -1000, -1000) to (1000, 1000, 1000). Also create a DebugRenderer component so that we can draw
-    // debug geometry
+    // Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
+    // Also create a DebugRenderer component so that we can draw debug geometry
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<DebugRenderer>();
     
@@ -93,7 +92,7 @@ void Decals::CreateScene()
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
     
-    // Create a Zone component for ambient lighting & fog color control
+    // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));

@@ -1,0 +1,3 @@
+<technique>
+    <pass name="alpha" vs="Unlit" ps="Unlit" />
+</technique>

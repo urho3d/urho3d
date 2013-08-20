@@ -28,20 +28,18 @@
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// Decals example.
+/// Render to texture example
 /// This sample demonstrates:
-///     - Performing a raycast to the octree and adding a decal to the hit location;
-///     - Defining a Cursor UI element which stays inside the window and can be shown/hidden;
-///     - Marking suitable (large) objects as occluders for occlusion culling;
-///     - Displaying renderer debug geometry to see the effect of occlusion;
-class Decals : public Sample
+///     - Creating two 3D scenes and rendering the other into a texture;
+///     - Creating rendertarget textures and materials programmatically;
+class RenderToTexture : public Sample
 {
     // Mandatory when deriving from Object, enables type information
-    OBJECT(Decals)
+    OBJECT(RenderToTexture)
 
 public:
     /// Construct.
-    Decals(Context* context);
+    RenderToTexture(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
@@ -49,29 +47,27 @@ public:
 private:
     /// Constructs the scene content.
     void CreateScene();
-    /// Constructs user interface elements.
-    void CreateUI();
+    /// Constructs an instruction text to the UI.
+    void CreateInstructions();
     /// Sets up a viewport for displaying the scene.
     void SetupViewport();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
-    /// Paints a decal using a ray cast from the mouse cursor.
-    void PaintDecal();
-    /// Subscribes to application-wide logic update events.
+    /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
     /// Callback method invoked when a logic update event is dispatched.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Callback method invoked when the post-render update event is dispatched.
-    void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    
-    /// Scene.
+
+    /// Scene in which the user moves.
     SharedPtr<Scene> scene_;
     /// Camera scene node.
     SharedPtr<Node> cameraNode_;
+    /// Scene that is rendered to a texture.
+    SharedPtr<Scene> rttScene_;
+    /// Camera scene node in the render-to-texture scene.
+    SharedPtr<Node> rttCameraNode_;
     /// Camera yaw angle.
     float yaw_;
     /// Camera pitch angle.
     float pitch_;
-    /// Flag for drawing debug geometry.
-    bool drawDebug_;
 };

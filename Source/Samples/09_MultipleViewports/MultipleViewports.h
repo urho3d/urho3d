@@ -28,20 +28,18 @@
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// Decals example.
+/// Multiple viewports example.
 /// This sample demonstrates:
-///     - Performing a raycast to the octree and adding a decal to the hit location;
-///     - Defining a Cursor UI element which stays inside the window and can be shown/hidden;
-///     - Marking suitable (large) objects as occluders for occlusion culling;
-///     - Displaying renderer debug geometry to see the effect of occlusion;
-class Decals : public Sample
+///     - Setting up two viewports with two separate cameras;
+///     - Adding post processing effects to a viewport's render path and toggling them;
+class MultipleViewports : public Sample
 {
     // Mandatory when deriving from Object, enables type information
-    OBJECT(Decals)
+    OBJECT(MultipleViewports)
 
 public:
     /// Construct.
-    Decals(Context* context);
+    MultipleViewports(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
@@ -49,14 +47,12 @@ public:
 private:
     /// Constructs the scene content.
     void CreateScene();
-    /// Constructs user interface elements.
-    void CreateUI();
-    /// Sets up a viewport for displaying the scene.
-    void SetupViewport();
+    /// Constructs an instruction text to the UI.
+    void CreateInstructions();
+    /// Sets up viewports.
+    void SetupViewports();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
-    /// Paints a decal using a ray cast from the mouse cursor.
-    void PaintDecal();
     /// Subscribes to application-wide logic update events.
     void SubscribeToEvents();
     /// Callback method invoked when a logic update event is dispatched.
@@ -68,6 +64,8 @@ private:
     SharedPtr<Scene> scene_;
     /// Camera scene node.
     SharedPtr<Node> cameraNode_;
+    /// Rear-facing camera scene node.
+    SharedPtr<Node> rearCameraNode_;
     /// Camera yaw angle.
     float yaw_;
     /// Camera pitch angle.

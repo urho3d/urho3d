@@ -56,7 +56,7 @@ private:
     void SetupViewport();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
-    /// Subscribe to application-wide logic update events.
+    /// Subscribes to application-wide logic update events.
     void SubscribeToEvents();
     /// Callback method invoked when a logic update event is dispatched.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);

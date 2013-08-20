@@ -50,7 +50,7 @@ private:
     void CreateSprites();
     /// Moves the sprites using the delta time step given.
     void MoveSprites(float timeStep);
-    /// Subscribe to application-wide logic update events.
+    /// Subscribes to application-wide logic update events.
     void SubscribeToEvents();
     /// Callback method invoked when a logic update event is dispatched.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);

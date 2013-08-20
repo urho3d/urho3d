@@ -414,6 +414,10 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     if (viewOverrideFlags & VO_DISABLE_OCCLUSION)
         maxOccluderTriangles_ = 0;
     
+    // Occlusion buffer has constant width. If resulting height would be too large due to aspect ratio, disable occlusion
+    if (viewSize_.y_ > viewSize_.x_ * 4)
+        maxOccluderTriangles_ = 0;
+    
     return true;
 }
 

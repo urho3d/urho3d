@@ -20,12 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Animation.h"
-#include "AnimatedModel.h"
-#include "AnimationState.h"
 #include "Camera.h"
 #include "CoreEvents.h"
+#include "Cursor.h"
 #include "DebugRenderer.h"
+#include "DecalSet.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
@@ -33,32 +32,32 @@
 #include "Light.h"
 #include "Material.h"
 #include "Model.h"
-#include "Mover.h"
 #include "Octree.h"
 #include "Renderer.h"
+#include "RenderPath.h"
 #include "ResourceCache.h"
+#include "StaticModel.h"
 #include "Text.h"
 #include "UI.h"
+#include "XMLFile.h"
 #include "Zone.h"
 
-#include "SkeletalAnimation.h"
+#include "MultipleViewports.h"
 
 #include "DebugNew.h"
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(SkeletalAnimation)
+DEFINE_APPLICATION_MAIN(MultipleViewports)
 
-SkeletalAnimation::SkeletalAnimation(Context* context) :
+MultipleViewports::MultipleViewports(Context* context) :
     Sample(context),
     yaw_(0.0f),
     pitch_(0.0f),
     drawDebug_(false)
 {
-    // Register an object factory for our custom Mover component so that we can create them to scene nodes
-    context->RegisterFactory<Mover>();
 }
 
-void SkeletalAnimation::Start()
+void MultipleViewports::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -69,14 +68,14 @@ void SkeletalAnimation::Start()
     // Create the UI content
     CreateInstructions();
     
-    // Setup the viewport for displaying the scene
-    SetupViewport();
+    // Setup the viewports for displaying the scene
+    SetupViewports();
 
     // Hook up to the frame update and render post-update events
     SubscribeToEvents();
 }
 
-void SkeletalAnimation::CreateScene()
+void MultipleViewports::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -112,47 +111,55 @@ void SkeletalAnimation::CreateScene()
     light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
-    
-    // Create animated models
-    const unsigned NUM_MODELS = 100;
-    const float MODEL_MOVE_SPEED = 2.0f;
-    const float MODEL_ROTATE_SPEED = 100.0f;
-    const BoundingBox bounds(Vector3(-47.0f, 0.0f, -47.0f), Vector3(47.0f, 0.0f, 47.0f));
-    
-    for (unsigned i = 0; i < NUM_MODELS; ++i)
+
+    // Create some mushrooms
+    const unsigned NUM_MUSHROOMS = 240;
+    for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
     {
-        Node* modelNode = scene_->CreateChild("Jack");
-        modelNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
-        modelNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
-        AnimatedModel* modelObject = modelNode->CreateComponent<AnimatedModel>();
-        modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
-        modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
-        modelObject->SetCastShadows(true);
-        
-        // Create an AnimationState for a walk animation. Its time position will need to be manually updated to advance the
-        // animation, The alternative would be to use an AnimationController component which updates the animation automatically,
-        // but we need to update the model's position manually in any case
-        Animation* walkAnimation = cache->GetResource<Animation>("Models/Jack_Walk.ani");
-        AnimationState* state = modelObject->AddAnimationState(walkAnimation);
-        // Enable full blending weight and looping
-        state->SetWeight(1.0f);
-        state->SetLooped(true);
-        
-        // Create our custom Mover component that will move & animate the model during each frame's update
-        Mover* mover = modelNode->CreateComponent<Mover>();
-        mover->SetParameters(MODEL_MOVE_SPEED, MODEL_ROTATE_SPEED, bounds);
+        Node* mushroomNode = scene_->CreateChild("Mushroom");
+        mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
+        mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
+        mushroomNode->SetScale(0.5f + Random(2.0f));
+        StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+        mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
+        mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
+        mushroomObject->SetCastShadows(true);
     }
     
-    // Create the camera. Limit far clip distance to match the fog
+    // Create randomly sized boxes. If boxes are big enough, make them occluders. Occluders will be software rasterized before
+    // rendering to a low-resolution depth-only buffer to test the objects in the view frustum for visibility
+    const unsigned NUM_BOXES = 20;
+    for (unsigned i = 0; i < NUM_BOXES; ++i)
+    {
+        Node* boxNode = scene_->CreateChild("Box");
+        float size = 1.0f + Random(10.0f);
+        boxNode->SetPosition(Vector3(Random(80.0f) - 40.0f, size * 0.5f, Random(80.0f) - 40.0f));
+        boxNode->SetScale(size);
+        StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+        boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+        boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+        boxObject->SetCastShadows(true);
+        if (size >= 5.0f)
+            boxObject->SetOccluder(true);
+    }
+    
+    // Create the cameras. Limit far clip distance to match the fog
     cameraNode_ = scene_->CreateChild("Camera");
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
     
-    // Set an initial position for the camera scene node above the plane
+    // Parent the rear camera node to the front camera node and turn it 180 degrees to face backward
+    // Here, we use the angle-axis constructor for Quaternion instead of the usual Euler angles
+    rearCameraNode_ = cameraNode_->CreateChild("RearCamera");
+    rearCameraNode_->Rotate(Quaternion(180.0f, Vector3::UP));
+    Camera* rearCamera = rearCameraNode_->CreateComponent<Camera>();
+    rearCamera->SetFarClip(300.0f);
+    
+    // Set an initial position for the front camera scene node above the plane
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
 }
 
-void SkeletalAnimation::CreateInstructions()
+void MultipleViewports::CreateInstructions()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
@@ -161,7 +168,8 @@ void SkeletalAnimation::CreateInstructions()
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse to move\n"
-        "Space to toggle debug geometry"
+        "B to toggle bloom, F to toggle FXAA\n"
+        "Space to toggle debug geometry\n"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     
@@ -171,18 +179,42 @@ void SkeletalAnimation::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void SkeletalAnimation::SetupViewport()
+
+void MultipleViewports::SetupViewports()
 {
+    Graphics* graphics = GetSubsystem<Graphics>();
     Renderer* renderer = GetSubsystem<Renderer>();
     
-    // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
+    renderer->SetNumViewports(2);
+    
+    // Set up the front camera viewport
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
+    
+    // Clone the default render path so that we do not interfere with the other viewport, then add
+    // bloom and FXAA post process effects to the front viewport. Render path commands can be tagged
+    // for example with the effect name to allow easy toggling on and off. We start with the effects
+    // disabled.
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
+    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/Bloom.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/EdgeFilter.xml"));
+    // Make the bloom mixing parameter more pronounced
+    effectRenderPath->SetShaderParameter("BloomMix", Vector2(0.9f, 0.6f));
+    effectRenderPath->SetEnabled("Bloom", false);
+    effectRenderPath->SetEnabled("EdgeFilter", false);
+    viewport->SetRenderPath(effectRenderPath);
+    
+    // Set up the rear camera viewport on top of the front view ("rear view mirror")
+    // The viewport index must be greater in that case, otherwise the view would be left behind
+    SharedPtr<Viewport> rearViewport(new Viewport(context_, scene_, rearCameraNode_->GetComponent<Camera>(),
+        IntRect(graphics->GetWidth() * 2 / 3, 32, graphics->GetWidth() - 32, graphics->GetHeight() / 3)));
+    renderer->SetViewport(1, rearViewport);
 }
 
-void SkeletalAnimation::MoveCamera(float timeStep)
+void MultipleViewports::MoveCamera(float timeStep)
 {
-    // Do not move if the UI has a focused element (the console)
+     // Do not move if the UI has a focused element (the console)
     if (GetSubsystem<UI>()->GetFocusElement())
         return;
     
@@ -212,22 +244,29 @@ void SkeletalAnimation::MoveCamera(float timeStep)
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
     
+    // Toggle post processing effects on the front viewport. Note that the rear viewport is unaffected
+    RenderPath* effectRenderPath = GetSubsystem<Renderer>()->GetViewport(0)->GetRenderPath();
+    if (input->GetKeyPress('B'))
+        effectRenderPath->ToggleEnabled("Bloom");
+    if (input->GetKeyPress('F'))
+        effectRenderPath->ToggleEnabled("EdgeFilter");
+    
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
 }
 
-void SkeletalAnimation::SubscribeToEvents()
+void MultipleViewports::SubscribeToEvents()
 {
     // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(SkeletalAnimation, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, HANDLER(MultipleViewports, HandleUpdate));
     
     // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, sent after Renderer subsystem is
     // done with defining the draw calls for the viewports (but before actually executing them)
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SkeletalAnimation, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(MultipleViewports, HandlePostRenderUpdate));
 }
 
-void SkeletalAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void MultipleViewports::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Event parameters are always defined inside a namespace corresponding to the event's name
     using namespace Update;
@@ -239,11 +278,10 @@ void SkeletalAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData
     MoveCamera(timeStep);
 }
 
-void SkeletalAnimation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+void MultipleViewports::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
-    // bones. Note that debug geometry has to be separately requested each frame. Disable depth test so that we can see the
-    // bones properly
+    // bones. Disable depth test so that we can see the effect of occlusion
     if (drawDebug_)
         GetSubsystem<Renderer>()->DrawDebugGeometry(false);
 }
