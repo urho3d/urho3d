@@ -166,14 +166,14 @@ void RenderToTexture::CreateScene()
         // and a plane for the actual view
         {
             Node* boxNode = scene_->CreateChild("ScreenBox");
-            boxNode->SetPosition(Vector3(0.0f, 10.0f, 20.0f));
+            boxNode->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
             boxNode->SetScale(Vector3(21.0f, 16.0f, 0.5f));
             StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
             boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
             boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
             
             Node* screenNode = scene_->CreateChild("Screen");
-            screenNode->SetPosition(Vector3(0.0f, 10.0f, 19.74f));
+            screenNode->SetPosition(Vector3(0.0f, 10.0f, -0.27f));
             screenNode->SetRotation(Quaternion(-90.0f, 0.0f, 0.0f));
             screenNode->SetScale(Vector3(20.0f, 0.0f, 15.0f));
             StaticModel* screenObject = screenNode->CreateComponent<StaticModel>();
@@ -205,7 +205,7 @@ void RenderToTexture::CreateScene()
         camera->SetFarClip(300.0f);
         
         // Set an initial position for the camera scene node above the plane
-        cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
+        cameraNode_->SetPosition(Vector3(0.0f, 7.0f, -30.0f));
     }
 }
 
