@@ -179,9 +179,10 @@ void RenderToTexture::CreateScene()
             StaticModel* screenObject = screenNode->CreateComponent<StaticModel>();
             screenObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
             
-            // Create a renderable texture (1024x768, RGB format) and a material for it
+            // Create a renderable texture (1024x768, RGB format), enable bilinear filtering on it
             SharedPtr<Texture2D> renderTexture(new Texture2D(context_));
             renderTexture->SetSize(1024, 768, Graphics::GetRGBFormat(), TEXTURE_RENDERTARGET);
+            renderTexture->SetFilterMode(FILTER_BILINEAR);
             
             // Create a new material from scratch, use the diffuse unlit technique, assign the render texture
             // as its diffuse texture, then assign the material to the screen plane object
