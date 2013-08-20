@@ -60,7 +60,7 @@ private:
     void CreateLogo();
     /// Create console and debug HUD.
     void CreateConsoleAndDebugHud();
-    /// Handle key down event.
+    /// Handle key down event to process key controls common to all samples.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
 };
 

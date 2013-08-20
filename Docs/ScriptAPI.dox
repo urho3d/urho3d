@@ -778,6 +778,7 @@ Methods:<br>
 - void FromString(VariantType, const String&)
 - String ToString() const
 - VectorBuffer GetBuffer() const
+- Serializable@ GetSerializable() const
 - Node@ GetNode() const
 - Component@ GetComponent() const
 - Scene@ GetScene() const
@@ -1387,6 +1388,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 
 
 Component
@@ -1417,6 +1419,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -1493,6 +1496,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - Vector3 position
 - Quaternion rotation
 - Vector3 direction
@@ -1547,6 +1551,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -1640,6 +1645,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - Vector3 position
 - Quaternion rotation
 - Vector3 direction
@@ -1734,6 +1740,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -1775,6 +1782,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2186,6 +2194,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2254,6 +2263,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2319,6 +2329,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2379,6 +2390,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2432,6 +2444,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2525,6 +2538,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2612,6 +2626,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2658,6 +2673,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2730,6 +2746,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2826,6 +2843,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2881,6 +2899,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2935,6 +2954,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -2985,6 +3005,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -3057,6 +3078,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -3263,6 +3285,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -3302,6 +3325,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -3351,6 +3375,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -3478,6 +3503,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -3602,6 +3628,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -3726,6 +3753,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 size
@@ -3831,6 +3859,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -3967,6 +3996,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -4100,6 +4130,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -4233,6 +4264,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -4369,6 +4401,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -4502,6 +4535,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -4651,6 +4685,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -4796,6 +4831,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -4896,6 +4932,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -4998,6 +5035,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -5143,6 +5181,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -5294,6 +5333,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -5440,6 +5480,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - String style
 - String name
 - IntVector2 position
@@ -5616,6 +5657,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -5727,6 +5769,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -5781,6 +5824,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -5841,6 +5885,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -5908,6 +5953,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -5948,6 +5994,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -5990,6 +6037,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -6042,6 +6090,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
@@ -6108,6 +6157,7 @@ Properties:<br>
 - Variant[] attributes
 - Variant[] attributeDefaults (readonly)
 - AttributeInfo[] attributeInfos (readonly)
+- bool temporary
 - bool enabled
 - bool enabledEffective (readonly)
 - uint id (readonly)
