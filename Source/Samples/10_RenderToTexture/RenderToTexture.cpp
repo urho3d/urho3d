@@ -95,13 +95,12 @@ void RenderToTexture::CreateScene()
         zone->SetFogStart(10.0f);
         zone->SetFogEnd(100.0f);
         
-        // Create randomly positioned and oriented box StaticModels in the scene. Use less of them as in the actual
-        // AnimatingScene sample to avoid the scene update (rotating the boxes) taking too much CPU time
-        const unsigned NUM_OBJECTS = 1000;
+        // Create randomly positioned and oriented box StaticModels in the scene
+        const unsigned NUM_OBJECTS = 2000;
         for (unsigned i = 0; i < NUM_OBJECTS; ++i)
         {
             Node* boxNode = rttScene_->CreateChild("Box");
-            boxNode->SetPosition(Vector3(Random(100.0f) - 50.0f, Random(100.0f) - 50.0f, Random(100.0f) - 50.0f));
+            boxNode->SetPosition(Vector3(Random(200.0f) - 100.0f, Random(200.0f) - 100.0f, Random(200.0f) - 100.0f));
             // Orient using random pitch, yaw and roll Euler angles
             boxNode->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
             StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();

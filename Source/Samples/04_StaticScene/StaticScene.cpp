@@ -79,7 +79,7 @@ void StaticScene::CreateScene()
     // optimizing manner
     scene_->CreateComponent<Octree>();
     
-    // Create a child scene node (at world origin) and a StaticModel component into it. Set the StaticModel to show a simple 
+    // Create a child scene node (at world origin) and a StaticModel component into it. Set the StaticModel to show a simple
     // plane mesh with a "stone" material. Note that naming the scene nodes is optional. Scale the scene node larger
     // (100 x 100 world units)
     Node* planeNode = scene_->CreateChild("Plane");
