@@ -1,4 +1,5 @@
 <technique>
     <pass name="alpha" vs="LitSolid_EnvCube" ps="LitSolid_EnvCube" depthwrite="false" blend="alpha" />
     <pass name="litalpha" vs="LitSolid" ps="LitSolid" depthwrite="false" blend="addalpha" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

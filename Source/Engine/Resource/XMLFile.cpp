@@ -82,7 +82,7 @@ bool XMLFile::Load(Deserializer& source)
     PROFILE(LoadXMLFile);
     
     unsigned dataSize = source.GetSize();
-    if (!dataSize)
+    if (!dataSize && !source.GetName().Empty())
     {
         LOGERROR("Zero sized XML data in " + source.GetName());
         return false;

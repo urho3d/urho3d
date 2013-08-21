@@ -287,8 +287,8 @@ void Decals::SubscribeToEvents()
     // Subscribes HandleUpdate() method for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(Decals, HandleUpdate));
     
-    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, sent after Renderer subsystem is
-    // done with defining the draw calls for the viewports (but before actually executing them)
+    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
+    // debug geometry
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Decals, HandlePostRenderUpdate));
 }
 
