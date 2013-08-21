@@ -110,8 +110,9 @@ void Physics::CreateScene()
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     
     {
-        // Create the floor object at origin, 100 x 100 world units
+        // Create a floor object, 100 x 100 world units. Adjust position so that the ground is at zero Y
         Node* floorNode = scene_->CreateChild("Floor");
+        floorNode->SetPosition(Vector3(0.0f, -0.25f, 0.0f));
         floorNode->SetScale(Vector3(100.0f, 0.5f, 100.0f));
         StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
         floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
@@ -140,10 +141,12 @@ void Physics::CreateScene()
                 boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMap.xml"));
                 boxObject->SetCastShadows(true);
                 
-                // Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable.
-                // The actual mass is not important; only the mass ratios between colliding objects are significant
+                // Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable
+                // and also adjust friction. The actual mass is not important; only the mass ratios between colliding 
+                // objects are significant
                 RigidBody* body = boxNode->CreateComponent<RigidBody>();
                 body->SetMass(1.0f);
+                body->SetFriction(0.75f);
                 CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
                 shape->SetBox(Vector3::ONE);
             }
@@ -245,10 +248,10 @@ void Physics::SpawnObject()
     boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMap.xml"));
     boxObject->SetCastShadows(true);
     
-    // Create physics components, use a smaller mass also and add some friction so that the object stops faster
+    // Create physics components, use a smaller mass also
     RigidBody* body = boxNode->CreateComponent<RigidBody>();
     body->SetMass(0.25f);
-    body->SetFriction(0.9f);
+    body->SetFriction(0.75f);
     CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
     shape->SetBox(Vector3::ONE);
     
