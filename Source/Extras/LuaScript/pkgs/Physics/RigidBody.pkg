@@ -22,6 +22,7 @@ class RigidBody : public Component
     void SetAngularRestThreshold(float threshold);
     void SetAngularDamping(float factor);
     void SetFriction(float friction);
+    void SetRollingFriction(float friction);
     void SetRestitution(float restitution);
     void SetContactProcessingThreshold(float threshold);
     void SetCcdRadius(float radius);
@@ -59,6 +60,7 @@ class RigidBody : public Component
     float GetAngularRestThreshold() const;
     float GetAngularDamping() const;
     float GetFriction() const;
+    float GetRollingFriction() const;
     float GetRestitution() const;
     float GetContactProcessingThreshold() const;
     float GetCcdRadius() const;
@@ -93,6 +95,7 @@ class RigidBody : public Component
     tolua_property__get_set float angularRestThreshold;
     tolua_property__get_set float angularDamping;
     tolua_property__get_set float friction;
+    tolua_property__get_set float rollingFriction;
     tolua_property__get_set float restitution;
     tolua_property__get_set float contactProcessingThreshold;
     tolua_property__get_set float ccdRadius;

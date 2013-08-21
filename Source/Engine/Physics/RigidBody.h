@@ -97,6 +97,8 @@ public:
     void SetAngularDamping(float factor);
     /// Set friction coefficient.
     void SetFriction(float friction);
+    /// Set rolling friction coefficient.
+    void SetRollingFriction(float friction);
     /// Set restitution coefficient.
     void SetRestitution(float restitution);
     /// Set contact processing threshold.
@@ -172,6 +174,8 @@ public:
     float GetAngularDamping() const;
     /// Return friction coefficient.
     float GetFriction() const;
+    /// Return rolling friction coefficient.
+    float GetRollingFriction() const;
     /// Return restitution coefficient.
     float GetRestitution() const;
     /// Return contact processing threshold.

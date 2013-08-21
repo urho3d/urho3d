@@ -46,6 +46,7 @@ namespace Urho3D
 static const float DEFAULT_MASS = 0.0f;
 static const float DEFAULT_FRICTION = 0.5f;
 static const float DEFAULT_RESTITUTION = 0.0f;
+static const float DEFAULT_ROLLING_FRICTION = 0.0f;
 static const unsigned DEFAULT_COLLISION_LAYER = 0x1;
 static const unsigned DEFAULT_COLLISION_MASK = M_MAX_UNSIGNED;
 
@@ -105,6 +106,7 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Rolling Friction", GetRollingFriction, SetRollingFriction, float, DEFAULT_ROLLING_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
@@ -369,6 +371,15 @@ void RigidBody::SetFriction(float friction)
     }
 }
 
+void RigidBody::SetRollingFriction(float friction)
+{
+    if (body_)
+    {
+        body_->setRollingFriction(friction);
+        MarkNetworkUpdate();
+    }
+}
+
 void RigidBody::SetRestitution(float restitution)
 {
     if (body_)
@@ -569,130 +580,87 @@ Vector3 RigidBody::GetPosition() const
 
 Quaternion RigidBody::GetRotation() const
 {
-    if (body_)
-        return ToQuaternion(body_->getWorldTransform().getRotation());
-    else
-        return Quaternion::IDENTITY;
+    return body_ ? ToQuaternion(body_->getWorldTransform().getRotation()) : Quaternion::IDENTITY;
 }
 
 Vector3 RigidBody::GetLinearVelocity() const
 {
-    if (body_)
-        return ToVector3(body_->getLinearVelocity());
-    else
-        return Vector3::ZERO;
+    return body_ ? ToVector3(body_->getLinearVelocity()) : Vector3::ZERO;
 }
 
 Vector3 RigidBody::GetLinearFactor() const
 {
-    if (body_)
-        return ToVector3(body_->getLinearFactor());
-    else
-        return Vector3::ZERO;
+    return body_ ? ToVector3(body_->getLinearFactor()) : Vector3::ZERO;
 }
 
 Vector3 RigidBody::GetVelocityAtPoint(const Vector3& position) const
 {
-    if (body_)
-        return ToVector3(body_->getVelocityInLocalPoint(ToBtVector3(position - centerOfMass_)));
-    else
-        return Vector3::ZERO;
+    return body_ ? ToVector3(body_->getVelocityInLocalPoint(ToBtVector3(position - centerOfMass_))) : Vector3::ZERO;
 }
 
 float RigidBody::GetLinearRestThreshold() const
 {
-    if (body_)
-        return body_->getLinearSleepingThreshold();
-    else
-        return 0.0f;
+    return body_ ? body_->getLinearSleepingThreshold() : 0.0f;
 }
 
 float RigidBody::GetLinearDamping() const
 {
-    if (body_)
-        return body_->getLinearDamping();
-    else
-        return 0.0f;
+    return body_ ? body_->getLinearDamping() : 0.0f;
 }
 
 Vector3 RigidBody::GetAngularVelocity() const
 {
-    if (body_)
-        return ToVector3(body_->getAngularVelocity());
-    else
-        return Vector3::ZERO;
+    return body_ ? ToVector3(body_->getAngularVelocity()) : Vector3::ZERO;
 }
 
 Vector3 RigidBody::GetAngularFactor() const
 {
-    if (body_)
-        return ToVector3(body_->getAngularFactor());
-    else
-        return Vector3::ZERO;
+    return body_ ? ToVector3(body_->getAngularFactor()) : Vector3::ZERO;
 }
 
 float RigidBody::GetAngularRestThreshold() const
 {
-    if (body_)
-        return body_->getAngularSleepingThreshold();
-    else
-        return 0.0f;
+    return body_ ? body_->getAngularSleepingThreshold() : 0.0f;
 }
 
 float RigidBody::GetAngularDamping() const
 {
-    if (body_)
-        return body_->getAngularDamping();
-    else
-        return 0.0f;
+    return body_ ? body_->getAngularDamping() : 0.0f;
 }
 
 float RigidBody::GetFriction() const
 {
-    if (body_)
-        return body_->getFriction();
-    else
-        return 0.0f;
+    return body_ ? body_->getFriction() : 0.0f;
+}
+
+float RigidBody::GetRollingFriction() const
+{
+    return body_ ? body_->getRollingFriction() : 0.0f;
 }
 
 float RigidBody::GetRestitution() const
 {
-    if (body_)
-        return body_->getRestitution();
-    else
-        return 0.0f;
+    return body_ ? body_->getRestitution() : 0.0f;
 }
 
 float RigidBody::GetContactProcessingThreshold() const
 {
-    if (body_)
-        return body_->getContactProcessingThreshold();
-    else
-        return 0.0f;
+    return body_ ? body_->getContactProcessingThreshold() : 0.0f;
 }
 
 float RigidBody::GetCcdRadius() const
 {
-    if (body_)
-        return body_->getCcdSweptSphereRadius();
-    else
-        return 0.0f;
+    return body_ ? body_->getCcdSweptSphereRadius() : 0.0f;
 }
 
 float RigidBody::GetCcdMotionThreshold() const
 {
-    if (body_)
-        return body_->getCcdMotionThreshold();
-    else
-        return 0.0f;
+    return body_ ? body_->getCcdMotionThreshold() : 0.0f;
 }
 
 bool RigidBody::IsActive() const
 {
-    if (body_)
-        return body_->isActive();
-    else
-        return false;
+    return body_ ? body_->isActive() : false;
 }
 
 void RigidBody::GetCollidingBodies(PODVector<RigidBody*>& result) const
