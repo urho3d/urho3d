@@ -60,7 +60,7 @@ public:
     bool SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
     /// Load one face from a stream. Return true if successful.
     bool Load(CubeMapFace face, Deserializer& source);
-    /// Load one face from an image. Return true if successful.
+    /// Load one face from an image. Return true if successful. Optionally make a single channel image alpha-only.
     bool Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha = false);
     
     /// Get data from a face's mip level. The destination buffer must be big enough. Return true if successful.

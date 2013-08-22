@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "ArrayPtr.h"
 #include "Color.h"
 #include "GPUObject.h"
 #include "GraphicsDefs.h"
@@ -45,7 +44,7 @@ public:
     /// Destruct.
     virtual ~Texture();
     
-    /// Set number of requested mipmap levels. Needs to be called before setting size.
+    /// Set number of requested mip levels. Needs to be called before setting size.
     void SetNumLevels(unsigned levels);
     /// Set filtering mode.
     void SetFilterMode(TextureFilterMode filter);
@@ -59,6 +58,8 @@ public:
     void SetSRGB(bool enable);
     /// Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
+    /// Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
+    void SetMipsToSkip(int quality, int mips);
     /// Dirty the parameters.
     void SetParametersDirty();
     /// Update changed parameters to OpenGL. Called by Graphics when binding the texture.
@@ -70,7 +71,7 @@ public:
     unsigned GetFormat() const { return format_; }
     /// Return whether the texture format is compressed.
     bool IsCompressed() const;
-    /// Return number of mipmap levels.
+    /// Return number of mip levels.
     unsigned GetLevels() const { return levels_; }
     /// Return width.
     int GetWidth() const { return width_; }
@@ -90,6 +91,8 @@ public:
     bool GetSRGB() const { return sRGB_; }
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
+    /// Return mip levels to skip on a quality setting when loading.
+    int GetMipsToSkip(int quality) const;
     /// Return mip level width, or 0 if level does not exist.
     int GetLevelWidth(unsigned level) const;
     /// Return mip level width, or 0 if level does not exist.
@@ -110,7 +113,7 @@ public:
     /// Load parameters from an XML file.
     void LoadParameters(XMLFile* xml);
     /// Load parameters from an XML element.
-    void LoadParameters(const XMLElement& elem);
+    void LoadParameters(const XMLElement& element);
     /// Return the corresponding SRGB texture format if supported. If not supported, return format unchanged.
     unsigned GetSRGBFormat(unsigned format);
     
@@ -126,9 +129,9 @@ protected:
     unsigned target_;
     /// Texture format.
     unsigned format_;
-    /// Current mipmap levels.
+    /// Current mip levels.
     unsigned levels_;
-    /// Requested mipmap levels.
+    /// Requested mip levels.
     unsigned requestedLevels_;
     /// Texture width.
     int width_;
@@ -142,7 +145,7 @@ protected:
     TextureFilterMode filterMode_;
     /// Addressing mode.
     TextureAddressMode addressMode_[MAX_COORDS];
-    /// Mipmaps to skip when loading.
+    /// Mip levels to skip when loading per texture quality setting.
     unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
     /// Border color.
     Color borderColor_;

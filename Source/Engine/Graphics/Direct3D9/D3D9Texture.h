@@ -24,7 +24,6 @@
 
 #include "Color.h"
 #include "GPUObject.h"
-#include "Image.h"
 #include "GraphicsDefs.h"
 #include "Resource.h"
 
@@ -57,6 +56,8 @@ public:
     void SetSRGB(bool enable);
     /// Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
+    /// Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
+    void SetMipsToSkip(int quality, int mips);
     
     /// Return texture format.
     unsigned GetFormat() const { return format_; }
@@ -78,6 +79,8 @@ public:
     bool GetSRGB() const { return sRGB_; }
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
+    /// Return mip levels to skip on a quality setting when loading.
+    int GetMipsToSkip(int quality) const;
     /// Return mip level width, or 0 if level does not exist.
     int GetLevelWidth(unsigned level) const;
     /// Return mip level width, or 0 if level does not exist.
@@ -118,7 +121,7 @@ protected:
     TextureFilterMode filterMode_;
     /// Addressing mode.
     TextureAddressMode addressMode_[MAX_COORDS];
-    /// Mipmaps to skip when loading.
+    /// Mip levels to skip when loading per texture quality setting.
     unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
     /// Border color.
     Color borderColor_;

@@ -56,7 +56,7 @@ public:
     bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
     /// Set data either partially or fully on a mip level. Return true if successful.
     bool SetData(unsigned level, int x, int y, int width, int height, const void* data);
-    /// Load from an image. Return true if successful.
+    /// Load from an image. Return true if successful. Optionally make a single channel image alpha-only.
     bool Load(SharedPtr<Image> image, bool useAlpha = false);
     
     /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.

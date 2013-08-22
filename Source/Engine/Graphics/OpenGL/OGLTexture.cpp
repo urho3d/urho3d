@@ -144,6 +144,21 @@ void Texture::SetBackupTexture(Texture* texture)
     backupTexture_ = texture;
 }
 
+void Texture::SetMipsToSkip(int quality, int mips)
+{
+    if (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS)
+    {
+        mipsToSkip_[quality] = mips;
+        
+        // Make sure a higher quality level does not actually skip more mips
+        for (int i = 1; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
+        {
+            if (mipsToSkip_[i] > mipsToSkip_[i - 1])
+                mipsToSkip_[i] = mipsToSkip_[i - 1];
+        }
+    }
+}
+
 void Texture::SetParametersDirty()
 {
     parametersDirty_ = true;
@@ -215,6 +230,11 @@ void Texture::UpdateParameters()
     #endif
     
     parametersDirty_ = false;
+}
+
+int Texture::GetMipsToSkip(int quality) const
+{
+    return (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS) ? mipsToSkip_[quality] : 0;
 }
 
 bool Texture::IsCompressed() const
@@ -415,20 +435,13 @@ void Texture::LoadParameters(const XMLElement& elem)
         if (name == "quality")
         {
             if (paramElem.HasAttribute("low"))
-                mipsToSkip_[QUALITY_LOW] = Max(paramElem.GetInt("low"), 0);
+                SetMipsToSkip(QUALITY_LOW, paramElem.GetInt("low"));
             if (paramElem.HasAttribute("med"))
-                mipsToSkip_[QUALITY_MEDIUM] = Max(paramElem.GetInt("med"), 0);
+                SetMipsToSkip(QUALITY_MEDIUM, paramElem.GetInt("med"));
             if (paramElem.HasAttribute("medium"))
-                mipsToSkip_[QUALITY_MEDIUM] = Max(paramElem.GetInt("medium"), 0);
+                SetMipsToSkip(QUALITY_MEDIUM, paramElem.GetInt("medium"));
             if (paramElem.HasAttribute("high"))
-                mipsToSkip_[QUALITY_HIGH] = Max(paramElem.GetInt("high"), 0);
-            
-            // Make sure a higher quality level does not actually skip more mips
-            for (int i = 1; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
-            {
-                if (mipsToSkip_[i] > mipsToSkip_[i - 1])
-                    mipsToSkip_[i] = mipsToSkip_[i - 1];
-            }
+                SetMipsToSkip(QUALITY_HIGH, paramElem.GetInt("high"));
         }
         
         if (name == "srgb")

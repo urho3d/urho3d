@@ -1910,6 +1910,7 @@ Properties:<br>
 - Color borderColor
 - bool sRGB
 - Texture@ backupTexture
+- int[] mipsToSkip
 - bool dataLost (readonly)
 
 
@@ -1981,6 +1982,7 @@ Properties:<br>
 - Color borderColor
 - bool sRGB
 - Texture@ backupTexture
+- int[] mipsToSkip
 - bool dataLost (readonly)
 - RenderSurface@ renderSurface (readonly)
 
@@ -2018,6 +2020,7 @@ Properties:<br>
 - Color borderColor
 - bool sRGB
 - Texture@ backupTexture
+- int[] mipsToSkip
 - bool dataLost (readonly)
 - RenderSurface@[] renderSurfaces (readonly)
 
@@ -5841,6 +5844,7 @@ Properties:<br>
 - float angularRestThreshold
 - float angularDamping
 - float friction
+- float rollingFriction
 - float restitution
 - float contactProcessingThreshold
 - float ccdRadius

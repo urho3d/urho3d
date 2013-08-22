@@ -558,7 +558,7 @@ const FontFace* Font::GetFaceTTF(int pointSize)
     }
     
     FT_Done_Face(face);
-        
+    
     SetMemoryUse(GetMemoryUse() + totalTextureSize);
     faces_[pointSize] = newFace;
     return newFace;
@@ -804,6 +804,7 @@ SharedPtr<FontFace> Font::Pack(const FontFace* fontFace)
 SharedPtr<Texture> Font::LoadFaceTexture(SharedPtr<Image> image)
 {
     Texture2D* texture = new Texture2D(context_);
+    texture->SetMipsToSkip(QUALITY_LOW, 0); // No quality reduction
     texture->SetNumLevels(1); // No mipmaps
     texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
     texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
