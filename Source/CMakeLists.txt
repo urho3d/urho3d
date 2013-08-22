@@ -159,9 +159,14 @@ endif ()
 
 # Generate platform specific export header file automatically
 set_target_properties (Urho3D PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
-generate_export_header (Urho3D EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Engine/Urho3D.h)
+generate_export_header (Urho3D EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Engine/Urho3D.h.new)
 
 # Append Urho3D license notice to the export header file
 file (READ ${CMAKE_SOURCE_DIR}/Engine/Urho3D.h.in LICENSE)
-file (READ ${CMAKE_BINARY_DIR}/Engine/Urho3D.h EXPORT_DEFINE)
-file (WRITE ${CMAKE_BINARY_DIR}/Engine/Urho3D.h ${LICENSE}${EXPORT_DEFINE})
+file (READ ${CMAKE_BINARY_DIR}/Engine/Urho3D.h.new EXPORT_DEFINE)
+file (WRITE ${CMAKE_BINARY_DIR}/Engine/Urho3D.h.new ${LICENSE}${EXPORT_DEFINE})
+
+# Copy the new export header file only if it is different to prevent unnecessary library rebuild
+execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/Engine/Urho3D.h.new ${CMAKE_BINARY_DIR}/Engine/Urho3D.h)
+file (REMOVE ${CMAKE_BINARY_DIR}/Engine/Urho3D.h.new)
+

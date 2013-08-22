@@ -135,10 +135,10 @@ void Physics::CreateScene()
             for (int x = -y; x <= y; ++x)
             {
                 Node* boxNode = scene_->CreateChild("Box");
-                boxNode->SetPosition(Vector3((float)x, -(float)y + 7.5f, 0.0f));
+                boxNode->SetPosition(Vector3((float)x, -(float)y + 8.0f, 0.0f));
                 StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
                 boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-                boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMap.xml"));
+                boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMapSmall.xml"));
                 boxObject->SetCastShadows(true);
                 
                 // Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable
@@ -245,7 +245,7 @@ void Physics::SpawnObject()
     boxNode->SetScale(0.25f);
     StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
     boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-    boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMap.xml"));
+    boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMapSmall.xml"));
     boxObject->SetCastShadows(true);
     
     // Create physics components, use a smaller mass also
