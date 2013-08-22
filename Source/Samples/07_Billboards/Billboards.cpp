@@ -92,7 +92,7 @@ void Billboards::CreateScene()
     zone->SetFogEnd(300.0f);
     
     // Create a directional light without shadows
-    Node* lightNode = scene_->CreateChild("Light");
+    Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f));
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
@@ -168,7 +168,7 @@ void Billboards::CreateScene()
     
     for (unsigned i = 0; i < NUM_LIGHTS; ++i)
     {
-        Node* lightNode = scene_->CreateChild("Light");
+        Node* lightNode = scene_->CreateChild("SpotLight");
         Light* light = lightNode->CreateComponent<Light>();
         
         float angle = 0.0f;

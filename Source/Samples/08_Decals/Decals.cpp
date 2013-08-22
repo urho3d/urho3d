@@ -102,7 +102,7 @@ void Decals::CreateScene()
     zone->SetFogEnd(300.0f);
     
     // Create a directional light to the world. Enable cascaded shadows on it
-    Node* lightNode = scene_->CreateChild("Directional light");
+    Node* lightNode = scene_->CreateChild("DirectionalLight");
     lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f));
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);

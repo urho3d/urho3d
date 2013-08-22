@@ -140,7 +140,7 @@ void RenderToTexture::CreateScene()
         zone->SetFogEnd(300.0f);
         
         // Create a directional light without shadows
-        Node* lightNode = scene_->CreateChild("Light");
+        Node* lightNode = scene_->CreateChild("DirectionalLight");
         lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f));
         Light* light = lightNode->CreateComponent<Light>();
         light->SetLightType(LIGHT_DIRECTIONAL);
