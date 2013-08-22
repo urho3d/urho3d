@@ -61,8 +61,9 @@ if (URHO3D_HOME)
             ${SOURCE_TREE_PATH}/Scene
             ${SOURCE_TREE_PATH}/Script
             ${SOURCE_TREE_PATH}/UI
-            ${SOURCE_TREE_PATH}/../Extras/LuaScript
-            ${SOURCE_TREE_PATH}/../ThirdParty/SDL/include)
+            ${URHO3D_HOME}/Source/Extras/LuaScript
+            ${URHO3D_HOME}/Source/ThirdParty/SDL/include
+            ${URHO3D_HOME}/Source/ThirdParty/Bullet/src)
 
         if (RASPI AND CMAKE_CROSSCOMPILING)
             set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/raspi-Build/Engine)
