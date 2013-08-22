@@ -43,14 +43,14 @@
 #include "UI.h"
 #include "Zone.h"
 
-#include "Physics.h"
+#include "PhysicsStressTest.h"
 
 #include "DebugNew.h"
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(Physics)
+DEFINE_APPLICATION_MAIN(PhysicsStressTest)
 
-Physics::Physics(Context* context) :
+PhysicsStressTest::PhysicsStressTest(Context* context) :
     Sample(context),
     yaw_(0.0f),
     pitch_(0.0f),
@@ -58,7 +58,7 @@ Physics::Physics(Context* context) :
 {
 }
 
-void Physics::Start()
+void PhysicsStressTest::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -76,7 +76,7 @@ void Physics::Start()
     SubscribeToEvents();
 }
 
-void Physics::CreateScene()
+void PhysicsStressTest::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -110,46 +110,61 @@ void Physics::CreateScene()
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     
     {
-        // Create a floor object, 100 x 100 world units. Adjust position so that the ground is at zero Y
+        // Create a floor object, 500 x 500 world units. Adjust position so that the ground is at zero Y
         Node* floorNode = scene_->CreateChild("Floor");
-        floorNode->SetPosition(Vector3(0.0f, -0.25f, 0.0f));
-        floorNode->SetScale(Vector3(100.0f, 0.5f, 100.0f));
+        floorNode->SetPosition(Vector3(0.0f, -0.5f, 0.0f));
+        floorNode->SetScale(Vector3(500.0f, 1.0f, 500.0f));
         StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
         floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         floorObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
         
-        // Make the floor physical by adding RigidBody and CollisionShape components. The RigidBody's default
-        // parameters make the object static (zero mass.) Note that a CollisionShape by itself will not participate
-        // in the physics simulation
+        // Make the floor physical by adding RigidBody and CollisionShape component
         RigidBody* body = floorNode->CreateComponent<RigidBody>();
         CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
-        // Set a box shape of size 1 x 1 x 1 for collision. The shape will be scaled with the scene node scale, so the
-        // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
         shape->SetBox(Vector3::ONE);
     }
     
     {
-        // Create a pyramid of movable physics objects
-        for (int y = 0; y < 8; ++y)
+        // Create static mushrooms with triangle mesh collision
+        const unsigned NUM_MUSHROOMS = 50;
+        for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
         {
-            for (int x = -y; x <= y; ++x)
-            {
-                Node* boxNode = scene_->CreateChild("Box");
-                boxNode->SetPosition(Vector3((float)x, -(float)y + 8.0f, 0.0f));
-                StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
-                boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-                boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMapSmall.xml"));
-                boxObject->SetCastShadows(true);
-                
-                // Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable
-                // and also adjust friction. The actual mass is not important; only the mass ratios between colliding 
-                // objects are significant
-                RigidBody* body = boxNode->CreateComponent<RigidBody>();
-                body->SetMass(1.0f);
-                body->SetFriction(0.75f);
-                CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
-                shape->SetBox(Vector3::ONE);
-            }
+            Node* mushroomNode = scene_->CreateChild("Mushroom");
+            mushroomNode->SetPosition(Vector3(Random(400.0f) - 200.0f, 0.0f, Random(400.0f) - 200.0f));
+            mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
+            mushroomNode->SetScale(5.0f);
+            StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+            mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
+            mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
+            mushroomObject->SetCastShadows(true);
+            
+            RigidBody* body = mushroomNode->CreateComponent<RigidBody>();
+            CollisionShape* shape = mushroomNode->CreateComponent<CollisionShape>();
+            // By default the highest LOD level will be used, the LOD level can be passed as an optional parameter
+            shape->SetTriangleMesh(mushroomObject->GetModel());
+        }
+    }
+    
+    {
+        // Create a large amount of falling physics objects
+        const unsigned NUM_OBJECTS = 1000;
+        for (unsigned i = 0; i < NUM_OBJECTS; ++i)
+        {
+            Node* boxNode = scene_->CreateChild("Box");
+            boxNode->SetPosition(Vector3(0.f, i * 2.0f + 100.0f, 0.0f));
+            StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+            boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+            boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
+            boxObject->SetCastShadows(true);
+            
+            // Give the RigidBody mass to make it movable and also adjust friction
+            RigidBody* body = boxNode->CreateComponent<RigidBody>();
+            body->SetMass(1.0f);
+            body->SetFriction(1.0f);
+            // Disable collision event signaling to reduce CPU load of the physics simulation
+            body->SetCollisionEventMode(COLLISION_NEVER);
+            CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
+            shape->SetBox(Vector3::ONE);
         }
     }
     
@@ -163,7 +178,7 @@ void Physics::CreateScene()
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, -20.0f));
 }
 
-void Physics::CreateInstructions()
+void PhysicsStressTest::CreateInstructions()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
@@ -184,7 +199,7 @@ void Physics::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void Physics::SetupViewport()
+void PhysicsStressTest::SetupViewport()
 {
     Renderer* renderer = GetSubsystem<Renderer>();
     
@@ -193,7 +208,7 @@ void Physics::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
-void Physics::MoveCamera(float timeStep)
+void PhysicsStressTest::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
     if (GetSubsystem<UI>()->GetFocusElement())
@@ -234,7 +249,7 @@ void Physics::MoveCamera(float timeStep)
         drawDebug_ = !drawDebug_;
 }
 
-void Physics::SpawnObject()
+void PhysicsStressTest::SpawnObject()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -245,7 +260,7 @@ void Physics::SpawnObject()
     boxNode->SetScale(0.25f);
     StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
     boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-    boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMapSmall.xml"));
+    boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
     boxObject->SetCastShadows(true);
     
     // Create physics components, use a smaller mass also
@@ -262,17 +277,17 @@ void Physics::SpawnObject()
     body->SetLinearVelocity(cameraNode_->GetRotation() * Vector3(0.0f, 0.25f, 1.0f) * OBJECT_VELOCITY);
 }
 
-void Physics::SubscribeToEvents()
+void PhysicsStressTest::SubscribeToEvents()
 {
     // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Physics, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, HANDLER(PhysicsStressTest, HandleUpdate));
     
     // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
     // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Physics, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(PhysicsStressTest, HandlePostRenderUpdate));
 }
 
-void Physics::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void PhysicsStressTest::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Event parameters are always defined inside a namespace corresponding to the event's name
     using namespace Update;
@@ -288,17 +303,17 @@ void Physics::HandleUpdate(StringHash eventType, VariantMap& eventData)
     Input* input = GetSubsystem<Input>();
     if (input->GetKeyPress(KEY_F5))
     {
-        File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Physics.xml", FILE_WRITE);
+        File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/PhysicsStressTest.xml", FILE_WRITE);
         scene_->SaveXML(saveFile);
     }
     if (input->GetKeyPress(KEY_F7))
     {
-        File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Physics.xml", FILE_READ);
+        File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/PhysicsStressTest.xml", FILE_READ);
         scene_->LoadXML(loadFile);
     }
 }
 
-void Physics::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+void PhysicsStressTest::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     // If draw debug mode is enabled, draw physics debug geometry. Use depth test to make the result easier to interpret
     if (drawDebug_)
