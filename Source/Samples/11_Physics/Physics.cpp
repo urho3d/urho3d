@@ -110,10 +110,10 @@ void Physics::CreateScene()
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     
     {
-        // Create a floor object, 100 x 100 world units. Adjust position so that the ground is at zero Y
+        // Create a floor object, 500 x 500 world units. Adjust position so that the ground is at zero Y
         Node* floorNode = scene_->CreateChild("Floor");
-        floorNode->SetPosition(Vector3(0.0f, -0.25f, 0.0f));
-        floorNode->SetScale(Vector3(100.0f, 0.5f, 100.0f));
+        floorNode->SetPosition(Vector3(0.0f, -0.5f, 0.0f));
+        floorNode->SetScale(Vector3(500.0f, 1.0f, 500.0f));
         StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
         floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         floorObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
