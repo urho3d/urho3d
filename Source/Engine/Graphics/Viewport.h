@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Object.h"
 #include "Ptr.h"
 #include "Rect.h"
 
