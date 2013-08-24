@@ -30,6 +30,8 @@ using namespace Urho3D;
 /// Custom component for rotating a scene node.
 class Rotator : public Component
 {
+    OBJECT(Rotator);
+    
 public:
     /// Construct.
     Rotator(Context* context);

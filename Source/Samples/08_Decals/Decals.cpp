@@ -176,7 +176,9 @@ void Decals::CreateUI()
         "7 to toggle occlusion culling"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
-
+    // The text has multiple rows. Center them in relation to each other
+    instructionText->SetTextAlignment(HA_CENTER);
+    
     // Position the text relative to the screen center
     instructionText->SetHorizontalAlignment(HA_CENTER);
     instructionText->SetVerticalAlignment(VA_CENTER);

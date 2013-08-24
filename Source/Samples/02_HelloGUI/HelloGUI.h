@@ -34,7 +34,7 @@ using namespace Urho3D;
 ///     - Handling of global and per-control events;
 class HelloGUI : public Sample
 {
-    OBJECT(HelloGUI)
+    OBJECT(HelloGUI);
 
 public:
     /// Construct.

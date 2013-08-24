@@ -35,8 +35,7 @@ using namespace Urho3D;
 ///     - Handling keyboard and mouse input to move a freelook camera;
 class StaticScene : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(StaticScene)
+    OBJECT(StaticScene);
 
 public:
     /// Construct.

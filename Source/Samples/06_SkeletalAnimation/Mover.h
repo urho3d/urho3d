@@ -30,6 +30,8 @@ using namespace Urho3D;
 /// Custom component for moving the animated model and rotating at area edges.
 class Mover : public Component
 {
+    OBJECT(Mover);
+    
 public:
     /// Construct.
     Mover(Context* context);

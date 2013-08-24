@@ -20,35 +20,13 @@
 # THE SOFTWARE.
 #
 
-# Include common to all samples
-set (COMMON_SAMPLE_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Sample.h" "${CMAKE_CURRENT_SOURCE_DIR}/Sample.inl")
+# Define target name
+set (TARGET_NAME 13_Ragdolls)
 
-# Define dependency libs
-set (LIBS ../../Engine/Container
-          ../../Engine/Core
-          ../../Engine/Engine
-          ../../Engine/Graphics
-          ../../Engine/Input
-          ../../Engine/IO
-          ../../Engine/Math
-          ../../Engine/Physics
-          ../../Engine/Resource
-          ../../Engine/Scene
-          ../../Engine/UI)
+# Define source files
+file (GLOB CPP_FILES *.cpp)
+file (GLOB H_FILES *.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${COMMON_SAMPLE_H_FILES})
 
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ../../ThirdParty/Bullet/src)
-
-# Add samples
-add_subdirectory (01_HelloWorld)
-add_subdirectory (02_HelloGUI)
-add_subdirectory (03_Sprites)
-add_subdirectory (04_StaticScene)
-add_subdirectory (05_AnimatingScene)
-add_subdirectory (06_SkeletalAnimation)
-add_subdirectory (07_Billboards)
-add_subdirectory (08_Decals)
-add_subdirectory (09_MultipleViewports)
-add_subdirectory (10_RenderToTexture)
-add_subdirectory (11_Physics)
-add_subdirectory (12_PhysicsStressTest)
-add_subdirectory (13_Ragdolls)
+# Setup target with resource copying
+setup_main_executable ()

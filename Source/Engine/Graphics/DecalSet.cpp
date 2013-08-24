@@ -923,9 +923,8 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
                     skinMatrices_.Resize(skinMatrices_.Size() + 1);
                     skinningDirty_ = true;
                     
-                    // Start listening to bone transform changes to update skinning, update amount of shader data in the batch
+                    // Start listening to bone transform changes to update skinning
                     bone->node_->AddListener(this);
-                    UpdateBatch();
                 }
             }
             
@@ -935,6 +934,8 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
             newBlendIndices[i] = 0;
     }
     
+    // Update amount of shader data in the decal batch
+    UpdateBatch();
     return true;
 }
 

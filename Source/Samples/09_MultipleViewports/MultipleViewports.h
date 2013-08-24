@@ -34,8 +34,7 @@ using namespace Urho3D;
 ///     - Adding post processing effects to a viewport's render path and toggling them;
 class MultipleViewports : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(MultipleViewports)
+    OBJECT(MultipleViewports);
 
 public:
     /// Construct.

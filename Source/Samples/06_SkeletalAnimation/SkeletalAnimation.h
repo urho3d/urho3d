@@ -37,8 +37,7 @@ using namespace Urho3D;
 ///     - Displaying renderer debug geometry;
 class SkeletalAnimation : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(SkeletalAnimation)
+    OBJECT(SkeletalAnimation);
 
 public:
     /// Construct.

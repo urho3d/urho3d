@@ -34,8 +34,7 @@ using namespace Urho3D;
 ///     - Creating rendertarget textures and materials programmatically;
 class RenderToTexture : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(RenderToTexture)
+    OBJECT(RenderToTexture);
 
 public:
     /// Construct.

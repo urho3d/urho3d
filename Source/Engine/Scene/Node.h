@@ -171,6 +171,8 @@ public:
     template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
     /// Template version of getting or creating a component.
     template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
+    /// Template version of removing a component.
+    template <class T> void RemoveComponent();
 
     /// Return ID.
     unsigned GetID() const { return id_; }
@@ -402,6 +404,7 @@ private:
 
 template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id) { return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode, id)); }
 template <class T> T* Node::GetOrCreateComponent(CreateMode mode, unsigned id) { return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode, id)); }
+template <class T> void Node::RemoveComponent() { RemoveComponent(T::GetTypeStatic()); }
 template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const { GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive); }
 template <class T> T* Node::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
 template <class T> void Node::GetComponents(PODVector<T*>& dest, bool recursive) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic(), recursive); }

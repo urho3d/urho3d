@@ -35,8 +35,7 @@ using namespace Urho3D;
 ///     - Attaching a light to an object (the camera);
 class AnimatingScene : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(AnimatingScene)
+    OBJECT(AnimatingScene);
 
 public:
     /// Construct.

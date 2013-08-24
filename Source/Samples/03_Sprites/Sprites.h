@@ -35,8 +35,8 @@ using namespace Urho3D;
 ///     - Handling frame update events in which the sprites are moved;
 class Sprites : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(Sprites)
+    // Enable type information.
+    OBJECT(Sprites);
 
 public:
     /// Construct.

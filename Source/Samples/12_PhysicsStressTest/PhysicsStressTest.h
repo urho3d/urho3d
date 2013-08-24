@@ -35,8 +35,7 @@ using namespace Urho3D;
 ///     - Optimizing physics simulation by leaving out collision event signaling;
 class PhysicsStressTest : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(PhysicsStressTest)
+    OBJECT(PhysicsStressTest);
 
 public:
     /// Construct.

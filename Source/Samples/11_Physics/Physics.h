@@ -35,8 +35,7 @@ using namespace Urho3D;
 ///     - Saving a scene to a file and loading it to restore a previous state;
 class Physics : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(Physics)
+    OBJECT(Physics);
 
 public:
     /// Construct.

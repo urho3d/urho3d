@@ -28,18 +28,17 @@
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// Billboard example.
+/// Ragdoll example.
 /// This sample demonstrates:
-///     - Populating a 3D scene with billboard sets and several shadow casting spotlights;
-///     - Parenting scene nodes to allow more intuitive creation of groups of objects;
-///     - Examining rendering performance with a somewhat large object and light count;
-class Billboards : public Sample
+///     - Detecting physics collisions;
+///     - Moving an AnimatedModel's bones with physics and connecting them with constraints;
+class Ragdolls : public Sample
 {
-    OBJECT(Billboards);
+    OBJECT(Ragdolls);
 
 public:
     /// Construct.
-    Billboards(Context* context);
+    Ragdolls(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
@@ -53,8 +52,8 @@ private:
     void SetupViewport();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
-    /// Animates the scene.
-    void AnimateScene(float timeStep);
+    /// Spawns a physics object from the camera position.
+    void SpawnObject();
     /// Subscribes to application-wide logic update events.
     void SubscribeToEvents();
     /// Callback method invoked when a logic update event is dispatched.

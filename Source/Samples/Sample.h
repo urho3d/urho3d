@@ -36,8 +36,8 @@ using namespace Urho3D;
 ///    - Handle Esc key down to hide Console or exit application;
 class Sample : public Application
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(Sample)
+    // Enable type information.
+    OBJECT(Sample);
 
 public:
     /// Construct.

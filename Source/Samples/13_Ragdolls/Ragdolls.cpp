@@ -20,9 +20,11 @@
 // THE SOFTWARE.
 //
 
+#include "AnimatedModel.h"
 #include "Camera.h"
 #include "CollisionShape.h"
 #include "CoreEvents.h"
+#include "CreateRagdoll.h"
 #include "DebugRenderer.h"
 #include "Engine.h"
 #include "File.h"
@@ -38,27 +40,28 @@
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "RigidBody.h"
-#include "StaticModel.h"
 #include "Text.h"
 #include "UI.h"
 #include "Zone.h"
 
-#include "Physics.h"
+#include "Ragdolls.h"
 
 #include "DebugNew.h"
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(Physics)
+DEFINE_APPLICATION_MAIN(Ragdolls)
 
-Physics::Physics(Context* context) :
+Ragdolls::Ragdolls(Context* context) :
     Sample(context),
     yaw_(0.0f),
     pitch_(0.0f),
     drawDebug_(false)
 {
+    // Register an object factory for our custom CreateRagdoll component so that we can create them to scene nodes
+    context->RegisterFactory<CreateRagdoll>();
 }
 
-void Physics::Start()
+void Ragdolls::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -76,7 +79,7 @@ void Physics::Start()
     SubscribeToEvents();
 }
 
-void Physics::CreateScene()
+void Ragdolls::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -128,28 +131,32 @@ void Physics::CreateScene()
         shape->SetBox(Vector3::ONE);
     }
     
+    // Create animated models
+    for (int z = -1; z <= 1; ++z)
     {
-        // Create a pyramid of movable physics objects
-        for (int y = 0; y < 8; ++y)
+        for (int x = -4; x <= 4; ++x)
         {
-            for (int x = -y; x <= y; ++x)
-            {
-                Node* boxNode = scene_->CreateChild("Box");
-                boxNode->SetPosition(Vector3((float)x, -(float)y + 8.0f, 0.0f));
-                StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
-                boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-                boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMapSmall.xml"));
-                boxObject->SetCastShadows(true);
-                
-                // Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable
-                // and also adjust friction. The actual mass is not important; only the mass ratios between colliding 
-                // objects are significant
-                RigidBody* body = boxNode->CreateComponent<RigidBody>();
-                body->SetMass(1.0f);
-                body->SetFriction(0.75f);
-                CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
-                shape->SetBox(Vector3::ONE);
-            }
+            Node* modelNode = scene_->CreateChild("Jack");
+            modelNode->SetPosition(Vector3(x * 5.0f, 0.0f, z * 5.0f));
+            modelNode->SetRotation(Quaternion(0.0f, 180.0f, 0.0f));
+            AnimatedModel* modelObject = modelNode->CreateComponent<AnimatedModel>();
+            modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
+            modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
+            modelObject->SetCastShadows(true);
+            
+            // Create a rigid body and a collision shape. These will act as a trigger for transforming the
+            // model into a ragdoll when hit by a moving object
+            RigidBody* body = modelNode->CreateComponent<RigidBody>();
+            // The phantom mode makes the rigid body only detect collisions, but impart no forces on the
+            // colliding objects
+            body->SetPhantom(true);
+            CollisionShape* shape = modelNode->CreateComponent<CollisionShape>();
+            // Create the capsule shape with an offset so that it is correctly aligned with the model, which
+            // has its origin at the feet
+            shape->SetCapsule(0.7f, 2.0f, Vector3(0.0f, 1.0f, 0.0f));
+            
+            // Create a custom component that reacts to collisions and creates the ragdoll
+            modelNode->CreateComponent<CreateRagdoll>();
         }
     }
     
@@ -163,7 +170,7 @@ void Physics::CreateScene()
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, -20.0f));
 }
 
-void Physics::CreateInstructions()
+void Ragdolls::CreateInstructions()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
@@ -186,7 +193,7 @@ void Physics::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void Physics::SetupViewport()
+void Ragdolls::SetupViewport()
 {
     Renderer* renderer = GetSubsystem<Renderer>();
     
@@ -195,7 +202,7 @@ void Physics::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
-void Physics::MoveCamera(float timeStep)
+void Ragdolls::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
     if (GetSubsystem<UI>()->GetFocusElement())
@@ -236,23 +243,21 @@ void Physics::MoveCamera(float timeStep)
         drawDebug_ = !drawDebug_;
 }
 
-void Physics::SpawnObject()
+void Ragdolls::SpawnObject()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    // Create a smaller box at camera position
     Node* boxNode = scene_->CreateChild("SmallBox");
     boxNode->SetPosition(cameraNode_->GetPosition());
     boxNode->SetRotation(cameraNode_->GetRotation());
     boxNode->SetScale(0.25f);
     StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
     boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-    boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneEnvMapSmall.xml"));
+    boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
     boxObject->SetCastShadows(true);
     
-    // Create physics components, use a smaller mass also
     RigidBody* body = boxNode->CreateComponent<RigidBody>();
-    body->SetMass(0.25f);
+    body->SetMass(1.0f);
     body->SetFriction(0.75f);
     CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
     shape->SetBox(Vector3::ONE);
@@ -264,17 +269,17 @@ void Physics::SpawnObject()
     body->SetLinearVelocity(cameraNode_->GetRotation() * Vector3(0.0f, 0.25f, 1.0f) * OBJECT_VELOCITY);
 }
 
-void Physics::SubscribeToEvents()
+void Ragdolls::SubscribeToEvents()
 {
     // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Physics, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, HANDLER(Ragdolls, HandleUpdate));
     
     // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
     // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Physics, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Ragdolls, HandlePostRenderUpdate));
 }
 
-void Physics::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void Ragdolls::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Event parameters are always defined inside a namespace corresponding to the event's name
     using namespace Update;
@@ -290,17 +295,17 @@ void Physics::HandleUpdate(StringHash eventType, VariantMap& eventData)
     Input* input = GetSubsystem<Input>();
     if (input->GetKeyPress(KEY_F5))
     {
-        File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Physics.xml", FILE_WRITE);
+        File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Ragdolls.xml", FILE_WRITE);
         scene_->SaveXML(saveFile);
     }
     if (input->GetKeyPress(KEY_F7))
     {
-        File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Physics.xml", FILE_READ);
+        File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Ragdolls.xml", FILE_READ);
         scene_->LoadXML(loadFile);
     }
 }
 
-void Physics::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+void Ragdolls::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     // If draw debug mode is enabled, draw physics debug geometry. Use depth test to make the result easier to interpret
     if (drawDebug_)

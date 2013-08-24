@@ -36,8 +36,7 @@ using namespace Urho3D;
 ///     - Displaying renderer debug geometry to see the effect of occlusion;
 class Decals : public Sample
 {
-    // Mandatory when deriving from Object, enables type information
-    OBJECT(Decals)
+    OBJECT(Decals);
 
 public:
     /// Construct.

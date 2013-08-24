@@ -22,33 +22,30 @@
 
 #pragma once
 
-#include "Sample.h"
+#include "CollisionShape.h"
+#include "Constraint.h"
 
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
-/// This first example, maintaining tradition, prints a "Hello World" message.
-/// Furthermore it shows:
-///     - Initialization of the Urho3D engine;
-///     - Adding a Text element to the graphical user interface;
-///     - Subscribing to and handling of update events;
-class HelloWorld : public Sample
+/// Custom component that creates a ragdoll upon collision.
+class CreateRagdoll : public Component
 {
-    OBJECT(HelloWorld);
-
+    OBJECT(CreateRagdoll);
+    
 public:
     /// Construct.
-    HelloWorld(Context* context);
-
-    /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
-
+    CreateRagdoll(Context* context);
+    
+protected:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
+    
 private:
-    /// Constructs a new Text instance, containing the 'Hello World' String, and
-    /// adds it to the UI root element.
-    void CreateText();
-    /// Subscribe to application-wide logic update events.
-    void SubscribeToEvents();
-    /// Callback method invoked when a logic update event is dispatched.
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle scene node's physics collision.
+    void HandleNodeCollision(StringHash eventType, VariantMap& eventData);
+    /// Make a bone physical by adding RigidBody and CollisionShape components.
+    void CreateRagdollBone(const String& boneName, ShapeType type, const Vector3& size, const Vector3& position, const Quaternion& rotation);
+    /// Join two bones with a Constraint component.
+    void CreateRagdollConstraint(const String& boneName, const String& parentName, ConstraintType type, const Vector3& axis, const Vector3& parentAxis, const Vector2& highLimit, const Vector2& lowLimit, bool disableCollision = true);
 };
