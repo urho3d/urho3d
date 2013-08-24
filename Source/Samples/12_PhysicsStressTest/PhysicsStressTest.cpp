@@ -118,7 +118,7 @@ void PhysicsStressTest::CreateScene()
         floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         floorObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
         
-        // Make the floor physical by adding RigidBody and CollisionShape component
+        // Make the floor physical by adding RigidBody and CollisionShape components
         RigidBody* body = floorNode->CreateComponent<RigidBody>();
         CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
         shape->SetBox(Vector3::ONE);
@@ -175,7 +175,7 @@ void PhysicsStressTest::CreateScene()
     camera->SetFarClip(300.0f);
     
     // Set an initial position for the camera scene node above the floor
-    cameraNode_->SetPosition(Vector3(0.0f, 5.0f, -20.0f));
+    cameraNode_->SetPosition(Vector3(0.0f, 3.0f, -20.0f));
 }
 
 void PhysicsStressTest::CreateInstructions()

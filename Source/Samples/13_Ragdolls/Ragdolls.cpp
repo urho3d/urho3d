@@ -121,10 +121,11 @@ void Ragdolls::CreateScene()
         floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         floorObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
         
-        // Make the floor physical by adding RigidBody and CollisionShape components. The RigidBody's default
-        // parameters make the object static (zero mass.) Note that a CollisionShape by itself will not participate
-        // in the physics simulation
+        // Make the floor physical by adding RigidBody and CollisionShape components
         RigidBody* body = floorNode->CreateComponent<RigidBody>();
+        // We will be spawning spherical objects in this sample. The ground also needs non-zero rolling friction so that
+        // the spheres will eventually come to rest
+        body->SetRollingFriction(0.15f);
         CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
         // Set a box shape of size 1 x 1 x 1 for collision. The shape will be scaled with the scene node scale, so the
         // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
@@ -167,7 +168,7 @@ void Ragdolls::CreateScene()
     camera->SetFarClip(300.0f);
     
     // Set an initial position for the camera scene node above the floor
-    cameraNode_->SetPosition(Vector3(0.0f, 5.0f, -20.0f));
+    cameraNode_->SetPosition(Vector3(0.0f, 3.0f, -20.0f));
 }
 
 void Ragdolls::CreateInstructions()
@@ -247,20 +248,20 @@ void Ragdolls::SpawnObject()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    Node* boxNode = scene_->CreateChild("SmallBox");
+    Node* boxNode = scene_->CreateChild("Sphere");
     boxNode->SetPosition(cameraNode_->GetPosition());
     boxNode->SetRotation(cameraNode_->GetRotation());
     boxNode->SetScale(0.25f);
     StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
-    boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+    boxObject->SetModel(cache->GetResource<Model>("Models/Sphere.mdl"));
     boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
     boxObject->SetCastShadows(true);
     
     RigidBody* body = boxNode->CreateComponent<RigidBody>();
     body->SetMass(1.0f);
-    body->SetFriction(0.75f);
+    body->SetRollingFriction(0.15f);
     CollisionShape* shape = boxNode->CreateComponent<CollisionShape>();
-    shape->SetBox(Vector3::ONE);
+    shape->SetSphere(1.0f);
     
     const float OBJECT_VELOCITY = 10.0f;
     
