@@ -36,7 +36,7 @@ using namespace Urho3D;
 /// Navigation example.
 /// This sample demonstrates:
 ///     - Generating a navigation mesh into the scene;
-///     - Performing route queries to the navigation mesh;
+///     - Performing path queries to the navigation mesh;
 ///     - Visualizing custom debug geometry;
 class Navigation : public Sample
 {
