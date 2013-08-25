@@ -71,6 +71,10 @@ public:
     void SetMovable(bool enable);
     /// Set whether can be resized.
     void SetResizable(bool enable);
+    /// Set whether resizing width is fixed.
+    void SetFixedWidthResizing(bool enable);
+    /// Set whether resizing height is fixed.
+    void SetFixedHeightResizing(bool enable);
     /// Set resize area width at edges.
     void SetResizeBorder(const IntRect& rect);
     /// Set modal flag. When the modal flag is set, the focused window needs to be dismissed first to allow other UI elements to gain focus.
@@ -86,6 +90,10 @@ public:
     bool IsMovable() const { return movable_; }
     /// Return whether is resizable.
     bool IsResizable() const { return resizable_; }
+    /// Return whether is resizing width is fixed.
+    bool GetFixedWidthResizing() const { return fixedWidthResizing_; }
+    /// Return whether is resizing height is fixed.
+    bool GetFixedHeightResizing() const { return fixedHeightResizing_; }
     /// Return resize area width at edges.
     const IntRect& GetResizeBorder() const { return resizeBorder_; }
     /// Return modal flag.
@@ -111,6 +119,10 @@ protected:
     bool movable_;
     /// Resizable flag.
     bool resizable_;
+    /// Fixed width resize flag.
+    bool fixedWidthResizing_;
+    /// Fixed height resize flag.
+    bool fixedHeightResizing_;
     /// Resize area width at edges.
     IntRect resizeBorder_;
     /// Current drag mode.

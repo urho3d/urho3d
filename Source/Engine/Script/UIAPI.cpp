@@ -36,6 +36,7 @@
 #include "Text3D.h"
 #include "UI.h"
 #include "Window.h"
+#include "View3D.h"
 
 namespace Urho3D
 {
@@ -448,21 +449,22 @@ static void RegisterDropDownList(asIScriptEngine* engine)
 
 static void RegisterWindow(asIScriptEngine* engine)
 {
-    RegisterBorderImage<Window>(engine, "Window");
-    engine->RegisterObjectMethod("Window", "void set_movable(bool)", asMETHOD(Window, SetMovable), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "bool get_movable() const", asMETHOD(Window, IsMovable), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void set_resizable(bool)", asMETHOD(Window, SetResizable), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "bool get_resizable() const", asMETHOD(Window, IsResizable), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void set_resizeBorder(const IntRect&in)", asMETHODPR(Window, SetResizeBorder, (const IntRect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "const IntRect& get_resizeBorder() const", asMETHOD(Window, GetResizeBorder), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void set_modal(bool)", asMETHOD(Window, SetModal), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "bool get_modal() const", asMETHOD(Window, IsModal), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void set_modalShadeColor(const Color&in)", asMETHOD(Window, SetModalShadeColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "const Color& get_modalShadeColor() const", asMETHOD(Window, GetModalShadeColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void set_modalFrameColor(const Color&in)", asMETHOD(Window, SetModalFrameColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "const Color& get_modalFrameColor() const", asMETHOD(Window, GetModalFrameColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void set_modalFrameSize(const IntVector2&in)", asMETHOD(Window, SetModalFrameSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "const IntVector2& get_modalFrameSize() const", asMETHOD(Window, GetModalFrameSize), asCALL_THISCALL);
+    RegisterWindow<Window>(engine, "Window");
+}
+
+static void RegisterView3D(asIScriptEngine* engine)
+{
+    RegisterWindow<View3D>(engine, "View3D");
+    engine->RegisterObjectMethod("View3D", "void SetView(Scene@+, Camera@+)", asMETHOD(View3D, SetView), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "void QueueUpdate()", asMETHOD(View3D, QueueUpdate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "void set_format(uint)", asMETHOD(View3D, SetFormat), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "uint get_format() const", asMETHOD(View3D, GetFormat), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "void set_autoUpdate(bool)", asMETHOD(View3D, SetAutoUpdate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "bool get_autoUpdate() const", asMETHOD(View3D, GetAutoUpdate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "Texture2D@+ get_renderTexture() const", asMETHOD(View3D, GetRenderTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "Viewport@+ get_viewport() const", asMETHOD(View3D, GetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "Scene@+ get_scene() const", asMETHOD(View3D, GetScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "Node@+ get_cameraNode() const", asMETHOD(View3D, GetCameraNode), asCALL_THISCALL);
 }
 
 static void FileSelectorSetFilters(CScriptArray* filters, unsigned defaultIndex, FileSelector* ptr)
@@ -609,6 +611,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterMenu(engine);
     RegisterDropDownList(engine);
     RegisterWindow(engine);
+    RegisterView3D(engine);
     RegisterFileSelector(engine);
     RegisterUI(engine);
 }

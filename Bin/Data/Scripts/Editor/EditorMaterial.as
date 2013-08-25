@@ -4,6 +4,13 @@ Window@ materialWindow;
 Material@ editMaterial;
 XMLFile@ oldMaterialState;
 bool inMaterialRefresh = true;
+View3D@ materialPreview;
+Scene@ previewScene;
+Node@ previewCameraNode;
+Node@ previewLightNode;
+Light@ previewLight;
+Node@ previewModelNode;
+StaticModel@ previewModel;
 
 void CreateMaterialEditor()
 {
@@ -14,6 +21,7 @@ void CreateMaterialEditor()
     ui.root.AddChild(materialWindow);
     materialWindow.opacity = uiMaxOpacity;
 
+    InitMaterialPreview();
     RefreshMaterialEditor();
 
     int height = Min(ui.root.height - 60, 500);
@@ -53,6 +61,43 @@ void HideMaterialEditor()
     materialWindow.visible = false;
 }
 
+void InitMaterialPreview()
+{
+    previewScene = Scene("PreviewScene");
+    previewScene.CreateComponent("Octree");
+
+    Node@ zoneNode = previewScene.CreateChild("Zone");
+    Zone@ zone = zoneNode.CreateComponent("Zone");
+    zone.boundingBox = BoundingBox(-1000, 1000);
+    zone.ambientColor = Color(0.15, 0.15, 0.15);
+    zone.fogColor = Color(0, 0, 0);
+    zone.fogStart = 10.0;
+    zone.fogEnd = 100.0;
+
+    previewCameraNode = previewScene.CreateChild("PreviewCamera");
+    previewCameraNode.position = Vector3(0, 0, -1.5);
+    Camera@ camera = previewCameraNode.CreateComponent("Camera");
+    camera.nearClip = 0.1f;
+    camera.farClip = 100.0f;
+
+    previewLightNode = previewScene.CreateChild("PreviewLight");
+    previewLightNode.direction = Vector3(0.5, -0.5, 0.5);
+    previewLight = previewLightNode.CreateComponent("Light");
+    previewLight.lightType = LIGHT_DIRECTIONAL;
+    previewLight.specularIntensity = 0.5;
+
+    previewModelNode = previewScene.CreateChild("PreviewModel");
+    previewModelNode.rotation = Quaternion(0, 0, 0);
+    previewModel = previewModelNode.CreateComponent("StaticModel");
+    previewModel.model = cache.GetResource("Model", "Models/Sphere.mdl");
+
+    materialPreview = materialWindow.GetChild("MaterialPreview", true);
+    materialPreview.SetView(previewScene, camera);
+    materialPreview.autoUpdate = false;
+
+    SubscribeToEvent(materialPreview, "DragMove", "RotateMaterialPreview");
+}
+
 void EditMaterial(Material@ mat)
 {
     if (editMaterial !is null)
@@ -68,11 +113,18 @@ void EditMaterial(Material@ mat)
 
 void RefreshMaterialEditor()
 {
+    RefreshMaterialPreview();
     RefreshMaterialName();
     RefreshMaterialTechniques();
     RefreshMaterialTextures();
     RefreshMaterialShaderParameters();
     RefreshMaterialMiscParameters();
+}
+
+void RefreshMaterialPreview()
+{
+    previewModel.material = editMaterial;
+    materialPreview.QueueUpdate();
 }
 
 void RefreshMaterialName()
@@ -264,6 +316,21 @@ void RefreshMaterialMiscParameters()
     attrList.selection = editMaterial.shadowCullMode;
     
     inMaterialRefresh = false;
+}
+
+void RotateMaterialPreview(StringHash eventType, VariantMap& eventData)
+{
+    int elemX = eventData["ElementX"].GetInt();
+    int elemY = eventData["ElementY"].GetInt();
+    
+    if (materialPreview.height > 0 && materialPreview.width > 0)
+    {
+        float yaw = ((materialPreview.height / 2) - elemY) * (90.0 / materialPreview.height);
+        float pitch = ((materialPreview.width / 2) - elemX) * (90.0 / materialPreview.width);
+
+        previewModelNode.rotation = previewModelNode.rotation.Slerp(Quaternion(yaw, pitch, 0), 0.1);
+        materialPreview.QueueUpdate();
+    }
 }
 
 void EditMaterialName(StringHash eventType, VariantMap& eventData)
@@ -741,4 +808,6 @@ void EndMaterialEdit()
     EditMaterialAction@ action = EditMaterialAction();
     action.Define(editMaterial, oldMaterialState);
     SaveEditAction(action);
+
+    materialPreview.QueueUpdate();
 }

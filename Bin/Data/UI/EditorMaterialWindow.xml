@@ -18,6 +18,16 @@
         </element>
     </element>
     <element type="BorderImage" style="EditorDivider" />
+    <element type="View3D">
+        <attribute name="Name" value="MaterialPreview" />
+        <attribute name="Texture" value="Texture2D;" />
+        <attribute name="Use Derived Opacity" value="false" />
+        <attribute name="Min Size" value="8 100" />
+        <attribute name="Is Resizable" value="true" />
+        <attribute name="Fixed Height Resizing" value="true" />
+        <attribute name="Resize Border" value="0 6 0 6" />
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
     <element>
         <attribute name="Min Size" value="0 16" />
         <attribute name="Max Size" value="2147483647 16" />

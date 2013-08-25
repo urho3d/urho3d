@@ -19,6 +19,7 @@ $pfile "UI/Text3D.pkg"
 $pfile "UI/UI.pkg"
 $pfile "UI/UIElement.pkg"
 $pfile "UI/Window.pkg"
+$pfile "UI/View3D.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)

@@ -41,6 +41,8 @@ Window::Window(Context* context) :
     BorderImage(context),
     movable_(false),
     resizable_(false),
+    fixedWidthResizing_(false),
+    fixedHeightResizing_(false),
     resizeBorder_(DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER),
     dragMode_(DRAG_NONE),
     modal_(false),
@@ -70,6 +72,8 @@ void Window::RegisterObject(Context* context)
         DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER), AM_FILE);
     ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Movable", IsMovable, SetMovable, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Resizable", IsResizable, SetResizable, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Fixed Width Resizing", GetFixedWidthResizing, SetFixedWidthResizing, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Fixed Height Resizing", GetFixedHeightResizing, SetFixedHeightResizing, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(Window, VAR_BOOL, "Is Modal", IsModal, SetModal, bool, false, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_COLOR, "Modal Shade Color", GetModalShadeColor, SetModalShadeColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Window, VAR_COLOR, "Modal Frame Color", GetModalFrameColor, SetModalFrameColor, Color, Color::TRANSPARENT, AM_FILE);
@@ -137,6 +141,7 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         return;
 
     IntVector2 delta = screenPosition - dragBeginCursor_;
+    IntVector2 dragSize;
 
     const IntVector2& position_ = GetPosition();
     const IntVector2& size_ = GetSize();
@@ -152,39 +157,51 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
     case DRAG_RESIZE_TOPLEFT:
         SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)),
             Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
-        SetSize(dragBeginSize_ - delta);
+        dragSize = dragBeginSize_ - delta;
+        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
+        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_TOP:
         SetPosition(dragBeginPosition_.x_, Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
-        SetSize(dragBeginSize_.x_, dragBeginSize_.y_ - delta.y_);
+        dragSize = IntVector2(dragBeginSize_.x_, dragBeginSize_.y_ - delta.y_);
+        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_TOPRIGHT:
         SetPosition(dragBeginPosition_.x_, dragBeginPosition_.y_ + delta.y_);
-        SetSize(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_ - delta.y_);
+        dragSize = IntVector2(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_ - delta.y_);
+        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
+        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_RIGHT:
-        SetSize(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_);
+        dragSize = IntVector2(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_);
+        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
         break;
 
     case DRAG_RESIZE_BOTTOMRIGHT:
-        SetSize(dragBeginSize_ + delta);
+        dragSize = dragBeginSize_ + delta;
+        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
+        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_BOTTOM:
-        SetSize(dragBeginSize_.x_, dragBeginSize_.y_ + delta.y_);
+        dragSize = IntVector2(dragBeginSize_.x_, dragBeginSize_.y_ + delta.y_);
+        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_BOTTOMLEFT:
         SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
-        SetSize(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_ + delta.y_);
+        dragSize = IntVector2(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_ + delta.y_);
+        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
+        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_LEFT:
         SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
-        SetSize(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_);
+        dragSize = IntVector2(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_);
+        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
         break;
 
     default:
@@ -208,6 +225,16 @@ void Window::SetMovable(bool enable)
 void Window::SetResizable(bool enable)
 {
     resizable_ = enable;
+}
+
+void Window::SetFixedWidthResizing(bool enable)
+{
+    fixedWidthResizing_ = enable;
+}
+
+void Window::SetFixedHeightResizing(bool enable)
+{
+    fixedHeightResizing_ = enable;
 }
 
 void Window::SetResizeBorder(const IntRect& rect)
