@@ -462,7 +462,7 @@ void HandlePostRenderUpdate()
     if (drawDebug == 3)
     {
         NavigationMesh@ navMesh = testScene.GetComponent("NavigationMesh");
-        navMesh.DrawDebugGeometry(testScene.debugRenderer, true);
+        navMesh.DrawDebugGeometry(true);
     }
 
     IntVector2 pos = ui.cursorPosition;

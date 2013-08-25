@@ -36,7 +36,8 @@ class NavigationMesh : public Component
     Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE);
     float GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE);
     Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
-    
+    void DrawDebugGeometry(bool depthTest);
+
     int GetTileSize() const;
     float GetCellSize() const;
     float GetCellHeight() const;

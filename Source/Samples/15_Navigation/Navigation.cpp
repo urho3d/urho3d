@@ -24,7 +24,6 @@
 #include "CoreEvents.h"
 #include "Cursor.h"
 #include "DebugRenderer.h"
-#include "DecalSet.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
@@ -32,9 +31,10 @@
 #include "Light.h"
 #include "Material.h"
 #include "Model.h"
+#include "Navigable.h"
+#include "NavigationMesh.h"
 #include "Octree.h"
 #include "Renderer.h"
-#include "RenderPath.h"
 #include "ResourceCache.h"
 #include "StaticModel.h"
 #include "Text.h"
@@ -42,14 +42,14 @@
 #include "XMLFile.h"
 #include "Zone.h"
 
-#include "MultipleViewports.h"
+#include "Navigation.h"
 
 #include "DebugNew.h"
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(MultipleViewports)
+DEFINE_APPLICATION_MAIN(Navigation)
 
-MultipleViewports::MultipleViewports(Context* context) :
+Navigation::Navigation(Context* context) :
     Sample(context),
     yaw_(0.0f),
     pitch_(0.0f),
@@ -57,7 +57,7 @@ MultipleViewports::MultipleViewports(Context* context) :
 {
 }
 
-void MultipleViewports::Start()
+void Navigation::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -66,16 +66,16 @@ void MultipleViewports::Start()
     CreateScene();
     
     // Create the UI content
-    CreateInstructions();
+    CreateUI();
     
-    // Setup the viewports for displaying the scene
-    SetupViewports();
+    // Setup the viewport for displaying the scene
+    SetupViewport();
 
     // Hook up to the frame update and render post-update events
     SubscribeToEvents();
 }
 
-void MultipleViewports::CreateScene()
+void Navigation::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -111,15 +111,15 @@ void MultipleViewports::CreateScene()
     light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
-
+    
     // Create some mushrooms
-    const unsigned NUM_MUSHROOMS = 240;
+    const unsigned NUM_MUSHROOMS = 100;
     for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
     {
         Node* mushroomNode = scene_->CreateChild("Mushroom");
         mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
         mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
-        mushroomNode->SetScale(0.5f + Random(2.0f));
+        mushroomNode->SetScale(2.0f + Random(0.5f));
         StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
         mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
@@ -142,37 +142,50 @@ void MultipleViewports::CreateScene()
             boxObject->SetOccluder(true);
     }
     
-    // Create the cameras. Limit far clip distance to match the fog
+    // Create a NavigationMesh component to the scene root
+    NavigationMesh* navMesh = scene_->CreateComponent<NavigationMesh>();
+    // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
+    // navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
+    scene_->CreateComponent<Navigable>();
+    // Add padding to the navigation mesh in Y-direction so that we can add objects on top of the tallest boxes
+    // in the scene and still update the mesh correctly
+    navMesh->SetPadding(Vector3(0.0f, 10.0f, 0.0f));
+    // Now build the navigation geometry. This will take some time. Note that the navigation mesh will prefer to use
+    // physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
+    // it will use renderable geometry instead
+    navMesh->Build();
+    
+    // Create the camera. Limit far clip distance to match the fog
     cameraNode_ = scene_->CreateChild("Camera");
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
     
-    // Parent the rear camera node to the front camera node and turn it 180 degrees to face backward
-    // Here, we use the angle-axis constructor for Quaternion instead of the usual Euler angles
-    rearCameraNode_ = cameraNode_->CreateChild("RearCamera");
-    rearCameraNode_->Rotate(Quaternion(180.0f, Vector3::UP));
-    Camera* rearCamera = rearCameraNode_->CreateComponent<Camera>();
-    rearCamera->SetFarClip(300.0f);
-    // Because the rear viewport is rather small, disable occlusion culling from it. Use the camera's
-    // "view override flags" for this. We could also disable eg. shadows or force low material quality
-    // if we wanted
-    rearCamera->SetViewOverrideFlags(VO_DISABLE_OCCLUSION);
-    
-    // Set an initial position for the front camera scene node above the plane
+    // Set an initial position for the camera scene node above the plane
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
 }
 
-void MultipleViewports::CreateInstructions()
+void Navigation::CreateUI()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
     
+    // Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
+    // control the camera, and when visible, it will point the raycast target
+    XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    SharedPtr<Cursor> cursor(new Cursor(context_));
+    cursor->SetStyleAuto(style);
+    ui->SetCursor(cursor);
+
+    // Set starting position of the cursor at the rendering window center
+    Graphics* graphics = GetSubsystem<Graphics>();
+    cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
+    
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
-        "Use WASD keys and mouse to move\n"
-        "B to toggle bloom, F to toggle FXAA\n"
-        "Space to toggle debug geometry\n"
+        "Use WASD keys to move, RMB to rotate view\n"
+        "Shift+LMB to set path start, LMB to set path end\n"
+        "Space to toggle debug geometry"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
@@ -184,46 +197,25 @@ void MultipleViewports::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-
-void MultipleViewports::SetupViewports()
+void Navigation::SetupViewport()
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
     Renderer* renderer = GetSubsystem<Renderer>();
     
-    renderer->SetNumViewports(2);
-    
-    // Set up the front camera viewport
+    // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
-    
-    // Clone the default render path so that we do not interfere with the other viewport, then add
-    // bloom and FXAA post process effects to the front viewport. Render path commands can be tagged
-    // for example with the effect name to allow easy toggling on and off. We start with the effects
-    // disabled.
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
-    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/Bloom.xml"));
-    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/EdgeFilter.xml"));
-    // Make the bloom mixing parameter more pronounced
-    effectRenderPath->SetShaderParameter("BloomMix", Vector2(0.9f, 0.6f));
-    effectRenderPath->SetEnabled("Bloom", false);
-    effectRenderPath->SetEnabled("EdgeFilter", false);
-    viewport->SetRenderPath(effectRenderPath);
-    
-    // Set up the rear camera viewport on top of the front view ("rear view mirror")
-    // The viewport index must be greater in that case, otherwise the view would be left behind
-    SharedPtr<Viewport> rearViewport(new Viewport(context_, scene_, rearCameraNode_->GetComponent<Camera>(),
-        IntRect(graphics->GetWidth() * 2 / 3, 32, graphics->GetWidth() - 32, graphics->GetHeight() / 3)));
-    renderer->SetViewport(1, rearViewport);
 }
 
-void MultipleViewports::MoveCamera(float timeStep)
+void Navigation::MoveCamera(float timeStep)
 {
-     // Do not move if the UI has a focused element (the console)
-    if (GetSubsystem<UI>()->GetFocusElement())
-        return;
-    
+    // Right mouse button controls mouse cursor visibility: hide when pressed
+    UI* ui = GetSubsystem<UI>();
     Input* input = GetSubsystem<Input>();
+    ui->GetCursor()->SetVisible(!input->GetMouseButtonDown(MOUSEB_RIGHT));
+    
+    // Do not move if the UI has a focused element (the console)
+    if (ui->GetFocusElement())
+        return;
     
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
@@ -231,13 +223,17 @@ void MultipleViewports::MoveCamera(float timeStep)
     const float MOUSE_SENSITIVITY = 0.1f;
     
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
-    IntVector2 mouseMove = input->GetMouseMove();
-    yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
-    pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
-    pitch_ = Clamp(pitch_, -90.0f, 90.0f);
-    
-    // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+    // Only move the camera when the cursor is hidden
+    if (!ui->GetCursor()->IsVisible())
+    {
+        IntVector2 mouseMove = input->GetMouseMove();
+        yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
+        pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
+        pitch_ = Clamp(pitch_, -90.0f, 90.0f);
+        
+        // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
+        cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+    }
     
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))
@@ -249,29 +245,86 @@ void MultipleViewports::MoveCamera(float timeStep)
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
     
-    // Toggle post processing effects on the front viewport. Note that the rear viewport is unaffected
-    RenderPath* effectRenderPath = GetSubsystem<Renderer>()->GetViewport(0)->GetRenderPath();
-    if (input->GetKeyPress('B'))
-        effectRenderPath->ToggleEnabled("Bloom");
-    if (input->GetKeyPress('F'))
-        effectRenderPath->ToggleEnabled("EdgeFilter");
+    // Set route start/endpoint, calculate route if applicable
+    if (input->GetMouseButtonPress(MOUSEB_LEFT))
+    {
+        Vector3 hitPos;
+        Node* hitNode;
+        Drawable* hitDrawable;
+        
+        if (Raycast(250.0f, hitPos, hitNode, hitDrawable))
+        {
+            bool setStart = input->GetQualifierDown(QUAL_SHIFT);
+            if (setStart)
+            {
+                startPos_ = hitPos;
+                startPosDefined_ = true;
+            }
+            else
+            {
+                endPos_ = hitPos;
+                endPosDefined_ = true;
+            }
+            
+            if (startPosDefined_ && endPosDefined_)
+                RecalculatePath();
+        }
+    }
     
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
 }
 
-void MultipleViewports::SubscribeToEvents()
+void Navigation::SubscribeToEvents()
 {
     // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(MultipleViewports, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, HANDLER(Navigation, HandleUpdate));
     
     // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
     // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(MultipleViewports, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Navigation, HandlePostRenderUpdate));
 }
 
-void MultipleViewports::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void Navigation::RecalculatePath()
+{
+    NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
+    navMesh->FindPath(currentPath_, startPos_, endPos_);
+}
+
+bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Node*& hitNode, Drawable*& hitDrawable)
+{
+    hitNode = 0;
+    hitDrawable = 0;
+    
+    UI* ui = GetSubsystem<UI>();
+    IntVector2 pos = ui->GetCursorPosition();
+    // Check the cursor is visible and there is no UI element in front of the cursor
+    if (!ui->GetCursor()->IsVisible() || ui->GetElementAt(pos, true))
+        return false;
+    
+    Graphics* graphics = GetSubsystem<Graphics>();
+    Camera* camera = cameraNode_->GetComponent<Camera>();
+    Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
+    // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
+    PODVector<RayQueryResult> results;
+    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
+    scene_->GetComponent<Octree>()->RaycastSingle(query);
+    if (results.Size())
+    {
+        RayQueryResult& result = results[0];
+        
+        // Calculate hit position in world space
+        hitPos = cameraRay.origin_ + cameraRay.direction_ * result.distance_;
+        hitNode = result.drawable_->GetNode();
+        hitDrawable = result.drawable_;
+        return true;
+    }
+    
+    return false;
+}
+
+void Navigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Event parameters are always defined inside a namespace corresponding to the event's name
     using namespace Update;
@@ -283,10 +336,23 @@ void MultipleViewports::HandleUpdate(StringHash eventType, VariantMap& eventData
     MoveCamera(timeStep);
 }
 
-void MultipleViewports::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+void Navigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
-    // bones. Disable depth test so that we can see the effect of occlusion
+    // If draw debug mode is enabled, draw navigation mesh debug geometry
     if (drawDebug_)
-        GetSubsystem<Renderer>()->DrawDebugGeometry(true);
+        scene_->GetComponent<NavigationMesh>()->DrawDebugGeometry(true);
+    
+    // Visualize the start and end points and the last calculated path
+    DebugRenderer* debug = scene_->GetComponent<DebugRenderer>();
+    if (startPosDefined_)
+        debug->AddBoundingBox(BoundingBox(startPos_ - 0.1f * Vector3::ONE, startPos_ + 0.1f * Vector3::ONE), Color::WHITE);
+    if (endPosDefined_)
+        debug->AddBoundingBox(BoundingBox(endPos_ - 0.1f * Vector3::ONE, endPos_ + 0.1f * Vector3::ONE), Color::WHITE);
+    if (currentPath_.Size() > 1)
+    {
+        // Draw the path with a small upward bias so that it does not clip into the surfaces
+        Vector3 bias = 0.05f * Vector3::UP;
+        for (unsigned i = 0; i < currentPath_.Size() - 1; ++i)
+            debug->AddLine(currentPath_[i] + bias, currentPath_[i + 1] + bias, Color::WHITE);
+    }
 }

@@ -591,6 +591,17 @@ Vector3 NavigationMesh::Raycast(const Vector3& start, const Vector3& end, const 
     return start.Lerp(end, t);
 }
 
+void NavigationMesh::DrawDebugGeometry(bool depthTest)
+{
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        if (debug)
+            DrawDebugGeometry(debug, depthTest);
+    }
+}
+
 BoundingBox NavigationMesh::GetWorldBoundingBox() const
 {
     return node_ ? boundingBox_.Transformed(node_->GetWorldTransform()) : boundingBox_;
