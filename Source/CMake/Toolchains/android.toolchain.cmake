@@ -1557,7 +1557,8 @@ if(NOT _CMAKE_IN_TRY_COMPILE)
  else()
   set( EXECUTABLE_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/bin" CACHE PATH "Output directory for applications" )
  endif()
- set( LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" )
+ # Urho3D: All libraries are first generated in CMake default binary directory and only the main target library is later copied to below output path by Urho3D own build script
+ set( ANDROID_LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" )
 endif()
 
 # set these global flags for cmake client scripts to change behavior

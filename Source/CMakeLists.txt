@@ -53,7 +53,7 @@ endif ()
 include_directories (${CMAKE_BINARY_DIR}/Engine ThirdParty/SDL/include)
 
 # Setup the compiler flags for building shared library
-if (URHO3D_BUILD_TYPE STREQUAL SHARED AND NOT IOS AND NOT ANDROID)
+if (URHO3D_BUILD_TYPE STREQUAL SHARED)
     # Hide the symbols that are not explicitly marked for export
     add_compiler_export_flags ()
     # Use PIC on platforms that support it 
@@ -109,7 +109,7 @@ if (NOT IOS AND NOT ANDROID)
 endif ()    
 
 # Urho3D build type is mutually exclusive due to potential different visibility (export) attribute
-if (URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT ANDROID)
+if (URHO3D_BUILD_TYPE MATCHES STATIC|SHARED)
     # Urho3D library
     add_subdirectory (Engine)
 else ()

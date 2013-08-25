@@ -172,9 +172,9 @@ else ()
             set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
         endif ()
+        set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
+        set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
     endif ()
-    set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
-    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 endif ()
 
 if (URHO3D_BUILD_TYPE)
@@ -288,7 +288,7 @@ macro (setup_library)
     add_library (${TARGET_NAME} ${LIB_TYPE} ${SOURCE_FILES})
     setup_target ()
     
-    if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED AND URHO3D_BUILD_TYPE MATCHES "STATIC|SHARED" AND NOT ANDROID)
+    if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED AND URHO3D_BUILD_TYPE MATCHES STATIC|SHARED)
         set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
         if (URHO3D_BUILD_TYPE STREQUAL SHARED)
             set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
@@ -377,11 +377,18 @@ macro (setup_main_executable)
 
     # Setup target
     if (ANDROID)
+        if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+            set (SOURCE_FILES ${SOURCE_FILES} ${PROJECT_SOURCE_DIR}/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+        elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+            set (SOURCE_FILES ${SOURCE_FILES} $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+        endif ()
         set (LIB_TYPE SHARED)
         setup_library ()
-        # Strip the output shared library
-        get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} ${TARGET_LOC})
+        file (MAKE_DIRECTORY ${ANDROID_LIBRARY_OUTPUT_PATH})
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
+            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ANDROID_LIBRARY_OUTPUT_PATH}
+            COMMENT "Stripping and copying the output shared library")
     else ()
         if (WIN32)
             set (EXE_TYPE WIN32)
@@ -409,7 +416,7 @@ macro (setup_main_executable)
             file (RELATIVE_PATH REL_PATH ${PATH} ${PROJECT_ROOT_DIR}/Bin)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND for dir in CoreData Data\; do cmake -E create_symlink ${REL_PATH}/$$dir ${PATH}/$$dir\; done
-                COMMENT "Create symbolic links to allow debugging/running the main executable within Xcode itself")
+                COMMENT "Creating symbolic links to allow debugging/running the main executable within Xcode itself")
         endif ()
     endif ()
 endmacro ()

@@ -65,7 +65,10 @@ if (URHO3D_HOME)
             ${URHO3D_HOME}/Source/ThirdParty/SDL/include
             ${URHO3D_HOME}/Source/ThirdParty/Bullet/src)
 
-        if (RASPI AND CMAKE_CROSSCOMPILING)
+        if (ANDROID)
+            set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/android-Build/Engine)
+            set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/android-Build/libs/${ANDROID_NDK_ABI_NAME})
+        elseif (RASPI AND CMAKE_CROSSCOMPILING)
             set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/raspi-Build/Engine)
             set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/Lib-CC)
         else ()
