@@ -20,15 +20,15 @@
 // THE SOFTWARE.
 //
 
+#include "Button.h"
+#include "CheckBox.h"
 #include "CoreEvents.h"
 #include "Engine.h"
 #include "Input.h"
+#include "LineEdit.h"
+#include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"
-#include "LineEdit.h"
-#include "CheckBox.h"
-#include "Button.h"
-#include "Text.h"
 
 #include "HelloGUI.h"
 
@@ -142,19 +142,6 @@ void HelloGUI::SubscribeToEvents()
 {
     // Subscribe handler; invoked whenever a mouse click event is dispatched
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(HelloGUI, HandleControlClicked));
-
-    // Subscribe to logic update events
-    SubscribeToEvent(E_UPDATE, HANDLER(HelloGUI, HandleUpdate));
-}
-
-void HelloGUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
-{
-    // Determine whether the escape key was pressed..
-    if (GetSubsystem<Input>()->GetKeyDown(KEY_ESC))
-    {
-        // .. if so, request Engine exit
-        GetSubsystem<Engine>()->Exit();
-    }
 }
 
 void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)

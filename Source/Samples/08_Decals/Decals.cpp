@@ -138,7 +138,7 @@ void Decals::CreateScene()
         boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         boxObject->SetCastShadows(true);
-        if (size >= 5.0f)
+        if (size >= 3.0f)
             boxObject->SetOccluder(true);
     }
     

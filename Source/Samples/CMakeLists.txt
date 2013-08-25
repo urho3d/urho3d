@@ -24,13 +24,16 @@
 set (COMMON_SAMPLE_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Sample.h" "${CMAKE_CURRENT_SOURCE_DIR}/Sample.inl")
 
 # Define dependency libs
-set (LIBS ../../Engine/Container
+set (LIBS ../../Engine/Audio
+          ../../Engine/Container
           ../../Engine/Core
           ../../Engine/Engine
           ../../Engine/Graphics
           ../../Engine/Input
           ../../Engine/IO
           ../../Engine/Math
+          ../../Engine/Navigation
+          ../../Engine/Network
           ../../Engine/Physics
           ../../Engine/Resource
           ../../Engine/Scene
@@ -52,3 +55,4 @@ add_subdirectory (10_RenderToTexture)
 add_subdirectory (11_Physics)
 add_subdirectory (12_PhysicsStressTest)
 add_subdirectory (13_Ragdolls)
+add_subdirectory (14_SoundEffects)

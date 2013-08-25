@@ -22,47 +22,48 @@
 
 #pragma once
 
+#include "Button.h"
 #include "Sample.h"
-#include "Window.h"
+#include "Slider.h"
+#include "SoundSource.h"
 
 using namespace Urho3D;
 
-/// A simple 'HelloWorld' GUI created purely from code.
+/// Sound effects example
 /// This sample demonstrates:
-///     - Creation of controls and building a UI hierarchy;
-///     - Loading UI style from XML and applying it to controls;
-///     - Handling of global and per-control events;
-class HelloGUI : public Sample
+///     - Playing sound effects and music;
+///     - Controlling sound and music master volume;
+class SoundEffects : public Sample
 {
-    OBJECT(HelloGUI);
+    OBJECT(SoundEffects);
 
 public:
     /// Construct.
-    HelloGUI(Context* context);
+    SoundEffects(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
     virtual void Start();
 
 private:
-    /// Creates and initializes a Window control.
-    void InitWindow();
-
-    /// Creates and add various common controls for demonstration purposes.
-    void InitControls();
-
-    /// Convenience method for event subscription.
-    void SubscribeToEvents();
-
-    /// Callback method invoked whenever any control is clicked.
-    void HandleControlClicked(StringHash eventType, VariantMap& eventData);
-
-    /// Callback method invoked when the close button is pressed and released.
-    void HandleClosePressed(StringHash eventType, VariantMap& eventData);
-
-    /// The Window.
-    SharedPtr<Window> window_;
-    /// The UI's root UIElement.
-    SharedPtr<UIElement> uiRoot_;
+    /// Creates the UI and subscribes to UI events.
+    void CreateUI();
+    /// Creates a button at position with specified text in it.
+    Button* CreateButton(int x, int y, int xSize, int ySize, const String& text);
+    /// Creates a horizontal slider with specified text above it.
+    Slider* CreateSlider(int x, int y, int xSize, int ySize, const String& text);
+    /// Handle a sound effect button click.
+    void HandlePlaySound(StringHash eventType, VariantMap& eventData);
+    /// Handle "play music" button click.
+    void HandlePlayMusic(StringHash eventType, VariantMap& eventData);
+    /// Handle "stop music" button click.
+    void HandleStopMusic(StringHash eventType, VariantMap& eventData);
+    /// Handle sound effects volume slider change.
+    void HandleSoundVolume(StringHash eventType, VariantMap& eventData);
+    /// Handle music volume slider change.
+    void HandleMusicVolume(StringHash eventType, VariantMap& eventData);
+    
+    /// Scene.
+    SharedPtr<Scene> scene_;
 };
 
 

@@ -139,7 +139,7 @@ void MultipleViewports::CreateScene()
         boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         boxObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
         boxObject->SetCastShadows(true);
-        if (size >= 5.0f)
+        if (size >= 3.0f)
             boxObject->SetOccluder(true);
     }
     
@@ -154,6 +154,10 @@ void MultipleViewports::CreateScene()
     rearCameraNode_->Rotate(Quaternion(180.0f, Vector3::UP));
     Camera* rearCamera = rearCameraNode_->CreateComponent<Camera>();
     rearCamera->SetFarClip(300.0f);
+    // Because the rear viewport is rather small, disable occlusion culling from it. Use the camera's
+    // "view override flags" for this. We could also disable eg. shadows or force low material quality
+    // if we wanted
+    rearCamera->SetViewOverrideFlags(VO_DISABLE_OCCLUSION);
     
     // Set an initial position for the front camera scene node above the plane
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
