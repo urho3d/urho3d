@@ -25,6 +25,11 @@
 #include "Sample.h"
 #include "Scene.h"
 
+namespace Urho3D
+{
+    class Drawable;
+}
+
 // All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
@@ -52,12 +57,14 @@ private:
     void CreateUI();
     /// Sets up a viewport for displaying the scene.
     void SetupViewport();
+    /// Subscribes to application-wide logic update events.
+    void SubscribeToEvents();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
     /// Paints a decal using a ray cast from the mouse cursor.
     void PaintDecal();
-    /// Subscribes to application-wide logic update events.
-    void SubscribeToEvents();
+    /// Utility function to raycast to the cursor position. Return true if hit
+    bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Callback method invoked when a logic update event is dispatched.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Callback method invoked when the post-render update event is dispatched.

@@ -37,6 +37,7 @@ using namespace Urho3D;
 /// This sample demonstrates:
 ///     - Generating a navigation mesh into the scene;
 ///     - Performing path queries to the navigation mesh;
+///     - Rebuilding the navigation mesh partially when adding or removing objects;
 ///     - Visualizing custom debug geometry;
 class Navigation : public Sample
 {
@@ -56,14 +57,20 @@ private:
     void CreateUI();
     /// Sets up a viewport for displaying the scene.
     void SetupViewport();
-    /// Reads input and moves the camera.
-    void MoveCamera(float timeStep);
     /// Subscribes to application-wide logic update events.
     void SubscribeToEvents();
+    /// Reads input and moves the camera.
+    void MoveCamera(float timeStep);
+    /// Sets path start or end point.
+    void SetPathPoint();
+    /// Add or remove object.
+    void AddOrRemoveObject();
+    /// Create a mushroom object at position.
+    Node* CreateMushroom(const Vector3& pos);
+    /// Utility function to raycast to the cursor position. Return true if hit
+    bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Recalculate path. Requires both start and endpoint defined.
     void RecalculatePath();
-    /// Utility function to raycast to the cursor position. Return true if hit
-    bool Raycast(float maxDistance, Vector3& hitPos, Node*& hitNode, Drawable*& hitDrawable);
     /// Callback method invoked when a logic update event is dispatched.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Callback method invoked when the post-render update event is dispatched.

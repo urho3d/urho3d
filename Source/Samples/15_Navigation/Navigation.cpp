@@ -115,16 +115,7 @@ void Navigation::CreateScene()
     // Create some mushrooms
     const unsigned NUM_MUSHROOMS = 100;
     for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
-    {
-        Node* mushroomNode = scene_->CreateChild("Mushroom");
-        mushroomNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
-        mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
-        mushroomNode->SetScale(2.0f + Random(0.5f));
-        StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
-        mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
-        mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
-        mushroomObject->SetCastShadows(true);
-    }
+        CreateMushroom(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
     
     // Create randomly sized boxes. If boxes are big enough, make them occluders
     const unsigned NUM_BOXES = 20;
@@ -185,6 +176,7 @@ void Navigation::CreateUI()
     instructionText->SetText(
         "Use WASD keys to move, RMB to rotate view\n"
         "Shift+LMB to set path start, LMB to set path end\n"
+        "MMB to add or remove obstacles\n"
         "Space to toggle debug geometry"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
@@ -204,6 +196,16 @@ void Navigation::SetupViewport()
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
+}
+
+void Navigation::SubscribeToEvents()
+{
+    // Subscribes HandleUpdate() method for processing update events
+    SubscribeToEvent(E_UPDATE, HANDLER(Navigation, HandleUpdate));
+    
+    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
+    // debug geometry
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Navigation, HandlePostRenderUpdate));
 }
 
 void Navigation::MoveCamera(float timeStep)
@@ -245,45 +247,86 @@ void Navigation::MoveCamera(float timeStep)
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
     
-    // Set route start/endpoint, calculate route if applicable
+    // Set route start/endpoint with left mouse button, recalculate route if applicable
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
-    {
-        Vector3 hitPos;
-        Node* hitNode;
-        Drawable* hitDrawable;
+        SetPathPoint();
+    // Add or remove objects with middle mouse button, then rebuild navigation mesh partially
+    if (input->GetMouseButtonPress(MOUSEB_MIDDLE))
+        AddOrRemoveObject();
         
-        if (Raycast(250.0f, hitPos, hitNode, hitDrawable))
-        {
-            bool setStart = input->GetQualifierDown(QUAL_SHIFT);
-            if (setStart)
-            {
-                startPos_ = hitPos;
-                startPosDefined_ = true;
-            }
-            else
-            {
-                endPos_ = hitPos;
-                endPosDefined_ = true;
-            }
-            
-            if (startPosDefined_ && endPosDefined_)
-                RecalculatePath();
-        }
-    }
-    
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
 }
 
-void Navigation::SubscribeToEvents()
+void Navigation::SetPathPoint()
 {
-    // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Navigation, HandleUpdate));
+    Vector3 hitPos;
+    Drawable* hitDrawable;
     
-    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
-    // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Navigation, HandlePostRenderUpdate));
+    if (Raycast(250.0f, hitPos, hitDrawable))
+    {
+        bool setStart = GetSubsystem<Input>()->GetQualifierDown(QUAL_SHIFT);
+        if (setStart)
+        {
+            startPos_ = hitPos;
+            startPosDefined_ = true;
+        }
+        else
+        {
+            endPos_ = hitPos;
+            endPosDefined_ = true;
+        }
+        
+        if (startPosDefined_ && endPosDefined_)
+            RecalculatePath();
+    }
+}
+
+void Navigation::AddOrRemoveObject()
+{
+    // Raycast and check if we hit a mushroom node. If yes, remove it, if no, create a new one
+    Vector3 hitPos;
+    Drawable* hitDrawable;
+    
+    if (Raycast(250.0f, hitPos, hitDrawable))
+    {
+        // The part of the navigation mesh we must update, which is the world bounding box of the associated
+        // drawable component
+        BoundingBox updateBox;
+        
+        Node* hitNode = hitDrawable->GetNode();
+        if (hitNode->GetName() == "Mushroom")
+        {
+            updateBox = hitDrawable->GetWorldBoundingBox();
+            hitNode->Remove();
+        }
+        else
+        {
+            Node* newNode = CreateMushroom(hitPos);
+            updateBox = newNode->GetComponent<StaticModel>()->GetWorldBoundingBox();
+        }
+        
+        // Rebuild part of the navigation mesh, then recalculate path if applicable
+        scene_->GetComponent<NavigationMesh>()->Build(updateBox);
+        RecalculatePath();
+    }
+}
+
+Node* Navigation::CreateMushroom(const Vector3& pos)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    Node* mushroomNode = scene_->CreateChild("Mushroom");
+    mushroomNode->SetPosition(pos);
+    mushroomNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
+    mushroomNode->SetScale(2.0f + Random(0.5f));
+    StaticModel* mushroomObject = mushroomNode->CreateComponent<StaticModel>();
+    mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
+    mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
+    mushroomObject->SetCastShadows(true);
+    
+    return mushroomNode;
 }
 
 void Navigation::RecalculatePath()
@@ -292,9 +335,8 @@ void Navigation::RecalculatePath()
     navMesh->FindPath(currentPath_, startPos_, endPos_);
 }
 
-bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Node*& hitNode, Drawable*& hitDrawable)
+bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
 {
-    hitNode = 0;
     hitDrawable = 0;
     
     UI* ui = GetSubsystem<UI>();
@@ -316,7 +358,6 @@ bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Node*& hitNode, Dra
         
         // Calculate hit position in world space
         hitPos = cameraRay.origin_ + cameraRay.direction_ * result.distance_;
-        hitNode = result.drawable_->GetNode();
         hitDrawable = result.drawable_;
         return true;
     }

@@ -171,7 +171,7 @@ void Decals::CreateUI()
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys to move\n"
-        "LMB = paint decal, RMB = rotate view\n"
+        "LMB to paint decals, RMB to rotate view\n"
         "Space to toggle debug geometry\n"
         "7 to toggle occlusion culling"
     );
@@ -192,6 +192,16 @@ void Decals::SetupViewport()
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
+}
+
+void Decals::SubscribeToEvents()
+{
+    // Subscribes HandleUpdate() method for processing update events
+    SubscribeToEvent(E_UPDATE, HANDLER(Decals, HandleUpdate));
+    
+    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
+    // debug geometry
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Decals, HandlePostRenderUpdate));
 }
 
 void Decals::MoveCamera(float timeStep)
@@ -244,29 +254,13 @@ void Decals::MoveCamera(float timeStep)
 
 void Decals::PaintDecal()
 {
-    UI* ui = GetSubsystem<UI>();
-    Graphics* graphics = GetSubsystem<Graphics>();
-    IntVector2 pos = ui->GetCursorPosition();
+    Vector3 hitPos;
+    Drawable* hitDrawable;
     
-    // Make sure no UI element in front of the cursor
-    if (ui->GetElementAt(pos, true))
-        return;
-    
-    Camera* camera = cameraNode_->GetComponent<Camera>();
-    Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
-    // Raycast up to 250 world units distance, pick only geometry objects, not eg. zones or lights, only get the first
-    // (closest) hit
-    PODVector<RayQueryResult> results;
-    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, 250.0f, DRAWABLE_GEOMETRY);
-    scene_->GetComponent<Octree>()->RaycastSingle(query);
-    if (results.Size())
+    if (Raycast(250.0f, hitPos, hitDrawable))
     {
-        RayQueryResult& result = results[0];
-        
-        // Calculate hit position in world space
-        Vector3 rayHitPos = cameraRay.origin_ + cameraRay.direction_ * result.distance_;
         // Check if target scene node already has a DecalSet component. If not, create now
-        Node* targetNode = result.drawable_->GetNode();
+        Node* targetNode = hitDrawable->GetNode();
         DecalSet* decal = targetNode->GetComponent<DecalSet>();
         if (!decal)
         {
@@ -279,19 +273,39 @@ void Decals::PaintDecal()
         // use full texture UV's (0,0) to (1,1). Note that if we create several decals to a large object (such as the ground
         // plane) over a large area using just one DecalSet component, the decals will all be culled as one unit. If that is
         // undesirable, it may be necessary to create more than one DecalSet based on the distance
-        decal->AddDecal(result.drawable_, rayHitPos, cameraNode_->GetWorldRotation(), 0.5f, 1.0f, 1.0f, Vector2::ZERO,
+        decal->AddDecal(hitDrawable, hitPos, cameraNode_->GetWorldRotation(), 0.5f, 1.0f, 1.0f, Vector2::ZERO,
             Vector2::ONE);
     }
 }
 
-void Decals::SubscribeToEvents()
+bool Decals::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
 {
-    // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Decals, HandleUpdate));
+    hitDrawable = 0;
     
-    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
-    // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Decals, HandlePostRenderUpdate));
+    UI* ui = GetSubsystem<UI>();
+    IntVector2 pos = ui->GetCursorPosition();
+    // Check the cursor is visible and there is no UI element in front of the cursor
+    if (!ui->GetCursor()->IsVisible() || ui->GetElementAt(pos, true))
+        return false;
+    
+    Graphics* graphics = GetSubsystem<Graphics>();
+    Camera* camera = cameraNode_->GetComponent<Camera>();
+    Ray cameraRay = camera->GetScreenRay((float)pos.x_ / graphics->GetWidth(), (float)pos.y_ / graphics->GetHeight());
+    // Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
+    PODVector<RayQueryResult> results;
+    RayOctreeQuery query(results, cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
+    scene_->GetComponent<Octree>()->RaycastSingle(query);
+    if (results.Size())
+    {
+        RayQueryResult& result = results[0];
+        
+        // Calculate hit position in world space
+        hitPos = cameraRay.origin_ + cameraRay.direction_ * result.distance_;
+        hitDrawable = result.drawable_;
+        return true;
+    }
+    
+    return false;
 }
 
 void Decals::HandleUpdate(StringHash eventType, VariantMap& eventData)
