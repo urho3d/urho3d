@@ -42,6 +42,7 @@ void Sample::Setup()
     engineParameters_["WindowTitle"] = GetTypeName();
     engineParameters_["LogName"]     = GetTypeName() + ".log";
     engineParameters_["FullScreen"]  = false;
+    engineParameters_["Headless"]    = false;
 }
 
 void Sample::Start()
