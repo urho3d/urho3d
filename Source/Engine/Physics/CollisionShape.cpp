@@ -47,7 +47,7 @@
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 #include <BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
-#include <BulletCollision/CollisionShapes/btTriangleMesh.h>
+#include <BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletCollision/CollisionShapes/btStaticPlaneShape.h>
 #include <hull.h>
@@ -76,70 +76,70 @@ static const char* typeNames[] =
 
 extern const char* PHYSICS_CATEGORY;
 
-TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
-    meshData_(0),
-    shape_(0)
+class TriangleMeshInterface : public btTriangleIndexVertexArray
 {
-    modelName_ = model->GetName();
-    meshData_ = new btTriangleMesh();
-    
-    unsigned numGeometries = model->GetNumGeometries();
-    
-    for (unsigned i = 0; i < numGeometries; ++i)
+public:
+    TriangleMeshInterface(Model* model, unsigned lodLevel) : btTriangleIndexVertexArray()
     {
-        Geometry* geometry = model->GetGeometry(i, lodLevel);
-        if (!geometry)
+        unsigned numGeometries = model->GetNumGeometries();
+        
+        for (unsigned i = 0; i < numGeometries; ++i)
         {
-            LOGWARNING("Skipping null geometry for triangle mesh collision");
-            continue;
-        }
-        
-        const unsigned char* vertexData;
-        const unsigned char* indexData;
-        unsigned vertexSize;
-        unsigned indexSize;
-        unsigned elementMask;
-        
-        geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-        if (!vertexData || !indexData)
-        {
-            LOGWARNING("Skipping geometry with no CPU-side geometry data for triangle mesh collision");
-            continue;
-        }
-        
-        unsigned indexStart = geometry->GetIndexStart();
-        unsigned indexCount = geometry->GetIndexCount();
-        
-        /// \todo Use btTriangleIndexVertexArray interface for adding the vertices & indices
-        // 16-bit indices
-        if (indexSize == sizeof(unsigned short))
-        {
-            const unsigned short* indices = (const unsigned short*)indexData;
-            
-            for (unsigned j = indexStart; j < indexStart + indexCount; j += 3)
+            Geometry* geometry = model->GetGeometry(i, lodLevel);
+            if (!geometry)
             {
-                const Vector3& v0 = *((const Vector3*)(&vertexData[indices[j] * vertexSize]));
-                const Vector3& v1 = *((const Vector3*)(&vertexData[indices[j + 1] * vertexSize]));
-                const Vector3& v2 = *((const Vector3*)(&vertexData[indices[j + 2] * vertexSize]));
-                meshData_->addTriangle(ToBtVector3(v0), ToBtVector3(v1), ToBtVector3(v2));
+                LOGWARNING("Skipping null geometry for triangle mesh collision");
+                continue;
             }
-        }
-        // 32-bit indices
-        else
-        {
-            const unsigned* indices = (const unsigned*)indexData;
             
-            for (unsigned j = indexStart; j < indexStart + indexCount; j += 3)
+            const unsigned char* vertexData;
+            const unsigned char* indexData;
+            unsigned vertexSize;
+            unsigned indexSize;
+            unsigned elementMask;
+            
+            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+            if (!vertexData || !indexData)
             {
-                const Vector3& v0 = *((const Vector3*)(&vertexData[indices[j] * vertexSize]));
-                const Vector3& v1 = *((const Vector3*)(&vertexData[indices[j + 1] * vertexSize]));
-                const Vector3& v2 = *((const Vector3*)(&vertexData[indices[j + 2] * vertexSize]));
-                meshData_->addTriangle(ToBtVector3(v0), ToBtVector3(v1), ToBtVector3(v2));
+                LOGWARNING("Skipping geometry with no CPU-side geometry data for triangle mesh collision");
+                continue;
             }
+            
+            // Keep a shared pointer to the referred geometry
+            /// \todo Model live reload is not handled properly, but at least we will not crash due to holding a pointer
+            /// to the original geometry
+            geometries_.Push(SharedPtr<Geometry>(geometry));
+            
+            unsigned indexStart = geometry->GetIndexStart();
+            unsigned indexCount = geometry->GetIndexCount();
+            
+            btIndexedMesh meshIndex;
+            meshIndex.m_numTriangles = indexCount / 3;
+            meshIndex.m_triangleIndexBase = &indexData[indexStart];
+            meshIndex.m_triangleIndexStride = 3 * indexSize;
+            meshIndex.m_numVertices = 0;
+            meshIndex.m_vertexBase = vertexData;
+            meshIndex.m_vertexStride = vertexSize;
+            meshIndex.m_indexType = (indexSize == sizeof(unsigned short)) ? PHY_SHORT : PHY_INTEGER;
+            meshIndex.m_vertexType = PHY_FLOAT;
+            m_indexedMeshes.push_back(meshIndex);
         }
     }
     
-    shape_ = new btBvhTriangleMeshShape(meshData_, true, true);
+private:
+    /// Geometries used in the collision
+    Vector<SharedPtr<Geometry> > geometries_;
+};
+
+TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
+    meshInterface_(0),
+    shape_(0),
+    infoMap_(0)
+{
+    modelName_ = model->GetName();
+    
+    meshInterface_ = new TriangleMeshInterface(model, lodLevel);
+    shape_ = new btBvhTriangleMeshShape(meshInterface_, true, true);
     
     infoMap_ = new btTriangleInfoMap();
     btGenerateInternalEdgeInfo(shape_, infoMap_);
@@ -150,8 +150,8 @@ TriangleMeshData::~TriangleMeshData()
     delete shape_;
     shape_ = 0;
     
-    delete meshData_;
-    meshData_ = 0;
+    delete meshInterface_;
+    meshInterface_ = 0;
     
     delete infoMap_;
     infoMap_ = 0;
@@ -275,8 +275,6 @@ void ConvexData::BuildHull(const PODVector<Vector3>& vertices)
         indexCount_ = 0;
     }
 }
-
-
 
 ConvexData::~ConvexData()
 {

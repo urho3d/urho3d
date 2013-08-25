@@ -43,6 +43,7 @@ class Model;
 class PhysicsWorld;
 class RigidBody;
 class Terrain;
+class TriangleMeshInterface;
 
 /// Collision shape type.
 enum ShapeType
@@ -73,8 +74,8 @@ struct TriangleMeshData : public CollisionGeometryData
     /// Destruct. Free geometry data.
     ~TriangleMeshData();
     
-    /// Bullet triangle mesh data.
-    btTriangleMesh* meshData_;
+    /// Bullet triangle mesh interface.
+    TriangleMeshInterface* meshInterface_;
     /// Bullet triangle mesh collision shape.
     btBvhTriangleMeshShape* shape_;
     /// Bullet triangle info map.
