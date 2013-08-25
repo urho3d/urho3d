@@ -470,6 +470,8 @@ void Network::OnServerDisconnected()
 {
     // Differentiate between failed connection, and disconnection
     bool failedConnect = serverConnection_ && serverConnection_->IsConnectPending();
+    serverConnection_.Reset();
+    
     if (!failedConnect)
     {
         LOGINFO("Disconnected from server");
@@ -480,8 +482,6 @@ void Network::OnServerDisconnected()
         LOGERROR("Failed to connect to server");
         SendEvent(E_CONNECTFAILED);
     }
-    
-    serverConnection_.Reset();
 }
 
 void RegisterNetworkLibrary(Context* context)

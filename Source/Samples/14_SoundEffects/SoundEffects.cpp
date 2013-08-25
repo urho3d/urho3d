@@ -77,6 +77,12 @@ void SoundEffects::CreateUI()
     // Create a scene which will not be actually rendered, but is used to hold SoundSource components while they play sounds
     scene_ = new Scene(context_);
     
+    UIElement* root = GetSubsystem<UI>()->GetRoot();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    XMLFile* uiStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    // Set style to the UI root so that elements will inherit it
+    root->SetDefaultStyle(uiStyle);
+    
     // Create buttons for playing back sounds
     for (unsigned i = 0; i < NUM_SOUNDS; ++i)
     {
@@ -109,14 +115,14 @@ Button* SoundEffects::CreateButton(int x, int y, int xSize, int ySize, const Str
 {
     UIElement* root = GetSubsystem<UI>()->GetRoot();
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* defaultStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
     
     // Create the button and center the text onto it
     Button* button = root->CreateChild<Button>();
-    button->SetStyleAuto(defaultStyle);
+    button->SetStyleAuto();
     button->SetPosition(x, y);
     button->SetSize(xSize, ySize);
+    
     Text* buttonText = button->CreateChild<Text>();
     buttonText->SetAlignment(HA_CENTER, VA_CENTER);
     buttonText->SetFont(font, 12);
@@ -129,7 +135,6 @@ Slider* SoundEffects::CreateSlider(int x, int y, int xSize, int ySize, const Str
 {
     UIElement* root = GetSubsystem<UI>()->GetRoot();
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* defaultStyle = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
     Font* font = cache->GetResource<Font>("Fonts/Anonymous Pro.ttf");
     
     // Create text and slider below it
@@ -139,7 +144,7 @@ Slider* SoundEffects::CreateSlider(int x, int y, int xSize, int ySize, const Str
     sliderText->SetText(text);
     
     Slider* slider = root->CreateChild<Slider>();
-    slider->SetStyleAuto(defaultStyle);
+    slider->SetStyleAuto();
     slider->SetPosition(x, y + 20);
     slider->SetSize(xSize, ySize);
     // Use 0-1 range for controlling sound/music master volume

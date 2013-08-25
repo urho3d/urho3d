@@ -63,7 +63,9 @@ if (URHO3D_HOME)
             ${SOURCE_TREE_PATH}/UI
             ${URHO3D_HOME}/Source/Extras/LuaScript
             ${URHO3D_HOME}/Source/ThirdParty/SDL/include
-            ${URHO3D_HOME}/Source/ThirdParty/Bullet/src)
+            ${URHO3D_HOME}/Source/ThirdParty/Bullet/src
+            ${URHO3D_HOME}/Source/ThirdParty/kNet/include
+            )
 
         if (ANDROID)
             set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/android-Build/Engine)

@@ -39,7 +39,7 @@ set (LIBS ../../Engine/Audio
           ../../Engine/Scene
           ../../Engine/UI)
 
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ../../ThirdParty/Bullet/src)
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include)
 
 # Add samples
 add_subdirectory (01_HelloWorld)
@@ -57,3 +57,4 @@ add_subdirectory (12_PhysicsStressTest)
 add_subdirectory (13_Ragdolls)
 add_subdirectory (14_SoundEffects)
 add_subdirectory (15_Navigation)
+add_subdirectory (16_Chat)
