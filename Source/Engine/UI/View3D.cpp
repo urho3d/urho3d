@@ -89,6 +89,7 @@ void View3D::SetView(Scene* scene, Camera* camera)
     
     viewport_->SetScene(scene_);
     viewport_->SetCamera(camera);
+    QueueUpdate();
 }
 
 void View3D::SetFormat(unsigned format)
