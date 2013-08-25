@@ -41,7 +41,7 @@ if (URHO3D_HOME)
     file (TO_CMAKE_PATH ${URHO3D_HOME} URHO3D_HOME)
     
     # Construct source tree paths from URHO3D_HOME environment variable
-    find_file (SOURCE_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/Source/Engine NO_DEFAULT_PATH)
+    find_file (SOURCE_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/Source/Engine NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     if (SOURCE_TREE_PATH)
         get_filename_component (SOURCE_TREE_PATH ${SOURCE_TREE_PATH} PATH)
         set (URHO3D_INCLUDE_DIR
@@ -75,7 +75,7 @@ if (URHO3D_HOME)
             set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/Build/Engine)
             set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/Lib)
         endif ()
-        find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH)
+        find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     endif ()
 else ()
     set (URHO3D_INC_SEARCH_PATH /opt/include)
