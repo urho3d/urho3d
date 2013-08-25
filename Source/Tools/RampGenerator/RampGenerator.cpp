@@ -56,7 +56,7 @@ int main(int argc, char** argv)
 void Run(const Vector<String>& arguments)
 {
     if (arguments.Size() < 3)
-        ErrorExit("Usage: RampGenerator <output file> <width> <power> [dimensions]\n");
+        ErrorExit("Usage: RampGenerator <output png file> <width> <power> [dimensions]\n");
     
     int width = ToInt(arguments[1]);
     float power = ToFloat(arguments[2]);
@@ -70,8 +70,6 @@ void Run(const Vector<String>& arguments)
     
     if (dimensions < 1 || dimensions > 2)
         ErrorExit("Dimensions must be 1 or 2");
-    
-    String tempDestName = arguments[0].Split('.')[0] + ".tga";
     
     if (dimensions == 1)
     {
@@ -88,7 +86,7 @@ void Run(const Vector<String>& arguments)
         data[0] = 255;
         data[width - 1] = 0;
         
-        stbi_write_tga(tempDestName.CString(), width, 1, 1, data.Get());
+        stbi_write_png(arguments[0].CString(), width, 1, 1, data.Get(), 0);
     }
     
     if (dimensions == 2)
@@ -121,14 +119,6 @@ void Run(const Vector<String>& arguments)
             data[x * width + (width - 1)] = 0;
         }
         
-        stbi_write_tga(tempDestName.CString(), width, width, 1, data.Get());
+        stbi_write_png(arguments[0].CString(), width, width, 1, data.Get(), 0);
     }
-    
-    String command = "texconv -f R8G8B8 -ft PNG -if NONE " + tempDestName;
-    int ret = system(command.CString());
-    
-    if (ret)
-        ErrorExit("Failed to convert to PNG");
-    
-    remove(tempDestName.CString());
 }
