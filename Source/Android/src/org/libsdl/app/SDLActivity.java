@@ -923,4 +923,3 @@ class SDLInputConnection extends BaseInputConnection {
     public native void nativeSetComposingText(String text, int newCursorPosition);
 
 }
-
