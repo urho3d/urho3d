@@ -52,7 +52,7 @@ public:
 private:
     /// Create the UI.
     void CreateUI();
-    /// Subscribe to UI and network events.
+    /// Subscribe to log message, UI and network events.
     void SubscribeToEvents();
     /// Create a button.
     Button* CreateButton(const String& text, int width);
@@ -70,7 +70,7 @@ private:
     void HandleDisconnect(StringHash eventType, VariantMap& eventData);
     /// Handle pressing the start server button.
     void HandleStartServer(StringHash eventType, VariantMap& eventData);
-    /// Handle a network message.
+    /// Handle an incoming network message.
     void HandleNetworkMessage(StringHash eventType, VariantMap& eventData);
     /// Handle connection status change (just update the buttons that should be shown.)
     void HandleConnectionStatus(StringHash eventType, VariantMap& eventData);

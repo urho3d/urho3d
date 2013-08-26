@@ -164,6 +164,7 @@ void Chat::UpdateButtons()
     Connection* serverConnection = network->GetServerConnection();
     bool serverRunning = network->IsServerRunning();
     
+    // Show and hide buttons so that eg. Connect and Disconnect are never shown at the same time
     sendButton_->SetVisible(serverConnection != 0);
     connectButton_->SetVisible(!serverConnection && !serverRunning);
     disconnectButton_->SetVisible(serverConnection || serverRunning);
@@ -193,8 +194,7 @@ void Chat::HandleSend(StringHash eventType, VariantMap& eventData)
         msg.WriteString(text);
         // Send the chat message as in-order and reliable
         serverConnection->SendMessage(MSG_CHAT, true, true, msg);
-        
-        // Empty the editor after sending
+        // Empty the text edit after sending
         textEdit_->SetText(String::EMPTY);
     }
 }
@@ -205,8 +205,12 @@ void Chat::HandleConnect(StringHash eventType, VariantMap& eventData)
     String address = textEdit_->GetText().Trimmed();
     if (address.Empty())
         address = "localhost"; // Use localhost to connect if nothing else specified
+    // Empty the text edit after reading the address to connect to
+    textEdit_->SetText(String::EMPTY);
     
-    // Connect to server, do not specify a client scene as we are not using scene replication, just messages
+    // Connect to server, do not specify a client scene as we are not using scene replication, just messages.
+    // At connect time we could also send identity parameters (such as username) in a VariantMap, but in this
+    // case we skip it for simplicity
     network->Connect(address, CHAT_SERVER_PORT, 0);
     
     UpdateButtons();
@@ -216,8 +220,10 @@ void Chat::HandleDisconnect(StringHash eventType, VariantMap& eventData)
 {
     Network* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
+    // If we were connected to server, disconnect
     if (serverConnection)
         serverConnection->Disconnect();
+    // Or if we were running a server, stop it
     else if (network->IsServerRunning())
         network->StopServer();
     

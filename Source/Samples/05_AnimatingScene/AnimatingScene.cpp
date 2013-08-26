@@ -148,6 +148,12 @@ void AnimatingScene::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
+void AnimatingScene::SubscribeToEvents()
+{
+    // Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent(E_UPDATE, HANDLER(AnimatingScene, HandleUpdate));
+}
+
 void AnimatingScene::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
@@ -179,12 +185,6 @@ void AnimatingScene::MoveCamera(float timeStep)
         cameraNode_->TranslateRelative(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->TranslateRelative(Vector3::RIGHT * MOVE_SPEED * timeStep);
-}
-
-void AnimatingScene::SubscribeToEvents()
-{
-    // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(AnimatingScene, HandleUpdate));
 }
 
 void AnimatingScene::HandleUpdate(StringHash eventType, VariantMap& eventData)

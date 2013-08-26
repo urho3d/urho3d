@@ -45,21 +45,21 @@ public:
     virtual void Start();
 
 private:
-    /// Constructs the scene content.
+    /// Construct the scene content.
     void CreateScene();
-    /// Constructs an instruction text to the UI.
+    /// Construct an instruction text to the UI.
     void CreateInstructions();
-    /// Sets up a viewport for displaying the scene.
+    /// Set up a viewport for displaying the scene.
     void SetupViewport();
-    /// Reads input and moves the camera.
-    void MoveCamera(float timeStep);
-    /// Animates the scene.
-    void AnimateScene(float timeStep);
-    /// Subscribes to application-wide logic update events.
+    /// Subscribe to application-wide logic update and post-render update events.
     void SubscribeToEvents();
-    /// Callback method invoked when a logic update event is dispatched.
+    /// Read input and moves the camera.
+    void MoveCamera(float timeStep);
+    /// Animate the scene.
+    void AnimateScene(float timeStep);
+    /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Callback method invoked when the post-render update event is dispatched.
+    /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Scene.

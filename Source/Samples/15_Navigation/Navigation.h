@@ -51,17 +51,17 @@ public:
     virtual void Start();
 
 private:
-    /// Constructs the scene content.
+    /// Construct the scene content.
     void CreateScene();
-    /// Constructs user interface elements.
+    /// Construct user interface elements.
     void CreateUI();
-    /// Sets up a viewport for displaying the scene.
+    /// Set up a viewport for displaying the scene.
     void SetupViewport();
-    /// Subscribes to application-wide logic update events.
+    /// Subscribe to application-wide logic update and post-render update events.
     void SubscribeToEvents();
-    /// Reads input and moves the camera.
+    /// Read input and moves the camera.
     void MoveCamera(float timeStep);
-    /// Sets path start or end point.
+    /// Set path start or end point.
     void SetPathPoint();
     /// Add or remove object.
     void AddOrRemoveObject();
@@ -71,9 +71,9 @@ private:
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Recalculate path. Requires both start and endpoint defined.
     void RecalculatePath();
-    /// Callback method invoked when a logic update event is dispatched.
+    /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Callback method invoked when the post-render update event is dispatched.
+    /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Scene.

@@ -272,10 +272,10 @@ void Ragdolls::SpawnObject()
 
 void Ragdolls::SubscribeToEvents()
 {
-    // Subscribes HandleUpdate() method for processing update events
+    // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(Ragdolls, HandleUpdate));
     
-    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
+    // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
     // debug geometry
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Ragdolls, HandlePostRenderUpdate));
 }

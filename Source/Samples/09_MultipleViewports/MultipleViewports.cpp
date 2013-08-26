@@ -217,6 +217,16 @@ void MultipleViewports::SetupViewports()
     renderer->SetViewport(1, rearViewport);
 }
 
+void MultipleViewports::SubscribeToEvents()
+{
+    // Subscribe HandleUpdate() method for processing update events
+    SubscribeToEvent(E_UPDATE, HANDLER(MultipleViewports, HandleUpdate));
+    
+    // Subscribe HandlePostRenderUpdate() method for processing the post-render update event, during which we request
+    // debug geometry
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(MultipleViewports, HandlePostRenderUpdate));
+}
+
 void MultipleViewports::MoveCamera(float timeStep)
 {
      // Do not move if the UI has a focused element (the console)
@@ -259,16 +269,6 @@ void MultipleViewports::MoveCamera(float timeStep)
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
-}
-
-void MultipleViewports::SubscribeToEvents()
-{
-    // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(MultipleViewports, HandleUpdate));
-    
-    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
-    // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(MultipleViewports, HandlePostRenderUpdate));
 }
 
 void MultipleViewports::HandleUpdate(StringHash eventType, VariantMap& eventData)

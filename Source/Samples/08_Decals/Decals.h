@@ -51,23 +51,23 @@ public:
     virtual void Start();
 
 private:
-    /// Constructs the scene content.
+    /// Construct the scene content.
     void CreateScene();
-    /// Constructs user interface elements.
+    /// Construct user interface elements.
     void CreateUI();
-    /// Sets up a viewport for displaying the scene.
+    /// Set up a viewport for displaying the scene.
     void SetupViewport();
-    /// Subscribes to application-wide logic update events.
+    /// Subscribe to application-wide logic update and post-render update events.
     void SubscribeToEvents();
     /// Reads input and moves the camera.
     void MoveCamera(float timeStep);
-    /// Paints a decal using a ray cast from the mouse cursor.
+    /// Paint a decal using a ray cast from the mouse cursor.
     void PaintDecal();
     /// Utility function to raycast to the cursor position. Return true if hit
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
-    /// Callback method invoked when a logic update event is dispatched.
+    /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Callback method invoked when the post-render update event is dispatched.
+    /// Handle the post-render update event.
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Scene.

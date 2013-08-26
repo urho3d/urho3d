@@ -44,11 +44,10 @@ public:
     virtual void Start();
 
 private:
-    /// Constructs a new Text instance, containing the 'Hello World' String, and
-    /// adds it to the UI root element.
+    /// Construct a new Text instance, containing the 'Hello World' String, and add it to the UI root element.
     void CreateText();
     /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
-    /// Callback method invoked when a logic update event is dispatched.
+    /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 };

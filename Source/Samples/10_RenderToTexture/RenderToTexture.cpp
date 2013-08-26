@@ -269,7 +269,7 @@ void RenderToTexture::MoveCamera(float timeStep)
 
 void RenderToTexture::SubscribeToEvents()
 {
-    // Subscribes HandleUpdate() method for processing update events
+    // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(RenderToTexture, HandleUpdate));
 }
 

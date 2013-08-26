@@ -45,11 +45,11 @@ public:
     virtual void Start();
 
 private:
-    /// Creates the UI and subscribes to UI events.
+    /// Create the UI and subscribes to UI events.
     void CreateUI();
-    /// Creates a button at position with specified text in it.
+    /// Create a button at position with specified text in it.
     Button* CreateButton(int x, int y, int xSize, int ySize, const String& text);
-    /// Creates a horizontal slider with specified text above it.
+    /// Create a horizontal slider with specified text above it.
     Slider* CreateSlider(int x, int y, int xSize, int ySize, const String& text);
     /// Handle a sound effect button click.
     void HandlePlaySound(StringHash eventType, VariantMap& eventData);

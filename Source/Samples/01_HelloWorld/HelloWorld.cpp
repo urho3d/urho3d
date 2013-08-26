@@ -76,7 +76,7 @@ void HelloWorld::CreateText()
 
 void HelloWorld::SubscribeToEvents()
 {
-    // Subscribes HandleUpdate() method for processing update events
+    // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(HelloWorld, HandleUpdate));
 }
 

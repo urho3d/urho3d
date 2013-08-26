@@ -46,13 +46,13 @@ public:
     virtual void Start();
 
 private:
-    /// Constructs the sprites.
+    /// Construct the sprites.
     void CreateSprites();
-    /// Moves the sprites using the delta time step given.
+    /// Move the sprites using the delta time step given.
     void MoveSprites(float timeStep);
-    /// Subscribes to application-wide logic update events.
+    /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
-    /// Callback method invoked when a logic update event is dispatched.
+    /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Vector to store the sprites for iterating through them.

@@ -182,6 +182,17 @@ void SkeletalAnimation::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
+void SkeletalAnimation::SubscribeToEvents()
+{
+    // Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent(E_UPDATE, HANDLER(SkeletalAnimation, HandleUpdate));
+    
+    // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, sent after Renderer subsystem is
+    // done with defining the draw calls for the viewports (but before actually executing them.) We will request debug geometry
+    // rendering during that event
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SkeletalAnimation, HandlePostRenderUpdate));
+}
+
 void SkeletalAnimation::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
@@ -217,17 +228,6 @@ void SkeletalAnimation::MoveCamera(float timeStep)
     // Toggle debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
-}
-
-void SkeletalAnimation::SubscribeToEvents()
-{
-    // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(SkeletalAnimation, HandleUpdate));
-    
-    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, sent after Renderer subsystem is
-    // done with defining the draw calls for the viewports (but before actually executing them.) We will request debug geometry
-    // rendering during that event
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SkeletalAnimation, HandlePostRenderUpdate));
 }
 
 void SkeletalAnimation::HandleUpdate(StringHash eventType, VariantMap& eventData)

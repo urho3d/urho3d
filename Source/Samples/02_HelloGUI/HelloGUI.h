@@ -44,19 +44,15 @@ public:
     virtual void Start();
 
 private:
-    /// Creates and initializes a Window control.
+    /// Create and initialize a Window control.
     void InitWindow();
-
-    /// Creates and add various common controls for demonstration purposes.
+    /// Create and add various common controls for demonstration purposes.
     void InitControls();
-
-    /// Convenience method for event subscription.
+    /// Subscribe to UI events.
     void SubscribeToEvents();
-
-    /// Callback method invoked whenever any control is clicked.
+    /// Handle any UI control being clicked.
     void HandleControlClicked(StringHash eventType, VariantMap& eventData);
-
-    /// Callback method invoked when the close button is pressed and released.
+    /// Handle close button pressed and released.
     void HandleClosePressed(StringHash eventType, VariantMap& eventData);
 
     /// The Window.

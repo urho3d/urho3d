@@ -210,6 +210,16 @@ void PhysicsStressTest::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
+void PhysicsStressTest::SubscribeToEvents()
+{
+    // Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent(E_UPDATE, HANDLER(PhysicsStressTest, HandleUpdate));
+    
+    // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
+    // debug geometry
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(PhysicsStressTest, HandlePostRenderUpdate));
+}
+
 void PhysicsStressTest::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
@@ -277,16 +287,6 @@ void PhysicsStressTest::SpawnObject()
     // Set initial velocity for the RigidBody based on camera forward vector. Add also a slight up component
     // to overcome gravity better
     body->SetLinearVelocity(cameraNode_->GetRotation() * Vector3(0.0f, 0.25f, 1.0f) * OBJECT_VELOCITY);
-}
-
-void PhysicsStressTest::SubscribeToEvents()
-{
-    // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(PhysicsStressTest, HandleUpdate));
-    
-    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
-    // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(PhysicsStressTest, HandlePostRenderUpdate));
 }
 
 void PhysicsStressTest::HandleUpdate(StringHash eventType, VariantMap& eventData)

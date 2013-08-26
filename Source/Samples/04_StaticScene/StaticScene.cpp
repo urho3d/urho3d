@@ -187,7 +187,7 @@ void StaticScene::MoveCamera(float timeStep)
 
 void StaticScene::SubscribeToEvents()
 {
-    // Subscribes HandleUpdate() method for processing update events
+    // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, HANDLER(StaticScene, HandleUpdate));
 }
 

@@ -238,6 +238,16 @@ void Billboards::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
+void Billboards::SubscribeToEvents()
+{
+    // Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent(E_UPDATE, HANDLER(Billboards, HandleUpdate));
+    
+    // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request
+    // debug geometry
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Billboards, HandlePostRenderUpdate));
+}
+
 void Billboards::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
@@ -303,16 +313,6 @@ void Billboards::AnimateScene(float timeStep)
         
         billboardObject->Commit();
     }
-}
-
-void Billboards::SubscribeToEvents()
-{
-    // Subscribes HandleUpdate() method for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Billboards, HandleUpdate));
-    
-    // Subscribes HandlePostRenderUpdate() method for processing the post-render update event, during which we request
-    // debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Billboards, HandlePostRenderUpdate));
 }
 
 void Billboards::HandleUpdate(StringHash eventType, VariantMap& eventData)
