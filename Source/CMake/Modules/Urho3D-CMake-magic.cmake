@@ -377,18 +377,30 @@ macro (setup_main_executable)
 
     # Setup target
     if (ANDROID)
+        # Add SDL native init function
         if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
             set (SOURCE_FILES ${SOURCE_FILES} ${PROJECT_SOURCE_DIR}/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
             set (SOURCE_FILES ${SOURCE_FILES} $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         endif ()
+        # Setup target as main shared library
         set (LIB_TYPE SHARED)
         setup_library ()
+        # Copy target main shared library to Android library output path 
         file (MAKE_DIRECTORY ${ANDROID_LIBRARY_OUTPUT_PATH})
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
             COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ANDROID_LIBRARY_OUTPUT_PATH}
             COMMENT "Stripping and copying the output shared library")
+        # For project references Urho3D as external shared library, also copy Urho3D shared library to Android library output path
+        if (URHO3D_LIBRARIES)
+            get_filename_component (URHO3D_LIBRARY_SUFFIX ${URHO3D_LIBRARIES} EXT)
+            if (URHO3D_LIBRARY_SUFFIX STREQUAL .so)
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${URHO3D_LIBRARIES} ${ANDROID_LIBRARY_OUTPUT_PATH}
+                    COMMENT "Copying Urho3D shared library to target library directory")
+            endif ()
+        endif ()
     else ()
         if (WIN32)
             set (EXE_TYPE WIN32)
@@ -431,7 +443,7 @@ endmacro ()
 # The purpose of this macro is emulate CMake to set the external library dependencies transitively to a main target setup but in other project's CMake build script that uses Urho3D static/shared library 
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
-    if (${TARGET} MATCHES "SDL|Main")
+    if (${TARGET} MATCHES SDL|Main)
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
         elseif (APPLE)
@@ -447,7 +459,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # ThirdParty/kNet external dependency
-    if (${TARGET} MATCHES "kNet|Main")
+    if (${TARGET} MATCHES kNet|Main)
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} ws2_32.lib)
         elseif (NOT ANDROID)
@@ -456,7 +468,7 @@ macro (define_dependency_libs TARGET)
     endif ()
     
     # Engine/Core external dependency
-    if (${TARGET} MATCHES "Core|Main")
+    if (${TARGET} MATCHES Core|Main)
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} winmm.lib)
             if (ENABLE_MINIDUMPS)
@@ -468,7 +480,7 @@ macro (define_dependency_libs TARGET)
     endif ()
     
     # Engine/Graphics external dependency
-    if (${TARGET} MATCHES "Graphics|Main")
+    if (${TARGET} MATCHES Graphics|Main)
         if (USE_OPENGL)
             if (WIN32)
                 set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} opengl32)
@@ -483,7 +495,7 @@ macro (define_dependency_libs TARGET)
     endif ()
     
     # Main external dependency
-    if (${TARGET} STREQUAL Main AND NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
+    if (${TARGET} STREQUAL Main AND URHO3D_LIBRARIES)
         set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} Urho3D)
     endif ()
     

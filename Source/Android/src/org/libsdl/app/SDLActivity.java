@@ -1,6 +1,8 @@
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 package org.libsdl.app;
+
+import java.io.File;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -52,11 +54,8 @@ public class SDLActivity extends Activity {
     protected static EGLConfig   mEGLConfig;
     protected static int mGLMajor, mGLMinor;
 
-    // Load the .so
-    static {
-		// Urho3D: everything resides in urho3d.so
-        System.loadLibrary("Urho3D");
-    }
+    // Urho3D: flag to load the .so
+    private static boolean mIsSharedLibraryLoaded = false;
 
     // Setup
     @Override
@@ -66,6 +65,18 @@ public class SDLActivity extends Activity {
         
         // So we can call stuff from static callbacks
         mSingleton = this;
+        
+    	// Urho3D: auto load all the shared libraries available in the library path
+    	String libraryPath = getApplicationInfo().dataDir + "/lib";
+    	//Log.v("SDL", "libraryPath: " + libraryPath);
+    	if (!mIsSharedLibraryLoaded) {
+            for (final File libraryFilename : new File(libraryPath).listFiles()) {
+                String name = libraryFilename.getName().replaceAll("^lib(.*)\\.so$", "$1");
+                //Log.v("SDL", "library name: " + name);
+                System.loadLibrary(name);
+            }            
+            mIsSharedLibraryLoaded = true;
+    	}
 
         // Set up the surface
         mEGLSurface = EGL10.EGL_NO_SURFACE;
