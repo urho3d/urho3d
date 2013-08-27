@@ -1380,6 +1380,7 @@ void Connection::OnPackagesReady()
     
     if (sceneFileName_.Empty())
     {
+        /// \todo Should not clear local nodes
         scene_->Clear();
         sceneLoaded_ = true;
         

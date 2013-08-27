@@ -162,7 +162,6 @@ void Decals::CreateUI()
     SharedPtr<Cursor> cursor(new Cursor(context_));
     cursor->SetStyleAuto(style);
     ui->SetCursor(cursor);
-
     // Set starting position of the cursor at the rendering window center
     Graphics* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
@@ -310,7 +309,6 @@ bool Decals::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
 
 void Decals::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Event parameters are always defined inside a namespace corresponding to the event's name
     using namespace Update;
 
     // Take the frame time step, which is stored as a float

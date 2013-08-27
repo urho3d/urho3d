@@ -139,7 +139,6 @@ void Sprites::SubscribeToEvents()
 
 void Sprites::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Event parameters are always defined inside a namespace corresponding to the event's name
     using namespace Update;
 
     // Take the frame time step, which is stored as a float

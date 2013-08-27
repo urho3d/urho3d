@@ -116,12 +116,17 @@ void Chat::CreateUI()
 
 void Chat::SubscribeToEvents()
 {
+    // Subscribe to UI element events
     SubscribeToEvent(textEdit_, E_TEXTFINISHED, HANDLER(Chat, HandleSend));
     SubscribeToEvent(sendButton_, E_RELEASED, HANDLER(Chat, HandleSend));
     SubscribeToEvent(connectButton_, E_RELEASED, HANDLER(Chat, HandleConnect));
     SubscribeToEvent(disconnectButton_, E_RELEASED, HANDLER(Chat, HandleDisconnect));
     SubscribeToEvent(startServerButton_, E_RELEASED, HANDLER(Chat, HandleStartServer));
+
+    // Subscribe to log messages so that we can pipe them to the chat window
     SubscribeToEvent(E_LOGMESSAGE, HANDLER(Chat, HandleLogMessage));
+    
+    // Subscribe to network events
     SubscribeToEvent(E_NETWORKMESSAGE, HANDLER(Chat, HandleNetworkMessage));
     SubscribeToEvent(E_SERVERCONNECTED, HANDLER(Chat, HandleConnectionStatus));
     SubscribeToEvent(E_SERVERDISCONNECTED, HANDLER(Chat, HandleConnectionStatus));

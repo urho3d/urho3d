@@ -24,7 +24,6 @@
 #include "CoreEvents.h"
 #include "Cursor.h"
 #include "DebugRenderer.h"
-#include "DecalSet.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Graphics.h"
@@ -273,7 +272,6 @@ void MultipleViewports::MoveCamera(float timeStep)
 
 void MultipleViewports::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Event parameters are always defined inside a namespace corresponding to the event's name
     using namespace Update;
 
     // Take the frame time step, which is stored as a float
