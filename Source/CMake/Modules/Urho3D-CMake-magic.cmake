@@ -440,7 +440,8 @@ macro (adjust_library_name)
 endmacro ()
 
 # Macro for defining external library dependencies
-# The purpose of this macro is emulate CMake to set the external library dependencies transitively to a main target setup but in other project's CMake build script that uses Urho3D static/shared library 
+# The purpose of this macro is emulate CMake to set the external library dependencies transitively
+# It works for both targets setup within Urho3D project and outside Urho3D project that uses Urho3D as external static/shared library 
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
     if (${TARGET} MATCHES SDL|Main)
