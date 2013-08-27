@@ -577,8 +577,37 @@ void Node::RemoveChild(Node* node)
 
 void Node::RemoveAllChildren()
 {
-    while (children_.Size())
-        RemoveChild(--children_.End());
+    RemoveChildren(true, true, true);
+}
+
+void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive)
+{
+    unsigned numRemoved = 0;
+    
+    for (unsigned i = 0; i < children_.Size();)
+    {
+        bool remove = false;
+        Node* childNode = children_[i];
+        
+        if (recursive)
+            childNode->RemoveChildren(removeReplicated, removeLocal, true);
+        if (childNode->GetID() < FIRST_LOCAL_ID && removeReplicated)
+            remove = true;
+        else if (childNode->GetID() >= FIRST_LOCAL_ID && removeLocal)
+            remove = true;
+        
+        if (remove)
+        {
+            RemoveChild(children_.Begin() + i);
+            ++numRemoved;
+        }
+        else
+            ++i;
+    }
+    
+    // Mark node dirty in all replication states
+    if (numRemoved)
+        MarkReplicationDirty();
 }
 
 Component* Node::CreateComponent(ShortStringHash type, CreateMode mode, unsigned id)
@@ -636,14 +665,35 @@ void Node::RemoveComponent(ShortStringHash type)
 
 void Node::RemoveAllComponents()
 {
-    if (components_.Empty())
-        return;
+    RemoveComponents(true, true);
+}
 
-    while (components_.Size())
-        RemoveComponent(--components_.End());
-
+void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
+{
+    unsigned numRemoved = 0;
+    
+    for (unsigned i = 0; i < components_.Size();)
+    {
+        bool remove = false;
+        Component* component = components_[i];
+        
+        if (component->GetID() < FIRST_LOCAL_ID && removeReplicated)
+            remove = true;
+        else if (component->GetID() >= FIRST_LOCAL_ID && removeLocal)
+            remove = true;
+        
+        if (remove)
+        {
+            RemoveComponent(components_.Begin() + i);
+            ++numRemoved;
+        }
+        else
+            ++i;
+    }
+    
     // Mark node dirty in all replication states
-    MarkReplicationDirty();
+    if (numRemoved)
+        MarkReplicationDirty();
 }
 
 Node* Node::Clone(CreateMode mode)

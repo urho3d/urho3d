@@ -95,8 +95,8 @@ public:
     Node* InstantiateXML(const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Instantiate scene content from XML data. Return root node if successful.
     Node* InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
-    /// Clear scene completely of nodes and components.
-    void Clear();
+    /// Clear scene completely of either replicated, local or all nodes and components.
+    void Clear(bool clearReplicated = true, bool clearLocal = true);
     /// Enable or disable scene update.
     void SetUpdateEnabled(bool enable);
     /// Set update time scale. 1.0 = real time (default.)

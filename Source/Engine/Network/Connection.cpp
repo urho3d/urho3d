@@ -1380,11 +1380,10 @@ void Connection::OnPackagesReady()
     
     if (sceneFileName_.Empty())
     {
-        /// \todo Should not clear local nodes
-        scene_->Clear();
+        // If the scene filename is empty, just clear the scene of all existing replicated content, and send the loaded reply
+        scene_->Clear(true, false);
         sceneLoaded_ = true;
         
-        // If filename is empty, can send the scene loaded reply immediately
         msg_.Clear();
         msg_.WriteUInt(scene_->GetChecksum());
         SendMessage(MSG_SCENELOADED, true, true, msg_);

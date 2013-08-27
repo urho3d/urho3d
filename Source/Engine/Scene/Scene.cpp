@@ -375,19 +375,33 @@ Node* Scene::InstantiateXML(Deserializer& source, const Vector3& position, const
     return InstantiateXML(xml->GetRoot(), position, rotation, mode);
 }
 
-void Scene::Clear()
+void Scene::Clear(bool clearReplicated, bool clearLocal)
 {
     StopAsyncLoading();
-    RemoveAllChildren();
-    RemoveAllComponents();
-    UnregisterAllVars();
-    SetName(String::EMPTY);
-    fileName_.Clear();
-    checksum_ = 0;
-    replicatedNodeID_ = FIRST_REPLICATED_ID;
-    replicatedComponentID_ = FIRST_REPLICATED_ID;
-    localNodeID_ = FIRST_LOCAL_ID;
-    localComponentID_ = FIRST_LOCAL_ID;
+    
+    RemoveChildren(clearReplicated, clearLocal, true);
+    RemoveComponents(clearReplicated, clearLocal);
+    
+    // Only clear name etc. if clearing completely
+    if (clearReplicated && clearLocal)
+    {
+        UnregisterAllVars();
+        SetName(String::EMPTY);
+        fileName_.Clear();
+        checksum_ = 0;
+    }
+    
+    // Reset ID generators
+    if (clearReplicated)
+    {
+        replicatedNodeID_ = FIRST_REPLICATED_ID;
+        replicatedComponentID_ = FIRST_REPLICATED_ID;
+    }
+    if (clearLocal)
+    {
+        localNodeID_ = FIRST_LOCAL_ID;
+        localComponentID_ = FIRST_LOCAL_ID;
+    }
 }
 
 void Scene::SetUpdateEnabled(bool enable)

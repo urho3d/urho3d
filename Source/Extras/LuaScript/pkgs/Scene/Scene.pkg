@@ -15,7 +15,7 @@ class Scene : public Node
     bool LoadAsync(File* file);
     bool LoadAsyncXML(File* file);
     void StopAsyncLoading();
-    void Clear();
+    void Clear(bool clearReplicated = true, bool clearLocal = true);
     void SetUpdateEnabled(bool enable);
     void SetTimeScale(float scale);
     void SetElapsedTime(float time);

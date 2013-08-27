@@ -100,9 +100,52 @@ void SceneReplication::CreateScene()
 {
     scene_ = new Scene(context_);
     
-    // Create the camera. Limit far clip distance to match the fog. Camera is created outside the scene so that network
-    // replication will not affect it (the scene will be cleared when connecting as a client)
-    cameraNode_ = new Node(context_);
+    // Create scene content on the server only
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    // Create octree and physics world with default settings. Create them as local so that they are not needlessly replicated
+    // when a client connects
+    scene_->CreateComponent<Octree>(LOCAL);
+    scene_->CreateComponent<PhysicsWorld>(LOCAL);
+    
+    // All static scene content and the camera are also created as local, so that they are unaffected by scene replication and are
+    // not removed from the client upon connection. Create a Zone component first for ambient lighting & fog control.
+    Node* zoneNode = scene_->CreateChild("Zone", LOCAL);
+    Zone* zone = zoneNode->CreateComponent<Zone>();
+    zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
+    zone->SetAmbientColor(Color(0.1f, 0.1f, 0.1f));
+    zone->SetFogStart(100.0f);
+    zone->SetFogEnd(300.0f);
+    
+    // Create a directional light without shadows
+    Node* lightNode = scene_->CreateChild("DirectionalLight", LOCAL);
+    lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f));
+    Light* light = lightNode->CreateComponent<Light>();
+    light->SetLightType(LIGHT_DIRECTIONAL);
+    light->SetColor(Color(0.2f, 0.2f, 0.2f));
+    light->SetSpecularIntensity(1.0f);
+    
+    // Create a "floor" consisting of several tiles. Make the tiles physical but leave small cracks between them
+    for (int y = -20; y <= 20; ++y)
+    {
+        for (int x = -20; x <= 20; ++x)
+        {
+            Node* floorNode = scene_->CreateChild("FloorTile", LOCAL);
+            floorNode->SetPosition(Vector3(x * 20.2f, -0.5f, y * 20.2f));
+            floorNode->SetScale(Vector3(20.0f, 1.0f, 20.0f));
+            StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
+            floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+            floorObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+            
+            RigidBody* body = floorNode->CreateComponent<RigidBody>();
+            body->SetFriction(1.0f);
+            CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
+            shape->SetBox(Vector3::ONE);
+        }
+    }
+    
+    // Create the camera. Limit far clip distance to match the fog
+    cameraNode_ = scene_->CreateChild("Camera", LOCAL);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
     
@@ -224,7 +267,7 @@ Node* SceneReplication::CreateControllableObject()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    // Create the scene node & visual representation
+    // Create the scene node & visual representation. This will be a replicated object
     Node* ballNode = scene_->CreateChild("Ball");
     ballNode->SetPosition(Vector3(Random(40.0f) - 20.0f, 5.0f, Random(40.0f) - 20.0f));
     ballNode->SetScale(0.5f);
@@ -389,20 +432,20 @@ void SceneReplication::HandleDisconnect(StringHash eventType, VariantMap& eventD
 {
     Network* network = GetSubsystem<Network>();
     Connection* serverConnection = network->GetServerConnection();
-    // If we were connected to server, disconnect
+    // If we were connected to server, disconnect. Or if we were running a server, stop it. In both cases clear the
+    // scene of all replicated content, but let the local nodes & components (the static world + camera) stay
     if (serverConnection)
     {
         serverConnection->Disconnect();
-        scene_->Clear();
+        scene_->Clear(true, false);
         clientObjectID_ = 0;
     }
     // Or if we were running a server, stop it
     else if (network->IsServerRunning())
     {
         network->StopServer();
-        scene_->Clear();
+        scene_->Clear(true, false);
     }
-    
     
     UpdateButtons();
 }
@@ -411,48 +454,6 @@ void SceneReplication::HandleStartServer(StringHash eventType, VariantMap& event
 {
     Network* network = GetSubsystem<Network>();
     network->StartServer(SERVER_PORT);
-    
-    // Create scene content on the server only
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    // Create octree and physics world with default settings
-    scene_->CreateComponent<Octree>();
-    scene_->CreateComponent<PhysicsWorld>();
-    
-    // Create a Zone component for ambient lighting & fog control
-    Node* zoneNode = scene_->CreateChild("Zone");
-    Zone* zone = zoneNode->CreateComponent<Zone>();
-    zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
-    zone->SetAmbientColor(Color(0.1f, 0.1f, 0.1f));
-    zone->SetFogStart(100.0f);
-    zone->SetFogEnd(300.0f);
-    
-    // Create a directional light without shadows
-    Node* lightNode = scene_->CreateChild("DirectionalLight");
-    lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f));
-    Light* light = lightNode->CreateComponent<Light>();
-    light->SetLightType(LIGHT_DIRECTIONAL);
-    light->SetColor(Color(0.2f, 0.2f, 0.2f));
-    light->SetSpecularIntensity(1.0f);
-    
-    // Create a "floor" consisting of several tiles. Make the tiles physical but leave small cracks between them
-    for (int y = -20; y <= 20; ++y)
-    {
-        for (int x = -20; x <= 20; ++x)
-        {
-            Node* floorNode = scene_->CreateChild("FloorTile");
-            floorNode->SetPosition(Vector3(x * 20.2f, -0.5f, y * 20.2f));
-            floorNode->SetScale(Vector3(20.0f, 1.0f, 20.0f));
-            StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
-            floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-            floorObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
-            
-            RigidBody* body = floorNode->CreateComponent<RigidBody>();
-            body->SetFriction(1.0f);
-            CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
-            shape->SetBox(Vector3::ONE);
-        }
-    }
     
     UpdateButtons();
 }

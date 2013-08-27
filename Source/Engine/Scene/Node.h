@@ -145,6 +145,8 @@ public:
     void RemoveChild(Node* node);
     /// Remove all child scene nodes.
     void RemoveAllChildren();
+    /// Remove child scene nodes that match criteria.
+    void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
     /// Create a component to this node (with specified ID if provided).
     Component* CreateComponent(ShortStringHash type, CreateMode mode = REPLICATED, unsigned id = 0);
     /// Create a component to this node if it does not exist already.
@@ -155,6 +157,8 @@ public:
     void RemoveComponent(ShortStringHash type);
     /// Remove all components from this node.
     void RemoveAllComponents();
+    /// Remove components that match criteria.
+    void RemoveComponents(bool removeReplicated, bool removeLocal);
     /// Clone scene node, components and child nodes. Return the clone.
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.

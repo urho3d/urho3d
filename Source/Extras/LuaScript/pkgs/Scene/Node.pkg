@@ -72,11 +72,13 @@ class Node : public Serializable
     void AddChild(Node* node);
     void RemoveChild(Node* node);
     void RemoveAllChildren();
+    void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
     void RemoveComponent(Component* component);
     void RemoveComponent(ShortStringHash type);
     void RemoveComponent(const char* type);
     
     void RemoveAllComponents();
+    void RemoveComponents(bool removeReplicated, bool removeLocal);
     
     Node* Clone(CreateMode mode = REPLICATED);
     
