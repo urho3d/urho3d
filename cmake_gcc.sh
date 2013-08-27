@@ -38,7 +38,7 @@ post_cmake() {
             # Add natures (Android nature must be inserted as first nature)
             #
             xmlstarlet ed -P -L \
-                -u "/projectDescription/name/text()" -x "concat(substring-before(/projectDescription/name/text(), '-Release'), substring-before(/projectDescription/name/text(), '-Debug'), substring-before(/projectDescription/name/text(), '-RelWithDebInfo'))" \
+                -u "/projectDescription/name/text()" -x "concat(substring-before(., '-Release'), substring-before(., '-Debug'), substring-before(., '-RelWithDebInfo'))" \
                 -i "/projectDescription/natures/nature[1]" -t elem -n nature -v "com.android.ide.eclipse.adt.AndroidNature" \
                 -s "/projectDescription/natures" -t elem -n nature -v "org.eclipse.jdt.core.javanature" \
                 $1/.project
@@ -57,7 +57,7 @@ post_cmake() {
         elif [ $1 == "raspi-Build" ]; then
             # For Raspberry Pi build, just remove build type from project name
             xmlstarlet ed -P -L \
-                -u "/projectDescription/name/text()" -x "concat(substring-before(/projectDescription/name/text(), '-Release'), substring-before(/projectDescription/name/text(), '-Debug'), substring-before(/projectDescription/name/text(), '-RelWithDebInfo'))" \
+                -u "/projectDescription/name/text()" -x "concat(substring-before(., '-Release'), substring-before(., '-Debug'), substring-before(., '-RelWithDebInfo'))" \
                 $1/.project
 
         else
@@ -71,7 +71,7 @@ post_cmake() {
             # Modify build argument to first change directory to Build folder
             #
             xmlstarlet ed -P -L \
-                -u "/projectDescription/name/text()" -x "concat(substring-before(/projectDescription/name/text(), '-Release'), substring-before(/projectDescription/name/text(), '-Debug'), substring-before(/projectDescription/name/text(), '-RelWithDebInfo'))" \
+                -u "/projectDescription/name/text()" -x "concat(substring-before(., '-Release'), substring-before(., '-Debug'), substring-before(., '-RelWithDebInfo'))" \
                 -u "/projectDescription/linkedResources/link/name/text()[. = '[Source directory]']" -v "[Build]" \
                 -u "/projectDescription/linkedResources/link/location[../name/text() = '[Build]']" -v "$( pwd )/$1" \
                 -u "/projectDescription/buildSpec/buildCommand/arguments/dictionary/value[../key/text() = 'org.eclipse.cdt.make.core.build.arguments']" -x "concat('-C ../$1 ', .)" \

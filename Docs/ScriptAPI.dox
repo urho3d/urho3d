@@ -5470,8 +5470,6 @@ Methods:<br>
 - IntVector2 ElementToScreen(const IntVector2&)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
-- void SetFullImageRect()
-- void SetHoverOffset(int, int)
 
 Properties:<br>
 - int refs (readonly)
@@ -5539,12 +5537,6 @@ Properties:<br>
 - IntRect combinedScreenRect (readonly)
 - float derivedOpacity (readonly)
 - VariantMap vars (readonly)
-- Texture@ texture
-- IntRect imageRect
-- IntRect border
-- IntVector2 hoverOffset
-- BlendMode blendMode
-- bool tiled
 - bool movable
 - bool resizable
 - IntRect resizeBorder
@@ -5552,6 +5544,148 @@ Properties:<br>
 - Color modalShadeColor
 - Color modalFrameColor
 - IntVector2 modalFrameSize
+- bool fixedWidthResizing
+- bool fixedHeightResizing
+
+
+View3D
+
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- bool Load(File@, bool arg1 = false)
+- bool Save(File@) const
+- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool SaveXML(XMLElement&) const
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- void ResetToDefault()
+- void RemoveInstanceDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(File@)
+- bool LoadXML(XMLFile@, XMLFile@)
+- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool SaveXML(File@)
+- bool SetStyle(const XMLElement&)
+- bool SetStyle(const String&, XMLFile@ arg1 = null)
+- bool SetStyleAuto(XMLFile@ arg0 = null)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(uint)
+- void RemoveAllChildren()
+- void Remove()
+- uint FindChild(UIElement@) const
+- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
+- UIElement@[]@ GetChildren(bool arg0 = false) const
+- UIElement@ GetElementEventSender() const
+- const Variant& GetVar(const ShortStringHash&)
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetView(Scene@, Camera@)
+- void QueueUpdate()
+
+Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- String category (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- Variant[] attributeDefaults (readonly)
+- AttributeInfo[] attributeInfos (readonly)
+- bool temporary
+- String style
+- String name
+- IntVector2 position
+- IntVector2 size
+- int width
+- int height
+- IntVector2 minSize
+- int minWidth
+- int minHeight
+- IntVector2 maxSize
+- int maxWidth
+- int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect clipBorder
+- Color color (writeonly)
+- Color[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool sortChildren
+- bool useDerivedOpacity
+- bool enabled
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool internal
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- TraversalMode traversalMode
+- XMLFile@ defaultStyle
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect layoutBorder
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
+- IntVector2 childOffset (readonly)
+- bool elementEventSender
+- uint[] numChildren (readonly)
+- uint numAllChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent
+- UIElement@ root (readonly)
+- IntVector2 screenPosition (readonly)
+- IntRect combinedScreenRect (readonly)
+- float derivedOpacity (readonly)
+- VariantMap vars (readonly)
+- bool movable
+- bool resizable
+- IntRect resizeBorder
+- bool modal
+- Color modalShadeColor
+- Color modalFrameColor
+- IntVector2 modalFrameSize
+- bool fixedWidthResizing
+- bool fixedHeightResizing
+- uint format
+- bool autoUpdate
+- Texture2D@ renderTexture (readonly)
+- Viewport@ viewport (readonly)
+- Scene@ scene (readonly)
+- Node@ cameraNode (readonly)
 
 
 FileSelector
@@ -6030,6 +6164,7 @@ Methods:<br>
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - float GetDistanceToWall(const Vector3&, float, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- void DrawDebugGeometry(bool)
 
 Properties:<br>
 - int refs (readonly)

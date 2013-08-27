@@ -97,7 +97,6 @@ endif ()
 # For Raspbery Pi, find Broadcom VideoCore IV firmware
 if (RASPI)
     find_package (BCM_VC REQUIRED)
-    link_directories (${BCM_VC_LIBRARY_DIR})
 endif ()
 
 # Platform and compiler specific options
@@ -279,8 +278,8 @@ macro (setup_target)
     include_directories (${LIBS} ${INCLUDE_DIRS_ONLY})
     # Link libraries
     define_dependency_libs (${TARGET_NAME})
-    string (REGEX REPLACE "\\.\\./|ThirdParty/|Engine/|Extras/|/Include|/include|/src" "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
-    target_link_libraries (${TARGET_NAME} ${STRIP_LIBS})
+    string (REGEX REPLACE \\.\\./|ThirdParty/|Engine/|Extras/|/include|/src "" LIB_NAME "${LIBS};${LINK_LIBS_ONLY}")
+    target_link_libraries (${TARGET_NAME} ${LIB_NAME} ${ABSOLUTE_PATH_LIBS})
 endmacro ()
 
 # Macro for setting up a library target
@@ -454,7 +453,7 @@ macro (define_dependency_libs TARGET)
         else ()
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dl pthread rt)
             if (RASPI)
-                set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} bcm_host)
+                set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${BCM_VC_LIBRARIES})
             endif ()
         endif ()
     endif ()
@@ -491,13 +490,13 @@ macro (define_dependency_libs TARGET)
                 set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} GL)
             endif ()
         else ()
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} d3d9)
+            set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${DIRECT3D_LIBRARIES})
         endif ()
     endif ()
     
     # Main external dependency
     if (${TARGET} STREQUAL Main AND URHO3D_LIBRARIES)
-        set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} Urho3D)
+        set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${URHO3D_LIBRARIES})
     endif ()
     
     if (LINK_LIBS_ONLY)

@@ -24,7 +24,6 @@
 #
 #  BCM_VC_FOUND
 #  BCM_VC_INCLUDE_DIR
-#  BCM_VC_LIBRARY_DIR
 #  BCM_VC_LIBRARIES
 #
 
@@ -43,7 +42,6 @@ if (RASPI)
 
     if (BCM_VC_INCLUDE_DIR AND BCM_VC_LIBRARIES)
         set (BCM_VC_FOUND 1)
-        get_filename_component (BCM_VC_LIBRARY_DIR ${BCM_VC_LIBRARIES} PATH)
     endif ()
 
     if (BCM_VC_FOUND)
