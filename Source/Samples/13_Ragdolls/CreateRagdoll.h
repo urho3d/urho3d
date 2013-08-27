@@ -25,7 +25,6 @@
 #include "CollisionShape.h"
 #include "Constraint.h"
 
-// All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
 /// Custom component that creates a ragdoll upon collision.

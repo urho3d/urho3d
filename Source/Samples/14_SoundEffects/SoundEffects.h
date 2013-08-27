@@ -22,10 +22,14 @@
 
 #pragma once
 
-#include "Button.h"
 #include "Sample.h"
-#include "Slider.h"
-#include "SoundSource.h"
+
+namespace Urho3D
+{
+    class Button;
+    class Scene;
+    class Slider;
+}
 
 using namespace Urho3D;
 

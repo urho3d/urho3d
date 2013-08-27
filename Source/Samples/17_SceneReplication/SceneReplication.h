@@ -23,17 +23,16 @@
 #pragma once
 
 #include "Sample.h"
-#include "Scene.h"
 
 namespace Urho3D
 {
     class Button;
     class Connection;
+    class Scene;
     class Text;
     class UIElement;
 }
 
-// All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
 /// Scene network replication example.

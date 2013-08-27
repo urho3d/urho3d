@@ -774,8 +774,6 @@ void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 Now you should be ready to compile HelloWorld.cpp. The resulting executable will be placed in the Bin directory. It should be substantially smaller than the Urho3D application due to leaving out the scripting functionality.
 
-For a more complex C++ example, check out CharacterDemo in the Extras directory, which creates the same static scene as the TestScene script example, and demonstrates a 1st/3rd person controllable character. To enable it in the build, uncomment from the bottom of the root CMakeLists.txt.
-
 
 \page EditorInstructions Editor instructions
 

@@ -27,6 +27,8 @@
 #include "RigidBody.h"
 #include "PhysicsEvents.h"
 
+#include "DebugNew.h"
+
 CreateRagdoll::CreateRagdoll(Context* context) :
     Component(context)
 {

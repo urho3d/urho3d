@@ -55,7 +55,6 @@ const int MSG_CHAT = 32;
 // UDP port we will use
 const unsigned short CHAT_SERVER_PORT = 2345;
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(Chat)
 
 Chat::Chat(Context* context) :

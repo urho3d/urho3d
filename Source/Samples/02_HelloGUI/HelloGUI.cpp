@@ -29,12 +29,12 @@
 #include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"
+#include "Window.h"
 
 #include "HelloGUI.h"
 
 #include "DebugNew.h"
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(HelloGUI)
 
 HelloGUI::HelloGUI(Context* context) :

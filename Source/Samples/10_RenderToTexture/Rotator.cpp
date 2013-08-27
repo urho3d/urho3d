@@ -24,6 +24,8 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 
+#include "DebugNew.h"
+
 Rotator::Rotator(Context* context) :
     Component(context),
     rotationSpeed_(Vector3::ZERO)

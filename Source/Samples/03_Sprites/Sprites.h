@@ -23,9 +23,12 @@
 #pragma once
 
 #include "Sample.h"
-#include "Sprite.h"
 
-// All Urho3D classes reside in namespace Urho3D
+namespace Urho3D
+{
+    class Sprite;
+}
+
 using namespace Urho3D;
 
 /// Moving sprites example.

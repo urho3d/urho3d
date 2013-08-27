@@ -5,7 +5,6 @@
 #include "CollisionShape.h"
 #include "Controls.h"
 #include "CoreEvents.h"
-#include "DebugRenderer.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Input.h"
@@ -34,8 +33,7 @@ const float CAMERA_MAX_DIST = 5.0f;
 DEFINE_APPLICATION_MAIN(CharacterDemo)
 
 CharacterDemo::CharacterDemo(Context* context) :
-    Application(context),
-    cache_(GetSubsystem<ResourceCache>()),
+    Sample(context),
     firstPerson_(false)
 {
     // Register factory for the Character component so it can be created via CreateComponent
@@ -44,26 +42,38 @@ CharacterDemo::CharacterDemo(Context* context) :
 
 void CharacterDemo::Start()
 {
+    // Execute base class startup
+    Sample::Start();
+    
+    // Create static scene content
     CreateScene();
+    
+    // Create the controllable character
     CreateCharacter();
+    
+    // Create the UI content
+    CreateInstructions();
+    
+    // Subscribe to necessary events
     SubscribeToEvents();
 }
 
 void CharacterDemo::CreateScene()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
     scene_ = new Scene(context_);
     
     // Create scene subsystem components
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<PhysicsWorld>();
-    scene_->CreateComponent<DebugRenderer>();
     
     // Create camera and define viewport. Camera does not necessarily have to belong to the scene
     cameraNode_ = new Node(context_);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     GetSubsystem<Renderer>()->SetViewport(0, new Viewport(context_, scene_, camera));
     
-    // Create static scene content, same as in TestScene.as
+    // Create static scene content. First create a zone for ambient lighting and fog control
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
@@ -72,79 +82,42 @@ void CharacterDemo::CreateScene()
     zone->SetFogEnd(300.0f);
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     
-    {
-        Node* lightNode = scene_->CreateChild("GlobalLight");
-        lightNode->SetDirection(Vector3(0.3f, -0.5f, 0.425f));
-        
-        Light* light = lightNode->CreateComponent<Light>();
-        light->SetLightType(LIGHT_DIRECTIONAL);
-        light->SetCastShadows(true);
-        light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
-        light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
-        light->SetSpecularIntensity(0.5f);
-    }
+    // Create a directional light with cascaded shadow mapping
+    Node* lightNode = scene_->CreateChild("DirectionalLight");
+    lightNode->SetDirection(Vector3(0.3f, -0.5f, 0.425f));
+    Light* light = lightNode->CreateComponent<Light>();
+    light->SetLightType(LIGHT_DIRECTIONAL);
+    light->SetCastShadows(true);
+    light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
+    light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
+    light->SetSpecularIntensity(0.5f);
 
-    {
-        Node* objectNode = scene_->CreateChild("Floor");
-        objectNode->SetPosition(Vector3(0.0f, -0.5f, 0.0f));
-        objectNode->SetScale(Vector3(200.0f, 1.0f, 200.0f));
-        
-        StaticModel* object = objectNode->CreateComponent<StaticModel>();
-        object->SetModel(cache_->GetResource<Model>("Models/Box.mdl"));
-        object->SetMaterial(cache_->GetResource<Material>("Materials/Stone.xml"));
-        object->SetOccluder(true);
-        
-        RigidBody* body = objectNode->CreateComponent<RigidBody>();
-        body->SetCollisionLayer(2);
-        CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
-        shape->SetBox(Vector3::ONE);
-    }
+    // Create the floor object
+    Node* floorNode = scene_->CreateChild("Floor");
+    floorNode->SetPosition(Vector3(0.0f, -0.5f, 0.0f));
+    floorNode->SetScale(Vector3(200.0f, 1.0f, 200.0f));
+    StaticModel* object = floorNode->CreateComponent<StaticModel>();
+    object->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+    object->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
     
-    for (unsigned i = 0; i < 50; ++i)
-    {
-        Node* objectNode = scene_->CreateChild("Box");
-        objectNode->SetPosition(Vector3(Random() * 180.0f - 90.0f, 1.0f, Random() * 180.0f - 90.0f));
-        objectNode->SetScale(2.0f);
-        
-        StaticModel* object = objectNode->CreateComponent<StaticModel>();
-        object->SetModel(cache_->GetResource<Model>("Models/Box.mdl"));
-        object->SetMaterial(cache_->GetResource<Material>("Materials/Stone.xml"));
-        object->SetCastShadows(true);
-        
-        RigidBody* body = objectNode->CreateComponent<RigidBody>();
-        body->SetCollisionLayer(2);
-        CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
-        shape->SetBox(Vector3::ONE);
-    }
+    RigidBody* body = floorNode->CreateComponent<RigidBody>();
+    // Use collision layer bit 2 to mark world scenery. This is what we will raycast against to prevent camera from going
+    // inside geometry
+    body->SetCollisionLayer(2);
+    CollisionShape* shape = floorNode->CreateComponent<CollisionShape>();
+    shape->SetBox(Vector3::ONE);
     
-    for (unsigned i = 0; i < 10; ++i)
-    {
-        Node* objectNode = scene_->CreateChild("Box");
-        objectNode->SetPosition(Vector3(Random() * 180.0f - 90.0f, 10.0f, Random() * 180.0f - 90.0f));
-        objectNode->SetScale(20);
-        
-        StaticModel* object = objectNode->CreateComponent<StaticModel>();
-        object->SetModel(cache_->GetResource<Model>("Models/Box.mdl"));
-        object->SetMaterial(cache_->GetResource<Material>("Materials/Stone.xml"));
-        object->SetCastShadows(true);
-        object->SetOccluder(true);
-        
-        RigidBody* body = objectNode->CreateComponent<RigidBody>();
-        body->SetCollisionLayer(2);
-        CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
-        shape->SetBox(Vector3::ONE);
-    }
-
-    for (unsigned i = 0; i < 50; ++i)
+    // Create mushrooms of varying sizes
+    const unsigned NUM_MUSHROOMS = 60;
+    for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
     {
         Node* objectNode = scene_->CreateChild("Mushroom");
-        objectNode->SetPosition(Vector3(Random() * 180.0f - 90.0f, 0.0f, Random() * 180.0f - 90.0f));
+        objectNode->SetPosition(Vector3(Random(180.0f) - 90.0f, 0.0f, Random(180.0f) - 90.0f));
         objectNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
-        objectNode->SetScale(5.0f);
-        
+        objectNode->SetScale(2.0f + Random(5.0f));
         StaticModel* object = objectNode->CreateComponent<StaticModel>();
-        object->SetModel(cache_->GetResource<Model>("Models/Mushroom.mdl"));
-        object->SetMaterial(cache_->GetResource<Material>("Materials/Mushroom.xml"));
+        object->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
+        object->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
         object->SetCastShadows(true);
         
         RigidBody* body = objectNode->CreateComponent<RigidBody>();
@@ -152,17 +125,42 @@ void CharacterDemo::CreateScene()
         CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetTriangleMesh(object->GetModel(), 0);
     }
+    
+    // Create movable boxes. Let them fall from the sky at first
+    const unsigned NUM_SMALL_BOXES = 100;
+    for (unsigned i = 0; i < NUM_SMALL_BOXES; ++i)
+    {
+        float scale = Random(2.0f) + 0.5f;
+        
+        Node* objectNode = scene_->CreateChild("Box");
+        objectNode->SetPosition(Vector3(Random(180.0f) - 90.0f, Random(10.0f) + 10.0f, Random(180.0f) - 90.0f));
+        objectNode->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
+        objectNode->SetScale(scale);
+        StaticModel* object = objectNode->CreateComponent<StaticModel>();
+        object->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+        object->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+        object->SetCastShadows(true);
+        
+        RigidBody* body = objectNode->CreateComponent<RigidBody>();
+        body->SetCollisionLayer(2);
+        // Bigger boxes will be heavier and harder to move
+        body->SetMass(scale * 2.0f);
+        CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
+        shape->SetBox(Vector3::ONE);
+    }
 }
 
 void CharacterDemo::CreateCharacter()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
     Node* objectNode = scene_->CreateChild("Jack");
     objectNode->SetPosition(Vector3(0.0f, 1.0f, 0.0f));
     
     // Create the rendering component + animation controller
     AnimatedModel* object = objectNode->CreateComponent<AnimatedModel>();
-    object->SetModel(cache_->GetResource<Model>("Models/Jack.mdl"));
-    object->SetMaterial(cache_->GetResource<Material>("Materials/Jack.xml"));
+    object->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
+    object->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
     object->SetCastShadows(true);
     objectNode->CreateComponent<AnimationController>();
     
@@ -188,9 +186,33 @@ void CharacterDemo::CreateCharacter()
     character_ = objectNode->CreateComponent<Character>();
 }
 
+void CharacterDemo::CreateInstructions()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    UI* ui = GetSubsystem<UI>();
+    
+    // Construct new Text object, set string to display and font to use
+    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    instructionText->SetText(
+        "Use WASD keys and mouse to move\n"
+        "Space to jump, F to toggle 1st/3rd person"
+    );
+    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    // The text has multiple rows. Center them in relation to each other
+    instructionText->SetTextAlignment(HA_CENTER);
+    
+    // Position the text relative to the screen center
+    instructionText->SetHorizontalAlignment(HA_CENTER);
+    instructionText->SetVerticalAlignment(VA_CENTER);
+    instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+}
+
 void CharacterDemo::SubscribeToEvents()
 {
+    // Subscribe to Update event for setting the character controls before physics simulation
     SubscribeToEvent(E_UPDATE, HANDLER(CharacterDemo, HandleUpdate));
+    
+    // Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent(E_POSTUPDATE, HANDLER(CharacterDemo, HandlePostUpdate));
 }
 
@@ -201,26 +223,31 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     Input* input = GetSubsystem<Input>();
 
-    if (input->GetKeyDown(KEY_ESC))
-        engine_->Exit();
-    
-    if (input->GetKeyPress('F'))
-        firstPerson_ = !firstPerson_;
-    
     if (character_)
     {
-        // Get movement controls and assign them to the character logic component
-        character_->controls_.Set(CTRL_UP, input->GetKeyDown('W'));
-        character_->controls_.Set(CTRL_DOWN, input->GetKeyDown('S'));
-        character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
-        character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
-        character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
+        UI* ui = GetSubsystem<UI>();
         
-        // Add character yaw & pitch from the mouse motion
-        character_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
-        character_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
-        // Limit pitch
-        character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
+        // Get movement controls and assign them to the character logic component. If UI has a focused element, clear controls
+        if (!ui->GetFocusElement())
+        {
+            character_->controls_.Set(CTRL_UP, input->GetKeyDown('W'));
+            character_->controls_.Set(CTRL_DOWN, input->GetKeyDown('S'));
+            character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
+            character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
+            character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
+            
+            // Add character yaw & pitch from the mouse motion
+            character_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
+            character_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
+            // Limit pitch
+            character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
+            
+            // Switch between 1st and 3rd person
+            if (input->GetKeyPress('F'))
+                firstPerson_ = !firstPerson_;
+        }
+        else
+            character_->controls_.Set(CTRL_UP | CTRL_DOWN | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
         
         // Set rotation already here so that it's updated every rendering frame instead of every physics frame
         character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));

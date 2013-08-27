@@ -42,6 +42,7 @@ const float JUMP_FORCE = 7.0f;
 const float YAW_SENSITIVITY = 0.1f;
 const float INAIR_THRESHOLD_TIME = 0.1f;
 
+/// Character component, responsible for physical movement according to controls, as well as animation.
 class Character : public Component
 {
     OBJECT(Character)

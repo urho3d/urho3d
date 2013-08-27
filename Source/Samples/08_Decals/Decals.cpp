@@ -35,6 +35,7 @@
 #include "Octree.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
+#include "Scene.h"
 #include "StaticModel.h"
 #include "Text.h"
 #include "UI.h"
@@ -45,7 +46,6 @@
 
 #include "DebugNew.h"
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(Decals)
 
 Decals::Decals(Context* context) :

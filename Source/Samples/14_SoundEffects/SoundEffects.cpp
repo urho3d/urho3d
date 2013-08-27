@@ -21,13 +21,16 @@
 //
 
 #include "Audio.h"
+#include "Button.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Input.h"
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Scene.h"
+#include "Slider.h"
 #include "Sound.h"
+#include "SoundSource.h"
 #include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"
@@ -52,7 +55,6 @@ static String soundResourceNames[] = {
     "Sounds/Powerup.wav"
 };
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(SoundEffects)
 
 SoundEffects::SoundEffects(Context* context) :

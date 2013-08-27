@@ -24,7 +24,6 @@
 
 #include "Component.h"
 
-// All Urho3D classes reside in namespace Urho3D
 using namespace Urho3D;
 
 /// Custom component for moving the animated model and rotating at area edges.

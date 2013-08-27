@@ -24,6 +24,7 @@
 #include "Engine.h"
 #include "Graphics.h"
 #include "ResourceCache.h"
+#include "Sprite.h"
 #include "Texture2D.h"
 #include "UI.h"
 
@@ -37,7 +38,6 @@ static const unsigned NUM_SPRITES = 100;
 // Custom variable identifier for storing sprite velocity within the UI element
 static const ShortStringHash VAR_VELOCITY("Velocity");
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(Sprites)
 
 Sprites::Sprites(Context* context) :

@@ -143,10 +143,8 @@ else ()
         endif ()
         
         # Urho3D extras
-        # Todo: CharacterDemo will be moved to Samples
         if (ENABLE_EXTRAS)
             add_subdirectory (Extras/OgreBatchConverter)
-            add_subdirectory (Extras/CharacterDemo)
         endif ()
     endif ()
     

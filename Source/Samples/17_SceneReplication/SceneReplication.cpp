@@ -44,6 +44,7 @@
 #include "Renderer.h"
 #include "RigidBody.h"
 #include "ResourceCache.h"
+#include "Scene.h"
 #include "StaticModel.h"
 #include "Text.h"
 #include "UI.h"
@@ -68,7 +69,6 @@ static const unsigned CTRL_BACK = 2;
 static const unsigned CTRL_LEFT = 4;
 static const unsigned CTRL_RIGHT = 8;
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(SceneReplication)
 
 SceneReplication::SceneReplication(Context* context) :
@@ -355,21 +355,16 @@ void SceneReplication::HandlePhysicsPreStep(StringHash eventType, VariantMap& ev
         Input* input = GetSubsystem<Input>();
         Controls controls;
         
-        // Assume buttons are not pressed, copy yaw
-        controls.buttons_ = 0;
+        // Copy mouse yaw
         controls.yaw_ = yaw_;
         
         // Only apply WASD controls if there is no focused UI element
         if (!ui->GetFocusElement())
         {
-            if (input->GetKeyDown('W'))
-                controls.buttons_ |= CTRL_FORWARD;
-            if (input->GetKeyDown('S'))
-                controls.buttons_ |= CTRL_BACK;
-            if (input->GetKeyDown('A'))
-                controls.buttons_ |= CTRL_LEFT;
-            if (input->GetKeyDown('D'))
-                controls.buttons_ |= CTRL_RIGHT;
+            controls.Set(CTRL_FORWARD, input->GetKeyDown('W'));
+            controls.Set(CTRL_BACK, input->GetKeyDown('S'));
+            controls.Set(CTRL_LEFT, input->GetKeyDown('A'));
+            controls.Set(CTRL_RIGHT, input->GetKeyDown('D'));
         }
         
         serverConnection->SetControls(controls);

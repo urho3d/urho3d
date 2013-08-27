@@ -33,6 +33,7 @@
 #include "RenderSurface.h"
 #include "ResourceCache.h"
 #include "Rotator.h"
+#include "Scene.h"
 #include "StaticModel.h"
 #include "Technique.h"
 #include "Text.h"
@@ -44,7 +45,6 @@
 
 #include "DebugNew.h"
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(RenderToTexture)
 
 RenderToTexture::RenderToTexture(Context* context) :

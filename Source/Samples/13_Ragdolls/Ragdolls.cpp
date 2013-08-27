@@ -40,6 +40,7 @@
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "RigidBody.h"
+#include "Scene.h"
 #include "Text.h"
 #include "UI.h"
 #include "Zone.h"
@@ -48,7 +49,6 @@
 
 #include "DebugNew.h"
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(Ragdolls)
 
 Ragdolls::Ragdolls(Context* context) :

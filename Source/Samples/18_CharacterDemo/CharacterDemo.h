@@ -22,20 +22,25 @@
 
 #pragma once
 
-#include "Application.h"
-
-using namespace Urho3D;
+#include "Sample.h"
 
 namespace Urho3D
 {
     class Node;
-    class ResourceCache;
     class Scene;
 }
 
+using namespace Urho3D;
+
 class Character;
 
-class CharacterDemo : public Application
+/// Moving character example.
+/// This sample demonstrates:
+///     - Controlling a humanoid character through physics;
+///     - Driving animations using the AnimationController component;
+///     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera
+///       clipping into scenery
+class CharacterDemo : public Sample
 {
     OBJECT(CharacterDemo);
 
@@ -51,17 +56,17 @@ private:
     void CreateScene();
     /// Create controllable character.
     void CreateCharacter();
+    /// Construct an instruction text to the UI.
+    void CreateInstructions();
     /// Subscribe to necessary events.
     void SubscribeToEvents();
-    /// Handle application update. Set controls to character & check global keys.
+    /// Handle application update. Set controls to character.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle application post-update. Update camera position after character has moved.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Scene.
     SharedPtr<Scene> scene_;
-    /// Resource cache subsystem, stored here for convenience.
-    SharedPtr<ResourceCache> cache_;
     /// Camera scene node.
     SharedPtr<Node> cameraNode_;
     /// The controllable character.

@@ -23,9 +23,13 @@
 #pragma once
 
 #include "Sample.h"
-#include "Scene.h"
 
-// All Urho3D classes reside in namespace Urho3D
+namespace Urho3D
+{
+    class Node;
+    class Scene;
+}
+
 using namespace Urho3D;
 
 /// Multiple viewports example.

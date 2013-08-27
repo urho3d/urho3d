@@ -35,6 +35,7 @@
 #include "Renderer.h"
 #include "RenderPath.h"
 #include "ResourceCache.h"
+#include "Scene.h"
 #include "StaticModel.h"
 #include "Text.h"
 #include "UI.h"
@@ -45,7 +46,6 @@
 
 #include "DebugNew.h"
 
-// Expands to this example's entry-point
 DEFINE_APPLICATION_MAIN(MultipleViewports)
 
 MultipleViewports::MultipleViewports(Context* context) :
@@ -182,7 +182,6 @@ void MultipleViewports::CreateInstructions()
     instructionText->SetVerticalAlignment(VA_CENTER);
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
-
 
 void MultipleViewports::SetupViewports()
 {

@@ -26,6 +26,8 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 
+#include "DebugNew.h"
+
 Mover::Mover(Context* context) :
     Component(context),
     moveSpeed_(0.0f),
