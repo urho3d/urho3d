@@ -390,15 +390,15 @@ macro (setup_main_executable)
             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
             COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ANDROID_LIBRARY_OUTPUT_PATH}
             COMMENT "Stripping and copying the output shared library")
-        # For project references Urho3D as external shared library, also copy Urho3D shared library to Android library output path
-        if (URHO3D_LIBRARIES)
-            get_filename_component (URHO3D_LIBRARY_SUFFIX ${URHO3D_LIBRARIES} EXT)
-            if (URHO3D_LIBRARY_SUFFIX STREQUAL .so)
+        # Also copy other dependent shared libraries to Android library output path
+        foreach(FILE ${ABSOLUTE_PATH_LIBS})
+            get_filename_component (EXT ${FILE} EXT)
+            if (EXT STREQUAL .so)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${URHO3D_LIBRARIES} ${ANDROID_LIBRARY_OUTPUT_PATH}
-                    COMMENT "Copying Urho3D shared library to target library directory")
+                    COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILE} ${ANDROID_LIBRARY_OUTPUT_PATH}
+                    COMMENT "Copying other dependent shared library to target library directory")
             endif ()
-        endif ()
+        endforeach ()
     else ()
         if (WIN32)
             set (EXE_TYPE WIN32)
