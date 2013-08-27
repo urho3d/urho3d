@@ -90,7 +90,6 @@ if (WIN32 AND NOT USE_OPENGL)
     find_package (Direct3D)
     if (DIRECT3D_FOUND)
         include_directories (${DIRECT3D_INCLUDE_DIR})
-        link_directories (${DIRECT3D_LIBRARY_DIR})
     endif ()
 endif ()
 
