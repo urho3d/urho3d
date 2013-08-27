@@ -278,8 +278,8 @@ macro (setup_target)
     include_directories (${LIBS} ${INCLUDE_DIRS_ONLY})
     # Link libraries
     define_dependency_libs (${TARGET_NAME})
-    string (REGEX REPLACE \\.\\./|ThirdParty/|Engine/|Extras/|/include|/src "" LIB_NAME "${LIBS};${LINK_LIBS_ONLY}")
-    target_link_libraries (${TARGET_NAME} ${LIB_NAME} ${ABSOLUTE_PATH_LIBS})
+    string (REGEX REPLACE \\.\\./|ThirdParty/|Engine/|Extras/|/include|/src "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
+    target_link_libraries (${TARGET_NAME} ${STRIP_LIBS} ${ABSOLUTE_PATH_LIBS})
 endmacro ()
 
 # Macro for setting up a library target
