@@ -1,3 +1,25 @@
+//
+// Copyright (c) 2008-2013 the Urho3D project.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
 #include "AnimatedModel.h"
 #include "AnimationController.h"
 #include "Camera.h"
@@ -71,6 +93,7 @@ void CharacterDemo::CreateScene()
     // Create camera and define viewport. Camera does not necessarily have to belong to the scene
     cameraNode_ = new Node(context_);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
+    camera->SetFarClip(300.0f);
     GetSubsystem<Renderer>()->SetViewport(0, new Viewport(context_, scene_, camera));
     
     // Create static scene content. First create a zone for ambient lighting and fog control
@@ -230,8 +253,8 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Get movement controls and assign them to the character logic component. If UI has a focused element, clear controls
         if (!ui->GetFocusElement())
         {
-            character_->controls_.Set(CTRL_UP, input->GetKeyDown('W'));
-            character_->controls_.Set(CTRL_DOWN, input->GetKeyDown('S'));
+            character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown('W'));
+            character_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
             character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
             character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
             character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
@@ -247,7 +270,7 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                 firstPerson_ = !firstPerson_;
         }
         else
-            character_->controls_.Set(CTRL_UP | CTRL_DOWN | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
+            character_->controls_.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
         
         // Set rotation already here so that it's updated every rendering frame instead of every physics frame
         character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));

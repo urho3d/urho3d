@@ -1,0 +1,161 @@
+//
+// Copyright (c) 2008-2013 the Urho3D project.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#include "CollisionShape.h"
+#include "Constraint.h"
+#include "Material.h"
+#include "Model.h"
+#include "PhysicsEvents.h"
+#include "PhysicsWorld.h"
+#include "ResourceCache.h"
+#include "RigidBody.h"
+#include "Scene.h"
+#include "StaticModel.h"
+#include "Vehicle.h"
+
+Vehicle::Vehicle(Context* context) :
+    Component(context),
+    steering_(0.0f)
+{
+}
+
+void Vehicle::OnNodeSet(Node* node)
+{
+    if (node)
+        SubscribeToEvent(GetScene()->GetComponent<PhysicsWorld>(), E_PHYSICSPRESTEP, HANDLER(Vehicle, HandleFixedUpdate));
+}
+
+void Vehicle::Init()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    StaticModel* hullObject = node_->CreateComponent<StaticModel>();
+    hullBody_ = node_->CreateComponent<RigidBody>();
+    CollisionShape* hullShape = node_->CreateComponent<CollisionShape>();
+
+    node_->SetScale(Vector3(1.5f, 1.0f, 3.0f));
+    hullObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+    hullObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+    hullObject->SetCastShadows(true);
+    hullShape->SetBox(Vector3::ONE);
+    hullBody_->SetMass(4.0f);
+    hullBody_->SetLinearDamping(0.2f); // Some air resistance
+    hullBody_->SetAngularDamping(0.5f);
+    hullBody_->SetCollisionLayer(1);
+
+    frontLeft_ = InitWheel("FrontLeft", Vector3(-0.6f, -0.4f, 0.3f));
+    frontRight_ = InitWheel("FrontRight", Vector3(0.6f, -0.4f, 0.3f));
+    rearLeft_ = InitWheel("RearLeft", Vector3(-0.6f, -0.4f, -0.3f));
+    rearRight_ = InitWheel("RearRight", Vector3(0.6f, -0.4f, -0.3f));
+    
+    frontLeftAxis_ = frontLeft_->GetComponent<Constraint>();
+    frontRightAxis_ = frontRight_->GetComponent<Constraint>();
+    frontLeftBody_ = frontLeft_->GetComponent<RigidBody>();
+    frontRightBody_ = frontRight_->GetComponent<RigidBody>();
+    rearLeftBody_ = rearLeft_->GetComponent<RigidBody>();
+    rearRightBody_ = rearRight_->GetComponent<RigidBody>();
+}
+
+Node* Vehicle::InitWheel(const String& name, const Vector3& offset)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    // Note: do not parent the wheel to the hull scene node. Instead create it on the root level and let the physics
+    // constraint keep it together
+    Node* wheelNode = GetScene()->CreateChild(name);
+    wheelNode->SetPosition(node_->LocalToWorld(offset));
+    wheelNode->SetRotation(node_->GetWorldRotation() * (offset.x_ >= 0.0 ? Quaternion(0.0f, 0.0f, -90.0f) :
+        Quaternion(0.0f, 0.0f, 90.0f)));
+    wheelNode->SetScale(Vector3(0.8f, 0.5f, 0.8f));
+
+    StaticModel* wheelObject = wheelNode->CreateComponent<StaticModel>();
+    RigidBody* wheelBody = wheelNode->CreateComponent<RigidBody>();
+    CollisionShape* wheelShape = wheelNode->CreateComponent<CollisionShape>();
+    Constraint* wheelConstraint = wheelNode->CreateComponent<Constraint>();
+
+    wheelObject->SetModel(cache->GetResource<Model>("Models/Cylinder.mdl"));
+    wheelObject->SetMaterial(cache->GetResource<Material>("Materials/Stone.xml"));
+    wheelObject->SetCastShadows(true);
+    wheelShape->SetSphere(1.0f);
+    wheelBody->SetFriction(1.0f);
+    wheelBody->SetMass(1.0f);
+    wheelBody->SetLinearDamping(0.2f); // Some air resistance
+    wheelBody->SetAngularDamping(0.75f); // Could also use rolling friction
+    wheelBody->SetCollisionLayer(1);
+    wheelConstraint->SetConstraintType(CONSTRAINT_HINGE);
+    wheelConstraint->SetOtherBody(GetComponent<RigidBody>()); // Connect to the hull body
+    wheelConstraint->SetWorldPosition(wheelNode->GetWorldPosition()); // Set constraint's both ends at wheel's location
+    wheelConstraint->SetAxis(Vector3::UP); // Wheel rotates around its local Y-axis
+    wheelConstraint->SetOtherAxis(offset.x_ >= 0.0 ? Vector3::RIGHT : Vector3::LEFT); // Wheel's hull axis points either left or right
+    wheelConstraint->SetLowLimit(Vector2(-180.0f, 0.0f)); // Let the wheel rotate freely around the axis
+    wheelConstraint->SetHighLimit(Vector2(180.0f, 0.0f));
+    wheelConstraint->SetDisableCollision(true); // Let the wheel intersect the vehicle hull
+    
+    return wheelNode;
+}
+
+void Vehicle::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
+{
+    float newSteering = 0.0f;
+    float accelerator = 0.0f;
+
+    // Read controls
+    if (controls_.buttons_ & CTRL_LEFT)
+        newSteering = -1.0f;
+    if (controls_.buttons_ & CTRL_RIGHT)
+        newSteering = 1.0f;
+    if (controls_.buttons_ & CTRL_FORWARD)
+        accelerator = 1.0f;
+    if (controls_.buttons_ & CTRL_BACK)
+        accelerator = -0.5f;
+
+    // When steering, wake up the wheel rigidbodies so that their orientation is updated
+    if (newSteering != 0.0f)
+    {
+        frontLeftBody_->Activate();
+        frontRightBody_->Activate();
+        steering_ = steering_ * 0.95f + newSteering * 0.05f;
+    }
+    else
+        steering_ = steering_ * 0.8f + newSteering * 0.2f;
+
+    // Set front wheel angles
+    Quaternion steeringRot(0, steering_ * MAX_WHEEL_ANGLE, 0);
+    frontLeftAxis_->SetOtherAxis(steeringRot * Vector3::LEFT);
+    frontRightAxis_->SetOtherAxis(steeringRot * Vector3::RIGHT);
+
+    Quaternion hullRot = hullBody_->GetRotation();
+    if (accelerator != 0.0f)
+    {
+        // Torques are applied in world space, so need to take the vehicle & wheel rotation into account
+        Vector3 torqueVec = Vector3(ENGINE_POWER * accelerator, 0.0f, 0.0f);
+        
+        frontLeftBody_->ApplyTorque(hullRot * steeringRot * torqueVec);
+        frontRightBody_->ApplyTorque(hullRot * steeringRot * torqueVec);
+        rearLeftBody_->ApplyTorque(hullRot * torqueVec);
+        rearRightBody_->ApplyTorque(hullRot * torqueVec);
+    }
+
+    // Apply downforce proportional to velocity
+    Vector3 localVelocity = hullRot.Inverse() * hullBody_->GetLinearVelocity();
+    hullBody_->ApplyForce(hullRot * Vector3::DOWN * Abs(localVelocity.z_) * DOWN_FORCE);
+}
