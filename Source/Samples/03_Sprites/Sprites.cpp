@@ -50,7 +50,7 @@ void Sprites::Start()
     // Execute base class startup
     Sample::Start();
 
-    // Create the sprites to the UI interface
+    // Create the sprites to the user interface
     CreateSprites();
 
     // Hook up to the frame update events
