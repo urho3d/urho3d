@@ -30,7 +30,6 @@
 #include "ResourceEvents.h"
 #include "Script.h"
 #include "ScriptFile.h"
-#include "Urho3D.h"
 
 #ifdef ENABLE_LUA
 #include "LuaScript.h"

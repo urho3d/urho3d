@@ -29,6 +29,7 @@ import android.hardware.*;
     SDL Activity
 */
 public class SDLActivity extends Activity {
+    // Urho3D: adjust log level, no verbose in production code, first check log level for non-trivial message construction
     private static final String TAG = "SDL";
 
     // Keep track of the paused state
@@ -60,23 +61,24 @@ public class SDLActivity extends Activity {
     // Setup
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Log.v("SDL", "onCreate()");
+        //Log.v(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
         
         // So we can call stuff from static callbacks
         mSingleton = this;
         
-    	// Urho3D: auto load all the shared libraries available in the library path
-    	String libraryPath = getApplicationInfo().dataDir + "/lib";
-    	//Log.v("SDL", "libraryPath: " + libraryPath);
-    	if (!mIsSharedLibraryLoaded) {
+        // Urho3D: auto load all the shared libraries available in the library path
+        // FIXME: use getApplicationInfo().nativeLibraryDir directly when min target API is 9 or above
+        String libraryPath = getApplicationInfo().dataDir + "/lib";
+        //Log.v(TAG, "library path: " + libraryPath);
+        if (!mIsSharedLibraryLoaded) {
             for (final File libraryFilename : new File(libraryPath).listFiles()) {
                 String name = libraryFilename.getName().replaceAll("^lib(.*)\\.so$", "$1");
-                //Log.v("SDL", "library name: " + name);
+                //Log.v(TAG, "library name: " + name);
                 System.loadLibrary(name);
             }            
             mIsSharedLibraryLoaded = true;
-    	}
+        }
 
         // Set up the surface
         mEGLSurface = EGL10.EGL_NO_SURFACE;
@@ -92,14 +94,14 @@ public class SDLActivity extends Activity {
     // Events
     @Override
     protected void onPause() {
-        Log.v("SDL", "onPause()");
+        //Log.v(TAG, "onPause()");
         super.onPause();
         SDLActivity.handlePause();
     }
 
     @Override
     protected void onResume() {
-        Log.v("SDL", "onResume()");
+        //Log.v(TAG, "onResume()");
         super.onResume();
         SDLActivity.handleResume();
     }
@@ -107,8 +109,8 @@ public class SDLActivity extends Activity {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
+        //Log.v(TAG, "onWindowFocusChanged(): " + hasFocus);
         super.onWindowFocusChanged(hasFocus);
-        Log.v("SDL", "onWindowFocusChanged(): " + hasFocus);
 
         SDLActivity.mHasFocus = hasFocus;
         if (hasFocus) {
@@ -118,15 +120,16 @@ public class SDLActivity extends Activity {
 
     @Override
     public void onLowMemory() {
-        Log.v("SDL", "onLowMemory()");
+        //Log.v(TAG, "onLowMemory()");
         super.onLowMemory();
         SDLActivity.nativeLowMemory();
     }
 
     @Override
     protected void onDestroy() {
+        //Log.v(TAG, "onDestroy()");
         super.onDestroy();
-        Log.v("SDL", "onDestroy()");
+        
         // Send a quit message to the application
         SDLActivity.nativeQuit();
 
@@ -135,11 +138,12 @@ public class SDLActivity extends Activity {
             try {
                 mSDLThread.join();
             } catch(Exception e) {
-                Log.v("SDL", "Problem stopping thread: " + e);
+                if (Log.isLoggable(TAG, Log.ERROR))
+                    Log.e(TAG, "Problem stopping thread: " + e);
             }
             mSDLThread = null;
 
-            //Log.v("SDL", "Finished waiting for SDL thread");
+            //Log.v(TAG, "Finished waiting for SDL thread");
         }
     }
 
@@ -150,7 +154,7 @@ public class SDLActivity extends Activity {
         // Urho3D: also ignore the Home key
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ||
             keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
-			keyCode == KeyEvent.KEYCODE_HOME) {
+            keyCode == KeyEvent.KEYCODE_HOME) {
             return false;
         }
         return super.dispatchKeyEvent(event);
@@ -239,7 +243,8 @@ public class SDLActivity extends Activity {
 
             default:
                 if ((context instanceof SDLActivity) && !((SDLActivity) context).onUnhandledMessage(msg.arg1, msg.obj)) {
-                    Log.e(TAG, "error handling message, command is " + msg.arg1);
+                    if (Log.isLoggable(TAG, Log.ERROR))
+                        Log.e(TAG, "error handling message, command is " + msg.arg1);
                 }
             }
         }
@@ -370,7 +375,8 @@ public class SDLActivity extends Activity {
             
             if (SDLActivity.mEGLDisplay != null && SDLActivity.mEGLContext == EGL10.EGL_NO_CONTEXT) {
                 // No current GL context exists, we will create a new one.
-                Log.v("SDL", "Starting up OpenGL ES " + majorVersion + "." + minorVersion);
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "Starting up OpenGL ES " + majorVersion + "." + minorVersion);
                 EGLConfig[] configs = new EGLConfig[128];
                 int[] num_config = new int[1];
                 if (!egl.eglChooseConfig(SDLActivity.mEGLDisplay, attribs, configs, 1, num_config) || num_config[0] == 0) {
@@ -383,7 +389,8 @@ public class SDLActivity extends Activity {
                 
                 // eglChooseConfig returns a number of configurations that match or exceed the requested attribs.
                 // From those, we select the one that matches our requirements more closely
-                Log.v("SDL", "Got " + num_config[0] + " valid modes from egl");
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "Got " + num_config[0] + " valid modes from egl");
                 for(int i = 0; i < num_config[0]; i++) {
                     bitdiff = 0;
                     // Go through some of the attributes and compute the bit difference between what we want and what we get.
@@ -410,7 +417,8 @@ public class SDLActivity extends Activity {
                     if (bitdiff == 0) break; // we found an exact match!
                 }
                 
-                Log.d("SDL", "Selected mode with a total bit difference of " + bestdiff);
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d("SDL", "Selected mode with a total bit difference of " + bestdiff);
 
                 SDLActivity.mEGLConfig = config;
                 SDLActivity.mGLMajor = majorVersion;
@@ -420,9 +428,12 @@ public class SDLActivity extends Activity {
             return SDLActivity.createEGLSurface();
 
         } catch(Exception e) {
-            Log.v("SDL", e + "");
-            for (StackTraceElement s : e.getStackTrace()) {
-                Log.v("SDL", s.toString());
+            if (Log.isLoggable(TAG, Log.ERROR))
+                Log.e(TAG, "initEGL(): " + e);
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    Log.d(TAG, s.toString());
+                }
             }
             return false;
         }
@@ -446,14 +457,14 @@ public class SDLActivity extends Activity {
             if (SDLActivity.mEGLContext == EGL10.EGL_NO_CONTEXT) createEGLContext();
 
             if (SDLActivity.mEGLSurface == EGL10.EGL_NO_SURFACE) {
-                Log.v("SDL", "Creating new EGL Surface");
+                Log.d(TAG, "Creating new EGL Surface");
                 SDLActivity.mEGLSurface = egl.eglCreateWindowSurface(SDLActivity.mEGLDisplay, SDLActivity.mEGLConfig, SDLActivity.mSurface, null);
                 if (SDLActivity.mEGLSurface == EGL10.EGL_NO_SURFACE) {
                     Log.e("SDL", "Couldn't create surface");
                     return false;
                 }
             }
-            else Log.v("SDL", "EGL Surface remains valid");
+            else Log.d(TAG, "EGL Surface remains valid");
 
             if (egl.eglGetCurrentContext() != SDLActivity.mEGLContext) {
                 if (!egl.eglMakeCurrent(SDLActivity.mEGLDisplay, SDLActivity.mEGLSurface, SDLActivity.mEGLSurface, SDLActivity.mEGLContext)) {
@@ -465,13 +476,14 @@ public class SDLActivity extends Activity {
                         return false;
                     }
                 }
-                else Log.v("SDL", "EGL Context made current");
+                else Log.d(TAG, "EGL Context made current");
             }
-            else Log.v("SDL", "EGL Context remains current");
+            else Log.d(TAG, "EGL Context remains current");
 
             return true;
         } else {
-            Log.e("SDL", "Surface creation failed, display = " + SDLActivity.mEGLDisplay + ", config = " + SDLActivity.mEGLConfig);
+            if (Log.isLoggable(TAG, Log.ERROR))
+                Log.e("SDL", "Surface creation failed, display = " + SDLActivity.mEGLDisplay + ", config = " + SDLActivity.mEGLConfig);
             return false;
         }
     }
@@ -491,9 +503,12 @@ public class SDLActivity extends Activity {
 
 
         } catch(Exception e) {
-            Log.v("SDL", "flipEGL(): " + e);
-            for (StackTraceElement s : e.getStackTrace()) {
-                Log.v("SDL", s.toString());
+            if (Log.isLoggable(TAG, Log.ERROR))
+                Log.e(TAG, "flipEGL(): " + e);
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                for (StackTraceElement s : e.getStackTrace()) {
+                    Log.d(TAG, s.toString());
+                }
             }
         }
     }
@@ -504,7 +519,8 @@ public class SDLActivity extends Activity {
         int audioFormat = is16Bit ? AudioFormat.ENCODING_PCM_16BIT : AudioFormat.ENCODING_PCM_8BIT;
         int frameSize = (isStereo ? 2 : 1) * (is16Bit ? 2 : 1);
         
-        Log.v("SDL", "SDL audio: wanted " + (isStereo ? "stereo" : "mono") + " " + (is16Bit ? "16-bit" : "8-bit") + " " + (sampleRate / 1000f) + "kHz, " + desiredFrames + " frames buffer");
+        if (Log.isLoggable(TAG, Log.DEBUG))
+            Log.d(TAG, "SDL audio: wanted " + (isStereo ? "stereo" : "mono") + " " + (is16Bit ? "16-bit" : "8-bit") + " " + (sampleRate / 1000f) + "kHz, " + desiredFrames + " frames buffer");
         
         // Let the user pick a larger buffer if they really want -- but ye
         // gods they probably shouldn't, the minimums are horrifyingly high
@@ -527,8 +543,9 @@ public class SDLActivity extends Activity {
             
             mAudioTrack.play();
         }
-       
-        Log.v("SDL", "SDL audio: got " + ((mAudioTrack.getChannelCount() >= 2) ? "stereo" : "mono") + " " + ((mAudioTrack.getAudioFormat() == AudioFormat.ENCODING_PCM_16BIT) ? "16-bit" : "8-bit") + " " + (mAudioTrack.getSampleRate() / 1000f) + "kHz, " + desiredFrames + " frames buffer");
+
+        if (Log.isLoggable(TAG, Log.DEBUG))
+            Log.d(TAG, "SDL audio: got " + ((mAudioTrack.getChannelCount() >= 2) ? "stereo" : "mono") + " " + ((mAudioTrack.getAudioFormat() == AudioFormat.ENCODING_PCM_16BIT) ? "16-bit" : "8-bit") + " " + (mAudioTrack.getSampleRate() / 1000f) + "kHz, " + desiredFrames + " frames buffer");
         
         return 0;
     }
@@ -602,6 +619,8 @@ class SDLMain implements Runnable {
 class SDLSurface extends SurfaceView implements SurfaceHolder.Callback, 
     View.OnKeyListener, View.OnTouchListener, SensorEventListener  {
 
+    private static final String TAG = "SDL";
+    
     // Sensors
     protected static SensorManager mSensorManager;
 
@@ -629,7 +648,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     // Called when we have a valid drawing surface
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.v("SDL", "surfaceCreated()");
+        //Log.v(TAG, "surfaceCreated()");
         holder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
         // Set mIsSurfaceReady to 'true' *before* any call to handleResume
         SDLActivity.mIsSurfaceReady = true;
@@ -638,7 +657,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     // Called when we lose the surface
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.v("SDL", "surfaceDestroyed()");
+        //Log.v(TAG, "surfaceDestroyed()");
         // Call this *before* setting mIsSurfaceReady to 'false'
         SDLActivity.handlePause();
         SDLActivity.mIsSurfaceReady = false;
@@ -658,57 +677,59 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     @Override
     public void surfaceChanged(SurfaceHolder holder,
                                int format, int width, int height) {
-        Log.v("SDL", "surfaceChanged()");
+        //Log.v(TAG, "surfaceChanged()");
 
         int sdlFormat = 0x15151002; // SDL_PIXELFORMAT_RGB565 by default
         switch (format) {
         case PixelFormat.A_8:
-            Log.v("SDL", "pixel format A_8");
+            Log.d(TAG, "pixel format A_8");
             break;
         case PixelFormat.LA_88:
-            Log.v("SDL", "pixel format LA_88");
+            Log.d(TAG, "pixel format LA_88");
             break;
         case PixelFormat.L_8:
-            Log.v("SDL", "pixel format L_8");
+            Log.d(TAG, "pixel format L_8");
             break;
         case PixelFormat.RGBA_4444:
-            Log.v("SDL", "pixel format RGBA_4444");
+            Log.d(TAG, "pixel format RGBA_4444");
             sdlFormat = 0x15421002; // SDL_PIXELFORMAT_RGBA4444
             break;
         case PixelFormat.RGBA_5551:
-            Log.v("SDL", "pixel format RGBA_5551");
+            Log.d(TAG, "pixel format RGBA_5551");
             sdlFormat = 0x15441002; // SDL_PIXELFORMAT_RGBA5551
             break;
         case PixelFormat.RGBA_8888:
-            Log.v("SDL", "pixel format RGBA_8888");
+            Log.d(TAG, "pixel format RGBA_8888");
             sdlFormat = 0x16462004; // SDL_PIXELFORMAT_RGBA8888
             break;
         case PixelFormat.RGBX_8888:
-            Log.v("SDL", "pixel format RGBX_8888");
+            Log.d(TAG, "pixel format RGBX_8888");
             sdlFormat = 0x16261804; // SDL_PIXELFORMAT_RGBX8888
             break;
         case PixelFormat.RGB_332:
-            Log.v("SDL", "pixel format RGB_332");
+            Log.d(TAG, "pixel format RGB_332");
             sdlFormat = 0x14110801; // SDL_PIXELFORMAT_RGB332
             break;
         case PixelFormat.RGB_565:
-            Log.v("SDL", "pixel format RGB_565");
+            Log.d(TAG, "pixel format RGB_565");
             sdlFormat = 0x15151002; // SDL_PIXELFORMAT_RGB565
             break;
         case PixelFormat.RGB_888:
-            Log.v("SDL", "pixel format RGB_888");
+            Log.d(TAG, "pixel format RGB_888");
             // Not sure this is right, maybe SDL_PIXELFORMAT_RGB24 instead?
             sdlFormat = 0x16161804; // SDL_PIXELFORMAT_RGB888
             break;
         default:
-            Log.v("SDL", "pixel format unknown " + format);
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "pixel format unknown " + format);
             break;
         }
 
         mWidth = width;
         mHeight = height;
         SDLActivity.onNativeResize(width, height, sdlFormat);
-        Log.v("SDL", "Window size:" + width + "x"+height);
+        if (Log.isLoggable(TAG, Log.DEBUG))
+            Log.d(TAG, "Window size: " + width + "x" + height);
 
         // Set mIsSurfaceReady to 'true' *before* making a call to handleResume
         SDLActivity.mIsSurfaceReady = true;
@@ -733,12 +754,12 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     public boolean onKey(View  v, int keyCode, KeyEvent event) {
         
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            //Log.v("SDL", "key down: " + keyCode);
+            //Log.v(TAG, "key down: " + keyCode);
             SDLActivity.onNativeKeyDown(keyCode);
             return true;
         }
         else if (event.getAction() == KeyEvent.ACTION_UP) {
-            //Log.v("SDL", "key up: " + keyCode);
+            //Log.v(TAG, "key up: " + keyCode);
             SDLActivity.onNativeKeyUp(keyCode);
             return true;
         }
@@ -877,7 +898,6 @@ class SDLInputConnection extends BaseInputConnection {
 
     public SDLInputConnection(View targetView, boolean fullEditor) {
         super(targetView, fullEditor);
-
     }
 
     @Override

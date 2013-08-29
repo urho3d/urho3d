@@ -140,8 +140,8 @@ else ()
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -ffast-math")
         if (RASPI)
             add_definitions (-DRASPI)
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard")
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wno-psabi")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -mcpu=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -Wno-psabi")
         elseif (ENABLE_64BIT)
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
@@ -226,8 +226,17 @@ endfunction ()
 
 # Override builtin function to suit our need, takes care of C flags as well as CXX flags
 function (add_compiler_export_flags)
+    if (NOT ANDROID)
+        message ("--")
+        message ("-- Following tests check whether compiler installed in this system has export/import and deprecated attributes support")
+        message ("-- CMake will generate a suitable export header file for this system based on the test result")
+        message ("-- It is OK to proceed to build Urho3D regardless of the test result")
+    endif ()    
     _test_compiler_hidden_visibility ()
     _test_compiler_has_deprecated ()
+    if (NOT ANDROID)
+        message ("--")
+    endif ()
 
     if (NOT (USE_COMPILER_HIDDEN_VISIBILITY AND COMPILER_HAS_HIDDEN_VISIBILITY))
         # Just return if there are no flags to add.
@@ -389,14 +398,15 @@ macro (setup_main_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
             COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ANDROID_LIBRARY_OUTPUT_PATH}
-            COMMENT "Stripping and copying the output shared library")
+            COMMENT "Stripping and copying lib${TARGET_NAME}.so to target library directory")
         # Also copy other dependent shared libraries to Android library output path
         foreach(FILE ${ABSOLUTE_PATH_LIBS})
             get_filename_component (EXT ${FILE} EXT)
             if (EXT STREQUAL .so)
+                get_filename_component (NAME ${FILE} NAME)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILE} ${ANDROID_LIBRARY_OUTPUT_PATH}
-                    COMMENT "Copying other dependent shared library to target library directory")
+                    COMMENT "Copying ${NAME} to target library directory")
             endif ()
         endforeach ()
     else ()
