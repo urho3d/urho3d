@@ -30,7 +30,11 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
 set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/Graphics ../../Engine/IO ../../Engine/Math ../../Engine/Resource ../../Engine/Scene ../../ThirdParty/MojoShader)
-set (LINK_LIBS_ONLY ${DIRECT3D_COMPILER_LIBRARY})
+if (DIRECT3D_FOUND)
+    set (ABSOLUTE_PATH_LIBS ${DIRECT3D_COMPILER_LIBRARY})
+else ()
+    set (LINK_LIBS_ONLY ${DIRECT3D_COMPILER_LIBRARY})
+endif ()
 
 # Setup target
 add_definitions(-DMOJOSHADER_NO_VERSION_INCLUDE)
