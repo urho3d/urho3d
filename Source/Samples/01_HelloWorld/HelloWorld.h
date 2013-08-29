@@ -29,7 +29,7 @@ using namespace Urho3D;
 
 /// This first example, maintaining tradition, prints a "Hello World" message.
 /// Furthermore it shows:
-///     - Initialization of the Urho3D engine;
+///     - Using the Sample / Application classes, which initialize the Urho3D engine and run the main loop;
 ///     - Adding a Text element to the graphical user interface;
 ///     - Subscribing to and handling of update events;
 class HelloWorld : public Sample

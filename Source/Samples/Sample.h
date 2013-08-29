@@ -33,6 +33,7 @@ using namespace Urho3D;
 ///    - Modify engine parameters for windowed mode and to show the class name as title
 ///    - Create Urho3D logo at screen;
 ///    - Create Console and Debug HUD, and use F1 and F2 key to toggle them;
+///    - Toggle rendering options from the keys 1-8;
 ///    - Handle Esc key down to hide Console or exit application;
 class Sample : public Application
 {
