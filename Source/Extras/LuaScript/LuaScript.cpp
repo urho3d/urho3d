@@ -24,6 +24,7 @@
 #include "EngineEvents.h"
 #include "File.h"
 #include "Log.h"
+#include "LuaFile.h"
 #include "LuaScript.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
@@ -66,6 +67,8 @@ LuaScript::LuaScript(Context* context) :
     luaState_(0)
 {
     currentContext_ = context_;
+
+    RegisterLuaScriptLibrary(context_);
 
     luaState_ = luaL_newstate();
     if (!luaState_)
@@ -112,35 +115,11 @@ bool LuaScript::ExecuteFile(const String& fileName)
     if (!cache)
         return false;
 
-    SharedPtr<File> file = cache->GetFile(fileName);
-    if (!file)
+    LuaFile* luaFile = cache->GetResource<LuaFile>(fileName);
+    if (!luaFile)
         return false;
 
-    unsigned size = file->GetSize();
-    char* buffer = new char[size];
-    file->Read(buffer, size);
-
-    int top = lua_gettop(luaState_);
-    int error = luaL_loadbuffer(luaState_, buffer, size, fileName.CString());
-    delete [] buffer;
-
-    if (error)
-    {
-        const char* message = lua_tostring(luaState_, -1);
-        ErrorDialog("Execute Lua File Failed", message);
-        lua_settop(luaState_, top);
-        return false;
-    }
-
-    if (lua_pcall(luaState_, 0, 0, 0))
-    {
-        const char* message = lua_tostring(luaState_, -1);
-        ErrorDialog("Execute Lua File Failed", message);
-        lua_settop(luaState_, top);
-        return false;
-    }
-
-    return true;
+    return luaFile->Execute(luaState_);
 }
 
 bool LuaScript::ExecuteString(const String& string)
@@ -371,6 +350,11 @@ void LuaScript::CallEventHandler(const String& functionName, StringHash eventTyp
         lua_settop(luaState_, top);
         return;
     }
+}
+
+void RegisterLuaScriptLibrary(Context* context)
+{
+    LuaFile::RegisterObject(context);
 }
 
 Context* GetContext()

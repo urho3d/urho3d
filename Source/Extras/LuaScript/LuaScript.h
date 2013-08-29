@@ -99,6 +99,9 @@ private:
 
 };
 
+/// Register Lua script library objects.
+void RegisterLuaScriptLibrary(Context* context);
+
 /// Return context.
 Context* GetContext();
 
