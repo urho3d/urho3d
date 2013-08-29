@@ -57,13 +57,13 @@ void HelloGUI::Start()
     SharedPtr<XMLFile> style(cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
 
     // Set the loaded style as default style
-    this->uiRoot_->SetDefaultStyle(style);
+    uiRoot_->SetDefaultStyle(style);
 
     // Initialize Window
-    this->InitWindow();
+    InitWindow();
 
     // Create and add some controls to the Window
-    this->InitControls();
+    InitControls();
 
     SubscribeToEvents();
 }
@@ -98,8 +98,8 @@ void HelloGUI::InitControls()
 void HelloGUI::InitWindow()
 {
     // Create the Window and add it to the UI's root node
-    this->window_ = SharedPtr<Window>(new Window(context_));
-    this->uiRoot_->AddChild(window_);
+    window_ = SharedPtr<Window>(new Window(context_));
+    uiRoot_->AddChild(window_);
 
     // Set Window size and layout settings
     window_->SetMinSize(384, 192);
@@ -152,7 +152,7 @@ void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)
 void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
 {
     // Get the Text control acting as the Window's title
-    SharedPtr<Text> windowTitle((Text*)window_->GetChild(String("WindowTitle"), true));
+    SharedPtr<Text> windowTitle((Text*)window_->GetChild("WindowTitle", true));
 
     // Get control that was clicked
     UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
@@ -165,5 +165,5 @@ void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
     }
 
     // Update the Window's title text
-    windowTitle->SetText(String("Hello " + name + "!"));
+    windowTitle->SetText("Hello " + name + "!");
 }
