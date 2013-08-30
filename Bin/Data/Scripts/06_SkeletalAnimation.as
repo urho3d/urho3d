@@ -18,7 +18,7 @@ void Start()
 {
     // Execute the common startup for samples
     SampleStart();
-    
+
     // Create the scene content
     CreateScene();
     
@@ -40,7 +40,7 @@ void CreateScene()
     // Also create a DebugRenderer component so that we can draw debug geometry
     scene_.CreateComponent("Octree");
     scene_.CreateComponent("DebugRenderer");
-    
+
     // Create scene node & StaticModel component for showing a static plane
     Node@ planeNode = scene_.CreateChild("Plane");
     planeNode.scale = Vector3(100.0f, 1.0f, 100.0f);
@@ -116,10 +116,12 @@ void CreateInstructions()
         "Use WASD keys and mouse to move\n"
         "Space to toggle debug geometry";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    // The text has multiple rows. Center them in relation to each other
+    instructionText.textAlignment = HA_CENTER;
 
     // Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER;
-    instructionText.verticalAlignment= VA_CENTER;
+    instructionText.verticalAlignment = VA_CENTER;
     instructionText.SetPosition(0, ui.root.height / 4);
 }
 
