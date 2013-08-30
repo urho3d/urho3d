@@ -118,5 +118,7 @@ URHO3D_API String GetInternalPath(const String& pathName);
 URHO3D_API String GetNativePath(const String& pathName);
 /// Convert a path to the format required by the operating system in wide characters.
 URHO3D_API WString GetWideNativePath(const String& pathName);
+/// Return whether a path is absolute.
+URHO3D_API bool IsAbsolutePath(const String& pathName);
 
 }

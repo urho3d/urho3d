@@ -308,8 +308,9 @@ The engine can be configured using the following command line options:
 -q          Enable quiet mode which does not log to standard output stream
 -b<length>  Sound buffer length in milliseconds
 -r<freq>    Sound mixing frequency in Hz
--headless   Headless mode. No application window will be created
+-p<paths>   Resource path(s) to use, separated by semicolons
 -log<level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'
+-headless   Headless mode. No application window will be created
 -prepass    Use light pre-pass rendering
 -deferred   Use deferred rendering
 -lqshadows  Use low-quality (1-sample) shadow filtering

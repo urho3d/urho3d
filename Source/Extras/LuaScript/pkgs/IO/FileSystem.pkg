@@ -66,6 +66,7 @@ String RemoveTrailingSlash(const String& pathName);
 String GetParentPath(const String& pathName);
 String GetInternalPath(const String& pathName);
 String GetNativePath(const String& pathName);
+bool IsAbsolutePath(const String& pathName);
 
 ${
 

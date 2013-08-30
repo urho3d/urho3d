@@ -337,6 +337,7 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("String RemoveTrailingSlash(const String&in)", asFUNCTION(RemoveTrailingSlash), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetParentPath(const String&in)", asFUNCTION(GetParentPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetInternalPath(const String&in)", asFUNCTION(GetInternalPath), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool IsAbsolutePath(const String&in)", asFUNCTION(IsAbsolutePath), asCALL_CDECL);
 }
 
 static PackageFile* ConstructPackageFile()

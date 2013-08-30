@@ -185,25 +185,34 @@ bool Engine::Initialize(const VariantMap& parameters)
     Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "CoreData;Data").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
     
-    // Prefer to add the resource paths as packages if possible
     for (unsigned i = 0; i < resourcePaths.Size(); ++i)
     {
         bool success = false;
         
-        String packageName = exePath + resourcePaths[i] + ".pak";
-        if (fileSystem->FileExists(packageName))
+        // If path is not absolute, prefer to add it as a package if possible
+        if (!IsAbsolutePath(resourcePaths[i]))
         {
-            SharedPtr<PackageFile> package(new PackageFile(context_));
-            if (package->Open(packageName))
+            String packageName = exePath + resourcePaths[i] + ".pak";
+            if (fileSystem->FileExists(packageName))
             {
-                cache->AddPackageFile(package);
-                success = true;
+                SharedPtr<PackageFile> package(new PackageFile(context_));
+                if (package->Open(packageName))
+                {
+                    cache->AddPackageFile(package);
+                    success = true;
+                }
+            }
+            
+            if (!success)
+            {
+                String pathName = exePath + resourcePaths[i];
+                if (fileSystem->DirExists(pathName))
+                    success = cache->AddResourceDir(pathName);
             }
         }
-        
-        if (!success)
+        else
         {
-            String pathName = exePath + resourcePaths[i];
+            String pathName = resourcePaths[i];
             if (fileSystem->DirExists(pathName))
                 success = cache->AddResourceDir(pathName);
         }
@@ -637,6 +646,10 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                     
                 case 'q':
                     ret["LogQuiet"] = true;
+                    break;
+                    
+                case 'p':
+                    ret["ResourcePaths"] = arguments[i].Substring(2);
                     break;
                 }
             }

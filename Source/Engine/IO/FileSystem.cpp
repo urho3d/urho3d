@@ -26,6 +26,7 @@
 #include "File.h"
 #include "FileSystem.h"
 #include "Log.h"
+#include "StringUtils.h"
 
 #include <cstdio>
 #include <cstring>
@@ -696,6 +697,24 @@ WString GetWideNativePath(const String& pathName)
 #else
     return WString(pathName);
 #endif
+}
+
+bool IsAbsolutePath(const String& pathName)
+{
+    if (pathName.Empty())
+        return false;
+    
+    String path = GetInternalPath(pathName);
+    
+    if (path[0] == '/')
+        return true;
+    
+#ifdef WIN32
+    if (path.Length() > 1 && IsAlpha(path[0]) && path[1] == ':')
+        return true;
+#endif
+
+    return false;
 }
 
 }

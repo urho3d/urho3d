@@ -66,6 +66,7 @@ namespace Urho3D
 - String RemoveTrailingSlash(const String&)
 - String GetParentPath(const String&)
 - String GetInternalPath(const String&)
+- bool IsAbsolutePath(const String&)
 - String[]@ GetObjectCategories()
 - String[]@ GetObjectsByCategory(const String&)
 - uint GetAlphaFormat()
@@ -1460,11 +1461,14 @@ Methods:<br>
 - void AddChild(Node@)
 - void RemoveChild(Node@)
 - void RemoveAllChildren()
+- void RemoveChildren(bool, bool, bool)
 - void Remove()
 - Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED, uint arg2 = 0)
 - Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED, uint arg2 = 0)
 - void RemoveComponent(Component@)
 - void RemoveComponent(const String&)
+- void RemoveAllComponents()
+- void RemoveComponents(bool, bool)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
@@ -1597,11 +1601,14 @@ Methods:<br>
 - void AddChild(Node@)
 - void RemoveChild(Node@)
 - void RemoveAllChildren()
+- void RemoveChildren(bool, bool, bool)
 - void Remove()
 - Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED, uint arg2 = 0)
 - Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED, uint arg2 = 0)
 - void RemoveComponent(Component@)
 - void RemoveComponent(const String&)
+- void RemoveAllComponents()
+- void RemoveComponents(bool, bool)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
@@ -1624,7 +1631,7 @@ Methods:<br>
 - Node@ InstantiateXML(File@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
 - Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
 - Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
-- void Clear()
+- void Clear(bool arg0 = true, bool arg1 = true)
 - void AddRequiredPackageFile(PackageFile@)
 - void ClearRequiredPackageFiles()
 - void RegisterVar(const String&)
