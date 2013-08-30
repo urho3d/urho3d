@@ -7,7 +7,6 @@
 require "LuaScripts/Utilities/Sample"
 
 local window = nil
-local windowTitle = nil
 
 function Start()
     -- Execute the common startup for samples
@@ -84,7 +83,7 @@ function InitWindow()
     titleBar.layoutMode = LM_HORIZONTAL
 
     -- Create the Window title Text
-    windowTitle = Text:new(context)
+    local windowTitle = Text:new(context)
     windowTitle:SetName("WindowTitle")
     windowTitle:SetText("Hello GUI!")
     
@@ -122,7 +121,8 @@ end
 
 function HandleControlClicked(eventType, eventData)
     -- Get the Text control acting as the Window's title
-    --local windowTitle = window:GetChild("WindowTitle", true)
+    local element = window:GetChild("WindowTitle", true)
+    local windowTitle = tolua.cast(element, 'Text')
     
     -- Get control that was clicked
     -- Note difference to C++: in C++ we would call GetPtr() and cast the function pointer to UIElement, here we must specify
