@@ -1,49 +1,52 @@
+-- This first example, maintaining tradition, prints a "Hello World" message.
+-- Furthermore it shows:
+--     - Using the Sample utility functions as a base for the application
+--     - Adding a Text element to the graphical user interface
+--     - Subscribing to and handling of update events
+
 require "LuaScripts/Utilities/Sample"
 
-HelloWorld = {}
-
-function HelloWorld:new()
-    local o = {}
-    self.__index = self
-    setmetatable(o, self)
-    setmetatable(self, {__index = Sample}) -- Set Sample as base class.
-    return o
-end
-
-function HelloWorld:Start()
-    Sample:Start() -- Call Start function in Sample.
-    self:CreateText()
-end
-
-function HelloWorld:CreateText()
-    local context = GetContext()
-    local helloText = Text:new(context)
-
-    helloText:SetText("Hello World from Urho3D!");
-
-    local cache = GetCache()
-    helloText:SetFont(cache:GetFont("Fonts/Anonymous Pro.ttf"), 30)
-    
-    helloText.color = Color(0.0, 1.0, 0.0)
-    
-    helloText.horizontalAlignment = HA_CENTER;
-    helloText.verticalAlignment = VA_CENTER;
-    
-    GetUI():GetRoot():AddChild(helloText)
-end
-
-local sample = nil
-
 function Start()
-    if sample == nil then
-        sample = HelloWorld:new()
-    end
-    sample:Start()
+    -- Execute the common startup for samples
+    SampleStart()
+    
+    -- Create "Hello World" Text
+    CreateText()
+    
+    -- Finally, hook-up this HelloWorld instance to handle update events
+    SubscribeToEvents()
 end
 
 function Stop()
-    if sample ~= nil then
-        sample:Stop()
-    end
-    sample = nil
+end
+
+function CreateText()
+    -- Construct new Text object
+    local context = GetContext()
+    local helloText = Text:new(context)
+
+    -- Set String to display
+    helloText:SetText("Hello World from Urho3D!");
+
+    -- Set font and text color
+    local cache = GetCache()
+    helloText:SetFont(cache:GetFont("Fonts/Anonymous Pro.ttf"), 30)
+    helloText.color = Color(0.0, 1.0, 0.0)
+    
+    -- Align Text center-screen
+    helloText.horizontalAlignment = HA_CENTER;
+    helloText.verticalAlignment = VA_CENTER;
+    
+    -- Add Text instance to the UI root element
+    local ui = GetUI()
+    ui.root:AddChild(helloText)
+end
+
+function SubscribeToEvents()
+    -- Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent("Update", "HandleUpdate")
+end
+
+function HandleUpdate(eventType, eventData)
+    -- Do nothing for now, could be extended to eg. animate the display
 end

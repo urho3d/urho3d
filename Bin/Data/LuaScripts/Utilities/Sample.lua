@@ -1,59 +1,86 @@
-Sample = {}
+-- Common sample initialization as a framework for all samples.
+--    - Create Urho3D logo at screen
+--    - Create Console and Debug HUD, and use F1 and F2 key to toggle them
+--    - Toggle rendering options from the keys 1-8
+--    - Handle Esc key down to hide Console or exit application
 
-function Sample:Start()
-    self.logoSprite = nil
-    self:CreateLogo()
-    self:CreateConsoleAndDebugHud()
+local logoSprite = nil
+
+function SampleStart()
+    -- Create logo
+    CreateLogo()
+    
+    -- Create console and debug HUD
+    CreateConsoleAndDebugHud()
+
+    -- Subscribe key down event
+    SubscribeToEvent("KeyDown", "HandleKeyDown")
 end
 
-function Sample:Stop()
-    self.logoSprite = nil
+function SetLogoVisible(enable)
+    if logoSprite ~= nil then
+        logoSprite.visible = enable
+    end
 end
 
-function Sample:CreateLogo()
+function CreateLogo()
+    -- Get logo texture
     local cache = GetCache()
     local logoTexture = cache:GetTexture2D("Textures/LogoLarge.png")
     if logoTexture == nil then
         return
     end
     
+    -- Create logo sprite and add to the UI layout
     local ui = GetUI()
-    self.logoSprite = ui.root:CreateSprite()
-    --self.logoSprite.texture = logoTexture
-    self.logoSprite:SetTexture(logoTexture)
+    logoSprite = ui.root:CreateSprite()
     
+    -- Set logo sprite texture
+    logoSprite:SetTexture(logoTexture)
     
     local textureWidth = logoTexture.width
     local textureHeight = logoTexture.height
     
-    self.logoSprite:SetScale(256 / textureWidth)
-    --self.logoSprite.size = IntVector2(textureWidth, textureHeight)
-    self.logoSprite:SetSize(textureWidth, textureHeight)
-    self.logoSprite.hotSpot = IntVector2(0, textureHeight)
+    -- Set logo sprite scale
+    logoSprite:SetScale(256 / textureWidth)
     
-    self.logoSprite:SetAlignment(HA_LEFT, VA_BOTTOM);
+    -- Set logo sprite size
+    logoSprite:SetSize(textureWidth, textureHeight)
+    
+    -- Set logo sprite hot spot
+    logoSprite.hotSpot = IntVector2(0, textureHeight)
+    
+    -- Set logo sprite alignment
+    logoSprite:SetAlignment(HA_LEFT, VA_BOTTOM);
+    
+    -- Make logo not fully opaque to show the scene underneath
+    logoSprite.opacity = 0.75
+    
+    -- Set a low priority for the logo so that other UI elements can be drawn on top
+    logoSprite.priority = -100
 end
 
-function Sample:CreateConsoleAndDebugHud()
+function CreateConsoleAndDebugHud()
+    -- Get default style
     local cache = GetCache()
     local uiStyle = cache:GetXMLFile("UI/DefaultStyle.xml")
     if uiStyle == nil then
         return
     end
     
+    -- Create console
     local engine = GetEngine()
     local console = engine:CreateConsole()
     console.defaultStyle = uiStyle
     
+    -- Create debug HUD
     local debugHud = engine:CreateDebugHud()
     debugHud.defaultStyle = uiStyle
-    
-    SubscribeToEvent("KeyDown", "Sample.HandleKeyDownEvent")
 end
 
-function Sample.HandleKeyDownEvent(eventType, eventData)
+function HandleKeyDown(eventType, eventData)
     local key = eventData:GetInt("Key")
-    
+    -- Close console (if open) or exit when ESC is pressed
     if key == KEY_ESC then
         local ui = GetUI()
         if ui:GetFocusElement() == nil then
@@ -73,5 +100,75 @@ function Sample.HandleKeyDownEvent(eventType, eventData)
     if key == KEY_F2 then
         local debugHud = GetDebugHud()
         debugHud:ToggleAll()
+    end
+    
+    local ui = GetUI()
+    if ui.focusElement == nil then
+        local renderer = GetRenderer()
+        -- Texture quality
+        if key == KEY_1 then
+            local quality = renderer.textureQuality
+            quality = quality + 1
+            if quality > QUALITY_HIGH then
+                quality = QUALITY_LOW
+            end
+            renderer.textureQuality = quality
+        end
+        
+        -- Material quality
+        if key == KEY_2 then
+            local quality = renderer.materialQuality
+            quality = quality + 1
+            if quality > QUALITY_HIGH then
+                quality = QUALITY_LOW
+            end
+            renderer.materialQuality = quality
+        end
+
+        -- Specular lighting
+        if key == KEY_3 then
+            renderer.specularLighting = not renderer.specularLighting
+        end
+        
+        -- Shadow rendering
+        if key == KEY_4 then
+            renderer.drawShadows = not renderer.drawShadows
+        end
+        
+        -- Shadow map resolution
+        if key == KEY_5 then
+            local shadowMapSize = renderer.shadowMapSize
+            shadowMapSize = shadowMapSize * 2
+            if shadowMapSize > 2048 then
+                shadowMapSize = 512
+            end
+            renderer.shadowMapSize = shadowMapSize
+        end
+        
+        -- Shadow depth and filtering quality
+        if key == KEY_6 then
+            local quality = renderer.shadowQuality
+            quality = quality + 1
+            if quality > SHADOWQUALITY_HIGH_24BIT then
+                quality = SHADOWQUALITY_LOW_16BIT
+            end
+            renderer.shadowQuality = quality
+        end
+        
+        -- Occlusion culling
+        if key == KEY_7 then
+            local occlusion = renderer.maxOccluderTriangles > 0
+            occlusion = not occlusion
+            if occlusion then
+                renderer.maxOccluderTriangles = 5000
+            else
+                renderer.maxOccluderTriangles = 0
+            end
+        end
+        
+        -- Instancing
+        if key == KEY_8 then
+            renderer.dynamicInstancing = not renderer.dynamicInstancing
+        end
     end
 end
