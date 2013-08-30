@@ -128,7 +128,8 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
                 float frame = block->intervalTime_ / intervalFrames / 1000.0f;
                 float all = block->intervalTime_ / 1000.0f;
         
-                sprintf(line, "%s %5u %8.3f %8.3f %8.3f %9.3f\n", indentedName, block->intervalCount_, avg, max, frame, all);
+                sprintf(line, "%s %5u %8.3f %8.3f %8.3f %9.3f\n", indentedName, Min(block->intervalCount_, 99999),
+                    avg, max, frame, all);
             }
             else
             {
@@ -140,8 +141,8 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
                 float totalMax = block->totalMaxTime_ / 1000.0f;
                 float totalAll = block->totalTime_ / 1000.0f;
                 
-                sprintf(line, "%s %5u %8.3f %8.3f %9.3f  %7u %9.3f %9.3f %11.3f\n", indentedName, block->frameCount_, avg, max,
-                    all, block->totalCount_, totalAvg, totalMax, totalAll);
+                sprintf(line, "%s %5u %8.3f %8.3f %9.3f  %7u %9.3f %9.3f %11.3f\n", indentedName, Min(block->frameCount_, 99999),
+                    avg, max, all, Min(block->totalCount_, 99999), totalAvg, totalMax, totalAll);
             }
             
             output += String(line);

@@ -62,10 +62,14 @@ void CreateScene()
         boxObject.material = cache.GetResource("Material", "Materials/Stone.xml");
 
         // Add the Rotator script object which will rotate the scene node each frame, when the scene sends its update event.
-        // Note that creating a script object into a scene node requires both a script file reference (scriptFile is the file
-        // we are executing now) and the class name. On the C++ side, this will create a ScriptInstance component to the node,
-        // which holds the script object. Then, simply set same rotation speed for all objects
-        Rotator@ rotator = cast<Rotator>(boxNode.CreateScriptObject(scriptFile, "Rotator"));
+        // This requires the C++ component ScriptInstance in the scene node, which acts as a container. We need to tell the 
+        // script file and class name to instantiate the object (scriptFile is a global property which refers to the currently
+        // executing script file.) There is also a shortcut for creating the ScriptInstance component and the script object,
+        // which is shown in a later sample, but this is what happens "under the hood."
+        ScriptInstance@ instance = boxNode.CreateComponent("ScriptInstance");
+        instance.CreateObject(scriptFile, "Rotator");
+        // Retrieve the created script object and set its rotation speed member variable
+        Rotator@ rotator = cast<Rotator>(instance.object);
         rotator.rotationSpeed = Vector3(10.0f, 20.0f, 30.0f);
     }
 
@@ -151,12 +155,12 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 }
 
-// Rotator script object. Script objects to be added to a scene node must implement the ScriptObject interface
+// Rotator script object class. Script objects to be added to a scene node must implement the empty ScriptObject interface
 class Rotator : ScriptObject
 {
     Vector3 rotationSpeed;
 
-    // Update is called during variable timestep scene update
+    // Update is called during the variable timestep scene update
     void Update(float timeStep)
     {
         node.Rotate(Quaternion(rotationSpeed.x * timeStep, rotationSpeed.y * timeStep, rotationSpeed.z * timeStep));
