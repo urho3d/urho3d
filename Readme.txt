@@ -10,12 +10,12 @@ Credits
 -------
 
 Urho3D development, contributions and bugfixes by:
-- Lasse Öörni (loorni@gmail.com)
+- Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
 - Wei Tjong Yao
 - Colin Barrett
 - Erik Beran
 - Carlo Carollo
-- Sebastian Delatorre
+- Sebastian Delatorre (primitivewaste)
 - Chris Friesen
 - Alex Fuller
 - Mika Heinonen
@@ -28,7 +28,6 @@ Urho3D development, contributions and bugfixes by:
 - Firegorilla
 - Magic.Lixin
 - amadeus_osa
-- primitivewaste
 - skaiware
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
