@@ -48,8 +48,7 @@
 
 #include "DebugNew.h"
 
-const float CAMERA_MIN_DIST = 3.0f;
-const float CAMERA_MAX_DIST = 8.0f;
+const float CAMERA_DISTANCE = 10.0f;
 
 DEFINE_APPLICATION_MAIN(VehicleDemo)
 
@@ -217,7 +216,7 @@ void VehicleDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             vehicle_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
             vehicle_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
             // Limit pitch
-            vehicle_->controls_.pitch_ = Clamp(vehicle_->controls_.pitch_, 1.0f, 80.0f);
+            vehicle_->controls_.pitch_ = Clamp(vehicle_->controls_.pitch_, 0.0f, 80.0f);
         }
         else
             vehicle_->controls_.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT, false);
@@ -231,21 +230,23 @@ void VehicleDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     
     Node* vehicleNode = vehicle_->GetNode();
     
-    // Get camera lookat dir from vehicle yaw + camera yaw and camera pitch. Do not apply vehicle's pitch
-    // angle, because it changes abruptly when going over bumps in the terrain
-    Quaternion rot = Quaternion(0.0f, vehicleNode->GetRotation().YawAngle() + vehicle_->controls_.yaw_, 0.0f);
-    Quaternion dir = rot * Quaternion(vehicle_->controls_.pitch_, Vector3::RIGHT);
-    Vector3 aimPoint = vehicleNode->GetPosition() + rot * Vector3(0.0f, 1.7f, 0.0f);
+    // Physics update has completed. Position camera behind vehicle
+    Quaternion dir(vehicleNode->GetRotation().YawAngle(), Vector3::UP);
+    dir = dir * Quaternion(vehicle_->controls_.yaw_, Vector3::UP);
+    dir = dir * Quaternion(vehicle_->controls_.pitch_, Vector3::RIGHT);
     
-    // Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the vehicle properly
-    Vector3 rayDir = dir * Vector3::BACK;
-    float rayDistance = CAMERA_MAX_DIST;
+    Vector3 cameraTargetPos = vehicleNode->GetPosition() - dir * Vector3(0.0f, 0.0f, CAMERA_DISTANCE);
+    Vector3 cameraStartPos = vehicleNode->GetPosition();
+
+    // Raycast camera against static objects (physics collision mask 2)
+    // and move it closer to the vehicle if something in between
+    Ray cameraRay(cameraStartPos, (cameraTargetPos - cameraStartPos).Normalized());
+    float cameraRayLength = (cameraTargetPos - cameraStartPos).Length();
     PhysicsRaycastResult result;
-    scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, Ray(aimPoint, rayDir), rayDistance, 2);
+    scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, cameraRay, cameraRayLength, 2);
     if (result.body_)
-        rayDistance = Min(rayDistance, result.distance_);
-    rayDistance = Clamp(rayDistance, CAMERA_MIN_DIST, CAMERA_MAX_DIST);
-    
-    cameraNode_->SetPosition(aimPoint + rayDir * rayDistance);
+        cameraTargetPos = cameraStartPos + cameraRay.direction_ * (result.distance_ - 0.5f);
+
+    cameraNode_->SetPosition(cameraTargetPos);
     cameraNode_->SetRotation(dir);
 }

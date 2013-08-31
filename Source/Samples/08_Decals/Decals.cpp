@@ -272,7 +272,7 @@ void Decals::PaintDecal()
         // use full texture UV's (0,0) to (1,1). Note that if we create several decals to a large object (such as the ground
         // plane) over a large area using just one DecalSet component, the decals will all be culled as one unit. If that is
         // undesirable, it may be necessary to create more than one DecalSet based on the distance
-        decal->AddDecal(hitDrawable, hitPos, cameraNode_->GetWorldRotation(), 0.5f, 1.0f, 1.0f, Vector2::ZERO,
+        decal->AddDecal(hitDrawable, hitPos, cameraNode_->GetRotation(), 0.5f, 1.0f, 1.0f, Vector2::ZERO,
             Vector2::ONE);
     }
 }
@@ -320,8 +320,7 @@ void Decals::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void Decals::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
-    // bones. Disable depth test so that we can see the effect of occlusion
+    // If draw debug mode is enabled, draw viewport debug geometry. Disable depth test so that we can see the effect of occlusion
     if (drawDebug_)
         GetSubsystem<Renderer>()->DrawDebugGeometry(false);
 }

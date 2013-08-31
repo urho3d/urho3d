@@ -83,7 +83,7 @@ Node* Vehicle::InitWheel(const String& name, const Vector3& offset)
     // constraint keep it together
     Node* wheelNode = GetScene()->CreateChild(name);
     wheelNode->SetPosition(node_->LocalToWorld(offset));
-    wheelNode->SetRotation(node_->GetWorldRotation() * (offset.x_ >= 0.0 ? Quaternion(0.0f, 0.0f, -90.0f) :
+    wheelNode->SetRotation(node_->GetRotation() * (offset.x_ >= 0.0 ? Quaternion(0.0f, 0.0f, -90.0f) :
         Quaternion(0.0f, 0.0f, 90.0f)));
     wheelNode->SetScale(Vector3(0.8f, 0.5f, 0.8f));
 
@@ -103,7 +103,7 @@ Node* Vehicle::InitWheel(const String& name, const Vector3& offset)
     wheelBody->SetCollisionLayer(1);
     wheelConstraint->SetConstraintType(CONSTRAINT_HINGE);
     wheelConstraint->SetOtherBody(GetComponent<RigidBody>()); // Connect to the hull body
-    wheelConstraint->SetWorldPosition(wheelNode->GetWorldPosition()); // Set constraint's both ends at wheel's location
+    wheelConstraint->SetWorldPosition(wheelNode->GetPosition()); // Set constraint's both ends at wheel's location
     wheelConstraint->SetAxis(Vector3::UP); // Wheel rotates around its local Y-axis
     wheelConstraint->SetOtherAxis(offset.x_ >= 0.0 ? Vector3::RIGHT : Vector3::LEFT); // Wheel's hull axis points either left or right
     wheelConstraint->SetLowLimit(Vector2(-180.0f, 0.0f)); // Let the wheel rotate freely around the axis
