@@ -1311,7 +1311,7 @@ For a demonstration of the navigation capabilities, check the Navigation script 
 
 \page UI User interface
 
-Urho3D implements a simple, hierarchical user interface system based on rectangular elements. The elements provided by default are:
+Urho3D implements a simple, hierarchical user interface system based on rectangular elements. The elements provided are:
 
 - BorderImage: a texture image with an optional border
 - Button: a pushbutton
@@ -1327,6 +1327,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 - Sprite: a texture image which supports subpixel positioning, scaling and rotating.
 - Text: static text that can be multiline
 - UIElement: container for other elements, renders nothing by itself
+- View3D: a window that renders a 3D viewport
 - Window: a movable and resizable window
 
 The root %UI element can be queried from the UI subsystem. It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.

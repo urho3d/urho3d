@@ -96,10 +96,10 @@ void SoundEffects::CreateUI()
     
     // Create buttons for playing/stopping music
     Button* button = CreateButton(20, 80, 120, 40, "Play Music");
-    SubscribeToEvent(button, E_PRESSED, HANDLER(SoundEffects, HandlePlayMusic));
+    SubscribeToEvent(button, E_RELEASED, HANDLER(SoundEffects, HandlePlayMusic));
     
     button = CreateButton(160, 80, 120, 40, "Stop Music");
-    SubscribeToEvent(button, E_PRESSED, HANDLER(SoundEffects, HandleStopMusic));
+    SubscribeToEvent(button, E_RELEASED, HANDLER(SoundEffects, HandleStopMusic));
     
     Audio* audio = GetSubsystem<Audio>();
     
