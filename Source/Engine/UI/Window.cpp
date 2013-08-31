@@ -142,6 +142,7 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
 
     IntVector2 delta = screenPosition - dragBeginCursor_;
     IntVector2 dragSize;
+    IntVector2 resizeBorderSize(resizeBorder_.left_ + resizeBorder_.right_, resizeBorder_.top_ + resizeBorder_.bottom_);
 
     const IntVector2& position_ = GetPosition();
     const IntVector2& size_ = GetSize();
@@ -158,50 +159,50 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)),
             Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
         dragSize = dragBeginSize_ - delta;
-        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
-        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
+        fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
+        fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_TOP:
         SetPosition(dragBeginPosition_.x_, Clamp(dragBeginPosition_.y_ + delta.y_, position_.y_ - (maxSize_.y_ - size_.y_), position_.y_ + (size_.y_ - minSize_.y_)));
         dragSize = IntVector2(dragBeginSize_.x_, dragBeginSize_.y_ - delta.y_);
-        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
+        fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_TOPRIGHT:
         SetPosition(dragBeginPosition_.x_, dragBeginPosition_.y_ + delta.y_);
         dragSize = IntVector2(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_ - delta.y_);
-        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
-        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
+        fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
+        fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_RIGHT:
         dragSize = IntVector2(dragBeginSize_.x_ + delta.x_, dragBeginSize_.y_);
-        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
+        fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
         break;
 
     case DRAG_RESIZE_BOTTOMRIGHT:
         dragSize = dragBeginSize_ + delta;
-        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
-        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
+        fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
+        fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_BOTTOM:
         dragSize = IntVector2(dragBeginSize_.x_, dragBeginSize_.y_ + delta.y_);
-        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
+        fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_BOTTOMLEFT:
         SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
         dragSize = IntVector2(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_ + delta.y_);
-        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
-        fixedHeightResizing_ ? SetFixedHeight(dragSize.y_) : SetHeight(dragSize.y_);
+        fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
+        fixedHeightResizing_ ? SetFixedHeight(Max(dragSize.y_, resizeBorderSize.y_)) : SetHeight(dragSize.y_);
         break;
 
     case DRAG_RESIZE_LEFT:
         SetPosition(Clamp(dragBeginPosition_.x_ + delta.x_, position_.x_ - (maxSize_.x_ - size_.x_), position_.x_ + (size_.x_ - minSize_.x_)), dragBeginPosition_.y_);
         dragSize = IntVector2(dragBeginSize_.x_ - delta.x_, dragBeginSize_.y_);
-        fixedWidthResizing_ ? SetFixedWidth(dragSize.x_) : SetWidth(dragSize.x_);
+        fixedWidthResizing_ ? SetFixedWidth(Max(dragSize.x_, resizeBorderSize.x_)) : SetWidth(dragSize.x_);
         break;
 
     default:

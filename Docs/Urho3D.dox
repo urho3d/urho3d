@@ -54,6 +54,7 @@ Urho3D development, contributions and bugfixes by:
 - Colin Barrett
 - Erik Beran
 - Carlo Carollo
+- Sebastian Delatorre
 - Chris Friesen
 - Alex Fuller
 - Mika Heinonen
@@ -144,7 +145,7 @@ V1.23
 - Switched to GLEW library for OpenGL extension handling.
 - Vegetation and lightmapping example shaders.
 - %Engine configuration through a parameter map.
-- Lots of refactoring, code cleanup and bugfixes.'
+- Lots of refactoring, code cleanup and bugfixes.
 
 V1.22
 
