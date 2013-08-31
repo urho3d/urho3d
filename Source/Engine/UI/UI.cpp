@@ -794,6 +794,120 @@ void UI::SetCursorShape(CursorShape shape)
         cursor_->SetShape(shape);
 }
 
+void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
+{
+    if (cursorVisible)
+    {
+        WeakPtr<UIElement> element(GetElementAt(cursorPos));
+
+        if (element)
+        {
+            // Handle focusing & bringing to front
+            if (button == MOUSEB_LEFT)
+            {
+                SetFocusElement(element);
+                element->BringToFront();
+            }
+
+            // Handle click
+            element->OnClick(element->ScreenToElement(cursorPos), cursorPos, buttons, qualifiers, cursor);
+            SendClickEvent(E_UIMOUSECLICK, element, cursorPos, button, buttons, qualifiers);
+
+            // Fire double click event if element matches and is in time
+            if (doubleClickElement_ && element == doubleClickElement_ && clickTimer_->GetMSec(true) <
+                (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
+            {
+                element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, buttons, qualifiers, cursor);
+                doubleClickElement_.Reset();
+                SendClickEvent(E_UIMOUSEDOUBLECLICK, element, cursorPos, button, buttons, qualifiers);
+            }
+            else
+            {
+                doubleClickElement_ = element;
+                clickTimer_->Reset();
+            }
+            
+            // Handle start of drag. Click handling may have caused destruction of the element, so check the pointer again
+            if (element && !dragElement_ && buttons == MOUSEB_LEFT)
+            {
+                dragElement_ = element;
+                element->OnDragBegin(element->ScreenToElement(cursorPos), cursorPos, buttons, qualifiers, cursor);
+                SendDragEvent(E_DRAGBEGIN, element, cursorPos);
+            }
+        }
+        else
+        {
+            // If clicked over no element, or a disabled element, lose focus
+            SetFocusElement(0);
+            SendClickEvent(E_UIMOUSECLICK, element, cursorPos, button, buttons, qualifiers);
+        }
+        
+        lastMouseButtons_ = buttons;
+    }
+}
+
+void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
+{
+    WeakPtr<UIElement> element(GetElementAt(cursorPos));
+
+    if (cursorVisible || dragElement_)
+    {
+        if (dragElement_ && !buttons)
+        {
+            if (dragElement_->IsEnabled() && dragElement_->IsVisible())
+            {
+                dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor);
+                SendDragEvent(E_DRAGEND, dragElement_, cursorPos);
+
+                // Drag and drop finish
+                bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
+                if (dragSource)
+                {
+                    bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
+                    bool dragDropFinish = dragSource && dragTarget && element != dragElement_;
+
+                    if (dragDropFinish)
+                    {
+                        bool accept = element->OnDragDropFinish(dragElement_);
+
+                        // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
+                        if (accept && dragElement_ && element)
+                        {
+                            using namespace DragDropFinish;
+
+                            VariantMap eventData;
+                            eventData[P_SOURCE] = (void*)dragElement_.Get();
+                            eventData[P_TARGET] = (void*)element.Get();
+                            eventData[P_ACCEPT] = accept;
+                            SendEvent(E_DRAGDROPFINISH, eventData);
+                        }
+                    }
+                }
+            }
+
+            dragElement_.Reset();
+        }
+    }
+}
+
+void UI::ProcessMove(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
+{
+    if (cursorVisible && dragElement_ && buttons)
+    {
+        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
+        {
+            dragElement_->OnDragMove(dragElement_->ScreenToElement(cursorPos), cursorPos, buttons, qualifiers, cursor);
+            SendDragEvent(E_DRAGMOVE, dragElement_, cursorPos);
+        }
+        else
+        {
+            dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor);
+            SendDragEvent(E_DRAGEND, dragElement_, cursorPos);
+            dragElement_.Reset();
+        }
+    }
+}
+
 void UI::SendDragEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos)
 {
     if (!element)
@@ -849,56 +963,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    if (cursorVisible)
-    {
-        int button = eventData[MouseButtonDown::P_BUTTON].GetInt();
-
-        WeakPtr<UIElement> element(GetElementAt(cursorPos));
-
-        if (element)
-        {
-            // Handle focusing & bringing to front
-            if (button == MOUSEB_LEFT)
-            {
-                SetFocusElement(element);
-                element->BringToFront();
-            }
-
-            // Handle click
-            element->OnClick(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
-            SendClickEvent(E_UIMOUSECLICK, element, cursorPos, button, mouseButtons_, qualifiers_);
-
-            // Fire double click event if element matches and is in time
-            if (doubleClickElement_ && element == doubleClickElement_ && clickTimer_->GetMSec(true) <
-                (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == mouseButtons_)
-            {
-                element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
-                doubleClickElement_.Reset();
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, element, cursorPos, button, mouseButtons_, qualifiers_);
-            }
-            else
-            {
-                doubleClickElement_ = element;
-                clickTimer_->Reset();
-            }
-            
-            // Handle start of drag. Click handling may have caused destruction of the element, so check the pointer again
-            if (element && !dragElement_ && mouseButtons_ == MOUSEB_LEFT)
-            {
-                dragElement_ = element;
-                element->OnDragBegin(element->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
-                SendDragEvent(E_DRAGBEGIN, element, cursorPos);
-            }
-        }
-        else
-        {
-            // If clicked over no element, or a disabled element, lose focus
-            SetFocusElement(0);
-            SendClickEvent(E_UIMOUSECLICK, element, cursorPos, button, mouseButtons_, qualifiers_);
-        }
-        
-        lastMouseButtons_ = mouseButtons_;
-    }
+    ProcessClickBegin(cursorPos, eventData[MouseButtonDown::P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
@@ -912,45 +977,7 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    if (cursorVisible || dragElement_)
-    {
-        if (dragElement_ && !mouseButtons_)
-        {
-            if (dragElement_->IsEnabled() && dragElement_->IsVisible())
-            {
-                dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor_);
-                SendDragEvent(E_DRAGEND, dragElement_, cursorPos);
-
-                // Drag and drop finish
-                bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
-                if (dragSource)
-                {
-                    WeakPtr<UIElement> target(GetElementAt(cursorPos));
-                    bool dragTarget = target && (target->GetDragDropMode() & DD_TARGET) != 0;
-                    bool dragDropFinish = dragSource && dragTarget && target != dragElement_;
-
-                    if (dragDropFinish)
-                    {
-                        bool accept = target->OnDragDropFinish(dragElement_);
-
-                        // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
-                        if (accept && dragElement_ && target)
-                        {
-                            using namespace DragDropFinish;
-
-                            VariantMap eventData;
-                            eventData[P_SOURCE] = (void*)dragElement_.Get();
-                            eventData[P_TARGET] = (void*)target.Get();
-                            eventData[P_ACCEPT] = accept;
-                            SendEvent(E_DRAGDROPFINISH, eventData);
-                        }
-                    }
-                }
-            }
-
-            dragElement_.Reset();
-        }
-    }
+    ProcessClickEnd(cursorPos, eventData[P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
@@ -990,20 +1017,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    if (cursorVisible && dragElement_ && mouseButtons_)
-    {
-        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
-        {
-            dragElement_->OnDragMove(dragElement_->ScreenToElement(cursorPos), cursorPos, mouseButtons_, qualifiers_, cursor_);
-            SendDragEvent(E_DRAGMOVE, dragElement_, cursorPos);
-        }
-        else
-        {
-            dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor_);
-            SendDragEvent(E_DRAGEND, dragElement_, cursorPos);
-            dragElement_.Reset();
-        }
-    }
+    ProcessMove(cursorPos, mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
 void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
@@ -1058,44 +1072,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     WeakPtr<UIElement> element(GetElementAt(pos));
     usingTouchInput_ = true;
 
-    if (element)
-    {
-        // Handle focusing & bringing to front
-        SetFocusElement(element);
-        element->BringToFront();
-
-        // Handle click
-        element->OnClick(element->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
-        SendClickEvent(E_UIMOUSECLICK, element, pos, MOUSEB_LEFT, MOUSEB_LEFT, 0);
-        
-        // Fire double click event if element matches and is in time
-        if (doubleClickElement_ && element == doubleClickElement_ && clickTimer_->GetMSec(true) <
-            (unsigned)(doubleClickInterval_ * 1000))
-        {
-            element->OnDoubleClick(element->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
-            doubleClickElement_.Reset();
-            SendClickEvent(E_UIMOUSEDOUBLECLICK, element, pos, MOUSEB_LEFT, MOUSEB_LEFT, 0);
-        }
-        else
-        {
-            doubleClickElement_ = element;
-            clickTimer_->Reset();
-        }
-        
-        // Handle start of drag. Click handling may have caused destruction of the element, so check the pointer again
-        if (element && !dragElement_ )
-        {
-            dragElement_ = element;
-            element->OnDragBegin(element->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
-            SendDragEvent(E_DRAGBEGIN, element, pos);
-        }
-    }
-    else
-    {
-        // If clicked over no element, or a disabled element, lose focus
-        SetFocusElement(0);
-        SendClickEvent(E_UIMOUSECLICK, element, pos, MOUSEB_LEFT, MOUSEB_LEFT, 0);
-    }
+    ProcessClickBegin(pos, MOUSEB_LEFT, MOUSEB_LEFT, 0, 0, true);
 }
 
 void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
@@ -1109,42 +1086,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     if (element && element->IsEnabled())
         element->OnHover(element->ScreenToElement(pos), pos, 0, 0, 0);
 
-    if (dragElement_)
-    {
-        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
-        {
-            dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, cursor_);
-            SendDragEvent(E_DRAGEND, dragElement_, pos);
-
-            // Drag and drop finish
-            bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
-            if (dragSource)
-            {
-                WeakPtr<UIElement> target(GetElementAt(pos));
-                bool dragTarget = target && (target->GetDragDropMode() & DD_TARGET) != 0;
-                bool dragDropFinish = dragSource && dragTarget && target != dragElement_;
-
-                if (dragDropFinish)
-                {
-                    bool accept = target->OnDragDropFinish(dragElement_);
-
-                    // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
-                    if (accept && dragElement_ && target)
-                    {
-                        using namespace DragDropFinish;
-
-                        VariantMap eventData;
-                        eventData[P_SOURCE] = (void*)dragElement_.Get();
-                        eventData[P_TARGET] = (void*)target.Get();
-                        eventData[P_ACCEPT] = accept;
-                        SendEvent(E_DRAGDROPFINISH, eventData);
-                    }
-                }
-            }
-        }
-
-        dragElement_.Reset();
-    }
+    ProcessClickEnd(pos, MOUSEB_LEFT, 0, 0, 0, true);
 }
 
 void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
@@ -1154,20 +1096,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
     usingTouchInput_ = true;
 
-    if (dragElement_)
-    {
-        if (dragElement_->IsEnabled() && dragElement_->IsVisible())
-        {
-            dragElement_->OnDragMove(dragElement_->ScreenToElement(pos), pos, MOUSEB_LEFT, 0, 0);
-            SendDragEvent(E_DRAGMOVE, dragElement_, pos);
-        }
-        else
-        {
-            dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, 0);
-            SendDragEvent(E_DRAGEND, dragElement_, pos);
-            dragElement_.Reset();
-        }
-    }
+    ProcessMove(pos, MOUSEB_LEFT, 0, 0, true);
 }
 
 void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)

@@ -126,6 +126,12 @@ private:
     void GetCursorPositionAndVisible(IntVector2& pos, bool& visible);
     /// Set active cursor's shape.
     void SetCursorShape(CursorShape shape);
+    /// Handle button or touch begin.
+    void ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
+    /// Handle button or touch end.
+    void ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
+    /// Handle mouse or touch move.
+    void ProcessMove(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Send a UI element drag event.
     void SendDragEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos);
     /// Send a UI click or double click event.
