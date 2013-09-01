@@ -241,6 +241,19 @@ void Physics::MoveCamera(float timeStep)
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
         SpawnObject();
     
+    // Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
+    // directory
+    if (input->GetKeyPress(KEY_F5))
+    {
+        File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Physics.xml", FILE_WRITE);
+        scene_->SaveXML(saveFile);
+    }
+    if (input->GetKeyPress(KEY_F7))
+    {
+        File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Physics.xml", FILE_READ);
+        scene_->LoadXML(loadFile);
+    }
+
     // Toggle physics debug geometry with space
     if (input->GetKeyPress(KEY_SPACE))
         drawDebug_ = !drawDebug_;
@@ -283,20 +296,6 @@ void Physics::HandleUpdate(StringHash eventType, VariantMap& eventData)
     
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
-    
-    // Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
-    // directory
-    Input* input = GetSubsystem<Input>();
-    if (input->GetKeyPress(KEY_F5))
-    {
-        File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Physics.xml", FILE_WRITE);
-        scene_->SaveXML(saveFile);
-    }
-    if (input->GetKeyPress(KEY_F7))
-    {
-        File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Physics.xml", FILE_READ);
-        scene_->LoadXML(loadFile);
-    }
 }
 
 void Physics::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
