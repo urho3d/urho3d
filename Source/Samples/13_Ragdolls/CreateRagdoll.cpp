@@ -36,7 +36,7 @@ CreateRagdoll::CreateRagdoll(Context* context) :
 
 void CreateRagdoll::OnNodeSet(Node* node)
 {
-    // If the node pointer is nonzero, this component has been created into a scene node. Subscribe physics collisions that
+    // If the node pointer is nonzero, this component has been created into a scene node. Subscribe to physics collisions that
     // concern this scene node
     if (node)
         SubscribeToEvent(node, E_NODECOLLISION, HANDLER(CreateRagdoll, HandleNodeCollision));

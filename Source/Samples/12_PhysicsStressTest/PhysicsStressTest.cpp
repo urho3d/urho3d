@@ -137,7 +137,7 @@ void PhysicsStressTest::CreateScene()
             mushroomObject->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
             mushroomObject->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
             mushroomObject->SetCastShadows(true);
-            
+
             RigidBody* body = mushroomNode->CreateComponent<RigidBody>();
             CollisionShape* shape = mushroomNode->CreateComponent<CollisionShape>();
             // By default the highest LOD level will be used, the LOD level can be passed as an optional parameter
@@ -151,7 +151,7 @@ void PhysicsStressTest::CreateScene()
         for (unsigned i = 0; i < NUM_OBJECTS; ++i)
         {
             Node* boxNode = scene_->CreateChild("Box");
-            boxNode->SetPosition(Vector3(0.f, i * 2.0f + 100.0f, 0.0f));
+            boxNode->SetPosition(Vector3(0.0f, i * 2.0f + 100.0f, 0.0f));
             StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
             boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
             boxObject->SetMaterial(cache->GetResource<Material>("Materials/StoneSmall.xml"));
@@ -254,8 +254,7 @@ void PhysicsStressTest::MoveCamera(float timeStep)
     
     // "Shoot" a physics object with left mousebutton
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
-        SpawnObject();
-    
+        SpawnObject();  
 
     // Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
     // directory
