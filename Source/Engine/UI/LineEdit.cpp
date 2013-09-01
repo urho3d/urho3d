@@ -112,9 +112,9 @@ void LineEdit::Update(float timeStep)
     cursor_->SetVisible(cursorVisible);
 }
 
-void LineEdit::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (buttons & MOUSEB_LEFT && cursorMovable_)
+    if (button == MOUSEB_LEFT && cursorMovable_)
     {
         unsigned pos = GetCharIndex(position);
         if (pos != M_MAX_UNSIGNED)
@@ -125,9 +125,10 @@ void LineEdit::OnClick(const IntVector2& position, const IntVector2& screenPosit
     }
 }
 
-void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void LineEdit::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
-    text_->SetSelection(0);
+    if (button == MOUSEB_LEFT)
+        text_->SetSelection(0);
 }
 
 void LineEdit::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)

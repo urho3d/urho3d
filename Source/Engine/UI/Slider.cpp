@@ -96,16 +96,15 @@ void Slider::OnHover(const IntVector2& position, const IntVector2& screenPositio
 
     // If not hovering on the knob, send it as page event
     if (!hovering_)
-        Page(position, buttons, qualifiers);
+        Page(position, 0, buttons, qualifiers);
 }
 
-void Slider::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Slider::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
-    BorderImage::OnClick(position, screenPosition, buttons, qualifiers, cursor);
     selected_ = true;
     hovering_ = knob_->IsInside(screenPosition, true);
     if (!hovering_)
-        Page(position, buttons, qualifiers);
+        Page(position, button, buttons, qualifiers);
 }
 
 void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
@@ -239,7 +238,7 @@ void Slider::UpdateSlider()
     }
 }
 
-void Slider::Page(const IntVector2& position, int buttons, int qualifiers)
+void Slider::Page(const IntVector2& position, int button, int buttons, int qualifiers)
 {
     IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
     int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
@@ -255,6 +254,7 @@ void Slider::Page(const IntVector2& position, int buttons, int qualifiers)
     if (selected_ && repeatRate_ > 0.0f && repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0, Abs(offset) / length))
     {
         repeatTimer_.Reset();
+        eventData[P_BUTTON] = button;
         eventData[P_BUTTONS] = buttons;
         eventData[P_QUALIFIERS] = qualifiers;
     }

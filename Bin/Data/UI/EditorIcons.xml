@@ -171,6 +171,10 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="144 32 158 46" />
     </element>
+    <element type="View3D">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="144 32 158 46" />
+    </element>
     <element type="ScrollBar">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="128 32 142 46" />

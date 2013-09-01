@@ -43,9 +43,9 @@ public:
     /// Perform UI element update.
     virtual void Update(float timeStep);
     /// React to mouse hover.
-    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse click.
-    virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition,  int buttons, int qualifiers, Cursor* cursor);
+    /// React to mouse click begin.
+    virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag begin.
     virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
@@ -83,7 +83,7 @@ protected:
     /// Update slider knob position & size.
     void UpdateSlider();
     /// Send slider page event.
-    void Page(const IntVector2& position, int buttons, int qualifiers);
+    void Page(const IntVector2& position, int button, int buttons, int qualifiers);
 
     /// Slider knob.
     SharedPtr<BorderImage> knob_;

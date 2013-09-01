@@ -38,6 +38,18 @@ EVENT(E_UIMOUSECLICK, UIMouseClick)
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
+/// Mouse click end in the UI.
+EVENT(E_UIMOUSECLICKEND, UIMouseClickEnd)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_BEGINELEMENT, BeginElement);    // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
 /// Mouse double click in the UI.
 EVENT(E_UIMOUSEDOUBLECLICK, UIMouseDoubleClick)
 {
@@ -150,6 +162,7 @@ EVENT(E_SLIDERPAGED, SliderPaged)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
     PARAM(P_OFFSET, Offset);                // int
+    PARAM(P_BUTTON, Button);                // int
     PARAM(P_BUTTONS, Buttons);              // int
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 }

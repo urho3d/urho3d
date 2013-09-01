@@ -66,9 +66,9 @@ void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexD
     BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
-void CheckBox::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void CheckBox::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
 {
-    if (buttons & MOUSEB_LEFT)
+    if (button == MOUSEB_LEFT && beginElement == this)
         SetChecked(!checked_);
 }
 

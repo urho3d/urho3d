@@ -215,6 +215,8 @@ private:
     unsigned nonModalBatchSize_;
     /// Timer used to trigger double click.
     Timer* clickTimer_;
+    /// UI element last clicked for tracking click end.
+    WeakPtr<UIElement> clickElement_;
     /// UI element last clicked for tracking double clicks.
     WeakPtr<UIElement> doubleClickElement_;
     /// Last mouse button pressed.

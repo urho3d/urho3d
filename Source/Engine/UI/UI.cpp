@@ -810,14 +810,17 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
             }
 
             // Handle click
-            element->OnClick(element->ScreenToElement(cursorPos), cursorPos, buttons, qualifiers, cursor);
+            element->OnClickBegin(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
             SendClickEvent(E_UIMOUSECLICK, element, cursorPos, button, buttons, qualifiers);
 
+            // Remember element clicked on for the click end
+            clickElement_ = element;
+            
             // Fire double click event if element matches and is in time
             if (doubleClickElement_ && element == doubleClickElement_ && clickTimer_->GetMSec(true) <
                 (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
             {
-                element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, buttons, qualifiers, cursor);
+                element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
                 SendClickEvent(E_UIMOUSEDOUBLECLICK, element, cursorPos, button, buttons, qualifiers);
             }
@@ -848,10 +851,17 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
 
 void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
 {
-    WeakPtr<UIElement> element(GetElementAt(cursorPos));
-
-    if (cursorVisible || dragElement_)
+    if (cursorVisible)
     {
+        WeakPtr<UIElement> element(GetElementAt(cursorPos));
+
+        // Handle end of click
+        if (element)
+            element->OnClickEnd(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor, clickElement_);
+        
+        SendClickEvent(E_UIMOUSECLICKEND, element, cursorPos, button, buttons, qualifiers);
+        
+        // Handle end of drag
         if (dragElement_ && !buttons)
         {
             if (dragElement_->IsEnabled() && dragElement_->IsVisible())
@@ -859,7 +869,6 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
                 dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor);
                 SendDragEvent(E_DRAGEND, dragElement_, cursorPos);
 
-                // Drag and drop finish
                 bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
                 if (dragSource)
                 {
@@ -887,6 +896,8 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
 
             dragElement_.Reset();
         }
+        
+        clickElement_.Reset();
     }
 }
 
@@ -936,6 +947,10 @@ void UI::SendClickEvent(StringHash eventType, UIElement* element, const IntVecto
     eventData[UIMouseClick::P_BUTTON] = button;
     eventData[UIMouseClick::P_BUTTONS] = buttons;
     eventData[UIMouseClick::P_QUALIFIERS] = qualifiers;
+    
+    // For click end events, send also the element the click began on
+    if (eventType == E_UIMOUSECLICKEND)
+        eventData[UIMouseClickEnd::P_BEGINELEMENT] = clickElement_;
     
     SendEvent(eventType, eventData);
 }

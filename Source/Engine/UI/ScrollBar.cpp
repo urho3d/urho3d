@@ -284,16 +284,28 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
     if (eventData[P_BUTTONS].GetInt() & MOUSEB_LEFT)
     {
         if (eventData[P_OFFSET].GetInt() < 0)
-            backButton_->OnClick(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        {
+            backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
+                eventData[P_BUTTON].GetInt(), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        }
         else
-            forwardButton_->OnClick(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        {
+            forwardButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
+                eventData[P_BUTTON].GetInt(), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        }
     }
     else
     {
         if (eventData[P_OFFSET].GetInt() < 0)
-            backButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        {
+            backButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(),
+                eventData[P_QUALIFIERS].GetInt(), 0);
+        }
         else
-            forwardButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        {
+            forwardButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
+                eventData[P_BUTTONS].GetInt(), eventData[P_QUALIFIERS].GetInt(), 0);
+        }
     }
 }
 

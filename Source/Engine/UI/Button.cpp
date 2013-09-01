@@ -94,24 +94,9 @@ void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
-void Button::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
-    BorderImage::OnHover(position, screenPosition, buttons, qualifiers, cursor);
-    if (pressed_ && !(buttons & MOUSEB_LEFT))
-    {
-        SetPressed(false);
-
-        using namespace Released;
-
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        SendEvent(E_RELEASED, eventData);
-    }
-}
-
-void Button::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
-{
-    if (buttons & MOUSEB_LEFT)
+    if (button == MOUSEB_LEFT)
     {
         SetPressed(true);
         repeatTimer_ = repeatDelay_;
@@ -122,6 +107,20 @@ void Button::OnClick(const IntVector2& position, const IntVector2& screenPositio
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         SendEvent(E_PRESSED, eventData);
+    }
+}
+
+void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
+{
+    if (pressed_ && button == MOUSEB_LEFT)
+    {
+        SetPressed(false);
+
+        using namespace Released;
+
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        SendEvent(E_RELEASED, eventData);
     }
 }
 

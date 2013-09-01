@@ -485,11 +485,15 @@ void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosi
     hovering_ = true;
 }
 
-void UIElement::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void UIElement::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
 }
 
-void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+void UIElement::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
+{
+}
+
+void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
 }
 
