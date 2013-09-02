@@ -70,10 +70,11 @@ void CreateScene()
         floorObject.model = cache.GetResource("Model", "Models/Box.mdl");
         floorObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
 
-        // Make the floor physical by adding RigidBody and CollisionShape components. The RigidBody's default
-        // parameters make the object static (zero mass.) Note that a CollisionShape by itself will not participate
-        // in the physics simulation
+        // Make the floor physical by adding RigidBody and CollisionShape components
         RigidBody@ body = floorNode.CreateComponent("RigidBody");
+        // We will be spawning spherical objects in this sample. The ground also needs non-zero rolling friction so that
+        // the spheres will eventually come to rest
+        body.rollingFriction = 0.15f;
         CollisionShape@ shape = floorNode.CreateComponent("CollisionShape");
         // Set a box shape of size 1 x 1 x 1 for collision. The shape will be scaled with the scene node scale, so the
         // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)

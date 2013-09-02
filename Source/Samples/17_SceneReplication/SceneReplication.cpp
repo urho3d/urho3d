@@ -180,7 +180,7 @@ void SceneReplication::CreateUI()
     // Position the text relative to the screen center
     instructionsText_->SetHorizontalAlignment(HA_CENTER);
     instructionsText_->SetVerticalAlignment(VA_CENTER);
-    instructionsText_->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
+    instructionsText_->SetPosition(0, graphics->GetHeight() / 4);
     // Hide until connected
     instructionsText_->SetVisible(false);
     
