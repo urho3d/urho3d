@@ -134,16 +134,15 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 
     // Toggle console with F1
-    if (key == KEY_F1)
+    else if (key == KEY_F1)
         GetSubsystem<Console>()->Toggle();
     
     // Toggle debug HUD with F2
-    if (key == KEY_F2)
+    else if (key == KEY_F2)
         GetSubsystem<DebugHud>()->ToggleAll();
     
     // Common rendering quality controls, only when UI has no focused element
-    UIElement* focusElement = GetSubsystem<UI>()->GetFocusElement();
-    if (!focusElement)
+    else if (!GetSubsystem<UI>()->GetFocusElement())
     {
         Renderer* renderer = GetSubsystem<Renderer>();
         
@@ -158,7 +157,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Material quality
-        if (key == '2')
+        else if (key == '2')
         {
             int quality = renderer->GetMaterialQuality();
             ++quality;
@@ -168,15 +167,15 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Specular lighting
-        if (key == '3')
+        else if (key == '3')
             renderer->SetSpecularLighting(!renderer->GetSpecularLighting());
         
         // Shadow rendering
-        if (key == '4')
+        else if (key == '4')
             renderer->SetDrawShadows(!renderer->GetDrawShadows());
         
         // Shadow map resolution
-        if (key == '5')
+        else if (key == '5')
         {
             int shadowMapSize = renderer->GetShadowMapSize();
             shadowMapSize *= 2;
@@ -186,7 +185,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Shadow depth and filtering quality
-        if (key == '6')
+        else if (key == '6')
         {
             int quality = renderer->GetShadowQuality();
             ++quality;
@@ -196,7 +195,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Occlusion culling
-        if (key == '7')
+        else if (key == '7')
         {
             bool occlusion = renderer->GetMaxOccluderTriangles() > 0;
             occlusion = !occlusion;
@@ -204,7 +203,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Instancing
-        if (key == '8')
+        else if (key == '8')
             renderer->SetDynamicInstancing(!renderer->GetDynamicInstancing());
     }
 }
