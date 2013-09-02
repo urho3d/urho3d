@@ -186,7 +186,7 @@ void VehicleDemo::CreateInstructions()
 
 void VehicleDemo::SubscribeToEvents()
 {
-    // Subscribe to Update event for setting the character controls before physics simulation
+    // Subscribe to Update event for setting the vehicle controls before physics simulation
     SubscribeToEvent(E_UPDATE, HANDLER(VehicleDemo, HandleUpdate));
     
     // Subscribe to PostUpdate event for updating the camera position after physics simulation

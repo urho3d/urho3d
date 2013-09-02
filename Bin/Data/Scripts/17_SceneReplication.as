@@ -329,13 +329,13 @@ void HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
             // Movement torque is applied before each simulation step, which happen at 60 FPS. This makes the simulation
             // independent from rendering framerate. We could also apply forces (which would enable in-air control),
             // but want to emphasize that it's a ball which should only control its motion by rolling along the ground
-            if (connection.controls.buttons & CTRL_FORWARD != 0)
+            if (connection.controls.IsDown(CTRL_FORWARD))
                 body.ApplyTorque(rotation * Vector3(1.0f, 0.0f, 0.0f) * MOVE_TORQUE);
-            if (connection.controls.buttons & CTRL_BACK != 0)
+            if (connection.controls.IsDown(CTRL_BACK))
                 body.ApplyTorque(rotation * Vector3(-1.0f, 0.0f, 0.0f) * MOVE_TORQUE);
-            if (connection.controls.buttons & CTRL_LEFT != 0)
+            if (connection.controls.IsDown(CTRL_LEFT))
                 body.ApplyTorque(rotation * Vector3(0.0f, 0.0f, 1.0f) * MOVE_TORQUE);
-            if (connection.controls.buttons & CTRL_RIGHT != 0)
+            if (connection.controls.IsDown(CTRL_RIGHT))
                 body.ApplyTorque(rotation * Vector3(0.0f, 0.0f, -1.0f) * MOVE_TORQUE);
         }
     }
