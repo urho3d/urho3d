@@ -90,18 +90,16 @@ function HandleKeyDown(eventType, eventData)
             local console = GetConsole()
             console:SetVisible(false)
         end
-    end
-    
-    if key == KEY_F1 then
+
+    elseif key == KEY_F1 then
         local console = GetConsole()
         console:Toggle()
-    end
-    
-    if key == KEY_F2 then
+
+    elseif key == KEY_F2 then
         local debugHud = GetDebugHud()
         debugHud:ToggleAll()
     end
-    
+
     local ui = GetUI()
     if ui.focusElement == nil then
         local renderer = GetRenderer()
@@ -113,50 +111,44 @@ function HandleKeyDown(eventType, eventData)
                 quality = QUALITY_LOW
             end
             renderer.textureQuality = quality
-        end
-        
+
         -- Material quality
-        if key == KEY_2 then
+        elseif key == KEY_2 then
             local quality = renderer.materialQuality
             quality = quality + 1
             if quality > QUALITY_HIGH then
                 quality = QUALITY_LOW
             end
             renderer.materialQuality = quality
-        end
 
         -- Specular lighting
-        if key == KEY_3 then
+        elseif key == KEY_3 then
             renderer.specularLighting = not renderer.specularLighting
-        end
-        
+
         -- Shadow rendering
-        if key == KEY_4 then
+        elseif key == KEY_4 then
             renderer.drawShadows = not renderer.drawShadows
-        end
-        
+
         -- Shadow map resolution
-        if key == KEY_5 then
+        elseif key == KEY_5 then
             local shadowMapSize = renderer.shadowMapSize
             shadowMapSize = shadowMapSize * 2
             if shadowMapSize > 2048 then
                 shadowMapSize = 512
             end
             renderer.shadowMapSize = shadowMapSize
-        end
-        
+
         -- Shadow depth and filtering quality
-        if key == KEY_6 then
+        elseif key == KEY_6 then
             local quality = renderer.shadowQuality
             quality = quality + 1
             if quality > SHADOWQUALITY_HIGH_24BIT then
                 quality = SHADOWQUALITY_LOW_16BIT
             end
             renderer.shadowQuality = quality
-        end
-        
+
         -- Occlusion culling
-        if key == KEY_7 then
+        elseif key == KEY_7 then
             local occlusion = renderer.maxOccluderTriangles > 0
             occlusion = not occlusion
             if occlusion then
@@ -164,10 +156,9 @@ function HandleKeyDown(eventType, eventData)
             else
                 renderer.maxOccluderTriangles = 0
             end
-        end
-        
+
         -- Instancing
-        if key == KEY_8 then
+        elseif key == KEY_8 then
             renderer.dynamicInstancing = not renderer.dynamicInstancing
         end
     end

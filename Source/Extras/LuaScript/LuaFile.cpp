@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "Log.h"
 #include "LuaFile.h"
 #include "ProcessUtils.h"
 #include "Serializer.h"
@@ -33,6 +34,8 @@ extern "C"
 #include <lualib.h>
 #include <lauxlib.h>
 }
+
+#include "DebugNew.h"
 
 namespace Urho3D
 {
@@ -100,7 +103,7 @@ bool LuaFile::Execute(lua_State* luaState)
     if (error)
     {
         const char* message = lua_tostring(luaState, -1);
-        ErrorDialog("Load Buffer Failed", message);
+        LOGERROR("Load Buffer Failed: " + String(message));
         lua_settop(luaState, top);
         return false;
     }
@@ -108,7 +111,7 @@ bool LuaFile::Execute(lua_State* luaState)
     if (lua_pcall(luaState, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState, -1);
-        ErrorDialog("Lua Execute Failed", message);
+        LOGERROR("Lua Execute Failed: " + String(message));
         lua_settop(luaState, top);
         return false;
     }

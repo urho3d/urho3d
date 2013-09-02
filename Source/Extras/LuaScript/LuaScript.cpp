@@ -73,7 +73,7 @@ LuaScript::LuaScript(Context* context) :
     luaState_ = luaL_newstate();
     if (!luaState_)
     {
-        ErrorDialog("Lua Error", "Could not create Lua state.");
+        LOGERROR("Could not create Lua state.");
         return;
     }
 
@@ -131,7 +131,7 @@ bool LuaScript::ExecuteString(const String& string)
     if (luaL_dostring(luaState_, string.CString()) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
-        ErrorDialog("Execute Lua String Failed", message);
+        LOGERROR("Execute Lua String Failed: " + String(message));
         lua_settop(luaState_, top);
         return false;
     }
@@ -154,7 +154,7 @@ bool LuaScript::ExecuteFunction(const String& functionName)
     if (lua_pcall(luaState_, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState_, -1);
-        ErrorDialog("Execute Lua Function Failed", message);
+        LOGERROR("Execute Lua Function Failed: " + String(message));
         lua_settop(luaState_, top);
         return false;
     }
@@ -223,7 +223,7 @@ int LuaScript::Loader(lua_State* L)
     if (error)
     {
         const char* message = lua_tostring(L, -1);
-        ErrorDialog("Execute Lua File Failed", message);
+        LOGERROR("Execute Lua File Failed: " + String(message));
         lua_settop(L, top);
         return 0;
     }
@@ -282,7 +282,7 @@ bool LuaScript::FindFunction(const String& functionName)
     {
         if (!lua_istable(luaState_, -1))
         {
-            ErrorDialog("Can Not Find Lua Table", String("Table Name = '") + currentName + "'.");
+            LOGERROR("Can Not Find Lua Table: " + String("Table Name = '") + currentName + "'.");
             return false;
         }
 
@@ -292,7 +292,7 @@ bool LuaScript::FindFunction(const String& functionName)
             lua_getfield(luaState_, -1, splitedNames[i].CString());
             if (!lua_istable(luaState_, -1))
             {
-                ErrorDialog("Can Not Find Lua Table", String("Table Name = '") + currentName + "'.");
+                LOGERROR("Can Not Find Lua Table: " + String("Table Name = '") + currentName + "'.");
                 return false;
             }
         }
@@ -303,7 +303,7 @@ bool LuaScript::FindFunction(const String& functionName)
 
     if (!lua_isfunction(luaState_, -1))
     {
-        ErrorDialog("Can Not Find Lua Function", String("Function Name = '") + currentName + "'.");
+        LOGERROR("Can Not Find Lua Function: " + String("Function Name = '") + currentName + "'.");
         return false;
     }
 
@@ -346,7 +346,7 @@ void LuaScript::CallEventHandler(const String& functionName, StringHash eventTyp
     if (lua_pcall(luaState_, 2, 0, 0) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
-        ErrorDialog("Execute Lua Function Failed", message);
+        LOGERROR("Execute Lua Function Failed: " + String(message));
         lua_settop(luaState_, top);
         return;
     }

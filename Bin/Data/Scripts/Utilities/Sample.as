@@ -90,13 +90,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 
     // Toggle console with F1
-    if (key == KEY_F1)
+    else if (key == KEY_F1)
         console.Toggle();
-    
+
     // Toggle debug HUD with F2
-    if (key == KEY_F2)
+    else if (key == KEY_F2)
         debugHud.ToggleAll();
-    
+
     // Common rendering quality controls, only when UI has no focused element
     if (ui.focusElement is null)
     {
@@ -109,9 +109,9 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = QUALITY_LOW;
             renderer.textureQuality = quality;
         }
-        
+
         // Material quality
-        if (key == '2')
+        else if (key == '2')
         {
             int quality = renderer.materialQuality;
             ++quality;
@@ -121,15 +121,15 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Specular lighting
-        if (key == '3')
+        else if (key == '3')
             renderer.specularLighting = !renderer.specularLighting;
-        
+
         // Shadow rendering
-        if (key == '4')
+        else if (key == '4')
             renderer.drawShadows = !renderer.drawShadows;
 
         // Shadow map resolution
-        if (key == '5')
+        else if (key == '5')
         {
             int shadowMapSize = renderer.shadowMapSize;
             shadowMapSize *= 2;
@@ -139,7 +139,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Shadow depth and filtering quality
-        if (key == '6')
+        else if (key == '6')
         {
             int quality = renderer.shadowQuality;
             ++quality;
@@ -149,7 +149,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Occlusion culling
-        if (key == '7')
+        else if (key == '7')
         {
             bool occlusion = renderer.maxOccluderTriangles > 0;
             occlusion = !occlusion;
@@ -157,7 +157,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         
         // Instancing
-        if (key == '8')
+        else if (key == '8')
             renderer.dynamicInstancing = !renderer.dynamicInstancing;
     }
 }
