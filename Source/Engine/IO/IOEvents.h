@@ -31,6 +31,7 @@ namespace Urho3D
 EVENT(E_LOGMESSAGE, LogMessage)
 {
     PARAM(P_MESSAGE, Message);              // String
+    PARAM(P_LEVEL, Level);                  // int
 }
 
 }

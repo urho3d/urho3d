@@ -149,6 +149,7 @@ void Log::Write(int level, const String& message)
 
     VariantMap eventData;
     eventData[P_MESSAGE] = formattedMessage;
+    eventData[P_LEVEL] = level;
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
 
     logInstance->inWrite_ = false;

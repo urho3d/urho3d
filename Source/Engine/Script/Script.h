@@ -40,13 +40,6 @@ class Scene;
 class ScriptFile;
 class ScriptInstance;
 
-/// Script engine logging mode.
-enum ScriptLogMode
-{
-    LOGMODE_IMMEDIATE = 0,
-    LOGMODE_RETAINED
-};
-
 /// Scripting subsystem. Allows execution of AngelScript.
 class URHO3D_API Script : public Object
 {
@@ -66,10 +59,6 @@ public:
     void SetDefaultScriptFile(ScriptFile* file);
     /// Set immediate mode scene.
     void SetDefaultScene(Scene* scene);
-    /// Set script engine logging mode, immediate is default.
-    void SetLogMode(ScriptLogMode mode);
-    /// Clear retained mode log messages.
-    void ClearLogMessages();
     /// Print the whole script API (all registered classes, methods and properties) to the log. No-ops when ENABLE_LOGGING not defined.
     void DumpAPI();
     /// Log a message from the script engine.
@@ -91,10 +80,6 @@ public:
     void ClearObjectTypeCache();
     /// Query for an inbuilt object type by constant declaration. Can not be used for script types.
     asIObjectType* GetObjectType(const char* declaration);
-    /// Return logging mode.
-    ScriptLogMode GetLogMode() const { return logMode_; }
-    /// Return retained mode log messages.
-    const String& GetLogMessages() const { return logMessages_; }
 
 private:
     /// Increase script nesting level.
@@ -122,10 +107,6 @@ private:
     Vector<asIScriptContext*> scriptFileContexts_;
     /// Search cache for inbuilt object types.
     HashMap<const char*, asIObjectType*> objectTypes_;
-    /// Script engine logging mode.
-    ScriptLogMode logMode_;
-    /// Retained mode log messages.
-    String logMessages_;
     /// Current script execution nesting level.
     unsigned scriptNestingLevel_;
 };

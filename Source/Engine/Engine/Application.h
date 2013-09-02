@@ -53,10 +53,15 @@ public:
     void ErrorExit(const String& message = String::EMPTY);
 
 protected:
+    /// Handle log message.
+    void HandleLogMessage(StringHash eventType, VariantMap& eventData);
+    
     /// Urho3D engine.
     SharedPtr<Engine> engine_;
     /// Engine parameters map.
     VariantMap engineParameters_;
+    /// Collected startup error log messages.
+    String startupErrors_;
     /// Application exit code.
     int exitCode_;
 };

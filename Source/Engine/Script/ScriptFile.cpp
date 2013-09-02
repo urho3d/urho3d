@@ -148,20 +148,13 @@ bool ScriptFile::Load(Deserializer& source)
     if (!AddScriptSection(engine, source))
         return false;
     
-    // Compile. Set script engine logging to retained mode so that potential exceptions can show all error info
-    ScriptLogMode oldLogMode = script_->GetLogMode();
-    script_->SetLogMode(LOGMODE_RETAINED);
-    script_->ClearLogMessages();
+    // Compile
     int result = scriptModule_->Build();
-    String errors = script_->GetLogMessages();
-    script_->SetLogMode(oldLogMode);
     if (result < 0)
     {
-        LOGERROR("Failed to compile script module " + GetName() + ":\n" + errors);
+        LOGERROR("Failed to compile script module " + GetName());
         return false;
     }
-    if (!errors.Empty())
-        LOGWARNING(errors);
     
     LOGINFO("Compiled script module " + GetName());
     compiled_ = true;

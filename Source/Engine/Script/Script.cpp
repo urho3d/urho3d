@@ -135,7 +135,6 @@ Script::Script(Context* context) :
     Object(context),
     scriptEngine_(0),
     immediateContext_(0),
-    logMode_(LOGMODE_IMMEDIATE),
     scriptNestingLevel_(0)
 {
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
@@ -244,16 +243,6 @@ void Script::SetDefaultScriptFile(ScriptFile* file)
 void Script::SetDefaultScene(Scene* scene)
 {
     defaultScene_ = scene;
-}
-
-void Script::SetLogMode(ScriptLogMode mode)
-{
-    logMode_ = mode;
-}
-
-void Script::ClearLogMessages()
-{
-    logMessages_.Clear();
 }
 
 void Script::DumpAPI()
@@ -388,28 +377,19 @@ void Script::MessageCallback(const asSMessageInfo* msg)
     String message;
     message.AppendWithFormat("%s:%d,%d %s", msg->section, msg->row, msg->col, msg->message);
 
-    if (logMode_ == LOGMODE_IMMEDIATE)
+    switch (msg->type)
     {
-        switch (msg->type)
-        {
-        case asMSGTYPE_ERROR:
-            LOGERROR(message);
-            break;
+    case asMSGTYPE_ERROR:
+        LOGERROR(message);
+        break;
 
-        case asMSGTYPE_WARNING:
-            LOGWARNING(message);
-            break;
+    case asMSGTYPE_WARNING:
+        LOGWARNING(message);
+        break;
 
-        default:
-            LOGINFO(message);
-            break;
-        }
-    }
-    else
-    {
-        // Ignore info messages in retained mode
-        if (msg->type == asMSGTYPE_ERROR || msg->type == asMSGTYPE_WARNING)
-            logMessages_ += message + "\n";
+    default:
+        LOGINFO(message);
+        break;
     }
 }
 

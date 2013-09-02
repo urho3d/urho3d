@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Application.h"
 #include "Engine.h"
+#include "IOEvents.h"
 #include "Log.h"
 #include "ProcessUtils.h"
 
@@ -41,6 +42,9 @@ Application::Application(Context* context) :
 
     // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point
     engine_ = new Engine(context);
+    
+    // Subscribe to log messages so that can show errors if ErrorExit() is called with empty message
+    SubscribeToEvent(E_LOGMESSAGE, HANDLER(Application, HandleLogMessage));
 }
 
 int Application::Run()
@@ -80,16 +84,33 @@ void Application::ErrorExit(const String& message)
     engine_->Exit(); // Close the rendering window
     exitCode_ = EXIT_FAILURE;
 
-    // Only for WIN32, otherwise the last message would be double posted on Mac OS X and Linux platforms
+    // Only for WIN32, otherwise the error messages would be double posted on Mac OS X and Linux platforms
     if (!message.Length())
     {
         #ifdef WIN32
-        Log* log = GetSubsystem<Log>();   // May be null if ENABLE_LOGGING is not defined during build
-        ErrorDialog(GetTypeName(), log ? log->GetLastMessage() : "Application has been terminated due to unexpected error.");
+        ErrorDialog(GetTypeName(), startupErrors_.Length() ? startupErrors_ :
+            "Application has been terminated due to unexpected error.");
         #endif
     }
     else
         ErrorDialog(GetTypeName(), message);
 }
+
+void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
+{
+    using namespace LogMessage;
+    
+    if (eventData[P_LEVEL].GetInt() == LOG_ERROR)
+    {
+        // Strip the timestamp if necessary
+        String error = eventData[P_MESSAGE].GetString();
+        unsigned bracketPos = error.Find(']');
+        if (bracketPos != String::NPOS)
+            error = error.Substring(bracketPos + 1);
+        
+        startupErrors_ += error + "\n";
+    }
+}
+
 
 }
