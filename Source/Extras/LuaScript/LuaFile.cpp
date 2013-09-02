@@ -103,7 +103,7 @@ bool LuaFile::Execute(lua_State* luaState)
     if (error)
     {
         const char* message = lua_tostring(luaState, -1);
-        LOGERROR("Load Buffer Failed: " + String(message));
+        LOGERROR("Load Buffer failed for " + GetName() + ": " + String(message));
         lua_settop(luaState, top);
         return false;
     }
@@ -111,7 +111,7 @@ bool LuaFile::Execute(lua_State* luaState)
     if (lua_pcall(luaState, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState, -1);
-        LOGERROR("Lua Execute Failed: " + String(message));
+        LOGERROR("Lua Execute failed for " + GetName() + ": " + String(message));
         lua_settop(luaState, top);
         return false;
     }

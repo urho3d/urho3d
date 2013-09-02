@@ -106,7 +106,7 @@ void Application::HandleLogMessage(StringHash eventType, VariantMap& eventData)
         String error = eventData[P_MESSAGE].GetString();
         unsigned bracketPos = error.Find(']');
         if (bracketPos != String::NPOS)
-            error = error.Substring(bracketPos + 1);
+            error = error.Substring(bracketPos + 2);
         
         startupErrors_ += error + "\n";
     }
