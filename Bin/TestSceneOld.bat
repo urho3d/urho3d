@@ -1,1 +1,0 @@
-Urho3D.exe Scripts/TestSceneOld.as %*

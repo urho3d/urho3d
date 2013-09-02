@@ -1,3 +1,11 @@
+-- Moving sprites example.
+-- This sample demonstrates:
+--     - Adding Sprite elements to the UI;
+--     - Storing custom data (sprite velocity) inside UI elements;
+--     - Handling frame update events in which the sprites are moved;
+
+require "LuaScripts/Utilities/Sample"
+
 local numSprites = 100
 local sprites = {}
 local speeds = {}
@@ -10,43 +18,20 @@ local graphics = GetGraphics()
 local ui = GetUI()
 
 function Start()
-    if engine.headless then
-        ErrorDialog("SpriteTest", "Headless mode is not supported. The program will now exit.")
-        engine:Exit()
-        return
-    end
+    -- Execute the common startup for samples
+    SampleStart()
     
-    InitUI()
-    InitSprites()
-    
-    SubscribeToEvent("Update", "HandleUpdate")
-    SubscribeToEvent("KeyDown", "HandleKeyDown")
+    -- Create the sprites to the user interface
+    CreateSprites();
+
+    -- Hook up to the frame update events
+    SubscribeToEvents();
 end
 
 function Stop()
 end
 
-function InitUI()
-    local uiStyle = cache:GetXMLFile("UI/DefaultStyle.xml")
-    
-    local debugHud = engine:CreateDebugHud()
-    debugHud.defaultStyle = uiStyle
-    debugHud.mode = DEBUGHUD_SHOW_ALL
-    
-    local console = engine:CreateConsole()
-    console.defaultStyle = uiStyle
-    
-    local cursor = Cursor:new(context)
-    cursor.styleAuto = uiStyle
-    cursor.position = IntVector2(graphics:GetWidth() / 2, graphics:GetHeight() / 2)
-    ui.cursor = cursor
-    
-    if GetPlatform() == "Android" or GetPlatform() == "iOS" then
-        ui.cursor.visible = false
-    end
-end
-
-function InitSprites()
+function CreateSprites()
     local decalTex = cache:GetTexture2D("Textures/UrhoDecal.dds")
     
     local width = graphics.width
@@ -68,16 +53,19 @@ function InitSprites()
         ui.root:AddChild(sprite)
         
         table.insert(sprites, sprite)
-        table.insert(speeds, Vector2(Random(200) - 100, Random(200) - 100))        
+        table.insert(speeds, Vector2(Random(200) - 100, Random(200) - 100))
     end
 end
 
-function HandleUpdate(eventType, eventData)
-    local timeStep = eventData:GetFloat("TimeStep")
-    
+function SubscribeToEvents()
+    -- Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent("Update", "HandleUpdate")
+end
+
+function MoveSprites(timeStep)
     local width = graphics.width
     local height = graphics.height
-    
+
     for i = 1, numSprites do
         local sprite = sprites[i]
         sprite.rotation = sprite.rotation + timeStep * 30
@@ -99,23 +87,8 @@ function HandleUpdate(eventType, eventData)
     end
 end
 
-function HandleKeyDown(eventType, eventData)
-    local key = eventData:GetInt("Key")
-    
-    if key == KEY_ESC then
-        if ui.focusElement == nil then
-            engine:Exit();
-        else
-            local console = GetConsole()
-            console.visible = false
-        end
-    end
-    
-    if key == KEY_F1 then
-        GetConsole():Toggle()
-    end
-    
-    if key == KEY_T then
-        GetDebugHud():Toggle(DEBUGHUD_SHOW_PROFILER)
-    end
+function HandleUpdate(eventType, eventData)
+    local timeStep = eventData:GetFloat("TimeStep")
+
+    MoveSprites(timeStep)
 end

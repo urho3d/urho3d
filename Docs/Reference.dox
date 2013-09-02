@@ -551,7 +551,7 @@ By default there is one viewport, but the amount can be increased with the funct
 
 Viewports can also be defined for rendertarget textures. See \ref AuxiliaryViews "Auxiliary views" for details.
 
-Each viewport defines a command sequence for rendering the scene, the \ref RenderPaths "render path". By default there exist forward, light pre-pass and deferred render paths in the Bin/CoreData/RenderPaths directory, see \ref Renderer::SetDefaultRenderPath "SetDefaultRenderPath()" to set the default for new viewports. If not overridden from the command line, forward rendering is the default. Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the TestScene script application for an example of how to use.
+Each viewport defines a command sequence for rendering the scene, the \ref RenderPaths "render path". By default there exist forward, light pre-pass and deferred render paths in the Bin/CoreData/RenderPaths directory, see \ref Renderer::SetDefaultRenderPath "SetDefaultRenderPath()" to set the default for new viewports. If not overridden from the command line, forward rendering is the default. Deferred rendering modes will be advantageous once there is a large number of per-pixel lights affecting each object, but their disadvantages are the lack of hardware multisampling and inability to choose the lighting model per material. In place of multisample antialiasing, a FXAA post-processing edge filter can be used, see the MultipleViewports sample application (Bin/Data/Scripts/09_MultipleViewports.as) for an example of how to use.
 
 The steps for rendering each viewport on each frame are roughly the following:
 
@@ -1306,7 +1306,7 @@ The navigation mesh generation must be triggered manually by calling \ref Naviga
 
 To query for a path between start and end points on the navigation mesh, call \ref NavigationMesh::FindPath "FindPath()".
 
-For a demonstration of the navigation capabilities, check the Navigation script application, which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
+For a demonstration of the navigation capabilities, check the related sample application (Bin/Data/Scripts/15_Navigation.as), which features partial navigation mesh rebuilds (objects can be created and deleted) and querying paths.
 
 
 \page UI User interface
