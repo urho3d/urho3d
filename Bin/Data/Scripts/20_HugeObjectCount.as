@@ -8,8 +8,10 @@
 
 Scene@ scene_;
 Node@ cameraNode;
+Array<Node@> boxNodes;
 float yaw = 0.0f;
 float pitch = 0.0f;
+bool animate = false;
 
 void Start()
 {
@@ -37,7 +39,7 @@ void CreateScene()
     // (-1000, -1000, -1000) to (1000, 1000, 1000)
     scene_.CreateComponent("Octree");
 
-    // Create a Zone component for ambient lighting & fog control
+    // Create a Zone for ambient light & fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
     zone.boundingBox = BoundingBox(-1000.0f, 1000.0f);
@@ -62,6 +64,7 @@ void CreateScene()
             boxNode.SetScale(0.25f);
             StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
             boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+            boxNodes.Push(boxNode);
         }
     }
 
@@ -76,9 +79,13 @@ void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = "Use WASD keys and mouse to move";
+    instructionText.text = 
+        "Use WASD keys and mouse to move\n"
+        "Space to toggle animation";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
-
+    // The text has multiple rows. Center them in relation to each other
+    instructionText.textAlignment = HA_CENTER;
+    
     // Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER;
     instructionText.verticalAlignment= VA_CENTER;
@@ -90,6 +97,12 @@ void SetupViewport()
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     Viewport@ viewport = Viewport(scene_, cameraNode.GetComponent("Camera"));
     renderer.viewports[0] = viewport;
+}
+
+void SubscribeToEvents()
+{
+    // Subscribe HandleUpdate() function for processing update events
+    SubscribeToEvent("Update", "HandleUpdate");
 }
 
 void MoveCamera(float timeStep)
@@ -123,10 +136,12 @@ void MoveCamera(float timeStep)
         cameraNode.TranslateRelative(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 }
 
-void SubscribeToEvents()
+void AnimateObjects(float timeStep)
 {
-    // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent("Update", "HandleUpdate");
+    const float ROTATE_SPEED = 15.0f;
+
+    for (uint i = 0; i < boxNodes.length; ++i)
+        boxNodes[i].Roll(ROTATE_SPEED * timeStep);
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -134,6 +149,14 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Take the frame time step, which is stored as a float
     float timeStep = eventData["TimeStep"].GetFloat();
 
+    // Toggle animation with space
+    if (input.keyPress[KEY_SPACE])
+        animate = !animate;
+
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+    
+    // Animate scene if enabled
+    if (animate)
+        AnimateObjects(timeStep);
 }
