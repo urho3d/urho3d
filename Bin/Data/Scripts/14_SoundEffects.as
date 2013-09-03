@@ -3,7 +3,7 @@
 //     - Playing sound effects and music;
 //     - Controlling sound and music master volume;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 

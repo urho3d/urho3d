@@ -5,7 +5,7 @@
 //       where the authoritative simulation happens;
 //     - Controlling a physics object's movement by applying forces;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 // UDP port we will use
 const uint SERVER_PORT = 2345;

@@ -3,7 +3,7 @@
 //     - Creating a heightmap terrain with collision;
 //     - Constructing a physical vehicle with rigid bodies for the hull and the wheels, joined with constraints;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 const int CTRL_FORWARD = 1;
 const int CTRL_BACK = 2;

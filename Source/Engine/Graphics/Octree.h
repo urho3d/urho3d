@@ -170,8 +170,8 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// Resize octree. If octree is not empty, drawable objects will be temporarily moved to the root.
-    void Resize(const BoundingBox& box, unsigned numLevels);
+    /// Set size and maximum subdivision levels. If octree is not empty, drawable objects will be temporarily moved to the root.
+    void SetSize(const BoundingBox& box, unsigned numLevels);
     /// Update and reinsert drawable objects.
     void Update(const FrameInfo& frame);
     /// Add a drawable manually.
@@ -192,6 +192,10 @@ public:
     void QueueUpdate(Drawable* drawable);
     /// Mark drawable object as requiring a reinsertion. Is thread-safe.
     void QueueReinsertion(Drawable* drawable);
+    /// Cancel drawable object's update.
+    void CancelUpdate(Drawable* drawable);
+    /// Cancel drawable object's reinsertion.
+    void CancelReinsertion(Drawable* drawable);
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(bool depthTest);
     
@@ -202,9 +206,9 @@ private:
     void ReinsertDrawables(const FrameInfo& frame);
     
     /// Drawable objects that require update.
-    Vector<WeakPtr<Drawable> > drawableUpdates_;
+    PODVector<Drawable*> drawableUpdates_;
     /// Drawable objects that require reinsertion.
-    Vector<WeakPtr<Drawable> > drawableReinsertions_;
+    PODVector<Drawable*> drawableReinsertions_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
     /// Current threaded ray query.

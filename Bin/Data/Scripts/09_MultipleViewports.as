@@ -3,7 +3,7 @@
 //     - Setting up two viewports with two separate cameras;
 //     - Adding post processing effects to a viewport's render path and toggling them;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

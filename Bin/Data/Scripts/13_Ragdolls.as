@@ -4,7 +4,7 @@
 //     - Moving an AnimatedModel's bones with physics and connecting them with constraints;
 //     - Using rolling friction to stop rolling objects from moving infinitely;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

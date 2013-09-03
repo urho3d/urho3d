@@ -4,7 +4,7 @@
 //     - Adding a Text element to the graphical user interface;
 //     - Subscribing to and handling of update events;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 void Start()
 {

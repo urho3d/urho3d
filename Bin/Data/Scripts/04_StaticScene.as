@@ -4,7 +4,7 @@
 //     - Displaying the scene using the Renderer subsystem;
 //     - Handling keyboard and mouse input to move a freelook camera;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

@@ -3,7 +3,7 @@
 //     - Starting up a network server or connecting to it;
 //     - Implementing simple chat functionality with network messages;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 // Identifier for the chat network messages
 const int MSG_CHAT = 32;

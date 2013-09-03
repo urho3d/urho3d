@@ -5,7 +5,7 @@
 //     - Rebuilding the navigation mesh partially when adding or removing objects;
 //     - Visualizing custom debug geometry;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

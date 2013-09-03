@@ -3,7 +3,7 @@
 //     - Creating two 3D scenes and rendering the other into a texture;
 //     - Creating rendertarget textures and materials programmatically;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Scene@ rttScene_;

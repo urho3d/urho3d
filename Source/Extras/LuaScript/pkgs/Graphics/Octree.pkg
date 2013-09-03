@@ -2,7 +2,7 @@ $#include "Octree.h"
 
 class Octree : public Component
 {    
-    void Resize(const BoundingBox& box, unsigned numLevels);
+    void SetSize(const BoundingBox& box, unsigned numLevels);
     void Update(const FrameInfo& frame);
     void AddManualDrawable(Drawable* drawable);
     void RemoveManualDrawable(Drawable* drawable);

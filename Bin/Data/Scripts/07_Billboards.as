@@ -4,7 +4,7 @@
 //     - Parenting scene nodes to allow more intuitive creation of groups of objects;
 //     - Examining rendering performance with a somewhat large object and light count;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

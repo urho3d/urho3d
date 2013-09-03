@@ -68,9 +68,8 @@ bool ResetScene()
 
     // Create a scene with default values, these will be overridden when loading scenes
     editorScene.Clear();
-    Octree@ octree = editorScene.CreateComponent("Octree");
-    PhysicsWorld@ physicsWorld = editorScene.CreateComponent("PhysicsWorld");
-    octree.Resize(BoundingBox(-1000.0, 1000.0), 8);
+    editorScene.CreateComponent("Octree");
+    editorScene.CreateComponent("PhysicsWorld");
     editorScene.CreateComponent("DebugRenderer");
 
     sceneModified = false;

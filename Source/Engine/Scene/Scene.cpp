@@ -73,7 +73,10 @@ Scene::Scene(Context* context) :
 
 Scene::~Scene()
 {
-    Clear();
+    // Remove root-level components first, so that scene subsystems such as the octree destroy themselves. This will speed up
+    // the removal of child nodes' components
+    RemoveAllComponents();
+    RemoveAllChildren();
     
     // Remove scene reference and owner from all nodes that still exist
     for (HashMap<unsigned, Node*>::Iterator i = replicatedNodes_.Begin(); i != replicatedNodes_.End(); ++i)

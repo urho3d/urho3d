@@ -4,7 +4,7 @@
 //     - Storing custom data (sprite velocity) inside UI elements;
 //     - Handling frame update events in which the sprites are moved;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 // Number of sprites to draw
 const uint NUM_SPRITES = 100;

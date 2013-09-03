@@ -394,7 +394,15 @@ void Drawable::AddToOctree()
 void Drawable::RemoveFromOctree()
 {
     if (octant_)
+    {
+        Octree* octree = octant_->GetRoot();
+        if (updateQueued_)
+            octree->CancelUpdate(this);
+        if (reinsertionQueued_)
+            octree->CancelReinsertion(this);
+        
         octant_->RemoveDrawable(this);
+    }
 }
 
 }

@@ -66,8 +66,8 @@ void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex)
 void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
-    WeakPtr<Drawable>* start = reinterpret_cast<WeakPtr<Drawable>*>(item->start_);
-    WeakPtr<Drawable>* end = reinterpret_cast<WeakPtr<Drawable>*>(item->end_);
+    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
+    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
 
     while (start != end)
     {
@@ -343,6 +343,8 @@ Octree::Octree(Context* context) :
 Octree::~Octree()
 {
     // Reset root pointer from all child octants now so that they do not move their drawables to root
+    drawableUpdates_.Clear();
+    drawableReinsertions_.Clear();
     ResetRoot();
 }
 
@@ -362,7 +364,7 @@ void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     // If any of the (size) attributes change, resize the octree
     Component::OnSetAttribute(attr, src);
-    Resize(worldBoundingBox_, numLevels_);
+    SetSize(worldBoundingBox_, numLevels_);
 }
 
 void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -375,7 +377,7 @@ void Octree::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     }
 }
 
-void Octree::Resize(const BoundingBox& box, unsigned numLevels)
+void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
 {
     PROFILE(ResizeOctree);
 
@@ -530,7 +532,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
 
 void Octree::QueueUpdate(Drawable* drawable)
 {
-    drawableUpdates_.Push(WeakPtr<Drawable>(drawable));
+    drawableUpdates_.Push(drawable);
     drawable->updateQueued_ = true;
 }
 
@@ -540,12 +542,24 @@ void Octree::QueueReinsertion(Drawable* drawable)
     if (scene && scene->IsThreadedUpdate())
     {
         MutexLock lock(octreeMutex_);
-        drawableReinsertions_.Push(WeakPtr<Drawable>(drawable));
+        drawableReinsertions_.Push(drawable);
     }
     else
-        drawableReinsertions_.Push(WeakPtr<Drawable>(drawable));
+        drawableReinsertions_.Push(drawable);
 
     drawable->reinsertionQueued_ = true;
+}
+
+void Octree::CancelUpdate(Drawable* drawable)
+{
+    drawableUpdates_.Remove(drawable);
+    drawable->updateQueued_ = false;
+}
+
+void Octree::CancelReinsertion(Drawable* drawable)
+{
+    drawableReinsertions_.Remove(drawable);
+    drawable->reinsertionQueued_ = false;
 }
 
 void Octree::DrawDebugGeometry(bool depthTest)
@@ -572,10 +586,10 @@ void Octree::UpdateDrawables(const FrameInfo& frame)
     item.workFunction_ = UpdateDrawablesWork;
     item.aux_ = const_cast<FrameInfo*>(&frame);
 
-    Vector<WeakPtr<Drawable> >::Iterator start = drawableUpdates_.Begin();
+    PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
     while (start != drawableUpdates_.End())
     {
-        Vector<WeakPtr<Drawable> >::Iterator end = drawableUpdates_.End();
+        PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
         if (end - start > DRAWABLES_PER_WORK_ITEM)
             end = start + DRAWABLES_PER_WORK_ITEM;
 
@@ -600,12 +614,9 @@ void Octree::ReinsertDrawables(const FrameInfo& frame)
 
     PROFILE(ReinsertToOctree);
 
-    for (Vector<WeakPtr<Drawable> >::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
+    for (PODVector<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
     {
         Drawable* drawable = *i;
-        if (!drawable)
-            continue;
-
         drawable->reinsertionQueued_ = false;
         Octant* octant = drawable->GetOctant();
         const BoundingBox& box = drawable->GetWorldBoundingBox();

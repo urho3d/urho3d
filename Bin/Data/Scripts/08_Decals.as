@@ -5,7 +5,7 @@
 //     - Marking suitable (large) objects as occluders for occlusion culling;
 //     - Displaying renderer debug geometry to see the effect of occlusion;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

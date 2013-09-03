@@ -5,7 +5,7 @@
 //     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera
 //       clipping into scenery
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 const int CTRL_FORWARD = 1;
 const int CTRL_BACK = 2;

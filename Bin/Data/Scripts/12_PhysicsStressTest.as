@@ -4,7 +4,7 @@
 //     - Using triangle meshes for collision;
 //     - Optimizing physics simulation by leaving out collision event signaling;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

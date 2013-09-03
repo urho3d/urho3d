@@ -4,7 +4,7 @@
 //     - Loading UI style from XML and applying it to controls;
 //     - Handling of global and per-control events;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Window@ window;
 

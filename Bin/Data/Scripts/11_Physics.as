@@ -4,7 +4,7 @@
 //     - Displaying physics debug geometry;
 //     - Saving a scene to a file and loading it to restore a previous state;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

@@ -4,7 +4,7 @@
 //     - Controlling scene ambience with the Zone component;
 //     - Attaching a light to an object (the camera);
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;

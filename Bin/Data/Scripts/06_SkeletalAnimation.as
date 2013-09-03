@@ -6,7 +6,7 @@
 //       over a large area (typically used in outdoor scenes for shadows cast by sunlight);
 //     - Displaying renderer debug geometry;
 
-#include "Utilities/Sample.as"
+#include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;
