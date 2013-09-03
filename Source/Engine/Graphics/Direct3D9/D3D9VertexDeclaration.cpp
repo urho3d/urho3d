@@ -107,7 +107,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, unsigned elementMask) :
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks) :
     declaration_(0)
 {
     unsigned usedElementMask = 0;

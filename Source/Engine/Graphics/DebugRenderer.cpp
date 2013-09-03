@@ -204,10 +204,10 @@ void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool dep
     for (unsigned i = 0; i < 360; i += 45)
     {
         unsigned j = i + 45;
-        float a = radius * Sin(i);
-        float b = radius * Cos(i);
-        float c = radius * Sin(j);
-        float d = radius * Cos(j);
+        float a = radius * Sin((float)i);
+        float b = radius * Cos((float)i);
+        float c = radius * Sin((float)j);
+        float d = radius * Cos((float)j);
         Vector3 start, end;
 
         start = center + Vector3(a, b, 0.0f);

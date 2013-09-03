@@ -125,8 +125,9 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
 
 void StaticModel::UpdateBatches(const FrameInfo& frame)
 {
+    const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
+    distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
     
     if (batches_.Size() > 1)
     {
@@ -142,7 +143,7 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
         batches_[0].worldTransform_ = &worldTransform;
     }
     
-    float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
+    float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     if (newLodDistance != lodDistance_)

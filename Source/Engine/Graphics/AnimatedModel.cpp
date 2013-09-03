@@ -215,8 +215,9 @@ void AnimatedModel::Update(const FrameInfo& frame)
 
 void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 {
+    const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
+    distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
 
     // Note: per-geometry distances do not take skinning into account
     if (batches_.Size() > 1)
@@ -233,7 +234,7 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         batches_[0].worldTransform_ = &worldTransform;
     }
 
-    float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
+    float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
 
     // If model is rendered from several views, use the minimum LOD distance for animation LOD

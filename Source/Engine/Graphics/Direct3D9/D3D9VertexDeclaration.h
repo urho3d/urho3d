@@ -52,7 +52,7 @@ public:
     /// Construct with vertex element mask.
     VertexDeclaration(Graphics* graphics, unsigned elementMask);
     /// Construct with vertex buffers and element masks to base declaration on.
-    VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks);
+    VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks);
     /// Construct with vertex buffers (shared pointer vector) and element masks to base declaration on.
     VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks);
     /// Destruct.

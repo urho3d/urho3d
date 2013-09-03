@@ -735,14 +735,15 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
-    Vector<VertexBuffer*> vertexBuffers(1);
-    PODVector<unsigned> elementMasks(1);
+    // Note: this is not multi-instance safe
+    static PODVector<VertexBuffer*> vertexBuffers(1);
+    static PODVector<unsigned> elementMasks(1);
     vertexBuffers[0] = buffer;
     elementMasks[0] = MASK_DEFAULT;
     SetVertexBuffers(vertexBuffers, elementMasks);
 }
 
-bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>&
+bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
    if (buffers.Size() > MAX_VERTEX_STREAMS)

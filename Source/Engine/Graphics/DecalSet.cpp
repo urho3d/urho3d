@@ -210,10 +210,11 @@ void DecalSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryRe
 
 void DecalSet::UpdateBatches(const FrameInfo& frame)
 {
+    const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
-    distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
+    distance_ = frame.camera_->GetDistance(worldBoundingBox.Center());
     
-    float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
+    float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);
     lodDistance_ = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     batches_[0].distance_ = distance_;
