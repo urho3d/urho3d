@@ -584,7 +584,7 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
 {
     unsigned numRemoved = 0;
     
-    for (unsigned i = 0; i < children_.Size();)
+    for (unsigned i = children_.Size() - 1; i < children_.Size(); --i)
     {
         bool remove = false;
         Node* childNode = children_[i];
@@ -601,8 +601,6 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
             RemoveChild(children_.Begin() + i);
             ++numRemoved;
         }
-        else
-            ++i;
     }
     
     // Mark node dirty in all replication states
@@ -672,7 +670,7 @@ void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 {
     unsigned numRemoved = 0;
     
-    for (unsigned i = 0; i < components_.Size();)
+    for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
     {
         bool remove = false;
         Component* component = components_[i];
@@ -687,8 +685,6 @@ void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
             RemoveComponent(components_.Begin() + i);
             ++numRemoved;
         }
-        else
-            ++i;
     }
     
     // Mark node dirty in all replication states
