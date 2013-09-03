@@ -3067,7 +3067,7 @@ Methods:<br>
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- void Resize(const BoundingBox&, uint)
+- void SetSize(const BoundingBox&, uint)
 - void DrawDebugGeometry(bool) const
 - void AddManualDrawable(Drawable@)
 - void RemoveManualDrawable(Drawable@)
