@@ -1,27 +1,31 @@
 -- A simple 'HelloWorld' GUI created purely from code.
 -- This sample demonstrates:
---     - Creation of controls and building a UI hierarchy
---     - Loading UI style from XML and applying it to controls
---     - Handling of global and per-control events
+--     - Creation of controls and building a UI hierarchy;
+--     - Loading UI style from XML and applying it to controls;
+--     - Handling of global and per-control events;
 
 require "LuaScripts/Utilities/Sample"
 
 local window = nil
 
+local context = GetContext()
+
+local cache = GetCache()
+local engine = GetEngine()
+local input = GetInput()
+local ui = GetUI()
+    
 function Start()
     -- Execute the common startup for samples
     SampleStart()
 
     -- Enable OS cursor
-    local input = GetInput()
     input.mouseVisible = true
 
     -- Load XML file containing default UI style sheet
-    local cache = GetCache()
     local style = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
 
     -- Set the loaded style as default style
-    local ui = GetUI()
     ui.root.defaultStyle = style
 
     -- Initialize Window
@@ -38,7 +42,6 @@ end
 
 function InitControls()
     -- Create a CheckBox
-    local context = GetContext()
     local checkBox = CheckBox:new(context)
     checkBox:SetName("CheckBox")
 
@@ -65,9 +68,7 @@ end
 
 function InitWindow()
     -- Create the Window and add it to the UI's root node
-    local context = GetContext()
     window = Window:new(context)
-    local ui = GetUI()
     ui.root:AddChild(window)
     
     -- Set Window size and layout settings
@@ -115,7 +116,6 @@ function SubscribeToEvents()
 end
 
 function HandleClosePressed(eventType, eventData)
-    local engine = GetEngine()
     engine:Exit()
 end
 
