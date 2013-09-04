@@ -308,34 +308,28 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, con
 
 void Node::SetWorldPosition(const Vector3& position)
 {
-    SetPosition((parent_ != scene_ && parent_) ? parent_->GetWorldTransform().Inverse() * position : position);
+    SetPosition((parent_ == scene_ || !parent_) ? position : parent_->GetWorldTransform().Inverse() * position);
 }
 
 void Node::SetWorldRotation(const Quaternion& rotation)
 {
-    SetRotation((parent_ != scene_ && parent_) ? parent_->GetWorldRotation().Inverse() * rotation : rotation);
+    SetRotation((parent_ == scene_ || !parent_) ? rotation : parent_->GetWorldRotation().Inverse() * rotation);
 }
 
 void Node::SetWorldDirection(const Vector3& direction)
 {
-    Vector3 localDirection = (parent_ != scene_ && parent_) ? parent_->GetWorldRotation().Inverse() * direction : direction;
+    Vector3 localDirection = (parent_ == scene_ || !parent_) ? direction : parent_->GetWorldRotation().Inverse() * direction;
     SetRotation(Quaternion(Vector3::FORWARD, localDirection));
 }
 
 void Node::SetWorldScale(float scale)
 {
-    if (parent_ != scene_ && parent_)
-    {
-        Vector3 parentWorldScale = parent_->GetWorldScale();
-        SetScale(Vector3(scale / parentWorldScale.x_, scale / parentWorldScale.y_, scale / parentWorldScale.z_));
-    }
-    else
-        SetScale(scale);
+    SetWorldScale(Vector3(scale, scale, scale));
 }
 
 void Node::SetWorldScale(const Vector3& scale)
 {
-    SetScale((parent_ != scene_ && parent_) ? scale / parent_->GetWorldScale() : scale);
+    SetScale((parent_ == scene_ || !parent_) ? scale : scale / parent_->GetWorldScale());
 }
 
 void Node::SetWorldTransform(const Vector3& position, const Quaternion& rotation)
@@ -407,7 +401,7 @@ void Node::LookAt(const Vector3& target, const Vector3& upAxis)
     Vector3 targetY = targetZ.CrossProduct(targetX).Normalized();
     
     Quaternion rotation(targetX, targetY, targetZ);
-    SetRotation((parent_ != scene_ && parent_) ? parent_->GetWorldRotation().Inverse() * rotation : rotation);
+    SetRotation((parent_ == scene_ || !parent_) ? rotation : parent_->GetWorldRotation().Inverse() * rotation);
 }
 
 void Node::Scale(float scale)
@@ -1346,15 +1340,15 @@ void Node::UpdateWorldTransform() const
     Matrix3x4 transform = GetTransform();
     
     // Assume the root node (scene) has identity transform
-    if (parent_ != scene_ && parent_)
-    {
-        worldTransform_ = parent_->GetWorldTransform() * transform;
-        worldRotation_ = parent_->GetWorldRotation() * rotation_;
-    }
-    else
+    if (parent_ == scene_ || !parent_)
     {
         worldTransform_ = transform;
         worldRotation_ = rotation_;
+    }
+    else
+    {
+        worldTransform_ = parent_->GetWorldTransform() * transform;
+        worldRotation_ = parent_->GetWorldRotation() * rotation_;
     }
     
     dirty_ = false;
