@@ -165,6 +165,8 @@ class Renderer
     ShaderVariation* GetStencilPS() const;
     const FrameInfo& GetFrameInfo();
     
+    void DrawDebugGeometry(bool depthTest);
+    
     tolua_property__get_set unsigned numViewports;
     tolua_property__get_set RenderPath* defaultRenderPath;
     tolua_property__get_set bool specularLighting;

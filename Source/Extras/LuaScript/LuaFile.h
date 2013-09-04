@@ -48,8 +48,10 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
 
-    /// Execute.
-    bool Execute(lua_State* luaState);
+    /// Load buffer as Lua chunk.
+    bool LoadChunk(lua_State* luaState);
+    /// Load buffer as lua chunk and execute.
+    bool LoadAndExecute(lua_State* luaState);
 
 private:
     /// File size.
@@ -57,6 +59,9 @@ private:
 
     /// File data.
     SharedArrayPtr<char> data_;
+
+    /// Has loaded.
+    bool hasLoaded_;
 
     /// Has executed.
     bool hasExecuted_;

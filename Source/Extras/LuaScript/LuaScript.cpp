@@ -119,7 +119,7 @@ bool LuaScript::ExecuteFile(const String& fileName)
     if (!luaFile)
         return false;
 
-    return luaFile->Execute(luaState_);
+    return luaFile->LoadAndExecute(luaState_);
 }
 
 bool LuaScript::ExecuteString(const String& string)
@@ -191,11 +191,11 @@ void LuaScript::ScriptSubscribeToEvent(Object* object, const String& eventName, 
 
 void LuaScript::RegisterLoader()
 {
+	// Get package.loaders table.
     lua_getglobal(luaState_, "package");
-
     lua_getfield(luaState_, -1, "loaders");
 
-    // Replace first loader.
+    // Set package.loaders[1] = LuaScript::Loader.
     lua_pushnumber(luaState_, 1);
     lua_pushcfunction(luaState_, &LuaScript::Loader);
     lua_settable(luaState_, -3);
@@ -207,28 +207,16 @@ int LuaScript::Loader(lua_State* L)
     if (!cache)
         return 0;
 
-    const char* name = luaL_checkstring(L, 1);
-    SharedPtr<File> file = cache->GetFile(String(name) + ".lua");
-    if (!file)
-        return 0;
+	// Get module name.
+	const char* name = luaL_checkstring(L, 1);
 
-    unsigned size = file->GetSize();
-    char* buffer = new char[size];
-    file->Read(buffer, size);
+	// Get Lua file from module name.
+	LuaFile* luaFile = cache->GetResource<LuaFile>(String(name) + ".lua");
+	if (!luaFile)
+		return false;
 
-    int top = lua_gettop(L);
-    int error = luaL_loadbuffer(L, buffer, size, name);
-    delete [] buffer;
-
-    if (error)
-    {
-        const char* message = lua_tostring(L, -1);
-        LOGERROR("Execute Lua file " + String(name) + " failed: " + String(message));
-        lua_settop(L, top);
-        return 0;
-    }
-
-    return 1;
+	// Load Lua file to Lua chunk.
+	return luaFile->LoadChunk(L) ? 1 : 0;
 }
 
 void LuaScript::ReplacePrint()

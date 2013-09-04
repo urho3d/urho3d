@@ -1,26 +1,4 @@
-$#include "AnimationController.h"
-$#include "AnimatedModel.h"
-$#include "Camera.h"
-$#include "CollisionShape.h"
-$#include "Constraint.h"
-$#include "DebugRenderer.h"
-$#include "DecalSet.h"
-$#include "Drawable.h"
-$#include "Light.h"
-$#include "Navigable.h"
-$#include "NavigationMesh.h"
-$#include "NetworkPriority.h"
 $#include "Node.h"
-$#include "Octree.h"
-$#include "OffMeshConnection.h"
-$#include "PhysicsWorld.h"
-$#include "RigidBody.h"
-$#include "SmoothedTransform.h"
-$#include "SoundListener.h"
-$#include "SoundSource.h"
-$#include "StaticModel.h"
-$#include "Terrain.h"
-$#include "Zone.h"
 
 enum CreateMode
 {
@@ -89,29 +67,8 @@ class Node : public Serializable
     void RemoveListener(Component* component);
     
     // template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
-    AnimationController* CreateComponent<AnimationController> @ CreateAnimationController(CreateMode mode = REPLICATED, unsigned id = 0);
-    AnimatedModel* CreateComponent<AnimatedModel> @ CreateAnimatedModel(CreateMode mode = REPLICATED, unsigned id = 0);
-    Camera* CreateComponent<Camera> @ CreateCamera(CreateMode mode = REPLICATED, unsigned id = 0);
-    CollisionShape* CreateComponent<CollisionShape> @ CreateCollisionShape(CreateMode mode = REPLICATED, unsigned id = 0);
-    Constraint* CreateComponent<Constraint> @ CreateConstraint(CreateMode mode = REPLICATED, unsigned id = 0);
-    DebugRenderer* CreateComponent<DebugRenderer> @ CreateDebugRenderer(CreateMode mode = REPLICATED, unsigned id = 0);
-    DecalSet* CreateComponent<DecalSet> @ CreateDecalSet(CreateMode mode = REPLICATED, unsigned id = 0);
-    Drawable* CreateComponent<Drawable> @ CreateDrawable(CreateMode mode = REPLICATED, unsigned id = 0);
-    Light* CreateComponent<Light> @ CreateLight(CreateMode mode = REPLICATED, unsigned id = 0);
-    Navigable* CreateComponent<Navigable> @ CreateNavigable(CreateMode mode = REPLICATED, unsigned id = 0);
-    NavigationMesh* CreateComponent<NavigationMesh> @ CreateNavigationMesh(CreateMode mode = REPLICATED, unsigned id = 0);
-    NetworkPriority* CreateComponent<NetworkPriority> @ CreateNetworkPriority(CreateMode mode = REPLICATED, unsigned id = 0);
-    Octree* CreateComponent<Octree> @ CreateOctree(CreateMode mode = REPLICATED, unsigned id = 0);
-    OffMeshConnection* CreateComponent<OffMeshConnection> @ CreateOffMeshConnection(CreateMode mode = REPLICATED, unsigned id = 0);
-    PhysicsWorld* CreateComponent<PhysicsWorld> @ CreatePhysicsWorld(CreateMode mode = REPLICATED, unsigned id = 0);
-    RigidBody* CreateComponent<RigidBody> @ CreateRigidBody(CreateMode mode = REPLICATED, unsigned id = 0);
-    SmoothedTransform* CreateComponent<SmoothedTransform> @ CreateSmoothedTransform(CreateMode mode = REPLICATED, unsigned id = 0);
-    SoundListener* CreateComponent<SoundListener> @ CreateSoundListener(CreateMode mode = REPLICATED, unsigned id = 0);
-    SoundSource* CreateComponent<SoundSource> @ CreateSoundSource(CreateMode mode = REPLICATED, unsigned id = 0);
-    StaticModel* CreateComponent<StaticModel> @ CreateStaticModel(CreateMode mode = REPLICATED, unsigned id = 0);
-    Terrain* CreateComponent<Terrain> @ CreateTerrain(CreateMode mode = REPLICATED, unsigned id = 0);
-    Zone* CreateComponent<Zone> @ CreateZone(CreateMode mode = REPLICATED, unsigned id = 0);
-
+    Component* CreateComponent(const char* type, CreateMode mode = REPLICATED, unsigned id = 0);
+    
     unsigned GetID() const;
     const String& GetName() const;
     StringHash GetNameHash() const;
@@ -150,29 +107,9 @@ class Node : public Serializable
     
     const Variant& GetVar(ShortStringHash key) const;
     const VariantMap& GetVars() const;
+    
     // template <class T> T* GetComponent() const;
-    AnimationController* GetComponent<AnimationController> @ GetAnimationController() const;
-    AnimatedModel* GetComponent<AnimatedModel> @ GetAnimatedModel() const;
-    Camera* GetComponent<Camera> @ GetCamera() const;
-    CollisionShape* GetComponent<CollisionShape> @ GetCollisionShape() const;
-    Constraint* GetComponent<Constraint> @ GetConstraint() const;
-    DebugRenderer* GetComponent<DebugRenderer> @ GetDebugRenderer() const;
-    DecalSet* GetComponent<DecalSet> @ GetDecalSet() const;
-    Drawable* GetComponent<Drawable> @ GetDrawable() const;
-    Light* GetComponent<Light> @ GetLight() const;
-    Navigable* GetComponent<Navigable> @ GetNavigable() const;
-    NavigationMesh* GetComponent<NavigationMesh> @ GetNavigationMesh() const;
-    NetworkPriority* GetComponent<NetworkPriority> @ GetNetworkPriority() const;
-    Octree* GetComponent<Octree> @ GetOctree() const;
-    OffMeshConnection* GetComponent<OffMeshConnection> @ GetOffMeshConnection() const;
-    PhysicsWorld* GetComponent<PhysicsWorld> @ GetPhysicsWorld() const;
-    RigidBody* GetComponent<RigidBody> @ GetRigidBody() const;
-    SmoothedTransform* GetComponent<SmoothedTransform> @ GetSmoothedTransform() const;
-    SoundListener* GetComponent<SoundListener> @ GetSoundListener() const;
-    SoundSource* GetComponent<SoundSource> @ GetSoundSource() const;
-    StaticModel* GetComponent<StaticModel> @ GetStaticModel() const;
-    Terrain* GetComponent<Terrain> @ GetTerrain() const;
-    Zone* GetComponent<Zone> @ GetZone() const;
+    Component* GetComponent(const char* type) const;
     
     void SetID(unsigned id);
     void SetScene(Scene* scene);
@@ -205,3 +142,79 @@ class Node : public Serializable
     tolua_readonly tolua_property__get_set unsigned numComponents;
     tolua_readonly tolua_property__get_set unsigned numNetworkComponents;
 };
+
+${
+
+// Disable generated CreateComponent funciton.
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_CreateComponent00
+
+static int tolua_SceneLuaAPI_Node_CreateComponent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
+  const char* type = ((const char*)  tolua_tostring(tolua_S,2,0));
+  CreateMode mode = ((CreateMode) (int)  tolua_tonumber(tolua_S,3,REPLICATED));
+  unsigned id = ((unsigned)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CreateComponent'", NULL);
+#endif
+  {
+   Component* tolua_ret = (Component*)  self->CreateComponent(type,mode,id);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,type);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CreateComponent'.",&tolua_err);
+ return 0;
+#endif
+}
+
+// Disable generated GetComponent funciton.
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_GetComponent00
+
+static int tolua_SceneLuaAPI_Node_GetComponent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Node",0,&tolua_err) ||
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Node* self = (const Node*)  tolua_tousertype(tolua_S,1,0);
+  const char* type = ((const char*)  tolua_tostring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetComponent'", NULL);
+#endif
+  {
+   Component* tolua_ret = (Component*)  self->GetComponent(type);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,type);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetComponent'.",&tolua_err);
+ return 0;
+#endif
+}
+
+$}

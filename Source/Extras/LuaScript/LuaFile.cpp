@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "LuaFile.h"
 #include "ProcessUtils.h"
@@ -40,9 +41,10 @@ extern "C"
 namespace Urho3D
 {
 
-LuaFile::LuaFile(Context* context) : 
+LuaFile::LuaFile(Context* context) :
     Resource(context),
     size_(0),
+	hasLoaded_(false),
     hasExecuted_(false)
 {
 
@@ -85,30 +87,53 @@ bool LuaFile::Save(Serializer& dest) const
     return true;
 }
 
-bool LuaFile::Execute(lua_State* luaState)
+
+bool LuaFile::LoadChunk(lua_State* luaState)
 {
-    if (hasExecuted_)
-        return true;
+	if (hasLoaded_)
+		return true;
 
-    if (size_ == 0)
-        return false;
+	if (size_ == 0)
+		return false;
 
-    if (!luaState)
-        return false;
+	if (!luaState)
+		return false;
 
-    int top = lua_gettop(luaState);
+	int top = lua_gettop(luaState);
 
-    const char* name = GetName().CString();
-    int error = luaL_loadbuffer(luaState, data_, size_, name);
-    if (error)
-    {
-        const char* message = lua_tostring(luaState, -1);
+	// Get file name without extension.
+	String name = GetName();
+	unsigned extPos = name.FindLast('.');
+	if (extPos != String::NPOS)
+	{
+		name = name.Substring(0, extPos);
+	}
+
+	int error = luaL_loadbuffer(luaState, data_, size_, name.CString());
+	if (error)
+	{
+		const char* message = lua_tostring(luaState, -1);
         LOGERROR("Load Buffer failed for " + GetName() + ": " + String(message));
-        lua_settop(luaState, top);
-        return false;
-    }
+		lua_settop(luaState, top);
+		return false;
+	}
 
-    if (lua_pcall(luaState, 0, 0, 0))
+	hasLoaded_ = true;
+
+	return true;
+}
+
+bool LuaFile::LoadAndExecute(lua_State* luaState)
+{
+	if (hasExecuted_)
+		return true;
+
+	if (!LoadChunk(luaState))
+		return false;
+
+	int top = lua_gettop(luaState);
+
+	if (lua_pcall(luaState, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState, -1);
         LOGERROR("Lua Execute failed for " + GetName() + ": " + String(message));
