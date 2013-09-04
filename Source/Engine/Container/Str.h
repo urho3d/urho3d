@@ -297,11 +297,11 @@ public:
     void Insert(unsigned pos, const String& str);
     /// Insert a character.
     void Insert(unsigned pos, char c);
-    /// Insert a string using an iterator.
+    /// Insert a string by iterator.
     Iterator Insert(const Iterator& dest, const String& str);
     /// Insert a string partially by iterators.
     Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end);
-    /// Insert a character using an iterator.
+    /// Insert a character by iterator.
     Iterator Insert(const Iterator& dest, char c);
     /// Erase a substring.
     void Erase(unsigned pos, unsigned length = 1);

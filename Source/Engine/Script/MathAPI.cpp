@@ -684,8 +684,7 @@ static void ConstructRayCopy(const Ray& ray, Ray* ptr)
 
 static void ConstructRayInit(const Vector3& origin, const Vector3& direction, Ray* ptr)
 {
-    // Normalize direction because performance is not critical
-    new(ptr) Ray(origin, direction.Normalized());
+    new(ptr) Ray(origin, direction);
 }
 
 static void RegisterRay(asIScriptEngine* engine)

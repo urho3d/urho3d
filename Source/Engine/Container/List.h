@@ -253,7 +253,7 @@ public:
             Erase(Begin());
     }
     
-    /// Erase an element. Return an iterator to the next element.
+    /// Erase an element by iterator. Return iterator to the next element.
     Iterator Erase(Iterator it)
     {
         return Iterator(EraseNode(static_cast<Node*>(it.ptr_)));

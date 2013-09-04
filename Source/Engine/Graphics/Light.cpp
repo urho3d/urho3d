@@ -501,7 +501,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
 
             Vector3 centerProj = lightRay.Project(centerPos);
             float centerDistance = (centerProj - lightPos).Length();
-            Ray centerRay(centerProj, (centerPos - centerProj).Normalized());
+            Ray centerRay(centerProj, centerPos - centerProj);
             float centerAngle = centerRay.HitDistance(box) / centerDistance;
 
             // Check if a corner of the bounding box is closer to the light ray than the center, use its angle in that case

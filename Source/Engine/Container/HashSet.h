@@ -273,7 +273,7 @@ public:
         return true;
     }
     
-    /// Erase a key by iterator.
+    /// Erase a key by iterator. Return iterator to the next key.
     Iterator Erase(const Iterator& it)
     {
         if (!ptrs_ || !it.ptr_)

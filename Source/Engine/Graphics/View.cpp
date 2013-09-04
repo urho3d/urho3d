@@ -1936,7 +1936,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
         
         // For perspective lights, extrusion direction depends on the position of the shadow caster
         Vector3 center = lightViewBox.Center();
-        Ray extrusionRay(center, center.Normalized());
+        Ray extrusionRay(center, center);
         
         float extrusionDistance = shadowCamera->GetFarClip();
         float originalDistance = Clamp(center.Length(), M_EPSILON, extrusionDistance);

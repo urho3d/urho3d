@@ -304,7 +304,7 @@ public:
         return true;
     }
     
-    /// Erase a pair by iterator.
+    /// Erase a pair by iterator. Return iterator to the next pair.
     Iterator Erase(const Iterator& it)
     {
         if (!ptrs_ || !it.ptr_)

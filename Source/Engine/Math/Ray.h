@@ -41,10 +41,10 @@ public:
     {
     }
     
-    /// Construct from origin and direction. The direction must be normalized.
+    /// Construct from origin and direction.
     Ray(const Vector3& origin, const Vector3& direction) :
         origin_(origin),
-        direction_(direction)
+        direction_(direction.Normalized())
     {
     }
     
