@@ -9,7 +9,6 @@ class Color
     Color(float r, float g, float b, float a);
     
     bool operator == (const Color& rhs) const;
-    bool operator != (const Color& rhs) const;
     Color operator * (float rhs) const;
     Color operator + (const Color& rhs);
     
