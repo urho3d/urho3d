@@ -157,8 +157,6 @@ private:
     PODVector<UIBatch> uiBatches_;
     /// Text vertex data.
     PODVector<float> uiVertexData_;
-    /// Local-space bounding box.
-    BoundingBox boundingBox_;
     /// Custom world transform for facing the camera automatically.
     Matrix3x4 customWorldTransform_;
     /// Face camera flag.

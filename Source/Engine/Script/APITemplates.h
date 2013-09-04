@@ -672,6 +672,7 @@ template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* cl
     engine->RegisterObjectMethod(className, "uint get_zoneMask() const", asMETHOD(T, GetZoneMask), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_maxLights(uint)", asMETHOD(T, SetMaxLights), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_maxLights() const", asMETHOD(T, GetMaxLights), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const BoundingBox& get_boundingBox() const", asMETHOD(T, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const BoundingBox& get_worldBoundingBox()", asMETHOD(T, GetWorldBoundingBox), asCALL_THISCALL);
 }
 
@@ -742,7 +743,6 @@ template <class T> void RegisterStaticModel(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "void set_material(Material@+)", asMETHODPR(T, SetMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool set_materials(uint, Material@+)", asMETHODPR(T, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Material@+ get_materials(uint) const", asMETHOD(T, GetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const BoundingBox& get_boundingBox() const", asMETHOD(T, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numGeometries() const", asMETHOD(T, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Zone@+ get_zone() const", asMETHOD(T, GetZone), asCALL_THISCALL);
 }

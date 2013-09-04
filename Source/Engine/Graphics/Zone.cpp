@@ -47,17 +47,18 @@ Zone::Zone(Context* context) :
     inverseWorldDirty_(true),
     override_(false),
     ambientGradient_(false),
-    boundingBox_(DEFAULT_BOUNDING_BOX_MIN, DEFAULT_BOUNDING_BOX_MAX),
     ambientColor_(DEFAULT_AMBIENT_COLOR),
     fogColor_(DEFAULT_FOG_COLOR),
     fogStart_(DEFAULT_FOG_START),
     fogEnd_(DEFAULT_FOG_END),
     priority_(0)
 {
+    boundingBox_ = BoundingBox(DEFAULT_BOUNDING_BOX_MIN, DEFAULT_BOUNDING_BOX_MAX);
 }
 
 Zone::~Zone()
 {
+    /// \todo When zone is destroyed, there is now possibility of dangling zone pointers
 }
 
 void Zone::RegisterObject(Context* context)
@@ -224,8 +225,11 @@ void Zone::OnMarkedDirty(Node* node)
             Drawable* drawable = *i;
             unsigned drawableFlags = drawable->GetDrawableFlags();
             if (drawableFlags & DRAWABLE_GEOMETRY)
-                (*i)->SetZone(0);
-            if (drawableFlags & DRAWABLE_ZONE)
+            {
+                if (drawable->GetZone() == this)
+                    drawable->SetZone(0);
+            }
+            else if (drawableFlags & DRAWABLE_ZONE)
             {
                 Zone* zone = static_cast<Zone*>(drawable);
                 zone->lastAmbientStartZone_.Reset();

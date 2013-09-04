@@ -34,6 +34,7 @@ class Drawable : public Component
     void SetOccludee(bool enable);
     void MarkForUpdate();
     
+    const BoundingBox& GetBoundingBox() const;
     const BoundingBox& GetWorldBoundingBox();
     unsigned char GetDrawableFlags() const;
     float GetDrawDistance() const;

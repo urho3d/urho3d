@@ -65,8 +65,6 @@ public:
     /// Set ambient gradient mode. In gradient mode ambient color is interpolated from neighbor zones.
     void SetAmbientGradient(bool enable);
     
-    /// Return bounding box.
-    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return inverse world transform.
     const Matrix3x4& GetInverseWorldTransform() const;
     /// Return zone's own ambient color, disregarding gradient mode.
@@ -107,8 +105,6 @@ protected:
     bool override_;
     /// Ambient gradient mode flag.
     bool ambientGradient_;
-    /// Local-space bounding box.
-    BoundingBox boundingBox_;
     /// Last world-space bounding box.
     BoundingBox lastWorldBoundingBox_;
     /// Ambient color.

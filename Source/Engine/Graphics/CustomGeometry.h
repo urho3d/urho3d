@@ -89,8 +89,6 @@ public:
     /// Set material on one geometry. Return true if successful.
     bool SetMaterial(unsigned index, Material* material);
     
-    /// Return local space bounding box.
-    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
     /// Return material by geometry index.
@@ -110,8 +108,6 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Local-space bounding box.
-    BoundingBox boundingBox_;
     /// Primitive type per geometry.
     PODVector<PrimitiveType> primitiveTypes_;
     /// Source vertices per geometry.

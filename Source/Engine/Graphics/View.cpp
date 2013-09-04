@@ -174,22 +174,28 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     const Matrix3x4& viewMatrix = view->camera_->GetView();
     Vector3 viewZ = Vector3(viewMatrix.m20_, viewMatrix.m21_, viewMatrix.m22_);
     Vector3 absViewZ = viewZ.Abs();
+    unsigned cameraViewMask = view->camera_->GetViewMask();
+    bool cameraZoneOverride = view->cameraZoneOverride_;
     
     while (start != end)
     {
         Drawable* drawable = *start++;
-        drawable->UpdateBatches(view->frame_);
         
         // If draw distance non-zero, check it
         float maxDistance = drawable->GetDrawDistance();
         if ((maxDistance <= 0.0f || drawable->GetDistance() <= maxDistance) && (!buffer || !drawable->IsOccludee() ||
             buffer->IsVisible(drawable->GetWorldBoundingBox())))
         {
+            drawable->UpdateBatches(view->frame_);
             drawable->MarkInView(view->frame_);
             
-            // For geometries, clear lights and calculate view space Z range
+            // For geometries, find zone, clear lights and calculate view space Z range
             if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
             {
+                Zone* drawableZone = drawable->GetZone();
+                if ((!drawableZone || (drawableZone->GetViewMask() & cameraViewMask) == 0) && !cameraZoneOverride)
+                    view->FindZone(drawable);
+                
                 const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
                 Vector3 center = geomBox.Center();
                 float viewCenterZ = viewZ.DotProduct(center) + viewMatrix.m23_;
@@ -662,13 +668,9 @@ void View::GetDrawables()
         queue->Complete(M_MAX_UNSIGNED);
     }
     
-    // Sort into geometries & lights, and build visible scene bounding boxes in world and view space
-    sceneBox_.min_ = sceneBox_.max_ = Vector3::ZERO;
-    sceneBox_.defined_ = false;
+    // Sort into geometries & lights, and build scene Z range
     minZ_ = M_INFINITY;
     maxZ_ = 0.0f;
-    
-    unsigned cameraViewMask = camera_->GetViewMask();
     
     for (unsigned i = 0; i < tempDrawables.Size(); ++i)
     {
@@ -678,15 +680,9 @@ void View::GetDrawables()
         
         if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
         {
-            // Find zone for the drawable if necessary
-            Zone* drawableZone = drawable->GetZone();
-            if ((drawable->IsZoneDirty() || !drawableZone || (drawableZone->GetViewMask() & cameraViewMask) == 0) && !cameraZoneOverride_)
-                FindZone(drawable);
-            
             // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
             if (drawable->GetType() != Skybox::GetTypeStatic())
             {
-                sceneBox_.Merge(drawable->GetWorldBoundingBox());
                 minZ_ = Min(minZ_, drawable->GetMinZ());
                 maxZ_ = Max(maxZ_, drawable->GetMaxZ());
             }
@@ -1884,20 +1880,18 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
        // For point light, check that this drawable is inside the split shadow camera frustum
         if (type == LIGHT_POINT && shadowCameraFrustum.IsInsideFast(drawable->GetWorldBoundingBox()) == OUTSIDE)
             continue;
-        
-        // Note: as lights are processed threaded, it is possible a drawable's UpdateBatches() function is called several
-        // times. However, this should not cause problems as no scene modification happens at this point.
-        if (!drawable->IsInView(frame_, false))
-            drawable->UpdateBatches(frame_);
-        
         // Check shadow distance
         float maxShadowDistance = drawable->GetShadowDistance();
         float drawDistance = drawable->GetDrawDistance();
         if (drawDistance > 0.0f && (maxShadowDistance <= 0.0f || drawDistance < maxShadowDistance))
             maxShadowDistance = drawDistance;
-        
         if (maxShadowDistance > 0.0f && drawable->GetDistance() > maxShadowDistance)
             continue;
+        
+        // Note: as lights are processed threaded, it is possible a drawable's UpdateBatches() function is called several
+        // times. However, this should not cause problems as no scene modification happens at this point.
+        if (!drawable->IsInView(frame_, false))
+            drawable->UpdateBatches(frame_);
         
         // Project shadow caster bounding box to light view space for visibility check
         lightViewBox = drawable->GetWorldBoundingBox().Transformed(lightView);

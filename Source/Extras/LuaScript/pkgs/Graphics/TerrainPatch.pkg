@@ -19,7 +19,6 @@ class TerrainPatch : public Drawable
     TerrainPatch* GetSouthPatch() const;
     TerrainPatch* GetWestPatch() const;
     TerrainPatch* GetEastPatch() const;
-    const BoundingBox& GetBoundingBox() const;
     const IntVector2& GetCoordinates() const;
     unsigned GetLodLevel() const;
     float GetOcclusionOffset() const;

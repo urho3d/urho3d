@@ -80,6 +80,8 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     maxLights_(0),
     octant_(0),
     firstLight_(0),
+    zone_(0),
+    lastZone_(0),
     viewFrame_(0),
     viewCamera_(0),
     zoneDirty_(false)
@@ -337,16 +339,6 @@ void Drawable::LimitVertexLights()
     vertexLights_.Resize(MAX_VERTEX_LIGHTS);
 }
 
-Zone* Drawable::GetZone() const
-{
-    return zone_;
-}
-
-Zone* Drawable::GetLastZone() const
-{
-    return lastZone_;
-}
-
 void Drawable::OnNodeSet(Node* node)
 {
     if (node)
@@ -364,8 +356,7 @@ void Drawable::OnMarkedDirty(Node* node)
     if (!reinsertionQueued_ && octant_)
         octant_->GetRoot()->QueueReinsertion(this);
 
-    // Mark zone assignment dirty. Due to possibly being called from a worker thread, it is unsafe to manipulate the Zone weak
-    // pointer here
+    // Mark zone assignment dirty
     if (node == node_)
         zoneDirty_ = true;
 }

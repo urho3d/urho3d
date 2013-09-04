@@ -783,7 +783,6 @@ static void RegisterZone(asIScriptEngine* engine)
 {
     RegisterDrawable<Zone>(engine, "Zone");
     engine->RegisterObjectMethod("Zone", "void set_boundingBox(const BoundingBox&in)", asMETHOD(Zone, SetBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Zone", "const BoundingBox& get_boundingBox() const", asMETHOD(Zone, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const Matrix3x4& get_inverseWorldTransform() const", asMETHOD(Zone, GetInverseWorldTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_ambientColor(const Color&in)", asMETHOD(Zone, SetAmbientColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const Color& get_ambientColor() const", asMETHOD(Zone, GetAmbientColor), asCALL_THISCALL);
@@ -813,7 +812,6 @@ static void RegisterStaticModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticModel", "void set_material(Material@+)", asMETHODPR(StaticModel, SetMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "bool set_materials(uint, Material@+)", asMETHODPR(StaticModel, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "Material@+ get_materials(uint) const", asMETHOD(StaticModel, GetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StaticModel", "const BoundingBox& get_boundingBox() const", asMETHOD(StaticModel, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "uint get_numGeometries() const", asMETHOD(StaticModel, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "void set_occlusionLodLevel(uint) const", asMETHOD(StaticModel, SetOcclusionLodLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "uint get_occlusionLodLevel() const", asMETHOD(StaticModel, GetOcclusionLodLevel), asCALL_THISCALL);
@@ -1078,7 +1076,6 @@ static void RegisterCustomGeometry(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CustomGeometry", "void set_material(Material@+)", asMETHODPR(CustomGeometry, SetMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "bool set_materials(uint, Material@+)", asMETHODPR(CustomGeometry, SetMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "Material@+ get_materials(uint) const", asMETHOD(CustomGeometry, GetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CustomGeometry", "const BoundingBox& get_boundingBox() const", asMETHOD(CustomGeometry, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "void set_numGeometries(uint)", asMETHOD(CustomGeometry, SetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "uint get_numGeometries() const", asMETHOD(CustomGeometry, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("CustomGeometry", "Zone@+ get_zone() const", asMETHOD(CustomGeometry, GetZone), asCALL_THISCALL);

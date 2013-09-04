@@ -30,7 +30,7 @@ class Quaternion
     void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
     void FromRotationMatrix(const Matrix3& matrix);
     
-    float Normalize();
+    void Normalize();
     
     Quaternion Normalized() const;
     Quaternion Inverse() const;

@@ -172,24 +172,31 @@ public:
     /// Define from a rotation matrix.
     void FromRotationMatrix(const Matrix3& matrix);
     
-    /// Normalize to unit length and return the previous length.
-    float Normalize()
+    /// Normalize to unit length.
+    void Normalize()
     {
-        float len = sqrtf(LengthSquared());
-        if (len >= M_EPSILON)
-            *this *= (1.0f / len);
-
-        return len;
+        float lenSquared = LengthSquared();
+        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        {
+            float invLen = 1.0f / sqrtf(lenSquared);
+            w_ *= invLen;
+            x_ *= invLen;
+            y_ *= invLen;
+            z_ *= invLen;
+        }
     }
     
     /// Return normalized to unit length.
     Quaternion Normalized() const
     {
         float lenSquared = LengthSquared();
-        if (lenSquared >= M_EPSILON * M_EPSILON)
-            return *this * (1.0f / sqrtf(lenSquared));
+        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        {
+            float invLen = 1.0f / sqrtf(lenSquared);
+            return *this * invLen;
+        }
         else
-            return IDENTITY;
+            return *this;
     }
     
     /// Return inverse.

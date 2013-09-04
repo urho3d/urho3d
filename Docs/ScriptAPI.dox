@@ -355,7 +355,7 @@ Properties:<br>
 Vector2
 
 Methods:<br>
-- float Normalize()
+- void Normalize()
 - float DotProduct(const Vector2&) const
 - float AbsDotProduct(const Vector2&) const
 - Vector2 Lerp(const Vector2&, float) const
@@ -374,7 +374,7 @@ Properties:<br>
 Vector3
 
 Methods:<br>
-- float Normalize()
+- void Normalize()
 - float DotProduct(const Vector3&) const
 - float AbsDotProduct(const Vector3&) const
 - Vector3 CrossProduct(const Vector3&) const
@@ -2221,6 +2221,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 
 
@@ -2290,6 +2291,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - LightType lightType
 - bool perVertex
@@ -2356,8 +2358,8 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
-- BoundingBox worldBoundingBox (readonly)
 - BoundingBox boundingBox
+- BoundingBox worldBoundingBox (readonly)
 - Matrix3x4 inverseWorldTransform (readonly)
 - Color ambientColor
 - Color ambientStartColor (readonly)
@@ -2417,11 +2419,11 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - Model@ model
 - Material@ material (writeonly)
 - Material@[] materials
-- BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
 - uint occlusionLodLevel
 
@@ -2471,11 +2473,11 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - Model@ model
 - Material@ material (writeonly)
 - Material@[] materials
-- BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
 - Zone@ zone (readonly)
 
@@ -2565,11 +2567,11 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - Model@ model
 - Material@ material (writeonly)
 - Material@[] materials
-- BoundingBox boundingBox (readonly)
 - uint numGeometries (readonly)
 - Zone@ zone (readonly)
 - float animationLodBias
@@ -2700,6 +2702,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - Material@ material
 - uint numBillboards
@@ -2773,6 +2776,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - Material@ material
 - bool relative
@@ -2870,10 +2874,10 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - Material@ material (writeonly)
 - Material@[] materials
-- BoundingBox boundingBox (readonly)
 - uint numGeometries
 - Zone@ zone (readonly)
 
@@ -2926,6 +2930,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - Material@ material
 - uint numDecals (readonly)
@@ -2981,6 +2986,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 
 
@@ -4959,6 +4965,7 @@ Properties:<br>
 - uint shadowMask
 - uint zoneMask
 - uint maxLights
+- BoundingBox boundingBox (readonly)
 - BoundingBox worldBoundingBox (readonly)
 - Font@ font (readonly)
 - int fontSize (readonly)

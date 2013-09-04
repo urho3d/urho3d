@@ -217,7 +217,7 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "Vector2 opMul(float) const", asMETHODPR(Vector2, operator *, (float) const, Vector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 opDiv(const Vector2&in) const", asMETHODPR(Vector2, operator /, (const Vector2&) const, Vector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 opDiv(float) const", asMETHODPR(Vector2, operator /, (float) const, Vector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector2", "float Normalize()", asMETHOD(Vector2, Normalize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "void Normalize()", asMETHOD(Vector2, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float DotProduct(const Vector2&in) const", asMETHOD(Vector2, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHOD(Vector2, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHOD(Vector2, Lerp), asCALL_THISCALL);
@@ -279,7 +279,7 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "Vector3 opMul(float) const", asMETHODPR(Vector3, operator *, (float) const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 opDiv(const Vector3&in) const", asMETHODPR(Vector3, operator /, (const Vector3&) const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 opDiv(float) const", asMETHODPR(Vector3, operator /, (float) const, Vector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector3", "float Normalize()", asMETHOD(Vector3, Normalize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "void Normalize()", asMETHOD(Vector3, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float DotProduct(const Vector3&in) const", asMETHOD(Vector3, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float AbsDotProduct(const Vector3&in) const", asMETHOD(Vector3, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 CrossProduct(const Vector3&in) const", asMETHOD(Vector3, CrossProduct), asCALL_THISCALL);

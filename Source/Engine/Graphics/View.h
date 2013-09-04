@@ -230,8 +230,6 @@ private:
     IntVector2 rtSize_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
-    /// Combined bounding box of visible geometries.
-    BoundingBox sceneBox_;
     /// Write screenbuffer index.
     unsigned writeBuffer_;
     /// Read screenbuffer index.

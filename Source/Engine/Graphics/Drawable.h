@@ -162,6 +162,8 @@ public:
     /// Mark for update before octree reinsertion.
     void MarkForUpdate();
     
+    /// Return local space bounding box. May not be applicable or properly updated on all drawables.
+    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return world-space bounding box.
     const BoundingBox& GetWorldBoundingBox();
     /// Return drawable flags.
@@ -191,7 +193,7 @@ public:
     /// Return draw call source data.
     const Vector<SourceBatch>& GetBatches() const { return batches_; }
     
-    /// Set new zone.
+    /// Set new zone. Zone assignment may optionally be temporary, meaning it needs to be re-evaluated on the next frame.
     void SetZone(Zone* zone, bool temporary = false);
     /// Set sorting value.
     void SetSortValue(float value);
@@ -214,9 +216,9 @@ public:
     /// Return octree octant.
     Octant* GetOctant() const { return octant_; }
     /// Return current zone.
-    Zone* GetZone() const;
+    Zone* GetZone() const { return zone_; }
     /// Return previous zone.
-    Zone* GetLastZone() const;
+    Zone* GetLastZone() const { return lastZone_; }
     /// Return if zone assignment needs re-evaluation.
     bool IsZoneDirty() const { return zoneDirty_; }
     /// Return distance from camera.
@@ -256,8 +258,10 @@ protected:
     /// Move into another octree octant.
     void SetOctant(Octant* octant) { octant_ = octant; }
     
-    /// World bounding box.
+    /// World-space bounding box.
     BoundingBox worldBoundingBox_;
+    /// Local-space bounding box.
+    BoundingBox boundingBox_;
     /// Draw call source data.
     Vector<SourceBatch> batches_;
     /// Drawable flags.
@@ -313,9 +317,9 @@ protected:
     /// Per-vertex lights affecting this drawable.
     PODVector<Light*> vertexLights_;
     /// Current zone.
-    WeakPtr<Zone> zone_;
+    Zone* zone_;
     /// Previous zone.
-    WeakPtr<Zone> lastZone_;
+    Zone* lastZone_;
     /// Last view's frameinfo. Not safe to dereference.
     const FrameInfo* viewFrame_;
     /// Last view's camera. Not safe to dereference.

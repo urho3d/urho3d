@@ -134,18 +134,16 @@ public:
         return *this;
     }
     
-    /// Normalize to unit length and return the previous length.
-    float Normalize()
+    /// Normalize to unit length.
+    void Normalize()
     {
-        float len = Length();
-        if (len >= M_EPSILON)
+        float lenSquared = LengthSquared();
+        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
         {
-            float invLen = 1.0f / len;
+            float invLen = 1.0f / sqrtf(lenSquared);
             x_ *= invLen;
             y_ *= invLen;
         }
-        
-        return len;
     }
     
     /// Return length.
@@ -166,9 +164,12 @@ public:
     /// Return normalized to unit length.
     Vector2 Normalized() const
     {
-        float len = Length();
-        if (len >= M_EPSILON)
-            return *this * (1.0f / len);
+        float lenSquared = LengthSquared();
+        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        {
+            float invLen = 1.0f / sqrtf(lenSquared);
+            return *this * invLen;
+        }
         else
             return *this;
     }

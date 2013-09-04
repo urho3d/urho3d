@@ -94,8 +94,6 @@ public:
     TerrainPatch* GetEastPatch() const { return east_; }
     /// Return geometrical error array.
     PODVector<float>& GetLodErrors() { return lodErrors_; }
-    /// Return local-space bounding box.
-    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return patch coordinates.
     const IntVector2& GetCoordinates() const { return coordinates_; }
     /// Return current LOD level.
@@ -131,8 +129,6 @@ private:
     WeakPtr<TerrainPatch> east_;
     /// Geometrical error per LOD level.
     PODVector<float> lodErrors_;
-    /// Local-space bounding box.
-    BoundingBox boundingBox_;
     /// Patch coordinates in the terrain. (0,0) is the northwest corner.
     IntVector2 coordinates_;
     /// Current LOD level.

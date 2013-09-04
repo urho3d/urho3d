@@ -73,8 +73,6 @@ public:
     
     /// Return model.
     Model* GetModel() const { return model_; }
-    /// Return model's bounding box.
-    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
     /// Return material by geometry index.
@@ -107,8 +105,6 @@ protected:
     /// Choose LOD levels based on distance.
     void CalculateLodLevels();
     
-    /// Local-space bounding box.
-    BoundingBox boundingBox_;
     /// Extra per-geometry data.
     PODVector<StaticModelGeometryData> geometryData_;
     /// All geometries.
