@@ -32,7 +32,7 @@ function Stop()
 end
 
 function CreateSprites()
-    local decalTex = cache:GetTexture2D("Textures/UrhoDecal.dds")
+    local decalTex = cache:GetResource("Texture2D", "Textures/UrhoDecal.dds")
     
     local width = graphics.width
     local height = graphics.height

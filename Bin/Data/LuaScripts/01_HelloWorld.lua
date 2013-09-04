@@ -30,7 +30,7 @@ function CreateText()
 
     -- Set font and text color
     local cache = GetCache()
-    helloText:SetFont(cache:GetFont("Fonts/Anonymous Pro.ttf"), 30)
+    helloText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 30)
     helloText.color = Color(0.0, 1.0, 0.0)
     
     -- Align Text center-screen

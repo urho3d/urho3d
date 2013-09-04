@@ -26,14 +26,14 @@ end
 function CreateLogo()
     -- Get logo texture
     local cache = GetCache()
-    local logoTexture = cache:GetTexture2D("Textures/LogoLarge.png")
+    local logoTexture = cache:GetResource("Texture2D", "Textures/LogoLarge.png")
     if logoTexture == nil then
         return
     end
     
     -- Create logo sprite and add to the UI layout
     local ui = GetUI()
-    logoSprite = ui.root:CreateSprite()
+    logoSprite = ui.root:CreateChild("Sprite")
     
     -- Set logo sprite texture
     logoSprite:SetTexture(logoTexture)
@@ -63,7 +63,7 @@ end
 function CreateConsoleAndDebugHud()
     -- Get default style
     local cache = GetCache()
-    local uiStyle = cache:GetXMLFile("UI/DefaultStyle.xml")
+    local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
     if uiStyle == nil then
         return
     end

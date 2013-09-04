@@ -48,7 +48,7 @@ function Start()
         SubscribeToEvent("ClientConnected", "HandleClientConnected")
 
         -- Disable physics interpolation to ensure clients get sent physically correct transforms
-        testScene:GetPhysicsWorld():SetInterpolation(false)
+        testScene:GetComponent("PhysicsWorld"):SetInterpolation(false)
     end
     
     if runClient then
@@ -63,7 +63,7 @@ function Stop()
 end
 
 function InitConsole()
-    local uiStyle = cache:GetXMLFile("UI/DefaultStyle.xml")
+    local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
 
     local debugHud = engine:CreateDebugHud()
     debugHud.defaultStyle = uiStyle
@@ -74,7 +74,7 @@ function InitConsole()
 end
 
 function InitUI()
-    local uiStyle = cache:GetXMLFile("UI/DefaultStyle.xml")
+    local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
     
     local newCursor = Cursor:new(context)
     newCursor.styleAuto = uiStyle
@@ -91,7 +91,7 @@ function InitScene()
     
     -- Create the camera outside the scene so it is unaffected by scene load/save
     cameraNode = Node(context)
-    camera = cameraNode:CreateCamera()
+    camera = cameraNode:CreateComponent("Camera")
     cameraNode.position = Vector3(0, 2, 0)
 
     if not engine:IsHeadless() then
@@ -101,24 +101,24 @@ function InitScene()
         -- local newRenderPathPtr = renderer:GetViewport(0):GetRenderPath():Clone()
         -- local newRenderPath = newRenderPathPtr:Get()
         local newRenderPath = renderer:GetViewport(0):GetRenderPath():Clone()
-        newRenderPath:Append(cache:GetXMLFile("PostProcess/Bloom.xml"))
-        newRenderPath.Append(cache:GetXMLFile("PostProcess/EdgeFilter.xml"))
+        newRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/Bloom.xml"))
+        newRenderPath.Append(cache:GetResource("XMLFile", "PostProcess/EdgeFilter.xml"))
         newRenderPath:SetEnabled("Bloom", false)
         newRenderPath:SetEnabled("EdgeFilter", false)
         renderer:GetViewport(0):SetRenderPath(newRenderPath)
-        audio:SetListener(cameraNode:CreateSoundListener())
+        audio:SetListener(cameraNode:CreateComponent("SoundListener"))
     end
     
     if runClient then
         return
     end
 
-    local world = testScene:CreatePhysicsWorld()
-    testScene:CreateOctree()
-    testScene:CreateDebugRenderer()
+    local world = testScene:CreateComponent("PhysicsWorld")
+    testScene:CreateComponent("Octree")
+    testScene:CreateComponent("DebugRenderer")
 
     local zoneNode = testScene:CreateChild("Zone")
-    local zone = zoneNode:CreateZone()
+    local zone = zoneNode:CreateComponent("Zone")
     zone.ambientColor = Color(0.15, 0.15, 0.15)
     zone.fogColor = Color(0.5, 0.5, 0.7)
     zone.fogStart = 100.0
@@ -129,7 +129,7 @@ function InitScene()
         local lightNode = testScene:CreateChild("GlobalLight")
         lightNode.direction = Vector3(0.3, -0.5, 0.425)
         
-        local light = lightNode:CreateLight()
+        local light = lightNode:CreateComponent("Light")
         light.lightType = LIGHT_DIRECTIONAL
         light.castShadows = true
         light.shadowBias = BiasParameters(0.0001, 0.5)
@@ -142,13 +142,13 @@ function InitScene()
         objectNode.position = Vector3(0, -0.5, 0)
         objectNode.scale = Vector3(200, 1, 200)
         
-        local object = objectNode:CreateStaticModel()
-        object.model = cache:GetModel("Models/Box.mdl")
-        object.material = cache:GetMaterial("Materials/StoneTiled.xml")
+        local object = objectNode:CreateComponent("StaticModel")
+        object.model = cache:GetResource("Model", "Models/Box.mdl")
+        object.material = cache:GetResource("Material", "Materials/StoneTiled.xml")
         object.occluder = true
 
-        local body = objectNode:CreateRigidBody()
-        local shape = objectNode:CreateCollisionShape()
+        local body = objectNode:CreateComponent("RigidBody")
+        local shape = objectNode:CreateComponent("CollisionShape")
         shape:SetBox(Vector3(1, 1, 1))
     end
 
@@ -157,13 +157,13 @@ function InitScene()
         objectNode.position = Vector3(Random() * 180 - 90, 1, Random() * 180 - 90)
         objectNode:SetScale(2)
 
-        local object = objectNode:CreateStaticModel()
-        object.model = cache:GetModel("Models/Box.mdl")
-        object.material = cache:GetMaterial("Materials/Stone.xml")
+        local object = objectNode:CreateComponent("StaticModel")
+        object.model = cache:GetResource("Model", "Models/Box.mdl")
+        object.material = cache:GetResource("Material", "Materials/Stone.xml")
         object.castShadows = true
 
-        local body = objectNode:CreateRigidBody()
-        local shape = objectNode:CreateCollisionShape()
+        local body = objectNode:CreateComponent("RigidBody")
+        local shape = objectNode:CreateComponent("CollisionShape")
         shape:SetBox(Vector3(1, 1, 1))
     end
 
@@ -172,14 +172,14 @@ function InitScene()
         objectNode.position = Vector3(Random() * 180 - 90, 10, Random() * 180 - 90)
         objectNode:SetScale(20)
 
-        local object = objectNode:CreateStaticModel()
-        object.model = cache:GetModel("Models/Box.mdl")
-        object.material = cache:GetMaterial("Materials/Stone.xml")
+        local object = objectNode:CreateComponent("StaticModel")
+        object.model = cache:GetResource("Model", "Models/Box.mdl")
+        object.material = cache:GetResource("Material", "Materials/Stone.xml")
         object.castShadows = true
         object.occluder = true
 
-        local body = objectNode:CreateRigidBody()
-        local shape = objectNode:CreateCollisionShape()
+        local body = objectNode:CreateComponent("RigidBody")
+        local shape = objectNode:CreateComponent("CollisionShape")
         shape:SetBox(Vector3(1, 1, 1))
     end
     
@@ -191,13 +191,13 @@ function InitScene()
         objectNode.rotation = Quaternion(0, Random(360.0), 0)
         objectNode:SetScale(5)
 
-        local object = objectNode:CreateStaticModel()
-        object.model = cache:GetModel("Models/Mushroom.mdl")
-        object.material = cache:GetMaterial("Materials/Mushroom.xml")
+        local object = objectNode:CreateComponent("StaticModel")
+        object.model = cache:GetResource("Model", "Models/Mushroom.mdl")
+        object.material = cache:GetResource("Material", "Materials/Mushroom.xml")
         object.castShadows = true
 
-        local body = objectNode:CreateRigidBody()
-        local shape = objectNode:CreateCollisionShape()
+        local body = objectNode:CreateComponent("RigidBody")
+        local shape = objectNode:CreateComponent("CollisionShape")
         shape:SetTriangleMesh(object:GetModel())
     end
 
@@ -207,18 +207,18 @@ function InitScene()
         objectNode:SetPosition(Vector3(Random() * 180 - 90, 0, Random() * 180 - 90))
         objectNode:SetRotation(Quaternion(0, Random() * 360, 0))
 
-        local object = objectNode:CreateAnimatedModel()
-        object.model = cache:GetModel("Models/Jack.mdl")
-        object.material = cache:GetMaterial("Materials/Jack.xml")
+        local object = objectNode:CreateComponent("AnimatedModel")
+        object.model = cache:GetResource("Model", "Models/Jack.mdl")
+        object.material = cache:GetResource("Material", "Materials/Jack.xml")
         object.castShadows = true
         
         -- Create a capsule shape for detecting collisions
-        local body = objectNode:CreateRigidBody()
+        local body = objectNode:CreateComponent("RigidBody")
         body.phantom = true
         
-        local shape = objectNode:CreateCollisionShape()
+        local shape = objectNode:CreateComponent("CollisionShape")
         shape:SetCapsule(0.7, 1.8, Vector3(0.0, 0.9, 0.0))
-        local ctrl = objectNode:CreateAnimationController()
+        local ctrl = objectNode:CreateComponent("AnimationController")
         ctrl:Play("Models/Jack_Walk.ani", 0, true, 0.0)
     end
 end
@@ -405,15 +405,15 @@ function HandleMouseButtonDown(eventType, eventData)
             end
         else
             local pos = ui:GetCursorPosition()
-            if ui:GetElementAt(pos, true) == nil and testScene:GetOctree() ~= nil then
+            if ui:GetElementAt(pos, true) == nil and testScene:GetComponent("Octree") ~= nil then
                 local cameraRay = camera:GetScreenRay(pos.x / graphics:GetWidth(), pos.y / graphics:GetHeight())
-                local result = testScene:GetOctree():RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY)
+                local result = testScene:GetComponent("Octree"):RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY)
                 if result.drawable ~= nil then
                     local rayHitPos = cameraRay.origin + cameraRay.direction * result.distance
-                    local decal = result.drawable:GetNode():GetDecalSet()
+                    local decal = result.drawable:GetNode():GetComponent("DecalSet")
                     if decal == nil then
-                        decal = result.drawable:GetNode():CreateDecalSet()
-                        decal.material = cache:GetMaterial("Materials/UrhoDecal.xml")
+                        decal = result.drawable:GetNode():CreateComponent("DecalSet")
+                        decal.material = cache:GetResource("Material", "Materials/UrhoDecal.xml")
                         -- Increase max. vertices/indices if the target is skinned
                         if result.drawable:GetTypeName() == "AnimatedModel" then
                             decal.maxVertices = 2048
@@ -436,17 +436,17 @@ function HandleSpawnBox(eventType, eventData)
     newNode.rotation =rotation
     newNode:SetScale(0.2)
     
-    local body = newNode:CreateRigidBody()
+    local body = newNode:CreateComponent("RigidBody")
     body.mass = 1.0
     body.friction = 1.0
     body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0)
 
-    local shape = newNode:CreateCollisionShape()
+    local shape = newNode:CreateComponent("CollisionShape")
     shape:SetBox(Vector3(1, 1, 1))
 
-    local object = newNode:CreateStaticModel()
-    object.model = cache:GetModel("Models/Box.mdl")
-    object.material = cache:GetMaterial("Materials/StoneSmall.xml")
+    local object = newNode:CreateComponent("StaticModel")
+    object.model = cache:GetResource("Model", "Models/Box.mdl")
+    object.material = cache:GetResource("Material", "Materials/StoneSmall.xml")
     object.castShadows = true
     object.shadowDistance = 150.0
     object.drawDistance = 200.0
@@ -465,19 +465,19 @@ function HandlePostRenderUpdate()
     
     -- Draw rendering debug geometry without depth test to see the effect of occlusion
     if drawDebug == 1 then
-        renderer:DrawDebugGeometry(false)
+        renderer:DrawDebugGeometry(true)
     end
     if drawDebug == 2 then
-        testScene:GetPhysicsWorld():DrawDebugGeometry(true)
+        testScene:GetComponent("PhysicsWorld"):DrawDebugGeometry(true)
     end
     
     local pos = ui.cursorPosition
-    if ui:GetElementAt(pos, true) == nil and testScene:GetOctree() ~= nil then
+    if ui:GetElementAt(pos, true) == nil and testScene:GetComponent("Octree") ~= nil then
         local cameraRay = camera:GetScreenRay(pos.x / graphics:GetWidth(), pos.y / graphics:GetHeight())
-        local result = testScene:GetOctree():RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY)
+        local result = testScene:GetComponent("Octree"):RaycastSingle(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY)
         if result.drawable ~= nil then
             local rayHitPos = cameraRay.origin + cameraRay.direction * result.distance
-            testScene:GetDebugRenderer():AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
+            testScene:GetComponent("DebugRenderer"):AddBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true)
         end
     end
@@ -505,7 +505,7 @@ function HandleHit(node)
     -- Remove the trigger physics shape, and create the ragdoll
     node:RemoveComponent("RigidBody")
     node:RemoveComponent("CollisionShape")
-    CreateRagdoll(node:GetAnimatedModel())
+    CreateRagdoll(node:GetComponent("AnimatedModel"))
 end
 
 function CreateRagdoll(model)
@@ -549,14 +549,14 @@ function CreateRagdollBone(root, boneName, type, size, position, rotation)
     -- In networked operation both client and server detect collisions separately, and create ragdolls on their own
     -- (bones are not synced over network.) To prevent replicated component ID range clashes when the client creates
     -- any components, it is important that the LOCAL creation mode is specified.
-    local body = boneNode:CreateRigidBody(LOCAL)
+    local body = boneNode:CreateComponent("RigidBody", LOCAL)
     body.mass = 1.0
     body.linearDamping = 0.05
     body.angularDamping = 0.85
     body.linearRestThreshold = 1.5
     body.angularRestThreshold = 2.5
 
-    local shape = boneNode:CreateCollisionShape(LOCAL)
+    local shape = boneNode:CreateComponent("CollisionShape", LOCAL)
     shape.shapeType = type
     shape.size = size
     shape.position = position
@@ -570,11 +570,11 @@ function CreateRagdollConstraint(root, boneName, parentName, type, axis, parentA
         return
     end
 
-    local constraint = boneNode:CreateConstraint(LOCAL)
+    local constraint = boneNode:CreateComponent("Constraint", LOCAL)
     constraint.constraintType = type
     constraint.disableCollision = disableCollision
     -- The connected body must be specified before setting the world position
-    constraint.otherBody = parentNode:GetRigidBody()
+    constraint.otherBody = parentNode:GetComponent("RigidBody")
     constraint.worldPosition = boneNode.worldPosition
     constraint:SetAxis(axis)
     constraint:SetOtherAxis(parentAxis)

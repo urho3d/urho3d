@@ -18,7 +18,7 @@ function Start()
 
     -- Load XML file containing default UI style sheet
     local cache = GetCache()
-    local style = cache:GetXMLFile("UI/DefaultStyle.xml")
+    local style = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
 
     -- Set the loaded style as default style
     local ui = GetUI()
