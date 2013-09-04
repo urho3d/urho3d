@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <scene id="1">
 	<attribute name="Name" value="NinjaSnowWar" />
-	<attribute name="Position" value="0 0 0" />
-	<attribute name="Rotation" value="1 0 0 0" />
-	<attribute name="Scale" value="1 1 1" />
+	<attribute name="Time Scale" value="1" />
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="500" />
+	<attribute name="Elapsed Time" value="0" />
 	<attribute name="Next Replicated Node ID" value="2" />
 	<attribute name="Next Replicated Component ID" value="1" />
 	<attribute name="Next Local Node ID" value="16777220" />
@@ -18,13 +17,11 @@
 		<attribute name="Number of Levels" value="7" />
 	</component>
 	<component type="PhysicsWorld" id="16777217">
-		<attribute name="Gravity" value="0 -9.81 0" />
 		<attribute name="Physics FPS" value="100" />
-		<attribute name="Net Max Angular Vel." value="100" />
-		<attribute name="Interpolation" value="true" />
 	</component>
 	<component type="DebugRenderer" id="16777218" />
 	<node id="16777216">
+		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Zone" />
 		<attribute name="Position" value="0 0 0" />
 		<attribute name="Rotation" value="1 0 0 0" />
@@ -37,15 +34,10 @@
 			<attribute name="Fog Color" value="0.2 0.2 0.7 1" />
 			<attribute name="Fog Start" value="50" />
 			<attribute name="Fog End" value="150" />
-			<attribute name="Override Mode" value="false" />
-			<attribute name="Ambient Gradient" value="false" />
-			<attribute name="Priority" value="0" />
-			<attribute name="Light Mask" value="-1" />
-			<attribute name="Shadow Mask" value="-1" />
-			<attribute name="Zone Mask" value="-1" />
 		</component>
 	</node>
 	<node id="16777217">
+		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="GlobalLight" />
 		<attribute name="Position" value="0 0 0" />
 		<attribute name="Rotation" value="0.888074 0.325058 -0.325058 0" />
@@ -53,37 +45,17 @@
 		<attribute name="Variables" />
 		<component type="Light" id="16777219">
 			<attribute name="Light Type" value="Directional" />
-			<attribute name="Color" value="1 1 1 1" />
 			<attribute name="Specular Intensity" value="0" />
-			<attribute name="Range" value="10" />
-			<attribute name="Spot FOV" value="30" />
-			<attribute name="Spot Aspect Ratio" value="1" />
-			<attribute name="Attenuation Texture" value="Texture2D;" />
-			<attribute name="Light Shape Texture" value="Texture2D;" />
-			<attribute name="Can Be Occluded" value="true" />
 			<attribute name="Cast Shadows" value="true" />
-			<attribute name="Per Vertex" value="false" />
-			<attribute name="Draw Distance" value="0" />
-			<attribute name="Fade Distance" value="0" />
-			<attribute name="Shadow Distance" value="0" />
-			<attribute name="Shadow Fade Distance" value="0" />
-			<attribute name="Shadow Intensity" value="0" />
-			<attribute name="Shadow Resolution" value="1" />
-			<attribute name="Focus To Scene" value="true" />
-			<attribute name="Non-uniform View" value="true" />
-			<attribute name="Auto-Reduce Size" value="true" />
 			<attribute name="CSM Splits" value="10 20 50 0" />
-			<attribute name="CSM Fade Start" value="0.8" />
 			<attribute name="View Size Quantize" value="1" />
 			<attribute name="View Size Minimum" value="5" />
 			<attribute name="Depth Constant Bias" value="0.00025" />
 			<attribute name="Depth Slope Bias" value="0.001" />
-			<attribute name="Near/Farclip Ratio" value="0.002" />
-			<attribute name="View Mask" value="-1" />
-			<attribute name="Light Mask" value="-1" />
 		</component>
 	</node>
 	<node id="16777218">
+		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Static" />
 		<attribute name="Position" value="0 0 0" />
 		<attribute name="Rotation" value="1 0 0 0" />
@@ -92,50 +64,19 @@
 		<component type="StaticModel" id="16777220">
 			<attribute name="Model" value="Model;Models/Level.mdl" />
 			<attribute name="Material" value="Material;Materials/Snow.xml" />
-			<attribute name="Is Occluder" value="false" />
-			<attribute name="Can Be Occluded" value="true" />
-			<attribute name="Cast Shadows" value="false" />
-			<attribute name="Draw Distance" value="0" />
-			<attribute name="Shadow Distance" value="0" />
-			<attribute name="LOD Bias" value="1" />
-			<attribute name="Max Lights" value="0" />
-			<attribute name="View Mask" value="-1" />
-			<attribute name="Light Mask" value="-1" />
-			<attribute name="Shadow Mask" value="-1" />
-			<attribute name="Zone Mask" value="-1" />
 		</component>
 		<component type="CollisionShape" id="16777221">
 			<attribute name="Shape Type" value="TriangleMesh" />
-			<attribute name="Size" value="1 1 1" />
-			<attribute name="Offset Position" value="0 0 0" />
-			<attribute name="Offset Rotation" value="1 0 0 0" />
-			<attribute name="Collision Margin" value="0.01" />
 			<attribute name="Model" value="Model;Models/Level.mdl" />
-			<attribute name="LOD Level" value="0" />
+			<attribute name="Collision Margin" value="0.01" />
 		</component>
 		<component type="RigidBody" id="16777223">
-			<attribute name="Physics Position" value="0 0 0" />
-			<attribute name="Physics Rotation" value="1 0 0 0" />
-			<attribute name="Mass" value="0" />
-			<attribute name="Friction" value="0.5" />
-			<attribute name="Restitution" value="0" />
-			<attribute name="Linear Velocity" value="0 0 0" />
-			<attribute name="Angular Velocity" value="0 0 0" />
-			<attribute name="Linear Factor" value="1 1 1" />
-			<attribute name="Angular Factor" value="1 1 1" />
-			<attribute name="Linear Damping" value="0" />
-			<attribute name="Angular Damping" value="0" />
-			<attribute name="Linear Rest Threshold" value="0.8" />
-			<attribute name="Angular Rest Threshold" value="1" />
 			<attribute name="Collision Layer" value="2" />
 			<attribute name="Collision Mask" value="3" />
-			<attribute name="Collision Event Mode" value="When Active" />
-			<attribute name="Use Gravity" value="true" />
-			<attribute name="Is Kinematic" value="false" />
-			<attribute name="Is Phantom" value="false" />
 		</component>
 	</node>
 	<node id="16777219">
+		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Sky" />
 		<attribute name="Position" value="0 30 0" />
 		<attribute name="Rotation" value="1 0 0 0" />
@@ -144,17 +85,6 @@
 		<component type="Skybox" id="16777222">
 			<attribute name="Model" value="Model;Models/CloudPlane.mdl" />
 			<attribute name="Material" value="Material;Materials/CloudPlane.xml" />
-			<attribute name="Is Occluder" value="false" />
-			<attribute name="Can Be Occluded" value="true" />
-			<attribute name="Cast Shadows" value="false" />
-			<attribute name="Draw Distance" value="0" />
-			<attribute name="Shadow Distance" value="0" />
-			<attribute name="LOD Bias" value="1" />
-			<attribute name="Max Lights" value="0" />
-			<attribute name="View Mask" value="-1" />
-			<attribute name="Light Mask" value="-1" />
-			<attribute name="Shadow Mask" value="-1" />
-			<attribute name="Zone Mask" value="-1" />
 		</component>
 	</node>
 </scene>
