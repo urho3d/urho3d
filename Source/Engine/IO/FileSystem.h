@@ -94,16 +94,16 @@ private:
     mutable String programDir_;
 };
 
-/// Split a full path to path, filename and extension. The extension will be converted to lowercase.
-URHO3D_API void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension);
+/// Split a full path to path, filename and extension. The extension will be converted to lowercase by default.
+URHO3D_API void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension = true);
 /// Return the path from a full path.
 URHO3D_API String GetPath(const String& fullPath);
 /// Return the filename from a full path.
 URHO3D_API String GetFileName(const String& fullPath);
-/// Return the extension from a full path, converted to lowercase.
-URHO3D_API String GetExtension(const String& fullPath);
-/// Return the filename and extension from a full path. The extension will be converted to lowercase.
-URHO3D_API String GetFileNameAndExtension(const String& fullPath);
+/// Return the extension from a full path, converted to lowercase by default.
+URHO3D_API String GetExtension(const String& fullPath, bool lowercaseExtension = true);
+/// Return the filename and extension from a full path. The case of the extension is preserved by default, so that the file can be opened in case-sensitive operating systems.
+URHO3D_API String GetFileNameAndExtension(const String& fullPath, bool lowercaseExtension = false);
 /// Replace the extension of a file name with another.
 URHO3D_API String ReplaceExtension(const String& fullPath, const String& newExtension);
 /// Add a slash at the end of the path if missing and convert to internal format (use slashes.)

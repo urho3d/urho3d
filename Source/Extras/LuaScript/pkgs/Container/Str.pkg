@@ -15,15 +15,15 @@ class String
     bool operator == (const char* rhs) const;
     tolua_outside bool StringEquals @ Equals(const String& rhs) const;
     tolua_outside bool StringEquals @ Equals(const char*& rhs) const;
-    
-    void Replace(const String& replaceThis, const String& replaceWith);
-    void Replace(const char* replaceThis, const char* replaceWith);
+
+    void Replace(const String& replaceThis, const String& replaceWith, bool caseSensitive = true);
+    void Replace(const char* replaceThis, const char* replaceWith, bool caseSensitive = true);
     
     void Replace(unsigned pos, unsigned length, const String& replaceWith);
     void Replace(unsigned pos, unsigned length, const char* replaceWith);
     
-    String Replaced(const String& replaceThis, const String& replaceWith) const;
-    String Replaced(const char* replaceThis, const char* replaceWith) const;
+    String Replaced(const String& replaceThis, const String& replaceWith, bool caseSensitive = true) const;
+    String Replaced(const char* replaceThis, const char* replaceWith, bool caseSensitive = true) const;
     
     String& Append(const String& str);
     String& Append(const char* str);
@@ -44,16 +44,16 @@ class String
     String ToUpper() const;
     String ToLower() const;
     
-    unsigned Find(const String& str, unsigned startPos = 0) const;
-    unsigned Find(const char* str, unsigned startPos = 0) const;
+    unsigned Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const;
+    unsigned Find(const char* str, unsigned startPos = 0, bool caseSensitive = true) const;
     
-    unsigned FindLast(const String& str, unsigned startPos = String::NPOS) const;
-    unsigned FindLast(const char* str, unsigned startPos = String::NPOS) const;
+    unsigned FindLast(const String& str, unsigned startPos = String::NPOS, bool caseSensitive = true) const;
+    unsigned FindLast(const char* str, unsigned startPos = String::NPOS, bool caseSensitive = true) const;
     
-    bool StartsWith(const String& str) const;
-    bool StartsWith(const char* str) const;
-    bool EndsWith(const String& str) const;
-    bool EndsWith(const char* str) const;
+    bool StartsWith(const String& str, bool caseSensitive = true) const;
+    bool StartsWith(const char* str, bool caseSensitive = true) const;
+    bool EndsWith(const String& str, bool caseSensitive = true) const;
+    bool EndsWith(const char* str, bool caseSensitive = true) const;
     
     const char* CString() const;
     unsigned Length() const;

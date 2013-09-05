@@ -133,7 +133,7 @@ public:
     
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path) const;
-    /// Remove unsupported constructs from the resource name to prevent ambiguity.
+    /// Remove unsupported constructs from the resource name to prevent ambiguity, and normalize absolute filename to resource path relative if possible.
     String SanitateResourceName(const String& name) const;
     /// Store a hash-to-name mapping.
     void StoreNameHash(const String& name);

@@ -274,17 +274,19 @@ public:
     const char& At(unsigned index) const { assert(index < length_); return buffer_[index]; }
     
     /// Replace all occurrences of a character.
-    void Replace(char replaceThis, char replaceWith);
+    void Replace(char replaceThis, char replaceWith, bool caseSensitive = true);
     /// Replace all occurrences of a string.
-    void Replace(const String& replaceThis, const String& replaceWith);
+    void Replace(const String& replaceThis, const String& replaceWith, bool caseSensitive = true);
     /// Replace a substring.
     void Replace(unsigned pos, unsigned length, const String& replaceWith);
+    /// Replace a substring with a C string.
+    void Replace(unsigned pos, unsigned length, const char* replaceWith);
     /// Replace a substring by iterators.
     Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
     /// Return a string with all occurrences of a character replaced.
-    String Replaced(char replaceThis, char replaceWith) const;
+    String Replaced(char replaceThis, char replaceWith, bool caseSensitive = true) const;
     /// Return a string with all occurrences of a string replaced.
-    String Replaced(const String& replaceThis, const String& replaceWith) const;
+    String Replaced(const String& replaceThis, const String& replaceWith, bool caseSensitive = true) const;
     /// Append a string.
     String& Append(const String& str);
     /// Append a C string.
@@ -347,17 +349,17 @@ public:
     /// Join substrings with a 'glue' string.
     void Join(const Vector<String>& subStrings, String glue);
     /// Return index to the first occurrence of a string, or NPOS if not found.
-    unsigned Find(const String& str, unsigned startPos = 0) const;
+    unsigned Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const;
     /// Return index to the first occurrence of a character, or NPOS if not found.
-    unsigned Find(char c, unsigned startPos = 0) const;
+    unsigned Find(char c, unsigned startPos = 0, bool caseSensitive = true) const;
     /// Return index to the last occurrence of a string, or NPOS if not found.
-    unsigned FindLast(const String& str, unsigned startPos = NPOS) const;
+    unsigned FindLast(const String& str, unsigned startPos = NPOS, bool caseSensitive = true) const;
     /// Return index to the last occurrence of a character, or NPOS if not found.
-    unsigned FindLast(char c, unsigned startPos = NPOS) const;
+    unsigned FindLast(char c, unsigned startPos = NPOS, bool caseSensitive = true) const;
     /// Return whether starts with a string.
-    bool StartsWith(const String& str) const;
+    bool StartsWith(const String& str, bool caseSensitive = true) const;
     /// Return whether ends with a string.
-    bool EndsWith(const String& str) const;
+    bool EndsWith(const String& str, bool casSensitive = true) const;
     /// Return the C string.
     const char* CString() const { return buffer_; }
     /// Return length.

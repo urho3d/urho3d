@@ -22,6 +22,8 @@ class Ray
     float HitDistance(const Sphere& sphere) const;
     float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
     
+    Ray Transformed(const Matrix3x4& transform) const;
+    
     Vector3 origin_ @ origin;
     Vector3 direction_ @ direction;
 };

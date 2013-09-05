@@ -108,10 +108,10 @@ void Console::SetDefaultStyle(XMLFile* style)
 void Console::SetVisible(bool enable)
 {
     // Check if we have script subsystem
-    bool hasScriptSubsystem = GetSubsystem<Script>();
+    bool hasScriptSubsystem = GetSubsystem<Script>() != 0;
     #ifdef ENABLE_LUA
     if (!hasScriptSubsystem)
-        hasScriptSubsystem = GetSubsystem<LuaScript>();
+        hasScriptSubsystem = GetSubsystem<LuaScript>() != 0;
     #endif
 
     lineEdit_->SetVisible(hasScriptSubsystem);
@@ -186,7 +186,7 @@ bool Console::IsVisible() const
 
 unsigned Console::GetNumRows() const
 {
-    rowContainer_->GetNumChildren();
+    return rowContainer_->GetNumChildren();
 }
 
 const String& Console::GetHistoryRow(unsigned index) const

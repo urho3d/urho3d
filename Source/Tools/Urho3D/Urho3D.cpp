@@ -136,7 +136,7 @@ void Urho::Setup()
 void Urho::Start()
 {
 #ifdef ENABLE_LUA
-    String extension = GetExtension(scriptFileName_).ToLower();
+    String extension = GetExtension(scriptFileName_);
     if (extension != ".lua")
     {
 #endif

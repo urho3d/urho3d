@@ -178,7 +178,7 @@ bool Font::Load(Deserializer& source)
         return false;
     }
 
-    String ext = GetExtension(GetName()).ToLower();
+    String ext = GetExtension(GetName());
     if (ext == ".ttf")
         fontType_ = FONT_TTF;
     else if (ext == ".xml" || ext == ".fnt")

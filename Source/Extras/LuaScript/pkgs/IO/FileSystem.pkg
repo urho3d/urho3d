@@ -35,7 +35,7 @@ class FileSystem : public Object
     
     String GetCurrentDir() const;
     bool HasRegisteredPaths() const;
-    
+
     bool CheckAccess(const String& pathName) const;
     bool CheckAccess(const char* pathName) const;
     
@@ -58,8 +58,8 @@ class FileSystem : public Object
 
 String GetPath(const String& fullPath);
 String GetFileName(const String& fullPath);
-String GetExtension(const String& fullPath);
-String GetFileNameAndExtension(const String& fullPath);
+String GetExtension(const String& fullPath, bool lowercaseExtension = true);
+String GetFileNameAndExtension(const String& fullPath, bool lowercaseExtension = false);
 String ReplaceExtension(const String& fullPath, const String& newExtension);
 String AddTrailingSlash(const String& pathName);
 String RemoveTrailingSlash(const String& pathName);

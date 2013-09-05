@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Vector3.h"
+#include "Matrix3x4.h"
 
 namespace Urho3D
 {
@@ -41,7 +42,7 @@ public:
     {
     }
     
-    /// Construct from origin and direction.
+    /// Construct from origin and direction. The direction will be normalized.
     Ray(const Vector3& origin, const Vector3& direction) :
         origin_(origin),
         direction_(direction.Normalized())
@@ -99,7 +100,9 @@ public:
     bool InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const;
     /// Return whether ray is inside indexed geometry.
     bool InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
-    
+    /// Return transformed by a 3x4 matrix. This may result in a non-normalized direction.
+    Ray Transformed(const Matrix3x4& transform) const;
+
     /// Ray origin.
     Vector3 origin_;
     /// Ray direction.

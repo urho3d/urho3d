@@ -320,8 +320,7 @@ void Run(const Vector<String>& arguments)
             // If output file already has the Models/ path (model mode), do not take it into the resource path
             if (command == "model")
             {
-                String resPathLower = resourcePath_.ToLower();
-                if (resPathLower.FindLast("models/") == resPathLower.Length() - 7)
+                if (resourcePath_.EndsWith("Models/", false))
                     resourcePath_ = resourcePath_.Substring(0, resourcePath_.Length() - 7);
             }
             if (resourcePath_.Empty())

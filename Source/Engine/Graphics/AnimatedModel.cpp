@@ -162,7 +162,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
             {
                 // Follow with an OBB test if required
                 Matrix3x4 inverse = transform.Inverse();
-                Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
+                Ray localRay = query.ray_.Transformed(inverse);
                 distance = localRay.HitDistance(box);
                 if (distance >= query.maxDistance_)
                     continue;

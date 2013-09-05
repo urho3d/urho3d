@@ -175,7 +175,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
     case RAY_OBB:
         {
             Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
-            Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
+            Ray localRay = query.ray_.Transformed(inverse);
             distance = localRay.HitDistance(GetWorldBoundingBox().Transformed(inverse));
             if (distance >= query.maxDistance_)
                 return;

@@ -581,6 +581,28 @@ String ResourceCache::SanitateResourceName(const String& nameIn) const
     String name = GetInternalPath(nameIn);
     name.Replace("../", "");
     name.Replace("./", "");
+
+    // If the path refers to one of the resource directories, normalize the resource name
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && resourceDirs_.Size())
+    {
+        String namePath = GetPath(name);
+        String exePath = fileSystem->GetProgramDir();
+        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+        {
+            String relativeResourcePath = resourceDirs_[i];
+            if (relativeResourcePath.StartsWith(exePath))
+                relativeResourcePath = relativeResourcePath.Substring(exePath.Length());
+            
+            if (namePath.StartsWith(resourceDirs_[i], false))
+                namePath = namePath.Substring(resourceDirs_[i].Length());
+            else if (namePath.StartsWith(relativeResourcePath, false))
+                namePath = namePath.Substring(relativeResourcePath.Length());
+        }
+
+        name = namePath + GetFileNameAndExtension(name);
+    }
+
     return name;
 }
 

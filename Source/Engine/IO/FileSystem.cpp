@@ -586,7 +586,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     #endif
 }
 
-void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension)
+void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension)
 {
     String fullPathCopy = GetInternalPath(fullPath);
 
@@ -595,7 +595,9 @@ void SplitPath(const String& fullPath, String& pathName, String& fileName, Strin
 
     if (extPos != String::NPOS && (pathPos == String::NPOS || extPos > pathPos))
     {
-        extension = fullPathCopy.Substring(extPos).ToLower();
+        extension = fullPathCopy.Substring(extPos);
+        if (lowercaseExtension)
+            extension = extension.ToLower();
         fullPathCopy = fullPathCopy.Substring(0, extPos);
     }
     else
@@ -628,17 +630,17 @@ String GetFileName(const String& fullPath)
     return file;
 }
 
-String GetExtension(const String& fullPath)
+String GetExtension(const String& fullPath, bool lowercaseExtension)
 {
     String path, file, extension;
-    SplitPath(fullPath, path, file, extension);
+    SplitPath(fullPath, path, file, extension, lowercaseExtension);
     return extension;
 }
 
-String GetFileNameAndExtension(const String& fileName)
+String GetFileNameAndExtension(const String& fileName, bool lowercaseExtension)
 {
     String path, file, extension;
-    SplitPath(fileName, path, file, extension);
+    SplitPath(fileName, path, file, extension, lowercaseExtension);
     return file + extension;
 }
 
