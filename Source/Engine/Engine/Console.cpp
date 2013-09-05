@@ -96,12 +96,15 @@ void Console::SetDefaultStyle(XMLFile* style)
     background_->SetDefaultStyle(style);
     background_->SetStyle("ConsoleBackground");
 
-    const Vector<SharedPtr<UIElement> >& children = rowContainer_->GetChildren();
+    // Setting the style may cause us to log messages, which will delete and remove the child objects.
+    // For safety, iterate through our own copy of the child element vector, which will keep the current
+    // text elements alive
+    Vector<SharedPtr<UIElement> > children = rowContainer_->GetChildren();
     for (unsigned i = 0; i < children.Size(); ++i)
-        children[i]->SetStyle("ConsoleText");
-
+        children[i]->SetStyle(children[i]->GetAppliedStyle());
+    
     lineEdit_->SetStyle("ConsoleLineEdit");
-
+    
     UpdateElements();
 }
 
@@ -144,7 +147,10 @@ void Console::SetNumRows(unsigned rows)
     else
     {
         for (int i = 0; i > delta; --i)
-            rowContainer_->CreateChild<Text>();
+        {
+            Text* row = rowContainer_->CreateChild<Text>();
+            row->SetStyle("ConsoleText");
+        }
     }
 
     rowContainer_->EnableLayoutUpdate();
