@@ -46,6 +46,7 @@ class Node : public Serializable
     void MarkDirty();
     
     Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
+    Node* CreateChild(const char* name = 0, CreateMode mode = REPLICATED, unsigned id = 0);
     
     void AddChild(Node* node);
     void RemoveChild(Node* node);
