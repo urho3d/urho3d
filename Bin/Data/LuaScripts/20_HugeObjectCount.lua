@@ -6,14 +6,15 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_
-local cameraNode
+local scene_ = nil
+local cameraNode = nil
 local boxNodes = {}
 local yaw = 0.0
 local pitch = 0.0
 local animate = false
 
 local context = GetContext()
+
 local cache = GetCache()
 local input = GetInput()
 local renderer = GetRenderer()
@@ -34,6 +35,9 @@ function Start()
 
     -- Hook up to the frame update events
     SubscribeToEvents()
+end
+
+function Stop()
 end
 
 function CreateScene()
