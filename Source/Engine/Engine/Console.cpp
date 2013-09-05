@@ -246,6 +246,8 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 
     using namespace LogMessage;
 
+    int level = eventData[P_LEVEL].GetInt();
+
     // Be prepared for possible multi-line messages
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
     for (unsigned i = 0; i < rows.Size(); ++i)
@@ -254,6 +256,8 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
         Text* text = static_cast<Text*>(rowContainer_->GetChild(0));
         rowContainer_->RemoveChild(text);
         text->SetText(rows[i]);
+        // Make error message highlight
+        text->SetColor(level == LOG_ERROR ? Color::RED : Color::WHITE);
         rowContainer_->AddChild(text);
     }
 
