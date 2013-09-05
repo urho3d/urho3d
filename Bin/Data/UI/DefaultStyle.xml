@@ -180,7 +180,7 @@
     </element>
     <element type="ConsoleText" style="Text" auto="false" />
     <element type="ConsoleHighlightedText" style="Text" auto="false">
-        <attribute name="Color" value="1 0 0 1" />
+        <attribute name="Color" value="0.75 0 0 1" />
     </element>
     <element type="ConsoleLineEdit" style="LineEdit" auto="false">
         <attribute name="Top Left Color" value="0 0 0 0.5" />

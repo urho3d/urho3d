@@ -59,8 +59,8 @@ namespace Urho3D
 - void PrintCallStack(bool arg0 = false)
 - String GetPath(const String&)
 - String GetFileName(const String&)
-- String GetExtension(const String&)
-- String GetFileNameAndExtension(const String&)
+- String GetExtension(const String&, bool arg1 = true)
+- String GetFileNameAndExtension(const String&, bool arg1 = false)
 - String ReplaceExtension(const String&, const String&)
 - String AddTrailingSlash(const String&)
 - String RemoveTrailingSlash(const String&)
@@ -279,17 +279,17 @@ Properties:<br>
 String
 
 Methods:<br>
-- void Replace(uint8, uint8)
-- void Replace(const String&, const String&)
-- String Replaced(uint8, uint8) const
-- String Replaced(const String&, const String&) const
+- void Replace(uint8, uint8, bool arg2 = true)
+- void Replace(const String&, const String&, bool arg2 = true)
+- String Replaced(uint8, uint8, bool arg2 = true) const
+- String Replaced(const String&, const String&, bool arg2 = true) const
 - void Resize(uint)
-- uint Find(const String&, uint arg1 = 0) const
-- uint Find(uint8, uint arg1 = 0) const
-- uint FindLast(const String&, uint arg1 = 0xffffffff) const
-- uint FindLast(uint8, uint arg1 = 0xffffffff) const
-- bool StartsWith(const String&) const
-- bool EndsWith(const String&) const
+- uint Find(const String&, uint arg1 = 0, bool arg2 = true) const
+- uint Find(uint8, uint arg1 = 0, bool arg2 = true) const
+- uint FindLast(const String&, uint arg1 = 0xffffffff, bool arg2 = true) const
+- uint FindLast(uint8, uint arg1 = 0xffffffff, bool arg2 = true) const
+- bool StartsWith(const String&, bool arg1 = true) const
+- bool EndsWith(const String&, bool arg1 = true) const
 - String Substring(uint) const
 - String Substring(uint, uint) const
 - String ToUpper() const
@@ -675,6 +675,7 @@ Methods:<br>
 - float HitDistance(const BoundingBox&) const
 - float HitDistance(const Frustum&, bool arg1 = true) const
 - float HitDistance(const Vector3&, const Vector3&, const Vector3&) const
+- Ray Transformed(const Matrix3x4&) const
 
 Properties:<br>
 - Vector3 origin

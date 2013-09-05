@@ -85,6 +85,8 @@ private:
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle a log message.
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
+    /// Handle the application post-update.
+    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Background.
     SharedPtr<BorderImage> background_;
@@ -94,14 +96,14 @@ private:
     SharedPtr<LineEdit> lineEdit_;
     /// Command history.
     Vector<String> history_;
+    /// Pending log message rows.
+    Vector<Pair<int, String> > pendingRows_;
     /// Current row being edited.
     String currentRow_;
     /// Command history maximum rows.
     unsigned historyRows_;
     /// Command history current position.
     unsigned historyPosition_;
-    /// Currently printing a log message flag.
-    bool inLogMessage_;
 };
 
 }

@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Console.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "EngineEvents.h"
 #include "Font.h"
 #include "Graphics.h"
@@ -51,8 +52,7 @@ static const int DEFAULT_HISTORY_SIZE = 16;
 Console::Console(Context* context) :
     Object(context),
     historyRows_(DEFAULT_HISTORY_SIZE),
-    historyPosition_(0),
-    inLogMessage_(false)
+    historyPosition_(0)
 {
     UI* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
@@ -81,6 +81,8 @@ Console::Console(Context* context) :
     SubscribeToEvent(lineEdit_, E_TEXTFINISHED, HANDLER(Console, HandleTextFinished));
     SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, HANDLER(Console, HandleLineEditKey));
     SubscribeToEvent(E_SCREENMODE, HANDLER(Console, HandleScreenMode));
+    SubscribeToEvent(E_LOGMESSAGE, HANDLER(Console, HandleLogMessage));
+    SubscribeToEvent(E_POSTUPDATE, HANDLER(Console, HandlePostUpdate));
 }
 
 Console::~Console()
@@ -116,7 +118,9 @@ void Console::SetVisible(bool enable)
 
     lineEdit_->SetVisible(hasScriptSubsystem);
     background_->SetVisible(enable);
-
+    // Ensure the background has no empty space when shown without the lineedit
+    background_->SetHeight(background_->GetMinHeight());
+    
     if (enable && hasScriptSubsystem)
         GetSubsystem<UI>()->SetFocusElement(lineEdit_);
     else
@@ -154,9 +158,6 @@ void Console::SetNumRows(unsigned rows)
     rowContainer_->UpdateLayout();
 
     UpdateElements();
-
-    if (!HasSubscribedToEvent(E_LOGMESSAGE))
-        SubscribeToEvent(E_LOGMESSAGE, HANDLER(Console, HandleLogMessage));
 }
 
 void Console::SetNumHistoryRows(unsigned rows)
@@ -173,6 +174,7 @@ void Console::UpdateElements()
     int width = GetSubsystem<Graphics>()->GetWidth();
     const IntRect& border = background_->GetLayoutBorder();
     background_->SetFixedWidth(width);
+    background_->SetHeight(background_->GetMinHeight());
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
     lineEdit_->SetFixedHeight(lineEdit_->GetTextElement()->GetRowHeight());
 }
@@ -268,46 +270,36 @@ void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
-    // If we are recursing here, do not write the message
-    if (inLogMessage_ || !rowContainer_->GetNumChildren())
-        return;
-
-    inLogMessage_ = true;
-
     using namespace LogMessage;
 
     int level = eventData[P_LEVEL].GetInt();
+    // The message may be multi-line, so split to rows in that case
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
+    
+    for (unsigned i = 0; i < rows.Size(); ++i)
+        pendingRows_.Push(MakePair(level, rows[i]));
+}
+
+void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (!rowContainer_->GetNumChildren())
+        return;
     
     rowContainer_->DisableLayoutUpdate();
     
-    const Vector<SharedPtr<UIElement> >& children = rowContainer_->GetChildren();
-    
-    for (unsigned i = 0; i < rows.Size(); ++i)
+    for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
-        if (children.Size() > 1)
-        {
-            for (unsigned j = 0; j < children.Size() - 1; ++j)
-            {
-                // Scroll text and styles upward. Do not create or remove elements, as we could be in a UI internal function
-                // while a message is being logged
-                Text* current = StaticCast<Text>(children[j]);
-                Text* next = StaticCast<Text>(children[j + 1]);
-                current->SetStyle(next->GetAppliedStyle());
-                current->SetText(next->GetText());
-            }
-        }
-
-        Text* text = StaticCast<Text>(children.Back());
-        text->SetText(rows[i]);
+        rowContainer_->RemoveChildAtIndex(0);
+        Text* text = rowContainer_->CreateChild<Text>();
+        text->SetText(pendingRows_[i].second_);
         // Make error message highlight
-        text->SetStyle(level == LOG_ERROR ? "ConsoleHighlightedText" : "ConsoleText");
+        text->SetStyle(pendingRows_[i].first_ == LOG_ERROR ? "ConsoleHighlightedText" : "ConsoleText");
     }
+    
+    pendingRows_.Clear();
     
     rowContainer_->EnableLayoutUpdate();
     rowContainer_->UpdateLayout();
-
-    inLogMessage_ = false;
 }
 
 }
