@@ -29,8 +29,10 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (LIBS ../Audio ../Container ../Core ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource 
-    ../Scene ../UI)
+set (LIBS ../Audio ../Container ../Core ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource ../Scene ../Script ../UI)
+if (ENABLE_LUA)
+    set (LIBS ${LIBS} ../../Extras/LuaScript)
+endif ()
 set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include)
 
 # Setup target

@@ -1244,6 +1244,20 @@ void UIElement::RemoveChildAtIndex(unsigned index)
     if (index >= children_.Size())
         return;
 
+    // Send change event if not already being destroyed
+    UIElement* sender = Refs() > 0 ? GetElementEventSender() : 0;
+    if (sender)
+    {
+        using namespace ElementRemoved;
+
+        VariantMap eventData;
+        eventData[P_ROOT] = (void*)GetRoot();
+        eventData[P_PARENT] = (void*)this;
+        eventData[P_ELEMENT] = (void*)children_[index];
+
+        sender->SendEvent(E_ELEMENTREMOVED, eventData);
+    }
+
     children_[index]->Detach();
     children_.Erase(index);
     UpdateLayout();

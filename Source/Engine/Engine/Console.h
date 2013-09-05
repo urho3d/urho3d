@@ -68,7 +68,7 @@ public:
     /// Return whether is visible.
     bool IsVisible() const;
     /// Return number of displayed rows.
-    unsigned GetNumRows() const { return rows_.Size(); }
+    unsigned GetNumRows() const;
     /// Return history maximum size.
     unsigned GetNumHistoryRows() const { return historyRows_; }
     /// Return current history position.
@@ -90,8 +90,6 @@ private:
     SharedPtr<BorderImage> background_;
     /// Container for text rows.
     SharedPtr<UIElement> rowContainer_;
-    /// Text rows.
-    Vector<SharedPtr<Text> > rows_;
     /// Line edit.
     SharedPtr<LineEdit> lineEdit_;
     /// Command history.

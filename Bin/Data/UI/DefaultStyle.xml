@@ -179,6 +179,9 @@
         <attribute name="Layout Border" value="4 4 4 4" />
     </element>
     <element type="ConsoleText" style="Text" auto="false" />
+    <element type="ConsoleHighlightedText" style="Text" auto="false">
+        <attribute name="Color" value="1 0 0 1" />
+    </element>
     <element type="ConsoleLineEdit" style="LineEdit" auto="false">
         <attribute name="Top Left Color" value="0 0 0 0.5" />
         <attribute name="Top Right Color" value="0 0 0 0.5" />

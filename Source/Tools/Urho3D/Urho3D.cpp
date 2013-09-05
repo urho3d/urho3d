@@ -24,16 +24,15 @@
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Log.h"
+#ifdef ENABLE_LUA
+#include "LuaScript.h"
+#endif
 #include "Main.h"
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "Script.h"
 #include "ScriptFile.h"
-
-#ifdef ENABLE_LUA
-#include "LuaScript.h"
-#endif
 
 #include "DebugNew.h"
 
@@ -145,7 +144,7 @@ void Urho::Start()
         context_->RegisterSubsystem(new Script(context_));
 
         // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
-        scriptFile_ = context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName_);
+        scriptFile_ = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName_);
 
         // If script loading is successful, proceed to main loop
         if (scriptFile_ && scriptFile_->Execute("void Start()"))

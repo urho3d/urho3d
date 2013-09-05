@@ -82,12 +82,11 @@ function HandleKeyDown(eventType, eventData)
     local key = eventData:GetInt("Key")
     -- Close console (if open) or exit when ESC is pressed
     if key == KEY_ESC then
-        local ui = GetUI()
-        if ui:GetFocusElement() == nil then
+        local console = GetConsole()
+        if not console:IsVisible() then
             local engine = GetEngine()
             engine:Exit()
         else
-            local console = GetConsole()
             console:SetVisible(false)
         end
 

@@ -31,7 +31,11 @@
 #include "IOEvents.h"
 #include "LineEdit.h"
 #include "Log.h"
+#ifdef ENABLE_LUA
+#include "LuaScript.h"
+#endif
 #include "ResourceCache.h"
+#include "Script.h"
 #include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"
@@ -77,7 +81,6 @@ Console::Console(Context* context) :
     SubscribeToEvent(lineEdit_, E_TEXTFINISHED, HANDLER(Console, HandleTextFinished));
     SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, HANDLER(Console, HandleLineEditKey));
     SubscribeToEvent(E_SCREENMODE, HANDLER(Console, HandleScreenMode));
-    SubscribeToEvent(E_LOGMESSAGE, HANDLER(Console, HandleLogMessage));
 }
 
 Console::~Console()
@@ -93,8 +96,9 @@ void Console::SetDefaultStyle(XMLFile* style)
     background_->SetDefaultStyle(style);
     background_->SetStyle("ConsoleBackground");
 
-    for (unsigned i = 0; i < rows_.Size(); ++i)
-        rows_[i]->SetStyle("ConsoleText");
+    const Vector<SharedPtr<UIElement> >& children = rowContainer_->GetChildren();
+    for (unsigned i = 0; i < children.Size(); ++i)
+        children[i]->SetStyle("ConsoleText");
 
     lineEdit_->SetStyle("ConsoleLineEdit");
 
@@ -103,8 +107,17 @@ void Console::SetDefaultStyle(XMLFile* style)
 
 void Console::SetVisible(bool enable)
 {
+    // Check if we have script subsystem
+    bool hasScriptSubsystem = GetSubsystem<Script>();
+    #ifdef ENABLE_LUA
+    if (!hasScriptSubsystem)
+        hasScriptSubsystem = GetSubsystem<LuaScript>();
+    #endif
+
+    lineEdit_->SetVisible(hasScriptSubsystem);
     background_->SetVisible(enable);
-    if (enable)
+
+    if (enable && hasScriptSubsystem)
         GetSubsystem<UI>()->SetFocusElement(lineEdit_);
     else
         lineEdit_->SetFocus(false);
@@ -120,18 +133,27 @@ void Console::SetNumRows(unsigned rows)
     if (!rows)
         return;
 
-    rowContainer_->RemoveAllChildren();
+    rowContainer_->DisableLayoutUpdate();
 
-    rows_.Resize(rows);
-    for (unsigned i = 0; i < rows_.Size(); ++i)
+    int delta = rowContainer_->GetNumChildren() - rows;
+    if (delta > 0)
     {
-        if (!rows_[i])
-            rows_[i] = new Text(context_);
-        rowContainer_->AddChild(rows_[i]);
-        rows_[i]->SetStyle("ConsoleText");
+        for (int i = 0; i < delta; ++i)
+            rowContainer_->RemoveChildAtIndex(0);
+    }
+    else
+    {
+        for (int i = 0; i > delta; --i)
+            rowContainer_->CreateChild<Text>();
     }
 
+    rowContainer_->EnableLayoutUpdate();
+    rowContainer_->UpdateLayout();
+
     UpdateElements();
+
+    if (!HasSubscribedToEvent(E_LOGMESSAGE))
+        SubscribeToEvent(E_LOGMESSAGE, HANDLER(Console, HandleLogMessage));
 }
 
 void Console::SetNumHistoryRows(unsigned rows)
@@ -160,6 +182,11 @@ XMLFile* Console::GetDefaultStyle() const
 bool Console::IsVisible() const
 {
     return background_ ? background_->IsVisible() : false;
+}
+
+unsigned Console::GetNumRows() const
+{
+    rowContainer_->GetNumChildren();
 }
 
 const String& Console::GetHistoryRow(unsigned index) const
@@ -238,11 +265,13 @@ void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
-    // If the rows are not fully initialized yet, or we are recursing here, do not write the message
-    if (inLogMessage_ || rows_.Empty() || !rows_.Back())
+    // If we are recursing here, do not write the message
+    if (inLogMessage_)
         return;
 
     inLogMessage_ = true;
+
+    rowContainer_->DisableLayoutUpdate();
 
     using namespace LogMessage;
 
@@ -252,14 +281,17 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
     for (unsigned i = 0; i < rows.Size(); ++i)
     {
-        // Remove the first row, change its text and re-add to the bottom
-        Text* text = static_cast<Text*>(rowContainer_->GetChild(0));
-        rowContainer_->RemoveChild(text);
+        // Remove the first row
+        rowContainer_->RemoveChildAtIndex(0);
+        // Create a new row at the bottom
+        Text* text = rowContainer_->CreateChild<Text>();
         text->SetText(rows[i]);
         // Make error message highlight
-        text->SetColor(level == LOG_ERROR ? Color::RED : Color::WHITE);
-        rowContainer_->AddChild(text);
+        text->SetStyle(level == LOG_ERROR ? "ConsoleHighlightedText" : "ConsoleText");
     }
+
+    rowContainer_->EnableLayoutUpdate();
+    rowContainer_->UpdateLayout();
 
     inLogMessage_ = false;
 }
