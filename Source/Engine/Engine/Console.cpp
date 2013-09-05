@@ -96,10 +96,7 @@ void Console::SetDefaultStyle(XMLFile* style)
     background_->SetDefaultStyle(style);
     background_->SetStyle("ConsoleBackground");
 
-    // Setting the style may cause us to log messages, which will delete and remove the child objects.
-    // For safety, iterate through our own copy of the child element vector, which will keep the current
-    // text elements alive
-    Vector<SharedPtr<UIElement> > children = rowContainer_->GetChildren();
+    const Vector<SharedPtr<UIElement> >& children = rowContainer_->GetChildren();
     for (unsigned i = 0; i < children.Size(); ++i)
         children[i]->SetStyle(children[i]->GetAppliedStyle());
     
@@ -272,30 +269,41 @@ void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
     // If we are recursing here, do not write the message
-    if (inLogMessage_)
+    if (inLogMessage_ || !rowContainer_->GetNumChildren())
         return;
 
     inLogMessage_ = true;
 
-    rowContainer_->DisableLayoutUpdate();
-
     using namespace LogMessage;
 
     int level = eventData[P_LEVEL].GetInt();
-
-    // Be prepared for possible multi-line messages
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
+    
+    rowContainer_->DisableLayoutUpdate();
+    
+    const Vector<SharedPtr<UIElement> >& children = rowContainer_->GetChildren();
+    
     for (unsigned i = 0; i < rows.Size(); ++i)
     {
-        // Remove the first row
-        rowContainer_->RemoveChildAtIndex(0);
-        // Create a new row at the bottom
-        Text* text = rowContainer_->CreateChild<Text>();
+        if (children.Size() > 1)
+        {
+            for (unsigned j = 0; j < children.Size() - 1; ++j)
+            {
+                // Scroll text and styles upward. Do not create or remove elements, as we could be in a UI internal function
+                // while a message is being logged
+                Text* current = StaticCast<Text>(children[j]);
+                Text* next = StaticCast<Text>(children[j + 1]);
+                current->SetStyle(next->GetAppliedStyle());
+                current->SetText(next->GetText());
+            }
+        }
+
+        Text* text = StaticCast<Text>(children.Back());
         text->SetText(rows[i]);
         // Make error message highlight
         text->SetStyle(level == LOG_ERROR ? "ConsoleHighlightedText" : "ConsoleText");
     }
-
+    
     rowContainer_->EnableLayoutUpdate();
     rowContainer_->UpdateLayout();
 
