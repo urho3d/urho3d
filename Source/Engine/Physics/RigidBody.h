@@ -73,15 +73,15 @@ public:
     
     /// Set mass. Zero mass makes the body static.
     void SetMass(float mass);
-    /// Set rigid body world-space position.
+    /// Set rigid body position in world space.
     void SetPosition(Vector3 position);
-    /// Set rigid body world-space rotation.
+    /// Set rigid body rotation in world space.
     void SetRotation(Quaternion rotation);
-    /// Set rigid body world-space position and rotation.
+    /// Set rigid body position and rotation in world space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// Set linear velocity.
     void SetLinearVelocity(Vector3 velocity);
-    /// Set linear degrees of freedom.
+    /// Set linear degrees of freedom. Use 1 to enable an axis or 0 to disable. Default is all axes enabled (1, 1, 1).
     void SetLinearFactor(Vector3 factor);
     /// Set linear velocity deactivation threshold.
     void SetLinearRestThreshold(float threshold);
@@ -89,7 +89,7 @@ public:
     void SetLinearDamping(float damping);
     /// Set angular velocity.
     void SetAngularVelocity(Vector3 angularVelocity);
-    /// Set angular degrees of freedom.
+    /// Set angular degrees of freedom. Use 1 to enable an axis or 0 to disable. Default is all axes enabled (1, 1, 1).
     void SetAngularFactor(Vector3 factor);
     /// Set angular velocity deactivation threshold.
     void SetAngularRestThreshold(float threshold);
@@ -150,9 +150,9 @@ public:
     btCompoundShape* GetCompoundShape() const { return compoundShape_; }
     /// Return mass.
     float GetMass() const { return mass_; }
-    /// Return rigid body world-space position.
+    /// Return rigid body position in world space.
     Vector3 GetPosition() const;
-    /// Return rigid body world-space rotation.
+    /// Return rigid body rotation in world space.
     Quaternion GetRotation() const;
     /// Return linear velocity.
     Vector3 GetLinearVelocity() const;

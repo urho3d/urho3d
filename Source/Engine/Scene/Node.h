@@ -77,45 +77,45 @@ public:
 
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest) const;
-    /// Set name.
+    /// Set name of the scene node. Names are not required to be unique.
     void SetName(const String& name);
-    /// Set position relative to parent node.
+    /// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.
     void SetPosition(const Vector3& position);
-    /// Set rotation relative to parent node.
+    /// Set rotation in parent space.
     void SetRotation(const Quaternion& rotation);
-    /// Set direction relative to parent node. Positive Z equals identity.
+    /// Set forward direction in parent space. Positive Z axis equals identity rotation.
     void SetDirection(const Vector3& direction);
-    /// Set uniform scale relative to parent node.
+    /// Set uniform scale in parent space.
     void SetScale(float scale);
-    /// Set scale relative to parent node.
+    /// Set scale in parent space.
     void SetScale(const Vector3& scale);
-    /// Set transform relative to parent node.
+    /// Set both position and rotation in parent space as an atomic operation. This is faster than setting position and rotation separately.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// Set transform relative to parent node.
+    /// Set both position, rotation and uniform scale in parent space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// Set transform relative to parent node.
+    /// Set both position, rotation and scale in parent space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
-    /// Set position relative to world space.
+    /// Set position in world space.
     void SetWorldPosition(const Vector3& position);
-    /// Set rotation relative to world space.
+    /// Set rotation in world space.
     void SetWorldRotation(const Quaternion& rotation);
-    /// Set direction relative to world space.
+    /// Set forward direction in world space.
     void SetWorldDirection(const Vector3& direction);
-    /// Set uniform scale relative to world space.
+    /// Set uniform scale in world space.
     void SetWorldScale(float scale);
-    /// Set scale relative to world space.
+    /// Set scale in world space.
     void SetWorldScale(const Vector3& scale);
-    /// Set transform relative to world space.
+    /// Set both position and rotation in world space as an atomic operation.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
-    /// Set transform relative to world space.
+    /// Set both position, rotation and uniform scale in world space as an atomic operation.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// Set transform relative to world space.
+    /// Set both position, rotation and scale in world space as an atomic opration.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
-    /// Move the scene node.
+    /// Move the scene node in parent space, which is the same as world space if the scene node is on the root level.
     void Translate(const Vector3& delta);
-    /// Move the scene node relative to its rotation.
+    /// Move the scene node in parent space relative to its current rotation.
     void TranslateRelative(const Vector3& delta);
-    /// Rotate the scene node.
+    /// Rotate the scene node in parent space either relative to its current rotation axes, or a fixed axis.
     void Rotate(const Quaternion& delta, bool fixedAxis = false);
     /// Rotate around the X axis.
     void Pitch(float angle, bool fixedAxis = false);
@@ -125,9 +125,9 @@ public:
     void Roll(float angle, bool fixedAxis = false);
     /// Look at a target world position.
     void LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP);
-    /// Modify scale uniformly.
+    /// Modify scale in parent space uniformly.
     void Scale(float scale);
-    /// Modify scale.
+    /// Modify scale in parent space.
     void Scale(const Vector3& scale);
     /// Set enabled/disabled state without recursion. Components in a disabled node become effectively disabled regardless of their own enable/disable state.
     void SetEnabled(bool enable);
@@ -192,15 +192,15 @@ public:
     bool IsEnabled() const { return enabled_; }
     /// Return owner connection in networking.
     Connection* GetOwner() const { return owner_; }
-    /// Return position relative to parent node.
+    /// Return position in parent space.
     const Vector3& GetPosition() const { return position_; }
-    /// Return rotation relative to parent node.
+    /// Return rotation in parent space.
     const Quaternion& GetRotation() const { return rotation_; }
-    /// Return direction relative to parent node. Identity rotation equals positive Z.
+    /// Return forward direction in parent space. Positive Z axis equals identity rotation.
     Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
-    /// Return scale relative to parent node.
+    /// Return scale in parent space.
     const Vector3& GetScale() const { return scale_; }
-    /// Return transform matrix relative to parent node.
+    /// Return parent space transform matrix.
     Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
 
     /// Return position in world space.
@@ -239,7 +239,7 @@ public:
         return worldTransform_.Scale();
     }
 
-    /// Return transform matrix in world space.
+    /// Return world space transform matrix.
     const Matrix3x4& GetWorldTransform() const
     {
         if (dirty_)
