@@ -32,11 +32,7 @@
 #include "IOEvents.h"
 #include "LineEdit.h"
 #include "Log.h"
-#ifdef ENABLE_LUA
-#include "LuaScript.h"
-#endif
 #include "ResourceCache.h"
-#include "Script.h"
 #include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"
@@ -100,7 +96,7 @@ void Console::SetDefaultStyle(XMLFile* style)
 
     const Vector<SharedPtr<UIElement> >& children = rowContainer_->GetChildren();
     for (unsigned i = 0; i < children.Size(); ++i)
-        children[i]->SetStyle(children[i]->GetAppliedStyle());
+        children[i]->SetStyle("ConsoleText");
     
     lineEdit_->SetStyle("ConsoleLineEdit");
     
@@ -109,20 +105,19 @@ void Console::SetDefaultStyle(XMLFile* style)
 
 void Console::SetVisible(bool enable)
 {
-    // Check if we have script subsystem
-    bool hasScriptSubsystem = GetSubsystem<Script>() != 0;
-    #ifdef ENABLE_LUA
-    if (!hasScriptSubsystem)
-        hasScriptSubsystem = GetSubsystem<LuaScript>() != 0;
-    #endif
-
-    lineEdit_->SetVisible(hasScriptSubsystem);
     background_->SetVisible(enable);
-    // Ensure the background has no empty space when shown without the lineedit
-    background_->SetHeight(background_->GetMinHeight());
-    
-    if (enable && hasScriptSubsystem)
-        GetSubsystem<UI>()->SetFocusElement(lineEdit_);
+
+    if (enable)
+    {
+        // Check if we have handler for E_CONSOLECOMMAND every time here in case the handler is being added later dynamically
+        bool hasConsoleCommandEventHandler = context_->GetEventReceivers(this, E_CONSOLECOMMAND) != 0 || context_->GetEventReceivers(E_CONSOLECOMMAND) != 0;
+        lineEdit_->SetVisible(hasConsoleCommandEventHandler);
+        if (hasConsoleCommandEventHandler)
+            GetSubsystem<UI>()->SetFocusElement(lineEdit_);
+
+        // Ensure the background has no empty space when shown without the lineedit
+        background_->SetHeight(background_->GetMinHeight());
+    }
     else
         lineEdit_->SetFocus(false);
 }
@@ -142,16 +137,15 @@ void Console::SetNumRows(unsigned rows)
     int delta = rowContainer_->GetNumChildren() - rows;
     if (delta > 0)
     {
+        // We have more, remove oldest rows first
         for (int i = 0; i < delta; ++i)
             rowContainer_->RemoveChildAtIndex(0);
     }
     else
     {
+        // We have less, add more rows at the bottom (text element style will be set initially in SetDefaultStyle() when the stylesheet is available and subsequently in HandlePostUpdate())
         for (int i = 0; i > delta; --i)
-        {
-            Text* row = rowContainer_->CreateChild<Text>();
-            row->SetStyle("ConsoleText");
-        }
+            rowContainer_->CreateChild<Text>();
     }
 
     rowContainer_->EnableLayoutUpdate();
