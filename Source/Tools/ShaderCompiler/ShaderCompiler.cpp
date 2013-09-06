@@ -519,6 +519,11 @@ void CompileVariation(CompiledVariation* variation)
 
         MOJOSHADER_freeParseData(parseData);
 
+        // Create the last part of the output path (SM2/SM3) if it does not exist
+        String outPath = GetPath(variation->outFileName_);
+        if (!fileSystem_->DirExists(outPath))
+            fileSystem_->CreateDir(outPath);
+
         File outFile(context_);
         if (!outFile.Open(variation->outFileName_, FILE_WRITE))
         {
