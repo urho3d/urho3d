@@ -60,7 +60,7 @@ static const Vector3* directions[] =
     &Vector3::BACK
 };
 
-static const int CHECK_DRAWABLES_PER_WORK_ITEM = 64;
+static const int CHECK_DRAWABLES_PER_WORK_ITEM = 128;
 static const float LIGHT_INTENSITY_THRESHOLD = 0.003f;
 
 /// %Frustum octree query for shadowcasters.
@@ -176,6 +176,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     Vector3 absViewZ = viewZ.Abs();
     unsigned cameraViewMask = view->camera_->GetViewMask();
     bool cameraZoneOverride = view->cameraZoneOverride_;
+    PerThreadSceneResult& result = view->sceneResults_[threadIndex];
     
     while (start != end)
     {
@@ -201,9 +202,27 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
                 float viewCenterZ = viewZ.DotProduct(center) + viewMatrix.m23_;
                 Vector3 edge = geomBox.Size() * 0.5f;
                 float viewEdgeZ = absViewZ.DotProduct(edge);
+                float minZ = viewCenterZ - viewEdgeZ;
+                float maxZ = viewCenterZ + viewEdgeZ;
                 
                 drawable->SetMinMaxZ(viewCenterZ - viewEdgeZ, viewCenterZ + viewEdgeZ);
                 drawable->ClearLights();
+                
+                // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
+                if (drawable->GetType() != Skybox::GetTypeStatic())
+                {
+                    result.minZ_ = Min(result.minZ_, minZ);
+                    result.maxZ_ = Max(result.maxZ_, maxZ);
+                }
+                
+                result.geometries_.Push(drawable);
+            }
+            else if (drawable->GetDrawableFlags() & DRAWABLE_LIGHT)
+            {
+                Light* light = static_cast<Light*>(drawable);
+                // Skip lights which are so dim that they can not contribute to a rendertarget
+                if (light->GetColor().SumRGB() > LIGHT_INTENSITY_THRESHOLD)
+                    result.lights_.Push(light);
             }
         }
     }
@@ -266,9 +285,12 @@ View::View(Context* context) :
     camera_(0),
     cameraZone_(0),
     farClipZone_(0),
-    renderTarget_(0),
-    tempDrawables_(GetSubsystem<WorkQueue>()->GetNumThreads() + 1)  // Create octree query vector for each thread
+    renderTarget_(0)
 {
+    // Create octree query and scene results vector for each thread
+    unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1;
+    tempDrawables_.Resize(numThreads);
+    sceneResults_.Resize(numThreads);
     frame_.camera_ = 0;
 }
 
@@ -645,8 +667,18 @@ void View::GetDrawables()
         octree_->GetDrawables(query);
     }
     
-    // Check drawable occlusion and find zones for moved drawables in worker threads
+    // Check drawable occlusion, find zones for moved drawables and collect geometries & lights in worker threads
     {
+        for (unsigned i = 0; i < sceneResults_.Size(); ++i)
+        {
+            PerThreadSceneResult& result = sceneResults_[i];
+            
+            result.geometries_.Clear();
+            result.lights_.Clear();
+            result.minZ_ = M_INFINITY;
+            result.maxZ_ = 0.0f;
+        }
+        
         WorkItem item;
         item.workFunction_ = CheckVisibilityWork;
         item.aux_ = this;
@@ -668,33 +700,31 @@ void View::GetDrawables()
         queue->Complete(M_MAX_UNSIGNED);
     }
     
-    // Sort into geometries & lights, and build scene Z range
+    // Combine lights, geometries & scene Z range from the threads
+    geometries_.Clear();
+    lights_.Clear();
     minZ_ = M_INFINITY;
     maxZ_ = 0.0f;
     
-    for (unsigned i = 0; i < tempDrawables.Size(); ++i)
+    if (sceneResults_.Size() > 1)
     {
-        Drawable* drawable = tempDrawables[i];
-        if (!drawable->IsInView(frame_))
-            continue;
-        
-        if (drawable->GetDrawableFlags() & DRAWABLE_GEOMETRY)
+        for (unsigned i = 0; i < sceneResults_.Size(); ++i)
         {
-            // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
-            if (drawable->GetType() != Skybox::GetTypeStatic())
-            {
-                minZ_ = Min(minZ_, drawable->GetMinZ());
-                maxZ_ = Max(maxZ_, drawable->GetMaxZ());
-            }
-            geometries_.Push(drawable);
+            PerThreadSceneResult& result = sceneResults_[i];
+            geometries_.Push(result.geometries_);
+            lights_.Push(result.lights_);
+            minZ_ = Min(minZ_, result.minZ_);
+            maxZ_ = Max(maxZ_, result.maxZ_);
         }
-        else
-        {
-            Light* light = static_cast<Light*>(drawable);
-            // Skip lights which are so dim that they can not contribute to a rendertarget
-            if (light->GetColor().SumRGB() > LIGHT_INTENSITY_THRESHOLD)
-                lights_.Push(light);
-        }
+    }
+    else
+    {
+        // If just 1 thread, copy the results directly
+        PerThreadSceneResult& result = sceneResults_[0];
+        minZ_ = result.minZ_;
+        maxZ_ = result.maxZ_;
+        Swap(geometries_, result.geometries_);
+        Swap(lights_, result.lights_);
     }
     
     if (minZ_ == M_INFINITY)

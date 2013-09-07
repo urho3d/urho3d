@@ -88,6 +88,19 @@ struct ScenePassInfo
     BatchQueue* batchQueue_;
 };
 
+/// Per-thread geometry, light and scene range collection structure.
+struct PerThreadSceneResult
+{
+    /// Geometry objects.
+    PODVector<Drawable*> geometries_;
+    /// Lights.
+    PODVector<Light*> lights_;
+    /// Scene minimum Z value.
+    float minZ_;
+    /// Scene maximum Z value.
+    float maxZ_;
+};
+
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
 class URHO3D_API View : public Object
 {
@@ -258,6 +271,8 @@ private:
     PODVector<Texture2D*> screenBuffers_;
     /// Per-thread octree query results.
     Vector<PODVector<Drawable*> > tempDrawables_;
+    /// Per-thread geometries, lights and Z range collection results.
+    Vector<PerThreadSceneResult> sceneResults_;
     /// Visible zones.
     PODVector<Zone*> zones_;
     /// Visible geometry objects.

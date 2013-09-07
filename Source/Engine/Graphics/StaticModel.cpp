@@ -401,6 +401,10 @@ void StaticModel::CalculateLodLevels()
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         const Vector<SharedPtr<Geometry> >& batchGeometries = geometries_[i];
+        // If only one LOD geometry, no reason to go through the LOD calculation
+        if (batchGeometries.Size() <= 1)
+            continue;
+        
         unsigned j;
         
         for (j = 1; j < batchGeometries.Size(); ++j)
