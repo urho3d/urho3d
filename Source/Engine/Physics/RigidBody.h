@@ -34,6 +34,7 @@ namespace Urho3D
 {
 
 class CollisionShape;
+class Constraint;
 class PhysicsWorld;
 class SmoothedTransform;
 
