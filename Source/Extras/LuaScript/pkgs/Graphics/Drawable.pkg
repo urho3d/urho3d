@@ -8,7 +8,6 @@ static const unsigned DEFAULT_VIEWMASK;
 static const unsigned DEFAULT_LIGHTMASK;
 static const unsigned DEFAULT_SHADOWMASK;
 static const unsigned DEFAULT_ZONEMASK;
-static const int DRAWABLES_PER_WORK_ITEM;
 static const int MAX_VERTEX_LIGHTS;
 static const float ANIMATION_LOD_BASESCALE;
 

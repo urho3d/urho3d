@@ -62,7 +62,6 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     occluder_(false),
     occludee_(true),
     updateQueued_(false),
-    reinsertionQueued_(false),
     viewMask_(DEFAULT_VIEWMASK),
     lightMask_(DEFAULT_LIGHTMASK),
     shadowMask_(DEFAULT_SHADOWMASK),
@@ -228,8 +227,8 @@ void Drawable::SetOccludee(bool enable)
     {
         occludee_ = enable;
         // Reinsert to octree to make sure octant occlusion does not erroneously hide this drawable
-        if (octant_ && !reinsertionQueued_)
-            octant_->GetRoot()->QueueReinsertion(this);
+        if (octant_ && !updateQueued_)
+            octant_->GetRoot()->QueueUpdate(this);
         MarkNetworkUpdate();
     }
 }
@@ -353,8 +352,8 @@ void Drawable::OnNodeSet(Node* node)
 void Drawable::OnMarkedDirty(Node* node)
 {
     worldBoundingBoxDirty_ = true;
-    if (!reinsertionQueued_ && octant_)
-        octant_->GetRoot()->QueueReinsertion(this);
+    if (!updateQueued_ && octant_)
+        octant_->GetRoot()->QueueUpdate(this);
 
     // Mark zone assignment dirty
     if (node == node_)
@@ -390,8 +389,6 @@ void Drawable::RemoveFromOctree()
         Octree* octree = octant_->GetRoot();
         if (updateQueued_)
             octree->CancelUpdate(this);
-        if (reinsertionQueued_)
-            octree->CancelReinsertion(this);
         
         octant_->RemoveDrawable(this);
     }

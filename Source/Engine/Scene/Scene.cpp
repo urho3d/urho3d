@@ -820,13 +820,29 @@ void Scene::CleanupConnection(Connection* connection)
 void Scene::MarkNetworkUpdate(Node* node)
 {
     if (node)
-        networkUpdateNodes_.Insert(node->GetID());
+    {
+        if (!threadedUpdate_)
+            networkUpdateNodes_.Insert(node->GetID());
+        else
+        {
+            MutexLock lock(sceneMutex_);
+            networkUpdateNodes_.Insert(node->GetID());
+        }
+    }
 }
 
 void Scene::MarkNetworkUpdate(Component* component)
 {
     if (component)
-        networkUpdateComponents_.Insert(component->GetID());
+    {
+        if (!threadedUpdate_)
+            networkUpdateComponents_.Insert(component->GetID());
+        else
+        {
+            MutexLock lock(sceneMutex_);
+            networkUpdateComponents_.Insert(component->GetID());
+        }
+    }
 }
 
 void Scene::MarkReplicationDirty(Node* node)

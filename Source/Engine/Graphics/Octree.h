@@ -188,23 +188,14 @@ public:
     /// Return subdivision levels.
     unsigned GetNumLevels() const { return numLevels_; }
     
-    /// Mark drawable object as requiring an update.
+    /// Mark drawable object as requiring an update and a reinsertion.
     void QueueUpdate(Drawable* drawable);
-    /// Mark drawable object as requiring a reinsertion. Is thread-safe.
-    void QueueReinsertion(Drawable* drawable);
     /// Cancel drawable object's update.
     void CancelUpdate(Drawable* drawable);
-    /// Cancel drawable object's reinsertion.
-    void CancelReinsertion(Drawable* drawable);
     /// Visualize the component as debug geometry.
     void DrawDebugGeometry(bool depthTest);
     
 private:
-    /// Update drawable objects marked for update. Updates are executed in worker threads.
-    void UpdateDrawables(const FrameInfo& frame);
-    /// Reinsert moved drawable objects into the octree.
-    void ReinsertDrawables(const FrameInfo& frame);
-    
     /// Drawable objects that require update.
     PODVector<Drawable*> drawableUpdates_;
     /// Drawable objects that require reinsertion.

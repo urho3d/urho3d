@@ -131,7 +131,7 @@ public:
     
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
+    /// Update before octree reinsertion. Is called from a worker thread.
     virtual void Update(const FrameInfo& frame);
     
     /// Load emitter parameters from an XML file.
@@ -358,14 +358,16 @@ private:
     float sizeAdd_;
     /// Particle size multiplicative parameter.
     float sizeMul_;
-    /// Currently emitting flag.
-    bool emitting_;
-    /// Update when invisible flag.
-    bool updateInvisible_;
     /// Last scene timestep.
     float lastTimeStep_;
     /// Rendering framenumber on which was last updated.
     unsigned lastUpdateFrameNumber_;
+    /// Currently emitting flag.
+    bool emitting_;
+    /// Update when invisible flag.
+    bool updateInvisible_;
+    /// Need update flag.
+    bool needUpdate_;
 };
 
 }

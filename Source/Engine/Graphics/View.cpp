@@ -60,7 +60,6 @@ static const Vector3* directions[] =
     &Vector3::BACK
 };
 
-static const int CHECK_DRAWABLES_PER_WORK_ITEM = 128;
 static const float LIGHT_INTENSITY_THRESHOLD = 0.003f;
 
 /// %Frustum octree query for shadowcasters.
@@ -288,7 +287,7 @@ View::View(Context* context) :
     renderTarget_(0)
 {
     // Create octree query and scene results vector for each thread
-    unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1;
+    unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1; // Worker threads + main thread
     tempDrawables_.Resize(numThreads);
     sceneResults_.Resize(numThreads);
     frame_.camera_ = 0;
@@ -679,16 +678,20 @@ void View::GetDrawables()
             result.maxZ_ = 0.0f;
         }
         
+        int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
+        int drawablesPerItem = tempDrawables.Size() / numWorkItems;
+        
         WorkItem item;
         item.workFunction_ = CheckVisibilityWork;
         item.aux_ = this;
         
         PODVector<Drawable*>::Iterator start = tempDrawables.Begin();
-        while (start != tempDrawables.End())
+        // Create a work item for each thread
+        for (int i = 0; i < numWorkItems; ++i)
         {
             PODVector<Drawable*>::Iterator end = tempDrawables.End();
-            if (end - start > CHECK_DRAWABLES_PER_WORK_ITEM)
-                end = start + CHECK_DRAWABLES_PER_WORK_ITEM;
+            if (i < numWorkItems - 1 && end - start > drawablesPerItem)
+                end = start + drawablesPerItem;
             
             item.start_ = &(*start);
             item.end_ = &(*end);
@@ -1100,16 +1103,19 @@ void View::UpdateGeometries()
         
         if (threadedGeometries_.Size())
         {
+            int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
+            int drawablesPerItem = threadedGeometries_.Size() / numWorkItems;
+            
             WorkItem item;
             item.workFunction_ = UpdateDrawableGeometriesWork;
             item.aux_ = const_cast<FrameInfo*>(&frame_);
             
             PODVector<Drawable*>::Iterator start = threadedGeometries_.Begin();
-            while (start != threadedGeometries_.End())
+            for (int i = 0; i < numWorkItems; ++i)
             {
                 PODVector<Drawable*>::Iterator end = threadedGeometries_.End();
-                if (end - start > DRAWABLES_PER_WORK_ITEM)
-                    end = start + DRAWABLES_PER_WORK_ITEM;
+                if (i < numWorkItems - 1 && end - start > drawablesPerItem)
+                    end = start + drawablesPerItem;
                 
                 item.start_ = &(*start);
                 item.end_ = &(*end);

@@ -55,7 +55,7 @@ public:
     virtual void ApplyAttributes();
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
-    /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
+    /// Update before octree reinsertion. Is called from a worker thread.
     virtual void Update(const FrameInfo& frame);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);

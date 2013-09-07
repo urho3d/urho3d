@@ -163,6 +163,10 @@ void ParticleEmitter::OnSetEnabled()
 
 void ParticleEmitter::Update(const FrameInfo& frame)
 {
+    // Cancel update if has only moved but does not actually need to animate the particles
+    if (!needUpdate_)
+        return;
+    
     // If there is an amount mismatch between particles and billboards, correct it
     if (particles_.Size() != billboards_.Size())
         SetNumBillboards(particles_.Size());
@@ -299,6 +303,8 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     
     if (needCommit)
         Commit();
+    
+    needUpdate_ = false;
 }
 
 bool ParticleEmitter::Load(XMLFile* file)
@@ -919,6 +925,7 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
     if (updateInvisible_ || viewFrameNumber_ != lastUpdateFrameNumber_)
     {
         lastUpdateFrameNumber_ = viewFrameNumber_;
+        needUpdate_ = true;
         MarkForUpdate();
     }
 }

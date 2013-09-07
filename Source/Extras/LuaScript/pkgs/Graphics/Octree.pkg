@@ -15,9 +15,8 @@ class Octree : public Component
     unsigned GetNumLevels() const;
     
     void QueueUpdate(Drawable* drawable);
-    void QueueReinsertion(Drawable* drawable);
     void DrawDebugGeometry(bool depthTest);
-    
+
     tolua_readonly tolua_property__get_set unsigned numLevels;
 };
 

@@ -139,9 +139,11 @@ void MoveCamera(float timeStep)
 void AnimateObjects(float timeStep)
 {
     const float ROTATE_SPEED = 15.0f;
+    // Rotate about the Z axis (roll)
+    Quaternion rotateQuat(ROTATE_SPEED * timeStep, Vector3(0.0f, 0.0f, 1.0f));
 
     for (uint i = 0; i < boxNodes.length; ++i)
-        boxNodes[i].Roll(ROTATE_SPEED * timeStep);
+        boxNodes[i].Rotate(rotateQuat);
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)

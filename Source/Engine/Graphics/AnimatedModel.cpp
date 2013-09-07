@@ -932,7 +932,6 @@ void AnimatedModel::MarkAnimationDirty()
     if (isMaster_)
     {
         animationDirty_ = true;
-        // Mark for pre-octree reinsertion update (threaded)
         MarkForUpdate();
     }
 }
@@ -942,7 +941,6 @@ void AnimatedModel::MarkAnimationOrderDirty()
     if (isMaster_)
     {
         animationOrderDirty_ = true;
-        // Mark for pre-octree reinsertion update (threaded)
         MarkForUpdate();
     }
 }
@@ -1128,9 +1126,8 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
         (*i)->Apply();
 
-    // Calculate new bone bounding box, then mark for octree reinsertion
+    // Calculate new bone bounding box
     UpdateBoneBoundingBox();
-    Drawable::OnMarkedDirty(node_);
     
     animationDirty_ = false;
 }

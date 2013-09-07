@@ -145,8 +145,9 @@ end
 function AnimateObjects(timeStep)
     local ROTATE_SPEED = 15.0
     local delta = ROTATE_SPEED * timeStep
+    local rotateQuat = Quaternion(delta, Vector3(0.0, 0.0, 1.0))
     for i, v in ipairs(boxNodes) do
-        v:Roll(delta)
+        v:Rotate(rotateQuat)
     end
 end
 

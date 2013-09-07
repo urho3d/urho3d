@@ -75,7 +75,8 @@ void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
         if (drawable)
         {
             drawable->Update(frame);
-            drawable->updateQueued_ = false;
+            // Ask for an updated world bounding box from the drawable already here to calculate them multithreaded
+            drawable->GetWorldBoundingBox();
         }
         ++start;
     }
@@ -108,7 +109,7 @@ Octant::~Octant()
         {
             (*i)->SetOctant(root_);
             root_->drawables_.Push(*i);
-            root_->QueueReinsertion(*i);
+            root_->QueueUpdate(*i);
         }
         drawables_.Clear();
         numDrawables_ = 0;
@@ -392,8 +393,43 @@ void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
 
 void Octree::Update(const FrameInfo& frame)
 {
-    UpdateDrawables(frame);
+    // Let drawables update themselves before reinsertion. This can be used for animation
+    if (!drawableUpdates_.Empty())
+    {
+        PROFILE(UpdateDrawables);
 
+        // Perform updates in worker threads. Notify the scene that a threaded update is going on and components
+        // (for example physics objects) should not perform non-threadsafe work when marked dirty
+        Scene* scene = GetScene();
+        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        scene->BeginThreadedUpdate();
+        
+        int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
+        int drawablesPerItem = drawableUpdates_.Size() / numWorkItems;
+        
+        WorkItem item;
+        item.workFunction_ = UpdateDrawablesWork;
+        item.aux_ = const_cast<FrameInfo*>(&frame);
+
+        PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
+        // Create a work item for each thread
+        for (int i = 0; i < numWorkItems; ++i)
+        {
+            PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
+            if (i < numWorkItems - 1 && end - start > drawablesPerItem)
+                end = start + drawablesPerItem;
+
+            item.start_ = &(*start);
+            item.end_ = &(*end);
+            queue->AddWorkItem(item);
+
+            start = end;
+        }
+
+        queue->Complete(M_MAX_UNSIGNED);
+        scene->EndThreadedUpdate();
+    }
+    
     // Notify drawable update being finished. Custom animation (eg. IK) can be done at this point
     Scene* scene = GetScene();
     if (scene)
@@ -405,8 +441,42 @@ void Octree::Update(const FrameInfo& frame)
         eventData[P_TIMESTEP] = frame.timeStep_;
         scene->SendEvent(E_SCENEDRAWABLEUPDATEFINISHED, eventData);
     }
+    
+    // Reinsert drawables that have been moved or resized, or that have been newly added to the octree and do not sit inside
+    // the proper octant yet
+    if (!drawableUpdates_.Empty())
+    {
+        PROFILE(ReinsertToOctree);
 
-    ReinsertDrawables(frame);
+        for (PODVector<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
+        {
+            Drawable* drawable = *i;
+            drawable->updateQueued_ = false;
+            Octant* octant = drawable->GetOctant();
+            const BoundingBox& box = drawable->GetWorldBoundingBox();
+
+            // Skip if no octant or does not belong to this octree anymore
+            if (!octant || octant->GetRoot() != this)
+                continue;
+            // Skip if still fits the current octant
+            if (drawable->IsOccludee() && octant->GetCullingBox().IsInside(box) == INSIDE && octant->CheckDrawableFit(box))
+                continue;
+
+            InsertDrawable(drawable);
+
+            #ifdef _DEBUG
+            // Verify that the drawable will be culled correctly
+            octant = drawable->GetOctant();
+            if (octant != this && octant->GetCullingBox().IsInside(box) != INSIDE)
+            {
+                LOGERROR("Drawable is not fully inside its octant's culling bounds: drawable box " + box.ToString() +
+                    " octant box " + octant->GetCullingBox().ToString());
+            }
+            #endif
+        }
+    }
+    
+    drawableUpdates_.Clear();
 }
 
 void Octree::AddManualDrawable(Drawable* drawable)
@@ -532,22 +602,16 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
 
 void Octree::QueueUpdate(Drawable* drawable)
 {
-    drawableUpdates_.Push(drawable);
-    drawable->updateQueued_ = true;
-}
-
-void Octree::QueueReinsertion(Drawable* drawable)
-{
     Scene* scene = GetScene();
     if (scene && scene->IsThreadedUpdate())
     {
         MutexLock lock(octreeMutex_);
-        drawableReinsertions_.Push(drawable);
+        drawableUpdates_.Push(drawable);
     }
     else
-        drawableReinsertions_.Push(drawable);
-
-    drawable->reinsertionQueued_ = true;
+        drawableUpdates_.Push(drawable);
+    
+    drawable->updateQueued_ = true;
 }
 
 void Octree::CancelUpdate(Drawable* drawable)
@@ -556,90 +620,10 @@ void Octree::CancelUpdate(Drawable* drawable)
     drawable->updateQueued_ = false;
 }
 
-void Octree::CancelReinsertion(Drawable* drawable)
-{
-    drawableReinsertions_.Remove(drawable);
-    drawable->reinsertionQueued_ = false;
-}
-
 void Octree::DrawDebugGeometry(bool depthTest)
 {
     DebugRenderer* debug = GetComponent<DebugRenderer>();
     DrawDebugGeometry(debug, depthTest);
-}
-
-void Octree::UpdateDrawables(const FrameInfo& frame)
-{
-    // Let drawables update themselves before reinsertion. This can be used for animation
-    if (drawableUpdates_.Empty())
-        return;
-
-    PROFILE(UpdateDrawables);
-
-    // Perform updates in worker threads. Notify the scene that a threaded update is going on and components 
-    // (for example physics objects) should not perform non-threadsafe work when marked dirty
-    Scene* scene = GetScene();
-    WorkQueue* queue = GetSubsystem<WorkQueue>();
-    scene->BeginThreadedUpdate();
-
-    WorkItem item;
-    item.workFunction_ = UpdateDrawablesWork;
-    item.aux_ = const_cast<FrameInfo*>(&frame);
-
-    PODVector<Drawable*>::Iterator start = drawableUpdates_.Begin();
-    while (start != drawableUpdates_.End())
-    {
-        PODVector<Drawable*>::Iterator end = drawableUpdates_.End();
-        if (end - start > DRAWABLES_PER_WORK_ITEM)
-            end = start + DRAWABLES_PER_WORK_ITEM;
-
-        item.start_ = &(*start);
-        item.end_ = &(*end);
-        queue->AddWorkItem(item);
-
-        start = end;
-    }
-
-    queue->Complete(M_MAX_UNSIGNED);
-    scene->EndThreadedUpdate();
-    drawableUpdates_.Clear();
-}
-
-void Octree::ReinsertDrawables(const FrameInfo& frame)
-{
-    // Reinsert drawables that have been moved or resized, or that have been newly added to the octree and do not sit inside
-    // the proper octant yet
-    if (drawableReinsertions_.Empty())
-        return;
-
-    PROFILE(ReinsertToOctree);
-
-    for (PODVector<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
-    {
-        Drawable* drawable = *i;
-        drawable->reinsertionQueued_ = false;
-        Octant* octant = drawable->GetOctant();
-        const BoundingBox& box = drawable->GetWorldBoundingBox();
-
-        // Skip if no octant or does not belong to this octree anymore
-        if (!octant || octant->GetRoot() != this)
-            continue;
-        // Skip if still fits the current octant
-        if (drawable->IsOccludee() && octant->GetCullingBox().IsInside(box) == INSIDE && octant->CheckDrawableFit(box))
-            continue;
-
-        InsertDrawable(drawable);
-
-        #ifdef _DEBUG
-        // Verify that the drawable will be culled correctly
-        octant = drawable->GetOctant();
-        if (octant != this && octant->GetCullingBox().IsInside(box) != INSIDE)
-            LOGERROR("Drawable is not fully inside its octant's culling bounds: drawable box " + box.ToString() + " octant box " +
-                octant->GetCullingBox().ToString());
-        #endif
-    }
-
-    drawableReinsertions_.Clear();
 }
 
 }

@@ -37,7 +37,6 @@ static const unsigned DEFAULT_VIEWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
 static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
-static const int DRAWABLES_PER_WORK_ITEM = 16;
 static const int MAX_VERTEX_LIGHTS = 4;
 static const float ANIMATION_LOD_BASESCALE = 2500.0f;
 
@@ -120,7 +119,7 @@ public:
     virtual void OnSetEnabled();
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
-    /// Update before octree reinsertion. Is called from a worker thread. Needs to be requested with MarkForUpdate().
+    /// Update before octree reinsertion. Is called from a worker thread.
     virtual void Update(const FrameInfo& frame) {}
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
@@ -159,7 +158,7 @@ public:
     void SetOccluder(bool enable);
     /// Set occludee flag.
     void SetOccludee(bool enable);
-    /// Mark for update before octree reinsertion.
+    /// Mark for update and octree reinsertion. Update is automatically queued when the drawable's scene node moves or changes scale.
     void MarkForUpdate();
     
     /// Return local space bounding box. May not be applicable or properly updated on all drawables.
@@ -276,8 +275,6 @@ protected:
     bool occludee_;
     /// Octree update queued flag.
     bool updateQueued_;
-    /// Octree reinsertion queued flag.
-    bool reinsertionQueued_;
     /// View mask.
     unsigned viewMask_;
     /// Light mask.
