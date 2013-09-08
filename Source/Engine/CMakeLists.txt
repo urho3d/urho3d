@@ -27,14 +27,20 @@ if (URHO3D_BUILD_TYPE STREQUAL SHARED)
 endif ()
 
 # Define generated source files
-if (WIN32)
-    add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
-        COMMAND for /F %%v in ('svnversion -n ${PROJECT_SOURCE_DIR}') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
-        COMMENT "Generating subversion revision number")
+FIND_PACKAGE(Subversion)
+If (SUBVERSION_FOUND)
+    if (WIN32)
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
+            COMMAND for /F %%v in ('svnversion -n ${PROJECT_SOURCE_DIR}') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
+            COMMENT "Generating subversion revision number")
+    else ()
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
+            COMMAND for v in `svnversion -n ${PROJECT_SOURCE_DIR}`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h\; break\; done DEPENDS ${STATIC_LIBRARY_TARGETS}
+            COMMENT "Generating subversion revision number")
+    endif ()
 else ()
-    add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
-        COMMAND for v in `svnversion -n ${PROJECT_SOURCE_DIR}`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h\; break\; done DEPENDS ${STATIC_LIBRARY_TARGETS}
-        COMMENT "Generating subversion revision number")
+    # No Subversion command line tools, generate a dummy version file
+    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h "const char* revision=\"Unversioned\";")
 endif ()
 
 # Define generated object files
