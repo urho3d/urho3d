@@ -28,6 +28,7 @@ Urho3D development, contributions and bugfixes by:
 - Firegorilla
 - Magic.Lixin
 - amadeus_osa
+- reattiva
 - skaiware
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
