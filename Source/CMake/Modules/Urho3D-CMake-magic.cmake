@@ -393,22 +393,24 @@ macro (setup_main_executable)
         # Setup target as main shared library
         set (LIB_TYPE SHARED)
         setup_library ()
-        # Copy target main shared library to Android library output path
-        file (MAKE_DIRECTORY ${ANDROID_LIBRARY_OUTPUT_PATH})
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ANDROID_LIBRARY_OUTPUT_PATH}
-            COMMENT "Stripping and copying lib${TARGET_NAME}.so to target library directory")
-        # Also copy other dependent shared libraries to Android library output path
+        # Copy other dependent shared libraries to Android library output path
         foreach(FILE ${ABSOLUTE_PATH_LIBS})
             get_filename_component (EXT ${FILE} EXT)
             if (EXT STREQUAL .so)
                 get_filename_component (NAME ${FILE} NAME)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILE} ${ANDROID_LIBRARY_OUTPUT_PATH}
+                    COMMAND ${CMAKE_COMMAND} ARGS -E touch ${ANDROID_LIBRARY_OUTPUT_PATH}/${NAME}
                     COMMENT "Copying ${NAME} to target library directory")
             endif ()
         endforeach ()
+        # Copy target main shared library to Android library output path
+        file (MAKE_DIRECTORY ${ANDROID_LIBRARY_OUTPUT_PATH})
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
+            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ANDROID_LIBRARY_OUTPUT_PATH}
+            COMMAND ${CMAKE_COMMAND} ARGS -E touch ${ANDROID_LIBRARY_OUTPUT_PATH}/lib${TARGET_NAME}.so
+            COMMENT "Stripping and copying lib${TARGET_NAME}.so to target library directory")
     else ()
         if (WIN32)
             set (EXE_TYPE WIN32)

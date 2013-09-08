@@ -27,8 +27,8 @@ if (URHO3D_BUILD_TYPE STREQUAL SHARED)
 endif ()
 
 # Define generated source files
-FIND_PACKAGE(Subversion)
-If (SUBVERSION_FOUND)
+find_program (SVNVERSION_EXECUTABLE svnversion NO_CMAKE_FIND_ROOT_PATH)
+if (SVNVERSION_EXECUTABLE)
     if (WIN32)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
             COMMAND for /F %%v in ('svnversion -n ${PROJECT_SOURCE_DIR}') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
@@ -115,6 +115,9 @@ endif ()
 
 # Setup target
 setup_library ()
+if (NOT SVNVERSION_EXECUTABLE)
+    add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
+endif ()
 
 # Setup the frameworks for Mac OS X platform
 if (APPLE AND LIB_TYPE STREQUAL SHARED)

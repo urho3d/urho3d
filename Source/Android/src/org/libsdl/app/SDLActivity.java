@@ -3,6 +3,8 @@
 package org.libsdl.app;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -72,7 +74,14 @@ public class SDLActivity extends Activity {
         String libraryPath = getApplicationInfo().dataDir + "/lib";
         //Log.v(TAG, "library path: " + libraryPath);
         if (!mIsSharedLibraryLoaded) {
-            for (final File libraryFilename : new File(libraryPath).listFiles()) {
+            File[] files = new File(libraryPath).listFiles();
+            Arrays.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(File lhs, File rhs) {
+                    return Long.valueOf(lhs.lastModified()).compareTo(rhs.lastModified());
+                }
+            });
+            for (final File libraryFilename : files) {
                 String name = libraryFilename.getName().replaceAll("^lib(.*)\\.so$", "$1");
                 //Log.v(TAG, "library name: " + name);
                 System.loadLibrary(name);
