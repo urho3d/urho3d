@@ -162,6 +162,8 @@ bool Technique::Load(Deserializer& source)
     if (rootElem.HasAttribute("sm3"))
         isSM3_ = rootElem.GetBool("sm3");
     
+    unsigned numPasses = 0;
+    
     XMLElement passElem = rootElem.GetChild("pass");
     while (passElem)
     {
@@ -169,6 +171,7 @@ bool Technique::Load(Deserializer& source)
         {
             StringHash nameHash(passElem.GetAttribute("name"));
             Pass* newPass = CreatePass(nameHash);
+            ++numPasses;
             
             if (passElem.HasAttribute("vs"))
                 newPass->SetVertexShader(passElem.GetAttribute("vs"));
@@ -210,13 +213,8 @@ bool Technique::Load(Deserializer& source)
         passElem = passElem.GetNext("pass");
     }
     
-    // Rehash the pass map to ensure minimum load factor and fast queries
-    passes_.Rehash(NextPowerOfTwo(passes_.Size()));
-    
     // Calculate memory use
-    unsigned memoryUse = sizeof(Technique);
-    memoryUse += sizeof(HashMap<StringHash, SharedPtr<Pass> >) + passes_.Size() * sizeof(Pass);
-    
+    unsigned memoryUse = sizeof(Technique) + numPasses * sizeof(Pass);
     SetMemoryUse(memoryUse);
     return true;
 }
@@ -228,8 +226,10 @@ void Technique::SetIsSM3(bool enable)
 
 void Technique::ReleaseShaders()
 {
-    for (HashMap<StringHash, SharedPtr<Pass> >::Iterator i = passes_.Begin(); i != passes_.End(); ++i)
-        i->second_->ReleaseShaders();
+    PODVector<SharedPtr<Pass>*> allPasses = passes_.Values();
+    
+    for (unsigned i = 0; i < allPasses.Size(); ++i)
+        allPasses[i]->Get()->ReleaseShaders();
 }
 
 Pass* Technique::CreatePass(StringHash type)
@@ -239,23 +239,14 @@ Pass* Technique::CreatePass(StringHash type)
         return oldPass;
     
     SharedPtr<Pass> newPass(new Pass(type));
-    passes_[type] = newPass;
-    
-    // Rehash the pass map to ensure minimum load factor and fast queries
-    passes_.Rehash(NextPowerOfTwo(passes_.Size()));
+    passes_.Insert(type.Value(), newPass);
     
     return newPass;
 }
 
 void Technique::RemovePass(StringHash type)
 {
-    passes_.Erase(type);
-}
-
-Pass* Technique::GetPass(StringHash type) const
-{
-    HashMap<StringHash, SharedPtr<Pass> >::ConstIterator i = passes_.Find(type);
-    return i != passes_.End() ? i->second_ : (Pass*)0;
+    passes_.Erase(type.Value());
 }
 
 }

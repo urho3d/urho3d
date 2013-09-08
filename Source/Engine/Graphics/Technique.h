@@ -23,6 +23,7 @@
 #pragma once
 
 #include "GraphicsDefs.h"
+#include "HashTable.h"
 #include "Resource.h"
 
 namespace Urho3D
@@ -141,20 +142,23 @@ public:
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
     
-    /// Return all passes.
-    const HashMap<StringHash, SharedPtr<Pass> >& GetPasses() const { return passes_; }
-    /// Return whether has a pass.
-    bool HasPass(StringHash type) const { return passes_.Contains(type); }
-    /// Return a pass, or null if not found.
-    Pass* GetPass(StringHash type) const;
     /// Return whether requires %Shader %Model 3.
     bool IsSM3() const { return isSM3_; }
+    /// Return whether has a pass.
+    bool HasPass(StringHash type) const { return  passes_.Find(type.Value()) != 0; }
+    
+    /// Return a pass, or null if not found.
+    Pass* GetPass(StringHash type) const
+    {
+        SharedPtr<Pass>* passPtr = passes_.Find(type.Value());
+        return passPtr ? passPtr->Get() : 0;
+    }
     
 private:
     /// Require %Shader %Model 3 flag.
     bool isSM3_;
     /// Passes.
-    HashMap<StringHash, SharedPtr<Pass> > passes_;
+    HashTable<SharedPtr<Pass>, 16> passes_;
 };
 
 }
