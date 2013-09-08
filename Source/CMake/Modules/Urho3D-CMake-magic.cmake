@@ -165,7 +165,7 @@ else ()
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
             # Additional compiler flags for Windows ports of GCC
             set (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
-            set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")           
+            set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
             # Reduce GCC optimization level from -O3 to -O2 for stability in RELEASE build type
             set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
             set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -199,7 +199,7 @@ macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
     endif ()
 
     get_property (type TARGET ${TARGET_LIBRARY} PROPERTY TYPE)
-    
+
     if (type MATCHES "STATIC|SHARED")
         if (WIN32)
             set (DEFINE_EXPORT "__declspec(dllexport)")
@@ -231,7 +231,7 @@ function (add_compiler_export_flags)
         message ("-- Following tests check whether compiler installed in this system has export/import and deprecated attributes support")
         message ("-- CMake will generate a suitable export header file for this system based on the test result")
         message ("-- It is OK to proceed to build Urho3D regardless of the test result")
-    endif ()    
+    endif ()
     _test_compiler_hidden_visibility ()
     _test_compiler_has_deprecated ()
     if (NOT ANDROID)
@@ -294,7 +294,7 @@ endmacro ()
 macro (setup_library)
     add_library (${TARGET_NAME} ${LIB_TYPE} ${SOURCE_FILES})
     setup_target ()
-    
+
     if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED AND URHO3D_BUILD_TYPE MATCHES STATIC|SHARED)
         set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
         if (URHO3D_BUILD_TYPE STREQUAL SHARED)
@@ -371,7 +371,7 @@ endmacro ()
 # Macro for setting up an executable target with resources to copy
 macro (setup_main_executable)
     # Define resource files
-    if (APPLE)
+    if (XCODE)
         set (RESOURCE_FILES ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data)
         set_source_files_properties(${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
         set (SOURCE_FILES ${SOURCE_FILES} ${RESOURCE_FILES})
@@ -393,7 +393,7 @@ macro (setup_main_executable)
         # Setup target as main shared library
         set (LIB_TYPE SHARED)
         setup_library ()
-        # Copy target main shared library to Android library output path 
+        # Copy target main shared library to Android library output path
         file (MAKE_DIRECTORY ${ANDROID_LIBRARY_OUTPUT_PATH})
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
@@ -421,7 +421,7 @@ macro (setup_main_executable)
         setup_executable ()
     endif ()
 
-    if (APPLE)
+    if (XCODE)
         get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
         if (IOS)
             # Define a custom target to check for resource modification
@@ -443,13 +443,13 @@ endmacro ()
 
 # Macro for adjusting library output name by dropping _suffix from the target name
 macro (adjust_library_name)
-    string (REGEX REPLACE "_.*$" "" LIB_NAME ${TARGET_NAME}) 
+    string (REGEX REPLACE "_.*$" "" LIB_NAME ${TARGET_NAME})
     set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${LIB_NAME})
 endmacro ()
 
 # Macro for defining external library dependencies
 # The purpose of this macro is emulate CMake to set the external library dependencies transitively
-# It works for both targets setup within Urho3D project and outside Urho3D project that uses Urho3D as external static/shared library 
+# It works for both targets setup within Urho3D project and outside Urho3D project that uses Urho3D as external static/shared library
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
     if (${TARGET} MATCHES SDL|Main)
@@ -475,7 +475,7 @@ macro (define_dependency_libs TARGET)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} pthread)
         endif ()
     endif ()
-    
+
     # Engine/Core external dependency
     if (${TARGET} MATCHES Core|Main)
         if (WIN32)
@@ -487,7 +487,7 @@ macro (define_dependency_libs TARGET)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} pthread)
         endif ()
     endif ()
-    
+
     # Engine/Graphics external dependency
     if (${TARGET} MATCHES Graphics|Main)
         if (USE_OPENGL)
@@ -502,12 +502,12 @@ macro (define_dependency_libs TARGET)
             set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${DIRECT3D_LIBRARY})
         endif ()
     endif ()
-    
+
     # Main external dependency
     if (${TARGET} STREQUAL Main AND URHO3D_LIBRARIES)
         set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${URHO3D_LIBRARIES})
     endif ()
-    
+
     if (LINK_LIBS_ONLY)
         list (SORT LINK_LIBS_ONLY)
         list (REMOVE_DUPLICATES LINK_LIBS_ONLY)
