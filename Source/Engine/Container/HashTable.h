@@ -36,10 +36,10 @@ public:
     struct Node
     {
         /// Construct.
-        Node(unsigned hash, const T& value) :
+        Node(unsigned hash, const T& value, Node* next) :
             hash_(hash),
             value_(value),
-            down_(0)
+            next_(next)
         {
         }
         
@@ -48,7 +48,7 @@ public:
         /// Node value.
         T value_;
         /// Next node in bucket.
-        Node* down_;
+        Node* next_;
     };
     
     /// Construct empty.
@@ -82,22 +82,13 @@ public:
                 ptr->value_ = value;
                 return;
             }
-            ptr = ptr->down_;
+            ptr = ptr->next_;
         }
         
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
-        new(newNode) Node(hash, value);
-        
-        ptr = ptrs_[bucket];
-        if (ptr)
-        {
-            ptrs_[bucket] = newNode;
-            newNode->down_ = ptr;
-        }
-        else
-            ptrs_[bucket] = newNode;
-        
-        return;
+        // Insert at the top of the bucket, connect to the previous top node if exists
+        new(newNode) Node(hash, value, ptrs_[bucket]);
+        ptrs_[bucket] = newNode;
     }
     
     /// Remove by hash value. Return true if was found and removed.
@@ -115,7 +106,7 @@ public:
                 return true;
             }
             else
-                ptr = ptr->down_;
+                ptr = ptr->next_;
         }
         
         return false;
@@ -129,7 +120,7 @@ public:
             Node* ptr = ptrs_[i];
             while (ptr)
             {
-                Node* next = ptr->down_;
+                Node* next = ptr->next_;
                 (ptr)->~Node();
                 AllocatorFree(allocator_, ptr);
                 ptr = next;
@@ -148,7 +139,7 @@ public:
             if (ptr->hash_ == hash)
                 return &ptr->value_;
             else
-                ptr = ptr->down_;
+                ptr = ptr->next_;
         }
         
         return 0;
@@ -165,7 +156,7 @@ public:
             while (ptr)
             {
                 ret.Push(&ptr->value_);
-                ptr = ptr->down_;
+                ptr = ptr->next_;
             }
         }
         
