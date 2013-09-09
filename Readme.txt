@@ -58,6 +58,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 Urho3D uses the following third-party libraries:
 - AngelScript 2.27.0 (http://www.angelcode.com/angelscript/)
 - Bullet 2.81 (http://www.bulletphysics.org/)
+- Civetweb (http://sourceforge.net/projects/civetweb/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLEW 1.9.0 (http://glew.sourceforge.net/)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)

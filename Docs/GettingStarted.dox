@@ -329,6 +329,7 @@ Third-party libraries are used for the following functionality:
 
 - AngelScript: scripting language implementation
 - Bullet: physics simulation implementation
+- Civetweb: HTTP requests, use could be expanded to also provide an embedded web server
 - FreeType: font rendering
 - GLEW: OpenGL extensions handling
 - kNet: UDP networking
