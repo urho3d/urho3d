@@ -13,6 +13,8 @@ const ShortStringHash NODE_ID_VAR("NodeID");
 const ShortStringHash COMPONENT_ID_VAR("ComponentID");
 const ShortStringHash UI_ELEMENT_ID_VAR("UIElementID");
 const ShortStringHash[] ID_VARS = { ShortStringHash(""), NODE_ID_VAR, COMPONENT_ID_VAR, UI_ELEMENT_ID_VAR };
+Color nodeTextColor(1.0f, 1.0f, 1.0f);
+Color componentTextColor(0.7f, 1.0f, 0.7f);
 
 Window@ hierarchyWindow;
 ListView@ hierarchyList;
@@ -200,6 +202,7 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
             Node@ node = cast<Node>(serializable);
 
             text.text = GetNodeTitle(node);
+            text.color = nodeTextColor;
             SetIconEnabledColor(text, node.enabled);
 
             // Update components first
@@ -225,6 +228,7 @@ uint UpdateHierarchyItem(uint itemIndex, Serializable@ serializable, UIElement@ 
         {
             Component@ component = cast<Component>(serializable);
             text.text = GetComponentTitle(component);
+            text.color = componentTextColor;
             SetIconEnabledColor(text, component.enabledEffective);
             break;
         }
@@ -279,6 +283,7 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
     text.vars[NODE_ID_VAR] = component.node.id;
     text.vars[COMPONENT_ID_VAR] = component.id;
     text.text = GetComponentTitle(component);
+    text.color = componentTextColor;
 
     IconizeUIElement(text, component.typeName);
     SetIconEnabledColor(text, component.enabledEffective);

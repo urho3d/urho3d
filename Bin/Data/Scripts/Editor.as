@@ -1,5 +1,6 @@
 // Urho3D editor
 
+#include "Scripts/Editor/EditorHierarchyWindow.as"
 #include "Scripts/Editor/EditorView.as"
 #include "Scripts/Editor/EditorScene.as"
 #include "Scripts/Editor/EditorActions.as"
@@ -155,6 +156,8 @@ void LoadConfig()
     {
         if (hierarchyElem.HasAttribute("showinternaluielement")) showInternalUIElement = hierarchyElem.GetBool("showinternaluielement");
         if (hierarchyElem.HasAttribute("showtemporaryobject")) showTemporaryObject = hierarchyElem.GetBool("showtemporaryobject");
+        if (inspectorElem.HasAttribute("nodecolor")) nodeTextColor = inspectorElem.GetColor("nodecolor");
+        if (inspectorElem.HasAttribute("componentcolor")) componentTextColor = inspectorElem.GetColor("componentcolor");
     }
 
     if (!inspectorElem.isNull)
@@ -220,6 +223,8 @@ void SaveConfig()
 
     hierarchyElem.SetBool("showinternaluielement", showInternalUIElement);
     hierarchyElem.SetBool("showtemporaryobject", showTemporaryObject);
+    inspectorElem.SetColor("nodecolor", nodeTextColor);
+    inspectorElem.SetColor("componentcolor", componentTextColor);
 
     inspectorElem.SetColor("originalcolor", normalTextColor);
     inspectorElem.SetColor("modifiedcolor", modifiedTextColor);

@@ -3,6 +3,13 @@
 bool subscribedToEditorPreferences = false;
 Window@ preferencesDialog;
 
+LineEdit@ nodeItemTextColorEditR;
+LineEdit@ nodeItemTextColorEditG;
+LineEdit@ nodeItemTextColorEditB;
+LineEdit@ componentItemTextColorEditR;
+LineEdit@ componentItemTextColorEditG;
+LineEdit@ componentItemTextColorEditB;
+
 LineEdit@ originalAttributeTextColorEditR;
 LineEdit@ originalAttributeTextColorEditG;
 LineEdit@ originalAttributeTextColorEditB;
@@ -22,6 +29,13 @@ void CreateEditorPreferencesDialog()
     ui.root.AddChild(preferencesDialog);
     preferencesDialog.opacity = uiMaxOpacity;
     CenterDialog(preferencesDialog);
+
+    nodeItemTextColorEditR = preferencesDialog.GetChild("NodeItemTextColor.r", true);
+    nodeItemTextColorEditG = preferencesDialog.GetChild("NodeItemTextColor.g", true);
+    nodeItemTextColorEditB = preferencesDialog.GetChild("NodeItemTextColor.b", true);
+    componentItemTextColorEditR = preferencesDialog.GetChild("ComponentItemTextColor.r", true);
+    componentItemTextColorEditG = preferencesDialog.GetChild("ComponentItemTextColor.g", true);
+    componentItemTextColorEditB = preferencesDialog.GetChild("ComponentItemTextColor.b", true);
 
     originalAttributeTextColorEditR = preferencesDialog.GetChild("OriginalAttributeTextColor.r", true);
     originalAttributeTextColorEditG = preferencesDialog.GetChild("OriginalAttributeTextColor.g", true);
@@ -54,6 +68,14 @@ void UpdateEditorPreferencesDialog()
     CheckBox@ showTemporaryObjectToggle = preferencesDialog.GetChild("ShowTemporaryObject", true);
     showTemporaryObjectToggle.checked = showTemporaryObject;
 
+    nodeItemTextColorEditR.text = String(nodeTextColor.r);
+    nodeItemTextColorEditG.text = String(nodeTextColor.g);
+    nodeItemTextColorEditB.text = String(nodeTextColor.b);
+
+    componentItemTextColorEditR.text = String(componentTextColor.r);
+    componentItemTextColorEditG.text = String(componentTextColor.g);
+    componentItemTextColorEditB.text = String(componentTextColor.b);
+
     CheckBox@ showNonEditableAttributeToggle = preferencesDialog.GetChild("ShowNonEditableAttribute", true);
     showNonEditableAttributeToggle.checked = showNonEditableAttribute;
 
@@ -75,6 +97,12 @@ void UpdateEditorPreferencesDialog()
         SubscribeToEvent(uiMaxOpacityEdit, "TextFinished", "EditUIMaxOpacity");
         SubscribeToEvent(showInternalUIElementToggle, "Toggled", "ToggleShowInternalUIElement");
         SubscribeToEvent(showTemporaryObjectToggle, "Toggled", "ToggleShowTemporaryObject");
+        SubscribeToEvent(nodeItemTextColorEditR, "TextFinished", "EditNodeTextColor");
+        SubscribeToEvent(nodeItemTextColorEditG, "TextFinished", "EditNodeTextColor");
+        SubscribeToEvent(nodeItemTextColorEditB, "TextFinished", "EditNodeTextColor");
+        SubscribeToEvent(componentItemTextColorEditR, "TextFinished", "EditComponentTextColor");
+        SubscribeToEvent(componentItemTextColorEditG, "TextFinished", "EditComponentTextColor");
+        SubscribeToEvent(componentItemTextColorEditB, "TextFinished", "EditComponentTextColor");
         SubscribeToEvent(showNonEditableAttributeToggle, "Toggled", "ToggleShowNonEditableAttribute");
         SubscribeToEvent(originalAttributeTextColorEditR, "TextFinished", "EditOriginalAttributeTextColor");
         SubscribeToEvent(originalAttributeTextColorEditG, "TextFinished", "EditOriginalAttributeTextColor");
@@ -132,6 +160,32 @@ void ToggleShowTemporaryObject(StringHash eventType, VariantMap& eventData)
     showTemporaryObject = cast<CheckBox>(eventData["Element"].GetUIElement()).checked;
     UpdateHierarchyItem(editorScene, true);
     UpdateHierarchyItem(editorUIElement, true);
+}
+
+void EditNodeTextColor(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetUIElement();
+    nodeTextColor = Color(nodeItemTextColorEditR.text.ToFloat(), nodeItemTextColorEditG.text.ToFloat(), nodeItemTextColorEditB.text.ToFloat());
+    if (edit.name == "NodeItemTextColor.r")
+        edit.text = String(normalTextColor.r);
+    else if (edit.name == "NodeItemTextColor.g")
+        edit.text = String(normalTextColor.g);
+    else if (edit.name == "NodeItemTextColor.b")
+        edit.text = String(normalTextColor.b);
+    UpdateHierarchyItem(editorScene);
+}
+
+void EditComponentTextColor(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetUIElement();
+    componentTextColor = Color(componentItemTextColorEditR.text.ToFloat(), componentItemTextColorEditG.text.ToFloat(), componentItemTextColorEditB.text.ToFloat());
+    if (edit.name == "ComponentItemTextColor.r")
+        edit.text = String(normalTextColor.r);
+    else if (edit.name == "ComponentItemTextColor.g")
+        edit.text = String(normalTextColor.g);
+    else if (edit.name == "ComponentItemTextColor.b")
+        edit.text = String(normalTextColor.b);
+    UpdateHierarchyItem(editorScene);
 }
 
 void ToggleShowNonEditableAttribute(StringHash eventType, VariantMap& eventData)

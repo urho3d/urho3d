@@ -92,6 +92,7 @@ void InitMaterialPreview()
     previewModel.model = cache.GetResource("Model", "Models/Sphere.mdl");
 
     materialPreview = materialWindow.GetChild("MaterialPreview", true);
+    materialPreview.SetFixedHeight(100);
     materialPreview.SetView(previewScene, camera);
     materialPreview.autoUpdate = false;
 
@@ -129,7 +130,7 @@ void RefreshMaterialPreview()
 
 void RefreshMaterialName()
 {
-    UIElement@ container = materialWindow.GetChild("NameContainer");
+    UIElement@ container = materialWindow.GetChild("NameContainer", true);
     container.RemoveAllChildren();
 
     LineEdit@ nameEdit = CreateAttributeLineEdit(container, null, 0, 0);
@@ -143,7 +144,7 @@ void RefreshMaterialName()
 
 void RefreshMaterialTechniques(bool fullUpdate = true)
 {
-    ListView@ list = materialWindow.GetChild("TechniqueList");
+    ListView@ list = materialWindow.GetChild("TechniqueList", true);
 
     if (editMaterial is null)
         return;
@@ -215,7 +216,7 @@ void RefreshMaterialTextures(bool fullUpdate = true)
 {
     if (fullUpdate)
     {
-        ListView@ list = materialWindow.GetChild("TextureList");
+        ListView@ list = materialWindow.GetChild("TextureList", true);
         list.RemoveAllItems();
     
         for (uint i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
@@ -268,7 +269,7 @@ void RefreshMaterialTextures(bool fullUpdate = true)
 
 void RefreshMaterialShaderParameters()
 {
-    ListView@ list = materialWindow.GetChild("ShaderParameterList");
+    ListView@ list = materialWindow.GetChild("ShaderParameterList", true);
     list.RemoveAllItems();
     if (editMaterial is null)
         return;
