@@ -1,0 +1,85 @@
+$#include "LuaScriptInstance.h"
+
+class LuaScriptInstance : public Component
+{
+    bool CreateObject(const String& objectType);
+    bool CreateObject(const char* objectType);
+    
+    void ScriptSubscribeToEvent @ SubscribeToEvent(const String& eventName, const char* functionName);
+    void ScriptSubscribeToEvent @ SubscribeToEvent(const char* eventName, const char* functionName);
+};
+
+$[
+LuaScriptObject = {}
+
+function LuaScriptObject:Start()
+end
+
+function LuaScriptObject:Stop()
+end
+
+function LuaScriptObject:GetNode()
+    local instance = self.instance
+    if instance == nil then
+        return nil
+    end    
+    return tolua.cast(instance, "Component"):GetNode()
+end
+
+function LuaScriptObject:SubscribeToEvent(eventType, functionName)
+    local instance = self.instance
+    if instance == nil then
+        return
+    end
+    instance:SubscribeToEvent(eventType, functionName)
+end
+
+function ScriptObject()
+    local o = {}
+    setmetatable(o, LuaScriptObject)
+    LuaScriptObject.__index = LuaScriptObject
+    return o
+end
+
+ScriptObjectInstances = {}
+
+function CreateScriptObjectInstance(object, instance)
+    local o = {}
+    setmetatable(o, object)
+    object.__index = object
+    
+    instance.object = o
+    o.instance = instance
+
+    -- Call object's start function.
+    -- if o.Start ~= nil then
+        o:Start()
+    -- end
+    
+    table.insert(ScriptObjectInstances, o);
+    
+    return o
+end
+
+function DestroyScriptObjectInstance(instance)
+    local object = instance.object
+    if object == nil then
+        return
+    end
+    
+    for i, o in ipairs(ScriptObjectInstances) do
+        if o == object then
+            table.remove(ScriptObjectInstances, i)
+            break
+        end
+    end
+    
+    -- Call stop function.
+    -- if object.Stop ~= nil then
+        object:Stop()
+    -- end
+    
+    object.instance = nil
+    instance.object = nil
+end
+$]

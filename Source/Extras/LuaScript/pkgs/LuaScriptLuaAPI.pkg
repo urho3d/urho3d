@@ -1,56 +1,7 @@
 $#define TOLUA_RELEASE
 
-$#include "LuaScript.h"
-
-void ExecuteFile(const String& fileName);
-void ExecuteFile(const char* fileName);
-
-Object* GetEventSender();
-
-void SendEvent(const String& eventName, VariantMap& eventData);
-void SendEvent(const char* eventName, VariantMap& eventData);
-
-void SubscribeToEvent(const String& eventName, const char* functionName);
-void SubscribeToEvent(const char* eventName, const char* functionName);
-
-void SubscribeToEvent(void* object, const String& eventName, const char* functionName);
-void SubscribeToEvent(void* object, const char* eventName, const char* functionName);
-
-
+$pfile "LuaScript/LuaScript.pkg"
+$pfile "LuaScript/LuaScriptInstance.pkg"
 
 $using namespace Urho3D;
 $#pragma warning(disable:4800)
-
-${
-
-static LuaScript* GetLuaScript()
-{
-    return GetContext()->GetSubsystem<LuaScript>();
-}
-
-static bool ExecuteFile(const String& fileName)
-{
-    return GetLuaScript()->ExecuteFile(fileName);
-}
-
-static void SendEvent(const String& eventName, VariantMap& eventData)
-{
-    GetLuaScript()->ScriptSendEvent(eventName, eventData);
-}
-
-static Object* GetEventSender()
-{
-    return GetLuaScript()->GetEventSender();
-}
-
-static void SubscribeToEvent(const String& eventName, const char* functionName)
-{
-    GetLuaScript()->ScriptSubscribeToEvent(eventName, functionName);
-}
-
-static void SubscribeToEvent(void* object, const String& eventName, const char* functionName)
-{
-    GetLuaScript()->ScriptSubscribeToEvent((Object*)object, eventName, functionName);
-}
-
-$}

@@ -26,6 +26,7 @@
 #include "Log.h"
 #include "LuaFile.h"
 #include "LuaScript.h"
+#include "LuaScriptInstance.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
@@ -343,6 +344,7 @@ void LuaScript::CallEventHandler(const String& functionName, StringHash eventTyp
 void RegisterLuaScriptLibrary(Context* context)
 {
     LuaFile::RegisterObject(context);
+	LuaScriptInstance::RegisterObject(context);
 }
 
 Context* GetContext()
