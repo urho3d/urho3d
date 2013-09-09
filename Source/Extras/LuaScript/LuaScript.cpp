@@ -192,7 +192,7 @@ void LuaScript::ScriptSubscribeToEvent(Object* object, const String& eventName, 
 
 void LuaScript::RegisterLoader()
 {
-	// Get package.loaders table.
+    // Get package.loaders table.
     lua_getglobal(luaState_, "package");
     lua_getfield(luaState_, -1, "loaders");
 
@@ -208,16 +208,16 @@ int LuaScript::Loader(lua_State* L)
     if (!cache)
         return 0;
 
-	// Get module name.
-	const char* name = luaL_checkstring(L, 1);
+    // Get module name.
+    const char* name = luaL_checkstring(L, 1);
 
-	// Get Lua file from module name.
-	LuaFile* luaFile = cache->GetResource<LuaFile>(String(name) + ".lua");
-	if (!luaFile)
-		return false;
+    // Get Lua file from module name.
+    LuaFile* luaFile = cache->GetResource<LuaFile>(String(name) + ".lua");
+    if (!luaFile)
+        return false;
 
-	// Load Lua file to Lua chunk.
-	return luaFile->LoadChunk(L) ? 1 : 0;
+    // Load Lua file to Lua chunk.
+    return luaFile->LoadChunk(L) ? 1 : 0;
 }
 
 void LuaScript::ReplacePrint()
@@ -344,7 +344,7 @@ void LuaScript::CallEventHandler(const String& functionName, StringHash eventTyp
 void RegisterLuaScriptLibrary(Context* context)
 {
     LuaFile::RegisterObject(context);
-	LuaScriptInstance::RegisterObject(context);
+    LuaScriptInstance::RegisterObject(context);
 }
 
 Context* GetContext()

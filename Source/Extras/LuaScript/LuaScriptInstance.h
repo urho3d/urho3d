@@ -43,27 +43,27 @@ public:
     static void RegisterObject(Context* context);
 
     /// Create script object.
-	bool CreateObject(const String& objectType);
+    bool CreateObject(const String& objectType);
 
-	/// Script subscribe event.
-	void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
+    /// Script subscribe event.
+    void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
 
 protected:
-	/// Push script object on stack.
-	bool PushScriptObject(lua_State* luaState);
+    /// Push script object on stack.
+    bool PushScriptObject(lua_State* luaState);
 
-	/// Handle event.
-	void HandleEvent(StringHash eventType, VariantMap& eventData);
+    /// Handle event.
+    void HandleEvent(StringHash eventType, VariantMap& eventData);
 
-	/// Call event handler.
-	void CallEventHandler(const String& functionName, StringHash eventType, VariantMap& eventData);
+    /// Call event handler.
+    void CallEventHandler(const String& functionName, StringHash eventType, VariantMap& eventData);
 
 private:
     /// Object type.
     String objectType_;
 
-	/// Event type to function name map.
-	HashMap<StringHash, HashSet<String> > eventTypeToFunctionNameMap_;
+    /// Event type to function name map.
+    HashMap<StringHash, HashSet<String> > eventTypeToFunctionNameMap_;
 };
 
 }

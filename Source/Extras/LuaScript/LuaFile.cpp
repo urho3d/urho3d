@@ -44,7 +44,7 @@ namespace Urho3D
 LuaFile::LuaFile(Context* context) :
     Resource(context),
     size_(0),
-	hasLoaded_(false),
+    hasLoaded_(false),
     hasExecuted_(false)
 {
 
@@ -90,50 +90,50 @@ bool LuaFile::Save(Serializer& dest) const
 
 bool LuaFile::LoadChunk(lua_State* luaState)
 {
-	if (hasLoaded_)
-		return true;
+    if (hasLoaded_)
+        return true;
 
-	if (size_ == 0)
-		return false;
+    if (size_ == 0)
+        return false;
 
-	if (!luaState)
-		return false;
+    if (!luaState)
+        return false;
 
-	int top = lua_gettop(luaState);
+    int top = lua_gettop(luaState);
 
-	// Get file name without extension.
-	String name = GetName();
-	unsigned extPos = name.FindLast('.');
-	if (extPos != String::NPOS)
-	{
-		name = name.Substring(0, extPos);
-	}
+    // Get file name without extension.
+    String name = GetName();
+    unsigned extPos = name.FindLast('.');
+    if (extPos != String::NPOS)
+    {
+        name = name.Substring(0, extPos);
+    }
 
-	int error = luaL_loadbuffer(luaState, data_, size_, name.CString());
-	if (error)
-	{
-		const char* message = lua_tostring(luaState, -1);
+    int error = luaL_loadbuffer(luaState, data_, size_, name.CString());
+    if (error)
+    {
+        const char* message = lua_tostring(luaState, -1);
         LOGERROR("Load Buffer failed for " + GetName() + ": " + String(message));
-		lua_settop(luaState, top);
-		return false;
-	}
+        lua_settop(luaState, top);
+        return false;
+    }
 
-	hasLoaded_ = true;
+    hasLoaded_ = true;
 
-	return true;
+    return true;
 }
 
 bool LuaFile::LoadAndExecute(lua_State* luaState)
 {
-	if (hasExecuted_)
-		return true;
+    if (hasExecuted_)
+        return true;
 
-	if (!LoadChunk(luaState))
-		return false;
+    if (!LoadChunk(luaState))
+        return false;
 
-	int top = lua_gettop(luaState);
+    int top = lua_gettop(luaState);
 
-	if (lua_pcall(luaState, 0, 0, 0))
+    if (lua_pcall(luaState, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState, -1);
         LOGERROR("Lua Execute failed for " + GetName() + ": " + String(message));

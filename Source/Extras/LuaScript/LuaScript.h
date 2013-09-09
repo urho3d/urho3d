@@ -61,11 +61,11 @@ public:
     /// Script subscribe object's event.
     void ScriptSubscribeToEvent(Object* object, const String& eventName, const String& functionName);
 
-	/// Return Lua state.
-	lua_State* GetLuaState() const { return luaState_; }
+    /// Return Lua state.
+    lua_State* GetLuaState() const { return luaState_; }
 
-	/// Find Lua function.
-	bool FindFunction(const String& functionName);
+    /// Find Lua function.
+    bool FindFunction(const String& functionName);
 
 private:
     /// Register loader.
@@ -79,9 +79,6 @@ private:
 
     /// Print function.
     static int Print(lua_State* L);
-
-    /// Find Lua function.
-    // bool FindFunction(const String& functionName);
 
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);

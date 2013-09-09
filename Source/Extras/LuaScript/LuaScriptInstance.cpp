@@ -46,148 +46,148 @@ LuaScriptInstance::LuaScriptInstance(Context* context) : Component(context)
 
 LuaScriptInstance::~LuaScriptInstance()
 {
-	if (objectType_.Empty())
-		return;
+    if (objectType_.Empty())
+        return;
 
-	LuaScript* luaScript = GetSubsystem<LuaScript>();
-	lua_State* luaState = luaScript->GetLuaState();
+    LuaScript* luaScript = GetSubsystem<LuaScript>();
+    lua_State* luaState = luaScript->GetLuaState();
 
-	int top = lua_gettop(luaState);
+    int top = lua_gettop(luaState);
 
-	lua_getglobal(luaState, "DestroyScriptObjectInstance");
-	if (!lua_isfunction(luaState, -1))
-	{
-		LOGERROR("Can not find lua function DestroyScriptObjectInstance.");
-		lua_settop(luaState, top);
-		return;
-	}
+    lua_getglobal(luaState, "DestroyScriptObjectInstance");
+    if (!lua_isfunction(luaState, -1))
+    {
+        LOGERROR("Can not find lua function DestroyScriptObjectInstance.");
+        lua_settop(luaState, top);
+        return;
+    }
 
-	// Push this as second parameter.
-	tolua_pushusertype(luaState, (void*)this, "LuaScriptInstance");
+    // Push this as second parameter.
+    tolua_pushusertype(luaState, (void*)this, "LuaScriptInstance");
 
-	// Call ObjectType:new function.
-	if (lua_pcall(luaState, 1, 0, 0) != 0)
-	{
-		const char* message = lua_tostring(luaState, -1);
-		LOGERROR("Execute Lua function failed: " + String(message));
-		lua_settop(luaState, top);
-		return;
-	}
+    // Call ObjectType:new function.
+    if (lua_pcall(luaState, 1, 0, 0) != 0)
+    {
+        const char* message = lua_tostring(luaState, -1);
+        LOGERROR("Execute Lua function failed: " + String(message));
+        lua_settop(luaState, top);
+        return;
+    }
 }
 
 void LuaScriptInstance::RegisterObject(Context* context)
 {
-	context->RegisterFactory<LuaScriptInstance>();
+    context->RegisterFactory<LuaScriptInstance>();
 }
 
 bool LuaScriptInstance::CreateObject(const String& objectType)
 {
-	if (objectType_ == objectType)
-		return true;
+    if (objectType_ == objectType)
+        return true;
 
-	LuaScript* luaScript = GetSubsystem<LuaScript>();
-	lua_State* luaState = luaScript->GetLuaState();
+    LuaScript* luaScript = GetSubsystem<LuaScript>();
+    lua_State* luaState = luaScript->GetLuaState();
 
-	int top = lua_gettop(luaState);
+    int top = lua_gettop(luaState);
 
-	lua_getglobal(luaState, "CreateScriptObjectInstance");
-	if (!lua_isfunction(luaState, -1))
-	{
-		LOGERROR("Can not find lua function CreateScriptObjectInstance.");
-		lua_settop(luaState, top);
-		return false;
-	}
+    lua_getglobal(luaState, "CreateScriptObjectInstance");
+    if (!lua_isfunction(luaState, -1))
+    {
+        LOGERROR("Can not find lua function CreateScriptObjectInstance.");
+        lua_settop(luaState, top);
+        return false;
+    }
 
-	// Get table as first paramter.
-	lua_getglobal(luaState, objectType.CString());
-	if (!lua_istable(luaState, -1))
-	{
-		LOGERROR("Can not find lua table " + objectType + ".");
-		lua_settop(luaState, top);
-		return false;
-	}
+    // Get table as first paramter.
+    lua_getglobal(luaState, objectType.CString());
+    if (!lua_istable(luaState, -1))
+    {
+        LOGERROR("Can not find lua table " + objectType + ".");
+        lua_settop(luaState, top);
+        return false;
+    }
 
-	// Push this as second parameter.
-	tolua_pushusertype(luaState, (void*)this, "LuaScriptInstance");
-	
-	// Call ObjectType:new function.
-	if (lua_pcall(luaState, 2, 1, 0) != 0)
-	{
-		const char* message = lua_tostring(luaState, -1);
-		LOGERROR("Execute Lua function failed: " + String(message));
-		lua_settop(luaState, top);
-		return false;
-	}
+    // Push this as second parameter.
+    tolua_pushusertype(luaState, (void*)this, "LuaScriptInstance");
+    
+    // Call ObjectType:new function.
+    if (lua_pcall(luaState, 2, 1, 0) != 0)
+    {
+        const char* message = lua_tostring(luaState, -1);
+        LOGERROR("Execute Lua function failed: " + String(message));
+        lua_settop(luaState, top);
+        return false;
+    }
 
-	objectType_ = objectType;
+    objectType_ = objectType;
 
-	return true;
+    return true;
 }
 
 void LuaScriptInstance::ScriptSubscribeToEvent(const String& eventName, const String& functionName)
 {
-	StringHash eventType(eventName);
-	String realFunctionName = functionName.Replaced(":", ".");
+    StringHash eventType(eventName);
+    String realFunctionName = functionName.Replaced(":", ".");
 
-	HashSet<Object*>* receivers = context_->GetEventReceivers(eventType);
-	if (!receivers || !receivers->Contains(this))
-		SubscribeToEvent(eventType, HANDLER(LuaScriptInstance, HandleEvent));
+    HashSet<Object*>* receivers = context_->GetEventReceivers(eventType);
+    if (!receivers || !receivers->Contains(this))
+        SubscribeToEvent(eventType, HANDLER(LuaScriptInstance, HandleEvent));
 
-	eventTypeToFunctionNameMap_[eventType].Insert(realFunctionName);
+    eventTypeToFunctionNameMap_[eventType].Insert(realFunctionName);
 }
 
 bool LuaScriptInstance::PushScriptObject(lua_State* luaState)
 {
-	tolua_pushusertype(luaState, (void*)this, "LuaScriptInstance");
-	tolua_pushstring(luaState, "object");
+    tolua_pushusertype(luaState, (void*)this, "LuaScriptInstance");
+    tolua_pushstring(luaState, "object");
 
-	lua_gettable(luaState, -2);
-	if (!lua_istable(luaState, -1))
-	{
-		return false;
-	}
+    lua_gettable(luaState, -2);
+    if (!lua_istable(luaState, -1))
+    {
+        return false;
+    }
 
-	lua_remove(luaState, -2);
+    lua_remove(luaState, -2);
 
-	return true;
+    return true;
 }
 
 void LuaScriptInstance::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
-	const HashSet<String>& functionNames = eventTypeToFunctionNameMap_[eventType];
-	for (HashSet<String>::ConstIterator i = functionNames.Begin(); i != functionNames.End(); ++i)
-		CallEventHandler(*i, eventType, eventData);
+    const HashSet<String>& functionNames = eventTypeToFunctionNameMap_[eventType];
+    for (HashSet<String>::ConstIterator i = functionNames.Begin(); i != functionNames.End(); ++i)
+        CallEventHandler(*i, eventType, eventData);
 }
 
 void LuaScriptInstance::CallEventHandler(const String& functionName, StringHash eventType, VariantMap& eventData )
 {
-	LuaScript* luaScript = GetSubsystem<LuaScript>();
-	lua_State* luaState = luaScript->GetLuaState();
+    LuaScript* luaScript = GetSubsystem<LuaScript>();
+    lua_State* luaState = luaScript->GetLuaState();
 
-	int top = lua_gettop(luaState);
-	
-	if (!luaScript->FindFunction(functionName))
-	{
-		lua_settop(luaState, top);
-		return;
-	}
+    int top = lua_gettop(luaState);
+    
+    if (!luaScript->FindFunction(functionName))
+    {
+        lua_settop(luaState, top);
+        return;
+    }
 
-	if (!PushScriptObject(luaState))
-	{
-		lua_settop(luaState, top);
-		return;
-	}
+    if (!PushScriptObject(luaState))
+    {
+        lua_settop(luaState, top);
+        return;
+    }
 
-	tolua_pushusertype(luaState, (void*)&eventType, "StringHash");
-	tolua_pushusertype(luaState, (void*)&eventData, "VariantMap");
+    tolua_pushusertype(luaState, (void*)&eventType, "StringHash");
+    tolua_pushusertype(luaState, (void*)&eventData, "VariantMap");
 
-	if (lua_pcall(luaState, 3, 0, 0) != 0)
-	{
-		const char* message = lua_tostring(luaState, -1);
-		LOGERROR("Execute Lua function failed: " + String(message));
-		lua_settop(luaState, top);
-		return;
-	}
+    if (lua_pcall(luaState, 3, 0, 0) != 0)
+    {
+        const char* message = lua_tostring(luaState, -1);
+        LOGERROR("Execute Lua function failed: " + String(message));
+        lua_settop(luaState, top);
+        return;
+    }
 }
 
 }
