@@ -33,6 +33,7 @@
 namespace Urho3D
 {
 
+class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
@@ -90,7 +91,9 @@ public:
     void UnregisterAllRemoteEvents();
     /// Set the package download cache directory.
     void SetPackageCacheDir(const String& path);
-    
+    /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data, or a null pointer on error.
+    SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
+
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
     /// Return a client or server connection by kNet MessageConnection, or null if none exist.

@@ -29,7 +29,7 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../IO ../Math ../Resource ../Scene ../../ThirdParty/kNet/include)
+set (LIBS ../Container ../Core ../IO ../Math ../Resource ../Scene ../../ThirdParty/kNet/include ../../ThirdParty/Civetweb/include)
 
 # Setup target
 enable_pch ()

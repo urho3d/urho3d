@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "CoreEvents.h"
 #include "FileSystem.h"
+#include "HttpRequest.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Network.h"
@@ -307,6 +308,19 @@ void Network::UnregisterAllRemoteEvents()
 void Network::SetPackageCacheDir(const String& path)
 {
     packageCacheDir_ = AddTrailingSlash(path);
+}
+
+SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData)
+{
+    SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
+    const String& error = request->GetError();
+    if (!error.Empty())
+    {
+        LOGERROR("Http request to " + url + " failed: " + error);
+        return SharedPtr<HttpRequest>();
+    }
+    else
+        return request;
 }
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const
