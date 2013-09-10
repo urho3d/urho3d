@@ -51,6 +51,7 @@
                         <attribute name="Min Size" value="0 16" />
                         <attribute name="Max Size" value="2147483647 16" />
                         <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="4" />
                         <element type="Button">
                             <attribute name="Name" value="NewTechniqueButton" />
                             <attribute name="Layout Mode" value="Horizontal" />
@@ -103,6 +104,7 @@
                         <attribute name="Min Size" value="0 17" />
                         <attribute name="Max Size" value="2147483647 17" />
                         <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="4" />
                         <element type="LineEdit">
                             <attribute name="Name" value="ParameterNameEdit" />
                         </element>
@@ -239,6 +241,7 @@
         <attribute name="Min Size" value="0 16" />
         <attribute name="Max Size" value="2147483647 16" />
         <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="4" />
         <element type="Button">
             <attribute name="Name" value="NewButton" />
             <attribute name="Layout Mode" value="Horizontal" />
@@ -276,4 +279,5 @@
             </element>
         </element>
     </element>
+    <element type="BorderImage" style="EditorDivider" />
 </element>
