@@ -613,8 +613,6 @@ class SDLMain implements Runnable {
         // Urho3D: pass filesDir
         SDLActivity.nativeInit(((Activity)SDLActivity.getContext()).getFilesDir().getAbsolutePath());
         //Log.v("SDL", "SDL thread terminated");
-        // Urho3D: finish activity when SDL_main returns
-        SDLActivity.finishActivity();
     }
 }
 
