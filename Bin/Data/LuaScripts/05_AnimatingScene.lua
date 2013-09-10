@@ -61,9 +61,9 @@ function CreateScene()
     local NUM_OBJECTS = 2000
     for i = 1, NUM_OBJECTS do
         local boxNode = scene_:CreateChild("Box")
-        boxNode.position = Vector3(Random(200.0) - 100.0, Random(200.0) - 100.0, Random(200.0) - 100.0)
+        boxNode:SetPositionXYZ(Random(200.0) - 100.0, Random(200.0) - 100.0, Random(200.0) - 100.0)
         -- Orient using random pitch, yaw and roll Euler angles
-        boxNode.rotation = Quaternion(Random(360.0), Random(360.0), Random(360.0))
+        boxNode:SetRotationXYZ(Random(360.0), Random(360.0), Random(360.0))
         local boxObject = boxNode:CreateComponent("StaticModel")
         boxObject.model = cache:GetResource("Model", "Models/Box.mdl")
         boxObject.material = cache:GetResource("Material", "Materials/Stone.xml")
@@ -122,25 +122,26 @@ function MoveCamera(timeStep)
 
     -- Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     local mouseMove = input.mouseMove
-    yaw = yaw +MOUSE_SENSITIVITY * mouseMove.x
-    pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
+    yaw = yaw + MOUSE_SENSITIVITY * mouseMove.x
+    pitch = pitch +  MOUSE_SENSITIVITY * mouseMove.y
     pitch = Clamp(pitch, -90.0, 90.0)
 
     -- Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-    cameraNode.rotation = Quaternion(pitch, yaw, 0.0)
+    cameraNode:SetRotationXYZ(pitch, yaw, 0.0)
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
+    local delta = MOVE_SPEED * timeStep
     if input:GetKeyDown(KEY_W) then
-        cameraNode:TranslateRelative(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
+        cameraNode:TranslateRelativeXYZ(0.0, 0.0, delta)
     end
     if input:GetKeyDown(KEY_S) then
-        cameraNode:TranslateRelative(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
+        cameraNode:TranslateRelativeXYZ(0.0, 0.0, -delta)
     end
     if input:GetKeyDown(KEY_A) then
-        cameraNode:TranslateRelative(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
+        cameraNode:TranslateRelativeXYZ(-delta, 0.0, 0.0)
     end
     if input:GetKeyDown(KEY_D) then
-        cameraNode:TranslateRelative(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
+        cameraNode:TranslateRelativeXYZ(delta, 0.0, 0.0)
     end
 end
 
@@ -174,15 +175,9 @@ end
 -- Update is called during the variable timestep scene update
 function Rotator.Update(self, eventType, eventData)
     local timeStep = eventData:GetFloat("TimeStep")
-    --[[
-    local x = self.rotationSpeed.x * timeStep
-    local y = self.rotationSpeed.y * timeStep
-    local z = self.rotationSpeed.z * timeStep
-    --]]
     local x = self.rotationSpeed[1] * timeStep
     local y = self.rotationSpeed[2] * timeStep
     local z = self.rotationSpeed[3] * timeStep
-    --self:GetNode():Rotate(Quaternion(x, y, z))
-    self.node:Rotate(Quaternion(x, y, z))
+    self.node:RotateXYZ(x, y, z)
 end
 

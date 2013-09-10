@@ -13,33 +13,61 @@ class Node : public Serializable
 
     bool SaveXML(Serializer& dest) const;
     void SetName(const String& name);
+    
     void SetPosition(const Vector3& position);
+    tolua_outside void NodeSetPositionXYZ @ SetPositionXYZ(float x, float y, float z);
+    
     void SetRotation(const Quaternion& rotation);
+    tolua_outside void NodeSetRotationXYZ @ SetRotationXYZ(float x, float y, float z);
+    
     void SetDirection(const Vector3& direction);
+    tolua_outside void NodeSetDirectionXYZ @ SetDirectionXYZ(float x, float y, float z);
+    
     void SetScale(float scale);
     void SetScale(const Vector3& scale);
+    tolua_outside void NodeSetScaleXYZ @ SetScaleXYZ(float x, float y, float z);
+    
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    
     void SetWorldPosition(const Vector3& position);
+    tolua_outside void NodeSetWorldPositionXYZ @ SetWorldPositionXYZ(float x, float y, float z);
+    
     void SetWorldRotation(const Quaternion& rotation);
+    tolua_outside void NodeSetWorldRotationXYZ @ SetWorldRotationXYZ(float x, float y, float z);
+    
     void SetWorldDirection(const Vector3& direction);
+    tolua_outside void NodeSetWorldDirectionXYZ @ SetWorldDirectionXYZ(float x, float y, float z);
+    
     void SetWorldScale(float scale);
     void SetWorldScale(const Vector3& scale);
+    tolua_outside void NodeSetWorldScaleXYZ @ SetWorldScaleXYZ(float x, float y, float z);
+    
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    
     void Translate(const Vector3& delta);
+    tolua_outside void NodeTranslateXYZ @ TranslateXYZ(float x, float y, float z);
+    
     void TranslateRelative(const Vector3& delta);
+    tolua_outside void NodeTranslateRelativeXYZ @ TranslateRelativeXYZ(float x, float y, float z);
     
     void Rotate(const Quaternion& delta, bool fixedAxis = false);
+    tolua_outside void NodeRotateXYZ @ RotateXYZ(float x, float y, float z, bool fixedAxis = false);
+    
     void Pitch(float angle, bool fixedAxis = false);
     void Yaw(float angle, bool fixedAxis = false);
     void Roll(float angle, bool fixedAxis = false);
+    
     void LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP);
+    tolua_outside void NodeLookAtXYZ @ LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 0.0f, float upZ =  1.0f);
     
     void Scale(float scale);
     void Scale(const Vector3& scale);
+    tolua_outside void NodeScaleXYZ @ ScaleXYZ(float x, float y, float z);
+    
     void SetEnabled(bool enable);
     void SetEnabled(bool enable, bool recursive);
     void SetOwner(Connection* owner);
@@ -77,16 +105,35 @@ class Node : public Serializable
     Scene* GetScene() const;
     bool IsEnabled() const;
     Connection* GetOwner() const;
+    
     const Vector3& GetPosition() const;
+    tolua_outside void NodeGetPositionXYZ @ GetPositionXYZ(float* x = 0.0f, float* y = 0.0f, float* z = 0.0f) const;
+    
     const Quaternion& GetRotation() const;
+    tolua_outside void NodeGetRotationXYZ @ GetRotationXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    tolua_outside void NodeGetRotationWXYZ @ GetRotationWXYZ(float* *w = 0.0f, float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    
     Vector3 GetDirection() const;
+    tolua_outside void NodeGetDirectionXYZ @ GetDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    
     const Vector3& GetScale() const;
+    tolua_outside void NodeGetScaleXYZ @ GetScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    
     Matrix3x4 GetTransform() const;
-
+    
     Vector3 GetWorldPosition() const;
+    tolua_outside void NodeGetWorldPositionXYZ @ GetWorldPositionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    
     Quaternion GetWorldRotation() const;
+    tolua_outside void NodeGetWorldRotationXYZ @ GetWorldRotationXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    tolua_outside void NodeGetWorldRotationWXYZ @ GetWorldRotationWXYZ(float* *w = 0.0f, float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    
     Vector3 GetWorldDirection() const;
+    tolua_outside void NodeGetWorldDirectionXYZ @ GetWorldDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    
     Vector3 GetWorldScale() const;
+    tolua_outside void NodeGetWorldScaleXYZ @ GetWorldScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+    
     const Matrix3x4& GetWorldTransform() const;
     Vector3 LocalToWorld(const Vector3& position) const;
     Vector3 LocalToWorld(const Vector4& vector) const;
@@ -145,6 +192,153 @@ class Node : public Serializable
 };
 
 ${
+
+static void NodeSetPositionXYZ(Node* node, float x, float y, float z)
+{
+    node->SetPosition(Vector3(x, y, z));
+}
+
+static void NodeSetRotationXYZ(Node* node, float x, float y, float z)
+{
+    node->SetRotation(Quaternion(x, y, z));
+}
+
+static void NodeSetDirectionXYZ(Node* node, float x, float y, float z)
+{
+    node->SetDirection(Vector3(x, y, z));
+}
+
+static void NodeSetScaleXYZ(Node* node, float x, float y, float z)
+{
+    node->SetScale(Vector3(x, y, z));
+}
+
+static void NodeSetWorldPositionXYZ(Node* node, float x, float y, float z)
+{
+    node->SetWorldPosition(Vector3(x, y, z));
+}
+
+static void NodeSetWorldRotationXYZ(Node* node, float x, float y, float z)
+{
+    node->SetWorldRotation(Quaternion(x, y, z));
+}
+
+static void NodeSetWorldDirectionXYZ(Node* node, float x, float y, float z)
+{
+    node->SetWorldDirection(Vector3(x, y, z));
+}
+
+static void NodeSetWorldScaleXYZ(Node* node, float x, float y, float z)
+{
+    node->SetWorldScale(Vector3(x, y, z));
+}
+
+static void NodeTranslateXYZ(Node* node, float x, float y, float z)
+{
+    node->Translate(Vector3(x, y, z));
+}
+
+static void NodeTranslateRelativeXYZ(Node* node, float x, float y, float z)
+{
+    node->TranslateRelative(Vector3(x, y, z));
+}
+
+static void NodeRotateXYZ(Node* node, float x, float y, float z, bool fixedAxis = false)
+{
+    node->Rotate(Quaternion(x, y, z), fixedAxis);
+}
+
+static void NodeLookAtXYZ(Node* node, float x, float y, float z, float upX = 0.0f, float upY = 0.0f, float upZ =  1.0f)
+{
+    node->LookAt(Vector3(x, y, z), Vector3(upX, upY, upZ));
+}
+
+static void NodeScaleXYZ(Node* node, float x, float y, float z)
+{
+    node->Scale(Vector3(x, y, z));
+}
+
+static void NodeGetPositionXYZ(const Node* node, float* x, float* y, float* z)
+{
+    const Vector3& position = node->GetPosition();
+    *x =  position.x_;
+    *y =  position.y_;
+    *z =  position.z_;
+}
+
+static void NodeGetRotationXYZ(const Node* node, float* x, float* y, float* z)
+{
+    const Quaternion& rotation = node->GetRotation();
+    *x =  rotation.x_;
+    *y =  rotation.y_;
+    *z =  rotation.z_;
+}
+
+static void NodeGetRotationWXYZ(const Node* node, float* w, float* x, float* y, float* z)
+{
+    const Quaternion& rotation = node->GetRotation();
+    *w =  rotation.w_;
+    *x =  rotation.x_;
+    *y =  rotation.y_;
+    *z =  rotation.z_;
+}
+
+static void NodeGetDirectionXYZ(const Node* node, float* x, float* y, float* z)
+{
+    const Vector3& direction = node->GetDirection();
+    *x =  direction.x_;
+    *y =  direction.y_;
+    *z =  direction.z_;
+}
+
+static void NodeGetScaleXYZ(const Node* node, float* x, float* y, float* z)
+{
+    const Vector3& scale = node->GetScale();
+    *x =  scale.x_;
+    *y =  scale.y_;
+    *z =  scale.z_;
+}
+
+static void NodeGetWorldPositionXYZ(const Node* node, float* x, float* y, float* z)
+{
+    Vector3 worldPosition = node->GetWorldPosition();
+    *x =  worldPosition.x_;
+    *y =  worldPosition.y_;
+    *z =  worldPosition.z_;
+}
+
+static void NodeGetWorldRotationXYZ(const Node* node, float* x, float* y, float* z)
+{
+    Quaternion worldRotation = node->GetWorldRotation();
+    *x =  worldRotation.x_;
+    *y =  worldRotation.y_;
+    *z =  worldRotation.z_;
+}
+
+static void NodeGetWorldRotationWXYZ(const Node* node, float* w, float* x, float* y, float* z)
+{
+    Quaternion worldRotation = node->GetWorldRotation();
+    *w =  worldRotation.w_;
+    *x =  worldRotation.x_;
+    *y =  worldRotation.y_;
+    *z =  worldRotation.z_;
+}
+
+static void NodeGetWorldDirectionXYZ(const Node* node, float* x, float* y, float* z)
+{
+    Vector3 worldDirection = node->GetWorldDirection();
+    *x =  worldDirection.x_;
+    *y =  worldDirection.y_;
+    *z =  worldDirection.z_;
+}
+
+static void NodeGetWorldScaleXYZ(const Node* node, float* x, float* y, float* z)
+{
+    Vector3 worldScale = node->GetWorldScale();
+    *x =  worldScale.x_;
+    *y =  worldScale.y_;
+    *z =  worldScale.z_;
+}
 
 // Disable generated CreateComponent funciton.
 #define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_CreateComponent00
