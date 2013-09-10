@@ -312,6 +312,8 @@ void Network::SetPackageCacheDir(const String& path)
 
 SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData)
 {
+    PROFILE(MakeHttpRequest);
+    
     SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
     const String& error = request->GetError();
     if (!error.Empty())

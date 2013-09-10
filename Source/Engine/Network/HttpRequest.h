@@ -22,13 +22,14 @@
 
 #pragma once
 
+#include "Deserializer.h"
 #include "RefCounted.h"
 
 namespace Urho3D
 {
 
 /// HTTP request class.
-class HttpRequest : public RefCounted
+class HttpRequest : public RefCounted, public Deserializer
 {
 public:
     /// Construct with parameters.
@@ -37,7 +38,10 @@ public:
     ~HttpRequest();
 
     /// Read response data from the HTTP connection. Return bytes actually read or 0 on error or end of data.
-    unsigned Read(void* dest, unsigned size);
+    virtual unsigned Read(void* dest, unsigned size);
+    /// Set position from the beginning of the stream. Not supported
+    virtual unsigned Seek(unsigned position) { return position_; }
+    
     /// Return whether connection is still open.
     bool IsOpen() const { return connection_ != 0; }
     /// Return URL used in the request.

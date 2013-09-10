@@ -905,6 +905,7 @@ Properties:<br>
 Serializer
 
 Methods:<br>
+- uint Write(uint8[]@)
 - bool WriteInt(int)
 - bool WriteShort(int16)
 - bool WriteByte(int8)
@@ -937,6 +938,7 @@ Methods:<br>
 Deserializer
 
 Methods:<br>
+- uint8[]@ Read(uint)
 - int ReadInt()
 - int16 ReadShort()
 - int8 ReadByte()
@@ -980,6 +982,7 @@ Methods:<br>
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Open(const String&, FileMode arg1 = FILE_READ)
 - void Close()
+- uint Write(uint8[]@)
 - bool WriteInt(int)
 - bool WriteShort(int16)
 - bool WriteByte(int8)
@@ -1007,6 +1010,7 @@ Methods:<br>
 - bool WriteVLE(uint)
 - bool WriteNetID(uint)
 - bool WriteLine(const String&)
+- uint8[]@ Read(uint)
 - int ReadInt()
 - int16 ReadShort()
 - int8 ReadByte()
@@ -1058,6 +1062,7 @@ Methods:<br>
 - void SetData(Deserializer@, uint)
 - void Clear()
 - void Resize(uint)
+- uint Write(uint8[]@)
 - bool WriteInt(int)
 - bool WriteShort(int16)
 - bool WriteByte(int8)
@@ -1085,6 +1090,7 @@ Methods:<br>
 - bool WriteVLE(uint)
 - bool WriteNetID(uint)
 - bool WriteLine(const String&)
+- uint8[]@ Read(uint)
 - int ReadInt()
 - int16 ReadShort()
 - int8 ReadByte()
@@ -5852,6 +5858,52 @@ Properties:<br>
 - VariantMap identity
 
 
+HttpRequest
+
+Methods:<br>
+- uint8[]@ Read(uint)
+- int ReadInt()
+- int16 ReadShort()
+- int8 ReadByte()
+- uint ReadUInt()
+- uint16 ReadUShort()
+- uint8 ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadFileID()
+- StringHash ReadStringHash()
+- ShortStringHash ReadShortStringHash()
+- Variant ReadVariant()
+- VariantMap ReadVariantMap()
+- uint ReadVLE()
+- uint ReadNetID()
+- String ReadLine()
+- uint Seek(uint)
+
+Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
+- String name (readonly)
+- uint checksum (readonly)
+- uint position (readonly)
+- uint size (readonly)
+- bool eof (readonly)
+- String url (readonly)
+- String verb (readonly)
+- bool open (readonly)
+
+
 Network
 
 Methods:<br>
@@ -5868,6 +5920,7 @@ Methods:<br>
 - void UnregisterRemoteEvent(const String&) const
 - void UnregisterAllRemoteEvents()
 - bool CheckRemoteEvent(const String&) const
+- HttpRequest@ MakeHttpRequest(const String&, const String& arg1 = String ( ), String[]@ arg2 = null, const String& arg3 = String ( ))
 
 Properties:<br>
 - int refs (readonly)

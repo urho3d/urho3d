@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "HttpRequest.h"
 #include "Log.h"
+#include "Profiler.h"
 #include "StringUtils.h"
 
 #include <civetweb.h>
@@ -35,23 +36,27 @@ namespace Urho3D
 static const unsigned ERROR_BUFFER_LEN = 256;
 
 HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData) :
-    url_(url),
+    url_(url.Trimmed()),
     verb_(!verb.Empty() ? verb : "GET"),
     connection_(0)
 {
+    // Size of response is unknown, so just set maximum value. The position will also be changed
+    // to maximum value once the request is done, signaling end for Deserializer::IsEof().
+    size_ = M_MAX_UNSIGNED;
+    
     String protocol = "http";
     String host;
     String path = "/";
     int port = 80;
     
-    unsigned protocolEnd = url.Find("://");
+    unsigned protocolEnd = url_.Find("://");
     if (protocolEnd != String::NPOS)
     {
-        protocol = url.Substring(0, protocolEnd);
-        host = url.Substring(protocolEnd + 3);
+        protocol = url_.Substring(0, protocolEnd);
+        host = url_.Substring(protocolEnd + 3);
     }
     else
-        host = url;
+        host = url_;
     
     unsigned pathStart = host.Find('/');
     if (pathStart != String::NPOS)
@@ -72,9 +77,14 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
     char errorBuffer[ERROR_BUFFER_LEN];
     memset(errorBuffer, 0, sizeof(errorBuffer));
     
-    String headerStr;
+    String headersStr;
     for (unsigned i = 0; i < headers.Size(); ++i)
-        headerStr += headers[i] + "\r\n";
+    {
+        // Trim and only add non-empty header strings
+        String header = headers[i].Trimmed();
+        if (header.Length())
+            headersStr += header + "\r\n";
+    }
     
     /// \todo SSL mode will not actually work unless Civetweb's SSL mode is initialized with an external SSL DLL
     if (postData.Empty())
@@ -83,7 +93,7 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"
-            "\r\n", verb_.CString(), path.CString(), host.CString(), headerStr.CString());
+            "\r\n", verb_.CString(), path.CString(), host.CString(), headersStr.CString());
     }
     else
     {
@@ -93,7 +103,7 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
             "%s"
             "Content-Length: %d\r\n"
             "\r\n"
-            "%s", verb_.CString(), path.CString(), host.CString(), headerStr.CString(), postData.Length(), postData.CString());
+            "%s", verb_.CString(), path.CString(), host.CString(), headersStr.CString(), postData.Length(), postData.CString());
     }
     
     if (!connection_)
@@ -124,6 +134,7 @@ void HttpRequest::Release()
     {
         mg_close_connection((mg_connection*)connection_);
         connection_ = 0;
+        position_ = M_MAX_UNSIGNED;
     }
 }
 

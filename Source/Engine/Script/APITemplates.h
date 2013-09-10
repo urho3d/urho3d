@@ -91,10 +91,9 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.Size(), type);
-
-        for (unsigned i = 0; i < arr->GetSize(); ++i)
-            *(static_cast<T*>(arr->At(i))) = vector[i];
-
+        if (vector.Size())
+            memcpy(arr->At(0), &vector[0], vector.Size() * sizeof(T));
+        
         return arr;
     }
     else
@@ -191,6 +190,18 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >
         return 0;
 }
 
+/// Template function for array to Vector conversion.
+template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
+{
+    Vector<T> dest(arr ? arr->GetSize() : 0);
+    if (arr)
+    {
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            dest[i] = *static_cast<T*>(arr->At(i));
+    }
+    return dest;
+}
+
 /// Template function for registering implicit casts between base and subclass.
 template <class T, class U> void RegisterSubclass(asIScriptEngine* engine, const char* classNameT, const char* classNameU)
 {
@@ -204,9 +215,17 @@ template <class T, class U> void RegisterSubclass(asIScriptEngine* engine, const
     engine->RegisterObjectBehaviour(classNameU, asBEHAVE_IMPLICIT_REF_CAST, declReturnT.CString(), asFUNCTION((RefCast<U, T>)), asCALL_CDECL_OBJLAST);
 }
 
+/// Template function for writing to a serializer from an array.
+template <class T> unsigned SerializerWrite(CScriptArray* arr, T* ptr)
+{
+    unsigned bytesToWrite = arr->GetSize();
+    return bytesToWrite ? ptr->Write(arr->At(0), bytesToWrite) : 0;
+}
+
 /// Template function for registering a class derived from Serializer.
 template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* className)
 {
+    engine->RegisterObjectMethod(className, "uint Write(Array<uint8>@+)", asFUNCTION(SerializerWrite<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool WriteInt(int)", asMETHODPR(T, WriteInt, (int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteShort(int16)", asMETHODPR(T, WriteShort, (short), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteByte(int8)", asMETHODPR(T, WriteByte, (signed char), bool), asCALL_THISCALL);
@@ -236,9 +255,19 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "bool WriteLine(const String&in)", asMETHODPR(T, WriteLine, (const String&), bool), asCALL_THISCALL);
 }
 
+/// Template function for reading from a serializer into an array.
+template <class T> CScriptArray* DeserializerRead(unsigned size, T* ptr)
+{
+    PODVector<unsigned char> vector(size);
+    unsigned bytesRead = size ? ptr->Read(&vector[0], size) : 0;
+    vector.Resize(bytesRead);
+    return VectorToArray(vector, "Array<uint8>");
+}
+
 /// Template function for registering a class derived from Deserializer.
 template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char* className)
 {
+    engine->RegisterObjectMethod(className, "Array<uint8>@ Read(uint)", asFUNCTION(DeserializerRead<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "int ReadInt()", asMETHODPR(T, ReadInt, (), int), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int16 ReadShort()", asMETHODPR(T, ReadShort, (), short), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int8 ReadByte()", asMETHODPR(T, ReadByte, (), signed char), asCALL_THISCALL);
@@ -285,7 +314,7 @@ template <class T> void RegisterRefCounted(asIScriptEngine* engine, const char* 
     RegisterSubclass<RefCounted, T>(engine, "RefCounted", className);
 }
 
-template <class T> void ObjectSendEvent(const String& eventType, VariantMap& eventData,  T* ptr)
+template <class T> void ObjectSendEvent(const String& eventType, VariantMap& eventData, T* ptr)
 {
     if (ptr)
         ptr->SendEvent(StringHash(eventType), eventData);
@@ -461,7 +490,7 @@ static CScriptArray* NodeGetChildren(bool recursive, Node* ptr)
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
-static CScriptArray* NodeGetChildrenWithComponent(String& typeName, bool recursive, Node* ptr)
+static CScriptArray* NodeGetChildrenWithComponent(const String& typeName, bool recursive, Node* ptr)
 {
     PODVector<Node*> nodes;
     ptr->GetChildrenWithComponent(nodes, typeName, recursive);

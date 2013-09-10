@@ -91,7 +91,7 @@ static CScriptArray* ScriptArrayFactoryDefVal(asIObjectType *ot, asUINT length, 
         return 0;
     }
 
-    return a;    
+    return a;
 }
 
 static CScriptArray* ScriptArrayFactory(asIObjectType *ot)

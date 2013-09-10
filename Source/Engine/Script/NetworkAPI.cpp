@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "APITemplates.h"
 #include "Controls.h"
+#include "HttpRequest.h"
 #include "Network.h"
 #include "NetworkPriority.h"
 #include "Protocol.h"
@@ -118,6 +119,15 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Node", "Connection@+ get_owner() const", asMETHOD(Node, GetOwner), asCALL_THISCALL);
 }
 
+static void RegisterHttpRequest(asIScriptEngine* engine)
+{
+    RegisterRefCounted<HttpRequest>(engine, "HttpRequest");
+    RegisterDeserializer<HttpRequest>(engine, "HttpRequest");
+    engine->RegisterObjectMethod("HttpRequest", "const String& get_url() const", asMETHOD(HttpRequest, GetURL), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HttpRequest", "const String& get_verb() const", asMETHOD(HttpRequest, GetVerb), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HttpRequest", "bool get_open() const", asMETHOD(HttpRequest, IsOpen), asCALL_THISCALL);
+}
+
 static Network* GetNetwork()
 {
     return GetScriptContext()->GetSubsystem<Network>();
@@ -159,6 +169,16 @@ static bool NetworkCheckRemoteEvent(const String& eventType, Network* ptr)
     return ptr->CheckRemoteEvent(eventType);
 }
 
+static HttpRequest* NetworkMakeHttpRequest(const String& url, const String& verb, CScriptArray* headers, const String& postData, Network* ptr)
+{
+    SharedPtr<HttpRequest> request = ptr->MakeHttpRequest(url, verb, ArrayToVector<String>(headers), postData);
+    // The shared pointer will go out of scope, so have to increment the reference count
+    // (here an auto handle can not be used)
+    if (request)
+        request->AddRef();
+    return request.Get();
+}
+
 void RegisterNetwork(asIScriptEngine* engine)
 {
     RegisterObject<Network>(engine, "Network");
@@ -174,6 +194,7 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "void UnregisterRemoteEvent(const String&in) const", asFUNCTION(NetworkUnregisterRemoteEvent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Network", "void UnregisterAllRemoteEvents()", asMETHOD(Network, UnregisterAllRemoteEvents), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool CheckRemoteEvent(const String&in) const", asFUNCTION(NetworkCheckRemoteEvent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Network", "HttpRequest@ MakeHttpRequest(const String&in, const String&in verb = String(), Array<String>@+ headers = null, const String&in postData = String())", asFUNCTION(NetworkMakeHttpRequest), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Network", "void set_updateFps(int)", asMETHOD(Network, SetUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "int get_updateFps() const", asMETHOD(Network, GetUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void set_packageCacheDir(const String&in)", asMETHOD(Network, SetPackageCacheDir), asCALL_THISCALL);
@@ -189,6 +210,7 @@ void RegisterNetworkAPI(asIScriptEngine* engine)
     RegisterControls(engine);
     RegisterNetworkPriority(engine);
     RegisterConnection(engine);
+    RegisterHttpRequest(engine);
     RegisterNetwork(engine);
 }
 

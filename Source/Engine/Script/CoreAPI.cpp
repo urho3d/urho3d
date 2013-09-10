@@ -541,14 +541,6 @@ static CScriptArray* StringSplit(char separator, const String* str)
     return VectorToArray<String>(result, "Array<String>");
 }
 
-template <class T> Vector<T> ArrayToVector(CScriptArray* arr)
-{
-    Vector<T> dest(arr->GetSize());
-    for (unsigned i = 0; i < arr->GetSize(); ++i)
-        dest[i] = *static_cast<T*>(arr->At(i));
-    return dest;
-}
-
 static void StringJoin(CScriptArray* arr, const String& glue, String* str)
 {
     Vector<String> subStrings = ArrayToVector<String>(arr);
