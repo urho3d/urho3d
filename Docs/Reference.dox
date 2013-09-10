@@ -186,7 +186,7 @@ The application window's state (has input focus, minimized or not) can be querie
 
 - On mobile devices it is also unsafe to access or create any graphics resources while the window is minimized (as the graphics context may be destroyed during this time); doing so can crash the program. It is recommended to leave the pause-minimized feature on to ensure you do not have to check for this in your update code.
 
-Note that on iOS you should never call \ref Engine::Exit "Exit()" as there is no officially sanctioned way to manually exit your program; the application would simply hang while no longer updating or rendering. On Android it is permitted (though perhaps not recommended) and will cause the activity to manually exit.
+Note that on iOS calling \ref Engine::Exit "Exit()" is a no-op as there is no officially sanctioned way to manually exit your program. On Android it will cause the activity to manually exit.
 
 \section MainLoop_ApplicationFramework Application framework
 
