@@ -245,7 +245,18 @@ void Slider::Page(const IntVector2& position, int button, int buttons, int quali
     float length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());
 
     using namespace SliderPaged;
-
+    
+    // If button is 0 (passed from hover event) assume it's the lowest pressed bit in buttons
+    if (!button && buttons)
+    {
+        if (buttons & MOUSEB_LEFT)
+            button = MOUSEB_LEFT;
+        else if (buttons & MOUSEB_MIDDLE)
+            button = MOUSEB_MIDDLE;
+        else if (buttons & MOUSEB_RIGHT)
+            button = MOUSEB_RIGHT;
+    }
+    
     VariantMap eventData;
     eventData[P_ELEMENT] = (void*)this;
     eventData[P_OFFSET] = offset;
