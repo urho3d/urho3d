@@ -176,7 +176,11 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
     if (!receivers || !receivers->Contains(this))
         SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
 
-    eventTypeToFunctionNameMap_[eventType].Insert(functionName);
+    int functionRef = LUA_REFNIL;
+    if (FindFunction(functionName))
+        functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
+
+    eventTypeToFunctionRefMap_[eventType] = functionRef;
 }
 
 void LuaScript::ScriptSubscribeToEvent(Object* object, const String& eventName, const String& functionName)
@@ -187,7 +191,11 @@ void LuaScript::ScriptSubscribeToEvent(Object* object, const String& eventName, 
     if (!receivers || !receivers->Contains(this))
         SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
 
-    objectToEventTypeToFunctionNameMap_[object][eventType].Insert(functionName);
+    int functionRef = LUA_REFNIL;
+    if (FindFunction(functionName))
+        functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
+
+    objectToEventTypeToFunctionRefMap_[object][eventType] = functionRef;
 }
 
 void LuaScript::RegisterLoader()
@@ -301,17 +309,21 @@ bool LuaScript::FindFunction(const String& functionName)
 
 void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
-    const HashSet<String>& functionNames = eventTypeToFunctionNameMap_[eventType];
-    for (HashSet<String>::ConstIterator i = functionNames.Begin(); i != functionNames.End(); ++i)
-        CallEventHandler(*i, eventType, eventData);
+    int functionRef = eventTypeToFunctionRefMap_[eventType];
+    if (functionRef == LUA_REFNIL)
+        return;
+
+    CallEventHandler(functionRef, eventType, eventData);
 }
 
 void LuaScript::HandleObjectEvent(StringHash eventType, VariantMap& eventData)
 {
     Object* object = GetEventSender();
-    const HashSet<String>& functionNames = objectToEventTypeToFunctionNameMap_[object][eventType];
-    for (HashSet<String>::ConstIterator i = functionNames.Begin(); i != functionNames.End(); ++i)
-        CallEventHandler(*i, eventType, eventData);
+    int functionRef = objectToEventTypeToFunctionRefMap_[object][eventType];
+    if (functionRef == LUA_REFNIL)
+        return;
+
+    CallEventHandler(functionRef, eventType, eventData);
 }
 
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
@@ -320,11 +332,13 @@ void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData
     ExecuteString(eventData[P_COMMAND].GetString());
 }
 
-void LuaScript::CallEventHandler(const String& functionName, StringHash eventType, VariantMap& eventData )
+void LuaScript::CallEventHandler(int functionRef, StringHash eventType, VariantMap& eventData )
 {
     int top = lua_gettop(luaState_);
-    if (!FindFunction(functionName))
+    lua_rawgeti(luaState_, LUA_REGISTRYINDEX, functionRef);
+    if (!lua_isfunction(luaState_, -1))
     {
+        LOGERROR("Can not find funciton.");
         lua_settop(luaState_, top);
         return;
     }

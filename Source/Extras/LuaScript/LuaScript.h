@@ -73,7 +73,7 @@ private:
 
     /// Loader.
     static int Loader(lua_State* L);
-    
+
     /// Replace print.
     void ReplacePrint();
 
@@ -91,15 +91,16 @@ private:
 
 private:
     /// Call Lua event handler.
-    void CallEventHandler(const String& functionName, StringHash eventType, VariantMap& eventData);
+    void CallEventHandler(int functionRef, StringHash eventType, VariantMap& eventData);
 
     /// Lua state.
     lua_State* luaState_;
-    /// Event type to function name map.
-    HashMap<StringHash, HashSet<String> > eventTypeToFunctionNameMap_;
-    /// Object to event type to function name map.
-    HashMap<Object*, HashMap<StringHash, HashSet<String> > > objectToEventTypeToFunctionNameMap_;
 
+    /// Event type to function ref map.
+    HashMap<StringHash, int> eventTypeToFunctionRefMap_;
+
+    /// Object to event type to function ref map.
+    HashMap<Object*, HashMap<StringHash, int> > objectToEventTypeToFunctionRefMap_;
 };
 
 /// Register Lua script library objects.

@@ -19,11 +19,7 @@ function LuaScriptObject:Stop()
 end
 
 function LuaScriptObject:GetNode()
-    local instance = self.instance
-    if instance == nil then
-        return nil
-    end    
-    return tolua.cast(instance, "Component"):GetNode()
+	return self.node
 end
 
 function LuaScriptObject:SubscribeToEvent(eventType, functionName)
@@ -41,8 +37,6 @@ function ScriptObject()
     return o
 end
 
-ScriptObjectInstances = {}
-
 function CreateScriptObjectInstance(object, instance)
     local o = {}
     setmetatable(o, object)
@@ -50,13 +44,10 @@ function CreateScriptObjectInstance(object, instance)
     
     instance.object = o
     o.instance = instance
-
-    -- Call object's start function.
-    -- if o.Start ~= nil then
-        o:Start()
-    -- end
+    o.node = instance:GetNode()
     
-    table.insert(ScriptObjectInstances, o);
+    -- Call object's start function.
+    o:Start()
     
     return o
 end
@@ -67,18 +58,10 @@ function DestroyScriptObjectInstance(instance)
         return
     end
     
-    for i, o in ipairs(ScriptObjectInstances) do
-        if o == object then
-            table.remove(ScriptObjectInstances, i)
-            break
-        end
-    end
-    
     -- Call stop function.
-    -- if object.Stop ~= nil then
-        object:Stop()
-    -- end
+    object:Stop()
     
+    object.node = nil
     object.instance = nil
     instance.object = nil
 end

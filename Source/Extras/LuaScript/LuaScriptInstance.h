@@ -29,6 +29,8 @@ struct lua_State;
 namespace Urho3D
 {
 
+class LuaScript;
+
 /// Lua instance.
 class URHO3D_API LuaScriptInstance : public Component
 {
@@ -49,21 +51,27 @@ public:
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
 
 protected:
-    /// Push script object on stack.
-    bool PushScriptObject(lua_State* luaState);
-
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
 
     /// Call event handler.
-    void CallEventHandler(const String& functionName, StringHash eventType, VariantMap& eventData);
+    void CallEventHandler(int functionRef, StringHash eventType, VariantMap& eventData);
 
 private:
+    // Lua Script.
+    LuaScript* luaScript_;
+
+    /// Lua state.
+    lua_State* luaState_;
+
     /// Object type.
     String objectType_;
 
-    /// Event type to function name map.
-    HashMap<StringHash, HashSet<String> > eventTypeToFunctionNameMap_;
+    /// Script object ref.
+    int scriptObjectRef_;
+
+    /// Event type to function ref map.
+    HashMap<StringHash, int> eventTypeToFunctionRefMap_;
 };
 
 }

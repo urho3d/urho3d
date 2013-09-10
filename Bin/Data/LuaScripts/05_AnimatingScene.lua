@@ -73,7 +73,8 @@ function CreateScene()
         -- class name to instantiate the object
         local instance = boxNode:CreateComponent("LuaScriptInstance")
         instance:CreateObject("Rotator")
-        instance.object.rotationSpeed = Vector3(10.0, 20.0, 30.0)
+        --instance.object.rotationSpeed = Vector3(10.0, 20.0, 30.0)
+        instance.object.rotationSpeed = {10.0, 20.0, 30.0}
     end
 
     -- Create the camera. Let the starting position be at the world origin. As the fog limits maximum visible distance, we can
@@ -162,7 +163,8 @@ end
 Rotator = ScriptObject()
 
 function Rotator:Start()
-    self.rotationSpeed = Vector3(0.0, 0.0, 0.0)
+    --self.rotationSpeed = Vector3(0.0, 0.0, 0.0)
+    self.rotationSpeed = {0.0, 0.0, 0.0}
     self:SubscribeToEvent("Update", "Rotator.Update")
 end
 
@@ -172,9 +174,15 @@ end
 -- Update is called during the variable timestep scene update
 function Rotator.Update(self, eventType, eventData)
     local timeStep = eventData:GetFloat("TimeStep")
+    --[[
     local x = self.rotationSpeed.x * timeStep
     local y = self.rotationSpeed.y * timeStep
     local z = self.rotationSpeed.z * timeStep
-    self:GetNode():Rotate(Quaternion(x, y, z))
+    --]]
+    local x = self.rotationSpeed[1] * timeStep
+    local y = self.rotationSpeed[2] * timeStep
+    local z = self.rotationSpeed[3] * timeStep
+    --self:GetNode():Rotate(Quaternion(x, y, z))
+    self.node:Rotate(Quaternion(x, y, z))
 end
 
