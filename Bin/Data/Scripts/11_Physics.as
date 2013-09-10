@@ -2,6 +2,7 @@
 // This sample demonstrates:
 //     - Creating both static and moving physics objects to a scene;
 //     - Displaying physics debug geometry;
+//     - Using the Skybox component for setting up an unmoving sky;
 //     - Saving a scene to a file and loading it to restore a previous state;
 
 #include "Scripts/Utilities/Sample.as"
@@ -47,10 +48,10 @@ void CreateScene()
     Zone@ zone = zoneNode.CreateComponent("Zone");
     zone.boundingBox = BoundingBox(-1000.0f, 1000.0f);
     zone.ambientColor = Color(0.15f, 0.15f, 0.15f);
-    zone.fogColor = Color(0.5f, 0.5f, 0.7f);
-    zone.fogStart = 100.0f;
-    zone.fogEnd = 300.0f;
-    
+    zone.fogColor = Color(0.7f, 0.6f, 0.5f);
+    zone.fogStart = 150.0f;
+    zone.fogEnd = 500.0f;
+
     // Create a directional light to the world. Enable cascaded shadows on it
     Node@ lightNode = scene_.CreateChild("DirectionalLight");
     lightNode.direction = Vector3(0.6f, -1.0f, 0.8f);
@@ -61,11 +62,20 @@ void CreateScene()
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
     
+    // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
+    // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
+    // generate the necessary 3D texture coordinates for cube mapping
+    Node@ skyNode = scene_.CreateChild("Sky");
+    skyNode.SetScale(500.0f); // The scale actually does not matter
+    Skybox@ skybox = skyNode.CreateComponent("Skybox");
+    skybox.model = cache.GetResource("Model", "Models/Box.mdl");
+    skybox.material = cache.GetResource("Material", "Materials/Skybox.xml");
+
     {
-        // Create a floor object, 500 x 500 world units. Adjust position so that the ground is at zero Y
+        // Create a floor object, 1000 x 1000 world units. Adjust position so that the ground is at zero Y
         Node@ floorNode = scene_.CreateChild("Floor");
         floorNode.position = Vector3(0.0f, -0.5f, 0.0f);
-        floorNode.scale = Vector3(500.0f, 1.0f, 500.0f);
+        floorNode.scale = Vector3(1000.0f, 1.0f, 1000.0f);
         StaticModel@ floorObject = floorNode.CreateComponent("StaticModel");
         floorObject.model = cache.GetResource("Model", "Models/Box.mdl");
         floorObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
@@ -105,11 +115,11 @@ void CreateScene()
         }
     }
     
-    // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
+    // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside
     // the scene, because we want it to be unaffected by scene load/save
     cameraNode = Node();
     Camera@ camera = cameraNode.CreateComponent("Camera");
-    camera.farClip = 300.0f;
+    camera.farClip = 500.0f;
 
     // Set an initial position for the camera scene node above the floor
     cameraNode.position = Vector3(0.0f, 5.0f, -20.0f);

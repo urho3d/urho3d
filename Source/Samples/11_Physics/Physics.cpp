@@ -39,6 +39,7 @@
 #include "ResourceCache.h"
 #include "RigidBody.h"
 #include "Scene.h"
+#include "Skybox.h"
 #include "StaticModel.h"
 #include "Text.h"
 #include "UI.h"
@@ -95,9 +96,9 @@ void Physics::CreateScene()
     Zone* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
-    zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
-    zone->SetFogStart(100.0f);
-    zone->SetFogEnd(300.0f);
+    zone->SetFogColor(Color(0.7f, 0.6f, 0.5f));
+    zone->SetFogStart(150.0f);
+    zone->SetFogEnd(500.0f);
     
     // Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = scene_->CreateChild("DirectionalLight");
@@ -109,11 +110,20 @@ void Physics::CreateScene()
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     
+    // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
+    // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will
+    // generate the necessary 3D texture coordinates for cube mapping
+    Node* skyNode = scene_->CreateChild("Sky");
+    skyNode->SetScale(500.0f); // The scale actually does not matter
+    Skybox* skybox = skyNode->CreateComponent<Skybox>();
+    skybox->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+    skybox->SetMaterial(cache->GetResource<Material>("Materials/Skybox.xml"));
+    
     {
-        // Create a floor object, 500 x 500 world units. Adjust position so that the ground is at zero Y
+        // Create a floor object, 1000 x 1000 world units. Adjust position so that the ground is at zero Y
         Node* floorNode = scene_->CreateChild("Floor");
         floorNode->SetPosition(Vector3(0.0f, -0.5f, 0.0f));
-        floorNode->SetScale(Vector3(500.0f, 1.0f, 500.0f));
+        floorNode->SetScale(Vector3(1000.0f, 1.0f, 1000.0f));
         StaticModel* floorObject = floorNode->CreateComponent<StaticModel>();
         floorObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
         floorObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
@@ -153,11 +163,11 @@ void Physics::CreateScene()
         }
     }
     
-    // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
-    // the scene, because we want it to be unaffected by scene load/save
+    // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside the scene, because
+    // we want it to be unaffected by scene load/save
     cameraNode_ = new Node(context_);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
-    camera->SetFarClip(300.0f);
+    camera->SetFarClip(500.0f);
     
     // Set an initial position for the camera scene node above the floor
     cameraNode_->SetPosition(Vector3(0.0f, 5.0f, -20.0f));
