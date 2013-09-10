@@ -66,6 +66,13 @@ typedef struct _CrtMemBlockHeader
 } _CrtMemBlockHeader;
 #endif
 
+#ifdef ANDROID
+extern "C"
+{
+    void Android_JNI_FinishActivity();
+}
+#endif
+
 namespace Urho3D
 {
 
@@ -396,16 +403,23 @@ void Engine::SetPauseMinimized(bool enable)
 
 void Engine::SetAutoExit(bool enable)
 {
+    // On mobile platforms exit is mandatory if requested by the platform itself and should not be attempted to be disabled
+#if defined(ANDROID) || defined(IOS)
+    enable = true;
+#endif
     autoExit_ = enable;
 }
 
 void Engine::Exit()
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
-    if (graphics)
-        graphics->Close();
-    
-    exiting_ = true;
+#if defined(IOS)
+    // On iOS it's not legal for the application to exit on its own, instead it will be minimized with the home key
+#elif defined(ANDROID)
+    // On Android we request the Java activity to finish itself
+    Android_JNI_FinishActivity();
+#else
+    DoExit();
+#endif
 }
 
 void Engine::DumpProfiler()
@@ -675,7 +689,20 @@ const Variant& Engine::GetParameter(const VariantMap& parameters, const String& 
 void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 {
     if (autoExit_)
-        Exit();
+    {
+        // Do not call Exit() here, as it contains mobile platform -specific tests to not exit.
+        // If we do receive an exit request from the system on those platforms, we must comply
+        DoExit();
+    }
+}
+
+void Engine::DoExit()
+{
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (graphics)
+        graphics->Close();
+    
+    exiting_ = true;
 }
 
 }

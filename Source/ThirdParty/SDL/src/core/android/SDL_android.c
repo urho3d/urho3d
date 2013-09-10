@@ -243,6 +243,8 @@ void Java_org_libsdl_app_SDLActivity_nativeLowMemory(
 void Java_org_libsdl_app_SDLActivity_nativeQuit(
                                     JNIEnv* env, jclass cls)
 {
+    // Urho3D: added log print
+    __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeQuit()");
     // Inject a SDL_QUIT event
     SDL_SendQuit();
     SDL_SendAppEvent(SDL_APP_TERMINATING);
@@ -433,6 +435,18 @@ SDL_bool Android_JNI_GetAccelerometerValues(float values[3])
     }
 
     return retval;
+}
+
+// Urho3D: added function
+void Android_JNI_FinishActivity()
+{
+    // Terminating the SDL main thread on our own may cause crashes with extra threads, so request
+    // the activity to finish instead
+    jmethodID mid;
+    JNIEnv *mEnv = Android_JNI_GetEnv();
+    mid = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass, "finishActivity","()V");
+    if (mid)
+        (*mEnv)->CallStaticVoidMethod(mEnv, mActivityClass, mid);
 }
 
 static void Android_JNI_ThreadDestroyed(void* value) {

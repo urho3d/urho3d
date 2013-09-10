@@ -60,7 +60,7 @@ public:
     void SetPauseMinimized(bool enable);
     /// Set whether to exit automatically on exit request (window close button.)
     void SetAutoExit(bool enable);
-    /// Close the application window and set the exit flag.
+    /// Close the graphics window and set the exit flag. No-op on iOS, as an iOS application can not legally exit.
     void Exit();
     /// Dump profiling information to the log.
     void DumpProfiler();
@@ -101,8 +101,10 @@ public:
     static const Variant& GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
     
 private:
-    /// Handle exit requested event.
+    /// Handle exit requested event. Auto-exit if enabled.
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
+    /// Actually perform the exit actions.
+    void DoExit();
     
     /// Frame update timer.
     HiresTimer frameTimer_;
