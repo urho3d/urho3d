@@ -203,7 +203,7 @@ The last command resets the launch service database and rebuilds it, so the chan
 
 \page Examples Example applications
 
-The examples included with Urho3D consist of two larger applications built in AngelScript, and a set of smaller sample applications provided in both C++ and AngelScript, which demonstrate a specific engine feature.
+The examples included with Urho3D consist of two larger applications built in AngelScript, and a set of smaller sample applications provided in both C++, AngelScript and Lua, which demonstrate a specific engine feature.
 
 \section Examples_NinjaSnowWar NinjaSnowWar
 
@@ -236,9 +236,9 @@ For details on how to use the editor, see \ref EditorInstructions "Editor instru
 
 The sample applications start from the very simple (a "Hello World" program) and progress to demonstrate more complex engine features. The code is heavily commented and should be easy to follow for learning. The applications display on-screen instructions when run.
 
-The AngelScript versions reside in the Bin/Data/Scripts directory. %Batch files to run each of them are not provided due to their large amount: instead run the script host application with the script file name as the parameter, for example Urho3D Scripts/01_HelloWorld.as
+The AngelScript and Lua versions reside in the Bin/Data/Scripts and Bin/Data/LuaScripts directories. %Batch files to run each of them are not provided due to their large amount: instead run the script host application with the script file name as the parameter, for example Urho3D Scripts/01_HelloWorld.as
 
-The C++ versions need to be explicitly enabled in the build with the CMake option -DENABLE_EXAMPLES=1. When enabled, the executables will be produced into the Bin directory and can be run from there. Their source code is in the Source/Samples directory.
+The C++ versions need to be explicitly enabled in the build with the CMake option -DENABLE_SAMPLES=1. When enabled, the executables will be produced into the Bin directory and can be run from there. Their source code is in the Source/Samples directory.
 
 The samples provide the following common key controls:
 
