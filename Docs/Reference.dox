@@ -1508,6 +1508,10 @@ Connection* remoteSender = static_cast<Connection*>(eventData[P_CONNECTION].GetP
 Connection@ remoteSender = eventData["Connection"].GetConnection();
 \endcode
 
+\section Network_HttpRequests HTTP requests
+
+In addition to UDP messaging, the network subsystem allows to make HTTP requests. Use the \ref Network::MakeHttpRequest "MakeHttpRequest()" function for this. You can specify the URL, the verb to use (default GET if empty), optional headers and optional post data. The HttpRequest object that is returned acts like a Deserializer, and you can read the response data in suitably sized chunks. After the whole response is read, the connection closes. The connection can also be closed early by allowing the request object to expire.
+
 \page Multithreading Multithreading
 
 Urho3D uses a task-based multithreading model. The WorkQueue subsystem can be supplied with tasks described by the WorkItem structure, by calling \ref WorkQueue::AddWorkItem "AddWorkItem()". These will be executed in background worker threads. The function \ref WorkQueue::Complete "Complete()" will complete all currently pending tasks, and execute them also in the main thread to make them finish faster.

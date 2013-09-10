@@ -39,7 +39,7 @@ public:
 
     /// Read response data from the HTTP connection. Return bytes actually read or 0 on error or end of data.
     virtual unsigned Read(void* dest, unsigned size);
-    /// Set position from the beginning of the stream. Not supported
+    /// Set position from the beginning of the stream. Not supported.
     virtual unsigned Seek(unsigned position) { return position_; }
     
     /// Return whether connection is still open.
