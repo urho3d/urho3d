@@ -93,6 +93,9 @@ Engine::Engine(Context* context) :
     #endif
     autoExit_(true),
     initialized_(false),
+#ifdef ANDROID
+    exitRequested_(false),
+#endif
     exiting_(false),
     headless_(false),
     audioPaused_(false)
@@ -416,7 +419,11 @@ void Engine::Exit()
     // On iOS it's not legal for the application to exit on its own, instead it will be minimized with the home key
 #elif defined(ANDROID)
     // On Android we request the Java activity to finish itself
-    Android_JNI_FinishActivity();
+    if (!exitRequested_)
+    {
+        Android_JNI_FinishActivity();
+        exitRequested_ = true;
+    }
 #else
     DoExit();
 #endif
