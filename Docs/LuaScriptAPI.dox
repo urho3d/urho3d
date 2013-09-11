@@ -2596,6 +2596,8 @@ Methods:<br>
 - bool CreateObject(const char* objectType)
 - SubscribeToEvent(const String& eventName, const char* functionName)
 - SubscribeToEvent(const char* eventName, const char* functionName)
+- SubscribeToEvent(void* object, const String& eventName, const char* functionName);
+- SubscribeToEvent(void* object, const char* eventName, const char* functionName);
 
 BoundingBox
 

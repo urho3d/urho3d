@@ -49,10 +49,16 @@ public:
 
     /// Script subscribe event.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
-
+    
+    /// Script subscribe object's event.
+    void ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName);
+    
 protected:
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
+
+    /// Handle object event.
+    void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
 
     /// Call event handler.
     void CallEventHandler(int functionRef, StringHash eventType, VariantMap& eventData);
@@ -72,6 +78,9 @@ private:
 
     /// Event type to function ref map.
     HashMap<StringHash, int> eventTypeToFunctionRefMap_;
+    
+    /// Object to event type to function ref map.
+    HashMap<Object*, HashMap<StringHash, int> > objectToEventTypeToFunctionRefMap_;
 };
 
 }

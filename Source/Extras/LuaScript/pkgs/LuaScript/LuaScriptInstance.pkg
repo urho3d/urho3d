@@ -7,6 +7,9 @@ class LuaScriptInstance : public Component
     
     void ScriptSubscribeToEvent @ SubscribeToEvent(const String& eventName, const char* functionName);
     void ScriptSubscribeToEvent @ SubscribeToEvent(const char* eventName, const char* functionName);
+    
+    void ScriptSubscribeToEvent @ SubscribeToEvent(void* object, const String& eventName, const char* functionName);
+    void ScriptSubscribeToEvent @ SubscribeToEvent(void* object, const char* eventName, const char* functionName);
 };
 
 $[
@@ -22,12 +25,16 @@ function LuaScriptObject:GetNode()
 	return self.node
 end
 
-function LuaScriptObject:SubscribeToEvent(eventType, functionName)
+function LuaScriptObject:SubscribeToEvent(param1, param2, param3)
     local instance = self.instance
     if instance == nil then
         return
     end
-    instance:SubscribeToEvent(eventType, functionName)
+    if param3 == nil then
+        instance:SubscribeToEvent(param1, param2)
+    else
+        instance:SubscribeToEvent(param1, param2, param3)
+    end
 end
 
 function ScriptObject()

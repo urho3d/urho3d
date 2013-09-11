@@ -59,7 +59,7 @@ public:
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
 
     /// Script subscribe object's event.
-    void ScriptSubscribeToEvent(Object* object, const String& eventName, const String& functionName);
+    void ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName);
 
     /// Return Lua state.
     lua_State* GetLuaState() const { return luaState_; }

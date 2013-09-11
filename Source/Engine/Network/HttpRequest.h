@@ -28,7 +28,7 @@
 namespace Urho3D
 {
 
-/// HTTP request class.
+/// An HTTP connection with response data stream.
 class HttpRequest : public RefCounted, public Deserializer
 {
 public:
