@@ -40,7 +40,7 @@ static const char* highlightModes[] =
     "Never",
     "Focus",
     "Always",
-    ""
+    0
 };
 
 template<> HighlightMode Variant::Get<HighlightMode>() const
