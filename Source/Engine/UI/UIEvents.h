@@ -162,9 +162,7 @@ EVENT(E_SLIDERPAGED, SliderPaged)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
     PARAM(P_OFFSET, Offset);                // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    PARAM(P_PRESSED, Pressed);              // bool
 }
 
 /// UI scrollbar value changed.

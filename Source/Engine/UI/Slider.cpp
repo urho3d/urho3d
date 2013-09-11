@@ -96,15 +96,22 @@ void Slider::OnHover(const IntVector2& position, const IntVector2& screenPositio
 
     // If not hovering on the knob, send it as page event
     if (!hovering_)
-        Page(position, 0, buttons, qualifiers);
+        Page(position, buttons & MOUSEB_LEFT);
 }
 
 void Slider::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
     selected_ = true;
     hovering_ = knob_->IsInside(screenPosition, true);
-    if (!hovering_)
-        Page(position, button, buttons, qualifiers);
+    if (!hovering_ && button == MOUSEB_LEFT)
+        Page(position, true);
+}
+
+void Slider::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
+{
+    hovering_ = knob_->IsInside(screenPosition, true);
+    if (!hovering_ && button == MOUSEB_LEFT)
+        Page(position, false);
 }
 
 void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
@@ -238,7 +245,7 @@ void Slider::UpdateSlider()
     }
 }
 
-void Slider::Page(const IntVector2& position, int button, int buttons, int qualifiers)
+void Slider::Page(const IntVector2& position, bool pressed)
 {
     IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
     int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
@@ -246,31 +253,18 @@ void Slider::Page(const IntVector2& position, int button, int buttons, int quali
 
     using namespace SliderPaged;
     
-    // If button is 0 (passed from hover event) assume it's the lowest pressed bit in buttons
-    if (!button && buttons)
-    {
-        if (buttons & MOUSEB_LEFT)
-            button = MOUSEB_LEFT;
-        else if (buttons & MOUSEB_MIDDLE)
-            button = MOUSEB_MIDDLE;
-        else if (buttons & MOUSEB_RIGHT)
-            button = MOUSEB_RIGHT;
-    }
-    
     VariantMap eventData;
     eventData[P_ELEMENT] = (void*)this;
     eventData[P_OFFSET] = offset;
-    // Only generate the 'click' variant of the event when the slider is selected
-    // i.e. when it has received the first initial click.
-    if (selected_ && repeatRate_ > 0.0f && repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0, Abs(offset) / length))
-    {
+
+    // Start transmitting repeated pages after the initial press
+    if (selected_ && pressed && repeatRate_ > 0.0f && repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0, Abs(offset) / length))
         repeatTimer_.Reset();
-        eventData[P_BUTTON] = button;
-        eventData[P_BUTTONS] = buttons;
-        eventData[P_QUALIFIERS] = qualifiers;
-    }
-    // When without buttons & qualifiers parameters, the receiver should interpret
-    // this event as just mouse hovering on slider's 'paging' area instead
+    else
+        pressed = false;
+
+    eventData[P_PRESSED] = pressed;
+
     SendEvent(E_SLIDERPAGED, eventData);
 }
 
