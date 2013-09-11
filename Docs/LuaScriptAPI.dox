@@ -1,0 +1,4852 @@
+namespace Urho3D
+{
+
+/**
+\page LuaScriptAPI Lua Scripting API
+
+\section LuaScriptAPI_GlobalFunctions Global functions
+- Context* GetContext()
+- Audio* GetAudio()
+- Console* GetConsole()
+- DebugHud* GetDebugHud()
+- DebugRenderer* GetDebugRenderer()
+- Engine* GetEngine()
+- FileSystem* GetFileSystem()
+- Graphics* GetGraphics()
+- Input* GetInput()
+- Log* GetLog()
+- Network* GetNetwork()
+- PhysicsWorld* GetPhysicsWorld()
+- Renderer* GetRenderer()
+- ResourceCache* GetCache()
+- Time* GetTime()
+- UI* GetUI()
+- void ErrorDialog(const String& title, const String& message)
+- void ErrorDialog(const char* title, const char* message)
+- void ErrorExit(const String& message = String::EMPTY, int exitCode = EXIT_FAILURE)
+- void ErrorExit(const char* message, int exitCode = EXIT_FAILURE)
+- void OpenConsoleWindow()
+- void PrintLine(const String& str, bool error = false)
+- void PrintLine(const char* str, bool error = false)
+- const Vector<String>& GetArguments()
+- GetConsoleInput()
+- GetPlatform()
+- unsigned GetNumPhysicalCPUs()
+- unsigned GetNumLogicalCPUs()
+- bool ToBool(const String& source)
+- bool ToBool(const char* source)
+- float ToFloat(const String& source)
+- float ToFloat(const char* source)
+- int ToInt(const String& source)
+- int ToInt(const char* source)
+- unsigned ToUInt(const String& source)
+- unsigned ToUInt(const char* source)
+- Color ToColor(const String& source)
+- Color ToColor(const char* source)
+- IntRect ToIntRect(const String& source)
+- IntRect ToIntRect(const char* source)
+- IntVector2 ToIntVector2(const String& source)
+- IntVector2 ToIntVector2(const char* source)
+- Quaternion ToQuaternion(const String& source)
+- Quaternion ToQuaternion(const char* source)
+- Rect ToRect(const String& source)
+- Rect ToRect(const char* source)
+- Vector2 ToVector2(const String& source)
+- Vector2 ToVector2(const char* source)
+- Vector3 ToVector3(const String& source)
+- Vector3 ToVector3(const char* source)
+- Vector4 ToVector4(const String& source, bool allowMissingCoords = false)
+- Vector4 ToVector4(const char* source, bool allowMissingCoords = false)
+- String ToString(void* value)
+- String ToStringHex(unsigned value)
+- bool IsAlpha(unsigned ch)
+- bool IsDigit(unsigned ch)
+- String GetPath(const String& fullPath)
+- String GetFileName(const String& fullPath)
+- String GetExtension(const String& fullPath, bool lowercaseExtension = true)
+- String GetFileNameAndExtension(const String& fullPath, bool lowercaseExtension = false)
+- String ReplaceExtension(const String& fullPath, const String& newExtension)
+- String AddTrailingSlash(const String& pathName)
+- String RemoveTrailingSlash(const String& pathName)
+- String GetParentPath(const String& pathName)
+- String GetInternalPath(const String& pathName)
+- String GetNativePath(const String& pathName)
+- bool IsAbsolutePath(const String& pathName)
+- void ExecuteFile(const String& fileName)
+- void ExecuteFile(const char* fileName)
+- Object* GetEventSender()
+- void SendEvent(const String& eventName, VariantMap& eventData)
+- void SendEvent(const char* eventName, VariantMap& eventData)
+- void SubscribeToEvent(const String& eventName, const char* functionName)
+- void SubscribeToEvent(const char* eventName, const char* functionName)
+- void SubscribeToEvent(void* object, const String& eventName, const char* functionName)
+- void SubscribeToEvent(void* object, const char* eventName, const char* functionName)
+- float Lerp(float lhs, float rhs, float t)
+- float Min(float lhs, float rhs)
+- float Max(float lhs, float rhs)
+- float Abs(float value)
+- float Clamp(float value, float min, float max)
+- bool Equals(float lhs, float rhs)
+- float Random()
+- float Random(float range)
+- RandomInt(int range)
+- void SetRandomSeed(unsigned seed)
+- unsigned GetRandomSeed()
+- int Rand()
+
+\section LuaScriptAPI_GlobalConstants Global constants
+- unsigned DEBUGHUD_SHOW_NONE
+- unsigned DEBUGHUD_SHOW_STATS
+- unsigned DEBUGHUD_SHOW_MODE
+- unsigned DEBUGHUD_SHOW_PROFILER
+- unsigned DEBUGHUD_SHOW_ALL
+- int QUALITY_LOW
+- int QUALITY_MEDIUM
+- int QUALITY_HIGH
+- int QUALITY_MAX
+- int SHADOWQUALITY_LOW_16BIT
+- int SHADOWQUALITY_LOW_24BIT
+- int SHADOWQUALITY_HIGH_16BIT
+- int SHADOWQUALITY_HIGH_24BIT
+- unsigned CLEAR_COLOR
+- unsigned CLEAR_DEPTH
+- unsigned CLEAR_STENCIL
+- unsigned char CHANNEL_POSITION
+- unsigned char CHANNEL_ROTATION
+- unsigned char CHANNEL_SCALE
+- unsigned DRAWABLE_GEOMETRY
+- unsigned DRAWABLE_LIGHT
+- unsigned DRAWABLE_ZONE
+- unsigned DRAWABLE_ANY
+- unsigned DEFAULT_VIEWMASK
+- unsigned DEFAULT_LIGHTMASK
+- unsigned DEFAULT_SHADOWMASK
+- unsigned DEFAULT_ZONEMASK
+- int MAX_VERTEX_LIGHTS
+- float ANIMATION_LOD_BASESCALE
+- int SHADOW_MIN_PIXELS
+- int INSTANCING_BUFFER_DEFAULT_SIZE
+- int MOUSEB_LEFT
+- int MOUSEB_MIDDLE
+- int MOUSEB_RIGHT
+- int QUAL_SHIFT
+- int QUAL_CTRL
+- int QUAL_ALT
+- int QUAL_ANY
+- int KEY_1
+- int KEY_2
+- int KEY_3
+- int KEY_4
+- int KEY_5
+- int KEY_6
+- int KEY_7
+- int KEY_8
+- int KEY_9
+- int KEY_0
+- int KEY_A
+- int KEY_B
+- int KEY_C
+- int KEY_D
+- int KEY_E
+- int KEY_F
+- int KEY_G
+- int KEY_H
+- int KEY_I
+- int KEY_J
+- int KEY_K
+- int KEY_L
+- int KEY_M
+- int KEY_N
+- int KEY_O
+- int KEY_P
+- int KEY_Q
+- int KEY_R
+- int KEY_S
+- int KEY_T
+- int KEY_U
+- int KEY_V
+- int KEY_W
+- int KEY_X
+- int KEY_Y
+- int KEY_Z
+- int KEY_BACKSPACE
+- int KEY_TAB
+- int KEY_RETURN
+- int KEY_RETURN2
+- int KEY_KP_ENTER
+- int KEY_SHIFT
+- int KEY_CTRL
+- int KEY_ALT
+- int KEY_PAUSE
+- int KEY_CAPSLOCK
+- int KEY_ESC
+- int KEY_SPACE
+- int KEY_PAGEUP
+- int KEY_PAGEDOWN
+- int KEY_END
+- int KEY_HOME
+- int KEY_LEFT
+- int KEY_UP
+- int KEY_RIGHT
+- int KEY_DOWN
+- int KEY_SELECT
+- int KEY_PRINTSCREEN
+- int KEY_INSERT
+- int KEY_DELETE
+- int KEY_LWIN
+- int KEY_RWIN
+- int KEY_APPS
+- int KEY_NUMPAD0
+- int KEY_NUMPAD1
+- int KEY_NUMPAD2
+- int KEY_NUMPAD3
+- int KEY_NUMPAD4
+- int KEY_NUMPAD5
+- int KEY_NUMPAD6
+- int KEY_NUMPAD7
+- int KEY_NUMPAD8
+- int KEY_NUMPAD9
+- int KEY_MULTIPLY
+- int KEY_ADD
+- int KEY_SUBTRACT
+- int KEY_DECIMAL
+- int KEY_DIVIDE
+- int KEY_F1
+- int KEY_F2
+- int KEY_F3
+- int KEY_F4
+- int KEY_F5
+- int KEY_F6
+- int KEY_F7
+- int KEY_F8
+- int KEY_F9
+- int KEY_F10
+- int KEY_F11
+- int KEY_F12
+- int KEY_F13
+- int KEY_F14
+- int KEY_F15
+- int KEY_F16
+- int KEY_F17
+- int KEY_F18
+- int KEY_F19
+- int KEY_F20
+- int KEY_F21
+- int KEY_F22
+- int KEY_F23
+- int KEY_F24
+- int KEY_NUMLOCK
+- int KEY_SCROLLLOCK
+- int KEY_LSHIFT
+- int KEY_RSHIFT
+- int KEY_LCTRL
+- int KEY_RCTRL
+- int KEY_LALT
+- int KEY_RALT
+- int HAT_CENTER
+- int HAT_UP
+- int HAT_RIGHT
+- int HAT_DOWN
+- int HAT_LEFT
+- unsigned SCAN_FILES
+- unsigned SCAN_DIRS
+- unsigned SCAN_HIDDEN
+- int LOG_DEBUG
+- int LOG_INFO
+- int LOG_WARNING
+- int LOG_ERROR
+- int LOG_NONE
+- float M_PI
+- int M_MIN_INT
+- int M_MAX_INT
+- unsigned M_MIN_UNSIGNED
+- unsigned M_MAX_UNSIGNED
+- float M_EPSILON
+- float M_LARGE_EPSILON
+- float M_MIN_NEARCLIP
+- float M_MAX_FOV
+- float M_LARGE_VALUE
+- float M_INFINITY
+- float M_DEGTORAD
+- float M_DEGTORAD_2
+- float M_RADTODEG
+- unsigned NUM_FRUSTUM_PLANES
+- unsigned NUM_FRUSTUM_VERTICES
+- unsigned FIRST_REPLICATED_ID
+- unsigned LAST_REPLICATED_ID
+- unsigned FIRST_LOCAL_ID
+- unsigned LAST_LOCAL_ID
+- unsigned DD_DISABLED
+- unsigned DD_SOURCE
+- unsigned DD_TARGET
+- unsigned DD_SOURCE_AND_TARGET
+- int SOUND_EFFECT
+- int SOUND_AMBIENT
+- int SOUND_VOICE
+- int SOUND_MUSIC
+- int SOUND_MASTER
+- int MAX_SOUND_TYPES
+- int VAR_NONE
+- int VAR_INT
+- int VAR_BOOL
+- int VAR_FLOAT
+- int VAR_VECTOR2
+- int VAR_VECTOR3
+- int VAR_VECTOR4
+- int VAR_QUATERNION
+- int VAR_COLOR
+- int VAR_STRING
+- int VAR_BUFFER
+- int VAR_PTR
+- int VAR_RESOURCEREF
+- int VAR_RESOURCEREFLIST
+- int VAR_VARIANTVECTOR
+- int VAR_VARIANTMAP
+- int VAR_INTRECT
+- int VAR_INTVECTOR2
+- int MAX_VAR_TYPES
+- int RENDER_FORWARD
+- int RENDER_PREPASS
+- int RENDER_DEFERRED
+- int TRIANGLE_LIST
+- int LINE_LIST
+- int GEOM_STATIC
+- int GEOM_SKINNED
+- int GEOM_INSTANCED
+- int GEOM_BILLBOARD
+- int GEOM_STATIC_NOINSTANCING
+- int MAX_GEOMETRYTYPES
+- int BLEND_REPLACE
+- int BLEND_ADD
+- int BLEND_MULTIPLY
+- int BLEND_ALPHA
+- int BLEND_ADDALPHA
+- int BLEND_PREMULALPHA
+- int BLEND_INVDESTALPHA
+- int MAX_BLENDMODES
+- int CMP_ALWAYS
+- int CMP_EQUAL
+- int CMP_NOTEQUAL
+- int CMP_LESS
+- int CMP_LESSEQUAL
+- int CMP_GREATER
+- int CMP_GREATEREQUAL
+- int MAX_COMPAREMODES
+- int CULL_NONE
+- int CULL_CCW
+- int CULL_CW
+- int MAX_CULLMODES
+- int FILL_SOLID
+- int FILL_WIREFRAME
+- int FILL_POINT
+- int OP_KEEP
+- int OP_ZERO
+- int OP_REF
+- int OP_INCR
+- int OP_DECR
+- int LOCK_NONE
+- int LOCK_HARDWARE
+- int LOCK_SHADOW
+- int LOCK_SCRATCH
+- int ELEMENT_POSITION
+- int ELEMENT_NORMAL
+- int ELEMENT_COLOR
+- int ELEMENT_TEXCOORD1
+- int ELEMENT_TEXCOORD2
+- int ELEMENT_CUBETEXCOORD1
+- int ELEMENT_CUBETEXCOORD2
+- int ELEMENT_TANGENT
+- int ELEMENT_BLENDWEIGHTS
+- int ELEMENT_BLENDINDICES
+- int ELEMENT_INSTANCEMATRIX1
+- int ELEMENT_INSTANCEMATRIX2
+- int ELEMENT_INSTANCEMATRIX3
+- int MAX_VERTEX_ELEMENTS
+- int FILTER_NEAREST
+- int FILTER_BILINEAR
+- int FILTER_TRILINEAR
+- int FILTER_ANISOTROPIC
+- int FILTER_DEFAULT
+- int MAX_FILTERMODES
+- int ADDRESS_WRAP
+- int ADDRESS_MIRROR
+- int ADDRESS_CLAMP
+- int ADDRESS_BORDER
+- int MAX_ADDRESSMODES
+- int COORD_U
+- int COORD_V
+- int COORD_W
+- int MAX_COORDS
+- int TEXTURE_STATIC
+- int TEXTURE_DYNAMIC
+- int TEXTURE_RENDERTARGET
+- int TEXTURE_DEPTHSTENCIL
+- int FACE_POSITIVE_X
+- int FACE_NEGATIVE_X
+- int FACE_POSITIVE_Y
+- int FACE_NEGATIVE_Y
+- int FACE_POSITIVE_Z
+- int FACE_NEGATIVE_Z
+- int MAX_CUBEMAP_FACES
+- int SURFACE_MANUALUPDATE
+- int SURFACE_UPDATEVISIBLE
+- int SURFACE_UPDATEALWAYS
+- int VS
+- int PS
+- int TU_DIFFUSE
+- int TU_ALBEDOBUFFER
+- int TU_NORMAL
+- int TU_NORMALBUFFER
+- int TU_SPECULAR
+- int TU_EMISSIVE
+- int TU_ENVIRONMENT
+- int MAX_MATERIAL_TEXTURE_UNITS
+- int TU_LIGHTRAMP
+- int TU_LIGHTSHAPE
+- int TU_SHADOWMAP
+- int TU_FACESELECT
+- int TU_INDIRECTION
+- int TU_DEPTHBUFFER
+- int TU_LIGHTBUFFER
+- int MAX_TEXTURE_UNITS
+- int SP_FRAME
+- int SP_CAMERA
+- int SP_VIEWPORT
+- int SP_ZONE
+- int SP_LIGHT
+- int SP_VERTEXLIGHTS
+- int SP_MATERIAL
+- int SP_OBJECTTRANSFORM
+- int SP_OBJECTDATA
+- int MAX_SHADER_PARAMETER_GROUPS
+- int UPDATE_NONE
+- int UPDATE_MAIN_THREAD
+- int UPDATE_WORKER_THREAD
+- int LIGHT_DIRECTIONAL
+- int LIGHT_SPOT
+- int LIGHT_POINT
+- int RAY_AABB_NOSUBOBJECTS
+- int RAY_AABB
+- int RAY_OBB
+- int RAY_TRIANGLE
+- int EMITTER_SPHERE
+- int EMITTER_BOX
+- int LVS_DIR
+- int LVS_SPOT
+- int LVS_POINT
+- int LVS_SPEC
+- int LVS_SPOTSPEC
+- int LVS_POINTSPEC
+- int LVS_SHADOW
+- int LVS_SPOTSHADOW
+- int LVS_POINTSHADOW
+- int LVS_DIRSPECSHADOW
+- int LVS_SPOTSPECSHADOW
+- int LVS_POINTSPECSHADOW
+- int MAX_LIGHT_VS_VARIATIONS
+- int VLVS_NOLIGHTS
+- int VLVS_1LIGHT
+- int VLVS_2LIGHTS
+- int VLVS_3LIGHTS
+- int VLVS_4LIGHTS
+- int MAX_VERTEXLIGHT_VS_VARIATIONS
+- int LPS_NONE
+- int LPS_SPOT
+- int LPS_POINT
+- int LPS_POINTMASK
+- int LPS_SPEC
+- int LPS_SPOTSPEC
+- int LPS_POINTSPEC
+- int LPS_POINTMASKSPEC
+- int LPS_SHADOW
+- int LPS_SPOTSHADOW
+- int LPS_POINTSHADOW
+- int LPS_POINTMASKSHADOW
+- int LPS_SHADOWSPEC
+- int LPS_SPOTSHADOWSPEC
+- int LPS_POINTSHADOWSPEC
+- int LPS_POINTMASKSHADOWSPEC
+- int MAX_LIGHT_PS_VARIATIONS
+- int DLVS_NONE
+- int DLVS_DIR
+- int DLVS_ORTHO
+- int DLVS_ORTHODIR
+- int MAX_DEFERRED_LIGHT_VS_VARIATIONS
+- int DLPS_NONE
+- int DLPS_SPOT
+- int DLPS_POINT
+- int DLPS_POINTMASK
+- int DLPS_SPEC
+- int DLPS_SPOTSPEC
+- int DLPS_POINTSPEC
+- int DLPS_POINTMASKSPEC
+- int DLPS_SHADOW
+- int DLPS_SPOTSHADOW
+- int DLPS_POINTSHADOW
+- int DLPS_POINTMASKSHADOW
+- int DLPS_SHADOWSPEC
+- int DLPS_SPOTSHADOWSPEC
+- int DLPS_POINTSHADOWSPEC
+- int DLPS_POINTMASKSHADOWSPEC
+- int DLPS_ORTHO
+- int DLPS_ORTHOSPOT
+- int DLPS_ORTHOPOINT
+- int DLPS_ORTHOPOINTMASK
+- int DLPS_ORTHOSPEC
+- int DLPS_ORTHOSPOTSPEC
+- int DLPS_ORTHOPOINTSPEC
+- int DLPS_ORTHOPOINTMASKSPEC
+- int DLPS_ORTHOSHADOW
+- int DLPS_ORTHOSPOTSHADOW
+- int DLPS_ORTHOPOINTSHADOW
+- int DLPS_ORTHOPOINTMASKSHADOW
+- int DLPS_ORTHOSHADOWSPEC
+- int DLPS_ORTHOSPOTSHADOWSPEC
+- int DLPS_ORTHOPOINTSHADOWSPEC
+- int DLPS_ORTHOPOINTMASKSHADOWSPEC
+- int MAX_DEFERRED_LIGHT_PS_VARIATIONS
+- int LIGHTING_UNLIT
+- int LIGHTING_PERVERTEX
+- int LIGHTING_PERPIXEL
+- int FILE_READ
+- int FILE_WRITE
+- int FILE_READWRITE
+- int OUTSIDE
+- int INTERSECTS
+- int INSIDE
+- int PLANE_NEAR
+- int PLANE_LEFT
+- int PLANE_RIGHT
+- int PLANE_UP
+- int PLANE_DOWN
+- int PLANE_FAR
+- int SHAPE_BOX
+- int SHAPE_SPHERE
+- int SHAPE_STATICPLANE
+- int SHAPE_CYLINDER
+- int SHAPE_CAPSULE
+- int SHAPE_CONE
+- int SHAPE_TRIANGLEMESH
+- int SHAPE_CONVEXHULL
+- int SHAPE_TERRAIN
+- int CONSTRAINT_POINT
+- int CONSTRAINT_HINGE
+- int CONSTRAINT_SLIDER
+- int CONSTRAINT_CONETWIST
+- int COLLISION_NEVER
+- int COLLISION_ACTIVE
+- int COLLISION_ALWAYS
+- int CF_NONE
+- int CF_DXT1
+- int CF_DXT3
+- int CF_DXT5
+- int CF_ETC1
+- int CF_PVRTC_RGB_2BPP
+- int CF_PVRTC_RGBA_2BPP
+- int CF_PVRTC_RGB_4BPP
+- int CF_PVRTC_RGBA_4BPP
+- int REPLICATED
+- int LOCAL
+- int CS_NORMAL
+- int CS_RESIZEVERTICAL
+- int CS_RESIZEDIAGONAL_TOPRIGHT
+- int CS_RESIZEHORIZONTAL
+- int CS_RESIZEDIAGONAL_TOPLEFT
+- int CS_ACCEPTDROP
+- int CS_REJECTDROP
+- int CS_BUSY
+- int CS_MAX_SHAPES
+- int HM_NEVER
+- int HM_FOCUS
+- int HM_ALWAYS
+- int HA_LEFT
+- int HA_CENTER
+- int HA_RIGHT
+- int VA_TOP
+- int VA_CENTER
+- int VA_BOTTOM
+- int C_TOPLEFT
+- int C_TOPRIGHT
+- int C_BOTTOMLEFT
+- int C_BOTTOMRIGHT
+- int MAX_UIELEMENT_CORNERS
+- int O_HORIZONTAL
+- int O_VERTICAL
+- int FM_NOTFOCUSABLE
+- int FM_RESETFOCUS
+- int FM_FOCUSABLE
+- int FM_FOCUSABLE_DEFOCUSABLE
+- int LM_FREE
+- int LM_HORIZONTAL
+- int LM_VERTICAL
+- int TM_BREADTH_FIRST
+- int TM_DEPTH_FIRST
+- int DRAG_NONE
+- int DRAG_MOVE
+- int DRAG_RESIZE_TOPLEFT
+- int DRAG_RESIZE_TOP
+- int DRAG_RESIZE_TOPRIGHT
+- int DRAG_RESIZE_RIGHT
+- int DRAG_RESIZE_BOTTOMRIGHT
+- int DRAG_RESIZE_BOTTOM
+- int DRAG_RESIZE_BOTTOMLEFT
+- int DRAG_RESIZE_LEFT
+
+\section LuaScriptAPI_Classes Classes
+
+Audio : Object
+
+Methods:<br>
+- bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true)
+- bool Play()
+- void Stop()
+- void SetMasterGain(SoundType type, float gain)
+- void SetListener(SoundListener* listener)
+- void StopSound(Sound* sound)
+- unsigned GetSampleSize() const
+- int GetMixRate() const
+- bool GetInterpolation() const
+- bool IsStereo() const
+- bool IsPlaying() const
+- bool IsInitialized() const
+- float GetMasterGain(SoundType type) const
+- SoundListener* GetListener() const
+- void AddSoundSource(SoundSource* soundSource)
+- void RemoveSoundSource(SoundSource* soundSource)
+- float GetSoundSourceMasterGain(SoundType type) const
+- void MixOutput(void *dest, unsigned samples)
+
+ Properties:<br>
+- unsigned sampleSize (readonly)
+- int mixRate (readonly)
+- bool interpolation (readonly)
+- SoundListener* listener
+- bool stereo    (readonly)
+- bool playing (readonly)
+- bool initialized (readonly)
+
+Sound : Resource
+
+Methods:<br>
+- float GetLength() const
+- unsigned GetDataSize() const
+- unsigned GetSampleSize() const
+- float GetFrequency()
+- unsigned GetIntFrequency()
+- bool IsLooped() const
+- bool IsSixteenBit() const
+- bool IsStereo() const
+- bool IsCompressed() const
+
+ Properties:<br>
+- float length (readonly)
+- unsigned dataSize (readonly)
+- unsigned sampleSize (readonly)
+- float frequency (readonly)
+- int intFrequency (readonly)
+- bool looped
+- bool sixteenBit (readonly)
+- bool stereo (readonly)
+- bool compressed (readonly)
+
+SoundListener : Component
+
+Methods:<br>
+
+SoundSource : Component
+
+Methods:<br>
+- void Play(Sound* sound)
+- void Play(Sound* sound, float frequency)
+- void Play(Sound* sound, float frequency, float gain)
+- void Play(Sound* sound, float frequency, float gain, float panning)
+- void Stop()
+- void SetSoundType(SoundType type)
+- void SetFrequency(float frequency)
+- void SetGain(float gain)
+- void SetAttenuation(float attenuation)
+- void SetPanning(float panning)
+- void SetAutoRemove(bool enable)
+- Sound* GetSound() const
+- SoundType GetSoundType() const
+- float GetTimePosition() const
+- float GetFrequency() const
+- float GetGain() const
+- float GetAttenuation() const
+- float GetPanning() const
+- bool GetAutoRemove() const
+- bool IsPlaying() const
+- void PlayLockless(Sound* sound)
+- void StopLockless()
+- void SetPlayPositionLockless(signed char* position)
+- void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation)
+
+ Properties:<br>
+- Sound* sound (readonly)
+- SoundType soundType
+- float timePosition (readonly)
+- float frequency
+- float gain
+- float attenuation
+- float panning
+- bool autoRemove
+- bool playing (readonly)
+
+SoundSource3D : SoundSource
+
+Methods:<br>
+- void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor)
+- void SetNearDistance(float distance)
+- void SetFarDistance(float distance)
+- void SetRolloffFactor(float factor)
+- void CalculateAttenuation()
+- float GetNearDistance() const
+- float GetFarDistance() const
+- float RollAngleoffFactor() const
+
+ Properties:<br>
+- float nearDistance
+- float farDistance
+- float rolloffFactor
+
+String
+
+Methods:<br>
+- String()
+- String(const String& str)
+- String(const char* str)
+- String(const char* str, unsigned length)
+- ~String()
+- String operator + (const String& rhs) const
+- String operator + (const char* rhs) const
+- bool operator == (const String& rhs) const
+- bool operator == (const char* rhs) const
+- Equals(const String& rhs) const
+- Equals(const char*& rhs) const
+- void Replace(const String& replaceThis, const String& replaceWith, bool caseSensitive = true)
+- void Replace(const char* replaceThis, const char* replaceWith, bool caseSensitive = true)
+- void Replace(unsigned pos, unsigned length, const String& replaceWith)
+- void Replace(unsigned pos, unsigned length, const char* replaceWith)
+- String Replaced(const String& replaceThis, const String& replaceWith, bool caseSensitive = true) const
+- String Replaced(const char* replaceThis, const char* replaceWith, bool caseSensitive = true) const
+- String& Append(const String& str)
+- String& Append(const char* str)
+- String& Append(const char* str, unsigned length)
+- void Insert(unsigned pos, const String& str)
+- void Insert(unsigned pos, char c)
+- void Erase(unsigned pos, unsigned length = 1)
+- void Resize(unsigned newLength)
+- void Reserve(unsigned newCapacity)
+- void Compact()
+- void Clear()
+- String Substring(unsigned pos) const
+- String Substring(unsigned pos, unsigned length) const
+- String Trimmed() const
+- String ToUpper() const
+- String ToLower() const
+- unsigned Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const
+- unsigned Find(const char* str, unsigned startPos = 0, bool caseSensitive = true) const
+- unsigned FindLast(const String& str, unsigned startPos = String::NPOS, bool caseSensitive = true) const
+- unsigned FindLast(const char* str, unsigned startPos = String::NPOS, bool caseSensitive = true) const
+- bool StartsWith(const String& str, bool caseSensitive = true) const
+- bool StartsWith(const char* str, bool caseSensitive = true) const
+- bool EndsWith(const String& str, bool caseSensitive = true) const
+- bool EndsWith(const char* str, bool caseSensitive = true) const
+- const char* CString() const
+- unsigned Length() const
+- unsigned Capacity() const
+- bool Empty() const
+- int Compare(const String& str, bool caseSensitive = true) const
+- int Compare(const char* str, bool caseSensitive = true) const
+- bool Contains(const String& str) const
+- unsigned ToHash() const
+- static int Compare(const char* str1, const char* str2, bool caseSensitive)
+- static const unsigned NPOS
+- static const String EMPTY
+
+ Properties:<br>
+- unsigned length (readonly)
+- unsigned capacity (readonly)
+- bool empty (readonly)
+
+Vector : VectorBase
+
+Methods:<br>
+- Vector()
+- Vector(const Vector<T>& vector)
+- ~Vector()
+- Vector<T> operator + (const T& rhs) const
+- Vector<T> operator + (const Vector<T>& rhs) const
+- bool operator == (const Vector<T>& rhs) const
+- T& operator [] (unsigned index)
+- const T& operator [] (unsigned index) const
+- T& At(unsigned index)
+- const T& At(unsigned index) const
+- void Push(const T& value)
+- void Push(const Vector<T>& vector)
+- void Pop()
+- void Insert(unsigned pos, const T& value)
+- void Insert(unsigned pos, const Vector<T>& vector)
+- void Erase(unsigned pos, unsigned length = 1)
+- bool Remove(const T& value)
+- void Clear()
+- void Resize(unsigned newSize)
+- void Reserve(unsigned newCapacity)
+- void Compact()
+- bool Contains(const T& value) const
+- T& Front()
+- const T& Front() const
+- T& Back()
+- const T& Back() const
+- unsigned Size() const
+- unsigned Capacity() const
+- bool Empty() const
+
+ Properties:<br>
+- unsigned size (readonly)
+- unsigned capacity (readonly)
+- bool empty (readonly)
+
+PODVector
+
+Methods:<br>
+- PODVector()
+- PODVector(const PODVector<T>& vector)
+- ~PODVector()
+- PODVector<T> operator + (const T& rhs) const
+- PODVector<T> operator + (const PODVector<T>& rhs) const
+- bool operator == (const PODVector<T>& rhs) const
+- T& operator [] (unsigned index)
+- const T& operator [] (unsigned index) const
+- T& At(unsigned index)
+- const T& At(unsigned index) const
+- void Push(const T& value)
+- void Push(const PODVector<T>& vector)
+- void Pop()
+- void Insert(unsigned pos, const T& value)
+- void Insert(unsigned pos, const PODVector<T>& vector)
+- void Erase(unsigned pos, unsigned length = 1)
+- bool Remove(const T& value)
+- void Clear()
+- void Resize(unsigned newSize)
+- void Reserve(unsigned newCapacity)
+- void Compact()
+- bool Contains(const T& value) const
+- T& Front()
+- const T& Front() const
+- T& Back()
+- const T& Back() const
+- unsigned Size() const
+- unsigned Capacity() const
+- bool Empty() const
+
+ Properties:<br>
+- unsigned size (readonly)
+- unsigned capacity (readonly)
+- bool empty (readonly)
+
+Context
+
+Methods:<br>
+- Object* GetEventSender() const
+- EventHandler* GetEventHandler() const
+- const String& GetTypeName(ShortStringHash type) const
+
+Object : RefCounted
+
+Methods:<br>
+- virtual ShortStringHash GetType() const
+- GetTypeName() const
+- const String& GetCategory() const
+- GetCategory() const
+- SendEvent(const char* eventName)
+- SendEvent(const char* eventName, VariantMap& eventData)
+
+ Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& category (readonly)
+- struct ResourceRef
+
+Methods:<br>
+- ResourceRef()
+- ResourceRef(ShortStringHash type)
+- ResourceRef(ShortStringHash type, StringHash id)
+- ResourceRef(const ResourceRef& rhs)
+- type
+- id
+- bool operator == (const ResourceRef& rhs) const
+- struct ResourceRefList
+
+Methods:<br>
+- ResourceRefList()
+- ResourceRefList(ShortStringHash type)
+- type
+- bool operator == (const ResourceRefList& rhs) const
+
+Variant
+
+Methods:<br>
+- Variant()
+- Variant(int value)
+- Variant(unsigned value)
+- Variant(const StringHash& value)
+- Variant(const ShortStringHash& value)
+- Variant(bool value)
+- Variant(float value)
+- Variant(const Vector2& value)
+- Variant(const Vector3& value)
+- Variant(const Vector4& value)
+- Variant(const Quaternion& value)
+- Variant(const Color& value)
+- Variant(const String& value)
+- Variant(const char* value)
+- Variant(void* value)
+- Variant(const ResourceRef& value)
+- Variant(const ResourceRefList& value)
+- Variant(const IntRect& value)
+- Variant(const IntVector2& value)
+- Variant(const String& type, const String& value)
+- Variant(VariantType type, const String& value) 
+- Variant(VariantType type, const char* value)
+- Variant(const Variant& value)
+- ~Variant()
+- void Clear()
+- bool operator == (const Variant& rhs) const
+- bool operator == (int rhs) const
+- bool operator == (unsigned rhs) const
+- bool operator == (bool rhs) const
+- bool operator == (float rhs) const
+- bool operator == (const Vector2& rhs)
+- bool operator == (const Vector3& rhs) const
+- bool operator == (const Vector4& rhs) const
+- bool operator == (const Quaternion& rhs) const
+- bool operator == (const Color& rhs) const
+- bool operator == (const String& rhs) const
+- bool operator == (void* rhs) const
+- bool operator == (const ResourceRef& rhs) const
+- bool operator == (const ResourceRefList& rhs) const
+- bool operator == (const IntRect& rhs) const
+- bool operator == (const IntVector2& rhs) const
+- bool operator == (const StringHash& rhs) const
+- bool operator == (const ShortStringHash& rhs) const
+- int GetInt() const
+- int GetUInt() const
+- StringHash GetStringHash()
+- ShortStringHash GetShortStringHash()
+- bool GetBool() const
+- float GetFloat() const
+- const Vector2& GetVector2() const
+- const Vector3& GetVector3() const
+- const Vector4& GetVector4() const
+- const Quaternion& GetQuaternion() const
+- const Color& GetColor() const
+- const String& GetString() const
+- void* GetPtr() const
+- const ResourceRef& GetResourceRef() const
+- const ResourceRefList& GetResourceRefList() const
+- const IntRect& GetIntRect() const
+- const IntVector2& GetIntVector2() const
+- VariantType GetType() const
+- String GetTypeName() const
+- String ToString() const
+- bool IsZero() const
+- bool IsEmpty() const
+
+ Properties:<br>
+- VariantType type (readonly)
+- String typeName (readonly)
+- bool zero (readonly)
+- bool empty (readonly)
+
+VariantMap
+
+Methods:<br>
+- VariantMap()
+- ~VariantMap()
+- SetInt(const char* key, int value)
+- SetBool(const char* key, bool value)
+- SetFloat(const char* key, float value)
+- SetVector2(const char* key, const Vector2& value)
+- SetVector3(const char* key, const Vector3& value)
+- SetVector4(const char* key, const Vector4& value)
+- SetQuaternion(const char* key, const Quaternion& value)
+- SetColor(const char* key, const Color& value)
+- SetString(const char* key, const String& value)
+- SetPtr(const char* key, void* value)
+- SetResourceRef(const char* key, const ResourceRef& value)
+- SetResourceRefList(const char* key, const ResourceRefList& value) 
+- SetIntRect(const char* key, const IntRect& value)
+- SetIntVector2(const char* key, const IntVector2& value)
+- SetCamera(const char* key, Camera* camera)
+- SetConnection(const char* key, Connection* connection)
+- SetNode(const char* key, Node* node)
+- SetPhysicsWorld(const char* key, PhysicsWorld* physicsworld)
+- SetRigidBody(const char* key, RigidBody* rigidbody)
+- SetScene(const char* key, Scene* scene)
+- SetUIElement(const char* key, UIElement* element)
+- GetInt(const char* key)
+- GetBool(const char* key)
+- GetFloat(const char* key)
+- GetVector2(const char* key)
+- GetVector3(const char* key)
+- GetVector4(const char* key)
+- GetQuaternion(const char* key)
+- GetColor(const char* key)
+- GetString(const char* key)
+- GetPtr(const char* key)
+- GetResourceRef(const char* key)
+- GetResourceRefList(const char* key)
+- GetIntRect(const char* key)
+- GetIntVector2(const char* key)
+- GetCamera(const char* key)
+- GetConnection(const char* key)
+- GetNode(const char* key)
+- GetPhysicsWorld(const char* key)
+- GetRigidBody(const char* key)
+- GetScene(const char* key)
+- GetUIElement(const char* key)
+
+Time : Object
+
+Methods:<br>
+- unsigned GetFrameNumber() const
+- float GetTimeStep() const
+- unsigned GetTimerPeriod() const
+- float GetElapsedTime()
+- static unsigned GetSystemTime()
+- static String GetTimeStamp()
+- static void Sleep(unsigned mSec)
+
+ Properties:<br>
+- unsigned frameNumber (readonly)
+- float timeStep (readonly)
+- unsigned timerPeriod (readonly)
+- float elapsedTime (readonly)
+
+Console : Object
+
+Methods:<br>
+- void SetDefaultStyle(XMLFile* style)
+- void SetVisible(bool enable)
+- void Toggle()
+- void SetNumRows(unsigned rows)
+- void SetNumHistoryRows(unsigned rows)
+- void UpdateElements()
+- XMLFile* GetDefaultStyle() const
+- BorderImage* GetBackground() const
+- LineEdit* GetLineEdit() const
+- bool IsVisible() const
+- unsigned GetNumRows() const
+- unsigned GetNumHistoryRows() const
+- unsigned GetHistoryPosition() const
+- const String& GetHistoryRow(unsigned index) const
+
+ Properties:<br>
+- XMLFile* defaultStyle
+- BorderImage* background (readonly)
+- LineEdit* lineEdit (readonly)
+- bool visible
+- unsigned numRows
+- unsigned numHistoryRows
+- unsigned historyPosition (readonly)
+
+DebugHud : Object
+
+Methods:<br>
+- void SetDefaultStyle(XMLFile* style)
+- void SetMode(unsigned mode)
+- void SetProfilerMaxDepth(unsigned depth)
+- void SetProfilerInterval(float interval)
+- void SetUseRendererStats(bool enable)
+- void Toggle(unsigned mode)
+- void ToggleAll()
+- XMLFile* GetDefaultStyle() const
+- Text* GetStatsText() const
+- Text* GetModeText() const
+- Text* GetProfilerText() const
+- unsigned GetMode() const
+- unsigned GetProfilerMaxDepth() const
+- float GetProfilerInterval() const
+- bool GetUseRendererStats() const
+- void SetAppStats(const String& label, const Variant& stats)
+- void SetAppStats(const String& label, const String& stats)
+- bool ResetAppStats(const String& label)
+- void ClearAppStats()
+
+ Properties:<br>
+- XMLFile* defaultStyle
+- Text* statsText (readonly)
+- Text* modeText (readonly)
+- Text* profilerText (readonly)
+- unsigned mode
+- unsigned profilerMaxDepth
+- float profilerInterval
+- bool useRendererStats
+
+Engine : Object
+
+Methods:<br>
+- void RunFrame()
+- Console* CreateConsole()
+- DebugHud* CreateDebugHud()
+- void SetMinFps(int fps)
+- void SetMaxFps(int fps)
+- void SetMaxInactiveFps(int fps)
+- void SetPauseMinimized(bool enable)
+- void SetAutoExit(bool enable)
+- void Exit()
+- void DumpProfiler()
+- void DumpResources()
+- void DumpMemory()
+- int GetMinFps() const
+- int GetMaxFps() const
+- int GetMaxInactiveFps() const
+- bool GetPauseMinimized() const
+- bool GetAutoExit() const
+- bool IsInitialized() const
+- bool IsExiting() const
+- bool IsHeadless() const
+
+ Properties:<br>
+- int minFps
+- int maxFps
+- int maxInactiveFps
+- bool pauseMinimized
+- bool autoExit
+- bool initialized (readonly)
+- bool exiting (readonly)
+- bool headless (readonly)
+
+AnimatedModel : StaticModel
+
+Methods:<br>
+- void SetModel(Model* model, bool createBones = true)
+- AnimationState* AddAnimationState(Animation* animation)
+- void RemoveAnimationState(Animation* animation)
+- void RemoveAnimationState(const String& animationName)
+- void RemoveAnimationState(StringHash animationNameHash)
+- void RemoveAnimationState(AnimationState* state)
+- void RemoveAnimationState(unsigned index)
+- void RemoveAllAnimationStates()
+- void SetAnimationLodBias(float bias)
+- void SetInvisibleLodFactor(float factor)
+- void SetMorphWeight(unsigned index, float weight)
+- void SetMorphWeight(const String& name, float weight)
+- void SetMorphWeight(StringHash nameHash, float weight)
+- void ResetMorphWeights()
+- Skeleton& GetSkeleton()
+- unsigned GetNumAnimationStates() const
+- AnimationState* GetAnimationState(Animation* animation) const
+- AnimationState* GetAnimationState(const String& animationName) const
+- AnimationState* GetAnimationState(const StringHash animationNameHash) const
+- AnimationState* GetAnimationState(unsigned index) const
+- float GetAnimationLodBias() const
+- float GetInvisibleLodFactor() const
+- unsigned GetNumMorphs() const
+- float GetMorphWeight(unsigned index) const
+- float GetMorphWeight(const String& name) const
+- float GetMorphWeight(StringHash nameHash) const
+- bool IsMaster() const
+
+ Properties:<br>
+- Skeleton& skeleton (readonly)
+- unsigned numAnimationStates (readonly)
+- float animationLodBias
+- float invisibleLodFactor
+- unsigned numMorphs (readonly)
+- bool master (readonly)
+- struct AnimationKeyFrame
+
+Methods:<br>
+- time
+- position
+- rotation
+- scale
+- struct AnimationTrack
+
+Methods:<br>
+- void GetKeyFrameIndex(float time, unsigned& index) const
+- name
+- nameHash
+- channelMas
+- keyFrames
+- struct AnimationTriggerPoint
+
+Methods:<br>
+- AnimationTriggerPoint()
+- time
+- data
+
+Animation : Resource
+
+Methods:<br>
+- const String& GetAnimationName() const
+- StringHash GetAnimationNameHash() const
+- float GetLength() const
+- unsigned GetNumTracks() const
+- const AnimationTrack* GetTrack(unsigned index) const
+- const AnimationTrack* GetTrack(const String& name) const
+- const AnimationTrack* GetTrack(StringHash nameHash) const
+- unsigned GetNumTriggers() const
+
+ Properties:<br>
+- String& animationName (readonly)
+- StringHash animationNameHash (readonly)
+- float length (readonly)
+- unsigned numTracks (readonly)
+- unsigned numTriggers (readonly)
+- struct AnimationControl
+
+Methods:<br>
+- AnimationControl()
+- StringHash hash_
+- float speed_
+- float targetWeight_
+- float fadeTime_
+- float autoFadeTime_
+- float setTimeTtl_
+- float setWeightTtl_
+- unsigned short setTime_
+- unsigned char setWeight_
+- unsigned char setTimeRev_
+- unsigned char setWeightRev_
+
+AnimationController : Component
+
+Methods:<br>
+- bool Play(const String& name, unsigned char layer, bool looped, float fadeInTime = 0.0f)
+- bool Play(const char* name, unsigned char layer, bool looped, float fadeInTime = 0.0f)
+- bool PlayExclusive(const String& name, unsigned char layer, bool looped, float fadeTime = 0.0f)
+- bool PlayExclusive(const char* name, unsigned char layer, bool looped, float fadeTime = 0.0f)
+- bool Stop(const String& name, float fadeOutTime = 0.0f)
+- bool Stop(const char* name, float fadeOutTime = 0.0f)
+- void StopLayer(unsigned char layer, float fadeOutTime = 0.0f)
+- void StopAll(float fadeTime = 0.0f)
+- bool Fade(const String& name, float targetWeight, float fadeTime)
+- bool Fade(const char* name, float targetWeight, float fadeTime)
+- bool FadeOthers(const String& name, float targetWeight, float fadeTime)
+- bool FadeOthers(const char* name, float targetWeight, float fadeTime)
+- bool SetLayer(const String& name, unsigned char layer)
+- bool SetLayer(const char* name, unsigned char layer)
+- bool SetStartBone(const String& name, const String& startBoneName)
+- bool SetStartBone(const char* name, const String& startBoneName)
+- bool SetTime(const String& name, float time)
+- bool SetTime(const char* name, float time)
+- bool SetWeight(const String& name, float weight)
+- bool SetWeight(const char* name, float weight)
+- bool SetLooped(const String& name, bool enable)
+- bool SetLooped(const char* name, bool enable)
+- bool SetSpeed(const String& name, float speed)
+- bool SetSpeed(const char* name, float speed)
+- bool SetAutoFade(const String& name, float fadeOutTime)
+- bool SetAutoFade(const char* name, float fadeOutTime)
+- bool IsPlaying(const String& name) const
+- bool IsPlaying(const char* name) const
+- bool IsFadingIn(const String& name) const
+- bool IsFadingIn(const char* name) const
+- bool IsFadingOut(const String& name) const
+- bool IsFadingOut(const char* name) const
+- unsigned char GetLayer(const String& name) const
+- unsigned char GetLayer(const char* name) const
+- Bone* GetStartBone(const String& name) const
+- Bone* GetStartBone(const char* name) const
+- const String& GetStartBoneName(const String& name) const
+- const String& GetStartBoneName(const char* name) const
+- float GetTime(const String& name) const
+- float GetTime(const String& name) const
+- float GetWeight(const String& name) const
+- float GetWeight(const char* name) const
+- bool IsLooped(const String& name) const
+- bool IsLooped(const char* name) const
+- float GetLength(const String& name) const
+- float GetLength(const char* name) const
+- float GetSpeed(const String& name) const
+- float GetSpeed(const char* name) const
+- float GetFadeTarget(const String& name) const
+- float GetFadeTarget(const char* name) const
+- float GetFadeTime(const String& name) const
+- float GetFadeTime(const char* name) const
+- float GetAutoFade(const String& name) const
+- float GetAutoFade(const char* name) const
+
+AnimationState
+
+Methods:<br>
+- AnimationState(AnimatedModel* model, Animation* animation)
+- AnimationState(Node* node, Animation* animation)
+- ~AnimationState()
+- void SetStartBone(Bone* bone)
+- void SetLooped(bool looped)
+- void SetWeight(float weight)
+- void SetTime(float time)
+- void SetBoneWeight(unsigned index, float weight)
+- void SetBoneWeight(const String& name, float weight)
+- void SetBoneWeight(StringHash nameHash, float weight)
+- void AddWeight(float delta)
+- void AddTime(float delta)
+- void SetLayer(unsigned char layer)
+- Animation* GetAnimation() const
+- Bone* GetStartBone() const
+- float GetBoneWeight(unsigned index) const
+- float GetBoneWeight(const String& name) const
+- float GetBoneWeight(StringHash nameHash) const
+- unsigned GetTrackIndex(const String& name) const
+- unsigned GetTrackIndex(StringHash nameHash) const
+- bool IsEnabled() const
+- bool IsLooped() const
+- float GetWeight() const
+- float GetTime() const
+- float GetLength() const
+- unsigned char GetLayer() const
+
+ Properties:<br>
+- Animation* animation (readonly)
+- Bone* startBone
+- bool enabled (readonly)
+- bool looped
+- float weight
+- float time
+- float length (readonly)
+- unsigned char layer
+- struct Billboard
+
+Methods:<br>
+- position
+- size
+- uv
+- color
+- rotation
+- enabled
+- sortDistance
+
+BillboardSet : Drawable
+
+Methods:<br>
+- void SetMaterial(Material* material)
+- void SetNumBillboards(unsigned num)
+- void SetRelative(bool enable)
+- void SetScaled(bool enable)
+- void SetSorted(bool enable)
+- void SetAnimationLodBias(float bias)
+- void Commit()
+- Material* GetMaterial() const
+- unsigned GetNumBillboards() const
+- Billboard* GetBillboard(unsigned index)
+- bool IsRelative() const
+- bool IsScaled() const
+- bool IsSorted() const
+- float GetAnimationLodBias() const
+
+ Properties:<br>
+- Material* material
+- unsigned numBillboards
+- bool relative
+- bool scaled
+- bool sorted
+- float animationLodBias
+
+Camera : Component
+
+Methods:<br>
+- void SetNearClip(float nearClip)
+- void SetFarClip(float farClip)
+- void SetFov(float fov)
+- void SetOrthoSize(float orthoSize)
+- void SetOrthoSize(const Vector2& orthoSize)
+- void SetAspectRatio(float aspectRatio)
+- void SetFillMode(FillMode mode)
+- void SetZoom(float zoom)
+- void SetLodBias(float bias)
+- void SetViewMask(unsigned mask)
+- void SetViewOverrideFlags(unsigned flags)
+- void SetOrthographic(bool enable)
+- void SetAutoAspectRatio(bool enable)
+- void SetProjectionOffset(const Vector2& offset)
+- void SetFlipVertical(bool enable)
+- float GetFarClip() const
+- float GetNearClip() const
+- float GetFov() const
+- float GetOrthoSize() const
+- float GetAspectRatio() const
+- float GetZoom() const
+- float GetLodBias() const
+- unsigned GetViewMask() const
+- unsigned GetViewOverrideFlags() const
+- FillMode GetFillMode() const
+- bool IsOrthographic() const
+- bool GetAutoAspectRatio() const
+- const Frustum& GetFrustum() const
+- const Matrix4& GetProjection() const
+- Matrix4 GetProjection(bool apiSpecific) const
+- const Matrix3x4& GetView() const
+- void GetFrustumSize(Vector3& near, Vector3& far) const
+- float GetHalfViewSize() const
+- Frustum GetSplitFrustum(float nearClip, float farClip) const
+- Frustum GetViewSpaceFrustum() const
+- Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const
+- Ray GetScreenRay(float x, float y) const
+- Vector2 WorldToScreenPoint(const Vector3& worldPos) const
+- Vector3 ScreenToWorldPoint(const Vector3& screenPos) const
+- Vector3 GetForwardVector() const
+- Vector3 GetRightVector() const
+- Vector3 GetUpVector() const
+- const Vector2& GetProjectionOffset() const
+- bool GetFlipVertical() const
+- float GetDistance(const Vector3& worldPos) const
+- float GetDistanceSquared(const Vector3& worldPos) const
+- float GetLodDistance(float distance, float scale, float bias) const
+- bool IsProjectionValid() const
+
+ Properties:<br>
+- float farClip
+- float nearClip
+- float fov
+- float orthoSize
+- float aspectRatio
+- float zoom
+- float lodBias
+- unsigned viewMask
+- unsigned viewOverrideFlags
+- FillMode fillMode
+- bool orthographic
+- bool autoAspectRatio
+- Frustum& frustum (readonly)
+- Matrix4& projection (readonly)
+- Matrix3x4& view (readonly)
+- float halfViewSize (readonly)
+- Frustum viewSpaceFrustum (readonly)
+- Vector3 forwardVector (readonly)
+- Vector3 rightVector (readonly)
+- Vector3 upVector (readonly)
+- Vector2& projectionOffset
+- bool flipVertical
+- bool projectionValid (readonly)
+
+DebugRenderer : Component
+
+Methods:<br>
+- void SetView(Camera* camera)
+- void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true)
+- void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true)
+- void AddNode(Node* node, float scale = 1.0f, bool depthTest = true)
+- void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true)
+- void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true)
+- void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true)
+- void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true)
+- void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true)
+- void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true)
+- void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true)
+- void Render()
+- const Matrix3x4& GetView() const
+- const Matrix4& GetProjection() const
+- const Frustum& GetFrustum() const
+- bool IsInside(const BoundingBox& box) const
+
+ Properties:<br>
+- Matrix3x4& view (readonly)
+- Matrix4& projection (readonly)
+- Frustum& frustum (readonly)
+
+DecalSet : Drawable
+
+Methods:<br>
+- void SetMaterial(Material* material)
+- void SetMaxVertices(unsigned num)
+- void SetMaxIndices(unsigned num)
+- bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED)
+- void RemoveDecals(unsigned num)
+- void RemoveAllDecals()
+- Material* GetMaterial() const
+- unsigned GetNumDecals() const
+- unsigned GetNumVertices() const
+- unsigned GetNumIndices() const
+- unsigned GetMaxVertices() const
+- unsigned GetMaxIndices() const
+
+ Properties:<br>
+- Material* material
+- unsigned numDecals (readonly)
+- unsigned numVertices (readonly)
+- unsigned numIndices (readonly)
+- unsigned maxVertices
+- unsigned maxIndices
+
+Drawable : Component
+
+Methods:<br>
+- void SetDrawDistance(float distance)
+- void SetShadowDistance(float distance)
+- void SetLodBias(float bias)
+- void SetViewMask(unsigned mask)
+- void SetLightMask(unsigned mask)
+- void SetShadowMask(unsigned mask)
+- void SetZoneMask(unsigned mask)
+- void SetMaxLights(unsigned num)
+- void SetCastShadows(bool enable)
+- void SetOccluder(bool enable)
+- void SetOccludee(bool enable)
+- void MarkForUpdate()
+- const BoundingBox& GetBoundingBox() const
+- const BoundingBox& GetWorldBoundingBox()
+- unsigned char GetDrawableFlags() const
+- float GetDrawDistance() const
+- float GetShadowDistance() const
+- float GetLodBias() const
+- unsigned GetViewMask() const
+- unsigned GetLightMask() const
+- unsigned GetShadowMask() const
+- unsigned GetZoneMask() const
+- unsigned GetMaxLights() const
+- bool GetCastShadows() const
+- bool IsOccluder() const
+- bool IsOccludee() const
+- void SetZone(Zone* zone, bool temporary = false)
+- void SetSortValue(float value)
+- void SetMinMaxZ(float minZ, float maxZ)
+- void MarkInView(const FrameInfo& frame, bool mainView = true)
+- void ClearLights()
+- void AddLight(Light* light)
+- void AddVertexLight(Light* light)
+- void LimitLights()
+- void LimitVertexLights()
+- void SetBasePass(unsigned batchIndex)
+- Octant* GetOctant() const
+- Zone* GetZone() const
+- Zone* GetLastZone() const
+- bool IsZoneDirty() const
+- float GetDistance() const
+- float GetLodDistance() const
+- float GetSortValue() const
+- bool IsInView(unsigned frameNumber) const
+- bool IsInView(const FrameInfo& frame, bool mainView = true) const
+- bool HasBasePass(unsigned batchIndex) const
+- Light* GetFirstLight() const
+- float GetMinZ() const
+- float GetMaxZ() const
+
+ Properties:<br>
+- BoundingBox& worldBoundingBox (readonly)
+- unsigned char drawableFlags (readonly)
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- unsigned viewMask
+- unsigned lightMask
+- unsigned shadowMask
+- unsigned zoneMask
+- unsigned maxLights
+- bool castShadows
+- bool occluder
+- bool occludee
+- Octant* octant (readonly)
+- Zone* zone
+- Zone* lastZone (readonly)
+- bool zoneDirty (readonly)
+- float distance (readonly)
+- float lodDistance (readonly)
+- float sortValue
+- Light* firstLight (readonly)
+- float minZ (readonly)
+- float maxZ (readonly)
+
+Graphics : Object
+
+Methods:<br>
+- void SetWindowTitle(const String& windowTitle)
+- void SetWindowTitle(const char* windowTitle)
+- bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
+- bool SetMode(int width, int height)
+- void SetSRGB(bool enable)
+- bool ToggleFullscreen()
+- void Close()
+- bool TakeScreenShot(Image& destImage)
+- bool IsInitialized() const
+- void* GetExternalWindow() const
+- const String& GetWindowTitle() const
+- int GetWidth() const
+- int GetHeight() const
+- int GetMultiSample() const
+- bool GetFullscreen() const
+- bool GetResizable() const
+- bool GetVSync() const
+- bool GetTripleBuffer() const
+- bool GetSRGB() const
+- bool IsDeviceLost() const
+- unsigned GetNumPrimitives() const
+- unsigned GetNumBatches() const
+- unsigned GetDummyColorFormat() const
+- unsigned GetShadowMapFormat() const
+- unsigned GetHiresShadowMapFormat() const
+- bool GetSM3Support() const
+- bool GetInstancingSupport() const
+- bool GetLightPrepassSupport() const
+- bool GetDeferredSupport() const
+- bool GetHardwareShadowSupport() const
+- bool GetStreamOffsetSupport() const
+- bool GetSRGBSupport() const
+- bool GetSRGBWriteSupport() const
+
+ Properties:<br>
+- bool initialized (readonly)
+- const String& windowTitle
+- int width (readonly)
+- int height (readonly)
+- int multiSample (readonly)
+- bool fullscreen (readonly)
+- bool resizable (readonly)
+- bool vSync (readonly)
+- bool tripleBuffer (readonly)
+- bool sRGB
+- bool deviceLost (readonly)
+- unsigned numPrimitives (readonly)
+- unsigned numBatches (readonly)
+- unsigned dummyColorFormat (readonly)
+- unsigned shadowMapFormat (readonly)
+- unsigned hiresShadowMapFormat (readonly)
+- bool sM3Support (readonly)
+- bool instancingSupport (readonly)
+- bool lightPrepassSupport (readonly)
+- bool deferredSupport (readonly)
+- bool hardwareShadowSupport (readonly)
+- bool streamOffsetSupport (readonly)
+- bool sRGBSupport (readonly)
+- bool sRGBWriteSupport (readonly)
+- struct BiasParameters
+
+Methods:<br>
+- BiasParameters()
+- BiasParameters(float constantBias, float slopeScaledBias)
+- struct CascadeParameters
+
+Methods:<br>
+- CascadeParameters()
+- CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f)
+- struct FocusParameters
+
+Methods:<br>
+- FocusParameters()
+- FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView)
+
+Light : Drawable
+
+Methods:<br>
+- void SetLightType(LightType type)
+- void SetPerVertex(bool enable)
+- void SetColor(const Color& color)
+- void SetSpecularIntensity(float intensity)
+- void SetRange(float range)
+- void SetFov(float fov)
+- void SetAspectRatio(float aspectRatio)
+- void SetFadeDistance(float distance)
+- void SetShadowFadeDistance(float distance)
+- void SetShadowBias(const BiasParameters& parameters)
+- void SetShadowCascade(const CascadeParameters& parameters)
+- void SetShadowFocus(const FocusParameters& parameters)
+- void SetShadowIntensity(float intensity)
+- void SetShadowResolution(float resolution)
+- void SetShadowNearFarRatio(float nearFarRatio)
+- void SetRampTexture(Texture* texture)
+- void SetShapeTexture(Texture* texture)
+- LightType GetLightType() const
+- bool GetPerVertex() const
+- const Color& GetColor() const
+- float GetSpecularIntensity() const
+- float GetRange() const
+- float GetFov() const
+- float GetAspectRatio() const
+- float GetFadeDistance() const
+- float GetShadowFadeDistance() const
+- const BiasParameters& GetShadowBias() const
+- const CascadeParameters& GetShadowCascade() const
+- const FocusParameters& GetShadowFocus() const
+- float GetShadowIntensity() const
+- float GetShadowResolution() const
+- float GetShadowNearFarRatio() const
+- Texture* GetRampTexture() const
+- Texture* GetShapeTexture() const
+- Frustum GetFrustum() const
+
+ Properties:<br>
+- LightType lightType
+- bool perVertex
+- Color& color
+- float specularIntensity
+- float range
+- float fov
+- float aspectRatio
+- float fadeDistance
+- float shadowFadeDistance
+- BiasParameters& shadowBias
+- CascadeParameters& shadowCascade
+- FocusParameters& shadowFocus
+- float shadowIntensity
+- float shadowResolution
+- float shadowNearFarRatio
+- Texture* rampTexture
+- Texture* shapeTexture
+- Frustum frustum (readonly)
+
+Material : Resource
+
+Methods:<br>
+- unsigned GetNumTechniques() const
+- Technique* GetTechnique(unsigned index) const
+- Pass* GetPass(unsigned index, StringHash passType) const
+- Pass* GetPass(unsigned index, const char* passType) const
+- Texture* GetTexture(TextureUnit unit) const
+- CullMode GetCullMode() const
+- CullMode GetShadowCullMode() const
+- const BiasParameters& GetDepthBias() const
+- unsigned GetAuxViewFrameNumber() const
+- bool GetOcclusion() const
+- bool GetSpecular() const
+
+ Properties:<br>
+- CullMode cullMode (readonly)
+- CullMode shadowCullMode (readonly)
+- unsigned auxViewFrameNumber (readonly)
+- bool occlusion (readonly)
+- bool specular (readonly)
+
+Model : Resource
+
+Methods:<br>
+- const BoundingBox& GetBoundingBox() const
+- Skeleton& GetSkeleton()
+- unsigned GetNumGeometries() const
+- unsigned GetNumGeometryLodLevels(unsigned index) const
+- Geometry* GetGeometry(unsigned index, unsigned lodLevel) const
+- unsigned GetNumMorphs() const
+- const ModelMorph* GetMorph(unsigned index) const
+- const ModelMorph* GetMorph(const String& name) const
+- const ModelMorph* GetMorph(StringHash nameHash) const
+- unsigned GetMorphRangeStart(unsigned bufferIndex) const
+- unsigned GetMorphRangeCount(unsigned bufferIndex) const
+
+ Properties:<br>
+- BoundingBox& boundingBox (readonly)
+- Skeleton skeleton (readonly)
+- unsigned numGeometries (readonly)
+- unsigned numMorphs (readonly)
+
+Octree : Component
+    
+Methods:<br>
+-     
+- void SetSize(const BoundingBox& box, unsigned numLevels)
+- void Update(const FrameInfo& frame)
+- void AddManualDrawable(Drawable* drawable)
+- void RemoveManualDrawable(Drawable* drawable)
+- RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
+- unsigned GetNumLevels() const
+- void QueueUpdate(Drawable* drawable)
+- void DrawDebugGeometry(bool depthTest)
+
+ Properties:<br>
+- unsigned numLevels (readonly)
+- struct RayQueryResult
+
+Methods:<br>
+- drawable
+- node
+- distance
+- subObject
+- struct Particle
+
+Methods:<br>
+- Vector3 velocity_
+- Vector2 size_
+- float timer_
+- float timeToLive_
+- float scale_
+- float rotationSpeed_
+- unsigned colorIndex_
+- unsigned texIndex_
+- struct ColorFrame
+
+Methods:<br>
+- ColorFrame()
+- ColorFrame(const Color& color)
+- ColorFrame(const Color& color, float time)
+- Color Interpolate(const ColorFrame& next, float time)
+- color
+- time
+- struct TextureFrame
+
+Methods:<br>
+- TextureFrame()
+- uv
+- time
+
+ParticleEmitter : BillboardSet
+
+Methods:<br>
+- bool Load(XMLFile* file)
+- void SetNumParticles(unsigned num)
+- void SetEmissionRate(float rate)
+- void SetMinEmissionRate(float rate)
+- void SetMaxEmissionRate(float rate)
+- void SetEmitterType(EmitterType type)
+- void SetEmitterSize(const Vector3& size)
+- void SetActiveTime(float time)
+- void SetInactiveTime(float time)
+- void SetEmitting(bool enable, bool resetPeriod = false)
+- void SetUpdateInvisible(bool enable)
+- void SetTimeToLive(float time)
+- void SetMinTimeToLive(float time)
+- void SetMaxTimeToLive(float time)
+- void SetParticleSize(const Vector2& size)
+- void SetMinParticleSize(const Vector2& size)
+- void SetMaxParticleSize(const Vector2& size)
+- void SetMinDirection(const Vector3& direction)
+- void SetMaxDirection(const Vector3& direction)
+- void SetVelocity(float velocity)
+- void SetMinVelocity(float velocity)
+- void SetMaxVelocity(float velocity)
+- void SetRotation(float rotation)
+- void SetMinRotation(float rotation)
+- void SetMaxRotation(float rotation)
+- void SetRotationSpeed(float speed)
+- void SetMinRotationSpeed(float speed)
+- void SetMaxRotationSpeed(float speed)
+- void SetConstantForce(const Vector3& force)
+- void SetDampingForce(float force)
+- void SetSizeAdd(float sizeAdd)
+- void SetSizeMul(float sizeMul)
+- void SetColor(const Color& color)
+- void SetNumColors(unsigned num)
+- void SetNumTextureFrames(unsigned num)
+- unsigned GetNumParticles() const
+- bool IsEmitting() const
+- bool GetUpdateInvisible() const
+- float GetMinEmissionRate() const
+- float GetMaxEmissionRate() const
+- EmitterType GetEmitterType() const
+- const Vector3& GetEmitterSize() const
+- float GetActiveTime() const
+- float GetInactiveTime() const
+- float GetMinTimeToLive() const
+- float GetMaxTimeToLive() const
+- const Vector2& GetMinParticleSize() const
+- const Vector2& GetMaxParticleSize() const
+- const Vector3& GetMinDirection() const
+- const Vector3& GetMaxDirection() const
+- float GetMinVelocity() const
+- float GetMaxVelocity() const
+- float GetMinRotation() const
+- float GetMaxRotation() const
+- float GetMinRotationSpeed() const
+- float GetMaxRotationSpeed() const
+- const Vector3& GetConstantForce() const
+- float GetDampingForce() const
+- float GetSizeAdd() const
+- float GetSizeMul() const
+- unsigned GetNumColors() const
+- ColorFrame* GetColor(unsigned index)
+- unsigned GetNumTextureFrames() const
+- TextureFrame* GetTextureFrame(unsigned index)
+
+ Properties:<br>
+- unsigned numParticles
+- bool emitting
+- bool updateInvisible
+- float minEmissionRate
+- float maxEmissionRate
+- EmitterType emitterType
+- Vector3& emitterSize
+- float activeTime
+- float inactiveTime
+- float minTimeToLive
+- float maxTimeToLive
+- Vector2& minParticleSize
+- Vector2& maxParticleSize
+- Vector3& minDirection
+- Vector3& maxDirection
+- float minVelocity
+- float maxVelocity
+- float minRotation
+- float maxRotation
+- float minRotationSpeed
+- float maxRotationSpeed
+- Vector3& constantForce
+- float dampingForce
+- float sizeAdd
+- float sizeMul
+- unsigned numColors
+- unsigned numTextureFrames
+
+Renderer
+
+Methods:<br>
+- void SetNumViewports(unsigned num)
+- void SetViewport(unsigned index, Viewport* viewport)
+- void SetDefaultRenderPath(RenderPath* renderPath)
+- void SetDefaultRenderPath(XMLFile* file)
+- void SetSpecularLighting(bool enable)
+- void SetTextureAnisotropy(int level)
+- void SetTextureFilterMode(TextureFilterMode mode)
+- void SetTextureQuality(int quality)
+- void SetMaterialQuality(int quality)
+- void SetDrawShadows(bool enable)
+- void SetShadowMapSize(int size)
+- void SetShadowQuality(int quality)
+- void SetReuseShadowMaps(bool enable)
+- void SetMaxShadowMaps(int shadowMaps)
+- void SetMaxShadowCascades(int cascades)
+- void SetDynamicInstancing(bool enable)
+- void SetMinInstances(int instances)
+- void SetMaxInstanceTriangles(int triangles)
+- void SetMaxSortedInstances(int instances)
+- void SetMaxOccluderTriangles(int triangles)
+- void SetOcclusionBufferSize(int size)
+- void SetOccluderSizeThreshold(float screenSize)
+- void ReloadShaders()
+- unsigned GetNumViewports() const
+- Viewport* GetViewport(unsigned index) const
+- RenderPath* GetDefaultRenderPath() const
+- bool GetSpecularLighting() const
+- bool GetDrawShadows() const
+- int GetTextureAnisotropy() const
+- TextureFilterMode GetTextureFilterMode() const
+- int GetTextureQuality() const
+- int GetMaterialQuality() const
+- int GetShadowMapSize() const
+- int GetShadowQuality() const
+- bool GetReuseShadowMaps() const
+- int GetMaxShadowMaps() const
+- int GetMaxShadowCascades() const
+- bool GetDynamicInstancing() const
+- int GetMinInstances() const
+- int GetMaxInstanceTriangles() const
+- int GetMaxSortedInstances() const
+- int GetMaxOccluderTriangles() const
+- int GetOcclusionBufferSize() const
+- float GetOccluderSizeThreshold() const
+- unsigned GetNumViews() const
+- unsigned GetNumPrimitives() const
+- unsigned GetNumBatches() const
+- unsigned GetNumGeometries(bool allViews = false) const
+- unsigned GetNumLights(bool allViews = false) const
+- unsigned GetNumShadowMaps(bool allViews = false) const
+- unsigned GetNumOccluders(bool allViews = false) const
+- Zone* GetDefaultZone() const
+- Light* GetQuadDirLight() const
+- Material* GetDefaultMaterial() const
+- Texture2D* GetDefaultLightRamp() const
+- Texture2D* GetDefaultLightSpot() const
+- TextureCube* GetFaceSelectCubeMap() const
+- TextureCube* GetIndirectionCubeMap() const
+- VertexBuffer* GetInstancingBuffer() const
+- ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const
+- ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const
+- ShaderVariation* GetStencilVS() const
+- ShaderVariation* GetStencilPS() const
+- const FrameInfo& GetFrameInfo()
+- void DrawDebugGeometry(bool depthTest)
+
+ Properties:<br>
+- unsigned numViewports
+- RenderPath* defaultRenderPath
+- bool specularLighting
+- bool drawShadows
+- int textureAnisotropy
+- TextureFilterMode textureFilterMode
+- int textureQuality
+- int materialQuality
+- int shadowMapSize
+- int shadowQuality
+- bool reuseShadowMaps
+- int maxShadowMaps
+- int maxShadowCascades
+- bool dynamicInstancing
+- int minInstances
+- int maxInstanceTriangles
+- int maxSortedInstances
+- int maxOccluderTriangles
+- int occlusionBufferSize
+- float occluderSizeThreshold
+- unsigned numViews (readonly)
+- unsigned numPrimitives (readonly)
+- unsigned numBatches (readonly)
+- Zone* defaultZone (readonly)
+- Light* quadDirLight (readonly)
+- Material* defaultMaterial (readonly)
+- Texture2D* defaultLightRamp (readonly)
+- Texture2D* defaultLightSpot (readonly)
+- TextureCube* faceSelectCubeMap (readonly)
+- TextureCube* indirectionCubeMap (readonly)
+- VertexBuffer* instancingBuffer (readonly)
+- ShaderVariation* stencilVS (readonly)
+- ShaderVariation* stencilPS (readonly)
+
+RenderPath
+
+Methods:<br>
+- Clone()
+- bool Load(XMLFile* file)
+- bool Append(XMLFile* file)
+- void SetEnabled(const String& tag, bool active)
+- void SetEnabled(const char* tag, bool active)
+- void ToggleEnabled(const String& tag)
+- void ToggleEnabled(const char* tag)
+- void SetRenderTarget(unsigned index, const RenderTargetInfo& info)
+- void AddRenderTarget(const RenderTargetInfo& info)
+- void RemoveRenderTarget(unsigned index)
+- void RemoveRenderTarget(const String& name)
+- void RemoveRenderTarget(const char* name)
+- void RemoveRenderTargets(const String& tag)
+- void RemoveRenderTargets(const char* tag)
+- void SetCommand(unsigned index, const RenderPathCommand& command)
+- void AddCommand(const RenderPathCommand& command)
+- void InsertCommand(unsigned index, const RenderPathCommand& command)
+- void RemoveCommand(unsigned index)
+- void RemoveCommands(const String& tag)
+- void RemoveCommands(const char* tag)
+- void SetShaderParameter(const String& name, const Variant& value)
+- void SetShaderParameter(const char* name, const Variant& value)
+- unsigned GetNumRenderTargets() const
+- unsigned GetNumCommands() const
+- const Variant& GetShaderParameter(const String& name) const
+
+RenderSurface
+
+Methods:<br>
+- RenderSurface(Texture* parentTexture)
+- ~RenderSurface()
+- void SetNumViewports(unsigned num)
+- void SetViewport(unsigned index, Viewport* viewport)
+- void SetUpdateMode(RenderSurfaceUpdateMode mode)
+- void SetLinkedRenderTarget(RenderSurface* renderTarget)
+- void SetLinkedDepthStencil(RenderSurface* depthStencil)
+- void QueueUpdate()
+- void Release()
+- Texture* GetParentTexture() const
+- int GetWidth() const
+- int GetHeight() const
+- TextureUsage GetUsage() const
+- unsigned GetNumViewports() const
+- Viewport* GetViewport(unsigned index) const
+- RenderSurfaceUpdateMode GetUpdateMode() const
+- RenderSurface* GetLinkedRenderTarget() const
+- RenderSurface* GetLinkedDepthStencil() const
+
+ Properties:<br>
+- Texture* parentTexture (readonly)
+- int width (readonly)
+- int height (readonly)
+- TextureUsage usage (readonly)
+- unsigned numViewports
+- RenderSurfaceUpdateMode updateMode
+- RenderSurface* linkedRenderTarget
+- RenderSurface* linkedDepthStencil
+- struct Bone
+
+Methods:<br>
+- Bone()
+- name
+- nameHash
+- parentIndex
+- initialPosition
+- initialRotation
+- initialScale
+- offsetMatrix
+- animated
+- collisionMask
+- radius
+- boundingBox
+- node
+
+Skeleton
+
+Methods:<br>
+- unsigned GetNumBones() const
+- Bone* GetRootBone()
+- Bone* GetBone(unsigned index)
+
+ Properties:<br>
+- unsigned numBones (readonly)
+- Bone* rootBone (readonly)
+
+Skybox : StaticModel
+
+Methods:<br>
+- struct StaticModelGeometryData
+
+Methods:<br>
+- center
+- lodLevel
+
+StaticModel : Drawable
+
+Methods:<br>
+- void SetModel(Model* model)
+- void SetMaterial(Material* material)
+- bool SetMaterial(unsigned index, Material* material)
+- void SetOcclusionLodLevel(unsigned level)
+- Model* GetModel() const
+- unsigned GetNumGeometries() const
+- Material* GetMaterial(unsigned index = 0) const
+- unsigned GetOcclusionLodLevel() const
+- bool IsInside(const Vector3& point) const
+- bool IsInsideLocal(const Vector3& point) const
+
+ Properties:<br>
+- Model* model
+- Material* material
+- BoundingBox& boundingBox (readonly)
+- unsigned numGeometries (readonly)
+- unsigned occlusionLodLevel
+
+Pass : RefCounted
+
+Methods:<br>
+
+Technique : Resource
+
+Methods:<br>
+- bool HasPass(const char* type) const
+- Pass* GetPass(const char*  type) const
+- bool IsSM3() const
+
+ Properties:<br>
+- bool SM3 (readonly)
+
+Terrain : Component
+
+Methods:<br>
+- void SetPatchSize(int size)
+- void SetSpacing(const Vector3& spacing)
+- void SetSmoothing(bool enable)
+- bool SetHeightMap(Image* image)
+- void SetMaterial(Material* material)
+- void SetDrawDistance(float distance)
+- void SetShadowDistance(float distance)
+- void SetLodBias(float bias)
+- void SetViewMask(unsigned mask)
+- void SetLightMask(unsigned mask)
+- void SetShadowMask(unsigned mask)
+- void SetZoneMask(unsigned mask)
+- void SetMaxLights(unsigned num)
+- void SetCastShadows(bool enable)
+- void SetOccluder(bool enable)
+- void SetOccludee(bool enable)
+- int GetPatchSize() const
+- const Vector3& GetSpacing() const
+- const IntVector2& GetNumVertices() const
+- const IntVector2& GetNumPatches() const
+- bool GetSmoothing() const
+- Image* GetHeightMap() const
+- Material* GetMaterial() const
+- TerrainPatch* GetPatch(unsigned index) const
+- TerrainPatch* GetPatch(int x, int z) const
+- float GetHeight(const Vector3& worldPosition) const
+- Vector3 GetNormal(const Vector3& worldPosition) const
+- SharedArrayPtr<float> GetHeightData() const
+- float GetDrawDistance() const
+- float GetShadowDistance() const
+- float GetLodBias() const
+- unsigned GetViewMask() const
+- unsigned GetLightMask() const
+- unsigned GetShadowMask() const
+- unsigned GetZoneMask() const
+- unsigned GetMaxLights() const
+- bool IsVisible() const
+- bool GetCastShadows() const
+- bool IsOccluder() const
+- bool IsOccludee() const
+
+ Properties:<br>
+- int patchSize
+- Vector3& spacing
+- IntVector2& numVertices (readonly)
+- IntVector2& numPatches (readonly)
+- bool smoothing
+- Image* heightMap
+- Material* material
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- unsigned viewMask
+- unsigned lightMask
+- unsigned shadowMask
+- unsigned zoneMask
+- unsigned maxLights
+- bool visible (readonly)
+- bool castShadows
+- bool occluder
+- bool occludee
+
+TerrainPatch : Drawable
+
+Methods:<br>
+- void SetOwner(Terrain* terrain)
+- void SetNeighbors(TerrainPatch* north, TerrainPatch* south, TerrainPatch* west, TerrainPatch* east)
+- void SetMaterial(Material* material)
+- void SetBoundingBox(const BoundingBox& box)
+- void SetCoordinates(const IntVector2& coordinates)
+- void SetOcclusionOffset(float offset)
+- void ResetLod()
+- Geometry* GetGeometry() const
+- Geometry* GetMaxLodGeometry() const
+- Geometry* GetMinLodGeometry() const
+- VertexBuffer* GetVertexBuffer() const
+- Terrain* GetOwner() const
+- TerrainPatch* GetNorthPatch() const
+- TerrainPatch* GetSouthPatch() const
+- TerrainPatch* GetWestPatch() const
+- TerrainPatch* GetEastPatch() const
+- const IntVector2& GetCoordinates() const
+- unsigned GetLodLevel() const
+- float GetOcclusionOffset() const
+
+ Properties:<br>
+- Geometry* geometry (readonly)
+- Geometry* maxLodGeometry (readonly)
+- Geometry* minLodGeometry (readonly)
+- VertexBuffer* vertexBuffer (readonly)
+- Terrain* owner
+- TerrainPatch* northPatch (readonly)
+- TerrainPatch* southPatch (readonly)
+- TerrainPatch* westPatch (readonly)
+- TerrainPatch* eastPatch (readonly)
+- BoundingBox& boundingBox
+- IntVector2& coordinates
+- unsigned lodLevel (readonly)
+- float occlusionOffset
+
+Texture : Resource
+
+Methods:<br>
+- void SetNumLevels(unsigned levels)
+- void SetFilterMode(TextureFilterMode filter)
+- void SetAddressMode(TextureCoordinate coord, TextureAddressMode address)
+- void SetBorderColor(const Color& color)
+- void SetSRGB(bool enable)
+- void SetBackupTexture(Texture* texture)
+- void SetMipsToSkip(int quality, int mips)
+- unsigned GetFormat() const
+- bool IsCompressed() const
+- unsigned GetLevels() const
+- int GetWidth() const
+- int GetHeight() const
+- TextureFilterMode GetFilterMode() const
+- TextureAddressMode GetAddressMode(TextureCoordinate coord) const
+- const Color& GetBorderColor() const
+- bool GetSRGB() const
+- Texture* GetBackupTexture() const
+- int GetMipsToSkip(int quality) const
+- int GetLevelWidth(unsigned level) const
+- int GetLevelHeight(unsigned level) const
+- TextureUsage GetUsage() const
+- unsigned GetDataSize(int width, int height) const
+- unsigned GetRowDataSize(int width) const
+
+ Properties:<br>
+- unsigned format (readonly)
+- bool compressed (readonly)
+- unsigned levels (readonly)
+- int width (readonly)
+- int height (readonly)
+- TextureFilterMode filterMode
+- Color& borderColor
+- bool sRGB
+- Texture* backupTexture
+- TextureUsage usage (readonly)
+
+Texture2D : Texture
+
+Methods:<br>
+- RenderSurface* GetRenderSurface() const
+
+TextureCube : Texture
+
+Methods:<br>
+- RenderSurface* GetRenderSurface(CubeMapFace face) const
+
+Viewport
+
+Methods:<br>
+- Viewport(Context* context)
+- Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* renderPath = 0)
+- Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0)
+- ~Viewport()
+- void SetScene(Scene* scene)
+- void SetCamera(Camera* camera)
+- void SetRect(const IntRect& rect)
+- void SetRenderPath(RenderPath* path)
+- void SetRenderPath(XMLFile* file)
+- Scene* GetScene() const
+- Camera* GetCamera() const
+- const IntRect& GetRect() const
+- RenderPath* GetRenderPath() const
+
+ Properties:<br>
+- Scene* scene
+- Camera* camera
+- IntRect& rect
+- RenderPath* renderPath
+
+Zone : Drawable
+
+Methods:<br>
+- void SetBoundingBox(const BoundingBox& box)
+- void SetAmbientColor(const Color& color)
+- void SetFogColor(const Color& color)
+- void SetFogStart(float start)
+- void SetFogEnd(float end)
+- void SetPriority(int priority)
+- void SetOverride(bool enable)
+- void SetAmbientGradient(bool enable)
+- const Matrix3x4& GetInverseWorldTransform() const
+- const Color& GetAmbientColor() const
+- const Color& GetAmbientStartColor()
+- const Color& GetAmbientEndColor()
+- const Color& GetFogColor() const
+- float GetFogStart() const
+- float GetFogEnd() const
+- int GetPriority() const
+- bool GetOverride() const
+- bool GetAmbientGradient() const
+- bool IsInside(const Vector3& point) const
+
+ Properties:<br>
+- BoundingBox& boundingBox
+- Matrix3x4& inverseWorldTransform (readonly)
+- Color& ambientColor
+- Color& ambientStartColor (readonly)
+- Color& ambientEndColor (readonly)
+- Color& fogColor
+- float fogStart
+- float fogEnd
+- int priority
+- bool override
+- bool ambientGradient
+- struct TouchState
+
+Methods:<br>
+- touchID
+- position
+- lastPosition
+- delta
+- pressure
+- struct JoystickState
+
+Methods:<br>
+- unsigned GetNumButtons() const
+- unsigned GetNumAxes() const
+- unsigned GetNumHats() const
+- bool GetButtonDown(unsigned index) const
+- bool GetButtonPress(unsigned index) const
+- float GetAxisPosition(unsigned index) const
+- int GetHatPosition(unsigned index) const
+
+ Properties:<br>
+- unsigned numButtons (readonly)
+- unsigned numAxes (readonly)
+- unsigned numHats (readonly)
+
+Input : Object
+
+Methods:<br>
+- void SetMouseVisible(bool enable)
+- bool OpenJoystick(unsigned index)
+- void CloseJoystick(unsigned index)
+- bool DetectJoysticks()
+- bool GetKeyDown(int key) const
+- bool GetKeyPress(int key) const
+- bool GetMouseButtonDown(int button) const
+- bool GetMouseButtonPress(int button) const
+- bool GetQualifierDown(int qualifier) const
+- bool GetQualifierPress(int qualifier) const
+- int GetQualifiers() const
+- IntVector2 GetMousePosition() const
+- const IntVector2& GetMouseMove() const
+- int GetMouseMoveX() const
+- int GetMouseMoveY() const
+- int GetMouseMoveWheel() const
+- unsigned GetNumTouches() const
+- TouchState* GetTouch(unsigned index) const
+- unsigned GetNumJoysticks() const
+- const String& GetJoystickName(unsigned index) const
+- JoystickState* GetJoystick(unsigned index)
+- bool GetToggleFullscreen() const
+- bool IsMouseVisible() const
+- bool HasFocus()
+- bool IsMinimized() const
+
+ Properties:<br>
+- int qualifiers (readonly)
+- IntVector2 mousePosition (readonly)
+- IntVector2& mouseMove (readonly)
+- int mouseMoveX (readonly)
+- int mouseMoveY (readonly)
+- int mouseMoveWheel (readonly)
+- unsigned numTouches (readonly)
+- unsigned numJoysticks (readonly)
+- bool toggleFullscreen (readonly)
+- bool mouseVisible
+- bool focus (readonly)
+- bool minimized (readonly)
+
+Deserializer
+
+Methods:<br>
+- virtual unsigned Seek(unsigned position)
+- virtual const String& GetName() const
+- virtual unsigned GetChecksum()
+- unsigned GetPosition() const
+- unsigned GetSize() const
+- bool IsEof() const
+- int ReadInt()
+- short ReadShort()
+- signed char ReadByte()
+- unsigned ReadUInt()
+- unsigned short ReadUShort()
+- unsigned char ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Rect ReadRect()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float maxAbsCoord)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadFileID()
+- StringHash ReadStringHash()
+- ShortStringHash ReadShortStringHash()
+- ResourceRef ReadResourceRef()
+- ResourceRefList ReadResourceRefList()
+- Variant ReadVariant()
+- Variant ReadVariant(VariantType type)
+- VariantVector ReadVariantVector()
+- VariantMap ReadVariantMap()
+- unsigned ReadVLE()
+- unsigned ReadNetID()
+- String ReadLine()
+
+ Properties:<br>
+- String& name (readonly)
+- unsigned checksum (readonly)
+- unsigned position (readonly)
+- unsigned size (readonly)
+- bool eof (readonly)
+
+File : Deserializer
+
+Methods:<br>
+- File(Context* context)
+- File(Context* context, const String& fileName, FileMode mode = FILE_READ)
+- File(Context* context, const char* fileName, FileMode mode = FILE_READ)
+- File(Context* context, PackageFile* package, const String& fileName)
+- virtual ~File()
+- virtual unsigned Read(void* dest, unsigned size)
+- virtual unsigned Seek(unsigned position)
+- virtual unsigned Write(const void* data, unsigned size)
+- virtual const String& GetName() const
+- virtual unsigned GetChecksum()
+- bool Open(const String& fileName, FileMode mode = FILE_READ)
+- bool Open(PackageFile* package, const String& fileName)
+- void Close()
+- void Flush()
+- void SetName(const String& name)
+- FileMode GetMode() const
+- bool IsOpen() const
+- void* GetHandle() const
+- bool IsPackaged() const
+
+ Properties:<br>
+- String& name (readonly)
+- unsigned checksum (readonly)
+- FileMode mode (readonly)
+- bool open (readonly)
+- bool packaged (readonly)
+
+FileSystem : Object
+
+Methods:<br>
+- bool SetCurrentDir(const String& pathName)
+- bool SetCurrentDir(const char* pathName)
+- bool CreateDir(const String& pathName)
+- bool CreateDir(const char* pathName)
+- int SystemCommand(const String& commandLine)
+- int SystemCommand(const char* commandLine)
+- int SystemRun(const String& fileName, const Vector<String>& arguments)
+- int SystemRun(const char* fileName, const Vector<String>& arguments)
+- bool SystemOpen(const String& fileName, const String& mode = String::EMPTY)
+- bool SystemOpen(const char* fileName, const char* mode = 0)
+- bool Copy(const String& srcFileName, const String& destFileName)
+- bool Copy(const char* srcFileName, const char* destFileName)
+- bool Rename(const String& srcFileName, const String& destFileName)
+- bool Rename(const char* srcFileName, const char* destFileName)
+- bool Delete(const String& fileName)
+- bool Delete(const char* fileName)
+- void RegisterPath(const String& pathName)
+- void RegisterPath(const char* pathName)
+- String GetCurrentDir() const
+- bool HasRegisteredPaths() const
+- bool CheckAccess(const String& pathName) const
+- bool CheckAccess(const char* pathName) const
+- unsigned GetLastModifiedTime(const String& fileName) const
+- unsigned GetLastModifiedTime(const char* fileName) const
+- bool FileExists(const String& fileName) const
+- bool FileExists(const char* fileName) const
+- bool DirExists(const String& pathName) const
+- bool DirExists(const char* pathName) const
+- ScanDir(const String& pathName, const String& filter, unsigned flags, bool recursive) const
+- ScanDir(const char* pathName, const char* filter, unsigned flags, bool recursive) const
+- String GetProgramDir() const
+- String GetUserDocumentsDir() const
+
+Log : Object
+
+Methods:<br>
+- void SetLevel(int level)
+- void SetTimeStamp(bool enable)
+- void SetQuiet(bool quiet)
+- int GetLevel() const
+- bool GetTimeStamp() const
+- String GetLastMessage() const
+- bool IsQuiet() const
+- static void Write(int level, const String& message)
+- static void Write(int level, const char* message)
+- static void WriteRaw(const String& message, bool error = false)
+- static void WriteRaw(const char* message, bool error = false)
+
+ Properties:<br>
+- int level
+- bool timeStamp
+- bool quiet
+- struct PackageEntry
+
+Methods:<br>
+- offset
+- size
+- checksum
+
+PackageFile : Object
+
+Methods:<br>
+- PackageFile(Context* context)
+- PackageFile(Context* context, const String& fileName)
+- virtual ~PackageFile()
+- bool Open(const String& fileName)
+- bool Exists(const String& fileName) const
+- const PackageEntry* GetEntry(const String& fileName) const
+- const HashMap<String, PackageEntry>& GetEntries() const
+- const String& GetName() const
+- StringHash GetNameHash() const
+- unsigned GetNumFiles() const
+- unsigned GetTotalSize() const
+- unsigned GetChecksum() const
+
+ Properties:<br>
+- String& name (readonly)
+- StringHash nameHash (readonly)
+- unsigned numFiles (readonly)
+- unsigned totalSize (readonly)
+- unsigned checksum (readonly)
+
+Serializer
+
+Methods:<br>
+- bool WriteInt(int value)
+- bool WriteShort(short value)
+- bool WriteByte(signed char value)
+- bool WriteUInt(unsigned value)
+- bool WriteUShort(unsigned short value)
+- bool WriteUByte(unsigned char value)
+- bool WriteBool(bool value)
+- bool WriteFloat(float value)
+- bool WriteIntRect(const IntRect& value)
+- bool WriteIntVector2(const IntVector2& value)
+- bool WriteRect(const Rect& value)
+- bool WriteVector2(const Vector2& value)
+- bool WriteVector3(const Vector3& value)
+- bool WritePackedVector3(const Vector3& value, float maxAbsCoord)
+- bool WriteVector4(const Vector4& value)
+- bool WriteQuaternion(const Quaternion& value)
+- bool WritePackedQuaternion(const Quaternion& value)
+- bool WriteColor(const Color& value)
+- bool WriteBoundingBox(const BoundingBox& value)
+- bool WriteString(const String& value)
+- bool WriteFileID(const String& value)
+- bool WriteStringHash(const StringHash& value)
+- bool WriteShortStringHash(const ShortStringHash& value)
+- bool WriteResourceRef(const ResourceRef& value)
+- bool WriteResourceRefList(const ResourceRefList& value)
+- bool WriteVariant(const Variant& value)
+- bool WriteVariantData(const Variant& value)
+- bool WriteVariantVector(const VariantVector& value)
+- bool WriteVariantMap(const VariantMap& value)
+- bool WriteVLE(unsigned value)
+- bool WriteNetID(unsigned value)
+- bool WriteLine(const String& value)
+
+LuaScriptInstance : Component
+
+Methods:<br>
+- bool CreateObject(const String& objectType)
+- bool CreateObject(const char* objectType)
+- SubscribeToEvent(const String& eventName, const char* functionName)
+- SubscribeToEvent(const char* eventName, const char* functionName)
+
+BoundingBox
+
+Methods:<br>
+- BoundingBox()
+- BoundingBox(const BoundingBox& box)
+- BoundingBox(const Rect& rect)
+- BoundingBox(const Vector3& min, const Vector3& max)
+- BoundingBox(float min, float max)
+- BoundingBox(const Frustum& frustum)
+- BoundingBox(const Polyhedron& poly)
+- BoundingBox(const Sphere& sphere)
+- bool operator == (const BoundingBox& rhs) const
+- void Define(const BoundingBox& box)
+- void Define(const Rect& rect)
+- void Define(const Vector3& min, const Vector3& max)
+- void Define(float min, float max)
+- void Define(const Vector3& point)
+- void Define(const Frustum& frustum)
+- void Define(const Polyhedron& poly)
+- void Define(const Sphere& sphere)
+- void Merge(const Vector3& point)
+- void Merge(const BoundingBox& box)
+- void Merge(const Frustum& frustum)
+- void Merge(const Polyhedron& poly)
+- void Merge(const Sphere& sphere)
+- void Clip(const BoundingBox& box)
+- void Transform(const Matrix3& transform)
+- void Transform(const Matrix3x4& transform)
+- void Clear()
+- Vector3 Center() const
+- Vector3 Size() const
+- Vector3 HalfSize() const
+- BoundingBox Transformed(const Matrix3& transform) const
+- BoundingBox Transformed(const Matrix3x4& transform) const
+- Rect Projected(const Matrix4& projection) const
+- Intersection IsInside(const Vector3& point) const
+- Intersection IsInside(const BoundingBox& box) const
+- Intersection IsInsideFast(const BoundingBox& box) const
+- Intersection IsInside(const Sphere& sphere) const
+- Intersection IsInsideFast(const Sphere& sphere) const
+- String ToString() const
+- min
+- max
+- defined
+
+ Properties:<br>
+- Vector3 center (readonly)
+- Vector3 size (readonly)
+- Vector3 halfSize (readonly)
+
+Color
+
+Methods:<br>
+- Color()
+- Color(const Color& color)
+- Color(const Color& color, float a)
+- Color(float r, float g, float b)
+- Color(float r, float g, float b, float a)
+- bool operator == (const Color& rhs) const
+- Color operator * (float rhs) const
+- Color operator + (const Color& rhs)
+- unsigned ToUInt() const
+- Vector3 ToHSL() const
+- Vector3 ToHSV() const
+- void FromHSL(float h, float s, float l, float a)
+- void FromHSV(float h, float s, float v, float a)
+- Vector3 ToVector3() const
+- Vector4 ToVector4() const
+- float SumRGB() const
+- float Average() const
+- float Luma() const
+- float Chroma() const
+- float Hue() const
+- float SaturationHSL() const
+- float SaturationHSV() const
+- float Value() const
+- float Lightness() const
+- float MaxRGB() const
+- float MinRGB() const
+- float Range() const
+- void Clip(bool clipAlpha = false)
+- void Invert(bool invertAlpha = false)
+- Color Lerp(const Color& rhs, float t) const
+- String ToString() const
+- r
+- g
+- b
+- a
+- static const Color WHITE
+- static const Color GRAY
+- static const Color BLACK
+- static const Color RED
+- static const Color GREEN
+- static const Color BLUE
+- static const Color CYAN
+- static const Color MAGENTA
+- static const Color YELLOW
+- static const Color TRANSPARENT
+
+Frustum
+
+Methods:<br>
+- Frustum()
+- Frustum(const Frustum& frustum)
+- void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY)
+- void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform = Matrix3x4::IDENTITY)
+- void Define(const BoundingBox& box, const Matrix3x4& transform = Matrix3x4::IDENTITY)
+- void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY)
+- void Transform(const Matrix3& transform)
+- void Transform(const Matrix3x4& transform)
+- Intersection IsInside(const Vector3& point) const
+- Intersection IsInside(const Sphere& sphere) const
+- Intersection IsInsideFast(const Sphere& sphere) const
+- Intersection IsInside(const BoundingBox& box) const
+- Intersection IsInsideFast(const BoundingBox& box) const
+- float Distance(const Vector3& point) const
+- Frustum Transformed(const Matrix3& transform) const
+- Frustum Transformed(const Matrix3x4& transform) const
+- Rect Projected(const Matrix4& transform) const
+- void UpdatePlanes()
+
+Matrix3
+
+Methods:<br>
+- Matrix3()
+- Matrix3(const Matrix3& matrix)
+- Matrix3(float v00, float v01, float v02,
+-     float v10, float v11, float v12,
+-     float v20, float v21, float v22)
+- bool operator == (const Matrix3& rhs) const
+- Vector3 operator * (const Vector3& rhs) const
+- Matrix3 operator + (const Matrix3& rhs) const
+- Matrix3 operator - (const Matrix3& rhs) const
+- Matrix3 operator * (float rhs) const
+- Matrix3 operator * (const Matrix3& rhs) const
+- void SetScale(const Vector3& scale)
+- void SetScale(float scale)
+- Vector3 Scale() const
+- Matrix3 Transpose() const
+- Matrix3 Scaled(const Vector3& scale) const
+- bool Equals(const Matrix3& rhs) const
+- Matrix3 Inverse() const
+- m00
+- m01
+- m02
+- m10
+- m11
+- m12
+- m20
+- m21
+- m22
+- static const Matrix3 ZERO
+- static const Matrix3 IDENTITY
+
+Matrix3x4
+
+Methods:<br>
+- Matrix3x4()
+- Matrix3x4(const Matrix3x4& matrix)
+- Matrix3x4(const Matrix3& matrix)
+- Matrix3x4(const Matrix4& matrix)
+- Matrix3x4(float v00, float v01, float v02, float v03,
+-     float v10, float v11, float v12, float v13,
+-     float v20, float v21, float v22, float v23)
+- Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
+- Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
+- bool operator == (const Matrix3x4& rhs) const
+- Vector3 operator * (const Vector3& rhs) const
+- Vector3 operator * (const Vector4& rhs) const
+- Matrix3x4 operator + (const Matrix3x4& rhs) const
+- Matrix3x4 operator - (const Matrix3x4& rhs) const
+- Matrix3x4 operator * (float rhs) const
+- Matrix3x4 operator * (const Matrix3x4& rhs) const
+- Matrix4 operator * (const Matrix4& rhs) const
+- void SetTranslation(const Vector3& translation)
+- void SetRotation(const Matrix3& rotation)
+- void SetScale(const Vector3& scale)
+- void SetScale(float scale)
+- Matrix3 ToMatrix3() const
+- Matrix3 RotationMatrix() const
+- Vector3 Translation() const
+- Quaternion Rotation() const
+- Vector3 Scale() const
+- bool Equals(const Matrix3x4& rhs) const
+- void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
+- Matrix3x4 Inverse() const
+- m00
+- m01
+- m02
+- m03
+- m10
+- m11
+- m12
+- m13
+- m20
+- m21
+- m22
+- m23
+- static const Matrix3x4 ZERO
+- static const Matrix3x4 IDENTITY
+
+Matrix4
+
+Methods:<br>
+- Matrix4()
+- Matrix4(const Matrix4& matrix)
+- Matrix4(const Matrix3& matrix)
+- Matrix4(float v00, float v01, float v02, float v03,
+-     float v10, float v11, float v12, float v13,
+-     float v20, float v21, float v22, float v23,
+-     float v30, float v31, float v32, float v33)
+- bool operator == (const Matrix4& rhs) const
+- Vector3 operator * (const Vector3& rhs) const
+- Vector4 operator * (const Vector4& rhs) const
+- Matrix4 operator + (const Matrix4& rhs) const
+- Matrix4 operator - (const Matrix4& rhs) const
+- Matrix4 operator * (float rhs) const
+- Matrix4 operator * (const Matrix4& rhs) const
+- void SetTranslation(const Vector3& translation)
+- void SetRotation(const Matrix3& rotation)
+- void SetScale(const Vector3& scale)
+- void SetScale(float scale)
+- Matrix3 ToMatrix3() const
+- Matrix3 RotationMatrix() const
+- Vector3 Translation() const
+- Quaternion Rotation() const
+- Vector3 Scale() const
+- Matrix4 Transpose() const
+- bool Equals(const Matrix4& rhs) const
+- void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
+- Matrix4 Inverse() const
+- m00
+- m01
+- m02
+- m03
+- m10
+- m11
+- m12
+- m13
+- m20
+- m21
+- m22
+- m23
+- m30
+- m31
+- m32
+- m33
+- static const Matrix4 ZERO
+- static const Matrix4 IDENTITY
+
+Plane
+
+Methods:<br>
+- Plane()
+- Plane(const Plane& plane)
+- Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2)
+- Plane(const Vector3& normal, const Vector3& point)
+- void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
+- void Define(const Vector3& normal, const Vector3& point)
+- float Distance(const Vector3& point) const
+- normal
+- absNormal
+- intercept
+
+Polyhedron
+
+Methods:<br>
+- Polyhedron()
+- Polyhedron(const Polyhedron& polyhedron)
+- Polyhedron(const BoundingBox& box)
+- Polyhedron(const Frustum& frustum)
+- ~Polyhedron()
+- void Define(const BoundingBox& box)
+- void Define(const Frustum& frustum)
+- void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2)
+- void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3)
+- void Clip(const Plane& plane)
+- void Clip(const BoundingBox& box)
+- void Clip(const Frustum& box)
+- void Clear()
+- void Transform(const Matrix3& transform)
+- void Transform(const Matrix3x4& transform)
+- Polyhedron Transformed(const Matrix3& transform) const
+- Polyhedron Transformed(const Matrix3x4& transform) const
+- bool Empty() const
+
+ Properties:<br>
+- bool empty (readonly)
+
+Quaternion
+
+Methods:<br>
+- Quaternion()
+- Quaternion(const Quaternion& quat)
+- Quaternion(float w, float x, float y, float z)
+- Quaternion(float angle, const Vector3& axis)
+- Quaternion(float x, float y, float z)
+- Quaternion(const Vector3& start, const Vector3& end)
+- Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
+- Quaternion(const Matrix3& matrix)
+- bool operator == (const Quaternion& rhs) const
+- Quaternion operator * (float rhs) const
+- Quaternion operator - () const
+- bool operator == (const Quaternion& rhs) const
+- Quaternion operator * (float rhs) const
+- Quaternion operator - () const
+- Quaternion operator + (const Quaternion& rhs) const
+- Quaternion operator - (const Quaternion& rhs) const
+- Quaternion operator * (const Quaternion& rhs) const
+- Vector3 operator * (const Vector3& rhs) const
+- void FromAngleAxis(float angle, const Vector3& axis)
+- void FromEulerAngles(float x, float y, float z)
+- void FromRotationTo(const Vector3& start, const Vector3& end)
+- void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
+- void FromRotationMatrix(const Matrix3& matrix)
+- void Normalize()
+- Quaternion Normalized() const
+- Quaternion Inverse() const
+- float LengthSquared() const
+- float DotProduct(const Quaternion& rhs) const
+- bool Equals(const Quaternion& rhs) const
+- Quaternion Conjugate() const
+- Vector3 EulerAngles() const
+- float YawAngle() const
+- float PitchAngle() const
+- float RollAngle() const
+- Matrix3 RotationMatrix() const
+- Quaternion Slerp(Quaternion rhs, float t) const
+- String ToString() const
+- w
+- x
+- y
+- z
+- static const Quaternion IDENTITY
+
+Ray
+
+Methods:<br>
+- Ray()
+- Ray(const Vector3& origin, const Vector3& direction)
+- Ray(const Ray& ray)
+- bool operator == (const Ray& rhs) const
+- void Define(const Vector3& origin, const Vector3& direction)
+- Vector3 Project(const Vector3& point) const
+- float Distance(const Vector3& point) const
+- Vector3 ClosestPoint(const Ray& ray) const
+- float HitDistance(const Plane& plane) const
+- float HitDistance(const BoundingBox& box) const
+- float HitDistance(const Frustum& frustum, bool solidInside = true) const
+- float HitDistance(const Sphere& sphere) const
+- float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
+- Ray Transformed(const Matrix3x4& transform) const
+- origin
+- direction
+
+Rect
+
+Methods:<br>
+- Rect()
+- Rect(const Rect& rect)
+- Rect(const Vector2& min, const Vector2& max)
+- Rect(float left, float top, float right, float bottom)
+- Rect(const Vector4& vector)
+- bool operator == (const Rect& rhs) const
+- void Define(const Rect& rect)
+- void Define(const Vector2& min, const Vector2& max)
+- void Define(const Vector2& point)
+- void Merge(const Vector2& point)
+- void Merge(const Rect& rect)
+- void Clear()
+- void Clip(const Rect& rect)
+- Vector2 Center() const
+- Vector2 Size() const
+- Vector2 HalfSize() const
+- bool Equals(const Rect& rhs) const
+- Vector4 ToVector4() const
+- String ToString() const
+- min
+- max
+- static const Rect FULL
+- static const Rect POSITIVE
+- static const Rect ZERO
+
+ Properties:<br>
+- Vector2 center (readonly)
+- Vector2 size (readonly)
+- Vector2 halfSize (readonly)
+
+IntRect
+
+Methods:<br>
+- IntRect()
+- IntRect(int left, int top, int right, int bottom)
+- bool operator == (const IntRect& rhs) const
+- IntVector2 Size() const
+- int Width() const
+- int Height() const
+- left
+- top
+- right
+- bottom
+- static const IntRect ZERO
+
+ Properties:<br>
+- IntVector2 size (readonly)
+- int width (readonly)
+- int height (readonly)
+
+Sphere
+
+Methods:<br>
+- Sphere()
+- Sphere(const Sphere& sphere)
+- Sphere(const Vector3& center, float radius)
+- Sphere(const BoundingBox& box)
+- Sphere(const Frustum& frustum)
+- Sphere(const Polyhedron& poly)
+- bool operator == (const Sphere& rhs) const
+- void Define(const Sphere& sphere)
+- void Define(const Vector3& center, float radius)
+- void Define(const BoundingBox& box)
+- void Define(const Frustum& frustum)
+- void Define(const Polyhedron& poly)
+- void Merge(const Vector3& point)
+- void Merge(const BoundingBox& box)
+- void Merge(const Frustum& frustum)
+- void Merge(const Polyhedron& poly)
+- void Merge(const Sphere& sphere)
+- void Clear()
+- Intersection IsInside(const Vector3& point) const
+- Intersection IsInside(const Sphere& sphere) const
+- Intersection IsInsideFast(const Sphere& sphere) const
+- Intersection IsInside(const BoundingBox& box) const
+- Intersection IsInsideFast(const BoundingBox& box) const
+- float Distance(const Vector3& point) const
+- center
+- radius
+- defined
+
+StringHash
+
+Methods:<br>
+- StringHash()
+- StringHash(const StringHash& rhs)
+- explicit StringHash(unsigned value)
+- StringHash(const char* str)
+- StringHash(const String& str)
+- StringHash operator + (const StringHash& rhs) const
+- bool operator == (const StringHash& rhs) const
+- bool operator < (const StringHash& rhs) const
+- operator bool () const
+- unsigned Value() const
+- String ToString() const
+- unsigned ToHash() const
+- static unsigned Calculate(const char* str)
+- static const StringHash ZERO
+
+ Properties:<br>
+- unsigned value (readonly)
+
+ShortStringHash
+
+Methods:<br>
+- ShortStringHash()
+- ShortStringHash(const ShortStringHash& rhs)
+- explicit ShortStringHash(const StringHash& rhs)
+- explicit ShortStringHash(unsigned short value)
+- ShortStringHash(const char* str)
+- ShortStringHash(const String& str)
+- ShortStringHash operator + (const ShortStringHash& rhs) const
+- bool operator == (const ShortStringHash& rhs) const
+- bool operator < (const ShortStringHash& rhs) const
+- unsigned short Value() const
+- static unsigned short Calculate(const char* str)
+- static const ShortStringHash ZERO
+
+ Properties:<br>
+- unsigned short value (readonly)
+
+Vector2
+
+Methods:<br>
+- Vector2()
+- Vector2(const Vector2& vector)
+- Vector2(float x, float y)
+- Vector2(const float* data)
+- bool operator == (const Vector2& rhs) const
+- Vector2 operator + (const Vector2& rhs) const
+- Vector2 operator - () const
+- Vector2 operator - (const Vector2& rhs) const
+- Vector2 operator * (float rhs) const
+- Vector2 operator * (const Vector2& rhs) const
+- Vector2 operator / (float rhs) const
+- Vector2 operator / (const Vector2& rhs) const
+- Vector2 operator / (const Vector2& rhs) const
+- void Normalize()
+- float Length() const
+- float LengthSquared() const
+- float DotProduct(const Vector2& rhs) const
+- float AbsDotProduct(const Vector2& rhs) const
+- Vector2 Abs() const
+- Vector2 Lerp(const Vector2& rhs, float t) const
+- bool Equals(const Vector2& rhs) const
+- Vector2 Normalized() const
+- String ToString() const
+- x
+- y
+- static const Vector2 ZERO
+- static const Vector2 LEFT
+- static const Vector2 RIGHT
+- static const Vector2 UP
+- static const Vector2 DOWN
+- static const Vector2 ONE
+
+IntVector2
+
+Methods:<br>
+- IntVector2()
+- IntVector2(int x, int y)
+- IntVector2(const int* data)
+- IntVector2(const IntVector2& rhs)
+- bool operator == (const IntVector2& rhs) const
+- IntVector2 operator + (const IntVector2& rhs) const
+- IntVector2 operator - () const
+- IntVector2 operator - (const IntVector2& rhs) const
+- IntVector2 operator * (int rhs) const
+- IntVector2 operator / (int rhs) const
+- IntVector2 operator / (int rhs) const
+- String ToString() const
+- x
+- y
+- static const IntVector2 ZERO
+
+Vector3
+
+Methods:<br>
+- Vector3()
+- Vector3(const Vector3& vector)
+- Vector3(const Vector2& vector, float z)
+- Vector3(float x, float y, float z)
+- bool operator == (const Vector3& rhs) const
+- Vector3 operator + (const Vector3& rhs) const
+- Vector3 operator - () const
+- Vector3 operator - (const Vector3& rhs) const
+- Vector3 operator * (float rhs) const
+- Vector3 operator * (const Vector3& rhs) const
+- Vector3 operator / (float rhs) const
+- Vector3 operator / (const Vector3& rhs) const
+- Vector3 operator / (const Vector3& rhs) const
+- void Normalize()
+- float Length() const
+- float LengthSquared() const
+- float DotProduct(const Vector3& rhs) const
+- float AbsDotProduct(const Vector3& rhs) const
+- Vector3 CrossProduct(const Vector3& rhs) const
+- Vector3 Abs() const
+- Vector3 Lerp(const Vector3& rhs, float t) const
+- bool Equals(const Vector3& rhs) const
+- Vector3 Normalized() const
+- String ToString() const
+- x
+- y
+- z
+- static const Vector3 ZERO
+- static const Vector3 LEFT
+- static const Vector3 RIGHT
+- static const Vector3 UP
+- static const Vector3 DOWN
+- static const Vector3 FORWARD
+- static const Vector3 BACK
+- static const Vector3 ONE
+
+Vector4
+
+Methods:<br>
+- Vector4()
+- Vector4(const Vector4& vector)
+- Vector4(const Vector3& vector, float w)
+- Vector4(float x, float y, float z, float w)
+- bool operator == (const Vector4& rhs) const
+- Vector4 operator + (const Vector4& rhs) const
+- Vector4 operator - () const
+- Vector4 operator - (const Vector4& rhs) const
+- Vector4 operator * (float rhs) const
+- Vector4 operator * (const Vector4& rhs) const
+- Vector4 operator / (float rhs) const
+- Vector4 operator / (const Vector4& rhs) const
+- Vector4 operator / (const Vector4& rhs) const
+- float DotProduct(const Vector4& rhs) const
+- float AbsDotProduct(const Vector4& rhs) const
+- Vector4 Abs() const
+- Vector4 Lerp(const Vector4& rhs, float t) const
+- bool Equals(const Vector4& rhs) const
+- String ToString() const
+- x
+- y
+- z
+- w
+- static const Vector4 ZERO
+- static const Vector4 ONE
+
+Navigable : Component
+
+Methods:<br>
+- void SetRecursive(bool enable)
+- bool IsRecursive() const
+
+ Properties:<br>
+- bool recursive
+- struct NavigationGeometryInfo
+
+Methods:<br>
+- component
+- lodLevel
+- transform
+- boundingBox
+
+NavigationMesh : Component
+
+Methods:<br>
+- void SetTileSize(int size)
+- void SetCellSize(float size)
+- void SetCellHeight(float height)
+- void SetAgentHeight(float height)
+- void SetAgentRadius(float radius)
+- void SetAgentMaxClimb(float maxClimb)
+- void SetAgentMaxSlope(float maxSlope)
+- void SetRegionMinSize(float size)
+- void SetRegionMergeSize(float size)
+- void SetEdgeMaxLength(float length)
+- void SetEdgeMaxError(float error)
+- void SetDetailSampleDistance(float distance)
+- void SetDetailSampleMaxError(float error)
+- void SetPadding(const Vector3& padding)
+- bool Build()
+- bool Build(const BoundingBox& boundingBox)
+- FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
+- Vector3 GetRandomPoint()
+- Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE)
+- float GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE)
+- Vector3 Raycast(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
+- void DrawDebugGeometry(bool depthTest)
+- int GetTileSize() const
+- float GetCellSize() const
+- float GetCellHeight() const
+- float GetAgentHeight() const
+- float GetAgentRadius() const
+- float GetAgentMaxClimb() const
+- float GetAgentMaxSlope() const
+- float GetRegionMinSize() const
+- float GetRegionMergeSize() const
+- float GetEdgeMaxLength() const
+- float GetEdgeMaxError() const
+- float GetDetailSampleDistance() const
+- float GetDetailSampleMaxError() const
+- const Vector3& GetPadding() const
+- bool IsInitialized() const
+- const BoundingBox& GetBoundingBox() const
+- BoundingBox GetWorldBoundingBox() const
+- IntVector2 GetNumTiles() const
+
+ Properties:<br>
+- int tileSize
+- float cellSize
+- float cellHeight
+- float agentHeight
+- float agentRadius
+- float agentMaxClimb
+- float agentMaxSlope
+- float regionMinSize
+- float regionMergeSize
+- float edgeMaxLength
+- float edgeMaxError
+- float detailSampleDistance
+- float detailSampleMaxError
+- Vector3& padding
+- bool initialized (readonly)
+- BoundingBox& boundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
+- IntVector2 numTiles (readonly)
+
+OffMeshConnection : Component
+
+Methods:<br>
+- void SetEndPoint(Node* node)
+- void SetRadius(float radius)
+- void SetBidirectional(bool enabled)
+- Node* GetEndPoint() const
+- float GetRadius() const
+- bool IsBidirectional() const
+
+ Properties:<br>
+- Node* endPoint
+- float radius
+- bool bidirectional
+- struct RemoteEvent
+
+Methods:<br>
+- senderID
+- eventType
+- eventData
+- inOrder
+
+Connection : Object
+
+Methods:<br>
+- void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0)
+- void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0)
+- void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void SendRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void SendRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void SetScene(Scene* newScene)
+- void SetIdentity(const VariantMap& identity)
+- void SetControls(const Controls& newControls)
+- void SetPosition(const Vector3& position)
+- void SetConnectPending(bool connectPending)
+- void SetLogStatistics(bool enable)
+- void Disconnect(int waitMSec = 0)
+- void SendServerUpdate()
+- void SendClientUpdate()
+- void SendRemoteEvents()
+- void SendPackages()
+- void ProcessPendingLatestData()
+- bool ProcessMessage(int msgID, MemoryBuffer& msg)
+- const VariantMap& GetIdentity() const
+- Scene* GetScene() const
+- const Controls& GetControls() const
+- const Vector3& GetPosition() const
+- bool IsClient() const
+- bool IsConnected() const
+- bool IsConnectPending() const
+- bool IsSceneLoaded() const
+- bool GetLogStatistics() const
+- String GetAddress() const
+- unsigned short GetPort() const
+- String ToString() const
+- unsigned GetNumDownloads() const
+- const String& GetDownloadName() const
+- float GetDownloadProgress() const
+
+ Properties:<br>
+- VariantMap& identity
+- Scene* scene
+- Controls& controls
+- Vector3& position
+- bool client (readonly)
+- bool connected (readonly)
+- bool connectPending
+- bool sceneLoaded (readonly)
+- bool logStatistics
+- String address (readonly)
+- unsigned short port (readonly)
+- unsigned numDownloads (readonly)
+- String& downloadName (readonly)
+- float downloadProgress (readonly)
+
+Controls
+
+Methods:<br>
+- void Reset()
+- void Set(unsigned buttons, bool down = true)
+- bool IsDown(unsigned button) const
+- bool IsPressed(unsigned button, const Controls& previousControls) const
+- buttons
+- yaw
+- pitch
+- extraData
+
+Network
+
+Methods:<br>
+- bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap)
+- bool Connect(const char* address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap)
+- void Disconnect(int waitMSec = 0)
+- bool StartServer(unsigned short port)
+- void StopServer()
+- void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0)
+- void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void BroadcastRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void BroadcastRemoteEvent(Scene* scene, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void BroadcastRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void SetUpdateFps(int fps)
+- void RegisterRemoteEvent(StringHash eventType)
+- void RegisterRemoteEvent(const char* eventType)
+- void UnregisterRemoteEvent(StringHash eventType)
+- void UnregisterRemoteEvent(const char* eventType)
+- void UnregisterAllRemoteEvents()
+- void SetPackageCacheDir(const String& path)
+- void SetPackageCacheDir(const char* path)
+- int GetUpdateFps() const
+- Connection* GetServerConnection() const
+- bool IsServerRunning() const
+- bool CheckRemoteEvent(StringHash eventType) const
+- bool CheckRemoteEvent(const char* eventType) const
+- const String& GetPackageCacheDir() const
+
+ Properties:<br>
+- int updateFps
+- Connection* serverConnection (readonly)
+- bool serverRunning (readonly)
+- String& packageCacheDir
+
+NetworkPriority : Component
+
+Methods:<br>
+- void SetBasePriority(float priority)
+- void SetDistanceFactor(float factor)
+- void SetMinPriority(float priority)
+- void SetAlwaysUpdateOwner(bool enable)
+- float GetBasePriority() const
+- float GetDistanceFactor() const
+- float GetMinPriority() const
+- bool GetAlwaysUpdateOwner() const
+- bool CheckUpdate(float distance, float& accumulator)
+
+ Properties:<br>
+- float basePriority
+- float distanceFactor
+- float minPriority
+- bool alwaysUpdateOwner
+
+CollisionShape : Component
+
+Methods:<br>
+- void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+- void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+- void SetStaticPlane(const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+- void SetCylinder(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+- void SetCapsule(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+- void SetCone(float diameter, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+- void SetTriangleMesh(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+- void SetConvexHull(Model* model, unsigned lodLevel = 0, const Vector3& scale = Vector3::ONE, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
+- void SetTerrain()
+- void SetShapeType(ShapeType type)
+- void SetSize(const Vector3& size)
+- void SetPosition(const Vector3& position)
+- void SetRotation(const Quaternion& rotation)
+- void SetTransform(const Vector3& position, const Quaternion& rotation)
+- void SetMargin(float margin)
+- void SetModel(Model* model)
+- void SetLodLevel(unsigned lodLevel)
+- PhysicsWorld* GetPhysicsWorld() const
+- ShapeType GetShapeType() const
+- const Vector3& GetSize() const
+- const Vector3& GetPosition() const
+- const Quaternion& GetRotation() const
+- float GetMargin() const
+- Model* GetModel() const
+- unsigned GetLodLevel() const
+- BoundingBox GetWorldBoundingBox() const
+- void NotifyRigidBody(bool updateMass = true)
+- void SetModelAttr(ResourceRef value)
+- ResourceRef GetModelAttr() const
+- void ReleaseShape()
+
+ Properties:<br>
+- PhysicsWorld* physicsWorld (readonly)
+- ShapeType shapeType
+- Vector3& size
+- Vector3& position
+- Quaternion& rotation
+- float margin
+- Model* model
+- unsigned lodLevel
+- BoundingBox worldBoundingBox (readonly)
+- ResourceRef modelAttr
+
+Constraint : Component
+
+Methods:<br>
+- void SetConstraintType(ConstraintType type)
+- void SetOtherBody(RigidBody* body)
+- void SetPosition(const Vector3& position)
+- void SetRotation(const Quaternion& rotation)
+- void SetAxis(const Vector3& axis)
+- void SetOtherPosition(const Vector3& position)
+- void SetOtherRotation(const Quaternion& rotation)
+- void SetOtherAxis(const Vector3& axis)
+- void SetWorldPosition(const Vector3& position)
+- void SetHighLimit(const Vector2& limit)
+- void SetLowLimit(const Vector2& limit)
+- void SetERP(float erp)
+- void SetCFM(float cfm)
+- void SetDisableCollision(bool disable)
+- PhysicsWorld* GetPhysicsWorld() const
+- ConstraintType GetConstraintType() const
+- RigidBody* GetOwnBody() const
+- RigidBody* GetOtherBody() const
+- const Vector3& GetPosition() const
+- const Quaternion& GetRotation() const
+- const Vector3& GetOtherPosition() const
+- const Quaternion& GetOtherRotation() const
+- Vector3 GetWorldPosition() const
+- const Vector2& GetHighLimit() const
+- const Vector2& GetLowLimit() const
+- float GetERP() const
+- float GetCFM() const
+- bool GetDisableCollision() const
+- void ReleaseConstraint()
+- void ApplyFrames()
+
+ Properties:<br>
+- PhysicsWorld* physicsWorld (readonly)
+- ConstraintType constraintType
+- RigidBody* ownBody (readonly)
+- RigidBody* otherBody
+- Vector3& position
+- Quaternion& rotation
+- Vector3& otherPosition
+- Quaternion& otherRotation
+- Vector3 worldPosition
+- Vector2& highLimit
+- Vector2& lowLimit
+- float ERP
+- float CFM
+- bool disableCollision
+- struct PhysicsRaycastResult
+
+Methods:<br>
+- PhysicsRaycastResult()
+- position
+- normal
+- distance
+- body
+- struct DelayedWorldTransform
+
+Methods:<br>
+- rigidBody
+- parentRigidBody
+- worldPosition
+- worldRotation
+
+PhysicsWorld : Component
+
+Methods:<br>
+- void Update(float timeStep)
+- void UpdateCollisions()
+- void SetFps(int fps)
+- void SetGravity(Vector3 gravity)
+- void SetNumIterations(int num)
+- void SetInterpolation(bool enable)
+- void SetInternalEdge(bool enable)
+- void SetSplitImpulse(bool enable)
+- void SetMaxNetworkAngularVelocity(float velocity)
+- RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- / void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- Vector3 GetGravity() const
+- int GetNumIterations() const
+- bool GetInterpolation() const
+- bool GetInternalEdge() const
+- bool GetSplitImpulse() const
+- int GetFps() const
+- float GetMaxNetworkAngularVelocity() const
+- void AddRigidBody(RigidBody* body)
+- void RemoveRigidBody(RigidBody* body)
+- void AddCollisionShape(CollisionShape* shape)
+- void RemoveCollisionShape(CollisionShape* shape)
+- void AddConstraint(Constraint* joint)
+- void RemoveConstraint(Constraint* joint)
+- void AddDelayedWorldTransform(const DelayedWorldTransform& transform)
+- void DrawDebugGeometry(bool depthTest)
+- void SetDebugRenderer(DebugRenderer* debug)
+- void SetDebugDepthTest(bool enable)
+- void CleanupGeometryCache()
+- void SetApplyingTransforms(bool enable)
+- bool IsApplyingTransforms() const
+
+ Properties:<br>
+- Vector3 gravity
+- int numIterations
+- bool interpolation
+- bool internalEdge
+- bool splitImpulse
+- int fps
+- float maxNetworkAngularVelocity
+- bool applyingTransforms
+
+RigidBody : Component
+
+Methods:<br>
+- void SetMass(float mass)
+- void SetPosition(Vector3 position)
+- void SetRotation(Quaternion rotation)
+- void SetTransform(const Vector3& position, const Quaternion& rotation)
+- void SetLinearVelocity(Vector3 velocity)
+- void SetLinearFactor(Vector3 factor)
+- void SetLinearRestThreshold(float threshold)
+- void SetLinearDamping(float damping)
+- void SetAngularVelocity(Vector3 angularVelocity)
+- void SetAngularFactor(Vector3 factor)
+- void SetAngularRestThreshold(float threshold)
+- void SetAngularDamping(float factor)
+- void SetFriction(float friction)
+- void SetRollingFriction(float friction)
+- void SetRestitution(float restitution)
+- void SetContactProcessingThreshold(float threshold)
+- void SetCcdRadius(float radius)
+- void SetCcdMotionThreshold(float threshold)
+- void SetUseGravity(bool enable)
+- void SetGravityOverride(const Vector3& gravity)
+- void SetKinematic(bool enable)
+- void SetPhantom(bool enable)
+- void SetCollisionLayer(unsigned layer)
+- void SetCollisionMask(unsigned mask)
+- void SetCollisionLayerAndMask(unsigned layer, unsigned mask)
+- void SetCollisionEventMode(CollisionEventMode mode)
+- void ApplyForce(const Vector3& force)
+- void ApplyForce(const Vector3& force, const Vector3& position)
+- void ApplyTorque(const Vector3& torque)
+- void ApplyImpulse(const Vector3& impulse)
+- void ApplyImpulse(const Vector3& impulse, const Vector3& position)
+- void ApplyTorqueImpulse(const Vector3& torque)
+- void ResetForces()
+- void Activate()
+- void ReAddBodyToWorld()
+- PhysicsWorld* GetPhysicsWorld() const
+- float GetMass() const
+- Vector3 GetPosition() const
+- Quaternion GetRotation() const
+- Vector3 GetLinearVelocity() const
+- Vector3 GetLinearFactor() const
+- Vector3 GetVelocityAtPoint(const Vector3& position) const
+- float GetLinearRestThreshold() const
+- float GetLinearDamping() const
+- Vector3 GetAngularVelocity() const
+- Vector3 GetAngularFactor() const
+- float GetAngularRestThreshold() const
+- float GetAngularDamping() const
+- float GetFriction() const
+- float GetRollingFriction() const
+- float GetRestitution() const
+- float GetContactProcessingThreshold() const
+- float GetCcdRadius() const
+- float GetCcdMotionThreshold() const
+- bool GetUseGravity() const
+- const Vector3& GetGravityOverride() const
+- const Vector3& GetCenterOfMass() const
+- bool IsKinematic() const
+- bool IsPhantom() const
+- bool IsActive() const
+- unsigned GetCollisionLayer() const
+- unsigned GetCollisionMask() const
+- CollisionEventMode GetCollisionEventMode() const
+- void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
+- void UpdateMass()
+- void UpdateGravity()
+- void AddConstraint(Constraint* constraint)
+- void RemoveConstraint(Constraint* constraint)
+- void ReleaseBody()
+
+ Properties:<br>
+- PhysicsWorld* physicsWorld (readonly)
+- float mass
+- Vector3 position
+- Quaternion rotation
+- Vector3 linearVelocity
+- Vector3 linearFactor
+- float linearRestThreshold
+- float linearDamping
+- Vector3 angularVelocity
+- Vector3 angularFactor
+- float angularRestThreshold
+- float angularDamping
+- float friction
+- float rollingFriction
+- float restitution
+- float contactProcessingThreshold
+- float ccdRadius
+- float ccdMotionThreshold
+- bool useGravity
+- Vector3& gravityOverride
+- Vector3& centerOfMass (readonly)
+- bool kinematic
+- bool phantom
+- bool active (readonly)
+- unsigned collisionLayer
+- unsigned collisionMask
+- CollisionEventMode collisionEventMode
+
+Image : Resource
+
+Methods:<br>
+- void FlipVertical()
+- bool SaveBMP(const char* fileName)
+- bool SavePNG(const char* fileName)
+- bool SaveTGA(const char* fileName)
+- bool SaveJPG(const char* fileName, int quality)
+- int GetWidth() const
+- int GetHeight() const
+- unsigned GetComponents() const
+- bool IsCompressed() const
+- CompressedFormat GetCompressedFormat() const
+- unsigned GetNumCompressedLevels() const
+- CompressedLevel GetCompressedLevel(unsigned index) const
+
+ Properties:<br>
+- int width (readonly)
+- int height (readonly)
+- unsigned components (readonly)
+- bool compressed (readonly)
+- CompressedFormat compressedFormat (readonly)
+- unsigned numCompressedLevels (readonly)
+
+Resource
+
+Methods:<br>
+- const String& GetName() const
+- StringHash GetNameHash() const
+- unsigned GetMemoryUse() const
+
+ Properties:<br>
+- String& name (readonly)
+- StringHash nameHash (readonly)
+- unsigned memoryUse (readonly)
+
+ResourceCache
+    
+Methods:<br>
+-     
+- void ReleaseAllResources(bool force = false)
+- bool ReloadResource(Resource* resource)
+- void SetMemoryBudget(ShortStringHash type, unsigned budget)
+- void SetMemoryBudget(const char* type, unsigned budget)
+- void SetAutoReloadResources(bool enable)
+- Resource* GetResource(const char* type, const String& name)
+- Resource* GetResource(const char* type, const char* name)
+- bool Exists(const String& name) const
+- bool Exists(StringHash nameHash) const
+- unsigned GetMemoryBudget(ShortStringHash type) const
+- unsigned GetMemoryUse(ShortStringHash type) const
+- unsigned GetTotalMemoryUse() const
+- const String& GetResourceName(StringHash nameHash) const
+- String GetResourceFileName(const String& name) const
+- bool GetAutoReloadResources() const
+
+ Properties:<br>
+- unsigned totalMemoryUse (readonly)
+- bool autoReloadResources (readonly)
+
+XMLElement
+
+Methods:<br>
+- bool IsNull() const
+- bool NotNull() const
+- operator bool () const
+- String GetName() const
+- bool HasChild(const String& name) const
+- bool HasChild(const char* name) const
+- XMLElement GetChild(const String& name = String::EMPTY) const
+- XMLElement GetChild(const char* name) const
+- XMLElement GetNext(const String& name = String::EMPTY) const
+- XMLElement GetNext(const char* name) const
+- XMLElement GetParent() const
+- unsigned GetNumAttributes() const
+- bool HasAttribute(const String& name) const
+- bool HasAttribute(const char* name) const
+- bool GetBool(const char* name) const
+- BoundingBox GetBoundingBox() const
+- Color GetColor(const String& name) const
+- Color GetColor(const char* name) const
+- float GetFloat(const String& name) const
+- float GetFloat(const char* name) const
+- unsigned GetUInt(const String& name) const
+- unsigned GetUInt(const char* name) const
+- int GetInt(const String& name) const
+- int GetInt(const char* name) const
+- IntRect GetIntRect(const String& name) const
+- IntRect GetIntRect(const char* name) const
+- IntVector2 GetIntVector2(const String& name) const
+- IntVector2 GetIntVector2(const char* name) const
+- Rect GetRect(const String& name) const
+- Rect GetRect(const char* name) const
+- Quaternion GetQuaternion(const String& name) const
+- Quaternion GetQuaternion(const char* name) const
+- Variant GetVariant() const
+- Variant GetVariantValue(VariantType type) const
+- ResourceRef GetResourceRef() const
+- ResourceRefList GetResourceRefList() const
+- VariantMap GetVariantMap() const
+- Vector2 GetVector2(const String& name) const
+- Vector2 GetVector2(const char* name) const
+- Vector3 GetVector3(const String& name) const
+- Vector3 GetVector3(const char* name) const
+- Vector4 GetVector4(const String& name) const
+- Vector4 GetVector4(const char* name) const
+- Vector4 GetVector(const String& name) const
+- Vector4 GetVector(const char* name) const
+- XMLFile* GetFile() const
+- static const XMLElement EMPTY
+
+ Properties:<br>
+- bool null (readonly)
+- String name (readonly)
+- XMLElement parent (readonly)
+- unsigned numAttributes (readonly)
+- XMLFile* file (readonly)
+
+XMLFile : Resource
+
+Methods:<br>
+- XMLElement GetRoot(const String& name = String::EMPTY)
+- XMLElement GetRoot(const char* name)
+
+Component : Serializable
+
+Methods:<br>
+- void SetEnabled(bool enable)
+- void Remove()
+- unsigned GetID() const
+- Node* GetNode() const
+- Scene* GetScene() const
+- bool IsEnabled() const
+- bool IsEnabledEffective() const
+- Component* GetComponent(ShortStringHash type) const
+- Component* GetComponent(const char* type) const
+
+Node : Serializable
+
+Methods:<br>
+- Node(Context* context)
+- virtual ~Node()
+- bool SaveXML(Serializer& dest) const
+- void SetName(const String& name)
+- void SetPosition(const Vector3& position)
+- SetPositionXYZ(float x, float y, float z)
+- void SetRotation(const Quaternion& rotation)
+- SetRotationXYZ(float x, float y, float z)
+- void SetDirection(const Vector3& direction)
+- SetDirectionXYZ(float x, float y, float z)
+- void SetScale(float scale)
+- void SetScale(const Vector3& scale)
+- SetScaleXYZ(float x, float y, float z)
+- void SetTransform(const Vector3& position, const Quaternion& rotation)
+- void SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
+- void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+- void SetWorldPosition(const Vector3& position)
+- SetWorldPositionXYZ(float x, float y, float z)
+- void SetWorldRotation(const Quaternion& rotation)
+- SetWorldRotationXYZ(float x, float y, float z)
+- void SetWorldDirection(const Vector3& direction)
+- SetWorldDirectionXYZ(float x, float y, float z)
+- void SetWorldScale(float scale)
+- void SetWorldScale(const Vector3& scale)
+- SetWorldScaleXYZ(float x, float y, float z)
+- void SetWorldTransform(const Vector3& position, const Quaternion& rotation)
+- void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale)
+- void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
+- void Translate(const Vector3& delta)
+- TranslateXYZ(float x, float y, float z)
+- void TranslateRelative(const Vector3& delta)
+- TranslateRelativeXYZ(float x, float y, float z)
+- void Rotate(const Quaternion& delta, bool fixedAxis = false)
+- RotateXYZ(float x, float y, float z, bool fixedAxis = false)
+- void Pitch(float angle, bool fixedAxis = false)
+- void Yaw(float angle, bool fixedAxis = false)
+- void Roll(float angle, bool fixedAxis = false)
+- void LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP)
+- LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 0.0f, float upZ =  1.0f)
+- void Scale(float scale)
+- void Scale(const Vector3& scale)
+- ScaleXYZ(float x, float y, float z)
+- void SetEnabled(bool enable)
+- void SetEnabled(bool enable, bool recursive)
+- void SetOwner(Connection* owner)
+- void MarkDirty()
+- Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
+- Node* CreateChild(const char* name = 0, CreateMode mode = REPLICATED, unsigned id = 0)
+- void AddChild(Node* node)
+- void RemoveChild(Node* node)
+- void RemoveAllChildren()
+- void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive)
+- void RemoveComponent(Component* component)
+- void RemoveComponent(ShortStringHash type)
+- void RemoveComponent(const char* type)
+- void RemoveAllComponents()
+- void RemoveComponents(bool removeReplicated, bool removeLocal)
+- Node* Clone(CreateMode mode = REPLICATED)
+- void Remove()
+- void SetParent(Node* parent)
+- void SetVar(ShortStringHash key, const Variant& value)
+- void AddListener(Component* component)
+- void RemoveListener(Component* component)
+- Component* CreateComponent(const char* type, CreateMode mode = REPLICATED, unsigned id = 0)
+- unsigned GetID() const
+- const String& GetName() const
+- StringHash GetNameHash() const
+- Node* GetParent() const
+- Scene* GetScene() const
+- bool IsEnabled() const
+- Connection* GetOwner() const
+- const Vector3& GetPosition() const
+- float, float, float GetPositionXYZ() const
+- const Quaternion& GetRotation() const
+- float, float, float GetRotationXYZ() const
+- float, float, float, float GetRotationWXYZ() const
+- Vector3 GetDirection() const
+- float, float, float GetDirectionXYZ() const
+- const Vector3& GetScale() const
+- float, float, float GetScaleXYZ() const
+- Matrix3x4 GetTransform() const
+- Vector3 GetWorldPosition() const
+- float, float, float GetWorldPositionXYZ() const
+- Quaternion GetWorldRotation() const
+- float, float, float GetWorldRotationXYZ() const
+- w, float, float, float GetWorldRotationWXYZ() const
+- Vector3 GetWorldDirection() const
+- float, float, float GetWorldDirectionXYZ() const
+- Vector3 GetWorldScale() const
+- float, float, float GetWorldScaleXYZ() const
+- const Matrix3x4& GetWorldTransform() const
+- Vector3 LocalToWorld(const Vector3& position) const
+- Vector3 LocalToWorld(const Vector4& vector) const
+- Vector3 WorldToLocal(const Vector3& position) const
+- Vector3 WorldToLocal(const Vector4& vector) const
+- bool IsDirty() const
+- unsigned GetNumChildren(bool recursive = false) const
+- Node* GetChild(unsigned index) const
+- Node* GetChild(const String& name, bool recursive = false) const
+- Node* GetChild(const char* name, bool recursive = false) const
+- Node* GetChild(StringHash nameHash, bool recursive = false) const
+- unsigned GetNumComponents() const
+- unsigned GetNumNetworkComponents() const
+- bool HasComponent(ShortStringHash type) const
+- bool HasComponent(const char* type) const
+- const Variant& GetVar(ShortStringHash key) const
+- const VariantMap& GetVars() const
+- Component* GetComponent(const char* type) const
+- void SetID(unsigned id)
+- void SetScene(Scene* scene)
+- void ResetScene()
+- bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
+- bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
+- Node* CreateChild(unsigned id, CreateMode mode)
+- void AddComponent(Component* component, unsigned id, CreateMode mode)
+
+ Properties:<br>
+- unsigned ID
+- String& name
+- StringHash nameHash (readonly)
+- Node* parent
+- Scene* scene
+- bool enabled
+- Connection* owner
+- Vector3& position
+- Quaternion& rotation
+- Vector3 direction
+- Vector3& scale
+- Matrix3x4 transform (readonly)
+- Vector3 worldPosition
+- Quaternion worldRotation
+- Vector3 worldDirection
+- Vector3 worldScale
+- Matrix3x4& worldTransform (readonly)
+- bool dirty (readonly)
+- unsigned numComponents (readonly)
+- unsigned numNetworkComponents (readonly)
+
+Scene : Node
+
+Methods:<br>
+- Scene(Context* context)
+- virtual ~Scene()
+- bool LoadXML(Deserializer& source)
+- bool SaveXML(Serializer& dest) const
+- bool LoadAsync(File* file)
+- bool LoadAsyncXML(File* file)
+- void StopAsyncLoading()
+- void Clear(bool clearReplicated = true, bool clearLocal = true)
+- void SetUpdateEnabled(bool enable)
+- void SetTimeScale(float scale)
+- void SetElapsedTime(float time)
+- void SetSmoothingConstant(float constant)
+- void SetSnapThreshold(float threshold)
+- bool IsUpdateEnabled() const
+- bool IsAsyncLoading() const
+- float GetAsyncProgress() const
+- const String& GetFileName() const
+- unsigned GetChecksum() const
+- float GetTimeScale() const
+- float GetElapsedTime() const
+- float GetSmoothingConstant() const
+- float GetSnapThreshold() const
+- const String& GetVarName(ShortStringHash hash) const
+- void Update(float timeStep)
+- void BeginThreadedUpdate()
+- void EndThreadedUpdate()
+- void DelayedMarkedDirty(Component* component)
+- bool IsThreadedUpdate() const
+- unsigned GetFreeNodeID(CreateMode mode)
+- unsigned GetFreeComponentID(CreateMode mode)
+- void NodeAdded(Node* node)
+- void NodeRemoved(Node* node)
+- void ComponentAdded(Component* component)
+- void ComponentRemoved(Component* component)
+- void SetVarNamesAttr(String value)
+- String GetVarNamesAttr() const
+- void PrepareNetworkUpdate()
+- void CleanupConnection(Connection* connection)
+- void MarkNetworkUpdate(Node* node)
+- void MarkNetworkUpdate(Component* component)
+- void MarkReplicationDirty(Node* node)
+
+ Properties:<br>
+- bool updateEnabled
+- bool asyncLoading (readonly)
+- float asyncProgress (readonly)
+- const String& fileName
+- unsigned checksum (readonly)
+- float timeScale
+- float elapsedTime
+- float smoothingConstant
+- float snapThreshold
+- bool threadedUpdate (readonly)
+- String varNamesAttr
+
+Serializable : Object
+
+Methods:<br>
+- void SetTemporary(bool enable)
+- bool IsTemporary() const
+
+ Properties:<br>
+- bool temporary
+
+BorderImage : UIElement
+
+Methods:<br>
+- BorderImage(Context* context)
+- virtual ~BorderImage()
+- void SetTexture(Texture* texture)
+- void SetImageRect(const IntRect& rect)
+- void SetFullImageRect()
+- void SetBorder(const IntRect& rect)
+- void SetHoverOffset(const IntVector2& offset)
+- void SetHoverOffset(int x, int y)
+- void SetBlendMode(BlendMode mode)
+- void SetTiled(bool enable)
+- Texture* GetTexture() const
+- const IntRect& GetImageRect() const
+- const IntRect& GetBorder() const
+- const IntVector2& GetHoverOffset() const
+- BlendMode GetBlendMode() const
+- bool IsTiled() const
+- void SetTextureAttr(ResourceRef value)
+- ResourceRef GetTextureAttr() const
+
+ Properties:<br>
+- Texture* texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- BlendMode blendMode
+- bool tiled
+- ResourceRef textureAttr
+
+Button : BorderImage
+
+Methods:<br>
+- Button(Context* context)
+- virtual ~Button()
+- void SetPressedOffset(const IntVector2& offset)
+- void SetPressedOffset(int x, int y)
+- void SetPressedChildOffset(const IntVector2& offset)
+- void SetPressedChildOffset(int x, int y)
+- void SetRepeat(float delay, float rate)
+- void SetRepeatDelay(float delay)
+- void SetRepeatRate(float rate)
+- const IntVector2& GetPressedOffset() const
+- const IntVector2& GetPressedChildOffset() const
+- float GetRepeatDelay() const
+- float GetRepeatRate() const
+- bool IsPressed() const
+
+ Properties:<br>
+- IntVector2& pressedOffset
+- IntVector2& pressedChildOffset
+- float repeatDelay
+- float repeatRate
+- bool pressed (readonly)
+
+CheckBox : BorderImage
+
+Methods:<br>
+- CheckBox(Context* context)
+- virtual ~CheckBox()
+- void SetChecked(bool enable)
+- void SetCheckedOffset(const IntVector2& rect)
+- void SetCheckedOffset(int x, int y)
+- bool IsChecked() const
+- const IntVector2& GetCheckedOffset() const
+
+ Properties:<br>
+- bool checked
+- IntVector2& checkedOffset
+
+Cursor : BorderImage
+
+Methods:<br>
+- Cursor(Context* context)
+- virtual ~Cursor()
+- void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot)
+- void SetShape(CursorShape shape)
+- void SetUseSystemShapes(bool enable)
+- CursorShape GetShape() const
+- bool GetUseSystemShapes() const
+
+ Properties:<br>
+- CursorShape shape
+- bool useSystemShapes
+
+DropDownList : Menu
+
+Methods:<br>
+- DropDownList(Context* context)
+- ~DropDownList()
+- void AddItem(UIElement* item)
+- void InsertItem(unsigned index, UIElement* item)
+- void RemoveItem(UIElement* item)
+- void RemoveItem(unsigned index)
+- void RemoveAllItems()
+- void SetSelection(unsigned index)
+- void SetPlaceholderText(const String& text)
+- void SetPlaceholderText(const const char* text)
+- void SetResizePopup(bool enable)
+- unsigned GetNumItems() const
+- UIElement* GetItem(unsigned index) const
+- unsigned GetSelection() const
+- UIElement* GetSelectedItem() const
+- ListView* GetListView() const
+- UIElement* GetPlaceholder() const
+- const String& GetPlaceholderText() const
+- bool GetResizePopup() const
+- void SetSelectionAttr(unsigned index)
+
+ Properties:<br>
+- unsigned numItems (readonly)
+- unsigned selection
+- UIElement* selectedItem (readonly)
+- ListView* listView (readonly)
+- UIElement* placeholder (readonly)
+- String& placeholderText
+- bool resizePopup
+- struct FileSelectorEntry
+
+Methods:<br>
+- name
+- directory
+
+FileSelector : Object
+
+Methods:<br>
+- FileSelector(Context* context)
+- virtual ~FileSelector()
+- void SetDefaultStyle(XMLFile* style)
+- void SetTitle(const String& text)
+- void SetTitle(const char* text)
+- void SetButtonTexts(const String& okText, const String& cancelText)
+- void SetButtonTexts(const char* okText, const char* cancelText)
+- void SetPath(const String& path)
+- void SetPath(const char* path)
+- void SetFileName(const String& fileName)
+- void SetFileName(const char* fileName)
+- void SetFilters(const Vector<String>& filters, unsigned defaultIndex)
+- void SetDirectoryMode(bool enable)
+- void UpdateElements()
+- XMLFile* GetDefaultStyle() const
+- Window* GetWindow() const
+- Text* GetTitleText() const
+- ListView* GetFileList() const
+- LineEdit* GetPathEdit() const
+- LineEdit* GetFileNameEdit() const
+- DropDownList* GetFilterList() const
+- Button* GetOKButton() const
+- Button* GetCancelButton() const
+- Button* GetCloseButton() const
+- const String& GetTitle() const
+- const String& GetPath() const
+- const String& GetFileName() const
+- const String& GetFilter() const
+- unsigned GetFilterIndex() const
+- bool GetDirectoryMode() const
+
+ Properties:<br>
+- XMLFile* defaultStyle
+- Window* window (readonly)
+- Text* titleText (readonly)
+- ListView* fileList (readonly)
+- LineEdit* pathEdit (readonly)
+- LineEdit* fileNameEdit (readonly)
+- DropDownList* filterList (readonly)
+- Button* OKButton (readonly)
+- Button* cancelButton (readonly)
+- Button* closeButton (readonly)
+- String& title
+- String& path
+- String& fileName
+- String& filter (readonly)
+- unsigned filterIndex (readonly)
+- bool directoryMode
+
+Font : Resource
+
+Methods:<br>
+
+LineEdit : BorderImage
+
+Methods:<br>
+- LineEdit(Context* context)
+- virtual ~LineEdit()
+- void SetText(const String& text)
+- void SetText(const char* text)
+- void SetCursorPosition(unsigned position)
+- void SetCursorBlinkRate(float rate)
+- void SetMaxLength(unsigned length)
+- void SetEchoCharacter(unsigned c)
+- void SetCursorMovable(bool enable)
+- void SetTextSelectable(bool enable)
+- void SetTextCopyable(bool enable)
+- const String& GetText() const
+- unsigned GetCursorPosition() const
+- float GetCursorBlinkRate() const
+- unsigned GetMaxLength() const
+- unsigned GetEchoCharacter() const
+- bool IsCursorMovable() const
+- bool IsTextSelectable() const
+- bool IsTextCopyable() const
+- Text* GetTextElement() const
+- BorderImage* GetCursor() const
+
+ Properties:<br>
+- String& text
+- unsigned cursorPosition
+- float cursorBlinkRate
+- unsigned maxLength
+- unsigned echoCharacter
+- bool cursorMovable
+- bool textSelectable
+- bool textCopyable
+- Text* textElement (readonly)
+- BorderImage* cursor (readonly)
+
+ListView : ScrollView
+
+Methods:<br>
+- ListView(Context* context)
+- virtual ~ListView()
+- void AddItem(UIElement* item)
+- void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0)
+- void RemoveItem(UIElement* item, unsigned index = 0)
+- void RemoveItem(unsigned index)
+- void RemoveAllItems()
+- void SetSelection(unsigned index)
+- void AddSelection(unsigned index)
+- void RemoveSelection(unsigned index)
+- void ToggleSelection(unsigned index)
+- void ChangeSelection(int delta, bool additive = false)
+- void ClearSelection()
+- void SetHighlightMode(HighlightMode mode)
+- void SetMultiselect(bool enable)
+- void SetHierarchyMode(bool enable)
+- void SetBaseIndent(int baseIndent)
+- void SetClearSelectionOnDefocus(bool enable)
+- void Expand(unsigned index, bool enable, bool recursive = false)
+- void ToggleExpand(unsigned index, bool recursive = false)
+- unsigned GetNumItems() const
+- UIElement* GetItem(unsigned index) const
+- unsigned FindItem(UIElement* item) const
+- unsigned GetSelection() const
+- UIElement* GetSelectedItem() const
+- bool IsSelected(unsigned index) const
+- bool IsExpanded(unsigned index) const
+- HighlightMode GetHighlightMode() const
+- bool GetMultiselect() const
+- bool GetClearSelectionOnDefocus() const
+- bool GetHierarchyMode() const
+- int GetBaseIndent() const
+
+ Properties:<br>
+- unsigned numItems (readonly)
+- unsigned selection
+- UIElement* selectedItem (readonly)
+- HighlightMode highlightMode
+- bool multiselect
+- bool clearSelectionOnDefocus
+- bool hierarchyMode
+- int baseIndent
+
+Menu : Button
+
+Methods:<br>
+- Menu(Context* context)
+- virtual ~Menu()
+- void SetPopup(UIElement* element)
+- void SetPopupOffset(const IntVector2& offset)
+- void SetPopupOffset(int x, int y)
+- void ShowPopup(bool enable)
+- void SetAccelerator(int key, int qualifiers)
+- UIElement* GetPopup() const
+- const IntVector2& GetPopupOffset() const
+- bool GetShowPopup() const
+- int GetAcceleratorKey() const
+- int GetAcceleratorQualifiers() const
+
+ Properties:<br>
+- UIElement* popup
+- IntVector2& popupOffset
+- bool showPopup
+- int acceleratorKey (readonly)
+- int acceleratorQualifiers (readonly)
+
+ScrollBar : UIElement
+
+Methods:<br>
+- ScrollBar(Context* context)
+- virtual ~ScrollBar()
+- void SetOrientation(Orientation orientation)
+- void SetRange(float range)
+- void SetValue(float value)
+- void ChangeValue(float delta)
+- void SetScrollStep(float step)
+- void SetStepFactor(float factor)
+- void StepBack()
+- void StepForward()
+- Orientation GetOrientation() const
+- float GetRange() const
+- float GetValue() const
+- float GetScrollStep() const
+- float GetStepFactor() const
+- float GetEffectiveScrollStep() const
+- Button* GetBackButton() const
+- Button* GetForwardButton() const
+- Slider* GetSlider() const
+
+ Properties:<br>
+- Orientation orientation
+- float range
+- float value
+- float scrollStep
+- float stepFactor
+- float effectiveScrollStep (readonly)
+- Button* backButton (readonly)
+- Button* forwardButton (readonly)
+- Slider* slider (readonly)
+
+ScrollView : UIElement
+
+Methods:<br>
+- ScrollView(Context* context)
+- virtual ~ScrollView()
+- void SetContentElement(UIElement* element)
+- void SetViewPosition(const IntVector2& position)
+- void SetViewPosition(int x, int y)
+- void SetScrollBarsVisible(bool horizontal, bool vertical)
+- void SetScrollBarsAutoVisible(bool enable)
+- void SetScrollStep(float step)
+- void SetPageStep(float step)
+- const IntVector2& GetViewPosition() const
+- UIElement* GetContentElement() const
+- ScrollBar* GetHorizontalScrollBar() const
+- ScrollBar* GetVerticalScrollBar() const
+- BorderImage* GetScrollPanel() const
+- bool GetScrollBarsAutoVisible() const
+- float GetScrollStep() const
+- float GetPageStep() const
+- void SetViewPositionAttr(const IntVector2& value)
+
+ Properties:<br>
+- IntVector2& viewPosition
+- UIElement* contentElement
+- ScrollBar* horizontalScrollBar (readonly)
+- ScrollBar* verticalScrollBar (readonly)
+- BorderImage* scrollPanel (readonly)
+- bool scrollBarsAutoVisible
+- float scrollStep
+- float pageStep
+
+Slider : BorderImage
+
+Methods:<br>
+- Slider(Context* context)
+- virtual ~Slider()
+- void SetOrientation(Orientation orientation)
+- void SetRange(float range)
+- void SetValue(float value)
+- void ChangeValue(float delta)
+- void SetRepeatRate(float rate)
+- Orientation GetOrientation() const
+- float GetRange() const
+- float GetValue() const
+- BorderImage* GetKnob() const
+- float GetRepeatRate() const
+
+ Properties:<br>
+- Orientation orientation
+- float range
+- float value
+- BorderImage* knob (readonly)
+- float repeatRate
+
+Sprite : UIElement
+
+Methods:<br>
+- Sprite(Context* context)
+- virtual ~Sprite()
+- void SetPosition(const Vector2& position)
+- void SetPosition(float x, float y)
+- void SetHotSpot(const IntVector2& hotSpot)
+- void SetHotSpot(int x, int y)
+- void SetScale(const Vector2& scale)
+- void SetScale(float x, float y)
+- void SetScale(float scale)
+- void SetRotation(float angle)
+- void SetTexture(Texture* texture)
+- void SetImageRect(const IntRect& rect)
+- void SetFullImageRect()
+- void SetBlendMode(BlendMode mode)
+- const Vector2& GetPosition() const
+- const IntVector2& GetHotSpot() const
+- const Vector2& GetScale() const
+- float GetRotation() const
+- Texture* GetTexture() const
+- const IntRect& GetImageRect() const
+- BlendMode GetBlendMode() const
+- void SetTextureAttr(ResourceRef value)
+- ResourceRef GetTextureAttr() const
+- const Matrix3x4& GetTransform() const
+
+ Properties:<br>
+- Vector2& position
+- IntVector2& hotSpot
+- Vector2& scale
+- float rotation
+- Texture* texture
+- IntRect& imageRect
+- BlendMode blendMode
+- ResourceRef textureAttr
+- Matrix3x4& transform (readonly)
+
+Text : UIElement
+
+Methods:<br>
+- Text(Context* context)
+- virtual ~Text()
+- bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE)
+- bool SetFont(const char* fontName, int size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
+- void SetText(const String& text)
+- void SetText(const char* text)
+- void SetTextAlignment(HorizontalAlignment align)
+- void SetRowSpacing(float spacing)
+- void SetWordwrap(bool enable)
+- void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED)
+- void ClearSelection()
+- void SetSelectionColor(const Color& color)
+- void SetHoverColor(const Color& color)
+- Font* GetFont() const
+- int GetFontSize() const
+- const String& GetText() const
+- HorizontalAlignment GetTextAlignment() const
+- float GetRowSpacing() const
+- bool GetWordwrap() const
+- unsigned GetSelectionStart() const
+- unsigned GetSelectionLength() const
+- const Color& GetSelectionColor() const
+- const Color& GetHoverColor() const
+- int GetRowHeight() const
+- unsigned GetNumRows() const
+- void SetFontAttr(ResourceRef value)
+- ResourceRef GetFontAttr() const
+
+ Properties:<br>
+- Font* font
+- int fontSize (readonly)
+- String& text
+- HorizontalAlignment textAlignment
+- float rowSpacing
+- bool wordwrap
+- unsigned selectionStart (readonly)
+- unsigned selectionLength (readonly)
+- Color& selectionColor
+- Color& hoverColor
+- int rowHeight (readonly)
+- unsigned numRows (readonly)
+- ResourceRef fontAttr
+
+Text3D : Drawable
+
+Methods:<br>
+- Text3D(Context* context)
+- ~Text3D()
+- bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE)
+- bool SetFont(const char* fontName, int size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font)
+- void SetMaterial(Material* material)
+- void SetText(const String& text)
+- void SetText(const char* text)
+- void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
+- void SetHorizontalAlignment(HorizontalAlignment align)
+- void SetVerticalAlignment(VerticalAlignment align)
+- void SetTextAlignment(HorizontalAlignment align)
+- void SetRowSpacing(float spacing)
+- void SetWordwrap(bool enable)
+- void SetWidth(int width)
+- void SetColor(const Color& color)
+- void SetColor(Corner corner, const Color& color)
+- void SetOpacity(float opacity)
+- void SetFaceCamera(bool enable)
+- Font* GetFont() const
+- Material* GetMaterial() const
+- int GetFontSize() const
+- const String& GetText() const
+- HorizontalAlignment GetTextAlignment() const
+- HorizontalAlignment GetHorizontalAlignment() const
+- VerticalAlignment GetVerticalAlignment() const
+- float GetRowSpacing() const
+- bool GetWordwrap() const
+- int GetWidth() const
+- int GetRowHeight() const
+- unsigned GetNumRows() const
+- const Color& GetColor(Corner corner) const
+- float GetOpacity() const
+- bool GetFaceCamera() const
+- void SetFontAttr(ResourceRef value)
+- ResourceRef GetFontAttr() const
+- void SetMaterialAttr(ResourceRef value)
+- ResourceRef GetMaterialAttr() const
+- const Color& GetColorAttr() const
+
+ Properties:<br>
+- Font* font
+- Material* material
+- int fontSize (readonly)
+- String& text
+- HorizontalAlignment textAlignment
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- float rowSpacing
+- bool wordwrap
+- int width
+- int rowHeight (readonly)
+- unsigned numRows (readonly)
+- float opacity
+- bool faceCamera
+- ResourceRef fontAttr
+- ResourceRef materialAttr
+- Color& colorAttr (readonly)
+
+UI : Object
+
+Methods:<br>
+- void SetCursor(Cursor* cursor)
+- void SetFocusElement(UIElement* element)
+- bool SetModalElement(UIElement* modalElement, bool enable)
+- void Clear()
+- void Update(float timeStep)
+- void RenderUpdate()
+- void Render()
+- void DebugDraw(UIElement* element)
+- bool SaveLayout(Serializer& dest, UIElement* element)
+- void SetClipBoardText(const String& text)
+- void SetClipBoardText(const char* text)
+- void SetDoubleClickInterval(float interval)
+- void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
+- UIElement* GetRoot() const
+- UIElement* GetRootModalElement() const
+- Cursor* GetCursor() const
+- UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true)
+- UIElement* GetElementAt(int x, int y, bool enabledOnly = true)
+- UIElement* GetFocusElement() const
+- UIElement* GetFrontElement() const
+- IntVector2 GetCursorPosition() const
+- const String& GetClipBoardText() const
+- float GetDoubleClickInterval() const
+- bool IsNonFocusedMouseWheel() const
+- bool HasModalElement() const
+
+ Properties:<br>
+- UIElement* root (readonly)
+- UIElement* rootModalElement (readonly)
+- Cursor* cursor
+- UIElement* focusElement (readonly)
+- UIElement* frontElement (readonly)
+- IntVector2 cursorPosition (readonly)
+- String& clipBoardText
+- float doubleClickInterval
+- bool nonFocusedMouseWheel (readonly)
+- bool modalElement (readonly)
+
+UIElement : Serializable
+
+Methods:<br>
+- UIElement(Context* context)
+- virtual ~UIElement()
+- virtual const IntVector2& GetScreenPosition() const
+- bool LoadXML(Deserializer& source)
+- bool SaveXML(Serializer& dest) const
+- bool FilterAttributes(XMLElement& dest) const
+- void SetName(const String& name)
+- void SetName(const char* name)
+- void SetPosition(const IntVector2& position)
+- void SetPosition(int x, int y)
+- void SetSize(const IntVector2& size)
+- void SetSize(int width, int height)
+- void SetWidth(int width)
+- void SetHeight(int height)
+- void SetMinSize(const IntVector2& minSize)
+- void SetMinSize(int width, int height)
+- void SetMinWidth(int width)
+- void SetMinHeight(int height)
+- void SetMaxSize(const IntVector2& maxSize)
+- void SetMaxSize(int width, int height)
+- void SetMaxWidth(int width)
+- void SetMaxHeight(int height)
+- void SetFixedSize(const IntVector2& size)
+- void SetFixedSize(int width, int height)
+- void SetFixedWidth(int width)
+- void SetFixedHeight(int height)
+- void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
+- void SetHorizontalAlignment(HorizontalAlignment align)
+- void SetVerticalAlignment(VerticalAlignment align)
+- void SetClipBorder(const IntRect& rect)
+- void SetColor(const Color& color)
+- void SetColor(Corner corner, const Color& color)
+- void SetPriority(int priority)
+- void SetOpacity(float opacity)
+- void SetBringToFront(bool enable)
+- void SetBringToBack(bool enable)
+- void SetClipChildren(bool enable)
+- void SetSortChildren(bool enable)
+- void SetUseDerivedOpacity(bool enable)
+- void SetEnabled(bool enable)
+- void SetFocus(bool enable)
+- void SetSelected(bool enable)
+- void SetVisible(bool enable)
+- void SetFocusMode(FocusMode mode)
+- void SetDragDropMode(unsigned mode)
+- bool SetStyle(const String& styleName, XMLFile* file = 0)
+- bool SetStyle(const char* styleName, XMLFile* file = 0)
+- bool SetStyle(const XMLElement& element)
+- bool SetStyleAuto(XMLFile* file = 0)
+- void SetDefaultStyle(XMLFile* style)
+- void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO)
+- void SetLayoutMode(LayoutMode mode)
+- void SetLayoutSpacing(int spacing)
+- void SetLayoutBorder(const IntRect& border)
+- void SetIndent(int indent)
+- void SetIndentSpacing(int indentSpacing)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- UIElement* CreateChild(const char* type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED)
+- UIElement* CreateChild(const char* type, const char* name = 0, unsigned index = M_MAX_UNSIGNED)
+- void AddChild(UIElement* element)
+- void InsertChild(unsigned index, UIElement* element)
+- void RemoveChild(UIElement* element, unsigned index = 0)
+- RemoveChild(unsigned index)
+- void RemoveAllChildren()
+- void Remove()
+- unsigned FindChild(UIElement* element) const
+- void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED)
+- void SetInternal(bool enable)
+- void SetTraversalMode(TraversalMode traversalMode)
+- void SetElementEventSender(bool flag)
+- const String& GetName() const
+- const IntVector2& GetPosition() const
+- const IntVector2& GetSize() const
+- int GetWidth() const
+- int GetHeight() const
+- const IntVector2& GetMinSize() const
+- int GetMinWidth() const
+- int GetMinHeight() const
+- const IntVector2& GetMaxSize() const
+- int GetMaxWidth() const
+- int GetMaxHeight() const
+- bool IsFixedSize() const
+- bool IsFixedWidth() const
+- bool IsFixedHeight() const
+- const IntVector2& GetChildOffset() const
+- HorizontalAlignment GetHorizontalAlignment() const
+- VerticalAlignment GetVerticalAlignment() const
+- const IntRect& GetClipBorder() const
+- const Color& GetColor(Corner corner) const
+- int GetPriority() const
+- float GetOpacity() const
+- float GetDerivedOpacity() const
+- bool GetBringToFront() const
+- bool GetBringToBack() const
+- bool GetClipChildren() const
+- bool GetSortChildren() const
+- bool GetUseDerivedOpacity() const
+- bool HasFocus() const
+- bool IsEnabled() const
+- bool IsSelected() const
+- bool IsVisible() const
+- bool IsHovering() const
+- bool IsInternal() const
+- bool HasColorGradient() const
+- FocusMode GetFocusMode() const
+- unsigned GetDragDropMode() const
+- const String& GetAppliedStyle() const
+- XMLFile* GetDefaultStyle(bool recursiveUp = true) const
+- LayoutMode GetLayoutMode() const
+- int GetLayoutSpacing() const
+- const IntRect& GetLayoutBorder() const
+- unsigned GetNumChildren(bool recursive = false) const
+- UIElement* GetChild(unsigned index) const
+- UIElement* GetChild(const String& name, bool recursive = false) const
+- GetChild(const char* name, bool recursive = false) const
+- UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const
+- GetChild(const char* key, const Variant& value = Variant::EMPTY, bool recursive = false) const
+- UIElement* GetParent() const
+- UIElement* GetRoot() const
+- const Color& GetDerivedColor() const
+- IntVector2 ScreenToElement(const IntVector2& screenPosition)
+- IntVector2 ElementToScreen(const IntVector2& position)
+- bool IsInside(IntVector2 position, bool isScreen)
+- bool IsInsideCombined(IntVector2 position, bool isScreen)
+- IntRect GetCombinedScreenRect()
+- void SortChildren()
+- int GetLayoutMinSize() const
+- int GetIndent() const
+- int GetIndentSpacing() const
+- int GetIndentWidth() const
+- void SetChildOffset(const IntVector2& offset)
+- void SetHovering(bool enable)
+- const Color& GetColorAttr() const
+- TraversalMode GetTraversalMode() const
+- bool IsElementEventSender() const
+- UIElement* GetElementEventSender() const
+
+ Properties:<br>
+- IntVector2& screenPosition (readonly)
+- String& name
+- IntVector2& position
+- IntVector2 size
+- int width
+- int height
+- IntVector2 minSize
+- int minWidth
+- int minHeight
+- IntVector2 maxSize
+- int maxWidth
+- int maxHeight
+- bool fixedSize (readonly)
+- bool fixedWidth (readonly)
+- bool fixedHeight (readonly)
+- IntVector2& childOffset
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect clipBorder
+- int priority
+- float opacity
+- float derivedOpacity (readonly)
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool sortChildren
+- bool useDerivedOpacity
+- bool focus
+- bool enabled
+- bool selected
+- bool visible
+- bool hovering
+- bool internal
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- unsigned dragDropMode
+- String& style
+- XMLFile* defaultStyle
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- unsigned numChildren (readonly)
+- UIElement* parent
+- UIElement* root (readonly)
+- Color& derivedColor (readonly)
+- IntRect combinedScreenRect (readonly)
+- int layoutMinSize (readonly)
+- int indent
+- int indentSpacing
+- int indentWidth (readonly)
+- Color& colorAttr
+- TraversalMode traversalMode
+- bool elementEventSender
+
+Window : BorderImage
+
+Methods:<br>
+- Window(Context* context)
+- virtual ~Window()
+- void SetMovable(bool enable)
+- void SetResizable(bool enable)
+- void SetFixedWidthResizing(bool enable)
+- void SetFixedHeightResizing(bool enable)
+- void SetResizeBorder(const IntRect& rect)
+- void SetModal(bool modal)
+- void SetModalShadeColor(const Color& color)
+- void SetModalFrameColor(const Color& color)
+- void SetModalFrameSize(const IntVector2& size)
+- bool IsMovable() const
+- bool IsResizable() const
+- bool GetFixedWidthResizing() const
+- bool GetFixedHeightResizing() const
+- const IntRect& GetResizeBorder() const
+- bool IsModal() const
+- const Color& GetModalShadeColor() const
+- const Color& GetModalFrameColor() const
+- const IntVector2& GetModalFrameSize() const
+
+ Properties:<br>
+- bool movable
+- bool resizable
+- bool fixedWidthResizing
+- bool fixedHeightResizing
+- IntRect& resizeBorder
+- bool modal
+- Color& modalShadeColor
+- Color& modalFrameColor
+- IntVector2& modalFrameSize
+
+View3D : Window
+
+Methods:<br>
+- View3D(Context* context)
+- ~View3D()
+- void SetView(Scene* scene, Camera* camera)
+- void SetFormat(unsigned format)
+- void SetAutoUpdate(bool enable)
+- void QueueUpdate()
+- unsigned GetFormat() const
+- bool GetAutoUpdate() const
+- Scene* GetScene() const
+- Node* GetCameraNode() const
+- Texture2D* GetRenderTexture() const
+- Viewport* GetViewport() const
+
+ Properties:<br>
+- unsigned format
+- bool autoUpdate
+
+Properties:<br>
+- uint length
+- bool empty (readonly)
+
+*/
+
+}
