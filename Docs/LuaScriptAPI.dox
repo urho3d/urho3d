@@ -2588,6 +2588,8 @@ LuaScriptInstance : Component
 Methods:<br>
 - bool CreateObject(const String& objectType)
 - bool CreateObject(const char* objectType)
+- bool CreateObject(const String& fileName, const String& objectType)
+- bool CreateObject(const char* fileName, const char* objectType)
 - SubscribeToEvent(const String& eventName, const char* functionName)
 - SubscribeToEvent(const char* eventName, const char* functionName)
 - SubscribeToEvent(void* object, const String& eventName, const char* functionName);

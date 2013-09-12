@@ -47,6 +47,9 @@ public:
     /// Create script object.
     bool CreateObject(const String& objectType);
 
+    /// Create script object.
+    bool CreateObject(const String& fileName, const String& objectType);
+
     /// Script subscribe event.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
     

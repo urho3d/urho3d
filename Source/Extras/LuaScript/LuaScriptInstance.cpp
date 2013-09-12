@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Log.h"
+#include "LuaFile.h"
 #include "LuaScript.h"
 #include "LuaScriptInstance.h"
 #include "ResourceCache.h"
@@ -125,6 +126,20 @@ bool LuaScriptInstance::CreateObject(const String& objectType)
     scriptObjectRef_ = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
     return true;
+}
+
+bool LuaScriptInstance::CreateObject(const String& fileName, const String& objectType)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
+    LuaFile* luaFile = cache->GetResource<LuaFile>(fileName);
+    if (!luaFile)
+        return false;
+
+    if (!luaFile->LoadAndExecute(luaState_))
+        return false;
+
+    return CreateObject(objectType);
 }
 
 void LuaScriptInstance::ScriptSubscribeToEvent(const String& eventName, const String& functionName)

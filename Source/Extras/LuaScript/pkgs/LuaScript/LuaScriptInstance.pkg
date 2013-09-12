@@ -5,6 +5,9 @@ class LuaScriptInstance : public Component
     bool CreateObject(const String& objectType);
     bool CreateObject(const char* objectType);
     
+    bool CreateObject(const String& fileName, const String& objectType);
+    bool CreateObject(const char* fileName, const char* objectType);
+    
     void ScriptSubscribeToEvent @ SubscribeToEvent(const String& eventName, const char* functionName);
     void ScriptSubscribeToEvent @ SubscribeToEvent(const char* eventName, const char* functionName);
     
