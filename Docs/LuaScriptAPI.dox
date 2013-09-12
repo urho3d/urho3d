@@ -72,8 +72,6 @@ namespace Urho3D
 - String GetInternalPath(const String& pathName)
 - String GetNativePath(const String& pathName)
 - bool IsAbsolutePath(const String& pathName)
-- void ExecuteFile(const String& fileName)
-- void ExecuteFile(const char* fileName)
 - Object* GetEventSender()
 - void SendEvent(const String& eventName, VariantMap& eventData)
 - void SendEvent(const char* eventName, VariantMap& eventData)
@@ -616,7 +614,7 @@ Methods:<br>
 - float GetSoundSourceMasterGain(SoundType type) const
 - void MixOutput(void *dest, unsigned samples)
 
- Properties:<br>
+Properties:<br>
 - unsigned sampleSize (readonly)
 - int mixRate (readonly)
 - bool interpolation (readonly)
@@ -638,7 +636,7 @@ Methods:<br>
 - bool IsStereo() const
 - bool IsCompressed() const
 
- Properties:<br>
+Properties:<br>
 - float length (readonly)
 - unsigned dataSize (readonly)
 - unsigned sampleSize (readonly)
@@ -650,8 +648,6 @@ Methods:<br>
 - bool compressed (readonly)
 
 SoundListener : Component
-
-Methods:<br>
 
 SoundSource : Component
 
@@ -681,7 +677,7 @@ Methods:<br>
 - void SetPlayPositionLockless(signed char* position)
 - void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation)
 
- Properties:<br>
+Properties:<br>
 - Sound* sound (readonly)
 - SoundType soundType
 - float timePosition (readonly)
@@ -704,7 +700,7 @@ Methods:<br>
 - float GetFarDistance() const
 - float RollAngleoffFactor() const
 
- Properties:<br>
+Properties:<br>
 - float nearDistance
 - float farDistance
 - float rolloffFactor
@@ -764,7 +760,7 @@ Methods:<br>
 - static const unsigned NPOS
 - static const String EMPTY
 
- Properties:<br>
+Properties:<br>
 - unsigned length (readonly)
 - unsigned capacity (readonly)
 - bool empty (readonly)
@@ -802,7 +798,7 @@ Methods:<br>
 - unsigned Capacity() const
 - bool Empty() const
 
- Properties:<br>
+Properties:<br>
 - unsigned size (readonly)
 - unsigned capacity (readonly)
 - bool empty (readonly)
@@ -840,7 +836,7 @@ Methods:<br>
 - unsigned Capacity() const
 - bool Empty() const
 
- Properties:<br>
+Properties:<br>
 - unsigned size (readonly)
 - unsigned capacity (readonly)
 - bool empty (readonly)
@@ -862,27 +858,33 @@ Methods:<br>
 - SendEvent(const char* eventName)
 - SendEvent(const char* eventName, VariantMap& eventData)
 
- Properties:<br>
+Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
 - String& category (readonly)
-- struct ResourceRef
+
+ResourceRef
 
 Methods:<br>
 - ResourceRef()
 - ResourceRef(ShortStringHash type)
 - ResourceRef(ShortStringHash type, StringHash id)
 - ResourceRef(const ResourceRef& rhs)
-- type
-- id
 - bool operator == (const ResourceRef& rhs) const
-- struct ResourceRefList
+
+Properties:<br>
+- ShortStringHash type
+- StringHash id
+
+ResourceRefList
 
 Methods:<br>
 - ResourceRefList()
 - ResourceRefList(ShortStringHash type)
-- type
 - bool operator == (const ResourceRefList& rhs) const
+
+Properties:<br>
+- ShortStringHash type
 
 Variant
 
@@ -953,7 +955,7 @@ Methods:<br>
 - bool IsZero() const
 - bool IsEmpty() const
 
- Properties:<br>
+Properties:<br>
 - VariantType type (readonly)
 - String typeName (readonly)
 - bool zero (readonly)
@@ -1018,7 +1020,7 @@ Methods:<br>
 - static String GetTimeStamp()
 - static void Sleep(unsigned mSec)
 
- Properties:<br>
+Properties:<br>
 - unsigned frameNumber (readonly)
 - float timeStep (readonly)
 - unsigned timerPeriod (readonly)
@@ -1042,7 +1044,7 @@ Methods:<br>
 - unsigned GetHistoryPosition() const
 - const String& GetHistoryRow(unsigned index) const
 
- Properties:<br>
+Properties:<br>
 - XMLFile* defaultStyle
 - BorderImage* background (readonly)
 - LineEdit* lineEdit (readonly)
@@ -1074,7 +1076,7 @@ Methods:<br>
 - bool ResetAppStats(const String& label)
 - void ClearAppStats()
 
- Properties:<br>
+Properties:<br>
 - XMLFile* defaultStyle
 - Text* statsText (readonly)
 - Text* modeText (readonly)
@@ -1108,7 +1110,7 @@ Methods:<br>
 - bool IsExiting() const
 - bool IsHeadless() const
 
- Properties:<br>
+Properties:<br>
 - int minFps
 - int maxFps
 - int maxInactiveFps
@@ -1149,34 +1151,21 @@ Methods:<br>
 - float GetMorphWeight(StringHash nameHash) const
 - bool IsMaster() const
 
- Properties:<br>
+Properties:<br>
 - Skeleton& skeleton (readonly)
 - unsigned numAnimationStates (readonly)
 - float animationLodBias
 - float invisibleLodFactor
 - unsigned numMorphs (readonly)
 - bool master (readonly)
-- struct AnimationKeyFrame
 
-Methods:<br>
+AnimationKeyFrame
+
+Properties:<br>
 - time
 - position
 - rotation
 - scale
-- struct AnimationTrack
-
-Methods:<br>
-- void GetKeyFrameIndex(float time, unsigned& index) const
-- name
-- nameHash
-- channelMas
-- keyFrames
-- struct AnimationTriggerPoint
-
-Methods:<br>
-- AnimationTriggerPoint()
-- time
-- data
 
 Animation : Resource
 
@@ -1190,16 +1179,19 @@ Methods:<br>
 - const AnimationTrack* GetTrack(StringHash nameHash) const
 - unsigned GetNumTriggers() const
 
- Properties:<br>
+Properties:<br>
 - String& animationName (readonly)
 - StringHash animationNameHash (readonly)
 - float length (readonly)
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
-- struct AnimationControl
+
+AnimationControl
 
 Methods:<br>
 - AnimationControl()
+
+Properties:<br>
 - StringHash hash_
 - float speed_
 - float targetWeight_
@@ -1300,7 +1292,7 @@ Methods:<br>
 - float GetLength() const
 - unsigned char GetLayer() const
 
- Properties:<br>
+Properties:<br>
 - Animation* animation (readonly)
 - Bone* startBone
 - bool enabled (readonly)
@@ -1309,16 +1301,17 @@ Methods:<br>
 - float time
 - float length (readonly)
 - unsigned char layer
-- struct Billboard
 
-Methods:<br>
-- position
-- size
-- uv
-- color
-- rotation
-- enabled
-- sortDistance
+Billboard
+
+Properties:<br>
+- Vector3 position;
+- Vector2 size;
+- Rect uv;
+- Color color;
+- float rotation;
+- bool enabled;
+- float sortDistance;
 
 BillboardSet : Drawable
 
@@ -1338,7 +1331,7 @@ Methods:<br>
 - bool IsSorted() const
 - float GetAnimationLodBias() const
 
- Properties:<br>
+Properties:<br>
 - Material* material
 - unsigned numBillboards
 - bool relative
@@ -1398,7 +1391,7 @@ Methods:<br>
 - float GetLodDistance(float distance, float scale, float bias) const
 - bool IsProjectionValid() const
 
- Properties:<br>
+Properties:<br>
 - float farClip
 - float nearClip
 - float fov
@@ -1443,7 +1436,7 @@ Methods:<br>
 - const Frustum& GetFrustum() const
 - bool IsInside(const BoundingBox& box) const
 
- Properties:<br>
+Properties:<br>
 - Matrix3x4& view (readonly)
 - Matrix4& projection (readonly)
 - Frustum& frustum (readonly)
@@ -1464,7 +1457,7 @@ Methods:<br>
 - unsigned GetMaxVertices() const
 - unsigned GetMaxIndices() const
 
- Properties:<br>
+Properties:<br>
 - Material* material
 - unsigned numDecals (readonly)
 - unsigned numVertices (readonly)
@@ -1525,7 +1518,7 @@ Methods:<br>
 - float GetMinZ() const
 - float GetMaxZ() const
 
- Properties:<br>
+Properties:<br>
 - BoundingBox& worldBoundingBox (readonly)
 - unsigned char drawableFlags (readonly)
 - float drawDistance
@@ -1587,7 +1580,7 @@ Methods:<br>
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
 
- Properties:<br>
+Properties:<br>
 - bool initialized (readonly)
 - const String& windowTitle
 - int width (readonly)
@@ -1612,17 +1605,20 @@ Methods:<br>
 - bool streamOffsetSupport (readonly)
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
-- struct BiasParameters
+
+BiasParameters
 
 Methods:<br>
 - BiasParameters()
 - BiasParameters(float constantBias, float slopeScaledBias)
-- struct CascadeParameters
+
+CascadeParameters
 
 Methods:<br>
 - CascadeParameters()
 - CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f)
-- struct FocusParameters
+
+FocusParameters
 
 Methods:<br>
 - FocusParameters()
@@ -1667,7 +1663,7 @@ Methods:<br>
 - Texture* GetShapeTexture() const
 - Frustum GetFrustum() const
 
- Properties:<br>
+Properties:<br>
 - LightType lightType
 - bool perVertex
 - Color& color
@@ -1702,7 +1698,7 @@ Methods:<br>
 - bool GetOcclusion() const
 - bool GetSpecular() const
 
- Properties:<br>
+Properties:<br>
 - CullMode cullMode (readonly)
 - CullMode shadowCullMode (readonly)
 - unsigned auxViewFrameNumber (readonly)
@@ -1724,16 +1720,15 @@ Methods:<br>
 - unsigned GetMorphRangeStart(unsigned bufferIndex) const
 - unsigned GetMorphRangeCount(unsigned bufferIndex) const
 
- Properties:<br>
+Properties:<br>
 - BoundingBox& boundingBox (readonly)
 - Skeleton skeleton (readonly)
 - unsigned numGeometries (readonly)
 - unsigned numMorphs (readonly)
 
 Octree : Component
-    
+
 Methods:<br>
--     
 - void SetSize(const BoundingBox& box, unsigned numLevels)
 - void Update(const FrameInfo& frame)
 - void AddManualDrawable(Drawable* drawable)
@@ -1743,41 +1738,37 @@ Methods:<br>
 - void QueueUpdate(Drawable* drawable)
 - void DrawDebugGeometry(bool depthTest)
 
- Properties:<br>
+Properties:<br>
 - unsigned numLevels (readonly)
-- struct RayQueryResult
 
-Methods:<br>
+RayQueryResult
+
+Properties:<br>
 - drawable
 - node
 - distance
 - subObject
-- struct Particle
 
-Methods:<br>
-- Vector3 velocity_
-- Vector2 size_
-- float timer_
-- float timeToLive_
-- float scale_
-- float rotationSpeed_
-- unsigned colorIndex_
-- unsigned texIndex_
-- struct ColorFrame
+ColorFrame
 
 Methods:<br>
 - ColorFrame()
 - ColorFrame(const Color& color)
 - ColorFrame(const Color& color, float time)
 - Color Interpolate(const ColorFrame& next, float time)
-- color
-- time
-- struct TextureFrame
+
+Properties:<br>
+- Color color
+- float time
+
+TextureFrame
 
 Methods:<br>
 - TextureFrame()
-- uv
-- time
+
+Properties:<br>
+- Rect uv
+- float time
 
 ParticleEmitter : BillboardSet
 
@@ -1847,7 +1838,7 @@ Methods:<br>
 - unsigned GetNumTextureFrames() const
 - TextureFrame* GetTextureFrame(unsigned index)
 
- Properties:<br>
+Properties:<br>
 - unsigned numParticles
 - bool emitting
 - bool updateInvisible
@@ -1945,7 +1936,7 @@ Methods:<br>
 - const FrameInfo& GetFrameInfo()
 - void DrawDebugGeometry(bool depthTest)
 
- Properties:<br>
+Properties:<br>
 - unsigned numViewports
 - RenderPath* defaultRenderPath
 - bool specularLighting
@@ -2031,7 +2022,7 @@ Methods:<br>
 - RenderSurface* GetLinkedRenderTarget() const
 - RenderSurface* GetLinkedDepthStencil() const
 
- Properties:<br>
+Properties:<br>
 - Texture* parentTexture (readonly)
 - int width (readonly)
 - int height (readonly)
@@ -2040,22 +2031,25 @@ Methods:<br>
 - RenderSurfaceUpdateMode updateMode
 - RenderSurface* linkedRenderTarget
 - RenderSurface* linkedDepthStencil
-- struct Bone
+
+Bone
 
 Methods:<br>
 - Bone()
-- name
-- nameHash
-- parentIndex
-- initialPosition
-- initialRotation
-- initialScale
-- offsetMatrix
-- animated
-- collisionMask
-- radius
-- boundingBox
-- node
+
+Properties:<br>
+- String name
+- StringHash nameHash
+- unsigned parentIndex
+- Vector3 initialPosition
+- Quaternion initialRotation
+- Vector3 initialScale
+- Matrix3x4 offsetMatrix
+- bool animated
+- unsigned char collisionMask
+- float radius
+- BoundingBox boundingBox
+- Node* node
 
 Skeleton
 
@@ -2064,16 +2058,15 @@ Methods:<br>
 - Bone* GetRootBone()
 - Bone* GetBone(unsigned index)
 
- Properties:<br>
+Properties:<br>
 - unsigned numBones (readonly)
 - Bone* rootBone (readonly)
 
 Skybox : StaticModel
 
-Methods:<br>
-- struct StaticModelGeometryData
+StaticModelGeometryData
 
-Methods:<br>
+Properties:<br>
 - center
 - lodLevel
 
@@ -2091,7 +2084,7 @@ Methods:<br>
 - bool IsInside(const Vector3& point) const
 - bool IsInsideLocal(const Vector3& point) const
 
- Properties:<br>
+Properties:<br>
 - Model* model
 - Material* material
 - BoundingBox& boundingBox (readonly)
@@ -2100,8 +2093,6 @@ Methods:<br>
 
 Pass : RefCounted
 
-Methods:<br>
-
 Technique : Resource
 
 Methods:<br>
@@ -2109,7 +2100,7 @@ Methods:<br>
 - Pass* GetPass(const char*  type) const
 - bool IsSM3() const
 
- Properties:<br>
+Properties:<br>
 - bool SM3 (readonly)
 
 Terrain : Component
@@ -2156,7 +2147,7 @@ Methods:<br>
 - bool IsOccluder() const
 - bool IsOccludee() const
 
- Properties:<br>
+Properties:<br>
 - int patchSize
 - Vector3& spacing
 - IntVector2& numVertices (readonly)
@@ -2200,7 +2191,7 @@ Methods:<br>
 - unsigned GetLodLevel() const
 - float GetOcclusionOffset() const
 
- Properties:<br>
+Properties:<br>
 - Geometry* geometry (readonly)
 - Geometry* maxLodGeometry (readonly)
 - Geometry* minLodGeometry (readonly)
@@ -2242,7 +2233,7 @@ Methods:<br>
 - unsigned GetDataSize(int width, int height) const
 - unsigned GetRowDataSize(int width) const
 
- Properties:<br>
+Properties:<br>
 - unsigned format (readonly)
 - bool compressed (readonly)
 - unsigned levels (readonly)
@@ -2281,7 +2272,7 @@ Methods:<br>
 - const IntRect& GetRect() const
 - RenderPath* GetRenderPath() const
 
- Properties:<br>
+Properties:<br>
 - Scene* scene
 - Camera* camera
 - IntRect& rect
@@ -2310,7 +2301,7 @@ Methods:<br>
 - bool GetAmbientGradient() const
 - bool IsInside(const Vector3& point) const
 
- Properties:<br>
+Properties:<br>
 - BoundingBox& boundingBox
 - Matrix3x4& inverseWorldTransform (readonly)
 - Color& ambientColor
@@ -2322,15 +2313,17 @@ Methods:<br>
 - int priority
 - bool override
 - bool ambientGradient
-- struct TouchState
 
-Methods:<br>
-- touchID
-- position
-- lastPosition
-- delta
-- pressure
-- struct JoystickState
+TouchState
+
+Properties:<br>
+- int touchID
+- IntVector2 position
+- IntVector2 lastPosition
+- IntVector2 delta
+- float pressure
+    
+JoystickState
 
 Methods:<br>
 - unsigned GetNumButtons() const
@@ -2341,7 +2334,7 @@ Methods:<br>
 - float GetAxisPosition(unsigned index) const
 - int GetHatPosition(unsigned index) const
 
- Properties:<br>
+Properties:<br>
 - unsigned numButtons (readonly)
 - unsigned numAxes (readonly)
 - unsigned numHats (readonly)
@@ -2375,7 +2368,7 @@ Methods:<br>
 - bool HasFocus()
 - bool IsMinimized() const
 
- Properties:<br>
+Properties:<br>
 - int qualifiers (readonly)
 - IntVector2 mousePosition (readonly)
 - IntVector2& mouseMove (readonly)
@@ -2431,7 +2424,7 @@ Methods:<br>
 - unsigned ReadNetID()
 - String ReadLine()
 
- Properties:<br>
+Properties:<br>
 - String& name (readonly)
 - unsigned checksum (readonly)
 - unsigned position (readonly)
@@ -2461,7 +2454,7 @@ Methods:<br>
 - void* GetHandle() const
 - bool IsPackaged() const
 
- Properties:<br>
+Properties:<br>
 - String& name (readonly)
 - unsigned checksum (readonly)
 - FileMode mode (readonly)
@@ -2519,16 +2512,17 @@ Methods:<br>
 - static void WriteRaw(const String& message, bool error = false)
 - static void WriteRaw(const char* message, bool error = false)
 
- Properties:<br>
+Properties:<br>
 - int level
 - bool timeStamp
 - bool quiet
-- struct PackageEntry
+
+PackageEntry
 
 Methods:<br>
-- offset
-- size
-- checksum
+- unsigned offset
+- unsigned size
+- unsigned checksum
 
 PackageFile : Object
 
@@ -2546,7 +2540,7 @@ Methods:<br>
 - unsigned GetTotalSize() const
 - unsigned GetChecksum() const
 
- Properties:<br>
+Properties:<br>
 - String& name (readonly)
 - StringHash nameHash (readonly)
 - unsigned numFiles (readonly)
@@ -2644,7 +2638,7 @@ Methods:<br>
 - max
 - defined
 
- Properties:<br>
+Properties:<br>
 - Vector3 center (readonly)
 - Vector3 size (readonly)
 - Vector3 halfSize (readonly)
@@ -2683,10 +2677,12 @@ Methods:<br>
 - void Invert(bool invertAlpha = false)
 - Color Lerp(const Color& rhs, float t) const
 - String ToString() const
-- r
-- g
-- b
-- a
+
+Properties:<br>
+- float r
+- float g
+- float b
+- float a
 - static const Color WHITE
 - static const Color GRAY
 - static const Color BLACK
@@ -2741,15 +2737,17 @@ Methods:<br>
 - Matrix3 Scaled(const Vector3& scale) const
 - bool Equals(const Matrix3& rhs) const
 - Matrix3 Inverse() const
-- m00
-- m01
-- m02
-- m10
-- m11
-- m12
-- m20
-- m21
-- m22
+
+Properties:<br>
+- float m00
+- float m01
+- float m02
+- float m10
+- float m11
+- float m12
+- float m20
+- float m21
+- float m22
 - static const Matrix3 ZERO
 - static const Matrix3 IDENTITY
 
@@ -2785,18 +2783,20 @@ Methods:<br>
 - bool Equals(const Matrix3x4& rhs) const
 - void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 - Matrix3x4 Inverse() const
-- m00
-- m01
-- m02
-- m03
-- m10
-- m11
-- m12
-- m13
-- m20
-- m21
-- m22
-- m23
+
+Properties:<br>
+- float m00
+- float m01
+- float m02
+- float m03
+- float m10
+- float m11
+- float m12
+- float m13
+- float m20
+- float m21
+- float m22
+- float m23
 - static const Matrix3x4 ZERO
 - static const Matrix3x4 IDENTITY
 
@@ -2830,22 +2830,24 @@ Methods:<br>
 - bool Equals(const Matrix4& rhs) const
 - void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 - Matrix4 Inverse() const
-- m00
-- m01
-- m02
-- m03
-- m10
-- m11
-- m12
-- m13
-- m20
-- m21
-- m22
-- m23
-- m30
-- m31
-- m32
-- m33
+
+Properties:<br>
+- float m00
+- float m01
+- float m02
+- float m03
+- float m10
+- float m11
+- float m12
+- float m13
+- float m20
+- float m21
+- float m22
+- float m23
+- float m30
+- float m31
+- float m32
+- float m33
 - static const Matrix4 ZERO
 - static const Matrix4 IDENTITY
 
@@ -2859,9 +2861,11 @@ Methods:<br>
 - void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - void Define(const Vector3& normal, const Vector3& point)
 - float Distance(const Vector3& point) const
-- normal
-- absNormal
-- intercept
+
+Properties:<br>
+- Vector3 normal
+- Vector3 absNormal
+- float intercept
 
 Polyhedron
 
@@ -2885,7 +2889,7 @@ Methods:<br>
 - Polyhedron Transformed(const Matrix3x4& transform) const
 - bool Empty() const
 
- Properties:<br>
+Properties:<br>
 - bool empty (readonly)
 
 Quaternion
@@ -2928,10 +2932,12 @@ Methods:<br>
 - Matrix3 RotationMatrix() const
 - Quaternion Slerp(Quaternion rhs, float t) const
 - String ToString() const
-- w
-- x
-- y
-- z
+
+Properties:<br>
+- float w
+- float x
+- float y
+- float z
 - static const Quaternion IDENTITY
 
 Ray
@@ -2951,8 +2957,10 @@ Methods:<br>
 - float HitDistance(const Sphere& sphere) const
 - float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 - Ray Transformed(const Matrix3x4& transform) const
-- origin
-- direction
+
+Properties:<br>
+- Vector3 origin
+- Vector3 direction
 
 Rect
 
@@ -2976,16 +2984,16 @@ Methods:<br>
 - bool Equals(const Rect& rhs) const
 - Vector4 ToVector4() const
 - String ToString() const
-- min
-- max
-- static const Rect FULL
-- static const Rect POSITIVE
-- static const Rect ZERO
 
- Properties:<br>
+Properties:<br>
+- Vector2 min
+- Vector2 max
 - Vector2 center (readonly)
 - Vector2 size (readonly)
 - Vector2 halfSize (readonly)
+- static const Rect FULL
+- static const Rect POSITIVE
+- static const Rect ZERO
 
 IntRect
 
@@ -2996,16 +3004,16 @@ Methods:<br>
 - IntVector2 Size() const
 - int Width() const
 - int Height() const
-- left
-- top
-- right
-- bottom
-- static const IntRect ZERO
 
- Properties:<br>
+Properties:<br>
+- int left
+- int top
+- int right
+- int bottom
 - IntVector2 size (readonly)
 - int width (readonly)
 - int height (readonly)
+- static const IntRect ZERO
 
 Sphere
 
@@ -3034,9 +3042,11 @@ Methods:<br>
 - Intersection IsInside(const BoundingBox& box) const
 - Intersection IsInsideFast(const BoundingBox& box) const
 - float Distance(const Vector3& point) const
-- center
-- radius
-- defined
+
+Properties:<br>
+- Vector3 center
+- float radius
+- bool defined
 
 StringHash
 
@@ -3056,7 +3066,7 @@ Methods:<br>
 - static unsigned Calculate(const char* str)
 - static const StringHash ZERO
 
- Properties:<br>
+Properties:<br>
 - unsigned value (readonly)
 
 ShortStringHash
@@ -3075,7 +3085,7 @@ Methods:<br>
 - static unsigned short Calculate(const char* str)
 - static const ShortStringHash ZERO
 
- Properties:<br>
+Properties:<br>
 - unsigned short value (readonly)
 
 Vector2
@@ -3104,8 +3114,10 @@ Methods:<br>
 - bool Equals(const Vector2& rhs) const
 - Vector2 Normalized() const
 - String ToString() const
-- x
-- y
+
+Properties:<br>
+- float x
+- float y
 - static const Vector2 ZERO
 - static const Vector2 LEFT
 - static const Vector2 RIGHT
@@ -3128,8 +3140,10 @@ Methods:<br>
 - IntVector2 operator / (int rhs) const
 - IntVector2 operator / (int rhs) const
 - String ToString() const
-- x
-- y
+
+Properties:<br>
+- int x
+- int y
 - static const IntVector2 ZERO
 
 Vector3
@@ -3159,9 +3173,11 @@ Methods:<br>
 - bool Equals(const Vector3& rhs) const
 - Vector3 Normalized() const
 - String ToString() const
-- x
-- y
-- z
+
+Properties:<br>
+- float x
+- float y
+- float z
 - static const Vector3 ZERO
 - static const Vector3 LEFT
 - static const Vector3 RIGHT
@@ -3193,10 +3209,12 @@ Methods:<br>
 - Vector4 Lerp(const Vector4& rhs, float t) const
 - bool Equals(const Vector4& rhs) const
 - String ToString() const
-- x
-- y
-- z
-- w
+
+Properties:<br>
+- float x
+- float y
+- float z
+- float w
 - static const Vector4 ZERO
 - static const Vector4 ONE
 
@@ -3206,15 +3224,16 @@ Methods:<br>
 - void SetRecursive(bool enable)
 - bool IsRecursive() const
 
- Properties:<br>
+Properties:<br>
 - bool recursive
-- struct NavigationGeometryInfo
 
-Methods:<br>
-- component
-- lodLevel
-- transform
-- boundingBox
+NavigationGeometryInfo
+
+Properties:<br>
+- Component* component
+- unsigned lodLevel
+- Matrix3x4 transform
+- BoundingBox boundingBox
 
 NavigationMesh : Component
 
@@ -3260,7 +3279,7 @@ Methods:<br>
 - BoundingBox GetWorldBoundingBox() const
 - IntVector2 GetNumTiles() const
 
- Properties:<br>
+Properties:<br>
 - int tileSize
 - float cellSize
 - float cellHeight
@@ -3290,17 +3309,18 @@ Methods:<br>
 - float GetRadius() const
 - bool IsBidirectional() const
 
- Properties:<br>
+Properties:<br>
 - Node* endPoint
 - float radius
 - bool bidirectional
-- struct RemoteEvent
 
-Methods:<br>
-- senderID
-- eventType
-- eventData
-- inOrder
+RemoteEvent
+
+Properties:<br>
+- unsigned senderID
+- StringHash eventType
+- VariantMap eventData
+- bool inOrder
 
 Connection : Object
 
@@ -3340,7 +3360,7 @@ Methods:<br>
 - const String& GetDownloadName() const
 - float GetDownloadProgress() const
 
- Properties:<br>
+Properties:<br>
 - VariantMap& identity
 - Scene* scene
 - Controls& controls
@@ -3398,7 +3418,7 @@ Methods:<br>
 - bool CheckRemoteEvent(const char* eventType) const
 - const String& GetPackageCacheDir() const
 
- Properties:<br>
+Properties:<br>
 - int updateFps
 - Connection* serverConnection (readonly)
 - bool serverRunning (readonly)
@@ -3417,7 +3437,7 @@ Methods:<br>
 - bool GetAlwaysUpdateOwner() const
 - bool CheckUpdate(float distance, float& accumulator)
 
- Properties:<br>
+Properties:<br>
 - float basePriority
 - float distanceFactor
 - float minPriority
@@ -3457,7 +3477,7 @@ Methods:<br>
 - ResourceRef GetModelAttr() const
 - void ReleaseShape()
 
- Properties:<br>
+Properties:<br>
 - PhysicsWorld* physicsWorld (readonly)
 - ShapeType shapeType
 - Vector3& size
@@ -3503,7 +3523,7 @@ Methods:<br>
 - void ReleaseConstraint()
 - void ApplyFrames()
 
- Properties:<br>
+Properties:<br>
 - PhysicsWorld* physicsWorld (readonly)
 - ConstraintType constraintType
 - RigidBody* ownBody (readonly)
@@ -3518,21 +3538,25 @@ Methods:<br>
 - float ERP
 - float CFM
 - bool disableCollision
-- struct PhysicsRaycastResult
+
+PhysicsRaycastResult
 
 Methods:<br>
 - PhysicsRaycastResult()
-- position
-- normal
-- distance
-- body
-- struct DelayedWorldTransform
 
-Methods:<br>
-- rigidBody
-- parentRigidBody
-- worldPosition
-- worldRotation
+Properties:<br>
+- Vector3 position
+- Vector3 normal
+- float distance
+- RigidBody* body
+
+DelayedWorldTransform
+
+Properties:<br>
+- RigidBody* rigidBody
+- RigidBody* parentRigidBody
+- Vector3 worldPosition
+- Quaternion worldRotation
 
 PhysicsWorld : Component
 
@@ -3570,7 +3594,7 @@ Methods:<br>
 - void SetApplyingTransforms(bool enable)
 - bool IsApplyingTransforms() const
 
- Properties:<br>
+Properties:<br>
 - Vector3 gravity
 - int numIterations
 - bool interpolation
@@ -3653,7 +3677,7 @@ Methods:<br>
 - void RemoveConstraint(Constraint* constraint)
 - void ReleaseBody()
 
- Properties:<br>
+Properties:<br>
 - PhysicsWorld* physicsWorld (readonly)
 - float mass
 - Vector3 position
@@ -3698,7 +3722,7 @@ Methods:<br>
 - unsigned GetNumCompressedLevels() const
 - CompressedLevel GetCompressedLevel(unsigned index) const
 
- Properties:<br>
+Properties:<br>
 - int width (readonly)
 - int height (readonly)
 - unsigned components (readonly)
@@ -3713,15 +3737,14 @@ Methods:<br>
 - StringHash GetNameHash() const
 - unsigned GetMemoryUse() const
 
- Properties:<br>
+Properties:<br>
 - String& name (readonly)
 - StringHash nameHash (readonly)
 - unsigned memoryUse (readonly)
 
 ResourceCache
-    
+
 Methods:<br>
--     
 - void ReleaseAllResources(bool force = false)
 - bool ReloadResource(Resource* resource)
 - void SetMemoryBudget(ShortStringHash type, unsigned budget)
@@ -3738,7 +3761,7 @@ Methods:<br>
 - String GetResourceFileName(const String& name) const
 - bool GetAutoReloadResources() const
 
- Properties:<br>
+Properties:<br>
 - unsigned totalMemoryUse (readonly)
 - bool autoReloadResources (readonly)
 
@@ -3793,7 +3816,7 @@ Methods:<br>
 - XMLFile* GetFile() const
 - static const XMLElement EMPTY
 
- Properties:<br>
+Properties:<br>
 - bool null (readonly)
 - String name (readonly)
 - XMLElement parent (readonly)
@@ -3938,7 +3961,7 @@ Methods:<br>
 - Node* CreateChild(unsigned id, CreateMode mode)
 - void AddComponent(Component* component, unsigned id, CreateMode mode)
 
- Properties:<br>
+Properties:<br>
 - unsigned ID
 - String& name
 - StringHash nameHash (readonly)
@@ -4005,7 +4028,7 @@ Methods:<br>
 - void MarkNetworkUpdate(Component* component)
 - void MarkReplicationDirty(Node* node)
 
- Properties:<br>
+Properties:<br>
 - bool updateEnabled
 - bool asyncLoading (readonly)
 - float asyncProgress (readonly)
@@ -4024,7 +4047,7 @@ Methods:<br>
 - void SetTemporary(bool enable)
 - bool IsTemporary() const
 
- Properties:<br>
+Properties:<br>
 - bool temporary
 
 BorderImage : UIElement
@@ -4049,7 +4072,7 @@ Methods:<br>
 - void SetTextureAttr(ResourceRef value)
 - ResourceRef GetTextureAttr() const
 
- Properties:<br>
+Properties:<br>
 - Texture* texture
 - IntRect& imageRect
 - IntRect& border
@@ -4076,7 +4099,7 @@ Methods:<br>
 - float GetRepeatRate() const
 - bool IsPressed() const
 
- Properties:<br>
+Properties:<br>
 - IntVector2& pressedOffset
 - IntVector2& pressedChildOffset
 - float repeatDelay
@@ -4094,7 +4117,7 @@ Methods:<br>
 - bool IsChecked() const
 - const IntVector2& GetCheckedOffset() const
 
- Properties:<br>
+Properties:<br>
 - bool checked
 - IntVector2& checkedOffset
 
@@ -4109,7 +4132,7 @@ Methods:<br>
 - CursorShape GetShape() const
 - bool GetUseSystemShapes() const
 
- Properties:<br>
+Properties:<br>
 - CursorShape shape
 - bool useSystemShapes
 
@@ -4137,7 +4160,7 @@ Methods:<br>
 - bool GetResizePopup() const
 - void SetSelectionAttr(unsigned index)
 
- Properties:<br>
+Properties:<br>
 - unsigned numItems (readonly)
 - unsigned selection
 - UIElement* selectedItem (readonly)
@@ -4145,11 +4168,12 @@ Methods:<br>
 - UIElement* placeholder (readonly)
 - String& placeholderText
 - bool resizePopup
-- struct FileSelectorEntry
 
-Methods:<br>
-- name
-- directory
+FileSelectorEntry
+
+Properties:<br>
+- String name
+- bool directory
 
 FileSelector : Object
 
@@ -4185,7 +4209,7 @@ Methods:<br>
 - unsigned GetFilterIndex() const
 - bool GetDirectoryMode() const
 
- Properties:<br>
+Properties:<br>
 - XMLFile* defaultStyle
 - Window* window (readonly)
 - Text* titleText (readonly)
@@ -4204,8 +4228,6 @@ Methods:<br>
 - bool directoryMode
 
 Font : Resource
-
-Methods:<br>
 
 LineEdit : BorderImage
 
@@ -4232,7 +4254,7 @@ Methods:<br>
 - Text* GetTextElement() const
 - BorderImage* GetCursor() const
 
- Properties:<br>
+Properties:<br>
 - String& text
 - unsigned cursorPosition
 - float cursorBlinkRate
@@ -4280,7 +4302,7 @@ Methods:<br>
 - bool GetHierarchyMode() const
 - int GetBaseIndent() const
 
- Properties:<br>
+Properties:<br>
 - unsigned numItems (readonly)
 - unsigned selection
 - UIElement* selectedItem (readonly)
@@ -4306,7 +4328,7 @@ Methods:<br>
 - int GetAcceleratorKey() const
 - int GetAcceleratorQualifiers() const
 
- Properties:<br>
+Properties:<br>
 - UIElement* popup
 - IntVector2& popupOffset
 - bool showPopup
@@ -4336,7 +4358,7 @@ Methods:<br>
 - Button* GetForwardButton() const
 - Slider* GetSlider() const
 
- Properties:<br>
+Properties:<br>
 - Orientation orientation
 - float range
 - float value
@@ -4369,7 +4391,7 @@ Methods:<br>
 - float GetPageStep() const
 - void SetViewPositionAttr(const IntVector2& value)
 
- Properties:<br>
+Properties:<br>
 - IntVector2& viewPosition
 - UIElement* contentElement
 - ScrollBar* horizontalScrollBar (readonly)
@@ -4395,7 +4417,7 @@ Methods:<br>
 - BorderImage* GetKnob() const
 - float GetRepeatRate() const
 
- Properties:<br>
+Properties:<br>
 - Orientation orientation
 - float range
 - float value
@@ -4430,7 +4452,7 @@ Methods:<br>
 - ResourceRef GetTextureAttr() const
 - const Matrix3x4& GetTransform() const
 
- Properties:<br>
+Properties:<br>
 - Vector2& position
 - IntVector2& hotSpot
 - Vector2& scale
@@ -4473,7 +4495,7 @@ Methods:<br>
 - void SetFontAttr(ResourceRef value)
 - ResourceRef GetFontAttr() const
 
- Properties:<br>
+Properties:<br>
 - Font* font
 - int fontSize (readonly)
 - String& text
@@ -4532,7 +4554,7 @@ Methods:<br>
 - ResourceRef GetMaterialAttr() const
 - const Color& GetColorAttr() const
 
- Properties:<br>
+Properties:<br>
 - Font* font
 - Material* material
 - int fontSize (readonly)
@@ -4580,7 +4602,7 @@ Methods:<br>
 - bool IsNonFocusedMouseWheel() const
 - bool HasModalElement() const
 
- Properties:<br>
+Properties:<br>
 - UIElement* root (readonly)
 - UIElement* rootModalElement (readonly)
 - Cursor* cursor
@@ -4735,7 +4757,7 @@ Methods:<br>
 - bool IsElementEventSender() const
 - UIElement* GetElementEventSender() const
 
- Properties:<br>
+Properties:<br>
 - IntVector2& screenPosition (readonly)
 - String& name
 - IntVector2& position
@@ -4790,6 +4812,26 @@ Methods:<br>
 - TraversalMode traversalMode
 - bool elementEventSender
 
+View3D : Window
+
+Methods:<br>
+- View3D(Context* context)
+- ~View3D()
+- void SetView(Scene* scene, Camera* camera)
+- void SetFormat(unsigned format)
+- void SetAutoUpdate(bool enable)
+- void QueueUpdate()
+- unsigned GetFormat() const
+- bool GetAutoUpdate() const
+- Scene* GetScene() const
+- Node* GetCameraNode() const
+- Texture2D* GetRenderTexture() const
+- Viewport* GetViewport() const
+
+Properties:<br>
+- unsigned format
+- bool autoUpdate
+
 Window : BorderImage
 
 Methods:<br>
@@ -4814,7 +4856,7 @@ Methods:<br>
 - const Color& GetModalFrameColor() const
 - const IntVector2& GetModalFrameSize() const
 
- Properties:<br>
+Properties:<br>
 - bool movable
 - bool resizable
 - bool fixedWidthResizing
@@ -4824,30 +4866,6 @@ Methods:<br>
 - Color& modalShadeColor
 - Color& modalFrameColor
 - IntVector2& modalFrameSize
-
-View3D : Window
-
-Methods:<br>
-- View3D(Context* context)
-- ~View3D()
-- void SetView(Scene* scene, Camera* camera)
-- void SetFormat(unsigned format)
-- void SetAutoUpdate(bool enable)
-- void QueueUpdate()
-- unsigned GetFormat() const
-- bool GetAutoUpdate() const
-- Scene* GetScene() const
-- Node* GetCameraNode() const
-- Texture2D* GetRenderTexture() const
-- Viewport* GetViewport() const
-
- Properties:<br>
-- unsigned format
-- bool autoUpdate
-
-Properties:<br>
-- uint length
-- bool empty (readonly)
 
 */
 
