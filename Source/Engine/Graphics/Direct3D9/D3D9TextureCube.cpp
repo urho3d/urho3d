@@ -46,6 +46,11 @@ TextureCube::TextureCube(Context* context) :
     Texture(context),
     lockedLevel_(-1)
 {
+    // Default to clamp mode addressing
+    addressMode_[COORD_U] = ADDRESS_CLAMP;
+    addressMode_[COORD_V] = ADDRESS_CLAMP;
+    addressMode_[COORD_W] = ADDRESS_CLAMP;
+    
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         faceMemoryUse_[i] = 0;
 }
@@ -145,10 +150,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         usage_ |= D3DUSAGE_RENDERTARGET;
         pool_ = D3DPOOL_DEFAULT;
         
-        // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
-        addressMode_[COORD_U] = ADDRESS_CLAMP;
-        addressMode_[COORD_V] = ADDRESS_CLAMP;
-        addressMode_[COORD_W] = ADDRESS_CLAMP;
+        // Nearest filtering and mipmaps disabled by default
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
