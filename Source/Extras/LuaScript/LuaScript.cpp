@@ -172,15 +172,15 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
 {
     StringHash eventType(eventName);
 
-    HashSet<Object*>* receivers = context_->GetEventReceivers(eventType);
-    if (!receivers || !receivers->Contains(this))
-        SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
-
     int functionRef = LUA_REFNIL;
     if (FindFunction(functionName))
         functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
-    eventTypeToFunctionRefMap_[eventType] = functionRef;
+    if (functionRef != LUA_REFNIL)
+    {
+        SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
+        eventTypeToFunctionRefMap_[eventType] = functionRef;
+    }
 }
 
 void LuaScript::ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName)
@@ -188,15 +188,15 @@ void LuaScript::ScriptSubscribeToEvent(void* object, const String& eventName, co
     StringHash eventType(eventName);
     Object* sender = (Object*)object;
 
-    HashSet<Object*>* receivers = context_->GetEventReceivers(sender, eventType);
-    if (!receivers || !receivers->Contains(this))
-        SubscribeToEvent(sender, eventType, HANDLER(LuaScript, HandleObjectEvent));
-
     int functionRef = LUA_REFNIL;
     if (FindFunction(functionName))
         functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
-    objectToEventTypeToFunctionRefMap_[sender][eventType] = functionRef;
+    if (functionRef != LUA_REFNIL)
+    {
+        SubscribeToEvent(sender, eventType, HANDLER(LuaScript, HandleObjectEvent));
+        objectToEventTypeToFunctionRefMap_[sender][eventType] = functionRef;
+    }
 }
 
 void LuaScript::RegisterLoader()

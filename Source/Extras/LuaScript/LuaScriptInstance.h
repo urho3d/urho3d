@@ -56,7 +56,7 @@ public:
     /// Script subscribe object's event.
     void ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName);
     
-protected:
+private:
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
 
@@ -66,7 +66,9 @@ protected:
     /// Call event handler.
     void CallEventHandler(int functionRef, StringHash eventType, VariantMap& eventData);
 
-private:
+    /// Release the script object.
+    void ReleaseObject();
+    
     // Lua Script.
     LuaScript* luaScript_;
 

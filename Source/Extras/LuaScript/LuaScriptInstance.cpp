@@ -41,7 +41,7 @@ namespace Urho3D
 {
 
 LuaScriptInstance::LuaScriptInstance(Context* context) : 
-    Component(context), 
+    Component(context),
     scriptObjectRef_(LUA_REFNIL)
 {
     luaScript_ = GetSubsystem<LuaScript>();
@@ -50,35 +50,7 @@ LuaScriptInstance::LuaScriptInstance(Context* context) :
 
 LuaScriptInstance::~LuaScriptInstance()
 {
-    // Unref script object.
-    if (scriptObjectRef_ != LUA_REFNIL)
-        luaL_unref(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
-
-    // Unref Lua function.
-    for (HashMap<StringHash, int>::Iterator i = eventTypeToFunctionRefMap_.Begin(); i != eventTypeToFunctionRefMap_.End(); ++i)
-        luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
-    
-    int top = lua_gettop(luaState_);
-
-    lua_getglobal(luaState_, "DestroyScriptObjectInstance");
-    if (!lua_isfunction(luaState_, -1))
-    {
-        LOGERROR("Can not find lua function DestroyScriptObjectInstance.");
-        lua_settop(luaState_, top);
-        return;
-    }
-
-    // Push this as second parameter.
-    tolua_pushusertype(luaState_, (void*)this, "LuaScriptInstance");
-
-    // Call ObjectType:new function.
-    if (lua_pcall(luaState_, 1, 0, 0) != 0)
-    {
-        const char* message = lua_tostring(luaState_, -1);
-        LOGERROR("Execute Lua function failed: " + String(message));
-        lua_settop(luaState_, top);
-        return;
-    }
+    ReleaseObject();
 }
 
 void LuaScriptInstance::RegisterObject(Context* context)
@@ -90,6 +62,8 @@ bool LuaScriptInstance::CreateObject(const String& objectType)
 {
     if (objectType_ == objectType)
         return true;
+
+    ReleaseObject();
 
     int top = lua_gettop(luaState_);
 
@@ -147,15 +121,15 @@ void LuaScriptInstance::ScriptSubscribeToEvent(const String& eventName, const St
     StringHash eventType(eventName);
     String realFunctionName = functionName.Replaced(":", ".");
 
-    HashSet<Object*>* receivers = context_->GetEventReceivers(eventType);
-    if (!receivers || !receivers->Contains(this))
-        SubscribeToEvent(eventType, HANDLER(LuaScriptInstance, HandleEvent));
-
     int functionRef = LUA_REFNIL;
     if (luaScript_->FindFunction(realFunctionName))
         functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
-    eventTypeToFunctionRefMap_[eventType] = functionRef;
+    if (functionRef != LUA_REFNIL)
+    {
+        SubscribeToEvent(eventType, HANDLER(LuaScriptInstance, HandleEvent));
+        eventTypeToFunctionRefMap_[eventType] = functionRef;
+    }
 }
 
 void LuaScriptInstance::ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName)
@@ -163,16 +137,16 @@ void LuaScriptInstance::ScriptSubscribeToEvent(void* object, const String& event
     StringHash eventType(eventName);
     String realFunctionName = functionName.Replaced(":", ".");
     Object* sender = (Object*)object;
-    
-    HashSet<Object*>* receivers = context_->GetEventReceivers(sender, eventType);
-    if (!receivers || !receivers->Contains(this))
-        SubscribeToEvent(sender, eventType, HANDLER(LuaScriptInstance, HandleObjectEvent));
 
     int functionRef = LUA_REFNIL;
     if (luaScript_->FindFunction(realFunctionName))
         functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
-    objectToEventTypeToFunctionRefMap_[sender][eventType] = functionRef;
+    if (functionRef != LUA_REFNIL)
+    {
+        SubscribeToEvent(sender, eventType, HANDLER(LuaScriptInstance, HandleObjectEvent));
+        objectToEventTypeToFunctionRefMap_[sender][eventType] = functionRef;
+    }
 }
 
 void LuaScriptInstance::HandleEvent(StringHash eventType, VariantMap& eventData)
@@ -205,7 +179,7 @@ void LuaScriptInstance::CallEventHandler(int functionRef, StringHash eventType, 
     int top = lua_gettop(luaState_);
 
     // Push function.
-    lua_rawgeti(luaState_, LUA_REGISTRYINDEX, functionRef);  
+    lua_rawgeti(luaState_, LUA_REGISTRYINDEX, functionRef);
 
     // Push script object.
     lua_rawgeti(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
@@ -223,7 +197,47 @@ void LuaScriptInstance::CallEventHandler(int functionRef, StringHash eventType, 
         lua_settop(luaState_, top);
         return;
     }
+}
 
+void LuaScriptInstance::ReleaseObject()
+{
+    if (scriptObjectRef_ == LUA_REFNIL)
+        return;
+    
+    // Unref script object.
+    luaL_unref(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
+    scriptObjectRef_ = LUA_REFNIL;
+    
+    // Unref Lua function.
+    for (HashMap<StringHash, int>::Iterator i = eventTypeToFunctionRefMap_.Begin(); i != eventTypeToFunctionRefMap_.End(); ++i)
+        luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
+    for (HashMap<Object*, HashMap<StringHash, int> >::Iterator i = objectToEventTypeToFunctionRefMap_.Begin(); 
+        i != objectToEventTypeToFunctionRefMap_.End(); ++i)
+    {
+        for (HashMap<StringHash, int>::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
+            luaL_unref(luaState_, LUA_REGISTRYINDEX, j->second_);
+    }
+    
+    int top = lua_gettop(luaState_);
+
+    lua_getglobal(luaState_, "DestroyScriptObjectInstance");
+    if (!lua_isfunction(luaState_, -1))
+    {
+        LOGERROR("Can not find lua function DestroyScriptObjectInstance.");
+        lua_settop(luaState_, top);
+        return;
+    }
+
+    // Push this as second parameter.
+    tolua_pushusertype(luaState_, (void*)this, "LuaScriptInstance");
+
+    if (lua_pcall(luaState_, 1, 0, 0) != 0)
+    {
+        const char* message = lua_tostring(luaState_, -1);
+        LOGERROR("Execute Lua function failed: " + String(message));
+        lua_settop(luaState_, top);
+        return;
+    }
 }
 
 }
