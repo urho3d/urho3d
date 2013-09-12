@@ -24,13 +24,12 @@
 
 #include "Sample.h"
 
-// Do forward declarations for the engine classes we have as member variables
 namespace Urho3D
 {
-    class Window;
-}
 
-using namespace Urho3D;
+class Window;
+
+}
 
 /// A simple 'HelloWorld' GUI created purely from code.
 /// This sample demonstrates:

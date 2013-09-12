@@ -26,12 +26,11 @@
 
 namespace Urho3D
 {
-    class Node;
-    class Scene;
-}
 
-// All Urho3D classes reside in namespace Urho3D
-using namespace Urho3D;
+class Node;
+class Scene;
+
+}
 
 /// Skeletal animation example.
 /// This sample demonstrates:

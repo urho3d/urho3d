@@ -26,11 +26,11 @@
 
 namespace Urho3D
 {
-    class Node;
-    class Scene;
-}
 
-using namespace Urho3D;
+class Node;
+class Scene;
+
+}
 
 /// Physics example.
 /// This sample demonstrates:

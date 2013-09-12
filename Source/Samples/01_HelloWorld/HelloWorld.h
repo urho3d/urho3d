@@ -24,9 +24,6 @@
 
 #include "Sample.h"
 
-// All Urho3D classes reside in namespace Urho3D
-using namespace Urho3D;
-
 /// This first example, maintaining tradition, prints a "Hello World" message.
 /// Furthermore it shows:
 ///     - Using the Sample / Application classes, which initialize the Urho3D engine and run the main loop;

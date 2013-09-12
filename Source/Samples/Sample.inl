@@ -27,6 +27,7 @@
 #include "InputEvents.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
+#include "Sprite.h"
 #include "Texture2D.h"
 #include "UI.h"
 #include "XMLFile.h"

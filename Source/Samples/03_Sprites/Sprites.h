@@ -24,13 +24,6 @@
 
 #include "Sample.h"
 
-namespace Urho3D
-{
-    class Sprite;
-}
-
-using namespace Urho3D;
-
 /// Moving sprites example.
 /// This sample demonstrates:
 ///     - Adding Sprite elements to the UI;

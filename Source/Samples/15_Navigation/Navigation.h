@@ -26,12 +26,12 @@
 
 namespace Urho3D
 {
-    class Drawable;
-    class Node;
-    class Scene;
-}
 
-using namespace Urho3D;
+class Drawable;
+class Node;
+class Scene;
+
+}
 
 /// Navigation example.
 /// This sample demonstrates:

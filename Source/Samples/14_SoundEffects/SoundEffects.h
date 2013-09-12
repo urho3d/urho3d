@@ -26,12 +26,12 @@
 
 namespace Urho3D
 {
-    class Button;
-    class Scene;
-    class Slider;
-}
 
-using namespace Urho3D;
+class Button;
+class Scene;
+class Slider;
+
+}
 
 /// Sound effects example
 /// This sample demonstrates:

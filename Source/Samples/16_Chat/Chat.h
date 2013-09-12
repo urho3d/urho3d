@@ -26,13 +26,13 @@
 
 namespace Urho3D
 {
-    class Button;
-    class LineEdit;
-    class Text;
-    class UIElement;
-}
 
-using namespace Urho3D;
+class Button;
+class LineEdit;
+class Text;
+class UIElement;
+
+}
 
 /// Chat example
 /// This sample demonstrates:
@@ -91,5 +91,3 @@ private:
     /// Start server button.
     SharedPtr<Button> startServerButton_;
 };
-
-

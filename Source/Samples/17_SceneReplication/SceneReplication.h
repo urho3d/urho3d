@@ -26,14 +26,14 @@
 
 namespace Urho3D
 {
-    class Button;
-    class Connection;
-    class Scene;
-    class Text;
-    class UIElement;
-}
 
-using namespace Urho3D;
+class Button;
+class Connection;
+class Scene;
+class Text;
+class UIElement;
+
+}
 
 /// Scene network replication example.
 /// This sample demonstrates:

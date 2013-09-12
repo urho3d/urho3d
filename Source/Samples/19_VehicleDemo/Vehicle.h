@@ -27,9 +27,11 @@
 
 namespace Urho3D
 {
-    class Constraint;
-    class Node;
-    class RigidBody;
+
+class Constraint;
+class Node;
+class RigidBody;
+
 }
 
 using namespace Urho3D;
