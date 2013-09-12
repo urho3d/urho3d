@@ -104,7 +104,7 @@ void InitAudio()
 
     // Lower mastervolumes slightly.
     audio.masterGain[SOUND_MASTER] = 0.75;
-    audio.masterGain[SOUND_MUSIC] = 0.75;
+    audio.masterGain[SOUND_MUSIC] = 0.9;
 
     if (!nobgm)
     {
@@ -115,6 +115,7 @@ void InitAudio()
         // Due to networked mode clearing the scene on connect, do not attach to the scene itself
         musicNode = Node();
         musicSource = musicNode.CreateComponent("SoundSource");
+        musicSource.soundType = SOUND_MUSIC;
         musicSource.Play(musicFile);
     }
 }
