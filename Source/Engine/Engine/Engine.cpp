@@ -309,9 +309,8 @@ void Engine::RunFrame()
 {
     assert(initialized_);
     
-    // If graphics subsystem exists, but does not have a window open, assume we should exit
-    Graphics* graphics = GetSubsystem<Graphics>();
-    if (graphics && !graphics->IsInitialized())
+    // If not headless, and the graphics subsystem no longer has a window open, assume we should exit
+    if (!headless_ && !GetSubsystem<Graphics>()->IsInitialized())
         exiting_ = true;
     
     if (exiting_)
@@ -523,11 +522,14 @@ void Engine::Update()
 
 void Engine::Render()
 {
+    if (headless_)
+        return;
+    
     PROFILE(Render);
     
-    // Do not render if device lost
+    // If device is lost, BeginFrame will fail and we skip rendering
     Graphics* graphics = GetSubsystem<Graphics>();
-    if (!graphics || !graphics->BeginFrame())
+    if (!graphics->BeginFrame())
         return;
     
     GetSubsystem<Renderer>()->Render();
