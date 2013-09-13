@@ -16,10 +16,10 @@ enum CompressedFormat
 class Image : public Resource
 {
     void FlipVertical();
-    bool SaveBMP(const char* fileName);
-    bool SavePNG(const char* fileName);
-    bool SaveTGA(const char* fileName);
-    bool SaveJPG(const char* fileName, int quality);
+    bool SaveBMP(const String fileName);
+    bool SavePNG(const String fileName);
+    bool SaveTGA(const String fileName);
+    bool SaveJPG(const String fileName, int quality);
     
     int GetWidth() const;
     int GetHeight() const;

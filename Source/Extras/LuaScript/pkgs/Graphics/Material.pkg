@@ -8,7 +8,7 @@ class Material : public Resource
     Technique* GetTechnique(unsigned index) const;
     
     Pass* GetPass(unsigned index, StringHash passType) const;
-    Pass* GetPass(unsigned index, const char* passType) const;
+    Pass* GetPass(unsigned index, const String passType) const;
     
     Texture* GetTexture(TextureUnit unit) const;
     

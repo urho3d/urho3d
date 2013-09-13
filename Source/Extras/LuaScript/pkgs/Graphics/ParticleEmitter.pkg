@@ -141,7 +141,6 @@ class ParticleEmitter : public BillboardSet
 };
 
 ${
-
 #define TOLUA_DISABLE_tolua_get_ParticleEmitter_emissionRate
 #define tolua_get_ParticleEmitter_emissionRate NULL
 
@@ -159,5 +158,4 @@ ${
 
 #define TOLUA_DISABLE_tolua_get_ParticleEmitter_rotationSpeed
 #define tolua_get_ParticleEmitter_rotationSpeed NULL
-
 $}

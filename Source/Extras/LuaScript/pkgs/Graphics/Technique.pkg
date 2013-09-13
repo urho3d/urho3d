@@ -13,8 +13,8 @@ class Pass : public RefCounted
 
 class Technique : public Resource
 {
-    bool HasPass(const char* type) const;
-    Pass* GetPass(const char*  type) const;
+    bool HasPass(const String type) const;
+    Pass* GetPass(const String  type) const;
     bool IsSM3() const;
     tolua_readonly tolua_property__is_set bool SM3;
 };

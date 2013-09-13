@@ -17,10 +17,8 @@ class Log : public Object
     String GetLastMessage() const;
     bool IsQuiet() const;
     
-    static void Write(int level, const String& message);
-    static void Write(int level, const char* message);
-    static void WriteRaw(const String& message, bool error = false);
-    static void WriteRaw(const char* message, bool error = false);
+    static void Write(int level, const String message);
+    static void WriteRaw(const String message, bool error = false);
     
     tolua_property__get_set int level;
     tolua_property__get_set bool timeStamp;

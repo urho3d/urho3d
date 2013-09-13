@@ -21,7 +21,6 @@ class Octree : public Component
 };
 
 ${
-
 static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
 {
     PODVector<RayQueryResult> result;
@@ -39,5 +38,4 @@ static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, 
         return empty;
     }
 }
-
 $}

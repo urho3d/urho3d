@@ -159,8 +159,8 @@ class Renderer
     TextureCube* GetFaceSelectCubeMap() const;
     TextureCube* GetIndirectionCubeMap() const;
     VertexBuffer* GetInstancingBuffer() const;
-    ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
-    ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const;
+    ShaderVariation* GetVertexShader(const String name, bool checkExists = false) const;
+    ShaderVariation* GetPixelShader(const String name, bool checkExists = false) const;
     ShaderVariation* GetStencilVS() const;
     ShaderVariation* GetStencilPS() const;
     const FrameInfo& GetFrameInfo();

@@ -5,12 +5,10 @@ class Text : public UIElement
     Text(Context* context);
     virtual ~Text();
 
-    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    bool SetFont(const char* fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     
-    void SetText(const String& text);
-    void SetText(const char* text);
+    void SetText(const String text);
     
     void SetTextAlignment(HorizontalAlignment align);
     void SetRowSpacing(float spacing);

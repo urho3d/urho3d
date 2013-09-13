@@ -1,40 +1,18 @@
 $#include "StringUtils.h"
 
-bool ToBool(const String& source);
-bool ToBool(const char* source);
+bool ToBool(const String source);
+float ToFloat(const String source);
+int ToInt(const String source);
+unsigned ToUInt(const String source);
 
-float ToFloat(const String& source);
-float ToFloat(const char* source);
-
-int ToInt(const String& source);
-int ToInt(const char* source);
-
-unsigned ToUInt(const String& source);
-unsigned ToUInt(const char* source);
-
-Color ToColor(const String& source);
-Color ToColor(const char* source);
-
-IntRect ToIntRect(const String& source);
-IntRect ToIntRect(const char* source);
-
-IntVector2 ToIntVector2(const String& source);
-IntVector2 ToIntVector2(const char* source);
-
-Quaternion ToQuaternion(const String& source);
-Quaternion ToQuaternion(const char* source);
-
-Rect ToRect(const String& source);
-Rect ToRect(const char* source);
-
-Vector2 ToVector2(const String& source);
-Vector2 ToVector2(const char* source);
-
-Vector3 ToVector3(const String& source);
-Vector3 ToVector3(const char* source);
-
-Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
-Vector4 ToVector4(const char* source, bool allowMissingCoords = false);
+Color ToColor(const String source);
+IntRect ToIntRect(const String source);
+IntVector2 ToIntVector2(const String source);
+Quaternion ToQuaternion(const String source);
+Rect ToRect(const String source);
+Vector2 ToVector2(const String source);
+Vector3 ToVector3(const String source);
+Vector4 ToVector4(const String source, bool allowMissingCoords = false);
 
 String ToString(void* value);
 String ToStringHex(unsigned value);

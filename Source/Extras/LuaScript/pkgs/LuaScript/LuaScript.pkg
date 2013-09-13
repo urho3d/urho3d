@@ -2,25 +2,14 @@ $#include "LuaScript.h"
 
 Object* GetEventSender();
 
-void SendEvent(const String& eventName, VariantMap& eventData);
-void SendEvent(const char* eventName, VariantMap& eventData);
-
-void SubscribeToEvent(const String& eventName, const char* functionName);
-void SubscribeToEvent(const char* eventName, const char* functionName);
-
-void SubscribeToEvent(void* object, const String& eventName, const char* functionName);
-void SubscribeToEvent(void* object, const char* eventName, const char* functionName);
+void SendEvent(const String eventName, VariantMap& eventData);
+void SubscribeToEvent(const String eventName, const String functionName);
+void SubscribeToEvent(void* object, const String eventName, const String functionName);
 
 ${
-
 static LuaScript* GetLuaScript()
 {
     return GetContext()->GetSubsystem<LuaScript>();
-}
-
-static void SendEvent(const String& eventName, VariantMap& eventData)
-{
-    GetLuaScript()->ScriptSendEvent(eventName, eventData);
 }
 
 static Object* GetEventSender()
@@ -28,14 +17,18 @@ static Object* GetEventSender()
     return GetContext()->GetEventSender();
 }
 
-static void SubscribeToEvent(const String& eventName, const char* functionName)
+static void SendEvent(const String& eventName, VariantMap& eventData)
+{
+    GetLuaScript()->ScriptSendEvent(eventName, eventData);
+}
+
+static void SubscribeToEvent(const String& eventName, const String& functionName)
 {
     GetLuaScript()->ScriptSubscribeToEvent(eventName, functionName);
 }
 
-static void SubscribeToEvent(void* object, const String& eventName, const char* functionName)
+static void SubscribeToEvent(void* object, const String& eventName, const String& functionName)
 {
     GetLuaScript()->ScriptSubscribeToEvent(object, eventName, functionName);
 }
-
 $}

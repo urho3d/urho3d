@@ -2,17 +2,10 @@ $#include "LuaScriptInstance.h"
 
 class LuaScriptInstance : public Component
 {
-    bool CreateObject(const String& objectType);
-    bool CreateObject(const char* objectType);
-    
-    bool CreateObject(const String& fileName, const String& objectType);
-    bool CreateObject(const char* fileName, const char* objectType);
-    
-    void ScriptSubscribeToEvent @ SubscribeToEvent(const String& eventName, const char* functionName);
-    void ScriptSubscribeToEvent @ SubscribeToEvent(const char* eventName, const char* functionName);
-    
-    void ScriptSubscribeToEvent @ SubscribeToEvent(void* object, const String& eventName, const char* functionName);
-    void ScriptSubscribeToEvent @ SubscribeToEvent(void* object, const char* eventName, const char* functionName);
+    bool CreateObject(const String objectType);
+    bool CreateObject(const String fileName, const String objectType);
+    void ScriptSubscribeToEvent @ SubscribeToEvent(const String eventName, const String functionName);
+    void ScriptSubscribeToEvent @ SubscribeToEvent(void* object, const String eventName, const String functionName);
 };
 
 $[
@@ -25,7 +18,7 @@ function LuaScriptObject:Stop()
 end
 
 function LuaScriptObject:GetNode()
-	return self.node
+    return self.node
 end
 
 function LuaScriptObject:SubscribeToEvent(param1, param2, param3)

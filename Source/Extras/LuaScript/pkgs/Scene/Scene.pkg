@@ -58,7 +58,7 @@ class Scene : public Node
     tolua_property__is_set bool updateEnabled;
     tolua_readonly tolua_property__is_set bool asyncLoading;
     tolua_readonly tolua_property__get_set float asyncProgress;
-    tolua_property__get_set const String& fileName;
+    tolua_property__get_set const String fileName;
     tolua_readonly tolua_property__get_set unsigned checksum;
     tolua_property__get_set float timeScale;
     tolua_property__get_set float elapsedTime;

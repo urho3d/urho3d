@@ -12,7 +12,7 @@ class Node : public Serializable
     virtual ~Node();
 
     bool SaveXML(Serializer& dest) const;
-    void SetName(const String& name);
+    void SetName(const String name);
     
     void SetPosition(const Vector3& position);
     tolua_outside void NodeSetPositionXYZ @ SetPositionXYZ(float x, float y, float z);
@@ -73,8 +73,7 @@ class Node : public Serializable
     void SetOwner(Connection* owner);
     void MarkDirty();
     
-    Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
-    Node* CreateChild(const char* name = 0, CreateMode mode = REPLICATED, unsigned id = 0);
+    Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
     
     void AddChild(Node* node);
     void RemoveChild(Node* node);
@@ -82,7 +81,7 @@ class Node : public Serializable
     void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
     void RemoveComponent(Component* component);
     void RemoveComponent(ShortStringHash type);
-    void RemoveComponent(const char* type);
+    void RemoveComponent(const String type);
     
     void RemoveAllComponents();
     void RemoveComponents(bool removeReplicated, bool removeLocal);
@@ -96,7 +95,7 @@ class Node : public Serializable
     void RemoveListener(Component* component);
     
     // template <class T> T* CreateComponent(CreateMode mode = REPLICATED, unsigned id = 0);
-    Component* CreateComponent(const char* type, CreateMode mode = REPLICATED, unsigned id = 0);
+    Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0);
     
     unsigned GetID() const;
     const String& GetName() const;
@@ -143,21 +142,20 @@ class Node : public Serializable
     
     unsigned GetNumChildren(bool recursive = false) const;
     Node* GetChild(unsigned index) const;
-    Node* GetChild(const String& name, bool recursive = false) const;
-    Node* GetChild(const char* name, bool recursive = false) const;
+    Node* GetChild(const String name, bool recursive = false) const;
     Node* GetChild(StringHash nameHash, bool recursive = false) const;
     
     unsigned GetNumComponents() const;
     unsigned GetNumNetworkComponents() const;
     
     bool HasComponent(ShortStringHash type) const;
-    bool HasComponent(const char* type) const;
+    bool HasComponent(const String type) const;
     
     const Variant& GetVar(ShortStringHash key) const;
     const VariantMap& GetVars() const;
     
     // template <class T> T* GetComponent() const;
-    Component* GetComponent(const char* type) const;
+    Component* GetComponent(const String type) const;
     
     void SetID(unsigned id);
     void SetScene(Scene* scene);
@@ -192,7 +190,6 @@ class Node : public Serializable
 };
 
 ${
-
 static void NodeSetPositionXYZ(Node* node, float x, float y, float z)
 {
     node->SetPosition(Vector3(x, y, z));
@@ -348,27 +345,27 @@ static int tolua_SceneLuaAPI_Node_CreateComponent00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+ !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
-  goto tolua_lerror;
+ goto tolua_lerror;
  else
 #endif
  {
   Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-  const char* type = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const String type = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
   CreateMode mode = ((CreateMode) (int)  tolua_tonumber(tolua_S,3,REPLICATED));
   unsigned id = ((unsigned)  tolua_tonumber(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CreateComponent'", NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CreateComponent'", NULL);
 #endif
-  {
-   Component* tolua_ret = (Component*)  self->CreateComponent(type,mode,id);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,type);
-  }
+ {
+  Component* tolua_ret = (Component*)  self->CreateComponent(type,mode,id);
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,type.CString());
+ }
  }
  return 1;
 #ifndef TOLUA_RELEASE
@@ -380,29 +377,28 @@ static int tolua_SceneLuaAPI_Node_CreateComponent00(lua_State* tolua_S)
 
 // Disable generated GetComponent funciton.
 #define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_GetComponent00
-
 static int tolua_SceneLuaAPI_Node_GetComponent00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"const Node",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ !tolua_isusertype(tolua_S,1,"const Node",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
-  goto tolua_lerror;
+ goto tolua_lerror;
  else
 #endif
  {
   const Node* self = (const Node*)  tolua_tousertype(tolua_S,1,0);
-  const char* type = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const String type = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetComponent'", NULL);
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetComponent'", NULL);
 #endif
-  {
-   Component* tolua_ret = (Component*)  self->GetComponent(type);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,type);
-  }
+ {
+  Component* tolua_ret = (Component*)  self->GetComponent(type);
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,type.CString());
+ }
  }
  return 1;
 #ifndef TOLUA_RELEASE
@@ -411,5 +407,4 @@ static int tolua_SceneLuaAPI_Node_GetComponent00(lua_State* tolua_S)
  return 0;
 #endif
 }
-
 $}

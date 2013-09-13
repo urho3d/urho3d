@@ -12,8 +12,7 @@ class DropDownList : public Menu
     void RemoveAllItems();
     void SetSelection(unsigned index);
     
-    void SetPlaceholderText(const String& text);
-    void SetPlaceholderText(const const char* text);
+    void SetPlaceholderText(const String text);
     
     void SetResizePopup(bool enable);
    

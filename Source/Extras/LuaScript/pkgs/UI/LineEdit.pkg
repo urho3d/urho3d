@@ -5,8 +5,7 @@ class LineEdit : public BorderImage
     LineEdit(Context* context);
     virtual ~LineEdit();
     
-    void SetText(const String& text);
-    void SetText(const char* text);
+    void SetText(const String text);
     
     void SetCursorPosition(unsigned position);
     void SetCursorBlinkRate(float rate);

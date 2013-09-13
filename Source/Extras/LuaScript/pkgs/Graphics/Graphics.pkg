@@ -2,8 +2,7 @@ $#include "Graphics.h"
 
 class Graphics : public Object
 {
-    void SetWindowTitle(const String& windowTitle);
-    void SetWindowTitle(const char* windowTitle);
+    void SetWindowTitle(const String windowTitle);
     
     bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     bool SetMode(int width, int height);
@@ -40,7 +39,7 @@ class Graphics : public Object
     bool GetSRGBWriteSupport() const;
     
     tolua_readonly tolua_property__is_set bool initialized;
-    tolua_property__get_set const String& windowTitle;
+    tolua_property__get_set const String windowTitle;
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
     tolua_readonly tolua_property__get_set int multiSample;

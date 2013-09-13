@@ -9,7 +9,7 @@ class Model : public Resource
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
     unsigned GetNumMorphs() const;
     const ModelMorph* GetMorph(unsigned index) const;
-    const ModelMorph* GetMorph(const String& name) const;
+    const ModelMorph* GetMorph(const String name) const;
     const ModelMorph* GetMorph(StringHash nameHash) const;
     unsigned GetMorphRangeStart(unsigned bufferIndex) const;
     unsigned GetMorphRangeCount(unsigned bufferIndex) const;

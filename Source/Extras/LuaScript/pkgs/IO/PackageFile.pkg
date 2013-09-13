@@ -10,12 +10,12 @@ struct PackageEntry
 class PackageFile : public Object
 {
     PackageFile(Context* context);
-    PackageFile(Context* context, const String& fileName);
+    PackageFile(Context* context, const String fileName);
     virtual ~PackageFile();
     
-    bool Open(const String& fileName);
-    bool Exists(const String& fileName) const;
-    const PackageEntry* GetEntry(const String& fileName) const;
+    bool Open(const String fileName);
+    bool Exists(const String fileName) const;
+    const PackageEntry* GetEntry(const String fileName) const;
     const HashMap<String, PackageEntry>& GetEntries() const;
     
     const String& GetName() const;

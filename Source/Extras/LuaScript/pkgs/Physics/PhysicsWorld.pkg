@@ -69,7 +69,6 @@ class PhysicsWorld : public Component
 };
 
 ${
-
 static PhysicsRaycastResult PhysicsWorldRaycastSingle(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 {
     PhysicsRaycastResult result;
@@ -83,5 +82,4 @@ PhysicsRaycastResult PhysicsWorldSphereCast(PhysicsWorld* physicsWorld, const Ra
     physicsWorld->SphereCast(result, ray, radius, maxDistance, collisionMask);
     return result;
 }
-
 $}

@@ -14,10 +14,10 @@ class Connection : public Object
     void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0);
     
     void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    void SendRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void SendRemoteEvent(const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     
     void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
-    void SendRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
+    void SendRemoteEvent(Node* node, const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap);
     
     void SetScene(Scene* newScene);
     void SetIdentity(const VariantMap& identity);

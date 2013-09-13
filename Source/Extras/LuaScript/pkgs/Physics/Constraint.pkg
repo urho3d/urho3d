@@ -62,11 +62,9 @@ class Constraint : public Component
 };
 
 ${
-
 #define TOLUA_DISABLE_tolua_get_Constraint_axis_ref
 #define tolua_get_Constraint_axis_ref NULL
 
 #define TOLUA_DISABLE_tolua_get_Constraint_otherAxis_ref
 #define tolua_get_Constraint_otherAxis_ref NULL
-
 $}

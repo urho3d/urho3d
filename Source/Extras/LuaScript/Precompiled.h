@@ -27,7 +27,7 @@
 #include "Str.h"
 #include "tolua++.h"
 
-// Add Urho3D::String Support in tolua++.
+// Add Urho3D::String support in tolua++
 inline const char* tolua_tourho3dstring(lua_State* L, int narg, const Urho3D::String& def)
 {
     return tolua_tourho3dstring(L, narg, def.CString());
@@ -37,3 +37,15 @@ inline const char* tolua_tofieldurho3dstring(lua_State* L, int lo, int index, co
 {
     return tolua_tofieldurho3dstring(L, lo, index, def.CString());
 };
+
+// Convert Urho3D::String vector to a lua table
+inline int tolua_pushurho3dstringvector(lua_State* L, const Urho3D::Vector<Urho3D::String>& strings)
+{
+    lua_newtable(L);
+    for (unsigned i = 0; i < strings.Size(); ++i)
+    {
+        tolua_pushurho3dstring(L, strings[i]);
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}

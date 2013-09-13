@@ -128,7 +128,6 @@ static const int HAT_DOWN;
 static const int HAT_LEFT;
 
 ${
-
 static const int KEY_1 = '1';
 static const int KEY_2 = '2';
 static const int KEY_3 = '3';
@@ -165,5 +164,4 @@ static const int KEY_W = 'W';
 static const int KEY_X = 'X';
 static const int KEY_Y = 'Y';
 static const int KEY_Z = 'Z';
-
 $}

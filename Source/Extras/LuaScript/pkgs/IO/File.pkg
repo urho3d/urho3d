@@ -10,9 +10,8 @@ enum FileMode
 class File : public Deserializer
 {
     File(Context* context);
-    File(Context* context, const String& fileName, FileMode mode = FILE_READ);
-    File(Context* context, const char* fileName, FileMode mode = FILE_READ);
-    File(Context* context, PackageFile* package, const String& fileName);
+    File(Context* context, const String fileName, FileMode mode = FILE_READ);
+    File(Context* context, PackageFile* package, const String fileName);
     virtual ~File();
     
     virtual unsigned Read(void* dest, unsigned size);
@@ -21,11 +20,11 @@ class File : public Deserializer
     virtual const String& GetName() const;
     virtual unsigned GetChecksum();
     
-    bool Open(const String& fileName, FileMode mode = FILE_READ);
-    bool Open(PackageFile* package, const String& fileName);
+    bool Open(const String fileName, FileMode mode = FILE_READ);
+    bool Open(PackageFile* package, const String fileName);
     void Close();
     void Flush();
-    void SetName(const String& name);
+    void SetName(const String name);
     
     FileMode GetMode() const;
     bool IsOpen() const;

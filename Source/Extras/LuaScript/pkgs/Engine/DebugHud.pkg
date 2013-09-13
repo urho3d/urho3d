@@ -25,9 +25,9 @@ class DebugHud : public Object
     float GetProfilerInterval() const;
     bool GetUseRendererStats() const;
     
-    void SetAppStats(const String& label, const Variant& stats);
-    void SetAppStats(const String& label, const String& stats);
-    bool ResetAppStats(const String& label);
+    void SetAppStats(const String label, const Variant stats);
+    void SetAppStats(const String label, const String stats);
+    bool ResetAppStats(const String label);
     void ClearAppStats();
     
     tolua_property__get_set XMLFile* defaultStyle;

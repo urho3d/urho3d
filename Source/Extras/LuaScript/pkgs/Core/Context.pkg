@@ -42,7 +42,6 @@ Time* GetTime();
 UI* GetUI();
 
 ${
-
 static Audio* GetAudio()
 {
     return GetContext()->GetSubsystem<Audio>();
@@ -117,5 +116,4 @@ static UI* GetUI()
 {
     return GetContext()->GetSubsystem<UI>();
 }
-
 $}

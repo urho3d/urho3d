@@ -12,8 +12,7 @@ class UI : public Object
     void DebugDraw(UIElement* element);
     bool SaveLayout(Serializer& dest, UIElement* element);
     
-    void SetClipBoardText(const String& text);
-    void SetClipBoardText(const char* text);
+    void SetClipBoardText(const String text);
     
     void SetDoubleClickInterval(float interval);
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);

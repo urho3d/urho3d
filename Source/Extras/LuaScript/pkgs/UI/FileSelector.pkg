@@ -13,19 +13,11 @@ class FileSelector : public Object
 
     void SetDefaultStyle(XMLFile* style);
     
-    void SetTitle(const String& text);
-    void SetTitle(const char* text);
-    
-    void SetButtonTexts(const String& okText, const String& cancelText);
-    void SetButtonTexts(const char* okText, const char* cancelText);
-    
-    void SetPath(const String& path);
-    void SetPath(const char* path);
-    
-    void SetFileName(const String& fileName);
-    void SetFileName(const char* fileName);
-    
-    void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
+    void SetTitle(const String text);
+    void SetButtonTexts(const String okText, const String cancelText);    
+    void SetPath(const String path);
+    void SetFileName(const String fileName);
+    // void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
     void SetDirectoryMode(bool enable);
     void UpdateElements();
 

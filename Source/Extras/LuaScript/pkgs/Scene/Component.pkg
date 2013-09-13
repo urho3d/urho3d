@@ -12,5 +12,5 @@ class Component : public Serializable
     bool IsEnabledEffective() const;
   
     Component* GetComponent(ShortStringHash type) const;
-    Component* GetComponent(const char* type) const;
+    Component* GetComponent(const String type) const;
 };
