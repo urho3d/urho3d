@@ -21,64 +21,46 @@ namespace Urho3D
 - ResourceCache* GetCache()
 - Time* GetTime()
 - UI* GetUI()
-- void ErrorDialog(const String& title, const String& message)
-- void ErrorDialog(const char* title, const char* message)
-- void ErrorExit(const String& message = String::EMPTY, int exitCode = EXIT_FAILURE)
-- void ErrorExit(const char* message, int exitCode = EXIT_FAILURE)
+- void ErrorDialog(const String title, const String message)
+- void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
 - void OpenConsoleWindow()
-- void PrintLine(const String& str, bool error = false)
-- void PrintLine(const char* str, bool error = false)
+- void PrintLine(const String str, bool error = false)
 - const Vector<String>& GetArguments()
-- GetConsoleInput()
-- GetPlatform()
+- String GetConsoleInput()
+- String GetPlatform()
 - unsigned GetNumPhysicalCPUs()
 - unsigned GetNumLogicalCPUs()
-- bool ToBool(const String& source)
-- bool ToBool(const char* source)
-- float ToFloat(const String& source)
-- float ToFloat(const char* source)
-- int ToInt(const String& source)
-- int ToInt(const char* source)
-- unsigned ToUInt(const String& source)
-- unsigned ToUInt(const char* source)
-- Color ToColor(const String& source)
-- Color ToColor(const char* source)
-- IntRect ToIntRect(const String& source)
-- IntRect ToIntRect(const char* source)
-- IntVector2 ToIntVector2(const String& source)
-- IntVector2 ToIntVector2(const char* source)
-- Quaternion ToQuaternion(const String& source)
-- Quaternion ToQuaternion(const char* source)
-- Rect ToRect(const String& source)
-- Rect ToRect(const char* source)
-- Vector2 ToVector2(const String& source)
-- Vector2 ToVector2(const char* source)
-- Vector3 ToVector3(const String& source)
-- Vector3 ToVector3(const char* source)
-- Vector4 ToVector4(const String& source, bool allowMissingCoords = false)
-- Vector4 ToVector4(const char* source, bool allowMissingCoords = false)
+- bool ToBool(const String source)
+- float ToFloat(const String source)
+- int ToInt(const String source)
+- unsigned ToUInt(const String source)
+- Color ToColor(const String source)
+- IntRect ToIntRect(const String source)
+- IntVector2 ToIntVector2(const String source)
+- Quaternion ToQuaternion(const String source)
+- Rect ToRect(const String source)
+- Vector2 ToVector2(const String source)
+- Vector3 ToVector3(const String source)
+- Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - String ToString(void* value)
 - String ToStringHex(unsigned value)
 - bool IsAlpha(unsigned ch)
 - bool IsDigit(unsigned ch)
-- String GetPath(const String& fullPath)
-- String GetFileName(const String& fullPath)
-- String GetExtension(const String& fullPath, bool lowercaseExtension = true)
-- String GetFileNameAndExtension(const String& fullPath, bool lowercaseExtension = false)
-- String ReplaceExtension(const String& fullPath, const String& newExtension)
-- String AddTrailingSlash(const String& pathName)
-- String RemoveTrailingSlash(const String& pathName)
-- String GetParentPath(const String& pathName)
-- String GetInternalPath(const String& pathName)
-- String GetNativePath(const String& pathName)
-- bool IsAbsolutePath(const String& pathName)
+- String GetPath(const String fullPath)
+- String GetFileName(const String fullPath)
+- String GetExtension(const String fullPath, bool lowercaseExtension = true)
+- String GetFileNameAndExtension(const String fullPath, bool lowercaseExtension = false)
+- String ReplaceExtension(const String fullPath, const String newExtension)
+- String AddTrailingSlash(const String pathName)
+- String RemoveTrailingSlash(const String pathName)
+- String GetParentPath(const String pathName)
+- String GetInternalPath(const String pathName)
+- String GetNativePath(const String pathName)
+- bool IsAbsolutePath(const String pathName)
 - Object* GetEventSender()
-- void SendEvent(const String& eventName, VariantMap& eventData)
-- void SendEvent(const char* eventName, VariantMap& eventData)
-- void SubscribeToEvent(const String& eventName, const char* functionName)
-- void SubscribeToEvent(const char* eventName, const char* functionName)
-- void SubscribeToEvent(void* object, const String& eventName, const char* functionName)
-- void SubscribeToEvent(void* object, const char* eventName, const char* functionName)
+- void SendEvent(const String eventName, VariantMap& eventData)
+- void SubscribeToEvent(const String eventName, const String functionName)
+- void SubscribeToEvent(void* object, const String eventName, const String functionName)
 - float Lerp(float lhs, float rhs, float t)
 - float Min(float lhs, float rhs)
 - float Max(float lhs, float rhs)
@@ -87,28 +69,17 @@ namespace Urho3D
 - bool Equals(float lhs, float rhs)
 - float Random()
 - float Random(float range)
-- RandomInt(int range)
+- int Random @ RandomInt(int range)
 - void SetRandomSeed(unsigned seed)
 - unsigned GetRandomSeed()
 - int Rand()
 
-\section LuaScriptAPI_GlobalConstants Global constants
+section LuaScriptAPI_GlobalConstants Global constants
 - unsigned DEBUGHUD_SHOW_NONE
 - unsigned DEBUGHUD_SHOW_STATS
 - unsigned DEBUGHUD_SHOW_MODE
 - unsigned DEBUGHUD_SHOW_PROFILER
 - unsigned DEBUGHUD_SHOW_ALL
-- int QUALITY_LOW
-- int QUALITY_MEDIUM
-- int QUALITY_HIGH
-- int QUALITY_MAX
-- int SHADOWQUALITY_LOW_16BIT
-- int SHADOWQUALITY_LOW_24BIT
-- int SHADOWQUALITY_HIGH_16BIT
-- int SHADOWQUALITY_HIGH_24BIT
-- unsigned CLEAR_COLOR
-- unsigned CLEAR_DEPTH
-- unsigned CLEAR_STENCIL
 - unsigned char CHANNEL_POSITION
 - unsigned char CHANNEL_ROTATION
 - unsigned char CHANNEL_SCALE
@@ -122,6 +93,17 @@ namespace Urho3D
 - unsigned DEFAULT_ZONEMASK
 - int MAX_VERTEX_LIGHTS
 - float ANIMATION_LOD_BASESCALE
+- int QUALITY_LOW
+- int QUALITY_MEDIUM
+- int QUALITY_HIGH
+- int QUALITY_MAX
+- int SHADOWQUALITY_LOW_16BIT
+- int SHADOWQUALITY_LOW_24BIT
+- int SHADOWQUALITY_HIGH_16BIT
+- int SHADOWQUALITY_HIGH_24BIT
+- unsigned CLEAR_COLOR
+- unsigned CLEAR_DEPTH
+- unsigned CLEAR_STENCIL
 - int SHADOW_MIN_PIXELS
 - int INSTANCING_BUFFER_DEFAULT_SIZE
 - int MOUSEB_LEFT
@@ -254,6 +236,8 @@ namespace Urho3D
 - int LOG_WARNING
 - int LOG_ERROR
 - int LOG_NONE
+- unsigned NUM_FRUSTUM_PLANES
+- unsigned NUM_FRUSTUM_VERTICES
 - float M_PI
 - int M_MIN_INT
 - int M_MAX_INT
@@ -268,8 +252,6 @@ namespace Urho3D
 - float M_DEGTORAD
 - float M_DEGTORAD_2
 - float M_RADTODEG
-- unsigned NUM_FRUSTUM_PLANES
-- unsigned NUM_FRUSTUM_VERTICES
 - unsigned FIRST_REPLICATED_ID
 - unsigned LAST_REPLICATED_ID
 - unsigned FIRST_LOCAL_ID
@@ -303,6 +285,9 @@ namespace Urho3D
 - int VAR_INTRECT
 - int VAR_INTVECTOR2
 - int MAX_VAR_TYPES
+- int UPDATE_NONE
+- int UPDATE_MAIN_THREAD
+- int UPDATE_WORKER_THREAD
 - int RENDER_FORWARD
 - int RENDER_PREPASS
 - int RENDER_DEFERRED
@@ -417,9 +402,6 @@ namespace Urho3D
 - int SP_OBJECTTRANSFORM
 - int SP_OBJECTDATA
 - int MAX_SHADER_PARAMETER_GROUPS
-- int UPDATE_NONE
-- int UPDATE_MAIN_THREAD
-- int UPDATE_WORKER_THREAD
 - int LIGHT_DIRECTIONAL
 - int LIGHT_SPOT
 - int LIGHT_POINT
@@ -509,15 +491,15 @@ namespace Urho3D
 - int FILE_READ
 - int FILE_WRITE
 - int FILE_READWRITE
-- int OUTSIDE
-- int INTERSECTS
-- int INSIDE
 - int PLANE_NEAR
 - int PLANE_LEFT
 - int PLANE_RIGHT
 - int PLANE_UP
 - int PLANE_DOWN
 - int PLANE_FAR
+- int OUTSIDE
+- int INTERSECTS
+- int INSIDE
 - int SHAPE_BOX
 - int SHAPE_SPHERE
 - int SHAPE_STATICPLANE
@@ -590,8 +572,7 @@ namespace Urho3D
 - int DRAG_RESIZE_BOTTOMLEFT
 - int DRAG_RESIZE_LEFT
 
-\section LuaScriptAPI_Classes Classes
-
+section LuaScriptAPI_Classes Classes
 Audio : Object
 
 Methods:<br>
@@ -619,7 +600,7 @@ Properties:<br>
 - int mixRate (readonly)
 - bool interpolation (readonly)
 - SoundListener* listener
-- bool stereo    (readonly)
+- bool stereo (readonly)
 - bool playing (readonly)
 - bool initialized (readonly)
 
@@ -648,6 +629,8 @@ Properties:<br>
 - bool compressed (readonly)
 
 SoundListener : Component
+
+Methods:<br>
 
 SoundSource : Component
 
@@ -705,69 +688,10 @@ Properties:<br>
 - float farDistance
 - float rolloffFactor
 
-String
-
-Methods:<br>
-- String()
-- String(const String& str)
-- String(const char* str)
-- String(const char* str, unsigned length)
-- ~String()
-- String operator + (const String& rhs) const
-- String operator + (const char* rhs) const
-- bool operator == (const String& rhs) const
-- bool operator == (const char* rhs) const
-- Equals(const String& rhs) const
-- Equals(const char*& rhs) const
-- void Replace(const String& replaceThis, const String& replaceWith, bool caseSensitive = true)
-- void Replace(const char* replaceThis, const char* replaceWith, bool caseSensitive = true)
-- void Replace(unsigned pos, unsigned length, const String& replaceWith)
-- void Replace(unsigned pos, unsigned length, const char* replaceWith)
-- String Replaced(const String& replaceThis, const String& replaceWith, bool caseSensitive = true) const
-- String Replaced(const char* replaceThis, const char* replaceWith, bool caseSensitive = true) const
-- String& Append(const String& str)
-- String& Append(const char* str)
-- String& Append(const char* str, unsigned length)
-- void Insert(unsigned pos, const String& str)
-- void Insert(unsigned pos, char c)
-- void Erase(unsigned pos, unsigned length = 1)
-- void Resize(unsigned newLength)
-- void Reserve(unsigned newCapacity)
-- void Compact()
-- void Clear()
-- String Substring(unsigned pos) const
-- String Substring(unsigned pos, unsigned length) const
-- String Trimmed() const
-- String ToUpper() const
-- String ToLower() const
-- unsigned Find(const String& str, unsigned startPos = 0, bool caseSensitive = true) const
-- unsigned Find(const char* str, unsigned startPos = 0, bool caseSensitive = true) const
-- unsigned FindLast(const String& str, unsigned startPos = String::NPOS, bool caseSensitive = true) const
-- unsigned FindLast(const char* str, unsigned startPos = String::NPOS, bool caseSensitive = true) const
-- bool StartsWith(const String& str, bool caseSensitive = true) const
-- bool StartsWith(const char* str, bool caseSensitive = true) const
-- bool EndsWith(const String& str, bool caseSensitive = true) const
-- bool EndsWith(const char* str, bool caseSensitive = true) const
-- const char* CString() const
-- unsigned Length() const
-- unsigned Capacity() const
-- bool Empty() const
-- int Compare(const String& str, bool caseSensitive = true) const
-- int Compare(const char* str, bool caseSensitive = true) const
-- bool Contains(const String& str) const
-- unsigned ToHash() const
-- static int Compare(const char* str1, const char* str2, bool caseSensitive)
-- static const unsigned NPOS
-- static const String EMPTY
-
-Properties:<br>
-- unsigned length (readonly)
-- unsigned capacity (readonly)
-- bool empty (readonly)
-
 Vector : VectorBase
 
 Methods:<br>
+- TOLUA_TEMPLATE_BIND(T, String)
 - Vector()
 - Vector(const Vector<T>& vector)
 - ~Vector()
@@ -806,6 +730,7 @@ Properties:<br>
 PODVector
 
 Methods:<br>
+- TOLUA_TEMPLATE_BIND(T, Vector3)
 - PODVector()
 - PODVector(const PODVector<T>& vector)
 - ~PODVector()
@@ -851,17 +776,32 @@ Methods:<br>
 Object : RefCounted
 
 Methods:<br>
-- virtual ShortStringHash GetType() const
-- GetTypeName() const
+- ShortStringHash GetType() const
+- const String& GetTypeName() const
 - const String& GetCategory() const
-- GetCategory() const
-- SendEvent(const char* eventName)
-- SendEvent(const char* eventName, VariantMap& eventData)
+- void SendEvent(const String eventName, VariantMap* eventData = 0)
 
 Properties:<br>
 - ShortStringHash type (readonly)
-- String& typeName (readonly)
-- String& category (readonly)
+- const String typeName (readonly)
+- const String category (readonly)
+
+Time : Object
+
+Methods:<br>
+- unsigned GetFrameNumber() const
+- float GetTimeStep() const
+- unsigned GetTimerPeriod() const
+- float GetElapsedTime()
+- static unsigned GetSystemTime()
+- static String GetTimeStamp()
+- static void Sleep(unsigned mSec)
+
+Properties:<br>
+- unsigned frameNumber (readonly)
+- float timeStep (readonly)
+- unsigned timerPeriod (readonly)
+- float elapsedTime (readonly)
 
 ResourceRef
 
@@ -870,21 +810,17 @@ Methods:<br>
 - ResourceRef(ShortStringHash type)
 - ResourceRef(ShortStringHash type, StringHash id)
 - ResourceRef(const ResourceRef& rhs)
-- bool operator == (const ResourceRef& rhs) const
-
-Properties:<br>
 - ShortStringHash type
 - StringHash id
+- bool operator == (const ResourceRef& rhs) const
 
 ResourceRefList
 
 Methods:<br>
 - ResourceRefList()
 - ResourceRefList(ShortStringHash type)
-- bool operator == (const ResourceRefList& rhs) const
-
-Properties:<br>
 - ShortStringHash type
+- bool operator == (const ResourceRefList& rhs) const
 
 Variant
 
@@ -901,15 +837,15 @@ Methods:<br>
 - Variant(const Vector4& value)
 - Variant(const Quaternion& value)
 - Variant(const Color& value)
-- Variant(const String& value)
+- Variant(const String value)
 - Variant(const char* value)
 - Variant(void* value)
 - Variant(const ResourceRef& value)
 - Variant(const ResourceRefList& value)
 - Variant(const IntRect& value)
 - Variant(const IntVector2& value)
-- Variant(const String& type, const String& value)
-- Variant(VariantType type, const String& value) 
+- Variant(const String type, const String value)
+- Variant(VariantType type, const String value)
 - Variant(VariantType type, const char* value)
 - Variant(const Variant& value)
 - ~Variant()
@@ -966,65 +902,48 @@ VariantMap
 Methods:<br>
 - VariantMap()
 - ~VariantMap()
-- SetInt(const char* key, int value)
-- SetBool(const char* key, bool value)
-- SetFloat(const char* key, float value)
-- SetVector2(const char* key, const Vector2& value)
-- SetVector3(const char* key, const Vector3& value)
-- SetVector4(const char* key, const Vector4& value)
-- SetQuaternion(const char* key, const Quaternion& value)
-- SetColor(const char* key, const Color& value)
-- SetString(const char* key, const String& value)
-- SetPtr(const char* key, void* value)
-- SetResourceRef(const char* key, const ResourceRef& value)
-- SetResourceRefList(const char* key, const ResourceRefList& value) 
-- SetIntRect(const char* key, const IntRect& value)
-- SetIntVector2(const char* key, const IntVector2& value)
-- SetCamera(const char* key, Camera* camera)
-- SetConnection(const char* key, Connection* connection)
-- SetNode(const char* key, Node* node)
-- SetPhysicsWorld(const char* key, PhysicsWorld* physicsworld)
-- SetRigidBody(const char* key, RigidBody* rigidbody)
-- SetScene(const char* key, Scene* scene)
-- SetUIElement(const char* key, UIElement* element)
-- GetInt(const char* key)
-- GetBool(const char* key)
-- GetFloat(const char* key)
-- GetVector2(const char* key)
-- GetVector3(const char* key)
-- GetVector4(const char* key)
-- GetQuaternion(const char* key)
-- GetColor(const char* key)
-- GetString(const char* key)
-- GetPtr(const char* key)
-- GetResourceRef(const char* key)
-- GetResourceRefList(const char* key)
-- GetIntRect(const char* key)
-- GetIntVector2(const char* key)
-- GetCamera(const char* key)
-- GetConnection(const char* key)
-- GetNode(const char* key)
-- GetPhysicsWorld(const char* key)
-- GetRigidBody(const char* key)
-- GetScene(const char* key)
-- GetUIElement(const char* key)
-
-Time : Object
-
-Methods:<br>
-- unsigned GetFrameNumber() const
-- float GetTimeStep() const
-- unsigned GetTimerPeriod() const
-- float GetElapsedTime()
-- static unsigned GetSystemTime()
-- static String GetTimeStamp()
-- static void Sleep(unsigned mSec)
-
-Properties:<br>
-- unsigned frameNumber (readonly)
-- float timeStep (readonly)
-- unsigned timerPeriod (readonly)
-- float elapsedTime (readonly)
+- void SetInt(const String key, int value)
+- void SetBool(const String key, bool value)
+- void SetFloat(const String key, float value)
+- void SetVector2(const String key, const Vector2 value)
+- void SetVector3(const String key, const Vector3 value)
+- void SetVector4(const String key, const Vector4 value)
+- void SetQuaternion(const String key, const Quaternion value)
+- void SetColor(const String key, const Color value)
+- void SetString(const String key, const String value)
+- void SetPtr(const String key, void* value)
+- void SetResourceRef(const String key, const ResourceRef value)
+- void SetResourceRefList(const String key, const ResourceRefList value) 
+- void SetIntRect(const String key, const IntRect value)
+- void SetIntVector2(const String key, const IntVector2 value)
+- void SetCamera(const String key, Camera* camera)
+- void SetConnection(const String key, Connection* connection)
+- void SetNode(const String key, Node* node)
+- void SetPhysicsWorld(const String key, PhysicsWorld* physicsworld)
+- void SetRigidBody(const String key, RigidBody* rigidbody)
+- void SetScene(const String key, Scene* scene)
+- void SetUIElement(const String key, UIElement* element)
+- int GetInt(const String key)
+- bool GetBool(const String key)
+- float GetFloat(const String key)
+- const GetVector2(const String key)
+- const GetVector3(const String key)
+- const GetVector4(const String key)
+- const GetQuaternion(const String key)
+- const GetColor(const String key)
+- const GetString(const String key)
+- const GetPtr(const String key)
+- const GetResourceRef(const String key)
+- const GetResourceRefList(const String key)
+- const GetIntRect(const String key)
+- const GetIntVector2(const String key)
+- Camera* GetCamera(const String key)
+- Connection* GetConnection(const String key)
+- Node* GetNode(const String key)
+- PhysicsWorld* GetPhysicsWorld(const String key)
+- RigidBody* GetRigidBody(const String key)
+- Scene* GetScene(const String key)
+- UIElement* GetUIElement(const String key)
 
 Console : Object
 
@@ -1071,9 +990,9 @@ Methods:<br>
 - unsigned GetProfilerMaxDepth() const
 - float GetProfilerInterval() const
 - bool GetUseRendererStats() const
-- void SetAppStats(const String& label, const Variant& stats)
-- void SetAppStats(const String& label, const String& stats)
-- bool ResetAppStats(const String& label)
+- void SetAppStats(const String label, const Variant stats)
+- void SetAppStats(const String label, const String stats)
+- bool ResetAppStats(const String label)
 - void ClearAppStats()
 
 Properties:<br>
@@ -1126,7 +1045,7 @@ Methods:<br>
 - void SetModel(Model* model, bool createBones = true)
 - AnimationState* AddAnimationState(Animation* animation)
 - void RemoveAnimationState(Animation* animation)
-- void RemoveAnimationState(const String& animationName)
+- void RemoveAnimationState(const String animationName)
 - void RemoveAnimationState(StringHash animationNameHash)
 - void RemoveAnimationState(AnimationState* state)
 - void RemoveAnimationState(unsigned index)
@@ -1134,20 +1053,20 @@ Methods:<br>
 - void SetAnimationLodBias(float bias)
 - void SetInvisibleLodFactor(float factor)
 - void SetMorphWeight(unsigned index, float weight)
-- void SetMorphWeight(const String& name, float weight)
+- void SetMorphWeight(const String name, float weight)
 - void SetMorphWeight(StringHash nameHash, float weight)
 - void ResetMorphWeights()
 - Skeleton& GetSkeleton()
 - unsigned GetNumAnimationStates() const
 - AnimationState* GetAnimationState(Animation* animation) const
-- AnimationState* GetAnimationState(const String& animationName) const
+- AnimationState* GetAnimationState(const String animationName) const
 - AnimationState* GetAnimationState(const StringHash animationNameHash) const
 - AnimationState* GetAnimationState(unsigned index) const
 - float GetAnimationLodBias() const
 - float GetInvisibleLodFactor() const
 - unsigned GetNumMorphs() const
 - float GetMorphWeight(unsigned index) const
-- float GetMorphWeight(const String& name) const
+- float GetMorphWeight(const String name) const
 - float GetMorphWeight(StringHash nameHash) const
 - bool IsMaster() const
 
@@ -1161,11 +1080,27 @@ Properties:<br>
 
 AnimationKeyFrame
 
-Properties:<br>
-- time
-- position
-- rotation
-- scale
+Methods:<br>
+- float time
+- Vector3 position
+- Quaternion rotation
+- Vector3 scale
+
+AnimationTrack
+
+Methods:<br>
+- void GetKeyFrameIndex(float time, unsigned& index) const
+- String name
+- StringHash nameHash
+- unsigned channelMas
+- Vector<AnimationKeyFrame> keyFrames
+
+AnimationTriggerPoint
+
+Methods:<br>
+- AnimationTriggerPoint()
+- float time
+- Variant data
 
 Animation : Resource
 
@@ -1175,7 +1110,7 @@ Methods:<br>
 - float GetLength() const
 - unsigned GetNumTracks() const
 - const AnimationTrack* GetTrack(unsigned index) const
-- const AnimationTrack* GetTrack(const String& name) const
+- const AnimationTrack* GetTrack(const String name) const
 - const AnimationTrack* GetTrack(StringHash nameHash) const
 - unsigned GetNumTriggers() const
 
@@ -1190,8 +1125,6 @@ AnimationControl
 
 Methods:<br>
 - AnimationControl()
-
-Properties:<br>
 - StringHash hash_
 - float speed_
 - float targetWeight_
@@ -1207,60 +1140,34 @@ Properties:<br>
 AnimationController : Component
 
 Methods:<br>
-- bool Play(const String& name, unsigned char layer, bool looped, float fadeInTime = 0.0f)
-- bool Play(const char* name, unsigned char layer, bool looped, float fadeInTime = 0.0f)
-- bool PlayExclusive(const String& name, unsigned char layer, bool looped, float fadeTime = 0.0f)
-- bool PlayExclusive(const char* name, unsigned char layer, bool looped, float fadeTime = 0.0f)
-- bool Stop(const String& name, float fadeOutTime = 0.0f)
-- bool Stop(const char* name, float fadeOutTime = 0.0f)
+- bool Play(const String name, unsigned char layer, bool looped, float fadeInTime = 0.0f)
+- bool PlayExclusive(const String name, unsigned char layer, bool looped, float fadeTime = 0.0f)
+- bool Stop(const String name, float fadeOutTime = 0.0f)
 - void StopLayer(unsigned char layer, float fadeOutTime = 0.0f)
 - void StopAll(float fadeTime = 0.0f)
-- bool Fade(const String& name, float targetWeight, float fadeTime)
-- bool Fade(const char* name, float targetWeight, float fadeTime)
-- bool FadeOthers(const String& name, float targetWeight, float fadeTime)
-- bool FadeOthers(const char* name, float targetWeight, float fadeTime)
-- bool SetLayer(const String& name, unsigned char layer)
-- bool SetLayer(const char* name, unsigned char layer)
-- bool SetStartBone(const String& name, const String& startBoneName)
-- bool SetStartBone(const char* name, const String& startBoneName)
-- bool SetTime(const String& name, float time)
-- bool SetTime(const char* name, float time)
-- bool SetWeight(const String& name, float weight)
-- bool SetWeight(const char* name, float weight)
-- bool SetLooped(const String& name, bool enable)
-- bool SetLooped(const char* name, bool enable)
-- bool SetSpeed(const String& name, float speed)
-- bool SetSpeed(const char* name, float speed)
-- bool SetAutoFade(const String& name, float fadeOutTime)
-- bool SetAutoFade(const char* name, float fadeOutTime)
-- bool IsPlaying(const String& name) const
-- bool IsPlaying(const char* name) const
-- bool IsFadingIn(const String& name) const
-- bool IsFadingIn(const char* name) const
-- bool IsFadingOut(const String& name) const
-- bool IsFadingOut(const char* name) const
-- unsigned char GetLayer(const String& name) const
-- unsigned char GetLayer(const char* name) const
-- Bone* GetStartBone(const String& name) const
-- Bone* GetStartBone(const char* name) const
-- const String& GetStartBoneName(const String& name) const
-- const String& GetStartBoneName(const char* name) const
-- float GetTime(const String& name) const
-- float GetTime(const String& name) const
-- float GetWeight(const String& name) const
-- float GetWeight(const char* name) const
-- bool IsLooped(const String& name) const
-- bool IsLooped(const char* name) const
-- float GetLength(const String& name) const
-- float GetLength(const char* name) const
-- float GetSpeed(const String& name) const
-- float GetSpeed(const char* name) const
-- float GetFadeTarget(const String& name) const
-- float GetFadeTarget(const char* name) const
-- float GetFadeTime(const String& name) const
-- float GetFadeTime(const char* name) const
-- float GetAutoFade(const String& name) const
-- float GetAutoFade(const char* name) const
+- bool Fade(const String name, float targetWeight, float fadeTime)
+- bool FadeOthers(const String name, float targetWeight, float fadeTime)
+- bool SetLayer(const String name, unsigned char layer)
+- bool SetStartBone(const String name, const String startBoneName)
+- bool SetTime(const String name, float time)
+- bool SetWeight(const String name, float weight)
+- bool SetLooped(const String name, bool enable)
+- bool SetSpeed(const String name, float speed)
+- bool SetAutoFade(const String name, float fadeOutTime)
+- bool IsPlaying(const String name) const
+- bool IsFadingIn(const String name) const
+- bool IsFadingOut(const String name) const
+- unsigned char GetLayer(const String name) const
+- Bone* GetStartBone(const String name) const
+- const String& GetStartBoneName(const String name) const
+- float GetTime(const String name) const
+- float GetWeight(const String name) const
+- bool IsLooped(const String name) const
+- float GetLength(const String name) const
+- float GetSpeed(const String name) const
+- float GetFadeTarget(const String name) const
+- float GetFadeTime(const String name) const
+- float GetAutoFade(const String name) const
 
 AnimationState
 
@@ -1273,7 +1180,7 @@ Methods:<br>
 - void SetWeight(float weight)
 - void SetTime(float time)
 - void SetBoneWeight(unsigned index, float weight)
-- void SetBoneWeight(const String& name, float weight)
+- void SetBoneWeight(const String name, float weight)
 - void SetBoneWeight(StringHash nameHash, float weight)
 - void AddWeight(float delta)
 - void AddTime(float delta)
@@ -1281,9 +1188,9 @@ Methods:<br>
 - Animation* GetAnimation() const
 - Bone* GetStartBone() const
 - float GetBoneWeight(unsigned index) const
-- float GetBoneWeight(const String& name) const
+- float GetBoneWeight(const String name) const
 - float GetBoneWeight(StringHash nameHash) const
-- unsigned GetTrackIndex(const String& name) const
+- unsigned GetTrackIndex(const String name) const
 - unsigned GetTrackIndex(StringHash nameHash) const
 - bool IsEnabled() const
 - bool IsLooped() const
@@ -1304,14 +1211,14 @@ Properties:<br>
 
 Billboard
 
-Properties:<br>
-- Vector3 position;
-- Vector2 size;
-- Rect uv;
-- Color color;
-- float rotation;
-- bool enabled;
-- float sortDistance;
+Methods:<br>
+- Vector3 position
+- Vector2 size
+- Rect uv
+- Color color
+- float rotation
+- bool enabled
+- float sortDistance
 
 BillboardSet : Drawable
 
@@ -1546,8 +1453,7 @@ Properties:<br>
 Graphics : Object
 
 Methods:<br>
-- void SetWindowTitle(const String& windowTitle)
-- void SetWindowTitle(const char* windowTitle)
+- void SetWindowTitle(const String windowTitle)
 - bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
@@ -1582,7 +1488,7 @@ Methods:<br>
 
 Properties:<br>
 - bool initialized (readonly)
-- const String& windowTitle
+- const String windowTitle
 - int width (readonly)
 - int height (readonly)
 - int multiSample (readonly)
@@ -1689,7 +1595,7 @@ Methods:<br>
 - unsigned GetNumTechniques() const
 - Technique* GetTechnique(unsigned index) const
 - Pass* GetPass(unsigned index, StringHash passType) const
-- Pass* GetPass(unsigned index, const char* passType) const
+- Pass* GetPass(unsigned index, const String passType) const
 - Texture* GetTexture(TextureUnit unit) const
 - CullMode GetCullMode() const
 - CullMode GetShadowCullMode() const
@@ -1715,7 +1621,7 @@ Methods:<br>
 - Geometry* GetGeometry(unsigned index, unsigned lodLevel) const
 - unsigned GetNumMorphs() const
 - const ModelMorph* GetMorph(unsigned index) const
-- const ModelMorph* GetMorph(const String& name) const
+- const ModelMorph* GetMorph(const String name) const
 - const ModelMorph* GetMorph(StringHash nameHash) const
 - unsigned GetMorphRangeStart(unsigned bufferIndex) const
 - unsigned GetMorphRangeCount(unsigned bufferIndex) const
@@ -1733,7 +1639,7 @@ Methods:<br>
 - void Update(const FrameInfo& frame)
 - void AddManualDrawable(Drawable* drawable)
 - void RemoveManualDrawable(Drawable* drawable)
-- RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
+- RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
 - unsigned GetNumLevels() const
 - void QueueUpdate(Drawable* drawable)
 - void DrawDebugGeometry(bool depthTest)
@@ -1743,11 +1649,23 @@ Properties:<br>
 
 RayQueryResult
 
-Properties:<br>
-- drawable
-- node
-- distance
-- subObject
+Methods:<br>
+- Drawable* drawable
+- Node* node
+- float distance
+- unsigned subObject
+
+Particle
+
+Methods:<br>
+- Vector3 velocity_
+- Vector2 size_
+- float timer_
+- float timeToLive_
+- float scale_
+- float rotationSpeed_
+- unsigned colorIndex_
+- unsigned texIndex_
 
 ColorFrame
 
@@ -1756,8 +1674,6 @@ Methods:<br>
 - ColorFrame(const Color& color)
 - ColorFrame(const Color& color, float time)
 - Color Interpolate(const ColorFrame& next, float time)
-
-Properties:<br>
 - Color color
 - float time
 
@@ -1765,8 +1681,6 @@ TextureFrame
 
 Methods:<br>
 - TextureFrame()
-
-Properties:<br>
 - Rect uv
 - float time
 
@@ -1929,8 +1843,8 @@ Methods:<br>
 - TextureCube* GetFaceSelectCubeMap() const
 - TextureCube* GetIndirectionCubeMap() const
 - VertexBuffer* GetInstancingBuffer() const
-- ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const
-- ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const
+- ShaderVariation* GetVertexShader(const String name, bool checkExists = false) const
+- ShaderVariation* GetPixelShader(const String name, bool checkExists = false) const
 - ShaderVariation* GetStencilVS() const
 - ShaderVariation* GetStencilPS() const
 - const FrameInfo& GetFrameInfo()
@@ -1974,31 +1888,25 @@ Properties:<br>
 RenderPath
 
 Methods:<br>
-- Clone()
+- RenderPath* Clone()
 - bool Load(XMLFile* file)
 - bool Append(XMLFile* file)
-- void SetEnabled(const String& tag, bool active)
-- void SetEnabled(const char* tag, bool active)
-- void ToggleEnabled(const String& tag)
-- void ToggleEnabled(const char* tag)
+- void SetEnabled(const String tag, bool active)
+- void ToggleEnabled(const String tag)
 - void SetRenderTarget(unsigned index, const RenderTargetInfo& info)
 - void AddRenderTarget(const RenderTargetInfo& info)
 - void RemoveRenderTarget(unsigned index)
-- void RemoveRenderTarget(const String& name)
-- void RemoveRenderTarget(const char* name)
-- void RemoveRenderTargets(const String& tag)
-- void RemoveRenderTargets(const char* tag)
+- void RemoveRenderTarget(const String name)
+- void RemoveRenderTargets(const String tag)
 - void SetCommand(unsigned index, const RenderPathCommand& command)
 - void AddCommand(const RenderPathCommand& command)
 - void InsertCommand(unsigned index, const RenderPathCommand& command)
 - void RemoveCommand(unsigned index)
-- void RemoveCommands(const String& tag)
-- void RemoveCommands(const char* tag)
-- void SetShaderParameter(const String& name, const Variant& value)
-- void SetShaderParameter(const char* name, const Variant& value)
+- void RemoveCommands(const String tag)
+- void SetShaderParameter(const String name, const Variant& value)
 - unsigned GetNumRenderTargets() const
 - unsigned GetNumCommands() const
-- const Variant& GetShaderParameter(const String& name) const
+- const Variant& GetShaderParameter(const String name) const
 
 RenderSurface
 
@@ -2036,8 +1944,6 @@ Bone
 
 Methods:<br>
 - Bone()
-
-Properties:<br>
 - String name
 - StringHash nameHash
 - unsigned parentIndex
@@ -2046,7 +1952,7 @@ Properties:<br>
 - Vector3 initialScale
 - Matrix3x4 offsetMatrix
 - bool animated
-- unsigned char collisionMask
+- unsigned collisionMask
 - float radius
 - BoundingBox boundingBox
 - Node* node
@@ -2064,11 +1970,13 @@ Properties:<br>
 
 Skybox : StaticModel
 
+Methods:<br>
+
 StaticModelGeometryData
 
-Properties:<br>
-- center
-- lodLevel
+Methods:<br>
+- Vector3 center
+- unsigned lodLevel
 
 StaticModel : Drawable
 
@@ -2093,11 +2001,13 @@ Properties:<br>
 
 Pass : RefCounted
 
+Methods:<br>
+
 Technique : Resource
 
 Methods:<br>
-- bool HasPass(const char* type) const
-- Pass* GetPass(const char*  type) const
+- bool HasPass(const String type) const
+- Pass* GetPass(const String  type) const
 - bool IsSM3() const
 
 Properties:<br>
@@ -2316,13 +2226,13 @@ Properties:<br>
 
 TouchState
 
-Properties:<br>
+Methods:<br>
 - int touchID
 - IntVector2 position
 - IntVector2 lastPosition
 - IntVector2 delta
 - float pressure
-    
+
 JoystickState
 
 Methods:<br>
@@ -2435,20 +2345,19 @@ File : Deserializer
 
 Methods:<br>
 - File(Context* context)
-- File(Context* context, const String& fileName, FileMode mode = FILE_READ)
-- File(Context* context, const char* fileName, FileMode mode = FILE_READ)
-- File(Context* context, PackageFile* package, const String& fileName)
+- File(Context* context, const String fileName, FileMode mode = FILE_READ)
+- File(Context* context, PackageFile* package, const String fileName)
 - virtual ~File()
 - virtual unsigned Read(void* dest, unsigned size)
 - virtual unsigned Seek(unsigned position)
 - virtual unsigned Write(const void* data, unsigned size)
 - virtual const String& GetName() const
 - virtual unsigned GetChecksum()
-- bool Open(const String& fileName, FileMode mode = FILE_READ)
-- bool Open(PackageFile* package, const String& fileName)
+- bool Open(const String fileName, FileMode mode = FILE_READ)
+- bool Open(PackageFile* package, const String fileName)
 - void Close()
 - void Flush()
-- void SetName(const String& name)
+- void SetName(const String name)
 - FileMode GetMode() const
 - bool IsOpen() const
 - void* GetHandle() const
@@ -2464,36 +2373,21 @@ Properties:<br>
 FileSystem : Object
 
 Methods:<br>
-- bool SetCurrentDir(const String& pathName)
-- bool SetCurrentDir(const char* pathName)
-- bool CreateDir(const String& pathName)
-- bool CreateDir(const char* pathName)
-- int SystemCommand(const String& commandLine)
-- int SystemCommand(const char* commandLine)
-- int SystemRun(const String& fileName, const Vector<String>& arguments)
-- int SystemRun(const char* fileName, const Vector<String>& arguments)
-- bool SystemOpen(const String& fileName, const String& mode = String::EMPTY)
-- bool SystemOpen(const char* fileName, const char* mode = 0)
-- bool Copy(const String& srcFileName, const String& destFileName)
-- bool Copy(const char* srcFileName, const char* destFileName)
-- bool Rename(const String& srcFileName, const String& destFileName)
-- bool Rename(const char* srcFileName, const char* destFileName)
-- bool Delete(const String& fileName)
-- bool Delete(const char* fileName)
-- void RegisterPath(const String& pathName)
-- void RegisterPath(const char* pathName)
+- bool SetCurrentDir(const String pathName)
+- bool CreateDir(const String pathName)
+- int SystemCommand(const String commandLine)
+- bool SystemOpen(const String fileName, const String mode = String::EMPTY)
+- bool Copy(const String srcFileName, const String destFileName)
+- bool Rename(const String srcFileName, const String destFileName)
+- bool Delete(const String fileName)
+- void RegisterPath(const String pathName)
 - String GetCurrentDir() const
 - bool HasRegisteredPaths() const
-- bool CheckAccess(const String& pathName) const
-- bool CheckAccess(const char* pathName) const
-- unsigned GetLastModifiedTime(const String& fileName) const
-- unsigned GetLastModifiedTime(const char* fileName) const
-- bool FileExists(const String& fileName) const
-- bool FileExists(const char* fileName) const
-- bool DirExists(const String& pathName) const
-- bool DirExists(const char* pathName) const
-- ScanDir(const String& pathName, const String& filter, unsigned flags, bool recursive) const
-- ScanDir(const char* pathName, const char* filter, unsigned flags, bool recursive) const
+- bool CheckAccess(const String pathName) const
+- unsigned GetLastModifiedTime(const String fileName) const
+- bool FileExists(const String fileName) const
+- bool DirExists(const String pathName) const
+- Vector<String> ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const
 - String GetProgramDir() const
 - String GetUserDocumentsDir() const
 
@@ -2507,10 +2401,8 @@ Methods:<br>
 - bool GetTimeStamp() const
 - String GetLastMessage() const
 - bool IsQuiet() const
-- static void Write(int level, const String& message)
-- static void Write(int level, const char* message)
-- static void WriteRaw(const String& message, bool error = false)
-- static void WriteRaw(const char* message, bool error = false)
+- static void Write(int level, const String message)
+- static void WriteRaw(const String message, bool error = false)
 
 Properties:<br>
 - int level
@@ -2528,11 +2420,11 @@ PackageFile : Object
 
 Methods:<br>
 - PackageFile(Context* context)
-- PackageFile(Context* context, const String& fileName)
+- PackageFile(Context* context, const String fileName)
 - virtual ~PackageFile()
-- bool Open(const String& fileName)
-- bool Exists(const String& fileName) const
-- const PackageEntry* GetEntry(const String& fileName) const
+- bool Open(const String fileName)
+- bool Exists(const String fileName) const
+- const PackageEntry* GetEntry(const String fileName) const
 - const HashMap<String, PackageEntry>& GetEntries() const
 - const String& GetName() const
 - StringHash GetNameHash() const
@@ -2558,42 +2450,38 @@ Methods:<br>
 - bool WriteUByte(unsigned char value)
 - bool WriteBool(bool value)
 - bool WriteFloat(float value)
-- bool WriteIntRect(const IntRect& value)
-- bool WriteIntVector2(const IntVector2& value)
-- bool WriteRect(const Rect& value)
-- bool WriteVector2(const Vector2& value)
-- bool WriteVector3(const Vector3& value)
-- bool WritePackedVector3(const Vector3& value, float maxAbsCoord)
-- bool WriteVector4(const Vector4& value)
-- bool WriteQuaternion(const Quaternion& value)
-- bool WritePackedQuaternion(const Quaternion& value)
-- bool WriteColor(const Color& value)
-- bool WriteBoundingBox(const BoundingBox& value)
-- bool WriteString(const String& value)
-- bool WriteFileID(const String& value)
-- bool WriteStringHash(const StringHash& value)
-- bool WriteShortStringHash(const ShortStringHash& value)
-- bool WriteResourceRef(const ResourceRef& value)
-- bool WriteResourceRefList(const ResourceRefList& value)
-- bool WriteVariant(const Variant& value)
-- bool WriteVariantData(const Variant& value)
-- bool WriteVariantVector(const VariantVector& value)
-- bool WriteVariantMap(const VariantMap& value)
+- bool WriteIntRect(const IntRect value)
+- bool WriteIntVector2(const IntVector2 value)
+- bool WriteRect(const Rect value)
+- bool WriteVector2(const Vector2 value)
+- bool WriteVector3(const Vector3 value)
+- bool WritePackedVector3(const Vector3 value, float maxAbsCoord)
+- bool WriteVector4(const Vector4 value)
+- bool WriteQuaternion(const Quaternion value)
+- bool WritePackedQuaternion(const Quaternion value)
+- bool WriteColor(const Color value)
+- bool WriteBoundingBox(const BoundingBox value)
+- bool WriteString(const String value)
+- bool WriteFileID(const String value)
+- bool WriteStringHash(const StringHash value)
+- bool WriteShortStringHash(const ShortStringHash value)
+- bool WriteResourceRef(const ResourceRef value)
+- bool WriteResourceRefList(const ResourceRefList value)
+- bool WriteVariant(const Variant value)
+- bool WriteVariantData(const Variant value)
+- bool WriteVariantVector(const VariantVector value)
+- bool WriteVariantMap(const VariantMap value)
 - bool WriteVLE(unsigned value)
 - bool WriteNetID(unsigned value)
-- bool WriteLine(const String& value)
+- bool WriteLine(const String value)
 
 LuaScriptInstance : Component
 
 Methods:<br>
-- bool CreateObject(const String& objectType)
-- bool CreateObject(const char* objectType)
-- bool CreateObject(const String& fileName, const String& objectType)
-- bool CreateObject(const char* fileName, const char* objectType)
-- SubscribeToEvent(const String& eventName, const char* functionName)
-- SubscribeToEvent(const char* eventName, const char* functionName)
-- SubscribeToEvent(void* object, const String& eventName, const char* functionName);
-- SubscribeToEvent(void* object, const char* eventName, const char* functionName);
+- bool CreateObject(const String objectType)
+- bool CreateObject(const String fileName, const String objectType)
+- void SubscribeToEvent(const String eventName, const String functionName)
+- void SubscribeToEvent(void* object, const String eventName, const String functionName)
 
 BoundingBox
 
@@ -2636,9 +2524,9 @@ Methods:<br>
 - Intersection IsInside(const Sphere& sphere) const
 - Intersection IsInsideFast(const Sphere& sphere) const
 - String ToString() const
-- min
-- max
-- defined
+- Vector3 min
+- Vector3 max
+- bool defined
 
 Properties:<br>
 - Vector3 center (readonly)
@@ -2679,8 +2567,6 @@ Methods:<br>
 - void Invert(bool invertAlpha = false)
 - Color Lerp(const Color& rhs, float t) const
 - String ToString() const
-
-Properties:<br>
 - float r
 - float g
 - float b
@@ -2724,8 +2610,8 @@ Methods:<br>
 - Matrix3()
 - Matrix3(const Matrix3& matrix)
 - Matrix3(float v00, float v01, float v02,
--     float v10, float v11, float v12,
--     float v20, float v21, float v22)
+- float v10, float v11, float v12,
+- float v20, float v21, float v22)
 - bool operator == (const Matrix3& rhs) const
 - Vector3 operator * (const Vector3& rhs) const
 - Matrix3 operator + (const Matrix3& rhs) const
@@ -2739,8 +2625,6 @@ Methods:<br>
 - Matrix3 Scaled(const Vector3& scale) const
 - bool Equals(const Matrix3& rhs) const
 - Matrix3 Inverse() const
-
-Properties:<br>
 - float m00
 - float m01
 - float m02
@@ -2761,8 +2645,8 @@ Methods:<br>
 - Matrix3x4(const Matrix3& matrix)
 - Matrix3x4(const Matrix4& matrix)
 - Matrix3x4(float v00, float v01, float v02, float v03,
--     float v10, float v11, float v12, float v13,
--     float v20, float v21, float v22, float v23)
+- float v10, float v11, float v12, float v13,
+- float v20, float v21, float v22, float v23)
 - Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
 - Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
 - bool operator == (const Matrix3x4& rhs) const
@@ -2785,8 +2669,6 @@ Methods:<br>
 - bool Equals(const Matrix3x4& rhs) const
 - void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 - Matrix3x4 Inverse() const
-
-Properties:<br>
 - float m00
 - float m01
 - float m02
@@ -2809,9 +2691,9 @@ Methods:<br>
 - Matrix4(const Matrix4& matrix)
 - Matrix4(const Matrix3& matrix)
 - Matrix4(float v00, float v01, float v02, float v03,
--     float v10, float v11, float v12, float v13,
--     float v20, float v21, float v22, float v23,
--     float v30, float v31, float v32, float v33)
+- float v10, float v11, float v12, float v13,
+- float v20, float v21, float v22, float v23,
+- float v30, float v31, float v32, float v33)
 - bool operator == (const Matrix4& rhs) const
 - Vector3 operator * (const Vector3& rhs) const
 - Vector4 operator * (const Vector4& rhs) const
@@ -2832,8 +2714,6 @@ Methods:<br>
 - bool Equals(const Matrix4& rhs) const
 - void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 - Matrix4 Inverse() const
-
-Properties:<br>
 - float m00
 - float m01
 - float m02
@@ -2863,8 +2743,6 @@ Methods:<br>
 - void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - void Define(const Vector3& normal, const Vector3& point)
 - float Distance(const Vector3& point) const
-
-Properties:<br>
 - Vector3 normal
 - Vector3 absNormal
 - float intercept
@@ -2934,8 +2812,6 @@ Methods:<br>
 - Matrix3 RotationMatrix() const
 - Quaternion Slerp(Quaternion rhs, float t) const
 - String ToString() const
-
-Properties:<br>
 - float w
 - float x
 - float y
@@ -2959,8 +2835,6 @@ Methods:<br>
 - float HitDistance(const Sphere& sphere) const
 - float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 - Ray Transformed(const Matrix3x4& transform) const
-
-Properties:<br>
 - Vector3 origin
 - Vector3 direction
 
@@ -2986,16 +2860,16 @@ Methods:<br>
 - bool Equals(const Rect& rhs) const
 - Vector4 ToVector4() const
 - String ToString() const
-
-Properties:<br>
 - Vector2 min
 - Vector2 max
-- Vector2 center (readonly)
-- Vector2 size (readonly)
-- Vector2 halfSize (readonly)
 - static const Rect FULL
 - static const Rect POSITIVE
 - static const Rect ZERO
+
+Properties:<br>
+- Vector2 center (readonly)
+- Vector2 size (readonly)
+- Vector2 halfSize (readonly)
 
 IntRect
 
@@ -3006,16 +2880,16 @@ Methods:<br>
 - IntVector2 Size() const
 - int Width() const
 - int Height() const
-
-Properties:<br>
 - int left
 - int top
 - int right
 - int bottom
+- static const IntRect ZERO
+
+Properties:<br>
 - IntVector2 size (readonly)
 - int width (readonly)
 - int height (readonly)
-- static const IntRect ZERO
 
 Sphere
 
@@ -3044,8 +2918,6 @@ Methods:<br>
 - Intersection IsInside(const BoundingBox& box) const
 - Intersection IsInsideFast(const BoundingBox& box) const
 - float Distance(const Vector3& point) const
-
-Properties:<br>
 - Vector3 center
 - float radius
 - bool defined
@@ -3056,8 +2928,7 @@ Methods:<br>
 - StringHash()
 - StringHash(const StringHash& rhs)
 - explicit StringHash(unsigned value)
-- StringHash(const char* str)
-- StringHash(const String& str)
+- StringHash(const String str)
 - StringHash operator + (const StringHash& rhs) const
 - bool operator == (const StringHash& rhs) const
 - bool operator < (const StringHash& rhs) const
@@ -3078,8 +2949,7 @@ Methods:<br>
 - ShortStringHash(const ShortStringHash& rhs)
 - explicit ShortStringHash(const StringHash& rhs)
 - explicit ShortStringHash(unsigned short value)
-- ShortStringHash(const char* str)
-- ShortStringHash(const String& str)
+- ShortStringHash(const String str)
 - ShortStringHash operator + (const ShortStringHash& rhs) const
 - bool operator == (const ShortStringHash& rhs) const
 - bool operator < (const ShortStringHash& rhs) const
@@ -3116,8 +2986,6 @@ Methods:<br>
 - bool Equals(const Vector2& rhs) const
 - Vector2 Normalized() const
 - String ToString() const
-
-Properties:<br>
 - float x
 - float y
 - static const Vector2 ZERO
@@ -3142,8 +3010,6 @@ Methods:<br>
 - IntVector2 operator / (int rhs) const
 - IntVector2 operator / (int rhs) const
 - String ToString() const
-
-Properties:<br>
 - int x
 - int y
 - static const IntVector2 ZERO
@@ -3175,8 +3041,6 @@ Methods:<br>
 - bool Equals(const Vector3& rhs) const
 - Vector3 Normalized() const
 - String ToString() const
-
-Properties:<br>
 - float x
 - float y
 - float z
@@ -3211,8 +3075,6 @@ Methods:<br>
 - Vector4 Lerp(const Vector4& rhs, float t) const
 - bool Equals(const Vector4& rhs) const
 - String ToString() const
-
-Properties:<br>
 - float x
 - float y
 - float z
@@ -3231,7 +3093,7 @@ Properties:<br>
 
 NavigationGeometryInfo
 
-Properties:<br>
+Methods:<br>
 - Component* component
 - unsigned lodLevel
 - Matrix3x4 transform
@@ -3256,7 +3118,7 @@ Methods:<br>
 - void SetPadding(const Vector3& padding)
 - bool Build()
 - bool Build(const BoundingBox& boundingBox)
-- FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
+- PODVector<Vector3> FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE)
 - float GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE)
@@ -3318,7 +3180,7 @@ Properties:<br>
 
 RemoteEvent
 
-Properties:<br>
+Methods:<br>
 - unsigned senderID
 - StringHash eventType
 - VariantMap eventData
@@ -3330,9 +3192,9 @@ Methods:<br>
 - void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0)
 - void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0)
 - void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
-- void SendRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void SendRemoteEvent(const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
 - void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
-- void SendRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void SendRemoteEvent(Node* node, const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
 - void SetScene(Scene* newScene)
 - void SetIdentity(const VariantMap& identity)
 - void SetControls(const Controls& newControls)
@@ -3385,39 +3247,36 @@ Methods:<br>
 - void Set(unsigned buttons, bool down = true)
 - bool IsDown(unsigned button) const
 - bool IsPressed(unsigned button, const Controls& previousControls) const
-- buttons
-- yaw
-- pitch
-- extraData
+- unsigned buttons
+- float yaw
+- float pitch
+- VariantMap extraData
 
 Network
 
 Methods:<br>
-- bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap)
-- bool Connect(const char* address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap)
+- bool Connect(const String address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap)
 - void Disconnect(int waitMSec = 0)
 - bool StartServer(unsigned short port)
 - void StopServer()
 - void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0)
 - void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
-- void BroadcastRemoteEvent(const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void BroadcastRemoteEvent(const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
 - void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
-- void BroadcastRemoteEvent(Scene* scene, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void BroadcastRemoteEvent(Scene* scene, const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
 - void BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
-- void BroadcastRemoteEvent(Node* node, const char* eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
+- void BroadcastRemoteEvent(Node* node, const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
 - void SetUpdateFps(int fps)
 - void RegisterRemoteEvent(StringHash eventType)
-- void RegisterRemoteEvent(const char* eventType)
+- void RegisterRemoteEvent(const String eventType)
 - void UnregisterRemoteEvent(StringHash eventType)
-- void UnregisterRemoteEvent(const char* eventType)
+- void UnregisterRemoteEvent(const String eventType)
 - void UnregisterAllRemoteEvents()
-- void SetPackageCacheDir(const String& path)
-- void SetPackageCacheDir(const char* path)
+- void SetPackageCacheDir(const String path)
 - int GetUpdateFps() const
 - Connection* GetServerConnection() const
 - bool IsServerRunning() const
 - bool CheckRemoteEvent(StringHash eventType) const
-- bool CheckRemoteEvent(const char* eventType) const
 - const String& GetPackageCacheDir() const
 
 Properties:<br>
@@ -3488,7 +3347,7 @@ Properties:<br>
 - float margin
 - Model* model
 - unsigned lodLevel
-- BoundingBox worldBoundingBox (readonly)
+- tolua_readonlyBoundingBox worldBoundingBox
 - ResourceRef modelAttr
 
 Constraint : Component
@@ -3545,8 +3404,6 @@ PhysicsRaycastResult
 
 Methods:<br>
 - PhysicsRaycastResult()
-
-Properties:<br>
 - Vector3 position
 - Vector3 normal
 - float distance
@@ -3554,7 +3411,7 @@ Properties:<br>
 
 DelayedWorldTransform
 
-Properties:<br>
+Methods:<br>
 - RigidBody* rigidBody
 - RigidBody* parentRigidBody
 - Vector3 worldPosition
@@ -3572,9 +3429,9 @@ Methods:<br>
 - void SetInternalEdge(bool enable)
 - void SetSplitImpulse(bool enable)
 - void SetMaxNetworkAngularVelocity(float velocity)
-- RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - / void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
-- SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - Vector3 GetGravity() const
 - int GetNumIterations() const
 - bool GetInterpolation() const
@@ -3712,10 +3569,10 @@ Image : Resource
 
 Methods:<br>
 - void FlipVertical()
-- bool SaveBMP(const char* fileName)
-- bool SavePNG(const char* fileName)
-- bool SaveTGA(const char* fileName)
-- bool SaveJPG(const char* fileName, int quality)
+- bool SaveBMP(const String fileName)
+- bool SavePNG(const String fileName)
+- bool SaveTGA(const String fileName)
+- bool SaveJPG(const String fileName, int quality)
 - int GetWidth() const
 - int GetHeight() const
 - unsigned GetComponents() const
@@ -3750,17 +3607,16 @@ Methods:<br>
 - void ReleaseAllResources(bool force = false)
 - bool ReloadResource(Resource* resource)
 - void SetMemoryBudget(ShortStringHash type, unsigned budget)
-- void SetMemoryBudget(const char* type, unsigned budget)
+- void SetMemoryBudget(const String type, unsigned budget)
 - void SetAutoReloadResources(bool enable)
-- Resource* GetResource(const char* type, const String& name)
-- Resource* GetResource(const char* type, const char* name)
-- bool Exists(const String& name) const
+- Resource* GetResource(const String type, const String name)
+- bool Exists(const String name) const
 - bool Exists(StringHash nameHash) const
 - unsigned GetMemoryBudget(ShortStringHash type) const
 - unsigned GetMemoryUse(ShortStringHash type) const
 - unsigned GetTotalMemoryUse() const
 - const String& GetResourceName(StringHash nameHash) const
-- String GetResourceFileName(const String& name) const
+- String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
 
 Properties:<br>
@@ -3774,47 +3630,31 @@ Methods:<br>
 - bool NotNull() const
 - operator bool () const
 - String GetName() const
-- bool HasChild(const String& name) const
-- bool HasChild(const char* name) const
-- XMLElement GetChild(const String& name = String::EMPTY) const
-- XMLElement GetChild(const char* name) const
-- XMLElement GetNext(const String& name = String::EMPTY) const
-- XMLElement GetNext(const char* name) const
+- bool HasChild(const String name) const
+- XMLElement GetChild(const String name = String::EMPTY) const
+- XMLElement GetNext(const String name = String::EMPTY) const
 - XMLElement GetParent() const
 - unsigned GetNumAttributes() const
-- bool HasAttribute(const String& name) const
-- bool HasAttribute(const char* name) const
-- bool GetBool(const char* name) const
+- bool HasAttribute(const String name) const
+- bool GetBool(const String name) const
 - BoundingBox GetBoundingBox() const
-- Color GetColor(const String& name) const
-- Color GetColor(const char* name) const
-- float GetFloat(const String& name) const
-- float GetFloat(const char* name) const
-- unsigned GetUInt(const String& name) const
-- unsigned GetUInt(const char* name) const
-- int GetInt(const String& name) const
-- int GetInt(const char* name) const
-- IntRect GetIntRect(const String& name) const
-- IntRect GetIntRect(const char* name) const
-- IntVector2 GetIntVector2(const String& name) const
-- IntVector2 GetIntVector2(const char* name) const
-- Rect GetRect(const String& name) const
-- Rect GetRect(const char* name) const
-- Quaternion GetQuaternion(const String& name) const
-- Quaternion GetQuaternion(const char* name) const
+- Color GetColor(const String name) const
+- float GetFloat(const String name) const
+- unsigned GetUInt(const String name) const
+- int GetInt(const String name) const
+- IntRect GetIntRect(const String name) const
+- IntVector2 GetIntVector2(const String name) const
+- Rect GetRect(const String name) const
+- Quaternion GetQuaternion(const String name) const
 - Variant GetVariant() const
 - Variant GetVariantValue(VariantType type) const
 - ResourceRef GetResourceRef() const
 - ResourceRefList GetResourceRefList() const
 - VariantMap GetVariantMap() const
-- Vector2 GetVector2(const String& name) const
-- Vector2 GetVector2(const char* name) const
-- Vector3 GetVector3(const String& name) const
-- Vector3 GetVector3(const char* name) const
-- Vector4 GetVector4(const String& name) const
-- Vector4 GetVector4(const char* name) const
-- Vector4 GetVector(const String& name) const
-- Vector4 GetVector(const char* name) const
+- Vector2 GetVector2(const String name) const
+- Vector3 GetVector3(const String name) const
+- Vector4 GetVector4(const String name) const
+- Vector4 GetVector(const String name) const
 - XMLFile* GetFile() const
 - static const XMLElement EMPTY
 
@@ -3828,8 +3668,7 @@ Properties:<br>
 XMLFile : Resource
 
 Methods:<br>
-- XMLElement GetRoot(const String& name = String::EMPTY)
-- XMLElement GetRoot(const char* name)
+- XMLElement GetRoot(const String name = String::EMPTY)
 
 Component : Serializable
 
@@ -3841,8 +3680,9 @@ Methods:<br>
 - Scene* GetScene() const
 - bool IsEnabled() const
 - bool IsEnabledEffective() const
+-   
 - Component* GetComponent(ShortStringHash type) const
-- Component* GetComponent(const char* type) const
+- Component* GetComponent(const String type) const
 
 Node : Serializable
 
@@ -3850,58 +3690,57 @@ Methods:<br>
 - Node(Context* context)
 - virtual ~Node()
 - bool SaveXML(Serializer& dest) const
-- void SetName(const String& name)
+- void SetName(const String name)
 - void SetPosition(const Vector3& position)
-- SetPositionXYZ(float x, float y, float z)
+- void SetPositionXYZ(float x, float y, float z)
 - void SetRotation(const Quaternion& rotation)
-- SetRotationXYZ(float x, float y, float z)
+- void SetRotationXYZ(float x, float y, float z)
 - void SetDirection(const Vector3& direction)
-- SetDirectionXYZ(float x, float y, float z)
+- void SetDirectionXYZ(float x, float y, float z)
 - void SetScale(float scale)
 - void SetScale(const Vector3& scale)
-- SetScaleXYZ(float x, float y, float z)
+- void SetScaleXYZ(float x, float y, float z)
 - void SetTransform(const Vector3& position, const Quaternion& rotation)
 - void SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
 - void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
 - void SetWorldPosition(const Vector3& position)
-- SetWorldPositionXYZ(float x, float y, float z)
+- void SetWorldPositionXYZ(float x, float y, float z)
 - void SetWorldRotation(const Quaternion& rotation)
-- SetWorldRotationXYZ(float x, float y, float z)
+- void SetWorldRotationXYZ(float x, float y, float z)
 - void SetWorldDirection(const Vector3& direction)
-- SetWorldDirectionXYZ(float x, float y, float z)
+- void SetWorldDirectionXYZ(float x, float y, float z)
 - void SetWorldScale(float scale)
 - void SetWorldScale(const Vector3& scale)
-- SetWorldScaleXYZ(float x, float y, float z)
+- void SetWorldScaleXYZ(float x, float y, float z)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale)
 - void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
 - void Translate(const Vector3& delta)
-- TranslateXYZ(float x, float y, float z)
+- void TranslateXYZ(float x, float y, float z)
 - void TranslateRelative(const Vector3& delta)
-- TranslateRelativeXYZ(float x, float y, float z)
+- void TranslateRelativeXYZ(float x, float y, float z)
 - void Rotate(const Quaternion& delta, bool fixedAxis = false)
-- RotateXYZ(float x, float y, float z, bool fixedAxis = false)
+- void RotateXYZ(float x, float y, float z, bool fixedAxis = false)
 - void Pitch(float angle, bool fixedAxis = false)
 - void Yaw(float angle, bool fixedAxis = false)
 - void Roll(float angle, bool fixedAxis = false)
 - void LookAt(const Vector3& target, const Vector3& upAxis = Vector3::UP)
-- LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ =  0.0f)
+- void LookAtXYZ(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f)
 - void Scale(float scale)
 - void Scale(const Vector3& scale)
-- ScaleXYZ(float x, float y, float z)
+- void ScaleXYZ(float x, float y, float z)
 - void SetEnabled(bool enable)
 - void SetEnabled(bool enable, bool recursive)
 - void SetOwner(Connection* owner)
 - void MarkDirty()
-- Node* CreateChild(const String& name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
-- Node* CreateChild(const char* name = 0, CreateMode mode = REPLICATED, unsigned id = 0)
+- Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
 - void AddChild(Node* node)
 - void RemoveChild(Node* node)
 - void RemoveAllChildren()
 - void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive)
 - void RemoveComponent(Component* component)
 - void RemoveComponent(ShortStringHash type)
-- void RemoveComponent(const char* type)
+- void RemoveComponent(const String type)
 - void RemoveAllComponents()
 - void RemoveComponents(bool removeReplicated, bool removeLocal)
 - Node* Clone(CreateMode mode = REPLICATED)
@@ -3910,7 +3749,7 @@ Methods:<br>
 - void SetVar(ShortStringHash key, const Variant& value)
 - void AddListener(Component* component)
 - void RemoveListener(Component* component)
-- Component* CreateComponent(const char* type, CreateMode mode = REPLICATED, unsigned id = 0)
+- Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0)
 - unsigned GetID() const
 - const String& GetName() const
 - StringHash GetNameHash() const
@@ -3919,24 +3758,24 @@ Methods:<br>
 - bool IsEnabled() const
 - Connection* GetOwner() const
 - const Vector3& GetPosition() const
-- float, float, float GetPositionXYZ() const
+- void GetPositionXYZ(float* x = 0.0f, float* y = 0.0f, float* z = 0.0f) const
 - const Quaternion& GetRotation() const
-- float, float, float GetRotationXYZ() const
-- float, float, float, float GetRotationWXYZ() const
+- void GetRotationXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
+- void GetRotationWXYZ(float* *w = 0.0f, float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Vector3 GetDirection() const
-- float, float, float GetDirectionXYZ() const
+- void GetDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - const Vector3& GetScale() const
-- float, float, float GetScaleXYZ() const
+- void GetScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Matrix3x4 GetTransform() const
 - Vector3 GetWorldPosition() const
-- float, float, float GetWorldPositionXYZ() const
+- void GetWorldPositionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Quaternion GetWorldRotation() const
-- float, float, float GetWorldRotationXYZ() const
-- w, float, float, float GetWorldRotationWXYZ() const
+- void GetWorldRotationXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
+- void GetWorldRotationWXYZ(float* *w = 0.0f, float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Vector3 GetWorldDirection() const
-- float, float, float GetWorldDirectionXYZ() const
+- void GetWorldDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Vector3 GetWorldScale() const
-- float, float, float GetWorldScaleXYZ() const
+- void GetWorldScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - const Matrix3x4& GetWorldTransform() const
 - Vector3 LocalToWorld(const Vector3& position) const
 - Vector3 LocalToWorld(const Vector4& vector) const
@@ -3945,16 +3784,15 @@ Methods:<br>
 - bool IsDirty() const
 - unsigned GetNumChildren(bool recursive = false) const
 - Node* GetChild(unsigned index) const
-- Node* GetChild(const String& name, bool recursive = false) const
-- Node* GetChild(const char* name, bool recursive = false) const
+- Node* GetChild(const String name, bool recursive = false) const
 - Node* GetChild(StringHash nameHash, bool recursive = false) const
 - unsigned GetNumComponents() const
 - unsigned GetNumNetworkComponents() const
 - bool HasComponent(ShortStringHash type) const
-- bool HasComponent(const char* type) const
+- bool HasComponent(const String type) const
 - const Variant& GetVar(ShortStringHash key) const
 - const VariantMap& GetVars() const
-- Component* GetComponent(const char* type) const
+- Component* GetComponent(const String type) const
 - void SetID(unsigned id)
 - void SetScene(Scene* scene)
 - void ResetScene()
@@ -4034,7 +3872,7 @@ Properties:<br>
 - bool updateEnabled
 - bool asyncLoading (readonly)
 - float asyncProgress (readonly)
-- const String& fileName
+- const String fileName
 - unsigned checksum (readonly)
 - float timeScale
 - float elapsedTime
@@ -4149,9 +3987,9 @@ Methods:<br>
 - void RemoveItem(unsigned index)
 - void RemoveAllItems()
 - void SetSelection(unsigned index)
-- void SetPlaceholderText(const String& text)
-- void SetPlaceholderText(const const char* text)
+- void SetPlaceholderText(const String text)
 - void SetResizePopup(bool enable)
+-    
 - unsigned GetNumItems() const
 - UIElement* GetItem(unsigned index) const
 - unsigned GetSelection() const
@@ -4173,7 +4011,7 @@ Properties:<br>
 
 FileSelectorEntry
 
-Properties:<br>
+Methods:<br>
 - String name
 - bool directory
 
@@ -4183,15 +4021,10 @@ Methods:<br>
 - FileSelector(Context* context)
 - virtual ~FileSelector()
 - void SetDefaultStyle(XMLFile* style)
-- void SetTitle(const String& text)
-- void SetTitle(const char* text)
-- void SetButtonTexts(const String& okText, const String& cancelText)
-- void SetButtonTexts(const char* okText, const char* cancelText)
-- void SetPath(const String& path)
-- void SetPath(const char* path)
-- void SetFileName(const String& fileName)
-- void SetFileName(const char* fileName)
-- void SetFilters(const Vector<String>& filters, unsigned defaultIndex)
+- void SetTitle(const String text)
+- void SetButtonTexts(const String okText, const String cancelText)
+- void SetPath(const String path)
+- void SetFileName(const String fileName)
 - void SetDirectoryMode(bool enable)
 - void UpdateElements()
 - XMLFile* GetDefaultStyle() const
@@ -4231,13 +4064,14 @@ Properties:<br>
 
 Font : Resource
 
+Methods:<br>
+
 LineEdit : BorderImage
 
 Methods:<br>
 - LineEdit(Context* context)
 - virtual ~LineEdit()
-- void SetText(const String& text)
-- void SetText(const char* text)
+- void SetText(const String text)
 - void SetCursorPosition(unsigned position)
 - void SetCursorBlinkRate(float rate)
 - void SetMaxLength(unsigned length)
@@ -4470,11 +4304,9 @@ Text : UIElement
 Methods:<br>
 - Text(Context* context)
 - virtual ~Text()
-- bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(const char* fontName, int size = DEFAULT_FONT_SIZE)
+- bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- void SetText(const String& text)
-- void SetText(const char* text)
+- void SetText(const String text)
 - void SetTextAlignment(HorizontalAlignment align)
 - void SetRowSpacing(float spacing)
 - void SetWordwrap(bool enable)
@@ -4517,13 +4349,11 @@ Text3D : Drawable
 Methods:<br>
 - Text3D(Context* context)
 - ~Text3D()
-- bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(const char* fontName, int size = DEFAULT_FONT_SIZE)
+- bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font)
 - void SetMaterial(Material* material)
-- void SetText(const String& text)
-- void SetText(const char* text)
+- void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
 - void SetHorizontalAlignment(HorizontalAlignment align)
 - void SetVerticalAlignment(VerticalAlignment align)
@@ -4587,8 +4417,7 @@ Methods:<br>
 - void Render()
 - void DebugDraw(UIElement* element)
 - bool SaveLayout(Serializer& dest, UIElement* element)
-- void SetClipBoardText(const String& text)
-- void SetClipBoardText(const char* text)
+- void SetClipBoardText(const String text)
 - void SetDoubleClickInterval(float interval)
 - void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 - UIElement* GetRoot() const
@@ -4625,8 +4454,7 @@ Methods:<br>
 - bool LoadXML(Deserializer& source)
 - bool SaveXML(Serializer& dest) const
 - bool FilterAttributes(XMLElement& dest) const
-- void SetName(const String& name)
-- void SetName(const char* name)
+- void SetName(const String name)
 - void SetPosition(const IntVector2& position)
 - void SetPosition(int x, int y)
 - void SetSize(const IntVector2& size)
@@ -4664,8 +4492,7 @@ Methods:<br>
 - void SetVisible(bool enable)
 - void SetFocusMode(FocusMode mode)
 - void SetDragDropMode(unsigned mode)
-- bool SetStyle(const String& styleName, XMLFile* file = 0)
-- bool SetStyle(const char* styleName, XMLFile* file = 0)
+- bool SetStyle(const String styleName, XMLFile* file = 0)
 - bool SetStyle(const XMLElement& element)
 - bool SetStyleAuto(XMLFile* file = 0)
 - void SetDefaultStyle(XMLFile* style)
@@ -4679,12 +4506,11 @@ Methods:<br>
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement* CreateChild(const char* type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED)
-- UIElement* CreateChild(const char* type, const char* name = 0, unsigned index = M_MAX_UNSIGNED)
+- UIElement* CreateChild(const String type, const String name = String::EMPTY, unsigned index = M_MAX_UNSIGNED)
 - void AddChild(UIElement* element)
 - void InsertChild(unsigned index, UIElement* element)
 - void RemoveChild(UIElement* element, unsigned index = 0)
-- RemoveChild(unsigned index)
+- void RemoveChild(unsigned index)
 - void RemoveAllChildren()
 - void Remove()
 - unsigned FindChild(UIElement* element) const
@@ -4735,10 +4561,7 @@ Methods:<br>
 - const IntRect& GetLayoutBorder() const
 - unsigned GetNumChildren(bool recursive = false) const
 - UIElement* GetChild(unsigned index) const
-- UIElement* GetChild(const String& name, bool recursive = false) const
-- GetChild(const char* name, bool recursive = false) const
-- UIElement* GetChild(const ShortStringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const
-- GetChild(const char* key, const Variant& value = Variant::EMPTY, bool recursive = false) const
+- UIElement* GetChild(const String name, bool recursive = false) const
 - UIElement* GetParent() const
 - UIElement* GetRoot() const
 - const Color& GetDerivedColor() const
