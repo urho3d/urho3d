@@ -48,6 +48,11 @@ function doit ()
 		_basic['string'] = 'cppstring'
 		_basic['std::string'] = 'cppstring'
 		_basic_ctype.cppstring = 'const char*'
+		
+		-- Add Urho3D::String Support in tolua++.
+		_basic['String'] = 'urho3dstring'
+		_basic['Urho3D::String'] = 'urho3dstring'
+		_basic_ctype.urho3dstring = 'const char*'
 	end
 
 	-- proccess package

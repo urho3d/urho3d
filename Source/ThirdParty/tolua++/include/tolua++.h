@@ -32,6 +32,13 @@ extern "C" {
 #define tolua_iscppstringarray tolua_isstringarray
 #define tolua_pushfieldcppstring(L,lo,idx,s) tolua_pushfieldstring(L, lo, idx, s.c_str())
 
+// Add Urho3D::String Support in tolua++.
+#define tolua_pushurho3dstring(x,y)	tolua_pushstring(x,y.CString())
+#define tolua_isurho3dstring	tolua_isstring
+
+#define tolua_isurho3dstringarray tolua_isstringarray
+#define tolua_pushfieldurho3dstring(L,lo,idx,s) tolua_pushfieldstring(L, lo, idx, s.CString())
+
 #ifndef TEMPLATE_BIND
  #define TEMPLATE_BIND(p)
 #endif
@@ -148,9 +155,24 @@ static inline const char* tolua_tofieldcppstring (lua_State* L, int lo, int inde
 	return s?s:"";
 };
 
+// Add Urho3D::String Support in tolua++.
+static inline const char* tolua_tourho3dstring (lua_State* L, int narg, const char* def) {
+
+	const char* s = tolua_tostring(L, narg, def);
+	return s?s:"";
+};
+
+static inline const char* tolua_tofieldurho3dstring (lua_State* L, int lo, int index, const char* def) {
+
+	const char* s = tolua_tofieldstring(L, lo, index, def);
+	return s?s:"";
+};
+
 #else
 #define tolua_tocppstring tolua_tostring
 #define tolua_tofieldcppstring tolua_tofieldstring
+#define tolua_tourho3dstring tolua_tostring
+#define tolua_tofieldurho3dstring tolua_tofieldstring
 #endif
 
 TOLUA_API int tolua_fast_isa(lua_State *L, int mt_indexa, int mt_indexb, int super_index);
