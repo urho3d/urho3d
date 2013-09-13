@@ -25,3 +25,15 @@
 #include "HashMap.h"
 #include "HashSet.h"
 #include "Str.h"
+#include "tolua++.h"
+
+// Add Urho3D::String Support in tolua++.
+inline const char* tolua_tourho3dstring(lua_State* L, int narg, const Urho3D::String& def)
+{
+    return tolua_tourho3dstring(L, narg, def.CString());
+}
+
+inline const char* tolua_tofieldurho3dstring(lua_State* L, int lo, int index, const Urho3D::String& def)
+{
+    return tolua_tofieldurho3dstring(L, lo, index, def.CString());
+};
