@@ -1,5 +1,5 @@
 runServer = false
-runClient = false
+runClient = true
 serverAddress = ''
 serverPort = 1234
 userName = ''
@@ -8,10 +8,9 @@ nobgm = false
 function ParseNetworkArguments()
     local index = 0
     local arguments = GetArguments()
-    for i = 1, arguments:Size() do
-        local argument = arguments[i-1]
-        if argument:Substring(0,1):CString() ~= '-' then
-            if argument:Equals("server") then
+    for i, argument in ipairs(arguments) do
+        if string.sub(argument, 1, 1) ~= '-'  then
+            if argument == "server" then
                 runServer = true
                 runClient = false
                 return
@@ -23,8 +22,8 @@ function ParseNetworkArguments()
             end
             index = index + 1
         else
-            argument = argument:Substring(1):ToLower()
-            if argument:Equals("nobgm") then
+            argument = string.lower(string.sub(argument, 2))
+            if argument == "nobgm" then
                 nobgm = true
             end
         end

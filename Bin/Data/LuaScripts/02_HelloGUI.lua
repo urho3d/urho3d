@@ -85,8 +85,8 @@ function InitWindow()
 
     -- Create the Window title Text
     local windowTitle = Text:new(context)
-    windowTitle:SetName("WindowTitle")
-    windowTitle:SetText("Hello GUI!")
+    windowTitle.name = "WindowTitle"
+    windowTitle.text = "Hello GUI!"
     
     
     -- Create the Window's close button
@@ -132,9 +132,9 @@ function HandleControlClicked(eventType, eventData)
     local name = "...?"
     if clicked ~= nil then
         -- Get the name of the control that was clicked
-        name = clicked:GetName():CString()
+        name = clicked.name
     end
 
     -- Update the Window's title text
-    windowTitle:SetText("Hello " .. name .. "!")
+    windowTitle.text = "Hello " .. name .. "!"
 end
