@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Name" value="QuickMenu" />
+	<attribute name="Position" value="697 594" />
+	<attribute name="Size" value="220 67" />
+	<attribute name="Layout Mode" value="Vertical" />
+	<attribute name="Layout Spacing" value="4" />
+	<attribute name="Layout Border" value="6 6 6 6" />
+	<attribute name="Is Movable" value="true" />
+	<element style="UIElement">
+		<attribute name="Position" value="6 6" />
+		<attribute name="Size" value="208 16" />
+		<attribute name="Min Size" value="112 16" />
+		<attribute name="Max Size" value="2147483647 16" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="Text">
+			<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+			<attribute name="Text" value="Quick Action" />
+		</element>
+		<element type="Button" style="CloseButton">
+			<attribute name="Name" value="CloseButton" />
+		</element>
+	</element>
+	<element type="BorderImage" style="EditorDivider" />
+	<element style="UIElement">
+		<attribute name="Name" value="SearchBar" />
+		<attribute name="Position" value="6 41" />
+		<attribute name="Size" value="208 16" />
+		<attribute name="Min Size" value="175 16" />
+		<attribute name="Layout Mode" value="Horizontal" />
+		<element type="LineEdit">
+			<attribute name="Name" value="Search" />
+			<attribute name="Min Size" value="175 16" />
+			<attribute name="Max Size" value="2147483647 16" />
+			<element type="Text" internal="true" style="none">
+				<attribute name="Top Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Top Right Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Left Color" value="0.9 1 0.9 1" />
+				<attribute name="Bottom Right Color" value="0.9 1 0.9 1" />
+			</element>
+			<element type="BorderImage" internal="true" style="none" />
+		</element>
+	</element>
+	<element type="Menu">
+		<attribute name="Name" value="ResultsMenu" />
+		<attribute name="Max Size" value="2147483647 200" />
+		<attribute name="Layout Mode" value="Vertical" />
+	</element>
+</element>

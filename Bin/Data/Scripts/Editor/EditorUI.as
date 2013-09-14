@@ -3,6 +3,8 @@
 XMLFile@ uiStyle;
 XMLFile@ iconStyle;
 UIElement@ uiMenuBar;
+UIElement@ quickMenu;
+Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
 
 const ShortStringHash UI_ELEMENT_TYPE("UIElement");
@@ -17,6 +19,7 @@ const ShortStringHash CALLBACK_VAR("Callback");
 const ShortStringHash INDENT_MODIFIED_BY_ICON_VAR("IconIndented");
 
 const int SHOW_POPUP_INDICATOR = -1;
+const uint MAX_QUICK_MENU_ITEMS = 10;
 
 Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.*"};
 Array<String> uiElementFilters = {"*.xml"};
@@ -42,11 +45,11 @@ void CreateUI()
 {
     uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
     ui.root.defaultStyle = uiStyle;
-
     iconStyle = cache.GetResource("XMLFile", "UI/EditorIcons.xml");
 
     CreateCursor();
     CreateMenuBar();
+    CreateQuickMenu();
     CreateHierarchyWindow();
     CreateAttributeInspectorWindow();
     CreateEditorSettingsDialog();
@@ -61,6 +64,8 @@ void CreateUI()
     SubscribeToEvent("KeyDown", "HandleKeyDown");
     SubscribeToEvent("KeyUp", "UnfadeUI");
     SubscribeToEvent("MouseButtonUp", "UnfadeUI");
+
+    CreateQuickMenu();
 }
 
 void ResizeUI()
@@ -119,6 +124,126 @@ void CreateCursor()
 funcdef bool MENU_CALLBACK();
 Array<MENU_CALLBACK@> menuCallbacks;
 
+void HandleQuickSearchChange(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ search = eventData["Element"].GetUIElement();
+    if (search is null)
+        return;
+
+    PerformQuickMenuSearch(search.text.ToLower().Trimmed());
+}
+
+void PerformQuickMenuSearch(const String&in query)
+{
+    Menu@ menu = quickMenu.GetChild("ResultsMenu", true);
+    if (menu is null)
+        return;
+
+    menu.RemoveAllChildren();
+    uint limit = 0;
+
+    if (query.length > 0)
+    {
+        int lastIndex = 0;
+        uint score = 0;
+        int index = 0;
+
+        Array<QuickMenuItem@> filtered;
+        {
+            QuickMenuItem@ qi;
+            for(uint x=0; x < quickMenuItems.length; x++)
+            {
+                @qi = quickMenuItems[x];
+                int find = qi.action.Find(query, 0, false);
+                if (find > -1)
+                {
+                    qi.sortScore = find;
+                    filtered.Push(qi);
+                }
+            }
+        }
+
+        {
+            QuickMenuItem@ a;
+            QuickMenuItem@ b;
+            for(uint x=0; x < filtered.length; x++)
+            {
+                for(uint y=0; y < filtered.length-1; y++)
+                {
+                    @a = filtered[y];
+                    @b = filtered[y+1];
+                    if(a.sortScore > b.sortScore)
+                    {
+                        @filtered[y+1] = a;
+                        @filtered[y] = b;
+                    }
+                }
+            }
+        }
+
+        {
+            QuickMenuItem@ qi;
+            limit = filtered.length > MAX_QUICK_MENU_ITEMS ? MAX_QUICK_MENU_ITEMS : filtered.length;
+            for(uint x=0; x < limit; x++)
+            {
+                @qi = filtered[x];
+                Menu@ item = CreateMenuItem(qi.action, qi.callback);
+                item.SetMaxSize(1000,16);
+                menu.AddChild(item);
+            }
+        }
+    }
+
+    menu.visible = limit > 0;
+    menu.SetFixedHeight(limit * 16);
+    quickMenu.SetFixedHeight(limit*16 + 62 + (menu.visible ? 6 : 0));
+}
+
+class QuickMenuItem
+{
+    String action;
+    MENU_CALLBACK@ callback;
+    uint sortScore = 0;
+    QuickMenuItem(){}
+    QuickMenuItem(String action, MENU_CALLBACK@ callback)
+    {
+        this.action = action;
+        this.callback = callback;
+    }
+}
+/// Creates popup search menu
+void CreateQuickMenu()
+{
+    if (quickMenu !is null)
+        return;
+
+    quickMenu = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorQuickMenu.xml"));
+    quickMenu.enabled = false;
+    quickMenu.visible = false;
+    
+    // Handle a dummy search in the quick menu to finalize its initial size to empty
+    PerformQuickMenuSearch("");
+
+    ui.root.AddChild(quickMenu);
+    LineEdit@ search = quickMenu.GetChild("Search", true);
+    SubscribeToEvent(search, "TextChanged", "HandleQuickSearchChange");
+    UIElement@ closeButton = quickMenu.GetChild("CloseButton", true);
+    SubscribeToEvent(closeButton, "Pressed", "ToggleQuickMenu");
+}
+
+void ToggleQuickMenu()
+{
+    quickMenu.enabled = !quickMenu.enabled && ui.cursor.visible;
+    quickMenu.visible = quickMenu.enabled;
+    if (quickMenu.enabled)
+    {
+        quickMenu.position = ui.cursorPosition - IntVector2(20,70);
+        LineEdit@ search = quickMenu.GetChild("Search", true);
+        search.text = "";
+        search.focus = true;
+    }
+}
+
 /// Create top menu bar.
 void CreateMenuBar()
 {
@@ -141,8 +266,8 @@ void CreateMenuBar()
 
         Menu@ childMenu = CreateMenuItem("Load node", null, SHOW_POPUP_INDICATOR);
         Window@ childPopup = CreatePopup(childMenu);
-        childPopup.AddChild(CreateMenuItem("As replicated...", @PickFile));
-        childPopup.AddChild(CreateMenuItem("As local...", @PickFile));
+        childPopup.AddChild(CreateMenuItem("As replicated...", @PickFile, 0, 0, true, "Load node as replicated..."));
+        childPopup.AddChild(CreateMenuItem("As local...", @PickFile, 0, 0, true, "Load node as local..."));
         popup.AddChild(childMenu);
 
         popup.AddChild(CreateMenuItem("Save node as...", @PickFile));
@@ -189,8 +314,8 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("Create");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("Replicated node", @PickNode));
-        popup.AddChild(CreateMenuItem("Local node", @PickNode));
+        popup.AddChild(CreateMenuItem("Replicated node", @PickNode, 0, 0, true, "Create Replicated node"));
+        popup.AddChild(CreateMenuItem("Local node", @PickNode, 0, 0, true, "Create Local node"));
         CreateChildDivider(popup);
 
         Menu@ childMenu = CreateMenuItem("Component", null, SHOW_POPUP_INDICATOR);
@@ -206,7 +331,7 @@ void CreateMenuBar()
             Window@ popup = CreatePopup(menu);
             String[] componentTypes = GetObjectsByCategory(objectCategories[i]);
             for (uint j = 0; j < componentTypes.length; ++j)
-                popup.AddChild(CreateIconizedMenuItem(componentTypes[j], @PickComponent));
+                popup.AddChild(CreateIconizedMenuItem(componentTypes[j], @PickComponent, 0, 0, "", true, "Create " + componentTypes[j]));
             childPopup.AddChild(menu);
         }
         FinalizedPopupMenu(childPopup);
@@ -216,7 +341,7 @@ void CreateMenuBar()
         childPopup = CreatePopup(childMenu);
         String[] objects = { "Box", "Cone", "Cylinder", "Plane", "Pyramid", "Sphere" };
         for (uint i = 0; i < objects.length; ++i)
-            childPopup.AddChild(CreateIconizedMenuItem(objects[i], @PickBuiltinObject, 0, 0, "Node"));
+            childPopup.AddChild(CreateIconizedMenuItem(objects[i], @PickBuiltinObject, 0, 0, "Node", true, "Create " + objects[i]));
         popup.AddChild(childMenu);
         CreateChildDivider(popup);
 
@@ -226,7 +351,7 @@ void CreateMenuBar()
         for (uint i = 0; i < uiElementTypes.length; ++i)
         {
             if (uiElementTypes[i] != "UIElement")
-                childPopup.AddChild(CreateIconizedMenuItem(uiElementTypes[i], @PickUIElement));
+                childPopup.AddChild(CreateIconizedMenuItem(uiElementTypes[i], @PickUIElement, 0, 0, "", true, "Create " + uiElementTypes[i]));
         }
         CreateChildDivider(childPopup);
         childPopup.AddChild(CreateIconizedMenuItem("UIElement", @PickUIElement));
@@ -306,13 +431,13 @@ bool PickFile()
         uiFileSelector.fileName = GetFileNameAndExtension(editorScene.fileName);
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveSceneFile");
     }
-    else if (action == "As replicated...")
+    else if (action == "As replicated..." || action == "Load node as replicated...")
     {
         instantiateMode = REPLICATED;
         CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadNodeFile");
     }
-    else if (action == "As local...")
+    else if (action == "As local..." || action == "Load node as local...")
     {
         instantiateMode = LOCAL;
         CreateFileSelector("Load node", "Load", "Cancel", uiNodePath, uiSceneFilters, uiNodeFilter);
@@ -399,7 +524,7 @@ bool PickNode()
     if (menu is null)
         return false;
 
-    String action = menu.name;
+    String action = GetActionName(menu.name);
     if (action.empty)
         return false;
 
@@ -416,7 +541,7 @@ bool PickComponent()
     if (menu is null)
         return false;
 
-    String action = menu.name;
+    String action = GetActionName(menu.name);
     if (action.empty)
         return false;
 
@@ -430,12 +555,21 @@ bool PickBuiltinObject()
     if (menu is null)
         return false;
 
-    String action = menu.name;
+    String action = GetActionName(menu.name);
     if (action.empty)
         return false;
 
     CreateBuiltinObject(action);
     return true;
+}
+
+// When calling items from the quick menu, they have "Create" prepended for clarity. Strip that now to get the object name to create
+String GetActionName(const String&in name)
+{
+    if (name.StartsWith("Create"))
+        return name.Substring(7);
+    else
+        return name;
 }
 
 bool PickUIElement()
@@ -459,13 +593,16 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     HandlePopup(menu);
 
+    quickMenu.visible = false;
+    quickMenu.enabled = false;
+
     // Execute the callback if available
     Variant variant = menu.GetVar(CALLBACK_VAR);
     if (!variant.empty)
         menuCallbacks[variant.GetUInt()]();
 }
 
-Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0)
+Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, bool addToQuickMenu = true, String quickMenuText="")
 {
     Menu@ menu = Menu(title);
     menu.defaultStyle = uiStyle;
@@ -484,6 +621,9 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
     menuText.style = "EditorMenuText";
     menuText.text = title;
 
+    if (addToQuickMenu)
+        AddQuickMenuItem(callback, quickMenuText.empty ? title : quickMenuText);
+
     if (accelKey != 0)
     {
         int minWidth = menuText.minWidth;
@@ -495,7 +635,25 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
     return menu;
 }
 
-Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, const String&in iconType = "")
+void AddQuickMenuItem(MENU_CALLBACK@ callback, String text)
+{
+    if (callback is null)
+        return;
+
+    bool exists = false;
+    for (uint i=0;i<quickMenuItems.length;i++)
+    {
+        if (quickMenuItems[i].action == text)
+        {
+            exists = true;
+            break;
+        }
+    }
+    if (!exists)
+        quickMenuItems.Push(QuickMenuItem(text, callback));
+}
+
+Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int accelKey = 0, int accelQual = 0, const String&in iconType = "", bool addToQuickMenu=true, String quickMenuText="")
 {
     Menu@ menu = Menu(title);
     menu.defaultStyle = uiStyle;
@@ -515,6 +673,9 @@ Menu@ CreateIconizedMenuItem(const String&in title, MENU_CALLBACK@ callback = nu
     menuText.text = title;
     // If icon type is not provided, use the title instead
     IconizeUIElement(menuText, iconType.empty ? title : iconType);
+
+    if (addToQuickMenu)
+        AddQuickMenuItem(callback, quickMenuText.empty ? title : quickMenuText);
 
     if (accelKey != 0)
     {
@@ -896,6 +1057,11 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
             // Update camera fill mode
             camera.fillMode = fillMode;
+        }
+        else if (key == KEY_SPACE)
+        {
+            if (ui.cursor.visible)
+                ToggleQuickMenu();
         }
         else
             SteppedObjectManipulation(key);

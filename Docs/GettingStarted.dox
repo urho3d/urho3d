@@ -408,6 +408,7 @@ Ctrl+P          - Toggle scene update on/off
 Ctrl+W          - Cycle through solid, wireframe and point rendering
 Ctrl+Z          - Undo
 Ctrl+Y          - Redo
+Ctrl+Space      - Open quick menu
 ESC             - Close the file selector or editor settings window
 DEL             - Delete node or component
 F1              - Toggle console
