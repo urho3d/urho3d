@@ -563,6 +563,19 @@ bool PickBuiltinObject()
     return true;
 }
 
+bool PickUIElement()
+{
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return false;
+
+    String action = GetActionName(menu.name);
+    if (action.empty)
+        return false;
+
+    return NewUIElement(action);
+}
+
 // When calling items from the quick menu, they have "Create" prepended for clarity. Strip that now to get the object name to create
 String GetActionName(const String&in name)
 {
@@ -570,19 +583,6 @@ String GetActionName(const String&in name)
         return name.Substring(7);
     else
         return name;
-}
-
-bool PickUIElement()
-{
-    Menu@ menu = GetEventSender();
-    if (menu is null)
-        return false;
-
-    String action = menu.name;
-    if (action.empty)
-        return false;
-
-    return NewUIElement(action);
 }
 
 void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
