@@ -945,6 +945,12 @@ Otherwise fully customized scene render passes can be specified, but there are a
 - Remember to mark the lighting mode (per-vertex / per-pixel) into the techniques which define custom passes, as the lighting mode can be guessed automatically only for the known default passes.
 - The forwardlights command can optionally disable the lit base pass optimization without having to touch the material techniques, if a separate opaque ambient-only base pass is needed. By default the optimization is enabled.
 
+\section RenderPaths_PostProcess Post-processing effects special considerations
+
+Post-processing effects are usually implemented by using the quad command. When using intermediate rendertargets that are of different size than the viewport rendertarget, it is necessary in shaders to reference their (inverse) size and the half-pixel offset for Direct3D9. These shader uniforms are automatically generated for named rendertargets. For an example look at the bloom postprocess shaders: the rendertarget called HBlur will define the shader uniforms cHBlurInvSize and cHBlurOffsets (both Vector2.)
+
+In OpenGL post-processing shaders it is important to distinguish between sampling a rendertarget texture and a regular texture resource, because intermediate rendertargets (such as the G-buffer) may be vertically inverted. Use the GetScreenPos() or GetQuadTexCoord() functions to get rendertarget UV coordinates from the clip coordinates; this takes flipping into account automatically. For sampling a regular texture, use GetQuadTexCoordNoFlip() function, which requires world coordinates instead of clip coordinates.
+
 \page Lights Lights and shadows
 
 Lights in Urho3D can be directional, point, or spot lights. Shadow mapping is supported for all light types.

@@ -18,8 +18,7 @@ class Camera : public Component
     void SetOrthographic(bool enable);
     void SetAutoAspectRatio(bool enable);
     void SetProjectionOffset(const Vector2& offset);
-    void SetFlipVertical(bool enable);
-    
+
     float GetFarClip() const;
     float GetNearClip() const;
     float GetFov() const;
@@ -48,7 +47,6 @@ class Camera : public Component
     Vector3 GetRightVector() const;
     Vector3 GetUpVector() const;
     const Vector2& GetProjectionOffset() const;
-    bool GetFlipVertical() const;
     float GetDistance(const Vector3& worldPos) const;
     float GetDistanceSquared(const Vector3& worldPos) const;
     float GetLodDistance(float distance, float scale, float bias) const;
@@ -75,7 +73,6 @@ class Camera : public Component
     tolua_readonly tolua_property__get_set Vector3 rightVector;
     tolua_readonly tolua_property__get_set Vector3 upVector;
     tolua_property__get_set Vector2& projectionOffset;
-    tolua_property__get_set bool flipVertical;
     tolua_readonly tolua_property__is_set bool projectionValid;
 };
 

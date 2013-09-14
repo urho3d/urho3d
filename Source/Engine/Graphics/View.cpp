@@ -382,11 +382,25 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     
     // Get light volume shaders according to the renderpath, if it needs them
     deferred_ = false;
+    deferredAmbient_ = false;
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
         if (!command.enabled_)
             continue;
+        
+        // Check if ambient pass and G-buffer rendering happens at the same time
+        if (command.type_ == CMD_SCENEPASS && command.outputNames_.Size() > 1)
+        {
+            for (unsigned j = 0; j < command.outputNames_.Size(); ++j)
+            {
+                if (!command.outputNames_[j].Compare("viewport", false))
+                {
+                    deferredAmbient_ = true;
+                    break;
+                }
+            }
+        }
         
         if (command.type_ == CMD_LIGHTVOLUMES)
         {
@@ -1247,10 +1261,7 @@ void View::ExecuteRenderPathCommands()
                     
                     // If this is a scene render pass, must copy the previous viewport contents now
                     if (command.type_ == CMD_SCENEPASS && !needResolve)
-                    {
                         BlitFramebuffer(screenBuffers_[readBuffer_], screenBuffers_[writeBuffer_]->GetRenderSurface(), false);
-                    }
-                    
                 }
                 
                 // Resolve multisampled framebuffer now if necessary
@@ -1568,9 +1579,9 @@ void View::AllocateScreenBuffers()
     unsigned neededBuffers = 0;
     #ifdef USE_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
-    // Also, if rendering to a texture with deferred rendering, it must be RGBA to comply with the rest of the buffers.
-    if (deferred_ && (!renderTarget_ || (deferred_ && renderTarget_->GetParentTexture()->GetFormat() != 
-        Graphics::GetRGBAFormat())))
+    // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers.
+    if ((deferred_ && !renderTarget_) || (deferredAmbient_ && renderTarget_ && renderTarget_->GetParentTexture()->GetFormat() !=
+        Graphics::GetRGBAFormat()))
         neededBuffers = 1;
     #endif
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer

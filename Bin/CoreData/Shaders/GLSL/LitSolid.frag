@@ -91,7 +91,7 @@ void main()
         #else
             finalColor = diff * lightColor * diffColor.rgb;
         #endif
-    
+
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
             gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
@@ -106,9 +106,9 @@ void main()
         #else
             vec3 normal = vNormal;
         #endif
-    
+
         float specPower = cMatSpecColor.a / 255.0;
-        
+
         gl_FragData[0] = vec4(normal * 0.5 + 0.5, specPower);
         gl_FragData[1] = vec4(EncodeDepth(vVertexLight.a), 0.0);
     #elif defined(DEFERRED)
@@ -127,13 +127,13 @@ void main()
 
         #ifdef ENVCUBEMAP
             normal = normalize(normal);
-            finalColor += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal)).rgb;
+            finalColor = cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal)).rgb;
         #endif
         #ifdef LIGHTMAP
             finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * diffColor.rgb;
         #endif
 
-        gl_FragData[0] = vec4(GetFog(finalColor * diffColor.rgb, vVertexLight.a), 1.0);
+        gl_FragData[0] = vec4(GetFog(finalColor, vVertexLight.a), 1.0);
         gl_FragData[1] = GetFogFactor(vVertexLight.a) * vec4(diffColor.rgb, specIntensity);
         gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
         gl_FragData[3] = vec4(EncodeDepth(vVertexLight.a), 0.0);

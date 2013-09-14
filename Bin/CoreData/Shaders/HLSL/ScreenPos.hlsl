@@ -21,6 +21,13 @@ float2 GetQuadTexCoord(float4 clipPos)
         -clipPos.y / clipPos.w * 0.5 + 0.5);
 }
 
+float2 GetQuadTexCoordNoFlip(float3 worldPos)
+{
+    return float2(
+        worldPos.x * 0.5 + 0.5,
+        -worldPos.y * 0.5 + 0.5);
+}
+
 float3 GetFarRay(float4 clipPos)
 {
     float3 viewRay = float3(

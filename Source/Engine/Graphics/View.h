@@ -233,7 +233,7 @@ private:
     OcclusionBuffer* occlusionBuffer_;
     /// Destination color rendertarget.
     RenderSurface* renderTarget_;
-    /// Effective color rendertarget to use, may be different if screenbuffers are used.
+    /// Color rendertarget active for the current renderpath command.
     RenderSurface* currentRenderTarget_;
     /// Viewport rectangle.
     IntRect viewRect_;
@@ -265,6 +265,8 @@ private:
     bool drawShadows_;
     /// Deferred flag. Inferred from the existence of a light volume command in the renderpath.
     bool deferred_;
+    /// Deferred ambient pass flag. This means that the destination rendertarget is being written to at the same time as albedo/normal/depth buffers, and needs to be RGBA on OpenGL.
+    bool deferredAmbient_;
     /// Renderpath.
     RenderPath* renderPath_;
     /// Intermediate screen buffers used in pingpong copies and OpenGL deferred framebuffer blit.
