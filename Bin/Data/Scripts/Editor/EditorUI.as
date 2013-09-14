@@ -64,8 +64,6 @@ void CreateUI()
     SubscribeToEvent("KeyDown", "HandleKeyDown");
     SubscribeToEvent("KeyUp", "UnfadeUI");
     SubscribeToEvent("MouseButtonUp", "UnfadeUI");
-
-    CreateQuickMenu();
 }
 
 void ResizeUI()
