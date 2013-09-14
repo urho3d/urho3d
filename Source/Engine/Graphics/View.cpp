@@ -1695,6 +1695,8 @@ void View::DrawFullscreenQuad(bool nearQuad)
     Matrix4 projection = Matrix4::IDENTITY;
     
     #ifdef USE_OPENGL
+    if (camera_->GetFlipVertical())
+        projection.m11_ = -1.0f;
     model.m23_ = nearQuad ? -1.0f : 1.0f;
     #else
     model.m23_ = nearQuad ? 0.0f : 1.0f;

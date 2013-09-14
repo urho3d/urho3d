@@ -25,7 +25,7 @@ vec2 GetQuadTexCoordNoFlip(vec3 worldPos)
 {
     return vec2(
         worldPos.x * 0.5 + 0.5,
-        worldPos.y * 0.5 + 0.5);
+        -worldPos.y * 0.5 + 0.5);
 }
 
 vec3 GetFarRay(vec4 clipPos)

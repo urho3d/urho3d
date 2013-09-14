@@ -76,7 +76,7 @@ public:
     void SetAutoAspectRatio(bool enable);
     /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
     void SetProjectionOffset(const Vector2& offset);
-    /// Set vertical flipping mode.
+    /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
     
     /// Return far clip distance.
