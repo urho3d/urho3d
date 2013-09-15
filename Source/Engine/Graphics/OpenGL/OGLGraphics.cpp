@@ -1246,7 +1246,11 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
     case VAR_VECTOR4:
         SetShaderParameter(param, value.GetVector4());
         break;
-        
+
+    case VAR_COLOR:
+        SetShaderParameter(param, value.GetColor());
+        break;
+
     default:
         // Unsupported parameter type, do nothing
         break;

@@ -218,9 +218,7 @@ bool Material::Load(const XMLElement& source)
     while (parameterElem)
     {
         String name = parameterElem.GetAttribute("name");
-        Variant value = parameterElem.GetVectorVariant("value");
-        SetShaderParameter(name, value);
-        
+        SetShaderParameter(name, ParseShaderParameterValue(parameterElem.GetAttribute("value")));
         parameterElem = parameterElem.GetNext("parameter");
     }
     
@@ -475,6 +473,15 @@ const Variant& Material::GetShaderParameter(const String& name) const
 String Material::GetTextureUnitName(TextureUnit unit)
 {
     return textureUnitNames[unit];
+}
+
+Variant Material::ParseShaderParameterValue(const String& value)
+{
+    String valueTrimmed = value.Trimmed();
+    if (valueTrimmed.Length() && IsAlpha(valueTrimmed[0]))
+        return Variant(ToBool(valueTrimmed));
+    else
+        return ToVectorVariant(valueTrimmed);
 }
 
 void Material::CheckOcclusion()

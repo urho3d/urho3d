@@ -1034,21 +1034,17 @@ void Graphics::SetShaderParameter(StringHash param, float value)
 
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
+    /// \todo Bool constants possibly have no effect on Direct3D9
     HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End() || i->second_.register_ >= MAX_CONSTANT_REGISTERS)
         return;
 
-    BOOL data[4];
-
-    data[0] = value;
-    data[1] = false;
-    data[2] = false;
-    data[3] = false;
+    BOOL data = value;
 
     if (i->second_.type_ == VS)
-        impl_->device_->SetVertexShaderConstantB(i->second_.register_, &data[0], 1);
+        impl_->device_->SetVertexShaderConstantB(i->second_.register_, &data, 1);
     else
-        impl_->device_->SetPixelShaderConstantB(i->second_.register_, &data[0], 1);
+        impl_->device_->SetPixelShaderConstantB(i->second_.register_, &data, 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Color& color)

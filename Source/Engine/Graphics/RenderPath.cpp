@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Graphics.h"
+#include "Material.h"
 #include "RenderPath.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
@@ -146,9 +147,7 @@ void RenderPathCommand::Load(const XMLElement& element)
             while (parameterElem)
             {
                 String name = parameterElem.GetAttribute("name");
-                Variant value = parameterElem.GetVectorVariant("value");
-                shaderParameters_[name] = value;
-                
+                shaderParameters_[name] = Material::ParseShaderParameterValue(parameterElem.GetAttribute("value"));
                 parameterElem = parameterElem.GetNext("parameter");
             }
         }

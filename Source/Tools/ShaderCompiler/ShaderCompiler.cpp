@@ -503,8 +503,8 @@ void CompileVariation(CompiledVariation* variation)
             
             if (isSampler)
             {
-                // Skip if it's a G-buffer sampler
-                if (!name.Contains("Buffer"))
+                // Skip if it's a G-buffer sampler, which are aliases for the standard texture units
+                if (name != "AlbedoBuffer" && name != "NormalBuffer" && name != "DepthBuffer" && name != "LightBuffer")
                 {
                     Parameter newTextureUnit(name, reg, 1);
                     variation->textureUnits_.Push(newTextureUnit);
