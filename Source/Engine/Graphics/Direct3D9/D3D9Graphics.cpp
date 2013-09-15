@@ -1032,6 +1032,25 @@ void Graphics::SetShaderParameter(StringHash param, float value)
         impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data[0], 1);
 }
 
+void Graphics::SetShaderParameter(StringHash param, bool value)
+{
+    HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
+    if (i == shaderParameters_.End() || i->second_.register_ >= MAX_CONSTANT_REGISTERS)
+        return;
+
+    bool data[4];
+
+    data[0] = value;
+    data[1] = false;
+    data[2] = false;
+    data[3] = false;
+
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantB(i->second_.register_, &data[0], 1);
+    else
+        impl_->device_->SetPixelShaderConstantB(i->second_.register_, &data[0], 1);
+}
+
 void Graphics::SetShaderParameter(StringHash param, const Color& color)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
@@ -1149,6 +1168,10 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 {
     switch (value.GetType())
     {
+    case VAR_BOOL:
+        SetShaderParameter(param, value.GetBool());
+        break;
+
     case VAR_FLOAT:
         SetShaderParameter(param, value.GetFloat());
         break;

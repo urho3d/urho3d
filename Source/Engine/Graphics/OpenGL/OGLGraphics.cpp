@@ -1227,6 +1227,10 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 {
     switch (value.GetType())
     {
+    case VAR_BOOL:
+        SetShaderParameter(param, value.GetBool());
+        break;
+
     case VAR_FLOAT:
         SetShaderParameter(param, value.GetFloat());
         break;
