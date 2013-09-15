@@ -490,6 +490,7 @@ void ScriptInstance::ClearScriptMethods()
 void ScriptInstance::ClearScriptAttributes()
 {
     attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
+    idAttributes_.Clear();
 }
 
 void ScriptInstance::GetScriptMethods()
