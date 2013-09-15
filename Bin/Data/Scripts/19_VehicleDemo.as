@@ -258,6 +258,7 @@ class Vehicle : ScriptObject
 
     void Init()
     {
+        // This function is called only from the main program when initially creating the vehicle, not on scene load
         StaticModel@ hullObject = node.CreateComponent("StaticModel");
         hullBody = node.CreateComponent("RigidBody");
         CollisionShape@ hullShape = node.CreateComponent("CollisionShape");

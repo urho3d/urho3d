@@ -97,8 +97,10 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
 {
     if (attr.mode_ & (AM_NODEID | AM_COMPONENTID))
     {
-        // The component / node to which the ID refers to may not be in scene yet. Delay searching for it to ApplyAttributes
-        idAttributes_[const_cast<AttributeInfo*>(&attr)] = src.GetUInt();
+        // The component / node to which the ID refers to may not be in the scene yet, and furthermore the ID must go through the
+        // SceneResolver first. Delay searching for the object to ApplyAttributes
+        AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
+        idAttributes_[attrPtr] = src.GetUInt();
     }
     else
         Serializable::OnSetAttribute(attr, src);
@@ -106,18 +108,28 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
 
 void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
 {
-    // Get ID's of node / component handle attributes
-    if (attr.mode_ & AM_NODEID)
+    AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
+    
+    // Get ID's for node / component handle attributes
+    if (attr.mode_ & (AM_NODEID | AM_COMPONENTID))
     {
-        Node* node = *(reinterpret_cast<Node**>(attr.ptr_));
-        unsigned nodeID = node ? node->GetID() : 0;
-        dest = Variant(nodeID);
-    }
-    else if (attr.mode_ & AM_COMPONENTID)
-    {
-        Component* component = *(reinterpret_cast<Component**>(attr.ptr_));
-        unsigned componentID = component ? component->GetID() : 0;
-        dest = Variant(componentID);
+        // If a cached ID value has been stored, return it instead of querying from the actual object
+        // (the object handle is likely null at that point)
+        HashMap<AttributeInfo*, unsigned>::ConstIterator i = idAttributes_.Find(attrPtr);
+        if (i != idAttributes_.End())
+            dest = i->second_;
+        else if (attr.mode_ & AM_NODEID)
+        {
+            Node* node = *(reinterpret_cast<Node**>(attr.ptr_));
+            unsigned nodeID = node ? node->GetID() : 0;
+            dest = nodeID;
+        }
+        else
+        {
+            Component* component = *(reinterpret_cast<Component**>(attr.ptr_));
+            unsigned componentID = component ? component->GetID() : 0;
+            dest = componentID;
+        }
     }
     else
         Serializable::OnGetAttribute(attr, dest);
@@ -125,14 +137,14 @@ void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) co
 
 void ScriptInstance::ApplyAttributes()
 {
-    // Apply node / component ID's now
+    // Apply node / component ID attributes now (find objects from the scene and assign to the object handles)
     for (HashMap<AttributeInfo*, unsigned>::Iterator i = idAttributes_.Begin(); i != idAttributes_.End(); ++i)
     {
         AttributeInfo& attr = *i->first_;
         if (attr.mode_ & AM_NODEID)
         {
             Node*& nodePtr = *(reinterpret_cast<Node**>(attr.ptr_));
-            // Decrease reference count of the old object, then increment the new
+            // Decrease reference count of the old object if any, then increment the new
             if (nodePtr)
                 nodePtr->ReleaseRef();
             nodePtr = GetScene()->GetNode(i->second_);
@@ -510,6 +522,7 @@ void ScriptInstance::GetScriptAttributes()
             typeName = typeName.Substring(0, typeName.Length() - 1);
         
         AttributeInfo info;
+        info.mode_ = AM_FILE;
         info.name_ = name;
         info.ptr_ = scriptObject_->GetAddressOfProperty(i);
         
