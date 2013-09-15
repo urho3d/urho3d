@@ -55,8 +55,13 @@ public:
     /// Construct.
     Vehicle(Context* context);
     
+    /// Register object factory and attributes.
+    static void RegisterObject(Context* context);
+    
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
+    /// Perform post-load after deserialization. Acquire the components from the scene nodes.
+    virtual void ApplyAttributes();
     
     /// Initialize the vehicle. Create rendering and physics components.
     void Init();
@@ -65,8 +70,10 @@ public:
     Controls controls_;
     
 private:
-    /// Initialize a wheel and return its scene node.
-    Node* InitWheel(const String& name, const Vector3& offset);
+    /// Initialize a wheel and remember its scene node and ID.
+    void InitWheel(const String& name, const Vector3& offset, WeakPtr<Node>& wheelNode, unsigned& wheelNodeID);
+    /// Acquire wheel components from wheel scene nodes.
+    void GetWheelComponents();
     /// Handle physics world update event.
     void HandleFixedUpdate(StringHash eventType, VariantMap& eventData);
     
@@ -86,6 +93,12 @@ private:
     WeakPtr<RigidBody> frontRightBody_;
     WeakPtr<RigidBody> rearLeftBody_;
     WeakPtr<RigidBody> rearRightBody_;
+    
+    // IDs of the wheel scene nodes for serialization.
+    unsigned frontLeftID_;
+    unsigned frontRightID_;
+    unsigned rearLeftID_;
+    unsigned rearRightID_;
     
     /// Current left/right steering amount (-1 to 1.)
     float steering_;
