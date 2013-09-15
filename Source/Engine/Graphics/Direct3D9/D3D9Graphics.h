@@ -139,7 +139,7 @@ public:
     void SetShaderParameter(StringHash param, const Vector4& vector);
     /// Set shader 3x4 matrix constant.
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
-    /// Set shader constant from a variant. Supported variant types: bool, float, vector2, vector3, vector4.
+    /// Set shader constant from a variant. Supported variant types: bool, float, vector2, vector3, vector4, color.
     void SetShaderParameter(StringHash param, const Variant& value);
     /// Register a shader parameter globally. Called by Shader.
     void RegisterShaderParameter(StringHash param, const ShaderParameter& definition);
