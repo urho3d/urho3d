@@ -162,7 +162,7 @@ void Ragdolls::CreateScene()
     }
     
     // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
-    // the scene, because we want it to be unaffected by scene load/save
+    // the scene, because we want it to be unaffected by scene load / save
     cameraNode_ = new Node(context_);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
@@ -239,8 +239,7 @@ void Ragdolls::MoveCamera(float timeStep)
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
         SpawnObject();
     
-    // Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
-    // directory
+    // Check for loading / saving the scene
     if (input->GetKeyPress(KEY_F5))
     {
         File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/Ragdolls.xml", FILE_WRITE);

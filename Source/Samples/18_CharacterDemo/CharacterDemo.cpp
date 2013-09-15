@@ -28,6 +28,7 @@
 #include "Controls.h"
 #include "CoreEvents.h"
 #include "Engine.h"
+#include "FileSystem.h"
 #include "Font.h"
 #include "Input.h"
 #include "Light.h"
@@ -58,8 +59,8 @@ CharacterDemo::CharacterDemo(Context* context) :
     Sample(context),
     firstPerson_(false)
 {
-    // Register factory for the Character component so it can be created via CreateComponent
-    context_->RegisterFactory<Character>();
+    // Register factory and attributes for the Character component so it can be created via CreateComponent, and loaded / saved
+    Character::RegisterObject(context);
 }
 
 void CharacterDemo::Start()
@@ -90,7 +91,8 @@ void CharacterDemo::CreateScene()
     scene_->CreateComponent<Octree>();
     scene_->CreateComponent<PhysicsWorld>();
     
-    // Create camera and define viewport. Camera does not necessarily have to belong to the scene
+    // Create camera and define viewport. We will be doing load / save, in which case it's convenient to create the camera
+    // outside the scene, so that it isn't being destroyed and recreated, and we don't have to redefine the viewport on load
     cameraNode_ = new Node(context_);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(300.0f);
@@ -218,7 +220,8 @@ void CharacterDemo::CreateInstructions()
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse to move\n"
-        "Space to jump, F to toggle 1st/3rd person"
+        "Space to jump, F to toggle 1st/3rd person\n"
+        "F5 to save scene, F7 to load"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
@@ -268,6 +271,24 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             // Switch between 1st and 3rd person
             if (input->GetKeyPress('F'))
                 firstPerson_ = !firstPerson_;
+
+            // Check for loading / saving the scene
+            if (input->GetKeyPress(KEY_F5))
+            {
+                File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml",
+                    FILE_WRITE);
+                scene_->SaveXML(saveFile);
+            }
+            if (input->GetKeyPress(KEY_F7))
+            {
+                File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/CharacterDemo.xml", FILE_READ);
+                scene_->LoadXML(loadFile);
+                // After loading we have to reacquire the weak pointer to the Character component, as it has been recreated
+                // Simply find the character's scene node by name as there's only one of them
+                Node* characterNode = scene_->GetChild("Jack", true);
+                if (characterNode)
+                    character_ = characterNode->GetComponent<Character>();
+            }
         }
         else
             character_->controls_.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);

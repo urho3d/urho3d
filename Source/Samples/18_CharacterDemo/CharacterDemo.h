@@ -39,7 +39,8 @@ class Character;
 ///     - Controlling a humanoid character through physics;
 ///     - Driving animations using the AnimationController component;
 ///     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera
-///       clipping into scenery
+///       clipping into scenery;
+///     - Defining attributes of a custom component so that it can be saved and loaded;
 class CharacterDemo : public Sample
 {
     OBJECT(CharacterDemo);

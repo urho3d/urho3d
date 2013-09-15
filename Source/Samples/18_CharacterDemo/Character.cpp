@@ -22,6 +22,7 @@
 
 #include "AnimationController.h"
 #include "Character.h"
+#include "Context.h"
 #include "MemoryBuffer.h"
 #include "PhysicsEvents.h"
 #include "PhysicsWorld.h"
@@ -35,6 +36,19 @@ Character::Character(Context* context) :
     okToJump_(true),
     inAirTimer_(0.0f)
 {
+}
+
+void Character::RegisterObject(Context* context)
+{
+    context->RegisterFactory<Character>();
+    
+    // These macros register the class attributes to the Context for automatic load / save handling.
+    // We specify the Default attribute mode which means it will be used both for saving into file, and network replication
+    ATTRIBUTE(Character, VAR_FLOAT, "Controls Yaw", controls_.yaw_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Character, VAR_FLOAT, "Controls Pitch", controls_.pitch_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Character, VAR_BOOL, "On Ground", onGround_, false, AM_DEFAULT);
+    ATTRIBUTE(Character, VAR_BOOL, "OK To Jump", okToJump_, true, AM_DEFAULT);
+    ATTRIBUTE(Character, VAR_FLOAT, "In Air Timer", inAirTimer_, 0.0f, AM_DEFAULT);
 }
 
 void Character::OnNodeSet(Node* node)

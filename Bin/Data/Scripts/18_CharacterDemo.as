@@ -3,7 +3,8 @@
 //     - Controlling a humanoid character through physics;
 //     - Driving animations using the AnimationController component;
 //     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera
-//       clipping into scenery
+//       clipping into scenery;
+//     - Saving and loading the variables of a script object;
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -35,13 +36,13 @@ void Start()
 
     // Create static scene content
     CreateScene();
-    
+
     // Create the controllable character
     CreateCharacter();
-    
+
     // Create the UI content
     CreateInstructions();
-    
+
     // Subscribe to necessary events
     SubscribeToEvents();
 }
@@ -49,11 +50,11 @@ void Start()
 void CreateScene()
 {
     scene_ = Scene();
-    
+
     // Create scene subsystem components
     scene_.CreateComponent("Octree");
     scene_.CreateComponent("PhysicsWorld");
-    
+
     // Create camera and define viewport. Camera does not necessarily have to belong to the scene
     cameraNode = Node();
     Camera@ camera = cameraNode.CreateComponent("Camera");
@@ -86,14 +87,14 @@ void CreateScene()
     StaticModel@ object = floorNode.CreateComponent("StaticModel");
     object.model = cache.GetResource("Model", "Models/Box.mdl");
     object.material = cache.GetResource("Material", "Materials/Stone.xml");
-    
+
     RigidBody@ body = floorNode.CreateComponent("RigidBody");
     // Use collision layer bit 2 to mark world scenery. This is what we will raycast against to prevent camera from going
     // inside geometry
     body.collisionLayer = 2;
     CollisionShape@ shape = floorNode.CreateComponent("CollisionShape");
     shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
-    
+
     // Create mushrooms of varying sizes
     const uint NUM_MUSHROOMS = 60;
     for (uint i = 0; i < NUM_MUSHROOMS; ++i)
@@ -106,19 +107,19 @@ void CreateScene()
         object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
         object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
         object.castShadows = true;
-        
+
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         body.collisionLayer = 2;
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
         shape.SetTriangleMesh(object.model, 0);
     }
-    
+
     // Create movable boxes. Let them fall from the sky at first
     const uint NUM_BOXES = 100;
     for (uint i = 0; i < NUM_BOXES; ++i)
     {
         float scale = Random(2.0f) + 0.5f;
-        
+
         Node@ objectNode = scene_.CreateChild("Box");
         objectNode.position = Vector3(Random(180.0f) - 90.0f, Random(10.0f) + 10.0f, Random(180.0f) - 90.0f);
         objectNode.rotation = Quaternion(Random(360.0f), Random(360.0f), Random(360.0f));
@@ -127,7 +128,7 @@ void CreateScene()
         object.model = cache.GetResource("Model", "Models/Box.mdl");
         object.material = cache.GetResource("Material", "Materials/Stone.xml");
         object.castShadows = true;
-        
+
         RigidBody@ body = objectNode.CreateComponent("RigidBody");
         body.collisionLayer = 2;
         // Bigger boxes will be heavier and harder to move
@@ -141,7 +142,7 @@ void CreateCharacter()
 {
     characterNode = scene_.CreateChild("Jack");
     characterNode.position = Vector3(0.0f, 1.0f, 0.0f);
-    
+
     // Create the rendering component + animation controller
     AnimatedModel@ object = characterNode.CreateComponent("AnimatedModel");
     object.model = cache.GetResource("Model", "Models/Jack.mdl");
@@ -153,18 +154,18 @@ void CreateCharacter()
     RigidBody@ body = characterNode.CreateComponent("RigidBody");
     body.collisionLayer = 1;
     body.mass = 1.0f;
-    
+
     // Set zero angular factor so that physics doesn't turn the character on its own.
     // Instead we will control the character yaw manually
     body.angularFactor = Vector3(0.0f, 0.0f, 0.0f);
-    
+
     // Set the rigidbody to signal collision also when in rest, so that we get ground collisions properly
     body.collisionEventMode = COLLISION_ALWAYS;
-    
+
     // Set a capsule shape for collision
     CollisionShape@ shape = characterNode.CreateComponent("CollisionShape");
     shape.SetCapsule(0.7f, 1.8f, Vector3(0.0f, 0.9f, 0.0f));
-    
+
     // Create the character logic object, which takes care of steering the rigidbody
     characterNode.CreateScriptObject(scriptFile, "Character");
 }
@@ -175,7 +176,8 @@ void CreateInstructions()
     Text@ instructionText = ui.root.CreateChild("Text");
     instructionText.text =
         "Use WASD keys and mouse to move\n"
-        "Space to jump, F to toggle 1st/3rd person";
+        "Space to jump, F to toggle 1st/3rd person\n"
+        "F5 to save scene, F7 to load";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
     instructionText.textAlignment = HA_CENTER;
@@ -212,7 +214,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         character.controls.Set(CTRL_LEFT, input.keyDown['A']);
         character.controls.Set(CTRL_RIGHT, input.keyDown['D']);
         character.controls.Set(CTRL_JUMP, input.keyDown[KEY_SPACE]);
-        
+
         // Add character yaw & pitch from the mouse motion
         character.controls.yaw += input.mouseMoveX * YAW_SENSITIVITY;
         character.controls.pitch += input.mouseMoveY * YAW_SENSITIVITY;
@@ -222,10 +224,30 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Switch between 1st and 3rd person
         if (input.keyPress['F'])
             firstPerson = !firstPerson;
+
+        // Check for loading / saving the scene
+        if (input.keyPress[KEY_F5])
+        {
+            File saveFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_WRITE);
+            scene_.SaveXML(saveFile);
+        }
+        if (input.keyPress[KEY_F7])
+        {
+            File loadFile(fileSystem.programDir + "Data/Scenes/CharacterDemo.xml", FILE_READ);
+            scene_.LoadXML(loadFile);
+            // After loading we have to reacquire the character scene node, as it has been recreated
+            // Simply find by name as there's only one of them
+            characterNode = scene_.GetChild("Jack", true);
+            if (characterNode is null)
+                return;
+            character = cast<Character>(characterNode.scriptObject);
+            if (character is null)
+                return;
+        }
     }
     else
         character.controls.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_JUMP, false);
-    
+
     // Set rotation already here so that it's updated every rendering frame instead of every physics frame
     characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
 }
@@ -257,7 +279,7 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     {
         // Third person camera: position behind the character
         Vector3 aimPoint = characterNode.position + rot * Vector3(0.0f, 1.7f, 0.0f);
-        
+
         // Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the character properly
         Vector3 rayDir = dir * Vector3(0.0f, 0.0f, -1.0f);
         float rayDistance = CAMERA_MAX_DIST;
@@ -265,13 +287,18 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         if (result.body !is null)
             rayDistance = Min(rayDistance, result.distance);
         rayDistance = Clamp(rayDistance, CAMERA_MIN_DIST, CAMERA_MAX_DIST);
-        
+
         cameraNode.position = aimPoint + rayDir * rayDistance;
         cameraNode.rotation = dir;
     }
 }
 
 // Character script object class
+//
+// Those public member variables that can be expressed with a Variant and do not begin with an underscore are automatically
+// loaded / saved as attributes of the ScriptInstance component. We also have variables which can not be automatically saved
+// (controls yaw and pitch) so we write manual binary format load / save functions for them. These functions will be called by
+// ScriptInstance when the script object is being loaded or saved.
 class Character : ScriptObject
 {
     // Character controls.
@@ -282,12 +309,24 @@ class Character : ScriptObject
     bool okToJump = true;
     // In air timer. Due to possible physics inaccuracy, character can be off ground for max. 1/10 second and still be allowed to move.
     float inAirTimer = 0.0f;
-    
+
     void Start()
     {
         SubscribeToEvent(node, "NodeCollision", "HandleNodeCollision");
     }
-    
+
+    void Load(Deserializer& deserializer)
+    {
+        controls.yaw = deserializer.ReadFloat();
+        controls.pitch = deserializer.ReadFloat();
+    }
+
+    void Save(Serializer& serializer)
+    {
+        serializer.WriteFloat(controls.yaw);
+        serializer.WriteFloat(controls.pitch);
+    }
+
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData)
     {
         VectorBuffer contacts = eventData["Contacts"].GetBuffer();

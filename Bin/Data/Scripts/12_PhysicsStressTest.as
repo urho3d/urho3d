@@ -123,7 +123,7 @@ void CreateScene()
     }
     
     // Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
-    // the scene, because we want it to be unaffected by scene load/save
+    // the scene, because we want it to be unaffected by scene load / save
     cameraNode = Node();
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.farClip = 300.0f;
@@ -202,8 +202,7 @@ void MoveCamera(float timeStep)
     if (input.mouseButtonPress[MOUSEB_LEFT])
         SpawnObject();
 
-    // Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
-    // directory
+    // Check for loading / saving the scene
     if (input.keyPress[KEY_F5])
     {
         File saveFile(fileSystem.programDir + "Data/Scenes/PhysicsStressTest.xml", FILE_WRITE);

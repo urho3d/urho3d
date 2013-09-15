@@ -116,7 +116,7 @@ void CreateScene()
     }
     
     // Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside
-    // the scene, because we want it to be unaffected by scene load/save
+    // the scene, because we want it to be unaffected by scene load / save
     cameraNode = Node();
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.farClip = 500.0f;
@@ -195,7 +195,7 @@ void MoveCamera(float timeStep)
     if (input.mouseButtonPress[MOUSEB_LEFT])
         SpawnObject();
 
-    // Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
+    // Check for loading / saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
     // directory
     if (input.keyPress[KEY_F5])
     {

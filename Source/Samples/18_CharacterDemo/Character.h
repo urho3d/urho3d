@@ -49,10 +49,13 @@ public:
     /// Construct.
     Character(Context* context);
     
+    /// Register object factory and attributes.
+    static void RegisterObject(Context* context);
+    
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     
-    /// Movement controls.
+    /// Movement controls. Assigned by the main program each frame.
     Controls controls_;
     
 private:
