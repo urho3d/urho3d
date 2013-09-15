@@ -553,42 +553,34 @@ void ScriptInstance::GetScriptAttributes()
         {
             // For a handle type, check if it's an Object subclass with a registered factory
             ShortStringHash typeHash(typeName);
+            const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+            const HashMap<String, Vector<ShortStringHash> >& categories = context_->GetObjectCategories();
             
-            if (context_->GetObjectFactories().Find(typeHash) != context_->GetObjectFactories().End())
+            if (factories.Find(typeHash) != factories.End())
             {
-                // There are three possibilities: the handle is for a Node, a Component or UIElement subclass
-                // We want to identify nodes and components so that we can store their ID's for serialization
-                const HashMap<String, Vector<ShortStringHash> >& categories = context_->GetObjectCategories();
-                if (categories.Contains(UI_CATEGORY))
-                {
-                    const Vector<ShortStringHash>& uiCategory = categories.Find(UI_CATEGORY)->second_;
-                    if (uiCategory.Contains(typeHash))
-                        continue; // Is handle to a UIElement; can not handle those
-                }
-                
-                if (typeHash == Node::GetTypeStatic() || typeHash == Scene::GetTypeStatic())
+                // There are four possibilities: the handle is for a Node, a Component or UIElement subclass, or for some
+                // other refcounted object. We can handle nodes & components with ID attributes, but want to skip the others
+                HashMap<String, Vector<ShortStringHash> >::ConstIterator ui = categories.Find(UI_CATEGORY);
+                if (ui != categories.End() && ui->second_.Contains(typeHash))
+                    continue; // Is handle to a UIElement; can not handle those
+                else if (typeHash == Node::GetTypeStatic() || typeHash == Scene::GetTypeStatic())
                 {
                     info.mode_ |= AM_NODEID;
                     info.type_ = VAR_INT;
                 }
                 else
                 {
-                    bool foundComponent = false;
                     // If is found in one of the component categories, must be a component
+                    // Note: this requires that custom components are registered inside component categories as well
                     for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = categories.Begin(); i != categories.End();
                         ++i)
                     {
                         if (i->second_.Contains(typeHash))
                         {
-                            foundComponent = true;
+                            info.mode_ |= AM_COMPONENTID;
+                            info.type_ = VAR_INT;
                             break;
                         }
-                    }
-                    
-                    if (foundComponent)
-                    {
-                        info.mode_ |= AM_COMPONENTID;
-                        info.type_ = VAR_INT;
                     }
                 }
             }
