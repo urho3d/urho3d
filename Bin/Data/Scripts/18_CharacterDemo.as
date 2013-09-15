@@ -240,9 +240,6 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             characterNode = scene_.GetChild("Jack", true);
             if (characterNode is null)
                 return;
-            character = cast<Character>(characterNode.scriptObject);
-            if (character is null)
-                return;
         }
     }
     else
@@ -297,8 +294,8 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 //
 // Those public member variables that can be expressed with a Variant and do not begin with an underscore are automatically
 // loaded / saved as attributes of the ScriptInstance component. We also have variables which can not be automatically saved
-// (controls yaw and pitch) so we write manual binary format load / save functions for them. These functions will be called by
-// ScriptInstance when the script object is being loaded or saved.
+// (yaw and pitch inside the Controls object) so we write manual binary format load / save methods for them. These functions
+// will be called by ScriptInstance when the script object is being loaded or saved.
 class Character : ScriptObject
 {
     // Character controls.

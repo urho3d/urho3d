@@ -80,6 +80,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Handle attribute read access.
+    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const;
     /// Return attribute descriptions, or null if none defined.
     virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
@@ -190,6 +194,8 @@ private:
     Vector<DelayedMethodCall> delayedMethodCalls_;
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
+    /// Storage for unapplied node and component ID attributes
+    HashMap<AttributeInfo*, unsigned> idAttributes_;
     /// Subscribed to scene update events flag.
     bool subscribed_;
     /// Subscribed to scene post and fixed update events flag.

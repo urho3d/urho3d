@@ -116,7 +116,7 @@ void CreateVehicle()
 {
     vehicleNode = scene_.CreateChild("Vehicle");
     vehicleNode.position = Vector3(0.0f, 5.0f, 0.0f);
-    
+
     // Create the vehicle logic script object
     Vehicle@ vehicle = cast<Vehicle>(vehicleNode.CreateScriptObject(scriptFile, "Vehicle"));
     // Create the rendering and physics components
@@ -127,8 +127,11 @@ void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = "Use WASD keys to drive, mouse to rotate camera";
+    instructionText.text = "Use WASD keys to drive, mouse to rotate camera\n"
+        "F5 to save scene, F7 to load";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    // The text has multiple rows. Center them in relation to each other
+    instructionText.textAlignment = HA_CENTER;
 
     // Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER;
@@ -140,7 +143,7 @@ void SubscribeToEvents()
 {
     // Subscribe to Update event for setting the vehicle controls before physics simulation
     SubscribeToEvent("Update", "HandleUpdate");
-    
+
     // Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent("PostUpdate", "HandlePostUpdate");
 }
@@ -149,7 +152,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (vehicleNode is null)
         return;
-    
+
     Vehicle@ vehicle = cast<Vehicle>(vehicleNode.scriptObject);
     if (vehicle is null)
         return;
@@ -161,12 +164,27 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         vehicle.controls.Set(CTRL_BACK, input.keyDown['S']);
         vehicle.controls.Set(CTRL_LEFT, input.keyDown['A']);
         vehicle.controls.Set(CTRL_RIGHT, input.keyDown['D']);
-    
+
         // Add yaw & pitch from the mouse motion. Used only for the camera, does not affect motion
         vehicle.controls.yaw += input.mouseMoveX * YAW_SENSITIVITY;
         vehicle.controls.pitch += input.mouseMoveY * YAW_SENSITIVITY;
         // Limit pitch
         vehicle.controls.pitch = Clamp(vehicle.controls.pitch, 0.0f, 80.0f);
+
+        // Check for loading / saving the scene
+        if (input.keyPress[KEY_F5])
+        {
+            File saveFile(fileSystem.programDir + "Data/Scenes/VehicleDemo.xml", FILE_WRITE);
+            scene_.SaveXML(saveFile);
+        }
+        if (input.keyPress[KEY_F7])
+        {
+            File loadFile(fileSystem.programDir + "Data/Scenes/VehicleDemo.xml", FILE_READ);
+            scene_.LoadXML(loadFile);
+            // After loading we have to reacquire the vehicle scene node, as it has been recreated
+            // Simply find by name as there's only one of them
+            vehicleNode = scene_.GetChild("Vehicle", true);
+        }
     }
     else
         vehicle.controls.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT, false);
@@ -176,7 +194,7 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (vehicleNode is null)
         return;
-    
+
     Vehicle@ vehicle = cast<Vehicle>(vehicleNode.scriptObject);
     if (vehicle is null)
         return;
@@ -185,7 +203,7 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     Quaternion dir(vehicleNode.rotation.yaw, Vector3(0.0f, 1.0f, 0.0f));
     dir = dir * Quaternion(vehicle.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
     dir = dir * Quaternion(vehicle.controls.pitch, Vector3(1.0f, 0.0f, 0.0f));
-    
+
     Vector3 cameraTargetPos = vehicleNode.position - dir * Vector3(0.0f, 0.0f, CAMERA_DISTANCE);
     Vector3 cameraStartPos = vehicleNode.position;
 
@@ -202,6 +220,11 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 }
 
 // Vehicle script object class
+//
+// When saving, the node and component handles are automatically converted into nodeID or componentID attributes
+// and are acquired from the scene when loading. The steering member variable will likewise be saved automatically.
+// The Controls object can not be automatically saved, so handle it manually in the Load() and Save() methods
+
 class Vehicle : ScriptObject
 {
     Node@ frontLeft;
@@ -221,6 +244,18 @@ class Vehicle : ScriptObject
     // Vehicle controls.
     Controls controls;
 
+    void Load(Deserializer& deserializer)
+    {
+        controls.yaw = deserializer.ReadFloat();
+        controls.pitch = deserializer.ReadFloat();
+    }
+
+    void Save(Serializer& serializer)
+    {
+        serializer.WriteFloat(controls.yaw);
+        serializer.WriteFloat(controls.pitch);
+    }
+
     void Init()
     {
         StaticModel@ hullObject = node.CreateComponent("StaticModel");
@@ -236,7 +271,7 @@ class Vehicle : ScriptObject
         hullBody.linearDamping = 0.2f; // Some air resistance
         hullBody.angularDamping = 0.5f;
         hullBody.collisionLayer = 1;
-    
+
         frontLeft = InitWheel("FrontLeft", Vector3(-0.6f, -0.4f, 0.3f));
         frontRight = InitWheel("FrontRight", Vector3(0.6f, -0.4f, 0.3f));
         rearLeft = InitWheel("RearLeft", Vector3(-0.6f, -0.4f, -0.3f));
@@ -282,7 +317,7 @@ class Vehicle : ScriptObject
         wheelConstraint.lowLimit = Vector2(-180.0f, 0.0f); // Let the wheel rotate freely around the axis
         wheelConstraint.highLimit = Vector2(180.0f, 0.0f);
         wheelConstraint.disableCollision = true; // Let the wheel intersect the vehicle hull
-    
+
         return wheelNode;
     }
 
@@ -319,7 +354,7 @@ class Vehicle : ScriptObject
         {
             // Torques are applied in world space, so need to take the vehicle & wheel rotation into account
             Vector3 torqueVec = Vector3(ENGINE_POWER * accelerator, 0.0f, 0.0f);
-            
+
             frontLeftBody.ApplyTorque(node.rotation * steeringRot * torqueVec);
             frontRightBody.ApplyTorque(node.rotation * steeringRot * torqueVec);
             rearLeftBody.ApplyTorque(node.rotation * torqueVec);

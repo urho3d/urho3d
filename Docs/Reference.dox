@@ -409,7 +409,8 @@ Note that these are not actual Node member functions on the C++ side, as the %Sc
 
 \section Scripting_ObjectSerialization Script object serialization
 
-After instantiation, the script object's public member variables that can be converted into Variant, and that don't begin with an underscore are automatically available as attributes of the ScriptInstance, and will be serialized. Note: this means that a ScriptInstance's attribute list changes dynamically depending on the class that has been instantiated.
+After instantiation, the script object's public member variables that can be converted into Variant, and that don't begin with an underscore are automatically available as attributes of the ScriptInstance, and will be serialized.
+Node and Component handles are also converted into nodeID and componentID attributes automatically. Note: this automatic attribute mechanism means that a ScriptInstance's attribute list changes dynamically depending on the class that has been instantiated.
 
 If the script object contains more complex data structures, you can also serialize and deserialize into a binary buffer manually by implementing the Load() and Save() methods.
 

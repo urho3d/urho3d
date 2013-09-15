@@ -57,6 +57,8 @@ static const char* methodDeclarations[] = {
     "void ApplyAttributes()"
 };
 
+extern const char* UI_CATEGORY;
+
 ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
     script_(GetSubsystem<Script>()),
@@ -91,10 +93,68 @@ void ScriptInstance::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
 
+void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
+{
+    if (attr.mode_ & (AM_NODEID | AM_COMPONENTID))
+    {
+        // The component / node to which the ID refers to may not be in scene yet. Delay searching for it to ApplyAttributes
+        idAttributes_[const_cast<AttributeInfo*>(&attr)] = src.GetUInt();
+    }
+    else
+        Serializable::OnSetAttribute(attr, src);
+}
+
+void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
+{
+    // Get ID's of node / component handle attributes
+    if (attr.mode_ & AM_NODEID)
+    {
+        Node* node = *(reinterpret_cast<Node**>(attr.ptr_));
+        unsigned nodeID = node ? node->GetID() : 0;
+        dest = Variant(nodeID);
+    }
+    else if (attr.mode_ & AM_COMPONENTID)
+    {
+        Component* component = *(reinterpret_cast<Component**>(attr.ptr_));
+        unsigned componentID = component ? component->GetID() : 0;
+        dest = Variant(componentID);
+    }
+    else
+        Serializable::OnGetAttribute(attr, dest);
+}
+
 void ScriptInstance::ApplyAttributes()
 {
+    // Apply node / component ID's now
+    for (HashMap<AttributeInfo*, unsigned>::Iterator i = idAttributes_.Begin(); i != idAttributes_.End(); ++i)
+    {
+        AttributeInfo& attr = *i->first_;
+        if (attr.mode_ & AM_NODEID)
+        {
+            Node*& nodePtr = *(reinterpret_cast<Node**>(attr.ptr_));
+            // Decrease reference count of the old object, then increment the new
+            if (nodePtr)
+                nodePtr->ReleaseRef();
+            nodePtr = GetScene()->GetNode(i->second_);
+            if (nodePtr)
+                nodePtr->AddRef();
+        }
+        else if (attr.mode_ & AM_COMPONENTID)
+        {
+            Component*& componentPtr = *(reinterpret_cast<Component**>(attr.ptr_));
+            if (componentPtr)
+                componentPtr->ReleaseRef();
+            componentPtr = GetScene()->GetComponent(i->second_);
+            if (componentPtr)
+                componentPtr->AddRef();
+        }
+    }
+    
+    idAttributes_.Clear();
+    
     if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
+
 }
 
 void ScriptInstance::OnSetEnabled()
@@ -428,14 +488,15 @@ void ScriptInstance::GetScriptMethods()
 
 void ScriptInstance::GetScriptAttributes()
 {
+    asIScriptEngine* engine = GetSubsystem<Script>()->GetScriptEngine();
     attributeInfos_ = *context_->GetAttributes(GetTypeStatic());
-    
+
     unsigned numProperties = scriptObject_->GetPropertyCount();
     for (unsigned i = 0; i < numProperties; ++i)
     {
         const char* name;
         int typeId;
-        bool isPrivate;
+        bool isPrivate, isHandle;
         
         scriptObject_->GetObjectType()->GetProperty(i, &name, &typeId, &isPrivate);
         
@@ -443,28 +504,80 @@ void ScriptInstance::GetScriptAttributes()
         if (isPrivate || name[0] == '_')
             continue;
         
+        String typeName = engine->GetTypeDeclaration(typeId);
+        isHandle = typeName.EndsWith("@");
+        if (isHandle)
+            typeName = typeName.Substring(0, typeName.Length() - 1);
+        
         AttributeInfo info;
         info.name_ = name;
         info.ptr_ = scriptObject_->GetAddressOfProperty(i);
         
-        switch (typeId)
+        if (!isHandle)
         {
-        case asTYPEID_BOOL:
-            info.type_ = VAR_BOOL;
-            break;
+            switch (typeId)
+            {
+            case asTYPEID_BOOL:
+                info.type_ = VAR_BOOL;
+                break;
+                
+            case asTYPEID_INT32:
+            case asTYPEID_UINT32:
+                info.type_ = VAR_INT;
+                break;
+                
+            case asTYPEID_FLOAT:
+                info.type_ = VAR_FLOAT;
+                break;
+                
+            default:
+                info.type_ = Variant::GetTypeFromName(typeName);
+                break;
+            }
+        }
+        else
+        {
+            // For a handle type, check if it's an Object subclass with a registered factory
+            ShortStringHash typeHash(typeName);
             
-        case asTYPEID_INT32:
-        case asTYPEID_UINT32:
-            info.type_ = VAR_INT;
-            break;
-            
-        case asTYPEID_FLOAT:
-            info.type_ = VAR_FLOAT;
-            break;
-            
-        default:
-            info.type_ = Variant::GetTypeFromName(GetSubsystem<Script>()->GetScriptEngine()->GetTypeDeclaration(typeId));
-            break;
+            if (context_->GetObjectFactories().Find(typeHash) != context_->GetObjectFactories().End())
+            {
+                // There are three possibilities: the handle is for a Node, a Component or UIElement subclass
+                // We want to identify nodes and components so that we can store their ID's for serialization
+                const HashMap<String, Vector<ShortStringHash> >& categories = context_->GetObjectCategories();
+                if (categories.Contains(UI_CATEGORY))
+                {
+                    const Vector<ShortStringHash>& uiCategory = categories.Find(UI_CATEGORY)->second_;
+                    if (uiCategory.Contains(typeHash))
+                        continue; // Is handle to a UIElement; can not handle those
+                }
+                
+                if (typeHash == Node::GetTypeStatic() || typeHash == Scene::GetTypeStatic())
+                {
+                    info.mode_ |= AM_NODEID;
+                    info.type_ = VAR_INT;
+                }
+                else
+                {
+                    bool foundComponent = false;
+                    // If is found in one of the component categories, must be a component
+                    for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = categories.Begin(); i != categories.End();
+                        ++i)
+                    {
+                        if (i->second_.Contains(typeHash))
+                        {
+                            foundComponent = true;
+                            break;
+                        }
+                    }
+                    
+                    if (foundComponent)
+                    {
+                        info.mode_ |= AM_COMPONENTID;
+                        info.type_ = VAR_INT;
+                    }
+                }
+            }
         }
         
         if (info.type_ != VAR_NONE)
