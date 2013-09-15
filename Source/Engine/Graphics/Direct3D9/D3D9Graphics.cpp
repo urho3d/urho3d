@@ -1038,7 +1038,7 @@ void Graphics::SetShaderParameter(StringHash param, bool value)
     if (i == shaderParameters_.End() || i->second_.register_ >= MAX_CONSTANT_REGISTERS)
         return;
 
-    bool data[4];
+    BOOL data[4];
 
     data[0] = value;
     data[1] = false;

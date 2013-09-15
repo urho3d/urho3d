@@ -123,6 +123,8 @@ public:
     void SetShaderParameter(StringHash param, const float* data, unsigned count);
     /// Set shader float constant.
     void SetShaderParameter(StringHash param, float value);
+    /// Set shader boolean constant.
+    void SetShaderParameter(StringHash param, bool value);
     /// Set shader color constant.
     void SetShaderParameter(StringHash param, const Color& color);
     /// Set shader 2D vector constant.
