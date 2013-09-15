@@ -41,7 +41,7 @@ set (CMAKE_OBJDUMP      "${RASPI_TOOL}/arm-linux-gnueabihf-objdump" CACHE PATH "
 set (CMAKE_RANLIB       "${RASPI_TOOL}/arm-linux-gnueabihf-ranlib"  CACHE PATH "ranlib")
 
 # where is the target environment 
-set (CMAKE_FIND_ROOT_PATH "${RASPI_TOOL}/../arm-linux-gnueabihf/libc")
+set (CMAKE_FIND_ROOT_PATH "${RASPI_TOOL}/../arm-linux-gnueabihf/libc" $ENV{RASPI_ROOT})
 
 # only search programs, libraries, and headers in the target directories
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)

@@ -38,9 +38,11 @@ if (RASPI)
     find_path (BCM_VC_INCLUDE_DIR bcm_host.h ${BCM_VC_INC_SEARCH_PATH})
     
     # Assume all the other libs are installed at the same relative path as libbcm_host.so
-    find_library (BCM_VC_LIBRARIES bcm_host ${BCM_VC_LIB_SEARCH_PATH})
+    find_library (BCM_VC_LIB_BCM_HOST bcm_host ${BCM_VC_LIB_SEARCH_PATH})
+    find_library (BCM_VC_LIB_GLES2 GLESv2 ${BCM_VC_LIB_SEARCH_PATH})
 
-    if (BCM_VC_INCLUDE_DIR AND BCM_VC_LIBRARIES)
+    if (BCM_VC_INCLUDE_DIR AND BCM_VC_LIB_BCM_HOST AND BCM_VC_LIB_GLES2)
+        set (BCM_VC_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_GLES2})
         set (BCM_VC_FOUND 1)
     endif ()
 
