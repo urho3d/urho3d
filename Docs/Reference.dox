@@ -924,7 +924,7 @@ The render path XML definition looks like this:
     </command>
     <command type="quad" vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
-        <shaderparameter name="ParameterName" value="x y z w" />
+        <parameter name="ParameterName" value="x y z w" />
     </command>
     <command type="forwardlights" pass="PassName" uselitbase="true|false" output="viewport|RTName" />
     <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" />
