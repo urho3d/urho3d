@@ -1,3 +1,4 @@
+$#include "File.h"
 $#include "Node.h"
 
 enum CreateMode
@@ -11,7 +12,7 @@ class Node : public Serializable
     Node(Context* context);
     virtual ~Node();
 
-    bool SaveXML(Serializer& dest) const;
+    tolua_outside bool NodeSaveXML @ SaveXML(File* dest) const;
     void SetName(const String name);
     
     void SetPosition(const Vector3& position);
@@ -190,6 +191,11 @@ class Node : public Serializable
 };
 
 ${
+static bool NodeSaveXML(const Node* node, File* file)
+{
+    return file ? node->SaveXML(*file) : false;
+}
+
 static void NodeSetPositionXYZ(Node* node, float x, float y, float z)
 {
     node->SetPosition(Vector3(x, y, z));

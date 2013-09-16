@@ -10,8 +10,8 @@ class Scene : public Node
     Scene(Context* context);
     virtual ~Scene();
     
-    bool LoadXML(Deserializer& source);
-    bool SaveXML(Serializer& dest) const;
+    tolua_outside bool SceneLoadXML @ LoadXML(File* source);
+    tolua_outside bool SceneSaveXML @ SaveXML(File* dest) const;
     bool LoadAsync(File* file);
     bool LoadAsyncXML(File* file);
     void StopAsyncLoading();
@@ -67,3 +67,16 @@ class Scene : public Node
     tolua_readonly tolua_property__is_set bool threadedUpdate;
     tolua_property__get_set String varNamesAttr;
 };
+
+${
+static bool SceneLoadXML(Scene* scene, File* file)
+{
+    return file ? scene->LoadXML(*file) : false;
+}
+
+static bool SceneSaveXML(const Scene* scene, File* file)
+{
+    return file ? scene->SaveXML(*file) : false;
+}
+$}
+

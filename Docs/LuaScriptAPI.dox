@@ -3694,7 +3694,7 @@ Node : Serializable
 Methods:<br>
 - Node(Context* context)
 - virtual ~Node()
-- bool SaveXML(Serializer& dest) const
+- bool SaveXML(File* dest) const
 - void SetName(const String name)
 - void SetPosition(const Vector3& position)
 - void SetPositionXYZ(float x, float y, float z)
@@ -3833,8 +3833,8 @@ Scene : Node
 Methods:<br>
 - Scene(Context* context)
 - virtual ~Scene()
-- bool LoadXML(Deserializer& source)
-- bool SaveXML(Serializer& dest) const
+- bool LoadXML(File* source)
+- bool SaveXML(File* dest) const
 - bool LoadAsync(File* file)
 - bool LoadAsyncXML(File* file)
 - void StopAsyncLoading()
