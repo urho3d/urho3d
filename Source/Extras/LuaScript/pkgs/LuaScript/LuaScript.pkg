@@ -4,7 +4,11 @@ Object* GetEventSender();
 
 void SendEvent(const String eventName, VariantMap& eventData);
 void SubscribeToEvent(const String eventName, const String functionName);
+void UnsubscribeFromEvent(const String eventName);
+void UnsubscribeFromAllEvents();
 void SubscribeToEvent(void* object, const String eventName, const String functionName);
+void UnsubscribeFromEvent(void* object, const String eventName);
+void UnsubscribeFromEvents(void* object);
 
 ${
 static LuaScript* GetLuaScript()
@@ -27,8 +31,29 @@ static void SubscribeToEvent(const String& eventName, const String& functionName
     GetLuaScript()->ScriptSubscribeToEvent(eventName, functionName);
 }
 
+static void UnsubscribeFromEvent(const String& eventName)
+{
+    GetLuaScript()->ScriptUnsubscribeFromEvent(eventName);
+}
+
+static void UnsubscribeFromAllEvents()
+{
+    GetLuaScript()->ScriptUnsubscribeFromAllEvents();
+}
+
 static void SubscribeToEvent(void* object, const String& eventName, const String& functionName)
 {
     GetLuaScript()->ScriptSubscribeToEvent(object, eventName, functionName);
 }
+
+static void UnsubscribeFromEvent(void* object, const String& eventName)
+{
+    GetLuaScript()->ScriptUnsubscribeFromEvent(object, eventName);
+}
+
+static void UnsubscribeFromEvents(void* object)
+{
+    GetLuaScript()->ScriptUnsubscribeFromEvents(object);
+}
+
 $}

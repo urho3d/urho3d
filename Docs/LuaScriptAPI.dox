@@ -60,7 +60,11 @@ namespace Urho3D
 - Object* GetEventSender()
 - void SendEvent(const String eventName, VariantMap& eventData)
 - void SubscribeToEvent(const String eventName, const String functionName)
+- void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromAllEvents()
 - void SubscribeToEvent(void* object, const String eventName, const String functionName)
+- void UnsubscribeFromEvent(void* object, const String eventName)
+- void UnsubscribeFromEvents(void* object)
 - float Lerp(float lhs, float rhs, float t)
 - float Min(float lhs, float rhs)
 - float Max(float lhs, float rhs)
@@ -2478,7 +2482,11 @@ Methods:<br>
 - bool CreateObject(const String objectType)
 - bool CreateObject(const String fileName, const String objectType)
 - void SubscribeToEvent(const String eventName, const String functionName)
+- void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromAllEvents()
 - void SubscribeToEvent(void* object, const String eventName, const String functionName)
+- void UnsubscribeFromEvent(void* object, const String eventName)
+- void UnsubscribeFromEvents(void* object)
 
 BoundingBox
 

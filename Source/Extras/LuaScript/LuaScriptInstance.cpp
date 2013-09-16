@@ -132,6 +132,36 @@ void LuaScriptInstance::ScriptSubscribeToEvent(const String& eventName, const St
     }
 }
 
+void LuaScriptInstance::ScriptUnsubscribeFromEvent(const String& eventName)
+{
+    StringHash eventType(eventName);
+
+    HashMap<StringHash, int>::Iterator i = eventTypeToFunctionRefMap_.Find(eventType);
+    if (i != eventTypeToFunctionRefMap_.End())
+    {
+        UnsubscribeFromEvent(eventType);
+
+        if (i->second_ != LUA_REFNIL)
+            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
+
+        eventTypeToFunctionRefMap_.Erase(i);
+    }
+}
+
+void LuaScriptInstance::ScriptUnsubscribeFromAllEvents()
+{
+    if (eventTypeToFunctionRefMap_.Empty())
+        return;
+
+    UnsubscribeFromAllEvents();
+
+    for (HashMap<StringHash, int>::Iterator i = eventTypeToFunctionRefMap_.Begin(); i != eventTypeToFunctionRefMap_.End(); ++i)
+        if (i->second_ != LUA_REFNIL)
+            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
+
+    eventTypeToFunctionRefMap_.Clear();
+}
+
 void LuaScriptInstance::ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName)
 {
     StringHash eventType(eventName);
@@ -147,6 +177,43 @@ void LuaScriptInstance::ScriptSubscribeToEvent(void* object, const String& event
         SubscribeToEvent(sender, eventType, HANDLER(LuaScriptInstance, HandleObjectEvent));
         objectToEventTypeToFunctionRefMap_[sender][eventType] = functionRef;
     }
+}
+
+void LuaScriptInstance::ScriptUnsubscribeFromEvent(void* object, const String& eventName)
+{
+    StringHash eventType(eventName);
+    Object* sender = (Object*)object;
+
+    HashMap<StringHash, int>::Iterator i = objectToEventTypeToFunctionRefMap_[sender].Find(eventType);
+    if (i != objectToEventTypeToFunctionRefMap_[sender].End())
+    {
+        UnsubscribeFromEvent(sender, eventType);
+
+        if (i->second_ != LUA_REFNIL)
+            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
+
+        objectToEventTypeToFunctionRefMap_[sender].Erase(i);
+    }
+}
+
+void LuaScriptInstance::ScriptUnsubscribeFromEvents(void* object)
+{
+    Object* sender = (Object*)object;
+
+    HashMap<Object*, HashMap<StringHash, int> >::Iterator it = objectToEventTypeToFunctionRefMap_.Find(sender);
+    if (it == objectToEventTypeToFunctionRefMap_.End())
+        return;
+
+    UnsubscribeFromEvents(sender);
+
+    HashMap<StringHash, int>& eventTypeToFunctionRefMap = it->second_;
+    for (HashMap<StringHash, int>::Iterator i = eventTypeToFunctionRefMap.Begin(); i != eventTypeToFunctionRefMap.End(); ++i)
+    {
+        if (i->second_ != LUA_REFNIL)
+            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
+    }
+
+    objectToEventTypeToFunctionRefMap_.Erase(it);
 }
 
 void LuaScriptInstance::HandleEvent(StringHash eventType, VariantMap& eventData)

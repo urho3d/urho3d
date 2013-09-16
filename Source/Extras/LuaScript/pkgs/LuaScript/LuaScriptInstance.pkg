@@ -5,7 +5,11 @@ class LuaScriptInstance : public Component
     bool CreateObject(const String objectType);
     bool CreateObject(const String fileName, const String objectType);
     void ScriptSubscribeToEvent @ SubscribeToEvent(const String eventName, const String functionName);
+    void ScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(const String eventName);
+    void ScriptUnsubscribeFromAllEvents @ UnsubscribeFromAllEvents();    
     void ScriptSubscribeToEvent @ SubscribeToEvent(void* object, const String eventName, const String functionName);
+    void ScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(void* object, const String eventName);
+    void ScriptUnsubscribeFromEvents @ UnsubscribeFromEvents(void* object);
 };
 
 $[

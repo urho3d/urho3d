@@ -55,11 +55,23 @@ public:
     /// Script send event.
     void ScriptSendEvent(const String& eventName, VariantMap& eventData);
 
-    /// Script subscribe event.
+    /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
 
-    /// Script subscribe object's event.
+    /// Script unsubscribe from an event.
+    void ScriptUnsubscribeFromEvent(const String& eventName);
+
+    /// Script unsubscribe from all events.
+    void ScriptUnsubscribeFromAllEvents();
+
+    /// Script subscribe to a specific sender's event.
     void ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName);
+
+    /// Script unsubscribe from a specific sender's event.
+    void ScriptUnsubscribeFromEvent(void* object, const String& eventName);
+
+    /// Script unsubscribe from a specific sender's all events.
+    void ScriptUnsubscribeFromEvents(void* object);
 
     /// Return Lua state.
     lua_State* GetLuaState() const { return luaState_; }
