@@ -155,7 +155,7 @@ function MoveCamera(timeStep)
 
     -- Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     local mouseMove = input.mouseMove
-    yaw = yaw +MOUSE_SENSITIVITY * mouseMove.x
+    yaw = yaw + MOUSE_SENSITIVITY * mouseMove.x
     pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
     pitch = Clamp(pitch, -90.0, 90.0)
 
