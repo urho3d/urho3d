@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Network/Connection.pkg"
 $pfile "Network/Controls.pkg"
 $pfile "Network/Network.pkg"

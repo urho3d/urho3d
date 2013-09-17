@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Engine/Console.pkg"
 $pfile "Engine/DebugHud.pkg"
 $pfile "Engine/Engine.pkg"

@@ -2,6 +2,11 @@ $#include "Camera.h"
 
 enum FillMode{};
 
+static const unsigned VO_NONE;
+static const unsigned VO_LOW_MATERIAL_QUALITY;
+static const unsigned VO_DISABLE_SHADOWS;
+static const unsigned VO_DISABLE_OCCLUSION;
+
 class Camera : public Component
 {
     void SetNearClip(float nearClip);

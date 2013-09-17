@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Navigation/Navigable.pkg"
 $pfile "Navigation/NavigationMesh.pkg"
 $pfile "Navigation/OffMeshConnection.pkg"

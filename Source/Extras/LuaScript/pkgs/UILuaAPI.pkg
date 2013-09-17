@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "UI/BorderImage.pkg"
 $pfile "UI/Button.pkg"
 $pfile "UI/CheckBox.pkg"

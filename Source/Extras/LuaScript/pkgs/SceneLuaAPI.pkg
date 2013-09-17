@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Scene/Component.pkg"
 $pfile "Scene/Node.pkg"
 $pfile "Scene/Scene.pkg"

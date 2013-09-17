@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Resource/Image.pkg"
 $pfile "Resource/Resource.pkg"
 $pfile "Resource/ResourceCache.pkg"

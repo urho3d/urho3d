@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "LuaScript/LuaScript.pkg"
 $pfile "LuaScript/LuaScriptInstance.pkg"
 

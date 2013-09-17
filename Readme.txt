@@ -360,6 +360,7 @@ cmake_xxxx batch files or shell scripts.
 |                      | other Desktop platforms)                              |
 |-DENABLE_SSE=0        |to disable SSE instruction set                         |
 |-DENABLE_MINIDUMPS=0  |to disable minidumps on crash (VS only)                |
+|-DENABLE_SAFE_LUA=0   |to disable Lua C++ wrapper safety for performance      |
 |-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS  |
 |                      | on Windows platform because this option is enabled by |
 |                      | default for other platforms)                          | 

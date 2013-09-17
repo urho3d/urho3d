@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Math/MathDefs.pkg"
 $pfile "Math/BoundingBox.pkg"
 $pfile "Math/Color.pkg"

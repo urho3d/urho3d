@@ -23,6 +23,14 @@
 # Define target name
 set (TARGET_NAME LuaScript)
 
+# Enable Lua / C++ wrapper safety checks by default. These can be disabled for performance
+if (NOT DEFINED ENABLE_SAFE_LUA)
+    set (ENABLE_SAFE_LUA 1)
+endif ()
+if (NOT ENABLE_SAFE_LUA)
+    add_definitions (-DTOLUA_RELEASE)
+endif ()
+
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)

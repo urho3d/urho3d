@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "IO/Deserializer.pkg"
 $pfile "IO/File.pkg"
 $pfile "IO/FileSystem.pkg"

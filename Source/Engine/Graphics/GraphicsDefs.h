@@ -30,14 +30,6 @@ namespace Urho3D
 
 class Vector3;
 
-/// Rendering modes.
-enum RenderMode
-{
-    RENDER_FORWARD = 0,
-    RENDER_PREPASS,
-    RENDER_DEFERRED
-};
-
 /// Primitive type.
 enum PrimitiveType
 {

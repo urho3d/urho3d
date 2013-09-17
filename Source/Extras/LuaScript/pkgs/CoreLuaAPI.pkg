@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Core/Context.pkg"
 $pfile "Core/Object.pkg"
 $pfile "Core/ProcessUtils.pkg"

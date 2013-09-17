@@ -1,13 +1,5 @@
 $#include "GraphicsDefs.h"
 
-/// Rendering modes.
-enum RenderMode
-{
-    RENDER_FORWARD = 0,
-    RENDER_PREPASS,
-    RENDER_DEFERRED
-};
-
 enum PrimitiveType
 {
     TRIANGLE_LIST = 0,

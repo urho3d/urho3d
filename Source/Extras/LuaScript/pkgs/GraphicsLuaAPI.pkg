@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Graphics/GraphicsDefs.pkg"
 $pfile "Graphics/AnimatedModel.pkg"
 $pfile "Graphics/Animation.pkg"

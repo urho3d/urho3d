@@ -108,6 +108,10 @@ section LuaScriptAPI_GlobalConstants Global constants
 - unsigned CLEAR_COLOR
 - unsigned CLEAR_DEPTH
 - unsigned CLEAR_STENCIL
+- unsigned VO_NONE
+- unsigned VO_LOW_MATERIAL_QUALITY
+- unsigned VO_DISABLE_SHADOWS
+- unsigned VO_DISABLE_OCCLUSION
 - int SHADOW_MIN_PIXELS
 - int INSTANCING_BUFFER_DEFAULT_SIZE
 - int MOUSEB_LEFT
@@ -292,9 +296,6 @@ section LuaScriptAPI_GlobalConstants Global constants
 - int UPDATE_NONE
 - int UPDATE_MAIN_THREAD
 - int UPDATE_WORKER_THREAD
-- int RENDER_FORWARD
-- int RENDER_PREPASS
-- int RENDER_DEFERRED
 - int TRIANGLE_LIST
 - int LINE_LIST
 - int GEOM_STATIC
@@ -404,7 +405,7 @@ section LuaScriptAPI_GlobalConstants Global constants
 - int SP_VERTEXLIGHTS
 - int SP_MATERIAL
 - int SP_OBJECTTRANSFORM
-- int MAX_SHADER_PARAMETER_GROUPS
+- int MAX_SHADER_PARAMETER_GROUPS   
 - int LIGHT_DIRECTIONAL
 - int LIGHT_SPOT
 - int LIGHT_POINT
@@ -842,7 +843,6 @@ Methods:<br>
 - Variant(const Color& value)
 - Variant(const String value)
 - Variant(const char* value)
-- Variant(void* value)
 - Variant(const ResourceRef& value)
 - Variant(const ResourceRefList& value)
 - Variant(const IntRect& value)
@@ -864,7 +864,6 @@ Methods:<br>
 - bool operator == (const Quaternion& rhs) const
 - bool operator == (const Color& rhs) const
 - bool operator == (const String& rhs) const
-- bool operator == (void* rhs) const
 - bool operator == (const ResourceRef& rhs) const
 - bool operator == (const ResourceRefList& rhs) const
 - bool operator == (const IntRect& rhs) const

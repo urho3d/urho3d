@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Container/Vector.pkg"
 
 $using namespace Urho3D;

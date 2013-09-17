@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Audio/Audio.pkg"
 $pfile "Audio/Sound.pkg"
 $pfile "Audio/SoundListener.pkg"

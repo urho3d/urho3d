@@ -129,6 +129,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |-DENABLE_TOOLS=1                             |to build the tools (only useful for Raspberry Pi build because this option is already enabled by default for other Desktop platforms)|
 |-DENABLE_SSE=0                               |to disable SSE instruction set|
 |-DENABLE_MINIDUMPS=0                         |to disable minidumps on crash (VS only)|
+|-DENABLE_SAFE_LUA=0                          |to disable Lua C++ wrapper safety for performance|
 |-DUSE_OPENGL=1                               |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)|
 |-DUSE_MKLINK=1                               |to use mklink command to create symbolic links (Windows Vista and above only)|
 |-DUSE_STATIC_RUNTIME=1                       |to use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|

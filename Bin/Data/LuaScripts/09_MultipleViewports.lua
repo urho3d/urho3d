@@ -1,14 +1,13 @@
--- Decals example.
+-- Multiple viewports example.
 -- This sample demonstrates:
---     - Performing a raycast to the octree and adding a decal to the hit location;
---     - Defining a Cursor UI element which stays inside the window and can be shown/hidden;
---     - Marking suitable (large) objects as occluders for occlusion culling;
---     - Displaying renderer debug geometry to see the effect of occlusion;
+--     - Setting up two viewports with two separate cameras;
+--     - Adding post processing effects to a viewport's render path and toggling them;
 
 require "LuaScripts/Utilities/Sample"
 
 local scene_
 local cameraNode
+local rearCameraNode
 local yaw = 0.0
 local pitch = 0.0
 local drawDebug = false
@@ -29,10 +28,10 @@ function Start()
     CreateScene()
 
     -- Create the UI content
-    CreateUI()
+    CreateInstructions()
 
-    -- Setup the viewport for displaying the scene
-    SetupViewport()
+    -- Setup the viewports for displaying the scene
+    SetupViewports()
 
     -- Hook up to the frame update and render post-update events
     SubscribeToEvents()
@@ -45,7 +44,7 @@ function CreateScene()
     -- Also create a DebugRenderer component so that we can draw debug geometry
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("DebugRenderer")
-
+    
     -- Create scene node & StaticModel component for showing a static plane
     local planeNode = scene_:CreateChild("Plane")
     planeNode.scale = Vector3(100.0, 1.0, 100.0)
@@ -101,33 +100,34 @@ function CreateScene()
             boxObject.occluder = true
         end
     end
-    
+
     -- Create the camera. Limit far clip distance to match the fog
     cameraNode = scene_:CreateChild("Camera")
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 300.0
 
-    -- Set an initial position for the camera scene node above the plane
+    -- Parent the rear camera node to the front camera node and turn it 180 degrees to face backward
+    -- Here, we use the angle-axis constructor for Quaternion instead of the usual Euler angles
+    rearCameraNode = cameraNode:CreateChild("RearCamera")
+    rearCameraNode:Rotate(Quaternion(180.0, Vector3(0.0, 1.0, 0.0)))
+    local rearCamera = rearCameraNode:CreateComponent("Camera")
+    rearCamera.farClip = 300.0
+    -- Because the rear viewport is rather small, disable occlusion culling from it. Use the camera's
+    -- "view override flags" for this. We could also disable eg. shadows or force low material quality
+    -- if we wanted
+    rearCamera.viewOverrideFlags = VO_DISABLE_OCCLUSION
+
+    -- Set an initial position for the front camera scene node above the plane
     cameraNode.position = Vector3(0.0, 5.0, 0.0)
 end
 
-function CreateUI()
-    -- Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
-    -- control the camera, and when visible, it will point the raycast target
-    local style = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
-    local cursor = ui.root:CreateChild("Cursor")
-    cursor:SetStyleAuto(style)
-    ui.cursor = cursor
-    -- Set starting position of the cursor at the rendering window center
-    cursor:SetPosition(graphics.width / 2, graphics.height / 2)
-    
+function CreateInstructions()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
     instructionText.text =
-        "Use WASD keys to move\n"..
-        "LMB to paint decals, RMB to rotate view\n"..
-        "Space to toggle debug geometry\n"..
-        "7 to toggle occlusion culling"
+        "Use WASD keys and mouse to move\n"..
+        "B to toggle bloom, F to toggle FXAA\n"..
+        "Space to toggle debug geometry\n"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
     instructionText.textAlignment = HA_CENTER
@@ -138,10 +138,31 @@ function CreateUI()
     instructionText:SetPosition(0, ui.root.height / 4)
 end
 
-function SetupViewport()
-    -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
+function SetupViewports()
+    renderer.numViewports = 2
+
+    -- Set up the front camera viewport
     local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
+    
+    -- Clone the default render path so that we do not interfere with the other viewport, then add
+    -- bloom and FXAA post process effects to the front viewport. Render path commands can be tagged
+    -- for example with the effect name to allow easy toggling on and off. We start with the effects
+    -- disabled.
+    local effectRenderPath = viewport:GetRenderPath():Clone()
+    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/Bloom.xml"))
+    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/EdgeFilter.xml"))
+    -- Make the bloom mixing parameter more pronounced
+    effectRenderPath:SetShaderParameter("BloomMix", Variant(Vector2(0.9, 0.6)))
+    effectRenderPath:SetEnabled("Bloom", false)
+    effectRenderPath:SetEnabled("EdgeFilter", false)
+    viewport:SetRenderPath(effectRenderPath)
+
+    -- Set up the rear camera viewport on top of the front view ("rear view mirror")
+    -- The viewport index must be greater in that case, otherwise the view would be left behind
+    local rearViewport = Viewport:new(context, scene_, rearCameraNode:GetComponent("Camera"),
+        IntRect(graphics.width * 2 / 3, 32, graphics.width - 32, graphics.height / 3))
+    renderer:SetViewport(1, rearViewport)
 end
 
 function SubscribeToEvents()
@@ -154,30 +175,24 @@ function SubscribeToEvents()
 end
 
 function MoveCamera(timeStep)
-    -- Right mouse button controls mouse cursor visibility: hide when pressed
-    ui.cursor.visible = not input:GetMouseButtonDown(MOUSEB_RIGHT)
-
     -- Do not move if the UI has a focused element (the console)
     if ui.focusElement ~= nil then
         return
     end
-    
+
     -- Movement speed as world units per second
     local MOVE_SPEED = 20.0
     -- Mouse sensitivity as degrees per pixel
     local MOUSE_SENSITIVITY = 0.1
 
     -- Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
-    -- Only move the camera when the cursor is hidden
-    if not ui.cursor.visible then
-        local mouseMove = input.mouseMove
-        yaw = yaw + MOUSE_SENSITIVITY * mouseMove.x
-        pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
-        pitch = Clamp(pitch, -90.0, 90.0)
+    local mouseMove = input.mouseMove
+    yaw = yaw + MOUSE_SENSITIVITY * mouseMove.x
+    pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
+    pitch = Clamp(pitch, -90.0, 90.0)
 
-        -- Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-        cameraNode.rotation = Quaternion(pitch, yaw, 0.0)
-    end
+    -- Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
+    cameraNode.rotation = Quaternion(pitch, yaw, 0.0)
 
     -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if input:GetKeyDown(KEY_W) then
@@ -193,58 +208,19 @@ function MoveCamera(timeStep)
         cameraNode:TranslateRelative(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
 
+    -- Toggle post processing effects on the front viewport. Note that the rear viewport is unaffected
+    local effectRenderPath = renderer:GetViewport(0).renderPath
+    if input:GetKeyPress(KEY_B) then
+        effectRenderPath:ToggleEnabled("Bloom")
+    end
+    if input:GetKeyPress(KEY_F) then
+        effectRenderPath:ToggleEnabled("EdgeFilter")
+    end
+
     -- Toggle debug geometry with space
     if input:GetKeyPress(KEY_SPACE) then
         drawDebug = not drawDebug
     end
-
-    -- Paint decal with the left mousebutton cursor must be visible
-    if ui.cursor.visible and input:GetMouseButtonPress(MOUSEB_LEFT) then
-        PaintDecal()
-    end
-end
-
-function PaintDecal()
-    local hit = {}
-
-    if Raycast(250.0, hit) then
-        -- Check if target scene node already has a DecalSet component. If not, create now
-        local targetNode = hit[2]:GetNode()
-        local decal = targetNode:GetComponent("DecalSet")
-        if decal == nil then
-            decal = targetNode:CreateComponent("DecalSet")
-            decal.material = cache:GetResource("Material", "Materials/UrhoDecal.xml")
-        end
-        -- Add a square decal to the decal set using the geometry of the drawable that was hit, orient it to face the camera,
-        -- use full texture UV's (0,0) to (1,1). Note that if we create several decals to a large object (such as the ground
-        -- plane) over a large area using just one DecalSet component, the decals will all be culled as one unit. If that is
-        -- undesirable, it may be necessary to create more than one DecalSet based on the distance
-        decal:AddDecal(hit[2], hit[1], cameraNode.rotation, 0.5, 1.0, 1.0, Vector2(0.0, 0.0), Vector2(1.0, 1.0))
-    end
-end
-
-function Raycast(maxDistance, hit)
-    hit[2] = nil
-
-    local pos = ui.cursorPosition
-    -- Check the cursor is visible and there is no UI element in front of the cursor
-    if not ui.cursor.visible or ui:GetElementAt(pos, true) ~= nil then
-        return false
-    end
-
-    local camera = cameraNode:GetComponent("Camera")
-    local cameraRay = camera:GetScreenRay(pos.x / graphics.width, pos.y / graphics.height)
-    -- Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
-    local result = scene_:GetComponent("Octree"):RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY)
-    if result.drawable ~= nil then
-        -- Calculate hit position in world space
-        hit[1] = cameraRay.origin + cameraRay.direction * result.distance
-        hit[2] = result.drawable
-        print("Has hit, drawable is " .. result.drawable.typeName)
-        return true
-    end
-
-    return false
 end
 
 function HandleUpdate(eventType, eventData)

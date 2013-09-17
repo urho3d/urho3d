@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Input/Input.pkg"
 $pfile "Input/InputEvents.pkg"
 

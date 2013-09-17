@@ -1,5 +1,3 @@
-$#define TOLUA_RELEASE
-
 $pfile "Physics/CollisionShape.pkg"
 $pfile "Physics/Constraint.pkg"
 $pfile "Physics/PhysicsWorld.pkg"
