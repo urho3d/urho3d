@@ -195,15 +195,16 @@ void InitTouchInput()
     moveButton = BorderImage();
     moveButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
     moveButton.imageRect = IntRect(0, 0, 96, 96);
-    moveButton.SetPosition(touchButtonBorder, graphics.height - touchButtonSize - touchButtonBorder);
+    moveButton.SetAlignment(HA_LEFT, VA_BOTTOM);
+    moveButton.SetPosition(touchButtonBorder, -touchButtonBorder);
     moveButton.SetSize(touchButtonSize, touchButtonSize);
     ui.root.AddChild(moveButton);
 
     fireButton = BorderImage();
     fireButton.texture = cache.GetResource("Texture2D", "Textures/TouchInput.png");
     fireButton.imageRect = IntRect(96, 0, 192, 96);
-    fireButton.SetPosition(graphics.width - touchButtonSize - touchButtonBorder, graphics.height - touchButtonSize -
-        touchButtonBorder);
+    fireButton.SetAlignment(HA_RIGHT, VA_BOTTOM);
+    fireButton.SetPosition(-touchButtonBorder, -touchButtonBorder);
     fireButton.SetSize(touchButtonSize, touchButtonSize);
     ui.root.AddChild(fireButton);
 }
@@ -904,8 +905,8 @@ void UpdateControls()
 
                 if (touch.touchID == moveTouchID)
                 {
-                    int relX = touch.position.x - touchButtonSize / 2;
-                    int relY = touch.position.y - (graphics.height - touchButtonSize / 2);
+                    int relX = touch.position.x - moveButton.screenPosition.x - touchButtonSize / 2;
+                    int relY = touch.position.y - moveButton.screenPosition.y - touchButtonSize / 2;
                     if (relY < 0 && Abs(relX * 3 / 2) < Abs(relY))
                         playerControls.Set(CTRL_UP, true);
                     if (relY > 0 && Abs(relX * 3 / 2) < Abs(relY))
