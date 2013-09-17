@@ -45,10 +45,10 @@ public:
     static void RegisterObject(Context* context);
 
     /// Create script object.
-    bool CreateObject(const String& objectType);
+    bool CreateObject(const String& scriptObjectType);
 
     /// Create script object.
-    bool CreateObject(const String& fileName, const String& objectType);
+    bool CreateObject(const String& fileName, const String& scriptObjectType);
 
     /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
@@ -67,7 +67,13 @@ public:
 
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* object);
-    
+
+    /// Return script object type.
+    const String& GetScriptObjectType() const { return scriptObjectType_; }
+
+    /// Return script object ref.
+    int GetScriptObjectRef() const { return scriptObjectRef_; }
+
 private:
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
@@ -87,8 +93,8 @@ private:
     /// Lua state.
     lua_State* luaState_;
 
-    /// Object type.
-    String objectType_;
+    /// Script object type.
+    String scriptObjectType_;
 
     /// Script object ref.
     int scriptObjectRef_;

@@ -3738,6 +3738,10 @@ Methods:<br>
 - void AddListener(Component* component)
 - void RemoveListener(Component* component)
 - Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0)
+- object CreateScriptObject(const String scriptObjectType)
+- object CreateScriptObject(const String fileName, const String scriptObjectType)
+- object GetScriptObject()
+- object GetScriptObject(const String scriptObjectType)
 - unsigned GetID() const
 - const String& GetName() const
 - StringHash GetNameHash() const

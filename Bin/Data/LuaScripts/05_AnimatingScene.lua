@@ -71,10 +71,10 @@ function CreateScene()
         -- Add the Rotator script object which will rotate the scene node each frame, when the scene sends its update event.
         -- This requires the C++ component LuaScriptInstance in the scene node, which acts as a container. We need to tell the 
         -- class name to instantiate the object
-        local instance = boxNode:CreateComponent("LuaScriptInstance")
-        instance:CreateObject("Rotator")
-        --instance.object.rotationSpeed = Vector3(10.0, 20.0, 30.0)
-        instance.object.rotationSpeed = {10.0, 20.0, 30.0}
+        
+
+        local object = boxNode:CreateScriptObject("Rotator")
+        object.rotationSpeed = {10.0, 20.0, 30.0}
     end
 
     -- Create the camera. Let the starting position be at the world origin. As the fog limits maximum visible distance, we can

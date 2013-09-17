@@ -58,9 +58,9 @@ void LuaScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<LuaScriptInstance>();
 }
 
-bool LuaScriptInstance::CreateObject(const String& objectType)
+bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 {
-    if (objectType_ == objectType)
+    if (scriptObjectType_ == scriptObjectType)
         return true;
 
     ReleaseObject();
@@ -76,10 +76,10 @@ bool LuaScriptInstance::CreateObject(const String& objectType)
     }
 
     // Get table as first paramter.
-    lua_getglobal(luaState_, objectType.CString());
+    lua_getglobal(luaState_, scriptObjectType.CString());
     if (!lua_istable(luaState_, -1))
     {
-        LOGERROR("Could not find lua table " + objectType);
+        LOGERROR("Could not find lua table " + scriptObjectType);
         lua_settop(luaState_, top);
         return false;
     }
@@ -96,13 +96,13 @@ bool LuaScriptInstance::CreateObject(const String& objectType)
         return false;
     }
 
-    objectType_ = objectType;
+    scriptObjectType_ = scriptObjectType;
     scriptObjectRef_ = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
     return true;
 }
 
-bool LuaScriptInstance::CreateObject(const String& fileName, const String& objectType)
+bool LuaScriptInstance::CreateObject(const String& fileName, const String& scriptObjectType)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
@@ -113,7 +113,7 @@ bool LuaScriptInstance::CreateObject(const String& fileName, const String& objec
     if (!luaFile->LoadAndExecute(luaState_))
         return false;
 
-    return CreateObject(objectType);
+    return CreateObject(scriptObjectType);
 }
 
 void LuaScriptInstance::ScriptSubscribeToEvent(const String& eventName, const String& functionName)

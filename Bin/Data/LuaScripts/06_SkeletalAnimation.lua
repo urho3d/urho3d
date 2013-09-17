@@ -97,9 +97,9 @@ function CreateScene()
         state.looped = true
 
         -- Create our Mover script object that will move & animate the model during each frame's update. 
-        local instance = modelNode:CreateComponent("LuaScriptInstance")
-        instance:CreateObject("Mover")
-        instance.object:SetParameters(MODEL_MOVE_SPEED, MODEL_ROTATE_SPEED, bounds)
+
+        local object = modelNode:CreateScriptObject("Mover")
+        object:SetParameters(MODEL_MOVE_SPEED, MODEL_ROTATE_SPEED, bounds)
     end
 
     -- Create the camera. Limit far clip distance to match the fog
