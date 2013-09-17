@@ -332,7 +332,7 @@ int LuaScript::Print(lua_State *L)
         lua_pop(L, 1);  /* pop result */
     }
 
-    LOGRAW(String("Lua: ") + string); // fputs("\n", stdout);
+    LOGRAW("Lua: " + string); // fputs("\n", stdout);
 
     return 0;
 }
@@ -348,7 +348,7 @@ bool LuaScript::FindFunction(const String& functionName)
     {
         if (!lua_istable(luaState_, -1))
         {
-            LOGERROR("Can not find Lua table: " + String("Table name = '") + currentName + "'.");
+            LOGERROR("Could not find Lua table: Table name = '" + currentName + "'");
             return false;
         }
 
@@ -358,7 +358,7 @@ bool LuaScript::FindFunction(const String& functionName)
             lua_getfield(luaState_, -1, splitedNames[i].CString());
             if (!lua_istable(luaState_, -1))
             {
-                LOGERROR("Can not find Lua table: " + String("Table name = '") + currentName + "'.");
+                LOGERROR("Could not find Lua table: Table name = '" + currentName + "'");
                 return false;
             }
         }
@@ -369,7 +369,7 @@ bool LuaScript::FindFunction(const String& functionName)
 
     if (!lua_isfunction(luaState_, -1))
     {
-        LOGERROR("Can not find Lua function: " + String("Function name = '") + currentName + "'.");
+        LOGERROR("Could not find Lua function: Function name = '" + currentName + "'");
         return false;
     }
 
@@ -407,7 +407,7 @@ void LuaScript::CallEventHandler(int functionRef, StringHash eventType, VariantM
     lua_rawgeti(luaState_, LUA_REGISTRYINDEX, functionRef);
     if (!lua_isfunction(luaState_, -1))
     {
-        LOGERROR("Can not find funciton.");
+        LOGERROR("Could not find function");
         lua_settop(luaState_, top);
         return;
     }
@@ -423,7 +423,6 @@ void LuaScript::CallEventHandler(int functionRef, StringHash eventType, VariantM
         return;
     }
 }
-
 
 void RegisterLuaScriptLibrary(Context* context)
 {

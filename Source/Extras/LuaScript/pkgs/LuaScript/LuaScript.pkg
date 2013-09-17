@@ -55,5 +55,4 @@ static void UnsubscribeFromEvents(void* object)
 {
     GetLuaScript()->ScriptUnsubscribeFromEvents(object);
 }
-
 $}

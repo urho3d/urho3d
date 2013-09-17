@@ -180,4 +180,3 @@ function Rotator.Update(self, eventType, eventData)
     local z = self.rotationSpeed[3] * timeStep
     self.node:RotateXYZ(x, y, z)
 end
-

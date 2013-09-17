@@ -833,11 +833,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 break;
             #endif
 
-            #if !defined(IOS) && !defined(ANDROID)
             case SDL_WINDOWEVENT_RESIZED:
                 graphics_->WindowResized();
                 break;
-            #endif
             }
         }
         break;

@@ -70,7 +70,7 @@ bool LuaScriptInstance::CreateObject(const String& objectType)
     lua_getglobal(luaState_, "CreateScriptObjectInstance");
     if (!lua_isfunction(luaState_, -1))
     {
-        LOGERROR("Can not find lua function CreateScriptObjectInstance.");
+        LOGERROR("Could not find lua function CreateScriptObjectInstance");
         lua_settop(luaState_, top);
         return false;
     }
@@ -79,7 +79,7 @@ bool LuaScriptInstance::CreateObject(const String& objectType)
     lua_getglobal(luaState_, objectType.CString());
     if (!lua_istable(luaState_, -1))
     {
-        LOGERROR("Can not find lua table " + objectType + ".");
+        LOGERROR("Could not find lua table " + objectType);
         lua_settop(luaState_, top);
         return false;
     }
@@ -290,7 +290,7 @@ void LuaScriptInstance::ReleaseObject()
     lua_getglobal(luaState_, "DestroyScriptObjectInstance");
     if (!lua_isfunction(luaState_, -1))
     {
-        LOGERROR("Can not find lua function DestroyScriptObjectInstance.");
+        LOGERROR("Could not find lua function DestroyScriptObjectInstance");
         lua_settop(luaState_, top);
         return;
     }
