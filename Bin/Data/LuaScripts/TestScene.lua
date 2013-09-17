@@ -484,7 +484,7 @@ function HandlePostRenderUpdate()
 end
 
 function HandleClientConnected(eventType, eventData)
-    local connection = eventData:GetConnection("Connection")
+    local connection = eventData:GetPtr("Connection", "Connection")
     connection.scene = testScene -- Begin scene replication to the client
     connection.logStatistics = true
 end
@@ -492,8 +492,8 @@ end
 
 function HandlePhysicsCollision(eventType, eventData)
     -- Check if either of the nodes has an AnimatedModel component
-    local nodeA = eventData:GetNode("NodeA")
-    local nodeB = eventData:GetNode("NodeB")
+    local nodeA = eventData:GetPtr("Node", "NodeA")
+    local nodeB = eventData:GetPtr("Node", "NodeB")
     if nodeA:HasComponent("AnimatedModel") then
         HandleHit(nodeA)
     elseif nodeB:HasComponent("AnimatedModel") then

@@ -109,7 +109,7 @@ class Variant
     const Quaternion& GetQuaternion() const;
     const Color& GetColor() const;
     const String& GetString() const;
-    void* GetPtr() const;
+
     const ResourceRef& GetResourceRef() const;
     const ResourceRefList& GetResourceRefList() const;
     const IntRect& GetIntRect() const;
@@ -141,19 +141,13 @@ class VariantMap
     tolua_outside void VariantMapSetQuaternion @ SetQuaternion(const String key, const Quaternion value);
     tolua_outside void VariantMapSetColor @ SetColor(const String key, const Color value);
     tolua_outside void VariantMapSetString @ SetString(const String key, const String value);
+    
     tolua_outside void VariantMapSetPtr @ SetPtr(const String key, void* value);
+    
     tolua_outside void VariantMapSetResourceRef @ SetResourceRef(const String key, const ResourceRef value);
     tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const String key, const ResourceRefList value); 
     tolua_outside void VariantMapSetIntRect @ SetIntRect(const String key, const IntRect value);
     tolua_outside void VariantMapSetIntVector2 @ SetIntVector2(const String key, const IntVector2 value);
-    
-    tolua_outside void VariantMapSetCamera @ SetCamera(const String key, Camera* camera);
-    tolua_outside void VariantMapSetConnection @ SetConnection(const String key, Connection* connection);
-    tolua_outside void VariantMapSetNode @ SetNode(const String key, Node* node);
-    tolua_outside void VariantMapSetPhysicsWorld @ SetPhysicsWorld(const String key, PhysicsWorld* physicsworld);
-    tolua_outside void VariantMapSetRigidBody @ SetRigidBody(const String key, RigidBody* rigidbody);
-    tolua_outside void VariantMapSetScene @ SetScene(const String key, Scene* scene);
-    tolua_outside void VariantMapSetUIElement @ SetUIElement(const String key, UIElement* element);
     
     tolua_outside int VariantMapGetInt @ GetInt(const String key);
     tolua_outside bool VariantMapGetBool @ GetBool(const String key);
@@ -164,19 +158,13 @@ class VariantMap
     tolua_outside const Quaternion& VariantMapGetQuaternion @ GetQuaternion(const String key);
     tolua_outside const Color& VariantMapGetColor @ GetColor(const String key);
     tolua_outside const String& VariantMapGetString @ GetString(const String key);
-    tolua_outside const void* VariantMapGetPtr @ GetPtr(const String key);
+    
     tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const String key);
     tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const String key);
     tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const String key);
     tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const String key);
     
-    tolua_outside Camera* VariantMapGetCamera @ GetCamera(const String key);
-    tolua_outside Connection* VariantMapGetConnection @ GetConnection(const String key);
-    tolua_outside Node* VariantMapGetNode @ GetNode(const String key);
-    tolua_outside PhysicsWorld* VariantMapGetPhysicsWorld @ GetPhysicsWorld(const String key);
-    tolua_outside RigidBody* VariantMapGetRigidBody @ GetRigidBody(const String key);
-    tolua_outside Scene* VariantMapGetScene @ GetScene(const String key);
-    tolua_outside UIElement* VariantMapGetUIElement @ GetUIElement(const String key);
+    tolua_outside const void* VariantMapGetPtr @ GetPtr(const String type, const String key);
 };
 
 ${
@@ -250,42 +238,6 @@ void VariantMapSetIntVector2(VariantMap* vmap, const String& key, const IntVecto
     (*vmap)[ShortStringHash(key)] = value;
 }
 
-
-void VariantMapSetCamera(VariantMap* vmap, const String& key, Camera* pointer)
-{
-    (*vmap)[ShortStringHash(key)] = (void*)pointer;
-}
-
-void VariantMapSetConnection(VariantMap* vmap, const String& key, Connection* pointer)
-{
-    (*vmap)[ShortStringHash(key)] = (void*)pointer;
-}
-
-void VariantMapSetNode(VariantMap* vmap, const String& key, Node* pointer)
-{
-    (*vmap)[ShortStringHash(key)] = (void*)pointer;
-}
-
-void VariantMapSetPhysicsWorld(VariantMap* vmap, const String& key, PhysicsWorld* pointer)
-{
-    (*vmap)[ShortStringHash(key)] = (void*)pointer;
-}
-
-void VariantMapSetRigidBody(VariantMap* vmap, const String& key, RigidBody* pointer)
-{
-    (*vmap)[ShortStringHash(key)] = (void*)pointer;
-}
-
-void VariantMapSetScene(VariantMap* vmap, const String& key, Scene* pointer)
-{
-    (*vmap)[ShortStringHash(key)] = (void*)pointer;
-}
-
-void VariantMapSetUIElement(VariantMap* vmap, const String& key, UIElement* pointer)
-{
-    (*vmap)[ShortStringHash(key)] = (void*)pointer;
-}
-
 const Variant& FindVariant(const VariantMap* vmap, const String& key)
 {
     VariantMap::ConstIterator i = vmap->Find(ShortStringHash(key));
@@ -337,11 +289,6 @@ const String& VariantMapGetString(const VariantMap* vmap, const String& key)
     return FindVariant(vmap, key).GetString();
 }
 
-const void* VariantMapGetPtr(const VariantMap* vmap, const String& key)
-{
-    return FindVariant(vmap, key).GetPtr();
-}
-
 const ResourceRef& VariantMapGetResourceRef(const VariantMap* vmap, const String& key)
 {
     return FindVariant(vmap, key).GetResourceRef();
@@ -362,38 +309,69 @@ const IntVector2& VariantMapGetIntVector2(const VariantMap* vmap, const String& 
     return FindVariant(vmap, key).GetIntVector2();
 }
 
-Camera* VariantMapGetCamera(const VariantMap* vmap, const String& key)
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_VariantMap_SetPtr00
+static int tolua_CoreLuaAPI_VariantMap_SetPtr00(lua_State* tolua_S)
 {
-    return (Camera*)FindVariant(vmap, key).GetPtr();
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"VariantMap",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isuserdata(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  VariantMap* self = (VariantMap*)  tolua_tousertype(tolua_S,1,0);
+  const String key = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+  void* value = ((void*) tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'VariantMapSetPtr'", NULL);
+#endif
+ {
+  VariantMapSetPtr(self,key,value);
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetPtr'.",&tolua_err);
+ return 0;
+#endif
 }
 
-Connection* VariantMapGetConnection(const VariantMap* vmap, const String& key)
-{
-    return (Connection*)FindVariant(vmap, key).GetPtr();
-}
+#define TOLUA_DISABLE_tolua_CoreLuaAPI_VariantMap_GetPtr00
 
-Node* VariantMapGetNode(const VariantMap* vmap, const String& key)
+static int tolua_CoreLuaAPI_VariantMap_GetPtr00(lua_State* tolua_S)
 {
-    return (Node*)FindVariant(vmap, key).GetPtr();
-}
-
-PhysicsWorld* VariantMapGetPhysicsWorld(const VariantMap* vmap, const String& key)
-{
-    return (PhysicsWorld*)FindVariant(vmap, key).GetPtr();
-}
-
-RigidBody* VariantMapGetRigidBody(const VariantMap* vmap, const String& key)
-{
-    return (RigidBody*)FindVariant(vmap, key).GetPtr();
-}
-
-Scene* VariantMapGetScene(const VariantMap* vmap, const String& key)
-{
-    return (Scene*)FindVariant(vmap, key).GetPtr();
-}
-
-UIElement* VariantMapGetUIElement(const VariantMap* vmap, const String& key)
-{
-    return (UIElement*)FindVariant(vmap, key).GetPtr();
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (!tolua_isusertype(tolua_S,1,"VariantMap",0,&tolua_err) ||
+  !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+  !tolua_isurho3dstring(tolua_S,3,0,&tolua_err) ||
+  !tolua_isnoobj(tolua_S,4,&tolua_err))
+  goto tolua_lerror;
+ else
+#endif
+ {
+  VariantMap* self = (VariantMap*)  tolua_tousertype(tolua_S,1,0);
+  const String type = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+  const String key = ((const String)  tolua_tourho3dstring(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'VariantMapGetPtr'", NULL);
+#endif
+  {
+   void* tolua_ret = (void*)FindVariant(self, key).GetPtr();
+   tolua_pushusertype(tolua_S,tolua_ret, type.CString());
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetPtr'.",&tolua_err);
+ return 0;
+#endif
 }
 $}

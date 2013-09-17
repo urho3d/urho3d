@@ -127,8 +127,7 @@ function HandleControlClicked(eventType, eventData)
     -- Get control that was clicked
     -- Note difference to C++: in C++ we would call GetPtr() and cast the function pointer to UIElement, here we must specify
     -- what kind of object we are getting. Null will be returned on type mismatch
-    local clicked = eventData:GetUIElement("Element")
-
+    local clicked = eventData:GetPtr("UIElement", "Element")
     local name = "...?"
     if clicked ~= nil then
         -- Get the name of the control that was clicked

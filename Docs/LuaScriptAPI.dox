@@ -884,7 +884,6 @@ Methods:<br>
 - const Quaternion& GetQuaternion() const
 - const Color& GetColor() const
 - const String& GetString() const
-- void* GetPtr() const
 - const ResourceRef& GetResourceRef() const
 - const ResourceRefList& GetResourceRefList() const
 - const IntRect& GetIntRect() const
@@ -920,34 +919,19 @@ Methods:<br>
 - void SetResourceRefList(const String key, const ResourceRefList value) 
 - void SetIntRect(const String key, const IntRect value)
 - void SetIntVector2(const String key, const IntVector2 value)
-- void SetCamera(const String key, Camera* camera)
-- void SetConnection(const String key, Connection* connection)
-- void SetNode(const String key, Node* node)
-- void SetPhysicsWorld(const String key, PhysicsWorld* physicsworld)
-- void SetRigidBody(const String key, RigidBody* rigidbody)
-- void SetScene(const String key, Scene* scene)
-- void SetUIElement(const String key, UIElement* element)
-- int GetInt(const String key)
 - bool GetBool(const String key)
 - float GetFloat(const String key)
-- const GetVector2(const String key)
-- const GetVector3(const String key)
-- const GetVector4(const String key)
-- const GetQuaternion(const String key)
-- const GetColor(const String key)
-- const GetString(const String key)
-- const GetPtr(const String key)
-- const GetResourceRef(const String key)
-- const GetResourceRefList(const String key)
-- const GetIntRect(const String key)
-- const GetIntVector2(const String key)
-- Camera* GetCamera(const String key)
-- Connection* GetConnection(const String key)
-- Node* GetNode(const String key)
-- PhysicsWorld* GetPhysicsWorld(const String key)
-- RigidBody* GetRigidBody(const String key)
-- Scene* GetScene(const String key)
-- UIElement* GetUIElement(const String key)
+- const Vector2 GetVector2(const String key)
+- const Vector3 GetVector3(const String key)
+- const Vector4 GetVector4(const String key)
+- const Quaternion GetQuaternion(const String key)
+- const Color GetColor(const String key)
+- const String GetString(const String key)
+- const ResourceRef GetResourceRef(const String key)
+- const ResourceRefList GetResourceRefList(const String key)
+- const IntRect GetIntRect(const String key)
+- const IntVector2 GetIntVector2(const String key)
+- const void* GetPtr(const String type, const String key)
 
 Console : Object
 
