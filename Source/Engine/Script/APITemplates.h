@@ -91,8 +91,9 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.Size(), type);
-        if (vector.Size())
-            memcpy(arr->At(0), &vector[0], vector.Size() * sizeof(T));
+        
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            *(static_cast<T*>(arr->At(i))) = vector[i];
         
         return arr;
     }
