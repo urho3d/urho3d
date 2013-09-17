@@ -236,7 +236,7 @@ public:
     float GetMaxZ() const { return maxZ_; }
     
     // Clear the frame's light list.
-    void Drawable::ClearLights()
+    void ClearLights()
     {
         basePassFlags_ = 0;
         firstLight_ = 0;
@@ -245,7 +245,7 @@ public:
     }
 
     // Add a per-pixel light affecting the object this frame.
-    void Drawable::AddLight(Light* light)
+    void AddLight(Light* light)
     {
         if (lights_.Empty())
             firstLight_ = light;
@@ -253,7 +253,7 @@ public:
     }
 
     // Add a per-vertex light affecting the object this frame.
-    void Drawable::AddVertexLight(Light* light)
+    void AddVertexLight(Light* light)
     {
         vertexLights_.Push(light);
     }
