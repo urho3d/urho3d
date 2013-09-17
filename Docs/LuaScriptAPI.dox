@@ -404,7 +404,6 @@ section LuaScriptAPI_GlobalConstants Global constants
 - int SP_VERTEXLIGHTS
 - int SP_MATERIAL
 - int SP_OBJECTTRANSFORM
-- int SP_OBJECTDATA
 - int MAX_SHADER_PARAMETER_GROUPS
 - int LIGHT_DIRECTIONAL
 - int LIGHT_SPOT

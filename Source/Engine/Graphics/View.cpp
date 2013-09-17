@@ -43,7 +43,6 @@
 #include "VertexBuffer.h"
 #include "View.h"
 #include "WorkQueue.h"
-#include "Zone.h"
 
 #include "DebugNew.h"
 
@@ -917,6 +916,7 @@ void View::GetBatches()
                     Batch volumeBatch;
                     volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
                     volumeBatch.worldTransform_ = &light->GetVolumeTransform(camera_);
+                    volumeBatch.numWorldTransforms_ = 1;
                     volumeBatch.overrideView_ = light->GetLightType() == LIGHT_DIRECTIONAL;
                     volumeBatch.camera_ = camera_;
                     volumeBatch.lightQueue_ = &lightQueue;
@@ -2312,32 +2312,6 @@ void View::FindZone(Drawable* drawable)
     drawable->SetZone(newZone, temporary);
 }
 
-Zone* View::GetZone(Drawable* drawable)
-{
-    if (cameraZoneOverride_)
-        return cameraZone_;
-    Zone* drawableZone = drawable->GetZone();
-    return drawableZone ? drawableZone : cameraZone_;
-}
-
-unsigned View::GetLightMask(Drawable* drawable)
-{
-    return drawable->GetLightMask() & GetZone(drawable)->GetLightMask();
-}
-
-unsigned View::GetShadowMask(Drawable* drawable)
-{
-    return drawable->GetShadowMask() & GetZone(drawable)->GetShadowMask();
-}
-
-unsigned long long View::GetVertexLightQueueHash(const PODVector<Light*>& vertexLights)
-{
-    unsigned long long hash = 0;
-    for (PODVector<Light*>::ConstIterator i = vertexLights.Begin(); i != vertexLights.End(); ++i)
-        hash += (unsigned long long)(*i);
-    return hash;
-}
-
 Technique* View::GetTechnique(Drawable* drawable, Material* material)
 {
     if (!material)
@@ -2414,8 +2388,7 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         batch.material_ = renderer_->GetDefaultMaterial();
     
     // Convert to instanced if possible
-    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer() && !batch.shaderData_ &&
-        !batch.overrideView_)
+    if (allowInstancing && batch.geometryType_ == GEOM_STATIC && batch.geometry_->GetIndexBuffer() && !batch.overrideView_)
         batch.geometryType_ = GEOM_INSTANCED;
     
     if (batch.geometryType_ == GEOM_INSTANCED)
@@ -2432,20 +2405,17 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
             newGroup.geometryType_ = GEOM_STATIC;
             renderer_->SetBatchShaders(newGroup, tech, allowShadows);
             newGroup.CalculateSortKey();
-            newGroup.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
-            groups->Insert(MakePair(key, newGroup));
+            i = groups->Insert(MakePair(key, newGroup));
         }
-        else
+
+        int oldSize = i->second_.instances_.Size();
+        i->second_.AddTransforms(batch);
+        // Convert to using instancing shaders when the instancing limit is reached
+        if (oldSize < minInstances_ && (int)i->second_.instances_.Size() >= minInstances_)
         {
-            i->second_.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
-            
-            // Convert to using instancing shaders when the instancing limit is reached
-            if (i->second_.instances_.Size() == minInstances_)
-            {
-                i->second_.geometryType_ = GEOM_INSTANCED;
-                renderer_->SetBatchShaders(i->second_, tech, allowShadows);
-                i->second_.CalculateSortKey();
-            }
+            i->second_.geometryType_ = GEOM_INSTANCED;
+            renderer_->SetBatchShaders(i->second_, tech, allowShadows);
+            i->second_.CalculateSortKey();
         }
     }
     else

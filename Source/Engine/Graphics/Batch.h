@@ -24,9 +24,9 @@
 
 #include "Drawable.h"
 #include "MathDefs.h"
+#include "Matrix3x4.h"
 #include "Ptr.h"
 #include "Rect.h"
-#include "Vector4.h"
 
 namespace Urho3D
 {
@@ -61,9 +61,8 @@ struct Batch
         geometry_(rhs.geometry_),
         material_(rhs.material_),
         worldTransform_(rhs.worldTransform_),
+        numWorldTransforms_(rhs.numWorldTransforms_),
         lightQueue_(0),
-        shaderData_(rhs.shaderData_),
-        shaderDataSize_(rhs.shaderDataSize_),
         geometryType_(rhs.geometryType_),
         overrideView_(rhs.overrideView_),
         isBase_(false)
@@ -85,8 +84,10 @@ struct Batch
     Geometry* geometry_;
     /// Material.
     Material* material_;
-    /// %Object's world transform.
+    /// World transform(s). For a skinned model, these are the bone transforms.
     const Matrix3x4* worldTransform_;
+    /// Number of world transforms.
+    unsigned numWorldTransforms_;
     /// Camera.
     Camera* camera_;
     /// Zone.
@@ -99,10 +100,6 @@ struct Batch
     ShaderVariation* vertexShader_;
     /// Pixel shader.
     ShaderVariation* pixelShader_;
-    /// Vertex shader data.
-    const float* shaderData_;
-    /// Vertex shader data size in floats.
-    unsigned shaderDataSize_;
     /// %Geometry type.
     GeometryType geometryType_;
     /// Override view transform flag.
@@ -153,6 +150,19 @@ struct BatchGroup : public Batch
     /// Destruct.
     ~BatchGroup()
     {
+    }
+    
+    /// Add world transform(s) from a batch.
+    void AddTransforms(const Batch& batch)
+    {
+        InstanceData newInstance;
+        newInstance.distance_ = batch.distance_;
+        
+        for (unsigned i = 0; i < batch.numWorldTransforms_; ++i)
+        {
+            newInstance.worldTransform_ = &batch.worldTransform_[i];
+            instances_.Push(newInstance);
+        }
     }
     
     /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms.

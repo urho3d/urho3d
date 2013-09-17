@@ -27,6 +27,7 @@
 #include "List.h"
 #include "Object.h"
 #include "Polyhedron.h"
+#include "Zone.h"
 
 namespace Urho3D
 {
@@ -190,14 +191,6 @@ private:
     IntRect GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D* shadowMap);
     /// Find and set a new zone for a drawable when it has moved.
     void FindZone(Drawable* drawable);
-    /// Return the drawable's zone, or camera zone if it has override mode enabled.
-    Zone* GetZone(Drawable* drawable);
-    /// Return the drawable's light mask, considering also its zone.
-    unsigned GetLightMask(Drawable* drawable);
-    /// Return the drawable's shadow mask, considering also its zone.
-    unsigned GetShadowMask(Drawable* drawable);
-    /// Return hash code for a vertex light queue.
-    unsigned long long GetVertexLightQueueHash(const PODVector<Light*>& vertexLights);
     /// Return material technique, considering the drawable's LOD distance.
     Technique* GetTechnique(Drawable* drawable, Material* material);
     /// Check if material should render an auxiliary view (if it has a camera attached.)
@@ -213,6 +206,36 @@ private:
     /// Return the proper depth-stencil surface to use for a rendertarget.
     RenderSurface* GetDepthStencil(RenderSurface* renderTarget);
     
+    /// Return the drawable's zone, or camera zone if it has override mode enabled.
+    Zone* GetZone(Drawable* drawable)
+    {
+        if (cameraZoneOverride_)
+            return cameraZone_;
+        Zone* drawableZone = drawable->GetZone();
+        return drawableZone ? drawableZone : cameraZone_;
+    }
+
+    /// Return the drawable's light mask, considering also its zone.
+    unsigned GetLightMask(Drawable* drawable)
+    {
+        return drawable->GetLightMask() & GetZone(drawable)->GetLightMask();
+    }
+
+    /// Return the drawable's shadow mask, considering also its zone.
+    unsigned GetShadowMask(Drawable* drawable)
+    {
+        return drawable->GetShadowMask() & GetZone(drawable)->GetShadowMask();
+    }
+
+    /// Return hash code for a vertex light queue.
+    unsigned long long GetVertexLightQueueHash(const PODVector<Light*>& vertexLights)
+    {
+        unsigned long long hash = 0;
+        for (PODVector<Light*>::ConstIterator i = vertexLights.Begin(); i != vertexLights.End(); ++i)
+            hash += (unsigned long long)(*i);
+        return hash;
+    }
+
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Renderer subsystem.

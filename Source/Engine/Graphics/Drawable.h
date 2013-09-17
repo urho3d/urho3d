@@ -86,12 +86,10 @@ struct SourceBatch
     Geometry* geometry_;
     /// Material.
     SharedPtr<Material> material_;
-    /// %Object's world transform.
+    /// World transform(s). For a skinned model, these are the bone transforms.
     const Matrix3x4* worldTransform_;
-    /// Vertex shader data in floats.
-    const float* shaderData_;
-    /// Vertex shader data size.
-    unsigned shaderDataSize_;
+    /// Number of world transforms.
+    unsigned numWorldTransforms_;
     /// %Geometry type.
     GeometryType geometryType_;
     /// Override view transform flag.
@@ -200,12 +198,6 @@ public:
     void SetMinMaxZ(float minZ, float maxZ);
     /// Mark in view (either the main camera, or a shadow camera view) this frame.
     void MarkInView(const FrameInfo& frame, bool mainView = true);
-    /// Clear lights and base pass flags for a new frame.
-    void ClearLights();
-    /// Add a per-pixel light.
-    void AddLight(Light* light);
-    /// Add a per-vertex light.
-    void AddVertexLight(Light* light);
     /// Sort and limit per-pixel lights to maximum allowed. Convert extra lights into vertex lights.
     void LimitLights();
     /// Sort and limit per-vertex lights to maximum allowed.
@@ -243,6 +235,29 @@ public:
     /// Return the maximum view-space depth.
     float GetMaxZ() const { return maxZ_; }
     
+    // Clear the frame's light list.
+    void Drawable::ClearLights()
+    {
+        basePassFlags_ = 0;
+        firstLight_ = 0;
+        lights_.Clear();
+        vertexLights_.Clear();
+    }
+
+    // Add a per-pixel light affecting the object this frame.
+    void Drawable::AddLight(Light* light)
+    {
+        if (lights_.Empty())
+            firstLight_ = light;
+        lights_.Push(light);
+    }
+
+    // Add a per-vertex light affecting the object this frame.
+    void Drawable::AddVertexLight(Light* light)
+    {
+        vertexLights_.Push(light);
+    }
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);

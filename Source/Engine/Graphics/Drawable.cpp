@@ -43,8 +43,7 @@ SourceBatch::SourceBatch() :
     distance_(0.0f),
     geometry_(0),
     worldTransform_(&Matrix3x4::IDENTITY),
-    shaderData_(0),
-    shaderDataSize_(0),
+    numWorldTransforms_(1),
     geometryType_(GEOM_STATIC),
     overrideView_(false)
 {
@@ -287,26 +286,6 @@ void Drawable::MarkInView(const FrameInfo& frame, bool mainView)
             viewCamera_ = 0;
         }
     }
-}
-
-void Drawable::ClearLights()
-{
-    basePassFlags_ = 0;
-    firstLight_ = 0;
-    lights_.Clear();
-    vertexLights_.Clear();
-}
-
-void Drawable::AddLight(Light* light)
-{
-    if (lights_.Empty())
-        firstLight_ = light;
-    lights_.Push(light);
-}
-
-void Drawable::AddVertexLight(Light* light)
-{
-    vertexLights_.Push(light);
 }
 
 void Drawable::LimitLights()

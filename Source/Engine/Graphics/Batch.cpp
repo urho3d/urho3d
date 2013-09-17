@@ -288,13 +288,17 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         graphics->SetShaderParameter(PSP_GBUFFERINVSIZE, Vector4(sizeX, sizeY, 0.0f, 0.0f));
     }
     
-    // Set model transform
+    // Set model or skinning transforms
     if (setModelTransform && graphics->NeedParameterUpdate(SP_OBJECTTRANSFORM, worldTransform_))
-        graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
-    
-    // Set skinning transforms
-    if (shaderData_ && shaderDataSize_ && graphics->NeedParameterUpdate(SP_OBJECTDATA, shaderData_))
-        graphics->SetShaderParameter(VSP_SKINMATRICES, shaderData_, shaderDataSize_);
+    {
+        if (geometryType_ == GEOM_SKINNED)
+        {
+            graphics->SetShaderParameter(VSP_SKINMATRICES, reinterpret_cast<const float*>(worldTransform_), 
+                12 * numWorldTransforms_);
+        }
+        else
+            graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
+    }
     
     // Set zone-related shader parameters
     BlendMode blend = graphics->GetBlendMode();
@@ -699,7 +703,7 @@ void BatchGroup::Draw(View* view) const
                     startIndex += instances;
                 }
             }
-            // Stream offset supported, and instancing buffer has been already filled, so just draw
+            // Stream offset supported and instancing buffer has been already filled, so just draw
             else
             {
                 graphics->SetIndexBuffer(geometry_->GetIndexBuffer());

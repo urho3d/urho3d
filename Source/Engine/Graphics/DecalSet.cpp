@@ -218,7 +218,8 @@ void DecalSet::UpdateBatches(const FrameInfo& frame)
     lodDistance_ = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     batches_[0].distance_ = distance_;
-    batches_[0].worldTransform_ = &worldTransform;
+    if (!skinned_)
+        batches_[0].worldTransform_ = &worldTransform;
 }
 
 void DecalSet::UpdateGeometry(const FrameInfo& frame)
@@ -1074,14 +1075,14 @@ void DecalSet::UpdateBatch()
     if (skinMatrices_.Size())
     {
         batches_[0].geometryType_ = GEOM_SKINNED;
-        batches_[0].shaderData_ = skinMatrices_[0].Data();
-        batches_[0].shaderDataSize_ = skinMatrices_.Size() * 12;
+        batches_[0].worldTransform_ = &skinMatrices_[0];
+        batches_[0].numWorldTransforms_ = skinMatrices_.Size();
     }
     else
     {
         batches_[0].geometryType_ = GEOM_STATIC;
-        batches_[0].shaderData_ = 0;
-        batches_[0].shaderDataSize_ = 0;
+        batches_[0].worldTransform_ = &node_->GetWorldTransform();
+        batches_[0].numWorldTransforms_ = 1;
     }
 }
 
