@@ -42,7 +42,7 @@ if (RASPI)
     find_library (BCM_VC_LIB_GLES2 GLESv2 ${BCM_VC_LIB_SEARCH_PATH})
 
     if (BCM_VC_INCLUDE_DIR AND BCM_VC_LIB_BCM_HOST AND BCM_VC_LIB_GLES2)
-        set (BCM_VC_INCLUDE_DIR ${BCM_VC_INCLUDE_DIR}/interface/vcos/pthreads)
+        set (BCM_VC_INCLUDE_DIR ${BCM_VC_INCLUDE_DIR} ${BCM_VC_INCLUDE_DIR}/interface/vcos/pthreads)
         set (BCM_VC_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_GLES2})
         set (BCM_VC_FOUND 1)
     endif ()
