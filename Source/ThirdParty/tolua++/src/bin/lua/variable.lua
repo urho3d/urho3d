@@ -9,6 +9,7 @@
 -- the author has no obligation to provide maintenance, support, updates,
 -- enhancements, or modifications.
 
+-- Modified by Aster Jian for Urho3D
 
 -- Variable class
 -- Represents a extern variable or a public member of a class.
@@ -105,6 +106,7 @@ function classVariable:supcode ()
 
  local class = self:inclass()
 
+    -- Urho3D: Fixed tolua++ bug, let it generate reference property's set code
 	local prop_type,prop_get,prop_set
 	if string.find(self.mod, 'tolua_property') then
 
@@ -160,7 +162,8 @@ function classVariable:supcode ()
 	else
 		local push_func = get_push_function(self.type)
 		t = self.type
-		if self.ptr == '&'then
+		-- Urho3D: Fixed tolua++ bug, let it generate reference property's set code
+		if self.ptr == '&' then
 			output('  ',push_func,'(tolua_S,(void*)&'..self:getvalue(class,static,prop_get)..',"',t,'");')
 		elseif self.ptr == '' then
 			if prop_type == nil then
@@ -253,6 +256,7 @@ function classVariable:supcode ()
 				output(' = ')
 			end
 			if not t and ptr=='' then output('*') end
+			-- Urho3D: Fixed tolua++ bug, let it generate reference property's set code
 			if self.ptr ~= '&' then
 				output('((',self.mod,self.type)
 			else

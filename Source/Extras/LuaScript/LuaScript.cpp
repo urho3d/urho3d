@@ -318,46 +318,7 @@ int LuaScript::Print(lua_State *L)
     return 0;
 }
 
-bool LuaScript::PushScriptFunction(const String& functionName)
-{
-    Vector<String> splitedNames = functionName.Split('.');
-
-    String currentName = splitedNames.Front();
-    lua_getglobal(luaState_, currentName.CString());
-
-    if (splitedNames.Size() > 1)
-    {
-        if (!lua_istable(luaState_, -1))
-        {
-            LOGERROR("Could not find Lua table: Table name = '" + currentName + "'");
-            return false;
-        }
-
-        for (unsigned i = 1; i < splitedNames.Size() - 1; ++i)
-        {
-            currentName = currentName + "." + splitedNames[i];
-            lua_getfield(luaState_, -1, splitedNames[i].CString());
-            if (!lua_istable(luaState_, -1))
-            {
-                LOGERROR("Could not find Lua table: Table name = '" + currentName + "'");
-                return false;
-            }
-        }
-
-        currentName = currentName + "." + splitedNames.Back().CString();
-        lua_getfield(luaState_, -1, splitedNames.Back().CString());
-    }
-
-    if (!lua_isfunction(luaState_, -1))
-    {
-        LOGERROR("Could not find Lua function: Function name = '" + currentName + "'");
-        return false;
-    }
-
-    return true;
-}
-
-int LuaScript::GetScriptFunctionRef(const String& functionName)
+int LuaScript::GetScriptFunctionRef(const String& functionName, bool silentIfNotFound)
 {
     HashMap<String, int>::Iterator i = functionNameToFunctionRefMap_.Find(functionName);
     if (i != functionNameToFunctionRefMap_.End())
@@ -366,7 +327,7 @@ int LuaScript::GetScriptFunctionRef(const String& functionName)
     int top = lua_gettop(luaState_);
     
     int functionRef = LUA_REFNIL;
-    if (PushScriptFunction(functionName))
+    if (PushScriptFunction(functionName, silentIfNotFound))
         functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
 
     lua_settop(luaState_, top);
@@ -399,6 +360,46 @@ void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData
 {
     using namespace ConsoleCommand;
     ExecuteString(eventData[P_COMMAND].GetString());
+}
+
+bool LuaScript::PushScriptFunction(const String& functionName, bool silentIfNotFound)
+{
+    Vector<String> splitedNames = functionName.Split('.');
+
+    String currentName = splitedNames.Front();
+    lua_getglobal(luaState_, currentName.CString());
+
+    if (splitedNames.Size() > 1)
+    {
+        if (!lua_istable(luaState_, -1))
+        {
+            LOGERROR("Could not find Lua table: Table name = '" + currentName + "'");
+            return false;
+        }
+
+        for (unsigned i = 1; i < splitedNames.Size() - 1; ++i)
+        {
+            currentName = currentName + "." + splitedNames[i];
+            lua_getfield(luaState_, -1, splitedNames[i].CString());
+            if (!lua_istable(luaState_, -1))
+            {
+                LOGERROR("Could not find Lua table: Table name = '" + currentName + "'");
+                return false;
+            }
+        }
+
+        currentName = currentName + "." + splitedNames.Back().CString();
+        lua_getfield(luaState_, -1, splitedNames.Back().CString());
+    }
+
+    if (!lua_isfunction(luaState_, -1))
+    {
+        if (!silentIfNotFound)
+            LOGERROR("Could not find Lua function: Function name = '" + currentName + "'");
+        return false;
+    }
+
+    return true;
 }
 
 void LuaScript::CallScriptFunction(int functionRef, StringHash eventType, VariantMap& eventData )

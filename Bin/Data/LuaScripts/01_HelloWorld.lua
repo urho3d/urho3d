@@ -17,9 +17,6 @@ function Start()
     SubscribeToEvents()
 end
 
-function Stop()
-end
-
 function CreateText()
     -- Construct new Text object
     local context = GetContext()

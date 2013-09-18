@@ -35,9 +35,6 @@ function Start()
     SubscribeToEvents()
 end
 
-function Stop()
-end
-
 function CreateScene()
     scene_ = Scene(context)
 
@@ -165,9 +162,6 @@ Rotator = ScriptObject()
 
 function Rotator:Start()
     self.rotationSpeed = {0.0, 0.0, 0.0}
-end
-
-function Rotator:Stop()
 end
 
 function Rotator:Update(timeStep)

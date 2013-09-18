@@ -12,6 +12,8 @@
 ** enhancements, or modifications.
 */
 
+// Modified by Aster Jian for Urho3D
+
 #include "tolua++.h"
 
 #include "lua.h"
@@ -22,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+// Urho3D: Add Urho3D::String Support in tolua++
 static void help (void)
 {
  fprintf(stderr,"\n"

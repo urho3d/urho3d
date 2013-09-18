@@ -37,9 +37,6 @@ function Start()
     SubscribeToEvents()
 end
 
-function Stop()
-end
-
 function CreateScene()
     scene_ = Scene(context)
 
@@ -258,6 +255,6 @@ end
 function HandlePostRenderUpdate(eventType, eventData)
     -- If draw debug mode is enabled, draw physics debug geometry. Use depth test to make the result easier to interpret
     if drawDebug then
-        scene_:GetComponent("PhysicsWorld"):DrawDebugGeometry(scene_:GetComponent("DebugRenderer"), true)
+        renderer:DrawDebugGeometry(true)
     end
 end

@@ -1,8 +1,8 @@
 /*
 ** Lua binding: tolua
-** Generated automatically by tolua++-1.0.92 on 09/13/13 13:31:48.
+** Generated automatically by tolua++-1.0.93 on Thu Sep 19 03:08:46 2013.
 */
 
 /* Exported function */
-TOLUA_API int  tolua_tolua_open (lua_State* tolua_S);
+TOLUA_API int tolua_tolua_open (lua_State* tolua_S);
 

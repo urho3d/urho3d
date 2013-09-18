@@ -78,11 +78,8 @@ public:
     /// Return Lua state.
     lua_State* GetLuaState() const { return luaState_; }
 
-    /// Push script function.
-    bool PushScriptFunction(const String& functionName);
-
     /// Return script function ref.
-    int GetScriptFunctionRef(const String& functionName);
+    int GetScriptFunctionRef(const String& functionName, bool silentIfNotfound = false);
 
 private:
     /// Register loader.
@@ -106,7 +103,9 @@ private:
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
 
-private:
+    /// Push script function.
+    bool PushScriptFunction(const String& functionName, bool silentIfNotfound = false);
+
     /// Call script function.
     void CallScriptFunction(int functionRef, StringHash eventType, VariantMap& eventData);
 

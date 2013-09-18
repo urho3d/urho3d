@@ -37,9 +37,6 @@ function Start()
     SubscribeToEvents()
 end
 
-function Stop()
-end
-
 function InitControls()
     -- Create a CheckBox
     local checkBox = CheckBox:new(context)

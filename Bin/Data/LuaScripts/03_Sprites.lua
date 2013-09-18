@@ -28,9 +28,6 @@ function Start()
     SubscribeToEvents();
 end
 
-function Stop()
-end
-
 function CreateSprites()
     local decalTex = cache:GetResource("Texture2D", "Textures/UrhoDecal.dds")
     

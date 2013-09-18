@@ -24,15 +24,20 @@
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Log.h"
-#ifdef ENABLE_LUA
-#include "LuaScript.h"
-#endif
 #include "Main.h"
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "Script.h"
 #include "ScriptFile.h"
+
+#ifdef ENABLE_LUA
+#include "LuaScript.h"
+extern "C"
+{
+#include <lauxlib.h>
+}
+#endif
 
 #include "DebugNew.h"
 
@@ -160,8 +165,8 @@ void Urho::Start()
     else
     {
         // Instantiate and register the Lua script subsystem
-        context_->RegisterSubsystem(new LuaScript(context_));
-        LuaScript* luaScript = GetSubsystem<LuaScript>();
+        LuaScript* luaScript = new LuaScript(context_);
+        context_->RegisterSubsystem(luaScript);
 
         // If script loading is successful, proceed to main loop
         if (luaScript->ExecuteFile(scriptFileName_))
@@ -188,7 +193,7 @@ void Urho::Stop()
     else
     {
         LuaScript* luaScript = GetSubsystem<LuaScript>();
-        if (luaScript)
+        if (luaScript && luaScript->GetScriptFunctionRef("Stop", true) != LUA_REFNIL)
             luaScript->ExecuteFunction("Stop");
     }
 #endif

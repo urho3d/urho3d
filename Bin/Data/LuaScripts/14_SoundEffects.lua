@@ -37,9 +37,6 @@ function Start()
     CreateUI()
 end
 
-function Stop()
-end
-
 function CreateUI()
     -- Create a scene which will not be actually rendered, but is used to hold SoundSource components while they play sounds
     scene_ = Scene(context)

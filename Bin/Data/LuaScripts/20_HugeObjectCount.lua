@@ -37,9 +37,6 @@ function Start()
     SubscribeToEvents()
 end
 
-function Stop()
-end
-
 function CreateScene()
     scene_ = Scene(context)
 

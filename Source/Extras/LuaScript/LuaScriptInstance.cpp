@@ -294,7 +294,7 @@ PODVector<unsigned char> LuaScriptInstance::GetScriptNetworkDataAttr() const
 void LuaScriptInstance::FindScriptObjectMethodRefs()
 {
     for (unsigned i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
-        scriptObjectMethodRefs_[i] = luaScript_->GetScriptFunctionRef(scriptObjectType_ + scriptObjectMethodNames[i]);
+        scriptObjectMethodRefs_[i] = luaScript_->GetScriptFunctionRef(scriptObjectType_ + scriptObjectMethodNames[i], true);
 
     if (scriptObjectMethodRefs_[LSOM_UPDATE] != LUA_REFNIL)
         SubscribeToEvent(E_UPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
@@ -515,4 +515,5 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, StringHash eve
         return;
     }
 }
+
 }

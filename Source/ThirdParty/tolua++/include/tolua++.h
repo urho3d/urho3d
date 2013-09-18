@@ -12,6 +12,7 @@
 ** enhancements, or modifications.
 */
 
+// Modified by Aster Jian for Urho3D
 
 #ifndef TOLUA_H
 #define TOLUA_H
@@ -32,7 +33,7 @@ extern "C" {
 #define tolua_iscppstringarray tolua_isstringarray
 #define tolua_pushfieldcppstring(L,lo,idx,s) tolua_pushfieldstring(L, lo, idx, s.c_str())
 
-// Add Urho3D::String Support in tolua++.
+// Urho3D: Add Urho3D::String Support in tolua++
 #define tolua_pushurho3dstring(x,y)	tolua_pushstring(x,y.CString())
 #define tolua_isurho3dstring	tolua_isstring
 
@@ -155,7 +156,7 @@ static inline const char* tolua_tofieldcppstring (lua_State* L, int lo, int inde
 	return s?s:"";
 };
 
-// Add Urho3D::String Support in tolua++.
+// Urho3D: Add Urho3D::String Support in tolua++
 static inline const char* tolua_tourho3dstring (lua_State* L, int narg, const char* def) {
 
 	const char* s = tolua_tostring(L, narg, def);
