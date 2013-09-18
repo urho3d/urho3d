@@ -2,7 +2,7 @@ $#include "AnimatedModel.h"
 
 class AnimatedModel : public StaticModel
 {
-    void SetModel(Model* model, bool createBones = true);
+    void SetModel(Model* model);
     AnimationState* AddAnimationState(Animation* animation);
     void RemoveAnimationState(Animation* animation);
     void RemoveAnimationState(const String animationName);
@@ -31,6 +31,7 @@ class AnimatedModel : public StaticModel
     float GetMorphWeight(StringHash nameHash) const;
     bool IsMaster() const;
     
+    tolua_property__get_set Model* model;    
     tolua_readonly tolua_property__get_set Skeleton& skeleton;
     tolua_readonly tolua_property__get_set unsigned numAnimationStates;
     tolua_property__get_set float animationLodBias;

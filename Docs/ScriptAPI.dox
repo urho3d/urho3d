@@ -141,6 +141,7 @@ namespace Urho3D
 - uint AM_NOEDIT
 - uint AM_NODEID
 - uint AM_COMPONENTID
+- uint AM_NODEIDVECTOR
 - uint FIRST_REPLICATED_ID
 - uint LAST_REPLICATED_ID
 - uint FIRST_LOCAL_ID

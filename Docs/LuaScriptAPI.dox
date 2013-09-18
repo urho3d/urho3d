@@ -1028,7 +1028,7 @@ Properties:<br>
 AnimatedModel : StaticModel
 
 Methods:<br>
-- void SetModel(Model* model, bool createBones = true)
+- void SetModel(Model* model)
 - AnimationState* AddAnimationState(Animation* animation)
 - void RemoveAnimationState(Animation* animation)
 - void RemoveAnimationState(const String animationName)
