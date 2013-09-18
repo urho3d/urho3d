@@ -17,6 +17,7 @@ class Frustum
 {
     Frustum();
     Frustum(const Frustum& frustum);
+    ~Frustum();
 
     void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY);
     void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform = Matrix3x4::IDENTITY);

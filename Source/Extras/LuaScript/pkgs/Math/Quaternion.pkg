@@ -10,6 +10,7 @@ class Quaternion
     Quaternion(const Vector3& start, const Vector3& end);
     Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
     Quaternion(const Matrix3& matrix);
+    ~Quaternion();
 
     bool operator == (const Quaternion& rhs) const;
     

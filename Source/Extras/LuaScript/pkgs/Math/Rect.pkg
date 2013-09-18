@@ -7,6 +7,7 @@ class Rect
     Rect(const Vector2& min, const Vector2& max);
     Rect(float left, float top, float right, float bottom);
     Rect(const Vector4& vector);
+    ~Rect();
 
     bool operator == (const Rect& rhs) const;
     
@@ -40,6 +41,7 @@ class IntRect
 {
     IntRect();
     IntRect(int left, int top, int right, int bottom);
+    ~IntRect();
 
     bool operator == (const IntRect& rhs) const;
     

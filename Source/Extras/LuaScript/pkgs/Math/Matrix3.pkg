@@ -7,6 +7,7 @@ class Matrix3
     Matrix3(float v00, float v01, float v02,
             float v10, float v11, float v12,
             float v20, float v21, float v22);
+    ~Matrix3();
     
     bool operator == (const Matrix3& rhs) const;
     

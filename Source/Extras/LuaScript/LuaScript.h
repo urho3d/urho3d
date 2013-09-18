@@ -30,6 +30,8 @@ struct lua_State;
 namespace Urho3D
 {
 
+extern const char* LOGIC_CATEGORY;
+
 class Scene;
 
 /// Lua script subsystem.
@@ -65,19 +67,22 @@ public:
     void ScriptUnsubscribeFromAllEvents();
 
     /// Script subscribe to a specific sender's event.
-    void ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName);
+    void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
 
     /// Script unsubscribe from a specific sender's event.
-    void ScriptUnsubscribeFromEvent(void* object, const String& eventName);
+    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
 
     /// Script unsubscribe from a specific sender's all events.
-    void ScriptUnsubscribeFromEvents(void* object);
+    void ScriptUnsubscribeFromEvents(void* sender);
 
     /// Return Lua state.
     lua_State* GetLuaState() const { return luaState_; }
 
-    /// Find Lua function.
-    bool FindFunction(const String& functionName);
+    /// Push script function.
+    bool PushScriptFunction(const String& functionName);
+
+    /// Return script function ref.
+    int GetScriptFunctionRef(const String& functionName);
 
 private:
     /// Register loader.
@@ -102,11 +107,14 @@ private:
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
 
 private:
-    /// Call Lua event handler.
-    void CallEventHandler(int functionRef, StringHash eventType, VariantMap& eventData);
+    /// Call script function.
+    void CallScriptFunction(int functionRef, StringHash eventType, VariantMap& eventData);
 
     /// Lua state.
     lua_State* luaState_;
+
+    /// Function name to function ref map.
+    HashMap<String, int> functionNameToFunctionRefMap_;
 
     /// Event type to function ref map.
     HashMap<StringHash, int> eventTypeToFunctionRefMap_;

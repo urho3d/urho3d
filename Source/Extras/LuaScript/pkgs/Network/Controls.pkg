@@ -2,6 +2,8 @@ $#include "Controls.h"
 
 class Controls
 {
+    Controls();
+    
     void Reset();
     void Set(unsigned buttons, bool down = true);
     bool IsDown(unsigned button) const;

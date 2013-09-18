@@ -6,6 +6,7 @@ class Vector4
     Vector4(const Vector4& vector);
     Vector4(const Vector3& vector, float w);
     Vector4(float x, float y, float z, float w);
+    ~Vector4();
 
     bool operator == (const Vector4& rhs) const;
     Vector4 operator + (const Vector4& rhs) const;

@@ -5,7 +5,7 @@ class Vector2
     Vector2();
     Vector2(const Vector2& vector);
     Vector2(float x, float y);
-    Vector2(const float* data);
+    ~Vector2();
     
     bool operator == (const Vector2& rhs) const;
     Vector2 operator + (const Vector2& rhs) const;
@@ -45,8 +45,8 @@ class IntVector2
 {
     IntVector2();
     IntVector2(int x, int y);
-    IntVector2(const int* data);
     IntVector2(const IntVector2& rhs);
+    ~IntVector2();
 
     bool operator == (const IntVector2& rhs) const;
     IntVector2 operator + (const IntVector2& rhs) const;

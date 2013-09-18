@@ -8,6 +8,7 @@ class Sphere
     Sphere(const BoundingBox& box);
     Sphere(const Frustum& frustum);
     Sphere(const Polyhedron& poly);
+    ~Sphere();
     
     bool operator == (const Sphere& rhs) const;
     

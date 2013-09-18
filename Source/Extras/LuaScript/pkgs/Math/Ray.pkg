@@ -5,6 +5,7 @@ class Ray
     Ray();
     Ray(const Vector3& origin, const Vector3& direction);
     Ray(const Ray& ray);
+    ~Ray();
 
     bool operator == (const Ray& rhs) const;
     

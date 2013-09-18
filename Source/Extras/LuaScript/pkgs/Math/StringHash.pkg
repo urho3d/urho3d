@@ -6,6 +6,7 @@ class StringHash
     StringHash(const StringHash& rhs);
     explicit StringHash(unsigned value);
     StringHash(const String str);
+    ~StringHash();
 
     StringHash operator + (const StringHash& rhs) const;
     bool operator == (const StringHash& rhs) const;
@@ -28,7 +29,8 @@ class ShortStringHash
     explicit ShortStringHash(const StringHash& rhs);
     explicit ShortStringHash(unsigned short value);
     ShortStringHash(const String str);
-
+    ~ShortStringHash();
+    
     ShortStringHash operator + (const ShortStringHash& rhs) const;
     bool operator == (const ShortStringHash& rhs) const;
     bool operator < (const ShortStringHash& rhs) const;

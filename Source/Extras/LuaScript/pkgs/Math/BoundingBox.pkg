@@ -10,6 +10,7 @@ class BoundingBox
     BoundingBox(const Frustum& frustum);
     BoundingBox(const Polyhedron& poly);
     BoundingBox(const Sphere& sphere);
+    ~BoundingBox();
     
     bool operator == (const BoundingBox& rhs) const;
     

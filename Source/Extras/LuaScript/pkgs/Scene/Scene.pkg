@@ -12,6 +12,10 @@ class Scene : public Node
     
     tolua_outside bool SceneLoadXML @ LoadXML(File* source);
     tolua_outside bool SceneSaveXML @ SaveXML(File* dest) const;
+    
+    tolua_outside bool SceneLoadXML @ LoadXML(const String fileName);
+    tolua_outside bool SceneSaveXML @ SaveXML(const String fileName) const;
+    
     bool LoadAsync(File* file);
     bool LoadAsyncXML(File* file);
     void StopAsyncLoading();
@@ -77,6 +81,22 @@ static bool SceneLoadXML(Scene* scene, File* file)
 static bool SceneSaveXML(const Scene* scene, File* file)
 {
     return file ? scene->SaveXML(*file) : false;
+}
+
+static bool SceneLoadXML(Scene* scene, const String& fileName)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    if (!file.IsOpen())
+        return false;
+    return scene->LoadXML(file);
+}
+
+static bool SceneSaveXML(const Scene* scene, const String& fileName)
+{
+    File file(scene->GetContext(), fileName, FILE_WRITE);
+    if (!file.IsOpen())
+        return false;
+    return scene->SaveXML(file);
 }
 $}
 

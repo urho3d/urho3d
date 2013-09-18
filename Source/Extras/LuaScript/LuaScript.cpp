@@ -104,6 +104,12 @@ LuaScript::LuaScript(Context* context) :
 
 LuaScript::~LuaScript()
 {
+    for (HashMap<String, int>::Iterator i = functionNameToFunctionRefMap_.Begin(); i != functionNameToFunctionRefMap_.End(); ++i)
+    {
+        if (i->second_ != LUA_REFNIL)
+            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
+    }
+
     if (luaState_)
         lua_close(luaState_);
 }
@@ -146,7 +152,7 @@ bool LuaScript::ExecuteFunction(const String& functionName)
 
     int top = lua_gettop(luaState_);
 
-    if (!FindFunction(functionName))
+    if (!PushScriptFunction(functionName))
     {
         lua_settop(luaState_, top);
         return false;
@@ -172,10 +178,7 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
 {
     StringHash eventType(eventName);
 
-    int functionRef = LUA_REFNIL;
-    if (FindFunction(functionName))
-        functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
-
+    int functionRef = GetScriptFunctionRef(functionName);
     if (functionRef != LUA_REFNIL)
     {
         SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
@@ -192,10 +195,6 @@ void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName)
     if (i != eventTypeToFunctionRefMap_.End())
     {
         UnsubscribeFromEvent(eventType);
-
-        if (i->second_ != LUA_REFNIL)
-            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
-
         eventTypeToFunctionRefMap_.Erase(i);
     }
 }
@@ -206,63 +205,45 @@ void LuaScript::ScriptUnsubscribeFromAllEvents()
         return;
 
     UnsubscribeFromAllEvents();
-
-    for (HashMap<StringHash, int>::Iterator i = eventTypeToFunctionRefMap_.Begin(); i != eventTypeToFunctionRefMap_.End(); ++i)
-        if (i->second_ != LUA_REFNIL)
-            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
-
     eventTypeToFunctionRefMap_.Clear();
 }
 
-void LuaScript::ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName)
+void LuaScript::ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName)
 {
     StringHash eventType(eventName);
-    Object* sender = (Object*)object;
+    Object* object = (Object*)sender;
 
-    int functionRef = LUA_REFNIL;
-    if (FindFunction(functionName))
-        functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
-
+    int functionRef = GetScriptFunctionRef(functionName);
     if (functionRef != LUA_REFNIL)
     {
-        SubscribeToEvent(sender, eventType, HANDLER(LuaScript, HandleObjectEvent));
-        objectToEventTypeToFunctionRefMap_[sender][eventType] = functionRef;
+        SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
+        objectToEventTypeToFunctionRefMap_[object][eventType] = functionRef;
     }
 }
 
-void LuaScript::ScriptUnsubscribeFromEvent(void* object, const String& eventName)
+void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName)
 {
     StringHash eventType(eventName);
-    Object* sender = (Object*)object;
+    Object* object = (Object*)sender;
 
-    HashMap<StringHash, int>::Iterator i = objectToEventTypeToFunctionRefMap_[sender].Find(eventType);
-    if (i != objectToEventTypeToFunctionRefMap_[sender].End())
+    HashMap<StringHash, int>::Iterator i = objectToEventTypeToFunctionRefMap_[object].Find(eventType);
+    if (i != objectToEventTypeToFunctionRefMap_[object].End())
     {
-        UnsubscribeFromEvent(sender, eventType);
+        UnsubscribeFromEvent(object, eventType);
 
-        if (i->second_ != LUA_REFNIL)
-            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
-
-        objectToEventTypeToFunctionRefMap_[sender].Erase(i);
+        objectToEventTypeToFunctionRefMap_[object].Erase(i);
     }
 }
 
-void LuaScript::ScriptUnsubscribeFromEvents(void* object)
+void LuaScript::ScriptUnsubscribeFromEvents(void* sender)
 {
-    Object* sender = (Object*)object;
+    Object* object = (Object*)sender;
 
-    HashMap<Object*, HashMap<StringHash, int> >::Iterator it = objectToEventTypeToFunctionRefMap_.Find(sender);
+    HashMap<Object*, HashMap<StringHash, int> >::Iterator it = objectToEventTypeToFunctionRefMap_.Find(object);
     if (it == objectToEventTypeToFunctionRefMap_.End())
         return;
 
-    UnsubscribeFromEvents(sender);
-
-    HashMap<StringHash, int>& eventTypeToFunctionRefMap = it->second_;
-    for (HashMap<StringHash, int>::Iterator i = eventTypeToFunctionRefMap.Begin(); i != eventTypeToFunctionRefMap.End(); ++i)
-    {
-        if (i->second_ != LUA_REFNIL)
-            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
-    }
+    UnsubscribeFromEvents(object);
 
     objectToEventTypeToFunctionRefMap_.Erase(it);
 }
@@ -337,7 +318,7 @@ int LuaScript::Print(lua_State *L)
     return 0;
 }
 
-bool LuaScript::FindFunction(const String& functionName)
+bool LuaScript::PushScriptFunction(const String& functionName)
 {
     Vector<String> splitedNames = functionName.Split('.');
 
@@ -376,13 +357,32 @@ bool LuaScript::FindFunction(const String& functionName)
     return true;
 }
 
+int LuaScript::GetScriptFunctionRef(const String& functionName)
+{
+    HashMap<String, int>::Iterator i = functionNameToFunctionRefMap_.Find(functionName);
+    if (i != functionNameToFunctionRefMap_.End())
+        return i->second_;
+
+    int top = lua_gettop(luaState_);
+    
+    int functionRef = LUA_REFNIL;
+    if (PushScriptFunction(functionName))
+        functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
+
+    lua_settop(luaState_, top);
+
+    functionNameToFunctionRefMap_[functionName] = functionRef;
+
+    return functionRef;
+}
+
 void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
     int functionRef = eventTypeToFunctionRefMap_[eventType];
     if (functionRef == LUA_REFNIL)
         return;
 
-    CallEventHandler(functionRef, eventType, eventData);
+    CallScriptFunction(functionRef, eventType, eventData);
 }
 
 void LuaScript::HandleObjectEvent(StringHash eventType, VariantMap& eventData)
@@ -392,7 +392,7 @@ void LuaScript::HandleObjectEvent(StringHash eventType, VariantMap& eventData)
     if (functionRef == LUA_REFNIL)
         return;
 
-    CallEventHandler(functionRef, eventType, eventData);
+    CallScriptFunction(functionRef, eventType, eventData);
 }
 
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
@@ -401,7 +401,7 @@ void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData
     ExecuteString(eventData[P_COMMAND].GetString());
 }
 
-void LuaScript::CallEventHandler(int functionRef, StringHash eventType, VariantMap& eventData )
+void LuaScript::CallScriptFunction(int functionRef, StringHash eventType, VariantMap& eventData )
 {
     int top = lua_gettop(luaState_);
     lua_rawgeti(luaState_, LUA_REGISTRYINDEX, functionRef);

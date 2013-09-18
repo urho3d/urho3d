@@ -31,7 +31,25 @@ namespace Urho3D
 
 class LuaScript;
 
-/// Lua instance.
+/// Lua Script object methods.
+enum LuaScriptObjectMethod
+{
+    LSOM_START = 0,
+    LSOM_STOP,
+    // LSOM_DELAYEDSTART,
+    LSOM_UPDATE,
+    LSOM_POSTUPDATE,
+    LSOM_FIXEDUPDATE,
+    LSOM_FIXEDPOSTUPDATE,
+    LSOM_LOAD,
+    LSOM_SAVE,
+    LSOM_READNETWORKUPDATE,
+    LSOM_WRITENETWORKUPDATE,
+    LSOM_APPLYATTRIBUTES,
+    MAX_LUA_SCRIPT_OBJECT_METHODS
+};
+
+/// Lua script instance.
 class URHO3D_API LuaScriptInstance : public Component
 {
     OBJECT(LuaScriptInstance);
@@ -44,11 +62,26 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    ///// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes();
+
     /// Create script object.
     bool CreateObject(const String& scriptObjectType);
 
     /// Create script object.
-    bool CreateObject(const String& fileName, const String& scriptObjectType);
+    bool CreateObject(const String& scriptFileName, const String& scriptObjectType);
+
+    /// Set script file name.
+    void SetScriptFileName(const String& scriptFileName);
+
+    /// Set script object type.
+    void SetScriptObjectType(const String& scriptObjectType);
+
+    /// Set script file serialization attribute by calling a script function.
+    void SetScriptDataAttr(PODVector<unsigned char> data);
+    
+    /// Set script network serialization attribute by calling a script function.
+    void SetScriptNetworkDataAttr(PODVector<unsigned char> data);
 
     /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
@@ -60,13 +93,16 @@ public:
     void ScriptUnsubscribeFromAllEvents();
 
     /// Script subscribe to a specific sender's event.
-    void ScriptSubscribeToEvent(void* object, const String& eventName, const String& functionName);
+    void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
 
     /// Script unsubscribe from a specific sender's event.
-    void ScriptUnsubscribeFromEvent(void* object, const String& eventName);
+    void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
 
     /// Script unsubscribe from a specific sender's all events.
-    void ScriptUnsubscribeFromEvents(void* object);
+    void ScriptUnsubscribeFromEvents(void* sender);
+
+    /// Return script file name.
+    const String& GetScriptFileName() const { return scriptFileName_; }
 
     /// Return script object type.
     const String& GetScriptObjectType() const { return scriptObjectType_; }
@@ -74,30 +110,69 @@ public:
     /// Return script object ref.
     int GetScriptObjectRef() const { return scriptObjectRef_; }
 
+    /// Get script file serialization attribute by calling a script function.
+    PODVector<unsigned char> GetScriptDataAttr() const;
+
+    /// Get script network serialization attribute by calling a script function.
+    PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+
 private:
+    /// Find script object method refs.
+    void FindScriptObjectMethodRefs();
+
+    /// Handle the logic update event.
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
+    /// Handle the logic post update event.
+    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
+
+    /// Handle the physics update event.
+    void HandleFixedUpdate(StringHash eventType, VariantMap& eventData);
+
+    /// Handle the physics post update event.
+    void HandlePostFixedUpdate(StringHash eventType, VariantMap& eventData);
+
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
 
     /// Handle object event.
     void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
 
-    /// Call event handler.
-    void CallEventHandler(int functionRef, StringHash eventType, VariantMap& eventData);
-
     /// Release the script object.
     void ReleaseObject();
     
+    /// Call script object function.
+    void CallScriptObjectFunction(int functionRef);
+
+    /// Call script object function.
+    void CallScriptObjectFunction(int functionRef, float timeStep);
+
+    /// Call script object function.
+    void CallScriptObjectFunction(int functionRef, Deserializer& deserializer);
+
+    /// Call script object function.
+    void CallScriptObjectFunction(int functionRef, Serializer& serializer) const;
+
+    /// Call script object function.
+    void CallScriptObjectFunction(int functionRef, StringHash eventType, VariantMap& eventData);
+
     // Lua Script.
     LuaScript* luaScript_;
 
     /// Lua state.
     lua_State* luaState_;
 
+    /// Script file name.
+    String scriptFileName_;
+
     /// Script object type.
     String scriptObjectType_;
 
     /// Script object ref.
     int scriptObjectRef_;
+
+    /// Script object method refs.
+    int scriptObjectMethodRefs_[MAX_LUA_SCRIPT_OBJECT_METHODS];
 
     /// Event type to function ref map.
     HashMap<StringHash, int> eventTypeToFunctionRefMap_;

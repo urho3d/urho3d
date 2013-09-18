@@ -3,15 +3,20 @@ $#include "LuaScriptInstance.h"
 class LuaScriptInstance : public Component
 {
     bool CreateObject(const String scriptObjectType);
-    bool CreateObject(const String fileName, const String scriptObjectType);
+    bool CreateObject(const String scriptFileName, const String scriptObjectType);
+    void SetScriptFileName(const String scriptFileName);
+    void SetScriptObjectType(const String scriptObjectType);
     void ScriptSubscribeToEvent @ SubscribeToEvent(const String eventName, const String functionName);
     void ScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(const String eventName);
     void ScriptUnsubscribeFromAllEvents @ UnsubscribeFromAllEvents();    
-    void ScriptSubscribeToEvent @ SubscribeToEvent(void* object, const String eventName, const String functionName);
-    void ScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(void* object, const String eventName);
-    void ScriptUnsubscribeFromEvents @ UnsubscribeFromEvents(void* object);
-    const String GetScriptObjectType() const;
-    int GetScriptObjectRef() const;
+    void ScriptSubscribeToEvent @ SubscribeToEvent(void* sender, const String eventName, const String functionName);
+    void ScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(void* sender, const String eventName);
+    void ScriptUnsubscribeFromEvents @ UnsubscribeFromEvents(void* sender);
+    const String& GetScriptFileName() const;
+    const String& GetScriptObjectType() const;
+    
+    tolua_property__get_set const String scriptFileName;
+    tolua_property__get_set const String scriptObjectType;
 };
 
 $[

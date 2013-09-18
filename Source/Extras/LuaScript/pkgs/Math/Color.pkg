@@ -7,6 +7,7 @@ class Color
     Color(const Color& color, float a);
     Color(float r, float g, float b);
     Color(float r, float g, float b, float a);
+    ~Color();
     
     bool operator == (const Color& rhs) const;
     Color operator * (float rhs) const;
