@@ -164,17 +164,13 @@ end
 Rotator = ScriptObject()
 
 function Rotator:Start()
-    --self.rotationSpeed = Vector3(0.0, 0.0, 0.0)
     self.rotationSpeed = {0.0, 0.0, 0.0}
-    self:SubscribeToEvent("Update", "Rotator.Update")
 end
 
 function Rotator:Stop()
 end
 
--- Update is called during the variable timestep scene update
-function Rotator.Update(self, eventType, eventData)
-    local timeStep = eventData:GetFloat("TimeStep")
+function Rotator:Update(timeStep)
     local x = self.rotationSpeed[1] * timeStep
     local y = self.rotationSpeed[2] * timeStep
     local z = self.rotationSpeed[3] * timeStep

@@ -26,7 +26,7 @@ function CreateText()
     local helloText = Text:new(context)
 
     -- Set String to display
-    helloText:SetText("Hello World from Urho3D!");
+    helloText.text = "Hello World from Urho3D!"
 
     -- Set font and text color
     local cache = GetCache()

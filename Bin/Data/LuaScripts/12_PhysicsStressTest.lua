@@ -210,17 +210,10 @@ function MoveCamera(timeStep)
     -- Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
     -- directory
     if input:GetKeyPress(KEY_F5) then
-        print("Filepath " .. fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
-        local saveFile = File(context, fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml", FILE_WRITE)
-        scene_:SaveXML(saveFile)
-        -- Make sure the file gets closed
-        saveFile:Close()
+        scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
     end
     if input:GetKeyPress(KEY_F7) then
-        local loadFile = File(context, fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml", FILE_READ)
-        scene_:LoadXML(loadFile)
-        -- Make sure the file gets closed
-        loadFile:Close()
+        scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
     end
 
     -- Toggle debug geometry with space

@@ -349,17 +349,12 @@ function HandleKeyDown(eventType, eventData)
         
         
         if key == KEY_F5  then
-            local xmlFile = File(context, fileSystem:GetProgramDir() + "Data/Scenes/LuaTestScene.xml", FILE_WRITE)
-            testScene:SaveXML(xmlFile)
+            testScene:SaveXML(fileSystem:GetProgramDir() + "Data/Scenes/LuaTestScene.xml")
         end
         
         if key == KEY_F7 then
-            local xmlFile = File(context, fileSystem:GetProgramDir() + "Data/Scenes/LuaTestScene.xml", FILE_READ)
-            if xmlFile:IsOpen() then
-                testScene:LoadXML(xmlFile)
-            end
+            testScene:LoadXML(fileSystem:GetProgramDir() + "Data/Scenes/LuaTestScene.xml")
         end
-        --]]
     end    
 end
 

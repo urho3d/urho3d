@@ -205,8 +205,6 @@ function Mover:Start()
     self.moveSpeed = 0.0
     self.rotationSpeed = 0.0
     self.bounds = BoundingBox()
-    
-    self:SubscribeToEvent("Update", "Mover:Update")
 end
 
 function Mover:SetParameters(moveSpeed, rotationSpeed, bounds)
@@ -215,9 +213,7 @@ function Mover:SetParameters(moveSpeed, rotationSpeed, bounds)
     self.bounds = bounds
 end
 
-function Mover:Update(eventType, eventData)
-    local timeStep = eventData:GetFloat("TimeStep")
-    
+function Mover:Update(timeStep)
     local node = self:GetNode()
     node:TranslateRelative(Vector3(0.0, 0.0, 1.0) * self.moveSpeed * timeStep)
     
