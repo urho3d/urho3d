@@ -35,8 +35,7 @@ namespace Urho3D
 extern const char* GEOMETRY_CATEGORY;
 
 StaticModelGroup::StaticModelGroup(Context* context) :
-    StaticModel(context),
-    transformsDirty_(true)
+    StaticModel(context)
 {
 }
 
@@ -114,43 +113,30 @@ Node* StaticModelGroup::GetInstanceNode(unsigned index) const
     return index < instanceNodes_.Size() ? instanceNodes_[index] : (Node*)0;
 }
 
-void StaticModelGroup::OnMarkedDirty(Node* node)
-{
-    Drawable::OnMarkedDirty(node);
-    transformsDirty_ = true;
-}
-
 void StaticModelGroup::OnNodeSetEnabled(Node* node)
 {
     Drawable::OnMarkedDirty(node);
-    transformsDirty_ = true;
 }
 
 void StaticModelGroup::OnWorldBoundingBoxUpdate()
 {
-    if (transformsDirty_)
-        UpdateTransforms();
-    
+    // Update transforms and bounding box at the same time to have to go through the objects only once
     worldBoundingBox_.defined_ = false;
-    for (unsigned i = 0; i < worldTransforms_.Size(); ++i)
-        worldBoundingBox_.Merge(boundingBox_.Transformed(worldTransforms_[i]));
-}
-
-void StaticModelGroup::UpdateTransforms()
-{
     worldTransforms_.Resize(instanceNodes_.Size());
     unsigned index = 0;
 
     for (unsigned i = 0; i < instanceNodes_.Size(); ++i)
     {
-        Node* instanceNode = instanceNodes_[i];
-        if (!instanceNode || !instanceNode->IsEnabled())
+        Node* node = instanceNodes_[i];
+        if (!node || !node->IsEnabled())
             continue;
-        worldTransforms_[index++] = instanceNode->GetWorldTransform();
+        
+        const Matrix3x4& worldTransform = node->GetWorldTransform();
+        worldTransforms_[index++] = worldTransform;
+        worldBoundingBox_.Merge(boundingBox_.Transformed(worldTransform));
     }
     
     worldTransforms_.Resize(index);
-    transformsDirty_ = false;
 }
 
 }

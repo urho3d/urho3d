@@ -97,13 +97,14 @@ void HugeObjectCount::CreateScene()
     
     // Create a directional light
     Node* lightNode = scene_->CreateChild("DirectionalLight");
-    lightNode->SetDirection(Vector3(0.5f, -1.0f, 0.5f)); // The direction vector does not need to be normalized
+    lightNode->SetDirection(Vector3(-0.6f, -1.0f, -0.8f)); // The direction vector does not need to be normalized
     Light* light = lightNode->CreateComponent<Light>();
     light->SetLightType(LIGHT_DIRECTIONAL);
-    light->SetColor(Color(0.7f, 0.35f, 0.0f));
 
     if (!useGroups_)
     {
+        light->SetColor(Color(0.7f, 0.35f, 0.0f));
+        
         // Create individual box StaticModels in the scene
         for (int y = -125; y < 125; ++y)
         {
@@ -120,6 +121,8 @@ void HugeObjectCount::CreateScene()
     }
     else
     {
+        light->SetColor(Color::WHITE);
+        
         // Create StaticModelGroups in the scene
         StaticModelGroup* lastGroup = 0;
 

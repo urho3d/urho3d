@@ -60,23 +60,16 @@ public:
     Node* GetInstanceNode(unsigned index) const;
     
 protected:
-   /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
     /// Handle scene node enabled status changing.
     virtual void OnNodeSetEnabled(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Gather the instances' transforms.
-    void UpdateTransforms();
-    
     /// Instance nodes.
     Vector<WeakPtr<Node> > instanceNodes_;
     /// World transforms of enabled instances.
     PODVector<Matrix3x4> worldTransforms_;
-    /// Instance transforms dirty flag.
-    bool transformsDirty_;
 };
 
 }
