@@ -311,6 +311,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     
     // Center the decal frustum on the world position
     Vector3 adjustedWorldPosition = worldPosition - 0.5f * depth * (worldRotation * Vector3::FORWARD);
+    /// \todo target transform is not right if adding a decal to StaticModelGroup
     Matrix3x4 targetTransform = target->GetNode()->GetWorldTransform().Inverse();
     
     // For an animated model, adjust the decal position back to the bind pose

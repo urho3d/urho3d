@@ -485,7 +485,7 @@ void Serializable::ResetToDefault()
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (attr.mode_ & AM_NOEDIT || attr.mode_ & AM_NODEID || attr.mode_ & AM_COMPONENTID)
+        if (attr.mode_ & (AM_NOEDIT | AM_NODEID | AM_COMPONENTID | AM_NODEIDVECTOR))
             continue;
 
         Variant defaultValue = GetInstanceDefault(attr.name_);

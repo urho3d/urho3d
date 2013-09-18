@@ -82,7 +82,7 @@ void SceneResolver::Resolve()
             if (info.mode_ & AM_NODEID)
             {
                 hasIDAttributes = true;
-                unsigned oldNodeID = component->GetAttribute(j).GetInt();
+                unsigned oldNodeID = component->GetAttribute(j).GetUInt();
                 
                 if (oldNodeID)
                 {
@@ -97,10 +97,10 @@ void SceneResolver::Resolve()
                         LOGWARNING("Could not resolve node ID " + String(oldNodeID));
                 }
             }
-            if (info.mode_ & AM_COMPONENTID)
+            else if (info.mode_ & AM_COMPONENTID)
             {
                 hasIDAttributes = true;
-                unsigned oldComponentID = component->GetAttribute(j).GetInt();
+                unsigned oldComponentID = component->GetAttribute(j).GetUInt();
 
                 if (oldComponentID)
                 {
@@ -113,6 +113,36 @@ void SceneResolver::Resolve()
                     }
                     else
                         LOGWARNING("Could not resolve component ID " + String(oldComponentID));
+                }
+            }
+            else if (info.mode_ & AM_NODEIDVECTOR)
+            {
+                hasIDAttributes = true;
+                const VariantVector& oldNodeIDs = component->GetAttribute(j).GetVariantVector();
+                
+                if (oldNodeIDs.Size())
+                {
+                    // The first index stores the number of IDs redundantly. This is for editing
+                    unsigned numIDs = oldNodeIDs[0].GetUInt();
+                    VariantVector newIDs;
+                    newIDs.Push(numIDs);
+                    
+                    for (unsigned k = 1; k < oldNodeIDs.Size(); ++k)
+                    {
+                        unsigned oldNodeID = oldNodeIDs[k].GetUInt();
+                        HashMap<unsigned, WeakPtr<Node> >::ConstIterator l = nodes_.Find(oldNodeID);
+                    
+                        if (l != nodes_.End() && l->second_)
+                            newIDs.Push(l->second_->GetID());
+                        else
+                        {
+                            // If node was not found, retain number of elements, just store ID 0
+                            newIDs.Push(0);
+                            LOGWARNING("Could not resolve node ID " + String(oldNodeID));
+                        }
+                    }
+                    
+                    component->SetAttribute(j, newIDs);
                 }
             }
         }

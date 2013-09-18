@@ -40,24 +40,33 @@ public:
     /// Register object factory. StaticModel must be registered first.
     static void RegisterObject(Context* context);
     
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    void ApplyAttributes();
     /// Process octree raycast. May be called from a worker thread.
-    //virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
     /// Return number of occlusion geometry triangles.
-    //virtual unsigned GetNumOccluderTriangles();
+    virtual unsigned GetNumOccluderTriangles();
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
-    //virtual bool DrawOcclusion(OcclusionBuffer* buffer);
+    virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     
     /// Add an instance scene node. It does not need any drawable components of its own.
     void AddInstanceNode(Node* node);
     /// Remove an instance scene node.
     void RemoveInstanceNode(Node* node);
+    /// Remove all instance scene nodes.
+    void RemoveAllInstanceNodes();
     
     /// Return number of instance nodes.
     unsigned GetNumInstanceNodes() const { return instanceNodes_.Size(); }
     /// Return instance node by index.
     Node* GetInstanceNode(unsigned index) const;
+    
+    /// Set node IDs attribute.
+    void SetNodeIDsAttr(const VariantVector& value);
+    /// Return node IDs attribute.
+    const VariantVector& GetNodeIDsAttr() const { return nodeIDsAttr_; }
     
 protected:
     /// Handle scene node enabled status changing.
@@ -66,10 +75,17 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
+    /// Update node IDs attribute.
+    void UpdateNodeIDs();
+    
     /// Instance nodes.
     Vector<WeakPtr<Node> > instanceNodes_;
     /// World transforms of enabled instances.
     PODVector<Matrix3x4> worldTransforms_;
+    /// IDs of instance nodes for serialization.
+    mutable VariantVector nodeIDsAttr_;
+    /// Whether node IDs have been set and nodes should be searched for during ApplyAttributes.
+    bool nodeIDsDirty_;
 };
 
 }

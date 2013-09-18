@@ -1197,6 +1197,12 @@ void InitVectorStructs()
         "   Time"
     };
     vectorStructs.Push(VectorStruct("ParticleEmitter", "UV Animation", particleUVAnimVariables, 1));
+
+    Array<String> staticModelGroupInstanceVariables = {
+        "Instance Count",
+        "   NodeID"
+    };
+    vectorStructs.Push(VectorStruct("StaticModelGroup", "Instance Nodes", staticModelGroupInstanceVariables, 1));
 }
 
 VectorStruct@ GetVectorStruct(Array<Serializable@>@ serializables, uint index)

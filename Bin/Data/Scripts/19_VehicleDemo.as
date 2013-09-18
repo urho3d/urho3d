@@ -2,6 +2,7 @@
 // This sample demonstrates:
 //     - Creating a heightmap terrain with collision;
 //     - Constructing a physical vehicle with rigid bodies for the hull and the wheels, joined with constraints;
+//     - Saving and loading the variables of a script object, including node & component references;
 
 #include "Scripts/Utilities/Sample.as"
 
