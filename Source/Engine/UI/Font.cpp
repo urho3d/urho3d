@@ -31,6 +31,7 @@
 #include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "StringUtils.h"
 #include "Texture2D.h"
 #include "XMLFile.h"
 
@@ -380,7 +381,7 @@ const FontFace* Font::GetFaceTTF(int pointSize)
         charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
     }
     
-    LOGDEBUG("Font face has " + String(numGlyphs) + " glyphs");
+    LOGDEBUG(ToString("Font face %s (%dpt) has %d glyphs", GetFileName(GetName()).CString(), pointSize, numGlyphs));
     
     // Load each of the glyphs to see the sizes & store other information
     int maxHeight = 0;
@@ -679,6 +680,8 @@ const FontFace* Font::GetFaceBitmap(int pointSize)
         }
     }
     
+    LOGDEBUG(ToString("Bitmap font face %s has %d glyphs", GetFileName(GetName()).CString(), count));
+
     SetMemoryUse(GetMemoryUse() + totalTextureSize);
     faces_[pointSize] = newFace;
     return newFace;
