@@ -33,7 +33,7 @@
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "StaticModel.h"
+#include "StaticModelGroup.h"
 #include "Text.h"
 #include "UI.h"
 #include "Zone.h"
@@ -48,7 +48,8 @@ HugeObjectCount::HugeObjectCount(Context* context) :
     Sample(context),
     yaw_(0.0f),
     pitch_(0.0f),
-    animate_(false)
+    animate_(false),
+    useGroups_(false)
 {
 }
 
@@ -65,7 +66,7 @@ void HugeObjectCount::Start()
     
     // Setup the viewport for displaying the scene
     SetupViewport();
-
+    
     // Hook up to the frame update events
     SubscribeToEvents();
 }
@@ -74,7 +75,13 @@ void HugeObjectCount::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    scene_ = new Scene(context_);
+    if (!scene_)
+        scene_ = new Scene(context_);
+    else
+    {
+        scene_->Clear();
+        boxNodes_.Clear();
+    }
     
     // Create the Octree component to the scene so that drawable objects can be rendered. Use default volume
     // (-1000, -1000, -1000) to (1000, 1000, 1000)
@@ -95,25 +102,58 @@ void HugeObjectCount::CreateScene()
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetColor(Color(0.7f, 0.35f, 0.0f));
 
-    // Create box StaticModels in the scene
-    for (int y = -125; y < 125; ++y)
+    if (!useGroups_)
     {
-        for (int x = -125; x < 125; ++x)
+        // Create individual box StaticModels in the scene
+        for (int y = -125; y < 125; ++y)
         {
-            Node* boxNode = scene_->CreateChild("Box");
-            boxNode->SetPosition(Vector3(x * 0.3f, 0.0f, y * 0.3f));
-            boxNode->SetScale(0.25f);
-            StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
-            boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
-            boxNodes_.Push(SharedPtr<Node>(boxNode));
+            for (int x = -125; x < 125; ++x)
+            {
+                Node* boxNode = scene_->CreateChild("Box");
+                boxNode->SetPosition(Vector3(x * 0.3f, 0.0f, y * 0.3f));
+                boxNode->SetScale(0.25f);
+                StaticModel* boxObject = boxNode->CreateComponent<StaticModel>();
+                boxObject->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+                boxNodes_.Push(SharedPtr<Node>(boxNode));
+            }
         }
     }
-    
-    // Create the camera
-    cameraNode_ = scene_->CreateChild("Camera");
-    cameraNode_->SetPosition(Vector3(0.0f, 10.0f, -100.0f));
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
-    camera->SetFarClip(300.0f);
+    else
+    {
+        // Create StaticModelGroups in the scene
+        StaticModelGroup* lastGroup = 0;
+
+        for (int y = -125; y < 125; ++y)
+        {
+            for (int x = -125; x < 125; ++x)
+            {
+                // Create new group if no group yet, or the group has already "enough" objects. The tradeoff is between culling
+                // accuracy and the amount of CPU processing needed for all the objects. Note that the group's own transform
+                // does not matter, and it does not render anything if instance nodes are not added to it
+                if (!lastGroup || lastGroup->GetNumInstanceNodes() >= 25* 25)
+                {
+                    Node* boxGroupNode = scene_->CreateChild("BoxGroup");
+                    lastGroup = boxGroupNode->CreateComponent<StaticModelGroup>();
+                    lastGroup->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+                }
+                
+                Node* boxNode = scene_->CreateChild("Box");
+                boxNode->SetPosition(Vector3(x * 0.3f, 0.0f, y * 0.3f));
+                boxNode->SetScale(0.25f);
+                boxNodes_.Push(SharedPtr<Node>(boxNode));
+                lastGroup->AddInstanceNode(boxNode);
+            }
+        }
+    }
+
+    // Create the camera. Create it outside the scene so that we can clear the whole scene without affecting it
+    if (!cameraNode_)
+    {
+        cameraNode_ = new Node(context_);
+        cameraNode_->SetPosition(Vector3(0.0f, 10.0f, -100.0f));
+        Camera* camera = cameraNode_->CreateComponent<Camera>();
+        camera->SetFarClip(300.0f);
+    }
 }
 
 void HugeObjectCount::CreateInstructions()
@@ -125,7 +165,8 @@ void HugeObjectCount::CreateInstructions()
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText(
         "Use WASD keys and mouse to move\n"
-        "Space to toggle animation"
+        "Space to toggle animation\n"
+        "G to toggle object group optimization\n"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
@@ -208,6 +249,13 @@ void HugeObjectCount::HandleUpdate(StringHash eventType, VariantMap& eventData)
     Input* input = GetSubsystem<Input>();
     if (input->GetKeyPress(KEY_SPACE))
         animate_ = !animate_;
+
+    // Toggle grouped / ungrouped mode
+    if (input->GetKeyPress('G'))
+    {
+        useGroups_ = !useGroups_;
+        CreateScene();
+    }
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);

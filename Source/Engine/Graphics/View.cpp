@@ -878,7 +878,7 @@ void View::GetBatches()
                             const SourceBatch& srcBatch = batches[l];
                             
                             Technique* tech = GetTechnique(drawable, srcBatch.material_);
-                            if (!srcBatch.geometry_ || !tech)
+                            if (!srcBatch.geometry_ || !srcBatch.numWorldTransforms_ || !tech)
                                 continue;
                             
                             Pass* pass = tech->GetPass(PASS_SHADOW);
@@ -987,7 +987,7 @@ void View::GetBatches()
                     CheckMaterialForAuxView(srcBatch.material_);
                 
                 Technique* tech = GetTechnique(drawable, srcBatch.material_);
-                if (!srcBatch.geometry_ || !tech)
+                if (!srcBatch.geometry_ || !srcBatch.numWorldTransforms_ || !tech)
                     continue;
                 
                 Batch destBatch(srcBatch);
@@ -1164,7 +1164,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
         const SourceBatch& srcBatch = batches[i];
         
         Technique* tech = GetTechnique(drawable, srcBatch.material_);
-        if (!srcBatch.geometry_ || !tech)
+        if (!srcBatch.geometry_ || !srcBatch.numWorldTransforms_ || !tech)
             continue;
         
         // Do not create pixel lit forward passes for materials that render into the G-buffer

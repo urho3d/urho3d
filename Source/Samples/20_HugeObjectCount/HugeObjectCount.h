@@ -77,4 +77,6 @@ private:
     float pitch_;
     /// Animation flag.
     bool animate_;
+    /// Group optimization flag.
+    bool useGroups_;
 };

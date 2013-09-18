@@ -46,6 +46,7 @@
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
 #include "Skybox.h"
+#include "StaticModelGroup.h"
 #include "StringUtils.h"
 #include "Technique.h"
 #include "Terrain.h"
@@ -2706,6 +2707,7 @@ void RegisterGraphicsLibrary(Context* context)
     Drawable::RegisterObject(context);
     Light::RegisterObject(context);
     StaticModel::RegisterObject(context);
+    StaticModelGroup::RegisterObject(context);
     Skybox::RegisterObject(context);
     AnimatedModel::RegisterObject(context);
     AnimationController::RegisterObject(context);
