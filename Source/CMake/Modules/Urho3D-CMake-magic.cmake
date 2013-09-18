@@ -96,6 +96,7 @@ endif ()
 # For Raspbery Pi, find Broadcom VideoCore IV firmware
 if (RASPI)
     find_package (BCM_VC REQUIRED)
+    include_directories (${BCM_VC_INCLUDE_DIR})    
 endif ()
 
 # Platform and compiler specific options

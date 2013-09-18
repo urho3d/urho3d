@@ -28,10 +28,6 @@ file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
-if (RASPI)
-    include_directories (${BCM_VC_INCLUDE_DIR})
-endif ()
-
 # Define dependency libs
 set (LIBS ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene)
 set (LINK_LIBS_ONLY SDL)

@@ -43,7 +43,6 @@ elseif (ANDROID)
 else ()
     # On Linux, make sure development libraries exist, and use their include file directories  
     if (RASPI)
-        include_directories (${BCM_VC_INCLUDE_DIR} ${BCM_VC_INCLUDE_DIR}/interface/vcos/pthreads)
         file (GLOB VIDEO_DRIVER_C_FILES src/video/raspi/*.c)
     else ()
         find_package (OpenGL REQUIRED)
