@@ -98,6 +98,8 @@ protected:
     virtual void OnNodeSet(Node* node) {};
     /// Handle scene node transform dirtied.
     virtual void OnMarkedDirty(Node* node) {};
+    /// Handle scene node enabled status changing.
+    virtual void OnNodeSetEnabled(Node* node) {};
     /// Set ID. Called by Scene.
     void SetID(unsigned id);
     /// Set scene node. Called by Node when creating the component.

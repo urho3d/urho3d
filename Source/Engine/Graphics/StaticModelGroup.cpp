@@ -25,7 +25,6 @@
 #include "Camera.h"
 #include "Context.h"
 #include "Scene.h"
-#include "SceneEvents.h"
 #include "StaticModelGroup.h"
 
 #include "DebugNew.h"
@@ -95,7 +94,7 @@ void StaticModelGroup::AddInstanceNode(Node* node)
     if (instanceNodes_.Contains(instanceWeak))
         return;
     
-    // Add as a transform listener, so that we know to dirty the instance transforms
+    // Add as a listener for the instance node, so that we know to dirty the transforms when the node moves or is enabled/disabled
     node->AddListener(this);
     instanceNodes_.Push(instanceWeak);
 }
@@ -115,20 +114,13 @@ Node* StaticModelGroup::GetInstanceNode(unsigned index) const
     return index < instanceNodes_.Size() ? instanceNodes_[index] : (Node*)0;
 }
 
-void StaticModelGroup::OnNodeSet(Node* node)
+void StaticModelGroup::OnMarkedDirty(Node* node)
 {
-    Drawable::OnNodeSet(node);
-
-    if (node)
-    {
-        Scene* scene = GetScene();
-        /// \todo It is non-optimal to listen to enabled/disabled change events from the whole scene. The nodes themselves should send an event
-        if (scene)
-            SubscribeToEvent(scene, E_NODEENABLEDCHANGED, HANDLER(StaticModelGroup, HandleNodeEnabledChanged));
-    }
+    Drawable::OnMarkedDirty(node);
+    transformsDirty_ = true;
 }
 
-void StaticModelGroup::OnMarkedDirty(Node* node)
+void StaticModelGroup::OnNodeSetEnabled(Node* node)
 {
     Drawable::OnMarkedDirty(node);
     transformsDirty_ = true;
@@ -146,26 +138,19 @@ void StaticModelGroup::OnWorldBoundingBoxUpdate()
 
 void StaticModelGroup::UpdateTransforms()
 {
-    worldTransforms_.Clear();
+    worldTransforms_.Resize(instanceNodes_.Size());
+    unsigned index = 0;
 
     for (unsigned i = 0; i < instanceNodes_.Size(); ++i)
     {
         Node* instanceNode = instanceNodes_[i];
         if (!instanceNode || !instanceNode->IsEnabled())
             continue;
-        worldTransforms_.Push(instanceNode->GetWorldTransform());
+        worldTransforms_[index++] = instanceNode->GetWorldTransform();
     }
     
+    worldTransforms_.Resize(index);
     transformsDirty_ = false;
-}
-
-void StaticModelGroup::HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
-{
-    using namespace NodeEnabledChanged;
-
-    WeakPtr<Node> instanceWeak((Node*)eventData[P_NODE].GetPtr());
-    if (instanceNodes_.Contains(instanceWeak))
-        OnMarkedDirty(instanceWeak);
 }
 
 }

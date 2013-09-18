@@ -48,7 +48,7 @@ void ClearSceneSelection()
 void CreateScene()
 {
     // Create a scene only once here
-    editorScene = Scene("");
+    editorScene = Scene();
 
     // Allow access to the scene from the console
     script.defaultScene = editorScene;

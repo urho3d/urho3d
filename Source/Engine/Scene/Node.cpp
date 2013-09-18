@@ -230,21 +230,24 @@ bool Node::SaveXML(Serializer& dest) const
 
 void Node::SetName(const String& name)
 {
-    name_ = name;
-    nameHash_ = name_;
-
-    MarkNetworkUpdate();
-
-    // Send change event
-    if (scene_)
+    if (name != name_)
     {
-        using namespace NodeNameChanged;
+        name_ = name;
+        nameHash_ = name_;
 
-        VariantMap eventData;
-        eventData[P_SCENE] = (void*)scene_;
-        eventData[P_NODE] = (void*)this;
+        MarkNetworkUpdate();
 
-        scene_->SendEvent(E_NODENAMECHANGED, eventData);
+        // Send change event
+        if (scene_)
+        {
+            using namespace NodeNameChanged;
+
+            VariantMap eventData;
+            eventData[P_SCENE] = (void*)scene_;
+            eventData[P_NODE] = (void*)this;
+
+            scene_->SendEvent(E_NODENAMECHANGED, eventData);
+        }
     }
 }
 
@@ -436,6 +439,19 @@ void Node::SetEnabled(bool enable, bool recursive)
         enabled_ = enable;
 
         MarkNetworkUpdate();
+
+        // Notify listener components of the state change
+        for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End();)
+        {
+            if (*i)
+            {
+                (*i)->OnNodeSetEnabled(this);
+                ++i;
+            }
+            // If listener has expired, erase from list
+            else
+                i = listeners_.Erase(i);
+        }
 
         // Send change event
         if (scene_)

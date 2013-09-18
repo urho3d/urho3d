@@ -575,7 +575,7 @@ private:
     SharedPtr<XMLFile> defaultStyle_;
     /// Traversal mode.
     TraversalMode traversalMode_;
-    /// Element creation/deletion event sender flag.
+    /// Flag whether node should send child added / removed events by itself.
     bool elementEventSender_;
     /// XPath query for selecting UI-style.
     static XPathQuery styleXPathQuery_;

@@ -60,18 +60,16 @@ public:
     Node* GetInstanceNode(unsigned index) const;
     
 protected:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
    /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /// Handle scene node enabled status changing.
+    virtual void OnNodeSetEnabled(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
     /// Gather the instances' transforms.
     void UpdateTransforms();
-    /// Handle an instance node being enabled/disabled.
-    void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData);
     
     /// Instance nodes.
     Vector<WeakPtr<Node> > instanceNodes_;
