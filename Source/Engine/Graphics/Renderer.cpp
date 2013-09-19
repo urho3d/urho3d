@@ -1161,14 +1161,14 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
             batch.pixelShader_ = pixelShaders[psi];
             
             // If shadow or specular variations do not exist, try without them
-            if ((!batch.vertexShader_ || !batch.pixelShader_) && (vsi >= LVS_SHADOW))
+            if ((!batch.vertexShader_ || !batch.pixelShader_) && ((vsi % MAX_LIGHT_VS_VARIATIONS) >= LVS_SHADOW))
             {
                 vsi -= LVS_SHADOW;
                 psi -= LPS_SHADOW;
                 batch.vertexShader_ = vertexShaders[vsi];
                 batch.pixelShader_ = pixelShaders[psi];
             }
-            if ((!batch.vertexShader_ || !batch.pixelShader_) && (vsi >= LVS_SPEC))
+            if ((!batch.vertexShader_ || !batch.pixelShader_) && ((vsi % MAX_LIGHT_VS_VARIATIONS) >= LVS_SPEC))
             {
                 vsi -= LVS_SPEC;
                 psi -= LPS_SPEC;

@@ -22,5 +22,6 @@
         <option name="Shadow" define="SHADOW" require="PERPIXEL" />
         <variation name="" />
         <variation name="Instanced" define="INSTANCED" />
+        <variation name="Billboard" define="BILLBOARD" />
     </shader>
 </shaders>
