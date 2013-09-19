@@ -915,6 +915,7 @@ void View::GetBatches()
                 {
                     Batch volumeBatch;
                     volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
+                    volumeBatch.geometryType_ = GEOM_STATIC;
                     volumeBatch.worldTransform_ = &light->GetVolumeTransform(camera_);
                     volumeBatch.numWorldTransforms_ = 1;
                     volumeBatch.overrideView_ = light->GetLightType() == LIGHT_DIRECTIONAL;
