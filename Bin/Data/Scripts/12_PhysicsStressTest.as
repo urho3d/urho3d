@@ -228,7 +228,7 @@ void SpawnObject()
     boxNode.SetScale(0.25f);
     StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
     boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
-    boxObject.material = cache.GetResource("Material", "Materials/StoneEnvMapSmall.xml");
+    boxObject.material = cache.GetResource("Material", "Materials/StoneSmall.xml");
     boxObject.castShadows = true;
 
     // Create physics components, use a smaller mass also
