@@ -310,13 +310,12 @@ const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
 
 void BillboardSet::OnWorldBoundingBoxUpdate()
 {
-    worldBoundingBox_.defined_ = false;
-    
     unsigned enabledBillboards = 0;
     const Matrix3x4& worldTransform = node_->GetWorldTransform();
     Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
     Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
-    
+    BoundingBox worldBox;
+
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
         if (!billboards_[i].enabled_)
@@ -325,14 +324,16 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
         float size = INV_SQRT_TWO * (billboards_[i].size_.x_ * billboardScale.x_ + billboards_[i].size_.y_ * billboardScale.y_);
         Vector3 center = billboardTransform * billboards_[i].position_;
         Vector3 edge = Vector3::ONE * size;
-        worldBoundingBox_.Merge(BoundingBox(center - edge, center + edge));
+        worldBox.Merge(BoundingBox(center - edge, center + edge));
         
         ++enabledBillboards;
     }
     
     // If no billboards enabled, the bounding box is just the node's world position
     if (!enabledBillboards)
-        worldBoundingBox_.Merge(node_->GetWorldPosition());
+        worldBox.Merge(node_->GetWorldPosition());
+
+    worldBoundingBox_ = worldBox;
 }
 
 void BillboardSet::UpdateBufferSize()

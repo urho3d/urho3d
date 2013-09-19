@@ -661,7 +661,7 @@ void DecalSet::OnWorldBoundingBoxUpdate()
     else
     {
         // When using skinning, update world bounding box based on the bones
-        worldBoundingBox_.defined_ = false;
+        BoundingBox worldBox;
         
         for (Vector<Bone>::ConstIterator i = bones_.Begin(); i != bones_.End(); ++i)
         {
@@ -672,10 +672,12 @@ void DecalSet::OnWorldBoundingBoxUpdate()
             // Use hitbox if available. If not, use only half of the sphere radius
             /// \todo The sphere radius should be multiplied with bone scale
             if (i->collisionMask_ & BONECOLLISION_BOX)
-                worldBoundingBox_.Merge(i->boundingBox_.Transformed(boneNode->GetWorldTransform()));
+                worldBox.Merge(i->boundingBox_.Transformed(boneNode->GetWorldTransform()));
             else if (i->collisionMask_ & BONECOLLISION_SPHERE)
-                worldBoundingBox_.Merge(Sphere(boneNode->GetWorldPosition(), i->radius_ * 0.5f));
+                worldBox.Merge(Sphere(boneNode->GetWorldPosition(), i->radius_ * 0.5f));
         }
+
+        worldBoundingBox_ = worldBox;
     }
 }
 
