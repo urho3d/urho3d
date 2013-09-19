@@ -33,10 +33,6 @@
 
 #ifdef ENABLE_LUA
 #include "LuaScript.h"
-extern "C"
-{
-#include <lauxlib.h>
-}
 #endif
 
 #include "DebugNew.h"
@@ -193,7 +189,7 @@ void Urho::Stop()
     else
     {
         LuaScript* luaScript = GetSubsystem<LuaScript>();
-        if (luaScript && luaScript->GetScriptFunctionRef("Stop", true) != LUA_REFNIL)
+        if (luaScript && luaScript->GetScriptFunctionRef("Stop", true) != -1) // -1 equals NIL reference
             luaScript->ExecuteFunction("Stop");
     }
 #endif

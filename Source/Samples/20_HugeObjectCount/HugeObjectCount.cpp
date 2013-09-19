@@ -121,7 +121,8 @@ void HugeObjectCount::CreateScene()
     }
     else
     {
-        light->SetColor(Color::WHITE);
+        light->SetColor(Color(0.6f, 0.6f, 0.6f));
+        light->SetSpecularIntensity(1.5f);
         
         // Create StaticModelGroups in the scene
         StaticModelGroup* lastGroup = 0;

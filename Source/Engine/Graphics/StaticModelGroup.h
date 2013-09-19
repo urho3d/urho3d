@@ -75,15 +75,17 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Update node IDs attribute.
+    /// Update node IDs attribute and ensure the transforms vector has the right size.
     void UpdateNodeIDs();
     
     /// Instance nodes.
     Vector<WeakPtr<Node> > instanceNodes_;
-    /// World transforms of enabled instances.
+    /// World transforms of valid (existing and visible) instances.
     PODVector<Matrix3x4> worldTransforms_;
     /// IDs of instance nodes for serialization.
     mutable VariantVector nodeIDsAttr_;
+    /// Number of valid instance node transforms.
+    unsigned numWorldTransforms_;
     /// Whether node IDs have been set and nodes should be searched for during ApplyAttributes.
     bool nodeIDsDirty_;
 };

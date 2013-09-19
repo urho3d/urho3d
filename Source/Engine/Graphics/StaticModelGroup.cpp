@@ -43,7 +43,7 @@ StaticModelGroup::StaticModelGroup(Context* context) :
     nodeIDsDirty_(false)
 {
     // Initialize the default node IDs attribute
-    nodeIDsAttr_.Push(0);
+    UpdateNodeIDs();
 }
 
 StaticModelGroup::~StaticModelGroup()
@@ -71,6 +71,7 @@ void StaticModelGroup::ApplyAttributes()
         if (node)
             node->RemoveListener(this);
     }
+    
     instanceNodes_.Clear();
     
     Scene* scene = GetScene();
@@ -90,8 +91,9 @@ void StaticModelGroup::ApplyAttributes()
         }
     }
     
-    OnMarkedDirty(GetNode());
+    worldTransforms_.Resize(instanceNodes_.Size());
     nodeIDsDirty_ = false;
+    OnMarkedDirty(GetNode());
 }
 
 void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -109,7 +111,7 @@ void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<Ra
     if (query.ray_.HitDistance(GetWorldBoundingBox()) >= query.maxDistance_)
         return;
     
-    for (unsigned i = 0; i < worldTransforms_.Size(); ++i)
+    for (unsigned i = 0; i < numWorldTransforms_; ++i)
     {
         // Initial test using AABB
         float distance = query.ray_.HitDistance(boundingBox_.Transformed(worldTransforms_[i]));
@@ -127,9 +129,9 @@ void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<Ra
             {
                 distance = M_INFINITY;
                 
-                for (unsigned i = 0; i < batches_.Size(); ++i)
+                for (unsigned j = 0; j < batches_.Size(); ++j)
                 {
-                    Geometry* geometry = batches_[i].geometry_;
+                    Geometry* geometry = batches_[j].geometry_;
                     if (geometry)
                     {
                         distance = geometry->GetHitDistance(localRay);
@@ -164,15 +166,15 @@ void StaticModelGroup::UpdateBatches(const FrameInfo& frame)
         for (unsigned i = 0; i < batches_.Size(); ++i)
         {
             batches_[i].distance_ = frame.camera_->GetDistance(worldTransform * geometryData_[i].center_);
-            batches_[i].worldTransform_ = worldTransforms_.Size() ? &worldTransforms_[0] : &Matrix3x4::IDENTITY;
-            batches_[i].numWorldTransforms_ = worldTransforms_.Size();
+            batches_[i].worldTransform_ = numWorldTransforms_ ? &worldTransforms_[0] : &Matrix3x4::IDENTITY;
+            batches_[i].numWorldTransforms_ = numWorldTransforms_;
         }
     }
     else if (batches_.Size() == 1)
     {
         batches_[0].distance_ = distance_;
-        batches_[0].worldTransform_ = worldTransforms_.Size() ? &worldTransforms_[0] : &Matrix3x4::IDENTITY;
-        batches_[0].numWorldTransforms_ = worldTransforms_.Size();
+        batches_[0].worldTransform_ = numWorldTransforms_ ? &worldTransforms_[0] : &Matrix3x4::IDENTITY;
+        batches_[0].numWorldTransforms_ = numWorldTransforms_;
     }
     
     float scale = worldBoundingBox.Size().DotProduct(DOT_SCALE);
@@ -203,7 +205,7 @@ unsigned StaticModelGroup::GetNumOccluderTriangles()
         if (mat && !mat->GetOcclusion())
             continue;
         
-        triangles += worldTransforms_.Size() * geometry->GetIndexCount() / 3;
+        triangles += numWorldTransforms_ * geometry->GetIndexCount() / 3;
     }
     
     return triangles;
@@ -214,7 +216,7 @@ bool StaticModelGroup::DrawOcclusion(OcclusionBuffer* buffer)
     // Make sure instance transforms are up-to-date
     GetWorldBoundingBox();
     
-    for (unsigned i = 0; i < worldTransforms_.Size(); ++i)
+    for (unsigned i = 0; i < numWorldTransforms_; ++i)
     {
         for (unsigned j = 0; j < batches_.Size(); ++j)
         {
@@ -269,8 +271,8 @@ void StaticModelGroup::AddInstanceNode(Node* node)
     node->AddListener(this);
     instanceNodes_.Push(instanceWeak);
     
-    OnMarkedDirty(GetNode());
     UpdateNodeIDs();
+    OnMarkedDirty(GetNode());
     MarkNetworkUpdate();
 }
 
@@ -283,8 +285,8 @@ void StaticModelGroup::RemoveInstanceNode(Node* node)
     node->RemoveListener(this);
     instanceNodes_.Remove(instanceWeak);
     
-    OnMarkedDirty(GetNode());
     UpdateNodeIDs();
+    OnMarkedDirty(GetNode());
     MarkNetworkUpdate();
 }
 
@@ -298,8 +300,9 @@ void StaticModelGroup::RemoveAllInstanceNodes()
     }
     
     instanceNodes_.Clear();
-    OnMarkedDirty(GetNode());
+    
     UpdateNodeIDs();
+    OnMarkedDirty(GetNode());
     MarkNetworkUpdate();
 }
 
@@ -349,7 +352,6 @@ void StaticModelGroup::OnWorldBoundingBoxUpdate()
 {
     // Update transforms and bounding box at the same time to have to go through the objects only once
     worldBoundingBox_.defined_ = false;
-    worldTransforms_.Resize(instanceNodes_.Size());
     unsigned index = 0;
 
     for (unsigned i = 0; i < instanceNodes_.Size(); ++i)
@@ -363,15 +365,21 @@ void StaticModelGroup::OnWorldBoundingBoxUpdate()
         worldBoundingBox_.Merge(boundingBox_.Transformed(worldTransform));
     }
     
-    worldTransforms_.Resize(index);
+    // Store the amount of valid instances we found instead of resizing worldTransforms_. This is because this function may be 
+    // called from multiple worker threads simultaneously
+    numWorldTransforms_ = index;
 }
 
 void StaticModelGroup::UpdateNodeIDs()
 {
-    nodeIDsAttr_.Clear();
-    nodeIDsAttr_.Push(instanceNodes_.Size());
+    unsigned numInstances = instanceNodes_.Size();
     
-    for (unsigned i = 0; i < instanceNodes_.Size(); ++i)
+    nodeIDsAttr_.Clear();
+    nodeIDsAttr_.Push(numInstances);
+    worldTransforms_.Resize(numInstances);
+    numWorldTransforms_ = 0; // For safety. OnWorldBoundingBoxUpdate() will calculate the proper amount
+    
+    for (unsigned i = 0; i < numInstances; ++i)
     {
         Node* node = instanceNodes_[i];
         nodeIDsAttr_.Push(node ? node->GetID() : 0);
