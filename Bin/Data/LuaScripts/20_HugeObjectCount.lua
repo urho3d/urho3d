@@ -3,6 +3,7 @@
 --     - Creating a scene with 250 x 250 simple objects;
 --     - Competing with http://yosoygames.com.ar/wp/2013/07/ogre-2-0-is-up-to-3x-faster/ :);
 --     - Allowing examination of performance hotspots in the rendering code;
+--     - Optionally speeding up rendering by grouping the objects using StaticModelGroup component;
 
 require "LuaScripts/Utilities/Sample"
 
@@ -12,6 +13,7 @@ local boxNodes = {}
 local yaw = 0.0
 local pitch = 0.0
 local animate = false
+local useGroups = false
 
 local context = GetContext()
 
@@ -38,7 +40,12 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    if scene_ == nil then
+        scene_ = Scene(context)
+    else
+        scene_:Clear()
+        boxNodes = {}
+    end
 
     -- Create the Octree component to the scene so that drawable objects can be rendered. Use default volume
     -- (-1000, -1000, -1000) to (1000, 1000, 1000)
@@ -54,42 +61,74 @@ function CreateScene()
     
     -- Create a directional light
     local lightNode = scene_:CreateChild("DirectionalLight")
-    lightNode.direction = Vector3(0.5, -1.0, 0.5) -- The direction vector does not need to be normalized
+    lightNode.direction = Vector3(-0.6, -1.0, -0.8) -- The direction vector does not need to be normalized
     local light = lightNode:CreateComponent("Light")
     light.lightType = LIGHT_DIRECTIONAL
-    light.color = Color(0.7, 0.35, 0.0)
 
-    -- Create box StaticModels in the scene
-    for y = -125, 125 do
-        for x = -125, 125 do
-            local boxNode = scene_:CreateChild("Box")
-            boxNode.position = Vector3(x * 0.3, 0.0, y * 0.3)
-            boxNode:SetScale(0.25)
-            local boxObject = boxNode:CreateComponent("StaticModel")
-            boxObject.model = cache:GetResource("Model", "Models/Box.mdl")
-            table.insert(boxNodes, boxNode)
+
+    if not useGroups then
+        light.color = Color(0.7, 0.35, 0.0)
+
+        -- Create individual box StaticModels in the scene
+        for y = -125, 125 do
+            for x = -125, 125 do
+                local boxNode = scene_:CreateChild("Box")
+                boxNode.position = Vector3(x * 0.3, 0.0, y * 0.3)
+                boxNode:SetScale(0.25)
+                local boxObject = boxNode:CreateComponent("StaticModel")
+                boxObject.model = cache:GetResource("Model", "Models/Box.mdl")
+                table.insert(boxNodes, boxNode)
+            end
+        end
+    else
+        light.color = Color(0.6, 0.6, 0.6);
+        light.specularIntensity = 1.5;
+
+        -- Create StaticModelGroups in the scene
+        local lastGroup = nil
+
+        for y = -125, 125 do
+            for x = -125, 125 do
+                -- Create new group if no group yet, or the group has already "enough" objects. The tradeoff is between culling
+                -- accuracy and the amount of CPU processing needed for all the objects. Note that the group's own transform
+                -- does not matter, and it does not render anything if instance nodes are not added to it
+                if lastGroup == nil or lastGroup.numInstanceNodes >= 25 * 25 then
+                    local boxGroupNode = scene_:CreateChild("BoxGroup")
+                    lastGroup = boxGroupNode:CreateComponent("StaticModelGroup")
+                    lastGroup.model = cache:GetResource("Model", "Models/Box.mdl")
+                end
+
+                local boxNode = scene_:CreateChild("Box");
+                boxNode.position = Vector3(x * 0.3, 0.0, y * 0.3)
+                boxNode:SetScale(0.25)
+                table.insert(boxNodes, boxNode)
+                lastGroup:AddInstanceNode(boxNode);
+            end
         end
     end
 
-    -- Create the camera
-    cameraNode = scene_:CreateChild("Camera")
-    cameraNode.position = Vector3(0.0, 10.0, -100.0)
-    local camera = cameraNode:CreateComponent("Camera")
-    camera.farClip = 300.0
+    -- Create the camera. Create it outside the scene so that we can clear the whole scene without affecting it
+    if cameraNode == nil then
+        cameraNode = Node(context)
+        cameraNode.position = Vector3(0.0, 10.0, -100.0)
+        local camera = cameraNode:CreateComponent("Camera")
+        camera.farClip = 300.0
+    end
 end
 
 function CreateInstructions()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
     instructionText:SetText("Use WASD keys and mouse to move\n"..
-        "Space to toggle animation")
+        "Space to toggle animation\n"..
+        "G to toggle object group optimization")
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
     instructionText.textAlignment = HA_CENTER
     
     -- Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER
-    instructionText.verticalAlignment= VA_CENTER
+    instructionText.verticalAlignment = VA_CENTER
     instructionText:SetPosition(0, ui.root.height / 4)
 end
 
@@ -155,6 +194,12 @@ function HandleUpdate(eventType, eventData)
     -- Toggle animation with space
     if input:GetKeyPress(KEY_SPACE) then
         animate = not animate
+    end
+
+    -- Toggle grouped / ungrouped mode
+    if input:GetKeyPress(KEY_G) then
+        useGroups = not useGroups
+        CreateScene()
     end
 
     -- Move the camera, scale movement with time step

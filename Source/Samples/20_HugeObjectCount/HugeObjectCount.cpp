@@ -134,7 +134,7 @@ void HugeObjectCount::CreateScene()
                 // Create new group if no group yet, or the group has already "enough" objects. The tradeoff is between culling
                 // accuracy and the amount of CPU processing needed for all the objects. Note that the group's own transform
                 // does not matter, and it does not render anything if instance nodes are not added to it
-                if (!lastGroup || lastGroup->GetNumInstanceNodes() >= 25* 25)
+                if (!lastGroup || lastGroup->GetNumInstanceNodes() >= 25 * 25)
                 {
                     Node* boxGroupNode = scene_->CreateChild("BoxGroup");
                     lastGroup = boxGroupNode->CreateComponent<StaticModelGroup>();
@@ -170,7 +170,7 @@ void HugeObjectCount::CreateInstructions()
     instructionText->SetText(
         "Use WASD keys and mouse to move\n"
         "Space to toggle animation\n"
-        "G to toggle object group optimization\n"
+        "G to toggle object group optimization"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other

@@ -94,7 +94,7 @@ function CreateInstructions()
 
     -- Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER
-    instructionText.verticalAlignment= VA_CENTER
+    instructionText.verticalAlignment = VA_CENTER
     instructionText:SetPosition(0, ui.root.height / 4)
 end
 

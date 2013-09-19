@@ -1982,6 +1982,18 @@ Properties:<br>
 - unsigned numGeometries (readonly)
 - unsigned occlusionLodLevel
 
+StaticModelGroup : StaticModel
+
+Methods:<br>
+- void AddInstanceNode(Node* node)
+- void RemoveInstanceNode(Node* node);
+- void RemoveAllInstanceNodes()
+- unsigned GetNumInstanceNodes() const
+- Node* GetInstanceNode(unsigned index) const
+
+Properties:<br>
+- unsigned numInstanceNodes (readonly)
+
 Pass : RefCounted
 
 Methods:<br>

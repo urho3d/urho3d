@@ -38,6 +38,7 @@
 #include "RenderPath.h"
 #include "Scene.h"
 #include "SmoothedTransform.h"
+#include "StaticModelGroup.h"
 #include "Technique.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"
@@ -817,6 +818,18 @@ static void RegisterStaticModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StaticModel", "uint get_occlusionLodLevel() const", asMETHOD(StaticModel, GetOcclusionLodLevel), asCALL_THISCALL);
 }
 
+static void RegisterStaticModelGroup(asIScriptEngine* engine)
+{
+    RegisterStaticModel<StaticModelGroup>(engine, "StaticModelGroup", true);
+    engine->RegisterObjectMethod("StaticModelGroup", "void set_occlusionLodLevel(uint) const", asMETHOD(StaticModelGroup, SetOcclusionLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModelGroup", "uint get_occlusionLodLevel() const", asMETHOD(StaticModelGroup, GetOcclusionLodLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModelGroup", "void AddInstanceNode(Node@+)", asMETHOD(StaticModelGroup, AddInstanceNode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModelGroup", "void RemoveInstanceNode(Node@+)", asMETHOD(StaticModelGroup, RemoveInstanceNode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModelGroup", "void RemoveAllInstanceNodes()", asMETHOD(StaticModelGroup, RemoveAllInstanceNodes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModelGroup", "uint get_numInstanceNodes() const", asMETHOD(StaticModelGroup, GetNumInstanceNodes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModelGroup", "Node@+ get_instanceNodes(uint) const", asMETHOD(StaticModelGroup, GetInstanceNode), asCALL_THISCALL);
+}
+
 static void RegisterSkybox(asIScriptEngine* engine)
 {
     RegisterStaticModel<Skybox>(engine, "Skybox", true);
@@ -1438,6 +1451,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterLight(engine);
     RegisterZone(engine);
     RegisterStaticModel(engine);
+    RegisterStaticModelGroup(engine);
     RegisterSkybox(engine);
     RegisterAnimatedModel(engine);
     RegisterAnimationController(engine);

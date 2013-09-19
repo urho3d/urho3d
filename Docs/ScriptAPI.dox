@@ -2436,6 +2436,66 @@ Properties:<br>
 - uint occlusionLodLevel
 
 
+StaticModelGroup
+
+Methods:<br>
+- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- bool Load(File@, bool arg1 = false)
+- bool Save(File@) const
+- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool SaveXML(XMLElement&) const
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- void ResetToDefault()
+- void RemoveInstanceDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- void Remove()
+- void MarkNetworkUpdate() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void AddInstanceNode(Node@)
+- void RemoveInstanceNode(Node@)
+- void RemoveAllInstanceNodes()
+
+Properties:<br>
+- int refs (readonly)
+- int weakRefs (readonly)
+- ShortStringHash type (readonly)
+- String typeName (readonly)
+- String category (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- Variant[] attributeDefaults (readonly)
+- AttributeInfo[] attributeInfos (readonly)
+- bool temporary
+- bool enabled
+- bool enabledEffective (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool inView (readonly)
+- bool castShadows
+- bool occluder
+- bool occludee
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- uint shadowMask
+- uint zoneMask
+- uint maxLights
+- BoundingBox boundingBox (readonly)
+- BoundingBox worldBoundingBox (readonly)
+- Model@ model
+- Material@ material (writeonly)
+- Material@[] materials
+- uint numGeometries (readonly)
+- Zone@ zone (readonly)
+- uint occlusionLodLevel
+- uint numInstanceNodes (readonly)
+- Node@[] instanceNodes (readonly)
+
+
 Skybox
 
 Methods:<br>

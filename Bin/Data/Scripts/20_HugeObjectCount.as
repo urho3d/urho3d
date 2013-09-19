@@ -3,6 +3,7 @@
 //     - Creating a scene with 250 x 250 simple objects;
 //     - Competing with http://yosoygames.com.ar/wp/2013/07/ogre-2-0-is-up-to-3x-faster/ :)
 //     - Allowing examination of performance hotspots in the rendering code;
+//     - Optionally speeding up rendering by grouping the objects using StaticModelGroup component;
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -12,6 +13,7 @@ Array<Node@> boxNodes;
 float yaw = 0.0f;
 float pitch = 0.0f;
 bool animate = false;
+bool useGroups = false;
 
 void Start()
 {
@@ -33,7 +35,13 @@ void Start()
 
 void CreateScene()
 {
-    scene_ = Scene();
+    if (scene_ is null)
+        scene_ = Scene();
+    else
+    {
+        scene_.Clear();
+        boxNodes.Clear();
+    }
 
     // Create the Octree component to the scene so that drawable objects can be rendered. Use default volume
     // (-1000, -1000, -1000) to (1000, 1000, 1000)
@@ -46,49 +54,87 @@ void CreateScene()
     zone.fogColor = Color(0.2f, 0.2f, 0.2f);
     zone.fogStart = 200.0f;
     zone.fogEnd = 300.0f;
-    
+
     // Create a directional light
     Node@ lightNode = scene_.CreateChild("DirectionalLight");
-    lightNode.direction = Vector3(0.5f, -1.0f, 0.5f); // The direction vector does not need to be normalized
+    lightNode.direction = Vector3(-0.6f, -1.0f, -0.8f); // The direction vector does not need to be normalized
     Light@ light = lightNode.CreateComponent("Light");
     light.lightType = LIGHT_DIRECTIONAL;
-    light.color = Color(0.7f, 0.35f, 0.0f);
 
-    // Create box StaticModels in the scene
-    for (int y = -125; y < 125; ++y)
+    if (!useGroups)
     {
-        for (int x = -125; x < 125; ++x)
+        light.color = Color(0.7f, 0.35f, 0.0f);
+
+        // Create individual box StaticModels in the scene
+        for (int y = -125; y < 125; ++y)
         {
-            Node@ boxNode = scene_.CreateChild("Box");
-            boxNode.position = Vector3(x * 0.3f, 0.0f, y * 0.3f);
-            boxNode.SetScale(0.25f);
-            StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
-            boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
-            boxNodes.Push(boxNode);
+            for (int x = -125; x < 125; ++x)
+            {
+                Node@ boxNode = scene_.CreateChild("Box");
+                boxNode.position = Vector3(x * 0.3f, 0.0f, y * 0.3f);
+                boxNode.SetScale(0.25f);
+                StaticModel@ boxObject = boxNode.CreateComponent("StaticModel");
+                boxObject.model = cache.GetResource("Model", "Models/Box.mdl");
+                boxNodes.Push(boxNode);
+            }
+        }
+    }
+    else
+    {
+        light.color = Color(0.6f, 0.6f, 0.6f);
+        light.specularIntensity = 1.5f;
+
+        // Create StaticModelGroups in the scene
+        StaticModelGroup@ lastGroup;
+
+        for (int y = -125; y < 125; ++y)
+        {
+            for (int x = -125; x < 125; ++x)
+            {
+                // Create new group if no group yet, or the group has already "enough" objects. The tradeoff is between culling
+                // accuracy and the amount of CPU processing needed for all the objects. Note that the group's own transform
+                // does not matter, and it does not render anything if instance nodes are not added to it
+                if (lastGroup is null || lastGroup.numInstanceNodes >= 25 * 25)
+                {
+                    Node@ boxGroupNode = scene_.CreateChild("BoxGroup");
+                    lastGroup = boxGroupNode.CreateComponent("StaticModelGroup");
+                    lastGroup.model = cache.GetResource("Model", "Models/Box.mdl");
+                }
+
+                Node@ boxNode = scene_.CreateChild("Box");
+                boxNode.position = Vector3(x * 0.3f, 0.0f, y * 0.3f);
+                boxNode.SetScale(0.25f);
+                boxNodes.Push(boxNode);
+                lastGroup.AddInstanceNode(boxNode);
+            }
         }
     }
 
-    // Create the camera
-    cameraNode = scene_.CreateChild("Camera");
-    cameraNode.position = Vector3(0.0f, 10.0f, -100.0f);
-    Camera@ camera = cameraNode.CreateComponent("Camera");
-    camera.farClip = 300.0f;
+    // Create the camera. Create it outside the scene so that we can clear the whole scene without affecting it
+    if (cameraNode is null)
+    {
+        cameraNode = Node("Camera");
+        cameraNode.position = Vector3(0.0f, 10.0f, -100.0f);
+        Camera@ camera = cameraNode.CreateComponent("Camera");
+        camera.farClip = 300.0f;
+    }
 }
 
 void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = 
+    instructionText.text =
         "Use WASD keys and mouse to move\n"
-        "Space to toggle animation";
+        "Space to toggle animation\n"
+        "G to toggle object group optimization";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
     instructionText.textAlignment = HA_CENTER;
-    
+
     // Position the text relative to the screen center
     instructionText.horizontalAlignment = HA_CENTER;
-    instructionText.verticalAlignment= VA_CENTER;
+    instructionText.verticalAlignment = VA_CENTER;
     instructionText.SetPosition(0, ui.root.height / 4);
 }
 
@@ -155,6 +201,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (input.keyPress[KEY_SPACE])
         animate = !animate;
 
+    // Toggle grouped / ungrouped mode
+    if (input.keyPress['G'])
+    {
+        useGroups = !useGroups;
+        CreateScene();
+    }
+    
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
     
