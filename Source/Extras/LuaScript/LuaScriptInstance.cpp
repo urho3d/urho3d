@@ -387,7 +387,6 @@ void LuaScriptInstance::ReleaseObject()
         const char* message = lua_tostring(luaState_, -1);
         LOGERROR("Execute Lua function failed: " + String(message));
         lua_settop(luaState_, top);
-        return;
     }
 }
 
@@ -404,7 +403,7 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef)
     // Push script object.
     lua_rawgeti(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
 
-    // Call update function.
+    // Call script object function.
     if (lua_pcall(luaState_, 1, 0, 0) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
@@ -430,7 +429,7 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, float timeStep
     // Push time step.
     tolua_pushnumber(luaState_, timeStep);
 
-    // Call update function.
+    // Call script object function.
     if (lua_pcall(luaState_, 2, 0, 0) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
@@ -457,7 +456,7 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, Deserializer& 
     // Push Deserializer.
     tolua_pushusertype(luaState_, (void*)&deserializer, "Deserializer");
 
-    // Call update function.
+    // Call script object function.
     if (lua_pcall(luaState_, 2, 0, 0) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
@@ -482,7 +481,7 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, Serializer& se
     // Push Deserializer.
     tolua_pushusertype(luaState_, (void*)&serializer, "Serializer");
 
-    // Call update function.
+    // Call script object function.
     if (lua_pcall(luaState_, 2, 0, 0) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
@@ -493,6 +492,9 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, Serializer& se
 
 void LuaScriptInstance::CallScriptObjectFunction(int functionRef, StringHash eventType, VariantMap& eventData )
 {
+    if (functionRef == LUA_REFNIL)
+        return;
+    
     int top = lua_gettop(luaState_);
 
     // Push function.
@@ -507,12 +509,12 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, StringHash eve
     // Push event data.
     tolua_pushusertype(luaState_, (void*)&eventData, "VariantMap");
 
+    // Call script object function.
     if (lua_pcall(luaState_, 3, 0, 0) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
         LOGERROR("Execute Lua function failed: " + String(message));
         lua_settop(luaState_, top);
-        return;
     }
 }
 

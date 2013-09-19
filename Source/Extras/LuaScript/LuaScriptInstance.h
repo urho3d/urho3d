@@ -135,7 +135,7 @@ private:
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
 
-    /// Handle object event.
+    /// Handle a specific sender's event.
     void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
 
     /// Release the script object.
