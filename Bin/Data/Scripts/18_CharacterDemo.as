@@ -1,10 +1,9 @@
 // Moving character example.
 // This sample demonstrates:
-//     - Controlling a humanoid character through physics;
-//     - Driving animations using the AnimationController component;
-//     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera
-//       clipping into scenery;
-//     - Saving and loading the variables of a script object;
+//     - Controlling a humanoid character through physics
+//     - Driving animations using the AnimationController component
+//     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera clipping into scenery
+//     - Saving and loading the variables of a script object
 
 #include "Scripts/Utilities/Sample.as"
 

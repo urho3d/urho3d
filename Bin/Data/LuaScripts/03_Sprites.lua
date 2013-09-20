@@ -1,14 +1,16 @@
 -- Moving sprites example.
 -- This sample demonstrates:
---     - Adding Sprite elements to the UI;
---     - Storing custom data (sprite velocity) inside UI elements;
---     - Handling frame update events in which the sprites are moved;
+--     - Adding Sprite elements to the UI
+--     - Storing custom data (sprite velocity) inside UI elements
+--     - Handling frame update events in which the sprites are moved
 
 require "LuaScripts/Utilities/Sample"
 
 local numSprites = 100
 local sprites = {}
-local speeds = {}
+
+-- Custom variable identifier for storing sprite velocity within the UI element
+local VAR_VELOCITY = ShortStringHash("Velocity")
 
 local context = GetContext()
 
@@ -35,22 +37,33 @@ function CreateSprites()
     local height = graphics.height
     
     for i = 1, numSprites do
+        -- Create a new sprite, set it to use the texture
         local sprite = Sprite:new(context)
         sprite.texture = decalTex
-        sprite:SetFullImageRect()
+        sprite:SetFullImageRect()       
+        
+        -- The UI root element is as big as the rendering window, set random position within it
         sprite.position = Vector2(Random(width), Random(height))
+        
+        -- Set sprite size & hotspot in its center
         sprite:SetSize(128, 128)
         sprite.hotSpot = IntVector2(64, 64)
-        sprite.rotation = Random(360)
-        sprite.scale = Vector2(1, 1) * (Random(1) + 0.5)
         
+        -- Set random rotation in degrees and random scale
+        sprite.rotation = Random(360.0)
+        sprite.scale = Vector2(1.0, 1.0) * (Random(1.0) + 0.5)
+        
+        -- Set random color and additive blending mode
         sprite:SetColor(Color(Random(0.5) + 0.5, Random(0.5) + 0.5, Random(0.5) + 0.5, 1.0))
         sprite.blendMode = BLEND_ADD
-        
+
+        -- Add as a child of the root UI element
         ui.root:AddChild(sprite)
         
+        -- Store sprite's velocity as a custom variable
+        sprite:SetVar(VAR_VELOCITY, Variant(Vector2(Random(200.0) - 100.0, Random(200.0) - 100.0)))
+        
         table.insert(sprites, sprite)
-        table.insert(speeds, Vector2(Random(200) - 100, Random(200) - 100))
     end
 end
 
@@ -68,7 +81,7 @@ function MoveSprites(timeStep)
         sprite.rotation = sprite.rotation + timeStep * 30
         
         local newPos = sprite.position
-        newPos = newPos + speeds[i] * timeStep
+        newPos = newPos + sprite:GetVar(VAR_VELOCITY):GetVector2() * timeStep
         
         if newPos.x >= width then
             newPos.x = newPos.x - width

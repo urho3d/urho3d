@@ -34,8 +34,8 @@ class Scene;
 
 /// Render to texture example
 /// This sample demonstrates:
-///     - Creating two 3D scenes and rendering the other into a texture;
-///     - Creating rendertarget textures and materials programmatically;
+///     - Creating two 3D scenes and rendering the other into a texture
+///     - Creating rendertarget texture and material programmatically
 class RenderToTexture : public Sample
 {
     OBJECT(RenderToTexture);

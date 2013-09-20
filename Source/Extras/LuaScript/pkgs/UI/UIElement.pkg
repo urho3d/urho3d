@@ -134,10 +134,11 @@ class UIElement : public Serializable
     void Remove();
     unsigned FindChild(UIElement* element) const;
     void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
+    void SetVar(ShortStringHash key, const Variant& value);
     void SetInternal(bool enable);
     void SetTraversalMode(TraversalMode traversalMode);
     void SetElementEventSender(bool flag);
-    
+
     const String& GetName() const;
     const IntVector2& GetPosition() const;
     const IntVector2& GetSize() const;
@@ -187,6 +188,8 @@ class UIElement : public Serializable
     UIElement* GetParent() const;
     UIElement* GetRoot() const;
     const Color& GetDerivedColor() const;
+    const Variant& GetVar(ShortStringHash key) const;
+    const VariantMap& GetVars() const;
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
     IntVector2 ElementToScreen(const IntVector2& position);
     bool IsInside(IntVector2 position, bool isScreen);

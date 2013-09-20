@@ -33,9 +33,9 @@ class Window;
 
 /// A simple 'HelloWorld' GUI created purely from code.
 /// This sample demonstrates:
-///     - Creation of controls and building a UI hierarchy;
-///     - Loading UI style from XML and applying it to controls;
-///     - Handling of global and per-control events;
+///     - Creation of controls and building a UI hierarchy
+///     - Loading UI style from XML and applying it to controls
+///     - Handling of global and per-control events
 class HelloGUI : public Sample
 {
     OBJECT(HelloGUI);

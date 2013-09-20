@@ -4528,6 +4528,7 @@ Methods:<br>
 - void Remove()
 - unsigned FindChild(UIElement* element) const
 - void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED)
+- void SetVar(ShortStringHash key, const Variant& value)
 - void SetInternal(bool enable)
 - void SetTraversalMode(TraversalMode traversalMode)
 - void SetElementEventSender(bool flag)
@@ -4578,6 +4579,8 @@ Methods:<br>
 - UIElement* GetParent() const
 - UIElement* GetRoot() const
 - const Color& GetDerivedColor() const
+- const Variant& GetVar(ShortStringHash key) const
+- const VariantMap& GetVars() const
 - IntVector2 ScreenToElement(const IntVector2& screenPosition)
 - IntVector2 ElementToScreen(const IntVector2& position)
 - bool IsInside(IntVector2 position, bool isScreen)

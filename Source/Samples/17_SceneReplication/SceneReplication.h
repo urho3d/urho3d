@@ -37,10 +37,10 @@ class UIElement;
 
 /// Scene network replication example.
 /// This sample demonstrates:
-///     - Creating a scene in which network clients can join;
-///     - Giving each client an object to control and sending the controls from the clients to the server,
-///       where the authoritative simulation happens;
-///     - Controlling a physics object's movement by applying forces;
+///     - Creating a scene in which network clients can join
+///     - Giving each client an object to control and sending the controls from the clients to the server
+///       where the authoritative simulation happens
+///     - Controlling a physics object's movement by applying forces
 class SceneReplication : public Sample
 {
     OBJECT(SceneReplication);
