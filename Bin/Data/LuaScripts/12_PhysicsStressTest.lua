@@ -102,7 +102,7 @@ function CreateScene()
         -- By default the highest LOD level will be used, the LOD level can be passed as an optional parameter
         shape:SetTriangleMesh(mushroomObject.model)
     end
-    
+
     -- Create a large amount of falling physics objects
     local NUM_OBJECTS = 1000
     for i = 1, NUM_OBJECTS do
@@ -122,7 +122,7 @@ function CreateScene()
         local shape = boxNode:CreateComponent("CollisionShape")
         shape:SetBox(Vector3(1.0, 1.0, 1.0))
     end
-    
+
     -- Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     -- the scene, because we want it to be unaffected by scene load/save
     cameraNode = Node(context)
@@ -198,12 +198,12 @@ function MoveCamera(timeStep)
     if input:GetKeyDown(KEY_D) then
         cameraNode:TranslateRelative(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
     end
-    
+
     -- "Shoot" a physics object with left mousebutton
     if input:GetMouseButtonPress(MOUSEB_LEFT) then
         SpawnObject()
     end
-    
+
     -- Check for loading/saving the scene. Save the scene to the file Data/Scenes/Physics.xml relative to the executable
     -- directory
     if input:GetKeyPress(KEY_F5) then
@@ -255,6 +255,6 @@ end
 function HandlePostRenderUpdate(eventType, eventData)
     -- If draw debug mode is enabled, draw physics debug geometry. Use depth test to make the result easier to interpret
     if drawDebug then
-        renderer:DrawDebugGeometry(true)
+        scene_:GetComponent("PhysicsWorld"):DrawDebugGeometry(true)
     end
 end

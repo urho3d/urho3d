@@ -179,7 +179,7 @@ void LuaScriptInstance::SetScriptDataAttr(PODVector<unsigned char> data)
     if (scriptObjectRef_ == LUA_REFNIL || functionRef == LUA_REFNIL)
         return;
 
-    MemoryBuffer buf(data);    
+    MemoryBuffer buf(data);
     CallScriptObjectFunction(functionRef, (Deserializer&)buf);
 }
 
