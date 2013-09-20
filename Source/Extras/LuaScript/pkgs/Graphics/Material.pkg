@@ -4,7 +4,26 @@ enum CullMode{};
 
 class Material : public Resource
 {
+    Material(Context* context);
+    ~Material();
+    
+    void SetNumTechniques(unsigned num);
+    void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
+    void SetShaderParameter(const String name, const Variant& value);
+    void SetTexture(TextureUnit unit, Texture* texture);
+    void SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat);
+    void SetUVTransform(const Vector2& offset, float rotation, float repeat);
+    void SetCullMode(CullMode mode);
+    void SetShadowCullMode(CullMode mode);
+    void SetDepthBias(const BiasParameters& parameters);
+    void RemoveShaderParameter(const String name);
+    void ReleaseShaders();
+    // SharedPtr<Material> Clone(const String cloneName = String::EMPTY) const;
+    void SortTechniques();
+    void MarkForAuxView(unsigned frameNumber);
+    
     unsigned GetNumTechniques() const;
+    
     Technique* GetTechnique(unsigned index) const;
     
     Pass* GetPass(unsigned index, StringHash passType) const;
