@@ -205,11 +205,10 @@ function MoveCamera(timeStep)
 end
 
 function PaintDecal()
-    local hit = {}
-
-    if Raycast(250.0, hit) then
+    local result, hitPos, hitDrawable = Raycast(250.0)
+    if result then
         -- Check if target scene node already has a DecalSet component. If not, create now
-        local targetNode = hit[2]:GetNode()
+        local targetNode = hitDrawable:GetNode()
         local decal = targetNode:GetComponent("DecalSet")
         if decal == nil then
             decal = targetNode:CreateComponent("DecalSet")
@@ -219,32 +218,33 @@ function PaintDecal()
         -- use full texture UV's (0,0) to (1,1). Note that if we create several decals to a large object (such as the ground
         -- plane) over a large area using just one DecalSet component, the decals will all be culled as one unit. If that is
         -- undesirable, it may be necessary to create more than one DecalSet based on the distance
-        decal:AddDecal(hit[2], hit[1], cameraNode.rotation, 0.5, 1.0, 1.0, Vector2(0.0, 0.0), Vector2(1.0, 1.0))
+        decal:AddDecal(hitDrawable, hitPos, cameraNode.rotation, 0.5, 1.0, 1.0, Vector2(0.0, 0.0), Vector2(1.0, 1.0))
     end
 end
 
-function Raycast(maxDistance, hit)
-    hit[2] = nil
+function Raycast(maxDistance)
+    local hitPos = nil
+    local hitDrawable = nil
 
     local pos = ui.cursorPosition
     -- Check the cursor is visible and there is no UI element in front of the cursor
-    if not ui.cursor.visible or ui:GetElementAt(pos, true) ~= nil then
-        return false
+    if (not ui.cursor.visible) or (ui:GetElementAt(pos, true) ~= nil) then
+        return false, nil, nil
     end
 
     local camera = cameraNode:GetComponent("Camera")
     local cameraRay = camera:GetScreenRay(pos.x / graphics.width, pos.y / graphics.height)
     -- Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
-    local result = scene_:GetComponent("Octree"):RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY)
+    local octree = scene_:GetComponent("Octree")
+    local result = octree:RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY)
     if result.drawable ~= nil then
         -- Calculate hit position in world space
-        hit[1] = cameraRay.origin + cameraRay.direction * result.distance
-        hit[2] = result.drawable
-        print("Has hit, drawable is " .. result.drawable.typeName)
-        return true
+        hitPos = cameraRay.origin + cameraRay.direction * result.distance
+        hitDrawable = result.drawable
+        return true, hitPos, hitDrawable
     end
 
-    return false
+    return false, nil, nil
 end
 
 function HandleUpdate(eventType, eventData)

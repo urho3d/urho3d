@@ -216,7 +216,7 @@ function MoveCamera(timeStep)
 end
 
 function SetPathPoint()
-    local result, hitPos, hitDrawable = Raycast(250.0, hitPos, hitDrawable)
+    local result, hitPos, hitDrawable = Raycast(250.0)
     if result then
         local setStart = input:GetQualifierDown(QUAL_SHIFT)
         if setStart then
@@ -235,7 +235,7 @@ end
 
 function AddOrRemoveObject()
     -- Raycast and check if we hit a mushroom node. If yes, remove it, if no, create a new one
-    local result, hitPos, hitDrawable = Raycast(250.0, hitPos, hitDrawable)
+    local result, hitPos, hitDrawable = Raycast(250.0)
     if result then
         -- The part of the navigation mesh we must update, which is the world bounding box of the associated
         -- drawable component
@@ -288,7 +288,6 @@ function Raycast(maxDistance)
     local camera = cameraNode:GetComponent("Camera")
     local cameraRay = camera:GetScreenRay(pos.x / graphics.width, pos.y / graphics.height)
     -- Pick only geometry objects, not eg. zones or lights, only get the first (closest) hit
-    -- Note the convenience accessor to scene's Octree component
     local octree = scene_:GetComponent("Octree")
     local result = octree:RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY)
     if result.drawable ~= nil then
