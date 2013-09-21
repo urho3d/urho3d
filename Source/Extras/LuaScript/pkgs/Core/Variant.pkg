@@ -131,6 +131,7 @@ class VariantMap
     ~VariantMap();
     
     tolua_outside void VariantMapSetInt @ SetInt(const String key, int value);
+    tolua_outside void VariantMapSetUInt @ SetUInt(const String key, unsigned value);
     tolua_outside void VariantMapSetBool @ SetBool(const String key, bool value);
     tolua_outside void VariantMapSetFloat @ SetFloat(const String key, float value);
     tolua_outside void VariantMapSetVector2 @ SetVector2(const String key, const Vector2 value);
@@ -139,15 +140,16 @@ class VariantMap
     tolua_outside void VariantMapSetQuaternion @ SetQuaternion(const String key, const Quaternion value);
     tolua_outside void VariantMapSetColor @ SetColor(const String key, const Color value);
     tolua_outside void VariantMapSetString @ SetString(const String key, const String value);
-    
+
     tolua_outside void VariantMapSetPtr @ SetPtr(const String key, void* value);
-    
+
     tolua_outside void VariantMapSetResourceRef @ SetResourceRef(const String key, const ResourceRef value);
-    tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const String key, const ResourceRefList value); 
+    tolua_outside void VariantMapSetResourceRefList @ SetResourceRefList(const String key, const ResourceRefList value);
     tolua_outside void VariantMapSetIntRect @ SetIntRect(const String key, const IntRect value);
     tolua_outside void VariantMapSetIntVector2 @ SetIntVector2(const String key, const IntVector2 value);
     
     tolua_outside int VariantMapGetInt @ GetInt(const String key);
+    tolua_outside int VariantMapGetUInt @ GetUInt(const String key);
     tolua_outside bool VariantMapGetBool @ GetBool(const String key);
     tolua_outside float VariantMapGetFloat @ GetFloat(const String key);
     tolua_outside const Vector2& VariantMapGetVector2 @ GetVector2(const String key);
@@ -156,17 +158,22 @@ class VariantMap
     tolua_outside const Quaternion& VariantMapGetQuaternion @ GetQuaternion(const String key);
     tolua_outside const Color& VariantMapGetColor @ GetColor(const String key);
     tolua_outside const String& VariantMapGetString @ GetString(const String key);
-    
+
     tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const String key);
     tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const String key);
     tolua_outside const IntRect& VariantMapGetIntRect @ GetIntRect(const String key);
     tolua_outside const IntVector2& VariantMapGetIntVector2 @ GetIntVector2(const String key);
-    
+
     tolua_outside const void* VariantMapGetPtr @ GetPtr(const String type, const String key);
 };
 
 ${
 void VariantMapSetInt(VariantMap* vmap, const String& key, int value)
+{
+    (*vmap)[ShortStringHash(key)] = value;
+}
+
+void VariantMapSetUInt(VariantMap* vmap, const String& key, unsigned value)
 {
     (*vmap)[ShortStringHash(key)] = value;
 }
@@ -245,6 +252,11 @@ const Variant& FindVariant(const VariantMap* vmap, const String& key)
 int VariantMapGetInt(const VariantMap* vmap, const String& key)
 {
     return FindVariant(vmap, key).GetInt();
+}
+
+unsigned VariantMapGetUInt(const VariantMap* vmap, const String& key)
+{
+    return FindVariant(vmap, key).GetUInt();
 }
 
 bool VariantMapGetBool(const VariantMap* vmap, const String& key)

@@ -26,9 +26,9 @@ class Scene : public Node
     void SetSmoothingConstant(float constant);
     void SetSnapThreshold(float threshold);
     
-    // Node* GetNode(unsigned id) const;
-    // Component* GetComponent(unsigned id) const;
-    
+    Node* GetNode(unsigned id) const;
+    //Component* GetComponent(unsigned id) const;
+
     bool IsUpdateEnabled() const;
     bool IsAsyncLoading() const;
     float GetAsyncProgress() const;

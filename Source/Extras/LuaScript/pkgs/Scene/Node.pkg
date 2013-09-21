@@ -152,29 +152,29 @@ class Node : public Serializable
     Node* GetChild(unsigned index) const;
     Node* GetChild(const String name, bool recursive = false) const;
     Node* GetChild(StringHash nameHash, bool recursive = false) const;
-    
+
     unsigned GetNumComponents() const;
     unsigned GetNumNetworkComponents() const;
-    
+
     bool HasComponent(ShortStringHash type) const;
     bool HasComponent(const String type) const;
-    
+
     const Variant& GetVar(ShortStringHash key) const;
     const VariantMap& GetVars() const;
-    
+
     // template <class T> T* GetComponent() const;
     Component* GetComponent(const String type) const;
-    
+
     void SetID(unsigned id);
     void SetScene(Scene* scene);
     void ResetScene();
-    
+
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
     bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
 
     Node* CreateChild(unsigned id, CreateMode mode);
     void AddComponent(Component* component, unsigned id, CreateMode mode);
-    
+
     tolua_property__get_set unsigned ID;
     tolua_property__get_set String& name;
     tolua_readonly tolua_property__get_set StringHash nameHash;

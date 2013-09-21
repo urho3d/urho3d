@@ -904,6 +904,7 @@ Methods:<br>
 - VariantMap()
 - ~VariantMap()
 - void SetInt(const String key, int value)
+- void SetUInt(const String key, unsigned value)
 - void SetBool(const String key, bool value)
 - void SetFloat(const String key, float value)
 - void SetVector2(const String key, const Vector2 value)
@@ -914,9 +915,11 @@ Methods:<br>
 - void SetString(const String key, const String value)
 - void SetPtr(const String key, void* value)
 - void SetResourceRef(const String key, const ResourceRef value)
-- void SetResourceRefList(const String key, const ResourceRefList value) 
+- void SetResourceRefList(const String key, const ResourceRefList value)
 - void SetIntRect(const String key, const IntRect value)
 - void SetIntVector2(const String key, const IntVector2 value)
+- int GetInt(const String key)
+- unsigned GetUInt(const String key)
 - bool GetBool(const String key)
 - float GetFloat(const String key)
 - const Vector2 GetVector2(const String key)
@@ -3852,6 +3855,7 @@ Methods:<br>
 - void SetElapsedTime(float time)
 - void SetSmoothingConstant(float constant)
 - void SetSnapThreshold(float threshold)
+- Node* GetNode(unsigned id) const;
 - bool IsUpdateEnabled() const
 - bool IsAsyncLoading() const
 - float GetAsyncProgress() const
