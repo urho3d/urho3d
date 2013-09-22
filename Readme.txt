@@ -12,6 +12,7 @@ Credits
 Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
 - Wei Tjong Yao
+- Aster Jian
 - Colin Barrett
 - Erik Beran
 - Carlo Carollo
@@ -19,7 +20,6 @@ Urho3D development, contributions and bugfixes by:
 - Chris Friesen
 - Alex Fuller
 - Mika Heinonen
-- Aster Jian
 - Jason Kinzer
 - Pete Leigh
 - Paul Noome

@@ -110,6 +110,7 @@ void LoadConfig()
     XMLElement uiElem = configElem.GetChild("ui");
     XMLElement hierarchyElem = configElem.GetChild("hierarchy");
     XMLElement inspectorElem = configElem.GetChild("attributeinspector");
+    XMLElement resourcesElem = configElem.GetChild("resources");
 
     if (!cameraElem.isNull)
     {
@@ -132,6 +133,23 @@ void LoadConfig()
         if (objectElem.HasAttribute("applymateriallist")) applyMaterialList = objectElem.GetBool("applymateriallist");
         if (objectElem.HasAttribute("importoptions")) importOptions = objectElem.GetAttribute("importoptions");
         if (objectElem.HasAttribute("pickmode")) pickMode = objectElem.GetInt("pickmode");
+    }
+
+    if (!resourcesElem.isNull)
+    {
+        if (resourcesElem.HasAttribute("rememberresourcepath")) rememberResourcePath = resourcesElem.GetBool("rememberresourcepath");
+        if (rememberResourcePath && resourcesElem.HasAttribute("resourcepath"))
+        {
+            String newResourcePath = resourcesElem.GetAttribute("resourcepath");
+            if (fileSystem.DirExists(newResourcePath))
+                SetResourcePath(resourcesElem.GetAttribute("resourcepath"), false);
+        }
+        if (resourcesElem.HasAttribute("importpath"))
+        {
+            String newImportPath = resourcesElem.GetAttribute("importpath");
+            if (fileSystem.DirExists(newImportPath))
+                uiImportPath = newImportPath;
+        }
     }
 
     if (!renderingElem.isNull)
@@ -181,6 +199,7 @@ void SaveConfig()
     XMLElement uiElem = configElem.CreateChild("ui");
     XMLElement hierarchyElem = configElem.CreateChild("hierarchy");
     XMLElement inspectorElem = configElem.CreateChild("attributeinspector");
+    XMLElement resourcesElem = configElem.CreateChild("resources");
 
     // The save config may be called on error exit so some of the objects below could still be null
     if (camera !is null)
@@ -202,6 +221,10 @@ void SaveConfig()
     objectElem.SetBool("applymateriallist", applyMaterialList);
     objectElem.SetAttribute("importoptions", importOptions);
     objectElem.SetInt("pickmode", pickMode);
+
+    resourcesElem.SetBool("rememberresourcepath", rememberResourcePath);
+    resourcesElem.SetAttribute("resourcepath", sceneResourcePath);
+    resourcesElem.SetAttribute("importpath", uiImportPath);
 
     if (renderer !is null)
     {

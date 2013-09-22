@@ -199,6 +199,20 @@
         <attribute name="Max Size" value="2147483647 17" />
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="8" />
+        <element type="Text">
+            <attribute name="Text" value="AssetImporter options" />
+        </element>
+        <element type="LineEdit">
+            <attribute name="Name" value="ImportOptionsEdit" />
+            <attribute name="Min Size" value="100 0" />
+            <attribute name="Max Size" value="100 2147483647" />
+        </element>
+    </element>
+    <element>
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="8" />
         <element type="CheckBox">
             <attribute name="Name" value="LocalIDToggle" />
         </element>
@@ -223,13 +237,11 @@
         <attribute name="Max Size" value="2147483647 17" />
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="8" />
-        <element type="Text">
-            <attribute name="Text" value="AssetImporter options" />
+        <element type="CheckBox">
+            <attribute name="Name" value="RememberResourcePathToggle" />
         </element>
-        <element type="LineEdit">
-            <attribute name="Name" value="ImportOptionsEdit" />
-            <attribute name="Min Size" value="100 0" />
-            <attribute name="Max Size" value="100 2147483647" />
+        <element type="Text">
+            <attribute name="Text" value="Remember resource path" />
         </element>
     </element>
     <element type="BorderImage" style="EditorDivider" />

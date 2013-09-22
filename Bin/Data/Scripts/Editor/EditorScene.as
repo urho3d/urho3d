@@ -87,7 +87,7 @@ bool ResetScene()
     return true;
 }
 
-void SetResourcePath(String newPath, bool usePreferredDir = true)
+void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive = false)
 {
     if (newPath.empty)
         return;
@@ -100,15 +100,34 @@ void SetResourcePath(String newPath, bool usePreferredDir = true)
     if (newPath == sceneResourcePath)
         return;
 
-    cache.ReleaseAllResources(false);
-    renderer.ReloadShaders();
-
     // Remove the old scene resource path if any. However make sure that the default data paths do not get removed
-    if (!sceneResourcePath.empty && !sceneResourcePath.Contains(fileSystem.programDir))
-        cache.RemoveResourceDir(sceneResourcePath);
+    if (!additive)
+    {
+        cache.ReleaseAllResources(false);
+        renderer.ReloadShaders();
+
+        if (!sceneResourcePath.empty && !sceneResourcePath.Contains(fileSystem.programDir))
+            cache.RemoveResourceDir(sceneResourcePath);
+    }
 
     cache.AddResourceDir(newPath);
-    sceneResourcePath = newPath;
+
+    if (!additive)
+    {
+        sceneResourcePath = newPath;
+        SetResourceSubPath(uiScenePath, newPath, "Scenes");
+        SetResourceSubPath(uiElementPath, newPath, "UI");
+        SetResourceSubPath(uiNodePath, newPath, "Objects");
+        SetResourceSubPath(uiScriptPath, newPath, "Scripts");
+    }
+}
+
+void SetResourceSubPath(String& outPath, const String&in basePath, const String&in subPath)
+{
+    if (fileSystem.DirExists(basePath + "/" + subPath))
+        outPath = AddTrailingSlash(basePath + "/" + subPath);
+    else
+        outPath = AddTrailingSlash(basePath);
 }
 
 bool LoadScene(const String&in fileName)
@@ -129,8 +148,10 @@ bool LoadScene(const String&in fileName)
     if (!file.open)
         return false;
 
-    // Add the new resource path
-    SetResourcePath(GetPath(fileName));
+    // Add the scene's resource path in case it's necessary
+    String newScenePath = GetPath(fileName);
+    if (!rememberResourcePath || !sceneResourcePath.StartsWith(newScenePath, false))
+        SetResourcePath(newScenePath);
 
     suppressSceneChanges = true;
 
@@ -257,9 +278,8 @@ void LoadNode(const String&in fileName)
 
     ui.cursor.shape = CS_BUSY;
 
-    // Before instantiating, set resource path if empty
-    if (sceneResourcePath.empty)
-        SetResourcePath(GetPath(fileName));
+    // Before instantiating, add object's resource path if necessary
+    SetResourcePath(GetPath(fileName), true, true);
 
     Vector3 position = GetNewNodePosition();
     Node@ newNode;

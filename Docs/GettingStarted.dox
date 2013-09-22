@@ -424,9 +424,11 @@ Press right mouse button in the 3D view if you want to defocus the active window
 
 When you start with an empty scene, set the resource path first (%File -> %Set resource path). This is the base directory, under which the subdirectories Models, Materials & Textures will be created as you import assets.
 
-Scenes should be saved either into this base directory, or into its immediate subdirectory, named for example Scenes or Levels. When loading a scene, the resource path will be set automatically.
+Scenes should be saved either into this base directory, or into its immediate subdirectory, named for example Scenes or Levels.
 
 Check the Editor settings window so that the camera parameters match the size of the objects you are using.
+
+The "Remember resource path" option in the settings window controls whether the resource path you set will be remembered on the next run.
 
 The editor settings will be saved on exit to a file Urho3D\Editor\Config.xml in the My Documents directory. Delete this file if you want to revert the settings to defaults.
 

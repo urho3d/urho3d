@@ -113,8 +113,8 @@ void OpenUILayout(const String&in fileName)
     if (!file.open)
         return;
 
-    // Add the new resource path
-    SetResourcePath(GetPath(fileName));
+    // Add the UI layout's resource path in case it's necessary
+    SetResourcePath(GetPath(fileName), true, true);
 
     XMLFile@ xmlFile = XMLFile();
     xmlFile.Load(file);

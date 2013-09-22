@@ -21,7 +21,8 @@ Color normalTextColor(1.0f, 1.0f, 1.0f);
 Color modifiedTextColor(1.0f, 0.8f, 0.5f);
 Color nonEditableTextColor(0.7f, 0.7f, 0.7f);
 
-String sceneResourcePath;
+String sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
+bool rememberResourcePath = true;
 
 WeakHandle testAnimState;
 
@@ -878,7 +879,6 @@ void InitResourcePicker()
     resourcePickers.Push(ResourcePicker("ScriptFile", scriptFilters));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
     resourcePickers.Push(ResourcePicker("Sound", soundFilters));
-    sceneResourcePath = AddTrailingSlash(fileSystem.programDir + "Data");
 }
 
 ResourcePicker@ GetResourcePicker(ShortStringHash resourceType)
