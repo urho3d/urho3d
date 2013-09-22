@@ -43,6 +43,10 @@ bool uiHidden = false;
 
 void CreateUI()
 {
+    // Remove all existing UI content in case we are reloading the editor script
+    /// \todo The console will not be properly recreated as it has already been created once
+    ui.root.RemoveAllChildren();
+
     uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
     ui.root.defaultStyle = uiStyle;
     iconStyle = cache.GetResource("XMLFile", "UI/EditorIcons.xml");
