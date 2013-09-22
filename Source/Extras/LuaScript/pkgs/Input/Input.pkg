@@ -27,6 +27,7 @@ struct JoystickState
 
 class Input : public Object
 {
+    void SetToggleFullscreen(bool enable);
     void SetMouseVisible(bool enable);
     bool OpenJoystick(unsigned index);
     void CloseJoystick(unsigned index);

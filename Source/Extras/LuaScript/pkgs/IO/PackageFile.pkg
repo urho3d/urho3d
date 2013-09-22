@@ -11,7 +11,7 @@ class PackageFile : public Object
 {
     PackageFile(Context* context);
     PackageFile(Context* context, const String fileName);
-    virtual ~PackageFile();
+    ~PackageFile();
     
     bool Open(const String fileName);
     bool Exists(const String fileName) const;

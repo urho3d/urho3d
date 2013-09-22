@@ -10,28 +10,39 @@ class Serializer
     bool WriteUByte(unsigned char value);
     bool WriteBool(bool value);
     bool WriteFloat(float value);
-    bool WriteIntRect(const IntRect value);
-    bool WriteIntVector2(const IntVector2 value);
-    bool WriteRect(const Rect value);
-    bool WriteVector2(const Vector2 value);
-    bool WriteVector3(const Vector3 value);
-    bool WritePackedVector3(const Vector3 value, float maxAbsCoord);
-    bool WriteVector4(const Vector4 value);
-    bool WriteQuaternion(const Quaternion value);
-    bool WritePackedQuaternion(const Quaternion value);
-    bool WriteColor(const Color value);
-    bool WriteBoundingBox(const BoundingBox value);
+    bool WriteIntRect(const IntRect& value);
+    bool WriteIntVector2(const IntVector2& value);
+    bool WriteRect(const Rect& value);
+    bool WriteVector2(const Vector2& value);
+    bool WriteVector3(const Vector3& value);
+    bool WritePackedVector3(const Vector3& value, float maxAbsCoord);
+    bool WriteVector4(const Vector4& value);
+    bool WriteQuaternion(const Quaternion& value);
+    bool WritePackedQuaternion(const Quaternion& value);
+    bool WriteColor(const Color& value);
+    bool WriteBoundingBox(const BoundingBox& value);
     bool WriteString(const String value);
     bool WriteFileID(const String value);
-    bool WriteStringHash(const StringHash value);
-    bool WriteShortStringHash(const ShortStringHash value);
-    bool WriteResourceRef(const ResourceRef value);
-    bool WriteResourceRefList(const ResourceRefList value);
-    bool WriteVariant(const Variant value);
-    bool WriteVariantData(const Variant value);
-    bool WriteVariantVector(const VariantVector value);
-    bool WriteVariantMap(const VariantMap value);
+    bool WriteStringHash(const StringHash& value);
+    bool WriteShortStringHash(const ShortStringHash& value);
+    
+    // bool WriteBuffer(const PODVector<unsigned char>& buffer);
+    tolua_outside bool SerializerWriteBuffer @ WriteBuffer(const VectorBuffer& buffer);
+    
+    bool WriteResourceRef(const ResourceRef& value);
+    bool WriteResourceRefList(const ResourceRefList& value);
+    bool WriteVariant(const Variant& value);
+    bool WriteVariantData(const Variant& value);
+    bool WriteVariantVector(const VariantVector& value);
+    bool WriteVariantMap(const VariantMap& value);
     bool WriteVLE(unsigned value);
     bool WriteNetID(unsigned value);
     bool WriteLine(const String value);
 };
+
+${
+static bool SerializerWriteBuffer(Serializer* serializer, const VectorBuffer& buffer)
+{
+    return serializer->WriteBuffer(buffer.GetBuffer());
+}
+$}

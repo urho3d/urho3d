@@ -1,0 +1,9 @@
+$#include "FileWatcher.h"
+
+class FileWatcher : public Object
+{
+    bool StartWatching(const String& pathName, bool watchSubDirs);
+    void StopWatching();
+    void AddChange(const String fileName);
+    const String& GetPath() const;
+};

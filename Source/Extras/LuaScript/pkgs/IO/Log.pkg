@@ -8,6 +8,7 @@ static const int LOG_NONE;
 
 class Log : public Object
 {
+    void Open(const String fileName);
     void SetLevel(int level);
     void SetTimeStamp(bool enable);
     void SetQuiet(bool quiet);

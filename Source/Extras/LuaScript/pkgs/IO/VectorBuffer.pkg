@@ -1,32 +1,21 @@
-$#include "File.h"
+$#include "VectorBuffer.h"
 
-enum FileMode
+class VectorBuffer
 {
-    FILE_READ = 0,
-    FILE_WRITE,
-    FILE_READWRITE
-};
-
-class File : public Object
-{
-    File(Context* context);
-    File(Context* context, const String fileName, FileMode mode = FILE_READ);
-    File(Context* context, PackageFile* package, const String fileName);
-    ~File();
+    VectorBuffer();
+    // VectorBuffer(const PODVector<unsigned char>& data);
+    VectorBuffer(Deserializer& source, unsigned size);
+    ~VectorBuffer();
     
-    bool Open(const String fileName, FileMode mode = FILE_READ);
-    bool Open(PackageFile* package, const String fileName);
-    void Close();
-    void Flush();
-    void SetName(const String name);
+    // void SetData(const PODVector<unsigned char>& data);
+    void SetData(Deserializer& source, unsigned size);
+    void Clear();
+    void Resize(unsigned size);
     
-    FileMode GetMode() const;
-    bool IsOpen() const;
-    void* GetHandle() const;
-    bool IsPackaged() const;
+    // const PODVector<unsigned char>& GetBuffer() const;
     
     // From Deserializer
-        unsigned Seek(unsigned position);
+    unsigned Seek(unsigned position);
     const String& GetName() const;
     unsigned GetChecksum();
     unsigned GetPosition() const;
@@ -107,10 +96,6 @@ class File : public Object
     bool WriteVLE(unsigned value);
     bool WriteNetID(unsigned value);
     bool WriteLine(const String value);
-    
-    tolua_readonly tolua_property__get_set FileMode mode;
-    tolua_readonly tolua_property__is_set bool open;
-    tolua_readonly tolua_property__is_set bool packaged;
     
     // From Deserializer
     tolua_readonly tolua_property__get_set String& name;

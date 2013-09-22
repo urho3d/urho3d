@@ -2,10 +2,9 @@ $#include "Deserializer.h"
 
 class Deserializer
 {
-    virtual unsigned Seek(unsigned position);
-    
-    virtual const String& GetName() const;
-    virtual unsigned GetChecksum();
+    unsigned Seek(unsigned position);
+    const String& GetName() const;
+    unsigned GetChecksum();
     unsigned GetPosition() const;
     unsigned GetSize() const;
     bool IsEof() const;
@@ -33,6 +32,10 @@ class Deserializer
     String ReadFileID();
     StringHash ReadStringHash();
     ShortStringHash ReadShortStringHash();
+    
+    // PODVector<unsigned char> ReadBuffer();
+    VectorBuffer ReadBuffer();
+    
     ResourceRef ReadResourceRef();
     ResourceRefList ReadResourceRefList();
     Variant ReadVariant();
