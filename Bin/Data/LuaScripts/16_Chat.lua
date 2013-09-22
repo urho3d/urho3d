@@ -67,9 +67,12 @@ function CreateUI()
     startServerButton = CreateButton("Start Server", 110)
 
     UpdateButtons()
-
-    -- chatHistory.Resize((graphics.height - 20) / chatHistoryText.rowHeight)
-
+    
+    local size = (graphics.height - 20) / chatHistoryText.rowHeight
+    for i = 1, size do
+        table.insert(chatHistory, "")
+    end
+    
     -- No viewports or scene is defined. However, the default zone's fog color controls the fill color
     renderer.defaultZone.fogColor = Color(0.0, 0.0, 0.1)
 end
@@ -108,9 +111,7 @@ function CreateButton(text, width)
 end
 
 function ShowChatText(row)
-    --chatHistory:Erase(0)
-    --chatHistory:Push(row)
-    table.remove(chatHistory, 0)
+    table.remove(chatHistory, 1)
     table.insert(chatHistory, row)
     
     -- Concatenate all the rows in history
@@ -196,7 +197,6 @@ function HandleNetworkMessage(eventType, eventData)
     local msgID = eventData:GetInt("MessageID")
     if msgID == MSG_CHAT then
         local msg = eventData:GetBuffer("Data")
-        print(tolua.type(msg))
         local text = msg:ReadString()
         -- If we are the server, prepend the sender's IP address and port and echo to everyone
         -- If we are a client, just display the message
