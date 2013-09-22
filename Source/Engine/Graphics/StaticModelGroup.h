@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-/// Renders several instances of static models while culling and receiving light as one unit. Using this class is not necessary for instanced rendering, but can be used as a CPU-side optimization.
+/// Renders several object instances while culling and receiving light as one unit. Can be used as a CPU-side optimization, but note that also regular StaticModels will use instanced rendering if possible.
 class URHO3D_API StaticModelGroup : public StaticModel
 {
     OBJECT(StaticModelGroup);

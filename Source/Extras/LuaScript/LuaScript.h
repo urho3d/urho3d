@@ -45,79 +45,61 @@ public:
     /// Destruct.
     ~LuaScript();
 
-    /// Execute script file.
+    /// Execute script file. Return true if successful.
     bool ExecuteFile(const String& fileName);
-
-    /// Execute script string.
+    /// Execute script string. Return true if successful.
     bool ExecuteString(const String& string);
-
-    /// Execute script function.
-    bool ExecuteFunction(const String& functionName);
-
+    /// Execute script function. Parameters can be supplied in a VariantVector. Return true if successful.
+    bool ExecuteFunction(const String& functionName, const VariantVector& parameters = Variant::emptyVariantVector);
     /// Script send event.
     void ScriptSendEvent(const String& eventName, VariantMap& eventData);
-
     /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
-
     /// Script unsubscribe from an event.
     void ScriptUnsubscribeFromEvent(const String& eventName);
-
     /// Script unsubscribe from all events.
     void ScriptUnsubscribeFromAllEvents();
-
     /// Script subscribe to a specific sender's event.
     void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
-
     /// Script unsubscribe from a specific sender's event.
     void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
-
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
-
+    /// Push parameters from a VariantVector to a Lua state. Return number of parameters successfully pushed.
+    unsigned PushParameters(lua_State* state, const VariantVector& parameters);
+    
     /// Return Lua state.
     lua_State* GetLuaState() const { return luaState_; }
-
     /// Return script function ref.
     int GetScriptFunctionRef(const String& functionName, bool silentIfNotfound = false);
-
+    
 private:
     /// Register loader.
     void RegisterLoader();
-
-    /// Loader.
-    static int Loader(lua_State* L);
-
     /// Replace print.
     void ReplacePrint();
-
-    /// Print function.
-    static int Print(lua_State* L);
-
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
-
     /// Handle object event.
     void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
-
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
-
     /// Push script function.
     bool PushScriptFunction(const String& functionName, bool silentIfNotfound = false);
-
     /// Call script function.
     void CallScriptFunction(int functionRef, StringHash eventType, VariantMap& eventData);
 
+    /// Loader.
+    static int Loader(lua_State* L);
+    /// Print function.
+    static int Print(lua_State* L);
+
     /// Lua state.
     lua_State* luaState_;
-
     /// Function name to function ref map.
     HashMap<String, int> functionNameToFunctionRefMap_;
-
     /// Event type to function ref map.
     HashMap<StringHash, int> eventTypeToFunctionRefMap_;
-
     /// Object to event type to function ref map.
     HashMap<Object*, HashMap<StringHash, int> > objectToEventTypeToFunctionRefMap_;
 };

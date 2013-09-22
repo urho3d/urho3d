@@ -56,13 +56,10 @@ public:
 private:
     /// File size.
     unsigned size_;
-
     /// File data.
     SharedArrayPtr<char> data_;
-
     /// Has loaded.
     bool hasLoaded_;
-
     /// Has executed.
     bool hasExecuted_;
 };

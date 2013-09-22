@@ -262,7 +262,7 @@ void LuaScriptInstance::ScriptUnsubscribeFromEvents(void* sender)
     objectToEventTypeToFunctionRefMap_.Erase(it);
 }
 
-bool LuaScriptInstance::Execute(const String& functionName, const VariantVector& parameters)
+bool LuaScriptInstance::ExecuteFunction(const String& functionName, const VariantVector& parameters)
 {
     if (scriptObjectRef_ == LUA_REFNIL)
         return false;
@@ -538,59 +538,7 @@ bool LuaScriptInstance::CallScriptObjectFunction(int functionRef, const VariantV
     // Push script object.
     lua_rawgeti(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
 
-    unsigned numParams = 1;
-    
-    // Push specified parameters
-    for (unsigned i = 0; i < parameters.Size(); ++i)
-    {
-        switch (parameters[i].GetType())
-        {
-        case VAR_BOOL:
-            tolua_pushboolean(luaState_, parameters[i].GetBool() ? 1 : 0);
-            ++numParams;
-            break;
-            
-        case VAR_INT:
-            tolua_pushnumber(luaState_, (double)parameters[i].GetInt());
-            ++numParams;
-            break;
-            
-        case VAR_FLOAT:
-            tolua_pushnumber(luaState_, parameters[i].GetFloat());
-            ++numParams;
-            break;
-            
-        case VAR_STRING:
-            tolua_pushstring(luaState_, parameters[i].GetString().CString());
-            ++numParams;
-            break;
-            
-        case VAR_VECTOR2:
-            tolua_pushusertype(luaState_, &const_cast<Vector2&>(parameters[i].GetVector2()), parameters[i].GetTypeName().CString());
-            ++numParams;
-            break;
-
-        case VAR_VECTOR3:
-            tolua_pushusertype(luaState_, &const_cast<Vector3&>(parameters[i].GetVector3()), parameters[i].GetTypeName().CString());
-            ++numParams;
-            break;
-            
-        case VAR_VECTOR4:
-            tolua_pushusertype(luaState_, &const_cast<Vector4&>(parameters[i].GetVector4()), parameters[i].GetTypeName().CString());
-            ++numParams;
-            break;
-
-        case VAR_QUATERNION:
-            tolua_pushusertype(luaState_, &const_cast<Quaternion&>(parameters[i].GetQuaternion()), parameters[i].GetTypeName().CString());
-            ++numParams;
-            break;
-            
-        case VAR_COLOR:
-            tolua_pushusertype(luaState_, &const_cast<Color&>(parameters[i].GetColor()), parameters[i].GetTypeName().CString());
-            ++numParams;
-            break;
-        }
-    }
+    unsigned numParams = 1 + luaScript_->PushParameters(luaState_, parameters);
     
     // Call script object function.
     if (lua_pcall(luaState_, numParams, 0, 0) != 0)

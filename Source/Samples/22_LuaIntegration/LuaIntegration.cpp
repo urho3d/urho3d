@@ -115,7 +115,7 @@ void LuaIntegration::CreateScene()
         parameters.Push(10.0f);
         parameters.Push(20.0f);
         parameters.Push(30.0f);
-        instance->Execute("SetRotationSpeed", parameters);
+        instance->ExecuteFunction("SetRotationSpeed", parameters);
     }
     
     // Create the camera. Let the starting position be at the world origin. As the fog limits maximum visible distance, we can

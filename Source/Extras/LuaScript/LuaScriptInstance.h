@@ -62,127 +62,91 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    ///// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
 
-    /// Create script object.
+    /// Create script object. Return true if successful.
     bool CreateObject(const String& scriptObjectType);
-
-    /// Create script object.
+    /// Create script object. Return true if successful.
     bool CreateObject(const String& scriptFileName, const String& scriptObjectType);
-
     /// Set script file name.
     void SetScriptFileName(const String& scriptFileName);
-
     /// Set script object type.
     void SetScriptObjectType(const String& scriptObjectType);
-
     /// Set script file serialization attribute by calling a script function.
     void SetScriptDataAttr(PODVector<unsigned char> data);
-    
     /// Set script network serialization attribute by calling a script function.
     void SetScriptNetworkDataAttr(PODVector<unsigned char> data);
-
     /// Script subscribe to an event that can by send by any sender.
     void ScriptSubscribeToEvent(const String& eventName, const String& functionName);
-
     /// Script unsubscribe from an event.
     void ScriptUnsubscribeFromEvent(const String& eventName);
-
     /// Script unsubscribe from all events.
     void ScriptUnsubscribeFromAllEvents();
-
     /// Script subscribe to a specific sender's event.
     void ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName);
-
     /// Script unsubscribe from a specific sender's event.
     void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
-
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
-
-    /// Execute a script object function with parameters. Return true if successful.
-    bool Execute(const String& functionName, const VariantVector& parameters);
+    /// Execute a script object function. Parameters can be supplied in a VariantVector. Return true if successful.
+    bool ExecuteFunction(const String& functionName, const VariantVector& parameters = Variant::emptyVariantVector);
     
     /// Return script file name.
     const String& GetScriptFileName() const { return scriptFileName_; }
-
     /// Return script object type.
     const String& GetScriptObjectType() const { return scriptObjectType_; }
-
     /// Return script object ref.
     int GetScriptObjectRef() const { return scriptObjectRef_; }
-
     /// Get script file serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptDataAttr() const;
-
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
 
 private:
     /// Find script object method refs.
     void FindScriptObjectMethodRefs();
-
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
     /// Handle the logic post update event.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
-
     /// Handle the physics update event.
     void HandleFixedUpdate(StringHash eventType, VariantMap& eventData);
-
     /// Handle the physics post update event.
     void HandlePostFixedUpdate(StringHash eventType, VariantMap& eventData);
-
     /// Handle event.
     void HandleEvent(StringHash eventType, VariantMap& eventData);
-
     /// Handle a specific sender's event.
     void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
-
     /// Release the script object.
     void ReleaseObject();
-    
     /// Call script object function.
     void CallScriptObjectFunction(int functionRef);
-
     /// Call script object function.
     void CallScriptObjectFunction(int functionRef, float timeStep);
-
     /// Call script object function.
     void CallScriptObjectFunction(int functionRef, Deserializer& deserializer);
-
     /// Call script object function.
     void CallScriptObjectFunction(int functionRef, Serializer& serializer) const;
-
     /// Call script object function.
     void CallScriptObjectFunction(int functionRef, StringHash eventType, VariantMap& eventData);
-
     /// Call script object function with arbitrary parameters.
     bool CallScriptObjectFunction(int functionRef, const VariantVector& parameters);
-
-    // Lua Script.
+    
+    // Lua Script subsystem.
     LuaScript* luaScript_;
-
     /// Lua state.
     lua_State* luaState_;
-
     /// Script file name.
     String scriptFileName_;
-
     /// Script object type.
     String scriptObjectType_;
-
     /// Script object ref.
     int scriptObjectRef_;
-
     /// Script object method refs.
     int scriptObjectMethodRefs_[MAX_LUA_SCRIPT_OBJECT_METHODS];
-
     /// Event type to function ref map.
     HashMap<StringHash, int> eventTypeToFunctionRefMap_;
-    
     /// Object to event type to function ref map.
     HashMap<Object*, HashMap<StringHash, int> > objectToEventTypeToFunctionRefMap_;
 };
