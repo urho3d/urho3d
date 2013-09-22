@@ -20,4 +20,24 @@
 :: THE SOFTWARE.
 ::
 
-@cmake_vs2012.bat -DVERSION="9 2008" %*
+@echo off
+cmake -E make_directory Build
+if exist Build\CMakeCache.txt. del /F Build\CMakeCache.txt
+if exist Source\CMakeCache.txt. del /F Source\CMakeCache.txt
+if exist CMakeCache.txt del /F CMakeCache.txt
+if exist Build\CMakeFiles. rd /S /Q Build\CMakeFiles
+if exist Source\CMakeFiles. rd /S /Q Source\CMakeFiles
+if exist CMakeFiles. rd /S /Q CMakeFiles.
+set "arch="
+set "version=9 2008"
+:loop
+if not "%1" == "" (
+    if "%1" == "-DENABLE_64BIT" if "%~2" == "1" set "arch= Win64"
+    if "%1" == "-DVERSION" set "version=%~2"
+    shift
+    shift
+    goto loop
+)
+cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
+echo on
+cmake -E chdir Build cmake -G "Visual Studio %version%%arch%" ..\Source %*

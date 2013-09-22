@@ -199,7 +199,7 @@ void ImportTundraScene(const String&in fileName)
         {
             String compType = compElem.GetAttribute("type");
 
-            if (compType == "EC_Mesh")
+            if (compType == "EC_Mesh" || compType == "Mesh")
             {
                 Array<String> coords = GetComponentAttribute(compElem, "Transform").Split(',');
                 meshPos = GetVector3FromStrings(coords, 0);
@@ -214,9 +214,9 @@ void ImportTundraScene(const String&in fileName)
                 for (uint i = 0; i < materialNames.length; ++i)
                     ProcessRef(materialNames[i]);
             }
-            if (compType == "EC_Name")
+            if (compType == "EC_Name" || compType == "Name")
                 nodeName = GetComponentAttribute(compElem, "name");
-            if (compType == "EC_Placeable")
+            if (compType == "EC_Placeable" || compType == "Placeable")
             {
                 Array<String> coords = GetComponentAttribute(compElem, "Transform").Split(',');
                 pos = GetVector3FromStrings(coords, 0);
@@ -225,7 +225,7 @@ void ImportTundraScene(const String&in fileName)
                 scale = GetVector3FromStrings(coords, 6);
                 parentName = GetComponentAttribute(compElem, "Parent entity ref");
             }
-            if (compType == "EC_RigidBody")
+            if (compType == "EC_RigidBody" || compType == "RigidBody")
             {
                 shapeType = GetComponentAttribute(compElem, "Shape type").ToInt();
                 mass = GetComponentAttribute(compElem, "Mass").ToFloat();
