@@ -1649,6 +1649,10 @@ Methods:<br>
 - Node@ GetNode(uint)
 - const String& GetVarName(ShortStringHash) const
 - void Update(float)
+- ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode arg2 = REPLICATED)
+- ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode arg2 = REPLICATED)
+- ScriptObject@ GetScriptObject() const
+- ScriptObject@ GetScriptObject(const String&) const
 
 Properties:<br>
 - int refs (readonly)
@@ -1693,6 +1697,7 @@ Properties:<br>
 - DebugRenderer@ debugRenderer (readonly)
 - Octree@ octree (readonly)
 - PhysicsWorld@ physicsWorld (readonly)
+- ScriptObject@ scriptObject (readonly)
 
 
 Bone
