@@ -20,8 +20,8 @@ Urho3D development, contributions and bugfixes by:
 - Chris Friesen
 - Alex Fuller
 - Mika Heinonen
-- Ali Kämäräinen
 - Jason Kinzer
+- Ali Kämäräinen
 - Pete Leigh
 - Paul Noome
 - Vladimir Pobedinsky

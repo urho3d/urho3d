@@ -101,6 +101,9 @@ public:
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
 
+    /// Execute a script object function with parameters. Return true if successful.
+    bool Execute(const String& functionName, const VariantVector& parameters);
+    
     /// Return script file name.
     const String& GetScriptFileName() const { return scriptFileName_; }
 
@@ -155,6 +158,9 @@ private:
 
     /// Call script object function.
     void CallScriptObjectFunction(int functionRef, StringHash eventType, VariantMap& eventData);
+
+    /// Call script object function with arbitrary parameters.
+    bool CallScriptObjectFunction(int functionRef, const VariantVector& parameters);
 
     // Lua Script.
     LuaScript* luaScript_;

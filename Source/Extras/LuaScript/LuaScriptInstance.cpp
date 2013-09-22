@@ -112,20 +112,16 @@ void LuaScriptInstance::SetScriptFileName(const String& scriptFileName)
 
     scriptFileName_ = scriptFileName;
 
-    if (!scriptFileName_.Empty())
+    if (scriptFileName_.Empty())
         return;
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     LuaFile* luaFile = cache->GetResource<LuaFile>(scriptFileName_);
     if (!luaFile)
-    {
-        LOGERROR("Get Lua file failed: " + scriptFileName_);
-    }
+        return;
 
     if (!luaFile->LoadAndExecute(luaState_))
-    {
         LOGERROR("Execute Lua file failed: " + scriptFileName_);
-    }
 }
 
 void LuaScriptInstance::SetScriptObjectType(const String& scriptObjectType)
@@ -264,6 +260,18 @@ void LuaScriptInstance::ScriptUnsubscribeFromEvents(void* sender)
 
     UnsubscribeFromEvents(object);
     objectToEventTypeToFunctionRefMap_.Erase(it);
+}
+
+bool LuaScriptInstance::Execute(const String& functionName, const VariantVector& parameters)
+{
+    if (scriptObjectRef_ == LUA_REFNIL)
+        return false;
+
+    int functionRef = luaScript_->GetScriptFunctionRef(scriptObjectType_ + "." + functionName);
+    if (functionRef == LUA_REFNIL)
+        return false;
+    
+    return CallScriptObjectFunction(functionRef, parameters);
 }
 
 PODVector<unsigned char> LuaScriptInstance::GetScriptDataAttr() const
@@ -439,7 +447,6 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, float timeStep
     }
 }
 
-
 void LuaScriptInstance::CallScriptObjectFunction(int functionRef, Deserializer& deserializer)
 {
     if (functionRef == LUA_REFNIL)
@@ -490,7 +497,7 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, Serializer& se
     }
 }
 
-void LuaScriptInstance::CallScriptObjectFunction(int functionRef, StringHash eventType, VariantMap& eventData )
+void LuaScriptInstance::CallScriptObjectFunction(int functionRef, StringHash eventType, VariantMap& eventData)
 {
     if (functionRef == LUA_REFNIL)
         return;
@@ -516,6 +523,85 @@ void LuaScriptInstance::CallScriptObjectFunction(int functionRef, StringHash eve
         LOGERROR("Execute Lua function failed: " + String(message));
         lua_settop(luaState_, top);
     }
+}
+
+bool LuaScriptInstance::CallScriptObjectFunction(int functionRef, const VariantVector& parameters)
+{
+    if (functionRef == LUA_REFNIL)
+        return false;
+
+    int top = lua_gettop(luaState_);
+
+    // Push function.
+    lua_rawgeti(luaState_, LUA_REGISTRYINDEX, functionRef);
+
+    // Push script object.
+    lua_rawgeti(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
+
+    unsigned numParams = 1;
+    
+    // Push specified parameters
+    for (unsigned i = 0; i < parameters.Size(); ++i)
+    {
+        switch (parameters[i].GetType())
+        {
+        case VAR_BOOL:
+            tolua_pushboolean(luaState_, parameters[i].GetBool() ? 1 : 0);
+            ++numParams;
+            break;
+            
+        case VAR_INT:
+            tolua_pushnumber(luaState_, (double)parameters[i].GetInt());
+            ++numParams;
+            break;
+            
+        case VAR_FLOAT:
+            tolua_pushnumber(luaState_, parameters[i].GetFloat());
+            ++numParams;
+            break;
+            
+        case VAR_STRING:
+            tolua_pushstring(luaState_, parameters[i].GetString().CString());
+            ++numParams;
+            break;
+            
+        case VAR_VECTOR2:
+            tolua_pushusertype(luaState_, &const_cast<Vector2&>(parameters[i].GetVector2()), parameters[i].GetTypeName().CString());
+            ++numParams;
+            break;
+
+        case VAR_VECTOR3:
+            tolua_pushusertype(luaState_, &const_cast<Vector3&>(parameters[i].GetVector3()), parameters[i].GetTypeName().CString());
+            ++numParams;
+            break;
+            
+        case VAR_VECTOR4:
+            tolua_pushusertype(luaState_, &const_cast<Vector4&>(parameters[i].GetVector4()), parameters[i].GetTypeName().CString());
+            ++numParams;
+            break;
+
+        case VAR_QUATERNION:
+            tolua_pushusertype(luaState_, &const_cast<Quaternion&>(parameters[i].GetQuaternion()), parameters[i].GetTypeName().CString());
+            ++numParams;
+            break;
+            
+        case VAR_COLOR:
+            tolua_pushusertype(luaState_, &const_cast<Color&>(parameters[i].GetColor()), parameters[i].GetTypeName().CString());
+            ++numParams;
+            break;
+        }
+    }
+    
+    // Call script object function.
+    if (lua_pcall(luaState_, numParams, 0, 0) != 0)
+    {
+        const char* message = lua_tostring(luaState_, -1);
+        LOGERROR("Execute Lua function failed: " + String(message));
+        lua_settop(luaState_, top);
+        return false;
+    }
+    
+    return true;
 }
 
 }
