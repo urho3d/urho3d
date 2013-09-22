@@ -49,7 +49,7 @@ enum LuaScriptObjectMethod
     MAX_LUA_SCRIPT_OBJECT_METHODS
 };
 
-/// Lua script instance.
+/// Lua script object component.
 class URHO3D_API LuaScriptInstance : public Component
 {
     OBJECT(LuaScriptInstance);

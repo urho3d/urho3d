@@ -517,6 +517,95 @@ In unmodified AngelScript, this would have to be written as:
 \endcode
 
 
+\page LuaScripting Lua scripting
+
+Lua scripting in Urho3D has its dedicated LuaScript subsystem that must be instantiated before the scripting capabilities can be used. Lua support is not compiled in by default but must be enabled by the CMake
+build option -DENABLE_LUA=1. For more details see \ref Build_Options "Build options". Instantiating the subsystem is done like this:
+
+\code
+context_->RegisterSubsystem(new LuaScript(context_));
+\endcode
+
+Like AngelScript, Lua scripting supports immediate compiling and execution of single script lines, loading script files and executing procedural functions from them, and instantiating script objects
+to scene nodes using the LuaScriptInstance component.
+
+\section LuaScripting_Immediate Immediate execution
+
+Use \ref LuaScript::ExecuteString "ExecuteString()" to compile and run a line of Lua script. This should not be used for performance-critical operations.
+
+\section LuaScripting_ScriptFiles Script files and functions
+
+In contrast to AngelScript modules, which exist as separate entities and do not share functions or variables unless explicitly marked shared, in the Lua subsystem everything is loaded and executed in one Lua state, so scripts can naturally access everything  loaded so far. To load and execute a Lua script file, call \ref LuaScript::ExecuteFile "ExecuteFile()".
+
+After that, the functions in the script file are available for calling. Use \ref LuaScript::ExecuteFunction "ExecuteFunction()" to call a Lua function. Parameters to the function can be supplied in a VariantVector.
+
+\section LuaScripting_ScriptObjects Script objects
+
+By using the LuaScriptInstance component, Lua script objects can be added to scene nodes. After the component has been created, there are two ways to specify the object to instantiate: either specifying both the script file name and the object class name, in which case the script file is loaded and executed first, or specifying only the class name, in which case the Lua code containing the class definition must already have been executed. An example of creating a script object in C++ from the LuaIntegration sample, where a class called Rotator is instantiated from the script file Rotator.lua:
+
+\code
+LuaScriptInstance* instance = node->CreateComponent<LuaScriptInstance>();
+instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
+\endcode
+
+After instantiation, functions can be \ref LuaScriptInstance::ExecuteFunction "called" on the script object; parameters are again supplied in a VariantVector.
+
+Like their AngelScript counterparts, script object classes can define functions which are automatically called by LuaScriptInstance for operations like initialization, scene update, or load/save. These functions are listed below. Refer to the \ref Scripting "AngelScript scripting" page for details.
+
+- void Start()
+- void Stop()
+- void Update(timeStep)
+- void PostUpdate(timeStep)
+- void FixedUpdate(timeStep)
+- void FixedPostUpdate(timeStep)
+- void Save(serializer)
+- void Load(deserializer)
+- void WriteNetworkUpdate(serializer)
+- void ReadNetworkUpdate(deserializer)
+- void ApplyAttributes()
+
+\section LuaScripting_Events Event handling
+
+Like in AngelScript, both procedural and object event handling is supported. In procedural event handling the LuaScript subsystem acts as the event receiver on the C++ side, and forwards the event to a Lua function. Use SubscribeToEvent and give the event name and the function to use as the handler. Optionally a specific sender object can be given as the first argument instead. For example, subscribing to the application-wide Update event, and getting its timestep parameter in the event handler function.
+
+\code
+SubscribeToEvent("Update", "HandleUpdate")
+
+...
+
+function HandleUpdate(eventType, eventData)
+    local timeStep = eventData:GetFloat("TimeStep")
+    ...
+end
+\endcode
+
+When subscribing a script object to receive an event, use the form self:SubscribeToEvent instead. The function to use as the handler is given as "ClassName:FunctionName". For example subscribing to the NodeCollision physics event, and getting the participating other scene node and the contact point VectorBuffer in the handler function:
+
+\code
+CollisionDetector = ScriptObject()
+
+function CollisionDetector:Start()
+    self:SubscribeToEvent(self.node, "NodeCollision", "CollisionDetector:HandleNodeCollision")
+end
+
+function CollisionDetector:HandleNodeCollision(eventType, eventData)
+    local otherNode = eventData:GetPtr("Node", "OtherNode")
+    local contacts = eventData:GetBuffer("Contacts")
+    ...
+end
+\endcode
+
+\section LuaScripting_API The script API
+
+The binding of Urho3D C++ classes is accomplished with the tolua++ library, which for the most part binds the exact same function parameters as C++. Compared to the AngelScript API, you will always have the classes' Get / Set functions available, but in addition convenience properties also exist.
+
+When constructing Object subclasses, you need to supply the Context pointer as the first parameter. Use the global function GetContext() to get it. Similarly, use eg. GetFileSystem() or GetInput() to access the subsystems.
+
+As seen above from the event handling examples, VariantMap handling has some differences to both C++ and AngelScript. To get a value, supply its key name as a string. To get a pointer to an object, supply first the object type, then the key name.
+
+For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the Bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
+
+
 \page Rendering Rendering
 
 Much of the rendering functionality in Urho3D is built on two subsystems, Graphics and Renderer, contained within the %Graphics library.
@@ -578,6 +667,7 @@ The rendering-related components defined by the %Graphics and %UI libraries are:
 - Camera: describes a viewpoint for rendering, including projection parameters (FOV, near/far distance, perspective/orthographic)
 - Drawable: Base class for anything visible.
 - StaticModel: non-skinned geometry. Can LOD transition according to distance.
+- StaticModelGroup: renders several object instances while culling and receiving light as one unit.
 - Skybox: a subclass of StaticModel that appears to always stay in place.
 - AnimatedModel: skinned geometry that can do skeletal and vertex morph animation.
 - AnimationController: drives animations forward automatically and controls animation fade-in/out.

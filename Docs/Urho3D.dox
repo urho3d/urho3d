@@ -26,6 +26,7 @@ For further reference, see:
 \ref SceneModel "Scene model" <br>
 \ref Resources "Resources" <br>
 \ref Scripting "Scripting" <br>
+\ref LuaScripting "Lua scripting" <br>
 \ref Rendering "Rendering" <br>
 \ref Input "Input" <br>
 \ref Audio "Audio" <br>
