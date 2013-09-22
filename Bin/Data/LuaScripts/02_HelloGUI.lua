@@ -14,7 +14,7 @@ local cache = GetCache()
 local engine = GetEngine()
 local input = GetInput()
 local ui = GetUI()
-    
+
 function Start()
     -- Execute the common startup for samples
     SampleStart()

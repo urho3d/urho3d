@@ -202,7 +202,7 @@ function HandleNetworkMessage(eventType, eventData)
         -- If we are a client, just display the message
         if network.serverRunning then
             local sender = eventData:GetPtr("Connection", "Connection")
-            local text = sender:ToString() .. " " .. text
+            text = sender:ToString() .. " " .. text
             local sendMsg = VectorBuffer()
             sendMsg:WriteString(text)
             -- Broadcast as in-order and reliable

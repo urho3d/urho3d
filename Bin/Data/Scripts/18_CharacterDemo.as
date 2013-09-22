@@ -26,7 +26,7 @@ const float CAMERA_MAX_DIST = 5.0f;
 Scene@ scene_;
 Node@ cameraNode;
 Node@ characterNode;
-bool firstPerson;
+bool firstPerson = false;
 
 void Start()
 {

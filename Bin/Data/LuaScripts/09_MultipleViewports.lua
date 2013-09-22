@@ -5,9 +5,9 @@
 
 require "LuaScripts/Utilities/Sample"
 
-local scene_
-local cameraNode
-local rearCameraNode
+local scene_ = nil
+local cameraNode = nil
+local rearCameraNode = nil
 local yaw = 0.0
 local pitch = 0.0
 local drawDebug = false

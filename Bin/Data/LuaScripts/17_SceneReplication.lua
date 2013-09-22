@@ -16,14 +16,14 @@ local CTRL_BACK = 2
 local CTRL_LEFT = 4
 local CTRL_RIGHT = 8
 
-local scene_
-local cameraNode
-local instructionsText
-local buttonContainer
-local textEdit
-local connectButton
-local disconnectButton
-local startServerButton
+local scene_ = nil
+local cameraNode = nil
+local instructionsText = nil
+local buttonContainer = nil
+local textEdit = nil
+local connectButton = nil
+local disconnectButton = nil
+local startServerButton = nil
 local clients = {}
 local yaw = 0.0
 local pitch = 1.0
