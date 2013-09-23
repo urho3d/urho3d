@@ -65,8 +65,6 @@ public:
     void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
-    /// Push parameters from a VariantVector to a Lua state. Return number of parameters successfully pushed.
-    unsigned PushParameters(lua_State* state, const VariantVector& parameters);
     
     /// Return Lua state.
     lua_State* GetLuaState() const { return luaState_; }

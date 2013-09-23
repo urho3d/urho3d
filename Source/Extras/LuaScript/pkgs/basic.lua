@@ -43,7 +43,9 @@ function post_output_hook(package)
     replace([[#ifndef __cplusplus
 #include "stdlib.h"
 #endif
-#include "string.h"]], [[//
+#include "string.h"
+
+#include "tolua++.h"]], [[//
 // Copyright (c) 2008-2013 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -65,7 +67,8 @@ function post_output_hook(package)
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"]]
+#include "Precompiled.h"
+#include "ToluaUrho3DEx.h"]]
       )
 
     WRITE(result)

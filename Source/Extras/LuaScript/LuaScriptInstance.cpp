@@ -30,6 +30,7 @@
 #include "MemoryBuffer.h"
 #include "PhysicsEvents.h"
 #include "ResourceCache.h"
+#include "ToluaUrho3DEx.h"
 #include "ProcessUtils.h"
 #include "VectorBuffer.h"
 
@@ -538,10 +539,15 @@ bool LuaScriptInstance::CallScriptObjectFunction(int functionRef, const VariantV
     // Push script object.
     lua_rawgeti(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
 
-    unsigned numParams = 1 + luaScript_->PushParameters(luaState_, parameters);
+    // Push parameters.
+    if (!tolua_pushurho3dvariantvector(luaState_, parameters))
+    {
+        lua_settop(luaState_, top);
+        return false;
+    }
     
     // Call script object function.
-    if (lua_pcall(luaState_, numParams, 0, 0) != 0)
+    if (lua_pcall(luaState_, 1 + parameters.Size(), 0, 0) != 0)
     {
         const char* message = lua_tostring(luaState_, -1);
         LOGERROR("Execute Lua function failed: " + String(message));

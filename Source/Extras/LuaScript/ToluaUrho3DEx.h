@@ -22,7 +22,22 @@
 
 #pragma once
 
-#include "HashMap.h"
-#include "HashSet.h"
-#include "Str.h"
-#include "tolua++.h"
+#include "Variant.h"
+
+struct lua_State;
+
+#define tolua_isurho3dstring tolua_isstring
+#define tolua_pushurho3dstring(x,y)	tolua_pushstring(x,y.CString())
+
+/// Convert Lua string to Urho3D string.
+const char* tolua_tourho3dstring(lua_State* L, int narg, const char* def);;
+const char* tolua_tourho3dstring(lua_State* L, int narg, const Urho3D::String& def);
+
+/// Convert Lua table field to Urho3D string.
+const char* tolua_tofieldurho3dstring(lua_State* L, int lo, int index, const char* def);;
+const char* tolua_tofieldurho3dstring(lua_State* L, int lo, int index, const Urho3D::String& def);
+
+/// Push Urho3D string vector to Lua.
+int tolua_pushurho3dstringvector(lua_State* L, const Urho3D::Vector<Urho3D::String>& strings);
+/// Push Urho3D variant vector to Lua, if meet unsupported data type return false.
+bool tolua_pushurho3dvariantvector(lua_State* L, const Urho3D::VariantVector& variants);
