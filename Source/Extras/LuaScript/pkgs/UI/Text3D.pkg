@@ -19,6 +19,8 @@ class Text3D : public Drawable
     void SetTextAlignment(HorizontalAlignment align);
     void SetRowSpacing(float spacing);
     void SetWordwrap(bool enable);
+    void SetTextEffect(TextEffect textEffect);
+    void SetEffectColor(const Color& effectColor);
     void SetWidth(int width);
     void SetColor(const Color& color);
     void SetColor(Corner corner, const Color& color);
@@ -34,6 +36,8 @@ class Text3D : public Drawable
     VerticalAlignment GetVerticalAlignment() const;
     float GetRowSpacing() const;
     bool GetWordwrap() const;
+    TextEffect GetTextEffect() const;
+    const Color& GetEffectColor() const;
     int GetWidth() const;
     int GetRowHeight() const;
     unsigned GetNumRows() const;
@@ -56,6 +60,8 @@ class Text3D : public Drawable
     tolua_property__get_set VerticalAlignment verticalAlignment;
     tolua_property__get_set float rowSpacing;
     tolua_property__get_set bool wordwrap;
+    tolua_property__get_set TextEffect textEffect;
+    tolua_property__get_set Color& effectColor;
     tolua_property__get_set int width;
     tolua_property__get_set Color& color; // Write only property.
     tolua_readonly tolua_property__get_set int rowHeight;

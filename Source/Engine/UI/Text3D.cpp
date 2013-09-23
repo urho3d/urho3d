@@ -39,6 +39,7 @@ namespace Urho3D
 
 extern const char* horizontalAlignments[];
 extern const char* verticalAlignments[];
+extern const char* textEffects[];
 extern const char* GEOMETRY_CATEGORY;
 
 static const float TEXT_SCALING = 1.0f / 128.0f;
@@ -70,6 +71,8 @@ void Text3D::RegisterObject(Context* context)
     ENUM_ATTRIBUTE(Text3D, "Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_FLOAT, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_BOOL, "Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
+    ENUM_ATTRIBUTE(Text3D, "Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Text3D, VAR_COLOR, "Effect Color", GetEffectColor, SetEffectColor, Color, Color::TRANSPARENT, AM_FILE);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_INT, "Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_DEFAULT);
@@ -224,6 +227,16 @@ void Text3D::SetWordwrap(bool enable)
     MarkTextDirty();
 }
 
+void Text3D::SetTextEffect(TextEffect textEffect)
+{
+    text_.SetTextEffect(textEffect);
+}
+
+void Text3D::SetEffectColor(const Color& effectColor)
+{
+    text_.SetEffectColor(effectColor);
+}
+
 void Text3D::SetWidth(int width)
 {
     text_.SetMinWidth(width);
@@ -307,6 +320,16 @@ float Text3D::GetRowSpacing() const
 bool Text3D::GetWordwrap() const
 {
     return text_.GetWordwrap();
+}
+
+TextEffect Text3D::GetTextEffect() const
+{
+    return text_.GetTextEffect();
+}
+
+const Color& Text3D::GetEffectColor() const
+{
+    return text_.GetEffectColor();
 }
 
 int Text3D::GetWidth() const

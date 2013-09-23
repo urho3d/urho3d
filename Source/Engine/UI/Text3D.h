@@ -74,6 +74,10 @@ public:
     void SetRowSpacing(float spacing);
     /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
     void SetWordwrap(bool enable);
+    /// Set text effect.
+    void SetTextEffect(TextEffect textEffect);
+    /// Set effect color.
+    void SetEffectColor(const Color& effectColor);
     /// Set text width. Only has effect in word wrap mode.
     void SetWidth(int width);
     /// Set color on all corners.
@@ -103,6 +107,10 @@ public:
     float GetRowSpacing() const;
     /// Return wordwrap mode.
     bool GetWordwrap() const;
+    /// Return text effect.
+    TextEffect GetTextEffect() const;
+    /// Return effect color.
+    const Color& GetEffectColor() const;
     /// Return text width.
     int GetWidth() const;
     /// Return row height.

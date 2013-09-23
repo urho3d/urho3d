@@ -371,6 +371,10 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "float get_rowSpacing() const", asMETHOD(Text3D, GetRowSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_wordwrap(bool)", asMETHOD(Text3D, SetWordwrap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "bool get_wordwrap() const", asMETHOD(Text3D, GetWordwrap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_textEffect(TextEffect)", asMETHOD(Text3D, SetTextEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "TextEffect get_textEffect() const", asMETHOD(Text3D, GetTextEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectColor(const Color&in)", asMETHOD(Text3D, SetEffectColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const Color& get_effectColor() const", asMETHOD(Text3D, GetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_width(int)", asMETHOD(Text3D, SetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "int get_width() const", asMETHOD(Text3D, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_color(const Color&in)", asMETHODPR(Text3D, SetColor, (const Color&), void), asCALL_THISCALL);
