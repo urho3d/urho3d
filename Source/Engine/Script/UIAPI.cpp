@@ -316,7 +316,7 @@ static void RegisterListView(asIScriptEngine* engine)
 static void RegisterText(asIScriptEngine* engine)
 {
     engine->RegisterEnum("TextEffect");
-    engine->RegisterEnumValue("TextEffect", "TE_NOE", TE_NONE);
+    engine->RegisterEnumValue("TextEffect", "TE_NONE", TE_NONE);
     engine->RegisterEnumValue("TextEffect", "TE_SHADOW", TE_SHADOW);
     engine->RegisterEnumValue("TextEffect", "TE_STROKE", TE_STROKE);
 
