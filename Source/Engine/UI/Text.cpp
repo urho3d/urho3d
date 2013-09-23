@@ -35,24 +35,18 @@
 namespace Urho3D
 {
 
+const char* textEffects[] =
+{
+    "None",
+    "Shadow",
+    "Stroke",
+    0
+};
+
 static const float MIN_ROW_SPACING = 0.5f;
 
 extern const char* horizontalAlignments[];
 extern const char* UI_CATEGORY;
-
-struct GlyphLocation
-{
-    int x_;
-    int y_;
-    const FontGlyph* glyph_;
-
-    GlyphLocation(int x, int y, const FontGlyph* glyph) :
-        x_(x),
-        y_(y),
-        glyph_(glyph)
-    {
-    }
-};
 
 Text::Text(Context* context) :
     UIElement(context),
@@ -64,6 +58,8 @@ Text::Text(Context* context) :
     selectionLength_(0),
     selectionColor_(Color::TRANSPARENT),
     hoverColor_(Color::TRANSPARENT),
+    textEffect_(TE_NONE),
+    effectColor_(Color::TRANSPARENT),
     rowHeight_(0)
 {
     // By default Text does not derive opacity from parent elements
@@ -88,6 +84,8 @@ void Text::RegisterObject(Context* context)
     ATTRIBUTE(Text, VAR_BOOL, "Word Wrap", wordWrap_, false, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
+    ENUM_ATTRIBUTE(Text, "Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Effect Color", GetEffectColor, SetEffectColor, Color, Color::TRANSPARENT, AM_FILE);
 
     // Change the default value for UseDerivedOpacity
     context->GetAttribute<Text>("Use Derived Opacity")->defaultValue_ = false;
@@ -199,11 +197,25 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, face->textures_[n], &vertexData);
 
                 const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations[n];
-                for (unsigned i = 0; i < pageGlyphLocation.Size(); ++i)
+
+                if (textEffect_ == TE_NONE)
+                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+                else if (textEffect_ == TE_SHADOW)
                 {
-                    const GlyphLocation& glyphLocation = pageGlyphLocation[i];
-                    const FontGlyph& glyph = *glyphLocation.glyph_;
-                    pageBatch.AddQuad(glyphLocation.x_ + glyph.offsetX_, glyphLocation.y_ + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+                }
+                else if (textEffect_ == TE_STROKE)
+                {
+                    ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
                 }
 
                 batches.Push(pageBatch);
@@ -211,34 +223,30 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         }
         else
         {
-            // If only one texture page, construct the UI batch directly
-            unsigned rowIndex = 0;
-            int x = GetRowStartPosition(rowIndex);
+            // If only one texture page, construct the UI batch directly            
+            int x = GetRowStartPosition(0);
             int y = 0;
 
             UIBatch batch(this, BLEND_ALPHA, currentScissor, face->textures_[0], &vertexData);
 
-            for (unsigned i = 0; i < printText_.Size(); ++i)
+            if (textEffect_ == TE_NONE)
+                ConstructBatch(batch, face, x, y);
+            else if (textEffect_ == TE_SHADOW)
             {
-                unsigned c = printText_[i];
-
-                if (c != '\n')
-                {
-                    const FontGlyph* p = face->GetGlyph(c);
-                    if (!p)
-                        continue;
-
-                    batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_);
-
-                    x += p->advanceX_;
-                    if (i < printText_.Size() - 1)
-                        x += face->GetKerning(c, printText_[i + 1]);
-                }
-                else
-                {
-                    x = GetRowStartPosition(++rowIndex);
-                    y += rowHeight_;
-                }
+                ConstructBatch(batch, face, x + 1, y + 1, &effectColor_);
+                ConstructBatch(batch, face, x, y);
+            }
+            else if (textEffect_ == TE_STROKE)
+            {
+                ConstructBatch(batch, face, x - 1, y - 1, &effectColor_);
+                ConstructBatch(batch, face, x, y - 1, &effectColor_);
+                ConstructBatch(batch, face, x + 1, y - 1, &effectColor_);
+                ConstructBatch(batch, face, x - 1, y, &effectColor_);
+                ConstructBatch(batch, face, x + 1, y, &effectColor_);
+                ConstructBatch(batch, face, x - 1, y + 1, &effectColor_);
+                ConstructBatch(batch, face, x, y + 1, &effectColor_);
+                ConstructBatch(batch, face, x + 1, y + 1, &effectColor_);
+                ConstructBatch(batch, face, x, y);
             }
 
             UIBatch::AddOrMerge(batch, batches);
@@ -340,6 +348,16 @@ void Text::SetSelectionColor(const Color& color)
 void Text::SetHoverColor(const Color& color)
 {
     hoverColor_ = color;
+}
+
+void Text::SetTextEffect(TextEffect textEffect)
+{
+    textEffect_ = textEffect;
+}
+
+void Text::SetEffectColor(const Color& effectColor)
+{
+    effectColor_ = effectColor;
 }
 
 void Text::SetFontAttr(ResourceRef value)
@@ -608,6 +626,50 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     }
 
     return ret;
+}
+
+void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color)
+{
+    for (unsigned i = 0; i < pageGlyphLocation.Size(); ++i)
+    {
+        const GlyphLocation& glyphLocation = pageGlyphLocation[i];
+        const FontGlyph& glyph = *glyphLocation.glyph_;
+        if (color == 0)
+            pageBatch.AddQuad(x + glyphLocation.x_ + glyph.offsetX_, y + glyphLocation.y_ + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+        else
+            pageBatch.AddQuad(x + glyphLocation.x_ + glyph.offsetX_, y + glyphLocation.y_ + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_, 0, 0, color);
+    }
+}
+
+void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color)
+{
+    unsigned rowIndex = 0;
+
+    for (unsigned i = 0; i < printText_.Size(); ++i)
+    {
+        unsigned c = printText_[i];
+
+        if (c != '\n')
+        {
+            const FontGlyph* p = face->GetGlyph(c);
+            if (!p)
+                continue;
+
+            if (color == 0)
+                batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_);
+            else
+                batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_, 0, 0, color);
+
+            x += p->advanceX_;
+            if (i < printText_.Size() - 1)
+                x += face->GetKerning(c, printText_[i + 1]);
+        }
+        else
+        {
+            x = GetRowStartPosition(++rowIndex);
+            y += rowHeight_;
+        }
+    }
 }
 
 }

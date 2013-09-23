@@ -315,6 +315,11 @@ static void RegisterListView(asIScriptEngine* engine)
 
 static void RegisterText(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("TextEffect");
+    engine->RegisterEnumValue("TextEffect", "TE_NOE", TE_NONE);
+    engine->RegisterEnumValue("TextEffect", "TE_SHADOW", TE_SHADOW);
+    engine->RegisterEnumValue("TextEffect", "TE_STROKE", TE_STROKE);
+
     RegisterUIElement<Text>(engine, "Text");
     engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, int)", asMETHODPR(Text, SetFont, (const String&, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "bool SetFont(Font@+, int)", asMETHODPR(Text, SetFont, (Font*, int), bool), asCALL_THISCALL);
@@ -336,6 +341,10 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "const Color& get_selectionColor() const", asMETHOD(Text, GetSelectionColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_hoverColor(const Color&in)", asMETHOD(Text, SetHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "const Color& get_hoverColor() const", asMETHOD(Text, GetHoverColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void set_textEffect(TextEffect)", asMETHOD(Text, SetTextEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "TextEffect get_textEffect() const", asMETHOD(Text, GetTextEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void set_effectColor(const Color&in)", asMETHOD(Text, SetEffectColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "const Color& get_effectColor() const", asMETHOD(Text, GetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_numRows() const", asMETHOD(Text, GetNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "int get_rowHeight() const", asMETHOD(Text, GetRowHeight), asCALL_THISCALL);
 }

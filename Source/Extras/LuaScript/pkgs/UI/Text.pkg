@@ -1,5 +1,12 @@
 $#include "Text.h"
 
+enum TextEffect
+{
+    TE_NONE = 0,
+    TE_SHADOW,
+    TE_STROKE
+};
+
 class Text : public UIElement
 {
     Text(Context* context);
@@ -17,7 +24,9 @@ class Text : public UIElement
     void ClearSelection();
     void SetSelectionColor(const Color& color);
     void SetHoverColor(const Color& color);
-
+    void SetTextEffect(TextEffect textEffect);
+    void SetEffectColor(const Color& effectColor);
+    
     Font* GetFont() const;
     int GetFontSize() const;
     const String& GetText() const;
@@ -28,6 +37,8 @@ class Text : public UIElement
     unsigned GetSelectionLength() const;
     const Color& GetSelectionColor() const;
     const Color& GetHoverColor() const;
+    TextEffect GetTextEffect() const;
+    const Color& GetEffectColor() const;
     int GetRowHeight() const;
     unsigned GetNumRows() const;
     
@@ -44,6 +55,8 @@ class Text : public UIElement
     tolua_readonly tolua_property__get_set unsigned selectionLength;
     tolua_property__get_set Color& selectionColor;
     tolua_property__get_set Color& hoverColor;
+    tolua_property__get_set TextEffect textEffect;
+    tolua_property__get_set Color& effectColor;
     tolua_readonly tolua_property__get_set int rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_property__get_set ResourceRef fontAttr;

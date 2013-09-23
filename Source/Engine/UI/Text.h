@@ -30,14 +30,39 @@ namespace Urho3D
 static const int DEFAULT_FONT_SIZE = 12;
 
 class Font;
+class FontFace;
+struct FontGlyph;
+
+/// Text effect.
+enum TextEffect
+{
+    TE_NONE = 0,
+    TE_SHADOW,
+    TE_STROKE
+};
+
+/// Glyph location.
+struct GlyphLocation
+{
+    int x_;
+    int y_;
+    const FontGlyph* glyph_;
+
+    GlyphLocation(int x, int y, const FontGlyph* glyph) :
+    x_(x),
+        y_(y),
+        glyph_(glyph)
+    {
+    }
+};
 
 /// %Text %UI element.
 class URHO3D_API Text : public UIElement
 {
     OBJECT(Text);
-    
+
     friend class Text3D;
-    
+
 public:
     /// Construct.
     Text(Context* context);
@@ -45,14 +70,14 @@ public:
     virtual ~Text();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to resize.
     virtual void OnResize();
-    
+
     /// Set font and font size.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size.
@@ -73,7 +98,11 @@ public:
     void SetSelectionColor(const Color& color);
     /// Set hover background color. Color with 0 alpha (default) disables.
     void SetHoverColor(const Color& color);
-    
+    /// Set text effect.
+    void SetTextEffect(TextEffect textEffect);
+    /// Set effect color.
+    void SetEffectColor(const Color& effectColor);
+
     /// Return font.
     Font* GetFont() const { return font_; }
     /// Return font size.
@@ -94,6 +123,10 @@ public:
     const Color& GetSelectionColor() const { return selectionColor_; }
     /// Return hover background color.
     const Color& GetHoverColor() const { return hoverColor_; }
+    /// Return text effect.
+    TextEffect GetTextEffect() const { return textEffect_; }
+    /// Return effect color.
+    const Color& GetEffectColor() const { return effectColor_; }
     /// Return row height.
     int GetRowHeight() const { return rowHeight_; }
     /// Return number of rows.
@@ -104,12 +137,12 @@ public:
     const PODVector<IntVector2>& GetCharPositions() const { return charPositions_; }
     /// Return size of each character.
     const PODVector<IntVector2>& GetCharSizes() const { return charSizes_; }
-    
+
     /// Set font attribute.
     void SetFontAttr(ResourceRef value);
     /// Return font attribute.
     ResourceRef GetFontAttr() const;
-    
+
 protected:
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
@@ -119,7 +152,11 @@ protected:
     void ValidateSelection();
     /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
-    
+    /// Contruct batch.
+    void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color = 0);
+    /// Contruct batch.
+    void ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color = 0);
+
     /// Font.
     SharedPtr<Font> font_;
     /// Font size.
@@ -144,6 +181,10 @@ protected:
     Color selectionColor_;
     /// Hover background color.
     Color hoverColor_;
+    /// Text effect.
+    TextEffect textEffect_;
+    /// Effect color.
+    Color effectColor_;
     /// Row height.
     int rowHeight_;
     /// Row widths.
