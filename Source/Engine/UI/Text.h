@@ -31,14 +31,6 @@ static const int DEFAULT_FONT_SIZE = 12;
 
 class Font;
 
-/// Text effect.
-enum TextEffect
-{
-    TE_NONE = 0
-    TE_SHADOW, 
-    TE_STROKE,
-};
-
 /// %Text %UI element.
 class URHO3D_API Text : public UIElement
 {
