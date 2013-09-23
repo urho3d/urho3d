@@ -104,7 +104,7 @@ void CreateAttributeInspectorWindow()
     ui.root.AddChild(attributeInspectorWindow);
     int height = Min(ui.root.height - 60, 500);
     attributeInspectorWindow.SetSize(300, height);
-    attributeInspectorWindow.SetPosition(ui.root.width - 20 - attributeInspectorWindow.width, 40);
+    attributeInspectorWindow.SetPosition(ui.root.width - 20 - attributeInspectorWindow.width, 60);
     attributeInspectorWindow.opacity = uiMaxOpacity;
     attributeInspectorWindow.BringToFront();
 

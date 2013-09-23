@@ -385,6 +385,26 @@ cmake_xxxx batch files or shell scripts.
 History
 -------
 
+V1.3    - Lua scripting support.
+        - Optional build as a single external library, static or dynamic.
+        - Raspberry Pi support.
+        - 64-bit build support.
+        - HTTP client using the Civetweb library.
+        - Enhanced CMake build scripts. Android build also uses CMake.
+        - Rendering performance optimizations, optional StaticModelGroup
+          component for culling and lighting several objects as one unit.
+        - A set of sample applications implemented in C++, AngelScript and Lua.
+        - Automatic Node/component handle member variable serialization for
+          AngelScript script objects.
+        - New UI theme.
+        - Boolean shader uniforms.
+        - Quick menu in the editor.
+        - Material editor and preview in the editor.
+        - Editable attributes for particle emitters.
+        - Components are grouped into categories in the editor.
+        - Update SDL to stable 2.0.0 release.
+        - Several other improvements and bugfixes.
+
 V1.23   - UI editing support in the editor.
         - Undo/redo in the editor.
         - Recast/Detour library integration for navigation mesh generation and
