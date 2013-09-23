@@ -112,9 +112,7 @@ void LuaIntegration::CreateScene()
         instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
         // Call the script object's "SetRotationSpeed" function. Function arguments need to be passed in a VariantVector
         VariantVector parameters;
-        parameters.Push(10.0f);
-        parameters.Push(20.0f);
-        parameters.Push(30.0f);
+        parameters.Push(Vector3(10.0f, 20.0f, 30.0f));
         instance->ExecuteFunction("SetRotationSpeed", parameters);
     }
     
