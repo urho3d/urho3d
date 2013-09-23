@@ -397,6 +397,7 @@ V1.3    - Lua scripting support.
         - Automatic Node/component handle member variable serialization for
           AngelScript script objects.
         - New UI theme.
+        - Shadow & stroke effects in Text & Text3D.
         - Boolean shader uniforms.
         - Quick menu in the editor.
         - Material editor and preview in the editor.

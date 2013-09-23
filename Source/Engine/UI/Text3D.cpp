@@ -43,6 +43,7 @@ extern const char* textEffects[];
 extern const char* GEOMETRY_CATEGORY;
 
 static const float TEXT_SCALING = 1.0f / 128.0f;
+static const float DEFAULT_EFFECT_DEPTH_BIAS = 0.1f;
 
 Text3D::Text3D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
@@ -53,6 +54,7 @@ Text3D::Text3D(Context* context) :
     textDirty_(true),
     geometryDirty_(true)
 {
+    text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
 }
 
 Text3D::~Text3D()
@@ -71,8 +73,9 @@ void Text3D::RegisterObject(Context* context)
     ENUM_ATTRIBUTE(Text3D, "Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_FLOAT, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_BOOL, "Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
-    ENUM_ATTRIBUTE(Text3D, "Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Text3D, VAR_COLOR, "Effect Color", GetEffectColor, SetEffectColor, Color, Color::TRANSPARENT, AM_FILE);
+    ENUM_ATTRIBUTE(Text3D, "Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(Text3D, VAR_COLOR, "Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_FLOAT, "Effect Depth Bias", text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_INT, "Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_DEFAULT);
@@ -230,11 +233,22 @@ void Text3D::SetWordwrap(bool enable)
 void Text3D::SetTextEffect(TextEffect textEffect)
 {
     text_.SetTextEffect(textEffect);
+    
+    MarkTextDirty();
 }
 
 void Text3D::SetEffectColor(const Color& effectColor)
 {
     text_.SetEffectColor(effectColor);
+    
+    MarkTextDirty();
+}
+
+void Text3D::SetEffectDepthBias(float bias)
+{
+    text_.SetEffectDepthBias(bias);
+    
+    MarkTextDirty();
 }
 
 void Text3D::SetWidth(int width)
@@ -330,6 +344,11 @@ TextEffect Text3D::GetTextEffect() const
 const Color& Text3D::GetEffectColor() const
 {
     return text_.GetEffectColor();
+}
+
+float Text3D::GetEffectDepthBias() const
+{
+    return text_.GetEffectDepthBias();
 }
 
 int Text3D::GetWidth() const

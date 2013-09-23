@@ -138,6 +138,10 @@ public:
     /// Return size of each character.
     const PODVector<IntVector2>& GetCharSizes() const { return charSizes_; }
 
+    /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
+    void SetEffectDepthBias(float bias);
+    /// Return effect Z bias.
+    float GetEffectDepthBias() const { return effectDepthBias_; }
     /// Set font attribute.
     void SetFontAttr(ResourceRef value);
     /// Return font attribute.
@@ -153,9 +157,9 @@ protected:
     /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Contruct batch.
-    void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color = 0);
+    void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color = 0, float depthBias = 0.0f);
     /// Contruct batch.
-    void ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color = 0);
+    void ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color = 0, float depthBias = 0.0f);
 
     /// Font.
     SharedPtr<Font> font_;
@@ -185,6 +189,8 @@ protected:
     TextEffect textEffect_;
     /// Effect color.
     Color effectColor_;
+    /// Text effect Z bias.
+    float effectDepthBias_;
     /// Row height.
     int rowHeight_;
     /// Row widths.

@@ -5053,6 +5053,7 @@ Properties:<br>
 - bool wordwrap
 - TextEffect textEffect
 - Color effectColor
+- float effectDepthBias
 - int width
 - Color color (writeonly)
 - Color[] colors

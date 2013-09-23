@@ -4388,6 +4388,7 @@ Methods:<br>
 - void SetWordwrap(bool enable)
 - void SetTextEffect(TextEffect textEffect)
 - void SetEffectColor(const Color& effectColor)
+- void SetEffectDepthBias(float bias)
 - void SetWidth(int width)
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
@@ -4404,6 +4405,7 @@ Methods:<br>
 - bool GetWordwrap() const
 - TextEffect GetTextEffect() const
 - const Color& GetEffectColor() const
+- float GetEffectDepthBias() const
 - int GetWidth() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
@@ -4428,6 +4430,7 @@ Properties:<br>
 - bool wordwrap
 - TextEffect textEffect
 - Color& effectColor
+- float effectDepthBias
 - int width
 - int rowHeight (readonly)
 - unsigned numRows (readonly)

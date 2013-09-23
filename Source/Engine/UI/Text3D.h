@@ -78,6 +78,8 @@ public:
     void SetTextEffect(TextEffect textEffect);
     /// Set effect color.
     void SetEffectColor(const Color& effectColor);
+    /// Set effect Z bias.
+    void SetEffectDepthBias(float bias);
     /// Set text width. Only has effect in word wrap mode.
     void SetWidth(int width);
     /// Set color on all corners.
@@ -111,6 +113,8 @@ public:
     TextEffect GetTextEffect() const;
     /// Return effect color.
     const Color& GetEffectColor() const;
+    /// Return effect depth bias.
+    float GetEffectDepthBias() const;
     /// Return text width.
     int GetWidth() const;
     /// Return row height.

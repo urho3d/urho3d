@@ -375,6 +375,8 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "TextEffect get_textEffect() const", asMETHOD(Text3D, GetTextEffect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_effectColor(const Color&in)", asMETHOD(Text3D, SetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "const Color& get_effectColor() const", asMETHOD(Text3D, GetEffectColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectDepthBias(float)", asMETHOD(Text3D, SetEffectDepthBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_effectDepthBias() const", asMETHOD(Text3D, GetEffectDepthBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_width(int)", asMETHOD(Text3D, SetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "int get_width() const", asMETHOD(Text3D, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_color(const Color&in)", asMETHODPR(Text3D, SetColor, (const Color&), void), asCALL_THISCALL);

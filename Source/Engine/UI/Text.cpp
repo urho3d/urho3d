@@ -59,7 +59,8 @@ Text::Text(Context* context) :
     selectionColor_(Color::TRANSPARENT),
     hoverColor_(Color::TRANSPARENT),
     textEffect_(TE_NONE),
-    effectColor_(Color::TRANSPARENT),
+    effectColor_(Color::BLACK),
+    effectDepthBias_(0.0f),
     rowHeight_(0)
 {
     // By default Text does not derive opacity from parent elements
@@ -85,7 +86,7 @@ void Text::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     ENUM_ATTRIBUTE(Text, "Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
-    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Effect Color", GetEffectColor, SetEffectColor, Color, Color::TRANSPARENT, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(Text, VAR_COLOR, "Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_FILE);
 
     // Change the default value for UseDerivedOpacity
     context->GetAttribute<Text>("Use Derived Opacity")->defaultValue_ = false;
@@ -198,24 +199,28 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 
                 const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations[n];
 
-                if (textEffect_ == TE_NONE)
-                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-                else if (textEffect_ == TE_SHADOW)
+                switch (textEffect_)
                 {
-                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_);
+                case TE_NONE:
                     ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-                }
-                else if (textEffect_ == TE_STROKE)
-                {
-                    ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_);
-                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_);
+                    break;
+                    
+                case TE_SHADOW:
+                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
                     ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+                    break;
+                    
+                case TE_STROKE:
+                    ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+                    ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+                    break;
                 }
 
                 batches.Push(pageBatch);
@@ -223,30 +228,34 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         }
         else
         {
-            // If only one texture page, construct the UI batch directly            
+            // If only one texture page, construct the UI batch directly
             int x = GetRowStartPosition(0);
             int y = 0;
 
             UIBatch batch(this, BLEND_ALPHA, currentScissor, face->textures_[0], &vertexData);
 
-            if (textEffect_ == TE_NONE)
-                ConstructBatch(batch, face, x, y);
-            else if (textEffect_ == TE_SHADOW)
+            switch (textEffect_)
             {
-                ConstructBatch(batch, face, x + 1, y + 1, &effectColor_);
+            case TE_NONE:
                 ConstructBatch(batch, face, x, y);
-            }
-            else if (textEffect_ == TE_STROKE)
-            {
-                ConstructBatch(batch, face, x - 1, y - 1, &effectColor_);
-                ConstructBatch(batch, face, x, y - 1, &effectColor_);
-                ConstructBatch(batch, face, x + 1, y - 1, &effectColor_);
-                ConstructBatch(batch, face, x - 1, y, &effectColor_);
-                ConstructBatch(batch, face, x + 1, y, &effectColor_);
-                ConstructBatch(batch, face, x - 1, y + 1, &effectColor_);
-                ConstructBatch(batch, face, x, y + 1, &effectColor_);
-                ConstructBatch(batch, face, x + 1, y + 1, &effectColor_);
+                break;
+                
+            case TE_SHADOW:
+                ConstructBatch(batch, face, x + 1, y + 1, &effectColor_, effectDepthBias_);
                 ConstructBatch(batch, face, x, y);
+                break;
+                
+            case TE_STROKE:
+                ConstructBatch(batch, face, x - 1, y - 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y - 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x + 1, y - 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x - 1, y, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x + 1, y, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x - 1, y + 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y + 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x + 1, y + 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y);
+                break;
             }
 
             UIBatch::AddOrMerge(batch, batches);
@@ -358,6 +367,11 @@ void Text::SetTextEffect(TextEffect textEffect)
 void Text::SetEffectColor(const Color& effectColor)
 {
     effectColor_ = effectColor;
+}
+
+void Text::SetEffectDepthBias(float bias)
+{
+    effectDepthBias_ = bias;
 }
 
 void Text::SetFontAttr(ResourceRef value)
@@ -628,23 +642,40 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     return ret;
 }
 
-void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color)
+void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color,
+    float depthBias)
 {
+    unsigned startDataSize = pageBatch.vertexData_->Size();
+    
     for (unsigned i = 0; i < pageGlyphLocation.Size(); ++i)
     {
         const GlyphLocation& glyphLocation = pageGlyphLocation[i];
         const FontGlyph& glyph = *glyphLocation.glyph_;
-        if (color == 0)
-            pageBatch.AddQuad(x + glyphLocation.x_ + glyph.offsetX_, y + glyphLocation.y_ + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_);
+        if (!color)
+        {
+            pageBatch.AddQuad(x + glyphLocation.x_ + glyph.offsetX_, y + glyphLocation.y_ + glyph.offsetY_, glyph.width_,
+                glyph.height_, glyph.x_, glyph.y_);
+        }
         else
-            pageBatch.AddQuad(x + glyphLocation.x_ + glyph.offsetX_, y + glyphLocation.y_ + glyph.offsetY_, glyph.width_, glyph.height_, glyph.x_, glyph.y_, 0, 0, color);
+        {
+            pageBatch.AddQuad(x + glyphLocation.x_ + glyph.offsetX_, y + glyphLocation.y_ + glyph.offsetY_, glyph.width_,
+                glyph.height_, glyph.x_, glyph.y_, 0, 0, color);
+        }
+    }
+
+    if (depthBias != 0.0f)
+    {
+        unsigned dataSize = pageBatch.vertexData_->Size();
+        for (unsigned i = startDataSize; i < dataSize; i += UI_VERTEX_SIZE)
+            pageBatch.vertexData_->At(i + 2) += depthBias;
     }
 }
 
-void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color)
+void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color, float depthBias)
 {
     unsigned rowIndex = 0;
-
+    unsigned startDataSize = batch.vertexData_->Size();
+    
     for (unsigned i = 0; i < printText_.Size(); ++i)
     {
         unsigned c = printText_[i];
@@ -655,7 +686,7 @@ void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Co
             if (!p)
                 continue;
 
-            if (color == 0)
+            if (!color)
                 batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_);
             else
                 batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_, 0, 0, color);
@@ -669,6 +700,13 @@ void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Co
             x = GetRowStartPosition(++rowIndex);
             y += rowHeight_;
         }
+    }
+    
+    if (depthBias != 0.0f)
+    {
+        unsigned dataSize = batch.vertexData_->Size();
+        for (unsigned i = startDataSize; i < dataSize; i += UI_VERTEX_SIZE)
+            batch.vertexData_->At(i + 2) += depthBias;
     }
 }
 
