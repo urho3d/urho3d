@@ -549,6 +549,9 @@ section LuaScriptAPI_GlobalConstants Global constants
 - int VA_TOP
 - int VA_CENTER
 - int VA_BOTTOM
+- int TE_NONE
+- int TE_SHADOW
+- int TE_STROKE
 - int C_TOPLEFT
 - int C_TOPRIGHT
 - int C_BOTTOMLEFT
@@ -4331,6 +4334,8 @@ Methods:<br>
 - void ClearSelection()
 - void SetSelectionColor(const Color& color)
 - void SetHoverColor(const Color& color)
+- void SetTextEffect(TextEffect textEffect)
+- void SetEffectColor(const Color& effectColor)
 - Font* GetFont() const
 - int GetFontSize() const
 - const String& GetText() const
@@ -4341,6 +4346,8 @@ Methods:<br>
 - unsigned GetSelectionLength() const
 - const Color& GetSelectionColor() const
 - const Color& GetHoverColor() const
+- TextEffect GetTextEffect() const
+- const Color& GetEffectColor() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
 - void SetFontAttr(ResourceRef value)
@@ -4357,6 +4364,8 @@ Properties:<br>
 - unsigned selectionLength (readonly)
 - Color& selectionColor
 - Color& hoverColor
+- TextEffect textEffect
+- Color& effectColor
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
 - ResourceRef fontAttr
@@ -4377,6 +4386,8 @@ Methods:<br>
 - void SetTextAlignment(HorizontalAlignment align)
 - void SetRowSpacing(float spacing)
 - void SetWordwrap(bool enable)
+- void SetTextEffect(TextEffect textEffect)
+- void SetEffectColor(const Color& effectColor)
 - void SetWidth(int width)
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
@@ -4391,6 +4402,8 @@ Methods:<br>
 - VerticalAlignment GetVerticalAlignment() const
 - float GetRowSpacing() const
 - bool GetWordwrap() const
+- TextEffect GetTextEffect() const
+- const Color& GetEffectColor() const
 - int GetWidth() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
@@ -4413,6 +4426,8 @@ Properties:<br>
 - VerticalAlignment verticalAlignment
 - float rowSpacing
 - bool wordwrap
+- TextEffect textEffect
+- Color& effectColor
 - int width
 - int rowHeight (readonly)
 - unsigned numRows (readonly)

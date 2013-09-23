@@ -4986,6 +4986,8 @@ Properties:<br>
 - uint selectionLength (readonly)
 - Color selectionColor
 - Color hoverColor
+- TextEffect textEffect
+- Color effectColor
 - uint numRows (readonly)
 - int rowHeight (readonly)
 
@@ -5049,6 +5051,8 @@ Properties:<br>
 - VerticalAlignment verticalAlignment
 - float rowSpacing
 - bool wordwrap
+- TextEffect textEffect
+- Color effectColor
 - int width
 - Color color (writeonly)
 - Color[] colors
