@@ -73,9 +73,9 @@ void Text3D::RegisterObject(Context* context)
     ENUM_ATTRIBUTE(Text3D, "Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_FLOAT, "Row Spacing", text_.rowSpacing_, 1.0f, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_BOOL, "Word Wrap", text_.wordWrap_, false, AM_DEFAULT);
-    ENUM_ATTRIBUTE(Text3D, "Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Text3D, VAR_COLOR, "Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
-    ATTRIBUTE(Text3D, VAR_FLOAT, "Effect Depth Bias", text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Face Camera", GetFaceCamera, SetFaceCamera, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Text3D, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Text3D, VAR_INT, "Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE(Text3D, "Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments, VA_TOP, AM_DEFAULT);
@@ -84,9 +84,9 @@ void Text3D::RegisterObject(Context* context)
     ATTRIBUTE(Text3D, VAR_COLOR, "Top Right Color", text_.color_[1], Color::WHITE, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_COLOR, "Bottom Left Color", text_.color_[2], Color::WHITE, AM_DEFAULT);
     ATTRIBUTE(Text3D, VAR_COLOR, "Bottom Right Color", text_.color_[3], Color::WHITE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Text3D, VAR_BOOL, "Face Camera", GetFaceCamera, SetFaceCamera, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Text3D, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    ENUM_ATTRIBUTE(Text3D, "Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(Text3D, VAR_COLOR, "Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
+    ATTRIBUTE(Text3D, VAR_FLOAT, "Effect Depth Bias", text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Text3D, Drawable);
 }
 
@@ -507,6 +507,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 pass->SetVertexShader("Basic_DiffVCol");
                 pass->SetPixelShader("Basic_AlphaVCol");
                 pass->SetBlendMode(BLEND_ALPHA);
+                pass->SetDepthWrite(false);
                 material->SetTechnique(0, tech);
                 material->SetCullMode(CULL_NONE);
                 batches_[i].material_ = material;
