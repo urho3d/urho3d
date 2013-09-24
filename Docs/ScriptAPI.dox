@@ -253,11 +253,329 @@ namespace Urho3D
 - uint DEBUGHUD_SHOW_MODE
 - uint DEBUGHUD_SHOW_PROFILER
 - uint DEBUGHUD_SHOW_ALL
+\section ScriptAPI_Enums Enumerations
+
+### Intersection
+
+- OUTSIDE
+- INTERSECTS
+- INSIDE
+
+
+### VariantType
+
+- VAR_NONE
+- VAR_INT
+- VAR_BOOL
+- VAR_FLOAT
+- VAR_VECTOR2
+- VAR_VECTOR3
+- VAR_VECTOR4
+- VAR_QUATERNION
+- VAR_COLOR
+- VAR_STRING
+- VAR_BUFFER
+- VAR_PTR
+- VAR_RESOURCEREF
+- VAR_RESOURCEREFLIST
+- VAR_VARIANTVECTOR
+- VAR_VARIANTMAP
+- VAR_INTRECT
+- VAR_INTVECTOR2
+
+
+### FileMode
+
+- FILE_READ
+- FILE_WRITE
+- FILE_READWRITE
+
+
+### CreateMode
+
+- REPLICATED
+- LOCAL
+
+
+### FillMode
+
+- FILL_SOLID
+- FILL_WIREFRAME
+- FILL_POINT
+
+
+### RenderCommandType
+
+- CMD_NONE
+- CMD_CLEAR
+- CMD_SCENEPASS
+- CMD_QUAD
+- CMD_FORWARDLIGHTS
+- CMD_LIGHTVOLUMES
+
+
+### RenderCommandSortMode
+
+- SORT_FRONTTOBACK
+- SORT_BACKTOFRONT
+
+
+### RenderTargetSizeMode
+
+- SIZE_ABSOLUTE
+- SIZE_RENDERTARGETDIVISOR
+- SIZE_VIEWPORTDIVISOR
+
+
+### TextureUnit
+
+- TU_DIFFUSE
+- TU_NORMAL
+- TU_SPECULAR
+- TU_EMISSIVE
+- TU_ENVIRONMENT
+- TU_LIGHTRAMP
+- TU_LIGHTSHAPE
+- TU_SHADOWMAP
+- TU_FACESELECT
+- TU_INDIRECTION
+- TU_ALBEDOBUFFER
+- TU_NORMALBUFFER
+- TU_DEPTHBUFFER
+- TU_LIGHTBUFFER
+- MAX_MATERIAL_TEXTURE_UNITS
+- MAX_TEXTURE_UNITS
+
+
+### TextureUsage
+
+- TEXTURE_STATIC
+- TEXTURE_DYNAMIC
+- TEXTURE_RENDERTARGET
+- TEXTURE_DEPTHSTENCIL
+
+
+### TextureFilterMode
+
+- FILTER_NEAREST
+- FILTER_BILINEAR
+- FILTER_TRILINEAR
+- FILTER_ANISOTROPIC
+- FILTER_DEFAULT
+
+
+### TextureAddressMode
+
+- ADDRESS_WRAP
+- ADDRESS_MIRROR
+- ADDRESS_CLAMP
+- ADDRESS_BORDER
+
+
+### TextureCoordinate
+
+- COORD_U
+- COORD_V
+- COORD_W
+
+
+### CubeMapFace
+
+- FACE_POSITIVE_X
+- FACE_NEGATIVE_X
+- FACE_POSITIVE_Y
+- FACE_NEGATIVE_Y
+- FACE_POSITIVE_Z
+- FACE_NEGATIVE_Z
+
+
+### RenderSurfaceUpdateMode
+
+- SURFACE_MANUALUPDATE
+- SURFACE_UPDATEVISIBLE
+- SURFACE_UPDATEALWAYS
+
+
+### BlendMode
+
+- BLEND_REPLACE
+- BLEND_ADD
+- BLEND_MULTIPLY
+- BLEND_ALPHA
+- BLEND_ADDALPHA
+- BLEND_PREMULALPHA
+- BLEND_INVDESTALPHA
+
+
+### CompareMode
+
+- CMP_ALWAYS
+- CMP_EQUAL
+- CMP_NOTEQUAL
+- CMP_LESS
+- CMP_LESSEQUAL
+- CMP_GREATER
+- CMP_GREATEREQUAL
+
+
+### CullMode
+
+- CULL_NONE
+- CULL_CCW
+- CULL_CW
+
+
+### PassLightingMode
+
+- LIGHTING_UNLIT
+- LIGHTING_PERVERTEX
+- LIGHTING_PERPIXEL
+
+
+### LightType
+
+- LIGHT_DIRECTIONAL
+- LIGHT_SPOT
+- LIGHT_POINT
+
+
+### EmitterType
+
+- EMITTER_SPHERE
+- EMITTER_BOX
+
+
+### PrimitiveType
+
+- TRIANGLE_LIST
+- LINE_LIST
+
+
+### RayQueryLevel
+
+- RAY_AABB_NOSUBOBJECTS
+- RAY_AABB
+- RAY_OBB
+- RAY_TRIANGLE
+
+
+### SoundType
+
+- SOUND_EFFECT
+- SOUND_AMBIENT
+- SOUND_VOICE
+- SOUND_MUSIC
+- SOUND_MASTER
+
+
+### HorizontalAlignment
+
+- HA_LEFT
+- HA_CENTER
+- HA_RIGHT
+
+
+### VerticalAlignment
+
+- VA_TOP
+- VA_CENTER
+- VA_BOTTOM
+
+
+### Corner
+
+- C_TOPLEFT
+- C_TOPRIGHT
+- C_BOTTOMLEFT
+- C_BOTTOMRIGHT
+
+
+### Orientation
+
+- O_HORIZONTAL
+- O_VERTICAL
+
+
+### FocusMode
+
+- FM_NOTFOCUSABLE
+- FM_RESETFOCUS
+- FM_FOCUSABLE
+- FM_FOCUSABLE_DEFOCUSABLE
+
+
+### LayoutMode
+
+- LM_FREE
+- LM_HORIZONTAL
+- LM_VERTICAL
+
+
+### TraversalMode
+
+- TM_BREADTH_FIRST
+- TM_DEPTH_FIRST
+
+
+### CursorShape
+
+- CS_NORMAL
+- CS_RESIZEVERTICAL
+- CS_RESIZEDIAGONAL_TOPRIGHT
+- CS_RESIZEHORIZONTAL
+- CS_RESIZEDIAGONAL_TOPLEFT
+- CS_ACCEPTDROP
+- CS_REJECTDROP
+- CS_BUSY
+
+
+### HighlightMode
+
+- HM_NEVER
+- HM_FOCUS
+- HM_ALWAYS
+
+
+### TextEffect
+
+- TE_NONE
+- TE_SHADOW
+- TE_STROKE
+
+
+### ShapeType
+
+- SHAPE_BOX
+- SHAPE_SPHERE
+- SHAPE_STATICPLANE
+- SHAPE_CYLINDER
+- SHAPE_CAPSULE
+- SHAPE_CONE
+- SHAPE_TRIANGLEMESH
+- SHAPE_CONVEXHULL
+- SHAPE_TERRAIN
+
+
+### CollisionEventMode
+
+- COLLISION_NEVER
+- COLLISION_ACTIVE
+- COLLISION_ALWAYS
+
+
+### ConstraintType
+
+- CONSTRAINT_POINT
+- CONSTRAINT_HINGE
+- CONSTRAINT_SLIDER
+- CONSTRAINT_CONETWIST
+
 \section ScriptAPI_Classes Classes
 
-Array
+### Array
 
-Methods:<br>
+Methods:
+
 - void Insert(uint, const T&)
 - void Erase(uint)
 - void Push(const T&)
@@ -272,14 +590,16 @@ Methods:<br>
 - int Find(const T&) const
 - int Find(uint, const T&) const
 
-Properties:<br>
+Properties:
+
 - uint length
 - bool empty (readonly)
 
 
-String
+### String
 
-Methods:<br>
+Methods:
+
 - void Replace(uint8, uint8, bool arg2 = true)
 - void Replace(const String&, const String&, bool arg2 = true)
 - String Replaced(uint8, uint8, bool arg2 = true) const
@@ -323,26 +643,30 @@ Methods:<br>
 - Vector4 ToVector4(bool arg0 = false) const
 - Variant ToVectorVariant() const
 
-Properties:<br>
+Properties:
+
 - uint utf8Length (readonly)
 - uint length (readonly)
 - bool empty (readonly)
 
 
-IntVector2
+### IntVector2
 
-Methods:<br>
+Methods:
+
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - int[] data (readonly)
 - int x
 - int y
 
 
-IntRect
+### IntRect
 
-Properties:<br>
+Properties:
+
 - int[] data (readonly)
 - IntVector2 size (readonly)
 - int width (readonly)
@@ -353,9 +677,10 @@ Properties:<br>
 - int bottom
 
 
-Vector2
+### Vector2
 
-Methods:<br>
+Methods:
+
 - void Normalize()
 - float DotProduct(const Vector2&) const
 - float AbsDotProduct(const Vector2&) const
@@ -364,7 +689,8 @@ Methods:<br>
 - Vector2 Normalized() const
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - float[] data (readonly)
 - float length (readonly)
 - float lengthSquared (readonly)
@@ -372,9 +698,10 @@ Properties:<br>
 - float y
 
 
-Vector3
+### Vector3
 
-Methods:<br>
+Methods:
+
 - void Normalize()
 - float DotProduct(const Vector3&) const
 - float AbsDotProduct(const Vector3&) const
@@ -384,7 +711,8 @@ Methods:<br>
 - Vector3 Normalized() const
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - float[] data (readonly)
 - float length (readonly)
 - float lengthSquared (readonly)
@@ -393,16 +721,18 @@ Properties:<br>
 - float z
 
 
-Vector4
+### Vector4
 
-Methods:<br>
+Methods:
+
 - float DotProduct(const Vector4&) const
 - float AbsDotProduct(const Vector4&) const
 - Vector4 Lerp(const Vector4&, float) const
 - bool Equals(const Vector4&) const
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - float[] data (readonly)
 - float x
 - float y
@@ -410,9 +740,10 @@ Properties:<br>
 - float w
 
 
-Quaternion
+### Quaternion
 
-Methods:<br>
+Methods:
+
 - void FromAngleAxis(float, const Vector3&)
 - void FromEulerAngles(float, float, float)
 - void FromRotationTo(const Vector3&, const Vector3&)
@@ -425,7 +756,8 @@ Methods:<br>
 - bool Equals(const Quaternion&) const
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - Vector3 eulerAngles (readonly)
 - float yaw (readonly)
 - float pitch (readonly)
@@ -436,9 +768,10 @@ Properties:<br>
 - float z
 
 
-Matrix3
+### Matrix3
 
-Methods:<br>
+Methods:
+
 - Vector3 Scale() const
 - Matrix3 Scaled(const Vector3&) const
 - void SetScale(const Vector3&)
@@ -447,7 +780,8 @@ Methods:<br>
 - Matrix3 Inverse() const
 - bool Equals(const Matrix3&) const
 
-Properties:<br>
+Properties:
+
 - float m00
 - float m01
 - float m02
@@ -459,9 +793,10 @@ Properties:<br>
 - float m22
 
 
-Matrix4
+### Matrix4
 
-Methods:<br>
+Methods:
+
 - Quaternion Rotation() const
 - Matrix3 RotationMatrix() const
 - Vector3 Scale() const
@@ -476,7 +811,8 @@ Methods:<br>
 - Matrix4 Inverse() const
 - bool Equals(const Matrix4&) const
 
-Properties:<br>
+Properties:
+
 - float m00
 - float m01
 - float m02
@@ -495,9 +831,10 @@ Properties:<br>
 - float m33
 
 
-Matrix3x4
+### Matrix3x4
 
-Methods:<br>
+Methods:
+
 - Quaternion Rotation() const
 - Matrix3 RotationMatrix() const
 - Vector3 Scale() const
@@ -511,7 +848,8 @@ Methods:<br>
 - Matrix3x4 Inverse() const
 - bool Equals(const Matrix3x4&) const
 
-Properties:<br>
+Properties:
+
 - float m00
 - float m01
 - float m02
@@ -526,9 +864,10 @@ Properties:<br>
 - float m23
 
 
-Rect
+### Rect
 
-Methods:<br>
+Methods:
+
 - void Define(const Vector2&, const Vector2&)
 - void Define(const Vector2&)
 - void Merge(const Vector2&)
@@ -538,7 +877,8 @@ Methods:<br>
 - bool Equals(const Rect&) const
 - Vector4 ToVector4() const
 
-Properties:<br>
+Properties:
+
 - Vector2 center (readonly)
 - Vector2 size (readonly)
 - Vector2 halfSize (readonly)
@@ -551,9 +891,10 @@ Properties:<br>
 - bool defined
 
 
-BoundingBox
+### BoundingBox
 
-Methods:<br>
+Methods:
+
 - void Define(const Vector3&, const Vector3&)
 - void Define(float, float)
 - void Define(const Vector3&)
@@ -578,7 +919,8 @@ Methods:<br>
 - Rect Projected(const Matrix4&) const
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - Vector3 center (readonly)
 - Vector3 size (readonly)
 - Vector3 halfSize (readonly)
@@ -587,9 +929,10 @@ Properties:<br>
 - bool defined
 
 
-Frustum
+### Frustum
 
-Methods:<br>
+Methods:
+
 - void Define(float, float, float, float, float, const Matrix3x4&)
 - void Define(const Vector3&, const Vector3&, const Matrix3x4&)
 - void Define(const BoundingBox&, const Matrix3x4&)
@@ -603,13 +946,15 @@ Methods:<br>
 - Frustum Transformed(const Matrix3&) const
 - Frustum Transformed(const Matrix3x4&) const
 
-Properties:<br>
+Properties:
+
 - Vector3[] vertices (readonly)
 
 
-Polyhedron
+### Polyhedron
 
-Methods:<br>
+Methods:
+
 - void AddFace(const Vector3&, const Vector3&, const Vector3&)
 - void AddFace(const Vector3&, const Vector3&, const Vector3&, const Vector3&)
 - void AddFace(const Vector3[]@)
@@ -623,14 +968,16 @@ Methods:<br>
 - Polyhedron Transformed(const Matrix3&) const
 - Polyhedron Transformed(const Matrix3x4&) const
 
-Properties:<br>
+Properties:
+
 - uint numFaces (readonly)
 - Vector3[]@[] face (readonly)
 
 
-Sphere
+### Sphere
 
-Methods:<br>
+Methods:
+
 - void Define(const Vector3&, float)
 - void Define(const BoundingBox&)
 - void Define(const Frustum&)
@@ -646,28 +993,32 @@ Methods:<br>
 - Intersection IsInside(const BoundingBox&) const
 - float Distance(const Vector3&) const
 
-Properties:<br>
+Properties:
+
 - Vector3 center
 - float radius
 - bool defined
 
 
-Plane
+### Plane
 
-Methods:<br>
+Methods:
+
 - void Define(const Vector3&, const Vector3&, const Vector3&)
 - void Define(const Vector3&, const Vector3&)
 - float Distance(const Vector3&) const
 
-Properties:<br>
+Properties:
+
 - Vector3 normal
 - Vector3 absNormal
 - float intercept
 
 
-Ray
+### Ray
 
-Methods:<br>
+Methods:
+
 - void Define(const Vector3&, const Vector3&)
 - Vector3 Project(const Vector3&) const
 - float Distance(const Vector3&) const
@@ -678,14 +1029,16 @@ Methods:<br>
 - float HitDistance(const Vector3&, const Vector3&, const Vector3&) const
 - Ray Transformed(const Matrix3x4&) const
 
-Properties:<br>
+Properties:
+
 - Vector3 origin
 - Vector3 direction
 
 
-Color
+### Color
 
-Methods:<br>
+Methods:
+
 - uint ToUInt() const
 - Vector3 ToHSL() const
 - Vector3 ToHSV() const
@@ -708,7 +1061,8 @@ Methods:<br>
 - Color Lerp(const Color&, float) const
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - float[] data (readonly)
 - Vector3 rgb (readonly)
 - Vector4 rgba (readonly)
@@ -718,46 +1072,54 @@ Properties:<br>
 - float a
 
 
-StringHash
+### StringHash
 
-Methods:<br>
+Methods:
+
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - uint value (readonly)
 
 
-ShortStringHash
+### ShortStringHash
 
-Methods:<br>
+Methods:
+
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - uint16 value (readonly)
 
 
-ResourceRef
+### ResourceRef
 
-Properties:<br>
+Properties:
+
 - ShortStringHash type
 - StringHash id
 
 
-ResourceRefList
+### ResourceRefList
 
-Methods:<br>
+Methods:
+
 - void Resize(uint)
 
-Properties:<br>
+Properties:
+
 - uint length (readonly)
 - bool empty (readonly)
 - StringHash[] ids
 - ShortStringHash type
 
 
-Variant
+### Variant
 
-Methods:<br>
+Methods:
+
 - void Clear()
 - int GetInt() const
 - uint GetUInt() const
@@ -794,30 +1156,34 @@ Methods:<br>
 - RigidBody@ GetRigidBody() const
 - PhysicsWorld@ GetPhysicsWorld() const
 
-Properties:<br>
+Properties:
+
 - bool zero (readonly)
 - bool empty (readonly)
 - VariantType type (readonly)
 - String typeName (readonly)
 
 
-VariantMap
+### VariantMap
 
-Methods:<br>
+Methods:
+
 - bool Contains(const String&) const
 - bool Erase(const String&)
 - bool Contains(ShortStringHash) const
 - bool Erase(ShortStringHash)
 - void Clear()
 
-Properties:<br>
+Properties:
+
 - uint length (readonly)
 - ShortStringHash[]@ keys (readonly)
 
 
-AttributeInfo
+### AttributeInfo
 
-Properties:<br>
+Properties:
+
 - String[]@ enumNames (readonly)
 - VariantType type
 - String name
@@ -825,19 +1191,22 @@ Properties:<br>
 - uint mode
 
 
-RefCounted
+### RefCounted
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 
 
-Object
+### Object
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -845,30 +1214,35 @@ Properties:<br>
 - String category (readonly)
 
 
-WeakHandle
+### WeakHandle
 
-Methods:<br>
+Methods:
+
 - RefCounted@ Get() const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - bool expired (readonly)
 
 
-Timer
+### Timer
 
-Methods:<br>
+Methods:
+
 - uint GetMSec(bool)
 - void Reset()
 
 
-Time
+### Time
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -881,9 +1255,10 @@ Properties:<br>
 - String timeStamp (readonly)
 
 
-Log
+### Log
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Write(const String&, bool arg1 = false)
 - void Debug(const String&)
@@ -891,7 +1266,8 @@ Methods:<br>
 - void Warning(const String&)
 - void Error(const String&)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -903,9 +1279,10 @@ Properties:<br>
 - bool quiet
 
 
-Serializer
+### Serializer
 
-Methods:<br>
+Methods:
+
 - uint Write(uint8[]@)
 - bool WriteInt(int)
 - bool WriteShort(int16)
@@ -936,9 +1313,10 @@ Methods:<br>
 - bool WriteLine(const String&)
 
 
-Deserializer
+### Deserializer
 
-Methods:<br>
+Methods:
+
 - uint8[]@ Read(uint)
 - int ReadInt()
 - int16 ReadShort()
@@ -969,7 +1347,8 @@ Methods:<br>
 - String ReadLine()
 - uint Seek(uint)
 
-Properties:<br>
+Properties:
+
 - String name (readonly)
 - uint checksum (readonly)
 - uint position (readonly)
@@ -977,9 +1356,10 @@ Properties:<br>
 - bool eof (readonly)
 
 
-File
+### File
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Open(const String&, FileMode arg1 = FILE_READ)
 - void Close()
@@ -1041,7 +1421,8 @@ Methods:<br>
 - String ReadLine()
 - uint Seek(uint)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1057,9 +1438,10 @@ Properties:<br>
 - bool eof (readonly)
 
 
-VectorBuffer
+### VectorBuffer
 
-Methods:<br>
+Methods:
+
 - void SetData(Deserializer@, uint)
 - void Clear()
 - void Resize(uint)
@@ -1121,7 +1503,8 @@ Methods:<br>
 - String ReadLine()
 - uint Seek(uint)
 
-Properties:<br>
+Properties:
+
 - String name (readonly)
 - uint checksum (readonly)
 - uint position (readonly)
@@ -1129,9 +1512,10 @@ Properties:<br>
 - bool eof (readonly)
 
 
-FileSystem
+### FileSystem
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool FileExists(const String&) const
 - bool DirExists(const String&) const
@@ -1145,7 +1529,8 @@ Methods:<br>
 - bool Rename(const String&, const String&)
 - bool Delete(const String&)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1156,14 +1541,16 @@ Properties:<br>
 - String userDocumentsDir (readonly)
 
 
-PackageFile
+### PackageFile
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Open(const String&) const
 - bool Exists(const String&) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1175,14 +1562,16 @@ Properties:<br>
 - uint checksum (readonly)
 
 
-Resource
+### Resource
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1193,9 +1582,10 @@ Properties:<br>
 - uint useTimer (readonly)
 
 
-ResourceCache
+### ResourceCache
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool AddResourceDir(const String&)
 - void AddPackageFile(PackageFile@, bool arg1 = false)
@@ -1218,7 +1608,8 @@ Methods:<br>
 - Resource@ GetResource(ShortStringHash, StringHash)
 - Resource@ GetResource(ShortStringHash, const String&)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1232,9 +1623,10 @@ Properties:<br>
 - bool autoReloadResources
 
 
-Image
+### Image
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
@@ -1244,7 +1636,8 @@ Methods:<br>
 - void SaveTGA(const String&)
 - void SaveJPG(const String&, int)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1259,16 +1652,18 @@ Properties:<br>
 - bool compressed (readonly)
 
 
-XMLFile
+### XMLFile
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - XMLElement CreateRoot(const String&)
 - XMLElement GetRoot(const String& arg0 = String ( ))
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1280,9 +1675,10 @@ Properties:<br>
 - XMLElement root (readonly)
 
 
-XMLElement
+### XMLElement
 
-Methods:<br>
+Methods:
+
 - XMLElement CreateChild(const String&)
 - bool RemoveChild(const XMLElement&)
 - bool RemoveChild(const String&)
@@ -1335,7 +1731,8 @@ Methods:<br>
 - Vector4 GetVector4(const String&) const
 - Variant GetVectorVariant(const String&) const
 
-Properties:<br>
+Properties:
+
 - String name (readonly)
 - uint numAttributes (readonly)
 - bool isNull (readonly)
@@ -1345,17 +1742,19 @@ Properties:<br>
 - XMLElement nextResult (readonly)
 
 
-XPathResultSet
+### XPathResultSet
 
-Properties:<br>
+Properties:
+
 - XMLElement firstResult (readonly)
 - uint size (readonly)
 - bool empty (readonly)
 
 
-XPathQuery
+### XPathQuery
 
-Methods:<br>
+Methods:
+
 - void Bind()
 - bool SetVariable(const String&, bool)
 - bool SetVariable(const String&, float)
@@ -1368,13 +1767,15 @@ Methods:<br>
 - String EvaluateToString(XMLElement)
 - XPathResultSet Evaluate(XMLElement)
 
-Properties:<br>
+Properties:
+
 - String query
 
 
-Serializable
+### Serializable
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -1387,7 +1788,8 @@ Methods:<br>
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1400,9 +1802,10 @@ Properties:<br>
 - bool temporary
 
 
-Component
+### Component
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -1418,7 +1821,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1435,9 +1839,10 @@ Properties:<br>
 - Node@ node (readonly)
 
 
-Node
+### Node
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -1498,7 +1903,8 @@ Methods:<br>
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1534,9 +1940,10 @@ Properties:<br>
 - ScriptObject@ scriptObject (readonly)
 
 
-SmoothedTransform
+### SmoothedTransform
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -1553,7 +1960,8 @@ Methods:<br>
 - void Update(float, float)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1575,9 +1983,10 @@ Properties:<br>
 - bool inProgress (readonly)
 
 
-Scene
+### Scene
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -1654,7 +2063,8 @@ Methods:<br>
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1700,9 +2110,10 @@ Properties:<br>
 - ScriptObject@ scriptObject (readonly)
 
 
-Bone
+### Bone
 
-Properties:<br>
+Properties:
+
 - Node@ node
 - String name
 - Vector3 initialPosition
@@ -1713,21 +2124,24 @@ Properties:<br>
 - BoundingBox boundingBox
 
 
-Skeleton
+### Skeleton
 
-Methods:<br>
+Methods:
+
 - void Reset()
 - Bone@ GetBone(const String&) const
 
-Properties:<br>
+Properties:
+
 - Bone@ rootBone (readonly)
 - uint numBones (readonly)
 - Bone@[] bones (readonly)
 
 
-DebugRenderer
+### DebugRenderer
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -1750,7 +2164,8 @@ Methods:<br>
 - void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1767,9 +2182,10 @@ Properties:<br>
 - Node@ node (readonly)
 
 
-Camera
+### Camera
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -1792,7 +2208,8 @@ Methods:<br>
 - float GetDistance(const Vector3&) const
 - float GetDistanceSquared(const Vector3&) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1830,9 +2247,10 @@ Properties:<br>
 - Vector3 upVector (readonly)
 
 
-RenderTargetInfo
+### RenderTargetInfo
 
-Properties:<br>
+Properties:
+
 - String name
 - String tag
 - uint format
@@ -1843,12 +2261,14 @@ Properties:<br>
 - bool sRGB
 
 
-RenderPathCommand
+### RenderPathCommand
 
-Methods:<br>
+Methods:
+
 - void RemoveShaderParameter(const String&)
 
-Properties:<br>
+Properties:
+
 - String[] textureNames
 - Variant[] shaderParameters
 - uint numOutputs
@@ -1872,9 +2292,10 @@ Properties:<br>
 - String pixelShaderName
 
 
-RenderPath
+### RenderPath
 
-Methods:<br>
+Methods:
+
 - RenderPath@ Clone()
 - bool Load(XMLFile@)
 - bool Append(XMLFile@)
@@ -1889,7 +2310,8 @@ Methods:<br>
 - void RemoveCommand(uint)
 - void RemoveCommands(const String&)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - uint numRenderTargets (readonly)
@@ -1899,16 +2321,18 @@ Properties:<br>
 - Variant[] shaderParameters
 
 
-Texture
+### Texture
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - void SetNumLevels(uint)
 - void ClearDataLost()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1934,13 +2358,15 @@ Properties:<br>
 - bool dataLost (readonly)
 
 
-Viewport
+### Viewport
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void SetRenderPath(XMLFile@)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -1952,12 +2378,14 @@ Properties:<br>
 - IntRect rect
 
 
-RenderSurface
+### RenderSurface
 
-Methods:<br>
+Methods:
+
 - void QueueUpdate()
 
-Properties:<br>
+Properties:
+
 - Texture@ parentTexture (readonly)
 - int width (readonly)
 - int height (readonly)
@@ -1969,9 +2397,10 @@ Properties:<br>
 - RenderSurface@ linkedDepthStencil
 
 
-Texture2D
+### Texture2D
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
@@ -1980,7 +2409,8 @@ Methods:<br>
 - bool SetSize(int, int, uint, TextureUsage arg3 = TEXTURE_STATIC)
 - bool Load(Image@, bool arg1 = false)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2007,9 +2437,10 @@ Properties:<br>
 - RenderSurface@ renderSurface (readonly)
 
 
-TextureCube
+### TextureCube
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
@@ -2018,7 +2449,8 @@ Methods:<br>
 - bool SetSize(int, uint, TextureUsage arg2 = TEXTURE_STATIC)
 - bool Load(CubeMapFace, Image@, bool arg2 = false)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2045,16 +2477,18 @@ Properties:<br>
 - RenderSurface@[] renderSurfaces (readonly)
 
 
-BiasParameters
+### BiasParameters
 
-Properties:<br>
+Properties:
+
 - float constantBias
 - float slopeScaledBias
 
 
-Pass
+### Pass
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - BlendMode blendMode
@@ -2066,9 +2500,10 @@ Properties:<br>
 - String pixelShader
 
 
-Technique
+### Technique
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
@@ -2076,7 +2511,8 @@ Methods:<br>
 - void RemovePass(StringHash)
 - bool HasPass(StringHash) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2089,17 +2525,19 @@ Properties:<br>
 - Pass@[] passes (readonly)
 
 
-TechniqueEntry
+### TechniqueEntry
 
-Properties:<br>
+Properties:
+
 - Technique@ technique
 - int qualityLevel
 - float lodDistance
 
 
-Material
+### Material
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
@@ -2112,7 +2550,8 @@ Methods:<br>
 - void SortTechniques()
 - Material@ Clone(const String& arg0 = String ( )) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2133,14 +2572,16 @@ Properties:<br>
 - BiasParameters depthBias
 
 
-Model
+### Model
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2156,16 +2597,18 @@ Properties:<br>
 - uint numMorphs (readonly)
 
 
-AnimationTriggerPoint
+### AnimationTriggerPoint
 
-Properties:<br>
+Properties:
+
 - float time
 - Variant data
 
 
-Animation
+### Animation
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
@@ -2173,7 +2616,8 @@ Methods:<br>
 - void RemoveTrigger(uint)
 - void RemoveAllTriggers()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2189,9 +2633,10 @@ Properties:<br>
 - AnimationTriggerPoint@[] triggers (readonly)
 
 
-Drawable
+### Drawable
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2207,7 +2652,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2238,9 +2684,10 @@ Properties:<br>
 - BoundingBox worldBoundingBox (readonly)
 
 
-CascadeParameters
+### CascadeParameters
 
-Properties:<br>
+Properties:
+
 - float split1
 - float split2
 - float split3
@@ -2249,9 +2696,10 @@ Properties:<br>
 - float biasAutoAdjust
 
 
-FocusParameters
+### FocusParameters
 
-Properties:<br>
+Properties:
+
 - bool focus
 - bool nonUniform
 - bool autoSize
@@ -2259,9 +2707,10 @@ Properties:<br>
 - float minView
 
 
-Light
+### Light
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2277,7 +2726,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2326,9 +2776,10 @@ Properties:<br>
 - Frustum frustum (readonly)
 
 
-Zone
+### Zone
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2344,7 +2795,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2385,9 +2837,10 @@ Properties:<br>
 - bool ambientGradient
 
 
-StaticModel
+### StaticModel
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2405,7 +2858,8 @@ Methods:<br>
 - bool IsInside(const Vector3&) const
 - bool IsInsideLocal(const Vector3&) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2441,9 +2895,10 @@ Properties:<br>
 - uint occlusionLodLevel
 
 
-StaticModelGroup
+### StaticModelGroup
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2462,7 +2917,8 @@ Methods:<br>
 - void RemoveInstanceNode(Node@)
 - void RemoveAllInstanceNodes()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2501,9 +2957,10 @@ Properties:<br>
 - Node@[] instanceNodes (readonly)
 
 
-Skybox
+### Skybox
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2519,7 +2976,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2555,9 +3013,10 @@ Properties:<br>
 - Zone@ zone (readonly)
 
 
-AnimationState
+### AnimationState
 
-Methods:<br>
+Methods:
+
 - void AddWeight(float)
 - void AddTime(float)
 - void Apply()
@@ -2568,7 +3027,8 @@ Methods:<br>
 - uint GetTrackIndex(const String&) const
 - uint GetTrackIndex(StringHash) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - Bone@ startBone
@@ -2584,9 +3044,10 @@ Properties:<br>
 - float[] boneWeights
 
 
-AnimatedModel
+### AnimatedModel
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2613,7 +3074,8 @@ Methods:<br>
 - AnimationState@ GetAnimationState(Animation@) const
 - AnimationState@ GetAnimationState(uint) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2657,9 +3119,10 @@ Properties:<br>
 - float[] morphWeights
 
 
-AnimationController
+### AnimationController
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2701,7 +3164,8 @@ Methods:<br>
 - float GetAutoFade(const String&) const
 - float GetFadeTarget(const String&) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2718,9 +3182,10 @@ Properties:<br>
 - Node@ node (readonly)
 
 
-Billboard
+### Billboard
 
-Properties:<br>
+Properties:
+
 - Vector3 position
 - Vector2 size
 - Rect uv
@@ -2729,9 +3194,10 @@ Properties:<br>
 - bool enabled
 
 
-BillboardSet
+### BillboardSet
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2748,7 +3214,8 @@ Methods:<br>
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void Commit()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2787,23 +3254,26 @@ Properties:<br>
 - Zone@ zone (readonly)
 
 
-ColorFrame
+### ColorFrame
 
-Properties:<br>
+Properties:
+
 - Color color
 - float time
 
 
-TextureFrame
+### TextureFrame
 
-Properties:<br>
+Properties:
+
 - Rect uv
 - float time
 
 
-ParticleEmitter
+### ParticleEmitter
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2822,7 +3292,8 @@ Methods:<br>
 - void SetEmitting(bool, bool)
 - void SetColor(const Color&)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2894,9 +3365,10 @@ Properties:<br>
 - Zone@ zone (readonly)
 
 
-CustomGeometry
+### CustomGeometry
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2920,7 +3392,8 @@ Methods:<br>
 - void DefineTangent(const Vector4&)
 - void Commit()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -2955,9 +3428,10 @@ Properties:<br>
 - Zone@ zone (readonly)
 
 
-DecalSet
+### DecalSet
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -2976,7 +3450,8 @@ Methods:<br>
 - void RemoveDecals(uint)
 - void RemoveAllDecals()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3014,9 +3489,10 @@ Properties:<br>
 - Zone@ zone (readonly)
 
 
-TerrainPatch
+### TerrainPatch
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3032,7 +3508,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3063,9 +3540,10 @@ Properties:<br>
 - BoundingBox worldBoundingBox (readonly)
 
 
-Terrain
+### Terrain
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3084,7 +3562,8 @@ Methods:<br>
 - Vector3 GetNormal(const Vector3&) const
 - TerrainPatch@ GetPatch(int, int) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3120,18 +3599,20 @@ Properties:<br>
 - uint maxLights
 
 
-RayQueryResult
+### RayQueryResult
 
-Properties:<br>
+Properties:
+
 - Drawable@ drawable (readonly)
 - Node@ node (readonly)
 - float distance
 - uint subObject
 
 
-Octree
+### Octree
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3157,7 +3638,8 @@ Methods:<br>
 - Node@[]@ GetDrawables(const Frustum&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
 - Node@[]@ GetDrawables(const Sphere&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3176,9 +3658,10 @@ Properties:<br>
 - uint numLevels (readonly)
 
 
-Graphics
+### Graphics
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool SetMode(int, int, bool, bool, bool, bool, int)
 - bool SetMode(int, int)
@@ -3186,7 +3669,8 @@ Methods:<br>
 - void Close()
 - bool TakeScreenShot(Image@)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3217,15 +3701,17 @@ Properties:<br>
 - int[]@ multiSampleLevels (readonly)
 
 
-Renderer
+### Renderer
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void DrawDebugGeometry(bool) const
 - void ReloadShaders() const
 - void SetDefaultRenderPath(XMLFile@)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3262,18 +3748,20 @@ Properties:<br>
 - uint[] numOccluders (readonly)
 
 
-TouchState
+### TouchState
 
-Properties:<br>
+Properties:
+
 - int touchID
 - IntVector2 position
 - IntVector2 delta
 - float pressure
 
 
-JoystickState
+### JoystickState
 
-Properties:<br>
+Properties:
+
 - uint numButtons (readonly)
 - uint numAxes (readonly)
 - uint numHats (readonly)
@@ -3284,15 +3772,17 @@ Properties:<br>
 - String name
 
 
-Input
+### Input
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool OpenJoystick(uint)
 - void CloseJoystick(uint)
 - bool DetectJoysticks()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3321,14 +3811,16 @@ Properties:<br>
 - bool minimized (readonly)
 
 
-Sound
+### Sound
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3346,9 +3838,10 @@ Properties:<br>
 - bool compressed (readonly)
 
 
-SoundListener
+### SoundListener
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3364,7 +3857,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3381,9 +3875,10 @@ Properties:<br>
 - Node@ node (readonly)
 
 
-SoundSource
+### SoundSource
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3404,7 +3899,8 @@ Methods:<br>
 - void Play(Sound@, float, float, float)
 - void Stop()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3430,9 +3926,10 @@ Properties:<br>
 - bool playing (readonly)
 
 
-SoundSource3D
+### SoundSource3D
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3454,7 +3951,8 @@ Methods:<br>
 - void Stop()
 - void SetDistanceAttenuation(float, float, float)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3483,15 +3981,17 @@ Properties:<br>
 - float rolloffFactor
 
 
-Audio
+### Audio
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void SetMode(int, int, bool, bool arg3 = true)
 - bool Play()
 - void Stop()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3507,16 +4007,18 @@ Properties:<br>
 - bool initialized (readonly)
 
 
-Font
+### Font
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - bool SaveXML(File@, int, bool arg2 = false)
 - bool SaveXML(const String&, int, bool arg2 = false)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3527,9 +4029,10 @@ Properties:<br>
 - uint useTimer (readonly)
 
 
-UIElement
+### UIElement
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3582,7 +4085,8 @@ Methods:<br>
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3650,9 +4154,10 @@ Properties:<br>
 - VariantMap vars (readonly)
 
 
-BorderImage
+### BorderImage
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3707,7 +4212,8 @@ Methods:<br>
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3781,9 +4287,10 @@ Properties:<br>
 - bool tiled
 
 
-Sprite
+### Sprite
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3832,7 +4339,8 @@ Methods:<br>
 - void SetScale(float)
 - void SetFullImageRect()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -3878,9 +4386,10 @@ Properties:<br>
 - BlendMode blendMode
 
 
-Button
+### Button
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -3938,7 +4447,8 @@ Methods:<br>
 - void SetPressedChildOffset(int, int)
 - void SetRepeat(float, float)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -4017,9 +4527,10 @@ Properties:<br>
 - bool pressed (readonly)
 
 
-CheckBox
+### CheckBox
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -4075,7 +4586,8 @@ Methods:<br>
 - void SetHoverOffset(int, int)
 - void SetCheckedOffset(int, int)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -4151,9 +4663,10 @@ Properties:<br>
 - IntVector2 checkedOffset
 
 
-Cursor
+### Cursor
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -4209,7 +4722,8 @@ Methods:<br>
 - void SetHoverOffset(int, int)
 - void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -4285,9 +4799,10 @@ Properties:<br>
 - bool useSystemShapes
 
 
-Slider
+### Slider
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -4343,7 +4858,8 @@ Methods:<br>
 - void SetHoverOffset(int, int)
 - void ChangeValue(float)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -4422,9 +4938,10 @@ Properties:<br>
 - float repeatRate
 
 
-ScrollBar
+### ScrollBar
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -4480,7 +4997,8 @@ Methods:<br>
 - void StepBack()
 - void StepForward()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -4557,9 +5075,10 @@ Properties:<br>
 - Slider@ slider (readonly)
 
 
-ScrollView
+### ScrollView
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -4614,7 +5133,8 @@ Methods:<br>
 - void SetViewPosition(int, int)
 - void SetScrollBarsVisible(bool, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -4690,9 +5210,10 @@ Properties:<br>
 - bool scrollBarsAutoVisible
 
 
-ListView
+### ListView
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -4764,7 +5285,8 @@ Methods:<br>
 - UIElement@[]@ GetItems() const
 - uint FindItem(UIElement@)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -4851,9 +5373,10 @@ Properties:<br>
 - bool clearSelectionOnDefocus
 
 
-Text
+### Text
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -4910,7 +5433,8 @@ Methods:<br>
 - void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)
 - void ClearSelection()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -4992,9 +5516,10 @@ Properties:<br>
 - int rowHeight (readonly)
 
 
-Text3D
+### Text3D
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -5013,7 +5538,8 @@ Methods:<br>
 - bool SetFont(Font@, int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5063,9 +5589,10 @@ Properties:<br>
 - int rowHeight (readonly)
 
 
-LineEdit
+### LineEdit
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -5120,7 +5647,8 @@ Methods:<br>
 - void SetFullImageRect()
 - void SetHoverOffset(int, int)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5204,9 +5732,10 @@ Properties:<br>
 - BorderImage@ cursor (readonly)
 
 
-Menu
+### Menu
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -5266,7 +5795,8 @@ Methods:<br>
 - void SetPopupOffset(int, int)
 - void SetAccelerator(int, int)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5350,9 +5880,10 @@ Properties:<br>
 - int acceleratorQualifiers (readonly)
 
 
-DropDownList
+### DropDownList
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -5418,7 +5949,8 @@ Methods:<br>
 - UIElement@[]@ GetItems() const
 - UIElement@ getPopup() const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5508,9 +6040,10 @@ Properties:<br>
 - String placeholderText
 
 
-Window
+### Window
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -5563,7 +6096,8 @@ Methods:<br>
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5640,9 +6174,10 @@ Properties:<br>
 - bool fixedHeightResizing
 
 
-View3D
+### View3D
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -5697,7 +6232,8 @@ Methods:<br>
 - void SetView(Scene@, Camera@)
 - void QueueUpdate()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5780,15 +6316,17 @@ Properties:<br>
 - Node@ cameraNode (readonly)
 
 
-FileSelector
+### FileSelector
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void SetButtonTexts(const String&, const String&)
 - void SetFilters(String[]@, uint)
 - void UpdateElements()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5811,9 +6349,10 @@ Properties:<br>
 - Button@ cancelButton (readonly)
 
 
-UI
+### UI
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Clear()
 - void DebugDraw(UIElement@)
@@ -5826,7 +6365,8 @@ Methods:<br>
 - UIElement@ GetElementAt(int, int, bool arg2 = true)
 - bool HasModalElement() const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5843,24 +6383,27 @@ Properties:<br>
 - bool nonFocusedMouseWheel
 
 
-Controls
+### Controls
 
-Methods:<br>
+Methods:
+
 - void Reset()
 - void Set(uint, bool)
 - bool IsDown(uint) const
 - bool IsPressed(uint, const Controls&) const
 
-Properties:<br>
+Properties:
+
 - uint buttons
 - float yaw
 - float pitch
 - VariantMap extraData
 
 
-NetworkPriority
+### NetworkPriority
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -5876,7 +6419,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5897,9 +6441,10 @@ Properties:<br>
 - bool alwaysUpdateOwner
 
 
-Connection
+### Connection
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void SendMessage(int, bool, bool, const VectorBuffer&, uint arg4 = 0)
 - void SendRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
@@ -5907,7 +6452,8 @@ Methods:<br>
 - void Disconnect(int arg0 = 0)
 - String ToString() const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -5929,9 +6475,10 @@ Properties:<br>
 - VariantMap identity
 
 
-HttpRequest
+### HttpRequest
 
-Methods:<br>
+Methods:
+
 - uint8[]@ Read(uint)
 - int ReadInt()
 - int16 ReadShort()
@@ -5962,7 +6509,8 @@ Methods:<br>
 - String ReadLine()
 - uint Seek(uint)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - String name (readonly)
@@ -5975,9 +6523,10 @@ Properties:<br>
 - bool open (readonly)
 
 
-Network
+### Network
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Connect(const String&, uint16, Scene@, const VariantMap& arg3 = VariantMap ( ))
 - void Disconnect(int arg0 = 0)
@@ -5993,7 +6542,8 @@ Methods:<br>
 - bool CheckRemoteEvent(const String&) const
 - HttpRequest@ MakeHttpRequest(const String&, const String& arg1 = String ( ), String[]@ arg2 = null, const String& arg3 = String ( ))
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6006,9 +6556,10 @@ Properties:<br>
 - Connection@[]@ clientConnections (readonly)
 
 
-CollisionShape
+### CollisionShape
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -6035,7 +6586,8 @@ Methods:<br>
 - void SetTerrain()
 - void SetTransform(const Vector3&, const Quaternion&)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6060,9 +6612,10 @@ Properties:<br>
 - BoundingBox worldBoundingBox (readonly)
 
 
-RigidBody
+### RigidBody
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -6090,7 +6643,8 @@ Methods:<br>
 - void ReAddBodyToWorld()
 - Vector3 GetVelocityAtPoint(const Vector3&) const
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6134,9 +6688,10 @@ Properties:<br>
 - RigidBody@[]@ collidingBodies (readonly)
 
 
-Constraint
+### Constraint
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -6152,7 +6707,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6184,18 +6740,20 @@ Properties:<br>
 - RigidBody@ otherBody
 
 
-PhysicsRaycastResult
+### PhysicsRaycastResult
 
-Properties:<br>
+Properties:
+
 - RigidBody@ body (readonly)
 - Vector3 position
 - Vector3 normal
 - float distance
 
 
-PhysicsWorld
+### PhysicsWorld
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -6220,7 +6778,8 @@ Methods:<br>
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - void DrawDebugGeometry(bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6243,9 +6802,10 @@ Properties:<br>
 - bool splitImpulse
 
 
-Navigable
+### Navigable
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -6261,7 +6821,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6279,9 +6840,10 @@ Properties:<br>
 - bool recursive
 
 
-NavigationMesh
+### NavigationMesh
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -6305,7 +6867,8 @@ Methods:<br>
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void DrawDebugGeometry(bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6340,9 +6903,10 @@ Properties:<br>
 - IntVector2 numTiles (readonly)
 
 
-OffMeshConnection
+### OffMeshConnection
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -6358,7 +6922,8 @@ Methods:<br>
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6378,15 +6943,17 @@ Properties:<br>
 - bool bidirectional
 
 
-ScriptFile
+### ScriptFile
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - bool Execute(const String&, const Variant[]@)
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6398,12 +6965,13 @@ Properties:<br>
 - bool compiled (readonly)
 
 
-ScriptObject
+### ScriptObject
 
 
-ScriptInstance
+### ScriptInstance
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Load(File@, bool arg1 = false)
 - bool Save(File@) const
@@ -6425,7 +6993,8 @@ Methods:<br>
 - void DelayedExecute(float, bool, const String&)
 - void ClearDelayedExecute(const String& arg0 = String ( ))
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6446,14 +7015,16 @@ Properties:<br>
 - String className
 
 
-Script
+### Script
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - bool Execute(const String&)
 - void DumpAPI()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6463,14 +7034,16 @@ Properties:<br>
 - Scene@ defaultScene
 
 
-Console
+### Console
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Toggle()
 - void UpdateElements()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6486,9 +7059,10 @@ Properties:<br>
 - LineEdit@ lineEdit (readonly)
 
 
-DebugHud
+### DebugHud
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void Toggle(uint)
 - void ToggleAll()
@@ -6497,7 +7071,8 @@ Methods:<br>
 - void ResetAppStats(const String&)
 - void ClearAppStats()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)
@@ -6513,9 +7088,10 @@ Properties:<br>
 - Text@ profilerText (readonly)
 
 
-Engine
+### Engine
 
-Methods:<br>
+Methods:
+
 - void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
 - void RunFrame()
 - void Exit()
@@ -6525,7 +7101,8 @@ Methods:<br>
 - Console@ CreateConsole()
 - DebugHud@ CreateDebugHud()
 
-Properties:<br>
+Properties:
+
 - int refs (readonly)
 - int weakRefs (readonly)
 - ShortStringHash type (readonly)

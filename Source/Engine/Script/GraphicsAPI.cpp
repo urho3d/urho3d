@@ -257,8 +257,8 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("RenderCommandType", "CMD_LIGHTVOLUMES", CMD_LIGHTVOLUMES);
     
     engine->RegisterEnum("RenderCommandSortMode");
-    engine->RegisterEnumValue("RenderCommandType", "SORT_FRONTTOBACK", SORT_FRONTTOBACK);
-    engine->RegisterEnumValue("RenderCommandType", "SORT_BACKTOFRONT", SORT_BACKTOFRONT);
+    engine->RegisterEnumValue("RenderCommandSortMode", "SORT_FRONTTOBACK", SORT_FRONTTOBACK);
+    engine->RegisterEnumValue("RenderCommandSortMode", "SORT_BACKTOFRONT", SORT_BACKTOFRONT);
     
     engine->RegisterEnum("RenderTargetSizeMode");
     engine->RegisterEnumValue("RenderTargetSizeMode", "SIZE_ABSOLUTE", SIZE_ABSOLUTE);

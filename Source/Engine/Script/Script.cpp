@@ -291,6 +291,24 @@ void Script::DumpAPI()
         OutputAPIRow(type + " " + String(propertyName), true);
     }
 
+    Log::WriteRaw("\\section ScriptAPI_Enums Enumerations\n");
+    
+    unsigned enums = scriptEngine_->GetEnumCount();
+    for (unsigned i = 0; i < enums; ++i)
+    {
+        int typeId;
+        Log::WriteRaw("\n### " + String(scriptEngine_->GetEnumByIndex(i, &typeId)) + "\n\n");
+        
+        for (unsigned j = 0; j < (unsigned)scriptEngine_->GetEnumValueCount(typeId); ++j)
+        {
+            int value = 0;
+            const char* name = scriptEngine_->GetEnumValueByIndex(typeId, j, &value);
+            OutputAPIRow(String(name));
+        }
+        
+        Log::WriteRaw("\n");
+    }
+    
     Log::WriteRaw("\\section ScriptAPI_Classes Classes\n");
 
     unsigned types = scriptEngine_->GetObjectTypeCount();
@@ -303,7 +321,7 @@ void Script::DumpAPI()
             Vector<String> methodDeclarations;
             Vector<PropertyInfo> propertyInfos;
 
-            Log::WriteRaw("\n" + typeName + "\n");
+            Log::WriteRaw("\n### " + typeName + "\n");
 
             unsigned methods = type->GetMethodCount();
             for (unsigned j = 0; j < methods; ++j)
@@ -345,14 +363,14 @@ void Script::DumpAPI()
 
             if (!methodDeclarations.Empty())
             {
-                Log::WriteRaw("\nMethods:<br>\n");
+                Log::WriteRaw("\nMethods:\n\n");
                 for (unsigned j = 0; j < methodDeclarations.Size(); ++j)
                     OutputAPIRow(methodDeclarations[j]);
             }
 
             if (!propertyInfos.Empty())
             {
-                Log::WriteRaw("\nProperties:<br>\n");
+                Log::WriteRaw("\nProperties:\n\n");
                 for (unsigned j = 0; j < propertyInfos.Size(); ++j)
                 {
                     String remark;
