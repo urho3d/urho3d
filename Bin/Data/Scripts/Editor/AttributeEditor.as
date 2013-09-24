@@ -1215,3 +1215,14 @@ VectorStruct@ GetVectorStruct(Array<Serializable@>@ serializables, uint index)
     }
     return null;
 }
+
+int GetAttributeIndex(Serializable@ serializable, const String&in attrName)
+{
+    for (uint i = 0; i < serializable.numAttributes; ++i)
+    {
+        if (serializable.attributeInfos[i].name.Compare(attrName, false) == 0)
+            return i;
+    }
+    
+    return -1;
+}

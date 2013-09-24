@@ -7,6 +7,8 @@ const int ITEM_UI_ELEMENT = 3;
 const uint NO_ITEM = M_MAX_UNSIGNED;
 const ShortStringHash SCENE_TYPE("Scene");
 const ShortStringHash NODE_TYPE("Node");
+const ShortStringHash STATICMODELGROUP_TYPE("StaticModelGroup");
+const ShortStringHash CONSTRAINT_TYPE("Constraint");
 const String NO_CHANGE(uint8(0));
 const ShortStringHash TYPE_VAR("Type");
 const ShortStringHash NODE_ID_VAR("NodeID");
@@ -284,6 +286,7 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
     text.vars[COMPONENT_ID_VAR] = component.id;
     text.text = GetComponentTitle(component);
     text.color = componentTextColor;
+    text.dragDropMode = DD_SOURCE_AND_TARGET;
 
     IconizeUIElement(text, component.typeName);
     SetIconEnabledColor(text, component.enabledEffective);
@@ -729,51 +732,30 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     UIElement@ source = eventData["Source"].GetUIElement();
     UIElement@ target = eventData["Target"].GetUIElement();
     int itemType = ITEM_NONE;
-    bool accept =  TestDragDrop(source, target, itemType);
+    bool accept = TestDragDrop(source, target, itemType);
     eventData["Accept"] = accept;
     if (!accept)
         return;
 
     if (itemType == ITEM_NODE)
     {
-        Node@ sourceNode = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
         Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetUInt());
 
         // If target is null, parent to scene
         if (targetNode is null)
             targetNode = editorScene;
 
-        // Handle multiple selected children from a ListView
-        if (source.parent !is null && source.parent.typeName == "HierarchyContainer")
+        Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
+        if (sourceNodes.length > 0)
         {
-            ListView@ listView_ = cast<ListView>(source.parent.parent.parent);
+            if (sourceNodes.length > 1)
+                SceneChangeParent(sourceNodes[0], sourceNodes, targetNode);
+            else
+                SceneChangeParent(sourceNodes[0], targetNode);
 
-            if (listView_ is null)
-                return;
-
-            Array<Node@> nodeList;
-            for (uint i=0; i < listView_.selectedItems.length; i++)
-            {
-                UIElement@ item_ = listView_.selectedItems[i];
-                if (item_.vars[TYPE_VAR] == ITEM_NODE)
-                {
-                    Node@ node = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
-                    if (node !is null)
-                        nodeList.Push(node);
-                }
-            }
-            if (!SceneChangeParent(sourceNode, nodeList, targetNode))
-                return;
+            // Focus the node at its new position in the list which in turn should trigger a refresh in attribute inspector
+            FocusNode(sourceNodes[0]);
         }
-        else
-        {
-            // Perform the reparenting
-            if (!SceneChangeParent(sourceNode, targetNode))
-                return;
-        }
-
-        // Focus the node at its new position in the list which in turn should trigger a refresh in attribute inspector
-        FocusNode(sourceNode);
     }
     else if (itemType == ITEM_UI_ELEMENT)
     {
@@ -791,45 +773,149 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         // Focus the element at its new position in the list which in turn should trigger a refresh in attribute inspector
         FocusUIElement(sourceElement);
     }
+    else if (itemType == ITEM_COMPONENT)
+    {
+        Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
+        Component@ targetComponent = editorScene.GetComponent(target.vars[COMPONENT_ID_VAR].GetUInt());
+        if (targetComponent !is null && sourceNodes.length > 0)
+        {
+            // Drag node to StaticModelGroup to make it an instance
+            StaticModelGroup@ smg = cast<StaticModelGroup>(targetComponent);
+            if (smg !is null)
+            {
+                // Save undo action
+                EditAttributeAction action;
+                uint attrIndex = GetAttributeIndex(smg, "Instance Nodes");
+                Variant oldIDs = smg.attributes[attrIndex];
+
+                for (uint i = 0; i < sourceNodes.length; ++i)
+                    smg.AddInstanceNode(sourceNodes[i]);
+                    
+                action.Define(smg, attrIndex, oldIDs);
+                SaveEditAction(action);
+                SetSceneModified();
+            }
+            
+            // Drag a node to Constraint to make it the remote end of the constraint
+            Constraint@ constraint = cast<Constraint>(targetComponent);
+            RigidBody@ rigidBody = sourceNodes[0].GetComponent("RigidBody");
+            if (constraint !is null && rigidBody !is null)
+            {
+                // Save undo action
+                EditAttributeAction action;
+                uint attrIndex = GetAttributeIndex(constraint, "Other Body NodeID");
+                Variant oldID = constraint.attributes[attrIndex];
+
+                constraint.otherBody = rigidBody;
+                
+                action.Define(constraint, attrIndex, oldID);
+                SaveEditAction(action);
+                SetSceneModified();
+            }
+        }
+    }
+}
+
+Array<Node@> GetMultipleSourceNodes(UIElement@ source)
+{
+    Array<Node@> nodeList;
+
+    // Handle multiple selected children from a ListView
+    if (source.parent !is null && source.parent.typeName == "HierarchyContainer")
+    {
+        ListView@ listView_ = cast<ListView>(source.parent.parent.parent);
+
+        if (listView_ is null)
+            return nodeList;
+
+        for (uint i = 0; i < listView_.selectedItems.length; i++)
+        {
+            UIElement@ item_ = listView_.selectedItems[i];
+            if (item_.vars[TYPE_VAR] == ITEM_NODE)
+            {
+                Node@ node = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
+                if (node !is null)
+                    nodeList.Push(node);
+            }
+        }
+    }
+    else
+    {
+        Node@ node = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
+        if (node !is null)
+            nodeList.Push(node);
+    }
+
+    return nodeList;
 }
 
 bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
 {
-    // Test for validity of reparenting by drag and drop
-    Node@ sourceNode;
-    Node@ targetNode;
-    Variant variant = source.GetVar(NODE_ID_VAR);
-    if (!variant.empty)
-        sourceNode = editorScene.GetNode(variant.GetUInt());
-    variant = target.GetVar(NODE_ID_VAR);
-    if (!variant.empty)
-        targetNode = editorScene.GetNode(variant.GetUInt());
+    int targetItemType = target.GetVar(TYPE_VAR).GetInt();
 
-    UIElement@ sourceElement;
-    UIElement@ targetElement;
-    variant = source.GetVar(UI_ELEMENT_ID_VAR);
-    if (!variant.empty)
-        sourceElement = GetUIElementByID(variant.GetUInt());
-    variant = target.GetVar(UI_ELEMENT_ID_VAR);
-    if (!variant.empty)
-        targetElement = GetUIElementByID(variant.GetUInt());
-
-    if (sourceNode !is null && targetNode !is null)
+    if (targetItemType == ITEM_NODE)
     {
-        itemType = ITEM_NODE;
+        Node@ sourceNode;
+        Node@ targetNode;
+        Variant variant = source.GetVar(NODE_ID_VAR);
+        if (!variant.empty)
+            sourceNode = editorScene.GetNode(variant.GetUInt());
+        variant = target.GetVar(NODE_ID_VAR);
+        if (!variant.empty)
+            targetNode = editorScene.GetNode(variant.GetUInt());
+    
+        if (sourceNode !is null && targetNode !is null)
+        {
+            itemType = ITEM_NODE;
 
-        if (sourceNode.parent is targetNode)
-            return false;
-        if (targetNode.parent is sourceNode)
-            return false;
+            if (sourceNode.parent is targetNode)
+                return false;
+            if (targetNode.parent is sourceNode)
+                return false;
+        }
+
+        return true;
     }
-    else if (sourceElement !is null && targetElement !is null)
+    else if (targetItemType == ITEM_UI_ELEMENT)
     {
-        itemType = ITEM_UI_ELEMENT;
+        UIElement@ sourceElement;
+        UIElement@ targetElement;
+        Variant variant = source.GetVar(UI_ELEMENT_ID_VAR);
+        if (!variant.empty)
+            sourceElement = GetUIElementByID(variant.GetUInt());
+        variant = target.GetVar(UI_ELEMENT_ID_VAR);
+        if (!variant.empty)
+            targetElement = GetUIElementByID(variant.GetUInt());
+  
+        if (sourceElement !is null && targetElement !is null)
+        {
+            itemType = ITEM_UI_ELEMENT;
 
-        if (sourceElement.parent is targetElement)
-            return false;
-        if (targetElement.parent is sourceElement)
+            if (sourceElement.parent is targetElement)
+                return false;
+            if (targetElement.parent is sourceElement)
+                return false;
+        }
+
+        return true;
+    }
+    else if (targetItemType == ITEM_COMPONENT)
+    {
+        // Now only support dragging of nodes to StaticModelGroup or Constraint. Can be expanded to support others
+        Node@ sourceNode;
+        Component@ targetComponent;
+        Variant variant = source.GetVar(NODE_ID_VAR);
+        if (!variant.empty)
+            sourceNode = editorScene.GetNode(variant.GetUInt());
+        variant = target.GetVar(COMPONENT_ID_VAR);
+        if (!variant.empty)
+            targetComponent = editorScene.GetComponent(variant.GetUInt());
+
+        itemType = ITEM_COMPONENT;
+
+        if (sourceNode !is null && targetComponent !is null && (targetComponent.type == STATICMODELGROUP_TYPE || targetComponent.type == CONSTRAINT_TYPE))
+            return true;
+        else
             return false;
     }
 
