@@ -21,9 +21,11 @@
 ::
 
 @echo off
-:: Define USE_MKLINK to 1 to enable out-of-source build
-del /F Source\Android\CMakeCache.txt CMakeCache.txt
-rd /S /Q Source\Android\CMakeFiles CMakeFiles
+:: Define USE_MKLINK to 1 to enable out-of-source build and symbolic linking of resources from Bin directory
+if exist CMakeCache.txt. del /F CMakeCache.txt
+if exist Source\Android\CMakeCache.txt. del /F Source\Android\CMakeCache.txt
+if exist CMakeFiles. rd /S /Q CMakeFiles
+if exist Source\Android\CMakeFiles. rd /S /Q Source\Android\CMakeFiles
 set "build=Source\Android"
 set "source=.."
 set "use_mklink="
@@ -36,8 +38,8 @@ if not "%1" == "" (
 )
 if "%use_mklink%" == "1" (
     cmake -E make_directory android-Build
-    del /F android-Build\CMakeCache.txt
-    rd /S /Q android-Build\CMakeFiles
+    if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt
+    if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
     set "build=android-Build"
     set "source=..\Source"
     for %%d in (CoreData Data) do mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
