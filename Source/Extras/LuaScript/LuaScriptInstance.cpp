@@ -92,6 +92,14 @@ void LuaScriptInstance::ApplyAttributes()
     CallScriptObjectFunction(scriptObjectMethodRefs_[LSOM_APPLYATTRIBUTES]);
 }
 
+void LuaScriptInstance::OnSetEnabled()
+{
+    if (enabled_)
+        SubscribeToEvents();    
+    else
+        UnsubscribeFromEvents();
+}
+
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 {
     SetScriptFileName(String::EMPTY);
@@ -305,6 +313,12 @@ void LuaScriptInstance::FindScriptObjectMethodRefs()
     for (unsigned i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
         scriptObjectMethodRefs_[i] = luaScript_->GetScriptFunctionRef(scriptObjectType_ + scriptObjectMethodNames[i], true);
 
+    if (enabled_)
+        SubscribeToEvents();
+}
+
+void LuaScriptInstance::SubscribeToEvents()
+{
     if (scriptObjectMethodRefs_[LSOM_UPDATE] != LUA_REFNIL)
         SubscribeToEvent(E_UPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
 
@@ -316,6 +330,21 @@ void LuaScriptInstance::FindScriptObjectMethodRefs()
 
     if (scriptObjectMethodRefs_[LSOM_FIXEDPOSTUPDATE] != LUA_REFNIL)
         SubscribeToEvent(E_PHYSICSPOSTSTEP, HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
+}
+
+void LuaScriptInstance::UnsubscribeFromEvents()
+{
+    if (scriptObjectMethodRefs_[LSOM_UPDATE] != LUA_REFNIL)
+        UnsubscribeFromEvent(E_UPDATE);
+
+    if (scriptObjectMethodRefs_[LSOM_POSTUPDATE] != LUA_REFNIL)
+        UnsubscribeFromEvent(E_POSTUPDATE);
+
+    if (scriptObjectMethodRefs_[LSOM_FIXEDUPDATE] != LUA_REFNIL)
+        UnsubscribeFromEvent(E_PHYSICSPRESTEP);
+
+    if (scriptObjectMethodRefs_[LSOM_FIXEDPOSTUPDATE] != LUA_REFNIL)
+        UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 }
 
 void LuaScriptInstance::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -375,7 +404,10 @@ void LuaScriptInstance::ReleaseObject()
 {
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
-    
+
+    if (enabled_)
+        UnsubscribeFromEvents();
+
     // Unref script object.
     luaL_unref(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);
     scriptObjectRef_ = LUA_REFNIL;

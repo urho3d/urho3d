@@ -64,6 +64,8 @@ public:
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
 
     /// Create script object. Return true if successful.
     bool CreateObject(const String& scriptObjectType);
@@ -106,6 +108,10 @@ public:
 private:
     /// Find script object method refs.
     void FindScriptObjectMethodRefs();
+    /// Subscribe to events.
+    void SubscribeToEvents();
+    /// Unsubscribe from events.
+    void UnsubscribeFromEvents();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the logic post update event.
