@@ -62,9 +62,9 @@ namespace Urho3D
 - void SubscribeToEvent(const String eventName, const String functionName)
 - void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromAllEvents()
-- void SubscribeToEvent(void* object, const String eventName, const String functionName)
-- void UnsubscribeFromEvent(void* object, const String eventName)
-- void UnsubscribeFromEvents(void* object)
+- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- void UnsubscribeFromEvent(void* sender, const String eventName)
+- void UnsubscribeFromEvents(void* sender)
 - float Lerp(float lhs, float rhs, float t)
 - float Min(float lhs, float rhs)
 - float Max(float lhs, float rhs)
@@ -73,12 +73,12 @@ namespace Urho3D
 - bool Equals(float lhs, float rhs)
 - float Random()
 - float Random(float range)
-- int Random @ RandomInt(int range)
+- int RandoRandomInt(int range)
 - void SetRandomSeed(unsigned seed)
 - unsigned GetRandomSeed()
 - int Rand()
 
-section LuaScriptAPI_GlobalConstants Global constants
+\section LuaScriptAPI_GlobalConstants Global constants
 - unsigned DEBUGHUD_SHOW_NONE
 - unsigned DEBUGHUD_SHOW_STATS
 - unsigned DEBUGHUD_SHOW_MODE
@@ -87,6 +87,10 @@ section LuaScriptAPI_GlobalConstants Global constants
 - unsigned char CHANNEL_POSITION
 - unsigned char CHANNEL_ROTATION
 - unsigned char CHANNEL_SCALE
+- unsigned VO_NONE
+- unsigned VO_LOW_MATERIAL_QUALITY
+- unsigned VO_DISABLE_SHADOWS
+- unsigned VO_DISABLE_OCCLUSION
 - unsigned DRAWABLE_GEOMETRY
 - unsigned DRAWABLE_LIGHT
 - unsigned DRAWABLE_ZONE
@@ -108,10 +112,6 @@ section LuaScriptAPI_GlobalConstants Global constants
 - unsigned CLEAR_COLOR
 - unsigned CLEAR_DEPTH
 - unsigned CLEAR_STENCIL
-- unsigned VO_NONE
-- unsigned VO_LOW_MATERIAL_QUALITY
-- unsigned VO_DISABLE_SHADOWS
-- unsigned VO_DISABLE_OCCLUSION
 - int SHADOW_MIN_PIXELS
 - int INSTANCING_BUFFER_DEFAULT_SIZE
 - int MOUSEB_LEFT
@@ -405,7 +405,7 @@ section LuaScriptAPI_GlobalConstants Global constants
 - int SP_VERTEXLIGHTS
 - int SP_MATERIAL
 - int SP_OBJECTTRANSFORM
-- int MAX_SHADER_PARAMETER_GROUPS   
+- int MAX_SHADER_PARAMETER_GROUPS
 - int LIGHT_DIRECTIONAL
 - int LIGHT_SPOT
 - int LIGHT_POINT
@@ -543,15 +543,15 @@ section LuaScriptAPI_GlobalConstants Global constants
 - int HM_NEVER
 - int HM_FOCUS
 - int HM_ALWAYS
+- int TE_NONE
+- int TE_SHADOW
+- int TE_STROKE
 - int HA_LEFT
 - int HA_CENTER
 - int HA_RIGHT
 - int VA_TOP
 - int VA_CENTER
 - int VA_BOTTOM
-- int TE_NONE
-- int TE_SHADOW
-- int TE_STROKE
 - int C_TOPLEFT
 - int C_TOPRIGHT
 - int C_BOTTOMLEFT
@@ -579,10 +579,12 @@ section LuaScriptAPI_GlobalConstants Global constants
 - int DRAG_RESIZE_BOTTOMLEFT
 - int DRAG_RESIZE_LEFT
 
-section LuaScriptAPI_Classes Classes
-Audio : Object
+\section LuaScriptAPI_Classes Classes
 
-Methods:<br>
+### Audio : Object
+
+Methods:
+
 - bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true)
 - bool Play()
 - void Stop()
@@ -602,7 +604,8 @@ Methods:<br>
 - float GetSoundSourceMasterGain(SoundType type) const
 - void MixOutput(void *dest, unsigned samples)
 
-Properties:<br>
+Properties:
+
 - unsigned sampleSize (readonly)
 - int mixRate (readonly)
 - bool interpolation (readonly)
@@ -611,9 +614,10 @@ Properties:<br>
 - bool playing (readonly)
 - bool initialized (readonly)
 
-Sound : Resource
+### Sound : Resource
 
-Methods:<br>
+Methods:
+
 - float GetLength() const
 - unsigned GetDataSize() const
 - unsigned GetSampleSize() const
@@ -624,7 +628,8 @@ Methods:<br>
 - bool IsStereo() const
 - bool IsCompressed() const
 
-Properties:<br>
+Properties:
+
 - float length (readonly)
 - unsigned dataSize (readonly)
 - unsigned sampleSize (readonly)
@@ -635,13 +640,15 @@ Properties:<br>
 - bool stereo (readonly)
 - bool compressed (readonly)
 
-SoundListener : Component
+### SoundListener : Component
 
-Methods:<br>
+Methods:
 
-SoundSource : Component
 
-Methods:<br>
+### SoundSource : Component
+
+Methods:
+
 - void Play(Sound* sound)
 - void Play(Sound* sound, float frequency)
 - void Play(Sound* sound, float frequency, float gain)
@@ -667,7 +674,8 @@ Methods:<br>
 - void SetPlayPositionLockless(signed char* position)
 - void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation)
 
-Properties:<br>
+Properties:
+
 - Sound* sound (readonly)
 - SoundType soundType
 - float timePosition (readonly)
@@ -678,9 +686,10 @@ Properties:<br>
 - bool autoRemove
 - bool playing (readonly)
 
-SoundSource3D : SoundSource
+### SoundSource3D : SoundSource
 
-Methods:<br>
+Methods:
+
 - void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor)
 - void SetNearDistance(float distance)
 - void SetFarDistance(float distance)
@@ -690,14 +699,16 @@ Methods:<br>
 - float GetFarDistance() const
 - float RollAngleoffFactor() const
 
-Properties:<br>
+Properties:
+
 - float nearDistance
 - float farDistance
 - float rolloffFactor
 
-Vector : VectorBase
+### Vector : VectorBase
 
-Methods:<br>
+Methods:
+
 - TOLUA_TEMPLATE_BIND(T, String)
 - Vector()
 - Vector(const Vector<T>& vector)
@@ -729,14 +740,16 @@ Methods:<br>
 - unsigned Capacity() const
 - bool Empty() const
 
-Properties:<br>
+Properties:
+
 - unsigned size (readonly)
 - unsigned capacity (readonly)
 - bool empty (readonly)
 
-PODVector
+### PODVector
 
-Methods:<br>
+Methods:
+
 - TOLUA_TEMPLATE_BIND(T, Vector3)
 - PODVector()
 - PODVector(const PODVector<T>& vector)
@@ -768,34 +781,39 @@ Methods:<br>
 - unsigned Capacity() const
 - bool Empty() const
 
-Properties:<br>
+Properties:
+
 - unsigned size (readonly)
 - unsigned capacity (readonly)
 - bool empty (readonly)
 
-Context
+### Context
 
-Methods:<br>
+Methods:
+
 - Object* GetEventSender() const
 - EventHandler* GetEventHandler() const
 - const String& GetTypeName(ShortStringHash type) const
 
-Object : RefCounted
+### Object : RefCounted
 
-Methods:<br>
+Methods:
+
 - ShortStringHash GetType() const
 - const String& GetTypeName() const
 - const String& GetCategory() const
 - void SendEvent(const String eventName, VariantMap* eventData = 0)
 
-Properties:<br>
+Properties:
+
 - ShortStringHash type (readonly)
 - const String typeName (readonly)
 - const String category (readonly)
 
-Time : Object
+### Time : Object
 
-Methods:<br>
+Methods:
+
 - unsigned GetFrameNumber() const
 - float GetTimeStep() const
 - unsigned GetTimerPeriod() const
@@ -804,75 +822,64 @@ Methods:<br>
 - static String GetTimeStamp()
 - static void Sleep(unsigned mSec)
 
-Properties:<br>
+Properties:
+
 - unsigned frameNumber (readonly)
 - float timeStep (readonly)
 - unsigned timerPeriod (readonly)
 - float elapsedTime (readonly)
 
-ResourceRef
+### ResourceRef
 
-Methods:<br>
+Methods:
+
 - ResourceRef()
 - ResourceRef(ShortStringHash type)
 - ResourceRef(ShortStringHash type, StringHash id)
 - ResourceRef(const ResourceRef& rhs)
+
+Properties:
+
 - ShortStringHash type
 - StringHash id
 - bool operator == (const ResourceRef& rhs) const
 
-ResourceRefList
+### ResourceRefList
 
-Methods:<br>
+Methods:
+
 - ResourceRefList()
 - ResourceRefList(ShortStringHash type)
+
+Properties:
+
 - ShortStringHash type
 - bool operator == (const ResourceRefList& rhs) const
 
-Variant
+### Variant
 
-Methods:<br>
+Methods:
+
 - Variant()
-- Variant(int value)
-- Variant(unsigned value)
-- Variant(const StringHash& value)
-- Variant(const ShortStringHash& value)
-- Variant(bool value)
-- Variant(float value)
-- Variant(const Vector2& value)
-- Variant(const Vector3& value)
-- Variant(const Vector4& value)
-- Variant(const Quaternion& value)
-- Variant(const Color& value)
-- Variant(const String value)
-- Variant(const char* value)
-- Variant(const ResourceRef& value)
-- Variant(const ResourceRefList& value)
-- Variant(const IntRect& value)
-- Variant(const IntVector2& value)
-- Variant(const String type, const String value)
-- Variant(VariantType type, const String value)
-- Variant(VariantType type, const char* value)
-- Variant(const Variant& value)
 - ~Variant()
 - void Clear()
-- bool operator == (const Variant& rhs) const
-- bool operator == (int rhs) const
-- bool operator == (unsigned rhs) const
-- bool operator == (bool rhs) const
-- bool operator == (float rhs) const
-- bool operator == (const Vector2& rhs)
-- bool operator == (const Vector3& rhs) const
-- bool operator == (const Vector4& rhs) const
-- bool operator == (const Quaternion& rhs) const
-- bool operator == (const Color& rhs) const
-- bool operator == (const String& rhs) const
-- bool operator == (const ResourceRef& rhs) const
-- bool operator == (const ResourceRefList& rhs) const
-- bool operator == (const IntRect& rhs) const
-- bool operator == (const IntVector2& rhs) const
-- bool operator == (const StringHash& rhs) const
-- bool operator == (const ShortStringHash& rhs) const
+- void SetInt(int value)
+- void SetUint(unsigned value)
+- void SetStringHash(const StringHash& value)
+- void SetShortStringHash(const ShortStringHash& value)
+- void SetBool(bool value)
+- void SetFloat(float value)
+- void SetVector2(const Vector2& value)
+- void SetVector3(const Vector3& value)
+- void SetVector4(const Vector4& value)
+- void SetQuaternion(const Quaternion& value)
+- void SetColor(const Color& value)
+- void SetString(const String value)
+- void SetBuffer(const VectorBuffer& value)
+- void SetResourceRef(const ResourceRef& value)
+- void SetResourceRefList(const ResourceRefList& value)
+- void SetIntRect(const IntRect& value)
+- void SetIntVector2(const IntVector2& value)
 - int GetInt() const
 - int GetUInt() const
 - StringHash GetStringHash()
@@ -885,6 +892,7 @@ Methods:<br>
 - const Quaternion& GetQuaternion() const
 - const Color& GetColor() const
 - const String& GetString() const
+- VectorBuffer GetBuffer() const
 - const ResourceRef& GetResourceRef() const
 - const ResourceRefList& GetResourceRefList() const
 - const IntRect& GetIntRect() const
@@ -895,19 +903,23 @@ Methods:<br>
 - bool IsZero() const
 - bool IsEmpty() const
 
-Properties:<br>
+Properties:
+
 - VariantType type (readonly)
 - String typeName (readonly)
 - bool zero (readonly)
 - bool empty (readonly)
 
-VariantMap
+### VariantMap
 
-Methods:<br>
+Methods:
+
 - VariantMap()
 - ~VariantMap()
 - void SetInt(const String key, int value)
 - void SetUInt(const String key, unsigned value)
+- void SetStringHash(const String key, const StringHash& value)
+- void SetShortStringHash(const String key, const ShortStringHash& value)
 - void SetBool(const String key, bool value)
 - void SetFloat(const String key, float value)
 - void SetVector2(const String key, const Vector2 value)
@@ -916,30 +928,35 @@ Methods:<br>
 - void SetQuaternion(const String key, const Quaternion value)
 - void SetColor(const String key, const Color value)
 - void SetString(const String key, const String value)
-- void SetPtr(const String key, void* value)
+- void SetBuffer(const String key, const VectorBuffer& value)
 - void SetResourceRef(const String key, const ResourceRef value)
 - void SetResourceRefList(const String key, const ResourceRefList value)
 - void SetIntRect(const String key, const IntRect value)
 - void SetIntVector2(const String key, const IntVector2 value)
+- void SetPtr(const String key, void* value)
 - int GetInt(const String key)
-- unsigned GetUInt(const String key)
+- int GetUInt(const String key)
+- StringHash GetStringHash(const String key)
+- ShortStringHash GetShortStringHash(const String key)
 - bool GetBool(const String key)
 - float GetFloat(const String key)
-- const Vector2 GetVector2(const String key)
-- const Vector3 GetVector3(const String key)
-- const Vector4 GetVector4(const String key)
-- const Quaternion GetQuaternion(const String key)
-- const Color GetColor(const String key)
-- const String GetString(const String key)
-- const ResourceRef GetResourceRef(const String key)
-- const ResourceRefList GetResourceRefList(const String key)
-- const IntRect GetIntRect(const String key)
-- const IntVector2 GetIntVector2(const String key)
+- const Vector2& GetVector2(const String key)
+- const Vector3& GetVector3(const String key)
+- const Vector4& GetVector4(const String key)
+- const Quaternion& GetQuaternion(const String key)
+- const Color& GetColor(const String key)
+- const String& GetString(const String key)
+- VectorBuffer GetBuffer(const String key)
+- const ResourceRef& GetResourceRef(const String key)
+- const ResourceRefList& GetResourceRefList(const String key)
+- const IntRect& GetIntRect(const String key)
+- const IntVector2& GetIntVector2(const String key)
 - const void* GetPtr(const String type, const String key)
 
-Console : Object
+### Console : Object
 
-Methods:<br>
+Methods:
+
 - void SetDefaultStyle(XMLFile* style)
 - void SetVisible(bool enable)
 - void Toggle()
@@ -955,7 +972,8 @@ Methods:<br>
 - unsigned GetHistoryPosition() const
 - const String& GetHistoryRow(unsigned index) const
 
-Properties:<br>
+Properties:
+
 - XMLFile* defaultStyle
 - BorderImage* background (readonly)
 - LineEdit* lineEdit (readonly)
@@ -964,9 +982,10 @@ Properties:<br>
 - unsigned numHistoryRows
 - unsigned historyPosition (readonly)
 
-DebugHud : Object
+### DebugHud : Object
 
-Methods:<br>
+Methods:
+
 - void SetDefaultStyle(XMLFile* style)
 - void SetMode(unsigned mode)
 - void SetProfilerMaxDepth(unsigned depth)
@@ -987,7 +1006,8 @@ Methods:<br>
 - bool ResetAppStats(const String label)
 - void ClearAppStats()
 
-Properties:<br>
+Properties:
+
 - XMLFile* defaultStyle
 - Text* statsText (readonly)
 - Text* modeText (readonly)
@@ -997,9 +1017,10 @@ Properties:<br>
 - float profilerInterval
 - bool useRendererStats
 
-Engine : Object
+### Engine : Object
 
-Methods:<br>
+Methods:
+
 - void RunFrame()
 - Console* CreateConsole()
 - DebugHud* CreateDebugHud()
@@ -1021,7 +1042,8 @@ Methods:<br>
 - bool IsExiting() const
 - bool IsHeadless() const
 
-Properties:<br>
+Properties:
+
 - int minFps
 - int maxFps
 - int maxInactiveFps
@@ -1031,9 +1053,10 @@ Properties:<br>
 - bool exiting (readonly)
 - bool headless (readonly)
 
-AnimatedModel : StaticModel
+### AnimatedModel : StaticModel
 
-Methods:<br>
+Methods:
+
 - void SetModel(Model* model)
 - AnimationState* AddAnimationState(Animation* animation)
 - void RemoveAnimationState(Animation* animation)
@@ -1062,7 +1085,9 @@ Methods:<br>
 - float GetMorphWeight(StringHash nameHash) const
 - bool IsMaster() const
 
-Properties:<br>
+Properties:
+
+- Model* model
 - Skeleton& skeleton (readonly)
 - unsigned numAnimationStates (readonly)
 - float animationLodBias
@@ -1070,33 +1095,22 @@ Properties:<br>
 - unsigned numMorphs (readonly)
 - bool master (readonly)
 
-AnimationKeyFrame
+### AnimationKeyFrame
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - float time
 - Vector3 position
 - Quaternion rotation
 - Vector3 scale
 
-AnimationTrack
+### Animation : Resource
 
-Methods:<br>
-- void GetKeyFrameIndex(float time, unsigned& index) const
-- String name
-- StringHash nameHash
-- unsigned channelMas
-- Vector<AnimationKeyFrame> keyFrames
+Methods:
 
-AnimationTriggerPoint
-
-Methods:<br>
-- AnimationTriggerPoint()
-- float time
-- Variant data
-
-Animation : Resource
-
-Methods:<br>
 - const String& GetAnimationName() const
 - StringHash GetAnimationNameHash() const
 - float GetLength() const
@@ -1106,17 +1120,22 @@ Methods:<br>
 - const AnimationTrack* GetTrack(StringHash nameHash) const
 - unsigned GetNumTriggers() const
 
-Properties:<br>
+Properties:
+
 - String& animationName (readonly)
 - StringHash animationNameHash (readonly)
 - float length (readonly)
 - unsigned numTracks (readonly)
 - unsigned numTriggers (readonly)
 
-AnimationControl
+### AnimationControl
 
-Methods:<br>
+Methods:
+
 - AnimationControl()
+
+Properties:
+
 - StringHash hash_
 - float speed_
 - float targetWeight_
@@ -1129,9 +1148,10 @@ Methods:<br>
 - unsigned char setTimeRev_
 - unsigned char setWeightRev_
 
-AnimationController : Component
+### AnimationController : Component
 
-Methods:<br>
+Methods:
+
 - bool Play(const String name, unsigned char layer, bool looped, float fadeInTime = 0.0f)
 - bool PlayExclusive(const String name, unsigned char layer, bool looped, float fadeTime = 0.0f)
 - bool Stop(const String name, float fadeOutTime = 0.0f)
@@ -1161,9 +1181,10 @@ Methods:<br>
 - float GetFadeTime(const String name) const
 - float GetAutoFade(const String name) const
 
-AnimationState
+### AnimationState
 
-Methods:<br>
+Methods:
+
 - AnimationState(AnimatedModel* model, Animation* animation)
 - AnimationState(Node* node, Animation* animation)
 - ~AnimationState()
@@ -1191,7 +1212,8 @@ Methods:<br>
 - float GetLength() const
 - unsigned char GetLayer() const
 
-Properties:<br>
+Properties:
+
 - Animation* animation (readonly)
 - Bone* startBone
 - bool enabled (readonly)
@@ -1201,9 +1223,13 @@ Properties:<br>
 - float length (readonly)
 - unsigned char layer
 
-Billboard
+### Billboard
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - Vector3 position
 - Vector2 size
 - Rect uv
@@ -1212,9 +1238,10 @@ Methods:<br>
 - bool enabled
 - float sortDistance
 
-BillboardSet : Drawable
+### BillboardSet : Drawable
 
-Methods:<br>
+Methods:
+
 - void SetMaterial(Material* material)
 - void SetNumBillboards(unsigned num)
 - void SetRelative(bool enable)
@@ -1230,7 +1257,8 @@ Methods:<br>
 - bool IsSorted() const
 - float GetAnimationLodBias() const
 
-Properties:<br>
+Properties:
+
 - Material* material
 - unsigned numBillboards
 - bool relative
@@ -1238,9 +1266,10 @@ Properties:<br>
 - bool sorted
 - float animationLodBias
 
-Camera : Component
+### Camera : Component
 
-Methods:<br>
+Methods:
+
 - void SetNearClip(float nearClip)
 - void SetFarClip(float farClip)
 - void SetFov(float fov)
@@ -1288,7 +1317,8 @@ Methods:<br>
 - float GetLodDistance(float distance, float scale, float bias) const
 - bool IsProjectionValid() const
 
-Properties:<br>
+Properties:
+
 - float farClip
 - float nearClip
 - float fov
@@ -1312,9 +1342,10 @@ Properties:<br>
 - Vector2& projectionOffset
 - bool projectionValid (readonly)
 
-DebugRenderer : Component
+### DebugRenderer : Component
 
-Methods:<br>
+Methods:
+
 - void SetView(Camera* camera)
 - void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true)
 - void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true)
@@ -1332,14 +1363,16 @@ Methods:<br>
 - const Frustum& GetFrustum() const
 - bool IsInside(const BoundingBox& box) const
 
-Properties:<br>
+Properties:
+
 - Matrix3x4& view (readonly)
 - Matrix4& projection (readonly)
 - Frustum& frustum (readonly)
 
-DecalSet : Drawable
+### DecalSet : Drawable
 
-Methods:<br>
+Methods:
+
 - void SetMaterial(Material* material)
 - void SetMaxVertices(unsigned num)
 - void SetMaxIndices(unsigned num)
@@ -1353,7 +1386,8 @@ Methods:<br>
 - unsigned GetMaxVertices() const
 - unsigned GetMaxIndices() const
 
-Properties:<br>
+Properties:
+
 - Material* material
 - unsigned numDecals (readonly)
 - unsigned numVertices (readonly)
@@ -1361,9 +1395,10 @@ Properties:<br>
 - unsigned maxVertices
 - unsigned maxIndices
 
-Drawable : Component
+### Drawable : Component
 
-Methods:<br>
+Methods:
+
 - void SetDrawDistance(float distance)
 - void SetShadowDistance(float distance)
 - void SetLodBias(float bias)
@@ -1414,7 +1449,8 @@ Methods:<br>
 - float GetMinZ() const
 - float GetMaxZ() const
 
-Properties:<br>
+Properties:
+
 - BoundingBox& worldBoundingBox (readonly)
 - unsigned char drawableFlags (readonly)
 - float drawDistance
@@ -1439,9 +1475,10 @@ Properties:<br>
 - float minZ (readonly)
 - float maxZ (readonly)
 
-Graphics : Object
+### Graphics : Object
 
-Methods:<br>
+Methods:
+
 - void SetWindowTitle(const String windowTitle)
 - bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 - bool SetMode(int width, int height)
@@ -1474,8 +1511,10 @@ Methods:<br>
 - bool GetStreamOffsetSupport() const
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
+- static unsigned GetRGBFormat()
 
-Properties:<br>
+Properties:
+
 - bool initialized (readonly)
 - const String windowTitle
 - int width (readonly)
@@ -1501,27 +1540,31 @@ Properties:<br>
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
 
-BiasParameters
+### BiasParameters
 
-Methods:<br>
+Methods:
+
 - BiasParameters()
 - BiasParameters(float constantBias, float slopeScaledBias)
 
-CascadeParameters
+### CascadeParameters
 
-Methods:<br>
+Methods:
+
 - CascadeParameters()
 - CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f)
 
-FocusParameters
+### FocusParameters
 
-Methods:<br>
+Methods:
+
 - FocusParameters()
 - FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView)
 
-Light : Drawable
+### Light : Drawable
 
-Methods:<br>
+Methods:
+
 - void SetLightType(LightType type)
 - void SetPerVertex(bool enable)
 - void SetColor(const Color& color)
@@ -1558,7 +1601,8 @@ Methods:<br>
 - Texture* GetShapeTexture() const
 - Frustum GetFrustum() const
 
-Properties:<br>
+Properties:
+
 - LightType lightType
 - bool perVertex
 - Color& color
@@ -1578,9 +1622,25 @@ Properties:<br>
 - Texture* shapeTexture
 - Frustum frustum (readonly)
 
-Material : Resource
+### Material : Resource
 
-Methods:<br>
+Methods:
+
+- Material(Context* context)
+- ~Material()
+- void SetNumTechniques(unsigned num)
+- void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f)
+- void SetShaderParameter(const String name, const Variant& value)
+- void SetTexture(TextureUnit unit, Texture* texture)
+- void SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat)
+- void SetUVTransform(const Vector2& offset, float rotation, float repeat)
+- void SetCullMode(CullMode mode)
+- void SetShadowCullMode(CullMode mode)
+- void SetDepthBias(const BiasParameters& parameters)
+- void RemoveShaderParameter(const String name)
+- void ReleaseShaders()
+- void SortTechniques()
+- void MarkForAuxView(unsigned frameNumber)
 - unsigned GetNumTechniques() const
 - Technique* GetTechnique(unsigned index) const
 - Pass* GetPass(unsigned index, StringHash passType) const
@@ -1593,16 +1653,18 @@ Methods:<br>
 - bool GetOcclusion() const
 - bool GetSpecular() const
 
-Properties:<br>
+Properties:
+
 - CullMode cullMode (readonly)
 - CullMode shadowCullMode (readonly)
 - unsigned auxViewFrameNumber (readonly)
 - bool occlusion (readonly)
 - bool specular (readonly)
 
-Model : Resource
+### Model : Resource
 
-Methods:<br>
+Methods:
+
 - const BoundingBox& GetBoundingBox() const
 - Skeleton& GetSkeleton()
 - unsigned GetNumGeometries() const
@@ -1615,15 +1677,17 @@ Methods:<br>
 - unsigned GetMorphRangeStart(unsigned bufferIndex) const
 - unsigned GetMorphRangeCount(unsigned bufferIndex) const
 
-Properties:<br>
+Properties:
+
 - BoundingBox& boundingBox (readonly)
 - Skeleton skeleton (readonly)
 - unsigned numGeometries (readonly)
 - unsigned numMorphs (readonly)
 
-Octree : Component
+### Octree : Component
 
-Methods:<br>
+Methods:
+
 - void SetSize(const BoundingBox& box, unsigned numLevels)
 - void Update(const FrameInfo& frame)
 - void AddManualDrawable(Drawable* drawable)
@@ -1633,49 +1697,51 @@ Methods:<br>
 - void QueueUpdate(Drawable* drawable)
 - void DrawDebugGeometry(bool depthTest)
 
-Properties:<br>
+Properties:
+
 - unsigned numLevels (readonly)
 
-RayQueryResult
+### RayQueryResult
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - Drawable* drawable
 - Node* node
 - float distance
 - unsigned subObject
 
-Particle
+### ColorFrame
 
-Methods:<br>
-- Vector3 velocity_
-- Vector2 size_
-- float timer_
-- float timeToLive_
-- float scale_
-- float rotationSpeed_
-- unsigned colorIndex_
-- unsigned texIndex_
+Methods:
 
-ColorFrame
-
-Methods:<br>
 - ColorFrame()
 - ColorFrame(const Color& color)
 - ColorFrame(const Color& color, float time)
 - Color Interpolate(const ColorFrame& next, float time)
+
+Properties:
+
 - Color color
 - float time
 
-TextureFrame
+### TextureFrame
 
-Methods:<br>
+Methods:
+
 - TextureFrame()
+
+Properties:
+
 - Rect uv
 - float time
 
-ParticleEmitter : BillboardSet
+### ParticleEmitter : BillboardSet
 
-Methods:<br>
+Methods:
+
 - bool Load(XMLFile* file)
 - void SetNumParticles(unsigned num)
 - void SetEmissionRate(float rate)
@@ -1741,7 +1807,8 @@ Methods:<br>
 - unsigned GetNumTextureFrames() const
 - TextureFrame* GetTextureFrame(unsigned index)
 
-Properties:<br>
+Properties:
+
 - unsigned numParticles
 - bool emitting
 - bool updateInvisible
@@ -1770,9 +1837,10 @@ Properties:<br>
 - unsigned numColors
 - unsigned numTextureFrames
 
-Renderer
+### Renderer
 
-Methods:<br>
+Methods:
+
 - void SetNumViewports(unsigned num)
 - void SetViewport(unsigned index, Viewport* viewport)
 - void SetDefaultRenderPath(RenderPath* renderPath)
@@ -1839,7 +1907,8 @@ Methods:<br>
 - const FrameInfo& GetFrameInfo()
 - void DrawDebugGeometry(bool depthTest)
 
-Properties:<br>
+Properties:
+
 - unsigned numViewports
 - RenderPath* defaultRenderPath
 - bool specularLighting
@@ -1874,9 +1943,10 @@ Properties:<br>
 - ShaderVariation* stencilVS (readonly)
 - ShaderVariation* stencilPS (readonly)
 
-RenderPath
+### RenderPath
 
-Methods:<br>
+Methods:
+
 - RenderPath* Clone()
 - bool Load(XMLFile* file)
 - bool Append(XMLFile* file)
@@ -1897,9 +1967,10 @@ Methods:<br>
 - unsigned GetNumCommands() const
 - const Variant& GetShaderParameter(const String name) const
 
-RenderSurface
+### RenderSurface
 
-Methods:<br>
+Methods:
+
 - RenderSurface(Texture* parentTexture)
 - ~RenderSurface()
 - void SetNumViewports(unsigned num)
@@ -1919,7 +1990,8 @@ Methods:<br>
 - RenderSurface* GetLinkedRenderTarget() const
 - RenderSurface* GetLinkedDepthStencil() const
 
-Properties:<br>
+Properties:
+
 - Texture* parentTexture (readonly)
 - int width (readonly)
 - int height (readonly)
@@ -1929,10 +2001,14 @@ Properties:<br>
 - RenderSurface* linkedRenderTarget
 - RenderSurface* linkedDepthStencil
 
-Bone
+### Bone
 
-Methods:<br>
+Methods:
+
 - Bone()
+
+Properties:
+
 - String name
 - StringHash nameHash
 - unsigned parentIndex
@@ -1941,35 +2017,43 @@ Methods:<br>
 - Vector3 initialScale
 - Matrix3x4 offsetMatrix
 - bool animated
-- unsigned collisionMask
+- unsigned char collisionMask
 - float radius
 - BoundingBox boundingBox
 - Node* node
 
-Skeleton
+### Skeleton
 
-Methods:<br>
+Methods:
+
 - unsigned GetNumBones() const
 - Bone* GetRootBone()
 - Bone* GetBone(unsigned index)
 
-Properties:<br>
+Properties:
+
 - unsigned numBones (readonly)
 - Bone* rootBone (readonly)
 
-Skybox : StaticModel
+### Skybox : StaticModel
 
-Methods:<br>
+Methods:
 
-StaticModelGeometryData
 
-Methods:<br>
+### StaticModelGeometryData
+
+Methods:
+
+
+Properties:
+
 - Vector3 center
 - unsigned lodLevel
 
-StaticModel : Drawable
+### StaticModel : Drawable
 
-Methods:<br>
+Methods:
+
 - void SetModel(Model* model)
 - void SetMaterial(Material* material)
 - bool SetMaterial(unsigned index, Material* material)
@@ -1981,42 +2065,49 @@ Methods:<br>
 - bool IsInside(const Vector3& point) const
 - bool IsInsideLocal(const Vector3& point) const
 
-Properties:<br>
+Properties:
+
 - Model* model
 - Material* material
 - BoundingBox& boundingBox (readonly)
 - unsigned numGeometries (readonly)
 - unsigned occlusionLodLevel
 
-StaticModelGroup : StaticModel
+### StaticModelGroup : StaticModel
 
-Methods:<br>
+Methods:
+
 - void AddInstanceNode(Node* node)
-- void RemoveInstanceNode(Node* node);
+- void RemoveInstanceNode(Node* node)
 - void RemoveAllInstanceNodes()
 - unsigned GetNumInstanceNodes() const
 - Node* GetInstanceNode(unsigned index) const
 
-Properties:<br>
+Properties:
+
 - unsigned numInstanceNodes (readonly)
 
-Pass : RefCounted
+### Pass : RefCounted
 
-Methods:<br>
+Methods:
 
-Technique : Resource
 
-Methods:<br>
+### Technique : Resource
+
+Methods:
+
 - bool HasPass(const String type) const
 - Pass* GetPass(const String  type) const
 - bool IsSM3() const
 
-Properties:<br>
+Properties:
+
 - bool SM3 (readonly)
 
-Terrain : Component
+### Terrain : Component
 
-Methods:<br>
+Methods:
+
 - void SetPatchSize(int size)
 - void SetSpacing(const Vector3& spacing)
 - void SetSmoothing(bool enable)
@@ -2058,7 +2149,8 @@ Methods:<br>
 - bool IsOccluder() const
 - bool IsOccludee() const
 
-Properties:<br>
+Properties:
+
 - int patchSize
 - Vector3& spacing
 - IntVector2& numVertices (readonly)
@@ -2079,9 +2171,10 @@ Properties:<br>
 - bool occluder
 - bool occludee
 
-TerrainPatch : Drawable
+### TerrainPatch : Drawable
 
-Methods:<br>
+Methods:
+
 - void SetOwner(Terrain* terrain)
 - void SetNeighbors(TerrainPatch* north, TerrainPatch* south, TerrainPatch* west, TerrainPatch* east)
 - void SetMaterial(Material* material)
@@ -2102,7 +2195,8 @@ Methods:<br>
 - unsigned GetLodLevel() const
 - float GetOcclusionOffset() const
 
-Properties:<br>
+Properties:
+
 - Geometry* geometry (readonly)
 - Geometry* maxLodGeometry (readonly)
 - Geometry* minLodGeometry (readonly)
@@ -2117,9 +2211,10 @@ Properties:<br>
 - unsigned lodLevel (readonly)
 - float occlusionOffset
 
-Texture : Resource
+### Texture : Resource
 
-Methods:<br>
+Methods:
+
 - void SetNumLevels(unsigned levels)
 - void SetFilterMode(TextureFilterMode filter)
 - void SetAddressMode(TextureCoordinate coord, TextureAddressMode address)
@@ -2144,7 +2239,8 @@ Methods:<br>
 - unsigned GetDataSize(int width, int height) const
 - unsigned GetRowDataSize(int width) const
 
-Properties:<br>
+Properties:
+
 - unsigned format (readonly)
 - bool compressed (readonly)
 - unsigned levels (readonly)
@@ -2156,19 +2252,29 @@ Properties:<br>
 - Texture* backupTexture
 - TextureUsage usage (readonly)
 
-Texture2D : Texture
+### Texture2D : Texture
 
-Methods:<br>
+Methods:
+
+- Texture2D(Context* context)
+- ~Texture2D()
+- bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
 - RenderSurface* GetRenderSurface() const
 
-TextureCube : Texture
+Properties:
 
-Methods:<br>
+- RenderSurface* renderSurface (readonly)
+
+### TextureCube : Texture
+
+Methods:
+
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
-Viewport
+### Viewport
 
-Methods:<br>
+Methods:
+
 - Viewport(Context* context)
 - Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* renderPath = 0)
 - Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0)
@@ -2183,15 +2289,17 @@ Methods:<br>
 - const IntRect& GetRect() const
 - RenderPath* GetRenderPath() const
 
-Properties:<br>
+Properties:
+
 - Scene* scene
 - Camera* camera
 - IntRect& rect
 - RenderPath* renderPath
 
-Zone : Drawable
+### Zone : Drawable
 
-Methods:<br>
+Methods:
+
 - void SetBoundingBox(const BoundingBox& box)
 - void SetAmbientColor(const Color& color)
 - void SetFogColor(const Color& color)
@@ -2212,7 +2320,8 @@ Methods:<br>
 - bool GetAmbientGradient() const
 - bool IsInside(const Vector3& point) const
 
-Properties:<br>
+Properties:
+
 - BoundingBox& boundingBox
 - Matrix3x4& inverseWorldTransform (readonly)
 - Color& ambientColor
@@ -2225,18 +2334,23 @@ Properties:<br>
 - bool override
 - bool ambientGradient
 
-TouchState
+### TouchState
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - int touchID
 - IntVector2 position
 - IntVector2 lastPosition
 - IntVector2 delta
 - float pressure
 
-JoystickState
+### JoystickState
 
-Methods:<br>
+Methods:
+
 - unsigned GetNumButtons() const
 - unsigned GetNumAxes() const
 - unsigned GetNumHats() const
@@ -2245,14 +2359,17 @@ Methods:<br>
 - float GetAxisPosition(unsigned index) const
 - int GetHatPosition(unsigned index) const
 
-Properties:<br>
+Properties:
+
 - unsigned numButtons (readonly)
 - unsigned numAxes (readonly)
 - unsigned numHats (readonly)
 
-Input : Object
+### Input : Object
 
-Methods:<br>
+Methods:
+
+- void SetToggleFullscreen(bool enable)
 - void SetMouseVisible(bool enable)
 - bool OpenJoystick(unsigned index)
 - void CloseJoystick(unsigned index)
@@ -2279,7 +2396,8 @@ Methods:<br>
 - bool HasFocus()
 - bool IsMinimized() const
 
-Properties:<br>
+Properties:
+
 - int qualifiers (readonly)
 - IntVector2 mousePosition (readonly)
 - IntVector2& mouseMove (readonly)
@@ -2293,12 +2411,13 @@ Properties:<br>
 - bool focus (readonly)
 - bool minimized (readonly)
 
-Deserializer
+### Deserializer
 
-Methods:<br>
-- virtual unsigned Seek(unsigned position)
-- virtual const String& GetName() const
-- virtual unsigned GetChecksum()
+Methods:
+
+- unsigned Seek(unsigned position)
+- const String& GetName() const
+- unsigned GetChecksum()
 - unsigned GetPosition() const
 - unsigned GetSize() const
 - bool IsEof() const
@@ -2325,6 +2444,7 @@ Methods:<br>
 - String ReadFileID()
 - StringHash ReadStringHash()
 - ShortStringHash ReadShortStringHash()
+- VectorBuffer ReadBuffer()
 - ResourceRef ReadResourceRef()
 - ResourceRefList ReadResourceRefList()
 - Variant ReadVariant()
@@ -2335,25 +2455,22 @@ Methods:<br>
 - unsigned ReadNetID()
 - String ReadLine()
 
-Properties:<br>
+Properties:
+
 - String& name (readonly)
 - unsigned checksum (readonly)
 - unsigned position (readonly)
 - unsigned size (readonly)
 - bool eof (readonly)
 
-File : Deserializer
+### File : Object
 
-Methods:<br>
+Methods:
+
 - File(Context* context)
 - File(Context* context, const String fileName, FileMode mode = FILE_READ)
 - File(Context* context, PackageFile* package, const String fileName)
-- virtual ~File()
-- virtual unsigned Read(void* dest, unsigned size)
-- virtual unsigned Seek(unsigned position)
-- virtual unsigned Write(const void* data, unsigned size)
-- virtual const String& GetName() const
-- virtual unsigned GetChecksum()
+- ~File()
 - bool Open(const String fileName, FileMode mode = FILE_READ)
 - bool Open(PackageFile* package, const String fileName)
 - void Close()
@@ -2363,17 +2480,94 @@ Methods:<br>
 - bool IsOpen() const
 - void* GetHandle() const
 - bool IsPackaged() const
+- unsigned Seek(unsigned position)
+- const String& GetName() const
+- unsigned GetChecksum()
+- unsigned GetPosition() const
+- unsigned GetSize() const
+- bool IsEof() const
+- int ReadInt()
+- short ReadShort()
+- signed char ReadByte()
+- unsigned ReadUInt()
+- unsigned short ReadUShort()
+- unsigned char ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Rect ReadRect()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float maxAbsCoord)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadFileID()
+- StringHash ReadStringHash()
+- ShortStringHash ReadShortStringHash()
+- VectorBuffer ReadBuffer()
+- ResourceRef ReadResourceRef()
+- ResourceRefList ReadResourceRefList()
+- Variant ReadVariant()
+- Variant ReadVariant(VariantType type)
+- VariantVector ReadVariantVector()
+- VariantMap ReadVariantMap()
+- unsigned ReadVLE()
+- unsigned ReadNetID()
+- String ReadLine()
+- bool WriteInt(int value)
+- bool WriteShort(short value)
+- bool WriteByte(signed char value)
+- bool WriteUInt(unsigned value)
+- bool WriteUShort(unsigned short value)
+- bool WriteUByte(unsigned char value)
+- bool WriteBool(bool value)
+- bool WriteFloat(float value)
+- bool WriteIntRect(const IntRect& value)
+- bool WriteIntVector2(const IntVector2& value)
+- bool WriteRect(const Rect& value)
+- bool WriteVector2(const Vector2& value)
+- bool WriteVector3(const Vector3& value)
+- bool WritePackedVector3(const Vector3& value, float maxAbsCoord)
+- bool WriteVector4(const Vector4& value)
+- bool WriteQuaternion(const Quaternion& value)
+- bool WritePackedQuaternion(const Quaternion& value)
+- bool WriteColor(const Color& value)
+- bool WriteBoundingBox(const BoundingBox& value)
+- bool WriteString(const String value)
+- bool WriteFileID(const String value)
+- bool WriteStringHash(const StringHash& value)
+- bool WriteShortStringHash(const ShortStringHash& value)
+- bool WriteBuffer(const VectorBuffer& buffer)
+- bool WriteResourceRef(const ResourceRef& value)
+- bool WriteResourceRefList(const ResourceRefList& value)
+- bool WriteVariant(const Variant& value)
+- bool WriteVariantData(const Variant& value)
+- bool WriteVariantVector(const VariantVector& value)
+- bool WriteVariantMap(const VariantMap& value)
+- bool WriteVLE(unsigned value)
+- bool WriteNetID(unsigned value)
+- bool WriteLine(const String value)
 
-Properties:<br>
-- String& name (readonly)
-- unsigned checksum (readonly)
+Properties:
+
 - FileMode mode (readonly)
 - bool open (readonly)
 - bool packaged (readonly)
+- String& name (readonly)
+- unsigned checksum (readonly)
+- unsigned position (readonly)
+- unsigned size (readonly)
+- bool eof (readonly)
 
-FileSystem : Object
+### FileSystem : Object
 
-Methods:<br>
+Methods:
+
 - bool SetCurrentDir(const String pathName)
 - bool CreateDir(const String pathName)
 - int SystemCommand(const String commandLine)
@@ -2392,9 +2586,11 @@ Methods:<br>
 - String GetProgramDir() const
 - String GetUserDocumentsDir() const
 
-Log : Object
+### Log : Object
 
-Methods:<br>
+Methods:
+
+- void Open(const String fileName)
 - void SetLevel(int level)
 - void SetTimeStamp(bool enable)
 - void SetQuiet(bool quiet)
@@ -2405,24 +2601,30 @@ Methods:<br>
 - static void Write(int level, const String message)
 - static void WriteRaw(const String message, bool error = false)
 
-Properties:<br>
+Properties:
+
 - int level
 - bool timeStamp
 - bool quiet
 
-PackageEntry
+### PackageEntry
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - unsigned offset
 - unsigned size
 - unsigned checksum
 
-PackageFile : Object
+### PackageFile : Object
 
-Methods:<br>
+Methods:
+
 - PackageFile(Context* context)
 - PackageFile(Context* context, const String fileName)
-- virtual ~PackageFile()
+- ~PackageFile()
 - bool Open(const String fileName)
 - bool Exists(const String fileName) const
 - const PackageEntry* GetEntry(const String fileName) const
@@ -2433,16 +2635,18 @@ Methods:<br>
 - unsigned GetTotalSize() const
 - unsigned GetChecksum() const
 
-Properties:<br>
+Properties:
+
 - String& name (readonly)
 - StringHash nameHash (readonly)
 - unsigned numFiles (readonly)
 - unsigned totalSize (readonly)
 - unsigned checksum (readonly)
 
-Serializer
+### Serializer
 
-Methods:<br>
+Methods:
+
 - bool WriteInt(int value)
 - bool WriteShort(short value)
 - bool WriteByte(signed char value)
@@ -2451,54 +2655,58 @@ Methods:<br>
 - bool WriteUByte(unsigned char value)
 - bool WriteBool(bool value)
 - bool WriteFloat(float value)
-- bool WriteIntRect(const IntRect value)
-- bool WriteIntVector2(const IntVector2 value)
-- bool WriteRect(const Rect value)
-- bool WriteVector2(const Vector2 value)
-- bool WriteVector3(const Vector3 value)
-- bool WritePackedVector3(const Vector3 value, float maxAbsCoord)
-- bool WriteVector4(const Vector4 value)
-- bool WriteQuaternion(const Quaternion value)
-- bool WritePackedQuaternion(const Quaternion value)
-- bool WriteColor(const Color value)
-- bool WriteBoundingBox(const BoundingBox value)
+- bool WriteIntRect(const IntRect& value)
+- bool WriteIntVector2(const IntVector2& value)
+- bool WriteRect(const Rect& value)
+- bool WriteVector2(const Vector2& value)
+- bool WriteVector3(const Vector3& value)
+- bool WritePackedVector3(const Vector3& value, float maxAbsCoord)
+- bool WriteVector4(const Vector4& value)
+- bool WriteQuaternion(const Quaternion& value)
+- bool WritePackedQuaternion(const Quaternion& value)
+- bool WriteColor(const Color& value)
+- bool WriteBoundingBox(const BoundingBox& value)
 - bool WriteString(const String value)
 - bool WriteFileID(const String value)
-- bool WriteStringHash(const StringHash value)
-- bool WriteShortStringHash(const ShortStringHash value)
-- bool WriteResourceRef(const ResourceRef value)
-- bool WriteResourceRefList(const ResourceRefList value)
-- bool WriteVariant(const Variant value)
-- bool WriteVariantData(const Variant value)
-- bool WriteVariantVector(const VariantVector value)
-- bool WriteVariantMap(const VariantMap value)
+- bool WriteStringHash(const StringHash& value)
+- bool WriteShortStringHash(const ShortStringHash& value)
+- bool WriteBuffer(const VectorBuffer& buffer)
+- bool WriteResourceRef(const ResourceRef& value)
+- bool WriteResourceRefList(const ResourceRefList& value)
+- bool WriteVariant(const Variant& value)
+- bool WriteVariantData(const Variant& value)
+- bool WriteVariantVector(const VariantVector& value)
+- bool WriteVariantMap(const VariantMap& value)
 - bool WriteVLE(unsigned value)
 - bool WriteNetID(unsigned value)
 - bool WriteLine(const String value)
 
-LuaScriptInstance : Component
+### LuaScriptInstance : Component
 
-Methods:<br>
-- bool CreateObject(const String objectType)
-- bool CreateObject(const String fileName, const String objectType)
+Methods:
+
+- bool CreateObject(const String scriptObjectType)
+- bool CreateObject(const String scriptFileName, const String scriptObjectType)
 - void SetScriptFileName(const String scriptFileName)
 - void SetScriptObjectType(const String scriptObjectType)
 - void SubscribeToEvent(const String eventName, const String functionName)
 - void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromAllEvents()
-- void SubscribeToEvent(void* object, const String eventName, const String functionName)
-- void UnsubscribeFromEvent(void* object, const String eventName)
-- void UnsubscribeFromEvents(void* object)
+- void SubscribeToEvent(void* sender, const String eventName, const String functionName)
+- void UnsubscribeFromEvent(void* sender, const String eventName)
+- void UnsubscribeFromEvents(void* sender)
 - const String& GetScriptFileName() const
 - const String& GetScriptObjectType() const
 
-Properties:<br>
+Properties:
+
 - const String scriptFileName
 - const String scriptObjectType
-    
-BoundingBox
 
-Methods:<br>
+### BoundingBox
+
+Methods:
+
 - BoundingBox()
 - BoundingBox(const BoundingBox& box)
 - BoundingBox(const Rect& rect)
@@ -2507,6 +2715,7 @@ Methods:<br>
 - BoundingBox(const Frustum& frustum)
 - BoundingBox(const Polyhedron& poly)
 - BoundingBox(const Sphere& sphere)
+- ~BoundingBox()
 - bool operator == (const BoundingBox& rhs) const
 - void Define(const BoundingBox& box)
 - void Define(const Rect& rect)
@@ -2537,23 +2746,26 @@ Methods:<br>
 - Intersection IsInside(const Sphere& sphere) const
 - Intersection IsInsideFast(const Sphere& sphere) const
 - String ToString() const
+
+Properties:
+
 - Vector3 min
 - Vector3 max
 - bool defined
-
-Properties:<br>
 - Vector3 center (readonly)
 - Vector3 size (readonly)
 - Vector3 halfSize (readonly)
 
-Color
+### Color
 
-Methods:<br>
+Methods:
+
 - Color()
 - Color(const Color& color)
 - Color(const Color& color, float a)
 - Color(float r, float g, float b)
 - Color(float r, float g, float b, float a)
+- ~Color()
 - bool operator == (const Color& rhs) const
 - Color operator * (float rhs) const
 - Color operator + (const Color& rhs)
@@ -2580,6 +2792,9 @@ Methods:<br>
 - void Invert(bool invertAlpha = false)
 - Color Lerp(const Color& rhs, float t) const
 - String ToString() const
+
+Properties:
+
 - float r
 - float g
 - float b
@@ -2595,11 +2810,13 @@ Methods:<br>
 - static const Color YELLOW
 - static const Color TRANSPARENT
 
-Frustum
+### Frustum
 
-Methods:<br>
+Methods:
+
 - Frustum()
 - Frustum(const Frustum& frustum)
+- ~Frustum()
 - void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY)
 - void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform = Matrix3x4::IDENTITY)
 - void Define(const BoundingBox& box, const Matrix3x4& transform = Matrix3x4::IDENTITY)
@@ -2617,14 +2834,19 @@ Methods:<br>
 - Rect Projected(const Matrix4& transform) const
 - void UpdatePlanes()
 
-Matrix3
+### Matrix3
 
-Methods:<br>
+Methods:
+
 - Matrix3()
 - Matrix3(const Matrix3& matrix)
+
+Properties:
+
 - Matrix3(float v00, float v01, float v02,
 - float v10, float v11, float v12,
 - float v20, float v21, float v22)
+- ~Matrix3()
 - bool operator == (const Matrix3& rhs) const
 - Vector3 operator * (const Vector3& rhs) const
 - Matrix3 operator + (const Matrix3& rhs) const
@@ -2650,13 +2872,17 @@ Methods:<br>
 - static const Matrix3 ZERO
 - static const Matrix3 IDENTITY
 
-Matrix3x4
+### Matrix3x4
 
-Methods:<br>
+Methods:
+
 - Matrix3x4()
 - Matrix3x4(const Matrix3x4& matrix)
 - Matrix3x4(const Matrix3& matrix)
 - Matrix3x4(const Matrix4& matrix)
+
+Properties:
+
 - Matrix3x4(float v00, float v01, float v02, float v03,
 - float v10, float v11, float v12, float v13,
 - float v20, float v21, float v22, float v23)
@@ -2697,16 +2923,21 @@ Methods:<br>
 - static const Matrix3x4 ZERO
 - static const Matrix3x4 IDENTITY
 
-Matrix4
+### Matrix4
 
-Methods:<br>
+Methods:
+
 - Matrix4()
 - Matrix4(const Matrix4& matrix)
 - Matrix4(const Matrix3& matrix)
+
+Properties:
+
 - Matrix4(float v00, float v01, float v02, float v03,
 - float v10, float v11, float v12, float v13,
 - float v20, float v21, float v22, float v23,
 - float v30, float v31, float v32, float v33)
+- ~Matrix4()
 - bool operator == (const Matrix4& rhs) const
 - Vector3 operator * (const Vector3& rhs) const
 - Vector4 operator * (const Vector4& rhs) const
@@ -2746,23 +2977,29 @@ Methods:<br>
 - static const Matrix4 ZERO
 - static const Matrix4 IDENTITY
 
-Plane
+### Plane
 
-Methods:<br>
+Methods:
+
 - Plane()
 - Plane(const Plane& plane)
 - Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - Plane(const Vector3& normal, const Vector3& point)
+- ~Plane()
 - void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - void Define(const Vector3& normal, const Vector3& point)
 - float Distance(const Vector3& point) const
+
+Properties:
+
 - Vector3 normal
 - Vector3 absNormal
 - float intercept
 
-Polyhedron
+### Polyhedron
 
-Methods:<br>
+Methods:
+
 - Polyhedron()
 - Polyhedron(const Polyhedron& polyhedron)
 - Polyhedron(const BoundingBox& box)
@@ -2782,12 +3019,14 @@ Methods:<br>
 - Polyhedron Transformed(const Matrix3x4& transform) const
 - bool Empty() const
 
-Properties:<br>
+Properties:
+
 - bool empty (readonly)
 
-Quaternion
+### Quaternion
 
-Methods:<br>
+Methods:
+
 - Quaternion()
 - Quaternion(const Quaternion& quat)
 - Quaternion(float w, float x, float y, float z)
@@ -2796,6 +3035,7 @@ Methods:<br>
 - Quaternion(const Vector3& start, const Vector3& end)
 - Quaternion(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
 - Quaternion(const Matrix3& matrix)
+- ~Quaternion()
 - bool operator == (const Quaternion& rhs) const
 - Quaternion operator * (float rhs) const
 - Quaternion operator - () const
@@ -2825,18 +3065,23 @@ Methods:<br>
 - Matrix3 RotationMatrix() const
 - Quaternion Slerp(Quaternion rhs, float t) const
 - String ToString() const
+
+Properties:
+
 - float w
 - float x
 - float y
 - float z
 - static const Quaternion IDENTITY
 
-Ray
+### Ray
 
-Methods:<br>
+Methods:
+
 - Ray()
 - Ray(const Vector3& origin, const Vector3& direction)
 - Ray(const Ray& ray)
+- ~Ray()
 - bool operator == (const Ray& rhs) const
 - void Define(const Vector3& origin, const Vector3& direction)
 - Vector3 Project(const Vector3& point) const
@@ -2848,17 +3093,22 @@ Methods:<br>
 - float HitDistance(const Sphere& sphere) const
 - float HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 - Ray Transformed(const Matrix3x4& transform) const
+
+Properties:
+
 - Vector3 origin
 - Vector3 direction
 
-Rect
+### Rect
 
-Methods:<br>
+Methods:
+
 - Rect()
 - Rect(const Rect& rect)
 - Rect(const Vector2& min, const Vector2& max)
 - Rect(float left, float top, float right, float bottom)
 - Rect(const Vector4& vector)
+- ~Rect()
 - bool operator == (const Rect& rhs) const
 - void Define(const Rect& rect)
 - void Define(const Vector2& min, const Vector2& max)
@@ -2873,46 +3123,52 @@ Methods:<br>
 - bool Equals(const Rect& rhs) const
 - Vector4 ToVector4() const
 - String ToString() const
+
+Properties:
+
 - Vector2 min
 - Vector2 max
 - static const Rect FULL
 - static const Rect POSITIVE
 - static const Rect ZERO
-
-Properties:<br>
 - Vector2 center (readonly)
 - Vector2 size (readonly)
 - Vector2 halfSize (readonly)
 
-IntRect
+### IntRect
 
-Methods:<br>
+Methods:
+
 - IntRect()
 - IntRect(int left, int top, int right, int bottom)
+- ~IntRect()
 - bool operator == (const IntRect& rhs) const
 - IntVector2 Size() const
 - int Width() const
 - int Height() const
+
+Properties:
+
 - int left
 - int top
 - int right
 - int bottom
 - static const IntRect ZERO
-
-Properties:<br>
 - IntVector2 size (readonly)
 - int width (readonly)
 - int height (readonly)
 
-Sphere
+### Sphere
 
-Methods:<br>
+Methods:
+
 - Sphere()
 - Sphere(const Sphere& sphere)
 - Sphere(const Vector3& center, float radius)
 - Sphere(const BoundingBox& box)
 - Sphere(const Frustum& frustum)
 - Sphere(const Polyhedron& poly)
+- ~Sphere()
 - bool operator == (const Sphere& rhs) const
 - void Define(const Sphere& sphere)
 - void Define(const Vector3& center, float radius)
@@ -2931,17 +3187,22 @@ Methods:<br>
 - Intersection IsInside(const BoundingBox& box) const
 - Intersection IsInsideFast(const BoundingBox& box) const
 - float Distance(const Vector3& point) const
+
+Properties:
+
 - Vector3 center
 - float radius
 - bool defined
 
-StringHash
+### StringHash
 
-Methods:<br>
+Methods:
+
 - StringHash()
 - StringHash(const StringHash& rhs)
-- explicit StringHash(unsigned value)
+- StringHash(unsigned value)
 - StringHash(const String str)
+- ~StringHash()
 - StringHash operator + (const StringHash& rhs) const
 - bool operator == (const StringHash& rhs) const
 - bool operator < (const StringHash& rhs) const
@@ -2950,36 +3211,41 @@ Methods:<br>
 - String ToString() const
 - unsigned ToHash() const
 - static unsigned Calculate(const char* str)
-- static const StringHash ZERO
 
-Properties:<br>
+Properties:
+
+- static const StringHash ZERO
 - unsigned value (readonly)
 
-ShortStringHash
+### ShortStringHash
 
-Methods:<br>
+Methods:
+
 - ShortStringHash()
 - ShortStringHash(const ShortStringHash& rhs)
-- explicit ShortStringHash(const StringHash& rhs)
-- explicit ShortStringHash(unsigned short value)
+- ShortStringHash(const StringHash& rhs)
+- ShortStringHash(unsigned short value)
 - ShortStringHash(const String str)
+- ~ShortStringHash()
 - ShortStringHash operator + (const ShortStringHash& rhs) const
 - bool operator == (const ShortStringHash& rhs) const
 - bool operator < (const ShortStringHash& rhs) const
 - unsigned short Value() const
 - static unsigned short Calculate(const char* str)
-- static const ShortStringHash ZERO
 
-Properties:<br>
+Properties:
+
+- static const ShortStringHash ZERO
 - unsigned short value (readonly)
 
-Vector2
+### Vector2
 
-Methods:<br>
+Methods:
+
 - Vector2()
 - Vector2(const Vector2& vector)
 - Vector2(float x, float y)
-- Vector2(const float* data)
+- ~Vector2()
 - bool operator == (const Vector2& rhs) const
 - Vector2 operator + (const Vector2& rhs) const
 - Vector2 operator - () const
@@ -2999,6 +3265,9 @@ Methods:<br>
 - bool Equals(const Vector2& rhs) const
 - Vector2 Normalized() const
 - String ToString() const
+
+Properties:
+
 - float x
 - float y
 - static const Vector2 ZERO
@@ -3008,13 +3277,14 @@ Methods:<br>
 - static const Vector2 DOWN
 - static const Vector2 ONE
 
-IntVector2
+### IntVector2
 
-Methods:<br>
+Methods:
+
 - IntVector2()
 - IntVector2(int x, int y)
-- IntVector2(const int* data)
 - IntVector2(const IntVector2& rhs)
+- ~IntVector2()
 - bool operator == (const IntVector2& rhs) const
 - IntVector2 operator + (const IntVector2& rhs) const
 - IntVector2 operator - () const
@@ -3023,17 +3293,22 @@ Methods:<br>
 - IntVector2 operator / (int rhs) const
 - IntVector2 operator / (int rhs) const
 - String ToString() const
+
+Properties:
+
 - int x
 - int y
 - static const IntVector2 ZERO
 
-Vector3
+### Vector3
 
-Methods:<br>
+Methods:
+
 - Vector3()
 - Vector3(const Vector3& vector)
 - Vector3(const Vector2& vector, float z)
 - Vector3(float x, float y, float z)
+- ~Vector3()
 - bool operator == (const Vector3& rhs) const
 - Vector3 operator + (const Vector3& rhs) const
 - Vector3 operator - () const
@@ -3054,6 +3329,9 @@ Methods:<br>
 - bool Equals(const Vector3& rhs) const
 - Vector3 Normalized() const
 - String ToString() const
+
+Properties:
+
 - float x
 - float y
 - float z
@@ -3066,13 +3344,15 @@ Methods:<br>
 - static const Vector3 BACK
 - static const Vector3 ONE
 
-Vector4
+### Vector4
 
-Methods:<br>
+Methods:
+
 - Vector4()
 - Vector4(const Vector4& vector)
 - Vector4(const Vector3& vector, float w)
 - Vector4(float x, float y, float z, float w)
+- ~Vector4()
 - bool operator == (const Vector4& rhs) const
 - Vector4 operator + (const Vector4& rhs) const
 - Vector4 operator - () const
@@ -3088,6 +3368,9 @@ Methods:<br>
 - Vector4 Lerp(const Vector4& rhs, float t) const
 - bool Equals(const Vector4& rhs) const
 - String ToString() const
+
+Properties:
+
 - float x
 - float y
 - float z
@@ -3095,26 +3378,33 @@ Methods:<br>
 - static const Vector4 ZERO
 - static const Vector4 ONE
 
-Navigable : Component
+### Navigable : Component
 
-Methods:<br>
+Methods:
+
 - void SetRecursive(bool enable)
 - bool IsRecursive() const
 
-Properties:<br>
+Properties:
+
 - bool recursive
 
-NavigationGeometryInfo
+### NavigationGeometryInfo
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - Component* component
 - unsigned lodLevel
 - Matrix3x4 transform
 - BoundingBox boundingBox
 
-NavigationMesh : Component
+### NavigationMesh : Component
 
-Methods:<br>
+Methods:
+
 - void SetTileSize(int size)
 - void SetCellSize(float size)
 - void SetCellHeight(float height)
@@ -3156,7 +3446,8 @@ Methods:<br>
 - BoundingBox GetWorldBoundingBox() const
 - IntVector2 GetNumTiles() const
 
-Properties:<br>
+Properties:
+
 - int tileSize
 - float cellSize
 - float cellHeight
@@ -3176,9 +3467,10 @@ Properties:<br>
 - BoundingBox worldBoundingBox (readonly)
 - IntVector2 numTiles (readonly)
 
-OffMeshConnection : Component
+### OffMeshConnection : Component
 
-Methods:<br>
+Methods:
+
 - void SetEndPoint(Node* node)
 - void SetRadius(float radius)
 - void SetBidirectional(bool enabled)
@@ -3186,24 +3478,29 @@ Methods:<br>
 - float GetRadius() const
 - bool IsBidirectional() const
 
-Properties:<br>
+Properties:
+
 - Node* endPoint
 - float radius
 - bool bidirectional
 
-RemoteEvent
+### RemoteEvent
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - unsigned senderID
 - StringHash eventType
 - VariantMap eventData
 - bool inOrder
 
-Connection : Object
+### Connection : Object
 
-Methods:<br>
+Methods:
+
 - void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0)
-- void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned contentID = 0)
 - void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
 - void SendRemoteEvent(const String eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
 - void SendRemoteEvent(Node* node, StringHash eventType, bool inOrder, const VariantMap& eventData = Variant::emptyVariantMap)
@@ -3237,7 +3534,8 @@ Methods:<br>
 - const String& GetDownloadName() const
 - float GetDownloadProgress() const
 
-Properties:<br>
+Properties:
+
 - VariantMap& identity
 - Scene* scene
 - Controls& controls
@@ -3253,21 +3551,27 @@ Properties:<br>
 - String& downloadName (readonly)
 - float downloadProgress (readonly)
 
-Controls
+### Controls
 
-Methods:<br>
+Methods:
+
+- Controls()
 - void Reset()
 - void Set(unsigned buttons, bool down = true)
 - bool IsDown(unsigned button) const
 - bool IsPressed(unsigned button, const Controls& previousControls) const
+
+Properties:
+
 - unsigned buttons
 - float yaw
 - float pitch
 - VariantMap extraData
 
-Network
+### Network
 
-Methods:<br>
+Methods:
+
 - bool Connect(const String address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap)
 - void Disconnect(int waitMSec = 0)
 - bool StartServer(unsigned short port)
@@ -3292,15 +3596,17 @@ Methods:<br>
 - bool CheckRemoteEvent(StringHash eventType) const
 - const String& GetPackageCacheDir() const
 
-Properties:<br>
+Properties:
+
 - int updateFps
 - Connection* serverConnection (readonly)
 - bool serverRunning (readonly)
 - String& packageCacheDir
 
-NetworkPriority : Component
+### NetworkPriority : Component
 
-Methods:<br>
+Methods:
+
 - void SetBasePriority(float priority)
 - void SetDistanceFactor(float factor)
 - void SetMinPriority(float priority)
@@ -3311,15 +3617,17 @@ Methods:<br>
 - bool GetAlwaysUpdateOwner() const
 - bool CheckUpdate(float distance, float& accumulator)
 
-Properties:<br>
+Properties:
+
 - float basePriority
 - float distanceFactor
 - float minPriority
 - bool alwaysUpdateOwner
 
-CollisionShape : Component
+### CollisionShape : Component
 
-Methods:<br>
+Methods:
+
 - void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
 - void SetSphere(float diameter, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
 - void SetStaticPlane(const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY)
@@ -3351,7 +3659,8 @@ Methods:<br>
 - ResourceRef GetModelAttr() const
 - void ReleaseShape()
 
-Properties:<br>
+Properties:
+
 - PhysicsWorld* physicsWorld (readonly)
 - ShapeType shapeType
 - Vector3& size
@@ -3360,12 +3669,13 @@ Properties:<br>
 - float margin
 - Model* model
 - unsigned lodLevel
-- tolua_readonlyBoundingBox worldBoundingBox
+- tolua_readonlyBoundingBox worldBoundingBox (readonly)
 - ResourceRef modelAttr
 
-Constraint : Component
+### Constraint : Component
 
-Methods:<br>
+Methods:
+
 - void SetConstraintType(ConstraintType type)
 - void SetOtherBody(RigidBody* body)
 - void SetPosition(const Vector3& position)
@@ -3397,7 +3707,8 @@ Methods:<br>
 - void ReleaseConstraint()
 - void ApplyFrames()
 
-Properties:<br>
+Properties:
+
 - PhysicsWorld* physicsWorld (readonly)
 - ConstraintType constraintType
 - RigidBody* ownBody (readonly)
@@ -3413,26 +3724,35 @@ Properties:<br>
 - float CFM
 - bool disableCollision
 
-PhysicsRaycastResult
+### PhysicsRaycastResult
 
-Methods:<br>
+Methods:
+
 - PhysicsRaycastResult()
+
+Properties:
+
 - Vector3 position
 - Vector3 normal
 - float distance
 - RigidBody* body
 
-DelayedWorldTransform
+### DelayedWorldTransform
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - RigidBody* rigidBody
 - RigidBody* parentRigidBody
 - Vector3 worldPosition
 - Quaternion worldRotation
 
-PhysicsWorld : Component
+### PhysicsWorld : Component
 
-Methods:<br>
+Methods:
+
 - void Update(float timeStep)
 - void UpdateCollisions()
 - void SetFps(int fps)
@@ -3466,7 +3786,8 @@ Methods:<br>
 - void SetApplyingTransforms(bool enable)
 - bool IsApplyingTransforms() const
 
-Properties:<br>
+Properties:
+
 - Vector3 gravity
 - int numIterations
 - bool interpolation
@@ -3476,9 +3797,10 @@ Properties:<br>
 - float maxNetworkAngularVelocity
 - bool applyingTransforms
 
-RigidBody : Component
+### RigidBody : Component
 
-Methods:<br>
+Methods:
+
 - void SetMass(float mass)
 - void SetPosition(Vector3 position)
 - void SetRotation(Quaternion rotation)
@@ -3549,7 +3871,8 @@ Methods:<br>
 - void RemoveConstraint(Constraint* constraint)
 - void ReleaseBody()
 
-Properties:<br>
+Properties:
+
 - PhysicsWorld* physicsWorld (readonly)
 - float mass
 - Vector3 position
@@ -3578,9 +3901,10 @@ Properties:<br>
 - unsigned collisionMask
 - CollisionEventMode collisionEventMode
 
-Image : Resource
+### Image : Resource
 
-Methods:<br>
+Methods:
+
 - void FlipVertical()
 - bool SaveBMP(const String fileName)
 - bool SavePNG(const String fileName)
@@ -3594,7 +3918,8 @@ Methods:<br>
 - unsigned GetNumCompressedLevels() const
 - CompressedLevel GetCompressedLevel(unsigned index) const
 
-Properties:<br>
+Properties:
+
 - int width (readonly)
 - int height (readonly)
 - unsigned components (readonly)
@@ -3602,21 +3927,24 @@ Properties:<br>
 - CompressedFormat compressedFormat (readonly)
 - unsigned numCompressedLevels (readonly)
 
-Resource
+### Resource
 
-Methods:<br>
+Methods:
+
 - const String& GetName() const
 - StringHash GetNameHash() const
 - unsigned GetMemoryUse() const
 
-Properties:<br>
+Properties:
+
 - String& name (readonly)
 - StringHash nameHash (readonly)
 - unsigned memoryUse (readonly)
 
-ResourceCache
+### ResourceCache
 
-Methods:<br>
+Methods:
+
 - void ReleaseAllResources(bool force = false)
 - bool ReloadResource(Resource* resource)
 - void SetMemoryBudget(ShortStringHash type, unsigned budget)
@@ -3632,13 +3960,15 @@ Methods:<br>
 - String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
 
-Properties:<br>
+Properties:
+
 - unsigned totalMemoryUse (readonly)
 - bool autoReloadResources (readonly)
 
-XMLElement
+### XMLElement
 
-Methods:<br>
+Methods:
+
 - bool IsNull() const
 - bool NotNull() const
 - operator bool () const
@@ -3669,23 +3999,26 @@ Methods:<br>
 - Vector4 GetVector4(const String name) const
 - Vector4 GetVector(const String name) const
 - XMLFile* GetFile() const
-- static const XMLElement EMPTY
 
-Properties:<br>
+Properties:
+
+- static const XMLElement EMPTY
 - bool null (readonly)
 - String name (readonly)
 - XMLElement parent (readonly)
 - unsigned numAttributes (readonly)
 - XMLFile* file (readonly)
 
-XMLFile : Resource
+### XMLFile : Resource
 
-Methods:<br>
+Methods:
+
 - XMLElement GetRoot(const String name = String::EMPTY)
 
-Component : Serializable
+### Component : Serializable
 
-Methods:<br>
+Methods:
+
 - void SetEnabled(bool enable)
 - void Remove()
 - unsigned GetID() const
@@ -3693,13 +4026,13 @@ Methods:<br>
 - Scene* GetScene() const
 - bool IsEnabled() const
 - bool IsEnabledEffective() const
--   
 - Component* GetComponent(ShortStringHash type) const
 - Component* GetComponent(const String type) const
 
-Node : Serializable
+### Node : Serializable
 
-Methods:<br>
+Methods:
+
 - Node(Context* context)
 - virtual ~Node()
 - bool SaveXML(File* dest) const
@@ -3763,10 +4096,10 @@ Methods:<br>
 - void AddListener(Component* component)
 - void RemoveListener(Component* component)
 - Component* CreateComponent(const String type, CreateMode mode = REPLICATED, unsigned id = 0)
-- object CreateScriptObject(const String scriptObjectType)
-- object CreateScriptObject(const String fileName, const String scriptObjectType)
-- object GetScriptObject()
-- object GetScriptObject(const String scriptObjectType)
+- int CreateScriptObject(const String scriptObjectType)
+- int CreateScriptObject(const String fileName, const String scriptObjectType)
+- int GetScriptObject() const
+- int GetScriptObject(const String scriptObjectType) const
 - unsigned GetID() const
 - const String& GetName() const
 - StringHash GetNameHash() const
@@ -3818,7 +4151,8 @@ Methods:<br>
 - Node* CreateChild(unsigned id, CreateMode mode)
 - void AddComponent(Component* component, unsigned id, CreateMode mode)
 
-Properties:<br>
+Properties:
+
 - unsigned ID
 - String& name
 - StringHash nameHash (readonly)
@@ -3840,9 +4174,10 @@ Properties:<br>
 - unsigned numComponents (readonly)
 - unsigned numNetworkComponents (readonly)
 
-Scene : Node
+### Scene : Node
 
-Methods:<br>
+Methods:
+
 - Scene(Context* context)
 - virtual ~Scene()
 - bool LoadXML(File* source)
@@ -3858,7 +4193,7 @@ Methods:<br>
 - void SetElapsedTime(float time)
 - void SetSmoothingConstant(float constant)
 - void SetSnapThreshold(float threshold)
-- Node* GetNode(unsigned id) const;
+- Node* GetNode(unsigned id) const
 - bool IsUpdateEnabled() const
 - bool IsAsyncLoading() const
 - float GetAsyncProgress() const
@@ -3888,7 +4223,8 @@ Methods:<br>
 - void MarkNetworkUpdate(Component* component)
 - void MarkReplicationDirty(Node* node)
 
-Properties:<br>
+Properties:
+
 - bool updateEnabled
 - bool asyncLoading (readonly)
 - float asyncProgress (readonly)
@@ -3901,18 +4237,21 @@ Properties:<br>
 - bool threadedUpdate (readonly)
 - String varNamesAttr
 
-Serializable : Object
+### Serializable : Object
 
-Methods:<br>
+Methods:
+
 - void SetTemporary(bool enable)
 - bool IsTemporary() const
 
-Properties:<br>
+Properties:
+
 - bool temporary
 
-BorderImage : UIElement
+### BorderImage : UIElement
 
-Methods:<br>
+Methods:
+
 - BorderImage(Context* context)
 - virtual ~BorderImage()
 - void SetTexture(Texture* texture)
@@ -3932,7 +4271,8 @@ Methods:<br>
 - void SetTextureAttr(ResourceRef value)
 - ResourceRef GetTextureAttr() const
 
-Properties:<br>
+Properties:
+
 - Texture* texture
 - IntRect& imageRect
 - IntRect& border
@@ -3941,9 +4281,10 @@ Properties:<br>
 - bool tiled
 - ResourceRef textureAttr
 
-Button : BorderImage
+### Button : BorderImage
 
-Methods:<br>
+Methods:
+
 - Button(Context* context)
 - virtual ~Button()
 - void SetPressedOffset(const IntVector2& offset)
@@ -3959,16 +4300,18 @@ Methods:<br>
 - float GetRepeatRate() const
 - bool IsPressed() const
 
-Properties:<br>
+Properties:
+
 - IntVector2& pressedOffset
 - IntVector2& pressedChildOffset
 - float repeatDelay
 - float repeatRate
 - bool pressed (readonly)
 
-CheckBox : BorderImage
+### CheckBox : BorderImage
 
-Methods:<br>
+Methods:
+
 - CheckBox(Context* context)
 - virtual ~CheckBox()
 - void SetChecked(bool enable)
@@ -3977,13 +4320,15 @@ Methods:<br>
 - bool IsChecked() const
 - const IntVector2& GetCheckedOffset() const
 
-Properties:<br>
+Properties:
+
 - bool checked
 - IntVector2& checkedOffset
 
-Cursor : BorderImage
+### Cursor : BorderImage
 
-Methods:<br>
+Methods:
+
 - Cursor(Context* context)
 - virtual ~Cursor()
 - void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot)
@@ -3992,13 +4337,15 @@ Methods:<br>
 - CursorShape GetShape() const
 - bool GetUseSystemShapes() const
 
-Properties:<br>
+Properties:
+
 - CursorShape shape
 - bool useSystemShapes
 
-DropDownList : Menu
+### DropDownList : Menu
 
-Methods:<br>
+Methods:
+
 - DropDownList(Context* context)
 - ~DropDownList()
 - void AddItem(UIElement* item)
@@ -4009,7 +4356,6 @@ Methods:<br>
 - void SetSelection(unsigned index)
 - void SetPlaceholderText(const String text)
 - void SetResizePopup(bool enable)
--    
 - unsigned GetNumItems() const
 - UIElement* GetItem(unsigned index) const
 - unsigned GetSelection() const
@@ -4020,7 +4366,8 @@ Methods:<br>
 - bool GetResizePopup() const
 - void SetSelectionAttr(unsigned index)
 
-Properties:<br>
+Properties:
+
 - unsigned numItems (readonly)
 - unsigned selection
 - UIElement* selectedItem (readonly)
@@ -4029,15 +4376,20 @@ Properties:<br>
 - String& placeholderText
 - bool resizePopup
 
-FileSelectorEntry
+### FileSelectorEntry
 
-Methods:<br>
+Methods:
+
+
+Properties:
+
 - String name
 - bool directory
 
-FileSelector : Object
+### FileSelector : Object
 
-Methods:<br>
+Methods:
+
 - FileSelector(Context* context)
 - virtual ~FileSelector()
 - void SetDefaultStyle(XMLFile* style)
@@ -4064,7 +4416,8 @@ Methods:<br>
 - unsigned GetFilterIndex() const
 - bool GetDirectoryMode() const
 
-Properties:<br>
+Properties:
+
 - XMLFile* defaultStyle
 - Window* window (readonly)
 - Text* titleText (readonly)
@@ -4082,13 +4435,15 @@ Properties:<br>
 - unsigned filterIndex (readonly)
 - bool directoryMode
 
-Font : Resource
+### Font : Resource
 
-Methods:<br>
+Methods:
 
-LineEdit : BorderImage
 
-Methods:<br>
+### LineEdit : BorderImage
+
+Methods:
+
 - LineEdit(Context* context)
 - virtual ~LineEdit()
 - void SetText(const String text)
@@ -4110,7 +4465,8 @@ Methods:<br>
 - Text* GetTextElement() const
 - BorderImage* GetCursor() const
 
-Properties:<br>
+Properties:
+
 - String& text
 - unsigned cursorPosition
 - float cursorBlinkRate
@@ -4122,9 +4478,10 @@ Properties:<br>
 - Text* textElement (readonly)
 - BorderImage* cursor (readonly)
 
-ListView : ScrollView
+### ListView : ScrollView
 
-Methods:<br>
+Methods:
+
 - ListView(Context* context)
 - virtual ~ListView()
 - void AddItem(UIElement* item)
@@ -4158,7 +4515,8 @@ Methods:<br>
 - bool GetHierarchyMode() const
 - int GetBaseIndent() const
 
-Properties:<br>
+Properties:
+
 - unsigned numItems (readonly)
 - unsigned selection
 - UIElement* selectedItem (readonly)
@@ -4168,9 +4526,10 @@ Properties:<br>
 - bool hierarchyMode
 - int baseIndent
 
-Menu : Button
+### Menu : Button
 
-Methods:<br>
+Methods:
+
 - Menu(Context* context)
 - virtual ~Menu()
 - void SetPopup(UIElement* element)
@@ -4184,16 +4543,18 @@ Methods:<br>
 - int GetAcceleratorKey() const
 - int GetAcceleratorQualifiers() const
 
-Properties:<br>
+Properties:
+
 - UIElement* popup
 - IntVector2& popupOffset
 - bool showPopup
 - int acceleratorKey (readonly)
 - int acceleratorQualifiers (readonly)
 
-ScrollBar : UIElement
+### ScrollBar : UIElement
 
-Methods:<br>
+Methods:
+
 - ScrollBar(Context* context)
 - virtual ~ScrollBar()
 - void SetOrientation(Orientation orientation)
@@ -4214,7 +4575,8 @@ Methods:<br>
 - Button* GetForwardButton() const
 - Slider* GetSlider() const
 
-Properties:<br>
+Properties:
+
 - Orientation orientation
 - float range
 - float value
@@ -4225,9 +4587,10 @@ Properties:<br>
 - Button* forwardButton (readonly)
 - Slider* slider (readonly)
 
-ScrollView : UIElement
+### ScrollView : UIElement
 
-Methods:<br>
+Methods:
+
 - ScrollView(Context* context)
 - virtual ~ScrollView()
 - void SetContentElement(UIElement* element)
@@ -4247,7 +4610,8 @@ Methods:<br>
 - float GetPageStep() const
 - void SetViewPositionAttr(const IntVector2& value)
 
-Properties:<br>
+Properties:
+
 - IntVector2& viewPosition
 - UIElement* contentElement
 - ScrollBar* horizontalScrollBar (readonly)
@@ -4257,9 +4621,10 @@ Properties:<br>
 - float scrollStep
 - float pageStep
 
-Slider : BorderImage
+### Slider : BorderImage
 
-Methods:<br>
+Methods:
+
 - Slider(Context* context)
 - virtual ~Slider()
 - void SetOrientation(Orientation orientation)
@@ -4273,16 +4638,18 @@ Methods:<br>
 - BorderImage* GetKnob() const
 - float GetRepeatRate() const
 
-Properties:<br>
+Properties:
+
 - Orientation orientation
 - float range
 - float value
 - BorderImage* knob (readonly)
 - float repeatRate
 
-Sprite : UIElement
+### Sprite : UIElement
 
-Methods:<br>
+Methods:
+
 - Sprite(Context* context)
 - virtual ~Sprite()
 - void SetPosition(const Vector2& position)
@@ -4308,7 +4675,8 @@ Methods:<br>
 - ResourceRef GetTextureAttr() const
 - const Matrix3x4& GetTransform() const
 
-Properties:<br>
+Properties:
+
 - Vector2& position
 - IntVector2& hotSpot
 - Vector2& scale
@@ -4319,9 +4687,10 @@ Properties:<br>
 - ResourceRef textureAttr
 - Matrix3x4& transform (readonly)
 
-Text : UIElement
+### Text : UIElement
 
-Methods:<br>
+Methods:
+
 - Text(Context* context)
 - virtual ~Text()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
@@ -4353,7 +4722,8 @@ Methods:<br>
 - void SetFontAttr(ResourceRef value)
 - ResourceRef GetFontAttr() const
 
-Properties:<br>
+Properties:
+
 - Font* font
 - int fontSize (readonly)
 - String& text
@@ -4370,9 +4740,10 @@ Properties:<br>
 - unsigned numRows (readonly)
 - ResourceRef fontAttr
 
-Text3D : Drawable
+### Text3D : Drawable
 
-Methods:<br>
+Methods:
+
 - Text3D(Context* context)
 - ~Text3D()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
@@ -4418,7 +4789,8 @@ Methods:<br>
 - ResourceRef GetMaterialAttr() const
 - const Color& GetColorAttr() const
 
-Properties:<br>
+Properties:
+
 - Font* font
 - Material* material
 - int fontSize (readonly)
@@ -4440,9 +4812,10 @@ Properties:<br>
 - ResourceRef materialAttr
 - Color& colorAttr (readonly)
 
-UI : Object
+### UI : Object
 
-Methods:<br>
+Methods:
+
 - void SetCursor(Cursor* cursor)
 - void SetFocusElement(UIElement* element)
 - bool SetModalElement(UIElement* modalElement, bool enable)
@@ -4468,7 +4841,8 @@ Methods:<br>
 - bool IsNonFocusedMouseWheel() const
 - bool HasModalElement() const
 
-Properties:<br>
+Properties:
+
 - UIElement* root (readonly)
 - UIElement* rootModalElement (readonly)
 - Cursor* cursor
@@ -4480,9 +4854,10 @@ Properties:<br>
 - bool nonFocusedMouseWheel (readonly)
 - bool modalElement (readonly)
 
-UIElement : Serializable
+### UIElement : Serializable
 
-Methods:<br>
+Methods:
+
 - UIElement(Context* context)
 - virtual ~UIElement()
 - virtual const IntVector2& GetScreenPosition() const
@@ -4620,7 +4995,8 @@ Methods:<br>
 - bool IsElementEventSender() const
 - UIElement* GetElementEventSender() const
 
-Properties:<br>
+Properties:
+
 - IntVector2& screenPosition (readonly)
 - String& name
 - IntVector2& position
@@ -4675,9 +5051,10 @@ Properties:<br>
 - TraversalMode traversalMode
 - bool elementEventSender
 
-View3D : Window
+### View3D : Window
 
-Methods:<br>
+Methods:
+
 - View3D(Context* context)
 - ~View3D()
 - void SetView(Scene* scene, Camera* camera)
@@ -4691,13 +5068,15 @@ Methods:<br>
 - Texture2D* GetRenderTexture() const
 - Viewport* GetViewport() const
 
-Properties:<br>
+Properties:
+
 - unsigned format
 - bool autoUpdate
 
-Window : BorderImage
+### Window : BorderImage
 
-Methods:<br>
+Methods:
+
 - Window(Context* context)
 - virtual ~Window()
 - void SetMovable(bool enable)
@@ -4719,7 +5098,8 @@ Methods:<br>
 - const Color& GetModalFrameColor() const
 - const IntVector2& GetModalFrameSize() const
 
-Properties:<br>
+Properties:
+
 - bool movable
 - bool resizable
 - bool fixedWidthResizing
@@ -4729,7 +5109,6 @@ Properties:<br>
 - Color& modalShadeColor
 - Color& modalFrameColor
 - IntVector2& modalFrameSize
-
 */
 
 }
