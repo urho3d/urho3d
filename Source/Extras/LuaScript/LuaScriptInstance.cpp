@@ -95,9 +95,9 @@ void LuaScriptInstance::ApplyAttributes()
 void LuaScriptInstance::OnSetEnabled()
 {
     if (enabled_)
-        SubscribeToEvents();    
+        SubscribeToScriptMethodEvents();    
     else
-        UnsubscribeFromEvents();
+        UnsubscribeFromScriptMethodEvents();
 }
 
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
@@ -314,10 +314,10 @@ void LuaScriptInstance::FindScriptObjectMethodRefs()
         scriptObjectMethodRefs_[i] = luaScript_->GetScriptFunctionRef(scriptObjectType_ + scriptObjectMethodNames[i], true);
 
     if (enabled_)
-        SubscribeToEvents();
+        SubscribeToScriptMethodEvents();
 }
 
-void LuaScriptInstance::SubscribeToEvents()
+void LuaScriptInstance::SubscribeToScriptMethodEvents()
 {
     if (scriptObjectMethodRefs_[LSOM_UPDATE] != LUA_REFNIL)
         SubscribeToEvent(E_UPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
@@ -332,7 +332,7 @@ void LuaScriptInstance::SubscribeToEvents()
         SubscribeToEvent(E_PHYSICSPOSTSTEP, HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
 }
 
-void LuaScriptInstance::UnsubscribeFromEvents()
+void LuaScriptInstance::UnsubscribeFromScriptMethodEvents()
 {
     if (scriptObjectMethodRefs_[LSOM_UPDATE] != LUA_REFNIL)
         UnsubscribeFromEvent(E_UPDATE);
@@ -406,7 +406,7 @@ void LuaScriptInstance::ReleaseObject()
         return;
 
     if (enabled_)
-        UnsubscribeFromEvents();
+        UnsubscribeFromScriptMethodEvents();
 
     // Unref script object.
     luaL_unref(luaState_, LUA_REGISTRYINDEX, scriptObjectRef_);

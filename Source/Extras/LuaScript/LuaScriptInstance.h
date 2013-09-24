@@ -108,10 +108,10 @@ public:
 private:
     /// Find script object method refs.
     void FindScriptObjectMethodRefs();
-    /// Subscribe to events.
-    void SubscribeToEvents();
-    /// Unsubscribe from events.
-    void UnsubscribeFromEvents();
+    /// Subscribe to script method events.
+    void SubscribeToScriptMethodEvents();
+    /// Unsubscribe from script method events.
+    void UnsubscribeFromScriptMethodEvents();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the logic post update event.
