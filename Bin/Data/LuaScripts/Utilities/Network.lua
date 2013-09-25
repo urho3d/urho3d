@@ -1,5 +1,5 @@
 runServer = false
-runClient = true
+runClient = false
 serverAddress = ''
 serverPort = 1234
 userName = ''
