@@ -33,7 +33,7 @@ rm -rf Build/CMakeCache.txt Build/CMakeFiles
 rm -rf {../build,.,build}/CMakeCache.txt {../build,.,build}/CMakeFiles
 
 # Create project with the Xcode generator
-cmake -E chdir Build cmake -G "Xcode" $SOURCE $@
+cmake -E chdir Build cmake -G "Xcode" $@ $SOURCE
 
 # Below temporary fix may no longer be required by newer version of CMake
 sed -i.bak 's/lastKnownFileType = sourcecode; name = "as_callfunc_arm_xcode.S"/lastKnownFileType = sourcecode.asm; name = "as_callfunc_arm_xcode.S"/g' Build/*.xcodeproj/project.pbxproj

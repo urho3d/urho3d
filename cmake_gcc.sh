@@ -120,9 +120,9 @@ GENERATOR="Unix Makefiles"
 
 # Create project with the respective Cmake generators
 OPT=
-msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $SOURCE $@ && post_cmake Build
-[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/raspberrypi.toolchain.cmake $SOURCE $@ && post_cmake raspi-Build
-[ $ANDROID_NDK ] && msg "Android build" && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $SOURCE $@ && post_cmake android-Build
+msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $@ $SOURCE && post_cmake Build
+[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/raspberrypi.toolchain.cmake $@ $SOURCE && post_cmake raspi-Build
+[ $ANDROID_NDK ] && msg "Android build" && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $@ $SOURCE && post_cmake android-Build
 unset IFS
 
 # Assume GCC user uses OpenGL, comment out below sed if this is not true

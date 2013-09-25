@@ -33,11 +33,11 @@ set "version=9 2008"
 :loop
 if not "%1" == "" (
     if "%1" == "-DENABLE_64BIT" if "%~2" == "1" set "arch= Win64"
-    if "%1" == "-DVERSION" set "version=%~2"
+    if "%1" == "VERSION" set "version=%~2"
     shift
     shift
     goto loop
 )
 cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
 echo on
-cmake -E chdir Build cmake -G "Visual Studio %version%%arch%" ..\Source %*
+cmake -E chdir Build cmake -G "Visual Studio %version%%arch%" %* ..\Source

@@ -391,6 +391,7 @@ V1.3    - Lua scripting support.
         - 64-bit build support.
         - HTTP client using the Civetweb library.
         - Enhanced CMake build scripts. Android build also uses CMake.
+          Use out-of-source build on platform that supports it.
         - Rendering performance optimizations, optional StaticModelGroup
           component for culling and lighting several objects as one unit.
         - A set of sample applications implemented in C++, AngelScript and Lua.

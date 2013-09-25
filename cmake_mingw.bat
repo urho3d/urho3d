@@ -30,4 +30,4 @@ if exist Build\CMakeFiles. rd /S /Q Build\CMakeFiles
 if exist Source\CMakeFiles. rd /S /Q Source\CMakeFiles
 cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
 echo on
-cmake -E chdir Build cmake -G "MinGW Makefiles" ..\Source %*
+cmake -E chdir Build cmake -G "MinGW Makefiles" %* ..\Source
