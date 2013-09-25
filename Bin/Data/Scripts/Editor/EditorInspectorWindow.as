@@ -31,6 +31,7 @@ void InitXMLResources()
         xmlResources.Push(cache.GetResource("XMLFile", "UI/EditorInspector_" + resources[i] + ".xml"));
 }
 
+/// Delete all child containers in the inspector list.
 void DeleteAllContainers()
 {
     parentContainer.RemoveAllChildren();
@@ -39,11 +40,13 @@ void DeleteAllContainers()
     elementContainerIndex = M_MAX_UNSIGNED;
 }
 
+/// Get container at the specified index in the inspector list, the container must be created before.
 UIElement@ GetContainer(uint index)
 {
     return parentContainer.children[index];
 }
 
+/// Get node container in the inspector list, create the container if it is not yet available.
 UIElement@ GetNodeContainer()
 {
     if (nodeContainerIndex != M_MAX_UNSIGNED)
@@ -60,15 +63,23 @@ UIElement@ GetNodeContainer()
     return container;
 }
 
+/// Get component container at the specified index, create the container if it is not yet available at the specified index.
 UIElement@ GetComponentContainer(uint index)
 {
-    for (uint i = parentContainer.numChildren - componentContainerStartIndex; i <= index; ++i)
+    if (componentContainerStartIndex + index < parentContainer.numChildren)
+        return GetContainer(componentContainerStartIndex + index);
+
+    UIElement@ container;
+    for (uint i = parentContainer.numChildren; i <= componentContainerStartIndex + index; ++i)
+    {
         parentContainer.LoadChildXML(xmlResources[ATTRIBUTE_RES], uiStyle);
-    UIElement@ container = parentContainer.children[componentContainerStartIndex + index];
-    SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
+        container = GetContainer(i);
+        SubscribeToEvent(container.GetChild("ResetToDefault", true), "Released", "HandleResetToDefault");
+    }
     return container;
 }
 
+/// Get UI-element container, create the container if it is not yet available.
 UIElement@ GetUIElementContainer()
 {
     if (elementContainerIndex != M_MAX_UNSIGNED)
@@ -124,6 +135,7 @@ bool ShowAttributeInspectorWindow()
     return true;
 }
 
+/// Handle main window layout updated event by positioning elements that needs manually-positioning (elements that are children of UI-element container with "Free" layout-mode).
 void HandleWindowLayoutUpdated()
 {
     // When window resize and so the list's width is changed, adjust the 'Is enabled' container width and icon panel width so that their children stay at the right most position
@@ -169,6 +181,8 @@ Array<Serializable@> ToSerializableArray(Array<Node@> nodes)
     return serializables;
 }
 
+/// Update the whole attribute inspector window, when fullUpdate flag is set to true then first delete all the containers and repopulate them again from scratch.
+/// The fullUpdate flag is usually set to true when the structure of the attributes are different than the existing attributes in the list.
 void UpdateAttributeInspector(bool fullUpdate = true)
 {
     attributesDirty = false;
@@ -296,8 +310,7 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         Text@ titleText = GetComponentContainer(0).GetChild("TitleText");
         titleText.text = "Select editable objects";
         UIElement@ panel = titleText.GetChild("IconsPanel");
-        if (panel !is null)
-            panel.visible = false;
+        panel.visible = false;
     }
 
     // Adjust size and position of manual-layout UI-elements, e.g. icons panel
@@ -305,12 +318,16 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         HandleWindowLayoutUpdated();
 }
 
+/// Update the attribute list of the node container.
 void UpdateNodeAttributes()
 {
     bool fullUpdate = false;
     UpdateAttributes(ToSerializableArray(editNodes), GetNodeContainer().GetChild("AttributeList"), fullUpdate);
 }
 
+/// Update the icons enabled color based on the internal state of the objects.
+/// For node and component, based on "enabled" property.
+/// For ui-element, based on "visible" property.
 void UpdateAttributeInspectorIcons()
 {
     if (!editNodes.empty)
@@ -357,13 +374,38 @@ void UpdateAttributeInspectorIcons()
             SetIconEnabledColor(componentTitle, enabledEffective, !hasSameEnabledState);
         }
     }
+    
+    if (!editUIElements.empty)
+    {
+        Text@ elementTitle = GetUIElementContainer().GetChild("TitleText");
+        if (editUIElement !is null)
+            SetIconEnabledColor(elementTitle, editUIElement.visible);
+        else if (editUIElements.length > 0)
+        {
+            bool hasSameVisibleState = true;
+            bool visible = cast<UIElement>(editUIElements[0]).visible;
+
+            for (uint i = 1; i < editUIElements.length; ++i)
+            {
+                if (cast<UIElement>(editUIElements[i]).visible != visible)
+                {
+                    hasSameVisibleState = false;
+                    break;
+                }
+            }
+
+            SetIconEnabledColor(elementTitle, visible, !hasSameVisibleState);
+        }
+    }
 }
 
+/// Return true if the edit attribute action should continue.
 bool PreEditAttribute(Array<Serializable@>@ serializables, uint index)
 {
     return true;
 }
 
+/// Call after the attribute values in the target serializables have been edited. 
 void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Array<Variant>& oldValues)
 {
     // Create undo actions for the edits
@@ -392,6 +434,7 @@ void PostEditAttribute(Array<Serializable@>@ serializables, uint index, const Ar
         SetSceneModified();
 }
 
+/// Call after the attribute values in the target serializables have been edited. 
 void PostEditAttribute(Serializable@ serializable, uint index)
 {
     // If a StaticModel/AnimatedModel/Skybox model was changed, apply a possibly different material list
@@ -403,6 +446,7 @@ void PostEditAttribute(Serializable@ serializable, uint index)
     }
 }
 
+/// Store the IDs of the actual serializable objects into user-defined variable of the 'attribute editor' (e.g. line-edit, drop-down-list, etc).
 void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializables)
 {
     if (serializables is null || serializables.length == 0)
@@ -435,6 +479,7 @@ void SetAttributeEditorID(UIElement@ attrEdit, Array<Serializable@>@ serializabl
     }
 }
 
+/// Return the actual serializable objects based on the IDs stored in the user-defined variable of the 'attribute editor'.
 Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
 {
     Array<Serializable@> ret;
@@ -481,6 +526,7 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
     return ret;
 }
 
+/// Handle reset to default event, sent when reset icon in the icon-panel is clicked.
 void HandleResetToDefault(StringHash eventType, VariantMap& eventData)
 {
     ui.cursor.shape = CS_BUSY;
@@ -519,6 +565,7 @@ void HandleResetToDefault(StringHash eventType, VariantMap& eventData)
     attributesFullDirty = true;
 }
 
+/// Handle create new user-defined variable event for node target. 
 void CreateNodeVariable(StringHash eventType, VariantMap& eventData)
 {
     if (editNodes.empty)
@@ -546,6 +593,7 @@ void CreateNodeVariable(StringHash eventType, VariantMap& eventData)
         attributesDirty = true;
 }
 
+/// Handle delete existing user-defined variable event for node target.
 void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
 {
     if (editNodes.empty)
@@ -567,6 +615,7 @@ void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
         attributesDirty = true;
 }
 
+/// Handle create new user-defined variable event for ui-element target.
 void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
 {
     if (editUIElements.empty)
@@ -595,6 +644,7 @@ void CreateUIElementVariable(StringHash eventType, VariantMap& eventData)
         attributesDirty = true;
 }
 
+/// Handle delete existing user-defined variable event for ui-element target.
 void DeleteUIElementVariable(StringHash eventType, VariantMap& eventData)
 {
     if (editUIElements.empty)
@@ -645,6 +695,7 @@ Variant ExtractVariantType(VariantMap& eventData)
     return Variant();   // This should not happen
 }
 
+/// Get back the human-readable variable name from the ShortStringHash.
 String GetVariableName(ShortStringHash hash)
 {
     // First try to get it from scene
@@ -657,6 +708,7 @@ String GetVariableName(ShortStringHash hash)
 
 bool inSetStyleListSelection = false;
 
+/// Select/highlight the matching style in the style drop-down-list based on specified style. 
 void SetStyleListSelection(DropDownList@ styleList, const String&in style)
 {
     // Prevent infinite loop upon initial style selection
@@ -681,6 +733,7 @@ void SetStyleListSelection(DropDownList@ styleList, const String&in style)
     inSetStyleListSelection = false;
 }
 
+/// Handle the style change of the target ui-elements event when a new style is picked from the style drop-down-list.
 void HandleStyleItemSelected(StringHash eventType, VariantMap& eventData)
 {
     if (inSetStyleListSelection || editUIElements.empty)

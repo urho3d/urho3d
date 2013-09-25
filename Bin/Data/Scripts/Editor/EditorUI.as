@@ -213,7 +213,8 @@ class QuickMenuItem
         this.callback = callback;
     }
 }
-/// Creates popup search menu
+
+/// Create popup search menu.
 void CreateQuickMenu()
 {
     if (quickMenu !is null)
