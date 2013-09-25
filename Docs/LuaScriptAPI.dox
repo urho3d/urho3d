@@ -861,8 +861,46 @@ Properties:
 Methods:
 
 - Variant()
+- Variant(int value)
+- Variant(unsigned value)
+- Variant(const StringHash& value)
+- Variant(const ShortStringHash& value)
+- Variant(bool value)
+- Variant(float value)
+- Variant(const Vector2& value)
+- Variant(const Vector3& value)
+- Variant(const Vector4& value)
+- Variant(const Quaternion& value)
+- Variant(const Color& value)
+- Variant(const String value)
+- Variant(const char* value)
+- Variant(const ResourceRef& value)
+- Variant(const ResourceRefList& value)
+- Variant(const IntRect& value)
+- Variant(const IntVector2& value)
+- Variant(const String type, const String value)
+- Variant(VariantType type, const String value)
+- Variant(VariantType type, const char* value)
+- Variant(const Variant& value)
 - ~Variant()
 - void Clear()
+- bool operator == (const Variant& rhs) const
+- bool operator == (int rhs) const
+- bool operator == (unsigned rhs) const
+- bool operator == (bool rhs) const
+- bool operator == (float rhs) const
+- bool operator == (const Vector2& rhs)
+- bool operator == (const Vector3& rhs) const
+- bool operator == (const Vector4& rhs) const
+- bool operator == (const Quaternion& rhs) const
+- bool operator == (const Color& rhs) const
+- bool operator == (const String& rhs) const
+- bool operator == (const ResourceRef& rhs) const
+- bool operator == (const ResourceRefList& rhs) const
+- bool operator == (const IntRect& rhs) const
+- bool operator == (const IntVector2& rhs) const
+- bool operator == (const StringHash& rhs) const
+- bool operator == (const ShortStringHash& rhs) const
 - void SetInt(int value)
 - void SetUint(unsigned value)
 - void SetStringHash(const StringHash& value)
