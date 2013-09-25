@@ -295,8 +295,7 @@ bool TextureCube::Load(Deserializer& source)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
     // In headless mode, do not actually load the texture, just return success
-    Graphics* graphics = GetSubsystem<Graphics>();
-    if (!graphics)
+    if (!graphics_)
         return true;
     
     // If device is lost, retry later
