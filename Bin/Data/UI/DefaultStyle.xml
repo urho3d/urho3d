@@ -155,10 +155,10 @@
     </element>
     <element type="Slider" style="BorderImage">
         <attribute name="Size" value="12 12" />
-        <attribute name="Image Rect" value="112 0 128 16" />
+        <attribute name="Image Rect" value="48 0 64 16" />
         <attribute name="Border" value="4 4 4 4" />
         <element type="BorderImage" internal="true">
-            <attribute name="Image Rect" value="48 0 64 16" />
+            <attribute name="Image Rect" value="16 0 32 16" />
             <attribute name="Border" value="4 4 4 4" />
             <attribute name="Hover Image Offset" value="0 16" />
         </element>
