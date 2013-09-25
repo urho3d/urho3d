@@ -244,6 +244,8 @@ private:
     bool suppressNextMouseMove_;
     /// Initialized flag.
     bool initialized_;
+    /// Map SDL joystick ID to internal index.
+    HashMap<int, unsigned> joystickIDMap_;
 };
 
 }

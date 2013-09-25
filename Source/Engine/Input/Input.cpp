@@ -233,6 +233,10 @@ bool Input::OpenJoystick(unsigned index)
     SDL_Joystick* joystick = SDL_JoystickOpen(index);
     if (joystick)
     {
+        // Map SDL joystick index to internal index (which starts at 0)
+        int sdl_joy_instance_id = SDL_JoystickInstanceID(joystick);
+        joystickIDMap_[sdl_joy_instance_id] = index;
+        
         JoystickState& state = joysticks_[index];
         state.joystick_ = joystick;
         state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
@@ -734,15 +738,16 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             using namespace JoystickButtonDown;
 
+            unsigned button = evt.jbutton.button;
+            unsigned joystickIndex = joystickIDMap_[evt.jbutton.which];
+            
             VariantMap eventData;
-            eventData[P_JOYSTICK] = evt.jbutton.which;
-            eventData[P_BUTTON] = evt.jbutton.button;
-
-            if (evt.jbutton.which < joysticks_.Size() && evt.jbutton.button <
-                joysticks_[evt.jbutton.which].buttons_.Size())
-            {
-                joysticks_[evt.jbutton.which].buttons_[evt.jbutton.button] = true;
-                joysticks_[evt.jbutton.which].buttonPress_[evt.jbutton.button] = true;
+            eventData[P_JOYSTICK] = joystickIndex;
+            eventData[P_BUTTON] = button;
+            
+            if (joystickIndex < joysticks_.Size() && button < joysticks_[joystickIndex].buttons_.Size()) {
+                joysticks_[joystickIndex].buttons_[button] = true;
+                joysticks_[joystickIndex].buttonPress_[button] = true;
                 SendEvent(E_JOYSTICKBUTTONDOWN, eventData);
             }
         }
@@ -752,14 +757,15 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             using namespace JoystickButtonUp;
 
+            unsigned button = evt.jbutton.button;
+            unsigned joystickIndex = joystickIDMap_[evt.jbutton.which];
+            
             VariantMap eventData;
-            eventData[P_JOYSTICK] = evt.jbutton.which;
-            eventData[P_BUTTON] = evt.jbutton.button;
+            eventData[P_JOYSTICK] = joystickIndex;
+            eventData[P_BUTTON] = button;
 
-            if (evt.jbutton.which < joysticks_.Size() && evt.jbutton.button <
-                joysticks_[evt.jbutton.which].buttons_.Size())
-            {
-                joysticks_[evt.jbutton.which].buttons_[evt.jbutton.button] = false;
+            if (joystickIndex < joysticks_.Size() && button < joysticks_[joystickIndex].buttons_.Size()) {
+                joysticks_[joystickIndex].buttons_[button] = false;
                 SendEvent(E_JOYSTICKBUTTONUP, eventData);
             }
         }
@@ -768,16 +774,18 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_JOYAXISMOTION:
         {
             using namespace JoystickAxisMove;
+            
+            unsigned joystickIndex = joystickIDMap_[evt.jaxis.which];
 
             VariantMap eventData;
-            eventData[P_JOYSTICK] = evt.jaxis.which;
+            eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_AXIS] = evt.jaxis.axis;
             eventData[P_POSITION] = Clamp((float)evt.jaxis.value / 32767.0f, -1.0f, 1.0f);
 
-            if (evt.jaxis.which < joysticks_.Size() && evt.jaxis.axis <
-                joysticks_[evt.jaxis.which].axes_.Size())
+            if (joystickIndex < joysticks_.Size() && evt.jaxis.axis <
+                joysticks_[joystickIndex].axes_.Size())
             {
-                joysticks_[evt.jaxis.which].axes_[evt.jaxis.axis] = eventData[P_POSITION].GetFloat();
+                joysticks_[joystickIndex].axes_[evt.jaxis.axis] = eventData[P_POSITION].GetFloat();
                 SendEvent(E_JOYSTICKAXISMOVE, eventData);
             }
         }
@@ -786,16 +794,18 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_JOYHATMOTION:
         {
             using namespace JoystickHatMove;
+            
+            unsigned joystickIndex = joystickIDMap_[evt.jaxis.which];
 
             VariantMap eventData;
-            eventData[P_JOYSTICK] = evt.jhat.which;
+            eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_HAT] = evt.jhat.hat;
             eventData[P_POSITION] = evt.jhat.value;
 
-            if (evt.jhat.which < joysticks_.Size() && evt.jhat.hat <
-                joysticks_[evt.jhat.which].hats_.Size())
+            if (joystickIndex < joysticks_.Size() && evt.jhat.hat <
+                joysticks_[joystickIndex].hats_.Size())
             {
-                joysticks_[evt.jhat.which].hats_[evt.jhat.hat] = evt.jhat.value;
+                joysticks_[joystickIndex].hats_[evt.jhat.hat] = evt.jhat.value;
                 SendEvent(E_JOYSTICKHATMOVE, eventData);
             }
         }
