@@ -8,6 +8,7 @@
 ** implementation for Windows, and a stub for other systems.
 */
 
+// Modified by Lasse Oorni for Urho3D
 
 #include <stdlib.h>
 #include <string.h>
@@ -620,8 +621,9 @@ static const luaL_Reg ll_funcs[] = {
 };
 
 
+// Urho3D: disable inbuilt loaders
 static const lua_CFunction loaders[] =
-  {loader_preload, loader_Lua, loader_C, loader_Croot, NULL};
+  {/*loader_preload, loader_Lua, loader_C, loader_Croot,*/ NULL};
 
 
 LUALIB_API int luaopen_package (lua_State *L) {

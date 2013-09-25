@@ -262,10 +262,11 @@ void LuaScript::RegisterLoader()
     lua_getglobal(luaState_, "package");
     lua_getfield(luaState_, -1, "loaders");
 
-    // Set package.loaders[1] = LuaScript::Loader.
-    lua_pushnumber(luaState_, 1);
+    // Set package.loaders[1]
+    lua_pushinteger(luaState_, 1);
     lua_pushcfunction(luaState_, &LuaScript::Loader);
     lua_settable(luaState_, -3);
+    lua_pop(luaState_, 2);
 }
 
 int LuaScript::Loader(lua_State* L)
