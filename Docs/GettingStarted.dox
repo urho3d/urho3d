@@ -188,7 +188,7 @@ By default Mac OS X recognizes file having extension .as as 'AppleSingle Archive
 
 The drawback of the above approach is, Xcode does not remember it. The steps need to be carried out each time Xcode is relaunched.
 
-To solve this permanently, we need to 'hack' the system a little bit to 'fool' Xcode to always treat .as file as one of the C++ source files. Execute the following commands in a terminal as normal user. These commands have been verified on Lion.
+To solve this permanently, we need to 'hack' the system a little bit to 'fool' Xcode to always treat .as file as one of the C++ source files. Execute the following commands in a terminal as normal user. These commands have been verified to work with Xcode 4.x on Lion and Xcode 5.x on Mountain Lion. 
 
 \code
 $ cd /System/Library/CoreServices/CoreTypes.bundle/Contents
