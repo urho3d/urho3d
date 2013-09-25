@@ -562,7 +562,7 @@ static int tolua_SceneLuaAPI_Node_GetScriptObject01(lua_State* tolua_S)
   } 
  }
  
- if (scriptObjectRef = LUA_REFNIL)
+ if (scriptObjectRef == LUA_REFNIL)
   lua_pushnil(tolua_S);
  else
   lua_rawgeti(tolua_S, LUA_REGISTRYINDEX, scriptObjectRef);
