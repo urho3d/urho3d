@@ -43,7 +43,7 @@ sed 's/OpenGL/Direct3D9/g' Docs/Doxyfile.in >Doxyfile
 
 if [ $1 == "-DIOS=1" ]; then
     # Due to a bug in the CMake/Xcode generator where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
-    # below temporary fix is required in order to solve the auto-linking issue when dependent libraries is changed.
+    # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
     sed -i.bak 's/\/Contents\/MacOS//g' Build/CMakeScripts/XCODE_DEPEND_HELPER.make
     echo -e "\tsed -i.bak 's/\/Contents\/MacOS//g' CMakeScripts/XCODE_DEPEND_HELPER.make" >> Build/CMakeScripts/ReRunCMake.make
 fi

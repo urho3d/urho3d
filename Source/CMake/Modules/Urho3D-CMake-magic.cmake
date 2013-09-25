@@ -103,9 +103,15 @@ endif ()
 if (IOS)
     # IOS-specific setup
     add_definitions (-DIOS)
-    set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+    if (ENABLE_64BIT)
+        set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_INCLUDING_64_BIT))
+    else ()
+        set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+    endif ()
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos;-iphonesimulator")
-    set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
+    if (NOT MACOSX_BUNDLE_GUI_IDENTIFIER)
+        set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
+    endif ()
     set (CMAKE_OSX_SYSROOT "iphoneos")    # Set to "Latest iOS"
 elseif (XCODE)
     # MacOSX-Xcode-specific setup
@@ -440,7 +446,7 @@ macro (setup_main_executable)
             string (REGEX REPLACE "/Contents/MacOS" "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
             add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
                 \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
-                COMMENT "This is a dummy target to check for changes in the Resource folders")
+                COMMENT "Checking for changes in the Resource folders")
             add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
         else ()
             # Create symbolic links to allow debugging/running the main executable within Xcode itself
