@@ -35,7 +35,7 @@ function post_output_hook(package)
             end
         until not e
         result = currentString..string.sub(result, nxt)
-        if k == 0 then print('Pattern not replaced', pattern) end
+        --if k == 0 then print('Pattern not replaced', pattern) end
     end
 
     replace("\t", "  ")
