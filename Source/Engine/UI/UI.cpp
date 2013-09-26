@@ -100,6 +100,7 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
     SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
     SubscribeToEvent(E_CHAR, HANDLER(UI, HandleChar));
+    SubscribeToEvent(E_DROPFILE, HANDLER(UI, HandleDropFile));
 
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -1201,6 +1202,35 @@ void UI::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     RenderUpdate();
+}
+
+void UI::HandleDropFile(StringHash eventType, VariantMap& eventData)
+{
+    Input* input = GetSubsystem<Input>();
+    
+    // Sending the UI variant of the event only makes sense if the OS cursor is visible (not locked to window center)
+    if (input->IsMouseVisible())
+    {
+        IntVector2 screenPos = input->GetMousePosition();
+        UIElement* element = GetElementAt(screenPos);
+        
+        using namespace UIDropFile;
+        
+        VariantMap uiEventData;
+        uiEventData[P_FILENAME] = eventData[P_FILENAME];
+        uiEventData[P_X] = screenPos.x_;
+        uiEventData[P_Y] = screenPos.y_;
+        uiEventData[P_ELEMENT] = (void*)element;
+        
+        if (element)
+        {
+            IntVector2 relativePos = element->ScreenToElement(screenPos);
+            uiEventData[P_ELEMENTX] = relativePos.x_;
+            uiEventData[P_ELEMENTY] = relativePos.y_;
+        }
+        
+        SendEvent(E_UIDROPFILE, uiEventData);
+    }
 }
 
 void RegisterUILibrary(Context* context)

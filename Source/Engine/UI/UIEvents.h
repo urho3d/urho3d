@@ -296,4 +296,15 @@ EVENT(E_DRAGEND, DragEnd)
     PARAM(P_ELEMENTY, ElementY);            // int
 }
 
+/// A file was drag-dropped into the application window. Includes also coordinates and UI element if applicable
+EVENT(E_UIDROPFILE, UIDropFile)
+{
+    PARAM(P_FILENAME, FileName);            // String
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_X, X);                          // int
+    PARAM(P_Y, Y);                          // int
+    PARAM(P_ELEMENTX, ElementX);            // int (only if element is non-null)
+    PARAM(P_ELEMENTY, ElementY);            // int (only if element is non-null)
+}
+
 }

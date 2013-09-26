@@ -22,6 +22,7 @@
 
 #include "Context.h"
 #include "CoreEvents.h"
+#include "FileSystem.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
@@ -850,6 +851,18 @@ void Input::HandleSDLEvent(void* sdlEvent)
         }
         break;
 
+    case SDL_DROPFILE:
+        {
+            using namespace DropFile;
+            
+            VariantMap eventData;
+            eventData[P_FILENAME] = GetInternalPath(String(evt.drop.file));
+            SDL_free(evt.drop.file);
+            
+            SendEvent(E_DROPFILE, eventData);
+        }
+        break;
+        
     case SDL_QUIT:
         SendEvent(E_EXITREQUESTED);
         break;

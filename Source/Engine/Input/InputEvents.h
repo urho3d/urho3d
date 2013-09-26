@@ -148,6 +148,12 @@ EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
     PARAM(P_POSITION, Position);            // int
 }
 
+/// A file was drag-dropped into the application window.
+EVENT(E_DROPFILE, DropFile)
+{
+    PARAM(P_FILENAME, FileName);            // String
+}
+
 /// Application input focus or minimization changed.
 EVENT(E_INPUTFOCUS, InputFocus)
 {

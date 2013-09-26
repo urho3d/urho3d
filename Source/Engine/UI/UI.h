@@ -160,6 +160,8 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle a file being drag-dropped into the application window.
+    void HandleDropFile(StringHash eventType, VariantMap& eventData);
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
