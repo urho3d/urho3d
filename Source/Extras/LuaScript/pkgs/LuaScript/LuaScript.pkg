@@ -1,7 +1,5 @@
 $#include "LuaScript.h"
 
-Object* GetEventSender();
-
 void SendEvent(const String eventName, VariantMap& eventData);
 void SubscribeToEvent(const String eventName, const String functionName);
 void UnsubscribeFromEvent(const String eventName);
@@ -14,11 +12,6 @@ ${
 static LuaScript* GetLuaScript()
 {
     return GetContext()->GetSubsystem<LuaScript>();
-}
-
-static Object* GetEventSender()
-{
-    return GetContext()->GetEventSender();
 }
 
 static void SendEvent(const String& eventName, VariantMap& eventData)

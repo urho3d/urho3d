@@ -27,7 +27,7 @@ class ResourceCache
 };
 
 ${
-// Disable generated GetResource funciton.
+// Disable generated GetResource function.
 #define TOLUA_DISABLE_tolua_ResourceLuaAPI_ResourceCache_GetResource00
 
 static int tolua_ResourceLuaAPI_ResourceCache_GetResource00(lua_State* tolua_S)

@@ -25,6 +25,7 @@
 #include "File.h"
 #include "Log.h"
 #include "LuaFile.h"
+#include "LuaFunction.h"
 #include "LuaScript.h"
 #include "LuaScriptInstance.h"
 #include "ProcessUtils.h"
@@ -105,14 +106,14 @@ LuaScript::LuaScript(Context* context) :
 
 LuaScript::~LuaScript()
 {
-    for (HashMap<String, int>::Iterator i = functionNameToFunctionRefMap_.Begin(); i != functionNameToFunctionRefMap_.End(); ++i)
-    {
-        if (i->second_ != LUA_REFNIL)
-            luaL_unref(luaState_, LUA_REGISTRYINDEX, i->second_);
-    }
+    for (HashMap<String, LuaFunction*>::Iterator i = functionNameToFunctionMap_.Begin(); i != functionNameToFunctionMap_.End(); ++i)
+        delete i->second_;
 
-    if (luaState_)
-        lua_close(luaState_);
+    lua_State* luaState = luaState_;
+    luaState_ = 0;
+
+    if (luaState)
+        lua_close(luaState);
 }
 
 bool LuaScript::ExecuteFile(const String& fileName)
@@ -147,34 +148,18 @@ bool LuaScript::ExecuteString(const String& string)
     return true;
 }
 
-bool LuaScript::ExecuteFunction(const String& functionName, const VariantVector& parameters)
+bool LuaScript::ExecuteFunction(const String& functionName)
 {
-    PROFILE(ExecuteFunction);
-
-    int top = lua_gettop(luaState_);
-
-    if (!PushScriptFunction(functionName))
-    {
-        lua_settop(luaState_, top);
+    LuaFunction* function = GetFunction(functionName);
+    if (!function)
         return false;
+
+    if (function->BeginCall())
+    {
+        return function->EndCall();
     }
 
-    // Push parameters.
-    if (!tolua_pushurho3dvariantvector(luaState_, parameters))
-    {
-        lua_settop(luaState_, top);
-        return false;
-    }
-
-    if (lua_pcall(luaState_, parameters.Size(), 0, 0))
-    {
-        const char* message = lua_tostring(luaState_, -1);
-        LOGERROR("Execute Lua function failed: " + String(message));
-        lua_settop(luaState_, top);
-        return false;
-    }
-
-    return true;
+    return false;
 }
 
 void LuaScript::ScriptSendEvent(const String& eventName, VariantMap& eventData)
@@ -186,34 +171,36 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
 {
     StringHash eventType(eventName);
 
-    int functionRef = GetScriptFunctionRef(functionName);
-    if (functionRef != LUA_REFNIL)
+    LuaFunction* luaFunciton = GetFunction(functionName);
+    if (luaFunciton)
     {
         SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
-        eventTypeToFunctionRefMap_[eventType] = functionRef;
+
+        eventTypeToFunctionMap_[eventType] = luaFunciton;
     }
 }
-
 
 void LuaScript::ScriptUnsubscribeFromEvent(const String& eventName)
 {
     StringHash eventType(eventName);
 
-    HashMap<StringHash, int>::Iterator i = eventTypeToFunctionRefMap_.Find(eventType);
-    if (i != eventTypeToFunctionRefMap_.End())
+    HashMap<StringHash, LuaFunction*>::Iterator i = eventTypeToFunctionMap_.Find(eventType);
+    if (i != eventTypeToFunctionMap_.End())
     {
         UnsubscribeFromEvent(eventType);
-        eventTypeToFunctionRefMap_.Erase(i);
+
+        eventTypeToFunctionMap_.Erase(i);
     }
 }
 
 void LuaScript::ScriptUnsubscribeFromAllEvents()
 {
-    if (eventTypeToFunctionRefMap_.Empty())
+    if (eventTypeToFunctionMap_.Empty())
         return;
 
     UnsubscribeFromAllEvents();
-    eventTypeToFunctionRefMap_.Clear();
+
+    eventTypeToFunctionMap_.Clear();
 }
 
 void LuaScript::ScriptSubscribeToEvent(void* sender, const String& eventName, const String& functionName)
@@ -221,11 +208,12 @@ void LuaScript::ScriptSubscribeToEvent(void* sender, const String& eventName, co
     StringHash eventType(eventName);
     Object* object = (Object*)sender;
 
-    int functionRef = GetScriptFunctionRef(functionName);
-    if (functionRef != LUA_REFNIL)
+    LuaFunction* function = GetFunction(functionName);
+    if (function)
     {
         SubscribeToEvent(object, eventType, HANDLER(LuaScript, HandleObjectEvent));
-        objectToEventTypeToFunctionRefMap_[object][eventType] = functionRef;
+
+        objectToEventTypeToFunctionMap_[object][eventType] = function;
     }
 }
 
@@ -234,12 +222,12 @@ void LuaScript::ScriptUnsubscribeFromEvent(void* sender, const String& eventName
     StringHash eventType(eventName);
     Object* object = (Object*)sender;
 
-    HashMap<StringHash, int>::Iterator i = objectToEventTypeToFunctionRefMap_[object].Find(eventType);
-    if (i != objectToEventTypeToFunctionRefMap_[object].End())
+    HashMap<StringHash, LuaFunction*>::Iterator i = objectToEventTypeToFunctionMap_[object].Find(eventType);
+    if (i != objectToEventTypeToFunctionMap_[object].End())
     {
         UnsubscribeFromEvent(object, eventType);
-
-        objectToEventTypeToFunctionRefMap_[object].Erase(i);
+		
+        objectToEventTypeToFunctionMap_[object].Erase(i);
     }
 }
 
@@ -247,13 +235,12 @@ void LuaScript::ScriptUnsubscribeFromEvents(void* sender)
 {
     Object* object = (Object*)sender;
 
-    HashMap<Object*, HashMap<StringHash, int> >::Iterator it = objectToEventTypeToFunctionRefMap_.Find(object);
-    if (it == objectToEventTypeToFunctionRefMap_.End())
+    HashMap<Object*, HashMap<StringHash, LuaFunction*> >::Iterator it = objectToEventTypeToFunctionMap_.Find(object);
+    if (it == objectToEventTypeToFunctionMap_.End())
         return;
 
     UnsubscribeFromEvents(object);
-
-    objectToEventTypeToFunctionRefMap_.Erase(it);
+    objectToEventTypeToFunctionMap_.Erase(it);
 }
 
 void LuaScript::RegisterLoader()
@@ -327,42 +314,58 @@ int LuaScript::Print(lua_State *L)
     return 0;
 }
 
-int LuaScript::GetScriptFunctionRef(const String& functionName, bool silentIfNotFound)
+LuaFunction* LuaScript::GetFunction(const String& functionName, bool silentIfNotFound)
 {
-    HashMap<String, int>::Iterator i = functionNameToFunctionRefMap_.Find(functionName);
-    if (i != functionNameToFunctionRefMap_.End())
+    if (!luaState_)
+        return 0;
+
+    HashMap<String, LuaFunction*>::Iterator i = functionNameToFunctionMap_.Find(functionName);
+    if (i != functionNameToFunctionMap_.End())
         return i->second_;
 
     int top = lua_gettop(luaState_);
 
-    int functionRef = LUA_REFNIL;
+    LuaFunction* function = 0;
     if (PushScriptFunction(functionName, silentIfNotFound))
-        functionRef = luaL_ref(luaState_, LUA_REGISTRYINDEX);
+    {
+        int ref = luaL_ref(luaState_, LUA_REGISTRYINDEX);
+        function = new LuaFunction(luaState_, ref);
+    }
 
     lua_settop(luaState_, top);
 
-    functionNameToFunctionRefMap_[functionName] = functionRef;
+    functionNameToFunctionMap_[functionName] = function;
 
-    return functionRef;
+    return function;
 }
 
 void LuaScript::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
-    int functionRef = eventTypeToFunctionRefMap_[eventType];
-    if (functionRef == LUA_REFNIL)
+    LuaFunction* function = eventTypeToFunctionMap_[eventType];
+    if (!function)
         return;
 
-    CallScriptFunction(functionRef, eventType, eventData);
+    if (function->BeginCall())
+    {
+        function->PushUserType(eventType, "StringHash");
+        function->PushUserType(eventData, "VariantMap");
+        function->EndCall();
+    }
 }
 
 void LuaScript::HandleObjectEvent(StringHash eventType, VariantMap& eventData)
 {
     Object* object = GetEventSender();
-    int functionRef = objectToEventTypeToFunctionRefMap_[object][eventType];
-    if (functionRef == LUA_REFNIL)
+    LuaFunction* function = objectToEventTypeToFunctionMap_[object][eventType];
+    if (!function)
         return;
 
-    CallScriptFunction(functionRef, eventType, eventData);
+    if (function->BeginCall())
+    {
+        function->PushUserType(eventType, "StringHash");
+        function->PushUserType(eventData, "VariantMap");
+        function->EndCall();
+    }
 }
 
 void LuaScript::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
@@ -409,29 +412,6 @@ bool LuaScript::PushScriptFunction(const String& functionName, bool silentIfNotF
     }
 
     return true;
-}
-
-void LuaScript::CallScriptFunction(int functionRef, StringHash eventType, VariantMap& eventData )
-{
-    int top = lua_gettop(luaState_);
-    lua_rawgeti(luaState_, LUA_REGISTRYINDEX, functionRef);
-    if (!lua_isfunction(luaState_, -1))
-    {
-        LOGERROR("Could not find function");
-        lua_settop(luaState_, top);
-        return;
-    }
-
-    tolua_pushusertype(luaState_, (void*)&eventType, "StringHash");
-    tolua_pushusertype(luaState_, (void*)&eventData, "VariantMap");
-
-    if (lua_pcall(luaState_, 2, 0, 0) != 0)
-    {
-        const char* message = lua_tostring(luaState_, -1);
-        LOGERROR("Execute Lua function failed: " + String(message));
-        lua_settop(luaState_, top);
-        return;
-    }
 }
 
 void RegisterLuaScriptLibrary(Context* context)

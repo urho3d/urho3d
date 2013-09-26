@@ -5,7 +5,7 @@ void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE
 void OpenConsoleWindow();
 void PrintLine(const String str, bool error = false);
 
-const Vector<String>& GetArguments();
+string* GetArguments();
 
 String GetConsoleInput();
 String GetPlatform();

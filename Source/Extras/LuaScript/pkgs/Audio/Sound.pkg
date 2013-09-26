@@ -2,6 +2,17 @@ $#include "Sound.h"
 
 class Sound : public Resource
 {
+    Sound(Context* context);
+    ~Sound();
+    bool LoadRaw(Deserializer& source);
+    bool LoadWav(Deserializer& source);
+    bool LoadOggVorbis(Deserializer& source);
+    void SetSize(unsigned dataSize);
+    void SetData(const void* data, unsigned dataSize);
+    void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
+    void SetLooped(bool enable);
+    void SetLoop(unsigned repeatOffset, unsigned endOffset);
+    void FixInterpolation();
     float GetLength() const;
     unsigned GetDataSize() const;
     unsigned GetSampleSize() const;

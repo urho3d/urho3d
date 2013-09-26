@@ -24,6 +24,8 @@ class Context
 };
 
 Context* GetContext();
+Object* GetEventSender();
+EventHandler* GetEventHandler() const;
 
 Audio* GetAudio();
 Console* GetConsole();
@@ -42,6 +44,16 @@ Time* GetTime();
 UI* GetUI();
 
 ${
+static Object* GetEventSender()
+{
+    return GetContext()->GetEventSender();
+}
+
+static EventHandler* GetEventHandler()
+{
+    return GetContext()->GetEventHandler();
+}
+
 static Audio* GetAudio()
 {
     return GetContext()->GetSubsystem<Audio>();

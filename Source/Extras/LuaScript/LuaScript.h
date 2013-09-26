@@ -32,6 +32,7 @@ namespace Urho3D
 
 extern const char* LOGIC_CATEGORY;
 
+class LuaFunction;
 class Scene;
 
 /// Lua script subsystem.
@@ -49,8 +50,8 @@ public:
     bool ExecuteFile(const String& fileName);
     /// Execute script string. Return true if successful.
     bool ExecuteString(const String& string);
-    /// Execute script function. Parameters can be supplied in a VariantVector. Return true if successful.
-    bool ExecuteFunction(const String& functionName, const VariantVector& parameters = Variant::emptyVariantVector);
+    /// Execute script function.
+    bool ExecuteFunction(const String& functionName);
     /// Script send event.
     void ScriptSendEvent(const String& eventName, VariantMap& eventData);
     /// Script subscribe to an event that can by send by any sender.
@@ -67,10 +68,10 @@ public:
     void ScriptUnsubscribeFromEvents(void* sender);
     
     /// Return Lua state.
-    lua_State* GetLuaState() const { return luaState_; }
-    /// Return script function ref.
-    int GetScriptFunctionRef(const String& functionName, bool silentIfNotfound = false);
-    
+    lua_State* GetState() const { return luaState_; }
+    /// Return Lua function.
+    LuaFunction* GetFunction(const String& funcitonName, bool silentIfNotfound = false);
+
 private:
     /// Register loader.
     void RegisterLoader();
@@ -84,9 +85,7 @@ private:
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
     /// Push script function.
     bool PushScriptFunction(const String& functionName, bool silentIfNotfound = false);
-    /// Call script function.
-    void CallScriptFunction(int functionRef, StringHash eventType, VariantMap& eventData);
-
+    
     /// Loader.
     static int Loader(lua_State* L);
     /// Print function.
@@ -94,12 +93,12 @@ private:
 
     /// Lua state.
     lua_State* luaState_;
-    /// Function name to function ref map.
-    HashMap<String, int> functionNameToFunctionRefMap_;
-    /// Event type to function ref map.
-    HashMap<StringHash, int> eventTypeToFunctionRefMap_;
-    /// Object to event type to function ref map.
-    HashMap<Object*, HashMap<StringHash, int> > objectToEventTypeToFunctionRefMap_;
+    /// Function name to function map.
+    HashMap<String, LuaFunction*> functionNameToFunctionMap_;
+    /// Event type to function map.
+    HashMap<StringHash, LuaFunction*> eventTypeToFunctionMap_;
+    /// Object to event type to function map.
+    HashMap<Object*, HashMap<StringHash, LuaFunction*> > objectToEventTypeToFunctionMap_;
 };
 
 /// Register Lua script library objects.

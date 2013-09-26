@@ -30,13 +30,13 @@ namespace Urho3D
 {
 
 class LuaScript;
+class LuaFunction;
 
 /// Lua Script object methods.
 enum LuaScriptObjectMethod
 {
     LSOM_START = 0,
     LSOM_STOP,
-    // LSOM_DELAYEDSTART,
     LSOM_UPDATE,
     LSOM_POSTUPDATE,
     LSOM_FIXEDUPDATE,
@@ -91,9 +91,7 @@ public:
     void ScriptUnsubscribeFromEvent(void* sender, const String& eventName);
     /// Script unsubscribe from a specific sender's all events.
     void ScriptUnsubscribeFromEvents(void* sender);
-    /// Execute a script object function. Parameters can be supplied in a VariantVector. Return true if successful.
-    bool ExecuteFunction(const String& functionName, const VariantVector& parameters = Variant::emptyVariantVector);
-    
+
     /// Return script file name.
     const String& GetScriptFileName() const { return scriptFileName_; }
     /// Return script object type.
@@ -104,6 +102,8 @@ public:
     PODVector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+    /// Return script object's funcition.
+    LuaFunction* GetScriptObjectFunction(const String& functionName);
 
 private:
     /// Find script object method refs.
@@ -126,19 +126,7 @@ private:
     void HandleObjectEvent(StringHash eventType, VariantMap& eventData);
     /// Release the script object.
     void ReleaseObject();
-    /// Call script object function.
-    void CallScriptObjectFunction(int functionRef);
-    /// Call script object function.
-    void CallScriptObjectFunction(int functionRef, float timeStep);
-    /// Call script object function.
-    void CallScriptObjectFunction(int functionRef, Deserializer& deserializer);
-    /// Call script object function.
-    void CallScriptObjectFunction(int functionRef, Serializer& serializer) const;
-    /// Call script object function.
-    void CallScriptObjectFunction(int functionRef, StringHash eventType, VariantMap& eventData);
-    /// Call script object function with arbitrary parameters.
-    bool CallScriptObjectFunction(int functionRef, const VariantVector& parameters);
-    
+
     // Lua Script subsystem.
     LuaScript* luaScript_;
     /// Lua state.
@@ -149,12 +137,12 @@ private:
     String scriptObjectType_;
     /// Script object ref.
     int scriptObjectRef_;
-    /// Script object method refs.
-    int scriptObjectMethodRefs_[MAX_LUA_SCRIPT_OBJECT_METHODS];
-    /// Event type to function ref map.
-    HashMap<StringHash, int> eventTypeToFunctionRefMap_;
-    /// Object to event type to function ref map.
-    HashMap<Object*, HashMap<StringHash, int> > objectToEventTypeToFunctionRefMap_;
+    /// Script object method.
+    LuaFunction* scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
+    /// Event type to function map.
+    HashMap<StringHash, LuaFunction*> eventTypeToFunctionMap_;
+    /// Object to event type to function map.
+    HashMap<Object*, HashMap<StringHash, LuaFunction*> > objectToEventTypeToFunctionMap_;
 };
 
 }

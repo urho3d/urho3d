@@ -26,6 +26,7 @@
 #include "Font.h"
 #include "Graphics.h"
 #include "Input.h"
+#include "LuaFunction.h"
 #include "LuaScript.h"
 #include "LuaScriptInstance.h"
 #include "Material.h"
@@ -110,10 +111,14 @@ void LuaIntegration::CreateScene()
         // rotate the scene node each frame, when the scene sends its update event
         LuaScriptInstance* instance = boxNode->CreateComponent<LuaScriptInstance>();
         instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
-        // Call the script object's "SetRotationSpeed" function. Function arguments need to be passed in a VariantVector
-        VariantVector parameters;
-        parameters.Push(Vector3(10.0f, 20.0f, 30.0f));
-        instance->ExecuteFunction("SetRotationSpeed", parameters);
+        
+        // Call the script object's "SetRotationSpeed" function.
+        LuaFunction* function = instance->GetScriptObjectFunction("SetRotationSpeed");
+        if (function && function->BeginCall(instance))
+        {
+            function->PushUserType(Vector3(10.0f, 20.0f, 30.0f), "Vector3");
+            function->EndCall();
+        }
     }
     
     // Create the camera. Let the starting position be at the world origin. As the fog limits maximum visible distance, we can

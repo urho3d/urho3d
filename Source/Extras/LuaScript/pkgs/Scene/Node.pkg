@@ -350,7 +350,7 @@ static void NodeGetWorldScaleXYZ(const Node* node, float* x, float* y, float* z)
     *z =  worldScale.z_;
 }
 
-// Disable generated CreateComponent funciton.
+// Disable generated CreateComponent function.
 #define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_CreateComponent00
 
 static int tolua_SceneLuaAPI_Node_CreateComponent00(lua_State* tolua_S)
@@ -388,7 +388,7 @@ static int tolua_SceneLuaAPI_Node_CreateComponent00(lua_State* tolua_S)
 #endif
 }
 
-// Disable generated GetComponent funciton.
+// Disable generated GetComponent function.
 #define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_GetComponent00
 static int tolua_SceneLuaAPI_Node_GetComponent00(lua_State* tolua_S)
 {

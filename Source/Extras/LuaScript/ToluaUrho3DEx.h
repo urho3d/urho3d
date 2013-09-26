@@ -39,5 +39,3 @@ const char* tolua_tofieldurho3dstring(lua_State* L, int lo, int index, const Urh
 
 /// Push Urho3D string vector to Lua.
 int tolua_pushurho3dstringvector(lua_State* L, const Urho3D::Vector<Urho3D::String>& strings);
-/// Push Urho3D variant vector to Lua, if meet unsupported data type return false.
-bool tolua_pushurho3dvariantvector(lua_State* L, const Urho3D::VariantVector& variants);

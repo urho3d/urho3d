@@ -189,7 +189,7 @@ void Urho::Stop()
     else
     {
         LuaScript* luaScript = GetSubsystem<LuaScript>();
-        if (luaScript && luaScript->GetScriptFunctionRef("Stop", true) != -1) // -1 equals NIL reference
+        if (luaScript && luaScript->GetFunction("Stop", true))
             luaScript->ExecuteFunction("Stop");
     }
 #endif
