@@ -157,15 +157,16 @@ else ()
 endif ()
 
 # Generate platform specific export header file automatically
-set_target_properties (Urho3D PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
-generate_export_header (Urho3D EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Engine/Urho3D.h.new)
+if (NOT URHO3D_BUILD_TYPE STREQUAL URHO3D_EXPORTS_BUILD_TYPE OR ${CMAKE_SOURCE_DIR}/Engine/Urho3D.h.in IS_NEWER_THAN ${CMAKE_BINARY_DIR}/Engine/Urho3D.h)
+    set_target_properties (Urho3D PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
+    generate_export_header (Urho3D EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Engine/Urho3D.h)
+    set (URHO3D_EXPORTS_BUILD_TYPE ${URHO3D_BUILD_TYPE} CACHE INTERNAL "Build type when Urho3D export header was last generated")
+    
+    # Append Urho3D license notice to the export header file
+    file (READ ${CMAKE_BINARY_DIR}/Engine/Urho3D.h EXPORT_DEFINE)
+    configure_file (${CMAKE_SOURCE_DIR}/Engine/Urho3D.h.in ${CMAKE_BINARY_DIR}/Engine/Urho3D.h) 
+endif ()
 
-# Append Urho3D license notice to the export header file
-file (READ ${CMAKE_SOURCE_DIR}/Engine/Urho3D.h.in LICENSE)
-file (READ ${CMAKE_BINARY_DIR}/Engine/Urho3D.h.new EXPORT_DEFINE)
-file (WRITE ${CMAKE_BINARY_DIR}/Engine/Urho3D.h.new ${LICENSE}${EXPORT_DEFINE})
-
-# Copy the new export header file only if it is different to prevent unnecessary library rebuild
-execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/Engine/Urho3D.h.new ${CMAKE_BINARY_DIR}/Engine/Urho3D.h)
-file (REMOVE ${CMAKE_BINARY_DIR}/Engine/Urho3D.h.new)
-
+# Reference supported build options that are potentially not being referenced due to platform or build type branching to suppress "unused variable" warning
+if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND ENABLE_MINIDUMPS AND ENABLE_SAFE_LUA AND USE_MKLINK AND USE_STATIC_RUNTIME AND SCP_TO_TARGET AND ANDROID_ABI)
+endif()

@@ -22,12 +22,6 @@
 
 @echo off
 cmake -E make_directory Build
-if exist CMakeCache.txt. del /F CMakeCache.txt
-if exist Build\CMakeCache.txt. del /F Build\CMakeCache.txt
-if exist Source\CMakeCache.txt. del /F Source\CMakeCache.txt
-if exist CMakeFiles. rd /S /Q CMakeFiles
-if exist Build\CMakeFiles. rd /S /Q Build\CMakeFiles
-if exist Source\CMakeFiles. rd /S /Q Source\CMakeFiles
 cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
 echo on
 cmake -E chdir Build cmake -G "MinGW Makefiles" %* ..\Source

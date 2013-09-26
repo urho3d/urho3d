@@ -171,12 +171,12 @@ void LuaScript::ScriptSubscribeToEvent(const String& eventName, const String& fu
 {
     StringHash eventType(eventName);
 
-    LuaFunction* luaFunciton = GetFunction(functionName);
-    if (luaFunciton)
+    LuaFunction* luaFunction = GetFunction(functionName);
+    if (luaFunction)
     {
         SubscribeToEvent(eventType, HANDLER(LuaScript, HandleEvent));
 
-        eventTypeToFunctionMap_[eventType] = luaFunciton;
+        eventTypeToFunctionMap_[eventType] = luaFunction;
     }
 }
 

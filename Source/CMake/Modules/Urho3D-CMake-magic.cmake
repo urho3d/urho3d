@@ -142,6 +142,9 @@ else ()
     if (ANDROID)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -fstack-protector")
+        if (ENABLE_64BIT)
+            # For now just reference it to suppress "unused variable" warning
+        endif ()
     elseif (NOT IOS)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -ffast-math")
@@ -233,17 +236,13 @@ endfunction ()
 
 # Override builtin function to suit our need, takes care of C flags as well as CXX flags
 function (add_compiler_export_flags)
-    if (NOT ANDROID)
-        message ("--")
+    if (NOT ANDROID AND NOT MSVC AND NOT DEFINED USE_COMPILER_HIDDEN_VISIBILITY AND NOT DEFINED COMPILER_HAS_DEPRECATED)
         message ("-- Following tests check whether compiler installed in this system has export/import and deprecated attributes support")
         message ("-- CMake will generate a suitable export header file for this system based on the test result")
         message ("-- It is OK to proceed to build Urho3D regardless of the test result")
     endif ()
     _test_compiler_hidden_visibility ()
     _test_compiler_has_deprecated ()
-    if (NOT ANDROID)
-        message ("--")
-    endif ()
 
     if (NOT (USE_COMPILER_HIDDEN_VISIBILITY AND COMPILER_HAS_HIDDEN_VISIBILITY))
         # Just return if there are no flags to add.

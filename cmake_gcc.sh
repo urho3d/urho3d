@@ -104,12 +104,6 @@ cmake -E make_directory Build
 [ $RASPI_TOOL ] && cmake -E make_directory raspi-Build
 [ $ANDROID_NDK ] && cmake -E make_directory android-Build
 
-# Remove existing CMake cache and rules
-rm -rf {Build,raspi-Build,android-Build}/CMakeCache.txt {Build,raspi-Build,android-Build}/CMakeFiles
-# Do cleanup a few more times for old build directory created by previous version of cmake_gcc.sh, just in case
-rm -rf {.,build,Android}/CMakeCache.txt {.,build,Android}/CMakeFiles
-rm -rf {../build,../raspi-build,../android-build}/CMakeCache.txt {../build,../raspi-build,../android-build}/CMakeFiles
-
 # Add support for Eclipse IDE
 IFS=#
 GENERATOR="Unix Makefiles"
@@ -118,7 +112,7 @@ GENERATOR="Unix Makefiles"
 # Add support for both native and cross-compiling build for Raspberry Pi
 [[ $( uname -m ) =~ ^armv6 ]] && PLATFORM="-DRASPI=1"
 
-# Create project with the respective Cmake generators
+# Create project with the respective CMake generators
 OPT=
 msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $@ $SOURCE && post_cmake Build
 [ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/raspberrypi.toolchain.cmake $@ $SOURCE && post_cmake raspi-Build

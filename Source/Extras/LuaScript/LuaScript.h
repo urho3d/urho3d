@@ -70,7 +70,7 @@ public:
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
     /// Return Lua function.
-    LuaFunction* GetFunction(const String& funcitonName, bool silentIfNotfound = false);
+    LuaFunction* GetFunction(const String& functionName, bool silentIfNotfound = false);
 
 private:
     /// Register loader.

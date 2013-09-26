@@ -22,10 +22,6 @@
 
 @echo off
 :: Define USE_MKLINK to 1 to enable out-of-source build and symbolic linking of resources from Bin directory
-if exist CMakeCache.txt. del /F CMakeCache.txt
-if exist Source\Android\CMakeCache.txt. del /F Source\Android\CMakeCache.txt
-if exist CMakeFiles. rd /S /Q CMakeFiles
-if exist Source\Android\CMakeFiles. rd /S /Q Source\Android\CMakeFiles
 set "build=Source\Android"
 set "source=.."
 set "use_mklink="
@@ -37,15 +33,19 @@ if not "%1" == "" (
     goto loop
 )
 if "%use_mklink%" == "1" (
+    :: Remove cache file from opposite build directory
+    if exist Source\Android\CMakeCache.txt. del /F Source\Android\CMakeCache.txt
+    if exist Source\Android\CMakeFiles. rd /S /Q Source\Android\CMakeFiles
     cmake -E make_directory android-Build
-    if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt
-    if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
     set "build=android-Build"
     set "source=..\Source"
     for %%d in (CoreData Data) do mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
     for %%d in (src res assets) do mklink /D "android-Build\%%d" "..\Source\Android\%%d"
     for %%f in (AndroidManifest.xml build.xml project.properties) do mklink "android-Build\%%f" "..\Source\Android\%%f"
-)
+) else (
+    if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt
+    if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
+) 
 cmake -E copy_if_different Docs\Doxyfile.in Doxyfile
 echo on
 cmake -E chdir %build% cmake -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\CMake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=.  %* %source%
