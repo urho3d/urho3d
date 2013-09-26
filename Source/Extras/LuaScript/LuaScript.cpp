@@ -262,8 +262,8 @@ void LuaScript::RegisterLoader()
     lua_getglobal(luaState_, "package");
     lua_getfield(luaState_, -1, "loaders");
 
-    // Set package.loaders[1]
-    lua_pushinteger(luaState_, 1);
+    // Add our loader to the end of the table
+    lua_pushinteger(luaState_, lua_objlen(luaState_, -1) + 1);
     lua_pushcfunction(luaState_, &LuaScript::Loader);
     lua_settable(luaState_, -3);
     lua_pop(luaState_, 2);
