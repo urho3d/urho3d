@@ -39,13 +39,13 @@ public:
     /// Destruct.
     ~LuaFunction();
 
-    /// Check function is valid.
+    /// Check that function is valid.
     bool IsValid() const;
-    /// Begin call function.
+    /// Begin function call.
     bool BeginCall();
-    /// Begin call script object's function.
+    /// Begin script object's function call.
     bool BeginCall(const LuaScriptInstance* instance);
-    /// End call function.
+    /// End call and actually execute the function.
     bool EndCall(int numReturns = 0);
     /// Push int to stack.
     void PushInt(int value);

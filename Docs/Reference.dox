@@ -540,7 +540,7 @@ Use \ref LuaScript::ExecuteString "ExecuteString()" to compile and run a line of
 
 In contrast to AngelScript modules, which exist as separate entities and do not share functions or variables unless explicitly marked shared, in the Lua subsystem everything is loaded and executed in one Lua state, so scripts can naturally access everything  loaded so far. To load and execute a Lua script file, call \ref LuaScript::ExecuteFile "ExecuteFile()".
 
-After that, the functions in the script file are available for calling. Use \ref LuaScript::ExecuteFunction "ExecuteFunction()" to call a Lua function. Parameters to the function can be supplied in a VariantVector.
+After that, the functions in the script file are available for calling. Use \ref LuaScript::GetFunction "GetFunction()" to get a Lua function by name. This returns a LuaFunction object, on which you should call \ref LuaFunction::BeginCall "BeginCall()" first, followed by pushing the function parameters if any, and finally execute the function with \ref LuaFunction::EndCall "EndCall()".
 
 \section LuaScripting_ScriptObjects Script objects
 
@@ -551,7 +551,7 @@ LuaScriptInstance* instance = node->CreateComponent<LuaScriptInstance>();
 instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
 \endcode
 
-After instantiation, functions can be \ref LuaScriptInstance::ExecuteFunction "called" on the script object; parameters are again supplied in a VariantVector.
+After instantiation, use \ref LuaScriptInstance::GetScriptObjectFunction "GetScriptObjectFunction()" to get the object's functions by name; calling happens like above.
 
 Like their AngelScript counterparts, script object classes can define functions which are automatically called by LuaScriptInstance for operations like initialization, scene update, or load/save. These functions are listed below. Refer to the \ref Scripting "AngelScript scripting" page for details.
 
