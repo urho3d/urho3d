@@ -54,7 +54,8 @@ static const char* methodDeclarations[] = {
     "void Save(Serializer&)",
     "void ReadNetworkUpdate(Deserializer&)",
     "void WriteNetworkUpdate(Serializer&)",
-    "void ApplyAttributes()"
+    "void ApplyAttributes()",
+    "void TransformChanged()"
 };
 
 extern const char* UI_CATEGORY;
@@ -430,6 +431,19 @@ PODVector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
     }
 }
 
+void ScriptInstance::OnMarkedDirty(Node* node)
+{
+    // Script functions are not safe from worker threads
+    Scene* scene = GetScene();
+    if (scene && scene->IsThreadedUpdate())
+    {
+        scene->DelayedMarkedDirty(this);
+        return;
+    }
+    
+    if (scriptObject_ && methods_[METHOD_TRANSFORMCHANGED])
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_TRANSFORMCHANGED]);
+}
 
 void ScriptInstance::CreateObject()
 {
@@ -467,6 +481,8 @@ void ScriptInstance::ReleaseObject()
         exceptions.Push(E_RELOADSTARTED);
         exceptions.Push(E_RELOADFINISHED);
         UnsubscribeFromAllEventsExcept(exceptions, false);
+        if (node_)
+            node_->RemoveListener(this);
         subscribed_ = false;
         subscribedPostFixed_ = false;
         
@@ -596,7 +612,7 @@ void ScriptInstance::UpdateEventSubscription()
     Scene* scene = GetScene();
     if (!scene)
     {
-        LOGERROR("Node is detached from scene, can not subscribe script object to update events");
+        LOGWARNING("Node is detached from scene, can not subscribe script object to update events");
         return;
     }
     
@@ -632,6 +648,9 @@ void ScriptInstance::UpdateEventSubscription()
             
             subscribedPostFixed_ = true;
         }
+        
+        if (methods_[METHOD_TRANSFORMCHANGED])
+            node_->AddListener(this);
     }
     else
     {
@@ -654,6 +673,9 @@ void ScriptInstance::UpdateEventSubscription()
             
             subscribedPostFixed_ = false;
         }
+        
+        if (methods_[METHOD_TRANSFORMCHANGED])
+            node_->RemoveListener(this);
     }
 }
 

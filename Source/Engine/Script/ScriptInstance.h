@@ -49,6 +49,7 @@ enum ScriptInstanceMethod
     METHOD_READNETWORKUPDATE,
     METHOD_WRITENETWORKUPDATE,
     METHOD_APPLYATTRIBUTES,
+    METHOD_TRANSFORMCHANGED,
     MAX_SCRIPT_METHODS
 };
 
@@ -141,6 +142,10 @@ public:
     PODVector<unsigned char> GetScriptDataAttr() const;
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
+    
+protected:
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
     
 private:
     /// (Re)create the script object and check for supported methods if successfully created.

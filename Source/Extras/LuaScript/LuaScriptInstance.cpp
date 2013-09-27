@@ -30,7 +30,10 @@
 #include "LuaScriptInstance.h"
 #include "MemoryBuffer.h"
 #include "PhysicsEvents.h"
+#include "PhysicsWorld.h"
 #include "ResourceCache.h"
+#include "Scene.h"
+#include "SceneEvents.h"
 #include "ToluaUrho3DEx.h"
 #include "ProcessUtils.h"
 #include "VectorBuffer.h"
@@ -59,7 +62,8 @@ static const char* scriptObjectMethodNames[] = {
     "Save",
     "ReadNetworkUpdate",
     "WriteNetworkUpdate",
-    "ApplyAttributes"
+    "ApplyAttributes",
+    "TransformChanged"
 };
 
 LuaScriptInstance::LuaScriptInstance(Context* context) :
@@ -100,7 +104,7 @@ void LuaScriptInstance::ApplyAttributes()
 
 void LuaScriptInstance::OnSetEnabled()
 {
-    if (enabled_)
+    if (IsEnabledEffective())
         SubscribeToScriptMethodEvents();
     else
         UnsubscribeFromScriptMethodEvents();
@@ -308,43 +312,72 @@ PODVector<unsigned char> LuaScriptInstance::GetScriptNetworkDataAttr() const
     return buf.GetBuffer();
 }
 
+void LuaScriptInstance::OnMarkedDirty(Node* node)
+{
+    // Script functions are not safe from worker threads
+    Scene* scene = GetScene();
+    if (scene && scene->IsThreadedUpdate())
+    {
+        scene->DelayedMarkedDirty(this);
+        return;
+    }
+    
+    LuaFunction* function = scriptObjectMethods_[LSOM_TRANSFORMCHANGED];
+    if (function && function->BeginCall(this))
+    {
+        function->EndCall();
+    }
+}
+
 void LuaScriptInstance::FindScriptObjectMethodRefs()
 {
     for (unsigned i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
         scriptObjectMethods_[i] = GetScriptObjectFunction(scriptObjectMethodNames[i]);
 
-    if (enabled_)
+    if (IsEnabledEffective())
         SubscribeToScriptMethodEvents();
 }
 
 void LuaScriptInstance::SubscribeToScriptMethodEvents()
 {
-    if (scriptObjectMethods_[LSOM_UPDATE])
-        SubscribeToEvent(E_UPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
+    Scene* scene = GetScene();
+    PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
+    
+    if (scene && scriptObjectMethods_[LSOM_UPDATE])
+        SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LuaScriptInstance, HandleUpdate));
 
-    if (scriptObjectMethods_[LSOM_POSTUPDATE])
-        SubscribeToEvent(E_POSTUPDATE, HANDLER(LuaScriptInstance, HandlePostUpdate));
+    if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(LuaScriptInstance, HandlePostUpdate));
 
-    if (scriptObjectMethods_[LSOM_FIXEDUPDATE])
-        SubscribeToEvent(E_PHYSICSPRESTEP, HANDLER(LuaScriptInstance, HandleFixedUpdate));
+    if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDUPDATE])
+        SubscribeToEvent(physicsWorld, E_PHYSICSPRESTEP, HANDLER(LuaScriptInstance, HandleFixedUpdate));
 
-    if (scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
-        SubscribeToEvent(E_PHYSICSPOSTSTEP, HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
+    if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
+        SubscribeToEvent(physicsWorld, E_PHYSICSPOSTSTEP, HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
+    
+    if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])
+        node_->AddListener(this);
 }
 
 void LuaScriptInstance::UnsubscribeFromScriptMethodEvents()
 {
-    if (scriptObjectMethods_[LSOM_UPDATE])
-        UnsubscribeFromEvent(E_UPDATE);
+    Scene* scene = GetScene();
+    PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
+    
+    if (scene && scriptObjectMethods_[LSOM_UPDATE])
+        UnsubscribeFromEvent(scene, E_SCENEUPDATE);
 
-    if (scriptObjectMethods_[LSOM_POSTUPDATE])
-        UnsubscribeFromEvent(E_POSTUPDATE);
+    if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
+        UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
 
-    if (scriptObjectMethods_[LSOM_FIXEDUPDATE])
-        UnsubscribeFromEvent(E_PHYSICSPRESTEP);
+    if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDUPDATE])
+        UnsubscribeFromEvent(physicsWorld, E_PHYSICSPRESTEP);
 
-    if (scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
-        UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
+    if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
+        UnsubscribeFromEvent(physicsWorld, E_PHYSICSPOSTSTEP);
+    
+    if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])
+        node_->RemoveListener(this);
 }
 
 void LuaScriptInstance::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -427,7 +460,7 @@ void LuaScriptInstance::ReleaseObject()
     if (scriptObjectRef_ == LUA_REFNIL)
         return;
 
-    if (enabled_)
+    if (IsEnabledEffective())
         UnsubscribeFromScriptMethodEvents();
 
     // Unref script object.

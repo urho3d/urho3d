@@ -46,6 +46,7 @@ enum LuaScriptObjectMethod
     LSOM_READNETWORKUPDATE,
     LSOM_WRITENETWORKUPDATE,
     LSOM_APPLYATTRIBUTES,
+    LSOM_TRANSFORMCHANGED,
     MAX_LUA_SCRIPT_OBJECT_METHODS
 };
 
@@ -104,6 +105,10 @@ public:
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
     /// Return script object's funcition.
     LuaFunction* GetScriptObjectFunction(const String& functionName);
+
+protected:
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
 
 private:
     /// Find script object method refs.
