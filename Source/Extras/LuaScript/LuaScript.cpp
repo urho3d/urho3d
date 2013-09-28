@@ -84,19 +84,19 @@ LuaScript::LuaScript(Context* context) :
     RegisterLoader();
     ReplacePrint();
 
-    tolua_AudioLuaAPI_open(luaState_);
     tolua_ContainerLuaAPI_open(luaState_);
+    tolua_MathLuaAPI_open(luaState_);
     tolua_CoreLuaAPI_open(luaState_);
+    tolua_IOLuaAPI_open(luaState_);
+    tolua_ResourceLuaAPI_open(luaState_);
+    tolua_SceneLuaAPI_open(luaState_);
+    tolua_AudioLuaAPI_open(luaState_);
     tolua_EngineLuaAPI_open(luaState_);
     tolua_GraphicsLuaAPI_open(luaState_);
     tolua_InputLuaAPI_open(luaState_);
-    tolua_IOLuaAPI_open(luaState_);
-    tolua_MathLuaAPI_open(luaState_);
     tolua_NavigationLuaAPI_open(luaState_);
     tolua_NetworkLuaAPI_open(luaState_);
     tolua_PhysicsLuaAPI_open(luaState_);
-    tolua_ResourceLuaAPI_open(luaState_);
-    tolua_SceneLuaAPI_open(luaState_);
     tolua_UILuaAPI_open(luaState_);
     tolua_LuaScriptLuaAPI_open(luaState_);
 

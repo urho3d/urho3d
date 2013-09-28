@@ -1,5 +1,5 @@
-$pfile "Resource/Image.pkg"
 $pfile "Resource/Resource.pkg"
+$pfile "Resource/Image.pkg"
 $pfile "Resource/ResourceCache.pkg"
 $pfile "Resource/XMLElement.pkg"
 $pfile "Resource/XMLFile.pkg"
