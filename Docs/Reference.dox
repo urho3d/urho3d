@@ -396,7 +396,7 @@ The Start() and Stop() methods do not have direct counterparts in C++ components
 
 When a scene node hierarchy with script objects is instantiated (such as when loading a scene) any child nodes may not have been created yet when Start() is executed, and can thus not be relied upon for initialization. The DelayedStart() method can be used in this case instead: if defined, it is called immediately before any of the Update() calls.
 
-TransformChanged() is called whenever the scene node transform changes, similar to C++ components' OnMarkedDirty() function.
+TransformChanged() is called whenever the scene node transform changes, similar to C++ components' OnMarkedDirty() function. Due to an optimization mechanism for repeated scene graph updates, you need to "undirty" the scene node by for example reading its world position to get further transform changed notifications.
 
 Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an object method, the ScriptInstance becomes the event receiver on the C++ side, and forwards the events to the script object. If called from a function, the ScriptFile will be the event receiver. Note that object-based event handling only works when the script object in question is attached to a ScriptInstance component, as a C++ side proxy is always needed. If you simply create a new free-standing object in script, it will not be able to subscribe to events.
 
