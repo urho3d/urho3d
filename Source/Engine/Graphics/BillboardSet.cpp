@@ -443,25 +443,25 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         
         *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
         *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.max_.y_;
+        *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.min_.y_;
         *dest++ = -size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
         *dest++ = -size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
         
         *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
         *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.max_.y_;
+        *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.min_.y_;
         *dest++ = size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
         *dest++ = size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
         
         *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
         *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.min_.y_;
+        *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.max_.y_;
         *dest++ = size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
         *dest++ = size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
         
         *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
         *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.min_.y_;
+        *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.max_.y_;
         *dest++ = -size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
         *dest++ = -size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
     }

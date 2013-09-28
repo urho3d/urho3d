@@ -12,6 +12,10 @@ void main()
 {
     #ifdef DIFFMAP
         vec4 diffColor = cMatDiffColor * texture2D(sDiffMap, vTexCoord);
+        #ifdef ALPHAMASK
+            if (diffColor.a < 0.5)
+                discard;
+        #endif
     #else
         vec4 diffColor = cMatDiffColor;
     #endif

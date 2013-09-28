@@ -60,8 +60,9 @@ void VS(float4 iPos : POSITION,
 {
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
+    float height = worldPos.y - cModel._m31;
 
-    float windStrength = max(iPos.y - cWindHeightPivot, 0.0) * cWindHeightFactor;
+    float windStrength = max(height - cWindHeightPivot, 0.0) * cWindHeightFactor;
     float windPeriod = cElapsedTime * cWindPeriod + dot(worldPos.xz, cWindWorldSpacing);
     worldPos.x += windStrength * sin(windPeriod);
     worldPos.z -= windStrength * cos(windPeriod);
