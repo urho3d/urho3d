@@ -40,7 +40,7 @@ namespace Urho3D
 - String GetPlatform()
 - uint GetNumPhysicalCPUs()
 - uint GetNumLogicalCPUs()
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SubscribeToEvent(const String&, const String&)
 - void SubscribeToEvent(Object@, const String&, const String&)
 - void UnsubscribeFromEvent(const String&)
@@ -50,17 +50,17 @@ namespace Urho3D
 - void UnsubscribeFromAllEventsExcept(String[]@)
 - Object@ GetEventSender()
 - const String& GetTypeName(ShortStringHash)
-- void Print(const String&, bool arg1 = false)
-- void Print(int, bool arg1 = false)
-- void Print(uint, bool arg1 = false)
-- void Print(float, bool arg1 = false)
-- void Print(bool, bool arg1 = false)
-- void Print(const Variant&, bool arg1 = false)
-- void PrintCallStack(bool arg0 = false)
+- void Print(const String&, bool = false)
+- void Print(int, bool = false)
+- void Print(uint, bool = false)
+- void Print(float, bool = false)
+- void Print(bool, bool = false)
+- void Print(const Variant&, bool = false)
+- void PrintCallStack(bool = false)
 - String GetPath(const String&)
 - String GetFileName(const String&)
-- String GetExtension(const String&, bool arg1 = true)
-- String GetFileNameAndExtension(const String&, bool arg1 = false)
+- String GetExtension(const String&, bool = true)
+- String GetFileNameAndExtension(const String&, bool = false)
 - String ReplaceExtension(const String&, const String&)
 - String AddTrailingSlash(const String&)
 - String RemoveTrailingSlash(const String&)
@@ -88,7 +88,7 @@ namespace Urho3D
 - void MarkNetworkUpdate()
 - void DelayedExecute(float, bool, const String&, const Variant[]@)
 - void DelayedExecute(float, bool, const String&)
-- void ClearDelayedExecute(const String& arg0 = String ( ))
+- void ClearDelayedExecute(const String& = String ( ))
 - void Remove()
 \section ScriptAPI_GlobalProperties Global properties
 - Time@ time
@@ -600,17 +600,17 @@ Properties:
 
 Methods:
 
-- void Replace(uint8, uint8, bool arg2 = true)
-- void Replace(const String&, const String&, bool arg2 = true)
-- String Replaced(uint8, uint8, bool arg2 = true) const
-- String Replaced(const String&, const String&, bool arg2 = true) const
+- void Replace(uint8, uint8, bool = true)
+- void Replace(const String&, const String&, bool = true)
+- String Replaced(uint8, uint8, bool = true) const
+- String Replaced(const String&, const String&, bool = true) const
 - void Resize(uint)
-- uint Find(const String&, uint arg1 = 0, bool arg2 = true) const
-- uint Find(uint8, uint arg1 = 0, bool arg2 = true) const
-- uint FindLast(const String&, uint arg1 = 0xffffffff, bool arg2 = true) const
-- uint FindLast(uint8, uint arg1 = 0xffffffff, bool arg2 = true) const
-- bool StartsWith(const String&, bool arg1 = true) const
-- bool EndsWith(const String&, bool arg1 = true) const
+- uint Find(const String&, uint = 0, bool = true) const
+- uint Find(uint8, uint = 0, bool = true) const
+- uint FindLast(const String&, uint = 0xffffffff, bool = true) const
+- uint FindLast(uint8, uint = 0xffffffff, bool = true) const
+- bool StartsWith(const String&, bool = true) const
+- bool EndsWith(const String&, bool = true) const
 - String Substring(uint) const
 - String Substring(uint, uint) const
 - String ToUpper() const
@@ -624,7 +624,7 @@ Methods:
 - void AppendUTF8(uint)
 - String SubstringUTF8(uint) const
 - String SubstringUTF8(uint, uint) const
-- int Compare(const String&, bool arg1 = true) const
+- int Compare(const String&, bool = true) const
 - bool Contains(const String&) const
 - bool Contains(uint8) const
 - void Clear()
@@ -640,7 +640,7 @@ Methods:
 - Quaternion ToQuaternion() const
 - Vector2 ToVector2() const
 - Vector3 ToVector3() const
-- Vector4 ToVector4(bool arg0 = false) const
+- Vector4 ToVector4(bool = false) const
 - Variant ToVectorVariant() const
 
 Properties:
@@ -1025,7 +1025,7 @@ Methods:
 - Vector3 ClosestPoint(const Ray&) const
 - float HitDistance(const Sphere&) const
 - float HitDistance(const BoundingBox&) const
-- float HitDistance(const Frustum&, bool arg1 = true) const
+- float HitDistance(const Frustum&, bool = true) const
 - float HitDistance(const Vector3&, const Vector3&, const Vector3&) const
 - Ray Transformed(const Matrix3x4&) const
 
@@ -1203,7 +1203,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
 
@@ -1239,7 +1239,7 @@ Methods:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
 
@@ -1259,8 +1259,8 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- void Write(const String&, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void Write(const String&, bool = false)
 - void Debug(const String&)
 - void Info(const String&)
 - void Warning(const String&)
@@ -1360,8 +1360,8 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Open(const String&, FileMode arg1 = FILE_READ)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Open(const String&, FileMode = FILE_READ)
 - void Close()
 - uint Write(uint8[]@)
 - bool WriteInt(int)
@@ -1516,7 +1516,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool FileExists(const String&) const
 - bool DirExists(const String&) const
 - uint GetLastModifiedTime(const String&) const
@@ -1545,7 +1545,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Open(const String&) const
 - bool Exists(const String&) const
 
@@ -1566,7 +1566,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 
@@ -1586,17 +1586,17 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool AddResourceDir(const String&)
-- void AddPackageFile(PackageFile@, bool arg1 = false)
+- void AddPackageFile(PackageFile@, bool = false)
 - bool AddManualResource(Resource@)
 - void RemoveResourceDir(const String&)
-- void RemovePackageFile(PackageFile@, bool arg1 = true, bool arg2 = false)
-- void RemovePackageFile(const String&, bool arg1 = true, bool arg2 = false)
-- void ReleaseResource(const String&, const String&, bool arg2 = false)
-- void ReleaseResources(const String&, bool arg1 = false)
-- void ReleaseResources(const String&, const String&, bool arg2 = false)
-- void ReleaseAllResources(bool arg0 = false)
+- void RemovePackageFile(PackageFile@, bool = true, bool = false)
+- void RemovePackageFile(const String&, bool = true, bool = false)
+- void ReleaseResource(const String&, const String&, bool = false)
+- void ReleaseResources(const String&, bool = false)
+- void ReleaseResources(const String&, const String&, bool = false)
+- void ReleaseAllResources(bool = false)
 - bool ReloadResource(Resource@)
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
@@ -1627,7 +1627,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - void FlipVertical()
@@ -1656,11 +1656,11 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - XMLElement CreateRoot(const String&)
-- XMLElement GetRoot(const String& arg0 = String ( ))
+- XMLElement GetRoot(const String& = String ( ))
 
 Properties:
 
@@ -1682,8 +1682,8 @@ Methods:
 - XMLElement CreateChild(const String&)
 - bool RemoveChild(const XMLElement&)
 - bool RemoveChild(const String&)
-- bool RemoveChildren(const String& arg0 = String ( ))
-- bool RemoveAttribute(const String& arg0 = String ( ))
+- bool RemoveChildren(const String& = String ( ))
+- bool RemoveAttribute(const String& = String ( ))
 - XMLElement SelectSingle(const String&)
 - XMLElement SelectSinglePrepared(const XPathQuery&)
 - XPathResultSet Select(const String&)
@@ -1707,13 +1707,13 @@ Methods:
 - bool SetVector4(const String&, const Vector4&)
 - bool SetVectorVariant(const String&, const Variant&)
 - bool HasAttribute(const String&) const
-- String GetAttribute(const String& arg0 = String ( )) const
+- String GetAttribute(const String& = String ( )) const
 - String GetAttributeLower(const String&) const
 - String GetAttributeUpper(const String&) const
 - String[]@ GetAttributeNames() const
 - bool HasChild(const String&) const
-- XMLElement GetChild(const String& arg0 = String ( )) const
-- XMLElement GetNext(const String& arg0 = String ( )) const
+- XMLElement GetChild(const String& = String ( )) const
+- XMLElement GetNext(const String& = String ( )) const
 - bool GetBool(const String&) const
 - BoundingBox GetBoundingBox() const
 - Color GetColor(const String&) const
@@ -1760,7 +1760,7 @@ Methods:
 - bool SetVariable(const String&, float)
 - bool SetVariable(const String&, const String&)
 - bool SetVariable(const String&, const XPathResultSet&)
-- bool SetQuery(const String&, const String& arg1 = String ( ), bool arg2 = true)
+- bool SetQuery(const String&, const String& = String ( ), bool = true)
 - void Clear()
 - bool EvaluateToBool(XMLElement)
 - float EvaluateToFloat(XMLElement)
@@ -1776,10 +1776,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -1806,10 +1806,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -1843,10 +1843,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -1863,32 +1863,32 @@ Methods:
 - void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
-- void Rotate(const Quaternion&, bool arg1 = false)
-- void Pitch(float, bool arg1 = false)
-- void Yaw(float, bool arg1 = false)
-- void Roll(float, bool arg1 = false)
-- void LookAt(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 1 , 0 ))
+- void Rotate(const Quaternion&, bool = false)
+- void Pitch(float, bool = false)
+- void Yaw(float, bool = false)
+- void Roll(float, bool = false)
+- void LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ))
 - void Scale(float)
 - void Scale(const Vector3&)
-- Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED, uint arg2 = 0)
+- Node@ CreateChild(const String& = "", CreateMode = REPLICATED, uint = 0)
 - void AddChild(Node@)
 - void RemoveChild(Node@)
 - void RemoveAllChildren()
 - void RemoveChildren(bool, bool, bool)
 - void Remove()
-- Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED, uint arg2 = 0)
-- Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED, uint arg2 = 0)
+- Component@ CreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
+- Component@ GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
 - void RemoveComponent(Component@)
 - void RemoveComponent(const String&)
 - void RemoveAllComponents()
 - void RemoveComponents(bool, bool)
-- Node@[]@ GetChildren(bool arg0 = false) const
-- Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
-- Node@[]@ GetChildrenWithScript(bool arg0 = false) const
-- Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
-- Node@ GetChild(const String&, bool arg1 = false) const
+- Node@[]@ GetChildren(bool = false) const
+- Node@[]@ GetChildrenWithComponent(const String&, bool = false) const
+- Node@[]@ GetChildrenWithScript(bool = false) const
+- Node@[]@ GetChildrenWithScript(const String&, bool = false) const
+- Node@ GetChild(const String&, bool = false) const
 - Component@[]@ GetComponents() const
-- Component@[]@ GetComponents(const String&, bool arg1 = false) const
+- Component@[]@ GetComponents(const String&, bool = false) const
 - Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
 - Vector3 LocalToWorld(const Vector3&) const
@@ -1897,9 +1897,9 @@ Methods:
 - Vector3 WorldToLocal(const Vector4&) const
 - void SetEnabled(bool, bool)
 - bool SaveXML(File@)
-- Node@ Clone(CreateMode arg0 = REPLICATED)
-- ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode arg2 = REPLICATED)
-- ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode arg2 = REPLICATED)
+- Node@ Clone(CreateMode = REPLICATED)
+- ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode = REPLICATED)
+- ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode = REPLICATED)
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 
@@ -1944,10 +1944,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -1987,10 +1987,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -2007,32 +2007,32 @@ Methods:
 - void SetWorldTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
-- void Rotate(const Quaternion&, bool arg1 = false)
-- void Pitch(float, bool arg1 = false)
-- void Yaw(float, bool arg1 = false)
-- void Roll(float, bool arg1 = false)
-- void LookAt(const Vector3&, const Vector3& arg1 = Vector3 ( 0 , 1 , 0 ))
+- void Rotate(const Quaternion&, bool = false)
+- void Pitch(float, bool = false)
+- void Yaw(float, bool = false)
+- void Roll(float, bool = false)
+- void LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ))
 - void Scale(float)
 - void Scale(const Vector3&)
-- Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED, uint arg2 = 0)
+- Node@ CreateChild(const String& = "", CreateMode = REPLICATED, uint = 0)
 - void AddChild(Node@)
 - void RemoveChild(Node@)
 - void RemoveAllChildren()
 - void RemoveChildren(bool, bool, bool)
 - void Remove()
-- Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED, uint arg2 = 0)
-- Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED, uint arg2 = 0)
+- Component@ CreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
+- Component@ GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
 - void RemoveComponent(Component@)
 - void RemoveComponent(const String&)
 - void RemoveAllComponents()
 - void RemoveComponents(bool, bool)
-- Node@[]@ GetChildren(bool arg0 = false) const
-- Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
-- Node@[]@ GetChildrenWithScript(bool arg0 = false) const
-- Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
-- Node@ GetChild(const String&, bool arg1 = false) const
+- Node@[]@ GetChildren(bool = false) const
+- Node@[]@ GetChildrenWithComponent(const String&, bool = false) const
+- Node@[]@ GetChildrenWithScript(bool = false) const
+- Node@[]@ GetChildrenWithScript(const String&, bool = false) const
+- Node@ GetChild(const String&, bool = false) const
 - Component@[]@ GetComponents() const
-- Component@[]@ GetComponents(const String&, bool arg1 = false) const
+- Component@[]@ GetComponents(const String&, bool = false) const
 - Component@ GetComponent(const String&) const
 - bool HasComponent(const String&) const
 - Vector3 LocalToWorld(const Vector3&) const
@@ -2044,11 +2044,11 @@ Methods:
 - bool LoadAsync(File@)
 - bool LoadAsyncXML(File@)
 - void StopAsyncLoading()
-- Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
-- Node@ InstantiateXML(File@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
-- Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
-- Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode arg3 = REPLICATED)
-- void Clear(bool arg0 = true, bool arg1 = true)
+- Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateXML(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- void Clear(bool = true, bool = true)
 - void AddRequiredPackageFile(PackageFile@)
 - void ClearRequiredPackageFiles()
 - void RegisterVar(const String&)
@@ -2058,8 +2058,8 @@ Methods:
 - Node@ GetNode(uint)
 - const String& GetVarName(ShortStringHash) const
 - void Update(float)
-- ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode arg2 = REPLICATED)
-- ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode arg2 = REPLICATED)
+- ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode = REPLICATED)
+- ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode = REPLICATED)
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 
@@ -2142,10 +2142,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -2155,13 +2155,13 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - void Remove()
 - void MarkNetworkUpdate() const
-- void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
-- void AddNode(Node@, float arg1 = 1.0, bool arg2 = true)
-- void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
-- void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
-- void AddPolyhedron(const Polyhedron&, const Color&, bool arg2 = true)
-- void AddSphere(const Sphere&, const Color&, bool arg2 = true)
-- void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
+- void AddLine(const Vector3&, const Vector3&, const Color&, bool = true)
+- void AddNode(Node@, float = 1.0, bool = true)
+- void AddBoundingBox(const BoundingBox&, const Color&, bool = true)
+- void AddFrustum(const Frustum&, const Color&, bool = true)
+- void AddPolyhedron(const Polyhedron&, const Color&, bool = true)
+- void AddSphere(const Sphere&, const Color&, bool = true)
+- void AddSkeleton(Skeleton@, const Color&, bool = true)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:
@@ -2186,10 +2186,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -2325,7 +2325,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - void SetNumLevels(uint)
@@ -2362,7 +2362,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetRenderPath(XMLFile@)
 
 Properties:
@@ -2401,13 +2401,13 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - void SetNumLevels(uint)
 - void ClearDataLost()
-- bool SetSize(int, int, uint, TextureUsage arg3 = TEXTURE_STATIC)
-- bool Load(Image@, bool arg1 = false)
+- bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
+- bool Load(Image@, bool = false)
 
 Properties:
 
@@ -2441,13 +2441,13 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - void SetNumLevels(uint)
 - void ClearDataLost()
-- bool SetSize(int, uint, TextureUsage arg2 = TEXTURE_STATIC)
-- bool Load(CubeMapFace, Image@, bool arg2 = false)
+- bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC)
+- bool Load(CubeMapFace, Image@, bool = false)
 
 Properties:
 
@@ -2504,7 +2504,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - Pass@ CreatePass(StringHash)
@@ -2538,17 +2538,17 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - bool Load(const XMLElement&)
 - bool Save(XMLElement&) const
-- void SetTechnique(uint, Technique@, uint arg2 = 0, float arg3 = 0.0)
+- void SetTechnique(uint, Technique@, uint = 0, float = 0.0)
 - void SetUVTransform(const Vector2&, float, const Vector2&)
 - void SetUVTransform(const Vector2&, float, float)
 - void RemoveShaderParameter(const String&)
 - void SortTechniques()
-- Material@ Clone(const String& arg0 = String ( )) const
+- Material@ Clone(const String& = String ( )) const
 
 Properties:
 
@@ -2576,7 +2576,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 
@@ -2609,7 +2609,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - void AddTrigger(float, bool, const Variant&)
@@ -2637,10 +2637,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -2711,10 +2711,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -2780,10 +2780,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -2841,10 +2841,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -2899,10 +2899,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -2961,10 +2961,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3048,10 +3048,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3123,10 +3123,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3137,11 +3137,11 @@ Methods:
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- bool Play(const String&, uint8, bool, float arg3 = 0.0f)
-- bool PlayExclusive(const String&, uint8, bool, float arg3 = 0.0f)
-- void Stop(const String&, float arg1 = 0.0f)
-- void StopLayer(uint8, float arg1 = 0.0f)
-- void StopAll(float arg0 = 0.0f)
+- bool Play(const String&, uint8, bool, float = 0.0f)
+- bool PlayExclusive(const String&, uint8, bool, float = 0.0f)
+- void Stop(const String&, float = 0.0f)
+- void StopLayer(uint8, float = 0.0f)
+- void StopAll(float = 0.0f)
 - bool Fade(const String&, float, float)
 - bool FadeOthers(const String&, float, float)
 - bool SetLayer(const String&, uint8)
@@ -3198,10 +3198,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3274,10 +3274,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3369,10 +3369,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3432,10 +3432,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3446,7 +3446,7 @@ Methods:
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float arg8 = 0.0, float arg9 = 0.1, uint arg10 = 0xffffffff)
+- bool AddDecal(Drawable@, const Vector3&, const Quaternion&, float, float, float, const Vector2&, const Vector2&, float = 0.0, float = 0.1, uint = 0xffffffff)
 - void RemoveDecals(uint)
 - void RemoveAllDecals()
 
@@ -3493,10 +3493,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3544,10 +3544,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3613,10 +3613,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3631,12 +3631,12 @@ Methods:
 - void DrawDebugGeometry(bool) const
 - void AddManualDrawable(Drawable@)
 - void RemoveManualDrawable(Drawable@)
-- RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK) const
-- RayQueryResult RaycastSingle(const Ray&, RayQueryLevel arg1 = RAY_TRIANGLE, float arg2 = M_INFINITY, uint8 arg3 = DRAWABLE_ANY, uint arg4 = DEFAULT_VIEWMASK) const
-- Node@[]@ GetDrawables(const Vector3&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
-- Node@[]@ GetDrawables(const BoundingBox&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
-- Node@[]@ GetDrawables(const Frustum&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
-- Node@[]@ GetDrawables(const Sphere&, uint8 arg1 = DRAWABLE_ANY, uint arg2 = DEFAULT_VIEWMASK)
+- RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
+- RayQueryResult RaycastSingle(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
+- Node@[]@ GetDrawables(const Vector3&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
+- Node@[]@ GetDrawables(const BoundingBox&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
+- Node@[]@ GetDrawables(const Frustum&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
+- Node@[]@ GetDrawables(const Sphere&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 
 Properties:
 
@@ -3662,7 +3662,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int, bool, bool, bool, bool, int)
 - bool SetMode(int, int)
 - bool ToggleFullscreen()
@@ -3705,7 +3705,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void DrawDebugGeometry(bool) const
 - void ReloadShaders() const
 - void SetDefaultRenderPath(XMLFile@)
@@ -3776,7 +3776,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool OpenJoystick(uint)
 - void CloseJoystick(uint)
 - bool DetectJoysticks()
@@ -3815,7 +3815,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 
@@ -3842,10 +3842,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3879,10 +3879,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3930,10 +3930,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -3985,8 +3985,8 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- void SetMode(int, int, bool, bool arg3 = true)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetMode(int, int, bool, bool = true)
 - bool Play()
 - void Stop()
 
@@ -4011,11 +4011,11 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
-- bool SaveXML(File@, int, bool arg2 = false)
-- bool SaveXML(const String&, int, bool arg2 = false)
+- bool SaveXML(File@, int, bool = false)
+- bool SaveXML(const String&, int, bool = false)
 
 Properties:
 
@@ -4033,10 +4033,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -4044,15 +4044,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4061,23 +4061,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4158,10 +4158,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -4169,15 +4169,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4186,23 +4186,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4291,10 +4291,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -4302,15 +4302,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
@@ -4319,18 +4319,18 @@ Methods:
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - void SetPosition(float, float)
@@ -4390,10 +4390,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -4401,15 +4401,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4418,23 +4418,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4531,10 +4531,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -4542,15 +4542,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4559,23 +4559,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4667,10 +4667,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -4678,15 +4678,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4695,23 +4695,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4803,10 +4803,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -4814,15 +4814,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4831,23 +4831,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -4942,10 +4942,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -4953,15 +4953,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -4970,23 +4970,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -5079,10 +5079,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -5090,15 +5090,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5107,23 +5107,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -5214,10 +5214,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -5225,15 +5225,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5242,23 +5242,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -5268,8 +5268,8 @@ Methods:
 - void SetViewPosition(int, int)
 - void SetScrollBarsVisible(bool, bool)
 - void AddItem(UIElement@)
-- void InsertItem(uint, UIElement@, UIElement@ arg2 = null)
-- void RemoveItem(UIElement@, uint arg1 = 0)
+- void InsertItem(uint, UIElement@, UIElement@ = null)
+- void RemoveItem(UIElement@, uint = 0)
 - void RemoveItem(uint)
 - void RemoveAllItems()
 - void AddSelection(uint)
@@ -5278,8 +5278,8 @@ Methods:
 - void ChangeSelection(int, bool)
 - void SetSelections(uint[]@)
 - void ClearSelection()
-- void Expand(uint, bool, bool arg2 = false)
-- void ToggleExpand(uint, bool arg1 = false)
+- void Expand(uint, bool, bool = false)
+- void ToggleExpand(uint, bool = false)
 - bool IsSelected(uint) const
 - bool IsExpanded(uint) const
 - UIElement@[]@ GetItems() const
@@ -5377,10 +5377,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -5388,15 +5388,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5405,23 +5405,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -5430,7 +5430,7 @@ Methods:
 - bool IsInsideCombined(IntVector2, bool)
 - bool SetFont(const String&, int)
 - bool SetFont(Font@, int)
-- void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)
+- void SetSelection(uint, uint = M_MAX_UNSIGNED)
 - void ClearSelection()
 
 Properties:
@@ -5520,10 +5520,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -5593,10 +5593,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -5604,15 +5604,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5621,23 +5621,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -5736,10 +5736,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -5747,15 +5747,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5764,23 +5764,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -5884,10 +5884,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -5895,15 +5895,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -5912,23 +5912,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -6044,10 +6044,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6055,15 +6055,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -6072,23 +6072,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -6178,10 +6178,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6189,15 +6189,15 @@ Methods:
 - void RemoveInstanceDefault()
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool LoadXML(const XMLElement&, XMLFile@, bool arg2 = false)
+- bool LoadXML(const XMLElement&, XMLFile@, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(XMLFile@, XMLFile@)
-- bool LoadChildXML(const XMLElement&, XMLFile@ arg1 = null, bool arg2 = false)
-- bool LoadChildXML(XMLFile@, XMLFile@ arg1 = null)
+- bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool SaveXML(File@)
 - bool SetStyle(const XMLElement&)
-- bool SetStyle(const String&, XMLFile@ arg1 = null)
-- bool SetStyleAuto(XMLFile@ arg0 = null)
+- bool SetStyle(const String&, XMLFile@ = null)
+- bool SetStyleAuto(XMLFile@ = null)
 - void SetPosition(int, int)
 - void SetSize(int, int)
 - void SetMinSize(int, int)
@@ -6206,23 +6206,23 @@ Methods:
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
-- void SetLayout(LayoutMode, int arg1 = 0, const IntRect& arg2 = IntRect ( 0 , 0 , 0 , 0 ))
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void UpdateLayout()
 - void DisableLayoutUpdate()
 - void EnableLayoutUpdate()
 - void BringToFront()
-- UIElement@ CreateChild(const String&, const String& arg1 = String ( ), uint arg2 = M_MAX_UNSIGNED)
+- UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
 - void AddChild(UIElement@)
 - void InsertChild(uint, UIElement@)
-- void RemoveChild(UIElement@, uint arg1 = 0)
+- void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveAllChildren()
 - void Remove()
 - uint FindChild(UIElement@) const
-- void SetParent(UIElement@, uint arg1 = M_MAX_UNSIGNED)
-- UIElement@ GetChild(const String&, bool arg1 = false) const
-- UIElement@ GetChild(const ShortStringHash&, const Variant& arg1 = Variant ( ), bool arg2 = false) const
-- UIElement@[]@ GetChildren(bool arg0 = false) const
+- void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
+- UIElement@ GetChild(const String&, bool = false) const
+- UIElement@ GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const
+- UIElement@[]@ GetChildren(bool = false) const
 - UIElement@ GetElementEventSender() const
 - const Variant& GetVar(const ShortStringHash&)
 - IntVector2 ScreenToElement(const IntVector2&)
@@ -6320,7 +6320,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetButtonTexts(const String&, const String&)
 - void SetFilters(String[]@, uint)
 - void UpdateElements()
@@ -6353,7 +6353,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void Clear()
 - void DebugDraw(UIElement@)
 - UIElement@ LoadLayout(File@)
@@ -6361,8 +6361,8 @@ Methods:
 - UIElement@ LoadLayout(XMLFile@)
 - UIElement@ LoadLayout(XMLFile@, XMLFile@)
 - bool SaveLayout(File@, UIElement@)
-- UIElement@ GetElementAt(const IntVector2&, bool arg1 = true)
-- UIElement@ GetElementAt(int, int, bool arg2 = true)
+- UIElement@ GetElementAt(const IntVector2&, bool = true)
+- UIElement@ GetElementAt(int, int, bool = true)
 - bool HasModalElement() const
 
 Properties:
@@ -6404,10 +6404,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6445,11 +6445,11 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- void SendMessage(int, bool, bool, const VectorBuffer&, uint arg4 = 0)
-- void SendRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
-- void SendRemoteEvent(Node@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
-- void Disconnect(int arg0 = 0)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SendMessage(int, bool, bool, const VectorBuffer&, uint = 0)
+- void SendRemoteEvent(const String&, bool, const VariantMap& = VariantMap ( ))
+- void SendRemoteEvent(Node@, const String&, bool, const VariantMap& = VariantMap ( ))
+- void Disconnect(int = 0)
 - String ToString() const
 
 Properties:
@@ -6527,20 +6527,20 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Connect(const String&, uint16, Scene@, const VariantMap& arg3 = VariantMap ( ))
-- void Disconnect(int arg0 = 0)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Connect(const String&, uint16, Scene@, const VariantMap& = VariantMap ( ))
+- void Disconnect(int = 0)
 - bool StartServer(uint16)
 - void StopServer()
-- void BroadcastMessage(int, bool, bool, const VectorBuffer&, uint arg4 = 0)
-- void BroadcastRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
-- void BroadcastRemoteEvent(Scene@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
-- void BroadcastRemoteEvent(Node@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
+- void BroadcastMessage(int, bool, bool, const VectorBuffer&, uint = 0)
+- void BroadcastRemoteEvent(const String&, bool, const VariantMap& = VariantMap ( ))
+- void BroadcastRemoteEvent(Scene@, const String&, bool, const VariantMap& = VariantMap ( ))
+- void BroadcastRemoteEvent(Node@, const String&, bool, const VariantMap& = VariantMap ( ))
 - void RegisterRemoteEvent(const String&) const
 - void UnregisterRemoteEvent(const String&) const
 - void UnregisterAllRemoteEvents()
 - bool CheckRemoteEvent(const String&) const
-- HttpRequest@ MakeHttpRequest(const String&, const String& arg1 = String ( ), String[]@ arg2 = null, const String& arg3 = String ( ))
+- HttpRequest@ MakeHttpRequest(const String&, const String& = String ( ), String[]@ = null, const String& = String ( ))
 
 Properties:
 
@@ -6560,10 +6560,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6574,15 +6574,15 @@ Methods:
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
-- void SetBox(const Vector3&, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
-- void SetSphere(float, const Vector3& arg1 = Vector3 ( ), const Quaternion& arg2 = Quaternion ( ))
-- void SetStaticPlane(const Vector3& arg0 = Vector3 ( ), const Quaternion& arg1 = Quaternion ( ))
-- void SetCylinder(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
-- void SetCapsule(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
-- void SetCone(float, float, const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
-- void SetTriangleMesh(Model@, uint arg1 = 0, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
-- void SetConvexHull(Model@, uint arg1 = 0, const Vector3& arg2 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg3 = Vector3 ( ), const Quaternion& arg4 = Quaternion ( ))
-- void SetCustomConvexHull(CustomGeometry@, const Vector3& arg1 = Vector3 ( 1 , 1 , 1 ), const Vector3& arg2 = Vector3 ( ), const Quaternion& arg3 = Quaternion ( ))
+- void SetBox(const Vector3&, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
+- void SetSphere(float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
+- void SetStaticPlane(const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
+- void SetCylinder(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
+- void SetCapsule(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
+- void SetCone(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
+- void SetTriangleMesh(Model@, uint = 0, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
+- void SetConvexHull(Model@, uint = 0, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
+- void SetCustomConvexHull(CustomGeometry@, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ))
 - void SetTerrain()
 - void SetTransform(const Vector3&, const Quaternion&)
 
@@ -6616,10 +6616,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6692,10 +6692,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6754,10 +6754,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6770,11 +6770,11 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void Update(float)
 - void UpdateCollisions()
-- PhysicsRaycastResult[]@ Raycast(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
-- PhysicsRaycastResult RaycastSingle(const Ray&, float arg1 = M_INFINITY, uint arg2 = 0xffff)
-- PhysicsRaycastResult SphereCast(const Ray&, float, float arg2 = M_INFINITY, uint arg3 = 0xffff)
-- RigidBody@[]@ GetRigidBodies(const Sphere&, uint arg1 = 0xffff)
-- RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint arg1 = 0xffff)
+- PhysicsRaycastResult[]@ Raycast(const Ray&, float = M_INFINITY, uint = 0xffff)
+- PhysicsRaycastResult RaycastSingle(const Ray&, float = M_INFINITY, uint = 0xffff)
+- PhysicsRaycastResult SphereCast(const Ray&, float, float = M_INFINITY, uint = 0xffff)
+- RigidBody@[]@ GetRigidBodies(const Sphere&, uint = 0xffff)
+- RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - void DrawDebugGeometry(bool)
 
@@ -6806,10 +6806,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6844,10 +6844,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6860,11 +6860,11 @@ Methods:
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - bool Build()
 - bool Build(const BoundingBox&)
-- Vector3[]@ FindPath(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- Vector3[]@ FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - Vector3 GetRandomPoint()
-- Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
-- float GetDistanceToWall(const Vector3&, float, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
-- Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& arg2 = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void DrawDebugGeometry(bool)
 
 Properties:
@@ -6907,10 +6907,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6947,7 +6947,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
 - bool Execute(const String&, const Variant[]@)
@@ -6972,10 +6972,10 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
-- bool Load(File@, bool arg1 = false)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
 - bool Save(File@) const
-- bool LoadXML(const XMLElement&, bool arg1 = false)
+- bool LoadXML(const XMLElement&, bool = false)
 - bool SaveXML(XMLElement&) const
 - void ApplyAttributes()
 - bool SetAttribute(const String&, const Variant&)
@@ -6991,7 +6991,7 @@ Methods:
 - bool Execute(const String&)
 - void DelayedExecute(float, bool, const String&, const Variant[]@)
 - void DelayedExecute(float, bool, const String&)
-- void ClearDelayedExecute(const String& arg0 = String ( ))
+- void ClearDelayedExecute(const String& = String ( ))
 
 Properties:
 
@@ -7019,7 +7019,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Execute(const String&)
 - void DumpAPI()
 
@@ -7038,7 +7038,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void Toggle()
 - void UpdateElements()
 
@@ -7063,7 +7063,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void Toggle(uint)
 - void ToggleAll()
 - void SetAppStats(const String&, const Variant&)
@@ -7092,7 +7092,7 @@ Properties:
 
 Methods:
 
-- void SendEvent(const String&, VariantMap& arg1 = VariantMap ( ))
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void RunFrame()
 - void Exit()
 - void DumpProfiler()

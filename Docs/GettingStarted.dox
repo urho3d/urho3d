@@ -125,6 +125,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |---------------------------------------------|---------------------|
 |-DENABLE_64BIT=1                             |to enable 64bit build|
 |-DENABLE_LUA=1                               |to enable additional Lua scripting support|
+|-DENABLE_LUA_JIT=1                           |to enable Lua Just-in-time compilation|
 |-DENABLE_SAMPLES=1                           |to build the C++ sample applications|
 |-DENABLE_TOOLS=1                             |to build the tools (only useful for Raspberry Pi build because this option is already enabled by default for other Desktop platforms)|
 |-DENABLE_SSE=0                               |to disable SSE instruction set|

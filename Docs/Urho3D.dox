@@ -97,6 +97,7 @@ Urho3D uses the following third-party libraries:
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
 - Lua 5.1 (http://www.lua.org)
+- LuaJIT 2.0.2 (http://www.luajit.org)
 - MojoShader (http://icculus.org/mojoshader/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)

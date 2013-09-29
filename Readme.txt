@@ -67,6 +67,7 @@ Urho3D uses the following third-party libraries:
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.0 (http://libcpuid.sourceforge.net/)
 - Lua 5.1 (http://www.lua.org)
+- LuaJIT 2.0.2 (http://www.luajit.org)
 - MojoShader (http://icculus.org/mojoshader/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.0 (http://pugixml.org/)
@@ -356,6 +357,7 @@ cmake_xxxx batch files or shell scripts.
 |----------------------|-------------------------------------------------------|
 |-DENABLE_64BIT=1      |to enable 64bit build                                  |
 |-DENABLE_LUA=1        |to enable additional Lua scripting support             |
+|-DENABLE_LUA_JIT=1    |to enable Lua Just-in-time compilation                 |
 |-DENABLE_SAMPLES=1    |to build the C++ sample applications                   |
 |-DENABLE_TOOLS=1      |to build the tools (only useful for Raspberry Pi build |
 |                      | because this option is already enabled by default for |
