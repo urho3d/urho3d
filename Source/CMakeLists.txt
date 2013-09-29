@@ -60,6 +60,11 @@ if (URHO3D_BUILD_TYPE STREQUAL SHARED)
     set (CMAKE_POSITION_INDEPENDENT_CODE true)
 endif ()
 
+# Enable Lua JIT
+if (ENABLE_LUA_JIT)
+    add_definitions (-DENABLE_LUA_JIT)
+endif ()
+
 # Add targets
 add_subdirectory (Engine/Audio)
 add_subdirectory (Engine/Container)
@@ -94,6 +99,11 @@ if (ENABLE_LUA)
     add_definitions (-DENABLE_LUA)
     add_subdirectory (ThirdParty/Lua)
     add_subdirectory (ThirdParty/tolua++/src/lib)
+    if (ENABLE_LUA_JIT)
+        add_subdirectory (ThirdParty/LuaJIT)
+        add_subdirectory (ThirdParty/LuaJIT/src/host/minilua)
+        add_subdirectory (ThirdParty/LuaJIT/src/host/buildvm)
+    endif ()
     add_subdirectory (Extras/LuaScript)
 endif ()
 

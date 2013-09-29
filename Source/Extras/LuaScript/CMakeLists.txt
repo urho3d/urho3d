@@ -54,7 +54,12 @@ set (SOURCE_FILES ${SOURCE_FILES} ${GEN_CPP_FILES})
 
 # Define dependency libs
 set (LIBS ../../Engine/Audio ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Engine/Graphics ../../Engine/Input ../../Engine/IO ../../Engine/Math ../../Engine/Navigation ../../Engine/Network
-    ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI ../../ThirdParty/Lua/src)
+    ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI)
+if (ENABLE_LUA_JIT)
+    set (LIBS ${LIBS} ../../ThirdParty/LuaJIT/src)
+else ()
+    set (LIBS ${LIBS} ../../ThirdParty/Lua/src)
+endif ()
 set (LINK_LIBS_ONLY tolua++_static)
 set (INCLUDE_DIRS_ONLY . ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
 

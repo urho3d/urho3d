@@ -108,7 +108,9 @@ void InitFPU()
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
     #ifdef _MSC_VER
+    #ifndef ENABLE_LUA_JIT
     _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
+    #endif
     #else
     unsigned control = GetFPUState();
     control &= ~(FPU_CW_PREC_MASK | FPU_CW_ROUND_MASK);

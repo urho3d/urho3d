@@ -86,6 +86,8 @@ private:
     /// Push script function.
     bool PushScriptFunction(const String& functionName, bool silentIfNotfound = false);
     
+    /// At panic.
+    static int AtPanic(lua_State* L);
     /// Loader.
     static int Loader(lua_State* L);
     /// Print function.

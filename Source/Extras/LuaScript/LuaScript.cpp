@@ -80,6 +80,8 @@ LuaScript::LuaScript(Context* context) :
         return;
     }
 
+    lua_atpanic(luaState_, &LuaScript::AtPanic);
+
     luaL_openlibs(luaState_);
     RegisterLoader();
     ReplacePrint();
@@ -254,6 +256,14 @@ void LuaScript::RegisterLoader()
     lua_pushcfunction(luaState_, &LuaScript::Loader);
     lua_settable(luaState_, -3);
     lua_pop(luaState_, 2);
+}
+
+int LuaScript::AtPanic(lua_State* L)
+{
+    String errorMessage = luaL_checkstring(L, -1);
+    LOGERROR("Lua error: Error message = '" + errorMessage + "'");
+    lua_pop(L, 1);
+    return 0;
 }
 
 int LuaScript::Loader(lua_State* L)
