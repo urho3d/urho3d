@@ -120,6 +120,8 @@ void LuaFunction::PushFloat(float value)
 
 void LuaFunction::PushString(const String& string)
 {
+    ++numArguments_;
+
     tolua_pushurho3dstring(luaState_, string);
 }
 
