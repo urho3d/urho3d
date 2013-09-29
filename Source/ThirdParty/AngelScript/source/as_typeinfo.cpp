@@ -40,6 +40,7 @@
 #ifndef AS_NO_COMPILER
 
 #include "as_typeinfo.h"
+#include "as_scriptengine.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -52,6 +53,7 @@ asCTypeInfo::asCTypeInfo()
 	isExplicitHandle      = false;
 	qwordValue            = 0;
 	isLValue              = false;
+	isVoidExpression      = false;
 }
 
 void asCTypeInfo::Set(const asCDataType &dt)
@@ -65,6 +67,7 @@ void asCTypeInfo::Set(const asCDataType &dt)
 	isExplicitHandle = false;
 	qwordValue       = 0;
 	isLValue         = false;
+	isVoidExpression = false;
 }
 
 void asCTypeInfo::SetVariable(const asCDataType &dt, int stackOffset, bool isTemporary)
@@ -116,12 +119,49 @@ void asCTypeInfo::SetConstantD(const asCDataType &dt, double value)
 	doubleValue = value;
 }
 
+void asCTypeInfo::SetUndefinedFuncHandle(asCScriptEngine *engine)
+{
+	// This is used for when the expression evaluates to a 
+	// function, but it is not yet known exactly which. The
+	// owner expression will hold the name of the function
+	// to determine the exact function when the signature is
+	// known.
+	Set(asCDataType::CreateObjectHandle(&engine->functionBehaviours, true));
+	isConstant       = true;
+	isExplicitHandle = false;
+	qwordValue       = 1; // Set to a different value than 0 to differentiate from null constant
+	isLValue         = false;
+}
+
 void asCTypeInfo::SetNullConstant()
 {
 	Set(asCDataType::CreateNullHandle());
 	isConstant       = true;
-	isExplicitHandle = true;
+	isExplicitHandle = false;
 	qwordValue       = 0;
+	isLValue         = false;
+}
+
+bool asCTypeInfo::IsNullConstant() const
+{
+	// We can't check the actual object type, because the null constant may have been cast to another type
+	if( isConstant && dataType.IsObjectHandle() && qwordValue == 0 )
+		return true;
+
+	return false;
+}
+
+void asCTypeInfo::SetVoidExpression()
+{
+	Set(asCDataType::CreatePrimitive(ttVoid, false));
+	isLValue = false;
+	isConstant = false;
+	isVoidExpression = true;
+}
+
+bool asCTypeInfo::IsVoidExpression() const
+{
+	return isVoidExpression;
 }
 
 void asCTypeInfo::SetDummy()
@@ -129,13 +169,6 @@ void asCTypeInfo::SetDummy()
 	SetConstantQW(asCDataType::CreatePrimitive(ttInt, true), 0);
 }
 
-bool asCTypeInfo::IsNullConstant()
-{
-	if( isConstant && dataType.IsObjectHandle() )
-		return true;
-
-	return false;
-}
 
 END_AS_NAMESPACE
 

@@ -28,7 +28,6 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Oorni for Urho3D
 
 //
 // as_config.h
@@ -39,9 +38,7 @@
 #ifndef AS_CONFIG_H
 #define AS_CONFIG_H
 
-// Urho3D: thread support or atomic operations are not needed, as SDL is not thread-safe in any case
-#define AS_NO_THREADS
-#define AS_NO_ATOMIC
+
 
 //
 // Features

@@ -84,6 +84,7 @@
 #define TXT_EXPECTED_DATA_TYPE            "Expected data type"
 #define TXT_EXPECTED_EXPRESSION_VALUE     "Expected expression value"
 #define TXT_EXPECTED_IDENTIFIER           "Expected identifier"
+#define TXT_EXPECTED_LIST                 "Expected a list enclosed by { } to match pattern"
 #define TXT_EXPECTED_METHOD_OR_PROPERTY   "Expected method or property"
 #define TXT_EXPECTED_ONE_OF               "Expected one of: "
 #define TXT_EXPECTED_OPERATOR             "Expected operator"
@@ -97,7 +98,7 @@
 #define TXT_FAILED_TO_COMPILE_DEF_ARG_d_IN_FUNC_s "Failed while compiling default arg for parameter %d in function '%s'"
 #define TXT_FAILED_TO_CREATE_TEMP_OBJ     "Previous error occurred while attempting to create a temporary copy of object"
 #define TXT_FOUND_MULTIPLE_ENUM_VALUES    "Found multiple matching enum values"
-#define TXT_FUNCTION_ALREADY_EXIST        "A function with the same name and parameters already exist"
+#define TXT_FUNCTION_ALREADY_EXIST        "A function with the same name and parameters already exists"
 #define TXT_FUNCTION_s_NOT_FOUND          "Function '%s' not found"
 
 #define TXT_GET_SET_ACCESSOR_TYPE_MISMATCH_FOR_s "The property '%s' has mismatching types for the get and set accessors"
@@ -169,6 +170,7 @@
 #define TXT_NONTERMINATED_STRING                   "Non-terminated string literal"
 #define TXT_NOT_A_FUNC_s_IS_VAR                    "Expression doesn't form a function call. '%s' is a variable of a non-function type"
 #define TXT_NOT_ALL_PATHS_RETURN                   "Not all paths return a value"
+#define TXT_NOT_ENOUGH_VALUES_FOR_LIST             "Not enough values to match pattern"
 #define TXT_s_NOT_DECLARED                         "'%s' is not declared"
 #define TXT_NOT_EXACT                              "Implicit conversion of value is not exact"
 #define TXT_s_NOT_INITIALIZED                      "'%s' is not initialized."
@@ -219,6 +221,7 @@
 #define TXT_TMPL_s_EXPECTS_d_SUBTYPES          "Template '%s' expects %d sub type(s)"
 #define TXT_TMPL_SUBTYPE_MUST_NOT_BE_READ_ONLY "Template subtype must not be read-only"
 #define TXT_TOO_MANY_JUMP_LABELS               "The function has too many jump labels to handle. Split the function into smaller ones."
+#define TXT_TOO_MANY_VALUES_FOR_LIST           "Too many values to match pattern"
 #define TXT_TYPE_s_NOT_AVAILABLE_FOR_MODULE    "Type '%s' is not available for this module"
 
 #define TXT_UNEXPECTED_END_OF_FILE        "Unexpected end of file"
@@ -230,6 +233,7 @@
 #define TXT_UNUSED_SCRIPT_NODE            "Unused script node"
 
 #define TXT_VALUE_TOO_LARGE_FOR_TYPE      "Value is too large for data type"
+#define TXT_VOID_CANT_BE_OPERAND          "Void cannot be an operand in expressions"
 
 #define TXT_WARNINGS_TREATED_AS_ERROR     "Warnings are treated as errors by the application"
 #define TXT_WHILE_PARSING_ARG_LIST        "While parsing argument list"
@@ -247,6 +251,7 @@
 // Engine message
 
 #define TXT_AUTOHANDLE_CANNOT_BE_USED_FOR_NOCOUNT     "Autohandles cannot be used with types that have been registered with NOCOUNT"
+#define TXT_FIRST_PARAM_MUST_BE_REF_FOR_TEMPLATE_FACTORY "First parameter to template factory must be a reference. This will be used to pass the object type of the template"
 #define TXT_INVALID_CONFIGURATION                     "Invalid configuration. Verify the registered application interface."
 #define TXT_VALUE_TYPE_MUST_HAVE_SIZE                 "A value type must be registered with a non-zero size"
 #define TXT_TYPE_s_IS_MISSING_BEHAVIOURS              "Type '%s' is missing behaviours"
@@ -266,6 +271,8 @@
 #define TXT_OBJECT_TYPE_s_DOESNT_EXIST                "Object type '%s' doesn't exist"
 #define TXT_TEMPLATE_TYPE_s_DOESNT_EXIST              "Template type '%s' doesn't exist"
 #define TXT_TEMPLATE_SUBTYPE_s_DOESNT_EXIST           "Template subtype '%s' doesn't exist"
+#define TXT_TEMPLATE_LIST_FACTORY_EXPECTS_2_REF_PARAMS "Template list factory expects two reference parameters. The last is the pointer to the initialization buffer"
+#define TXT_LIST_FACTORY_EXPECTS_1_REF_PARAM          "List factory expects only one reference parameter. The pointer to the initialization buffer will be passed in this parameter"
 #define TXT_FAILED_READ_SUBTYPE_OF_TEMPLATE_s         "Failed to read subtype of template type '%s'"
 #define TXT_INSTANCING_INVLD_TMPL_TYPE_s_s            "Attempting to instanciate invalid template type '%s<%s>'"
 #define TXT_FAILED_IN_FUNC_s_d                        "Failed in call to function '%s' (Code: %d)"

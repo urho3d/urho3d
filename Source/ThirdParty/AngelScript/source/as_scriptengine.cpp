@@ -1042,7 +1042,7 @@ int asCScriptEngine::ClearUnusedTypes()
 	// Build a list of all types to check for
 	asCArray<asCObjectType*> types;
 	types = classTypes;
-	types.Concatenate(templateInstanceTypes);
+	types.Concatenate(generatedTemplateTypes);
 
 	// Go through all modules
 	asUINT n;
@@ -1143,6 +1143,17 @@ int asCScriptEngine::ClearUnusedTypes()
 
 		if( didClearTemplateInstanceType == false )
 			break;
+	}
+
+	// Clear the list pattern types that are no longer used
+	for( n = 0; n < listPatternTypes.GetLength(); n++ )
+	{
+		if( listPatternTypes[n]->refCount.get() == 0 )
+		{
+			asDELETE(listPatternTypes[n], asCObjectType);
+			listPatternTypes.RemoveIndexUnordered(n);
+			n--;
+		}
 	}
 
 	return clearCount;
@@ -1637,10 +1648,10 @@ int asCScriptEngine::RegisterObjectType(const char *name, int byteSize, asDWORD 
 				return asALREADY_REGISTERED;
 		}
 
-		// Verify the most recently created template instance type
+		// Keep the most recent template generated instance type, so we know what it was before parsing the datatype
 		asCObjectType *mostRecentTemplateInstanceType = 0;
-		if( templateInstanceTypes.GetLength() )
-			mostRecentTemplateInstanceType = templateInstanceTypes[templateInstanceTypes.GetLength()-1];
+		if( generatedTemplateTypes.GetLength() )
+			mostRecentTemplateInstanceType = generatedTemplateTypes[generatedTemplateTypes.GetLength()-1];
 
 		// Use builder to parse the datatype
 		asCDataType dt;
@@ -1697,10 +1708,16 @@ int asCScriptEngine::RegisterObjectType(const char *name, int byteSize, asDWORD 
 				return ConfigError(asINVALID_TYPE, "RegisterObjectType", name, 0);
 
 			// Was the template instance type created before?
-			if( templateInstanceTypes[templateInstanceTypes.GetLength()-1] == mostRecentTemplateInstanceType ||
+			if( (generatedTemplateTypes.GetLength() &&
+				 generatedTemplateTypes[generatedTemplateTypes.GetLength()-1] == mostRecentTemplateInstanceType) ||
 				mostRecentTemplateInstanceType == dt.GetObjectType() )
 				// TODO: Should have a better error message
 				return ConfigError(asNOT_SUPPORTED, "RegisterObjectType", name, 0);
+
+			// If this is not a template instance type, then it means it is an  
+			// already registered template specialization
+			if( !generatedTemplateTypes.Exists(dt.GetObjectType()) )
+				return ConfigError(asALREADY_REGISTERED, "RegisterObjectType", name, 0);
 
 			// TODO: Add this again. The type is used by the factory stubs so we need to discount that
 			// Is the template instance type already being used?
@@ -1807,10 +1824,15 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 	// Verify function declaration
 	asCScriptFunction func(this, 0, asFUNC_DUMMY);
 
+	asCScriptNode *listPattern = 0;
 	asCBuilder bld(this, 0);
-	int r = bld.ParseFunctionDeclaration(objectType, decl, &func, true, &internal.paramAutoHandles, &internal.returnAutoHandle);
+	int r = bld.ParseFunctionDeclaration(objectType, decl, &func, true, &internal.paramAutoHandles, &internal.returnAutoHandle, 0, behaviour == asBEHAVE_LIST_FACTORY ? &listPattern : 0);
 	if( r < 0 )
+	{
+		if( listPattern )
+			listPattern->Destroy(this);
 		return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+	}
 	func.name.Format("_beh_%d_", behaviour);
 
 	if( behaviour != asBEHAVE_FACTORY && behaviour != asBEHAVE_LIST_FACTORY )
@@ -1923,13 +1945,19 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 		// Must be a ref type and must not have asOBJ_NOHANDLE
 		if( !(objectType->flags & asOBJ_REF) || (objectType->flags & asOBJ_NOHANDLE) )
 		{
+			if( listPattern )
+				listPattern->Destroy(this);
 			WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_ILLEGAL_BEHAVIOUR_FOR_TYPE);
 			return ConfigError(asILLEGAL_BEHAVIOUR_FOR_TYPE, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
 		}
 
 		// Verify that the return type is a handle to the type
 		if( func.returnType != asCDataType::CreateObjectHandle(objectType, false) )
+		{
+			if( listPattern )
+				listPattern->Destroy(this);
 			return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+		}
 
 		// TODO: Add support for implicit factories
 
@@ -1940,8 +1968,10 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 			(func.parameterTypes.GetLength() == 0 ||
 			 !func.parameterTypes[0].IsReference()) )
 		{
-			// TODO: Give proper error message that explain that the first parameter is expected to be a reference
-			//       The library should try to avoid having to read the manual as much as possible.
+			if( listPattern )
+				listPattern->Destroy(this);
+
+			WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_FIRST_PARAM_MUST_BE_REF_FOR_TEMPLATE_FACTORY);
 			return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
 		}
 
@@ -1961,7 +1991,42 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 				 (func.parameterTypes.GetLength() == 2 && (objectType->flags & asOBJ_TEMPLATE)) )
 		{
 			if( behaviour == asBEHAVE_LIST_FACTORY )
+			{
 				beh->listFactory = func.id;
+
+				// Make sure the factory takes a reference as its last parameter
+				if( objectType->flags & asOBJ_TEMPLATE )
+				{
+					if( func.parameterTypes.GetLength() != 2 || !func.parameterTypes[1].IsReference() )
+					{
+						if( listPattern )
+							listPattern->Destroy(this);
+
+						WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_TEMPLATE_LIST_FACTORY_EXPECTS_2_REF_PARAMS);
+						return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+					}
+				}
+				else
+				{
+					if( func.parameterTypes.GetLength() != 1 || !func.parameterTypes[0].IsReference() )
+					{
+						if( listPattern )
+							listPattern->Destroy(this);
+
+						WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_LIST_FACTORY_EXPECTS_1_REF_PARAM);
+						return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+					}
+				}
+
+				// Store the list pattern for this function
+				int r = scriptFunctions[func.id]->RegisterListPattern(decl, listPattern);
+
+				if( listPattern )
+					listPattern->Destroy(this);
+
+				if( r < 0 )
+					return ConfigError(r, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+			}
 			else
 			{
 				// Is this the copy factory?
@@ -3091,14 +3156,14 @@ void asCScriptEngine::RemoveTemplateInstanceType(asCObjectType *t)
 		}
 	}
 
-	for( n = (int)templateInstanceTypes.GetLength()-1; n >= 0; n-- )
+	for( n = (int)generatedTemplateTypes.GetLength()-1; n >= 0; n-- )
 	{
-		if( templateInstanceTypes[n] == t )
+		if( generatedTemplateTypes[n] == t )
 		{
-			if( n == (signed)templateInstanceTypes.GetLength()-1 )
-				templateInstanceTypes.PopLast();
+			if( n == (signed)generatedTemplateTypes.GetLength()-1 )
+				generatedTemplateTypes.PopLast();
 			else
-				templateInstanceTypes[n] = templateInstanceTypes.PopLast();
+				generatedTemplateTypes[n] = generatedTemplateTypes.PopLast();
 		}
 	}
 
@@ -3231,18 +3296,36 @@ asCObjectType *asCScriptEngine::GetTemplateInstanceType(asCObjectType *templateT
 	for( n = 0; n < ot->beh.constructors.GetLength(); n++ )
 		scriptFunctions[ot->beh.constructors[n]]->AddRef();
 
+	// As the new template type is instanciated the engine should
+	// generate new functions to substitute the ones with the template subtype.
+	for( n = 0; n < ot->beh.constructors.GetLength(); n++ )
+	{
+		int funcId = ot->beh.constructors[n];
+		asCScriptFunction *func = scriptFunctions[funcId];
+
+		if( GenerateNewTemplateFunction(templateType, ot, func, &func) )
+		{
+			// Release the old function, the new one already has its ref count set to 1
+			scriptFunctions[funcId]->Release();
+			ot->beh.constructors[n] = func->id;
+
+			if( ot->beh.construct == funcId )
+				ot->beh.construct = func->id;
+		}
+	}
+
 	ot->beh.factory = 0;
 
 	// Generate factory stubs for each of the factories
-	for( n = 0; n < templateType->beh.factories.GetLength(); n++ )
+	for( n = 0; n < ot->beh.constructors.GetLength(); n++ )
 	{
-		asCScriptFunction *func = GenerateTemplateFactoryStub(templateType, ot, templateType->beh.factories[n]);
+		asCScriptFunction *func = GenerateTemplateFactoryStub(templateType, ot, ot->beh.constructors[n]);
 
 		// The function's refCount was already initialized to 1
 		ot->beh.factories.PushLast(func->id);
 
 		// Set the default factory as well
-		if( templateType->beh.factories[n] == templateType->beh.factory )
+		if( ot->beh.constructors[n] == ot->beh.construct )
 			ot->beh.factory = func->id;
 	}
 
@@ -3314,9 +3397,9 @@ asCObjectType *asCScriptEngine::GetTemplateInstanceType(asCObjectType *templateT
 
 	templateTypes.PushLast(ot);
 
-	// We need to store the object type somewhere for clean-up later
-	// TODO: Why do we need both templateTypes and templateInstanceTypes? It is possible to differ between template instance and template specialization by checking for the asOBJ_TEMPLATE flag
-	templateInstanceTypes.PushLast(ot);
+	// Store the template instance types that have been created automatically by the engine from a template type
+	// The object types in templateTypes that are not also in generatedTemplateTypes are registered template specializations
+	generatedTemplateTypes.PushLast(ot);
 
 	return ot;
 }
@@ -3402,6 +3485,7 @@ asCScriptFunction *asCScriptEngine::GenerateTemplateFactoryStub(asCObjectType *t
 	}
 
 	func->funcType         = asFUNC_SCRIPT;
+	func->AllocateScriptFunctionData();
 	func->name             = "factstub";
 	func->id               = GetNextScriptFunctionId();
 	func->returnType       = asCDataType::CreateObjectHandle(ot, false);
@@ -3415,7 +3499,7 @@ asCScriptFunction *asCScriptEngine::GenerateTemplateFactoryStub(asCObjectType *t
 		func->parameterTypes[p-1] = DetermineTypeForTemplate(factory->parameterTypes[p], templateType, ot);
 		func->inOutFlags[p-1] = factory->inOutFlags[p];
 	}
-	func->objVariablesOnHeap = 0;
+	func->scriptData->objVariablesOnHeap = 0;
 
 	SetScriptFunction(func);
 
@@ -3427,8 +3511,8 @@ asCScriptFunction *asCScriptEngine::GenerateTemplateFactoryStub(asCObjectType *t
 	if( ep.includeJitInstructions )
 		bcLength += asBCTypeSize[asBCInfo[asBC_JitEntry].type];
 
-	func->byteCode.SetLength(bcLength);
-	asDWORD *bc = func->byteCode.AddressOf();
+	func->scriptData->byteCode.SetLength(bcLength);
+	asDWORD *bc = func->scriptData->byteCode.AddressOf();
 
 	if( ep.includeJitInstructions )
 	{
@@ -3447,12 +3531,37 @@ asCScriptFunction *asCScriptEngine::GenerateTemplateFactoryStub(asCObjectType *t
 	*(((asWORD*)bc)+1) = (asWORD)func->GetSpaceNeededForArguments();
 
 	func->AddReferences();
-	func->stackNeeded = AS_PTR_SIZE;
+	func->scriptData->stackNeeded = AS_PTR_SIZE;
 
 	// Tell the virtual machine not to clean up the object on exception
 	func->dontCleanUpOnException = true;
 
 	func->JITCompile();
+
+	// Need to translate the list pattern too so the VM and compiler will know the correct type of the members
+	if( factory->listPattern )
+	{
+		asSListPatternNode *n = factory->listPattern;
+		asSListPatternNode *last = 0;
+		while( n )
+		{
+			asSListPatternNode *newNode = n->Duplicate();
+			if( newNode->type == asLPT_TYPE )
+			{
+				asSListPatternDataTypeNode *typeNode = reinterpret_cast<asSListPatternDataTypeNode*>(newNode);
+				typeNode->dataType = DetermineTypeForTemplate(typeNode->dataType, templateType, ot);
+			}
+
+			if( last )
+				last->next = newNode;
+			else
+				func->listPattern = newNode;
+
+			last = newNode;
+
+			n = n->next;
+		}
+	}
 
 	return func;
 }
@@ -3503,7 +3612,6 @@ bool asCScriptEngine::GenerateNewTemplateFunction(asCObjectType *templateType, a
 	func2->inOutFlags = func->inOutFlags;
 	func2->isReadOnly = func->isReadOnly;
 	func2->objectType = ot;
-	func2->stackNeeded = func->stackNeeded;
 	func2->sysFuncIntf = asNEW(asSSystemFunctionInterface)(*func->sysFuncIntf);
 
 	SetScriptFunction(func2);
@@ -4456,11 +4564,15 @@ void asCScriptEngine::ReleaseScriptObject(void *obj, const asIObjectType *type)
 	}
 	else
 	{
-		// TODO: interface: shouldn't work on non reference types
+		// There is really only one reason why the application would want to 
+		// call this method for a value type, and that is if it is calling it
+		// as from a JIT compiled asBC_FREE instruction.
 
 		// Call the destructor
 		if( objType->beh.destruct )
 			CallObjectMethod(obj, objType->beh.destruct);
+		else if( objType->flags & asOBJ_LIST_PATTERN )
+			DestroyList((asBYTE*)obj, objType);
 
 		// Then free the memory
 		CallFree(obj);
@@ -5254,6 +5366,159 @@ void asCScriptEngine::SetObjectTypeUserDataCleanupCallback(asCLEANOBJECTTYPEFUNC
 	cleanObjectTypeFuncs.PushLast(otc);
 
 	RELEASEEXCLUSIVE(engineRWLock);
+}
+
+// internal
+asCObjectType *asCScriptEngine::GetListPatternType(int listPatternFuncId)
+{
+	asCObjectType *ot = scriptFunctions[listPatternFuncId]->returnType.GetObjectType();
+	asASSERT( ot );
+
+	for( asUINT n = 0; n < listPatternTypes.GetLength(); n++ )
+	{
+		if( listPatternTypes[n]->templateSubTypes[0].GetObjectType() == ot )
+			return listPatternTypes[n];
+	}
+
+	// Create a new list pattern type for the given object type
+	asCObjectType *lpt = asNEW(asCObjectType)(this);
+	lpt->templateSubTypes.PushLast(asCDataType::CreateObject(ot, false));
+	lpt->flags = asOBJ_LIST_PATTERN;
+	listPatternTypes.PushLast(lpt);
+
+	return lpt;
+}
+
+// internal
+void asCScriptEngine::DestroyList(asBYTE *buffer, const asCObjectType *listPatternType)
+{
+	asASSERT( listPatternType && (listPatternType->flags & asOBJ_LIST_PATTERN) );
+
+	// Get the list pattern from the listFactory function
+	// TODO: runtime optimize: Store the used list factory in the listPatternType itself
+	// TODO: runtime optimize: Keep a flag to indicate if there is really a need to free anything
+	asCObjectType *ot = listPatternType->templateSubTypes[0].GetObjectType();
+	asCScriptFunction *listFactory = scriptFunctions[ot->beh.listFactory];
+	asASSERT( listFactory );
+
+	asSListPatternNode *node = listFactory->listPattern;
+	DestroySubList(buffer, node);
+
+	asASSERT( node->type == asLPT_END );
+}
+
+// internal
+void asCScriptEngine::DestroySubList(asBYTE *&buffer, asSListPatternNode *&node)
+{
+	asASSERT( node->type == asLPT_START );
+
+	int count = 0;
+
+	node = node->next;
+	while( node )
+	{
+		if( node->type == asLPT_REPEAT )
+		{
+			// Determine how many times the pattern repeat
+			count = *(asUINT*)buffer;
+			buffer += 4;
+		}
+		else if( node->type == asLPT_TYPE )
+		{
+			// If we're not in a repeat iteration, then only 1 value should be destroyed
+			if( count <= 0 )
+				count = 1;
+
+			asCDataType dt = reinterpret_cast<asSListPatternDataTypeNode*>(node)->dataType;
+			bool isVarType = dt.GetTokenType() == ttQuestion;
+
+			while( count-- )
+			{
+				if( isVarType )
+				{
+					int typeId = *(int*)buffer;
+					buffer += 4;
+					dt = GetDataTypeFromTypeId(typeId);
+				}
+
+				asCObjectType *ot = dt.GetObjectType();
+				if( ot && (ot->flags & asOBJ_ENUM) == 0 )
+				{
+					// Free all instances of this type
+					if( ot->flags & asOBJ_VALUE )
+					{
+						if( ot->beh.destruct )
+						{
+							// Only call the destructor if the object has been created
+							// We'll assume the object has been created if any byte in
+							// the memory is different from 0.
+							// TODO: This is not really correct, as bytes may have been
+							//       modified by the constructor, but then an exception 
+							//       thrown aborting the initialization. The engine
+							//       really should be keeping track of which objects has
+							//       been successfully initialized.
+							asUINT size = ot->GetSize();
+							for( asUINT n = 0; n < size; n++ )
+							{
+								if( buffer[n] != 0 )
+								{
+									void *ptr = (void*)buffer;
+									CallObjectMethod(ptr, ot->beh.destruct);
+									break;
+								}
+							}
+							buffer += size;
+						}
+						else
+						{
+							// Advance the pointer in the buffer
+							buffer += ot->GetSize();
+						}
+					}
+					else
+					{
+						// Call the release behaviour
+						void *ptr = *(void**)buffer;
+						if( ptr )
+							ReleaseScriptObject(ptr, ot);
+						buffer += AS_PTR_SIZE*4;
+					}
+				}
+				else
+				{
+					// Advance the buffer
+					buffer += dt.GetSizeInMemoryBytes();
+				}
+			}
+		}
+		else if( node->type == asLPT_START )
+		{
+			// If we're not in a repeat iteration, then only 1 value should be destroyed
+			if( count <= 0 )
+				count = 1;
+
+			while( count-- )
+			{
+				asSListPatternNode *subList = node;
+				DestroySubList(buffer, subList);
+
+				asASSERT( subList->type == asLPT_END );
+
+				if( count == 0 )
+					node = subList;
+			}
+		}
+		else if( node->type == asLPT_END )
+		{
+			return;
+		}
+		else
+		{
+			asASSERT( false );
+		}
+
+		node = node->next;
+	}
 }
 
 END_AS_NAMESPACE

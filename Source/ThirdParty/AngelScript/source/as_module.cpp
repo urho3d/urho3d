@@ -42,6 +42,7 @@
 #include "as_context.h"
 #include "as_texts.h"
 #include "as_debug.h"
+#include "as_restore.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -65,7 +66,7 @@ asCModule::~asCModule()
 {
 	InternalReset();
 
-	if( builder ) 
+	if( builder )
 	{
 		asDELETE(builder,asCBuilder);
 		builder = 0;
@@ -190,10 +191,12 @@ int asCModule::AddScriptSection(const char *name, const char *code, size_t codeL
 // internal
 void asCModule::JITCompile()
 {
+	asIJITCompiler *jit = engine->GetJITCompiler();
+	if( !jit )
+		return;
+
 	for (unsigned int i = 0; i < scriptFunctions.GetLength(); i++)
-	{
 		scriptFunctions[i]->JITCompile();
-	}
 }
 
 // interface
@@ -240,9 +243,9 @@ int asCModule::Build()
 		return r;
 	}
 
-    JITCompile();
+	JITCompile();
 
- 	engine->PrepareEngine();
+	engine->PrepareEngine();
 
 #ifdef AS_DEBUG
 	// Verify that there are no unwanted gaps in the scriptFunctions array.
@@ -321,7 +324,7 @@ int asCModule::CallInit(asIScriptContext *myCtx)
 					msg.Format(TXT_FAILED_TO_INITIALIZE_s, desc->name.AddressOf());
 					asCScriptFunction *func = desc->GetInitFunc();
 
-					engine->WriteMessage(func->scriptSectionIdx >= 0 ? engine->scriptSectionNames[func->scriptSectionIdx]->AddressOf() : "",
+					engine->WriteMessage(func->scriptData->scriptSectionIdx >= 0 ? engine->scriptSectionNames[func->scriptData->scriptSectionIdx]->AddressOf() : "",
 										 func->GetLineNumber(0, 0) & 0xFFFFF, 
 										 func->GetLineNumber(0, 0) >> 20,
 										 asMSGTYPE_ERROR,
@@ -814,7 +817,14 @@ int asCModule::AddScriptFunction(int sectionIdx, int id, const asCString &name, 
 	// Store the function information
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine, this, isInterface ? asFUNC_INTERFACE : asFUNC_SCRIPT);
 	if( func == 0 )
+	{
+		// Free the default args
+		for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+			if( defaultArgs[n] )
+				asDELETE(defaultArgs[n], asCString);
+
 		return asOUT_OF_MEMORY;
+	}
 
 	if( ns == 0 )
 		ns = engine->nameSpaces[0];
@@ -827,7 +837,8 @@ int asCModule::AddScriptFunction(int sectionIdx, int id, const asCString &name, 
 	func->nameSpace        = ns;
 	func->id               = id;
 	func->returnType       = returnType;
-	func->scriptSectionIdx = sectionIdx;
+	if( func->funcType == asFUNC_SCRIPT )
+		func->scriptData->scriptSectionIdx = sectionIdx;
 	func->parameterTypes   = params;
 	func->inOutFlags       = inOutFlags;
 	func->defaultArgs      = defaultArgs;
@@ -880,7 +891,14 @@ int asCModule::AddImportedFunction(int id, const asCString &name, const asCDataT
 	// Store the function information
 	asCScriptFunction *func = asNEW(asCScriptFunction)(engine, this, asFUNC_IMPORTED);
 	if( func == 0 )
+	{
+		// Free the default args
+		for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+			if( defaultArgs[n] )
+				asDELETE(defaultArgs[n], asCString);
+
 		return asOUT_OF_MEMORY;
+	}
 
 	func->name           = name;
 	func->id             = id;
@@ -893,7 +911,10 @@ int asCModule::AddImportedFunction(int id, const asCString &name, const asCDataT
 
 	sBindInfo *info = asNEW(sBindInfo);
 	if( info == 0 )
+	{
+		asDELETE(func, asCScriptFunction);
 		return asOUT_OF_MEMORY;
+	}
 
 	info->importedFunctionSignature = func;
 	info->boundFunctionId           = -1;

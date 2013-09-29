@@ -151,7 +151,7 @@ int asCGarbageCollector::GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, a
 
 	ENTERCRITICALSECTION(gcCritical);
 	asSObjTypePair *o = 0;
-	asUINT newObjs = gcNewObjects.GetLength();
+	asUINT newObjs = asUINT(gcNewObjects.GetLength());
 	if( idx < newObjs )
 		o = &gcNewObjects[idx];
 	else if( idx < gcOldObjects.GetLength() + newObjs )

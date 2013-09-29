@@ -125,13 +125,17 @@ public:
 
 	void CallDestructor();
 
+//=============================================
+// Properties
+//=============================================
+public:
 	asCObjectType *objType;
 
 protected:
 	mutable asCAtomic refCount;
 	mutable bool gcFlag;
-	mutable asCLockableSharedBool *weakRefFlag;
 	bool isDestructCalled;
+	mutable asCLockableSharedBool *weakRefFlag;
 	
 	// Urho3D: added userdata
 	void* userData;

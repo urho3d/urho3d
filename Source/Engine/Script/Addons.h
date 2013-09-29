@@ -38,6 +38,7 @@ struct SArrayCache;
 class URHO3D_API CScriptArray
 {
 public:
+    CScriptArray(asIObjectType *ot, void *buf);
     CScriptArray(asUINT length, asIObjectType *ot);
     CScriptArray(asUINT length, void *defVal, asIObjectType *ot);
     CScriptArray(const CScriptArray &other);

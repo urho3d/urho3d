@@ -128,6 +128,7 @@ public:
 	int InstrW_PTR(asEBCInstr bc, short a, void *param);
 	int InstrW_FLOAT(asEBCInstr bc, asWORD a, float b);
 	int InstrW_W(asEBCInstr bc, int w, int b);
+	int InstrSHORT_DW_DW(asEBCInstr bc, short a, asDWORD b, asDWORD c);
 
 	asCArray<int> lineNumbers;
 	asCArray<int> sectionIdxs;

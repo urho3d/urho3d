@@ -51,13 +51,14 @@ BEGIN_AS_NAMESPACE
 
 // TODO: memory: Need to minimize used memory here, because not all types use all properties of the class
 
-// TODO: The type id should have flags for diferenciating between value types and reference types. It should also have a flag for differenciating interface types.
+// TODO: The type id should have flags for differenciating between value types and reference types. It should also have a flag for differenciating interface types.
 
 // Additional flag to the class object type
 const asDWORD asOBJ_IMPLICIT_HANDLE  = 0x00400000;
-const asDWORD asOBJ_TYPEDEF          = 0x40000000;
+const asDWORD asOBJ_LIST_PATTERN     = 0x08000000;
 const asDWORD asOBJ_ENUM             = 0x10000000;
 const asDWORD asOBJ_TEMPLATE_SUBTYPE = 0x20000000;
+const asDWORD asOBJ_TYPEDEF          = 0x40000000;
 
 
 
@@ -157,7 +158,7 @@ public:
 	int              GetTypeId() const;
 	int              GetSubTypeId(asUINT subtypeIndex = 0) const;
 	asIObjectType   *GetSubType(asUINT subtypeIndex = 0) const;
-	asUINT			 GetSubTypeCount() const;
+	asUINT           GetSubTypeCount() const;
 
 	// Interfaces
 	asUINT           GetInterfaceCount() const;

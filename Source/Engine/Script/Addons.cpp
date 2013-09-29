@@ -78,6 +78,22 @@ static CScriptArray* ScriptArrayFactory2(asIObjectType *ot, asUINT length)
     return a;
 }
 
+static CScriptArray* ScriptArrayListFactory(asIObjectType *ot, void *initList)
+{
+    CScriptArray *a = new CScriptArray(ot, initList);
+
+    // It's possible the constructor raised a script exception, in which case we 
+    // need to free the memory and return null instead, else we get a memory leak.
+    asIScriptContext *ctx = asGetActiveContext();
+    if( ctx && ctx->GetState() == asEXECUTION_EXCEPTION )
+    {
+        a->Release();
+        return 0;
+    }
+
+    return a;
+}
+
 static CScriptArray* ScriptArrayFactoryDefVal(asIObjectType *ot, asUINT length, void *defVal)
 {
     CScriptArray *a = new CScriptArray(length, defVal, ot);
@@ -199,6 +215,96 @@ CScriptArray &CScriptArray::operator=(const CScriptArray &other)
     }
 
     return *this;
+}
+
+CScriptArray::CScriptArray(asIObjectType *ot, void *buf)
+{
+    refCount = 1;
+    gcFlag = false;
+    objType = ot;
+    objType->AddRef();
+    buffer = 0;
+
+    Precache();
+
+    asIScriptEngine *engine = ot->GetEngine();
+
+    // Determine element size
+    if( subTypeId & asTYPEID_MASK_OBJECT )
+        elementSize = sizeof(asPWORD);
+    else
+        elementSize = engine->GetSizeOfPrimitiveType(subTypeId);
+
+    // Determine the initial size from the buffer
+    asUINT length = *(asUINT*)buf;
+
+    // Make sure the array size isn't too large for us to handle
+    if( !CheckMaxSize(length) )
+    {
+        // Don't continue with the initialization
+        return;
+    }
+
+    // Copy the values of the array elements from the buffer
+    if( (ot->GetSubTypeId() & asTYPEID_MASK_OBJECT) == 0 )
+    {
+        CreateBuffer(&buffer, length);
+
+        // Copy the values of the primitive type into the internal buffer
+        memcpy(At(0), (((asUINT*)buf)+1), length * elementSize);
+    }
+    else if( ot->GetSubTypeId() & asTYPEID_OBJHANDLE )
+    {
+        CreateBuffer(&buffer, length);
+
+        // Copy the handles into the internal buffer
+        memcpy(At(0), (((asUINT*)buf)+1), length * elementSize);
+
+        // With object handles it is safe to clear the memory in the received buffer
+        // instead of increasing the ref count. It will save time both by avoiding the
+        // call the increase ref, and also relieve the engine from having to release
+        // its references too
+        memset((((asUINT*)buf)+1), 0, length * elementSize);
+    }
+    else if( ot->GetSubType()->GetFlags() & asOBJ_REF )
+    {
+        // Only allocate the buffer, but not the objects
+        subTypeId |= asTYPEID_OBJHANDLE;
+        CreateBuffer(&buffer, length);
+        subTypeId &= ~asTYPEID_OBJHANDLE;
+
+        // Copy the handles into the internal buffer
+        memcpy(buffer->data, (((asUINT*)buf)+1), length * elementSize);
+
+        // For ref types we can do the same as for handles, as they are 
+        // implicitly stored as handles.
+        memset((((asUINT*)buf)+1), 0, length * elementSize);
+    }
+    else
+    {
+        // TODO: Optimize by calling the copy constructor of the object instead of 
+        //       constructing with the default constructor and then assigning the value
+        // TODO: With C++11 ideally we should be calling the move constructor, instead
+        //       of the copy constructor as the engine will just discard the objects in the
+        //       buffer afterwards.
+        CreateBuffer(&buffer, length);
+
+        // For value types we need to call the opAssign for each individual object
+        for( asUINT n = 0; n < length; n++ )
+        {
+            void *obj = At(n);
+            asBYTE *srcObj = (asBYTE*)buf;
+            srcObj += 4 + n*ot->GetSubType()->GetSize();
+            engine->AssignScriptObject(obj, srcObj, ot->GetSubType());
+        }
+    }
+
+    // Urho3D: garbage collection disabled
+    /*
+    // Notify the GC of the successful creation
+    if( objType->GetFlags() & asOBJ_GC )
+        objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
+    */
 }
 
 CScriptArray::CScriptArray(asUINT length, asIObjectType *ot)
@@ -1391,7 +1497,7 @@ void RegisterArray(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int& in)", asFUNCTIONPR(ScriptArrayFactory, (asIObjectType*), CScriptArray*), asCALL_CDECL);
     engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int& in, uint)", asFUNCTIONPR(ScriptArrayFactory2, (asIObjectType*, asUINT), CScriptArray*), asCALL_CDECL);
     engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_FACTORY, "Array<T>@ f(int& in, uint, const T& in)", asFUNCTIONPR(ScriptArrayFactoryDefVal, (asIObjectType*, asUINT, void *), CScriptArray*), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_LIST_FACTORY, "Array<T>@ f(int& in, uint)", asFUNCTIONPR(ScriptArrayFactory2, (asIObjectType*, asUINT), CScriptArray*), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_LIST_FACTORY, "Array<T>@ f(int&in type, int&in list) {repeat T}", asFUNCTIONPR(ScriptArrayListFactory, (asIObjectType*, void*), CScriptArray*), asCALL_CDECL);
     engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_ADDREF, "void f()", asMETHOD(CScriptArray,AddRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Array<T>", asBEHAVE_RELEASE, "void f()", asMETHOD(CScriptArray,Release), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "T& opIndex(uint)", asMETHODPR(CScriptArray, At, (unsigned), void*), asCALL_THISCALL);

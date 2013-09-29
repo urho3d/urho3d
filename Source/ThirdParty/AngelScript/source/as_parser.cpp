@@ -91,7 +91,7 @@ asCScriptNode *asCParser::GetScriptNode()
 	return scriptNode;
 }
 
-int asCParser::ParseFunctionDefinition(asCScriptCode *script)
+int asCParser::ParseFunctionDefinition(asCScriptCode *script, bool expectListPattern)
 {
 	Reset();
 
@@ -101,6 +101,9 @@ int asCParser::ParseFunctionDefinition(asCScriptCode *script)
 	this->script = script;
 
 	scriptNode = ParseFunctionDefinition();
+
+	if( expectListPattern )
+		scriptNode->AddChildLast(ParseListPattern());
 
 	// The declaration should end after the definition
 	if( !isSyntaxError )
@@ -610,7 +613,7 @@ asCScriptNode *asCParser::ParseParameterList()
 			node->AddChildLast(ParseTypeMod(true));
 			if( isSyntaxError ) return node;
 
-			// Parse identifier
+			// Parse optional identifier
 			GetToken(&t1);
 			if( t1.type == ttIdentifier )
 			{
@@ -620,17 +623,17 @@ asCScriptNode *asCParser::ParseParameterList()
 				if( isSyntaxError ) return node;
 
 				GetToken(&t1);
+			}
 
-				// Parse the expression for the default arg
-				if( t1.type == ttAssignment )
-				{
-					// Do a superficial parsing of the default argument
-					// The actual parsing will be done when the argument is compiled for a function call
-					node->AddChildLast(SuperficiallyParseExpression());
-					if( isSyntaxError ) return node;
+			// Parse optional expression for the default arg
+			if( t1.type == ttAssignment )
+			{
+				// Do a superficial parsing of the default argument
+				// The actual parsing will be done when the argument is compiled for a function call
+				node->AddChildLast(SuperficiallyParseExpression());
+				if( isSyntaxError ) return node;
 
-					GetToken(&t1);
-				}
+				GetToken(&t1);
 			}
 
 			// Check if list continues
@@ -928,7 +931,91 @@ asCString asCParser::ExpectedOneOf(const char **tokens, int count)
 	return str;
 }
 
-#ifndef AS_NO_COMPILER
+asCScriptNode *asCParser::ParseListPattern()
+{
+	asCScriptNode *node = CreateNode(snListPattern);
+	if( node == 0 ) return 0;
+
+	sToken t1;
+
+	GetToken(&t1);
+	if( t1.type != ttStartStatementBlock )
+	{
+		Error(ExpectedToken("{"), &t1);
+		return node;
+	}
+
+	node->UpdateSourcePos(t1.pos, t1.length);
+
+	sToken start = t1;
+
+	bool isBeginning = true;
+	bool afterType = false;
+	while( !isSyntaxError )
+	{
+		GetToken(&t1);
+		if( t1.type == ttEndStatementBlock )
+		{
+			if( !afterType )
+				Error(TXT_EXPECTED_DATA_TYPE, &t1);
+			break;
+		}
+		else if( t1.type == ttStartStatementBlock )
+		{
+			if( afterType )
+			{
+				asCString msg;
+				msg.Format(TXT_EXPECTED_s_OR_s, ",", "}");
+				Error(msg.AddressOf(), &t1);
+			}
+			RewindTo(&t1);
+			node->AddChildLast(ParseListPattern());
+			afterType = true;
+		}
+		else if( t1.type == ttIdentifier && IdentifierIs(t1, "repeat") )
+		{
+			if( !isBeginning )
+			{
+				asCString msg;
+				msg.Format(TXT_UNEXPECTED_TOKEN_s, "repeat");
+				Error(msg.AddressOf(), &t1);
+			}
+			RewindTo(&t1);
+			node->AddChildLast(ParseIdentifier());
+		}
+		else if( t1.type == ttEnd )
+		{
+			Error(TXT_UNEXPECTED_END_OF_FILE, &t1);
+			Info(TXT_WHILE_PARSING_STATEMENT_BLOCK, &start);
+			break;
+		}
+		else if( t1.type == ttListSeparator )
+		{
+			if( !afterType )
+				Error(TXT_EXPECTED_DATA_TYPE, &t1);
+			afterType = false;
+		}
+		else
+		{
+			if( afterType )
+			{
+				asCString msg;
+				msg.Format(TXT_EXPECTED_s_OR_s, ",", "}");
+				Error(msg.AddressOf(), &t1);
+			}
+			RewindTo(&t1);
+			node->AddChildLast(ParseType(true, true));
+			afterType = true;
+		}
+
+		isBeginning = false;
+	}
+
+	node->UpdateSourcePos(t1.pos, t1.length);
+
+	return node;
+}
+
 bool asCParser::IdentifierIs(const sToken &t, const char *str)
 {
 	if( t.type != ttIdentifier ) 
@@ -937,6 +1024,7 @@ bool asCParser::IdentifierIs(const sToken &t, const char *str)
 	return script->TokenEquals(t.pos, t.length, str);
 }
 
+#ifndef AS_NO_COMPILER
 bool asCParser::CheckTemplateType(sToken &t)
 {
 	// Is this a template type?
@@ -1079,7 +1167,10 @@ asCScriptNode *asCParser::ParseExprValue()
 	GetToken(&t2);
 	RewindTo(&t1);
 
-	if( IsRealType(t1.type) )
+	// 'void' is a special expression that doesn't do anything (normally used for skipping output arguments)
+	if( t1.type == ttVoid )
+		node->AddChildLast(ParseToken(ttVoid));
+	else if( IsRealType(t1.type) )
 		node->AddChildLast(ParseConstructCall());
 	else if( t1.type == ttIdentifier || t1.type == ttScope )
 	{
@@ -1871,7 +1962,7 @@ int asCParser::ParseStatementBlock(asCScriptCode *script, asCScriptNode *block)
 	this->script = script;
 	sourcePos = block->tokenPos;
 
-	scriptNode = ParseStatementBlock();	
+	scriptNode = ParseStatementBlock();
 
 	if( isSyntaxError || errorWhileParsing )
 		return -1;

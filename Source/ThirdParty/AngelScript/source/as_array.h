@@ -73,8 +73,8 @@ public:
 	void Concatenate(const asCArray<T> &);
 	void Concatenate(T*, unsigned int count);
 
-	bool Exists(T &element) const;
-	int  IndexOf(T &element) const;
+	bool Exists(const T &element) const;
+	int  IndexOf(const T &element) const;
 	void RemoveIndex(size_t index);          // Removes the entry without reordering the array
 	void RemoveValue(const T &element);      // Removes the value without reordering the array
 	void RemoveIndexUnordered(size_t index); // Removes the entry without keeping the order
@@ -463,13 +463,13 @@ void asCArray<T>::Concatenate(T* array, unsigned int count)
 }
 
 template <class T>
-bool asCArray<T>::Exists(T &e) const
+bool asCArray<T>::Exists(const T &e) const
 {
 	return IndexOf(e) == -1 ? false : true;
 }
 
 template <class T>
-int asCArray<T>::IndexOf(T &e) const
+int asCArray<T>::IndexOf(const T &e) const
 {
 	for( size_t n = 0; n < length; n++ )
 		if( array[n] == e ) return static_cast<int>(n);

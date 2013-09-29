@@ -254,6 +254,10 @@ void asCObjectType::SetGCFlag()
 
 asCObjectType::~asCObjectType()
 {
+	// Skip this for list patterns as they do not increase the references
+	if( flags & asOBJ_LIST_PATTERN )
+		return;
+
 	// Release the object types held by the templateSubTypes
 	for( asUINT subtypeIndex = 0; subtypeIndex < templateSubTypes.GetLength(); subtypeIndex++ )
 	{
@@ -264,18 +268,16 @@ asCObjectType::~asCObjectType()
 	if( derivedFrom )
 		derivedFrom->Release();
 
-	asUINT n;
-
 	ReleaseAllProperties();
 
 	ReleaseAllFunctions();
 
+	asUINT n;
 	for( n = 0; n < enumValues.GetLength(); n++ )
 	{
 		if( enumValues[n] )
 			asDELETE(enumValues[n],asSEnumValue);
 	}
-
 	enumValues.SetLength(0);
 
 	// Clean the user data

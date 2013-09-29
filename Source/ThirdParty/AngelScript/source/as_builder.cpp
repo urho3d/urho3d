@@ -365,9 +365,9 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 
 	asCArray<asCString> parameterNames;
 	GetParsedFunctionDetails(node, scripts[0], 0, func->name, func->returnType, parameterNames, func->parameterTypes, func->inOutFlags, func->defaultArgs, func->isReadOnly, isConstructor, isDestructor, isPrivate, isFinal, isOverride, isShared, module->defaultNamespace);
-	func->id               = engine->GetNextScriptFunctionId();
-	func->scriptSectionIdx = engine->GetScriptSectionNameIndex(sectionName ? sectionName : "");
-	func->nameSpace        = module->defaultNamespace;
+	func->id                           = engine->GetNextScriptFunctionId();
+	func->scriptData->scriptSectionIdx = engine->GetScriptSectionNameIndex(sectionName ? sectionName : "");
+	func->nameSpace                    = module->defaultNamespace;
 
 	// Make sure the default args are declared correctly
 	int r = ValidateDefaultArgs(script, node, func);
@@ -929,7 +929,7 @@ asCGlobalProperty *asCBuilder::GetGlobalProperty(const char *prop, asSNameSpace 
 	return 0;
 }
 
-int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *decl, asCScriptFunction *func, bool isSystemFunction, asCArray<bool> *paramAutoHandles, bool *returnAutoHandle, asSNameSpace *ns)
+int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *decl, asCScriptFunction *func, bool isSystemFunction, asCArray<bool> *paramAutoHandles, bool *returnAutoHandle, asSNameSpace *ns, asCScriptNode **listPattern)
 {
 	asASSERT( objType || ns );
 
@@ -941,7 +941,7 @@ int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *dec
 	source.SetCode(TXT_SYSTEM_FUNCTION, decl, true);
 
 	asCParser parser(this);
-	int r = parser.ParseFunctionDefinition(&source);
+	int r = parser.ParseFunctionDefinition(&source, listPattern != 0);
 	if( r < 0 )
 		return asINVALID_DECLARATION;
 
@@ -971,7 +971,7 @@ int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *dec
 	if( isSystemFunction &&
 		(func->returnType.GetObjectType() &&
 		 (func->returnType.GetObjectType()->flags & asOBJ_REF)) &&
-        !(func->returnType.IsReference() ||
+		!(func->returnType.IsReference() ||
 		  func->returnType.IsObjectHandle()) )
 		return asINVALID_DECLARATION;
 
@@ -1006,7 +1006,7 @@ int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *dec
 		// Reference types cannot be passed by value to system functions
 		if( isSystemFunction &&
 			(type.GetObjectType() &&
-		     (type.GetObjectType()->flags & asOBJ_REF)) &&
+			 (type.GetObjectType()->flags & asOBJ_REF)) &&
 			!(type.IsReference() ||
 			  type.IsObjectHandle()) )
 			return asINVALID_DECLARATION;
@@ -1051,15 +1051,35 @@ int asCBuilder::ParseFunctionDeclaration(asCObjectType *objType, const char *dec
 	}
 
 	// Set the read-only flag if const is declared after parameter list
-	if( node->lastChild->nodeType == snUndefined && node->lastChild->tokenType == ttConst )
+	n = paramList->next;
+	if( n && n->nodeType == snUndefined && n->tokenType == ttConst )
 	{
 		if( objType == 0 )
 			return asINVALID_DECLARATION;
 		func->isReadOnly = true;
+
+		n = n->next;
 	}
 	else
 		func->isReadOnly = false;
 
+	// If the caller expects a list pattern, check for the existence, else report an error if not
+	if( listPattern )
+	{
+		if( n == 0 || n->nodeType != snListPattern ) 
+			return asINVALID_DECLARATION;
+		else
+		{
+			*listPattern = n;
+			n->DisconnectParent();
+		}
+	}
+	else
+	{
+		if( n )
+			return asINVALID_DECLARATION;
+	}
+	
 	// Make sure the default args are declared correctly
 	ValidateDefaultArgs(&source, node, func);
 
@@ -1302,10 +1322,7 @@ int asCBuilder::RegisterFuncDef(asCScriptNode *node, asCScriptCode *file, asSNam
 
 void asCBuilder::CompleteFuncDef(sFuncDef *funcDef)
 {
-	asCDataType                returnType;
 	asCArray<asCString>        parameterNames;
-	asCArray<asCDataType>      parameterTypes;
-	asCArray<asETypeModifiers> inOutFlags;
 	asCArray<asCString *>      defaultArgs;
 	bool                       isConstMethod;
 	bool                       isConstructor;
@@ -1318,44 +1335,37 @@ void asCBuilder::CompleteFuncDef(sFuncDef *funcDef)
 	asCScriptFunction *func = module->funcDefs[funcDef->idx];
 	asASSERT( func );
 
-	GetParsedFunctionDetails(funcDef->node, funcDef->script, 0, funcDef->name, returnType, parameterNames, parameterTypes, inOutFlags, defaultArgs, isConstMethod, isConstructor, isDestructor, isPrivate, isOverride, isFinal, isShared, func->nameSpace);
+	GetParsedFunctionDetails(funcDef->node, funcDef->script, 0, funcDef->name, func->returnType, parameterNames, func->parameterTypes, func->inOutFlags, defaultArgs, isConstMethod, isConstructor, isDestructor, isPrivate, isOverride, isFinal, isShared, func->nameSpace);
 
-	if( func )
+	// There should not be any defaultArgs, but if there are any we need to delete them to avoid leaks
+	for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+		if( defaultArgs[n] )
+			asDELETE(defaultArgs[n], asCString);
+
+	// TODO: Should we force the use of 'shared' for this check to be done?
+	// Check if there is another identical funcdef from another module and if so reuse that instead
+	for( asUINT n = 0; n < engine->funcDefs.GetLength(); n++ )
 	{
-		func->returnType = returnType;
-		for( asUINT p = 0; p < parameterTypes.GetLength(); p++ )
+		asCScriptFunction *f2 = engine->funcDefs[n];
+		if( f2 == 0 || func == f2 )
+			continue;
+
+		if( f2->name == func->name &&
+			f2->nameSpace == func->nameSpace &&
+			f2->IsSignatureExceptNameEqual(func) )
 		{
-			func->parameterTypes.PushLast(parameterTypes[p]);
-			func->inOutFlags.PushLast(inOutFlags[p]);
+			// Replace our funcdef for the existing one
+			funcDef->idx = f2->id;
+			module->funcDefs[module->funcDefs.IndexOf(func)] = f2;
+			f2->AddRef();
 
-			// Don't copy the default arg expression as it is not allowed for function definitions
-		}
+			engine->funcDefs.RemoveValue(func);
 
-		// TODO: Should we force the use of 'shared' for this check to be done?
-		// Check if there is another identical funcdef from another module and if so reuse that instead
-		for( asUINT n = 0; n < engine->funcDefs.GetLength(); n++ )
-		{
-			asCScriptFunction *f2 = engine->funcDefs[n];
-			if( f2 == 0 || func == f2 )
-				continue;
+			func->Release();
 
-			if( f2->name == func->name &&
-				f2->nameSpace == func->nameSpace &&
-				f2->IsSignatureExceptNameEqual(func) )
-			{
-				// Replace our funcdef for the existing one
-				funcDef->idx = f2->id;
-				module->funcDefs[module->funcDefs.IndexOf(func)] = f2;
-				f2->AddRef();
-
-				engine->funcDefs.RemoveValue(func);
-
-				func->Release();
-
-				// funcdefs aren't destroyed when the refCount reaches zero so we need to manually delete them
-				asDELETE(func, asCScriptFunction);
-				break;
-			}
+			// funcdefs aren't destroyed when the refCount reaches zero so we need to manually delete them
+			asDELETE(func, asCScriptFunction);
+			break;
 		}
 	}
 }
@@ -1760,7 +1770,7 @@ void asCBuilder::CompileGlobalVariables()
 				if( gvar->nextNode )
 				{
 					asCCompiler comp(engine);
-					asCScriptFunction func(engine, module, asFUNC_DUMMY);
+					asCScriptFunction func(engine, module, asFUNC_SCRIPT);
 
 					// Set the namespace that should be used during the compilation
 					func.nameSpace = gvar->datatype.GetObjectType()->nameSpace;
@@ -1771,6 +1781,9 @@ void asCBuilder::CompileGlobalVariables()
 					gvar->datatype = asCDataType::CreatePrimitive(ttInt, true);
 					r = comp.CompileGlobalVariable(this, gvar->script, gvar->nextNode, gvar, &func);
 					gvar->datatype = saveType;
+
+					// Make the function a dummy so it doesn't try to release objects while destroying the function
+					func.funcType = asFUNC_DUMMY;
 				}
 				else
 				{
@@ -1820,7 +1833,7 @@ void asCBuilder::CompileGlobalVariables()
 			else
 			{
 				// Compile the global variable
-				initFunc = asNEW(asCScriptFunction)(engine, module, asFUNC_DUMMY);
+				initFunc = asNEW(asCScriptFunction)(engine, module, asFUNC_SCRIPT);
 				if( initFunc == 0 )
 				{
 					// Out of memory
@@ -1841,6 +1854,7 @@ void asCBuilder::CompileGlobalVariables()
 				else
 				{
 					// Compilation failed
+					initFunc->funcType = asFUNC_DUMMY;
 					asDELETE(initFunc, asCScriptFunction);
 					initFunc = 0;
 				}
@@ -1861,16 +1875,15 @@ void asCBuilder::CompileGlobalVariables()
 					initOrder.Put(gvar->property);
 
 				// Does the function contain more than just a SUSPEND followed by a RET instruction?
-				if( initFunc && initFunc->byteCode.GetLength() > 2 )
+				if( initFunc && initFunc->scriptData->byteCode.GetLength() > 2 )
 				{
 					// Create the init function for this variable
 					initFunc->id = engine->GetNextScriptFunctionId();
 					engine->SetScriptFunction(initFunc);
 
 					// Finalize the init function for this variable
-					initFunc->funcType = asFUNC_SCRIPT;
 					initFunc->returnType = asCDataType::CreatePrimitive(ttVoid, false);
-					initFunc->scriptSectionIdx = engine->GetScriptSectionNameIndex(gvar->script->name.AddressOf());
+					initFunc->scriptData->scriptSectionIdx = engine->GetScriptSectionNameIndex(gvar->script->name.AddressOf());
 
 					gvar->property->SetInitFunc(initFunc);
 
@@ -1880,6 +1893,7 @@ void asCBuilder::CompileGlobalVariables()
 				else if( initFunc )
 				{
 					// Destroy the function as it won't be used
+					initFunc->funcType = asFUNC_DUMMY;
 					asDELETE(initFunc, asCScriptFunction);
 					initFunc = 0;
 				}
@@ -3051,7 +3065,6 @@ int asCBuilder::CreateVirtualFunction(asCScriptFunction *func, int idx)
 	vf->parameterTypes   = func->parameterTypes;
 	vf->inOutFlags       = func->inOutFlags;
 	vf->id               = engine->GetNextScriptFunctionId();
-	vf->scriptSectionIdx = func->scriptSectionIdx;
 	vf->isReadOnly       = func->isReadOnly;
 	vf->objectType       = func->objectType;
 	vf->signatureId      = func->signatureId;
@@ -3635,12 +3648,12 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 {
 	// Determine default namespace if not specified
 	if( ns == 0 )
-    {
+	{
 		if( objType )
 			ns = objType->nameSpace;
 		else
 			ns = engine->nameSpaces[0];
-    }
+	}
 
 	if( isExistingShared )
 	{
@@ -3674,6 +3687,11 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 			WriteError(str, file, node);
 		}
 
+		// Free the default args
+		for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+			if( defaultArgs[n] )
+				asDELETE(defaultArgs[n], asCString);
+
 		node->Destroy(engine);
 		return 0;
 	}
@@ -3697,6 +3715,12 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 		{
 			// Mixins cannot implement constructors/destructors
 			WriteError(TXT_MIXIN_CANNOT_HAVE_CONSTRUCTOR, file, node);
+
+			// Free the default args
+			for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+				if( defaultArgs[n] )
+					asDELETE(defaultArgs[n], asCString);
+
 			node->Destroy(engine);
 			return 0;
 		}
@@ -3715,7 +3739,14 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 	{
 		sFunctionDescription *func = asNEW(sFunctionDescription);
 		if( func == 0 )
+		{
+			// Free the default args
+			for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+				if( defaultArgs[n] )
+					asDELETE(defaultArgs[n], asCString);
+
 			return asOUT_OF_MEMORY;
+		}
 
 		functions.PushLast(func);
 
@@ -3793,6 +3824,12 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 					node->Destroy(engine);
 				sFunctionDescription *func = functions.PopLast();
 				asDELETE(func, sFunctionDescription);
+
+				// Free the default args
+				for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+					if( defaultArgs[n] )
+						asDELETE(defaultArgs[n], asCString);
+
 				return 0;
 			}
 
@@ -3804,6 +3841,11 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 	// Register the function
 	if( isExistingShared )
 	{
+		// Delete the default args as they won't be used anymore
+		for( asUINT n = 0; n < defaultArgs.GetLength(); n++ )
+			if( defaultArgs[n] )
+				asDELETE(defaultArgs[n], asCString);
+
 		asCScriptFunction *f = engine->scriptFunctions[funcId];
 		module->AddScriptFunction(f);
 
@@ -4376,9 +4418,10 @@ asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCod
 			{
 				for( asUINT subtypeIndex = 0; subtypeIndex < currentType->templateSubTypes.GetLength(); subtypeIndex++)
 				{
-					if(str == currentType->templateSubTypes[subtypeIndex].GetObjectType()->name )
+					asCObjectType *type = currentType->templateSubTypes[subtypeIndex].GetObjectType();
+					if( type && str == type->name )
 					{
-						ot = currentType->templateSubTypes[subtypeIndex].GetObjectType();
+						ot = type;
 						break;
 					}
 				}
@@ -4621,7 +4664,9 @@ asCDataType asCBuilder::ModifyDataTypeFromNode(const asCDataType &type, asCScrip
 	if( n && n->tokenType == ttPlus )
 	{
 		// Autohandles are not supported for types with NOCOUNT
-		if( dt.GetObjectType()->flags & asOBJ_NOCOUNT )
+		// If the type is not a handle then there was an error with building the type, but 
+		// this error would already have been reported so no need to report another error here
+		if( dt.IsObjectHandle() && (dt.GetObjectType()->flags & asOBJ_NOCOUNT) )
 			WriteError(TXT_AUTOHANDLE_CANNOT_BE_USED_FOR_NOCOUNT, file, node->firstChild);
 
 		if( autoHandle ) *autoHandle = true;

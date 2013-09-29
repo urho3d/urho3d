@@ -55,6 +55,7 @@
 #include "as_scriptengine.h"
 #include "as_texts.h"
 #include "as_tokendef.h"
+#include "as_context.h"
 
 #if !defined(AS_LINUX)
 

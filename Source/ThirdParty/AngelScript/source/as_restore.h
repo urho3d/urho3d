@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2013 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -117,6 +117,33 @@ protected:
 
 	asCMap<void*,bool>              existingShared;
 	asCMap<asCScriptFunction*,bool> dontTranslate;
+
+	// Helper class for adjusting offsets within initialization list buffers
+	struct SListAdjuster
+	{
+		SListAdjuster(asDWORD *bc, asCObjectType *ot);
+		void AdjustAllocMem();
+		int  AdjustOffset(int offset, asCObjectType *listPatternType);
+		void SetRepeatCount(asUINT rc);
+		void SetNextType(int typeId);
+
+		struct SInfo
+		{
+			asUINT              repeatCount;
+			asSListPatternNode *startNode;
+		};
+		asCArray<SInfo> stack;
+
+		asDWORD            *allocMemBC;
+		asUINT              maxOffset;
+		asCObjectType      *patternType;
+		asUINT              repeatCount;
+		int                 lastOffset;
+		asUINT              lastAdjustedOffset;
+		asSListPatternNode *patternNode;
+		int                 nextTypeId;
+	};
+	asCArray<SListAdjuster*> listAdjusters;
 };
 
 #ifndef AS_NO_COMPILER
@@ -189,6 +216,30 @@ protected:
 		int            offset;
 	};
 	asCArray<SObjProp>           usedObjectProperties;
+
+	// Helper class for adjusting offsets within initialization list buffers
+	struct SListAdjuster
+	{
+		SListAdjuster(asCObjectType *ot);
+		int  AdjustOffset(int offset, asCObjectType *listPatternType);
+		void SetRepeatCount(asUINT rc);
+		void SetNextType(int typeId);
+
+		struct SInfo
+		{
+			asUINT              repeatCount;
+			asSListPatternNode *startNode;
+		};
+		asCArray<SInfo> stack;
+
+		asCObjectType      *patternType;
+		asUINT              repeatCount;
+		asSListPatternNode *patternNode;
+		asUINT              entries;
+		int                 lastOffset;
+		int                 nextTypeId;
+	};
+	asCArray<SListAdjuster*> listAdjusters;
 };
 
 #endif
