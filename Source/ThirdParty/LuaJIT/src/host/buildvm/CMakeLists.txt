@@ -3,7 +3,7 @@ set (TARGET_NAME buildvm)
 
 # Dynasm
 set ( DASM ${CMAKE_CURRENT_SOURCE_DIR}/../../../dynasm/dynasm.lua )
-set ( DASM_T ${CMAKE_CURRENT_SOURCE_DIR}/../buildvm_arch.h )
+set ( DASM_T ${CMAKE_CURRENT_BINARY_DIR}/generated/buildvm_arch.h )
 
 # Proper detection of flags
 set ( DASM_VER "" )
@@ -55,6 +55,6 @@ add_custom_command(OUTPUT ${DASM_T}
 file (GLOB C_FILES ../buildvm*.c)
 set (SOURCE_FILES ${C_FILES} ${DASM_T})
 
-set (INCLUDE_DIRS_ONLY . ../../)
+set (INCLUDE_DIRS_ONLY . ../../ ${CMAKE_CURRENT_BINARY_DIR}/generated/)
 # Setup target
 setup_executable ()

@@ -32,8 +32,8 @@ else ()
 endif ()
 
 macro(add_buildvm_target _target _mode)
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}
-    COMMAND ${PROJECT_ROOT_DIR}/Bin/buildvm ARGS -m ${_mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${_target} ${ARGN}
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/${_target}
+    COMMAND ${PROJECT_ROOT_DIR}/Bin/buildvm ARGS -m ${_mode} -o ${CMAKE_CURRENT_BINARY_DIR}/generated/${_target} ${ARGN}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS buildvm ${ARGN}
   )
@@ -41,10 +41,10 @@ endmacro(add_buildvm_target)
 
 if ( WIN32 AND NOT CYGWIN )
   add_buildvm_target ( lj_vm.obj peobj )
-  set (LJ_VM_SRC ${CMAKE_CURRENT_BINARY_DIR}/lj_vm.obj)
+  set (LJ_VM_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated/lj_vm.obj)
 else ()
   add_buildvm_target ( lj_vm.s ${LJVM_MODE} )
-  set (LJ_VM_SRC ${CMAKE_CURRENT_BINARY_DIR}/lj_vm.s)
+  set (LJ_VM_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated/lj_vm.s)
 endif ()
 
 add_buildvm_target ( lj_ffdef.h   ffdef   ${LJLIB_C} )
@@ -56,15 +56,15 @@ add_buildvm_target ( jit/vmdef.lua  libvm  ${LJLIB_C} )
 
 SET ( DEPS
   ${LJ_VM_SRC}
-  ${CMAKE_CURRENT_BINARY_DIR}/lj_ffdef.h
-  ${CMAKE_CURRENT_BINARY_DIR}/lj_bcdef.h
-  ${CMAKE_CURRENT_BINARY_DIR}/lj_libdef.h
-  ${CMAKE_CURRENT_BINARY_DIR}/lj_recdef.h
-  ${CMAKE_CURRENT_BINARY_DIR}/lj_folddef.h
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/lj_ffdef.h
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/lj_bcdef.h
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/lj_libdef.h
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/lj_recdef.h
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/lj_folddef.h
 )
 
 ## LuaJIT Library
-include_directories ( ${CMAKE_CURRENT_BINARY_DIR} dynasm src src/host )
+include_directories ( ${CMAKE_CURRENT_BINARY_DIR}/generated dynasm src src/host )
 
 set ( LJCORE_C 
   src/lj_gc.c
@@ -121,7 +121,7 @@ set ( LJCORE_C
 )
 
 set (SOURCE_FILES ${LJCORE_C} ${DEPS})
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} dynasm src src/host )
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR}/generated dynasm src src/host )
 
 # Setup target
 setup_library ()
