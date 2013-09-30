@@ -31,6 +31,8 @@ else ()
   list ( APPEND LJLIB_C src/lib_package.c )
 endif ()
 
+file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+
 macro(add_buildvm_target _target _mode)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/${_target}
     COMMAND ${PROJECT_ROOT_DIR}/Bin/buildvm ARGS -m ${_mode} -o ${CMAKE_CURRENT_BINARY_DIR}/generated/${_target} ${ARGN}

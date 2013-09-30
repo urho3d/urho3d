@@ -44,6 +44,8 @@ string ( REPLACE ";" " " DASM_FLAGS_STR "${DASM_FLAGS}")
 
 set ( DASM_DASC ${CMAKE_CURRENT_SOURCE_DIR}/../../vm_${DASM_ARCH}.dasc )
 
+file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+
 # Generate buildvm arch header
 add_custom_command(OUTPUT ${DASM_T}
   COMMAND ${PROJECT_ROOT_DIR}/Bin/minilua ${DASM} ${DASM_FLAGS} -o ${DASM_T} ${DASM_DASC}
