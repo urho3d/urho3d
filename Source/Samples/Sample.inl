@@ -106,8 +106,6 @@ void Sample::CreateConsoleAndDebugHud()
     // Get default style
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
-    if (!xmlFile)
-        return;
 
     // Create console
     Console* console = engine_->CreateConsole();
