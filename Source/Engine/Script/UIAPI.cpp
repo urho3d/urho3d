@@ -477,6 +477,7 @@ static void RegisterView3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("View3D", "void set_autoUpdate(bool)", asMETHOD(View3D, SetAutoUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "bool get_autoUpdate() const", asMETHOD(View3D, GetAutoUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "Texture2D@+ get_renderTexture() const", asMETHOD(View3D, GetRenderTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("View3D", "Texture2D@+ get_depthTexture() const", asMETHOD(View3D, GetDepthTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "Viewport@+ get_viewport() const", asMETHOD(View3D, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "Scene@+ get_scene() const", asMETHOD(View3D, GetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("View3D", "Node@+ get_cameraNode() const", asMETHOD(View3D, GetCameraNode), asCALL_THISCALL);

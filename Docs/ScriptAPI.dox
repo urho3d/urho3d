@@ -6311,6 +6311,7 @@ Properties:
 - uint format
 - bool autoUpdate
 - Texture2D@ renderTexture (readonly)
+- Texture2D@ depthTexture (readonly)
 - Viewport@ viewport (readonly)
 - Scene@ scene (readonly)
 - Node@ cameraNode (readonly)

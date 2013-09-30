@@ -6,6 +6,8 @@ namespace Urho3D
 
 \section LuaScriptAPI_GlobalFunctions Global functions
 - Context* GetContext()
+- Object* GetEventSender()
+- EventHandler* GetEventHandler() const
 - Audio* GetAudio()
 - Console* GetConsole()
 - DebugHud* GetDebugHud()
@@ -25,7 +27,7 @@ namespace Urho3D
 - void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
 - void OpenConsoleWindow()
 - void PrintLine(const String str, bool error = false)
-- const Vector<String>& GetArguments()
+- string* GetArguments()
 - String GetConsoleInput()
 - String GetPlatform()
 - unsigned GetNumPhysicalCPUs()
@@ -57,7 +59,6 @@ namespace Urho3D
 - String GetInternalPath(const String pathName)
 - String GetNativePath(const String pathName)
 - bool IsAbsolutePath(const String pathName)
-- Object* GetEventSender()
 - void SendEvent(const String eventName, VariantMap& eventData)
 - void SubscribeToEvent(const String eventName, const String functionName)
 - void UnsubscribeFromEvent(const String eventName)
@@ -618,6 +619,17 @@ Properties:
 
 Methods:
 
+- Sound(Context* context)
+- ~Sound()
+- bool LoadRaw(Deserializer& source)
+- bool LoadWav(Deserializer& source)
+- bool LoadOggVorbis(Deserializer& source)
+- void SetSize(unsigned dataSize)
+- void SetData(const void* data, unsigned dataSize)
+- void SetFormat(unsigned frequency, bool sixteenBit, bool stereo)
+- void SetLooped(bool enable)
+- void SetLoop(unsigned repeatOffset, unsigned endOffset)
+- void FixInterpolation()
 - float GetLength() const
 - unsigned GetDataSize() const
 - unsigned GetSampleSize() const
@@ -672,7 +684,6 @@ Methods:
 - void PlayLockless(Sound* sound)
 - void StopLockless()
 - void SetPlayPositionLockless(signed char* position)
-- void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolation)
 
 Properties:
 
@@ -5104,6 +5115,7 @@ Methods:
 - Scene* GetScene() const
 - Node* GetCameraNode() const
 - Texture2D* GetRenderTexture() const
+- Texture2D* GetDepthTexture() const
 - Viewport* GetViewport() const
 
 Properties:

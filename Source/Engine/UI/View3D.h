@@ -68,11 +68,15 @@ public:
     Node* GetCameraNode() const;
     /// Return render texture.
     Texture2D* GetRenderTexture() const;
+    /// Return depth stencil texture.
+    Texture2D* GetDepthTexture() const;
     /// Return viewport.
     Viewport* GetViewport() const;
     
     /// Renderable texture.
     SharedPtr<Texture2D> renderTexture_;
+    /// Depth stencil texture.
+    SharedPtr<Texture2D> depthTexture_;
     /// Viewport.
     SharedPtr<Viewport> viewport_;
     /// Scene.

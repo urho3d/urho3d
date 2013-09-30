@@ -251,7 +251,7 @@ static const char* lightPSVariations[] =
 };
 
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
-static const unsigned MAX_BUFFER_AGE = 2000;
+static const unsigned MAX_BUFFER_AGE = 1000;
 
 Renderer::Renderer(Context* context) :
     Object(context),

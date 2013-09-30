@@ -15,6 +15,7 @@ class View3D : public Window
     Scene* GetScene() const;
     Node* GetCameraNode() const;
     Texture2D* GetRenderTexture() const;
+    Texture2D* GetDepthTexture() const;
     Viewport* GetViewport() const;
     
     tolua_property__get_set unsigned format;
