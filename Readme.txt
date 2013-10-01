@@ -358,13 +358,13 @@ cmake_xxxx batch files or shell scripts.
 |-DENABLE_64BIT=1      |to enable 64bit build                                  |
 |-DENABLE_LUA=1        |to enable additional Lua scripting support             |
 |-DENABLE_LUA_JIT=1    |to enable Lua Just-in-time compilation                 |
+|-DENABLE_SAFE_LUA=1   |to enable Lua C++ wrapper safety checks                |
 |-DENABLE_SAMPLES=1    |to build the C++ sample applications                   |
 |-DENABLE_TOOLS=1      |to build the tools (only useful for Raspberry Pi build |
 |                      | because this option is already enabled by default for |
 |                      | other Desktop platforms)                              |
 |-DENABLE_SSE=0        |to disable SSE instruction set                         |
 |-DENABLE_MINIDUMPS=0  |to disable minidumps on crash (VS only)                |
-|-DENABLE_SAFE_LUA=0   |to disable Lua C++ wrapper safety for performance      |
 |-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS  |
 |                      | on Windows platform because this option is enabled by |
 |                      | default for other platforms)                          | 
