@@ -13,6 +13,18 @@ Bin-CC/
 Lib/
 Lib-CC/
 
+# Compiled shaders
+*.vs2
+*.vs3
+*.ps2
+*.ps3
+
+# Compiled AngelScript
+*.asc
+
+# Generated html
+Docs/html
+
 # Eclipse project settings
 Source/.*project
 
