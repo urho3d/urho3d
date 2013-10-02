@@ -60,9 +60,11 @@ if (URHO3D_BUILD_TYPE STREQUAL SHARED)
     set (CMAKE_POSITION_INDEPENDENT_CODE true)
 endif ()
 
-# Enable Lua JIT
+# Add definition for Lua JIT
 if (ENABLE_LUA_JIT)
     add_definitions (-DENABLE_LUA_JIT)
+    # Implied ENABLE_LUA
+    set (ENABLE_LUA 1)
 endif ()
 
 # Add targets

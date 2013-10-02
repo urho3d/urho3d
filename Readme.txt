@@ -164,7 +164,8 @@ process has two steps:
    generate the build files. You can use the provided batch files or shell
    scripts on the respective platform.
    
-    Windows: cmake_vs2008.bat, cmake_vs2010.bat, cmake_vs2012.bat or cmake_mingw.bat,
+    Windows: cmake_vs2008.bat, cmake_vs2010.bat, cmake_vs2012.bat, or
+             cmake_mingw.bat,
     Linux: cmake_gcc.sh or cmake_eclipse.sh,
     Mac OS X: cmake_gcc.sh or cmake_macosx.sh.
 
@@ -208,23 +209,32 @@ to execute "Urho3D" in the "Info" tab. In the "Arguments" tab, specify the
 arguments required by Urho3D executable. Ensure the check boxes are ticked on
 the argument entries that you want to be active.
 
+CMake caches some internal variables to speed up the subsequent invocation of
+the CMake build script. This is normally a good thing. However, there are cases
+when this is not desirable, for instance when switching CMake generators or
+after upgrading development software components. In such cases, it is recomended
+to first clean the CMake cache by invoking cmake_clean.bat or cmake_clean.sh.
+
 
 Android build process
 ---------------------
 
-First, if you are building under Windows platform, copy Bin/Data and Bin/CoreData
-directories to the Source/Android/assets directory (you can use the provided 
-batch file CopyData.bat). This step is not necessary for non-Windows platform 
-because the build script uses symbolic links for platforms that support it.
+First, if you are building under Windows platform without MKLINK support then
+copy Bin/Data and Bin/CoreData directories to the Source/Android/assets
+directory (you can use the provided batch file CopyData.bat). This step is not
+necessary for Windows with MKLINK support and non-Windows platforms because the
+build script uses symbolic links for platforms that support it.
 
 Set the ANDROID_NDK environment variable to point to your Android NDK. On 
 Windows, ensure that make.exe from the Android NDK is included in the path and
 is executable from the command line.
 
-On Windows, execute cmake_android.bat then go to the Source/Android directory
-and execute the following commands. On OS X or Linux, execute cmake_gcc.sh (the 
-ANDROID_NDK environment variable distinguishes from a normal desktop build) then 
-go to the android-Build directory (which is a GCC out-of-source build) and execute
+On Windows, execute cmake_android.bat. If MKLINK support is available, provide
+build option "-DUSE_MKLINK=1" to generate out-of-source build. Then go to the
+build directory Source/Android (or android-Build if out-of-source build) and
+execute the following commands. On OS X or Linux, execute cmake_gcc.sh (the
+ANDROID_NDK environment variable distinguishes from a normal desktop build) then
+go to the android-Build directory (always an out-of-source build) and execute
 the following commands.
 
 - android update project -p . -t 1 (only needed on the first time,
@@ -233,8 +243,8 @@ the following commands.
             host/build system)
 - ant debug
 
-After the commands finish successfully, the APK should have been generated to the
-build's "bin" subdirectory, from where it can be installed on a device or an
+After the commands finish successfully, the APK should have been generated to
+the build's "bin" subdirectory, from where it can be installed on a device or an
 emulator. The command "ant installd" can be used for this.
 
 For a release build, use the "ant release" command instead of "ant debug" and
@@ -248,16 +258,15 @@ activity subclasses the SDLActivity from org.libsdl.app package, whose name
 Note that the native code is built by default for armeabi-v7a ABI. To make your
 program compatible also with old Android devices, build also an armeabi version
 by executing the CMake batch file again with the parameter -DANDROID_ABI=armeabi
-added, then execute make again in the Android directory on Windows or android-Build
-directory on Mac/Linux.
+added, then execute make again in the build directory.
 
-You can also build and deploy using Eclipse IDE with ADT plugin. To do that, after
-setting the ANDROID_NDK environment variable then run cmake_eclipse.sh. Import
-"Existing Android Code into Workspace" from the CMake generated Eclipse's project
-found in the android-Build directory. Switch Eclipse IDE to use Java Perspective.
-Update project properties to choose the desired Android API target and that's it.
-Just choose "Run" to let ADT automatically build and deploy the application to
-Android (virtual) device.
+You can also build and deploy using Eclipse IDE with ADT plugin. To do that,
+after setting the ANDROID_NDK environment variable then run cmake_eclipse.sh.
+Import "Existing Android Code into Workspace" from the CMake generated Eclipse's
+project found in the android-Build directory. Switch Eclipse IDE to use Java
+Perspective. Update project properties to choose the desired Android API target
+and that's it. Just choose "Run" to let ADT automatically build and deploy the
+application to Android (virtual) device.
 
 
 iOS build process
@@ -282,27 +291,28 @@ to "Urho3D.app".
 Raspberry Pi build process
 --------------------------
 
-For native build on Raspberry Pi itself, use the similar process for Linux Desktop
-build described above.
+For native build on Raspberry Pi itself, use the similar process for Linux
+Desktop build described above.
 
 For cross-compiling build on another build/host machine, set the RASPI_TOOL
-environment variable to point to your Raspberry Pi Cross-Compiling tool where all
-the arm-linux-gnueabihf-* executables are located. You can setup the tool using
-crosstool-NG (http://crosstool-ng.org/) or just download one from
+environment variable to point to your Raspberry Pi Cross-Compiling tool where
+all the arm-linux-gnueabihf-* executables are located. You can setup the tool
+using crosstool-NG (http://crosstool-ng.org/) or just download one from
 https://github.com/raspberrypi/tools. The RASPI_TOOL environment variable tells
 build script to generate additional build directory for cross-compiling.
 
-Run cmake_gcc.sh then go to the raspi-Build directory and proceed to execute make.
-After the build is complete, the ARM executables can be found in Bin-CC directory. 
+Run cmake_gcc.sh then go to the raspi-Build directory and proceed to execute
+make. After the build is complete, the ARM executables can be found in Bin-CC
+directory. 
 
-You can also build, deploy, run/debug (as C/C++ Remote Application) using Eclipse
-IDE, if you run cmake_eclipse.sh to generate the project file. Import the CMake
-generated Eclipse project in the raspi-Build directory into Eclipse's workspace.
-Build the project as usual. Use the SCP_TO_TARGET build option to automatically
-deploy the ARM executables to target Raspberry Pi as part of every project build
-or configure Eclipse to perform a "download to target path" in the Run/Debug
-configuration for C/C++ Remote Application. Either way, you have to configure the
-Run/Debug configuration how to reach your target Raspberry Pi.
+You can also build, deploy, run/debug (as C/C++ Remote Application) using
+Eclipse IDE, if you run cmake_eclipse.sh to generate the project file. Import
+the CMake generated Eclipse project in the raspi-Build directory into Eclipse's
+workspace. Build the project as usual. Use the SCP_TO_TARGET build option to
+automatically deploy the ARM executables to target Raspberry Pi as part of every
+project build or configure Eclipse to perform a "download to target path" in the
+Run/Debug configuration for C/C++ Remote Application. Either way, you have to
+configure the Run/Debug configuration how to reach your target Raspberry Pi.
 
 
 Desktop 64bit build
@@ -310,25 +320,27 @@ Desktop 64bit build
 
 Currently CMake build configuration has been set to compile Urho3D as 32bit by
 default. To enable 64bit build, run the provided cmake_xxxx.bat or cmake_xxxx.sh
-by passing the option "-DENABLE_64BIT=1" explicitly. For Visual Studio on Windows
-platform, this option also overrides CMake to use a 64bit solution generator.
+by passing the option "-DENABLE_64BIT=1" explicitly. For Visual Studio on
+Windows platform, this option also overrides CMake to use a 64bit solution
+generator.
 
 
 Library build
 -------------
 
 CMake build configuration has been scripted to generate Urho3D executable as the
-default build target. This default target builds the Urho3D script host application
-(a tool to execute AngelScript and Lua script). To change it to generate an Urho3D
-static or shared (dynamic) library build target instead, specify the build option
-"-DURHO3D_BUILD_TYPE=STATIC" or "-DURHO3D_BUILD_TYPE=SHARED", respectively. When
-this option is set, the other build options to generate sample and tool targets are
-ignored. Due to the way the Urho3D project is being structured and the potential
-conflict of different visibility (export) attribute settings, when building the
-Urho3D library target then no other runtime targets can be built at the same time.    
+default build target. This default target builds the Urho3D script host
+application (a tool to execute AngelScript and Lua script). To change it to
+generate an Urho3D static or shared (dynamic) library build target instead,
+specify the build option "-DURHO3D_BUILD_TYPE=STATIC" or
+"-DURHO3D_BUILD_TYPE=SHARED", respectively. When this option is set, the other
+build options to generate sample and tool targets are ignored. Due to the way
+the Urho3D project is being structured and the potential conflict of different
+visibility (export) attribute settings, when building the Urho3D library target
+then no other runtime targets can be built at the same time.
 
-Refer to "Using Urho3D as external library" on how to setup your own project to use
-Urho3D as external library.
+Refer to "Using Urho3D as external library" on how to setup your own project to
+use Urho3D as external library.
 
 
 Compiling Direct3D shaders
@@ -357,7 +369,8 @@ cmake_xxxx batch files or shell scripts.
 |----------------------|-------------------------------------------------------|
 |-DENABLE_64BIT=1      |to enable 64bit build                                  |
 |-DENABLE_LUA=1        |to enable additional Lua scripting support             |
-|-DENABLE_LUA_JIT=1    |to enable Lua Just-in-time compilation                 |
+|-DENABLE_LUA_JIT=1    |to enable Lua Just-in-time compilation,                |
+|                      | implied ENABLE_LUA                                    |
 |-DENABLE_SAFE_LUA=1   |to enable Lua C++ wrapper safety checks                |
 |-DENABLE_SAMPLES=1    |to build the C++ sample applications                   |
 |-DENABLE_TOOLS=1      |to build the tools (only useful for Raspberry Pi build |
