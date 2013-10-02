@@ -27,20 +27,25 @@ if (URHO3D_BUILD_TYPE STREQUAL SHARED)
 endif ()
 
 # Define generated source files
-find_program (SVNVERSION_EXECUTABLE svnversion NO_CMAKE_FIND_ROOT_PATH)
-if (SVNVERSION_EXECUTABLE)
+find_program (GIT_EXECUTABLE git NO_CMAKE_FIND_ROOT_PATH)
+if (GIT_EXECUTABLE)
+    execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+endif ()
+if (GIT_EXECUTABLE AND GIT_EXIT_CODE EQUAL 0)
     if (WIN32)
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
-            COMMAND for /F %%v in ('svnversion -n ${PROJECT_SOURCE_DIR}') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
-            COMMENT "Generating subversion revision number")
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
+            COMMAND for /F %%v in ('git describe --always --dirty') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
     else ()
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
-            COMMAND for v in `svnversion -n ${PROJECT_SOURCE_DIR}`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/svnversion.h\; break\; done DEPENDS ${STATIC_LIBRARY_TARGETS}
-            COMMENT "Generating subversion revision number")
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
+            COMMAND for v in `git describe --always --dirty`\; do echo 'const char* revision="'$$v'"\;' >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h\; break\; done DEPENDS ${STATIC_LIBRARY_TARGETS}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
     endif ()
 else ()
-    # No Subversion command line tools, generate a dummy version file
-    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h "const char* revision=\"Unversioned\";")
+    # No GIT command line tool or not a GIT repository, generate a dummy version file
+    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h "const char* revision=\"Unversioned\";")
 endif ()
 
 # Define generated object files
@@ -104,7 +109,7 @@ endforeach ()
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${OBJ_FILES} svnversion.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${OBJ_FILES} gitversion.h)
 set_source_files_properties (${OBJ_FILES} PROPERTIES GENERATED TRUE)
 
 # Define dependency libs
@@ -115,7 +120,7 @@ endif ()
 
 # Setup target
 setup_library ()
-if (NOT SVNVERSION_EXECUTABLE)
+if (NOT GIT_EXECUTABLE)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 endif ()
 

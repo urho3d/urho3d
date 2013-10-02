@@ -23,7 +23,7 @@ Lib-CC/
 *.asc
 
 # Generated html
-Docs/html
+Docs/html/
 
 # Eclipse project settings
 Source/.*project

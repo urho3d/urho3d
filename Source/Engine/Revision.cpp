@@ -21,7 +21,7 @@
 //
 
 #include "Revision.h"
-#include "svnversion.h"
+#include "gitversion.h"
 
 namespace Urho3D
 {
