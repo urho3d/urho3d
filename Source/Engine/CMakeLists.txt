@@ -120,7 +120,7 @@ endif ()
 
 # Setup target
 setup_library ()
-if (NOT GIT_EXECUTABLE)
+if (NOT GIT_EXECUTABLE OR NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 endif ()
 
