@@ -22,11 +22,11 @@
 
 @echo off
 
-# Clean all the CMake cache
+:: Clean all the CMake cache
 if exist Build\CMakeCache.txt. del /F Build\CMakeCache.txt
 if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt
 if exist Source\Android\CMakeCache.txt. del /F Source\Android\CMakeCache.txt
 
-# For Android build, need to clean the CMakeFiles as well
+:: For Android build, need to clean the CMakeFiles as well
 if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
 if exist Source\Android\CMakeFiles. rd /S /Q Source\Android\CMakeFiles
