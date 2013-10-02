@@ -1,0 +1,30 @@
+# Build directories
+Build/
+android-Build/
+ios-Build/
+raspi-Build/
+
+# Output directories
+Bin/*
+!Bin/**/
+!Bin/*.bat
+!Bin/*.sh
+Bin-CC/
+Lib/
+Lib-CC/
+
+# Eclipse project settings
+Source/.*project
+
+# CMake files for non out-of-source build
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# Misc.
+Doxyfile
+configure*
+*~
+*.swp
