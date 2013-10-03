@@ -70,7 +70,7 @@ public:
     /// Return Lua state.
     lua_State* GetState() const { return luaState_; }
     /// Return Lua function.
-    LuaFunction* GetFunction(const String& functionName, bool silentIfNotfound = false);
+    WeakPtr<LuaFunction> GetFunction(const String& functionName, bool silentIfNotfound = false);
 
 private:
     /// Register loader.
@@ -96,11 +96,11 @@ private:
     /// Lua state.
     lua_State* luaState_;
     /// Function name to function map.
-    HashMap<String, LuaFunction*> functionNameToFunctionMap_;
+    HashMap<String, SharedPtr<LuaFunction> > functionNameToFunctionMap_;
     /// Event type to function map.
-    HashMap<StringHash, LuaFunction*> eventTypeToFunctionMap_;
+    HashMap<StringHash, WeakPtr<LuaFunction> > eventTypeToFunctionMap_;
     /// Object to event type to function map.
-    HashMap<Object*, HashMap<StringHash, LuaFunction*> > objectToEventTypeToFunctionMap_;
+    HashMap<Object*, HashMap<StringHash, WeakPtr<LuaFunction> > > objectToEventTypeToFunctionMap_;
 };
 
 /// Register Lua script library objects.

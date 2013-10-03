@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "RefCounted.h"
+
 struct lua_State;
 
 namespace Urho3D
@@ -31,7 +33,7 @@ class LuaScript;
 class LuaScriptInstance;
 
 /// Lua function.
-class URHO3D_API LuaFunction
+class URHO3D_API LuaFunction : public RefCounted
 {
 public:
     /// Construct.

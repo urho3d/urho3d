@@ -104,7 +104,7 @@ public:
     /// Get script network serialization attribute by calling a script function.
     PODVector<unsigned char> GetScriptNetworkDataAttr() const;
     /// Return script object's funcition.
-    LuaFunction* GetScriptObjectFunction(const String& functionName);
+    WeakPtr<LuaFunction> GetScriptObjectFunction(const String& functionName);
 
 protected:
     /// Handle node transform being dirtied.
@@ -143,11 +143,11 @@ private:
     /// Script object ref.
     int scriptObjectRef_;
     /// Script object method.
-    LuaFunction* scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
+    WeakPtr<LuaFunction> scriptObjectMethods_[MAX_LUA_SCRIPT_OBJECT_METHODS];
     /// Event type to function map.
-    HashMap<StringHash, LuaFunction*> eventTypeToFunctionMap_;
+    HashMap<StringHash, WeakPtr<LuaFunction> > eventTypeToFunctionMap_;
     /// Object to event type to function map.
-    HashMap<Object*, HashMap<StringHash, LuaFunction*> > objectToEventTypeToFunctionMap_;
+    HashMap<Object*, HashMap<StringHash, WeakPtr<LuaFunction> > > objectToEventTypeToFunctionMap_;
 };
 
 }

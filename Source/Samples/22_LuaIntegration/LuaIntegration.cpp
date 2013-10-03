@@ -113,7 +113,7 @@ void LuaIntegration::CreateScene()
         instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
         
         // Call the script object's "SetRotationSpeed" function.
-        LuaFunction* function = instance->GetScriptObjectFunction("SetRotationSpeed");
+        WeakPtr<LuaFunction> function = instance->GetScriptObjectFunction("SetRotationSpeed");
         if (function && function->BeginCall(instance))
         {
             function->PushUserType(Vector3(10.0f, 20.0f, 30.0f), "Vector3");
