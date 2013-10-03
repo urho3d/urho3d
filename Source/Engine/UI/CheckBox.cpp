@@ -68,7 +68,7 @@ void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexD
 
 void CheckBox::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (button == MOUSEB_LEFT)
+    if (button == MOUSEB_LEFT && editable_)
         SetChecked(!checked_);
 }
 

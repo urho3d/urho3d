@@ -119,6 +119,7 @@ UIElement::UIElement(Context* context) :
     sortChildren_(true),
     useDerivedOpacity_(true),
     enabled_(false),
+    editable_(true),
     selected_(false),
     visible_(true),
     hovering_(false),
@@ -181,6 +182,7 @@ void UIElement::RegisterObject(Context* context)
     ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Left Color", color_[2], Color::WHITE, AM_FILE);
     ATTRIBUTE(UIElement, VAR_COLOR, "Bottom Right Color", color_[3], Color::WHITE, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Is Visible", IsVisible, SetVisible, bool, true, AM_FILE);
     ACCESSOR_ATTRIBUTE(UIElement, VAR_BOOL, "Bring To Front", GetBringToFront, SetBringToFront, bool, false, AM_FILE);
@@ -485,60 +487,6 @@ void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosi
     hovering_ = true;
 }
 
-void UIElement::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
-{
-}
-
-void UIElement::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement)
-{
-}
-
-void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor)
-{
-}
-
-void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
-{
-}
-
-void UIElement::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
-{
-}
-
-void UIElement::OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor)
-{
-}
-
-bool UIElement::OnDragDropTest(UIElement* source)
-{
-    return true;
-}
-
-bool UIElement::OnDragDropFinish(UIElement* source)
-{
-    return true;
-}
-
-void UIElement::OnWheel(int delta, int buttons, int qualifiers)
-{
-}
-
-void UIElement::OnKey(int key, int buttons, int qualifiers)
-{
-}
-
-void UIElement::OnChar(unsigned c, int buttons, int qualifiers)
-{
-}
-
-void UIElement::OnResize()
-{
-}
-
-void UIElement::OnPositionSet()
-{
-}
-
 bool UIElement::LoadXML(Deserializer& source)
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
@@ -824,6 +772,12 @@ void UIElement::SetUseDerivedOpacity(bool enable)
 void UIElement::SetEnabled(bool enable)
 {
     enabled_ = enable;
+}
+
+void UIElement::SetEditable(bool enable)
+{
+    editable_ = enable;
+    OnSetEditable();
 }
 
 void UIElement::SetFocusMode(FocusMode mode)

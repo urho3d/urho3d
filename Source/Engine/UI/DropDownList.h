@@ -48,7 +48,9 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to the popup being shown.
     virtual void OnShowPopup();
-
+    /// React to editable status change.
+    virtual void OnSetEditable();
+    
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
     /// Insert item to a specific position.

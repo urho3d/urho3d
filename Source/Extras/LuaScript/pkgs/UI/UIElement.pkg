@@ -100,6 +100,7 @@ class UIElement : public Serializable
     void SetSortChildren(bool enable);
     void SetUseDerivedOpacity(bool enable);
     void SetEnabled(bool enable);
+    void SetEditable(bool enable);
     void SetFocus(bool enable);
     void SetSelected(bool enable);
     void SetVisible(bool enable);
@@ -168,6 +169,7 @@ class UIElement : public Serializable
     bool GetUseDerivedOpacity() const;
     bool HasFocus() const;
     bool IsEnabled() const;
+    bool IsEditable() const;
     bool IsSelected() const;
     bool IsVisible() const;
     bool IsHovering() const;
@@ -238,6 +240,7 @@ class UIElement : public Serializable
     tolua_property__get_set bool useDerivedOpacity;
     tolua_property__has_set bool focus;
     tolua_property__is_set bool enabled;
+    tolua_property__is_set bool editable;
     tolua_property__is_set bool selected;
     tolua_property__is_set bool visible;
     tolua_property__is_set bool hovering;

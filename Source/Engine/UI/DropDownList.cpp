@@ -126,6 +126,11 @@ void DropDownList::OnShowPopup()
     SetPopupOffset(0, showAbove ? -popup_->GetHeight() : GetHeight());
 }
 
+void DropDownList::OnSetEditable()
+{
+    listView_->SetEditable(editable_);
+}
+
 void DropDownList::AddItem(UIElement* item)
 {
     InsertItem(M_MAX_UNSIGNED, item);

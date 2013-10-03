@@ -127,6 +127,11 @@ void ScrollBar::OnResize()
     EnableLayoutUpdate();
 }
 
+void ScrollBar::OnSetEditable()
+{
+    slider_->SetEditable(editable_);
+}
+
 void ScrollBar::SetOrientation(Orientation orientation)
 {
     slider_->SetOrientation(orientation);
@@ -259,12 +264,14 @@ bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& n
 
 void ScrollBar::HandleBackButtonPressed(StringHash eventType, VariantMap& eventData)
 {
-    StepBack();
+    if (editable_)
+        StepBack();
 }
 
 void ScrollBar::HandleForwardButtonPressed(StringHash eventType, VariantMap& eventData)
 {
-    StepForward();
+    if (editable_)
+        StepForward();
 }
 
 void ScrollBar::HandleSliderChanged(StringHash eventType, VariantMap& eventData)

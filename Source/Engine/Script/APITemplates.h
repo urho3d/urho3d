@@ -988,6 +988,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     {
         engine->RegisterObjectMethod(className, "void set_enabled(bool)", asMETHOD(T, SetEnabled), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHOD(T, IsEnabled), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "void set_editable(bool)", asMETHOD(T, SetEditable), asCALL_THISCALL);
+        engine->RegisterObjectMethod(className, "bool get_editable() const", asMETHOD(T, IsEditable), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "bool get_focus() const", asMETHOD(T, HasFocus), asCALL_THISCALL);
         engine->RegisterObjectMethod(className, "void set_selected(bool)", asMETHOD(T, SetSelected), asCALL_THISCALL);

@@ -4877,6 +4877,7 @@ Methods:
 - void SetClipBoardText(const String text)
 - void SetDoubleClickInterval(float interval)
 - void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
+- void SetUseSystemClipBoard(bool enable)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -4888,6 +4889,7 @@ Methods:
 - const String& GetClipBoardText() const
 - float GetDoubleClickInterval() const
 - bool IsNonFocusedMouseWheel() const
+- bool GetUseSystemClipBoard() const
 - bool HasModalElement() const
 
 Properties:
@@ -4900,7 +4902,8 @@ Properties:
 - IntVector2 cursorPosition (readonly)
 - String& clipBoardText
 - float doubleClickInterval
-- bool nonFocusedMouseWheel (readonly)
+- bool nonFocusedMouseWheel
+- bool useSystemClipBoard
 - bool modalElement (readonly)
 
 ### UIElement : Serializable
@@ -4946,6 +4949,7 @@ Methods:
 - void SetSortChildren(bool enable)
 - void SetUseDerivedOpacity(bool enable)
 - void SetEnabled(bool enable)
+- void SetEditable(bool enable)
 - void SetFocus(bool enable)
 - void SetSelected(bool enable)
 - void SetVisible(bool enable)
@@ -5007,6 +5011,7 @@ Methods:
 - bool GetUseDerivedOpacity() const
 - bool HasFocus() const
 - bool IsEnabled() const
+- bool IsEditable() const
 - bool IsSelected() const
 - bool IsVisible() const
 - bool IsHovering() const
@@ -5075,6 +5080,7 @@ Properties:
 - bool useDerivedOpacity
 - bool focus
 - bool enabled
+- bool editable
 - bool selected
 - bool visible
 - bool hovering

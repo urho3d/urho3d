@@ -147,31 +147,33 @@ public:
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click begin.
-    virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) {}
     /// React to mouse click end.
-    virtual void OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement);
+    virtual void OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor, UIElement* beginElement) {}
     /// React to double mouse click.
-    virtual void OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) {}
     /// React to mouse drag begin.
-    virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) {}
     /// React to mouse drag motion.
-    virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) {}
     /// React to mouse drag end.
-    virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
+    virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor) {}
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
-    virtual bool OnDragDropTest(UIElement* source);
+    virtual bool OnDragDropTest(UIElement* source) { return true; }
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
-    virtual bool OnDragDropFinish(UIElement* source);
+    virtual bool OnDragDropFinish(UIElement* source) { return true; }
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, int buttons, int qualifiers);
+    virtual void OnWheel(int delta, int buttons, int qualifiers) {}
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    virtual void OnKey(int key, int buttons, int qualifiers) {}
     /// React to a key press translated to a character.
-    virtual void OnChar(unsigned c, int buttons, int qualifiers);
+    virtual void OnChar(unsigned c, int buttons, int qualifiers) {}
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize() {}
     /// React to position change.
-    virtual void OnPositionSet();
+    virtual void OnPositionSet() {}
+    /// React to editable status change.
+    virtual void OnSetEditable() {}
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
@@ -244,8 +246,10 @@ public:
     void SetSortChildren(bool enable);
     /// Set whether parent elements' opacity affects opacity. Default true.
     void SetUseDerivedOpacity(bool enable);
-    /// Set whether reacts to input.
+    /// Set whether reacts to input. Default false, but is enabled by subclasses if applicable.
     void SetEnabled(bool enable);
+    /// Set whether value is editable through input. Not applicable to all elements. Default true.
+    void SetEditable(bool enable);
     /// Set whether is focused. Only one element can be focused at a time.
     void SetFocus(bool enable);
     /// Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
@@ -372,6 +376,8 @@ public:
     bool HasFocus() const;
     /// Return whether reacts to input.
     bool IsEnabled() const { return enabled_; }
+    /// Return whether value is editable through input.
+    bool IsEditable() const { return editable_; }
     /// Return whether is selected. Actual meaning is element dependent.
     bool IsSelected() const { return selected_; }
     /// Return whether is visible.
@@ -496,6 +502,8 @@ protected:
     bool useDerivedOpacity_;
     /// Input enabled flag.
     bool enabled_;
+    /// Value editable flag.
+    bool editable_;
     /// Selected flag.
     bool selected_;
     /// Visible flag.

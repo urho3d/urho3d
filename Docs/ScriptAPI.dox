@@ -4125,6 +4125,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -4252,6 +4253,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -4487,6 +4489,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -4626,6 +4629,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -4762,6 +4766,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -4898,6 +4903,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -5037,6 +5043,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -5173,6 +5180,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -5325,6 +5333,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -5473,6 +5482,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -5687,6 +5697,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -5835,6 +5846,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -5989,6 +6001,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -6136,6 +6149,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -6272,6 +6286,7 @@ Properties:
 - bool sortChildren
 - bool useDerivedOpacity
 - bool enabled
+- bool editable
 - bool focus
 - bool selected
 - bool visible
@@ -6382,6 +6397,7 @@ Properties:
 - String clipBoardText
 - float doubleClickInterval
 - bool nonFocusedMouseWheel
+- bool useSystemClipBoard
 
 
 ### Controls

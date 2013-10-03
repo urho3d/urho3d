@@ -47,6 +47,8 @@ public:
     virtual void ApplyAttributes();
     /// React to resize.
     virtual void OnResize();
+    /// React to editable status change.
+    virtual void OnSetEditable();
     
     /// Set orientation type.
     void SetOrientation(Orientation orientation);

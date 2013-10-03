@@ -123,7 +123,7 @@ void Slider::OnDragBegin(const IntVector2& position, const IntVector2& screenPos
 
 void Slider::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (!dragSlider_ || GetSize() == knob_->GetSize())
+    if (!editable_ || !dragSlider_ || GetSize() == knob_->GetSize())
         return;
 
     float newValue = value_;
@@ -247,6 +247,9 @@ void Slider::UpdateSlider()
 
 void Slider::Page(const IntVector2& position, bool pressed)
 {
+    if (!editable_)
+        return;
+    
     IntVector2 offsetXY = position - knob_->GetPosition() - knob_->GetSize() / 2;
     int offset = orientation_ == O_HORIZONTAL ? offsetXY.x_ : offsetXY.y_;
     float length = (float)(orientation_ == O_HORIZONTAL ? GetWidth() : GetHeight());

@@ -923,6 +923,13 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 
     UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
 
+    // If not editable, repeat the previous selection. This will send an event and allow eg. a dropdownlist to close
+    if (!editable_)
+    {
+        SetSelections(selections_);
+        return;
+    }
+
     unsigned numItems = GetNumItems();
     for (unsigned i = 0; i < numItems; ++i)
     {

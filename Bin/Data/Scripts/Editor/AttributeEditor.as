@@ -31,7 +31,7 @@ UIElement@ SetEditable(UIElement@ element, bool editable)
     if (element is null)
         return element;
 
-    element.enabled = editable;
+    element.editable = editable;
     element.colors[C_TOPLEFT] = editable ? element.colors[C_BOTTOMRIGHT] : nonEditableTextColor;
     element.colors[C_BOTTOMLEFT] = element.colors[C_TOPLEFT];
     element.colors[C_TOPRIGHT] = element.colors[C_TOPLEFT];
