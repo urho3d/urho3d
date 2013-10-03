@@ -16,6 +16,7 @@ class UI : public Object
     
     void SetDoubleClickInterval(float interval);
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
+    void SetUseSystemClipBoard(bool enable);
 
     UIElement* GetRoot() const;
     UIElement* GetRootModalElement() const;
@@ -30,6 +31,7 @@ class UI : public Object
     const String& GetClipBoardText() const;
     float GetDoubleClickInterval() const;
     bool IsNonFocusedMouseWheel() const;
+    bool GetUseSystemClipBoard() const;
     bool HasModalElement() const;
     
     tolua_readonly tolua_property__get_set UIElement* root;
@@ -41,5 +43,6 @@ class UI : public Object
     tolua_property__get_set String& clipBoardText;
     tolua_property__get_set float doubleClickInterval;
     tolua_readonly tolua_property__is_set bool nonFocusedMouseWheel;
+    tolua_readonly tolua_property__get_set bool useSystemClipBoard;
     tolua_readonly tolua_property__has_set bool modalElement;
 };

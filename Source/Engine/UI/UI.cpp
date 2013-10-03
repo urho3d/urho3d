@@ -53,6 +53,8 @@
 #include "Window.h"
 #include "View3D.h"
 
+#include <SDL.h>
+
 #include "DebugNew.h"
 
 namespace Urho3D
@@ -81,6 +83,7 @@ UI::UI(Context* context) :
     #else
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
     #endif
+    useSystemClipBoard_(false),
     nonModalBatchSize_(0)
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
@@ -454,6 +457,8 @@ bool UI::SaveLayout(Serializer& dest, UIElement* element)
 void UI::SetClipBoardText(const String& text)
 {
     clipBoard_ = text;
+    if (useSystemClipBoard_)
+        SDL_SetClipboardText(text.CString());
 }
 
 void UI::SetDoubleClickInterval(float interval)
@@ -464,6 +469,11 @@ void UI::SetDoubleClickInterval(float interval)
 void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 {
     nonFocusedMouseWheel_ = nonFocusedMouseWheel;
+}
+
+void UI::SetUseSystemClipBoard(bool enable)
+{
+    useSystemClipBoard_ = enable;
 }
 
 IntVector2 UI::GetCursorPosition() const
@@ -504,6 +514,19 @@ UIElement* UI::GetFrontElement() const
     }
 
     return front;
+}
+
+const String& UI::GetClipBoardText() const
+{
+    if (useSystemClipBoard_)
+    {
+        char* text = SDL_GetClipboardText();
+        clipBoard_ = String(text);
+        if (text)
+            SDL_free(text);
+    }
+    
+    return clipBoard_;
 }
 
 bool UI::HasModalElement() const

@@ -79,8 +79,10 @@ public:
     void SetClipBoardText(const String& text);
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
-    /// Set mouse wheel handling flag.
+    /// Set whether mouse wheel can control also a non-focused element.
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
+    /// Set whether to use system clipboard. Default false.
+    void SetUseSystemClipBoard(bool enable);
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -99,11 +101,13 @@ public:
     /// Return topmost enabled root-level non-modal element.
     UIElement* GetFrontElement() const;
     /// Return clipboard text.
-    const String& GetClipBoardText() const { return clipBoard_; }
+    const String& GetClipBoardText() const;
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
-    /// Return mouse wheel handling flag.
+    /// Return whether mouse wheel can control also a non-focused element.
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
+    /// Return whether is using the system clipboard.
+    bool GetUseSystemClipBoard() const { return useSystemClipBoard_; }
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
 
@@ -202,7 +206,7 @@ private:
     /// UI element query vector.
     PODVector<UIElement*> tempElements_;
     /// Clipboard text.
-    String clipBoard_;
+    mutable String clipBoard_;
     /// Mouse buttons held down.
     int mouseButtons_;
     /// Qualifier keys held down.
@@ -213,6 +217,8 @@ private:
     bool usingTouchInput_;
     /// Flag to switch mouse wheel event to be sent to non-focused element at cursor.
     bool nonFocusedMouseWheel_;
+    /// Flag for using operating system clipboard instead of internal.
+    bool useSystemClipBoard_;
     /// Non-modal batch size (used internally for rendering).
     unsigned nonModalBatchSize_;
     /// Timer used to trigger double click.
