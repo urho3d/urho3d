@@ -27,11 +27,8 @@ if (URHO3D_BUILD_TYPE STREQUAL SHARED)
 endif ()
 
 # Define generated source files
-find_program (GIT_EXECUTABLE git NO_CMAKE_FIND_ROOT_PATH)
-if (GIT_EXECUTABLE)
-    execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-endif ()
-if (GIT_EXECUTABLE AND GIT_EXIT_CODE EQUAL 0)
+execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+if (GIT_EXIT_CODE EQUAL 0)
     if (WIN32)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
             COMMAND for /F %%v in ('git describe --always --dirty') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
@@ -120,7 +117,7 @@ endif ()
 
 # Setup target
 setup_library ()
-if (NOT GIT_EXECUTABLE OR NOT GIT_EXIT_CODE EQUAL 0)
+if (NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 endif ()
 
