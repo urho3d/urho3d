@@ -179,6 +179,17 @@ if (NOT URHO3D_BUILD_TYPE STREQUAL URHO3D_EXPORTS_BUILD_TYPE OR ${CMAKE_SOURCE_D
     configure_file (${CMAKE_SOURCE_DIR}/Engine/Urho3D.h.in ${CMAKE_BINARY_DIR}/Engine/Urho3D.h) 
 endif ()
 
+# Generate platform specific Doxyfile automatically
+if (NOT USE_OPENGL EQUAL DOXYFILE_USE_OPENGL OR ${PROJECT_ROOT_DIR}/Docs/Doxyfile.in IS_NEWER_THAN ${PROJECT_ROOT_DIR}/Doxyfile)
+    set (DOXYFILE_USE_OPENGL ${USE_OPENGL} CACHE INTERNAL "USE_OPENGL flag when Doxyfile was last generated")
+    if (USE_OPENGL)
+        set (EXCLUDE_GRAPHICS_API Direct3D9)
+    else ()
+        set (EXCLUDE_GRAPHICS_API OpenGL)
+    endif ()
+    configure_file (${PROJECT_ROOT_DIR}/Docs/Doxyfile.in ${PROJECT_ROOT_DIR}/Doxyfile) 
+endif ()
+
 # Reference supported build options that are potentially not being referenced due to platform or build type branching to suppress "unused variable" warning
 if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND ENABLE_MINIDUMPS AND ENABLE_SAFE_LUA AND USE_MKLINK AND USE_STATIC_RUNTIME AND SCP_TO_TARGET AND ANDROID_ABI)
 endif()

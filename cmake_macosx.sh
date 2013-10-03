@@ -34,9 +34,6 @@ cmake -E make_directory $BUILD
 # Create project with the Xcode generator
 cmake -E chdir $BUILD cmake -G "Xcode" $@ $SOURCE
 
-# Apple always uses OpenGL
-sed 's/OpenGL/Direct3D9/g' Docs/Doxyfile.in >Doxyfile
-
 if [ $1 == "-DIOS=1" ]; then
     # Due to a bug in the CMake/Xcode generator where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
     # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed

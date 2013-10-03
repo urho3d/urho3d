@@ -119,9 +119,6 @@ msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $@
 [ $ANDROID_NDK ] && msg "Android build" && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $@ $SOURCE && post_cmake android-Build
 unset IFS
 
-# Assume GCC user uses OpenGL, comment out below sed if this is not true
-sed 's/OpenGL/Direct3D9/g' Docs/Doxyfile.in >Doxyfile
-
 # Create symbolic links in the build directories
 if [ $ANDROID_NDK ]; then
     for dir in CoreData Data; do
