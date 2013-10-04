@@ -173,8 +173,6 @@ Graphics::Graphics(Context* context) :
     width_(0),
     height_(0),
     multiSample_(1),
-    windowPosX_(0),
-    windowPosY_(0),
     fullscreen_(false),
     resizable_(false),
     vsync_(false),
@@ -259,6 +257,17 @@ void Graphics::SetWindowTitle(const String& windowTitle)
     windowTitle_ = windowTitle;
     if (impl_->window_)
         SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
+}
+
+void Graphics::SetWindowPosition(const IntVector2& position)
+{
+    if (impl_->window_)
+        SDL_SetWindowPosition(impl_->window_, position.x_, position.y_);
+}
+
+void Graphics::SetWindowPosition(int x, int y)
+{
+    SetWindowPosition(IntVector2(x, y));
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
@@ -1779,6 +1788,16 @@ void Graphics::SetForceSM2(bool enable)
 bool Graphics::IsInitialized() const
 {
     return impl_->window_ != 0 && impl_->GetDevice() != 0;
+}
+
+IntVector2 Graphics::GetWindowPosition() const
+{
+    IntVector2 ret(IntVector2::ZERO);
+    
+    if (impl_->window_)
+        SDL_GetWindowPosition(impl_->window_, &ret.x_, &ret.y_);
+    
+    return ret;
 }
 
 PODVector<IntVector2> Graphics::GetResolutions() const

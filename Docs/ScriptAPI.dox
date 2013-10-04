@@ -3665,6 +3665,7 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int, bool, bool, bool, bool, int)
 - bool SetMode(int, int)
+- void SetWindowPosition(int, int)
 - bool ToggleFullscreen()
 - void Close()
 - bool TakeScreenShot(Image@)
@@ -3677,6 +3678,7 @@ Properties:
 - String typeName (readonly)
 - String category (readonly)
 - String windowTitle
+- IntVector2 windowPosition
 - bool sRGB
 - int width (readonly)
 - int height (readonly)

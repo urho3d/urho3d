@@ -1529,6 +1529,8 @@ Properties:
 Methods:
 
 - void SetWindowTitle(const String windowTitle)
+- void SetWindowPosition(const IntVector2& position)
+- void SetWindowPosition(int x, int y)
 - bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
@@ -1538,6 +1540,7 @@ Methods:
 - bool IsInitialized() const
 - void* GetExternalWindow() const
 - const String& GetWindowTitle() const
+- IntVector2 GetWindowPosition() const
 - int GetWidth() const
 - int GetHeight() const
 - int GetMultiSample() const
@@ -1565,7 +1568,8 @@ Methods:
 Properties:
 
 - bool initialized (readonly)
-- const String windowTitle
+- String windowTitle
+- IntVector2 windowPosition
 - int width (readonly)
 - int height (readonly)
 - int multiSample (readonly)

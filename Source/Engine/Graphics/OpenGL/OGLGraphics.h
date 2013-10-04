@@ -83,11 +83,15 @@ public:
     Graphics(Context* context_);
     /// Destruct. Release the OpenGL context and close the window.
     virtual ~Graphics();
-    
+
     /// Set external window handle. Only effective before setting the initial screen mode. On Windows it is necessary to set up OpenGL pixel format manually for the window.
     void SetExternalWindow(void* window);
     /// Set window title.
     void SetWindowTitle(const String& windowTitle);
+    /// Set window position.
+    void SetWindowPosition(const IntVector2& position);
+    /// Set window position.
+    void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
     bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
@@ -221,6 +225,8 @@ public:
     void* GetExternalWindow() const { return externalWindow_; }
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
+    /// Return window position.
+    IntVector2 GetWindowPosition() const;
     /// Return window width.
     int GetWidth() const { return width_; }
     /// Return window height.

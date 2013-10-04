@@ -3,7 +3,9 @@ $#include "Graphics.h"
 class Graphics : public Object
 {
     void SetWindowTitle(const String windowTitle);
-    
+    void SetWindowPosition(const IntVector2& position);
+    void SetWindowPosition(int x, int y);
+
     bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     bool SetMode(int width, int height);
     
@@ -15,6 +17,7 @@ class Graphics : public Object
     bool IsInitialized() const;
     void* GetExternalWindow() const;
     const String& GetWindowTitle() const;
+    IntVector2 GetWindowPosition() const;
     int GetWidth() const;
     int GetHeight() const;
     int GetMultiSample() const;
@@ -41,7 +44,8 @@ class Graphics : public Object
     static unsigned GetRGBFormat();
     
     tolua_readonly tolua_property__is_set bool initialized;
-    tolua_property__get_set const String windowTitle;
+    tolua_property__get_set String windowTitle;
+    tolua_property__get_set IntVector2 windowPosition;
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
     tolua_readonly tolua_property__get_set int multiSample;
