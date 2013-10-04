@@ -40,6 +40,7 @@ class Graphics : public Object
     bool GetStreamOffsetSupport() const;
     bool GetSRGBSupport() const;
     bool GetSRGBWriteSupport() const;
+    IntVector2 GetDesktopResolution() const;
     
     static unsigned GetRGBFormat();
     
@@ -68,4 +69,5 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool streamOffsetSupport;
     tolua_readonly tolua_property__get_set bool sRGBSupport;
     tolua_readonly tolua_property__get_set bool sRGBWriteSupport;
+    tolua_readonly tolua_property__get_set IntVector2 desktopResolution;
 };

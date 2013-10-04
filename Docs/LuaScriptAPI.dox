@@ -1563,6 +1563,7 @@ Methods:
 - bool GetStreamOffsetSupport() const
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
+- IntVector2 GetDesktopResolution() const
 - static unsigned GetRGBFormat()
 
 Properties:
@@ -1592,6 +1593,7 @@ Properties:
 - bool streamOffsetSupport (readonly)
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
+- IntVector2 desktopResolution (readonly)
 
 ### BiasParameters
 

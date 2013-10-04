@@ -277,6 +277,8 @@ public:
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;
+    /// Return the desktop resolution.
+    IntVector2 GetDesktopResolution() const;
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
     /// Return vertex buffer by index.

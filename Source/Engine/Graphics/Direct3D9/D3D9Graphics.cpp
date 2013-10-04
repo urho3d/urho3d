@@ -1853,6 +1853,13 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     return ret;
 }
 
+IntVector2 Graphics::GetDesktopResolution() const
+{
+    SDL_DisplayMode mode;
+    SDL_GetDesktopDisplayMode(0, &mode);
+    return IntVector2(mode.w, mode.h);
+}
+
 unsigned Graphics::GetFormat(CompressedFormat format) const
 {
     switch (format)

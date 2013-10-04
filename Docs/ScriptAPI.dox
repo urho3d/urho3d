@@ -3701,6 +3701,7 @@ Properties:
 - bool forceSM2
 - IntVector2[]@ resolutions (readonly)
 - int[]@ multiSampleLevels (readonly)
+- IntVector2 desktopResolution (readonly)
 
 
 ### Renderer

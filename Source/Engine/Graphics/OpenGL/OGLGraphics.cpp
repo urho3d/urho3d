@@ -1810,7 +1810,7 @@ bool Graphics::IsDeviceLost() const
     if (impl_->window_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED) != 0)
         return true;
     #endif
-    
+
     return impl_->context_ == 0;
 }
 
@@ -1862,6 +1862,13 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     /// \todo Implement properly, if possible
     
     return ret;
+}
+
+IntVector2 Graphics::GetDesktopResolution() const
+{
+    SDL_DisplayMode mode;
+    SDL_GetDesktopDisplayMode(0, &mode);
+    return IntVector2(mode.w, mode.h);
 }
 
 unsigned Graphics::GetFormat(CompressedFormat format) const
