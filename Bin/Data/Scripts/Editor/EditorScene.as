@@ -115,19 +115,20 @@ void SetResourcePath(String newPath, bool usePreferredDir = true, bool additive 
     if (!additive)
     {
         sceneResourcePath = newPath;
-        SetResourceSubPath(uiScenePath, newPath, "Scenes");
-        SetResourceSubPath(uiElementPath, newPath, "UI");
-        SetResourceSubPath(uiNodePath, newPath, "Objects");
-        SetResourceSubPath(uiScriptPath, newPath, "Scripts");
+        uiScenePath = GetResourceSubPath(newPath, "Scenes");
+        uiElementPath = GetResourceSubPath(newPath, "UI");
+        uiNodePath = GetResourceSubPath(newPath, "Objects");
+        uiScriptPath = GetResourceSubPath(newPath, "Scripts");
     }
 }
 
-void SetResourceSubPath(String& outPath, const String&in basePath, const String&in subPath)
+String GetResourceSubPath(String basePath, const String&in subPath)
 {
-    if (fileSystem.DirExists(basePath + "/" + subPath))
-        outPath = AddTrailingSlash(basePath + "/" + subPath);
+    basePath = AddTrailingSlash(basePath);
+    if (fileSystem.DirExists(basePath + subPath))
+        return AddTrailingSlash(basePath + subPath);
     else
-        outPath = AddTrailingSlash(basePath);
+        return basePath;
 }
 
 bool LoadScene(const String&in fileName)

@@ -653,7 +653,7 @@ String ReplaceExtension(const String& fullPath, const String& newExtension)
 
 String AddTrailingSlash(const String& pathName)
 {
-    String ret = pathName;
+    String ret = pathName.Trimmed();
     ret.Replace('\\', '/');
     if (!ret.Empty() && ret.Back() != '/')
         ret += '/';
@@ -662,7 +662,7 @@ String AddTrailingSlash(const String& pathName)
 
 String RemoveTrailingSlash(const String& pathName)
 {
-    String ret = pathName;
+    String ret = pathName.Trimmed();
     ret.Replace('\\', '/');
     if (!ret.Empty() && ret.Back() == '/')
         ret.Resize(ret.Length() - 1);
