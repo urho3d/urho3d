@@ -387,11 +387,10 @@ void Constraint::ReleaseConstraint()
 
 void Constraint::ApplyFrames()
 {
-    if (!constraint_)
+    if (!constraint_ || !node_ || (otherBody_ && !otherBody_->GetNode()))
         return;
     
-    if (node_)
-        cachedWorldScale_ = node_->GetWorldScale();
+    cachedWorldScale_ = node_->GetWorldScale();
     
     Vector3 ownBodyScaledPosition = position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass();
     Vector3 otherBodyScaledPosition = otherBody_ ? otherPosition_ * otherBody_->GetNode()->GetWorldScale() -
