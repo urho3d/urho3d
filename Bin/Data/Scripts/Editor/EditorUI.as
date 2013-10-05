@@ -402,7 +402,7 @@ void CreateMenuBar()
 
     BorderImage@ logo = BorderImage("Logo");
     logo.texture = cache.GetResource("Texture2D", "Textures/Logo.png");
-    logo.SetFixedWidth(50);
+    logo.SetFixedWidth(64);
     uiMenuBar.AddChild(logo);
 }
 
