@@ -59,10 +59,10 @@ public:
     
     /// Return type hash.
     virtual ShortStringHash GetType() const = 0;
-    /// Return type name.
-    virtual const String& GetTypeName() const = 0;
     /// Return base class type hash.
     virtual ShortStringHash GetBaseType() const = 0;
+    /// Return type name.
+    virtual const String& GetTypeName() const = 0;
     /// Handle event.
     virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
     
@@ -140,20 +140,20 @@ public:
     Context* GetContext() const { return context_; }
     /// Return type hash of objects created by this factory.
     ShortStringHash GetType() const { return type_; }
-    /// Return type name of objects created by this factory.
-    const String& GetTypeName() const { return typeName_; }
     /// Return base type hash of objects created by this factory.
     ShortStringHash GetBaseType() const { return baseType_; }
+    /// Return type name of objects created by this factory.
+    const String& GetTypeName() const { return typeName_; }
     
 protected:
     /// Execution context.
     Context* context_;
     /// Object type.
     ShortStringHash type_;
-    /// Object type name.
-    String typeName_;
     /// Object base type.
     ShortStringHash baseType_;
+    /// Object type name.
+    String typeName_;
 };
 
 /// Template implementation of the object factory.
@@ -165,8 +165,8 @@ public:
         ObjectFactory(context)
     {
         type_ = T::GetTypeStatic();
-        typeName_ = T::GetTypeNameStatic();
         baseType_ = T::GetBaseTypeStatic();
+        typeName_ = T::GetTypeNameStatic();
     }
     
     /// Create an object of the specific type.
