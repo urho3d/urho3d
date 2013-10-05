@@ -81,8 +81,9 @@ class HierarchyContainer : public UIElement
 
 public:
     /// Construct.
-    HierarchyContainer(Context* context, UIElement* overlayContainer) :
+    HierarchyContainer(Context* context, ListView* listView, UIElement* overlayContainer) :
         UIElement(context),
+        listView_(listView),
         overlayContainer_(overlayContainer)
     {
         SubscribeToEvent(this, E_LAYOUTUPDATED, HANDLER(HierarchyContainer, HandleLayoutUpdated));
@@ -133,7 +134,7 @@ public:
             const Vector<SharedPtr<UIElement> >& children = overlayContainer_->GetChildren();
             Vector<SharedPtr<UIElement> >::ConstIterator i = children.Find(SharedPtr<UIElement>(overlay));
             if (i != children.End())
-                static_cast<ListView*>(overlayContainer_->GetParent())->ToggleExpand(i - children.Begin());
+                listView_->ToggleExpand(i - children.Begin());
         }
     }
 
@@ -143,7 +144,7 @@ public:
         // Insert the overlay at the same index position to the overlay container
         CheckBox* overlay = static_cast<CheckBox*>(overlayContainer_->CreateChild(CheckBox::GetTypeStatic(), String::EMPTY, index));
         overlay->SetStyle("ListViewHierarchyOverlay");
-        int baseIndent = static_cast<ListView*>(overlayContainer_->GetParent())->GetBaseIndent();
+        int baseIndent = listView_->GetBaseIndent();
         int indent = element->GetIndent() - baseIndent - 1;
         overlay->SetIndent(indent);
         overlay->SetFixedWidth((indent + 1) * element->GetIndentSpacing());
@@ -153,6 +154,9 @@ public:
     }
 
 private:
+    // Parent list view.
+    ListView* listView_;
+    // Container for overlay checkboxes.
     UIElement* overlayContainer_;
 };
 
@@ -669,7 +673,7 @@ void ListView::SetHierarchyMode(bool enable)
         overlayContainer_->SetSortChildren(false);
         overlayContainer_->SetClipChildren(true);
 
-        container = new HierarchyContainer(context_, overlayContainer_);
+        container = new HierarchyContainer(context_, this, overlayContainer_);
     }
     else
     {
