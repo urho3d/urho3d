@@ -1866,9 +1866,14 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
 
 IntVector2 Graphics::GetDesktopResolution() const
 {
+#if !defined(ANDROID) && !defined(IOS)
     SDL_DisplayMode mode;
     SDL_GetDesktopDisplayMode(0, &mode);
     return IntVector2(mode.w, mode.h);
+#else
+    // SDL_GetDesktopDisplayMode() may not work correctly on mobile platforms. Rather return the window size
+    return IntVector2(width_, height_);
+#endif
 }
 
 unsigned Graphics::GetFormat(CompressedFormat format) const
