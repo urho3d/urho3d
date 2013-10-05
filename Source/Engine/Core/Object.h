@@ -32,9 +32,23 @@ namespace Urho3D
 class Context;
 class EventHandler;
 
+#define OBJECT(typeName) \
+    public: \
+        virtual Urho3D::ShortStringHash GetType() const { return GetTypeStatic(); } \
+        virtual Urho3D::ShortStringHash GetBaseType() const { return GetBaseTypeStatic(); } \
+        virtual const Urho3D::String& GetTypeName() const { return GetTypeNameStatic(); } \
+        static Urho3D::ShortStringHash GetTypeStatic() { static const Urho3D::ShortStringHash typeStatic(#typeName); return typeStatic; } \
+        static const Urho3D::String& GetTypeNameStatic() { static const Urho3D::String typeNameStatic(#typeName); return typeNameStatic; } \
+
+#define BASEOBJECT(typeName) \
+    public: \
+        static Urho3D::ShortStringHash GetBaseTypeStatic() { static const Urho3D::ShortStringHash baseTypeStatic(#typeName); return baseTypeStatic; } \
+
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
 class URHO3D_API Object : public RefCounted
 {
+    BASEOBJECT(Object);
+    
     friend class Context;
     
 public:
@@ -47,6 +61,8 @@ public:
     virtual ShortStringHash GetType() const = 0;
     /// Return type name.
     virtual const String& GetTypeName() const = 0;
+    /// Return base class type hash.
+    virtual ShortStringHash GetBaseType() const = 0;
     /// Handle event.
     virtual void OnEvent(Object* sender, StringHash eventType, VariantMap& eventData);
     
@@ -126,6 +142,8 @@ public:
     ShortStringHash GetType() const { return type_; }
     /// Return type name of objects created by this factory.
     const String& GetTypeName() const { return typeName_; }
+    /// Return base type hash of objects created by this factory.
+    ShortStringHash GetBaseType() const { return baseType_; }
     
 protected:
     /// Execution context.
@@ -134,6 +152,8 @@ protected:
     ShortStringHash type_;
     /// Object type name.
     String typeName_;
+    /// Object base type.
+    ShortStringHash baseType_;
 };
 
 /// Template implementation of the object factory.
@@ -146,6 +166,7 @@ public:
     {
         type_ = T::GetTypeStatic();
         typeName_ = T::GetTypeNameStatic();
+        baseType_ = T::GetBaseTypeStatic();
     }
     
     /// Create an object of the specific type.
@@ -240,13 +261,6 @@ private:
     /// Class-specific pointer to handler function.
     HandlerFunctionPtr function_;
 };
-
-#define OBJECT(typeName) \
-    public: \
-        virtual Urho3D::ShortStringHash GetType() const { return GetTypeStatic(); } \
-        virtual const Urho3D::String& GetTypeName() const { return GetTypeNameStatic(); } \
-        static Urho3D::ShortStringHash GetTypeStatic() { static const Urho3D::ShortStringHash typeStatic(#typeName); return typeStatic; } \
-        static const Urho3D::String& GetTypeNameStatic() { static const Urho3D::String typeNameStatic(#typeName); return typeNameStatic; } \
 
 #define EVENT(eventID, eventName) static const Urho3D::StringHash eventID(#eventName); namespace eventName
 #define PARAM(paramID, paramName) static const Urho3D::ShortStringHash paramID(#paramName)

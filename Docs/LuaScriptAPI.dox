@@ -811,6 +811,7 @@ Methods:
 Methods:
 
 - ShortStringHash GetType() const
+- ShortStringHash GetBaseType() const
 - const String& GetTypeName() const
 - const String& GetCategory() const
 - void SendEvent(const String eventName, VariantMap* eventData = 0)
@@ -818,6 +819,7 @@ Methods:
 Properties:
 
 - ShortStringHash type (readonly)
+- ShortStringHash baseType (readonly)
 - const String typeName (readonly)
 - const String category (readonly)
 

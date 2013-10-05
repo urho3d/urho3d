@@ -37,6 +37,7 @@ struct ComponentReplicationState;
 class URHO3D_API Component : public Serializable
 {
     OBJECT(Component);
+    BASEOBJECT(Component);
     
     friend class Node;
     friend class Scene;

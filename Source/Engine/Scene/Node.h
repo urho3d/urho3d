@@ -47,9 +47,10 @@ enum CreateMode
 class URHO3D_API Node : public Serializable
 {
     OBJECT(Node);
-
+    BASEOBJECT(Node);
+    
     friend class Connection;
-
+    
 public:
     /// Construct.
     Node(Context* context);

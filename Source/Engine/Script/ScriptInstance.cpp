@@ -58,8 +58,6 @@ static const char* methodDeclarations[] = {
     "void TransformChanged()"
 };
 
-extern const char* UI_CATEGORY;
-
 ScriptInstance::ScriptInstance(Context* context) :
     Component(context),
     script_(GetSubsystem<Script>()),
@@ -103,6 +101,17 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
         idAttributes_[attrPtr] = src.GetUInt();
     }
+    else if (attr.type_ == VAR_RESOURCEREF && attr.ptr_)
+    {
+        Resource*& resourcePtr = *(reinterpret_cast<Resource**>(attr.ptr_));
+        // Decrease reference count of the old object if any, then increment the new
+        if (resourcePtr)
+            resourcePtr->ReleaseRef();
+        const ResourceRef& ref = src.GetResourceRef();
+        resourcePtr = GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.id_);
+        if (resourcePtr)
+            resourcePtr->AddRef();
+    }
     else
         Serializable::OnSetAttribute(attr, src);
 }
@@ -131,6 +140,13 @@ void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) co
             unsigned componentID = component ? component->GetID() : 0;
             dest = componentID;
         }
+    }
+    else if (attr.type_ == VAR_RESOURCEREF && attr.ptr_)
+    {
+        Resource* resource = *(reinterpret_cast<Resource**>(attr.ptr_));
+        // If resource is non-null get its type and name hash. Otherwise get type from the default value
+        dest = resource ? ResourceRef(resource->GetType(), resource->GetNameHash()) :
+            ResourceRef(attr.defaultValue_.GetResourceRef().type_);
     }
     else
         Serializable::OnGetAttribute(attr, dest);
@@ -167,7 +183,6 @@ void ScriptInstance::ApplyAttributes()
     
     if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
-
 }
 
 void ScriptInstance::OnSetEnabled()
@@ -570,34 +585,25 @@ void ScriptInstance::GetScriptAttributes()
             // For a handle type, check if it's an Object subclass with a registered factory
             ShortStringHash typeHash(typeName);
             const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-            const HashMap<String, Vector<ShortStringHash> >& categories = context_->GetObjectCategories();
-            
-            if (factories.Find(typeHash) != factories.End())
+            HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator j = factories.Find(typeHash);
+            if (j != factories.End())
             {
-                // There are four possibilities: the handle is for a Node, a Component or UIElement subclass, or for some
-                // other refcounted object. We can handle nodes & components with ID attributes, but want to skip the others
-                HashMap<String, Vector<ShortStringHash> >::ConstIterator ui = categories.Find(UI_CATEGORY);
-                if (ui != categories.End() && ui->second_.Contains(typeHash))
-                    continue; // Is handle to a UIElement; can not handle those
-                else if (typeHash == Node::GetTypeStatic() || typeHash == Scene::GetTypeStatic())
+                // Check base class type. Node & Component are supported as ID attributes, Resource as a resource reference
+                ShortStringHash baseType = j->second_->GetBaseType();
+                if (baseType == Node::GetTypeStatic())
                 {
                     info.mode_ |= AM_NODEID;
                     info.type_ = VAR_INT;
                 }
-                else
+                else if (baseType == Component::GetTypeStatic())
                 {
-                    // If is found in one of the component categories, must be a component
-                    // Note: this requires that custom components are registered inside component categories as well
-                    for (HashMap<String, Vector<ShortStringHash> >::ConstIterator i = categories.Begin(); i != categories.End();
-                        ++i)
-                    {
-                        if (i->second_.Contains(typeHash))
-                        {
-                            info.mode_ |= AM_COMPONENTID;
-                            info.type_ = VAR_INT;
-                            break;
-                        }
-                    }
+                    info.mode_ |= AM_COMPONENTID;
+                    info.type_ = VAR_INT;
+                }
+                else if (baseType == Resource::GetTypeStatic())
+                {
+                    info.type_ = VAR_RESOURCEREF;
+                    info.defaultValue_ = ResourceRef(typeHash);
                 }
             }
         }

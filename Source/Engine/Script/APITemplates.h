@@ -326,6 +326,7 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
 {
     RegisterRefCounted<T>(engine, className);
     engine->RegisterObjectMethod(className, "ShortStringHash get_type() const", asMETHODPR(T, GetType, () const, ShortStringHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ShortStringHash get_baseType() const", asMETHODPR(T, GetBaseType, () const, ShortStringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(ObjectSendEvent<T>), asCALL_CDECL_OBJLAST);

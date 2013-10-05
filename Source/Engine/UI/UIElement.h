@@ -114,7 +114,8 @@ class ResourceCache;
 class URHO3D_API UIElement : public Serializable
 {
     OBJECT(UIElement);
-
+    BASEOBJECT(UIElement);
+    
 public:
     /// Construct.
     UIElement(Context* context);
@@ -455,13 +456,13 @@ public:
     /// Get UI rendering batches with a specified offset. Also recurses to child elements.
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect
         currentScissor);
-    /// Get color attribute. Uses just the top-left color.
+    /// Return color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return color_[0]; }
-    /// Get traversal mode.
+    /// Return traversal mode.
     TraversalMode GetTraversalMode() const { return traversalMode_; }
-    /// Get element event sender flag.
+    /// Return whether element should send child added / removed events by itself. If false, defers to parent element.
     bool IsElementEventSender() const { return elementEventSender_; }
-    /// Get element event sender.
+    /// Get element which should send child added / removed events.
     UIElement* GetElementEventSender() const;
 
 protected:

@@ -35,6 +35,7 @@ class Serializer;
 class URHO3D_API Resource : public Object
 {
     OBJECT(Resource);
+    BASEOBJECT(Resource);
     
 public:
     /// Construct.
