@@ -1004,6 +1004,11 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             UnhideUI();
         else if (console.visible)
             console.visible = false;
+        else if (quickMenu.visible)
+        {
+            quickMenu.visible = false;
+            quickMenu.enabled = false;
+        }
         else
         {
             UIElement@ front = ui.frontElement;
