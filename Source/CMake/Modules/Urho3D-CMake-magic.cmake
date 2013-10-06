@@ -373,14 +373,16 @@ macro (setup_executable)
     endif ()
 endmacro ()
 
-# Macro for setting up linker flags to link against the framework for Mac OS X desktop build
-macro (setup_macosx_framework FRAMEWORKS)
-    set (${FRAMEWORKS} "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+# Macro for setting up linker flags for Mac OS X desktop build
+macro (setup_macosx_linker_flags LINKER_FLAGS)
+    # Framework list to link against 
+    set (${LINKER_FLAGS} "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
 endmacro ()
 
-# Macro for setting up linker flags to link against the framework for IOS build
-macro (setup_ios_framework FRAMEWORKS)
-    set (${FRAMEWORKS} "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
+# Macro for setting up linker flags for IOS build
+macro (setup_ios_linker_flags LINKER_FLAGS)
+    # Framework list to link against 
+    set (${LINKER_FLAGS} "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
 endmacro ()
 
 # Macro for setting up an executable target with resources to copy
@@ -431,9 +433,9 @@ macro (setup_main_executable)
             set (EXE_TYPE WIN32)
         elseif (IOS)
             set (EXE_TYPE MACOSX_BUNDLE)
-            setup_ios_framework (CMAKE_EXE_LINKER_FLAGS)
+            setup_ios_linker_flags (CMAKE_EXE_LINKER_FLAGS)
         elseif (APPLE)
-            setup_macosx_framework (CMAKE_EXE_LINKER_FLAGS)
+            setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
         endif ()
         setup_executable ()
     endif ()

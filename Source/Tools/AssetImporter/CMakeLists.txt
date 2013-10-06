@@ -34,6 +34,6 @@ set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src)
 
 # Setup target
 if (APPLE)
-    setup_macosx_framework (CMAKE_EXE_LINKER_FLAGS)
+    setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
 endif ()
 setup_executable ()

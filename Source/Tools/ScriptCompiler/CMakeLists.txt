@@ -33,6 +33,6 @@ set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Eng
 
 # Setup target
 if (APPLE)
-    setup_macosx_framework (CMAKE_EXE_LINKER_FLAGS)
+    setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
 endif ()
 setup_executable ()
