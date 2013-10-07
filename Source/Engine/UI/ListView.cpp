@@ -668,8 +668,10 @@ void ListView::SetHierarchyMode(bool enable)
     UIElement* container;
     if (enable)
     {
-        overlayContainer_ = CreateChild<UIElement>("LV_OverlayContainer");
+        overlayContainer_ = new UIElement(context_);
+        overlayContainer_->SetName("LV_OverlayContainer");
         overlayContainer_->SetInternal(true);
+        AddChild(overlayContainer_);
         overlayContainer_->SetSortChildren(false);
         overlayContainer_->SetClipChildren(true);
 
@@ -686,9 +688,9 @@ void ListView::SetHierarchyMode(bool enable)
         container = new UIElement(context_);
     }
 
-    SetContentElement(container);
-    container->SetInternal(true);
     container->SetName("LV_ItemContainer");
+    container->SetInternal(true);
+    SetContentElement(container);
     container->SetEnabled(true);
     container->SetLayout(LM_VERTICAL);
     container->SetSortChildren(false);
