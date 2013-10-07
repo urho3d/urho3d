@@ -64,7 +64,7 @@ ScrollBar::ScrollBar(Context* context) :
     SubscribeToEvent(slider_, E_SLIDERCHANGED, HANDLER(ScrollBar, HandleSliderChanged));
     SubscribeToEvent(slider_, E_SLIDERPAGED, HANDLER(ScrollBar, HandleSliderPaged));
 
-    // Set default orientation/layout
+    // Set default orientation
     SetOrientation(O_HORIZONTAL);
 }
 
@@ -108,23 +108,32 @@ void ScrollBar::ApplyAttributes()
 
 void ScrollBar::OnResize()
 {
-    // Disable layout operations while setting the button sizes is incomplete
-    DisableLayoutUpdate();
-
     if (slider_->GetOrientation() == O_HORIZONTAL)
     {
         int height = GetHeight();
-        backButton_->SetFixedSize(height, height);
-        forwardButton_->SetFixedSize(height, height);
+        int sliderWidth = Max(GetWidth() - 2 * height, 0);
+
+        backButton_->SetSize(height, height);
+        slider_->SetSize(sliderWidth, height);
+        forwardButton_->SetSize(height, height);
+        
+        backButton_->SetPosition(0, 0);
+        slider_->SetPosition(height, 0);
+        forwardButton_->SetPosition(height + sliderWidth, 0);
     }
     else
     {
         int width = GetWidth();
-        backButton_->SetFixedSize(width, width);
-        forwardButton_->SetFixedSize(width, width);
-    }
+        int sliderHeight = Max(GetHeight() - 2 * width, 0);
 
-    EnableLayoutUpdate();
+        backButton_->SetSize(width, width);
+        slider_->SetSize(width, sliderHeight);
+        forwardButton_->SetSize(width, width);
+        
+        backButton_->SetPosition(0, 0);
+        slider_->SetPosition(0, width);
+        forwardButton_->SetPosition(0, sliderHeight + width);
+    }
 }
 
 void ScrollBar::OnSetEditable()
@@ -148,10 +157,6 @@ void ScrollBar::SetOrientation(Orientation orientation)
     }
 
     OnResize();
-    if (orientation == O_HORIZONTAL)
-        SetLayout(LM_HORIZONTAL);
-    else
-        SetLayout(LM_VERTICAL);
 }
 
 void ScrollBar::SetRange(float range)
