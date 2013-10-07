@@ -75,9 +75,9 @@ foreach (TARGET ${STATIC_LIBRARY_TARGETS})
     
     foreach (SOURCE ${SOURCES})
         get_filename_component (NAME ${SOURCE} NAME)
-        if (NAME MATCHES \\.c.*$|\\.m$|\\.S$)
+        if (NAME MATCHES \\.c.*$|\\.mm?$|\\.S$|\\.s$)
             if (MSVC OR XCODE)
-                string (REGEX REPLACE \\.c.*$|\\.m$|\\.S$ "" NAME ${NAME}) 
+                string (REGEX REPLACE \\.c.*$|\\.mm?$|\\.S$|\\.s$ "" NAME ${NAME}) 
             endif ()
             set (SYS_DIR "")
             if (NOT MSVC AND NOT XCODE)
@@ -123,8 +123,12 @@ endif ()
 
 # Setup the frameworks for Mac OS X platform
 if (APPLE AND LIB_TYPE STREQUAL SHARED)
-    setup_macosx_framework (FRAMEWORKS)
-    set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${FRAMEWORKS})
+    if (IOS)
+        setup_ios_linker_flags (LINKER_FLAGS)
+    else ()
+        setup_macosx_linker_flags (LINKER_FLAGS)
+    endif ()
+    set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${LINKER_FLAGS})
 endif ()
 
 # Define post build steps

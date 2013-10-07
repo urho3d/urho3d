@@ -163,8 +163,8 @@ else ()
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
                 else ()
-                    message ("-- Using SSE2 instead of SSE because SSE fails on some Windows ports of GCC")
-                    message ("-- Disable SSE with the CMake option -DENABLE_SSE=0 if this is not desired")
+                    message (STATUS "Using SSE2 instead of SSE because SSE fails on some Windows ports of GCC")
+                    message (STATUS "Disable SSE with the CMake option -DENABLE_SSE=0 if this is not desired")
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
                 endif ()
@@ -237,9 +237,9 @@ endfunction ()
 # Override builtin function to suit our need, takes care of C flags as well as CXX flags
 function (add_compiler_export_flags)
     if (NOT ANDROID AND NOT MSVC AND NOT DEFINED USE_COMPILER_HIDDEN_VISIBILITY AND NOT DEFINED COMPILER_HAS_DEPRECATED)
-        message ("-- Following tests check whether compiler installed in this system has export/import and deprecated attributes support")
-        message ("-- CMake will generate a suitable export header file for this system based on the test result")
-        message ("-- It is OK to proceed to build Urho3D regardless of the test result")
+        message (STATUS "Following tests check whether compiler installed in this system has export/import and deprecated attributes support")
+        message (STATUS "CMake will generate a suitable export header file for this system based on the test result")
+        message (STATUS "It is OK to proceed to build Urho3D regardless of the test result")
     endif ()
     _test_compiler_hidden_visibility ()
     _test_compiler_has_deprecated ()
@@ -373,14 +373,16 @@ macro (setup_executable)
     endif ()
 endmacro ()
 
-# Macro for setting up linker flags to link against the framework for Mac OS X desktop build
-macro (setup_macosx_framework FRAMEWORKS)
-    set (${FRAMEWORKS} "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+# Macro for setting up linker flags for Mac OS X desktop build
+macro (setup_macosx_linker_flags LINKER_FLAGS)
+    # Framework list to link against 
+    set (${LINKER_FLAGS} "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
 endmacro ()
 
-# Macro for setting up linker flags to link against the framework for IOS build
-macro (setup_ios_framework FRAMEWORKS)
-    set (${FRAMEWORKS} "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
+# Macro for setting up linker flags for IOS build
+macro (setup_ios_linker_flags LINKER_FLAGS)
+    # Framework list to link against 
+    set (${LINKER_FLAGS} "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
 endmacro ()
 
 # Macro for setting up an executable target with resources to copy
@@ -431,9 +433,9 @@ macro (setup_main_executable)
             set (EXE_TYPE WIN32)
         elseif (IOS)
             set (EXE_TYPE MACOSX_BUNDLE)
-            setup_ios_framework (CMAKE_EXE_LINKER_FLAGS)
+            setup_ios_linker_flags (CMAKE_EXE_LINKER_FLAGS)
         elseif (APPLE)
-            setup_macosx_framework (CMAKE_EXE_LINKER_FLAGS)
+            setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
         endif ()
         setup_executable ()
     endif ()

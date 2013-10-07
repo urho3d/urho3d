@@ -397,6 +397,15 @@ cmake_xxxx batch files or shell scripts.
 |                      | default is armeabi-v7a                                |
 |----------------------|-------------------------------------------------------|
 
+Note that build option values specified via command line are cached by CMake.
+The cached values will be used by CMake in the subsequent invocation. That is,
+the same build options are not required to be specified again and again. Once a
+non-default build option value is being cached, it can only be reverted back to
+its default value by explicitly setting it via command line. That is, simply by
+NOT passing the corresponding build option would not work. One way to revert all
+the build options to their default values is by clearing the CMake cache by
+calling cmake_clean.bat or cmake_clean.sh.
+
 
 History
 -------

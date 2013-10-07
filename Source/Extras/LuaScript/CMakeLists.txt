@@ -28,11 +28,6 @@ if (NOT ENABLE_SAFE_LUA)
     add_definitions (-DTOLUA_RELEASE)
 endif ()
 
-# Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
-
 # Define generated source files
 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 file (GLOB API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/*.pkg)
@@ -47,7 +42,11 @@ foreach (API_PKG_FILE ${API_PKG_FILES})
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pkgs
         COMMENT "Generating tolua++ API binding on the fly for ${API}")
 endforeach ()
-set (SOURCE_FILES ${SOURCE_FILES} ${GEN_CPP_FILES})
+
+# Define source files
+file (GLOB CPP_FILES *.cpp)
+file (GLOB H_FILES *.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${GEN_CPP_FILES})
 
 # Define dependency libs
 set (LIBS ../../Engine/Audio ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Engine/Graphics ../../Engine/Input ../../Engine/IO ../../Engine/Math ../../Engine/Navigation ../../Engine/Network
