@@ -5,7 +5,7 @@
 /*    Support for the FT_Outline type used to store glyph shapes of        */
 /*    most scalable font formats (specification).                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 by */
+/*  Copyright 1996-2003, 2005-2013 by                                      */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -59,6 +59,7 @@ FT_BEGIN_HEADER
   /*    FT_Outline_Translate                                               */
   /*    FT_Outline_Transform                                               */
   /*    FT_Outline_Embolden                                                */
+  /*    FT_Outline_EmboldenXY                                              */
   /*    FT_Outline_Reverse                                                 */
   /*    FT_Outline_Check                                                   */
   /*                                                                       */
@@ -96,13 +97,20 @@ FT_BEGIN_HEADER
   /*                      operations.                                      */
   /*                                                                       */
   /* <InOut>                                                               */
-  /*    user           :: A typeless pointer which is passed to each       */
+  /*    user           :: A typeless pointer that is passed to each        */
   /*                      emitter during the decomposition.  It can be     */
   /*                      used to store the state during the               */
   /*                      decomposition.                                   */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0~means success.                             */
+  /*                                                                       */
+  /* <Note>                                                                */
+  /*    A contour that contains a single point only is represented by a    */
+  /*    `move to' operation followed by `line to' to the same point.  In   */
+  /*    most cases, it is best to filter this out before using the         */
+  /*    outline for stroking purposes (otherwise it would result in a      */
+  /*    visible dot when round caps are used).                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Outline_Decompose( FT_Outline*              outline,
@@ -124,9 +132,11 @@ FT_BEGIN_HEADER
   /*                   outline will *not* necessarily be *freed*, when     */
   /*                   destroying the library, by @FT_Done_FreeType.       */
   /*                                                                       */
-  /*    numPoints   :: The maximal number of points within the outline.    */
+  /*    numPoints   :: The maximum number of points within the outline.    */
+  /*                   Must be smaller than or equal to 0xFFFF (65535).    */
   /*                                                                       */
-  /*    numContours :: The maximal number of contours within the outline.  */
+  /*    numContours :: The maximum number of contours within the outline.  */
+  /*                   This value must be in the range 0 to `numPoints'.   */
   /*                                                                       */
   /* <Output>                                                              */
   /*    anoutline   :: A handle to the new outline.                        */
@@ -214,18 +224,21 @@ FT_BEGIN_HEADER
   /*    the outline's points, including Bézier control points.  Though it  */
   /*    coincides with the exact bounding box for most glyphs, it can be   */
   /*    slightly larger in some situations (like when rotating an outline  */
-  /*    which contains Bézier outside arcs).                               */
+  /*    that contains Bézier outside arcs).                                */
   /*                                                                       */
   /*    Computing the control box is very fast, while getting the bounding */
   /*    box can take much more time as it needs to walk over all segments  */
   /*    and arcs in the outline.  To get the latter, you can use the       */
-  /*    `ftbbox' component which is dedicated to this single task.         */
+  /*    `ftbbox' component, which is dedicated to this single task.        */
   /*                                                                       */
   /* <Input>                                                               */
   /*    outline :: A pointer to the source outline descriptor.             */
   /*                                                                       */
   /* <Output>                                                              */
   /*    acbox   :: The outline's control box.                              */
+  /*                                                                       */
+  /* <Note>                                                                */
+  /*    See @FT_Glyph_Get_CBox for a discussion of tricky fonts.           */
   /*                                                                       */
   FT_EXPORT( void )
   FT_Outline_Get_CBox( const FT_Outline*  outline,
@@ -332,7 +345,7 @@ FT_BEGIN_HEADER
   /*    handled incorrectly.                                               */
   /*                                                                       */
   /*    If you need `better' metrics values you should call                */
-  /*    @FT_Outline_Get_CBox ot @FT_Outline_Get_BBox.                      */
+  /*    @FT_Outline_Get_CBox or @FT_Outline_Get_BBox.                      */
   /*                                                                       */
   /*    Example call:                                                      */
   /*                                                                       */
@@ -345,6 +358,23 @@ FT_BEGIN_HEADER
   FT_EXPORT( FT_Error )
   FT_Outline_Embolden( FT_Outline*  outline,
                        FT_Pos       strength );
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Function>                                                            */
+  /*    FT_Outline_EmboldenXY                                              */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    Embolden an outline.  The new outline will be `xstrength' pixels   */
+  /*    wider and `ystrength' pixels higher.  Otherwise, it is similar to  */
+  /*    @FT_Outline_Embolden, which uses the same strength in both         */
+  /*    directions.                                                        */
+  /*                                                                       */
+  FT_EXPORT( FT_Error )
+  FT_Outline_EmboldenXY( FT_Outline*  outline,
+                         FT_Pos       xstrength,
+                         FT_Pos       ystrength );
 
 
   /*************************************************************************/
@@ -502,9 +532,11 @@ FT_BEGIN_HEADER
   *
   * @description:
   *   This function analyzes a glyph outline and tries to compute its
-  *   fill orientation (see @FT_Orientation).  This is done by computing
-  *   the direction of each global horizontal and/or vertical extrema
-  *   within the outline.
+  *   fill orientation (see @FT_Orientation).  This is done by integrating 
+  *   the total area covered by the outline. The positive integral
+  *   corresponds to the clockwise orientation and @FT_ORIENTATION_POSTSCRIPT
+  *   is returned. The negative integral corresponds to the counter-clockwise
+  *   orientation and @FT_ORIENTATION_TRUETYPE is returned.
   *
   *   Note that this will return @FT_ORIENTATION_TRUETYPE for empty
   *   outlines.
