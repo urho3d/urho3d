@@ -128,6 +128,10 @@ if (MSVC)
     endif ()
     set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_ARCH_BITS ${MSVC_ARCH_BITS}\n")
     set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_TARGET_${MSVC_TARGET_ARCH} 1\n")
+
+	# More assumptions
+    set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_ARCH_HASFPU 1\n")
+    set (TARGET_TESTARCH "${TARGET_TESTARCH} LJ_ABI_SOFTFP 0\n")
 else ()
     get_directory_property (TARGET_TCFLAGS COMPILE_DEFINITIONS)
     string (REPLACE ";" ";-D" TARGET_TCFLAGS ";${TARGET_TCFLAGS}")
@@ -185,7 +189,7 @@ else ()
 endif ()
 
 # Add definitions specific for target C Compiler 
-if (NOT TARGET_SYS STREQUAL Windows)
+if (NOT MSVC)
     # Large file support
     add_definitions (-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE)
     # Buffer overflows check
@@ -207,13 +211,13 @@ endmacro ()
 
 # Define generated source files
 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-if (TARGET_SYS STREQUAL Windows)
+if (WIN32)
     set (LJVM_MODE peobj)
     set (LJVM_BOUT lj_vm.obj)
 else ()
     set (LJVM_BOUT lj_vm.s)
     enable_language (ASM)
-    if (TARGET_SYS MATCHES Darwin|iOS)
+    if (APPLE)
         set (LJVM_MODE machasm)
     else ()
         set (LJVM_MODE elfasm)
