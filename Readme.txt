@@ -369,8 +369,8 @@ cmake_xxxx batch files or shell scripts.
 |----------------------|-------------------------------------------------------|
 |-DENABLE_64BIT=1      |to enable 64bit build                                  |
 |-DENABLE_LUA=1        |to enable additional Lua scripting support             |
-|-DENABLE_LUA_JIT=1    |to enable Lua Just-in-time compilation,                |
-|                      | implied ENABLE_LUA                                    |
+|-DENABLE_LUA_JIT=1    |to enable Lua Just-in-time compilation, implied        |
+|                      | ENABLE_LUA (check its CMakeLists.txt for more options)|
 |-DENABLE_SAFE_LUA=1   |to enable Lua C++ wrapper safety checks                |
 |-DENABLE_SAMPLES=1    |to build the C++ sample applications                   |
 |-DENABLE_TOOLS=1      |to build the tools (only useful for Raspberry Pi build |
@@ -405,6 +405,11 @@ its default value by explicitly setting it via command line. That is, simply by
 NOT passing the corresponding build option would not work. One way to revert all
 the build options to their default values is by clearing the CMake cache by
 calling cmake_clean.bat or cmake_clean.sh.
+
+With the exception of these two build options on Windows platform: ENABLE_64BIT
+and USE_MKLINK. Because they are used as both batch option and build option. On
+the batch side, unfortunately, they must always be passed to supply a non-
+default value.
 
 
 History

@@ -376,7 +376,16 @@ endmacro ()
 # Macro for setting up linker flags for Mac OS X desktop build
 macro (setup_macosx_linker_flags LINKER_FLAGS)
     # Framework list to link against 
-    set (${LINKER_FLAGS} "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+    set (FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
+    # LuaJIT specific - extra linker flags for linking against LuaJIT in 64-bit Mac OS X desktop build
+    if (ENABLE_LUA_JIT AND ENABLE_64BIT)
+        if (URHO3D_BUILD_TYPE STREQUAL SHARED)
+            set (FLAGS "${FLAGS} -image_base 7fff04c4a000")
+        else ()
+            set (FLAGS "${FLAGS} -pagezero_size 10000 -image_base 100000000")
+        endif ()
+    endif ()
+    set (${LINKER_FLAGS} ${FLAGS})
 endmacro ()
 
 # Macro for setting up linker flags for IOS build
@@ -492,6 +501,16 @@ macro (define_dependency_libs TARGET)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} ws2_32)
         elseif (NOT ANDROID)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} pthread)
+        endif ()
+    endif ()
+
+    # ThirdParty/LuaJIT external dependency
+    if (ENABLE_LUA_JIT AND ${TARGET} MATCHES LuaJIT|Main)
+        if (NOT WIN32)
+            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dl m)
+            if (NOT APPLE)
+                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
+            endif ()
         endif ()
     endif ()
 

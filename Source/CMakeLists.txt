@@ -102,8 +102,6 @@ if (ENABLE_LUA)
     add_subdirectory (ThirdParty/Lua)
     add_subdirectory (ThirdParty/tolua++/src/lib)
     if (ENABLE_LUA_JIT)
-        add_subdirectory (ThirdParty/LuaJIT/src/host/minilua)
-        add_subdirectory (ThirdParty/LuaJIT/src/host/buildvm)
         add_subdirectory (ThirdParty/LuaJIT)
     endif ()
     add_subdirectory (Extras/LuaScript)
@@ -191,5 +189,9 @@ if (NOT USE_OPENGL EQUAL DOXYFILE_USE_OPENGL OR ${PROJECT_ROOT_DIR}/Docs/Doxyfil
 endif ()
 
 # Reference supported build options that are potentially not being referenced due to platform or build type branching to suppress "unused variable" warning
-if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND ENABLE_MINIDUMPS AND ENABLE_SAFE_LUA AND USE_MKLINK AND USE_STATIC_RUNTIME AND SCP_TO_TARGET AND ANDROID_ABI)
+if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND
+    ENABLE_MINIDUMPS AND USE_MKLINK AND USE_STATIC_RUNTIME AND
+    SCP_TO_TARGET AND
+    ANDROID_ABI AND
+    ENABLE_SAFE_LUA)
 endif()
