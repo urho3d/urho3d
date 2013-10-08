@@ -160,7 +160,7 @@ if (CMAKE_CROSSCOMPILING OR IOS)
         message (FATAL_ERROR
             "The configuration cannot be done now because the target-specific '${BUILDVM_X}' tool has not been built yet. "
             "However, the specific target architecture information is now saved. "
-            "Reconfigure the desktop native build to incorporate the saved information by calling this batch/shell script again. " 
+            "Reconfigure the desktop native build to incorporate the saved information by calling the respective batch/shell script for native build (it might be the same script as this one). "
             "Then run make or the equivalent command to actually build the missing tool natively. "
             "Finally, after the tool is built, come back to call this batch/shell script again to complete this configuration.")
     endif ()
