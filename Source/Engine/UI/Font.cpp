@@ -496,17 +496,35 @@ const FontFace* Font::GetFaceTTF(int pointSize)
             
             FT_Load_Glyph(face, i, FT_LOAD_DEFAULT);
             FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
-            
+
             unsigned char glyphOpacity = 0;
-            for (int y = 0; y < newFace->glyphs_[i].height_; ++y)
+            
+            if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
             {
-                unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
-                unsigned char* dest = imageData + texWidth * (y + newFace->glyphs_[i].y_) + newFace->glyphs_[i].x_;
-                
-                for (int x = 0; x < newFace->glyphs_[i].width_; ++x)
+                for (int y = 0; y < newFace->glyphs_[i].height_; ++y)
                 {
-                    dest[x] = src[x];
-                    glyphOpacity = Max(glyphOpacity, src[x]);
+                    unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
+                    unsigned char* dest = imageData + texWidth * (y + newFace->glyphs_[i].y_) + newFace->glyphs_[i].x_;
+
+                    for (int x = 0; x < newFace->glyphs_[i].width_; ++x)
+                    {
+                        dest[x] = (src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0;
+                        glyphOpacity = 255;
+                    }
+                }
+            }
+            else
+            {
+                for (int y = 0; y < newFace->glyphs_[i].height_; ++y)
+                {
+                    unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
+                    unsigned char* dest = imageData + texWidth * (y + newFace->glyphs_[i].y_) + newFace->glyphs_[i].x_;
+
+                    for (int x = 0; x < newFace->glyphs_[i].width_; ++x)
+                    {
+                        dest[x] = src[x];
+                        glyphOpacity = Max(glyphOpacity, src[x]);
+                    }
                 }
             }
             if (glyphOpacity)
