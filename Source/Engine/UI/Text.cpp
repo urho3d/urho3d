@@ -241,19 +241,20 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 break;
                 
             case TE_SHADOW:
-                ConstructBatch(batch, face, x + 1, y + 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, 1, 1, &effectColor_, effectDepthBias_);
                 ConstructBatch(batch, face, x, y);
                 break;
                 
             case TE_STROKE:
-                ConstructBatch(batch, face, x - 1, y - 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y - 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x + 1, y - 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x - 1, y, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x + 1, y, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x - 1, y + 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x, y + 1, &effectColor_, effectDepthBias_);
-                ConstructBatch(batch, face, x + 1, y + 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, -1, -1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, 0, -1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, 1, -1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, -1, 0, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, 1, 0, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, -1, 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, 0, 1, &effectColor_, effectDepthBias_);
+                ConstructBatch(batch, face, x, y, 1, 1, &effectColor_, effectDepthBias_);
+                
                 ConstructBatch(batch, face, x, y);
                 break;
             }
@@ -642,7 +643,7 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     return ret;
 }
 
-void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color,
+void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx, int dy, Color* color,
     float depthBias)
 {
     unsigned startDataSize = pageBatch.vertexData_->Size();
@@ -653,12 +654,12 @@ void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pa
         const FontGlyph& glyph = *glyphLocation.glyph_;
         if (!color)
         {
-            pageBatch.AddQuad(x + glyphLocation.x_ + glyph.offsetX_, y + glyphLocation.y_ + glyph.offsetY_, glyph.width_,
+            pageBatch.AddQuad(dx + glyphLocation.x_ + glyph.offsetX_, dy + glyphLocation.y_ + glyph.offsetY_, glyph.width_,
                 glyph.height_, glyph.x_, glyph.y_);
         }
         else
         {
-            pageBatch.AddQuad(x + glyphLocation.x_ + glyph.offsetX_, y + glyphLocation.y_ + glyph.offsetY_, glyph.width_,
+            pageBatch.AddQuad(dx + glyphLocation.x_ + glyph.offsetX_, dy + glyphLocation.y_ + glyph.offsetY_, glyph.width_,
                 glyph.height_, glyph.x_, glyph.y_, 0, 0, color);
         }
     }
@@ -671,7 +672,7 @@ void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pa
     }
 }
 
-void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color, float depthBias)
+void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, int dx, int dy, Color* color, float depthBias)
 {
     unsigned rowIndex = 0;
     unsigned startDataSize = batch.vertexData_->Size();
@@ -687,9 +688,9 @@ void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Co
                 continue;
 
             if (!color)
-                batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_);
+                batch.AddQuad(dx + x + p->offsetX_, dy + y + p->offsetY_, p->width_, p->height_, p->x_, p->y_);
             else
-                batch.AddQuad(x + p->offsetX_, y + p->offsetY_, p->width_, p->height_, p->x_, p->y_, 0, 0, color);
+                batch.AddQuad(dx + x + p->offsetX_, dy + y + p->offsetY_, p->width_, p->height_, p->x_, p->y_, 0, 0, color);
 
             x += p->advanceX_;
             if (i < printText_.Size() - 1)

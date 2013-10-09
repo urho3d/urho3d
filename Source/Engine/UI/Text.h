@@ -157,9 +157,9 @@ protected:
     /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Contruct batch.
-    void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int x, int y, Color* color = 0, float depthBias = 0.0f);
+    void ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0, float depthBias = 0.0f);
     /// Contruct batch.
-    void ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, Color* color = 0, float depthBias = 0.0f);
+    void ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, int dx = 0, int dy = 0, Color* color = 0, float depthBias = 0.0f);
 
     /// Font.
     SharedPtr<Font> font_;
