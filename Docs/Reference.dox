@@ -1707,7 +1707,7 @@ Examines a directory recursively for files and subdirectories and creates a Pack
 Usage:
 
 \verbatim
-PackageTool <directory to process> <package name> [basepath]
+PackageTool <directory to process> <package name> [basepath] [-c]
 \endverbatim
 
 When PackageTool runs, it will go inside the source directory, then look for subdirectories and any files. Paths inside the package will by default be relative to the source directory, but if an extra path prefix is desired, it can be specified by the optional basepath argument.
@@ -1717,6 +1717,8 @@ For example, this would convert all the resource files inside the Urho3D Data di
 \verbatim
 PackageTool Data Data.pak
 \endverbatim
+
+The -c option enables LZ4 file compression on the package.
 
 \section Tools_RampGenerator RampGenerator
 
@@ -1919,13 +1921,32 @@ uint       Bytecode size
 byte[]     Bytecode
 \endverbatim
 
+\section FileFormats_Package Package file (.pak)
+
+\verbatim
+byte[4]    Identifier "UPAK" or "ULZ4" if compressed
+uint       Number of file entries
+uint       Whole package checksum
+(uint)     Compressed block size, only included if compressed
+
+    For each file entry:
+    cstring    Name
+    uint       Start offset
+    uint       Size
+    uint       Checksum
+
+    For each compressed block in file data:
+    ushort     Uncompressed length of block
+    ushort     Compressed length of block
+    byte[]     Compressed data
+\endverbatim
+
 \section FileFormats_Script Compiled AngelScript (.asc)
 
 \verbatim
 byte[4]    Identifier "ASBC"
-?          Bytecode, produced by AngelScript serializer
+byte[]     Bytecode, produced by AngelScript serializer
 \endverbatim
-
 
 \page CodingConventions Coding conventions
 
