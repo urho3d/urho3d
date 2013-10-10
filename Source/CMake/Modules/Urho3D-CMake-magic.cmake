@@ -302,7 +302,7 @@ macro (setup_target)
     # Link libraries
     define_dependency_libs (${TARGET_NAME})
     string (REGEX REPLACE \\.\\./|ThirdParty/|Engine/|Extras/|/include|/src "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
-    target_link_libraries (${TARGET_NAME} ${STRIP_LIBS} ${ABSOLUTE_PATH_LIBS})
+    target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${STRIP_LIBS})
 endmacro ()
 
 # Macro for setting up a library target
