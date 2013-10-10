@@ -9,6 +9,8 @@
 -- the author has no obligation to provide maintenance, support, updates,
 -- enhancements, or modifications.
 
+-- Modified by Yao Wei Tjong for Urho3D
+
 
 -- Feature class
 -- Represents the base class of all mapped feature.
@@ -128,11 +130,12 @@ function classFeature:cfuncname (n)
   n = self.parent:cfuncname(n)
  end
 
+ -- Urho3D: comply with stricter escape sequence 
  local fname = self.lname
  if not fname or fname == '' then
  	fname = self.name
  end
-  n = string.gsub(n..'_'.. (fname), "[<>:, \.%*&]", "_")
+  n = string.gsub(n..'_'.. (fname), "[<>:, \\.%*&]", "_")
 
   return n
 end

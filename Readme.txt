@@ -369,7 +369,7 @@ cmake_xxxx batch files or shell scripts.
 |----------------------|-------------------------------------------------------|
 |-DENABLE_64BIT=1      |to enable 64bit build                                  |
 |-DENABLE_LUA=1        |to enable additional Lua scripting support             |
-|-DENABLE_LUA_JIT=1    |to enable Lua Just-in-time compilation, implied        |
+|-DENABLE_LUAJIT=1     |to enable Lua Just-in-time compilation, implied        |
 |                      | ENABLE_LUA (check its CMakeLists.txt for more options)|
 |-DENABLE_SAFE_LUA=1   |to enable Lua C++ wrapper safety checks                |
 |-DENABLE_SAMPLES=1    |to build the C++ sample applications                   |

@@ -2220,7 +2220,7 @@ bool Graphics::CreateInterface()
 
 bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 {
-#ifdef ENABLE_LUA_JIT
+#ifdef ENABLE_LUAJIT
     DWORD behaviorFlags = D3DCREATE_FPU_PRESERVE;
 #else
     DWORD behaviorFlags = 0;

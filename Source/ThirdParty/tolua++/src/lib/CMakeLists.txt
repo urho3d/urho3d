@@ -7,7 +7,7 @@ file (GLOB H_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (INCLUDE_DIRS_ONLY ../../include ../../../Lua/src)
+set (INCLUDE_DIRS_ONLY ../../include ../../../Lua${JIT}/src)
 
 # Setup target
 setup_library ()

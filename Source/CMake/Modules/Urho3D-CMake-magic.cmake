@@ -378,7 +378,7 @@ macro (setup_macosx_linker_flags LINKER_FLAGS)
     # Framework list to link against 
     set (FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
     # LuaJIT specific - extra linker flags for linking against LuaJIT in 64-bit Mac OS X desktop build
-    if (ENABLE_LUA_JIT AND ENABLE_64BIT)
+    if (ENABLE_LUAJIT AND ENABLE_64BIT)
         if (URHO3D_BUILD_TYPE STREQUAL SHARED)
             set (FLAGS "${FLAGS} -image_base 7fff04c4a000")
         else ()
@@ -505,7 +505,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # ThirdParty/LuaJIT external dependency
-    if (ENABLE_LUA_JIT AND ${TARGET} MATCHES LuaJIT|Main)
+    if (ENABLE_LUAJIT AND ${TARGET} MATCHES LuaJIT|Main)
         if (NOT WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dl m)
             if (NOT APPLE)

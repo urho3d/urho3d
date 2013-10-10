@@ -61,8 +61,9 @@ if (URHO3D_BUILD_TYPE STREQUAL SHARED)
 endif ()
 
 # Add definition for Lua JIT
-if (ENABLE_LUA_JIT)
-    add_definitions (-DENABLE_LUA_JIT)
+if (ENABLE_LUAJIT)
+    add_definitions (-DENABLE_LUAJIT)
+    set (JIT "JIT")
     # Implied ENABLE_LUA
     set (ENABLE_LUA 1)
 endif ()
@@ -99,11 +100,8 @@ add_subdirectory (ThirdParty/JO)
 # Alternative Lua bindings target
 if (ENABLE_LUA)
     add_definitions (-DENABLE_LUA)
-    add_subdirectory (ThirdParty/Lua)
+    add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/tolua++/src/lib)
-    if (ENABLE_LUA_JIT)
-        add_subdirectory (ThirdParty/LuaJIT)
-    endif ()
     add_subdirectory (Extras/LuaScript)
 endif ()
 

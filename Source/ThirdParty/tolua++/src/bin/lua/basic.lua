@@ -10,10 +10,13 @@
 -- the author has no obligation to provide maintenance, support, updates,
 -- enhancements, or modifications.
 
+-- Modified by Yao Wei Tjong for Urho3D
+
 
 -- Basic C types and their corresponding Lua types
 -- All occurrences of "char*" will be replaced by "_cstring",
 -- and all occurrences of "void*" will be replaced by "_userdata"
+
 _basic = {
  ['void'] = '',
  ['char'] = 'number',
@@ -249,21 +252,22 @@ function concat (t,f,l,jstr)
  return s
 end
 
+-- Urho3D: replace deprecated arg usage
 -- concatenate all parameters, following output rules
 function concatparam (line, ...)
  local i=1
- while i<=arg.n do
+ while i<=select("#",...) do
   if _cont and not strfind(_cont,'[%(,"]') and
-     strfind(arg[i],"^[%a_~]") then
+     strfind(select(i,...),"^[%a_~]") then
 	    line = line .. ' '
   end
-  line = line .. arg[i]
-  if arg[i] ~= '' then
-   _cont = strsub(arg[i],-1,-1)
+  line = line .. select(i,...)
+  if select(i,...) ~= '' then
+   _cont = strsub(select(i,...),-1,-1)
   end
   i = i+1
  end
- if strfind(arg[arg.n],"[%/%)%;%{%}]$") then
+ if strfind(select(select("#",...),...),"[%/%)%;%{%}]$") then
   _cont=nil line = line .. '\n'
  end
 	return line
@@ -272,18 +276,18 @@ end
 -- output line
 function output (...)
  local i=1
- while i<=arg.n do
+ while i<=select("#",...) do
   if _cont and not strfind(_cont,'[%(,"]') and
-     strfind(arg[i],"^[%a_~]") then
+     strfind(select(i,...),"^[%a_~]") then
 	    write(' ')
   end
-  write(arg[i])
-  if arg[i] ~= '' then
-   _cont = strsub(arg[i],-1,-1)
+  write((select(i,...)))
+  if select(i,...) ~= '' then
+   _cont = strsub(select(i,...),-1,-1)
   end
   i = i+1
  end
- if strfind(arg[arg.n],"[%/%)%;%{%}]$") then
+ if strfind(select(select("#",...),...),"[%/%)%;%{%}]$") then
   _cont=nil write('\n')
  end
 end

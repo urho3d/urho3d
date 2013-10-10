@@ -9,6 +9,8 @@
 -- the author has no obligation to provide maintenance, support, updates,
 -- enhancements, or modifications.
 
+-- Modified by Yao Wei Tjong for Urho3D
+
 
 -- Declaration class
 -- Represents variable, function, or argument declaration.
@@ -521,8 +523,9 @@ function Declaration (s,kind,is_parameter)
   }
  end
 
+ -- Urho3D: comply with stricter escape sequence 
  -- check the form: mod type* name
- local s1 = gsub(s,"(%b\[\])",function (n) return gsub(n,'%*','\1') end)
+ local s1 = gsub(s,"(%b\\[\\])",function (n) return gsub(n,'%*','\1') end)
  t = split_c_tokens(s1,'%*')
  if t.n == 2 then
   t[2] = gsub(t[2],'\1','%*') -- restore * in dimension expression

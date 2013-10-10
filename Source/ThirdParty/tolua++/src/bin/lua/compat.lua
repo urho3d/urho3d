@@ -1,3 +1,5 @@
+-- Modified by Yao Wei Tjong for Urho3D
+
 -------------------------------------------------------------------
 -- Real globals
 -- _ALERT
@@ -175,8 +177,10 @@ function appendto (name)
   return f, err, cod
 end
 
+-- Urho3D: replace deprecated arg usage
 function read (...)
   local f = _INPUT
+  local arg = {...} -- quick and dirty fix for LuaJIT without 5.1 compatibility mode for varargs
   if rawtype(arg[1]) == 'userdata' then
     f = tab.remove(arg, 1)
   end
@@ -185,6 +189,7 @@ end
 
 function write (...)
   local f = _OUTPUT
+  local arg = {...} -- quick and dirty fix for LuaJIT without 5.1 compatibility mode for varargs
   if rawtype(arg[1]) == 'userdata' then
     f = tab.remove(arg, 1)
   end

@@ -104,7 +104,7 @@ void GetCPUData(struct cpu_id_t* data)
 
 void InitFPU()
 {
-    #if !defined(ENABLE_LUA_JIT) && !defined(ANDROID) && !defined(IOS) && !defined(RASPI) && !defined(__x86_64__) && !defined(_M_AMD64)
+    #if !defined(ENABLE_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RASPI) && !defined(__x86_64__) && !defined(_M_AMD64)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
     #ifdef _MSC_VER
