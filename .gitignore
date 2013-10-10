@@ -27,6 +27,7 @@ Docs/html/
 
 # Eclipse project settings
 Source/.*project
+Source/.settings
 
 # CMake files for non out-of-source build
 CMakeCache.txt
