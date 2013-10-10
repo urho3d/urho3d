@@ -213,12 +213,9 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
     
-    bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
-    // Use Direct3D convention with the vertical coordinates ie. 0 is top
-    y = levelHeight - (y + height);
-    
     graphics_->SetTextureForUpdate(this);
     
+    bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     
     if (!IsCompressed())
