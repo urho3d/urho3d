@@ -48,7 +48,8 @@ static const int DEFAULT_HISTORY_SIZE = 16;
 Console::Console(Context* context) :
     Object(context),
     historyRows_(DEFAULT_HISTORY_SIZE),
-    historyPosition_(0)
+    historyPosition_(0),
+    printing_(false)
 {
     UI* ui = GetSubsystem<UI>();
     UIElement* uiRoot = ui->GetRoot();
@@ -264,6 +265,10 @@ void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
+    // If printing a log message causes more messages to be logged (error accessing font), disregard them
+    if (printing_)
+        return;
+    
     using namespace LogMessage;
 
     int level = eventData[P_LEVEL].GetInt();
@@ -279,6 +284,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     if (!rowContainer_->GetNumChildren())
         return;
     
+    printing_ = true;
     rowContainer_->DisableLayoutUpdate();
     
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
@@ -294,6 +300,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     
     rowContainer_->EnableLayoutUpdate();
     rowContainer_->UpdateLayout();
+    printing_ = false;
 }
 
 }

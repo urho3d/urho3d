@@ -104,6 +104,8 @@ private:
     unsigned historyRows_;
     /// Command history current position.
     unsigned historyPosition_;
+    /// Flag when printing messages to prevent endless loop.
+    bool printing_;
 };
 
 }
