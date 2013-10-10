@@ -340,6 +340,8 @@ Third-party libraries are used for the following functionality:
 - GLEW: OpenGL extensions handling
 - kNet: UDP networking
 - libcpuid: CPU properties detection
+- Lua, LuaJIT, tolua+: Lua scripting implementation and bindings
+- LZ4: data compression for package files
 - MojoShader: HLSL shader reflection after compiling
 - Open Asset Import Library: reading various 3D file formats
 - pugixml: parsing XML files

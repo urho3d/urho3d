@@ -34,7 +34,7 @@ endif()
 set (SOURCE_FILES ${CPP_FILES} ${C_FILES} ${H_FILES})
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../Math)
+set (LIBS ../Container ../Core ../Math ../../ThirdParty/LZ4)
 
 # Setup target
 enable_pch ()

@@ -69,6 +69,10 @@ public:
     unsigned GetTotalSize() const { return totalSize_; }
     /// Return checksum of the package file contents.
     unsigned GetChecksum() const { return checksum_; }
+    /// Return compressed mode block size.
+    unsigned GetBlockSize() const { return blockSize_; }
+    /// Return whether the files are compressed.
+    bool IsCompressed() const { return compressed_; }
     
 private:
     /// File entries.
@@ -81,6 +85,10 @@ private:
     unsigned totalSize_;
     /// Package file checksum.
     unsigned checksum_;
+    /// Compressed mode block size.
+    unsigned blockSize_;
+    /// Compressed flag.
+    bool compressed_;
 };
 
 }

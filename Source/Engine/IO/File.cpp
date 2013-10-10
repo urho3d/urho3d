@@ -24,10 +24,12 @@
 #include "File.h"
 #include "FileSystem.h"
 #include "Log.h"
+#include "MemoryBuffer.h"
 #include "PackageFile.h"
 #include "Profiler.h"
 
 #include <cstdio>
+#include <lz4.h>
 
 #include "DebugNew.h"
 
@@ -50,9 +52,7 @@ static const char* openMode[] =
 };
 #endif
 
-#ifdef ANDROID
 static const unsigned READ_BUFFER_SIZE = 1024;
-#endif
 
 File::File(Context* context) :
     Object(context),
@@ -60,9 +60,9 @@ File::File(Context* context) :
     handle_(0),
     #ifdef ANDROID
     assetHandle_(0),
+    #endif
     readBufferOffset_(0),
     readBufferSize_(0),
-    #endif
     offset_(0),
     checksum_(0)
 {
@@ -74,9 +74,9 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     handle_(0),
     #ifdef ANDROID
     assetHandle_(0),
+    #endif
     readBufferOffset_(0),
     readBufferSize_(0),
-    #endif
     offset_(0),
     checksum_(0)
 {
@@ -89,9 +89,9 @@ File::File(Context* context, PackageFile* package, const String& fileName) :
     handle_(0),
     #ifdef ANDROID
     assetHandle_(0),
+    #endif
     readBufferOffset_(0),
     readBufferSize_(0),
-    #endif
     offset_(0),
     checksum_(0)
 {
@@ -198,6 +198,13 @@ bool File::Open(PackageFile* package, const String& fileName)
     position_ = 0;
     size_ = entry->size_;
     
+    if (package->IsCompressed())
+    {
+        readBuffer_ = new unsigned char[package->GetBlockSize()];
+        readBufferOffset_ = 0;
+        readBufferSize_ = 0;
+    }
+    
     fseek((FILE*)handle_, offset_, SEEK_SET);
     return true;
 }
@@ -228,6 +235,44 @@ unsigned File::Read(void* dest, unsigned size)
                 readBufferSize_ = Min((int)size_ - position_, (int)READ_BUFFER_SIZE);
                 readBufferOffset_ = 0;
                 SDL_RWread(assetHandle_, readBuffer_.Get(), readBufferSize_, 1);
+            }
+            
+            unsigned copySize = Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
+            memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
+            destPtr += copySize;
+            sizeLeft -= copySize;
+            readBufferOffset_ += copySize;
+            position_ += copySize;
+        }
+        
+        return size;
+    }
+    #else
+    // Package compressed mode
+    if (readBuffer_)
+    {
+        unsigned sizeLeft = size;
+        unsigned char* destPtr = (unsigned char*)dest;
+        
+        while (sizeLeft)
+        {
+            if (readBufferOffset_ >= readBufferSize_)
+            {
+                unsigned char blockHeaderBytes[4];
+                fread(blockHeaderBytes, sizeof blockHeaderBytes, 1, (FILE*)handle_);
+                
+                MemoryBuffer blockHeader(&blockHeaderBytes[0], sizeof blockHeaderBytes);
+                unsigned unpackedSize = blockHeader.ReadUShort();
+                unsigned packedSize = blockHeader.ReadUShort();
+                
+                /// \todo Should reuse a block to hold the packed data
+                /// \todo Handle errors
+                SharedArrayPtr<unsigned char> packedBytes(new unsigned char[packedSize]);
+                fread(packedBytes.Get(), packedSize, 1, (FILE*)handle_);
+                LZ4_decompress_fast((const char*)packedBytes.Get(), (char *)readBuffer_.Get(), unpackedSize);
+                
+                readBufferSize_ = unpackedSize;
+                readBufferOffset_ = 0;
             }
             
             unsigned copySize = Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
@@ -274,6 +319,30 @@ unsigned File::Seek(unsigned position)
         position_ = position;
         readBufferOffset_ = 0;
         readBufferSize_ = 0;
+        return position_;
+    }
+    #else
+    // Package compressed mode
+    if (readBuffer_)
+    {
+        // Start over from the beginning
+        if (position == 0)
+        {
+            position_ = 0;
+            readBufferOffset_ = 0;
+            readBufferSize_ = 0;
+            fseek((FILE*)handle_, offset_, SEEK_SET);
+        }
+        // Skip bytes
+        else if (position >= position_)
+        {
+            unsigned char skipBuffer[READ_BUFFER_SIZE];
+            while (position > position_)
+                Read(skipBuffer, Min((int)position - position_, (int)READ_BUFFER_SIZE));
+        }
+        else
+            LOGERROR("Seeking backward in a compressed file is not supported");
+        
         return position_;
     }
     #endif
@@ -353,9 +422,10 @@ void File::Close()
     {
         SDL_RWclose(assetHandle_);
         assetHandle_ = 0;
-        readBuffer_.Reset();
     }
     #endif
+    
+    readBuffer_.Reset();
     
     if (handle_)
     {

@@ -22,13 +22,12 @@
 
 #pragma once
 
+#include "ArrayPtr.h"
 #include "Deserializer.h"
 #include "Serializer.h"
 #include "Object.h"
 
 #ifdef ANDROID
-#include "ArrayPtr.h"
-
 #include <SDL_rwops.h>
 #endif
 
@@ -101,13 +100,13 @@ private:
     #ifdef ANDROID
     /// SDL RWops context for Android asset loading.
     SDL_RWops* assetHandle_;
-    /// Read buffer for Android asset loading.
+    #endif
+    /// Read buffer for Android asset or compressed file loading.
     SharedArrayPtr<unsigned char> readBuffer_;
     /// Read buffer position.
     unsigned readBufferOffset_;
     /// Bytes in the current read buffer.
     unsigned readBufferSize_;
-    #endif
     /// Start position within a package file, 0 for regular files.
     unsigned offset_;
     /// Content checksum.

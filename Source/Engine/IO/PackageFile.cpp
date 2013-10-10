@@ -31,14 +31,18 @@ namespace Urho3D
 PackageFile::PackageFile(Context* context) :
     Object(context),
     totalSize_(0),
-    checksum_(0)
+    checksum_(0),
+    blockSize_(0),
+    compressed_(false)
 {
 }
 
 PackageFile::PackageFile(Context* context, const String& fileName) :
     Object(context),
     totalSize_(0),
-    checksum_(0)
+    checksum_(0),
+    blockSize_(0),
+    compressed_(false)
 {
     Open(fileName);
 }
@@ -54,7 +58,8 @@ bool PackageFile::Open(const String& fileName)
         return false;
     
     // Check ID, then read the directory
-    if (file->ReadFileID() != "UPAK")
+    String id = file->ReadFileID();
+    if (id != "UPAK" && id != "ULZ4")
     {
         LOGERROR(fileName + " is not a valid package file");
         return false;
@@ -63,9 +68,12 @@ bool PackageFile::Open(const String& fileName)
     fileName_ = fileName;
     nameHash_ = fileName_;
     totalSize_ = file->GetSize();
+    compressed_ = id == "ULZ4";
     
     unsigned numFiles = file->ReadUInt();
     checksum_ = file->ReadUInt();
+    if (compressed_)
+        blockSize_ = file->ReadUInt();
     
     for (unsigned i = 0; i < numFiles; ++i)
     {
@@ -74,7 +82,7 @@ bool PackageFile::Open(const String& fileName)
         newEntry.offset_ = file->ReadUInt();
         newEntry.size_ = file->ReadUInt();
         newEntry.checksum_ = file->ReadUInt();
-        if (newEntry.offset_ + newEntry.size_ > totalSize_)
+        if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)
             LOGERROR("File entry " + entryName + " outside package file");
         else
             entries_[entryName.ToLower()] = newEntry;
