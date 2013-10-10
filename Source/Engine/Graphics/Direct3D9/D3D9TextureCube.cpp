@@ -239,13 +239,10 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
-    unsigned rowOffset = GetRowDataSize(x);
+    
     // GetRowDataSize() returns CPU-side (source) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
-    {
         rowSize = rowSize / 3 * 4;
-        rowOffset = rowOffset / 3 * 4;
-    }
     
     // Perform conversion from RGB / RGBA as necessary
     switch (format_)
@@ -253,7 +250,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     default:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
             memcpy(dest, src, rowSize);
             src += rowSize;
         }
@@ -262,7 +259,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     case D3DFMT_X8R8G8B8:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
             for (int j = 0; j < width; ++j)
             {
                 *dest++  = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = 255;
@@ -274,7 +271,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     case D3DFMT_A8R8G8B8:
         for (int i = 0; i < height; ++i)
         {
-            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
             for (int j = 0; j < width; ++j)
             {
                 *dest++  = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = src[3];
