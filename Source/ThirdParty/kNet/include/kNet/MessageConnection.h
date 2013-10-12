@@ -22,11 +22,11 @@
 #include <set>
 
 #include "kNetBuildConfig.h"
+#include "Socket.h"
 #include "WaitFreeQueue.h"
 #include "NetworkSimulator.h"
 #include "LockFreePoolAllocator.h"
 #include "Lockable.h"
-#include "Socket.h"
 #include "IMessageHandler.h"
 #include "BasicSerializedDataTypes.h"
 #include "Datagram.h"
