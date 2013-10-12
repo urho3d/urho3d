@@ -10,6 +10,11 @@ file (GLOB C_FILES
 
 if (WIN32)
     CHECK_INCLUDE_FILES (wbemcli.h HAVE_WBEMCLI_H)
+    # New MinGW versions may evaluate whether to use A or W postfix on functions before SDL gets to define UNICODE on its own,
+    # so make sure it is already defined
+    if (MINGW)
+        add_definitions (-DUNICODE=1)
+    endif ()
     if (HAVE_WBEMCLI_H)
         add_definitions (-DSDL_JOYSTICK_DINPUT)
         add_definitions (-DSDL_HAPTIC_DINPUT)
