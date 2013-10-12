@@ -439,15 +439,18 @@ private:
     /// Copy elements from one buffer to another.
     static void CopyElements(T* dest, const T* src, unsigned count)
     {
-        for (unsigned i = 0; i < count; ++i)
-            dest[i] = src[i];
+        while (count--)
+            *dest++ = *src++;
     }
     
     // Call the elements' destructors.
     static void DestructElements(T* dest, unsigned count)
     {
-        for (unsigned i = 0; i < count; ++i)
-            (dest + i)->~T();
+        while (count--)
+        {
+            dest->~T();
+            ++dest;
+        }
     }
 };
 
