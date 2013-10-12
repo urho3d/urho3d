@@ -24,9 +24,11 @@
 cmake -E make_directory Build
 set "arch="
 set "version=9 2008"
+if exist Build\CMakeCache.txt. for /F "eol=/ delims=:= tokens=1-3" %%i in (Build\CMakeCache.txt) do if "%%i" == "ENABLE_64BIT" if "%%k" == "1" set "arch= Win64"
 :loop
 if not "%1" == "" (
     if "%1" == "-DENABLE_64BIT" if "%~2" == "1" set "arch= Win64"
+    if "%1" == "-DENABLE_64BIT" if "%~2" == "0" set "arch="
     if "%1" == "VERSION" set "version=%~2"
     shift
     shift

@@ -406,11 +406,6 @@ NOT passing the corresponding build option would not work. One way to revert all
 the build options to their default values is by clearing the CMake cache by
 calling cmake_clean.bat or cmake_clean.sh.
 
-With the exception of these two build options on Windows platform: ENABLE_64BIT
-and USE_MKLINK. Because they are used as both batch option and build option. On
-the batch side, unfortunately, they must always be passed to supply a non-
-default value.
-
 
 History
 -------
