@@ -2691,6 +2691,7 @@ Methods:
 - unsigned GetNumFiles() const
 - unsigned GetTotalSize() const
 - unsigned GetChecksum() const
+- bool IsCompressed() const
 
 Properties:
 
@@ -2699,6 +2700,7 @@ Properties:
 - unsigned numFiles (readonly)
 - unsigned totalSize (readonly)
 - unsigned checksum (readonly)
+- bool compressed (readonly)
 
 ### Serializer
 

@@ -23,10 +23,12 @@ class PackageFile : public Object
     unsigned GetNumFiles() const;
     unsigned GetTotalSize() const;
     unsigned GetChecksum() const;
-    
+    bool IsCompressed() const;
+
     tolua_readonly tolua_property__get_set String& name;
     tolua_readonly tolua_property__get_set StringHash nameHash;
     tolua_readonly tolua_property__get_set unsigned numFiles;
     tolua_readonly tolua_property__get_set unsigned totalSize;
     tolua_readonly tolua_property__get_set unsigned checksum;
+    tolua_readonly tolua_property__is_set bool compressed;
 };

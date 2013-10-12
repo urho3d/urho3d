@@ -176,6 +176,8 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         dest.WriteUInt(entries_[i].checksum_);
     }
     
+    unsigned totalDataSize = 0;
+    
     // Write file data, calculate checksums & correct offsets
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
@@ -187,6 +189,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
             ErrorExit("Could not open file " + fileFullPath);
         
         unsigned dataSize = entries_[i].size_;
+        totalDataSize += dataSize;
         SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
         
         if (srcFile.Read(&buffer[0], dataSize) != dataSize)
@@ -229,7 +232,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 pos += unpackedSize;
             }
             
-            PrintLine(entries_[i].name_ + " size " + String(dataSize) + " packed " + String(totalPackedBytes));
+            PrintLine(entries_[i].name_ + " in " + String(dataSize) + " out " + String(totalPackedBytes));
         }
     }
     
@@ -245,7 +248,9 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         dest.WriteUInt(entries_[i].checksum_);
     }
     
-    PrintLine("Package total size " + String(dest.GetSize()));
+    PrintLine("Number of files " + String(entries_.Size()));
+    PrintLine("File data size " + String(totalDataSize));
+    PrintLine("Package size " + String(dest.GetSize()));
 }
 
 void WriteHeader(File& dest)
@@ -256,6 +261,4 @@ void WriteHeader(File& dest)
         dest.WriteFileID("ULZ4");
     dest.WriteUInt(entries_.Size());
     dest.WriteUInt(checksum_);
-    if (compress_)
-        dest.WriteUInt(blockSize_);
 }

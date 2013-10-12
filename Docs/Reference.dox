@@ -1702,7 +1702,7 @@ Note: outputting only bone rotations may help when using an animation in a diffe
 
 \section Tools_PackageTool PackageTool
 
-Examines a directory recursively for files and subdirectories and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem.
+Examines a directory recursively for files and subdirectories and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem. The file data can optionally be compressed using the LZ4 compression library.
 
 Usage:
 
@@ -1718,7 +1718,7 @@ For example, this would convert all the resource files inside the Urho3D Data di
 PackageTool Data Data.pak
 \endverbatim
 
-The -c option enables LZ4 file compression on the package.
+The -c option enables LZ4 compression on the files.
 
 \section Tools_RampGenerator RampGenerator
 
@@ -1927,7 +1927,6 @@ byte[]     Bytecode
 byte[4]    Identifier "UPAK" or "ULZ4" if compressed
 uint       Number of file entries
 uint       Whole package checksum
-(uint)     Compressed block size, only included if compressed
 
     For each file entry:
     cstring    Name
@@ -1935,7 +1934,7 @@ uint       Whole package checksum
     uint       Size
     uint       Checksum
 
-    For each compressed block in file data:
+    The compressed data for each file is the following, repeated until the file is done:
     ushort     Uncompressed length of block
     ushort     Compressed length of block
     byte[]     Compressed data

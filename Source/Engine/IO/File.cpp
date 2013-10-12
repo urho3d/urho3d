@@ -52,7 +52,8 @@ static const char* openMode[] =
 };
 #endif
 
-static const unsigned READ_BUFFER_SIZE = 1024;
+static const unsigned READ_BUFFER_SIZE = 32768;
+static const unsigned SKIP_BUFFER_SIZE = 1024;
 
 File::File(Context* context) :
     Object(context),
@@ -64,7 +65,8 @@ File::File(Context* context) :
     readBufferOffset_(0),
     readBufferSize_(0),
     offset_(0),
-    checksum_(0)
+    checksum_(0),
+    compressed_(false)
 {
 }
 
@@ -78,7 +80,8 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     readBufferOffset_(0),
     readBufferSize_(0),
     offset_(0),
-    checksum_(0)
+    checksum_(0),
+    compressed_(false)
 {
     Open(fileName, mode);
 }
@@ -93,7 +96,8 @@ File::File(Context* context, PackageFile* package, const String& fileName) :
     readBufferOffset_(0),
     readBufferSize_(0),
     offset_(0),
-    checksum_(0)
+    checksum_(0),
+    compressed_(false)
 {
     Open(package, fileName);
 }
@@ -162,6 +166,7 @@ bool File::Open(const String& fileName, FileMode mode)
     position_ = 0;
     offset_ = 0;
     checksum_ = 0;
+    compressed_ = false;
     
     fseek((FILE*)handle_, 0, SEEK_END);
     size_ = ftell((FILE*)handle_);
@@ -197,13 +202,7 @@ bool File::Open(PackageFile* package, const String& fileName)
     checksum_ = entry->checksum_;
     position_ = 0;
     size_ = entry->size_;
-    
-    if (package->IsCompressed())
-    {
-        readBuffer_ = new unsigned char[package->GetBlockSize()];
-        readBufferOffset_ = 0;
-        readBufferSize_ = 0;
-    }
+    compressed_ = package->IsCompressed();
     
     fseek((FILE*)handle_, offset_, SEEK_SET);
     return true;
@@ -247,16 +246,15 @@ unsigned File::Read(void* dest, unsigned size)
         
         return size;
     }
-    #else
-    // Package compressed mode
-    if (readBuffer_)
+    #endif
+    if (compressed_)
     {
         unsigned sizeLeft = size;
         unsigned char* destPtr = (unsigned char*)dest;
         
         while (sizeLeft)
         {
-            if (readBufferOffset_ >= readBufferSize_)
+            if (!readBuffer_ || readBufferOffset_ >= readBufferSize_)
             {
                 unsigned char blockHeaderBytes[4];
                 fread(blockHeaderBytes, sizeof blockHeaderBytes, 1, (FILE*)handle_);
@@ -265,11 +263,15 @@ unsigned File::Read(void* dest, unsigned size)
                 unsigned unpackedSize = blockHeader.ReadUShort();
                 unsigned packedSize = blockHeader.ReadUShort();
                 
-                /// \todo Should reuse a block to hold the packed data
+                if (!readBuffer_)
+                {
+                    readBuffer_ = new unsigned char[unpackedSize];
+                    inputBuffer_ = new unsigned char[LZ4_compressBound(unpackedSize)];
+                }
+                
                 /// \todo Handle errors
-                SharedArrayPtr<unsigned char> packedBytes(new unsigned char[packedSize]);
-                fread(packedBytes.Get(), packedSize, 1, (FILE*)handle_);
-                LZ4_decompress_fast((const char*)packedBytes.Get(), (char *)readBuffer_.Get(), unpackedSize);
+                fread(inputBuffer_.Get(), packedSize, 1, (FILE*)handle_);
+                LZ4_decompress_fast((const char*)inputBuffer_.Get(), (char *)readBuffer_.Get(), unpackedSize);
                 
                 readBufferSize_ = unpackedSize;
                 readBufferOffset_ = 0;
@@ -285,7 +287,6 @@ unsigned File::Read(void* dest, unsigned size)
         
         return size;
     }
-    #endif
     
     if (!handle_)
     {
@@ -321,9 +322,8 @@ unsigned File::Seek(unsigned position)
         readBufferSize_ = 0;
         return position_;
     }
-    #else
-    // Package compressed mode
-    if (readBuffer_)
+    #endif
+    if (compressed_)
     {
         // Start over from the beginning
         if (position == 0)
@@ -336,16 +336,15 @@ unsigned File::Seek(unsigned position)
         // Skip bytes
         else if (position >= position_)
         {
-            unsigned char skipBuffer[READ_BUFFER_SIZE];
+            unsigned char skipBuffer[SKIP_BUFFER_SIZE];
             while (position > position_)
-                Read(skipBuffer, Min((int)position - position_, (int)READ_BUFFER_SIZE));
+                Read(skipBuffer, Min((int)position - position_, (int)SKIP_BUFFER_SIZE));
         }
         else
             LOGERROR("Seeking backward in a compressed file is not supported");
         
         return position_;
     }
-    #endif
     
     if (!handle_)
     {
@@ -426,6 +425,7 @@ void File::Close()
     #endif
     
     readBuffer_.Reset();
+    inputBuffer_.Reset();
     
     if (handle_)
     {

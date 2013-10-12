@@ -32,7 +32,6 @@ PackageFile::PackageFile(Context* context) :
     Object(context),
     totalSize_(0),
     checksum_(0),
-    blockSize_(0),
     compressed_(false)
 {
 }
@@ -41,7 +40,6 @@ PackageFile::PackageFile(Context* context, const String& fileName) :
     Object(context),
     totalSize_(0),
     checksum_(0),
-    blockSize_(0),
     compressed_(false)
 {
     Open(fileName);
@@ -53,6 +51,14 @@ PackageFile::~PackageFile()
 
 bool PackageFile::Open(const String& fileName)
 {
+    #ifdef ANDROID
+    if (fileName.StartsWith("/apk/"))
+    {
+        LOGERROR("Package files within the apk are not supported on Android");
+        return false;
+    }
+    #endif
+    
     SharedPtr<File> file(new File(context_, fileName));
     if (!file->IsOpen())
         return false;
@@ -72,8 +78,6 @@ bool PackageFile::Open(const String& fileName)
     
     unsigned numFiles = file->ReadUInt();
     checksum_ = file->ReadUInt();
-    if (compressed_)
-        blockSize_ = file->ReadUInt();
     
     for (unsigned i = 0; i < numFiles; ++i)
     {

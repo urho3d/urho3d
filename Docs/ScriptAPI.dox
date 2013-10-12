@@ -1553,6 +1553,7 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Open(const String&) const
 - bool Exists(const String&) const
+- bool compressed() const
 
 Properties:
 
