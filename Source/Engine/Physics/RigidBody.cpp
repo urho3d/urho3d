@@ -955,7 +955,8 @@ void RigidBody::AddBodyToWorld()
     else
         flags &= ~btCollisionObject::CF_KINEMATIC_OBJECT;
     body_->setCollisionFlags(flags);
-
+    body_->forceActivationState(kinematic_ ? DISABLE_DEACTIVATION : ISLAND_SLEEPING);
+    
     if (!IsEnabledEffective())
         return;
 
