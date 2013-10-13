@@ -66,6 +66,7 @@ const ShortStringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
 const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
 
 const float DEFAULT_DOUBLECLICK_INTERVAL = 0.5f;
+const int DEFAULT_FONT_TEXTURE_MAX_SIZE = 2048;
 
 const char* UI_CATEGORY = "UI";
 
@@ -75,6 +76,7 @@ UI::UI(Context* context) :
     rootModalElement_(new UIElement(context)),
     mouseButtons_(0),
     qualifiers_(0),
+    maxFontTextureSize_(DEFAULT_FONT_TEXTURE_MAX_SIZE),
     doubleClickInterval_(DEFAULT_DOUBLECLICK_INTERVAL),
     initialized_(false),
     usingTouchInput_(false),
@@ -84,6 +86,7 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
     #endif
     useSystemClipBoard_(false),
+    useMutableGlyphs_(false),
     nonModalBatchSize_(0)
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
@@ -466,6 +469,12 @@ void UI::SetDoubleClickInterval(float interval)
     doubleClickInterval_ = Max(interval, 0.0f);
 }
 
+void UI::SetMaxFontTextureSize(int size)
+{
+    if (IsPowerOfTwo(size) && size >= FONT_TEXTURE_MIN_SIZE)
+        maxFontTextureSize_ = size;
+}
+
 void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 {
     nonFocusedMouseWheel_ = nonFocusedMouseWheel;
@@ -474,6 +483,11 @@ void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 void UI::SetUseSystemClipBoard(bool enable)
 {
     useSystemClipBoard_ = enable;
+}
+
+void UI::SetUseMutableGlyphs(bool enable)
+{
+    useMutableGlyphs_ = enable;
 }
 
 IntVector2 UI::GetCursorPosition() const

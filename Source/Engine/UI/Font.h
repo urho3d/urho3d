@@ -24,6 +24,7 @@
 
 #include "AreaAllocator.h"
 #include "ArrayPtr.h"
+#include "List.h"
 #include "Resource.h"
 
 namespace Urho3D
@@ -36,8 +37,21 @@ class Image;
 class Texture2D;
 
 static const int FONT_TEXTURE_MIN_SIZE = 128;
-static const int FONT_TEXTURE_MAX_SIZE = 2048;
 static const int FONT_DPI = 96;
+
+/// Mutable font glyph description.
+struct MutableGlyph
+{
+    /// Construct.
+    MutableGlyph();
+    
+    /// The actual glyph index that currently occupies this mutable slot. M_MAX_UNSIGNED if none.
+    unsigned glyphIndex_;
+    /// X position in texture.
+    short x_;
+    /// Y position in texture.
+    short y_;
+};
 
 /// %Font glyph description.
 struct FontGlyph
@@ -65,6 +79,8 @@ struct FontGlyph
     bool used_;
     /// Kerning information.
     HashMap<unsigned, unsigned> kerning_;
+    /// Mutable glyph list iterator.
+    List<MutableGlyph*>::Iterator iterator_;
 };
 
 /// %Font file type.
@@ -101,14 +117,16 @@ public:
     const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
     
 private:
-    /// Render all glyphs of the face into a single texture. Return true if could fit them. Called internally.
-    bool RenderAllGlyphs();
-    /// Render one glyph on demand into the current texture. Return true if successful. Called internally.
-    bool RenderGlyph(unsigned index);
-    /// Render a glyph bitmap into a memory buffer. Called internally.
+    /// Render all glyphs of the face into a single texture. Return true if could fit them. Called by Font.
+    bool RenderAllGlyphs(int maxWidth, int maxHeight);
+    /// Render one glyph on demand into the current texture.
+    void RenderGlyph(unsigned index);
+    /// Render a glyph bitmap into a memory buffer.
     void RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned pitch);
-    /// Setup next texture for dynamic glyph rendering. Called internally.
-    void SetupNextTexture();
+    /// Setup next texture for dynamic glyph rendering.
+    void SetupNextTexture(int width, int height);
+    /// Setup mutable glyph rendering, in which glyphs form a regular-sized grid.
+    void SetupMutableGlyphs(int textureWidth, int textureHeight, int maxGlyphWidth, int maxGlyphHeight);
     
     /// Parent font.
     Font* font_;
@@ -120,10 +138,16 @@ private:
     HashMap<unsigned, unsigned> glyphMapping_;
     /// Glyph texture pages.
     Vector<SharedPtr<Texture2D> > textures_;
+    /// Mutable glyph list.
+    List<MutableGlyph*> mutableGlyphs_;
     /// Point size.
     int pointSize_;
     /// Row height.
     int rowHeight_;
+    /// Mutable glyph cell width, including 1 pixel padding.
+    int cellWidth_;
+    /// Mutable glyph cell height, including 1 pixel padding.
+    int cellHeight_;
     /// Kerning flag.
     bool hasKerning_;
     /// Glyph area allocator.

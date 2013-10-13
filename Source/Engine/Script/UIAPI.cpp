@@ -603,10 +603,14 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "const String& get_clipBoardText() const", asMETHOD(UI, GetClipBoardText), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_doubleClickInterval(float)", asMETHOD(UI, SetDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_doubleClickInterval() const", asMETHOD(UI, GetDoubleClickInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_maxFontTextureSize(int)", asMETHOD(UI, SetMaxFontTextureSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_maxFontTextureSize() const", asMETHOD(UI, GetMaxFontTextureSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHOD(UI, SetNonFocusedMouseWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHOD(UI, IsNonFocusedMouseWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_useSystemClipBoard(bool)", asMETHOD(UI, SetUseSystemClipBoard), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_useSystemClipBoard() const", asMETHOD(UI, GetUseSystemClipBoard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useMutableGlyphs(bool)", asMETHOD(UI, SetUseMutableGlyphs), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useMutableGlyphs() const", asMETHOD(UI, GetUseMutableGlyphs), asCALL_THISCALL);
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
 }
 

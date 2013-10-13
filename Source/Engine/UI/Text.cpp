@@ -181,7 +181,9 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                     if (!p)
                         continue;
 
-                    pageGlyphLocations[p->page_].Push(GlyphLocation(x, y, p));
+                    // Validate page because of possible glyph unallocations (should not happen, though)
+                    if (p->page_ < textures.Size())
+                        pageGlyphLocations[p->page_].Push(GlyphLocation(x, y, p));
 
                     x += p->advanceX_;
                     if (i < printText_.Size() - 1)
