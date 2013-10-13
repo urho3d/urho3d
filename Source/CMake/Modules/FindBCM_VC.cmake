@@ -35,7 +35,7 @@ if (RASPI)
     set (BCM_VC_LIB_SEARCH_PATH /opt/vc/lib)
 
     # Assume all the other headers are installed at same relative path as bcm_host.h
-    find_path (BCM_VC_INCLUDE_DIR bcm_host.h ${BCM_VC_INC_SEARCH_PATH})
+    find_path (BCM_VC_INCLUDE_DIR bcm_host.h PATHS ${BCM_VC_INC_SEARCH_PATH} PATH_SUFFIXES vc)
     
     # Assume all the other libs are installed at the same relative path as libbcm_host.so
     find_library (BCM_VC_LIB_BCM_HOST bcm_host PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc)
