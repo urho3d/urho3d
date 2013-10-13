@@ -79,11 +79,15 @@ public:
     void SetClipBoardText(const String& text);
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
+    /// Set maximum font face texture size. Must be a power of two. Default is 2048.
+    void SetMaxFontTextureSize(int size);
     /// Set whether mouse wheel can control also a non-focused element.
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
     /// Set whether to use system clipboard. Default false.
     void SetUseSystemClipBoard(bool enable);
-
+    /// Set whether to use mutable (eraseable) glyphs to ensure a font face never expands to more than one texture. Default false.
+    void SetUseMutableGlyphs(bool enable);
+    
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
     /// Return root modal element.
@@ -104,10 +108,14 @@ public:
     const String& GetClipBoardText() const;
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
+    /// Return font texture maximum size.
+    int GetMaxFontTextureSize() const { return maxFontTextureSize_; }
     /// Return whether mouse wheel can control also a non-focused element.
     bool IsNonFocusedMouseWheel() const { return nonFocusedMouseWheel_; }
     /// Return whether is using the system clipboard.
     bool GetUseSystemClipBoard() const { return useSystemClipBoard_; }
+    /// Return whether is using mutable (eraseable) glyphs for fonts.
+    bool GetUseMutableGlyphs() const { return useMutableGlyphs_; }
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
 
@@ -211,6 +219,8 @@ private:
     int mouseButtons_;
     /// Qualifier keys held down.
     int qualifiers_;
+    /// Font texture maximum size.
+    int maxFontTextureSize_;
     /// Initialized flag.
     bool initialized_;
     /// Touch used flag.
@@ -219,6 +229,8 @@ private:
     bool nonFocusedMouseWheel_;
     /// Flag for using operating system clipboard instead of internal.
     bool useSystemClipBoard_;
+    /// Flag for using mutable (eraseable) font glyphs.
+    bool useMutableGlyphs_;
     /// Non-modal batch size (used internally for rendering).
     unsigned nonModalBatchSize_;
     /// Timer used to trigger double click.

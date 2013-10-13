@@ -4886,8 +4886,10 @@ Methods:
 - bool SaveLayout(Serializer& dest, UIElement* element)
 - void SetClipBoardText(const String text)
 - void SetDoubleClickInterval(float interval)
+- void SetMaxFontTextureSize(int size)
 - void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 - void SetUseSystemClipBoard(bool enable)
+- void SetUseMutableGlyphs(bool enable)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -4898,8 +4900,10 @@ Methods:
 - IntVector2 GetCursorPosition() const
 - const String& GetClipBoardText() const
 - float GetDoubleClickInterval() const
+- int GetMaxFontTextureSize() const
 - bool IsNonFocusedMouseWheel() const
 - bool GetUseSystemClipBoard() const
+- bool GetUseMutableGlyphs() const
 - bool HasModalElement() const
 
 Properties:
@@ -4912,8 +4916,10 @@ Properties:
 - IntVector2 cursorPosition (readonly)
 - String& clipBoardText
 - float doubleClickInterval
+- int maxFontTextureSize
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard
+- bool useMutableGlyphs
 - bool modalElement (readonly)
 
 ### UIElement : Serializable

@@ -26,6 +26,14 @@
 namespace Urho3D
 {
 
+AreaAllocator::AreaAllocator() :
+    size_(IntVector2::ZERO),
+    maxSize_(IntVector2::ZERO),
+    doubleWidth_(true)
+{
+    Reset(0, 0);
+}
+
 AreaAllocator::AreaAllocator(int width, int height) :
     size_(width, height),
     maxSize_(IntVector2::ZERO),

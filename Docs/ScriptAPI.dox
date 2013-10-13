@@ -6468,8 +6468,10 @@ Properties:
 - UIElement@ modalRoot (readonly)
 - String clipBoardText
 - float doubleClickInterval
+- int maxFontTextureSize
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard
+- bool useMutableGlyphs
 
 
 ### Controls
