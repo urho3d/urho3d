@@ -156,14 +156,16 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     // Text batch
     if (font_)
     {
-        const FontFace* face = font_->GetFace(fontSize_);
+        FontFace* face = font_->GetFace(fontSize_);
         if (!face)
             return;
 
-        if (face->textures_.Size() > 1)
+        const Vector<SharedPtr<Texture2D> >& textures = face->GetTextures();
+        
+        if (textures.Size() > 1)
         {
             // Only traversing thru the printText once regardless of number of textures/pages in the font
-            Vector<PODVector<GlyphLocation> > pageGlyphLocations(face->textures_.Size());
+            Vector<PODVector<GlyphLocation> > pageGlyphLocations(textures.Size());
 
             unsigned rowIndex = 0;
             int x = GetRowStartPosition(rowIndex);
@@ -192,10 +194,10 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 }
             }
 
-            for (unsigned n = 0; n < face->textures_.Size(); ++n)
+            for (unsigned n = 0; n < textures.Size(); ++n)
             {
                 // One batch per texture/page
-                UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, face->textures_[n], &vertexData);
+                UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
 
                 const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations[n];
 
@@ -232,7 +234,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             int x = GetRowStartPosition(0);
             int y = 0;
 
-            UIBatch batch(this, BLEND_ALPHA, currentScissor, face->textures_[0], &vertexData);
+            UIBatch batch(this, BLEND_ALPHA, currentScissor, textures[0], &vertexData);
 
             switch (textEffect_)
             {
@@ -416,11 +418,11 @@ void Text::UpdateText()
 
     if (font_)
     {
-        const FontFace* face = font_->GetFace(fontSize_);
+        FontFace* face = font_->GetFace(fontSize_);
         if (!face)
             return;
 
-        rowHeight_ = face->rowHeight_;
+        rowHeight_ = face->GetRowHeight();
         int rowWidth = 0;
         int rowHeight = (int)(rowSpacing_ * rowHeight_);
 
@@ -672,7 +674,7 @@ void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pa
     }
 }
 
-void Text::ConstructBatch(UIBatch& batch, const FontFace* face, int x, int y, int dx, int dy, Color* color, float depthBias)
+void Text::ConstructBatch(UIBatch& batch, FontFace* face, int x, int y, int dx, int dy, Color* color, float depthBias)
 {
     unsigned rowIndex = 0;
     unsigned startDataSize = batch.vertexData_->Size();

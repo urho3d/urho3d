@@ -31,6 +31,8 @@ namespace Urho3D
 class URHO3D_API AreaAllocator
 {
 public:
+    /// Default construct with empty size.
+    AreaAllocator();
     /// Construct with given width and height.
     AreaAllocator(int width, int height);
     /// Construct with given width and height, and set the maximum it allows to grow.

@@ -22,15 +22,18 @@
 
 #pragma once
 
+#include "AreaAllocator.h"
 #include "ArrayPtr.h"
 #include "Resource.h"
 
 namespace Urho3D
 {
 
+class Font;
+class FreeTypeLibrary;
 class Graphics;
 class Image;
-class Texture;
+class Texture2D;
 
 static const int FONT_TEXTURE_MIN_SIZE = 128;
 static const int FONT_TEXTURE_MAX_SIZE = 2048;
@@ -56,12 +59,12 @@ struct FontGlyph
     short offsetY_;
     /// Horizontal advance.
     short advanceX_;
-    /// Page.
+    /// Texture page. M_MAX_UNSIGNED if not yet resident on any texture.
     unsigned page_;
+    /// Used flag.
+    bool used_;
     /// Kerning information.
     HashMap<unsigned, unsigned> kerning_;
-    /// Used flag.
-    mutable bool used_;
 };
 
 /// %Font file type.
@@ -76,31 +79,59 @@ enum FONT_TYPE
 /// %Font face description.
 class URHO3D_API FontFace : public RefCounted
 {
+    friend class Font;
+    
 public:
     /// Construct.
-    FontFace();
+    FontFace(Font* font);
     /// Destruct.
     ~FontFace();
     
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
-    const FontGlyph* GetGlyph(unsigned c) const;
+    const FontGlyph* GetGlyph(unsigned c);
     /// Return the kerning for a character and the next character.
     short GetKerning(unsigned c, unsigned d) const;
     /// Return true when one of the texture has a data loss.
     bool IsDataLost() const;
+    /// Return point size.
+    int GetPointSize() const { return pointSize_; }
+    /// Return row height.
+    int GetRowHeight() const { return rowHeight_; }
+    /// Return textures.
+    const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
     
-    /// Texture.
-    Vector<SharedPtr<Texture> > textures_;
+private:
+    /// Render all glyphs of the face into a single texture. Return true if could fit them. Called internally.
+    bool RenderAllGlyphs();
+    /// Render one glyph on demand into the current texture. Return true if successful. Called internally.
+    bool RenderGlyph(unsigned index);
+    /// Render a glyph bitmap into a memory buffer. Called internally.
+    void RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned pitch);
+    /// Setup next texture for dynamic glyph rendering. Called internally.
+    void SetupNextTexture();
+    
+    /// Parent font.
+    Font* font_;
+    /// FreeType face in dynamic mode.
+    void* face_;
+    /// Glyph texture pages.
+    Vector<SharedPtr<Texture2D> > textures_;
     /// Glyphs.
     Vector<FontGlyph> glyphs_;
+    /// Glyph index mapping.
+    HashMap<unsigned, unsigned> glyphMapping_;
     /// Point size.
     int pointSize_;
     /// Row height.
     int rowHeight_;
-    /// Glyph index mapping.
-    HashMap<unsigned, unsigned> glyphMapping_;
     /// Kerning flag.
     bool hasKerning_;
+    /// AreaAllocator in dynamic mode.
+    AreaAllocator allocator_;
+    /// Rendering bitmap in dynamic mode glyphs.
+    SharedArrayPtr<unsigned char> bitmap_;
+    /// Dynamic mode bitmap byte size.
+    unsigned bitmapSize_;
 };
 
 /// %Font resource.
@@ -120,24 +151,29 @@ public:
     /// Save resource as a new bitmap font type in XML format. Return true if successful.
     bool SaveXML(Serializer& dest, int pointSize, bool usedGlyphs = false);
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
-    const FontFace* GetFace(int pointSize);
+    FontFace* GetFace(int pointSize);
+    
+    /// Create a texture for font rendering.
+    SharedPtr<Texture2D> CreateFaceTexture();
+    /// Load font face texture from image resource.
+    SharedPtr<Texture2D> LoadFaceTexture(SharedPtr<Image> image);
     
 private:
     /// Return True-type font face. Called internally. Return null on error.
-    const FontFace* GetFaceTTF(int pointSize);
+    FontFace* GetFaceTTF(int pointSize);
     /// Return bitmap font face. Called internally. Return null on error.
-    const FontFace* GetFaceBitmap(int pointSize);
+    FontFace* GetFaceBitmap(int pointSize);
     /// Convert graphics format to number of components.
     unsigned ConvertFormatToNumComponents(unsigned format);
     /// Pack used glyphs into smallest texture size and smallest number of texture.
-    SharedPtr<FontFace> Pack(const FontFace* fontFace);
-    /// Load font face texture from image resource.
-    SharedPtr<Texture> LoadFaceTexture(SharedPtr<Image> image);
+    SharedPtr<FontFace> Pack(FontFace* fontFace);
     /// Save font face texture as image resource.
-    SharedPtr<Image> SaveFaceTexture(Texture* texture);
+    SharedPtr<Image> SaveFaceTexture(Texture2D* texture);
     /// Save font face texture as image file.
-    bool SaveFaceTexture(Texture* texture, const String& fileName);
+    bool SaveFaceTexture(Texture2D* texture, const String& fileName);
     
+    /// FreeType library.
+    SharedPtr<FreeTypeLibrary> freeType_;
     /// Created faces.
     HashMap<int, SharedPtr<FontFace> > faces_;
     /// Font data.
