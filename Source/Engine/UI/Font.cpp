@@ -301,9 +301,6 @@ void FontFace::RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned p
 
 void FontFace::SetupNextTexture()
 {
-    if (!font_)
-        return;
-    
     // If several dynamic textures are needed, use the maximum size to pack as many as possible to one texture
     allocator_ = AreaAllocator(FONT_TEXTURE_MAX_SIZE, FONT_TEXTURE_MAX_SIZE);
 

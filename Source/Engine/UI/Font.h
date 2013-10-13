@@ -112,25 +112,25 @@ private:
     
     /// Parent font.
     Font* font_;
-    /// FreeType face in dynamic mode.
+    /// FreeType face. Non-null after creation only in dynamic mode.
     void* face_;
-    /// Glyph texture pages.
-    Vector<SharedPtr<Texture2D> > textures_;
     /// Glyphs.
     Vector<FontGlyph> glyphs_;
     /// Glyph index mapping.
     HashMap<unsigned, unsigned> glyphMapping_;
+    /// Glyph texture pages.
+    Vector<SharedPtr<Texture2D> > textures_;
     /// Point size.
     int pointSize_;
     /// Row height.
     int rowHeight_;
     /// Kerning flag.
     bool hasKerning_;
-    /// AreaAllocator in dynamic mode.
+    /// Glyph area allocator.
     AreaAllocator allocator_;
-    /// Rendering bitmap in dynamic mode glyphs.
+    /// Glyph rendering bitmap in dynamic mode.
     SharedArrayPtr<unsigned char> bitmap_;
-    /// Dynamic mode bitmap byte size.
+    /// Glyph rendering bitmap byte size.
     unsigned bitmapSize_;
 };
 
