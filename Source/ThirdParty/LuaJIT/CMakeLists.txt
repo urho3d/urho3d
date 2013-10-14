@@ -136,7 +136,13 @@ if (MSVC)
 else ()
     get_directory_property (TARGET_TCFLAGS COMPILE_DEFINITIONS)
     string (REPLACE ";" ";-D" TARGET_TCFLAGS ";${TARGET_TCFLAGS}")
-    execute_process (COMMAND ${CMAKE_C_COMPILER} ${TARGET_TCFLAGS} -E ${CMAKE_CURRENT_SOURCE_DIR}/src/lj_arch.h -dM OUTPUT_VARIABLE TARGET_TESTARCH ERROR_QUIET)
+    execute_process (COMMAND egrep -V RESULT_VARIABLE EGREP_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)    
+    if (EGREP_EXIT_CODE EQUAL 0)
+        execute_process (COMMAND ${CMAKE_C_COMPILER} ${TARGET_TCFLAGS} -E ${CMAKE_CURRENT_SOURCE_DIR}/src/lj_arch.h -dM
+            COMMAND egrep "LJ_|MIPSEL|__SSE__" OUTPUT_VARIABLE TARGET_TESTARCH ERROR_QUIET)
+    else ()
+        execute_process (COMMAND ${CMAKE_C_COMPILER} ${TARGET_TCFLAGS} -E ${CMAKE_CURRENT_SOURCE_DIR}/src/lj_arch.h -dM OUTPUT_VARIABLE TARGET_TESTARCH ERROR_QUIET)
+    endif ()
 endif ()
 
 # Makefile: Build mode handling
