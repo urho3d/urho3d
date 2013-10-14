@@ -87,7 +87,7 @@ struct FontGlyph
 enum FONT_TYPE
 {
     FONT_NONE = 0,
-    FONT_TTF,
+    FONT_FREETYPE,
     FONT_BITMAP,
     MAX_FONT_TYPES
 };

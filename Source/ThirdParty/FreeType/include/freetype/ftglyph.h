@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType convenience functions to handle glyphs (specification).     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2006, 2008, 2009 by                   */
+/*  Copyright 1996-2003, 2006, 2008, 2009, 2011, 2013 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -94,7 +94,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    The root glyph structure contains a given glyph image plus its     */
-  /*    advance width in 16.16 fixed float format.                         */
+  /*    advance width in 16.16 fixed-point format.                         */
   /*                                                                       */
   /* <Fields>                                                              */
   /*    library :: A handle to the FreeType library object.                */
@@ -358,17 +358,17 @@ FT_BEGIN_HEADER
   /*    outline's points, including Bézier control points.  Though it      */
   /*    coincides with the exact bounding box for most glyphs, it can be   */
   /*    slightly larger in some situations (like when rotating an outline  */
-  /*    which contains Bézier outside arcs).                               */
+  /*    that contains Bézier outside arcs).                                */
   /*                                                                       */
   /*    Computing the control box is very fast, while getting the bounding */
   /*    box can take much more time as it needs to walk over all segments  */
   /*    and arcs in the outline.  To get the latter, you can use the       */
-  /*    `ftbbox' component which is dedicated to this single task.         */
+  /*    `ftbbox' component, which is dedicated to this single task.        */
   /*                                                                       */
   /* <Input>                                                               */
   /*    glyph :: A handle to the source glyph object.                      */
   /*                                                                       */
-  /*    mode  :: The mode which indicates how to interpret the returned    */
+  /*    mode  :: The mode that indicates how to interpret the returned     */
   /*             bounding box values.                                      */
   /*                                                                       */
   /* <Output>                                                              */
@@ -383,6 +383,13 @@ FT_BEGIN_HEADER
   /*    must be set to @FT_GLYPH_BBOX_UNSCALED to get unscaled font        */
   /*    units in 26.6 pixel format.  The value @FT_GLYPH_BBOX_SUBPIXELS    */
   /*    is another name for this constant.                                 */
+  /*                                                                       */
+  /*    If the font is tricky and the glyph has been loaded with           */
+  /*    @FT_LOAD_NO_SCALE, the resulting CBox is meaningless.  To get      */
+  /*    reasonable values for the CBox it is necessary to load the glyph   */
+  /*    at a large ppem value (so that the hinting instructions can        */
+  /*    properly shift and scale the subglyphs), then extracting the CBox, */
+  /*    which can be eventually converted back to font units.              */
   /*                                                                       */
   /*    Note that the maximum coordinates are exclusive, which means that  */
   /*    one can compute the width and height of the glyph image (be it in  */

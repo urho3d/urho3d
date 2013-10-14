@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType error codes (specification).                                */
 /*                                                                         */
-/*  Copyright 2002, 2004, 2006, 2007 by                                    */
+/*  Copyright 2002, 2004, 2006, 2007, 2010-2013 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -54,6 +54,10 @@
                 "broken offset within table" )
   FT_ERRORDEF_( Array_Too_Large,                             0x0A, \
                 "array allocation size too large" )
+  FT_ERRORDEF_( Missing_Module,                              0x0B, \
+                "missing module" )
+  FT_ERRORDEF_( Missing_Property,                            0x0C, \
+                "missing property" )
 
   /* glyph/character errors */
 
@@ -211,6 +215,10 @@
                 "argument stack underflow" )
   FT_ERRORDEF_( Ignore,                                      0xA2, \
                 "ignore" )
+  FT_ERRORDEF_( No_Unicode_Glyph_Name,                       0xA3, \
+                "no Unicode glyph name found" )
+  FT_ERRORDEF_( Glyph_Too_Big,                               0xA4, \
+                "glyph to big for hinting" )
 
   /* BDF errors */
 
@@ -220,19 +228,21 @@
                 "`FONT' field missing" )
   FT_ERRORDEF_( Missing_Size_Field,                          0xB2, \
                 "`SIZE' field missing" )
-  FT_ERRORDEF_( Missing_Chars_Field,                         0xB3, \
+  FT_ERRORDEF_( Missing_Fontboundingbox_Field,               0xB3, \
+                "`FONTBOUNDINGBOX' field missing" )
+  FT_ERRORDEF_( Missing_Chars_Field,                         0xB4, \
                 "`CHARS' field missing" )
-  FT_ERRORDEF_( Missing_Startchar_Field,                     0xB4, \
+  FT_ERRORDEF_( Missing_Startchar_Field,                     0xB5, \
                 "`STARTCHAR' field missing" )
-  FT_ERRORDEF_( Missing_Encoding_Field,                      0xB5, \
+  FT_ERRORDEF_( Missing_Encoding_Field,                      0xB6, \
                 "`ENCODING' field missing" )
-  FT_ERRORDEF_( Missing_Bbx_Field,                           0xB6, \
+  FT_ERRORDEF_( Missing_Bbx_Field,                           0xB7, \
                 "`BBX' field missing" )
-  FT_ERRORDEF_( Bbx_Too_Big,                                 0xB7, \
+  FT_ERRORDEF_( Bbx_Too_Big,                                 0xB8, \
                 "`BBX' too big" )
-  FT_ERRORDEF_( Corrupted_Font_Header,                       0xB8, \
+  FT_ERRORDEF_( Corrupted_Font_Header,                       0xB9, \
                 "Font header corrupted or missing fields" )
-  FT_ERRORDEF_( Corrupted_Font_Glyphs,                       0xB9, \
+  FT_ERRORDEF_( Corrupted_Font_Glyphs,                       0xBA, \
                 "Font glyphs corrupted or missing fields" )
 
 
