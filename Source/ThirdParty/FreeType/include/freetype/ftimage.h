@@ -5,8 +5,7 @@
 /*    FreeType glyph image formats and default raster interface            */
 /*    (specification).                                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,   */
-/*            2010 by                                                      */
+/*  Copyright 1996-2010, 2013 by                                           */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -54,7 +53,7 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    The type FT_Pos is used to store vectorial coordinates.  Depending */
   /*    on the context, these can represent distances in integer font      */
-  /*    units, or 16.16, or 26.6 fixed float pixel coordinates.            */
+  /*    units, or 16.16, or 26.6 fixed-point pixel coordinates.            */
   /*                                                                       */
   typedef signed long  FT_Pos;
 
@@ -169,6 +168,15 @@ FT_BEGIN_HEADER
   /*      times taller than the original glyph image.  See also            */
   /*      @FT_RENDER_MODE_LCD_V.                                           */
   /*                                                                       */
+  /*    FT_PIXEL_MODE_BGRA ::                                              */
+  /*      An image with four 8-bit channels per pixel, representing a      */
+  /*      color image (such as emoticons) with alpha channel.  For each    */
+  /*      pixel, the format is BGRA, which means, the blue channel comes   */
+  /*      first in memory.  The color channels are pre-multiplied and in   */
+  /*      the sRGB colorspace.  For example, full red at half-translucent  */
+  /*      opacity will be represented as `00,00,80,80', not `00,00,FF,80'. */
+  /*      See also @FT_LOAD_COLOR.                                         */
+  /*                                                                       */
   typedef enum  FT_Pixel_Mode_
   {
     FT_PIXEL_MODE_NONE = 0,
@@ -178,6 +186,7 @@ FT_BEGIN_HEADER
     FT_PIXEL_MODE_GRAY4,
     FT_PIXEL_MODE_LCD,
     FT_PIXEL_MODE_LCD_V,
+    FT_PIXEL_MODE_BGRA,
 
     FT_PIXEL_MODE_MAX      /* do not remove */
 
@@ -268,8 +277,20 @@ FT_BEGIN_HEADER
   /*                    flow.  In all cases, the pitch is an offset to add */
   /*                    to a bitmap pointer in order to go down one row.   */
   /*                                                                       */
+  /*                    Note that `padding' means the alignment of a       */
+  /*                    bitmap to a byte border, and FreeType functions    */
+  /*                    normally align to the smallest possible integer    */
+  /*                    value.                                             */
+  /*                                                                       */
   /*                    For the B/W rasterizer, `pitch' is always an even  */
   /*                    number.                                            */
+  /*                                                                       */
+  /*                    To change the pitch of a bitmap (say, to make it a */
+  /*                    multiple of 4), use @FT_Bitmap_Convert.            */
+  /*                    Alternatively, you might use callback functions to */
+  /*                    directly render to the application's surface; see  */
+  /*                    the file `example2.cpp' in the tutorial for a      */
+  /*                    demonstration.                                     */
   /*                                                                       */
   /*    buffer       :: A typeless pointer to the bitmap buffer.  This     */
   /*                    value should be aligned on 32-bit boundaries in    */
@@ -534,7 +555,7 @@ FT_BEGIN_HEADER
   /* <Input>                                                               */
   /*    to   :: A pointer to the target point of the `move to'.            */
   /*                                                                       */
-  /*    user :: A typeless pointer which is passed from the caller of the  */
+  /*    user :: A typeless pointer, which is passed from the caller of the */
   /*            decomposition function.                                    */
   /*                                                                       */
   /* <Return>                                                              */
@@ -561,7 +582,7 @@ FT_BEGIN_HEADER
   /* <Input>                                                               */
   /*    to   :: A pointer to the target point of the `line to'.            */
   /*                                                                       */
-  /*    user :: A typeless pointer which is passed from the caller of the  */
+  /*    user :: A typeless pointer, which is passed from the caller of the */
   /*            decomposition function.                                    */
   /*                                                                       */
   /* <Return>                                                              */
@@ -592,7 +613,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    to      :: A pointer to the target end point of the conic arc.     */
   /*                                                                       */
-  /*    user    :: A typeless pointer which is passed from the caller of   */
+  /*    user    :: A typeless pointer, which is passed from the caller of  */
   /*               the decomposition function.                             */
   /*                                                                       */
   /* <Return>                                                              */
@@ -624,7 +645,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    to       :: A pointer to the target end point.                     */
   /*                                                                       */
-  /*    user     :: A typeless pointer which is passed from the caller of  */
+  /*    user     :: A typeless pointer, which is passed from the caller of */
   /*                the decomposition function.                            */
   /*                                                                       */
   /* <Return>                                                              */
@@ -870,8 +891,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Note>                                                                */
   /*    This structure is used by the span drawing callback type named     */
-  /*    @FT_SpanFunc which takes the y~coordinate of the span as a         */
-  /*    a parameter.                                                       */
+  /*    @FT_SpanFunc that takes the y~coordinate of the span as a          */
+  /*    parameter.                                                         */
   /*                                                                       */
   /*    The coverage value is always between 0 and 255.  If you want less  */
   /*    gray values, the callback function has to reduce them.             */
@@ -1244,7 +1265,7 @@ FT_BEGIN_HEADER
   /*    XXX: For now, the standard raster doesn't support direct           */
   /*         composition but this should change for the final release (see */
   /*         the files `demos/src/ftgrays.c' and `demos/src/ftgrays2.c'    */
-  /*         for examples of distinct implementations which support direct */
+  /*         for examples of distinct implementations that support direct  */
   /*         composition).                                                 */
   /*                                                                       */
   typedef int

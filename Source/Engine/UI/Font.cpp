@@ -424,8 +424,8 @@ bool Font::Load(Deserializer& source)
     }
 
     String ext = GetExtension(GetName());
-    if (ext == ".ttf")
-        fontType_ = FONT_TTF;
+    if (ext == ".ttf" || ext == ".otf" || ext == ".woff")
+        fontType_ = FONT_FREETYPE;
     else if (ext == ".xml" || ext == ".fnt")
         fontType_ = FONT_BITMAP;
 
@@ -562,7 +562,7 @@ FontFace* Font::GetFace(int pointSize)
     
     switch (fontType_)
     {
-    case FONT_TTF:
+    case FONT_FREETYPE:
         return GetFaceTTF(pointSize);
 
     case FONT_BITMAP:

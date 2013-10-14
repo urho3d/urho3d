@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    ANSI-specific configuration file (specification only).               */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010 by       */
+/*  Copyright 1996-2004, 2006-2008, 2010-2011, 2013 by                     */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -95,10 +95,6 @@ FT_BEGIN_HEADER
 #endif
 
 
-  /* Preferred alignment of data */
-#define FT_ALIGNMENT  8
-
-
   /* FT_UNUSED is a macro used to indicate that a given parameter is not  */
   /* used -- this is only used to get rid of unpleasant compiler warnings */
 #ifndef FT_UNUSED
@@ -124,15 +120,17 @@ FT_BEGIN_HEADER
   /*   This is the only necessary change, so it is defined here instead    */
   /*   providing a new configuration file.                                 */
   /*                                                                       */
-#if ( defined( __APPLE__ ) && !defined( DARWIN_NO_CARBON ) ) || \
-    ( defined( __MWERKS__ ) && defined( macintosh )        )
+#if defined( __APPLE__ ) || ( defined( __MWERKS__ ) && defined( macintosh ) )
   /* no Carbon frameworks for 64bit 10.4.x */
+  /* AvailabilityMacros.h is available since Mac OS X 10.2,        */
+  /* so guess the system version by maximum errno before inclusion */
+#include <errno.h>
+#ifdef ECANCELED /* defined since 10.2 */
 #include "AvailabilityMacros.h"
+#endif
 #if defined( __LP64__ ) && \
     ( MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4 )
-#define DARWIN_NO_CARBON 1
-#else
-#define FT_MACINTOSH 1
+#undef FT_MACINTOSH
 #endif
 
 #elif defined( __SC__ ) || defined( __MRC__ )
@@ -202,6 +200,30 @@ FT_BEGIN_HEADER
   /*                                                                       */
   typedef unsigned XXX  FT_UInt32;
 
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Type>                                                                */
+  /*    FT_Int64                                                           */
+  /*                                                                       */
+  /*    A typedef for a 64bit signed integer type.  The size depends on    */
+  /*    the configuration.  Only defined if there is real 64bit support;   */
+  /*    otherwise, it gets emulated with a structure (if necessary).       */
+  /*                                                                       */
+  typedef signed XXX  FT_Int64;
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Type>                                                                */
+  /*    FT_UInt64                                                          */
+  /*                                                                       */
+  /*    A typedef for a 64bit unsigned integer type.  The size depends on  */
+  /*    the configuration.  Only defined if there is real 64bit support;   */
+  /*    otherwise, it gets emulated with a structure (if necessary).       */
+  /*                                                                       */
+  typedef unsigned XXX  FT_UInt64;
+
   /* */
 
 #endif
@@ -241,13 +263,15 @@ FT_BEGIN_HEADER
 
   /* FT_LONG64 must be defined if a 64-bit type is available */
 #define FT_LONG64
-#define FT_INT64  long
+#define FT_INT64   long
+#define FT_UINT64  unsigned long
 
 #elif defined( _MSC_VER ) && _MSC_VER >= 900  /* Visual C++ (and Intel C++) */
 
   /* this compiler provides the __int64 type */
 #define FT_LONG64
-#define FT_INT64  __int64
+#define FT_INT64   __int64
+#define FT_UINT64  unsigned __int64
 
 #elif defined( __BORLANDC__ )  /* Borland C++ */
 
@@ -256,7 +280,8 @@ FT_BEGIN_HEADER
 
   /* this compiler provides the __int64 type */
 #define FT_LONG64
-#define FT_INT64  __int64
+#define FT_INT64   __int64
+#define FT_UINT64  unsigned __int64
 
 #elif defined( __WATCOMC__ )   /* Watcom C++ */
 
@@ -265,13 +290,15 @@ FT_BEGIN_HEADER
 #elif defined( __MWERKS__ )    /* Metrowerks CodeWarrior */
 
 #define FT_LONG64
-#define FT_INT64  long long int
+#define FT_INT64   long long int
+#define FT_UINT64  unsigned long long int
 
 #elif defined( __GNUC__ )
 
   /* GCC provides the `long long' type */
 #define FT_LONG64
-#define FT_INT64  long long int
+#define FT_INT64   long long int
+#define FT_UINT64  unsigned long long int
 
 #endif /* FT_SIZEOF_LONG == (64 / FT_CHAR_BIT) */
 
@@ -295,6 +322,11 @@ FT_BEGIN_HEADER
 
 #endif /* FT_LONG64 && !FT_CONFIG_OPTION_FORCE_INT64 */
 
+#ifdef FT_LONG64
+  typedef FT_INT64   FT_Int64;
+  typedef FT_UINT64  FT_UInt64;
+#endif
+
 
 #define FT_BEGIN_STMNT  do {
 #define FT_END_STMNT    } while ( 0 )
@@ -306,6 +338,7 @@ FT_BEGIN_HEADER
   /* These must be defined `static __inline__' with GCC.             */
 
 #if defined( __CC_ARM ) || defined( __ARMCC__ )  /* RVCT */
+
 #define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
 
   /* documentation is in freetype.h */
@@ -335,8 +368,10 @@ FT_BEGIN_HEADER
 
 #ifdef __GNUC__
 
-#if defined( __arm__ ) && !defined( __thumb__ )    && \
+#if defined( __arm__ )                                 && \
+    ( !defined( __thumb__ ) || defined( __thumb2__ ) ) && \
     !( defined( __CC_ARM ) || defined( __ARMCC__ ) )
+
 #define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
 
   /* documentation is in freetype.h */
@@ -348,22 +383,27 @@ FT_BEGIN_HEADER
     register FT_Int32  t, t2;
 
 
-    asm __volatile__ (
-      "smull  %1, %2, %4, %3\n\t"   /* (lo=%1,hi=%2) = a*b */
-      "mov    %0, %2, asr #31\n\t"  /* %0  = (hi >> 31) */
-      "add    %0, %0, #0x8000\n\t"  /* %0 += 0x8000 */
-      "adds   %1, %1, %0\n\t"       /* %1 += %0 */
-      "adc    %2, %2, #0\n\t"       /* %2 += carry */
-      "mov    %0, %1, lsr #16\n\t"  /* %0  = %1 >> 16 */
-      "orr    %0, %2, lsl #16\n\t"  /* %0 |= %2 << 16 */
+    __asm__ __volatile__ (
+      "smull  %1, %2, %4, %3\n\t"       /* (lo=%1,hi=%2) = a*b */
+      "mov    %0, %2, asr #31\n\t"      /* %0  = (hi >> 31) */
+      "add    %0, %0, #0x8000\n\t"      /* %0 += 0x8000 */
+      "adds   %1, %1, %0\n\t"           /* %1 += %0 */
+      "adc    %2, %2, #0\n\t"           /* %2 += carry */
+      "mov    %0, %1, lsr #16\n\t"      /* %0  = %1 >> 16 */
+      "orr    %0, %0, %2, lsl #16\n\t"  /* %0 |= %2 << 16 */
       : "=r"(a), "=&r"(t2), "=&r"(t)
-      : "r"(a), "r"(b) );
+      : "r"(a), "r"(b)
+      : "cc" );
     return a;
   }
 
-#endif /* __arm__ && !__thumb__ && !( __CC_ARM || __ARMCC__ ) */
+#endif /* __arm__                      && */
+       /* ( __thumb2__ || !__thumb__ ) && */
+       /* !( __CC_ARM || __ARMCC__ )      */
 
-#if defined( i386 )
+
+#if defined( __i386__ )
+
 #define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
 
   /* documentation is in freetype.h */
@@ -395,6 +435,99 @@ FT_BEGIN_HEADER
 
 #endif /* __GNUC__ */
 
+
+#ifdef _MSC_VER /* Visual C++ */
+
+#ifdef _M_IX86
+
+#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
+
+  /* documentation is in freetype.h */
+
+  static __inline FT_Int32
+  FT_MulFix_i386( FT_Int32  a,
+                  FT_Int32  b )
+  {
+    register FT_Int32  result;
+
+    __asm
+    {
+      mov eax, a
+      mov edx, b
+      imul edx
+      mov ecx, edx
+      sar ecx, 31
+      add ecx, 8000h
+      add eax, ecx
+      adc edx, 0
+      shr eax, 16
+      shl edx, 16
+      add eax, edx
+      mov result, eax
+    }
+    return result;
+  }
+
+#endif /* _M_IX86 */
+
+#endif /* _MSC_VER */
+
+
+#if defined( __GNUC__ ) && defined( __x86_64__ )
+
+#define FT_MULFIX_ASSEMBLER  FT_MulFix_x86_64
+
+  static __inline__ FT_Int32
+  FT_MulFix_x86_64( FT_Int32  a,
+                    FT_Int32  b )
+  {
+    /* Temporarily disable the warning that C90 doesn't support */
+    /* `long long'.                                             */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wlong-long"
+
+#if 1
+    /* Technically not an assembly fragment, but GCC does a really good */
+    /* job at inlining it and generating good machine code for it.      */
+    long long  ret, tmp;
+
+
+    ret  = (long long)a * b;
+    tmp  = ret >> 63;
+    ret += 0x8000 + tmp;
+
+    return (FT_Int32)( ret >> 16 );
+#else
+
+    /* For some reason, GCC 4.6 on Ubuntu 12.04 generates invalid machine  */
+    /* code from the lines below.  The main issue is that `wide_a' is not  */
+    /* properly initialized by sign-extending `a'.  Instead, the generated */
+    /* machine code assumes that the register that contains `a' on input   */
+    /* can be used directly as a 64-bit value, which is wrong most of the  */
+    /* time.                                                               */
+    long long  wide_a = (long long)a;
+    long long  wide_b = (long long)b;
+    long long  result;
+
+
+    __asm__ __volatile__ (
+      "imul %2, %1\n"
+      "mov %1, %0\n"
+      "sar $63, %0\n"
+      "lea 0x8000(%1, %0), %0\n"
+      "sar $16, %0\n"
+      : "=&r"(result), "=&r"(wide_a)
+      : "r"(wide_b)
+      : "cc" );
+
+    return (FT_Int32)result;
+#endif
+
+#pragma GCC diagnostic pop
+  }
+
+#endif /* __GNUC__ && __x86_64__ */
+
 #endif /* !FT_CONFIG_OPTION_NO_ASSEMBLER */
 
 
@@ -421,6 +554,9 @@ FT_BEGIN_HEADER
 #endif
 
 #endif /* FT_MAKE_OPTION_SINGLE_OBJECT */
+
+#define FT_LOCAL_ARRAY( x )      extern const  x
+#define FT_LOCAL_ARRAY_DEF( x )  const  x
 
 
 #ifndef FT_BASE

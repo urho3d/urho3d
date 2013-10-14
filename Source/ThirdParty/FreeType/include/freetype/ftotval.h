@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType API for validating OpenType tables (specification).         */
 /*                                                                         */
-/*  Copyright 2004, 2005, 2006, 2007 by                                    */
+/*  Copyright 2004-2007, 2013 by                                           */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -116,7 +116,7 @@ FT_BEGIN_HEADER
   *
   * @description:
   *    Validate various OpenType tables to assure that all offsets and
-  *    indices are valid.  The idea is that a higher-level library which
+  *    indices are valid.  The idea is that a higher-level library that
   *    actually does the text layout can access those tables without
   *    error checking (which can be quite time consuming).
   *
@@ -125,7 +125,7 @@ FT_BEGIN_HEADER
   *       A handle to the input face.
   *
   *    validation_flags ::
-  *       A bit field which specifies the tables to be validated.  See
+  *       A bit field that specifies the tables to be validated.  See
   *       @FT_VALIDATE_OTXXX for possible values.
   *
   * @output:

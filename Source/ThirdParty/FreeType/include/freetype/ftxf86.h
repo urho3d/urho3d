@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Support functions for X11.                                           */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2006, 2007 by                              */
+/*  Copyright 2002-2004, 2006, 2007, 2013 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -62,7 +62,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*   Return a string describing the format of a given face, using values */
-  /*   which can be used as an X11 FONT_PROPERTY.  Possible values are     */
+  /*   that can be used as an X11 FONT_PROPERTY.  Possible values are      */
   /*   `TrueType', `Type~1', `BDF', `PCF', `Type~42', `CID~Type~1', `CFF', */
   /*   `PFR', and `Windows~FNT'.                                           */
   /*                                                                       */
