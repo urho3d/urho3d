@@ -707,9 +707,9 @@ FontFace* Font::GetFaceTTF(int pointSize)
         }
     }
     
-    // Store point size and the height of a row. Use the height of the tallest font if taller than the specified row height
+    // Store point size and the height of a row
     newFace->pointSize_ = pointSize;
-    newFace->rowHeight_ = Max((face->size->metrics.height + 63) >> 6, maxHeight);
+    newFace->rowHeight_ = face->size->metrics.height >> 6;
     
     // Now try to pack into the smallest possible texture. If face does not fit into one texture, enable dynamic mode where
     // glyphs are only created as necessary
