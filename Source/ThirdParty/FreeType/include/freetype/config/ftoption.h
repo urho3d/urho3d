@@ -591,7 +591,7 @@ FT_BEGIN_HEADER
   /*   This option requires TT_CONFIG_OPTION_BYTECODE_INTERPRETER to be    */
   /*   defined.                                                            */
   /*                                                                       */
-/* #define TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+#define TT_CONFIG_OPTION_SUBPIXEL_HINTING
 
 
   /*************************************************************************/

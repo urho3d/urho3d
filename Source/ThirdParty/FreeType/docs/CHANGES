@@ -1,3 +1,503 @@
+
+CHANGES BETWEEN 2.4.12 and 2.5
+
+  I. IMPORTANT BUG FIXES
+
+    - The cache manager function `FTC_Manager_Reset'  didn't flush the
+      cache.
+
+
+  II. IMPORTANT CHANGES
+
+    - Behdad Esfahbod  (on behalf  of Google) contributed  support for
+      color embedded bitmaps (eg. color emoji).
+
+      A  new  load  flag,  FT_LOAD_COLOR, makes  FreeType  load  color
+      embedded-bitmaps, following this draft specification
+
+        https://color-emoji.googlecode.com/git/specification/v1.html
+
+      which defines two new SFNT  tables, `CBDT' and `CBLC' (named and
+      modeled  after  `EBDT'  and `EBLC',  respectively).   The  color
+      bitmaps  are  stored in  the  new  FT_PIXEL_MODE_BGRA format  to
+      represent BGRA  pre-multiplied sRGB  images.  If PNG  support is
+      available,  PNG color  images as  defined in  the same  proposed
+      specification are supported also.
+
+      Note that  color bitmaps  are converted  to grayscale  if client
+      didn't ask for color.
+
+    - As  announced in  the  previous release,  the  old FreeType  CFF
+      engine  is now  disabled by  default.  It  can be  conditionally
+      compiled     by     defining     the     configuration     macro
+      CFF_CONFIG_OPTION_OLD_ENGINE.
+
+    - As announced in the previous release,  all code related to macro
+      FT_CONFIG_OPTION_OLD_INTERNALS  has been removed,  thus becoming
+      obsolete.
+
+
+  III. MISCELLANEOUS
+
+    - The  property API  (`FT_Property_Get' and  `FT_Property_Set') is
+      now declared as stable.
+
+      The  exception,   however,  are  the   experimental  auto-hinter
+      properties `glyph-to-script-map' and `fallback-script' which are
+      subject to change in a forthcoming release.
+
+    - `ftview' has been updated to  support color embedded bitmaps; it
+      can be toggled on and off  with key `c'.  The small cache toggle
+      is now key `K'.
+
+    - It  is now  possible  to  control the  version  of the  TrueType
+      hinting engine  using the new `interpreter-version'  property of
+      the  `truetype' module:  Versions 35  and 38  (the default)  are
+      supported,  which  roughly  corresponds to  disable  and  enable
+      subpixel hinting support, respectively.
+
+      In  both  `ftview'  and  `ftdiff',  switching  between  the  two
+      versions  can be  done  with  key `H'.   In  the `ftbench'  demo
+      program, command line option `-H'  has been extended to activate
+      the non-default interpreter version.
+
+    - The `ttdebug' program has been further improved.  In particular,
+      it accepts a new command line  option `-H' to select the hinting
+      engine.
+
+    - Another round of TrueType subpixel hinting fixes.
+
+    - The `apinames' tool can now create an import file for NetWare.
+
+    - 64bit compilation of the new CFF engine was buggy.
+
+    - Some fixes to improve robustness in memory-tight situations.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.11 and 2.4.12
+
+    - We have another CFF parsing and hinting engine!  Written by Dave
+      Arnold <darnold@adobe.com>,  this work  has been  contributed by
+      Adobe in  collaboration with Google.   It is vastly  superior to
+      the old CFF engine, and it  will replace it in the next release.
+      Right  now,  it  is  still  off by  default,  and  you  have  to
+      explicitly select it using  the new `hinting-engine' property of
+      the cff driver:
+
+        ...
+        #include FT_MODULE_H
+        #include FT_CFF_DRIVER_H
+
+        FT_Library  library;
+        int         engine = FT_CFF_HINTING_ADOBE;
+
+
+        ...
+        FT_Property_Set( library, "cff", "hinting-engine", &engine );
+
+      The code has  a (mature) beta status; we encourage  all users to
+      test it and report any problems.
+
+      In case you want to activate the new CFF engine unconditionally,
+      apply this patch:
+
+--- snip ---
+diff --git a/src/cff/cffobjs.c b/src/cff/cffobjs.c
+index ebcf189..3f2ce6b 100644
+--- a/src/cff/cffobjs.c
++++ b/src/cff/cffobjs.c
+@@ -1056,7 +1056,7 @@
+
+
+     /* set default property values */
+-    driver->hinting_engine    = FT_CFF_HINTING_FREETYPE;
++    driver->hinting_engine    = FT_CFF_HINTING_ADOBE;
+     driver->no_stem_darkening = FALSE;
+
+     return FT_Err_Ok;
+--- snip ---
+
+    - The  macro FT_CONFIG_OPTION_OLD_INTERNALS  is no  longer set  by
+      default.  In  the next  release, we  will completely  remove the
+      associated code.   Please update your  programs in case  you are
+      still using this macro.
+
+
+  II. MISCELLANEOUS
+
+    - The  (top-level)  `configure'  script   now  respects  the  MAKE
+      environment variable to specify a `make' binary.   For backwards
+      compatibility, GNUMAKE still overrides MAKE, though.
+
+    - The `ftview'  and `ftdiff'  demo programs have  been redesigned,
+      showing  more options  permanently  on the  screen, among  other
+      minor improvements.
+
+    - Using the `H'  key, it is now possible to  select the CFF engine
+      in both `ftview' and `ftdiff'.
+
+    - The new command line option `-H' for `ftbench' selects the Adobe
+      CFF engine.
+
+    - It is  now possible  to directly select  the LCD  rendering mode
+      with the keys `A'-`F' in  `ftview'.  The key mapping for cycling
+      through LCD modes  has been changed from `K' and  `L' to `k' and
+      `l', and  toggling custom LCD  filtering is no longer  mapped to
+      key `F' but to key `L'.
+
+    - In `ftdiff',  key `x' toggles  between layout modes:  Either use
+      the  advance width  (this is  new and  now the  default) or  the
+      bounding box information to determine line breaks.
+
+    - For all demo  tools, the new command line option  `-v' shows the
+      version.
+
+    - For the demo tools with a GUI, the new command line options `-w'
+      and `-h' select  the width and the height of  the output window,
+      respectively.
+
+    - The `ttdebug' program was broken and has been reactivated.  Note
+      that this program is not compiled by default.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.10 and 2.4.11
+
+  I. IMPORTANT BUG FIXES
+
+    - Some vulnerabilities in the  BDF implementation have been fixed.
+      Users of this font format should upgrade.
+
+
+  II. IMPORTANT CHANGES
+
+    - Subpixel  hinting support  has been  contributed by  Infinality,
+      based on Greg Hitchcock's whitepaper at
+
+        http://www.microsoft.com/typography/cleartype/truetypecleartype.aspx
+
+      Originally, it was a separate patch available from
+
+        http://www.infinality.net/blog/
+
+      and which has been integrated.
+
+      Note that  ClearType support is not  completely implemented!  In
+      particular,  full support  for the  options `compatible_widths',
+      `symmetrical_smoothing,  and  `bgr'  (via the  GETINFO  bytecode
+      instruction) is missing.
+
+      Activation of  subpixel hinting  support can be  controlled with
+      the `TT_CONFIG_OPTION_SUBPIXEL_HINTING' configuration option; it
+      is switched off by default.  This feature is still experimental;
+      we welcome test reports!
+
+    - Support for OpenType collections (OTC) has been added.
+
+    - Pure CFF fonts within an SFNT wrapper are now supported.
+
+
+  III. MISCELLANEOUS
+
+    - Minor rendering improvements to the auto-hinter.
+
+    - `FT_GlyphSlot_Oblique' now uses a shear angle of 12°.
+
+    - Experimental support  to handle `property modules',  for example
+      to control the  behaviour of the auto-hinter.   The API consists
+      of two new functions, `FT_Property_Set' and `FT_Property_Get'.
+
+      The code is  still subject to change and should  not be used for
+      production.
+
+    - The `ftdiff' demo program now supports UTF-8 encoded input files
+      for option `-f'.
+
+    - Using keys `r' and `R', you can now adjust the stroker radius in
+      the `ftview' demo program.
+
+    - Other, minor fixes and improvements.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.9 and 2.4.10
+
+  I. IMPORTANT BUG FIXES
+
+    - Incremental glyph loading as needed by ghostscript was broken.
+
+
+  II. MISCELLANEOUS
+
+    - A new  function `FT_Outline_EmboldenXY',  contributed by  Alexei
+      Podtelezhnikov.
+
+    - In the `ftview' demo program, key `e' has been replaced with `x'
+      and `y' to  embolden in  the horizontal and  vertical direction,
+      respectively.
+
+    - The glyph  spacing computation  in `FT_GlyphSlot_Embolden'  (and
+      similar code in `ftview') has been improved.
+
+    - Minor  improvements to  the TrueType  bytecode  interpreter  and
+      glyph loader, the auto-hinter, and the B/W rasterizer.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.8 and 2.4.9
+
+  I. IMPORTANT BUG FIXES
+
+    - Another round of fixes to better handle invalid fonts.   Many of
+      them are vulnerabilities  (see CVE-2012-1126 up to CVE-2012-1144
+      and SA48320) so all users should upgrade.
+
+
+  II. MISCELLANEOUS
+
+    - The `ENCODING -1 <n>' format of BDF fonts is now supported.
+
+    - For BDF fonts,  support for the whole Unicode encoding range has
+      been added.
+
+    - Better TTF support for x_ppem != y_ppem.
+
+    - `FT_Get_Advances' sometimes returned bogus values.
+
+    - The  demo  programs  no  longer  recognize  and  handle  default
+      suffixes; you now have to always specify the complete font name.
+
+    - Better rendering and LCD mode cycling added to `ftview'.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.7 and 2.4.8
+
+  I. IMPORTANT BUG FIXES
+
+    - Some vulnerabilities in handling CID-keyed PostScript fonts have
+      been fixed; see CVE-2011-3439.
+
+
+  II. MISCELLANEOUS
+
+    - Chris Liddell contributed a new API, `FT_Get_PS_Font_Value',  to
+      retrieve most of the dictionary keys in Type 1 fonts.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.6 and 2.4.7
+
+  I. IMPORTANT BUG FIXES
+
+    - Some  vulnerabilities in handling Type 1 fonts  have been fixed;
+      see CVE-2011-3256.
+
+
+  II. MISCELLANEOUS
+
+    - FreeType  now properly  handles ZapfDingbats  glyph names  while
+      constructing a Unicode character map (for fonts which don't have
+      one).
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.5 and 2.4.6
+
+  I. IMPORTANT BUG FIXES
+
+    - For TrueType based fonts, the ascender and descender values were
+      incorrect sometimes  (off by a pixel if the ppem value was not a
+      multiple of 5).   Depending on the use you might now  experience
+      a different  layout; the  change should  result in  better, more
+      consistent line spacing.
+
+    - Fix CVE-2011-0226  which causes a  vulnerability while  handling
+      Type 1 fonts.
+
+    - BDF fonts  containing  glyphs with negative values  for ENCODING
+      were  incorrectly  rejected.  This  bug has  been introduced  in
+      FreeType version 2.2.0.
+
+    - David Bevan contributed a major revision of the FreeType stroker
+      code:
+
+      . The behaviour of FT_STROKER_LINEJOIN_BEVEL has been corrected.
+
+      . A new  line join style,  FT_STROKER_LINEJOIN_MITER_FIXED,  has
+        been introduced to support PostScript and PDF miter joins.
+
+      . FT_STROKER_LINEJOIN_MITER_VARIABLE  has been introduced  as an
+        alias for FT_STROKER_LINEJOIN_MITER.
+
+      . Various stroking glitches has been fixed.
+
+
+  II. MISCELLANEOUS
+
+      - SFNT bitmap fonts which contain an outline glyph for `.notdef'
+        only no longer set the FT_FACE_FLAG_SCALABLE flag.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.4 and 2.4.5
+
+  I. IMPORTANT BUG FIXES
+
+    - A rendering regression  for second-order Bézier curves  has been
+      fixed, introduced in 2.4.3.
+
+
+  II. IMPORTANT CHANGES
+
+    - If autohinting  is not  explicitly disabled,  FreeType now  uses
+      the autohinter if  a TrueType based font doesn't  contain native
+      hints.
+
+    - The load flag FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH  has been made
+      redundant and  is simply ignored;  this means that FreeType  now
+      ignores the global advance width value in TrueType fonts.
+
+
+  III. MISCELLANEOUS
+
+    - `FT_Sfnt_Table_Info' can now return the number of SFNT tables of
+      a font.
+
+    - Support for PCF files compressed with bzip2 has been contributed
+      by Joel  Klinghed.  To  make this  work, the  OS must  provide a
+      bzip2 library.
+
+    - Bradley  Grainger  contributed  project  and  solution  files in
+      Visual Studio 2010 format.
+
+    - Again some fixes to better handle broken fonts.
+
+    - Some improvements to the B/W rasterizer.
+
+    - Fixes to the cache module to improve robustness.
+
+    - Just  Fill Bugs contributed (experimental) code to compute  blue
+      zones for CJK Ideographs, improving the alignment of  horizontal
+      stems at the top or bottom edges.
+
+    - The `ftgrid' demo program  can now display  autohinter segments,
+      to be toggled on and off with key `s'.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.3 and 2.4.4
+
+  I. IMPORTANT BUG FIXES
+
+    - UVS support (TrueType/OpenType cmap format 14) support is fixed.
+      This regression has been introduced in version 2.4.0.
+
+
+  II. MISCELLANEOUS
+
+    - Detect tricky fonts (e.g. MingLiU)  by the lengths and checksums
+      of Type42-persistent subtables (`cvt ', `fpgm', and `prep') when
+      a TrueType font without family name is given.  The previous fix,
+      introduced in 2.4.3,  was too rigorous,  causing many  subsetted
+      fonts (mainly  from PDF files) displayed badly  because FreeType
+      forced  rendering with  the TrueType bytecode engine  instead of
+      the autohinter.
+
+    - Better support for 64bit platforms.
+
+    - More fixes to improve handling of broken fonts.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.2 and 2.4.3
+
+  I. IMPORTANT BUG FIXES
+
+    - Fix rendering of certain cubic, S-shaped arcs.   This regression
+      has been introduced in version 2.4.0.
+
+
+  II. MISCELLANEOUS
+
+    - To  fix  the  above  mentioned  rendering  issue,  a  new spline
+      flattening algorithm  has been  introduced which  speeds up both
+      conic and cubic arcs.
+
+    - Handling of broken fonts has been further improved.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.1 and 2.4.2
+
+  I. IMPORTANT BUG FIXES
+
+    - A stack overflow in CFF Type2 CharStrings interpreter is fixed.
+
+    - Handling Type 42 font deallocation was broken; additionally, the
+      library is now more robust against malformed Type 42 fonts.
+
+
+  II. MISCELLANEOUS
+
+    - Two new functions,  `FT_Reference_Library' (in FT_MODULE_H)  and
+      `FT_Reference_Face'  (in  FT_FREETYPE_H),  have  been  added  to
+      simplify life-cycle management.  A counter gets initialized to 1
+      at the  time an  FT_Library (or  FT_Face) structure  is created.
+      The  two  new   functions  increment  the  respective   counter.
+      `FT_Done_Library' and `FT_Done_Face' then only destroy a library
+      or face if the counter is 1, otherwise they simply decrement the
+      counter.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.4.0 and 2.4.1
+
+  I. IMPORTANT CHANGES
+
+    - A serious bug in the  CFF font module prevented  display of many
+      glyphs in CFF fonts like `MinionPro-Regular.otf'.
+
+
+======================================================================
+
+CHANGES BETWEEN 2.3.12 and 2.4.0
+
+  I. IMPORTANT CHANGES
+
+    - Since May  2010, all  patents  regarding  the TrueType  bytecode
+      interpreter have expired worldwide.  Consequently, we now define
+      TT_CONFIG_OPTION_BYTECODE_INTERPRETER by  default (and  undefine
+      TT_CONFIG_OPTION_UNPATENTED_HINTING).
+
+    - A new function `FT_Library_SetLcdFilterWeights' is available  to
+      adjust the filter weights set by `FT_Library_SetLcdFilter'.
+
+
+  II. MISCELLANEOUS
+
+    - Thanks to many reports from Robert Święcki, FreeType's stability
+      in handling broken or damaged fonts is much improved.
+
+    - Support  for LCD  filter  control has  been  added to  the  demo
+      programs `ftdiff' and `ftview'.
+
+
+======================================================================
+
 CHANGES BETWEEN 2.3.11 and 2.3.12
 
   I. IMPORTANT CHANGES
@@ -5,6 +505,7 @@ CHANGES BETWEEN 2.3.11 and 2.3.12
     - For  `FT_Open_Face',  new  parameters  are  available  to ignore
       preferred family names: FT_PARAM_TAG_IGNORE_PREFERRED_FAMILY and
       FT_PARAM_TAG_IGNORE_PREFERRED_SUBFAMILY.
+
 
   II. MISCELLANEOUS
 
@@ -2150,7 +2651,7 @@ CHANGES BETWEEN 2.0.3 and 2.0.2
       number.  see <freetype/fterrors.h> for details.
 
     - A   new  public   header   file  has   been  introduced,   named
-      FT_TRIGONOMETRY_H     (include/freetype/fttrig.h),     providing
+      FT_TRIGONOMETRY_H    (include/freetype/fttrigon.h),    providing
       trigonometric functions to  compute sines, cosines, arctangents,
       etc. with 16.16 fixed precision.  The implementation is based on
       the CORDIC  algorithm and is very fast  while being sufficiently
@@ -3378,7 +3879,7 @@ Extensions support:
 
 ------------------------------------------------------------------------
 
-Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by
+Copyright 2000-2013 by
 David Turner, Robert Wilhelm, and Werner Lemberg.
 
 This  file  is  part  of the  FreeType  project, and may  only be  used,
