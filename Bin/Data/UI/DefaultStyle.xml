@@ -249,7 +249,7 @@
     <element type="EditorMenuText" style="Text" auto="false" />
     <element type="EditorAttributeText" auto="false">
         <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
-        <attribute name="Font Size" value="11" />
+        <attribute name="Font Size" value="12" />
     </element>
     <element type="EditorEnumAttributeText" style="EditorAttributeText" auto="false">
         <attribute name="Is Enabled" value="true" />
