@@ -1509,7 +1509,7 @@ void Renderer::ResetViews()
 
 void Renderer::LoadShaders()
 {
-    LOGINFO("Reloading shaders");
+    LOGDEBUG("Reloading shaders");
     
     // Release old material shaders, mark them for reload
     ReleaseMaterialShaders();

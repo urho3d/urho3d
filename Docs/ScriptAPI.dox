@@ -6472,6 +6472,7 @@ Properties:
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard
 - bool useMutableGlyphs
+- bool forceAutoHint
 
 
 ### Controls

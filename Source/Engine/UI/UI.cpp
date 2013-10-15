@@ -38,6 +38,7 @@
 #include "Matrix3x4.h"
 #include "Profiler.h"
 #include "Renderer.h"
+#include "ResourceCache.h"
 #include "ScrollBar.h"
 #include "Shader.h"
 #include "ShaderVariation.h"
@@ -472,7 +473,13 @@ void UI::SetDoubleClickInterval(float interval)
 void UI::SetMaxFontTextureSize(int size)
 {
     if (IsPowerOfTwo(size) && size >= FONT_TEXTURE_MIN_SIZE)
-        maxFontTextureSize_ = size;
+    {
+        if (size != maxFontTextureSize_)
+        {
+            maxFontTextureSize_ = size;
+            ReleaseFontFaces();
+        }
+    }
 }
 
 void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
@@ -487,7 +494,20 @@ void UI::SetUseSystemClipBoard(bool enable)
 
 void UI::SetUseMutableGlyphs(bool enable)
 {
-    useMutableGlyphs_ = enable;
+    if (enable != useMutableGlyphs_)
+    {
+        useMutableGlyphs_ = enable;
+        ReleaseFontFaces();
+    }
+}
+
+void UI::SetForceAutoHint(bool enable)
+{
+    if (enable != forceAutoHint_)
+    {
+        forceAutoHint_ = enable;
+        ReleaseFontFaces();
+    }
 }
 
 IntVector2 UI::GetCursorPosition() const
@@ -830,6 +850,17 @@ void UI::SetCursorShape(CursorShape shape)
 {
     if (cursor_)
         cursor_->SetShape(shape);
+}
+
+void UI::ReleaseFontFaces()
+{
+    LOGDEBUG("Reloading font faces");
+
+    PODVector<Font*> fonts;
+    GetSubsystem<ResourceCache>()->GetResources<Font>(fonts);
+
+    for (unsigned i = 0; i < fonts.Size(); ++i)
+        fonts[i]->ReleaseFaces();
 }
 
 void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)

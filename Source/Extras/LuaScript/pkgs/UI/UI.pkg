@@ -19,6 +19,7 @@ class UI : public Object
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
     void SetUseSystemClipBoard(bool enable);
     void SetUseMutableGlyphs(bool enable);
+    void SetForceAutoHint(bool enable);
 
     UIElement* GetRoot() const;
     UIElement* GetRootModalElement() const;
@@ -36,6 +37,7 @@ class UI : public Object
     bool IsNonFocusedMouseWheel() const;
     bool GetUseSystemClipBoard() const;
     bool GetUseMutableGlyphs() const;
+    bool GetForceAutoHint() const;
     bool HasModalElement() const;
 
     tolua_readonly tolua_property__get_set UIElement* root;
@@ -50,5 +52,6 @@ class UI : public Object
     tolua_property__is_set bool nonFocusedMouseWheel;
     tolua_property__get_set bool useSystemClipBoard;
     tolua_property__get_set bool useMutableGlyphs;
+    tolua_property__get_set bool forceAutoHint;
     tolua_readonly tolua_property__has_set bool modalElement;
 };

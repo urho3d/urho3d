@@ -87,6 +87,8 @@ public:
     void SetUseSystemClipBoard(bool enable);
     /// Set whether to use mutable (eraseable) glyphs to ensure a font face never expands to more than one texture. Default false.
     void SetUseMutableGlyphs(bool enable);
+    /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
+    void SetForceAutoHint(bool enable);
     
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -116,11 +118,13 @@ public:
     bool GetUseSystemClipBoard() const { return useSystemClipBoard_; }
     /// Return whether is using mutable (eraseable) glyphs for fonts.
     bool GetUseMutableGlyphs() const { return useMutableGlyphs_; }
+    /// Return whether is using forced autohinting.
+    bool GetForceAutoHint() const { return forceAutoHint_; }
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
 
 private:
-    /// Initialize when screen mode initially se.
+    /// Initialize when screen mode initially set.
     void Initialize();
     /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
@@ -138,6 +142,8 @@ private:
     void GetCursorPositionAndVisible(IntVector2& pos, bool& visible);
     /// Set active cursor's shape.
     void SetCursorShape(CursorShape shape);
+    /// Force release of font faces when global font properties change.
+    void ReleaseFontFaces();
     /// Handle button or touch begin.
     void ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle button or touch end.
@@ -231,6 +237,8 @@ private:
     bool useSystemClipBoard_;
     /// Flag for using mutable (eraseable) font glyphs.
     bool useMutableGlyphs_;
+    /// Flag for forcing FreeType autohinting.
+    bool forceAutoHint_;
     /// Non-modal batch size (used internally for rendering).
     unsigned nonModalBatchSize_;
     /// Timer used to trigger double click.

@@ -122,7 +122,7 @@ private:
     /// Render one glyph on demand into the current texture.
     void RenderGlyph(unsigned index);
     /// Render a glyph bitmap into a memory buffer.
-    void RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned pitch);
+    void RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned pitch, int loadMode);
     /// Setup next texture for dynamic glyph rendering.
     void SetupNextTexture(int width, int height);
     /// Setup mutable glyph rendering, in which glyphs form a regular-sized grid.
@@ -177,14 +177,16 @@ public:
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     FontFace* GetFace(int pointSize);
     
+    /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
+    void ReleaseFaces();
     /// Create a texture for font rendering.
     SharedPtr<Texture2D> CreateFaceTexture();
     /// Load font face texture from image resource.
     SharedPtr<Texture2D> LoadFaceTexture(SharedPtr<Image> image);
     
 private:
-    /// Return True-type font face. Called internally. Return null on error.
-    FontFace* GetFaceTTF(int pointSize);
+    /// Return font face using FreeTyp. Called internally. Return null on error.
+    FontFace* GetFaceFreeType(int pointSize);
     /// Return bitmap font face. Called internally. Return null on error.
     FontFace* GetFaceBitmap(int pointSize);
     /// Convert graphics format to number of components.

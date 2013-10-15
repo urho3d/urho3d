@@ -4890,6 +4890,7 @@ Methods:
 - void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 - void SetUseSystemClipBoard(bool enable)
 - void SetUseMutableGlyphs(bool enable)
+- void SetForceAutoHint(bool enable)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -4904,6 +4905,7 @@ Methods:
 - bool IsNonFocusedMouseWheel() const
 - bool GetUseSystemClipBoard() const
 - bool GetUseMutableGlyphs() const
+- bool GetForceAutoHint() const
 - bool HasModalElement() const
 
 Properties:
@@ -4920,6 +4922,7 @@ Properties:
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard
 - bool useMutableGlyphs
+- bool forceAutoHint
 - bool modalElement (readonly)
 
 ### UIElement : Serializable
