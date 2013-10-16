@@ -30,7 +30,7 @@ float GetDepth(float4 clipPos)
 
 float3 GetBillboardPos(float4 iPos, float2 iSize, float4x3 modelMatrix)
 {
-    return mul(float4(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector, 1.0), modelMatrix);
+    return mul(iPos, modelMatrix) + iSize.x * cViewRightVector + iSize.y * cViewUpVector;
 }
 
 float3 GetBillboardNormal()

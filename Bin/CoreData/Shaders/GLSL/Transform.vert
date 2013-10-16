@@ -61,7 +61,7 @@ float GetDepth(vec4 clipPos)
 
 vec3 GetBillboardPos(vec4 iPos, vec2 iSize, mat4 modelMatrix)
 {
-    return (modelMatrix * vec4(iPos.xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector, 1.0)).xyz;
+    return (modelMatrix * iPos).xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector;
 }
 
 vec3 GetBillboardNormal()
