@@ -88,6 +88,7 @@ UI::UI(Context* context) :
     #endif
     useSystemClipBoard_(false),
     useMutableGlyphs_(false),
+    forceAutoHint_(false),
     nonModalBatchSize_(0)
 {
     rootElement_->SetTraversalMode(TM_DEPTH_FIRST);
