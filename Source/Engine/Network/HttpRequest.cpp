@@ -33,17 +33,37 @@
 namespace Urho3D
 {
 
-static const unsigned ERROR_BUFFER_LEN = 256;
+static const unsigned ERROR_BUFFER_SIZE = 256;
+static const unsigned READ_BUFFER_SIZE = 65536; // Must be a power of two
 
 HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData) :
     url_(url.Trimmed()),
     verb_(!verb.Empty() ? verb : "GET"),
-    connection_(0)
+    headers_(headers),
+    postData_(postData),
+    state_(HTTP_INITIALIZING),
+    httpReadBuffer_(new unsigned char[READ_BUFFER_SIZE]),
+    readBuffer_(new unsigned char[READ_BUFFER_SIZE]),
+    readPosition_(0),
+    writePosition_(0)
 {
     // Size of response is unknown, so just set maximum value. The position will also be changed
     // to maximum value once the request is done, signaling end for Deserializer::IsEof().
     size_ = M_MAX_UNSIGNED;
     
+    LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
+    
+    // Start the worker thread to actually create the connection and read the response data.
+    Run();
+}
+
+HttpRequest::~HttpRequest()
+{
+    Stop();
+}
+
+void HttpRequest::ThreadFunction()
+{
     String protocol = "http";
     String host;
     String path = "/";
@@ -72,24 +92,24 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
         host = host.Substring(0, portStart);
     }
     
-    LOGDEBUG("HTTP " + verb_ + " request to host " + host + " port " + String(port) + " path " + String(path));
-    
-    char errorBuffer[ERROR_BUFFER_LEN];
+    char errorBuffer[ERROR_BUFFER_SIZE];
     memset(errorBuffer, 0, sizeof(errorBuffer));
     
     String headersStr;
-    for (unsigned i = 0; i < headers.Size(); ++i)
+    for (unsigned i = 0; i < headers_.Size(); ++i)
     {
         // Trim and only add non-empty header strings
-        String header = headers[i].Trimmed();
+        String header = headers_[i].Trimmed();
         if (header.Length())
             headersStr += header + "\r\n";
     }
     
+    // Initiate the connection. This may block due to DNS query
     /// \todo SSL mode will not actually work unless Civetweb's SSL mode is initialized with an external SSL DLL
-    if (postData.Empty())
+    mg_connection* connection = 0;
+    if (postData_.Empty())
     {
-        connection_ = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
+        connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"
@@ -97,46 +117,140 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
     }
     else
     {
-        connection_ = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
+        connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"
             "Content-Length: %d\r\n"
             "\r\n"
-            "%s", verb_.CString(), path.CString(), host.CString(), headersStr.CString(), postData.Length(), postData.CString());
+            "%s", verb_.CString(), path.CString(), host.CString(), headersStr.CString(), postData_.Length(), postData_.CString());
     }
     
-    if (!connection_)
-        error_ = String(&errorBuffer[0]);
-}
-
-HttpRequest::~HttpRequest()
-{
-    Release();
+    {
+        MutexLock lock(mutex_);
+        state_ = connection ? HTTP_OPEN : HTTP_ERROR;
+        
+        // If no connection could be made, store the error and exit
+        if (state_ == HTTP_ERROR)
+        {
+            error_ = String(&errorBuffer[0]);
+            return;
+        }
+    }
+    
+    // Loop while should run, read data from the connection, copy to the main thread buffer if there is space
+    while (shouldRun_)
+    {
+        // Read less than full buffer to be able to distinguish between full and empty ring buffer. Reading may block
+        int bytesRead = mg_read(connection, httpReadBuffer_.Get(), READ_BUFFER_SIZE / 4);
+        if (bytesRead <= 0)
+            break;
+        
+        mutex_.Acquire();
+        
+        // Wait until enough space in the main thread's ring buffer
+        for (;;)
+        {
+            unsigned spaceInBuffer = READ_BUFFER_SIZE - ((writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1));
+            if ((int)spaceInBuffer > bytesRead || !shouldRun_)
+                break;
+            
+            mutex_.Release();
+            Sleep(5);
+            mutex_.Acquire();
+        }
+        
+        if (!shouldRun_)
+        {
+            mutex_.Release();
+            break;
+        }
+        
+        if (writePosition_ + bytesRead <= READ_BUFFER_SIZE)
+            memcpy(readBuffer_.Get() + writePosition_, httpReadBuffer_.Get(), bytesRead);
+        else
+        {
+            // Handle ring buffer wrap
+            unsigned part1 = READ_BUFFER_SIZE - writePosition_;
+            unsigned part2 = bytesRead - part1;
+            memcpy(readBuffer_.Get() + writePosition_, httpReadBuffer_.Get(), part1);
+            memcpy(readBuffer_.Get(), httpReadBuffer_.Get() + part1, part2);
+        }
+        
+        writePosition_ += bytesRead;
+        writePosition_ &= READ_BUFFER_SIZE - 1;
+        
+        mutex_.Release();
+    }
+    
+    // Close the connection
+    mg_close_connection(connection);
+    
+    {
+        MutexLock lock(mutex_);
+        state_ = HTTP_CLOSED;
+    }
 }
 
 unsigned HttpRequest::Read(void* dest, unsigned size)
 {
-    if (!connection_)
-        return 0;
+    mutex_.Acquire();
     
-    int bytesRead = mg_read((mg_connection*)connection_, dest, size);
-    // Automatically close the connection if no more data
-    if (bytesRead <= 0)
-        Release();
+    unsigned char* destPtr = (unsigned char*)dest;
+    unsigned bytesAvailable = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    if (size > bytesAvailable)
+        size = bytesAvailable;
     
-    return bytesRead > 0 ? bytesRead : 0;
-}
-
-void HttpRequest::Release()
-{
-    if (connection_)
+    if (size)
     {
-        mg_close_connection((mg_connection*)connection_);
-        connection_ = 0;
-        position_ = M_MAX_UNSIGNED;
+        if (readPosition_ + size <= READ_BUFFER_SIZE)
+            memcpy(destPtr, readBuffer_.Get() + readPosition_, size);
+        else
+        {
+            // Handle ring buffer wrap
+            unsigned part1 = READ_BUFFER_SIZE - readPosition_;
+            unsigned part2 = size - part1;
+            memcpy(destPtr, readBuffer_.Get() + readPosition_, part1);
+            memcpy(destPtr + part1, readBuffer_.Get(), part2);
+        }
+        
+        readPosition_ += size;
+        readPosition_ &= READ_BUFFER_SIZE - 1;
     }
+    
+    // If connection has been closed and there is no more buffered data, we are at the end
+    CheckEof();
+    
+    mutex_.Release();
+    return size;
+}
+
+String HttpRequest::GetError() const
+{
+    MutexLock lock(mutex_);
+    const_cast<HttpRequest*>(this)->CheckEof();
+    return error_;
+}
+
+HttpRequestState HttpRequest::GetState() const
+{
+    MutexLock lock(mutex_);
+    const_cast<HttpRequest*>(this)->CheckEof();
+    return state_;
+}
+
+unsigned HttpRequest::GetAvailableSize() const
+{
+    MutexLock lock(mutex_);
+    const_cast<HttpRequest*>(this)->CheckEof();
+    return (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+}
+
+void HttpRequest::CheckEof()
+{
+    unsigned bytesAvailable = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    if (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !bytesAvailable))
+        position_ = M_MAX_UNSIGNED;
 }
 
 }
-

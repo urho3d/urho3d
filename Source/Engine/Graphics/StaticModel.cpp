@@ -86,38 +86,31 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
         Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
         Ray localRay = query.ray_.Transformed(inverse);
         float distance = localRay.HitDistance(boundingBox_);
-        if (distance < query.maxDistance_)
+        
+        if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
-            if (level == RAY_TRIANGLE)
+            distance = M_INFINITY;
+            
+            for (unsigned i = 0; i < batches_.Size(); ++i)
             {
-                for (unsigned i = 0; i < batches_.Size(); ++i)
+                Geometry* geometry = batches_[i].geometry_;
+                if (geometry)
                 {
-                    Geometry* geometry = batches_[i].geometry_;
-                    if (geometry)
-                    {
-                        distance = geometry->GetHitDistance(localRay);
-                        if (distance < query.maxDistance_)
-                        {
-                            RayQueryResult result;
-                            result.drawable_ = this;
-                            result.node_ = node_;
-                            result.distance_ = distance;
-                            result.subObject_ = M_MAX_UNSIGNED;
-                            results.Push(result);
-                            break;
-                        }
-                    }
+                    float geometryDistance = geometry->GetHitDistance(localRay);
+                    if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
+                        distance = geometryDistance;
                 }
             }
-            else
-            {
-                RayQueryResult result;
-                result.drawable_ = this;
-                result.node_ = node_;
-                result.distance_ = distance;
-                result.subObject_ = M_MAX_UNSIGNED;
-                results.Push(result);
-            }
+        }
+        
+        if (distance < query.maxDistance_)
+        {
+            RayQueryResult result;
+            result.drawable_ = this;
+            result.node_ = node_;
+            result.distance_ = distance;
+            result.subObject_ = M_MAX_UNSIGNED;
+            results.Push(result);
         }
         break;
     }

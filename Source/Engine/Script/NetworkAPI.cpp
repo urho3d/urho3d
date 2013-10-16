@@ -121,10 +121,19 @@ static void RegisterConnection(asIScriptEngine* engine)
 
 static void RegisterHttpRequest(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("HttpRequestState");
+    engine->RegisterEnumValue("HttpRequestState", "HTTP_INITIALIZING", HTTP_INITIALIZING);
+    engine->RegisterEnumValue("HttpRequestState", "HTTP_ERROR", HTTP_ERROR);
+    engine->RegisterEnumValue("HttpRequestState", "HTTP_OPEN", HTTP_OPEN);
+    engine->RegisterEnumValue("HttpRequestState", "HTTP_CLOSED", HTTP_CLOSED);
+    
     RegisterRefCounted<HttpRequest>(engine, "HttpRequest");
     RegisterDeserializer<HttpRequest>(engine, "HttpRequest");
     engine->RegisterObjectMethod("HttpRequest", "const String& get_url() const", asMETHOD(HttpRequest, GetURL), asCALL_THISCALL);
     engine->RegisterObjectMethod("HttpRequest", "const String& get_verb() const", asMETHOD(HttpRequest, GetVerb), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HttpRequest", "String get_error() const", asMETHOD(HttpRequest, GetError), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HttpRequest", "HttpRequestState get_state() const", asMETHOD(HttpRequest, GetState), asCALL_THISCALL);
+    engine->RegisterObjectMethod("HttpRequest", "uint get_availableSize() const", asMETHOD(HttpRequest, GetAvailableSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("HttpRequest", "bool get_open() const", asMETHOD(HttpRequest, IsOpen), asCALL_THISCALL);
 }
 

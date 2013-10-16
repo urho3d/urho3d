@@ -189,7 +189,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
             if (distance >= query.maxDistance_)
                 return;
         }
-        else // if (lightType_ == LIGHT_POINT)
+        else
         {
             distance = query.ray_.HitDistance(Sphere(node_->GetWorldPosition(), range_));
             if (distance >= query.maxDistance_)

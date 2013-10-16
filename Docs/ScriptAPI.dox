@@ -543,6 +543,14 @@ namespace Urho3D
 - TE_STROKE
 
 
+### HttpRequestState
+
+- HTTP_INITIALIZING
+- HTTP_ERROR
+- HTTP_OPEN
+- HTTP_CLOSED
+
+
 ### ShapeType
 
 - SHAPE_BOX
@@ -6614,6 +6622,9 @@ Properties:
 - bool eof (readonly)
 - String url (readonly)
 - String verb (readonly)
+- String error (readonly)
+- HttpRequestState state (readonly)
+- uint availableSize (readonly)
 - bool open (readonly)
 
 
