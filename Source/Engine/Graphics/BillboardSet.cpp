@@ -329,9 +329,8 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
         ++enabledBillboards;
     }
     
-    // If no billboards enabled, the bounding box is just the node's world position
-    if (!enabledBillboards)
-        worldBox.Merge(node_->GetWorldPosition());
+    // Always merge the node's own position to ensure particle emitter updates continue when the relative mode is switched
+    worldBox.Merge(node_->GetWorldPosition());
 
     worldBoundingBox_ = worldBox;
 }
