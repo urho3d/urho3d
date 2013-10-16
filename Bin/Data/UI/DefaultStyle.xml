@@ -171,7 +171,7 @@
             </element>
         </element>
     </element>
-    <element type="Panel" style="UIElement">
+    <element type="Panel">
         <attribute name="Layout Mode" value="Vertical" />
         <attribute name="Layout Spacing" value="4" />
     </element>
