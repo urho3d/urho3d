@@ -180,7 +180,9 @@
         <attribute name="Font Size" value="11" />
         <attribute name="Color" value="0.85 0.85 0.85" />
     </element>
-    <element type="DebugHudText" style="Text" auto="false" />
+    <element type="DebugHudText" style="Text" auto="false">
+        <attribute name="Text Effect" value="Shadow" />
+    </element>
     <element type="ConsoleBackground" auto="false">
         <attribute name="Color" value="0.15 0.15 0.15 0.8" />
         <attribute name="Layout Border" value="4 4 4 4" />
