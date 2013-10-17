@@ -49,6 +49,7 @@
 #include "TerrainPatch.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
+#include "Timer.h"
 #include "VertexBuffer.h"
 #include "VertexDeclaration.h"
 #include "Zone.h"
@@ -570,7 +571,7 @@ bool Graphics::BeginFrame()
         // The device can not be reset yet, sleep and try again eventually
         if (hr == D3DERR_DEVICELOST)
         {
-            Sleep(20);
+            Time::Sleep(20);
             return false;
         }
         // The device is lost, but ready to be reset. Reset device but do not render on this frame yet

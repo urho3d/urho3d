@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "Profiler.h"
 #include "StringUtils.h"
+#include "Timer.h"
 
 #include <civetweb.h>
 
@@ -156,7 +157,7 @@ void HttpRequest::ThreadFunction()
                 break;
             
             mutex_.Release();
-            Sleep(5);
+            Time::Sleep(5);
             mutex_.Acquire();
         }
         
