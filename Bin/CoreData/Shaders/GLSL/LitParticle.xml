@@ -1,6 +1,7 @@
 <shaders>
     <shader type="vs">
         <option name="VCol" define="VERTEXCOLOR" />
+        <option name="HeightFog" define="HEIGHTFOG" />
         <variation name="" define="AMBIENT" />
         <variation name="1VL" define="NUMVERTEXLIGHTS=1" />
         <variation name="2VL" define="NUMVERTEXLIGHTS=2" />
@@ -28,6 +29,7 @@
         <option name="Diff" define="DIFFMAP" />
         <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
+        <option name="HeightFog" define="HEIGHTFOG" />
         <variation name="" define="AMBIENT" />
         <variation name="Dir">
             <define name="DIRLIGHT" />

@@ -128,9 +128,18 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
 }
 
+static bool ImageLoadColorLUT(File* file, Serializable* ptr)
+{
+    if (file)
+        return ptr->Load(*file);
+    else
+        return false;
+}
+
 static void RegisterImage(asIScriptEngine* engine)
 {
     RegisterResource<Image>(engine, "Image");
+    engine->RegisterObjectMethod("Image", "bool LoadColorLUT(File@+)", asFUNCTION(ImageLoadColorLUT), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Image", "void FlipVertical()", asMETHOD(Image, FlipVertical), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SaveBMP(const String&in)", asMETHOD(Image, SaveBMP), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "void SavePNG(const String&in)", asMETHOD(Image, SavePNG), asCALL_THISCALL);

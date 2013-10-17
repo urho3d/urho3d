@@ -1,0 +1,10 @@
+<technique sm3="true" >
+    <pass name="base" vs="LitSolid_HeightFog" ps="LitSolid_DiffAlphaMaskHeightFog" alphamask="true" />
+    <pass name="litbase" vs="LitSolid_NormalHeightFog" ps="LitSolid_DiffNormalAlphaMaskAmbientHeightFog" alphamask="true" />
+    <pass name="light" vs="LitSolid_NormalHeightFog" ps="LitSolid_DiffNormalAlphaMask" depthtest="equal" depthwrite="false" blend="add" alphamask="true" />
+    <pass name="prepass" vs="LitSolid_NormalHeightFog" ps="LitSolid_DiffNormalAlphaMaskHeightFogPrepass" alphamask="true" />
+    <pass name="material" vs="LitSolid_HeightFog" ps="LitSolid_DiffAlphaMaskHeightFogMaterial" depthtest="equal" depthwrite="false" alphamask="true" />
+    <pass name="deferred" vs="LitSolid_NormalHeightFog" ps="LitSolid_DiffNormalAlphaMaskHeightFogDeferred" alphamask="true" />
+    <pass name="depth" vs="Depth" ps="Depth_AlphaMask" alphamask="true" />
+    <pass name="shadow" vs="Shadow" ps="Shadow_AlphaMask" alphamask="true" />
+</technique>

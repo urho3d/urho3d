@@ -1,0 +1,18 @@
+<shaders>
+    <shader type="vs">
+        <variation name="Luminance64" define="LUMINANCE64" />
+        <variation name="Luminance16" define="LUMINANCE16" />
+        <variation name="Luminance4" define="LUMINANCE4" />
+        <variation name="Luminance1" define="LUMINANCE1" />
+        <variation name="AdaptLuminance" define="ADAPTLUMINANCE" />
+        <variation name="Expose" define="EXPOSE" />
+    </shader>
+    <shader type="ps">
+        <variation name="Luminance64" define="LUMINANCE64" />
+        <variation name="Luminance16" define="LUMINANCE16" />
+        <variation name="Luminance4" define="LUMINANCE4" />
+        <variation name="Luminance1" define="LUMINANCE1" />
+        <variation name="AdaptLuminance" define="ADAPTLUMINANCE" />
+        <variation name="Expose" define="EXPOSE" />
+    </shader>
+</shaders>

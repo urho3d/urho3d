@@ -77,6 +77,8 @@ public:
     int GetWidth() const { return width_; }
     /// Return height.
     int GetHeight() const { return height_; }
+    /// Return height.
+    int GetDepth() const { return depth_; }
     /// Return whether parameters are dirty.
     bool GetParametersDirty() const { return parametersDirty_; }
     /// Return filtering mode.
@@ -97,10 +99,14 @@ public:
     int GetLevelWidth(unsigned level) const;
     /// Return mip level width, or 0 if level does not exist.
     int GetLevelHeight(unsigned level) const;
+    /// Return mip level depth, or 0 if level does not exist.
+    int GetLevelDepth(unsigned level) const;
     /// Return texture usage type.
     TextureUsage GetUsage() const { return usage_; }
     /// Return data size in bytes for a rectangular region.
     unsigned GetDataSize(int width, int height) const;
+    /// Return data size in bytes for a volume region.
+    unsigned GetDataSize(int width, int height, int depth) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
     /// Return the non-internal texture format corresponding to an OpenGL internal format.
@@ -137,6 +143,8 @@ protected:
     int width_;
     /// Texture height.
     int height_;
+    /// Texture depth.
+    int depth_;
     /// Shadow compare mode, OpenGL only.
     bool shadowCompare_;
     /// Parameters dirty flag.

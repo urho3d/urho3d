@@ -3,6 +3,9 @@
 #include "Lighting.vert"
 
 varying vec2 vTexCoord;
+#ifdef HEIGHTFOG
+    varying vec3 vWorldPos;
+#endif
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
@@ -24,6 +27,10 @@ void main()
     vec3 worldPos = GetWorldPos(modelMatrix);
     gl_Position = GetClipPos(worldPos);
     vTexCoord = GetTexCoord(iTexCoord);
+    
+    #ifdef HEIGHTFOG
+        vWorldPos = worldPos;
+    #endif
 
     #ifdef VERTEXCOLOR
         vColor = iColor;

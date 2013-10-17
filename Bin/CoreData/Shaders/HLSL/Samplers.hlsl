@@ -15,6 +15,7 @@ samplerCUBE sFaceSelectCubeMap : register(S8);
 samplerCUBE sIndirectionCubeMap : register(S9);
 sampler2D sDepthBuffer : register(S10);
 sampler2D sLightBuffer : register(S11);
+sampler3D sVolumeMap : register(S12);
 
 float4 Sample(sampler2D map, float2 texCoord)
 {

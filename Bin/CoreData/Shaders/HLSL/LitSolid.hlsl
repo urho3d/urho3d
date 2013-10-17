@@ -30,6 +30,9 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     out float2 oTexCoord : TEXCOORD0,
+    #ifdef HEIGHTFOG
+        out float3 oWorldPos : TEXCOORD8,
+    #endif
     #ifdef PERPIXEL
         out float4 oLightVec : TEXCOORD1,
         #ifndef NORMALMAP
@@ -68,6 +71,10 @@ void VS(float4 iPos : POSITION,
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
+
+    #ifdef HEIGHTFOG
+        oWorldPos = worldPos;
+    #endif
 
     #if defined(PERPIXEL) && defined(NORMALMAP)
         float3 oNormal;
@@ -139,6 +146,9 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
+    #ifdef HEIGHTFOG
+        float3 iWorldPos : TEXCOORD8,
+    #endif
     #ifdef PERPIXEL
         float4 iLightVec : TEXCOORD1,
         #ifndef NORMALMAP
@@ -233,13 +243,19 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #else
             finalColor = diff * lightColor * diffColor.rgb;
         #endif
+
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(iLightVec.w, iWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(iLightVec.w);
+        #endif
     
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
             finalColor += cMatEmissiveColor;
-            oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
+            oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
         #else
-            oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
+            oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #elif defined(PREPASS)
         // Fill light pre-pass G-Buffer
@@ -288,8 +304,14 @@ void PS(float2 iTexCoord : TEXCOORD0,
             finalColor += cMatEmissiveColor;
         #endif
 
-        oColor = float4(GetFog(finalColor, iVertexLight.a), 1.0);
-        oAlbedo = GetFogFactor(iVertexLight.a) * float4(diffColor.rgb, specIntensity);
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(iVertexLight.a, iWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(iVertexLight.a);
+        #endif
+
+        oColor = float4(GetFog(finalColor, fogFactor), 1.0);
+        oAlbedo = fogFactor * float4(diffColor.rgb, specIntensity);
         oNormal = float4(normal * 0.5 + 0.5, specPower);
         oDepth = iVertexLight.a;
     #else
@@ -328,6 +350,12 @@ void PS(float2 iTexCoord : TEXCOORD0,
             finalColor += cMatEmissiveColor;
         #endif
 
-        oColor = float4(GetFog(finalColor, iVertexLight.a), diffColor.a);
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(iVertexLight.a, iWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(iVertexLight.a);
+        #endif
+
+        oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }

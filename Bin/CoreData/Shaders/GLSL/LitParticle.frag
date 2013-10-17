@@ -4,6 +4,9 @@
 #include "Fog.frag"
 
 varying vec2 vTexCoord;
+#ifdef HEIGHTFOG
+    varying vec3 vWorldPos;
+#endif
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
@@ -54,16 +57,29 @@ void main()
         #endif
     
         finalColor = diff * lightColor * diffColor.rgb;
+
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(vLightVec.w, vWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(vLightVec.w);
+        #endif
         
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
-            gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
+            gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
         #else
-            gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
+            gl_FragColor = vec4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight.rgb * diffColor.rgb;
-        gl_FragColor = vec4(GetFog(finalColor, vVertexLight.a), diffColor.a);
+        
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(vVertexLight.a, vWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(vVertexLight.a);
+        #endif
+
+        gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }

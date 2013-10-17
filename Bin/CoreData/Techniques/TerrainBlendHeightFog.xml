@@ -1,0 +1,10 @@
+<technique sm3="true" >
+    <pass name="base" vs="TerrainBlend_HeightFog" ps="TerrainBlend_HeightFog" />
+    <pass name="litbase" vs="TerrainBlend_HeightFog" ps="TerrainBlend_AmbientHeightFog" />
+    <pass name="light" vs="TerrainBlend_HeightFog" ps="TerrainBlend_HeightFog" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vs="TerrainBlend_HeightFog" ps="TerrainBlend_HeightFogPrepass" />
+    <pass name="material" vs="TerrainBlend_HeightFog" ps="TerrainBlend_HeightFogMaterial" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vs="TerrainBlend_HeightFog" ps="TerrainBlend_HeightFogDeferred" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

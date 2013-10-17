@@ -1,5 +1,6 @@
 <shaders>
     <shader type="vs">
+        <option name="HeightFog" define="HEIGHTFOG" require="SM3" />
         <variation name="" define="AMBIENT" />
         <variation name="1VL" define="NUMVERTEXLIGHTS=1" />
         <variation name="2VL" define="NUMVERTEXLIGHTS=2" />
@@ -24,6 +25,7 @@
     </shader>
     <shader type="ps">
         <option name="Ambient" define="AMBIENT" require="PERPIXEL" />
+        <option name="HeightFog" define="HEIGHTFOG" require="SM3" />
         <variation name="" define="AMBIENT" />
         <variation name="Dir">
             <define name="DIRLIGHT" />

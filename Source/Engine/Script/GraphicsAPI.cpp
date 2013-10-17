@@ -43,6 +43,7 @@
 #include "Terrain.h"
 #include "TerrainPatch.h"
 #include "Texture2D.h"
+#include "Texture3D.h"
 #include "TextureCube.h"
 #include "Skybox.h"
 #include "Zone.h"
@@ -177,6 +178,11 @@ static bool Texture2DLoad(Image* image, bool useAlpha, Texture2D* ptr)
     return ptr->Load(SharedPtr<Image>(image), useAlpha);
 }
 
+static bool Texture3DLoad(Image* image, bool useAlpha, Texture3D* ptr)
+{
+    return ptr->Load(SharedPtr<Image>(image), useAlpha);
+}
+
 static bool TextureCubeLoad(CubeMapFace face, Image* image, bool useAlpha, TextureCube* ptr)
 {
     return ptr->Load(face, SharedPtr<Image>(image), useAlpha);
@@ -286,6 +292,7 @@ static void RegisterRenderPath(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_NORMALBUFFER", TU_NORMALBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_DEPTHBUFFER", TU_DEPTHBUFFER);
     engine->RegisterEnumValue("TextureUnit", "TU_LIGHTBUFFER", TU_LIGHTBUFFER);
+    engine->RegisterEnumValue("TextureUnit", "TU_VOLUMEMAP", TU_VOLUMEMAP);
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     engine->RegisterEnumValue("TextureUnit", "MAX_TEXTURE_UNITS", MAX_TEXTURE_UNITS);
     
@@ -442,6 +449,11 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Texture2D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Texture2D", "bool Load(Image@+, bool useAlpha = false)", asFUNCTION(Texture2DLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Texture2D", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture2D, GetRenderSurface), asCALL_THISCALL);
+
+    RegisterTexture<Texture3D>(engine, "Texture3D");
+    engine->RegisterObjectMethod("Texture3D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture3D, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture3D", "bool Load(Image@+, bool useAlpha = false)", asFUNCTION(Texture3DLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Texture3D", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture3D, GetRenderSurface), asCALL_THISCALL);
     
     RegisterTexture<TextureCube>(engine, "TextureCube");
     engine->RegisterObjectMethod("TextureCube", "bool SetSize(int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
@@ -801,6 +813,10 @@ static void RegisterZone(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Zone", "float get_fogStart() const", asMETHOD(Zone, GetFogStart), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_fogEnd(float)", asMETHOD(Zone, SetFogEnd), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "float get_fogEnd() const", asMETHOD(Zone, GetFogEnd), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "void set_fogHeight(float)", asMETHOD(Zone, SetFogHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "float get_fogHeight() const", asMETHOD(Zone, GetFogHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "void set_fogHeightScale(float)", asMETHOD(Zone, SetFogHeightScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "float get_fogHeightScale() const", asMETHOD(Zone, GetFogHeightScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_priority(int)", asMETHOD(Zone, SetPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "int get_priority() const", asMETHOD(Zone, GetPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_override(bool)", asMETHOD(Zone, SetOverride), asCALL_THISCALL);
@@ -1264,6 +1280,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "void set_defaultRenderPath(RenderPath@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (RenderPath*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "RenderPath@+ get_defaultRenderPath() const", asMETHOD(Renderer, GetDefaultRenderPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "Zone@+ get_defaultZone() const", asMETHOD(Renderer, GetDefaultZone), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_hdrRendering(bool)", asMETHOD(Renderer, SetHDRRendering), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "bool get_hdrRendering() const", asMETHOD(Renderer, GetHDRRendering), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_specularLighting(bool)", asMETHOD(Renderer, SetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool get_specularLighting() const", asMETHOD(Renderer, GetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_textureAnisotropy(int)", asMETHOD(Renderer, SetTextureAnisotropy), asCALL_THISCALL);

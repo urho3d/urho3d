@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Camera.h"
 #include "DebugRenderer.h"
+#include "FileSystem.h"
 #include "Geometry.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
@@ -39,6 +40,7 @@
 #include "Skybox.h"
 #include "Technique.h"
 #include "Texture2D.h"
+#include "Texture3D.h"
 #include "TextureCube.h"
 #include "VertexBuffer.h"
 #include "View.h"
@@ -1526,7 +1528,14 @@ void View::SetTextures(RenderPathCommand& command)
         }
         
         // Bind a texture from the resource system
-        Texture2D* texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
+        Texture* texture;
+
+        // Detect 3d textures by file extension: they are defined by an XML file
+        if (GetExtension(command.textureNames_[i]) == ".xml")
+            texture = cache->GetResource<Texture3D>(command.textureNames_[i]);
+        else
+            texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
+
         if (texture)
             graphics_->SetTexture(i, texture);
         else
@@ -1553,6 +1562,16 @@ void View::RenderQuad(RenderPathCommand& command)
     const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
     for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
         graphics_->SetShaderParameter(k->first_, k->second_);
+
+    graphics_->SetShaderParameter(VSP_DELTATIME, frame_.timeStep_);
+    graphics_->SetShaderParameter(PSP_DELTATIME, frame_.timeStep_);
+
+    float nearClip = camera_->GetNearClip();
+    float farClip = camera_->GetFarClip();
+    graphics_->SetShaderParameter(VSP_NEARCLIP, nearClip);
+    graphics_->SetShaderParameter(VSP_FARCLIP, farClip);
+    graphics_->SetShaderParameter(PSP_NEARCLIP, nearClip);
+    graphics_->SetShaderParameter(PSP_FARCLIP, farClip);
     
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;
@@ -1677,8 +1696,17 @@ void View::AllocateScreenBuffers()
     // Follow final rendertarget format, or use RGB to match the backbuffer format
     unsigned format = renderTarget_ ? renderTarget_->GetParentTexture()->GetFormat() : Graphics::GetRGBFormat();
     
+    // If HDR rendering is enabled use RGBA16f and reserve a buffer
+    bool hdrRendering = renderer_->GetHDRRendering();
+
+    if (renderer_->GetHDRRendering())
+    {
+        format = Graphics::GetRGBAFloat16Format();
+        needSubstitute = true;
+    }
+
     #ifdef USE_OPENGL
-    if (deferred_)
+    if (deferred_ && !hdrRendering)
         format = Graphics::GetRGBAFormat();
     #endif
     
@@ -2461,8 +2489,14 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
         {
             const TechniqueEntry& entry = techniques[i];
             Technique* tech = entry.technique_;
+
+            #ifdef USE_OPENGL
+            if (!tech || materialQuality_ < entry.qualityLevel_)
+                continue;
+            #else
             if (!tech || (tech->IsSM3() && !graphics_->GetSM3Support()) || materialQuality_ < entry.qualityLevel_)
                 continue;
+            #endif
             if (lodDistance >= entry.lodDistance_)
                 return tech;
         }

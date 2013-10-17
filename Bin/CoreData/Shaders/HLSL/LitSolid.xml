@@ -4,6 +4,7 @@
         <option name="EnvCube" define="ENVCUBEMAP" />
         <option name="LightMap" define="LIGHTMAP" exclude="AO" />
         <option name="AO" define="AO" exclude="LightMap" />
+        <option name="HeightFog" define="HEIGHTFOG" require="SM3" />
         <variation name="" define="AMBIENT" />
         <variation name="1VL" define="NUMVERTEXLIGHTS=1" />
         <variation name="2VL" define="NUMVERTEXLIGHTS=2" />
@@ -40,6 +41,7 @@
         <variation name="Emissive" define="EMISSIVEMAP" />
         <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="Ambient" define="AMBIENT" require="PERPIXEL" />
+        <option name="HeightFog" define="HEIGHTFOG" require="SM3" />
         <variation name="" define="AMBIENT" />
         <variation name="Dir">
             <exclude name="EnvCube" />

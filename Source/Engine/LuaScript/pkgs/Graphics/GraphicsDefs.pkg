@@ -166,7 +166,8 @@ enum TextureUnit
     TU_INDIRECTION = 9,
     TU_DEPTHBUFFER = 10,
     TU_LIGHTBUFFER = 11,
-    MAX_TEXTURE_UNITS = 12
+    TU_VOLUMEMAP = 12,
+    MAX_TEXTURE_UNITS = 13
 };
 
 enum ShaderParameterGroup

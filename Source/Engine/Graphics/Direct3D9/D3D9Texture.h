@@ -69,6 +69,8 @@ public:
     int GetWidth() const { return width_; }
     /// Return height.
     int GetHeight() const { return height_; }
+    /// Return height.
+    int GetDepth() const { return depth_; }
     /// Return filtering mode.
     TextureFilterMode GetFilterMode() const { return filterMode_; }
     /// Return addressing mode by texture coordinate.
@@ -85,10 +87,14 @@ public:
     int GetLevelWidth(unsigned level) const;
     /// Return mip level width, or 0 if level does not exist.
     int GetLevelHeight(unsigned level) const;
+    /// Return mip level depth, or 0 if level does not exist.
+    int GetLevelDepth(unsigned level) const;
     /// Return texture usage type.
     TextureUsage GetUsage() const;
     /// Return data size in bytes for a rectangular region.
     unsigned GetDataSize(int width, int height) const;
+    /// Return data size in bytes for a volume region.
+    unsigned GetDataSize(int width, int height, int depth) const;
     /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
     
@@ -117,6 +123,8 @@ protected:
     int width_;
     /// Texture height.
     int height_;
+    /// Texture depth.
+    int depth_;
     /// Filtering mode.
     TextureFilterMode filterMode_;
     /// Addressing mode.

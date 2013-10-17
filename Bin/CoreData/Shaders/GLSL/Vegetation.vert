@@ -9,6 +9,9 @@ uniform float cWindPeriod;
 uniform vec2 cWindWorldSpacing;
 
 varying vec2 vTexCoord;
+#ifdef HEIGHTFOG
+    varying vec3 vWorldPos;
+#endif
 #ifdef PERPIXEL
     varying vec4 vLightVec;
     #ifdef SPECULAR
@@ -49,6 +52,10 @@ void main()
 
     gl_Position = GetClipPos(worldPos);
     vTexCoord = GetTexCoord(iTexCoord);
+
+    #ifdef HEIGHTFOG
+        vWorldPos = worldPos;
+    #endif
 
     #if defined(PERPIXEL) && defined(NORMALMAP)
         vec3 vNormal;

@@ -1,0 +1,24 @@
+<shaders>
+    <shader type="vs">
+        <variation name="Bright" define="BRIGHT" />
+        <variation name="Blur2" define="BLUR2" />
+        <variation name="Blur4" define="BLUR4" />
+        <variation name="Blur8" define="BLUR8" />
+        <variation name="Blur16" define="BLUR16" />
+        <variation name="Combine2" define="COMBINE2" />
+        <variation name="Combine4" define="COMBINE4" />
+        <variation name="Combine8" define="COMBINE8" />
+        <variation name="Combine16" define="COMBINE16" />
+    </shader>
+    <shader type="ps">
+        <variation name="Bright" define="BRIGHT" />
+        <variation name="Blur2" define="BLUR2" />
+        <variation name="Blur4" define="BLUR4" />
+        <variation name="Blur8" define="BLUR8" />
+        <variation name="Blur16" define="BLUR16" />
+        <variation name="Combine2" define="COMBINE2" />
+        <variation name="Combine4" define="COMBINE4" />
+        <variation name="Combine8" define="COMBINE8" />
+        <variation name="Combine16" define="COMBINE16" />
+    </shader>
+</shaders>

@@ -1,6 +1,7 @@
 <shaders>
     <shader type="vs">
         <option name="VCol" define="VERTEXCOLOR" />
+        <option name="HeightFog" define="HEIGHTFOG" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
         <variation name="Instanced" define="INSTANCED" />
@@ -10,5 +11,6 @@
         <option name="Diff" define="DIFFMAP" />
         <option name="VCol" define="VERTEXCOLOR" />
         <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
+        <option name="HeightFog" define="HEIGHTFOG" />
     </shader>
 </shaders>

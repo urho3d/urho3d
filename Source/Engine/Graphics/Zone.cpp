@@ -39,6 +39,8 @@ static const Color DEFAULT_AMBIENT_COLOR(0.1f, 0.1f, 0.1f);
 static const Color DEFAULT_FOG_COLOR(0.0f, 0.0f, 0.0f);
 static const float DEFAULT_FOG_START = 250.0f;
 static const float DEFAULT_FOG_END = 1000.0f;
+static const float DEFAULT_FOG_HEIGHT = 0.0f;
+static const float DEFAULT_FOG_HEIGHT_SCALE = 0.5f;
 
 extern const char* SCENE_CATEGORY;
 
@@ -51,6 +53,8 @@ Zone::Zone(Context* context) :
     fogColor_(DEFAULT_FOG_COLOR),
     fogStart_(DEFAULT_FOG_START),
     fogEnd_(DEFAULT_FOG_END),
+    fogHeight_(DEFAULT_FOG_HEIGHT),
+    fogHeightScale_(DEFAULT_FOG_HEIGHT_SCALE),
     priority_(0)
 {
     boundingBox_ = BoundingBox(DEFAULT_BOUNDING_BOX_MIN, DEFAULT_BOUNDING_BOX_MAX);
@@ -72,6 +76,8 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOG_END, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Height", fogHeight_, DEFAULT_FOG_HEIGHT, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Height Scale", fogHeightScale_, DEFAULT_FOG_HEIGHT_SCALE, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Override Mode", override_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_BOOL, "Ambient Gradient", ambientGradient_, false, AM_DEFAULT);
     ATTRIBUTE(Zone, VAR_INT, "Priority", priority_, 0, AM_DEFAULT);
@@ -139,6 +145,18 @@ void Zone::SetFogEnd(float end)
         end = 0.0f;
 
     fogEnd_ = end;
+    MarkNetworkUpdate();
+}
+
+void Zone::SetFogHeight(float height)
+{
+    fogHeight_ = height;
+    MarkNetworkUpdate();
+}
+
+void Zone::SetFogHeightScale(float scale)
+{
+    fogHeightScale_ = scale;
     MarkNetworkUpdate();
 }
 

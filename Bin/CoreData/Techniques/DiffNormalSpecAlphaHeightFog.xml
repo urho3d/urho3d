@@ -1,0 +1,5 @@
+<technique sm3="true" >
+    <pass name="alpha" vs="LitSolid_HeightFog" ps="LitSolid_DiffHeightFog" depthwrite="false" blend="alpha" />
+    <pass name="litalpha" vs="LitSolid_NormalHeightFog" ps="LitSolid_DiffNormalSpecMapHeightFog" depthwrite="false" blend="addalpha" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

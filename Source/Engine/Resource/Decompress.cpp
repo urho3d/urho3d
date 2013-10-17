@@ -218,48 +218,52 @@ static void DecompressDXT( unsigned char* rgba, const void* block, CompressedFor
         DecompressAlphaDXT5( rgba, alphaBock );
 }
 
-void DecompressImageDXT( unsigned char* rgba, const void* blocks, int width, int height, CompressedFormat format )
+void DecompressImageDXT( unsigned char* rgba, const void* blocks, int width, int height, int depth, CompressedFormat format )
 {
     // initialise the block input
     unsigned char const* sourceBlock = reinterpret_cast< unsigned char const* >( blocks );
     int bytesPerBlock = format == CF_DXT1 ? 8 : 16;
     
     // loop over blocks
-    for( int y = 0; y < height; y += 4 )
+    for( int z = 0; z < depth; ++z )
     {
-        for( int x = 0; x < width; x += 4 )
+        int sz = width*height*4*z;
+        for( int y = 0; y < height; y += 4 )
         {
-            // decompress the block
-            unsigned char targetRgba[4*16];
-            DecompressDXT( targetRgba, sourceBlock, format );
-            
-            // write the decompressed pixels to the correct image locations
-            unsigned char const* sourcePixel = targetRgba;
-            for( int py = 0; py < 4; ++py )
+            for( int x = 0; x < width; x += 4 )
             {
-                for( int px = 0; px < 4; ++px )
+                // decompress the block
+                unsigned char targetRgba[4*16];
+                DecompressDXT( targetRgba, sourceBlock, format );
+                
+                // write the decompressed pixels to the correct image locations
+                unsigned char const* sourcePixel = targetRgba;
+                for( int py = 0; py < 4; ++py )
                 {
-                    // get the target location
-                    int sx = x + px;
-                    int sy = y + py;
-                    if( sx < width && sy < height )
+                    for( int px = 0; px < 4; ++px )
                     {
-                        unsigned char* targetPixel = rgba + 4*( width*sy + sx );
-                        
-                        // copy the rgba value
-                        for( int i = 0; i < 4; ++i )
-                            *targetPixel++ = *sourcePixel++;
-                    }
-                    else
-                    {
-                        // skip this pixel as its outside the image
-                        sourcePixel += 4;
+                        // get the target location
+                        int sx = x + px;
+                        int sy = y + py;
+                        if( sx < width && sy < height )
+                        {
+                            unsigned char* targetPixel = rgba + sz + 4*( width*sy + sx );
+                            
+                            // copy the rgba value
+                            for( int i = 0; i < 4; ++i )
+                                *targetPixel++ = *sourcePixel++;
+                        }
+                        else
+                        {
+                            // skip this pixel as its outside the image
+                            sourcePixel += 4;
+                        }
                     }
                 }
+                
+                // advance
+                sourceBlock += bytesPerBlock;
             }
-            
-            // advance
-            sourceBlock += bytesPerBlock;
         }
     }
 }

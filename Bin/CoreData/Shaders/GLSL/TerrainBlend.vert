@@ -4,6 +4,9 @@
 #include "Lighting.vert"
 
 varying vec2 vTexCoord;
+#ifdef HEIGHTFOG
+    varying vec3 vWorldPos;
+#endif
 #ifdef PERPIXEL
     varying vec4 vLightVec;
     #ifdef SPECULAR
@@ -32,6 +35,10 @@ void main()
     gl_Position = GetClipPos(worldPos);
     vTexCoord = GetTexCoord(iTexCoord);
     vNormal = GetWorldNormal(modelMatrix);
+
+    #ifdef HEIGHTFOG
+        vWorldPos = worldPos;
+    #endif
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting

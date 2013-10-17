@@ -1,0 +1,38 @@
+<renderpath>
+    <rendertarget name="hdr128" tag="AutoExposure" size="128 128" format="rgba16f" filter="true" />
+    <rendertarget name="lum64" tag="AutoExposure" size="64 64" format="rg16f" filter="true" />
+    <rendertarget name="lum16" tag="AutoExposure" size="16 16" format="rg16f" filter="true" />
+    <rendertarget name="lum4" tag="AutoExposure" size="4 4" format="rg16f" filter="true" />
+    <rendertarget name="lum1" tag="AutoExposure" size="1 1" format="rg16f" filter="false" />
+    <rendertarget name="adaptedLum" tag="AutoExposure" size="1 1" format="rg16f" filter="false" />
+    <rendertarget name="prevAdaptedLum" tag="AutoExposure" size="1 1" format="rg16f" filter="false" />
+    <command type="quad" tag="AutoExposure" vs="CopyFrameBuffer" ps="CopyFrameBuffer" output="hdr128">
+        <texture unit="diffuse" name="viewport" />
+    </command>
+    <command type="quad" tag="AutoExposure" vs="AutoExposure_Luminance64" ps="AutoExposure_Luminance64" output="lum64">
+        <texture unit="diffuse" name="hdr128" />
+    </command>
+    <command type="quad" tag="AutoExposure" vs="AutoExposure_Luminance16" ps="AutoExposure_Luminance16" output="lum16">
+        <texture unit="diffuse" name="lum64" />
+    </command>
+    <command type="quad" tag="AutoExposure" vs="AutoExposure_Luminance4" ps="AutoExposure_Luminance4" output="lum4">
+        <texture unit="diffuse" name="lum16" />
+    </command>
+    <command type="quad" tag="AutoExposure" vs="AutoExposure_Luminance1" ps="AutoExposure_Luminance1" output="lum1">
+        <texture unit="diffuse" name="lum4" />
+    </command>
+    <command type="quad" tag="AutoExposure" vs="CopyFrameBuffer" ps="CopyFrameBuffer" output="prevAdaptedLum">
+        <texture unit="diffuse" name="adaptedLum" />
+    </command>
+    <command type="quad" tag="AutoExposure" vs="AutoExposure_AdaptLuminance" ps="AutoExposure_AdaptLuminance" output="adaptedLum">
+        <parameter name="AutoExposureAdaptRate" value="0.6" />
+        <texture unit="diffuse" name="prevAdaptedLum" />
+        <texture unit="normal" name="lum1" />
+    </command>
+    <command type="quad" tag="AutoExposure" vs="AutoExposure_Expose" ps="AutoExposure_Expose" output="viewport">
+        <parameter name="AutoExposureMiddleGrey" value="0.8" />
+        <parameter name="AutoExposureSensitivity" value="1.2" />
+        <texture unit="diffuse" name="viewport" />
+        <texture unit="normal" name="adaptedLum" />
+    </command>
+</renderpath>

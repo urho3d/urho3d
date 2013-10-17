@@ -171,6 +171,8 @@ public:
     void SetDefaultRenderPath(RenderPath* renderPath);
     /// Set default renderpath from an XML file.
     void SetDefaultRenderPath(XMLFile* file);
+    /// Set HDR rendering on/off.
+    void SetHDRRendering(bool enable);
     /// Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
     /// Set texture anisotropy.
@@ -216,6 +218,8 @@ public:
     Viewport* GetViewport(unsigned index) const;
     /// Return default renderpath.
     RenderPath* GetDefaultRenderPath() const;
+    /// Return whether HDR rendering is enabled.
+    bool GetHDRRendering() const { return hdrRendering_; }
     /// Return whether specular lighting is enabled.
     bool GetSpecularLighting() const { return specularLighting_; }
     /// Return whether drawing shadows is enabled.
@@ -483,6 +487,8 @@ private:
     unsigned shadersChangedFrameNumber_;
     /// Current stencil value for light optimization.
     unsigned char lightStencilValue_;
+    /// HDR rendering flag.
+    bool hdrRendering_;
     /// Specular lighting flag.
     bool specularLighting_;
     /// Draw shadows flag.

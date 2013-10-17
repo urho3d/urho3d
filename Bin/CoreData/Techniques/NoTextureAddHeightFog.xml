@@ -1,0 +1,3 @@
+<technique sm3="true" >
+    <pass name="alpha" vs="Unlit_HeightFog" ps="Unlit_HeightFog" depthwrite="false" blend="add" />
+</technique>

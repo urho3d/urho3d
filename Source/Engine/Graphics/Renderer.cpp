@@ -275,6 +275,7 @@ Renderer::Renderer(Context* context) :
     numOcclusionBuffers_(0),
     numShadowCameras_(0),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
+    hdrRendering_(false),
     specularLighting_(true),
     drawShadows_(true),
     reuseShadowMaps_(true),
@@ -325,6 +326,11 @@ void Renderer::SetDefaultRenderPath(XMLFile* xmlFile)
     SharedPtr<RenderPath> newRenderPath(new RenderPath());
     if (newRenderPath->Load(xmlFile))
         defaultRenderPath_ = newRenderPath;
+}
+
+void Renderer::SetHDRRendering(bool enable)
+{
+    hdrRendering_ = enable;
 }
 
 void Renderer::SetSpecularLighting(bool enable)

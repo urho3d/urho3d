@@ -20,6 +20,9 @@ void VS(float4 iPos : POSITION,
     #endif
     out float2 oTexCoord : TEXCOORD0,
     out float oDepth : TEXCOORD1,
+    #ifdef HEIGHTFOG
+        out float3 oWorldPos : TEXCOORD8,
+    #endif
     #ifdef VERTEXCOLOR
         out float4 oColor : COLOR0,
     #endif
@@ -31,6 +34,10 @@ void VS(float4 iPos : POSITION,
     oTexCoord = GetTexCoord(iTexCoord);
     oDepth = GetDepth(oPos);
 
+    #ifdef HEIGHTFOG
+        oWorldPos = worldPos;
+    #endif
+
     #ifdef VERTEXCOLOR
         oColor = iColor;
     #endif
@@ -38,6 +45,9 @@ void VS(float4 iPos : POSITION,
 
 void PS(float2 iTexCoord : TEXCOORD0,
     float iDepth : TEXCOORD1,
+    #ifdef HEIGHTFOG
+        float3 iWorldPos : TEXCOORD8,
+    #endif
     #ifdef VERTEXCOLOR
         float4 iColor : COLOR0,
     #endif
@@ -57,5 +67,11 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    oColor = float4(GetFog(diffColor.rgb, iDepth), diffColor.a);
+    #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(iDepth, iWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(iDepth);
+        #endif
+
+    oColor = float4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
 }

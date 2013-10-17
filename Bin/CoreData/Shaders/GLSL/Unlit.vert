@@ -5,6 +5,9 @@ varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
 #endif
+#ifdef HEIGHTFOG
+    varying vec3 vWorldPos;
+#endif
 varying float vDepth;
 
 void main()
@@ -14,6 +17,10 @@ void main()
     gl_Position = GetClipPos(worldPos);
     vTexCoord = GetTexCoord(iTexCoord);
     vDepth = GetDepth(gl_Position);
+
+    #ifdef HEIGHTFOG
+        vWorldPos = worldPos;
+    #endif
 
     #ifdef VERTEXCOLOR
         vColor = iColor;

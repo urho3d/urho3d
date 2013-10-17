@@ -4,6 +4,9 @@
 #include "Fog.frag"
 
 varying vec2 vTexCoord;
+#ifdef HEIGHTFOG
+    varying vec3 vWorldPos;
+#endif
 #ifdef PERPIXEL
     varying vec4 vLightVec;
     #ifdef SPECULAR
@@ -75,11 +78,17 @@ void main()
             finalColor = diff * lightColor * diffColor.rgb;
         #endif
 
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(vLightVec.w, vWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(vLightVec.w);
+        #endif
+
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
-            gl_FragColor = vec4(GetFog(finalColor, vLightVec.w), diffColor.a);
+            gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
         #else
-            gl_FragColor = vec4(GetLitFog(finalColor, vLightVec.w), diffColor.a);
+            gl_FragColor = vec4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #elif defined(PREPASS)
         // Fill light pre-pass G-Buffer
@@ -96,8 +105,14 @@ void main()
         float specIntensity = specColor.g;
         float specPower = cMatSpecColor.a / 255.0;
 
-        gl_FragData[0] = vec4(GetFog(vVertexLight.rgb * diffColor.rgb, vVertexLight.a), 1.0);
-        gl_FragData[1] = GetFogFactor(vVertexLight.a) * vec4(diffColor.rgb, specIntensity);
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(vVertexLight.a, vWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(vVertexLight.a);
+        #endif
+
+        gl_FragData[0] = vec4(GetFog(vVertexLight.rgb * diffColor.rgb, fogFactor), 1.0);
+        gl_FragData[1] = fogFactor * vec4(diffColor.rgb, specIntensity);
         gl_FragData[2] = vec4(normal * 0.5 + 0.5, specPower);
         gl_FragData[3] = vec4(EncodeDepth(vVertexLight.a), 0.0);
     #else
@@ -113,6 +128,12 @@ void main()
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
         #endif
 
-        gl_FragColor = vec4(GetFog(finalColor, vVertexLight.a), diffColor.a);
+        #ifdef HEIGHTFOG
+            float fogFactor = GetHeightFogFactor(vVertexLight.a, vWorldPos.y);
+        #else
+            float fogFactor = GetFogFactor(vVertexLight.a);
+        #endif
+
+        gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }

@@ -58,6 +58,10 @@ public:
     void SetFogStart(float start);
     /// Set fog end distance.
     void SetFogEnd(float end);
+    /// Set fog height distance.
+    void SetFogHeight(float height);
+    /// Set fog height scale.
+    void SetFogHeightScale(float scale);
     /// Set zone priority. If an object or camera is inside several zones, the one with highest priority is used.
     void SetPriority(int priority);
     /// Set override mode. If camera is inside an override zone, it will also be used for all drawables.
@@ -79,6 +83,10 @@ public:
     float GetFogStart() const { return fogStart_; }
     /// Return fog end distance.
     float GetFogEnd() const { return fogEnd_; }
+    /// Return fog height distance.
+    float GetFogHeight() const { return fogHeight_; }
+    /// Return fog height scale.
+    float GetFogHeightScale() const { return fogHeightScale_; }
     /// Return zone priority.
     int GetPriority() const { return priority_; }
     /// Return override mode.
@@ -119,6 +127,10 @@ protected:
     float fogStart_;
     /// Fog end distance.
     float fogEnd_;
+    /// Fog height distance.
+    float fogHeight_;
+    /// Fog height cale.
+    float fogHeightScale_;
     /// Zone priority.
     int priority_;
     /// Last zone used for ambient gradient start color.

@@ -1,0 +1,10 @@
+<technique sm3="true" >
+    <pass name="base" vs="Vegetation_HeightFog" ps="LitSolid_DiffAlphaMaskHeightFog" alphamask="true" />
+    <pass name="litbase" vs="Vegetation_HeightFog" ps="LitSolid_DiffAlphaMaskAmbientHeightFog" alphamask="true" />
+    <pass name="light" vs="Vegetation_HeightFog" ps="LitSolid_DiffAlphaMaskHeightFog"  depthtest="equal" depthwrite="false" blend="add" alphamask="true" />
+    <pass name="prepass" vs="Vegetation_HeightFog" ps="LitSolid_DiffAlphaMaskHeightFogPrepass" alphamask="true" />
+    <pass name="material" vs="Vegetation_HeightFog" ps="LitSolid_DiffAlphaMaskHeightFogMaterial" depthtest="equal" depthwrite="false" alphamask="true" />
+    <pass name="deferred" vs="Vegetation_HeightFog" ps="LitSolid_DiffAlphaMaskHeightFogDeferred" alphamask="true" />
+    <pass name="depth" vs="VegetationDepth" ps="Depth_AlphaMask" alphamask="true" />
+    <pass name="shadow" vs="VegetationShadow" ps="Shadow_AlphaMask" alphamask="true" />
+</technique>

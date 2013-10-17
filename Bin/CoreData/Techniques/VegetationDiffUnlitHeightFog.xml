@@ -1,0 +1,5 @@
+<technique sm3="true" >
+    <pass name="base" vs="Vegetation_HeightFog" ps="Unlit_DiffHeightFog" />
+    <pass name="depth" vs="VegetationDepth" ps="Depth" />
+    <pass name="shadow" vs="VegetationShadow" ps="Shadow" />
+</technique>

@@ -56,6 +56,9 @@ void VS(float4 iPos : POSITION,
         #endif
         out float4 oScreenPos : TEXCOORD5,
     #endif
+    #ifdef HEIGHTFOG
+        out float3 oWorldPos : TEXCOORD8,
+    #endif
     out float4 oPos : POSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
@@ -69,6 +72,10 @@ void VS(float4 iPos : POSITION,
 
     oPos = GetClipPos(worldPos);
     oTexCoord = GetTexCoord(iTexCoord);
+
+    #ifdef HEIGHTFOG
+        oWorldPos = worldPos;
+    #endif
 
     #if defined(PERPIXEL) && defined(NORMALMAP)
         float3 oNormal;
