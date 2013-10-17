@@ -15,6 +15,7 @@
 /*                                                                         */
 /***************************************************************************/
 
+// Modified by Lasse Oorni for Urho3D
 
 /* Greg Hitchcock from Microsoft has helped a lot in resolving unclear */
 /* issues; many thanks!                                                */
@@ -1440,8 +1441,8 @@
 
 #ifndef FT_CONFIG_OPTION_NO_ASSEMBLER
 
-#if defined( __arm__ )                                 && \
-    ( defined( __thumb2__ ) || !defined( __thumb__ ) )
+// Urho3D: modified architecture check
+#if defined( __arm__ ) && !defined( __thumb__ )
 
 #define TT_MulFix14  TT_MulFix14_arm
 
@@ -1484,7 +1485,7 @@
     return a;
   }
 
-#endif /* __arm__ && ( __thumb2__ || !__thumb__ ) */
+#endif /* __arm__ && !__thumb__ */
 
 #endif /* !FT_CONFIG_OPTION_NO_ASSEMBLER */
 
