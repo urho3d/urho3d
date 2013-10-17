@@ -91,7 +91,7 @@ public:
     void UnregisterAllRemoteEvents();
     /// Set the package download cache directory.
     void SetPackageCacheDir(const String& path);
-    /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data, or a null pointer on error.
+    /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
     SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
 
     /// Return network update FPS.

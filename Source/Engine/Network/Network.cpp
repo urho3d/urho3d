@@ -314,15 +314,9 @@ SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String&
 {
     PROFILE(MakeHttpRequest);
     
+    // The initialization of the request will take time, can not know at this point if it has an error or not
     SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
-    const String& error = request->GetError();
-    if (!error.Empty())
-    {
-        LOGERROR("Http request to " + url + " failed: " + error);
-        return SharedPtr<HttpRequest>();
-    }
-    else
-        return request;
+    return request;
 }
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const
