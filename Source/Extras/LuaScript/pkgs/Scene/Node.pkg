@@ -106,7 +106,7 @@ class Node : public Serializable
     int GetScriptObject(const String scriptObjectType) const;
     
     unsigned GetID() const;
-    const String& GetName() const;
+    const String GetName() const;
     StringHash GetNameHash() const;
     Node* GetParent() const;
     Scene* GetScene() const;

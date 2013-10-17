@@ -28,17 +28,16 @@ class Network
     void UnregisterRemoteEvent(const String eventType);
     
     void UnregisterAllRemoteEvents();
-    void SetPackageCacheDir(const String& path);
+    void SetPackageCacheDir(const String path);
     SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY);
-    // SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
-
+    
     int GetUpdateFps() const;
     Connection* GetServerConnection() const;
     
     bool IsServerRunning() const;
     
     bool CheckRemoteEvent(StringHash eventType) const;
-    const String& GetPackageCacheDir() const;
+    const String GetPackageCacheDir() const;
     
     tolua_property__get_set int updateFps;
     tolua_readonly tolua_property__get_set Connection* serverConnection;

@@ -32,13 +32,13 @@ class Scene : public Node
     bool IsUpdateEnabled() const;
     bool IsAsyncLoading() const;
     float GetAsyncProgress() const;
-    const String& GetFileName() const;
+    const String GetFileName() const;
     unsigned GetChecksum() const;
     float GetTimeScale() const;
     float GetElapsedTime() const;
     float GetSmoothingConstant() const;
     float GetSnapThreshold() const;
-    const String& GetVarName(ShortStringHash hash) const;
+    const String GetVarName(ShortStringHash hash) const;
 
     void Update(float timeStep);
     void BeginThreadedUpdate();

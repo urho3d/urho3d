@@ -10,8 +10,8 @@ enum HttpRequestState
 
 class HttpRequest : public Deserializer
 {
-    const String& GetURL() const;
-    const String& GetVerb() const;
+    const String GetURL() const;
+    const String GetVerb() const;
     String GetError() const;
     HttpRequestState GetState() const;
     unsigned GetAvailableSize() const;

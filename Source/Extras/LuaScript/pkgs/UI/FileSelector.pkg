@@ -31,10 +31,10 @@ class FileSelector : public Object
     Button* GetOKButton() const;
     Button* GetCancelButton() const;
     Button* GetCloseButton() const;
-    const String& GetTitle() const;
-    const String& GetPath() const;
-    const String& GetFileName() const;
-    const String& GetFilter() const;
+    const String GetTitle() const;
+    const String GetPath() const;
+    const String GetFileName() const;
+    const String GetFilter() const;
     unsigned GetFilterIndex() const;
     bool GetDirectoryMode() const;
     

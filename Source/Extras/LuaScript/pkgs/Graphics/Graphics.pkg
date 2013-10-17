@@ -16,7 +16,7 @@ class Graphics : public Object
     
     bool IsInitialized() const;
     void* GetExternalWindow() const;
-    const String& GetWindowTitle() const;
+    const String GetWindowTitle() const;
     IntVector2 GetWindowPosition() const;
     int GetWidth() const;
     int GetHeight() const;

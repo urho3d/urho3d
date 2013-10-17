@@ -16,7 +16,7 @@ class Console : public Object
     unsigned GetNumRows() const;
     unsigned GetNumHistoryRows() const;
     unsigned GetHistoryPosition() const;
-    const String& GetHistoryRow(unsigned index) const;
+    const String GetHistoryRow(unsigned index) const;
     
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_readonly tolua_property__get_set BorderImage* background;

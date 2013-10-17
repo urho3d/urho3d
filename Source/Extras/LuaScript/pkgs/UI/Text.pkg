@@ -29,7 +29,7 @@ class Text : public UIElement
     
     Font* GetFont() const;
     int GetFontSize() const;
-    const String& GetText() const;
+    const String GetText() const;
     HorizontalAlignment GetTextAlignment() const;
     float GetRowSpacing() const;
     bool GetWordwrap() const;

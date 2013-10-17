@@ -18,7 +18,7 @@ class PackageFile : public Object
     const PackageEntry* GetEntry(const String fileName) const;
     const HashMap<String, PackageEntry>& GetEntries() const;
     
-    const String& GetName() const;
+    const String GetName() const;
     StringHash GetNameHash() const;
     unsigned GetNumFiles() const;
     unsigned GetTotalSize() const;

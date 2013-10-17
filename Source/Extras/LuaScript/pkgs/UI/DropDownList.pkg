@@ -22,7 +22,7 @@ class DropDownList : public Menu
     UIElement* GetSelectedItem() const;
     ListView* GetListView() const;
     UIElement* GetPlaceholder() const;
-    const String& GetPlaceholderText() const;
+    const String GetPlaceholderText() const;
     bool GetResizePopup() const;
     
     void SetSelectionAttr(unsigned index);

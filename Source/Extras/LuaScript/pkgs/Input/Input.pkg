@@ -48,7 +48,7 @@ class Input : public Object
     unsigned GetNumTouches() const;
     TouchState* GetTouch(unsigned index) const;
     unsigned GetNumJoysticks() const;
-    const String& GetJoystickName(unsigned index) const;
+    const String GetJoystickName(unsigned index) const;
     JoystickState* GetJoystick(unsigned index);
     bool GetToggleFullscreen() const;
     bool IsMouseVisible() const;

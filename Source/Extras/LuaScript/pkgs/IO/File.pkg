@@ -27,7 +27,7 @@ class File : public Object
     
     // From Deserializer
         unsigned Seek(unsigned position);
-    const String& GetName() const;
+    const String GetName() const;
     unsigned GetChecksum();
     unsigned GetPosition() const;
     unsigned GetSize() const;

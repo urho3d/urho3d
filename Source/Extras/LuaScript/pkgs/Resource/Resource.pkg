@@ -2,7 +2,7 @@ $#include "Resource.h"
 
 class Resource
 {
-    const String& GetName() const;
+    const String GetName() const;
     StringHash GetNameHash() const;
     unsigned GetMemoryUse() const;
     

@@ -15,8 +15,7 @@ class LineEdit : public BorderImage
     void SetTextSelectable(bool enable);
     void SetTextCopyable(bool enable);
 
-
-    const String& GetText() const;
+    const String GetText() const;
     unsigned GetCursorPosition() const;
     float GetCursorBlinkRate() const;
     unsigned GetMaxLength() const;

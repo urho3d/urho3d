@@ -12,8 +12,8 @@ class LuaScriptInstance : public Component
     void ScriptSubscribeToEvent @ SubscribeToEvent(void* sender, const String eventName, const String functionName);
     void ScriptUnsubscribeFromEvent @ UnsubscribeFromEvent(void* sender, const String eventName);
     void ScriptUnsubscribeFromEvents @ UnsubscribeFromEvents(void* sender);
-    const String& GetScriptFileName() const;
-    const String& GetScriptObjectType() const;
+    const String GetScriptFileName() const;
+    const String GetScriptObjectType() const;
     
     tolua_property__get_set const String scriptFileName;
     tolua_property__get_set const String scriptObjectType;

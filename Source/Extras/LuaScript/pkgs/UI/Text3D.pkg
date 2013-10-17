@@ -31,7 +31,7 @@ class Text3D : public Drawable
     Font* GetFont() const;
     Material* GetMaterial() const;
     int GetFontSize() const;
-    const String& GetText() const;
+    const String GetText() const;
     HorizontalAlignment GetTextAlignment() const;
     HorizontalAlignment GetHorizontalAlignment() const;
     VerticalAlignment GetVerticalAlignment() const;

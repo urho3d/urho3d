@@ -84,7 +84,7 @@ class Variant
     bool operator == (const Vector4& rhs) const;
     bool operator == (const Quaternion& rhs) const;
     bool operator == (const Color& rhs) const;
-    bool operator == (const String& rhs) const;
+    bool operator == (const String rhs) const;
     bool operator == (const ResourceRef& rhs) const;
     bool operator == (const ResourceRefList& rhs) const;
     bool operator == (const IntRect& rhs) const;
@@ -121,7 +121,7 @@ class Variant
     const Vector4& GetVector4() const;
     const Quaternion& GetQuaternion() const;
     const Color& GetColor() const;
-    const String& GetString() const;
+    const String GetString() const;
     tolua_outside VectorBuffer VariantGetBuffer @ GetBuffer() const;
     const ResourceRef& GetResourceRef() const;
     const ResourceRefList& GetResourceRefList() const;
@@ -175,7 +175,7 @@ class VariantMap
     tolua_outside const Vector4& VariantMapGetVector4 @ GetVector4(const String key);
     tolua_outside const Quaternion& VariantMapGetQuaternion @ GetQuaternion(const String key);
     tolua_outside const Color& VariantMapGetColor @ GetColor(const String key);
-    tolua_outside const String& VariantMapGetString @ GetString(const String key);
+    tolua_outside const String VariantMapGetString @ GetString(const String key);
     tolua_outside VectorBuffer VariantMapGetBuffer @ GetBuffer(const String key);
     tolua_outside const ResourceRef& VariantMapGetResourceRef @ GetResourceRef(const String key);
     tolua_outside const ResourceRefList& VariantMapGetResourceRefList @ GetResourceRefList(const String key);

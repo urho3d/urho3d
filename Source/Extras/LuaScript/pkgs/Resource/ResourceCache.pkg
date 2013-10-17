@@ -17,7 +17,7 @@ class ResourceCache
     unsigned GetMemoryBudget(ShortStringHash type) const;
     unsigned GetMemoryUse(ShortStringHash type) const;
     unsigned GetTotalMemoryUse() const;
-    const String& GetResourceName(StringHash nameHash) const;
+    const String GetResourceName(StringHash nameHash) const;
     String GetResourceFileName(const String name) const;
     
     bool GetAutoReloadResources() const;

@@ -140,7 +140,7 @@ class UIElement : public Serializable
     void SetTraversalMode(TraversalMode traversalMode);
     void SetElementEventSender(bool flag);
 
-    const String& GetName() const;
+    const String GetName() const;
     const IntVector2& GetPosition() const;
     const IntVector2& GetSize() const;
     int GetWidth() const;
@@ -177,7 +177,7 @@ class UIElement : public Serializable
     bool HasColorGradient() const;
     FocusMode GetFocusMode() const;
     unsigned GetDragDropMode() const;
-    const String& GetAppliedStyle() const;
+    const String GetAppliedStyle() const;
     XMLFile* GetDefaultStyle(bool recursiveUp = true) const;
     LayoutMode GetLayoutMode() const;
     int GetLayoutSpacing() const;

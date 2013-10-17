@@ -4,8 +4,8 @@ class Object : public RefCounted
 {
     ShortStringHash GetType() const;
     ShortStringHash GetBaseType() const;
-    const String& GetTypeName() const;
-    const String& GetCategory() const;
+    const String GetTypeName() const;
+    const String GetCategory() const;
 
     tolua_outside void ObjectSendEvent @ SendEvent(const String eventName, VariantMap* eventData = 0);
     

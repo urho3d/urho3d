@@ -31,7 +31,7 @@ class UI : public Object
     UIElement* GetFocusElement() const;
     UIElement* GetFrontElement() const;
     IntVector2 GetCursorPosition() const;
-    const String& GetClipBoardText() const;
+    const String GetClipBoardText() const;
     float GetDoubleClickInterval() const;
     int GetMaxFontTextureSize() const;
     bool IsNonFocusedMouseWheel() const;

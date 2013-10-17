@@ -38,7 +38,7 @@ class AnimationController : public Component
     bool IsFadingOut(const String name) const;
     unsigned char GetLayer(const String name) const;
     Bone* GetStartBone(const String name) const;
-    const String& GetStartBoneName(const String name) const;
+    const String GetStartBoneName(const String name) const;
     
     float GetTime(const String name) const;
     float GetWeight(const String name) const;

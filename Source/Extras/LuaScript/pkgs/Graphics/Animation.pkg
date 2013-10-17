@@ -32,7 +32,7 @@ static const unsigned char CHANNEL_SCALE;
 
 class Animation : public Resource
 {
-    const String& GetAnimationName() const;
+    const String GetAnimationName() const;
     StringHash GetAnimationNameHash() const;
     float GetLength() const;
     unsigned GetNumTracks() const;

@@ -46,7 +46,7 @@ class Connection : public Object
     unsigned short GetPort() const;
     String ToString() const;
     unsigned GetNumDownloads() const;
-    const String& GetDownloadName() const;
+    const String GetDownloadName() const;
     float GetDownloadProgress() const;
     
     tolua_property__get_set VariantMap& identity;

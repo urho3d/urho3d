@@ -20,7 +20,7 @@ class Context
 {
     Object* GetEventSender() const;
     EventHandler* GetEventHandler() const;
-    const String& GetTypeName(ShortStringHash type) const;
+    const String GetTypeName(ShortStringHash type) const;
 };
 
 Context* GetContext();
