@@ -3,6 +3,8 @@ local currentString = ''
 local out
 local WRITE, OUTPUT = write, output
 
+_to_functions["HttpRequest"] = "tolua_tourho3dhttprequest"
+
 function output(s)
     out = _OUTPUT
     output = OUTPUT -- restore

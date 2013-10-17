@@ -1,0 +1,53 @@
+$#include "HttpRequest.h"
+
+enum HttpRequestState
+{
+    HTTP_INITIALIZING,
+    HTTP_ERROR,
+    HTTP_OPEN,
+    HTTP_CLOSED
+};
+
+class HttpRequest : public Deserializer
+{
+    const String& GetURL() const;
+    const String& GetVerb() const;
+    String GetError() const;
+    HttpRequestState GetState() const;
+    unsigned GetAvailableSize() const;
+    bool IsOpen() const;
+    
+    tolua_readonly tolua_property__get_set String URL;
+    tolua_readonly tolua_property__get_set String verb;
+    tolua_readonly tolua_property__get_set String error;
+    tolua_readonly tolua_property__get_set HttpRequestState state;
+    tolua_readonly tolua_property__get_set unsigned availableSize;
+    tolua_readonly tolua_property__is_set bool open;
+};
+
+class SharedPtr : public T
+{
+    TOLUA_TEMPLATE_BIND(T, HttpRequest)
+
+    SharedPtr();
+    ~SharedPtr();
+    
+    bool Null() const;
+    bool NotNull() const;
+    int Refs() const;
+};
+
+$renaming SharedPtr<HttpRequest> @ HttpRequestSPtr
+
+${
+static void* tolua_tourho3dhttprequest(lua_State* L, int reg, void* def)
+{
+    void* userdata = tolua_tousertype(L, reg, def);
+    
+    const char* type = tolua_typename(L, reg);
+    if (strcmp(type, "HttpRequest") == 0)
+        return userdata;
+        
+    return *static_cast<SharedPtr<HttpRequest>*>(userdata);
+}
+$}
