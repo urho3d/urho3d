@@ -26,7 +26,7 @@ cd $( dirname $0 )
 # Create out-of-source build directory
 SOURCE=`pwd`/Source
 BUILD=Build
-if [ $1 == "-DIOS=1" ]; then
+if [ "$1" == "-DIOS=1" ]; then
     BUILD=ios-Build
 fi
 cmake -E make_directory $BUILD
@@ -34,7 +34,7 @@ cmake -E make_directory $BUILD
 # Create project with the Xcode generator
 cmake -E chdir $BUILD cmake -G "Xcode" $@ $SOURCE
 
-if [ $1 == "-DIOS=1" ]; then
+if [ "$1" == "-DIOS=1" ]; then
     # Due to a bug in the CMake/Xcode generator where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
     # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
     sed -i.bak 's/\/Contents\/MacOS//g' $BUILD/CMakeScripts/XCODE_DEPEND_HELPER.make
