@@ -80,6 +80,7 @@ LuaScript::LuaScript(Context* context) :
         return;
     }
 
+    lua_gc(luaState_, LUA_GCSETPAUSE, 125);
     lua_atpanic(luaState_, &LuaScript::AtPanic);
 
     luaL_openlibs(luaState_);
