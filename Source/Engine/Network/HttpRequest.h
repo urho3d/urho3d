@@ -52,7 +52,7 @@ public:
     /// Process the connection in the worker thread until closed.
     virtual void ThreadFunction();
     
-    /// Read response data from the HTTP connection. Return bytes actually read or 0 on error or end of data.
+    /// Read response data from the HTTP connection and return number of bytes actually read. While the connection is open, will block while trying to read the specified size. To avoid blocking, only read up to as many bytes as GetAvailableSize() returns.
     virtual unsigned Read(void* dest, unsigned size);
     /// Set position from the beginning of the stream. Not supported.
     virtual unsigned Seek(unsigned position) { return position_; }
@@ -71,8 +71,8 @@ public:
     bool IsOpen() const { return GetState() == HTTP_OPEN; }
     
 private:
-    /// Check for end of the data stream. Must only be called when the mutex is held by the main thread.
-    void CheckEof();
+    /// Check for end of the data stream and return available size in buffer. Must only be called when the mutex is held by the main thread.
+    unsigned CheckEofAndAvailableSize();
     
     /// URL.
     String url_;

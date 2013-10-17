@@ -198,60 +198,83 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
     mutex_.Acquire();
     
     unsigned char* destPtr = (unsigned char*)dest;
-    unsigned bytesAvailable = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
-    if (size > bytesAvailable)
-        size = bytesAvailable;
-    
-    if (size)
+    unsigned sizeLeft = size;
+    unsigned totalRead = 0;
+
+    for (;;)
     {
-        if (readPosition_ + size <= READ_BUFFER_SIZE)
-            memcpy(destPtr, readBuffer_.Get() + readPosition_, size);
-        else
+        unsigned bytesAvailable;
+        
+        for (;;)
         {
-            // Handle ring buffer wrap
-            unsigned part1 = READ_BUFFER_SIZE - readPosition_;
-            unsigned part2 = size - part1;
-            memcpy(destPtr, readBuffer_.Get() + readPosition_, part1);
-            memcpy(destPtr + part1, readBuffer_.Get(), part2);
+            bytesAvailable = CheckEofAndAvailableSize();
+            if (bytesAvailable || IsEof())
+                break;
+            // While no bytes and connection is still open, block until has some data
+            mutex_.Release();
+            Time::Sleep(5);
+            mutex_.Acquire();
         }
         
-        readPosition_ += size;
-        readPosition_ &= READ_BUFFER_SIZE - 1;
+        if (bytesAvailable)
+        {
+            if (bytesAvailable > sizeLeft)
+                bytesAvailable = sizeLeft;
+            
+            if (readPosition_ + bytesAvailable <= READ_BUFFER_SIZE)
+                memcpy(destPtr, readBuffer_.Get() + readPosition_, bytesAvailable);
+            else
+            {
+                // Handle ring buffer wrap
+                unsigned part1 = READ_BUFFER_SIZE - readPosition_;
+                unsigned part2 = bytesAvailable - part1;
+                memcpy(destPtr, readBuffer_.Get() + readPosition_, part1);
+                memcpy(destPtr + part1, readBuffer_.Get(), part2);
+            }
+            
+            readPosition_ += bytesAvailable;
+            readPosition_ &= READ_BUFFER_SIZE - 1;
+            sizeLeft -= bytesAvailable;
+            totalRead += bytesAvailable;
+            destPtr += bytesAvailable;
+        }
+        
+        if (!sizeLeft || !bytesAvailable)
+            break;
     }
     
-    // If connection has been closed and there is no more buffered data, we are at the end
-    CheckEof();
-    
+    // Check for end-of-file once more after reading the bytes
+    CheckEofAndAvailableSize();
     mutex_.Release();
-    return size;
+    return totalRead;
 }
 
 String HttpRequest::GetError() const
 {
     MutexLock lock(mutex_);
-    const_cast<HttpRequest*>(this)->CheckEof();
+    const_cast<HttpRequest*>(this)->CheckEofAndAvailableSize();
     return error_;
 }
 
 HttpRequestState HttpRequest::GetState() const
 {
     MutexLock lock(mutex_);
-    const_cast<HttpRequest*>(this)->CheckEof();
+    const_cast<HttpRequest*>(this)->CheckEofAndAvailableSize();
     return state_;
 }
 
 unsigned HttpRequest::GetAvailableSize() const
 {
     MutexLock lock(mutex_);
-    const_cast<HttpRequest*>(this)->CheckEof();
-    return (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    return const_cast<HttpRequest*>(this)->CheckEofAndAvailableSize();
 }
 
-void HttpRequest::CheckEof()
+unsigned HttpRequest::CheckEofAndAvailableSize()
 {
     unsigned bytesAvailable = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
     if (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !bytesAvailable))
         position_ = M_MAX_UNSIGNED;
+    return bytesAvailable;
 }
 
 }
