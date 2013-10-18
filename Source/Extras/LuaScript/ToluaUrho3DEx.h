@@ -22,20 +22,20 @@
 
 #pragma once
 
-#include "Variant.h"
-
 struct lua_State;
+
+using namespace Urho3D;
 
 #define tolua_isurho3dstring tolua_isstring
 #define tolua_pushurho3dstring(x,y)	tolua_pushstring(x,y.CString())
 
 /// Convert Lua string to Urho3D string.
-const char* tolua_tourho3dstring(lua_State* L, int narg, const char* def);;
-const char* tolua_tourho3dstring(lua_State* L, int narg, const Urho3D::String& def);
+const char* tolua_tourho3dstring(lua_State* L, int narg, const char* def);
+const char* tolua_tourho3dstring(lua_State* L, int narg, const String& def);
 
-/// Convert Lua table field to Urho3D string.
-const char* tolua_tofieldurho3dstring(lua_State* L, int lo, int index, const char* def);;
-const char* tolua_tofieldurho3dstring(lua_State* L, int lo, int index, const Urho3D::String& def);
-
-/// Push Urho3D string vector to Lua.
-int tolua_pushurho3dstringvector(lua_State* L, const Urho3D::Vector<Urho3D::String>& strings);
+/// Check is const Vector<String>.
+int tolua_isurho3dconstvectorstring(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
+/// Convert to const Vector<String>.
+void* tolua_tourho3dconstvectorstring(lua_State* L, int narg, void* def);
+/// Push const Vector<String>.
+int tolua_pushurho3dconstvectorstring(lua_State* L, void* data, const char* type);

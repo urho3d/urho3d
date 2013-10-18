@@ -3,6 +3,10 @@ local currentString = ''
 local out
 local WRITE, OUTPUT = write, output
 
+_is_functions["const Vector<String>"] = "tolua_isurho3dconstvectorstring"
+_to_functions["const Vector<String>"] = "tolua_tourho3dconstvectorstring"
+_push_functions["const Vector<String>"] = "tolua_pushurho3dconstvectorstring"
+
 _to_functions["HttpRequest"] = "tolua_tourho3dhttprequest"
 
 function output(s)

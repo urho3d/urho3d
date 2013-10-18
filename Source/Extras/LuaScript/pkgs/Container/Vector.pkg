@@ -1,55 +1,6 @@
 $#include "Vector.h"
 $#include "Vector3.h"
 
-class Vector : public VectorBase
-{
-    TOLUA_TEMPLATE_BIND(T, String)
-
-    Vector();
-    Vector(const Vector<T>& vector);
-    ~Vector();
-    
-    Vector<T> operator + (const T& rhs) const;
-    Vector<T> operator + (const Vector<T>& rhs) const;
-    
-    bool operator == (const Vector<T>& rhs) const;
-    
-    T& operator [] (unsigned index);
-    const T& operator [] (unsigned index) const;
-    T& At(unsigned index);
-    const T& At(unsigned index) const;
-    
-    void Push(const T& value);
-    void Push(const Vector<T>& vector);
-    void Pop();
-    
-    void Insert(unsigned pos, const T& value);
-    void Insert(unsigned pos, const Vector<T>& vector);
-    void Erase(unsigned pos, unsigned length = 1);
-    
-    bool Remove(const T& value);
-    void Clear();
-    
-    void Resize(unsigned newSize);
-    void Reserve(unsigned newCapacity);
-    void Compact();
-    
-    bool Contains(const T& value) const;
-    
-    T& Front();
-    const T& Front() const;
-    T& Back();
-    const T& Back() const;
-    
-    unsigned Size() const;
-    unsigned Capacity() const;
-    bool Empty() const;
-    
-    tolua_readonly tolua_property__no_prefix unsigned size;
-    tolua_readonly tolua_property__no_prefix unsigned capacity;
-    tolua_readonly tolua_property__no_prefix bool empty;
-};
-
 class PODVector
 {
     TOLUA_TEMPLATE_BIND(T, Vector3)

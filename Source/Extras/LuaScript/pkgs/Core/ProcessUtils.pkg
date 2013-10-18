@@ -5,19 +5,10 @@ void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE
 void OpenConsoleWindow();
 void PrintLine(const String str, bool error = false);
 
-string* GetArguments();
+const Vector<String>& GetArguments();
 
 String GetConsoleInput();
 String GetPlatform();
 
 unsigned GetNumPhysicalCPUs();
 unsigned GetNumLogicalCPUs();
-
-${
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetArguments00
-
-static int tolua_CoreLuaAPI_GetArguments00(lua_State* tolua_S)
-{
-    return tolua_pushurho3dstringvector(tolua_S, GetArguments());
-}
-$}

@@ -9,7 +9,7 @@ class FileSystem : public Object
     bool SetCurrentDir(const String pathName);
     bool CreateDir(const String pathName);
     int SystemCommand(const String commandLine);
-    // int SystemRun(const String fileName, const Vector<String>& arguments);
+    int SystemRun(const String fileName, const Vector<String>& arguments);
     bool SystemOpen(const String fileName, const String mode = String::EMPTY);
     bool Copy(const String srcFileName, const String destFileName);
     bool Rename(const String srcFileName, const String destFileName);
@@ -22,7 +22,7 @@ class FileSystem : public Object
     bool FileExists(const String fileName) const;
     bool DirExists(const String pathName) const;
     
-    Vector<String> ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const;
+    tolua_outside const Vector<String>& FileSystemScanDir @ ScanDir(const String pathName, const String filter, unsigned flags, bool recursive) const;
     
     String GetProgramDir() const;
     String GetUserDocumentsDir() const;
@@ -41,43 +41,10 @@ String GetNativePath(const String pathName);
 bool IsAbsolutePath(const String pathName);
 
 ${
-#define TOLUA_DISABLE_tolua_IOLuaAPI_FileSystem_ScanDir00
-
-static int tolua_IOLuaAPI_FileSystem_ScanDir00(lua_State* tolua_S)
+static const Vector<String>& FileSystemScanDir(const FileSystem* fileSystem, const String pathName, const String filter, unsigned flags, bool recursive)
 {
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isusertype(tolua_S,1,"const FileSystem",0,&tolua_err) ||
- !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
- !tolua_isurho3dstring(tolua_S,3,0,&tolua_err) ||
- !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
- !tolua_isboolean(tolua_S,5,0,&tolua_err) ||
- !tolua_isnoobj(tolua_S,6,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
-  const FileSystem* self = (const FileSystem*)  tolua_tousertype(tolua_S,1,0);
-  const String pathName = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
-  const String filter = ((const String)  tolua_tourho3dstring(tolua_S,3,0));
-  unsigned flags = ((unsigned)  tolua_tonumber(tolua_S,4,0));
-  bool recursive = ((bool)  tolua_toboolean(tolua_S,5,0));
-#ifndef TOLUA_RELEASE
- if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ScanDir'", NULL);
-#endif
- {
-  Vector<String> tolua_ret;
-  self->ScanDir(tolua_ret, pathName,filter,flags,recursive);
-  tolua_pushurho3dstringvector(tolua_S, tolua_ret);
- }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'ScanDir'.",&tolua_err);
- return 0;
-#endif
+    static Vector<String> result;
+    fileSystem->ScanDir(result, pathName, filter, flags, recursive);
+    return result;
 }
 $}
