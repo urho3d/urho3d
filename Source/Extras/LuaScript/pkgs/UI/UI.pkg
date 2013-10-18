@@ -24,13 +24,12 @@ class UI : public Object
     UIElement* GetRoot() const;
     UIElement* GetRootModalElement() const;
     Cursor* GetCursor() const;
-
+    IntVector2 GetCursorPosition() const;
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
 
     UIElement* GetFocusElement() const;
     UIElement* GetFrontElement() const;
-    IntVector2 GetCursorPosition() const;
     const String GetClipBoardText() const;
     float GetDoubleClickInterval() const;
     int GetMaxFontTextureSize() const;
@@ -43,9 +42,10 @@ class UI : public Object
     tolua_readonly tolua_property__get_set UIElement* root;
     tolua_readonly tolua_property__get_set UIElement* rootModalElement;
     tolua_property__get_set Cursor* cursor;
+    tolua_readonly tolua_property__get_set IntVector2 cursorPosition;
     tolua_readonly tolua_property__get_set UIElement* focusElement;
     tolua_readonly tolua_property__get_set UIElement* frontElement;
-    tolua_readonly tolua_property__get_set IntVector2 cursorPosition;
+
     tolua_property__get_set String& clipBoardText;
     tolua_property__get_set float doubleClickInterval;
     tolua_property__get_set int maxFontTextureSize;

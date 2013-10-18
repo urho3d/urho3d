@@ -43,6 +43,7 @@ class Text3D : public Drawable
     int GetWidth() const;
     int GetRowHeight() const;
     unsigned GetNumRows() const;
+    const PODVector<int>& GetRowWidths() const;
     const Color& GetColor(Corner corner) const;
     float GetOpacity() const;
     bool GetFaceCamera() const;

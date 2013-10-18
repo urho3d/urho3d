@@ -22,16 +22,40 @@
 
 #pragma once
 
+#include "Vector2.h"
+
 struct lua_State;
+
+namespace Urho3D
+{
+    class UIElement;
+}
 
 using namespace Urho3D;
 
+/// Check is String.
 #define tolua_isurho3dstring tolua_isstring
-#define tolua_pushurho3dstring(x,y)	tolua_pushstring(x,y.CString())
-
-/// Convert Lua string to Urho3D string.
+/// Push String.
+#define tolua_pushurho3dstring(x, y) tolua_pushstring(x, y.CString())
+/// Convert to String.
 const char* tolua_tourho3dstring(lua_State* L, int narg, const char* def);
 const char* tolua_tourho3dstring(lua_State* L, int narg, const String& def);
+
+/// Convert to HttpRequest.
+void* tolua_tourho3dhttprequest(lua_State* L, int reg, void* def);
+
+/// Push const PODVector<IntVector2>.
+int tolua_pushurho3dconstpodvectorintvector2(lua_State* L, void* data, const char* type);
+
+/// Push const PODVector<UIElement*>.
+int tolua_pushurho3dpodvectoruielement(lua_State* L, void* data, const char* type);
+
+/// Check is const PODVector<unsigned>.
+int tolua_isurho3dconstpodvectorunsigned(lua_State* L, int lo, const char* type, int def, tolua_Error* err);
+/// Convert to const PODVector<unsigned>.
+void* tolua_tourho3dconstpodvectorunsigned(lua_State* L, int narg, void* def);
+/// Push const PODVector<unsigned>.
+int tolua_pushurho3dconstpodvectorunsigned(lua_State* L, void* data, const char* type);
 
 /// Check is const Vector<String>.
 int tolua_isurho3dconstvectorstring(lua_State* L, int lo, const char* type, int def, tolua_Error* err);

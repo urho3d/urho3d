@@ -26,7 +26,7 @@
 #include "LuaScript.h"
 #include "LuaScriptInstance.h"
 #include "VectorBuffer.h"
-#include "ToluaUrho3DEx.h"
+#include "tolua++urho3d.h"
 
 extern "C"
 {

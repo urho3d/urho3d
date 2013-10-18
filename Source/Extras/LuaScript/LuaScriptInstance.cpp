@@ -34,7 +34,6 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
-#include "ToluaUrho3DEx.h"
 #include "ProcessUtils.h"
 #include "VectorBuffer.h"
 
@@ -45,6 +44,7 @@ extern "C"
 #include <lauxlib.h>
 }
 #include "tolua++.h"
+#include "tolua++urho3d.h"
 
 #include "DebugNew.h"
 

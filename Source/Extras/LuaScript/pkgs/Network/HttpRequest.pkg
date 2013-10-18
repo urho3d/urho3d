@@ -38,16 +38,3 @@ class SharedPtr : public T
 };
 
 $renaming SharedPtr<HttpRequest> @ HttpRequestSPtr
-
-${
-static void* tolua_tourho3dhttprequest(lua_State* L, int reg, void* def)
-{
-    void* userdata = tolua_tousertype(L, reg, def);
-    
-    const char* type = tolua_typename(L, reg);
-    if (strcmp(type, "HttpRequest") == 0)
-        return userdata;
-        
-    return *static_cast<SharedPtr<HttpRequest>*>(userdata);
-}
-$}

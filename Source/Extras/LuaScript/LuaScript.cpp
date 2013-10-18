@@ -32,7 +32,6 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "ToluaUrho3DEx.h"
 
 extern "C"
 {
@@ -41,6 +40,7 @@ extern "C"
 #include <lauxlib.h>
 }
 #include "tolua++.h"
+#include "tolua++urho3d.h"
 
 #include "DebugNew.h"
 

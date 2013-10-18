@@ -3,11 +3,23 @@ local currentString = ''
 local out
 local WRITE, OUTPUT = write, output
 
+_to_functions["HttpRequest"] = "tolua_tourho3dhttprequest"
+
+_is_functions["const PODVector<IntVector2>"] = "not implemented"
+_to_functions["const PODVector<IntVector2>"] = "not implemented"
+_push_functions["const PODVector<IntVector2>"] = "tolua_pushurho3dconstpodvectorintvector2"
+
+_is_functions["const PODVector<UIElement*>"] = "not implemented"
+_to_functions["const PODVector<UIElement*>"] = "not implemented"
+_push_functions["const PODVector<UIElement*>"] = "tolua_pushurho3dpodvectoruielement"
+
+_is_functions["const PODVector<unsigned>"] = "tolua_isurho3dconstpodvectorunsigned"
+_to_functions["const PODVector<unsigned>"] = "tolua_tourho3dconstpodvectorunsigned"
+_push_functions["const PODVector<unsigned>"] = "tolua_pushurho3dconstpodvectorunsigned"
+
 _is_functions["const Vector<String>"] = "tolua_isurho3dconstvectorstring"
 _to_functions["const Vector<String>"] = "tolua_tourho3dconstvectorstring"
 _push_functions["const Vector<String>"] = "tolua_pushurho3dconstvectorstring"
-
-_to_functions["HttpRequest"] = "tolua_tourho3dhttprequest"
 
 function output(s)
     out = _OUTPUT
@@ -74,7 +86,7 @@ function post_output_hook(package)
 //
 
 #include "Precompiled.h"
-#include "ToluaUrho3DEx.h"]]
+#include "tolua++urho3d.h"]]
       )
 
     WRITE(result)
