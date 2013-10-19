@@ -56,6 +56,8 @@ public:
     void SetMaxFps(int fps);
     /// Set maximum frames per second when the application does not have input focus.
     void SetMaxInactiveFps(int fps);
+    /// Set how many frames to average for timestep smoothing. Default is 2. 1 disables smoothing.
+    void SetTimeStepSmoothing(int frames);
     /// Set whether to pause update events and audio when minimized.
     void SetPauseMinimized(bool enable);
     /// Set whether to exit automatically on exit request (window close button.)
@@ -75,6 +77,8 @@ public:
     int GetMaxFps() const { return maxFps_; }
     /// Return the maximum frames per second when the application does not have input focus.
     int GetMaxInactiveFps() const { return maxInactiveFps_; }
+    /// Return how many frames to average for timestep smoothing.
+    int GetTimeStepSmoothing() const { return timeStepSmoothing_; }
     /// Return whether to pause update events and audio when minimized.
     bool GetPauseMinimized() const { return pauseMinimized_; }
     /// Return whether to exit automatically on exit request.
@@ -108,8 +112,12 @@ private:
     
     /// Frame update timer.
     HiresTimer frameTimer_;
+    /// Previous timesteps for smoothing.
+    PODVector<float> lastTimeSteps_;
     /// Next frame timestep in seconds.
     float timeStep_;
+    /// How many frames to average for the smoothed timestep.
+    unsigned timeStepSmoothing_;
     /// Minimum frames per second.
     unsigned minFps_;
     /// Maximum frames per second.

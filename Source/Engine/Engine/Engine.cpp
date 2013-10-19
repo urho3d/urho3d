@@ -81,6 +81,7 @@ extern const char* logLevelPrefixes[];
 Engine::Engine(Context* context) :
     Object(context),
     timeStep_(0.0f),
+    timeStepSmoothing_(2),
     minFps_(10),
     #if defined(ANDROID) || defined(IOS) || defined(RASPI)
     maxFps_(60),
@@ -383,6 +384,11 @@ DebugHud* Engine::CreateDebugHud()
     return debugHud;
 }
 
+void Engine::SetTimeStepSmoothing(int frames)
+{
+    timeStepSmoothing_ = Clamp(frames, 1, 10);
+}
+
 void Engine::SetMinFps(int fps)
 {
     minFps_ = Max(fps, 0);
@@ -581,7 +587,14 @@ void Engine::ApplyFrameLimit()
             elapsed = targetMin;
     }
     
-    timeStep_ = elapsed / 1000000.0f;
+    // Perform timestep smoothing
+    timeStep_ = 0.0f;
+    lastTimeSteps_.Push(elapsed / 1000000.0f);
+    if (lastTimeSteps_.Size() > timeStepSmoothing_)
+        lastTimeSteps_.Erase(0);
+    for (unsigned i = 0; i < lastTimeSteps_.Size(); ++i)
+        timeStep_ += lastTimeSteps_[i];
+    timeStep_ /= lastTimeSteps_.Size();
 }
 
 VariantMap Engine::ParseParameters(const Vector<String>& arguments)
