@@ -3,8 +3,6 @@ local currentString = ''
 local out
 local WRITE, OUTPUT = write, output
 
-_to_functions["HttpRequest"] = "tolua_tourho3dhttprequest"
-
 _is_functions["const PODVector<IntVector2>"] = "not implemented"
 _to_functions["const PODVector<IntVector2>"] = "not implemented"
 _push_functions["const PODVector<IntVector2>"] = "tolua_pushurho3dconstpodvectorintvector2"

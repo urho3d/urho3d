@@ -2,6 +2,8 @@ $#include "Deserializer.h"
 
 class Deserializer
 {
+    // unsigned Read(void* dest, unsigned size);
+    tolua_outside VectorBuffer DeserializerRead @ Read(unsigned size);
     unsigned Seek(unsigned position);
     const String GetName() const;
     unsigned GetChecksum();
@@ -52,3 +54,14 @@ class Deserializer
     tolua_readonly tolua_property__get_set unsigned size;
     tolua_readonly tolua_property__is_set bool eof;
 };
+
+${
+static VectorBuffer DeserializerRead(Deserializer* deserializer, unsigned size)
+{
+    unsigned char* data = new unsigned char[size];
+    deserializer->Read(data, size);
+    VectorBuffer buffer(data, size);
+    delete [] data;
+    return buffer;
+}
+$}

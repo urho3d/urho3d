@@ -26,7 +26,9 @@ class File : public Object
     bool IsPackaged() const;
     
     // From Deserializer
-        unsigned Seek(unsigned position);
+    // unsigned Read(void* dest, unsigned size);
+    tolua_outside VectorBuffer DeserializerRead @ Read(unsigned size);
+    unsigned Seek(unsigned position);
     const String GetName() const;
     unsigned GetChecksum();
     unsigned GetPosition() const;
@@ -71,6 +73,9 @@ class File : public Object
     String ReadLine();
     
     // From Serializer
+    // unsigned Write(const void* data, unsigned size);
+    tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
+    
     bool WriteInt(int value);
     bool WriteShort(short value);
     bool WriteByte(signed char value);

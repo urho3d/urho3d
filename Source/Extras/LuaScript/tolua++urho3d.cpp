@@ -21,10 +21,8 @@
 //
 
 #include "Precompiled.h"
-#include "tolua++urho3d.h"
-
-#include "HttpRequest.h"
 #include "Ptr.h"
+#include "tolua++urho3d.h"
 
 const char* tolua_tourho3dstring(lua_State* L, int narg, const char* def)
 {
@@ -35,18 +33,6 @@ const char* tolua_tourho3dstring(lua_State* L, int narg, const char* def)
 const char* tolua_tourho3dstring(lua_State* L, int narg, const String& def)
 {
     return tolua_tourho3dstring(L, narg, def.CString());
-}
-
-void* tolua_tourho3dhttprequest(lua_State* L, int reg, void* def)
-{
-    void* userdata = tolua_tousertype(L, reg, def);
-
-    /// Use data type may be SharedPtr<HttpRequest>.
-    const char* type = tolua_typename(L, reg);
-    if (strcmp(type, "SharedPtr<HttpRequest>") == 0)
-        return *static_cast<SharedPtr<HttpRequest>*>(userdata);
-
-    return userdata;
 }
 
 int tolua_pushurho3dconstpodvectorintvector2(lua_State* L, void* data, const char* type)

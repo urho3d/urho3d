@@ -12,9 +12,15 @@ class VectorBuffer
     void Clear();
     void Resize(unsigned size);
     
+    // const unsigned char* GetData() const;
+    const void* GetData() const;
+    // unsigned char* GetModifiableData();
+    void* GetModifiableData();
     // const PODVector<unsigned char>& GetBuffer() const;
     
     // From Deserializer
+    // unsigned Read(void* dest, unsigned size);
+    tolua_outside VectorBuffer DeserializerRead @ Read(unsigned size);
     unsigned Seek(unsigned position);
     const String GetName() const;
     unsigned GetChecksum();
@@ -60,6 +66,9 @@ class VectorBuffer
     String ReadLine();
     
     // From Serializer
+    // unsigned Write(const void* data, unsigned size);
+    tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
+    
     bool WriteInt(int value);
     bool WriteShort(short value);
     bool WriteByte(signed char value);

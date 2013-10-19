@@ -41,9 +41,6 @@ using namespace Urho3D;
 const char* tolua_tourho3dstring(lua_State* L, int narg, const char* def);
 const char* tolua_tourho3dstring(lua_State* L, int narg, const String& def);
 
-/// Convert to HttpRequest.
-void* tolua_tourho3dhttprequest(lua_State* L, int reg, void* def);
-
 /// Push const PODVector<IntVector2>.
 int tolua_pushurho3dconstpodvectorintvector2(lua_State* L, void* data, const char* type);
 

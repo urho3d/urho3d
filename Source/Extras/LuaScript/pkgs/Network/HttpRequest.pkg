@@ -25,16 +25,16 @@ class HttpRequest : public Deserializer
     tolua_readonly tolua_property__is_set bool open;
 };
 
-class SharedPtr : public T
+class SharedPtr
 {
     TOLUA_TEMPLATE_BIND(T, HttpRequest)
-
+    
     SharedPtr();
     ~SharedPtr();
     
     bool Null() const;
     bool NotNull() const;
-    int Refs() const;
+    T* Get() const;
 };
 
 $renaming SharedPtr<HttpRequest> @ HttpRequestSPtr

@@ -2,6 +2,9 @@ $#include "Serializer.h"
 
 class Serializer
 {
+    // unsigned Write(const void* data, unsigned size);
+    tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
+    
     bool WriteInt(int value);
     bool WriteShort(short value);
     bool WriteByte(signed char value);
@@ -41,6 +44,11 @@ class Serializer
 };
 
 ${
+static unsigned SerializerWrite(Serializer* serializer, const VectorBuffer& buffer)
+{
+    return serializer->Write(buffer.GetData(), buffer.GetSize());
+}
+
 static bool SerializerWriteBuffer(Serializer* serializer, const VectorBuffer& buffer)
 {
     return serializer->WriteBuffer(buffer.GetBuffer());

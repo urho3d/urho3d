@@ -29,7 +29,7 @@ class Network
     
     void UnregisterAllRemoteEvents();
     void SetPackageCacheDir(const String path);
-    SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY);
+    SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY);
     
     int GetUpdateFps() const;
     Connection* GetServerConnection() const;
