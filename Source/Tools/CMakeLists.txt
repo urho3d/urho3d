@@ -20,14 +20,34 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME PackageTool)
+# Find Urho3D library
+find_package (Urho3D REQUIRED)
+include_directories (${URHO3D_INCLUDE_DIR})
 
-# Define source files
-set (SOURCE_FILES PackageTool.cpp)
+# Urho3D script host application
+add_subdirectory (Urho3D)
 
-# Define dependency libs
-set (LIBS ../../ThirdParty/LZ4)
+# Do not build tools for Raspberry Pi unless it is explicitly enabled
+if (NOT DEFINED ENABLE_TOOLS)
+    if (RASPI)
+        set (ENABLE_TOOLS 0)
+    else ()
+        set (ENABLE_TOOLS 1)
+    endif ()
+endif ()
 
-# Setup target
-setup_executable ()
+# Do not build tools for iOS and Android regardless of the ENABLE_TOOLS build option
+if (NOT IOS AND NOT ANDROID AND ENABLE_TOOLS)
+    # Urho3D tools
+    add_subdirectory (AssetImporter)
+    add_subdirectory (OgreImporter)
+    add_subdirectory (PackageTool)
+    add_subdirectory (RampGenerator)
+    add_subdirectory (ScriptCompiler)
+    add_subdirectory (DocConverter)
+    
+    # Urho3D Non-OpenGL tools
+    if (NOT USE_OPENGL)
+        add_subdirectory (ShaderCompiler)
+    endif ()
+endif ()

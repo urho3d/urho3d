@@ -29,8 +29,8 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
-set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/Graphics ../../Engine/IO ../../Engine/Math ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../ThirdParty/Assimp/include)
-set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src)
+add_subdirectory (../../ThirdParty/Assimp ../../ThirdParty/Assimp)
+set (LIBS ../../ThirdParty/Assimp/include)
 
 # Setup target
 if (APPLE)

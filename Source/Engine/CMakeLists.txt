@@ -21,10 +21,7 @@
 #
 
 # Define target name
-set (TARGET_NAME Urho3D)
-if (URHO3D_BUILD_TYPE STREQUAL SHARED)
-    set (LIB_TYPE SHARED)
-endif ()
+set (TARGET_NAME Urho3D_lib)
 
 # Define generated source files
 execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
@@ -109,26 +106,32 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${OBJ_FILES} gitversion.h)
 set_source_files_properties (${OBJ_FILES} PROPERTIES GENERATED TRUE)
 
-# Define dependency libs
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR})
-if (LIB_TYPE STREQUAL SHARED)
-    define_dependency_libs (Main)
-endif ()
-
 # Setup target
-setup_library ()
+setup_library (${URHO3D_LIB_TYPE})
+adjust_library_name ()
 if (NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 endif ()
 
 # Setup the frameworks for Mac OS X platform
-if (APPLE AND LIB_TYPE STREQUAL SHARED)
+if (APPLE AND URHO3D_LIB_TYPE STREQUAL SHARED)
     if (IOS)
         setup_ios_linker_flags (LINKER_FLAGS)
     else ()
         setup_macosx_linker_flags (LINKER_FLAGS)
     endif ()
     set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${LINKER_FLAGS})
+endif ()
+
+# Generate platform specific export header file automatically
+if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_BUILD_TYPE OR ${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
+    set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
+    generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
+    set (URHO3D_EXPORTS_BUILD_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Build type when Urho3D export header was last generated")
+    
+    # Append Urho3D license notice to the export header file
+    file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)
+    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h) 
 endif ()
 
 # Define post build steps
@@ -138,14 +141,14 @@ if (MSVC)
         COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Lib\"
         COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" \"${PROJECT_ROOT_DIR}/Lib\"
         COMMENT "Copying library and debug files to Lib directory")
-    if (LIB_TYPE STREQUAL SHARED)
+    if (URHO3D_LIB_TYPE STREQUAL SHARED)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).lib\" \"${PROJECT_ROOT_DIR}/Lib\"
             COMMENT "Copying import library to Lib directory")
     endif ()
 else ()
     # Strip the output shared library for embedded devices
-    if (LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
+    if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>)
     endif ()
     set (OUTPUT_PATH ${PROJECT_ROOT_DIR}/Lib)

@@ -28,8 +28,5 @@ file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${COMMON_SAMPLE_H_FILES})
 
-# Define dependency libs
-set (LIBS ${LIBS} ../../Extras/LuaScript)
-
 # Setup target with resource copying
 setup_main_executable ()

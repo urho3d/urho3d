@@ -28,12 +28,5 @@ file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
-# Define dependency libs
-set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Engine/IO ../../Engine/Math ../../Engine/Resource ../../Engine/Script)
-
-if (ENABLE_LUA)
-    set (LIBS ${LIBS} ../../Extras/LuaScript)
-endif ()
-
 # Setup target with resource copying
 setup_main_executable ()

@@ -29,6 +29,7 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
+add_subdirectory (../../ThirdParty/MojoShader ../../ThirdParty/MojoShader)
 set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/Graphics ../../Engine/IO ../../Engine/Math ../../Engine/Resource ../../Engine/Scene ../../ThirdParty/MojoShader)
 set (ABSOLUTE_PATH_LIBS ${DIRECT3D_COMPILER_LIBRARY})
 

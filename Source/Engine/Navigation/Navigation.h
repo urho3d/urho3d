@@ -28,6 +28,6 @@ namespace Urho3D
 class Context;
 
 /// Register Navigation library objects.
-void RegisterNavigationLibrary(Context* context);
+void URHO3D_API RegisterNavigationLibrary(Context* context);
 
 }

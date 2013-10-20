@@ -33,10 +33,6 @@ if (WIN32)
    add_definitions(-D_WINSOCKAPI_)
    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
    add_definitions(-DKNET_MEMORY_LEAK_CHECK)
-   
-   #Moved to define_dependency_libs() macro
-   #set(kNetLinkLibraries ${kNetLinkLibraries} ws2_32.lib)
-
 elseif (UNIX)
    list (REMOVE_ITEM kNetSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/Clock.cpp)
    file(GLOB kNetUnixSourceFiles ./src/unix/*.cpp)
@@ -44,9 +40,6 @@ elseif (UNIX)
 
    if (USE_BOOST)
       list(REMOVE_ITEM kNetUnixSourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
-   #elseif (NOT ANDROID)
-   #Moved to define_dependency_libs() macro
-   #  set(kNetLinkLibraries ${kNetLinkLibraries} pthread)
    endif()
 
    set(kNetSourceFiles ${kNetSourceFiles} ${kNetUnixSourceFiles})

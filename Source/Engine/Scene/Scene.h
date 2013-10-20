@@ -247,6 +247,6 @@ private:
 };
 
 /// Register Scene library objects.
-void RegisterSceneLibrary(Context* context);
+void URHO3D_API RegisterSceneLibrary(Context* context);
 
 }

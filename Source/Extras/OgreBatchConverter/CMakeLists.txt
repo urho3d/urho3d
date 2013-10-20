@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+# Find Urho3D library
+find_package (Urho3D REQUIRED)
+include_directories (${URHO3D_INCLUDE_DIR})
+
 # Define target name
 set (TARGET_NAME OgreBatchConverter)
 
@@ -27,9 +31,6 @@ set (TARGET_NAME OgreBatchConverter)
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
-
-# Define dependency libs
-set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/IO ../../Engine/Math)
 
 # Setup target
 setup_executable ()

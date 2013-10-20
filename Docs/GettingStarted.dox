@@ -103,7 +103,7 @@ You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclip
 
 \section Building_Library Library build
 
-CMake build configuration has been scripted to generate Urho3D executable as the default build target. This default target builds the Urho3D script host application (a tool to execute AngelScript and Lua script). To change it to generate an Urho3D static or shared (dynamic) library build target instead, specify the build option "-DURHO3D_BUILD_TYPE=STATIC" or "-DURHO3D_BUILD_TYPE=SHARED", respectively. When this option is set, the other build options to generate sample and tool targets are ignored. Due to the way the Urho3D project is being structured and the potential conflict of different visibility (export) attribute settings, when building the Urho3D library target then no other runtime targets can be built at the same time.
+As of v1.31 (to be released), the build process first builds the Urho3D library target (either static or shared). The library is then linked against by other targets like tools and samples that reference Urho3D as one of the external libraries. The Urho3D library type is defaulted to static, so the build process would generate standalone executables as previous releases. The Urho3D library type can be changed using "URHO3D_LIB_TYPE" build option.    
 
 Refer to \ref UsingLibrary "Using Urho3D as external library" on how to setup your own project to use Urho3D as external library.
     
@@ -138,7 +138,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |-DUSE_STATIC_RUNTIME=1                       |to use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
 |-DSCP_TO_TARGET=user\@target:remote-location |to automatically scp executables to target system (Raspberry Pi cross-compiling build only), SSH digital key must be setup first for this to work|
 |-DCMAKE_BUILD_TYPE=Release/Debug/RelWithDebInfo |to tell CMake which build configuration to be generated, default is Release (cmake_gcc.sh and cmake_eclipse.sh only)|
-|-DURHO3D_BUILD_TYPE=EXE/STATIC/SHARED        |to tell CMake which Urho3D target to be built, default is EXE (Urho3D script host application)|
+|-DURHO3D_LIB_TYPE=STATIC/SHARED              |to specify Urho3D library type, default is STATIC|
 |-DANDROID_ABI=armeabi                        |to build armeabi native code (Android build only), default is armeabi-v7a|
 
 Note that build option values specified via command line are cached by CMake. The cached values will be used by CMake in the subsequent invocation. That is, the same build options are not required to be specified again and again. Once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly setting it via command line. That is, simply by NOT passing the corresponding build option would not work. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.
@@ -302,11 +302,11 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 setup_main_executable ()
 \endcode
 
-Copy the "cmake" sub-directory from Urho3D project to your own project so that CMake can find the Urho3D-specific CMake modules in your project. Instead of copying, for platform that supports symbolic link, you can also create "cmake" symbolic link in your project build tree to point to "cmake" sub-directory from Urho3D project. Alternatively, you can just modify the CMAKE_MODULE_PATH search path above to "$ENV{URHO3D_HOME}/Source/CMake/Modules/".
+Copy the "CMake" sub-directory from Urho3D project to your own project so that CMake can find the Urho3D-specific CMake modules in your project. Instead of copying, for platform that supports symbolic link, you can also create "CMake" symbolic link in your project build tree to point to "CMake" sub-directory from Urho3D project. Alternatively, you can just modify the CMAKE_MODULE_PATH search path above to "$ENV{URHO3D_HOME}/Source/CMake/Modules/".
 
-Since your CMake build script include the Urho3D-Cmake-magic module, your project also now has the cross-platform build capability.  
+Since your CMake build script include the Urho3D-Cmake-magic module, your project also now has the cross-platform build capability.
 
-When both Urho3D static and shared library are built and available in the Urho3D project build tree, the Urho3D shared library takes precedence over static library to be linked against your own project. You can modify the CMAKE_FIND_LIBRARY_SUFFIXES global variable to change this behaviour. When linking statically against Urho3D static library, you must remember to additionally define "-DURHO3D_STATIC_DEFINE" in your compiler flag, especially on MSVC.
+When both Urho3D static and shared library are built and available in the Urho3D project build tree, the Urho3D shared library takes precedence over static library to be linked against your own project. You can modify the CMAKE_FIND_LIBRARY_SUFFIXES global variable to change this behaviour.
 
 
 \page Structure Overall structure

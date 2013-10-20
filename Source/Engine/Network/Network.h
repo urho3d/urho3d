@@ -145,6 +145,6 @@ private:
 };
 
 /// Register Network library objects.
-void RegisterNetworkLibrary(Context* context);
+void URHO3D_API RegisterNetworkLibrary(Context* context);
 
 }
