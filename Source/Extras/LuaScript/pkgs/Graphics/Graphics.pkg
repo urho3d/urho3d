@@ -10,6 +10,7 @@ class Graphics : public Object
     bool SetMode(int width, int height);
     
     void SetSRGB(bool enable);
+    void SetFlushGPU(bool enable);
     bool ToggleFullscreen();
     void Close();
     bool TakeScreenShot(Image& destImage);
@@ -26,6 +27,7 @@ class Graphics : public Object
     bool GetVSync() const;
     bool GetTripleBuffer() const;
     bool GetSRGB() const;
+    bool GetFlushGPU() const;
     bool IsDeviceLost() const;
     unsigned GetNumPrimitives() const;
     unsigned GetNumBatches() const;
@@ -55,6 +57,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool vSync;
     tolua_readonly tolua_property__get_set bool tripleBuffer;
     tolua_property__get_set bool sRGB;
+    tolua_property__get_set bool flushGPU;
     tolua_readonly tolua_property__is_set bool deviceLost;
     tolua_readonly tolua_property__get_set unsigned numPrimitives;
     tolua_readonly tolua_property__get_set unsigned numBatches;

@@ -98,6 +98,8 @@ public:
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
+    /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Not yet implemented on OpenGL.
+    void SetFlushGPU(bool enable) {}
     /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     /// Close the window.
@@ -243,6 +245,8 @@ public:
     bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
+    /// Return whether the GPU command buffer is flushed each frame. Not yet implemented on OpenGL.
+    bool GetFlushGPU() const { return false; }
     /// Return whether device is lost, and can not yet render.
     bool IsDeviceLost() const;
     /// Return number of primitives drawn this frame.

@@ -93,6 +93,8 @@ public:
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
+    /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Default off, may decrease performance if enabled.
+    void SetFlushGPU(bool enable);
     /// Toggle between full screen and windowed mode. Return true if successful.
     bool ToggleFullscreen();
     /// Close the window.
@@ -236,6 +238,8 @@ public:
     bool GetTripleBuffer() const { return tripleBuffer_; }
     /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
+    /// Return whether the GPU command buffer is flushed each frame.
+    bool GetFlushGPU() const { return flushGPU_; }
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
     /// Return number of primitives drawn this frame.
@@ -427,10 +431,14 @@ private:
     bool vsync_;
     /// Triple buffering flag.
     bool tripleBuffer_;
+    /// Flush GPU command buffer flag.
+    bool flushGPU_;
     /// sRGB conversion on write flag for the main window.
     bool sRGB_;
     /// Direct3D device lost flag.
     bool deviceLost_;
+    /// Flush query issued flag.
+    bool queryIssued_;
     /// Light pre-pass rendering support flag.
     bool lightPrepassSupport_;
     /// Deferred rendering support flag.

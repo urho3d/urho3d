@@ -178,8 +178,10 @@ Graphics::Graphics(Context* context) :
     resizable_(false),
     vsync_(false),
     tripleBuffer_(false),
+    flushGPU_(false),
     sRGB_(false),
     deviceLost_(false),
+    queryIssued_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     hardwareShadowSupport_(false),
@@ -220,6 +222,11 @@ Graphics::~Graphics()
     {
         impl_->defaultDepthStencilSurface_->Release();
         impl_->defaultDepthStencilSurface_ = 0;
+    }
+    if (impl_->frameQuery_)
+    {
+        impl_->frameQuery_->Release();
+        impl_->frameQuery_ = 0;
     }
     if (impl_->device_)
     {
@@ -446,6 +453,11 @@ void Graphics::SetSRGB(bool enable)
     sRGB_ = enable && sRGBWriteSupport_;
 }
 
+void Graphics::SetFlushGPU(bool enable)
+{
+    flushGPU_ = enable;
+}
+
 bool Graphics::ToggleFullscreen()
 {
     return SetMode(width_, height_, !fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
@@ -582,6 +594,18 @@ bool Graphics::BeginFrame()
         }
     }
     
+    // If a query was issued on the previous frame, wait for it to finish before beginning the next
+    if (impl_->frameQuery_ && queryIssued_)
+    {
+        PROFILE(FlushGPU);
+        
+        while (impl_->frameQuery_->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE)
+        {
+        }
+        
+        queryIssued_ = false;
+    }
+    
     impl_->device_->BeginScene();
     
     // Set default rendertarget and depth buffer
@@ -613,6 +637,13 @@ void Graphics::EndFrame()
     
     impl_->device_->EndScene();
     impl_->device_->Present(0, 0, 0, 0);
+    
+    // Optionally flush GPU buffer to avoid control lag or framerate fluctuations due to pre-render
+    if (impl_->frameQuery_ && flushGPU_)
+    {
+        impl_->frameQuery_->Issue(D3DISSUE_END);
+        queryIssued_ = true;
+    }
     
     // Clean up too large scratch buffers
     CleanupScratchBuffers();
@@ -2370,6 +2401,11 @@ void Graphics::OnDeviceLost()
         impl_->defaultDepthStencilSurface_->Release();
         impl_->defaultDepthStencilSurface_ = 0;
     }
+    if (impl_->frameQuery_)
+    {
+        impl_->frameQuery_->Release();
+        impl_->frameQuery_ = 0;
+    }
     
     for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
         gpuObjects_[i]->OnDeviceLost();
@@ -2383,6 +2419,9 @@ void Graphics::OnDeviceReset()
     // Get default surfaces
     impl_->device_->GetRenderTarget(0, &impl_->defaultColorSurface_);
     impl_->device_->GetDepthStencilSurface(&impl_->defaultDepthStencilSurface_);
+    
+    // Create frame query for flushing the GPU command buffer
+    impl_->device_->CreateQuery(D3DQUERYTYPE_EVENT, &impl_->frameQuery_);
     
     ResetCachedState();
 }
@@ -2448,6 +2487,8 @@ void Graphics::ResetCachedState()
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;
+    
+    queryIssued_ = false;
 }
 
 void Graphics::SetTextureUnitMappings()
