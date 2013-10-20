@@ -386,7 +386,7 @@ DebugHud* Engine::CreateDebugHud()
 
 void Engine::SetTimeStepSmoothing(int frames)
 {
-    timeStepSmoothing_ = Clamp(frames, 1, 10);
+    timeStepSmoothing_ = Clamp(frames, 1, 20);
 }
 
 void Engine::SetMinFps(int fps)
@@ -591,10 +591,15 @@ void Engine::ApplyFrameLimit()
     timeStep_ = 0.0f;
     lastTimeSteps_.Push(elapsed / 1000000.0f);
     if (lastTimeSteps_.Size() > timeStepSmoothing_)
-        lastTimeSteps_.Erase(0);
-    for (unsigned i = 0; i < lastTimeSteps_.Size(); ++i)
-        timeStep_ += lastTimeSteps_[i];
-    timeStep_ /= lastTimeSteps_.Size();
+    {
+        // If the smoothing configuration was changed, ensure correct amount of samples
+        lastTimeSteps_.Erase(0, lastTimeSteps_.Size() - timeStepSmoothing_);
+        for (unsigned i = 0; i < lastTimeSteps_.Size(); ++i)
+            timeStep_ += lastTimeSteps_[i];
+        timeStep_ /= lastTimeSteps_.Size();
+    }
+    else
+        timeStep_ = lastTimeSteps_.Back();
 }
 
 VariantMap Engine::ParseParameters(const Vector<String>& arguments)
