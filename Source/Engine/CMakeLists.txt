@@ -26,7 +26,7 @@ set (TARGET_NAME Urho3D_lib)
 # Define generated source files
 execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
 if (GIT_EXIT_CODE EQUAL 0)
-    if (WIN32)
+    if (CMAKE_HOST_WIN32)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
             COMMAND for /F %%v in ('git describe --always --dirty') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
