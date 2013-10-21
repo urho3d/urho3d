@@ -96,8 +96,10 @@ add_subdirectory (Engine)
 # Urho3D tool targets
 add_subdirectory (Tools)
 
-# Urho3D samples (should work also on iOS and Android)
-if (ENABLE_SAMPLES)
+# Urho3D samples
+# Samples are built on iOS platform too when enabled
+# Although samples should also work for Android platform, currently there is no available mechanism to package each sample apps into individual *.apk
+if (NOT ANDROID AND ENABLE_SAMPLES)
     add_subdirectory (Samples)
 endif ()
 
