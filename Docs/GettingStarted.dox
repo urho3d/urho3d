@@ -103,10 +103,10 @@ You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclip
 
 \section Building_Library Library build
 
-As of v1.31 (to be released), the build process first builds the Urho3D library target (either static or shared). The library is then linked against by other targets like tools and samples that reference Urho3D as one of the external libraries. The Urho3D library type is defaulted to static, so the build process would generate standalone executables as previous releases. The Urho3D library type can be changed using "URHO3D_LIB_TYPE" build option.    
+As of v1.31 (to be released), the build process first builds the Urho3D library target (either static or shared). The library is then linked against by other targets like tools and samples that reference Urho3D as one of the external libraries. The Urho3D library type is defaulted to static, so the build process would generate standalone executables as previous releases. The Urho3D library type can be changed using "URHO3D_LIB_TYPE" build option.
 
 Refer to \ref UsingLibrary "Using Urho3D as external library" on how to setup your own project to use Urho3D as external library.
-    
+
 
 \section Building_64bit Desktop 64bit build
 
@@ -265,7 +265,7 @@ F2          Toggle debug HUD
 
 \page UsingLibrary Using Urho3D as external library
 
-This page shows how to create a new C++ project using Urho3D library as external library. This page assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find the external library in the Urho3D project build tree, specify an environment variable called "URHO3D_HOME" which points to the root directory of the Urho3D project.  
+This page shows how to create a new C++ project using Urho3D library as external library. This page assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find the external library in the Urho3D project build tree, specify an environment variable called "URHO3D_HOME" which points to the root directory of the Urho3D project.
 
 In your own project root directory, create a new CMakeLists.txt file and add the following lines:
 
@@ -311,9 +311,7 @@ When both Urho3D static and shared library are built and available in the Urho3D
 
 \page Structure Overall structure
 
-Urho3D consists of several static libraries that are independent where possible: for example the Graphics library could be used without the Engine library, if only rendering capabilities were desired.
-
-The libraries are the following:
+The Urho3D library consists of the following subdirectories that represent different subsystems:
 
 - Container. Provides STL replacement classes and shared pointers.
 - Math. Provides vector, quaternion & matrix types and geometric shapes used in intersection tests.
@@ -329,7 +327,7 @@ The libraries are the following:
 - Physics. Provides physics simulation.
 - Navigation. Provides navigation mesh generation and pathfinding.
 - %Script. Provides scripting support using the AngelScript language.
-- %Engine. Instantiates the subsystems from the libraries above (except Script, which needs to be instantiated by the application) and manages the main loop iteration.
+- %Engine. Instantiates the subsystems from the modules above (except Script, which needs to be instantiated by the application) and manages the main loop iteration.
 
 Third-party libraries are used for the following functionality:
 
