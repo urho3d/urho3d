@@ -323,27 +323,7 @@ macro (setup_library)
                 set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
             endif ()
     
-            if (MSVC)
-                # Specific to VS generator
-                # On VS2008 we need to add a backslash to the IntDir, on later VS it already exists
-                if (CMAKE_GENERATOR MATCHES "2008")
-                    set (INTDIR_SLASH "\\")
-                else ()
-                    set (INTDIR_SLASH "")
-                endif ()
-                if (USE_MKLINK)
-                    set (SYMLINK ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.lnk)
-                    add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                        COMMAND rd \"${SYMLINK}\"
-                        COMMAND mklink /D \"${SYMLINK}\" \"$(ProjectDir)$(IntDir)\"
-                        COMMENT "Creating a symbolic link pointing to object file directory")
-                else ()
-                    file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
-                    add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                        COMMAND copy /B \"$(ProjectDir)$(IntDir)${INTDIR_SLASH}*.obj\" \"$(ProjectDir)CMakeFiles\\${TARGET_NAME}.dir\"
-                        COMMENT "Copying object files to a common location also used by Makefile generator")
-                endif ()
-            elseif (XCODE)
+            if (XCODE)
                 # Specific to Xcode generator
                 set (SYMLINK ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.lnk)
                 add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
