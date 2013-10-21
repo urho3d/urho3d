@@ -126,8 +126,8 @@ endif ()
 # Generate platform specific export header file automatically
 if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_BUILD_TYPE OR ${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
     set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
-    generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
-    set (URHO3D_EXPORTS_BUILD_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Build type when Urho3D export header was last generated")
+    generate_export_header (${TARGET_NAME} BASE_NAME ${LIB_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
+    set (URHO3D_EXPORTS_BUILD_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type when Urho3D export header was last generated")
     
     # Append Urho3D license notice to the export header file
     file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)

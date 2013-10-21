@@ -88,7 +88,7 @@ if (URHO3D_LIB_TYPE)
     string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
 endif ()
 if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
-    add_definitions (-DURHO3D_LIB_STATIC_DEFINE)
+    add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
 # If using Windows and not OpenGL, find DirectX SDK include & library directories
