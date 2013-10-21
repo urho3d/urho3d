@@ -20,22 +20,15 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME IO)
-
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
-
 if (APPLE AND NOT IOS)
     file (GLOB C_FILES *.m)
 endif()
-
 set (SOURCE_FILES ${CPP_FILES} ${C_FILES} ${H_FILES})
+set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${SOURCE_FILES} PARENT_SCOPE)
+enable_pch ()
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../Math ../../ThirdParty/LZ4)
-
-# Setup target
-enable_pch ()
-setup_library ()
+set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/LZ4 PARENT_SCOPE)

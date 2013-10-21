@@ -103,8 +103,22 @@ endforeach ()
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${OBJ_FILES} gitversion.h)
+set (SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${H_FILES} ${OBJ_FILES} gitversion.h)
 set_source_files_properties (${OBJ_FILES} PROPERTIES GENERATED TRUE)
+
+# Define dependency libs
+macro (set_list LIST_NAME)
+    remove_duplicate (ENGINE_${LIST_NAME})
+    set (${LIST_NAME} ${ENGINE_${LIST_NAME}})
+endmacro ()
+foreach (LIST_NAME LIBS INCLUDE_DIRS_ONLY LINK_LIBS_ONLY)
+    set_list (${LIST_NAME})
+endforeach ()
+file (GLOB ENGINE_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} */CMakeLists.txt)
+foreach (ENGINE_DIR ${ENGINE_DIRS})
+    get_filename_component (ENGINE_DIR ${ENGINE_DIR} PATH)
+    list (APPEND INCLUDE_DIRS_ONLY ${ENGINE_DIR})
+endforeach ()
 
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})

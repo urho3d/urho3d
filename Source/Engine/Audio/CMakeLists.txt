@@ -20,18 +20,13 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME Audio)
-
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${SOURCE_FILES} PARENT_SCOPE)
+enable_pch ()
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene ../../ThirdParty/STB)
-set (LINK_LIBS_ONLY SDL)
-
-# Setup target
-enable_pch ()
-setup_library ()
+set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/STB PARENT_SCOPE)
+set (ENGINE_LINK_LIBS_ONLY ${ENGINE_LINK_LIBS_ONLY} SDL PARENT_SCOPE)

@@ -20,17 +20,12 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME Physics)
-
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${SOURCE_FILES} PARENT_SCOPE)
+enable_pch ()
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene ../../ThirdParty/Bullet/src ../../ThirdParty/StanHull)
-
-# Setup target
-enable_pch ()
-setup_library ()
+set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/Bullet/src ../ThirdParty/StanHull PARENT_SCOPE)

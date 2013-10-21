@@ -61,9 +61,10 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${GEN_CPP_FILES})
 
 # Define dependency libs
-set (LIBS ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../../ThirdParty/Lua${JIT}/src ../Math ../Navigation ../Network ../Physics ../Resource ../Scene ../UI)
+set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY tolua++_static)
-set (INCLUDE_DIRS_ONLY . ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
+set (INCLUDE_DIRS_ONLY . ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource ../Scene ../UI
+    ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
 
 # Setup target
 enable_pch ()

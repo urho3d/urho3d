@@ -553,7 +553,12 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     if (LINK_LIBS_ONLY)
-        list (SORT LINK_LIBS_ONLY)
-        list (REMOVE_DUPLICATES LINK_LIBS_ONLY)
+        remove_duplicate (LINK_LIBS_ONLY)
     endif ()
+endmacro ()
+
+# Macro for sorting and removing duplicate value
+macro (remove_duplicate LIST_NAME)
+    list (SORT ${LIST_NAME})
+    list (REMOVE_DUPLICATES ${LIST_NAME})
 endmacro ()
