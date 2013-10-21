@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "VectorBase.h"
 
 #include "DebugNew.h"

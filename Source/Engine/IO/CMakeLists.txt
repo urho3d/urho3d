@@ -28,7 +28,6 @@ if (APPLE AND NOT IOS)
 endif()
 set (SOURCE_FILES ${CPP_FILES} ${C_FILES} ${H_FILES})
 set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${SOURCE_FILES} PARENT_SCOPE)
-enable_pch ()
 
 # Define dependency libs
 set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/LZ4 PARENT_SCOPE)

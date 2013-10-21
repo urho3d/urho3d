@@ -67,5 +67,4 @@ set (INCLUDE_DIRS_ONLY . ../Audio ../Container ../Core ../Engine ../Graphics ../
     ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
 
 # Setup target
-enable_pch ()
 setup_library ()

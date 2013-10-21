@@ -103,6 +103,7 @@ file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${H_FILES} ${OBJ_FILES} gitversion.h)
 set_source_files_properties (${OBJ_FILES} PROPERTIES GENERATED TRUE)
+enable_pch ()
 
 # Define dependency libs
 macro (set_list LIST_NAME)

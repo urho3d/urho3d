@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "HashBase.h"
 
 #include "DebugNew.h"

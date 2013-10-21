@@ -25,7 +25,6 @@ file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${SOURCE_FILES} PARENT_SCOPE)
-enable_pch ()
 
 # Define dependency libs
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)
