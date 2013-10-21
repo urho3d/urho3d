@@ -3,6 +3,11 @@ set (TARGET_NAME FreeType)
 
 add_definitions (-DFT2_BUILD_LIBRARY)
 
+# Rename z_verbose and z_error symbols to prevent Xcode duplicate symbol linker error (clash with Assimp) on debug build
+if (XCODE)
+    add_definitions (-Dz_verbose=ft2_z_verbose -Dz_error=ft2_z_error)
+endif ()
+
 # Define source files
 set (SOURCE_FILES
     src/autofit/autofit.c
