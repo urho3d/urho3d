@@ -26,7 +26,6 @@
 #include "LuaScript.h"
 #include "LuaScriptInstance.h"
 #include "VectorBuffer.h"
-#include "tolua++urho3d.h"
 
 extern "C"
 {
@@ -35,6 +34,7 @@ extern "C"
 #include <lauxlib.h>
 }
 #include "tolua++.h"
+#include "tolua++urho3d.h"
 
 #include "DebugNew.h"
 

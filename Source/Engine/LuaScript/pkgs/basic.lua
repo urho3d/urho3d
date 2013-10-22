@@ -84,8 +84,9 @@ function post_output_hook(package)
 //
 
 #include "Precompiled.h"
+#include "tolua++.h"
 #include "tolua++urho3d.h"]]
-      )
+    )
 
     WRITE(result)
 end

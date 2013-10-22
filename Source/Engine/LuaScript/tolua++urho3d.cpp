@@ -22,6 +22,7 @@
 
 #include "Precompiled.h"
 #include "Ptr.h"
+#include "tolua++.h"
 #include "tolua++urho3d.h"
 
 const char* tolua_tourho3dstring(lua_State* L, int narg, const char* def)
