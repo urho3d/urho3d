@@ -157,6 +157,9 @@ if (MSVC)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).lib\" \"${PROJECT_ROOT_DIR}/Lib\"
             COMMENT "Copying import library to Lib directory")
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Bin\"
+            COMMENT "Copying shared library to Bin directory")
     endif ()
 else ()
     # Strip the output shared library for embedded devices
