@@ -20,10 +20,6 @@
 # THE SOFTWARE.
 #
 
-# Find Urho3D library
-find_package (Urho3D REQUIRED)
-include_directories (${URHO3D_INCLUDE_DIR})
-
 # Define target name
 set (TARGET_NAME OgreBatchConverter)
 

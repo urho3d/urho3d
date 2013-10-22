@@ -20,6 +20,9 @@
 # THE SOFTWARE.
 #
 
+# Set project name
+project (Urho3D-Samples)
+
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIR})

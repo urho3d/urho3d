@@ -106,7 +106,7 @@ endif ()
 # Do not build extras for iOS and Android regardless of its build option 
 if (NOT IOS AND NOT ANDROID AND ENABLE_EXTRAS)   
     # Urho3D extras
-    add_subdirectory (Extras/OgreBatchConverter)
+    add_subdirectory (Extras)
 endif ()
 
 # Generate platform specific Doxyfile automatically
