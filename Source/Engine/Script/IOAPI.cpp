@@ -345,17 +345,17 @@ static PackageFile* ConstructPackageFile()
     return new PackageFile(GetScriptContext());
 }
 
-static PackageFile* ConstructAndOpenPackageFile(const String& fileName)
+static PackageFile* ConstructAndOpenPackageFile(const String& fileName, unsigned startOffset)
 {
-    return new PackageFile(GetScriptContext(), fileName);
+    return new PackageFile(GetScriptContext(), fileName, startOffset);
 }
 
 static void RegisterPackageFile(asIScriptEngine* engine)
 {
     RegisterObject<PackageFile>(engine, "PackageFile");
     engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(ConstructPackageFile), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
-    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in) const", asMETHOD(PackageFile, Open), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in, uint startOffset = 0)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
+    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in, uint startOffset = 0) const", asMETHOD(PackageFile, Open), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "bool Exists(const String&in) const", asMETHOD(PackageFile, Exists), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "const String& get_name() const", asMETHOD(PackageFile, GetName), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHOD(PackageFile, GetNumFiles), asCALL_THISCALL);

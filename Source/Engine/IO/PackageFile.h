@@ -47,12 +47,12 @@ public:
     /// Construct.
     PackageFile(Context* context);
     /// Construct and open.
-    PackageFile(Context* context, const String& fileName);
+    PackageFile(Context* context, const String& fileName, unsigned startOffset = 0);
     /// Destruct.
     virtual ~PackageFile();
     
     /// Open the package file. Return true if successful.
-    bool Open(const String& fileName);
+    bool Open(const String& fileName, unsigned startOffset = 0);
     /// Check if a file exists within the package file.
     bool Exists(const String& fileName) const;
     /// Return the file entry corresponding to the name, or null if not found.

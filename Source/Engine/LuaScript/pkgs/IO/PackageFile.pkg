@@ -10,10 +10,10 @@ struct PackageEntry
 class PackageFile : public Object
 {
     PackageFile(Context* context);
-    PackageFile(Context* context, const String fileName);
+    PackageFile(Context* context, const String fileName, unsigned startOffset = 0);
     ~PackageFile();
     
-    bool Open(const String fileName);
+    bool Open(const String fileName, unsigned startOffset = 0);
     bool Exists(const String fileName) const;
     const PackageEntry* GetEntry(const String fileName) const;
     const HashMap<String, PackageEntry>& GetEntries() const;

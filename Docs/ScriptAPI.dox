@@ -1559,7 +1559,7 @@ Properties:
 Methods:
 
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- bool Open(const String&) const
+- bool Open(const String&, uint = 0) const
 - bool Exists(const String&) const
 - bool compressed() const
 
@@ -3730,6 +3730,7 @@ Properties:
 - String windowTitle
 - IntVector2 windowPosition
 - bool sRGB
+- bool flushGPU
 - int width (readonly)
 - int height (readonly)
 - int multiSample (readonly)

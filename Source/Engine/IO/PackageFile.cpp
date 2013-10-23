@@ -36,20 +36,20 @@ PackageFile::PackageFile(Context* context) :
 {
 }
 
-PackageFile::PackageFile(Context* context, const String& fileName) :
+PackageFile::PackageFile(Context* context, const String& fileName, unsigned startOffset) :
     Object(context),
     totalSize_(0),
     checksum_(0),
     compressed_(false)
 {
-    Open(fileName);
+    Open(fileName, startOffset);
 }
 
 PackageFile::~PackageFile()
 {
 }
 
-bool PackageFile::Open(const String& fileName)
+bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
     #ifdef ANDROID
     if (fileName.StartsWith("/apk/"))
@@ -64,11 +64,30 @@ bool PackageFile::Open(const String& fileName)
         return false;
     
     // Check ID, then read the directory
+    file->Seek(startOffset);
     String id = file->ReadFileID();
     if (id != "UPAK" && id != "ULZ4")
     {
-        LOGERROR(fileName + " is not a valid package file");
-        return false;
+        // If start offset has not been explicitly specified, also try to read package size from the end of file
+        // to know how much we must rewind to find the package start
+        if (!startOffset)
+        {
+            unsigned fileSize = file->GetSize();
+            file->Seek(fileSize - sizeof(unsigned));
+            unsigned newStartOffset = fileSize - file->ReadUInt();
+            if (newStartOffset < fileSize)
+            {
+                startOffset = newStartOffset;
+                file->Seek(startOffset);
+                id = file->ReadFileID();
+            }
+        }
+        
+        if (id != "UPAK" && id != "ULZ4")
+        {
+            LOGERROR(fileName + " is not a valid package file");
+            return false;
+        }
     }
     
     fileName_ = fileName;
@@ -83,7 +102,7 @@ bool PackageFile::Open(const String& fileName)
     {
         String entryName = file->ReadString();
         PackageEntry newEntry;
-        newEntry.offset_ = file->ReadUInt();
+        newEntry.offset_ = file->ReadUInt() + startOffset;
         newEntry.size_ = file->ReadUInt();
         newEntry.checksum_ = file->ReadUInt();
         if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)

@@ -1498,6 +1498,7 @@ Methods:
 - bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
+- void SetFlushGPU(bool enable)
 - bool ToggleFullscreen()
 - void Close()
 - bool TakeScreenShot(Image& destImage)
@@ -1513,6 +1514,7 @@ Methods:
 - bool GetVSync() const
 - bool GetTripleBuffer() const
 - bool GetSRGB() const
+- bool GetFlushGPU() const
 - bool IsDeviceLost() const
 - unsigned GetNumPrimitives() const
 - unsigned GetNumBatches() const
@@ -1543,6 +1545,7 @@ Properties:
 - bool vSync (readonly)
 - bool tripleBuffer (readonly)
 - bool sRGB
+- bool flushGPU
 - bool deviceLost (readonly)
 - unsigned numPrimitives (readonly)
 - unsigned numBatches (readonly)
@@ -2646,9 +2649,9 @@ Properties:
 Methods:
 
 - PackageFile(Context* context)
-- PackageFile(Context* context, const String fileName)
+- PackageFile(Context* context, const String fileName, unsigned startOffset = 0)
 - ~PackageFile()
-- bool Open(const String fileName)
+- bool Open(const String fileName, unsigned startOffset = 0)
 - bool Exists(const String fileName) const
 - const PackageEntry* GetEntry(const String fileName) const
 - const HashMap<String, PackageEntry>& GetEntries() const

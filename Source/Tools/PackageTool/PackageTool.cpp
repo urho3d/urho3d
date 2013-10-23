@@ -236,6 +236,10 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         }
     }
     
+    // Write package size to the end of file to allow finding it linked to an executable file
+    unsigned currentSize = dest.GetSize();
+    dest.WriteUInt(currentSize + sizeof(unsigned));
+    
     // Write header again with correct offsets & checksums
     dest.Seek(0);
     WriteHeader(dest);
