@@ -20,13 +20,12 @@
 # THE SOFTWARE.
 #
 
-# Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-if (APPLE AND NOT IOS)
-    file (GLOB C_FILES *.m)
-endif()
-set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${C_FILES} ${H_FILES} PARENT_SCOPE)
+# Set project name
+project (Urho3D-Extras)
 
-# Define dependency libs
-set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/LZ4 PARENT_SCOPE)
+# Find Urho3D library
+find_package (Urho3D REQUIRED)
+include_directories (${URHO3D_INCLUDE_DIR})
+
+# Urho3D script host application
+add_subdirectory (OgreBatchConverter)

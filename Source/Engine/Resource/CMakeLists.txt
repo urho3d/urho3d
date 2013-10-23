@@ -20,17 +20,10 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME Resource)
-
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${H_FILES} PARENT_SCOPE)
 
 # Define dependency libs
-set (LIBS ../Container ../Core ../IO ../Math ../../ThirdParty/JO ../../ThirdParty/PugiXml/src ../../ThirdParty/STB)
-
-# Setup target
-enable_pch ()
-setup_library ()
+set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/JO ../ThirdParty/PugiXml/src ../ThirdParty/STB PARENT_SCOPE)

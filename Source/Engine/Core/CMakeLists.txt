@@ -20,22 +20,13 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME Core)
-
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${H_FILES} PARENT_SCOPE)
 
 # Define dependency libs
-set (LIBS ../Container ../Math)
-
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)
-    set (INCLUDE_DIRS_ONLY ../../ThirdParty/LibCpuId/src)
-    set (LINK_LIBS_ONLY LibCpuId)
+    set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/LibCpuId/src PARENT_SCOPE)
+    set (ENGINE_LINK_LIBS_ONLY ${ENGINE_LINK_LIBS_ONLY} LibCpuId PARENT_SCOPE)
 endif ()
-
-# Setup target
-enable_pch ()
-setup_library ()

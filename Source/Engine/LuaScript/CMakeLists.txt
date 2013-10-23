@@ -28,6 +28,17 @@ if (NOT ENABLE_SAFE_LUA)
     add_definitions (-DTOLUA_RELEASE)
 endif ()
 
+# The host tool must be built natively and would be used when cross-compiling
+if (CMAKE_CROSSCOMPILING OR IOS)
+    execute_process (COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -v RESULT_VARIABLE TOLUA_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+    if (NOT TOLUA_EXIT_CODE EQUAL 0)
+        message (WARNING "For cross-compiling build to be successful, the 'tolua++' tool must be built natively first and present in the 'Bin' folder." )
+    endif ()
+else ()
+    add_subdirectory (../../ThirdParty/tolua++/src/bin ../../ThirdParty/tolua++/src/bin)
+    set (TOLUADEP tolua++)
+endif ()
+
 # Define generated source files
 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 file (GLOB API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/*.pkg)
@@ -38,7 +49,8 @@ foreach (API_PKG_FILE ${API_PKG_FILES})
     set (GEN_CPP_FILES ${GEN_CPP_FILES} ${GEN_CPP_FILE})
     file (GLOB PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/${API}/*.pkg)
     add_custom_command (OUTPUT ${GEN_CPP_FILE} 
-        COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -L basic.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME} DEPENDS ${API_PKG_FILE} ${PKG_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/basic.lua
+        COMMAND ${PROJECT_ROOT_DIR}/Bin/tolua++ -L basic.lua -o ${CMAKE_CURRENT_BINARY_DIR}/${GEN_CPP_FILE} ${NAME}
+        DEPENDS ${TOLUADEP} ${API_PKG_FILE} ${PKG_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/pkgs/basic.lua
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pkgs
         COMMENT "Generating tolua++ API binding on the fly for ${API}")
 endforeach ()
@@ -49,19 +61,10 @@ file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${GEN_CPP_FILES})
 
 # Define dependency libs
-set (LIBS ../../Engine/Audio ../../Engine/Container ../../Engine/Core ../../Engine/Engine ../../Engine/Graphics ../../Engine/Input ../../Engine/IO ../../ThirdParty/Lua${JIT}/src 
-    ../../Engine/Math ../../Engine/Navigation ../../Engine/Network ../../Engine/Physics ../../Engine/Resource ../../Engine/Scene ../../Engine/UI)
+set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY tolua++_static)
-set (INCLUDE_DIRS_ONLY . ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
+set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource ../Scene ../UI
+    ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
 
 # Setup target
-enable_pch ()
 setup_library ()
-
-# For IOS, Android, and Raspberry-Pi cross-compiling build to be successful, the "tolua++" tool must be already present in the "Bin" folder
-# One way to achieve this is to first do a native desktop build where all the tools would be generated, then switch to IOS/Android/Raspberry-Pi cross-compiling build
-# Intentionally do not include NOT RASPI in the condition below because the dependency is still required for Raspberry Pi native build
-if (NOT IOS AND NOT ANDROID)
-    # Add dependency to the "tolua++" bin tool
-    add_dependencies (${TARGET_NAME} tolua++)
-endif ()

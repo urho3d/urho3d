@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "Context.h"
 #include "CoreEvents.h"
 #include "FileSystem.h"

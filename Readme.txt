@@ -329,16 +329,12 @@ generator.
 Library build
 -------------
 
-CMake build configuration has been scripted to generate Urho3D executable as the
-default build target. This default target builds the Urho3D script host
-application (a tool to execute AngelScript and Lua script). To change it to
-generate an Urho3D static or shared (dynamic) library build target instead,
-specify the build option "-DURHO3D_BUILD_TYPE=STATIC" or
-"-DURHO3D_BUILD_TYPE=SHARED", respectively. When this option is set, the other
-build options to generate sample and tool targets are ignored. Due to the way
-the Urho3D project is being structured and the potential conflict of different
-visibility (export) attribute settings, when building the Urho3D library target
-then no other runtime targets can be built at the same time.
+As of v1.31 (to be released), the build process first builds the Urho3D library
+target (either static or shared). The library is then linked against by other
+targets like tools and samples that reference Urho3D as one of the external
+libraries. The Urho3D library type is defaulted to static, so the build process
+would generate standalone executables as previous releases. The Urho3D library
+type can be changed using "URHO3D_LIB_TYPE" build option.    
 
 Refer to "Using Urho3D as external library" on how to setup your own project to
 use Urho3D as external library.
@@ -392,8 +388,8 @@ cmake_xxxx batch files or shell scripts.
 |-DCMAKE_BUILD_TYPE=   |to tell CMake which build configuration to be          |
 |  Release/Debug/      | generated, default is Release (cmake_gcc.sh and       |
 |  RelWithDebInfo      | cmake_eclipse.sh only)                                |
-|-DURHO3D_BUILD_TYPE=  |to tell CMake which Urho3D target to be built, default |
-|  EXE/STATIC/SHARED   | is EXE (Urho3D script host)                           |          
+|-DURHO3D_LIB_TYPE=    |to specify Urho3D library type, default is STATIC      |
+|  STATIC/SHARED       |                                                       |          
 |-DANDROID_ABI=armeabi |to build armeabi native code (Android build only),     |
 |                      | default is armeabi-v7a                                |
 |----------------------|-------------------------------------------------------|

@@ -20,26 +20,18 @@
 # THE SOFTWARE.
 #
 
+# Set project name
+project (Urho3D-Samples)
+
+# Find Urho3D library
+find_package (Urho3D REQUIRED)
+include_directories (${URHO3D_INCLUDE_DIR})
+
 # Include common to all samples
 set (COMMON_SAMPLE_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Sample.h" "${CMAKE_CURRENT_SOURCE_DIR}/Sample.inl")
 
 # Define dependency libs
-set (LIBS ../../Engine/Audio
-          ../../Engine/Container
-          ../../Engine/Core
-          ../../Engine/Engine
-          ../../Engine/Graphics
-          ../../Engine/Input
-          ../../Engine/IO
-          ../../Engine/Math
-          ../../Engine/Navigation
-          ../../Engine/Network
-          ../../Engine/Physics
-          ../../Engine/Resource
-          ../../Engine/Scene
-          ../../Engine/UI)
-
-set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR} ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include)
+set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Add samples
 add_subdirectory (01_HelloWorld)

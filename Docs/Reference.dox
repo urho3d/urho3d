@@ -190,7 +190,7 @@ Note that on iOS calling \ref Engine::Exit "Exit()" is a no-op as there is no of
 
 \section MainLoop_ApplicationFramework Application framework
 
-The Application class in the Engine library provides a minimal framework for an Urho3D C++ program with a main loop. It has virtual functions Setup(), Start() and Stop() which can be defined by the application subclass. The header file also provides a macro for defining a program entry point, which
+The Application class provides a minimal framework for an Urho3D C++ program with a main loop. It has virtual functions Setup(), Start() and Stop() which can be defined by the application subclass. The header file also provides a macro for defining a program entry point, which
 will instantiate the Context object and then the user-specified application class. A minimal example, which would just display a blank rendering window and exit by pressing ESC:
 
 \code
@@ -408,7 +408,7 @@ There are shortcut methods on the script side for creating and accessing a node'
 ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");
 \endcode
 
-Note that these are not actual Node member functions on the C++ side, as the %Scene library is not allowed to depend on scripting.
+Note that these are not actual Node member functions on the C++ side, as the %Scene classes are not allowed to depend on scripting.
 
 \section Scripting_ObjectSerialization Script object serialization
 
@@ -636,7 +636,7 @@ text:delete()
 
 \page Rendering Rendering
 
-Much of the rendering functionality in Urho3D is built on two subsystems, Graphics and Renderer, contained within the %Graphics library.
+Much of the rendering functionality in Urho3D is built on two subsystems, Graphics and Renderer.
 
 \section Rendering_Graphics Graphics
 
@@ -1328,7 +1328,7 @@ The Audio subsystem is always instantiated, but in headless mode it is not activ
 
 \page Physics Physics
 
-The %Physics library in Urho3D implements rigid body physics simulation using the Bullet library.
+Urho3D implements rigid body physics simulation using the Bullet library.
 
 To use, a PhysicsWorld component must first be created to the Scene.
 
@@ -1530,7 +1530,7 @@ The default flags are AM_FILE and AM_NET. Note that it is legal to define neithe
 
 \page Network Networking
 
-The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
+The Network subsystem provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
 
 %Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 30 FPS. The client responds by sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
 
@@ -1604,7 +1604,7 @@ The controls update message also includes the client's observer position for int
 
 \section Network_Messages Raw network messages
 
-All network messages have an integer ID. The first ID you can use for custom messages is 22 (lower ID's are either reserved for kNet's or the %Network library's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
+All network messages have an integer ID. The first ID you can use for custom messages is 22 (lower ID's are either reserved for kNet's or the %Network subsystem's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
 
 To send a message to a Connection, use its \ref Connection::SendMessage "SendMessage()" function. On the server, messages can also be broadcast to all client connections by calling the \ref Network::BroadcastMessage "BroadcastMessage()" function.
 

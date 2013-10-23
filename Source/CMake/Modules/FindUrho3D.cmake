@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-# Find Urho3D library and include directories in the project root tree or installed location
+# Find Urho3D library and include directories in the project root tree or installed location (although there is no install option at the moment)
 # For project root tree detection to work, Urho3D library must be already been built
 #
 #  URHO3D_FOUND
@@ -35,7 +35,11 @@ if (WIN32)
     set (URHO3D_LIB_NAMES ${URHO3D_LIB_NAMES} Urho3D_d)
 endif ()
 
-set (URHO3D_HOME $ENV{URHO3D_HOME})
+if (CMAKE_PROJECT_NAME MATCHES Urho3D.* AND PROJECT_ROOT_DIR)
+    set (URHO3D_HOME ${PROJECT_ROOT_DIR})
+else ()
+    set (URHO3D_HOME $ENV{URHO3D_HOME})
+endif ()
 if (URHO3D_HOME)
     file (TO_CMAKE_PATH ${URHO3D_HOME} URHO3D_HOME)
     
@@ -52,6 +56,7 @@ if (URHO3D_HOME)
             ${SOURCE_TREE_PATH}/Graphics
             ${SOURCE_TREE_PATH}/Input
             ${SOURCE_TREE_PATH}/IO
+            ${SOURCE_TREE_PATH}/LuaScript
             ${SOURCE_TREE_PATH}/Math
             ${SOURCE_TREE_PATH}/Navigation
             ${SOURCE_TREE_PATH}/Network
@@ -60,10 +65,11 @@ if (URHO3D_HOME)
             ${SOURCE_TREE_PATH}/Scene
             ${SOURCE_TREE_PATH}/Script
             ${SOURCE_TREE_PATH}/UI
-            ${URHO3D_HOME}/Source/Extras/LuaScript
-            ${URHO3D_HOME}/Source/ThirdParty/SDL/include
             ${URHO3D_HOME}/Source/ThirdParty/Bullet/src
             ${URHO3D_HOME}/Source/ThirdParty/kNet/include
+            ${URHO3D_HOME}/Source/ThirdParty/LZ4
+            ${URHO3D_HOME}/Source/ThirdParty/SDL/include
+            ${URHO3D_HOME}/Source/ThirdParty/STB
         )
 
         if (ANDROID)
@@ -76,11 +82,16 @@ if (URHO3D_HOME)
             set (URHO3D_INCLUDE_DIR ${URHO3D_INCLUDE_DIR} ${URHO3D_HOME}/Build/Engine)
             set (URHO3D_LIB_SEARCH_PATH ${URHO3D_HOME}/Lib)
         endif ()
-        find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+        if (TARGET Urho3D_lib)
+            set (URHO3D_LIBRARIES Urho3D_lib)
+            set (FOUND_MESSAGE "Found Urho3D: as CMake target")
+        else ()
+            find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+        endif ()
     endif ()
 else ()
     set (URHO3D_INC_SEARCH_PATH /opt/include)
-    find_path (URHO3D_INCLUDE_DIR Urho3D.h ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES Urho3D)
+    find_path (URHO3D_INCLUDE_DIR Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES Urho3D)
     
     set (URHO3D_LIB_SEARCH_PATH /opt/lib)
     find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES Urho3D)
@@ -88,11 +99,14 @@ endif ()
 
 if (URHO3D_INCLUDE_DIR AND URHO3D_LIBRARIES)
     set (URHO3D_FOUND 1)
+    if (NOT FOUND_MESSAGE)
+        set (FOUND_MESSAGE "Found Urho3D: ${URHO3D_LIBRARIES}")
+    endif ()
 endif ()
 
 if (URHO3D_FOUND)
     include (FindPackageMessage)
-    FIND_PACKAGE_MESSAGE (Urho3D "Found Urho3D: ${URHO3D_LIBRARIES} ${URHO3D_INCLUDE_DIR}" "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIR}]")
+    FIND_PACKAGE_MESSAGE (Urho3D ${FOUND_MESSAGE} "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIR}]")
 else ()
     if (Urho3D_FIND_REQUIRED)
         message (FATAL_ERROR "Could not find Urho3D library installation or project root tree via ENV{URHO3D_HOME}")

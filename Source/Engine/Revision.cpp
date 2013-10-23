@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "Revision.h"
 #include "gitversion.h"
 

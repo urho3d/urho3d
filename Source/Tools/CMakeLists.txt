@@ -20,13 +20,37 @@
 # THE SOFTWARE.
 #
 
-# Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-if (APPLE AND NOT IOS)
-    file (GLOB C_FILES *.m)
-endif()
-set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${C_FILES} ${H_FILES} PARENT_SCOPE)
+# Set project name
+project (Urho3D-Tools)
 
-# Define dependency libs
-set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/LZ4 PARENT_SCOPE)
+# Find Urho3D library
+find_package (Urho3D REQUIRED)
+include_directories (${URHO3D_INCLUDE_DIR})
+
+# Urho3D script host application
+add_subdirectory (Urho3D)
+
+# Do not build tools for Raspberry Pi unless it is explicitly enabled
+if (NOT DEFINED ENABLE_TOOLS)
+    if (RASPI)
+        set (ENABLE_TOOLS 0)
+    else ()
+        set (ENABLE_TOOLS 1)
+    endif ()
+endif ()
+
+# Do not build tools for iOS and Android regardless of the ENABLE_TOOLS build option
+if (NOT IOS AND NOT ANDROID AND ENABLE_TOOLS)
+    # Urho3D tools
+    add_subdirectory (AssetImporter)
+    add_subdirectory (OgreImporter)
+    add_subdirectory (PackageTool)
+    add_subdirectory (RampGenerator)
+    add_subdirectory (ScriptCompiler)
+    add_subdirectory (DocConverter)
+    
+    # Urho3D Non-OpenGL tools
+    if (NOT USE_OPENGL)
+        add_subdirectory (ShaderCompiler)
+    endif ()
+endif ()

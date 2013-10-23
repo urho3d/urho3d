@@ -83,6 +83,14 @@ if (NOT WIN32)
     add_definitions (-DUNIX)
 endif ()
 
+# Default library type is STATIC
+if (URHO3D_LIB_TYPE)
+    string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
+endif ()
+if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+    add_definitions (-DURHO3D_STATIC_DEFINE)
+endif ()
+
 # If using Windows and not OpenGL, find DirectX SDK include & library directories
 # Note: if a recent Windows SDK is installed instead, it will be possible to compile without;
 # therefore do not log a fatal error in that case
@@ -183,10 +191,6 @@ else ()
         set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
         set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
     endif ()
-endif ()
-
-if (URHO3D_BUILD_TYPE)
-    string (TOUPPER ${URHO3D_BUILD_TYPE} URHO3D_BUILD_TYPE)
 endif ()
 
 # Include CMake builtin module for building shared library support
@@ -307,51 +311,35 @@ endmacro ()
 
 # Macro for setting up a library target
 macro (setup_library)
-    add_library (${TARGET_NAME} ${LIB_TYPE} ${SOURCE_FILES})
+    add_library (${TARGET_NAME} ${ARGN} ${SOURCE_FILES})
     setup_target ()
 
-    if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT LIB_TYPE STREQUAL SHARED AND URHO3D_BUILD_TYPE MATCHES STATIC|SHARED)
-        set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
-        if (URHO3D_BUILD_TYPE STREQUAL SHARED)
-            set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
-        elseif (URHO3D_BUILD_TYPE STREQUAL STATIC)
-            set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_STATIC_DEFINE)
-        endif ()
-
-        if (MSVC)
-            # Specific to VS generator
-            # On VS2008 we need to add a backslash to the IntDir, on later VS it already exists
-            if (CMAKE_GENERATOR MATCHES "2008")
-                set (INTDIR_SLASH "\\")
-            else ()
-                set (INTDIR_SLASH "")
+    if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+        get_target_property (LIB_TYPE ${TARGET_NAME} TYPE)
+        # Only interested in static library type, i.e. exclude shared and module library types
+        if (LIB_TYPE MATCHES STATIC)
+            set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+            if (URHO3D_LIB_TYPE STREQUAL SHARED)
+                set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
             endif ()
-            if (USE_MKLINK)
+    
+            if (XCODE)
+                # Specific to Xcode generator
                 set (SYMLINK ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.lnk)
                 add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                    COMMAND rd \"${SYMLINK}\"
-                    COMMAND mklink /D \"${SYMLINK}\" \"$(ProjectDir)$(IntDir)\"
+                    COMMAND rm -f ${SYMLINK} && ln -s "$(OBJECT_FILE_DIR)-$(CURRENT_VARIANT)/$(CURRENT_ARCH)" ${SYMLINK}
                     COMMENT "Creating a symbolic link pointing to object file directory")
-            else ()
-                file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.dir)
-                add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                    COMMAND copy /B \"$(ProjectDir)$(IntDir)${INTDIR_SLASH}*.obj\" \"$(ProjectDir)CMakeFiles\\${TARGET_NAME}.dir\"
-                    COMMENT "Copying object files to a common location also used by Makefile generator")
             endif ()
-        elseif (XCODE)
-            # Specific to Xcode generator
-            set (SYMLINK ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.lnk)
-            add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                COMMAND rm -f ${SYMLINK} && ln -s "$(OBJECT_FILE_DIR)-$(CURRENT_VARIANT)/$(CURRENT_ARCH)" ${SYMLINK}
-                COMMENT "Creating a symbolic link pointing to object file directory")
         endif ()
     endif ()
 endmacro ()
 
 # Macro for setting up an executable target
 macro (setup_executable)
-    add_executable (${TARGET_NAME} ${EXE_TYPE} ${SOURCE_FILES})
+    add_executable (${TARGET_NAME} ${EXE_TYPE} ${SOURCE_FILES})   
+    define_dependency_libs (Urho3D_lib)
     setup_target ()
+    
     if (MSVC)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Bin\"
@@ -360,15 +348,14 @@ macro (setup_executable)
     elseif (IOS)
         set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
     else ()
-        get_target_property (EXECUTABLE_NAME ${TARGET_NAME} LOCATION)
         if (CMAKE_CROSSCOMPILING)
             file (MAKE_DIRECTORY ${PROJECT_ROOT_DIR}/Bin-CC)
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${EXECUTABLE_NAME} ${PROJECT_ROOT_DIR}/Bin-CC)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${PROJECT_ROOT_DIR}/Bin-CC)
             if (SCP_TO_TARGET)
-                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp ${EXECUTABLE_NAME} ${SCP_TO_TARGET} || exit 0)
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
             endif ()
         else ()
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${EXECUTABLE_NAME} ${PROJECT_ROOT_DIR}/Bin)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${PROJECT_ROOT_DIR}/Bin)
         endif ()
     endif ()
 endmacro ()
@@ -379,7 +366,7 @@ macro (setup_macosx_linker_flags LINKER_FLAGS)
     set (FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
     # LuaJIT specific - extra linker flags for linking against LuaJIT in 64-bit Mac OS X desktop build
     if (ENABLE_LUAJIT AND ENABLE_64BIT)
-        if (URHO3D_BUILD_TYPE STREQUAL SHARED)
+        if (URHO3D_LIB_TYPE STREQUAL SHARED)
             set (FLAGS "${FLAGS} -image_base 7fff04c4a000")
         else ()
             set (FLAGS "${FLAGS} -pagezero_size 10000 -image_base 100000000")
@@ -403,22 +390,21 @@ macro (setup_main_executable)
         set (SOURCE_FILES ${SOURCE_FILES} ${RESOURCE_FILES})
     endif ()
 
-    # Define external dependency libraries, for the convenience of other main target (not in Urho3D project) referencing Urho3D as external library
-    if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT TARGET_NAME STREQUAL Main)
-        define_dependency_libs (Main)
-    endif ()
-
     # Setup target
     if (ANDROID)
         # Add SDL native init function
-        if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
-            set (SOURCE_FILES ${SOURCE_FILES} ${PROJECT_SOURCE_DIR}/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+        if (CMAKE_PROJECT_NAME MATCHES Urho3D.*)
+            set (SOURCE_FILES ${SOURCE_FILES} ${PROJECT_ROOT_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+            if (TARGET_NAME STREQUAL Urho3D AND URHO3D_LIB_TYPE STREQUAL SHARED)
+                # Rename target name to avoid name clash
+                set (TARGET_NAME Urho3Dapp)
+            endif ()
         elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
             set (SOURCE_FILES ${SOURCE_FILES} $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         endif ()
         # Setup target as main shared library
-        set (LIB_TYPE SHARED)
-        setup_library ()
+        define_dependency_libs (Urho3D_lib)
+        setup_library (SHARED)
         # Copy other dependent shared libraries to Android library output path
         foreach(FILE ${ABSOLUTE_PATH_LIBS})
             get_filename_component (EXT ${FILE} EXT)
@@ -448,7 +434,7 @@ macro (setup_main_executable)
         endif ()
         setup_executable ()
     endif ()
-
+    
     if (XCODE)
         get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
         if (IOS)
@@ -480,7 +466,7 @@ endmacro ()
 # It works for both targets setup within Urho3D project and outside Urho3D project that uses Urho3D as external static/shared library
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
-    if (${TARGET} MATCHES SDL|Main)
+    if (${TARGET} MATCHES SDL|Urho3D_lib)
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
         elseif (APPLE)
@@ -496,7 +482,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # ThirdParty/kNet & ThirdParty/Civetweb external dependency
-    if (${TARGET} MATCHES Civetweb|kNet|Main)
+    if (${TARGET} MATCHES Civetweb|kNet|Urho3D_lib)
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} ws2_32)
         elseif (NOT ANDROID)
@@ -505,7 +491,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # ThirdParty/LuaJIT external dependency
-    if (ENABLE_LUAJIT AND ${TARGET} MATCHES LuaJIT|Main)
+    if (ENABLE_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D_lib)
         if (NOT WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dl m)
             if (NOT APPLE)
@@ -515,7 +501,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # Engine/Core external dependency
-    if (${TARGET} MATCHES Core|Main)
+    if (${TARGET} MATCHES Core|Urho3D_lib)
         if (WIN32)
             set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} winmm)
             if (ENABLE_MINIDUMPS)
@@ -527,7 +513,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # Engine/Graphics external dependency
-    if (${TARGET} MATCHES Graphics|Main)
+    if (${TARGET} MATCHES Graphics|Urho3D_lib)
         if (USE_OPENGL)
             if (WIN32)
                 set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} opengl32)
@@ -541,13 +527,18 @@ macro (define_dependency_libs TARGET)
         endif ()
     endif ()
 
-    # Main external dependency
-    if (${TARGET} STREQUAL Main AND URHO3D_LIBRARIES)
+    # Urho3D_lib external dependency
+    if (${TARGET} STREQUAL Urho3D_lib AND URHO3D_LIBRARIES)
         set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${URHO3D_LIBRARIES})
     endif ()
 
     if (LINK_LIBS_ONLY)
-        list (SORT LINK_LIBS_ONLY)
-        list (REMOVE_DUPLICATES LINK_LIBS_ONLY)
+        remove_duplicate (LINK_LIBS_ONLY)
     endif ()
+endmacro ()
+
+# Macro for sorting and removing duplicate value
+macro (remove_duplicate LIST_NAME)
+    list (SORT ${LIST_NAME})
+    list (REMOVE_DUPLICATES ${LIST_NAME})
 endmacro ()

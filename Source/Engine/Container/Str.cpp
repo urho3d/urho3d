@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "Str.h"
 #include "Swap.h"
 

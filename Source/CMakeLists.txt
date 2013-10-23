@@ -49,131 +49,64 @@ if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
     add_definitions (-DGLEW_NO_GLU)
 endif ()
 
-# Add global include directories for export header and SDL header
-include_directories (${CMAKE_BINARY_DIR}/Engine ThirdParty/SDL/include)
-
-# Setup the compiler flags for building shared library
-if (URHO3D_BUILD_TYPE STREQUAL SHARED)
-    # Hide the symbols that are not explicitly marked for export
-    add_compiler_export_flags ()
-    # Use PIC on platforms that support it 
-    set (CMAKE_POSITION_INDEPENDENT_CODE true)
-endif ()
-
-# Add definition for Lua JIT
+# Add definition for Lua and LuaJIT
 if (ENABLE_LUAJIT)
     add_definitions (-DENABLE_LUAJIT)
     set (JIT "JIT")
     # Implied ENABLE_LUA
     set (ENABLE_LUA 1)
 endif ()
-
-# Add targets
-add_subdirectory (Engine/Audio)
-add_subdirectory (Engine/Container)
-add_subdirectory (Engine/Core)
-add_subdirectory (Engine/Engine)
-add_subdirectory (Engine/Graphics)
-add_subdirectory (Engine/Input)
-add_subdirectory (Engine/IO)
-add_subdirectory (Engine/Math)
-add_subdirectory (Engine/Navigation)
-add_subdirectory (Engine/Network)
-add_subdirectory (Engine/Physics)
-add_subdirectory (Engine/Resource)
-add_subdirectory (Engine/Scene)
-add_subdirectory (Engine/Script)
-add_subdirectory (Engine/UI)
-add_subdirectory (ThirdParty/AngelScript)
-add_subdirectory (ThirdParty/Bullet)
-add_subdirectory (ThirdParty/Civetweb)
-add_subdirectory (ThirdParty/Detour)
-add_subdirectory (ThirdParty/FreeType)
-add_subdirectory (ThirdParty/JO)
-add_subdirectory (ThirdParty/kNet)
-add_subdirectory (ThirdParty/LZ4)
-add_subdirectory (ThirdParty/PugiXml)
-add_subdirectory (ThirdParty/Recast)
-add_subdirectory (ThirdParty/SDL)
-add_subdirectory (ThirdParty/StanHull)
-add_subdirectory (ThirdParty/STB)
-
-# Alternative Lua bindings target
 if (ENABLE_LUA)
     add_definitions (-DENABLE_LUA)
+endif ()
+
+# Add global include directories for export header and SDL header
+include_directories (${CMAKE_BINARY_DIR}/Engine ThirdParty/SDL/include)
+
+# Setup the compiler flags for building shared library
+if (URHO3D_LIB_TYPE STREQUAL SHARED)
+    # Hide the symbols that are not explicitly marked for export
+    add_compiler_export_flags ()
+    # Use PIC on platforms that support it 
+    set (CMAKE_POSITION_INDEPENDENT_CODE true)
+endif ()
+
+# Add targets
+foreach (SOURCE Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene Script UI)
+    add_subdirectory (Engine/${SOURCE})
+endforeach ()
+foreach (TARGET AngelScript Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
+    add_subdirectory (ThirdParty/${TARGET})
+endforeach ()
+if (ENABLE_LUA)
+    add_subdirectory (Engine/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})
     add_subdirectory (ThirdParty/tolua++/src/lib)
-    add_subdirectory (Extras/LuaScript)
+endif ()
+if (NOT IOS AND NOT ANDROID AND NOT RASPI)
+    if (USE_OPENGL)
+        add_subdirectory (ThirdParty/GLEW)
+    endif ()
+    add_subdirectory (ThirdParty/LibCpuId)
 endif ()
 
-if (NOT IOS AND NOT ANDROID)
-    if (ENABLE_LUA)
-        add_subdirectory (ThirdParty/tolua++/src/bin)
-    endif ()
-    if (NOT RASPI)
-        if (USE_OPENGL)
-            add_subdirectory (ThirdParty/GLEW)
-        endif ()
-        add_subdirectory (ThirdParty/LibCpuId)
-    endif ()
-endif ()    
+# Urho3D game engine library targets
+add_subdirectory (Engine)
 
-# Urho3D build type is mutually exclusive due to potential different visibility (export) attribute
-if (URHO3D_BUILD_TYPE MATCHES STATIC|SHARED)
-    # Urho3D library
-    add_subdirectory (Engine)
-else ()
-    # Urho3D script host application
-    add_subdirectory (Tools/Urho3D)
+# Urho3D tool targets
+add_subdirectory (Tools)
 
-    # Do not build tools for embedded system unless it is explicitly enabled
-    if (NOT DEFINED ENABLE_TOOLS)
-        if (RASPI)
-            set (ENABLE_TOOLS 0)
-        else ()
-            set (ENABLE_TOOLS 1)
-        endif ()
-    endif ()
-    
-    if (NOT IOS AND NOT ANDROID)
-        # Urho3D tools
-        if (ENABLE_TOOLS)
-            add_subdirectory (ThirdParty/Assimp)
-            add_subdirectory (Tools/AssetImporter)
-            add_subdirectory (Tools/OgreImporter)
-            add_subdirectory (Tools/PackageTool)
-            add_subdirectory (Tools/RampGenerator)
-            add_subdirectory (Tools/ScriptCompiler)
-            add_subdirectory (Tools/DocConverter)
-        endif ()
-    
-        # Urho3D samples
-        if (ENABLE_SAMPLES)
-            add_subdirectory (Samples)
-        endif ()
-        
-        # Urho3D extras
-        if (ENABLE_EXTRAS)
-            add_subdirectory (Extras/OgreBatchConverter)
-        endif ()
-    endif ()
-    
-    # Urho3D non-GL tools
-    if (NOT USE_OPENGL AND ENABLE_TOOLS)
-        add_subdirectory (ThirdParty/MojoShader)
-        add_subdirectory (Tools/ShaderCompiler)
-    endif ()
+# Urho3D samples
+# Samples are built on iOS platform too when enabled
+# Although samples should also work for Android platform, currently there is no available mechanism to package each sample apps into individual *.apk
+if (NOT ANDROID AND ENABLE_SAMPLES)
+    add_subdirectory (Samples)
 endif ()
 
-# Generate platform specific export header file automatically
-if (NOT URHO3D_BUILD_TYPE STREQUAL URHO3D_EXPORTS_BUILD_TYPE OR ${CMAKE_SOURCE_DIR}/Engine/Urho3D.h.in IS_NEWER_THAN ${CMAKE_BINARY_DIR}/Engine/Urho3D.h)
-    set_target_properties (Urho3D PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
-    generate_export_header (Urho3D EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Engine/Urho3D.h)
-    set (URHO3D_EXPORTS_BUILD_TYPE ${URHO3D_BUILD_TYPE} CACHE INTERNAL "Build type when Urho3D export header was last generated")
-    
-    # Append Urho3D license notice to the export header file
-    file (READ ${CMAKE_BINARY_DIR}/Engine/Urho3D.h EXPORT_DEFINE)
-    configure_file (${CMAKE_SOURCE_DIR}/Engine/Urho3D.h.in ${CMAKE_BINARY_DIR}/Engine/Urho3D.h) 
+# Do not build extras for iOS and Android regardless of its build option 
+if (NOT IOS AND NOT ANDROID AND ENABLE_EXTRAS)   
+    # Urho3D extras
+    add_subdirectory (Extras)
 endif ()
 
 # Generate platform specific Doxyfile automatically

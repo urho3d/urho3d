@@ -20,18 +20,10 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME Engine)
-
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${H_FILES} PARENT_SCOPE)
 
 # Define dependency libs
-set (LIBS ../Audio ../Container ../Core ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource ../Scene ../UI)
-set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include)
-
-# Setup target
-enable_pch ()
-setup_library ()
+set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/Bullet/src ../ThirdParty/kNet/include PARENT_SCOPE)

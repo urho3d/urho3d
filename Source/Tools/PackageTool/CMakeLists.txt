@@ -27,7 +27,7 @@ set (TARGET_NAME PackageTool)
 set (SOURCE_FILES PackageTool.cpp)
 
 # Define dependency libs
-set (LIBS ../../Engine/Container ../../Engine/Core ../../Engine/IO ../../Engine/Math ../../Engine/Resource ../../ThirdParty/LZ4)
+set (LIBS ../../ThirdParty/LZ4)
 
 # Setup target
 setup_executable ()

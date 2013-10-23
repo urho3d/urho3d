@@ -125,6 +125,6 @@ private:
 };
 
 /// Register Audio library objects.
-void RegisterAudioLibrary(Context* context);
+void URHO3D_API RegisterAudioLibrary(Context* context);
 
 }

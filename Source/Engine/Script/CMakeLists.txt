@@ -20,19 +20,12 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME Script)
-
 # Define source files
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${H_FILES} PARENT_SCOPE)
 
 # Define dependency libs
-set (LIBS ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics
-    ../Resource ../Scene ../UI ../../ThirdParty/AngelScript/include)
-set (INCLUDE_DIRS_ONLY ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include)
+set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/AngelScript/include PARENT_SCOPE)
+set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/Bullet/src ../ThirdParty/kNet/include PARENT_SCOPE)
 
-# Setup target
-enable_pch ()
-setup_library ()

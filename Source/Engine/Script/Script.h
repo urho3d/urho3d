@@ -112,6 +112,6 @@ private:
 };
 
 /// Register Script library objects.
-void RegisterScriptLibrary(Context* context);
+void URHO3D_API RegisterScriptLibrary(Context* context);
 
 }
