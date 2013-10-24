@@ -199,6 +199,15 @@ include (GenerateExportHeader)
 # Determine the project root directory
 get_filename_component (PROJECT_ROOT_DIR ${PROJECT_SOURCE_DIR} PATH)
 
+# Reference supported build options that are potentially not being referenced due to platform or build type branching to suppress "unused variable" warning
+if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND
+    ENABLE_MINIDUMPS AND USE_MKLINK AND USE_STATIC_RUNTIME AND
+    ENABLE_64BIT AND
+    SCP_TO_TARGET AND
+    ANDROID_ABI AND
+    ENABLE_SAFE_LUA)
+endif()
+
 # Override builtin macro and function to suit our need, always generate header file regardless of target type...
 macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
     set (DEFINE_DEPRECATED)

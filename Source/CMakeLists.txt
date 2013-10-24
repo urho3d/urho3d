@@ -119,11 +119,3 @@ if (NOT USE_OPENGL EQUAL DOXYFILE_USE_OPENGL OR ${PROJECT_ROOT_DIR}/Docs/Doxyfil
     endif ()
     configure_file (${PROJECT_ROOT_DIR}/Docs/Doxyfile.in ${PROJECT_ROOT_DIR}/Doxyfile) 
 endif ()
-
-# Reference supported build options that are potentially not being referenced due to platform or build type branching to suppress "unused variable" warning
-if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND
-    ENABLE_MINIDUMPS AND USE_MKLINK AND USE_STATIC_RUNTIME AND
-    SCP_TO_TARGET AND
-    ANDROID_ABI AND
-    ENABLE_SAFE_LUA)
-endif()
