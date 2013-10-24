@@ -306,7 +306,7 @@ Copy the "CMake" sub-directory from Urho3D project to your own project so that C
 
 Since your CMake build script include the Urho3D-Cmake-magic module, your project also now has the cross-platform build capability.
 
-When both Urho3D static and shared library are built and available in the Urho3D project build tree, the Urho3D shared library takes precedence over static library to be linked against your own project. You can modify the CMAKE_FIND_LIBRARY_SUFFIXES global variable to change this behaviour.
+When both Urho3D static and shared library are built and available in the Urho3D project build tree, the Urho3D static library takes precedence over shared library to be linked against your own project. Use the URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be linked against.
 
 
 \page Structure Overall structure
