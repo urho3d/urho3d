@@ -28,17 +28,20 @@
 #  URHO3D_LIBRARIES
 #
 
-set (URHO3D_FOUND 0)
-
-# Urho3D prefers static library type by default while CMake prefers shared one, so we need to change CMake preference to agree with Urho3D
-if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
-    list (REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
+if (URHO3D_FOUND)
+    return ()
 endif ()
+set (URHO3D_FOUND 0)
 
 # If the URHO3D_LIB_TYPE build option changes then invalidate the found library cache
 if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE)
     unset (URHO3D_LIBRARIES CACHE)
     set (URHO3D_FOUND_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type when Urho3D library was last found")
+
+    # Urho3D prefers static library type by default while CMake prefers shared one, so we need to change CMake preference to agree with Urho3D
+    if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+        list (REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
+    endif ()
 endif ()
 
 set (URHO3D_LIB_NAMES Urho3D)
