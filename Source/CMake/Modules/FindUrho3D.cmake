@@ -31,7 +31,6 @@
 if (URHO3D_FOUND)
     return ()
 endif ()
-set (URHO3D_FOUND 0)
 
 # If the URHO3D_LIB_TYPE build option changes then invalidate the found library cache
 if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_FOUND_LIB_TYPE)
