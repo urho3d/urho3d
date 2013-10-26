@@ -118,6 +118,22 @@ foreach (ENGINE_DIR ${ENGINE_DIRS})
     list (APPEND INCLUDE_DIRS_ONLY ${ENGINE_DIR})
 endforeach ()
 
+# Setup source groups, Visual Studio only
+if (MSVC)
+    foreach (ENGINE_DIR ${ENGINE_DIRS})
+        get_filename_component (ENGINE_DIR ${ENGINE_DIR} PATH)
+        if (${ENGINE_DIR} MATCHES Graphics)
+            file (GLOB GROUP_H_FILES ${ENGINE_DIR}/*.h ${ENGINE_DIR}/${GRAPHICS_SYS_DIR}/*.h)
+            file (GLOB GROUP_CPP_FILES ${ENGINE_DIR}/*.cpp ${ENGINE_DIR}/${GRAPHICS_SYS_DIR}/*.cpp)
+        else ()
+            file (GLOB GROUP_H_FILES ${ENGINE_DIR}/*.h)
+            file (GLOB GROUP_CPP_FILES ${ENGINE_DIR}/*.cpp)
+        endif ()
+        source_group("Header Files\\${ENGINE_DIR}" FILES ${GROUP_H_FILES})
+        source_group("Source Files\\${ENGINE_DIR}" FILES ${GROUP_CPP_FILES})
+    endforeach ()
+endif ()
+
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
 adjust_library_name ()
