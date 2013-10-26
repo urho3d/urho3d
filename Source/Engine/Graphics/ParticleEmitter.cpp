@@ -587,7 +587,7 @@ void ParticleEmitter::SetMinVelocity(float velocity)
 
 void ParticleEmitter::SetMaxVelocity(float velocity)
 {
-    velocityMin_ = velocity;
+    velocityMax_ = velocity;
     MarkNetworkUpdate();
 }
 
