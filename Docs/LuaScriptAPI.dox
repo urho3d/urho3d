@@ -1260,6 +1260,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
+- void SetFaceCamera(bool enable)
 - void SetAnimationLodBias(float bias)
 - void Commit()
 - Material* GetMaterial() const
@@ -1268,6 +1269,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
+- bool GetFaceCamera() const
 - float GetAnimationLodBias() const
 
 Properties:
@@ -1277,6 +1279,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
+- bool faceCamera
 - float animationLodBias
 
 ### Camera : Component

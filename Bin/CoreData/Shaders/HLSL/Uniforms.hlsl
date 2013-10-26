@@ -1,6 +1,7 @@
 // Vertex shader uniforms
 uniform float3 cAmbientStartColor;
 uniform float3 cAmbientEndColor;
+uniform float3x3 cBillboardRot;
 uniform float3 cCameraPos;
 uniform float3x3 cCameraRot;
 uniform float4 cDepthMode;
@@ -13,8 +14,6 @@ uniform float4x3 cModel;
 uniform float4x4 cViewProj;
 uniform float4 cUOffset;
 uniform float4 cVOffset;
-uniform float3 cViewRightVector;
-uniform float3 cViewUpVector;
 uniform float4x3 cZone;
 uniform float4x4 cLightMatrices[4];
 #ifdef SKINNED

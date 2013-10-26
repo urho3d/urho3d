@@ -1,5 +1,6 @@
 uniform vec3 cAmbientStartColor;
 uniform vec3 cAmbientEndColor;
+uniform mat3 cBillboardRot;
 uniform vec3 cCameraPos;
 uniform mat3 cCameraRot;
 uniform vec4 cDepthMode;
@@ -12,8 +13,6 @@ uniform mat4 cModel;
 uniform mat4 cViewProj;
 uniform vec4 cUOffset;
 uniform vec4 cVOffset;
-uniform vec3 cViewRightVector;
-uniform vec3 cViewUpVector;
 uniform mat4 cZone;
 #ifndef GL_ES
     uniform mat4 cLightMatrices[4];

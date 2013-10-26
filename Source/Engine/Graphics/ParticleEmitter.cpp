@@ -118,6 +118,7 @@ void ParticleEmitter::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Face Camera", GetFaceCamera, SetFaceCamera, bool, true, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Time To Live Min", timeToLiveMin_, DEFAULT_TIME_TO_LIVE, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Time To Live Max", timeToLiveMax_, DEFAULT_TIME_TO_LIVE, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_VECTOR2, "Particle Size Min", sizeMin_, DEFAULT_PARTICLE_SIZE, AM_DEFAULT);

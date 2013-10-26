@@ -18,16 +18,18 @@ class BillboardSet : public Drawable
     void SetRelative(bool enable);
     void SetScaled(bool enable);
     void SetSorted(bool enable);
+    void SetFaceCamera(bool enable);
     void SetAnimationLodBias(float bias);
-    
+
     void Commit();
-    
+
     Material* GetMaterial() const;
     unsigned GetNumBillboards() const;
     Billboard* GetBillboard(unsigned index);
     bool IsRelative() const;
     bool IsScaled() const;
     bool IsSorted() const;
+    bool GetFaceCamera() const;
     float GetAnimationLodBias() const;
     
     tolua_property__get_set Material* material;
@@ -35,5 +37,6 @@ class BillboardSet : public Drawable
     tolua_property__is_set bool relative;
     tolua_property__is_set bool scaled;
     tolua_property__is_set bool sorted;
+    tolua_property__get_set bool faceCamera;
     tolua_property__get_set float animationLodBias;
 };

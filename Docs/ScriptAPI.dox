@@ -3292,6 +3292,7 @@ Properties:
 - bool relative
 - bool sorted
 - bool scaled
+- bool faceCamera
 - float animationLodBias
 - Billboard@[] billboards (readonly)
 - Zone@ zone (readonly)

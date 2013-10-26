@@ -57,6 +57,7 @@ BillboardSet::BillboardSet(Context* context) :
     relative_(true),
     scaled_(true),
     sorted_(false),
+    faceCamera_(true),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context_)),
     indexBuffer_(new IndexBuffer(context_)),
@@ -72,6 +73,7 @@ BillboardSet::BillboardSet(Context* context) :
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
     batches_[0].geometryType_ = GEOM_BILLBOARD;
+    batches_[0].worldTransform_ = &transforms_[0];
 }
 
 BillboardSet::~BillboardSet()
@@ -87,6 +89,7 @@ void BillboardSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Face Camera", GetFaceCamera, SetFaceCamera, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
@@ -128,7 +131,10 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = 0.0f;
     
     batches_[0].distance_ = distance_;
-    batches_[0].worldTransform_ = relative_ ? &node_->GetWorldTransform() : &Matrix3x4::IDENTITY;
+    batches_[0].numWorldTransforms_ = faceCamera_ ? 1 : 2;
+    transforms_[0] = relative_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+    if (!faceCamera_)
+        transforms_[1] = node_->GetWorldTransform();
 }
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
@@ -197,6 +203,12 @@ void BillboardSet::SetSorted(bool enable)
 {
     sorted_ = enable;
     Commit();
+}
+
+void BillboardSet::SetFaceCamera(bool enable)
+{
+    faceCamera_ = enable;
+    MarkNetworkUpdate();
 }
 
 void BillboardSet::SetAnimationLodBias(float bias)

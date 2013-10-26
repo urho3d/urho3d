@@ -198,6 +198,7 @@ enum ShaderType
 // Inbuilt shader parameters.
 extern StringHash VSP_AMBIENTSTARTCOLOR;
 extern StringHash VSP_AMBIENTENDCOLOR;
+extern StringHash VSP_BILLBOARDROT;
 extern StringHash VSP_CAMERAPOS;
 extern StringHash VSP_CAMERAROT;
 extern StringHash VSP_DEPTHMODE;
@@ -210,8 +211,6 @@ extern StringHash VSP_MODEL;
 extern StringHash VSP_VIEWPROJ;
 extern StringHash VSP_UOFFSET;
 extern StringHash VSP_VOFFSET;
-extern StringHash VSP_VIEWRIGHTVECTOR;
-extern StringHash VSP_VIEWUPVECTOR;
 extern StringHash VSP_ZONE;
 extern StringHash VSP_LIGHTMATRICES;
 extern StringHash VSP_SKINMATRICES;

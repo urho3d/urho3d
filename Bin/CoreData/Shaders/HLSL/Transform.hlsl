@@ -30,12 +30,12 @@ float GetDepth(float4 clipPos)
 
 float3 GetBillboardPos(float4 iPos, float2 iSize, float4x3 modelMatrix)
 {
-    return mul(iPos, modelMatrix) + iSize.x * cViewRightVector + iSize.y * cViewUpVector;
+    return mul(iPos, modelMatrix) + mul(float3(iSize.x, iSize.y, 0.0), cBillboardRot);
 }
 
 float3 GetBillboardNormal()
 {
-    return float3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
+    return float3(-cBillboardRot[2][0], -cBillboardRot[2][1], -cBillboardRot[2][2]);
 }
 
 #if defined(SKINNED)

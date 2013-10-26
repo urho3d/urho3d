@@ -214,7 +214,6 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     unsigned cameraHash = overrideView_ ? (unsigned)(size_t)camera_ + 4 : (unsigned)(size_t)camera_;
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<void*>(cameraHash)))
     {
-        // Calculate camera rotation just once
         Matrix3 cameraWorldRotation = cameraNode->GetWorldRotation().RotationMatrix();
         
         graphics->SetShaderParameter(VSP_CAMERAPOS, cameraNode->GetWorldPosition());
@@ -257,9 +256,6 @@ void Batch::Prepare(View* view, bool setModelTransform) const
             graphics->SetShaderParameter(VSP_VIEWPROJ, projection);
         else
             graphics->SetShaderParameter(VSP_VIEWPROJ, projection * camera_->GetView());
-        
-        graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, cameraWorldRotation * Vector3::RIGHT);
-        graphics->SetShaderParameter(VSP_VIEWUPVECTOR, cameraWorldRotation * Vector3::UP);
     }
     
     // Set viewport shader parameters
@@ -298,6 +294,15 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         }
         else
             graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
+        
+        // Set the orientation for billboards, either from the object itself or from the camera
+        if (geometryType_ == GEOM_BILLBOARD)
+        {
+            if (numWorldTransforms_ > 1)
+                graphics->SetShaderParameter(VSP_BILLBOARDROT, worldTransform_[1].RotationMatrix());
+            else
+                graphics->SetShaderParameter(VSP_BILLBOARDROT, cameraNode->GetWorldRotation().RotationMatrix());
+        }
     }
     
     // Set zone-related shader parameters

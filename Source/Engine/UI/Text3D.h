@@ -88,7 +88,7 @@ public:
     void SetColor(Corner corner, const Color& color);
     /// Set opacity.
     void SetOpacity(float opacity);
-    /// Set whether to face camera automatically.
+    /// Set whether to face the camera automatically.
     void SetFaceCamera(bool enable);
     
     /// Return font.
@@ -127,7 +127,7 @@ public:
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
     float GetOpacity() const;
-    /// Return whether faces camera automatically.
+    /// Return whether faces the camera automatically.
     bool GetFaceCamera() const { return faceCamera_; }
     
     /// Set font attribute.

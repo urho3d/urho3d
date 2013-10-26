@@ -61,12 +61,12 @@ float GetDepth(vec4 clipPos)
 
 vec3 GetBillboardPos(vec4 iPos, vec2 iSize, mat4 modelMatrix)
 {
-    return (modelMatrix * iPos).xyz + iSize.x * cViewRightVector + iSize.y * cViewUpVector;
+    return (modelMatrix * iPos).xyz + cBillboardRot * vec3(iSize.x, iSize.y, 0.0);
 }
 
 vec3 GetBillboardNormal()
 {
-    return vec3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
+    return vec3(-cBillboardRot[2][0], -cBillboardRot[2][1], -cBillboardRot[2][2]);
 }
 
 // Note: the skinning/instancing model matrix is a transpose, so the matrix multiply order must be swapped

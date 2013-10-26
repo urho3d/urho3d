@@ -31,6 +31,7 @@ namespace Urho3D
 
 StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
 StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
+StringHash VSP_BILLBOARDROT("BillboardRot");
 StringHash VSP_CAMERAPOS("CameraPos");
 StringHash VSP_CAMERAROT("CameraRot");
 StringHash VSP_DEPTHMODE("DepthMode");
@@ -43,8 +44,6 @@ StringHash VSP_MODEL("Model");
 StringHash VSP_VIEWPROJ("ViewProj");
 StringHash VSP_UOFFSET("UOffset");
 StringHash VSP_VOFFSET("VOffset");
-StringHash VSP_VIEWRIGHTVECTOR("ViewRightVector");
-StringHash VSP_VIEWUPVECTOR("ViewUpVector");
 StringHash VSP_ZONE("Zone");
 StringHash VSP_LIGHTMATRICES("LightMatrices");
 StringHash VSP_SKINMATRICES("SkinMatrices");
