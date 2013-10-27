@@ -837,13 +837,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 break;
 
             #ifdef ANDROID
-            case SDL_WINDOWEVENT_FOCUS_LOST:
-                // Mark GPU objects lost
-                graphics_->Release(false, false);
-                break;
-
             case SDL_WINDOWEVENT_FOCUS_GAINED:
-                // Restore GPU objects
+                // Restore GPU objects to the new GL context
                 graphics_->Restore();
                 break;
             #endif

@@ -418,7 +418,7 @@ private:
     /// Check FBO completeness.
     bool CheckFramebuffer();
     /// Cleanup unused and unbound FBO's.
-    void CleanupFramebuffers(bool contextLost);
+    void CleanupFramebuffers(bool force = false);
     /// Reset cached rendering state.
     void ResetCachedState();
     /// Initialize texture unit mappings.

@@ -117,19 +117,23 @@ void Texture2D::Release()
 {
     if (object_)
     {
-        if (!graphics_ || graphics_->IsDeviceLost())
+        if (!graphics_)
             return;
         
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        if (!graphics_->IsDeviceLost())
         {
-            if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+            for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+            {
+                if (graphics_->GetTexture(i) == this)
+                    graphics_->SetTexture(i, 0);
+            }
+            
+            glDeleteTextures(1, &object_);
         }
         
         if (renderSurface_)
             renderSurface_->Release();
         
-        glDeleteTextures(1, &object_);
         object_ = 0;
     }
     else

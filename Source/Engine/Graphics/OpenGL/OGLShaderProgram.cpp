@@ -64,17 +64,21 @@ void ShaderProgram::Release()
         if (!graphics_)
             return;
         
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-            useTextureUnit_[i] = false;
-        shaderParameters_.Clear();
+        if (!graphics_->IsDeviceLost())
+        {
+            if (graphics_->GetShaderProgram() == this)
+                graphics_->SetShaders(0, 0);
+            
+            glDeleteProgram(object_);
+        }
         
-        if (graphics_->GetShaderProgram() == this)
-            graphics_->SetShaders(0, 0);
-        
-        glDeleteProgram(object_);
         object_ = 0;
         linked_ = false;
         linkerOutput_.Clear();
+        shaderParameters_.Clear();
+        
+        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+            useTextureUnit_[i] = false;
     }
 }
 

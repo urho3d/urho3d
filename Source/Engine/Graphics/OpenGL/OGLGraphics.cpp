@@ -533,7 +533,7 @@ void Graphics::EndFrame()
     SDL_GL_SwapWindow(impl_->window_);
     
     // Clean up FBO's that have not been used for a long time, and too large scratch buffers
-    CleanupFramebuffers(false);
+    CleanupFramebuffers();
     CleanupScratchBuffers();
 }
 
@@ -2146,6 +2146,17 @@ void Graphics::Restore()
     if (!impl_->window_)
         return;
     
+    #ifdef ANDROID
+    // On Android the context may be lost behind the scenes as the application is minimized
+    if (impl_->context_ && !SDL_GL_GetCurrentContext())
+    {
+        impl_->context_ = 0;
+        // Mark GPU objects lost without a current context. In this case they just mark their internal state lost
+        // but do not perform OpenGL commands to delete the GL objects
+        Release(false, false);
+    }
+    #endif
+    
     // Ensure first that the context exists
     if (!impl_->context_)
     {
@@ -2621,15 +2632,15 @@ bool Graphics::CheckFramebuffer()
     return glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT;
 }
 
-void Graphics::CleanupFramebuffers(bool contextLost)
+void Graphics::CleanupFramebuffers(bool force)
 {
-    if (!contextLost)
+    if (!IsDeviceLost())
     {
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
             i != impl_->frameBuffers_.End();)
         {
-            if (i->second_.fbo_ != impl_->boundFbo_ && i->second_.useTimer_.GetMSec(false) >
-                MAX_FRAMEBUFFER_AGE)
+            if (i->second_.fbo_ != impl_->boundFbo_ && (force || i->second_.useTimer_.GetMSec(false) >
+                MAX_FRAMEBUFFER_AGE))
             {
                 glDeleteFramebuffersEXT(1, &i->second_.fbo_);
                 i = impl_->frameBuffers_.Erase(i);
