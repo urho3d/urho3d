@@ -29,26 +29,28 @@ if (WIN32)
     file (GLOB SYS_C_FILES
         src/audio/directsound/*.c src/haptic/${HAPTIC_DRIVER}/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c
         src/power/windows/*.c src/thread/windows/*.c src/thread/generic/SDL_syscond.c src/timer/windows/*.c src/video/windows/*.c src/joystick/dummy/*.c
+        src/filesystem/windows/*.c
     )
 elseif (IOS)
     file (GLOB SYS_C_FILES
         src/audio/coreaudio/*.c src/file/cocoa/*.m src/joystick/iphoneos/*.m src/loadso/dlopen/*.c src/power/uikit/*.m
         src/thread/pthread/*.c src/timer/unix/*.c src/video/uikit/*.m src/video/uikit/*.c src/haptic/dummy/*.c
+        src/filesystem/cocoa/*.m
     )
 elseif (APPLE)
     file (GLOB SYS_C_FILES
         src/audio/coreaudio/*.c src/file/cocoa/*.m src/haptic/darwin/*.c src/joystick/darwin/*.c src/loadso/dlopen/*.c
-        src/power/macosx/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m
+        src/power/macosx/*.c src/thread/pthread/*.c src/timer/unix/*.c src/video/cocoa/*.m src/filesystem/cocoa/*.m
     )
 elseif (ANDROID)
     file (GLOB SYS_C_FILES
         src/audio/android/*.c src/core/android/*.c src/joystick/android/*.c src/loadso/dlopen/*.c src/power/android/*.c
-        src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c src/haptic/dummy/*.c
+        src/thread/pthread/*.c src/timer/unix/*.c src/video/android/*.c src/haptic/dummy/*.c src/filesystem/dummy/*.c
     )
 else ()
     # On Linux, make sure development libraries exist, and use their include file directories  
     if (RASPI)
-        file (GLOB VIDEO_DRIVER_C_FILES src/video/raspi/*.c)
+        file (GLOB VIDEO_DRIVER_C_FILES src/video/raspberry/*.c)
     else ()
         find_package (OpenGL REQUIRED)
         include_directories (${OpenGL_INCLUDE_DIRS})
@@ -92,7 +94,7 @@ else ()
 
     file (GLOB SYS_C_FILES
         src/audio/alsa/*.c src/audio/dma/*.c src/audio/dsp/*.c src/haptic/linux/*.c src/joystick/linux/*.c src/loadso/dlopen/*.c
-        src/power/linux/*.c src/thread/pthread/*.c src/timer/unix/*.c
+        src/power/linux/*.c src/thread/pthread/*.c src/timer/unix/*.c src/filesystem/unix/*.c
     )
     set (SYS_C_FILES ${SYS_C_FILES} ${VIDEO_DRIVER_C_FILES})
 endif ()

@@ -671,6 +671,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_FINGERDOWN:
+        if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = touches_[touchID];
@@ -693,6 +694,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_FINGERUP:
+        if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = touches_[touchID];
@@ -713,6 +715,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_FINGERMOTION:
+        if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = touches_[touchID];

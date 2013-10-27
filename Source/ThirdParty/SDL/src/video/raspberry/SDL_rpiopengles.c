@@ -18,17 +18,25 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Created by Yao Wei Tjong for Urho3D
-
 #include "SDL_config.h"
 
-#ifndef _SDL_raspiwindow_h
-#define _SDL_raspiwindow_h
+#if SDL_VIDEO_DRIVER_RPI && SDL_VIDEO_OPENGL_EGL
 
-extern int RASPI_CreateWindow(_THIS, SDL_Window * window);
-extern void RASPI_DestroyWindow(_THIS, SDL_Window * window);
+#include "SDL_rpivideo.h"
+#include "SDL_rpiopengles.h"
 
-#endif /* _SDL_raspiwindow_h */
+/* EGL implementation of SDL OpenGL support */
+
+int
+RPI_GLES_LoadLibrary(_THIS, const char *path) {
+    return SDL_EGL_LoadLibrary(_this, path, EGL_DEFAULT_DISPLAY);
+}
+
+SDL_EGL_CreateContext_impl(RPI)
+SDL_EGL_SwapWindow_impl(RPI)
+SDL_EGL_MakeCurrent_impl(RPI)
+
+#endif /* SDL_VIDEO_DRIVER_RPI && SDL_VIDEO_OPENGL_EGL */
 
 /* vi: set ts=4 sw=4 expandtab: */
+
