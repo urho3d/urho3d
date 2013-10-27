@@ -284,6 +284,12 @@ public class SDLActivity extends Activity {
         return mSingleton.sendCommand(COMMAND_CHANGE_TITLE, title);
     }
 
+    // Urho3D: added function
+    public static void finishActivity()
+    {
+        mSingleton.sendCommand(COMMAND_FINISH, null);
+    }
+
     public static boolean sendMessage(int command, int param) {
         return mSingleton.sendCommand(command, Integer.valueOf(param));
     }
