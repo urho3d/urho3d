@@ -37,10 +37,11 @@ void android_egl_context_backup();
 void android_egl_context_restore();
 
 void 
-android_egl_context_restore() 
+android_egl_context_restore()
 {
     SDL_WindowData *data = (SDL_WindowData *) Android_Window->driverdata;
-    if (SDL_GL_MakeCurrent(Android_Window, (SDL_GLContext) data->egl_context) < 0) {
+    // Urho3D: make sure there is a valid stored context to restore
+    if (data->egl_context && SDL_GL_MakeCurrent(Android_Window, (SDL_GLContext) data->egl_context) < 0) {
         // Urho3D: if the old context could not be restored, leave it to the Graphics subsystem to create a new one
         data->egl_context = NULL;
     }

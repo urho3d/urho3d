@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "SDL_config.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
@@ -42,8 +45,9 @@ void
 Android_GLES_SwapWindow(_THIS, SDL_Window * window)
 {
     /* FIXME: These two functions were in the Java code, do we really need them? */
-    _this->egl_data->eglWaitNative(EGL_CORE_NATIVE_ENGINE);
-    _this->egl_data->eglWaitGL();
+    // Urho3D: disabled
+    //_this->egl_data->eglWaitNative(EGL_CORE_NATIVE_ENGINE);
+    //_this->egl_data->eglWaitGL();
     SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);
 }
 
