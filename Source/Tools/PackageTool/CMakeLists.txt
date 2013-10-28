@@ -24,7 +24,7 @@
 set (TARGET_NAME PackageTool)
 
 # Define source files
-set (SOURCE_FILES PackageTool.cpp)
+define_source_files ()
 
 # Define dependency libs
 set (LIBS ../../ThirdParty/LZ4)

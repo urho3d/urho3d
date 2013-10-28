@@ -72,9 +72,6 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Add targets
-foreach (SOURCE Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene Script UI)
-    add_subdirectory (Engine/${SOURCE})
-endforeach ()
 foreach (TARGET AngelScript Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()

@@ -21,19 +21,14 @@
 #
 
 # Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
 if (USE_OPENGL)
-    set (GRAPHICS_SYS_DIR OpenGL PARENT_SCOPE)
-    file (GLOB SYS_CPP_FILES OpenGL/*.cpp)
-    file (GLOB SYS_H_FILES OpenGL/*.h)
+    set (GRAPHICS_SYS_DIR OpenGL)
 else ()
-    set (GRAPHICS_SYS_DIR Direct3D9 PARENT_SCOPE)
-    file (GLOB SYS_CPP_FILES Direct3D9/*.cpp)
-    file (GLOB SYS_H_FILES Direct3D9/*.h)
+    set (GRAPHICS_SYS_DIR Direct3D9)
 endif ()
-
-set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${H_FILES} ${SYS_CPP_FILES} ${SYS_H_FILES} PARENT_SCOPE)
+file (GLOB SYS_CPP_FILES ${GRAPHICS_SYS_DIR}/*.cpp)
+file (GLOB SYS_H_FILES ${GRAPHICS_SYS_DIR}/*.h)
+define_source_files (CPP_FILES ${SYS_CPP_FILES} H_FILES ${SYS_H_FILES} PARENT_SCOPE)
 
 # Define dependency libs
 set (ENGINE_LINK_LIBS_ONLY ${ENGINE_LINK_LIBS_ONLY} SDL PARENT_SCOPE)

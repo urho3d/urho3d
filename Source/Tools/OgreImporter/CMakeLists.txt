@@ -24,9 +24,7 @@
 set (TARGET_NAME OgreImporter)
 
 # Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+define_source_files ()
 
 # Setup target
 if (APPLE)

@@ -24,9 +24,7 @@
 set (TARGET_NAME 22_LuaIntegration)
 
 # Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES} ${COMMON_SAMPLE_H_FILES})
+define_source_files (H_FILES ${COMMON_SAMPLE_H_FILES})
 
 # Setup target with resource copying
 setup_main_executable ()
