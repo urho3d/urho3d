@@ -24,7 +24,7 @@
 set (TARGET_NAME RampGenerator)
 
 # Define source files
-set (SOURCE_FILES RampGenerator.cpp)
+define_source_files ()
 
 # Define dependency libs
 set (LIBS ../../ThirdParty/STB)

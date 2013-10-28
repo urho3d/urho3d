@@ -21,12 +21,10 @@
 #
 
 # Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
 if (APPLE AND NOT IOS)
     file (GLOB C_FILES *.m)
 endif()
-set (ENGINE_SOURCE_FILES ${ENGINE_SOURCE_FILES} ${CPP_FILES} ${C_FILES} ${H_FILES} PARENT_SCOPE)
+define_source_files (CPP_FILES ${C_FILES} PARENT_SCOPE)
 
 # Define dependency libs
 set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/LZ4 PARENT_SCOPE)

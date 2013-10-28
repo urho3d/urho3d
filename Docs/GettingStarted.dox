@@ -297,6 +297,8 @@ set (TARGET_NAME Main)
 file (GLOB CPP_FILES *.cpp)
 file (GLOB H_FILES *.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+# Alternatively remove three lines above and uncomment below macro
+# define_source_files ()
 
 # Setup target with resource copying
 setup_main_executable ()

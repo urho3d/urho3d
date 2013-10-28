@@ -345,7 +345,7 @@ endmacro ()
 
 # Macro for setting up an executable target
 macro (setup_executable)
-    add_executable (${TARGET_NAME} ${EXE_TYPE} ${SOURCE_FILES})   
+    add_executable (${TARGET_NAME} ${ARGN} ${SOURCE_FILES})
     define_dependency_libs (Urho3D_lib)
     setup_target ()
     
@@ -441,7 +441,7 @@ macro (setup_main_executable)
         elseif (APPLE)
             setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
         endif ()
-        setup_executable ()
+        setup_executable (${EXE_TYPE})
     endif ()
     
     if (XCODE)
@@ -546,8 +546,45 @@ macro (define_dependency_libs TARGET)
     endif ()
 endmacro ()
 
-# Macro for sorting and removing duplicate value
+# Macro for sorting and removing duplicate values
 macro (remove_duplicate LIST_NAME)
     list (SORT ${LIST_NAME})
     list (REMOVE_DUPLICATES ${LIST_NAME})
+endmacro ()
+
+# Macro for setting a list from another with option to sort and remove duplicate values
+macro (set_list TO_LIST FROM_LIST)
+    set (${TO_LIST} ${${FROM_LIST}})
+    if (${ARGN} STREQUAL REMOVE_DUPLICATE)
+        remove_duplicate (${TO_LIST})
+    endif ()
+endmacro ()
+
+# Macro for defining source files
+macro (define_source_files)
+    # Parse extra arguments
+    cmake_parse_arguments (EXTRA "PCH;PARENT_SCOPE" "GROUP" "CPP_FILES;H_FILES" ${ARGN})
+
+    # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
+    file (GLOB CPP_FILES *.cpp)
+    file (GLOB H_FILES *.h)
+    list (APPEND CPP_FILES ${EXTRA_CPP_FILES})
+    list (APPEND H_FILES ${EXTRA_H_FILES})
+    set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+    
+    # Optionally enable PCH
+    if (EXTRA_PCH)
+        enable_pch ()
+    endif ()
+    
+    # Optionally accumulate source files at parent scope
+    if (EXTRA_PARENT_SCOPE)
+        get_filename_component (DIR_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+        set (${DIR_NAME}_CPP_FILES ${CPP_FILES} PARENT_SCOPE)
+        set (${DIR_NAME}_H_FILES ${H_FILES} PARENT_SCOPE)
+    # Optionally put source files into further sub-group (only works for current scope due to CMake limitation)
+    elseif (EXTRA_GROUP)
+        source_group ("Source Files\\${EXTRA_GROUP}" FILES ${CPP_FILES})
+        source_group ("Header Files\\${EXTRA_GROUP}" FILES ${H_FILES})
+    endif ()
 endmacro ()

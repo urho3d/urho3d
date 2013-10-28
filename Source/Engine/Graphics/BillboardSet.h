@@ -24,6 +24,7 @@
 
 #include "Color.h"
 #include "Drawable.h"
+#include "Matrix3x4.h"
 #include "Rect.h"
 #include "VectorBuffer.h"
 
