@@ -50,6 +50,7 @@ Vector<Vector<ModelSubGeometryLodLevel> > subGeometries_;
 Vector<Vector3> subGeometryCenters_;
 Vector<ModelBone> bones_;
 Vector<ModelMorph> morphs_;
+Vector<String> materialNames_;
 BoundingBox boundingBox_;
 unsigned numSubMeshes_ = 0;
 bool useOneBuffer_ = true;
@@ -58,9 +59,10 @@ int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void LoadSkeleton(const String& skeletonFileName);
 void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool exportMorphs);
-void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly);
+void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly, bool saveMaterialList);
 void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, ModelIndexBuffer* ib);
 void CalculateScore(ModelVertex& vertex);
+String SanitateAssetName(const String& name);
 
 int main(int argc, char** argv)
 {
@@ -83,6 +85,7 @@ void Run(const Vector<String>& arguments)
         ErrorExit(
             "Usage: OgreImporter <input file> <output file> [options]\n\n"
             "Options:\n"
+            "-m   Output material list file\n"
             "-na  Do not output animations\n"
             "-nm  Do not output morphs\n"
             "-r   Output only rotations from animations\n"
@@ -96,6 +99,7 @@ void Run(const Vector<String>& arguments)
     bool exportAnimations = true;
     bool exportMorphs = true;
     bool rotationsOnly = false;
+    bool saveMaterialList = false;
     
     if (arguments.Size() > 2)
     {
@@ -127,13 +131,17 @@ void Run(const Vector<String>& arguments)
                 case 's':
                     splitSubMeshes = true;
                     break;
+                    
+                case 'm':
+                    saveMaterialList = true;
+                    break;
                 }
             }
         }
     }
     
     LoadMesh(arguments[0], generateTangents, splitSubMeshes, exportMorphs);
-    WriteOutput(arguments[1], exportAnimations, rotationsOnly);
+    WriteOutput(arguments[1], exportAnimations, rotationsOnly, saveMaterialList);
     
     PrintLine("Finished");
 }
@@ -260,6 +268,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     unsigned maxSubMeshVertices = 0;
     while (subMesh)
     {
+        materialNames_.Push(subMesh.GetAttribute("material"));
         XMLElement geometry = subMesh.GetChild("geometry");
         if (geometry)
         {
@@ -819,7 +828,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     }
 }
 
-void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly)
+void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly, bool saveMaterialList)
 {
     // Begin serialization
     {
@@ -894,6 +903,19 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
         // Geometry centers
         for (unsigned i = 0; i < subGeometryCenters_.Size(); ++i)
             dest.WriteVector3(subGeometryCenters_[i]);
+    }
+    
+    if (saveMaterialList)
+    {
+        String materialListName = ReplaceExtension(outputFileName, ".txt");
+        File listFile(context_);
+        if (listFile.Open(materialListName, FILE_WRITE))
+        {
+            for (unsigned i = 0; i < materialNames_.Size(); ++i)
+                listFile.WriteLine(ReplaceExtension(SanitateAssetName(materialNames_[i]), ".xml"));
+        }
+        else
+            PrintLine("Warning: could not write material list file " + materialListName);
     }
     
     XMLElement skeletonRoot = skelFile_->GetRoot("skeleton");
@@ -1173,4 +1195,20 @@ void CalculateScore(ModelVertex& vertex)
     float valenceBoost = powf((float)vertex.useCount_, -valenceBoostPower);
     score += valenceBoostScale * valenceBoost;
     vertex.score_ = score;
+}
+
+String SanitateAssetName(const String& name)
+{
+    String fixedName = name;
+    fixedName.Replace("<", "");
+    fixedName.Replace(">", "");
+    fixedName.Replace("?", "");
+    fixedName.Replace("*", "");
+    fixedName.Replace(":", "");
+    fixedName.Replace("\"", "");
+    fixedName.Replace("/", "");
+    fixedName.Replace("\\", "");
+    fixedName.Replace("|", "");
+    
+    return fixedName;
 }

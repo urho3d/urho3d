@@ -1715,6 +1715,7 @@ Usage:
 OgreImporter <input file> <output file> [options]
 
 Options:
+-m   Output material list file
 -na  Do not output animations
 -nm  Do not output morphs
 -r   Output only rotations from animations
