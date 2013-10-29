@@ -180,8 +180,6 @@ void Input::Update()
 
 void Input::SetMouseVisible(bool enable)
 {
-    // Urho3D implementation of SDL Raspberry Pi "video driver" does not have OS mouse support, so no-op
-    #ifndef RASPI
     if (enable != mouseVisible_)
     {
         mouseVisible_ = enable;
@@ -207,7 +205,6 @@ void Input::SetMouseVisible(bool enable)
         eventData[P_VISIBLE] = mouseVisible_;
         SendEvent(E_MOUSEVISIBLECHANGED, eventData);
     }
-    #endif
 }
 
 void Input::SetToggleFullscreen(bool enable)
@@ -238,7 +235,7 @@ bool Input::OpenJoystick(unsigned index)
         // Map SDL joystick index to internal index (which starts at 0)
         int sdl_joy_instance_id = SDL_JoystickInstanceID(joystick);
         joystickIDMap_[sdl_joy_instance_id] = index;
-        
+
         JoystickState& state = joysticks_[index];
         state.joystick_ = joystick;
         state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
@@ -745,11 +742,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             unsigned button = evt.jbutton.button;
             unsigned joystickIndex = joystickIDMap_[evt.jbutton.which];
-            
+
             VariantMap eventData;
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_BUTTON] = button;
-            
+
             if (joystickIndex < joysticks_.Size() && button < joysticks_[joystickIndex].buttons_.Size()) {
                 joysticks_[joystickIndex].buttons_[button] = true;
                 joysticks_[joystickIndex].buttonPress_[button] = true;
@@ -764,7 +761,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             unsigned button = evt.jbutton.button;
             unsigned joystickIndex = joystickIDMap_[evt.jbutton.which];
-            
+
             VariantMap eventData;
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_BUTTON] = button;
@@ -779,7 +776,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_JOYAXISMOTION:
         {
             using namespace JoystickAxisMove;
-            
+
             unsigned joystickIndex = joystickIDMap_[evt.jaxis.which];
 
             VariantMap eventData;
@@ -799,7 +796,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_JOYHATMOTION:
         {
             using namespace JoystickHatMove;
-            
+
             unsigned joystickIndex = joystickIDMap_[evt.jaxis.which];
 
             VariantMap eventData;
@@ -853,15 +850,15 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_DROPFILE:
         {
             using namespace DropFile;
-            
+
             VariantMap eventData;
             eventData[P_FILENAME] = GetInternalPath(String(evt.drop.file));
             SDL_free(evt.drop.file);
-            
+
             SendEvent(E_DROPFILE, eventData);
         }
         break;
-        
+
     case SDL_QUIT:
         SendEvent(E_EXITREQUESTED);
         break;
