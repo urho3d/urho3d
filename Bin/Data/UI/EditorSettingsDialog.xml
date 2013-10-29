@@ -214,18 +214,6 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="8" />
         <element type="CheckBox">
-            <attribute name="Name" value="LocalIDToggle" />
-        </element>
-        <element type="Text">
-            <attribute name="Text" value="Use local entity IDs on import" />
-        </element>
-    </element>
-    <element>
-        <attribute name="Min Size" value="0 17" />
-        <attribute name="Max Size" value="2147483647 17" />
-        <attribute name="Layout Mode" value="Horizontal" />
-        <attribute name="Layout Spacing" value="8" />
-        <element type="CheckBox">
             <attribute name="Name" value="ApplyMaterialListToggle" />
         </element>
         <element type="Text">

@@ -85,7 +85,7 @@ void Run(const Vector<String>& arguments)
         ErrorExit(
             "Usage: OgreImporter <input file> <output file> [options]\n\n"
             "Options:\n"
-            "-m   Output material list file\n"
+            "-l   Output a material list file\n"
             "-na  Do not output animations\n"
             "-nm  Do not output morphs\n"
             "-r   Output only rotations from animations\n"
@@ -110,8 +110,8 @@ void Run(const Vector<String>& arguments)
                 String arg = arguments[i].Substring(1).ToLower();
                 switch (arg[0])
                 {
-                case 't':
-                    generateTangents = true;
+                case 'l':
+                    saveMaterialList = true;
                     break;
                     
                 case 'n':
@@ -132,8 +132,8 @@ void Run(const Vector<String>& arguments)
                     splitSubMeshes = true;
                     break;
                     
-                case 'm':
-                    saveMaterialList = true;
+                case 't':
+                    generateTangents = true;
                     break;
                 }
             }

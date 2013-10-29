@@ -129,7 +129,6 @@ void LoadConfig()
         if (objectElem.HasAttribute("movesnap")) moveSnap = objectElem.GetBool("movesnap");
         if (objectElem.HasAttribute("rotatesnap")) rotateSnap = objectElem.GetBool("rotatesnap");
         if (objectElem.HasAttribute("scalesnap")) scaleSnap = objectElem.GetBool("scalesnap");
-        if (objectElem.HasAttribute("uselocalids")) useLocalIDs = objectElem.GetBool("uselocalids");
         if (objectElem.HasAttribute("applymateriallist")) applyMaterialList = objectElem.GetBool("applymateriallist");
         if (objectElem.HasAttribute("importoptions")) importOptions = objectElem.GetAttribute("importoptions");
         if (objectElem.HasAttribute("pickmode")) pickMode = objectElem.GetInt("pickmode");
@@ -217,7 +216,6 @@ void SaveConfig()
     objectElem.SetBool("movesnap", moveSnap);
     objectElem.SetBool("rotatesnap", rotateSnap);
     objectElem.SetBool("scalesnap", scaleSnap);
-    objectElem.SetBool("uselocalids", useLocalIDs);
     objectElem.SetBool("applymateriallist", applyMaterialList);
     objectElem.SetAttribute("importoptions", importOptions);
     objectElem.SetInt("pickmode", pickMode);

@@ -806,6 +806,7 @@ static void RegisterZone(asIScriptEngine* engine)
 static void RegisterStaticModel(asIScriptEngine* engine)
 {
     RegisterDrawable<StaticModel>(engine, "StaticModel");
+    engine->RegisterObjectMethod("StaticModel", "void ApplyMaterialList(const String&in fileName = String())", asMETHOD(StaticModel, ApplyMaterialList), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "bool IsInside(const Vector3&in) const", asMETHOD(StaticModel, IsInside), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "bool IsInsideLocal(const Vector3&in) const", asMETHOD(StaticModel, IsInsideLocal), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "void set_model(Model@+)", asMETHOD(StaticModel, SetModel), asCALL_THISCALL);

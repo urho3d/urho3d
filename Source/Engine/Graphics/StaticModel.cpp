@@ -25,6 +25,7 @@
 #include "Batch.h"
 #include "Camera.h"
 #include "Context.h"
+#include "FileSystem.h"
 #include "Geometry.h"
 #include "Log.h"
 #include "Material.h"
@@ -291,6 +292,30 @@ void StaticModel::SetOcclusionLodLevel(unsigned level)
 {
     occlusionLodLevel_ = level;
     MarkNetworkUpdate();
+}
+
+void StaticModel::ApplyMaterialList(const String& fileName)
+{
+    String useFileName = fileName;
+    if (useFileName.Trimmed().Empty() && model_)
+        useFileName = ReplaceExtension(model_->GetName(), ".txt");
+    
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    if (!cache->Exists(useFileName))
+        return;
+    SharedPtr<File> file = cache->GetFile(useFileName);
+    if (!file)
+        return;
+    
+    unsigned index = 0;
+    while (!file->IsEof() && index < batches_.Size())
+    {
+        Material* material = cache->GetResource<Material>(file->ReadLine());
+        if (material)
+            SetMaterial(index, material);
+        
+        ++index;
+    }
 }
 
 Material* StaticModel::GetMaterial(unsigned index) const

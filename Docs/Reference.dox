@@ -1669,7 +1669,7 @@ Usage:
 AssetImporter <command> <input file> <output file> [options]
 
 Commands:
-model Output a model and a material list
+model Output a model
 scene Output a scene
 dump  Dump scene node structure. No output file is generated
 lod   Combine several Urho3D models as LOD levels of the output model
@@ -1679,6 +1679,7 @@ Options:
 -b    Save scene in binary format, default format is XML
 -h    Generate hard instead of smooth normals if input file has no normals
 -i    Use local ID's for scene nodes
+-l    Output a material list file for models
 -na   Do not output animations
 -nm   Do not output materials
 -ns   Do not create subdirectories for resources
@@ -1715,7 +1716,7 @@ Usage:
 OgreImporter <input file> <output file> [options]
 
 Options:
--m   Output material list file
+-l   Output a material list file
 -na  Do not output animations
 -nm  Do not output morphs
 -r   Output only rotations from animations

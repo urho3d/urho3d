@@ -768,6 +768,7 @@ template <class T> void RegisterStaticModel(asIScriptEngine* engine, const char*
 {
     RegisterDrawable<T>(engine, className);
     RegisterSubclass<StaticModel, T>(engine, "StaticModel", className);
+    engine->RegisterObjectMethod(className, "void ApplyMaterialList(const String&in fileName = String())", asMETHOD(T, ApplyMaterialList), asCALL_THISCALL);
     if (registerSetModel)
         engine->RegisterObjectMethod(className, "void set_model(Model@+)", asMETHOD(T, SetModel), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Model@+ get_model() const", asMETHOD(T, GetModel), asCALL_THISCALL);

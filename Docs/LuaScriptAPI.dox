@@ -2083,6 +2083,7 @@ Methods:
 - void SetMaterial(Material* material)
 - bool SetMaterial(unsigned index, Material* material)
 - void SetOcclusionLodLevel(unsigned level)
+- void ApplyMaterialList(const String fileName = String::EMPTY)
 - Model* GetModel() const
 - unsigned GetNumGeometries() const
 - Material* GetMaterial(unsigned index = 0) const

@@ -103,6 +103,7 @@ bool saveBinary_ = false;
 bool createZone_ = true;
 bool noAnimations_ = false;
 bool noMaterials_ = false;
+bool saveMaterialList_ = false;
 
 HashSet<aiAnimation*> allAnimations_;
 PODVector<aiAnimation*> sceneAnimations_;
@@ -184,7 +185,7 @@ void Run(const Vector<String>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model Output a model and a material list\n"
+            "model Output a model\n"
             "scene Output a scene\n"
             "dump  Dump scene node structure. No output file is generated\n"
             "lod   Combine several Urho3D models as LOD levels of the output model\n"
@@ -194,6 +195,7 @@ void Run(const Vector<String>& arguments)
             "-b    Save scene in binary format, default format is XML\n"
             "-h    Generate hard instead of smooth normals if input file has no normals\n"
             "-i    Use local ID's for scene nodes\n"
+            "-l    Output a material list file for models\n"
             "-na   Do not output animations\n"
             "-nm   Do not output materials\n"
             "-ns   Do not create subdirectories for resources\n"
@@ -252,6 +254,10 @@ void Run(const Vector<String>& arguments)
                 
             case 'i':
                 localIDs_ = true;
+                break;
+                
+            case 'l':
+                saveMaterialList_ = true;
                 break;
                 
             case 'p':
@@ -853,7 +859,7 @@ void BuildAndSaveModel(OutModel& model)
     outModel->Save(outFile);
     
     // If exporting materials, also save material list for use by the editor
-    if (!noMaterials_)
+    if (!noMaterials_ && saveMaterialList_)
     {
         String materialListName = ReplaceExtension(model.outName_, ".txt");
         File listFile(context_);

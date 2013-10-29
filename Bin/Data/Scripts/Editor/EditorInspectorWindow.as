@@ -442,7 +442,7 @@ void PostEditAttribute(Serializable@ serializable, uint index)
     {
         StaticModel@ staticModel = cast<StaticModel>(serializable);
         if (staticModel !is null)
-            ApplyMaterialList(staticModel);
+            staticModel.ApplyMaterialList();
     }
 }
 

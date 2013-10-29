@@ -2892,6 +2892,7 @@ Methods:
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- void ApplyMaterialList(const String& = String ( ))
 - bool IsInside(const Vector3&) const
 - bool IsInsideLocal(const Vector3&) const
 
@@ -2951,6 +2952,7 @@ Methods:
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- void ApplyMaterialList(const String& = String ( ))
 - void AddInstanceNode(Node@)
 - void RemoveInstanceNode(Node@)
 - void RemoveAllInstanceNodes()
@@ -3014,6 +3016,7 @@ Methods:
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- void ApplyMaterialList(const String& = String ( ))
 
 Properties:
 
@@ -3102,6 +3105,7 @@ Methods:
 - void Remove()
 - void MarkNetworkUpdate() const
 - void DrawDebugGeometry(DebugRenderer@, bool)
+- void ApplyMaterialList(const String& = String ( ))
 - AnimationState@ AddAnimationState(Animation@)
 - void RemoveAnimationState(Animation@)
 - void RemoveAnimationState(const String&)

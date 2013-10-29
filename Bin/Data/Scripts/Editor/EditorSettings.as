@@ -51,9 +51,6 @@ void UpdateEditorSettingsDialog()
     CheckBox@ scaleSnapToggle = settingsDialog.GetChild("ScaleSnapToggle", true);
     scaleSnapToggle.checked = scaleSnap;
 
-    CheckBox@ localIDToggle = settingsDialog.GetChild("LocalIDToggle", true);
-    localIDToggle.checked = useLocalIDs;
-
     CheckBox@ applyMaterialListToggle = settingsDialog.GetChild("ApplyMaterialListToggle", true);
     applyMaterialListToggle.checked = applyMaterialList;
 
@@ -111,7 +108,6 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(moveSnapToggle, "Toggled", "EditMoveSnap");
         SubscribeToEvent(rotateSnapToggle, "Toggled", "EditRotateSnap");
         SubscribeToEvent(scaleSnapToggle, "Toggled", "EditScaleSnap");
-        SubscribeToEvent(localIDToggle, "Toggled", "EditUseLocalIDs");
         SubscribeToEvent(rememberResourcePathToggle, "Toggled", "EditRememberResourcePath");
         SubscribeToEvent(applyMaterialListToggle, "Toggled", "EditApplyMaterialList");
         SubscribeToEvent(importOptionsEdit, "TextChanged", "EditImportOptions");
@@ -224,12 +220,6 @@ void EditScaleSnap(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     scaleSnap = edit.checked;
-}
-
-void EditUseLocalIDs(StringHash eventType, VariantMap& eventData)
-{
-    CheckBox@ edit = eventData["Element"].GetUIElement();
-    useLocalIDs = edit.checked;
 }
 
 void EditRememberResourcePath(StringHash eventType, VariantMap& eventData)

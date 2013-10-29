@@ -14,7 +14,6 @@ class AssetMapping
     String fullAssetName;
 }
 
-bool useLocalIDs = false;
 Array<AssetMapping> assetMappings;
 
 void ImportModel(const String&in fileName)
@@ -36,6 +35,9 @@ void ImportModel(const String&in fileName)
     Array<String> options = importOptions.Trimmed().Split(' ');
     for (uint i = 0; i < options.length; ++i)
         args.Push(options[i]);
+    // If material lists are to be applied, make sure the option to create them exists
+    if (applyMaterialList)
+        args.Push("-l");
 
     if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
     {
@@ -43,7 +45,7 @@ void ImportModel(const String&in fileName)
         StaticModel@ newModel = newNode.CreateComponent("StaticModel");
         newNode.position = GetNewNodePosition();
         newModel.model = cache.GetResource("Model", modelName);
-        ApplyMaterialList(newModel);
+        newModel.ApplyMaterialList(); // Setup default materials if possible
 
         // Create an undo action for the create
         CreateNodeAction action;
@@ -52,36 +54,6 @@ void ImportModel(const String&in fileName)
         SetSceneModified();
 
         FocusNode(newNode);
-    }
-}
-
-void ApplyMaterialList(StaticModel@ newModel)
-{
-    String materialListName;
-
-    if (newModel.model !is null)
-        materialListName = ReplaceExtension(newModel.model.name, ".txt");
-    else
-        return;
-
-    if (!cache.Exists(materialListName))
-        return;
-
-    File@ list = cache.GetFile(materialListName);
-    if (list !is null)
-    {
-        for (uint i = 0; i < newModel.numGeometries; ++i)
-        {
-            if (!list.eof)
-            {
-                Material@ newMat = cache.GetResource("Material", list.ReadLine());
-                if (newMat !is null)
-                    newModel.materials[i] = newMat;
-            }
-            else
-                break;
-        }
-        list.Close();
     }
 }
 
@@ -107,9 +79,8 @@ void ImportScene(const String&in fileName)
         Array<String> options = importOptions.Trimmed().Split(' ');
         for (uint i = 0; i < options.length; ++i)
             args.Push(options[i]);
-        if (useLocalIDs)
-            args.Push("-i");
-
+        if (applyMaterialList)
+            args.Push("-l");
         if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
         {
             LoadScene(tempSceneName);
@@ -153,7 +124,7 @@ void ImportTundraScene(const String&in fileName)
     editorScene.physicsWorld.gravity = Vector3(0, -9.81, 0);
 
     // Create zone & global light
-    Node@ zoneNode = editorScene.CreateChild("Zone", useLocalIDs ? LOCAL : REPLICATED);
+    Node@ zoneNode = editorScene.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
     zone.boundingBox = BoundingBox(-1000, 1000);
     zone.ambientColor = Color(0.364, 0.364, 0.364);
@@ -161,7 +132,7 @@ void ImportTundraScene(const String&in fileName)
     zone.fogStart = 100.0;
     zone.fogEnd = 500.0;
 
-    Node@ lightNode = editorScene.CreateChild("GlobalLight", useLocalIDs ? LOCAL : REPLICATED);
+    Node@ lightNode = editorScene.CreateChild("GlobalLight");
     Light@ light = lightNode.CreateComponent("Light");
     lightNode.rotation = Quaternion(60, 30, 0);
     light.lightType = LIGHT_DIRECTIONAL;
@@ -253,7 +224,7 @@ void ImportTundraScene(const String&in fileName)
             ConvertModel(meshName, filePath, convertedMeshes);
             ConvertModel(collisionMeshName, filePath, convertedMeshes);
 
-            Node@ newNode = editorScene.CreateChild(nodeName, useLocalIDs ? LOCAL : REPLICATED);
+            Node@ newNode = editorScene.CreateChild(nodeName);
 
             // Calculate final transform in an Ogre-like fashion
             Quaternion quat = GetTransformQuaternion(rot);
