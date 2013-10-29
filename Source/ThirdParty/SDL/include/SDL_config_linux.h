@@ -285,6 +285,8 @@
 #define SDL_VIDEO_RENDER_OGL_ES 1
 #define SDL_VIDEO_RENDER_OGL_ES2 1
 
+/* Linux device manager */
+#define HAVE_LIBUDEV_H 1
 /* Linux keyboard */
 #define SDL_INPUT_LINUXKD 1
 
