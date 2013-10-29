@@ -125,10 +125,10 @@ successfully:
   development libraries.
 
 - For Raspberry Pi, the following development packages need to be installed:
-  libraspberrypi0, libraspberrypi-dev, libasound2-dev on Raspbian;
-  raspberrypi-vc-libs, raspberrypi-vc-libs-devel, alsa-lib-devel on Pidora.
-  The first two packages which contain the Broadcom VideoCore IV libraries and
-  development headers should normally come preinstalled.
+  libraspberrypi0, libraspberrypi-dev, libasound2-dev, libudev-dev on Raspbian;
+  raspberrypi-vc-libs, raspberrypi-vc-libs-devel, alsa-lib-devel, systemd-devel
+  on Pidora. The first two packages which contain the Broadcom VideoCore IV
+  libraries and development headers should normally come preinstalled.
 
 - For Mac OS X, the Xcode developer tools package should include everything
   necessary.
