@@ -56,7 +56,7 @@ foreach (API_PKG_FILE ${API_PKG_FILES})
 endforeach ()
 
 # Define source files
-define_source_files (CPP_FILES ${GEN_CPP_FILES})
+define_source_files (EXTRA_CPP_FILES ${GEN_CPP_FILES})
 
 # Define dependency libs
 set (LIBS ../../ThirdParty/Lua${JIT}/src)

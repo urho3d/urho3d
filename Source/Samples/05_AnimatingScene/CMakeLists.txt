@@ -24,7 +24,7 @@
 set (TARGET_NAME 05_AnimatingScene)
 
 # Define source files
-define_source_files (H_FILES ${COMMON_SAMPLE_H_FILES})
+define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
 
 # Setup target with resource copying
 setup_main_executable ()

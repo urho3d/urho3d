@@ -26,9 +26,7 @@ if (USE_OPENGL)
 else ()
     set (GRAPHICS_SYS_DIR Direct3D9)
 endif ()
-file (GLOB SYS_CPP_FILES ${GRAPHICS_SYS_DIR}/*.cpp)
-file (GLOB SYS_H_FILES ${GRAPHICS_SYS_DIR}/*.h)
-define_source_files (CPP_FILES ${SYS_CPP_FILES} H_FILES ${SYS_H_FILES} PARENT_SCOPE)
+define_source_files (GLOB_CPP_PATTERNS *.cpp ${GRAPHICS_SYS_DIR}/*.cpp GLOB_H_PATTERNS *.h ${GRAPHICS_SYS_DIR}/*.h PARENT_SCOPE)
 
 # Define dependency libs
 set (ENGINE_LINK_LIBS_ONLY ${ENGINE_LINK_LIBS_ONLY} SDL PARENT_SCOPE)

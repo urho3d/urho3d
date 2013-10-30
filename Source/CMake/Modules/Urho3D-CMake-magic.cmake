@@ -262,25 +262,25 @@ function (add_compiler_export_flags)
         return ()
     endif ()
 
-    set (EXTRA_FLAGS "-fvisibility=hidden")
+    set (p_FLAGS "-fvisibility=hidden")
     # Either return the extra flags needed in the supplied argument, or to the
     # CMAKE_C_FLAGS if no argument is supplied.
     if (ARGV1)
-        set (${ARGV1} "${EXTRA_FLAGS}" PARENT_SCOPE)
+        set (${ARGV1} "${p_FLAGS}" PARENT_SCOPE)
     else ()
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_FLAGS}" PARENT_SCOPE)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${p_FLAGS}" PARENT_SCOPE)
     endif ()
 
     if (COMPILER_HAS_HIDDEN_INLINE_VISIBILITY)
-        set (EXTRA_FLAGS "${EXTRA_FLAGS} -fvisibility-inlines-hidden")
+        set (p_FLAGS "${p_FLAGS} -fvisibility-inlines-hidden")
     endif ()
 
     # Either return the extra flags needed in the supplied argument, or to the
     # CMAKE_CXX_FLAGS if no argument is supplied.
     if (ARGV0)
-        set (${ARGV0} "${EXTRA_FLAGS}" PARENT_SCOPE)
+        set (${ARGV0} "${p_FLAGS}" PARENT_SCOPE)
     else ()
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" PARENT_SCOPE)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${p_FLAGS}" PARENT_SCOPE)
     endif ()
 endfunction ()
 
@@ -563,28 +563,34 @@ endmacro ()
 # Macro for defining source files
 macro (define_source_files)
     # Parse extra arguments
-    cmake_parse_arguments (EXTRA "PCH;PARENT_SCOPE" "GROUP" "CPP_FILES;H_FILES" ${ARGN})
+    cmake_parse_arguments (ARG "PCH;PARENT_SCOPE" "GROUP" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS" ${ARGN})
 
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
-    file (GLOB CPP_FILES *.cpp)
-    file (GLOB H_FILES *.h)
-    list (APPEND CPP_FILES ${EXTRA_CPP_FILES})
-    list (APPEND H_FILES ${EXTRA_H_FILES})
+    if (NOT ARG_GLOB_CPP_PATTERNS)
+        set (ARG_GLOB_CPP_PATTERNS *.cpp)    # Default glob pattern
+    endif ()
+    if (NOT ARG_GLOB_H_PATTERNS)
+        set (ARG_GLOB_H_PATTERNS *.h)
+    endif ()
+    file (GLOB CPP_FILES ${ARG_GLOB_CPP_PATTERNS})
+    file (GLOB H_FILES ${ARG_GLOB_H_PATTERNS})
+    list (APPEND CPP_FILES ${ARG_EXTRA_CPP_FILES})
+    list (APPEND H_FILES ${ARG_EXTRA_H_FILES})
     set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
     
     # Optionally enable PCH
-    if (EXTRA_PCH)
+    if (ARG_PCH)
         enable_pch ()
     endif ()
     
     # Optionally accumulate source files at parent scope
-    if (EXTRA_PARENT_SCOPE)
+    if (ARG_PARENT_SCOPE)
         get_filename_component (DIR_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
         set (${DIR_NAME}_CPP_FILES ${CPP_FILES} PARENT_SCOPE)
         set (${DIR_NAME}_H_FILES ${H_FILES} PARENT_SCOPE)
     # Optionally put source files into further sub-group (only works for current scope due to CMake limitation)
-    elseif (EXTRA_GROUP)
-        source_group ("Source Files\\${EXTRA_GROUP}" FILES ${CPP_FILES})
-        source_group ("Header Files\\${EXTRA_GROUP}" FILES ${H_FILES})
+    elseif (ARG_GROUP)
+        source_group ("Source Files\\${ARG_GROUP}" FILES ${CPP_FILES})
+        source_group ("Header Files\\${ARG_GROUP}" FILES ${H_FILES})
     endif ()
 endmacro ()

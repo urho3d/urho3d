@@ -108,7 +108,7 @@ foreach (SOURCE Audio Container Core Engine Graphics Input IO Math Navigation Ne
     list (APPEND ENGINE_SOURCE_FILES ${${SOURCE}_CPP_FILES} ${${SOURCE}_H_FILES})
     list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${SOURCE})
 endforeach ()
-define_source_files (CPP_FILES ${ENGINE_SOURCE_FILES} H_FILES gitversion.h PCH)
+define_source_files (EXTRA_CPP_FILES ${ENGINE_SOURCE_FILES} EXTRA_H_FILES gitversion.h PCH)
 list (APPEND SOURCE_FILES ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 

@@ -22,9 +22,9 @@
 
 # Define source files
 if (APPLE AND NOT IOS)
-    file (GLOB C_FILES *.m)
+    set (GLOB_OBJC_PATTERN *.m)
 endif()
-define_source_files (CPP_FILES ${C_FILES} PARENT_SCOPE)
+define_source_files (GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} PARENT_SCOPE)
 
 # Define dependency libs
 set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/LZ4 PARENT_SCOPE)
