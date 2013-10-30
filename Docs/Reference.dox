@@ -1659,6 +1659,8 @@ Note that as the Profiler currently manages only a single hierarchy tree, profil
 
 \page Tools Tools
 
+Note: like with the Urho3D script host application, command line options with a parameter do not have a space between the option and the parameter, except the -dumpapi command in ScriptCompiler.
+
 \section Tools_AssetImporter AssetImporter
 
 Loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at http://assimp.sourceforge.net/main_features_formats.html.
@@ -1669,30 +1671,30 @@ Usage:
 AssetImporter <command> <input file> <output file> [options]
 
 Commands:
-model Output a model
-scene Output a scene
-dump  Dump scene node structure. No output file is generated
-lod   Combine several Urho3D models as LOD levels of the output model
-      Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>
+model    Output a model
+scene    Output a scene
+dump     Dump scene node structure. No output file is generated
+lod      Combine several Urho3D models as LOD levels of the output model
+         Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>
 
 Options:
--b    Save scene in binary format, default format is XML
--h    Generate hard instead of smooth normals if input file has no normals
--i    Use local ID's for scene nodes
--l    Output a material list file for models
--na   Do not output animations
--nm   Do not output materials
--ns   Do not create subdirectories for resources
--nz   Do not create a zone and a directional light (scene mode only)
--nf   Do not fix infacing normals
--pX   Set path X for scene resources. Default is output file path
--rX   Use scene node X as root node
--fX   Animation tick frequency to use if unspecified. Default 4800
--o    Optimize redundant submeshes. Loses scene hierarchy and animations
--t    Generate tangents
+-b       Save scene in binary format, default format is XML
+-h       Generate hard instead of smooth normals if input file has no normals
+-i       Use local ID's for scene nodes
+-l       Output a material list file for models
+-na      Do not output animations
+-nm      Do not output materials
+-ns      Do not create subdirectories for resources
+-nz      Do not create a zone and a directional light (scene mode only)
+-nf      Do not fix infacing normals
+-p<path> Set path for scene resources. Default is output file path\n"
+-r<name> Use the named scene node as root node\n"
+-f<freq> Animation tick frequency to use if unspecified. Default 4800\n"
+-o       Optimize redundant submeshes. Loses scene hierarchy and animations
+-t       Generate tangents
 \endverbatim
 
-The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, AnimatedModel or Skybox component. The list files can safely be deleted if not needed, and should not be included in production builds of Urho3D applications.
+The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
 
 In model or scene mode, the AssetImporter utility will also automatically save non-skeletal node animations into the output file directory.
 
@@ -1716,12 +1718,12 @@ Usage:
 OgreImporter <input file> <output file> [options]
 
 Options:
--l   Output a material list file
--na  Do not output animations
--nm  Do not output morphs
--r   Output only rotations from animations
--s   Split each submesh into own vertex buffer
--t   Generate tangents
+-l      Output a material list file
+-na     Do not output animations
+-nm     Do not output morphs
+-r      Output only rotations from animations
+-s      Split each submesh into own vertex buffer
+-t      Generate tangents
 \endverbatim
 
 Note: outputting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.
@@ -1733,7 +1735,10 @@ Examines a directory recursively for files and subdirectories and creates a Pack
 Usage:
 
 \verbatim
-PackageTool <directory to process> <package name> [basepath] [-c]
+PackageTool <directory to process> <package name> [basepath] [options]
+
+Options:
+-c      Enable package file LZ4 compression
 \endverbatim
 
 When PackageTool runs, it will go inside the source directory, then look for subdirectories and any files. Paths inside the package will by default be relative to the source directory, but if an extra path prefix is desired, it can be specified by the optional basepath argument.
@@ -1766,7 +1771,7 @@ Usage:
 
 \verbatim
 ScriptCompiler <input file> [resource path for includes]
-ScriptCompiler -dumpapi [output file]
+ScriptCompiler -dumpapi <output file>
 
 \endverbatim
 
@@ -1786,10 +1791,9 @@ Usage:
 ShaderCompiler <definitionfile> <outputpath> [options]
 
 Options:
--tVS|PS Compile only vertex or pixel shaders, by default compile both
--vX     Compile only the shader variation X
--dX     Add a define. Add SM3 to compile for Shader Model 3
--dDefine Add an arbitrary define
+-t<VS|PS>  Compile only vertex or pixel shaders, by default compile both
+-v<name>   Compile only the shader variation with name
+-d<define> Add a define. Add SM3 to compile for Shader Model 3
 
 If output path is not specified, shader binaries will be output into the same
 directory as the definition file. Specify a wildcard to compile multiple

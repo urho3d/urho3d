@@ -86,7 +86,12 @@ int main(int argc, char** argv)
 void Run(const Vector<String>& arguments)
 {
     if (arguments.Size() < 2)
-        ErrorExit("Usage: PackageTool <directory to process> <package name> [basepath] [-c]\n");
+        ErrorExit(
+            "Usage: PackageTool <directory to process> <package name> [basepath] [options]\n"
+            "\n"
+            "Options:\n"
+            "-c      Enable package file LZ4 compression\n"
+        );
     
     const String& dirName = arguments[0];
     const String& packageName = arguments[1];

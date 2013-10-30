@@ -160,7 +160,7 @@ On Android and iOS the command line can not be entered, so it is instead read fr
 
 \section Running_Commandline Command line options
 
-The engine can be configured using the following command line options:
+The engine can be configured using the following command line options. Note the lack of space between the option and its parameter, like -x1024 or -p"MyResourcePath"
 
 \verbatim
 -x<res>     Horizontal resolution

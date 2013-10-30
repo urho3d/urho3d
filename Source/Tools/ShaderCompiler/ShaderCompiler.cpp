@@ -195,9 +195,9 @@ void Run(const Vector<String>& arguments)
         ErrorExit(
             "Usage: ShaderCompiler <definitionfile> [outputpath] [options]\n\n"
             "Options:\n"
-            "-tVS|PS Compile only vertex or pixel shaders, by default compile both\n"
-            "-vX     Compile only the shader variation X\n"
-            "-dX     Add a define. Add SM3 to compile for Shader Model 3\n\n"
+            "-t<VS|PS>  Compile only vertex or pixel shaders, by default compile both\n"
+            "-v<name>   Compile only the shader variation with name\n"
+            "-d<define> Add a define. Add SM3 to compile for Shader Model 3\n\n"
             "If output path is not specified, shader binaries will be output into the same\n"
             "directory as the definition file. Specify a wildcard to compile multiple\n"
             "shaders."

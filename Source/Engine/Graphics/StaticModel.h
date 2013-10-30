@@ -70,7 +70,7 @@ public:
     bool SetMaterial(unsigned index, Material* material);
     /// Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
     void SetOcclusionLodLevel(unsigned level);
-    /// Apply default materials from a material list file, by default named as modelName.txt.
+    /// Apply default materials from a material list file. If filename is empty (default), the model's resource name with extension .txt will be used.
     void ApplyMaterialList(const String& fileName = String::EMPTY);
     
     /// Return model.

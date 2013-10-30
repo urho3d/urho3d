@@ -85,12 +85,12 @@ void Run(const Vector<String>& arguments)
         ErrorExit(
             "Usage: OgreImporter <input file> <output file> [options]\n\n"
             "Options:\n"
-            "-l   Output a material list file\n"
-            "-na  Do not output animations\n"
-            "-nm  Do not output morphs\n"
-            "-r   Output only rotations from animations\n"
-            "-s   Split each submesh into own vertex buffer\n"
-            "-t   Generate tangents\n"
+            "-l      Output a material list file\n"
+            "-na     Do not output animations\n"
+            "-nm     Do not output morphs\n"
+            "-r      Output only rotations from animations\n"
+            "-s      Split each submesh into own vertex buffer\n"
+            "-t      Generate tangents\n"
         );
     }
     
@@ -912,7 +912,10 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
         if (listFile.Open(materialListName, FILE_WRITE))
         {
             for (unsigned i = 0; i < materialNames_.Size(); ++i)
-                listFile.WriteLine(ReplaceExtension(SanitateAssetName(materialNames_[i]), ".xml"));
+            {
+                // Assume the materials will be located inside the standard Materials subdirectory
+                listFile.WriteLine("Materials/" + ReplaceExtension(SanitateAssetName(materialNames_[i]), ".xml"));
+            }
         }
         else
             PrintLine("Warning: could not write material list file " + materialListName);
