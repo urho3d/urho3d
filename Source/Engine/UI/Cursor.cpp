@@ -102,7 +102,7 @@ void Cursor::SetUseSystemShapes(bool enable)
     if (enable != useSystemShapes_)
     {
         useSystemShapes_ = enable;
-        
+
         // Reapply current shape
         ApplyShape();
     }
@@ -115,13 +115,13 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
         LOGERROR("Shape index out of bounds, can not define cursor shape");
         return;
     }
-    
+
     if (!image)
         return;
-    
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     CursorShapeInfo& info = shapeInfos_[shape];
-    
+
     // Prefer to get the texture with same name from cache to prevent creating several copies of the texture
     if (cache->Exists(image->GetName()))
         info.texture_ = cache->GetResource<Texture2D>(image->GetName());
@@ -131,11 +131,11 @@ void Cursor::DefineShape(CursorShape shape, Image* image, const IntRect& imageRe
         texture->Load(SharedPtr<Image>(image));
         info.texture_ = texture;
     }
-    
+
     info.image_ = image;
     info.imageRect_ = imageRect;
     info.hotSpot_ = hotSpot;
-    
+
     // Remove existing SDL cursor
     if (info.osCursor_)
     {
@@ -236,12 +236,20 @@ void Cursor::ApplyShape()
             SDL_FreeCursor(info.osCursor_);
             info.osCursor_ = 0;
         }
-        
+
         // Create SDL cursor now if necessary
         if (!info.osCursor_)
         {
+            // Create a system default shape
+            if (useSystemShapes_)
+            {
+                info.osCursor_ = SDL_CreateSystemCursor((SDL_SystemCursor)osCursorLookup[shape_]);
+                info.systemDefined_ = true;
+                if (!info.osCursor_)
+                    LOGERROR("Could not create system cursor");
+            }
             // Create from image
-            if (!useSystemShapes_ && info.image_)
+            else if (info.image_)
             {
                 unsigned comp = info.image_->GetComponents();
                 int imageWidth = info.image_->GetWidth();
@@ -272,17 +280,8 @@ void Cursor::ApplyShape()
                     SDL_FreeSurface(surface);
                 }
             }
-            
-            // Create a system default shape
-            if (useSystemShapes_)
-            {
-                info.osCursor_ = SDL_CreateSystemCursor((SDL_SystemCursor)osCursorLookup[shape_]);
-                info.systemDefined_ = true;
-                if (!info.osCursor_)
-                    LOGERROR("Could not create system cursor");
-            }
         }
-        
+
         if (info.osCursor_)
             SDL_SetCursor(info.osCursor_);
     }

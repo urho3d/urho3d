@@ -180,6 +180,8 @@ void Input::Update()
 
 void Input::SetMouseVisible(bool enable)
 {
+    // SDL Raspberry Pi "video driver" does not have proper OS mouse support yet, so no-op for now
+    #ifndef RASPI
     if (enable != mouseVisible_)
     {
         mouseVisible_ = enable;
@@ -205,6 +207,7 @@ void Input::SetMouseVisible(bool enable)
         eventData[P_VISIBLE] = mouseVisible_;
         SendEvent(E_MOUSEVISIBLECHANGED, eventData);
     }
+    #endif
 }
 
 void Input::SetToggleFullscreen(bool enable)
