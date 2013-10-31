@@ -9,6 +9,8 @@ Bin/*
 !Bin/**/
 !Bin/*.bat
 !Bin/*.sh
+Bin/*.app/
+Bin/*.app.dSYM/
 Bin-CC/
 Lib/
 Lib-CC/
