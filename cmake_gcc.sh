@@ -124,7 +124,7 @@ if [ $ANDROID_NDK ]; then
     for dir in CoreData Data; do
         cmake -E create_symlink ../../../Bin/$dir Source/Android/assets/$dir
     done
-    for f in AndroidManifest.xml build.xml project.properties src res assets; do
+    for f in AndroidManifest.xml build.xml src res assets; do
         cmake -E create_symlink ../Source/Android/$f android-Build/$f
     done
 fi
