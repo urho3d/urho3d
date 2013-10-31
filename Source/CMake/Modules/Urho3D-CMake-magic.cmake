@@ -199,6 +199,22 @@ include (GenerateExportHeader)
 # Determine the project root directory
 get_filename_component (PROJECT_ROOT_DIR ${PROJECT_SOURCE_DIR} PATH)
 
+# Macro for setting common output directories
+macro (set_output_directories OUTPUT_PATH)
+    foreach (TYPE ${ARGN})
+        set(CMAKE_${TYPE}_OUTPUT_DIRECTORY ${OUTPUT_PATH})
+        foreach (CONFIG RELEASE RELWITHDEBINFO DEBUG)
+            set(CMAKE_${TYPE}_OUTPUT_DIRECTORY_${CONFIG} ${OUTPUT_PATH})
+        endforeach ()
+    endforeach ()
+endmacro ()
+
+# Set common binary output directory for all targets
+if (CMAKE_CROSSCOMPILING)
+    set (OUTPUT_PATH_SUFFIX -CC)
+endif ()
+set_output_directories (${PROJECT_ROOT_DIR}/Bin${OUTPUT_PATH_SUFFIX} RUNTIME PDB)
+
 # Reference supported build options that are potentially not being referenced due to platform or build type branching to suppress "unused variable" warning
 if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND
     ENABLE_MINIDUMPS AND USE_MKLINK AND USE_STATIC_RUNTIME AND
@@ -349,23 +365,10 @@ macro (setup_executable)
     define_dependency_libs (Urho3D_lib)
     setup_target ()
     
-    if (MSVC)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Bin\"
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" \"${PROJECT_ROOT_DIR}/Bin\"
-            COMMENT "Copying executable and debug files to Bin directory")
-    elseif (IOS)
+    if (IOS)
         set_target_properties (${TARGET_NAME} PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
-    else ()
-        if (CMAKE_CROSSCOMPILING)
-            file (MAKE_DIRECTORY ${PROJECT_ROOT_DIR}/Bin-CC)
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${PROJECT_ROOT_DIR}/Bin-CC)
-            if (SCP_TO_TARGET)
-                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
-            endif ()
-        else ()
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${PROJECT_ROOT_DIR}/Bin)
-        endif ()
+    elseif (RASPI AND SCP_TO_TARGET)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
     endif ()
 endmacro ()
 
@@ -396,21 +399,23 @@ macro (setup_main_executable)
     if (XCODE)
         set (RESOURCE_FILES ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data)
         set_source_files_properties(${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-        set (SOURCE_FILES ${SOURCE_FILES} ${RESOURCE_FILES})
+        list (APPEND SOURCE_FILES ${RESOURCE_FILES})
     endif ()
 
-    # Setup target
     if (ANDROID)
         # Add SDL native init function
         if (CMAKE_PROJECT_NAME MATCHES Urho3D.*)
-            set (SOURCE_FILES ${SOURCE_FILES} ${PROJECT_ROOT_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+            set (URHO3D_HOME ${PROJECT_ROOT_DIR})
+            # Rename target name to avoid name clash with Urho3D game engine shared library
             if (TARGET_NAME STREQUAL Urho3D AND URHO3D_LIB_TYPE STREQUAL SHARED)
-                # Rename target name to avoid name clash
                 set (TARGET_NAME Urho3Dapp)
             endif ()
         elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-            set (SOURCE_FILES ${SOURCE_FILES} $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+            set (URHO3D_HOME $ENV{URHO3D_HOME})
         endif ()
+        list (APPEND SOURCE_FILES ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+        # Setup shared library output path
+        set_output_directories (${ANDROID_LIBRARY_OUTPUT_PATH} LIBRARY)
         # Setup target as main shared library
         define_dependency_libs (Urho3D_lib)
         setup_library (SHARED)
@@ -421,18 +426,15 @@ macro (setup_main_executable)
                 get_filename_component (NAME ${FILE} NAME)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILE} ${ANDROID_LIBRARY_OUTPUT_PATH}
-                    COMMAND ${CMAKE_COMMAND} ARGS -E touch ${ANDROID_LIBRARY_OUTPUT_PATH}/${NAME}
-                    COMMENT "Copying ${NAME} to target library directory")
+                    COMMENT "Copying ${NAME} to library output directory")
             endif ()
         endforeach ()
-        # Copy target main shared library to Android library output path
-        file (MAKE_DIRECTORY ${ANDROID_LIBRARY_OUTPUT_PATH})
+        # Strip target main shared library
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${ANDROID_LIBRARY_OUTPUT_PATH}
-            COMMAND ${CMAKE_COMMAND} ARGS -E touch ${ANDROID_LIBRARY_OUTPUT_PATH}/lib${TARGET_NAME}.so
-            COMMENT "Stripping and copying lib${TARGET_NAME}.so to target library directory")
+            COMMENT "Stripping lib${TARGET_NAME}.so in library output directory")
     else ()
+        # Setup target as executable
         if (WIN32)
             set (EXE_TYPE WIN32)
         elseif (IOS)
@@ -444,23 +446,14 @@ macro (setup_main_executable)
         setup_executable (${EXE_TYPE})
     endif ()
     
-    if (XCODE)
+    if (IOS)
         get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
-        if (IOS)
-            # Define a custom target to check for resource modification
-            string (REGEX REPLACE "/Contents/MacOS" "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
-            add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
-                \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
-                COMMENT "Checking for changes in the Resource folders")
-            add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
-        else ()
-            # Create symbolic links to allow debugging/running the main executable within Xcode itself
-            get_filename_component (PATH ${TARGET_LOC} PATH)
-            file (RELATIVE_PATH REL_PATH ${PATH} ${PROJECT_ROOT_DIR}/Bin)
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-                COMMAND for dir in CoreData Data\; do cmake -E create_symlink ${REL_PATH}/$$dir ${PATH}/$$dir\; done
-                COMMENT "Creating symbolic links to allow debugging/running the main executable within Xcode itself")
-        endif ()
+        # Define a custom target to check for resource modification
+        string (REGEX REPLACE "/Contents/MacOS" "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
+        add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
+            \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
+            COMMENT "Checking for changes in the Resource folders")
+        add_dependencies (${TARGET_NAME} RESOURCE_CHECK_${TARGET_NAME})
     endif ()
 endmacro ()
 

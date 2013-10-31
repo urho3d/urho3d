@@ -87,10 +87,10 @@ if (NOT IOS AND NOT ANDROID AND NOT RASPI)
     add_subdirectory (ThirdParty/LibCpuId)
 endif ()
 
-# Urho3D game engine library targets
+# Urho3D game engine library
 add_subdirectory (Engine)
 
-# Urho3D tool targets
+# Urho3D tools
 add_subdirectory (Tools)
 
 # Urho3D samples
@@ -100,9 +100,9 @@ if (NOT ANDROID AND ENABLE_SAMPLES)
     add_subdirectory (Samples)
 endif ()
 
+# Urho3D extras
 # Do not build extras for iOS and Android regardless of its build option 
 if (NOT IOS AND NOT ANDROID AND ENABLE_EXTRAS)   
-    # Urho3D extras
     add_subdirectory (Extras)
 endif ()
 

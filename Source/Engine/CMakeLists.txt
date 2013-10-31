@@ -117,6 +117,15 @@ foreach (LIST_NAME LIBS INCLUDE_DIRS_ONLY LINK_LIBS_ONLY)
     set_list (${LIST_NAME} ENGINE_${LIST_NAME} REMOVE_DUPLICATE)
 endforeach ()
 
+# Setup library output path
+set (OUTPUT_PATH ${PROJECT_ROOT_DIR}/Lib)
+if (ANDROID)
+    set (OUTPUT_PATH ${ANDROID_LIBRARY_OUTPUT_PATH})
+elseif (CMAKE_CROSSCOMPILING)
+    set (OUTPUT_PATH ${OUTPUT_PATH}-CC)
+endif ()
+set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
+ 
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
 adjust_library_name ()
@@ -146,34 +155,12 @@ if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOUR
 endif ()
 
 # Define post build steps
-file (MAKE_DIRECTORY ${PROJECT_ROOT_DIR}/Lib)
-if (MSVC)
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Lib\"
-        COMMENT "Copying library to Lib directory")
-    if (URHO3D_LIB_TYPE STREQUAL SHARED)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).lib\" \"${PROJECT_ROOT_DIR}/Lib\"
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETDIR)$(TARGETNAME).pdb\" \"${PROJECT_ROOT_DIR}/Lib\"
-            COMMENT "Copying import library and debug files to Lib directory")
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different \"$(TARGETPATH)\" \"${PROJECT_ROOT_DIR}/Bin\"
-            COMMENT "Copying shared library to Bin directory")
-    endif ()
-else ()
-    # Strip the output shared library for embedded devices
-    if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>)
-    endif ()
-    set (OUTPUT_PATH ${PROJECT_ROOT_DIR}/Lib)
-    if (ANDROID)
-        set (OUTPUT_PATH ${ANDROID_LIBRARY_OUTPUT_PATH})
-    elseif (CMAKE_CROSSCOMPILING)
-        set (OUTPUT_PATH ${OUTPUT_PATH}-CC)
-        if (SCP_TO_TARGET)
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
-        endif ()
-    endif ()
-    file (MAKE_DIRECTORY ${OUTPUT_PATH})
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${OUTPUT_PATH})
+# Strip the output shared library for embedded devices
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
+    COMMENT "Stripping shared library")
+endif ()
+if (RASPI AND SCP_TO_TARGET)
+    # Ensure SCP is the last command
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
 endif ()
