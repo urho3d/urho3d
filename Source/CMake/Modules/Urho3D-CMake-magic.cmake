@@ -25,7 +25,7 @@ if (CMAKE_GENERATOR STREQUAL Xcode)
     set (XCODE TRUE)
 endif ()
 if (NOT MSVC AND NOT XCODE AND NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "Release")
+    set (CMAKE_BUILD_TYPE Release)
 endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
@@ -50,8 +50,8 @@ endif ()
 # this can be switched off if not using Urho3D as a shared library.
 if (MSVC)
     if (USE_STATIC_RUNTIME)
-        set (RELEASE_RUNTIME "/MT")
-        set (DEBUG_RUNTIME "/MTd")
+        set (RELEASE_RUNTIME /MT)
+        set (DEBUG_RUNTIME /MTd)
     else ()
         set (RELEASE_RUNTIME "")
         set (DEBUG_RUNTIME "")
@@ -116,28 +116,29 @@ if (IOS)
     else ()
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
     endif ()
-    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos;-iphonesimulator")
+    set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
     if (NOT MACOSX_BUNDLE_GUI_IDENTIFIER)
-        set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.googlecode.urho3d")
+        set (MACOSX_BUNDLE_GUI_IDENTIFIER com.googlecode.urho3d)
     endif ()
-    set (CMAKE_OSX_SYSROOT "iphoneos")    # Set to "Latest iOS"
+    set (CMAKE_OSX_SYSROOT iphoneos)    # Set to "Latest iOS"
 elseif (XCODE)
     # MacOSX-Xcode-specific setup
     if (NOT ENABLE_64BIT)
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
     endif ()
     set (CMAKE_OSX_SYSROOT "")        # Set to "Current OS X"
-    #set (CMAKE_OSX_SYSROOT "macosx") # Set to "Latest OS X"
+    #set (CMAKE_OSX_SYSROOT macosx) # Uncomment to set to "Latest OS X"
 endif ()
 if (MSVC)
     # Visual Studio-specific setup
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
+    # Note: All CMAKE_xxx_FLAGS variables are not in list context (although they should be)
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
     set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS-")
-    set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+    set (CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELWITHDEBINFO})
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS- /D _SECURE_SCL=0")
-    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+    set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
     # SSE flag is redundant if already compiling as 64bit
     if (ENABLE_SSE AND NOT ENABLE_64BIT)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE")
@@ -410,8 +411,10 @@ macro (setup_main_executable)
             if (TARGET_NAME STREQUAL Urho3D AND URHO3D_LIB_TYPE STREQUAL SHARED)
                 set (TARGET_NAME Urho3Dapp)
             endif ()
-        elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+        elseif ($ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
             set (URHO3D_HOME $ENV{URHO3D_HOME})
+        else ()
+            message (FATAL_ERROR "Could not find URHO3D_HOME environment variable or it is not point to a Urho3D project root tree")
         endif ()
         list (APPEND SOURCE_FILES ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         # Setup shared library output path
@@ -449,7 +452,7 @@ macro (setup_main_executable)
     if (IOS)
         get_target_property (TARGET_LOC ${TARGET_NAME} LOCATION)
         # Define a custom target to check for resource modification
-        string (REGEX REPLACE "/Contents/MacOS" "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
+        string (REGEX REPLACE /Contents/MacOS "" TARGET_LOC ${TARGET_LOC})    # The regex replacement is temporary workaround to correct the wrong location caused by CMake/Xcode generator bug
         add_custom_target (RESOURCE_CHECK_${TARGET_NAME} ALL
             \(\( `find ${RESOURCE_FILES} -newer ${TARGET_LOC} 2>/dev/null |wc -l` \)\) && touch -cm ${SOURCE_FILES} || exit 0
             COMMENT "Checking for changes in the Resource folders")
@@ -459,7 +462,7 @@ endmacro ()
 
 # Macro for adjusting library output name by dropping _suffix from the target name
 macro (adjust_library_name)
-    string (REGEX REPLACE "_.*$" "" LIB_NAME ${TARGET_NAME})
+    string (REGEX REPLACE _.*$ "" LIB_NAME ${TARGET_NAME})
     set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${LIB_NAME})
 endmacro ()
 
@@ -470,15 +473,16 @@ macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
     if (${TARGET} MATCHES SDL|Urho3D_lib)
         if (WIN32)
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
+            list (APPEND LINK_LIBS_ONLY user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
         elseif (APPLE)
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dl pthread)
+            list (APPEND LINK_LIBS_ONLY dl pthread)
         elseif (ANDROID)
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dl log)
+            list (APPEND LINK_LIBS_ONLY dl log)
         else ()
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dl pthread rt)
+            # Linux
+            list (APPEND LINK_LIBS_ONLY dl pthread rt)
             if (RASPI)
-                set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${BCM_VC_LIBRARIES})
+                list (APPEND ABSOLUTE_PATH_LIBS ${BCM_VC_LIBRARIES})
             endif ()
         endif ()
     endif ()
@@ -486,52 +490,52 @@ macro (define_dependency_libs TARGET)
     # ThirdParty/kNet & ThirdParty/Civetweb external dependency
     if (${TARGET} MATCHES Civetweb|kNet|Urho3D_lib)
         if (WIN32)
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} ws2_32)
+            list (APPEND LINK_LIBS_ONLY ws2_32)
         elseif (NOT ANDROID)
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} pthread)
+            list (APPEND LINK_LIBS_ONLY pthread)
         endif ()
     endif ()
 
-    # ThirdParty/LuaJIT external dependency
+    # Engine/LuaJIT external dependency
     if (ENABLE_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D_lib)
         if (NOT WIN32)
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dl m)
+            list (APPEND LINK_LIBS_ONLY dl m)
             if (NOT APPLE)
                 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
             endif ()
         endif ()
     endif ()
 
-    # Engine/Core external dependency
-    if (${TARGET} MATCHES Core|Urho3D_lib)
+    # Engine external dependency
+    if (${TARGET} STREQUAL Urho3D_lib)
+        # Core
         if (WIN32)
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} winmm)
+            list (APPEND LINK_LIBS_ONLY winmm)
             if (ENABLE_MINIDUMPS)
-                set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} dbghelp)
+                list (APPEND LINK_LIBS_ONLY dbghelp)
             endif ()
         elseif (NOT ANDROID)
-            set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} pthread)
+            list (APPEND LINK_LIBS_ONLY pthread)
         endif ()
-    endif ()
 
-    # Engine/Graphics external dependency
-    if (${TARGET} MATCHES Graphics|Urho3D_lib)
+        # Graphics
         if (USE_OPENGL)
             if (WIN32)
-                set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} opengl32)
+                list (APPEND LINK_LIBS_ONLY opengl32)
             elseif (ANDROID)
-                set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} GLESv1_CM GLESv2)
+                list (APPEND LINK_LIBS_ONLY GLESv1_CM GLESv2)
             elseif (NOT APPLE AND NOT RASPI)
-                set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} GL)
+                list (APPEND LINK_LIBS_ONLY GL)
             endif ()
         else ()
-            set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${DIRECT3D_LIBRARY})
+            list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARY})
         endif ()
-    endif ()
 
-    # Urho3D_lib external dependency
-    if (${TARGET} STREQUAL Urho3D_lib AND URHO3D_LIBRARIES)
-        set (ABSOLUTE_PATH_LIBS ${ABSOLUTE_PATH_LIBS} ${URHO3D_LIBRARIES})
+        # This variable value can either be 'Urho3D_lib' target or an absolute path to an actual static/shared Urho3D library
+        # The former would cause CMake not only to link against the Urho3D library but also to add a dependency to Urho3D_lib target
+        if (URHO3D_LIBRARIES)
+            list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
+        endif ()
     endif ()
 
     if (LINK_LIBS_ONLY)
@@ -553,7 +557,14 @@ macro (set_list TO_LIST FROM_LIST)
     endif ()
 endmacro ()
 
-# Macro for defining source files
+# Macro for defining source files with optional arguments as follows:
+#  GROUP <value> - Group source files into a sub-group folder in VS and Xcode (only works in curent scope context)
+#  GLOB_CPP_PATTERNS <list> - Use the provided globbing patterns for CPP_FILES instead of the default *.cpp
+#  GLOB_H_PATTERNS <list> - Use the provided globbing patterns for H_FILES instead of the default *.h
+#  EXTRA_CPP_FILES <list> - Include the provided list of files into CPP_FILES result
+#  EXTRA_H_FILES <list> - Include the provided list of files into H_FILES result
+#  PCH - Enable precompiled header on the defined source files
+#  PARENT_SCOPE - Glob source files in current directory but set the result in parent-scope's variable ${DIR}_CPP_FILES and ${DIR}_H_FILES instead
 macro (define_source_files)
     # Parse extra arguments
     cmake_parse_arguments (ARG "PCH;PARENT_SCOPE" "GROUP" "EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS" ${ARGN})

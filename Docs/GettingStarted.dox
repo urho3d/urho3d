@@ -281,7 +281,7 @@ if (COMMAND cmake_policy)
 endif ()
 
 # Add cmake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
+list (APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/Modules/")
 
 # Include Urho3D cmake module
 include (Urho3D-CMake-magic)
@@ -294,11 +294,11 @@ include_directories (${URHO3D_INCLUDE_DIR})
 set (TARGET_NAME Main)
 
 # Define source files
-file (GLOB CPP_FILES *.cpp)
-file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
-# Alternatively remove three lines above and uncomment below macro
-# define_source_files ()
+define_source_files ()
+# Which is equivalent to below three lines:
+# file (GLOB CPP_FILES *.cpp)
+# file (GLOB H_FILES *.h)
+# set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Setup target with resource copying
 setup_main_executable ()

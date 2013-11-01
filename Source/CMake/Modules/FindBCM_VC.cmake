@@ -47,7 +47,7 @@ find_library (BCM_VC_LIB_EGL EGL PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES v
 find_library (BCM_VC_LIB_GLES2 GLESv2 PATHS ${BCM_VC_LIB_SEARCH_PATH} PATH_SUFFIXES vc)
 
 if (BCM_VC_INCLUDE_DIR AND BCM_VC_LIB_BCM_HOST AND BCM_VC_LIB_EGL AND BCM_VC_LIB_GLES2)
-    set (BCM_VC_INCLUDE_DIR ${BCM_VC_INCLUDE_DIR} ${BCM_VC_INCLUDE_DIR}/interface/vcos/pthreads)
+    list (APPEND BCM_VC_INCLUDE_DIR ${BCM_VC_INCLUDE_DIR}/interface/vcos/pthreads)  # Note: variable change to list context after this
     set (BCM_VC_LIBRARIES ${BCM_VC_LIB_BCM_HOST} ${BCM_VC_LIB_EGL} ${BCM_VC_LIB_GLES2})
     set (BCM_VC_FOUND 1)
 endif ()

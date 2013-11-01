@@ -31,7 +31,7 @@ if (COMMAND cmake_policy)
 endif ()
 
 # Add cmake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake/Modules/")
+list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D cmake module
 include (Urho3D-CMake-magic)
@@ -52,7 +52,7 @@ endif ()
 # Add definition for Lua and LuaJIT
 if (ENABLE_LUAJIT)
     add_definitions (-DENABLE_LUAJIT)
-    set (JIT "JIT")
+    set (JIT JIT)
     # Implied ENABLE_LUA
     set (ENABLE_LUA 1)
 endif ()
