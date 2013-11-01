@@ -75,13 +75,17 @@ void IndexBuffer::Release()
     
     if (object_)
     {
-        if (!graphics_ || graphics_->IsDeviceLost())
+        if (!graphics_)
             return;
         
-        if (graphics_->GetIndexBuffer() == this)
-            graphics_->SetIndexBuffer(0);
+        if (!graphics_->IsDeviceLost())
+        {
+            if (graphics_->GetIndexBuffer() == this)
+                graphics_->SetIndexBuffer(0);
+            
+            glDeleteBuffers(1, &object_);
+        }
         
-        glDeleteBuffers(1, &object_);
         object_ = 0;
     }
 }

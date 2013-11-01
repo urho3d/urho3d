@@ -31,6 +31,11 @@ Docs/html/
 Source/.*project
 Source/.settings
 
+# Android project settings for non out-of-source build
+Source/Android/project.properties
+Source/Android/local.properties
+Source/Android/proguard-project.txt
+
 # CMake files for non out-of-source build
 CMakeCache.txt
 CMakeFiles

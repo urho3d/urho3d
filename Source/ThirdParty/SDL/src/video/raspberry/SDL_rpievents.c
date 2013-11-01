@@ -19,26 +19,27 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Created by Yao Wei Tjong for Urho3D
-
 #include "SDL_config.h"
 
-#ifndef _SDL_raspivideo_h
-#define _SDL_raspivideo_h
+#if SDL_VIDEO_DRIVER_RPI
 
-#include "../SDL_sysvideo.h"
+#include "../../events/SDL_sysevents.h"
+#include "../../events/SDL_events_c.h"
+#include "../../events/SDL_keyboard_c.h"
+#include "SDL_rpivideo.h"
+#include "SDL_rpievents_c.h"
 
-#include <EGL/egl.h>
+#ifdef SDL_INPUT_LINUXEV
+#include "../../input/evdev/SDL_evdev.h"
+#endif
 
-/* Private display data */
-
-typedef struct
+void RPI_PumpEvents(_THIS)
 {
-    SDL_Window *window;
-    EGL_DISPMANX_WINDOW_T nativewindow;
-    DISPMANX_DISPLAY_HANDLE_T display;
-} SDL_VideoData;
+#ifdef SDL_INPUT_LINUXEV
+    SDL_EVDEV_Poll();
+#endif
+    
+}
 
-#endif /* _SDL_raspivideo_h */
+#endif /* SDL_VIDEO_DRIVER_RPI */
 
-/* vi: set ts=4 sw=4 expandtab: */

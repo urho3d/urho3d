@@ -105,13 +105,18 @@ void TextureCube::Release()
 {
     if (object_)
     {
-        if (!graphics_ || graphics_->IsDeviceLost())
+        if (!graphics_)
             return;
         
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        if (!graphics_->IsDeviceLost())
         {
-            if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+            for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+            {
+                if (graphics_->GetTexture(i) == this)
+                    graphics_->SetTexture(i, 0);
+            }
+            
+            glDeleteTextures(1, &object_);
         }
         
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
@@ -120,7 +125,6 @@ void TextureCube::Release()
                 renderSurfaces_[i]->Release();
         }
         
-        glDeleteTextures(1, &object_);
         object_ = 0;
     }
 }

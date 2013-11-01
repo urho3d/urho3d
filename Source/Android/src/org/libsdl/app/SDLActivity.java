@@ -6,12 +6,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.egl.EGLDisplay;
-import javax.microedition.khronos.egl.EGLSurface;
-
 import android.app.*;
 import android.content.*;
 import android.view.*;
@@ -50,12 +44,6 @@ public class SDLActivity extends Activity {
     protected static Thread mAudioThread;
     protected static AudioTrack mAudioTrack;
 
-    // EGL objects
-    protected static EGLContext  mEGLContext;
-    protected static EGLSurface  mEGLSurface;
-    protected static EGLDisplay  mEGLDisplay;
-    protected static EGLConfig   mEGLConfig;
-    protected static int mGLMajor, mGLMinor;
 
     // Urho3D: flag to load the .so
     private static boolean mIsSharedLibraryLoaded = false;
@@ -63,15 +51,14 @@ public class SDLActivity extends Activity {
     // Setup
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Log.v(TAG, "onCreate()");
+        //Log.v("SDL", "onCreate()");
         super.onCreate(savedInstanceState);
         
         // So we can call stuff from static callbacks
         mSingleton = this;
         
         // Urho3D: auto load all the shared libraries available in the library path
-        // FIXME: use getApplicationInfo().nativeLibraryDir directly when min target API is 9 or above
-        String libraryPath = getApplicationInfo().dataDir + "/lib";
+        String libraryPath = getApplicationInfo().nativeLibraryDir;
         //Log.v(TAG, "library path: " + libraryPath);
         if (!mIsSharedLibraryLoaded) {
             File[] files = new File(libraryPath).listFiles();
@@ -90,9 +77,7 @@ public class SDLActivity extends Activity {
         }
 
         // Set up the surface
-        mEGLSurface = EGL10.EGL_NO_SURFACE;
         mSurface = new SDLSurface(getApplication());
-        mEGLContext = EGL10.EGL_NO_CONTEXT;
 
         mLayout = new AbsoluteLayout(this);
         mLayout.addView(mSurface);
@@ -103,14 +88,14 @@ public class SDLActivity extends Activity {
     // Events
     @Override
     protected void onPause() {
-        //Log.v(TAG, "onPause()");
+        Log.v("SDL", "onPause()");
         super.onPause();
         SDLActivity.handlePause();
     }
 
     @Override
     protected void onResume() {
-        //Log.v(TAG, "onResume()");
+        Log.v("SDL", "onResume()");
         super.onResume();
         SDLActivity.handleResume();
     }
@@ -118,8 +103,8 @@ public class SDLActivity extends Activity {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        //Log.v(TAG, "onWindowFocusChanged(): " + hasFocus);
         super.onWindowFocusChanged(hasFocus);
+        Log.v("SDL", "onWindowFocusChanged(): " + hasFocus);
 
         SDLActivity.mHasFocus = hasFocus;
         if (hasFocus) {
@@ -129,16 +114,15 @@ public class SDLActivity extends Activity {
 
     @Override
     public void onLowMemory() {
-        //Log.v(TAG, "onLowMemory()");
+        Log.v("SDL", "onLowMemory()");
         super.onLowMemory();
         SDLActivity.nativeLowMemory();
     }
 
     @Override
     protected void onDestroy() {
-        //Log.v(TAG, "onDestroy()");
         super.onDestroy();
-        
+        Log.v("SDL", "onDestroy()");
         // Send a quit message to the application
         SDLActivity.nativeQuit();
 
@@ -147,23 +131,26 @@ public class SDLActivity extends Activity {
             try {
                 mSDLThread.join();
             } catch(Exception e) {
-                if (Log.isLoggable(TAG, Log.ERROR))
-                    Log.e(TAG, "Problem stopping thread: " + e);
+                Log.v("SDL", "Problem stopping thread: " + e);
             }
             mSDLThread = null;
 
-            //Log.v(TAG, "Finished waiting for SDL thread");
+            //Log.v("SDL", "Finished waiting for SDL thread");
         }
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
-        // Ignore volume keys so they're handled by Android
+        // Ignore certain special keys so they're handled by Android
         // Urho3D: also ignore the Home key
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ||
             keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
-            keyCode == KeyEvent.KEYCODE_HOME) {
+            keyCode == KeyEvent.KEYCODE_HOME ||
+            keyCode == KeyEvent.KEYCODE_CAMERA ||
+            keyCode == 168 || /* API 11: KeyEvent.KEYCODE_ZOOM_IN */
+            keyCode == 169 /* API 11: KeyEvent.KEYCODE_ZOOM_OUT */
+            ) {
             return false;
         }
         return super.dispatchKeyEvent(event);
@@ -252,8 +239,7 @@ public class SDLActivity extends Activity {
 
             default:
                 if ((context instanceof SDLActivity) && !((SDLActivity) context).onUnhandledMessage(msg.arg1, msg.obj)) {
-                    if (Log.isLoggable(TAG, Log.ERROR))
-                        Log.e(TAG, "error handling message, command is " + msg.arg1);
+                    Log.e(TAG, "error handling message, command is " + msg.arg1);
                 }
             }
         }
@@ -271,6 +257,7 @@ public class SDLActivity extends Activity {
     }
 
     // C functions we call
+    // Urho3D: added parameter
     public static native void nativeInit(String filesDir);
     public static native void nativeLowMemory();
     public static native void nativeQuit();
@@ -284,29 +271,12 @@ public class SDLActivity extends Activity {
                                             int action, float x, 
                                             float y, float p);
     public static native void onNativeAccel(float x, float y, float z);
-
-    // Java functions called from C
-
-    public static boolean createGLContext(int majorVersion, int minorVersion, int[] attribs) {
-        return initEGL(majorVersion, minorVersion, attribs);
-    }
-    
-    public static void deleteGLContext() {
-        if (SDLActivity.mEGLDisplay != null && SDLActivity.mEGLContext != EGL10.EGL_NO_CONTEXT) {
-            EGL10 egl = (EGL10)EGLContext.getEGL();
-            egl.eglMakeCurrent(SDLActivity.mEGLDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
-            egl.eglDestroyContext(SDLActivity.mEGLDisplay, SDLActivity.mEGLContext);
-            SDLActivity.mEGLContext = EGL10.EGL_NO_CONTEXT;
-
-            if (SDLActivity.mEGLSurface != EGL10.EGL_NO_SURFACE) {
-                egl.eglDestroySurface(SDLActivity.mEGLDisplay, SDLActivity.mEGLSurface);
-                SDLActivity.mEGLSurface = EGL10.EGL_NO_SURFACE;
-            }
-        }
-    }
+    public static native void onNativeSurfaceChanged();
+    public static native void onNativeSurfaceDestroyed();
+    public static native void nativeFlipBuffers();
 
     public static void flipBuffers() {
-        flipEGL();
+        SDLActivity.nativeFlipBuffers();
     }
 
     public static boolean setActivityTitle(String title) {
@@ -314,6 +284,7 @@ public class SDLActivity extends Activity {
         return mSingleton.sendCommand(COMMAND_CHANGE_TITLE, title);
     }
 
+    // Urho3D: added function
     public static void finishActivity()
     {
         mSingleton.sendCommand(COMMAND_FINISH, null);
@@ -369,157 +340,9 @@ public class SDLActivity extends Activity {
         // Transfer the task to the main thread as a Runnable
         return mSingleton.commandHandler.post(new ShowTextInputTask(x, y, w, h));
     }
-
-
-    // EGL functions
-    public static boolean initEGL(int majorVersion, int minorVersion, int[] attribs) {
-        try {
-            EGL10 egl = (EGL10)EGLContext.getEGL();
             
-            if (SDLActivity.mEGLDisplay == null) {
-                SDLActivity.mEGLDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
-                int[] version = new int[2];
-                egl.eglInitialize(SDLActivity.mEGLDisplay, version);
-            }
-            
-            if (SDLActivity.mEGLDisplay != null && SDLActivity.mEGLContext == EGL10.EGL_NO_CONTEXT) {
-                // No current GL context exists, we will create a new one.
-                if (Log.isLoggable(TAG, Log.DEBUG))
-                    Log.d(TAG, "Starting up OpenGL ES " + majorVersion + "." + minorVersion);
-                EGLConfig[] configs = new EGLConfig[128];
-                int[] num_config = new int[1];
-                if (!egl.eglChooseConfig(SDLActivity.mEGLDisplay, attribs, configs, 1, num_config) || num_config[0] == 0) {
-                    Log.e("SDL", "No EGL config available");
-                    return false;
-                }
-                EGLConfig config = null;
-                int bestdiff = -1, bitdiff;
-                int[] value = new int[1];
-                
-                // eglChooseConfig returns a number of configurations that match or exceed the requested attribs.
-                // From those, we select the one that matches our requirements more closely
-                if (Log.isLoggable(TAG, Log.DEBUG))
-                    Log.d(TAG, "Got " + num_config[0] + " valid modes from egl");
-                for(int i = 0; i < num_config[0]; i++) {
-                    bitdiff = 0;
-                    // Go through some of the attributes and compute the bit difference between what we want and what we get.
-                    for (int j = 0; ; j += 2) {
-                        if (attribs[j] == EGL10.EGL_NONE)
-                            break;
-
-                        if (attribs[j+1] != EGL10.EGL_DONT_CARE && (attribs[j] == EGL10.EGL_RED_SIZE ||
-                            attribs[j] == EGL10.EGL_GREEN_SIZE ||
-                            attribs[j] == EGL10.EGL_BLUE_SIZE ||
-                            attribs[j] == EGL10.EGL_ALPHA_SIZE ||
-                            attribs[j] == EGL10.EGL_DEPTH_SIZE ||
-                            attribs[j] == EGL10.EGL_STENCIL_SIZE)) {
-                            egl.eglGetConfigAttrib(SDLActivity.mEGLDisplay, configs[i], attribs[j], value);
-                            bitdiff += value[0] - attribs[j + 1]; // value is always >= attrib
-                        }
-                    }
-                    
-                    if (bitdiff < bestdiff || bestdiff == -1) {
-                        config = configs[i];
-                        bestdiff = bitdiff;
-                    }
-                    
-                    if (bitdiff == 0) break; // we found an exact match!
-                }
-                
-                if (Log.isLoggable(TAG, Log.DEBUG))
-                    Log.d("SDL", "Selected mode with a total bit difference of " + bestdiff);
-
-                SDLActivity.mEGLConfig = config;
-                SDLActivity.mGLMajor = majorVersion;
-                SDLActivity.mGLMinor = minorVersion;
-            }
-            
-            return SDLActivity.createEGLSurface();
-
-        } catch(Exception e) {
-            if (Log.isLoggable(TAG, Log.ERROR))
-                Log.e(TAG, "initEGL(): " + e);
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                for (StackTraceElement s : e.getStackTrace()) {
-                    Log.d(TAG, s.toString());
-                }
-            }
-            return false;
-        }
-    }
-
-    public static boolean createEGLContext() {
-        EGL10 egl = (EGL10)EGLContext.getEGL();
-        int EGL_CONTEXT_CLIENT_VERSION=0x3098;
-        int contextAttrs[] = new int[] { EGL_CONTEXT_CLIENT_VERSION, SDLActivity.mGLMajor, EGL10.EGL_NONE };
-        SDLActivity.mEGLContext = egl.eglCreateContext(SDLActivity.mEGLDisplay, SDLActivity.mEGLConfig, EGL10.EGL_NO_CONTEXT, contextAttrs);
-        if (SDLActivity.mEGLContext == EGL10.EGL_NO_CONTEXT) {
-            Log.e("SDL", "Couldn't create context");
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean createEGLSurface() {
-        if (SDLActivity.mEGLDisplay != null && SDLActivity.mEGLConfig != null) {
-            EGL10 egl = (EGL10)EGLContext.getEGL();
-            if (SDLActivity.mEGLContext == EGL10.EGL_NO_CONTEXT) createEGLContext();
-
-            if (SDLActivity.mEGLSurface == EGL10.EGL_NO_SURFACE) {
-                Log.d(TAG, "Creating new EGL Surface");
-                SDLActivity.mEGLSurface = egl.eglCreateWindowSurface(SDLActivity.mEGLDisplay, SDLActivity.mEGLConfig, SDLActivity.mSurface, null);
-                if (SDLActivity.mEGLSurface == EGL10.EGL_NO_SURFACE) {
-                    Log.e("SDL", "Couldn't create surface");
-                    return false;
-                }
-            }
-            else Log.d(TAG, "EGL Surface remains valid");
-
-            if (egl.eglGetCurrentContext() != SDLActivity.mEGLContext) {
-                if (!egl.eglMakeCurrent(SDLActivity.mEGLDisplay, SDLActivity.mEGLSurface, SDLActivity.mEGLSurface, SDLActivity.mEGLContext)) {
-                    Log.e("SDL", "Old EGL Context doesnt work, trying with a new one");
-                    // TODO: Notify the user via a message that the old context could not be restored, and that textures need to be manually restored.
-                    createEGLContext();
-                    if (!egl.eglMakeCurrent(SDLActivity.mEGLDisplay, SDLActivity.mEGLSurface, SDLActivity.mEGLSurface, SDLActivity.mEGLContext)) {
-                        Log.e("SDL", "Failed making EGL Context current");
-                        return false;
-                    }
-                }
-                else Log.d(TAG, "EGL Context made current");
-            }
-            else Log.d(TAG, "EGL Context remains current");
-
-            return true;
-        } else {
-            if (Log.isLoggable(TAG, Log.ERROR))
-                Log.e("SDL", "Surface creation failed, display = " + SDLActivity.mEGLDisplay + ", config = " + SDLActivity.mEGLConfig);
-            return false;
-        }
-    }
-
-    // EGL buffer flip
-    public static void flipEGL() {
-        try {
-            EGL10 egl = (EGL10)EGLContext.getEGL();
-
-            egl.eglWaitNative(EGL10.EGL_CORE_NATIVE_ENGINE, null);
-
-            // drawing here
-
-            egl.eglWaitGL();
-
-            egl.eglSwapBuffers(SDLActivity.mEGLDisplay, SDLActivity.mEGLSurface);
-
-
-        } catch(Exception e) {
-            if (Log.isLoggable(TAG, Log.ERROR))
-                Log.e(TAG, "flipEGL(): " + e);
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                for (StackTraceElement s : e.getStackTrace()) {
-                    Log.d(TAG, s.toString());
-                }
-            }
-        }
+    public static Surface getNativeSurface() {
+        return SDLActivity.mSurface.getNativeSurface();
     }
 
     // Audio
@@ -528,8 +351,7 @@ public class SDLActivity extends Activity {
         int audioFormat = is16Bit ? AudioFormat.ENCODING_PCM_16BIT : AudioFormat.ENCODING_PCM_8BIT;
         int frameSize = (isStereo ? 2 : 1) * (is16Bit ? 2 : 1);
         
-        if (Log.isLoggable(TAG, Log.DEBUG))
-            Log.d(TAG, "SDL audio: wanted " + (isStereo ? "stereo" : "mono") + " " + (is16Bit ? "16-bit" : "8-bit") + " " + (sampleRate / 1000f) + "kHz, " + desiredFrames + " frames buffer");
+        Log.v("SDL", "SDL audio: wanted " + (isStereo ? "stereo" : "mono") + " " + (is16Bit ? "16-bit" : "8-bit") + " " + (sampleRate / 1000f) + "kHz, " + desiredFrames + " frames buffer");
         
         // Let the user pick a larger buffer if they really want -- but ye
         // gods they probably shouldn't, the minimums are horrifyingly high
@@ -552,9 +374,8 @@ public class SDLActivity extends Activity {
             
             mAudioTrack.play();
         }
-
-        if (Log.isLoggable(TAG, Log.DEBUG))
-            Log.d(TAG, "SDL audio: got " + ((mAudioTrack.getChannelCount() >= 2) ? "stereo" : "mono") + " " + ((mAudioTrack.getAudioFormat() == AudioFormat.ENCODING_PCM_16BIT) ? "16-bit" : "8-bit") + " " + (mAudioTrack.getSampleRate() / 1000f) + "kHz, " + desiredFrames + " frames buffer");
+       
+        Log.v("SDL", "SDL audio: got " + ((mAudioTrack.getChannelCount() >= 2) ? "stereo" : "mono") + " " + ((mAudioTrack.getAudioFormat() == AudioFormat.ENCODING_PCM_16BIT) ? "16-bit" : "8-bit") + " " + (mAudioTrack.getSampleRate() / 1000f) + "kHz, " + desiredFrames + " frames buffer");
         
         return 0;
     }
@@ -601,6 +422,24 @@ public class SDLActivity extends Activity {
             mAudioTrack = null;
         }
     }
+
+    // Input
+
+    /**
+     * @return an array which may be empty but is never null.
+     */
+    public static int[] inputGetInputDeviceIds(int sources) {
+        int[] ids = InputDevice.getDeviceIds();
+        int[] filtered = new int[ids.length];
+        int used = 0;
+        for (int i = 0; i < ids.length; ++i) {
+            InputDevice device = InputDevice.getDevice(ids[i]);
+            if ((device != null) && ((device.getSources() & sources) != 0)) {
+                filtered[used++] = device.getId();
+            }
+        }
+        return Arrays.copyOf(filtered, used);
+    }
 }
 
 /**
@@ -626,10 +465,9 @@ class SDLMain implements Runnable {
 class SDLSurface extends SurfaceView implements SurfaceHolder.Callback, 
     View.OnKeyListener, View.OnTouchListener, SensorEventListener  {
 
-    private static final String TAG = "SDL";
-    
     // Sensors
     protected static SensorManager mSensorManager;
+    protected static Display mDisplay;
 
     // Keep track of the surface size to normalize touch events
     protected static float mWidth, mHeight;
@@ -645,101 +483,95 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         setOnKeyListener(this); 
         setOnTouchListener(this);   
 
+        mDisplay = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
 
         // Some arbitrary defaults to avoid a potential division by zero
         mWidth = 1.0f;
         mHeight = 1.0f;
     }
+    
+    public Surface getNativeSurface() {
+        return getHolder().getSurface();
+    }
 
     // Called when we have a valid drawing surface
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        //Log.v(TAG, "surfaceCreated()");
+        Log.v("SDL", "surfaceCreated()");
         holder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
-        // Set mIsSurfaceReady to 'true' *before* any call to handleResume
-        SDLActivity.mIsSurfaceReady = true;
     }
 
     // Called when we lose the surface
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        //Log.v(TAG, "surfaceDestroyed()");
+        Log.v("SDL", "surfaceDestroyed()");
         // Call this *before* setting mIsSurfaceReady to 'false'
         SDLActivity.handlePause();
         SDLActivity.mIsSurfaceReady = false;
-
-        /* We have to clear the current context and destroy the egl surface here
-         * Otherwise there's BAD_NATIVE_WINDOW errors coming from eglCreateWindowSurface on resume
-         * Ref: http://stackoverflow.com/questions/8762589/eglcreatewindowsurface-on-ics-and-switching-from-2d-to-3d
-         */
-        
-        EGL10 egl = (EGL10)EGLContext.getEGL();
-        egl.eglMakeCurrent(SDLActivity.mEGLDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
-        egl.eglDestroySurface(SDLActivity.mEGLDisplay, SDLActivity.mEGLSurface);
-        SDLActivity.mEGLSurface = EGL10.EGL_NO_SURFACE;
+        SDLActivity.onNativeSurfaceDestroyed();
     }
 
     // Called when the surface is resized
     @Override
     public void surfaceChanged(SurfaceHolder holder,
                                int format, int width, int height) {
-        //Log.v(TAG, "surfaceChanged()");
+        Log.v("SDL", "surfaceChanged()");
 
         int sdlFormat = 0x15151002; // SDL_PIXELFORMAT_RGB565 by default
         switch (format) {
         case PixelFormat.A_8:
-            Log.d(TAG, "pixel format A_8");
+            Log.v("SDL", "pixel format A_8");
             break;
         case PixelFormat.LA_88:
-            Log.d(TAG, "pixel format LA_88");
+            Log.v("SDL", "pixel format LA_88");
             break;
         case PixelFormat.L_8:
-            Log.d(TAG, "pixel format L_8");
+            Log.v("SDL", "pixel format L_8");
             break;
         case PixelFormat.RGBA_4444:
-            Log.d(TAG, "pixel format RGBA_4444");
+            Log.v("SDL", "pixel format RGBA_4444");
             sdlFormat = 0x15421002; // SDL_PIXELFORMAT_RGBA4444
             break;
         case PixelFormat.RGBA_5551:
-            Log.d(TAG, "pixel format RGBA_5551");
+            Log.v("SDL", "pixel format RGBA_5551");
             sdlFormat = 0x15441002; // SDL_PIXELFORMAT_RGBA5551
             break;
         case PixelFormat.RGBA_8888:
-            Log.d(TAG, "pixel format RGBA_8888");
+            Log.v("SDL", "pixel format RGBA_8888");
             sdlFormat = 0x16462004; // SDL_PIXELFORMAT_RGBA8888
             break;
         case PixelFormat.RGBX_8888:
-            Log.d(TAG, "pixel format RGBX_8888");
+            Log.v("SDL", "pixel format RGBX_8888");
             sdlFormat = 0x16261804; // SDL_PIXELFORMAT_RGBX8888
             break;
         case PixelFormat.RGB_332:
-            Log.d(TAG, "pixel format RGB_332");
+            Log.v("SDL", "pixel format RGB_332");
             sdlFormat = 0x14110801; // SDL_PIXELFORMAT_RGB332
             break;
         case PixelFormat.RGB_565:
-            Log.d(TAG, "pixel format RGB_565");
+            Log.v("SDL", "pixel format RGB_565");
             sdlFormat = 0x15151002; // SDL_PIXELFORMAT_RGB565
             break;
         case PixelFormat.RGB_888:
-            Log.d(TAG, "pixel format RGB_888");
+            Log.v("SDL", "pixel format RGB_888");
             // Not sure this is right, maybe SDL_PIXELFORMAT_RGB24 instead?
             sdlFormat = 0x16161804; // SDL_PIXELFORMAT_RGB888
             break;
         default:
-            if (Log.isLoggable(TAG, Log.DEBUG))
-                Log.d(TAG, "pixel format unknown " + format);
+            Log.v("SDL", "pixel format unknown " + format);
             break;
         }
 
         mWidth = width;
         mHeight = height;
         SDLActivity.onNativeResize(width, height, sdlFormat);
-        if (Log.isLoggable(TAG, Log.DEBUG))
-            Log.d(TAG, "Window size: " + width + "x" + height);
+        Log.v("SDL", "Window size:" + width + "x"+height);
 
         // Set mIsSurfaceReady to 'true' *before* making a call to handleResume
         SDLActivity.mIsSurfaceReady = true;
+        SDLActivity.onNativeSurfaceChanged();
+
 
         if (SDLActivity.mSDLThread == null) {
             // This is the entry point to the C app.
@@ -761,12 +593,12 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     public boolean onKey(View  v, int keyCode, KeyEvent event) {
         
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            //Log.v(TAG, "key down: " + keyCode);
+            //Log.v("SDL", "key down: " + keyCode);
             SDLActivity.onNativeKeyDown(keyCode);
             return true;
         }
         else if (event.getAction() == KeyEvent.ACTION_UP) {
-            //Log.v(TAG, "key up: " + keyCode);
+            //Log.v("SDL", "key up: " + keyCode);
             SDLActivity.onNativeKeyUp(keyCode);
             return true;
         }
@@ -825,9 +657,28 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            SDLActivity.onNativeAccel(event.values[0] / SensorManager.GRAVITY_EARTH,
-                                      event.values[1] / SensorManager.GRAVITY_EARTH,
-                                      event.values[2] / SensorManager.GRAVITY_EARTH);
+            float x, y;
+            switch (mDisplay.getRotation()) {
+                case Surface.ROTATION_90:
+                    x = -event.values[1];
+                    y = event.values[0];
+                    break;
+                case Surface.ROTATION_270:
+                    x = event.values[1];
+                    y = -event.values[0];
+                    break;
+                case Surface.ROTATION_180:
+                    x = -event.values[1];
+                    y = -event.values[0];
+                    break;
+                default:
+                    x = event.values[0];
+                    y = event.values[1];
+                    break;
+            }
+            SDLActivity.onNativeAccel(-x / SensorManager.GRAVITY_EARTH,
+                                      y / SensorManager.GRAVITY_EARTH,
+                                      event.values[2] / SensorManager.GRAVITY_EARTH - 1);
         }
     }
     
@@ -905,6 +756,7 @@ class SDLInputConnection extends BaseInputConnection {
 
     public SDLInputConnection(View targetView, boolean fullEditor) {
         super(targetView, fullEditor);
+
     }
 
     @Override
@@ -950,3 +802,4 @@ class SDLInputConnection extends BaseInputConnection {
     public native void nativeSetComposingText(String text, int newCursorPosition);
 
 }
+

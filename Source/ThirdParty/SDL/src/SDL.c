@@ -23,6 +23,10 @@
 
 #include "SDL_config.h"
 
+#if defined(__WIN32__)
+#include "core/windows/SDL_windows.h"
+#endif
+
 /* Initialization code for SDL */
 
 #include "SDL.h"

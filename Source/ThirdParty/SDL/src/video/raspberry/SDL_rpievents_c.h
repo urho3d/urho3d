@@ -19,17 +19,13 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-// Created by Yao Wei Tjong for Urho3D
+#ifndef _SDL_rpievents_c_h
+#define _SDL_rpievents_c_h
 
-#include "SDL_config.h"
+#include "SDL_rpivideo.h"
 
-#ifndef _SDL_raspievents_h
-#define _SDL_raspievents_h
+void RPI_PumpEvents(_THIS);
+void RPI_EventInit(_THIS);
+void RPI_EventQuit(_THIS);
 
-extern void RASPI_PumpEvents(_THIS);
-extern int RASPI_InitInput(_THIS);
-extern void RASPI_QuitInput(_THIS);
-
-#endif /* _SDL_raspievents_h */
-
-/* vi: set ts=4 sw=4 expandtab: */
+#endif /* _SDL_rpievents_c_h */

@@ -477,7 +477,7 @@ macro (define_dependency_libs TARGET)
         elseif (APPLE)
             list (APPEND LINK_LIBS_ONLY dl pthread)
         elseif (ANDROID)
-            list (APPEND LINK_LIBS_ONLY dl log)
+            list (APPEND LINK_LIBS_ONLY dl log android)
         else ()
             # Linux
             list (APPEND LINK_LIBS_ONLY dl pthread rt)

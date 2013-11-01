@@ -63,18 +63,22 @@ void ShaderVariation::Release()
         if (!graphics_)
             return;
         
-        if (shaderType_ == VS)
+        if (!graphics_->IsDeviceLost())
         {
-            if (graphics_->GetVertexShader() == this)
-                graphics_->SetShaders(0, 0);
-        }
-        else
-        {
-            if (graphics_->GetPixelShader() == this)
-                graphics_->SetShaders(0, 0);
+            if (shaderType_ == VS)
+            {
+                if (graphics_->GetVertexShader() == this)
+                    graphics_->SetShaders(0, 0);
+            }
+            else
+            {
+                if (graphics_->GetPixelShader() == this)
+                    graphics_->SetShaders(0, 0);
+            }
+            
+            glDeleteShader(object_);
         }
         
-        glDeleteShader(object_);
         object_ = 0;
         compiled_ = false;
         compilerOutput_.Clear();

@@ -180,7 +180,7 @@ void Input::Update()
 
 void Input::SetMouseVisible(bool enable)
 {
-    // Urho3D implementation of SDL Raspberry Pi "video driver" does not have OS mouse support, so no-op
+    // SDL Raspberry Pi "video driver" does not have proper OS mouse support yet, so no-op for now
     #ifndef RASPI
     if (enable != mouseVisible_)
     {
@@ -238,7 +238,7 @@ bool Input::OpenJoystick(unsigned index)
         // Map SDL joystick index to internal index (which starts at 0)
         int sdl_joy_instance_id = SDL_JoystickInstanceID(joystick);
         joystickIDMap_[sdl_joy_instance_id] = index;
-        
+
         JoystickState& state = joysticks_[index];
         state.joystick_ = joystick;
         state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
@@ -671,6 +671,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_FINGERDOWN:
+        if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = touches_[touchID];
@@ -693,6 +694,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_FINGERUP:
+        if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = touches_[touchID];
@@ -713,6 +715,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_FINGERMOTION:
+        if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = evt.tfinger.fingerId & 0x7ffffff;
             TouchState& state = touches_[touchID];
@@ -742,11 +745,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             unsigned button = evt.jbutton.button;
             unsigned joystickIndex = joystickIDMap_[evt.jbutton.which];
-            
+
             VariantMap eventData;
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_BUTTON] = button;
-            
+
             if (joystickIndex < joysticks_.Size() && button < joysticks_[joystickIndex].buttons_.Size()) {
                 joysticks_[joystickIndex].buttons_[button] = true;
                 joysticks_[joystickIndex].buttonPress_[button] = true;
@@ -761,7 +764,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             unsigned button = evt.jbutton.button;
             unsigned joystickIndex = joystickIDMap_[evt.jbutton.which];
-            
+
             VariantMap eventData;
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_BUTTON] = button;
@@ -776,7 +779,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_JOYAXISMOTION:
         {
             using namespace JoystickAxisMove;
-            
+
             unsigned joystickIndex = joystickIDMap_[evt.jaxis.which];
 
             VariantMap eventData;
@@ -796,7 +799,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_JOYHATMOTION:
         {
             using namespace JoystickHatMove;
-            
+
             unsigned joystickIndex = joystickIDMap_[evt.jaxis.which];
 
             VariantMap eventData;
@@ -834,13 +837,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 break;
 
             #ifdef ANDROID
-            case SDL_WINDOWEVENT_FOCUS_LOST:
-                // Mark GPU objects lost
-                graphics_->Release(false, false);
-                break;
-
             case SDL_WINDOWEVENT_FOCUS_GAINED:
-                // Restore GPU objects
+                // Restore GPU objects to the new GL context
                 graphics_->Restore();
                 break;
             #endif
@@ -855,15 +853,15 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_DROPFILE:
         {
             using namespace DropFile;
-            
+
             VariantMap eventData;
             eventData[P_FILENAME] = GetInternalPath(String(evt.drop.file));
             SDL_free(evt.drop.file);
-            
+
             SendEvent(E_DROPFILE, eventData);
         }
         break;
-        
+
     case SDL_QUIT:
         SendEvent(E_EXITREQUESTED);
         break;
