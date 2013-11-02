@@ -62,7 +62,7 @@ if (URHO3D_HOME)
         get_filename_component (SOURCE_TREE_PATH ${SOURCE_TREE_PATH} PATH)
         set (URHO3D_INCLUDE_DIR ${SOURCE_TREE_PATH})
         foreach (DIR Audio Container Core Engine Graphics Input IO LuaScript Math Navigation Network Physics Resource Scene Script UI)
-            list (APPEND URHO3D_INCLUDE_DIR ${SOURCE_TREE_PATH}/${DIR})
+            list (APPEND URHO3D_INCLUDE_DIR ${SOURCE_TREE_PATH}/${DIR})     # Note: variable change to list context after this
         endforeach ()
         foreach (DIR Bullet/src kNet/include LZ4 SDL/include STB)
             list (APPEND URHO3D_INCLUDE_DIR ${URHO3D_HOME}/Source/ThirdParty/${DIR})
@@ -99,6 +99,13 @@ else ()
     endif ()
     find_path (URHO3D_INCLUDE_DIR Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES Urho3D)
     find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES Urho3D)
+
+    if (URHO3D_INCLUDE_DIR)
+        set (BASE_DIR ${URHO3D_INCLUDE_DIR})
+        foreach (DIR Bullet kNet LZ4 SDL STB)
+            list (APPEND URHO3D_INCLUDE_DIR ${BASE_DIR}/${DIR})     # Note: variable change to list context after this, so we need BASE_DIR to remain the same
+        endforeach ()
+    endif ()
 endif ()
 
 if (URHO3D_INCLUDE_DIR AND URHO3D_LIBRARIES)
