@@ -86,8 +86,8 @@ if (URHO3D_HOME)
         endif ()
     endif ()
 else ()
-    # If Urho3D SDK is not being installed in the default system location, use the URHO3D_INSTALL_PREFIX environment to specify the prefix path to that location
-    # Note that the prefix path should not usually contain the "/include" or "/lib"
+    # If Urho3D SDK is not being installed in the default system location, use the URHO3D_INSTALL_PREFIX environment variable to specify the prefix path to that location
+    # Note that the prefix path should not contain the "/include" or "/lib"
     # For example on Linux platform: URHO3D_INSTALL_PREFIX=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local (default)
     set (CMAKE_PREFIX_PATH $ENV{URHO3D_INSTALL_PREFIX})
     if (WIN32)
@@ -120,7 +120,10 @@ if (URHO3D_FOUND)
     FIND_PACKAGE_MESSAGE (Urho3D ${FOUND_MESSAGE} "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIR}]")
 else ()
     if (Urho3D_FIND_REQUIRED)
-        message (FATAL_ERROR "Could not find Urho3D library installation or project root tree via ENV{URHO3D_HOME}")
+        message (FATAL_ERROR
+            "Could not find Urho3D library in default SDK installation location or Urho3D project root tree. "
+            "For detecting a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
+            "For detecting Urhor3D library in a build tree of Urho3D source installation, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory. The Urho3D library itself must already be built successfully.")
     endif ()
 endif ()
 
