@@ -16,7 +16,8 @@ file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
     src/LinearMath/*.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 if (DEST_INCLUDE_DIR)
-    install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR}/Bullet)
+    # Dependency from Engine/PhysicsWorld.h and Engine/RigidBody.h
+    install (DIRECTORY src/LinearMath DESTINATION ${DEST_INCLUDE_DIR}/Bullet USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h)
 endif ()
 
 # Define dependency libs

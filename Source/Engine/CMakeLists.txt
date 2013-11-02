@@ -104,7 +104,7 @@ endforeach ()
 foreach (SOURCE Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene Script UI)
     add_subdirectory (${SOURCE})
     if (DEST_INCLUDE_DIR)
-        install (FILES ${${SOURCE}_H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
+        install (DIRECTORY ${SOURCE}/ DESTINATION ${DEST_INCLUDE_DIR} USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h)    # Note: the trailing slash is significant
     endif ()
     source_group ("Source Files\\${SOURCE}" FILES ${${SOURCE}_CPP_FILES})
     source_group ("Header Files\\${SOURCE}" FILES ${${SOURCE}_H_FILES})

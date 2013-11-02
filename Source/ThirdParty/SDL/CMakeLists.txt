@@ -105,9 +105,6 @@ file (GLOB H_FILES include/*.h)
 set_source_files_properties (${C_FILES} PROPERTIES LANGUAGE C)
 set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
-if (DEST_INCLUDE_DIR)
-    install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR}/SDL)
-endif ()
 
 # Setup target
 setup_library ()
