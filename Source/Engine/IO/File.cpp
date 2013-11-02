@@ -110,14 +110,14 @@ File::~File()
 bool File::Open(const String& fileName, FileMode mode)
 {
     Close();
-    
+
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         LOGERROR("Access denied to " + fileName);
         return false;
     }
-    
+
     #ifdef ANDROID
     if (fileName.StartsWith("/apk/"))
     {
@@ -126,7 +126,7 @@ bool File::Open(const String& fileName, FileMode mode)
             LOGERROR("Only read mode is supported for asset files");
             return false;
         }
-        
+
         assetHandle_ = SDL_RWFromFile(fileName.Substring(5).CString(), "rb");
         if (!assetHandle_)
         {
@@ -148,26 +148,26 @@ bool File::Open(const String& fileName, FileMode mode)
         }
     }
     #endif
-    
+
     #ifdef WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
     #else
     handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
     #endif
-    
+
     if (!handle_)
     {
         LOGERROR("Could not open file " + fileName);
         return false;
     }
-    
+
     fileName_ = fileName;
     mode_ = mode;
     position_ = 0;
     offset_ = 0;
     checksum_ = 0;
     compressed_ = false;
-    
+
     fseek((FILE*)handle_, 0, SEEK_END);
     size_ = ftell((FILE*)handle_);
     fseek((FILE*)handle_, 0, SEEK_SET);
@@ -177,14 +177,14 @@ bool File::Open(const String& fileName, FileMode mode)
 bool File::Open(PackageFile* package, const String& fileName)
 {
     Close();
-    
+
     if (!package)
         return false;
-    
+
     const PackageEntry* entry = package->GetEntry(fileName);
     if (!entry)
         return false;
-    
+
     #ifdef WIN32
     handle_ = _wfopen(GetWideNativePath(package->GetName()).CString(), L"rb");
     #else
@@ -195,7 +195,7 @@ bool File::Open(PackageFile* package, const String& fileName)
         LOGERROR("Could not open package file " + fileName);
         return false;
     }
-    
+
     fileName_ = fileName;
     mode_ = FILE_READ;
     offset_ = entry->offset_;
@@ -203,30 +203,36 @@ bool File::Open(PackageFile* package, const String& fileName)
     position_ = 0;
     size_ = entry->size_;
     compressed_ = package->IsCompressed();
-    
+
     fseek((FILE*)handle_, offset_, SEEK_SET);
     return true;
 }
 
 unsigned File::Read(void* dest, unsigned size)
 {
+    if (!handle_)
+    {
+        // Do not log the error further here to prevent spamming the stderr stream
+        return 0;
+    }
+
     if (mode_ == FILE_WRITE)
     {
         LOGERROR("File not opened for reading");
         return 0;
     }
-    
+
     if (size + position_ > size_)
         size = size_ - position_;
     if (!size)
         return 0;
-    
+
     #ifdef ANDROID
     if (assetHandle_)
     {
         unsigned sizeLeft = size;
         unsigned char* destPtr = (unsigned char*)dest;
-        
+
         while (sizeLeft)
         {
             if (readBufferOffset_ >= readBufferSize_)
@@ -235,7 +241,7 @@ unsigned File::Read(void* dest, unsigned size)
                 readBufferOffset_ = 0;
                 SDL_RWread(assetHandle_, readBuffer_.Get(), readBufferSize_, 1);
             }
-            
+
             unsigned copySize = Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
@@ -243,7 +249,7 @@ unsigned File::Read(void* dest, unsigned size)
             readBufferOffset_ += copySize;
             position_ += copySize;
         }
-        
+
         return size;
     }
     #endif
@@ -251,32 +257,32 @@ unsigned File::Read(void* dest, unsigned size)
     {
         unsigned sizeLeft = size;
         unsigned char* destPtr = (unsigned char*)dest;
-        
+
         while (sizeLeft)
         {
             if (!readBuffer_ || readBufferOffset_ >= readBufferSize_)
             {
                 unsigned char blockHeaderBytes[4];
                 fread(blockHeaderBytes, sizeof blockHeaderBytes, 1, (FILE*)handle_);
-                
+
                 MemoryBuffer blockHeader(&blockHeaderBytes[0], sizeof blockHeaderBytes);
                 unsigned unpackedSize = blockHeader.ReadUShort();
                 unsigned packedSize = blockHeader.ReadUShort();
-                
+
                 if (!readBuffer_)
                 {
                     readBuffer_ = new unsigned char[unpackedSize];
                     inputBuffer_ = new unsigned char[LZ4_compressBound(unpackedSize)];
                 }
-                
+
                 /// \todo Handle errors
                 fread(inputBuffer_.Get(), packedSize, 1, (FILE*)handle_);
                 LZ4_decompress_fast((const char*)inputBuffer_.Get(), (char *)readBuffer_.Get(), unpackedSize);
-                
+
                 readBufferSize_ = unpackedSize;
                 readBufferOffset_ = 0;
             }
-            
+
             unsigned copySize = Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
@@ -284,16 +290,10 @@ unsigned File::Read(void* dest, unsigned size)
             readBufferOffset_ += copySize;
             position_ += copySize;
         }
-        
+
         return size;
     }
-    
-    if (!handle_)
-    {
-        LOGERROR("File not open");
-        return 0;
-    }
-    
+
     size_t ret = fread(dest, size, 1, (FILE*)handle_);
     if (ret != 1)
     {
@@ -302,17 +302,23 @@ unsigned File::Read(void* dest, unsigned size)
         LOGERROR("Error while reading from file " + GetName());
         return 0;
     }
-    
+
     position_ += size;
     return size;
 }
 
 unsigned File::Seek(unsigned position)
 {
+    if (!handle_)
+    {
+        // Do not log the error further here to prevent spamming the stderr stream
+        return 0;
+    }
+
     // Allow sparse seeks if writing
     if (mode_ == FILE_READ && position > size_)
         position = size_;
-    
+
     #ifdef ANDROID
     if (assetHandle_)
     {
@@ -342,16 +348,10 @@ unsigned File::Seek(unsigned position)
         }
         else
             LOGERROR("Seeking backward in a compressed file is not supported");
-        
+
         return position_;
     }
-    
-    if (!handle_)
-    {
-        LOGERROR("File not open");
-        return 0;
-    }
-    
+
     fseek((FILE*)handle_, position + offset_, SEEK_SET);
     position_ = position;
     return position_;
@@ -359,21 +359,21 @@ unsigned File::Seek(unsigned position)
 
 unsigned File::Write(const void* data, unsigned size)
 {
+    if (!handle_)
+    {
+        // Do not log the error further here to prevent spamming the stderr stream
+        return 0;
+    }
+
     if (mode_ == FILE_READ)
     {
         LOGERROR("File not opened for writing");
         return 0;
     }
-    
-    if (!handle_)
-    {
-        LOGERROR("File not open");
-        return 0;
-    }
-    
+
     if (!size)
         return 0;
-    
+
     if (fwrite(data, size, 1, (FILE*)handle_) != 1)
     {
         // Return to the position where the write began
@@ -381,11 +381,11 @@ unsigned File::Write(const void* data, unsigned size)
         LOGERROR("Error while writing to file " + GetName());
         return 0;
     }
-    
+
     position_ += size;
     if (position_ > size_)
         size_ = position_;
-    
+
     return size;
 }
 
@@ -395,12 +395,12 @@ unsigned File::GetChecksum()
         return checksum_;
     if (!handle_ || mode_ == FILE_WRITE)
         return 0;
-    
+
     PROFILE(CalculateFileChecksum);
-    
+
     unsigned oldPos = position_;
     checksum_ = 0;
-    
+
     Seek(0);
     while (!IsEof())
     {
@@ -409,7 +409,7 @@ unsigned File::GetChecksum()
         for (unsigned i = 0; i < readBytes; ++i)
             checksum_ = SDBMHash(checksum_, block[i]);
     }
-    
+
     Seek(oldPos);
     return checksum_;
 }
@@ -423,10 +423,10 @@ void File::Close()
         assetHandle_ = 0;
     }
     #endif
-    
+
     readBuffer_.Reset();
     inputBuffer_.Reset();
-    
+
     if (handle_)
     {
         fclose((FILE*)handle_);
