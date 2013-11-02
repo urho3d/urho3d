@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-# Find Urho3D library and include directories in the project root tree or installed location (although there is no install option at the moment)
+# Find Urho3D library and include directories in the project root tree or installed location
 # For project root tree detection to work, Urho3D library must be already been built
 #
 #  URHO3D_FOUND
@@ -60,30 +60,13 @@ if (URHO3D_HOME)
     find_file (SOURCE_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/Source/Engine NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     if (SOURCE_TREE_PATH)
         get_filename_component (SOURCE_TREE_PATH ${SOURCE_TREE_PATH} PATH)
-        set (URHO3D_INCLUDE_DIR
-            ${SOURCE_TREE_PATH}
-            ${SOURCE_TREE_PATH}/Audio
-            ${SOURCE_TREE_PATH}/Container
-            ${SOURCE_TREE_PATH}/Core
-            ${SOURCE_TREE_PATH}/Engine
-            ${SOURCE_TREE_PATH}/Graphics
-            ${SOURCE_TREE_PATH}/Input
-            ${SOURCE_TREE_PATH}/IO
-            ${SOURCE_TREE_PATH}/LuaScript
-            ${SOURCE_TREE_PATH}/Math
-            ${SOURCE_TREE_PATH}/Navigation
-            ${SOURCE_TREE_PATH}/Network
-            ${SOURCE_TREE_PATH}/Physics
-            ${SOURCE_TREE_PATH}/Resource
-            ${SOURCE_TREE_PATH}/Scene
-            ${SOURCE_TREE_PATH}/Script
-            ${SOURCE_TREE_PATH}/UI
-            ${URHO3D_HOME}/Source/ThirdParty/Bullet/src
-            ${URHO3D_HOME}/Source/ThirdParty/kNet/include
-            ${URHO3D_HOME}/Source/ThirdParty/LZ4
-            ${URHO3D_HOME}/Source/ThirdParty/SDL/include
-            ${URHO3D_HOME}/Source/ThirdParty/STB
-        )
+        set (URHO3D_INCLUDE_DIR ${SOURCE_TREE_PATH})
+        foreach (DIR Audio Container Core Engine Graphics Input IO LuaScript Math Navigation Network Physics Resource Scene Script UI)
+            list (APPEND URHO3D_INCLUDE_DIR ${SOURCE_TREE_PATH}/${DIR})
+        endforeach ()
+        foreach (DIR Bullet/src kNet/include LZ4 SDL/include STB)
+            list (APPEND URHO3D_INCLUDE_DIR ${URHO3D_HOME}/Source/ThirdParty/${DIR})
+        endforeach ()
 
         if (ANDROID)
             list (APPEND URHO3D_INCLUDE_DIR ${URHO3D_HOME}/android-Build/Engine)
@@ -103,10 +86,18 @@ if (URHO3D_HOME)
         endif ()
     endif ()
 else ()
-    set (URHO3D_INC_SEARCH_PATH /opt/include)
+    # If Urho3D SDK is not being installed in the default system location, use the URHO3D_INSTALL_PREFIX environment to specify the prefix path to that location
+    # Note that the prefix path should not usually contain the "/include" or "/lib"
+    # For example on Linux platform: URHO3D_INSTALL_PREFIX=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local (default)
+    set (CMAKE_PREFIX_PATH $ENV{URHO3D_INSTALL_PREFIX})
+    if (WIN32)
+        set (URHO3D_INC_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/Urho3D SDK/Include")
+        set (URHO3D_LIB_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/Urho3D SDK/Lib")
+    else ()
+        set (URHO3D_INC_SEARCH_PATH /opt/include)
+        set (URHO3D_LIB_SEARCH_PATH /opt/lib)
+    endif ()
     find_path (URHO3D_INCLUDE_DIR Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES Urho3D)
-    
-    set (URHO3D_LIB_SEARCH_PATH /opt/lib)
     find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES Urho3D)
 endif ()
 

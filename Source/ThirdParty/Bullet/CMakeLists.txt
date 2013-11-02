@@ -15,6 +15,9 @@ file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
     src/BulletDynamics/Dynamics/*.h src/BulletDynamics/Vehicle/*.h src/BulletSoftBody/*.h 
     src/LinearMath/*.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+if (DEST_INCLUDE_DIR)
+    install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR}/Bullet)
+endif ()
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY src)

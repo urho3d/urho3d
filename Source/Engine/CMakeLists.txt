@@ -103,12 +103,18 @@ endforeach ()
 # Define source files
 foreach (SOURCE Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene Script UI)
     add_subdirectory (${SOURCE})
+    if (DEST_INCLUDE_DIR)
+        install (FILES ${${SOURCE}_H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
+    endif ()
     source_group ("Source Files\\${SOURCE}" FILES ${${SOURCE}_CPP_FILES})
     source_group ("Header Files\\${SOURCE}" FILES ${${SOURCE}_H_FILES})
     list (APPEND ENGINE_SOURCE_FILES ${${SOURCE}_CPP_FILES} ${${SOURCE}_H_FILES})
     list (APPEND ENGINE_INCLUDE_DIRS_ONLY ${SOURCE})
 endforeach ()
-define_source_files (EXTRA_CPP_FILES ${ENGINE_SOURCE_FILES} EXTRA_H_FILES gitversion.h PCH)
+define_source_files (EXTRA_CPP_FILES ${ENGINE_SOURCE_FILES} EXTRA_H_FILES ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h PCH)
+if (DEST_INCLUDE_DIR)
+    install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
+endif ()
 list (APPEND SOURCE_FILES ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 
@@ -129,6 +135,9 @@ set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
 adjust_library_name ()
+if (DEST_RUNTIME_DIR AND DEST_LIBRARY_DIR AND DEST_ARCHIVE_DIR)
+    install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_ARCHIVE_DIR})
+endif ()
 if (NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 endif ()
@@ -151,7 +160,10 @@ if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOUR
     
     # Append Urho3D license notice to the export header file
     file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)
-    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h) 
+    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
+endif ()
+if (DEST_INCLUDE_DIR)
+    install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
 endif ()
 
 # Define post build steps

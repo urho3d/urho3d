@@ -281,7 +281,7 @@ if (COMMAND cmake_policy)
 endif ()
 
 # Add cmake modules search path
-list (APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/Modules/")
+list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D cmake module
 include (Urho3D-CMake-magic)

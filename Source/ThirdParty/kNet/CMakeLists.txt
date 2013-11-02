@@ -58,6 +58,11 @@ endif ()
 
 # Define source files
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
+if (DEST_INCLUDE_DIR)
+    install (FILES ${kNetHeaderFiles} DESTINATION ${DEST_INCLUDE_DIR}/kNet)
+endif ()
+
+# Define dependency libs
 set (INCLUDE_DIRS_ONLY include)
 
 # Setup target
