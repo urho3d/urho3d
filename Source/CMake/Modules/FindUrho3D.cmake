@@ -49,13 +49,12 @@ if (WIN32)
 endif ()
 
 if (CMAKE_PROJECT_NAME MATCHES Urho3D.* AND PROJECT_ROOT_DIR)
-    set (URHO3D_HOME ${PROJECT_ROOT_DIR})
+    set (URHO3D_HOME ${PROJECT_ROOT_DIR} CACHE PATH "Path to Urho3D project root tree" FORCE)
 else ()
-    set (URHO3D_HOME $ENV{URHO3D_HOME})
+    file (TO_CMAKE_PATH "$ENV{URHO3D_HOME}" URHO3D_HOME)
+    set (URHO3D_HOME ${URHO3D_HOME} CACHE PATH "Path to Urho3D project root tree")
 endif ()
 if (URHO3D_HOME)
-    file (TO_CMAKE_PATH ${URHO3D_HOME} URHO3D_HOME)
-    
     # Construct source tree paths from URHO3D_HOME environment variable
     find_file (SOURCE_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/Source/Engine NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     if (SOURCE_TREE_PATH)
@@ -89,11 +88,14 @@ else ()
     # If Urho3D SDK is not being installed in the default system location, use the URHO3D_INSTALL_PREFIX environment variable to specify the prefix path to that location
     # Note that the prefix path should not contain the "/include" or "/lib"
     # For example on Linux platform: URHO3D_INSTALL_PREFIX=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local (default)
-    set (CMAKE_PREFIX_PATH $ENV{URHO3D_INSTALL_PREFIX})
+    set (CMAKE_PREFIX_PATH $ENV{URHO3D_INSTALL_PREFIX} CACHE PATH "Prefix path to Urho3D SDK installation")
     if (WIN32)
         set (URHO3D_INC_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/Urho3D SDK/Include")
         set (URHO3D_LIB_SEARCH_PATH "${CMAKE_INSTALL_PREFIX}/Urho3D SDK/Lib")
     else ()
+        if (IOS)
+            set (CMAKE_LIBRARY_ARCHITECTURE ios)
+        endif ()
         set (URHO3D_INC_SEARCH_PATH /opt/include)
         set (URHO3D_LIB_SEARCH_PATH /opt/lib)
     endif ()
@@ -102,7 +104,7 @@ else ()
 
     if (URHO3D_INCLUDE_DIR)
         set (BASE_DIR ${URHO3D_INCLUDE_DIR})
-        foreach (DIR Bullet kNet)
+        foreach (DIR Bullet kNet SDL)
             list (APPEND URHO3D_INCLUDE_DIR ${BASE_DIR}/${DIR})     # Note: variable change to list context after this, so we need BASE_DIR to remain the same
         endforeach ()
     endif ()
@@ -122,8 +124,8 @@ else ()
     if (Urho3D_FIND_REQUIRED)
         message (FATAL_ERROR
             "Could not find Urho3D library in default SDK installation location or Urho3D project root tree. "
-            "For detecting a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
-            "For detecting Urhor3D library in a build tree of Urho3D source installation, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory. The Urho3D library itself must already be built successfully.")
+            "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
+            "For searching in a build tree of Urho3D source installation, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory. The Urho3D library itself must already be built successfully.")
     endif ()
 endif ()
 

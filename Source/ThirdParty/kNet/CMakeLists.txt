@@ -58,10 +58,8 @@ endif ()
 
 # Define source files
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
-if (DEST_INCLUDE_DIR)
-    # Dependency from Engine/Connection.h and Engine/Network.h
-    install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/kNet USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h PATTERN *.inl)     # Note: the trailing slash is significant
-endif ()
+# Install dependency for Engine/Network/Connection.h and Engine/Network/Network.h
+install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/kNet USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h PATTERN *.inl)     # Note: the trailing slash is significant
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY include)

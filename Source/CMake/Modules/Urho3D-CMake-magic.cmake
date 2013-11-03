@@ -147,11 +147,13 @@ if (MSVC)
     set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG")
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
 else ()
-    # GCC-specific setup
+    # GCC/Clang-specific setup
     if (ANDROID)
+        # Most of the flags are already setup in android.toolchain.cmake module
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector")
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -fstack-protector")
         if (ENABLE_64BIT)
+            # TODO: Revisit this again when ARM also support 64bit
             # For now just reference it to suppress "unused variable" warning
         endif ()
     elseif (NOT IOS)
@@ -371,9 +373,7 @@ macro (setup_executable)
     elseif (RASPI AND SCP_TO_TARGET)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
     endif ()
-    if (DEST_RUNTIME_DIR)
-        install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR})
-    endif ()
+    install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_RUNTIME_DIR})
 endmacro ()
 
 # Macro for setting up linker flags for Mac OS X desktop build
@@ -397,6 +397,33 @@ macro (setup_ios_linker_flags LINKER_FLAGS)
     set (${LINKER_FLAGS} "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
 endmacro ()
 
+# Macro for adding SDL native init function on Android platform
+macro (add_android_native_init)
+    # This source file could not be added when building SDL static library because it needs SDL_Main() which is not yet available at library building time
+    # The SDL_Main() is defined by Android application that could be resided in other CMake projects outside of Urho3D CMake project which makes things a little bit complicated
+    if (CMAKE_PROJECT_NAME MATCHES Urho3D.*)
+        list (APPEND SOURCE_FILES ${PROJECT_ROOT_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+        # Rename target name to avoid name clash with Urho3D game engine shared library
+        if (TARGET_NAME STREQUAL Urho3D AND URHO3D_LIB_TYPE STREQUAL SHARED)
+            set (TARGET_NAME Urho3Dapp)
+        endif ()
+    elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+        # Use Urho3D source installation
+        list (APPEND SOURCE_FILES $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+    elseif (EXISTS $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
+        # Use Urho3D SDK installation on non-default installation location
+        list (APPEND SOURCE_FILES $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
+    elseif (EXISTS ${CMAKE_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
+        # Use Urho3D SDK installation on system default installation location
+        list (APPEND SOURCE_FILES ${CMAKE_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
+    else ()
+        message (FATAL_ERROR
+            "Could not find SDL_android_main.c source file in default SDK installation location or Urho3D project root tree. "
+            "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
+            "For searching in a source tree of Urho3D source installation, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory.")
+    endif ()
+endmacro ()
+
 # Macro for setting up an executable target with resources to copy
 macro (setup_main_executable)
     # Define resource files
@@ -407,19 +434,8 @@ macro (setup_main_executable)
     endif ()
 
     if (ANDROID)
-        # Add SDL native init function
-        if (CMAKE_PROJECT_NAME MATCHES Urho3D.*)
-            set (URHO3D_HOME ${PROJECT_ROOT_DIR})
-            # Rename target name to avoid name clash with Urho3D game engine shared library
-            if (TARGET_NAME STREQUAL Urho3D AND URHO3D_LIB_TYPE STREQUAL SHARED)
-                set (TARGET_NAME Urho3Dapp)
-            endif ()
-        elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-            set (URHO3D_HOME $ENV{URHO3D_HOME})
-        else ()
-            message (FATAL_ERROR "Could not find URHO3D_HOME environment variable or it is not point to a Urho3D project root tree")
-        endif ()
-        list (APPEND SOURCE_FILES ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+        # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES} 
+        add_android_native_init ()
         # Setup shared library output path
         set_output_directories (${ANDROID_LIBRARY_OUTPUT_PATH} LIBRARY)
         # Setup target as main shared library

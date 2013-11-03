@@ -57,9 +57,7 @@ endforeach ()
 
 # Define source files
 define_source_files (EXTRA_CPP_FILES ${GEN_CPP_FILES})
-if (DEST_INCLUDE_DIR)
-    install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
-endif ()
+install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 
 # Define dependency libs
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
