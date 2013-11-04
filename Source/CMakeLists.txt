@@ -83,10 +83,12 @@ else ()
     set (DEST_RUNTIME_DIR share/Urho3D)
     if (ENABLE_64BIT)
         if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)    # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores ENABLE_64BIT build option
+            # Probably target system is a RedHat-based distro
             set (LIB_SUFFIX 64)
         endif ()
     endif ()
     if (IOS)
+        # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
         set (LIB_SUFFIX ${LIB_SUFFIX}/ios)
     endif ()
     set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/Urho3D)
