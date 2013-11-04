@@ -188,28 +188,28 @@ They can be copied to the MinGW installation eg. from the following package:
 http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
 
 After the build is complete, the programs can be run from the Bin directory.
-These include the Urho3D script host application, which can run application
-scripts, the tools, and C++ sample applications if they have been enabled.
+These include the Urho3D player application, which can run application scripts,
+the tools, and C++ sample applications if they have been enabled.
 
-To run the Urho3D application from the Visual Studio debugger, set the Urho3D
-project as the startup project and enter its relative path and filename into
-Properties -> Debugging -> Command: ..\..\..\Bin\Urho3D.exe. Additionally, 
-entering -w into Debugging -> Command Arguments is highly recommended. This
-enables startup in windowed mode: without it running into an exception or break-
-point will be obnoxious as the mouse cursor will likely be hidden. To actually
-make the Urho3D application do something useful, it must be supplied with the
-name of the script file it should load and run. You can try for example the 
-following arguments: Scripts/NinjaSnowWar.as -w
+To run the Urho3D player application from the Visual Studio debugger, set the 
+Urho3DPlayer project as the startup project and enter its relative path and 
+filename into Properties -> Debugging -> Command: ..\..\..\Bin\Urho3DPlayer.exe.
+Additionally, entering -w into Debugging -> Command Arguments is highly
+recommended. This enables startup in windowed mode: without it running into an
+exception or breakpoint will be obnoxious as the mouse cursor will likely be
+hidden. To actually make the Urho3DPlayer application do something useful, it
+must be supplied with the name of the script file it should load and run. You
+can try for example the following arguments: Scripts/NinjaSnowWar.as -w
 
-To run from Eclipse on Linux, locate and select the Urho3D executable in the
-Project Explorer. From the menu, choose "Run Configurations" to create a new
+To run from Eclipse on Linux, locate and select the Urho3DPlayer executable in
+the Project Explorer. From the menu, choose "Run Configurations" to create a new
 launch configuration for "C/C++ Application". Switch to "Arguments" tab, specify
-the argument required by Urho3D executable.
+the argument required by Urho3DPlayer executable.
 
 To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting
-to execute "Urho3D" in the "Info" tab. In the "Arguments" tab, specify the
-arguments required by Urho3D executable. Ensure the check boxes are ticked on
-the argument entries that you want to be active.
+to execute "Urho3DPlayer" in the "Info" tab. In the "Arguments" tab, specify the
+arguments required by Urho3DPlayer executable. Ensure the check boxes are ticked
+on the argument entries that you want to be active.
 
 CMake caches some internal variables to speed up the subsequent invocation of
 the CMake build script. This is normally a good thing. However, there are cases
@@ -281,13 +281,13 @@ in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK
 (CMake would automatically select latest iOS when generating the Xcode project).
 In Code Signing, enter your developer identity as necessary.
 
-The Urho3D target will actually build the application bundle and copy resources
-from Bin/Data and Bin/CoreData directories. Edit its build scheme to choose
-debug or release mode.
+The Urho3DPlayer target will actually build the application bundle and copy
+resources from Bin/Data and Bin/CoreData directories. Edit its build scheme to
+choose debug or release mode.
 
 To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 destination setting to "iPhone Simulator" or "iPad Simulator", and executable
-to "Urho3D.app".
+to "Urho3DPlayer.app".
 
 
 Raspberry Pi build process
@@ -335,7 +335,7 @@ target (either static or shared). The library is then linked against by other
 targets like tools and samples that reference Urho3D as one of the external
 libraries. The Urho3D library type is defaulted to static, so the build process
 would generate standalone executables as previous releases. The Urho3D library
-type can be changed using "URHO3D_LIB_TYPE" build option.    
+type can be changed using "URHO3D_LIB_TYPE" build option.
 
 Refer to "Using Urho3D as external library" on how to setup your own project to
 use Urho3D as external library.
@@ -356,7 +356,7 @@ option in the table below; OpenGL does not need a separate shader compilation
 step or utility.
 
 
-Build options     
+Build options
 -------------
 
 A number of build options can be defined explicitly when invoking the above
@@ -390,7 +390,7 @@ cmake_xxxx batch files or shell scripts.
 |  Release/Debug/      | generated, default is Release (cmake_gcc.sh and       |
 |  RelWithDebInfo      | cmake_eclipse.sh only)                                |
 |-DURHO3D_LIB_TYPE=    |to specify Urho3D library type, default is STATIC      |
-|  STATIC/SHARED       |                                                       |          
+|  STATIC/SHARED       |                                                       |
 |-DANDROID_ABI=armeabi |to build armeabi native code (Android build only),     |
 |                      | default is armeabi-v7a                                |
 |----------------------|-------------------------------------------------------|

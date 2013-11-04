@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Application.h"
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Log.h"
@@ -30,44 +29,13 @@
 #include "ResourceEvents.h"
 #include "Script.h"
 #include "ScriptFile.h"
+#include "Urho3DPlayer.h"
 
 #ifdef ENABLE_LUA
 #include "LuaScript.h"
 #endif
 
 #include "DebugNew.h"
-
-using namespace Urho3D;
-
-/// Urho3DPlayer application runs a script specified on the command line.
-class Urho3DPlayer : public Application
-{
-    OBJECT(Urho3DPlayer);
-
-public:
-    /// Construct.
-    Urho3DPlayer(Context* context);
-
-    /// Setup before engine initialization. Verify that a script file has been specified.
-    virtual void Setup();
-    /// Setup after engine initialization. Load the script and execute its start function.
-    virtual void Start();
-    /// Cleanup after the main loop. Run the script's stop function if it exists.
-    virtual void Stop();
-
-private:
-    /// Handle reload start of the script file.
-    void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
-    /// Handle reload success of the script file.
-    void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
-    /// Handle reload failure of the script file.
-    void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
-
-    /// Script file name.
-    String scriptFileName_;
-    /// Script file.
-    SharedPtr<ScriptFile> scriptFile_;
-};
 
 DEFINE_APPLICATION_MAIN(Urho3DPlayer);
 

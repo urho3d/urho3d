@@ -47,13 +47,13 @@ For Xcode, open Urho3D.xcodeproj and build.
 
 If using MinGW to compile, DirectX headers may need to be acquired separately. They can be copied to the MinGW installation eg. from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz
 
-After the build is complete, the programs can be run from the Bin directory. These include the Urho3D script host application, which can run application scripts, the tools, and C++ sample applications if they have been enabled.
+After the build is complete, the programs can be run from the Bin directory. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled.
 
-To run the Urho3D application from the Visual Studio debugger, set the Urho3D project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ../../../Bin/Urho3D.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make the Urho3D application do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/NinjaSnowWar.as -w
+To run the Urho3D player application from the Visual Studio debugger, set the Urho3DPlayer project as the startup project and enter its relative path and filename into Properties -> Debugging -> Command: ../../../Bin/Urho3DPlayer.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will likely be hidden. To actually make the Urho3DPlayer application do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/NinjaSnowWar.as -w
 
-To run from Eclipse on Linux, locate and select the Urho3D executable in the Project Explorer. From the menu, choose "Run Configurations" to create a new launch configuration for "C/C++ Application". Switch to "Arguments" tab, specify the argument required by Urho3D executable.
+To run from Eclipse on Linux, locate and select the Urho3DPlayer executable in the Project Explorer. From the menu, choose "Run Configurations" to create a new launch configuration for "C/C++ Application". Switch to "Arguments" tab, specify the argument required by Urho3DPlayer executable.
 
-To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting to execute "Urho3D" in the "Info" tab. In the "Arguments" tab, specify the arguments required by Urho3D executable. Ensure the check boxes are ticked on the argument entries that you want to be active.
+To run from Xcode on Mac OS X, edit the Product Scheme to set "Run" setting to execute "Urho3DPlayer" in the "Info" tab. In the "Arguments" tab, specify the arguments required by Urho3DPlayer executable. Ensure the check boxes are ticked on the argument entries that you want to be active.
 
 CMake caches some internal variables to speed up the subsequent invocation of the CMake build script. This is normally a good thing. However, there are cases when this is not desirable, for instance when switching CMake generators or after upgrading development software components. In such cases, it is recomended to first clean the CMake cache by invoking cmake_clean.bat or cmake_clean.sh.
 
@@ -87,9 +87,9 @@ Run cmake_ios.sh. This generates an Xcode project named Urho3D.xcodeproj.
 
 Open the Xcode project and check the properties for the Urho3D project (topmost in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK (CMake would automatically select latest iOS when generating the Xcode project). In Code Signing, enter your developer identity as necessary.
 
-The Urho3D target will actually build the application bundle and copy resources from Bin/Data and Bin/CoreData directories. Edit its build scheme to choose debug or release mode.
+The Urho3DPlayer target will actually build the application bundle and copy resources from Bin/Data and Bin/CoreData directories. Edit its build scheme to choose debug or release mode.
 
-To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run" destination setting to "iPhone Simulator" or "iPad Simulator", and executable to "Urho3D.app".
+To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run" destination setting to "iPhone Simulator" or "iPad Simulator", and executable to "Urho3DPlayer.app".
 
 \section Building_RaspberryPi Raspberry Pi build process
 
@@ -144,15 +144,15 @@ A number of build options can be defined explicitly when invoking the above cmak
 Note that build option values specified via command line are cached by CMake. The cached values will be used by CMake in the subsequent invocation. That is, the same build options are not required to be specified again and again. Once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly setting it via command line. That is, simply by NOT passing the corresponding build option would not work. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.
 
 
-\page Running Running Urho3D script host application
+\page Running Running the Urho3D player application
 
-The Urho3D script host application in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
+The Urho3D player application in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
 
 \verbatim
-Urho3D <scriptfilename> [options]
+Urho3DPlayer <scriptfilename> [options]
 \endverbatim
 
-The scripting language supported by default is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Bin/Data or Bin/CoreData subdirectories so that Urho3D can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
+The scripting language supported by default is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Bin/Data or Bin/CoreData subdirectories so that Urho3DPlayer can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
 Lua language support can optionally be built in, see \ref Build_Options "Build options".
 
@@ -213,7 +213,7 @@ The examples included with Urho3D consist of two larger applications built in An
 
 \section Examples_NinjaSnowWar NinjaSnowWar
 
-The first of the larger examples is a third-person action game. To start, run NinjaSnowWar.bat or NinjaSnowWar.sh in the Bin directory, or use the command Urho3D Scripts/NinjaSnowWar.as
+The first of the larger examples is a third-person action game. To start, run NinjaSnowWar.bat or NinjaSnowWar.sh in the Bin directory, or use the command Urho3DPlayer Scripts/NinjaSnowWar.as
 
 Key and mouse controls:
 
@@ -234,7 +234,7 @@ NinjaSnowWar also supports client/server multiplayer. To start the server, run t
 
 \section Examples_Editor Editor
 
-The second larger example is a scene and %UI layout editor application written in script. To start, run Editor.bat or Editor.sh, or use the command Urho3D Scripts/Editor.as
+The second larger example is a scene and %UI layout editor application written in script. To start, run Editor.bat or Editor.sh, or use the command Urho3DPlayer Scripts/Editor.as
 
 For details on how to use the editor, see \ref EditorInstructions "Editor instructions."
 
@@ -242,7 +242,7 @@ For details on how to use the editor, see \ref EditorInstructions "Editor instru
 
 The sample applications start from the very simple (a "Hello World" program) and progress to demonstrate more complex engine features. The code is heavily commented and should be easy to follow for learning. The applications display on-screen instructions when run.
 
-The AngelScript and Lua versions reside in the Bin/Data/Scripts and Bin/Data/LuaScripts directories. %Batch files to run each of them are not provided due to their large amount: instead run the script host application with the script file name as the parameter, for example Urho3D Scripts/01_HelloWorld.as
+The AngelScript and Lua versions reside in the Bin/Data/Scripts and Bin/Data/LuaScripts directories. %Batch files to run each of them are not provided due to their large amount: instead run the player application with the script file name as the parameter, for example Urho3DPlayer Scripts/01_HelloWorld.as
 
 The C++ versions need to be explicitly enabled in the build with the CMake option -DENABLE_SAMPLES=1. When enabled, the executables will be produced into the Bin directory and can be run from there. Their source code is in the Source/Samples directory.
 
@@ -381,7 +381,7 @@ For more details related to the C++ coding style, see also \ref CodingConvention
 
 \page EditorInstructions Editor instructions
 
-The Urho3D editor is a script application that can be run with the Urho3D script host application. To start, execute any of these commands: (in the Bin directory) Editor.bat, Editor.sh or Urho3D Scripts/Editor.as
+The Urho3D editor is a script application that can be run with the Urho3D player application. To start, execute any of these commands: (in the Bin directory) Editor.bat, Editor.sh or Urho3DPlayer Scripts/Editor.as
 
 Hint: to get some content to look at, run the Physics sample application (Bin/Data/Scripts/11_Physics.as), and press F5. This saves a scene file called Physics.xml into the Data/Scenes subdirectory, which can be loaded in the editor. The NinjaSnowWar scene also exists in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
 
@@ -447,8 +447,6 @@ As an alternative to using the transform gizmo, scene nodes can be moved/rotated
 
 To reparent scene nodes, drag and drop them onto the new parent scene node in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
 
-Though Urho3D supports setting a non-identity transform on the root node (scene), it is still best to leave it at identity (position 0, 0, 0, rotation 0, 0, 0, scale 1, 1, 1.)
-
 To create a user variable into the current node, or delete it, type the variable name into the edit field below the node attributes, and press New or Del buttons next to it. The New button will prompt to choose the variable type.
 
 While editing, you can execute script files using the "Run script" item in the %File menu. These are AngelScript files that are executed in immediate mode ie. you do not need to define a function. The editor's scene will be accessible to the script as the global property "scene."
@@ -467,7 +465,7 @@ The editor can import models or scenes from all the formats that the Open Asset 
 
 When a model is imported, it will also be instantiated into the scene as a new scene node with a StaticModel component.
 
-To do the actual importing, the editor will invoke AssetImporter from the same directory where the Urho3D application was run from, so be sure both are built.
+To do the actual importing, the editor will invoke AssetImporter from the same directory where the Urho3DPlayer application was run from, so be sure both are built.
 
 If the imported scene has no lights, a single directional light is created, so that you can at least see something.
 
