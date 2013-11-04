@@ -21,7 +21,7 @@
 #
 
 # Define target name
-set (TARGET_NAME Urho3D_lib)
+set (TARGET_NAME Urho3D)
 
 # Define generated source files
 execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
@@ -130,7 +130,6 @@ set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
  
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
-adjust_library_name ()
 install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_ARCHIVE_DIR})
 if (NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
@@ -149,7 +148,7 @@ endif ()
 # Generate platform specific export header file automatically
 if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
     set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
-    generate_export_header (${TARGET_NAME} BASE_NAME ${LIB_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
+    generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
     set (URHO3D_EXPORTS_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type when Urho3D export header was last generated")
     
     # Append Urho3D license notice to the export header file

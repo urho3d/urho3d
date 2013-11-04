@@ -39,22 +39,22 @@
 
 using namespace Urho3D;
 
-/// Urho3D script host application, which runs a script specified on the command line.
-class Urho : public Application
+/// Urho3DPlayer application runs a script specified on the command line.
+class Urho3DPlayer : public Application
 {
-    OBJECT(Urho3D);
-    
+    OBJECT(Urho3DPlayer);
+
 public:
     /// Construct.
-    Urho(Context* context);
-    
+    Urho3DPlayer(Context* context);
+
     /// Setup before engine initialization. Verify that a script file has been specified.
     virtual void Setup();
     /// Setup after engine initialization. Load the script and execute its start function.
     virtual void Start();
     /// Cleanup after the main loop. Run the script's stop function if it exists.
     virtual void Stop();
-    
+
 private:
     /// Handle reload start of the script file.
     void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
@@ -62,21 +62,21 @@ private:
     void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Handle reload failure of the script file.
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
-    
+
     /// Script file name.
     String scriptFileName_;
     /// Script file.
     SharedPtr<ScriptFile> scriptFile_;
 };
 
-DEFINE_APPLICATION_MAIN(Urho);
+DEFINE_APPLICATION_MAIN(Urho3DPlayer);
 
-Urho::Urho(Context* context) :
+Urho3DPlayer::Urho3DPlayer(Context* context) :
     Application(context)
 {
 }
 
-void Urho::Setup()
+void Urho3DPlayer::Setup()
 {
     // On Android and iOS, read command line from a file as parameters can not otherwise be easily given
     #if defined(ANDROID) || defined(IOS)
@@ -86,7 +86,7 @@ void Urho::Setup()
     ParseArguments(commandLine, false);
     commandFile->Close();
     #endif
-    
+
     // Check for script file name
     const Vector<String>& arguments = GetArguments();
     String scriptFileName;
@@ -98,11 +98,11 @@ void Urho::Setup()
             break;
         }
     }
-    
+
     // Show usage if not found
     if (scriptFileName_.Empty())
     {
-        ErrorExit("Usage: Urho3D <scriptfile> [options]\n\n"
+        ErrorExit("Usage: Urho3DPlayer <scriptfile> [options]\n\n"
             "The script file should implement the function void Start() for initializing the "
             "application and subscribing to all necessary events, such as the frame update.\n"
             #ifndef WIN32
@@ -134,7 +134,7 @@ void Urho::Setup()
     }
 }
 
-void Urho::Start()
+void Urho3DPlayer::Start()
 {
 #ifdef ENABLE_LUA
     String extension = GetExtension(scriptFileName_);
@@ -151,9 +151,9 @@ void Urho::Start()
         if (scriptFile_ && scriptFile_->Execute("void Start()"))
         {
             // Subscribe to script's reload event to allow live-reload of the application
-            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, HANDLER(Urho, HandleScriptReloadStarted));
-            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, HANDLER(Urho, HandleScriptReloadFinished));
-            SubscribeToEvent(scriptFile_, E_RELOADFAILED, HANDLER(Urho, HandleScriptReloadFailed));
+            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, HANDLER(Urho3DPlayer, HandleScriptReloadStarted));
+            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, HANDLER(Urho3DPlayer, HandleScriptReloadFinished));
+            SubscribeToEvent(scriptFile_, E_RELOADFAILED, HANDLER(Urho3DPlayer, HandleScriptReloadFailed));
             return;
         }
 #ifdef ENABLE_LUA
@@ -177,7 +177,7 @@ void Urho::Start()
     ErrorExit();
 }
 
-void Urho::Stop()
+void Urho3DPlayer::Stop()
 {
     if (scriptFile_)
     {
@@ -195,13 +195,13 @@ void Urho::Stop()
 #endif
 }
 
-void Urho::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
+void Urho3DPlayer::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
 {
     if (scriptFile_->GetFunction("void Stop()"))
         scriptFile_->Execute("void Stop()");
 }
 
-void Urho::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
+void Urho3DPlayer::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     // Restart the script application after reload
     if (!scriptFile_->Execute("void Start()"))
@@ -211,7 +211,7 @@ void Urho::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventDat
     }
 }
 
-void Urho::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
+void Urho3DPlayer::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
 {
     scriptFile_.Reset();
     ErrorExit();

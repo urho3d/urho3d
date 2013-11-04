@@ -27,8 +27,8 @@ project (Urho3D-Tools)
 find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIR})
 
-# Urho3D script host application
-add_subdirectory (Urho3D)
+# Urho3DPlayer application
+add_subdirectory (Urho3DPlayer)
 
 # Do not build tools for Raspberry Pi unless it is explicitly enabled
 if (NOT DEFINED ENABLE_TOOLS)

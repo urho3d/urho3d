@@ -365,7 +365,7 @@ endmacro ()
 # Macro for setting up an executable target
 macro (setup_executable)
     add_executable (${TARGET_NAME} ${ARGN} ${SOURCE_FILES})
-    define_dependency_libs (Urho3D_lib)
+    define_dependency_libs (Urho3D)
     setup_target ()
     
     if (IOS)
@@ -403,10 +403,6 @@ macro (add_android_native_init)
     # The SDL_Main() is defined by Android application that could be resided in other CMake projects outside of Urho3D CMake project which makes things a little bit complicated
     if (CMAKE_PROJECT_NAME MATCHES Urho3D.*)
         list (APPEND SOURCE_FILES ${PROJECT_ROOT_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-        # Rename target name to avoid name clash with Urho3D game engine shared library
-        if (TARGET_NAME STREQUAL Urho3D AND URHO3D_LIB_TYPE STREQUAL SHARED)
-            set (TARGET_NAME Urho3Dapp)
-        endif ()
     elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         # Use Urho3D source installation
         list (APPEND SOURCE_FILES $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
@@ -439,7 +435,7 @@ macro (setup_main_executable)
         # Setup shared library output path
         set_output_directories (${ANDROID_LIBRARY_OUTPUT_PATH} LIBRARY)
         # Setup target as main shared library
-        define_dependency_libs (Urho3D_lib)
+        define_dependency_libs (Urho3D)
         setup_library (SHARED)
         # Copy other dependent shared libraries to Android library output path
         foreach(FILE ${ABSOLUTE_PATH_LIBS})
@@ -490,7 +486,7 @@ endmacro ()
 # It works for both targets setup within Urho3D project and outside Urho3D project that uses Urho3D as external static/shared library
 macro (define_dependency_libs TARGET)
     # ThirdParty/SDL external dependency
-    if (${TARGET} MATCHES SDL|Urho3D_lib)
+    if (${TARGET} MATCHES SDL|Urho3D)
         if (WIN32)
             list (APPEND LINK_LIBS_ONLY user32 gdi32 winmm imm32 ole32 oleaut32 version uuid)
         elseif (APPLE)
@@ -507,7 +503,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # ThirdParty/kNet & ThirdParty/Civetweb external dependency
-    if (${TARGET} MATCHES Civetweb|kNet|Urho3D_lib)
+    if (${TARGET} MATCHES Civetweb|kNet|Urho3D)
         if (WIN32)
             list (APPEND LINK_LIBS_ONLY ws2_32)
         elseif (NOT ANDROID)
@@ -516,7 +512,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # Engine/LuaJIT external dependency
-    if (ENABLE_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D_lib)
+    if (ENABLE_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
         if (NOT WIN32)
             list (APPEND LINK_LIBS_ONLY dl m)
             if (NOT APPLE)
@@ -526,7 +522,7 @@ macro (define_dependency_libs TARGET)
     endif ()
 
     # Engine external dependency
-    if (${TARGET} STREQUAL Urho3D_lib)
+    if (${TARGET} STREQUAL Urho3D)
         # Core
         if (WIN32)
             list (APPEND LINK_LIBS_ONLY winmm)
@@ -550,8 +546,8 @@ macro (define_dependency_libs TARGET)
             list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARY})
         endif ()
 
-        # This variable value can either be 'Urho3D_lib' target or an absolute path to an actual static/shared Urho3D library
-        # The former would cause CMake not only to link against the Urho3D library but also to add a dependency to Urho3D_lib target
+        # This variable value can either be 'Urho3D' target or an absolute path to an actual static/shared Urho3D library
+        # The former would cause CMake not only to link against the Urho3D library but also to add a dependency to Urho3D target
         if (URHO3D_LIBRARIES)
             list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
         endif ()

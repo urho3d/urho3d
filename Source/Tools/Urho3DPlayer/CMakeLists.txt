@@ -21,7 +21,7 @@
 #
 
 # Define target name
-set (TARGET_NAME Urho3D)
+set (TARGET_NAME Urho3DPlayer)
 
 # Define source files
 define_source_files ()
