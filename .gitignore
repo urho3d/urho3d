@@ -24,8 +24,9 @@ Lib-CC/
 # Compiled AngelScript
 *.asc
 
-# Generated html
+# Generated documentation
 Docs/html/
+Doxyfile
 
 # Eclipse project settings
 Source/.*project
@@ -38,13 +39,14 @@ Source/Android/proguard-project.txt
 
 # CMake files for non out-of-source build
 CMakeCache.txt
-CMakeFiles
+CMakeFiles/
+CMakeScripts/
 Makefile
 cmake_install.cmake
 install_manifest.txt
 
 # Misc.
-Doxyfile
 configure*
 *~
 *.swp
+.DS_Store
