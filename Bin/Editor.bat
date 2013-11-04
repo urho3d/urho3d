@@ -1,1 +1,1 @@
-Urho3D.exe Scripts/Editor.as %*
+Urho3DPlayer.exe Scripts/Editor.as %*

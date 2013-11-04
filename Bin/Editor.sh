@@ -1,1 +1,1 @@
-$( dirname $0 )/Urho3D Scripts/Editor.as $@
+$( dirname $0 )/Urho3DPlayer Scripts/Editor.as $@
