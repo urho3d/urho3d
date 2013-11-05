@@ -70,9 +70,12 @@ add_definitions (-DENABLE_LOGGING)
 
 # If not on MSVC, enable use of OpenGL instead of Direct3D9 (either not compiling on Windows or
 # with a compiler that may not have an up-to-date DirectX SDK). This can also be unconditionally
-# enabled, but Windows graphics card drivers are usually better optimized for Direct3D.
+# enabled, but Windows graphics card drivers are usually better optimized for Direct3D. Direct3D can
+# be manually enabled for MinGW with -DUSE_OPENGL=0, but is likely to fail due to missing headers.
 if (NOT MSVC)
-    set (USE_OPENGL 1)
+    if (NOT WIN32 OR NOT DEFINED USE_OPENGL)
+        set (USE_OPENGL 1)
+    endif ()
 endif ()
 if (USE_OPENGL)
     add_definitions (-DUSE_OPENGL)
