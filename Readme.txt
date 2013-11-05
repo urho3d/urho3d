@@ -337,6 +337,15 @@ libraries. The Urho3D library type is defaulted to static, so the build process
 would generate standalone executables as previous releases. The Urho3D library
 type can be changed using "URHO3D_LIB_TYPE" build option.
 
+To install the Urho3D library (or should we call it SDK), use the usual
+'make install' command when using Makefile. There is an equivalent command in
+Visual Studio and Xcode IDE to build 'install' target instead of the default
+'all' target. This could be useful when you want your application to always link
+against a 'stable' installed version of the Urho3D library, while keeping your
+Urho3D project root tree in sync with origin/master. That is, install the newly
+built library after you have tested the changes do not break your application
+during development.
+
 Refer to "Using Urho3D as external library" on how to setup your own project to
 use Urho3D as external library.
 

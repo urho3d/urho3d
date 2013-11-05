@@ -125,7 +125,7 @@ else ()
         message (FATAL_ERROR
             "Could not find Urho3D library in default SDK installation location or Urho3D project root tree. "
             "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
-            "For searching in a build tree of Urho3D source installation, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory. The Urho3D library itself must already be built successfully.")
+            "For searching in a build tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory. The Urho3D library itself must already be built successfully.")
     endif ()
 endif ()
 

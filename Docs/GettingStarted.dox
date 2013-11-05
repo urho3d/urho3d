@@ -105,6 +105,8 @@ You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclip
 
 As of v1.31 (to be released), the build process first builds the Urho3D library target (either static or shared). The library is then linked against by other targets like tools and samples that reference Urho3D as one of the external libraries. The Urho3D library type is defaulted to static, so the build process would generate standalone executables as previous releases. The Urho3D library type can be changed using "URHO3D_LIB_TYPE" build option.
 
+To install the Urho3D library (or should we call it SDK), use the usual 'make install' command when using Makefile. There is an equivalent command in Visual Studio and Xcode IDE to build 'install' target instead of the default 'all' target. This could be useful when you want your application to always link against a 'stable' installed version of the Urho3D library, while keeping your Urho3D project root tree in sync with origin/master. That is, install the newly built library after you have tested the changes do not break your application during development.   
+
 Refer to \ref UsingLibrary "Using Urho3D as external library" on how to setup your own project to use Urho3D as external library.
 
 
@@ -265,7 +267,11 @@ F2          Toggle debug HUD
 
 \page UsingLibrary Using Urho3D as external library
 
-This page shows how to create a new C++ project using Urho3D library as external library. This page assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find the external library in the Urho3D project build tree, specify an environment variable called "URHO3D_HOME" which points to the root directory of the Urho3D project.
+This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. It is imperative to clear the CMake cache when changing from one approach to the other. In fact, you also need to clear the cache when any of the environment variables required by the CMake build script below change its value.
+
+\section UsingLibraryFromProjectRootTree From Urho3D project root tree
+
+This section assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find Urho3D library in Urho3D project library output directory, specify an environment variable called "URHO3D_HOME" which points to a Urho3D project root directory that you want to use (if you have more than one).
 
 In your own project root directory, create a new CMakeLists.txt file and add the following lines:
 
@@ -280,8 +286,8 @@ if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
 endif ()
 
-# Add cmake modules search path
-list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+# Set CMake modules search path
+set (CMAKE_MODULE_PATH $ENV{URHO3D_HOME}/Source/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
 
 # Include Urho3D cmake module
 include (Urho3D-CMake-magic)
@@ -295,21 +301,42 @@ set (TARGET_NAME Main)
 
 # Define source files
 define_source_files ()
-# Which is equivalent to below three lines:
-# file (GLOB CPP_FILES *.cpp)
-# file (GLOB H_FILES *.h)
-# set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Setup target with resource copying
 setup_main_executable ()
 \endcode
 
-Copy the "CMake" sub-directory from Urho3D project to your own project so that CMake can find the Urho3D-specific CMake modules in your project. Instead of copying, for platform that supports symbolic link, you can also create "CMake" symbolic link in your project build tree to point to "CMake" sub-directory from Urho3D project. Alternatively, you can just modify the CMAKE_MODULE_PATH search path above to "$ENV{URHO3D_HOME}/Source/CMake/Modules/".
+The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-magic.cmake is the module where all the reusable commands and macros are defined. It slso gives your project cross-platform build capability similar to Urho3D project.
 
-Since your CMake build script include the Urho3D-Cmake-magic module, your project also now has the cross-platform build capability.
+When both Urho3D static and shared library are built and available in the Urho3D project's library output directory, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected.
 
-When both Urho3D static and shared library are built and available in the Urho3D project build tree, the Urho3D static library takes precedence over shared library to be linked against your own project. Use the URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be linked against.
+The define_source_files() and setup_main_executable() are Urho3D-specific macros. The define_source_file() macro is a shorthand to glob all the source files in the current source directory. It is equivalent to these commands:
 
+\code
+file (GLOB CPP_FILES *.cpp)
+file (GLOB H_FILES *.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+\endcode
+
+The setup_main_executable() macro then uses SOURCE_FILES and TARGET_NAME variables to setup a new CMake target that would work on ALL platforms supported by Urho3D. Make sure both your project name and target name are not called 'Urho3D', as this name is already reserved by Urho3D project.
+
+\section UsingLibraryFromSDK From Urho3D SDK installation
+
+This section assumes that you have already installed Urho3D SDK into your system. If you have installed the SDK in a non-default location then you need to use "URHO3D_INSTALL_PREFIX" environment variable to specify the prefix path of the non-default installation location.
+
+In your own project root directory, create a new CMakeLists.txt file similar to the first approach but change the CMake module path setup to read as follows on Windows platform:
+
+\code
+# Set CMake modules search path
+set (CMAKE_MODULE_PATH "$ENV{URHO3D_INSTALL_PREFIX}/Urho3D SDK/CMake/Modules" "${CMAKE_INSTALL_PREFIX}/Urho3D SDK/CMake/Modules" CACHE PATH "Path to Urho3D-specific CMake modules")
+\endcode
+
+On non-Windows platform:
+
+\code
+# Set CMake modules search path
+set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/CMake/Modules ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+\endcode
 
 \page Structure Overall structure
 

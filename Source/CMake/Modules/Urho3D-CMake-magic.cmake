@@ -373,7 +373,10 @@ macro (setup_executable)
     elseif (RASPI AND SCP_TO_TARGET)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
     endif ()
-    install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_RUNTIME_DIR})
+    if (DEST_RUNTIME_DIR)
+        # Need to check if the variable is defined first because this macro could be called by CMake project outside of Urho3D that does not wish to install anything
+        install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} BUNDLE DESTINATION ${DEST_RUNTIME_DIR})
+    endif ()
 endmacro ()
 
 # Macro for setting up linker flags for Mac OS X desktop build
@@ -416,7 +419,7 @@ macro (add_android_native_init)
         message (FATAL_ERROR
             "Could not find SDL_android_main.c source file in default SDK installation location or Urho3D project root tree. "
             "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
-            "For searching in a source tree of Urho3D source installation, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory.")
+            "For searching in a source tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory.")
     endif ()
 endmacro ()
 

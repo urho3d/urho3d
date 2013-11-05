@@ -30,8 +30,8 @@ if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
 endif ()
 
-# Add cmake modules search path
-list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+# Set CMake modules search path
+set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D cmake module
 include (Urho3D-CMake-magic)
@@ -77,10 +77,11 @@ if (WIN32)
     set (DEST_RUNTIME_DIR "Urho3D SDK/Bin")
     set (DEST_LIBRARY_DIR "Urho3D SDK/Lib")
     set (DEST_ARCHIVE_DIR "Urho3D SDK/Lib")
+    set (DEST_CMAKE_DIR   "Urho3D SDK/CMake")
     set (SCRIPT_PATTERN *.bat)
 else ()
     set (DEST_INCLUDE_DIR include/Urho3D)
-    set (DEST_RUNTIME_DIR share/Urho3D)
+    set (DEST_RUNTIME_DIR share/Urho3D/Bin)
     if (ENABLE_64BIT)
         if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)    # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores ENABLE_64BIT build option
             # Probably target system is a RedHat-based distro
@@ -93,10 +94,15 @@ else ()
     endif ()
     set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/Urho3D)
     set (DEST_ARCHIVE_DIR lib${LIB_SUFFIX}/Urho3D)
+    set (DEST_CMAKE_DIR share/Urho3D/CMake)
     set (SCRIPT_PATTERN *.sh)
 endif ()
+# Install application launcher scripts
 install (DIRECTORY ${PROJECT_ROOT_DIR}/Bin/ DESTINATION ${DEST_RUNTIME_DIR} USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN ${SCRIPT_PATTERN})    # Note: the trailing slash is significant
+# Install resource directories required by applications built with Urho3D library
 install (DIRECTORY ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data DESTINATION ${DEST_RUNTIME_DIR} USE_SOURCE_PERMISSIONS)
+# Install CMake modules and toolchains provided by and for Urho3D
+install (DIRECTORY ${PROJECT_ROOT_DIR}/Source/CMake/ DESTINATION ${DEST_CMAKE_DIR} USE_SOURCE_PERMISSIONS)
 
 # Add targets
 foreach (TARGET AngelScript Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
