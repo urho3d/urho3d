@@ -409,17 +409,24 @@ macro (add_android_native_init)
     elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         # Use Urho3D source installation
         list (APPEND SOURCE_FILES $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-    elseif (EXISTS $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
-        # Use Urho3D SDK installation on non-default installation location
-        list (APPEND SOURCE_FILES $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
-    elseif (EXISTS ${CMAKE_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
-        # Use Urho3D SDK installation on system default installation location
-        list (APPEND SOURCE_FILES ${CMAKE_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
     else ()
-        message (FATAL_ERROR
-            "Could not find SDL_android_main.c source file in default SDK installation location or Urho3D project root tree. "
-            "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
-            "For searching in a source tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory.")
+        if (WIN32)
+            set (TEMPLATE_DIR "Urho3D SDK/Templates")
+        else ()
+            set (TEMPLATE_DIR share/Urho3D/Templates)
+        endif ()
+        if (EXISTS $ENV{URHO3D_INSTALL_PREFIX}/${TEMPLATE_DIR}/android/SDL_android_main.c)
+            # Use Urho3D SDK installation on non-default installation location
+            list (APPEND SOURCE_FILES $ENV{URHO3D_INSTALL_PREFIX}/${TEMPLATE_DIR}/android/SDL_android_main.c)
+        elseif (EXISTS ${CMAKE_INSTALL_PREFIX}/${TEMPLATE_DIR}/android/SDL_android_main.c)
+            # Use Urho3D SDK installation on system default installation location
+            list (APPEND SOURCE_FILES ${CMAKE_INSTALL_PREFIX}/${TEMPLATE_DIR}/android/SDL_android_main.c)
+        else ()
+            message (FATAL_ERROR
+                "Could not find SDL_android_main.c source file in default SDK installation location or Urho3D project root tree. "
+                "For searching in a non-default Urho3D SDK installation, use 'URHO3D_INSTALL_PREFIX' environment variable to specify the prefix path of the installation location. "
+                "For searching in a source tree of Urho3D project, use 'URHO3D_HOME' environment variable to specify the Urho3D project root directory.")
+        endif ()
     endif ()
 endmacro ()
 
