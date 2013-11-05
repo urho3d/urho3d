@@ -210,7 +210,11 @@ bool File::Open(PackageFile* package, const String& fileName)
 
 unsigned File::Read(void* dest, unsigned size)
 {
+    #ifdef ANDROID
+    if (!handle_ && !assetHandle_)
+    #else
     if (!handle_)
+    #endif
     {
         // Do not log the error further here to prevent spamming the stderr stream
         return 0;
@@ -309,7 +313,11 @@ unsigned File::Read(void* dest, unsigned size)
 
 unsigned File::Seek(unsigned position)
 {
+    #ifdef ANDROID
+    if (!handle_ && !assetHandle_)
+    #else
     if (!handle_)
+    #endif
     {
         // Do not log the error further here to prevent spamming the stderr stream
         return 0;
