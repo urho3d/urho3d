@@ -108,7 +108,7 @@ set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 if (ANDROID)
     # Install dependency for SDL_android_main.c
     install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
-    install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_RUNTIME_DIR}/../Templates/android)
+    install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_RUNTIME_DIR}/templates/android)
 endif ()
 
 # Setup target
