@@ -296,16 +296,20 @@ Raspberry Pi build process
 For native build on Raspberry Pi itself, use the similar process for Linux
 Desktop build described above.
 
-For cross-compiling build on another build/host machine, set the RASPI_TOOL
-environment variable to point to your Raspberry Pi Cross-Compiling tool where
-all the arm-linux-gnueabihf-* executables are located. You can setup the tool
-using crosstool-NG (http://crosstool-ng.org/) or just download one from
-https://github.com/raspberrypi/tools. The RASPI_TOOL environment variable tells
-build script to generate additional build directory for cross-compiling.
+For cross-compiling build on another build/host machine, firstly set the
+RASPI_TOOL environment variable to point to your Raspberry Pi Cross-Compiling
+tool where all the arm-linux-gnueabihf-* executables are located. You can setup
+the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just
+download one from https://github.com/raspberrypi/tools. Secondly, set the
+RASPI_ROOT environment variable to point to your Raspbian or Pidora system root.
+You must install the Urho3D prerequisites software development packages for
+Raspberry Pi (see "Building_Prerequisites") in the system root before attempting
+to do the Urho3D cross-compiling build.
 
-Run cmake_gcc.sh then go to the raspi-Build directory and proceed to execute
-make. After the build is complete, the ARM executables can be found in Bin-CC
-directory. 
+When running cmake_gcc.sh with RASPI_TOOL environment variable set, it tells
+build script to generate additional raspi-Build directory for cross-compiling.
+Go to this raspi-Build directory and proceed to execute make. After the build
+is complete, the ARM executables can be found in Bin-CC output directory.
 
 You can also build, deploy, run/debug (as C/C++ Remote Application) using
 Eclipse IDE, if you run cmake_eclipse.sh to generate the project file. Import
