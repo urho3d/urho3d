@@ -63,7 +63,7 @@ if (URHO3D_HOME)
         foreach (DIR Audio Container Core Engine Graphics Input IO LuaScript Math Navigation Network Physics Resource Scene Script UI)
             list (APPEND URHO3D_INCLUDE_DIR ${SOURCE_TREE_PATH}/${DIR})     # Note: variable change to list context after this
         endforeach ()
-        foreach (DIR Bullet/src kNet/include)
+        foreach (DIR Bullet/src kNet/include SDL/include)
             list (APPEND URHO3D_INCLUDE_DIR ${URHO3D_HOME}/Source/ThirdParty/${DIR})
         endforeach ()
 
