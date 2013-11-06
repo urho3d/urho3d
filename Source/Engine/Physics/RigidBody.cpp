@@ -106,6 +106,7 @@ void RigidBody::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Anisotropic Friction", GetAnisotropicFriction, SetAnisotropicFriction, Vector3, Vector3::ONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Rolling Friction", GetRollingFriction, SetRollingFriction, float, DEFAULT_ROLLING_FRICTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Restitution", GetRestitution, SetRestitution, float, DEFAULT_RESTITUTION, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
@@ -371,6 +372,15 @@ void RigidBody::SetFriction(float friction)
     }
 }
 
+void RigidBody::SetAnisotropicFriction(Vector3 friction)
+{
+    if (body_)
+    {
+        body_->setAnisotropicFriction(ToBtVector3(friction));
+        MarkNetworkUpdate();
+    }
+}
+
 void RigidBody::SetRollingFriction(float friction)
 {
     if (body_)
@@ -631,6 +641,11 @@ float RigidBody::GetAngularDamping() const
 float RigidBody::GetFriction() const
 {
     return body_ ? body_->getFriction() : 0.0f;
+}
+
+Vector3 RigidBody::GetAnisotropicFriction() const
+{
+	return body_ ? ToVector3(body_->getAnisotropicFriction()) : Vector3::ZERO;
 }
 
 float RigidBody::GetRollingFriction() const

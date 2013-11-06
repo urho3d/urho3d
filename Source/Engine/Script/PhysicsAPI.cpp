@@ -153,6 +153,8 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "float get_angularDamping() const", asMETHOD(RigidBody, GetAngularDamping), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_friction(float)", asMETHOD(RigidBody, SetFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_friction() const", asMETHOD(RigidBody, GetFriction), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void set_anisotropicFriction(Vector3)", asMETHOD(RigidBody, SetAnisotropicFriction), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "Vector3 get_anisotropicFriction() const", asMETHOD(RigidBody, GetAnisotropicFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_rollingFriction(float)", asMETHOD(RigidBody, SetRollingFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_rollingFriction() const", asMETHOD(RigidBody, GetRollingFriction), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void set_restitution(float)", asMETHOD(RigidBody, SetRestitution), asCALL_THISCALL);
