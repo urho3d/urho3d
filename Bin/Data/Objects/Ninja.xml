@@ -6,11 +6,11 @@
 	<attribute name="Scale" value="1 1 1" />
 	<attribute name="Variables" />
 	<component type="ScriptInstance" id="16777216">
+		<attribute name="Delayed Method Calls" value="0" />
 		<attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
 		<attribute name="Class Name" value="Ninja" />
 		<attribute name="Fixed Update FPS" value="0" />
 		<attribute name="Time Accumulator" value="0" />
-		<attribute name="Delayed Method Calls" value="0" />
 		<attribute name="Script Data" value="" />
 	</component>
 	<component type="NetworkPriority" id="16777217">
@@ -108,11 +108,11 @@
 			<attribute name="Animations" />
 		</component>
     	<component type="ScriptInstance" id="8">
+    		<attribute name="Delayed Method Calls" value="0" />
     		<attribute name="Script File" value="ScriptFile;Scripts/NinjaSnowWar.as" />
     		<attribute name="Class Name" value="FootSteps" />
     		<attribute name="Fixed Update FPS" value="0" />
     		<attribute name="Time Accumulator" value="0" />
-    		<attribute name="Delayed Method Calls" value="0" />
     		<attribute name="Script Data" value="" />
     	</component>
 	</node>
