@@ -2621,6 +2621,7 @@ Methods:
 Methods:
 
 - void Open(const String fileName)
+- void Close()
 - void SetLevel(int level)
 - void SetTimeStamp(bool enable)
 - void SetQuiet(bool quiet)
@@ -3848,6 +3849,7 @@ Methods:
 - void SetAngularRestThreshold(float threshold)
 - void SetAngularDamping(float factor)
 - void SetFriction(float friction)
+- void SetAnisotropicFriction(Vector3 friction)
 - void SetRollingFriction(float friction)
 - void SetRestitution(float restitution)
 - void SetContactProcessingThreshold(float threshold)
@@ -3884,6 +3886,7 @@ Methods:
 - float GetAngularRestThreshold() const
 - float GetAngularDamping() const
 - float GetFriction() const
+- Vector3 GetAnisotropicFriction() const
 - float GetRollingFriction() const
 - float GetRestitution() const
 - float GetContactProcessingThreshold() const
@@ -3920,6 +3923,7 @@ Properties:
 - float angularRestThreshold
 - float angularDamping
 - float friction
+- Vector3 anisotropicFriction
 - float rollingFriction
 - float restitution
 - float contactProcessingThreshold

@@ -1,4 +1,9 @@
 -- Generate dox from pkg file
+if #arg == 0 then
+    print("Usage: lua pkgToDox.lua <output file name>")
+    os.exit(1)
+end
+
 require "pkgFiles"
 
 enums = {}
@@ -214,7 +219,7 @@ function writeClasses(ofile)
     end
 end
 
-ofile = io.open("LuaScriptAPI.dox", "w")
+ofile = io.open(arg[1], "w")
 ofile:write([[
 namespace Urho3D
 {
