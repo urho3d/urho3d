@@ -134,6 +134,8 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int LOG_NONE", (void*)&LOG_NONE);
 
     RegisterObject<Log>(engine, "Log");
+    engine->RegisterObjectMethod("Log", "void Open(const String&in)", asMETHOD(Log, Open), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Log", "void Close()", asMETHOD(Log, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "void Write(const String&in, bool error = false)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Debug(const String&in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "void Info(const String&in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);

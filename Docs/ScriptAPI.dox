@@ -4,255 +4,6 @@ namespace Urho3D
 /**
 \page ScriptAPI Scripting API
 
-\section ScriptAPI_GlobalFunctions Global functions
-- bool Equals(float, float)
-- float Sin(float)
-- float Cos(float)
-- float Tan(float)
-- float Asin(float)
-- float Acos(float)
-- float Atan(float)
-- float Atan2(float, float)
-- float Abs(float)
-- float Sqrt(float)
-- float Pow(float)
-- float Min(float, float)
-- float Max(float, float)
-- float Clamp(float, float, float)
-- float Lerp(float, float, float)
-- float Mod(float, float)
-- float Floor(float)
-- float Ceil(float)
-- float Random()
-- float Random(float)
-- int RandomInt()
-- int RandomInt(int)
-- void SetRandomSeed(uint)
-- uint GetRandomSeed()
-- String ToStringHex(int)
-- String Join(String[]&, const String&)
-- bool IsDigit(uint)
-- bool IsAlpha(uint)
-- void ErrorDialog(const String&, const String&)
-- void OpenConsoleWindow()
-- String GetConsoleInput()
-- String[]@ GetArguments()
-- String GetPlatform()
-- uint GetNumPhysicalCPUs()
-- uint GetNumLogicalCPUs()
-- void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void SubscribeToEvent(const String&, const String&)
-- void SubscribeToEvent(Object@, const String&, const String&)
-- void UnsubscribeFromEvent(const String&)
-- void UnsubscribeFromEvent(Object@, const String&)
-- void UnsubscribeFromEvents(Object@)
-- void UnsubscribeFromAllEvents()
-- void UnsubscribeFromAllEventsExcept(String[]@)
-- Object@ GetEventSender()
-- const String& GetTypeName(ShortStringHash)
-- void Print(const String&, bool = false)
-- void Print(int, bool = false)
-- void Print(uint, bool = false)
-- void Print(float, bool = false)
-- void Print(bool, bool = false)
-- void Print(const Variant&, bool = false)
-- void PrintCallStack(bool = false)
-- String GetPath(const String&)
-- String GetFileName(const String&)
-- String GetExtension(const String&, bool = true)
-- String GetFileNameAndExtension(const String&, bool = false)
-- String ReplaceExtension(const String&, const String&)
-- String AddTrailingSlash(const String&)
-- String RemoveTrailingSlash(const String&)
-- String GetParentPath(const String&)
-- String GetInternalPath(const String&)
-- bool IsAbsolutePath(const String&)
-- String[]@ GetObjectCategories()
-- String[]@ GetObjectsByCategory(const String&)
-- uint GetAlphaFormat()
-- uint GetLuminanceFormat()
-- uint GetLuminanceAlphaFormat()
-- uint GetRGBFormat()
-- uint GetRGBAFormat()
-- uint GetRGBA16Format()
-- uint GetRGBAFloat16Format()
-- uint GetRGBAFloat32Format()
-- uint GetRG16Format()
-- uint GetRGFloat16Format()
-- uint GetRGFloat32Format()
-- uint GetFloat16Format()
-- uint GetFloat32Format()
-- uint GetDepthStencilFormat()
-- uint GetFormat(const String&)
-- String GetTextureUnitName(TextureUnit)
-- void MarkNetworkUpdate()
-- void DelayedExecute(float, bool, const String&, const Variant[]@)
-- void DelayedExecute(float, bool, const String&)
-- void ClearDelayedExecute(const String& = String ( ))
-- void Remove()
-\section ScriptAPI_GlobalProperties Global properties
-- Time@ time
-- Log@ log
-- FileSystem@ fileSystem
-- ResourceCache@ resourceCache
-- ResourceCache@ cache
-- Node@ node
-- Scene@ scene
-- DebugRenderer@ debugRenderer
-- Octree@ octree
-- Graphics@ graphics
-- Renderer@ renderer
-- Input@ input
-- Audio@ audio
-- UI@ ui
-- Network@ network
-- PhysicsWorld@ physicsWorld
-- ScriptFile@ scriptFile
-- ScriptInstance@ self
-- Script@ script
-- Console@ console
-- DebugHud@ debugHud
-- Engine@ engine
-\section ScriptAPI_GlobalConstants Global constants
-- float M_INFINITY
-- float M_EPSILON
-- float M_LARGE_EPSILON
-- float M_LARGE_VALUE
-- float M_DEGTORAD
-- float M_DEGTORAD_2
-- float M_RADTODEG
-- float M_PI
-- int M_MIN_INT
-- int M_MAX_INT
-- uint M_MIN_UNSIGNED
-- uint M_MAX_UNSIGNED
-- int LOG_DEBUG
-- int LOG_INFO
-- int LOG_WARNING
-- int LOG_ERROR
-- int LOG_NONE
-- uint SCAN_FILES
-- uint SCAN_DIRS
-- uint SCAN_HIDDEN
-- uint AM_FILE
-- uint AM_NET
-- uint AM_DEFAULT
-- uint AM_LATESTDATA
-- uint AM_NOEDIT
-- uint AM_NODEID
-- uint AM_COMPONENTID
-- uint AM_NODEIDVECTOR
-- uint FIRST_REPLICATED_ID
-- uint LAST_REPLICATED_ID
-- uint FIRST_LOCAL_ID
-- uint LAST_LOCAL_ID
-- uint VO_NONE
-- uint VO_LOW_MATERIAL_QUALITY
-- uint VO_DISABLE_SHADOWS
-- uint VO_DISABLE_OCCLUSION
-- uint DRAWABLE_GEOMETRY
-- uint DRAWABLE_LIGHT
-- uint DRAWABLE_ZONE
-- uint DRAWABLE_ANY
-- uint DEFAULT_VIEWMASK
-- uint DEFAULT_LIGHTMASK
-- int QUALITY_LOW
-- int QUALITY_MEDIUM
-- int QUALITY_HIGH
-- int SHADOWQUALITY_LOW_16BIT
-- int SHADOWQUALITY_LOW_24BIT
-- int SHADOWQUALITY_HIGH_16BIT
-- int SHADOWQUALITY_HIGH_24BIT
-- int MOUSEB_LEFT
-- int MOUSEB_RIGHT
-- int MOUSEB_MIDDLE
-- int QUAL_SHIFT
-- int QUAL_CTRL
-- int QUAL_ALT
-- int QUAL_ANY
-- int KEY_BACKSPACE
-- int KEY_TAB
-- int KEY_RETURN
-- int KEY_RETURN2
-- int KEY_KP_ENTER
-- int KEY_PAUSE
-- int KEY_CAPSLOCK
-- int KEY_ESC
-- int KEY_SPACE
-- int KEY_PAGEUP
-- int KEY_PAGEDOWN
-- int KEY_END
-- int KEY_HOME
-- int KEY_LEFT
-- int KEY_UP
-- int KEY_RIGHT
-- int KEY_DOWN
-- int KEY_INSERT
-- int KEY_DELETE
-- int KEY_LWIN
-- int KEY_RWIN
-- int KEY_APPS
-- int KEY_NUMPAD0
-- int KEY_NUMPAD1
-- int KEY_NUMPAD2
-- int KEY_NUMPAD3
-- int KEY_NUMPAD4
-- int KEY_NUMPAD5
-- int KEY_NUMPAD6
-- int KEY_NUMPAD7
-- int KEY_NUMPAD8
-- int KEY_NUMPAD9
-- int KEY_MULTIPLY
-- int KEY_ADD
-- int KEY_SUBTRACT
-- int KEY_DECIMAL
-- int KEY_DIVIDE
-- int KEY_F1
-- int KEY_F2
-- int KEY_F3
-- int KEY_F4
-- int KEY_F5
-- int KEY_F6
-- int KEY_F7
-- int KEY_F8
-- int KEY_F9
-- int KEY_F10
-- int KEY_F11
-- int KEY_F12
-- int KEY_F13
-- int KEY_F14
-- int KEY_F15
-- int KEY_F16
-- int KEY_F17
-- int KEY_F18
-- int KEY_F19
-- int KEY_F20
-- int KEY_F21
-- int KEY_F22
-- int KEY_F23
-- int KEY_F24
-- int KEY_NUMLOCK
-- int KEY_SCROLLLOCK
-- int KEY_LSHIFT
-- int KEY_RSHIFT
-- int KEY_LCTRL
-- int KEY_RCTRL
-- int KEY_LALT
-- int KEY_RALT
-- int HAT_CENTER
-- int HAT_UP
-- int HAT_RIGHT
-- int HAT_DOWN
-- int HAT_LEFT
-- uint DD_DISABLED
-- uint DD_SOURCE
-- uint DD_TARGET
-- uint DD_SOURCE_AND_TARGET
-- uint DEBUGHUD_SHOW_NONE
-- uint DEBUGHUD_SHOW_STATS
-- uint DEBUGHUD_SHOW_MODE
-- uint DEBUGHUD_SHOW_PROFILER
-- uint DEBUGHUD_SHOW_ALL
 \section ScriptAPI_Enums Enumerations
 
 ### Intersection
@@ -577,6 +328,12 @@ namespace Urho3D
 - CONSTRAINT_HINGE
 - CONSTRAINT_SLIDER
 - CONSTRAINT_CONETWIST
+
+
+### DumpMode
+
+- DOXYGEN
+- C_HEADER
 
 \section ScriptAPI_Classes Classes
 
@@ -1270,6 +1027,8 @@ Properties:
 Methods:
 
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void Open(const String&)
+- void Close()
 - void Write(const String&, bool = false)
 - void Debug(const String&)
 - void Info(const String&)
@@ -6785,6 +6544,7 @@ Properties:
 - float angularRestThreshold
 - float angularDamping
 - float friction
+- Vector3 anisotropicFriction
 - float rollingFriction
 - float restitution
 - float contactProcessingThreshold
@@ -7142,7 +6902,7 @@ Methods:
 
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Execute(const String&)
-- void DumpAPI()
+- void DumpAPI(DumpMode = DOXYGEN)
 
 Properties:
 
@@ -7243,6 +7003,255 @@ Properties:
 - bool exiting (readonly)
 - bool headless (readonly)
 
+\section ScriptAPI_GlobalFunctions Global functions
+- bool Equals(float, float)
+- float Sin(float)
+- float Cos(float)
+- float Tan(float)
+- float Asin(float)
+- float Acos(float)
+- float Atan(float)
+- float Atan2(float, float)
+- float Abs(float)
+- float Sqrt(float)
+- float Pow(float)
+- float Min(float, float)
+- float Max(float, float)
+- float Clamp(float, float, float)
+- float Lerp(float, float, float)
+- float Mod(float, float)
+- float Floor(float)
+- float Ceil(float)
+- float Random()
+- float Random(float)
+- int RandomInt()
+- int RandomInt(int)
+- void SetRandomSeed(uint)
+- uint GetRandomSeed()
+- String ToStringHex(int)
+- String Join(String[]&, const String&)
+- bool IsDigit(uint)
+- bool IsAlpha(uint)
+- void ErrorDialog(const String&, const String&)
+- void OpenConsoleWindow()
+- String GetConsoleInput()
+- String[]@ GetArguments()
+- String GetPlatform()
+- uint GetNumPhysicalCPUs()
+- uint GetNumLogicalCPUs()
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SubscribeToEvent(const String&, const String&)
+- void SubscribeToEvent(Object@, const String&, const String&)
+- void UnsubscribeFromEvent(const String&)
+- void UnsubscribeFromEvent(Object@, const String&)
+- void UnsubscribeFromEvents(Object@)
+- void UnsubscribeFromAllEvents()
+- void UnsubscribeFromAllEventsExcept(String[]@)
+- Object@ GetEventSender()
+- const String& GetTypeName(ShortStringHash)
+- void Print(const String&, bool = false)
+- void Print(int, bool = false)
+- void Print(uint, bool = false)
+- void Print(float, bool = false)
+- void Print(bool, bool = false)
+- void Print(const Variant&, bool = false)
+- void PrintCallStack(bool = false)
+- String GetPath(const String&)
+- String GetFileName(const String&)
+- String GetExtension(const String&, bool = true)
+- String GetFileNameAndExtension(const String&, bool = false)
+- String ReplaceExtension(const String&, const String&)
+- String AddTrailingSlash(const String&)
+- String RemoveTrailingSlash(const String&)
+- String GetParentPath(const String&)
+- String GetInternalPath(const String&)
+- bool IsAbsolutePath(const String&)
+- String[]@ GetObjectCategories()
+- String[]@ GetObjectsByCategory(const String&)
+- uint GetAlphaFormat()
+- uint GetLuminanceFormat()
+- uint GetLuminanceAlphaFormat()
+- uint GetRGBFormat()
+- uint GetRGBAFormat()
+- uint GetRGBA16Format()
+- uint GetRGBAFloat16Format()
+- uint GetRGBAFloat32Format()
+- uint GetRG16Format()
+- uint GetRGFloat16Format()
+- uint GetRGFloat32Format()
+- uint GetFloat16Format()
+- uint GetFloat32Format()
+- uint GetDepthStencilFormat()
+- uint GetFormat(const String&)
+- String GetTextureUnitName(TextureUnit)
+- void MarkNetworkUpdate()
+- void DelayedExecute(float, bool, const String&, const Variant[]@)
+- void DelayedExecute(float, bool, const String&)
+- void ClearDelayedExecute(const String& = String ( ))
+- void Remove()
+\section ScriptAPI_GlobalProperties Global properties
+- Time@ time
+- Log@ log
+- FileSystem@ fileSystem
+- ResourceCache@ resourceCache
+- ResourceCache@ cache
+- Node@ node
+- Scene@ scene
+- DebugRenderer@ debugRenderer
+- Octree@ octree
+- Graphics@ graphics
+- Renderer@ renderer
+- Input@ input
+- Audio@ audio
+- UI@ ui
+- Network@ network
+- PhysicsWorld@ physicsWorld
+- ScriptFile@ scriptFile
+- ScriptInstance@ self
+- Script@ script
+- Console@ console
+- DebugHud@ debugHud
+- Engine@ engine
+\section ScriptAPI_GlobalConstants Global constants
+- float M_INFINITY
+- float M_EPSILON
+- float M_LARGE_EPSILON
+- float M_LARGE_VALUE
+- float M_DEGTORAD
+- float M_DEGTORAD_2
+- float M_RADTODEG
+- float M_PI
+- int M_MIN_INT
+- int M_MAX_INT
+- uint M_MIN_UNSIGNED
+- uint M_MAX_UNSIGNED
+- int LOG_DEBUG
+- int LOG_INFO
+- int LOG_WARNING
+- int LOG_ERROR
+- int LOG_NONE
+- uint SCAN_FILES
+- uint SCAN_DIRS
+- uint SCAN_HIDDEN
+- uint AM_FILE
+- uint AM_NET
+- uint AM_DEFAULT
+- uint AM_LATESTDATA
+- uint AM_NOEDIT
+- uint AM_NODEID
+- uint AM_COMPONENTID
+- uint AM_NODEIDVECTOR
+- uint FIRST_REPLICATED_ID
+- uint LAST_REPLICATED_ID
+- uint FIRST_LOCAL_ID
+- uint LAST_LOCAL_ID
+- uint VO_NONE
+- uint VO_LOW_MATERIAL_QUALITY
+- uint VO_DISABLE_SHADOWS
+- uint VO_DISABLE_OCCLUSION
+- uint DRAWABLE_GEOMETRY
+- uint DRAWABLE_LIGHT
+- uint DRAWABLE_ZONE
+- uint DRAWABLE_ANY
+- uint DEFAULT_VIEWMASK
+- uint DEFAULT_LIGHTMASK
+- int QUALITY_LOW
+- int QUALITY_MEDIUM
+- int QUALITY_HIGH
+- int SHADOWQUALITY_LOW_16BIT
+- int SHADOWQUALITY_LOW_24BIT
+- int SHADOWQUALITY_HIGH_16BIT
+- int SHADOWQUALITY_HIGH_24BIT
+- int MOUSEB_LEFT
+- int MOUSEB_RIGHT
+- int MOUSEB_MIDDLE
+- int QUAL_SHIFT
+- int QUAL_CTRL
+- int QUAL_ALT
+- int QUAL_ANY
+- int KEY_BACKSPACE
+- int KEY_TAB
+- int KEY_RETURN
+- int KEY_RETURN2
+- int KEY_KP_ENTER
+- int KEY_PAUSE
+- int KEY_CAPSLOCK
+- int KEY_ESC
+- int KEY_SPACE
+- int KEY_PAGEUP
+- int KEY_PAGEDOWN
+- int KEY_END
+- int KEY_HOME
+- int KEY_LEFT
+- int KEY_UP
+- int KEY_RIGHT
+- int KEY_DOWN
+- int KEY_INSERT
+- int KEY_DELETE
+- int KEY_LWIN
+- int KEY_RWIN
+- int KEY_APPS
+- int KEY_NUMPAD0
+- int KEY_NUMPAD1
+- int KEY_NUMPAD2
+- int KEY_NUMPAD3
+- int KEY_NUMPAD4
+- int KEY_NUMPAD5
+- int KEY_NUMPAD6
+- int KEY_NUMPAD7
+- int KEY_NUMPAD8
+- int KEY_NUMPAD9
+- int KEY_MULTIPLY
+- int KEY_ADD
+- int KEY_SUBTRACT
+- int KEY_DECIMAL
+- int KEY_DIVIDE
+- int KEY_F1
+- int KEY_F2
+- int KEY_F3
+- int KEY_F4
+- int KEY_F5
+- int KEY_F6
+- int KEY_F7
+- int KEY_F8
+- int KEY_F9
+- int KEY_F10
+- int KEY_F11
+- int KEY_F12
+- int KEY_F13
+- int KEY_F14
+- int KEY_F15
+- int KEY_F16
+- int KEY_F17
+- int KEY_F18
+- int KEY_F19
+- int KEY_F20
+- int KEY_F21
+- int KEY_F22
+- int KEY_F23
+- int KEY_F24
+- int KEY_NUMLOCK
+- int KEY_SCROLLLOCK
+- int KEY_LSHIFT
+- int KEY_RSHIFT
+- int KEY_LCTRL
+- int KEY_RCTRL
+- int KEY_LALT
+- int KEY_RALT
+- int HAT_CENTER
+- int HAT_UP
+- int HAT_RIGHT
+- int HAT_DOWN
+- int HAT_LEFT
+- uint DD_DISABLED
+- uint DD_SOURCE
+- uint DD_TARGET
+- uint DD_SOURCE_AND_TARGET
+- uint DEBUGHUD_SHOW_NONE
+- uint DEBUGHUD_SHOW_STATS
+- uint DEBUGHUD_SHOW_MODE
+- uint DEBUGHUD_SHOW_PROFILER
+- uint DEBUGHUD_SHOW_ALL
 */
 
 }

@@ -44,22 +44,24 @@ class File;
 class URHO3D_API Log : public Object
 {
     OBJECT(Log);
-    
+
 public:
     /// Construct.
     Log(Context* context);
     /// Destruct. Close the log file if open.
     virtual ~Log();
-    
+
     /// Open the log file.
     void Open(const String& fileName);
+    /// Close the log file.
+    void Close();
     /// Set logging level.
     void SetLevel(int level);
     /// Set whether to timestamp log messages.
     void SetTimeStamp(bool enable);
     /// Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
     void SetQuiet(bool quiet);
-    
+
     /// Return logging level.
     int GetLevel() const { return level_; }
     /// Return whether log messages are timestamped.
@@ -68,12 +70,12 @@ public:
     String GetLastMessage() const { return lastMessage_; }
     /// Return whether log is in quiet mode (only errors printed to standard error stream).
     bool IsQuiet() const { return quiet_; }
-    
+
     /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
     static void Write(int level, const String& message);
     /// Write raw output to the log.
     static void WriteRaw(const String& message, bool error = false);
-    
+
 private:
     /// Log file.
     SharedPtr<File> logFile_;

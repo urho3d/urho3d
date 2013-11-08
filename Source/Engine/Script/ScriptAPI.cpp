@@ -33,13 +33,13 @@ static bool ScriptFileExecute(const String& declaration, CScriptArray* srcParams
 {
     if (!srcParams)
         return false;
-    
+
     unsigned numParams = srcParams->GetSize();
     VariantVector destParams(numParams);
-    
+
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
-    
+
     return ptr->Execute(declaration, destParams);
 }
 
@@ -47,7 +47,7 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
 {
     if (!file)
         return 0;
-    
+
     // Try first to reuse an existing, empty ScriptInstance
     const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
     for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
@@ -97,7 +97,7 @@ asIScriptObject* NodeGetScriptObject(Node* ptr)
                 return object;
         }
     }
-    
+
     return 0;
 }
 
@@ -117,7 +117,7 @@ asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
             }
         }
     }
-    
+
     return 0;
 }
 
@@ -125,14 +125,14 @@ static bool ScriptInstanceExecute(const String& declaration, CScriptArray* srcPa
 {
     if (!srcParams)
         return false;
-    
+
     unsigned numParams = srcParams->GetSize();
     VariantVector destParams;
     destParams.Resize(numParams);
-    
+
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
-    
+
     return ptr->Execute(declaration, destParams);
 }
 
@@ -145,14 +145,14 @@ static void ScriptInstanceDelayedExecute(float delay, bool repeat, const String&
 {
     if (!srcParams)
         return;
-    
+
     unsigned numParams = srcParams->GetSize();
     VariantVector destParams;
     destParams.Resize(numParams);
-    
+
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
-    
+
     ptr->DelayedExecute(delay, repeat, declaration, destParams);
 }
 
@@ -171,14 +171,14 @@ static void SelfDelayedExecute(float delay, bool repeat, const String& declarati
     ScriptInstance* ptr = GetScriptContextInstance();
     if (!ptr || !srcParams)
         return;
-    
+
     unsigned numParams = srcParams->GetSize();
     VariantVector destParams;
     destParams.Resize(numParams);
-    
+
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
-    
+
     ptr->DelayedExecute(delay, repeat, declaration, destParams);
 }
 
@@ -218,13 +218,13 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Node", "ScriptObject@+ GetScriptObject() const", asFUNCTION(NodeGetScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "ScriptObject@+ GetScriptObject(const String&in) const", asFUNCTION(NodeGetNamedScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "ScriptObject@+ get_scriptObject() const", asFUNCTION(NodeGetScriptObject), asCALL_CDECL_OBJLAST);
-    
+
     engine->RegisterObjectMethod("Scene", "ScriptObject@+ CreateScriptObject(ScriptFile@+, const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeCreateScriptObjectWithFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "ScriptObject@+ CreateScriptObject(const String&in, const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeCreateScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "ScriptObject@+ GetScriptObject() const", asFUNCTION(NodeGetScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "ScriptObject@+ GetScriptObject(const String&in) const", asFUNCTION(NodeGetNamedScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "ScriptObject@+ get_scriptObject() const", asFUNCTION(NodeGetScriptObject), asCALL_CDECL_OBJLAST);
-    
+
     RegisterComponent<ScriptInstance>(engine, "ScriptInstance");
     engine->RegisterObjectMethod("ScriptInstance", "bool CreateObject(ScriptFile@+, const String&in)", asMETHODPR(ScriptInstance, CreateObject, (ScriptFile*, const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool Execute(const String&in, const Array<Variant>@+)", asFUNCTION(ScriptInstanceExecute), asCALL_CDECL_OBJLAST);
@@ -240,7 +240,7 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "void set_className(const String&in)", asMETHOD(ScriptInstance, SetClassName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "const String& get_className() const", asMETHOD(ScriptInstance, GetClassName), asCALL_THISCALL);
     engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);
-    
+
     // Register convenience functions for controlling self, similar to event sending
     engine->RegisterGlobalFunction("void MarkNetworkUpdate()", asFUNCTION(SelfMarkNetworkUpdate), asCALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, bool, const String&in, const Array<Variant>@+)", asFUNCTION(SelfDelayedExecute), asCALL_CDECL);
@@ -256,9 +256,13 @@ static Script* GetScript()
 
 static void RegisterScript(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("DumpMode");
+    engine->RegisterEnumValue("DumpMode", "DOXYGEN", DOXYGEN);
+    engine->RegisterEnumValue("DumpMode", "C_HEADER", C_HEADER);
+
     RegisterObject<Script>(engine, "Script");
     engine->RegisterObjectMethod("Script", "bool Execute(const String&in)", asMETHOD(Script, Execute), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Script", "void DumpAPI()", asMETHOD(Script, DumpAPI), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Script", "void DumpAPI(DumpMode mode = DOXYGEN)", asMETHOD(Script, DumpAPI), asCALL_THISCALL);
     engine->RegisterObjectMethod("Script", "void set_defaultScriptFile(ScriptFile@+)", asMETHOD(Script, SetDefaultScriptFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("Script", "ScriptFile@+ get_defaultScriptFile() const", asMETHOD(Script, GetDefaultScriptFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("Script", "void set_defaultScene(Scene@+)", asMETHOD(Script, SetDefaultScene), asCALL_THISCALL);

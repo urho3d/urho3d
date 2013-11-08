@@ -75,8 +75,15 @@ Log::~Log()
 void Log::Open(const String& fileName)
 {
     #if !defined(ANDROID) && !defined(IOS)
-    if ((logFile_ && logFile_->IsOpen()) || fileName.Empty())
+    if (fileName.Empty())
         return;
+    if (logFile_ && logFile_->IsOpen())
+    {
+        if (logFile_->GetName() == fileName)
+            return;
+        else
+            Close();
+    }
 
     logFile_ = new File(context_);
     if (logFile_->Open(fileName, FILE_WRITE))
@@ -85,6 +92,17 @@ void Log::Open(const String& fileName)
     {
         logFile_.Reset();
         Write(LOG_ERROR, "Failed to create log file " + fileName);
+    }
+    #endif
+}
+
+void Log::Close()
+{
+    #if !defined(ANDROID) && !defined(IOS)
+    if (logFile_ && logFile_->IsOpen())
+    {
+        logFile_->Close();
+        logFile_.Reset();
     }
     #endif
 }
