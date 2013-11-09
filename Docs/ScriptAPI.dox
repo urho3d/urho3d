@@ -2914,7 +2914,7 @@ Properties:
 - uint numGeometries (readonly)
 - Zone@ zone (readonly)
 - float animationLodBias
-- float invisibleLodFactor
+- bool updateInvisible
 - Skeleton@ skeleton (readonly)
 - uint numAnimationStates (readonly)
 - AnimationState@[] animationStates (readonly)

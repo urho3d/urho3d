@@ -524,6 +524,7 @@ void ParticleEmitter::SetEmitting(bool enable, bool resetPeriod)
 void ParticleEmitter::SetUpdateInvisible(bool enable)
 {
     updateInvisible_ = enable;
+    MarkNetworkUpdate();
 }
 
 void ParticleEmitter::SetTimeToLive(float time)

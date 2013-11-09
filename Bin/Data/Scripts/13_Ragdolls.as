@@ -93,7 +93,10 @@ void CreateScene()
             modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
             modelObject.material = cache.GetResource("Material", "Materials/Jack.xml");
             modelObject.castShadows = true;
-            
+            // Set the model to also update when invisible to avoid staying invisible when the model should come into
+            // view, but does not as the bounding box is not updated
+            modelObject.updateInvisible = true;
+
             // Create a rigid body and a collision shape. These will act as a trigger for transforming the
             // model into a ragdoll when hit by a moving object
             RigidBody@ body = modelNode.CreateComponent("RigidBody");

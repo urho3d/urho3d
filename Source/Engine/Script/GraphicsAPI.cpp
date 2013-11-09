@@ -898,8 +898,8 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "void set_model(Model@+)", asFUNCTION(AnimatedModelSetModel), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AnimatedModel", "void set_animationLodBias(float)", asMETHOD(AnimatedModel, SetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float get_animationLodBias() const", asMETHOD(AnimatedModel, GetAnimationLodBias), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_invisibleLodFactor(float)", asMETHOD(AnimatedModel, SetInvisibleLodFactor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "float get_invisibleLodFactor() const", asMETHOD(AnimatedModel, GetInvisibleLodFactor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_updateInvisible(bool)", asMETHOD(AnimatedModel, SetUpdateInvisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool get_updateInvisible() const", asMETHOD(AnimatedModel, GetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "Skeleton@+ get_skeleton()", asMETHOD(AnimatedModel, GetSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numAnimationStates() const", asMETHOD(AnimatedModel, GetNumAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);

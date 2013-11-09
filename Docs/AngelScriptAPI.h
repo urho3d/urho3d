@@ -3307,7 +3307,7 @@ uint numGeometries;
 /* (readonly) */
 Zone zone;
 float animationLodBias;
-float invisibleLodFactor;
+bool updateInvisible;
 /* (readonly) */
 Skeleton skeleton;
 /* (readonly) */

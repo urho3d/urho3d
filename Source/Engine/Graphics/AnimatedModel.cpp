@@ -63,7 +63,7 @@ AnimatedModel::AnimatedModel(Context* context) :
     animationLodBias_(1.0f),
     animationLodTimer_(-1.0f),
     animationLodDistance_(0.0f),
-    invisibleLodFactor_(0.0f),
+    updateInvisible_(false),
     animationDirty_(false),
     animationOrderDirty_(false),
     morphsDirty_(false),
@@ -89,11 +89,11 @@ void AnimatedModel::RegisterObject(Context* context)
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BOOL, "Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Invisible Anim LOD", GetInvisibleLodFactor, SetInvisibleLodFactor, float, 0.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(AnimatedModel, Drawable);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
@@ -191,26 +191,25 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
 
 void AnimatedModel::Update(const FrameInfo& frame)
 {
-    // Update animation here
-    if (!animationDirty_ && !animationOrderDirty_)
-        return;
-
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
     if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
     {
-        if (invisibleLodFactor_ == 0.0f)
+        // First check for no update at all when invisible
+        if (!updateInvisible_)
             return;
         float distance = frame.camera_->GetDistance(node_->GetWorldPosition());
         // If distance is greater than draw distance, no need to update at all
         if (drawDistance_ > 0.0f && distance > drawDistance_)
             return;
-        // Multiply the distance by a constant so that invisible nodes don't update that often
         float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
-        animationLodDistance_ = frame.camera_->GetLodDistance(distance, scale, lodBias_) * invisibleLodFactor_;
+        animationLodDistance_ = frame.camera_->GetLodDistance(distance, scale, lodBias_);
     }
 
-    UpdateAnimation(frame);
+    if (animationDirty_ || animationOrderDirty_)
+        UpdateAnimation(frame);
+    else if (boneBoundingBoxDirty_)
+        UpdateBoneBoundingBox();
 }
 
 void AnimatedModel::UpdateBatches(const FrameInfo& frame)
@@ -251,9 +250,6 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
     if (morphsDirty_)
         UpdateMorphs();
-    
-    if (boneBoundingBoxDirty_)
-        UpdateBoneBoundingBox();
     
     if (skinningDirty_)
         UpdateSkinning();
@@ -477,16 +473,12 @@ void AnimatedModel::SetAnimationLodBias(float bias)
     MarkNetworkUpdate();
 }
 
-void AnimatedModel::SetInvisibleLodFactor(float factor)
+void AnimatedModel::SetUpdateInvisible(bool enable)
 {
-    if (factor < 0.0f)
-        factor = 0.0f;
-    else if (factor != 0.0f && factor < 1.0f)
-        factor = 1.0f;
-
-    invisibleLodFactor_ = factor;
+    updateInvisible_ = enable;
     MarkNetworkUpdate();
 }
+
 
 void AnimatedModel::SetMorphWeight(unsigned index, float weight)
 {

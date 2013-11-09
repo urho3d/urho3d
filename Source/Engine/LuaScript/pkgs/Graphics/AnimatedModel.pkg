@@ -11,7 +11,7 @@ class AnimatedModel : public StaticModel
     void RemoveAnimationState(unsigned index);
     void RemoveAllAnimationStates();
     void SetAnimationLodBias(float bias);
-    void SetInvisibleLodFactor(float factor);
+    void SetUpdateInvisible(bool enable);
     void SetMorphWeight(unsigned index, float weight);
     void SetMorphWeight(const String name, float weight);
     void SetMorphWeight(StringHash nameHash, float weight);
@@ -24,7 +24,7 @@ class AnimatedModel : public StaticModel
     AnimationState* GetAnimationState(const StringHash animationNameHash) const;
     AnimationState* GetAnimationState(unsigned index) const;
     float GetAnimationLodBias() const;
-    float GetInvisibleLodFactor() const;
+    bool GetUpdateInvisible() const;
     unsigned GetNumMorphs() const;
     float GetMorphWeight(unsigned index) const;
     float GetMorphWeight(const String name) const;
@@ -35,7 +35,7 @@ class AnimatedModel : public StaticModel
     tolua_readonly tolua_property__get_set Skeleton& skeleton;
     tolua_readonly tolua_property__get_set unsigned numAnimationStates;
     tolua_property__get_set float animationLodBias;
-    tolua_property__get_set float invisibleLodFactor;
+    tolua_property__get_set bool updateInvisible;
     tolua_readonly tolua_property__get_set unsigned numMorphs;
     tolua_readonly tolua_property__is_set bool master;
 };
