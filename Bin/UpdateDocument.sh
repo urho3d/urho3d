@@ -9,7 +9,6 @@ if [ $? -eq 0 ]; then
     pushd ../Source/Engine/LuaScript/pkgs >/dev/null
     lua pkgToDox.lua $out
     if [ $? -ne 0 ]; then exit 1; fi
-    unix2dos $out 2>/dev/null
     popd >/dev/null
 fi
 if [ "$1" != "-a" ]; then exit 0; fi
