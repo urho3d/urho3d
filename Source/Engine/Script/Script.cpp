@@ -556,7 +556,7 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
                 break;
             if (posBegin > posEnd)
                 posBegin = posEnd - 1;
-            while (isalnum(out.Substring(posBegin, 1)[0]) && posBegin < posEnd)
+            while (posBegin < posEnd && isalnum(out[posBegin]))
                 --posBegin;
             ++posBegin;
             out.Replace(posBegin, posEnd - posBegin + 2, "Array<" + out.Substring(posBegin, posEnd - posBegin) + ">");
