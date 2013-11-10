@@ -7,7 +7,7 @@ if %errorlevel%== 0 (
     echo "Dumping LuaScript API..."
     set "out=%cd%/../Docs/LuaScriptAPI.dox"
     pushd ..\Source\Engine\LuaScript\pkgs
-    lua pkgToDox.lua %out%
+    lua pkgToDox.lua %out% *.pkg
     if errorlevel 1 exit /B 1
     popd
 )

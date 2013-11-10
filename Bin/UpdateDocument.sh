@@ -7,7 +7,7 @@ if [ $? -eq 0 ]; then
     echo "Dumping LuaScript API..."
     out=`pwd`/../Docs/LuaScriptAPI.dox
     pushd ../Source/Engine/LuaScript/pkgs >/dev/null
-    lua pkgToDox.lua $out
+    lua pkgToDox.lua $out *.pkg
     if [ $? -ne 0 ]; then exit 1; fi
     popd >/dev/null
 fi

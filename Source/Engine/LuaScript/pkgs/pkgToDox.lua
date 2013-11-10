@@ -1,11 +1,10 @@
 -- Generate dox from pkg file
 if #arg == 0 then
-    print("Usage: lua pkgToDox.lua <output file name>")
+    print("Usage: lua pkgToDox.lua <output file name> <input pkg file name> ...")
     os.exit(1)
 end
 
-require "pkgFiles"
-
+pkgFiles = {}
 enums = {}
 classes = {}
 globalConstants = {}
@@ -129,6 +128,24 @@ function handleLine(line)
     end
 end
 
+function gatherPkgFile(apiFile)
+    local file = io.open(apiFile)
+    if file == nil then
+        return
+    end
+
+    local line = file:read()
+    while line ~= nil do
+        line = trim(line)
+        local i, _, pkgFile = line:find("$pfile \"(.+)\"")
+        if i ~= nil then -- begin of pkg file.
+            table.insert(pkgFiles, pkgFile)
+        end
+        line = file:read()
+    end
+    file:close()
+end
+
 function handlePkgFile(pkgFile)
     local file = io.open(pkgFile)
     if file == nil then
@@ -146,6 +163,10 @@ function handlePkgFile(pkgFile)
         line = file:read()
     end
     file:close()
+end
+
+for i=2,#arg do
+    gatherPkgFile(arg[i])
 end
 
 for _, pkgFile in ipairs(pkgFiles) do
@@ -229,9 +250,9 @@ namespace Urho3D
 ]])
 ofile:write("\n")
 
+writeClasses(ofile)
 writeGlobalFunctions(ofile)
 writeGlobalConstants(ofile)
-writeClasses(ofile)
 
 ofile:write([[
 */
