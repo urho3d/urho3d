@@ -209,7 +209,7 @@ $ find /System/Library/Frameworks -type f -name lsregister -exec {} -kill -r -do
 The last command resets the launch service database and rebuilds it, so the changes should take effect immediately when Xcode restarts.
 
 
-\page Examples Example applications
+\page Examples Examples
 
 The examples included with Urho3D consist of two larger applications built in AngelScript, and a set of smaller sample applications provided in both C++, AngelScript and Lua, which demonstrate a specific engine feature.
 
