@@ -162,20 +162,20 @@ On Android and iOS the command line can not be entered, so it is instead read fr
 
 \section Running_Commandline Command line options
 
-The engine can be configured using the following command line options. Note the lack of space between the option and its parameter, like -x1024 or -p"MyResourcePath"
+The engine can be configured using the following command line options.
 
 \verbatim
--x<res>     Horizontal resolution
--y<res>     Vertical resolution
--m<level>   Enable hardware multisampling
+-x <res>    Horizontal resolution
+-y <res>    Vertical resolution
+-m <level>  Enable hardware multisampling
 -v          Enable vertical sync
 -t          Enable triple buffering
 -w          Start in windowed mode
 -s          Enable resizing when in windowed mode
 -q          Enable quiet mode which does not log to standard output stream
--b<length>  Sound buffer length in milliseconds
--r<freq>    Sound mixing frequency in Hz
--p<paths>   Resource path(s) to use, separated by semicolons
+-b <length> Sound buffer length in milliseconds
+-r <freq>   Sound mixing frequency in Hz
+-p <paths>  Resource path(s) to use, separated by semicolons
 -log<level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'
 -headless   Headless mode. No application window will be created
 -prepass    Use light pre-pass rendering
@@ -232,7 +232,7 @@ F4          Toggle octree debug geometry
 
 If a joystick is connected, it can also be used for controlling the player character.
 
-NinjaSnowWar also supports client/server multiplayer. To start the server, run the command NinjaSnowWar.bat server (-headless switch can optionally given so that the server will not open a graphics window.) To connect to a server, specify the server address on the command line, for example NinjaSnowWar.bat 127.0.0.1
+NinjaSnowWar also supports client/server multiplayer. To start the server, run the command NinjaSnowWar.bat -server (-headless option can optionally given so that the server will not open a graphics window.) To connect to a server, specify the option -address followed by the server address (for example -address 127.0.0.1). Optionally set client username with the option -username, followed by the desired name. Use -nobgm option to switch music off.
 
 \section Examples_Editor Editor
 

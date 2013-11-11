@@ -7,34 +7,32 @@ bool nobgm = false;
 
 void ParseNetworkArguments()
 {
-    uint index = 0;
-
     Array<String>@ arguments = GetArguments();
     
     for (uint i = 0; i < arguments.length; ++i)
     {
-        if (arguments[i][0] != '-')
+        String argument = arguments[i].ToLower();
+        if (argument[0] == '-')
         {
-            if (arguments[i] == "server")
+            argument = argument.Substring(1);
+            if (argument == "server")
             {
                 runServer = true;
                 runClient = false;
-                return;
             }
-            else if (index == 1) // First parameter is script name, so skip that
+            else if (argument == "address")
             {
                 runClient = true;
-                serverAddress = arguments[i];
+                runServer = false;
+                serverAddress = arguments[i + 1];
+                ++i;
             }
-            else if (index == 2 && runClient)
-                userName = arguments[i];
-            
-            ++index;
-        }
-        else
-        {
-            String argument = arguments[i].Substring(1).ToLower();
-            if (argument == "nobgm")
+            else if (argument == "username")
+            {
+                userName = arguments[i + 1];
+                ++i;
+            }
+            else if (argument == "nobgm")
                 nobgm = true;
         }
     }

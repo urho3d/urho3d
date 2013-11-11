@@ -195,9 +195,9 @@ void Run(const Vector<String>& arguments)
         ErrorExit(
             "Usage: ShaderCompiler <definitionfile> [outputpath] [options]\n\n"
             "Options:\n"
-            "-t<VS|PS>  Compile only vertex or pixel shaders, by default compile both\n"
-            "-v<name>   Compile only the shader variation with name\n"
-            "-d<define> Add a define. Add SM3 to compile for Shader Model 3\n\n"
+            "-t <VS|PS>  Compile only vertex or pixel shaders, by default compile both\n"
+            "-v <name>   Compile only the shader variation with name\n"
+            "-d <define> Add a define. Add SM3 to compile for Shader Model 3\n\n"
             "If output path is not specified, shader binaries will be output into the same\n"
             "directory as the definition file. Specify a wildcard to compile multiple\n"
             "shaders."
@@ -214,50 +214,50 @@ void Run(const Vector<String>& arguments)
     
     for (unsigned i = 1; i < arguments.Size(); ++i)
     {
-        if (arguments[i][0] == '-' && arguments[i].Length() > 1)
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
         {
-            char option = arguments[i][1];
-            String arg = arguments[i].Substring(2);
+            String argument = arguments[i].Substring(1).ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
             
-            switch (option)
+            if (argument == "d" && !value.Empty())
             {
-            case 'd':
+                Vector<String> nameAndValue = value.Split('=');
+                if (nameAndValue.Size() == 2)
                 {
-                    Vector<String> nameAndValue = arg.Split('=');
-                    if (nameAndValue.Size() == 2)
-                    {
-                        defines_.Push(nameAndValue[0]);
-                        defineValues_.Push(nameAndValue[1]);
-                        if (nameAndValue[0] == "SM3" && ToInt(nameAndValue[1]) > 0)
-                            useSM3_ = true;
-                    }
-                    else
-                    {
-                        defines_.Push(arg);
-                        defineValues_.Push("1");
-                        if (arg == "SM3")
-                            useSM3_ = true;
-                    }
+                    defines_.Push(nameAndValue[0]);
+                    defineValues_.Push(nameAndValue[1]);
+                    if (nameAndValue[0] == "SM3" && ToInt(nameAndValue[1]) > 0)
+                        useSM3_ = true;
                 }
-                break;
-                
-            case 't':
-                if (arg.ToLower() == "vs")
+                else
+                {
+                    defines_.Push(value);
+                    defineValues_.Push("1");
+                    if (value == "SM3")
+                        useSM3_ = true;
+                }
+                ++i;
+            }
+            else if (argument == "t" && !value.Empty())
+            {
+                if (value.ToLower() == "vs")
                 {
                     compileVS_ = true;
                     compilePS_ = false;
                 }
-                else if (arg.ToLower() == "ps")
+                else if (value.ToLower() == "ps")
                 {
                     compileVS_ = false;
                     compilePS_ = true;
                 }
-                break;
-                
-            case 'v':
+                ++i;
+            }
+            // Note: variation name must be allowed to be empty
+            else if (argument == "v")
+            {
                 compileVariation_ = true;
-                variationName_ = arg;
-                break;
+                variationName_ = value;
+                ++i;
             }
         }
     }

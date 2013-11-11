@@ -608,9 +608,10 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
     
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
-        if (arguments[i][0] == '-' && arguments[i].Length() >= 2)
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
         {
             String argument = arguments[i].Substring(1).ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
             
             if (argument == "headless")
                 ret["Headless"] = true;
@@ -641,58 +642,45 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["WorkerThreads"] = false;
             else if (argument == "sm2")
                 ret["ForceSM2"] = true;
-            else
+            else if (argument == "v")
+                ret["VSync"] = true;
+            else if (argument == "t")
+                ret["TripleBuffer"] = true;
+            else if (argument == "w")
+                ret["FullScreen"] = false;
+            else if (argument == "s")
+                ret["WindowResizable"] = true;
+            else if (argument == "q")
+                ret["LogQuiet"] = true;
+            else if (argument == "x" && !value.Empty())
             {
-                int value;
-                if (argument.Length() > 1)
-                    value = ToInt(argument.Substring(1));
-                
-                switch (tolower(argument[0]))
-                {
-                case 'x':
-                    ret["WindowWidth"] = value;
-                    break;
-                    
-                case 'y':
-                    ret["WindowHeight"] = value;
-                    break;
-                
-                case 'm':
-                    ret["MultiSample"] = value;
-                    break;
-                    
-                case 'b':
-                    ret["SoundBuffer"] = value;
-                    break;
-                    
-                case 'r':
-                    ret["SoundMixRate"] = value;
-                    break;
-                    
-                case 'v':
-                    ret["VSync"] = true;
-                    break;
-                    
-                case 't':
-                    ret["TripleBuffer"] = true;
-                    break;
-                    
-                case 'w':
-                    ret["FullScreen"] = false;
-                    break;
-                        
-                case 's':
-                    ret["WindowResizable"] = true;
-                    break;
-                    
-                case 'q':
-                    ret["LogQuiet"] = true;
-                    break;
-                    
-                case 'p':
-                    ret["ResourcePaths"] = arguments[i].Substring(2);
-                    break;
-                }
+                ret["WindowWidth"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "y" && !value.Empty())
+            {
+                ret["WindowHeight"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "m" && !value.Empty())
+            {
+                ret["MultiSample"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "b" && !value.Empty())
+            {
+                ret["SoundBuffer"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "r" && !value.Empty())
+            {
+                ret["SoundMixRate"] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "p" && !value.Empty())
+            {
+                ret["ResourcePaths"] = value;
+                ++i;
             }
         }
     }

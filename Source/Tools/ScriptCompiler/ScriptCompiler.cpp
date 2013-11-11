@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
     if (arguments.Size() < 1)
         ErrorExit("Usage: ScriptCompiler <input file> [resource path for includes]\n"
-                  "       ScriptCompiler -dumpapi <Oxygen output file> [C header output file]");
+                  "       ScriptCompiler -dumpapi <Doxygen output file> [C header output file]");
     else
     {
         if (arguments[0] != "-dumpapi")

@@ -185,27 +185,27 @@ void Run(const Vector<String>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model    Output a model\n"
-            "scene    Output a scene\n"
-            "dump     Dump scene node structure. No output file is generated\n"
-            "lod      Combine several Urho3D models as LOD levels of the output model\n"
-            "         Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
+            "model     Output a model\n"
+            "scene     Output a scene\n"
+            "dump      Dump scene node structure. No output file is generated\n"
+            "lod       Combine several Urho3D models as LOD levels of the output model\n"
+            "          Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
             "\n"
             "Options:\n"
-            "-b       Save scene in binary format, default format is XML\n"
-            "-h       Generate hard instead of smooth normals if input file has no normals\n"
-            "-i       Use local ID's for scene nodes\n"
-            "-l       Output a material list file for models\n"
-            "-na      Do not output animations\n"
-            "-nm      Do not output materials\n"
-            "-ns      Do not create subdirectories for resources\n"
-            "-nz      Do not create a zone and a directional light (scene mode only)\n"
-            "-nf      Do not fix infacing normals\n"
-            "-p<path> Set path for scene resources. Default is output file path\n"
-            "-r<name> Use the named scene node as root node\n"
-            "-f<freq> Animation tick frequency to use if unspecified. Default 4800\n"
-            "-o       Optimize redundant submeshes. Loses scene hierarchy and animations\n"
-            "-t       Generate tangents\n"
+            "-b        Save scene in binary format, default format is XML\n"
+            "-h        Generate hard instead of smooth normals if input file has no normals\n"
+            "-i        Use local ID's for scene nodes\n"
+            "-l        Output a material list file for models\n"
+            "-na       Do not output animations\n"
+            "-nm       Do not output materials\n"
+            "-ns       Do not create subdirectories for resources\n"
+            "-nz       Do not create a zone and a directional light (scene mode only)\n"
+            "-nf       Do not fix infacing normals\n"
+            "-p <path> Set path for scene resources. Default is output file path\n"
+            "-r <name> Use the named scene node as root node\n"
+            "-f <freq> Animation tick frequency to use if unspecified. Default 4800\n"
+            "-o        Optimize redundant submeshes. Loses scene hierarchy and animations\n"
+            "-t        Generate tangents\n"
         );
     }
     
@@ -235,78 +235,65 @@ void Run(const Vector<String>& arguments)
     
     for (unsigned i = 2; i < arguments.Size(); ++i)
     {
-        if (arguments[i].Length() >= 2 && arguments[i][0] == '-')
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
         {
-            String parameter;
-            if (arguments[i].Length() >= 3)
-                parameter = arguments[i].Substring(2);
+            String argument = arguments[i].Substring(1).ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
             
-            switch (tolower(arguments[i][1]))
-            {
-            case 'b':
+            if (argument == "b")
                 saveBinary_ = true;
-                break;
-                
-            case 'h':
+            else if (argument == "h")
+            {
                 flags &= ~aiProcess_GenSmoothNormals;
                 flags |= aiProcess_GenNormals;
-                break;
-                
-            case 'i':
+            }
+            else if (argument == "i")
                 localIDs_ = true;
-                break;
-                
-            case 'l':
+            else if (argument == "l")
                 saveMaterialList_ = true;
-                break;
-                
-            case 'p':
-                resourcePath_ = AddTrailingSlash(parameter);
-                break;
-                
-            case 'r':
-                rootNodeName = parameter;
-                break;
-                
-            case 't':
+            else if (argument == "t")
                 flags |= aiProcess_CalcTangentSpace;
-                break;
-                
-            case 'f':
-                defaultTicksPerSecond_ = ToFloat(parameter);
-                break;
-                
-            case 'o':
+            else if (argument == "o")
                 flags |= aiProcess_PreTransformVertices;
-                break;
-                
-            case 'n':
-                if (!parameter.Empty())
+            else if (argument.Length() == 2 && argument[0] == 'n')
+            {
+                switch (tolower(argument[1]))
                 {
-                    switch (tolower(parameter[0]))
-                    {
-                    case 'a':
-                        noAnimations_ = true;
-                        break;
-                        
-                    case 'm':
-                        noMaterials_ = true;
-                        break;
-                        
-                    case 's':
-                        useSubdirs_ = false;
-                        break;
-                        
-                    case 'z':
-                        createZone_ = false;
-                        break;
-                        
-                    case 'f':
-                        flags &= ~aiProcess_FixInfacingNormals;
-                        break;
-                    }
+                case 'a':
+                    noAnimations_ = true;
+                    break;
+                    
+                case 'm':
+                    noMaterials_ = true;
+                    break;
+                    
+                case 's':
+                    useSubdirs_ = false;
+                    break;
+                    
+                case 'z':
+                    createZone_ = false;
+                    break;
+                    
+                case 'f':
+                    flags &= ~aiProcess_FixInfacingNormals;
+                    break;
                 }
-                break;
+            }
+            else if (argument == "p" && !value.Empty())
+            {
+                resourcePath_ = AddTrailingSlash(value);
+                ++i;
+            }
+            else if (argument == "r" && !value.Empty())
+            {
+                rootNodeName = value;
+                ++i;
+            }
+            else if (argument == "f" && !value.Empty())
+            {
+                defaultTicksPerSecond_ = ToFloat(value);
+                ++i;
             }
         }
     }

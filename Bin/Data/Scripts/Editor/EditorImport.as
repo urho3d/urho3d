@@ -31,7 +31,7 @@ void ImportModel(const String&in fileName)
     args.Push("model");
     args.Push("\"" + fileName + "\"");
     args.Push("\"" + outFileName + "\"");
-    args.Push("-p\"" + sceneResourcePath + "\"");
+    args.Push("-p \"" + sceneResourcePath + "\"");
     Array<String> options = importOptions.Trimmed().Split(' ');
     for (uint i = 0; i < options.length; ++i)
         args.Push(options[i]);
@@ -75,7 +75,7 @@ void ImportScene(const String&in fileName)
         args.Push("scene");
         args.Push("\"" + fileName + "\"");
         args.Push("\"" + tempSceneName + "\"");
-        args.Push("-p\"" + sceneResourcePath + "\"");
+        args.Push("-p \"" + sceneResourcePath + "\"");
         Array<String> options = importOptions.Trimmed().Split(' ');
         for (uint i = 0; i < options.length; ++i)
             args.Push(options[i]);

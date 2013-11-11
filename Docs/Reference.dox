@@ -1659,8 +1659,6 @@ Note that as the Profiler currently manages only a single hierarchy tree, profil
 
 \page Tools Tools
 
-Note: like with the Urho3D player application, command line options with a parameter do not have a space between the option and the parameter, except the -dumpapi command in ScriptCompiler.
-
 \section Tools_AssetImporter AssetImporter
 
 Loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at http://assimp.sourceforge.net/main_features_formats.html.
@@ -1678,20 +1676,20 @@ lod      Combine several Urho3D models as LOD levels of the output model
          Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>
 
 Options:
--b       Save scene in binary format, default format is XML
--h       Generate hard instead of smooth normals if input file has no normals
--i       Use local ID's for scene nodes
--l       Output a material list file for models
--na      Do not output animations
--nm      Do not output materials
--ns      Do not create subdirectories for resources
--nz      Do not create a zone and a directional light (scene mode only)
--nf      Do not fix infacing normals
--p<path> Set path for scene resources. Default is output file path\n"
--r<name> Use the named scene node as root node\n"
--f<freq> Animation tick frequency to use if unspecified. Default 4800\n"
--o       Optimize redundant submeshes. Loses scene hierarchy and animations
--t       Generate tangents
+-b        Save scene in binary format, default format is XML
+-h        Generate hard instead of smooth normals if input file has no normals
+-i        Use local ID's for scene nodes
+-l        Output a material list file for models
+-na       Do not output animations
+-nm       Do not output materials
+-ns       Do not create subdirectories for resources
+-nz       Do not create a zone and a directional light (scene mode only)
+-nf       Do not fix infacing normals
+-p <path> Set path for scene resources. Default is output file path\n"
+-r <name> Use the named scene node as root node\n"
+-f <freq> Animation tick frequency to use if unspecified. Default 4800\n"
+-o        Optimize redundant submeshes. Loses scene hierarchy and animations
+-t        Generate tangents
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
@@ -1771,7 +1769,7 @@ Usage:
 
 \verbatim
 ScriptCompiler <input file> [resource path for includes]
-ScriptCompiler -dumpapi <output file>
+ScriptCompiler -dumpapi <Doxygen output file> [C header output file]
 
 \endverbatim
 
@@ -1791,9 +1789,9 @@ Usage:
 ShaderCompiler <definitionfile> <outputpath> [options]
 
 Options:
--t<VS|PS>  Compile only vertex or pixel shaders, by default compile both
--v<name>   Compile only the shader variation with name
--d<define> Add a define. Add SM3 to compile for Shader Model 3
+-t <VS|PS>  Compile only vertex or pixel shaders, by default compile both
+-v <name>   Compile only the shader variation with name
+-d <define> Add a define. Add SM3 to compile for Shader Model 3
 
 If output path is not specified, shader binaries will be output into the same
 directory as the definition file. Specify a wildcard to compile multiple

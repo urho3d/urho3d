@@ -105,35 +105,29 @@ void Run(const Vector<String>& arguments)
     {
         for (unsigned i = 2; i < arguments.Size(); ++i)
         {
-            if (arguments[i][0] == '-')
+            if (arguments[i].Length() > 1 && arguments[i][0] == '-')
             {
-                String arg = arguments[i].Substring(1).ToLower();
-                switch (arg[0])
-                {
-                case 'l':
+                String argument = arguments[i].Substring(1).ToLower();
+                if (argument == "l")
                     saveMaterialList = true;
-                    break;
-                    
-                case 'n':
-                    if (arg.Length() > 1)
-                    {
-                        if (arg[1] == 'a')
-                            exportAnimations = false;
-                        if (arg[1] == 'm')
-                            exportMorphs = false;
-                    }
-                    break;
-                    
-                case 'r':
+                else if (argument == "r")
                     rotationsOnly = true;
-                    break;
-                    
-                case 's':
+                else if (argument == "s")
                     splitSubMeshes = true;
-                    break;
-                    
-                case 't':
+                else if (argument == "t")
                     generateTangents = true;
+                else if (argument.Length() == 2 && argument[0] == 'n')
+                {
+                    switch (tolower(argument[1]))
+                    {
+                    case 'a':
+                        exportAnimations = false;
+                        break;
+                        
+                    case 'm':
+                        exportMorphs = false;
+                        break;
+                    }
                     break;
                 }
             }
