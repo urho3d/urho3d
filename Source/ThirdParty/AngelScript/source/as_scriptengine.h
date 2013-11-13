@@ -61,11 +61,6 @@ class asCContext;
 // TODO: import: Remove this when import is removed
 struct sBindInfo;
 
-// TODO: DiscardModule should take an optional pointer to asIScriptModule instead of module name. If null, nothing is done.
-
-// TODO: Should allow enumerating modules, in case they have not been named.
-
-
 class asCScriptEngine : public asIScriptEngine
 {
 //=============================================================
@@ -151,6 +146,8 @@ public:
 	// Script modules
 	virtual asIScriptModule *GetModule(const char *module, asEGMFlags flag);
 	virtual int              DiscardModule(const char *module);
+	virtual asUINT           GetModuleCount() const;
+	virtual asIScriptModule *GetModuleByIndex(asUINT index) const;
 
 	// Script functions
 	virtual asIScriptFunction *GetFunctionById(int funcId) const;
@@ -266,7 +263,7 @@ public:
 
 	int CreateContext(asIScriptContext **context, bool isInternal);
 
-	asCObjectType *GetObjectType(const char *type, asSNameSpace *ns);
+	asCObjectType *GetObjectType(const char *type, asSNameSpace *ns) const;
 
 	asCObjectType *GetListPatternType(int listPatternFuncId);
 	void DestroyList(asBYTE *buffer, const asCObjectType *listPatternType);

@@ -179,7 +179,7 @@ asCString asCDataType::Format(bool includeNamespace) const
 	else if( objectType )
 	{
 		str += objectType->name;
-		if( objectType->flags & asOBJ_TEMPLATE )
+		if( objectType->templateSubTypes.GetLength() > 0 )
 		{
 			str += "<";
 			for( asUINT subtypeIndex = 0; subtypeIndex < objectType->templateSubTypes.GetLength(); subtypeIndex++ )

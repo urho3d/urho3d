@@ -1034,6 +1034,21 @@ int asCScriptEngine::DiscardModule(const char *module)
 	return 0;
 }
 
+// interface
+asUINT asCScriptEngine::GetModuleCount() const
+{
+	return asUINT(scriptModules.GetLength());
+}
+
+// interface
+asIScriptModule *asCScriptEngine::GetModuleByIndex(asUINT index) const
+{
+	if( index >= scriptModules.GetLength() )
+		return 0;
+
+	return scriptModules[index];
+}
+
 // internal
 int asCScriptEngine::ClearUnusedTypes()
 {
@@ -1195,6 +1210,9 @@ int asCScriptEngine::GetFactoryIdByDecl(const asCObjectType *ot, const char *dec
 
 	asCBuilder bld(this, mod);
 
+	// Don't write parser errors to the message callback
+	bld.silent = true;
+
 	asCScriptFunction func(this, mod, asFUNC_DUMMY);
 	int r = bld.ParseFunctionDeclaration(0, decl, &func, false, 0, 0, defaultNamespace);
 	if( r < 0 )
@@ -1222,6 +1240,9 @@ int asCScriptEngine::GetFactoryIdByDecl(const asCObjectType *ot, const char *dec
 int asCScriptEngine::GetMethodIdByDecl(const asCObjectType *ot, const char *decl, asCModule *mod)
 {
 	asCBuilder bld(this, mod);
+
+	// Don't write parser errors to the message callback
+	bld.silent = true;
 
 	asCScriptFunction func(this, mod, asFUNC_DUMMY);
 
@@ -1316,7 +1337,7 @@ int asCScriptEngine::RegisterObjectProperty(const char *obj, const char *declara
 		return ConfigError(r, "RegisterObjectProperty", obj, declaration);
 
 	// Store the property info
-	if( dt.GetObjectType() == 0 )
+	if( dt.GetObjectType() == 0 || dt.IsObjectHandle() )
 		return ConfigError(asINVALID_OBJECT, "RegisterObjectProperty", obj, declaration);
 
 	// The VM currently only supports 16bit offsets
@@ -1767,7 +1788,7 @@ int asCScriptEngine::RegisterObjectBehaviour(const char *datatype, asEBehaviours
 	if( r < 0 )
 		return ConfigError(r, "RegisterObjectBehaviour", datatype, decl);
 
-	if( type.GetObjectType() == 0 )
+	if( type.GetObjectType() == 0 || type.IsObjectHandle()  )
 		return ConfigError(asINVALID_TYPE, "RegisterObjectBehaviour", datatype, decl);
 
 	// Don't allow application to modify built-in types
@@ -1824,9 +1845,10 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 	// Verify function declaration
 	asCScriptFunction func(this, 0, asFUNC_DUMMY);
 
+	bool expectListPattern = behaviour == asBEHAVE_LIST_FACTORY || behaviour == asBEHAVE_LIST_CONSTRUCT;
 	asCScriptNode *listPattern = 0;
 	asCBuilder bld(this, 0);
-	int r = bld.ParseFunctionDeclaration(objectType, decl, &func, true, &internal.paramAutoHandles, &internal.returnAutoHandle, 0, behaviour == asBEHAVE_LIST_FACTORY ? &listPattern : 0);
+	int r = bld.ParseFunctionDeclaration(objectType, decl, &func, true, &internal.paramAutoHandles, &internal.returnAutoHandle, 0, expectListPattern ? &listPattern : 0);
 	if( r < 0 )
 	{
 		if( listPattern )
@@ -1867,8 +1889,6 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 
 	if( behaviour == asBEHAVE_CONSTRUCT )
 	{
-		// TODO: Add asBEHAVE_IMPLICIT_CONSTRUCT
-
 		// Verify that the return type is void
 		if( func.returnType != asCDataType::CreatePrimitive(ttVoid, false) )
 			return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
@@ -1893,8 +1913,6 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 				WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_ILLEGAL_BEHAVIOUR_FOR_TYPE);
 				return ConfigError(asILLEGAL_BEHAVIOUR_FOR_TYPE, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
 			}
-
-			// TODO: Add support for implicit constructors
 
 			// TODO: Verify that the same constructor hasn't been registered already
 
@@ -1940,6 +1958,52 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 
 		func.id = beh->destruct = AddBehaviourFunction(func, internal);
 	}
+	else if( behaviour == asBEHAVE_LIST_CONSTRUCT )
+	{
+		// Verify that the return type is void
+		if( func.returnType != asCDataType::CreatePrimitive(ttVoid, false) )
+		{
+			if( listPattern )
+				listPattern->Destroy(this);
+
+			return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+		}
+
+		// Verify that it is a value type
+		if( !(func.objectType->flags & asOBJ_VALUE) )
+		{
+			if( listPattern )
+				listPattern->Destroy(this);
+
+			WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_ILLEGAL_BEHAVIOUR_FOR_TYPE);
+			return ConfigError(asILLEGAL_BEHAVIOUR_FOR_TYPE, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+		}
+
+		// Verify the parameters
+		if( func.parameterTypes.GetLength() != 1 || !func.parameterTypes[0].IsReference() )
+		{
+			if( listPattern )
+				listPattern->Destroy(this);
+
+			WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_LIST_FACTORY_EXPECTS_1_REF_PARAM);
+			return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+		}
+
+		// Add the function
+		func.id = AddBehaviourFunction(func, internal);
+
+		// Re-use the listFactory member, as it is not possible to have both anyway
+		beh->listFactory = func.id;
+
+		// Store the list pattern for this function
+		int r = scriptFunctions[func.id]->RegisterListPattern(decl, listPattern);
+
+		if( listPattern )
+			listPattern->Destroy(this);
+
+		if( r < 0 )
+			return ConfigError(r, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
+	}
 	else if( behaviour == asBEHAVE_FACTORY || behaviour == asBEHAVE_LIST_FACTORY )
 	{
 		// Must be a ref type and must not have asOBJ_NOHANDLE
@@ -1958,8 +2022,6 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 				listPattern->Destroy(this);
 			return ConfigError(asINVALID_DECLARATION, "RegisterObjectBehaviour", objectType->name.AddressOf(), decl);
 		}
-
-		// TODO: Add support for implicit factories
 
 		// TODO: Verify that the same factory function hasn't been registered already
 
@@ -2478,6 +2540,9 @@ int asCScriptEngine::GetGlobalPropertyIndexByDecl(const char *decl) const
 	// This const cast is OK. The builder won't modify the engine
 	asCBuilder bld(const_cast<asCScriptEngine*>(this), 0);
 
+	// Don't write parser errors to the message callback
+	bld.silent = true;
+
 	asCString name;
 	asSNameSpace *ns;
 	asCDataType dt;
@@ -2506,7 +2571,7 @@ int asCScriptEngine::RegisterObjectMethod(const char *obj, const char *declarati
 	if( r < 0 )
 		return ConfigError(r, "RegisterObjectMethod", obj, declaration);
 
-	if( dt.GetObjectType() == 0 )
+	if( dt.GetObjectType() == 0 || dt.IsObjectHandle() )
 		return ConfigError(asINVALID_ARG, "RegisterObjectMethod", obj, declaration);
 
 	// Don't allow application to modify built-in types
@@ -2773,6 +2838,9 @@ asIScriptFunction *asCScriptEngine::GetGlobalFunctionByDecl(const char *decl) co
 {
 	asCBuilder bld(const_cast<asCScriptEngine*>(this), 0);
 
+	// Don't write parser errors to the message callback
+	bld.silent = true;
+
 	asCScriptFunction func(const_cast<asCScriptEngine*>(this), 0, asFUNC_DUMMY);
 	int r = bld.ParseFunctionDeclaration(0, decl, &func, false, 0, 0, defaultNamespace);
 	if( r < 0 )
@@ -2814,7 +2882,7 @@ asIScriptFunction *asCScriptEngine::GetGlobalFunctionByDecl(const char *decl) co
 }
 
 
-asCObjectType *asCScriptEngine::GetObjectType(const char *type, asSNameSpace *ns)
+asCObjectType *asCScriptEngine::GetObjectType(const char *type, asSNameSpace *ns) const
 {
 	// TODO: optimize: Improve linear search
 	for( asUINT n = 0; n < objectTypes.GetLength(); n++ )
@@ -4248,6 +4316,10 @@ int asCScriptEngine::GetTypeIdByDecl(const char *decl) const
 	asCDataType dt;
 	// This cast is ok, because we are not changing anything in the engine
 	asCBuilder bld(const_cast<asCScriptEngine*>(this), 0);
+
+	// Don't write parser errors to the message callback
+	bld.silent = true;
+	
 	int r = bld.ParseDataType(decl, &dt, defaultNamespace);
 	if( r < 0 )
 		return asINVALID_TYPE;
@@ -4515,7 +4587,7 @@ void asCScriptEngine::AddRefScriptObject(void *obj, int typeId)
 void asCScriptEngine::AddRefScriptObject(void *obj, const asIObjectType *type)
 {
 	// Make sure it is not a null pointer
-	if( obj == 0 ) return;
+	if( obj == 0 || type == 0 ) return;
 
 	const asCObjectType *objType = static_cast<const asCObjectType *>(type);
 	if( objType->beh.addref )
@@ -4550,7 +4622,7 @@ void asCScriptEngine::ReleaseScriptObject(void *obj, int typeId)
 void asCScriptEngine::ReleaseScriptObject(void *obj, const asIObjectType *type)
 {
 	// Make sure it is not a null pointer
-	if( obj == 0 ) return;
+	if( obj == 0 || type == 0 ) return;
 
 	const asCObjectType *objType = static_cast<const asCObjectType *>(type);
 	if( objType->flags & asOBJ_REF )
@@ -5371,9 +5443,14 @@ void asCScriptEngine::SetObjectTypeUserDataCleanupCallback(asCLEANOBJECTTYPEFUNC
 // internal
 asCObjectType *asCScriptEngine::GetListPatternType(int listPatternFuncId)
 {
-	asCObjectType *ot = scriptFunctions[listPatternFuncId]->returnType.GetObjectType();
+	// Get the object type either from the constructor's object for value types
+	// or from the factory's return type for reference types
+	asCObjectType *ot = scriptFunctions[listPatternFuncId]->objectType;
+	if( ot == 0 )
+		ot = scriptFunctions[listPatternFuncId]->returnType.GetObjectType();
 	asASSERT( ot );
 
+	// Check if this object type already has a list pattern type
 	for( asUINT n = 0; n < listPatternTypes.GetLength(); n++ )
 	{
 		if( listPatternTypes[n]->templateSubTypes[0].GetObjectType() == ot )
@@ -5419,6 +5496,10 @@ void asCScriptEngine::DestroySubList(asBYTE *&buffer, asSListPatternNode *&node)
 	{
 		if( node->type == asLPT_REPEAT )
 		{
+			// Align the offset to 4 bytes boundary
+			if( (asPWORD(buffer) & 0x3) )
+				buffer += 4 - (asPWORD(buffer) & 0x3);
+
 			// Determine how many times the pattern repeat
 			count = *(asUINT*)buffer;
 			buffer += 4;
@@ -5436,6 +5517,10 @@ void asCScriptEngine::DestroySubList(asBYTE *&buffer, asSListPatternNode *&node)
 			{
 				if( isVarType )
 				{
+					// Align the offset to 4 bytes boundary
+					if( (asPWORD(buffer) & 0x3) )
+						buffer += 4 - (asPWORD(buffer) & 0x3);
+
 					int typeId = *(int*)buffer;
 					buffer += 4;
 					dt = GetDataTypeFromTypeId(typeId);
@@ -5447,6 +5532,12 @@ void asCScriptEngine::DestroySubList(asBYTE *&buffer, asSListPatternNode *&node)
 					// Free all instances of this type
 					if( ot->flags & asOBJ_VALUE )
 					{
+						asUINT size = ot->GetSize();
+
+						// Align the offset to 4 bytes boundary
+						if( size >= 4 && (asPWORD(buffer) & 0x3) )
+							buffer += 4 - (asPWORD(buffer) & 0x3);
+
 						if( ot->beh.destruct )
 						{
 							// Only call the destructor if the object has been created
@@ -5457,7 +5548,7 @@ void asCScriptEngine::DestroySubList(asBYTE *&buffer, asSListPatternNode *&node)
 							//       thrown aborting the initialization. The engine
 							//       really should be keeping track of which objects has
 							//       been successfully initialized.
-							asUINT size = ot->GetSize();
+						
 							for( asUINT n = 0; n < size; n++ )
 							{
 								if( buffer[n] != 0 )
@@ -5467,16 +5558,17 @@ void asCScriptEngine::DestroySubList(asBYTE *&buffer, asSListPatternNode *&node)
 									break;
 								}
 							}
-							buffer += size;
 						}
-						else
-						{
-							// Advance the pointer in the buffer
-							buffer += ot->GetSize();
-						}
+
+						// Advance the pointer in the buffer
+						buffer += size;
 					}
 					else
 					{
+						// Align the offset to 4 bytes boundary
+						if( asPWORD(buffer) & 0x3 )
+							buffer += 4 - (asPWORD(buffer) & 0x3);
+						
 						// Call the release behaviour
 						void *ptr = *(void**)buffer;
 						if( ptr )
@@ -5486,8 +5578,14 @@ void asCScriptEngine::DestroySubList(asBYTE *&buffer, asSListPatternNode *&node)
 				}
 				else
 				{
+					asUINT size = dt.GetSizeInMemoryBytes();
+
+					// Align the offset to 4 bytes boundary
+					if( size >= 4 && (asPWORD(buffer) & 0x3) )
+						buffer += 4 - (asPWORD(buffer) & 0x3);
+
 					// Advance the buffer
-					buffer += dt.GetSizeInMemoryBytes();
+					buffer += size;
 				}
 			}
 		}

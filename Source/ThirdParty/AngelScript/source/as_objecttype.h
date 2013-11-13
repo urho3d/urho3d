@@ -179,7 +179,7 @@ public:
 	// Properties
 	asUINT      GetPropertyCount() const;
 	int         GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, int *offset, bool *isReference, asDWORD *accessMask) const;
-	const char *GetPropertyDeclaration(asUINT index) const;
+	const char *GetPropertyDeclaration(asUINT index, bool includeNamespace = false) const;
 
 	// Behaviours
 	asUINT             GetBehaviourCount() const;

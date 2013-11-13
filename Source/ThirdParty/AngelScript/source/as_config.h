@@ -639,41 +639,7 @@
 			#define AS_SIZEOF_BOOL 1
 		#endif
 
-		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
-			// Support native calling conventions on Mac OS X + Intel 32bit CPU
-			#define AS_X86
-			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
-			#undef COMPLEX_MASK
-			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-			#undef COMPLEX_RETURN_MASK
-			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-		#elif defined(__LP64__) && !defined(__ppc__) && !defined(__PPC__)
-			// http://developer.apple.com/library/mac/#documentation/DeveloperTools/Conceptual/LowLevelABI/140-x86-64_Function_Calling_Conventions/x86_64.html#//apple_ref/doc/uid/TP40005035-SW1
-			#define AS_X64_GCC
-			#define HAS_128_BIT_PRIMITIVES
-			#define SPLIT_OBJS_BY_MEMBER_TYPES
-			#undef COMPLEX_MASK
-			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-			#undef COMPLEX_RETURN_MASK
-			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-			#define AS_LARGE_OBJS_PASSED_BY_REF
-			#define AS_LARGE_OBJ_MIN_SIZE 5
-			// STDCALL is not available on 64bit Mac
-			#undef STDCALL
-			#define STDCALL
-		#elif (defined(__ppc__) || defined(__PPC__)) && !defined(__LP64__)
-			// Support native calling conventions on Mac OS X + PPC 32bit CPU
-			#define AS_PPC
-			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
-			#define CDECL_RETURN_SIMPLE_IN_MEMORY
-			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
-			#undef COMPLEX_MASK
-			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-			#undef COMPLEX_RETURN_MASK
-			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
-		#elif (defined(__ppc__) || defined(__PPC__)) && defined(__LP64__)
-			#define AS_PPC_64
-		#elif (defined(_ARM_) || defined(__arm__))
+		#if (defined(_ARM_) || defined(__arm__))
 			// The IPhone use an ARM processor
 			#define AS_ARM
 			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
@@ -699,6 +665,56 @@
 			// STDCALL is not available on ARM
 			#undef STDCALL
 			#define STDCALL
+
+		#elif (defined(__arm64__))
+			// The IPhone 5S+ uses an ARM64 processor
+			
+			// AngelScript currently doesn't support native calling 
+			// for 64bit ARM processors so it's necessary to turn on
+			// portability mode
+			#define AS_MAX_PORTABILITY
+
+			// STDCALL is not available on ARM
+			#undef STDCALL
+			#define STDCALL
+
+		#elif (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
+			// Support native calling conventions on Mac OS X + Intel 32bit CPU
+			#define AS_X86
+			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+			#undef COMPLEX_RETURN_MASK
+			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+
+		#elif defined(__LP64__) && !defined(__ppc__) && !defined(__PPC__) && !defined(__arm64__)
+			// http://developer.apple.com/library/mac/#documentation/DeveloperTools/Conceptual/LowLevelABI/140-x86-64_Function_Calling_Conventions/x86_64.html#//apple_ref/doc/uid/TP40005035-SW1
+			#define AS_X64_GCC
+			#define HAS_128_BIT_PRIMITIVES
+			#define SPLIT_OBJS_BY_MEMBER_TYPES
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+			#undef COMPLEX_RETURN_MASK
+			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+			#define AS_LARGE_OBJS_PASSED_BY_REF
+			#define AS_LARGE_OBJ_MIN_SIZE 5
+			// STDCALL is not available on 64bit Mac
+			#undef STDCALL
+			#define STDCALL
+
+		#elif (defined(__ppc__) || defined(__PPC__)) && !defined(__LP64__)
+			// Support native calling conventions on Mac OS X + PPC 32bit CPU
+			#define AS_PPC
+			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+			#define CDECL_RETURN_SIMPLE_IN_MEMORY
+			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+			#undef COMPLEX_RETURN_MASK
+			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+
+		#elif (defined(__ppc__) || defined(__PPC__)) && defined(__LP64__)
+			#define AS_PPC_64
 		#else
 			// Unknown CPU type
 			#define AS_MAX_PORTABILITY
@@ -758,7 +774,7 @@
 			// Support native calling conventions on Intel 32bit CPU
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
-		#elif defined(__LP64__)
+		#elif defined(__LP64__) && !defined(__arm64__)
 			#define AS_X64_GCC
 			#define HAS_128_BIT_PRIMITIVES
 			#define SPLIT_OBJS_BY_MEMBER_TYPES
@@ -871,7 +887,9 @@
 	// Android
 	#elif defined(ANDROID) || defined(__ANDROID__)
 		#define AS_ANDROID
-		#define AS_NO_ATOMIC
+
+		// Android NDK 9+ supports posix threads
+		#define AS_POSIX_THREADS
 
 		#define CDECL_RETURN_SIMPLE_IN_MEMORY
 		#define STDCALL_RETURN_SIMPLE_IN_MEMORY

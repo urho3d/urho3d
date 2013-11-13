@@ -381,9 +381,8 @@ asCScriptNode *asCParser::ParseType(bool allowConst, bool allowVariableType)
 
 	// If the datatype is a template type, then parse the subtype within the < >
 	asCScriptNode *type = node->lastChild;
-	asCString typeName;
-	typeName.Assign(&script->code[type->tokenPos], type->tokenLength);
-	if( engine->IsTemplateType(typeName.AddressOf()) )
+	tempString.Assign(&script->code[type->tokenPos], type->tokenLength);
+	if( engine->IsTemplateType(tempString.AddressOf()) )
 	{
 		GetToken(&t);
 		if( t.type != ttLessThan )
@@ -509,9 +508,9 @@ asCScriptNode *asCParser::ParseDataType(bool allowVariableType)
 	{
 		if( t1.type == ttIdentifier )
 		{
-			asCString errMsg, Identifier;
-			Identifier.Assign(&script->code[t1.pos], t1.length);
-			errMsg.Format(TXT_IDENTIFIER_s_NOT_DATA_TYPE, Identifier.AddressOf());
+			asCString errMsg;
+			tempString.Assign(&script->code[t1.pos], t1.length);
+			errMsg.Format(TXT_IDENTIFIER_s_NOT_DATA_TYPE, tempString.AddressOf());
 			Error(errMsg, &t1);
 		}
 		else
@@ -869,9 +868,8 @@ bool asCParser::IsDataType(const sToken &token)
 		if( checkValidTypes )
 		{
 			// Check if this is an existing type, regardless of namespace
-			asCString str;
-			str.Assign(&script->code[token.pos], token.length);
-			if( !builder->DoesTypeExist(str.AddressOf()) )
+			tempString.Assign(&script->code[token.pos], token.length);
+			if( !builder->DoesTypeExist(tempString.AddressOf()) )
 				return false;
 		}
 		return true;
@@ -1028,9 +1026,8 @@ bool asCParser::IdentifierIs(const sToken &t, const char *str)
 bool asCParser::CheckTemplateType(sToken &t)
 {
 	// Is this a template type?
-	asCString typeName;
-	typeName.Assign(&script->code[t.pos], t.length);
-	if( engine->IsTemplateType(typeName.AddressOf()) )
+	tempString.Assign(&script->code[t.pos], t.length);
+	if( engine->IsTemplateType(tempString.AddressOf()) )
 	{
 		// Expect the sub type within < >
 		GetToken(&t);
@@ -1773,9 +1770,8 @@ asCScriptNode *asCParser::ParseImport()
 		return node;
 	}
 
-	asCString str;
-	str.Assign(&script->code[t.pos], t.length);
-	if( str != FROM_TOKEN )
+	tempString.Assign(&script->code[t.pos], t.length);
+	if( tempString != FROM_TOKEN )
 	{
 		Error(ExpectedToken(FROM_TOKEN), &t);
 		return node;
@@ -2676,9 +2672,8 @@ asCScriptNode *asCParser::ParseInterface()
 	// Allow keyword 'shared' before 'interface'
 	if( t.type == ttIdentifier )
 	{
-		asCString str;
-		str.Assign(&script->code[t.pos], t.length);
-		if( str != SHARED_TOKEN )
+		tempString.Assign(&script->code[t.pos], t.length);
+		if( tempString != SHARED_TOKEN )
 		{
 			Error(ExpectedToken(SHARED_TOKEN), &t);
 			return node;

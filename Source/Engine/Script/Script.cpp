@@ -158,9 +158,10 @@ Script::Script(Context* context) :
     // Register Script library object factories
     RegisterScriptLibrary(context_);
 
-    // Register the Array & String API
+    // Register the Array, String & Dictionary API
     RegisterArray(scriptEngine_);
     RegisterString(scriptEngine_);
+    RegisterDictionary(scriptEngine_);
 
     // Register the rest of the script API
     RegisterMathAPI(scriptEngine_);

@@ -79,10 +79,6 @@ struct sGlobalVariableDescription
 	asQWORD            constantValue;
 };
 
-// asCSymbolTable template specializations for sGlobalVariableDescription entries
-template<>
-void asCSymbolTable<sGlobalVariableDescription>::GetKey(const sGlobalVariableDescription *entry, asCString &key) const;
-
 struct sPropertyInitializer
 {
 	sPropertyInitializer() : declNode(0), initNode(0), file(0) {}
@@ -155,6 +151,7 @@ protected:
 	friend class asCModule;
 	friend class asCParser;
 	friend class asCScriptFunction;
+	friend class asCScriptEngine;
 
 	void               Reset();
 
@@ -178,7 +175,7 @@ protected:
 	asCString          GetScopeFromNode(asCScriptNode *n, asCScriptCode *script, asCScriptNode **next = 0);
 	asSNameSpace      *GetParentNameSpace(asSNameSpace *ns);
 
-	bool               DoesTypeExist(const char *type);
+	bool               DoesTypeExist(const asCString &type);
 	asCObjectType     *GetObjectType(const char *type, asSNameSpace *ns);
 	asCScriptFunction *GetFuncDef(const char *type);
 	asCObjectType     *GetObjectTypeFromTypesKnownByObject(const char *type, asCObjectType *currentType);
@@ -196,6 +193,7 @@ protected:
 
 	int numErrors;
 	int numWarnings;
+	bool silent;
 
 	asCScriptEngine *engine;
 	asCModule       *module;

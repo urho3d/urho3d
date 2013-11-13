@@ -207,6 +207,9 @@ bool asCContext::IsNested(asUINT *nestCount) const
 		}
 	}
 
+	if( nestCount && *nestCount > 0 )
+		return true;
+
 	return false;
 }
 
@@ -4779,12 +4782,12 @@ const char *asCContext::GetVarName(asUINT varIndex, asUINT stackLevel)
 }
 
 // interface
-const char *asCContext::GetVarDeclaration(asUINT varIndex, asUINT stackLevel)
+const char *asCContext::GetVarDeclaration(asUINT varIndex, asUINT stackLevel, bool includeNamespace)
 {
 	asIScriptFunction *func = GetFunction(stackLevel);
 	if( func == 0 ) return 0;
 
-	return func->GetVarDecl(varIndex);
+	return func->GetVarDecl(varIndex, includeNamespace);
 }
 
 // interface

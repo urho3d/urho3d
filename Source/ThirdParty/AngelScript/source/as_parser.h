@@ -179,6 +179,8 @@ protected:
 	asCScriptCode   *script;
 	asCScriptNode   *scriptNode;
 
+	asCString tempString; // Used for reduzing amount of dynamic allocations
+
 	sToken       lastToken;
 	size_t       sourcePos;
 };

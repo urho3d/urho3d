@@ -86,6 +86,7 @@ asCBuilder::asCBuilder(asCScriptEngine *engine, asCModule *module)
 {
 	this->engine = engine;
 	this->module = module;
+	silent = false;
 }
 
 asCBuilder::~asCBuilder()
@@ -367,6 +368,9 @@ int asCBuilder::CompileFunction(const char *sectionName, const char *code, int l
 	GetParsedFunctionDetails(node, scripts[0], 0, func->name, func->returnType, parameterNames, func->parameterTypes, func->inOutFlags, func->defaultArgs, func->isReadOnly, isConstructor, isDestructor, isPrivate, isFinal, isOverride, isShared, module->defaultNamespace);
 	func->id                           = engine->GetNextScriptFunctionId();
 	func->scriptData->scriptSectionIdx = engine->GetScriptSectionNameIndex(sectionName ? sectionName : "");
+	int row, col;
+	scripts[0]->ConvertPosToRowCol(node->tokenPos, &row, &col);
+	func->scriptData->declaredAt       = (row & 0xFFFFF)|((col & 0xFFF)<<20);
 	func->nameSpace                    = module->defaultNamespace;
 
 	// Make sure the default args are declared correctly
@@ -1884,6 +1888,12 @@ void asCBuilder::CompileGlobalVariables()
 					// Finalize the init function for this variable
 					initFunc->returnType = asCDataType::CreatePrimitive(ttVoid, false);
 					initFunc->scriptData->scriptSectionIdx = engine->GetScriptSectionNameIndex(gvar->script->name.AddressOf());
+					if( gvar->nextNode )
+					{
+						int row, col;
+						gvar->script->ConvertPosToRowCol(gvar->nextNode->tokenPos, &row, &col);
+						initFunc->scriptData->declaredAt = (row & 0xFFFFF)|((col & 0xFFF)<<20);
+					}
 
 					gvar->property->SetInitFunc(initFunc);
 
@@ -2771,7 +2781,6 @@ void asCBuilder::CompileClasses()
 	//                         existing module. However, the applications that want to use that should use a special
 	//                         build flag to not finalize the module.
 
-
 	// Urho3D: disable garbage collection from script classes
 	/*
 	for( n = 0; n < classDeclarations.GetLength(); n++ )
@@ -3155,7 +3164,8 @@ void asCBuilder::AddDefaultConstructor(asCObjectType *objType, asCScriptCode *fi
 	asCArray<asCString *> defaultArgs;
 
 	// Add the script function
-	module->AddScriptFunction(file->idx, funcId, objType->name, returnType, parameterTypes, inOutFlags, defaultArgs, false, objType);
+	// TODO: declaredAt should be set to where the class has been declared
+	module->AddScriptFunction(file->idx, 0, funcId, objType->name, returnType, parameterTypes, inOutFlags, defaultArgs, false, objType);
 
 	// Set it as default constructor
 	if( objType->beh.construct )
@@ -3189,7 +3199,8 @@ void asCBuilder::AddDefaultConstructor(asCObjectType *objType, asCScriptCode *fi
 	objType->beh.factory = funcId;
 	objType->beh.factories[0] = funcId;
 	returnType = asCDataType::CreateObjectHandle(objType, false);
-	module->AddScriptFunction(file->idx, funcId, objType->name, returnType, parameterTypes, inOutFlags, defaultArgs, false);
+	// TODO: should be the same as the constructor
+	module->AddScriptFunction(file->idx, 0, funcId, objType->name, returnType, parameterTypes, inOutFlags, defaultArgs, false);
 	functions.PushLast(0);
 	asCCompiler compiler(engine);
 	compiler.CompileFactory(this, file, engine->scriptFunctions[funcId]);
@@ -3854,7 +3865,12 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 		f->AddRef();
 	}
 	else
-		module->AddScriptFunction(file->idx, funcId, name, returnType, parameterTypes, inOutFlags, defaultArgs, isInterface, objType, isConstMethod, isGlobalFunction, isPrivate, isFinal, isOverride, isShared, ns);
+	{
+		int row = 0, col = 0;
+		if( node )
+			file->ConvertPosToRowCol(node->tokenPos, &row, &col);
+		module->AddScriptFunction(file->idx, (row&0xFFFFF)|((col&0xFFF)<<20), funcId, name, returnType, parameterTypes, inOutFlags, defaultArgs, isInterface, objType, isConstMethod, isGlobalFunction, isPrivate, isFinal, isOverride, isShared, ns);
+	}
 
 	// Make sure the default args are declared correctly
 	ValidateDefaultArgs(file, node, engine->scriptFunctions[funcId]);
@@ -3893,7 +3909,7 @@ int asCBuilder::RegisterScriptFunction(asCScriptNode *node, asCScriptCode *file,
 					defaultArgs[n] = asNEW(asCString)(*defaultArgs[n]);
 
 			asCDataType dt = asCDataType::CreateObjectHandle(objType, false);
-			module->AddScriptFunction(file->idx, factoryId, name, dt, parameterTypes, inOutFlags, defaultArgs, false);
+			module->AddScriptFunction(file->idx, engine->scriptFunctions[funcId]->scriptData->declaredAt, factoryId, name, dt, parameterTypes, inOutFlags, defaultArgs, false);
 
 			// If the object is shared, then the factory must also be marked as shared
 			if( objType->flags & asOBJ_SHARED )
@@ -4265,7 +4281,9 @@ void asCBuilder::WriteInfo(const asCString &scriptname, const asCString &message
 	else
 	{
 		preMessage.isSet = false;
-		engine->WriteMessage(scriptname.AddressOf(), r, c, asMSGTYPE_INFORMATION, message.AddressOf());
+
+		if( !silent )
+			engine->WriteMessage(scriptname.AddressOf(), r, c, asMSGTYPE_INFORMATION, message.AddressOf());
 	}
 }
 
@@ -4284,7 +4302,7 @@ void asCBuilder::WriteError(const asCString &message, asCScriptCode *file, asCSc
 	if( node && file )
 		file->ConvertPosToRowCol(node->tokenPos, &r, &c);
 
-	WriteError(file ? file->name : "", message, r, c);
+	WriteError(file ? file->name : asCString(""), message, r, c);
 }
 
 void asCBuilder::WriteError(const asCString &scriptname, const asCString &message, int r, int c)
@@ -4295,7 +4313,8 @@ void asCBuilder::WriteError(const asCString &scriptname, const asCString &messag
 	if( preMessage.isSet )
 		WriteInfo(preMessage.scriptname, preMessage.message, preMessage.r, preMessage.c, false);
 
-	engine->WriteMessage(scriptname.AddressOf(), r, c, asMSGTYPE_ERROR, message.AddressOf());
+	if( !silent )
+		engine->WriteMessage(scriptname.AddressOf(), r, c, asMSGTYPE_ERROR, message.AddressOf());
 }
 
 void asCBuilder::WriteWarning(const asCString &scriptname, const asCString &message, int r, int c)
@@ -4308,7 +4327,8 @@ void asCBuilder::WriteWarning(const asCString &scriptname, const asCString &mess
 		if( preMessage.isSet )
 			WriteInfo(preMessage.scriptname, preMessage.message, preMessage.r, preMessage.c, false);
 
-		engine->WriteMessage(scriptname.AddressOf(), r, c, asMSGTYPE_WARNING, message.AddressOf());
+		if( !silent )
+			engine->WriteMessage(scriptname.AddressOf(), r, c, asMSGTYPE_WARNING, message.AddressOf());
 	}
 }
 
@@ -4686,7 +4706,7 @@ asCObjectType *asCBuilder::GetObjectType(const char *type, asSNameSpace *ns)
 
 // This function will return true if there are any types in the engine or module
 // with the given name. The namespace is ignored in this verification.
-bool asCBuilder::DoesTypeExist(const char *type)
+bool asCBuilder::DoesTypeExist(const asCString &type)
 {
 	asUINT n;
 

@@ -23,7 +23,7 @@
 #include "Precompiled.h"
 #include "Addons.h"
 
-#include <cstring>
+#include <cString>
 #include <new>
 #include <stdio.h>
 
@@ -352,9 +352,12 @@ CScriptArray::CScriptArray(const CScriptArray &other)
 
     elementSize = other.elementSize;
 
+    // Urho3D: garbage collection disabled
+    /*
     if( objType->GetFlags() & asOBJ_GC )
         objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
-
+    */
+    
     CreateBuffer(&buffer, 0);
 
     // Copy the content
@@ -386,10 +389,13 @@ CScriptArray::CScriptArray(asUINT length, void *defVal, asIObjectType *ot)
 
     CreateBuffer(&buffer, length);
 
+    // Urho3D: garbage collection disabled
+    /*
     // Notify the GC of the successful creation
     if( objType->GetFlags() & asOBJ_GC )
         objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
-
+    */
+    
     // Initialize the elements with the default value
     for( asUINT n = 0; n < GetSize(); n++ )
         SetValue(n, defVal);
@@ -1522,6 +1528,445 @@ void RegisterArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Array<T>", "bool get_empty() const", asMETHOD(CScriptArray, IsEmpty), asCALL_THISCALL);
     engine->RegisterDefaultArrayType("Array<T>");
 }
+
+CScriptDictionary::CScriptDictionary(asIScriptEngine *engine)
+{
+    // We start with one reference
+    refCount = 1;
+    gcFlag = false;
+
+    // Keep a reference to the engine for as long as we live
+    // We don't increment the reference counter, because the 
+    // engine will hold a pointer to the object. 
+    this->engine = engine;
+
+    // Urho3D: garbage collection disabled
+    /*
+    // Notify the garbage collector of this object
+    // TODO: The type id should be cached
+    engine->NotifyGarbageCollectorOfNewObject(this, engine->GetObjectTypeByName("dictionary"));
+    */
+}
+
+CScriptDictionary::CScriptDictionary(asBYTE *buffer)
+{
+    // We start with one reference
+    refCount = 1;
+    gcFlag = false;
+
+    // This constructor will always be called from a script
+    // so we can get the engine from the active context
+    asIScriptContext *ctx = asGetActiveContext();
+    engine = ctx->GetEngine();
+
+    // Urho3D: garbage collection disable
+    /*
+    // Notify the garbage collector of this object
+    // TODO: The type id should be cached
+    engine->NotifyGarbageCollectorOfNewObject(this, engine->GetObjectTypeByName("dictionary"));
+    */
+
+    // Initialize the dictionary from the buffer
+    asUINT length = *(asUINT*)buffer;
+    buffer += 4;
+
+    while( length-- )
+    {
+        // Align the buffer pointer on a 4 byte boundary in 
+        // case previous value was smaller than 4 bytes
+        if( asPWORD(buffer) & 0x3 )
+            buffer += 4 - (asPWORD(buffer) & 0x3);
+
+        // Get the name value pair from the buffer and insert it in the dictionary
+        String name = *(String*)buffer;
+        buffer += sizeof(String);
+
+        // Get the type id of the value
+        int typeId = *(int*)buffer;
+        buffer += sizeof(int);
+
+        // Depending on the type id, the value will inline in the buffer or a pointer
+        void *ref = (void*)buffer;
+
+        if( typeId >= asTYPEID_INT8 && typeId <= asTYPEID_DOUBLE )
+        {
+            // Convert primitive values to either int64 or double, so we can use the overloaded Set methods
+            asINT64 i64;
+            double d;
+            switch( typeId )
+            {
+            case asTYPEID_INT8: i64 = *(char*)ref; break;
+            case asTYPEID_INT16: i64 = *(short*)ref; break;
+            case asTYPEID_INT32: i64 = *(int*)ref; break;
+            case asTYPEID_INT64: i64 = *(asINT64*)ref; break;
+            case asTYPEID_UINT8: i64 = *(unsigned char*)ref; break;
+            case asTYPEID_UINT16: i64 = *(unsigned short*)ref; break;
+            case asTYPEID_UINT32: i64 = *(unsigned int*)ref; break;
+            case asTYPEID_UINT64: i64 = *(asINT64*)ref; break;
+            case asTYPEID_FLOAT: d = *(float*)ref; break;
+            case asTYPEID_DOUBLE: d = *(double*)ref; break;
+            }
+            
+            if( typeId >= asTYPEID_FLOAT )
+                Set(name, d);
+            else
+                Set(name, i64);
+        }
+        else
+        {
+            if( (typeId & asTYPEID_MASK_OBJECT) && 
+                !(typeId & asTYPEID_OBJHANDLE) && 
+                (engine->GetObjectTypeById(typeId)->GetFlags() & asOBJ_REF) )
+            {
+                // Dereference the pointer to get the reference to the actual object
+                ref = *(void**)ref;
+            }
+
+            Set(name, ref, typeId);
+        }
+
+        // Advance the buffer pointer with the size of the value
+        if( typeId & asTYPEID_MASK_OBJECT )
+        {
+            asIObjectType *ot = engine->GetObjectTypeById(typeId);
+            if( ot->GetFlags() & asOBJ_VALUE )
+                buffer += ot->GetSize();
+            else
+                buffer += sizeof(void*);
+        }
+        else if( typeId == 0 )
+        {
+            // null pointer
+            buffer += sizeof(void*);
+        }
+        else
+        {
+            buffer += engine->GetSizeOfPrimitiveType(typeId);
+        }
+    }
+}
+
+CScriptDictionary::~CScriptDictionary()
+{
+    // Delete all keys and values
+    DeleteAll();
+}
+
+void CScriptDictionary::AddRef() const
+{
+    // We need to clear the GC flag
+    gcFlag = false;
+    asAtomicInc(refCount);
+}
+
+void CScriptDictionary::Release() const
+{
+    // We need to clear the GC flag
+    gcFlag = false;
+    if( asAtomicDec(refCount) == 0 )
+        delete this;
+}
+
+int CScriptDictionary::GetRefCount()
+{
+    return refCount;
+}
+
+void CScriptDictionary::SetGCFlag()
+{
+    gcFlag = true;
+}
+
+bool CScriptDictionary::GetGCFlag()
+{
+    return gcFlag;
+}
+
+void CScriptDictionary::EnumReferences(asIScriptEngine *engine)
+{
+    // Call the gc enum callback for each of the objects
+    HashMap<String, valueStruct>::Iterator it;
+    for( it = dict.Begin(); it != dict.End(); it++ )
+    {
+        if( it->second_.typeId & asTYPEID_MASK_OBJECT )
+            engine->GCEnumCallback(it->second_.valueObj);
+    }
+}
+
+void CScriptDictionary::ReleaseAllReferences(asIScriptEngine * /*engine*/)
+{
+    // We're being told to release all references in 
+    // order to break circular references for dead objects
+    DeleteAll();
+}
+
+CScriptDictionary &CScriptDictionary::operator =(const CScriptDictionary &other)
+{
+    // Clear everything we had before
+    DeleteAll();
+
+    // Do a shallow copy of the dictionary
+    HashMap<String, valueStruct>::ConstIterator it;
+    for( it = other.dict.Begin(); it != other.dict.End(); it++ )
+    {
+        if( it->second_.typeId & asTYPEID_OBJHANDLE )
+            Set(it->first_, (void*)&it->second_.valueObj, it->second_.typeId);
+        else if( it->second_.typeId & asTYPEID_MASK_OBJECT )
+            Set(it->first_, (void*)it->second_.valueObj, it->second_.typeId);
+        else
+            Set(it->first_, (void*)&it->second_.valueInt, it->second_.typeId);
+    }
+
+    return *this;
+}
+
+void CScriptDictionary::Set(const String &key, void *value, int typeId)
+{
+    valueStruct valStruct = {{0},0};
+    valStruct.typeId = typeId;
+    if( typeId & asTYPEID_OBJHANDLE )
+    {
+        // We're receiving a reference to the handle, so we need to dereference it
+        valStruct.valueObj = *(void**)value;
+        engine->AddRefScriptObject(valStruct.valueObj, engine->GetObjectTypeById(typeId));
+    }
+    else if( typeId & asTYPEID_MASK_OBJECT )
+    {
+        // Create a copy of the object
+        valStruct.valueObj = engine->CreateScriptObjectCopy(value, engine->GetObjectTypeById(typeId));
+    }
+    else
+    {
+        // Copy the primitive value
+        // We receive a pointer to the value.
+        int size = engine->GetSizeOfPrimitiveType(typeId);
+        memcpy(&valStruct.valueInt, value, size);
+    }
+
+    HashMap<String, valueStruct>::Iterator it;
+    it = dict.Find(key);
+    if( it != dict.End() )
+    {
+        FreeValue(it->second_);
+
+        // Insert the new value
+        it->second_ = valStruct;
+    }
+    else
+    {
+        dict.Insert(MakePair(key, valStruct));
+    }
+}
+
+// This overloaded method is implemented so that all integer and
+// unsigned integers types will be stored in the dictionary as int64
+// through implicit conversions. This simplifies the management of the
+// numeric types when the script retrieves the stored value using a 
+// different type.
+void CScriptDictionary::Set(const String &key, asINT64 &value)
+{
+    Set(key, &value, asTYPEID_INT64);
+}
+
+// This overloaded method is implemented so that all floating point types 
+// will be stored in the dictionary as double through implicit conversions. 
+// This simplifies the management of the numeric types when the script 
+// retrieves the stored value using a different type.
+void CScriptDictionary::Set(const String &key, double &value)
+{
+    Set(key, &value, asTYPEID_DOUBLE);
+}
+
+// Returns true if the value was successfully retrieved
+bool CScriptDictionary::Get(const String &key, void *value, int typeId) const
+{
+    HashMap<String, valueStruct>::ConstIterator it;
+    it = dict.Find(key);
+    if( it != dict.End() )
+    {
+        // Return the value
+        if( typeId & asTYPEID_OBJHANDLE )
+        {
+            // A handle can be retrieved if the stored type is a handle of same or compatible type
+            // or if the stored type is an object that implements the interface that the handle refer to.
+            if( (it->second_.typeId & asTYPEID_MASK_OBJECT) && 
+                engine->IsHandleCompatibleWithObject(it->second_.valueObj, it->second_.typeId, typeId) )
+            {
+                engine->AddRefScriptObject(it->second_.valueObj, engine->GetObjectTypeById(it->second_.typeId));
+                *(void**)value = it->second_.valueObj;
+
+                return true;
+            }
+        }
+        else if( typeId & asTYPEID_MASK_OBJECT )
+        {
+            // Verify that the copy can be made
+            bool isCompatible = false;
+            if( it->second_.typeId == typeId )
+                isCompatible = true;
+
+            // Copy the object into the given reference
+            if( isCompatible )
+            {
+                engine->AssignScriptObject(value, it->second_.valueObj, engine->GetObjectTypeById(typeId));
+
+                return true;
+            }
+        }
+        else
+        {
+            if( it->second_.typeId == typeId )
+            {
+                int size = engine->GetSizeOfPrimitiveType(typeId);
+                memcpy(value, &it->second_.valueInt, size);
+                return true;
+            }
+
+            // We know all numbers are stored as either int64 or double, since we register overloaded functions for those
+            if( it->second_.typeId == asTYPEID_INT64 && typeId == asTYPEID_DOUBLE )
+            {
+                *(double*)value = double(it->second_.valueInt);
+                return true;
+            }
+            else if( it->second_.typeId == asTYPEID_DOUBLE && typeId == asTYPEID_INT64 )
+            {
+                *(asINT64*)value = asINT64(it->second_.valueFlt);
+                return true;
+            }
+        }
+    }
+
+    // AngelScript has already initialized the value with a default value,
+    // so we don't have to do anything if we don't find the element, or if 
+    // the element is incompatible with the requested type.
+
+    return false;
+}
+
+bool CScriptDictionary::Get(const String &key, asINT64 &value) const
+{
+    return Get(key, &value, asTYPEID_INT64);
+}
+
+bool CScriptDictionary::Get(const String &key, double &value) const
+{
+    return Get(key, &value, asTYPEID_DOUBLE);
+}
+
+bool CScriptDictionary::Exists(const String &key) const
+{
+    HashMap<String, valueStruct>::ConstIterator it;
+    it = dict.Find(key);
+    if( it != dict.End() )
+        return true;
+
+    return false;
+}
+
+bool CScriptDictionary::IsEmpty() const
+{
+    if( dict.Size() == 0 )
+        return true;
+
+    return false;
+}
+
+asUINT CScriptDictionary::GetSize() const
+{
+    return asUINT(dict.Size());
+}
+
+void CScriptDictionary::Delete(const String &key)
+{
+    HashMap<String, valueStruct>::Iterator it;
+    it = dict.Find(key);
+    if( it != dict.End() )
+    {
+        FreeValue(it->second_);
+        dict.Erase(it);
+    }
+}
+
+void CScriptDictionary::DeleteAll()
+{
+    HashMap<String, valueStruct>::Iterator it;
+    for( it = dict.Begin(); it != dict.End(); it++ )
+        FreeValue(it->second_);
+
+    dict.Clear();
+}
+
+void CScriptDictionary::FreeValue(valueStruct &value)
+{
+    // If it is a handle or a ref counted object, call release
+    if( value.typeId & asTYPEID_MASK_OBJECT )
+    {
+        // Let the engine release the object
+        engine->ReleaseScriptObject(value.valueObj, engine->GetObjectTypeById(value.typeId));
+        value.valueObj = 0;
+        value.typeId = 0;
+    }
+
+    // For primitives, there's nothing to do
+}
+
+CScriptArray* CScriptDictionary::GetKeys() const
+{
+    // TODO: optimize: The String array type should only be determined once. 
+    //                 It should be recomputed when registering the dictionary class.
+    //                 Only problem is if multiple engines are used, as they may not
+    //                 share the same type id. Alternatively it can be stored in the 
+    //                 user data for the dictionary type.
+    int StringArrayType = engine->GetTypeIdByDecl("Array<String>");
+    asIObjectType *ot = engine->GetObjectTypeById(StringArrayType);
+
+    // Create the array object
+    CScriptArray *arr = new CScriptArray(asUINT(dict.Size()), ot);
+    long current = -1;
+    HashMap<String, valueStruct>::ConstIterator it;
+    for( it = dict.Begin(); it != dict.End(); it++ )
+    {
+        current++;
+        *(String*)arr->At(current) = it->first_;
+    }
+
+    return arr;
+}
+
+void ScriptDictionaryFactory_Generic(asIScriptGeneric *gen)
+{
+    *(CScriptDictionary**)gen->GetAddressOfReturnLocation() = new CScriptDictionary(gen->GetEngine());
+}
+
+void ScriptDictionaryListFactory_Generic(asIScriptGeneric *gen)
+{
+    asBYTE *buffer = (asBYTE*)gen->GetArgAddress(0);
+    *(CScriptDictionary**)gen->GetAddressOfReturnLocation() = new CScriptDictionary(buffer);
+}
+
+void RegisterDictionary(asIScriptEngine *engine)
+{
+    engine->RegisterObjectType("Dictionary", sizeof(CScriptDictionary), asOBJ_REF);
+    // Use the generic interface to construct the object since we need the engine pointer, we could also have retrieved the engine pointer from the active context
+    engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_FACTORY, "Dictionary@ f()", asFUNCTION(ScriptDictionaryFactory_Generic), asCALL_GENERIC);
+    engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_LIST_FACTORY, "Dictionary @f(int &in) {repeat {String, ?}}", asFUNCTION(ScriptDictionaryListFactory_Generic), asCALL_GENERIC);
+    engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_ADDREF, "void f()", asMETHOD(CScriptDictionary,AddRef), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Dictionary", asBEHAVE_RELEASE, "void f()", asMETHOD(CScriptDictionary,Release), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "Dictionary &opAssign(const Dictionary &in)", asMETHODPR(CScriptDictionary, operator=, (const CScriptDictionary &), CScriptDictionary&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, ?&in)", asMETHODPR(CScriptDictionary,Set,(const String&,void*,int),void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, ?&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,void*,int) const,bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, int64&in)", asMETHODPR(CScriptDictionary,Set,(const String&,asINT64&),void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, int64&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,asINT64&) const,bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Set(const String &in, double&in)", asMETHODPR(CScriptDictionary,Set,(const String&,double&),void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Get(const String &in, double&out) const", asMETHODPR(CScriptDictionary,Get,(const String&,double&) const,bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool Exists(const String &in) const", asMETHOD(CScriptDictionary,Exists), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "bool get_empty() const", asMETHOD(CScriptDictionary, IsEmpty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "uint get_length() const", asMETHOD(CScriptDictionary, GetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Erase(const String &in)", asMETHOD(CScriptDictionary,Delete), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "void Clear()", asMETHOD(CScriptDictionary,DeleteAll), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Dictionary", "Array<String> @get_keys() const", asMETHOD(CScriptDictionary,GetKeys), asCALL_THISCALL);
+}
+
 
 static String StringFactory(asUINT length, const char* s)
 {

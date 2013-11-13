@@ -30,6 +30,7 @@
 
 // Modified by Lasse Oorni for Urho3D
 
+
 //
 // as_scriptobject.h
 //
@@ -133,7 +134,8 @@ public:
 
 protected:
 	mutable asCAtomic refCount;
-	mutable bool gcFlag;
+	mutable asBYTE gcFlag:1;
+	mutable asBYTE hasRefCountReachedZero:1;
 	bool isDestructCalled;
 	mutable asCLockableSharedBool *weakRefFlag;
 	

@@ -104,10 +104,6 @@ struct asSObjectVariableInfo
 
 struct asSSystemFunctionInterface;
 
-// TODO: GetModuleName should be removed. A function won't belong to a specific module anymore
-//       as the function can be removed from the module, but still remain alive. For example
-//       for dynamically generated functions held by a function pointer.
-
 // TODO: Might be interesting to allow enumeration of accessed global variables, and 
 //       also functions/methods that are being called. This could be used to build a 
 //       code database with call graphs, etc.
@@ -160,7 +156,7 @@ public:
 	// Debug information
 	asUINT               GetVarCount() const;
 	int                  GetVar(asUINT index, const char **name, int *typeId = 0) const;
-	const char *         GetVarDecl(asUINT index) const;
+	const char *         GetVarDecl(asUINT index, bool includeNamespace = false) const;
 	int                  FindNextLineWithCode(int line) const;
 
 	// For JIT compilation
@@ -293,6 +289,8 @@ public:
 		asCArray<int>                   lineNumbers;
 		// Store the script section where the code was declared
 		int                             scriptSectionIdx;
+		// Store the location where the function was declared
+		int                             declaredAt;
 		// Store position/index pairs if the bytecode is compiled from multiple script sections
 		asCArray<int>                   sectionIdxs;
 	};

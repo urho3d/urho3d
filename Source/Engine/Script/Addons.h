@@ -23,10 +23,11 @@
 #pragma once
 
 #include "Urho3D.h"
+#include "HashMap.h"
 
 #include <angelscript.h>
 
-// Adapted from Angelscript's scriptarray & scriptstdstring add-ons, but with garbage collection disabled
+// Adapted from Angelscript's scriptarray, scriptdictionary & scriptstdstring add-ons, but with garbage collection disabled
 
 namespace Urho3D
 {
@@ -110,8 +111,83 @@ protected:
     bool Equals(const void *a, const void *b, asIScriptContext *ctx, SArrayCache *cache) const;
 };
 
+/// Script dictionary class
+class CScriptDictionary
+{
+public:
+    // Memory management
+    CScriptDictionary(asIScriptEngine *engine);
+    CScriptDictionary(asBYTE *buffer);
+    void AddRef() const;
+    void Release() const;
+
+    CScriptDictionary &operator =(const CScriptDictionary &other);
+
+    // Sets/Gets a variable type value for a key
+    void Set(const String &key, void *value, int typeId);
+    bool Get(const String &key, void *value, int typeId) const;
+
+    // Sets/Gets an integer number value for a key
+    void Set(const String &key, asINT64 &value);
+    bool Get(const String &key, asINT64 &value) const;
+
+    // Sets/Gets a real number value for a key
+    void Set(const String &key, double &value);
+    bool Get(const String &key, double &value) const;
+
+    // Returns true if the key is set
+    bool Exists(const String &key) const;
+    bool IsEmpty() const;
+    asUINT GetSize() const;
+
+    // Deletes the key
+    void Delete(const String &key);
+
+    // Deletes all keys
+    void DeleteAll();
+
+    // Get an array of all keys
+    CScriptArray *GetKeys() const;
+
+    // Garbage collections behaviours
+    int GetRefCount();
+    void SetGCFlag();
+    bool GetGCFlag();
+    void EnumReferences(asIScriptEngine *engine);
+    void ReleaseAllReferences(asIScriptEngine *engine);
+
+protected:
+    // The structure for holding the values
+    struct valueStruct
+    {
+        union
+        {
+            asINT64 valueInt;
+            double  valueFlt;
+            void   *valueObj;
+        };
+        int   typeId;
+    };
+
+    // We don't want anyone to call the destructor directly, it should be called through the Release method
+    virtual ~CScriptDictionary();
+
+    // Helper methods
+    void FreeValue(valueStruct &value);
+    
+    // Our properties
+    asIScriptEngine *engine;
+    mutable int refCount;
+    mutable bool gcFlag;
+
+    HashMap<String, valueStruct> dict;
+};
+
+
 /// Register the array type to script.
 void RegisterArray(asIScriptEngine* engine);
+/// Register the dictionary type to script.
+void RegisterDictionary(asIScriptEngine* engine);
 /// Register String to script.
 void RegisterString(asIScriptEngine* engine);
 

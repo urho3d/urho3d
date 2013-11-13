@@ -797,6 +797,7 @@ asCScriptFunction *asCReader::ReadFunction(bool &isNew, bool addToModule, bool a
 			asCString name;
 			ReadString(&name);
 			func->scriptData->scriptSectionIdx = engine->GetScriptSectionNameIndex(name.AddressOf());
+			func->scriptData->declaredAt = ReadEncodedUInt();
 		}
 	}
 	else if( func->funcType == asFUNC_VIRTUAL )
@@ -2445,6 +2446,13 @@ int asCReader::SListAdjuster::AdjustOffset(int offset, asCObjectType *listPatter
 	// What is being expected at this position?
 	if( patternNode->type == asLPT_REPEAT )
 	{
+		// Align the offset to 4 bytes boundary
+		if( maxOffset & 0x3 )
+		{
+			maxOffset += 4 - (maxOffset & 0x3);
+			lastAdjustedOffset = maxOffset;
+		}
+
 		// Don't move the patternNode yet because the caller must make a call to SetRepeatCount too
 		maxOffset += 4;
 		return lastAdjustedOffset;
@@ -2465,18 +2473,32 @@ int asCReader::SListAdjuster::AdjustOffset(int offset, asCObjectType *listPatter
 					size = AS_PTR_SIZE*4;
 				else
 					size = dt.GetSizeInMemoryBytes();
-				maxOffset += size;
-			
+
+				// Align the offset to 4 bytes boundary
+				if( size >= 4 && (maxOffset & 0x3) )
+				{
+					maxOffset += 4 - (maxOffset & 0x3);
+					lastAdjustedOffset = maxOffset;
+				}
+
 				// Only move the patternNode if we're not expecting any more repeated entries
 				if( repeatCount == 0 )
 					patternNode = patternNode->next;
 
 				nextTypeId = -1;
 
+				maxOffset += size;
 				return lastAdjustedOffset;
 			}
 			else
 			{
+				// Align the offset to 4 bytes boundary
+				if( maxOffset & 0x3 )
+				{
+					maxOffset += 4 - (maxOffset & 0x3);
+					lastAdjustedOffset = maxOffset;
+				}
+
 				// The first adjustment is for the typeId
 				maxOffset += 4;
 
@@ -2495,6 +2517,14 @@ int asCReader::SListAdjuster::AdjustOffset(int offset, asCObjectType *listPatter
 				size = AS_PTR_SIZE*4;
 			else
 				size = dt.GetSizeInMemoryBytes();
+
+			// Align the offset to 4 bytes boundary
+			if( size >= 4 && (maxOffset & 0x3) )
+			{
+				maxOffset += 4 - (maxOffset & 0x3);
+				lastAdjustedOffset = maxOffset;
+			}
+
 			maxOffset += size;
 
 			// Only move the patternNode if we're not expecting any more repeated entries
@@ -3343,6 +3373,7 @@ void asCWriter::WriteFunction(asCScriptFunction* func)
 				char c = 0;
 				WriteData(&c, 1);
 			}
+			WriteEncodedInt64(func->scriptData->declaredAt);
 		}
 	}
 	else if( func->funcType == asFUNC_VIRTUAL )

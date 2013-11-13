@@ -418,6 +418,28 @@ uint length;
 bool empty;
 };
 
+class Dictionary
+{
+// Methods:
+void Set(const String&, ?&);
+bool Get(const String&, ?&) const;
+void Set(const String&, int64&);
+bool Get(const String&, int64&) const;
+void Set(const String&, double&);
+bool Get(const String&, double&) const;
+bool Exists(const String&) const;
+void Erase(const String&);
+void Clear();
+
+// Properties:
+/* (readonly) */
+bool empty;
+/* (readonly) */
+uint length;
+/* (readonly) */
+Array<String> keys;
+};
+
 class IntVector2
 {
 // Methods:

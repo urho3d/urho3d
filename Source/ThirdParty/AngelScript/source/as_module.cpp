@@ -82,9 +82,6 @@ asCModule::~asCModule()
 		if( engine->lastModule == this )
 			engine->lastModule = 0;
 		engine->scriptModules.RemoveValue(this);
-
-		// Allow the engine to clean up what is not used
-		engine->CleanupAfterDiscardModule();
 	}
 }
 
@@ -469,6 +466,9 @@ void asCModule::InternalReset()
 		funcDefs[n]->Release();
 	}
 	funcDefs.SetLength(0);
+
+	// Allow the engine to clean up what is not used
+	engine->CleanupAfterDiscardModule();
 }
 
 // interface
@@ -492,6 +492,9 @@ asUINT asCModule::GetImportedFunctionCount() const
 int asCModule::GetImportedFunctionIndexByDecl(const char *decl) const
 {
 	asCBuilder bld(engine, const_cast<asCModule*>(this));
+
+	// Don't write parser errors to the message callback
+	bld.silent = true;
 
 	asCScriptFunction func(engine, const_cast<asCModule*>(this), asFUNC_DUMMY);
 	bld.ParseFunctionDeclaration(0, decl, &func, false, 0, 0, defaultNamespace);
@@ -540,6 +543,9 @@ asUINT asCModule::GetFunctionCount() const
 asIScriptFunction *asCModule::GetFunctionByDecl(const char *decl) const
 {
 	asCBuilder bld(engine, const_cast<asCModule*>(this));
+
+	// Don't write parser errors to the message callback
+	bld.silent = true;
 
 	asCScriptFunction func(engine, const_cast<asCModule*>(this), asFUNC_DUMMY);
 	int r = bld.ParseFunctionDeclaration(0, decl, &func, false, 0, 0, defaultNamespace);
@@ -621,6 +627,9 @@ int asCModule::RemoveGlobalVar(asUINT index)
 int asCModule::GetGlobalVarIndexByDecl(const char *decl) const
 {
 	asCBuilder bld(engine, const_cast<asCModule*>(this));
+
+	// Don't write parser errors to the message callback
+	bld.silent = true;
 
 	asCString name;
 	asSNameSpace *nameSpace;
@@ -719,7 +728,13 @@ asIObjectType *asCModule::GetObjectTypeByName(const char *name) const
 int asCModule::GetTypeIdByDecl(const char *decl) const
 {
 	asCDataType dt;
+
+	// This const cast is safe since we know the engine won't be modified
 	asCBuilder bld(engine, const_cast<asCModule*>(this));
+
+	// Don't write parser errors to the message callback
+	bld.silent = true;
+
 	int r = bld.ParseDataType(decl, &dt, defaultNamespace);
 	if( r < 0 )
 		return asINVALID_TYPE;
@@ -810,7 +825,7 @@ int asCModule::GetNextImportedFunctionId()
 
 #ifndef AS_NO_COMPILER
 // internal
-int asCModule::AddScriptFunction(int sectionIdx, int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate, bool isFinal, bool isOverride, bool isShared, asSNameSpace *ns)
+int asCModule::AddScriptFunction(int sectionIdx, int declaredAt, int id, const asCString &name, const asCDataType &returnType, const asCArray<asCDataType> &params, const asCArray<asETypeModifiers> &inOutFlags, const asCArray<asCString *> &defaultArgs, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate, bool isFinal, bool isOverride, bool isShared, asSNameSpace *ns)
 {
 	asASSERT(id >= 0);
 
@@ -838,7 +853,10 @@ int asCModule::AddScriptFunction(int sectionIdx, int id, const asCString &name, 
 	func->id               = id;
 	func->returnType       = returnType;
 	if( func->funcType == asFUNC_SCRIPT )
+	{
 		func->scriptData->scriptSectionIdx = sectionIdx;
+		func->scriptData->declaredAt = declaredAt;
+	}
 	func->parameterTypes   = params;
 	func->inOutFlags       = inOutFlags;
 	func->defaultArgs      = defaultArgs;
