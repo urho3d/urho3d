@@ -53,21 +53,6 @@ enum ScriptInstanceMethod
     MAX_SCRIPT_METHODS
 };
 
-/// Delay-executed method call.
-struct DelayedMethodCall
-{
-   /// Period for repeating calls.
-    float period_;
-    /// Delay time remaining until execution.
-    float delay_;
-    /// Repeat flag.
-    bool repeat_;
-    /// Method declaration.
-    String declaration_;
-    /// Parameters.
-    VariantVector parameters_;
-};
-
 /// %Script object component.
 class URHO3D_API ScriptInstance : public Component, public ScriptEventListener
 {
@@ -125,7 +110,7 @@ public:
     /// Set script file attribute.
     void SetScriptFileAttr(ResourceRef value);
     /// Set delayed method calls attribute.
-    void SetDelayedMethodCallsAttr(PODVector<unsigned char> value);
+    void SetDelayedCallsAttr(PODVector<unsigned char> value);
     /// Set fixed update time accumulator attribute.
     void SetFixedUpdateAccAttr(float value);
     /// Set script file serialization attribute by calling a script function.
@@ -135,7 +120,7 @@ public:
     /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;
     /// Return delayed method calls attribute.
-    PODVector<unsigned char> GetDelayedMethodCallsAttr() const;
+    PODVector<unsigned char> GetDelayedCallsAttr() const;
     /// Return fixed update time accumulator attribute.
     float GetFixedUpdateAccAttr() const;
     /// Get script file serialization attribute by calling a script function.
@@ -196,7 +181,7 @@ private:
     /// Fixed post update time accumulator.
     float fixedPostUpdateAcc_;
     /// Delayed method calls.
-    Vector<DelayedMethodCall> delayedMethodCalls_;
+    Vector<DelayedCall> delayedCalls_;
     /// Attributes, including script object variables.
     Vector<AttributeInfo> attributeInfos_;
     /// Storage for unapplied node and component ID attributes

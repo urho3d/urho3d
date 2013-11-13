@@ -83,7 +83,7 @@ void ScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<ScriptInstance>(LOGIC_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", GetFixedUpdateFps, SetFixedUpdateFps, int, 0, AM_DEFAULT);
@@ -266,12 +266,12 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
     if (!scriptObject_)
         return;
     
-    DelayedMethodCall call;
+    DelayedCall call;
     call.period_ = call.delay_ = Max(delay, 0.0f);
     call.repeat_ = repeat;
     call.declaration_ = declaration;
     call.parameters_ = parameters;
-    delayedMethodCalls_.Push(call);
+    delayedCalls_.Push(call);
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
     if (!subscribed_)
@@ -281,13 +281,13 @@ void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& decl
 void ScriptInstance::ClearDelayedExecute(const String& declaration)
 {
     if (declaration.Empty())
-        delayedMethodCalls_.Clear();
+        delayedCalls_.Clear();
     else
     {
-        for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End();)
+        for (Vector<DelayedCall>::Iterator i = delayedCalls_.Begin(); i != delayedCalls_.End();)
         {
             if (declaration == i->declaration_)
-                i = delayedMethodCalls_.Erase(i);
+                i = delayedCalls_.Erase(i);
             else
                 ++i;
         }
@@ -348,11 +348,11 @@ void ScriptInstance::SetScriptFileAttr(ResourceRef value)
     SetScriptFile(cache->GetResource<ScriptFile>(value.id_));
 }
 
-void ScriptInstance::SetDelayedMethodCallsAttr(PODVector<unsigned char> value)
+void ScriptInstance::SetDelayedCallsAttr(PODVector<unsigned char> value)
 {
     MemoryBuffer buf(value);
-    delayedMethodCalls_.Resize(buf.ReadVLE());
-    for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
+    delayedCalls_.Resize(buf.ReadVLE());
+    for (Vector<DelayedCall>::Iterator i = delayedCalls_.Begin(); i != delayedCalls_.End(); ++i)
     {
         i->period_ = buf.ReadFloat();
         i->delay_ = buf.ReadFloat();
@@ -361,7 +361,7 @@ void ScriptInstance::SetDelayedMethodCallsAttr(PODVector<unsigned char> value)
         i->parameters_ = buf.ReadVariantVector();
     }
     
-    if (scriptObject_ && delayedMethodCalls_.Size() && !subscribed_)
+    if (scriptObject_ && delayedCalls_.Size() && !subscribed_)
         UpdateEventSubscription();
 }
 
@@ -398,11 +398,11 @@ ResourceRef ScriptInstance::GetScriptFileAttr() const
     return GetResourceRef(scriptFile_, ScriptFile::GetTypeStatic());
 }
 
-PODVector<unsigned char> ScriptInstance::GetDelayedMethodCallsAttr() const
+PODVector<unsigned char> ScriptInstance::GetDelayedCallsAttr() const
 {
     VectorBuffer buf;
-    buf.WriteVLE(delayedMethodCalls_.Size());
-    for (Vector<DelayedMethodCall>::ConstIterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
+    buf.WriteVLE(delayedCalls_.Size());
+    for (Vector<DelayedCall>::ConstIterator i = delayedCalls_.Begin(); i != delayedCalls_.End(); ++i)
     {
         buf.WriteFloat(i->period_);
         buf.WriteFloat(i->delay_);
@@ -514,7 +514,7 @@ void ScriptInstance::ClearScriptMethods()
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
         methods_[i] = 0;
     
-    delayedMethodCalls_.Clear();
+    delayedCalls_.Clear();
 }
 
 void ScriptInstance::ClearScriptAttributes()
@@ -625,7 +625,7 @@ void ScriptInstance::UpdateEventSubscription()
     
     if (enabled)
     {
-        if (!subscribed_ && (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART] || delayedMethodCalls_.Size()))
+        if (!subscribed_ && (methods_[METHOD_UPDATE] || methods_[METHOD_DELAYEDSTART] || delayedCalls_.Size()))
         {
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(ScriptInstance, HandleSceneUpdate));
             subscribed_ = true;
@@ -693,10 +693,10 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     
-    // Execute delayed method calls
-    for (unsigned i = 0; i < delayedMethodCalls_.Size();)
+    // Execute delayed calls
+    for (unsigned i = 0; i < delayedCalls_.Size();)
     {
-        DelayedMethodCall& call = delayedMethodCalls_[i];
+        DelayedCall& call = delayedCalls_[i];
         bool remove = false;
         
         call.delay_ -= timeStep;
@@ -711,7 +711,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
         }
         
         if (remove)
-            delayedMethodCalls_.Erase(i);
+            delayedCalls_.Erase(i);
         else
             ++i;
     }

@@ -80,7 +80,7 @@ public:
     
     /// Set local-space bounding box.
     void SetBoundingBox(const BoundingBox& box);
-    /// Set vertex buffers.
+    /// Set vertex buffers and their morph ranges.
     bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts);
     /// Set index buffers.
     bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers);

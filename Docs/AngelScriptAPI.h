@@ -8042,6 +8042,9 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool Load(File);
 bool Save(File) const;
 bool Execute(const String&, const Array<Variant>);
+void DelayedExecute(float, bool, const String&, const Array<Variant>);
+void DelayedExecute(float, bool, const String&);
+void ClearDelayedExecute(const String& = String ( ));
 
 // Properties:
 /* (readonly) */

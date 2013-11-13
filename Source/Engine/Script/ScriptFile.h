@@ -68,6 +68,10 @@ public:
     bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Execute an object method.
     bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+    /// Add a delay-executed function call, optionally repeating.
+    void DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector);
+    /// Clear pending delay-executed function calls. If empty declaration given, clears all.
+    void ClearDelayedExecute(const String& declaration = String::EMPTY);
     /// Create a script object.
     asIScriptObject* CreateObject(const String& className);
     /// Save the script bytecode. Return true if successful.
@@ -91,6 +95,8 @@ private:
     void ReleaseModule();
     /// Handle an event in script.
     void HandleScriptEvent(StringHash eventType, VariantMap& eventData);
+    /// Handle application update event.
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Script subsystem.
     SharedPtr<Script> script_;
@@ -98,6 +104,8 @@ private:
     asIScriptModule* scriptModule_;
     /// Compiled flag.
     bool compiled_;
+    /// Subscribed to application update event flag.
+    bool subscribed_;
     /// Encountered include files during script file loading.
     HashSet<String> includeFiles_;
     /// Search cache for checking whether script classes implement "ScriptObject" interface.
@@ -106,6 +114,8 @@ private:
     HashMap<String, asIScriptFunction*> functions_;
     /// Search cache for methods.
     HashMap<asIObjectType*, HashMap<String, asIScriptFunction*> > methods_;
+    /// Delayed function calls.
+    Vector<DelayedCall> delayedCalls_;
 };
 
 /// Get currently executing script file.

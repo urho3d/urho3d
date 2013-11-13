@@ -27,6 +27,21 @@
 namespace Urho3D
 {
 
+/// Delay-executed function or method call.
+struct DelayedCall
+{
+   /// Period for repeating calls.
+    float period_;
+    /// Delay time remaining until execution.
+    float delay_;
+    /// Repeat flag.
+    bool repeat_;
+    /// Function declaration.
+    String declaration_;
+    /// Parameters.
+    VariantVector parameters_;
+};
+
 /// Interface class for event listeners that forward events to script.
 class URHO3D_API ScriptEventListener
 {

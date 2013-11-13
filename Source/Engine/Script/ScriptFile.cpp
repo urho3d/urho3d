@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "ArrayPtr.h"
 #include "Context.h"
+#include "CoreEvents.h"
 #include "FileSystem.h"
 #include "Log.h"
 #include "Profiler.h"
@@ -96,7 +97,8 @@ ScriptFile::ScriptFile(Context* context) :
     Resource(context),
     script_(GetSubsystem<Script>()),
     scriptModule_(0),
-    compiled_(false)
+    compiled_(false),
+    subscribed_(false)
 {
 }
 
@@ -289,6 +291,38 @@ bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, con
     return success;
 }
 
+void ScriptFile::DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters)
+{
+    DelayedCall call;
+    call.period_ = call.delay_ = Max(delay, 0.0f);
+    call.repeat_ = repeat;
+    call.declaration_ = declaration;
+    call.parameters_ = parameters;
+    delayedCalls_.Push(call);
+    
+    // Make sure we are registered to the application update event, because delayed calls are executed there
+    if (!subscribed_)
+    {
+        SubscribeToEvent(E_UPDATE, HANDLER(ScriptFile, HandleUpdate));
+        subscribed_ = true;
+    }
+}
+
+void ScriptFile::ClearDelayedExecute(const String& declaration)
+{
+    if (declaration.Empty())
+        delayedCalls_.Clear();
+    else
+    {
+        for (Vector<DelayedCall>::Iterator i = delayedCalls_.Begin(); i != delayedCalls_.End();)
+        {
+            if (declaration == i->declaration_)
+                i = delayedCalls_.Erase(i);
+            else
+                ++i;
+        }
+    }
+}
 asIScriptObject* ScriptFile::CreateObject(const String& className)
 {
     PROFILE(CreateObject);
@@ -598,6 +632,7 @@ void ScriptFile::ReleaseModule()
         validClasses_.Clear();
         functions_.Clear();
         methods_.Clear();
+        delayedCalls_.Clear();
         UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
         
         // Remove the module
@@ -629,6 +664,39 @@ void ScriptFile::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
     }
     
     Execute(function, parameters);
+}
+
+void ScriptFile::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (!compiled_)
+        return;
+    
+    using namespace Update;
+    
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
+    
+    // Execute delayed calls
+    for (unsigned i = 0; i < delayedCalls_.Size();)
+    {
+        DelayedCall& call = delayedCalls_[i];
+        bool remove = false;
+        
+        call.delay_ -= timeStep;
+        if (call.delay_ <= 0.0f)
+        {
+            if (!call.repeat_)
+                remove = true;
+            else
+                call.delay_ += call.period_;
+            
+            Execute(call.declaration_, call.parameters_);
+        }
+        
+        if (remove)
+            delayedCalls_.Erase(i);
+        else
+            ++i;
+    }
 }
 
 ScriptFile* GetScriptContextFile()

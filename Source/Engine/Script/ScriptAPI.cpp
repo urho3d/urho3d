@@ -43,6 +43,26 @@ static bool ScriptFileExecute(const String& declaration, CScriptArray* srcParams
     return ptr->Execute(declaration, destParams);
 }
 
+static void ScriptFileDelayedExecute(float delay, bool repeat, const String& declaration, CScriptArray* srcParams, ScriptFile* ptr)
+{
+    if (!srcParams)
+        return;
+
+    unsigned numParams = srcParams->GetSize();
+    VariantVector destParams;
+    destParams.Resize(numParams);
+
+    for (unsigned i = 0; i < numParams; ++i)
+        destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
+
+    ptr->DelayedExecute(delay, repeat, declaration, destParams);
+}
+
+static void ScriptFileDelayedExecuteNoParams(float delay, bool repeat, const String& declaration, ScriptFile* ptr)
+{
+    ptr->DelayedExecute(delay, repeat, declaration);
+}
+
 static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const String& className, CreateMode mode, Node* ptr)
 {
     if (!file)
@@ -73,6 +93,9 @@ static void RegisterScriptFile(asIScriptEngine* engine)
 {
     RegisterResource<ScriptFile>(engine, "ScriptFile");
     engine->RegisterObjectMethod("ScriptFile", "bool Execute(const String&in, const Array<Variant>@+)", asFUNCTION(ScriptFileExecute), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptFile", "void DelayedExecute(float, bool, const String&in, const Array<Variant>@+)", asFUNCTION(ScriptFileDelayedExecute), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptFile", "void DelayedExecute(float, bool, const String&in)", asFUNCTION(ScriptFileDelayedExecuteNoParams), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptFile", "void ClearDelayedExecute(const String&in declaration = String())", asMETHOD(ScriptFile, ClearDelayedExecute), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptFile", "bool get_compiled() const", asMETHOD(ScriptFile, IsCompiled), asCALL_THISCALL);
     engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", asFUNCTION(GetScriptContextFile), asCALL_CDECL);
 }
@@ -168,10 +191,9 @@ static ScriptInstance* GetSelf()
 
 static void SelfDelayedExecute(float delay, bool repeat, const String& declaration, CScriptArray* srcParams)
 {
-    ScriptInstance* ptr = GetScriptContextInstance();
-    if (!ptr || !srcParams)
+    if (!srcParams)
         return;
-
+    
     unsigned numParams = srcParams->GetSize();
     VariantVector destParams;
     destParams.Resize(numParams);
@@ -179,14 +201,15 @@ static void SelfDelayedExecute(float delay, bool repeat, const String& declarati
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
 
-    ptr->DelayedExecute(delay, repeat, declaration, destParams);
-}
-
-static void SelfMarkNetworkUpdate()
-{
     ScriptInstance* ptr = GetScriptContextInstance();
     if (ptr)
-        ptr->MarkNetworkUpdate();
+        ptr->DelayedExecute(delay, repeat, declaration, destParams);
+    else
+    {
+        ScriptFile* file = GetScriptContextFile();
+        if (file)
+            file->DelayedExecute(delay, repeat, declaration, destParams);
+    }
 }
 
 static void SelfDelayedExecuteNoParams(float delay, bool repeat, const String& declaration)
@@ -194,6 +217,12 @@ static void SelfDelayedExecuteNoParams(float delay, bool repeat, const String& d
     ScriptInstance* ptr = GetScriptContextInstance();
     if (ptr)
         ptr->DelayedExecute(delay, repeat, declaration);
+    else
+    {
+        ScriptFile* file = GetScriptContextFile();
+        if (file)
+            file->DelayedExecute(delay, repeat, declaration);
+    }
 }
 
 static void SelfClearDelayedExecute(const String& declaration)
@@ -201,6 +230,19 @@ static void SelfClearDelayedExecute(const String& declaration)
     ScriptInstance* ptr = GetScriptContextInstance();
     if (ptr)
         ptr->ClearDelayedExecute(declaration);
+    else
+    {
+        ScriptFile* file = GetScriptContextFile();
+        if (file)
+            file->ClearDelayedExecute(declaration);
+    }
+}
+
+static void SelfMarkNetworkUpdate()
+{
+    ScriptInstance* ptr = GetScriptContextInstance();
+    if (ptr)
+        ptr->MarkNetworkUpdate();
 }
 
 static void SelfRemove()
