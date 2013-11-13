@@ -75,11 +75,13 @@ post_cmake() {
             #
             # Replace [Source directory] linked resource to [Build] instead
             # Modify build argument to first change directory to Build folder
+            # Remove [Subprojects]/Urho3D linked resource to suppress Eclipse resource overlaps warning during project import
             #
             xmlstarlet ed -P -L \
                 -u "/projectDescription/linkedResources/link/name/text()[. = '[Source directory]']" -v "[Build]" \
                 -u "/projectDescription/linkedResources/link/location[../name/text() = '[Build]']" -v "$( pwd )/$1" \
                 -u "/projectDescription/buildSpec/buildCommand/arguments/dictionary/value[../key/text() = 'org.eclipse.cdt.make.core.build.arguments']" -x "concat('-C ../$1 ', .)" \
+                -d "/projectDescription/linkedResources/link[name/text() = '[Subprojects]/Urho3D']" \
                 Source/.project
             #
             # Fix source path entry to Source folder and modify its filter condition
