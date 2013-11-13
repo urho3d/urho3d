@@ -50,3 +50,4 @@ configure*
 *~
 *.swp
 .DS_Store
+*.log
