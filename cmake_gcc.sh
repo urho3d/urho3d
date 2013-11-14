@@ -20,12 +20,12 @@
 # THE SOFTWARE.
 #
 
-# Define helpers
-. .bash_helpers
-
 # Ensure we are in project root directory
 cd $( dirname $0 )
 SOURCE=`pwd`/Source
+
+# Define helpers
+. .bash_helpers
 
 # Create out-of-source build directory
 cmake -E make_directory Build
