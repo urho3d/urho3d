@@ -23,7 +23,7 @@
 #include "Precompiled.h"
 #include "Addons.h"
 
-#include <cString>
+#include <cstring>
 #include <new>
 #include <stdio.h>
 
