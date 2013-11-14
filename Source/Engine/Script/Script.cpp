@@ -252,7 +252,14 @@ void Script::DumpAPI(DumpMode mode)
     if (mode == DOXYGEN)
         Log::WriteRaw("namespace Urho3D\n{\n\n/**\n\\page ScriptAPI Scripting API\n\n");
     else if (mode == C_HEADER)
-        Log::WriteRaw("// Script API header for AngelScript content assist / code completion in IDE\n\n#define uint8 uint\n#define uint16 uint\n#define int8 int\n#define int16 int\n#define null 0\n");
+        Log::WriteRaw("// Script API header intended to be 'force included' in IDE for AngelScript content assist / code completion\n\n"
+            "#define int8 signed char\n"
+            "#define int16 signed short\n"
+            "#define int64 long\n"
+            "#define uint8 unsigned char\n"
+            "#define uint16 unsigned short\n"
+            "#define uint64 unsigned long\n"
+            "#define null 0\n");
 
     if (mode == DOXYGEN)
         Log::WriteRaw("\\section ScriptAPI_Enums Enumerations\n");
@@ -547,6 +554,7 @@ void Script::OutputAPIRow(DumpMode mode, const String& row, bool removeReference
     else if (mode == C_HEADER)
     {
         out.Replace("@", "");
+        out.Replace("?&", "void*");
 
         // s/(\w+)\[\]/Array<\1>/g
         unsigned posBegin = String::NPOS;

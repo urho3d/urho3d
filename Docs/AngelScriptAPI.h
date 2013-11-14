@@ -1,9 +1,11 @@
-// Script API header for AngelScript content assist / code completion in IDE
+// Script API header intended to be 'force included' in IDE for AngelScript content assist / code completion
 
-#define uint8 uint
-#define uint16 uint
-#define int8 int
-#define int16 int
+#define int8 signed char
+#define int16 signed short
+#define int64 long
+#define uint8 unsigned char
+#define uint16 unsigned short
+#define uint64 unsigned long
 #define null 0
 
 // Enumerations
@@ -421,8 +423,8 @@ bool empty;
 class Dictionary
 {
 // Methods:
-void Set(const String&, ?&);
-bool Get(const String&, ?&) const;
+void Set(const String&, void*);
+bool Get(const String&, void*) const;
 void Set(const String&, int64&);
 bool Get(const String&, int64&) const;
 void Set(const String&, double&);
