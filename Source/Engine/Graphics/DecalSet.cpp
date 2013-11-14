@@ -504,7 +504,7 @@ Material* DecalSet::GetMaterial() const
 void DecalSet::SetMaterialAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.id_));
+    SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void DecalSet::SetDecalsAttr(PODVector<unsigned char> value)

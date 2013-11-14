@@ -236,7 +236,7 @@ Billboard* BillboardSet::GetBillboard(unsigned index)
 void BillboardSet::SetMaterialAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.id_));
+    SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void BillboardSet::SetBillboardsAttr(VariantVector value)

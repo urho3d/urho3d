@@ -13,11 +13,9 @@ class ResourceCache
     Resource* GetResource(const String type, const String name);
     
     bool Exists(const String name) const;
-    bool Exists(StringHash nameHash) const;
     unsigned GetMemoryBudget(ShortStringHash type) const;
     unsigned GetMemoryUse(ShortStringHash type) const;
     unsigned GetTotalMemoryUse() const;
-    const String GetResourceName(StringHash nameHash) const;
     String GetResourceFileName(const String name) const;
     
     bool GetAutoReloadResources() const;

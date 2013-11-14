@@ -465,7 +465,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
     }
     else if (type == VAR_RESOURCEREF)
     {
-        SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(value.GetResourceRef().id), sameValue), editable && sameValue);
+        SetEditable(SetValue(parent.children[1].children[0], value.GetResourceRef().name, sameValue), editable && sameValue);
         SetEditable(parent.children[1].children[1], editable && sameValue);  // If editable then can pick
         for (uint i = 2; i < parent.children[1].numChildren; ++i)
             SetEditable(parent.children[1].children[i], sameValue); // If same value then can open/edit/test
@@ -480,22 +480,22 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             if (parent is null)
                 break;
 
-            StringHash firstID = refList.ids[subIndex];
-            bool idSameValue = true;
+            String firstName = refList.names[subIndex];
+            bool nameSameValue = true;
             if (!sameValue)
             {
-                // Reevaluate each ID in the list
+                // Reevaluate each name in the list
                 for (uint i = 0; i < values.length; ++i)
                 {
                     ResourceRefList refList = values[i].GetResourceRefList();
-                    if (subIndex >= refList.length || refList.ids[subIndex] != firstID)
+                    if (subIndex >= refList.length || refList.names[subIndex] != firstName)
                     {
-                        idSameValue = false;
+                        nameSameValue = false;
                         break;
                     }
                 }
             }
-            SetEditable(SetValue(parent.children[1].children[0], cache.GetResourceName(firstID), idSameValue), editable && idSameValue);
+            SetEditable(SetValue(parent.children[1].children[0], firstName, nameSameValue), editable && nameSameValue);
         }
     }
     else if (type == VAR_VARIANTVECTOR)
@@ -619,7 +619,7 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
             Variant[] values(1);
             GetEditorValue(parent, VAR_RESOURCEREF, null, coordinate, values);
             ResourceRef ref = values[0].GetResourceRef();
-            refList.ids[subIndex] = ref.id;
+            refList.names[subIndex] = ref.name;
             serializables[i].attributes[index] = Variant(refList);
         }
     }
@@ -710,7 +710,7 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
     {
         LineEdit@ attrEdit = parent.children[0];
         ResourceRef ref;
-        ref.id = StringHash(attrEdit.text.Trimmed());
+        ref.name = attrEdit.text.Trimmed();
         ref.type = ShortStringHash(attrEdit.vars[TYPE_VAR].GetUInt());
         FillValue(values, Variant(ref));
     }
@@ -965,7 +965,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
         {
             ResourceRef ref = target.attributes[resourcePickIndex].GetResourceRef();
             ref.type = res.type;
-            ref.id = StringHash(res.name);
+            ref.name = res.name;
             target.attributes[resourcePickIndex] = Variant(ref);
             target.ApplyAttributes();
         }
@@ -974,7 +974,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             ResourceRefList refList = target.attributes[resourcePickIndex].GetResourceRefList();
             if (resourcePickSubIndex < refList.length)
             {
-                refList.ids[resourcePickSubIndex] = StringHash(res.name);
+                refList.names[resourcePickSubIndex] = res.name;
                 target.attributes[resourcePickIndex] = Variant(refList);
                 target.ApplyAttributes();
             }
@@ -984,7 +984,7 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             Array<Variant>@ attrs = target.attributes[resourcePickIndex].GetVariantVector();
             ResourceRef ref = attrs[resourcePickSubIndex].GetResourceRef();
             ref.type = res.type;
-            ref.id = StringHash(res.name);
+            ref.name = res.name;
             attrs[resourcePickSubIndex] = ref;
             target.attributes[resourcePickIndex] = Variant(attrs);
             target.ApplyAttributes();

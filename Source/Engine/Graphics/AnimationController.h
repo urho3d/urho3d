@@ -51,6 +51,8 @@ struct AnimationControl
     {
     }
 
+    /// Animation resource name.
+    String name_;
     /// Animation resource name hash.
     StringHash hash_;
     /// Animation speed.

@@ -154,39 +154,39 @@ static void DestructResourceRefList(ResourceRefList* ptr)
 
 static void ResourceRefListResize(unsigned size, ResourceRefList* ptr)
 {
-    ptr->ids_.Resize(size);
+    ptr->names_.Resize(size);
 }
 
 static unsigned ResourceRefListGetSize(ResourceRefList* ptr)
 {
-    return ptr->ids_.Size();
+    return ptr->names_.Size();
 }
 
 static bool ResourceRefListIsEmpty(ResourceRefList* ptr)
 {
-    return ptr->ids_.Size() == 0;
+    return ptr->names_.Size() == 0;
 }
 
-static void ResourceRefListSetId(unsigned index, const StringHash& id, ResourceRefList* ptr)
+static void ResourceRefListSetName(unsigned index, const String& name, ResourceRefList* ptr)
 {
-    if (index >= ptr->ids_.Size())
+    if (index >= ptr->names_.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return;
     }
 
-    ptr->ids_[index] = id;
+    ptr->names_[index] = name;
 }
 
-static StringHash ResourceRefListGetId(unsigned index, ResourceRefList* ptr)
+static const String& ResourceRefListGetName(unsigned index, ResourceRefList* ptr)
 {
-    if (index >= ptr->ids_.Size())
+    if (index >= ptr->names_.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
-        return StringHash();
+        return String::EMPTY;
     }
 
-    return ptr->ids_[index];
+    return ptr->names_[index];
 }
 
 void ArrayToVariantVector(CScriptArray* arr, VariantVector& dest)
@@ -413,7 +413,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceRef", "ResourceRef& opAssign(const ResourceRef&in)", asMETHOD(ResourceRef, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceRef", "bool opEquals(const ResourceRef&in) const", asMETHOD(ResourceRef, operator ==), asCALL_THISCALL);
     engine->RegisterObjectProperty("ResourceRef", "ShortStringHash type", offsetof(ResourceRef, type_));
-    engine->RegisterObjectProperty("ResourceRef", "StringHash id", offsetof(ResourceRef, id_));
+    engine->RegisterObjectProperty("ResourceRef", "String name", offsetof(ResourceRef, name_));
 
     engine->RegisterObjectType("ResourceRefList", sizeof(ResourceRefList), asOBJ_VALUE | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructResourceRefList), asCALL_CDECL_OBJLAST);
@@ -424,8 +424,8 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceRefList", "void Resize(uint)", asFUNCTION(ResourceRefListResize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceRefList", "uint get_length() const", asFUNCTION(ResourceRefListGetSize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceRefList", "bool get_empty() const", asFUNCTION(ResourceRefListIsEmpty), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceRefList", "void set_ids(uint, const StringHash&in) const", asFUNCTION(ResourceRefListSetId), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceRefList", "StringHash get_ids(uint) const", asFUNCTION(ResourceRefListGetId), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceRefList", "void set_names(uint, const String&in) const", asFUNCTION(ResourceRefListSetName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceRefList", "const String& get_names(uint) const", asFUNCTION(ResourceRefListGetName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("ResourceRefList", "ShortStringHash type", offsetof(ResourceRef, type_));
 
     engine->RegisterObjectType("Variant", sizeof(Variant), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);

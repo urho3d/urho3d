@@ -739,7 +739,7 @@ void AnimatedModel::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     // When loading a scene, set model without creating the bone nodes (will be assigned later during post-load)
-    SetModel(cache->GetResource<Model>(value.id_), !loading_);
+    SetModel(cache->GetResource<Model>(value.name_), !loading_);
 }
 
 void AnimatedModel::SetBonesEnabledAttr(VariantVector value)
@@ -768,7 +768,7 @@ void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
         {
             // Note: null animation is allowed here for editing
             const ResourceRef& animRef = value[index++].GetResourceRef();
-            SharedPtr<AnimationState> newState(new AnimationState(this, cache->GetResource<Animation>(animRef.id_)));
+            SharedPtr<AnimationState> newState(new AnimationState(this, cache->GetResource<Animation>(animRef.name_)));
             animationStates_.Push(newState);
 
             newState->SetStartBone(skeleton_.GetBone(value[index++].GetString()));
@@ -819,7 +819,7 @@ VariantVector AnimatedModel::GetAnimationStatesAttr() const
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
         Bone* startBone = state->GetStartBone();
-        ret.Push(ResourceRef(Animation::GetTypeStatic(), animation ? animation->GetNameHash() : StringHash()));
+        ret.Push(GetResourceRef(animation, Animation::GetTypeStatic()));
         ret.Push(startBone ? startBone->name_ : String::EMPTY);
         ret.Push(state->IsLooped());
         ret.Push(state->GetWeight());

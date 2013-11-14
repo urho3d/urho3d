@@ -410,13 +410,13 @@ void Text3D::MarkTextDirty()
 void Text3D::SetMaterialAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.id_));
+    SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void Text3D::SetFontAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    text_.font_ = cache->GetResource<Font>(value.id_);
+    text_.font_ = cache->GetResource<Font>(value.name_);
 }
 
 ResourceRef Text3D::GetMaterialAttr() const

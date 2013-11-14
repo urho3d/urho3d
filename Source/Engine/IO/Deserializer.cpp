@@ -251,7 +251,7 @@ ResourceRef Deserializer::ReadResourceRef()
 {
     ResourceRef ret;
     ret.type_ = ReadShortStringHash();
-    ret.id_ = ReadStringHash();
+    ret.name_ = ReadString();
     return ret;
 }
 
@@ -259,9 +259,9 @@ ResourceRefList Deserializer::ReadResourceRefList()
 {
     ResourceRefList ret;
     ret.type_ = ReadShortStringHash();
-    ret.ids_.Resize(ReadVLE());
-    if (ret.ids_.Size())
-        Read(&ret.ids_[0], ret.ids_.Size() * sizeof(StringHash));
+    ret.names_.Resize(ReadVLE());
+    for (unsigned i = 0; i < ret.names_.Size(); ++i)
+        ret.names_[i] = ReadString();
     return ret;
 }
 

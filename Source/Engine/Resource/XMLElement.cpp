@@ -23,7 +23,6 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Log.h"
-#include "ResourceCache.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
 
@@ -361,11 +360,10 @@ bool XMLElement::SetResourceRef(const ResourceRef& value)
     if (!file_ || (!node_ && !xpathNode_))
         return false;
 
-    // Need the context & resource cache to query for reverse hash mappings
+    // Need the context to query for the type
     Context* context = file_->GetContext();
-    ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
 
-    return SetAttribute("value", String(context->GetTypeName(value.type_)) + ";" + cache->GetResourceName(value.id_));
+    return SetAttribute("value", String(context->GetTypeName(value.type_)) + ";" + value.name_);
 }
 
 bool XMLElement::SetResourceRefList(const ResourceRefList& value)
@@ -373,15 +371,14 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
     if (!file_ || (!node_ && !xpathNode_))
         return false;
 
-    // Need the context & resource cache to query for reverse hash mappings
+    // Need the context to query for the type
     Context* context = file_->GetContext();
-    ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
 
     String str(context->GetTypeName(value.type_));
-    for (unsigned i = 0; i < value.ids_.Size(); ++i)
+    for (unsigned i = 0; i < value.names_.Size(); ++i)
     {
         str += ";";
-        str += cache->GetResourceName(value.ids_[i]);
+        str += value.names_[i];
     }
 
     return SetAttribute("value", str.CString());
@@ -734,12 +731,7 @@ ResourceRef XMLElement::GetResourceRef() const
     if (values.Size() == 2)
     {
         ret.type_ = values[0];
-        ret.id_ = values[1];
-
-        // Whenever we encounter a resource name read from a ResourceRef XML element, store the reverse mapping to
-        // ResourceCache if possible. We will probably use the hash to request a resource shortly afterward
-        if (file_)
-            file_->GetSubsystem<ResourceCache>()->StoreNameHash(values[1]);
+        ret.name_ = values[1];
     }
 
     return ret;
@@ -752,18 +744,10 @@ ResourceRefList XMLElement::GetResourceRefList() const
     Vector<String> values = GetAttribute("value").Split(';');
     if (values.Size() >= 1)
     {
-        // Whenever we encounter resource names read from a ResourceRefList XML element, store the reverse mapping to
-        // ResourceCache if possible. We will probably use the hashes to request resources shortly afterward
-        ResourceCache* cache = file_ ? file_->GetSubsystem<ResourceCache>() : 0;
-
         ret.type_ = values[0];
-        ret.ids_.Resize(values.Size() - 1);
+        ret.names_.Resize(values.Size() - 1);
         for (unsigned i = 1; i < values.Size(); ++i)
-        {
-            ret.ids_[i - 1] = StringHash(values[i]);
-            if (cache)
-                cache->StoreNameHash(values[i]);
-        }
+            ret.names_[i - 1] = values[i];
     }
 
     return ret;

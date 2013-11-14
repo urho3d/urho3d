@@ -108,7 +108,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         if (resourcePtr)
             resourcePtr->ReleaseRef();
         const ResourceRef& ref = src.GetResourceRef();
-        resourcePtr = GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.id_);
+        resourcePtr = GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.name_);
         if (resourcePtr)
             resourcePtr->AddRef();
     }
@@ -145,8 +145,7 @@ void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) co
     {
         Resource* resource = *(reinterpret_cast<Resource**>(attr.ptr_));
         // If resource is non-null get its type and name hash. Otherwise get type from the default value
-        dest = resource ? ResourceRef(resource->GetType(), resource->GetNameHash()) :
-            ResourceRef(attr.defaultValue_.GetResourceRef().type_);
+        dest = GetResourceRef(resource, attr.defaultValue_.GetResourceRef().type_);
     }
     else
         Serializable::OnGetAttribute(attr, dest);
@@ -345,7 +344,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
 void ScriptInstance::SetScriptFileAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetScriptFile(cache->GetResource<ScriptFile>(value.id_));
+    SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
 }
 
 void ScriptInstance::SetDelayedCallsAttr(PODVector<unsigned char> value)

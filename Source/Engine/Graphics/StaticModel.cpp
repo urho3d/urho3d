@@ -370,14 +370,14 @@ void StaticModel::SetNumGeometries(unsigned num)
 void StaticModel::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetModel(cache->GetResource<Model>(value.id_));
+    SetModel(cache->GetResource<Model>(value.name_));
 }
 
 void StaticModel::SetMaterialsAttr(const ResourceRefList& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    for (unsigned i = 0; i < value.ids_.Size(); ++i)
-        SetMaterial(i, cache->GetResource<Material>(value.ids_[i]));
+    for (unsigned i = 0; i < value.names_.Size(); ++i)
+        SetMaterial(i, cache->GetResource<Material>(value.names_[i]));
 }
 
 ResourceRef StaticModel::GetModelAttr() const
@@ -387,9 +387,9 @@ ResourceRef StaticModel::GetModelAttr() const
 
 const ResourceRefList& StaticModel::GetMaterialsAttr() const
 {
-    materialsAttr_.ids_.Resize(batches_.Size());
+    materialsAttr_.names_.Resize(batches_.Size());
     for (unsigned i = 0; i < batches_.Size(); ++i)
-        materialsAttr_.ids_[i] = batches_[i].material_ ? batches_[i].material_->GetNameHash() : StringHash();
+        materialsAttr_.names_[i] = GetResourceName(batches_[i].material_);
     
     return materialsAttr_;
 }

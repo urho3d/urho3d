@@ -427,13 +427,13 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
 void Light::SetRampTextureAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    rampTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.id_));
+    rampTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 
 void Light::SetShapeTextureAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    shapeTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.id_));
+    shapeTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 
 ResourceRef Light::GetRampTextureAttr() const

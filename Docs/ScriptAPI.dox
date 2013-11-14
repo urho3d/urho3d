@@ -885,7 +885,7 @@ Properties:
 Properties:
 
 - ShortStringHash type
-- StringHash id
+- String name
 
 
 ### ResourceRefList
@@ -898,7 +898,7 @@ Properties:
 
 - uint length (readonly)
 - bool empty (readonly)
-- StringHash[] ids
+- String[] names
 - ShortStringHash type
 
 
@@ -1398,10 +1398,8 @@ Methods:
 - File@ GetFile(const String&)
 - String GetPreferredResourceDir(const String&) const
 - String SanitateResourceName(const String&) const
-- const String& GetResourceName(StringHash) const
 - String GetResourceFileName(const String&) const
 - Resource@ GetResource(const String&, const String&)
-- Resource@ GetResource(ShortStringHash, StringHash)
 - Resource@ GetResource(ShortStringHash, const String&)
 
 Properties:

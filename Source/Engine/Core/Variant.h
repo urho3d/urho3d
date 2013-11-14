@@ -103,29 +103,29 @@ struct URHO3D_API ResourceRef
     {
     }
 
-    /// Construct with type and id.
-    ResourceRef(ShortStringHash type, StringHash id) :
+    /// Construct with type and resource name.
+    ResourceRef(ShortStringHash type, const String& name) :
         type_(type),
-        id_(id)
+        name_(name)
     {
     }
 
     // Construct from another ResourceRef.
     ResourceRef(const ResourceRef& rhs) :
         type_(rhs.type_),
-        id_(rhs.id_)
+        name_(rhs.name_)
     {
     }
 
     /// Object type.
     ShortStringHash type_;
-    /// Object identifier (name hash.)
-    StringHash id_;
+    /// Object name.
+    String name_;
 
     /// Test for equality with another reference.
-    bool operator == (const ResourceRef& rhs) const { return type_ == rhs.type_ && id_ == rhs.id_; }
+    bool operator == (const ResourceRef& rhs) const { return type_ == rhs.type_ && name_ == rhs.name_; }
     /// Test for inequality with another reference.
-    bool operator != (const ResourceRef& rhs) const { return type_ != rhs.type_ || id_ != rhs.id_; }
+    bool operator != (const ResourceRef& rhs) const { return type_ != rhs.type_ || name_ != rhs.name_; }
 };
 
 /// %List of typed resource references.
@@ -142,21 +142,21 @@ struct URHO3D_API ResourceRefList
     {
     }
     /// Construct with type and id list.
-    ResourceRefList(ShortStringHash type, const Vector<StringHash>& ids) :
+    ResourceRefList(ShortStringHash type, const Vector<String>& names) :
         type_(type),
-        ids_(ids)
+        names_(names)
     {
     }
 
     /// Object type.
     ShortStringHash type_;
-    /// List of object identifiers (name hashes).
-    Vector<StringHash> ids_;
+    /// List of object names.
+    Vector<String> names_;
 
     /// Test for equality with another reference list.
-    bool operator == (const ResourceRefList& rhs) const { return type_ == rhs.type_ && ids_ == rhs.ids_; }
+    bool operator == (const ResourceRefList& rhs) const { return type_ == rhs.type_ && names_ == rhs.names_; }
     /// Test for inequality with another reference list.
-    bool operator != (const ResourceRefList& rhs) const { return type_ != rhs.type_ || ids_ != rhs.ids_; }
+    bool operator != (const ResourceRefList& rhs) const { return type_ != rhs.type_ || names_ != rhs.names_; }
 };
 
 class Variant;

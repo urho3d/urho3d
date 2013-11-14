@@ -168,6 +168,7 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
     {
         AnimationControl newControl;
         Animation* animation = state->GetAnimation();
+        newControl.name_ = animation->GetName();
         newControl.hash_ = animation->GetNameHash();
         animations_.Push(newControl);
         index = animations_.Size() - 1;
@@ -494,7 +495,8 @@ void AnimationController::SetAnimationsAttr(VariantVector value)
     while (index + 4 < value.Size())    // Prevent out-of-bound index access
     {
         AnimationControl newControl;
-        newControl.hash_ = value[index++].GetStringHash();
+        newControl.name_ = value[index++].GetString();
+        newControl.hash_ = StringHash(newControl.name_);
         newControl.speed_ = value[index++].GetFloat();
         newControl.targetWeight_ = value[index++].GetFloat();
         newControl.fadeTime_ = value[index++].GetFloat();
@@ -515,14 +517,15 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
     unsigned numAnimations = buf.ReadVLE();
     while (numAnimations--)
     {
-        StringHash animHash = buf.ReadStringHash();
+        String animName = buf.ReadString();
+        StringHash animHash(animName);
         processedAnimations.Insert(animHash);
         
         // Check if the animation state exists. If not, add new
         AnimationState* state = GetAnimationState(animHash);
         if (!state)
         {
-            Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animHash);
+            Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animName);
             state = AddAnimationState(newAnimation);
             if (!state)
             {
@@ -540,6 +543,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
         if (index == animations_.Size())
         {
             AnimationControl newControl;
+            newControl.name_ = animName;
             newControl.hash_ = animHash;
             animations_.Push(newControl);
         }
@@ -617,7 +621,7 @@ void AnimationController::SetNodeAnimationStatesAttr(VariantVector value)
         {
             // Note: null animation is allowed here for editing
             const ResourceRef& animRef = value[index++].GetResourceRef();
-            SharedPtr<AnimationState> newState(new AnimationState(GetNode(), cache->GetResource<Animation>(animRef.id_)));
+            SharedPtr<AnimationState> newState(new AnimationState(GetNode(), cache->GetResource<Animation>(animRef.name_)));
             nodeAnimationStates_.Push(newState);
 
             newState->SetLooped(value[index++].GetBool());
@@ -638,7 +642,7 @@ VariantVector AnimationController::GetAnimationsAttr() const
     ret.Reserve(animations_.Size() * 5);
     for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
     {
-        ret.Push(i->hash_);
+        ret.Push(i->name_);
         ret.Push(i->speed_);
         ret.Push(i->targetWeight_);
         ret.Push(i->fadeTime_);
@@ -680,7 +684,7 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
         if (i->setWeightTtl_ > 0.0f)
             ctrl |= CTRL_SETWEIGHT;
         
-        attrBuffer_.WriteStringHash(i->hash_);
+        attrBuffer_.WriteString(i->name_);
         attrBuffer_.WriteUByte(ctrl);
         attrBuffer_.WriteUByte(state->GetLayer());
         attrBuffer_.WriteShort((short)Clamp(i->speed_ * 2048.0f, -32767.0f, 32767.0f));
@@ -714,7 +718,7 @@ VariantVector AnimationController::GetNodeAnimationStatesAttr() const
     {
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
-        ret.Push(ResourceRef(Animation::GetTypeStatic(), animation ? animation->GetNameHash() : StringHash()));
+        ret.Push(GetResourceRef(animation, Animation::GetTypeStatic()));
         ret.Push(state->IsLooped());
         ret.Push(state->GetTime());
     }

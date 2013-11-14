@@ -96,8 +96,6 @@ public:
     Resource* GetResource(ShortStringHash type, const String& name);
     /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
     Resource* GetResource(ShortStringHash type, const char* name);
-    /// Return a resource by type and name hash. Load if not loaded yet. Return null if fails.
-    Resource* GetResource(ShortStringHash type, StringHash nameHash);
     /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
     /// Return all loaded resources.
@@ -110,22 +108,16 @@ public:
     template <class T> T* GetResource(const String& name);
     /// Template version of returning a resource by name.
     template <class T> T* GetResource(const char* name);
-    /// Template version of returning a resource by name hash.
-    template <class T> T* GetResource(StringHash nameHash);
     /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
     /// Return whether a file exists by name.
     bool Exists(const String& name) const;
-    /// Return whether a file exists by name hash.
-    bool Exists(StringHash nameHash) const;
     /// Return memory budget for a resource type.
     unsigned GetMemoryBudget(ShortStringHash type) const;
     /// Return total memory use for a resource type.
     unsigned GetMemoryUse(ShortStringHash type) const;
     /// Return total memory use for all resources.
     unsigned GetTotalMemoryUse() const;
-    /// Return resource name from hash, or empty if not found.
-    const String& GetResourceName(StringHash nameHash) const;
     /// Return full absolute file name of resource if possible.
     String GetResourceFileName(const String& name) const;
     /// Return whether automatic resource reloading is enabled.
@@ -135,8 +127,6 @@ public:
     String GetPreferredResourceDir(const String& path) const;
     /// Remove unsupported constructs from the resource name to prevent ambiguity, and normalize absolute filename to resource path relative if possible.
     String SanitateResourceName(const String& name) const;
-    /// Store a hash-to-name mapping.
-    void StoreNameHash(const String& name);
     /// Store a dependency for a resource. If a dependency file changes, the resource will be reloaded.
     void StoreResourceDependency(Resource* resource, const String& dependency);
     /// Reset dependencies for a resource.
@@ -162,8 +152,6 @@ private:
     Vector<SharedPtr<FileWatcher> > fileWatchers_;
     /// Package files.
     Vector<SharedPtr<PackageFile> > packages_;
-    /// Mapping of hashes to filenames.
-    HashMap<StringHash, String> hashToName_;
     /// Dependent resources.
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
     /// Automatic resource reloading flag.
@@ -180,12 +168,6 @@ template <class T> T* ResourceCache::GetResource(const char* name)
 {
     ShortStringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name));
-}
-
-template <class T> T* ResourceCache::GetResource(StringHash nameHash)
-{
-    ShortStringHash type = T::GetTypeStatic();
-    return static_cast<T*>(GetResource(type, nameHash));
 }
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const

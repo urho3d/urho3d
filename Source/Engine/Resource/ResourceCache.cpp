@@ -90,12 +90,6 @@ bool ResourceCache::AddResourceDir(const String& pathName)
     
     resourceDirs_.Push(fixedPath);
     
-    // Scan the path for files recursively and add their hash-to-name mappings
-    Vector<String> fileNames;
-    fileSystem->ScanDir(fileNames, fixedPath, "*.*", SCAN_FILES, true);
-    for (unsigned i = 0; i < fileNames.Size(); ++i)
-        StoreNameHash(fileNames[i]);
-    
     // If resource auto-reloading active, create a file watcher for the directory
     if (autoReloadResources_)
     {
@@ -119,11 +113,6 @@ void ResourceCache::AddPackageFile(PackageFile* package, bool addAsFirst)
     else
         packages_.Push(SharedPtr<PackageFile>(package));
     
-    // Scan the package for files and add their hash-to-name mappings
-    const HashMap<String, PackageEntry>& entries = package->GetEntries();
-    for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
-        StoreNameHash(i->first_);
-    
     LOGINFO("Added resource package " + package->GetName());
 }
 
@@ -142,7 +131,6 @@ bool ResourceCache::AddManualResource(Resource* resource)
         return false;
     }
     
-    StoreNameHash(name);
     resource->ResetUseTimer();
     resourceGroups_[resource->GetType()].resources_[resource->GetNameHash()] = resource;
     UpdateResourceGroup(resource->GetType());
@@ -383,39 +371,25 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn)
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const String& nameIn)
-{
-    String name = SanitateResourceName(nameIn);
-    
-    // Add the name to the hash map, so if this is an unknown resource, the error will not be unintelligible
-    StoreNameHash(name);
-    
-    return GetResource(type, StringHash(name));
-}
-
 Resource* ResourceCache::GetResource(ShortStringHash type, const char* name)
 {
     return GetResource(type, String(name));
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
+Resource* ResourceCache::GetResource(ShortStringHash type, const String& nameIn)
 {
-    // If null hash, return null pointer immediately
-    if (!nameHash)
+    String name = SanitateResourceName(nameIn);
+    
+    // If empty name, return null pointer immediately
+    if (name.Empty())
         return 0;
     
+    StringHash nameHash(name);
     const SharedPtr<Resource>& existing = FindResource(type, nameHash);
     if (existing)
         return existing;
     
     SharedPtr<Resource> resource;
-    const String& name = GetResourceName(nameHash);
-    if (name.Empty())
-    {
-        LOGERROR("Could not load unknown resource " + String(nameHash));
-        return 0;
-    }
-    
     // Make sure the pointer is non-null and is a Resource subclass
     resource = DynamicCast<Resource>(context_->CreateObject(type));
     if (!resource)
@@ -481,11 +455,6 @@ bool ResourceCache::Exists(const String& nameIn) const
     return false;
 }
 
-bool ResourceCache::Exists(StringHash nameHash) const
-{
-    return Exists(GetResourceName(nameHash));
-}
-
 unsigned ResourceCache::GetMemoryBudget(ShortStringHash type) const
 {
     HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
@@ -510,15 +479,6 @@ unsigned ResourceCache::GetTotalMemoryUse() const
     for (HashMap<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
         total += i->second_.memoryUse_;
     return total;
-}
-
-const String& ResourceCache::GetResourceName(StringHash nameHash) const
-{
-    HashMap<StringHash, String>::ConstIterator i = hashToName_.Find(nameHash);
-    if (i == hashToName_.End())
-        return String::EMPTY;
-    else
-        return i->second_;
 }
 
 String ResourceCache::GetResourceFileName(const String& name) const
@@ -603,26 +563,7 @@ String ResourceCache::SanitateResourceName(const String& nameIn) const
         name = namePath + GetFileNameAndExtension(name);
     }
 
-    return name;
-}
-
-void ResourceCache::StoreNameHash(const String& name)
-{
-    if (name.Empty())
-        return;
-    
-    StringHash hash(name);
-    
-    // If entry exists, check for difference (collision)
-    HashMap<StringHash, String>::Iterator i = hashToName_.Find(hash);
-    if (i != hashToName_.End())
-    {
-        if (i->second_.Compare(name, false))
-            LOGERROR("Resource hash collision " + i->second_ + " vs " + name);
-        i->second_ = name;
-    }
-    else
-        hashToName_[hash] = name;
+    return name.Trimmed();
 }
 
 void ResourceCache::StoreResourceDependency(Resource* resource, const String& dependency)

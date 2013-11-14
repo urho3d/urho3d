@@ -885,7 +885,7 @@ class ResourceRef
 
 // Properties:
 ShortStringHash type;
-StringHash id;
+String name;
 };
 
 class ResourceRefList
@@ -898,7 +898,7 @@ void Resize(uint);
 uint length;
 /* (readonly) */
 bool empty;
-Array<StringHash> ids;
+Array<String> names;
 ShortStringHash type;
 };
 
@@ -1457,10 +1457,8 @@ bool Exists(const String&) const;
 File GetFile(const String&);
 String GetPreferredResourceDir(const String&) const;
 String SanitateResourceName(const String&) const;
-const String& GetResourceName(StringHash) const;
 String GetResourceFileName(const String&) const;
 Resource GetResource(const String&, const String&);
-Resource GetResource(ShortStringHash, StringHash);
 Resource GetResource(ShortStringHash, const String&);
 
 // Properties:

@@ -231,7 +231,7 @@ void Variant::FromString(VariantType type, const char* value)
                 SetType(VAR_RESOURCEREF);
                 ResourceRef& ref = *(reinterpret_cast<ResourceRef*>(&value_));
                 ref.type_ = values[0];
-                ref.id_ = values[1];
+                ref.name_ = values[1];
             }
         }
         break;
@@ -244,9 +244,9 @@ void Variant::FromString(VariantType type, const char* value)
                 SetType(VAR_RESOURCEREFLIST);
                 ResourceRefList& refList = *(reinterpret_cast<ResourceRefList*>(&value_));
                 refList.type_ = values[0];
-                refList.ids_.Resize(values.Size() - 1);
+                refList.names_.Resize(values.Size() - 1);
                 for (unsigned i = 1; i < values.Size(); ++i)
-                    refList.ids_[i - 1] = values[i];
+                    refList.names_[i - 1] = values[i];
             }
         }
         break;
@@ -332,7 +332,7 @@ String Variant::ToString() const
 
     default:
         // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_VARIANTMAP
-        // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
+        // Reference string serialization requires typehash-to-name mapping from the context. Can not support here
         // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
         return String::EMPTY;
     }
@@ -377,14 +377,14 @@ bool Variant::IsZero() const
         return value_.ptr_ == 0;
 
     case VAR_RESOURCEREF:
-        return reinterpret_cast<const ResourceRef*>(&value_)->id_ == StringHash::ZERO;
+        return reinterpret_cast<const ResourceRef*>(&value_)->name_.Empty();
 
     case VAR_RESOURCEREFLIST:
     {
-        Vector<StringHash> ids = reinterpret_cast<const ResourceRefList*>(&value_)->ids_;
-        for (Vector<StringHash>::ConstIterator i = ids.Begin(); i != ids.End(); ++i)
+        const Vector<String>& names = reinterpret_cast<const ResourceRefList*>(&value_)->names_;
+        for (Vector<String>::ConstIterator i = names.Begin(); i != names.End(); ++i)
         {
-            if (*i != StringHash::ZERO)
+            if (!i->Empty())
                 return false;
         }
         return true;

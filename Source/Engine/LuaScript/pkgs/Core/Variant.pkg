@@ -27,11 +27,11 @@ struct ResourceRef
 {
     ResourceRef();
     ResourceRef(ShortStringHash type);
-    ResourceRef(ShortStringHash type, StringHash id);
+    ResourceRef(ShortStringHash type, String name);
     ResourceRef(const ResourceRef& rhs);
     
     ShortStringHash type_ @ type;
-    StringHash id_ @ id;
+    String name_ @ name;
 
     bool operator == (const ResourceRef& rhs) const;
 };

@@ -382,7 +382,7 @@ void Text::SetEffectDepthBias(float bias)
 void Text::SetFontAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    font_ = cache->GetResource<Font>(value.id_);
+    font_ = cache->GetResource<Font>(value.name_);
 }
 
 ResourceRef Text::GetFontAttr() const

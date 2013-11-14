@@ -172,7 +172,7 @@ void Cursor::SetShapesAttr(VariantVector value)
             ResourceRef ref = value[index++].GetResourceRef();
             IntRect imageRect = value[index++].GetIntRect();
             IntVector2 hotSpot = value[index++].GetIntVector2();
-            DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Image>(ref.id_), imageRect, hotSpot);
+            DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Image>(ref.name_), imageRect, hotSpot);
         }
         else
             index += 3;

@@ -73,14 +73,9 @@ private:
     unsigned memoryUse_;
 };
 
-inline StringHash GetResourceHash(Resource* resource)
+inline const String& GetResourceName(Resource* resource)
 {
-    return resource ? resource->GetNameHash() : StringHash();
-}
-
-inline String GetResourceName(Resource* resource)
-{
-    return resource ? resource->GetName() : String();
+    return resource ? resource->GetName() : String::EMPTY;
 }
 
 inline ShortStringHash GetResourceType(Resource* resource, ShortStringHash defaultType)
@@ -90,21 +85,21 @@ inline ShortStringHash GetResourceType(Resource* resource, ShortStringHash defau
 
 inline ResourceRef GetResourceRef(Resource* resource, ShortStringHash defaultType)
 {
-    return ResourceRef(GetResourceType(resource, defaultType), GetResourceHash(resource));
+    return ResourceRef(GetResourceType(resource, defaultType), GetResourceName(resource));
 }
 
-template <class T> Vector<StringHash> GetResourceHashes(const Vector<SharedPtr<T> >& resources)
+template <class T> Vector<String> GetResourceNames(const Vector<SharedPtr<T> >& resources)
 {
     Vector<StringHash> ret(resources.Size());
     for (unsigned i = 0; i < resources.Size(); ++i)
-        ret[i] = GetResourceHash(resources[i]);
+        ret[i] = GetResourceName(resources[i]);
     
     return ret;
 }
 
 template <class T> ResourceRefList GetResourceRefList(const Vector<SharedPtr<T> >& resources)
 {
-    return ResourceRefList(T::GetTypeStatic(), GetResourceHashes(resources));
+    return ResourceRefList(T::GetTypeStatic(), GetResourceNames(resources));
 }
 
 }

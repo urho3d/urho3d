@@ -498,7 +498,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
 void SoundSource::SetSoundAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Play(cache->GetResource<Sound>(value.id_));
+    Play(cache->GetResource<Sound>(value.name_));
 }
 
 void SoundSource::SetPositionAttr(int value)
