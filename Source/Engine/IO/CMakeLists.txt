@@ -27,4 +27,4 @@ endif()
 define_source_files (GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} PARENT_SCOPE)
 
 # Define dependency libs
-set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/LZ4 PARENT_SCOPE)
+set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/LZ4 PARENT_SCOPE)

@@ -24,6 +24,5 @@
 define_source_files (PARENT_SCOPE)
 
 # Define dependency libs
-set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/AngelScript/include PARENT_SCOPE)
-set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/Bullet/src ../ThirdParty/kNet/include PARENT_SCOPE)
+set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/AngelScript/include ../ThirdParty/Bullet/src ../ThirdParty/kNet/include PARENT_SCOPE)
 

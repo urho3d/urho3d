@@ -107,7 +107,7 @@ set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 # Install dependency for SDL_android_main.c, D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h
 install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
-install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_RUNTIME_DIR}/../templates/android)
+install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_SHARE_DIR}/templates/android)
 
 # Setup target
 setup_library ()

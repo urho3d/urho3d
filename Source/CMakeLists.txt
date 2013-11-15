@@ -43,45 +43,23 @@ if (HAVE_STDINT_H)
     add_definitions (-DHAVE_STDINT_H)
 endif ()
 
-# Add definitions for GLEW
-if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
-    add_definitions (-DGLEW_STATIC)
-    add_definitions (-DGLEW_NO_GLU)
-endif ()
-
-# Add definition for Lua and LuaJIT
-if (ENABLE_LUAJIT)
-    add_definitions (-DENABLE_LUAJIT)
-    set (JIT JIT)
-    # Implied ENABLE_LUA
-    set (ENABLE_LUA 1)
-endif ()
-if (ENABLE_LUA)
-    add_definitions (-DENABLE_LUA)
-endif ()
-
 # Add global include directories for export header and SDL header
 include_directories (${CMAKE_BINARY_DIR}/Engine ThirdParty/SDL/include)
 
-# Setup the compiler flags for building shared library
-if (URHO3D_LIB_TYPE STREQUAL SHARED)
-    # Hide the symbols that are not explicitly marked for export
-    add_compiler_export_flags ()
-    # Use PIC on platforms that support it 
-    set (CMAKE_POSITION_INDEPENDENT_CODE true)
-endif ()
-
-# Setup install destinations
+# Setup SDK install destinations
 if (WIN32)
-    set (DEST_INCLUDE_DIR "Urho3D SDK/Include")
-    set (DEST_RUNTIME_DIR "Urho3D SDK/Bin")
-    set (DEST_LIBRARY_DIR "Urho3D SDK/Lib")
-    set (DEST_ARCHIVE_DIR "Urho3D SDK/Lib")
-    set (DEST_CMAKE_DIR   "Urho3D SDK/CMake")
+    set (PATH_PREFIX "Urho3D SDK")
+    set (DEST_INCLUDE_DIR ${PATH_PREFIX}/Include)
+    set (DEST_RUNTIME_DIR ${PATH_PREFIX}/Bin)
+    set (DEST_LIBRARY_DIR ${PATH_PREFIX}/Lib)
+    set (DEST_ARCHIVE_DIR ${PATH_PREFIX}/Lib)
+    set (DEST_SHARE_DIR ${PATH_PREFIX})
+    set (DEST_PKGCONFIG_DIR ${PATH_PREFIX}/Lib/pkgconfig)
     set (SCRIPT_PATTERN *.bat)
 else ()
-    set (DEST_INCLUDE_DIR include/Urho3D)
-    set (DEST_RUNTIME_DIR share/Urho3D/Bin)
+    set (PATH_SUFFIX /Urho3D)   # This could be patched to "" if the suffix is not desirable
+    set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
+    set (DEST_RUNTIME_DIR share${PATH_SUFFIX}/Bin)
     if (ENABLE_64BIT)
         if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)    # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores ENABLE_64BIT build option
             # Probably target system is a RedHat-based distro
@@ -92,17 +70,22 @@ else ()
         # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
         set (LIB_SUFFIX ${LIB_SUFFIX}/ios)
     endif ()
-    set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/Urho3D)
-    set (DEST_ARCHIVE_DIR lib${LIB_SUFFIX}/Urho3D)
-    set (DEST_CMAKE_DIR share/Urho3D/CMake)
+    set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
+    set (DEST_ARCHIVE_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
+    set (DEST_SHARE_DIR share${PATH_SUFFIX})
+    set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
     set (SCRIPT_PATTERN *.sh)
 endif ()
 # Install application launcher scripts
-install (DIRECTORY ${PROJECT_ROOT_DIR}/Bin/ DESTINATION ${DEST_RUNTIME_DIR} USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN ${SCRIPT_PATTERN})    # Note: the trailing slash is significant
+file (GLOB APP_SCRIPTS ${PROJECT_ROOT_DIR}/Bin/${SCRIPT_PATTERN})
+install (FILES ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR} PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)   # 755
 # Install resource directories required by applications built with Urho3D library
 install (DIRECTORY ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data DESTINATION ${DEST_RUNTIME_DIR} USE_SOURCE_PERMISSIONS)
 # Install CMake modules and toolchains provided by and for Urho3D
-install (DIRECTORY ${PROJECT_ROOT_DIR}/Source/CMake/ DESTINATION ${DEST_CMAKE_DIR} USE_SOURCE_PERMISSIONS)
+install (DIRECTORY ${PROJECT_ROOT_DIR}/Source/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake USE_SOURCE_PERMISSIONS)    # Note: the trailing slash is significant
+# Install CMake launcher scripts
+file (GLOB CMAKE_SCRIPTS ${PROJECT_ROOT_DIR}/${SCRIPT_PATTERN})
+install (FILES ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 # Add targets
 foreach (TARGET AngelScript Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)

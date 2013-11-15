@@ -26,5 +26,4 @@ define_source_files (PARENT_SCOPE)
 # Define dependency libs
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)
     set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/LibCpuId/src PARENT_SCOPE)
-    set (ENGINE_LINK_LIBS_ONLY ${ENGINE_LINK_LIBS_ONLY} LibCpuId PARENT_SCOPE)
 endif ()

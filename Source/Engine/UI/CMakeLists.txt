@@ -24,4 +24,4 @@
 define_source_files (PARENT_SCOPE)
 
 # Define dependency libs
-set (ENGINE_LIBS ${ENGINE_LIBS} ../ThirdParty/FreeType/include PARENT_SCOPE)
+set (ENGINE_INCLUDE_DIRS_ONLY ${ENGINE_INCLUDE_DIRS_ONLY} ../ThirdParty/FreeType/include PARENT_SCOPE)

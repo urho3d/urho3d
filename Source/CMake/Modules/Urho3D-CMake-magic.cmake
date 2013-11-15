@@ -61,8 +61,7 @@ endif ()
 # Enable file watcher support for automatic resource reloads.
 add_definitions (-DENABLE_FILEWATCHER)
 
-# Enable profiling. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not
-# instantiated.
+# Enable profiling. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not instantiated.
 add_definitions (-DENABLE_PROFILING)
 
 # Enable logging. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
@@ -84,6 +83,23 @@ endif ()
 # If not on Windows, enable Unix mode for kNet library.
 if (NOT WIN32)
     add_definitions (-DUNIX)
+endif ()
+
+# Add definitions for GLEW
+if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
+    add_definitions (-DGLEW_STATIC)
+    add_definitions (-DGLEW_NO_GLU)
+endif ()
+
+# Add definition for Lua and LuaJIT
+if (ENABLE_LUAJIT)
+    add_definitions (-DENABLE_LUAJIT)
+    set (JIT JIT)
+    # Implied ENABLE_LUA
+    set (ENABLE_LUA 1)
+endif ()
+if (ENABLE_LUA)
+    add_definitions (-DENABLE_LUA)
 endif ()
 
 # Default library type is STATIC
@@ -412,12 +428,12 @@ macro (add_android_native_init)
     elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         # Use Urho3D source installation
         list (APPEND SOURCE_FILES $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-    elseif (EXISTS $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
-        # Use Urho3D SDK installation on non-default installation location
-        list (APPEND SOURCE_FILES $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
-    elseif (EXISTS ${CMAKE_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
+    elseif (EXISTS $ENV{URHO3D_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
+        # Use Urho3D SDK installation on non-default installation location (PATH_SUFFIX variable is set in FindUrho3D.cmake module)
+        list (APPEND SOURCE_FILES $ENV{URHO3D_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
+    elseif (EXISTS ${CMAKE_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
         # Use Urho3D SDK installation on system default installation location
-        list (APPEND SOURCE_FILES ${CMAKE_INSTALL_PREFIX}/share/Urho3D/templates/android/SDL_android_main.c)
+        list (APPEND SOURCE_FILES ${CMAKE_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
     else ()
         message (FATAL_ERROR
             "Could not find SDL_android_main.c source file in default SDK installation location or Urho3D project root tree. "
@@ -521,9 +537,6 @@ macro (define_dependency_libs TARGET)
     if (ENABLE_LUAJIT AND ${TARGET} MATCHES LuaJIT|Urho3D)
         if (NOT WIN32)
             list (APPEND LINK_LIBS_ONLY dl m)
-            if (NOT APPLE)
-                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
-            endif ()
         endif ()
     endif ()
 
@@ -557,6 +570,11 @@ macro (define_dependency_libs TARGET)
         if (URHO3D_LIBRARIES)
             list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
         endif ()
+
+        # GCC-specific executable linker flag for LuaJIT
+        if (ENABLE_LUAJIT AND NOT WIN32 AND NOT APPLE)
+            set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
+        endif ()
     endif ()
 
     if (LINK_LIBS_ONLY)
@@ -566,8 +584,10 @@ endmacro ()
 
 # Macro for sorting and removing duplicate values
 macro (remove_duplicate LIST_NAME)
-    list (SORT ${LIST_NAME})
-    list (REMOVE_DUPLICATES ${LIST_NAME})
+    if (${LIST_NAME})
+        list (SORT ${LIST_NAME})
+        list (REMOVE_DUPLICATES ${LIST_NAME})
+    endif ()
 endmacro ()
 
 # Macro for setting a list from another with option to sort and remove duplicate values

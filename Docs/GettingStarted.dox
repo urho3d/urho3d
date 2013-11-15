@@ -269,10 +269,6 @@ F2          Toggle debug HUD
 
 This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. It is imperative to clear the CMake cache when changing from one approach to the other. In fact, you also need to clear the cache when any of the environment variables required by the CMake build script below change its value.
 
-\section UsingLibraryFromProjectRootTree From Urho3D project root tree
-
-This section assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find Urho3D library in Urho3D project library output directory, specify an environment variable called "URHO3D_HOME" which points to a Urho3D project root directory that you want to use (if you have more than one).
-
 First of all, structure your project similar to Urho3D project as below:
 
 \code
@@ -280,11 +276,16 @@ PROJECT_ROOT/
 L Source/
 L Bin/
 L Build/
+L *.bat or *.sh
 \endcode
 
-The Source/ directory is where your project CMakeLists.txt and all your source codes should reside. The Bin/ directory is where all the executables output will be generated. In order to run the executable in this directory, you need to copy (or symlink) the CoreData/ and Data/ directories from Urho3D project Bin/ directory to here. The Build/ directory will be created automatically by the Urho3D CMake module that will be discussed shortly below. The module creates a so-called out-of-source build tree to keep the Source/ directory clean from intermediate build files.
+The Source/ directory is where your project CMakeLists.txt and all your source codes should reside. The Bin/ directory is where all the executables output will be generated. In order to run the executable in this directory, you need to copy (or symlink) the CoreData/ and Data/ directories from Urho3D project Bin/ directory (or from Urho3D SDK installation) to here. You may also want to copy (or symlink) the batch files or shell script files from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. The Build/ directory will be created automatically by the Urho3D CMake module that will be discussed shortly below. The *.bat or *.sh scripts work together with the module to create a so-called out-of-source build tree to keep the Source/ directory clean from intermediate build files.
 
-Now, in your own project Source/ directory, create a new CMakeLists.txt file and add the following lines:
+\section UsingLibraryFromProjectRootTree From Urho3D project root tree
+
+This section assumes that you have already successfully build a static or shared library in the Urho3D project (separately from your own project). In order to find Urho3D library in Urho3D project library output directory, specify an environment variable called "URHO3D_HOME" which points to a Urho3D project root directory that you want to use (if you have more than one).
+
+In your own project Source/ directory, create a new CMakeLists.txt file and add the following lines:
 
 \code
 # Set project name
@@ -347,6 +348,14 @@ On non-Windows platform:
 \code
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/CMake/Modules ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+\endcode
+
+\subsection UsingLibraryFromSDKWithPkgConfig Using pkg-config instead of CMake 
+
+If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of Urho3D.pc configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. For example on Fedora with local installation:
+
+\code
+cc `PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig pkg-config --cflags --libs Urho3D` -o myapp myapp.cpp
 \endcode
 
 \page Structure Overall structure

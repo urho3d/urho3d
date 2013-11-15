@@ -157,6 +157,23 @@ if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOUR
 endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
 
+# Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
+get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
+list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU)     # Remove those defines that are only used for building the library and not needed by library user
+string (REPLACE ";" " -D" URHO3D_COMPILE_DEFINITIONS ";${URHO3D_COMPILE_DEFINITIONS}")
+set (URHO3D_EXT_LIBS ${LINK_LIBS_ONLY})
+string (REPLACE ";" " -l" URHO3D_EXT_LIBS ";${URHO3D_EXT_LIBS}")
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR})
+
+# Setup the compiler flags for building shared library (do this here so that it does not interfere with the pkg-config file generation above)
+if (URHO3D_LIB_TYPE STREQUAL SHARED)
+    # Hide the symbols that are not explicitly marked for export
+    add_compiler_export_flags ()
+    # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
+    set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true) 
+endif ()
+
 # Define post build steps
 # Strip the output shared library for embedded devices
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
