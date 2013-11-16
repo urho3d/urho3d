@@ -39,7 +39,7 @@ class AnimationController : public Component
     unsigned char GetLayer(const String name) const;
     Bone* GetStartBone(const String name) const;
     const String GetStartBoneName(const String name) const;
-    
+
     float GetTime(const String name) const;
     float GetWeight(const String name) const;
     bool IsLooped(const String name) const;
@@ -48,4 +48,7 @@ class AnimationController : public Component
     float GetFadeTarget(const String name) const;
     float GetFadeTime(const String name) const;
     float GetAutoFade(const String name) const;
+    
+    AnimationState* GetAnimationState(const String name) const;
+    AnimationState* GetAnimationState(StringHash nameHash) const;
 };

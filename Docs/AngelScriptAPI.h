@@ -3215,8 +3215,9 @@ class AnimationState
 void AddWeight(float);
 void AddTime(float);
 void Apply();
-void SetBoneWeight(uint, float);
-void SetBoneWeight(StringHash, float);
+void SetBoneWeight(uint, float, bool = false);
+void SetBoneWeight(const String&, float, bool = false);
+void SetBoneWeight(StringHash, float, bool = false);
 float GetBoneWeight(uint) const;
 float GetBoneWeight(StringHash) const;
 uint GetTrackIndex(const String&) const;
@@ -3386,6 +3387,8 @@ float GetLength(const String&) const;
 float GetSpeed(const String&) const;
 float GetAutoFade(const String&) const;
 float GetFadeTarget(const String&) const;
+AnimationState GetAnimationState(const String&) const;
+AnimationState GetAnimationState(StringHash) const;
 
 // Properties:
 /* (readonly) */

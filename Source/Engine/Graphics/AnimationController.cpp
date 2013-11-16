@@ -487,6 +487,29 @@ float AnimationController::GetAutoFade(const String& name) const
     return index != M_MAX_UNSIGNED ? animations_[index].autoFadeTime_ : 0.0f;
 }
 
+AnimationState* AnimationController::GetAnimationState(const String& name) const
+{
+    return GetAnimationState(StringHash(name));
+}
+
+AnimationState* AnimationController::GetAnimationState(StringHash nameHash) const
+{
+    // Model mode
+    AnimatedModel* model = GetComponent<AnimatedModel>();
+    if (model)
+        return model->GetAnimationState(nameHash);
+    
+    // Node hierarchy mode
+    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = nodeAnimationStates_.Begin(); i != nodeAnimationStates_.End(); ++i)
+    {
+        Animation* animation = (*i)->GetAnimation();
+        if (animation->GetNameHash() == nameHash || animation->GetAnimationNameHash() == nameHash)
+            return *i;
+    }
+    
+    return 0;
+}
+
 void AnimationController::SetAnimationsAttr(VariantVector value)
 {
     animations_.Clear();
@@ -773,24 +796,6 @@ void AnimationController::RemoveAnimationState(AnimationState* state)
             return;
         }
     }
-}
-
-AnimationState* AnimationController::GetAnimationState(StringHash nameHash) const
-{
-    // Model mode
-    AnimatedModel* model = GetComponent<AnimatedModel>();
-    if (model)
-        return model->GetAnimationState(nameHash);
-    
-    // Node hierarchy mode
-    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = nodeAnimationStates_.Begin(); i != nodeAnimationStates_.End(); ++i)
-    {
-        Animation* animation = (*i)->GetAnimation();
-        if (animation->GetNameHash() == nameHash || animation->GetAnimationNameHash() == nameHash)
-            return *i;
-    }
-    
-    return 0;
 }
 
 void AnimationController::FindAnimation(const String& name, unsigned& index, AnimationState*& state) const

@@ -10,9 +10,9 @@ class AnimationState
     void SetLooped(bool looped);
     void SetWeight(float weight);
     void SetTime(float time);
-    void SetBoneWeight(unsigned index, float weight);
-    void SetBoneWeight(const String name, float weight);
-    void SetBoneWeight(StringHash nameHash, float weight);
+    void SetBoneWeight(unsigned index, float weight, bool recursive = false);
+    void SetBoneWeight(const String name, float weight, bool recursive = false);
+    void SetBoneWeight(StringHash nameHash, float weight, bool recursive = false);
     void AddWeight(float delta);
     void AddTime(float delta);
     void SetLayer(unsigned char layer);
