@@ -273,10 +273,10 @@ First of all, structure your project similar to Urho3D project as below:
 
 \code
 PROJECT_ROOT/
-L Source/
-L Bin/
-L Build/
-L *.bat or *.sh
+ ┝ Source/
+ ┝ Build/
+ ┝ Bin/
+ ┕ *.bat or *.sh
 \endcode
 
 The Source/ directory is where your project CMakeLists.txt and all your source codes should reside. The Bin/ directory is where all the executables output will be generated. In order to run the executable in this directory, you need to copy (or symlink) the CoreData/ and Data/ directories from Urho3D project Bin/ directory (or from Urho3D SDK installation) to here. You may also want to copy (or symlink) the batch files or shell script files from Urho3D project root directory (or from Urho3D SDK installation) to your project root directory. The Build/ directory will be created automatically by the Urho3D CMake module that will be discussed shortly below. The *.bat or *.sh scripts work together with the module to create a so-called out-of-source build tree to keep the Source/ directory clean from intermediate build files.
@@ -336,26 +336,37 @@ The setup_main_executable() macro then uses SOURCE_FILES and TARGET_NAME variabl
 
 This section assumes that you have already installed Urho3D SDK into your system. If you have installed the SDK in a non-default location then you need to use "URHO3D_INSTALL_PREFIX" environment variable to specify the prefix path of the non-default installation location.
 
-In your own project Source/ directory, create a new CMakeLists.txt file similar to the first approach but change the CMake module path setup to read as follows on Windows platform:
+In your own project Source/ directory, create a new CMakeLists.txt file similar to the first approach but change the CMake module search path setup to read as follows on Windows platform:
 
 \code
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH "$ENV{URHO3D_INSTALL_PREFIX}/Urho3D SDK/CMake/Modules" "${CMAKE_INSTALL_PREFIX}/Urho3D SDK/CMake/Modules" CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
 
-On non-Windows platform:
+On non-Windows platform, assuming Urho3D SDK is being built with PATH_SUFFIX set to 'Urho3D' (default):
 
 \code
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/CMake/Modules ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/cmake/Modules ${CMAKE_INSTALL_PREFIX}/share/Urho3D/cmake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
+
+If the PATH_SUFFIX is not set (i.e. empty string) then replace 'share/Urho3D/cmake' to just 'share/cmake' in the above path. Note that 'cmake' is in lower case letter.
 
 \subsection UsingLibraryFromSDKWithPkgConfig Using pkg-config instead of CMake 
 
-If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of Urho3D.pc configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. For example on Fedora with local installation:
+If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of Urho3D.pc configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. Below are a few invocation examples on a 64-bit RedHat-based distro with local installation:
 
 \code
-cc `PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig pkg-config --cflags --libs Urho3D` -o myapp myapp.cpp
+# To get installed Urho3D version
+PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig pkg-config --modversion Urho3D
+
+# To compile and link in one liner
+c++ -o Urho3DPlayer Urho3DPlayer.cpp `PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig pkg-config --cflags --libs Urho3D`
+
+# To compile and link separately
+export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig
+c++ -c Urho3DPlayer.cpp `pkg-config --cflags Urho3D`
+c++ -o Urho3DPlayer Urho3DPlayer.o `pkg-config --libs Urho3D`
 \endcode
 
 \page Structure Overall structure
