@@ -8,5 +8,5 @@ Description: Urho3D is a lightweight, cross-platform rendering and game engine i
 Version: 1.3.0
 Requires:
 Conflicts:
-Cflags: @URHO3D_COMPILE_DEFINITIONS@ @CMAKE_CXX_FLAGS@ -I${includedir} -I${includedir}/Bullet -I${includedir}/kNet -I${includedir}/SDL
-Libs: @CMAKE_EXE_LINKER_FLAGS@ -L${libdir} -lUrho3D @URHO3D_EXT_LIBS@
+Cflags: @URHO3D_COMPILE_DEFINITIONS@ @CMAKE_CXX_FLAGS@ @URHO3D_INCLUDE_DIRS@
+Libs: @CMAKE_EXE_LINKER_FLAGS@ -L${libdir} @URHO3D_LIBS@

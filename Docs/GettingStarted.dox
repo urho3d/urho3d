@@ -343,14 +343,12 @@ In your own project Source/ directory, create a new CMakeLists.txt file similar 
 set (CMAKE_MODULE_PATH "$ENV{URHO3D_INSTALL_PREFIX}/Urho3D SDK/CMake/Modules" "${CMAKE_INSTALL_PREFIX}/Urho3D SDK/CMake/Modules" CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
 
-On non-Windows platform, assuming Urho3D SDK is being built with PATH_SUFFIX set to 'Urho3D' (default):
+On non-Windows platform:
 
 \code
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/cmake/Modules ${CMAKE_INSTALL_PREFIX}/share/Urho3D/cmake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+set (CMAKE_MODULE_PATH $ENV{URHO3D_INSTALL_PREFIX}/share/Urho3D/CMake/Modules ${CMAKE_INSTALL_PREFIX}/share/Urho3D/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
 \endcode
-
-If the PATH_SUFFIX is not set (i.e. empty string) then replace 'share/Urho3D/cmake' to just 'share/cmake' in the above path. Note that 'cmake' is in lower case letter.
 
 \subsection UsingLibraryFromSDKWithPkgConfig Using pkg-config instead of CMake 
 

@@ -57,7 +57,7 @@ if (WIN32)
     set (DEST_PKGCONFIG_DIR ${PATH_PREFIX}/Lib/pkgconfig)
     set (SCRIPT_PATTERN *.bat)
 else ()
-    set (PATH_SUFFIX /Urho3D)   # This could be patched to "" if the suffix is not desirable
+    set (PATH_SUFFIX /Urho3D)
     set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
     set (DEST_RUNTIME_DIR share${PATH_SUFFIX}/Bin)
     if (ENABLE_64BIT)
@@ -70,8 +70,8 @@ else ()
         # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
         set (LIB_SUFFIX ${LIB_SUFFIX}/ios)
     endif ()
-    set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
-    set (DEST_ARCHIVE_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})
+    set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})   # The ${PATH_SUFFIX} could be removed if the suffix is not desirable
+    set (DEST_ARCHIVE_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})   # idem
     set (DEST_SHARE_DIR share${PATH_SUFFIX})
     set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
     set (SCRIPT_PATTERN *.sh)
@@ -81,8 +81,8 @@ file (GLOB APP_SCRIPTS ${PROJECT_ROOT_DIR}/Bin/${SCRIPT_PATTERN})
 install (FILES ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR} PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)   # 755
 # Install resource directories required by applications built with Urho3D library
 install (DIRECTORY ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data DESTINATION ${DEST_RUNTIME_DIR} USE_SOURCE_PERMISSIONS)
-# Install CMake modules and toolchains provided by and for Urho3D (the destination uses 'cmake' in small letter case intentionally)
-install (DIRECTORY ${PROJECT_ROOT_DIR}/Source/CMake/ DESTINATION ${DEST_SHARE_DIR}/cmake USE_SOURCE_PERMISSIONS)    # Note: the trailing slash is significant
+# Install CMake modules and toolchains provided by and for Urho3D
+install (DIRECTORY ${PROJECT_ROOT_DIR}/Source/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake USE_SOURCE_PERMISSIONS)    # Note: the trailing slash is significant
 # Install CMake launcher scripts
 file (GLOB CMAKE_SCRIPTS ${PROJECT_ROOT_DIR}/${SCRIPT_PATTERN})
 install (FILES ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
