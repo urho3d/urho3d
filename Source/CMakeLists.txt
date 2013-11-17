@@ -43,9 +43,6 @@ if (HAVE_STDINT_H)
     add_definitions (-DHAVE_STDINT_H)
 endif ()
 
-# Add global include directories for export header and SDL header
-include_directories (${CMAKE_BINARY_DIR}/Engine ThirdParty/SDL/include)
-
 # Setup SDK install destinations
 if (WIN32)
     set (PATH_PREFIX "Urho3D SDK")

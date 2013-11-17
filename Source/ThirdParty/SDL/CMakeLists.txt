@@ -110,5 +110,8 @@ install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL USE_SOURCE_PERMI
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} SDL PARENT_SCOPE)
 install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_SHARE_DIR}/templates/android)
 
+# Define dependency libs
+set (INCLUDE_DIRS_ONLY include)
+
 # Setup target
 setup_library ()

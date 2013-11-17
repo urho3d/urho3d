@@ -562,7 +562,11 @@ macro (define_dependency_libs TARGET)
                 list (APPEND LINK_LIBS_ONLY GL)
             endif ()
         else ()
-            list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARY})
+            if (IS_ABSOLUTE ${DIRECT3D_LIBRARY})
+                list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARY})
+            else ()
+                list (APPEND LINK_LIBS_ONLY ${DIRECT3D_LIBRARY})
+            endif ()
         endif ()
 
         # This variable value can either be 'Urho3D' target or an absolute path to an actual static/shared Urho3D library
@@ -572,7 +576,7 @@ macro (define_dependency_libs TARGET)
         endif ()
 
         # GCC-specific executable linker flag for LuaJIT
-        if (ENABLE_LUAJIT AND NOT WIN32 AND NOT APPLE)
+        if (ENABLE_LUAJIT AND NOT WIN32 AND NOT APPLE AND NOT ANDROID)
             set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
         endif ()
     endif ()

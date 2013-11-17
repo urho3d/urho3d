@@ -358,13 +358,19 @@ If for some reason you could not use CMake in your project, you could configure 
 # To get installed Urho3D version
 PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig pkg-config --modversion Urho3D
 
-# To compile and link in one liner
+# To compile and link natively in one liner
 c++ -o Urho3DPlayer Urho3DPlayer.cpp `PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig pkg-config --cflags --libs Urho3D`
 
-# To compile and link separately
+# To compile and link natively but in separate steps
 export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig
 c++ -c Urho3DPlayer.cpp `pkg-config --cflags Urho3D`
 c++ -o Urho3DPlayer Urho3DPlayer.o `pkg-config --libs Urho3D`
+
+# To cross-compile and link for Raspberry Pi platform
+export CC=${RASPI_TOOL}/arm-linux-gnueabihf-c++
+export PKG_CONFIG_SYSROOT_DIR=${RASPI_ROOT}
+export PKG_CONFIG_PATH=${RASPI_ROOT}/usr/local/lib/pkgconfig
+$CC -o Urho3DPlayer Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D`
 \endcode
 
 \page Structure Overall structure

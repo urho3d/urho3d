@@ -158,15 +158,24 @@ endif ()
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
-get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
-list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU)     # Remove those defines that are only used for building the library and not needed by library user
-string (REPLACE ";" " -D" URHO3D_COMPILE_DEFINITIONS ";${URHO3D_COMPILE_DEFINITIONS}")
-set (URHO3D_LIBS ${LINK_LIBS_ONLY})
-string (REPLACE ";" " -l" URHO3D_LIBS "-lUrho3D;${URHO3D_LIBS}")
-set (URHO3D_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS})
-string (REPLACE ";" " -I\${includedir}/" URHO3D_INCLUDE_DIRS "-I\${includedir};${URHO3D_INCLUDE_DIRS}")
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR})
+if (NOT ANDROID AND NOT IOS)
+    set (SYSROOT ${RASPI_SYSROOT})  # SYSROOT is empty for native build
+    string (REPLACE "${SYSROOT}" "" DEST_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+    get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
+    list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU)     # Remove those defines that are only used for building the library and not needed by library user
+    string (REPLACE ";" " -D" URHO3D_COMPILE_DEFINITIONS ";${URHO3D_COMPILE_DEFINITIONS}")
+    string (REPLACE ";" " " URHO3D_ABS_PATH_LIBS "${ABSOLUTE_PATH_LIBS}")   # Note: need to always "stringify" a variable in list context for replace to work correctly, besides the list could be empty
+    string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" URHO3D_ABS_PATH_LIBS "${URHO3D_ABS_PATH_LIBS}") 
+    string (REPLACE ";" " -l" URHO3D_LIBS "-lUrho3D;${LINK_LIBS_ONLY}")
+    get_directory_property (GLOBAL_INCLUDE_DIRS DIRECTORY ${CMAKE_SOURCE_DIR} INCLUDE_DIRECTORIES)
+    if (GLOBAL_INCLUDE_DIRS)
+        string (REPLACE ";" " -I" GLOBAL_INCLUDE_DIRS ";${GLOBAL_INCLUDE_DIRS}")
+        string (REPLACE "${SYSROOT}" "" GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS})
+    endif ()
+    string (REPLACE ";" " -I\${includedir}/" URHO3D_INCLUDE_DIRS "-I\${includedir};${INSTALL_INCLUDE_DIRS}")
+    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc @ONLY)
+    install (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc DESTINATION ${DEST_PKGCONFIG_DIR})
+endif ()
 
 # Setup the compiler flags for building shared library (do this here so that it does not interfere with the pkg-config file generation above)
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
@@ -175,6 +184,9 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
     # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true) 
 endif ()
+
+# Add include directories to find the export header and SDL header for building Urho3D library
+include_directories (${CMAKE_BINARY_DIR}/Engine ../ThirdParty/SDL/include)
 
 # Define post build steps
 # Strip the output shared library for embedded devices

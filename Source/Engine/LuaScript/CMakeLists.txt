@@ -63,7 +63,7 @@ install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
 set (LINK_LIBS_ONLY tolua++_static)
 set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource ../Scene ../UI
-    ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/tolua++/include)
+    ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/SDL/include ../../ThirdParty/tolua++/include ${CMAKE_BINARY_DIR}/Engine)
 
 # Setup target
 setup_library ()
