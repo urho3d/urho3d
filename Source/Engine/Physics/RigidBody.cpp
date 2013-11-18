@@ -715,74 +715,74 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
 
 void RigidBody::UpdateMass()
 {
-    if (body_)
+    if (!body_)
+        return;
+    
+    btTransform principal;
+    principal.setRotation(btQuaternion::getIdentity());
+    principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
+    
+    // Calculate center of mass shift from all the collision shapes
+    unsigned numShapes = compoundShape_->getNumChildShapes();
+    if (numShapes)
     {
-        btTransform principal;
-        principal.setRotation(btQuaternion::getIdentity());
-        principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
-        
-        // Calculate center of mass shift from all the collision shapes
-        unsigned numShapes = compoundShape_->getNumChildShapes();
-        if (numShapes)
-        {
-            PODVector<float> masses(numShapes);
-            for (unsigned i = 0; i < numShapes; ++i)
-            {
-                // The actual mass does not matter, divide evenly between child shapes
-                masses[i] = 1.0f;
-            }
-            
-            btVector3 inertia(0.0f, 0.0f, 0.0f);
-            compoundShape_->calculatePrincipalAxisTransform(&masses[0], principal, inertia);
-        }
-        
-        // Add child shapes to shifted compound shape with adjusted offset
-        while (shiftedCompoundShape_->getNumChildShapes())
-            shiftedCompoundShape_->removeChildShapeByIndex(shiftedCompoundShape_->getNumChildShapes() - 1);
+        PODVector<float> masses(numShapes);
         for (unsigned i = 0; i < numShapes; ++i)
         {
-            btTransform adjusted = compoundShape_->getChildTransform(i);
-            adjusted.setOrigin(adjusted.getOrigin() - principal.getOrigin());
-            shiftedCompoundShape_->addChildShape(adjusted, compoundShape_->getChildShape(i));
+            // The actual mass does not matter, divide evenly between child shapes
+            masses[i] = 1.0f;
         }
         
-        // If shifted compound shape has only one child with no offset/rotation, use the child shape
-        // directly as the rigid body collision shape for better collision detection performance
-        bool useCompound = !numShapes || numShapes > 1;
-        if (!useCompound)
-        {
-            const btTransform& childTransform = shiftedCompoundShape_->getChildTransform(0);
-            if (!ToVector3(childTransform.getOrigin()).Equals(Vector3::ZERO) ||
-                !ToQuaternion(childTransform.getRotation()).Equals(Quaternion::IDENTITY))
-                useCompound = true;
-        }
-        body_->setCollisionShape(useCompound ? shiftedCompoundShape_ : shiftedCompoundShape_->getChildShape(0));
-        
-        // If we have one shape and this is a triangle mesh, we use a custom material callback in order to adjust internal edges
-        if (!useCompound && body_->getCollisionShape()->getShapeType() == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE &&
-            physicsWorld_->GetInternalEdge())
-            body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-        else
-            body_->setCollisionFlags(body_->getCollisionFlags() & ~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+        btVector3 inertia(0.0f, 0.0f, 0.0f);
+        compoundShape_->calculatePrincipalAxisTransform(&masses[0], principal, inertia);
+    }
+    
+    // Add child shapes to shifted compound shape with adjusted offset
+    while (shiftedCompoundShape_->getNumChildShapes())
+        shiftedCompoundShape_->removeChildShapeByIndex(shiftedCompoundShape_->getNumChildShapes() - 1);
+    for (unsigned i = 0; i < numShapes; ++i)
+    {
+        btTransform adjusted = compoundShape_->getChildTransform(i);
+        adjusted.setOrigin(adjusted.getOrigin() - principal.getOrigin());
+        shiftedCompoundShape_->addChildShape(adjusted, compoundShape_->getChildShape(i));
+    }
+    
+    // If shifted compound shape has only one child with no offset/rotation, use the child shape
+    // directly as the rigid body collision shape for better collision detection performance
+    bool useCompound = !numShapes || numShapes > 1;
+    if (!useCompound)
+    {
+        const btTransform& childTransform = shiftedCompoundShape_->getChildTransform(0);
+        if (!ToVector3(childTransform.getOrigin()).Equals(Vector3::ZERO) ||
+            !ToQuaternion(childTransform.getRotation()).Equals(Quaternion::IDENTITY))
+            useCompound = true;
+    }
+    body_->setCollisionShape(useCompound ? shiftedCompoundShape_ : shiftedCompoundShape_->getChildShape(0));
+    
+    // If we have one shape and this is a triangle mesh, we use a custom material callback in order to adjust internal edges
+    if (!useCompound && body_->getCollisionShape()->getShapeType() == SCALED_TRIANGLE_MESH_SHAPE_PROXYTYPE &&
+        physicsWorld_->GetInternalEdge())
+        body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+    else
+        body_->setCollisionFlags(body_->getCollisionFlags() & ~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
-        // Reapply rigid body position with new center of mass shift
-        Vector3 oldPosition = GetPosition();
-        centerOfMass_ = ToVector3(principal.getOrigin());
-        SetPosition(oldPosition);
-        
-        // Calculate final inertia
-        btVector3 localInertia(0.0f, 0.0f, 0.0f);
-        if (mass_ > 0.0f)
-            shiftedCompoundShape_->calculateLocalInertia(mass_, localInertia);
-        body_->setMassProps(mass_, localInertia);
-        body_->updateInertiaTensor();
-        
-        // Reapply constraint positions for new center of mass shift
-        if (node_)
-        {
-            for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
-                (*i)->ApplyFrames();
-        }
+    // Reapply rigid body position with new center of mass shift
+    Vector3 oldPosition = GetPosition();
+    centerOfMass_ = ToVector3(principal.getOrigin());
+    SetPosition(oldPosition);
+    
+    // Calculate final inertia
+    btVector3 localInertia(0.0f, 0.0f, 0.0f);
+    if (mass_ > 0.0f)
+        shiftedCompoundShape_->calculateLocalInertia(mass_, localInertia);
+    body_->setMassProps(mass_, localInertia);
+    body_->updateInertiaTensor();
+    
+    // Reapply constraint positions for new center of mass shift
+    if (node_)
+    {
+        for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
+            (*i)->ApplyFrames();
     }
 }
 
