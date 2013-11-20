@@ -553,6 +553,8 @@ private:
     IntVector2 GetLayoutChildPosition(UIElement* child);
     /// Detach from parent.
     void Detach();
+    /// Verify that child elements have proper alignment for layout mode.
+    void VerifyChildAlignment();
 
     /// Size.
     IntVector2 size_;

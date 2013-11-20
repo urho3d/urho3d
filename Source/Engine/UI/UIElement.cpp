@@ -682,21 +682,38 @@ void UIElement::SetFixedHeight(int height)
 
 void UIElement::SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
 {
-    horizontalAlignment_ = hAlign;
-    verticalAlignment_ = vAlign;
-    MarkDirty();
+    SetHorizontalAlignment(hAlign);
+    SetVerticalAlignment(vAlign);
 }
 
 void UIElement::SetHorizontalAlignment(HorizontalAlignment align)
 {
-    horizontalAlignment_ = align;
-    MarkDirty();
+    if (align != HA_LEFT && parent_ && parent_->GetLayoutMode() == LM_HORIZONTAL)
+    {
+        LOGWARNING("Forcing left alignment because parent element has horizontal layout");
+        align = HA_LEFT;
+    }
+
+    if (horizontalAlignment_ != align)
+    {
+        horizontalAlignment_ = align;
+        MarkDirty();
+    }
 }
 
 void UIElement::SetVerticalAlignment(VerticalAlignment align)
 {
-    verticalAlignment_ = align;
-    MarkDirty();
+    if (align != VA_TOP && parent_ && parent_->GetLayoutMode() == LM_VERTICAL)
+    {
+        LOGWARNING("Forcing top alignment because parent element has vertical layout");
+        align = VA_TOP;
+    }
+
+    if (verticalAlignment_ != align)
+    {
+        verticalAlignment_ = align;
+        MarkDirty();
+    }
 }
 
 void UIElement::SetClipBorder(const IntRect& rect)
@@ -884,12 +901,14 @@ void UIElement::SetLayout(LayoutMode mode, int spacing, const IntRect& border)
     layoutMode_ = mode;
     layoutSpacing_ = Max(spacing, 0);
     layoutBorder_ = IntRect(Max(border.left_, 0), Max(border.top_, 0), Max(border.right_, 0), Max(border.bottom_, 0));
+    VerifyChildAlignment();
     UpdateLayout();
 }
 
 void UIElement::SetLayoutMode(LayoutMode mode)
 {
     layoutMode_ = mode;
+    VerifyChildAlignment();
     UpdateLayout();
 }
 
@@ -973,10 +992,7 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            HorizontalAlignment horizontalAlignment = children_[i]->horizontalAlignment_;
-            children_[i]->horizontalAlignment_ = HA_LEFT;
             children_[i]->SetPosition(positions[j], GetLayoutChildPosition(children_[i]).y_);
-            children_[i]->horizontalAlignment_ = horizontalAlignment;
             children_[i]->SetSize(sizes[j], height - layoutBorder_.top_ - layoutBorder_.bottom_);
             ++j;
         }
@@ -1015,10 +1031,7 @@ void UIElement::UpdateLayout()
         {
             if (!children_[i]->IsVisible())
                 continue;
-            VerticalAlignment verticalAlignment = children_[i]->verticalAlignment_;
-            children_[i]->verticalAlignment_ = VA_TOP;
             children_[i]->SetPosition(GetLayoutChildPosition(children_[i]).x_ + baseIndentWidth, positions[j]);
-            children_[i]->verticalAlignment_ = verticalAlignment;
             children_[i]->SetSize(width - layoutBorder_.left_ - layoutBorder_.right_, sizes[j]);
             ++j;
         }
@@ -1150,6 +1163,7 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
     if (!previousStyleFile && !element->appliedStyle_.Empty() && GetDefaultStyle())
         element->SetStyle(element->appliedStyle_);
 
+    VerifyChildAlignment();
     UpdateLayout();
 
     // Send change event
@@ -1835,4 +1849,15 @@ void UIElement::Detach()
     MarkDirty();
 }
 
+void UIElement::VerifyChildAlignment()
+{
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        // Reapply child alignments. If they are illegal compared to layout, they will be set left/top as neded
+        (*i)->SetHorizontalAlignment((*i)->GetHorizontalAlignment());
+        (*i)->SetVerticalAlignment((*i)->GetVerticalAlignment());
+    }
 }
+
+}
+

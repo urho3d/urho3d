@@ -629,10 +629,11 @@ Menu@ CreateMenuItem(const String&in title, MENU_CALLBACK@ callback = null, int 
 
     if (accelKey != 0)
     {
-        int minWidth = menuText.minWidth;
-        menuText.layoutMode = LM_HORIZONTAL;
-        menuText.AddChild(CreateAccelKeyText(accelKey, accelQual));
-        menuText.minWidth = minWidth;
+        UIElement@ spacer = UIElement();
+        spacer.minWidth = menuText.indentSpacing;
+        spacer.height = menuText.height;
+        menu.AddChild(spacer);
+        menu.AddChild(CreateAccelKeyText(accelKey, accelQual));
     }
 
     return menu;
@@ -722,8 +723,7 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
     Text@ accelKeyText = Text();
     accelKeyText.defaultStyle = uiStyle;
     accelKeyText.style = "EditorMenuText";
-    accelKeyText.horizontalAlignment = HA_RIGHT;
-    accelKeyText.indent = 1;
+    accelKeyText.textAlignment = HA_RIGHT;
 
     String text;
     if (accelKey == KEY_DELETE)
