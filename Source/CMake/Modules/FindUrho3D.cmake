@@ -87,14 +87,14 @@ if (URHO3D_HOME)
 else ()
     # If Urho3D SDK is not being installed in the default system location, use the URHO3D_INSTALL_PREFIX environment variable to specify the prefix path to that location
     # Note that the prefix path should not contain the "/include" or "/lib"
-    # For example on Linux platform: URHO3D_INSTALL_PREFIX=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local (default)
+    # For example on Windows platform: URHO3D_INSTALL_PREFIX=C:/Users/john/Urho3D if the SDK is installed using CMAKE_INSTALL_PREFIX=C:/Users/john/Urho3D
+    # For example on Linux platform: URHO3D_INSTALL_PREFIX=/home/john/usr/local if the SDK is installed using DESTDIR=/home/john and CMAKE_INSTALL_PREFIX=/usr/local
     set (CMAKE_PREFIX_PATH $ENV{URHO3D_INSTALL_PREFIX} CACHE PATH "Prefix path to Urho3D SDK installation")
     if (WIN32)
-        set (PATH_PREFIX "Urho3D SDK")
-        set (URHO3D_INC_SEARCH_PATH ${PATH_PREFIX}/Include)
-        set (URHO3D_LIB_SEARCH_PATH ${PATH_PREFIX}/Lib)
+        set (URHO3D_INC_SEARCH_PATH include)
+        set (URHO3D_LIB_SEARCH_PATH lib)
     else ()
-        set (PATH_SUFFIX Urho3D)    # This could be patched to "" if the suffix is not desirable
+        set (PATH_SUFFIX Urho3D)
         if (IOS)
             set (CMAKE_LIBRARY_ARCHITECTURE ios)
         endif ()

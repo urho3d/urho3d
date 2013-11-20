@@ -118,6 +118,8 @@ set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 foreach (LIST_NAME LIBS INCLUDE_DIRS_ONLY LINK_LIBS_ONLY)
     set_list (${LIST_NAME} ENGINE_${LIST_NAME} REMOVE_DUPLICATE)
 endforeach ()
+# Add include directory to find the export header
+list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/Engine)
 
 # Setup library output path
 set (OUTPUT_PATH ${PROJECT_ROOT_DIR}/Lib)
@@ -130,7 +132,7 @@ set_output_directories (${OUTPUT_PATH} ARCHIVE LIBRARY)
  
 # Setup target
 setup_library (${URHO3D_LIB_TYPE})
-install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_ARCHIVE_DIR})
+install (TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${DEST_RUNTIME_DIR} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
 if (NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 endif ()
@@ -184,9 +186,6 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
     # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true) 
 endif ()
-
-# Add include directories to find the export header and SDL header for building Urho3D library
-include_directories (${CMAKE_BINARY_DIR}/Engine ../ThirdParty/SDL/include)
 
 # Define post build steps
 # Strip the output shared library for embedded devices

@@ -45,20 +45,12 @@ endif ()
 
 # Setup SDK install destinations
 if (WIN32)
-    set (PATH_PREFIX "Urho3D SDK")
-    set (DEST_INCLUDE_DIR ${PATH_PREFIX}/Include)
-    set (DEST_RUNTIME_DIR ${PATH_PREFIX}/Bin)
-    set (DEST_LIBRARY_DIR ${PATH_PREFIX}/Lib)
-    set (DEST_ARCHIVE_DIR ${PATH_PREFIX}/Lib)
-    set (DEST_SHARE_DIR ${PATH_PREFIX})
-    set (DEST_PKGCONFIG_DIR ${PATH_PREFIX}/Lib/pkgconfig)
+    # CMake already automatically prepends "Urho3D" to CMAKE_INSTALL_PREFIX on Windows platform
     set (SCRIPT_PATTERN *.bat)
 else ()
     set (PATH_SUFFIX /Urho3D)
-    set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
-    set (DEST_RUNTIME_DIR share${PATH_SUFFIX}/Bin)
-    if (ENABLE_64BIT)
-        if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)    # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores ENABLE_64BIT build option
+    if (ENABLE_64BIT)   # TODO: Revisit this again when ARM also supports 64bit, for now ARM architecture ignores ENABLE_64BIT build option
+        if (NOT CMAKE_CROSSCOMPILING AND EXISTS /usr/lib64)
             # Probably target system is a RedHat-based distro
             set (LIB_SUFFIX 64)
         endif ()
@@ -67,12 +59,13 @@ else ()
         # Use 'ios' arch subdirectory to differentiate, in case both Mac OS X and iOS build are installed at the same destination
         set (LIB_SUFFIX ${LIB_SUFFIX}/ios)
     endif ()
-    set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})   # The ${PATH_SUFFIX} could be removed if the suffix is not desirable
-    set (DEST_ARCHIVE_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})   # idem
-    set (DEST_SHARE_DIR share${PATH_SUFFIX})
-    set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
     set (SCRIPT_PATTERN *.sh)
 endif ()
+set (DEST_INCLUDE_DIR include${PATH_SUFFIX})
+set (DEST_SHARE_DIR share${PATH_SUFFIX})
+set (DEST_RUNTIME_DIR ${DEST_SHARE_DIR}/Bin)
+set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}${PATH_SUFFIX})   # Note to Linux package maintainer: ${PATH_SUFFIX} for library could be patched out if the suffix is not desirable
+set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 # Install application launcher scripts
 file (GLOB APP_SCRIPTS ${PROJECT_ROOT_DIR}/Bin/${SCRIPT_PATTERN})
 install (FILES ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR} PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)   # 755
