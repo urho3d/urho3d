@@ -1003,7 +1003,7 @@ void UpdateControls()
 
         playerControls.yaw += mouseSensitivity * input.mouseMoveX;
         playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-        playerControls.pitch = Clamp(playerControls.pitch, -60, 60);
+        playerControls.pitch = Clamp(playerControls.pitch, -60.0, 60.0);
 
         // In singleplayer, set controls directly on the player's ninja. In multiplayer, transmit to server
         if (singlePlayer)
@@ -1110,7 +1110,7 @@ void UpdateFreelookCamera()
 
     playerControls.yaw += mouseSensitivity * input.mouseMoveX;
     playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-    playerControls.pitch = Clamp(playerControls.pitch, -90, 90);
+    playerControls.pitch = Clamp(playerControls.pitch, -90.0, 90.0);
     gameCameraNode.rotation = Quaternion(playerControls.pitch, playerControls.yaw, 0);
 }
 

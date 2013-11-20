@@ -84,7 +84,7 @@ class AIController
             Vector3 targetAim = (predictedPos - ownPos);
 
             // Add distance/height compensation
-            float compensation = Max(targetAim.length - 15, 0);
+            float compensation = Max(targetAim.length - 15, 0.0);
             targetAim += Vector3(0, 0.6, 0) * compensation;
 
             // X-aiming
