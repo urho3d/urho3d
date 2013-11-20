@@ -118,8 +118,8 @@ set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 foreach (LIST_NAME LIBS INCLUDE_DIRS_ONLY LINK_LIBS_ONLY)
     set_list (${LIST_NAME} ENGINE_${LIST_NAME} REMOVE_DUPLICATE)
 endforeach ()
-# Add include directory to find the export header
-list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/Engine)
+# Add include directories to find the export header and SDL header
+list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/Engine ../ThirdParty/SDL/include)
 
 # Setup library output path
 set (OUTPUT_PATH ${PROJECT_ROOT_DIR}/Lib)
