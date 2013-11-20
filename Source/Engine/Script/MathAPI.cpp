@@ -59,8 +59,11 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float Sqrt(float)", asFUNCTION(sqrtf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Pow(float)", asFUNCTION(powf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Min(float, float)", asFUNCTIONPR(Min, (float, float), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int Min(int, int)", asFUNCTIONPR(Min, (int, int), int), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Max(float, float)", asFUNCTIONPR(Max, (float, float), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int Max(int, int)", asFUNCTIONPR(Max, (int, int), int), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Clamp(float, float, float)", asFUNCTIONPR(Clamp, (float, float, float), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int Clamp(int, int, int)", asFUNCTIONPR(Clamp, (int, int, int), int), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Lerp(float, float, float)", asFUNCTIONPR(Lerp, (float, float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Mod(float, float)", asFUNCTION(fmodf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Floor(float)", asFUNCTION(floorf), asCALL_CDECL);
