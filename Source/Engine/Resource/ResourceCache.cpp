@@ -188,17 +188,13 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool releaseResour
 
 void ResourceCache::ReleaseResource(ShortStringHash type, const String& name, bool force)
 {
-    ReleaseResource(type, StringHash(name), force);
-}
-
-void ResourceCache::ReleaseResource(ShortStringHash type, StringHash nameHash, bool force)
-{
+    StringHash nameHash(name);
     const SharedPtr<Resource>& existingRes = FindResource(type, nameHash);
     if (!existingRes)
         return;
     
     // If other references exist, do not release, unless forced
-    if (existingRes.Refs() == 1 || force)
+    if ((existingRes.Refs() == 1 && existingRes.WeakRefs() == 0) || force)
     {
         resourceGroups_[type].resources_.Erase(nameHash);
         UpdateResourceGroup(type);
@@ -217,7 +213,7 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
         {
             HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
             // If other references exist, do not release, unless forced
-            if (current->second_.Refs() == 1 || force)
+            if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
             {
                 i->second_.resources_.Erase(current);
                 released = true;
@@ -243,7 +239,7 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
             if (current->second_->GetName().Contains(partialName))
             {
                 // If other references exist, do not release, unless forced
-                if (current->second_.Refs() == 1 || force)
+                if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
                 {
                     i->second_.resources_.Erase(current);
                     released = true;
@@ -256,26 +252,63 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
         UpdateResourceGroup(type);
 }
 
+void ResourceCache::ReleaseResources(const String& partialName, bool force)
+{
+    // Some resources refer to others, like materials to textures. Release twice to ensure these get released.
+    // This is not necessary if forcing release
+    unsigned repeat = force ? 1 : 2;
+    
+    while (repeat--)
+    {
+        for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
+        {
+            bool released = false;
+            
+            for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+                j != i->second_.resources_.End();)
+            {
+                HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+                if (current->second_->GetName().Contains(partialName))
+                {
+                    // If other references exist, do not release, unless forced
+                    if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
+                    {
+                        i->second_.resources_.Erase(current);
+                        released = true;
+                    }
+                }
+            }
+            if (released)
+                UpdateResourceGroup(i->first_);
+        }
+    }
+}
+
 void ResourceCache::ReleaseAllResources(bool force)
 {
-    for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
-        i != resourceGroups_.End(); ++i)
+    unsigned repeat = force ? 1 : 2;
+    
+    while (repeat--)
     {
-        bool released = false;
-        
-        for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
-            j != i->second_.resources_.End();)
+        for (HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
+            i != resourceGroups_.End(); ++i)
         {
-            HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
-            // If other references exist, do not release, unless forced
-            if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
+            bool released = false;
+            
+            for (HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+                j != i->second_.resources_.End();)
             {
-                i->second_.resources_.Erase(current);
-                released = true;
+                HashMap<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+                // If other references exist, do not release, unless forced
+                if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
+                {
+                    i->second_.resources_.Erase(current);
+                    released = true;
+                }
             }
+            if (released)
+                UpdateResourceGroup(i->first_);
         }
-        if (released)
-            UpdateResourceGroup(i->first_);
     }
 }
 
@@ -637,7 +670,7 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
             if (k != j->second_.resources_.End())
             {
                 // If other references exist, do not release, unless forced
-                if (k->second_.Refs() == 1 || force)
+                if ((k->second_.Refs() == 1 && k->second_.WeakRefs() == 0) || force)
                 {
                     j->second_.resources_.Erase(k);
                     affectedGroups.Insert(j->first_);

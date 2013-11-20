@@ -1390,8 +1390,9 @@ Methods:
 - void RemovePackageFile(PackageFile@, bool = true, bool = false)
 - void RemovePackageFile(const String&, bool = true, bool = false)
 - void ReleaseResource(const String&, const String&, bool = false)
-- void ReleaseResources(const String&, bool = false)
+- void ReleaseResources(ShortStringHash, bool = false)
 - void ReleaseResources(const String&, const String&, bool = false)
+- void ReleaseResources(const String&, bool = false)
 - void ReleaseAllResources(bool = false)
 - bool ReloadResource(Resource@)
 - bool Exists(const String&) const

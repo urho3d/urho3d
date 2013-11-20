@@ -75,13 +75,13 @@ public:
     void RemovePackageFile(const String& fileName, bool releaseResources = true, bool forceRelease = false);
     /// Release a resource by name.
     void ReleaseResource(ShortStringHash type, const String& name, bool force = false);
-    /// Release a resource by name hash.
-    void ReleaseResource(ShortStringHash type, StringHash nameHash, bool force = false);
     /// Release all resources of a specific type.
     void ReleaseResources(ShortStringHash type, bool force = false);
     /// Release resources of a specific type and partial name.
     void ReleaseResources(ShortStringHash type, const String& partialName, bool force = false);
-    /// Release all resources.
+    /// Release resources of all types by partial name.
+    void ReleaseResources(const String& partialName, bool force = false);
+    /// Release all resources. When called with the force flag false, releases all currently unused resources.
     void ReleaseAllResources(bool force = false);
     /// Reload a resource. Return false and release it if fails.
     bool ReloadResource(Resource* resource);

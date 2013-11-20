@@ -72,6 +72,9 @@ bool ResetScene()
     editorScene.CreateComponent("PhysicsWorld");
     editorScene.CreateComponent("DebugRenderer");
 
+    // Release resources that became unused after the scene clear
+    cache.ReleaseAllResources(false);
+
     sceneModified = false;
     runUpdate = false;
 
@@ -162,6 +165,9 @@ bool LoadScene(const String&in fileName)
         loaded = editorScene.Load(file);
     else
         loaded = editorScene.LoadXML(file);
+
+    // Release resources which are not used by the new scene
+    cache.ReleaseAllResources(false);
 
     // Always pause the scene, and do updates manually
     editorScene.updateEnabled = false;
