@@ -25,7 +25,7 @@
 set "build=Source\Android"
 set "source=.."
 set "use_mklink="
-if exist Build\CMakeCache.txt. for /F "eol=/ delims=:= tokens=1-3" %%i in (Build\CMakeCache.txt) do if "%%i" == "USE_MKLINK" set "use_mklink=%%k"
+if exist android-Build\CMakeCache.txt. set "use_mklink=1"
 :loop
 if not "%1" == "" (
     if "%1" == "-DUSE_MKLINK" set "use_mklink=%~2"
@@ -40,9 +40,9 @@ if "%use_mklink%" == "1" (
     cmake -E make_directory android-Build
     set "build=android-Build"
     set "source=..\Source"
-    for %%d in (CoreData Data) do mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
-    for %%d in (src res assets) do mklink /D "android-Build\%%d" "..\Source\Android\%%d"
-    for %%f in (AndroidManifest.xml build.xml) do mklink "android-Build\%%f" "..\Source\Android\%%f"
+    for %%d in (CoreData Data) do if not exist "Source\Android\assets\%%d". mklink /D "Source\Android\assets\%%d" "..\..\..\Bin\%%d"
+    for %%d in (src res assets) do if not exist "android-Build\%%d". mklink /D "android-Build\%%d" "..\Source\Android\%%d"
+    for %%f in (AndroidManifest.xml build.xml) do if not exist "android-Build\%%f". mklink "android-Build\%%f" "..\Source\Android\%%f"
 ) else (
     if exist android-Build\CMakeCache.txt. del /F android-Build\CMakeCache.txt
     if exist android-Build\CMakeFiles. rd /S /Q android-Build\CMakeFiles
