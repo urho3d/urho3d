@@ -25,7 +25,7 @@
 set "build=Source\Android"
 set "source=.."
 set "use_mklink="
-if exist android-Build\CMakeCache.txt. set "use_mklink=1"
+if exist android-Build\CMakeCache.txt. for /F "eol=/ delims=:= tokens=1-3" %%i in (android-Build\CMakeCache.txt) do if "%%i" == "USE_MKLINK" set "use_mklink=%%k"
 :loop
 if not "%1" == "" (
     if "%1" == "-DUSE_MKLINK" set "use_mklink=%~2"
