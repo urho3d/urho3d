@@ -138,11 +138,14 @@ if (NOT GIT_EXIT_CODE EQUAL 0)
 endif ()
 
 # Setup the frameworks for Mac OS X platform
-if (APPLE AND URHO3D_LIB_TYPE STREQUAL SHARED)
+if (APPLE)
     if (IOS)
         setup_ios_linker_flags (LINKER_FLAGS)
     else ()
-        setup_macosx_linker_flags (LINKER_FLAGS)
+        # Intentionally use built-in CMAKE_EXE_LINKER_FLAGS here although CMake does not use it when building library, but the variable would be used later when configuring Urho3D.pc for MacOSX platform
+        setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
+        # LuaJIT 64-bit specific - replace EXE linker flags with flags for building shared library (adapted from LuaJIT's original Makefile)
+        string (REPLACE "-pagezero_size 10000 -image_base 100000000" "-image_base 7fff04c4a000" LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
     endif ()
     set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${LINKER_FLAGS})
 endif ()
@@ -184,7 +187,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
     # Hide the symbols that are not explicitly marked for export
     add_compiler_export_flags ()
     # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
-    set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true) 
+    set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
 endif ()
 
 # Define post build steps

@@ -400,23 +400,12 @@ endmacro ()
 
 # Macro for setting up linker flags for Mac OS X desktop build
 macro (setup_macosx_linker_flags LINKER_FLAGS)
-    # Framework list to link against 
-    set (FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
-    # LuaJIT specific - extra linker flags for linking against LuaJIT in 64-bit Mac OS X desktop build
-    if (ENABLE_LUAJIT AND ENABLE_64BIT)
-        if (URHO3D_LIB_TYPE STREQUAL SHARED)
-            set (FLAGS "${FLAGS} -image_base 7fff04c4a000")
-        else ()
-            set (FLAGS "${FLAGS} -pagezero_size 10000 -image_base 100000000")
-        endif ()
-    endif ()
-    set (${LINKER_FLAGS} ${FLAGS})
+    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} -framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices")
 endmacro ()
 
 # Macro for setting up linker flags for IOS build
 macro (setup_ios_linker_flags LINKER_FLAGS)
-    # Framework list to link against 
-    set (${LINKER_FLAGS} "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
+    set (${LINKER_FLAGS} "${${LINKER_FLAGS}} -framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework Foundation -framework OpenGLES -framework QuartzCore -framework UIKit")
 endmacro ()
 
 # Macro for adding SDL native init function on Android platform
@@ -575,9 +564,16 @@ macro (define_dependency_libs TARGET)
             list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
         endif ()
 
-        # GCC-specific executable linker flag for LuaJIT
-        if (ENABLE_LUAJIT AND NOT WIN32 AND NOT APPLE AND NOT ANDROID)
-            set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
+        # LuaJIT specific - extra linker flags for linking against LuaJIT (adapted from LuaJIT's original Makefile)
+        if (ENABLE_LUAJIT)
+            # 64-bit Mac OS X
+            if (ENABLE_64BIT AND APPLE AND NOT IOS)
+                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pagezero_size 10000 -image_base 100000000")
+            endif ()
+            # GCC-specific
+            if (NOT WIN32 AND NOT APPLE AND NOT ANDROID)
+                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
+            endif ()
         endif ()
     endif ()
 
