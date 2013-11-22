@@ -119,7 +119,7 @@ foreach (LIST_NAME LIBS INCLUDE_DIRS_ONLY LINK_LIBS_ONLY)
     set_list (${LIST_NAME} ENGINE_${LIST_NAME} REMOVE_DUPLICATE)
 endforeach ()
 # Add include directories to find the export header and SDL header
-list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_BINARY_DIR}/Engine ../ThirdParty/SDL/include)
+list (APPEND INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR} ../ThirdParty/SDL/include)
 
 # Setup library output path
 set (OUTPUT_PATH ${PROJECT_ROOT_DIR}/Lib)
@@ -145,7 +145,7 @@ if (APPLE)
         # Intentionally use built-in CMAKE_EXE_LINKER_FLAGS here although CMake does not use it when building library, but the variable would be used later when configuring Urho3D.pc for MacOSX platform
         setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
         # LuaJIT 64-bit specific - replace EXE linker flags with flags for building shared library (adapted from LuaJIT's original Makefile)
-        string (REPLACE "-pagezero_size 10000 -image_base 100000000" "-image_base 7fff04c4a000" LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+        string (REPLACE "-pagezero_size 10000 -image_base 100000000" "-image_base 7fff04c4a000" LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
     endif ()
     set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${LINKER_FLAGS})
 endif ()
