@@ -263,6 +263,23 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
         }
     }
     
+    // Check fullscreen mode validity (desktop only). If not valid, revert to windowed
+    #if !defined(ANDROID) && !defined(IOS) && !defined(RASPI)
+    if (fullscreen)
+    {
+        PODVector<IntVector2> resolutions = GetResolutions();
+        fullscreen = false;
+        for (unsigned i = 0; i < resolutions.Size(); ++i)
+        {
+            if (width == resolutions[i].x_ && height == resolutions[i].y_)
+            {
+                fullscreen = true;
+                break;
+            }
+        }
+    }
+    #endif
+    
     String extensions;
     
     // With an external window, only the size can change after initial setup, so do not recreate context
