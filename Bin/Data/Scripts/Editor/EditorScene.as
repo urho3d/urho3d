@@ -76,7 +76,7 @@ bool ResetScene()
     cache.ReleaseAllResources(false);
 
     sceneModified = false;
-    runUpdate = false;
+    StopSceneUpdate();
 
     UpdateWindowTitle();
     UpdateHierarchyItem(editorScene, true);
@@ -158,6 +158,8 @@ bool LoadScene(const String&in fileName)
         SetResourcePath(newScenePath);
 
     suppressSceneChanges = true;
+    sceneModified = false;
+    StopSceneUpdate();
 
     String extension = GetExtension(fileName);
     bool loaded;
@@ -171,9 +173,6 @@ bool LoadScene(const String&in fileName)
 
     // Always pause the scene, and do updates manually
     editorScene.updateEnabled = false;
-
-    sceneModified = false;
-    runUpdate = false;
 
     UpdateWindowTitle();
     UpdateHierarchyItem(editorScene, true);
@@ -333,6 +332,24 @@ void UpdateScene(float timeStep)
 {
     if (runUpdate)
         editorScene.Update(timeStep);
+}
+
+void StopSceneUpdate()
+{
+    runUpdate = false;
+    audio.Stop();
+}
+
+bool ToggleSceneUpdate()
+{
+    runUpdate = !runUpdate;
+    // Run audio playback only when scene is updating, to allow editing SoundSources without the play position changing
+    // or onestop sounds losing their assigned sound resource after playing once
+    if (runUpdate)
+        audio.Play();
+    else
+        audio.Stop();
+    return true;
 }
 
 void SetSceneModified()
