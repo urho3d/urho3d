@@ -1,11 +1,12 @@
 @echo off
+cd ..\Docs
 echo "Dumping AngelScript API..."
-ScriptCompiler -dumpapi ../Docs/ScriptAPI.dox ../Docs/AngelScriptAPI.h
+..\Bin\ScriptCompiler -dumpapi ScriptAPI.dox AngelScriptAPI.h
 if errorlevel 1 exit /B 1
 lua -v 1>nul 2>&1
 if %errorlevel%== 0 (
     echo "Dumping LuaScript API..."
-    set "out=%cd%/../Docs/LuaScriptAPI.dox"
+    set "out=%cd%\LuaScriptAPI.dox"
     pushd ..\Source\Engine\LuaScript\pkgs
     lua pkgToDox.lua %out% *.pkg
     if errorlevel 1 exit /B 1
@@ -13,5 +14,5 @@ if %errorlevel%== 0 (
 )
 if not "%1" == "-a" exit /B 0
 echo "Converting Doxygen files to HTML..."
-cd .. && doxygen Doxyfile 1>nul
+doxygen Doxyfile 1>nul
 echo "Finish."
