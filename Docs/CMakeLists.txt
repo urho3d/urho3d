@@ -24,47 +24,53 @@
 project (Urho3D-Docs)
 
 # There could be bug in CMake find_package() command, it currently does not honor NO_CMAKE_FIND_ROOT_PATH option for a non-rooted search as per CMake's documentation
-# As a workaround, we unset CMAKE_FIND_ROOT_PATH in this scope ONLY to always do a non-rooted search for Doxygen package (even when we are cross-compiling)
+# As a workaround, we unset CMAKE_FIND_ROOT_PATH (even when we are cross-compiling) but in this scope ONLY in order to always do a non-rooted search for Doxygen package
 unset (CMAKE_FIND_ROOT_PATH)
 # Find Doxygen and DOT packages
 find_package (Doxygen QUIET)
 
 if (DOXYGEN_FOUND)
     # Generate platform specific Doxyfile automatically
-    if (NOT USE_OPENGL EQUAL DOXYFILE_USE_OPENGL OR ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+    if (NOT USE_OPENGL EQUAL DOXYFILE_USE_OPENGL OR ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in IS_NEWER_THAN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
         set (DOXYFILE_USE_OPENGL ${USE_OPENGL} CACHE INTERNAL "USE_OPENGL flag when Doxyfile was last generated")
         if (USE_OPENGL)
             set (EXCLUDE_GRAPHICS_API Direct3D9)
         else ()
             set (EXCLUDE_GRAPHICS_API OpenGL)
         endif ()
-        configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile) 
+        configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
     endif ()
 
     # Dump AngelScript and LuaScript API to Doxygen file if the tool is available
     if (TARGET ScriptCompiler)
-        add_custom_command (OUTPUT ScriptAPI.dox
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox
             COMMAND ${PROJECT_ROOT_DIR}/Bin/ScriptCompiler -dumpapi ScriptAPI.dox AngelScriptAPI.h DEPENDS Urho3D ScriptCompiler
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMENT "Dumping AngelScript API to ScriptAPI.dox")
     endif ()
     execute_process (COMMAND lua -v RESULT_VARIABLE LUA_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
     if (LUA_EXIT_CODE EQUAL 0)
-        add_custom_command (OUTPUT LuaScriptAPI.dox
-            COMMAND lua pkgToDox.lua ${CMAKE_CURRENT_BINARY_DIR}/LuaScriptAPI.dox *.pkg DEPENDS Urho3D
+        add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox
+            COMMAND lua pkgToDox.lua ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox *.pkg DEPENDS Urho3D ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs/pkgToDox.lua
             WORKING_DIRECTORY ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs
             COMMENT "Dumping LuaScript API to LuaScriptAPI.dox")
     endif ()
     
+    # If ENABLE_DOCS build option is set then add the custom 'doc' target into the default 'all' target, i.e. a normal build would not only build the software but also the documentation
+    if (ENABLE_DOCS)
+        set (ALL ALL)
+    endif ()
+
     # Add custom 'doc' target for generating Urho3D documentation
-    add_custom_target (doc
-        COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile DEPENDS ScriptAPI.dox LuaScriptAPI.dox
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    add_custom_target (doc ${ALL}
+        COMMAND ${DOXYGEN_EXECUTABLE} Doxyfile DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox   # Note: these two dependencies need to be made explicit or otherwise CMake would not automatically 'refresh' them with provided custom command
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating documentation with Doxygen")
 endif ()
 
 # Make sure html output directory exists and not empty
-file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/html/Readme.txt "Use 'make doc' command or an equivalent command in IDE to re-generate Urho3D documentation.")
+file (WRITE ${CMAKE_CURRENT_SOURCE_DIR}/html/Readme.txt "If ENABLE_DOCS build option is not set then use 'make doc' command or an equivalent command in IDE to re-generate Urho3D documentation before calling 'make install' or its equivalent.")
     
-# Currently it is not possible to make built-in 'install' target to depends on 'doc' in CMake, therefore 'make doc' command need to be invoked manually before 'make install' in order to install the SDK with complete documentation
-install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ DESTINATION ${DEST_SHARE_DIR}/Docs USE_SOURCE_PERMISSIONS)
+# Currently it is not possible to make built-in 'install' target to depend on 'doc' in CMake, therefore 'make doc' command need to be invoked manually before 'make install' in order to install the SDK with complete documentation
+# Unless, ENABLE_DOCS build option is set in which case the custom 'doc' target is part of the default 'all' target which in turn the 'install' target depends on, so a single 'make install' alone is suffice to install everything 
+install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/html/ DESTINATION ${DEST_SHARE_DIR}/Docs USE_SOURCE_PERMISSIONS)

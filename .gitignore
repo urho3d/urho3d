@@ -1,8 +1,6 @@
 # Build directories
 Build/
-android-Build/
-ios-Build/
-raspi-Build/
+*-Build/
 
 # Output directories
 Bin/*
