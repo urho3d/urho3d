@@ -137,13 +137,14 @@ void SoundSource::RegisterObject(Context* context)
     context->RegisterFactory<SoundSource>(AUDIO_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(SoundSource, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(SoundSource, VAR_RESOURCEREF, "Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
     ENUM_ATTRIBUTE(SoundSource, "Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Frequency", frequency_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Gain", gain_, 1.0f, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Attenuation", attenuation_, 1.0f, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_FLOAT, "Panning", panning_, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(SoundSource, VAR_BOOL, "Is Playing", IsPlaying, SetPlayingAttr, bool, false, AM_DEFAULT);
     ATTRIBUTE(SoundSource, VAR_BOOL, "Autoremove on Stop", autoRemove_, false, AM_FILE);
-    ACCESSOR_ATTRIBUTE(SoundSource, VAR_RESOURCEREF, "Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(SoundSource, VAR_INT, "Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
 }
 
@@ -203,7 +204,6 @@ void SoundSource::Stop()
 
     // Free the compressed sound decoder now if any
     FreeDecoder();
-    sound_.Reset();
 
     MarkNetworkUpdate();
 }
@@ -248,7 +248,7 @@ void SoundSource::SetAutoRemove(bool enable)
 
 bool SoundSource::IsPlaying() const
 {
-    return sound_.Get() != 0;
+    return sound_ != 0 && position_ != 0;
 }
 
 void SoundSource::SetPlayPosition(signed char* pos)
@@ -273,7 +273,7 @@ void SoundSource::PlayLockless(Sound* sound)
             signed char* start = sound->GetStart();
             if (start)
             {
-                // Free Decoder in case previous sound was compressed
+                // Free decoder in case previous sound was compressed
                 FreeDecoder();
                 sound_ = sound;
                 position_ = start;
@@ -284,15 +284,15 @@ void SoundSource::PlayLockless(Sound* sound)
         else
         {
             // Compressed sound start
-            if (sound == sound_)
+            if (sound == sound_ && decoder_)
             {
-                // If same compressed sound is already playing, rewind the Decoder
+                // If same compressed sound is already playing, rewind the decoder
                 sound_->RewindDecoder(decoder_);
                 return;
             }
             else
             {
-                // Else just set the new sound with a dummy start position. The mixing routine will allocate the new Decoder
+                // Else just set the new sound with a dummy start position. The mixing routine will allocate the new decoder
                 FreeDecoder();
                 sound_ = sound;
                 position_ = sound->GetStart();
@@ -341,12 +341,9 @@ void SoundSource::Update(float timeStep)
     if (!audio_->IsInitialized())
         MixNull(timeStep);
 
-    // Free the sound if playback has stopped
-    if (sound_ && !position_)
-    {
+    // Free the decoder if playback has stopped
+    if (!position_ && decoder_)
         FreeDecoder();
-        sound_.Reset();
-    }
 
     // Check for autoremove
     if (autoRemove_)
@@ -498,7 +495,26 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
 void SoundSource::SetSoundAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Play(cache->GetResource<Sound>(value.name_));
+    Sound* newSound = cache->GetResource<Sound>(value.name_);
+    if (IsPlaying())
+        Play(newSound);
+    else
+    {
+        // When changing the sound and not playing, make sure the old decoder (if any) is freed
+        FreeDecoder();
+        sound_ = newSound;
+    }
+}
+
+void SoundSource::SetPlayingAttr(bool value)
+{
+    if (value)
+    {
+        if (!IsPlaying())
+            Play(sound_);
+    }
+    else
+        Stop();
 }
 
 void SoundSource::SetPositionAttr(int value)
@@ -514,7 +530,7 @@ ResourceRef SoundSource::GetSoundAttr() const
 
 int SoundSource::GetPositionAttr() const
 {
-    if (sound_)
+    if (sound_ && position_)
         return (int)(GetPlayPosition() - sound_->GetStart());
     else
         return 0;

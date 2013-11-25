@@ -110,6 +110,8 @@ public:
     void SetPositionAttr(int value);
     /// Return sound attribute.
     ResourceRef GetSoundAttr() const;
+    /// Set sound playing attribute
+    void SetPlayingAttr(bool value);
     /// Return sound position attribute.
     int GetPositionAttr() const;
     
