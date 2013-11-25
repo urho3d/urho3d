@@ -343,8 +343,8 @@ void StopSceneUpdate()
 bool ToggleSceneUpdate()
 {
     runUpdate = !runUpdate;
-    // Run audio playback only when scene is updating, to allow editing SoundSources without the play position changing
-    // or onestop sounds losing their assigned sound resource after playing once
+    // Run audio playback only when scene is updating, so that audio components' time-dependent attributes stay constant when
+    // paused (similar to physics)
     if (runUpdate)
         audio.Play();
     else
