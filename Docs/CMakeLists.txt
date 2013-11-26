@@ -48,10 +48,10 @@ if (DOXYGEN_FOUND)
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMENT "Dumping AngelScript API to ScriptAPI.dox")
     endif ()
-    execute_process (COMMAND lua -v RESULT_VARIABLE LUA_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-    if (LUA_EXIT_CODE EQUAL 0)
+    string (TOLOWER "${JIT}" jit)   # Note: ${JIT} could be empty if LuaJIT is not enabled
+    if (TARGET lua${jit}_interpreter)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox
-            COMMAND lua pkgToDox.lua ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox *.pkg DEPENDS Urho3D ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs/pkgToDox.lua
+            COMMAND ${PROJECT_ROOT_DIR}/Bin/lua${jit} pkgToDox.lua ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox *.pkg DEPENDS Urho3D lua${jit}_interpreter ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs/pkgToDox.lua
             WORKING_DIRECTORY ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs
             COMMENT "Dumping LuaScript API to LuaScriptAPI.dox")
     endif ()

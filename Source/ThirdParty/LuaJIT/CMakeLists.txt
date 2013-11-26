@@ -203,7 +203,7 @@ if (NOT MSVC)
     add_definitions (-U_FORTIFY_SOURCE)
 endif ()
 
-# Define target name
+# Define target name for LuaJIT library
 set (TARGET_NAME LuaJIT)
 
 # Macro for generating source file
@@ -269,3 +269,20 @@ set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 # Setup target
 setup_library ()
+
+# On Android platform, use 'adb push' to copy the tool(s) from Bin-CC to Android (virtual) device; use 'adb shell' to login into a remote shell to execute the tool in the (virtual) device
+# The tools are not built on iOS platform as there is no (easy) way to execute them on the iOS device
+if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
+    # Define target name for LuaJIT interpreter cum compiler
+    set (TARGET_NAME luajit_interpreter)   # Note: intended target name is 'luajit' which clashes with 'LuaJIT' library target above for case-insensitive platform
+
+    # Define source files
+    set (SOURCE_FILES src/luajit.c)
+
+    # Define dependency libs
+    set (LINK_LIBS_ONLY LuaJIT)
+
+    # Setup target
+    setup_executable ()
+    adjust_target_name ()
+endif ()

@@ -11,4 +11,4 @@ set (INCLUDE_DIRS_ONLY ../../include ../../../Lua${JIT}/src)
 
 # Setup target
 setup_library ()
-adjust_library_name ()
+adjust_target_name ()

@@ -486,10 +486,10 @@ macro (setup_main_executable)
     endif ()
 endmacro ()
 
-# Macro for adjusting library output name by dropping _suffix from the target name
-macro (adjust_library_name)
-    string (REGEX REPLACE _.*$ "" LIB_NAME ${TARGET_NAME})
-    set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${LIB_NAME})
+# Macro for adjusting target output name by dropping _suffix from the target name
+macro (adjust_target_name)
+    string (REGEX REPLACE _.*$ "" OUTPUT_NAME ${TARGET_NAME})
+    set_target_properties (${TARGET_NAME} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
 endmacro ()
 
 # Macro for defining external library dependencies
