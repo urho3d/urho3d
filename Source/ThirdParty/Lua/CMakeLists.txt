@@ -42,9 +42,9 @@ if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
     set (SOURCE_FILES src/lua.c)
 
     # Define dependency libs
-    set (LIBS ../Lua/src)
+    set (LINK_LIBS_ONLY Lua)
     if (NOT MSVC)
-        set (LINK_LIBS_ONLY m)
+        list (APPEND LINK_LIBS_ONLY m)
     endif ()
 
     # Setup target
@@ -58,7 +58,7 @@ if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
     set (SOURCE_FILES src/luac.c)
 
     # Define dependency libs
-    set (LIBS ../Lua/src)
+    # Same as above
 
     # Setup target
     setup_executable ()
