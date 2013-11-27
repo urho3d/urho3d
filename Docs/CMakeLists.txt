@@ -45,7 +45,7 @@ if (DOXYGEN_FOUND)
     # CMake's custom command output is intentionally set to mismatch with the tool's output file location to achieve two desired side-effect results:
     # 1) 'make clean' does not remove the generated ScriptAPI.dox and LuaScriptAPI.dox in the 'Docs' subdirectory
     # 2) ScriptAPI.dox and LuaScriptAPI.dox always get refreshed first before the 'doc' target is being built (similar to VS-only PRE_BUILD custom command)
-    if (TARGET ScriptCompiler)
+    if (TARGET ScriptCompiler AND NOT CMAKE_CROSSCOMPILING)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ScriptAPI.dox
             COMMAND ${PROJECT_ROOT_DIR}/Bin/ScriptCompiler -dumpapi ScriptAPI.dox AngelScriptAPI.h
             DEPENDS Urho3D ScriptCompiler
@@ -57,7 +57,7 @@ if (DOXYGEN_FOUND)
     if (ENABLE_LUAJIT)
         set (jit jit)
     endif ()
-    if (TARGET lua${jit}_interpreter)
+    if (TARGET lua${jit}_interpreter AND NOT CMAKE_CROSSCOMPILING)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/LuaScriptAPI.dox
             COMMAND ${PROJECT_ROOT_DIR}/Bin/lua${jit} pkgToDox.lua ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox *.pkg
             DEPENDS Urho3D lua${jit}_interpreter
