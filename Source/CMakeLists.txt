@@ -113,4 +113,4 @@ if (NOT IOS AND NOT ANDROID AND ENABLE_EXTRAS)
 endif ()
 
 # Urho3D documentation
-add_subdirectory (../Docs ../doc-Build)
+add_subdirectory (../Docs ${PROJECT_BINARY_DIR}/Docs)

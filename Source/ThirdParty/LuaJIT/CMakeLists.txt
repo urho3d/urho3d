@@ -284,5 +284,5 @@ if (NOT IOS AND (NOT DEFINED ENABLE_TOOLS OR ENABLE_TOOLS))
 
     # Setup target
     setup_executable ()
-    adjust_target_name ()
+    adjust_target_name ()   # Adjust to intended target output name
 endif ()
