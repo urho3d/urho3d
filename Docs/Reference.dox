@@ -1696,16 +1696,6 @@ The material list is a text file, one material per line, saved alongside the Urh
 
 In model or scene mode, the AssetImporter utility will also automatically save non-skeletal node animations into the output file directory.
 
-\section Tools_DocConverter DocConverter
-
-Automatically converts the Urho3D Doxygen pages to Google Code wiki format.
-
-Usage:
-
-\verbatim
-DocConverter <dox input path> <wiki output path> <mainpage name>
-\endverbatim
-
 \section Tools_OgreImporter OgreImporter
 
 Loads OGRE .mesh.xml and .skeleton.xml files and saves them as Urho3D .mdl (model) and .ani (animation) files. For other 3D formats and whole scene importing, see AssetImporter instead. However that tool does not handle the OGRE formats as completely as this.

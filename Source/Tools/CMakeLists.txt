@@ -47,8 +47,7 @@ if (NOT IOS AND NOT ANDROID AND ENABLE_TOOLS)
     add_subdirectory (PackageTool)
     add_subdirectory (RampGenerator)
     add_subdirectory (ScriptCompiler)
-    add_subdirectory (DocConverter)
-    
+
     # Urho3D non-OpenGL tools
     if (NOT USE_OPENGL)
         add_subdirectory (ShaderCompiler)
