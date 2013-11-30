@@ -179,13 +179,22 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
     while (start != end)
     {
         Drawable* drawable = *start++;
+        bool batchesUpdated = false;
         
-        // If draw distance non-zero, check it
+        // If draw distance non-zero, update and check it
         float maxDistance = drawable->GetDrawDistance();
-        if ((maxDistance <= 0.0f || drawable->GetDistance() <= maxDistance) && (!buffer || !drawable->IsOccludee() ||
-            buffer->IsVisible(drawable->GetWorldBoundingBox())))
+        if (maxDistance > 0.0f)
         {
             drawable->UpdateBatches(view->frame_);
+            batchesUpdated = true;
+            if (drawable->GetDistance() > maxDistance)
+                continue;
+        }
+        
+        if (!buffer || !drawable->IsOccludee() || buffer->IsVisible(drawable->GetWorldBoundingBox()))
+        {
+            if (!batchesUpdated)
+                drawable->UpdateBatches(view->frame_);
             drawable->MarkInView(view->frame_);
             
             // For geometries, find zone, clear lights and calculate view space Z range
@@ -1930,19 +1939,29 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
        // For point light, check that this drawable is inside the split shadow camera frustum
         if (type == LIGHT_POINT && shadowCameraFrustum.IsInsideFast(drawable->GetWorldBoundingBox()) == OUTSIDE)
             continue;
+        
         // Check shadow distance
         float maxShadowDistance = drawable->GetShadowDistance();
         float drawDistance = drawable->GetDrawDistance();
+        bool batchesUpdated = drawable->IsInView(frame_, false);
         if (drawDistance > 0.0f && (maxShadowDistance <= 0.0f || drawDistance < maxShadowDistance))
             maxShadowDistance = drawDistance;
-        if (maxShadowDistance > 0.0f && drawable->GetDistance() > maxShadowDistance)
-            continue;
+        if (maxShadowDistance > 0.0f)
+        {
+            if (!batchesUpdated)
+            {
+                drawable->UpdateBatches(frame_);
+                batchesUpdated = true;
+            }
+            if (drawable->GetDistance() > maxShadowDistance)
+                continue;
+        }
         
         // Note: as lights are processed threaded, it is possible a drawable's UpdateBatches() function is called several
         // times. However, this should not cause problems as no scene modification happens at this point.
-        if (!drawable->IsInView(frame_, false))
+        if (!batchesUpdated)
             drawable->UpdateBatches(frame_);
-        
+
         // Project shadow caster bounding box to light view space for visibility check
         lightViewBox = drawable->GetWorldBoundingBox().Transformed(lightView);
         
