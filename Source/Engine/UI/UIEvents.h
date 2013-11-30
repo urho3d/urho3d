@@ -247,6 +247,7 @@ EVENT(E_UNHANDLEDKEY, UnhandledKey)
 EVENT(E_FILESELECTED, FileSelected)
 {
     PARAM(P_FILENAME, FileName);            // String
+    PARAM(P_FILTER, Filter);                // String
     PARAM(P_OK, Ok);                        // bool
 }
 

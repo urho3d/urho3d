@@ -396,6 +396,7 @@ bool FileSelector::EnterFile()
 
             VariantMap eventData;
             eventData[P_FILENAME] = path_ + fileEntries_[index].name_;
+            eventData[P_FILTER] = GetFilter();
             eventData[P_OK] = true;
             SendEvent(E_FILESELECTED, eventData);
         }
@@ -475,6 +476,7 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
 
             VariantMap newEventData;
             newEventData[P_FILENAME] = path_ + GetFileName();
+            newEventData[P_FILTER] = GetFilter();
             newEventData[P_OK] = true;
             SendEvent(E_FILESELECTED, newEventData);
         }
@@ -485,6 +487,7 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
 
         VariantMap newEventData;
         newEventData[P_FILENAME] = path_;
+        newEventData[P_FILTER] = GetFilter();
         newEventData[P_OK] = true;
         SendEvent(E_FILESELECTED, newEventData);
     }
@@ -502,6 +505,7 @@ void FileSelector::HandleCancelPressed(StringHash eventType, VariantMap& eventDa
 
     VariantMap newEventData;
     newEventData[P_FILENAME] = String::EMPTY;
+    newEventData[P_FILTER] = GetFilter();
     newEventData[P_OK] = false;
     SendEvent(E_FILESELECTED, newEventData);
 }

@@ -887,14 +887,19 @@ void HandlePopup(Menu@ menu)
         menu.showPopup = false;
 }
 
-String ExtractFileName(VariantMap& eventData)
+String ExtractFileName(VariantMap& eventData, bool forSave = false)
 {
     String fileName;
 
     // Check for OK
     if (eventData["OK"].GetBool())
+    {
+        String filter = eventData["Filter"].GetString();
         fileName = eventData["FileName"].GetString();
-
+        // Add default extension for saving if not specified
+        if (GetExtension(fileName).empty && forSave && filter != "*.*")
+            fileName = fileName + filter.Substring(1);
+    }
     return fileName;
 }
 
@@ -907,7 +912,7 @@ void HandleOpenSceneFile(StringHash eventType, VariantMap& eventData)
 void HandleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiSceneFilter, uiScenePath);
-    SaveScene(ExtractFileName(eventData));
+    SaveScene(ExtractFileName(eventData, true));
 }
 
 void HandleLoadNodeFile(StringHash eventType, VariantMap& eventData)
@@ -919,7 +924,7 @@ void HandleLoadNodeFile(StringHash eventType, VariantMap& eventData)
 void HandleSaveNodeFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiNodeFilter, uiNodePath);
-    SaveNode(ExtractFileName(eventData));
+    SaveNode(ExtractFileName(eventData, true));
 }
 
 void HandleImportModel(StringHash eventType, VariantMap& eventData)
@@ -973,7 +978,7 @@ void HandleOpenUILayoutFile(StringHash eventType, VariantMap& eventData)
 void HandleSaveUILayoutFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiElementFilter, uiElementPath);
-    SaveUILayout(ExtractFileName(eventData));
+    SaveUILayout(ExtractFileName(eventData, true));
 }
 
 void HandleLoadChildUIElementFile(StringHash eventType, VariantMap& eventData)
@@ -985,7 +990,7 @@ void HandleLoadChildUIElementFile(StringHash eventType, VariantMap& eventData)
 void HandleSaveChildUIElementFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiElementFilter, uiElementPath);
-    SaveChildUIElement(ExtractFileName(eventData));
+    SaveChildUIElement(ExtractFileName(eventData, true));
 }
 
 void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
