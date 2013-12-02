@@ -52,6 +52,9 @@ private:
 
     /// Script file name.
     String scriptFileName_;
+    
+#ifdef ENABLE_ANGEL_SCRIPT
     /// Script file.
     SharedPtr<ScriptFile> scriptFile_;
+#endif
 };
