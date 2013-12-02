@@ -33,6 +33,7 @@ void CreateRootUIElement()
     editorUIElement.name = "UI";
     editorUIElement.SetSize(graphics.width, graphics.height);
     editorUIElement.traversalMode = TM_DEPTH_FIRST;     // This is needed for root-like element to prevent artifacts
+    editorUIElement.priority = -1000;   // All user-created UI elements have lowest priority so they do not cover editor's windows
 
     // This is needed to distinguish our own element events from Editor's UI element events
     editorUIElement.elementEventSender = true;
