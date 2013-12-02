@@ -136,7 +136,11 @@ inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6
 inline float Random() { return Rand() / 32768.0f; }
 /// Return a random float between 0.0 and range, inclusive from both ends.
 inline float Random(float range) { return Rand() * range / 32767.0f; }
+/// Return a random float between min and max, inclusive from both ends.
+inline float Random(float min, float max) { return Rand() * (max - min) / 32767.0f + min; }
 /// Return a random integer between 0 and range - 1.
 inline int Random(int range) { return (Rand() * (range - 1) + 16384) / 32767; }
+/// Return a random integer between min and max - 1.
+inline int Random(int min, int max) { return (Rand() * (max - min - 1) + 16384) / 32767 + min; }
 
 }

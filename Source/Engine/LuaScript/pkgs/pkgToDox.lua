@@ -176,7 +176,7 @@ end
 function writeGlobalFunctions(ofile)
     ofile:write("\\section LuaScriptAPI_GlobalFunctions Global functions\n")
     for _, line in ipairs(globalFunctions) do
-        line = line:gsub("%a @ ", "")
+        line = line:gsub("%w+ @ ", "")
         line = line:gsub(";", "")
         ofile:write("- " .. line .. "\n")
     end
