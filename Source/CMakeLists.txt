@@ -33,6 +33,11 @@ endif ()
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
+# Enable AngelScript by default
+if (NOT DEFINED ENABLE_ANGEL_SCRIPT)
+    set (ENABLE_ANGEL_SCRIPT 1)
+endif ()
+
 # Include Urho3D cmake module
 include (Urho3D-CMake-magic)
 
@@ -78,9 +83,14 @@ file (GLOB CMAKE_SCRIPTS ${PROJECT_ROOT_DIR}/${SCRIPT_PATTERN})
 install (FILES ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 # Add targets
-foreach (TARGET AngelScript Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
+foreach (TARGET Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
+
+if (ENABLE_ANGEL_SCRIPT)
+    add_subdirectory(ThirdParty/AngelScript)
+endif ()
+
 if (ENABLE_LUA)
     add_subdirectory (Engine/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})

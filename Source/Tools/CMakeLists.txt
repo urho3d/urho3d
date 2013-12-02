@@ -46,7 +46,9 @@ if (NOT IOS AND NOT ANDROID AND ENABLE_TOOLS)
     add_subdirectory (OgreImporter)
     add_subdirectory (PackageTool)
     add_subdirectory (RampGenerator)
-    add_subdirectory (ScriptCompiler)
+    if (ENABLE_ANGEL_SCRIPT)
+        add_subdirectory (ScriptCompiler)
+    endif ()
 
     # Urho3D non-OpenGL tools
     if (NOT USE_OPENGL)
