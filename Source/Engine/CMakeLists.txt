@@ -101,7 +101,13 @@ foreach (TARGET ${STATIC_LIBRARY_TARGETS})
 endforeach ()
 
 # Define source files
-foreach (SOURCE Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene Script UI)
+set (SOURCES Audio Container Core Engine Graphics Input IO Math Navigation Network Physics Resource Scene UI)
+
+if (ENABLE_ANGELSCRIPT)
+    set (SOURCES ${SOURCES} Script)
+endif ()
+
+foreach (SOURCE ${SOURCES})
     add_subdirectory (${SOURCE})
     install (DIRECTORY ${SOURCE}/ DESTINATION ${DEST_INCLUDE_DIR} USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h)    # Note: the trailing slash is significant
     source_group ("Source Files\\${SOURCE}" FILES ${${SOURCE}_CPP_FILES})

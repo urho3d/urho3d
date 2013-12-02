@@ -27,6 +27,7 @@ Urho3D development, contributions and bugfixes by:
 - Paul Noome
 - Vladimir Pobedinsky
 - Miika Santala
+- Steven Zhang
 - Firegorilla
 - Magic.Lixin
 - amadeus_osa
@@ -404,6 +405,7 @@ cmake_xxxx batch files or shell scripts.
 |                      | because this option is already enabled by default for |
 |                      | other Desktop platforms)                              |
 |-DENABLE_DOCS=1       |to build the docs when building all the targets        |
+|-DENABLE_ANGELSCRIPT=0|to disable AngelScript scripting support               |
 |-DENABLE_SSE=0        |to disable SSE instruction set                         |
 |-DENABLE_MINIDUMPS=0  |to disable minidumps on crash (VS only)                |
 |-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS  |

@@ -91,6 +91,11 @@ if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
     add_definitions (-DGLEW_NO_GLU)
 endif ()
 
+# Add definition for AngelScript
+if (ENABLE_ANGELSCRIPT)
+    add_definitions (-DENABLE_ANGELSCRIPT)
+endif ()
+
 # Add definition for Lua and LuaJIT
 if (ENABLE_LUAJIT)
     add_definitions (-DENABLE_LUAJIT)

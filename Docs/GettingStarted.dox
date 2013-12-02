@@ -139,6 +139,7 @@ A number of build options can be defined explicitly when invoking the above cmak
 |-DENABLE_SAMPLES=1                           |to build the C++ sample applications|
 |-DENABLE_TOOLS=1                             |to build the tools (only useful for Raspberry Pi build because this option is already enabled by default for other Desktop platforms)|
 |-DENABLE_DOCS=1                              |to build the docs when building all the targets|
+|-DENABLE_ANGELSCRIPT=0                       |to disable AngelScript scripting support|
 |-DENABLE_SSE=0                               |to disable SSE instruction set|
 |-DENABLE_MINIDUMPS=0                         |to disable minidumps on crash (VS only)|
 |-DUSE_OPENGL=1                               |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)|
