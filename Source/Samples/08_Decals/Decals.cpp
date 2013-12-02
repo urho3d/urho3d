@@ -297,9 +297,7 @@ bool Decals::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
     if (results.Size())
     {
         RayQueryResult& result = results[0];
-        
-        // Calculate hit position in world space
-        hitPos = cameraRay.origin_ + cameraRay.direction_ * result.distance_;
+        hitPos = result.position_;
         hitDrawable = result.drawable_;
         return true;
     }

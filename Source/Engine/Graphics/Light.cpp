@@ -200,9 +200,11 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
 
     // If the code reaches here then we have a hit
     RayQueryResult result;
+    result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+    result.normal_ = -query.ray_.direction_;
+    result.distance_ = distance;
     result.drawable_ = this;
     result.node_ = node_;
-    result.distance_ = distance;
     result.subObject_ = M_MAX_UNSIGNED;
     results.Push(result);
 }

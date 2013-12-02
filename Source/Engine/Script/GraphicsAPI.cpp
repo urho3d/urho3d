@@ -1336,9 +1336,8 @@ static void RegisterDebugRenderer(asIScriptEngine* engine)
 static void ConstructRayQueryResult(RayQueryResult* ptr)
 {
     new(ptr) RayQueryResult();
-    // Zero the drawable & node pointers for safety when constructing these from script
-    ptr->drawable_ = 0;
-    ptr->node_ = 0;
+    ptr->position_ = Vector3::ZERO;
+    ptr->normal_ = Vector3::ZERO;
     ptr->distance_ = 0.0f;
     ptr->subObject_ = 0;
 }
@@ -1371,8 +1370,8 @@ static RayQueryResult OctreeRaycastSingle(const Ray& ray, RayQueryLevel level, f
     else
     {
         RayQueryResult empty;
-        empty.drawable_ = 0;
-        empty.node_ = 0;
+        empty.position_ = Vector3::ZERO;
+        empty.normal_ = Vector3::ZERO;
         empty.distance_ = M_INFINITY;
         empty.subObject_ = 0;
         return empty;
@@ -1432,9 +1431,11 @@ static void RegisterOctree(asIScriptEngine* engine)
     
     engine->RegisterObjectType("RayQueryResult", sizeof(RayQueryResult), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("RayQueryResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRayQueryResult), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("RayQueryResult", "Vector3 position", offsetof(RayQueryResult, position_));
+    engine->RegisterObjectProperty("RayQueryResult", "Vector3 normal", offsetof(RayQueryResult, normal_));
+    engine->RegisterObjectProperty("RayQueryResult", "float distance", offsetof(RayQueryResult, distance_));
     engine->RegisterObjectMethod("RayQueryResult", "Drawable@+ get_drawable() const", asFUNCTION(RayQueryResultGetDrawable), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("RayQueryResult", "Node@+ get_node() const", asFUNCTION(RayQueryResultGetNode), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("RayQueryResult", "float distance", offsetof(RayQueryResult, distance_));
     engine->RegisterObjectProperty("RayQueryResult", "uint subObject", offsetof(RayQueryResult, subObject_));
     
     RegisterComponent<Octree>(engine, "Octree");

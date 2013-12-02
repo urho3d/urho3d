@@ -216,6 +216,11 @@ float Ray::HitDistance(const Sphere& sphere) const
 
 float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 {
+    return HitDistance(v0, v1, v2, 0);
+}
+
+float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, Vector3* outNormal) const
+{
     // Based on Fast, Minimum Storage Ray/Triangle Intersection by Möller & Trumbore
     // http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
     // Calculate edge vectors
@@ -236,7 +241,10 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) 
             float v = direction_.DotProduct(q);
             if (v >= 0.0f && u + v <= det)
             {
-                // There is an intersection, so calculate distance
+                // There is an intersection, so calculate distance & optional normal
+                if (outNormal)
+                    *outNormal = edge1.CrossProduct(edge2);
+                
                 return edge2.DotProduct(q) / det;
             }
         }
@@ -245,8 +253,7 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) 
     return M_INFINITY;
 }
 
-
-float Ray::HitDistance(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const
+float Ray::HitDistance(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount, Vector3* outNormal) const
 {
     float nearest = M_INFINITY;
     const unsigned char* vertices = ((const unsigned char*)vertexData) + vertexStart * vertexSize;
@@ -257,7 +264,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexSize, unsigned ver
         const Vector3& v0 = *((const Vector3*)(&vertices[index * vertexSize]));
         const Vector3& v1 = *((const Vector3*)(&vertices[(index + 1) * vertexSize]));
         const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexSize]));
-        nearest = Min(nearest, HitDistance(v0, v1, v2));
+        nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal));
         index += 3;
     }
     
@@ -265,7 +272,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexSize, unsigned ver
 }
 
 float Ray::HitDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize,
-    unsigned indexStart, unsigned indexCount) const
+    unsigned indexStart, unsigned indexCount, Vector3* outNormal) const
 {
     float nearest = M_INFINITY;
     const unsigned char* vertices = (const unsigned char*)vertexData;
@@ -281,7 +288,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexSize, const void* 
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
-            nearest = Min(nearest, HitDistance(v0, v1, v2));
+            nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal));
             indices += 3;
         }
     }
@@ -296,7 +303,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexSize, const void* 
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[0] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
-            nearest = Min(nearest, HitDistance(v0, v1, v2));
+            nearest = Min(nearest, HitDistance(v0, v1, v2, outNormal));
             indices += 3;
         }
     }

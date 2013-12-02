@@ -3440,6 +3440,8 @@ Properties:
 
 - Drawable@ drawable (readonly)
 - Node@ node (readonly)
+- Vector3 position
+- Vector3 normal
 - float distance
 - uint subObject
 

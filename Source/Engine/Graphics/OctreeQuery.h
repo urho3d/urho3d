@@ -160,12 +160,22 @@ enum RayQueryLevel
 /// Raycast result.
 struct RayQueryResult
 {
+    RayQueryResult() :
+        drawable_(0),
+        node_(0)
+    {
+    }
+    
+    /// Hit position in world space.
+    Vector3 position_;
+    /// Hit normal in world space. Negation of ray direction if per-triangle data not available.
+    Vector3 normal_;
+    /// Distance from ray origin.
+    float distance_;
     /// Drawable.
     Drawable* drawable_;
     /// Scene node.
     Node* node_;
-    /// Distance from ray origin.
-    float distance_;
     /// Drawable specific subobject if applicable.
     unsigned subObject_;
 };

@@ -301,8 +301,7 @@ bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
     RayQueryResult result = scene_.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, maxDistance, DRAWABLE_GEOMETRY);
     if (result.drawable !is null)
     {
-        // Calculate hit position in world space
-        hitPos = cameraRay.origin + cameraRay.direction * result.distance;
+        hitPos = result.position;
         hitDrawable = result.drawable;
         return true;
     }

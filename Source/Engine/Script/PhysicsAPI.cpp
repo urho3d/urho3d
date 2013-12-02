@@ -45,6 +45,9 @@ static PhysicsWorld* GetPhysicsWorld()
 static void ConstructPhysicsRaycastResult(PhysicsRaycastResult* ptr)
 {
     new(ptr) PhysicsRaycastResult();
+    ptr->position_ = Vector3::ZERO;
+    ptr->normal_ = Vector3::ZERO;
+    ptr->distance_ = 0.0f;
 }
 
 static void DestructPhysicsRaycastResult(PhysicsRaycastResult* ptr)

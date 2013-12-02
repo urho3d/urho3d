@@ -344,17 +344,17 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
 
     if (rayCallback.hasHit())
     {
-        result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
         result.position_ = ToVector3(rayCallback.m_hitPointWorld);
         result.normal_ = ToVector3(rayCallback.m_hitNormalWorld);
         result.distance_ = (result.position_ - ray.origin_).Length();
+        result.body_ = static_cast<RigidBody*>(rayCallback.m_collisionObject->getUserPointer());
     }
     else
     {
-        result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
         result.distance_ = M_INFINITY;
+        result.body_ = 0;
     }
 }
 

@@ -280,7 +280,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
     }
 }
 
-float Geometry::GetHitDistance(const Ray& ray) const
+float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal) const
 {
     const unsigned char* vertexData;
     const unsigned char* indexData;
@@ -291,9 +291,9 @@ float Geometry::GetHitDistance(const Ray& ray) const
     GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
     
     if (vertexData && indexData)
-        return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
+        return ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal);
     else if (vertexData)
-        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_);
+        return ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal);
     else
         return M_INFINITY;
 }

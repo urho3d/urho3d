@@ -61,9 +61,9 @@ struct PhysicsRaycastResult
     {
     }
 
-    /// Hit position.
+    /// Hit worldspace position.
     Vector3 position_;
-    /// Hit normal.
+    /// Hit worldspace normal.
     Vector3 normal_;
     /// Hit distance from ray origin.
     float distance_;

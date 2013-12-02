@@ -3948,6 +3948,8 @@ class RayQueryResult
 Drawable drawable;
 /* (readonly) */
 Node node;
+Vector3 position;
+Vector3 normal;
 float distance;
 uint subObject;
 };

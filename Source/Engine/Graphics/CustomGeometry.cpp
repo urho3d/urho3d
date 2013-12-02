@@ -91,6 +91,7 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
         Matrix3x4 inverse(node_->GetWorldTransform().Inverse());
         Ray localRay = query.ray_.Transformed(inverse);
         float distance = localRay.HitDistance(boundingBox_);
+        Vector3 normal = -query.ray_.direction_;
         
         if (level == RAY_TRIANGLE && distance < query.maxDistance_)
         {
@@ -101,9 +102,13 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
                 Geometry* geometry = batches_[i].geometry_;
                 if (geometry)
                 {
-                    float geometryDistance = geometry->GetHitDistance(localRay);
+                    Vector3 geometryNormal;
+                    float geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
                     if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
+                    {
                         distance = geometryDistance;
+                        normal = (node_->GetWorldTransform() * Vector4(geometryNormal, 0.0f)).Normalized();
+                    }
                 }
             }
         }
@@ -111,9 +116,11 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
         if (distance < query.maxDistance_)
         {
             RayQueryResult result;
+            result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+            result.normal_ = normal;
+            result.distance_ = distance;
             result.drawable_ = this;
             result.node_ = node_;
-            result.distance_ = distance;
             result.subObject_ = M_MAX_UNSIGNED;
             results.Push(result);
         }

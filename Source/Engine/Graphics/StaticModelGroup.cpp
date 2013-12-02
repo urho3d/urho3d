@@ -115,6 +115,7 @@ void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<Ra
     {
         // Initial test using AABB
         float distance = query.ray_.HitDistance(boundingBox_.Transformed(worldTransforms_[i]));
+        Vector3 normal = -query.ray_.direction_;
         
         // Then proceed to OBB and triangle-level tests if necessary
         if (level >= RAY_OBB && distance < query.maxDistance_)
@@ -132,9 +133,13 @@ void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<Ra
                     Geometry* geometry = batches_[j].geometry_;
                     if (geometry)
                     {
-                        float geometryDistance = geometry->GetHitDistance(localRay);
+                        Vector3 geometryNormal;
+                        float geometryDistance = geometry->GetHitDistance(localRay, &geometryNormal);
                         if (geometryDistance < query.maxDistance_ && geometryDistance < distance)
+                        {
                             distance = geometryDistance;
+                            normal = (worldTransforms_[i] * Vector4(geometryNormal, 0.0f)).Normalized();
+                        }
                     }
                 }
             }
@@ -143,9 +148,11 @@ void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<Ra
         if (distance < query.maxDistance_)
         {
             RayQueryResult result;
+            result.position_ = query.ray_.origin_ + distance * query.ray_.direction_;
+            result.normal_ = normal;
+            result.distance_ = distance;
             result.drawable_ = this;
             result.node_ = node_;
-            result.distance_ = distance;
             result.subObject_ = i;
             results.Push(result);
         }

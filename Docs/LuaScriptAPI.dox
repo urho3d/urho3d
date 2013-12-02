@@ -1159,9 +1159,11 @@ Methods:
 
 Properties:
 
+- Vector3 position
+- Vector3 normal
+- float distance
 - Drawable* drawable
 - Node* node
-- float distance
 - unsigned subObject
 
 ### ColorFrame
