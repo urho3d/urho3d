@@ -61,6 +61,7 @@ Sound::Sound(Context* context) :
     Resource(context),
     repeat_(0),
     end_(0),
+    dataSize_(0),
     frequency_(44100),
     looped_(false),
     sixteenBit_(false),

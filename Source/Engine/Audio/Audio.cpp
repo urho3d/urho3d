@@ -74,9 +74,6 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     bufferLengthMSec = Max(bufferLengthMSec, MIN_BUFFERLENGTH);
     mixRate = Clamp(mixRate, MIN_MIXRATE, MAX_MIXRATE);
     
-    // Guarantee a fragment size that is low enough so that Vorbis decoding buffers do not wrap
-    fragmentSize_ = NextPowerOfTwo(mixRate >> 6);
-    
     SDL_AudioSpec desired;
     SDL_AudioSpec obtained;
     
@@ -114,7 +111,8 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     
     stereo_ = obtained.channels == 2;
     sampleSize_ = stereo_ ? sizeof(int) : sizeof(short);
-    fragmentSize_ = obtained.samples;
+    // Guarantee a fragment size that is low enough so that Vorbis decoding buffers do not wrap
+    fragmentSize_ = Min((int)NextPowerOfTwo(mixRate >> 6), (int)obtained.samples);
     mixRate_ = mixRate;
     interpolation_ = interpolation;
     clipBuffer_ = new int[stereo ? fragmentSize_ << 1 : fragmentSize_];
@@ -247,7 +245,7 @@ void Audio::MixOutput(void *dest, unsigned samples)
             *destPtr++ = Clamp(*clipPtr++, -32768, 32767);
         
         samples -= workSamples;
-        ((unsigned char*&)destPtr) += sampleSize_ * workSamples;
+        ((unsigned char*&)dest) += sampleSize_ * workSamples;
     }
 }
 
