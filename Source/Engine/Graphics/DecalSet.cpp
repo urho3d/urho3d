@@ -1011,10 +1011,11 @@ void DecalSet::UpdateBuffers()
     
     float* vertices = (float*)vertexBuffer_->Lock(0, numVertices_);
     unsigned short* indices = (unsigned short*)indexBuffer_->Lock(0, numIndices_);
-    unsigned short indexStart = 0;
     
     if (vertices && indices)
     {
+        unsigned short indexStart = 0;
+        
         for (List<Decal>::ConstIterator i = decals_.Begin(); i != decals_.End(); ++i)
         {
             for (unsigned j = 0; j < i->vertices_.Size(); ++j)

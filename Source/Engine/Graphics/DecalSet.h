@@ -212,8 +212,6 @@ private:
     Vector<Bone> bones_;
     /// Skinning matrices.
     PODVector<Matrix3x4> skinMatrices_;
-    /// Local-space bounding box.
-    BoundingBox boundingBox_;
     /// Vertices in the current decals.
     unsigned numVertices_;
     /// Indices in the current decals.
