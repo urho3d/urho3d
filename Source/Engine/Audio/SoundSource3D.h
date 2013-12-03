@@ -45,10 +45,16 @@ public:
     
     /// Set attenuation parameters.
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
-    /// Set near distance. Distances closer than this do not have an effect.
+    /// Set angle attenuation parameters.
+    void SetAngleAttenuation(float innerAngle, float outerAngle);
+    /// Set near distance. Inside this range sound will not be attenuated.
     void SetNearDistance(float distance);
-    /// Set far distance. Beyond this sound will be completely attenuated.
+    /// Set far distance. Outside this range sound will be completely attenuated.
     void SetFarDistance(float distance);
+    /// Set inner angle in degrees. Inside this angle sound will not be attenuated.By default 360, meaning direction never has an effect.
+    void SetInnerAngle(float angle);
+    /// Set outer angle in degrees. Outside this angle sound will be completely attenuated. By default 360, meaning direction never has an effect.
+    void SetOuterAngle(float angle);
     /// Set rolloff power factor, defines attenuation function shape.
     void SetRolloffFactor(float factor);
     /// Calculate attenuation and panning based on current position and listener position.
@@ -58,6 +64,10 @@ public:
     float GetNearDistance() const { return nearDistance_; }
     /// Return far distance.
     float GetFarDistance() const { return farDistance_; }
+    /// Return inner angle in degrees.
+    float GetInnerAngle() const { return innerAngle_; }
+    /// Return outer angle in degrees.
+    float GetOuterAngle() const { return outerAngle_; }
     /// Return rolloff power factor.
     float RollAngleoffFactor() const { return rolloffFactor_; }
     
@@ -66,6 +76,10 @@ protected:
     float nearDistance_;
     /// Far distance.
     float farDistance_;
+    /// Inner angle for directional attenuation.
+    float innerAngle_;
+    /// Outer angle for directional attenuation.
+    float outerAngle_;
     /// Rolloff power factor.
     float rolloffFactor_;
 };

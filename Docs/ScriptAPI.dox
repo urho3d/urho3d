@@ -3798,6 +3798,7 @@ Methods:
 - void Play(Sound@, float, float, float)
 - void Stop()
 - void SetDistanceAttenuation(float, float, float)
+- void SetAngleAttenuation(float, float)
 
 Properties:
 
@@ -3827,6 +3828,8 @@ Properties:
 - bool playing (readonly)
 - float nearDistance
 - float farDistance
+- float innerAngle
+- float outerAngle
 - float rolloffFactor
 
 

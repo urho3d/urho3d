@@ -4420,6 +4420,7 @@ void Play(Sound, float, float);
 void Play(Sound, float, float, float);
 void Stop();
 void SetDistanceAttenuation(float, float, float);
+void SetAngleAttenuation(float, float);
 
 // Properties:
 /* (readonly) */
@@ -4464,6 +4465,8 @@ bool autoRemove;
 bool playing;
 float nearDistance;
 float farDistance;
+float innerAngle;
+float outerAngle;
 float rolloffFactor;
 };
 

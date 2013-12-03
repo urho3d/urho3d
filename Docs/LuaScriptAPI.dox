@@ -126,18 +126,25 @@ Properties:
 Methods:
 
 - void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor)
+- void SetAngleAttenuation(float innerAngle, float outerAngle)
 - void SetNearDistance(float distance)
 - void SetFarDistance(float distance)
+- void SetInnerAngle(float angle)
+- void SetOuterAngle(float angle)
 - void SetRolloffFactor(float factor)
 - void CalculateAttenuation()
 - float GetNearDistance() const
 - float GetFarDistance() const
+- float GetInnerAngle() const
+- float GetOuterAngle() const
 - float RollAngleoffFactor() const
 
 Properties:
 
 - float nearDistance
 - float farDistance
+- float innerAngle
+- float outerAngle
 - float rolloffFactor
 
 ### PODVector
@@ -1156,6 +1163,7 @@ Properties:
 
 Methods:
 
+- RayQueryResult()
 
 Properties:
 
