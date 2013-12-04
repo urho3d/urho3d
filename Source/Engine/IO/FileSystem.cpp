@@ -478,6 +478,9 @@ String FileSystem::GetProgramDir() const
         DirExists(currentDir + "Data")))
         programDir_ = currentDir;
     
+    // Sanitate /./ construct away
+    programDir_.Replace("/./", "/");
+    
     return programDir_;
 }
 

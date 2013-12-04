@@ -79,7 +79,13 @@ bool ResourceCache::AddResourceDir(const String& pathName)
         return false;
     }
     
+    // Convert path to absolute
     String fixedPath = AddTrailingSlash(pathName);
+    if (!IsAbsolutePath(fixedPath))
+        fixedPath = fileSystem->GetCurrentDir() + fixedPath;
+    
+    // Sanitate away /./ construct
+    fixedPath.Replace("/./", "/");
     
     // Check that the same path does not already exist
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
