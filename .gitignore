@@ -26,6 +26,9 @@ Lib-CC/
 Docs/html/
 Docs/Doxyfile
 
+# Generated site
+_site/
+
 # Eclipse project settings
 Source/.*project
 Source/.settings
