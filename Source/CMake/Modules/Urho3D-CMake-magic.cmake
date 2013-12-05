@@ -142,7 +142,7 @@ if (IOS)
     endif ()
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
     if (NOT MACOSX_BUNDLE_GUI_IDENTIFIER)
-        set (MACOSX_BUNDLE_GUI_IDENTIFIER com.googlecode.urho3d)
+        set (MACOSX_BUNDLE_GUI_IDENTIFIER com.github.urho3d.\${PRODUCT_NAME:rfc1034identifier})
     endif ()
     set (CMAKE_OSX_SYSROOT iphoneos)    # Set to "Latest iOS"
 elseif (XCODE)
