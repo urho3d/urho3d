@@ -208,18 +208,21 @@ void EditMoveSnap(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     moveSnap = edit.checked;
+    toolBarDirty = true;
 }
 
 void EditRotateSnap(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     rotateSnap = edit.checked;
+    toolBarDirty = true;
 }
 
 void EditScaleSnap(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     scaleSnap = edit.checked;
+    toolBarDirty = true;
 }
 
 void EditRememberResourcePath(StringHash eventType, VariantMap& eventData)

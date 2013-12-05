@@ -9,6 +9,7 @@
 #include "Scripts/Editor/EditorMaterial.as"
 #include "Scripts/Editor/EditorSettings.as"
 #include "Scripts/Editor/EditorPreferences.as"
+#include "Scripts/Editor/EditorToolBar.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
 

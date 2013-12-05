@@ -53,6 +53,7 @@ void CreateUI()
 
     CreateCursor();
     CreateMenuBar();
+    CreateToolBar();
     CreateQuickMenu();
     CreateHierarchyWindow();
     CreateAttributeInspectorWindow();
@@ -1078,6 +1079,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         }
         else
             SteppedObjectManipulation(key);
+        toolBarDirty = true;
     }
 }
 
@@ -1199,6 +1201,8 @@ void SetIconEnabledColor(UIElement@ element, bool enabled, bool partial = false)
 
 void UpdateDirtyUI()
 {
+    UpdateDirtyToolBar();
+
     // Perform hierarchy selection latently after the new selections are finalized (used in undo/redo action)
     if (!hierarchyUpdateSelections.empty)
     {

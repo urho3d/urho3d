@@ -17,6 +17,13 @@ enum AxisMode
     AXIS_LOCAL
 }
 
+enum SnapScaleMode
+{
+    SNAP_SCALE_FULL = 0,
+    SNAP_SCALE_HALF,
+    SNAP_SCALE_QUARTER
+}
+
 Text@ editorModeText;
 Text@ renderStatsText;
 Text@ cameraPosText;
@@ -24,6 +31,7 @@ Text@ cameraPosText;
 EditMode editMode = EDIT_MOVE;
 AxisMode axisMode = AXIS_WORLD;
 FillMode fillMode = FILL_SOLID;
+SnapScaleMode snapScaleMode = SNAP_SCALE_FULL;
 
 float cameraBaseSpeed = 10;
 float cameraBaseRotationSpeed = 0.2;
@@ -34,6 +42,7 @@ float newNodeDistance = 20;
 float moveStep = 0.5;
 float rotateStep = 5;
 float scaleStep = 0.1;
+float snapScale = 1.0;
 bool moveSnap = false;
 bool rotateSnap = false;
 bool scaleSnap = false;
@@ -109,13 +118,13 @@ void CreateStatsBar()
 
     if (ui.root.width >= 1200)
     {
-        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 0, 24, HA_RIGHT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 4, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
     }
     else
     {
-        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 0, 36, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 4, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 4, 78, HA_LEFT, VA_TOP);
     }
 
     SetupStatsBarText(cameraPosText, font, 0, 0, HA_LEFT, VA_BOTTOM);
@@ -251,13 +260,7 @@ void UpdateView(float timeStep)
 
         case EDIT_ROTATE:
             if (!rotateSnap)
-            {
-                Vector3 rotAdjust;
-                rotAdjust.x = adjust.z * rotateStep;
-                rotAdjust.y = adjust.x * rotateStep;
-                rotAdjust.z = adjust.y * rotateStep;
-                moved = RotateNodes(rotAdjust);
-            }
+                moved = RotateNodes(adjust * rotateStep);
             break;
 
         case EDIT_SCALE:
@@ -318,16 +321,16 @@ void SteppedObjectManipulation(int key)
 
     case EDIT_ROTATE:
         {
-            Vector3 rotAdjust;
-            rotAdjust.x = adjust.z * rotateStep;
-            rotAdjust.y = adjust.x * rotateStep;
-            rotAdjust.z = adjust.y * rotateStep;
-            moved = RotateNodes(rotAdjust);
+            float rotateStepScaled = rotateStep * snapScale;
+            moved = RotateNodes(adjust * rotateStepScaled);
         }
         break;
 
     case EDIT_SCALE:
-        moved = ScaleNodes(adjust * scaleStep);
+        {
+            float scaleStepScaled = scaleStep * snapScale;
+            moved = ScaleNodes(adjust * scaleStepScaled);
+        }
         break;
     }
 

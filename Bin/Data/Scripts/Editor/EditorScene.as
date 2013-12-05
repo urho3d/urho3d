@@ -349,6 +349,8 @@ bool ToggleSceneUpdate()
         audio.Play();
     else
         audio.Stop();
+
+    toolBarDirty = true;
     return true;
 }
 
