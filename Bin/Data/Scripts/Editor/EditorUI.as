@@ -79,17 +79,20 @@ void ResizeUI()
     // Resize menu bar
     uiMenuBar.SetFixedWidth(graphics.width);
 
+    // Resize tool bar
+    toolBar.SetFixedWidth(graphics.width);
+
     // Relayout stats bar
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
     if (graphics.width >= 1200)
     {
-        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 0, 24, HA_RIGHT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 4, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
     }
     else
     {
-        SetupStatsBarText(editorModeText, font, 0, 24, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 0, 36, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 4, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 4, 78, HA_LEFT, VA_TOP);
     }
 
     // Relayout windows
@@ -110,9 +113,9 @@ void AdjustPosition(Window@ window)
     IntVector2 size = window.size;
     IntVector2 extend = position + size;
     if (extend.x > graphics.width)
-        position.x = Max(20, graphics.width - size.x - 20);
+        position.x = Max(10, graphics.width - size.x - 10);
     if (extend.y > graphics.height)
-        position.y = Max(40, graphics.height - size.y - 20);
+        position.y = Max(100, graphics.height - size.y - 10);
     window.position = position;
 }
 
