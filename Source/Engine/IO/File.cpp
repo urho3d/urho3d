@@ -149,6 +149,12 @@ bool File::Open(const String& fileName, FileMode mode)
     }
     #endif
 
+    if (fileName.Empty())
+    {
+        LOGERROR("Could not open file with empty name");
+        return false;
+    }
+    
     #ifdef WIN32
     handle_ = _wfopen(GetWideNativePath(fileName).CString(), openMode[mode]);
     #else
