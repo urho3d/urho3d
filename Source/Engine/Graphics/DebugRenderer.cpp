@@ -195,30 +195,33 @@ void DebugRenderer::AddPolyhedron(const Polyhedron& poly, const Color& color, bo
     }
 }
 
+static Vector3 PointOnSphere(const Sphere& sphere, unsigned theta, unsigned phi)
+{
+    return Vector3(
+        sphere.center_.x_ + sphere.radius_ * Sin((float)theta) * Sin((float)phi),
+        sphere.center_.y_ + sphere.radius_ * Cos((float)phi),
+        sphere.center_.z_ + sphere.radius_ * Cos((float)theta) * Sin((float)phi)
+    );
+}
+
 void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool depthTest)
 {
-    const Vector3& center = sphere.center_;
-    float radius = sphere.radius_;
     unsigned uintColor = color.ToUInt();
-
-    for (unsigned i = 0; i < 360; i += 45)
+    
+    for (unsigned j = 0; j < 180; j += 45)
     {
-        unsigned j = i + 45;
-        float a = radius * Sin((float)i);
-        float b = radius * Cos((float)i);
-        float c = radius * Sin((float)j);
-        float d = radius * Cos((float)j);
-        Vector3 start, end;
-
-        start = center + Vector3(a, b, 0.0f);
-        end = center + Vector3(c, d, 0.0f);
-        AddLine(start, end, uintColor, depthTest);
-        start = center + Vector3(a, 0.0f, b);
-        end = center + Vector3(c, 0.0f, d);
-        AddLine(start, end, uintColor, depthTest);
-        start = center + Vector3(0.0f, a, b);
-        end = center + Vector3(0.0f, c, d);
-        AddLine(start, end, uintColor, depthTest);
+        for (unsigned i = 0; i < 360; i += 45)
+        {
+            Vector3 p1 = PointOnSphere(sphere, i, j);
+            Vector3 p2 = PointOnSphere(sphere, i + 45, j);
+            Vector3 p3 = PointOnSphere(sphere, i, j + 45);
+            Vector3 p4 = PointOnSphere(sphere, i + 45, j + 45);
+            
+            AddLine(p1, p2, uintColor, depthTest);
+            AddLine(p3, p4, uintColor, depthTest);
+            AddLine(p1, p3, uintColor, depthTest);
+            AddLine(p2, p4, uintColor, depthTest);
+        }
     }
 }
 

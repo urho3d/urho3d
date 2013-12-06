@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Audio.h"
 #include "Context.h"
+#include "DebugRenderer.h"
 #include "Node.h"
 #include "Sound.h"
 #include "SoundListener.h"
@@ -38,8 +39,67 @@ static const float DEFAULT_FARDISTANCE = 100.0f;
 static const float DEFAULT_ROLLOFF = 2.0f;
 static const float DEFAULT_ANGLE = 360.0f;
 static const float MIN_ROLLOFF = 0.1f;
+static const Color INNER_COLOR(1.0f, 0.5f, 1.0f);
+static const Color OUTER_COLOR(1.0f, 0.0f, 1.0f);
 
 extern const char* AUDIO_CATEGORY;
+
+static Vector3 PointOnSphere(float radius, float theta, float phi)
+{
+    // Zero angles point toward positive Z axis
+    phi += 90.0f;
+    
+    return Vector3(
+        radius * Sin(theta) * Sin(phi),
+        radius * Cos(phi),
+        radius * Cos(theta) * Sin(phi)
+    );
+}
+
+static void DrawDebugArc(const Vector3& worldPosition, const Quaternion& worldRotation, float angle, float distance, bool drawLines,
+    const Color& color, DebugRenderer* debug, bool depthTest)
+{
+    if (angle <= 0.f)
+        return;
+    else if (angle >= 360.0f)
+    {
+        debug->AddSphere(Sphere(worldPosition, distance), color, depthTest);
+        return;
+    }
+    
+    unsigned uintColor = color.ToUInt();
+    float halfAngle = 0.5f * angle;
+    
+    if (drawLines)
+    {
+        debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, halfAngle, halfAngle),
+            uintColor);
+        debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, halfAngle),
+            uintColor);
+        debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, halfAngle, -halfAngle),
+            uintColor);
+        debug->AddLine(worldPosition, worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, -halfAngle),
+            uintColor);
+    }
+    
+    const float step = 0.5f;
+    
+    for (float x = -1.0f; x < 1.0f; x += step)
+    {
+        debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, x * halfAngle, halfAngle),
+            worldPosition + worldRotation * PointOnSphere(distance, (x + step) * halfAngle, halfAngle),
+            uintColor);
+        debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, x * halfAngle, -halfAngle),
+            worldPosition + worldRotation * PointOnSphere(distance, (x + step) * halfAngle, -halfAngle),
+            uintColor);
+        debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, halfAngle, x * halfAngle),
+            worldPosition + worldRotation * PointOnSphere(distance, halfAngle, (x + step) * halfAngle),
+            uintColor);
+        debug->AddLine(worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, x * halfAngle),
+            worldPosition + worldRotation * PointOnSphere(distance, -halfAngle, (x + step) * halfAngle),
+            uintColor);
+    }
+}
 
 SoundSource3D::SoundSource3D(Context* context) :
     SoundSource(context),
@@ -66,6 +126,30 @@ void SoundSource3D::RegisterObject(Context* context)
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Inner Angle", innerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Outer Angle", outerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
     ATTRIBUTE(SoundSource3D, VAR_FLOAT, "Rolloff Factor", rolloffFactor_, DEFAULT_ROLLOFF, AM_DEFAULT);
+}
+
+void SoundSource3D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    if (!debug || !node_ || !IsEnabledEffective())
+        return;
+    
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
+    Vector3 worldPosition = worldTransform.Translation();
+    Quaternion worldRotation = worldTransform.Rotation();
+    
+    // Draw cones for directional sounds, or spheres for non-directional
+    if (innerAngle_ < DEFAULT_ANGLE && outerAngle_ > 0.0f)
+    {
+        DrawDebugArc(worldPosition, worldRotation, innerAngle_, nearDistance_, false, INNER_COLOR, debug, depthTest);
+        DrawDebugArc(worldPosition, worldRotation, outerAngle_, nearDistance_, false, OUTER_COLOR, debug, depthTest);
+        DrawDebugArc(worldPosition, worldRotation, innerAngle_, farDistance_, true, INNER_COLOR, debug, depthTest);
+        DrawDebugArc(worldPosition, worldRotation, outerAngle_, farDistance_, true, OUTER_COLOR, debug, depthTest);
+    }
+    else
+    {
+        debug->AddSphere(Sphere(worldPosition, nearDistance_), INNER_COLOR, depthTest);
+        debug->AddSphere(Sphere(worldPosition, farDistance_), OUTER_COLOR, depthTest);
+    }
 }
 
 void SoundSource3D::Update(float timeStep)
@@ -146,7 +230,7 @@ void SoundSource3D::CalculateAttenuation()
             panning_ = relativePos.Normalized().x_;
             
             // Angle attenuation
-            if (innerAngle_ < DEFAULT_ANGLE)
+            if (innerAngle_ < DEFAULT_ANGLE && outerAngle_ > 0.0f)
             {
                 Vector3 listenerRelativePos(node_->GetWorldRotation().Inverse() * (listenerNode->GetWorldPosition() -
                     node_->GetWorldPosition()));

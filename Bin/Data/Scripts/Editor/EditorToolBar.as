@@ -131,7 +131,7 @@ void ToolBarRunUpdatePlay(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     if (edit.checked)
-        runUpdate = true;
+        StartSceneUpdate();
     toolBarDirty = true;
 }
 
@@ -139,7 +139,7 @@ void ToolBarRunUpdatePause(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     if (edit.checked)
-        runUpdate = false;
+        StopSceneUpdate();
     toolBarDirty = true;
 }
 

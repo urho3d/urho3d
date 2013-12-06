@@ -338,19 +338,24 @@ void StopSceneUpdate()
 {
     runUpdate = false;
     audio.Stop();
+    toolBarDirty = true;
+}
+
+void StartSceneUpdate()
+{
+    runUpdate = true;
+    // Run audio playback only when scene is updating, so that audio components' time-dependent attributes stay constant when
+    // paused (similar to physics)
+    audio.Play();
+    toolBarDirty = true;
 }
 
 bool ToggleSceneUpdate()
 {
-    runUpdate = !runUpdate;
-    // Run audio playback only when scene is updating, so that audio components' time-dependent attributes stay constant when
-    // paused (similar to physics)
-    if (runUpdate)
-        audio.Play();
+    if (!runUpdate)
+        StartSceneUpdate();
     else
-        audio.Stop();
-
-    toolBarDirty = true;
+        StopSceneUpdate();
     return true;
 }
 

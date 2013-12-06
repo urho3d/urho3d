@@ -201,7 +201,7 @@ void NavigationMesh::RegisterObject(Context* context)
 
 void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    if (!navMesh_ || !node_)
+    if (!debug || !navMesh_ || !node_)
         return;
     
     const Matrix3x4& worldTransform = node_->GetWorldTransform();

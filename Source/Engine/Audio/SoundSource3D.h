@@ -40,6 +40,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
     
+    /// Visualize the component as debug geometry.
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     /// Update sound source.
     virtual void Update(float timeStep);
     
