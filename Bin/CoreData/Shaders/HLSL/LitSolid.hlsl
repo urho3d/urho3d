@@ -276,6 +276,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef LIGHTMAP
             finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
         #endif
+        #ifdef EMISSIVE
+            finalColor += cMatEmissiveColor * tex2D(sEmissiveMap, iTexCoord).rgb;
+        #endif
 
         oColor = float4(GetFog(finalColor, iVertexLight.a), 1.0);
         oAlbedo = GetFogFactor(iVertexLight.a) * float4(diffColor.rgb, specIntensity);
@@ -306,6 +309,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
         #ifdef LIGHTMAP
             finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
+        #endif
+        #ifdef EMISSIVE
+            finalColor += cMatEmissiveColor * tex2D(sEmissiveMap, iTexCoord).rgb;
         #endif
 
         oColor = float4(GetFog(finalColor, iVertexLight.a), diffColor.a);

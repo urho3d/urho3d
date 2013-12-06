@@ -510,7 +510,7 @@ void Material::ResetToDefaults()
     SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     SetShaderParameter("MatDiffColor", Vector4::ONE);
-    SetShaderParameter("MatEmissiveColor", Vector4::ZERO);
+    SetShaderParameter("MatEmissiveColor", Vector4::ONE);
     SetShaderParameter("MatEnvMapColor", Vector4::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
     

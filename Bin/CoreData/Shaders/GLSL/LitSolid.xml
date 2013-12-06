@@ -33,29 +33,37 @@
         <option name="Packed" define="PACKEDNORMAL" require="NORMALMAP" />
         <option name="SpecMap" define="SPECMAP" require="DIFFMAP" />
         <option name="EnvCube" define="ENVCUBEMAP" />
-        <option name="LightMap" define="LIGHTMAP" />
+        <option name="LightMap" define="LIGHTMAP" require="DIFFMAP" exclude="Emissive" />
+        <option name="Emissive" define="EMISSIVE" exclude="LightMap" />
         <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="Ambient" define="AMBIENT" require="PERPIXEL" />
         <variation name="" define="AMBIENT" />
         <variation name="Dir">
             <exclude name="EnvCube" />
             <exclude name="LightMap" />
+            <exclude name="Emissive" />
             <define name="DIRLIGHT" />
             <define name="PERPIXEL" />
         </variation>
         <variation name="Spot">
             <exclude name="EnvCube" />
             <exclude name="LightMap" />
+            <exclude name="Emissive" />
             <define name="SPOTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
         <variation name="Point">
             <exclude name="EnvCube" />
             <exclude name="LightMap" />
+            <exclude name="Emissive" />
             <define name="POINTLIGHT" />
             <define name="PERPIXEL" />
         </variation>
-        <variation name="Prepass" define="PREPASS" exclude="EnvCube" />
+        <variation name="Prepass" define="PREPASS">
+            <exclude name="EnvCube" />
+            <exclude name="LightMap" />
+            <exclude name="Emissive" />
+        </variation>
         <variation name="Material" define="MATERIAL" />
         <variation name="Deferred" define="DEFERRED" />
         <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />

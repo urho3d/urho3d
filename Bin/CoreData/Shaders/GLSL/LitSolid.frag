@@ -132,6 +132,9 @@ void main()
         #ifdef LIGHTMAP
             finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * diffColor.rgb;
         #endif
+        #ifdef EMISSIVE
+            finalColor += cMatEmissiveColor * texture2D(sEmissiveMap, vTexCoord).rgb;
+        #endif
 
         gl_FragData[0] = vec4(GetFog(finalColor, vVertexLight.a), 1.0);
         gl_FragData[1] = GetFogFactor(vVertexLight.a) * vec4(diffColor.rgb, specIntensity);
@@ -164,6 +167,9 @@ void main()
         #endif
         #ifdef LIGHTMAP
             finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * diffColor.rgb;
+        #endif
+        #ifdef EMISSIVE
+            finalColor += cMatEmissiveColor * texture2D(sEmissiveMap, vTexCoord).rgb;
         #endif
 
         gl_FragColor = vec4(GetFog(finalColor, vVertexLight.a), diffColor.a);
