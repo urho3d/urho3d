@@ -25,16 +25,19 @@ Array<String> uiSceneFilters = {"*.xml", "*.bin", "*.*"};
 Array<String> uiElementFilters = {"*.xml"};
 Array<String> uiAllFilters = {"*.*"};
 Array<String> uiScriptFilters = {"*.as", "*.*"};
+Array<String> uiParticleFilters = {"*.xml"};
 uint uiSceneFilter = 0;
 uint uiElementFilter = 0;
 uint uiNodeFilter = 0;
 uint uiImportFilter = 0;
 uint uiScriptFilter = 0;
+uint uiParticleFilter = 0;
 String uiScenePath = fileSystem.programDir + "Data/Scenes";
 String uiElementPath = fileSystem.programDir + "Data/UI";
 String uiNodePath = fileSystem.programDir + "Data/Objects";
 String uiImportPath;
 String uiScriptPath = fileSystem.programDir + "Data/Scripts";
+String uiParticlePath = fileSystem.programDir + "Data/Particles";
 
 bool uiFaded = false;
 float uiMinOpacity = 0.3;
@@ -311,6 +314,8 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Stop test animation", @StopTestAnimation));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Rebuild navigation data", @SceneRebuildNavigation));
+        popup.AddChild(CreateMenuItem("Load particle data", @PickFile));
+        popup.AddChild(CreateMenuItem("Save particle data", @PickFile));
         FinalizedPopupMenu(popup);
         uiMenuBar.AddChild(menu);
     }
@@ -476,6 +481,31 @@ bool PickFile()
         CreateFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilters, 0);
         uiFileSelector.directoryMode = true;
         SubscribeToEvent(uiFileSelector, "FileSelected", "HandleResourcePath");
+    }
+    else if (action == "Load particle data")
+    {
+        bool hasParticleEmitter = false;
+        for (uint i = 0; i < editComponents.length; ++i)
+        {
+            if (editComponents[i].typeName == "ParticleEmitter")
+            {
+                hasParticleEmitter = true;
+                break;
+            }
+        }
+        if (hasParticleEmitter)
+        {
+            CreateFileSelector("Load particle data", "Load", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleLoadParticleData");
+        }
+    }
+    else if (action == "Save particle data")
+    {
+        if (editComponents.length == 1 && editComponents[0].typeName == "ParticleEmitter")
+        {
+            CreateFileSelector("Save particle data", "Save", "Cancel", uiParticlePath, uiParticleFilters, uiParticleFilter);
+            SubscribeToEvent(uiFileSelector, "FileSelected", "HandleSaveParticleData");
+        }
     }
     // UI-element
     else if (action == "Open UI-layout...")
@@ -938,6 +968,18 @@ void HandleImportScene(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiImportFilter, uiImportPath);
     ImportScene(ExtractFileName(eventData));
+}
+
+void HandleLoadParticleData(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiParticleFilter, uiParticlePath);
+    LoadParticleData(ExtractFileName(eventData));
+}
+
+void HandleSaveParticleData(StringHash eventType, VariantMap& eventData)
+{
+    CloseFileSelector(uiParticleFilter, uiParticlePath);
+    SaveParticleData(ExtractFileName(eventData, true));
 }
 
 void ExecuteScript(const String&in fileName)

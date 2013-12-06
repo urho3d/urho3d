@@ -1204,6 +1204,7 @@ Properties:
 Methods:
 
 - bool Load(XMLFile* file)
+- bool Save(XMLFile* file)
 - void SetNumParticles(unsigned num)
 - void SetEmissionRate(float rate)
 - void SetMinEmissionRate(float rate)

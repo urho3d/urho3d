@@ -136,6 +136,8 @@ public:
     
     /// Load emitter parameters from an XML file.
     bool Load(XMLFile* file);
+    /// Save particle emitter parameters to an XML file. Return true if successful.
+    bool Save(XMLFile* file) const;
     /// Set maximum number of particles.
     void SetNumParticles(unsigned num);
     /// Set emission rate (both minimum and maximum.)

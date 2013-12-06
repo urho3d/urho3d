@@ -3544,6 +3544,7 @@ void Remove();
 void MarkNetworkUpdate() const;
 void DrawDebugGeometry(DebugRenderer, bool);
 bool Load(XMLFile);
+bool Save(XMLFile);
 void SetEmitting(bool, bool);
 void SetColor(const Color&);
 

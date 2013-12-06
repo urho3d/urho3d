@@ -457,6 +457,113 @@ bool ParticleEmitter::Load(XMLFile* file)
     return true;
 }
 
+bool ParticleEmitter::Save(XMLFile* file) const
+{
+    if (!file)
+    {
+        LOGERROR("Null particle emitter parameter file");
+        return false;
+    }
+    
+    XMLElement rootElem = file->CreateRoot("particleemitter");
+    
+    XMLElement childElem = rootElem.CreateChild("material");
+    childElem.SetAttribute("name", GetResourceName(batches_[0].material_));
+    
+    childElem = rootElem.CreateChild("numparticles");
+    childElem.SetInt("value", particles_.Size());
+    
+    childElem = rootElem.CreateChild("updateinvisible");
+    childElem.SetBool("enable", updateInvisible_);
+    
+    childElem = rootElem.CreateChild("relative");
+    childElem.SetBool("enable", relative_);
+    
+    childElem = rootElem.CreateChild("scaled");
+    childElem.SetBool("enable", scaled_);
+    
+    childElem = rootElem.CreateChild("sorted");
+    childElem.SetBool("enable", sorted_);
+
+    childElem = rootElem.CreateChild("animlodbias");
+    childElem.SetFloat("value", animationLodBias_);
+    
+    childElem = rootElem.CreateChild("emittertype");
+    childElem.SetAttribute("value", emitterTypeNames[emitterType_]);
+    
+    childElem = rootElem.CreateChild("emittersize");
+    childElem.SetVector3("value", emitterSize_);
+    
+    childElem = rootElem.CreateChild("direction");
+    childElem.SetVector3("min", directionMin_);
+    childElem.SetVector3("max", directionMax_);
+    
+    childElem = rootElem.CreateChild("constantforce");
+    childElem.SetVector3("value", constantForce_);
+    
+    childElem = rootElem.CreateChild("dampingforce");
+    childElem.SetFloat("value", dampingForce_);
+    
+    childElem = rootElem.CreateChild("activetime");
+    childElem.SetFloat("value", activeTime_);
+    
+    childElem = rootElem.CreateChild("inactivetime");
+    childElem.SetFloat("value", inactiveTime_);
+    
+    childElem = rootElem.CreateChild("emissionrate");
+    childElem.SetFloat("min", emissionRateMin_);
+    childElem.SetFloat("max", emissionRateMax_);
+    
+    childElem = rootElem.CreateChild("particlesize");
+    childElem.SetVector2("min", sizeMin_);
+    childElem.SetVector2("max", sizeMax_);
+    
+    childElem = rootElem.CreateChild("timetolive");
+    childElem.SetFloat("min", timeToLiveMin_);
+    childElem.SetFloat("max", timeToLiveMax_);
+    
+    childElem = rootElem.CreateChild("velocity");
+    childElem.SetFloat("min", velocityMin_);
+    childElem.SetFloat("max", velocityMax_);
+
+    childElem = rootElem.CreateChild("rotation");
+    childElem.SetFloat("min", rotationMin_);
+    childElem.SetFloat("max", rotationMax_);
+    
+    childElem = rootElem.CreateChild("rotationspeed");
+    childElem.SetFloat("min", rotationSpeedMin_);
+    childElem.SetFloat("max", rotationSpeedMax_);
+    
+    childElem = rootElem.CreateChild("sizedelta");
+    childElem.SetFloat("add", sizeAdd_);
+    childElem.SetFloat("mul", sizeMul_);
+    
+    if (colorFrames_.Size() == 1)
+    {
+        childElem = rootElem.CreateChild("color");
+        childElem.SetColor("value", colorFrames_[0].color_);
+    }
+    
+    if (colorFrames_.Size() > 1)
+    {
+        for (unsigned i = 0; i < colorFrames_.Size(); ++i)
+        {
+            childElem = rootElem.CreateChild("colorfade");
+            childElem.SetColor("color", colorFrames_[i].color_);
+            childElem.SetFloat("time", colorFrames_[i].time_);
+        }
+    }
+    
+    for (unsigned i = 0; i < textureFrames_.Size(); ++i)
+    {
+        childElem = rootElem.CreateChild("texanim");
+        childElem.SetRect("uv", textureFrames_[i].uv_);
+        childElem.SetFloat("time", textureFrames_[i].time_);
+    }
+    
+    return true;
+}
+
 void ParticleEmitter::SetNumParticles(unsigned num)
 {
     // Prevent negative value being assigned from the editor
