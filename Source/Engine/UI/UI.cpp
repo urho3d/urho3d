@@ -868,6 +868,9 @@ void UI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, 
     bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
     bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
     bool dragDropTest = dragSource && dragTarget && element != dragElement_;
+    // If drag start event has not been posted yet, do not do drag handling here
+    if (dragBeginPending_)
+        dragSource = dragTarget = dragDropTest = false;
 
     // Hover effect
     // If a drag is going on, transmit hover only to the element being dragged, unless it's a drop target
@@ -879,30 +882,27 @@ void UI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, 
     else if (cursor)
         cursor->SetShape(CS_NORMAL);
 
-    if (!dragBeginPending_)
+    // Drag and drop test
+    if (dragDropTest)
     {
-        // Drag and drop test
-        if (dragDropTest)
+        bool accept = element->OnDragDropTest(dragElement_);
+        if (accept)
         {
-            bool accept = element->OnDragDropTest(dragElement_);
-            if (accept)
-            {
-                using namespace DragDropTest;
+            using namespace DragDropTest;
 
-                VariantMap eventData;
-                eventData[P_SOURCE] = (void*)dragElement_.Get();
-                eventData[P_TARGET] = (void*)element.Get();
-                eventData[P_ACCEPT] = accept;
-                SendEvent(E_DRAGDROPTEST, eventData);
-                accept = eventData[P_ACCEPT].GetBool();
-            }
-
-            if (cursor)
-                cursor->SetShape(accept ? CS_ACCEPTDROP : CS_REJECTDROP);
+            VariantMap eventData;
+            eventData[P_SOURCE] = (void*)dragElement_.Get();
+            eventData[P_TARGET] = (void*)element.Get();
+            eventData[P_ACCEPT] = accept;
+            SendEvent(E_DRAGDROPTEST, eventData);
+            accept = eventData[P_ACCEPT].GetBool();
         }
-        else if (dragSource && cursor)
-            cursor->SetShape(dragElement_ == element ? CS_ACCEPTDROP : CS_REJECTDROP);
+
+        if (cursor)
+            cursor->SetShape(accept ? CS_ACCEPTDROP : CS_REJECTDROP);
     }
+    else if (dragSource && cursor)
+        cursor->SetShape(dragElement_ == element ? CS_ACCEPTDROP : CS_REJECTDROP);
 }
 
 void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
