@@ -7360,11 +7360,15 @@ UIElement focusElement;
 /* (readonly) */
 UIElement frontElement;
 /* (readonly) */
+UIElement dragElement;
+/* (readonly) */
 UIElement root;
 /* (readonly) */
 UIElement modalRoot;
 String clipBoardText;
 float doubleClickInterval;
+float dragBeginInterval;
+int dragBeginDistance;
 int maxFontTextureSize;
 bool nonFocusedMouseWheel;
 bool useSystemClipBoard;

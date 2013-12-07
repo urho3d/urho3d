@@ -482,7 +482,8 @@ const IntVector2& UIElement::GetScreenPosition() const
 
 void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if (cursor && cursor->IsVisible())
+    // Reset cursor shape on hover, but do not do that unnecessarily during drag
+    if (cursor && cursor->IsVisible() && !GetSubsystem<UI>()->GetDragElement())
         cursor->SetShape(CS_NORMAL);
     hovering_ = true;
 }

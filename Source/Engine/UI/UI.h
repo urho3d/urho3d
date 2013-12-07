@@ -79,6 +79,10 @@ public:
     void SetClipBoardText(const String& text);
     /// Set UI element double click interval in seconds.
     void SetDoubleClickInterval(float interval);
+    /// Set UI drag event start interval in seconds.
+    void SetDragBeginInterval(float interval);
+    /// Set UI drag event start distance threshold in pixels.
+    void SetDragBeginDistance(int pixels);
     /// Set maximum font face texture size. Must be a power of two. Default is 2048.
     void SetMaxFontTextureSize(int size);
     /// Set whether mouse wheel can control also a non-focused element.
@@ -106,10 +110,16 @@ public:
     UIElement* GetFocusElement() const { return focusElement_; }
     /// Return topmost enabled root-level non-modal element.
     UIElement* GetFrontElement() const;
+    /// Return currently dragged element.
+    UIElement* GetDragElement() const;
     /// Return clipboard text.
     const String& GetClipBoardText() const;
     /// Return UI element double click interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
+    /// Return UI drag start event interval in seconds.
+    float GetDragBeginInterval() const { return dragBeginInterval_; }
+    /// Return UI drag start event distance threshold in pixels.
+    int GetDragBeginDistance() const { return dragBeginDistance_; }
     /// Return font texture maximum size.
     int GetMaxFontTextureSize() const { return maxFontTextureSize_; }
     /// Return whether mouse wheel can control also a non-focused element.
@@ -144,6 +154,8 @@ private:
     void SetCursorShape(CursorShape shape);
     /// Force release of font faces when global font properties change.
     void ReleaseFontFaces();
+    /// Handle button or touch hover
+    void ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor);
     /// Handle button or touch begin.
     void ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible);
     /// Handle button or touch end.
@@ -221,8 +233,16 @@ private:
     PODVector<UIElement*> tempElements_;
     /// Clipboard text.
     mutable String clipBoard_;
+    /// Seconds between clicks to register a double click.
+    float doubleClickInterval_;
+    /// Seconds from mouse button down to begin a drag if there has been no movement exceeding pixel threshold.
+    float dragBeginInterval_;
+    /// Drag begin event distance threshold in pixels.
+    int dragBeginDistance_;
     /// Mouse buttons held down.
     int mouseButtons_;
+    /// Last mouse button pressed.
+    int lastMouseButtons_;
     /// Qualifier keys held down.
     int qualifiers_;
     /// Font texture maximum size.
@@ -239,18 +259,21 @@ private:
     bool useMutableGlyphs_;
     /// Flag for forcing FreeType autohinting.
     bool forceAutoHint_;
+    /// Flag for a drag start event pending.
+    bool dragBeginPending_;
     /// Non-modal batch size (used internally for rendering).
     unsigned nonModalBatchSize_;
     /// Timer used to trigger double click.
-    Timer* clickTimer_;
+    Timer clickTimer_;
+    /// Timer used to trigger drag begin event.
+    Timer dragBeginTimer_;
+    /// Drag start position.
+    IntVector2 dragBeginPos_;
+    /// Timer used for drag begin.
     /// UI element last clicked for tracking click end.
     WeakPtr<UIElement> clickElement_;
     /// UI element last clicked for tracking double clicks.
     WeakPtr<UIElement> doubleClickElement_;
-    /// Last mouse button pressed.
-    int lastMouseButtons_;
-    /// Seconds between clicks to register a double click.
-    float doubleClickInterval_;
 };
 
 /// Register UI library objects.

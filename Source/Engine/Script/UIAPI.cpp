@@ -597,12 +597,17 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "void set_focusElement(UIElement@+)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_focusElement() const", asMETHOD(UI, GetFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_frontElement() const", asMETHOD(UI, GetFrontElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ get_dragElement() const", asMETHOD(UI, GetDragElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_root() const", asMETHOD(UI, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ get_modalRoot() const", asMETHOD(UI, GetRootModalElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_clipBoardText(const String&in)", asMETHOD(UI, SetClipBoardText), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "const String& get_clipBoardText() const", asMETHOD(UI, GetClipBoardText), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_doubleClickInterval(float)", asMETHOD(UI, SetDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_doubleClickInterval() const", asMETHOD(UI, GetDoubleClickInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_dragBeginInterval(float)", asMETHOD(UI, SetDragBeginInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_dragBeginInterval() const", asMETHOD(UI, GetDragBeginInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_dragBeginDistance(int)", asMETHOD(UI, SetDragBeginDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_dragBeginDistance() const", asMETHOD(UI, GetDragBeginDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_maxFontTextureSize(int)", asMETHOD(UI, SetMaxFontTextureSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "int get_maxFontTextureSize() const", asMETHOD(UI, GetMaxFontTextureSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHOD(UI, SetNonFocusedMouseWheel), asCALL_THISCALL);

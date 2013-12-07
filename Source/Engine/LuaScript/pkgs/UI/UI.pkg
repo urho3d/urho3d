@@ -15,6 +15,8 @@ class UI : public Object
     void SetClipBoardText(const String text);
 
     void SetDoubleClickInterval(float interval);
+    void SetDragBeginInterval(float interval);
+    void SetDragBeginDistance(int pixels);
     void SetMaxFontTextureSize(int size);
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
     void SetUseSystemClipBoard(bool enable);
@@ -30,8 +32,11 @@ class UI : public Object
 
     UIElement* GetFocusElement() const;
     UIElement* GetFrontElement() const;
+    UIElement* GetDragElement() const;
     const String GetClipBoardText() const;
     float GetDoubleClickInterval() const;
+    float GetDragBeginInterval() const;
+    int GetDragBeginDistance() const;
     int GetMaxFontTextureSize() const;
     bool IsNonFocusedMouseWheel() const;
     bool GetUseSystemClipBoard() const;
@@ -45,9 +50,12 @@ class UI : public Object
     tolua_readonly tolua_property__get_set IntVector2 cursorPosition;
     tolua_readonly tolua_property__get_set UIElement* focusElement;
     tolua_readonly tolua_property__get_set UIElement* frontElement;
+    tolua_readonly tolua_property__get_set UIElement* dragElement;
 
     tolua_property__get_set String& clipBoardText;
     tolua_property__get_set float doubleClickInterval;
+    tolua_property__get_set float dragBeginInterval;
+    tolua_property__get_set int dragBeginDistance;
     tolua_property__get_set int maxFontTextureSize;
     tolua_property__is_set bool nonFocusedMouseWheel;
     tolua_property__get_set bool useSystemClipBoard;

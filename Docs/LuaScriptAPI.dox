@@ -4646,6 +4646,8 @@ Methods:
 - bool SaveLayout(Serializer& dest, UIElement* element)
 - void SetClipBoardText(const String text)
 - void SetDoubleClickInterval(float interval)
+- void SetDragBeginInterval(float interval)
+- void SetDragBeginDistance(int pixels)
 - void SetMaxFontTextureSize(int size)
 - void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 - void SetUseSystemClipBoard(bool enable)
@@ -4659,8 +4661,11 @@ Methods:
 - UIElement* GetElementAt(int x, int y, bool enabledOnly = true)
 - UIElement* GetFocusElement() const
 - UIElement* GetFrontElement() const
+- UIElement* GetDragElement() const
 - const String GetClipBoardText() const
 - float GetDoubleClickInterval() const
+- float GetDragBeginInterval() const
+- int GetDragBeginDistance() const
 - int GetMaxFontTextureSize() const
 - bool IsNonFocusedMouseWheel() const
 - bool GetUseSystemClipBoard() const
@@ -4676,8 +4681,11 @@ Properties:
 - IntVector2 cursorPosition (readonly)
 - UIElement* focusElement (readonly)
 - UIElement* frontElement (readonly)
+- UIElement* dragElement (readonly)
 - String& clipBoardText
 - float doubleClickInterval
+- float dragBeginInterval
+- int dragBeginDistance
 - int maxFontTextureSize
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard
