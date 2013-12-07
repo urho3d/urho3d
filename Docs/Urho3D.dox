@@ -42,6 +42,7 @@ For further reference, see:
 \ref CodingConventions "Coding conventions" <br>
 \ref ScriptAPI "Scripting API (generated)" <br>
 \ref LuaScriptAPI "Lua Scripting API (generated)" <br>
+\ref EventList "Event list (generated)" <br>
 
 For credits, copyright and licensing information, see \ref Credits & \ref License.
 

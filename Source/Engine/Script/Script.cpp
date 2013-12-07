@@ -24,6 +24,8 @@
 #include "Addons.h"
 #include "Context.h"
 #include "EngineEvents.h"
+#include "File.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "Scene.h"
@@ -441,6 +443,59 @@ void Script::DumpAPI(DumpMode mode)
 
         String type(propertyDeclaration);
         OutputAPIRow(mode, type + " " + String(propertyName), true);
+    }
+
+    // Dump event descriptions in Doxygen mode. This means going through the header files, as the information is not
+    // available otherwise
+    if (mode == DOXYGEN)
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        Vector<String> headerFiles;
+        String path = fileSystem->GetProgramDir();
+        path.Replace("/Bin", "/Source/Engine");
+        
+        fileSystem->ScanDir(headerFiles, path, "*.h", SCAN_FILES, true);
+        if (!headerFiles.Empty())
+            Log::WriteRaw("\\page EventList Event list\n");
+        
+        for (unsigned i = 0; i < headerFiles.Size(); ++i)
+        {
+            if (headerFiles[i].EndsWith("Events.h"))
+            {
+                SharedPtr<File> file(new File(context_, path + headerFiles[i], FILE_READ));
+                if (!file->IsOpen())
+                    continue;
+                
+                unsigned start = headerFiles[i].Find('/') + 1;
+                unsigned end = headerFiles[i].Find("Events.h");
+                Log::WriteRaw("\n## %" + headerFiles[i].Substring(start, end - start) + " events\n");
+                
+                while (!file->IsEof())
+                {
+                    String line = file->ReadLine();
+                    if (line.StartsWith("EVENT"))
+                    {
+                        Vector<String> parts = line.Split(',');
+                        if (parts.Size() == 2)
+                            Log::WriteRaw("\n### " + parts[1].Substring(0, parts[1].Length() - 1).Trimmed() + "\n");
+                    }
+                    if (line.Contains("PARAM"))
+                    {
+                        Vector<String> parts = line.Split(',');
+                        if (parts.Size() == 2)
+                        {
+                            String paramName = parts[1].Substring(0, parts[1].Find(')')).Trimmed();
+                            String paramType = parts[1].Substring(parts[1].Find("// ") + 3);
+                            if (!paramName.Empty() && !paramType.Empty())
+                                Log::WriteRaw("- %" + paramName + " : " + paramType + "\n");
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!headerFiles.Empty())
+            Log::WriteRaw("\n");
     }
 
     if (mode == DOXYGEN)
