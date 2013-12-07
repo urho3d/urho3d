@@ -688,7 +688,8 @@ bool String::StartsWith(const String& str, bool caseSensitive) const
 
 bool String::EndsWith(const String& str, bool caseSensitive) const
 {
-    return FindLast(str, Length() - 1, caseSensitive) == Length() - str.Length();
+    unsigned pos = FindLast(str, Length() - 1, caseSensitive);
+    return pos != NPOS && pos == Length() - str.Length();
 }
 
 int String::Compare(const String& str, bool caseSensitive) const

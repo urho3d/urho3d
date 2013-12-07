@@ -359,7 +359,7 @@ public:
     /// Return whether starts with a string.
     bool StartsWith(const String& str, bool caseSensitive = true) const;
     /// Return whether ends with a string.
-    bool EndsWith(const String& str, bool casSensitive = true) const;
+    bool EndsWith(const String& str, bool caseSensitive = true) const;
     /// Return the C string.
     const char* CString() const { return buffer_; }
     /// Return length.
