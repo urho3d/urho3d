@@ -183,6 +183,8 @@
         <attribute name="Color" value="0.75 0 0 1" />
     </element>
     <element type="ConsoleLineEdit" style="LineEdit" auto="false">
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
         <attribute name="Top Left Color" value="0 0 0 0.5" />
         <attribute name="Top Right Color" value="0 0 0 0.5" />
         <attribute name="Bottom Left Color" value="0 0 0 0.5" />
@@ -209,10 +211,13 @@
     </element>
     <element type="FileSelectorButtonText" style="Text" auto="false" />
     <element type="FileSelectorListView" style="ListView" auto="false" />
-    <element type="FileSelectorLineEdit" style="LineEdit" auto="false" />
+    <element type="FileSelectorLineEdit" style="LineEdit" auto="false">
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+    </element>
     <element type="FileSelectorFilterList" style="DropDownList" auto="false">
-        <attribute name="Min Size" value="64 0" />
-        <attribute name="Max Size" value="64 2147483647" />
+        <attribute name="Min Size" value="64 18" />
+        <attribute name="Max Size" value="64 18" />
         <attribute name="Resize Popup" value="true" />
     </element>
     <element type="FileSelectorFilterText" style="Text" auto="false">
@@ -220,13 +225,10 @@
         <attribute name="Selection Color" value="0.7 0.7 0.7 1" />
         <attribute name="Hover Color" value="0.45 0.7 0.45 1" />
     </element>
-    <element type="FileSelectorTitleLayout" auto="false">
-        <attribute name="Min Size" value="0 16" />
-        <attribute name="Max Size" value="2147483647 16" />
-        <attribute name="Layout Spacing" value="4" />
-    </element>
     <element type="FileSelectorLayout" auto="false">
         <attribute name="Layout Spacing" value="4" />
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
     </element>
     <element type="FileSelectorListText" style="Text" auto="false">
         <attribute name="Hover Color" value="0.45 0.7 0.45 1" />

@@ -171,7 +171,6 @@ void Console::UpdateElements()
     background_->SetFixedWidth(width);
     background_->SetHeight(background_->GetMinHeight());
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
-    lineEdit_->SetFixedHeight(lineEdit_->GetTextElement()->GetRowHeight());
 }
 
 XMLFile* Console::GetDefaultStyle() const

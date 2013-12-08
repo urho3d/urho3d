@@ -160,7 +160,7 @@ void FileSelector::SetDefaultStyle(XMLFile* style)
     okButtonText_->SetStyle("FileSelectorButtonText");
     cancelButtonText_->SetStyle("FileSelectorButtonText");
 
-    titleLayout->SetStyle("FileSelectorTitleLayout");
+    titleLayout->SetStyle("FileSelectorLayout");
     fileNameLayout_->SetStyle("FileSelectorLayout");
     buttonLayout_->SetStyle("FileSelectorLayout");
 
@@ -253,19 +253,6 @@ void FileSelector::SetDirectoryMode(bool enable)
 
 void FileSelector::UpdateElements()
 {
-    {
-        const IntRect& clipBorder = pathEdit_->GetClipBorder();
-        pathEdit_->SetFixedHeight(pathEdit_->GetTextElement()->GetRowHeight() + clipBorder.top_ + clipBorder.bottom_);
-    }
-
-    {
-        const IntRect& clipBorder = fileNameEdit_->GetClipBorder();
-        int fileNameHeight = fileNameEdit_->GetTextElement()->GetRowHeight() + clipBorder.top_ + clipBorder.bottom_;
-        fileNameEdit_->SetFixedHeight(fileNameHeight);
-        filterList_->SetFixedHeight(fileNameHeight);
-        fileNameLayout_->SetFixedHeight(fileNameHeight);
-    }
-
     buttonLayout_->SetFixedHeight(Max(okButton_->GetHeight(), cancelButton_->GetHeight()));
 }
 
