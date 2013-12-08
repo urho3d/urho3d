@@ -37,6 +37,7 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include FT_TRUETYPE_TABLES_H
 
 #include "DebugNew.h"
 
@@ -321,23 +322,23 @@ void FontFace::RenderGlyphBitmap(unsigned index, unsigned char* dest, unsigned p
 
     if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
     {
-        for (int y = 0; y < glyph.height_; ++y)
+        for (int y = 0; y < slot->bitmap.rows; ++y)
         {
             unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
             unsigned char* rowDest = dest + y * pitch;
 
-            for (int x = 0; x < glyph.width_; ++x)
+            for (int x = 0; x < slot->bitmap.width; ++x)
                 rowDest[x] = (src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0;
         }
     }
     else
     {
-        for (int y = 0; y < glyph.height_; ++y)
+        for (int y = 0; y < slot->bitmap.rows; ++y)
         {
             unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
             unsigned char* rowDest = dest + y * pitch;
 
-            for (int x = 0; x < glyph.width_; ++x)
+            for (int x = 0; x < slot->bitmap.width; ++x)
                 rowDest[x] = src[x];
         }
     }
@@ -668,7 +669,22 @@ FontFace* Font::GetFaceFreeType(int pointSize)
     int maxWidth = 0;
     int maxHeight = 0;
     int loadMode = GetSubsystem<UI>()->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
-    FT_Pos ascender = face->size->metrics.ascender;
+    int ascender = face->size->metrics.ascender >> 6;
+    int descender = face->size->metrics.descender >> 6;
+    
+    // Check if the font's OS/2 info gives different (larger) values for ascender & descender
+    TT_OS2* os2Info = (TT_OS2*)FT_Get_Sfnt_Table(face, ft_sfnt_os2);
+    if (os2Info)
+    {
+        ascender = Max(ascender, os2Info->usWinAscent * face->size->metrics.y_ppem / face->units_per_EM);
+        ascender = Max(ascender, os2Info->sTypoAscender * face->size->metrics.y_ppem / face->units_per_EM);
+        descender = Max(descender, os2Info->usWinDescent * face->size->metrics.y_ppem / face->units_per_EM);
+        descender = Max(descender, os2Info->sTypoDescender * face->size->metrics.y_ppem / face->units_per_EM);
+    }
+    
+    // Store point size and row height. Use the maximum of ascender + descender, or the face's stored default row height
+    newFace->pointSize_ = pointSize;
+    newFace->rowHeight_ = Max(ascender + descender, face->size->metrics.height >> 6);
     
     newFace->glyphs_.Reserve(numGlyphs);
     
@@ -680,11 +696,11 @@ FontFace* Font::GetFaceFreeType(int pointSize)
         if (!error)
         {
             // Note: position within texture will be filled later
-            newGlyph.width_ = (short)((slot->metrics.width) >> 6);
-            newGlyph.height_ = (short)((slot->metrics.height) >> 6);
-            newGlyph.offsetX_ = (short)((slot->metrics.horiBearingX) >> 6);
-            newGlyph.offsetY_ = (short)((ascender - slot->metrics.horiBearingY) >> 6);
-            newGlyph.advanceX_ = (short)((slot->metrics.horiAdvance) >> 6);
+            newGlyph.width_ = (short)Max(slot->metrics.width >> 6, slot->bitmap.width);
+            newGlyph.height_ = (short)Max(slot->metrics.height >> 6, slot->bitmap.rows);
+            newGlyph.offsetX_ = (short)(slot->metrics.horiBearingX >> 6);
+            newGlyph.offsetY_ = (short)(ascender - (slot->metrics.horiBearingY >> 6));
+            newGlyph.advanceX_ = (short)(slot->metrics.horiAdvance >> 6);
             
             maxWidth = Max(maxWidth, newGlyph.width_);
             maxHeight = Max(maxHeight, newGlyph.height_);
@@ -716,10 +732,6 @@ FontFace* Font::GetFaceFreeType(int pointSize)
             }
         }
     }
-    
-    // Store point size and the height of a row
-    newFace->pointSize_ = pointSize;
-    newFace->rowHeight_ = face->size->metrics.height >> 6;
     
     // Now try to pack into the smallest possible texture. If face does not fit into one texture, enable dynamic mode where
     // glyphs are only created as necessary
