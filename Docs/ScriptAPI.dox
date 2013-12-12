@@ -7292,6 +7292,7 @@ Properties:
 - uint DEBUGHUD_SHOW_MODE
 - uint DEBUGHUD_SHOW_PROFILER
 - uint DEBUGHUD_SHOW_ALL
+
 \page EventList Event list
 
 ## %Core events
@@ -7379,6 +7380,12 @@ Properties:
 - %Surface : RenderSurface pointer
 - %Scene : Scene pointer
 - %Camera : Camera pointer
+
+## %IO events
+
+### LogMessage
+- %Message : String
+- %Level : int
 
 ## %Input events
 
@@ -7469,12 +7476,6 @@ Properties:
 - %Visible : bool
 
 ### ExitRequested
-
-## %IO events
-
-### LogMessage
-- %Message : String
-- %Level : int
 
 ## %Network events
 

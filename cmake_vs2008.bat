@@ -21,6 +21,7 @@
 ::
 
 @echo off
+pushd %~dp0
 cmake -E make_directory Build
 set "arch="
 set "version=9 2008"
@@ -36,3 +37,4 @@ if not "%1" == "" (
 )
 echo on
 cmake -E chdir Build cmake -G "Visual Studio %version%%arch%" %* ..\Source
+@popd

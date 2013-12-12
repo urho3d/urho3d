@@ -21,6 +21,7 @@
 ::
 
 @echo off
+pushd %~dp0
 :: Define USE_MKLINK to 1 to enable out-of-source build and symbolic linking of resources from Bin directory
 set "build=Source\Android"
 set "source=.."
@@ -49,3 +50,4 @@ if "%use_mklink%" == "1" (
 ) 
 echo on
 cmake -E chdir %build% cmake -G "Unix Makefiles" -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=%source%\CMake\Toolchains\android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=.  %* %source%
+@popd

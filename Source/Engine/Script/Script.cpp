@@ -456,7 +456,10 @@ void Script::DumpAPI(DumpMode mode)
         
         fileSystem->ScanDir(headerFiles, path, "*.h", SCAN_FILES, true);
         if (!headerFiles.Empty())
-            Log::WriteRaw("\\page EventList Event list\n");
+        {
+            Log::WriteRaw("\n\\page EventList Event list\n");
+            Sort(headerFiles.Begin(), headerFiles.End());
+        }
         
         for (unsigned i = 0; i < headerFiles.Size(); ++i)
         {

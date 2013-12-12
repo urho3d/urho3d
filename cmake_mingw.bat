@@ -21,6 +21,8 @@
 ::
 
 @echo off
+pushd %~dp0
 cmake -E make_directory Build
 echo on
 cmake -E chdir Build cmake -G "MinGW Makefiles" %* ..\Source
+@popd

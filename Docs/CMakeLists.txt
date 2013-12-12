@@ -58,8 +58,13 @@ if (DOXYGEN_FOUND)
         set (jit jit)
     endif ()
     if (TARGET lua${jit}_interpreter AND NOT CMAKE_CROSSCOMPILING)
+        if (WIN32)
+            file (GLOB pkglist ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs/*.pkg)
+        else ()
+            set (pkglist *.pkg)
+        endif ()
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/LuaScriptAPI.dox
-            COMMAND ${PROJECT_ROOT_DIR}/Bin/lua${jit} pkgToDox.lua ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox *.pkg
+            COMMAND ${PROJECT_ROOT_DIR}/Bin/lua${jit} pkgToDox.lua ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox ${pkglist}
             DEPENDS Urho3D lua${jit}_interpreter
             WORKING_DIRECTORY ${PROJECT_ROOT_DIR}/Source/Engine/LuaScript/pkgs
             COMMENT "Dumping LuaScript API to LuaScriptAPI.dox")
