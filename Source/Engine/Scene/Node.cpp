@@ -1432,9 +1432,14 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
     resolver.AddNode(id_, cloneNode);
 
     // Copy attributes
-    unsigned numAttributes = GetNumAttributes();
-    for (unsigned j = 0; j < numAttributes; ++j)
-        cloneNode->SetAttribute(j, GetAttribute(j));
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    for (unsigned j = 0; j < attributes->Size(); ++j)
+    {
+        const AttributeInfo& attr = attributes->At(j);
+        // Do not copy network-only attributes, as they may have unintended side effects
+        if (attr.mode_ & AM_FILE)
+            cloneNode->SetAttribute(j, GetAttribute(j));
+    }
 
     // Clone components
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
@@ -1449,9 +1454,13 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
         }
         resolver.AddComponent(component->GetID(), cloneComponent);
 
-        numAttributes = component->GetNumAttributes();
-        for (unsigned j = 0; j < numAttributes; ++j)
-            cloneComponent->SetAttribute(j, component->GetAttribute(j));
+        const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
+        for (unsigned j = 0; j < compAttributes->Size(); ++j)
+        {
+            const AttributeInfo& attr = compAttributes->At(j);
+            if (attr.mode_ & AM_FILE)
+                cloneComponent->SetAttribute(j, component->GetAttribute(j));
+        }
     }
 
     // Clone child nodes recursively
