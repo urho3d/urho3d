@@ -364,7 +364,11 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             if (bufferDef.HasAttribute("normals"))
                 vBuf->elementMask_ |= MASK_NORMAL;
             if (bufferDef.HasAttribute("texture_coords"))
+            {
                 vBuf->elementMask_ |= MASK_TEXCOORD1;
+                if (bufferDef.GetInt("texture_coords") > 1)
+                    vBuf->elementMask_ |= MASK_TEXCOORD2;
+            }
             
             unsigned vertexNum = vertexStart;
             if (vertices)
@@ -403,6 +407,19 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         Vector2 vec(x, y);
                         
                         vBuf->vertices_[vertexNum].texCoord1_ = vec;
+                        
+                        if (vBuf->elementMask_ & MASK_TEXCOORD2)
+                        {
+                            uv = uv.GetNext("texcoord");
+                            if (uv)
+                            {
+                                float x = uv.GetFloat("u");
+                                float y = uv.GetFloat("v");
+                                Vector2 vec(x, y);
+                                
+                                vBuf->vertices_[vertexNum].texCoord2_ = vec;
+                            }
+                        }
                     }
                     
                     vertexNum++;
