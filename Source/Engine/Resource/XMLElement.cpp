@@ -222,6 +222,20 @@ XPathResultSet XMLElement::SelectPrepared(const XPathQuery& query) const
     return XPathResultSet(file_, &result);
 }
 
+bool XMLElement::SetValue(const String& value)
+{
+	return SetValue(value.CString());
+}
+
+bool XMLElement::SetValue(const char* value)
+{
+	if (!file_ || (!node_ && !xpathNode_))
+		return false;
+
+	pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+	return node.append_child(pugi::node_pcdata).set_value(value);
+}
+
 bool XMLElement::SetAttribute(const String& name, const String& value)
 {
     return SetAttribute(name.CString(), value.CString());
@@ -561,6 +575,15 @@ bool XMLElement::HasAttribute(const char* name) const
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
     return !node.attribute(name).empty();
+}
+
+String XMLElement::GetValue() const
+{
+	if (!file_ || (!node_ && !xpathNode_))
+		return String::EMPTY;
+
+	const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+	return String(node.child_value());
 }
 
 String XMLElement::GetAttribute(const String& name) const
