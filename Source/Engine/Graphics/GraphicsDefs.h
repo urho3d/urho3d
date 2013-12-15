@@ -321,4 +321,5 @@ static const int MAX_VERTEX_STREAMS = 4;
 static const int MAX_SKIN_MATRICES = 64;
 static const int MAX_CONSTANT_REGISTERS = 256;
 
+static const int BITS_PER_COMPONENT = 8;
 }
