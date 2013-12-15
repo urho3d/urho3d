@@ -692,10 +692,6 @@ SET( CONTRIB_FILES
 	${Boost_SRCS}
 )
 
-set (TARGET_NAME Assimp)
-list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
-setup_library ()
-
 if (MSVC)
     foreach(FILE ${SOURCE_FILES})
         if (${FILE} MATCHES "[A-Za-z0-9 _/]*[.]cpp")
@@ -707,3 +703,7 @@ if (MSVC)
         endif ()
     endforeach ()
 endif ()
+
+set (TARGET_NAME Assimp)
+list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
+setup_library ()
