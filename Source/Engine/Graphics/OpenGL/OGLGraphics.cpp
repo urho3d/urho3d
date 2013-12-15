@@ -2520,7 +2520,7 @@ void Graphics::CommitFramebuffer()
             glDrawBuffer(GL_NONE);
         else
         {
-            int drawBufferIds[4];
+            int drawBufferIds[MAX_RENDERTARGETS];
             unsigned drawBufferCount = 0;
             
             for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
@@ -2585,7 +2585,7 @@ void Graphics::CommitFramebuffer()
                 texture->UpdateParameters();
                 SetTexture(0, 0);
             }
-            
+
             if (i->second_.depthAttachment_ != depthStencil_)
             {
                 glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
