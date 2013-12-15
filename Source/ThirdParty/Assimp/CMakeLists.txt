@@ -6,7 +6,7 @@
 #    source groups and library command)
 #
 
-# Modified by Lasse Oorni for Urho3D
+# Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 INCLUDE_DIRECTORIES( include )
 INCLUDE_DIRECTORIES( code/BoostWorkaround )
@@ -692,12 +692,9 @@ SET( CONTRIB_FILES
 	${Boost_SRCS}
 )
 
-ADD_LIBRARY( Assimp STATIC
-	${SOURCE_FILES}
-	${CONTRIB_FILES}
-	${PUBLIC_HEADERS}
-	${COMPILER_HEADERS}
-)
+set (TARGET_NAME Assimp)
+list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
+setup_library ()
 
 if (MSVC)
     foreach(FILE ${SOURCE_FILES})

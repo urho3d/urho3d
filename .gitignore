@@ -9,9 +9,9 @@ Bin/*
 !Bin/*.sh
 Bin/*.app/
 Bin/*.app.dSYM/
-Bin-CC/
+*-Bin/
 Lib/
-Lib-CC/
+*-Lib/
 
 # Compiled shaders
 *.vs2
@@ -30,12 +30,17 @@ Docs/Doxyfile
 Source/.*project
 Source/.settings
 
-# Android project settings for non out-of-source build
+# Android in-the-source project settings
 Source/Android/project.properties
 Source/Android/local.properties
 Source/Android/proguard-project.txt
 
-# CMake files for non out-of-source build
+# Android in-the-source build and output directories
+Source/Android/Engine
+Source/Android/ThirdParty
+Source/Android/libs
+
+# Android in-the-source CMake build files
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/

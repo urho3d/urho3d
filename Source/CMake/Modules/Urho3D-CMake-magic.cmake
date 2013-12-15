@@ -144,14 +144,18 @@ if (IOS)
     if (NOT MACOSX_BUNDLE_GUI_IDENTIFIER)
         set (MACOSX_BUNDLE_GUI_IDENTIFIER com.github.urho3d.\${PRODUCT_NAME:rfc1034identifier})
     endif ()
-    set (CMAKE_OSX_SYSROOT iphoneos)    # Set to "Latest iOS"
+    set (CMAKE_OSX_SYSROOT iphoneos)    # Set Base SDK to "Latest iOS"
 elseif (XCODE)
     # MacOSX-Xcode-specific setup
     if (NOT ENABLE_64BIT)
         set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
     endif ()
-    set (CMAKE_OSX_SYSROOT "")        # Set to "Current OS X"
-    #set (CMAKE_OSX_SYSROOT macosx) # Uncomment to set to "Latest OS X"
+    set (CMAKE_OSX_SYSROOT macosx)	# Set Base SDK to "Latest OS X"
+    if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        # If not set, set to current running build system OS version by default
+        execute_process (COMMAND sw_vers -productVersion COMMAND tr -d '\n' OUTPUT_VARIABLE CURRENT_OSX_VERSION)
+        string (REGEX REPLACE ^\([^.]+\\.[^.]+\).* \\1 CMAKE_OSX_DEPLOYMENT_TARGET ${CURRENT_OSX_VERSION})
+    endif ()
 endif ()
 if (MSVC)
     # Visual Studio-specific setup
@@ -229,18 +233,24 @@ get_filename_component (PROJECT_ROOT_DIR ${PROJECT_SOURCE_DIR} PATH)
 # Macro for setting common output directories
 macro (set_output_directories OUTPUT_PATH)
     foreach (TYPE ${ARGN})
-        set(CMAKE_${TYPE}_OUTPUT_DIRECTORY ${OUTPUT_PATH})
+        set (CMAKE_${TYPE}_OUTPUT_DIRECTORY ${OUTPUT_PATH})
         foreach (CONFIG RELEASE RELWITHDEBINFO DEBUG)
-            set(CMAKE_${TYPE}_OUTPUT_DIRECTORY_${CONFIG} ${OUTPUT_PATH})
+            set (CMAKE_${TYPE}_OUTPUT_DIRECTORY_${CONFIG} ${OUTPUT_PATH})
         endforeach ()
     endforeach ()
 endmacro ()
 
 # Set common binary output directory for all targets
-if (CMAKE_CROSSCOMPILING)
-    set (OUTPUT_PATH_SUFFIX -CC)
+if (IOS)
+    set (PLATFORM_PREFIX ios-)
+elseif (CMAKE_CROSSCOMPILING)
+    if (RASPI)
+        set (PLATFORM_PREFIX raspi-)
+    elseif (ANDROID)
+        set (PLATFORM_PREFIX android-)      # Note: this is for Android tools (ARM arch) runtime binaries, Android libs output directory is not affected by this
+    endif ()
 endif ()
-set_output_directories (${PROJECT_ROOT_DIR}/Bin${OUTPUT_PATH_SUFFIX} RUNTIME PDB)
+set_output_directories (${PROJECT_ROOT_DIR}/${PLATFORM_PREFIX}Bin RUNTIME PDB)
 
 # Reference supported build options that are potentially not being referenced due to platform or build type branching to suppress "unused variable" warning
 if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND
@@ -359,6 +369,17 @@ macro (setup_target)
     define_dependency_libs (${TARGET_NAME})
     string (REGEX REPLACE \\.\\./|ThirdParty/|Engine/|Extras/|/include|/src "" STRIP_LIBS "${LIBS};${LINK_LIBS_ONLY}")
     target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${STRIP_LIBS})
+
+    # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red as if they are not yet built
+    if (XCODE)
+        file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+        get_target_property (LOCATION ${TARGET_NAME} LOCATION)
+        string (REGEX REPLACE "^.*\\$\\(CONFIGURATION\\)" $(CONFIGURATION) SYMLINK ${LOCATION})
+        get_filename_component (DIRECTORY ${SYMLINK} DIRECTORY)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND mkdir -p ${DIRECTORY} && ln -s -f $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+    endif ()
 endmacro ()
 
 # Macro for setting up a library target
@@ -370,17 +391,11 @@ macro (setup_library)
         get_target_property (LIB_TYPE ${TARGET_NAME} TYPE)
         # Only interested in static library type, i.e. exclude shared and module library types
         if (LIB_TYPE MATCHES STATIC)
-            set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+            if (NOT ${TARGET_NAME} STREQUAL Urho3D)
+                set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+            endif ()
             if (URHO3D_LIB_TYPE STREQUAL SHARED)
                 set_target_properties (${TARGET_NAME} PROPERTIES COMPILE_DEFINITIONS URHO3D_EXPORTS)
-            endif ()
-    
-            if (XCODE)
-                # Specific to Xcode generator
-                set (SYMLINK ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${TARGET_NAME}.lnk)
-                add_custom_command (TARGET ${TARGET_NAME} PRE_LINK
-                    COMMAND rm -f ${SYMLINK} && ln -s "$(OBJECT_FILE_DIR)-$(CURRENT_VARIANT)/$(CURRENT_ARCH)" ${SYMLINK}
-                    COMMENT "Creating a symbolic link pointing to object file directory")
             endif ()
         endif ()
     endif ()
