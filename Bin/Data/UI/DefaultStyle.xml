@@ -84,7 +84,6 @@
     </element>
     <element type="LineEdit" style="BorderImage">
         <attribute name="Border" value="4 4 4 4" />
-        <attribute name="Clip Border" value="0 0 0 0" />
         <attribute name="Image Rect" value="64 0 80 16" />
         <attribute name="Hover Image Offset" value="0 16" />    <!-- Background color of the hover image IS the hover color of LineEdit -->
         <element type="Text" internal="true">
@@ -160,6 +159,11 @@
         <attribute name="Image Rect" value="48 0 64 16" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Resize Border" value="8 8 8 8" />
+    </element>
+    <element type="ListRow">
+        <attribute name="Min Size" value="0 17" />
+        <attribute name="Max Size" value="2147483647 17" />
+        <attribute name="Layout Mode" value="Horizontal" />
     </element>
     <element type="PanelView" style="ListView">
         <element type="BorderImage" internal="true" style="none">

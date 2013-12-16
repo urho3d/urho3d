@@ -111,6 +111,7 @@ void LoadConfig()
     XMLElement uiElem = configElem.GetChild("ui");
     XMLElement hierarchyElem = configElem.GetChild("hierarchy");
     XMLElement inspectorElem = configElem.GetChild("attributeinspector");
+    XMLElement viewElem = configElem.GetChild("view");
     XMLElement resourcesElem = configElem.GetChild("resources");
 
     if (!cameraElem.isNull)
@@ -185,6 +186,21 @@ void LoadConfig()
         if (inspectorElem.HasAttribute("noneditablecolor")) nonEditableTextColor = inspectorElem.GetColor("noneditablecolor");
         if (inspectorElem.HasAttribute("shownoneditable")) showNonEditableAttribute = inspectorElem.GetBool("shownoneditable");
     }
+
+    if (!viewElem.isNull)
+    {
+        if (viewElem.HasAttribute("defaultzoneambientcolor")) renderer.defaultZone.ambientColor = viewElem.GetColor("defaultzoneambientcolor");
+        if (viewElem.HasAttribute("defaultzonefogcolor")) renderer.defaultZone.fogColor = viewElem.GetColor("defaultzonefogcolor");
+        if (viewElem.HasAttribute("defaultzonefogstart")) renderer.defaultZone.fogStart = viewElem.GetInt("defaultzonefogstart");
+        if (viewElem.HasAttribute("defaultzonefogend")) renderer.defaultZone.fogEnd = viewElem.GetInt("defaultzonefogend");
+        if (viewElem.HasAttribute("showgrid")) showGrid = viewElem.GetBool("showgrid");
+        if (viewElem.HasAttribute("grid2dmode")) grid2DMode = viewElem.GetBool("grid2dmode");
+        if (viewElem.HasAttribute("gridsize")) gridSize = viewElem.GetInt("gridsize");
+        if (viewElem.HasAttribute("gridsubdivisions")) gridSubdivisions = viewElem.GetInt("gridsubdivisions");
+        if (viewElem.HasAttribute("gridscale")) gridScale = viewElem.GetFloat("gridscale");
+        if (viewElem.HasAttribute("gridcolor")) gridColor = viewElem.GetColor("gridcolor");
+        if (viewElem.HasAttribute("gridsubdivisioncolor")) gridSubdivisionColor = viewElem.GetColor("gridsubdivisioncolor");
+    }
 }
 
 void SaveConfig()
@@ -199,6 +215,7 @@ void SaveConfig()
     XMLElement uiElem = configElem.CreateChild("ui");
     XMLElement hierarchyElem = configElem.CreateChild("hierarchy");
     XMLElement inspectorElem = configElem.CreateChild("attributeinspector");
+    XMLElement viewElem = configElem.CreateChild("view");
     XMLElement resourcesElem = configElem.CreateChild("resources");
 
     // The save config may be called on error exit so some of the objects below could still be null
@@ -252,6 +269,18 @@ void SaveConfig()
     inspectorElem.SetColor("modifiedcolor", modifiedTextColor);
     inspectorElem.SetColor("noneditablecolor", nonEditableTextColor);
     inspectorElem.SetBool("shownoneditable", showNonEditableAttribute);
+
+    viewElem.SetBool("showgrid", showGrid);
+    viewElem.SetBool("grid2dmode", grid2DMode);
+    viewElem.SetColor("defaultzoneambientcolor", renderer.defaultZone.ambientColor);
+    viewElem.SetColor("defaultzonefogcolor", renderer.defaultZone.fogColor);
+    viewElem.SetFloat("defaultzonefogstart", renderer.defaultZone.fogStart);
+    viewElem.SetFloat("defaultzonefogend", renderer.defaultZone.fogEnd);
+    viewElem.SetInt("gridsize", gridSize);
+    viewElem.SetInt("gridsubdivisions", gridSubdivisions);
+    viewElem.SetFloat("gridscale", gridScale);
+    viewElem.SetColor("gridcolor", gridColor);
+    viewElem.SetColor("gridsubdivisioncolor", gridSubdivisionColor);
 
     config.Save(File(configFileName, FILE_WRITE));
 }

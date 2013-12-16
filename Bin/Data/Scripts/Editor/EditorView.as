@@ -3,6 +3,9 @@
 Node@ cameraNode;
 Camera@ camera;
 
+Node@ gridNode;
+CustomGeometry@ grid;
+
 enum EditMode
 {
     EDIT_MOVE = 0,
@@ -50,6 +53,17 @@ bool renderingDebug = false;
 bool physicsDebug = false;
 bool octreeDebug = false;
 int pickMode = PICK_GEOMETRIES;
+
+bool showGrid = true;
+bool grid2DMode = false;
+uint gridSize = 16;
+uint gridSubdivisions = 3;
+float gridScale = 8.0;
+Color gridColor(0.1, 0.1, 0.1);
+Color gridSubdivisionColor(0.05, 0.05, 0.05);
+Color gridXColor(0.5, 0.1, 0.1);
+Color gridYColor(0.1, 0.5, 0.1);
+Color gridZColor(0.1, 0.1, 0.5);
 
 Array<int> pickModeDrawableFlags = {
     DRAWABLE_GEOMETRY,
@@ -99,10 +113,97 @@ void CreateCamera()
 
 void ResetCamera()
 {
-    cameraNode.position = Vector3(0, 10, 0);
-    cameraNode.rotation = Quaternion();
-    cameraPitch = 0;
+    cameraPitch = 20;
     cameraYaw = 0;
+    cameraNode.position = Vector3(0, 5, -10);
+    cameraNode.rotation = Quaternion(cameraPitch, cameraYaw, 0);
+}
+
+void CreateGrid()
+{
+    gridNode = Node();
+    grid = gridNode.CreateComponent("CustomGeometry");
+    grid.numGeometries = 1;
+    grid.material = cache.GetResource("Material", "Materials/VColUnlit.xml");
+    grid.viewMask = 0x80000000; // Editor raycasts use viewmask 0x7fffffff
+    grid.occludee = false;
+
+    UpdateGrid();
+}
+
+void HideGrid()
+{
+    if (grid !is null)
+        grid.enabled = false;
+}
+
+void ShowGrid()
+{
+    if (grid !is null)
+    {
+        grid.enabled = true;
+
+        if (editorScene.octree !is null)
+            editorScene.octree.AddManualDrawable(grid);
+    }
+}
+
+void UpdateGrid(bool updateGridGeometry = true)
+{
+    showGrid ? ShowGrid() : HideGrid();
+    gridNode.scale = Vector3(gridScale, gridScale, gridScale);
+
+    if (!updateGridGeometry)
+        return;
+
+    uint size = uint(Floor(gridSize / 2) * 2);
+    float halfSizeScaled = size / 2;
+    float scale = 1.0;
+    uint subdivisionSize = uint(Pow(2.0f, float(gridSubdivisions)));
+
+    if (subdivisionSize > 0)
+    {
+        size *= subdivisionSize;
+        scale /= subdivisionSize;
+    }
+
+    uint halfSize = size / 2;
+
+    grid.BeginGeometry(0, LINE_LIST);
+    float lineOffset = -halfSizeScaled;
+    for (uint i = 0; i <= size; ++i)
+    {
+        bool lineCenter = i == halfSize;
+        bool lineSubdiv = !Equals(Mod(i, subdivisionSize), 0.0);
+
+        if (!grid2DMode)
+        {
+            grid.DefineVertex(Vector3(lineOffset, 0.0, halfSizeScaled));
+            grid.DefineColor(lineCenter ? gridZColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+            grid.DefineVertex(Vector3(lineOffset, 0.0, -halfSizeScaled));
+            grid.DefineColor(lineCenter ? gridZColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+
+            grid.DefineVertex(Vector3(-halfSizeScaled, 0.0, lineOffset));
+            grid.DefineColor(lineCenter ? gridXColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+            grid.DefineVertex(Vector3(halfSizeScaled, 0.0, lineOffset));
+            grid.DefineColor(lineCenter ? gridXColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+        }
+        else
+        {
+            grid.DefineVertex(Vector3(lineOffset, halfSizeScaled, 0.0));
+            grid.DefineColor(lineCenter ? gridYColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+            grid.DefineVertex(Vector3(lineOffset, -halfSizeScaled, 0.0));
+            grid.DefineColor(lineCenter ? gridYColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+
+            grid.DefineVertex(Vector3(-halfSizeScaled, lineOffset, 0.0));
+            grid.DefineColor(lineCenter ? gridXColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+            grid.DefineVertex(Vector3(halfSizeScaled, lineOffset, 0.0));
+            grid.DefineColor(lineCenter ? gridXColor : (lineSubdiv ? gridSubdivisionColor : gridColor));
+        }
+
+        lineOffset  += scale;
+    }
+    grid.Commit();
 }
 
 void CreateStatsBar()
@@ -199,6 +300,16 @@ void UpdateView(float timeStep)
         if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
         {
             cameraNode.TranslateRelative(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
+            FadeUI();
+        }
+        if (input.keyDown[KEY_PAGEUP])
+        {
+            cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier);
+            FadeUI();
+        }
+        if (input.keyDown[KEY_PAGEDOWN])
+        {
+            cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier);
             FadeUI();
         }
     }

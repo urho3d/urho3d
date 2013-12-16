@@ -86,6 +86,7 @@ bool ResetScene()
 
     ResetCamera();
     CreateGizmo();
+    CreateGrid();
 
     return true;
 }
@@ -183,6 +184,7 @@ bool LoadScene(const String&in fileName)
 
     ResetCamera();
     CreateGizmo();
+    CreateGrid();
 
     return loaded;
 }

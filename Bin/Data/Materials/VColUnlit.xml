@@ -1,0 +1,3 @@
+<material>
+    <technique name="Techniques/NoTextureUnlitVCol.xml" />
+</material>
