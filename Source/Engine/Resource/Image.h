@@ -25,6 +25,8 @@
 #include "ArrayPtr.h"
 #include "Resource.h"
 
+struct SDL_Surface;
+
 namespace Urho3D
 {
 
@@ -108,6 +110,8 @@ public:
     bool SaveTGA(const String& fileName);
     /// Save in JPG format with compression quality. Return true if successful.
     bool SaveJPG(const String& fileName, int quality);
+    /// Create SDL surface from the image, or null if failed. Specify rect to only return partial image. Only RGB images are supported. You must free the surface yourself.
+    SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
     
     /// Return width.
     int GetWidth() const { return width_; }

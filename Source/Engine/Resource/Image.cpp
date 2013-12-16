@@ -31,6 +31,7 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 #include <jo_jpeg.h>
+#include <SDL_surface.h>
 
 #include "DebugNew.h"
 
@@ -852,6 +853,66 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
             ++i;
         }
     }
+}
+
+SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
+{
+    if (!data_)
+        return 0;
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not get SDL surface from compressed image " + GetName());
+        return 0;
+    }
+    
+    if (components_ < 3)
+    {
+        LOGERROR("Can not get SDL surface from image " + GetName() + " with less than 3 components");
+        return 0;
+    }
+    
+    IntRect imageRect = rect;
+    // Use full image if illegal rect
+    if (imageRect.left_ < 0 || imageRect.top_ < 0 || imageRect.right_ > width_ || imageRect.bottom_ > height_ || 
+        imageRect.left_ >= imageRect.right_ || imageRect.top_ >= imageRect.bottom_)
+    {
+        imageRect.left_ = 0;
+        imageRect.top_ = 0;
+        imageRect.right_ = width_;
+        imageRect.bottom_ = height_;
+    }
+    
+    int imageWidth = width_;
+    int width = imageRect.Width();
+    int height = imageRect.Height();
+
+    // Assume little-endian for all the supported platforms
+    unsigned rMask = 0x000000ff;
+    unsigned gMask = 0x0000ff00;
+    unsigned bMask = 0x00ff0000;
+    unsigned aMask = 0xff000000;
+
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, components_ * 8, rMask, gMask, bMask, aMask);
+    if (surface)
+    {
+        SDL_LockSurface(surface);
+        
+        unsigned char* destination = reinterpret_cast<unsigned char*>(surface->pixels);
+        unsigned char* source = data_ + components_ * (imageWidth * imageRect.top_ + imageRect.left_);
+        for (int i = 0; i < height; ++i)
+        {
+            memcpy(destination, source, components_ * width);
+            destination += surface->pitch;
+            source += components_ * imageWidth;
+        }
+        
+        SDL_UnlockSurface(surface);
+    }
+    else
+        LOGERROR("Failed to create SDL surface from image " + GetName());
+    
+    return surface;
 }
 
 }

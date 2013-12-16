@@ -272,9 +272,7 @@ void Graphics::SetWindowIcon(Image* windowIcon)
 {
     windowIcon_ = windowIcon;
     if (impl_->window_)
-    {
         CreateWindowIcon();
-    }
 }
 
 void Graphics::SetWindowPosition(const IntVector2& position)
@@ -2221,22 +2219,12 @@ void Graphics::CreateWindowIcon()
 {
     if (windowIcon_)
     {
-        SDL_Surface*  surface = SDL_CreateRGBSurface(0, windowIcon_->GetWidth(), windowIcon_->GetHeight(), windowIcon_->GetComponents() * BITS_PER_COMPONENT, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-
-        if (windowIcon_->GetMemoryUse() > 0)
+        SDL_Surface* surface = windowIcon_->GetSDLSurface();
+        if (surface)
         {
-            SDL_LockSurface(surface);
-            memcpy(surface->pixels, windowIcon_->GetData(), windowIcon_->GetMemoryUse());
-            SDL_UnlockSurface(surface);
-
             SDL_SetWindowIcon(impl_->window_, surface);
+            SDL_FreeSurface(surface);
         }
-
-        SDL_FreeSurface(surface);
-    }
-    else
-    {
-        LOGERROR("Unable to load icon windowIcon_ " + windowIcon_->GetName());
     }
 }
 

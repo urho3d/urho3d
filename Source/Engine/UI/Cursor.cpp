@@ -251,28 +251,10 @@ void Cursor::ApplyShape()
             // Create from image
             else if (info.image_)
             {
-                unsigned comp = info.image_->GetComponents();
-                int imageWidth = info.image_->GetWidth();
-                int width = imageRect_.Width();
-                int height = imageRect_.Height();
-
-                // Assume little-endian for all the supported platforms
-                unsigned rMask = 0x000000ff;
-                unsigned gMask = 0x0000ff00;
-                unsigned bMask = 0x00ff0000;
-                unsigned aMask = 0xff000000;
-
-                SDL_Surface* surface = (comp >= 3 ? SDL_CreateRGBSurface(0, width, height, comp * 8, rMask, gMask, bMask, aMask) : 0);
+                SDL_Surface* surface = info.image_->GetSDLSurface(info.imageRect_);
+                
                 if (surface)
                 {
-                    unsigned char* destination = reinterpret_cast<unsigned char*>(surface->pixels);
-                    unsigned char* source = info.image_->GetData() + comp * (imageWidth * imageRect_.top_ + imageRect_.left_);
-                    for (int i = 0; i < height; ++i)
-                    {
-                        memcpy(destination, source, comp * width);
-                        destination += comp * width;
-                        source += comp * imageWidth;
-                    }
                     info.osCursor_ = SDL_CreateColorCursor(surface, info.hotSpot_.x_, info.hotSpot_.y_);
                     info.systemDefined_ = false;
                     if (!info.osCursor_)
