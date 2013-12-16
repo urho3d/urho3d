@@ -90,8 +90,7 @@ public:
 
     /// Set the value for an inner node in the following format <node>value</node>.
     bool SetValue(const String& value);
-    /// Set the value for an inner node in the following format
-    /// <node>value</node>. Must be used on the <node> element.
+    /// Set the value for an inner node in the following format <node>value</node>. Must be used on the <node> element.
     bool SetValue(const char* value);
     /// Set an attribute.
     bool SetAttribute(const String& name, const String& value);

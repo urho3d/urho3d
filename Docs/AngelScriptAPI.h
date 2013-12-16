@@ -1570,6 +1570,7 @@ XMLElement SelectSingle(const String&);
 XMLElement SelectSinglePrepared(const XPathQuery&);
 XPathResultSet Select(const String&);
 XPathResultSet SelectPrepared(const XPathQuery&);
+bool SetValue(const String&);
 bool SetAttribute(const String&, const String&);
 bool SetAttribute(const String&);
 bool SetBool(const String&, bool);
@@ -1589,6 +1590,7 @@ bool SetVector3(const String&, const Vector3&);
 bool SetVector4(const String&, const Vector4&);
 bool SetVectorVariant(const String&, const Variant&);
 bool HasAttribute(const String&) const;
+String GetValue() const;
 String GetAttribute(const String& = String ( )) const;
 String GetAttributeLower(const String&) const;
 String GetAttributeUpper(const String&) const;
@@ -1614,6 +1616,7 @@ Vector4 GetVector4(const String&) const;
 Variant GetVectorVariant(const String&) const;
 
 // Properties:
+String value;
 /* (readonly) */
 String name;
 /* (readonly) */
@@ -4042,6 +4045,8 @@ String typeName;
 /* (readonly) */
 String category;
 String windowTitle;
+/* (writeonly) */
+Image windowIcon;
 IntVector2 windowPosition;
 bool sRGB;
 bool flushGPU;
@@ -8312,7 +8317,7 @@ float Atan(float);
 float Atan2(float, float);
 float Abs(float);
 float Sqrt(float);
-float Pow(float);
+float Pow(float, float);
 float Min(float, float);
 int Min(int, int);
 float Max(float, float);

@@ -269,6 +269,8 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "Vector3 GetVector3(const String&in) const", asMETHOD(XMLElement, GetVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Vector4 GetVector4(const String&in) const", asMETHOD(XMLElement, GetVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Variant GetVectorVariant(const String&in) const", asMETHOD(XMLElement, GetVectorVariant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool set_value(const String&in)", asMETHODPR(XMLElement, SetValue, (const String&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "String get_value() const", asMETHOD(XMLElement, GetValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String get_name() const", asMETHOD(XMLElement, GetName), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "uint get_numAttributes() const", asMETHOD(XMLElement, GetNumAttributes), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool get_isNull() const", asMETHOD(XMLElement, IsNull), asCALL_THISCALL);

@@ -1486,6 +1486,7 @@ Methods:
 - XMLElement SelectSinglePrepared(const XPathQuery&)
 - XPathResultSet Select(const String&)
 - XPathResultSet SelectPrepared(const XPathQuery&)
+- bool SetValue(const String&)
 - bool SetAttribute(const String&, const String&)
 - bool SetAttribute(const String&)
 - bool SetBool(const String&, bool)
@@ -1505,6 +1506,7 @@ Methods:
 - bool SetVector4(const String&, const Vector4&)
 - bool SetVectorVariant(const String&, const Variant&)
 - bool HasAttribute(const String&) const
+- String GetValue() const
 - String GetAttribute(const String& = String ( )) const
 - String GetAttributeLower(const String&) const
 - String GetAttributeUpper(const String&) const
@@ -1531,6 +1533,7 @@ Methods:
 
 Properties:
 
+- String value
 - String name (readonly)
 - uint numAttributes (readonly)
 - bool isNull (readonly)
@@ -3518,6 +3521,7 @@ Properties:
 - String typeName (readonly)
 - String category (readonly)
 - String windowTitle
+- Image@ windowIcon (writeonly)
 - IntVector2 windowPosition
 - bool sRGB
 - bool flushGPU
@@ -7049,7 +7053,7 @@ Properties:
 - float Atan2(float, float)
 - float Abs(float)
 - float Sqrt(float)
-- float Pow(float)
+- float Pow(float, float)
 - float Min(float, float)
 - int Min(int, int)
 - float Max(float, float)

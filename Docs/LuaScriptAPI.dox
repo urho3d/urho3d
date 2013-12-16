@@ -929,6 +929,7 @@ Properties:
 Methods:
 
 - void SetWindowTitle(const String windowTitle)
+- void SetWindowIcon(Image* windowIcon)
 - void SetWindowPosition(const IntVector2& position)
 - void SetWindowPosition(int x, int y)
 - bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
@@ -3576,6 +3577,32 @@ Properties:
 
 Methods:
 
+- XMLElement CreateChild(const String name)
+- bool RemoveChild(const XMLElement& element)
+- bool RemoveChild(const String name)
+- bool RemoveChildren(const String name = String::EMPTY)
+- bool RemoveAttribute(const String name = String::EMPTY)
+- bool SetValue(const String value)
+- bool SetAttribute(const String name, const String value)
+- bool SetBool(const String name, bool value)
+- bool SetBoundingBox(const BoundingBox& value)
+- bool SetColor(const String name, const Color& value)
+- bool SetFloat(const String name, float value)
+- bool SetUInt(const String name, unsigned value)
+- bool SetInt(const String name, int value)
+- bool SetIntRect(const String name, const IntRect& value)
+- bool SetIntVector2(const String name, const IntVector2& value)
+- bool SetRect(const String name, const Rect& value)
+- bool SetQuaternion(const String name, const Quaternion& value)
+- bool SetString(const String name, const String value)
+- bool SetVariant(const Variant& value)
+- bool SetVariantValue(const Variant& value)
+- bool SetResourceRef(const ResourceRef& value)
+- bool SetResourceRefList(const ResourceRefList& value)
+- bool SetVector2(const String name, const Vector2& value)
+- bool SetVector3(const String name, const Vector3& value)
+- bool SetVector4(const String name, const Vector4& value)
+- bool SetVectorVariant(const String name, const Variant& value)
 - bool IsNull() const
 - bool NotNull() const
 - operator bool () const
@@ -3588,6 +3615,7 @@ Methods:
 - bool HasAttribute(const String name) const
 - bool GetBool(const String name) const
 - BoundingBox GetBoundingBox() const
+- String GetValue() const
 - Color GetColor(const String name) const
 - float GetFloat(const String name) const
 - unsigned GetUInt(const String name) const
@@ -3612,6 +3640,7 @@ Properties:
 - static const XMLElement EMPTY
 - bool null (readonly)
 - String name (readonly)
+- String value (readonly)
 - XMLElement parent (readonly)
 - unsigned numAttributes (readonly)
 - XMLFile* file (readonly)
