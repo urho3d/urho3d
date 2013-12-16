@@ -25,6 +25,7 @@ Urho3D development, contributions and bugfixes by:
 - Ali Kämäräinen
 - Pete Leigh
 - Paul Noome
+- Alex Parlett
 - Vladimir Pobedinsky
 - Miika Santala
 - Steven Zhang

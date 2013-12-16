@@ -401,7 +401,7 @@ bool FileSystem::DirExists(const String& pathName) const
     #ifndef WIN32
     // Always return true for the root directory
     if (pathName == "/")
-	return true;
+        return true;
     #endif
 
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));

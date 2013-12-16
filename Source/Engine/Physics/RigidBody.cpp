@@ -645,7 +645,7 @@ float RigidBody::GetFriction() const
 
 Vector3 RigidBody::GetAnisotropicFriction() const
 {
-	return body_ ? ToVector3(body_->getAnisotropicFriction()) : Vector3::ZERO;
+    return body_ ? ToVector3(body_->getAnisotropicFriction()) : Vector3::ZERO;
 }
 
 float RigidBody::GetRollingFriction() const

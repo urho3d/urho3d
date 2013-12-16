@@ -150,7 +150,7 @@ bool CheckExtension(String& extensions, const String& name)
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
-	windowIcon_(0),
+    windowIcon_(0),
     externalWindow_(0),
     width_(0),
     height_(0),
@@ -215,11 +215,11 @@ void Graphics::SetWindowTitle(const String& windowTitle)
 
 void Graphics::SetWindowIcon(Image* windowIcon)
 {
-	windowIcon_ = windowIcon;
-	if (impl_->window_)
-	{
-		CreateWindowIcon();
-	}
+    windowIcon_ = windowIcon;
+    if (impl_->window_)
+    {
+        CreateWindowIcon();
+    }
 }
 
 void Graphics::SetWindowPosition(const IntVector2& position)
@@ -367,7 +367,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
             }
         }
 
-		CreateWindowIcon();
+        CreateWindowIcon();
         
         // Create/restore context and GPU objects and set initial renderstate
         Restore();
@@ -2400,25 +2400,25 @@ unsigned Graphics::GetFormat(const String& formatName)
 
 void Graphics::CreateWindowIcon()
 {
-	if (windowIcon_)
-	{
-		SDL_Surface*  surface = SDL_CreateRGBSurface(0, windowIcon_->GetWidth(), windowIcon_->GetHeight(), windowIcon_->GetComponents() * BITS_PER_COMPONENT, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+    if (windowIcon_)
+    {
+        SDL_Surface*  surface = SDL_CreateRGBSurface(0, windowIcon_->GetWidth(), windowIcon_->GetHeight(), windowIcon_->GetComponents() * BITS_PER_COMPONENT, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
-		if (windowIcon_->GetMemoryUse() > 0)
-		{
-			SDL_LockSurface(surface);
-			memcpy(surface->pixels, windowIcon_->GetData(), windowIcon_->GetMemoryUse());
-			SDL_UnlockSurface(surface);
+        if (windowIcon_->GetMemoryUse() > 0)
+        {
+            SDL_LockSurface(surface);
+            memcpy(surface->pixels, windowIcon_->GetData(), windowIcon_->GetMemoryUse());
+            SDL_UnlockSurface(surface);
 
-			SDL_SetWindowIcon(impl_->window_, surface);
-		}
+            SDL_SetWindowIcon(impl_->window_, surface);
+        }
 
-		SDL_FreeSurface(surface);
-	}
-	else
-	{
-		LOGERROR("Unable to load icon windowIcon_ " + windowIcon_->GetName());
-	}
+        SDL_FreeSurface(surface);
+    }
+    else
+    {
+        LOGERROR("Unable to load icon windowIcon_ " + windowIcon_->GetName());
+    }
 }
 
 void Graphics::CheckFeatureSupport(String& extensions)

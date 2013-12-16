@@ -88,11 +88,11 @@ public:
     /// Select elements/attributes using XPath query.
     XPathResultSet SelectPrepared(const XPathQuery& query) const;
 
-	/// Set the value for an inner node in the following format <node>value</node>.
-	bool SetValue(const String& value);
-	/// Set the value for an inner node in the following format
-	/// <node>value</node>. Must be used on the <node> element.
-	bool SetValue(const char* value);
+    /// Set the value for an inner node in the following format <node>value</node>.
+    bool SetValue(const String& value);
+    /// Set the value for an inner node in the following format
+    /// <node>value</node>. Must be used on the <node> element.
+    bool SetValue(const char* value);
     /// Set an attribute.
     bool SetAttribute(const String& name, const String& value);
     /// Set an attribute.
@@ -176,9 +176,9 @@ public:
     bool HasAttribute(const String& name) const;
     /// Return whether has an attribute.
     bool HasAttribute(const char* name) const;
-	/// Return inner value, or empty if missing for nodes like <node>value</node>
-	String GetValue() const;
-	/// Return attribute, or empty if missing.
+    /// Return inner value, or empty if missing for nodes like <node>value</node>
+    String GetValue() const;
+    /// Return attribute, or empty if missing.
     String GetAttribute(const String& name = String::EMPTY) const;
     /// Return attribute, or empty if missing.
     String GetAttribute(const char* name) const;

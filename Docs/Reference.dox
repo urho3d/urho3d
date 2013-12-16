@@ -133,6 +133,7 @@ The full list of supported parameters, their datatypes and default values:
 - ResourcePackages (string) A semicolon-separated list of resource paths to use. Default empty.
 - ForceSM2 (bool) Whether to force %Shader %Model 2, effective in Direct3D9 mode only. Default false.
 - ExternalWindow (void ptr) External window handle to use instead of creating an application window. Default null.
+- WindowIcon (string) %Window icon image resource name. Default empty (use application default icon.)
 - WindowTitle (string) %Window title. Default "Urho3D".
 - WindowWidth (int) %Window horizontal dimension. Default 0 (use desktop resolution, or 1024 in windowed mode.)
 - WindowHeight (int) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode.)

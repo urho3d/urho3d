@@ -88,8 +88,8 @@ public:
     void SetExternalWindow(void* window);
     /// Set window icon.
     void SetWindowIcon(Image* windowIcon);
-	/// Set window title.
-	void SetWindowTitle(const String& windowTitle);
+    /// Set window title.
+    void SetWindowTitle(const String& windowTitle);
     /// Set window position.
     void SetWindowPosition(const IntVector2& position);
     /// Set window position.
@@ -413,8 +413,8 @@ public:
     static unsigned GetFormat(const String& formatName);
     
 private:
-	/// Create the application window icon.
-	void CreateWindowIcon();
+    /// Create the application window icon.
+    void CreateWindowIcon();
     /// Check supported rendering features.
     void CheckFeatureSupport(String& extensions);
     /// Select FBO and commit changes.
@@ -432,8 +432,8 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
-	/// Window Icon File Name
-	Image* windowIcon_;
+    /// Window Icon File Name
+    Image* windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
     /// Window width.

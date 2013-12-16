@@ -224,16 +224,16 @@ XPathResultSet XMLElement::SelectPrepared(const XPathQuery& query) const
 
 bool XMLElement::SetValue(const String& value)
 {
-	return SetValue(value.CString());
+    return SetValue(value.CString());
 }
 
 bool XMLElement::SetValue(const char* value)
 {
-	if (!file_ || (!node_ && !xpathNode_))
-		return false;
+    if (!file_ || (!node_ && !xpathNode_))
+        return false;
 
-	pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-	return node.append_child(pugi::node_pcdata).set_value(value);
+    pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+    return node.append_child(pugi::node_pcdata).set_value(value);
 }
 
 bool XMLElement::SetAttribute(const String& name, const String& value)
@@ -579,11 +579,11 @@ bool XMLElement::HasAttribute(const char* name) const
 
 String XMLElement::GetValue() const
 {
-	if (!file_ || (!node_ && !xpathNode_))
-		return String::EMPTY;
+    if (!file_ || (!node_ && !xpathNode_))
+        return String::EMPTY;
 
-	const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-	return String(node.child_value());
+    const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+    return String(node.child_value());
 }
 
 String XMLElement::GetAttribute(const String& name) const
