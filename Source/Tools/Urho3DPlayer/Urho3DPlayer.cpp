@@ -55,8 +55,10 @@ void Urho3DPlayer::Setup()
     SharedPtr<File> commandFile(new File(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/CommandLine.txt",
         FILE_READ));
     String commandLine = commandFile->ReadLine();
-    ParseArguments(commandLine, false);
     commandFile->Close();
+    ParseArguments(commandLine, false);
+    // Reparse engine startup parameters now
+    engineParameters_ = Engine::ParseParameters(GetArguments());
     #endif
 
     // Check for script file name
