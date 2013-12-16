@@ -83,6 +83,8 @@ public:
     void SetExternalWindow(void* window);
     /// Set window title.
     void SetWindowTitle(const String& windowTitle);
+	/// Set window icon.
+	void SetWindowIcon(Image* windowIcon);
     /// Set window position.
     void SetWindowPosition(const IntVector2& position);
     /// Set window position.
@@ -392,6 +394,8 @@ public:
 private:
     /// Create the application window.
     bool OpenWindow(int width, int height, bool resizable);
+	/// Create the application window icon.
+	void CreateWindowIcon();
     /// Adjust the window for new resolution and fullscreen mode.
     void AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen);
     /// Create the Direct3D interface.
@@ -415,6 +419,8 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
+	/// Window Icon File Name
+	Image* windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
     /// Window width.
