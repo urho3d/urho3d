@@ -2051,9 +2051,6 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
             i->data_ = new unsigned char[size];
             i->size_ = size;
             i->reserved_ = true;
-            
-            LOGDEBUG("Resized scratch buffer to size " + String(size));
-            
             return i->data_.Get();
         }
     }
@@ -2065,8 +2062,6 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
     newBuffer.reserved_ = true;
     scratchBuffers_.Push(newBuffer);
     return newBuffer.data_.Get();
-    
-    LOGDEBUG("Allocated scratch buffer with size " + String(size));
 }
 
 void Graphics::FreeScratchBuffer(void* buffer)
@@ -2094,8 +2089,6 @@ void Graphics::CleanupScratchBuffers()
         {
             i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
             i->size_ = maxScratchBufferRequest_;
-            
-            LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
         }
     }
     
