@@ -110,8 +110,6 @@ public:
     bool SaveTGA(const String& fileName);
     /// Save in JPG format with compression quality. Return true if successful.
     bool SaveJPG(const String& fileName, int quality);
-    /// Create SDL surface from the image, or null if failed. Specify rect to only return partial image. Only RGB images are supported. You must free the surface yourself.
-    SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
     
     /// Return width.
     int GetWidth() const { return width_; }
@@ -131,6 +129,8 @@ public:
     SharedPtr<Image> GetNextLevel() const;
     /// Return a compressed mip level.
     CompressedLevel GetCompressedLevel(unsigned index) const;
+    /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.
+    SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
     
 private:
     /// Decode an image using stb_image.
