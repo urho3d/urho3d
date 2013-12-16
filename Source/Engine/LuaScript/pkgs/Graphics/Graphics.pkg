@@ -3,6 +3,7 @@ $#include "Graphics.h"
 class Graphics : public Object
 {
     void SetWindowTitle(const String windowTitle);
+	void SetWindowIcon(Image* windowIcon);
     void SetWindowPosition(const IntVector2& position);
     void SetWindowPosition(int x, int y);
 
