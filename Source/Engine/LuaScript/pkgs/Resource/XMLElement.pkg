@@ -20,6 +20,7 @@ class XMLElement
     
     BoundingBox GetBoundingBox() const;
     
+	String GetValue() const;
     Color GetColor(const String name) const;
     float GetFloat(const String name) const;
     unsigned GetUInt(const String name) const;
