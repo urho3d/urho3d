@@ -232,8 +232,8 @@ bool XMLElement::SetValue(const char* value)
     if (!file_ || (!node_ && !xpathNode_))
         return false;
 
-    pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
-    return node.append_child(pugi::node_pcdata).set_value(value);
+    const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+    return const_cast<pugi::xml_node&>(node).append_child(pugi::node_pcdata).set_value(value);
 }
 
 bool XMLElement::SetAttribute(const String& name, const String& value)
