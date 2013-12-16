@@ -148,7 +148,7 @@ if (APPLE)
             COMMAND mv \"$<TARGET_FILE:${TARGET_NAME}>\"{,.iphonesimulator}
             COMMAND xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk iphoneos
             COMMAND mv \"$<TARGET_FILE:${TARGET_NAME}>\"{,.iphoneos}
-            COMMAND lipo -create -output \"$<TARGET_FILE:${TARGET_NAME}>\" \"$<TARGET_FILE:${TARGET_NAME}>\"{.iphonesimulator,.iphoneos}
+            COMMAND lipo -create -output \"$<TARGET_FILE:${TARGET_NAME}>\"{,.iphonesimulator,.iphoneos}
             COMMAND rm \"$<TARGET_FILE:${TARGET_NAME}>\"{.iphonesimulator,.iphoneos}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Creating Mach-O universal binary library")
@@ -158,9 +158,9 @@ if (APPLE)
         # LuaJIT 64-bit specific - replace EXE linker flags with flags for building shared library (adapted from LuaJIT's original Makefile)
         string (REPLACE "-pagezero_size 10000 -image_base 100000000" "-image_base 7fff04c4a000" LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
     endif ()
-    set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS "${LINKER_FLAGS} -all_load")
+    set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${LINKER_FLAGS})
     foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-        list (APPEND ARCHIVES $<TARGET_FILE:${TARGET}>)
+        list (APPEND ARCHIVES -force_load $<TARGET_FILE:${TARGET}>)
     endforeach ()
     set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${ARCHIVES})
 endif ()
