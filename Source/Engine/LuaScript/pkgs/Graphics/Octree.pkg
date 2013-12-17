@@ -9,6 +9,7 @@ class Octree : public Component
     
     // void GetDrawables(OctreeQuery& query) const;
     // void Raycast(RayOctreeQuery& query) const;
+	tolua_outside void OctreeRaycast @ Raycast(PODVector<RayQueryResult> &result, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const;
     // void RaycastSingle(RayOctreeQuery& query) const;
     tolua_outside RayQueryResult OctreeRaycastSingle @ RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const;
     
@@ -37,5 +38,11 @@ static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, 
         empty.subObject_ = 0;
         return empty;
     }
+}
+
+static void OctreeRaycast(const Octree* octree, PODVector<RayQueryResult> &result, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
+{
+	RayOctreeQuery query(result,ray,level,maxDistance,drawableFlags);
+	octree->Raycast(query);
 }
 $}

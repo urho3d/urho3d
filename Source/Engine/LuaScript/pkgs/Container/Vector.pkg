@@ -1,9 +1,10 @@
 $#include "Vector.h"
 $#include "Vector3.h"
+$#include "OctreeQuery.h"
 
 class PODVector
 {
-    TOLUA_TEMPLATE_BIND(T, Vector3)
+    TOLUA_TEMPLATE_BIND(T, Vector3,RayQueryResult)
     
     PODVector();
     PODVector(const PODVector<T>& vector);
@@ -49,3 +50,5 @@ class PODVector
     tolua_readonly tolua_property__no_prefix unsigned capacity;
     tolua_readonly tolua_property__no_prefix bool empty;
 };
+
+$renaming PODVector<RayQueryResult> @ RayQueryResultVector
