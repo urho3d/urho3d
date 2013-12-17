@@ -39,14 +39,13 @@ void Rotator::SetRotationSpeed(const Vector3& speed)
 
 void Rotator::OnNodeSet(Node* node)
 {
-    // If the node pointer is nonzero, this component has been created into a scene node. Subscribe to the variable timestep
-    // scene update event now. If the node pointer is zero, the component is being removed from a scene node at destruction
+    // If the node pointer is non-null, this component has been created into a scene node. Subscribe to the variable timestep
+    // scene update event now. If the node pointer is null, the component is being removed from a scene node at destruction
     // time. In that case we do nothing
     if (node)
     {
         Scene* scene = node->GetScene();
-        // The scene pointer will be nonzero if the scene node belongs to a scene (it is also legal to create free-standing
-        // scene nodes)
+        // The scene pointer can be null if this scene node has been created free-standing and not part of a scene
         if (scene)
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(Rotator, HandleSceneUpdate));
     }
