@@ -24,5 +24,7 @@
 pushd %~dp0
 cmake -E make_directory Build
 echo on
-cmake -E chdir Build cmake -G "MinGW Makefiles" %* ..\Source
+:: \todo suppress policy warning (for 2.8.12 early adopters), remove this option when CMake minimum version is 2.8.12
+set "OPT=-Wno-dev"
+cmake -E chdir Build cmake %OPT% -G "MinGW Makefiles" %* ..\Source
 @popd

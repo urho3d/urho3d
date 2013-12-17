@@ -120,11 +120,11 @@ if (APPLE)
         # Add a custom target to build Mach-O universal binary consisting of iphoneos (universal ARM archs) and iphonesimulator (i386 arch)
         add_custom_target (${TARGET_NAME}_universal
             COMMAND xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk iphonesimulator
-            COMMAND mv \"$<TARGET_FILE:${TARGET_NAME}>\"{,.iphonesimulator}
+            COMMAND mv $<TARGET_FILE:${TARGET_NAME}>{,.iphonesimulator}
             COMMAND xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION) -sdk iphoneos
-            COMMAND mv \"$<TARGET_FILE:${TARGET_NAME}>\"{,.iphoneos}
-            COMMAND lipo -create -output \"$<TARGET_FILE:${TARGET_NAME}>\"{,.iphonesimulator,.iphoneos}
-            COMMAND rm \"$<TARGET_FILE:${TARGET_NAME}>\"{.iphonesimulator,.iphoneos}
+            COMMAND mv $<TARGET_FILE:${TARGET_NAME}>{,.iphoneos}
+            COMMAND lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{,.iphonesimulator,.iphoneos}
+            COMMAND rm $<TARGET_FILE:${TARGET_NAME}>{.iphonesimulator,.iphoneos}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Creating Mach-O universal binary library")
     else ()
@@ -147,21 +147,27 @@ if (NOT APPLE AND NOT MSVC)
     set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)
     if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)    # GCC ar does not take archives directly as input like Apple libtool, however, it can be scripted to do so
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND mv \"$<TARGET_FILE:${TARGET_NAME}>\"{,.engine}
-            COMMAND echo CREATE \"$<TARGET_FILE:${TARGET_NAME}>\" >script.ar
-            COMMAND echo ADDLIB \"$<TARGET_FILE:${TARGET_NAME}>\".engine >>script.ar
+            COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${TARGET_NAME}> $<TARGET_FILE:${TARGET_NAME}>.engine
+            COMMAND echo CREATE $<TARGET_FILE:${TARGET_NAME}> >script.ar
+            COMMAND echo ADDLIB $<TARGET_FILE:${TARGET_NAME}>.engine >>script.ar
             COMMENT "Preparing merge script")
         foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND echo ADDLIB \"$<TARGET_FILE:${TARGET}>\" >>script.ar)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND echo ADDLIB $<TARGET_FILE:${TARGET}> >>script.ar)
         endforeach ()
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND echo SAVE >>script.ar
             COMMAND echo END >>script.ar
             COMMAND ${CMAKE_AR} -M <script.ar
-            COMMAND rm \"$<TARGET_FILE:${TARGET_NAME}>\".engine script.ar
+            COMMAND ${CMAKE_COMMAND} -E remove $<TARGET_FILE:${TARGET_NAME}>.engine script.ar
             COMMENT "Merging all archives into a single static library")
     endif ()
 endif ()
+# \todo This is a deprecated property in CMake version 2.8.12 - Remove below macros when CMake minimum version is 2.8.12
+set_target_properties (${TARGET_NAME} PROPERTIES LINK_INTERFACE_LIBRARIES "")
+if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+    set_target_properties (${TARGET_NAME} PROPERTIES LINK_LIBRARIES "")
+endif ()
+# \endtodo
 
 # Generate platform specific export header file automatically
 if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
@@ -206,11 +212,11 @@ endif ()
 # Define post build steps
 # Strip the output shared library for embedded devices
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} \"$<TARGET_FILE:${TARGET_NAME}>\"
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
         COMMENT "Stripping shared library")
 endif ()
 if (RASPI AND SCP_TO_TARGET)
     # Ensure SCP is the last command
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp \"$<TARGET_FILE:${TARGET_NAME}>\" ${SCP_TO_TARGET} || exit 0
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0
         COMMENT "Scp-ing library to Raspberry Pi device")
 endif ()

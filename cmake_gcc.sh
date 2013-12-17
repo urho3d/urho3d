@@ -41,7 +41,7 @@ GENERATOR="Unix Makefiles"
 [[ $( uname -m ) =~ ^armv6 ]] && PLATFORM="-DRASPI=1"
 
 # Create project with the respective CMake generators
-OPT=
+OPT=-Wno-dev    # \todo suppress policy warning (for 2.8.12 early adopters), remove this option when CMake minimum version is 2.8.12
 [ $ANDROID_NDK ] && msg "Android build" && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $@ $SOURCE && post_cmake android-Build
 [ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/raspberrypi.toolchain.cmake $@ $SOURCE && post_cmake raspi-Build
 msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $@ $SOURCE && post_cmake Build
