@@ -1,5 +1,5 @@
 # Define target name
-set (TARGET_NAME tolua++_static)
+set (TARGET_NAME toluapp)
 
 # Define source files
 file (GLOB CPP_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c)
@@ -11,4 +11,3 @@ set (INCLUDE_DIRS_ONLY ../../include ../../../Lua${JIT}/src)
 
 # Setup target
 setup_library ()
-adjust_target_name ()

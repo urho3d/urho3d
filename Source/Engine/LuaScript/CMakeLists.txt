@@ -35,7 +35,7 @@ if (CMAKE_CROSSCOMPILING OR IOS)
         message (WARNING "For cross-compiling build to be successful, the 'tolua++' tool must be built natively first and present in the 'Bin' folder." )
     endif ()
 else ()
-    add_subdirectory (../../ThirdParty/tolua++/src/bin ../../ThirdParty/tolua++/src/bin)
+    add_subdirectory (../../ThirdParty/toluapp/src/bin ../../ThirdParty/toluapp/src/bin)
     set (TOLUADEP tolua++)
 endif ()
 
@@ -61,9 +61,9 @@ install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 
 # Define dependency libs
 set (LIBS ../../ThirdParty/Lua${JIT}/src)
-set (LINK_LIBS_ONLY tolua++_static)
+set (LINK_LIBS_ONLY toluapp)
 set (INCLUDE_DIRS_ONLY . .. ../Audio ../Container ../Core ../Engine ../Graphics ../Input ../IO ../Math ../Navigation ../Network ../Physics ../Resource ../Scene ../UI
-    ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/SDL/include ../../ThirdParty/tolua++/include ${CMAKE_BINARY_DIR}/Engine)
+    ../../ThirdParty/Bullet/src ../../ThirdParty/kNet/include ../../ThirdParty/SDL/include ../../ThirdParty/toluapp/include ${CMAKE_BINARY_DIR}/Engine)
 
 # Setup target
 setup_library ()

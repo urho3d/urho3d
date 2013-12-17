@@ -8,7 +8,7 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Define dependency libs
 set (LIBS ../../../../ThirdParty/Lua${JIT}/src)
-set (LINK_LIBS_ONLY tolua++_static)
+set (LINK_LIBS_ONLY toluapp)
 if (NOT MSVC)
     set (LINK_LIBS_ONLY ${LINK_LIBS_ONLY} m)
 endif ()

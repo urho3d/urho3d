@@ -42,52 +42,27 @@ else ()
     file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h "const char* revision=\"Unversioned\";")
 endif ()
 
+if (WIN32)
+    set (CMAKE_DEBUG_POSTFIX _d)
+endif ()
+
 # Define generated object files
 # This is a hack as it relies on internal working of CMake
-if (NOT APPLE)
-    if (WIN32)
-        set (CMAKE_DEBUG_POSTFIX _d)
-        set (OBJ_EXT .obj)
-    else ()
-        set (OBJ_EXT .o)
-    endif ()
+if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have force_load/whole_archive equivalent
     foreach (TARGET ${STATIC_LIBRARY_TARGETS})
         get_target_property (SOURCES ${TARGET} SOURCES)
         get_target_property (INT_DIR ${TARGET} LOCATION)
         get_filename_component (INT_DIR ${INT_DIR} PATH)
-        if (MSVC)
-            if (CMAKE_GENERATOR MATCHES 2008)
-                string (REPLACE /$(OutDir) /${TARGET}.dir/$(ConfigurationName) INT_DIR ${INT_DIR})
-            else ()
-                string (REPLACE /$(Configuration) /${TARGET}.dir/$(ConfigurationName) INT_DIR ${INT_DIR})
-            endif ()
+        if (CMAKE_GENERATOR MATCHES 2008)
+            string (REPLACE /$(OutDir) /${TARGET}.dir/$(ConfigurationName) INT_DIR ${INT_DIR})
         else ()
-            set (INT_DIR ${INT_DIR}/CMakeFiles/${TARGET}.dir)
+            string (REPLACE /$(Configuration) /${TARGET}.dir/$(ConfigurationName) INT_DIR ${INT_DIR})
         endif ()
         foreach (SOURCE ${SOURCES})
             get_filename_component (NAME ${SOURCE} NAME)
             if (NAME MATCHES \\.c.*$|\\.mm?$|\\.S$|\\.s$)
-                if (MSVC)
-                    string (REGEX REPLACE \\.c.*$|\\.mm?$|\\.S$|\\.s$ "" NAME ${NAME})
-                endif ()
-                unset (DIR_SUFFIX)
-                if (NOT MSVC)
-                    get_filename_component (PATH ${SOURCE} PATH)
-                    foreach (DIR source src generated)
-                        if (PATH MATCHES \(ThirdParty|Engine\)/.*/${DIR}$)
-                            set (DIR_SUFFIX /${DIR})
-                            break ()
-                        elseif (PATH MATCHES ThirdParty/.*/${DIR}/)
-                            string (REGEX REPLACE .*/${DIR}/ "" DIR_SUFFIX ${PATH})
-                            set (DIR_SUFFIX /${DIR}/${DIR_SUFFIX})
-                            break ()
-                        elseif (PATH MATCHES ^${DIR}/|^${DIR}$)
-                            set (DIR_SUFFIX /${PATH})
-                            break ()
-                        endif ()
-                    endforeach ()
-                endif ()
-                list (APPEND OBJ_FILES ${INT_DIR}${DIR_SUFFIX}/${NAME}${OBJ_EXT})
+                string (REGEX REPLACE \\.c.*$|\\.mm?$|\\.S$|\\.s$ "" NAME ${NAME})
+                list (APPEND OBJ_FILES ${INT_DIR}/${NAME}.obj)
             elseif (NAME MATCHES \\.o.*$)
                 list (APPEND OBJ_FILES ${SOURCE})
             endif ()
@@ -138,7 +113,7 @@ if (NOT GIT_EXIT_CODE EQUAL 0)
     add_dependencies (${TARGET_NAME} ${STATIC_LIBRARY_TARGETS})
 endif ()
 
-# Setup the frameworks and libraries for Mac OS X and iOS platforms
+# Setup dependency frameworks and libraries
 if (APPLE)
     if (IOS)
         setup_ios_linker_flags (LINKER_FLAGS)
@@ -159,10 +134,33 @@ if (APPLE)
         string (REPLACE "-pagezero_size 10000 -image_base 100000000" "-image_base 7fff04c4a000" LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
     endif ()
     set_target_properties (${TARGET_NAME} PROPERTIES LINK_FLAGS ${LINKER_FLAGS})
-    foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-        list (APPEND ARCHIVES -force_load $<TARGET_FILE:${TARGET}>)
-    endforeach ()
-    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${ARCHIVES})
+    set (FORCE_LOAD -force_load)
+elseif (NOT MSVC)
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--whole-archive)
+endif ()
+foreach (TARGET ${STATIC_LIBRARY_TARGETS})
+    get_target_property (ARCHIVE ${TARGET} LOCATION)
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})        # Only works in Apple and GCC while building shared library
+    set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}")      # Only works in Apple and MSVC while building static library
+endforeach ()
+if (NOT APPLE AND NOT MSVC)
+    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)
+    if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)    # GCC ar does not take archives directly as input like Apple libtool, however, it can be scripted to do so
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND mv \"$<TARGET_FILE:${TARGET_NAME}>\"{,.engine}
+            COMMAND echo CREATE \"$<TARGET_FILE:${TARGET_NAME}>\" >script.ar
+            COMMAND echo ADDLIB \"$<TARGET_FILE:${TARGET_NAME}>\".engine >>script.ar
+            COMMENT "Preparing merge script")
+        foreach (TARGET ${STATIC_LIBRARY_TARGETS})
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND echo ADDLIB \"$<TARGET_FILE:${TARGET}>\" >>script.ar)
+        endforeach ()
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND echo SAVE >>script.ar
+            COMMAND echo END >>script.ar
+            COMMAND ${CMAKE_AR} -M <script.ar
+            COMMAND rm \"$<TARGET_FILE:${TARGET_NAME}>\".engine script.ar
+            COMMENT "Merging all archives into a single static library")
+    endif ()
 endif ()
 
 # Generate platform specific export header file automatically
@@ -208,10 +206,11 @@ endif ()
 # Define post build steps
 # Strip the output shared library for embedded devices
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND (CMAKE_CROSSCOMPILING OR IOS))
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
-    COMMENT "Stripping shared library")
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} \"$<TARGET_FILE:${TARGET_NAME}>\"
+        COMMENT "Stripping shared library")
 endif ()
 if (RASPI AND SCP_TO_TARGET)
     # Ensure SCP is the last command
-    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${SCP_TO_TARGET} || exit 0)
+    add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp \"$<TARGET_FILE:${TARGET_NAME}>\" ${SCP_TO_TARGET} || exit 0
+        COMMENT "Scp-ing library to Raspberry Pi device")
 endif ()

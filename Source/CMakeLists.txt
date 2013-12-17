@@ -28,7 +28,7 @@ cmake_minimum_required (VERSION 2.8.12)
 
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
-    cmake_policy (SET CMP0022 OLD)
+    cmake_policy (SET CMP0022 NEW)
 endif ()
 
 # Set CMake modules search path
@@ -87,15 +87,13 @@ install (FILES ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts PERMISSION
 foreach (TARGET Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
-
 if (ENABLE_ANGELSCRIPT)
     add_subdirectory(ThirdParty/AngelScript)
 endif ()
-
 if (ENABLE_LUA)
     add_subdirectory (Engine/LuaScript)
     add_subdirectory (ThirdParty/Lua${JIT})
-    add_subdirectory (ThirdParty/tolua++/src/lib)
+    add_subdirectory (ThirdParty/toluapp/src/lib)
 endif ()
 if (NOT IOS AND NOT ANDROID AND NOT RASPI)
     if (USE_OPENGL)
