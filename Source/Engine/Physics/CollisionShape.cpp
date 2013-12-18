@@ -115,7 +115,7 @@ public:
             
             btIndexedMesh meshIndex;
             meshIndex.m_numTriangles = indexCount / 3;
-            meshIndex.m_triangleIndexBase = &indexData[indexStart];
+            meshIndex.m_triangleIndexBase = &indexData[indexStart * indexSize];
             meshIndex.m_triangleIndexStride = 3 * indexSize;
             meshIndex.m_numVertices = 0;
             meshIndex.m_vertexBase = vertexData;
