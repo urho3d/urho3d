@@ -26,7 +26,7 @@ set (TARGET_NAME Urho3D)
 # Define generated source files
 execute_process (COMMAND git describe --always WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} RESULT_VARIABLE GIT_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
 if (GIT_EXIT_CODE EQUAL 0)
-    if (CMAKE_HOST_WIN32)
+    if (CMAKE_HOST_WIN32 AND NOT MSYS)
         add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gitversion.h
             COMMAND for /F %%v in ('git describe --always --dirty') do echo const char* revision="%%v"\; >${CMAKE_CURRENT_BINARY_DIR}/gitversion.h DEPENDS ${STATIC_LIBRARY_TARGETS}
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -140,26 +140,42 @@ elseif (NOT MSVC)
 endif ()
 foreach (TARGET ${STATIC_LIBRARY_TARGETS})
     get_target_property (ARCHIVE ${TARGET} LOCATION)
-    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})        # Only works in Apple and GCC while building shared library
-    set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}")      # Only works in Apple and MSVC while building static library
+    if (NOT MSVC)
+        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES ${FORCE_LOAD} ${ARCHIVE})    # Only works in Apple (Xcode and Makefile) and GCC while building shared library
+    endif ()
+    if (XCODE OR MSVC)
+        set_property (TARGET ${TARGET_NAME} APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS " ${ARCHIVE}")  # Only works in Apple (Xcode only) and MSVC while building static library
+    else ()
+        list (APPEND ARCHIVES ${ARCHIVE})
+    endif ()
 endforeach ()
-if (NOT APPLE AND NOT MSVC)
-    set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)
+if (NOT XCODE AND NOT MSVC)
+    if (NOT APPLE)
+        set_property (TARGET ${TARGET_NAME} APPEND PROPERTY LINK_LIBRARIES -Wl,--no-whole-archive)
+    endif ()
     if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)    # GCC ar does not take archives directly as input like Apple libtool, however, it can be scripted to do so
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${TARGET_NAME}> $<TARGET_FILE:${TARGET_NAME}>.engine
-            COMMAND echo CREATE $<TARGET_FILE:${TARGET_NAME}> >script.ar
-            COMMAND echo ADDLIB $<TARGET_FILE:${TARGET_NAME}>.engine >>script.ar
-            COMMENT "Preparing merge script")
-        foreach (TARGET ${STATIC_LIBRARY_TARGETS})
-            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND echo ADDLIB $<TARGET_FILE:${TARGET}> >>script.ar)
-        endforeach ()
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND echo SAVE >>script.ar
-            COMMAND echo END >>script.ar
-            COMMAND ${CMAKE_AR} -M <script.ar
-            COMMAND ${CMAKE_COMMAND} -E remove $<TARGET_FILE:${TARGET_NAME}>.engine script.ar
-            COMMENT "Merging all archives into a single static library")
+        if (APPLE)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND mv $<TARGET_FILE:${TARGET_NAME}>{,.engine}
+                COMMAND libtool -static $<TARGET_FILE:${TARGET_NAME}>.engine ${ARCHIVES} -o $<TARGET_FILE:${TARGET_NAME}>
+                COMMAND rm $<TARGET_FILE:${TARGET_NAME}>.engine
+                COMMENT "Merging all archives into a single static library using libtool")
+        else ()
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${TARGET_NAME}> $<TARGET_FILE:${TARGET_NAME}>.engine
+                COMMAND echo CREATE $<TARGET_FILE:${TARGET_NAME}> >script.ar
+                COMMAND echo ADDLIB $<TARGET_FILE:${TARGET_NAME}>.engine >>script.ar
+                COMMENT "Preparing merge script")
+            foreach (ARCHIVE ${ARCHIVES})
+                add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND echo ADDLIB ${ARCHIVE} >>script.ar)
+            endforeach ()
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND echo SAVE >>script.ar
+                COMMAND echo END >>script.ar
+                COMMAND ${CMAKE_AR} -M <script.ar
+                COMMAND ${CMAKE_COMMAND} -E remove $<TARGET_FILE:${TARGET_NAME}>.engine script.ar
+                COMMENT "Merging all archives into a single static library using ar")
+        endif ()
     endif ()
 endif ()
 # \todo This is a deprecated property in CMake version 2.8.12 - Remove below macros when CMake minimum version is 2.8.12
@@ -174,7 +190,7 @@ if (NOT URHO3D_LIB_TYPE STREQUAL URHO3D_EXPORTS_LIB_TYPE OR ${CMAKE_CURRENT_SOUR
     set_target_properties (${TARGET_NAME} PROPERTIES DEFINE_SYMBOL URHO3D_EXPORTS)
     generate_export_header (${TARGET_NAME} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h)
     set (URHO3D_EXPORTS_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE INTERNAL "Lib type when Urho3D export header was last generated")
-    
+
     # Append Urho3D license notice to the export header file
     file (READ ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h EXPORT_DEFINE)
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)

@@ -27,6 +27,12 @@ endif ()
 if (NOT MSVC AND NOT XCODE AND NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE Release)
 endif ()
+if (CMAKE_HOST_WIN32)
+    execute_process (COMMAND uname -o COMMAND tr -d '\n' RESULT_VARIABLE UNAME_EXIT_CODE OUTPUT_VARIABLE UNAME_OPERATING_SYSTEM ERROR_QUIET)
+    if (UNAME_EXIT_CODE EQUAL 0 AND UNAME_OPERATING_SYSTEM STREQUAL Msys)
+        set (MSYS 1)
+    endif ()
+endif ()
 
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
 if (NOT DEFINED ENABLE_SSE)

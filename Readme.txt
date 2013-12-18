@@ -1,7 +1,7 @@
-﻿Urho3D - cross-platform rendering and game engine
+Urho3D - cross-platform rendering and game engine
 -------------------------------------------------
 
-http://urho3d.googlecode.com
+http://urho3d.github.io/
 
 Licensed under the MIT license, see License.txt for details.
 
