@@ -463,6 +463,17 @@ Right mouse     - Hold down and move mouse to rotate camera
 
 WSAD or arrows  - Move
 Shift+WSAD      - Move faster
+E               - Ascend
+Q               - Descend
+Shift+E,Q       - Ascend or descend faster
+
+Numpad1         - Front view
+Numpad3         - Right hand view
+Numpad7         - Top view
+Ctrl+Numpad1    - Back view
+Ctrl+Numpad3    - Left view
+Ctrl+Numpad7    - Bottom view
+
 Ctrl+1,2,3      - Object manipulation mode: move/rotate/scale
 Ctrl+4          - Object selection mode, no manipulation
 Ctrl+5          - Toggle between world and local axes manipulation
