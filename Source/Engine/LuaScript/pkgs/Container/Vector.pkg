@@ -4,7 +4,7 @@ $#include "OctreeQuery.h"
 
 class PODVector
 {
-    TOLUA_TEMPLATE_BIND(T, Vector3,RayQueryResult)
+    TOLUA_TEMPLATE_BIND(T, Vector3, RayQueryResult)
     
     PODVector();
     PODVector(const PODVector<T>& vector);

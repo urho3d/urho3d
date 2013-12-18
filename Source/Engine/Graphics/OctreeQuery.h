@@ -160,13 +160,15 @@ enum RayQueryLevel
 /// Raycast result.
 struct RayQueryResult
 {
+    /// Construct with defaults.
     RayQueryResult() :
         drawable_(0),
         node_(0)
     {
     }
-	
-	bool operator != (const RayQueryResult& rhs) const { return position_!=rhs.position_ || normal_!=rhs.normal_ || distance_!=rhs.distance_ || drawable_!=rhs.drawable_ || node_!=rhs.node_ || subObject_!=rhs.subObject_; }
+
+    /// Test for inequality, added to prevent GCC from complaining.
+    bool operator != (const RayQueryResult& rhs) const { return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || drawable_ != rhs.drawable_ || node_ != rhs.node_ || subObject_ != rhs.subObject_; }
     
     /// Hit position in world space.
     Vector3 position_;
