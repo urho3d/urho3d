@@ -68,6 +68,15 @@
                         <attribute name="Max Size" value="100 2147483647" />
                     </element>
                 </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="LimitRotationToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Limit camera pitch" />
+                    </element>
+                </element>
                 <element type="BorderImage" style="EditorDivider" />
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="20" />

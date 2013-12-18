@@ -1093,6 +1093,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         pos.y = 0;
         cameraNode.position = pos;
         cameraNode.direction = Vector3(0, 0, viewDirection);
+        ReacquireCameraYawPitch();
     }
 
     else if (key == KEY_NUMPAD3) // Side view
@@ -1103,6 +1104,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         pos.z = 0;
         cameraNode.position = pos;
         cameraNode.direction = Vector3(-viewDirection, 0, 0);
+        ReacquireCameraYawPitch();
     }
 
     else if (key == KEY_NUMPAD7) // Top view
@@ -1113,6 +1115,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         pos.z = 0;
         cameraNode.position = pos;
         cameraNode.direction = Vector3(0, -viewDirection, 0);
+        ReacquireCameraYawPitch();
     }
 
     else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)

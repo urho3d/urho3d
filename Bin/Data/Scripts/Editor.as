@@ -120,6 +120,7 @@ void LoadConfig()
         if (cameraElem.HasAttribute("farclip")) camera.farClip = cameraElem.GetFloat("farclip");
         if (cameraElem.HasAttribute("fov")) camera.fov = cameraElem.GetFloat("fov");
         if (cameraElem.HasAttribute("speed")) cameraBaseSpeed = cameraElem.GetFloat("speed");
+        if (cameraElem.HasAttribute("limitrotation")) limitRotation = cameraElem.GetBool("limitrotation");
     }
 
     if (!objectElem.isNull)
@@ -225,6 +226,7 @@ void SaveConfig()
         cameraElem.SetFloat("farclip", camera.farClip);
         cameraElem.SetFloat("fov", camera.fov);
         cameraElem.SetFloat("speed", cameraBaseSpeed);
+        cameraElem.SetBool("limitrotation", limitRotation);
     }
 
     objectElem.SetFloat("newnodedistance", newNodeDistance);

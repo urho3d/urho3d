@@ -34,6 +34,9 @@ void UpdateEditorSettingsDialog()
     LineEdit@ speedEdit = settingsDialog.GetChild("SpeedEdit", true);
     speedEdit.text = String(cameraBaseSpeed);
 
+    CheckBox@ limitRotationToggle = settingsDialog.GetChild("LimitRotationToggle", true);
+    limitRotationToggle.checked = limitRotation;
+
     LineEdit@ distanceEdit = settingsDialog.GetChild("DistanceEdit", true);
     distanceEdit.text = String(newNodeDistance);
 
@@ -98,6 +101,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(fovEdit, "TextFinished", "EditCameraFOV");
         SubscribeToEvent(speedEdit, "TextChanged", "EditCameraSpeed");
         SubscribeToEvent(speedEdit, "TextFinished", "EditCameraSpeed");
+        SubscribeToEvent(limitRotationToggle, "Toggled", "EditLimitRotation");
         SubscribeToEvent(distanceEdit, "TextChanged", "EditNewNodeDistance");
         SubscribeToEvent(distanceEdit, "TextFinished", "EditNewNodeDistance");
         SubscribeToEvent(moveStepEdit, "TextChanged", "EditMoveStep");
@@ -171,6 +175,12 @@ void EditCameraSpeed(StringHash eventType, VariantMap& eventData)
     cameraBaseSpeed = Max(edit.text.ToFloat(), 1.0);
     if (eventType == StringHash("TextFinished"))
         edit.text = String(cameraBaseSpeed);
+}
+
+void EditLimitRotation(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetUIElement();
+    limitRotation = edit.checked;
 }
 
 void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)

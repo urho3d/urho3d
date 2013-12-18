@@ -39,11 +39,14 @@ SnapScaleMode snapScaleMode = SNAP_SCALE_FULL;
 float cameraBaseSpeed = 10;
 float cameraBaseRotationSpeed = 0.2;
 float cameraShiftSpeedMultiplier = 5;
+float cameraYaw = 0;
+float cameraPitch = 0;
 float newNodeDistance = 20;
 float moveStep = 0.5;
 float rotateStep = 5;
 float scaleStep = 0.1;
 float snapScale = 1.0;
+bool limitRotation = false;
 bool moveSnap = false;
 bool rotateSnap = false;
 bool scaleSnap = false;
@@ -114,6 +117,13 @@ void ResetCamera()
     cameraNode.position = Vector3(0, 5, -10);
     // Look at the origin so user can see the scene.
     cameraNode.rotation = Quaternion(Vector3(0, 0, 1), -cameraNode.position);
+    ReacquireCameraYawPitch();
+}
+
+void ReacquireCameraYawPitch()
+{
+    cameraYaw = cameraNode.rotation.yaw;
+    cameraPitch = cameraNode.rotation.pitch;
 }
 
 void CreateGrid()
@@ -327,9 +337,13 @@ void UpdateView(float timeStep)
         IntVector2 mouseMove = input.mouseMove;
         if (mouseMove.x != 0 || mouseMove.y != 0)
         {
-            float cameraYaw = mouseMove.x * cameraBaseRotationSpeed;
-            float cameraPitch = mouseMove.y * cameraBaseRotationSpeed;
-            cameraNode.rotation = cameraNode.rotation * Quaternion(cameraPitch, cameraYaw, 0);
+            cameraYaw += mouseMove.x * cameraBaseRotationSpeed;
+            cameraPitch += mouseMove.y * cameraBaseRotationSpeed;
+
+            if (limitRotation)
+                cameraPitch = Clamp(cameraPitch, -90.0, 90.0);
+
+            cameraNode.rotation = Quaternion(cameraPitch, cameraYaw, 0);
             FadeUI();
         }
     }
