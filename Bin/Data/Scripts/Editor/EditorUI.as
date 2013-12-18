@@ -1048,6 +1048,7 @@ void HandleUIElementDefaultStyle(StringHash eventType, VariantMap& eventData)
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
+    int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
 
     if (key == KEY_ESC)
     {
@@ -1083,6 +1084,36 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
+
+    else if (key == KEY_NUMPAD1) // Front view
+    {
+        Vector3 pos = cameraNode.position;
+        pos.z = -pos.length * viewDirection;
+        pos.x = 0;
+        pos.y = 0;
+        cameraNode.position = pos;
+        cameraNode.direction = Vector3(0, 0, viewDirection);
+    }
+
+    else if (key == KEY_NUMPAD3) // Side view
+    {
+        Vector3 pos = cameraNode.position;
+        pos.x = pos.length * viewDirection;
+        pos.y = 0;
+        pos.z = 0;
+        cameraNode.position = pos;
+        cameraNode.direction = Vector3(-viewDirection, 0, 0);
+    }
+
+    else if (key == KEY_NUMPAD7) // Top view
+    {
+        Vector3 pos = cameraNode.position;
+        pos.y = pos.length * viewDirection;
+        pos.x = 0;
+        pos.z = 0;
+        cameraNode.position = pos;
+        cameraNode.direction = Vector3(0, -viewDirection, 0);
+    }
 
     else if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
     {
