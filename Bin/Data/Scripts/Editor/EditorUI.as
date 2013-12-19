@@ -1085,7 +1085,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     else if (key == KEY_F4)
         ToggleOctreeDebug();
 
-    else if (key == KEY_NUMPAD1) // Front view
+    else if (key == KEY_NUMPAD1 && ui.focusElement is null) // Front view
     {
         Vector3 pos = cameraNode.position;
         pos.z = -pos.length * viewDirection;
@@ -1096,7 +1096,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         ReacquireCameraYawPitch();
     }
 
-    else if (key == KEY_NUMPAD3) // Side view
+    else if (key == KEY_NUMPAD3 && ui.focusElement is null) // Side view
     {
         Vector3 pos = cameraNode.position;
         pos.x = pos.length * viewDirection;
@@ -1107,7 +1107,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         ReacquireCameraYawPitch();
     }
 
-    else if (key == KEY_NUMPAD7) // Top view
+    else if (key == KEY_NUMPAD7 && ui.focusElement is null) // Top view
     {
         Vector3 pos = cameraNode.position;
         pos.y = pos.length * viewDirection;
