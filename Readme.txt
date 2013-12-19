@@ -18,6 +18,7 @@ Urho3D development, contributions and bugfixes by:
 - Carlo Carollo
 - Pete Chown
 - Sebastian Delatorre (primitivewaste)
+- Josh Engebretson
 - Chris Friesen
 - Alex Fuller
 - Mika Heinonen
