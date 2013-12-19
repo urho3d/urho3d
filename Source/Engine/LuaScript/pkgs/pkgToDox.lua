@@ -9,6 +9,7 @@ enums = {}
 classes = {}
 globalConstants = {}
 globalFunctions = {}
+renamings = {}
 
 -- trim string.
 function trim(s)
@@ -118,10 +119,15 @@ function handleLine(line)
             return
         end
         
-        if line:find(")") == nil then -- global function.
-            table.insert(globalConstants, line)
-        else
+        if line:find(")") ~= nil then -- global function.
             table.insert(globalFunctions, line)
+        else
+            local i, _, oldName, newName = line:find("$renaming%s+(.-)%s*@%s*(.-)%s*$") 
+            if i ~= nill then -- renaming types.
+                renamings[oldName] = newName
+            else
+                table.insert(globalConstants, line)
+            end
         end
         
         return
@@ -178,7 +184,7 @@ function writeGlobalFunctions(ofile)
     for _, line in ipairs(globalFunctions) do
         line = line:gsub("%w+ @ ", "")
         line = line:gsub(";", "")
-        ofile:write("- " .. line .. "\n")
+        ofile:write("- ", line, "\n")
     end
     
     ofile:write("\n")
@@ -190,13 +196,13 @@ function writeGlobalConstants(ofile)
         line = line:gsub("static ", "")
         line = line:gsub("const ", "")
         line = line:gsub(";", "")
-        ofile:write("- " .. line .. "\n")
+        ofile:write("- ", line, "\n")
     end
         
     for _, line in ipairs(enums) do
         line = line:gsub(",", "")
         line = line:gsub(" = .*", "")
-        ofile:write("- int " .. line .. "\n")
+        ofile:write("- int ", line, "\n")
     end
     
     ofile:write("\n")
@@ -210,7 +216,7 @@ function writeClasses(ofile)
             line = line:gsub("class ", "")
             line = line:gsub("struct ", "")
             line = line:gsub("public ", "")
-            ofile:write("\n### " .. line .. "\n\nMethods:\n\n")
+            ofile:write("\n### ", line, "\n\nMethods:\n\n")
             firstProperty = true
         else
             line = line:gsub(";", "")
@@ -218,7 +224,7 @@ function writeClasses(ofile)
                 line = line:gsub(" %w+ @ ", " ")
                 line = line:gsub("explicit ", "")
                 line = line:gsub("tolua_outside ", "")
-                ofile:write("- " .. line .. "\n")
+                ofile:write("- ", line, "\n")
             else
                 if firstProperty then
                     firstProperty = false
@@ -230,14 +236,25 @@ function writeClasses(ofile)
                 line = line:gsub("tolua_property__has_set ", "")
                 line = line:gsub("tolua_property__no_prefix ", "")
                 if line:find("tolua_readonly") == nil then
-                    ofile:write("- " .. line .. "\n")
+                    ofile:write("- ", line, "\n")
                 else
                     line = line:gsub("tolua_readonly ", "")
-                    ofile:write("- " .. line .. " (readonly)\n")
+                    ofile:write("- ", line, " (readonly)\n")
                 end
             end
         end
     end
+
+    ofile:write("\n")
+end
+
+function writeRenamings(ofile)
+    ofile:write("\\section LuaScriptAPI_RenameTypes Rename types\n")
+    for oldName, newName in pairs(renamings) do
+        ofile:write("- ", oldName, " becomes ", newName, "\n")
+    end
+
+    ofile:write("\n")
 end
 
 ofile = io.open(arg[1], "w")
@@ -253,6 +270,7 @@ ofile:write("\n")
 writeClasses(ofile)
 writeGlobalFunctions(ofile)
 writeGlobalConstants(ofile)
+writeRenamings(ofile)
 
 ofile:write([[
 */

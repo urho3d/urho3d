@@ -151,7 +151,7 @@ Properties:
 
 Methods:
 
-- TOLUA_TEMPLATE_BIND(T, Vector3)
+- TOLUA_TEMPLATE_BIND(T, Vector3, RayQueryResult)
 - PODVector()
 - PODVector(const PODVector<T>& vector)
 - ~PODVector()
@@ -1151,6 +1151,7 @@ Methods:
 - void Update(const FrameInfo& frame)
 - void AddManualDrawable(Drawable* drawable)
 - void RemoveManualDrawable(Drawable* drawable)
+- void Raycast(PODVector<RayQueryResult> &result, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
 - RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
 - unsigned GetNumLevels() const
 - void QueueUpdate(Drawable* drawable)
@@ -4781,6 +4782,7 @@ Properties:
 
 - unsigned format
 - bool autoUpdate
+
 \section LuaScriptAPI_GlobalFunctions Global functions
 - Context* GetContext()
 - Object* GetEventSender()
@@ -5040,7 +5042,6 @@ Properties:
 - float M_RADTODEG
 - unsigned NUM_FRUSTUM_PLANES
 - unsigned NUM_FRUSTUM_VERTICES
-- $renaming SharedPtr<HttpRequest> @ HttpRequestSPtr
 - unsigned FIRST_REPLICATED_ID
 - unsigned LAST_REPLICATED_ID
 - unsigned FIRST_LOCAL_ID
@@ -5363,6 +5364,10 @@ Properties:
 - int DRAG_RESIZE_BOTTOM
 - int DRAG_RESIZE_BOTTOMLEFT
 - int DRAG_RESIZE_LEFT
+
+\section LuaScriptAPI_RenameTypes Rename types
+- PODVector<RayQueryResult> becomes RayQueryResultVector
+- SharedPtr<HttpRequest> becomes HttpRequestSPtr
 
 */
 
