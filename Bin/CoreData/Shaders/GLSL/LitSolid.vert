@@ -32,7 +32,7 @@ varying vec2 vTexCoord;
     #ifdef ENVCUBEMAP
         varying vec3 vReflectionVec;
     #endif
-    #ifdef LIGHTMAP
+    #if defined(LIGHTMAP) || defined(AO)
         varying vec2 vTexCoord2;
     #endif
 #endif
@@ -97,12 +97,13 @@ void main()
         #endif
     #else
         // Ambient & per-vertex lighting
-        #ifndef LIGHTMAP
-            vVertexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
-        #else
+        #if defined(LIGHTMAP) || defined(AO)
             // If using lightmap, disregard zone ambient light
+            // If using AO, calculate ambient in the PS
             vVertexLight = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
             vTexCoord2 = iTexCoord2;
+        #else
+            vVertexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
         #endif
         
         #ifdef NUMVERTEXLIGHTS

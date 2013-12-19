@@ -13,7 +13,7 @@
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     float2 iTexCoord : TEXCOORD0,
-    #ifdef LIGHTMAP
+    #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
     #ifdef NORMALMAP
@@ -58,7 +58,7 @@ void VS(float4 iPos : POSITION,
         #ifdef ENVCUBEMAP
             out float3 oReflectionVec : TEXCOORD6,
         #endif
-        #ifdef LIGHTMAP
+        #if defined(LIGHTMAP) || defined(AO)
             out float2 oTexCoord2 : TEXCOORD7,
         #endif
     #endif
@@ -116,12 +116,13 @@ void VS(float4 iPos : POSITION,
         #endif
     #else
         // Ambient & per-vertex lighting
-        #ifndef LIGHTMAP
-            oVertexLight = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
-        #else
+        #if defined(LIGHTMAP) || defined(AO)
             // If using lightmap, disregard zone ambient light
+            // If using AO, calculate ambient in the PS
             oVertexLight = float4(0.0, 0.0, 0.0, GetDepth(oPos));
             oTexCoord2 = iTexCoord2;
+        #else
+            oVertexLight = float4(GetAmbient(GetZonePos(worldPos)), GetDepth(oPos));
         #endif
 
         #ifdef NUMVERTEXLIGHTS
@@ -166,7 +167,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef ENVCUBEMAP
             float3 iReflectionVec : TEXCOORD6,
         #endif
-        #ifdef LIGHTMAP
+        #if defined(LIGHTMAP) || defined(AO)
             float2 iTexCoord2 : TEXCOORD7,
         #endif
     #endif
@@ -270,6 +271,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float specPower = cMatSpecColor.a / 255.0;
 
         float3 finalColor = iVertexLight.rgb * diffColor.rgb;
+        #ifdef AO
+            // If using AO, the vertex light ambient is black, calculate occluded ambient here
+            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+        #endif
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * texCUBE(sEnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
@@ -287,6 +292,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #else
         // Ambient & per-vertex lighting
         float3 finalColor = iVertexLight.rgb * diffColor.rgb;
+        #ifdef AO
+            // If using AO, the vertex light ambient is black, calculate occluded ambient here
+            finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+        #endif
 
         #ifdef MATERIAL
             // Add light pre-pass accumulation result

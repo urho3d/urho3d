@@ -32,7 +32,7 @@ varying vec2 vTexCoord;
     #ifdef ENVCUBEMAP
         varying vec3 vReflectionVec;
     #endif
-    #ifdef LIGHTMAP
+    #if defined(LIGHTMAP) || defined(AO)
         varying vec2 vTexCoord2;
     #endif
 #endif
@@ -124,6 +124,10 @@ void main()
         float specPower = cMatSpecColor.a / 255.0;
 
         vec3 finalColor = vVertexLight.rgb * diffColor.rgb;
+        #ifdef AO
+            // If using AO, the vertex light ambient is black, calculate occluded ambient here
+            finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+        #endif
 
         #ifdef ENVCUBEMAP
             normal = normalize(normal);
@@ -145,7 +149,11 @@ void main()
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight.rgb * diffColor.rgb;
-
+        #ifdef AO
+            // If using AO, the vertex light ambient is black, calculate occluded ambient here
+            finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+        #endif
+        
         #ifdef MATERIAL
             // Add light pre-pass accumulation result
             // Lights are accumulated at half intensity. Bring back to full intensity now
