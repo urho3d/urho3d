@@ -231,8 +231,8 @@ Object::~Object()
 
 // ------------------------------------------------------------------------------------------------
 FileGlobalSettings::FileGlobalSettings(const Document& doc, boost::shared_ptr<const PropertyTable> props)
-: doc(doc)
-, props(props)
+: props(props)
+, doc(doc) 
 {
 
 }
@@ -290,14 +290,19 @@ void Document::ReadHeader()
 	const Scope& shead = *ehead->Compound();
 	fbxVersion = ParseTokenAsInt(GetRequiredToken(GetRequiredElement(shead,"FBXVersion",ehead),0));
 
-	
-	if(fbxVersion < 7200 || fbxVersion > 7300) {
+	// while we maye have some success with newer files, we don't support
+	// the older 6.n fbx format
+	if(fbxVersion < 7100) {
+		DOMError("unsupported, old format version, supported are only FBX 2011, FBX 2012 and FBX 2013");
+	}
+	if(fbxVersion > 7300) {
 		if(Settings().strictMode) {
-			DOMError("unsupported format version, supported are only FBX 2012 and FBX 2013"\
-				" in ASCII format (turn off strict mode to try anyhow) ");
+			DOMError("unsupported, newer format version, supported are only FBX 2011, FBX 2012 and FBX 2013"
+				" (turn off strict mode to try anyhow) ");
 		}
 		else {
-			DOMWarning("unsupported format version, supported are only FBX 2012 and FBX 2013, trying to read it nevertheless");
+			DOMWarning("unsupported, newer format version, supported are only FBX 2011, FBX 2012 and FBX 2013,"
+				" trying to read it nevertheless");
 		}
 	}
 	
@@ -579,7 +584,7 @@ std::vector<const Connection*> Document::GetConnectionsSequenced(uint64_t id, bo
 
 		for (size_t i = 0; i < c; ++i) {
 			ai_assert(classnames[i]);
-			if(std::distance(key.begin(),key.end()) == lenghts[i] && !strncmp(classnames[i],obtype,lenghts[i])) {
+			if(static_cast<size_t>(std::distance(key.begin(),key.end())) == lenghts[i] && !strncmp(classnames[i],obtype,lenghts[i])) {
 				obtype = NULL;
 				break;
 			}

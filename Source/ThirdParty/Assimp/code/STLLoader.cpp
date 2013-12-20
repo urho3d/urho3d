@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace Assimp;
 
+namespace {
 static const aiImporterDesc desc = {
 	"Stereolithography (STL) Importer",
 	"",
@@ -63,6 +64,39 @@ static const aiImporterDesc desc = {
 	0,
 	"stl" 
 };
+
+// A valid binary STL buffer should consist of the following elements, in order:
+// 1) 80 byte header
+// 2) 4 byte face count
+// 3) 50 bytes per face
+bool IsBinarySTL(const char* buffer, unsigned int fileSize) {
+	if (fileSize < 84)
+		return false;
+
+	const uint32_t faceCount = *reinterpret_cast<const uint32_t*>(buffer + 80);
+	const uint32_t expectedBinaryFileSize = faceCount * 50 + 84;
+
+	return expectedBinaryFileSize == fileSize;
+}
+
+// An ascii STL buffer will begin with "solid NAME", where NAME is optional.
+// Note: The "solid NAME" check is necessary, but not sufficient, to determine
+// if the buffer is ASCII; a binary header could also begin with "solid NAME".
+bool IsAsciiSTL(const char* buffer, unsigned int fileSize) {
+	if (IsBinarySTL(buffer, fileSize))
+		return false;
+
+	const char* bufferEnd = buffer + fileSize;
+
+	if (!SkipSpaces(&buffer))
+		return false;
+
+	if (buffer + 5 >= bufferEnd)
+		return false;
+
+	return strncmp(buffer, "solid", 5) == 0;
+}
+} // namespace
 
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
@@ -119,8 +153,8 @@ void STLImporter::InternReadFile( const std::string& pFile,
 	this->pScene = pScene;
 	this->mBuffer = &mBuffer2[0];
 
-	// the default vertex color is white
-	clrColorDefault.r = clrColorDefault.g = clrColorDefault.b = clrColorDefault.a = 1.0f;
+	// the default vertex color is light gray.
+	clrColorDefault.r = clrColorDefault.g = clrColorDefault.b = clrColorDefault.a = 0.6f;
 
 	// allocate one mesh
 	pScene->mNumMeshes = 1;
@@ -136,12 +170,13 @@ void STLImporter::InternReadFile( const std::string& pFile,
 
 	bool bMatClr = false;
 
-	// check whether the file starts with 'solid' -
-	// in this case we can simply assume it IS a text file. finished.
-	if (!::strncmp(mBuffer,"solid",5)) {
+	if (IsBinarySTL(mBuffer, fileSize)) {
+		bMatClr = LoadBinaryFile();
+	} else if (IsAsciiSTL(mBuffer, fileSize)) {
 		LoadASCIIFile();
+	} else {
+		throw DeadlyImportError( "Failed to determine STL storage representation for " + pFile + ".");
 	}
-	else bMatClr = LoadBinaryFile();
 
 	// now copy faces
 	pMesh->mFaces = new aiFace[pMesh->mNumFaces];
@@ -154,13 +189,14 @@ void STLImporter::InternReadFile( const std::string& pFile,
 		}
 	}
 
-	// create a single default material - everything white, as we have vertex colors
+	// create a single default material, using a light gray diffuse color for consistency with
+	// other geometric types (e.g., PLY).
 	aiMaterial* pcMat = new aiMaterial();
 	aiString s;
 	s.Set(AI_DEFAULT_MATERIAL_NAME);
 	pcMat->AddProperty(&s, AI_MATKEY_NAME);
 
-	aiColor4D clrDiffuse(1.0f,1.0f,1.0f,1.0f);
+	aiColor4D clrDiffuse(0.6f,0.6f,0.6f,1.0f);
 	if (bMatClr) {
 		clrDiffuse = clrColorDefault;
 	}
@@ -179,7 +215,11 @@ void STLImporter::LoadASCIIFile()
 {
 	aiMesh* pMesh = pScene->mMeshes[0];
 
-	const char* sz = mBuffer + 5; // skip the "solid"
+	const char* sz = mBuffer;
+	SkipSpaces(&sz);
+	ai_assert(!IsLineEnd(sz));
+
+	sz += 5; // skip the "solid"
 	SkipSpaces(&sz);
 	const char* szMe = sz;
 	while (!::IsSpaceOrNewLine(*sz)) {

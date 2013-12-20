@@ -364,6 +364,8 @@ SET(COB_SRCS
 SOURCE_GROUP( COB FILES ${COB_SRCS})
 
 SET(BLENDER_SRCS
+	code/BlenderBMesh.cpp
+	code/BlenderBMesh.h
 	code/BlenderLoader.cpp
 	code/BlenderLoader.h
 	code/BlenderDNA.cpp
@@ -372,6 +374,8 @@ SET(BLENDER_SRCS
 	code/BlenderScene.cpp
 	code/BlenderScene.h
 	code/BlenderSceneGen.h
+	code/BlenderTessellator.cpp
+	code/BlenderTessellator.h
 	code/BlenderIntermediate.h
 	code/BlenderModifier.h
 	code/BlenderModifier.cpp
@@ -609,6 +613,12 @@ SET( zlib_SRCS
 	contrib/zlib/crc32.h
 	contrib/zlib/deflate.c
 	contrib/zlib/deflate.h
+#	contrib/zlib/gzclose.c
+#	contrib/zlib/gzguts.h
+#	contrib/zlib/gzlib.c
+#	contrib/zlib/gzread.c
+#	contrib/zlib/gzwrite.c
+	contrib/zlib/infback.c
 	contrib/zlib/inffast.c
 	contrib/zlib/inffast.h
 	contrib/zlib/inffixed.h
