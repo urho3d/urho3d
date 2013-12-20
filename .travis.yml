@@ -1,9 +1,9 @@
 language: cpp
 compiler: gcc
-before_install: sudo apt-get install -qq libx11-dev libxrandr-dev libasound2-dev libgl1-mesa-dev doxygen graphviz
+#before_install: sudo apt-get install -qq libx11-dev libxrandr-dev libasound2-dev libgl1-mesa-dev doxygen graphviz
 #script: ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_DOCS_QUIET=1 && cd Build && make
-script: echo Bypass
+script: echo Pardon our dust
 after_success: rake travis
 env:
   global:
-    secure: Bg7YyGEd7KXP8TFm9FEFpW5mg/OS0sQmlQlFmD6Y4I2rCFikwF/qoeLmIJ5fu8hpt/69tYiG/ivTyXjntNlOCqFztK4LeYY8RicAlfAbY73XtvWoq5uhXACmjev3nsBsVfcNu8dJyXUW0L7LAerSbhJP7V2CdvoEGAlN5mOMgJc=
+    secure: k5O6h69/u4YJw337dFKKqJMBCZDM0zlistcHfnHkdIiSfBAZCAL6jdnLhwp7KAPu6QTc1NKou7WimE5stPA6lM1/NITAWv3IqkB7O6EjPTdP5haHBXl3yiaMYTWV0OGcNc8TVrNHvpaYy5eLe9ZUx98nKoueYgYxDpP//TpN9cg=
