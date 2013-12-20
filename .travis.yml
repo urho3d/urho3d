@@ -1,10 +1,8 @@
 language: cpp
 compiler: gcc
-before_install: sudo apt-get install -qq libx11-dev libxrandr-dev libasound2-dev libgl1-mesa-dev
-  doxygen graphviz
-script: exit 0 && ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1
-  -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_DOCS_QUIET=1 && cd
-  Build && make
+before_install: sudo apt-get install -qq libx11-dev libxrandr-dev libasound2-dev libgl1-mesa-dev doxygen graphviz
+#script: ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_DOCS_QUIET=1 && cd Build && make
+script: echo Bypass
 after_success: rake travis
 env:
   global:
