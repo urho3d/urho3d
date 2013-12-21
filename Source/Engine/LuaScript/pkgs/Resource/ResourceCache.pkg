@@ -9,6 +9,7 @@ class ResourceCache
     void SetMemoryBudget(const String type, unsigned budget);
     
     void SetAutoReloadResources(bool enable);
+    void SetSearchPackagesFirst(bool value);
     
     Resource* GetResource(const String type, const String name);
     
@@ -19,9 +20,11 @@ class ResourceCache
     String GetResourceFileName(const String name) const;
     
     bool GetAutoReloadResources() const;
+    bool GetSearchPackagesFirst() const;
     
     tolua_readonly tolua_property__get_set unsigned totalMemoryUse;
     tolua_readonly tolua_property__get_set bool autoReloadResources;
+    tolua_readonly tolua_property__get_set bool searchPackagesFirst;
 };
 
 ${

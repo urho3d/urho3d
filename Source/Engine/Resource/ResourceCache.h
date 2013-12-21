@@ -32,6 +32,9 @@ namespace Urho3D
 class FileWatcher;
 class PackageFile;
 
+/// Sets to priority so that a package or file is pushed to the end of the vector.
+static const unsigned int PRIORITY_LAST = -1;
+
 /// Container of resources with specific type.
 struct ResourceGroup
 {
@@ -61,10 +64,10 @@ public:
     /// Destruct. Free all resources.
     virtual ~ResourceCache();
     
-    /// Add a resource load directory.
-    bool AddResourceDir(const String& pathName);
-    /// Add a package file for loading resources from.
-    void AddPackageFile(PackageFile* package, bool addAsFirst = false);
+    /// Add a resource load directory. Optional priority parameter which will control search order.
+    bool AddResourceDir(const String& pathName, unsigned int priority = PRIORITY_LAST );
+    /// Add a package file for loading resources from. Optional priority parameter which will control search order.
+    void AddPackageFile(PackageFile* package, unsigned int priority = PRIORITY_LAST );
     /// Add a manually created resource. Must be uniquely named.
     bool AddManualResource(Resource* resource);
     /// Remove a resource load directory.
@@ -89,7 +92,9 @@ public:
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
     /// Enable or disable automatic reloading of resources as files are modified.
     void SetAutoReloadResources(bool enable);
-    
+    /// Define whether when getting resources should check package files or directories first. True for packages, false for directories.
+    void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
+
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
     SharedPtr<File> GetFile(const String& name);
     /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
@@ -122,7 +127,9 @@ public:
     String GetResourceFileName(const String& name) const;
     /// Return whether automatic resource reloading is enabled.
     bool GetAutoReloadResources() const { return autoReloadResources_; }
-    
+    /// Define whether when getting resources should check package files or directories first.
+    bool GetSearchPackagesFirst() const { return searchPackagesFirst_; }
+
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path) const;
     /// Remove unsupported constructs from the resource name to prevent ambiguity, and normalize absolute filename to resource path relative if possible.
@@ -143,6 +150,10 @@ private:
     void UpdateResourceGroup(ShortStringHash type);
     /// Handle begin frame event. Automatic resource reloads are processed here.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    /// Search FileSystem for File.
+    File* SearchResourceDirs(const String& nameIn);
+    /// Search Packages for File.
+    File* SearchPackages(const String& nameIn);
     
     /// Resources by type.
     HashMap<ShortStringHash, ResourceGroup> resourceGroups_;
@@ -156,6 +167,8 @@ private:
     HashMap<StringHash, HashSet<StringHash> > dependentResources_;
     /// Automatic resource reloading flag.
     bool autoReloadResources_;
+    /// Search priority flag.
+    bool searchPackagesFirst_;
 };
 
 template <class T> T* ResourceCache::GetResource(const String& name)

@@ -1442,8 +1442,8 @@ class ResourceCache
 {
 // Methods:
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-bool AddResourceDir(const String&);
-void AddPackageFile(PackageFile, bool = false);
+bool AddResourceDir(const String&, uint = - 1);
+void AddPackageFile(PackageFile, uint = - 1);
 bool AddManualResource(Resource);
 void RemoveResourceDir(const String&);
 void RemovePackageFile(PackageFile, bool = true, bool = false);
@@ -1484,6 +1484,10 @@ uint totalMemoryUse;
 Array<String> resourceDirs;
 /* (readonly) */
 Array<PackageFile> packageFiles;
+/* (writeonly) */
+bool searchPackagesFirst;
+/* (readonly) */
+bool seachPackagesFirst;
 bool autoReloadResources;
 };
 

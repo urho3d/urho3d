@@ -1383,8 +1383,8 @@ Properties:
 Methods:
 
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- bool AddResourceDir(const String&)
-- void AddPackageFile(PackageFile@, bool = false)
+- bool AddResourceDir(const String&, uint = - 1)
+- void AddPackageFile(PackageFile@, uint = - 1)
 - bool AddManualResource(Resource@)
 - void RemoveResourceDir(const String&)
 - void RemovePackageFile(PackageFile@, bool = true, bool = false)
@@ -1416,6 +1416,8 @@ Properties:
 - uint totalMemoryUse (readonly)
 - String[]@ resourceDirs (readonly)
 - PackageFile@[]@ packageFiles (readonly)
+- bool searchPackagesFirst (writeonly)
+- bool seachPackagesFirst (readonly)
 - bool autoReloadResources
 
 
