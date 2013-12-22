@@ -236,6 +236,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
     
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
+            finalColor += cMatEmissiveColor;
             oColor = float4(GetFog(finalColor, iLightVec.w), diffColor.a);
         #else
             oColor = float4(GetLitFog(finalColor, iLightVec.w), diffColor.a);
@@ -281,8 +282,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef LIGHTMAP
             finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
         #endif
-        #ifdef EMISSIVE
+        #ifdef EMISSIVEMAP
             finalColor += cMatEmissiveColor * tex2D(sEmissiveMap, iTexCoord).rgb;
+        #else
+            finalColor += cMatEmissiveColor;
         #endif
 
         oColor = float4(GetFog(finalColor, iVertexLight.a), 1.0);
@@ -319,8 +322,10 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef LIGHTMAP
             finalColor += tex2D(sEmissiveMap, iTexCoord2).rgb * diffColor.rgb;
         #endif
-        #ifdef EMISSIVE
+        #ifdef EMISSIVEMAP
             finalColor += cMatEmissiveColor * tex2D(sEmissiveMap, iTexCoord).rgb;
+        #else
+            finalColor += cMatEmissiveColor;
         #endif
 
         oColor = float4(GetFog(finalColor, iVertexLight.a), diffColor.a);

@@ -37,7 +37,7 @@
         <variation name="" />
         <variation name="LightMap" define="LIGHTMAP" />
         <variation name="AO" define="AO" />
-        <variation name="Emissive" define="EMISSIVE" />
+        <variation name="Emissive" define="EMISSIVEMAP" />
         <option name="AlphaMask" define="ALPHAMASK" require="DIFFMAP" />
         <option name="Ambient" define="AMBIENT" require="PERPIXEL" />
         <variation name="" define="AMBIENT" />

@@ -510,8 +510,8 @@ void Material::ResetToDefaults()
     SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     SetShaderParameter("MatDiffColor", Vector4::ONE);
-    SetShaderParameter("MatEmissiveColor", Vector4::ONE);
-    SetShaderParameter("MatEnvMapColor", Vector4::ONE);
+    SetShaderParameter("MatEmissiveColor", Vector3::ZERO);
+    SetShaderParameter("MatEnvMapColor", Vector3::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
     
     cullMode_ = CULL_CCW;
