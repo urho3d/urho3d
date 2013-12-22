@@ -7970,6 +7970,8 @@ void MarkNetworkUpdate() const;
 void DrawDebugGeometry(DebugRenderer, bool);
 bool Build();
 bool Build(const BoundingBox&);
+Vector3 FindNearestPoint();
+Vector3 MoveAlongSurface();
 Array<Vector3> FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));

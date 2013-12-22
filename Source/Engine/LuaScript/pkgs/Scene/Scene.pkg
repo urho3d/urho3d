@@ -10,12 +10,19 @@ class Scene : public Node
     Scene(Context* context);
     virtual ~Scene();
     
+    tolua_outside bool SceneLoad @ Load(File* source);
+    tolua_outside bool SceneSave @ Save(File* dest) const;
+    tolua_outside bool SceneLoad @ Load(const String fileName);
+    tolua_outside bool SceneSave @ Save(const String fileName) const;
     tolua_outside bool SceneLoadXML @ LoadXML(File* source);
     tolua_outside bool SceneSaveXML @ SaveXML(File* dest) const;
-    
     tolua_outside bool SceneLoadXML @ LoadXML(const String fileName);
     tolua_outside bool SceneSaveXML @ SaveXML(const String fileName) const;
-    
+    tolua_outside Node* SceneInstantiate @ Instantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    tolua_outside Node* SceneInstantiate @ Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    tolua_outside Node* SceneInstantiateXML @ InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    tolua_outside Node* SceneInstantiateXML @ InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+
     bool LoadAsync(File* file);
     bool LoadAsyncXML(File* file);
     void StopAsyncLoading();
@@ -73,6 +80,32 @@ class Scene : public Node
 };
 
 ${
+static bool SceneLoad(Scene* scene, File* file)
+{
+    return file ? scene->Load(*file) : false;
+}
+
+static bool SceneSave(const Scene* scene, File* file)
+{
+    return file ? scene->Save(*file) : false;
+}
+
+static bool SceneLoad(Scene* scene, const String& fileName)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    if (!file.IsOpen())
+        return false;
+    return scene->Load(file);
+}
+
+static bool SceneSave(const Scene* scene, const String& fileName)
+{
+    File file(scene->GetContext(), fileName, FILE_WRITE);
+    if (!file.IsOpen())
+        return false;
+    return scene->Save(file);
+}
+
 static bool SceneLoadXML(Scene* scene, File* file)
 {
     return file ? scene->LoadXML(*file) : false;
@@ -98,5 +131,32 @@ static bool SceneSaveXML(const Scene* scene, const String& fileName)
         return false;
     return scene->SaveXML(file);
 }
+
+static Node* SceneInstantiate(Scene* scene, File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    return file ? scene->Instantiate(*file, position, rotation, mode) : 0;
+}
+
+static Node* SceneInstantiate(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    if (!file.IsOpen())
+        return 0;
+    return scene->Instantiate(file, position, rotation, mode);
+}
+
+static Node* SceneInstantiateXML(Scene* scene, File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    return file ? scene->InstantiateXML(*file, position, rotation, mode) : 0;
+}
+
+static Node* SceneInstantiateXML(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
+{
+    File file(scene->GetContext(), fileName, FILE_READ);
+    if (!file.IsOpen())
+        return 0;
+    return scene->InstantiateXML(file, position, rotation, mode);
+}
+
 $}
 

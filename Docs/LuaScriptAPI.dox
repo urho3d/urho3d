@@ -2998,6 +2998,8 @@ Methods:
 - void SetPadding(const Vector3& padding)
 - bool Build()
 - bool Build(const BoundingBox& boundingBox)
+- Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE)
+- Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents=Vector3::ONE, int maxVisited=3)
 - PODVector<Vector3> FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE)
@@ -3561,6 +3563,7 @@ Methods:
 - void SetMemoryBudget(ShortStringHash type, unsigned budget)
 - void SetMemoryBudget(const String type, unsigned budget)
 - void SetAutoReloadResources(bool enable)
+- void SetSearchPackagesFirst(bool value)
 - Resource* GetResource(const String type, const String name)
 - bool Exists(const String name) const
 - unsigned GetMemoryBudget(ShortStringHash type) const
@@ -3568,11 +3571,13 @@ Methods:
 - unsigned GetTotalMemoryUse() const
 - String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
+- bool GetSearchPackagesFirst() const
 
 Properties:
 
 - unsigned totalMemoryUse (readonly)
 - bool autoReloadResources (readonly)
+- bool searchPackagesFirst (readonly)
 
 ### XMLElement
 
@@ -3828,10 +3833,18 @@ Methods:
 
 - Scene(Context* context)
 - virtual ~Scene()
+- bool Load(File* source)
+- bool Save(File* dest) const
+- bool Load(const String fileName)
+- bool Save(const String fileName) const
 - bool LoadXML(File* source)
 - bool SaveXML(File* dest) const
 - bool LoadXML(const String fileName)
 - bool SaveXML(const String fileName) const
+- Node* Instantiate(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
+- Node* Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
+- Node* InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
+- Node* InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - bool LoadAsync(File* file)
 - bool LoadAsyncXML(File* file)
 - void StopAsyncLoading()
