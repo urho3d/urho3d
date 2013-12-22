@@ -60,7 +60,8 @@ static const SharedPtr<Resource> noResource;
 
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
-    autoReloadResources_(false)
+    autoReloadResources_(false),
+    searchPackagesFirst_(true)
 {
     // Register Resource library object factories
     RegisterResourceLibrary(context_);
@@ -70,7 +71,7 @@ ResourceCache::~ResourceCache()
 {
 }
 
-bool ResourceCache::AddResourceDir(const String& pathName)
+bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem || !fileSystem->DirExists(pathName))
@@ -94,7 +95,11 @@ bool ResourceCache::AddResourceDir(const String& pathName)
             return true;
     }
     
-    resourceDirs_.Push(fixedPath);
+    // If the priority isn't last or greater than size insert at position otherwise push.
+    if (priority > PRIORITY_LAST && priority < resourceDirs_.Size())
+        resourceDirs_.Insert(priority, fixedPath);
+    else
+        resourceDirs_.Push(fixedPath);
     
     // If resource auto-reloading active, create a file watcher for the directory
     if (autoReloadResources_)
@@ -108,14 +113,15 @@ bool ResourceCache::AddResourceDir(const String& pathName)
     return true;
 }
 
-void ResourceCache::AddPackageFile(PackageFile* package, bool addAsFirst)
+void ResourceCache::AddPackageFile(PackageFile* package, unsigned int priority)
 {
     // Do not add packages that failed to load
     if (!package || !package->GetNumFiles())
         return;
     
-    if (addAsFirst)
-        packages_.Insert(packages_.Begin(), SharedPtr<PackageFile>(package));
+    // If the priority isn't last or greater than size insert at position otherwise push.
+    if (priority > PRIORITY_LAST && priority < packages_.Size())
+        packages_.Insert(priority, SharedPtr<PackageFile>(package));
     else
         packages_.Push(SharedPtr<PackageFile>(package));
     
@@ -377,34 +383,23 @@ void ResourceCache::SetAutoReloadResources(bool enable)
 SharedPtr<File> ResourceCache::GetFile(const String& nameIn)
 {
     String name = SanitateResourceName(nameIn);
-    
-    // Check first the packages
-    for (unsigned i = 0; i < packages_.Size(); ++i)
+    File* file = 0;
+
+    if (searchPackagesFirst_)
     {
-        if (packages_[i]->Exists(name))
-            return SharedPtr<File>(new File(context_, packages_[i], name));
+        file = SearchPackages(name);
+        if (!file)
+            file = SearchResourceDirs(name);
+    }
+    else
+    {
+        file = SearchResourceDirs(name);
+        if (!file)
+            file = SearchPackages(name);
     }
     
-    // Then the filesystem
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem)
-    {
-        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
-        {
-            if (fileSystem->FileExists(resourceDirs_[i] + name))
-            {
-                // Construct the file first with full path, then rename it to not contain the resource path,
-                // so that the file's name can be used in further GetFile() calls (for example over the network)
-                SharedPtr<File> file(new File(context_, resourceDirs_[i] + name));
-                file->SetName(name);
-                return file;
-            }
-        }
-        
-        // Fallback using absolute path
-        if (fileSystem->FileExists(name))
-            return SharedPtr<File>(new File(context_, name));
-    }
+    if (file)
+        return SharedPtr<File>(file);
     
     LOGERROR("Could not find resource " + name);
     return SharedPtr<File>();
@@ -771,6 +766,44 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
             }
         }
     }
+}
+
+File* ResourceCache::SearchResourceDirs(const String& nameIn)
+{
+    // Then the filesystem
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem)
+    {
+        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
+        {
+            if (fileSystem->FileExists(resourceDirs_[i] + nameIn))
+            {
+                // Construct the file first with full path, then rename it to not contain the resource path,
+                // so that the file's name can be used in further GetFile() calls (for example over the network)
+                File* file(new File(context_, resourceDirs_[i] + nameIn));
+                file->SetName(nameIn);
+                return file;
+            }
+        }
+
+        // Fallback using absolute path
+        if (fileSystem->FileExists(nameIn))
+            return new File(context_, nameIn);
+    }
+
+    return 0;
+}
+
+File* ResourceCache::SearchPackages(const String& nameIn)
+{
+    // Check first the packages
+    for (unsigned i = 0; i < packages_.Size(); ++i)
+    {
+        if (packages_[i]->Exists(nameIn))
+            return new File(context_, packages_[i], nameIn);
+    }
+
+    return 0;
 }
 
 void RegisterResourceLibrary(Context* context)
