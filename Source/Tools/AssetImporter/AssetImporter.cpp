@@ -1274,8 +1274,10 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     String normalTexName;
     String specularTexName;
     String lightmapTexName;
+    String emissiveTexName;
     Color diffuseColor;
     Color specularColor;
+    Color emissiveColor = Color::BLACK;
     bool hasAlpha = false;
     bool twoSided = false;
     float specPower = 1.0f;
@@ -1293,10 +1295,14 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
+        emissiveTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
         diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
     if (material->Get(AI_MATKEY_COLOR_SPECULAR, colorVal) == AI_SUCCESS)
         specularColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    if (material->Get(AI_MATKEY_COLOR_EMISSIVE, colorVal) == AI_SUCCESS)
+        emissiveColor = Color(colorVal.r, colorVal.g, colorVal.b);
     if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
     {
         if (floatVal < 1.0f)
@@ -1319,6 +1325,8 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         // For now lightmap does not coexist with normal & specular
         if (normalTexName.Empty() && specularTexName.Empty() && !lightmapTexName.Empty())
             techniqueName += "LightMap";
+        if (lightmapTexName.Empty() && !emissiveTexName.Empty())
+            techniqueName += "Emissive";
     }
     if (hasAlpha)
         techniqueName += "Alpha";
@@ -1342,17 +1350,24 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     }
     if (!specularTexName.Empty())
     {
-        XMLElement normalElem = materialElem.CreateChild("texture");
-        normalElem.SetString("unit", "specular");
-        normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + specularTexName);
+        XMLElement specularElem = materialElem.CreateChild("texture");
+        specularElem.SetString("unit", "specular");
+        specularElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + specularTexName);
         usedTextures.Insert(specularTexName);
     }
     if (!lightmapTexName.Empty())
     {
-        XMLElement normalElem = materialElem.CreateChild("texture");
-        normalElem.SetString("unit", "emissive");
-        normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + lightmapTexName);
+        XMLElement lightmapElem = materialElem.CreateChild("texture");
+        lightmapElem.SetString("unit", "emissive");
+        lightmapElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + lightmapTexName);
         usedTextures.Insert(lightmapTexName);
+    }
+    if (!emissiveTexName.Empty())
+    {
+        XMLElement emissiveElem = materialElem.CreateChild("texture");
+        emissiveElem.SetString("unit", "emissive");
+        emissiveElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + emissiveTexName);
+        usedTextures.Insert(emissiveTexName);
     }
     
     XMLElement diffuseColorElem = materialElem.CreateChild("parameter");
@@ -1361,6 +1376,9 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     XMLElement specularElem = materialElem.CreateChild("parameter");
     specularElem.SetString("name", "MatSpecColor");
     specularElem.SetVector4("value", Vector4(specularColor.r_, specularColor.g_, specularColor.b_, specPower));
+    XMLElement emissiveColorElem = materialElem.CreateChild("parameter");
+    emissiveColorElem.SetString("name", "MatEmissiveColor");
+    emissiveColorElem.SetColor("value", emissiveColor);
     
     if (twoSided)
     {
