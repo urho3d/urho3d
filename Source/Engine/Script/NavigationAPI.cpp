@@ -48,6 +48,7 @@ void RegisterNavigationMesh(asIScriptEngine* engine)
     RegisterComponent<NavigationMesh>(engine, "NavigationMesh");
     engine->RegisterObjectMethod("NavigationMesh", "bool Build()", asMETHODPR(NavigationMesh, Build, (void), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "bool Build(const BoundingBox&in)", asMETHODPR(NavigationMesh, Build, (const BoundingBox&), bool), asCALL_THISCALL);
+	engine->RegisterObjectMethod("NavigationMesh", "Vector3 FindNearestPoint()", asMETHOD(NavigationMesh, FindNearestPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindPath), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("NavigationMesh", "Vector3 GetRandomPoint()", asMETHOD(NavigationMesh, GetRandomPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "Vector3 GetRandomPointInCircle(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(NavigationMesh, GetRandomPointInCircle), asCALL_THISCALL);

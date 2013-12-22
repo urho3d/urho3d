@@ -28,6 +28,7 @@ class NavigationMesh : public Component
     bool Build();
     bool Build(const BoundingBox& boundingBox);
     
+	Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE);
     // void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     tolua_outside PODVector<Vector3> NavigationMeshFindPath @ FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE);
     

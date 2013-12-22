@@ -461,6 +461,25 @@ bool NavigationMesh::Build(const BoundingBox& boundingBox)
     return true;
 }
 
+Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents)
+{
+	if(!InitializeQuery())
+		return point;
+		
+	const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverse = transform.Inverse();
+	
+	Vector3 localPoint = inverse * point;
+	Vector3 nearestPoint;
+	
+	dtPolyRef pointRef;
+	navMeshQuery_->findNearestPoly(&localPoint.x_, &extents.x_, queryFilter_, &pointRef, &nearestPoint.x_);
+	if (!pointRef)
+		return point;
+		
+	return nearestPoint;
+}
+
 void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents)
 {
     PROFILE(FindPath);
