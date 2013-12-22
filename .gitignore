@@ -25,6 +25,7 @@ Lib/
 # Generated documentation
 Docs/html/
 Docs/Doxyfile
+Docs/minimal-*
 
 # Eclipse project settings
 Source/.*project
