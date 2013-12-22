@@ -477,7 +477,30 @@ Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& ex
 	if (!pointRef)
 		return point;
 		
-	return nearestPoint;
+	return transform*nearestPoint;
+}
+
+Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents, int maxVisited)
+{
+	if (!InitializeQuery())
+        return end;
+    
+    const Matrix3x4& transform = node_->GetWorldTransform();
+    Matrix3x4 inverse = transform.Inverse();
+    
+    Vector3 localStart = inverse * start;
+    Vector3 localEnd = inverse * end;
+    
+    dtPolyRef startRef;
+	navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
+	if (!startRef)
+		return end;
+		
+	Vector3 resultPos;
+	int visitedCount=0;
+	dtPolyRef visited[maxVisited];
+	navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter_, &resultPos.x_, visited, &visitedCount, maxVisited);
+	return transform*resultPos;
 }
 
 void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents)
