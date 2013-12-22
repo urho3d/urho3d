@@ -495,12 +495,14 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
     if (!startRef)
         return end;
-        
+    
     Vector3 resultPos;
-    int visitedCount=0;
-    dtPolyRef visited[maxVisited];
-    navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter_, &resultPos.x_, visited, &visitedCount, maxVisited);
-    return transform*resultPos;
+    int visitedCount = 0;
+    maxVisited = Max(maxVisited, 0);
+    PODVector<dtPolyRef> visited(maxVisited);
+    navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter_, &resultPos.x_, maxVisited ?
+        &visited[0] : (dtPolyRef*)0, &visitedCount, maxVisited);
+    return transform * resultPos;
 }
 
 void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents)
