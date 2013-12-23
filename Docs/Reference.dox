@@ -1020,6 +1020,15 @@ The uniforms must be prefixed in a certain way so that the shader compiler and t
 - c for uniform constants, for example cMatDiffColor. The c is stripped when referred to inside the engine, so it would be called "MatDiffColor" in eg. \ref Material::SetShaderParameter "SetShaderParameter()"
 - s for texture samplers, for example sDiffMap.
 
+In GLSL shaders it is important that the samplers are assigned to the correct texture units. If you are using sampler names that are not predefined in the engine like sDiffMap, just make sure there is a number somewhere in the sampler's name and it will be interpreted as the texture unit. For example the terrain shader uses texture units 0-3 in the following way:
+
+\code
+uniform sampler2D sWeightMap0;
+uniform sampler2D sDetailMap1;
+uniform sampler2D sDetailMap2;
+uniform sampler2D sDetailMap3;
+\endcode
+
 \page RenderPaths Render path
 
 %Scene rendering and any post-processing on a Viewport is defined by its RenderPath object, which can either be read from an XML file or be created programmatically.
