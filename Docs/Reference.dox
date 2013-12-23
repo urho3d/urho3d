@@ -997,16 +997,28 @@ Pixel shader:
 Shaders must be written separately for HLSL (Direct3D9) and GLSL (OpenGL). The built-in shaders try to implement the same functionality on both shader languages as closely as possible.
 
 To get started with writing your own shaders, start with studying the most basic examples possible: the Basic, Shadow & Unlit shaders. Note the required include files which bring common functionality, for example Uniforms.hlsl, Samplers.hlsl & Transform.hlsl for HLSL shaders.
-Transforming the vertex (which hides the actual skinning, instancing or billboarding process) is a slight hack which uses a combination of macros and functions: it is safest to copy the following piece of code (for HLSL) verbatim:
+Transforming the vertex (which hides the actual skinning, instancing or billboarding process) is a slight hack which uses a combination of macros and functions: it is safest to copy the following piece of code verbatim:
 
+For HLSL:
 \code
 float4x3 modelMatrix = iModelMatrix;
 float3 worldPos = GetWorldPos(modelMatrix);
 oPos = GetClipPos(worldPos);
 \endcode
 
+For GLSL:
+\code
+mat4 modelMatrix = iModelMatrix;
+vec3 worldPos = GetWorldPos(modelMatrix);
+gl_Position = GetClipPos(worldPos);
+\endcode
+
 Note that for HLSL shaders both the vertex and the pixel shader are written into the same file, and the functions must be called VS() and PS(), while for GLSL they are put into separate .vert and .frag files, and are called main().
 
+The uniforms must be prefixed in a certain way so that the shader compiler and the engine understand them:
+
+- c for uniform constants, for example cMatDiffColor. The c is stripped when referred to inside the engine, so it would be called "MatDiffColor" in eg. \ref Material::SetShaderParameter "SetShaderParameter()"
+- s for texture samplers, for example sDiffMap.
 
 \page RenderPaths Render path
 
