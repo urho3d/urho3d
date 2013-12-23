@@ -373,9 +373,9 @@ public:
     /// Return comparision result with a C string.
     int Compare(const char* str, bool caseSensitive = true) const;
     /// Return whether contains a specific occurences of string.
-    bool Contains(const String& str) const { return Find(str) != NPOS; }
+    bool Contains(const String& str, bool caseSensitive = true) const { return Find(str, 0, caseSensitive) != NPOS; }
     /// Return whether contains a specific character.
-    bool Contains(char c) const { return Find(c) != NPOS; }
+    bool Contains(char c, bool caseSensitive = true) const { return Find(c, 0, caseSensitive) != NPOS; }
 
     /// Construct UTF8 content from Latin1.
     void SetUTF8FromLatin1(const char* str);

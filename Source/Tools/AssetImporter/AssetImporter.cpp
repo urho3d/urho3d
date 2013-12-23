@@ -104,6 +104,9 @@ bool createZone_ = true;
 bool noAnimations_ = false;
 bool noMaterials_ = false;
 bool saveMaterialList_ = false;
+bool includeNonSkinningBones_ = false;
+Vector<String> nonSkinningBoneIncludes_;
+Vector<String> nonSkinningBoneExcludes_;
 
 HashSet<aiAnimation*> allAnimations_;
 PODVector<aiAnimation*> sceneAnimations_;
@@ -185,27 +188,31 @@ void Run(const Vector<String>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model     Output a model\n"
-            "scene     Output a scene\n"
-            "dump      Dump scene node structure. No output file is generated\n"
-            "lod       Combine several Urho3D models as LOD levels of the output model\n"
-            "          Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
+            "model      Output a model\n"
+            "scene      Output a scene\n"
+            "dump       Dump scene node structure. No output file is generated\n"
+            "lod        Combine several Urho3D models as LOD levels of the output model\n"
+            "           Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
             "\n"
             "Options:\n"
-            "-b        Save scene in binary format, default format is XML\n"
-            "-h        Generate hard instead of smooth normals if input file has no normals\n"
-            "-i        Use local ID's for scene nodes\n"
-            "-l        Output a material list file for models\n"
-            "-na       Do not output animations\n"
-            "-nm       Do not output materials\n"
-            "-ns       Do not create subdirectories for resources\n"
-            "-nz       Do not create a zone and a directional light (scene mode only)\n"
-            "-nf       Do not fix infacing normals\n"
-            "-p <path> Set path for scene resources. Default is output file path\n"
-            "-r <name> Use the named scene node as root node\n"
-            "-f <freq> Animation tick frequency to use if unspecified. Default 4800\n"
-            "-o        Optimize redundant submeshes. Loses scene hierarchy and animations\n"
-            "-t        Generate tangents\n"
+            "-b          Save scene in binary format, default format is XML\n"
+            "-h          Generate hard instead of smooth normals if input file has no normals\n"
+            "-i          Use local ID's for scene nodes\n"
+            "-l          Output a material list file for models\n"
+            "-na         Do not output animations\n"
+            "-nm         Do not output materials\n"
+            "-ns         Do not create subdirectories for resources\n"
+            "-nz         Do not create a zone and a directional light (scene mode only)\n"
+            "-nf         Do not fix infacing normals\n"
+            "-p <path>   Set path for scene resources. Default is output file path\n"
+            "-r <name>   Use the named scene node as root node\n"
+            "-f <freq>   Animation tick frequency to use if unspecified. Default 4800\n"
+            "-o          Optimize redundant submeshes. Loses scene hierarchy and animations\n"
+            "-s <filter> Include non-skinning bones in the model's skeleton. Can be given a\n"
+            "            case-insensitive semicolon separated filter list. Bone is included\n"
+            "            if its name contains any of the filters. Prefix filter with minus\n"
+            "            sign to use as an exclude. For example -s \"Bip01;-Dummy;-Helper\"\n"
+            "-t          Generate tangents\n"
         );
     }
     
@@ -294,6 +301,21 @@ void Run(const Vector<String>& arguments)
             {
                 defaultTicksPerSecond_ = ToFloat(value);
                 ++i;
+            }
+            else if (argument == "s")
+            {
+                includeNonSkinningBones_ = true;
+                if (value.Length() && (value[0] != '-' || value.Length() > 3))
+                {
+                    Vector<String> filters = value.Split(';');
+                    for (unsigned i = 0; i < filters.Size(); ++i)
+                    {
+                        if (filters[i][0] == '-')
+                            nonSkinningBoneExcludes_.Push(filters[i].Substring(1));
+                        else
+                            nonSkinningBoneIncludes_.Push(filters[i]);
+                    }
+                }
             }
         }
     }
@@ -541,12 +563,43 @@ void CollectBones(OutModel& model)
 
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node)
 {
-    if (necessary.Find(node) != necessary.End())
+    bool includeBone = necessary.Find(node) != necessary.End();
+    String boneName = FromAIString(node->mName);
+    
+    // Check include/exclude filters for non-skinned bones
+    if (!includeBone && includeNonSkinningBones_)
     {
-        dest.Push(node);
-        for (unsigned i = 0; i < node->mNumChildren; ++i)
-            CollectBonesFinal(dest, necessary, node->mChildren[i]);
+        // If no includes specified, include by default but check for excludes
+        if (nonSkinningBoneIncludes_.Empty())
+            includeBone = true;
+        
+        // Check against includes/excludes
+        for (unsigned i = 0; i < nonSkinningBoneIncludes_.Size(); ++i)
+        {
+            if (boneName.Contains(nonSkinningBoneIncludes_[i], false))
+            {
+                includeBone = true;
+                break;
+            }
+        }
+        for (unsigned i = 0; i < nonSkinningBoneExcludes_.Size(); ++i)
+        {
+            if (boneName.Contains(nonSkinningBoneExcludes_[i], false))
+            {
+                includeBone = false;
+                break;
+            }
+        }
+        
+        if (includeBone)
+            PrintLine("Including non-skinning bone " + boneName);
     }
+    
+    if (includeBone)
+        dest.Push(node);
+        
+    for (unsigned i = 0; i < node->mNumChildren; ++i)
+        CollectBonesFinal(dest, necessary, node->mChildren[i]);
 }
 
 void CollectAnimations(OutModel* model)
