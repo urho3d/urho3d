@@ -3,8 +3,8 @@ require "rubygems"
 # Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master rake travis)
 desc 'Update site documentation to GitHub Pages'
 task :travis do
-  # Skip documentation update if it is a pull request or if it is a commit in topic branch
-  if ENV['TRAVIS_PULL_REQUEST'].to_i > 0 or ENV['TRAVIS_BRANCH'] != 'master'
+  # Skip documentation update if one of the following conditions is met
+  if ENV['TRAVIS_PULL_REQUEST'].to_i > 0 or ENV['TRAVIS_BRANCH'] != 'master' or ENV['TEST_LIB_TYPE'] == 'SHARED'
     next
   end
   # Pull or clone
