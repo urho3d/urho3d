@@ -274,6 +274,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
             GetParameter(parameters, "WindowHeight", 0).GetInt(),
             GetParameter(parameters, "FullScreen", true).GetBool(),
+            GetParameter(parameters, "Borderless", false).GetBool(),
             GetParameter(parameters, "WindowResizable", false).GetBool(),
             GetParameter(parameters, "VSync", false).GetBool(),
             GetParameter(parameters, "TripleBuffer", false).GetBool(),
@@ -286,7 +287,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         renderer->SetDrawShadows(GetParameter(parameters, "Shadows", true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, "LowQualityShadows", false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_LOW_16BIT);
-
+    
         if (GetParameter(parameters, "Sound", true).GetBool())
         {
             GetSubsystem<Audio>()->SetMode(

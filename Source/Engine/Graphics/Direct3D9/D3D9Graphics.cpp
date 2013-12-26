@@ -286,44 +286,50 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
+
+    bool maximize = false;
     
     // Find out the full screen mode display format (match desktop color depth)
     SDL_DisplayMode mode;
     SDL_GetDesktopDisplayMode(0, &mode);
     D3DFORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
     
-    // If zero dimensions in windowed mode, set default. If zero in fullscreen, use desktop mode
+    // If zero dimensions in windowed mode, ignore well use the maximize flag. If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
-        if (!fullscreen)
-        {
-            width = 1024;
-            height = 768;
-        }
-        else
+        if (fullscreen || borderless)
         {
             width = mode.w;
             height = mode.h;
         }
+        else
+        {
+            maximize = true;
+            width = 1024;
+            height = 768;
+        }
     }
     
-    // Fullscreen can not be resizable
-    if (fullscreen)
+    // Fullscreen or Borderless can not be resizable
+    if(fullscreen || borderless)
         resizable = false;
+
+    if(borderless)
+        fullscreen = false;
     
     multiSample = Clamp(multiSample, 1, (int)D3DMULTISAMPLE_16_SAMPLES);
     
     // If nothing changes, do not reset the device
-    if (width == width_ && height == height_ && fullscreen == fullscreen_ &&  resizable == resizable_ &&
+    if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     if (!impl_->window_)
     {
-        if (!OpenWindow(width, height, resizable))
+        if (!OpenWindow(width, height, resizable, borderless))
             return false;
     }
     
@@ -361,7 +367,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
             multiSample = 1;
     }
     
-    AdjustWindow(width, height, fullscreen);
+    AdjustWindow(width, height, fullscreen, borderless);
+
+    if(maximize)
+    {
+        Maximize();
+    }
     
     if (fullscreen)
     {
@@ -394,6 +405,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     width_ = width;
     height_ = height;
     fullscreen_ = fullscreen;
+    borderless_ = borderless;
     resizable_ = resizable;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
@@ -432,6 +444,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     #ifdef ENABLE_LOGGING
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    if(borderless_)
+        msg.Append(" borderless");
     if (resizable_)
         msg.Append(" resizable");
     if (multiSample > 1)
@@ -446,6 +460,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
+    eventData[P_BORDERLESS] = borderless_;
     SendEvent(E_SCREENMODE, eventData);
     
     return true;
@@ -468,7 +483,7 @@ void Graphics::SetFlushGPU(bool enable)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -1994,7 +2009,24 @@ void Graphics::WindowResized()
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
+    eventData[P_BORDERLESS] borderless_;
     SendEvent(E_SCREENMODE, eventData);
+}
+
+void Graphics::Maximize()
+{
+    if(!impl_->window_)
+        return;
+
+    SDL_MaximizeWindow(impl_->window_);
+}
+
+void Graphics::Minimize()
+{
+    if(!impl_->window_)
+        return;
+
+    SDL_MinimizeWindow(impl_->window_);
 }
 
 void Graphics::AddGPUObject(GPUObject* object)
@@ -2197,10 +2229,18 @@ unsigned Graphics::GetFormat(const String& formatName)
     return GetRGBFormat();
 }
 
-bool Graphics::OpenWindow(int width, int height, bool resizable)
+bool Graphics::(int width, int height, bool resizable, bool borderless, bool fullscreen)
 {
-    if (!externalWindow_)
-        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, resizable ? SDL_WINDOW_RESIZABLE : 0);
+    if(!externalWindow_)
+    {
+        unsigned flags = 0;
+        if(resizable)
+            flags |= SDL_WINDOW_RESIZABLE;
+        if(borderless)
+            flags |= SDL_WINDOW_BORDERLESS;
+
+        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+    }
     else
         impl_->window_ = SDL_CreateWindowFrom(externalWindow_, 0);
     
@@ -2228,12 +2268,20 @@ void Graphics::CreateWindowIcon()
     }
 }
 
-void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen)
+void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless)
 {
     if (!externalWindow_)
     {
-        SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
+        if(!newWidth || !newHeight)
+        {
+            SDL_MaximizeWindow(impl_->window_);
+            SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+        }
+        else
+            SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
+
         SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_TRUE : SDL_FALSE);
+        SDL_SetWindowBordered(impl_->window_, newBorderless ? SDL_TRUE : SDL_FALSE);
     }
     else
     {

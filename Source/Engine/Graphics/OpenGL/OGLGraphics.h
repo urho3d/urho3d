@@ -95,7 +95,7 @@ public:
     /// Set window position.
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
-    bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
@@ -239,7 +239,9 @@ public:
     int GetMultiSample() const { return multiSample_; }
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
-    /// Return whether window is resizable.
+    /// Return whether window is borderless.
+    bool GetBorderless() const { return borderless_; }
+    /// Return whether window is resizable
     bool GetResizable() const { return resizable_; }
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
@@ -374,6 +376,10 @@ public:
     void Release(bool clearGPUObjects, bool closeWindow);
     /// Restore GPU objects and reinitialize state. Requires an open window.
     void Restore();
+    /// Maximize the Window
+    void Maximize();
+    /// Minimize the Window
+    void Minimize();
     /// Clean up a render surface from all FBOs.
     void CleanupRenderSurface(RenderSurface* surface);
     /// Mark the FBO needing an update.
@@ -444,6 +450,8 @@ private:
     int multiSample_;
     /// Fullscreen flag.
     bool fullscreen_;
+    /// Borderless flag.
+    bool borderless_;
     /// Resizable flag.
     bool resizable_;
     /// Vertical sync flag.
