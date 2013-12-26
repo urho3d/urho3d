@@ -67,13 +67,16 @@ void ParseArguments()
     Array<String> arguments = GetArguments();
     bool loaded = false;
 
-    // The first argument should be the editor script name. Scan for a scene to load
+    // Scan for a scene to load
     for (uint i = 1; i < arguments.length; ++i)
     {
-        if (arguments[i][0] != '-')
+        if (arguments[i].ToLower() == "-scene")
         {
-            loaded = LoadScene(arguments[i]);
-            break;
+            if (++i < arguments.length)
+            {
+                loaded = LoadScene(arguments[i]);
+                break;
+            }
         }
     }
 

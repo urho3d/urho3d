@@ -452,6 +452,12 @@ For more details related to the C++ coding style, see also \ref CodingConvention
 
 The Urho3D editor is a script application that can be run with the Urho3D player application. To start, execute any of these commands: (in the Bin directory) Editor.bat, Editor.sh or Urho3DPlayer Scripts/Editor.as
 
+All the \ref Running_Commandline "command line options" supported by Urho3D player application are available for Editor as well. Additionally, Editor also supports the following command line options:
+
+\verbatim
+-scene </path/to/scene.xml>     Load a scene after starting up
+\endverbatim
+
 Hint: to get some content to look at, run the Physics sample application (Bin/Data/Scripts/11_Physics.as), and press F5. This saves a scene file called Physics.xml into the Data/Scenes subdirectory, which can be loaded in the editor. The NinjaSnowWar scene also exists in the Data/Scenes subdirectory, and the NinjaSnowWar object "prefabs" are in the Data/Objects subdirectory.
 
 \section EditorInstructions_Controls Controls
