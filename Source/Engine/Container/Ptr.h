@@ -308,7 +308,7 @@ public:
     /// Test for inequality with another weak pointer.
     bool operator != (const WeakPtr<T>& rhs) const { return ptr_ != rhs.ptr_ || refCount_ != rhs.refCount_; }
     /// Test for less than with another weak pointer.
-    bool operator < (const SharedPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
+    bool operator < (const WeakPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Convert to a raw pointer, null if the object is expired.
     operator T* () const { return Get(); }
     

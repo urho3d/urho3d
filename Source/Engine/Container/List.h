@@ -130,7 +130,8 @@ public:
     /// Construct from another list.
     List(const List<T>& list)
     {
-        allocator_ = AllocatorInitialize(sizeof(Node));
+        // Reserve the tail node + initial capacity according to the list's size
+        allocator_ = AllocatorInitialize(sizeof(Node), list.Size() + 1);
         head_ = tail_ = ReserveNode();
         *this = list;
     }

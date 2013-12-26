@@ -166,8 +166,8 @@ public:
     /// Construct from another hash map.
     HashMap(const HashMap<T, U>& map)
     {
-        // Reserve the tail node
-        allocator_ = AllocatorInitialize(sizeof(Node));
+        // Reserve the tail node + initial capacity according to the map's size
+        allocator_ = AllocatorInitialize(sizeof(Node), map.Size() + 1);
         head_ = tail_ = ReserveNode();
         *this = map;
     }
@@ -587,7 +587,6 @@ private:
     /// Reserve a node.
     Node* ReserveNode()
     {
-        assert(allocator_);
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
@@ -596,7 +595,6 @@ private:
     /// Reserve a node with specified key and value.
     Node* ReserveNode(const T& key, const U& value)
     {
-        assert(allocator_);
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key, value);
         return newNode;
