@@ -395,6 +395,10 @@ void String::Resize(unsigned newLength)
 {
     if (!capacity_)
     {
+        // If zero length requested, do not allocate buffer yet
+        if (!newLength)
+            return;
+        
         // Calculate initial capacity
         capacity_ = newLength + 1;
         if (capacity_ < MIN_CAPACITY)
