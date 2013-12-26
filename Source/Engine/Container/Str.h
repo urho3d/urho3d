@@ -524,7 +524,7 @@ public:
     /// Return const char at index.
     const wchar_t& At(unsigned index) const { assert(index < length_); return buffer_[index]; }
     /// Resize the string.
-    void Resize(unsigned newSize);
+    void Resize(unsigned newLength);
     /// Return whether the string is empty.
     bool Empty() const { return length_ == 0; }
     /// Return length.

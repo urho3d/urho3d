@@ -1259,9 +1259,9 @@ WString::~WString()
     delete[] buffer_;
 }
 
-void WString::Resize(unsigned newSize)
+void WString::Resize(unsigned newLength)
 {
-    if (!newSize)
+    if (!newLength)
     {
         delete[] buffer_;
         buffer_ = 0;
@@ -1269,12 +1269,16 @@ void WString::Resize(unsigned newSize)
     }
     else
     {
-        wchar_t* newBuffer = new wchar_t[newSize + 1];
+        wchar_t* newBuffer = new wchar_t[newLength + 1];
         if (buffer_)
-            memcpy(newBuffer, buffer_, length_ * sizeof(wchar_t));
-        newBuffer[newSize] = 0;
+        {
+            unsigned copyLength = length_ < newLength ? length_ : newLength;
+            memcpy(newBuffer, buffer_, copyLength * sizeof(wchar_t));
+            delete[] buffer_;
+        }
+        newBuffer[newLength] = 0;
         buffer_ = newBuffer;
-        length_ = newSize;
+        length_ = newLength;
     }
 }
 
