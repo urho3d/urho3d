@@ -157,6 +157,7 @@ Graphics::Graphics(Context* context_) :
     multiSample_(1),
     fullscreen_(false),
     resizable_(false),
+    borderless_(false),
     vsync_(false),
     tripleBuffer_(false),
     sRGB_(false),
@@ -231,22 +232,28 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
+
+    bool maximize = false;
     
-    // Fullscreen can not be resizable
-    if (fullscreen)
+    // Fullscreen or Borderless can not be resizable
+    if (fullscreen || borderless)
         resizable = false;
+
+    // Borderless cannot be fullscreen, they are mutually exclusive
+    if (borderless)
+        fullscreen = false;
     
     multiSample = Clamp(multiSample, 1, 16);
     
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && resizable == resizable_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && resizable == resizable_ &&
+    if(IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
@@ -254,20 +261,21 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
         return true;
     }
     
-    // If zero dimensions in windowed mode, set default. If zero in fullscreen, use desktop mode
+    // If zero dimensions in windowed mode, ignore well maximize. If zero in fullscreen, use desktop mod
     if (!width || !height)
     {
-        if (!fullscreen)
-        {
-            width = 1024;
-            height = 768;
-        }
-        else
+        if (fullscreen || borderless)
         {
             SDL_DisplayMode mode;
             SDL_GetDesktopDisplayMode(0, &mode);
             width = mode.w;
             height = mode.h;
+        }
+        else
+        {
+            maximize = true;
+            width = 1024;
+            height = 768;
         }
     }
     
@@ -330,10 +338,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
         int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-        if (fullscreen)
-            flags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
+        if(fullscreen)
+            flags |= SDL_WINDOW_FULLSCREEN;
         if (resizable)
             flags |= SDL_WINDOW_RESIZABLE;
+        if (borderless)
+            flags |= SDL_WINDOW_BORDERLESS;
         
         for (;;)
         {
@@ -366,6 +376,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
         }
 
         CreateWindowIcon();
+
+        if(maximize)
+            Maximize();
         
         // Create/restore context and GPU objects and set initial renderstate
         Restore();
@@ -435,6 +448,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     
     fullscreen_ = fullscreen;
     resizable_ = resizable;
+    borderless_ = borderless;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
@@ -453,6 +467,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     #ifdef ENABLE_LOGGING
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    if (borderless_)
+        msg.Append(" borderless");
     if (resizable_)
         msg.Append(" resizable");
     if (multiSample > 1)
@@ -467,6 +483,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
+    eventData[P_BORDERLESS] = borderless_;
     SendEvent(E_SCREENMODE, eventData);
     
     return true;
@@ -474,7 +491,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool resizable, b
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -490,7 +507,7 @@ void Graphics::SetSRGB(bool enable)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -2022,6 +2039,7 @@ void Graphics::WindowResized()
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
+    eventData[P_BORDERLESS] = borderless_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
@@ -2191,6 +2209,22 @@ void Graphics::Restore()
     
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceReset();
+}
+
+void Graphics::Maximize()
+{
+    if (!impl_->window_)
+        return;
+
+    SDL_MaximizeWindow(impl_->window_);
+}
+
+void Graphics::Minimize()
+{
+    if (!impl_->window_)
+        return;
+
+    SDL_MinimizeWindow(impl_->window_);
 }
 
 void Graphics::CleanupRenderSurface(RenderSurface* surface)

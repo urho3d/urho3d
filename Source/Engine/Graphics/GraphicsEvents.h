@@ -44,6 +44,7 @@ EVENT(E_SCREENMODE, ScreenMode)
     PARAM(P_HEIGHT, Height);                // int
     PARAM(P_FULLSCREEN, Fullscreen);        // bool
     PARAM(P_RESIZABLE, Resizable);          // bool
+    PARAM(P_BORDERLESS, Borderless);        // bool
 }
 
 /// Graphics features checked.
