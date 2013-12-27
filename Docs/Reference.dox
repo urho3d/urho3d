@@ -139,6 +139,7 @@ The full list of supported parameters, their datatypes and default values:
 - WindowHeight (int) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode.)
 - WindowResizable (bool) Whether window is resizable. Default false.
 - FullScreen (bool) Whether to create a full-screen window. Default true.
+- Borderless (bool) Whether to create the window as borderless. Default false.
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)

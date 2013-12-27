@@ -184,6 +184,7 @@ The engine can be configured using the following command line options.
 -r <freq>    Sound mixing frequency in Hz
 -p <paths>   Resource path(s) to use, separated by semicolons
 -log <level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'
+-borderless  Borderless window mode
 -headless    Headless mode. No application window will be created
 -prepass     Use light pre-pass rendering
 -deferred    Use deferred rendering

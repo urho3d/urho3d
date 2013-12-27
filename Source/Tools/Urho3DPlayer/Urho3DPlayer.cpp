@@ -93,6 +93,7 @@ void Urho3DPlayer::Setup()
             "-r <freq>   Sound mixing frequency in Hz\n"
             "-p <paths>  Resource path(s) to use, separated by semicolons\n"
             "-log<level> Change the log level, valid 'level' values are 'debug', 'info', 'warning', 'error'\n"
+            "-borderless Borderless window mode\n"
             "-headless   Headless mode. No application window will be created\n"
             "-prepass    Use light pre-pass rendering\n"
             "-deferred   Use deferred rendering\n"

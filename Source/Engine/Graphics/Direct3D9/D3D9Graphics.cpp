@@ -176,6 +176,7 @@ Graphics::Graphics(Context* context) :
     height_(0),
     multiSample_(1),
     fullscreen_(false),
+    borderless_(false),
     resizable_(false),
     vsync_(false),
     tripleBuffer_(false),
@@ -468,7 +469,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -2009,7 +2010,7 @@ void Graphics::WindowResized()
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
-    eventData[P_BORDERLESS] borderless_;
+    eventData[P_BORDERLESS] = borderless_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
@@ -2229,7 +2230,7 @@ unsigned Graphics::GetFormat(const String& formatName)
     return GetRGBFormat();
 }
 
-bool Graphics::(int width, int height, bool resizable, bool borderless, bool fullscreen)
+bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
 {
     if(!externalWindow_)
     {

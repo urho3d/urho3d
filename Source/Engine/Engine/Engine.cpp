@@ -645,6 +645,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["FullScreen"] = false;
             else if (argument == "s")
                 ret["WindowResizable"] = true;
+            else if (argument == "borderless")
+                ret["Borderless"] = true;
             else if (argument == "q")
                 ret["LogQuiet"] = true;
             else if (argument == "log" && !value.Empty())
