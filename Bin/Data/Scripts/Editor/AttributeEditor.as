@@ -349,11 +349,14 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
             mapInfo.name = varName + " (Var)";
             mapInfo.type = value.type;
             parent = CreateAttributeEditor(list, serializables, mapInfo, index, i);
-            // Add the variant key to the parent
-            parent.vars["Key"] = keys[i].value;
-            // If variable name is not registered (i.e. it is an editor internal variable) then hide it
-            if (varName.empty)
-                parent.visible = false;
+            // Add the variant key to the parent. We may fail to add the editor in case it is unsupported
+            if (parent !is null)
+            {
+                parent.vars["Key"] = keys[i].value;
+                // If variable name is not registered (i.e. it is an editor internal variable) then hide it
+                if (varName.empty)
+                    parent.visible = false;
+            }
         }
     }
 
