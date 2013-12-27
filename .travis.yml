@@ -2,8 +2,8 @@ language: cpp
 compiler: gcc
 before_install:
     - sudo add-apt-repository ppa:george-edison55/precise-backports -y
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq libx11-dev libxrandr-dev libasound2-dev libgl1-mesa-dev doxygen graphviz
+    - sudo apt-get update -q -y
+    - sudo apt-get install -q -y libx11-dev libxrandr-dev libasound2-dev libgl1-mesa-dev doxygen graphviz
 script: ./cmake_gcc.sh -DURHO3D_LIB_TYPE=$TEST_LIB_TYPE -DENABLE_64BIT=1 -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 && cd Build && make
 after_success: rake travis
 env:

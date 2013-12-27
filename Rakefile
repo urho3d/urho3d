@@ -17,5 +17,5 @@ task :travis do
   # Generate and sync doxygen pages
   system 'cd Build && make doc >/dev/null 2>&1 && rsync -a --delete ../Docs/html/ ../doc-Build/documentation' or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push to GitHub
-  system "cd doc-Build && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/urho3d.github.io.git && git add -A && git commit -q -a -m 'Travis CI: site documentation update at #{Time.now.utc}.' && git push -q" or abort 'Failed to push'
+  system "cd doc-Build && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/urho3d.github.io.git && git add -A && git commit -q -a -m 'Travis CI: site documentation update at #{Time.now.utc}.' && git push -q" or abort 'Failed or nothing to push'
 end
