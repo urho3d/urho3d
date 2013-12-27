@@ -923,8 +923,8 @@ void ListView::EnsureItemVisibility(UIElement* item)
 
 void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData[UIMouseClick::P_BUTTON].GetInt() != MOUSEB_LEFT)
-        return;
+    int button = eventData[UIMouseClick::P_BUTTON].GetInt();
+    int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
     int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
 
     UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
@@ -936,62 +936,75 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
         return;
     }
 
+    /// \todo Should not be doing a linear search of all items
     unsigned numItems = GetNumItems();
     for (unsigned i = 0; i < numItems; ++i)
     {
         if (element == GetItem(i))
         {
-            // Single selection
-            if (!multiselect_ || !qualifiers)
-                SetSelection(i);
-
-            // Check multiselect with shift & ctrl
-            if (multiselect_)
+            if (button == MOUSEB_LEFT)
             {
-                if (qualifiers & QUAL_SHIFT)
-                {
-                    if (selections_.Empty())
-                        SetSelection(i);
-                    else
-                    {
-                        unsigned first = selections_.Front();
-                        unsigned last = selections_.Back();
-                        PODVector<unsigned> newSelections = selections_;
-                        if (i == first || i == last)
-                        {
-                            for (unsigned j = first; j <= last; ++j)
-                                newSelections.Push(j);
-                        }
-                        else if (i < first)
-                        {
-                            for (unsigned j = i; j <= first; ++j)
-                                newSelections.Push(j);
-                        }
-                        else if (i < last)
-                        {
-                            if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
-                            {
-                                for (unsigned j = first; j <= i; ++j)
-                                    newSelections.Push(j);
-                            }
-                            else
-                            {
-                                for (unsigned j = i; j <= last; ++j)
-                                    newSelections.Push(j);
-                            }
-                        }
-                        else if (i > last)
-                        {
-                            for (unsigned j = last; j <= i; ++j)
-                                newSelections.Push(j);
-                        }
-                        SetSelections(newSelections);
-                    }
-                }
-                else if (qualifiers & QUAL_CTRL)
-                    ToggleSelection(i);
-            }
+                // Single selection
+                if (!multiselect_ || !qualifiers)
+                    SetSelection(i);
 
+                // Check multiselect with shift & ctrl
+                if (multiselect_)
+                {
+                    if (qualifiers & QUAL_SHIFT)
+                    {
+                        if (selections_.Empty())
+                            SetSelection(i);
+                        else
+                        {
+                            unsigned first = selections_.Front();
+                            unsigned last = selections_.Back();
+                            PODVector<unsigned> newSelections = selections_;
+                            if (i == first || i == last)
+                            {
+                                for (unsigned j = first; j <= last; ++j)
+                                    newSelections.Push(j);
+                            }
+                            else if (i < first)
+                            {
+                                for (unsigned j = i; j <= first; ++j)
+                                    newSelections.Push(j);
+                            }
+                            else if (i < last)
+                            {
+                                if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
+                                {
+                                    for (unsigned j = first; j <= i; ++j)
+                                        newSelections.Push(j);
+                                }
+                                else
+                                {
+                                    for (unsigned j = i; j <= last; ++j)
+                                        newSelections.Push(j);
+                                }
+                            }
+                            else if (i > last)
+                            {
+                                for (unsigned j = last; j <= i; ++j)
+                                    newSelections.Push(j);
+                            }
+                            SetSelections(newSelections);
+                        }
+                    }
+                    else if (qualifiers & QUAL_CTRL)
+                        ToggleSelection(i);
+                }
+            }
+            
+            // Propagate the click as an event. Also include right-clicks
+            VariantMap clickEventData;
+            clickEventData[ItemClicked::P_ELEMENT] = (void*)this;
+            clickEventData[ItemClicked::P_ITEM] = (void*)element;
+            clickEventData[ItemClicked::P_SELECTION] = i;
+            clickEventData[ItemClicked::P_BUTTON] = button;
+            clickEventData[ItemClicked::P_BUTTONS] = buttons;
+            clickEventData[ItemClicked::P_QUALIFIERS] = qualifiers;
+            SendEvent(E_ITEMCLICKED, clickEventData);
             return;
         }
     }
@@ -999,19 +1012,26 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 
 void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventData)
 {
-    if (eventData[UIMouseClick::P_BUTTON].GetInt() != MOUSEB_LEFT)
-        return;
+    int button = eventData[UIMouseClick::P_BUTTON].GetInt();
+    int buttons = eventData[UIMouseClick::P_BUTTONS].GetInt();
+    int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].GetInt();
+
     UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
 
+    /// \todo Should not be doing a linear search of all items
     unsigned numItems = GetNumItems();
     for (unsigned i = 0; i < numItems; ++i)
     {
         if (element == GetItem(i))
         {
-            VariantMap eventData;
-            eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
-            eventData[ItemDoubleClicked::P_SELECTION] = i;
-            SendEvent(E_ITEMDOUBLECLICKED, eventData);
+            VariantMap clickEventData;
+            clickEventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
+            clickEventData[ItemDoubleClicked::P_ITEM] = (void*)element;
+            clickEventData[ItemDoubleClicked::P_SELECTION] = i;
+            clickEventData[ItemDoubleClicked::P_BUTTON] = button;
+            clickEventData[ItemDoubleClicked::P_BUTTONS] = buttons;
+            clickEventData[ItemDoubleClicked::P_QUALIFIERS] = qualifiers;
+            SendEvent(E_ITEMDOUBLECLICKED, clickEventData);
             return;
         }
     }

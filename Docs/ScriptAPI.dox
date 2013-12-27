@@ -7773,9 +7773,21 @@ Properties:
 ### SelectionChanged
 - %Element : UIElement pointer
 
+### ItemClicked
+- %Element : UIElement pointer
+- %Item : UIElement pointer
+- %Selection : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
 ### ItemDoubleClicked
 - %Element : UIElement pointer
+- %Item : UIElement pointer
 - %Selection : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
 
 ### UnhandledKey
 - %Element : UIElement pointer

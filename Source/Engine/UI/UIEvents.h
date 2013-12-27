@@ -227,11 +227,26 @@ EVENT(E_SELECTIONCHANGED, SelectionChanged)
     PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
+/// Listview item clicked. If this is a left-click, also ItemSelected event will be sent. If this is a right-click, only this event is sent.
+EVENT(E_ITEMCLICKED, ItemClicked)
+{
+    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_ITEM, Item);                    // UIElement pointer
+    PARAM(P_SELECTION, Selection);          // int
+    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
 /// Listview item double clicked.
 EVENT(E_ITEMDOUBLECLICKED, ItemDoubleClicked)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_ITEM, Item);                    // UIElement pointer
     PARAM(P_SELECTION, Selection);          // int
+    PARAM(P_BUTTON, Button);                // int
+    PARAM(P_BUTTONS, Buttons);              // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// LineEdit or ListView unhandled key pressed.

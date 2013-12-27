@@ -428,7 +428,8 @@ void FileSelector::HandleFileDoubleClicked(StringHash eventType, VariantMap& eve
     if (ignoreEvents_)
         return;
 
-    EnterFile();
+    if (eventData[ItemDoubleClicked::P_BUTTON] == MOUSEB_LEFT)
+        EnterFile();
 }
 
 void FileSelector::HandleFileListKey(StringHash eventType, VariantMap& eventData)

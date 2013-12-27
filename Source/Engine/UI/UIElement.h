@@ -89,7 +89,7 @@ enum LayoutMode
     LM_VERTICAL
 };
 
-/// Traversal mode.
+/// Traversal mode for rendering.
 enum TraversalMode
 {
     /// Traverse thru children having same priority first and recurse into their children before traversing children having higher priority.
@@ -311,7 +311,7 @@ public:
     void SetVar(ShortStringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
     void SetInternal(bool enable);
-    /// Set traversal mode. The default traversal mode is TM_BREADTH_FIRST for non-root element. Root element should be set to TM_DEPTH_FIRST to avoid artifacts during rendering.
+    /// Set traversal mode for rendering. The default traversal mode is TM_BREADTH_FIRST for non-root element. Root element should be set to TM_DEPTH_FIRST to avoid artifacts during rendering.
     void SetTraversalMode(TraversalMode traversalMode);
     /// Set element event sender flag. When child element is added or deleted, the event would be sent using UIElement found in the parental chain having this flag set. If not set, the event is sent using UI's root as per normal.
     void SetElementEventSender(bool flag);
@@ -458,7 +458,7 @@ public:
         currentScissor);
     /// Return color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return color_[0]; }
-    /// Return traversal mode.
+    /// Return traversal mode for rendering.
     TraversalMode GetTraversalMode() const { return traversalMode_; }
     /// Return whether element should send child added / removed events by itself. If false, defers to parent element.
     bool IsElementEventSender() const { return elementEventSender_; }
@@ -584,7 +584,7 @@ private:
     bool colorGradient_;
     /// Default style file.
     SharedPtr<XMLFile> defaultStyle_;
-    /// Traversal mode.
+    /// Traversal mode for rendering.
     TraversalMode traversalMode_;
     /// Flag whether node should send child added / removed events by itself.
     bool elementEventSender_;
