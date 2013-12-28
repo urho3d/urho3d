@@ -290,9 +290,13 @@ void CompileShader(const String& fileName)
     if (compileVS_)
     {
         ShaderParser vsParser;
-        if (!vsParser.Parse(VS, shaders, defines_, defineValues_))
+        if (!vsParser.Parse(VS, shaders, !compileVariation_, defines_, defineValues_))
             ErrorExit("VS: " + vsParser.GetErrorMessage());
         
+        // If compiling a specific variation only, request it beforehand
+        if (compileVariation_)
+            vsParser.GetCombination(variationName_);
+
         const HashMap<String, unsigned>& combinations = vsParser.GetAllCombinations();
         for (HashMap<String, unsigned>::ConstIterator i = combinations.Begin(); i != combinations.End(); ++i)
         {
@@ -322,9 +326,13 @@ void CompileShader(const String& fileName)
     if (compilePS_)
     {
         ShaderParser psParser;
-        if (!psParser.Parse(PS, shaders, defines_, defineValues_))
+        if (!psParser.Parse(PS, shaders, !compileVariation_, defines_, defineValues_))
             ErrorExit("PS: " + psParser.GetErrorMessage());
         
+        // If compiling a specific variation only, request it beforehand
+        if (compileVariation_)
+            psParser.GetCombination(variationName_);
+
         const HashMap<String, unsigned>& combinations = psParser.GetAllCombinations();
         for (HashMap<String, unsigned>::ConstIterator i = combinations.Begin(); i != combinations.End(); ++i)
         {

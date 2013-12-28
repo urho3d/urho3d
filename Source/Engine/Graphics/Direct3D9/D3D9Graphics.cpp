@@ -315,10 +315,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     }
     
     // Fullscreen or Borderless can not be resizable
-    if(fullscreen || borderless)
+    if (fullscreen || borderless)
         resizable = false;
 
-    if(borderless)
+    if (borderless)
         fullscreen = false;
     
     multiSample = Clamp(multiSample, 1, (int)D3DMULTISAMPLE_16_SAMPLES);
@@ -2235,9 +2235,9 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
     if(!externalWindow_)
     {
         unsigned flags = 0;
-        if(resizable)
+        if (resizable)
             flags |= SDL_WINDOW_RESIZABLE;
-        if(borderless)
+        if (borderless)
             flags |= SDL_WINDOW_BORDERLESS;
 
         impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
@@ -2282,7 +2282,7 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
 
         SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_TRUE : SDL_FALSE);
-        SDL_SetWindowBordered(impl_->window_, newBorderless ? SDL_TRUE : SDL_FALSE);
+        SDL_SetWindowBordered(impl_->window_, newBorderless ? SDL_FALSE : SDL_TRUE);
     }
     else
     {

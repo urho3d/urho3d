@@ -27,7 +27,14 @@
 namespace Urho3D
 {
 
-bool ShaderParser::Parse(ShaderType type, const XMLElement& element, const Vector<String>& globalDefines, const Vector<String>& globalDefineValues)
+ShaderParser::ShaderParser() :
+    maxCombinations_(0),
+    numVariationGroups_(0),
+    builtAll_(false)
+{
+}
+
+bool ShaderParser::Parse(ShaderType type, const XMLElement& element, bool buildAll, const Vector<String>& globalDefines, const Vector<String>& globalDefineValues)
 {
     if (globalDefines.Size() != globalDefineValues.Size())
     {
@@ -40,6 +47,9 @@ bool ShaderParser::Parse(ShaderType type, const XMLElement& element, const Vecto
     errorMessage_.Clear();
     options_.Clear();
     combinations_.Clear();
+    usedCombinations_.Clear();
+    failedCombinations_.Clear();
+    nameToIndex_.Clear();
     
     XMLElement shader = element.GetChild("shader");
     while (shader)
@@ -49,7 +59,8 @@ bool ShaderParser::Parse(ShaderType type, const XMLElement& element, const Vecto
         {
             if (!ParseOptions(shader))
                 return false;
-            BuildCombinations();
+            if (buildAll)
+                BuildCombinations();
             return true;
         }
         
@@ -59,15 +70,29 @@ bool ShaderParser::Parse(ShaderType type, const XMLElement& element, const Vecto
     return true;
 }
 
-bool ShaderParser::HasCombination(const String& name) const
+bool ShaderParser::HasCombination(const String& name)
 {
-    return combinations_.Contains(name);
+    if (builtAll_)
+        return combinations_.Contains(name);
+    else
+    {
+        if (combinations_.Contains(name))
+            return true;
+        else
+            return BuildCombination(name);
+    }
 }
 
-ShaderCombination ShaderParser::GetCombination(const String& name) const
+ShaderCombination ShaderParser::GetCombination(const String& name)
 {
     ShaderCombination dest;
     
+    if (!builtAll_ && !combinations_.Contains(name))
+    {
+        if (!BuildCombination(name))
+            return dest;
+    }
+
     HashMap<String, unsigned>::ConstIterator i = combinations_.Find(name);
     if (i != combinations_.End())
     {
@@ -82,12 +107,12 @@ ShaderCombination ShaderParser::GetCombination(const String& name) const
                     dest.defines_.Push(options_[j].defines_[k]);
                     dest.defineValues_.Push(options_[j].defineValues_[k]);
                 }
-                for (unsigned k = 0; k < globalDefines_.Size(); ++k)
-                {
-                    dest.defines_.Push(globalDefines_[k]);
-                    dest.defineValues_.Push(globalDefineValues_[k]);
-                }
             }
+        }
+        for (unsigned j = 0; j < globalDefines_.Size(); ++j)
+        {
+            dest.defines_.Push(globalDefines_[j]);
+            dest.defineValues_.Push(globalDefineValues_[j]);
         }
     }
 
@@ -196,22 +221,14 @@ bool ShaderParser::ParseOptions(const XMLElement& element)
         option = option.GetNext();
     }
     
-    return true;
-}
-
-void ShaderParser::BuildCombinations()
-{
-    unsigned combinations = 1;
-    unsigned numVariationGroups = 0;
-    HashSet<unsigned> usedCombinations;
-    HashMap<String, unsigned> nameToIndex;
-    
+    maxCombinations_ = 1;
+    numVariationGroups_ = 0;
     for (unsigned i = 0; i < options_.Size(); ++i)
     {
-        combinations *= 2;
-        nameToIndex[options_[i].name_] = i;
+        maxCombinations_ *= 2;
+        nameToIndex_[options_[i].name_] = i;
         if (options_[i].isVariation_ && (i == 0 || !options_[i - 1].isVariation_))
-            ++numVariationGroups;
+            ++numVariationGroups_;
     }
     
     // Preprocess includes/excludes for faster combination handling
@@ -221,9 +238,9 @@ void ShaderParser::BuildCombinations()
         i->includeIndices_.Resize(i->includes_.Size());
         
         for (unsigned j = 0; j < i->excludes_.Size(); ++j)
-            i->excludeIndices_[j] = nameToIndex[i->excludes_[j]];
+            i->excludeIndices_[j] = nameToIndex_[i->excludes_[j]];
         for (unsigned j = 0; j < i->includes_.Size(); ++j)
-            i->includeIndices_[j] = nameToIndex[i->includes_[j]];
+            i->includeIndices_[j] = nameToIndex_[i->includes_[j]];
     }
     
     // Preprocess requirements
@@ -269,87 +286,153 @@ void ShaderParser::BuildCombinations()
         }
     }
     
-    for (unsigned i = 0; i < combinations; ++i)
+    return true;
+}
+
+void ShaderParser::BuildCombinations()
+{
+    for (unsigned i = 0; i < maxCombinations_; ++i)
+        BuildCombination(i);
+
+    builtAll_ = true;
+}
+
+bool ShaderParser::BuildCombination(unsigned active)
+{
+    unsigned variationsActive = 0;
+    bool skipThis = false;
+    
+    // Check for excludes & includes first
+    for (unsigned j = 0; j < options_.Size(); ++j)
     {
-        // Variations/options active on this particular combination
-        unsigned active = i;
-        unsigned variationsActive = 0;
-        bool skipThis = false;
-        
-        // Check for excludes & includes first
-        for (unsigned j = 0; j < options_.Size(); ++j)
+        if ((active >> j) & 1)
         {
-            if ((active >> j) & 1)
+            for (unsigned k = 0; k < options_[j].includeIndices_.Size(); ++k)
+                active |= 1 << options_[j].includeIndices_[k];
+                
+            for (unsigned k = 0; k < options_[j].excludeIndices_.Size(); ++k)
+                active &= ~(1 << options_[j].excludeIndices_[k]);
+                
+            // Skip dummy separators (options without name and defines)
+            if (options_[j].name_.Empty() && !options_[j].isVariation_ && options_[j].defines_.Empty())
+                active &= ~(1 << j);
+                
+            // If it's a variation, exclude all other variations in the same group
+            if (options_[j].isVariation_)
             {
-                for (unsigned k = 0; k < options_[j].includeIndices_.Size(); ++k)
-                    active |= 1 << options_[j].includeIndices_[k];
-                
-                for (unsigned k = 0; k < options_[j].excludeIndices_.Size(); ++k)
-                    active &= ~(1 << options_[j].excludeIndices_[k]);
-                
-                // Skip dummy separators (options without name and defines)
-                if (options_[j].name_.Empty() && !options_[j].isVariation_ && options_[j].defines_.Empty())
-                    active &= ~(1 << j);
-                
-                // If it's a variation, exclude all other variations in the same group
-                if (options_[j].isVariation_)
+                for (unsigned k = j - 1; k < options_.Size(); --k)
                 {
-                    for (unsigned k = j - 1; k < options_.Size(); --k)
-                    {
-                        if (options_[k].isVariation_)
-                            active &= ~(1 << k);
-                        else
-                            break;
-                    }
-                    for (unsigned k = j + 1; k < options_.Size(); ++k)
-                    {
-                        if (options_[k].isVariation_)
-                            active &= ~(1 << k);
-                        else
-                            break;
-                    }
-                    
-                    ++variationsActive;
-                }
-            }
-        }
-        
-        // Check that combination is correct: a variation chosen from all groups, and is unique
-        if (variationsActive < numVariationGroups || usedCombinations.Contains(active))
-            continue;
-        
-        // Check for required defines, which may yet cause this combination to be skipped
-        unsigned compareBits = active | 0x80000000;
-        for (unsigned j = 0; j < options_.Size(); ++j)
-        {
-            if (active & (1 << j))
-            {
-                for (unsigned l = 0; l < options_[j].requirementBits_.Size(); ++l)
-                {
-                    if (!(compareBits & options_[j].requirementBits_[l]))
-                    {
-                        skipThis = true;
+                    if (options_[k].isVariation_)
+                        active &= ~(1 << k);
+                    else
                         break;
-                    }
+                }
+                for (unsigned k = j + 1; k < options_.Size(); ++k)
+                {
+                    if (options_[k].isVariation_)
+                        active &= ~(1 << k);
+                    else
+                        break;
+                }
+                    
+                ++variationsActive;
+            }
+        }
+    }
+    
+    // Check that combination is correct: a variation chosen from all groups, and is unique
+    if (variationsActive < numVariationGroups_ || usedCombinations_.Contains(active))
+        return false;
+    
+    // Check for required defines, which may yet cause this combination to be skipped
+    unsigned compareBits = active | 0x80000000;
+    for (unsigned j = 0; j < options_.Size(); ++j)
+    {
+        if (active & (1 << j))
+        {
+            for (unsigned l = 0; l < options_[j].requirementBits_.Size(); ++l)
+            {
+                if (!(compareBits & options_[j].requirementBits_[l]))
+                {
+                    skipThis = true;
+                    break;
                 }
             }
         }
-        
-        if (skipThis)
-            continue;
-        
-        String combinationName;
-        
-        // Build shader combination name from active options
-        for (unsigned j = 0; j < options_.Size(); ++j)
-        {
-            if (active & (1 << j) && options_[j].name_.Length())
-                combinationName += options_[j].name_;
-        }
-        
-        combinations_[combinationName] = active;
-        usedCombinations.Insert(active);
     }
+        
+    if (skipThis)
+        return false;
+    
+    String combinationName;
+    
+    // Build shader combination name from active options
+    for (unsigned j = 0; j < options_.Size(); ++j)
+    {
+        if (active & (1 << j) && options_[j].name_.Length())
+            combinationName += options_[j].name_;
+    }
+    
+    combinations_[combinationName] = active;
+    usedCombinations_.Insert(active);
+    return true;
+}
+
+bool ShaderParser::BuildCombination(const String& name)
+{
+    // Do not attempt again if already failed
+    if (failedCombinations_.Contains(name))
+        return false;
+
+    // Decode active bits from the name
+    unsigned active = 0;
+    String nameCopy = name;
+    for (unsigned i = 0; i < options_.Size(); ++i)
+    {
+        // Option
+        if (!options_[i].isVariation_)
+        {
+            if (!options_[i].name_.Empty() && nameCopy.StartsWith(options_[i].name_))
+            {
+                /// \todo Hack fix for options like Alpha & AlphaMask appearing in that order. Not a 100% general fix
+                if (i < options_.Size() - 1 && nameCopy.StartsWith(options_[i + 1].name_))
+                    continue;
+
+                active |= 1 << i;
+                nameCopy = nameCopy.Substring(options_[i].name_.Length());
+            }
+        }
+        // Variation, must choose only one from the group, furthermore there can be empty variations with defines
+        else
+        {
+            bool emptyFirstVariation = options_[i].name_.Empty();
+            bool variationFound = false;
+            unsigned j = i;
+            for (; j < options_.Size(); ++j)
+            {
+                // Reach end of group?
+                if (!options_[j].isVariation_)
+                    break;
+                if (!variationFound && !options_[j].name_.Empty() && nameCopy.StartsWith(options_[j].name_))
+                {
+                    variationFound = true;
+                    active |= 1 << j;
+                    nameCopy = nameCopy.Substring(options_[j].name_.Length());
+                }
+            }
+            // If no other variation was found, must choose the empty first variation, as it may have defines
+            if (emptyFirstVariation && !variationFound)
+                active |= 1 << i;
+            // Skip past the group
+            i = j - 1;
+        }
+    }
+
+    bool success = BuildCombination(active);
+    if (!success)
+        failedCombinations_.Insert(name);
+
+    return success;
 }
 
 }

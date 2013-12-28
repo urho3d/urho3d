@@ -162,12 +162,12 @@ bool Shader::Load(Deserializer& source)
     {
         PROFILE(ParseShaderDefinition);
         
-        if (!vsParser_.Parse(VS, shaders, globalDefines, globalDefineValues))
+        if (!vsParser_.Parse(VS, shaders, false, globalDefines, globalDefineValues))
         {
             LOGERROR("VS: " + vsParser_.GetErrorMessage());
             return false;
         }
-        if (!psParser_.Parse(PS, shaders, globalDefines, globalDefineValues))
+        if (!psParser_.Parse(PS, shaders, false, globalDefines, globalDefineValues))
         {
             LOGERROR("PS: " + psParser_.GetErrorMessage());
             return false;

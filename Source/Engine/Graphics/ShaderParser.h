@@ -24,6 +24,7 @@
 
 #include "GraphicsDefs.h"
 #include "HashMap.h"
+#include "HashSet.h"
 
 namespace Urho3D
 {
@@ -70,25 +71,30 @@ struct ShaderCombination
 class URHO3D_API ShaderParser
 {
 public:
+    /// Construct with defaults.
+    ShaderParser();
+
     /// Parse from an XML element. Return true if successful.
-    bool Parse(ShaderType type, const XMLElement& element, const Vector<String>& globalDefines = Vector<String>(), const Vector<String>& globalDefineValues = Vector<String>());
+    bool Parse(ShaderType type, const XMLElement& element, bool buildAll = false, const Vector<String>& globalDefines = Vector<String>(), const Vector<String>& globalDefineValues = Vector<String>());
     
     /// Return error message if parsing failed.
     String GetErrorMessage() const { return errorMessage_; }
-    /// Return number of combinations.
-    unsigned GetNumCombinations() const { return combinations_.Size(); }
-   /// Return all combinations.
+    /// Return all combinations. Should only be called after building all combinations, because otherwise it only returns combinations built so far.
     const HashMap<String, unsigned>& GetAllCombinations() const { return combinations_; }
-    /// Return whether a shader combination exists.
-    bool HasCombination(const String& name) const;
-    /// Return a combination by name.
-    ShaderCombination GetCombination(const String& name) const;
+    /// Return whether a shader combination exists. Will be built on demand if all combinations not yet built.
+    bool HasCombination(const String& name);
+    /// Return a combination by name. Will be built on demand if all combinations not yet built.
+    ShaderCombination GetCombination(const String& name);
     
 private:
-    /// Parse options for a shader.
+    /// Parse options for a shader, then preprocess them for building combinations.
     bool ParseOptions(const XMLElement& element);
-    /// Construct shader combinations from the options.
+    /// Construct all shader combinations from the options. This is potentially slow
     void BuildCombinations();
+    /// Construct one shader combination on demand based on active option bitmask. Return true if was valid.
+    bool BuildCombination(unsigned active);
+    /// Construct one shader combination on demand based on the name. Return true if was valid.
+    bool BuildCombination(const String& name);
     
     /// Error message.
     String errorMessage_;
@@ -98,8 +104,20 @@ private:
     Vector<String> globalDefineValues_;
     /// Shader options.
     Vector<ShaderOption> options_;
+    /// Option name to index mapping.
+    HashMap<String, unsigned> nameToIndex_;
     /// Available combinations.
     HashMap<String, unsigned> combinations_;
+    /// Combinations that were attempted to be built, but were not found.
+    HashSet<String> failedCombinations_;
+    /// Bitmasks of already built valid combinations.
+    HashSet<unsigned> usedCombinations_;
+    /// Total number of possible combinations, including invalid ones.
+    unsigned maxCombinations_;
+    /// Number of variation groups.
+    unsigned numVariationGroups_;
+    /// All combinations built flag.
+    bool builtAll_;
 };
 
 }
