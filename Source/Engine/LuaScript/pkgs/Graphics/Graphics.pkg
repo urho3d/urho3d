@@ -13,8 +13,8 @@ class Graphics : public Object
     void SetSRGB(bool enable);
     void SetFlushGPU(bool enable);
     bool ToggleFullscreen();
-	void Maximize();
-	void Minimize();
+    void Maximize();
+    void Minimize();
     void Close();
     bool TakeScreenShot(Image& destImage);
     
@@ -27,7 +27,7 @@ class Graphics : public Object
     int GetMultiSample() const;
     bool GetFullscreen() const;
     bool GetResizable() const;
-	bool GetBorderless() const;
+    bool GetBorderless() const;
     bool GetVSync() const;
     bool GetTripleBuffer() const;
     bool GetSRGB() const;
@@ -58,7 +58,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set int multiSample;
     tolua_readonly tolua_property__get_set bool fullscreen;
     tolua_readonly tolua_property__get_set bool resizable;
-	    tolua_readonly tolua_property__get_set bool borderless;
+    tolua_readonly tolua_property__get_set bool borderless;
     tolua_readonly tolua_property__get_set bool vSync;
     tolua_readonly tolua_property__get_set bool tripleBuffer;
     tolua_property__get_set bool sRGB;

@@ -245,7 +245,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // Borderless cannot be fullscreen, they are mutually exclusive
     if (borderless)
         fullscreen = false;
-    
+
     multiSample = Clamp(multiSample, 1, 16);
     
     if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
@@ -253,7 +253,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if(IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
+    if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
         tripleBuffer == tripleBuffer_ && multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
@@ -261,7 +261,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         return true;
     }
     
-    // If zero dimensions in windowed mode, ignore well maximize. If zero in fullscreen, use desktop mod
+    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
         if (fullscreen || borderless)
@@ -338,7 +338,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         int y = fullscreen ? 0 : SDL_WINDOWPOS_UNDEFINED;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-        if(fullscreen)
+        if (fullscreen)
             flags |= SDL_WINDOW_FULLSCREEN;
         if (resizable)
             flags |= SDL_WINDOW_RESIZABLE;
@@ -377,7 +377,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
         CreateWindowIcon();
 
-        if(maximize)
+        if (maximize)
             Maximize();
         
         // Create/restore context and GPU objects and set initial renderstate

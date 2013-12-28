@@ -241,7 +241,7 @@ public:
     bool GetFullscreen() const { return fullscreen_; }
     /// Return whether window is borderless.
     bool GetBorderless() const { return borderless_; }
-    /// Return whether window is resizable
+    /// Return whether window is resizable.
     bool GetResizable() const { return resizable_; }
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
@@ -376,9 +376,9 @@ public:
     void Release(bool clearGPUObjects, bool closeWindow);
     /// Restore GPU objects and reinitialize state. Requires an open window.
     void Restore();
-    /// Maximize the Window
+    /// Maximize the Window.
     void Maximize();
-    /// Minimize the Window
+    /// Minimize the Window.
     void Minimize();
     /// Clean up a render surface from all FBOs.
     void CleanupRenderSurface(RenderSurface* surface);

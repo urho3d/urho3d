@@ -349,9 +349,9 @@ public:
     
     /// Window was resized through user interaction. Called by Input subsystem.
     void WindowResized();
-    /// Maximize the Window
+    /// Maximize the Window.
     void Maximize();
-    /// Minimize the Window
+    /// Minimize the Window.
     void Minimize();
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);

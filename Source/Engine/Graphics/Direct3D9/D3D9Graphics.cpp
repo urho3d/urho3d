@@ -298,7 +298,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     SDL_GetDesktopDisplayMode(0, &mode);
     D3DFORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
     
-    // If zero dimensions in windowed mode, ignore well use the maximize flag. If zero in fullscreen, use desktop mode
+    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
         if (fullscreen || borderless)
@@ -318,6 +318,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (fullscreen || borderless)
         resizable = false;
 
+    // Borderless cannot be fullscreen, they are mutually exclusive
     if (borderless)
         fullscreen = false;
     
@@ -370,7 +371,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     
     AdjustWindow(width, height, fullscreen, borderless);
 
-    if(maximize)
+    if (maximize)
     {
         Maximize();
     }
@@ -445,7 +446,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     #ifdef ENABLE_LOGGING
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
-    if(borderless_)
+    if (borderless_)
         msg.Append(" borderless");
     if (resizable_)
         msg.Append(" resizable");
@@ -2016,7 +2017,7 @@ void Graphics::WindowResized()
 
 void Graphics::Maximize()
 {
-    if(!impl_->window_)
+    if (!impl_->window_)
         return;
 
     SDL_MaximizeWindow(impl_->window_);
@@ -2024,7 +2025,7 @@ void Graphics::Maximize()
 
 void Graphics::Minimize()
 {
-    if(!impl_->window_)
+    if (!impl_->window_)
         return;
 
     SDL_MinimizeWindow(impl_->window_);
@@ -2232,7 +2233,7 @@ unsigned Graphics::GetFormat(const String& formatName)
 
 bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
 {
-    if(!externalWindow_)
+    if (!externalWindow_)
     {
         unsigned flags = 0;
         if (resizable)
@@ -2273,7 +2274,7 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
 {
     if (!externalWindow_)
     {
-        if(!newWidth || !newHeight)
+        if (!newWidth || !newHeight)
         {
             SDL_MaximizeWindow(impl_->window_);
             SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
