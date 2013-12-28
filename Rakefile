@@ -1,6 +1,6 @@
 require "rubygems"
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... GH_TOKEN2=... TRAVIS_BRANCH=master rake travis)
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master rake travis)
 desc 'Update site documentation to GitHub Pages'
 task :travis do
   # Skip documentation update if one of the following conditions is met
@@ -18,5 +18,5 @@ task :travis do
   system 'cd Build && make doc >/dev/null 2>&1 && rsync -a --delete ../Docs/html/ ../doc-Build/documentation' or abort 'Failed to generate/rsync doxygen pages'
   # Supply GIT credentials and push to GitHub
   system "cd doc-Build && git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/urho3d.github.io.git && git add -A && git commit -q -a -m 'Travis CI: site documentation update at #{Time.now.utc}.' && git push -q" or abort 'Failed or nothing to push to urho3d/urho3d.github.io.git'
-  system "git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN2']}@github.com/urho3d/Urho3D.git && git add Docs/*API* && git commit -q -a -m 'Travis CI: API documentation update at #{Time.now.utc}.' && git push -q" or abort 'Failed or nothing to push to urho3d/Urho3D.git'
+  system "git config user.name '#{ENV['GIT_NAME']}' && git config user.email '#{ENV['GIT_EMAIL']}' && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/urho3d/Urho3D.git && git add Docs/*API* && git commit -q -a -m 'Travis CI: API documentation update at #{Time.now.utc}.\n[ci skip]' && git push -q" or abort 'Failed or nothing to push to urho3d/Urho3D.git'
 end
