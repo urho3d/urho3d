@@ -46,14 +46,18 @@ struct ShaderOption
     Vector<String> includes_;
     /// Required defines for variation to be compiled.
     Vector<String> requires_;
-    /// Exclude indices.
-    PODVector<unsigned> excludeIndices_;
-    /// Include indices.
-    PODVector<unsigned> includeIndices_;
+    /// Excluded options as a bitmask.
+    unsigned excludeBits_;
+    /// Included options as a bitmask.
+    unsigned includeBits_;
+    /// Exclude bits for variations of the same group.
+    unsigned variationGroupBits_;
     /// Option(s) which satisfy the requirements.
     PODVector<unsigned> requirementBits_;
     /// Variation flag. A variation excludes all other variations, unless in a separate group.
     bool isVariation_;
+    /// Dummy separator flag.
+    bool isDummySeparator_;
 };
 
 /// Combination of shader options, used for compiling a shader variation.

@@ -223,43 +223,65 @@ bool ShaderParser::ParseOptions(const XMLElement& element)
     
     maxCombinations_ = 1;
     numVariationGroups_ = 0;
+
+    // Build search index of option names
     for (unsigned i = 0; i < options_.Size(); ++i)
     {
+        ShaderOption& option = options_[i];
+
         maxCombinations_ *= 2;
-        nameToIndex_[options_[i].name_] = i;
-        if (options_[i].isVariation_ && (i == 0 || !options_[i - 1].isVariation_))
+        nameToIndex_[option.name_] = i;
+        if (option.isVariation_ && (i == 0 || !options_[i - 1].isVariation_))
             ++numVariationGroups_;
     }
     
-    // Preprocess includes/excludes for faster combination handling
-    for (Vector<ShaderOption>::Iterator i = options_.Begin(); i != options_.End(); ++i)
-    {
-        i->excludeIndices_.Resize(i->excludes_.Size());
-        i->includeIndices_.Resize(i->includes_.Size());
-        
-        for (unsigned j = 0; j < i->excludes_.Size(); ++j)
-            i->excludeIndices_[j] = nameToIndex_[i->excludes_[j]];
-        for (unsigned j = 0; j < i->includes_.Size(); ++j)
-            i->includeIndices_[j] = nameToIndex_[i->includes_[j]];
-    }
-    
-    // Preprocess requirements
+    // Preprocess includes/excludes/requires for faster combination handling
     for (unsigned i = 0; i < options_.Size(); ++i)
     {
-        for (unsigned j = 0; j < options_[i].requires_.Size(); ++j)
+        ShaderOption& option = options_[i];
+
+        option.isDummySeparator_ = option.name_.Empty() && !option.isVariation_ && option.defines_.Empty();
+
+        option.excludeBits_ = 0;
+        option.includeBits_ = 0;
+        for (unsigned j = 0; j < option.excludes_.Size(); ++j)
+            option.excludeBits_ |= 1 << nameToIndex_[option.excludes_[j]];
+        for (unsigned j = 0; j < option.includes_.Size(); ++j)
+            option.includeBits_ |= 1 << nameToIndex_[option.includes_[j]];
+
+        option.variationGroupBits_ = 0;
+        if (option.isVariation_)
+        {
+            for (unsigned j = i - 1; j < options_.Size(); --j)
+            {
+                if (options_[j].isVariation_)
+                    option.variationGroupBits_ |= 1 << j;
+                else
+                    break;
+            }
+            for (unsigned j = i + 1; j < options_.Size(); ++j)
+            {
+                if (options_[j].isVariation_)
+                    option.variationGroupBits_ |= 1 << j;
+                else
+                    break;
+            }
+        }
+        
+        for (unsigned j = 0; j < option.requires_.Size(); ++j)
         {
             unsigned bits = 0;
             for (unsigned l = 0; l < options_.Size(); ++l)
             {
                 if (l != i)
                 {
-                    if (options_[l].name_ == options_[i].requires_[j])
+                    if (options_[l].name_ == option.requires_[j])
                         bits |= 1 << l;
                     else
                     {
                         for (unsigned m = 0; m < options_[l].defines_.Size(); ++m)
                         {
-                            if (options_[l].defines_[m] == options_[i].requires_[j])
+                            if (options_[l].defines_[m] == option.requires_[j])
                             {
                                 bits |= 1 << l;
                                 break;
@@ -274,7 +296,7 @@ bool ShaderParser::ParseOptions(const XMLElement& element)
             {
                 for (unsigned l = 0; l < globalDefines_.Size(); ++l)
                 {
-                    if (globalDefines_[l] == options_[i].requires_[j])
+                    if (globalDefines_[l] == option.requires_[j])
                     {
                         bits |= 0x80000000;
                         break;
@@ -282,7 +304,7 @@ bool ShaderParser::ParseOptions(const XMLElement& element)
                 }
             }
             
-            options_[i].requirementBits_.Push(bits);
+            option.requirementBits_.Push(bits);
         }
     }
     
@@ -300,41 +322,25 @@ void ShaderParser::BuildCombinations()
 bool ShaderParser::BuildCombination(unsigned active)
 {
     unsigned variationsActive = 0;
-    bool skipThis = false;
     
     // Check for excludes & includes first
-    for (unsigned j = 0; j < options_.Size(); ++j)
+    for (unsigned i = 0; i < options_.Size(); ++i)
     {
-        if ((active >> j) & 1)
+        if ((active >> i) & 1)
         {
-            for (unsigned k = 0; k < options_[j].includeIndices_.Size(); ++k)
-                active |= 1 << options_[j].includeIndices_[k];
-                
-            for (unsigned k = 0; k < options_[j].excludeIndices_.Size(); ++k)
-                active &= ~(1 << options_[j].excludeIndices_[k]);
-                
+            ShaderOption& option = options_[i];
+            
+            active |= option.includeBits_;
+            active &= ~option.excludeBits_;
+            
             // Skip dummy separators (options without name and defines)
-            if (options_[j].name_.Empty() && !options_[j].isVariation_ && options_[j].defines_.Empty())
-                active &= ~(1 << j);
-                
+            if (option.isDummySeparator_)
+                active &= ~(1 << i);
+            
             // If it's a variation, exclude all other variations in the same group
-            if (options_[j].isVariation_)
+            if (option.isVariation_)
             {
-                for (unsigned k = j - 1; k < options_.Size(); --k)
-                {
-                    if (options_[k].isVariation_)
-                        active &= ~(1 << k);
-                    else
-                        break;
-                }
-                for (unsigned k = j + 1; k < options_.Size(); ++k)
-                {
-                    if (options_[k].isVariation_)
-                        active &= ~(1 << k);
-                    else
-                        break;
-                }
-                    
+                active &= ~options_[i].variationGroupBits_;
                 ++variationsActive;
             }
         }
@@ -346,31 +352,27 @@ bool ShaderParser::BuildCombination(unsigned active)
     
     // Check for required defines, which may yet cause this combination to be skipped
     unsigned compareBits = active | 0x80000000;
-    for (unsigned j = 0; j < options_.Size(); ++j)
+    for (unsigned i = 0; i < options_.Size(); ++i)
     {
-        if (active & (1 << j))
+        if (active & (1 << i))
         {
-            for (unsigned l = 0; l < options_[j].requirementBits_.Size(); ++l)
+            ShaderOption& option = options_[i];
+            
+            for (unsigned j = 0; j < option.requirementBits_.Size(); ++j)
             {
-                if (!(compareBits & options_[j].requirementBits_[l]))
-                {
-                    skipThis = true;
-                    break;
-                }
+                if (!(compareBits & option.requirementBits_[j]))
+                    return false;
             }
         }
     }
-        
-    if (skipThis)
-        return false;
     
     String combinationName;
     
     // Build shader combination name from active options
-    for (unsigned j = 0; j < options_.Size(); ++j)
+    for (unsigned i = 0; i < options_.Size(); ++i)
     {
-        if (active & (1 << j) && options_[j].name_.Length())
-            combinationName += options_[j].name_;
+        if (active & (1 << i))
+            combinationName += options_[i].name_;
     }
     
     combinations_[combinationName] = active;
