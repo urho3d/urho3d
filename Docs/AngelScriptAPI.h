@@ -4028,10 +4028,12 @@ class Graphics
 {
 // Methods:
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-bool SetMode(int, int, bool, bool, bool, bool, int);
+bool SetMode(int, int, bool, bool, bool, bool, bool, int);
 bool SetMode(int, int);
 void SetWindowPosition(int, int);
 bool ToggleFullscreen();
+void Maximize();
+void Minimize();
 void Close();
 bool TakeScreenShot(Image);
 
@@ -4064,6 +4066,8 @@ int multiSample;
 bool fullscreen;
 /* (readonly) */
 bool resizable;
+/* (readonly) */
+bool borderless;
 /* (readonly) */
 bool vsync;
 /* (readonly) */

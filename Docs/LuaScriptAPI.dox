@@ -932,11 +932,13 @@ Methods:
 - void SetWindowIcon(Image* windowIcon)
 - void SetWindowPosition(const IntVector2& position)
 - void SetWindowPosition(int x, int y)
-- bool SetMode(int width, int height, bool fullscreen, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
+- bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
 - void SetFlushGPU(bool enable)
 - bool ToggleFullscreen()
+- void Maximize()
+- void Minimize()
 - void Close()
 - bool TakeScreenShot(Image& destImage)
 - bool IsInitialized() const
@@ -948,6 +950,7 @@ Methods:
 - int GetMultiSample() const
 - bool GetFullscreen() const
 - bool GetResizable() const
+- bool GetBorderless() const
 - bool GetVSync() const
 - bool GetTripleBuffer() const
 - bool GetSRGB() const
@@ -979,6 +982,7 @@ Properties:
 - int multiSample (readonly)
 - bool fullscreen (readonly)
 - bool resizable (readonly)
+- bool borderless (readonly)
 - bool vSync (readonly)
 - bool tripleBuffer (readonly)
 - bool sRGB
