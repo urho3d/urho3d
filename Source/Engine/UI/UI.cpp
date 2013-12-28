@@ -48,6 +48,7 @@
 #include "Text.h"
 #include "Text3D.h"
 #include "Texture2D.h"
+#include "ToolTip.h"
 #include "UI.h"
 #include "UIEvents.h"
 #include "VertexBuffer.h"
@@ -1385,6 +1386,7 @@ void RegisterUILibrary(Context* context)
     Menu::RegisterObject(context);
     DropDownList::RegisterObject(context);
     FileSelector::RegisterObject(context);
+    Tooltip::RegisterObject(context);
 }
 
 }
