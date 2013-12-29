@@ -24,6 +24,7 @@
 #include "ToolTip.h"
 #include "Context.h"
 #include "Timer.h"
+#include "Serializable.h"
 
 namespace Urho3D
 {
@@ -33,6 +34,7 @@ extern const char* UI_CATEGORY;
 ToolTip::ToolTip(Context* context) :
     UIElement(context),
     delay_(500.f),
+    offset_(IntVector2::ZERO),
     parentHovered_(false)
 {
     SetVisible(false);
@@ -47,7 +49,8 @@ void ToolTip::RegisterObject(Context* context)
     context->RegisterFactory<ToolTip>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(ToolTip, UIElement);
-    ACCESSOR_ATTRIBUTE(ToolTip, VAR_FLOAT, "Delay", GetDelay, SetDelay, float, 0.5f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ToolTip, VAR_FLOAT, "Delay", GetDelay, SetDelay, float, 500.f, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(ToolTip, VAR_INTVECTOR2, "Offset", GetOffset, SetOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
 void ToolTip::Update(float timeStep)
@@ -79,7 +82,7 @@ void ToolTip::Update(float timeStep)
             originalPosition_ = GetPosition();
             IntVector2 screenPosition = GetScreenPosition();
             SetParent(root);
-            SetPosition(screenPosition);
+            SetPosition(screenPosition + offset_);
             SetVisible(true);
             // BringToFront() is unreliable in this case as it takes into account only input-enabled elements.
             // Rather just force priority to max
@@ -102,6 +105,11 @@ void ToolTip::Update(float timeStep)
 void ToolTip::SetDelay(float delay)
 {
     delay_ = delay;
+}
+
+void ToolTip::SetOffset(const IntVector2& offset)
+{
+    offset_ = offset;
 }
 
 }

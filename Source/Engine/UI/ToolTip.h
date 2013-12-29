@@ -46,15 +46,21 @@ public:
 
     /// Set the delay (milliseconds) until the tooltip shows once hovering.
     void SetDelay(float delay);
+    /// Set the offset of the tooltip from the parent element once shown.
+    void SetOffset(const IntVector2& offset);
 
     /// Return the delay until the tooltip shows once hovering.
     float GetDelay() const { return delay_; }
+    /// Get the offset from the parent position.
+    const IntVector2& GetOffset() const { return offset_; }
 
 private:
     /// The element that is being tracked for hovering. Normally the parent element.
     WeakPtr<UIElement> target_;
     /// Delay from hover start to displaying the tooltip.
     float delay_;
+    /// Offet from the parent position of where to display the tooltip.
+    IntVector2 offset_;
     /// Point at which the parent was hovered.
     bool parentHovered_;
     /// Point at which the tooltip was set visible.
