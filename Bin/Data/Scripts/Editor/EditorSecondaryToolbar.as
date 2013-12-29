@@ -14,11 +14,11 @@ void CreateSecondaryToolBar()
     secondaryToolBar.SetPosition(0, uiMenuBar.height+40);
     secondaryToolBar.SetFixedHeight(graphics.height);
 
-    Button@ b = CreateSmallToolBarButton("Node");
+    Button@ b = CreateSmallToolBarButton("Node", "Replicated Node");
     secondaryToolBar.AddChild(b);
     SubscribeToEvent(b, "Released", "SmallToolBarCreateReplNode");  
 
-    b = CreateSmallToolBarButton("Node");
+    b = CreateSmallToolBarButton("Node", "Local Node");
     secondaryToolBar.AddChild(b);
     SubscribeToEvent(b, "Released", "SmallToolBarCreateLocalNode");
 
@@ -30,7 +30,7 @@ void CreateSecondaryToolBar()
 
     b = CreateSmallToolBarButton("Camera");
     secondaryToolBar.AddChild(b);
-    SubscribeToEvent(b, "Released", "SmallToolBarCreateComponent");     
+    SubscribeToEvent(b, "Released", "SmallToolBarCreateComponent");
 
     b = CreateSmallToolBarButton("Zone");
     secondaryToolBar.AddChild(b);
@@ -102,7 +102,7 @@ void CreateSecondaryToolBar()
     secondaryToolBar.AddChild(b);
     SubscribeToEvent(b, "Released", "SmallToolBarCreateComponent");
 
-    secondaryToolBar.AddChild(CreateSmallToolBarSpacer(3));     
+    secondaryToolBar.AddChild(CreateSmallToolBarSpacer(3));
 
     b = CreateSmallToolBarButton("Navigable");
     secondaryToolBar.AddChild(b);
@@ -123,13 +123,18 @@ void CreateSecondaryToolBar()
     SubscribeToEvent(b, "Released", "SmallToolBarCreateComponent"); 
 }
 
-Button@ CreateSmallToolBarButton(const String&in title)
+Button@ CreateSmallToolBarButton(const String&in title, String toolTipTitle = "")
 {
     Button@ button = Button(title);
     button.defaultStyle = uiStyle;
     button.style = "ToolBarButton";
     button.SetFixedSize(20, 20);
     CreateSmallToolBarIcon(button);
+
+    if (toolTipTitle.empty)
+        toolTipTitle = title;
+    CreateToolTip(button, toolTipTitle, IntVector2(button.width + 10, button.height - 10));
+
     return button;
 }
 

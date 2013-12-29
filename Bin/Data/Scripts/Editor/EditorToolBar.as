@@ -73,6 +73,8 @@ Button@ CreateToolBarButton(const String&in title)
     button.style = "ToolBarButton";
 
     CreateToolBarIcon(button);
+    CreateToolTip(button, title, IntVector2(button.width + 10, button.height - 10));
+
     return button;
 }
 
@@ -83,6 +85,8 @@ CheckBox@ CreateToolBarToggle(const String&in title)
     toggle.style = "ToolBarToggle";
 
     CreateToolBarIcon(toggle);
+    CreateToolTip(toggle, title, IntVector2(toggle.width + 10, toggle.height - 10));
+
     return toggle;
 }
 
@@ -125,6 +129,16 @@ UIElement@ CreateToolBarSpacer(uint width)
     UIElement@ spacer = UIElement();
     spacer.SetFixedWidth(width);
     return spacer;
+}
+
+UIElement@ CreateToolTip(UIElement@ parent, const String&in title, const IntVector2&in offset)
+{
+    ToolTip@ toolTip = parent.CreateChild("ToolTip");
+    toolTip.position = offset;
+    Text@ toolTipText = toolTip.CreateChild("Text");
+    toolTipText.SetStyle("ToolTipText");
+    toolTipText.text = title;
+    return toolTip;
 }
 
 void ToolBarRunUpdatePlay(StringHash eventType, VariantMap& eventData)
