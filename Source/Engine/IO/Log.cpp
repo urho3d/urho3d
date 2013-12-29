@@ -48,7 +48,8 @@ const char* logLevelPrefixes[] =
     "DEBUG",
     "INFO",
     "WARNING",
-    "ERROR"
+    "ERROR",
+    0
 };
 
 static Log* logInstance = 0;
