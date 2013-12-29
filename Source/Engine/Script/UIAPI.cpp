@@ -34,6 +34,7 @@
 #include "Sprite.h"
 #include "Text.h"
 #include "Text3D.h"
+#include "ToolTip.h"
 #include "UI.h"
 #include "Window.h"
 #include "View3D.h"
@@ -526,6 +527,13 @@ static void RegisterFileSelector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "Button@+ get_cancelButton() const", asMETHOD(FileSelector, GetCancelButton), asCALL_THISCALL);
 }
 
+static void RegisterTooltip(asIScriptEngine* engine)
+{
+    RegisterUIElement<Tooltip>(engine, "Tooltip");
+    engine->RegisterObjectMethod("Tooltip", "void set_delay(float)", asMETHOD(Tooltip, SetDelay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Tooltip", "float get_delay() const", asMETHOD(Tooltip, GetDelay), asCALL_THISCALL);
+}
+
 static UI* GetUI()
 {
     return GetScriptContext()->GetSubsystem<UI>();
@@ -642,6 +650,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterWindow(engine);
     RegisterView3D(engine);
     RegisterFileSelector(engine);
+    RegisterTooltip(engine);
     RegisterUI(engine);
 }
 
