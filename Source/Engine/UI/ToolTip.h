@@ -29,34 +29,38 @@ namespace Urho3D
 {
 
 /// Tooltip %UI element.
-class URHO3D_API Tooltip : public UIElement
+class URHO3D_API ToolTip : public UIElement
 {
-    OBJECT(Tooltip)
+    OBJECT(ToolTip)
 
 public:
     /// Construct.
-    Tooltip(Context* context);
+    ToolTip(Context* context);
     /// Destruct.
-    virtual ~Tooltip();
+    virtual ~ToolTip();
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Perform UI element update.
     virtual void Update(float timeStep);
 
-    /// Set The Delay (milliseconds) till the Tooltip shows once hovering.
+    /// Set the delay (milliseconds) until the tooltip shows once hovering.
     void SetDelay(float delay);
 
-    /// Get the Delay till the Tooltip shows once hovering.
+    /// Return the delay until the tooltip shows once hovering.
     float GetDelay() const { return delay_; }
 
 private:
-    /// Delay from hover start to start hovering.
+    /// The element that is being tracked for hovering. Normally the parent element.
+    WeakPtr<UIElement> target_;
+    /// Delay from hover start to displaying the tooltip.
     float delay_;
     /// Point at which the parent was hovered.
     bool parentHovered_;
     /// Point at which the tooltip was set visible.
-    Timer displayat_;
+    Timer displayAt_;
+    /// Original offset position to the parent.
+    IntVector2 originalPosition_;
 };
 
 }

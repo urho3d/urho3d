@@ -527,11 +527,11 @@ static void RegisterFileSelector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "Button@+ get_cancelButton() const", asMETHOD(FileSelector, GetCancelButton), asCALL_THISCALL);
 }
 
-static void RegisterTooltip(asIScriptEngine* engine)
+static void RegisterToolTip(asIScriptEngine* engine)
 {
-    RegisterUIElement<Tooltip>(engine, "Tooltip");
-    engine->RegisterObjectMethod("Tooltip", "void set_delay(float)", asMETHOD(Tooltip, SetDelay), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Tooltip", "float get_delay() const", asMETHOD(Tooltip, GetDelay), asCALL_THISCALL);
+    RegisterUIElement<ToolTip>(engine, "ToolTip");
+    engine->RegisterObjectMethod("ToolTip", "void set_delay(float)", asMETHOD(ToolTip, SetDelay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ToolTip", "float get_delay() const", asMETHOD(ToolTip, GetDelay), asCALL_THISCALL);
 }
 
 static UI* GetUI()
@@ -650,7 +650,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterWindow(engine);
     RegisterView3D(engine);
     RegisterFileSelector(engine);
-    RegisterTooltip(engine);
+    RegisterToolTip(engine);
     RegisterUI(engine);
 }
 

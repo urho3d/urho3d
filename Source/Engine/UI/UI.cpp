@@ -602,11 +602,17 @@ void UI::Initialize()
 
 void UI::Update(float timeStep, UIElement* element)
 {
+    // Keep a weak pointer to the element in case it destroys itself on update
+    WeakPtr<UIElement> elementWeak(element);
+
     element->Update(timeStep);
+    if (elementWeak.Expired())
+        return;
 
     const Vector<SharedPtr<UIElement> >& children = element->GetChildren();
-    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children.Begin(); i != children.End(); ++i)
-        Update(timeStep, *i);
+    // Update of an element may modify its child vector. Use just index-based iteration to be safe
+    for (unsigned i = 0; i < children.Size(); ++i)
+        Update(timeStep, children[i]);
 }
 
 void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
@@ -1386,7 +1392,7 @@ void RegisterUILibrary(Context* context)
     Menu::RegisterObject(context);
     DropDownList::RegisterObject(context);
     FileSelector::RegisterObject(context);
-    Tooltip::RegisterObject(context);
+    ToolTip::RegisterObject(context);
 }
 
 }

@@ -4678,6 +4678,19 @@ Properties:
 - ResourceRef materialAttr
 - Color& colorAttr (readonly)
 
+### Tooltip : UIElement
+
+Methods:
+
+- Tooltip(Context* context)
+- virtual ~Tooltip()
+- void SetDelay(float delay)
+- float GetDelay() const
+
+Properties:
+
+- float delay
+
 ### UI : Object
 
 Methods:

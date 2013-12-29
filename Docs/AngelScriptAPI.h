@@ -7338,6 +7338,157 @@ Button okButton;
 Button cancelButton;
 };
 
+class Tooltip
+{
+// Methods:
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool Load(File, bool = false);
+bool Save(File) const;
+bool LoadXML(const XMLElement&, bool = false);
+bool SaveXML(XMLElement&) const;
+void ApplyAttributes();
+bool SetAttribute(const String&, const Variant&);
+void ResetToDefault();
+void RemoveInstanceDefault();
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool LoadXML(const XMLElement&, XMLFile, bool = false);
+bool LoadXML(File);
+bool LoadXML(XMLFile, XMLFile);
+bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadChildXML(XMLFile, XMLFile = null);
+bool SaveXML(File);
+bool SetStyle(const XMLElement&);
+bool SetStyle(const String&, XMLFile = null);
+bool SetStyleAuto(XMLFile = null);
+void SetPosition(int, int);
+void SetSize(int, int);
+void SetMinSize(int, int);
+void SetMaxSize(int, int);
+void SetFixedSize(int, int);
+void SetFixedWidth(int);
+void SetFixedHeight(int);
+void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void UpdateLayout();
+void DisableLayoutUpdate();
+void EnableLayoutUpdate();
+void BringToFront();
+UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
+void AddChild(UIElement);
+void InsertChild(uint, UIElement);
+void RemoveChild(UIElement, uint = 0);
+void RemoveChild(uint);
+void RemoveAllChildren();
+void Remove();
+uint FindChild(UIElement) const;
+void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+UIElement GetChild(const String&, bool = false) const;
+UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = false) const;
+Array<UIElement> GetChildren(bool = false) const;
+UIElement GetElementEventSender() const;
+const Variant& GetVar(const ShortStringHash&);
+IntVector2 ScreenToElement(const IntVector2&);
+IntVector2 ElementToScreen(const IntVector2&);
+bool IsInside(IntVector2, bool);
+bool IsInsideCombined(IntVector2, bool);
+
+// Properties:
+/* (readonly) */
+int refs;
+/* (readonly) */
+int weakRefs;
+/* (readonly) */
+ShortStringHash type;
+/* (readonly) */
+ShortStringHash baseType;
+/* (readonly) */
+String typeName;
+/* (readonly) */
+String category;
+/* (readonly) */
+uint numAttributes;
+Array<Variant> attributes;
+/* (readonly) */
+Array<Variant> attributeDefaults;
+/* (readonly) */
+Array<AttributeInfo> attributeInfos;
+bool temporary;
+String style;
+String name;
+IntVector2 position;
+IntVector2 size;
+int width;
+int height;
+IntVector2 minSize;
+int minWidth;
+int minHeight;
+IntVector2 maxSize;
+int maxWidth;
+int maxHeight;
+/* (readonly) */
+bool fixedSize;
+/* (readonly) */
+bool fixedWidth;
+/* (readonly) */
+bool fixedHeight;
+HorizontalAlignment horizontalAlignment;
+VerticalAlignment verticalAlignment;
+IntRect clipBorder;
+/* (writeonly) */
+Color color;
+Array<Color> colors;
+int priority;
+float opacity;
+bool bringToFront;
+bool bringToBack;
+bool clipChildren;
+bool sortChildren;
+bool useDerivedOpacity;
+bool enabled;
+bool editable;
+bool focus;
+bool selected;
+bool visible;
+/* (readonly) */
+bool hovering;
+bool internal;
+/* (readonly) */
+bool colorGradient;
+FocusMode focusMode;
+uint dragDropMode;
+TraversalMode traversalMode;
+XMLFile defaultStyle;
+LayoutMode layoutMode;
+int layoutSpacing;
+IntRect layoutBorder;
+int indent;
+int indentSpacing;
+/* (readonly) */
+int indentWidth;
+/* (readonly) */
+IntVector2 childOffset;
+bool elementEventSender;
+/* (readonly) */
+Array<uint> numChildren;
+/* (readonly) */
+uint numAllChildren;
+/* (readonly) */
+Array<UIElement> children;
+UIElement parent;
+/* (readonly) */
+UIElement root;
+/* (readonly) */
+IntVector2 screenPosition;
+/* (readonly) */
+IntRect combinedScreenRect;
+/* (readonly) */
+float derivedOpacity;
+/* (readonly) */
+VariantMap vars;
+float delay;
+};
+
 class UI
 {
 // Methods:

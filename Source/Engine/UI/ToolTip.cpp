@@ -30,51 +30,76 @@ namespace Urho3D
 
 extern const char* UI_CATEGORY;
 
-Tooltip::Tooltip(Context* context) :
+ToolTip::ToolTip(Context* context) :
     UIElement(context),
     delay_(500.f),
     parentHovered_(false)
 {
+    SetVisible(false);
 }
 
-Tooltip::~Tooltip()
+ToolTip::~ToolTip()
 {
 }
 
-void Tooltip::RegisterObject(Context* context)
+void ToolTip::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Tooltip>(UI_CATEGORY);
+    context->RegisterFactory<ToolTip>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(Tooltip, UIElement);
-    ACCESSOR_ATTRIBUTE(Tooltip, VAR_FLOAT, "Delay", GetDelay, SetDelay, float, 0.5f, AM_FILE);
+    COPY_BASE_ATTRIBUTES(ToolTip, UIElement);
+    ACCESSOR_ATTRIBUTE(ToolTip, VAR_FLOAT, "Delay", GetDelay, SetDelay, float, 0.5f, AM_FILE);
 }
 
-void Tooltip::Update(float timeStep)
+void ToolTip::Update(float timeStep)
 {
-    if (parent_->IsHovering())
+    // Track the element we are parented to for hovering. When we display, we move ourself to the root element
+    // to ensure displaying on top
+    UIElement* root = GetRoot();
+    if (!root)
+        return;
+    if (parent_ != root)
+        target_ = parent_;
+
+    // If target is removed while we are displaying, we have no choice but to destroy ourself
+    if (target_.Expired())
+    {
+        Remove();
+        return;
+    }
+
+    if (target_->IsHovering())
     {
         if (!parentHovered_)
         {
             parentHovered_ = true;
-            displayat_.Reset();
+            displayAt_.Reset();
         }
-        else if(displayat_.GetMSec(false) >= delay_)
+        else if(displayAt_.GetMSec(false) >= delay_ && parent_ == target_)
         {
-            visible_ = true;
-            BringToFront();
+            originalPosition_ = GetPosition();
+            IntVector2 screenPosition = GetScreenPosition();
+            SetParent(root);
+            SetPosition(screenPosition);
+            SetVisible(true);
+            // BringToFront() is unreliable in this case as it takes into account only input-enabled elements.
+            // Rather just force priority to max
+            SetPriority(M_MAX_INT);
         }
     }
     else
     {
-        if (visible_)
-            visible_ = false;
-
+        if (IsVisible() && parent_ == root)
+        {
+            SetParent(target_);
+            SetPosition(originalPosition_);
+            SetVisible(false);
+        }
         parentHovered_ = false;
-        displayat_.Reset();
+        displayAt_.Reset();
     }
 }
 
-void Tooltip::SetDelay(float delay)
+void ToolTip::SetDelay(float delay)
 {
     delay_ = delay;
 }
