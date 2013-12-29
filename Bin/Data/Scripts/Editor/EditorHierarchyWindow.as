@@ -57,7 +57,7 @@ void CreateHierarchyWindow()
     ui.root.AddChild(hierarchyWindow);
     int height = Min(ui.root.height - 60, 500);
     hierarchyWindow.SetSize(300, height);
-    hierarchyWindow.SetPosition(10, 100);
+    hierarchyWindow.SetPosition(35, 100);
     hierarchyWindow.opacity = uiMaxOpacity;
     hierarchyWindow.BringToFront();
 

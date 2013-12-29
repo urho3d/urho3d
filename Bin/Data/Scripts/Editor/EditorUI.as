@@ -57,6 +57,7 @@ void CreateUI()
     CreateCursor();
     CreateMenuBar();
     CreateToolBar();
+    CreateSecondaryToolBar();
     CreateQuickMenu();
     CreateHierarchyWindow();
     CreateAttributeInspectorWindow();
@@ -82,17 +83,20 @@ void ResizeUI()
     // Resize tool bar
     toolBar.SetFixedWidth(graphics.width);
 
+    // Resize secondary tool bar
+    secondaryToolBar.SetFixedHeight(graphics.height);
+
     // Relayout stats bar
     Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
     if (graphics.width >= 1200)
     {
-        SetupStatsBarText(editorModeText, font, 4, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
     }
     else
     {
-        SetupStatsBarText(editorModeText, font, 4, 64, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 4, 78, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
     }
 
     // Relayout windows
