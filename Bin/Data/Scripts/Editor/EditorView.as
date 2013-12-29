@@ -226,16 +226,16 @@ void CreateStatsBar()
 
     if (ui.root.width >= 1200)
     {
-        SetupStatsBarText(editorModeText, font, 4, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
     }
     else
     {
-        SetupStatsBarText(editorModeText, font, 4, 64, HA_LEFT, VA_TOP);
-        SetupStatsBarText(renderStatsText, font, 4, 78, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
     }
 
-    SetupStatsBarText(cameraPosText, font, 0, 0, HA_LEFT, VA_BOTTOM);
+    SetupStatsBarText(cameraPosText, font, 35, -2, HA_LEFT, VA_BOTTOM);
 }
 
 void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment hAlign, VerticalAlignment vAlign)
