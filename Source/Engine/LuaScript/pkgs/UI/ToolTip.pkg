@@ -1,0 +1,13 @@
+$#include "ToolTip.h"
+
+class ToolTip : public UIElement
+{
+    ToolTip(Context* context);
+    virtual ~ToolTip();
+
+    void SetDelay(float delay);
+    
+    float GetDelay() const;
+    
+    tolua_property__get_set float delay;
+};
