@@ -532,6 +532,8 @@ static void RegisterToolTip(asIScriptEngine* engine)
     RegisterUIElement<ToolTip>(engine, "ToolTip");
     engine->RegisterObjectMethod("ToolTip", "void set_delay(float)", asMETHOD(ToolTip, SetDelay), asCALL_THISCALL);
     engine->RegisterObjectMethod("ToolTip", "float get_delay() const", asMETHOD(ToolTip, GetDelay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ToolTip", "void set_offset(const IntVector2&in)", asMETHOD(ToolTip, SetOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ToolTip", "const IntVector2& get_offset() const", asMETHOD(ToolTip, GetDelay), asCALL_THISCALL);
 }
 
 static UI* GetUI()

@@ -6,8 +6,11 @@ class ToolTip : public UIElement
     virtual ~ToolTip();
 
     void SetDelay(float delay);
+    void SetOffset(const IntVector2& offset);
     
     float GetDelay() const;
+    const IntVector2& GetOffset() const;
     
     tolua_property__get_set float delay;
+    tolua_property__get_set IntVector2 offset;
 };
