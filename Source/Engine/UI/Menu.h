@@ -53,6 +53,8 @@ public:
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to the popup being shown.
     virtual void OnShowPopup();
+    /// React to the popup being hidden.
+    virtual void OnHidePopup() {}
 
     /// Set popup element to show on selection.
     void SetPopup(UIElement* element);

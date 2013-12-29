@@ -301,6 +301,8 @@ void Menu::ShowPopup(bool enable)
     }
     else
     {
+        OnHidePopup();
+
         // If the popup has child menus, hide their popups as well
         PODVector<UIElement*> children;
         popup_->GetChildren(children, true);

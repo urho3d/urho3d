@@ -23,8 +23,11 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "DropDownList.h"
+#include "InputEvents.h"
 #include "ListView.h"
+#include "Log.h"
 #include "Text.h"
+#include "UI.h"
 #include "UIEvents.h"
 #include "Window.h"
 
@@ -47,7 +50,6 @@ DropDownList::DropDownList(Context* context) :
     listView_ = new ListView(context_);
     listView_->SetInternal(true);
     listView_->SetScrollBarsVisible(false, false);
-    listView_->SetFocusMode(FM_NOTFOCUSABLE);
     popup_->SetLayout(LM_VERTICAL);
     popup_->AddChild(listView_);
     placeholder_ = CreateChild<UIElement>("DDL_Placeholder");
@@ -56,7 +58,8 @@ DropDownList::DropDownList(Context* context) :
     text->SetInternal(true);
     text->SetVisible(false);
 
-    SubscribeToEvent(listView_, E_ITEMSELECTED, HANDLER(DropDownList, HandleItemSelected));
+    SubscribeToEvent(listView_, E_ITEMCLICKED, HANDLER(DropDownList, HandleItemClicked));
+    SubscribeToEvent(listView_, E_UNHANDLEDKEY, HANDLER(DropDownList, HandleListViewKey));
 }
 
 DropDownList::~DropDownList()
@@ -124,6 +127,20 @@ void DropDownList::OnShowPopup()
             showAbove = true;
     }
     SetPopupOffset(0, showAbove ? -popup_->GetHeight() : GetHeight());
+
+    // Focus the ListView to allow making the selection with keys
+    GetSubsystem<UI>()->SetFocusElement(listView_);
+}
+
+void DropDownList::OnHidePopup()
+{
+    // When the popup is hidden, propagate the selection
+    using namespace ItemSelected;
+
+    VariantMap newEventData;
+    newEventData[P_ELEMENT] = (void*)this;
+    newEventData[P_SELECTION] = GetSelection();
+    SendEvent(E_ITEMSELECTED, newEventData);
 }
 
 void DropDownList::OnSetEditable()
@@ -296,24 +313,27 @@ bool DropDownList::FilterPopupImplicitAttributes(XMLElement& dest) const
     return true;
 }
 
-void DropDownList::HandleItemSelected(StringHash eventType, VariantMap& eventData)
+void DropDownList::HandleItemClicked(StringHash eventType, VariantMap& eventData)
 {
     // Resize the selection placeholder to match the selected item
     UIElement* selectedItem = GetSelectedItem();
     if (selectedItem)
         placeholder_->SetSize(selectedItem->GetSize());
 
-    // Close the popup as the selection was made
-    if (GetShowPopup())
-        ShowPopup(false);
+    // Close and defocus the popup. This will actually send the selection forward
+    if (listView_->HasFocus())
+        GetSubsystem<UI>()->SetFocusElement(0);
+    ShowPopup(false);
+}
 
-    // Send the event forward
-    using namespace ItemSelected;
+void DropDownList::HandleListViewKey(StringHash eventType, VariantMap& eventData)
+{
+    using namespace UnhandledKey;
 
-    VariantMap newEventData;
-    newEventData[P_ELEMENT] = (void*)this;
-    newEventData[P_SELECTION] = GetSelection();
-    SendEvent(E_ITEMSELECTED, newEventData);
+    // If enter pressed in the list view, close and propagate selection
+    int key = eventData[P_KEY].GetInt();
+    if (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER)
+        HandleItemClicked(eventType, eventData);
 }
 
 }

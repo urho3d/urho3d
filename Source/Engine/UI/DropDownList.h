@@ -48,6 +48,8 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to the popup being shown.
     virtual void OnShowPopup();
+    /// React to the popup being hidden.
+    virtual void OnHidePopup();
     /// React to editable status change.
     virtual void OnSetEditable();
     
@@ -104,8 +106,10 @@ protected:
     bool resizePopup_;
 
 private:
-    /// Handle listview item selected event.
-    void HandleItemSelected(StringHash eventType, VariantMap& eventData);
+    /// Handle listview item click event.
+    void HandleItemClicked(StringHash eventType, VariantMap& eventData);
+    /// Handle a key press from the listview
+    void HandleListViewKey(StringHash eventType, VariantMap& eventData);
 
     /// Selected item index attribute.
     unsigned selectionAttr_;
