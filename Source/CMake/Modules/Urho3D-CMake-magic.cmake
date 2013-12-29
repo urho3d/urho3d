@@ -34,6 +34,13 @@ if (CMAKE_HOST_WIN32)
     endif ()
 endif ()
 
+# Enable testing
+if (ENABLE_TESTING)
+    enable_testing ()
+    add_definitions (-DENABLE_TESTING)
+    set (TEST_TIME_OUT 5)    # in seconds
+endif ()
+
 # Enable SSE instruction set. Requires Pentium III or Athlon XP processor at minimum.
 if (NOT DEFINED ENABLE_SSE)
     set (ENABLE_SSE 1)

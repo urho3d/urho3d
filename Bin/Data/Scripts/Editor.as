@@ -10,7 +10,7 @@
 #include "Scripts/Editor/EditorSettings.as"
 #include "Scripts/Editor/EditorPreferences.as"
 #include "Scripts/Editor/EditorToolBar.as"
-#include "Scripts/Editor/EditorSecondaryToolBar.as"
+#include "Scripts/Editor/EditorSecondaryToolbar.as"
 #include "Scripts/Editor/EditorUI.as"
 #include "Scripts/Editor/EditorImport.as"
 

@@ -28,3 +28,8 @@ define_source_files ()
 
 # Setup target with resource copying
 setup_main_executable ()
+
+# Setup test cases
+add_test (NAME Editor COMMAND ${TARGET_NAME} Data/Scripts/Editor.as -w -timeout ${TEST_TIME_OUT})
+add_test (NAME AngelSprites COMMAND ${TARGET_NAME} Data/Scripts/03_Sprites.as -w -timeout ${TEST_TIME_OUT})
+add_test (NAME LuaSprites COMMAND ${TARGET_NAME} Data/LuaScripts/03_Sprites.lua -w -timeout ${TEST_TIME_OUT})

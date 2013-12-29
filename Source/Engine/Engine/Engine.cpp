@@ -92,6 +92,9 @@ Engine::Engine(Context* context) :
     maxInactiveFps_(60),
     pauseMinimized_(false),
     #endif
+#ifdef ENABLE_TESTING
+    timeOut_(0),
+#endif
     autoExit_(true),
     initialized_(false),
 #ifdef ANDROID
@@ -258,7 +261,6 @@ bool Engine::Initialize(const VariantMap& parameters)
         }
     }
 
-
     // Initialize graphics & audio output
     if (!headless_)
     {
@@ -301,6 +303,11 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     // Init FPU state of main thread
     InitFPU();
+
+    #ifdef ENABLE_TESTING
+    if (HasParameter(parameters, "TimeOut"))
+        timeOut_ = GetParameter(parameters, "TimeOut", 0).GetInt() * 1000000LL;
+    #endif
 
     frameTimer_.Reset();
 
@@ -580,6 +587,14 @@ void Engine::ApplyFrameLimit()
     }
 
     elapsed = frameTimer_.GetUSec(true);
+    #ifdef ENABLE_TESTING
+    if (timeOut_ != 0)
+    {
+        timeOut_ -= elapsed;
+        if (timeOut_ < 0)
+            Exit();
+    }
+    #endif
 
     // If FPS lower than minimum, clamp elapsed time
     if (minFps_)
@@ -688,6 +703,13 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["ResourcePaths"] = value;
                 ++i;
             }
+            #ifdef ENABLE_TESTING
+            else if (argument == "timeout" && !value.Empty())
+            {
+                ret["TimeOut"] = ToInt(value);
+                ++i;
+            }
+            #endif
         }
     }
 
