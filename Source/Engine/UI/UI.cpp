@@ -1309,7 +1309,9 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 {
                     if (tempElements_[i] == element)
                     {
-                        UIElement* next = tempElements_[(i + 1) % tempElements_.Size()];
+                        int verse = (qualifiers_ & QUAL_SHIFT) ? -1 : 1;
+                        unsigned inext = (tempElements_.Size() + i + verse) % tempElements_.Size();
+                        UIElement* next = tempElements_[inext];
                         SetFocusElement(next, true);
                         return;
                     }
