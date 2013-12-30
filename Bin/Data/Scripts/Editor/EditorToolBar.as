@@ -134,7 +134,6 @@ UIElement@ CreateToolBarSpacer(uint width)
 UIElement@ CreateToolTip(UIElement@ parent, const String&in title, const IntVector2&in offset)
 {
     ToolTip@ toolTip = parent.CreateChild("ToolTip");
-    toolTip.SetLayout(LM_HORIZONTAL);
     toolTip.position = offset;
 
     BorderImage@ textHolder = toolTip.CreateChild("BorderImage");

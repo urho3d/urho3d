@@ -44,10 +44,10 @@ public:
     /// Perform UI element update.
     virtual void Update(float timeStep);
 
-    /// Set the delay (milliseconds) until the tooltip shows once hovering.
+    /// Set the delay in seconds until the tooltip shows once hovering. Set zero to use the default from the UI subsystem.
     void SetDelay(float delay);
 
-    /// Return the delay until the tooltip shows once hovering.
+    /// Return the delay in seconds until the tooltip shows once hovering.
     float GetDelay() const { return delay_; }
 
 private:

@@ -69,6 +69,7 @@ const ShortStringHash VAR_PARENT_CHANGED("ParentChanged");
 
 const float DEFAULT_DOUBLECLICK_INTERVAL = 0.5f;
 const float DEFAULT_DRAGBEGIN_INTERVAL = 0.5f;
+const float DEFAULT_TOOLTIP_DELAY = 0.5f;
 const int DEFAULT_DRAGBEGIN_DISTANCE = 5;
 const int DEFAULT_FONT_TEXTURE_MAX_SIZE = 2048;
 
@@ -85,6 +86,7 @@ UI::UI(Context* context) :
     doubleClickInterval_(DEFAULT_DOUBLECLICK_INTERVAL),
     dragBeginInterval_(DEFAULT_DRAGBEGIN_INTERVAL),
     dragBeginDistance_(DEFAULT_DRAGBEGIN_DISTANCE),
+    defaultToolTipDelay_(DEFAULT_TOOLTIP_DELAY),
     initialized_(false),
     usingTouchInput_(false),
     #ifdef WIN32
@@ -461,6 +463,11 @@ void UI::SetDragBeginInterval(float interval)
 void UI::SetDragBeginDistance(int pixels)
 {
     dragBeginDistance_ = Max(pixels, 0);
+}
+
+void UI::SetDefaultToolTipDelay(float delay)
+{
+    defaultToolTipDelay_ = Max(delay, 0.0f);
 }
 
 void UI::SetMaxFontTextureSize(int size)

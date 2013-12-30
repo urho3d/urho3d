@@ -1496,6 +1496,7 @@ Methods:
 
 - unsigned GetNumBones() const
 - Bone* GetRootBone()
+- Bone* GetBone(String& name)
 - Bone* GetBone(unsigned index)
 
 Properties:
@@ -4678,12 +4679,12 @@ Properties:
 - ResourceRef materialAttr
 - Color& colorAttr (readonly)
 
-### Tooltip : UIElement
+### ToolTip : UIElement
 
 Methods:
 
-- Tooltip(Context* context)
-- virtual ~Tooltip()
+- ToolTip(Context* context)
+- virtual ~ToolTip()
 - void SetDelay(float delay)
 - float GetDelay() const
 
@@ -4708,6 +4709,7 @@ Methods:
 - void SetDoubleClickInterval(float interval)
 - void SetDragBeginInterval(float interval)
 - void SetDragBeginDistance(int pixels)
+- void SetDefaultToolTipDelay(float delay)
 - void SetMaxFontTextureSize(int size)
 - void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 - void SetUseSystemClipBoard(bool enable)
@@ -4726,6 +4728,7 @@ Methods:
 - float GetDoubleClickInterval() const
 - float GetDragBeginInterval() const
 - int GetDragBeginDistance() const
+- float GetDefaultToolTipDelay() const
 - int GetMaxFontTextureSize() const
 - bool IsNonFocusedMouseWheel() const
 - bool GetUseSystemClipBoard() const
@@ -4746,6 +4749,7 @@ Properties:
 - float doubleClickInterval
 - float dragBeginInterval
 - int dragBeginDistance
+- float defaultToolTipDelay
 - int maxFontTextureSize
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard

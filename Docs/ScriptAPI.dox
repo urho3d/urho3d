@@ -6247,7 +6247,7 @@ Properties:
 - Button@ cancelButton (readonly)
 
 
-### Tooltip
+### ToolTip
 
 Methods:
 
@@ -6410,6 +6410,7 @@ Properties:
 - float doubleClickInterval
 - float dragBeginInterval
 - int dragBeginDistance
+- float defaultToolTipDelay
 - int maxFontTextureSize
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard

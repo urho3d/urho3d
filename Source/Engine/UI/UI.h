@@ -83,6 +83,8 @@ public:
     void SetDragBeginInterval(float interval);
     /// Set UI drag event start distance threshold in pixels.
     void SetDragBeginDistance(int pixels);
+    /// Set tooltip default display delay in seconds.
+    void SetDefaultToolTipDelay(float delay);
     /// Set maximum font face texture size. Must be a power of two. Default is 2048.
     void SetMaxFontTextureSize(int size);
     /// Set whether mouse wheel can control also a non-focused element.
@@ -120,6 +122,8 @@ public:
     float GetDragBeginInterval() const { return dragBeginInterval_; }
     /// Return UI drag start event distance threshold in pixels.
     int GetDragBeginDistance() const { return dragBeginDistance_; }
+    /// Return tooltip default display delay in seconds.
+    float GetDefaultToolTipDelay() const { return defaultToolTipDelay_; }
     /// Return font texture maximum size.
     int GetMaxFontTextureSize() const { return maxFontTextureSize_; }
     /// Return whether mouse wheel can control also a non-focused element.
@@ -237,6 +241,8 @@ private:
     float doubleClickInterval_;
     /// Seconds from mouse button down to begin a drag if there has been no movement exceeding pixel threshold.
     float dragBeginInterval_;
+    /// Tooltip default display delay in seconds.
+    float defaultToolTipDelay_;
     /// Drag begin event distance threshold in pixels.
     int dragBeginDistance_;
     /// Mouse buttons held down.

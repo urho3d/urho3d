@@ -616,6 +616,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "float get_dragBeginInterval() const", asMETHOD(UI, GetDragBeginInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_dragBeginDistance(int)", asMETHOD(UI, SetDragBeginDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "int get_dragBeginDistance() const", asMETHOD(UI, GetDragBeginDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_defaultToolTipDelay(float)", asMETHOD(UI, SetDefaultToolTipDelay), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_defaultToolTipDelay() const", asMETHOD(UI, GetDefaultToolTipDelay), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_maxFontTextureSize(int)", asMETHOD(UI, SetMaxFontTextureSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "int get_maxFontTextureSize() const", asMETHOD(UI, GetMaxFontTextureSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_nonFocusedMouseWheel(bool)", asMETHOD(UI, SetNonFocusedMouseWheel), asCALL_THISCALL);

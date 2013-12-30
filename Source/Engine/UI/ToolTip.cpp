@@ -24,6 +24,7 @@
 #include "ToolTip.h"
 #include "Context.h"
 #include "Timer.h"
+#include "UI.h"
 
 namespace Urho3D
 {
@@ -32,7 +33,7 @@ extern const char* UI_CATEGORY;
 
 ToolTip::ToolTip(Context* context) :
     UIElement(context),
-    delay_(500.f),
+    delay_(0.0f),
     parentHovered_(false)
 {
     SetVisible(false);
@@ -47,7 +48,7 @@ void ToolTip::RegisterObject(Context* context)
     context->RegisterFactory<ToolTip>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(ToolTip, UIElement);
-    ACCESSOR_ATTRIBUTE(ToolTip, VAR_FLOAT, "Delay", GetDelay, SetDelay, float, 0.5f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ToolTip, VAR_FLOAT, "Delay", GetDelay, SetDelay, float, 0.0f, AM_FILE);
 }
 
 void ToolTip::Update(float timeStep)
@@ -69,12 +70,14 @@ void ToolTip::Update(float timeStep)
 
     if (target_->IsHovering())
     {
+        float effectiveDelay = delay_ > 0.0f ? delay_ : GetSubsystem<UI>()->GetDefaultToolTipDelay();
+        
         if (!parentHovered_)
         {
             parentHovered_ = true;
             displayAt_.Reset();
         }
-        else if(displayAt_.GetMSec(false) >= delay_ && parent_ == target_)
+        else if(displayAt_.GetMSec(false) >= (unsigned)(effectiveDelay * 1000.0f) && parent_ == target_)
         {
             originalPosition_ = GetPosition();
             IntVector2 screenPosition = GetScreenPosition();

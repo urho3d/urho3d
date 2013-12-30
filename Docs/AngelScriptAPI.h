@@ -7338,7 +7338,7 @@ Button okButton;
 Button cancelButton;
 };
 
-class Tooltip
+class ToolTip
 {
 // Methods:
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -7533,6 +7533,7 @@ String clipBoardText;
 float doubleClickInterval;
 float dragBeginInterval;
 int dragBeginDistance;
+float defaultToolTipDelay;
 int maxFontTextureSize;
 bool nonFocusedMouseWheel;
 bool useSystemClipBoard;
