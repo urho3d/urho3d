@@ -291,11 +291,14 @@
         <attribute name="Image Rect" value="224 32 240 48" />
     </element>
     <element type="EditorAttributeEdit" style="LineEdit" auto="false" />
-    <element type="ToolTipText">
-        <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
-        <attribute name="Font Size" value="8" />
-        <attribute name="Color" value="0 0 0" />
-        <attribute name="Is Selected" value="true" />
-        <attribute name="Selection Color" value="0.85 0.85 0.85 0.85" />
+    <element type="ToolTipBorderImage" style="BorderImage">
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Border" value="6 2 6 2" />
+        <attribute name="Image Rect" value="48 0 64 16" />
+        <attribute name="Border" value="6 2 2 2" />
+    </element>
+    <element type="ToolTipText" style="Text">
+        <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
+        <attribute name="Font Size" value="12" />
     </element>
 </elements>
