@@ -117,6 +117,7 @@ EVENT(E_VISIBLECHANGED, VisibleChanged)
 EVENT(E_FOCUSED, Focused)
 {
     PARAM(P_ELEMENT, Element);              // UIElement pointer
+    PARAM(P_BYKEY, ByKey);                  // bool
 }
 
 /// UI element defocused.

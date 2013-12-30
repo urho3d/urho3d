@@ -607,6 +607,11 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
 
 void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
 {
+    if (eventData[Focused::P_BYKEY].GetBool())
+    {
+        cursorPosition_ = line_.LengthUTF8();
+        text_->SetSelection(0);
+    }
     UpdateCursor();
 }
 
