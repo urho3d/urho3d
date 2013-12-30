@@ -249,8 +249,6 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         // Fallthru
 
     case KEY_LEFT:
-        if (!(qualifiers & QUAL_SHIFT))
-            text_->ClearSelection();
         if (cursorMovable_ && cursorPosition_ > 0)
         {
             if (textSelectable_ && qualifiers & QUAL_SHIFT && !text_->GetSelectionLength())
@@ -258,6 +256,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
 
             if (qualifiers & QUAL_CTRL)
                 cursorPosition_ = 0;
+            else if (text_->GetSelectionLength() && !(qualifiers & QUAL_SHIFT))
+                cursorPosition_ = text_->GetSelectionStart();
             else
                 --cursorPosition_;
             cursorMoved = true;
@@ -272,6 +272,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
                     text_->SetSelection(current, start - current);
             }
         }
+        if (!(qualifiers & QUAL_SHIFT))
+            text_->ClearSelection();
         break;
 
     case KEY_END:
@@ -279,8 +281,6 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         // Fallthru
 
     case KEY_RIGHT:
-        if (!(qualifiers & QUAL_SHIFT))
-            text_->ClearSelection();
         if (cursorMovable_ && cursorPosition_ < line_.LengthUTF8())
         {
             if (textSelectable_ && qualifiers & QUAL_SHIFT && !text_->GetSelectionLength())
@@ -288,6 +288,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
 
             if (qualifiers & QUAL_CTRL)
                 cursorPosition_ = line_.LengthUTF8();
+            else if (text_->GetSelectionLength() && !(qualifiers & QUAL_SHIFT))
+                cursorPosition_ = text_->GetSelectionStart() + text_->GetSelectionLength();
             else
                 ++cursorPosition_;
             cursorMoved = true;
@@ -302,6 +304,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
                     text_->SetSelection(current, start - current);
             }
         }
+        if (!(qualifiers & QUAL_SHIFT))
+            text_->ClearSelection();
         break;
 
     case KEY_DELETE:
