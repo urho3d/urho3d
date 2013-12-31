@@ -161,9 +161,9 @@ void PositionGizmo()
         lastGizmoMode = editMode;
     }
 
-    if (editMode != EDIT_SELECT && !gizmo.enabled)
+    if ((editMode != EDIT_SELECT && !orbiting) && !gizmo.enabled)
         ShowGizmo();
-    else if (editMode == EDIT_SELECT && gizmo.enabled)
+    else if ((editMode == EDIT_SELECT || orbiting) && gizmo.enabled)
         HideGizmo();
 }
 
