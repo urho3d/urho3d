@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
+#include "Pair.h"
 #include "PhysicsEvents.h"
 #include "PhysicsWorld.h"
 #include "Profiler.h"
@@ -181,7 +182,7 @@ void ScriptInstance::ApplyAttributes()
     idAttributes_.Clear();
     
     if (scriptObject_ && methods_[METHOD_APPLYATTRIBUTES])
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_APPLYATTRIBUTES]);
 }
 
 void ScriptInstance::OnSetEnabled()
@@ -249,7 +250,7 @@ bool ScriptInstance::Execute(const String& declaration, const VariantVector& par
         return false;
     
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
-    return scriptFile_->Execute(scriptObject_, method, parameters);
+    return scriptFile_->ExecuteScript(this, scriptObject_, method, parameters);
 }
 
 bool ScriptInstance::Execute(asIScriptFunction* method, const VariantVector& parameters)
@@ -257,7 +258,7 @@ bool ScriptInstance::Execute(asIScriptFunction* method, const VariantVector& par
     if (!method || !scriptObject_)
         return false;
     
-    return scriptFile_->Execute(scriptObject_, method, parameters);
+    return scriptFile_->ExecuteScript(this, scriptObject_, method, parameters);
 }
 
 void ScriptInstance::DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters)
@@ -293,28 +294,41 @@ void ScriptInstance::ClearDelayedExecute(const String& declaration)
     }
 }
 
-void ScriptInstance::AddEventHandler(StringHash eventType, const String& handlerName)
+void ScriptInstance::AddEventHandler(StringHash eventType, const String& handlerName, asIScriptObject* reciever)
 {
     if (!scriptObject_)
         return;
-    
+
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
-    asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
+    asIScriptFunction* method = scriptFile_->GetMethod(reciever ? reciever : scriptObject_, declaration);
     if (!method)
     {
         declaration = "void " + handlerName + "()";
-        method = scriptFile_->GetMethod(scriptObject_, declaration);
+        method = scriptFile_->GetMethod(reciever ? reciever : scriptObject_, declaration);
         if (!method)
         {
             LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
             return;
         }
     }
-    
-    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
+
+    asILockableSharedBool* ref = 0;
+
+    if (reciever)
+        ref = script_->GetScriptEngine()->GetWeakRefFlagOfScriptObject(reciever, reciever->GetObjectType());
+
+    if (ref)
+        ref->AddRef();
+
+    Vector<void*>* data = new Vector<void*>();
+    data->Push(ref);
+    data->Push(reciever);
+    data->Push(method);
+
+    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) data));
 }
 
-void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName)
+void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName, asIScriptObject* reciever)
 {
     if (!scriptObject_)
         return;
@@ -324,21 +338,34 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
         LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
         return;
     }
-    
+
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
-    asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
+    asIScriptFunction* method = scriptFile_->GetMethod(reciever ? reciever : scriptObject_, declaration);
     if (!method)
     {
         declaration = "void " + handlerName + "()";
-        method = scriptFile_->GetMethod(scriptObject_, declaration);
+        method = scriptFile_->GetMethod(reciever ? reciever : scriptObject_, declaration);
         if (!method)
         {
             LOGERROR("Event handler method " + handlerName + " not found in " + scriptFile_->GetName());
             return;
         }
     }
-    
-    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
+
+    asILockableSharedBool* ref = 0;
+
+    if (reciever)
+        ref = script_->GetScriptEngine()->GetWeakRefFlagOfScriptObject(reciever, reciever->GetObjectType());
+
+    if (ref)
+        ref->AddRef();
+
+    Vector<void*>* data = new Vector<void*>();
+    data->Push(ref);
+    data->Push(reciever);
+    data->Push(method);
+
+    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) data));
 }
 
 void ScriptInstance::SetScriptFileAttr(ResourceRef value)
@@ -377,7 +404,7 @@ void ScriptInstance::SetScriptDataAttr(PODVector<unsigned char> data)
         MemoryBuffer buf(data);
         VariantVector parameters;
         parameters.Push(Variant((void*)static_cast<Deserializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_LOAD], parameters);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_LOAD], parameters);
     }
 }
 
@@ -388,7 +415,7 @@ void ScriptInstance::SetScriptNetworkDataAttr(PODVector<unsigned char> data)
         MemoryBuffer buf(data);
         VariantVector parameters;
         parameters.Push(Variant((void*)static_cast<Deserializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_READNETWORKUPDATE], parameters);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_READNETWORKUPDATE], parameters);
     }
 }
 
@@ -426,7 +453,7 @@ PODVector<unsigned char> ScriptInstance::GetScriptDataAttr() const
         VectorBuffer buf;
         VariantVector parameters;
         parameters.Push(Variant((void*)static_cast<Serializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_SAVE], parameters);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_SAVE], parameters);
         return buf.GetBuffer();
     }
 }
@@ -440,7 +467,7 @@ PODVector<unsigned char> ScriptInstance::GetScriptNetworkDataAttr() const
         VectorBuffer buf;
         VariantVector parameters;
         parameters.Push(Variant((void*)static_cast<Serializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_WRITENETWORKUPDATE], parameters);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_WRITENETWORKUPDATE]);
         return buf.GetBuffer();
     }
 }
@@ -456,7 +483,7 @@ void ScriptInstance::OnMarkedDirty(Node* node)
     }
     
     if (scriptObject_ && methods_[METHOD_TRANSFORMCHANGED])
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_TRANSFORMCHANGED]);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_TRANSFORMCHANGED]);
 }
 
 void ScriptInstance::CreateObject()
@@ -469,15 +496,12 @@ void ScriptInstance::CreateObject()
     scriptObject_ = scriptFile_->CreateObject(className_);
     if (scriptObject_)
     {
-        // Map script object to script instance with userdata
-        scriptObject_->SetUserData(this);
-        
         GetScriptMethods();
         GetScriptAttributes();
         UpdateEventSubscription();
         
         if (methods_[METHOD_START])
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);
+            scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_START]);
     }
     else
         LOGERROR("Failed to create object of class " + className_ + " from " + scriptFile_->GetName());
@@ -488,7 +512,7 @@ void ScriptInstance::ReleaseObject()
     if (scriptObject_)
     {
         if (methods_[METHOD_STOP])
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_STOP]);
+            scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_STOP]);
         
         PODVector<StringHash> exceptions;
         exceptions.Push(E_RELOADSTARTED);
@@ -502,7 +526,6 @@ void ScriptInstance::ReleaseObject()
         ClearScriptMethods();
         ClearScriptAttributes();
         
-        scriptObject_->SetUserData(0);
         scriptObject_->Release();
         scriptObject_ = 0;
     }
@@ -718,7 +741,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     // Execute delayed start before first update
     if (methods_[METHOD_DELAYEDSTART])
     {
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_DELAYEDSTART]);
         methods_[METHOD_DELAYEDSTART] = 0;  // Only execute once
     }
     
@@ -726,7 +749,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     {
         VariantVector parameters;
         parameters.Push(timeStep);
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_UPDATE], parameters);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_UPDATE], parameters);
     }
 }
 
@@ -739,7 +762,7 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     
     VariantVector parameters;
     parameters.Push(eventData[P_TIMESTEP]);
-    scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
+    scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
 }
 
 void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
@@ -753,7 +776,7 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
     {
         VariantVector parameters;
         parameters.Push(eventData[P_TIMESTEP]);
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
     }
     else
     {
@@ -764,7 +787,7 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
             fixedUpdateAcc_ = fmodf(fixedUpdateAcc_, fixedUpdateInterval_);
             VariantVector parameters;
             parameters.Push(fixedUpdateInterval_);
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
+            scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
         }
     }
 }
@@ -780,7 +803,7 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
     {
         VariantVector parameters;
         parameters.Push(eventData[P_TIMESTEP]);
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
+        scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
     }
     else
     {
@@ -791,17 +814,28 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
             fixedPostUpdateAcc_ = fmodf(fixedPostUpdateAcc_, fixedUpdateInterval_);
             VariantVector parameters;
             parameters.Push(fixedUpdateInterval_);
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
+            scriptFile_->ExecuteScript(this, scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
         }
     }
 }
 
 void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 {
-    if (!IsEnabledEffective() || !scriptFile_ || !scriptObject_)
+    Vector<void*>* data = static_cast<Vector<void*>*>(GetEventHandler()->GetUserData());
+
+    asILockableSharedBool* ref = static_cast<asILockableSharedBool*>(data->At(0));
+    asIScriptObject* object = static_cast<asIScriptObject*>(data->At(1));
+    asIScriptFunction* method = static_cast<asIScriptFunction*>(data->At(2));
+
+    if (ref && ref->Get())
+    {
+        UnsubscribeFromEvent(eventType);
+        ref->Release();
         return;
-    
-    asIScriptFunction* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
+    }
+
+    if (!IsEnabledEffective() || !scriptFile_ || !object)
+        return;
     
     VariantVector parameters;
     if (method->GetParamCount() > 0)
@@ -810,7 +844,7 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
         parameters.Push(Variant((void*)&eventData));
     }
     
-    scriptFile_->Execute(scriptObject_, method, parameters);
+    scriptFile_->ExecuteScript(this, object, method, parameters);
 }
 
 void ScriptInstance::HandleScriptFileReload(StringHash eventType, VariantMap& eventData)
@@ -834,7 +868,7 @@ ScriptInstance* GetScriptContextInstance()
     asIScriptContext* context = asGetActiveContext();
     asIScriptObject* object = context ? static_cast<asIScriptObject*>(context->GetThisPointer()) : 0;
     if (object)
-        return static_cast<ScriptInstance*>(object->GetUserData());
+        return static_cast<ScriptInstance*>(context->GetUserData());
     else
         return 0;
 }
@@ -860,15 +894,10 @@ Scene* GetScriptContextScene()
 
 ScriptEventListener* GetScriptContextEventListener()
 {
-    // If context's this pointer is non-null, try to get the script instance. Else get the script file for procedural
-    // event handling
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        if (context->GetThisPointer())
-            return GetScriptContextInstance();
-        else
-            return GetScriptContextFile();
+        return static_cast<ScriptEventListener*>(context->GetUserData());
     }
     else
         return 0;

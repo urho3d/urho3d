@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Object.h"
+class asIScriptObject;
 
 namespace Urho3D
 {
@@ -48,10 +48,11 @@ class URHO3D_API ScriptEventListener
 public:
     /// Destruct
     virtual ~ScriptEventListener() {};
-    /// Add a scripted event handler. Called by script exposed version of SubscribeToEvent().
-    virtual void AddEventHandler(StringHash eventType, const String& handlerName) = 0;
-    /// Add a scripted event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) = 0;
+
+    /// Add an event handler. Called by script exposed version of SubscribeToEvent().
+    virtual void AddEventHandler(StringHash eventType, const String& handlerName, asIScriptObject* receiver = 0) = 0;
+    /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
+    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName, asIScriptObject* receiver = 0) = 0;
 };
 
 }

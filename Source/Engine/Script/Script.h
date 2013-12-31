@@ -54,6 +54,7 @@ class URHO3D_API Script : public Object
     OBJECT(Script);
 
     friend class ScriptFile;
+    friend class ScriptInstance;
 
 public:
     /// Construct.
