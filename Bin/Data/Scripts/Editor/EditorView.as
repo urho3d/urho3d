@@ -54,6 +54,7 @@ bool renderingDebug = false;
 bool physicsDebug = false;
 bool octreeDebug = false;
 int pickMode = PICK_GEOMETRIES;
+bool orbiting = false;
 
 bool showGrid = true;
 bool grid2DMode = false;
@@ -331,8 +332,8 @@ void UpdateView(float timeStep)
         }
     }
 
-    // Rotate camera
-    if (input.mouseButtonDown[MOUSEB_RIGHT])
+    // Rotate/orbit camera
+    if (input.mouseButtonDown[MOUSEB_RIGHT] || input.mouseButtonDown[MOUSEB_MIDDLE])
     {
         IntVector2 mouseMove = input.mouseMove;
         if (mouseMove.x != 0 || mouseMove.y != 0)
@@ -343,10 +344,20 @@ void UpdateView(float timeStep)
             if (limitRotation)
                 cameraPitch = Clamp(cameraPitch, -90.0, 90.0);
 
-            cameraNode.rotation = Quaternion(cameraPitch, cameraYaw, 0);
+            Quaternion q = Quaternion(cameraPitch, cameraYaw, 0);
+            cameraNode.rotation = q;
+            if (input.mouseButtonDown[MOUSEB_MIDDLE] && editNode !is null)
+            {
+                Vector3 d = cameraNode.worldPosition - editNode.worldPosition;
+                cameraNode.worldPosition = editNode.worldPosition - q * Vector3(0.0, 0.0, d.length);
+                orbiting = true;
+            }
+            
             FadeUI();
         }
     }
+    if (orbiting && !input.mouseButtonDown[MOUSEB_MIDDLE])
+        orbiting = false;
 
     // Move/rotate/scale object
     if (!editNodes.empty && editMode != EDIT_SELECT && ui.focusElement is null && input.keyDown[KEY_LCTRL])
@@ -469,7 +480,7 @@ void SteppedObjectManipulation(int key)
 void HandlePostRenderUpdate()
 {
     DebugRenderer@ debug = editorScene.debugRenderer;
-    if (debug is null)
+    if (debug is null || orbiting)
         return;
 
     // Visualize the currently selected nodes as their local axes + the first drawable component
