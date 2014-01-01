@@ -266,6 +266,12 @@ EVENT(E_FILESELECTED, FileSelected)
     PARAM(P_OK, Ok);                        // bool
 }
 
+/// MessageBox acknowlegement.
+EVENT(E_MESSAGEACK, MessageACK)
+{
+    PARAM(P_OK, Ok);                        // bool
+}
+
 /// A child element has been added to an element. Sent by the UI root element, or element-event-sender if set.
 EVENT(E_ELEMENTADDED, ElementAdded)
 {

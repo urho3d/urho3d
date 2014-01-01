@@ -854,7 +854,6 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
     uiFileSelector.path = initialPath;
     uiFileSelector.SetButtonTexts(ok, cancel);
     uiFileSelector.SetFilters(filters, initialFilter);
-    uiFileSelector.window.priority = 1000;    // Ensure when it is visible then it has the highest priority (in front of all others UI)
     CenterDialog(uiFileSelector.window);
 }
 

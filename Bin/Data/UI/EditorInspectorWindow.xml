@@ -17,9 +17,7 @@
             <attribute name="Name" value="CloseButton" />
         </element>
     </element>
-    <element>
+    <element style="Panel">
         <attribute name="Name" value="ParentContainer" />
-        <attribute name="Layout Mode" value="Vertical" />
-        <attribute name="Layout Spacing" value="4" />
     </element>
 </element>

@@ -210,6 +210,8 @@ bool SaveScene(const String&in fileName)
         sceneModified = false;
         UpdateWindowTitle();
     }
+    else
+        MessageBox("Could not save scene successfully!\nSee Urho3D.log for more detail.");
 
     return success;
 }
@@ -327,6 +329,8 @@ bool SaveNode(const String&in fileName)
     bool success = (extension != ".xml" ? editNode.Save(file) : editNode.SaveXML(file));
     if (success)
         instantiateFileName = fileName;
+    else
+        MessageBox("Could not save node successfully!\nSee Urho3D.log for more detail.");
 
     return success;
 }

@@ -1,0 +1,16 @@
+$#include "MessageBox.h"
+
+class MessageBox : public Object
+{
+    MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    virtual ~MessageBox();
+
+    void SetTitle(const String& text);
+    void SetMessage(const String& text);
+    
+    const String GetTitle() const;
+    const String GetMessage() const;
+       
+    tolua_property__get_set String& title;
+    tolua_property__get_set String& message;
+};

@@ -34,7 +34,6 @@ class LineEdit;
 class ListView;
 class ResourceCache;
 class Text;
-class UI;
 class UIElement;
 class Window;
 class XMLFile;
@@ -133,8 +132,6 @@ private:
     /// Handle cancel button pressed.
     void HandleCancelPressed(StringHash eventType, VariantMap& eventData);
 
-    /// UI subsystem.
-    SharedPtr<UI> ui_;
     /// Fileselector window.
     SharedPtr<Window> window_;
     /// Title layout.

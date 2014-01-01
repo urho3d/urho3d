@@ -117,12 +117,9 @@ FileSelector::FileSelector(Context* context) :
 
     // Focus the fileselector's filelist initially when created, and bring to front
     UI* ui = GetSubsystem<UI>();
-    if (ui)
-    {
-        ui->GetRoot()->AddChild(window_);
-        ui->SetFocusElement(fileList_);
-        window_->SetModal(true);
-    }
+    ui->GetRoot()->AddChild(window_);
+    ui->SetFocusElement(fileList_);
+    window_->SetModal(true);
 
     SubscribeToEvent(filterList_, E_ITEMSELECTED, HANDLER(FileSelector, HandleFilterChanged));
     SubscribeToEvent(pathEdit_, E_TEXTFINISHED, HANDLER(FileSelector, HandlePathChanged));

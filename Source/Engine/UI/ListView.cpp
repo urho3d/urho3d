@@ -143,7 +143,7 @@ public:
     {
         // Insert the overlay at the same index position to the overlay container
         CheckBox* overlay = static_cast<CheckBox*>(overlayContainer_->CreateChild(CheckBox::GetTypeStatic(), String::EMPTY, index));
-        overlay->SetStyle("ListViewHierarchyOverlay");
+        overlay->SetStyle("HierarchyListViewOverlay");
         int baseIndent = listView_->GetBaseIndent();
         int indent = element->GetIndent() - baseIndent - 1;
         overlay->SetIndent(indent);
@@ -692,7 +692,6 @@ void ListView::SetHierarchyMode(bool enable)
     container->SetInternal(true);
     SetContentElement(container);
     container->SetEnabled(true);
-    container->SetLayout(LM_VERTICAL);
     container->SetSortChildren(false);
 }
 

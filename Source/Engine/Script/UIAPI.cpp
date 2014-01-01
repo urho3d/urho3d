@@ -29,6 +29,7 @@
 #include "Font.h"
 #include "LineEdit.h"
 #include "ListView.h"
+#include "MessageBox.h"
 #include "ScrollBar.h"
 #include "Slider.h"
 #include "Sprite.h"
@@ -36,8 +37,10 @@
 #include "Text3D.h"
 #include "ToolTip.h"
 #include "UI.h"
-#include "Window.h"
 #include "View3D.h"
+#include "Window.h"
+
+#include "DebugNew.h"
 
 namespace Urho3D
 {
@@ -429,6 +432,24 @@ static void RegisterMenu(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Menu", "int get_acceleratorQualifiers() const", asMETHOD(Menu, GetAcceleratorQualifiers), asCALL_THISCALL);
 }
 
+static MessageBox* ConstructMessageBox(const String& messageString, const String& titleString, XMLFile* layoutFile, XMLFile* styleFile)
+{
+    SharedPtr<MessageBox> messageBox(new MessageBox(GetScriptContext(), messageString, titleString, layoutFile, styleFile));
+    if (messageBox)
+        messageBox->AddRef();
+    return messageBox.Get();
+}
+
+static void RegisterMessageBox(asIScriptEngine* engine)
+{
+    RegisterObject<MessageBox>(engine, "MessageBox");
+    engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_FACTORY, "MessageBox@+ f(const String&in messageString = String(), const String&in titleString = String(), XMLFile@+ layoutFile = null, XMLFile@+ styleFile = null)", asFUNCTION(ConstructMessageBox), asCALL_CDECL);
+    engine->RegisterObjectMethod("MessageBox", "void set_title(const String&in)", asMETHOD(MessageBox, SetTitle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const String& get_title() const", asMETHOD(MessageBox, GetTitle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "void set_message(const String&in)", asMETHOD(MessageBox, SetMessage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "const String& get_message() const", asMETHOD(MessageBox, GetMessage), asCALL_THISCALL);
+}
+
 static CScriptArray* DropDownListGetItems(DropDownList* ptr)
 {
     PODVector<UIElement*> result = ptr->GetItems();
@@ -648,6 +669,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterText3D(engine);
     RegisterLineEdit(engine);
     RegisterMenu(engine);
+    RegisterMessageBox(engine);
     RegisterDropDownList(engine);
     RegisterWindow(engine);
     RegisterView3D(engine);

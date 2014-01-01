@@ -216,6 +216,8 @@ bool SaveUILayout(const String&in fileName)
             SetUIElementModified(element, false);
         }
     }
+    if (!success)
+        MessageBox("Could not save UI layout successfully!\nSee Urho3D.log for more detail.");
 
     return success;
 }
@@ -304,6 +306,8 @@ bool SaveChildUIElement(const String&in fileName)
         if (success)
             editUIElement.vars[CHILD_ELEMENT_FILENAME_VAR] = fileName;
     }
+    if (!success)
+        MessageBox("Could not save child UI element successfully!\nSee Urho3D.log for more detail.");
 
     return success;
 }

@@ -339,7 +339,7 @@ bool UIElement::SaveXML(XMLElement& dest) const
     }
 
     // Write style
-    if (!appliedStyle_.Empty())
+    if (!appliedStyle_.Empty() && appliedStyle_ != "UIElement")
     {
         if (!dest.SetAttribute("style", appliedStyle_))
             return false;
@@ -367,10 +367,8 @@ bool UIElement::SaveXML(XMLElement& dest) const
     }
 
     // Filter UI-style and implicit attributes
-    //\todo Fail the serialization when encountered error in filtering, for now let it passes until the filtering process is stable and fully tested in the field
-//    if (!FilterAttributes(dest))
-//        return false;
-    FilterAttributes(dest);
+    if (!FilterAttributes(dest))
+        return false;
 
     return true;
 }
@@ -513,7 +511,7 @@ bool UIElement::FilterAttributes(XMLElement& dest) const
             if (styleXPathQuery_.SetVariable("typeName", style))
             {
                 XMLElement styleElem = GetDefaultStyle()->GetRoot().SelectSinglePrepared(styleXPathQuery_);
-                if (!styleElem || !FilterUIStyleAttributes(dest, styleElem))
+                if (styleElem && !FilterUIStyleAttributes(dest, styleElem))
                     return false;
             }
         }
@@ -1641,7 +1639,7 @@ bool UIElement::FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styl
     {
         if (!childElem.GetBool("internal"))
         {
-            LOGERROR("Invalid style style, style element can only contain internal child elements");
+            LOGERROR("Invalid style file, style element can only contain internal child elements");
             return false;
         }
         if (!FilterUIStyleAttributes(childDest, childElem))
@@ -1861,4 +1859,3 @@ void UIElement::VerifyChildAlignment()
 }
 
 }
-
