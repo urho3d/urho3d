@@ -448,7 +448,7 @@ static void RegisterMessageBox(asIScriptEngine* engine)
     engine->RegisterObjectMethod("MessageBox", "const String& get_title() const", asMETHOD(MessageBox, GetTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("MessageBox", "void set_message(const String&in)", asMETHOD(MessageBox, SetMessage), asCALL_THISCALL);
     engine->RegisterObjectMethod("MessageBox", "const String& get_message() const", asMETHOD(MessageBox, GetMessage), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MessageBox", "Window@+ get_window() const", asMETHOD(MessageBox, GetWindow), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MessageBox", "UIElement@+ get_window() const", asMETHOD(MessageBox, GetWindow), asCALL_THISCALL);
 }
 
 static CScriptArray* DropDownListGetItems(DropDownList* ptr)

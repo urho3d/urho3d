@@ -10,9 +10,9 @@ class MessageBox : public Object
 
     const String GetTitle() const;
     const String GetMessage() const;
-    Window* GetWindow() const;
+    UIElement* GetWindow() const;
 
     tolua_property__get_set String& title;
     tolua_property__get_set String& message;
-    tolua_readonly tolua_property__get_set Window* window;
+    tolua_readonly tolua_property__get_set UIElement* window;
 };
