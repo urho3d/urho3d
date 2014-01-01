@@ -164,8 +164,7 @@ if (NOT XCODE AND NOT MSVC)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${TARGET_NAME}> $<TARGET_FILE:${TARGET_NAME}>.engine
                 COMMAND echo CREATE $<TARGET_FILE:${TARGET_NAME}> >script.ar
-                COMMAND echo ADDLIB $<TARGET_FILE:${TARGET_NAME}>.engine >>script.ar
-                COMMENT "Preparing merge script")
+                COMMAND echo ADDLIB $<TARGET_FILE:${TARGET_NAME}>.engine >>script.ar)
             foreach (ARCHIVE ${ARCHIVES})
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND echo ADDLIB ${ARCHIVE} >>script.ar)
             endforeach ()
