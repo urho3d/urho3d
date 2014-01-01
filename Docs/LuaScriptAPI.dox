@@ -4335,11 +4335,13 @@ Methods:
 - void SetMessage(const String& text)
 - const String GetTitle() const
 - const String GetMessage() const
+- UIElement* GetWindow() const
 
 Properties:
 
 - String& title
 - String& message
+- UIElement* window (readonly)
 
 ### DropDownList : Menu
 

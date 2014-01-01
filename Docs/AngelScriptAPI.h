@@ -6785,6 +6785,8 @@ String typeName;
 String category;
 String title;
 String message;
+/* (readonly) */
+UIElement window;
 };
 
 class DropDownList

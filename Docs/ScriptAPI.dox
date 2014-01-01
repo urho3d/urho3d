@@ -5786,6 +5786,7 @@ Properties:
 - String category (readonly)
 - String title
 - String message
+- UIElement@ window (readonly)
 
 
 ### DropDownList
