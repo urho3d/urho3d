@@ -346,10 +346,11 @@ void UpdateView(float timeStep)
 
             Quaternion q = Quaternion(cameraPitch, cameraYaw, 0);
             cameraNode.rotation = q;
-            if (input.mouseButtonDown[MOUSEB_MIDDLE] && editNode !is null)
+            if (input.mouseButtonDown[MOUSEB_MIDDLE] && (selectedNodes.length > 0 || selectedComponents.length > 0))
             {
-                Vector3 d = cameraNode.worldPosition - editNode.worldPosition;
-                cameraNode.worldPosition = editNode.worldPosition - q * Vector3(0.0, 0.0, d.length);
+                Vector3 centerPoint = SelectedNodesCenterPoint();
+                Vector3 d = cameraNode.worldPosition - centerPoint;
+                cameraNode.worldPosition = centerPoint - q * Vector3(0.0, 0.0, d.length);
                 orbiting = true;
             }
             
@@ -693,4 +694,27 @@ bool StopTestAnimation()
 {
     testAnimState = null;
     return true;
+}
+
+Vector3 SelectedNodesCenterPoint()
+{
+    Vector3 centerPoint;
+    uint count = selectedNodes.length;
+    for (uint i = 0; i < selectedNodes.length; ++i)
+        centerPoint += selectedNodes[i].worldPosition;
+
+    for (uint i = 0; i < selectedComponents.length; ++i)
+    {
+        Drawable@ drawable = cast<Drawable>(selectedComponents[i]);
+        if (drawable !is null)
+        {
+            centerPoint += drawable.node.LocalToWorld(drawable.boundingBox.center);
+            count++;
+        }
+    }
+
+    if (count > 0)
+        return centerPoint / count;
+    else
+        return centerPoint;
 }
