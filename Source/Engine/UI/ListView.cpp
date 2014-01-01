@@ -803,7 +803,7 @@ unsigned ListView::FindItem(UIElement* item) const
     const Vector<SharedPtr<UIElement> >& children = contentElement_->GetChildren();
 
     // Binary search for list item based on screen coordinate Y
-    if (item->GetHeight())
+    if (contentElement_->GetLayoutMode() == LM_VERTICAL && item->GetHeight())
     {
         int itemY = item->GetScreenPosition().y_;
         int left = 0;
