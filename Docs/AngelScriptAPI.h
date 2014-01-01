@@ -1784,7 +1784,7 @@ void Roll(float, bool = false);
 void LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ));
 void Scale(float);
 void Scale(const Vector3&);
-Node CreateChild(const String& = "", CreateMode = REPLICATED, uint = 0);
+Node CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0);
 void AddChild(Node);
 void RemoveChild(Node);
 void RemoveAllChildren();
@@ -1959,7 +1959,7 @@ void Roll(float, bool = false);
 void LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ));
 void Scale(float);
 void Scale(const Vector3&);
-Node CreateChild(const String& = "", CreateMode = REPLICATED, uint = 0);
+Node CreateChild(const String& = String ( ), CreateMode = REPLICATED, uint = 0);
 void AddChild(Node);
 void RemoveChild(Node);
 void RemoveAllChildren();
@@ -6763,6 +6763,28 @@ bool showPopup;
 int acceleratorKey;
 /* (readonly) */
 int acceleratorQualifiers;
+};
+
+class MessageBox
+{
+// Methods:
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* (readonly) */
+int refs;
+/* (readonly) */
+int weakRefs;
+/* (readonly) */
+ShortStringHash type;
+/* (readonly) */
+ShortStringHash baseType;
+/* (readonly) */
+String typeName;
+/* (readonly) */
+String category;
+String title;
+String message;
 };
 
 class DropDownList
