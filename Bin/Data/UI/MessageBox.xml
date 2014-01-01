@@ -13,7 +13,7 @@
 		<attribute name="Layout Mode" value="Horizontal" />
 		<element type="Text">
 			<attribute name="Name" value="TitleText" />
-            <attribute name="Text" value="Urho3D" />
+			<attribute name="Text" value="Urho3D" />
 		</element>
 		<element type="Button" style="CloseButton">
 			<attribute name="Name" value="CloseButton" />

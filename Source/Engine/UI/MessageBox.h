@@ -54,6 +54,8 @@ public:
     const String& GetTitle() const;
     /// Return message text. Return empty string if there is no message text element.
     const String& GetMessage() const;
+    /// Return dialog window.
+    Window* GetWindow() const { return window_; }
 
 private:
     /// Handle events that dismiss the message box.

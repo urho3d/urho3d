@@ -7,10 +7,12 @@ class MessageBox : public Object
 
     void SetTitle(const String& text);
     void SetMessage(const String& text);
-    
+
     const String GetTitle() const;
     const String GetMessage() const;
-       
+    Window* GetWindow() const;
+
     tolua_property__get_set String& title;
     tolua_property__get_set String& message;
+    tolua_readonly tolua_property__get_set Window* window;
 };
