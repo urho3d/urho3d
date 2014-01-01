@@ -124,6 +124,8 @@ private:
     HashMap<asIObjectType*, HashMap<String, asIScriptFunction*> > methods_;
     /// Delayed function calls.
     Vector<DelayedCall> delayedCalls_;
+    /// ScriptEventData objects that this ScriptFile is subscribed with.
+    Vector< SharedPtr<ScriptEventData> > scriptEventData_;
 };
 
 /// Get currently executing script file.

@@ -191,6 +191,8 @@ private:
     bool subscribed_;
     /// Subscribed to scene post and fixed update events flag.
     bool subscribedPostFixed_;
+    /// ScriptEventData objects that this Instance is subscribed with.
+    Vector< SharedPtr<ScriptEventData> > scriptEventData_;
 };
 
 /// Return the Urho3D context of the active script context.

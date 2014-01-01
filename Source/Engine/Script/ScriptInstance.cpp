@@ -312,20 +312,9 @@ void ScriptInstance::AddEventHandler(StringHash eventType, const String& handler
         }
     }
 
-    asILockableSharedBool* ref = 0;
-
-    if (reciever)
-        ref = script_->GetScriptEngine()->GetWeakRefFlagOfScriptObject(reciever, reciever->GetObjectType());
-
-    if (ref)
-        ref->AddRef();
-
-    Vector<void*>* data = new Vector<void*>();
-    data->Push(ref);
-    data->Push(reciever);
-    data->Push(method);
-
-    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) data));
+    SharedPtr<ScriptEventData> data(new ScriptEventData(method, reciever ? reciever : scriptObject_));
+    scriptEventData_.Push(data);
+    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, data.Get()));
 }
 
 void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName, asIScriptObject* reciever)
@@ -352,20 +341,9 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
         }
     }
 
-    asILockableSharedBool* ref = 0;
-
-    if (reciever)
-        ref = script_->GetScriptEngine()->GetWeakRefFlagOfScriptObject(reciever, reciever->GetObjectType());
-
-    if (ref)
-        ref->AddRef();
-
-    Vector<void*>* data = new Vector<void*>();
-    data->Push(ref);
-    data->Push(reciever);
-    data->Push(method);
-
-    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*) data));
+    SharedPtr<ScriptEventData> data(new ScriptEventData(method, reciever ? reciever : scriptObject_));
+    scriptEventData_.Push(data);
+    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, data.Get()));
 }
 
 void ScriptInstance::SetScriptFileAttr(ResourceRef value)
@@ -518,6 +496,9 @@ void ScriptInstance::ReleaseObject()
         exceptions.Push(E_RELOADSTARTED);
         exceptions.Push(E_RELOADFINISHED);
         UnsubscribeFromAllEventsExcept(exceptions, false);
+
+        scriptEventData_.Clear();
+
         if (node_)
             node_->RemoveListener(this);
         subscribed_ = false;
@@ -821,16 +802,15 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
 
 void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 {
-    Vector<void*>* data = static_cast<Vector<void*>*>(GetEventHandler()->GetUserData());
+    ScriptEventData* data = static_cast<ScriptEventData*>(GetEventHandler()->GetUserData());
 
-    asILockableSharedBool* ref = static_cast<asILockableSharedBool*>(data->At(0));
-    asIScriptObject* object = static_cast<asIScriptObject*>(data->At(1));
-    asIScriptFunction* method = static_cast<asIScriptFunction*>(data->At(2));
+    asIScriptObject* object = data->GetObject();
+    asIScriptFunction* method = data->GetFunction();
 
-    if (ref && ref->Get())
+    if (object && !data->IsObjectAlive())
     {
+        scriptEventData_.Remove(SharedPtr<ScriptEventData>(data));
         UnsubscribeFromEvent(eventType);
-        ref->Release();
         return;
     }
 

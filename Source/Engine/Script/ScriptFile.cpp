@@ -191,20 +191,9 @@ void ScriptFile::AddEventHandler(StringHash eventType, const String& handlerName
         }
     }
 
-    asILockableSharedBool* ref = 0;
-
-    if (reciever)
-        ref = script_->GetScriptEngine()->GetWeakRefFlagOfScriptObject(reciever, reciever->GetObjectType());
-
-    if (ref)
-        ref->AddRef();
-
-    Vector<void*>* data = new Vector<void*>();
-    data->Push(ref);
-    data->Push(reciever);
-    data->Push(function);
-
-    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, (void*) data));
+    SharedPtr<ScriptEventData> data(new ScriptEventData(function, reciever));
+    scriptEventData_.Push(data);
+    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, data.Get()));
 }
 
 void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName, asIScriptObject* reciever)
@@ -242,20 +231,9 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const Str
         }
     }
 
-    asILockableSharedBool* ref = 0;
-
-    if (reciever)
-        ref = script_->GetScriptEngine()->GetWeakRefFlagOfScriptObject(reciever,reciever->GetObjectType());
-
-    if (ref)
-        ref->AddRef();
-
-    Vector<void*>* data = new Vector<void*>();
-    data->Push(ref);
-    data->Push(reciever);
-    data->Push(function);
-
-    SubscribeToEvent(sender,eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, (void*)data));
+    SharedPtr<ScriptEventData> data(new ScriptEventData(function, reciever));
+    scriptEventData_.Push(data);
+    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, data.Get()));
 }
 
 bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, bool unprepare)
@@ -699,6 +677,8 @@ void ScriptFile::ReleaseModule()
         methods_.Clear();
         delayedCalls_.Clear();
         UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
+
+        scriptEventData_.Clear();
         
         asIScriptEngine* engine = script_->GetScriptEngine();
         engine->DiscardModule(GetName().CString());
@@ -717,21 +697,20 @@ void ScriptFile::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
     if (!compiled_)
         return;
 
-    Vector<void*>* data = static_cast<Vector<void*>*>(GetEventHandler()->GetUserData());
+    ScriptEventData* data = static_cast<ScriptEventData*>(GetEventHandler()->GetUserData());
 
-    asILockableSharedBool* ref = static_cast<asILockableSharedBool*>(data->At(0));
-    asIScriptObject* object = static_cast<asIScriptObject*>(data->At(1));
-    asIScriptFunction* function = static_cast<asIScriptFunction*>(data->At(2));
+    asIScriptObject* object = data->GetObject();
+    asIScriptFunction* method = data->GetFunction();
 
-    if (ref && ref->Get())
+    if (object && !data->IsObjectAlive())
     {
+        scriptEventData_.Remove(SharedPtr<ScriptEventData>(data));
         UnsubscribeFromEvent(eventType);
-        ref->Release();
         return;
     }
 
     VariantVector parameters;
-    if (function->GetParamCount() > 0)
+    if (method->GetParamCount() > 0)
     {
         parameters.Push(Variant((void*)&eventType));
         parameters.Push(Variant((void*)&eventData));
@@ -739,11 +718,11 @@ void ScriptFile::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
     
     if (object)
     {
-        Execute(object,function, parameters);
+        Execute(object, method, parameters);
     }
     else
     {
-        Execute(function, parameters);
+        Execute(method, parameters);
     }
 }
 
