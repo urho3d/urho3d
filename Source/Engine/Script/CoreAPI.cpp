@@ -674,35 +674,35 @@ static void SubscribeToSenderEvent(Object* sender, const String& eventType, cons
 
 static void UnsubscribeFromEvent(const String& eventType)
 {
-    Object* listener = GetScriptContextEventListenerObject();
+    ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
-        listener->UnsubscribeFromEvent(eventType);
+        listener->RemoveEventHandler(eventType);
 }
 
 static void UnsubscribeFromSenderEvent(Object* sender, const String& eventType)
 {
-    Object* listener = GetScriptContextEventListenerObject();
+    ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
-        listener->UnsubscribeFromEvent(sender, eventType);
+        listener->RemoveEventHandler(sender, eventType);
 }
 
 static void UnsubscribeFromSenderEvents(Object* sender)
 {
-    Object* listener = GetScriptContextEventListenerObject();
+    ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
-        listener->UnsubscribeFromEvents(sender);
+        listener->RemoveEventHandlers(sender);
 }
 
 static void UnsubscribeFromAllEvents()
 {
-    Object* listener = GetScriptContextEventListenerObject();
+    ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
-        listener->UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
+        listener->RemoveEventHandlers();
 }
 
 static void UnsubscribeFromAllEventsExcept(CScriptArray* exceptions)
 {
-    Object* listener = GetScriptContextEventListenerObject();
+    ScriptEventListener* listener = GetScriptContextEventListener();
     if (!listener || !exceptions)
         return;
 
@@ -711,7 +711,7 @@ static void UnsubscribeFromAllEventsExcept(CScriptArray* exceptions)
     for (unsigned i = 0; i < numExceptions; ++i)
         destExceptions[i] = StringHash(*(static_cast<String*>(exceptions->At(i))));
 
-    listener->UnsubscribeFromAllEventsExcept(destExceptions, true);
+    listener->RemoveEventHandlersExcept(destExceptions);
 }
 
 static Object* GetEventSender()

@@ -341,6 +341,31 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
     SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
 }
 
+void ScriptInstance::RemoveEventHandler(StringHash eventType)
+{
+    UnsubscribeFromEvent(eventType);
+}
+
+void ScriptInstance::RemoveEventHandler(Object* sender, StringHash eventType)
+{
+    UnsubscribeFromEvent(sender, eventType);
+}
+
+void ScriptInstance::RemoveEventHandlers(Object* sender)
+{
+    UnsubscribeFromEvents(sender);
+}
+
+void ScriptInstance::RemoveEventHandlers()
+{
+    UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
+}
+
+void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions)
+{
+    UnsubscribeFromAllEventsExcept(exceptions, true);
+}
+
 void ScriptInstance::SetScriptFileAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();

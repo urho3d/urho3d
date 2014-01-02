@@ -97,6 +97,8 @@ public:
     bool HasSubscribedToEvent(StringHash eventType) const;
     /// Return whether has subscribed to a specific sender's event.
     bool HasSubscribedToEvent(Object* sender, StringHash eventType) const;
+    /// Return whether has subscribed to any event.
+    bool HasEventHandlers() const { return !eventHandlers_.Empty(); }
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.

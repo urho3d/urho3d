@@ -77,11 +77,21 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
 
-    /// Add an event handler. Called by script exposed version of SubscribeToEvent().
+    /// Add a scripted event handler.
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
-    /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
+    /// Add a scripted event handler for a specific sender.
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
-    
+    /// Remove a scripted event handler.
+    virtual void RemoveEventHandler(StringHash eventType);
+    /// Remove a scripted event handler for a specific sender.
+    virtual void RemoveEventHandler(Object* sender, StringHash eventType);
+    /// Remove all scripted event handlers for a specific sender.
+    virtual void RemoveEventHandlers(Object* sender);
+    /// Remove all scripted event handlers.
+    virtual void RemoveEventHandlers();
+    /// Remove all scripted event handlers, except those listed.
+    virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions);
+
     /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
     /// Set script file only. Recreate object if necessary.

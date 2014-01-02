@@ -46,40 +46,27 @@ struct DelayedCall
     VariantVector parameters_;
 };
 
-/// Interface class for event listeners that forward events to script.
+/// Interface class for allowing script objects or functions to subscribe to events.
 class URHO3D_API ScriptEventListener
 {
 public:
     /// Destruct
     virtual ~ScriptEventListener() {};
 
-    /// Add a scripted event handler. Called by script exposed version of SubscribeToEvent().
+    /// Add a scripted event handler.
     virtual void AddEventHandler(StringHash eventType, const String& handlerName) = 0;
-    /// Add a scripted event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
+    /// Add a scripted event handler for a specific sender.
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) = 0;
-};
-
-/// Holds the data required to send events to scripts.
-class URHO3D_API ScriptEventData : public RefCounted
-{
-public:
-    /// Constructor, will create the asILockableSharedBool if a ScriptObject is passed in.
-    ScriptEventData(asIScriptFunction* function, asIScriptObject* object = 0);
-    /// Destructor, release the ref it we still hold it.
-    ~ScriptEventData();
-
-    /// Get the asIScriptFunction to call.
-    asIScriptFunction* GetFunction() const { return function_; }
-    /// Get the asIScriptObject to call the method on, can be null.
-    asIScriptObject* GetObject() const { return object_; }
-
-    /// Returns whether a ScriptObject is still alive. Will return true if there is no reference and object.
-    bool IsObjectAlive() const;
-
-private:
-    asILockableSharedBool* sharedbool_;
-    asIScriptFunction* function_;
-    asIScriptObject* object_;
+    /// Remove a scripted event handler.
+    virtual void RemoveEventHandler(StringHash eventType) = 0;
+    /// Remove a scripted event handler for a specific sender.
+    virtual void RemoveEventHandler(Object* sender, StringHash eventType) = 0;
+    /// Remove all scripted event handlers for a specific sender.
+    virtual void RemoveEventHandlers(Object* sender) = 0;
+    /// Remove all scripted event handlers.
+    virtual void RemoveEventHandlers() = 0;
+    /// Remove all scripted event handlers, except those listed.
+    virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) = 0;
 };
 
 }
