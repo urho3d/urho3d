@@ -234,9 +234,4 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
         group->Erase(receiver);
 }
 
-void Context::EndSendEvent()
-{
-    eventSenders_.Pop();
-}
-
 }

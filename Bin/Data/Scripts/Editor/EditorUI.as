@@ -6,6 +6,7 @@ UIElement@ uiMenuBar;
 UIElement@ quickMenu;
 Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
+MessageBox@ uiMessageBox;
 
 const ShortStringHash UI_ELEMENT_TYPE("UIElement");
 const ShortStringHash WINDOW_TYPE("Window");
@@ -136,6 +137,7 @@ void CreateCursor()
 // AngelScript does not support closures (yet), but funcdef should do just fine as a workaround for a few cases here for now
 funcdef bool MENU_CALLBACK();
 Array<MENU_CALLBACK@> menuCallbacks;
+MENU_CALLBACK@ messageBoxCallback;
 
 void HandleQuickSearchChange(StringHash eventType, VariantMap& eventData)
 {
@@ -421,6 +423,40 @@ void CreateMenuBar()
 
 bool Exit()
 {
+    ui.cursor.shape = CS_BUSY;
+
+    if (messageBoxCallback is null)
+    {
+        String message;
+        if (sceneModified)
+            message = "Scene has been modified.\n";
+
+        bool uiLayoutModified = false;
+        for (uint i = 0; i < editorUIElement.numChildren; ++i)
+        {
+            UIElement@ element = editorUIElement.children[i];
+            if (element !is null && element.vars[MODIFIED_VAR].GetBool())
+            {
+                uiLayoutModified = true;
+                message += "UI layout has been modified.\n";
+                break;
+            }
+        }
+
+        if (sceneModified || uiLayoutModified)
+        {
+            uiMessageBox = MessageBox(message + "Continue to exit?", "Warning");
+            Button@ cancelButton = uiMessageBox.window.GetChild("CancelButton", true);
+            cancelButton.visible = true;
+            cancelButton.focus = true;
+            SubscribeToEvent(uiMessageBox, "MessageACK", "HandleMessageAcknowledgement");
+            messageBoxCallback = @Exit;
+            return false;
+        }
+    }
+    else
+        messageBoxCallback = null;
+
     engine.Exit();
     return true;
 }
@@ -1295,4 +1331,13 @@ void UpdateDirtyUI()
     // Perform some event-triggered updates latently in case a large hierarchy was changed
     if (attributesFullDirty || attributesDirty)
         UpdateAttributeInspector(attributesFullDirty);
+}
+
+void HandleMessageAcknowledgement(StringHash eventType, VariantMap& eventData)
+{
+    uiMessageBox = null;
+    if (eventData["Ok"].GetBool())
+        messageBoxCallback();
+    else
+        messageBoxCallback = null;
 }

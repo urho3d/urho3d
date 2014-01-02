@@ -48,6 +48,16 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     UI* ui = GetSubsystem<UI>();
     window_ = ui->LoadLayout(layoutFile, styleFile);
     ui->GetRoot()->AddChild(window_);
+
+    // Set the title and message strings if they are given
+    titleText_ = dynamic_cast<Text*>(window_->GetChild("TitleText", true));
+    if (titleText_ && !titleString.Empty())
+        titleText_->SetText(titleString);
+    messageText_ = dynamic_cast<Text*>(window_->GetChild("MessageText", true));
+    if (messageText_ && !messageString.Empty())
+        messageText_->SetText(messageString);
+
+    // Center window after the message is set
     Window* window = dynamic_cast<Window*>(window_.Get());
     if (window)
     {
@@ -59,14 +69,6 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
         }
         window->SetModal(true);
     }
-
-    // Set the title and message strings if they are given
-    titleText_ = dynamic_cast<Text*>(window_->GetChild("TitleText", true));
-    if (titleText_ && !titleString.Empty())
-        titleText_->SetText(titleString);
-    messageText_ = dynamic_cast<Text*>(window_->GetChild("MessageText", true));
-    if (messageText_ && !messageString.Empty())
-        messageText_->SetText(messageString);
 
     // Bind the buttons (if any in the loaded UI layout) to event handlers
     okButton_ = dynamic_cast<Button*>(window_->GetChild("OkButton", true));

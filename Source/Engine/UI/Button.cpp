@@ -24,6 +24,7 @@
 #include "Button.h"
 #include "Context.h"
 #include "InputEvents.h"
+#include "UI.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
@@ -43,6 +44,7 @@ Button::Button(Context* context) :
     pressed_(false)
 {
     enabled_ = true;
+    focusMode_ = FM_FOCUSABLE;
 }
 
 Button::~Button()
@@ -127,6 +129,17 @@ void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
 void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     SetPressed(true);
+}
+
+void Button::OnKey(int key, int buttons, int qualifiers)
+{
+    UI* ui = GetSubsystem<UI>();
+    if (ui->GetFocusElement() == this && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
+    {
+        // Simulate LMB
+        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0);
+        OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0, 0);
+    }
 }
 
 void Button::SetPressedOffset(const IntVector2& offset)

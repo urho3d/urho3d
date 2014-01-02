@@ -2,18 +2,18 @@
 <element type="Window" style="DialogWindow">
 	<attribute name="Name" value="MessageBox" />
 	<attribute name="Position" value="500 500" />
-	<attribute name="Min Size" value="400 83" />
+	<attribute name="Size" value="400 83" />
 	<attribute name="Layout Mode" value="Vertical" />
 	<attribute name="Layout Spacing" value="4" />
 	<attribute name="Layout Border" value="6 6 6 6" />
 	<attribute name="Resize Border" value="6 6 6 6" />
 	<element>
-		<attribute name="Min Size" value="0 16" />
+		<attribute name="Min Size" value="64 16" />
 		<attribute name="Max Size" value="2147483647 16" />
 		<attribute name="Layout Mode" value="Horizontal" />
 		<element type="Text">
 			<attribute name="Name" value="TitleText" />
-			<attribute name="Text" value="Urho3D" />
+			<attribute name="Text" value="Error" />
 		</element>
 		<element type="Button" style="CloseButton">
 			<attribute name="Name" value="CloseButton" />
@@ -30,10 +30,23 @@
 		</element>
 	</element>
 	<element>
-		<attribute name="Min Size" value="0 17" />
+		<attribute name="Min Size" value="74 17" />
 		<attribute name="Max Size" value="2147483647 17" />
 		<attribute name="Layout Mode" value="Horizontal" />
+		<attribute name="Layout Spacing" value="4" />
 		<element />
+		<element type="Button">
+			<attribute name="Name" value="CancelButton" />
+			<attribute name="Min Size" value="70 17" />
+			<attribute name="Max Size" value="70 17" />
+			<attribute name="Is Visible" value="false" />
+			<attribute name="Layout Mode" value="Horizontal" />
+			<attribute name="Layout Border" value="1 1 1 1" />
+			<element type="Text">
+				<attribute name="Text" value="Cancel" />
+				<attribute name="Text Alignment" value="Center" />
+			</element>
+		</element>
 		<element type="Button">
 			<attribute name="Name" value="OkButton" />
 			<attribute name="Min Size" value="70 17" />

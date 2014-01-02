@@ -145,7 +145,7 @@ private:
     /// Begin event send.
     void BeginSendEvent(Object* sender) { eventSenders_.Push(sender); }
     /// End event send. Clean up event receivers removed in the meanwhile.
-    void EndSendEvent();
+    void EndSendEvent() { eventSenders_.Pop(); }
 
     /// Object factories.
     HashMap<ShortStringHash, SharedPtr<ObjectFactory> > factories_;
