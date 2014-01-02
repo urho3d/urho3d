@@ -658,18 +658,18 @@ static void SendEvent(const String& eventType, VariantMap& eventData)
         sender->SendEvent(eventType, eventData);
 }
 
-static void SubscribeToEvent(const String& eventType, const String& handlerName)
+static void SubscribeToEvent(const String& eventType, const String& handlerName, asIScriptObject* reciever)
 {
     ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
-        listener->AddEventHandler(eventType, handlerName);
+        listener->AddEventHandler(eventType, handlerName, reciever);
 }
 
-static void SubscribeToSenderEvent(Object* sender, const String& eventType, const String& handlerName)
+static void SubscribeToSenderEvent(Object* sender, const String& eventType, const String& handlerName, asIScriptObject* reciever)
 {
     ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
-        listener->AddEventHandler(sender, eventType, handlerName);
+        listener->AddEventHandler(sender, eventType, handlerName, reciever);
 }
 
 static void UnsubscribeFromEvent(const String& eventType)
@@ -746,6 +746,8 @@ static void DestructWeakHandle(WeakPtr<RefCounted>* ptr)
 
 void RegisterObject(asIScriptEngine* engine)
 {
+    engine->RegisterInterface("ScriptObject");
+
     engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructAttributeInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f(const AttributeInfo&in)", asFUNCTION(ConstructAttributeInfoCopy), asCALL_CDECL_OBJLAST);
@@ -761,8 +763,8 @@ void RegisterObject(asIScriptEngine* engine)
     RegisterObject<Object>(engine, "Object");
 
     engine->RegisterGlobalFunction("void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(SendEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SubscribeToEvent(const String&in, const String&in)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SubscribeToEvent(Object@+, const String&in, const String&in)", asFUNCTION(SubscribeToSenderEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SubscribeToEvent(const String&in, const String&in, ScriptObject@+ = null)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SubscribeToEvent(Object@+, const String&in, const String&in, ScriptObject@+ = null)", asFUNCTION(SubscribeToSenderEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromEvent(const String&in)", asFUNCTION(UnsubscribeFromEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromEvent(Object@+, const String&in)", asFUNCTION(UnsubscribeFromSenderEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);

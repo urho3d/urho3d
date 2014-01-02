@@ -135,8 +135,6 @@ bool ScriptFile::Load(Deserializer& source)
         {
             LOGINFO("Loaded script module " + GetName() + " from bytecode");
             compiled_ = true;
-            // Map script module to script resource with userdata
-            scriptModule_->SetUserData(this);
             
             return true;
         }
@@ -160,34 +158,45 @@ bool ScriptFile::Load(Deserializer& source)
     
     LOGINFO("Compiled script module " + GetName());
     compiled_ = true;
-    // Map script module to script resource with userdata
-    scriptModule_->SetUserData(this);
     
     return true;
 }
 
-void ScriptFile::AddEventHandler(StringHash eventType, const String& handlerName)
+void ScriptFile::AddEventHandler(StringHash eventType, const String& handlerName, asIScriptObject* reciever)
 {
     if (!compiled_)
         return;
     
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
-    asIScriptFunction* function = GetFunction(declaration);
+    asIScriptFunction* function = 0;
+
+    if (reciever)
+        function = GetMethod(reciever, declaration);
+    else
+        function = GetFunction(declaration);
+
     if (!function)
     {
         declaration = "void " + handlerName + "()";
-        function = GetFunction(declaration);
+
+        if (reciever)
+            function = GetMethod(reciever, declaration);
+        else
+            function = GetFunction(declaration);
+
         if (!function)
         {
             LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
             return;
         }
     }
-    
-    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, (void*)function));
+
+    SharedPtr<ScriptEventData> data(new ScriptEventData(function, reciever));
+    scriptEventData_.Push(data);
+    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, data.Get()));
 }
 
-void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName)
+void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName, asIScriptObject* reciever)
 {
     if (!compiled_)
         return;
@@ -199,19 +208,32 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const Str
     }
     
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
-    asIScriptFunction* function = GetFunction(declaration);
+    asIScriptFunction* function = 0;
+
+    if (reciever)
+        function = GetMethod(reciever, declaration);
+    else
+        function = GetFunction(declaration);
+
     if (!function)
     {
         declaration = "void " + handlerName + "()";
-        function = GetFunction(declaration);
+
+        if (reciever)
+            function = GetMethod(reciever, declaration);
+        else
+            function = GetFunction(declaration);
+
         if (!function)
         {
             LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
             return;
         }
     }
-    
-    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, (void*)function));
+
+    SharedPtr<ScriptEventData> data(new ScriptEventData(function, reciever));
+    scriptEventData_.Push(data);
+    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, data.Get()));
 }
 
 bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, bool unprepare)
@@ -228,28 +250,11 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
 
 bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
 {
-    PROFILE(ExecuteFunction);
-    
     if (!compiled_ || !function)
         return false;
+
     
-    // It is possible that executing the function causes us to unload. Therefore do not rely on member variables
-    // However, we are not prepared for the whole script system getting destroyed during execution (should never happen)
-    Script* scriptSystem = script_;
-    
-    asIScriptContext* context = scriptSystem->GetScriptFileContext();
-    if (context->Prepare(function) < 0)
-        return false;
-    
-    SetParameters(context, function, parameters);
-    
-    scriptSystem->IncScriptNestingLevel();
-    bool success = context->Execute() >= 0;
-    if (unprepare)
-        context->Unprepare();
-    scriptSystem->DecScriptNestingLevel();
-    
-    return success;
+    return ExecuteScript(this, function, parameters, unprepare);
 }
 
 bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters, bool unprepare)
@@ -266,29 +271,10 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
 
 bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
 {
-    PROFILE(ExecuteMethod);
-    
     if (!compiled_ || !object || !method)
         return false;
     
-    // It is possible that executing the method causes us to unload. Therefore do not rely on member variables
-    // However, we are not prepared for the whole script system getting destroyed during execution (should never happen)
-    Script* scriptSystem = script_;
-    
-    asIScriptContext* context = scriptSystem->GetScriptFileContext();
-    if (context->Prepare(method) < 0)
-        return false;
-    
-    context->SetObject(object);
-    SetParameters(context, method, parameters);
-    
-    scriptSystem->IncScriptNestingLevel();
-    bool success = context->Execute() >= 0;
-    if (unprepare)
-        context->Unprepare();
-    scriptSystem->DecScriptNestingLevel();
-    
-    return success;
+    return ExecuteScript(this, object, method, parameters, unprepare);
 }
 
 void ScriptFile::DelayedExecute(float delay, bool repeat, const String& declaration, const VariantVector& parameters)
@@ -419,6 +405,63 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
     asIScriptFunction* function = type->GetMethodByDecl(declaration.CString());
     methods_[type][declaration] = function;
     return function;
+}
+
+bool ScriptFile::ExecuteScript(const ScriptEventListener* listener, asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
+{
+    PROFILE(ExecuteFunction);
+
+    if (!compiled_ || !function)
+        return false;
+
+    // It is possible that executing the function causes us to unload. Therefore do not rely on member variables
+    // However, we are not prepared for the whole script system getting destroyed during execution (should never happen)
+    Script* scriptSystem = script_;
+
+    asIScriptContext* context = scriptSystem->GetScriptFileContext();
+    context->SetUserData((void*) listener);
+
+    if (context->Prepare(function) < 0)
+        return false;
+
+    SetParameters(context, function, parameters);
+
+    scriptSystem->IncScriptNestingLevel();
+    bool success = context->Execute() >= 0;
+    if (unprepare)
+        context->Unprepare();
+    scriptSystem->DecScriptNestingLevel();
+
+    return success;
+}
+
+bool ScriptFile::ExecuteScript(const ScriptEventListener* listener, asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
+{
+    PROFILE(ExecuteMethod);
+
+    if (!compiled_ || !object || !method)
+        return false;
+
+    // It is possible that executing the method causes us to unload. Therefore do not rely on member variables
+    // However, we are not prepared for the whole script system getting destroyed during execution (should never happen)
+    Script* scriptSystem = script_;
+
+    asIScriptContext* context = scriptSystem->GetScriptFileContext();
+    context->SetUserData((void*) listener);
+
+    if (context->Prepare(method) < 0)
+        return false;
+
+    context->SetObject(object);
+    SetParameters(context, method, parameters);
+
+    scriptSystem->IncScriptNestingLevel();
+    bool success = context->Execute() >= 0;
+    if (unprepare)
+        context->Unprepare();
+    scriptSystem->DecScriptNestingLevel();
+
+    return success;
 }
 
 bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
@@ -634,9 +677,9 @@ void ScriptFile::ReleaseModule()
         methods_.Clear();
         delayedCalls_.Clear();
         UnsubscribeFromAllEventsExcept(PODVector<StringHash>(), true);
+
+        scriptEventData_.Clear();
         
-        // Remove the module
-        scriptModule_->SetUserData(0);
         asIScriptEngine* engine = script_->GetScriptEngine();
         engine->DiscardModule(GetName().CString());
         scriptModule_ = 0;
@@ -653,17 +696,34 @@ void ScriptFile::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 {
     if (!compiled_)
         return;
-    
-    asIScriptFunction* function = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
-    
+
+    ScriptEventData* data = static_cast<ScriptEventData*>(GetEventHandler()->GetUserData());
+
+    asIScriptObject* object = data->GetObject();
+    asIScriptFunction* method = data->GetFunction();
+
+    if (object && !data->IsObjectAlive())
+    {
+        scriptEventData_.Remove(SharedPtr<ScriptEventData>(data));
+        UnsubscribeFromEvent(eventType);
+        return;
+    }
+
     VariantVector parameters;
-    if (function->GetParamCount() > 0)
+    if (method->GetParamCount() > 0)
     {
         parameters.Push(Variant((void*)&eventType));
         parameters.Push(Variant((void*)&eventData));
     }
     
-    Execute(function, parameters);
+    if (object)
+    {
+        Execute(object, method, parameters);
+    }
+    else
+    {
+        Execute(method, parameters);
+    }
 }
 
 void ScriptFile::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -705,7 +765,7 @@ ScriptFile* GetScriptContextFile()
     asIScriptFunction* function = context ? context->GetFunction() : 0;
     asIScriptModule* module = function ? function->GetEngine()->GetModule(function->GetModuleName()) : 0;
     if (module)
-        return static_cast<ScriptFile*>(module->GetUserData());
+        return static_cast<ScriptFile*>(context->GetUserData());
     else
         return 0;
 }

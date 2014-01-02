@@ -45,6 +45,8 @@ class URHO3D_API ScriptFile : public Resource, public ScriptEventListener
 {
     OBJECT(ScriptFile);
     
+    friend class ScriptInstance;
+
 public:
     /// Construct.
     ScriptFile(Context* context);
@@ -55,11 +57,12 @@ public:
     
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
+
     /// Add an event handler. Called by script exposed version of SubscribeToEvent().
-    virtual void AddEventHandler(StringHash eventType, const String& handlerName);
+    virtual void AddEventHandler(StringHash eventType, const String& handlerName, asIScriptObject* receiver = 0);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
-    
+    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName, asIScriptObject* receiver = 0);
+
     /// Query for a function by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
     /// Execute a function.
@@ -87,6 +90,11 @@ public:
     bool IsCompiled() const { return compiled_; }
     
 private:
+    /// Execute a function.
+    bool ExecuteScript(const ScriptEventListener* listener, asIScriptFunction* function, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+    /// Execute an object method.
+    bool ExecuteScript(const ScriptEventListener* listener, asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
+
     /// Add a script section, checking for includes recursively. Return true if successful.
     bool AddScriptSection(asIScriptEngine* engine, Deserializer& source);
     /// Set parameters for a function or method.
@@ -116,6 +124,8 @@ private:
     HashMap<asIObjectType*, HashMap<String, asIScriptFunction*> > methods_;
     /// Delayed function calls.
     Vector<DelayedCall> delayedCalls_;
+    /// ScriptEventData objects that this ScriptFile is subscribed with.
+    Vector< SharedPtr<ScriptEventData> > scriptEventData_;
 };
 
 /// Get currently executing script file.

@@ -76,10 +76,11 @@ public:
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
+
     /// Add an event handler. Called by script exposed version of SubscribeToEvent().
-    virtual void AddEventHandler(StringHash eventType, const String& handlerName);
+    virtual void AddEventHandler(StringHash eventType, const String& handlerName, asIScriptObject* receiver = 0);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
+    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName, asIScriptObject* receiver = 0);
     
     /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
@@ -190,6 +191,8 @@ private:
     bool subscribed_;
     /// Subscribed to scene post and fixed update events flag.
     bool subscribedPostFixed_;
+    /// ScriptEventData objects that this Instance is subscribed with.
+    Vector< SharedPtr<ScriptEventData> > scriptEventData_;
 };
 
 /// Return the Urho3D context of the active script context.
