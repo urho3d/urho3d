@@ -170,48 +170,76 @@ void ScriptFile::AddEventHandler(StringHash eventType, const String& handlerName
 {
     if (!compiled_)
         return;
-    
+
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
-    asIScriptFunction* function = GetFunction(declaration);
+    asIScriptFunction* function = 0;
+    asIScriptObject* reciever = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+
+    if (reciever)
+        function = GetMethod(reciever, declaration);
+    else
+        function = GetFunction(declaration);
+
     if (!function)
     {
         declaration = "void " + handlerName + "()";
-        function = GetFunction(declaration);
+
+        if (reciever)
+            function = GetMethod(reciever, declaration);
+        else
+            function = GetFunction(declaration);
+
         if (!function)
         {
             LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
             return;
         }
     }
-    
-    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, (void*)function));
+
+    SharedPtr<ScriptEventData> data(new ScriptEventData(function, reciever));
+    scriptEventData_.Push(data);
+    SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, data.Get()));
 }
 
 void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName)
 {
     if (!compiled_)
         return;
-    
+
     if (!sender)
     {
         LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
         return;
     }
-    
+
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
-    asIScriptFunction* function = GetFunction(declaration);
+    asIScriptFunction* function = 0;
+    asIScriptObject* reciever = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+
+    if (reciever)
+        function = GetMethod(reciever, declaration);
+    else
+        function = GetFunction(declaration);
+
     if (!function)
     {
         declaration = "void " + handlerName + "()";
-        function = GetFunction(declaration);
+
+        if (reciever)
+            function = GetMethod(reciever, declaration);
+        else
+            function = GetFunction(declaration);
+
         if (!function)
         {
             LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
             return;
         }
     }
-    
-    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, (void*)function));
+
+    SharedPtr<ScriptEventData> data(new ScriptEventData(function, reciever));
+    scriptEventData_.Push(data);
+    SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, data.Get()));
 }
 
 bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, bool unprepare)
@@ -653,17 +681,34 @@ void ScriptFile::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 {
     if (!compiled_)
         return;
-    
-    asIScriptFunction* function = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
-    
-    VariantVector parameters;
-    if (function->GetParamCount() > 0)
+
+    ScriptEventData* data = static_cast<ScriptEventData*>(GetEventHandler()->GetUserData());
+
+    asIScriptObject* object = data->GetObject();
+    asIScriptFunction* method = data->GetFunction();
+
+    if (object && !data->IsObjectAlive())
     {
-        parameters.Push(Variant((void*)&eventType));
-        parameters.Push(Variant((void*)&eventData));
+        scriptEventData_.Remove(SharedPtr<ScriptEventData>(data));
+        UnsubscribeFromEvent(eventType);
+        return;
     }
-    
-    Execute(function, parameters);
+
+    VariantVector parameters;
+    if (method->GetParamCount() > 0)
+    {
+        parameters.Push(Variant((void*) &eventType));
+        parameters.Push(Variant((void*) &eventData));
+    }
+
+    if (object)
+    {
+        Execute(object, method, parameters);
+    }
+    else
+    {
+        Execute(method, parameters);
+    }
 }
 
 void ScriptFile::HandleUpdate(StringHash eventType, VariantMap& eventData)

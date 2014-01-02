@@ -860,12 +860,12 @@ Scene* GetScriptContextScene()
 
 ScriptEventListener* GetScriptContextEventListener()
 {
-    // If context's this pointer is non-null, try to get the script instance. Else get the script file for procedural
-    // event handling
+    // If the context has an object and that object has user data set, try and get the ScriptInstance, otherwise try and get a ScriptFile.
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        if (context->GetThisPointer())
+        asIScriptObject* object = static_cast<asIScriptObject*>(context->GetThisPointer());
+        if (object && object->GetUserData())
             return GetScriptContextInstance();
         else
             return GetScriptContextFile();

@@ -76,6 +76,7 @@ public:
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
+
     /// Add an event handler. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
