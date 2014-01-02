@@ -1,0 +1,6 @@
+<material>
+    <technique name="Techniques/DiffAlpha.xml" />
+    <texture unit="diffuse" name="Textures/UrhoDecalAlpha.dds" />
+    <parameter name="MatDiffColor" value="1 1 0 1" />
+    <depthbias constant="-0.00001" slopescaled="0" />
+</material>
