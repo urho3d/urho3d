@@ -55,6 +55,7 @@ public:
     
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
+
     /// Add an event handler. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
@@ -116,6 +117,8 @@ private:
     HashMap<asIObjectType*, HashMap<String, asIScriptFunction*> > methods_;
     /// Delayed function calls.
     Vector<DelayedCall> delayedCalls_;
+    /// ScriptEventData objects that this ScriptFile is subscribed with.
+    Vector< SharedPtr<ScriptEventData> > scriptEventData_;
 };
 
 /// Get currently executing script file.

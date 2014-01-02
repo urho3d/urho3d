@@ -24,13 +24,17 @@
 
 #include "Object.h"
 
+class asILockableSharedBool;
+class asIScriptFunction;
+class asIScriptObject;
+
 namespace Urho3D
 {
 
 /// Delay-executed function or method call.
 struct DelayedCall
 {
-   /// Period for repeating calls.
+    /// Period for repeating calls.
     float period_;
     /// Delay time remaining until execution.
     float delay_;
@@ -48,10 +52,34 @@ class URHO3D_API ScriptEventListener
 public:
     /// Destruct
     virtual ~ScriptEventListener() {};
+
     /// Add a scripted event handler. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(StringHash eventType, const String& handlerName) = 0;
     /// Add a scripted event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) = 0;
+};
+
+/// Holds the data required to send events to scripts.
+class URHO3D_API ScriptEventData : public RefCounted
+{
+public:
+    /// Constructor, will create the asILockableSharedBool if a ScriptObject is passed in.
+    ScriptEventData(asIScriptFunction* function, asIScriptObject* object = 0);
+    /// Destructor, release the ref it we still hold it.
+    ~ScriptEventData();
+
+    /// Get the asIScriptFunction to call.
+    asIScriptFunction* GetFunction() const { return function_; }
+    /// Get the asIScriptObject to call the method on, can be null.
+    asIScriptObject* GetObject() const { return object_; }
+
+    /// Returns whether a ScriptObject is still alive. Will return true if there is no reference and object.
+    bool IsObjectAlive() const;
+
+private:
+    asILockableSharedBool* sharedbool_;
+    asIScriptFunction* function_;
+    asIScriptObject* object_;
 };
 
 }
