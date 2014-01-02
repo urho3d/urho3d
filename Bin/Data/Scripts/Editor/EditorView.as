@@ -706,11 +706,11 @@ Vector3 SelectedNodesCenterPoint()
     for (uint i = 0; i < selectedComponents.length; ++i)
     {
         Drawable@ drawable = cast<Drawable>(selectedComponents[i]);
+        count++;
         if (drawable !is null)
-        {
             centerPoint += drawable.node.LocalToWorld(drawable.boundingBox.center);
-            count++;
-        }
+        else
+            centerPoint += selectedComponents[i].node.worldPosition;
     }
 
     if (count > 0)
