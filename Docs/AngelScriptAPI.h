@@ -4604,6 +4604,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 
 // Properties:
 /* (readonly) */
@@ -4682,7 +4683,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -4754,6 +4755,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetFullImageRect();
 void SetHoverOffset(int, int);
 
@@ -4834,7 +4836,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -4903,6 +4905,7 @@ UIElement GetChild(const ShortStringHash&, const Variant& = Variant ( ), bool = 
 Array<UIElement> GetChildren(bool = false) const;
 UIElement GetElementEventSender() const;
 const Variant& GetVar(const ShortStringHash&);
+uint GetNumChildren(bool) const;
 void SetPosition(float, float);
 void SetHotSpot(int, int);
 void SetScale(float, float);
@@ -4952,7 +4955,7 @@ bool colorGradient;
 XMLFile defaultStyle;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -5027,6 +5030,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetPressedOffset(int, int);
@@ -5110,7 +5114,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -5194,6 +5198,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetCheckedOffset(int, int);
@@ -5275,7 +5280,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -5355,6 +5360,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetFullImageRect();
 void SetHoverOffset(int, int);
 void DefineShape(CursorShape, Texture, const IntRect&, const IntVector2&);
@@ -5436,7 +5442,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -5516,6 +5522,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetFullImageRect();
 void SetHoverOffset(int, int);
 void ChangeValue(float);
@@ -5597,7 +5604,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -5681,6 +5688,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void ChangeValue(float);
 void StepBack();
 void StepForward();
@@ -5762,7 +5770,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -5847,6 +5855,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetViewPosition(int, int);
 void SetScrollBarsVisible(bool, bool);
 
@@ -5927,7 +5936,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -6010,6 +6019,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetViewPosition(int, int);
 void SetScrollBarsVisible(bool, bool);
 void AddItem(UIElement);
@@ -6107,7 +6117,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -6207,6 +6217,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 bool SetFont(const String&, int);
 bool SetFont(Font, int);
 void SetSelection(uint, uint = M_MAX_UNSIGNED);
@@ -6289,7 +6300,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -6473,6 +6484,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetFullImageRect();
 void SetHoverOffset(int, int);
 
@@ -6553,7 +6565,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -6643,6 +6655,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetPressedOffset(int, int);
@@ -6728,7 +6741,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -6843,6 +6856,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetPressedOffset(int, int);
@@ -6934,7 +6948,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -7036,6 +7050,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 
 // Properties:
 /* (readonly) */
@@ -7114,7 +7129,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -7195,6 +7210,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 void SetView(Scene, Camera);
 void QueueUpdate();
 
@@ -7275,7 +7291,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
@@ -7416,6 +7432,7 @@ IntVector2 ScreenToElement(const IntVector2&);
 IntVector2 ElementToScreen(const IntVector2&);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
+uint GetNumChildren(bool) const;
 
 // Properties:
 /* (readonly) */
@@ -7494,7 +7511,7 @@ int indentWidth;
 IntVector2 childOffset;
 bool elementEventSender;
 /* (readonly) */
-Array<uint> numChildren;
+uint numChildren;
 /* (readonly) */
 uint numAllChildren;
 /* (readonly) */
