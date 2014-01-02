@@ -136,7 +136,7 @@ void Button::OnKey(int key, int buttons, int qualifiers)
     UI* ui = GetSubsystem<UI>();
     if (ui->GetFocusElement() == this && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
     {
-        // Simulate LMB
+        // Simulate LMB click
         OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0);
         OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0, 0);
     }

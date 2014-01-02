@@ -1,4 +1,5 @@
 // Urho3D editor UI-element handling
+
 UIElement@ editorUIElement;
 XMLFile@ uiElementDefaultStyle;
 Array<String> availableStyles;
