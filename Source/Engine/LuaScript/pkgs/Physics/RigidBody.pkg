@@ -76,14 +76,7 @@ class RigidBody : public Component
     unsigned GetCollisionLayer() const;
     unsigned GetCollisionMask() const;
     CollisionEventMode GetCollisionEventMode() const;
-    
-    void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
-    void UpdateMass();
-    void UpdateGravity();
-    void AddConstraint(Constraint* constraint);
-    void RemoveConstraint(Constraint* constraint);
-    void ReleaseBody();
-    
+
     tolua_readonly tolua_property__get_set PhysicsWorld* physicsWorld;
     tolua_property__get_set float mass;
     tolua_property__get_set Vector3 position;

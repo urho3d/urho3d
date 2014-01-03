@@ -44,6 +44,7 @@ namespace Urho3D
 class CollisionShape;
 class Deserializer;
 class Constraint;
+class Model;
 class Node;
 class Ray;
 class RigidBody;
@@ -143,6 +144,8 @@ public:
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept sphere test and return the closest hit.
     void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Invalidate cached collision geometry for a model.
+    void RemoveCachedGeometry(Model* model);
     /// Return rigid bodies by a sphere query.
     void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
@@ -190,8 +193,10 @@ public:
     btDiscreteDynamicsWorld* GetWorld() { return world_; }
     /// Clean up the geometry cache.
     void CleanupGeometryCache();
-    /// Return the collision geometry cache.
-    HashMap<String, SharedPtr<CollisionGeometryData> >& GetGeometryCache() { return geometryCache_; }
+    /// Return trimesh collision geometry cache.
+    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& GetTriMeshCache() { return triMeshCache_; }
+    /// Return convex collision geometry cache.
+    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& GetConvexCache() { return convexCache_; }
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
     /// Return whether node dirtying should be disregarded.
@@ -204,6 +209,8 @@ protected:
 private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle collision model reload finished.
+    void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Trigger update before each physics simulation step.
     void PreStep(float timeStep);
     /// Trigger update after ecah physics simulation step.
@@ -235,8 +242,10 @@ private:
     HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold* > previousCollisions_;
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
-    /// Cache for collision geometry data.
-    HashMap<String, SharedPtr<CollisionGeometryData> > geometryCache_;
+    /// Cache for trimesh geometry data by model and LOD level.
+    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> > triMeshCache_;
+    /// Cache for convex geometry data by model and LOD level.
+    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> > convexCache_;
     /// Simulation steps per second.
     unsigned fps_;
     /// Time accumulator for non-interpolated mode.

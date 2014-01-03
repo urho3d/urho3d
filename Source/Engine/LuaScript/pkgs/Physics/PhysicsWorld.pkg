@@ -34,7 +34,9 @@ class PhysicsWorld : public Component
     
     // void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside PhysicsRaycastResult PhysicsWorldSphereCast @ SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    
+
+    void RemoveCachedGeometry(Model* model);
+
     Vector3 GetGravity() const;
     int GetNumIterations() const;
     bool GetInterpolation() const;
@@ -43,21 +45,6 @@ class PhysicsWorld : public Component
     int GetFps() const;
     float GetMaxNetworkAngularVelocity() const;
 
-    void AddRigidBody(RigidBody* body);
-    void RemoveRigidBody(RigidBody* body);
-    void AddCollisionShape(CollisionShape* shape);
-    void RemoveCollisionShape(CollisionShape* shape);
-    void AddConstraint(Constraint* joint);
-    void RemoveConstraint(Constraint* joint);
-    void AddDelayedWorldTransform(const DelayedWorldTransform& transform);
-    void DrawDebugGeometry(bool depthTest);
-    void SetDebugRenderer(DebugRenderer* debug);
-    void SetDebugDepthTest(bool enable);
-    
-    void CleanupGeometryCache();
-    void SetApplyingTransforms(bool enable);
-    bool IsApplyingTransforms() const;
-    
     tolua_property__get_set Vector3 gravity;
     tolua_property__get_set int numIterations;
     tolua_property__get_set bool interpolation;

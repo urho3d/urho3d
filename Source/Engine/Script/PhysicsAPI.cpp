@@ -291,6 +291,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(const BoundingBox&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetRigidBodiesBody), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHODPR(PhysicsWorld, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void RemoveCachedGeometry(Model@+)", asMETHOD(PhysicsWorld, RemoveCachedGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(Vector3)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 get_gravity() const", asMETHOD(PhysicsWorld, GetGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_numIterations(int)", asMETHOD(PhysicsWorld, SetNumIterations), asCALL_THISCALL);

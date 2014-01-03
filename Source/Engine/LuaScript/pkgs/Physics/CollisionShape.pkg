@@ -42,14 +42,7 @@ class CollisionShape : public Component
     Model* GetModel() const;
     unsigned GetLodLevel() const;
     BoundingBox GetWorldBoundingBox() const;
-    
-    void NotifyRigidBody(bool updateMass = true);
-    
-    void SetModelAttr(ResourceRef value);
-    ResourceRef GetModelAttr() const;
-    
-    void ReleaseShape();
-    
+
     tolua_readonly tolua_property__get_set PhysicsWorld* physicsWorld;
     tolua_property__get_set ShapeType shapeType;
     tolua_property__get_set Vector3& size;

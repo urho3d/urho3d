@@ -26,6 +26,7 @@
 #include "Context.h"
 #include "DebugRenderer.h"
 #include "Log.h"
+#include "Model.h"
 #include "Mutex.h"
 #include "PhysicsEvents.h"
 #include "PhysicsUtils.h"
@@ -388,6 +389,24 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
     }
 }
 
+void PhysicsWorld::RemoveCachedGeometry(Model* model)
+{
+    for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = triMeshCache_.Begin();
+        i != triMeshCache_.End();)
+    {
+        HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
+        if (current->first_.first_ == model)
+            triMeshCache_.Erase(current);
+    }
+    for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = convexCache_.Begin();
+        i != convexCache_.End();)
+    {
+        HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
+        if (current->first_.first_ == model)
+            convexCache_.Erase(current);
+    }
+}
+
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask)
 {
     PROFILE(PhysicsSphereQuery);
@@ -512,12 +531,19 @@ void PhysicsWorld::SetDebugDepthTest(bool enable)
 void PhysicsWorld::CleanupGeometryCache()
 {
     // Remove cached shapes whose only reference is the cache itself
-    for (HashMap<String, SharedPtr<CollisionGeometryData> >::Iterator i = geometryCache_.Begin();
-        i != geometryCache_.End();)
+    for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = triMeshCache_.Begin();
+        i != triMeshCache_.End();)
     {
-        HashMap<String, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
+        HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
         if (current->second_.Refs() == 1)
-            geometryCache_.Erase(current);
+            triMeshCache_.Erase(current);
+    }
+    for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = convexCache_.Begin();
+        i != convexCache_.End();)
+    {
+        HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
+        if (current->second_.Refs() == 1)
+            convexCache_.Erase(current);
     }
 }
 

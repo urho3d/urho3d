@@ -8062,6 +8062,7 @@ Array<RigidBody> GetRigidBodies(const Sphere&, uint = 0xffff);
 Array<RigidBody> GetRigidBodies(const BoundingBox&, uint = 0xffff);
 Array<RigidBody> GetRigidBodies(RigidBody);
 void DrawDebugGeometry(bool);
+void RemoveCachedGeometry(Model);
 
 // Properties:
 /* (readonly) */

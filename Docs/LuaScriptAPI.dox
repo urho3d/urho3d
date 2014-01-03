@@ -1804,6 +1804,83 @@ Properties:
 - bool override
 - bool ambientGradient
 
+### TouchState
+
+Methods:
+
+
+Properties:
+
+- int touchID
+- IntVector2 position
+- IntVector2 lastPosition
+- IntVector2 delta
+- float pressure
+
+### JoystickState
+
+Methods:
+
+- unsigned GetNumButtons() const
+- unsigned GetNumAxes() const
+- unsigned GetNumHats() const
+- bool GetButtonDown(unsigned index) const
+- bool GetButtonPress(unsigned index) const
+- float GetAxisPosition(unsigned index) const
+- int GetHatPosition(unsigned index) const
+
+Properties:
+
+- unsigned numButtons (readonly)
+- unsigned numAxes (readonly)
+- unsigned numHats (readonly)
+
+### Input : Object
+
+Methods:
+
+- void SetToggleFullscreen(bool enable)
+- void SetMouseVisible(bool enable)
+- bool OpenJoystick(unsigned index)
+- void CloseJoystick(unsigned index)
+- bool DetectJoysticks()
+- bool GetKeyDown(int key) const
+- bool GetKeyPress(int key) const
+- bool GetMouseButtonDown(int button) const
+- bool GetMouseButtonPress(int button) const
+- bool GetQualifierDown(int qualifier) const
+- bool GetQualifierPress(int qualifier) const
+- int GetQualifiers() const
+- IntVector2 GetMousePosition() const
+- const IntVector2& GetMouseMove() const
+- int GetMouseMoveX() const
+- int GetMouseMoveY() const
+- int GetMouseMoveWheel() const
+- unsigned GetNumTouches() const
+- TouchState* GetTouch(unsigned index) const
+- unsigned GetNumJoysticks() const
+- const String GetJoystickName(unsigned index) const
+- JoystickState* GetJoystick(unsigned index)
+- bool GetToggleFullscreen() const
+- bool IsMouseVisible() const
+- bool HasFocus()
+- bool IsMinimized() const
+
+Properties:
+
+- int qualifiers (readonly)
+- IntVector2 mousePosition (readonly)
+- IntVector2& mouseMove (readonly)
+- int mouseMoveX (readonly)
+- int mouseMoveY (readonly)
+- int mouseMoveWheel (readonly)
+- unsigned numTouches (readonly)
+- unsigned numJoysticks (readonly)
+- bool toggleFullscreen (readonly)
+- bool mouseVisible
+- bool focus (readonly)
+- bool minimized (readonly)
+
 ### Deserializer
 
 Methods:
@@ -2185,83 +2262,6 @@ Properties:
 - unsigned position (readonly)
 - unsigned size (readonly)
 - bool eof (readonly)
-
-### TouchState
-
-Methods:
-
-
-Properties:
-
-- int touchID
-- IntVector2 position
-- IntVector2 lastPosition
-- IntVector2 delta
-- float pressure
-
-### JoystickState
-
-Methods:
-
-- unsigned GetNumButtons() const
-- unsigned GetNumAxes() const
-- unsigned GetNumHats() const
-- bool GetButtonDown(unsigned index) const
-- bool GetButtonPress(unsigned index) const
-- float GetAxisPosition(unsigned index) const
-- int GetHatPosition(unsigned index) const
-
-Properties:
-
-- unsigned numButtons (readonly)
-- unsigned numAxes (readonly)
-- unsigned numHats (readonly)
-
-### Input : Object
-
-Methods:
-
-- void SetToggleFullscreen(bool enable)
-- void SetMouseVisible(bool enable)
-- bool OpenJoystick(unsigned index)
-- void CloseJoystick(unsigned index)
-- bool DetectJoysticks()
-- bool GetKeyDown(int key) const
-- bool GetKeyPress(int key) const
-- bool GetMouseButtonDown(int button) const
-- bool GetMouseButtonPress(int button) const
-- bool GetQualifierDown(int qualifier) const
-- bool GetQualifierPress(int qualifier) const
-- int GetQualifiers() const
-- IntVector2 GetMousePosition() const
-- const IntVector2& GetMouseMove() const
-- int GetMouseMoveX() const
-- int GetMouseMoveY() const
-- int GetMouseMoveWheel() const
-- unsigned GetNumTouches() const
-- TouchState* GetTouch(unsigned index) const
-- unsigned GetNumJoysticks() const
-- const String GetJoystickName(unsigned index) const
-- JoystickState* GetJoystick(unsigned index)
-- bool GetToggleFullscreen() const
-- bool IsMouseVisible() const
-- bool HasFocus()
-- bool IsMinimized() const
-
-Properties:
-
-- int qualifiers (readonly)
-- IntVector2 mousePosition (readonly)
-- IntVector2& mouseMove (readonly)
-- int mouseMoveX (readonly)
-- int mouseMoveY (readonly)
-- int mouseMoveWheel (readonly)
-- unsigned numTouches (readonly)
-- unsigned numJoysticks (readonly)
-- bool toggleFullscreen (readonly)
-- bool mouseVisible
-- bool focus (readonly)
-- bool minimized (readonly)
 
 ### LuaScriptInstance : Component
 
@@ -3270,10 +3270,6 @@ Methods:
 - Model* GetModel() const
 - unsigned GetLodLevel() const
 - BoundingBox GetWorldBoundingBox() const
-- void NotifyRigidBody(bool updateMass = true)
-- void SetModelAttr(ResourceRef value)
-- ResourceRef GetModelAttr() const
-- void ReleaseShape()
 
 Properties:
 
@@ -3320,8 +3316,6 @@ Methods:
 - float GetERP() const
 - float GetCFM() const
 - bool GetDisableCollision() const
-- void ReleaseConstraint()
-- void ApplyFrames()
 
 Properties:
 
@@ -3380,6 +3374,7 @@ Methods:
 - void SetMaxNetworkAngularVelocity(float velocity)
 - PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- void RemoveCachedGeometry(Model* model)
 - Vector3 GetGravity() const
 - int GetNumIterations() const
 - bool GetInterpolation() const
@@ -3387,19 +3382,6 @@ Methods:
 - bool GetSplitImpulse() const
 - int GetFps() const
 - float GetMaxNetworkAngularVelocity() const
-- void AddRigidBody(RigidBody* body)
-- void RemoveRigidBody(RigidBody* body)
-- void AddCollisionShape(CollisionShape* shape)
-- void RemoveCollisionShape(CollisionShape* shape)
-- void AddConstraint(Constraint* joint)
-- void RemoveConstraint(Constraint* joint)
-- void AddDelayedWorldTransform(const DelayedWorldTransform& transform)
-- void DrawDebugGeometry(bool depthTest)
-- void SetDebugRenderer(DebugRenderer* debug)
-- void SetDebugDepthTest(bool enable)
-- void CleanupGeometryCache()
-- void SetApplyingTransforms(bool enable)
-- bool IsApplyingTransforms() const
 
 Properties:
 
@@ -3481,12 +3463,6 @@ Methods:
 - unsigned GetCollisionLayer() const
 - unsigned GetCollisionMask() const
 - CollisionEventMode GetCollisionEventMode() const
-- void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
-- void UpdateMass()
-- void UpdateGravity()
-- void AddConstraint(Constraint* constraint)
-- void RemoveConstraint(Constraint* constraint)
-- void ReleaseBody()
 
 Properties:
 
@@ -4948,14 +4924,6 @@ Properties:
 - unsigned VO_DISABLE_OCCLUSION
 - int SHADOW_MIN_PIXELS
 - int INSTANCING_BUFFER_DEFAULT_SIZE
-- unsigned SCAN_FILES
-- unsigned SCAN_DIRS
-- unsigned SCAN_HIDDEN
-- int LOG_DEBUG
-- int LOG_INFO
-- int LOG_WARNING
-- int LOG_ERROR
-- int LOG_NONE
 - int MOUSEB_LEFT
 - int MOUSEB_MIDDLE
 - int MOUSEB_RIGHT
@@ -5078,6 +5046,14 @@ Properties:
 - int HAT_RIGHT
 - int HAT_DOWN
 - int HAT_LEFT
+- unsigned SCAN_FILES
+- unsigned SCAN_DIRS
+- unsigned SCAN_HIDDEN
+- int LOG_DEBUG
+- int LOG_INFO
+- int LOG_WARNING
+- int LOG_ERROR
+- int LOG_NONE
 - float M_PI
 - int M_MIN_INT
 - int M_MAX_INT

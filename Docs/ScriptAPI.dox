@@ -6858,6 +6858,7 @@ Methods:
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - void DrawDebugGeometry(bool)
+- void RemoveCachedGeometry(Model@)
 
 Properties:
 

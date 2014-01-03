@@ -39,10 +39,7 @@ class Constraint : public Component
     float GetERP() const;
     float GetCFM() const;
     bool GetDisableCollision() const;
-    
-    void ReleaseConstraint();
-    void ApplyFrames();
-    
+
     tolua_readonly tolua_property__get_set PhysicsWorld* physicsWorld;
     tolua_property__get_set ConstraintType constraintType;
     tolua_readonly tolua_property__get_set RigidBody* ownBody;
