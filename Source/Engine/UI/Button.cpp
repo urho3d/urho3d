@@ -44,7 +44,6 @@ Button::Button(Context* context) :
     pressed_(false)
 {
     enabled_ = true;
-    focusMode_ = FM_FOCUSABLE;
 }
 
 Button::~Button()
@@ -88,7 +87,7 @@ void Button::Update(float timeStep)
 void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if (hovering_)
+    if (hovering_ || HasFocus())
         offset += hoverOffset_;
     if (pressed_ || selected_)
         offset += pressedOffset_;
@@ -133,8 +132,7 @@ void Button::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
 
 void Button::OnKey(int key, int buttons, int qualifiers)
 {
-    UI* ui = GetSubsystem<UI>();
-    if (ui->GetFocusElement() == this && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
+    if (HasFocus() && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
     {
         // Simulate LMB click
         OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0);

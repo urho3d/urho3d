@@ -424,8 +424,7 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         acceleratorQualifiers_) && eventData[P_REPEAT].GetBool() == false)
     {
         // Ignore if UI has modal element
-        UI* ui = GetSubsystem<UI>();
-        if (ui->HasModalElement())
+        if (GetSubsystem<UI>()->HasModalElement())
             return;
 
         HandlePressedReleased(eventType, eventData);
