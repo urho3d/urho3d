@@ -147,7 +147,7 @@ void UI::SetCursor(Cursor* cursor)
     }
 }
 
-void UI::SetFocusElement(UIElement* element)
+void UI::SetFocusElement(UIElement* element, bool byKey)
 {
     using namespace FocusChanged;
 
@@ -194,6 +194,7 @@ void UI::SetFocusElement(UIElement* element)
 
         VariantMap focusEventData;
         focusEventData[Focused::P_ELEMENT] = element;
+        focusEventData[Focused::P_BYKEY] = byKey;
         element->SendEvent(E_FOCUSED, focusEventData);
     }
 
@@ -1308,8 +1309,10 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 {
                     if (tempElements_[i] == element)
                     {
-                        UIElement* next = tempElements_[(i + 1) % tempElements_.Size()];
-                        SetFocusElement(next);
+                        int verse = (qualifiers_ & QUAL_SHIFT) ? -1 : 1;
+                        unsigned inext = (tempElements_.Size() + i + verse) % tempElements_.Size();
+                        UIElement* next = tempElements_[inext];
+                        SetFocusElement(next, true);
                         return;
                     }
                 }
