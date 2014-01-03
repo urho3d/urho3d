@@ -53,7 +53,7 @@ public:
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
     /// Set focused UI element.
-    void SetFocusElement(UIElement* element);
+    void SetFocusElement(UIElement* element, bool byKey = false);
     /// Set modal element. Until all the modal elements are dismissed, all the inputs and events are only sent to them. Return true when successful.
     /// Only the modal element can clear its modal status or when it is being destructed.
     bool SetModalElement(UIElement* modalElement, bool enable);
