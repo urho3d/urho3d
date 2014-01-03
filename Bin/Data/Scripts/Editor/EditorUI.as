@@ -462,7 +462,8 @@ bool Exit()
 
 void HandleExitRequested()
 {
-    Exit();
+    if (!ui.HasModalElement())
+        Exit();
 }
 
 bool PickFile()

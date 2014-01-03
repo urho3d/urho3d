@@ -807,9 +807,6 @@ void UIElement::SetFocus(bool enable)
         enable = false;
 
     UI* ui = GetSubsystem<UI>();
-    if (!ui)
-        return;
-
     if (enable)
     {
         if (ui->GetFocusElement() != this)
@@ -1321,8 +1318,7 @@ float UIElement::GetDerivedOpacity() const
 
 bool UIElement::HasFocus() const
 {
-    UI* ui = GetSubsystem<UI>();
-    return ui ? ui->GetFocusElement() == this : false;
+    return GetSubsystem<UI>()->GetFocusElement() == this;
 }
 
 const String& UIElement::GetAppliedStyle() const

@@ -668,7 +668,7 @@ FontFace* Font::GetFaceFreeType(int pointSize)
     // Load each of the glyphs to see the sizes & store other information
     int maxWidth = 0;
     int maxHeight = 0;
-    int loadMode = GetSubsystem<UI>()->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
+    int loadMode = ui->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT;
     int ascender = face->size->metrics.ascender >> 6;
     int descender = face->size->metrics.descender >> 6;
     
