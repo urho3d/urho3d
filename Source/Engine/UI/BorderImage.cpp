@@ -68,7 +68,7 @@ void BorderImage::RegisterObject(Context* context)
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    GetBatches(batches, vertexData, currentScissor, hovering_ || selected_ ? hoverOffset_ : IntVector2::ZERO);
+    GetBatches(batches, vertexData, currentScissor, hovering_ || selected_ || HasFocus() ? hoverOffset_ : IntVector2::ZERO);
 }
 
 void BorderImage::SetTexture(Texture* texture)

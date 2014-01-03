@@ -47,6 +47,8 @@ Menu::Menu(Context* context) :
     acceleratorQualifiers_(0),
     autoPopup_(true)
 {
+    focusMode_ = FM_NOTFOCUSABLE;
+
     SubscribeToEvent(this, E_PRESSED, HANDLER(Menu, HandlePressedReleased));
     SubscribeToEvent(this, E_RELEASED, HANDLER(Menu, HandlePressedReleased));
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(Menu, HandleFocusChanged));
@@ -64,6 +66,7 @@ void Menu::RegisterObject(Context* context)
     context->RegisterFactory<Menu>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(Menu, Button);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Menu, "Focus Mode", FM_NOTFOCUSABLE);
     REF_ACCESSOR_ATTRIBUTE(Menu, VAR_INTVECTOR2, "Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 

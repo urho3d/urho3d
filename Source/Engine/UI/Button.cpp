@@ -44,6 +44,7 @@ Button::Button(Context* context) :
     pressed_(false)
 {
     enabled_ = true;
+    focusMode_ = FM_FOCUSABLE;
 }
 
 Button::~Button()
@@ -56,6 +57,7 @@ void Button::RegisterObject(Context* context)
 
     COPY_BASE_ATTRIBUTES(Button, BorderImage);
     UPDATE_ATTRIBUTE_DEFAULT_VALUE(Button, "Is Enabled", true);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(Button, "Focus Mode", FM_FOCUSABLE);
     REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Button, VAR_INTVECTOR2, "Pressed Child Offset", GetPressedChildOffset, SetPressedChildOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(Button, VAR_FLOAT, "Repeat Delay", GetRepeatDelay, SetRepeatDelay, float, 1.0f, AM_FILE);

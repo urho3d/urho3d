@@ -47,7 +47,6 @@ public:
     virtual void ApplyAttributes();
     /// Perform UI element update.
     virtual void Update(float timeStep);
-
     /// React to mouse click begin.
     virtual void OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse doubleclick.

@@ -175,7 +175,9 @@ ListView::ListView(Context* context) :
 
     SubscribeToEvent(E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
     SubscribeToEvent(E_UIMOUSEDOUBLECLICK, HANDLER(ListView, HandleUIMouseDoubleClick));
-    SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleFocusChanged));
+    SubscribeToEvent(E_FOCUSCHANGED, HANDLER(ListView, HandleItemFocusChanged));
+    SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleFocusChanged));
+    SubscribeToEvent(this, E_FOCUSED, HANDLER(ListView, HandleFocusChanged));
 }
 
 ListView::~ListView()
@@ -709,13 +711,13 @@ void ListView::SetClearSelectionOnDefocus(bool enable)
 
         if (clearSelectionOnDefocus_)
         {
-            SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleDefocused));
+            SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleClearSelectionOnDefocused));
 
             if (!HasFocus())
                 ClearSelection();
         }
         else
-            UnsubscribeFromEvent(this, E_DEFOCUSED);
+            SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleFocusChanged));
     }
 }
 
@@ -1057,7 +1059,7 @@ void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventD
 }
 
 
-void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
+void ListView::HandleItemFocusChanged(StringHash eventType, VariantMap& eventData)
 {
     using namespace FocusChanged;
 
@@ -1075,9 +1077,15 @@ void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void ListView::HandleDefocused(StringHash eventType, VariantMap& eventData)
+void ListView::HandleClearSelectionOnDefocused(StringHash eventType, VariantMap& eventData)
 {
     ClearSelection();
+}
+
+void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
+{
+    scrollPanel_->SetSelected(eventType == E_FOCUSED);
+    UpdateSelectionEffect();
 }
 
 }

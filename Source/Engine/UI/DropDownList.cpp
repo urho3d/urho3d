@@ -43,6 +43,8 @@ DropDownList::DropDownList(Context* context) :
     resizePopup_(false),
     selectionAttr_(0)
 {
+    focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
+
     Window* window = new Window(context_);
     window->SetInternal(true);
     SetPopup(window);
@@ -71,6 +73,7 @@ void DropDownList::RegisterObject(Context* context)
     context->RegisterFactory<DropDownList>(UI_CATEGORY);
 
     COPY_BASE_ATTRIBUTES(DropDownList, Menu);
+    UPDATE_ATTRIBUTE_DEFAULT_VALUE(DropDownList, "Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_INT, "Selection", GetSelection, SetSelectionAttr, unsigned, 0, AM_FILE);
     ACCESSOR_ATTRIBUTE(DropDownList, VAR_BOOL, "Resize Popup", GetResizePopup, SetResizePopup, bool, false, AM_FILE);
 }
@@ -322,7 +325,7 @@ void DropDownList::HandleItemClicked(StringHash eventType, VariantMap& eventData
 
     // Close and defocus the popup. This will actually send the selection forward
     if (listView_->HasFocus())
-        GetSubsystem<UI>()->SetFocusElement(0);
+        GetSubsystem<UI>()->SetFocusElement(focusMode_ < FM_FOCUSABLE ? 0 : this);
     ShowPopup(false);
 }
 

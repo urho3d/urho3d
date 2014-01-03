@@ -162,9 +162,11 @@ private:
     /// Handle global UI mouse doubleclick.
     void HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventData);
     /// Handle global focus change to check whether an invisible item was focused.
-    void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
+    void HandleItemFocusChanged(StringHash eventType, VariantMap& eventData);
     /// Handle being defocused.
-    void HandleDefocused(StringHash eventType, VariantMap& eventData);
+    void HandleClearSelectionOnDefocused(StringHash eventType, VariantMap& eventData);
+    /// Handle focus changed.
+    void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
 };
 
 }

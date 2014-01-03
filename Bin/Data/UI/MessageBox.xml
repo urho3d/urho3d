@@ -35,7 +35,7 @@
 		<attribute name="Layout Mode" value="Horizontal" />
 		<attribute name="Layout Spacing" value="4" />
 		<element />
-		<element type="Button" style="CommandButton">
+		<element type="Button">
 			<attribute name="Name" value="CancelButton" />
 			<attribute name="Min Size" value="70 17" />
 			<attribute name="Max Size" value="70 17" />
@@ -47,7 +47,7 @@
 				<attribute name="Text Alignment" value="Center" />
 			</element>
 		</element>
-		<element type="Button" style="CommandButton">
+		<element type="Button">
 			<attribute name="Name" value="OkButton" />
 			<attribute name="Min Size" value="70 17" />
 			<attribute name="Max Size" value="70 17" />
