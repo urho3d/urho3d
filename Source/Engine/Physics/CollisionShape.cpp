@@ -27,6 +27,7 @@
 #include "DebugRenderer.h"
 #include "DrawableEvents.h"
 #include "Geometry.h"
+#include "IndexBuffer.h"
 #include "Log.h"
 #include "Model.h"
 #include "PhysicsUtils.h"
@@ -303,6 +304,32 @@ HeightfieldData::HeightfieldData(Terrain* terrain) :
 
 HeightfieldData::~HeightfieldData()
 {
+}
+
+bool HasDynamicBuffers(Model* model, unsigned lodLevel)
+{
+    unsigned numGeometries = model->GetNumGeometries();
+
+    for (unsigned i = 0; i < numGeometries; ++i)
+    {
+        Geometry* geometry = model->GetGeometry(i, lodLevel);
+        if (!geometry)
+            continue;
+        unsigned numVertexBuffers = geometry->GetNumVertexBuffers();
+        for (unsigned j = 0; j < numVertexBuffers; ++j)
+        {
+            VertexBuffer* buffer = geometry->GetVertexBuffer(j);
+            if (!buffer)
+                continue;
+            if (buffer->IsDynamic())
+                return true;
+        }
+        IndexBuffer* buffer = geometry->GetIndexBuffer();
+        if (buffer && buffer->IsDynamic())
+            return true;
+    }
+
+    return false;
 }
 
 CollisionShape::CollisionShape(Context* context) :
@@ -888,29 +915,9 @@ void CollisionShape::UpdateShape()
                 else
                 {
                     geometry_ = new TriangleMeshData(model_, lodLevel_);
-                    // Check if any geometry has a dynamic vertex buffer
-                    bool dynamic = false;
-                    unsigned numGeometries = model_->GetNumGeometries();
-                    for (unsigned i = 0; i < numGeometries; ++i)
-                    {
-                        Geometry* geometry = model_->GetGeometry(i, lodLevel_);
-                        if (!geometry)
-                            continue;
-                        unsigned numVertexBuffers = geometry->GetNumVertexBuffers();
-                        for(unsigned j = 0; j < numVertexBuffers; ++j)
-                        {
-                            VertexBuffer* buffer = geometry->GetVertexBuffer(j);
-                            if(!buffer)
-                                continue;
-                            if(buffer->IsDynamic())
-                                dynamic = true;
-                        }
-                    }
-                    // Don't cache geometry with dynamic vertex buffers
-                    if(!dynamic)
-                    {
+                    // Check if model has dynamic buffers, do not cache in that case
+                    if (!HasDynamicBuffers(model_, lodLevel_))
                         cache[id] = geometry_;
-                    }
                 }
                 
                 TriangleMeshData* triMesh = static_cast<TriangleMeshData*>(geometry_.Get());
@@ -947,29 +954,9 @@ void CollisionShape::UpdateShape()
                 else
                 {
                     geometry_ = new ConvexData(model_, lodLevel_);
-                    // Check if any geometry has a dynamic vertex buffer
-                    bool dynamic = false;
-                    unsigned numGeometries = model_->GetNumGeometries();
-                    for (unsigned i = 0; i < numGeometries; ++i)
-                    {
-                        Geometry* geometry = model_->GetGeometry(i, lodLevel_);
-                        if (!geometry)
-                            continue;
-                        unsigned numVertexBuffers = geometry->GetNumVertexBuffers();
-                        for(unsigned j = 0; j < numVertexBuffers; ++j)
-                        {
-                            VertexBuffer* buffer = geometry->GetVertexBuffer(j);
-                            if(!buffer)
-                                continue;
-                            if(buffer->IsDynamic())
-                                dynamic = true;
-                        }
-                    }
-                    // Don't cache geometry with dynamic vertex buffers
-                    if(!dynamic)
-                    {
+                    // Check if model has dynamic buffers, do not cache in that case
+                    if (!HasDynamicBuffers(model_, lodLevel_))
                         cache[id] = geometry_;
-                    }
                 }
                 
                 ConvexData* convex = static_cast<ConvexData*>(geometry_.Get());
