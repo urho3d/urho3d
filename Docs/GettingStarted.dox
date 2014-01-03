@@ -383,7 +383,8 @@ $CC -o Urho3DPlayer Urho3DPlayer.cpp `pkg-config --cflags --libs Urho3D`
 
 \page Structure Overall structure
 
-The Urho3D library consists of the following subdirectories that represent different subsystems:
+The Urho3D engine compiles into one library. Conceptually it consists of several "sublibraries" that represent different subsystems or functionality. Each of these resides in a subdirectory
+under the Source/Engine directory:
 
 - Container. Provides STL replacement classes and shared pointers.
 - Math. Provides vector, quaternion & matrix types and geometric shapes used in intersection tests.
@@ -401,7 +402,21 @@ The Urho3D library consists of the following subdirectories that represent diffe
 - %Script. Provides scripting support using the AngelScript language.
 - %Engine. Instantiates the subsystems from the modules above (except Script, which needs to be instantiated by the application) and manages the main loop iteration.
 
-Third-party libraries are used for the following functionality:
+\section Structure_Context Execution context
+
+The heart of Urho3D is the Context object, which must always be created as the first in a Urho3D application, and deleted last. All "important" objects that derive from the Object base class,
+such as scene nodes, resources like textures and models, and the subsystems themselves require %Context pointer in their constructor. This avoids both the singleton pattern for subsystems,
+or having to pass around several objects into constructors.
+
+The %Context provides the following functionality (described in detail on their own pages):
+
+- Registering and accessing \ref Subsystems "subsystems"
+- Creation and reflection facilities per object type: \ref ObjectTypes "object factories" and \ref Serialization "serializable attributes".
+- Sending \ref Events "events" between objects
+
+\section Structure_ThirdParty Third-party libraries
+
+The third-party libraries used by Urho3D and their purposes are:
 
 - AngelScript: scripting language implementation
 - Bullet: physics simulation implementation
