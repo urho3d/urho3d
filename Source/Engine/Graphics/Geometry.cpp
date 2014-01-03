@@ -226,12 +226,57 @@ unsigned short Geometry::GetBufferHash() const
 void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData,
     unsigned& indexSize, unsigned& elementMask) const
 {
-    // These shared arrays are held in the vertex/index buffers so it's safe to construct temporary shared pointers
-    SharedArrayPtr<unsigned char> vertexDataShared;
-    SharedArrayPtr<unsigned char> indexDataShared;
-    GetRawDataShared(vertexDataShared, vertexSize, indexDataShared, indexSize, elementMask);
-    vertexData = vertexDataShared.Get();
-    indexData = indexDataShared.Get();
+    if (rawVertexData_)
+    {
+        vertexData = rawVertexData_;
+        vertexSize = rawVertexSize_;
+        elementMask = rawElementMask_;
+    }
+    else
+    {
+        if (positionBufferIndex_ < vertexBuffers_.Size() && vertexBuffers_[positionBufferIndex_])
+        {
+            vertexData = vertexBuffers_[positionBufferIndex_]->GetShadowData();
+            if (vertexData)
+            {
+                vertexSize = vertexBuffers_[positionBufferIndex_]->GetVertexSize();
+                elementMask = vertexBuffers_[positionBufferIndex_]->GetElementMask();
+            }
+            else
+            {
+                vertexSize = 0;
+                elementMask = 0;
+            }
+        }
+        else
+        {
+            vertexData = 0;
+            vertexSize = 0;
+            elementMask = 0;
+        }
+    }
+    
+    if (rawIndexData_)
+    {
+        indexData = rawIndexData_;
+        indexSize = rawIndexSize_;
+    }
+    else
+    {
+        if (indexBuffer_)
+        {
+            indexData = indexBuffer_->GetShadowData();
+            if (indexData)
+                indexSize = indexBuffer_->GetIndexSize();
+            else
+                indexSize = 0;
+        }
+        else
+        {
+            indexData = 0;
+            indexSize = 0;
+        }
+    }
 }
 
 void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize,
