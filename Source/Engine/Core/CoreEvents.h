@@ -63,4 +63,10 @@ EVENT(E_ENDFRAME, EndFrame)
 {
 }
 
+/// Work item completed event.
+EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
+{
+    PARAM(P_ITEM, Item);                        // WorkItem ptr
+}
+
 }
