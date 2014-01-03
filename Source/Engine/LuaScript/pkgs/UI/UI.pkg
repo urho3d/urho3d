@@ -3,7 +3,7 @@ $#include "UI.h"
 class UI : public Object
 {
     void SetCursor(Cursor* cursor);
-    void SetFocusElement(UIElement* element);
+    void SetFocusElement(UIElement* element, bool byKey = false);
     bool SetModalElement(UIElement* modalElement, bool enable);
     void Clear();
     void Update(float timeStep);

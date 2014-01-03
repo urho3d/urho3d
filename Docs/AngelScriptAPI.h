@@ -7541,6 +7541,7 @@ UIElement LoadLayout(File, XMLFile);
 UIElement LoadLayout(XMLFile);
 UIElement LoadLayout(XMLFile, XMLFile);
 bool SaveLayout(File, UIElement);
+void SetFocusElement(UIElement, bool = false);
 UIElement GetElementAt(const IntVector2&, bool = true);
 UIElement GetElementAt(int, int, bool = true);
 bool HasModalElement() const;
