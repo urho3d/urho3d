@@ -92,23 +92,22 @@ public:
                 continue;
             }
             
-            const unsigned char* vertexData;
-            const unsigned char* indexData;
+            SharedArrayPtr<unsigned char> vertexData;
+            SharedArrayPtr<unsigned char> indexData;
             unsigned vertexSize;
             unsigned indexSize;
             unsigned elementMask;
             
-            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+            geometry->GetRawDataShared(vertexData, vertexSize, indexData, indexSize, elementMask);
             if (!vertexData || !indexData)
             {
                 LOGWARNING("Skipping geometry with no CPU-side geometry data for triangle mesh collision");
                 continue;
             }
             
-            // Keep a shared pointer to the referred geometry
-            /// \todo Model live reload is not handled properly, but at least we will not crash due to holding a pointer
-            /// to the original geometry
-            geometries_.Push(SharedPtr<Geometry>(geometry));
+            // Keep shared pointers to the vertex/index data so that if it's unloaded or changes size, we don't crash
+            dataArrays_.Push(vertexData);
+            dataArrays_.Push(indexData);
             
             unsigned indexStart = geometry->GetIndexStart();
             unsigned indexCount = geometry->GetIndexCount();
@@ -127,8 +126,8 @@ public:
     }
     
 private:
-    /// Geometries used in the collision
-    Vector<SharedPtr<Geometry> > geometries_;
+    /// Shared vertex/index data used in the collision
+    Vector<SharedArrayPtr<unsigned char> > dataArrays_;
 };
 
 TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :

@@ -78,7 +78,9 @@ public:
     unsigned long long GetBufferHash(unsigned streamIndex, unsigned useMask);
     /// Return CPU memory shadow data.
     unsigned char* GetShadowData() const { return shadowData_.Get(); }
-    
+    /// Return shared array pointer to the CPU memory shadow data.
+    SharedArrayPtr<unsigned char> GetShadowDataShared() const { return shadowData_; }
+
     /// Return vertex size corresponding to a vertex element mask.
     static unsigned GetVertexSize(unsigned elementMask);
     /// Return element offset from an element mask.

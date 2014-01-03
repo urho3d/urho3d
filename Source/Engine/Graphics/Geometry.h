@@ -92,6 +92,8 @@ public:
     unsigned short GetBufferHash() const;
     /// Return raw vertex and index data for CPU operations, or null pointers if not available.
     void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, unsigned& elementMask) const;
+    /// Return raw vertex and index data for CPU operations, or null pointers if not available.
+    void GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize, SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, unsigned& elementMask) const;
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set. Optionally return hit normal.
     float GetHitDistance(const Ray& ray, Vector3* outNormal = 0) const;
     /// Return whether or not the ray is inside geometry.
