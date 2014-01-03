@@ -6,7 +6,6 @@ UIElement@ uiMenuBar;
 UIElement@ quickMenu;
 Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
-MessageBox@ uiMessageBox;
 
 const ShortStringHash UI_ELEMENT_TYPE("UIElement");
 const ShortStringHash WINDOW_TYPE("Window");
@@ -445,11 +444,11 @@ bool Exit()
 
         if (sceneModified || uiLayoutModified)
         {
-            uiMessageBox = MessageBox(message + "Continue to exit?", "Warning");
-            Button@ cancelButton = uiMessageBox.window.GetChild("CancelButton", true);
+            MessageBox@ messageBox = MessageBox(message + "Continue to exit?", "Warning");
+            Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
             cancelButton.visible = true;
             cancelButton.focus = true;
-            SubscribeToEvent(uiMessageBox, "MessageACK", "HandleMessageAcknowledgement");
+            SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
             messageBoxCallback = @Exit;
             return false;
         }
@@ -459,6 +458,11 @@ bool Exit()
 
     engine.Exit();
     return true;
+}
+
+void HandleExitRequested()
+{
+    Exit();
 }
 
 bool PickFile()
@@ -1335,7 +1339,6 @@ void UpdateDirtyUI()
 
 void HandleMessageAcknowledgement(StringHash eventType, VariantMap& eventData)
 {
-    uiMessageBox = null;
     if (eventData["Ok"].GetBool())
         messageBoxCallback();
     else

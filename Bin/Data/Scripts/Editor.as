@@ -45,6 +45,9 @@ void Start()
     cache.autoReloadResources = true;
     // Use OS mouse without grabbing it
     input.mouseVisible = true;
+    // Disable Editor auto exit, check first if it is OK to exit
+    engine.autoExit = false;
+    SubscribeToEvent(input, "ExitRequested", "HandleExitRequested");
 
     // Create root scene node
     CreateScene();

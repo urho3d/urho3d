@@ -161,11 +161,11 @@ bool CloseUILayout()
             UIElement@ element = GetTopLevelUIElement(selectedUIElements[i]);
             if (element !is null && element.vars[MODIFIED_VAR].GetBool())
             {
-                uiMessageBox = MessageBox("UI layout has been modified.\nContinue to close?", "Warning");
-                Button@ cancelButton = uiMessageBox.window.GetChild("CancelButton", true);
+                MessageBox@ messageBox = MessageBox("UI layout has been modified.\nContinue to close?", "Warning");
+                Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
                 cancelButton.visible = true;
                 cancelButton.focus = true;
-                SubscribeToEvent(uiMessageBox, "MessageACK", "HandleMessageAcknowledgement");
+                SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
                 messageBoxCallback = @CloseUILayout;
                 return false;
             }
@@ -204,11 +204,11 @@ bool CloseAllUILayouts()
             UIElement@ element = editorUIElement.children[i];
             if (element !is null && element.vars[MODIFIED_VAR].GetBool())
             {
-                uiMessageBox = MessageBox("UI layout has been modified.\nContinue to close?", "Warning");
-                Button@ cancelButton = uiMessageBox.window.GetChild("CancelButton", true);
+                MessageBox@ messageBox = MessageBox("UI layout has been modified.\nContinue to close?", "Warning");
+                Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
                 cancelButton.visible = true;
                 cancelButton.focus = true;
-                SubscribeToEvent(uiMessageBox, "MessageACK", "HandleMessageAcknowledgement");
+                SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
                 messageBoxCallback = @CloseAllUILayouts;
                 return false;
             }
