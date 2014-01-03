@@ -42,4 +42,10 @@ EVENT(E_RELOADFAILED, ReloadFailed)
 {
 }
 
+/// Resource loaded asynchronously.
+EVENT(E_RESOURCELOADEDASYNC, ResourceLoadedAsync)
+{
+    PARAM(P_NAME, Name);            //Name of the resource as a String
+}
+
 }

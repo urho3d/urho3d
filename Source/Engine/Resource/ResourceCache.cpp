@@ -65,6 +65,8 @@ ResourceCache::ResourceCache(Context* context) :
 {
     // Register Resource library object factories
     RegisterResourceLibrary(context_);
+
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
 }
 
 ResourceCache::~ResourceCache()
@@ -144,7 +146,11 @@ bool ResourceCache::AddManualResource(Resource* resource)
     }
     
     resource->ResetUseTimer();
+
+    groupMutex_.Acquire();
     resourceGroups_[resource->GetType()].resources_[resource->GetNameHash()] = resource;
+    groupMutex_.Release();
+
     UpdateResourceGroup(resource->GetType());
     return true;
 }
@@ -208,7 +214,10 @@ void ResourceCache::ReleaseResource(ShortStringHash type, const String& name, bo
     // If other references exist, do not release, unless forced
     if ((existingRes.Refs() == 1 && existingRes.WeakRefs() == 0) || force)
     {
+        groupMutex_.Acquire();
         resourceGroups_[type].resources_.Erase(nameHash);
+        groupMutex_.Release();
+
         UpdateResourceGroup(type);
     }
 }
@@ -227,7 +236,10 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
             // If other references exist, do not release, unless forced
             if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
             {
+                groupMutex_.Acquire();
                 i->second_.resources_.Erase(current);
+                groupMutex_.Release();
+
                 released = true;
             }
         }
@@ -253,7 +265,10 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
                 // If other references exist, do not release, unless forced
                 if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
                 {
+                    groupMutex_.Acquire();
                     i->second_.resources_.Erase(current);
+                    groupMutex_.Release();
+
                     released = true;
                 }
             }
@@ -285,7 +300,10 @@ void ResourceCache::ReleaseResources(const String& partialName, bool force)
                     // If other references exist, do not release, unless forced
                     if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
                     {
+                        groupMutex_.Acquire();
                         i->second_.resources_.Erase(current);
+                        groupMutex_.Release();
+
                         released = true;
                     }
                 }
@@ -314,7 +332,10 @@ void ResourceCache::ReleaseAllResources(bool force)
                 // If other references exist, do not release, unless forced
                 if ((current->second_.Refs() == 1 && current->second_.WeakRefs() == 0) || force)
                 {
+                    groupMutex_.Acquire();
                     i->second_.resources_.Erase(current);
+                    groupMutex_.Release();
+
                     released = true;
                 }
             }
@@ -352,7 +373,9 @@ bool ResourceCache::ReloadResource(Resource* resource)
 
 void ResourceCache::SetMemoryBudget(ShortStringHash type, unsigned budget)
 {
+    groupMutex_.Acquire();
     resourceGroups_[type].memoryBudget_ = budget;
+    groupMutex_.Release();
 }
 
 void ResourceCache::SetAutoReloadResources(bool enable)
@@ -367,12 +390,9 @@ void ResourceCache::SetAutoReloadResources(bool enable)
                 watcher->StartWatching(resourceDirs_[i], true);
                 fileWatchers_.Push(watcher);
             }
-
-            SubscribeToEvent(E_BEGINFRAME, HANDLER(ResourceCache, HandleBeginFrame));
         }
         else
         {
-            UnsubscribeFromEvent(E_BEGINFRAME);
             fileWatchers_.Clear();
         }
         
@@ -444,7 +464,11 @@ Resource* ResourceCache::GetResource(ShortStringHash type, const String& nameIn)
     
     // Store to cache
     resource->ResetUseTimer();
+
+    groupMutex_.Acquire();
     resourceGroups_[type].resources_[nameHash] = resource;
+    groupMutex_.Release();
+
     UpdateResourceGroup(type);
     
     return resource;
@@ -635,7 +659,9 @@ const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, Str
     HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return noResource;
+
     HashMap<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
+
     if (j == i->second_.resources_.End())
         return noResource;
     
@@ -673,7 +699,10 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
                 // If other references exist, do not release, unless forced
                 if ((k->second_.Refs() == 1 && k->second_.WeakRefs() == 0) || force)
                 {
+                    groupMutex_.Acquire();
                     j->second_.resources_.Erase(k);
+                    groupMutex_.Release();
+
                     affectedGroups.Insert(j->first_);
                 }
                 break;
@@ -690,6 +719,8 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
     HashMap<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
     if (i == resourceGroups_.End())
         return;
+
+    groupMutex_.Acquire();
     
     for (;;)
     {
@@ -723,6 +754,8 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
         else
             break;
     }
+
+    groupMutex_.Release();
 }
 
 void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
@@ -765,6 +798,19 @@ void ResourceCache::HandleBeginFrame(StringHash eventType, VariantMap& eventData
                 }
             }
         }
+    }
+
+    if (eventQueue_.Size() > 0)
+    {
+        eventMutex_.Acquire();
+
+        for (unsigned i = 0; i < eventQueue_.Size(); ++i)
+        {
+            SendEvent(E_RESOURCELOADEDASYNC, eventQueue_[i]);
+        }
+
+        eventQueue_.Clear();
+        eventMutex_.Release();
     }
 }
 
@@ -810,6 +856,30 @@ void RegisterResourceLibrary(Context* context)
 {
     Image::RegisterObject(context);
     XMLFile::RegisterObject(context);
+}
+
+void LoadResourceAsyncWork(const WorkItem* item, unsigned int threadIndex)
+{
+    ResourceCache* rc = static_cast<ResourceCache*>(item->aux_);
+
+    // Get the oldest element, and remove it.
+    rc->loadMutex_.Acquire();
+    Pair<String, ShortStringHash> data = rc->loadQueue_.Front();
+    rc->loadQueue_.Remove(data);
+    rc->loadMutex_.Release();
+
+    // Load the resouce, function has mutex locks so should be safe.
+    rc->GetResource(data.second_,data.first_);
+
+    // Store the event data to send next frame on the main thread.
+    using namespace ResourceLoadedAsync;
+
+    VariantMap eventData;
+    eventData[P_NAME] = data.first_;
+
+    rc->eventMutex_.Acquire();
+    rc->eventQueue_.Push(eventData);
+    rc->eventMutex_.Release();
 }
 
 }

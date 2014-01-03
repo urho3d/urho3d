@@ -25,6 +25,7 @@
 #include "File.h"
 #include "HashSet.h"
 #include "Resource.h"
+#include "WorkQueue.h"
 
 namespace Urho3D
 {
@@ -57,6 +58,8 @@ struct ResourceGroup
 class URHO3D_API ResourceCache : public Object
 {
     OBJECT(ResourceCache);
+
+    friend void LoadResourceAsyncWork(const WorkItem* item, unsigned int threadIndex);
     
 public:
     /// Construct.
@@ -94,6 +97,11 @@ public:
     void SetAutoReloadResources(bool enable);
     /// Define whether when getting resources should check package files or directories first. True for packages, false for directories.
     void SetSearchPackagesFirst(bool value) { searchPackagesFirst_ = value; }
+
+    /// Load a resource asynchronously, can be accessed afterwards using GetResource. A ResourceLoadedAsync event will be sent the next frame after completion.
+    template <class T> void LoadResourceAsync(const char* name);
+    /// Load a resource asynchronously, can be accessed afterwards using GetResource. A ResourceLoadedAsync event will be sent the next frame after completion.
+    template <class T> void LoadResourceAsync(const String& name);
 
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails.
     SharedPtr<File> GetFile(const String& name);
@@ -169,6 +177,16 @@ private:
     bool autoReloadResources_;
     /// Search priority flag.
     bool searchPackagesFirst_;
+    /// Queue of Resource to load.
+    Vector<Pair<String, ShortStringHash> > loadQueue_;
+    /// Loaded Event Queue.
+    Vector<VariantMap> eventQueue_;
+    /// Load Queue Mutex.
+    Mutex loadMutex_;
+    /// Event Queue Mutex.
+    Mutex eventMutex_;
+    /// ResourceGroup Mutex.
+    Mutex groupMutex_;
 };
 
 template <class T> T* ResourceCache::GetResource(const String& name)
@@ -182,6 +200,27 @@ template <class T> T* ResourceCache::GetResource(const char* name)
     ShortStringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name));
 }
+
+template <class T> void ResourceCache::LoadResourceAsync(const char* name)
+{
+    return LoadResourceAsync<T>(String(name));
+}
+
+template <class T> void ResourceCache::LoadResourceAsync(const String& name)
+{
+    ShortStringHash type = T::GetTypeStatic();
+
+    loadMutex_.Acquire();
+    loadQueue_.Push(MakePair<String, ShortStringHash>(name, type));
+    loadMutex_.Release();
+
+    WorkItem item;
+    item.aux_ = this;
+    item.workFunction_ = LoadResourceAsyncWork;
+
+    GetSubsystem<WorkQueue>()->AddWorkItem(item);
+}
+
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 {
