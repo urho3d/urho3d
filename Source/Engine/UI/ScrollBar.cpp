@@ -52,12 +52,14 @@ ScrollBar::ScrollBar(Context* context) :
     backButton_ = CreateChild<Button>("SB_Back");
     backButton_->SetInternal(true);
     backButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
+    backButton_->SetFocusMode(FM_NOTFOCUSABLE);
     slider_ = CreateChild<Slider>("SB_Slider");
     slider_->SetInternal(true);
     slider_->SetRepeatRate(DEFAULT_REPEAT_RATE);
     forwardButton_ = CreateChild<Button>("SB_Forward");
     forwardButton_->SetInternal(true);
     forwardButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
+    forwardButton_->SetFocusMode(FM_NOTFOCUSABLE);
 
     SubscribeToEvent(backButton_, E_PRESSED, HANDLER(ScrollBar, HandleBackButtonPressed));
     SubscribeToEvent(forwardButton_, E_PRESSED, HANDLER(ScrollBar, HandleForwardButtonPressed));
@@ -263,6 +265,8 @@ bool ScrollBar::FilterButtonImplicitAttributes(XMLElement& dest, const String& n
         return false;
     if (!RemoveChildXML(dest, "Max Size"))
         return false;
+    if (!RemoveChildXML(dest, "Focus Mode", "NotFocusable"))
+        return false;
 
     return true;
 }
@@ -303,28 +307,16 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
     if (eventData[P_PRESSED].GetBool())
     {
         if (eventData[P_OFFSET].GetInt() < 0)
-        {
-            backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, MOUSEB_LEFT,
-                0, 0);
-        }
+            backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
         else
-        {
-            forwardButton_->OnClickBegin(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT,
-                MOUSEB_LEFT, 0, 0);
-        }
+            forwardButton_->OnClickBegin(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
     }
     else
     {
         if (eventData[P_OFFSET].GetInt() < 0)
-        {
-            backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0,
-                backButton_);
-        }
+            backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0, backButton_);
         else
-        {
-            forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0,
-                forwardButton_);
-        }
+            forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), MOUSEB_LEFT, 0, 0, 0, forwardButton_);
     }
 }
 
