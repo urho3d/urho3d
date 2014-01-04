@@ -330,6 +330,11 @@ void UpdateView(float timeStep)
             cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier);
             FadeUI();
         }
+        if (input.mouseMoveWheel != 0)
+        {
+            cameraNode.TranslateRelative(Vector3(0, 0, -cameraBaseSpeed) * -input.mouseMoveWheel*20 * timeStep * speedMultiplier);
+            FadeUI();
+        }
     }
 
     // Rotate/orbit camera
