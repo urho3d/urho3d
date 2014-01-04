@@ -223,6 +223,20 @@ bool Input::DetectJoysticks()
     return true;
 }
 
+void Input::SetScreenKeyboardVisible(bool enable)
+{
+    if (!graphics_)
+        return;
+    
+    if (enable != IsScreenKeyboardVisible())
+    {
+        if (enable)
+            SDL_StartTextInput();
+        else
+            SDL_StopTextInput();
+    }
+}
+
 bool Input::OpenJoystick(unsigned index)
 {
     if (index >= joysticks_.Size())
@@ -375,6 +389,25 @@ JoystickState* Input::GetJoystick(unsigned index)
     }
     else
         return 0;
+}
+
+bool Input::GetScreenKeyboardSupport() const
+{
+    if (graphics_)
+        return SDL_HasScreenKeyboardSupport() ? true : false;
+    else
+        return false;
+}
+
+bool Input::IsScreenKeyboardVisible() const
+{
+    if (graphics_)
+    {
+        SDL_Window* window = graphics_->GetImpl()->GetWindow();
+        return SDL_IsScreenKeyboardShown(window) ? true : false;
+    }
+    else
+        return false;
 }
 
 bool Input::IsMinimized() const

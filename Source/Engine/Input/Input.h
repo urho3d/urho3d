@@ -136,6 +136,8 @@ public:
     void CloseJoystick(unsigned index);
     /// Redetect joysticks. Return true if successful.
     bool DetectJoysticks();
+    /// Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
+    void SetScreenKeyboardVisible(bool enable);
     
     /// Check if a key is held down.
     bool GetKeyDown(int key) const;
@@ -173,6 +175,10 @@ public:
     JoystickState* GetJoystick(unsigned index);
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
+    /// Return whether on-screen keyboard is supported.
+    bool GetScreenKeyboardSupport() const;
+    /// Return whether on-screen keyboard is being shown.
+    bool IsScreenKeyboardVisible() const;
     /// Return whether the operating system mouse cursor is visible.
     bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether application window has input focus.

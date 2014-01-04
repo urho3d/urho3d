@@ -652,6 +652,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "bool get_nonFocusedMouseWheel() const", asMETHOD(UI, IsNonFocusedMouseWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_useSystemClipBoard(bool)", asMETHOD(UI, SetUseSystemClipBoard), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_useSystemClipBoard() const", asMETHOD(UI, GetUseSystemClipBoard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_useScreenKeyboard(bool)", asMETHOD(UI, SetUseScreenKeyboard), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_useScreenKeyboard() const", asMETHOD(UI, GetUseScreenKeyboard), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_useMutableGlyphs(bool)", asMETHOD(UI, SetUseMutableGlyphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_useMutableGlyphs() const", asMETHOD(UI, GetUseMutableGlyphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_forceAutoHint(bool)", asMETHOD(UI, SetForceAutoHint), asCALL_THISCALL);

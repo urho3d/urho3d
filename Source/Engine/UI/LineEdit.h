@@ -146,6 +146,8 @@ private:
     void HandleFocused(StringHash eventType, VariantMap& eventData);
     /// Handle being defocused.
     void HandleDefocused(StringHash eventType, VariantMap& eventData);
+    /// Handle the element layout having been updated.
+    void HandleLayoutUpdated(StringHash eventType, VariantMap& eventData);
 };
 
 }

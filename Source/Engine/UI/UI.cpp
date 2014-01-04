@@ -95,6 +95,11 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
     #endif
     useSystemClipBoard_(false),
+    #if defined(ANDROID) || defined(IOS)
+    useScreenKeyboard_(true),
+    #else
+    useScreenKeyboard_(false),
+    #endif
     useMutableGlyphs_(false),
     forceAutoHint_(false),
     dragBeginPending_(false),
@@ -491,6 +496,11 @@ void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 void UI::SetUseSystemClipBoard(bool enable)
 {
     useSystemClipBoard_ = enable;
+}
+
+void UI::SetUseScreenKeyboard(bool enable)
+{
+    useScreenKeyboard_ = enable;
 }
 
 void UI::SetUseMutableGlyphs(bool enable)

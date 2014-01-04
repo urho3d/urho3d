@@ -61,7 +61,7 @@ LineEdit::LineEdit(Context* context) :
 
     SubscribeToEvent(this, E_FOCUSED, HANDLER(LineEdit, HandleFocused));
     SubscribeToEvent(this, E_DEFOCUSED, HANDLER(LineEdit, HandleDefocused));
-    SubscribeToEvent(this, E_LAYOUTUPDATED, HANDLER(LineEdit, HandleFocused));
+    SubscribeToEvent(this, E_LAYOUTUPDATED, HANDLER(LineEdit, HandleLayoutUpdated));
 }
 
 LineEdit::~LineEdit()
@@ -386,6 +386,10 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     case KEY_RETURN2:
     case KEY_KP_ENTER:
         {
+            // If using the on-screen keyboard, defocus this element to hide it now
+            if (GetSubsystem<UI>()->GetUseScreenKeyboard() && HasFocus())
+                SetFocus(false);
+            
             using namespace TextFinished;
 
             VariantMap eventData;
@@ -617,11 +621,22 @@ void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
         text_->SetSelection(0);
     }
     UpdateCursor();
+    
+    if (GetSubsystem<UI>()->GetUseScreenKeyboard())
+        GetSubsystem<Input>()->SetScreenKeyboardVisible(true);
 }
 
 void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
 {
     text_->ClearSelection();
+    
+    if (GetSubsystem<UI>()->GetUseScreenKeyboard())
+        GetSubsystem<Input>()->SetScreenKeyboardVisible(false);
+}
+
+void LineEdit::HandleLayoutUpdated(StringHash eventType, VariantMap& eventData)
+{
+    UpdateCursor();
 }
 
 }

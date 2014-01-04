@@ -14,12 +14,12 @@ struct JoystickState
     unsigned GetNumButtons() const;
     unsigned GetNumAxes() const;
     unsigned GetNumHats() const;
-    
+
     bool GetButtonDown(unsigned index) const;
     bool GetButtonPress(unsigned index) const;
     float GetAxisPosition(unsigned index) const;
     int GetHatPosition(unsigned index) const;
-    
+
     tolua_readonly tolua_property__get_set unsigned numButtons;
     tolua_readonly tolua_property__get_set unsigned numAxes;
     tolua_readonly tolua_property__get_set unsigned numHats;
@@ -32,7 +32,8 @@ class Input : public Object
     bool OpenJoystick(unsigned index);
     void CloseJoystick(unsigned index);
     bool DetectJoysticks();
-    
+    void SetScreenKeyboardVisible(bool enable);
+
     bool GetKeyDown(int key) const;
     bool GetKeyPress(int key) const;
     bool GetMouseButtonDown(int button) const;
@@ -51,10 +52,12 @@ class Input : public Object
     const String GetJoystickName(unsigned index) const;
     JoystickState* GetJoystick(unsigned index);
     bool GetToggleFullscreen() const;
+    bool GetScreenKeyboardSupport() const;
+    bool IsScreenKeyboardVisible() const;
     bool IsMouseVisible() const;
     bool HasFocus();
     bool IsMinimized() const;
-    
+
     tolua_readonly tolua_property__get_set int qualifiers;
     tolua_readonly tolua_property__get_set IntVector2 mousePosition;
     tolua_readonly tolua_property__get_set IntVector2& mouseMove;
@@ -64,6 +67,8 @@ class Input : public Object
     tolua_readonly tolua_property__get_set unsigned numTouches;
     tolua_readonly tolua_property__get_set unsigned numJoysticks;
     tolua_readonly tolua_property__get_set bool toggleFullscreen;
+    tolua_readonly tolua_property__get_set bool screenKeyboardSupport;
+    tolua_property__is_set bool screenKeyboardVisible;
     tolua_property__is_set bool mouseVisible;
     tolua_readonly tolua_property__has_set bool focus;
     tolua_readonly tolua_property__is_set bool minimized;
