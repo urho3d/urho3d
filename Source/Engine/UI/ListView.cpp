@@ -207,14 +207,15 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     bool additive = multiselect_ && qualifiers & (QUAL_SHIFT | QUAL_CTRL);
     int delta = 0;
     int pageDirection = 1;
+    bool acceptZeroDelta = false;
 
-    if (selection != M_MAX_UNSIGNED && numItems)
+    if (numItems)
     {
         switch (key)
         {
         case KEY_LEFT:
         case KEY_RIGHT:
-            if (hierarchyMode_)
+            if (selection != M_MAX_UNSIGNED && hierarchyMode_)
             {
                 Expand(selection, key == KEY_RIGHT);
                 return;
@@ -224,7 +225,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_RETURN:
         case KEY_RETURN2:
         case KEY_KP_ENTER:
-            if (hierarchyMode_)
+            if (selection != M_MAX_UNSIGNED && hierarchyMode_)
             {
                 ToggleExpand(selection);
                 return;
@@ -246,7 +247,9 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_PAGEDOWN:
             {
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
-                int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - GetSelectedItem()->GetHeight();
+                if (selection == M_MAX_UNSIGNED)
+                    selection = 0;      // Assume as if first item is selected
+                int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - contentElement_->GetChild(selection)->GetHeight();
                 unsigned newSelection = selection;
                 unsigned okSelection = selection;
                 unsigned invisible = 0;
@@ -267,6 +270,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
                     newSelection += pageDirection;
                 }
                 delta = okSelection - selection - pageDirection * invisible;
+                acceptZeroDelta = true;     // Ensure Page Up and Down are being treated as handled key even though they generate zero delta
             }
             break;
 
@@ -280,7 +284,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         }
     }
 
-    if (delta)
+    if (delta || acceptZeroDelta)
     {
         ChangeSelection(delta, additive);
         return;
@@ -612,15 +616,21 @@ void ListView::ToggleSelection(unsigned index)
 
 void ListView::ChangeSelection(int delta, bool additive)
 {
+    unsigned numItems = GetNumItems();
     if (selections_.Empty())
-        return;
+    {
+        // Select first item if there is no selection yet
+        if (numItems > 0)
+            SetSelection(0);
+        if (abs(delta) == 1)
+            return;
+    }
     if (!multiselect_)
         additive = false;
 
     // If going downwards, use the last selection as a base. Otherwise use first
     unsigned selection = delta > 0 ? selections_.Back() : selections_.Front();
     int direction = delta > 0 ? 1 : -1;
-    unsigned numItems = GetNumItems();
     unsigned newSelection = selection;
     unsigned okSelection = selection;
     PODVector<unsigned> indices = selections_;
@@ -708,16 +718,8 @@ void ListView::SetClearSelectionOnDefocus(bool enable)
     if (enable != clearSelectionOnDefocus_)
     {
         clearSelectionOnDefocus_ = enable;
-
-        if (clearSelectionOnDefocus_)
-        {
-            SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleClearSelectionOnDefocused));
-
-            if (!HasFocus())
-                ClearSelection();
-        }
-        else
-            SubscribeToEvent(this, E_DEFOCUSED, HANDLER(ListView, HandleFocusChanged));
+        if (clearSelectionOnDefocus_ && !HasFocus())
+            ClearSelection();
     }
 }
 
@@ -1077,15 +1079,13 @@ void ListView::HandleItemFocusChanged(StringHash eventType, VariantMap& eventDat
     }
 }
 
-void ListView::HandleClearSelectionOnDefocused(StringHash eventType, VariantMap& eventData)
-{
-    ClearSelection();
-}
-
 void ListView::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
 {
     scrollPanel_->SetSelected(eventType == E_FOCUSED);
-    UpdateSelectionEffect();
+    if (clearSelectionOnDefocus_ && eventType == E_DEFOCUSED)
+        ClearSelection();
+    else if (highlightMode_ == HM_FOCUS)
+        UpdateSelectionEffect();
 }
 
 }
