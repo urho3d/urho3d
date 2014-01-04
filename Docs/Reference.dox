@@ -1311,6 +1311,8 @@ To get joystick input, the joystick(s) must first be explicitly opened using \re
 
 From the input subsystem you can also query whether the application window has input focus, or is minimized.
 
+On platforms that support it (such as Android) an on-screen virtual keyboard can be shown or hidden. When shown, keypresses from the virtual keyboard will be sent as char events just as if typed from an actual keyboard. Show or hide it by calling \ref Input::SetScreenKeyboardVisible "SetScreenKeyboardVisible()". The UI subsystem can also automatically show the virtual keyboard when a LineEdit element is focused, and hide it when defocused. This behavior can be controlled by calling \ref UI::SetUseScreenKeyboard "SetUseScreenKeyboard()".
+
 \page Audio %Audio
 
 The Audio subsystem implements an audio output stream. Once it has been initialized, the following operations are supported:
