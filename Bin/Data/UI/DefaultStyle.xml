@@ -185,6 +185,7 @@
     <element type="PanelView" style="ListView" auto="false">    <!-- todo: rename this to PanelListView -->
         <element type="BorderImage" internal="true">
             <attribute name="Image Rect" value="48 16 64 32" />
+            <attribute name="Hover Image Offset" value="16 0" />
             <element internal="true">
                 <attribute name="Layout Spacing" value="4" />
                 <attribute name="Layout Border" value="4 4 4 4" />
