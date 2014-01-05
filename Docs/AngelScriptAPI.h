@@ -1458,6 +1458,7 @@ bool Exists(const String&) const;
 File GetFile(const String&);
 String GetPreferredResourceDir(const String&) const;
 String SanitateResourceName(const String&) const;
+String SanitateResourceDirName(const String&) const;
 String GetResourceFileName(const String&) const;
 Resource GetResource(const String&, const String&);
 Resource GetResource(ShortStringHash, const String&);

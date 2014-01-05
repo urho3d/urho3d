@@ -3559,6 +3559,9 @@ Methods:
 - String GetResourceFileName(const String name) const
 - bool GetAutoReloadResources() const
 - bool GetSearchPackagesFirst() const
+- String GetPreferredResourceDir(const String path) const
+- String SanitateResourceName(const String name) const
+- String SanitateResourceDirName(const String name) const
 
 Properties:
 
