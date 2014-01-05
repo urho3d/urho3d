@@ -81,12 +81,7 @@ bool ResourceCache::AddResourceDir(const String& pathName, unsigned int priority
     }
     
     // Convert path to absolute
-    String fixedPath = AddTrailingSlash(pathName);
-    if (!IsAbsolutePath(fixedPath))
-        fixedPath = fileSystem->GetCurrentDir() + fixedPath;
-    
-    // Sanitate away /./ construct
-    fixedPath.Replace("/./", "/");
+    String fixedPath = SanitateResourceDirName(pathName);
     
     // Check that the same path does not already exist
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
@@ -149,12 +144,13 @@ bool ResourceCache::AddManualResource(Resource* resource)
     return true;
 }
 
-void ResourceCache::RemoveResourceDir(const String& path)
+void ResourceCache::RemoveResourceDir(const String& pathName)
 {
-    String fixedPath = AddTrailingSlash(path);
+    String fixedPath = SanitateResourceDirName(pathName);
+    
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
-        if (!resourceDirs_[i].Compare(path, false))
+        if (!resourceDirs_[i].Compare(fixedPath, false))
         {
             resourceDirs_.Erase(i);
             if (fileWatchers_.Size() > i)
@@ -598,6 +594,18 @@ String ResourceCache::SanitateResourceName(const String& nameIn) const
     }
 
     return name.Trimmed();
+}
+
+String ResourceCache::SanitateResourceDirName(const String& nameIn) const
+{
+    String fixedPath = AddTrailingSlash(nameIn);
+    if (!IsAbsolutePath(fixedPath))
+        fixedPath = GetSubsystem<FileSystem>()->GetCurrentDir() + fixedPath;
+    
+    // Sanitate away /./ construct
+    fixedPath.Replace("/./", "/");
+    
+    return fixedPath.Trimmed();
 }
 
 void ResourceCache::StoreResourceDependency(Resource* resource, const String& dependency)

@@ -134,6 +134,8 @@ public:
     String GetPreferredResourceDir(const String& path) const;
     /// Remove unsupported constructs from the resource name to prevent ambiguity, and normalize absolute filename to resource path relative if possible.
     String SanitateResourceName(const String& name) const;
+    /// Remove unnecessary constructs from a resource directory name and ensure it to be an absolute path.
+    String SanitateResourceDirName(const String& name) const;
     /// Store a dependency for a resource. If a dependency file changes, the resource will be reloaded.
     void StoreResourceDependency(Resource* resource, const String& dependency);
     /// Reset dependencies for a resource.

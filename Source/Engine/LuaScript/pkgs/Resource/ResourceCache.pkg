@@ -4,7 +4,7 @@ class ResourceCache
 {    
     void ReleaseAllResources(bool force = false);
     bool ReloadResource(Resource* resource);
-    
+
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
     void SetMemoryBudget(const String type, unsigned budget);
     
@@ -23,6 +23,10 @@ class ResourceCache
     bool GetAutoReloadResources() const;
     bool GetSearchPackagesFirst() const;
     
+    String GetPreferredResourceDir(const String path) const;
+    String SanitateResourceName(const String name) const;
+    String SanitateResourceDirName(const String name) const;
+
     tolua_readonly tolua_property__get_set unsigned totalMemoryUse;
     tolua_readonly tolua_property__get_set bool autoReloadResources;
     tolua_readonly tolua_property__get_set bool searchPackagesFirst;

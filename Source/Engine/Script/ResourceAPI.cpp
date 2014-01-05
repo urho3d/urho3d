@@ -110,6 +110,7 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "File@ GetFile(const String&in)", asFUNCTION(ResourceCacheGetFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "String GetPreferredResourceDir(const String&in) const", asMETHOD(ResourceCache, GetPreferredResourceDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "String SanitateResourceName(const String&in) const", asMETHOD(ResourceCache, SanitateResourceName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "String SanitateResourceDirName(const String&in) const", asMETHOD(ResourceCache, SanitateResourceDirName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "String GetResourceFileName(const String&in) const", asMETHOD(ResourceCache, GetResourceFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(const String&in, const String&in)", asFUNCTION(ResourceCacheGetResource), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(ShortStringHash, const String&in)", asMETHODPR(ResourceCache, GetResource, (ShortStringHash, const String&), Resource*), asCALL_THISCALL);
