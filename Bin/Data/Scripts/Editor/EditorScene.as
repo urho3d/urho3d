@@ -29,6 +29,7 @@ Array<XMLFile@> sceneCopyBuffer;
 
 bool suppressSceneChanges = false;
 bool inSelectionModify = false;
+bool skipMruScene = false;
 
 Array<EditActionGroup> undoStack;
 uint undoStackPos = 0;
@@ -198,6 +199,12 @@ bool LoadScene(const String&in fileName)
 
     suppressSceneChanges = false;
 
+    // global variable to mostly bypass adding mru upon importing tempscene
+    if (!skipMruScene)
+        UpdateSceneMru(fileName);
+
+    skipMruScene = false;
+
     ResetCamera();
     CreateGizmo();
     CreateGrid();
@@ -223,6 +230,7 @@ bool SaveScene(const String&in fileName)
 
     if (success)
     {
+        UpdateSceneMru(fileName);
         sceneModified = false;
         UpdateWindowTitle();
     }
@@ -871,4 +879,17 @@ bool SaveParticleData(const String&in fileName)
     }
 
     return false;
+}
+
+void UpdateSceneMru(String filename)
+{
+    while (uiRecentScenes.Find(filename) > -1)
+        uiRecentScenes.Erase(uiRecentScenes.Find(filename));
+
+    uiRecentScenes.Insert(0, filename);
+
+    for(uint i=uiRecentScenes.length-1;i>=maxRecentSceneCount;i--)
+        uiRecentScenes.Erase(i);
+
+    PopulateMruScenes();
 }

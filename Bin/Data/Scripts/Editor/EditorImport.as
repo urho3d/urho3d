@@ -83,6 +83,7 @@ void ImportScene(const String&in fileName)
             args.Push("-l");
         if (fileSystem.SystemRun(fileSystem.programDir + "AssetImporter", args) == 0)
         {
+            skipMruScene = true; // set to avoid adding tempscene to mru
             LoadScene(tempSceneName);
             fileSystem.Delete(tempSceneName);
             UpdateWindowTitle();
