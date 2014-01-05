@@ -4216,6 +4216,9 @@ String typeName;
 /* (readonly) */
 String category;
 bool mouseVisible;
+bool screenKeyboardVisible;
+/* (readonly) */
+bool screenKeyboardSupport;
 bool toggleFullscreen;
 /* (readonly) */
 Array<bool> keyDown;
@@ -7579,6 +7582,7 @@ float defaultToolTipDelay;
 int maxFontTextureSize;
 bool nonFocusedMouseWheel;
 bool useSystemClipBoard;
+bool useScreenKeyboard;
 bool useMutableGlyphs;
 bool forceAutoHint;
 };

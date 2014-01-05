@@ -2226,6 +2226,7 @@ Methods:
 - bool OpenJoystick(unsigned index)
 - void CloseJoystick(unsigned index)
 - bool DetectJoysticks()
+- void SetScreenKeyboardVisible(bool enable)
 - bool GetKeyDown(int key) const
 - bool GetKeyPress(int key) const
 - bool GetMouseButtonDown(int button) const
@@ -2244,6 +2245,8 @@ Methods:
 - const String GetJoystickName(unsigned index) const
 - JoystickState* GetJoystick(unsigned index)
 - bool GetToggleFullscreen() const
+- bool GetScreenKeyboardSupport() const
+- bool IsScreenKeyboardVisible() const
 - bool IsMouseVisible() const
 - bool HasFocus()
 - bool IsMinimized() const
@@ -2259,6 +2262,8 @@ Properties:
 - unsigned numTouches (readonly)
 - unsigned numJoysticks (readonly)
 - bool toggleFullscreen (readonly)
+- bool screenKeyboardSupport (readonly)
+- bool screenKeyboardVisible
 - bool mouseVisible
 - bool focus (readonly)
 - bool minimized (readonly)
@@ -4707,6 +4712,7 @@ Methods:
 - void SetMaxFontTextureSize(int size)
 - void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 - void SetUseSystemClipBoard(bool enable)
+- void SetUseScreenKeyboard(bool enable)
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
 - UIElement* GetRoot() const
@@ -4726,6 +4732,7 @@ Methods:
 - int GetMaxFontTextureSize() const
 - bool IsNonFocusedMouseWheel() const
 - bool GetUseSystemClipBoard() const
+- bool GetUseScreenKeyboard() const
 - bool GetUseMutableGlyphs() const
 - bool GetForceAutoHint() const
 - bool HasModalElement() const
@@ -4747,6 +4754,7 @@ Properties:
 - int maxFontTextureSize
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard
+- bool useScreenKeyboard
 - bool useMutableGlyphs
 - bool forceAutoHint
 - bool modalElement (readonly)

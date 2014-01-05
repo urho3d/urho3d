@@ -3644,6 +3644,8 @@ Properties:
 - String typeName (readonly)
 - String category (readonly)
 - bool mouseVisible
+- bool screenKeyboardVisible
+- bool screenKeyboardSupport (readonly)
 - bool toggleFullscreen
 - bool[] keyDown (readonly)
 - bool[] keyPress (readonly)
@@ -6451,6 +6453,7 @@ Properties:
 - int maxFontTextureSize
 - bool nonFocusedMouseWheel
 - bool useSystemClipBoard
+- bool useScreenKeyboard
 - bool useMutableGlyphs
 - bool forceAutoHint
 
