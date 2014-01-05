@@ -636,6 +636,8 @@ Otherwise, to prevent memory leaks it needs to be deleted manually by calling th
 text:delete()
 \endcode
 
+When you call the \ref ResourceCache::GetFile "GetFile()" function of ResourceCache from Lua, the file you receive must also be manually deleted like described above once you are done with it.
+
 \page Rendering Rendering
 
 Much of the rendering functionality in Urho3D is built on two subsystems, Graphics and Renderer.
