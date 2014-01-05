@@ -42,8 +42,6 @@ public:
     MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     /// Destruct.
     virtual ~MessageBox();
-    /// Register object factory.
-    static void RegisterObject(Context* context);
 
     /// Set title text. No-ops if there is no title text element.
     void SetTitle(const String& text);
@@ -61,13 +59,13 @@ private:
     /// Handle events that dismiss the message box.
     void HandleMessageAcknowledged(StringHash eventType, VariantMap& eventData);
 
-    /// UI window layout.
+    /// UI element containing the whole UI layout. Typically it is a Window element type.
     SharedPtr<UIElement> window_;
-    /// UI title text element.
+    /// Title text element.
     Text* titleText_;
-    /// UI message text element.
+    /// Message text element.
     Text* messageText_;
-    /// UI OK button element.
+    /// OK button element.
     Button* okButton_;
 };
 

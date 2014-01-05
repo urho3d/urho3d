@@ -205,9 +205,8 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
 
     // If either shift or ctrl held down, add to selection if multiselect enabled
     bool additive = multiselect_ && qualifiers & (QUAL_SHIFT | QUAL_CTRL);
-    int delta = 0;
+    int delta = M_MAX_INT;
     int pageDirection = 1;
-    bool acceptZeroDelta = false;
 
     if (numItems)
     {
@@ -270,7 +269,6 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
                     newSelection += pageDirection;
                 }
                 delta = okSelection - selection - pageDirection * invisible;
-                acceptZeroDelta = true;     // Ensure Page Up and Down are being treated as handled key even though they generate zero delta
             }
             break;
 
@@ -284,7 +282,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         }
     }
 
-    if (delta || acceptZeroDelta)
+    if (delta != M_MAX_INT)
     {
         ChangeSelection(delta, additive);
         return;

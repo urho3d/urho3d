@@ -24,6 +24,7 @@
 #include "Button.h"
 #include "Context.h"
 #include "Graphics.h"
+#include "Log.h"
 #include "MessageBox.h"
 #include "ResourceCache.h"
 #include "Text.h"
@@ -67,6 +68,8 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
             const IntVector2& size = window->GetSize();
             window->SetPosition((graphics->GetWidth() - size.x_) / 2, (graphics->GetHeight() - size.y_) / 2);
         }
+        else
+            LOGWARNING("Instantiating a modal window in headless mode!");
         window->SetModal(true);
     }
 
@@ -90,11 +93,6 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
 MessageBox::~MessageBox()
 {
     window_->Remove();
-}
-
-void MessageBox::RegisterObject(Context* context)
-{
-    context->RegisterFactory<MessageBox>();
 }
 
 void MessageBox::SetTitle(const String& text)

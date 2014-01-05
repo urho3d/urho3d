@@ -393,10 +393,7 @@ JoystickState* Input::GetJoystick(unsigned index)
 
 bool Input::GetScreenKeyboardSupport() const
 {
-    if (graphics_)
-        return SDL_HasScreenKeyboardSupport() ? true : false;
-    else
-        return false;
+    return graphics_ ? SDL_HasScreenKeyboardSupport() : false;
 }
 
 bool Input::IsScreenKeyboardVisible() const
@@ -404,7 +401,7 @@ bool Input::IsScreenKeyboardVisible() const
     if (graphics_)
     {
         SDL_Window* window = graphics_->GetImpl()->GetWindow();
-        return SDL_IsScreenKeyboardShown(window) ? true : false;
+        return SDL_IsScreenKeyboardShown(window);
     }
     else
         return false;

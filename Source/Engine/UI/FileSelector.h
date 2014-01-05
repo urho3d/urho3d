@@ -135,31 +135,33 @@ private:
     /// Fileselector window.
     SharedPtr<Window> window_;
     /// Title layout.
-    SharedPtr<UIElement> titleLayout;
+    UIElement* titleLayout;
     /// Window title text.
-    SharedPtr<Text> titleText_;
+    Text* titleText_;
     /// File list.
-    SharedPtr<ListView> fileList_;
+    ListView* fileList_;
     /// Path editor.
-    SharedPtr<LineEdit> pathEdit_;
+    LineEdit* pathEdit_;
     /// Filename editor.
-    SharedPtr<LineEdit> fileNameEdit_;
+    LineEdit* fileNameEdit_;
     /// Filter dropdown.
-    SharedPtr<DropDownList> filterList_;
+    DropDownList* filterList_;
     /// OK button.
-    SharedPtr<Button> okButton_;
+    Button* okButton_;
     /// OK button text.
-    SharedPtr<Text> okButtonText_;
+    Text* okButtonText_;
     /// Cancel button.
-    SharedPtr<Button> cancelButton_;
+    Button* cancelButton_;
     /// Cancel button text.
-    SharedPtr<Text> cancelButtonText_;
+    Text* cancelButtonText_;
     /// Close button.
-    SharedPtr<Button> closeButton_;
+    Button* closeButton_;
     /// Filename and filter layout.
-    SharedPtr<UIElement> fileNameLayout_;
+    UIElement* fileNameLayout_;
+    /// Separator layout.
+    UIElement* separatorLayout_;
     /// Button layout.
-    SharedPtr<UIElement> buttonLayout_;
+    UIElement* buttonLayout_;
     /// Current directory.
     String path_;
     /// Filters.

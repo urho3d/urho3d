@@ -177,6 +177,12 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Resize Border" value="8 8 8 8" />
     </element>
+    <element type="DialogWindow" style="Window" auto="false">
+        <attribute name="Is Movable" value="true" />
+        <attribute name="Modal Shade Color" value="0.3 0.4 0.7 0.4" />
+        <attribute name="Modal Frame Color" value="0.3 0.4 0.7" />
+        <attribute name="Modal Frame Size" value="2 2" />
+    </element>
     <element type="ListRow">
         <attribute name="Min Size" value="0 17" />
         <attribute name="Max Size" value="2147483647 17" />
@@ -185,7 +191,7 @@
     <element type="PanelView" style="ListView" auto="false">    <!-- todo: rename this to PanelListView -->
         <element type="BorderImage" internal="true">
             <attribute name="Image Rect" value="48 16 64 32" />
-            <attribute name="Hover Image Offset" value="16 0" />
+            <attribute name="Hover Image Offset" value="80 32" />
             <element internal="true">
                 <attribute name="Layout Spacing" value="4" />
                 <attribute name="Layout Border" value="4 4 4 4" />
@@ -194,6 +200,10 @@
     </element>
     <element type="Panel" auto="false">
         <attribute name="Layout Mode" value="Vertical" />
+        <attribute name="Layout Spacing" value="4" />
+    </element>
+    <element type="HorizontalPanel" auto="false">
+        <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="4" />
     </element>
     <element type="Text">
@@ -218,12 +228,6 @@
         <element type="Text" internal="true">
             <attribute name="Selection Color" value="0.3 0.4 0.7 0.75" />
         </element>
-    </element>
-    <element type="DialogWindow" style="Window" auto="false">
-        <attribute name="Is Movable" value="true" />
-        <attribute name="Modal Shade Color" value="0.3 0.4 0.7 0.05" />
-        <attribute name="Modal Frame Color" value="0.3 0.4 0.7" />
-        <attribute name="Modal Frame Size" value="2 2" />
     </element>
     <element type="FileSelector" style="DialogWindow" auto="false">
         <attribute name="Size" value="400 300" />
@@ -270,6 +274,10 @@
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Min Size" value="0 11" />
         <attribute name="Max Size" value="2147483647 11" />
+    </element>
+    <element type="EditorSeparator" auto="false">
+        <attribute name="Min Size" value="0 2" />
+        <attribute name="Max Size" value="2147483647 2" />
     </element>
     <element type="EditorMenuBar" style="BorderImage" auto="false">
         <attribute name="Image Rect" value="112 0 128 16" />

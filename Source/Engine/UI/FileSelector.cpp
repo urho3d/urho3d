@@ -85,16 +85,11 @@ FileSelector::FileSelector(Context* context) :
 
     window_->AddChild(fileNameLayout_);
 
+    separatorLayout_ = new UIElement(context_);
+    window_->AddChild(separatorLayout_);
+
     buttonLayout_ = new UIElement(context_);
     buttonLayout_->SetLayout(LM_HORIZONTAL);
-
-    buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
-
-    okButton_ = new Button(context_);
-    okButtonText_ = new Text(context_);
-    okButtonText_->SetAlignment(HA_CENTER, VA_CENTER);
-    okButton_->AddChild(okButtonText_);
-    buttonLayout_->AddChild(okButton_);
 
     buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
 
@@ -104,7 +99,11 @@ FileSelector::FileSelector(Context* context) :
     cancelButton_->AddChild(cancelButtonText_);
     buttonLayout_->AddChild(cancelButton_);
 
-    buttonLayout_->AddChild(new UIElement(context_)); // Add spacer
+    okButton_ = new Button(context_);
+    okButtonText_ = new Text(context_);
+    okButtonText_->SetAlignment(HA_CENTER, VA_CENTER);
+    okButton_->AddChild(okButtonText_);
+    buttonLayout_->AddChild(okButton_);
 
     window_->AddChild(buttonLayout_);
 
@@ -160,6 +159,7 @@ void FileSelector::SetDefaultStyle(XMLFile* style)
     titleLayout->SetStyle("FileSelectorLayout");
     fileNameLayout_->SetStyle("FileSelectorLayout");
     buttonLayout_->SetStyle("FileSelectorLayout");
+    separatorLayout_->SetStyle("EditorSeparator");
 
     fileList_->SetStyle("FileSelectorListView");
     fileNameEdit_->SetStyle("FileSelectorLineEdit");
