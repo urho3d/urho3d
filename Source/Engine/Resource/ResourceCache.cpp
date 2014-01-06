@@ -153,8 +153,15 @@ void ResourceCache::RemoveResourceDir(const String& pathName)
         if (!resourceDirs_[i].Compare(fixedPath, false))
         {
             resourceDirs_.Erase(i);
-            if (fileWatchers_.Size() > i)
-                fileWatchers_.Erase(i);
+            // Remove the filewatcher with the matching path
+            for (unsigned j = 0; j < fileWatchers_.Size(); ++j)
+            {
+                if (!fileWatchers_[j]->GetPath().Compare(fixedPath, false))
+                {
+                    fileWatchers_.Erase(j);
+                    break;
+                }
+            }
             LOGINFO("Removed resource path " + fixedPath);
             return;
         }
