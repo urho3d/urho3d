@@ -25,6 +25,7 @@
 #include "ArrayPtr.h"
 #include "BoundingBox.h"
 #include "Component.h"
+#include "HashSet.h"
 #include "Matrix3x4.h"
 
 class dtNavMesh;

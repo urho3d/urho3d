@@ -24,6 +24,7 @@
 
 #include "Urho3D.h"
 #include "HashMap.h"
+#include "Str.h"
 
 #include <angelscript.h>
 
