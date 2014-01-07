@@ -33,11 +33,6 @@ endif ()
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
-# Enable AngelScript by default
-if (NOT DEFINED ENABLE_ANGELSCRIPT)
-    set (ENABLE_ANGELSCRIPT 1)
-endif ()
-
 # Include Urho3D cmake module
 include (Urho3D-CMake-magic)
 

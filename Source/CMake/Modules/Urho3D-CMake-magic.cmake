@@ -104,6 +104,11 @@ if (NOT IOS AND NOT ANDROID AND NOT RASPI AND USE_OPENGL)
     add_definitions (-DGLEW_NO_GLU)
 endif ()
 
+# Enable AngelScript by default
+if (NOT DEFINED ENABLE_ANGELSCRIPT)
+    set (ENABLE_ANGELSCRIPT 1)
+endif ()
+
 # Add definition for AngelScript
 if (ENABLE_ANGELSCRIPT)
     add_definitions (-DENABLE_ANGELSCRIPT)

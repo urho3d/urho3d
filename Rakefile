@@ -1,8 +1,49 @@
 require "rubygems"
 
-# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master rake travis)
+# Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
+desc 'Configure, build, and test Urho3D project'
+task :travis_ci do
+  system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$TEST_LIB_TYPE -DENABLE_64BIT=1 -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 && cd Build && make && make test' or abort 'Failed to configure/build/test Urho3D library'
+  system 'mkdir -p Build/generated/externallib/{Source,Bin} && cp *.sh .*.sh Build/generated/externallib && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* Build/generated/externallib/Source && ln -sf ../../../../Bin/{Core,}Data Build/generated/externallib/Bin && cat <<EOF >Build/generated/externallib/Source/CMakeLists.txt
+# Set project name
+project (MySuperDuperGame)
+
+# Set minimum version
+cmake_minimum_required (VERSION 2.8.6)
+
+if (COMMAND cmake_policy)
+    cmake_policy (SET CMP0003 NEW)
+endif ()
+
+# Set CMake modules search path
+set (CMAKE_MODULE_PATH \$ENV{URHO3D_HOME}/Source/CMake/Modules CACHE PATH "Path to Urho3D-specific CMake modules")
+
+# Include Urho3D cmake module
+include (Urho3D-CMake-magic)
+
+# Find Urho3D library
+find_package (Urho3D REQUIRED)
+include_directories (\${URHO3D_INCLUDE_DIR})
+
+# Define target name
+set (TARGET_NAME Main)
+
+# Define source files
+define_source_files ()
+
+# Setup target with resource copying
+setup_main_executable ()
+
+# Setup test cases
+add_test (NAME ExternalLibAS COMMAND \${TARGET_NAME} Data/Scripts/12_PhysicsStressTest.as -w -timeout \${TEST_TIME_OUT})
+add_test (NAME ExternalLibLua COMMAND \${TARGET_NAME} Data/LuaScripts/12_PhysicsStressTest.lua -w -timeout \${TEST_TIME_OUT})
+EOF' or abort 'Failed to prepare temporary project structure using Urho3D as external library'
+  system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUA=1 -DENABLE_TESTING=1 && cd Build && make && make test" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
+end
+
+# Usage: NOT intended to be used manually (if you insist then try: GIT_NAME=... GIT_EMAIL=... GH_TOKEN=... TRAVIS_BRANCH=master rake travis_ci_site_update)
 desc 'Update site documentation to GitHub Pages'
-task :travis do
+task :travis_ci_site_update do
   # Skip documentation update if one of the following conditions is met
   if ENV['TRAVIS_PULL_REQUEST'].to_i > 0 or ENV['TRAVIS_BRANCH'] != 'master' or ENV['TEST_LIB_TYPE'] == 'SHARED'
     next
