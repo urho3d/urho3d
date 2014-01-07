@@ -4,6 +4,7 @@ XMLFile@ uiStyle;
 XMLFile@ iconStyle;
 UIElement@ uiMenuBar;
 UIElement@ quickMenu;
+Menu@ recentSceneMenu;
 Window@ mruScenesPopup;
 Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
@@ -281,9 +282,9 @@ void CreateMenuBar()
         popup.AddChild(CreateMenuItem("Open scene...", @PickFile, 'O', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene", @SaveSceneWithExistingName, 'S', QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Save scene as...", @PickFile, 'S', QUAL_SHIFT | QUAL_CTRL));
-        Menu@ openRecentScene = CreateMenuItem("Open recent scene");
-        popup.AddChild(openRecentScene);
-        mruScenesPopup = CreatePopup(openRecentScene);
+        recentSceneMenu = CreateMenuItem("Open recent scene", null, SHOW_POPUP_INDICATOR);
+        popup.AddChild(recentSceneMenu);
+        mruScenesPopup = CreatePopup(recentSceneMenu);
         PopulateMruScenes();
         CreateChildDivider(popup);
 
@@ -1357,8 +1358,15 @@ void HandleMessageAcknowledgement(StringHash eventType, VariantMap& eventData)
 void PopulateMruScenes()
 {
     mruScenesPopup.RemoveAllChildren();
-    for (uint i=0; i < uiRecentScenes.length; ++i)
-        mruScenesPopup.AddChild(CreateMenuItem(uiRecentScenes[i], @LoadMostRecentScene, 0, 0, false));
+    if (uiRecentScenes.length > 0)
+    {
+        recentSceneMenu.enabled = true;
+        for (uint i=0; i < uiRecentScenes.length; ++i)
+            mruScenesPopup.AddChild(CreateMenuItem(uiRecentScenes[i], @LoadMostRecentScene, 0, 0, false));
+    }
+    else
+        recentSceneMenu.enabled = false;
+
 }
 
 bool LoadMostRecentScene()
@@ -1373,4 +1381,3 @@ bool LoadMostRecentScene()
 
     return LoadScene(text.text);
 }
-
