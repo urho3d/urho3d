@@ -36,6 +36,7 @@
 #include "ListView.h"
 #include "Log.h"
 #include "Matrix3x4.h"
+#include "MessageBox.h"
 #include "Profiler.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
@@ -1412,6 +1413,7 @@ void RegisterUILibrary(Context* context)
     Menu::RegisterObject(context);
     DropDownList::RegisterObject(context);
     FileSelector::RegisterObject(context);
+    MessageBox::RegisterObject(context);
     ToolTip::RegisterObject(context);
 }
 

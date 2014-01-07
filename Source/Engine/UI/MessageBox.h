@@ -42,6 +42,8 @@ public:
     MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     /// Destruct.
     virtual ~MessageBox();
+    /// Register object factory.
+    static void RegisterObject(Context* context);
 
     /// Set title text. No-ops if there is no title text element.
     void SetTitle(const String& text);

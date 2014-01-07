@@ -157,13 +157,6 @@ bool Engine::Initialize(const VariantMap& parameters)
         RegisterGraphicsLibrary(context_);
     }
 
-    // In debug mode, check now that all factory created objects can be created without crashing
-    #ifdef _DEBUG
-    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
-        SharedPtr<Object> object = i->second_->CreateObject();
-    #endif
-
     // Start logging
     Log* log = GetSubsystem<Log>();
     if (log)
@@ -307,6 +300,13 @@ bool Engine::Initialize(const VariantMap& parameters)
     #ifdef ENABLE_TESTING
     if (HasParameter(parameters, "TimeOut"))
         timeOut_ = GetParameter(parameters, "TimeOut", 0).GetInt() * 1000000LL;
+    #endif
+
+    // In debug mode, check now that all factory created objects can be created without crashing
+    #ifdef _DEBUG
+    const HashMap<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
+    for (HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+        SharedPtr<Object> object = i->second_->CreateObject();
     #endif
 
     frameTimer_.Reset();

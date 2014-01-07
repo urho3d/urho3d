@@ -37,13 +37,21 @@ namespace Urho3D
 {
 
 MessageBox::MessageBox(Context* context, const String& messageString, const String& titleString, XMLFile* layoutFile, XMLFile* styleFile) :
-    Object(context)
+    Object(context),
+    titleText_(0),
+    messageText_(0),
+    okButton_(0)
 {
     // If layout file is not given, use the default message box layout
     if (!layoutFile)
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         layoutFile = cache->GetResource<XMLFile>("UI/MessageBox.xml");
+        if (!layoutFile)
+        {
+            LOGERROR("Could not find default message box layout file: UI/MessageBox.xml");
+            return;
+        }
     }
 
     UI* ui = GetSubsystem<UI>();
@@ -70,7 +78,9 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
         }
         else
             LOGWARNING("Instantiating a modal window in headless mode!");
+
         window->SetModal(true);
+        SubscribeToEvent(window, E_MODALCHANGED, HANDLER(MessageBox, HandleMessageAcknowledged));
     }
 
     // Bind the buttons (if any in the loaded UI layout) to event handlers
@@ -86,13 +96,17 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     Button* closeButton = dynamic_cast<Button*>(window_->GetChild("CloseButton", true));
     if (closeButton)
         SubscribeToEvent(closeButton, E_RELEASED, HANDLER(MessageBox, HandleMessageAcknowledged));
-
-    SubscribeToEvent(window_, E_MODALCHANGED, HANDLER(MessageBox, HandleMessageAcknowledged));
 }
 
 MessageBox::~MessageBox()
 {
-    window_->Remove();
+    if (window_)
+        window_->Remove();
+}
+
+void MessageBox::RegisterObject(Context* context)
+{
+    context->RegisterFactory<MessageBox>();
 }
 
 void MessageBox::SetTitle(const String& text)
