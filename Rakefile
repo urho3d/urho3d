@@ -4,7 +4,7 @@ require "rubygems"
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
   system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$TEST_LIB_TYPE -DENABLE_64BIT=1 -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 && cd Build && make && make test' or abort 'Failed to configure/build/test Urho3D library'
-  system 'mkdir -p Build/generated/externallib/{Source,Bin} && cp *.sh .*.sh Build/generated/externallib && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* Build/generated/externallib/Source && ln -sf ../../../../Bin/{Core,}Data Build/generated/externallib/Bin && cat <<EOF >Build/generated/externallib/Source/CMakeLists.txt
+  system 'bash -c "mkdir -p Build/generated/externallib/{Source,Bin}" && cp *.sh .*.sh Build/generated/externallib && cp Source/Tools/Urho3DPlayer/Urho3DPlayer.* Build/generated/externallib/Source && bash -c "ln -sf ../../../../Bin/{Core,}Data Build/generated/externallib/Bin" && cat <<EOF >Build/generated/externallib/Source/CMakeLists.txt
 # Set project name
 project (MySuperDuperGame)
 
