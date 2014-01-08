@@ -210,7 +210,10 @@ void UseGizmo()
     IntVector2 pos = ui.cursorPosition;
     if (ui.GetElementAt(pos) !is null)
         return;
-    Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+    IntRect view = activeViewport.viewport.rect;
+    Ray cameraRay = camera.GetScreenRay(
+        float(pos.x-view.left) / view.width,
+        float(pos.y-view.top) / view.height);
     float scale = gizmoNode.scale.x;
 
     // Recalculate axes only when not left-dragging

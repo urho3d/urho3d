@@ -72,6 +72,7 @@ void CreateUI()
     CreateStatsBar();
     CreateConsole();
     CreateDebugHud();
+    CreateViewportUI();
 
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");
@@ -1202,7 +1203,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 fillMode = FILL_SOLID;
 
             // Update camera fill mode
-            camera.fillMode = fillMode;
+            SetFillMode(fillMode);
         }
         else if (key == KEY_SPACE)
         {

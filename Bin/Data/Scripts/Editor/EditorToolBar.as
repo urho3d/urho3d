@@ -64,6 +64,22 @@ void CreateToolBar()
     fillModeGroup.AddChild(CreateToolBarToggle("FillSolid"));
     FinalizeGroupHorizontal(fillModeGroup, "ToolBarToggle");
     toolBar.AddChild(fillModeGroup);
+
+    toolBar.AddChild(CreateToolBarSpacer(4));
+    DropDownList@ viewportMode = DropDownList();
+    viewportMode.style = AUTO_STYLE;
+    viewportMode.SetMaxSize(100, 18);
+    viewportMode.SetAlignment(HA_LEFT, VA_CENTER);
+    toolBar.AddChild(viewportMode);
+    viewportMode.AddItem(CreateViewPortModeText("Single", VIEWPORT_SINGLE));
+    viewportMode.AddItem(CreateViewPortModeText("Vertical Split", VIEWPORT_LEFT|VIEWPORT_RIGHT));
+    viewportMode.AddItem(CreateViewPortModeText("Horizontal Split", VIEWPORT_TOP|VIEWPORT_BOTTOM));
+    viewportMode.AddItem(CreateViewPortModeText("Quad", VIEWPORT_TOP_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM_LEFT|VIEWPORT_BOTTOM_RIGHT));
+    viewportMode.AddItem(CreateViewPortModeText("1 Top / 2 Bottom", VIEWPORT_TOP|VIEWPORT_BOTTOM_LEFT|VIEWPORT_BOTTOM_RIGHT));
+    viewportMode.AddItem(CreateViewPortModeText("2 Top / 1 Bottom", VIEWPORT_TOP_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM));
+    viewportMode.AddItem(CreateViewPortModeText("1 Left / 2 Right", VIEWPORT_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM_RIGHT));
+    viewportMode.AddItem(CreateViewPortModeText("2 Left / 1 Right", VIEWPORT_TOP_LEFT|VIEWPORT_BOTTOM_LEFT|VIEWPORT_RIGHT));
+    SubscribeToEvent(viewportMode, "ItemSelected", "ToolBarSetViewportMode");
 }
 
 Button@ CreateToolBarButton(const String&in title)
@@ -309,7 +325,7 @@ void ToolBarFillModePoint(StringHash eventType, VariantMap& eventData)
     if (edit.checked)
     {
         fillMode = FILL_POINT;
-        camera.fillMode = fillMode;
+        SetFillMode(fillMode);
     }
     toolBarDirty = true;
 }
@@ -320,7 +336,7 @@ void ToolBarFillModeWireFrame(StringHash eventType, VariantMap& eventData)
     if (edit.checked)
     {
         fillMode = FILL_WIREFRAME;
-        camera.fillMode = fillMode;
+        SetFillMode(fillMode);
     }
     toolBarDirty = true;
 }
@@ -331,9 +347,17 @@ void ToolBarFillModeSolid(StringHash eventType, VariantMap& eventData)
     if (edit.checked)
     {
         fillMode = FILL_SOLID;
-        camera.fillMode = fillMode;
+        SetFillMode(fillMode);
     }
     toolBarDirty = true;
+}
+
+void ToolBarSetViewportMode(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ dropDown = eventData["Element"].GetUIElement();
+    UIElement@ selected = dropDown.GetItems()[dropDown.selection];
+    uint mode = selected.vars["VIEW_MODE"].GetUInt();
+    SetViewportMode(mode);
 }
 
 void UpdateDirtyToolBar()
@@ -452,4 +476,13 @@ void UpdateDirtyToolBar()
     }
 
     toolBarDirty = false;
+}
+
+Text@ CreateViewPortModeText(String text_, uint mode)
+{
+    Text@ text = Text();
+    text.text = text_;
+    text.vars["VIEW_MODE"] = mode;
+    text.style = "EditorEnumAttributeText";
+    return text;
 }
