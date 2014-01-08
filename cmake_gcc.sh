@@ -28,10 +28,9 @@ SOURCE=`pwd`/Source
 # Define helpers
 . ./.bash_helpers.sh
 
-# Create out-of-source build directory
-cmake -E make_directory Build
-[ $RASPI_TOOL ] && cmake -E make_directory raspi-Build
-[ $ANDROID_NDK ] && cmake -E make_directory android-Build
+# Detect CMake toolchains directory
+TOOLCHAINS=$SOURCE/CMake/Toolchains
+[ ! -d $TOOLCHAINS -a -d $URHO3D_HOME/Source/CMake/Toolchains ] && TOOLCHAINS=$URHO3D_HOME/Source/CMake/Toolchains
 
 # Add support for Eclipse IDE
 IFS=#
@@ -43,9 +42,9 @@ GENERATOR="Unix Makefiles"
 
 # Create project with the respective CMake generators
 OPT=-Wno-dev    # \todo suppress policy warning (for 2.8.12 early adopters), remove this option when CMake minimum version is 2.8.12
-[ $ANDROID_NDK ] && msg "Android build" && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $@ $SOURCE && post_cmake android-Build
-[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCE/CMake/Toolchains/raspberrypi.toolchain.cmake $@ $SOURCE && post_cmake raspi-Build
-msg "Native build" && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $@ $SOURCE && post_cmake Build
+[ $ANDROID_NDK ] && msg "Android build" && cmake -E make_directory android-Build && cmake -E chdir android-Build cmake $OPT -G $GENERATOR -DANDROID=1 -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/android.toolchain.cmake -DLIBRARY_OUTPUT_PATH_ROOT=. $@ $SOURCE && post_cmake android-Build
+[ $RASPI_TOOL ] && msg "Raspberry Pi build" && cmake -E make_directory raspi-Build && cmake -E chdir raspi-Build cmake $OPT -G $GENERATOR -DRASPI=1 -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/raspberrypi.toolchain.cmake $@ $SOURCE && post_cmake raspi-Build
+msg "Native build" && cmake -E make_directory Build && cmake -E chdir Build cmake $OPT -G $GENERATOR $PLATFORM $@ $SOURCE && post_cmake Build
 unset IFS
 
 # Create symbolic links in the build directories
@@ -57,5 +56,7 @@ if [ $ANDROID_NDK ]; then
         cmake -E create_symlink ../Source/Android/$f android-Build/$f
     done
 fi
+
+exit 0
 
 # vi: set ts=4 sw=4 expandtab:

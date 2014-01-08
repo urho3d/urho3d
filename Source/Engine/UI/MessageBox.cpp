@@ -50,6 +50,7 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
         if (!layoutFile)
         {
             LOGERROR("Could not find default message box layout file: UI/MessageBox.xml");
+            assert(false);  // Bark loudly in debug mode
             return;
         }
     }

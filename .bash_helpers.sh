@@ -31,11 +31,11 @@ post_cmake() {
         # Common fixes for all builds
         #
         # Remove build type from project name
-        # Replace deprecated GNU gmake Error Parser with newer version (6.0 -> 7.0)
+        # Replace deprecated GNU gmake Error Parser with newer version (6.0 -> 7.0) and add GCC Error Parser
         #
         xmlstarlet ed -P -L \
             -u "/projectDescription/name/text()" -x "concat(substring-before(., '-Release'), substring-before(., '-Debug'), substring-before(., '-RelWithDebInfo'))" \
-            -u "/projectDescription/buildSpec/buildCommand/arguments/dictionary/value[../key/text() = 'org.eclipse.cdt.core.errorOutputParser']" -x "concat('org.eclipse.cdt.core.GmakeErrorParser', substring-after(., 'org.eclipse.cdt.core.MakeErrorParser'))" \
+            -u "/projectDescription/buildSpec/buildCommand/arguments/dictionary/value[../key/text() = 'org.eclipse.cdt.core.errorOutputParser']" -x "concat('org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;', substring-after(., 'org.eclipse.cdt.core.MakeErrorParser'))" \
             $1/.project
 
         # Build-specific fixes
