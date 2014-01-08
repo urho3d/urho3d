@@ -54,6 +54,8 @@
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/DefaultLogger.hpp>
+
 #include <cstring>
 
 #include "DebugNew.h"
@@ -105,6 +107,7 @@ bool noAnimations_ = false;
 bool noMaterials_ = false;
 bool saveMaterialList_ = false;
 bool includeNonSkinningBones_ = false;
+bool verboseLog_ = false;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
 
@@ -213,6 +216,7 @@ void Run(const Vector<String>& arguments)
             "            if its name contains any of the filters. Prefix filter with minus\n"
             "            sign to use as an exclude. For example -s \"Bip01;-Dummy;-Helper\"\n"
             "-t          Generate tangents\n"
+            "-v          Enable verbose Assimp library logging\n"
         );
     }
     
@@ -317,6 +321,8 @@ void Run(const Vector<String>& arguments)
                     }
                 }
             }
+            else if (argument == "v")
+                verboseLog_ = true;
         }
     }
     
@@ -347,10 +353,16 @@ void Run(const Vector<String>& arguments)
         if (command != "dump" && outFile.Empty())
             ErrorExit("No output file defined");
         
+        if (verboseLog_)
+            Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
+        
         PrintLine("Reading file " + inFile);
         scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
         if (!scene_)
             ErrorExit("Could not open or parse input file " + inFile);
+        
+        if (verboseLog_)
+            Assimp::DefaultLogger::kill();
         
         rootNode_ = scene_->mRootNode;
         if (!rootNodeName.Empty())
