@@ -4,7 +4,7 @@ require "rubygems"
 desc 'Create a new project using Urho3D as external library'
 task :scaffolding do
   abort 'Usage: rake scaffolding dir=/path/to/new/project/root' unless ENV['dir']
-  scaffolding "#{ENV['dir']}"
+  scaffolding ENV['dir']
   puts "\nNew project created in #{ENV['dir']}\n\n"
   puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'URHO3D_INSTALL_PREFIX' environment variable"
   puts "Please see http://urho3d.github.io/documentation/a00004.html for more detail. For example:\n\n"
@@ -15,7 +15,7 @@ end
 desc 'Configure, build, and test Urho3D project'
 task :travis_ci do
   system './cmake_gcc.sh -DURHO3D_LIB_TYPE=$TEST_LIB_TYPE -DENABLE_64BIT=1 -DENABLE_LUAJIT=1 -DENABLE_LUAJIT_AMALG=1 -DENABLE_SAMPLES=1 -DENABLE_TOOLS=1 -DENABLE_EXTRAS=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd Build && make && make test' or abort 'Failed to configure/build/test Urho3D library'
-  scaffolding 'Build/generated/externallib' or abort
+  scaffolding 'Build/generated/externallib'
   system "URHO3D_HOME=`pwd`; export URHO3D_HOME && cd Build/generated/externallib && echo '\nUsing Urho3D as external library in external project' && ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUA=1 -DENABLE_TESTING=1 -DCMAKE_BUILD_TYPE=Debug && cd Build && make && make test" or abort 'Failed to configure/build/test temporary project using Urho3D as external library' 
 end
 
