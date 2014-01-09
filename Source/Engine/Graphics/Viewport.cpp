@@ -28,7 +28,6 @@
 #include "RenderPath.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "StringUtils.h"
 #include "Viewport.h"
 #include "XMLFile.h"
 

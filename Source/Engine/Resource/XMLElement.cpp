@@ -23,7 +23,6 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Log.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
 
 #include <pugixml.hpp>

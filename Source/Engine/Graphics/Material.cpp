@@ -29,7 +29,6 @@
 #include "Matrix3x4.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"

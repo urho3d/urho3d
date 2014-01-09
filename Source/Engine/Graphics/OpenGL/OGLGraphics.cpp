@@ -47,7 +47,6 @@
 #include "ShaderVariation.h"
 #include "Skybox.h"
 #include "StaticModelGroup.h"
-#include "StringUtils.h"
 #include "Technique.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"

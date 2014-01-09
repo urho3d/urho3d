@@ -33,7 +33,6 @@
 #include "Profiler.h"
 #include "Protocol.h"
 #include "Scene.h"
-#include "StringUtils.h"
 
 #include <kNet.h>
 

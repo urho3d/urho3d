@@ -34,7 +34,6 @@
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "Scene.h"
-#include "StringUtils.h"
 #include "Terrain.h"
 #include "TerrainPatch.h"
 #include "VertexBuffer.h"

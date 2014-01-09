@@ -42,7 +42,6 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
-#include "StringUtils.h"
 #include "UI.h"
 #include "WorkQueue.h"
 #include "XMLFile.h"

@@ -26,7 +26,6 @@
 #include "File.h"
 #include "FileSystem.h"
 #include "Log.h"
-#include "StringUtils.h"
 
 #include <cstdio>
 #include <cstring>

@@ -29,7 +29,6 @@
 #include "Profiler.h"
 #include "RenderSurface.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "Texture.h"
 #include "XMLFile.h"
 

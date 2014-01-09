@@ -27,7 +27,6 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "ShaderVariation.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"

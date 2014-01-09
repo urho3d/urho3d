@@ -23,6 +23,7 @@
 #pragma once
 
 #include "Object.h"
+#include "StringUtils.h"
 
 namespace Urho3D
 {
@@ -97,11 +98,21 @@ private:
 #define LOGWARNING(message) Log::Write(LOG_WARNING, message)
 #define LOGERROR(message) Log::Write(LOG_ERROR, message)
 #define LOGRAW(message) Log::WriteRaw(message)
+#define LOGDEBUGF(format, ...) Log::Write(LOG_DEBUG, ToString(format, ##__VA_ARGS__))
+#define LOGINFOF(format, ...) Log::Write(LOG_INFO, ToString(format, ##__VA_ARGS__))
+#define LOGWARNINGF(format, ...) Log::Write(LOG_WARNING, ToString(format, ##__VA_ARGS__))
+#define LOGERRORF(format, ...) Log::Write(LOG_ERROR, ToString(format, ##__VA_ARGS__))
+#define LOGRAWF(format, ...) Log::WriteRaw(ToString(format, ##__VA_ARGS__))
 #else
 #define LOGDEBUG(message)
 #define LOGINFO(message)
 #define LOGWARNING(message)
 #define LOGERROR(message)
 #define LOGRAW(message)
+#define LOGDEBUGF(...)
+#define LOGINFOF(...)
+#define LOGWARNINGF(...)
+#define LOGERRORF(...)
+#define LOGRAWF(...)
 #endif
 }

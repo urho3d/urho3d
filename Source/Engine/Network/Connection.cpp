@@ -37,7 +37,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
-#include "StringUtils.h"
 
 #include <kNet.h>
 

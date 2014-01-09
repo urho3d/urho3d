@@ -28,7 +28,6 @@
 #include "SceneEvents.h"
 #include "Serializable.h"
 #include "Serializer.h"
-#include "StringUtils.h"
 #include "XMLElement.h"
 
 #include "DebugNew.h"

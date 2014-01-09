@@ -27,7 +27,6 @@
 #include "ListView.h"
 #include "Log.h"
 #include "Sort.h"
-#include "StringUtils.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"

@@ -24,7 +24,6 @@
 #include "HttpRequest.h"
 #include "Log.h"
 #include "Profiler.h"
-#include "StringUtils.h"
 #include "Timer.h"
 
 #include <civetweb.h>

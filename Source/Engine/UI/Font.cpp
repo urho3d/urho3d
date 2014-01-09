@@ -30,7 +30,6 @@
 #include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "Texture2D.h"
 #include "UI.h"
 #include "XMLFile.h"

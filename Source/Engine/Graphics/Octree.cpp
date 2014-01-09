@@ -29,7 +29,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "Sort.h"
-#include "StringUtils.h"
 #include "WorkQueue.h"
 
 #include "DebugNew.h"

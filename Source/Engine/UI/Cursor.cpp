@@ -28,7 +28,6 @@
 #include "Log.h"
 #include "Ptr.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "Texture2D.h"
 #include "UI.h"
 

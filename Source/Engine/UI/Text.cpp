@@ -26,7 +26,6 @@
 #include "Log.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "Text.h"
 #include "Texture2D.h"
 
