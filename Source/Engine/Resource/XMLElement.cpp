@@ -878,7 +878,7 @@ XPathResultSet& XPathResultSet::operator = (const XPathResultSet& rhs)
 XMLElement XPathResultSet::operator[](unsigned index) const
 {
     if (!resultSet_)
-        LOGERROR(ToString("Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.", index));
+        LOGERRORF("Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.", index);
 
     return resultSet_ && index < Size() ? XMLElement(file_, this, &resultSet_->operator [](index), index) : XMLElement();
 }

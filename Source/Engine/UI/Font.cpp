@@ -236,8 +236,7 @@ bool FontFace::RenderAllGlyphs(int maxWidth, int maxHeight)
     textures_.Push(texture);
     font_->SetMemoryUse(font_->GetMemoryUse() + image->GetWidth() * image->GetHeight());
     
-    LOGDEBUG(ToString("Font face %s (%dpt) uses a static page texture of size %dx%d", GetFileName(font_->GetName()).CString(), pointSize_, 
-        texture->GetWidth(), texture->GetHeight()));
+    LOGDEBUGF("Font face %s (%dpt) uses a static page texture of size %dx%d", GetFileName(font_->GetName()).CString(), pointSize_, texture->GetWidth(), texture->GetHeight());
     return true;
 }
 
@@ -357,8 +356,7 @@ void FontFace::SetupNextTexture(int width, int height)
     textures_.Push(texture);
     font_->SetMemoryUse(font_->GetMemoryUse() + width * height);
     
-    LOGDEBUG(ToString("Font face %s (%dpt) is using %d dynamic page textures of size %dx%d", GetFileName(font_->GetName()).CString(),
-        pointSize_, textures_.Size(), width, height));
+    LOGDEBUGF("Font face %s (%dpt) is using %d dynamic page textures of size %dx%d", GetFileName(font_->GetName()).CString(), pointSize_, textures_.Size(), width, height);
 }
 
 void FontFace::SetupMutableGlyphs(int textureWidth, int textureHeight, int maxWidth, int maxHeight)
@@ -380,8 +378,7 @@ void FontFace::SetupMutableGlyphs(int textureWidth, int textureHeight, int maxWi
         mutableGlyphs_.Push(glyph);
     }
     
-    LOGDEBUG(ToString("Font face %s (%dpt) is using %d mutable glyphs", GetFileName(font_->GetName()).CString(), pointSize_,
-        mutableGlyphs_.Size()));
+    LOGDEBUGF("Font face %s (%dpt) is using %d mutable glyphs", GetFileName(font_->GetName()).CString(), pointSize_, mutableGlyphs_.Size());
 }
 
 Font::Font(Context* context) :
@@ -662,7 +659,7 @@ FontFace* Font::GetFaceFreeType(int pointSize)
         charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
     }
     
-    LOGDEBUG(ToString("Font face %s (%dpt) has %d glyphs", GetFileName(GetName()).CString(), pointSize, numGlyphs));
+    LOGDEBUGF("Font face %s (%dpt) has %d glyphs", GetFileName(GetName()).CString(), pointSize, numGlyphs);
     
     // Load each of the glyphs to see the sizes & store other information
     int maxWidth = 0;
@@ -866,7 +863,7 @@ FontFace* Font::GetFaceBitmap(int pointSize)
         }
     }
     
-    LOGDEBUG(ToString("Bitmap font face %s has %d glyphs", GetFileName(GetName()).CString(), count));
+    LOGDEBUGF("Bitmap font face %s has %d glyphs", GetFileName(GetName()).CString(), count);
 
     SetMemoryUse(GetMemoryUse() + totalTextureSize);
     faces_[pointSize] = newFace;

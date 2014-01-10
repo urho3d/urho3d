@@ -180,7 +180,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     {
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
 
-        LOGINFO(ToString("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : ""));
+        LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
     }
 
     // Add resource paths

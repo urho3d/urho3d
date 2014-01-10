@@ -2029,7 +2029,7 @@ void Graphics::WindowResized()
     // Reset rendertargets and viewport for the new screen size
     ResetRenderTargets();
     
-    LOGDEBUG(ToString("Window was resized to %dx%d", width_, height_));
+    LOGDEBUGF("Window was resized to %dx%d", width_, height_);
     
     using namespace ScreenMode;
     
