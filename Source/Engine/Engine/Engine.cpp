@@ -587,10 +587,10 @@ void Engine::ApplyFrameLimit()
 
     elapsed = frameTimer_.GetUSec(true);
     #ifdef ENABLE_TESTING
-    if (timeOut_ != 0)
+    if (timeOut_ > 0)
     {
         timeOut_ -= elapsed;
-        if (timeOut_ < 0)
+        if (timeOut_ <= 0)
             Exit();
     }
     #endif
