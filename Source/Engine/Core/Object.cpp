@@ -99,8 +99,12 @@ void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
 
 void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler)
 {
+    // If a null sender was specified, the event can not be subscribed to. Delete the handler in that case
     if (!sender || !handler)
+    {
+        delete handler;
         return;
+    }
     
     handler->SetSenderAndEventType(sender, eventType);
     // Remove old event handler first
