@@ -61,7 +61,7 @@ public:
     /// Return the pugixml document.
     pugi::xml_document* GetDocument() const { return document_; }
 
-    /// Patch the XMLFile with another XMLFile.
+    /// Patch the XMLFile with another XMLFile. Based on RFC 5261.
     void Patch(XMLFile* patchFile);
     
 private:

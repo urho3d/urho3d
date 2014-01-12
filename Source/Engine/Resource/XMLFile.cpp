@@ -147,7 +147,7 @@ void XMLFile::Patch(XMLFile* patchFile)
         if (!original)
         {
             LOGERRORF("XML Patch failed with bad select: %s.", sel.value());
-            continue;;
+            continue;
         }
 
         if (strcmp(patch->name(),"add") == 0)
@@ -173,13 +173,9 @@ void XMLFile::PatchAdd(const pugi::xml_node& patch, pugi::xpath_node& original)
     // If no type add node, if contains '@' treat as attribute.
     pugi::xml_attribute type = patch.attribute("type");
     if (!type || strlen(type.value()) <= 0)
-    {
         AddNode(patch, original);
-    }
     else if (type.value()[0] == '@')
-    {
         AddAttribute(patch, original);
-    }
 }
 
 void XMLFile::PatchReplace(const pugi::xml_node& patch, pugi::xpath_node& original)
@@ -228,9 +224,7 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
             start++;
 
         for (; start != end; start++)
-        {
             original.node().append_copy(*start);
-        }
     }
     else if (strcmp(pos.value(), "prepend") == 0)
     {
@@ -244,9 +238,7 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
 
         pugi::xml_node pos = original.node().first_child();
         for (; start != end; start++)
-        {
             original.node().insert_copy_before(*start, pos);
-        }
     }
     else if (strcmp(pos.value(), "before") == 0)
     {
@@ -264,9 +256,7 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
             end--;
 
         for (; start != end; start++)
-        {
             original.parent().insert_copy_before(*start, original.node());
-        }
     }
     else if (strcmp(pos.value(), "after") == 0)
     {
@@ -285,9 +275,7 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
 
         pugi::xml_node pos = original.node();
         for (; start != end; start++)
-        {
             pos = original.parent().insert_copy_after(*start, pos);
-        }
     }
 }
 
