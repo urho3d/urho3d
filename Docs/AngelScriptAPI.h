@@ -1540,6 +1540,7 @@ bool Load(File);
 bool Save(File) const;
 XMLElement CreateRoot(const String&);
 XMLElement GetRoot(const String& = String ( ));
+void Patch(XMLFile);
 
 // Properties:
 /* (readonly) */

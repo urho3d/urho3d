@@ -3646,6 +3646,7 @@ Properties:
 Methods:
 
 - XMLElement GetRoot(const String name = String::EMPTY)
+- void Patch(XMLFile* patchFile)
 
 ### Serializable : Object
 
