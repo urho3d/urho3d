@@ -592,7 +592,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         {
             TextureUnit unit = (TextureUnit)i;
-            if (graphics->HasTextureUnit(unit))
+            if (textures[i] && graphics->HasTextureUnit(unit))
                 graphics->SetTexture(i, textures[i]);
         }
     }

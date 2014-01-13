@@ -1665,7 +1665,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(true);
+    graphics_->SetDepthWrite(depthWrite);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
