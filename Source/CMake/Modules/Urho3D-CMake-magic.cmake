@@ -454,12 +454,12 @@ macro (add_android_native_init)
     # The SDL_Main() is defined by Android application that could be resided in other CMake projects outside of Urho3D CMake project which makes things a little bit complicated
     if (CMAKE_PROJECT_NAME MATCHES Urho3D.*)
         list (APPEND SOURCE_FILES ${PROJECT_ROOT_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-    elseif (EXISTS $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+    elseif (EXISTS ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
         # Use Urho3D source installation
-        list (APPEND SOURCE_FILES $ENV{URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
-    elseif (EXISTS $ENV{URHO3D_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
+        list (APPEND SOURCE_FILES ${URHO3D_HOME}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+    elseif (EXISTS ${CMAKE_PREFIX_PATH}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
         # Use Urho3D SDK installation on non-default installation location (PATH_SUFFIX variable is set in FindUrho3D.cmake module)
-        list (APPEND SOURCE_FILES $ENV{URHO3D_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
+        list (APPEND SOURCE_FILES ${CMAKE_PREFIX_PATH}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
     elseif (EXISTS ${CMAKE_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
         # Use Urho3D SDK installation on system default installation location
         list (APPEND SOURCE_FILES ${CMAKE_INSTALL_PREFIX}/share/${PATH_SUFFIX}/templates/android/SDL_android_main.c)
