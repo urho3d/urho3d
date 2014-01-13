@@ -1,14 +1,16 @@
-require "rubygems"
+require 'pathname'
 
 # Usage: rake scaffolding dir=/path/to/new/project/root
 desc 'Create a new project using Urho3D as external library'
 task :scaffolding do
   abort 'Usage: rake scaffolding dir=/path/to/new/project/root' unless ENV['dir']
-  scaffolding ENV['dir']
-  puts "\nNew project created in #{ENV['dir']}\n\n"
+  abs_path = ENV['dir'][0, 1] == '/' ? ENV['dir'] : "#{Dir.pwd}/#{ENV['dir']}"
+  scaffolding abs_path
+  abs_path = Pathname.new(abs_path).realpath
+  puts "\nNew project created in #{abs_path}\n\n"
   puts "To build the new project, you may need to first define and export either 'URHO3D_HOME' or 'URHO3D_INSTALL_PREFIX' environment variable"
   puts "Please see http://urho3d.github.io/documentation/a00004.html for more detail. For example:\n\n"
-  puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{ENV['dir']}\n$ ./cmake_gcc.sh -DENABLE_64BIT=1\n$ cd Build\n$ make\n\n"
+  puts "$ URHO3D_HOME=#{Dir.pwd}; export URHO3D_HOME\n$ cd #{abs_path}\n$ ./cmake_gcc.sh -DENABLE_64BIT=1 -DENABLE_LUA=1\n$ cd Build\n$ make\n\n"
 end
 
 # Usage: NOT intended to be used manually (if you insist then try: rake travis_ci)
