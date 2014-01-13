@@ -1078,11 +1078,13 @@ void View::UpdateGeometries()
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             const RenderPathCommand& command = renderPath_->commands_[i];
-            if (!command.enabled_)
+            if (!IsNecessary(command))
                 continue;
             
             if (command.type_ == CMD_SCENEPASS)
             {
+                BatchQueue* passQueue = &batchQueues_[command.pass_];
+                
                 item.workFunction_ = command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork :
                     SortBatchQueueBackToFrontWork;
                 item.start_ = &batchQueues_[command.pass_];
@@ -1248,7 +1250,7 @@ void View::ExecuteRenderPathCommands()
         unsigned lastCommandIndex = 0;
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
-            if (!renderPath_->commands_[i].enabled_)
+            if (!IsNecessary(renderPath_->commands_[i]))
                 continue;
             lastCommandIndex = i;
         }
@@ -1256,7 +1258,7 @@ void View::ExecuteRenderPathCommands()
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             RenderPathCommand& command = renderPath_->commands_[i];
-            if (!command.enabled_)
+            if (!IsNecessary(command))
                 continue;
             
             // If command writes and reads the target at same time, pingpong automatically
@@ -1573,6 +1575,11 @@ void View::RenderQuad(RenderPathCommand& command)
     DrawFullscreenQuad(false);
 }
 
+bool View::IsNecessary(const RenderPathCommand& command)
+{
+    return command.enabled_ && (command.type_ != CMD_SCENEPASS || !batchQueues_[command.pass_].IsEmpty());
+}
+
 bool View::CheckViewportRead(const RenderPathCommand& command)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
@@ -1614,7 +1621,7 @@ void View::AllocateScreenBuffers()
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
-        if (!command.enabled_)
+        if (!IsNecessary(command))
             continue;
         if (CheckViewportRead(command))
         {

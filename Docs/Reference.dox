@@ -894,7 +894,7 @@ A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="base|litbase|light|alpha|litalpha|prealpha|postalpha|prepass|material|deferred|depth|shadow" vs="VertexShaderName" ps="PixelShaderName"
+    <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" vs="VertexShaderName" ps="PixelShaderName"
         lighting="unlit|pervertex|perpixel" alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" alphamask="true|false" />
     <pass ... />
@@ -909,7 +909,8 @@ The purposes of the different passes are:
 - light: Renders one per-pixel light's contribution additively for an opaque object.
 - alpha: Renders ambient light, per-vertex lights and fog for a transparent object.
 - litalpha: Renders one per-pixel light's contribution additively for a transparent object
-- prealpha: Custom rendering pass after opaque geometry. Can be used for example to render the skybox.
+- postopaque: Custom rendering pass after opaque geometry. Can be used to render the skybox.
+- refract: Custom rendering pass after postopaque pass. Can sample the viewport texture from the environment texture unit to render refractive objects.
 - postalpha: Custom rendering pass after transparent geometry.
 - prepass: %Light pre-pass only - renders normals, specular power and depth to the G-buffer.
 - material: %Light pre-pass only - renders opaque geometry final color by combining ambient light, per-vertex lights and per-pixel light accumulation.
@@ -926,6 +927,8 @@ Note that the technique does not need to enumerate shaders used for different ge
 The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
 
 "Alphamask" is not an actual rendering state, but a hint which tells that the pixel shader will use discard based on alpha. Because this may interfere with the early-Z culling, materials without the alpha masking hint will be drawn first.
+
+The refract pass requires pingponging the scene rendertarget to a texture, but this will not be performed if there is no refractive geometry to render, so there is no unnecessary cost to it.
 
 
 \page Shaders Shaders

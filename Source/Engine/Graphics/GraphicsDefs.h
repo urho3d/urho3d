@@ -244,7 +244,8 @@ extern StringHash PASS_SHADOW;
 extern StringHash PASS_DEFERRED;
 extern StringHash PASS_PREPASS;
 extern StringHash PASS_MATERIAL;
-extern StringHash PASS_PREALPHA;
+extern StringHash PASS_POSTOPAQUE;
+extern StringHash PASS_REFRACT;
 extern StringHash PASS_POSTALPHA;
 
 // Scale calculation from bounding box diagonal.

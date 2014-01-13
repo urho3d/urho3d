@@ -161,6 +161,8 @@ private:
     void SetTextures(RenderPathCommand& command);
     /// Perform a quad rendering command.
     void RenderQuad(RenderPathCommand& command);
+    /// Check if a command is enabled and has content to render. To be called only after render update has completed for the frame.
+    bool IsNecessary(const RenderPathCommand& command);
     /// Check if a command reads the rendered scene.
     bool CheckViewportRead(const RenderPathCommand& command);
     /// Allocate needed screen buffers.
