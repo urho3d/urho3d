@@ -279,7 +279,7 @@ if (ENABLE_SAMPLES AND ENABLE_EXTRAS AND ENABLE_TOOLS AND
     SCP_TO_TARGET AND
     ANDROID_ABI AND
     ENABLE_SAFE_LUA)
-endif()
+endif ()
 
 # Override builtin macro and function to suit our need, always generate header file regardless of target type...
 macro (_DO_SET_MACRO_VALUES TARGET_LIBRARY)
@@ -314,10 +314,10 @@ function (GENERATE_EXPORT_HEADER TARGET_LIBRARY)
         message (WARNING "This macro should not be used with libraries of type MODULE")
         return ()
     endif ()
-    _test_compiler_hidden_visibility()
-    _test_compiler_has_deprecated()
-    _do_set_macro_values(${TARGET_LIBRARY})
-    _do_generate_export_header(${TARGET_LIBRARY} ${ARGN})
+    _test_compiler_hidden_visibility ()
+    _test_compiler_has_deprecated ()
+    _do_set_macro_values (${TARGET_LIBRARY})
+    _do_generate_export_header (${TARGET_LIBRARY} ${ARGN})
 endfunction ()
 
 # Override builtin function to suit our need, takes care of C flags as well as CXX flags
@@ -363,9 +363,9 @@ macro (enable_pch)
         foreach (FILE ${SOURCE_FILES})
             if (FILE MATCHES \\.cpp$)
                 if (FILE MATCHES Precompiled\\.cpp$)
-                    set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YcPrecompiled.h")
+                    set_source_files_properties (${FILE} PROPERTIES COMPILE_FLAGS "/YcPrecompiled.h")
                 else ()
-                    set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YuPrecompiled.h")
+                    set_source_files_properties (${FILE} PROPERTIES COMPILE_FLAGS "/YuPrecompiled.h")
                 endif ()
             endif ()
         endforeach ()
@@ -476,7 +476,7 @@ macro (setup_main_executable)
     # Define resource files
     if (XCODE)
         set (RESOURCE_FILES ${PROJECT_ROOT_DIR}/Bin/CoreData ${PROJECT_ROOT_DIR}/Bin/Data)
-        set_source_files_properties(${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+        set_source_files_properties (${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
         list (APPEND SOURCE_FILES ${RESOURCE_FILES})
     endif ()
 
@@ -489,7 +489,7 @@ macro (setup_main_executable)
         define_dependency_libs (Urho3D)
         setup_library (SHARED)
         # Copy other dependent shared libraries to Android library output path
-        foreach(FILE ${ABSOLUTE_PATH_LIBS})
+        foreach (FILE ${ABSOLUTE_PATH_LIBS})
             get_filename_component (EXT ${FILE} EXT)
             if (EXT STREQUAL .so)
                 get_filename_component (NAME ${FILE} NAME)

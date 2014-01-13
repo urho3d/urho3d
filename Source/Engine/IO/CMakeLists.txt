@@ -23,7 +23,7 @@
 # Define source files
 if (APPLE AND NOT IOS)
     set (GLOB_OBJC_PATTERN *.m)
-endif()
+endif ()
 define_source_files (GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} PARENT_SCOPE)
 
 # Define dependency libs

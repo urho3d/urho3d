@@ -32,5 +32,5 @@ set (LIBS ../../ThirdParty/MojoShader)
 set (ABSOLUTE_PATH_LIBS ${DIRECT3D_COMPILER_LIBRARY})
 
 # Setup target
-add_definitions(-DMOJOSHADER_NO_VERSION_INCLUDE)
+add_definitions (-DMOJOSHADER_NO_VERSION_INCLUDE)
 setup_executable ()

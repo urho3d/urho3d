@@ -210,7 +210,7 @@ set (TARGET_NAME LuaJIT)
 macro (generate_source name mode)
     set (GEN_SRC ${CMAKE_CURRENT_BINARY_DIR}/generated/${name})
     set (GEN_SRCS ${GEN_SRCS} ${GEN_SRC}) 
-    add_custom_command(OUTPUT ${GEN_SRC}
+    add_custom_command (OUTPUT ${GEN_SRC}
         COMMAND ${PROJECT_ROOT_DIR}/Bin/${BUILDVM_X} -m ${mode} -o ${GEN_SRC} ${ARGN} DEPENDS ${BUILDVM_DEP} ${ARGN}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating buildvm output: ${name}")
@@ -242,7 +242,7 @@ set (LJLIB_C src/lib_base.c src/lib_math.c src/lib_bit.c src/lib_string.c src/li
 generate_source (${LJVM_BOUT} ${LJVM_MODE})
 foreach (MODE bcdef ffdef libdef recdef)
     generate_source (lj_${MODE}.h ${MODE} ${LJLIB_C})
-endforeach()
+endforeach ()
 generate_source (lj_folddef.h folddef src/lj_opt_fold.c)
 
 # Define source files

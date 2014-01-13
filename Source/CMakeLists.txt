@@ -82,7 +82,7 @@ foreach (TARGET Bullet Civetweb Detour FreeType JO kNet LZ4 PugiXml Recast SDL S
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 if (ENABLE_ANGELSCRIPT)
-    add_subdirectory(ThirdParty/AngelScript)
+    add_subdirectory (ThirdParty/AngelScript)
 endif ()
 if (ENABLE_LUA)
     add_subdirectory (Engine/LuaScript)

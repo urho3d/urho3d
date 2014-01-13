@@ -24,7 +24,7 @@ cmake_minimum_required (VERSION 2.6.3)
 
 if (CMAKE_TOOLCHAIN_FILE)
     # Reference toolchain variable to suppress "unused variable" warning
-endif()
+endif ()
 
 # this one is important
 set (CMAKE_SYSTEM_NAME Linux)
