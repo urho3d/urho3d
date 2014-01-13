@@ -545,7 +545,7 @@ void ViewRaycast(bool mouseClick)
         bool multiselect = input.qualifierDown[QUAL_CTRL];
 
         // Only interested in user-created UI elements
-        if (elementAtPos !is editorUIElement && elementAtPos.GetElementEventSender() is editorUIElement)
+        if (elementAtPos !is null && elementAtPos !is editorUIElement && elementAtPos.GetElementEventSender() is editorUIElement)
         {
             ui.DebugDraw(elementAtPos);
 
