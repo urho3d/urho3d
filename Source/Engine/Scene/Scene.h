@@ -70,11 +70,11 @@ public:
     /// Register object factory. Node must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Load from binary data. Return true if successful.
+    /// Load from binary data. Removes all existing child nodes and components first. Return true if successful.
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Save to binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
-    /// Load from XML data. Return true if successful.
+    /// Load from XML data. Removes all existing child nodes and components first. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Add a replication state that is tracking this scene.
     virtual void AddReplicationState(NodeReplicationState* state);
@@ -124,7 +124,7 @@ public:
     Component* GetComponent(unsigned id) const;
     /// Return whether updates are enabled.
     bool IsUpdateEnabled() const { return updateEnabled_; }
-    /// Return asynchronous loading flag.
+    /// Return whether an asynchronous loading operation is in progress.
     bool IsAsyncLoading() const { return asyncLoading_; }
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
     float GetAsyncProgress() const;

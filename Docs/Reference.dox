@@ -277,20 +277,36 @@ Whenever there is some hierarchical composition, it is recommended (and in fact 
 
 %Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
 
-It is also legal to create a Node that does not belong to a scene. This is useful with cameras, because then the camera will not be serialized along with the actual scene, which is perhaps not always wanted. However, note that creating geometry, physics or script components to an unattached node, and then moving it into a scene later will cause those components to not work correctly.
+It is also legal to create a Node that does not belong to a scene. This is useful for example with a camera moving in a scene that may be loaded or saved, because then the camera will not be saved along with the actual scene, and will not be destroyed when the scene is loaded. However, note that creating geometry, physics or script components to an unattached node, and then moving it into a scene later will cause those components to not work correctly.
 
-\section SceneModel_Update Scene updates and serialization
+\section SceneModel_Update Scene updates
 
 A Scene whose updates are enabled (default) will be automatically updated on each main loop iteration. See \ref Scene::SetUpdateEnabled "SetUpdateEnabled()".
 
 Nodes and components can be excluded from the scene update by disabling them, see \ref Node::SetEnabled "SetEnabled()". Disabling for example a drawable component also makes it invisible, a sound source component becomes inaudible etc. If a node is disabled, all of its components are treated as disabled regardless of their own enable/disable state.
 
-Scenes can be loaded and saved in either binary or XML format; see \ref Serialization "Serialization" for details.
+\section SceneModel_LoadSave Loading and saving scenes
+
+Scenes can be loaded and saved in either binary or XML format; see the functions \ref Scene::Load "Load()", \ref Scene::LoadXML "LoadXML()", \ref Scene::Save "Save()" and \ref Scene::SaveXML "SaveXML()". See \ref Serialization
+"Serialization" for the technical details on how this works. When a scene is loaded, all existing content in it (child nodes and components) is removed first.
+
+Nodes and components that are marked temporary will not be saved. See \ref Serializable::SetTemporary "SetTemporary()".
+
+To be able to track the progress of loading a (large) scene without having the program stall for the duration of the loading, a scene can also be loaded asynchronously. This means that on each frame the scene loads child nodes until a certain amount of milliseconds has been exceeded. See \ref Scene::LoadAsync "LoadAsync()" and \ref Scene::LoadAsyncXML "LoadAsyncXML()". Use the functions \ref Scene::IsAsyncLoading "IsAsyncLoading()" and \ref Scene::GetAsyncProgress "GetAsyncProgress()" to track the loading progress; the latter returns a float value between 0 and 1, where 1 is fully loaded. The scene will not update or render before it is fully loaded.
+
+\section SceneModel_Instantiation Object prefabs
+
+Just loading or saving whole scenes is not flexible enough for eg. games where new objects need to be dynamically created. On the other hand, creating complex objects and setting their properties in code will also be tedious. For this reason, it is also possible to save a scene node (and its child nodes, components and attributes) to either binary or XML to be able to instantiate it later into a scene. Such a saved object is often referred to as a prefab. There are three ways to do this:
+
+- In code by calling \ref Node::Save "Save()" or \ref Node::SaveXML "SaveXML()" on the Node in question.
+- In the editor, by selecting the node in the hierarchy window and choosing "Save node as" from the "File" menu.
+- Using the "node" command in AssetImporter, which will save the scene node hierarchy and any models contained in the input asset (eg. a Collada file)
+
+To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()" or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the Bin/Data/Objects directory.
 
 \section SceneModel_FurtherInformation Further information
 
-For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/.
-
+For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/. Note that the Urho3D scene model is not a pure Entity-Component-System design, which would have the components just as bare data containers, and only systems acting on them. Instead the Urho3D components contain logic of their own, and actively communicate with the systems (such as rendering, physics or script engine) they depend on.
 
 \page Resources Resources
 
@@ -1701,6 +1717,7 @@ AssetImporter <command> <input file> <output file> [options]
 Commands:
 model       Output a model
 scene       Output a scene
+node        Output a node and its children (prefab)
 dump        Dump scene node structure. No output file is generated
 lod         Combine several Urho3D models as LOD levels of the output model
             Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>

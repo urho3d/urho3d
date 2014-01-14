@@ -883,6 +883,7 @@ void Scene::UpdateAsyncLoading()
         }
 
         // Read one child node with its full sub-hierarchy either from binary or XML
+        /// \todo Works poorly in scenes where one root-level child node contains all content
         if (!asyncProgress_.xmlFile_)
         {
             unsigned nodeID = asyncProgress_.file_->ReadUInt();

@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "AnimatedModel.h"
 #include "Animation.h"
 #include "Context.h"
 #include "DebugRenderer.h"
@@ -37,7 +38,6 @@
 #include "Quaternion.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "StaticModel.h"
 #include "StringUtils.h"
 #include "Vector3.h"
 #include "VertexBuffer.h"
@@ -129,9 +129,10 @@ void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
 void BuildAndSaveAnimations(OutModel* model = 0);
 
-void ExportScene(const String& outName);
+void ExportScene(const String& outName, bool asPrefab);
 void CollectSceneModels(OutScene& scene, aiNode* node);
-void BuildAndSaveScene(OutScene& scene);
+Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, WeakPtr<Node> >& nodeMapping);
+void BuildAndSaveScene(OutScene& scene, bool asPrefab);
 
 void ExportMaterials(HashSet<String>& usedTextures);
 void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures);
@@ -157,8 +158,8 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
 unsigned GetElementMask(aiMesh* mesh);
 
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
-aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode);
-aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode);
+aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive = true);
+aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode, bool rootInclusive = true);
 aiMatrix4x4 GetMeshBakingTransform(aiNode* meshNode, aiNode* modelRootNode);
 void GetPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale);
 
@@ -193,6 +194,7 @@ void Run(const Vector<String>& arguments)
             "Commands:\n"
             "model      Output a model\n"
             "scene      Output a scene\n"
+            "node       Output a node and its children (prefab)\n"
             "dump       Dump scene node structure. No output file is generated\n"
             "lod        Combine several Urho3D models as LOD levels of the output model\n"
             "           Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
@@ -326,7 +328,7 @@ void Run(const Vector<String>& arguments)
         }
     }
     
-    if (command == "model" || command == "scene" || command == "dump")
+    if (command == "model" || command == "scene" || command == "node" || command == "dump")
     {
         String inFile = arguments[1];
         String outFile;
@@ -381,8 +383,8 @@ void Run(const Vector<String>& arguments)
         if (command == "model")
             ExportModel(outFile);
         
-        if (command == "scene")
-            ExportScene(outFile);
+        if (command == "scene" || command == "node")
+            ExportScene(outFile, command == "node");
         
         if (!noMaterials_)
         {
@@ -1093,7 +1095,7 @@ void BuildAndSaveAnimations(OutModel* model)
     }
 }
 
-void ExportScene(const String& outName)
+void ExportScene(const String& outName, bool asPrefab)
 {
     OutScene outScene;
     outScene.outName_ = outName;
@@ -1116,7 +1118,7 @@ void ExportScene(const String& outName)
     }
     
     // Save scene
-    BuildAndSaveScene(outScene);
+    BuildAndSaveScene(outScene, asPrefab);
 }
 
 void CollectSceneModels(OutScene& scene, aiNode* node)
@@ -1175,46 +1177,86 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
         CollectSceneModels(scene, node->mChildren[i]);
 }
 
-void BuildAndSaveScene(OutScene& scene)
+Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& nodeMapping)
 {
-    PrintLine("Writing scene");
-    
+    if (nodeMapping.Contains(srcNode))
+        return nodeMapping[srcNode];
+    if (srcNode == rootNode_ || !srcNode->mParent)
+    {
+        Node* outNode = scene->CreateChild(FromAIString(srcNode->mName), localIDs_ ? LOCAL : REPLICATED);
+        Vector3 pos, scale;
+        Quaternion rot;
+        GetPosRotScale(srcNode->mTransformation, pos, rot, scale);
+        outNode->SetTransform(pos, rot, scale);
+        nodeMapping[srcNode] = outNode;
+
+        return outNode;
+    }
+    else
+    {
+        // Ensure the existence of the parent chain as in the original file
+        if (!nodeMapping.Contains(srcNode->mParent))
+            CreateSceneNode(scene, srcNode->mParent, nodeMapping);
+        
+        Node* parent = nodeMapping[srcNode->mParent];
+        Node* outNode = parent->CreateChild(FromAIString(srcNode->mName), localIDs_ ? LOCAL : REPLICATED);
+        Vector3 pos, scale;
+        Quaternion rot;
+        GetPosRotScale(srcNode->mTransformation, pos, rot, scale);
+        outNode->SetTransform(pos, rot, scale);
+        nodeMapping[srcNode] = outNode;
+
+        return outNode;
+    }
+}
+
+void BuildAndSaveScene(OutScene& scene, bool asPrefab)
+{
+    if (!asPrefab)
+        PrintLine("Writing scene");
+    else
+        PrintLine("Writing node hierarchy");
+
     SharedPtr<Scene> outScene(new Scene(context_));
     
-    /// \todo Make the physics properties configurable
-    outScene->CreateComponent<PhysicsWorld>();
-    
-    /// \todo Make the octree properties configurable, or detect from the scene contents
-    outScene->CreateComponent<Octree>();
-    
-    outScene->CreateComponent<DebugRenderer>();
-    
-    if (createZone_)
+    if (!asPrefab)
     {
-        Node* zoneNode = outScene->CreateChild("Zone", localIDs_ ? LOCAL : REPLICATED);
-        Zone* zone = zoneNode->CreateComponent<Zone>();
-        zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
-        zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
+        /// \todo Make the physics properties configurable
+        outScene->CreateComponent<PhysicsWorld>();
+    
+        /// \todo Make the octree properties configurable, or detect from the scene contents
+        outScene->CreateComponent<Octree>();
+
+        outScene->CreateComponent<DebugRenderer>();
         
-        // Create default light only if scene does not define them
-        if (!scene_->HasLights())
+        if (createZone_)
         {
-            Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
-            Light* light = lightNode->CreateComponent<Light>();
-            light->SetLightType(LIGHT_DIRECTIONAL);
-            lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
+            Node* zoneNode = outScene->CreateChild("Zone", localIDs_ ? LOCAL : REPLICATED);
+            Zone* zone = zoneNode->CreateComponent<Zone>();
+            zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
+            zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
+            
+            // Create default light only if scene does not define them
+            if (!scene_->HasLights())
+            {
+                Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
+                Light* light = lightNode->CreateComponent<Light>();
+                light->SetLightType(LIGHT_DIRECTIONAL);
+                lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
+            }
         }
     }
-    
+
+    HashMap<aiNode*, Node*> nodeMapping;
+    Node* outRootNode = CreateSceneNode(outScene, rootNode_, nodeMapping);
     ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
     
     // Create geometry nodes
     for (unsigned i = 0; i < scene.nodes_.Size(); ++i)
     {
         const OutModel& model = scene.models_[scene.nodeModelIndices_[i]];
-        
-        Node* modelNode = outScene->CreateChild(FromAIString(scene.nodes_[i]->mName), localIDs_ ? LOCAL : REPLICATED);
-        StaticModel* staticModel = modelNode->CreateComponent<StaticModel>();
+        Node* modelNode = CreateSceneNode(outScene, scene.nodes_[i], nodeMapping);
+        StaticModel* staticModel = model.bones_.Empty() ? modelNode->CreateComponent<StaticModel>() : modelNode->CreateComponent<AnimatedModel>();
         
         // Create a dummy model so that the reference can be stored
         String modelName = (useSubdirs_ ? "Models/" : "") + GetFileNameAndExtension(model.outName_);
@@ -1227,11 +1269,6 @@ void BuildAndSaveScene(OutScene& scene)
         }
         staticModel->SetModel(cache->GetResource<Model>(modelName));
         
-        // Set a flattened transform
-        Vector3 pos, scale;
-        Quaternion rot;
-        GetPosRotScale(GetDerivedTransform(scene.nodes_[i], rootNode_), pos, rot, scale);
-        modelNode->SetTransform(pos, rot, scale);
         // Set materials if they are known
         for (unsigned j = 0; j < model.meshes_.Size(); ++j)
         {
@@ -1251,64 +1288,81 @@ void BuildAndSaveScene(OutScene& scene)
     }
     
     // Create lights
-    for (unsigned i = 0; i < scene_->mNumLights; ++i)
+    if (!asPrefab)
     {
-        aiLight* light = scene_->mLights[i];
-        aiNode* lightNode = GetNode(FromAIString(light->mName), rootNode_, true);
-        if (!lightNode)
-            continue;
-        Matrix3x4 lightNodeTransform = ToMatrix3x4(GetDerivedTransform(lightNode, rootNode_));
-        Vector3 lightWorldPosition = lightNodeTransform * ToVector3(light->mPosition);
-        Vector3 lightWorldDirection = lightNodeTransform.RotationMatrix() * ToVector3(light->mDirection);
-        
-        Node* outNode = outScene->CreateChild(FromAIString(light->mName));
-        Light* outLight = outNode->CreateComponent<Light>();
-        outLight->SetColor(Color(light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b));
-        
-        switch (light->mType)
+        for (unsigned i = 0; i < scene_->mNumLights; ++i)
         {
-        case aiLightSource_DIRECTIONAL:
-            outNode->SetDirection(lightWorldDirection);
-            outLight->SetLightType(LIGHT_DIRECTIONAL);
-            break;
-        case aiLightSource_SPOT:
-            outNode->SetPosition(lightWorldPosition);
-            outNode->SetDirection(lightWorldDirection);
-            outLight->SetLightType(LIGHT_SPOT);
-            outLight->SetFov(light->mAngleOuterCone * M_RADTODEG);
-            break;
-        case aiLightSource_POINT:
-            outNode->SetPosition(lightWorldPosition);
-            outLight->SetLightType(LIGHT_POINT);
-            break;
-        default:
-            break;
-        }
-        
-        // Calculate range from attenuation parameters so that light intensity has been reduced to 10% at that distance
-        if (light->mType != aiLightSource_DIRECTIONAL)
-        {
-            float a = light->mAttenuationQuadratic;
-            float b = light->mAttenuationLinear;
-            float c = -10.0f;
-            if (!Equals(a, 0.0f))
+            aiLight* light = scene_->mLights[i];
+            aiNode* lightNode = GetNode(FromAIString(light->mName), rootNode_, true);
+            if (!lightNode)
+                continue;
+            Node* outNode = CreateSceneNode(outScene, lightNode, nodeMapping);
+
+            Vector3 lightAdjustPosition = ToVector3(light->mPosition);
+            Vector3 lightAdjustDirection = ToVector3(light->mDirection);
+            // If light is not aligned at the scene node, an adjustment node needs to be created
+            if (!lightAdjustPosition.Equals(Vector3::ZERO) || (light->mType != aiLightSource_POINT &&
+                !lightAdjustDirection.Equals(Vector3::FORWARD)))
             {
-                float root1 = (-b + sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
-                float root2 = (-b - sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
-                outLight->SetRange(Max(root1, root2));
+                outNode = outNode->CreateChild("LightAdjust");
+                outNode->SetPosition(lightAdjustPosition);
+                outNode->SetDirection(lightAdjustDirection);
             }
-            else if (!Equals(b, 0.0f))
-                outLight->SetRange(-c / b);
+
+            Light* outLight = outNode->CreateComponent<Light>();
+            outLight->SetColor(Color(light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b));
+            
+            switch (light->mType)
+            {
+            case aiLightSource_DIRECTIONAL:
+                outLight->SetLightType(LIGHT_DIRECTIONAL);
+                break;
+            case aiLightSource_SPOT:
+                outLight->SetLightType(LIGHT_SPOT);
+                outLight->SetFov(light->mAngleOuterCone * M_RADTODEG);
+                break;
+            case aiLightSource_POINT:
+                outLight->SetLightType(LIGHT_POINT);
+                break;
+            default:
+                break;
+            }
+            
+            // Calculate range from attenuation parameters so that light intensity has been reduced to 10% at that distance
+            if (light->mType != aiLightSource_DIRECTIONAL)
+            {
+                float a = light->mAttenuationQuadratic;
+                float b = light->mAttenuationLinear;
+                float c = -10.0f;
+                if (!Equals(a, 0.0f))
+                {
+                    float root1 = (-b + sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
+                    float root2 = (-b - sqrtf(b * b - 4.0f * a * c)) / (2.0f * a);
+                    outLight->SetRange(Max(root1, root2));
+                }
+                else if (!Equals(b, 0.0f))
+                    outLight->SetRange(-c / b);
+            }
         }
     }
     
     File file(context_);
     if (!file.Open(scene.outName_, FILE_WRITE))
         ErrorExit("Could not open output file " + scene.outName_);
-    if (!saveBinary_)
-        outScene->SaveXML(file);
+    if (!asPrefab)
+    {
+        if (!saveBinary_)
+            outScene->SaveXML(file);
+        else
+            outScene->Save(file);
+    }
     else
-        outScene->Save(file);
+    {
+        if (!saveBinary_)
+            outRootNode->SaveXML(file);
+        else
+            outRootNode->Save(file);
+    }
 }
 
 void ExportMaterials(HashSet<String>& usedTextures)
@@ -1828,17 +1882,19 @@ aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)
     return 0;
 }
 
-aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode)
+aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive)
 {
-    return GetDerivedTransform(node->mTransformation, node, rootNode);
+    return GetDerivedTransform(node->mTransformation, node, rootNode, rootInclusive);
 }
 
-aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode)
+aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode, bool rootInclusive)
 {
     // If basenode is defined, go only up to it in the parent chain
     while (node && node != rootNode)
     {
         node = node->mParent;
+        if (!rootInclusive && node == rootNode)
+            break;
         if (node)
             transform = node->mTransformation * transform;
     }
