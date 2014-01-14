@@ -1729,6 +1729,7 @@ Options:
 -l          Output a material list file for models
 -na         Do not output animations
 -nm         Do not output materials
+-nh         Do not save full node hierarchy (scene mode only)\n"
 -ns         Do not create subdirectories for resources
 -nz         Do not create a zone and a directional light (scene mode only)
 -nf         Do not fix infacing normals

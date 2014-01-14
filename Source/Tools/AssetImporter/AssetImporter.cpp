@@ -104,6 +104,7 @@ bool localIDs_ = false;
 bool saveBinary_ = false;
 bool createZone_ = true;
 bool noAnimations_ = false;
+bool noHierarchy_ = false;
 bool noMaterials_ = false;
 bool saveMaterialList_ = false;
 bool includeNonSkinningBones_ = false;
@@ -206,6 +207,7 @@ void Run(const Vector<String>& arguments)
             "-l          Output a material list file for models\n"
             "-na         Do not output animations\n"
             "-nm         Do not output materials\n"
+            "-nh         Do not save full node hierarchy (scene mode only)\n"
             "-ns         Do not create subdirectories for resources\n"
             "-nz         Do not create a zone and a directional light (scene mode only)\n"
             "-nf         Do not fix infacing normals\n"
@@ -279,7 +281,11 @@ void Run(const Vector<String>& arguments)
                 case 'm':
                     noMaterials_ = true;
                     break;
-                    
+
+                case 'h':
+                    noHierarchy_ = true;
+                    break;
+
                 case 's':
                     useSubdirs_ = false;
                     break;
@@ -384,7 +390,13 @@ void Run(const Vector<String>& arguments)
             ExportModel(outFile);
         
         if (command == "scene" || command == "node")
-            ExportScene(outFile, command == "node");
+        {
+            bool asPrefab = command == "node";
+            // Saving as prefab requires the hierarchy, especially the root node
+            if (asPrefab)
+                noHierarchy_ = false;
+            ExportScene(outFile, asPrefab);
+        }
         
         if (!noMaterials_)
         {
@@ -1181,6 +1193,19 @@ Node* CreateSceneNode(Scene* scene, aiNode* srcNode, HashMap<aiNode*, Node*>& no
 {
     if (nodeMapping.Contains(srcNode))
         return nodeMapping[srcNode];
+    // Flatten hierarchy if requested
+    if (noHierarchy_)
+    {
+        Node* outNode = scene->CreateChild(FromAIString(srcNode->mName), localIDs_ ? LOCAL : REPLICATED);
+        Vector3 pos, scale;
+        Quaternion rot;
+        GetPosRotScale(GetDerivedTransform(srcNode, rootNode_), pos, rot, scale);
+        outNode->SetTransform(pos, rot, scale);
+        nodeMapping[srcNode] = outNode;
+
+        return outNode;
+    }
+
     if (srcNode == rootNode_ || !srcNode->mParent)
     {
         Node* outNode = scene->CreateChild(FromAIString(srcNode->mName), localIDs_ ? LOCAL : REPLICATED);
@@ -1247,9 +1272,12 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         }
     }
 
-    HashMap<aiNode*, Node*> nodeMapping;
-    Node* outRootNode = CreateSceneNode(outScene, rootNode_, nodeMapping);
     ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
+
+    HashMap<aiNode*, Node*> nodeMapping;
+    Node* outRootNode = 0;
+    if (asPrefab || !noHierarchy_)
+        outRootNode = CreateSceneNode(outScene, rootNode_, nodeMapping);
     
     // Create geometry nodes
     for (unsigned i = 0; i < scene.nodes_.Size(); ++i)
