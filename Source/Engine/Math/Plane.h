@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Vector3.h"
+#include "Matrix3x4.h"
 
 namespace Urho3D
 {
@@ -75,7 +75,30 @@ public:
     
     /// Return signed distance to a point.
     float Distance(const Vector3& point) const { return normal_.DotProduct(point) - intercept_; }
-    
+    /// Reflect a normalized direction vector.
+    Vector3 Reflect(const Vector3& direction) const { return direction - (2.0f * normal_.DotProduct(direction) * normal_); }
+
+    /// Return a reflection matrix.
+    Matrix3x4 ReflectionMatrix() const
+    {
+        float negIntercept = -intercept_;
+
+        return Matrix3x4(
+            -2.0f * normal_.x_ * normal_.x_ + 1.0f,
+            -2.0f * normal_.x_ * normal_.y_,
+            -2.0f * normal_.x_ * normal_.z_,
+            -2.0f * normal_.x_ * negIntercept,
+            -2.0f * normal_.y_ * normal_.x_ ,
+            -2.0f * normal_.y_ * normal_.y_ + 1.0f,
+            -2.0f * normal_.y_ * normal_.z_,
+            -2.0f * normal_.y_ * negIntercept,
+            -2.0f * normal_.z_ * normal_.x_,
+            -2.0f * normal_.z_ * normal_.y_,
+            -2.0f * normal_.z_ * normal_.z_ + 1.0f,
+            -2.0f * normal_.z_ * negIntercept
+        );
+    }
+
     /// Plane normal.
     Vector3 normal_;
     /// Plane absolute normal.

@@ -279,9 +279,10 @@ void CompileShader(const String& fileName)
     
     XMLFile doc(context_);
     File source(context_);
-    source.Open(fileName);
-    if (!doc.Load(source))
+    if (!source.Open(fileName))
         ErrorExit("Could not open input file " + fileName);
+    if (!doc.Load(source))
+        ErrorExit("Could not parse input file " + fileName);
     
     XMLElement shaders = doc.GetRoot("shaders");
     if (!shaders)

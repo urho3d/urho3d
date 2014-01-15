@@ -49,8 +49,10 @@ protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
-    /// Custom world transform.
-    Matrix3x4 customWorldTransform_;
+    /// Custom world transform per camera.
+    HashMap<Camera*, Matrix3x4> customWorldTransforms_;
+    /// Last frame counter for knowing when to erase the custom world transforms of previous frame.
+    unsigned lastFrame_;
 };
 
 }

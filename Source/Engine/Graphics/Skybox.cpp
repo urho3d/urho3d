@@ -36,7 +36,7 @@ extern const char* GEOMETRY_CATEGORY;
 
 Skybox::Skybox(Context* context) :
     StaticModel(context),
-    customWorldTransform_(Matrix3x4::IDENTITY)
+    lastFrame_(0)
 {
 }
 
@@ -60,13 +60,20 @@ void Skybox::UpdateBatches(const FrameInfo& frame)
 {
     distance_ = 0.0f;
 
+    if (frame.frameNumber_ != lastFrame_)
+    {
+        customWorldTransforms_.Clear();
+        lastFrame_ = frame.frameNumber_;
+    }
+
     // Follow only the camera rotation, not position
     Matrix3x4 customView(Vector3::ZERO, frame.camera_->GetNode()->GetWorldRotation().Inverse(), Vector3::ONE);
-    customWorldTransform_ = customView * node_->GetWorldTransform();
+    HashMap<Camera*, Matrix3x4>::Iterator it = customWorldTransforms_.Insert(MakePair(frame.camera_, customView *
+        node_->GetWorldTransform()));
 
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
-        batches_[i].worldTransform_ = &customWorldTransform_;
+        batches_[i].worldTransform_ = &it->second_;
         batches_[i].distance_ = 0.0f;
         batches_[i].overrideView_ = true;
     }

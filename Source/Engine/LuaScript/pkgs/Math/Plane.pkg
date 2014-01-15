@@ -13,7 +13,9 @@ class Plane
     void Define(const Vector3& normal, const Vector3& point);
     
     float Distance(const Vector3& point) const;
-    
+    Vector3 Reflect(const Vector3& direction) const;
+    Matrix3x4 ReflectionMatrix() const;
+
     Vector3 normal_ @ normal;
     Vector3 absNormal_ @ absNormal;
     float intercept_ @ intercept;

@@ -79,7 +79,7 @@ public:
         FromEulerAngles(x, y, z);
     }
     
-    /// Construct from the rotation difference between two vectors.
+    /// Construct from the rotation difference between two direction vectors.
     Quaternion(const Vector3& start, const Vector3& end)
     {
         FromRotationTo(start, end);
@@ -165,7 +165,7 @@ public:
     void FromAngleAxis(float angle, const Vector3& axis);
     /// Define from Euler angles (in degrees.)
     void FromEulerAngles(float x, float y, float z);
-    /// Define from the rotation difference between two vectors.
+    /// Define from the rotation difference between two direction vectors.
     void FromRotationTo(const Vector3& start, const Vector3& end);
     /// Define from orthonormal axes.
     void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
