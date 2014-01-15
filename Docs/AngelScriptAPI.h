@@ -797,8 +797,11 @@ class Plane
 void Define(const Vector3&, const Vector3&, const Vector3&);
 void Define(const Vector3&, const Vector3&);
 float Distance(const Vector3&) const;
+Vector3 Reflect(const Vector3&) const;
 
 // Properties:
+/* (readonly) */
+Matrix3x4 reflectionMatrix;
 Vector3 normal;
 Vector3 absNormal;
 float intercept;

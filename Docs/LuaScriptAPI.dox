@@ -2576,6 +2576,8 @@ Methods:
 - void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - void Define(const Vector3& normal, const Vector3& point)
 - float Distance(const Vector3& point) const
+- Vector3 Reflect(const Vector3& direction) const
+- Matrix3x4 ReflectionMatrix() const
 
 Properties:
 
