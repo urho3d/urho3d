@@ -559,7 +559,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (*pos * vol) / 256;
                 ++dest;
@@ -569,7 +569,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (*pos * vol) / 256;
                 ++dest;
@@ -586,7 +586,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + *pos * vol;
                 ++dest;
@@ -596,7 +596,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + *pos * vol;
                 ++dest;
@@ -633,7 +633,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (*pos * leftVol) / 256;
                 ++dest;
@@ -645,7 +645,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (*pos * leftVol) / 256;
                 ++dest;
@@ -664,7 +664,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + *pos * leftVol;
                 ++dest;
@@ -676,7 +676,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + *pos * leftVol;
                 ++dest;
@@ -714,7 +714,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (GET_IP_SAMPLE() * vol) / 256;
                 ++dest;
@@ -724,7 +724,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (GET_IP_SAMPLE() * vol) / 256;
                 ++dest;
@@ -741,7 +741,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + GET_IP_SAMPLE() * vol;
                 ++dest;
@@ -751,7 +751,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + GET_IP_SAMPLE() * vol;
                 ++dest;
@@ -788,7 +788,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = GET_IP_SAMPLE();
                 *dest = *dest + (s * leftVol) / 256;
@@ -801,7 +801,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = GET_IP_SAMPLE();
                 *dest = *dest + (s * leftVol) / 256;
@@ -821,7 +821,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = GET_IP_SAMPLE();
                 *dest = *dest + s * leftVol;
@@ -834,7 +834,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = GET_IP_SAMPLE();
                 *dest = *dest + s * leftVol;
@@ -873,7 +873,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = ((int)pos[0] + (int)pos[1]) / 2;
                 *dest = *dest + (s * vol) / 256;
@@ -884,7 +884,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = ((int)pos[0] + (int)pos[1]) / 2;
                 *dest = *dest + (s * vol) / 256;
@@ -902,7 +902,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = ((int)pos[0] + (int)pos[1]) / 2;
                 *dest = *dest + s * vol;
@@ -913,7 +913,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = ((int)pos[0] + (int)pos[1]) / 2;
                 *dest = *dest + s * vol;
@@ -950,7 +950,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (pos[0] * vol) / 256;
                 ++dest;
@@ -962,7 +962,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (pos[0] * vol) / 256;
                 ++dest;
@@ -981,7 +981,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + pos[0] * vol;
                 ++dest;
@@ -993,7 +993,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + pos[0] * vol;
                 ++dest;
@@ -1031,7 +1031,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
                 *dest = *dest + (s * vol) / 256;
@@ -1042,7 +1042,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
                 *dest = *dest + (s * vol) / 256;
@@ -1060,7 +1060,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
                 *dest = *dest + s * vol;
@@ -1071,7 +1071,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 int s = (GET_IP_SAMPLE_LEFT() + GET_IP_SAMPLE_RIGHT()) / 2;
                 *dest = *dest + s * vol;
@@ -1108,7 +1108,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (GET_IP_SAMPLE_LEFT() * vol) / 256;
                 ++dest;
@@ -1120,7 +1120,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + (GET_IP_SAMPLE_LEFT() * vol) / 256;
                 ++dest;
@@ -1139,7 +1139,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
 
         if (sound->IsLooped())
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + GET_IP_SAMPLE_LEFT() * vol;
                 ++dest;
@@ -1151,7 +1151,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
         }
         else
         {
-            while (--samples)
+            while (samples--)
             {
                 *dest = *dest + GET_IP_SAMPLE_LEFT() * vol;
                 ++dest;

@@ -80,19 +80,14 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     desired.freq = mixRate;
     desired.format = AUDIO_S16SYS;
     desired.channels = stereo ? 2 : 1;
-    
-    // For SDL, do not actually use the buffer length, but calculate a suitable power-of-two size from the mixrate
-    if (desired.freq <= 11025)
-        desired.samples = 512;
-    else if (desired.freq <= 22050)
-        desired.samples = 1024;
-    else if (desired.freq <= 44100)
-        desired.samples = 2048;
-    else
-        desired.samples = 4096;
-    
     desired.callback = SDLAudioCallback;
     desired.userdata = this;
+    
+    // SDL uses power of two audio fragments. Determine the closest match
+    int bufferSamples = mixRate * bufferLengthMSec / 1000;
+    desired.samples = NextPowerOfTwo(bufferSamples);
+    if (Abs((int)desired.samples / 2 - bufferSamples) < Abs((int)desired.samples - bufferSamples))
+        desired.samples /= 2;
     
     deviceID_ = SDL_OpenAudioDevice(0, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
     if (!deviceID_)
