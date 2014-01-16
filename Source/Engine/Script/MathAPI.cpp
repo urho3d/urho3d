@@ -34,6 +34,11 @@ namespace Urho3D
 
 static void RegisterMathFunctions(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("Intersection");
+    engine->RegisterEnumValue("Intersection", "OUTSIDE", OUTSIDE);
+    engine->RegisterEnumValue("Intersection", "INTERSECTS", INTERSECTS);
+    engine->RegisterEnumValue("Intersection", "INSIDE", INSIDE);
+    
     engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_INFINITY);
     engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_EPSILON);
     engine->RegisterGlobalProperty("const float M_LARGE_EPSILON", (void*)&M_LARGE_EPSILON);
@@ -111,6 +116,7 @@ static void RegisterIntRect(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(const IntRect&in)", asFUNCTION(ConstructIntRectCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", asFUNCTION(ConstructIntRectInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int[]&)", asFUNCTION(ConstructIntRectArrayInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("IntRect", "Intersection IsInside(const IntVector2&in) const", asMETHOD(IntRect, IsInside), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntRect", "int[]& get_data() const", asFUNCTION(IntRectData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("IntRect", "IntRect& opAssign(const IntRect&in)", asMETHOD(IntRect, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntRect", "bool opEquals(const IntRect&in) const", asMETHOD(IntRect, operator ==), asCALL_THISCALL);
@@ -758,6 +764,7 @@ static void RegisterRect(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Rect", "void Clip(const Rect&in)", asMETHODPR(Rect, Clip, (const Rect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "void Clear()", asMETHOD(Rect, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "bool Equals(const Rect&in) const", asMETHOD(Rect, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Rect", "Intersection IsInside(const Vector2&in) const", asMETHOD(Rect, IsInside), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "Vector4 ToVector4() const", asMETHOD(Rect, ToVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "Vector2 get_center() const", asMETHOD(Rect, Center), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "Vector2 get_size() const", asMETHOD(Rect, Size), asCALL_THISCALL);
@@ -915,11 +922,6 @@ static Vector3 FrustumGetVertex(unsigned index, Frustum* ptr)
 
 static void RegisterVolumes(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("Intersection");
-    engine->RegisterEnumValue("Intersection", "OUTSIDE", OUTSIDE);
-    engine->RegisterEnumValue("Intersection", "INTERSECTS", INTERSECTS);
-    engine->RegisterEnumValue("Intersection", "INSIDE", INSIDE);
-    
     engine->RegisterObjectType("BoundingBox", sizeof(BoundingBox), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     engine->RegisterObjectType("Frustum", sizeof(Frustum), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectType("Polyhedron", sizeof(Polyhedron), asOBJ_VALUE | asOBJ_APP_CLASS_CDK);

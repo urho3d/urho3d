@@ -22,6 +22,7 @@ class Rect
     Vector2 Size() const;
     Vector2 HalfSize() const;
     bool Equals(const Rect& rhs) const;
+    Intersection IsInside(const Vector2& point) const;
     Vector4 ToVector4() const;
     
     String ToString() const;
@@ -48,6 +49,7 @@ class IntRect
     IntVector2 Size() const;
     int Width() const;
     int Height() const;
+    Intersection IsInside(const IntVector2& point) const;
     
     int left_ @ left;
     int top_ @ top;
