@@ -32,6 +32,7 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
+#include "Spline.h"
 #include "WorkQueue.h"
 #include "XMLFile.h"
 
@@ -955,6 +956,7 @@ void RegisterSceneLibrary(Context* context)
     Node::RegisterObject(context);
     Scene::RegisterObject(context);
     SmoothedTransform::RegisterObject(context);
+    Spline::RegisterObject(context);
 }
 
 }
