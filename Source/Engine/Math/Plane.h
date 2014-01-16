@@ -62,42 +62,23 @@ public:
         Vector3 dist1 = v1 - v0;
         Vector3 dist2 = v2 - v0;
         
-        Define(dist1.CrossProduct(dist2).Normalized(), v0);
+        Define(dist1.CrossProduct(dist2), v0);
     }
 
-    /// Define from a normal and a point.
+    /// Define from a normal vector and a point on the plane.
     void Define(const Vector3& normal, const Vector3& point)
     {
-        normal_ = normal;
-        absNormal_ = normal.Abs();
-        intercept_ = normal.DotProduct(point);
+        normal_ = normal.Normalized();
+        absNormal_ = normal_.Abs();
+        intercept_ = normal_.DotProduct(point);
     }
     
     /// Return signed distance to a point.
     float Distance(const Vector3& point) const { return normal_.DotProduct(point) - intercept_; }
     /// Reflect a normalized direction vector.
     Vector3 Reflect(const Vector3& direction) const { return direction - (2.0f * normal_.DotProduct(direction) * normal_); }
-
     /// Return a reflection matrix.
-    Matrix3x4 ReflectionMatrix() const
-    {
-        float negIntercept = -intercept_;
-
-        return Matrix3x4(
-            -2.0f * normal_.x_ * normal_.x_ + 1.0f,
-            -2.0f * normal_.x_ * normal_.y_,
-            -2.0f * normal_.x_ * normal_.z_,
-            -2.0f * normal_.x_ * negIntercept,
-            -2.0f * normal_.y_ * normal_.x_ ,
-            -2.0f * normal_.y_ * normal_.y_ + 1.0f,
-            -2.0f * normal_.y_ * normal_.z_,
-            -2.0f * normal_.y_ * negIntercept,
-            -2.0f * normal_.z_ * normal_.x_,
-            -2.0f * normal_.z_ * normal_.y_,
-            -2.0f * normal_.z_ * normal_.z_ + 1.0f,
-            -2.0f * normal_.z_ * negIntercept
-        );
-    }
+    Matrix3x4 ReflectionMatrix() const;
 
     /// Plane normal.
     Vector3 normal_;
@@ -105,6 +86,9 @@ public:
     Vector3 absNormal_;
     /// Plane intercept parameter.
     float intercept_;
+
+    /// Plane at origin with normal pointing up.
+    static const Plane UP;
 };
 
 }

@@ -97,6 +97,10 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "bool get_autoAspectRatio() const", asMETHOD(Camera, GetAutoAspectRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_projectionOffset(const Vector2&in)", asMETHOD(Camera, SetProjectionOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Vector2& get_projectionOffset() const", asMETHOD(Camera, GetProjectionOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "void set_useReflection(bool)", asMETHOD(Camera, SetUseReflection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "bool get_useReflection() const", asMETHOD(Camera, GetUseReflection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "void set_reflectionPlane(const Plane&in) const", asMETHOD(Camera, SetReflectionPlane), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "const Plane& get_reflectionPlane() const", asMETHOD(Camera, GetReflectionPlane), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_viewMask(uint)", asMETHOD(Camera, SetViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "uint get_viewMask() const", asMETHOD(Camera, GetViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_viewOverrideFlags(uint)", asMETHOD(Camera, SetViewOverrideFlags), asCALL_THISCALL);
@@ -111,7 +115,8 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "Vector3 get_forwardVector() const", asMETHOD(Camera, GetForwardVector), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Vector3 get_rightVector() const", asMETHOD(Camera, GetRightVector), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Vector3 get_upVector() const", asMETHOD(Camera, GetUpVector), asCALL_THISCALL);
-    
+    engine->RegisterObjectMethod("Camera", "Matrix3x4 get_effectiveWorldTransform() const", asMETHOD(Camera, GetEffectiveWorldTransform), asCALL_THISCALL);
+
     // Register Variant GetPtr() for Camera
     engine->RegisterObjectMethod("Variant", "Camera@+ GetCamera() const", asFUNCTION(GetVariantPtr<Camera>), asCALL_CDECL_OBJLAST);
 }

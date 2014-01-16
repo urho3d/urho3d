@@ -48,6 +48,7 @@ OcclusionBuffer::OcclusionBuffer(Context* context) :
     maxTriangles_(OCCLUSION_DEFAULT_MAX_TRIANGLES),
     cullMode_(CULL_CCW),
     depthHierarchyDirty_(true),
+    reverseCulling_(false),
     nearClip_(0.0f),
     farClip_(0.0f)
 {
@@ -112,6 +113,7 @@ void OcclusionBuffer::SetView(Camera* camera)
     viewProj_ = projection_ * view_;
     nearClip_ = camera->GetNearClip();
     farClip_ = camera->GetFarClip();
+    reverseCulling_ = camera->GetReverseCulling();
     CalculateViewport();
 }
 
@@ -122,6 +124,13 @@ void OcclusionBuffer::SetMaxTriangles(unsigned triangles)
 
 void OcclusionBuffer::SetCullMode(CullMode mode)
 {
+    if (reverseCulling_)
+    {
+        if (mode == CULL_CW)
+            mode = CULL_CCW;
+        else if (mode == CULL_CCW)
+            mode = CULL_CW;
+    }
     cullMode_ = mode;
 }
 

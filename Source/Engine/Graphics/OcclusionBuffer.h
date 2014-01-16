@@ -140,6 +140,8 @@ private:
     CullMode cullMode_;
     /// Depth hierarchy needs update flag.
     bool depthHierarchyDirty_;
+    /// Culling reverse flag.
+    bool reverseCulling_;
     /// View transform matrix.
     Matrix3x4 view_;
     /// Projection matrix.

@@ -214,10 +214,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     unsigned cameraHash = overrideView_ ? (unsigned)(size_t)camera_ + 4 : (unsigned)(size_t)camera_;
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<void*>(cameraHash)))
     {
-        Matrix3 cameraWorldRotation = cameraNode->GetWorldRotation().RotationMatrix();
+        Matrix3x4 cameraEffectiveTransform = camera_->GetEffectiveWorldTransform();
         
-        graphics->SetShaderParameter(VSP_CAMERAPOS, cameraNode->GetWorldPosition());
-        graphics->SetShaderParameter(VSP_CAMERAROT, cameraWorldRotation);
+        graphics->SetShaderParameter(VSP_CAMERAPOS, cameraEffectiveTransform.Translation());
+        graphics->SetShaderParameter(VSP_CAMERAROT, cameraEffectiveTransform.RotationMatrix());
         Vector4 depthMode = Vector4::ZERO;
         if (camera_->IsOrthographic())
         {
@@ -399,6 +399,9 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     
     if (light && graphics->NeedParameterUpdate(SP_LIGHT, light))
     {
+        Matrix3x4 cameraEffectiveTransform = camera_->GetEffectiveWorldTransform();
+        Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
+
         Node* lightNode = light->GetNode();
         Matrix3 lightWorldRotation = lightNode->GetWorldRotation().RotationMatrix();
         
@@ -460,7 +463,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         
         graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetColor(), light->GetSpecularIntensity()) * fade);
         graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
-        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() - cameraNode->GetWorldPosition(), atten));
+        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() - cameraEffectivePos, atten));
         
         if (graphics->HasShaderParameter(PS, PSP_LIGHTMATRICES))
         {
@@ -471,7 +474,7 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
                     unsigned numSplits = lightQueue_->shadowSplits_.Size();
                     for (unsigned i = 0; i < numSplits; ++i)
-                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, cameraNode->GetWorldPosition());
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, cameraEffectivePos);
                     
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                 }
@@ -481,10 +484,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                 {
                     Matrix4 shadowMatrices[2];
                     
-                    CalculateSpotMatrix(shadowMatrices[0], light, cameraNode->GetWorldPosition());
+                    CalculateSpotMatrix(shadowMatrices[0], light, cameraEffectivePos);
                     bool isShadowed = lightQueue_->shadowMap_ != 0;
                     if (isShadowed)
-                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, cameraNode->GetWorldPosition());
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, cameraEffectivePos);
                     
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                 }

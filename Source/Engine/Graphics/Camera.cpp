@@ -70,9 +70,12 @@ Camera::Camera(Context* context) :
     viewOverrideFlags_(VO_NONE),
     fillMode_(FILL_SOLID),
     projectionOffset_(Vector2::ZERO),
+    reflectionPlane_(Plane::UP),
     autoAspectRatio_(true),
-    flipVertical_(false)
+    flipVertical_(false),
+    useReflection_(false)
 {
+    reflectionMatrix_ = reflectionPlane_.ReflectionMatrix();
 }
 
 Camera::~Camera()
@@ -97,6 +100,8 @@ void Camera::RegisterObject(Context* context)
     ATTRIBUTE(Camera, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VO_NONE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_VECTOR4, "Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4, Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Camera, VAR_BOOL, "Use Reflection", GetUseReflection, SetUseReflection, bool, false, AM_DEFAULT);
 }
 
 void Camera::SetNearClip(float nearClip)
@@ -202,6 +207,23 @@ void Camera::SetProjectionOffset(const Vector2& offset)
     MarkNetworkUpdate();
 }
 
+void Camera::SetUseReflection(bool enable)
+{
+    useReflection_ = enable;
+    viewDirty_ = true;
+    frustumDirty_ = true;
+    MarkNetworkUpdate();
+}
+
+void Camera::SetReflectionPlane(const Plane& reflectionPlane)
+{
+    reflectionPlane_ = reflectionPlane;
+    reflectionMatrix_ = reflectionPlane_.ReflectionMatrix();
+    viewDirty_ = true;
+    frustumDirty_ = true;
+    MarkNetworkUpdate();
+}
+
 void Camera::SetFlipVertical(bool enable)
 {
     flipVertical_ = enable;
@@ -222,8 +244,8 @@ float Camera::GetNearClip() const
 Frustum Camera::GetSplitFrustum(float nearClip, float farClip) const
 {
     Frustum ret;
-
-    const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+    
+    Matrix3x4 worldTransform = GetEffectiveWorldTransform();
     nearClip = Max(nearClip, GetNearClip());
     farClip = Min(farClip, farClip_);
     if (farClip < nearClip)
@@ -323,7 +345,8 @@ const Frustum& Camera::GetFrustum() const
 {
     if (frustumDirty_)
     {
-        const Matrix3x4& worldTransform = node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
+        Matrix3x4 worldTransform = GetEffectiveWorldTransform();
+        
         if (!orthographic_)
             frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
         else
@@ -503,6 +526,12 @@ float Camera::GetLodDistance(float distance, float scale, float bias) const
         return orthoSize_ / d;
 }
 
+Matrix3x4 Camera::GetEffectiveWorldTransform() const
+{
+    Matrix3x4 worldTransform = node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f) : Matrix3x4::IDENTITY;
+    return useReflection_ ? reflectionMatrix_ * worldTransform : worldTransform;
+}
+
 bool Camera::IsProjectionValid() const
 {
     return farClip_ > GetNearClip();
@@ -513,11 +542,25 @@ const Matrix3x4& Camera::GetView() const
     if (viewDirty_)
     {
         // Note: view matrix is unaffected by node or parent scale
-        view_ = node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f).Inverse() : Matrix3x4::IDENTITY;
+        view_ = GetEffectiveWorldTransform().Inverse();
         viewDirty_ = false;
     }
     
     return view_;
+}
+
+void Camera::SetReflectionPlaneAttr(Vector4 value)
+{
+    Plane plane;
+    plane.normal_ = Vector3(value.x_, value.y_, value.z_).Normalized();
+    plane.absNormal_ = plane.normal_.Abs();
+    plane.intercept_ = value.w_;
+    SetReflectionPlane(plane);
+}
+
+Vector4 Camera::GetReflectionPlaneAttr() const
+{
+    return Vector4(reflectionPlane_.normal_, reflectionPlane_.intercept_);
 }
 
 void Camera::OnNodeSet(Node* node)

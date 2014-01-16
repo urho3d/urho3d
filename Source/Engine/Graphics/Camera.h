@@ -76,6 +76,10 @@ public:
     void SetAutoAspectRatio(bool enable);
     /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
     void SetProjectionOffset(const Vector2& offset);
+    /// Set reflection mode. The reflection plane is specified in world space.
+    void SetUseReflection(bool enable);
+    /// Set reflection plane in world space for reflection mode.
+    void SetReflectionPlane(const Plane& reflectionPlane);
     /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
     
@@ -135,17 +139,30 @@ public:
     Vector3 GetUpVector() const;
     /// Return projection offset.
     const Vector2& GetProjectionOffset() const { return projectionOffset_; }
+    /// Return whether is using reflection.
+    bool GetUseReflection() const { return useReflection_; }
+    /// Return the reflection plane.
+    const Plane& GetReflectionPlane() const { return reflectionPlane_; }
     /// Return vertical flipping mode.
     bool GetFlipVertical() const { return flipVertical_; }
+    /// Return whether to reverse culling; affected by vertical flipping and reflection.
+    bool GetReverseCulling() const { return flipVertical_ ^ useReflection_; }
     /// Return distance to position. In orthographic mode uses only Z coordinate.
     float GetDistance(const Vector3& worldPos) const;
     /// Return squared distance to position. In orthographic mode uses only Z coordinate.
     float GetDistanceSquared(const Vector3& worldPos) const;
     /// Return a scene node's LOD scaled distance.
     float GetLodDistance(float distance, float scale, float bias) const;
+    /// Get effective world transform for matrix and frustum calculations including reflection but excluding node scaling.
+    Matrix3x4 GetEffectiveWorldTransform() const;
     /// Return if projection parameters are valid for rendering and raycasting.
     bool IsProjectionValid() const;
     
+    /// Set reflection plane attribute.
+    void SetReflectionPlaneAttr(Vector4 value);
+    /// Return reflection plane attribute.
+    Vector4 GetReflectionPlaneAttr() const;
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -153,6 +170,7 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     
 private:
+
     /// Cached view matrix.
     mutable Matrix3x4 view_;
     /// Cached projection matrix.
@@ -189,10 +207,16 @@ private:
     FillMode fillMode_;
     /// Projection offset.
     Vector2 projectionOffset_;
+    /// Reflection plane.
+    Plane reflectionPlane_;
+    /// Reflection matrix calculated from the plane.
+    Matrix3x4 reflectionMatrix_;
     /// Auto aspect ratio flag.
     bool autoAspectRatio_;
     /// Flip vertical flag.
     bool flipVertical_;
+    /// Reflection mode enabled flag.
+    bool useReflection_;
 };
 
 }

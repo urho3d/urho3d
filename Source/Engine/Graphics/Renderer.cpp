@@ -1257,8 +1257,8 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariatio
 
 void Renderer::SetCullMode(CullMode mode, Camera* camera)
 {
-    // If a camera is specified, check for vertical flipping and reverse culling in that case
-    if (camera && camera->GetFlipVertical())
+    // If a camera is specified, check whether it reverses culling due to vertical flipping or reflection
+    if (camera && camera->GetReverseCulling())
     {
         if (mode == CULL_CW)
             mode = CULL_CCW;

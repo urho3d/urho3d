@@ -193,6 +193,17 @@ void Frustum::UpdatePlanes()
     planes_[PLANE_UP].Define(vertices_[0], vertices_[4], vertices_[7]);
     planes_[PLANE_DOWN].Define(vertices_[6], vertices_[5], vertices_[1]);
     planes_[PLANE_FAR].Define(vertices_[5], vertices_[6], vertices_[7]);
+
+    // Check if we ended up with inverted planes (reflected transform) and flip in that case
+    if (planes_[PLANE_NEAR].Distance(vertices_[5]) < 0.0f)
+    {
+        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        {
+            planes_[i].normal_ = -planes_[i].normal_;
+            planes_[i].intercept_ = -planes_[i].intercept_;
+        }
+    }
+
 }
 
 }
