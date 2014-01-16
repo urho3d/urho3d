@@ -551,16 +551,12 @@ const Matrix3x4& Camera::GetView() const
 
 void Camera::SetReflectionPlaneAttr(Vector4 value)
 {
-    Plane plane;
-    plane.normal_ = Vector3(value.x_, value.y_, value.z_).Normalized();
-    plane.absNormal_ = plane.normal_.Abs();
-    plane.intercept_ = value.w_;
-    SetReflectionPlane(plane);
+    SetReflectionPlane(Plane(value));
 }
 
 Vector4 Camera::GetReflectionPlaneAttr() const
 {
-    return Vector4(reflectionPlane_.normal_, reflectionPlane_.intercept_);
+    return reflectionPlane_.ToVector4();
 }
 
 void Camera::OnNodeSet(Node* node)

@@ -56,6 +56,12 @@ public:
         Define(normal, point);
     }
     
+    /// Construct from a 4-dimensional vector, where the w coordinate is the plane parameter.
+    Plane(const Vector4& plane)
+    {
+        Define(plane);
+    }
+    
     /// Define from 3 vertices.
     void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
     {
@@ -73,12 +79,22 @@ public:
         intercept_ = normal_.DotProduct(point);
     }
     
+    /// Define from a 4-dimensional vector, where the w coordinate is the plane parameter.
+    void Define(const Vector4& plane)
+    {
+        normal_ = Vector3(plane.x_, plane.y_, plane.z_);
+        absNormal_ = normal_.Abs();
+        intercept_ = plane.w_;
+    }
+    
     /// Return signed distance to a point.
     float Distance(const Vector3& point) const { return normal_.DotProduct(point) - intercept_; }
     /// Reflect a normalized direction vector.
     Vector3 Reflect(const Vector3& direction) const { return direction - (2.0f * normal_.DotProduct(direction) * normal_); }
     /// Return a reflection matrix.
     Matrix3x4 ReflectionMatrix() const;
+    /// Return as a vector.
+    Vector4 ToVector4() const { return Vector4(normal_, intercept_); }
 
     /// Plane normal.
     Vector3 normal_;

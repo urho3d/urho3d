@@ -657,14 +657,19 @@ static void ConstructPlaneCopy(const Plane& plane, Plane* ptr)
     new(ptr) Plane(plane);
 }
 
-static void ConstructPlaneInitVertices(const Vector3& v0, const Vector3& v1, const Vector3& v2, Ray* ptr)
+static void ConstructPlaneInitVertices(const Vector3& v0, const Vector3& v1, const Vector3& v2, Plane* ptr)
 {
     new(ptr) Plane(v0, v1, v2);
 }
 
-static void ConstructPlaneInitNormalPoint(const Vector3& normal, const Vector3& point, Ray* ptr)
+static void ConstructPlaneInitNormalPoint(const Vector3& normal, const Vector3& point, Plane* ptr)
 {
     new(ptr) Plane(normal, point);
+}
+
+static void ConstructPlaneInitVector4(const Vector4& plane, Plane* ptr)
+{
+    new(ptr) Plane(plane);
 }
 
 static void RegisterPlane(asIScriptEngine* engine)
@@ -674,10 +679,13 @@ static void RegisterPlane(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Plane&in)", asFUNCTION(ConstructPlaneCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in, const Vector3&in)", asFUNCTION(ConstructPlaneInitVertices), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in)", asFUNCTION(ConstructPlaneInitNormalPoint), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Plane", asBEHAVE_CONSTRUCT, "void f(const Vector4&in)", asFUNCTION(ConstructPlaneInitVector4), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Plane", "void Define(const Vector3&in, const Vector3&in, const Vector3&in)", asMETHODPR(Plane, Define, (const Vector3&, const Vector3&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "void Define(const Vector3&in, const Vector3&in)", asMETHODPR(Plane, Define, (const Vector3&, const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "void Define(const Vector4&in)", asMETHODPR(Plane, Define, (const Vector4&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "float Distance(const Vector3&in) const", asMETHOD(Plane, Distance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "Vector3 Reflect(const Vector3&in) const", asMETHOD(Plane, Reflect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "Vector4 ToVector4() const", asMETHOD(Plane, ToVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "Matrix3x4 get_reflectionMatrix() const", asMETHOD(Plane, ReflectionMatrix), asCALL_THISCALL);
     engine->RegisterObjectProperty("Plane", "Vector3 normal", offsetof(Plane, normal_));
     engine->RegisterObjectProperty("Plane", "Vector3 absNormal", offsetof(Plane, absNormal_));
