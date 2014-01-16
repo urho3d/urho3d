@@ -813,6 +813,8 @@ Methods:
 - void SetOrthographic(bool enable)
 - void SetAutoAspectRatio(bool enable)
 - void SetProjectionOffset(const Vector2& offset)
+- void SetUseReflection(bool enable)
+- void SetReflectionPlane(const Plane& reflectionPlane)
 - float GetFarClip() const
 - float GetNearClip() const
 - float GetFov() const
@@ -827,7 +829,6 @@ Methods:
 - bool GetAutoAspectRatio() const
 - const Frustum& GetFrustum() const
 - const Matrix4& GetProjection() const
-- Matrix4 GetProjection(bool apiSpecific) const
 - const Matrix3x4& GetView() const
 - void GetFrustumSize(Vector3& near, Vector3& far) const
 - float GetHalfViewSize() const
@@ -841,10 +842,13 @@ Methods:
 - Vector3 GetRightVector() const
 - Vector3 GetUpVector() const
 - const Vector2& GetProjectionOffset() const
+- bool GetUseReflection() const
+- const Plane& GetReflectionPlane() const
 - float GetDistance(const Vector3& worldPos) const
 - float GetDistanceSquared(const Vector3& worldPos) const
 - float GetLodDistance(float distance, float scale, float bias) const
 - bool IsProjectionValid() const
+- Matrix3x4 GetEffectiveWorldTransform() const
 
 Properties:
 
@@ -869,7 +873,10 @@ Properties:
 - Vector3 rightVector (readonly)
 - Vector3 upVector (readonly)
 - Vector2& projectionOffset
+- bool useReflection
+- Plane& reflectionPlane
 - bool projectionValid (readonly)
+- Matrix3x4 effectiveWorldTransform (readonly)
 
 ### DebugRenderer : Component
 
@@ -2572,18 +2579,22 @@ Methods:
 - Plane(const Plane& plane)
 - Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - Plane(const Vector3& normal, const Vector3& point)
+- Plane(const Vector4& plane)
 - ~Plane()
 - void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - void Define(const Vector3& normal, const Vector3& point)
+- void Define(const Vector4& plane)
 - float Distance(const Vector3& point) const
 - Vector3 Reflect(const Vector3& direction) const
 - Matrix3x4 ReflectionMatrix() const
+- Vector4 ToVector4() const
 
 Properties:
 
 - Vector3 normal
 - Vector3 absNormal
 - float intercept
+- static const Plane UP
 
 ### Polyhedron
 
@@ -2710,6 +2721,7 @@ Methods:
 - Vector2 Size() const
 - Vector2 HalfSize() const
 - bool Equals(const Rect& rhs) const
+- Intersection IsInside(const Vector2& point) const
 - Vector4 ToVector4() const
 - String ToString() const
 
@@ -2735,6 +2747,7 @@ Methods:
 - IntVector2 Size() const
 - int Width() const
 - int Height() const
+- Intersection IsInside(const IntVector2& point) const
 
 Properties:
 

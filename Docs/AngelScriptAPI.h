@@ -456,6 +456,8 @@ int y;
 
 class IntRect
 {
+// Methods:
+Intersection IsInside(const IntVector2&) const;
 
 // Properties:
 /* (readonly) */
@@ -666,6 +668,7 @@ void Merge(const Rect&);
 void Clip(const Rect&);
 void Clear();
 bool Equals(const Rect&) const;
+Intersection IsInside(const Vector2&) const;
 Vector4 ToVector4() const;
 
 // Properties:
@@ -796,8 +799,10 @@ class Plane
 // Methods:
 void Define(const Vector3&, const Vector3&, const Vector3&);
 void Define(const Vector3&, const Vector3&);
+void Define(const Vector4&);
 float Distance(const Vector3&) const;
 Vector3 Reflect(const Vector3&) const;
+Vector4 ToVector4() const;
 
 // Properties:
 /* (readonly) */
@@ -2234,6 +2239,8 @@ float lodBias;
 bool orthographic;
 bool autoAspectRatio;
 Vector2 projectionOffset;
+bool useReflection;
+Plane reflectionPlane;
 uint viewMask;
 uint viewOverrideFlags;
 FillMode fillMode;
@@ -2253,6 +2260,8 @@ Vector3 forwardVector;
 Vector3 rightVector;
 /* (readonly) */
 Vector3 upVector;
+/* (readonly) */
+Matrix3x4 effectiveWorldTransform;
 };
 
 class RenderTargetInfo

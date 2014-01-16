@@ -451,6 +451,10 @@ Properties:
 
 ### IntRect
 
+Methods:
+
+- Intersection IsInside(const IntVector2&) const
+
 Properties:
 
 - int[] data (readonly)
@@ -661,6 +665,7 @@ Methods:
 - void Clip(const Rect&)
 - void Clear()
 - bool Equals(const Rect&) const
+- Intersection IsInside(const Vector2&) const
 - Vector4 ToVector4() const
 
 Properties:
@@ -792,8 +797,10 @@ Methods:
 
 - void Define(const Vector3&, const Vector3&, const Vector3&)
 - void Define(const Vector3&, const Vector3&)
+- void Define(const Vector4&)
 - float Distance(const Vector3&) const
 - Vector3 Reflect(const Vector3&) const
+- Vector4 ToVector4() const
 
 Properties:
 
@@ -2048,6 +2055,8 @@ Properties:
 - bool orthographic
 - bool autoAspectRatio
 - Vector2 projectionOffset
+- bool useReflection
+- Plane reflectionPlane
 - uint viewMask
 - uint viewOverrideFlags
 - FillMode fillMode
@@ -2059,6 +2068,7 @@ Properties:
 - Vector3 forwardVector (readonly)
 - Vector3 rightVector (readonly)
 - Vector3 upVector (readonly)
+- Matrix3x4 effectiveWorldTransform (readonly)
 
 
 ### RenderTargetInfo
