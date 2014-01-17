@@ -815,6 +815,8 @@ Methods:
 - void SetProjectionOffset(const Vector2& offset)
 - void SetUseReflection(bool enable)
 - void SetReflectionPlane(const Plane& reflectionPlane)
+- void SetUseClipping(bool enable)
+- void SetClipPlane(const Plane& clipPlane)
 - float GetFarClip() const
 - float GetNearClip() const
 - float GetFov() const
@@ -844,6 +846,8 @@ Methods:
 - const Vector2& GetProjectionOffset() const
 - bool GetUseReflection() const
 - const Plane& GetReflectionPlane() const
+- bool GetUseClipping() const
+- const Plane& GetClipPlane() const
 - float GetDistance(const Vector3& worldPos) const
 - float GetDistanceSquared(const Vector3& worldPos) const
 - float GetLodDistance(float distance, float scale, float bias) const
@@ -875,6 +879,8 @@ Properties:
 - Vector2& projectionOffset
 - bool useReflection
 - Plane& reflectionPlane
+- bool useClipping
+- Plane& clipPlane
 - bool projectionValid (readonly)
 - Matrix3x4 effectiveWorldTransform (readonly)
 
@@ -2495,6 +2501,7 @@ Properties:
 - void SetScale(const Vector3& scale)
 - void SetScale(float scale)
 - Matrix3 ToMatrix3() const
+- Matrix4 ToMatrix4() const
 - Matrix3 RotationMatrix() const
 - Vector3 Translation() const
 - Quaternion Rotation() const
@@ -2584,9 +2591,15 @@ Methods:
 - void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
 - void Define(const Vector3& normal, const Vector3& point)
 - void Define(const Vector4& plane)
+- void Transform(const Matrix3& transform)
+- void Transform(const Matrix3x4& transform)
+- void Transform(const Matrix4& transform)
 - float Distance(const Vector3& point) const
 - Vector3 Reflect(const Vector3& direction) const
 - Matrix3x4 ReflectionMatrix() const
+- Plane Transformed(const Matrix3& transform) const
+- Plane Transformed(const Matrix3x4& transform) const
+- Plane Transformed(const Matrix4& transform) const
 - Vector4 ToVector4() const
 
 Properties:
@@ -4905,6 +4918,7 @@ Properties:
 - float Min(float lhs, float rhs)
 - float Max(float lhs, float rhs)
 - float Abs(float value)
+- float Sign(float value)
 - float Clamp(float value, float min, float max)
 - bool Equals(float lhs, float rhs)
 - float Random()

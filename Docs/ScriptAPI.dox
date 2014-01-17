@@ -633,6 +633,7 @@ Methods:
 - void SetScale(float)
 - void SetTranslation(const Vector3&)
 - Matrix3 ToMatrix3() const
+- Matrix4 ToMatrix4() const
 - Vector3 Translation() const
 - void Decompose(Vector3&, Quaternion&, Vector3&) const
 - Matrix3x4 Inverse() const
@@ -798,8 +799,14 @@ Methods:
 - void Define(const Vector3&, const Vector3&, const Vector3&)
 - void Define(const Vector3&, const Vector3&)
 - void Define(const Vector4&)
+- void Transform(const Matrix3&)
+- void Transform(const Matrix3x4&)
+- void Transform(const Matrix4&)
 - float Distance(const Vector3&) const
 - Vector3 Reflect(const Vector3&) const
+- Plane Transformed(const Matrix3&) const
+- Plane Transformed(const Matrix3x4&) const
+- Plane Transformed(const Matrix4&) const
 - Vector4 ToVector4() const
 
 Properties:
@@ -2057,6 +2064,8 @@ Properties:
 - Vector2 projectionOffset
 - bool useReflection
 - Plane reflectionPlane
+- bool useClipping
+- Plane clipPlane
 - uint viewMask
 - uint viewOverrideFlags
 - FillMode fillMode
@@ -7243,6 +7252,7 @@ Properties:
 - float Atan(float)
 - float Atan2(float, float)
 - float Abs(float)
+- float Sign(float)
 - float Sqrt(float)
 - float Pow(float, float)
 - float Min(float, float)
