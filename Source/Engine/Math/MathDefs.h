@@ -66,6 +66,8 @@ inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
 inline float Max(float lhs, float rhs) { return lhs > rhs ? lhs : rhs; }
 /// Return absolute value of a float.
 inline float Abs(float value) { return value >= 0.0f ? value : -value; }
+/// Return the sign of a float (-1, 0 or 1.)
+inline float Sign(float value) { return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f); }
 
 /// Clamp a float to a range.
 inline float Clamp(float value, float min, float max)

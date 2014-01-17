@@ -76,10 +76,14 @@ public:
     void SetAutoAspectRatio(bool enable);
     /// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
     void SetProjectionOffset(const Vector2& offset);
-    /// Set reflection mode. The reflection plane is specified in world space.
+    /// Set reflection mode.
     void SetUseReflection(bool enable);
     /// Set reflection plane in world space for reflection mode.
-    void SetReflectionPlane(const Plane& reflectionPlane);
+    void SetReflectionPlane(const Plane& plane);
+    /// Set whether to use a custom clip plane.
+    void SetUseClipping(bool enable);
+    /// Set custom clipping plane in world space.
+    void SetClipPlane(const Plane& plane);
     /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
     
@@ -143,6 +147,10 @@ public:
     bool GetUseReflection() const { return useReflection_; }
     /// Return the reflection plane.
     const Plane& GetReflectionPlane() const { return reflectionPlane_; }
+    /// Return whether is using a custom clipping plane.
+    bool GetUseClipping() const { return useClipping_; }
+    /// Return the custom clipping plane.
+    const Plane& GetClipPlane() const { return clipPlane_; }
     /// Return vertical flipping mode.
     bool GetFlipVertical() const { return flipVertical_; }
     /// Return whether to reverse culling; affected by vertical flipping and reflection.
@@ -162,7 +170,11 @@ public:
     void SetReflectionPlaneAttr(Vector4 value);
     /// Return reflection plane attribute.
     Vector4 GetReflectionPlaneAttr() const;
-
+    /// Set clipping plane attribute.
+    void SetClipPlaneAttr(Vector4 value);
+    /// Return clipping plane attribute.
+    Vector4 GetClipPlaneAttr() const;
+    
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -170,7 +182,6 @@ protected:
     virtual void OnMarkedDirty(Node* node);
     
 private:
-
     /// Cached view matrix.
     mutable Matrix3x4 view_;
     /// Cached projection matrix.
@@ -209,6 +220,8 @@ private:
     Vector2 projectionOffset_;
     /// Reflection plane.
     Plane reflectionPlane_;
+    /// Clipping plane.
+    Plane clipPlane_;
     /// Reflection matrix calculated from the plane.
     Matrix3x4 reflectionMatrix_;
     /// Auto aspect ratio flag.
@@ -217,6 +230,8 @@ private:
     bool flipVertical_;
     /// Reflection mode enabled flag.
     bool useReflection_;
+    /// Use custom clip plane flag.
+    bool useClipping_;
 };
 
 }

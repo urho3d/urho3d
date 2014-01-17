@@ -1812,6 +1812,24 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
     }
 }
 
+void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection)
+{
+    if (enable != useClipPlane_)
+    {
+        impl_->device_->SetRenderState(D3DRS_CLIPPLANEENABLE, enable ? 1 : 0);
+        useClipPlane_ = enable;
+    }
+    
+    if (enable)
+    {
+        Matrix4 viewProj = projection * view;
+        // Intercept convention needs to be reversed
+        Plane plane = clipPlane;
+        plane.intercept_ *= -1.0f;
+        impl_->device_->SetClipPlane(0, plane.Transformed(viewProj).ToVector4().Data());
+    }
+}
+
 void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
 {
     if (index < MAX_VERTEX_STREAMS && streamFrequencies_[index] != frequency)
@@ -2556,6 +2574,7 @@ void Graphics::ResetCachedState()
     stencilRef_ = 0;
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
+    useClipPlane_ = false;
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;

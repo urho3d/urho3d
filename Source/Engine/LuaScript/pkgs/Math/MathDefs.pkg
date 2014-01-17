@@ -26,6 +26,7 @@ float Lerp(float lhs, float rhs, float t);
 float Min(float lhs, float rhs);
 float Max(float lhs, float rhs);
 float Abs(float value);
+float Sign(float value);
 float Clamp(float value, float min, float max);
 bool Equals(float lhs, float rhs);
 

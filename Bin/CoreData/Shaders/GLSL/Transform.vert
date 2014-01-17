@@ -46,7 +46,12 @@ vec2 GetTexCoord(vec2 texCoord)
 
 vec4 GetClipPos(vec3 worldPos)
 {
-    return cViewProj * vec4(worldPos, 1.0);
+    vec4 ret = cViewProj * vec4(worldPos, 1.0);
+    // While getting the clip coordinate, also automatically set gl_ClipVertex for user clip planes
+    #ifndef GL_ES
+    gl_ClipVertex = ret;
+    #endif
+    return ret;
 }
 
 float GetZonePos(vec3 worldPos)

@@ -30,6 +30,7 @@ class Matrix3x4
     void SetScale(float scale);
     
     Matrix3 ToMatrix3() const;
+    Matrix4 ToMatrix4() const;
     Matrix3 RotationMatrix() const;
     Vector3 Translation() const;
     Quaternion Rotation() const;

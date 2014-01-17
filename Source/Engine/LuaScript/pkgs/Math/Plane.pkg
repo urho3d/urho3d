@@ -13,10 +13,16 @@ class Plane
     void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2);
     void Define(const Vector3& normal, const Vector3& point);
     void Define(const Vector4& plane);
+    void Transform(const Matrix3& transform);
+    void Transform(const Matrix3x4& transform);
+    void Transform(const Matrix4& transform);
 
     float Distance(const Vector3& point) const;
     Vector3 Reflect(const Vector3& direction) const;
     Matrix3x4 ReflectionMatrix() const;
+    Plane Transformed(const Matrix3& transform) const;
+    Plane Transformed(const Matrix3x4& transform) const;
+    Plane Transformed(const Matrix4& transform) const;
     Vector4 ToVector4() const;
 
     Vector3 normal_ @ normal;

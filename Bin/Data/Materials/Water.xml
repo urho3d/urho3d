@@ -1,0 +1,8 @@
+<material>
+    <technique name="Techniques/Water.xml" />
+    <parameter name="DistortSpeed" value="5.0" />
+    <parameter name="DistortStrength" value="0.001" />
+    <parameter name="ReflectionMix" value="0.33" />
+    <parameter name="RefractionMix" value="0.66" />
+    <parameter name="WaterTint" value="0.7 0.7 0.9" />
+</material>

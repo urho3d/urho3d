@@ -1792,6 +1792,37 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     }
 }
 
+void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4& view, const Matrix4& projection)
+{
+    #ifndef GL_ES_VERSION_2_0
+    if (enable != useClipPlane_)
+    {
+        if (enable)
+            glEnable(GL_CLIP_PLANE0);
+        else
+            glDisable(GL_CLIP_PLANE0);
+        useClipPlane_ = enable;
+    }
+    
+    if (enable)
+    {
+        Matrix4 viewProj = projection * view;
+        // Intercept convention needs to be reversed
+        Plane plane = clipPlane;
+        plane.intercept_ *= -1.0f;
+        Vector4 planeVec =  plane.Transformed(viewProj).ToVector4();
+        
+        GLdouble planeData[4];
+        planeData[0] = planeVec.x_;
+        planeData[1] = planeVec.y_;
+        planeData[2] = planeVec.z_;
+        planeData[3] = planeVec.w_;
+        
+        glClipPlane(GL_CLIP_PLANE0, &planeData[0]);
+    }
+    #endif
+}
+
 void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
 {
 }
@@ -2766,6 +2797,7 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     lastInstanceOffset_ = 0;
+    useClipPlane_ = false;
     impl_->activeTexture_ = 0;
     impl_->enabledAttributes_ = 0;
     impl_->boundFbo_ = impl_->systemFbo_;

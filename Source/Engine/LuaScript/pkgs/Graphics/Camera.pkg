@@ -25,6 +25,8 @@ class Camera : public Component
     void SetProjectionOffset(const Vector2& offset);
     void SetUseReflection(bool enable);
     void SetReflectionPlane(const Plane& reflectionPlane);
+    void SetUseClipping(bool enable);
+    void SetClipPlane(const Plane& clipPlane);
 
     float GetFarClip() const;
     float GetNearClip() const;
@@ -55,6 +57,8 @@ class Camera : public Component
     const Vector2& GetProjectionOffset() const;
     bool GetUseReflection() const;
     const Plane& GetReflectionPlane() const;
+    bool GetUseClipping() const;
+    const Plane& GetClipPlane() const;
 
     float GetDistance(const Vector3& worldPos) const;
     float GetDistanceSquared(const Vector3& worldPos) const;
@@ -85,6 +89,8 @@ class Camera : public Component
     tolua_property__get_set Vector2& projectionOffset;
     tolua_property__get_set bool useReflection;
     tolua_property__get_set Plane& reflectionPlane;
+    tolua_property__get_set bool useClipping;
+    tolua_property__get_set Plane& clipPlane;
     tolua_readonly tolua_property__is_set bool projectionValid;
     tolua_readonly tolua_property__get_set Matrix3x4 effectiveWorldTransform;
 };

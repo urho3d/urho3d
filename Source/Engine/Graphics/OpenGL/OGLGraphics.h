@@ -27,8 +27,8 @@
 #include "GraphicsDefs.h"
 #include "HashMap.h"
 #include "Image.h"
-#include "Matrix3x4.h"
 #include "Object.h"
+#include "Plane.h"
 #include "Rect.h"
 
 namespace Urho3D
@@ -36,9 +36,6 @@ namespace Urho3D
 
 class Image;
 class IndexBuffer;
-class Matrix3;
-class Matrix4;
-class Matrix3x4;
 class GPUObject;
 class GraphicsImpl;
 class RenderSurface;
@@ -214,6 +211,8 @@ public:
     void SetScissorTest(bool enable, const IntRect& rect);
     /// Set stencil test.
     void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned compareMask = M_MAX_UNSIGNED, unsigned writeMask = M_MAX_UNSIGNED);
+    /// Set a custom clipping plane. The plane is specified in world space, but is dependent on the view and projection matrices.
+    void SetClipPlane(bool enable, const Plane& clipPlane = Plane::UP, const Matrix3x4& view = Matrix3x4::IDENTITY, const Matrix4& projection = Matrix4::IDENTITY);
     /// Set vertex buffer stream frequency. No-op on OpenGL.
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies. No-op on OpenGL.
@@ -353,6 +352,8 @@ public:
     unsigned GetStencilCompareMask() const { return stencilCompareMask_; }
     /// Return stencil write bitmask.
     unsigned GetStencilWriteMask() const { return stencilWriteMask_; }
+    /// Return whether a custom clipping plane is in use.
+    bool GetUseClipPlane() const { return useClipPlane_; }
     /// Return stream frequency by vertex buffer index. Always returns 0 on OpenGL.
     unsigned GetStreamFrequency(unsigned index) const { return 0; }
     /// Return rendertarget width and height.
@@ -570,6 +571,8 @@ private:
     Matrix3 tempMatrices3_[NUM_TEMP_MATRICES];
     /// Temp matrices for transposing shader parameters.
     Matrix4 tempMatrices4_[NUM_TEMP_MATRICES];
+    /// Custom clip plane enable flag.
+    bool useClipPlane_;
     /// Releasing GPU objects flag.
     bool releasingGPUObjects_;
 };

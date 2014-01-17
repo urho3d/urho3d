@@ -87,12 +87,25 @@ public:
         intercept_ = plane.w_;
     }
     
+    /// Transform with a 3x3 matrix.
+    void Transform(const Matrix3& transform);
+    /// Transform with a 3x4 matrix.
+    void Transform(const Matrix3x4& transform);
+    /// Transform with a 4x4 matrix.
+    void Transform(const Matrix4& transform);
+    
     /// Return signed distance to a point.
     float Distance(const Vector3& point) const { return normal_.DotProduct(point) - intercept_; }
     /// Reflect a normalized direction vector.
     Vector3 Reflect(const Vector3& direction) const { return direction - (2.0f * normal_.DotProduct(direction) * normal_); }
     /// Return a reflection matrix.
     Matrix3x4 ReflectionMatrix() const;
+    /// Return transformed by a 3x3 matrix.
+    Plane Transformed(const Matrix3& transform) const;
+    /// Return transformed by a 3x4 matrix.
+    Plane Transformed(const Matrix3x4& transform) const;
+    /// Return transformed by a 4x4 matrix.
+    Plane Transformed(const Matrix4& transform) const;
     /// Return as a vector.
     Vector4 ToVector4() const { return Vector4(normal_, intercept_); }
 

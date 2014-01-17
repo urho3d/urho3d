@@ -29,6 +29,21 @@ namespace Urho3D
 // Static initialization order can not be relied on, so do not use Vector3 constants
 const Plane Plane::UP(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f));
 
+void Plane::Transform(const Matrix3& transform)
+{
+    *this = Transformed(transform);
+}
+
+void Plane::Transform(const Matrix3x4& transform)
+{
+    *this = Transformed(transform);
+}
+
+void Plane::Transform(const Matrix4& transform)
+{
+    *this = Transformed(transform);
+}
+
 Matrix3x4 Plane::ReflectionMatrix() const
 {
     float negIntercept = -intercept_;
@@ -47,6 +62,25 @@ Matrix3x4 Plane::ReflectionMatrix() const
         -2.0f * normal_.z_ * normal_.z_ + 1.0f,
         -2.0f * normal_.z_ * negIntercept
     );
+}
+
+Plane Plane::Transformed(const Matrix3& transform) const
+{
+    Vector3 newNormal = (transform * normal_).Normalized();
+    Vector3 newPoint = newNormal * intercept_;
+    return Plane(newNormal, newPoint);
+}
+
+Plane Plane::Transformed(const Matrix3x4& transform) const
+{
+    Vector3 newNormal = (transform * normal_).Normalized();
+    Vector3 newPoint = transform * (normal_ * intercept_);
+    return Plane(newNormal, newPoint);
+}
+
+Plane Plane::Transformed(const Matrix4& transform) const
+{
+    return Plane(transform.Inverse().Transpose() * ToVector4());
 }
 
 }

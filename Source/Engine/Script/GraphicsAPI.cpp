@@ -101,6 +101,10 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "bool get_useReflection() const", asMETHOD(Camera, GetUseReflection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_reflectionPlane(const Plane&in) const", asMETHOD(Camera, SetReflectionPlane), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "const Plane& get_reflectionPlane() const", asMETHOD(Camera, GetReflectionPlane), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "void set_useClipping(bool)", asMETHOD(Camera, SetUseClipping), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "bool get_useClipping() const", asMETHOD(Camera, GetUseClipping), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "void set_clipPlane(const Plane&in) const", asMETHOD(Camera, SetClipPlane), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "const Plane& get_clipPlane() const", asMETHOD(Camera, GetClipPlane), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_viewMask(uint)", asMETHOD(Camera, SetViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "uint get_viewMask() const", asMETHOD(Camera, GetViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_viewOverrideFlags(uint)", asMETHOD(Camera, SetViewOverrideFlags), asCALL_THISCALL);

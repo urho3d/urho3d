@@ -61,6 +61,7 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float Atan(float)", asFUNCTION(Atan), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Atan2(float, float)", asFUNCTION(Atan2), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Abs(float)", asFUNCTIONPR(Abs, (float), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Sign(float)", asFUNCTION(Sign), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Sqrt(float)", asFUNCTION(sqrtf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Pow(float, float)", asFUNCTION(powf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Min(float, float)", asFUNCTIONPR(Min, (float, float), float), asCALL_CDECL);
@@ -629,6 +630,7 @@ static void RegisterMatrix3x4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Matrix3x4", "void SetScale(float)", asMETHODPR(Matrix3x4, SetScale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "void SetTranslation(const Vector3&in)", asMETHODPR(Matrix3x4, SetTranslation, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3 ToMatrix3() const", asMETHODPR(Matrix3x4, ToMatrix3, () const, Matrix3), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix3x4", "Matrix4 ToMatrix4() const", asMETHODPR(Matrix3x4, ToMatrix4, () const, Matrix4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Vector3 Translation() const", asMETHODPR(Matrix3x4, Translation, () const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "void Decompose(Vector3&, Quaternion&, Vector3&) const", asMETHODPR(Matrix3x4, Decompose, (Vector3&, Quaternion&, Vector3&) const, void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Matrix3x4", "Matrix3x4 Inverse() const", asMETHODPR(Matrix3x4, Inverse, () const, Matrix3x4), asCALL_THISCALL);
@@ -683,8 +685,14 @@ static void RegisterPlane(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Plane", "void Define(const Vector3&in, const Vector3&in, const Vector3&in)", asMETHODPR(Plane, Define, (const Vector3&, const Vector3&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "void Define(const Vector3&in, const Vector3&in)", asMETHODPR(Plane, Define, (const Vector3&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "void Define(const Vector4&in)", asMETHODPR(Plane, Define, (const Vector4&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "void Transform(const Matrix3&in)", asMETHODPR(Plane, Transform, (const Matrix3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "void Transform(const Matrix3x4&in)", asMETHODPR(Plane, Transform, (const Matrix3x4&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "void Transform(const Matrix4&in)", asMETHODPR(Plane, Transform, (const Matrix4&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "float Distance(const Vector3&in) const", asMETHOD(Plane, Distance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "Vector3 Reflect(const Vector3&in) const", asMETHOD(Plane, Reflect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "Plane Transformed(const Matrix3&in) const", asMETHODPR(Plane, Transformed, (const Matrix3&) const, Plane), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "Plane Transformed(const Matrix3x4&in) const", asMETHODPR(Plane, Transformed, (const Matrix3x4&) const, Plane), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Plane", "Plane Transformed(const Matrix4&in) const", asMETHODPR(Plane, Transformed, (const Matrix4&) const, Plane), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "Vector4 ToVector4() const", asMETHOD(Plane, ToVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("Plane", "Matrix3x4 get_reflectionMatrix() const", asMETHOD(Plane, ReflectionMatrix), asCALL_THISCALL);
     engine->RegisterObjectProperty("Plane", "Vector3 normal", offsetof(Plane, normal_));

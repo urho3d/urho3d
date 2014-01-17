@@ -373,6 +373,29 @@ public:
         );
     }
     
+    /// Convert to a 4x4 matrix by filling in an identity last row.
+    Matrix4 ToMatrix4() const
+    {
+        return Matrix4(
+            m00_,
+            m01_,
+            m02_,
+            m03_,
+            m10_,
+            m11_,
+            m12_,
+            m13_,
+            m20_,
+            m21_,
+            m22_,
+            m23_,
+            0.0f,
+            0.0f,
+            0.0f,
+            1.0f
+        );
+    }
+    
     /// Return the rotation matrix with scaling removed.
     Matrix3 RotationMatrix() const
     {

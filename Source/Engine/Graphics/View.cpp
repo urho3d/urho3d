@@ -1320,6 +1320,7 @@ void View::ExecuteRenderPathCommands()
                     SetRenderTargets(command);
                     SetTextures(command);
                     graphics_->SetFillMode(camera_->GetFillMode());
+                    graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
                     batchQueues_[command.pass_].Draw(this, command.useScissor_, command.markToStencil_);
                 }
                 break;
@@ -1353,6 +1354,7 @@ void View::ExecuteRenderPathCommands()
                         
                         SetTextures(command);
                         graphics_->SetFillMode(camera_->GetFillMode());
+                        graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(), camera_->GetProjection());
                         i->litBatches_.Draw(i->light_, this);
                     }
                     
@@ -1368,7 +1370,6 @@ void View::ExecuteRenderPathCommands()
                     PROFILE(RenderLightVolumes);
                     
                     SetRenderTargets(command);
-                    
                     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
                     {
                         // If reusing shadowmaps, render each of them before the lit batches
@@ -1405,6 +1406,7 @@ void View::ExecuteRenderPathCommands()
     graphics_->SetDepthStencil(GetDepthStencil(renderTarget_));
     graphics_->SetViewport(viewRect_);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
 }
 
 void View::SetRenderTargets(RenderPathCommand& command)
@@ -1569,6 +1571,7 @@ void View::RenderQuad(RenderPathCommand& command)
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
@@ -1674,6 +1677,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(depthWrite);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, destination);
@@ -2503,6 +2507,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     
     if (type != LIGHT_DIRECTIONAL)
     {
@@ -2545,6 +2550,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     
     graphics_->SetColorWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetClipPlane(false);
     graphics_->SetStencilTest(false);
     graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
     graphics_->SetDepthStencil(shadowMap);
