@@ -26,7 +26,6 @@
 #include "Node.h"
 #include "Scene.h"
 #include "Spline.h"
-#include "Timer.h"
 
 namespace Urho3D
 {
@@ -37,7 +36,6 @@ Spline::Spline(Context* context) :
     Component(context),
     interpolationMode_(BEZIER_CURVE),
     speed_(1.f),
-    startTime_(-1.f),
     elapsedTime_(0.f),
     length_(0.f),
     traveled_(0.f),
@@ -53,10 +51,9 @@ void Spline::RegisterObject(Context* context)
     ATTRIBUTE(Spline, VAR_FLOAT, "Speed", speed_, 1.f, AM_FILE);
     ATTRIBUTE(Spline, VAR_INT, "Interpolation Mode", interpolationMode_, BEZIER_CURVE, AM_FILE);
     ATTRIBUTE(Spline, VAR_FLOAT, "Traveled", traveled_, 0.f, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(Spline, VAR_FLOAT, "Start Time", startTime_, -1.f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Spline, VAR_FLOAT, "Elapsed Time", elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Spline, VAR_FLOAT, "Length", length_, 0.f, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(Spline, VAR_BOOL, "Attached", attached_, false, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE(Spline, VAR_BOOL, "Attached", attached_, false, AM_FILE);
 }
 
 void Spline::SetControlPoints(const Vector<Vector3> controlPoints)
@@ -67,6 +64,25 @@ void Spline::SetControlPoints(const Vector<Vector3> controlPoints)
 void Spline::SetInterpolationMode(InterpolationMode interpolationMode)
 {
     interpolationMode_ = interpolationMode;
+}
+
+Vector3 Spline::GetPosition(float factor)
+{
+    float t = factor;
+
+    if (t < 0.f)
+        t = 0.0f;
+    else if (t > 1.0f)
+        t = 1.0f;
+
+    switch (interpolationMode_)
+    {
+    case BEZIER_CURVE:
+        return BezierMove(controlPoints_, t);
+
+    default:
+        return Vector3::ZERO;
+    }
 }
 
 void Spline::Push(const Vector3& controlPoint)
@@ -84,22 +100,29 @@ void Spline::Attach()
     if (controlPoints_.Size() > 0)
     {
         CalculateLength();
-
-        GetNode()->SetPosition(BezierMove(controlPoints_,traveled_));
+        
+        switch (interpolationMode_)
+        {
+        case BEZIER_CURVE:
+            if (controlPoints_.Size() < 2)
+            {
+                LOGERRORF("Spline on Node[%d,%s] in Beizer Curve mode attempted with less than two control points.", GetNode()->GetID(), GetNode()->GetName().CString());
+                return;
+            }
+            GetNode()->SetPosition(BezierMove(controlPoints_, traveled_));
+            break;
+        }
 
         attached_ = true;
     }
 }
 
-void Spline::Move()
+void Spline::Move(float timeStep)
 {
-    if (!attached_ || traveled_ >= 1.0f)
+    if (!attached_ || traveled_ >= 1.0f || length_ <= 0.0f)
         return;
 
-    if (startTime_ <= -1.f)
-        startTime_ = GetSubsystem<Time>()->GetElapsedTime();
-
-    elapsedTime_ += GetSubsystem<Time>()->GetElapsedTime() - startTime_;
+    elapsedTime_ += timeStep;
 
     float distanceCovered = elapsedTime_ * speed_;
     traveled_ = distanceCovered / length_;
@@ -120,14 +143,12 @@ void Spline::Move()
 void Spline::Detach()
 {
     attached_ = false;
-    startTime_ = -1.f;
 }
 
 void Spline::Reset()
 {
     attached_ = false;
     traveled_ = 0.f;
-    startTime_ = -1.f;
     elapsedTime_ = 0.f;
 }
 
@@ -161,7 +182,7 @@ void Spline::CalculateLength()
         for (float f = 0.000f; f <= 1.000f; f += 0.001f)
         {
             Vector3 b = BezierMove(controlPoints_, f);
-            length_ += (a - b).Length();
+            length_ += Abs((a - b).Length());
             a = b;
         }
         break;

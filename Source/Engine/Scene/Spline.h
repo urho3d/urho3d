@@ -57,6 +57,8 @@ public:
     InterpolationMode GetInterpolationMode() const { return interpolationMode_; }
     /// Get the movement Speed.
     float GetSpeed() const { return speed_; }
+    /// Get a position on the spine from 0.f to 1.f where 0 is the start and 1 is the end.
+    Vector3 GetPosition(float factor);
 
     /// Add a Control Point to the end.
     void Push(const Vector3& controlPoint);
@@ -66,7 +68,7 @@ public:
     /// Attach the Parent to the path at the position it was at last or at the start if after Reset was called or no movement has occurred.
     void Attach();
     /// Move the parent node to the next position along the Spline based off the Speed value.
-    void Move();
+    void Move(float timeStep);
     /// Detach the Parent from the path. Movement is not reset.
     void Detach();
     /// Reset movement along the path.
@@ -92,8 +94,6 @@ private:
     /// The Speed of movement along the Spline.
     float speed_;
 
-    /// The time when movement started along the Spline.
-    float startTime_;
     /// Amount of time that has elapsed while moving.
     float elapsedTime_;
     /// The fraction of the Spline covered.
