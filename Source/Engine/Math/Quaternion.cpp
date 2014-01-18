@@ -154,10 +154,10 @@ void Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDir
 
     Quaternion ret;
     ret.w_ = sqrtf(1.0f + right.x_ + up.y_ + forward.z_) * 0.5f;
-    float w4_recip = 1.0f / (4.0f * ret.w_);
-    ret.x_ = (up.z_ - forward.y_) * w4_recip;
-    ret.y_ = (forward.x_ - right.z_) * w4_recip;
-    ret.z_ = (right.y_ - up.x_) * w4_recip;
+    float w4Recip = 1.0f / (4.0f * ret.w_);
+    ret.x_ = (up.z_ - forward.y_) * w4Recip;
+    ret.y_ = (forward.x_ - right.z_) * w4Recip;
+    ret.z_ = (right.y_ - up.x_) * w4Recip;
 
     (*this) = ret;
 }

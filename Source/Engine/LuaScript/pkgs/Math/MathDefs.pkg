@@ -28,6 +28,7 @@ float Max(float lhs, float rhs);
 float Abs(float value);
 float Sign(float value);
 float Clamp(float value, float min, float max);
+float SmoothStep(float lhs, float rhs, float t);
 bool Equals(float lhs, float rhs);
 
 float Random();

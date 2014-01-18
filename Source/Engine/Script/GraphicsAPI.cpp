@@ -116,9 +116,6 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "const Matrix3x4& get_view() const", asMETHOD(Camera, GetView), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum get_viewSpaceFrustum() const", asMETHOD(Camera, GetViewSpaceFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_halfViewSize() const", asMETHOD(Camera, GetHalfViewSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Vector3 get_forwardVector() const", asMETHOD(Camera, GetForwardVector), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Vector3 get_rightVector() const", asMETHOD(Camera, GetRightVector), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "Vector3 get_upVector() const", asMETHOD(Camera, GetUpVector), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Matrix3x4 get_effectiveWorldTransform() const", asMETHOD(Camera, GetEffectiveWorldTransform), asCALL_THISCALL);
 
     // Register Variant GetPtr() for Camera

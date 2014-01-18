@@ -135,12 +135,6 @@ public:
     Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
     // Convert normalized screen coordinates (0.0 - 1.0) and depth to a world space point.
     Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
-    /// Return forward vector.
-    Vector3 GetForwardVector() const;
-    /// Return right vector.
-    Vector3 GetRightVector() const;
-    /// Return up vector.
-    Vector3 GetUpVector() const;
     /// Return projection offset.
     const Vector2& GetProjectionOffset() const { return projectionOffset_; }
     /// Return whether is using reflection.

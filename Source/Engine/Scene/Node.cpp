@@ -399,11 +399,9 @@ void Node::Roll(float angle, bool fixedAxis)
 
 void Node::LookAt(const Vector3& target, const Vector3& upAxis)
 {
-    Vector3 targetZ = (target - GetWorldPosition()).Normalized();
-    Vector3 targetX = upAxis.CrossProduct(targetZ).Normalized();
-    Vector3 targetY = targetZ.CrossProduct(targetX).Normalized();
-    
-    Quaternion rotation(targetX, targetY, targetZ);
+    Vector3 lookDir = (target - GetWorldPosition()).Normalized();
+    Quaternion rotation;
+    rotation.FromLookRotation(lookDir, upAxis);
     SetRotation((parent_ == scene_ || !parent_) ? rotation : parent_->GetWorldRotation().Inverse() * rotation);
 }
 

@@ -314,7 +314,7 @@ Ray Camera::GetScreenRay(float x, float y) const
     if (!IsProjectionValid())
     {
         ret.origin_ = node_ ? node_->GetWorldPosition() : Vector3::ZERO;
-        ret.direction_ = GetForwardVector();
+        ret.direction_ = node_ ? node_->GetWorldDirection() : Vector3::FORWARD;
         return ret;
     }
 
@@ -490,21 +490,6 @@ float Camera::GetHalfViewSize() const
         return tanf(fov_ * M_DEGTORAD * 0.5f) / zoom_;
     else
         return orthoSize_ * 0.5f / zoom_;
-}
-
-Vector3 Camera::GetForwardVector() const
-{
-    return node_ ? node_->GetWorldDirection() : Vector3::FORWARD;
-}
-
-Vector3 Camera::GetRightVector() const
-{
-    return node_ ? node_->GetWorldRotation() * Vector3::RIGHT : Vector3::RIGHT;
-}
-
-Vector3 Camera::GetUpVector() const
-{
-    return node_ ? node_->GetWorldRotation() * Vector3::UP : Vector3::UP;
 }
 
 float Camera::GetDistance(const Vector3& worldPos) const

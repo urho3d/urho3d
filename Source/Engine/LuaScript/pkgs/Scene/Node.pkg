@@ -144,15 +144,15 @@ class Node : public Serializable
     Vector3 GetWorldDirection() const;
     tolua_outside void NodeGetWorldDirectionXYZ @ GetWorldDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
 
-    Vector3 GetWorldUp() const;    
+    Vector3 GetWorldUp() const;
     tolua_outside void NodeGetWorldUpXYZ @ GetWorldUpXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
-    
+
     Vector3 GetWorldRight() const;
     tolua_outside void NodeGetWorldRightXYZ @ GetWorldRightXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
 
     Vector3 GetWorldScale() const;
     tolua_outside void NodeGetWorldScaleXYZ @ GetWorldScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
-    
+
     const Matrix3x4& GetWorldTransform() const;
     Vector3 LocalToWorld(const Vector3& position) const;
     Vector3 LocalToWorld(const Vector4& vector) const;
@@ -197,11 +197,15 @@ class Node : public Serializable
     tolua_property__get_set Vector3& position;
     tolua_property__get_set Quaternion& rotation;
     tolua_property__get_set Vector3 direction;
+    tolua_readonly tolua_property__get_set Vector3 up;
+    tolua_readonly tolua_property__get_set Vector3 right;
     tolua_property__get_set Vector3& scale;
     tolua_readonly tolua_property__get_set Matrix3x4 transform;
     tolua_property__get_set Vector3 worldPosition;
     tolua_property__get_set Quaternion worldRotation;
     tolua_property__get_set Vector3 worldDirection;
+    tolua_readonly tolua_property__get_set Vector3 worldUp;
+    tolua_readonly tolua_property__get_set Vector3 worldRight;
     tolua_property__get_set Vector3 worldScale;
     tolua_readonly tolua_property__get_set Matrix3x4& worldTransform;
     tolua_readonly tolua_property__is_set bool dirty;

@@ -51,9 +51,6 @@ class Camera : public Component
     Ray GetScreenRay(float x, float y) const;
     Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
     Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
-    Vector3 GetForwardVector() const;
-    Vector3 GetRightVector() const;
-    Vector3 GetUpVector() const;
     const Vector2& GetProjectionOffset() const;
     bool GetUseReflection() const;
     const Plane& GetReflectionPlane() const;
@@ -83,9 +80,6 @@ class Camera : public Component
     tolua_readonly tolua_property__get_set Matrix3x4& view;
     tolua_readonly tolua_property__get_set float halfViewSize;
     tolua_readonly tolua_property__get_set Frustum viewSpaceFrustum;
-    tolua_readonly tolua_property__get_set Vector3 forwardVector;
-    tolua_readonly tolua_property__get_set Vector3 rightVector;
-    tolua_readonly tolua_property__get_set Vector3 upVector;
     tolua_property__get_set Vector2& projectionOffset;
     tolua_property__get_set bool useReflection;
     tolua_property__get_set Plane& reflectionPlane;

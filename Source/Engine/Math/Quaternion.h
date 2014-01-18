@@ -234,7 +234,7 @@ public:
     Matrix3 RotationMatrix() const;
     /// Spherical interpolation with another quaternion.
     Quaternion Slerp(Quaternion rhs, float t) const;
-    /// Normalized inear interpolation with another quaternion.   
+    /// Normalized linear interpolation with another quaternion.
     Quaternion Nlerp(Quaternion rhs, float t, bool shortestPath = false) const;
     /// Return float data.
     const float* Data() const { return &w_; }

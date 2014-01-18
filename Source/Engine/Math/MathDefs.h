@@ -83,10 +83,9 @@ inline float Clamp(float value, float min, float max)
 /// Smoothly damp between values
 inline float SmoothStep(float lhs, float rhs, float t)
 {
-    t = Clamp((t - lhs)/(rhs-lhs), 0, 1); //Saturate t
-    return t*t*(3-2*t);
+    t = Clamp((t - lhs) / (rhs - lhs), 0.0f, 1.0f); // Saturate t
+    return t * t * (3.0f - 2.0f * t);
 }
-
 
 /// Return sine of an angle in degrees.
 inline float Sin(float angle) { return sinf(angle * M_DEGTORAD); }
