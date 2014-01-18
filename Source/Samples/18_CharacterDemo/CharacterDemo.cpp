@@ -189,6 +189,9 @@ void CharacterDemo::CreateCharacter()
     object->SetCastShadows(true);
     objectNode->CreateComponent<AnimationController>();
     
+    // Set the head bone for manual control
+    object->GetSkeleton().GetBone("Bip01_Head")->animated_ = false;
+
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
     RigidBody* body = objectNode->CreateComponent<RigidBody>();
     body->SetCollisionLayer(1);
@@ -309,15 +312,20 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
     Quaternion rot = characterNode->GetRotation();
     Quaternion dir = rot * Quaternion(character_->controls_.pitch_, Vector3::RIGHT);
     
+    // Turn head to camera pitch, but limit to avoid unnatural animation
+    Node* headNode = characterNode->GetChild("Bip01_Head", true);
+    float limitPitch = Clamp(character_->controls_.pitch_, -45.0f, 45.0f);
+    Quaternion headDir = rot * Quaternion(limitPitch, Vector3(1.0f, 0.0f, 0.0f));
+    // This could be expanded to look at an arbitrary target, now just look at a point in front
+    Vector3 headWorldTarget = headNode->GetWorldPosition() + headDir * Vector3(0.0f, 0.0f, 1.0f);
+    headNode->LookAt(headWorldTarget, Vector3(0.0f, 1.0f, 0.0f));
+    // Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
+    headNode->Rotate(Quaternion(0.0f, 90.0f, 90.0f));
+
     if (firstPerson_)
     {
-        // First person camera: position to the head bone + offset slightly forward & up
-        Node* headNode = characterNode->GetChild("Bip01_Head", true);
-        if (headNode)
-        {
-            cameraNode_->SetPosition(headNode->GetWorldPosition() + rot * Vector3(0.0f, 0.15f, 0.2f));
-            cameraNode_->SetRotation(dir);
-        }
+        cameraNode_->SetPosition(headNode->GetWorldPosition() + rot * Vector3(0.0f, 0.15f, 0.2f));
+        cameraNode_->SetRotation(dir);
     }
     else
     {

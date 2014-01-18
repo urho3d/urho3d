@@ -2,6 +2,7 @@
 -- This sample demonstrates:
 --     - Controlling a humanoid character through physics
 --     - Driving animations using the AnimationController component
+--     - Manual control of a bone scene node
 --     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera clipping into scenery
 --     - Saving and loading the variables of a script object
 
@@ -154,6 +155,9 @@ function CreateCharacter()
     object.castShadows = true
     characterNode:CreateComponent("AnimationController")
 
+    -- Set the head bone for manual control
+    object.skeleton:GetBone("Bip01_Head").animated = false;
+
     -- Create rigidbody, and set non-zero mass so that the body becomes dynamic
     local body = characterNode:CreateComponent("RigidBody")
     body.collisionLayer = 1
@@ -264,13 +268,20 @@ function HandlePostUpdate(eventType, eventData)
     local rot = characterNode.rotation
     local dir = rot * Quaternion(character.controls.pitch, Vector3(1.0, 0.0, 0.0))
 
+    -- Turn head to camera pitch, but limit to avoid unnatural animation
+    local headNode = characterNode:GetChild("Bip01_Head", true);
+    local limitPitch = Clamp(character.controls.pitch, -45.0, 45.0);
+    local headDir = rot * Quaternion(limitPitch, Vector3(1.0, 0.0, 0.0));
+    -- This could be expanded to look at an arbitrary target, now just look at a point in front
+    local headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0, 0.0, 1.0);
+    headNode:LookAt(headWorldTarget, Vector3(0.0, 1.0, 0.0));
+    -- Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
+    headNode:Rotate(Quaternion(0.0, 90.0, 90.0));
+
     if firstPerson then
         -- First person camera: position to the head bone + offset slightly forward & up
-        local headNode = characterNode:GetChild("Bip01_Head", true)
-        if headNode ~= nil then
-            cameraNode.position = headNode.worldPosition + rot * Vector3(0.0, 0.15, 0.2)
-            cameraNode.rotation = dir
-        end
+        cameraNode.position = headNode.worldPosition + rot * Vector3(0.0, 0.15, 0.2)
+        cameraNode.rotation = dir
     else
         -- Third person camera: position behind the character
         local aimPoint = characterNode.position + rot * Vector3(0.0, 1.7, 0.0)

@@ -80,7 +80,7 @@ inline float Clamp(float value, float min, float max)
         return value;
 }
 
-/// Smoothly damp between values
+/// Smoothly damp between values.
 inline float SmoothStep(float lhs, float rhs, float t)
 {
     t = Clamp((t - lhs) / (rhs - lhs), 0.0f, 1.0f); // Saturate t

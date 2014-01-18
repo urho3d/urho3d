@@ -141,13 +141,12 @@ Bone* Skeleton::GetBone(unsigned index)
 
 Bone* Skeleton::GetBone(const String& name)
 {
-    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
-    {
-        if (i->name_ == name)
-            return &(*i);
-    }
-    
-    return 0;
+    return GetBone(StringHash(name));
+}
+
+Bone* Skeleton::GetBone(const char* name)
+{
+    return GetBone(StringHash(name));
 }
 
 Bone* Skeleton::GetBone(StringHash nameHash)

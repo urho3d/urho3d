@@ -2,6 +2,7 @@
 // This sample demonstrates:
 //     - Controlling a humanoid character through physics
 //     - Driving animations using the AnimationController component
+//     - Manual control of a bone scene node
 //     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera clipping into scenery
 //     - Saving and loading the variables of a script object
 
@@ -149,6 +150,9 @@ void CreateCharacter()
     object.castShadows = true;
     characterNode.CreateComponent("AnimationController");
 
+    // Set the head bone for manual control
+    object.skeleton.GetBone("Bip01_Head").animated = false;
+
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
     RigidBody@ body = characterNode.CreateComponent("RigidBody");
     body.collisionLayer = 1;
@@ -261,15 +265,21 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     Quaternion rot = characterNode.rotation;
     Quaternion dir = rot * Quaternion(character.controls.pitch, Vector3(1.0f, 0.0f, 0.0f));
 
+    // Turn head to camera pitch, but limit to avoid unnatural animation
+    Node@ headNode = characterNode.GetChild("Bip01_Head", true);
+    float limitPitch = Clamp(character.controls.pitch, -45.0f, 45.0f);
+    Quaternion headDir = rot * Quaternion(limitPitch, Vector3(1.0f, 0.0f, 0.0f));
+    // This could be expanded to look at an arbitrary target, now just look at a point in front
+    Vector3 headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0f, 0.0f, 1.0f);
+    headNode.LookAt(headWorldTarget, Vector3(0.0f, 1.0f, 0.0f));
+    // Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
+    headNode.Rotate(Quaternion(0.0f, 90.0f, 90.0f));
+
     if (firstPerson)
     {
         // First person camera: position to the head bone + offset slightly forward & up
-        Node@ headNode = characterNode.GetChild("Bip01_Head", true);
-        if (headNode !is null)
-        {
-            cameraNode.position = headNode.worldPosition + rot * Vector3(0.0f, 0.15f, 0.2f);
-            cameraNode.rotation = dir;
-        }
+        cameraNode.position = headNode.worldPosition + rot * Vector3(0.0f, 0.15f, 0.2f);
+        cameraNode.rotation = dir;
     }
     else
     {

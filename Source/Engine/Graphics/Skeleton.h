@@ -109,6 +109,8 @@ public:
     Bone* GetBone(unsigned index);
     /// Return bone by name.
     Bone* GetBone(const String& boneName);
+    /// Return bone by name.
+    Bone* GetBone(const char* boneName);
     /// Return bone by name hash.
     Bone* GetBone(StringHash boneNameHash);
     
