@@ -199,6 +199,11 @@ public:
     const Quaternion& GetRotation() const { return rotation_; }
     /// Return forward direction in parent space. Positive Z axis equals identity rotation.
     Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
+    /// Return up direction in parent space. Positive Y axis equals identity rotation.
+    Vector3 GetUp() const { return rotation_ * Vector3::UP; }
+    /// Return right direction in parent space. Positive X axis equals identity rotation.
+    Vector3 GetRight() const { return rotation_ * Vector3::RIGHT; }
+
     /// Return scale in parent space.
     const Vector3& GetScale() const { return scale_; }
     /// Return parent space transform matrix.
@@ -229,6 +234,24 @@ public:
             UpdateWorldTransform();
         
         return worldRotation_ * Vector3::FORWARD;
+    }
+
+    /// Return node's up vector in world space.
+    Vector3 GetWorldUp() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldRotation_ * Vector3::UP;
+    }
+
+    /// Return node's right vector in world space.
+    Vector3 GetWorldRight() const
+    {
+        if (dirty_)
+            UpdateWorldTransform();
+        
+        return worldRotation_ * Vector3::RIGHT;
     }
 
     /// Return scale in world space.

@@ -32,7 +32,7 @@ namespace Urho3D
 
 #undef M_PI
 static const float M_PI = 3.14159265358979323846264338327950288f;
-
+static const float M_HALF_PI = M_PI * 0.5f;
 static const int M_MIN_INT = 0x80000000;
 static const int M_MAX_INT = 0x7fffffff;
 static const unsigned M_MIN_UNSIGNED = 0x00000000;
@@ -79,6 +79,14 @@ inline float Clamp(float value, float min, float max)
     else
         return value;
 }
+
+/// Smoothly damp between values
+inline float SmoothStep(float lhs, float rhs, float t)
+{
+    t = Clamp((t - lhs)/(rhs-lhs), 0, 1); //Saturate t
+    return t*t*(3-2*t);
+}
+
 
 /// Return sine of an angle in degrees.
 inline float Sin(float angle) { return sinf(angle * M_DEGTORAD); }
