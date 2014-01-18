@@ -545,11 +545,13 @@ void FromAngleAxis(float, const Vector3&);
 void FromEulerAngles(float, float, float);
 void FromRotationTo(const Vector3&, const Vector3&);
 void FromAxes(const Vector3&, const Vector3&, const Vector3&);
+void FromLookRotation(const Vector3&, const Vector3&);
 void Normalize();
 Quaternion Normalized() const;
 Quaternion Inverse() const;
 float DotProduct(const Quaternion&) const;
 Quaternion Slerp(Quaternion, float) const;
+Quaternion Nlerp(Quaternion, float, bool) const;
 bool Equals(const Quaternion&) const;
 String ToString() const;
 
@@ -1858,10 +1860,18 @@ bool temporary;
 Vector3 position;
 Quaternion rotation;
 Vector3 direction;
+/* (readonly) */
+Vector3 up;
+/* (readonly) */
+Vector3 right;
 Vector3 scale;
 Vector3 worldPosition;
 Quaternion worldRotation;
 Vector3 worldDirection;
+/* (readonly) */
+Vector3 worldUp;
+/* (readonly) */
+Vector3 worldRight;
 Vector3 worldScale;
 /* (readonly) */
 Matrix3x4 transform;
@@ -2049,10 +2059,18 @@ bool temporary;
 Vector3 position;
 Quaternion rotation;
 Vector3 direction;
+/* (readonly) */
+Vector3 up;
+/* (readonly) */
+Vector3 right;
 Vector3 scale;
 Vector3 worldPosition;
 Quaternion worldRotation;
 Vector3 worldDirection;
+/* (readonly) */
+Vector3 worldUp;
+/* (readonly) */
+Vector3 worldRight;
 Vector3 worldScale;
 /* (readonly) */
 Matrix3x4 transform;
@@ -2263,12 +2281,6 @@ Matrix3x4 view;
 Frustum viewSpaceFrustum;
 /* (readonly) */
 float halfViewSize;
-/* (readonly) */
-Vector3 forwardVector;
-/* (readonly) */
-Vector3 rightVector;
-/* (readonly) */
-Vector3 upVector;
 /* (readonly) */
 Matrix3x4 effectiveWorldTransform;
 };
@@ -8556,6 +8568,7 @@ int Min(int, int);
 float Max(float, float);
 int Max(int, int);
 float Clamp(float, float, float);
+float SmoothStep(float, float, float);
 int Clamp(int, int, int);
 float Lerp(float, float, float);
 float Mod(float, float);
@@ -8664,6 +8677,7 @@ float M_DEGTORAD;
 float M_DEGTORAD_2;
 float M_RADTODEG;
 float M_PI;
+float M_HALF_PI;
 int M_MIN_INT;
 int M_MAX_INT;
 uint M_MIN_UNSIGNED;

@@ -538,11 +538,13 @@ Methods:
 - void FromEulerAngles(float, float, float)
 - void FromRotationTo(const Vector3&, const Vector3&)
 - void FromAxes(const Vector3&, const Vector3&, const Vector3&)
+- void FromLookRotation(const Vector3&, const Vector3&)
 - void Normalize()
 - Quaternion Normalized() const
 - Quaternion Inverse() const
 - float DotProduct(const Quaternion&) const
 - Quaternion Slerp(Quaternion, float) const
+- Quaternion Nlerp(Quaternion, float, bool) const
 - bool Equals(const Quaternion&) const
 - String ToString() const
 
@@ -1742,10 +1744,14 @@ Properties:
 - Vector3 position
 - Quaternion rotation
 - Vector3 direction
+- Vector3 up (readonly)
+- Vector3 right (readonly)
 - Vector3 scale
 - Vector3 worldPosition
 - Quaternion worldRotation
 - Vector3 worldDirection
+- Vector3 worldUp (readonly)
+- Vector3 worldRight (readonly)
 - Vector3 worldScale
 - Matrix3x4 transform (readonly)
 - Matrix3x4 worldTransform (readonly)
@@ -1904,10 +1910,14 @@ Properties:
 - Vector3 position
 - Quaternion rotation
 - Vector3 direction
+- Vector3 up (readonly)
+- Vector3 right (readonly)
 - Vector3 scale
 - Vector3 worldPosition
 - Quaternion worldRotation
 - Vector3 worldDirection
+- Vector3 worldUp (readonly)
+- Vector3 worldRight (readonly)
 - Vector3 worldScale
 - Matrix3x4 transform (readonly)
 - Matrix3x4 worldTransform (readonly)
@@ -2074,9 +2084,6 @@ Properties:
 - Matrix3x4 view (readonly)
 - Frustum viewSpaceFrustum (readonly)
 - float halfViewSize (readonly)
-- Vector3 forwardVector (readonly)
-- Vector3 rightVector (readonly)
-- Vector3 upVector (readonly)
 - Matrix3x4 effectiveWorldTransform (readonly)
 
 
@@ -7260,6 +7267,7 @@ Properties:
 - float Max(float, float)
 - int Max(int, int)
 - float Clamp(float, float, float)
+- float SmoothStep(float, float, float)
 - int Clamp(int, int, int)
 - float Lerp(float, float, float)
 - float Mod(float, float)
@@ -7366,6 +7374,7 @@ Properties:
 - float M_DEGTORAD_2
 - float M_RADTODEG
 - float M_PI
+- float M_HALF_PI
 - int M_MIN_INT
 - int M_MAX_INT
 - uint M_MIN_UNSIGNED

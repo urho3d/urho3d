@@ -840,9 +840,6 @@ Methods:
 - Ray GetScreenRay(float x, float y) const
 - Vector2 WorldToScreenPoint(const Vector3& worldPos) const
 - Vector3 ScreenToWorldPoint(const Vector3& screenPos) const
-- Vector3 GetForwardVector() const
-- Vector3 GetRightVector() const
-- Vector3 GetUpVector() const
 - const Vector2& GetProjectionOffset() const
 - bool GetUseReflection() const
 - const Plane& GetReflectionPlane() const
@@ -873,9 +870,6 @@ Properties:
 - Matrix3x4& view (readonly)
 - float halfViewSize (readonly)
 - Frustum viewSpaceFrustum (readonly)
-- Vector3 forwardVector (readonly)
-- Vector3 rightVector (readonly)
-- Vector3 upVector (readonly)
 - Vector2& projectionOffset
 - bool useReflection
 - Plane& reflectionPlane
@@ -2664,6 +2658,7 @@ Methods:
 - void FromRotationTo(const Vector3& start, const Vector3& end)
 - void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
 - void FromRotationMatrix(const Matrix3& matrix)
+- void FromLookRotation(const Vector3& direction, const Vector3& up)
 - void Normalize()
 - Quaternion Normalized() const
 - Quaternion Inverse() const
@@ -2677,6 +2672,7 @@ Methods:
 - float RollAngle() const
 - Matrix3 RotationMatrix() const
 - Quaternion Slerp(Quaternion rhs, float t) const
+- Quaternion Nlerp(Quaternion rhs, float t, bool shortestPath) const
 - String ToString() const
 
 Properties:
@@ -3787,6 +3783,10 @@ Methods:
 - void GetRotationWXYZ(float* *w = 0.0f, float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Vector3 GetDirection() const
 - void GetDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
+- Vector3 GetUp() const
+- void GetUpXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
+- Vector3 GetRight() const
+- void GetRightXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - const Vector3& GetScale() const
 - void GetScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Matrix3x4 GetTransform() const
@@ -3797,6 +3797,10 @@ Methods:
 - void GetWorldRotationWXYZ(float* *w = 0.0f, float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Vector3 GetWorldDirection() const
 - void GetWorldDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
+- Vector3 GetWorldUp() const
+- void GetWorldUpXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
+- Vector3 GetWorldRight() const
+- void GetWorldRightXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - Vector3 GetWorldScale() const
 - void GetWorldScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const
 - const Matrix3x4& GetWorldTransform() const
@@ -3836,11 +3840,15 @@ Properties:
 - Vector3& position
 - Quaternion& rotation
 - Vector3 direction
+- Vector3 up (readonly)
+- Vector3 right (readonly)
 - Vector3& scale
 - Matrix3x4 transform (readonly)
 - Vector3 worldPosition
 - Quaternion worldRotation
 - Vector3 worldDirection
+- Vector3 worldUp (readonly)
+- Vector3 worldRight (readonly)
 - Vector3 worldScale
 - Matrix3x4& worldTransform (readonly)
 - bool dirty (readonly)
@@ -4921,6 +4929,7 @@ Properties:
 - float Abs(float value)
 - float Sign(float value)
 - float Clamp(float value, float min, float max)
+- float SmoothStep(float lhs, float rhs, float t)
 - bool Equals(float lhs, float rhs)
 - float Random()
 - float Random(float range)
