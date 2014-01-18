@@ -247,8 +247,10 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
     }
 
     SharedPtr<File> srcFile(new File(context_, srcFileName, FILE_READ));
+    if (!srcFile->IsOpen())
+        return false;
     SharedPtr<File> destFile(new File(context_, destFileName, FILE_WRITE));
-    if (!srcFile->IsOpen() || !destFile->IsOpen())
+    if (!destFile->IsOpen())
         return false;
 
     unsigned fileSize = srcFile->GetSize();

@@ -1729,13 +1729,15 @@ Options:
 -l          Output a material list file for models
 -na         Do not output animations
 -nm         Do not output materials
+-nt         Do not output material textures
+-nc         Do not use material diffuse color value, instead output white
 -nh         Do not save full node hierarchy (scene mode only)\n"
 -ns         Do not create subdirectories for resources
 -nz         Do not create a zone and a directional light (scene mode only)
 -nf         Do not fix infacing normals
--p <path>   Set path for scene resources. Default is output file path\n"
+-p <path>   Set path for scene resources. Default is output file path
 -r <name>   Use the named scene node as root node\n"
--f <freq>   Animation tick frequency to use if unspecified. Default 4800\n"
+-f <freq>   Animation tick frequency to use if unspecified. Default 4800
 -o          Optimize redundant submeshes. Loses scene hierarchy and animations
 -s <filter> Include non-skinning bones in the model's skeleton. Can be given a
             case-insensitive semicolon separated filter list. Bone is included
@@ -1743,6 +1745,10 @@ Options:
             sign to use as an exclude. For example -s "Bip01;-Dummy;-Helper"
 -t          Generate tangents
 -v          Enable verbose Assimp library logging
+-eao        Interpret material emissive texture as ambient occlusion
+-cm         Check and do not overwrite if material exists
+-ct         Check and do not overwrite if texture exists
+-ctn        Check and do not overwrite if texture has newer timestamp
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.

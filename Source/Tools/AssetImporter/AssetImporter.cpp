@@ -106,9 +106,15 @@ bool createZone_ = true;
 bool noAnimations_ = false;
 bool noHierarchy_ = false;
 bool noMaterials_ = false;
+bool noTextures_ = false;
+bool noMaterialDiffuseColor_ = false;
 bool saveMaterialList_ = false;
 bool includeNonSkinningBones_ = false;
 bool verboseLog_ = false;
+bool emissiveAO_ = false;
+bool noOverwriteMaterial_ = false;
+bool noOverwriteTexture_ = false;
+bool noOverwriteNewerTexture_ = false;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
 
@@ -207,6 +213,8 @@ void Run(const Vector<String>& arguments)
             "-l          Output a material list file for models\n"
             "-na         Do not output animations\n"
             "-nm         Do not output materials\n"
+            "-nt         Do not output material textures\n"
+            "-nc         Do not use material diffuse color value, instead output white\n"
             "-nh         Do not save full node hierarchy (scene mode only)\n"
             "-ns         Do not create subdirectories for resources\n"
             "-nz         Do not create a zone and a directional light (scene mode only)\n"
@@ -221,6 +229,10 @@ void Run(const Vector<String>& arguments)
             "            sign to use as an exclude. For example -s \"Bip01;-Dummy;-Helper\"\n"
             "-t          Generate tangents\n"
             "-v          Enable verbose Assimp library logging\n"
+            "-eao        Interpret material emissive texture as ambient occlusion\n"
+            "-cm         Check and do not overwrite if material exists\n"
+            "-ct         Check and do not overwrite if texture exists\n"
+            "-ctn        Check and do not overwrite if texture has newer timestamp\n"
         );
     }
     
@@ -278,6 +290,10 @@ void Run(const Vector<String>& arguments)
                     noAnimations_ = true;
                     break;
                     
+                case 'c':
+                    noMaterialDiffuseColor_ = true;
+                    break;
+                    
                 case 'm':
                     noMaterials_ = true;
                     break;
@@ -288,6 +304,10 @@ void Run(const Vector<String>& arguments)
 
                 case 's':
                     useSubdirs_ = false;
+                    break;
+                    
+                case 't':
+                    noTextures_ = true;
                     break;
                     
                 case 'z':
@@ -331,6 +351,14 @@ void Run(const Vector<String>& arguments)
             }
             else if (argument == "v")
                 verboseLog_ = true;
+            else if (argument == "eao")
+                emissiveAO_ = true;
+            else if (argument == "cm")
+                noOverwriteMaterial_ = true;
+            else if (argument == "ct")
+                noOverwriteTexture_ = true;
+            else if (argument == "ctn")
+                noOverwriteNewerTexture_ = true;
         }
     }
     
@@ -402,7 +430,8 @@ void Run(const Vector<String>& arguments)
         {
             HashSet<String> usedTextures;
             ExportMaterials(usedTextures);
-            CopyTextures(usedTextures, GetPath(inFile));
+            if (!noTextures_)
+                CopyTextures(usedTextures, GetPath(inFile));
         }
     }
     else if (command == "lod")
@@ -1411,8 +1440,6 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     if (matName.Empty())
         return;
     
-    PrintLine("Writing material " + matName);
-    
     // Do not actually create a material instance, but instead craft an xml file manually
     XMLFile outMaterial(context_);
     XMLElement materialElem = outMaterial.CreateRoot("material");
@@ -1422,7 +1449,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     String specularTexName;
     String lightmapTexName;
     String emissiveTexName;
-    Color diffuseColor;
+    Color diffuseColor = Color::WHITE;
     Color specularColor;
     Color emissiveColor = Color::BLACK;
     bool hasAlpha = false;
@@ -1444,12 +1471,18 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
         emissiveTexName = GetFileNameAndExtension(FromAIString(stringVal));
-    if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
-        diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    if (!noMaterialDiffuseColor_)
+    {
+        if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
+            diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    }
     if (material->Get(AI_MATKEY_COLOR_SPECULAR, colorVal) == AI_SUCCESS)
         specularColor = Color(colorVal.r, colorVal.g, colorVal.b);
-    if (material->Get(AI_MATKEY_COLOR_EMISSIVE, colorVal) == AI_SUCCESS)
-        emissiveColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    if (!emissiveAO_)
+    {
+        if (material->Get(AI_MATKEY_COLOR_EMISSIVE, colorVal) == AI_SUCCESS)
+            emissiveColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    }
     if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
     {
         if (floatVal < 1.0f)
@@ -1473,7 +1506,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         if (normalTexName.Empty() && specularTexName.Empty() && !lightmapTexName.Empty())
             techniqueName += "LightMap";
         if (lightmapTexName.Empty() && !emissiveTexName.Empty())
-            techniqueName += "Emissive";
+            techniqueName += emissiveAO_ ? "AO" : "Emissive";
     }
     if (hasAlpha)
         techniqueName += "Alpha";
@@ -1535,8 +1568,18 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         shadowCullElem.SetString("value", "none");
     }
     
-    File outFile(context_);
+    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+    
     String outFileName = resourcePath_ + (useSubdirs_ ? "Materials/" : "" ) + matName + ".xml";
+    if (noOverwriteMaterial_ && fileSystem->FileExists(outFileName))
+    {
+        PrintLine("Skipping save of existing material " + matName);
+        return;
+    }
+    
+    PrintLine("Writing material " + matName);
+    
+    File outFile(context_);
     if (!outFile.Open(outFileName, FILE_WRITE))
         ErrorExit("Could not open output file " + outFileName);
     outMaterial.Save(outFile);
@@ -1544,13 +1587,45 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 
 void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
 {
+    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+    
     if (useSubdirs_)
-        context_->GetSubsystem<FileSystem>()->CreateDir(resourcePath_ + "Textures");
+        fileSystem->CreateDir(resourcePath_ + "Textures");
     
     for (HashSet<String>::ConstIterator i = usedTextures.Begin(); i != usedTextures.End(); ++i)
     {
-        PrintLine("Copying texture " + (*i));
-        context_->GetSubsystem<FileSystem>()->Copy(sourcePath + *i, resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i);
+        String fullSourceName = sourcePath + *i;
+        String fullDestName = resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i;
+        
+        if (!fileSystem->FileExists(fullSourceName))
+        {
+            PrintLine("Skipping copy of nonexisting material texture " + *i);
+            continue;
+        }
+        {
+            File test(context_, fullSourceName);
+            if (!test.GetSize())
+            {
+                PrintLine("Skipping copy of zero-size material texture " + *i);
+                continue;
+            }
+        }
+        
+        bool destExists = fileSystem->FileExists(fullDestName);
+        if (destExists && noOverwriteTexture_)
+        {
+            PrintLine("Skipping copy of existing texture " + *i);
+            continue;
+        }
+        if (destExists && noOverwriteNewerTexture_ && fileSystem->GetLastModifiedTime(fullDestName) >
+            fileSystem->GetLastModifiedTime(fullSourceName))
+        {
+            PrintLine("Skipping copying of material texture " + *i + ", destination is newer");
+            continue;
+        }
+
+        PrintLine("Copying material texture " + *i);
+        fileSystem->Copy(fullSourceName, fullDestName);
     }
 }
 
