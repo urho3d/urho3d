@@ -122,7 +122,13 @@ class Node : public Serializable
     
     Vector3 GetDirection() const;
     tolua_outside void NodeGetDirectionXYZ @ GetDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
-    
+
+    Vector3 GetUp() const;
+    tolua_outside void NodeGetUpXYZ @ GetUpXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+  
+    Vector3 GetRight() const;
+    tolua_outside void NodeGetRightXYZ @ GetRightXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+
     const Vector3& GetScale() const;
     tolua_outside void NodeGetScaleXYZ @ GetScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
     
@@ -137,7 +143,13 @@ class Node : public Serializable
     
     Vector3 GetWorldDirection() const;
     tolua_outside void NodeGetWorldDirectionXYZ @ GetWorldDirectionXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+
+    Vector3 GetWorldUp() const;    
+    tolua_outside void NodeGetWorldUpXYZ @ GetWorldUpXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
     
+    Vector3 GetWorldRight() const;
+    tolua_outside void NodeGetWorldRightXYZ @ GetWorldRightXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
+
     Vector3 GetWorldScale() const;
     tolua_outside void NodeGetWorldScaleXYZ @ GetWorldScaleXYZ(float* *x = 0.0f, float* *y = 0.0f, float* *z = 0.0f) const;
     
@@ -301,6 +313,22 @@ static void NodeGetDirectionXYZ(const Node* node, float* x, float* y, float* z)
     *z =  direction.z_;
 }
 
+static void NodeGetUpXYZ(const Node* node, float* x, float* y, float* z)
+{
+    const Vector3& up = node->GetUp();
+    *x =  up.x_;
+    *y =  up.y_;
+    *z =  up.z_;
+}
+
+static void NodeGetRightXYZ(const Node* node, float* x, float* y, float* z)
+{
+    const Vector3& right = node->GetRight();
+    *x =  right.x_;
+    *y =  right.y_;
+    *z =  right.z_;
+}
+
 static void NodeGetScaleXYZ(const Node* node, float* x, float* y, float* z)
 {
     const Vector3& scale = node->GetScale();
@@ -340,6 +368,22 @@ static void NodeGetWorldDirectionXYZ(const Node* node, float* x, float* y, float
     *x =  worldDirection.x_;
     *y =  worldDirection.y_;
     *z =  worldDirection.z_;
+}
+
+static void NodeGetWorldUpXYZ(const Node* node, float* x, float* y, float* z)
+{
+    Vector3 worldUp = node->GetWorldUp();
+    *x =  worldUp.x_;
+    *y =  worldUp.y_;
+    *z =  worldUp.z_;
+}
+
+static void NodeGetWorldRightXYZ(const Node* node, float* x, float* y, float* z)
+{
+    Vector3 worldRight = node->GetWorldRight();
+    *x =  worldRight.x_;
+    *y =  worldRight.y_;
+    *z =  worldRight.z_;
 }
 
 static void NodeGetWorldScaleXYZ(const Node* node, float* x, float* y, float* z)

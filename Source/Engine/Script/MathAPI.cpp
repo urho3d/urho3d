@@ -47,6 +47,7 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const float M_DEGTORAD_2", (void*)&M_DEGTORAD_2);
     engine->RegisterGlobalProperty("const float M_RADTODEG", (void*)&M_RADTODEG);
     engine->RegisterGlobalProperty("const float M_PI", (void*)&M_PI);
+    engine->RegisterGlobalProperty("const float M_HALF_PI", (void*)&M_HALF_PI);
     engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_MIN_INT);
     engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_MAX_INT);
     engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
@@ -436,11 +437,13 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "void FromEulerAngles(float, float, float)", asMETHOD(Quaternion, FromEulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void FromRotationTo(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromRotationTo), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void FromAxes(const Vector3&in, const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromAxes), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "void FromLookRotation(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromLookRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void Normalize()", asMETHOD(Quaternion, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Normalized() const", asMETHOD(Quaternion, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Inverse() const", asMETHOD(Quaternion, Inverse), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float DotProduct(const Quaternion&in) const", asMETHOD(Quaternion, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Slerp(Quaternion, float) const", asMETHOD(Quaternion, Slerp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Quaternion Nlerp(Quaternion, float, bool) const", asMETHOD(Quaternion, Nlerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "bool Equals(const Quaternion&in) const", asMETHOD(Quaternion, Equals), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "String ToString() const", asMETHOD(Quaternion, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Vector3 get_eulerAngles() const", asMETHOD(Quaternion, EulerAngles), asCALL_THISCALL);
