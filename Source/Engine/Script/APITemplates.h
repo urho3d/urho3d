@@ -611,6 +611,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "const Quaternion& get_rotation() const", asMETHOD(T, GetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_direction(const Vector3&in)", asMETHOD(T, SetDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_direction() const", asMETHOD(T, GetDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_up() const", asMETHOD(T, GetUp), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_right() const", asMETHOD(T, GetRight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_scale(const Vector3&in)", asMETHODPR(T, SetScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& get_scale() const", asMETHOD(T, GetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldPosition(const Vector3&in)", asMETHOD(T, SetWorldPosition), asCALL_THISCALL);
@@ -619,6 +621,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Quaternion get_worldRotation()", asMETHOD(T, GetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldDirection(const Vector3&in)", asMETHOD(T, SetWorldDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldDirection()", asMETHOD(T, GetWorldDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_worldUp()", asMETHOD(T, GetWorldUp), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_worldRight()", asMETHOD(T, GetWorldRight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldScale(const Vector3&in)", asMETHODPR(T, SetWorldScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldScale()", asMETHOD(T, GetWorldScale), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Matrix3x4 get_transform() const", asMETHOD(T, GetTransform), asCALL_THISCALL);

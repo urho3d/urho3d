@@ -171,7 +171,9 @@ public:
     void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
     /// Define from a rotation matrix.
     void FromRotationMatrix(const Matrix3& matrix);
-    
+    /// Define from a direction to look in and an up direction
+    void FromLookRotation(const Vector3& direction, const Vector3&up = Vector3::UP);
+
     /// Normalize to unit length.
     void Normalize()
     {
@@ -232,6 +234,8 @@ public:
     Matrix3 RotationMatrix() const;
     /// Spherical interpolation with another quaternion.
     Quaternion Slerp(Quaternion rhs, float t) const;
+    /// Normalized inear interpolation with another quaternion.   
+    Quaternion Nlerp(Quaternion rhs, float t, bool shortestPath = false) const;
     /// Return float data.
     const float* Data() const { return &w_; }
     /// Return as string.
