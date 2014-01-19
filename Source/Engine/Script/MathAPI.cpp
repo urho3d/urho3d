@@ -299,6 +299,7 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "Vector3 CrossProduct(const Vector3&in) const", asMETHOD(Vector3, CrossProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Lerp(const Vector3&in, float) const", asMETHOD(Vector3, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "bool Equals(const Vector3&in) const", asMETHOD(Vector3, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "float Angle(const Vector3&in) const", asMETHOD(Vector3, Angle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Normalized() const", asMETHOD(Vector3, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "String ToString() const", asMETHOD(Vector3, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float get_length() const", asMETHOD(Vector3, Length), asCALL_THISCALL);
