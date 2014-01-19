@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-/// Three-dimensional vector classs.
+/// Three-dimensional vector.
 class URHO3D_API Vector3
 {
 public:
@@ -190,10 +190,7 @@ public:
     /// Test for equality with another vector with epsilon.
     bool Equals(const Vector3& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_); }
     /// Returns the angle between this vector and another vector in degrees.
-    float Angle(const Vector3& rhs) const
-    {
-        return Urho3D::Acos(DotProduct(rhs) / (Length() * rhs.Length() ) );
-    }
+    float Angle(const Vector3& rhs) const { return Urho3D::Acos(DotProduct(rhs) / (Length() * rhs.Length() ) ); }
 
     /// Return normalized to unit length.
     Vector3 Normalized() const
