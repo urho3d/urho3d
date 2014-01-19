@@ -1206,6 +1206,12 @@ void InitVectorStructs()
         "   NodeID"
     };
     vectorStructs.Push(VectorStruct("StaticModelGroup", "Instance Nodes", staticModelGroupInstanceVariables, 1));
+    
+    Array<String> splineControlPointVariables = {
+        "Control Point Count",
+        "   Point"
+    };
+    vectorStructs.Push(VectorStruct("Spline", "Control Points", splineControlPointVariables, 1));
 }
 
 VectorStruct@ GetVectorStruct(Array<Serializable@>@ serializables, uint index)

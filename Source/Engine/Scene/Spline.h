@@ -30,7 +30,7 @@ namespace Urho3D
 /// Interpolation Mode for a Spline.
 enum InterpolationMode
 {
-    BEZIER_CURVE
+    BEZIER_CURVE = 0
 };
 
 /// Spline for creating smooth movement based on Speed along a set of Control Points modified by the Interpolation Mode.

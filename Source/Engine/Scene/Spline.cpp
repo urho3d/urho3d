@@ -30,7 +30,13 @@
 namespace Urho3D
 {
 
-extern const char* SCENE_CATEGORY;
+extern const char* LOGIC_CATEGORY;
+
+static const char* interpolationModeNames[] =
+{
+    "Bezier",
+    0
+};
 
 Spline::Spline(Context* context) :
     Component(context),
@@ -45,13 +51,13 @@ Spline::Spline(Context* context) :
 
 void Spline::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Spline>(SCENE_CATEGORY);
+    context->RegisterFactory<Spline>(LOGIC_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE(Spline, VAR_VARIANTVECTOR, "Control Points", GetControlPointsAttr, SetControlPointsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
     ATTRIBUTE(Spline, VAR_FLOAT, "Speed", speed_, 1.f, AM_FILE);
-    ATTRIBUTE(Spline, VAR_INT, "Interpolation Mode", interpolationMode_, BEZIER_CURVE, AM_FILE);
+    ENUM_ATTRIBUTE(Spline, "Interpolation Mode", interpolationMode_, interpolationModeNames, BEZIER_CURVE, AM_FILE);
     ATTRIBUTE(Spline, VAR_FLOAT, "Traveled", traveled_, 0.f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Spline, VAR_FLOAT, "Elapsed Time", elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(Spline, VAR_VARIANTVECTOR, "Control Points", GetControlPointsAttr, SetControlPointsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
 }
 
 void Spline::SetControlPoints(const PODVector<Vector3>& controlPoints)
@@ -133,7 +139,7 @@ void Spline::Move(float timeStep)
     case BEZIER_CURVE:
         if (controlPoints_.Size() < 2)
         {
-            LOGERRORF("Spline on Node[%d,%s] in Beizer Curve mode attempted with less than two control points.", GetNode()->GetID(), GetNode()->GetName().CString());
+            LOGERRORF("Spline on Node[%d,%s] in Bezier Curve mode attempted with less than two control points.", GetNode()->GetID(), GetNode()->GetName().CString());
             return;
         }
         GetNode()->SetPosition(BezierMove(controlPoints_,traveled_));
@@ -150,6 +156,8 @@ void Spline::Reset()
 Urho3D::VariantVector Spline::GetControlPointsAttr() const
 {
     VariantVector ret;
+    // Store number of points first for editing
+    ret.Push(controlPoints_.Size());
     for (unsigned i = 0; i < controlPoints_.Size(); i++)
         ret.Push(controlPoints_[i]);
     return ret;
@@ -157,8 +165,17 @@ Urho3D::VariantVector Spline::GetControlPointsAttr() const
 
 void Spline::SetControlPointsAttr(VariantVector value)
 {
-    for (unsigned i = 0; i < value.Size(); i++)
-        controlPoints_.Push(value[i].GetVector3());
+    controlPoints_.Clear();
+    unsigned index = 0;
+    unsigned numPoints = index < value.Size() ? value[index++].GetUInt() : 0;
+    // Prevent negative value being assigned from the editor
+    if (numPoints > M_MAX_INT)
+        numPoints = 0;
+    for (unsigned i = 0; i < numPoints; ++i)
+    {
+        Vector3 point = index < value.Size() ? value[index++].GetVector3() : Vector3::ZERO;
+        controlPoints_.Push(point);
+    }
 
     CalculateLength();
 }
