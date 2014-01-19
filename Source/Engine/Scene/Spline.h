@@ -45,38 +45,36 @@ public:
     static void RegisterObject(Context* context);
 
     /// Set the Control Points from an already defined set.
-    void SetControlPoints(const Vector<Vector3> controlPoints);
+    void SetControlPoints(const PODVector<Vector3>& controlPoints);
     /// Set the Interpolation Mode.
-    void SetInterpolationMode(InterpolationMode interpolationMode);
+    void SetInterpolationMode(InterpolationMode interpolationMode) { interpolationMode_ = interpolationMode; }
     /// Set the movement Speed.
     void SetSpeed(float speed) { speed_ = speed; }
+    /// Set the parent node's position on the Spline.
+    void SetPosition(float factor);
 
     /// Get the Control Points.
-    const Vector<Vector3>& GetControlPoints() const { return controlPoints_; }
+    const PODVector<Vector3>& GetControlPoints() const { return controlPoints_; }
     /// Get the Interpolation Mode.
     InterpolationMode GetInterpolationMode() const { return interpolationMode_; }
     /// Get the movement Speed.
     float GetSpeed() const { return speed_; }
-    /// Get a position on the spine from 0.f to 1.f where 0 is the start and 1 is the end.
-    Vector3 GetPosition(float factor);
+    /// Get the parent node's last position on the spline.
+    Vector3 GetPosition() const;
 
     /// Add a Control Point to the end.
     void Push(const Vector3& controlPoint);
     /// Remove a Control Point from the end.
     void Pop();
+    /// Get a point on the spline from 0.f to 1.f where 0 is the start and 1 is the end.
+    Vector3 GetPoint(float factor) const;
 
-    /// Attach the Parent to the path at the position it was at last or at the start if after Reset was called or no movement has occurred.
-    void Attach();
     /// Move the parent node to the next position along the Spline based off the Speed value.
     void Move(float timeStep);
-    /// Detach the Parent from the path. Movement is not reset.
-    void Detach();
     /// Reset movement along the path.
     void Reset();
     /// Returns whether the movement along the Spline complete.
     bool IsFinished() const { return traveled_ >= 1.0f; }
-    /// Returns whether the parent node is attached.
-    bool IsAttached() const { return attached_; }
 
     VariantVector GetControlPointsAttr() const;
     void SetControlPointsAttr(VariantVector value);
@@ -84,11 +82,11 @@ public:
 private:
     /// Calculate the length of the Spline. Used for movement calculations.
     void CalculateLength();
-    /// Move the parent node along the Spline in Beizer Mode.
-    Vector3 BezierMove(Vector<Vector3>& controlPoints, float t);
+    /// Move the parent node along the Spline in Bezier Mode.
+    Vector3 BezierMove(const PODVector<Vector3>& controlPoints, float t) const;
 
     /// The Control Points of the Spline.
-    Vector<Vector3> controlPoints_;
+    PODVector<Vector3> controlPoints_;
     /// The Interpolation Mode of the Spline.
     InterpolationMode interpolationMode_;
     /// The Speed of movement along the Spline.
@@ -100,7 +98,7 @@ private:
     float traveled_;
     /// The length of the Spline.
     float length_;
-    /// The parent is attached to the spline.
-    bool attached_;
+    /// Whether the length needs to be recalculated. Will only be true after a push or pop.
+    bool dirty_;
 };
 }

@@ -39,7 +39,7 @@ Spline::Spline(Context* context) :
     elapsedTime_(0.f),
     length_(0.f),
     traveled_(0.f),
-    attached_(false)
+    dirty_(false)
 {
 }
 
@@ -52,21 +52,34 @@ void Spline::RegisterObject(Context* context)
     ATTRIBUTE(Spline, VAR_INT, "Interpolation Mode", interpolationMode_, BEZIER_CURVE, AM_FILE);
     ATTRIBUTE(Spline, VAR_FLOAT, "Traveled", traveled_, 0.f, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Spline, VAR_FLOAT, "Elapsed Time", elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(Spline, VAR_FLOAT, "Length", length_, 0.f, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(Spline, VAR_BOOL, "Attached", attached_, false, AM_FILE);
 }
 
-void Spline::SetControlPoints(const Vector<Vector3> controlPoints)
+void Spline::SetControlPoints(const PODVector<Vector3>& controlPoints)
 {
     controlPoints_ = controlPoints;
+
+    // We can calculate the length here because all the control points have changed so it shouldn't be too expensive.
+    CalculateLength();
 }
 
-void Spline::SetInterpolationMode(InterpolationMode interpolationMode)
+void Spline::SetPosition(float factor)
 {
-    interpolationMode_ = interpolationMode;
+    float t = factor;
+
+    if (t < 0.f)
+        t = 0.0f;
+    else if (t > 1.0f)
+        t = 1.0f;
+
+    traveled_ = t;
 }
 
-Vector3 Spline::GetPosition(float factor)
+Vector3 Spline::GetPosition() const
+{
+    return GetPoint(traveled_);
+}
+
+Vector3 Spline::GetPoint(float factor) const
 {
     float t = factor;
 
@@ -88,42 +101,30 @@ Vector3 Spline::GetPosition(float factor)
 void Spline::Push(const Vector3& controlPoint)
 {
     controlPoints_.Push(controlPoint);
+
+    // Calculate the length at the next move so we don't recalculate the entire length multiple times if more than one control point is changed.
+    dirty_ = true;
 }
 
 void Spline::Pop()
 {
     controlPoints_.Pop();
-}
 
-void Spline::Attach()
-{
-    if (controlPoints_.Size() > 0)
-    {
-        CalculateLength();
-        
-        switch (interpolationMode_)
-        {
-        case BEZIER_CURVE:
-            if (controlPoints_.Size() < 2)
-            {
-                LOGERRORF("Spline on Node[%d,%s] in Beizer Curve mode attempted with less than two control points.", GetNode()->GetID(), GetNode()->GetName().CString());
-                return;
-            }
-            GetNode()->SetPosition(BezierMove(controlPoints_, traveled_));
-            break;
-        }
-
-        attached_ = true;
-    }
+    // Calculate the length at the next move so we don't recalculate the entire length multiple times if more than one control point is changed.
+    dirty_ = true;
 }
 
 void Spline::Move(float timeStep)
 {
-    if (!attached_ || traveled_ >= 1.0f || length_ <= 0.0f)
+    if (dirty_)
+        CalculateLength();
+
+    if (traveled_ >= 1.0f || length_ <= 0.0f)
         return;
 
     elapsedTime_ += timeStep;
 
+    // Calculate where we should be on the spline based on length, speed and time. If that is less than the set traveled_ don't move till caught up.
     float distanceCovered = elapsedTime_ * speed_;
     traveled_ = distanceCovered / length_;
 
@@ -140,14 +141,8 @@ void Spline::Move(float timeStep)
     }
 }
 
-void Spline::Detach()
-{
-    attached_ = false;
-}
-
 void Spline::Reset()
 {
-    attached_ = false;
     traveled_ = 0.f;
     elapsedTime_ = 0.f;
 }
@@ -164,10 +159,15 @@ void Spline::SetControlPointsAttr(VariantVector value)
 {
     for (unsigned i = 0; i < value.Size(); i++)
         controlPoints_.Push(value[i].GetVector3());
+
+    CalculateLength();
 }
 
 void Spline::CalculateLength()
 {
+    if (dirty_)
+        dirty_ = false;
+
     length_ = 0.f;
 
     if (controlPoints_.Size() <= 0)
@@ -189,7 +189,7 @@ void Spline::CalculateLength()
     }
 }
 
-Vector3 Spline::BezierMove(Vector<Vector3>& controlPoints, float t)
+Vector3 Spline::BezierMove(const PODVector<Vector3>& controlPoints, float t) const
 {
     if (controlPoints.Size() == 2)
     {
@@ -197,7 +197,7 @@ Vector3 Spline::BezierMove(Vector<Vector3>& controlPoints, float t)
     }
     else
     {
-        Vector<Vector3> newControlPoints;
+        PODVector<Vector3> newControlPoints;
         for (unsigned i = 1; i < controlPoints.Size(); i++)
         {
             newControlPoints.Push(controlPoints[i - 1].Lerp(controlPoints[i], t));
