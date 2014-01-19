@@ -48,6 +48,11 @@ namespace Urho3D
 - LOCAL
 
 
+### InterpolationMode
+
+- BEZIER_CURVE
+
+
 ### FillMode
 
 - FILL_SOLID
@@ -498,6 +503,7 @@ Methods:
 - Vector3 CrossProduct(const Vector3&) const
 - Vector3 Lerp(const Vector3&, float) const
 - bool Equals(const Vector3&) const
+- float Angle(const Vector3&) const
 - Vector3 Normalized() const
 - String ToString() const
 
@@ -1944,6 +1950,53 @@ Properties:
 - Octree@ octree (readonly)
 - PhysicsWorld@ physicsWorld (readonly)
 - ScriptObject@ scriptObject (readonly)
+
+
+### Spline
+
+Methods:
+
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@, bool = false)
+- bool Save(File@) const
+- bool LoadXML(const XMLElement&, bool = false)
+- bool SaveXML(XMLElement&) const
+- void ApplyAttributes()
+- bool SetAttribute(const String&, const Variant&)
+- void ResetToDefault()
+- void RemoveInstanceDefault()
+- Variant GetAttribute(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- void Remove()
+- void MarkNetworkUpdate() const
+- void Push(const Vector3&)
+- void Pop()
+- Vector3 GetPoint(float) const
+- void Move(float)
+- void Reset()
+
+Properties:
+
+- int refs (readonly)
+- int weakRefs (readonly)
+- ShortStringHash type (readonly)
+- ShortStringHash baseType (readonly)
+- String typeName (readonly)
+- String category (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- Variant[] attributeDefaults (readonly)
+- AttributeInfo[] attributeInfos (readonly)
+- bool temporary
+- bool enabled
+- bool enabledEffective (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- Vector3[]@ controlPoints
+- InterpolationMode interpolationMode
+- float speed
+- Vector3 position
+- bool finished (readonly)
 
 
 ### Bone

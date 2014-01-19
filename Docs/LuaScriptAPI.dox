@@ -2938,6 +2938,7 @@ Methods:
 - Vector3 Abs() const
 - Vector3 Lerp(const Vector3& rhs, float t) const
 - bool Equals(const Vector3& rhs) const
+- float Angle(const Vector3& rhs) const
 - Vector3 Normalized() const
 - String ToString() const
 
@@ -3925,6 +3926,28 @@ Properties:
 - float snapThreshold
 - bool threadedUpdate (readonly)
 - String varNamesAttr
+
+### Spline : Component
+
+Methods:
+
+- void SetInterpolationMode(InterpolationMode interpolationMode)
+- void SetSpeed(float speed)
+- void SetPosition(float factor)
+- InterpolationMode GetInterpolationMode() const
+- float GetSpeed() const
+- Vector3 GetPosition() const
+- void Push(const Vector3& controlPoint)
+- void Pop()
+- Vector3 GetPoint(float factor) const
+- void Move(float timeStep)
+- void Reset()
+- bool IsFinished() const
+
+Properties:
+
+- InterpolationMode interpolationMode
+- float speed
 
 ### UIElement : Serializable
 
@@ -5397,6 +5420,7 @@ Properties:
 - int CF_PVRTC_RGBA_4BPP
 - int REPLICATED
 - int LOCAL
+- int BEZIER_CURVE
 - int HA_LEFT
 - int HA_CENTER
 - int HA_RIGHT

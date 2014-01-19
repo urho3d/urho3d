@@ -52,6 +52,11 @@ REPLICATED,
 LOCAL,
 };
 
+enum InterpolationMode
+{
+BEZIER_CURVE,
+};
+
 enum FillMode
 {
 FILL_SOLID,
@@ -505,6 +510,7 @@ float AbsDotProduct(const Vector3&) const;
 Vector3 CrossProduct(const Vector3&) const;
 Vector3 Lerp(const Vector3&, float) const;
 bool Equals(const Vector3&) const;
+float Angle(const Vector3&) const;
 Vector3 Normalized() const;
 String ToString() const;
 
@@ -2115,6 +2121,64 @@ Octree octree;
 PhysicsWorld physicsWorld;
 /* (readonly) */
 ScriptObject scriptObject;
+};
+
+class Spline
+{
+// Methods:
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool Load(File, bool = false);
+bool Save(File) const;
+bool LoadXML(const XMLElement&, bool = false);
+bool SaveXML(XMLElement&) const;
+void ApplyAttributes();
+bool SetAttribute(const String&, const Variant&);
+void ResetToDefault();
+void RemoveInstanceDefault();
+Variant GetAttribute(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+void Remove();
+void MarkNetworkUpdate() const;
+void Push(const Vector3&);
+void Pop();
+Vector3 GetPoint(float) const;
+void Move(float);
+void Reset();
+
+// Properties:
+/* (readonly) */
+int refs;
+/* (readonly) */
+int weakRefs;
+/* (readonly) */
+ShortStringHash type;
+/* (readonly) */
+ShortStringHash baseType;
+/* (readonly) */
+String typeName;
+/* (readonly) */
+String category;
+/* (readonly) */
+uint numAttributes;
+Array<Variant> attributes;
+/* (readonly) */
+Array<Variant> attributeDefaults;
+/* (readonly) */
+Array<AttributeInfo> attributeInfos;
+bool temporary;
+bool enabled;
+/* (readonly) */
+bool enabledEffective;
+/* (readonly) */
+uint id;
+/* (readonly) */
+Node node;
+Array<Vector3> controlPoints;
+InterpolationMode interpolationMode;
+float speed;
+Vector3 position;
+/* (readonly) */
+bool finished;
 };
 
 class Bone
