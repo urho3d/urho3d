@@ -63,7 +63,7 @@ static const float DEFAULT_COLLISION_MARGIN = 0.04f;
 static const btVector3 WHITE(1.0f, 1.0f, 1.0f);
 static const btVector3 GREEN(0.0f, 1.0f, 0.0f);
 
-static const char* typeNames[] = 
+static const char* collisionShapeTypeNames[] =
 {
     "Box",
     "Sphere",
@@ -357,7 +357,7 @@ void CollisionShape::RegisterObject(Context* context)
     context->RegisterFactory<CollisionShape>(PHYSICS_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, typeNames, SHAPE_BOX, AM_DEFAULT);
+    ENUM_ATTRIBUTE(CollisionShape, "Shape Type", shapeType_, collisionShapeTypeNames, SHAPE_BOX, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ONE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Offset Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);

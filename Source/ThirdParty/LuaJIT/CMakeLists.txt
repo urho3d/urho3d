@@ -263,6 +263,7 @@ else ()
         ${LJLIB_C} src/lib_init.c)
 endif ()
 set (SOURCE_FILES ${LJCORE_C} ${GEN_SRCS})
+set (AMALG_SINGLE_TARGET 1)
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY ${CMAKE_CURRENT_BINARY_DIR}/generated)

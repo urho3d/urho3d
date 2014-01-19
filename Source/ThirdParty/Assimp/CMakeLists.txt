@@ -716,4 +716,5 @@ endif ()
 
 set (TARGET_NAME Assimp)
 list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
+set (AMALG_EXCLUDES "(3DSConverter|Blender|IFC|Importer|Loader|LWO|Ogre|Parser|zlib)")
 setup_library ()

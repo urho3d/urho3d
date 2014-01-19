@@ -52,8 +52,8 @@ static const char* openMode[] =
 };
 #endif
 
-static const unsigned READ_BUFFER_SIZE = 32768;
-static const unsigned SKIP_BUFFER_SIZE = 1024;
+static const unsigned FILE_READ_BUFFER_SIZE = 32768;
+static const unsigned FILE_SKIP_BUFFER_SIZE = 1024;
 
 File::File(Context* context) :
     Object(context),
@@ -141,7 +141,7 @@ bool File::Open(const String& fileName, FileMode mode)
             offset_ = 0;
             checksum_ = 0;
             size_ = assetHandle_->hidden.androidio.size;
-            readBuffer_ = new unsigned char[READ_BUFFER_SIZE];
+            readBuffer_ = new unsigned char[FILE_READ_BUFFER_SIZE];
             readBufferOffset_ = 0;
             readBufferSize_ = 0;
             return true;
@@ -247,7 +247,7 @@ unsigned File::Read(void* dest, unsigned size)
         {
             if (readBufferOffset_ >= readBufferSize_)
             {
-                readBufferSize_ = Min((int)size_ - position_, (int)READ_BUFFER_SIZE);
+                readBufferSize_ = Min((int)size_ - position_, (int)FILE_READ_BUFFER_SIZE);
                 readBufferOffset_ = 0;
                 SDL_RWread(assetHandle_, readBuffer_.Get(), readBufferSize_, 1);
             }
@@ -356,9 +356,9 @@ unsigned File::Seek(unsigned position)
         // Skip bytes
         else if (position >= position_)
         {
-            unsigned char skipBuffer[SKIP_BUFFER_SIZE];
+            unsigned char skipBuffer[FILE_SKIP_BUFFER_SIZE];
             while (position > position_)
-                Read(skipBuffer, Min((int)position - position_, (int)SKIP_BUFFER_SIZE));
+                Read(skipBuffer, Min((int)position - position_, (int)FILE_SKIP_BUFFER_SIZE));
         }
         else
             LOGERROR("Seeking backward in a compressed file is not supported");

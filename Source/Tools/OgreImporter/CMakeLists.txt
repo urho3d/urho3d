@@ -28,6 +28,6 @@ define_source_files ()
 
 # Setup target
 if (APPLE)
-    set (CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreServices")
+    setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
 endif ()
 setup_executable ()

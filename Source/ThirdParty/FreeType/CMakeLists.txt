@@ -3,10 +3,8 @@ set (TARGET_NAME FreeType)
 
 add_definitions (-DFT2_BUILD_LIBRARY)
 
-# Rename z_verbose and z_error symbols to prevent Xcode duplicate symbol linker error (clash with Assimp) on debug build
-if (XCODE)
-    add_definitions (-Dz_verbose=ft2_z_verbose -Dz_error=ft2_z_error)
-endif ()
+# Rename z_verbose and z_error symbols to prevent duplicate symbol linker error (clash with Assimp) on debug build
+add_definitions (-Dz_verbose=ft2_z_verbose -Dz_error=ft2_z_error)
 
 # Define source files
 set (SOURCE_FILES
@@ -50,6 +48,7 @@ set (SOURCE_FILES
     src/type1/type1.c
     src/type42/type42.c
     src/winfonts/winfnt.c)
+set (AMALG_EXCLUDES "(ftgzip|pcf|pfr|raster|sfnt)")
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY include)

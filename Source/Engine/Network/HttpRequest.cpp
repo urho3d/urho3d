@@ -33,8 +33,8 @@
 namespace Urho3D
 {
 
-static const unsigned ERROR_BUFFER_SIZE = 256;
-static const unsigned READ_BUFFER_SIZE = 65536; // Must be a power of two
+static const unsigned HTTP_REQUEST_ERROR_BUFFER_SIZE = 256;
+static const unsigned HTTP_REQUEST_READ_BUFFER_SIZE = 65536; // Must be a power of two
 
 HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData) :
     url_(url.Trimmed()),
@@ -42,8 +42,8 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
     headers_(headers),
     postData_(postData),
     state_(HTTP_INITIALIZING),
-    httpReadBuffer_(new unsigned char[READ_BUFFER_SIZE]),
-    readBuffer_(new unsigned char[READ_BUFFER_SIZE]),
+    httpReadBuffer_(new unsigned char[HTTP_REQUEST_READ_BUFFER_SIZE]),
+    readBuffer_(new unsigned char[HTTP_REQUEST_READ_BUFFER_SIZE]),
     readPosition_(0),
     writePosition_(0)
 {
@@ -92,7 +92,7 @@ void HttpRequest::ThreadFunction()
         host = host.Substring(0, portStart);
     }
     
-    char errorBuffer[ERROR_BUFFER_SIZE];
+    char errorBuffer[HTTP_REQUEST_ERROR_BUFFER_SIZE];
     memset(errorBuffer, 0, sizeof(errorBuffer));
     
     String headersStr;
@@ -142,7 +142,7 @@ void HttpRequest::ThreadFunction()
     while (shouldRun_)
     {
         // Read less than full buffer to be able to distinguish between full and empty ring buffer. Reading may block
-        int bytesRead = mg_read(connection, httpReadBuffer_.Get(), READ_BUFFER_SIZE / 4);
+        int bytesRead = mg_read(connection, httpReadBuffer_.Get(), HTTP_REQUEST_READ_BUFFER_SIZE / 4);
         if (bytesRead <= 0)
             break;
         
@@ -151,7 +151,7 @@ void HttpRequest::ThreadFunction()
         // Wait until enough space in the main thread's ring buffer
         for (;;)
         {
-            unsigned spaceInBuffer = READ_BUFFER_SIZE - ((writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1));
+            unsigned spaceInBuffer = HTTP_REQUEST_READ_BUFFER_SIZE - ((writePosition_ - readPosition_) & (HTTP_REQUEST_READ_BUFFER_SIZE - 1));
             if ((int)spaceInBuffer > bytesRead || !shouldRun_)
                 break;
             
@@ -166,19 +166,19 @@ void HttpRequest::ThreadFunction()
             break;
         }
         
-        if (writePosition_ + bytesRead <= READ_BUFFER_SIZE)
+        if (writePosition_ + bytesRead <= HTTP_REQUEST_READ_BUFFER_SIZE)
             memcpy(readBuffer_.Get() + writePosition_, httpReadBuffer_.Get(), bytesRead);
         else
         {
             // Handle ring buffer wrap
-            unsigned part1 = READ_BUFFER_SIZE - writePosition_;
+            unsigned part1 = HTTP_REQUEST_READ_BUFFER_SIZE - writePosition_;
             unsigned part2 = bytesRead - part1;
             memcpy(readBuffer_.Get() + writePosition_, httpReadBuffer_.Get(), part1);
             memcpy(readBuffer_.Get(), httpReadBuffer_.Get() + part1, part2);
         }
         
         writePosition_ += bytesRead;
-        writePosition_ &= READ_BUFFER_SIZE - 1;
+        writePosition_ &= HTTP_REQUEST_READ_BUFFER_SIZE - 1;
         
         mutex_.Release();
     }
@@ -220,19 +220,19 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
             if (bytesAvailable > sizeLeft)
                 bytesAvailable = sizeLeft;
             
-            if (readPosition_ + bytesAvailable <= READ_BUFFER_SIZE)
+            if (readPosition_ + bytesAvailable <= HTTP_REQUEST_READ_BUFFER_SIZE)
                 memcpy(destPtr, readBuffer_.Get() + readPosition_, bytesAvailable);
             else
             {
                 // Handle ring buffer wrap
-                unsigned part1 = READ_BUFFER_SIZE - readPosition_;
+                unsigned part1 = HTTP_REQUEST_READ_BUFFER_SIZE - readPosition_;
                 unsigned part2 = bytesAvailable - part1;
                 memcpy(destPtr, readBuffer_.Get() + readPosition_, part1);
                 memcpy(destPtr + part1, readBuffer_.Get(), part2);
             }
             
             readPosition_ += bytesAvailable;
-            readPosition_ &= READ_BUFFER_SIZE - 1;
+            readPosition_ &= HTTP_REQUEST_READ_BUFFER_SIZE - 1;
             sizeLeft -= bytesAvailable;
             totalRead += bytesAvailable;
             destPtr += bytesAvailable;
@@ -270,7 +270,7 @@ unsigned HttpRequest::GetAvailableSize() const
 
 unsigned HttpRequest::CheckEofAndAvailableSize()
 {
-    unsigned bytesAvailable = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    unsigned bytesAvailable = (writePosition_ - readPosition_) & (HTTP_REQUEST_READ_BUFFER_SIZE - 1);
     if (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !bytesAvailable))
         position_ = M_MAX_UNSIGNED;
     return bytesAvailable;
