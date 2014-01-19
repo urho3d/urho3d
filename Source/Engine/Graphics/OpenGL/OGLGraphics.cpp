@@ -76,6 +76,14 @@
 #define glCheckFramebufferStatusEXT glCheckFramebufferStatus
 #endif
 
+#ifdef WIN32
+// On Intel / NVIDIA setups prefer the NVIDIA GPU
+#include <windows.h>
+extern "C" {
+    _declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
+#endif
+
 namespace Urho3D
 {
 
