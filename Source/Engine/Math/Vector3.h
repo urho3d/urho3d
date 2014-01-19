@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-/// Three-dimensional vector.
+/// Three-dimensional vector classs.
 class URHO3D_API Vector3
 {
 public:
