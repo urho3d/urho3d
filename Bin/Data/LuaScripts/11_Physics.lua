@@ -3,7 +3,7 @@
 --     - Creating both static and moving physics objects to a scene
 --     - Displaying physics debug geometry
 --     - Using the Skybox component for setting up an unmoving sky
---     - Saving a scene to a file and loading it to restore a previous 
+--     - Saving a scene to a file and loading it to restore a previous state
 
 require "LuaScripts/Utilities/Sample"
 
@@ -103,9 +103,9 @@ function CreateScene()
             boxObject.model = cache:GetResource("Model", "Models/Box.mdl")
             boxObject.material = cache:GetResource("Material", "Materials/StoneEnvMapSmall.xml")
             boxObject.castShadows = true
-            
+
             -- Create RigidBody and CollisionShape components like above. Give the RigidBody mass to make it movable
-            -- and also adjust friction. The actual mass is not important only the mass ratios between colliding 
+            -- and also adjust friction. The actual mass is not important only the mass ratios between colliding
             -- objects are significant
             local body = boxNode:CreateComponent("RigidBody")
             body.mass = 1.0
@@ -114,7 +114,7 @@ function CreateScene()
             shape:SetBox(Vector3(1.0, 1.0, 1.0))
         end
     end
-    
+
     -- Create the camera. Set far clip to match the fog. Note: now we actually create the camera node outside
     -- the scene, because we want it to be unaffected by scene load / save
     cameraNode = Node(context)
@@ -171,7 +171,7 @@ function MoveCamera(timeStep)
     -- Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     local mouseMove = input.mouseMove
     yaw = yaw + MOUSE_SENSITIVITY * mouseMove.x
-    pitch = pitch  +MOUSE_SENSITIVITY * mouseMove.y
+    pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
     pitch = Clamp(pitch, -90.0, 90.0)
 
     -- Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero

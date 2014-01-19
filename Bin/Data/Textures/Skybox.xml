@@ -5,4 +5,5 @@
     <face name="BrightDay1_NegY.dds" />
     <face name="BrightDay1_PosZ.dds" />
     <face name="BrightDay1_NegZ.dds" />
+    <quality low="0" />
 </cubemap>

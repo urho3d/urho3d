@@ -118,17 +118,11 @@ Urho3D uses the following third-party libraries:
 - tolua++ 1.0.93 (http://www.codenix.com/~tolua)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong %Engine.
-
 Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
-
-Ninja model and terrain / smoke / flare / status bar textures from OGRE.
-
+Ninja model and terrain, water, smoke, flare and status bar textures from OGRE.
 %Skybox cubemap from http://www.codemonsters.de.
-
 BlueHighway font from Larabie Fonts.
-
 Anonymous Pro font by Mark Simonson.
-
 NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.
 
 
