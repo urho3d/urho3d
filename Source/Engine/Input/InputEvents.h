@@ -25,6 +25,7 @@
 #include "Object.h"
 
 #include <SDL_joystick.h>
+#include <SDL_gamecontroller.h>
 #include <SDL_keycode.h>
 
 namespace Urho3D
@@ -148,6 +149,28 @@ EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
     PARAM(P_POSITION, Position);            // int
 }
 
+/// Controller button pressed
+EVENT(E_CONTROLLERBUTTONDOWN, ControllerButtonDown)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_BUTTON, Button);                // int
+}
+
+/// Controller button released.
+EVENT(E_CONTROLLERBUTTONUP, ControllerButtonUp)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_BUTTON, Button);                // int
+}
+
+/// Controller axis moved.
+EVENT(E_CONTROLLERAXISMOVE, ControllerAxisMove)
+{
+    PARAM(P_JOYSTICK, Joystick);            // int
+    PARAM(P_AXIS, Button);                  // int
+    PARAM(P_POSITION, Position);            // float
+}
+
 /// A file was drag-dropped into the application window.
 EVENT(E_DROPFILE, DropFile)
 {
@@ -261,5 +284,28 @@ static const int HAT_UP = SDL_HAT_UP;
 static const int HAT_RIGHT = SDL_HAT_RIGHT;
 static const int HAT_DOWN = SDL_HAT_DOWN;
 static const int HAT_LEFT = SDL_HAT_LEFT;
+
+static const int CONTROLLER_BUTTON_A = SDL_CONTROLLER_BUTTON_A;
+static const int CONTROLLER_BUTTON_B = SDL_CONTROLLER_BUTTON_B;
+static const int CONTROLLER_BUTTON_X = SDL_CONTROLLER_BUTTON_X;
+static const int CONTROLLER_BUTTON_Y = SDL_CONTROLLER_BUTTON_Y;
+static const int CONTROLLER_BUTTON_BACK = SDL_CONTROLLER_BUTTON_BACK;
+static const int CONTROLLER_BUTTON_GUIDE = SDL_CONTROLLER_BUTTON_GUIDE;
+static const int CONTROLLER_BUTTON_START = SDL_CONTROLLER_BUTTON_START;
+static const int CONTROLLER_BUTTON_LEFTSTICK = SDL_CONTROLLER_BUTTON_LEFTSTICK;
+static const int CONTROLLER_BUTTON_RIGHTSTICK = SDL_CONTROLLER_BUTTON_RIGHTSTICK;
+static const int CONTROLLER_BUTTON_LEFTSHOULDER = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
+static const int CONTROLLER_BUTTON_RIGHTSHOULDER = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
+static const int CONTROLLER_BUTTON_DPAD_UP = SDL_CONTROLLER_BUTTON_DPAD_UP;
+static const int CONTROLLER_BUTTON_DPAD_DOWN = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+static const int CONTROLLER_BUTTON_DPAD_LEFT = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+static const int CONTROLLER_BUTTON_DPAD_RIGHT = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+
+static const int CONTROLLER_AXIS_LEFTX = SDL_CONTROLLER_AXIS_LEFTX;
+static const int CONTROLLER_AXIS_LEFTY = SDL_CONTROLLER_AXIS_LEFTY;
+static const int CONTROLLER_AXIS_RIGHTX = SDL_CONTROLLER_AXIS_RIGHTX;
+static const int CONTROLLER_AXIS_RIGHTY = SDL_CONTROLLER_AXIS_RIGHTY;
+static const int CONTROLLER_AXIS_TRIGGERLEFT = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
+static const int CONTROLLER_AXIS_TRIGGERRIGHT = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
 
 }
