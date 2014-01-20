@@ -1240,6 +1240,9 @@ void View::ExecuteRenderPathCommands()
     {
         PROFILE(ExecuteRenderPath);
         
+        // Set for safety in case of empty renderpath
+        currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
+
         bool viewportModified = false;
         bool isPingponging = false;
         
