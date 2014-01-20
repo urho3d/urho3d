@@ -102,6 +102,8 @@ struct PerThreadSceneResult
     float maxZ_;
 };
 
+static const unsigned MAX_VIEWPORT_TEXTURES = 2;
+
 /// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
 class URHO3D_API View : public Object
 {
@@ -165,6 +167,8 @@ private:
     bool IsNecessary(const RenderPathCommand& command);
     /// Check if a command reads the rendered scene.
     bool CheckViewportRead(const RenderPathCommand& command);
+    /// Check whether a command should use pingponging instead of simple resolve to viewport texture.
+    bool CheckPingpong(unsigned index);
     /// Allocate needed screen buffers.
     void AllocateScreenBuffers();
     /// Blit the viewport from one surface to another.
@@ -258,6 +262,10 @@ private:
     OcclusionBuffer* occlusionBuffer_;
     /// Destination color rendertarget.
     RenderSurface* renderTarget_;
+    /// Substitute rendertarget for deferred rendering. Allocated if necessary.
+    RenderSurface* substituteRenderTarget_;
+    /// Texture(s) for sampling the viewport contents. Allocated if necessary.
+    Texture2D* viewportTextures_[MAX_VIEWPORT_TEXTURES];
     /// Color rendertarget active for the current renderpath command.
     RenderSurface* currentRenderTarget_;
     /// Viewport rectangle.
@@ -268,10 +276,6 @@ private:
     IntVector2 rtSize_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
-    /// Write screenbuffer index.
-    unsigned writeBuffer_;
-    /// Read screenbuffer index.
-    unsigned readBuffer_;
     /// Minimum Z value of the visible scene.
     float minZ_;
     /// Maximum Z value of the visible scene.
@@ -294,8 +298,6 @@ private:
     bool deferredAmbient_;
     /// Renderpath.
     RenderPath* renderPath_;
-    /// Intermediate screen buffers used in pingpong copies and OpenGL deferred framebuffer blit.
-    PODVector<Texture2D*> screenBuffers_;
     /// Per-thread octree query results.
     Vector<PODVector<Drawable*> > tempDrawables_;
     /// Per-thread geometries, lights and Z range collection results.

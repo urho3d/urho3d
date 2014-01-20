@@ -292,7 +292,8 @@ View::View(Context* context) :
     camera_(0),
     cameraZone_(0),
     farClipZone_(0),
-    renderTarget_(0)
+    renderTarget_(0),
+    substituteRenderTarget_(0)
 {
     // Create octree query and scene results vector for each thread
     unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1; // Worker threads + main thread
@@ -482,8 +483,7 @@ void View::Update(const FrameInfo& frame)
     
     int maxSortedInstances = renderer_->GetMaxSortedInstances();
     
-    // Clear screen buffers, geometry, light, occluder & batch lists
-    screenBuffers_.Clear();
+    // Clear buffers, geometry, light, occluder & batch list
     renderTargets_.Clear();
     geometries_.Clear();
     shadowGeometries_.Clear();
@@ -512,10 +512,6 @@ void View::Render()
     
     // Allocate screen buffers as necessary
     AllocateScreenBuffers();
-    
-    // Initialize screenbuffer indices to use for read and write (pingponging)
-    writeBuffer_ = 0;
-    readBuffer_ = 0;
     
     // Forget parameter sources from the previous view
     graphics_->ClearParameterSources();
@@ -563,7 +559,7 @@ void View::Render()
     graphics_->ResetStreamFrequencies();
     
     // Run framebuffer blitting if necessary
-    if (screenBuffers_.Size() && currentRenderTarget_ != renderTarget_)
+    if (currentRenderTarget_ != renderTarget_)
         BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()), renderTarget_, true);
     
     // If this is a main view, draw the associated debug geometry now
@@ -1241,19 +1237,11 @@ void View::ExecuteRenderPathCommands()
         }
     }
     
-    // Check if forward rendering needs to resolve the multisampled backbuffer to a texture
-    bool needResolve = !deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1 && screenBuffers_.Size();
-    
     {
         PROFILE(ExecuteRenderPath);
         
-        unsigned lastCommandIndex = 0;
-        for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
-        {
-            if (!IsNecessary(renderPath_->commands_[i]))
-                continue;
-            lastCommandIndex = i;
-        }
+        bool viewportModified = false;
+        bool isPingponging = false;
         
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
@@ -1261,42 +1249,40 @@ void View::ExecuteRenderPathCommands()
             if (!IsNecessary(command))
                 continue;
             
-            // If command writes and reads the target at same time, pingpong automatically
-            if (CheckViewportRead(command))
+            // Has the viewport been modified and will be read as a texture by the current command?
+            if (CheckViewportRead(command) && viewportModified)
             {
-                readBuffer_ = writeBuffer_;
-                if (!command.outputNames_[0].Compare("viewport", false))
+                // If not using pingponging, simply resolve/copy to the first viewport texture
+                if (!isPingponging)
                 {
-                    ++writeBuffer_;
-                    if (writeBuffer_ >= screenBuffers_.Size())
-                        writeBuffer_ = 0;
-                    
-                    // If this is a scene render pass, must copy the previous viewport contents now
-                    if (command.type_ == CMD_SCENEPASS && !needResolve)
-                        BlitFramebuffer(screenBuffers_[readBuffer_], screenBuffers_[writeBuffer_]->GetRenderSurface(), false);
+                    if (!currentRenderTarget_)
+                        graphics_->ResolveToTexture(viewportTextures_[0], viewRect_);
+                    else
+                    {
+                        /// \todo Must use dynamic_cast because the render target could also be a cube map. That will not currently work
+                        BlitFramebuffer(dynamic_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()),
+                            viewportTextures_[0]->GetRenderSurface(), false);
+                    }
                 }
-                
-                // Resolve multisampled framebuffer now if necessary
-                /// \todo Does not copy the depth buffer
-                if (needResolve)
+                else
                 {
-                    graphics_->ResolveToTexture(screenBuffers_[readBuffer_], viewRect_);
-                    needResolve = false;
+                    // Swap the pingpong double buffer sides. Texture 0 will be read next
+                    viewportTextures_[1] = viewportTextures_[0];
+                    viewportTextures_[0] = static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture());
                 }
+
+                viewportModified = false;
             }
-            
-            // Check which rendertarget will be used on this pass
-            if (screenBuffers_.Size() && !needResolve)
-                currentRenderTarget_ = screenBuffers_[writeBuffer_]->GetRenderSurface();
+
+            // Check if current command begins / continues the pingpong chain
+            if (CheckPingpong(i))
+            {
+                isPingponging = true;
+                currentRenderTarget_ = viewportTextures_[1]->GetRenderSurface();
+            }
             else
-                currentRenderTarget_ = renderTarget_;
-            
-            // Optimization: if the last command is a quad with output to the viewport, do not use the screenbuffers,
-            // but the viewport directly. This saves the extra copy
-            if (screenBuffers_.Size() && i == lastCommandIndex && command.type_ == CMD_QUAD && command.outputNames_.Size() == 1 &&
-                !command.outputNames_[0].Compare("viewport", false))
-                currentRenderTarget_ = renderTarget_;
-            
+                currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
+
             switch (command.type_)
             {
             case CMD_CLEAR:
@@ -1396,6 +1382,10 @@ void View::ExecuteRenderPathCommands()
             default:
                 break;
             }
+
+            // If current command output to the viewport, mark it modified
+            if (!command.outputNames_[0].Compare("viewport", false))
+                viewportModified = true;
         }
     }
     
@@ -1486,7 +1476,7 @@ void View::SetTextures(RenderPathCommand& command)
         // Bind the rendered output
         if (!command.textureNames_[i].Compare("viewport", false))
         {
-            graphics_->SetTexture(i, screenBuffers_[readBuffer_]);
+            graphics_->SetTexture(i, viewportTextures_[0]);
             continue;
         }
         
@@ -1594,19 +1584,53 @@ bool View::CheckViewportRead(const RenderPathCommand& command)
     return false;
 }
 
+bool View::CheckPingpong(unsigned index)
+{
+    RenderPathCommand& current = renderPath_->commands_[index];
+    if (current.type_ != CMD_QUAD || current.outputNames_.Size() != 1 || current.outputNames_[0].Compare("viewport", false))
+        return false;
+
+    // If there are commands other than quads that target the viewport, we must keep rendering to the final target and resolving
+    // to a viewport texture when necessary instead of pingponging, as a scene pass is not guaranteed to fill the entire viewport
+    for (unsigned i = index + 1; i < renderPath_->commands_.Size(); ++i)
+    {
+        RenderPathCommand& command = renderPath_->commands_[index];
+        if (!IsNecessary(command))
+            continue;
+        if (!command.outputNames_[0].Compare("viewport", false) && command.type_ != CMD_QUAD)
+            return false;
+    }
+
+    // Pingponging is OK when there are several quad commands in sequence at the end of the renderpath
+    for (unsigned i = index + 1; i < renderPath_->commands_.Size(); ++i)
+    {
+        RenderPathCommand& command = renderPath_->commands_[index];
+        if (!IsNecessary(command))
+            continue;
+        if (command.type_ == CMD_QUAD && current.outputNames_.Size() == 1 && current.outputNames_[0].Compare("viewport", false))
+            return true;
+    }
+
+    // Note: the last quad command does not pingpong; it should write to the final destination rendertarget
+    return false;
+}
+
 void View::AllocateScreenBuffers()
 {
-    unsigned neededBuffers = 0;
+    bool needSubstitute = false;
+    unsigned numViewportTextures = 0;
+
     #ifdef USE_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
     // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers.
     if ((deferred_ && !renderTarget_) || (deferredAmbient_ && renderTarget_ && renderTarget_->GetParentTexture()->GetFormat() !=
         Graphics::GetRGBAFormat()))
-        neededBuffers = 1;
+        needSubstitute = true;
+
     #endif
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
-        neededBuffers = 1;
+        needSubstitute = true;
     
     // Follow final rendertarget format, or use RGB to match the backbuffer format
     unsigned format = renderTarget_ ? renderTarget_->GetParentTexture()->GetFormat() : Graphics::GetRGBFormat();
@@ -1616,10 +1640,9 @@ void View::AllocateScreenBuffers()
         format = Graphics::GetRGBAFormat();
     #endif
     
-    // Check for commands which read the rendered scene and allocate a buffer for each, up to 2 maximum for pingpong
-    /// \todo If the last copy is optimized away, this allocates an extra buffer unnecessarily
+    // Check for commands which read the viewport, or pingpong between viewport textures
     bool hasViewportRead = false;
-    bool hasViewportReadWrite = false;
+    bool hasPingpong = false;
     
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
@@ -1627,22 +1650,32 @@ void View::AllocateScreenBuffers()
         if (!IsNecessary(command))
             continue;
         if (CheckViewportRead(command))
-        {
             hasViewportRead = true;
-            if (!command.outputNames_[0].Compare("viewport", false))
-                hasViewportReadWrite = true;
-        }
+        if (!hasPingpong && CheckPingpong(i))
+            hasPingpong = true;
     }
-    if (hasViewportRead && !neededBuffers)
-        neededBuffers = 1;
-    if (hasViewportReadWrite)
-        neededBuffers = 2;
-    
+
+    if (hasViewportRead)
+        ++numViewportTextures;
+    if (hasPingpong && !needSubstitute)
+        ++numViewportTextures;
+
     // Allocate screen buffers with filtering active in case the quad commands need that
-    // Follow the sRGB mode of the destination rendertarget
+    // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
-    for (unsigned i = 0; i < neededBuffers; ++i)
-        screenBuffers_.Push(renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB));
+    if (needSubstitute)
+    {
+        substituteRenderTarget_ = needSubstitute ? 
+            renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB)->GetRenderSurface() : (RenderSurface*)0;
+    }
+    for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
+    {
+        viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB) :
+            (Texture2D*)0;
+    }
+    // If has allocated the substitute render target, it can also be used for pingponging
+    if (substituteRenderTarget_ && hasPingpong)
+        viewportTextures_[1] = static_cast<Texture2D*>(substituteRenderTarget_->GetParentTexture());
     
     // Allocate extra render targets defined by the rendering path
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
@@ -1671,6 +1704,12 @@ void View::AllocateScreenBuffers()
 
 void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool depthWrite)
 {
+    if (!source)
+    {
+        LOGERROR("Null source texture in BlitFramebuffer");
+        return;
+    }
+
     PROFILE(BlitFramebuffer);
     
     graphics_->SetBlendMode(BLEND_REPLACE);
