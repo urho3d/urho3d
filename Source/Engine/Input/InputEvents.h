@@ -149,7 +149,7 @@ EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
     PARAM(P_POSITION, Position);            // int
 }
 
-/// Controller button pressed
+/// Controller button pressed.
 EVENT(E_CONTROLLERBUTTONDOWN, ControllerButtonDown)
 {
     PARAM(P_JOYSTICK, Joystick);            // int

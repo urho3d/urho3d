@@ -256,9 +256,8 @@ bool Input::OpenJoystick(unsigned index)
         JoystickState& state = joysticks_[index];
         state.joystick_ = joystick;
         if (SDL_IsGameController(index))
-        {
             state.controller_ = SDL_GameControllerOpen(index);
-        }
+        
         state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
         state.buttonPress_.Resize(state.buttons_.Size());
         state.axes_.Resize(SDL_JoystickNumAxes(joystick));

@@ -113,6 +113,27 @@ static void RegisterInputConstants(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int HAT_RIGHT", (void*)&HAT_RIGHT);
     engine->RegisterGlobalProperty("const int HAT_DOWN", (void*)&HAT_DOWN);
     engine->RegisterGlobalProperty("const int HAT_LEFT", (void*)&HAT_LEFT);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_A", (void*)&CONTROLLER_BUTTON_A);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_B", (void*)&CONTROLLER_BUTTON_B);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_X", (void*)&CONTROLLER_BUTTON_X);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_Y", (void*)&CONTROLLER_BUTTON_Y);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_BACK", (void*)&CONTROLLER_BUTTON_BACK);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_GUIDE", (void*)&CONTROLLER_BUTTON_GUIDE);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_START", (void*)&CONTROLLER_BUTTON_START);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_LEFTSTICK", (void*)&CONTROLLER_BUTTON_LEFTSTICK);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_RIGHTSTICK", (void*)&CONTROLLER_BUTTON_RIGHTSTICK);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_LEFTSHOULDER", (void*)&CONTROLLER_BUTTON_LEFTSHOULDER);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_RIGHTSHOULDER", (void*)&CONTROLLER_BUTTON_RIGHTSHOULDER);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_DPAD_UP", (void*)&CONTROLLER_BUTTON_DPAD_UP);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_DPAD_DOWN", (void*)&CONTROLLER_BUTTON_DPAD_DOWN);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_DPAD_LEFT", (void*)&CONTROLLER_BUTTON_DPAD_LEFT);
+    engine->RegisterGlobalProperty("const int CONTROLLER_BUTTON_DPAD_RIGHT", (void*)&CONTROLLER_BUTTON_DPAD_RIGHT);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_LEFTX", (void*)&CONTROLLER_AXIS_LEFTX);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_LEFTY", (void*)&CONTROLLER_AXIS_LEFTY);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_RIGHTX", (void*)&CONTROLLER_AXIS_RIGHTX);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_RIGHTY", (void*)&CONTROLLER_AXIS_RIGHTY);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_TRIGGERLEFT", (void*)&CONTROLLER_AXIS_TRIGGERLEFT);
+    engine->RegisterGlobalProperty("const int CONTROLLER_AXIS_TRIGGERRIGHT", (void*)&CONTROLLER_AXIS_TRIGGERRIGHT);
 }
 
 static Input* GetInput()
