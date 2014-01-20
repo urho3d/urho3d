@@ -1274,7 +1274,8 @@ void View::ExecuteRenderPathCommands()
                 viewportModified = false;
             }
 
-            // Check if current command begins / continues the pingpong chain
+            // Check if current command begins / continues the pingpong chain. The final command in the renderpath ends the chain
+            // by rendering to the destination render target again
             if (CheckPingpong(i))
             {
                 isPingponging = true;
@@ -1570,7 +1571,8 @@ void View::RenderQuad(RenderPathCommand& command)
 
 bool View::IsNecessary(const RenderPathCommand& command)
 {
-    return command.enabled_ && (command.type_ != CMD_SCENEPASS || !batchQueues_[command.pass_].IsEmpty());
+    return command.enabled_ && command.outputNames_.Size() && (command.type_ != CMD_SCENEPASS ||
+        !batchQueues_[command.pass_].IsEmpty());
 }
 
 bool View::CheckViewportRead(const RenderPathCommand& command)
