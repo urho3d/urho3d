@@ -66,16 +66,12 @@ Matrix3x4 Plane::ReflectionMatrix() const
 
 Plane Plane::Transformed(const Matrix3& transform) const
 {
-    Vector3 newNormal = (transform * normal_).Normalized();
-    Vector3 newPoint = newNormal * intercept_;
-    return Plane(newNormal, newPoint);
+    return Plane(Matrix4(transform).Inverse().Transpose() * ToVector4());
 }
 
 Plane Plane::Transformed(const Matrix3x4& transform) const
 {
-    Vector3 newNormal = (transform * normal_).Normalized();
-    Vector3 newPoint = transform * (normal_ * intercept_);
-    return Plane(newNormal, newPoint);
+    return Plane(transform.ToMatrix4().Inverse().Transpose() * ToVector4());
 }
 
 Plane Plane::Transformed(const Matrix4& transform) const
