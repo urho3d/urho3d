@@ -255,6 +255,10 @@ bool Input::OpenJoystick(unsigned index)
 
         JoystickState& state = joysticks_[index];
         state.joystick_ = joystick;
+        if (SDL_IsGameController(index))
+        {
+            state.controller_ = SDL_GameControllerOpen(index);
+        }
         state.buttons_.Resize(SDL_JoystickNumButtons(joystick));
         state.buttonPress_.Resize(state.buttons_.Size());
         state.axes_.Resize(SDL_JoystickNumAxes(joystick));
@@ -842,6 +846,63 @@ void Input::HandleSDLEvent(void* sdlEvent)
             {
                 joysticks_[joystickIndex].hats_[evt.jhat.hat] = evt.jhat.value;
                 SendEvent(E_JOYSTICKHATMOVE, eventData);
+            }
+        }
+        break;
+
+    case SDL_CONTROLLERBUTTONDOWN:
+        {
+            using namespace ControllerButtonDown;
+
+            unsigned button = evt.cbutton.button;
+            unsigned joystickIndex = joystickIDMap_[evt.cbutton.which];
+
+            VariantMap eventData;
+            eventData[P_JOYSTICK] = joystickIndex;
+            eventData[P_BUTTON] = button;
+
+            if (joystickIndex < joysticks_.Size() && button < joysticks_[joystickIndex].buttons_.Size()) {
+                joysticks_[joystickIndex].buttons_[button] = true;
+                joysticks_[joystickIndex].buttonPress_[button] = true;
+                SendEvent(E_CONTROLLERBUTTONDOWN, eventData);
+            }
+        }
+        break;
+
+    case SDL_CONTROLLERBUTTONUP:
+        {
+            using namespace ControllerButtonUp;
+
+            unsigned button = evt.cbutton.button;
+            unsigned joystickIndex = joystickIDMap_[evt.cbutton.which];
+
+            VariantMap eventData;
+            eventData[P_JOYSTICK] = joystickIndex;
+            eventData[P_BUTTON] = button;
+
+            if (joystickIndex < joysticks_.Size() && button < joysticks_[joystickIndex].buttons_.Size()) {
+                joysticks_[joystickIndex].buttons_[button] = false;
+                SendEvent(E_CONTROLLERBUTTONUP, eventData);
+            }
+        }
+        break;
+
+    case SDL_CONTROLLERAXISMOTION:
+        {
+            using namespace ControllerAxisMove;
+
+            unsigned joystickIndex = joystickIDMap_[evt.caxis.which];
+
+            VariantMap eventData;
+            eventData[P_JOYSTICK] = joystickIndex;
+            eventData[P_AXIS] = evt.caxis.axis;
+            eventData[P_POSITION] = Clamp((float)evt.caxis.value / 32767.0f, -1.0f, 1.0f);
+
+            if (joystickIndex < joysticks_.Size() && evt.caxis.axis <
+                joysticks_[joystickIndex].axes_.Size())
+            {
+                joysticks_[joystickIndex].axes_[evt.caxis.axis] = eventData[P_POSITION].GetFloat();
+                SendEvent(E_CONTROLLERAXISMOVE, eventData);
             }
         }
         break;

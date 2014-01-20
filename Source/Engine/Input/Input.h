@@ -52,7 +52,7 @@ struct JoystickState
 {
     /// Construct with defaults.
     JoystickState() :
-        joystick_(0)
+        joystick_(0), controller_(0)
     {
     }
     
@@ -101,6 +101,8 @@ struct JoystickState
     
     /// SDL joystick.
     SDL_Joystick* joystick_;
+    /// SDL game controller
+    SDL_GameController* controller_;
     /// Joystick name.
     String name_;
     /// Button up/down state.
