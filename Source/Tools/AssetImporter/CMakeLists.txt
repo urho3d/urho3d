@@ -31,7 +31,6 @@ add_subdirectory (../../ThirdParty/Assimp ../../ThirdParty/Assimp)
 set (LIBS ../../ThirdParty/Assimp/include)
 
 # Setup target
-prepare_amalgamated_build (FINALIZED)
 if (APPLE)
     setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
 endif ()
