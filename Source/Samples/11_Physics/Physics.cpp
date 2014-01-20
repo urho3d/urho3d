@@ -96,8 +96,8 @@ void Physics::CreateScene()
     Zone* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
-    zone->SetFogColor(Color(0.7f, 0.6f, 0.5f));
-    zone->SetFogStart(150.0f);
+    zone->SetFogColor(Color(1.0f, 1.0f, 1.0f));
+    zone->SetFogStart(300.0f);
     zone->SetFogEnd(500.0f);
     
     // Create a directional light to the world. Enable cascaded shadows on it

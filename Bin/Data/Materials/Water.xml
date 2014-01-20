@@ -7,5 +7,5 @@
     <parameter name="NoiseTiling" value="50" />
     <parameter name="NoiseStrength" value="0.02" />
     <parameter name="FresnelPower" value="8" />
-    <parameter name="WaterTint" value="0.6 0.6 0.8" />
+    <parameter name="WaterTint" value="0.8 0.8 1.0" />
 </material>

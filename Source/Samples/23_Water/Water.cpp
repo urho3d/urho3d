@@ -89,8 +89,8 @@ void Water::CreateScene()
     Zone* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
     zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
-    zone->SetFogColor(Color(0.4f, 0.5f, 0.7f));
-    zone->SetFogStart(150.0f);
+    zone->SetFogColor(Color(1.0f, 1.0f, 1.0f));
+    zone->SetFogStart(500.0f);
     zone->SetFogEnd(750.0f);
 
     // Create a directional light to the world. Enable cascaded shadows on it
@@ -101,6 +101,9 @@ void Water::CreateScene()
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.0001f, 0.5f));
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
+    light->SetSpecularIntensity(0.5f);
+    // Apply slightly overbright lighting to match the skybox
+    light->SetColor(Color(1.2f, 1.2f, 1.2f));
 
     // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
     // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will

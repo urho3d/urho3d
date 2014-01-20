@@ -54,8 +54,8 @@ function CreateScene()
     local zone = zoneNode:CreateComponent("Zone")
     zone.boundingBox = BoundingBox(-1000.0, 1000.0)
     zone.ambientColor = Color(0.15, 0.15, 0.15)
-    zone.fogColor = Color(0.7, 0.6, 0.5)
-    zone.fogStart = 150.0
+    zone.fogColor = Color(1.0, 1.0, 1.0)
+    zone.fogStart = 300.0
     zone.fogEnd = 500.0
 
     -- Create a directional light to the world. Enable cascaded shadows on it

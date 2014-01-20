@@ -45,8 +45,8 @@ void CreateScene()
     Zone@ zone = zoneNode.CreateComponent("Zone");
     zone.boundingBox = BoundingBox(-1000.0f, 1000.0f);
     zone.ambientColor = Color(0.15f, 0.15f, 0.15f);
-    zone.fogColor = Color(0.4f, 0.5f, 0.7f);
-    zone.fogStart = 150.0f;
+    zone.fogColor = Color(1.0f, 1.0f, 1.0f);
+    zone.fogStart = 500.0f;
     zone.fogEnd = 750.0f;
 
     // Create a directional light to the world. Enable cascaded shadows on it
@@ -58,6 +58,8 @@ void CreateScene()
     light.shadowBias = BiasParameters(0.0001f, 0.5f);
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
     light.specularIntensity = 0.5f;
+    // Apply slightly overbright lighting to match the skybox
+    light.color = Color(1.2f, 1.2f, 1.2f);
 
     // Create skybox. The Skybox component is used like StaticModel, but it will be always located at the camera, giving the
     // illusion of the box planes being far away. Use just the ordinary Box model and a suitable material, whose shader will

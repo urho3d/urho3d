@@ -92,7 +92,6 @@ DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
 Engine.
 Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
 Ninja model and terrain, water, smoke, flare and status bar textures from OGRE.
-Skybox cubemap from http://www.codemonsters.de.
 BlueHighway font from Larabie Fonts.
 Anonymous Pro font by Mark Simonson.
 NinjaSnowWar sounds by Veli-Pekka Tätilä.
