@@ -71,6 +71,7 @@ Camera::Camera(Context* context) :
     fillMode_(FILL_SOLID),
     projectionOffset_(Vector2::ZERO),
     reflectionPlane_(Plane::UP),
+    clipPlane_(Plane::UP),
     autoAspectRatio_(true),
     flipVertical_(false),
     useReflection_(false),
