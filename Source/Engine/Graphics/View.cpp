@@ -401,14 +401,8 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         // Check if ambient pass and G-buffer rendering happens at the same time
         if (command.type_ == CMD_SCENEPASS && command.outputNames_.Size() > 1)
         {
-            for (unsigned j = 0; j < command.outputNames_.Size(); ++j)
-            {
-                if (!command.outputNames_[j].Compare("viewport", false))
-                {
-                    deferredAmbient_ = true;
-                    break;
-                }
-            }
+            if (CheckViewportWrite(command))
+                deferredAmbient_ = true;
         }
         
         if (command.type_ == CMD_LIGHTVOLUMES)
@@ -1242,29 +1236,61 @@ void View::ExecuteRenderPathCommands()
         
         // Set for safety in case of empty renderpath
         currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
+        currentViewportTexture_ = 0;
 
         bool viewportModified = false;
         bool isPingponging = false;
         
+        unsigned lastCommandIndex = 0;
+        for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
+        {
+            RenderPathCommand& command = renderPath_->commands_[i];
+            if (IsNecessary(command))
+                lastCommandIndex = i;
+        }
+
         for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
         {
             RenderPathCommand& command = renderPath_->commands_[i];
             if (!IsNecessary(command))
                 continue;
+
+            bool viewportRead = CheckViewportRead(command);
+            bool viewportWrite = CheckViewportWrite(command);
+            bool beginPingpong = CheckPingpong(i);
             
             // Has the viewport been modified and will be read as a texture by the current command?
-            if (CheckViewportRead(command) && viewportModified)
+            if (viewportRead && viewportModified)
             {
+                // Start pingponging without a blit if already rendering to the substitute render target
+                if (currentRenderTarget_ && currentRenderTarget_ == substituteRenderTarget_ && beginPingpong)
+                    isPingponging = true;
+                
                 // If not using pingponging, simply resolve/copy to the first viewport texture
                 if (!isPingponging)
                 {
                     if (!currentRenderTarget_)
+                    {
                         graphics_->ResolveToTexture(viewportTextures_[0], viewRect_);
+                        currentViewportTexture_ = viewportTextures_[0];
+                        viewportModified = false;
+                    }
                     else
                     {
-                        /// \todo Must use dynamic_cast because the render target could also be a cube map. That will not currently work
-                        BlitFramebuffer(dynamic_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()),
-                            viewportTextures_[0]->GetRenderSurface(), false);
+                        if (viewportWrite)
+                        {
+                            BlitFramebuffer(static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture()),
+                                viewportTextures_[0]->GetRenderSurface(), false);
+                            currentViewportTexture_ = viewportTextures_[0];
+                            viewportModified = false;
+                        }
+                        else
+                        {
+                            // If the current render target is already a texture, and we are not writing to it, can read that
+                            // texture directly instead of blitting. However keep the viewport dirty flag in case a later command
+                            // will do both read and write, and then we need to blit / resolve
+                            currentViewportTexture_ = static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture());
+                        }
                     }
                 }
                 else
@@ -1272,20 +1298,27 @@ void View::ExecuteRenderPathCommands()
                     // Swap the pingpong double buffer sides. Texture 0 will be read next
                     viewportTextures_[1] = viewportTextures_[0];
                     viewportTextures_[0] = static_cast<Texture2D*>(currentRenderTarget_->GetParentTexture());
+                    currentViewportTexture_ = viewportTextures_[0];
+                    viewportModified = false;
                 }
-
-                viewportModified = false;
             }
-
-            // Check if current command begins / continues the pingpong chain. The final command in the renderpath ends the chain
-            // by rendering to the destination render target again
-            if (CheckPingpong(i))
-            {
+            
+            if (beginPingpong)
                 isPingponging = true;
-                currentRenderTarget_ = viewportTextures_[1]->GetRenderSurface();
+
+            // Determine viewport write target
+            if (viewportWrite)
+            {
+                if (isPingponging)
+                {
+                    currentRenderTarget_ = viewportTextures_[1]->GetRenderSurface();
+                    // If the render path ends into a quad, it can be redirected to the final render target
+                    if (i == lastCommandIndex && command.type_ == CMD_QUAD)
+                        currentRenderTarget_ = renderTarget_;
+                }
+                else
+                    currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
             }
-            else
-                currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
 
             switch (command.type_)
             {
@@ -1388,7 +1421,7 @@ void View::ExecuteRenderPathCommands()
             }
 
             // If current command output to the viewport, mark it modified
-            if (!command.outputNames_[0].Compare("viewport", false))
+            if (viewportWrite)
                 viewportModified = true;
         }
     }
@@ -1480,7 +1513,7 @@ void View::SetTextures(RenderPathCommand& command)
         // Bind the rendered output
         if (!command.textureNames_[i].Compare("viewport", false))
         {
-            graphics_->SetTexture(i, viewportTextures_[0]);
+            graphics_->SetTexture(i, currentViewportTexture_);
             continue;
         }
         
@@ -1589,35 +1622,40 @@ bool View::CheckViewportRead(const RenderPathCommand& command)
     return false;
 }
 
+bool View::CheckViewportWrite(const RenderPathCommand& command)
+{
+    for (unsigned i = 0; i < command.outputNames_.Size(); ++i)
+    {
+        if (!command.outputNames_[i].Compare("viewport", false))
+            return true;
+    }
+    
+    return false;
+}
+
+
 bool View::CheckPingpong(unsigned index)
 {
+    // Current command must be a viewport-writing quad to begin the pingpong chain
     RenderPathCommand& current = renderPath_->commands_[index];
-    if (current.type_ != CMD_QUAD || current.outputNames_.Size() != 1 || current.outputNames_[0].Compare("viewport", false))
+    if (current.type_ != CMD_QUAD || !CheckViewportWrite(current))
         return false;
 
     // If there are commands other than quads that target the viewport, we must keep rendering to the final target and resolving
     // to a viewport texture when necessary instead of pingponging, as a scene pass is not guaranteed to fill the entire viewport
     for (unsigned i = index + 1; i < renderPath_->commands_.Size(); ++i)
     {
-        RenderPathCommand& command = renderPath_->commands_[index];
+        RenderPathCommand& command = renderPath_->commands_[i];
         if (!IsNecessary(command))
             continue;
-        if (!command.outputNames_[0].Compare("viewport", false) && command.type_ != CMD_QUAD)
-            return false;
+        if (CheckViewportWrite(command))
+        {
+            if (command.type_ != CMD_QUAD)
+                return false;
+        }
     }
 
-    // Pingponging is OK when there are several quad commands in sequence at the end of the renderpath
-    for (unsigned i = index + 1; i < renderPath_->commands_.Size(); ++i)
-    {
-        RenderPathCommand& command = renderPath_->commands_[index];
-        if (!IsNecessary(command))
-            continue;
-        if (command.type_ == CMD_QUAD && current.outputNames_.Size() == 1 && current.outputNames_[0].Compare("viewport", false))
-            return true;
-    }
-
-    // Note: the last quad command does not pingpong; it should write to the final destination rendertarget
-    return false;
+    return true;
 }
 
 void View::AllocateScreenBuffers()
@@ -1631,7 +1669,6 @@ void View::AllocateScreenBuffers()
     if ((deferred_ && !renderTarget_) || (deferredAmbient_ && renderTarget_ && renderTarget_->GetParentTexture()->GetFormat() !=
         Graphics::GetRGBAFormat()))
         needSubstitute = true;
-
     #endif
     // If backbuffer is antialiased when using deferred rendering, need to reserve a buffer
     if (deferred_ && !renderTarget_ && graphics_->GetMultiSample() > 1)
@@ -1661,9 +1698,15 @@ void View::AllocateScreenBuffers()
     }
 
     if (hasViewportRead)
+    {
         ++numViewportTextures;
-    if (hasPingpong && !needSubstitute)
-        ++numViewportTextures;
+        // If we have viewport read and target is a cube map, must allocate a substitute target instead as BlitFramebuffer()
+        // does not support reading a cube map
+        if (renderTarget_ && renderTarget_->GetParentTexture()->GetType() == TextureCube::GetTypeStatic())
+            needSubstitute = true;
+        if (hasPingpong && !needSubstitute)
+            ++numViewportTextures;
+    }
 
     // Allocate screen buffers with filtering active in case the quad commands need that
     // Follow the sRGB mode of the destination render target
@@ -1678,8 +1721,8 @@ void View::AllocateScreenBuffers()
         viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(rtSize_.x_, rtSize_.y_, format, true, sRGB) :
             (Texture2D*)0;
     }
-    // If has allocated the substitute render target, it can also be used for pingponging
-    if (substituteRenderTarget_ && hasPingpong)
+    // If using a substitute render target and pingponging, the substitute can act as the second viewport texture
+    if (numViewportTextures == 1 && substituteRenderTarget_)
         viewportTextures_[1] = static_cast<Texture2D*>(substituteRenderTarget_->GetParentTexture());
     
     // Allocate extra render targets defined by the rendering path
@@ -1710,10 +1753,7 @@ void View::AllocateScreenBuffers()
 void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool depthWrite)
 {
     if (!source)
-    {
-        LOGERROR("Null source texture in BlitFramebuffer");
         return;
-    }
 
     PROFILE(BlitFramebuffer);
     

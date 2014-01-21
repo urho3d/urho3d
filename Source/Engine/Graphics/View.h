@@ -165,9 +165,11 @@ private:
     void RenderQuad(RenderPathCommand& command);
     /// Check if a command is enabled and has content to render. To be called only after render update has completed for the frame.
     bool IsNecessary(const RenderPathCommand& command);
-    /// Check if a command reads the rendered scene.
+    /// Check if a command reads the destination render target.
     bool CheckViewportRead(const RenderPathCommand& command);
-    /// Check whether a command should use pingponging instead of simple resolve to viewport texture.
+    /// Check if a command writes into the destination render target.
+    bool CheckViewportWrite(const RenderPathCommand& command);
+    /// Check whether a command should use pingponging instead of resolve from destination render target to viewport texture.
     bool CheckPingpong(unsigned index);
     /// Allocate needed screen buffers.
     void AllocateScreenBuffers();
@@ -268,6 +270,8 @@ private:
     Texture2D* viewportTextures_[MAX_VIEWPORT_TEXTURES];
     /// Color rendertarget active for the current renderpath command.
     RenderSurface* currentRenderTarget_;
+    /// Texture containing the latest viewport texture.
+    Texture2D* currentViewportTexture_;
     /// Viewport rectangle.
     IntRect viewRect_;
     /// Viewport size.

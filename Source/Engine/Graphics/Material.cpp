@@ -116,6 +116,7 @@ Material::Material(Context* context) :
 {
     SetNumTechniques(1);
     ResetToDefaults();
+    RefreshMemoryUse();
 }
 
 Material::~Material()
@@ -234,13 +235,7 @@ bool Material::Load(const XMLElement& source)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
     
     // Calculate memory use
-    unsigned memoryUse = sizeof(Material);
-    
-    memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
-    memoryUse += MAX_MATERIAL_TEXTURE_UNITS * sizeof(SharedPtr<Texture>);
-    memoryUse += shaderParameters_.Size() * sizeof(MaterialShaderParameter);
-    
-    SetMemoryUse(memoryUse);
+    RefreshMemoryUse();
     CheckOcclusion();
     return true;
 }
@@ -307,6 +302,7 @@ void Material::SetNumTechniques(unsigned num)
         return;
     
     techniques_.Resize(num);
+    RefreshMemoryUse();
 }
 
 void Material::SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel, float lodDistance)
@@ -340,6 +336,8 @@ void Material::SetShaderParameter(const String& name, const Variant& value)
             specular_ = vec.x_ > 0.0f || vec.y_ > 0.0f || vec.z_ > 0.0f;
         }
     }
+    
+    RefreshMemoryUse();
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -404,6 +402,8 @@ void Material::RemoveShaderParameter(const String& name)
 
     if (nameHash == PSP_MATSPECCOLOR)
         specular_ = false;
+    
+    RefreshMemoryUse();
 }
 
 void Material::ReleaseShaders()
@@ -426,8 +426,10 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     for (unsigned i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         ret->textures_[i] = textures_[i];
     ret->occlusion_ = occlusion_;
+    ret->specular_ = specular_;
     ret->cullMode_ = cullMode_;
     ret->shadowCullMode_ = shadowCullMode_;
+    ret->RefreshMemoryUse();
     
     return ret;
 }
@@ -516,6 +518,17 @@ void Material::ResetToDefaults()
     cullMode_ = CULL_CCW;
     shadowCullMode_ = CULL_CCW;
     depthBias_ = BiasParameters(0.0f, 0.0f);
+}
+
+void Material::RefreshMemoryUse()
+{
+    unsigned memoryUse = sizeof(Material);
+    
+    memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
+    memoryUse += MAX_MATERIAL_TEXTURE_UNITS * sizeof(SharedPtr<Texture>);
+    memoryUse += shaderParameters_.Size() * sizeof(MaterialShaderParameter);
+    
+    SetMemoryUse(memoryUse);
 }
 
 }

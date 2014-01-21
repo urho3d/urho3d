@@ -155,6 +155,8 @@ private:
     void CheckOcclusion();
     /// Reset to defaults.
     void ResetToDefaults();
+    /// Recalculate the memory used by the material.
+    void RefreshMemoryUse();
     
     /// Techniques.
     Vector<TechniqueEntry> techniques_;
