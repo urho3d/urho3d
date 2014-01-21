@@ -50,7 +50,7 @@ if (NOT CMAKE_CXX_COMPILER)
 endif ()
 
 # specify the system root
-if (NOT BCM_VC_INCLUDE_DIR)
+if (NOT BCM_VC_INCLUDE_DIRS)
     # Keep invalidating the cache until we found the BCM library and its include directory which hopefully also mean we have found the correct SYSROOT
     unset (RASPI_SYSROOT CACHE)
     unset (CMAKE_INSTALL_PREFIX CACHE)

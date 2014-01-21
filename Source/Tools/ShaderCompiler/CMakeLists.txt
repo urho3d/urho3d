@@ -29,7 +29,7 @@ define_source_files ()
 # Define dependency libs
 add_subdirectory (../../ThirdParty/MojoShader ../../ThirdParty/MojoShader)
 set (LIBS ../../ThirdParty/MojoShader)
-set (ABSOLUTE_PATH_LIBS ${DIRECT3D_COMPILER_LIBRARY})
+set (ABSOLUTE_PATH_LIBS ${DIRECT3D_COMPILER_LIBRARIES})
 
 # Setup target
 add_definitions (-DMOJOSHADER_NO_VERSION_INCLUDE)

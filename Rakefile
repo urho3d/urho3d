@@ -67,7 +67,7 @@ include (Urho3D-CMake-magic)
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
-include_directories (\\${URHO3D_INCLUDE_DIR})
+include_directories (\\${URHO3D_INCLUDE_DIRS})
 
 # Define target name
 set (TARGET_NAME Main)

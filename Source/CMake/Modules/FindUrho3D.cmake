@@ -24,7 +24,7 @@
 # For project root tree detection to work, Urho3D library must be already been built
 #
 #  URHO3D_FOUND
-#  URHO3D_INCLUDE_DIR
+#  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
 #
 
@@ -60,16 +60,16 @@ if (URHO3D_HOME)
     find_file (SOURCE_TREE_PATH Urho3D.h.in ${URHO3D_HOME}/Source/Engine NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     if (SOURCE_TREE_PATH)
         get_filename_component (SOURCE_TREE_PATH ${SOURCE_TREE_PATH} PATH)
-        set (URHO3D_INCLUDE_DIR ${SOURCE_TREE_PATH})
+        set (URHO3D_INCLUDE_DIRS ${SOURCE_TREE_PATH})
         foreach (DIR Audio Container Core Engine Graphics Input IO LuaScript Math Navigation Network Physics Resource Scene Script UI)
-            list (APPEND URHO3D_INCLUDE_DIR ${SOURCE_TREE_PATH}/${DIR})     # Note: variable change to list context after this
+            list (APPEND URHO3D_INCLUDE_DIRS ${SOURCE_TREE_PATH}/${DIR})     # Note: variable change to list context after this
         endforeach ()
         set (DIRS Bullet/src kNet/include SDL/include)
         if (ENABLE_ANGELSCRIPT)
             list (APPEND DIRS AngelScript/include)
         endif ()
         foreach (DIR ${DIRS})
-            list (APPEND URHO3D_INCLUDE_DIR ${URHO3D_HOME}/Source/ThirdParty/${DIR})
+            list (APPEND URHO3D_INCLUDE_DIRS ${URHO3D_HOME}/Source/ThirdParty/${DIR})
         endforeach ()
 
         # For non Urho3D project using Urho3D as external library, Urho3D project itself must be built using predefined build directory as per specified in the provided build scripts.
@@ -80,7 +80,7 @@ if (URHO3D_HOME)
         else ()
             set (BINARY_DIR ${URHO3D_HOME}/${PLATFORM_PREFIX}Build)
         endif () 
-        list (APPEND URHO3D_INCLUDE_DIR ${BINARY_DIR}/Engine)
+        list (APPEND URHO3D_INCLUDE_DIRS ${BINARY_DIR}/Engine)
         if (ANDROID)
             if (IS_INTERNAL)
                 set (URHO3D_LIB_SEARCH_PATH ${ANDROID_LIBRARY_OUTPUT_PATH})
@@ -117,22 +117,22 @@ else ()
         set (URHO3D_INC_SEARCH_PATH /opt/include)
         set (URHO3D_LIB_SEARCH_PATH /opt/lib)
     endif ()
-    find_path (URHO3D_INCLUDE_DIR Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
+    find_path (URHO3D_INCLUDE_DIRS Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
     find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
 
-    if (URHO3D_INCLUDE_DIR)
-        set (BASE_DIR ${URHO3D_INCLUDE_DIR})
+    if (URHO3D_INCLUDE_DIRS)
+        set (BASE_DIR ${URHO3D_INCLUDE_DIRS})
         set (DIRS Bullet kNet SDL)
         if (ENABLE_ANGELSCRIPT)
             list (APPEND DIRS AngelScript)
         endif ()
         foreach (DIR ${DIRS})
-            list (APPEND URHO3D_INCLUDE_DIR ${BASE_DIR}/${DIR})     # Note: variable change to list context after this, so we need BASE_DIR to remain the same
+            list (APPEND URHO3D_INCLUDE_DIRS ${BASE_DIR}/${DIR})     # Note: variable change to list context after this, so we need BASE_DIR to remain the same
         endforeach ()
     endif ()
 endif ()
 
-if (URHO3D_INCLUDE_DIR AND URHO3D_LIBRARIES)
+if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES)
     set (URHO3D_FOUND 1)
     if (NOT FOUND_MESSAGE)
         set (FOUND_MESSAGE "Found Urho3D: ${URHO3D_LIBRARIES}")
@@ -141,7 +141,7 @@ endif ()
 
 if (URHO3D_FOUND)
     include (FindPackageMessage)
-    FIND_PACKAGE_MESSAGE (Urho3D ${FOUND_MESSAGE} "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIR}]")
+    FIND_PACKAGE_MESSAGE (Urho3D ${FOUND_MESSAGE} "[${URHO3D_LIBRARIES}][${URHO3D_INCLUDE_DIRS}]")
 else ()
     if (Urho3D_FIND_REQUIRED)
         message (FATAL_ERROR
@@ -151,4 +151,4 @@ else ()
     endif ()
 endif ()
 
-mark_as_advanced (URHO3D_INCLUDE_DIR URHO3D_LIBRARIES)
+mark_as_advanced (URHO3D_INCLUDE_DIRS URHO3D_LIBRARIES)

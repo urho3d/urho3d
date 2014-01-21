@@ -25,7 +25,7 @@ project (Urho3D-Samples)
 
 # Find Urho3D library
 find_package (Urho3D REQUIRED)
-include_directories (${URHO3D_INCLUDE_DIR})
+include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Include common to all samples
 set (COMMON_SAMPLE_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Sample.h" "${CMAKE_CURRENT_SOURCE_DIR}/Sample.inl")
