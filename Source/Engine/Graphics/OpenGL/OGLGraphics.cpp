@@ -2426,7 +2426,7 @@ unsigned Graphics::GetDepthStencilFormat()
     #ifndef GL_ES_VERSION_2_0
     return GL_DEPTH24_STENCIL8_EXT;
     #else
-    return GL_DEPTH_COMPONENT;
+    return GL_DEPTH_COMPONENT16;
     #endif
 }
 

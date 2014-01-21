@@ -1700,10 +1700,19 @@ void View::AllocateScreenBuffers()
     if (hasViewportRead)
     {
         ++numViewportTextures;
+
+        // If OpenGL ES, use substitute target to avoid resolve from the backbuffer, which may be slow. However if multisampling
+        // is specified, there is no choice
+        #ifdef GL_ES_VERSION_2_0
+        if (!renderTarget_ && graphics_->GetMultiSample() < 2)
+            needSubstitute = true;
+        #endif
+
         // If we have viewport read and target is a cube map, must allocate a substitute target instead as BlitFramebuffer()
         // does not support reading a cube map
         if (renderTarget_ && renderTarget_->GetParentTexture()->GetType() == TextureCube::GetTypeStatic())
             needSubstitute = true;
+
         if (hasPingpong && !needSubstitute)
             ++numViewportTextures;
     }

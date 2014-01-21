@@ -409,7 +409,7 @@ bool Texture2D::Create()
         LOGWARNING("Texture creation while device is lost");
         return true;
     }
-    
+
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
@@ -419,7 +419,7 @@ bool Texture2D::Create()
     #ifndef GL_ES_VERSION_2_0
     if (format == Graphics::GetDepthStencilFormat())
     #else
-    if (!graphics_->GetShadowMapFormat() && externalFormat == GL_DEPTH_COMPONENT)
+    if (format == Graphics::GetDepthStencilFormat() || (!graphics_->GetShadowMapFormat() && externalFormat == GL_DEPTH_COMPONENT))
     #endif
     {
         if (renderSurface_)
