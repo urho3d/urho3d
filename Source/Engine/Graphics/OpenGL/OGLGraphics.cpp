@@ -280,7 +280,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         }
         else
         {
-            maximize = true;
+            maximize = resizable;
             width = 1024;
             height = 768;
         }
