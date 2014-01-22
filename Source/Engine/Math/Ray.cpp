@@ -30,18 +30,6 @@
 namespace Urho3D
 {
 
-Vector3 Ray::Project(const Vector3& point) const
-{
-    Vector3 offset = point - origin_;
-    return origin_ + offset.DotProduct(direction_) * direction_;
-}
-
-float Ray::Distance(const Vector3& point) const
-{
-    Vector3 projected = Project(point);
-    return (point - projected).Length();
-}
-
 Vector3 Ray::ClosestPoint(const Ray& ray) const
 {
     // Algorithm based on http://paulbourke.net/geometry/lineline3d/

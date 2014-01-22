@@ -31,17 +31,17 @@ const Plane Plane::UP(Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f));
 
 void Plane::Transform(const Matrix3& transform)
 {
-    *this = Transformed(transform);
+    Define(Matrix4(transform).Inverse().Transpose() * ToVector4());
 }
 
 void Plane::Transform(const Matrix3x4& transform)
 {
-    *this = Transformed(transform);
+    Define(transform.ToMatrix4().Inverse().Transpose() * ToVector4());
 }
 
 void Plane::Transform(const Matrix4& transform)
 {
-    *this = Transformed(transform);
+    Define(transform.Inverse().Transpose() * ToVector4());
 }
 
 Matrix3x4 Plane::ReflectionMatrix() const

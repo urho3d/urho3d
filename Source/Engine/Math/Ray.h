@@ -43,10 +43,9 @@ public:
     }
     
     /// Construct from origin and direction. The direction will be normalized.
-    Ray(const Vector3& origin, const Vector3& direction) :
-        origin_(origin),
-        direction_(direction.Normalized())
+    Ray(const Vector3& origin, const Vector3& direction)
     {
+        Define(origin, direction);
     }
     
     /// Copy-construct from another ray.
@@ -77,9 +76,19 @@ public:
     }
     
     /// Project a point on the ray.
-    Vector3 Project(const Vector3& point) const;
-    /// Return distance of a point from the ray
-    float Distance(const Vector3& point) const;
+    Vector3 Project(const Vector3& point) const
+    {
+        Vector3 offset = point - origin_;
+        return origin_ + offset.DotProduct(direction_) * direction_;
+    }
+
+    /// Return distance of a point from the ray.
+    float Distance(const Vector3& point) const
+    {
+        Vector3 projected = Project(point);
+        return (point - projected).Length();
+    }
+
     /// Return closest point to another ray.
     Vector3 ClosestPoint(const Ray& ray) const;
     /// Return hit distance to a plane, or infinity if no hit.
