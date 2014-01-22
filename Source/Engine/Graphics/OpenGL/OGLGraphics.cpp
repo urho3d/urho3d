@@ -147,6 +147,10 @@ static const unsigned glVertexAttrIndex[] =
 
 static const unsigned MAX_FRAMEBUFFER_AGE = 2000;
 
+#ifdef GL_ES_VERSION_2_0
+static unsigned glesDepthStencilFormat = GL_DEPTH_COMPONENT16;
+#endif
+
 bool CheckExtension(String& extensions, const String& name)
 {
     if (extensions.Empty())
@@ -2426,7 +2430,7 @@ unsigned Graphics::GetDepthStencilFormat()
     #ifndef GL_ES_VERSION_2_0
     return GL_DEPTH24_STENCIL8_EXT;
     #else
-    return GL_DEPTH_COMPONENT16;
+    return glesDepthStencilFormat;
     #endif
 }
 
@@ -2498,6 +2502,11 @@ void Graphics::CheckFeatureSupport(String& extensions)
     if (numSupportedRTs >= 4)
         deferredSupport_ = true;
     #else
+    // Check for best supported depth renderbuffer format for GLES2
+    if (CheckExtension(extensions, "GL_OES_depth24"))
+        glesDepthStencilFormat = GL_DEPTH_COMPONENT24_OES;
+    if (CheckExtension(extensions, "GL_OES_packed_depth_stencil"))
+        glesDepthStencilFormat = GL_DEPTH24_STENCIL8_OES;
     if (!CheckExtension(extensions, "GL_OES_depth_texture"))
     {
         shadowMapFormat_ = 0;
@@ -2659,9 +2668,9 @@ void Graphics::CommitFramebuffer()
         // Bind either a renderbuffer or a depth texture, depending on what is available
         Texture* texture = depthStencil_->GetParentTexture();
         #ifndef GL_ES_VERSION_2_0
-        bool hasStencil = texture->GetFormat() == GetDepthStencilFormat();
+        bool hasStencil = texture->GetFormat() == GL_DEPTH24_STENCIL8_EXT;
         #else
-        bool hasStencil = false;
+        bool hasStencil = texture->GetFormat() == GL_DEPTH24_STENCIL8_OES;
         #endif
         unsigned renderBufferID = depthStencil_->GetRenderBuffer();
         if (!renderBufferID)
