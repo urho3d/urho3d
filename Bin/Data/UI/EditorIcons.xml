@@ -203,6 +203,10 @@
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="64 32 78 46" />
     </element>
+    <element type="ToolTip">
+        <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
+        <attribute name="Image Rect" value="64 32 78 46" />
+    </element>
     <element type="Unknown">
         <attribute name="Texture" value="Texture2D;Textures/EditorIcons.png" />
         <attribute name="Image Rect" value="240 64 254 78" />
