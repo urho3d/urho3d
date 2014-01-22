@@ -114,7 +114,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
         batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) : (selected_ && selectionColor_.a_ > 0.0f ? 
             selectionColor_: hoverColor_));
-        batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0);
+        batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0);
         UIBatch::AddOrMerge(batch, batches);
     }
 
@@ -134,7 +134,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 if (charPositions_[i].y_ != currentStart.y_)
                 {
                     batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
-                        0, 0, 0, 0);
+                        0, 0);
                     currentStart = charPositions_[i];
                     currentEnd = currentStart + charSizes_[i];
                 }
@@ -148,7 +148,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         if (currentEnd != currentStart)
         {
             batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_,
-                0, 0, 0, 0);
+                0, 0);
         }
 
         UIBatch::AddOrMerge(batch, batches);
