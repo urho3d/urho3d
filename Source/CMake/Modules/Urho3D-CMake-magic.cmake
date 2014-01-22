@@ -134,13 +134,13 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
     add_definitions (-DURHO3D_STATIC_DEFINE)
 endif ()
 
-# Find DirectX SDK include & library directories if applicable. The headers in the SDK will
-# be incompatible with MinGW, so only search when using Visual Studio.
+# Find DirectX SDK include & library directories if applicable
 # Note: if a recent Windows SDK is installed instead, it will be possible to compile without;
 # therefore do not log a fatal error in that case
-if (MSVC)
+if (WIN32)
     find_package (Direct3D)
-    if (DIRECT3D_FOUND)
+    if (MSVC AND DIRECT3D_FOUND)
+        # The headers in the SDK will be incompatible with MinGW, so only add the include directories when using Visual Studio
         include_directories (${DIRECT3D_INCLUDE_DIRS})
     endif ()
 endif ()
