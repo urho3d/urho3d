@@ -148,6 +148,7 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("TouchState", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("TouchState", "const int touchID", offsetof(TouchState, touchID_));
     engine->RegisterObjectProperty("TouchState", "const IntVector2 position", offsetof(TouchState, position_));
+    engine->RegisterObjectProperty("TouchState", "const IntVector2 lastPosition", offsetof(TouchState, lastPosition_));
     engine->RegisterObjectProperty("TouchState", "const IntVector2 delta", offsetof(TouchState, delta_));
     engine->RegisterObjectProperty("TouchState", "const float pressure", offsetof(TouchState, pressure_));
     
