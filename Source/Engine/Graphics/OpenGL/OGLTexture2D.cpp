@@ -419,7 +419,8 @@ bool Texture2D::Create()
     #ifndef GL_ES_VERSION_2_0
     if (format == Graphics::GetDepthStencilFormat())
     #else
-    if (format == Graphics::GetDepthStencilFormat() || (!graphics_->GetShadowMapFormat() && externalFormat == GL_DEPTH_COMPONENT))
+    if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24_OES || format == GL_DEPTH24_STENCIL8_OES ||
+        (format == GL_DEPTH_COMPONENT && !graphics_->GetShadowMapFormat()))
     #endif
     {
         if (renderSurface_)

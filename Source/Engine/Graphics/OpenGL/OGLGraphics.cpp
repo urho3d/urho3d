@@ -2514,6 +2514,11 @@ void Graphics::CheckFeatureSupport(String& extensions)
     }
     else
     {
+        #ifdef IOS
+        // iOS hack: depth renderbuffer seems to fail, so use depth textures for everything
+        // if supported
+        glesDepthStencilFormat = GL_DEPTH_COMPONENT;
+        #endif
         shadowMapFormat_ = GL_DEPTH_COMPONENT;
         hiresShadowMapFormat_ = 0;
     }
