@@ -405,14 +405,15 @@ void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float
         }
     }
 
+    batch.SetColor(DEBUG_DRAW_COLOR, true);
     // Left
-    batch.AddQuad(0, 0, horizontalThickness, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, 0, horizontalThickness, size_.y_, 0, 0, 0, 0);
     // Top
-    batch.AddQuad(0, 0, size_.x_, verticalThickness, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, 0, size_.x_, verticalThickness, 0, 0, 0, 0);
     // Right
-    batch.AddQuad(size_.x_ - horizontalThickness, 0, horizontalThickness, size_.y_, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(size_.x_ - horizontalThickness, 0, horizontalThickness, size_.y_, 0, 0, 0, 0);
     // Bottom
-    batch.AddQuad(0, size_.y_ - verticalThickness, size_.x_, verticalThickness, 0, 0, 0, 0, DEBUG_DRAW_COLOR);
+    batch.AddQuad(0, size_.y_ - verticalThickness, size_.x_, verticalThickness, 0, 0, 0, 0);
 
     UIBatch::AddOrMerge(batch, batches);
 }

@@ -45,11 +45,11 @@ UIBatch::UIBatch() :
     blendMode_(BLEND_REPLACE),
     texture_(0),
     invTextureSize_(Vector2::ONE),
-    fixedColor_(0),
     vertexData_(0),
     vertexStart_(0),
     vertexEnd_(0)
 {
+    SetDefaultColor();
 }
 
 UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
@@ -58,30 +58,50 @@ UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor
     scissor_(scissor),
     texture_(texture),
     invTextureSize_(texture ? Vector2(1.0f / (float)texture->GetWidth(), 1.0f / (float)texture->GetHeight()) : Vector2::ONE),
-    fixedColor_(element->GetDerivedColor().ToUInt()),
     vertexData_(vertexData),
     vertexStart_(vertexData->Size()),
     vertexEnd_(vertexData->Size())
 {
+    SetDefaultColor();
 }
 
-void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight,
-    Color* color)
+void UIBatch::SetColor(const Color& color, bool overrideAlpha)
+{
+    if (!element_)
+        overrideAlpha = true;
+
+    useGradient_ = false;
+    color_ = overrideAlpha ? color.ToUInt() : Color(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity()).ToUInt();
+}
+
+void UIBatch::SetDefaultColor()
+{
+    if (element_)
+    {
+        color_ = element_->GetDerivedColor().ToUInt();
+        useGradient_ = element_->HasColorGradient();
+    }
+    else
+    {
+        color_ = 0xffffffff;
+        useGradient_ = false;
+    }
+}
+
+void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
 
-    if (color || !element_->HasColorGradient())
+    if (!useGradient_)
     {
-        unsigned uintColor = color ? color->ToUInt() : fixedColor_;
-        
         // If alpha is 0, nothing will be rendered, so do not add the quad
-        if (!(uintColor & 0xff000000))
+        if (!(color_ & 0xff000000))
             return;
         
-        topLeftColor = uintColor;
-        topRightColor = uintColor;
-        bottomLeftColor = uintColor;
-        bottomRightColor = uintColor;
+        topLeftColor = color_;
+        topRightColor = color_;
+        bottomLeftColor = color_;
+        bottomRightColor = color_;
     }
     else
     {
@@ -134,22 +154,20 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 }
 
 void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
-    int texWidth, int texHeight, Color* color)
+    int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
     
-    if (color || !element_->HasColorGradient())
+    if (!useGradient_)
     {
-        unsigned uintColor = color ? color->ToUInt() : fixedColor_;
-        
         // If alpha is 0, nothing will be rendered, so do not add the quad
-        if (!(uintColor & 0xff000000))
+        if (!(color_ & 0xff000000))
             return;
         
-        topLeftColor = uintColor;
-        topRightColor = uintColor;
-        bottomLeftColor = uintColor;
-        bottomRightColor = uintColor;
+        topLeftColor = color_;
+        topRightColor = color_;
+        bottomLeftColor = color_;
+        bottomRightColor = color_;
     }
     else
     {
@@ -231,13 +249,6 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
         
         tileY += tileH;
     }
-}
-
-void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight,
-    const Color& color)
-{
-    Color derivedColor(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity());
-    AddQuad(x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight, &derivedColor);
 }
 
 bool UIBatch::Merge(const UIBatch& batch)
