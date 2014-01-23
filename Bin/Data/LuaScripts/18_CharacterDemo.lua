@@ -5,14 +5,17 @@
 --     - Manual control of a bone scene node
 --     - Implementing 1st and 3rd person cameras, using raycasts to avoid the 3rd person camera clipping into scenery
 --     - Saving and loading the variables of a script object
+--     - Using touch inputs/gyroscope for iOS/Android (implemented through an external file)
 
 require "LuaScripts/Utilities/Sample"
 
-local CTRL_FORWARD = 1
-local CTRL_BACK = 2
-local CTRL_LEFT = 4
-local CTRL_RIGHT = 8
-local CTRL_JUMP = 16
+-- Variables used by external file are made global in order to be accessed
+
+CTRL_FORWARD = 1
+CTRL_BACK = 2
+CTRL_LEFT = 4
+CTRL_RIGHT = 8
+CTRL_JUMP = 16
 
 local MOVE_FORCE = 0.8
 local INAIR_MOVE_FORCE = 0.02
@@ -21,22 +24,22 @@ local JUMP_FORCE = 7.0
 local YAW_SENSITIVITY = 0.1
 local INAIR_THRESHOLD_TIME = 0.1
 
-local CAMERA_MIN_DIST = 1.0
-local CAMERA_MAX_DIST = 5.0
+CAMERA_MIN_DIST = 1.0
+CAMERA_MAX_DIST = 5.0
 
-local scene_ = nil
-local cameraNode = nil
-local characterNode = nil
-local firstPerson = false
+scene_ = nil
+cameraNode = nil
+characterNode = nil
+firstPerson = false
 
 local context = GetContext()
 
-local cache = GetCache()
+cache = GetCache()
 local fileSystem = GetFileSystem()
-local input = GetInput()
-local graphics = GetGraphics()
-local renderer = GetRenderer()
-local ui = GetUI()
+input = GetInput()
+graphics = GetGraphics()
+renderer = GetRenderer()
+ui = GetUI()
 
 function Start()
     -- Execute the common startup for samples
@@ -50,6 +53,9 @@ function Start()
 
     -- Create the UI content
     CreateInstructions()
+
+    -- Activate mobile stuff only when appropriate
+    if GetPlatform() == "Android" or GetPlatform() == "iOS" then require "LuaScripts/Utilities/Touch" end
 
     -- Subscribe to necessary events
     SubscribeToEvents()
@@ -201,6 +207,9 @@ function SubscribeToEvents()
 
     -- Subscribe to PostUpdate event for updating the camera position after physics simulation
     SubscribeToEvent("PostUpdate", "HandlePostUpdate")
+
+    -- Subscribe to mobile touch events
+    if GetPlatform() == "Android" or GetPlatform() == "iOS" then SubscribeToTouchEvents() end
 end
 
 function HandleUpdate(eventType, eventData)
@@ -213,40 +222,45 @@ function HandleUpdate(eventType, eventData)
         return
     end
 
-    -- Get movement controls and assign them to the character logic component. If UI has a focused element, clear controls
-    if ui.focusElement == nil then
-        character.controls:Set(CTRL_FORWARD, input:GetKeyDown(KEY_W))
-        character.controls:Set(CTRL_BACK, input:GetKeyDown(KEY_S))
-        character.controls:Set(CTRL_LEFT, input:GetKeyDown(KEY_A))
-        character.controls:Set(CTRL_RIGHT, input:GetKeyDown(KEY_D))
-        character.controls:Set(CTRL_JUMP, input:GetKeyDown(KEY_SPACE))
+    character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false) -- clear previous controls
+    if GetPlatform() == "Android" or GetPlatform() == "iOS" then updateTouches()
 
-        -- Add character yaw & pitch from the mouse motion
-        character.controls.yaw = character.controls.yaw + input.mouseMoveX * YAW_SENSITIVITY
-        character.controls.pitch = character.controls.pitch + input.mouseMoveY * YAW_SENSITIVITY
-        -- Limit pitch
-        character.controls.pitch = Clamp(character.controls.pitch, -80.0, 80.0)
+    else -- On desktop, get movement controls and assign them to the character logic component
 
-        -- Switch between 1st and 3rd person
-        if input:GetKeyPress(KEY_F) then
-            firstPerson = not firstPerson
-        end
+        if ui.focusElement == nil then
+            if input:GetKeyDown(KEY_W) then character.controls:Set(CTRL_FORWARD, true) end
+            if input:GetKeyDown(KEY_S) then character.controls:Set(CTRL_BACK, true) end
+            if input:GetKeyDown(KEY_A) then character.controls:Set(CTRL_LEFT, true) end
+            if input:GetKeyDown(KEY_D) then character.controls:Set(CTRL_RIGHT, true) end
+            if input:GetKeyDown(KEY_SPACE) then character.controls:Set(CTRL_JUMP, true) end
 
-        -- Check for loading / saving the scene
-        if input:GetKeyPress(KEY_F5) then
-            scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
-        end
-        if input:GetKeyPress(KEY_F7) then
-            scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
-            -- After loading we have to reacquire the character scene node, as it has been recreated
-            -- Simply find by name as there's only one of them
-            characterNode = scene_:GetChild("Jack", true)
-            if characterNode == nil then
-                return
+            -- Add character yaw & pitch from the mouse motion
+            character.controls.yaw = character.controls.yaw + input.mouseMoveX * YAW_SENSITIVITY
+            character.controls.pitch = character.controls.pitch + input.mouseMoveY * YAW_SENSITIVITY
+            -- Limit pitch
+            character.controls.pitch = Clamp(character.controls.pitch, -80.0, 80.0)
+
+            -- Switch between 1st and 3rd person
+            if input:GetKeyPress(KEY_F) then
+                firstPerson = not firstPerson
             end
+
+            -- Check for loading / saving the scene
+            if input:GetKeyPress(KEY_F5) then
+                scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
+            end
+            if input:GetKeyPress(KEY_F7) then
+                scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
+                -- After loading we have to reacquire the character scene node, as it has been recreated
+                -- Simply find by name as there's only one of them
+                characterNode = scene_:GetChild("Jack", true)
+                if characterNode == nil then
+                    return
+                end
+            end
+--  	  else
+--  	      character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false)
         end
-    else
-        character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false)
     end
 
     -- Set rotation already here so that it's updated every rendering frame instead of every physics frame
@@ -269,14 +283,14 @@ function HandlePostUpdate(eventType, eventData)
     local dir = rot * Quaternion(character.controls.pitch, Vector3(1.0, 0.0, 0.0))
 
     -- Turn head to camera pitch, but limit to avoid unnatural animation
-    local headNode = characterNode:GetChild("Bip01_Head", true);
-    local limitPitch = Clamp(character.controls.pitch, -45.0, 45.0);
-    local headDir = rot * Quaternion(limitPitch, Vector3(1.0, 0.0, 0.0));
+    local headNode = characterNode:GetChild("Bip01_Head", true)
+    local limitPitch = Clamp(character.controls.pitch, -45.0, 45.0)
+    local headDir = rot * Quaternion(limitPitch, Vector3(1.0, 0.0, 0.0))
     -- This could be expanded to look at an arbitrary target, now just look at a point in front
-    local headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0, 0.0, 1.0);
-    headNode:LookAt(headWorldTarget, Vector3(0.0, 1.0, 0.0));
+    local headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0, 0.0, 1.0)
+    headNode:LookAt(headWorldTarget, Vector3(0.0, 1.0, 0.0))
     -- Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
-    headNode:Rotate(Quaternion(0.0, 90.0, 90.0));
+    headNode:Rotate(Quaternion(0.0, 90.0, 90.0))
 
     if firstPerson then
         -- First person camera: position to the head bone + offset slightly forward & up
@@ -284,10 +298,10 @@ function HandlePostUpdate(eventType, eventData)
         cameraNode.rotation = dir
     else
         -- Third person camera: position behind the character
-        local aimPoint = characterNode.position + rot * Vector3(0.0, 1.7, 0.0)
+        local aimPoint = characterNode.position + rot * Vector3(0.0, 1.7, 0.0) -- You can modify x Vector3 value to translate the fixed character position (indicative range[-2;2])
 
         -- Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the character properly
-        local rayDir = dir * Vector3(0.0, 0.0, -1.0)
+        local rayDir = dir * Vector3(0.0, 0.0, -1.0) -- For indoor scenes you can use dir * Vector3(0.0, 0.0, -0.5) to prevent camera from crossing the walls
         local rayDistance = CAMERA_MAX_DIST
         local result = scene_:GetComponent("PhysicsWorld"):RaycastSingle(Ray(aimPoint, rayDir), rayDistance, 2)
         if result.body ~= nil then
