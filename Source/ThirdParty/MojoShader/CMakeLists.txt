@@ -10,6 +10,7 @@ add_definitions (-DMOJOSHADER_NO_VERSION_INCLUDE)
 if (MSVC)
     add_definitions (-D_CRT_SECURE_NO_WARNINGS=1 -TP)
 endif (MSVC)
+set (AMALG_EXCLUDES .)
 
 # Setup target
 setup_library ()

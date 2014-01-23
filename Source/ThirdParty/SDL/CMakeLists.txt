@@ -109,7 +109,11 @@ set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/SDL USE_SOURCE_PERMISSIONS FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} SDL PARENT_SCOPE)
 install (FILES src/main/android/SDL_android_main.c DESTINATION ${DEST_SHARE_DIR}/templates/android)
-set (AMALG_EXCLUDES "(audio|blit_A|joystick|libm|rwops|SDL_sys|video)")
+if (MSVC)
+    set (AMALG_EXCLUDES .)
+else ()
+    set (AMALG_EXCLUDES "(audio|blit_A|joystick|libm|rwops|SDL_sys|video)")
+endif ()
 
 # Define dependency libs
 set (INCLUDE_DIRS_ONLY include)

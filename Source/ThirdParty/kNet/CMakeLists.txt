@@ -63,6 +63,8 @@ install (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/kNet USE_SOURCE_PERM
 set (INSTALL_INCLUDE_DIRS ${INSTALL_INCLUDE_DIRS} kNet PARENT_SCOPE)
 if (APPLE)
     set (AMALG_EXCLUDES UnixClock)
+elseif (MSVC)
+    set (AMALG_EXCLUDES "(Connection|Data.*erializer)")
 endif ()
 
 # Define dependency libs
