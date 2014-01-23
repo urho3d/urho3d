@@ -371,9 +371,10 @@ void BillboardSet::UpdateBufferSize()
     unsigned vertexIndex = 0;
     while (numBillboards--)
     {
-        *dest++ = vertexIndex; *dest++ = vertexIndex + 1; *dest++ = vertexIndex + 2;
-        *dest++ = vertexIndex + 2; *dest++ = vertexIndex + 3; *dest++ = vertexIndex;
+        dest[0] = vertexIndex; dest[1] = vertexIndex + 1; dest[2] = vertexIndex + 2;
+        dest[3] = vertexIndex + 2; dest[4] = vertexIndex + 3; dest[5] = vertexIndex;
         
+        dest += 6;
         vertexIndex += 4;
     }
     
@@ -452,29 +453,31 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         rotationMatrix[1][0] = -rotationMatrix[0][1];
         rotationMatrix[1][1] = rotationMatrix[0][0];
         
-        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
-        *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.min_.y_;
-        *dest++ = -size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
-        *dest++ = -size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
+        dest[0] = billboard.position_.x_; dest[1] = billboard.position_.y_; dest[2] = billboard.position_.z_;
+        ((unsigned&)dest[3]) = color;
+        dest[4] = billboard.uv_.min_.x_; dest[5] = billboard.uv_.min_.y_;
+        dest[6] = -size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
+        dest[7] = -size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
         
-        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
-        *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.min_.y_;
-        *dest++ = size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
-        *dest++ = size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
+        dest[8] = billboard.position_.x_; dest[9] = billboard.position_.y_; dest[10] = billboard.position_.z_;
+        ((unsigned&)dest[11]) = color;
+        dest[12] = billboard.uv_.max_.x_; dest[13] = billboard.uv_.min_.y_;
+        dest[14] = size.x_ * rotationMatrix[0][0] + size.y_ * rotationMatrix[0][1];
+        dest[15] = size.x_ * rotationMatrix[1][0] + size.y_ * rotationMatrix[1][1];
         
-        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
-        *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.max_.x_; *dest++ = billboard.uv_.max_.y_;
-        *dest++ = size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
-        *dest++ = size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
+        dest[16] = billboard.position_.x_; dest[17] = billboard.position_.y_; dest[18] = billboard.position_.z_;
+        ((unsigned&)dest[19]) = color;
+        dest[20] = billboard.uv_.max_.x_; dest[21] = billboard.uv_.max_.y_;
+        dest[22] = size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
+        dest[23] = size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
         
-        *dest++ = billboard.position_.x_; *dest++ = billboard.position_.y_; *dest++ = billboard.position_.z_;
-        *((unsigned*)dest) = color; dest++;
-        *dest++ = billboard.uv_.min_.x_; *dest++ = billboard.uv_.max_.y_;
-        *dest++ = -size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
-        *dest++ = -size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
+        dest[24] = billboard.position_.x_; dest[25] = billboard.position_.y_; dest[26] = billboard.position_.z_;
+        ((unsigned&)dest[27]) = color;
+        dest[28] = billboard.uv_.min_.x_; dest[29] = billboard.uv_.max_.y_;
+        dest[30] = -size.x_ * rotationMatrix[0][0] - size.y_ * rotationMatrix[0][1];
+        dest[31] = -size.x_ * rotationMatrix[1][0] - size.y_ * rotationMatrix[1][1];
+
+        dest += 32;
     }
     
     vertexBuffer_->Unlock();

@@ -336,22 +336,24 @@ void DebugRenderer::Render()
     {
         const DebugLine& line = lines_[i];
 
-        *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
-        *((unsigned*)dest) = line.color_; dest++;
+        dest[0] = line.start_.x_; dest[1] = line.start_.y_; dest[2] = line.start_.z_;
+        ((unsigned&)dest[3]) = line.color_;
+        dest[4] = line.end_.x_; dest[5] = line.end_.y_; dest[6] = line.end_.z_;
+        ((unsigned&)dest[7]) = line.color_;
 
-        *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
-        *((unsigned*)dest) = line.color_; dest++;
+        dest += 8;
     }
 
     for (unsigned i = 0; i < noDepthLines_.Size(); ++i)
     {
         const DebugLine& line = noDepthLines_[i];
 
-        *dest++ = line.start_.x_; *dest++ = line.start_.y_; *dest++ = line.start_.z_;
-        *((unsigned*)dest) = line.color_; dest++;
+        dest[0] = line.start_.x_; dest[1] = line.start_.y_; dest[2] = line.start_.z_;
+        ((unsigned&)dest[3]) = line.color_;
+        dest[4] = line.end_.x_; dest[5] = line.end_.y_; dest[6] = line.end_.z_;
+        ((unsigned&)dest[7]) = line.color_;
 
-        *dest++ = line.end_.x_; *dest++ = line.end_.y_; *dest++ = line.end_.z_;
-        *((unsigned*)dest) = line.color_; dest++;
+        dest += 8;
     }
 
     vertexBuffer_->Unlock();

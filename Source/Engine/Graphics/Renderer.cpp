@@ -1713,16 +1713,17 @@ void Renderer::SetIndirectionTextureData()
             for (unsigned x = 0; x < 256; ++x)
             {
                 #ifdef USE_OPENGL
-                *dest++ = x;
-                *dest++ = 255 - y;
-                *dest++ = faceX;
-                *dest++ = 255 * 2 / 3 - faceY;
+                dest[0] = x;
+                dest[1] = 255 - y;
+                dest[2] = faceX;
+                dest[3] = 255 * 2 / 3 - faceY;
                 #else
-                *dest++ = x;
-                *dest++ = y;
-                *dest++ = faceX;
-                *dest++ = faceY;
+                dest[0] = x;
+                dest[1] = y;
+                dest[2] = faceX;
+                dest[3] = faceY;
                 #endif
+                dest += 4;
             }
         }
         

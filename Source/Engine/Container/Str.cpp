@@ -874,38 +874,43 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
         *dest++ = unicodeChar;
     else if (unicodeChar < 0x800)
     {
-        *dest++ = 0xc0 | ((unicodeChar >> 6) & 0x1f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xc0 | ((unicodeChar >> 6) & 0x1f);
+        dest[1] = 0x80 | (unicodeChar & 0x3f);
+        dest += 2;
     }
     else if (unicodeChar < 0x10000)
     {
-        *dest++ = 0xe0 | ((unicodeChar >> 12) & 0xf);
-        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xe0 | ((unicodeChar >> 12) & 0xf);
+        dest[1] = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        dest[2] = 0x80 | (unicodeChar & 0x3f);
+        dest += 3;
     }
     else if (unicodeChar < 0x200000)
     {
-        *dest++ = 0xf0 | ((unicodeChar >> 18) & 0x7);
-        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xf0 | ((unicodeChar >> 18) & 0x7);
+        dest[1] = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        dest[2] = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        dest[3] = 0x80 | (unicodeChar & 0x3f);
+        dest += 4;
     }
     else if (unicodeChar < 0x4000000)
     {
-        *dest++ = 0xf8 | ((unicodeChar >> 24) & 0x3);
-        *dest++ = 0x80 | ((unicodeChar >> 18) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xf8 | ((unicodeChar >> 24) & 0x3);
+        dest[1] = 0x80 | ((unicodeChar >> 18) & 0x3f);
+        dest[2] = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        dest[3] = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        dest[4] = 0x80 | (unicodeChar & 0x3f);
+        dest += 5;
     }
     else
     {
-        *dest++ = 0xfc | ((unicodeChar >> 30) & 0x1);
-        *dest++ = 0x80 | ((unicodeChar >> 24) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 18) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 12) & 0x3f);
-        *dest++ = 0x80 | ((unicodeChar >> 6) & 0x3f);
-        *dest++ = 0x80 | (unicodeChar & 0x3f);
+        dest[0] = 0xfc | ((unicodeChar >> 30) & 0x1);
+        dest[1] = 0x80 | ((unicodeChar >> 24) & 0x3f);
+        dest[2] = 0x80 | ((unicodeChar >> 18) & 0x3f);
+        dest[3] = 0x80 | ((unicodeChar >> 12) & 0x3f);
+        dest[4] = 0x80 | ((unicodeChar >> 6) & 0x3f);
+        dest[5] = 0x80 | (unicodeChar & 0x3f);
+        dest += 6;
     }
 }
 

@@ -166,11 +166,13 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
         if (textures.Size() > 1)
         {
             // Only traversing thru the printText once regardless of number of textures/pages in the font
-            Vector<PODVector<GlyphLocation> > pageGlyphLocations(textures.Size());
-
+            pageGlyphLocations_.Resize(textures.Size());
+            
             unsigned rowIndex = 0;
             int x = GetRowStartPosition(rowIndex);
             int y = 0;
+            const FontGlyph* p = 0;
+            unsigned last = 0;
 
             for (unsigned i = 0; i < printText_.Size(); ++i)
             {
@@ -178,13 +180,19 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 
                 if (c != '\n')
                 {
-                    const FontGlyph* p = face->GetGlyph(c);
+                    // Optimize if same glyph requested several times in a row
+                    if (!p || c != last)
+                    {
+                        p = face->GetGlyph(c);
+                        last = c;
+                    }
+
                     if (!p)
                         continue;
 
                     // Validate page because of possible glyph unallocations (should not happen, though)
                     if (p->page_ < textures.Size())
-                        pageGlyphLocations[p->page_].Push(GlyphLocation(x, y, p));
+                        pageGlyphLocations_[p->page_].Push(GlyphLocation(x, y, p));
 
                     x += p->advanceX_;
                     if (i < printText_.Size() - 1)
@@ -202,7 +210,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 // One batch per texture/page
                 UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
 
-                const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations[n];
+                const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
 
                 switch (textEffect_)
                 {

@@ -1028,24 +1028,27 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
         if (mask & MASK_POSITION)
         {
             float* posSrc = (float*)src;
-            *dest++ = posSrc[0];
-            *dest++ = posSrc[1];
-            *dest++ = posSrc[2];
+            dest[0] = posSrc[0];
+            dest[1] = posSrc[1];
+            dest[2] = posSrc[2];
+            dest += 3;
         }
         if (mask & MASK_NORMAL)
         {
             float* normalSrc = (float*)(src + normalOffset);
-            *dest++ = normalSrc[0];
-            *dest++ = normalSrc[1];
-            *dest++ = normalSrc[2];
+            dest[0] = normalSrc[0];
+            dest[1] = normalSrc[1];
+            dest[2] = normalSrc[2];
+            dest += 3;
         }
         if (mask & MASK_TANGENT)
         {
             float* tangentSrc = (float*)(src + tangentOffset);
-            *dest++ = tangentSrc[0];
-            *dest++ = tangentSrc[1];
-            *dest++ = tangentSrc[2];
-            *dest++ = tangentSrc[3];
+            dest[0] = tangentSrc[0];
+            dest[1] = tangentSrc[1];
+            dest[2] = tangentSrc[2];
+            dest[3] = tangentSrc[3];
+            dest += 4;
         }
 
         src += vertexSize;

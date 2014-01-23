@@ -555,9 +555,10 @@ bool Graphics::TakeScreenShot(Image& destImage)
                 int g = (rgb >> 5) & 63;
                 int r = (rgb >> 11);
                 
-                *dest++ = (int)(r * 255.0f / 31.0f);
-                *dest++ = (int)(g * 255.0f / 63.0f);
-                *dest++ = (int)(b * 255.0f / 31.0f);
+                dest[0] = (int)(r * 255.0f / 31.0f);
+                dest[1] = (int)(g * 255.0f / 63.0f);
+                dest[2] = (int)(b * 255.0f / 31.0f);
+                dest += 3;
             }
         }
     }
@@ -570,10 +571,11 @@ bool Graphics::TakeScreenShot(Image& destImage)
             
             for (int x = 0; x < width_; ++x)
             {
-                *dest++ = src[2];
-                *dest++ = src[1];
-                *dest++ = src[0];
+                dest[0] = src[2];
+                dest[1] = src[1];
+                dest[2] = src[0];
                 src += 4;
+                dest += 3;
             }
         }
     }

@@ -41,19 +41,23 @@ enum TextEffect
     TE_STROKE
 };
 
-/// Glyph location.
+/// Glyph and its location within the text. Used when preparing text rendering.
 struct GlyphLocation
 {
-    int x_;
-    int y_;
-    const FontGlyph* glyph_;
-
+    // Construct.
     GlyphLocation(int x, int y, const FontGlyph* glyph) :
-    x_(x),
+        x_(x),
         y_(y),
         glyph_(glyph)
     {
     }
+
+    /// X coordinate.
+    int x_;
+    /// Y coordinate.
+    int y_;
+    /// Glyph.
+    const FontGlyph* glyph_;
 };
 
 /// %Text %UI element.
@@ -199,6 +203,8 @@ protected:
     PODVector<IntVector2> charPositions_;
     /// Sizes of each character.
     PODVector<IntVector2> charSizes_;
+    /// Glyph locations per each texture in the font.
+    Vector<PODVector<GlyphLocation> > pageGlyphLocations_;
 };
 
 }
