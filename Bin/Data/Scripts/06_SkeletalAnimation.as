@@ -63,7 +63,7 @@ void CreateScene()
     Light@ light = lightNode.CreateComponent("Light");
     light.lightType = LIGHT_DIRECTIONAL;
     light.castShadows = true;
-    light.shadowBias = BiasParameters(0.0001f, 0.5f);
+    light.shadowBias = BiasParameters(0.00025f, 0.5f);
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
     
@@ -72,7 +72,7 @@ void CreateScene()
     const float MODEL_MOVE_SPEED = 2.0f;
     const float MODEL_ROTATE_SPEED = 100.0f;
     const BoundingBox bounds(Vector3(-47.0f, 0.0f, -47.0f), Vector3(47.0f, 0.0f, 47.0f));
-    
+
     for (uint i = 0; i < NUM_MODELS; ++i)
     {
         Node@ modelNode = scene_.CreateChild("Jack");
@@ -82,7 +82,7 @@ void CreateScene()
         modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
         modelObject.material = cache.GetResource("Material", "Materials/Jack.xml");
         modelObject.castShadows = true;
-        
+
         // Create an AnimationState for a walk animation. Its time position will need to be manually updated to advance the
         // animation, The alternative would be to use an AnimationController component which updates the animation automatically,
         // but we need to update the model's position manually in any case
