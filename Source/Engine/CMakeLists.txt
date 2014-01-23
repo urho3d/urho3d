@@ -91,10 +91,11 @@ install (FILES ${H_FILES} DESTINATION ${DEST_INCLUDE_DIR})
 list (APPEND SOURCE_FILES ${ALL_OBJ_FILES})
 set_source_files_properties (${ALL_OBJ_FILES} PROPERTIES GENERATED TRUE)
 if (APPLE)
-    set (AMALG_EXCLUDES MathAPI)
+    set (AMALG_EXCLUDES_PLATFORM_SPECIFIC |MathAPI)
 elseif (MSVC)
-    set (AMALG_EXCLUDES "(Camera|Color|Frustum|MathAPI|Network|Precompiled|ResourceCache|Text\\.|Window)")
+    set (AMALG_EXCLUDES_PLATFORM_SPECIFIC |Camera|Color|Frustum|MathAPI|Network|Precompiled|ResourceCache|Text\\.|Window)
 endif ()
+set (AMALG_EXCLUDES "(Camera|CollisionShape|Constraint|HttpRequest|Light|SoundSource|Variant${AMALG_EXCLUDES_PLATFORM_SPECIFIC})")
 set (AMALG_FINAL_TARGET 1)
 
 # Define dependency libs

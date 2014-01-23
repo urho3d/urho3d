@@ -39,20 +39,20 @@ namespace Urho3D
 
 extern const char* SCENE_CATEGORY;
 
-static const LightType DEFAULT_LIGHT_TYPE = LIGHT_POINT;
-static const float DEFAULT_LIGHT_RANGE = 10.0f;
-static const float DEFAULT_LIGHT_FOV = 30.0f;
-static const float DEFAULT_LIGHT_SPECULARINTENSITY = 1.0f;
-static const float DEFAULT_LIGHT_CONSTANTBIAS = 0.0001f;
-static const float DEFAULT_LIGHT_SLOPESCALEDBIAS = 0.5f;
-static const float DEFAULT_LIGHT_BIASAUTOADJUST = 1.0f;
-static const float DEFAULT_LIGHT_SHADOWFADESTART = 0.8f;
-static const float DEFAULT_LIGHT_SHADOWQUANTIZE = 0.5f;
-static const float DEFAULT_LIGHT_SHADOWMINVIEW = 3.0f;
-static const float DEFAULT_LIGHT_SHADOWNEARFARRATIO = 0.002f;
-static const float DEFAULT_LIGHT_SHADOWSPLIT = 1000.0f;
+static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
+static const float DEFAULT_RANGE = 10.0f;
+static const float DEFAULT_FOV = 30.0f;
+static const float DEFAULT_SPECULARINTENSITY = 1.0f;
+static const float DEFAULT_CONSTANTBIAS = 0.0001f;
+static const float DEFAULT_SLOPESCALEDBIAS = 0.5f;
+static const float DEFAULT_BIASAUTOADJUST = 1.0f;
+static const float DEFAULT_SHADOWFADESTART = 0.8f;
+static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
+static const float DEFAULT_SHADOWMINVIEW = 3.0f;
+static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
+static const float DEFAULT_SHADOWSPLIT = 1000.0f;
 
-static const char* lightTypeNames[] =
+static const char* typeNames[] =
 {
     "Directional",
     "Spot",
@@ -86,20 +86,20 @@ template<> LightType Variant::Get<LightType>() const
 
 Light::Light(Context* context) :
     Drawable(context, DRAWABLE_LIGHT),
-    lightType_(DEFAULT_LIGHT_TYPE),
-    shadowBias_(BiasParameters(DEFAULT_LIGHT_CONSTANTBIAS, DEFAULT_LIGHT_SLOPESCALEDBIAS)),
-    shadowCascade_(CascadeParameters(DEFAULT_LIGHT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f, DEFAULT_LIGHT_SHADOWFADESTART)),
-    shadowFocus_(FocusParameters(true, true, true, DEFAULT_LIGHT_SHADOWQUANTIZE, DEFAULT_LIGHT_SHADOWMINVIEW)),
+    lightType_(DEFAULT_LIGHTTYPE),
+    shadowBias_(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
+    shadowCascade_(CascadeParameters(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
+    shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     lightQueue_(0),
-    specularIntensity_(DEFAULT_LIGHT_SPECULARINTENSITY),
-    range_(DEFAULT_LIGHT_RANGE),
-    fov_(DEFAULT_LIGHT_FOV),
+    specularIntensity_(DEFAULT_SPECULARINTENSITY),
+    range_(DEFAULT_RANGE),
+    fov_(DEFAULT_FOV),
     aspectRatio_(1.0f),
     fadeDistance_(0.0f),
     shadowFadeDistance_(0.0f),
     shadowIntensity_(0.0f),
     shadowResolution_(1.0f),
-    shadowNearFarRatio_(DEFAULT_LIGHT_SHADOWNEARFARRATIO),
+    shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO),
     perVertex_(false)
 {
 }
@@ -113,11 +113,11 @@ void Light::RegisterObject(Context* context)
     context->RegisterFactory<Light>(SCENE_CATEGORY);
 
     ACCESSOR_ATTRIBUTE(Light, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, lightTypeNames, DEFAULT_LIGHT_TYPE, AM_DEFAULT);
+    ENUM_ACCESSOR_ATTRIBUTE(Light, "Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Light, VAR_COLOR, "Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_LIGHT_SPECULARINTENSITY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, DEFAULT_LIGHT_RANGE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot FOV", GetFov, SetFov, float, DEFAULT_FOV, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_FLOAT, "Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
@@ -133,14 +133,14 @@ void Light::RegisterObject(Context* context)
     ATTRIBUTE(Light, VAR_BOOL, "Focus To Scene", shadowFocus_.focus_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Non-uniform View", shadowFocus_.nonUniform_, true, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_BOOL, "Auto-Reduce Size", shadowFocus_.autoSize_, true, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(DEFAULT_LIGHT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, DEFAULT_LIGHT_SHADOWFADESTART, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "CSM Bias Auto Adjust", shadowCascade_.biasAutoAdjust_, DEFAULT_LIGHT_BIASAUTOADJUST, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_LIGHT_SHADOWQUANTIZE, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_LIGHT_SHADOWMINVIEW, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_LIGHT_CONSTANTBIAS, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Depth Slope Bias", shadowBias_.slopeScaledBias_, DEFAULT_LIGHT_SLOPESCALEDBIAS, AM_DEFAULT);
-    ATTRIBUTE(Light, VAR_FLOAT, "Near/Farclip Ratio", shadowNearFarRatio_, DEFAULT_LIGHT_SHADOWNEARFARRATIO, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_VECTOR4, "CSM Splits", shadowCascade_.splits_, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Fade Start", shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "CSM Bias Auto Adjust", shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "View Size Quantize", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "View Size Minimum", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Depth Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Depth Slope Bias", shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Near/Farclip Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     ATTRIBUTE(Light, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }

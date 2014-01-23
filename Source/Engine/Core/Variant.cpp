@@ -35,7 +35,7 @@ const ResourceRefList Variant::emptyResourceRefList;
 const VariantMap Variant::emptyVariantMap;
 const VariantVector Variant::emptyVariantVector;
 
-static const char* variantTypeNames[] =
+static const char* typeNames[] =
 {
     "None",
     "Int",
@@ -278,7 +278,7 @@ void Variant::SetBuffer(const void* data, unsigned size)
 
 String Variant::GetTypeName() const
 {
-    return variantTypeNames[type_];
+    return typeNames[type_];
 }
 
 String Variant::ToString() const
@@ -622,7 +622,7 @@ template<> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() co
 
 String Variant::GetTypeName(VariantType type)
 {
-    return variantTypeNames[type];
+    return typeNames[type];
 }
 
 VariantType Variant::GetTypeFromName(const String& typeName)
@@ -632,7 +632,7 @@ VariantType Variant::GetTypeFromName(const String& typeName)
 
 VariantType Variant::GetTypeFromName(const char* typeName)
 {
-    return (VariantType)GetStringListIndex(typeName, variantTypeNames, VAR_NONE);
+    return (VariantType)GetStringListIndex(typeName, typeNames, VAR_NONE);
 }
 
 }

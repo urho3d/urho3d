@@ -40,7 +40,7 @@
 namespace Urho3D
 {
 
-static const char* constraintTypeNames[] =
+static const char* typeNames[] =
 {
     "Point",
     "Hinge",
@@ -83,7 +83,7 @@ void Constraint::RegisterObject(Context* context)
     context->RegisterFactory<Constraint>(PHYSICS_CATEGORY);
     
     ACCESSOR_ATTRIBUTE(Constraint, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, constraintTypeNames, CONSTRAINT_POINT, AM_DEFAULT);
+    ENUM_ATTRIBUTE(Constraint, "Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
     ATTRIBUTE(Constraint, VAR_VECTOR3, "Other Body Position", otherPosition_, Vector3::ZERO, AM_DEFAULT);
