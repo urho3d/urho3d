@@ -215,6 +215,7 @@ void PerformQuickMenuSearch(const String&in query)
 
     menu.visible = limit > 0;
     menu.SetFixedHeight(limit * 16);
+    quickMenu.BringToFront();
     quickMenu.SetFixedHeight(limit*16 + 62 + (menu.visible ? 6 : 0));
 }
 
