@@ -57,7 +57,7 @@ float Ray::HitDistance(const Plane& plane) const
     float d = plane.normal_.DotProduct(direction_);
     if (Abs(d) >= M_EPSILON)
     {
-        float t = -(plane.normal_.DotProduct(origin_) - plane.intercept_) / d;
+        float t = -(plane.normal_.DotProduct(origin_) + plane.d_) / d;
         if (t >= 0.0f)
             return t;
         else

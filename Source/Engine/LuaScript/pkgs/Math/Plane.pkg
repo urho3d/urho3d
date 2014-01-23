@@ -27,7 +27,7 @@ class Plane
 
     Vector3 normal_ @ normal;
     Vector3 absNormal_ @ absNormal;
-    float intercept_ @ intercept;
+    float d_ @ d;
     
     static const Plane UP;
 };

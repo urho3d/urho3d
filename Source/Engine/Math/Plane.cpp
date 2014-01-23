@@ -46,21 +46,19 @@ void Plane::Transform(const Matrix4& transform)
 
 Matrix3x4 Plane::ReflectionMatrix() const
 {
-    float negIntercept = -intercept_;
-
     return Matrix3x4(
         -2.0f * normal_.x_ * normal_.x_ + 1.0f,
         -2.0f * normal_.x_ * normal_.y_,
         -2.0f * normal_.x_ * normal_.z_,
-        -2.0f * normal_.x_ * negIntercept,
+        -2.0f * normal_.x_ * d_,
         -2.0f * normal_.y_ * normal_.x_ ,
         -2.0f * normal_.y_ * normal_.y_ + 1.0f,
         -2.0f * normal_.y_ * normal_.z_,
-        -2.0f * normal_.y_ * negIntercept,
+        -2.0f * normal_.y_ * d_,
         -2.0f * normal_.z_ * normal_.x_,
         -2.0f * normal_.z_ * normal_.y_,
         -2.0f * normal_.z_ * normal_.z_ + 1.0f,
-        -2.0f * normal_.z_ * negIntercept
+        -2.0f * normal_.z_ * d_
     );
 }
 

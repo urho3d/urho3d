@@ -702,7 +702,7 @@ static void RegisterPlane(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Plane", "Matrix3x4 get_reflectionMatrix() const", asMETHOD(Plane, ReflectionMatrix), asCALL_THISCALL);
     engine->RegisterObjectProperty("Plane", "Vector3 normal", offsetof(Plane, normal_));
     engine->RegisterObjectProperty("Plane", "Vector3 absNormal", offsetof(Plane, absNormal_));
-    engine->RegisterObjectProperty("Plane", "float intercept", offsetof(Plane, intercept_));
+    engine->RegisterObjectProperty("Plane", "float d", offsetof(Plane, d_));
 }
 
 static void ConstructRay(Ray* ptr)

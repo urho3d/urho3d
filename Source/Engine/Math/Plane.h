@@ -40,7 +40,7 @@ public:
     Plane(const Plane& plane) :
         normal_(plane.normal_),
         absNormal_(plane.absNormal_),
-        intercept_(plane.intercept_)
+        d_(plane.d_)
     {
     }
     
@@ -76,7 +76,7 @@ public:
     {
         normal_ = normal.Normalized();
         absNormal_ = normal_.Abs();
-        intercept_ = normal_.DotProduct(point);
+        d_ = -normal_.DotProduct(point);
     }
     
     /// Define from a 4-dimensional vector, where the w coordinate is the plane parameter.
@@ -84,7 +84,7 @@ public:
     {
         normal_ = Vector3(plane.x_, plane.y_, plane.z_);
         absNormal_ = normal_.Abs();
-        intercept_ = plane.w_;
+        d_ = plane.w_;
     }
     
     /// Transform with a 3x3 matrix.
@@ -95,7 +95,7 @@ public:
     void Transform(const Matrix4& transform);
     
     /// Return signed distance to a point.
-    float Distance(const Vector3& point) const { return normal_.DotProduct(point) - intercept_; }
+    float Distance(const Vector3& point) const { return normal_.DotProduct(point) + d_; }
     /// Reflect a normalized direction vector.
     Vector3 Reflect(const Vector3& direction) const { return direction - (2.0f * normal_.DotProduct(direction) * normal_); }
     /// Return a reflection matrix.
@@ -107,14 +107,14 @@ public:
     /// Return transformed by a 4x4 matrix.
     Plane Transformed(const Matrix4& transform) const;
     /// Return as a vector.
-    Vector4 ToVector4() const { return Vector4(normal_, intercept_); }
+    Vector4 ToVector4() const { return Vector4(normal_, d_); }
 
     /// Plane normal.
     Vector3 normal_;
     /// Plane absolute normal.
     Vector3 absNormal_;
-    /// Plane intercept parameter.
-    float intercept_;
+    /// Plane constant.
+    float d_;
 
     /// Plane at origin with normal pointing up.
     static const Plane UP;

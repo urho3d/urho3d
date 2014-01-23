@@ -200,7 +200,7 @@ void Frustum::UpdatePlanes()
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
             planes_[i].normal_ = -planes_[i].normal_;
-            planes_[i].intercept_ = -planes_[i].intercept_;
+            planes_[i].d_ = -planes_[i].d_;
         }
     }
 

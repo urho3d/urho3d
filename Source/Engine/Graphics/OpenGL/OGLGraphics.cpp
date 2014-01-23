@@ -1819,10 +1819,7 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
     if (enable)
     {
         Matrix4 viewProj = projection * view;
-        // Intercept convention needs to be reversed
-        Plane plane = clipPlane;
-        plane.intercept_ *= -1.0f;
-        Vector4 planeVec =  plane.Transformed(viewProj).ToVector4();
+        Vector4 planeVec =  clipPlane.Transformed(viewProj).ToVector4();
         
         GLdouble planeData[4];
         planeData[0] = planeVec.x_;
