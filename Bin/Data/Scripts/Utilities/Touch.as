@@ -166,19 +166,19 @@ void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     else
         rotateTouchID = touchID;
 
-    // Init Raycast (for example to aquire a target)
+    // Init Raycast (for example to acquire a target)
     Camera@ camera = cameraNode.GetComponent("Camera");
     Ray cameraRay = camera.GetScreenRay(float(eventData["X"].GetInt()) / graphics.width, float(eventData["Y"].GetInt()) / graphics.height);
 
     // Raycast of RigidBodies
     PhysicsRaycastResult result = scene_.physicsWorld.RaycastSingle(cameraRay, camera.farClip, 2); // NB: here we restrict targets to layer 2
     if (result.body !is null)
-        log.Info(result.body.node.name);
+        log.Info("Physics raycast hit " + result.body.node.name);
 
-    // Raycast of drawable components (for targets with or without physics)
+    // Raycast of drawable components (for targets without physics)
     RayQueryResult result2 = scene_.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY);
     if (result2.drawable !is null)
-        log.Info(result2.drawable.node.name);
+        log.Info("Drawable raycast hit " + result2.drawable.node.name);
 }
 
 void HandleTouchEnd(StringHash eventType, VariantMap& eventData)

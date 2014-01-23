@@ -134,15 +134,15 @@ function HandleTouchBegin(eventType, eventData)
     elseif element == fireButton then fireTouchID = touchID
     else rotateTouchID = touchID end
 
-    -- Raycast of RigidBodies (for example to aquire a target)
+    -- Raycast of RigidBodies (for example to acquire a target)
     local camera = cameraNode:GetComponent("Camera")
     local cameraRay = camera:GetScreenRay(eventData:GetInt("X") / graphics.width, eventData:GetInt("Y") / graphics.height)
     local result = scene_:GetComponent("PhysicsWorld"):RaycastSingle(cameraRay, camera.farClip, 2) -- NB: here we restrict targets to layer 2
-    if result.body ~= nil then print(result.body:GetNode().name) end
+    if result.body ~= nil then print("Physics raycast hit " .. result.body:GetNode().name) end
 
     -- Raycast of drawable components (for targets with or without physics)
-    --local result = scene_:GetComponent("Octree"):RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY)
-    --if result.drawable ~= nil then print(result.drawable:GetNode().name) end
+    local result2 = scene_:GetComponent("Octree"):RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip, DRAWABLE_GEOMETRY)
+    if result2.drawable ~= nil then print("Drawable raycast hit " .. result2.drawable:GetNode().name) end
 end
 
 

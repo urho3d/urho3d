@@ -24,7 +24,6 @@ void SetLogoVisible(bool enable)
         logoSprite.visible = enable;
 }
 
-
 void CreateLogo()
 {
     // Get logo texture
