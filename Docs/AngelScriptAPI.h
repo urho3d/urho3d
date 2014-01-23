@@ -4268,6 +4268,7 @@ class TouchState
 // Properties:
 int touchID;
 IntVector2 position;
+IntVector2 lastPosition;
 IntVector2 delta;
 float pressure;
 };
