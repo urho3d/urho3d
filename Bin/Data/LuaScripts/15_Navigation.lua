@@ -4,6 +4,8 @@
 --     - Performing path queries to the navigation mesh
 --     - Rebuilding the navigation mesh partially when adding or removing objects
 --     - Visualizing custom debug geometry
+--     - Raycasting drawable components
+--     - Make a node follow the Detour path
 
 require "LuaScripts/Utilities/Sample"
 
@@ -17,6 +19,8 @@ local pitch = 0.0
 local drawDebug = false
 local startPosDefined = false
 local endPosDefined = false
+local Jack = nil
+local nextWaypoint = nil
 
 local context = GetContext()
 
@@ -98,7 +102,15 @@ function CreateScene()
             boxObject.occluder = true
         end
     end
-    
+
+    -- Create Jack node that will follow the path
+    Jack = scene_:CreateChild("Jack")
+    Jack.position = Vector3(-5, 0, 20)
+    local modelObject = Jack:CreateComponent("AnimatedModel")
+    modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
+    modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
+    modelObject.castShadows = true
+
     -- Create a NavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("NavigationMesh")
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -230,6 +242,7 @@ function SetPathPoint()
         if startPosDefined and endPosDefined then
             RecalculatePath()
         end
+        Jack.position = startPos -- Reset Jack position to start
     end
 end
 
@@ -273,6 +286,7 @@ end
 function RecalculatePath()
     local navMesh = scene_:GetComponent("NavigationMesh")
     currentPath = navMesh:FindPath(startPos, endPos)
+    nextWaypoint = 0 -- Reset next waypoint ID
 end
 
 function Raycast(maxDistance)
@@ -300,12 +314,27 @@ function Raycast(maxDistance)
     return false, nil, nil
 end
 
+function followPath()
+    if startPosDefined and endPosDefined then
+        -- Get next waypoint to reach
+        if math.floor(Jack.position.x) == math.floor(currentPath[nextWaypoint].x) and math.floor(Jack.position.z) == math.floor(currentPath[nextWaypoint].z) then nextWaypoint = nextWaypoint + 1 end -- When a waypoint is reached, update next waypoint to reach
+        if nextWaypoint > currentPath:Size() - 1  then return end -- Stop when endPos reached
+
+        -- Rotate Jack toward next waypoint to reach and move
+        Jack:LookAt(currentPath[nextWaypoint], Vector3(0, 1, 0))
+        Jack:TranslateRelative(Vector3(0, 0, 1) * 0.4)
+    end
+end
+
 function HandleUpdate(eventType, eventData)
     -- Take the frame time step, which is stored as a float
     local timeStep = eventData:GetFloat("TimeStep")
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
+
+    -- Make Jack follow the Detour path
+    followPath()
 end
 
 function HandlePostRenderUpdate(eventType, eventData)
