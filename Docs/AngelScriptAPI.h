@@ -824,7 +824,7 @@ Vector4 ToVector4() const;
 Matrix3x4 reflectionMatrix;
 Vector3 normal;
 Vector3 absNormal;
-float intercept;
+float d;
 };
 
 class Ray

@@ -2600,7 +2600,7 @@ Properties:
 
 - Vector3 normal
 - Vector3 absNormal
-- float intercept
+- float d
 - static const Plane UP
 
 ### Polyhedron

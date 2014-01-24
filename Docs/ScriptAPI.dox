@@ -822,7 +822,7 @@ Properties:
 - Matrix3x4 reflectionMatrix (readonly)
 - Vector3 normal
 - Vector3 absNormal
-- float intercept
+- float d
 
 
 ### Ray
