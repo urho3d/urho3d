@@ -3,6 +3,8 @@ bool subscribedToEditorToolBar = false;
 bool toolBarDirty = true;
 UIElement@ toolBar;
 
+const ShortStringHash VIEW_MODE("VIEW_MODE");
+
 void CreateToolBar()
 {
     toolBar = BorderImage("ToolBar");
@@ -66,20 +68,28 @@ void CreateToolBar()
     toolBar.AddChild(fillModeGroup);
 
     toolBar.AddChild(CreateToolBarSpacer(4));
-    DropDownList@ viewportMode = DropDownList();
-    viewportMode.style = AUTO_STYLE;
-    viewportMode.SetMaxSize(100, 18);
-    viewportMode.SetAlignment(HA_LEFT, VA_CENTER);
-    toolBar.AddChild(viewportMode);
-    viewportMode.AddItem(CreateViewPortModeText("Single", VIEWPORT_SINGLE));
-    viewportMode.AddItem(CreateViewPortModeText("Vertical Split", VIEWPORT_LEFT|VIEWPORT_RIGHT));
-    viewportMode.AddItem(CreateViewPortModeText("Horizontal Split", VIEWPORT_TOP|VIEWPORT_BOTTOM));
-    viewportMode.AddItem(CreateViewPortModeText("Quad", VIEWPORT_TOP_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM_LEFT|VIEWPORT_BOTTOM_RIGHT));
-    viewportMode.AddItem(CreateViewPortModeText("1 Top / 2 Bottom", VIEWPORT_TOP|VIEWPORT_BOTTOM_LEFT|VIEWPORT_BOTTOM_RIGHT));
-    viewportMode.AddItem(CreateViewPortModeText("2 Top / 1 Bottom", VIEWPORT_TOP_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM));
-    viewportMode.AddItem(CreateViewPortModeText("1 Left / 2 Right", VIEWPORT_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM_RIGHT));
-    viewportMode.AddItem(CreateViewPortModeText("2 Left / 1 Right", VIEWPORT_TOP_LEFT|VIEWPORT_BOTTOM_LEFT|VIEWPORT_RIGHT));
-    SubscribeToEvent(viewportMode, "ItemSelected", "ToolBarSetViewportMode");
+    DropDownList@ viewportModeList = DropDownList();
+    viewportModeList.style = AUTO_STYLE;
+    viewportModeList.SetMaxSize(100, 18);
+    viewportModeList.SetAlignment(HA_LEFT, VA_CENTER);
+    toolBar.AddChild(viewportModeList);
+    viewportModeList.AddItem(CreateViewPortModeText("Single", VIEWPORT_SINGLE));
+    viewportModeList.AddItem(CreateViewPortModeText("Vertical Split", VIEWPORT_LEFT|VIEWPORT_RIGHT));
+    viewportModeList.AddItem(CreateViewPortModeText("Horizontal Split", VIEWPORT_TOP|VIEWPORT_BOTTOM));
+    viewportModeList.AddItem(CreateViewPortModeText("Quad", VIEWPORT_TOP_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM_LEFT|VIEWPORT_BOTTOM_RIGHT));
+    viewportModeList.AddItem(CreateViewPortModeText("1 Top / 2 Bottom", VIEWPORT_TOP|VIEWPORT_BOTTOM_LEFT|VIEWPORT_BOTTOM_RIGHT));
+    viewportModeList.AddItem(CreateViewPortModeText("2 Top / 1 Bottom", VIEWPORT_TOP_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM));
+    viewportModeList.AddItem(CreateViewPortModeText("1 Left / 2 Right", VIEWPORT_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM_RIGHT));
+    viewportModeList.AddItem(CreateViewPortModeText("2 Left / 1 Right", VIEWPORT_TOP_LEFT|VIEWPORT_BOTTOM_LEFT|VIEWPORT_RIGHT));
+    for (uint i = 0; i < viewportModeList.numItems; ++i)
+    {
+        if (viewportModeList.items[i].vars[VIEW_MODE].GetUInt() == viewportMode)
+        {
+            viewportModeList.selection = i;
+            break;
+        }
+    }
+    SubscribeToEvent(viewportModeList, "ItemSelected", "ToolBarSetViewportMode");
 }
 
 Button@ CreateToolBarButton(const String&in title)
@@ -356,7 +366,7 @@ void ToolBarSetViewportMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ dropDown = eventData["Element"].GetUIElement();
     UIElement@ selected = dropDown.GetItems()[dropDown.selection];
-    uint mode = selected.vars["VIEW_MODE"].GetUInt();
+    uint mode = selected.vars[VIEW_MODE].GetUInt();
     SetViewportMode(mode);
 }
 
@@ -482,7 +492,7 @@ Text@ CreateViewPortModeText(String text_, uint mode)
 {
     Text@ text = Text();
     text.text = text_;
-    text.vars["VIEW_MODE"] = mode;
+    text.vars[VIEW_MODE] = mode;
     text.style = "EditorEnumAttributeText";
     return text;
 }

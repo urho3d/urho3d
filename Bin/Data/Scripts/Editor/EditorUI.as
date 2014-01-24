@@ -72,7 +72,7 @@ void CreateUI()
     CreateStatsBar();
     CreateConsole();
     CreateDebugHud();
-    CreateViewportUI();
+    CreateCamera();
 
     SubscribeToEvent("ScreenMode", "ResizeUI");
     SubscribeToEvent("MenuSelected", "HandleMenuSelected");

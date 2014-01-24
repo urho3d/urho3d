@@ -123,11 +123,13 @@ void LoadConfig()
 
     if (!cameraElem.isNull)
     {
-        if (cameraElem.HasAttribute("nearclip")) camera.nearClip = cameraElem.GetFloat("nearclip");
-        if (cameraElem.HasAttribute("farclip")) camera.farClip = cameraElem.GetFloat("farclip");
-        if (cameraElem.HasAttribute("fov")) camera.fov = cameraElem.GetFloat("fov");
+        if (cameraElem.HasAttribute("nearclip")) viewNearClip = cameraElem.GetFloat("nearclip");
+        if (cameraElem.HasAttribute("farclip")) viewFarClip = cameraElem.GetFloat("farclip");
+        if (cameraElem.HasAttribute("fov")) viewFov = cameraElem.GetFloat("fov");
         if (cameraElem.HasAttribute("speed")) cameraBaseSpeed = cameraElem.GetFloat("speed");
         if (cameraElem.HasAttribute("limitrotation")) limitRotation = cameraElem.GetBool("limitrotation");
+        if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
+        UpdateViewParameters();
     }
 
     if (!objectElem.isNull)
@@ -230,15 +232,12 @@ void SaveConfig()
     XMLElement viewElem = configElem.CreateChild("view");
     XMLElement resourcesElem = configElem.CreateChild("resources");
 
-    // The save config may be called on error exit so some of the objects below could still be null
-    if (camera !is null)
-    {
-        cameraElem.SetFloat("nearclip", camera.nearClip);
-        cameraElem.SetFloat("farclip", camera.farClip);
-        cameraElem.SetFloat("fov", camera.fov);
-        cameraElem.SetFloat("speed", cameraBaseSpeed);
-        cameraElem.SetBool("limitrotation", limitRotation);
-    }
+    cameraElem.SetFloat("nearclip", viewNearClip);
+    cameraElem.SetFloat("farclip", viewFarClip);
+    cameraElem.SetFloat("fov", viewFov);
+    cameraElem.SetFloat("speed", cameraBaseSpeed);
+    cameraElem.SetBool("limitrotation", limitRotation);
+    cameraElem.SetUInt("viewportmode", viewportMode);
 
     objectElem.SetFloat("newnodedistance", newNodeDistance);
     objectElem.SetFloat("movestep", moveStep);

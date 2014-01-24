@@ -23,13 +23,13 @@ void UpdateEditorSettingsDialog()
         return;
 
     LineEdit@ nearClipEdit = settingsDialog.GetChild("NearClipEdit", true);
-    nearClipEdit.text = String(camera.nearClip);
-    
+    nearClipEdit.text = String(viewNearClip);
+
     LineEdit@ farClipEdit = settingsDialog.GetChild("FarClipEdit", true);
-    farClipEdit.text = String(camera.farClip);
-    
+    farClipEdit.text = String(viewFarClip);
+
     LineEdit@ fovEdit = settingsDialog.GetChild("FOVEdit", true);
-    fovEdit.text = String(camera.fov);
+    fovEdit.text = String(viewFov);
 
     LineEdit@ speedEdit = settingsDialog.GetChild("SpeedEdit", true);
     speedEdit.text = String(cameraBaseSpeed);
@@ -148,7 +148,8 @@ void HideEditorSettingsDialog()
 void EditCameraNearClip(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetUIElement();
-    camera.nearClip = edit.text.ToFloat();
+    viewNearClip = edit.text.ToFloat();
+    UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(camera.nearClip);
 }
@@ -156,7 +157,8 @@ void EditCameraNearClip(StringHash eventType, VariantMap& eventData)
 void EditCameraFarClip(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetUIElement();
-    camera.farClip = edit.text.ToFloat();
+    viewFarClip = edit.text.ToFloat();
+    UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(camera.farClip);
 }
@@ -164,7 +166,8 @@ void EditCameraFarClip(StringHash eventType, VariantMap& eventData)
 void EditCameraFOV(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetUIElement();
-    camera.fov = edit.text.ToFloat();
+    viewFov = edit.text.ToFloat();
+    UpdateViewParameters();
     if (eventType == StringHash("TextFinished"))
         edit.text = String(camera.fov);
 }
