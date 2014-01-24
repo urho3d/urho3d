@@ -332,4 +332,8 @@
         <attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
         <attribute name="Font Size" value="12" />
     </element>
+    <element type="ViewportBorder" style="BorderImage">
+        <attribute name="Image Rect" value="50 5 51 6" />
+        <attribute name="Border" value="0 0 0 0" />
+    </element>
 </elements>
