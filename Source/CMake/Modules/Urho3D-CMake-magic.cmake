@@ -124,9 +124,13 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Add definition for amalgamated build
-if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)
-    message (STATUS "Reverted back to non-amalgamated build because even conventional build of Urho3D shared library for MSVC is already a CMake-hack by itself")
-    set (ENABLE_AMALG 0)
+if (MSVC)
+    if (URHO3D_LIB_TYPE STREQUAL SHARED)
+        message (STATUS "Reverted back to non-amalgamated build because even conventional build of Urho3D shared library for MSVC is already a CMake-hack by itself")
+        set (ENABLE_AMALG 0)
+    elseif (ENABLE_AMALG LESS 3)
+        set (ENABLE_AMALG 3)    # Force to autosplit to minimal 3 translation units to avoid symbols conflict
+    endif ()
 endif ()
 if (ENABLE_AMALG)
     add_definitions (-DENABLE_AMALG)
