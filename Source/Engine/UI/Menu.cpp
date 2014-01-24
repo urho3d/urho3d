@@ -300,7 +300,9 @@ void Menu::ShowPopup(bool enable)
 
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
         popup_->SetVisible(true);
-        popup_->BringToFront();
+        // BringToFront() is unreliable in this case as it takes into account only input-enabled elements.
+        // Rather just force priority to max
+        popup_->SetPriority(M_MAX_INT);
     }
     else
     {
