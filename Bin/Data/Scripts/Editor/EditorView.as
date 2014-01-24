@@ -6,6 +6,44 @@ Camera@ camera;
 Node@ gridNode;
 CustomGeometry@ grid;
 
+UIElement@ viewportUI; // holds the viewport ui, convienent for clearing and hiding
+uint setViewportCursor = 0; // used to set cursor in post update
+uint resizingBorder = 0; // current border that is dragging
+uint viewportMode = VIEWPORT_SINGLE;
+int  viewportBorderOffset = 2; // used to center borders over viewport seams,  should be half of width
+int  viewportBorderWidth = 4; // width of a viewport resize border
+IntRect viewportArea(0, 0, graphics.width, graphics.height); // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that
+IntRect viewportUIClipBorder = IntRect(27, 60, 0, 0); // used to clip viewport borders, the borders are ugly when going behind the transparent toolbars
+
+const uint VIEWPORT_BORDER_H     = 0x00000001;
+const uint VIEWPORT_BORDER_H1    = 0x00000002;
+const uint VIEWPORT_BORDER_H2    = 0x00000004;
+const uint VIEWPORT_BORDER_V     = 0x00000010;
+const uint VIEWPORT_BORDER_V1    = 0x00000020;
+const uint VIEWPORT_BORDER_V2    = 0x00000040;
+
+const uint VIEWPORT_SINGLE       = 0x00000000;
+const uint VIEWPORT_TOP          = 0x00000100;
+const uint VIEWPORT_BOTTOM       = 0x00000200;
+const uint VIEWPORT_LEFT         = 0x00000400;
+const uint VIEWPORT_RIGHT        = 0x00000800;
+const uint VIEWPORT_TOP_LEFT     = 0x00001000;
+const uint VIEWPORT_TOP_RIGHT    = 0x00002000;
+const uint VIEWPORT_BOTTOM_LEFT  = 0x00004000;
+const uint VIEWPORT_BOTTOM_RIGHT = 0x00008000;
+
+// not used for setting for easier testing
+const uint VIEWPORT_BORDER_H_ANY = 0x00000007;
+const uint VIEWPORT_BORDER_V_ANY = 0x00000070;
+const uint VIEWPORT_SPLIT_H      = 0x0000f300;
+const uint VIEWPORT_SPLIT_V      = 0x0000fc00;
+const uint VIEWPORT_SPLIT_HV     = 0x0000f000;
+const uint VIEWPORT_TOP_ANY      = 0x00003300;
+const uint VIEWPORT_BOTTOM_ANY   = 0x0000c200;
+const uint VIEWPORT_LEFT_ANY     = 0x00005400;
+const uint VIEWPORT_RIGHT_ANY    = 0x0000c800;
+const uint VIEWPORT_QUAD         = 0x0000f000;
+
 enum EditMode
 {
     EDIT_MOVE = 0,
@@ -27,6 +65,49 @@ enum SnapScaleMode
     SNAP_SCALE_QUARTER
 }
 
+// holds info about a viewport such as camera settings and splits up shared resources
+class ViewportContext
+{
+    float cameraYaw = 0;
+    float cameraPitch = 0;
+    Camera@ camera;
+    Node@ cameraNode;
+    SoundListener@ soundListener;
+    Viewport@ viewport;
+    bool enabled = false;
+    uint index = 0;
+    uint viewportId = 0;
+
+    ViewportContext(IntRect viewRect, uint index_, uint viewportId_)
+    {
+        cameraNode = Node();
+        camera = cameraNode.CreateComponent("Camera");
+        camera.fillMode = fillMode;
+        soundListener = cameraNode.CreateComponent("SoundListener");
+        viewport = Viewport(editorScene, camera, viewRect);
+        index = index_;
+        viewportId = viewportId_;
+        camera.viewMask = 0x80000000 + 1 << index; // its easier to only have 1 gizmo active this viewport is shared with the gizmo
+    }
+
+    void ResetCamera()
+    {
+        cameraNode.position = Vector3(0, 5, -10);
+        // Look at the origin so user can see the scene.
+        cameraNode.rotation = Quaternion(Vector3(0, 0, 1), -cameraNode.position);
+        ReacquireCameraYawPitch();
+    }
+
+    void ReacquireCameraYawPitch()
+    {
+        cameraYaw = cameraNode.rotation.yaw;
+        cameraPitch = cameraNode.rotation.pitch;
+    }
+}
+
+Array<ViewportContext@> viewports;
+ViewportContext@ activeViewport;
+
 Text@ editorModeText;
 Text@ renderStatsText;
 Text@ cameraPosText;
@@ -36,11 +117,11 @@ AxisMode axisMode = AXIS_WORLD;
 FillMode fillMode = FILL_SOLID;
 SnapScaleMode snapScaleMode = SNAP_SCALE_FULL;
 
+float cameraYaw = 0;
+float cameraPitch = 0;
 float cameraBaseSpeed = 10;
 float cameraBaseRotationSpeed = 0.2;
 float cameraShiftSpeedMultiplier = 5;
-float cameraYaw = 0;
-float cameraPitch = 0;
 float newNodeDistance = 20;
 float moveStep = 0.5;
 float rotateStep = 5;
@@ -101,30 +182,472 @@ Array<String> fillModeText = {
 
 void CreateCamera()
 {
-    // Note: the camera is not inside the scene, so that it is not listed, and does not get deleted
-    cameraNode = Node();
-    camera = cameraNode.CreateComponent("Camera");
-    audio.listener = cameraNode.CreateComponent("SoundListener");
-    ResetCamera();
+    SetViewportMode(VIEWPORT_SINGLE, false);
+    SetActiveViewport(viewports[0]);
 
-    renderer.viewports[0] = Viewport(editorScene, camera);
+    // Note: the camera is not inside the scene, so that it is not listed, and does not get deleted
+    ResetCamera();
 
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("UIMouseClick", "ViewMouseClick");
+    SubscribeToEvent("MouseMove", "ViewMouseMove");
+}
+
+// create any ui associated with changing the editor viewports
+void CreateViewportUI()
+{
+    if (viewportUI is null)
+    {
+        viewportUI = UIElement();
+        ui.root.AddChild(viewportUI);
+        viewportUI.SetFixedSize(viewportArea.width, viewportArea.height);
+        viewportUI.position = IntVector2(viewportArea.top, viewportArea.left);
+        viewportUI.clipChildren = true;
+        viewportUI.clipBorder = viewportUIClipBorder;
+    }
+
+    viewportUI.RemoveAllChildren();
+    
+    Array<BorderImage@> borders;
+
+    IntRect top;
+    IntRect bottom;
+    IntRect left;
+    IntRect right;
+    IntRect topLeft;
+    IntRect topRight;
+    IntRect bottomLeft;
+    IntRect bottomRight;
+
+    for(uint i=0; i<viewports.length; i++)
+    {
+        ViewportContext@ vc = viewports[i];
+        if (vc.viewportId & VIEWPORT_TOP > 0)
+            top = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_BOTTOM > 0)
+            bottom = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_LEFT > 0)
+            left = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_RIGHT > 0)
+            right = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_TOP_LEFT > 0)
+            topLeft = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_TOP_RIGHT > 0)
+            topRight = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_BOTTOM_LEFT > 0)
+            bottomLeft = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_BOTTOM_RIGHT > 0)
+            bottomRight = vc.viewport.rect;
+    }
+
+    // creates resize borders based on the mode set
+    if (viewportMode == VIEWPORT_QUAD) // independent borders for quad isn't easy
+    {
+        borders.Push(CreateViewportDragBorder(VIEWPORT_BORDER_V, topLeft.right-viewportBorderOffset, topLeft.top, viewportBorderWidth, viewportArea.height));
+        borders.Push(CreateViewportDragBorder(VIEWPORT_BORDER_H, topLeft.left, topLeft.bottom-viewportBorderOffset, viewportArea.width, viewportBorderWidth));
+    }
+    else
+    {
+        // figures what borders to create based on mode
+        if (viewportMode & (VIEWPORT_LEFT|VIEWPORT_RIGHT) > 0)
+        {
+            borders.Push(
+                    viewportMode & VIEWPORT_LEFT > 0 ? 
+                        CreateViewportDragBorder(VIEWPORT_BORDER_V, left.right-viewportBorderOffset, left.top, viewportBorderWidth, left.height) : 
+                        CreateViewportDragBorder(VIEWPORT_BORDER_V, right.left-viewportBorderOffset, right.top, viewportBorderWidth, right.height)
+                    );
+        }
+        else 
+        {
+            if (viewportMode & (VIEWPORT_TOP_LEFT|VIEWPORT_TOP_RIGHT) > 0)
+            {
+                borders.Push(CreateViewportDragBorder(VIEWPORT_BORDER_V1, topLeft.right-viewportBorderOffset, topLeft.top, viewportBorderWidth, topLeft.height));
+            }
+            if (viewportMode & (VIEWPORT_BOTTOM_LEFT|VIEWPORT_BOTTOM_RIGHT) > 0)
+            {
+                borders.Push(CreateViewportDragBorder(VIEWPORT_BORDER_V2, bottomLeft.right-viewportBorderOffset, bottomLeft.top, viewportBorderWidth, bottomLeft.height));
+            }
+        }
+
+        if (viewportMode & (VIEWPORT_TOP|VIEWPORT_BOTTOM) > 0)
+        {
+            borders.Push(
+                    viewportMode & VIEWPORT_TOP > 0 ?
+                        CreateViewportDragBorder(VIEWPORT_BORDER_H, top.left, top.bottom-viewportBorderOffset, top.width, viewportBorderWidth) :
+                        CreateViewportDragBorder(VIEWPORT_BORDER_H, bottom.left, bottom.top-viewportBorderOffset, bottom.width, viewportBorderWidth)
+                    );
+        }
+        else 
+        {
+            if (viewportMode & (VIEWPORT_TOP_LEFT|VIEWPORT_BOTTOM_LEFT) > 0)
+            {
+                borders.Push(CreateViewportDragBorder(VIEWPORT_BORDER_H1, topLeft.left, topLeft.bottom-viewportBorderOffset, topLeft.width, viewportBorderWidth));
+            }
+            if (viewportMode & (VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM_RIGHT) > 0)
+            {
+                borders.Push(CreateViewportDragBorder(VIEWPORT_BORDER_H2, topRight.left, topRight.bottom-viewportBorderOffset, topRight.width, viewportBorderWidth));
+            }
+        }
+    }
+}
+
+BorderImage@ CreateViewportDragBorder(uint value, int posX, int posY, int sizeX, int sizeY)
+{
+    BorderImage@ border = BorderImage();
+    viewportUI.AddChild(border);
+    border.name = "border";
+    border.enabled = true;
+    border.style = "ViewportBorder";
+    border.vars["VIEWMODE"] = value;
+    border.SetFixedSize(sizeX, sizeY); // relevant size gets set by viewport later
+    border.position = IntVector2(posX, posY);
+    border.opacity = uiMaxOpacity;
+    SubscribeToEvent(border, "DragMove", "HandleViewportBorderDragMove");
+    SubscribeToEvent(border, "DragEnd", "HandleViewportBorderDragEnd");
+    return border;
+}
+
+void SetFillMode(FillMode fillMode_)
+{
+    fillMode = fillMode_;
+    for (uint i = 0; i < viewports.length; i++)
+        viewports[i].camera.fillMode = fillMode_;
+}
+
+
+// Sets the viewport mode
+// the updateUI is to get around a load order issue.  cameras load before the ui
+void SetViewportMode(uint mode = VIEWPORT_SINGLE, bool updateUI = true)
+{
+    viewports.Clear();
+    viewportMode = mode;
+
+    // always have quad a
+    {
+        uint viewport = 0;
+        ViewportContext@ vc = ViewportContext(
+            IntRect(
+                0,
+                0,
+                mode & (VIEWPORT_LEFT|VIEWPORT_TOP_LEFT) > 0 ? viewportArea.width/2 : viewportArea.width,
+                mode & (VIEWPORT_TOP|VIEWPORT_TOP_LEFT) > 0 ? viewportArea.height/2 : viewportArea.height)
+            , viewports.length+1
+            , viewportMode & (VIEWPORT_TOP|VIEWPORT_LEFT|VIEWPORT_TOP_LEFT)
+        );
+        viewports.Push(vc);
+    }
+
+    uint topRight = viewportMode & (VIEWPORT_RIGHT|VIEWPORT_TOP_RIGHT);
+    if (topRight > 0)
+    {
+        ViewportContext@ vc = ViewportContext(
+            IntRect(
+                viewportArea.width/2,
+                0,
+                viewportArea.width,
+                mode & VIEWPORT_TOP_RIGHT > 0 ? viewportArea.height/2 : viewportArea.height)
+            , viewports.length+1
+            , topRight
+        );
+        viewports.Push(vc);
+    }
+
+    uint bottomLeft = viewportMode & (VIEWPORT_BOTTOM|VIEWPORT_BOTTOM_LEFT);
+    if (bottomLeft > 0)
+    {
+        ViewportContext@ vc = ViewportContext(
+            IntRect(
+                0,
+                viewportArea.height/2,
+                mode & (VIEWPORT_BOTTOM_LEFT) > 0 ? viewportArea.width/2 : viewportArea.width,
+                viewportArea.height)
+            , viewports.length+1
+            , bottomLeft
+        );
+        viewports.Push(vc);
+    }
+
+    uint bottomRight = viewportMode & (VIEWPORT_BOTTOM_RIGHT);
+    if (bottomRight > 0)
+    {
+        ViewportContext@ vc = ViewportContext(
+            IntRect(
+                viewportArea.width/2,
+                viewportArea.height/2,
+                viewportArea.width,
+                viewportArea.height
+            )
+            , viewports.length+1
+            , bottomRight
+        );
+        viewports.Push(vc);
+    }
+
+    renderer.numViewports = viewports.length;
+    for (uint i=0; i<viewports.length; i++)
+        renderer.viewports[i] = viewports[i].viewport;
+
+    if (updateUI)
+        CreateViewportUI();
+}
+
+void HandleViewportBorderDragMove(StringHash eventType, VariantMap& eventData)
+{
+
+    UIElement@ dragBorder = eventData["Element"].GetUIElement();
+    if (dragBorder is null)
+        return;
+
+    uint hPos;
+    uint vPos;
+
+    // moves border to new cursor position, restricts motion to 1 axis, and keeps borders within view area
+    if (resizingBorder & VIEWPORT_BORDER_V_ANY > 0)
+    {
+        hPos = Clamp(ui.cursorPosition.x, 150, viewportArea.width-150);
+        vPos = dragBorder.position.y;
+        dragBorder.position = IntVector2(hPos, vPos);
+    }
+    if (resizingBorder & VIEWPORT_BORDER_H_ANY > 0)
+    {
+        vPos = Clamp(ui.cursorPosition.y, 150, viewportArea.height-150);
+        hPos = dragBorder.position.x;
+        dragBorder.position = IntVector2(hPos, vPos);
+    }
+
+    // move all dependent borders
+    Array<UIElement@> borders = viewportUI.GetChildren();
+    for (uint i = 0; i < borders.length; i++)
+    {
+        BorderImage@ border = borders[i];
+        if (border is null || border is dragBorder || border.name != "border")
+            continue;
+
+        uint borderViewMode = border.vars["VIEWMODE"].GetUInt();
+        if (resizingBorder == VIEWPORT_BORDER_H)
+        {
+            if (borderViewMode == VIEWPORT_BORDER_V1)
+            {
+                border.SetFixedHeight(vPos);
+            }
+            else if (borderViewMode == VIEWPORT_BORDER_V2)
+            {
+                border.position = IntVector2(border.position.x, vPos);
+                border.SetFixedHeight(viewportArea.height - vPos);
+            }
+        }
+        else if (resizingBorder == VIEWPORT_BORDER_V)
+        {
+            if (borderViewMode == VIEWPORT_BORDER_H1)
+            {
+                border.SetFixedWidth(hPos);
+            }
+            else if (borderViewMode == VIEWPORT_BORDER_H2)
+            {
+                border.position = IntVector2(hPos, border.position.y);
+                border.SetFixedWidth(viewportArea.width - hPos);
+            }
+        }
+    }
+}
+
+void HandleViewportBorderDragEnd(StringHash eventType, VariantMap& eventData)
+{
+    // sets the new viewports by checking all the dependencies
+
+    Array<UIElement@> children = viewportUI.GetChildren();
+    Array<BorderImage@> borders;
+
+    BorderImage@ borderV;
+    BorderImage@ borderV1;
+    BorderImage@ borderV2;
+    BorderImage@ borderH;
+    BorderImage@ borderH1;
+    BorderImage@ borderH2;
+
+    for(uint i = 0; i<children.length; i++)
+    {
+        if (children[i].name == "border")
+        {
+            BorderImage@ border = children[i];
+            uint mode = border.vars["VIEWMODE"].GetUInt();
+            if (mode == VIEWPORT_BORDER_V)
+                borderV = border;
+            else if (mode == VIEWPORT_BORDER_V1)
+                borderV1 = border;
+            else if (mode == VIEWPORT_BORDER_V2)
+                borderV2 = border;
+            else if (mode == VIEWPORT_BORDER_H)
+                borderH = border;
+            else if (mode == VIEWPORT_BORDER_H1)
+                borderH1 = border;
+            else if (mode == VIEWPORT_BORDER_H2)
+                borderH2 = border;
+        }
+    }
+
+    IntRect top;
+    IntRect bottom;
+    IntRect left;
+    IntRect right;
+    IntRect topLeft;
+    IntRect topRight;
+    IntRect bottomLeft;
+    IntRect bottomRight;
+
+    for(uint i=0; i<viewports.length; i++)
+    {
+        ViewportContext@ vc = viewports[i];
+        if (vc.viewportId & VIEWPORT_TOP > 0)
+            top = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_BOTTOM > 0)
+            bottom = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_LEFT > 0)
+            left = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_RIGHT > 0)
+            right = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_TOP_LEFT > 0)
+            topLeft = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_TOP_RIGHT > 0)
+            topRight = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_BOTTOM_LEFT > 0)
+            bottomLeft = vc.viewport.rect;
+        else if (vc.viewportId & VIEWPORT_BOTTOM_RIGHT > 0)
+            bottomRight = vc.viewport.rect;
+    }
+
+    if (borderV !is null)
+    {
+        if (viewportMode & VIEWPORT_LEFT > 0)
+            left.right = borderV.position.x+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_TOP_LEFT > 0)
+            topLeft.right = borderV.position.x+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_TOP_RIGHT > 0)
+            topRight.left = borderV.position.x+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_RIGHT > 0)
+            right.left = borderV.position.x+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_BOTTOM_LEFT > 0)
+            bottomLeft.right = borderV.position.x+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_BOTTOM_RIGHT > 0)
+            bottomRight.left = borderV.position.x+viewportBorderOffset;
+    }
+    else
+    {
+        if (borderV1 !is null)
+        {
+            if (viewportMode & VIEWPORT_TOP_LEFT > 0)
+                topLeft.right = borderV1.position.x+viewportBorderOffset;
+            if (viewportMode & VIEWPORT_TOP_RIGHT > 0)
+                topRight.left = borderV1.position.x+viewportBorderOffset;
+        }
+        if (borderV2 !is null)
+        {
+            if (viewportMode & VIEWPORT_BOTTOM_LEFT > 0)
+                bottomLeft.right = borderV2.position.x+viewportBorderOffset;
+            if (viewportMode & VIEWPORT_BOTTOM_RIGHT > 0)
+                bottomRight.left = borderV2.position.x+viewportBorderOffset;
+        }
+    }
+
+    if (borderH !is null)
+    {
+        if (viewportMode & VIEWPORT_TOP > 0)
+            top.bottom = borderH.position.y+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_TOP_LEFT > 0)
+            topLeft.bottom = borderH.position.y+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_BOTTOM_LEFT > 0)
+            bottomLeft.top = borderH.position.y+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_BOTTOM > 0)
+            bottom.top = borderH.position.y+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_TOP_RIGHT > 0)
+            topRight.bottom = borderH.position.y+viewportBorderOffset;
+        if (viewportMode & VIEWPORT_BOTTOM_RIGHT > 0)
+            bottomRight.top = borderH.position.y+viewportBorderOffset;
+    }
+    else
+    {
+        if (borderH1 !is null)
+        {
+            if (viewportMode & VIEWPORT_TOP_LEFT > 0)
+                topLeft.bottom = borderH1.position.y+viewportBorderOffset;
+            if (viewportMode & VIEWPORT_BOTTOM_LEFT > 0)
+                bottomLeft.top = borderH1.position.y+viewportBorderOffset;
+        }
+        if (borderH2 !is null)
+        {
+            if (viewportMode & VIEWPORT_TOP_RIGHT > 0)
+                topRight.bottom = borderH2.position.y+viewportBorderOffset;
+            if (viewportMode & VIEWPORT_BOTTOM_RIGHT > 0)
+                bottomRight.top = borderH2.position.y+viewportBorderOffset;
+        }
+    }
+
+    // applies the calculated changes
+    for(uint i=0; i<viewports.length; i++)
+    {
+        ViewportContext@ vc = viewports[i];
+        if (vc.viewportId & VIEWPORT_TOP > 0)
+            vc.viewport.rect = top;
+        else if (vc.viewportId & VIEWPORT_BOTTOM > 0)
+            vc.viewport.rect = bottom;
+        else if (vc.viewportId & VIEWPORT_LEFT > 0)
+            vc.viewport.rect = left;
+        else if (vc.viewportId & VIEWPORT_RIGHT > 0)
+            vc.viewport.rect = right;
+        else if (vc.viewportId & VIEWPORT_TOP_LEFT > 0)
+            vc.viewport.rect = topLeft;
+        else if (vc.viewportId & VIEWPORT_TOP_RIGHT > 0)
+            vc.viewport.rect = topRight;
+        else if (vc.viewportId & VIEWPORT_BOTTOM_LEFT > 0)
+            vc.viewport.rect = bottomLeft;
+        else if (vc.viewportId & VIEWPORT_BOTTOM_RIGHT > 0)
+            vc.viewport.rect = bottomRight;
+    }
+
+    // end drag state
+    resizingBorder = 0;
+    setViewportCursor = 0;
+}
+
+void SetViewportCursor()
+{
+    if (setViewportCursor & VIEWPORT_BORDER_V_ANY > 0)
+        ui.cursor.shape = CS_RESIZEHORIZONTAL;
+    else if (setViewportCursor & VIEWPORT_BORDER_H_ANY > 0)
+        ui.cursor.shape = CS_RESIZEVERTICAL;
+}
+
+void SetActiveViewport(ViewportContext@ context)
+{
+    // sets the global variables to the current context
+
+    @cameraNode = context.cameraNode;
+    @camera = context.camera;
+    @audio.listener = context.soundListener;
+    cameraYaw = context.cameraYaw;
+    cameraPitch = context.cameraPitch;
+
+    // camera is created before gizmo, this gets called again after ui is created
+    if (gizmo !is null)
+        gizmo.viewMask = camera.viewMask;
+
+    @activeViewport = context;
+
+    // if a mode is changed while in a drag or hovering over a border these can get out of sync
+    resizingBorder = 0;
+    setViewportCursor = 0;
 }
 
 void ResetCamera()
 {
-    cameraNode.position = Vector3(0, 5, -10);
-    // Look at the origin so user can see the scene.
-    cameraNode.rotation = Quaternion(Vector3(0, 0, 1), -cameraNode.position);
-    ReacquireCameraYawPitch();
+    for(uint i=0; i<viewports.length; i++)
+        viewports[i].ResetCamera();
 }
 
 void ReacquireCameraYawPitch()
 {
-    cameraYaw = cameraNode.rotation.yaw;
-    cameraPitch = cameraNode.rotation.pitch;
+    for(uint i=0; i<viewports.length; i++)
+        viewports[i].ReacquireCameraYawPitch();
 }
 
 void CreateGrid()
@@ -413,6 +936,18 @@ void UpdateView(float timeStep)
         if (moved)
             UpdateNodeAttributes();
     }
+
+    // if not dragging
+    if (resizingBorder == 0)
+    {
+        UIElement@ uiElement = ui.GetElementAt(ui.cursorPosition);
+        if (uiElement !is null && uiElement.vars.Contains("VIEWMODE"))
+        {
+            setViewportCursor = uiElement.vars["VIEWMODE"].GetUInt();
+            if (input.mouseButtonDown[MOUSEB_LEFT])
+                resizingBorder = setViewportCursor;
+        }
+    }
 }
 
 void SteppedObjectManipulation(int key)
@@ -517,7 +1052,29 @@ void HandlePostRenderUpdate()
     if (octreeDebug && editorScene.octree !is null)
         editorScene.octree.DrawDebugGeometry(true);
 
+    if (setViewportCursor | resizingBorder > 0)
+    {
+        SetViewportCursor();
+        if (resizingBorder == 0)
+            setViewportCursor = 0;
+    }
+
     ViewRaycast(false);
+}
+
+void ViewMouseMove()
+{
+    // setting mouse position based on mouse position
+    if (ui.focusElement !is null || input.mouseButtonDown[MOUSEB_LEFT|MOUSEB_MIDDLE|MOUSEB_RIGHT])
+        return;
+
+    IntVector2 pos = ui.cursor.position;
+    for(uint i=0;i<viewports.length;i++)
+    {
+        ViewportContext@ vc = viewports[i];
+        if (vc !is activeViewport && vc.viewport.rect.IsInside(pos) == INSIDE)
+            SetActiveViewport(vc);
+    }
 }
 
 void ViewMouseClick()
@@ -563,7 +1120,7 @@ void ViewRaycast(bool mouseClick)
     if (elementAtPos !is null)
         return;
 
-    Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
+    Ray cameraRay = camera.GetScreenRay(float(pos.x) / viewportArea.width, float(pos.y) / graphics.height);
     Component@ selectedComponent;
 
     if (pickMode != PICK_RIGIDBODIES)
