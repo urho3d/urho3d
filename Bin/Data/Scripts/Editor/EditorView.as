@@ -402,6 +402,7 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
     }
     
     ReacquireCameraYawPitch();
+    UpdateViewParameters();
     CreateViewportUI();
 }
 
