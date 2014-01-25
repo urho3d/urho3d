@@ -21,7 +21,6 @@
 //
 
 #include "Precompiled.h"
-#include "Component.h"
 #include "Context.h"
 #include "CoreEvents.h"
 #include "File.h"
@@ -33,6 +32,7 @@
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
 #include "Spline.h"
+#include "UnknownComponent.h"
 #include "WorkQueue.h"
 #include "XMLFile.h"
 
@@ -957,6 +957,7 @@ void RegisterSceneLibrary(Context* context)
     Scene::RegisterObject(context);
     SmoothedTransform::RegisterObject(context);
     Spline::RegisterObject(context);
+    UnknownComponent::RegisterObject(context);
 }
 
 }

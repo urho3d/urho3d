@@ -172,10 +172,10 @@ Object* Context::GetEventSender() const
         return 0;
 }
 
-const String& Context::GetTypeName(ShortStringHash type) const
+const String& Context::GetTypeName(ShortStringHash objectType) const
 {
     // Search factories to find the hash-to-name mapping
-    HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
+    HashMap<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
     return i != factories_.End() ? i->second_->GetTypeName() : String::EMPTY;
 }
 

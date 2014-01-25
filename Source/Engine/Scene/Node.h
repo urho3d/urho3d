@@ -375,6 +375,8 @@ protected:
     VariantMap vars_;
 
 private:
+    /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
+    Component* SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id);
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
     /// Remove child node by iterator.

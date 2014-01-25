@@ -30,6 +30,7 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "SmoothedTransform.h"
+#include "UnknownComponent.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"
@@ -122,7 +123,7 @@ bool Node::Save(Serializer& dest) const
         if (component->IsTemporary())
             continue;
         
-        // Create a separate buffer to be able to skip unknown components during deserialization
+        // Create a separate buffer to be able to skip failing components during deserialization
         VectorBuffer compBuffer;
         if (!component->Save(compBuffer))
             return false;
@@ -1056,7 +1057,8 @@ bool Node::Load(Deserializer& source, SceneResolver& resolver, bool readChildren
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash compType = compBuffer.ReadShortStringHash();
         unsigned compID = compBuffer.ReadUInt();
-        Component* newComponent = CreateComponent(compType,
+        
+        Component* newComponent = SafeCreateComponent(String::EMPTY, compType,
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
@@ -1097,7 +1099,7 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
-        Component* newComponent = CreateComponent(typeName,
+        Component* newComponent = SafeCreateComponent(typeName, ShortStringHash(typeName),
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
         if (newComponent)
         {
@@ -1349,6 +1351,25 @@ unsigned Node::GetNumPersistentComponents() const
     return ret;
 }
 
+Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash type, CreateMode mode, unsigned id)
+{
+    // First check if factory for type exists
+    if (!context_->GetTypeName(type).Empty())
+        return CreateComponent(type, mode, id);
+    else
+    {
+        // Else create as UnknownComponent
+        SharedPtr<UnknownComponent> newComponent(new UnknownComponent(context_));
+        if (typeName.Empty() || typeName.StartsWith("Unknown", false))
+            newComponent->SetType(type);
+        else
+            newComponent->SetTypeName(typeName);
+        
+        AddComponent(newComponent, id, mode);
+        return newComponent;
+    }
+}
+
 void Node::UpdateWorldTransform() const
 {
     Matrix3x4 transform = GetTransform();
@@ -1443,8 +1464,8 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         Component* component = *i;
-        Component* cloneComponent = cloneNode->CreateComponent(component->GetType(), (mode == REPLICATED && component->GetID() <
-            FIRST_LOCAL_ID) ? REPLICATED : LOCAL);
+        Component* cloneComponent = cloneNode->SafeCreateComponent(component->GetTypeName(), component->GetType(), 
+            (mode == REPLICATED && component->GetID() < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, 0);
         if (!cloneComponent)
         {
             LOGERROR("Could not clone component " + component->GetTypeName());

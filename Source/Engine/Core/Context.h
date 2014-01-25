@@ -87,7 +87,7 @@ public:
     /// Return active event handler. Set by Object. Null outside event handling.
     EventHandler* GetEventHandler() const { return eventHandler_; }
     /// Return object type name from hash, or empty if unknown.
-    const String& GetTypeName(ShortStringHash type) const;
+    const String& GetTypeName(ShortStringHash objectType) const;
     /// Return a specific attribute description for an object, or null if not found.
     AttributeInfo* GetAttribute(ShortStringHash objectType, const char* name);
     /// Template version of returning a subsystem.
