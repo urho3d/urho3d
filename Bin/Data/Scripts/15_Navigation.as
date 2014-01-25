@@ -4,6 +4,8 @@
 //     - Performing path queries to the navigation mesh
 //     - Rebuilding the navigation mesh partially when adding or removing objects
 //     - Visualizing custom debug geometry
+//     - Raycasting drawable components
+//     - Make a node follow the Detour path
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -17,6 +19,8 @@ float pitch = 0.0f;
 bool drawDebug = false;
 bool startPosDefined = false;
 bool endPosDefined = false;
+Node@ Jack;
+uint nextWaypoint = 0;
 
 void Start()
 {
@@ -92,7 +96,15 @@ void CreateScene()
         if (size >= 3.0f)
             boxObject.occluder = true;
     }
-    
+
+    // Create Jack node that will follow the path
+    Jack = scene_.CreateChild("Jack");
+    Jack.position = Vector3(-5.0f, 0.0f, 20.0f);
+    AnimatedModel@ modelObject = Jack.CreateComponent("AnimatedModel");
+    modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
+    modelObject.material = cache.GetResource("Material", "Materials/Jack.xml");
+    modelObject.castShadows = true;
+
     // Create a NavigationMesh component to the scene root
     NavigationMesh@ navMesh = scene_.CreateComponent("NavigationMesh");
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -230,6 +242,7 @@ void SetPathPoint()
         
         if (startPosDefined && endPosDefined)
             RecalculatePath();
+        Jack.position = startPos; // Reset Jack position to start
     }
 }
 
@@ -283,6 +296,7 @@ void RecalculatePath()
 {
     NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
     currentPath = navMesh.FindPath(startPos, endPos);
+    nextWaypoint = 0; // Reset next waypoint ID
 }
 
 bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
@@ -309,6 +323,22 @@ bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
     return false;
 }
 
+void followPath()
+{
+    if (startPosDefined && endPosDefined)
+    {
+        // Get next waypoint to reach
+        if (Floor(Jack.position.x) == Floor(currentPath[nextWaypoint].x) && Floor(Jack.position.z) == Floor(currentPath[nextWaypoint].z))
+            nextWaypoint = nextWaypoint + 1; // When a waypoint is reached, update next waypoint to reach
+        if (nextWaypoint < currentPath.length - 1) // Stop when endPos reached
+        {
+            // Rotate Jack toward next waypoint to reach and move
+            Jack.LookAt(currentPath[nextWaypoint], Vector3(0.0f, 1.0f, 0.0f));
+            Jack.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * 0.4);
+        }
+    }
+}
+
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Take the frame time step, which is stored as a float
@@ -316,6 +346,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+
+    // Make Jack follow the Detour path
+    followPath();
 }
 
 void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
