@@ -104,9 +104,9 @@ public:
     Cursor* GetCursor() const { return cursor_; }
     /// Return cursor position.
     IntVector2 GetCursorPosition() const;
-    /// Return UI element at screen coordinates.
+    /// Return UI element at screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(const IntVector2& position, bool enabledOnly = true);
-    /// Return UI element at screen coordinates.
+    /// Return UI element at screen coordinates. By default returns only input-enabled elements.
     UIElement* GetElementAt(int x, int y, bool enabledOnly = true);
     /// Return focused element.
     UIElement* GetFocusElement() const { return focusElement_; }
