@@ -365,7 +365,8 @@ void ToolBarFillModeSolid(StringHash eventType, VariantMap& eventData)
 void ToolBarSetViewportMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ dropDown = eventData["Element"].GetUIElement();
-    UIElement@ selected = dropDown.GetItems()[dropDown.selection];
+    UIElement@ selected = dropDown.selectedItem;
+    dropDown.focus = false;     // Lose the focus so the RMB dragging, immediately followed after changing viewport setup, behaves as expected
     uint mode = selected.vars[VIEW_MODE].GetUInt();
     SetViewportMode(mode);
 }
