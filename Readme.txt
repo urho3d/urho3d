@@ -416,16 +416,17 @@ cmake_xxxx batch files or shell scripts.
 |                      |  Vista and above only)                                |
 |-DUSE_STATIC_RUNTIME=1|to use static C/C++ runtime libraries and eliminate the|
 |                      |  need for runtime DLLs installation (VS only)         |
-|-DSCP_TO_TARGET=      |to automatically scp executables to target system      |
-|  usr@tgt:remote-loc  | (Raspberry Pi cross-compiling build only), SSH digital|
-|                      | key must be setup first for this to work              | 
-|-DCMAKE_BUILD_TYPE=   |to tell CMake which build configuration to be          |
-|  Release/Debug/      | generated, default is Release (cmake_gcc.sh and       |
-|  RelWithDebInfo      | cmake_eclipse.sh only)                                |
-|-DURHO3D_LIB_TYPE=    |to specify Urho3D library type, default is STATIC      |
-|  STATIC/SHARED       |                                                       |
-|-DANDROID_ABI=armeabi |to build armeabi native code (Android build only),     |
-|                      | default is armeabi-v7a                                |
+|-DSCP_TO_TARGET=<v>   |to automatically scp executables to target system      |
+|                      | (Raspberry Pi cross-compiling build only), SSH digital|
+|                      | key must be setup first for this to work, typical     |
+|                      | value has a pattern of usr@tgt:remote-loc             |
+|-DCMAKE_BUILD_TYPE=<v>|to tell CMake which build configuration to be          |
+|                      | generated (Makefile generator only), possible values  |
+|                      | are Release (default), Debug, and RelWithDebInfo      |
+|-DURHO3D_LIB_TYPE=<v> |to specify Urho3D library type, possible values are    |
+|                      | STATIC (default) and SHARED                           |
+|-DANDROID_ABI=<v>     |to specify ABI for native code (Android build only),   |
+|                      | possible values are armeabi-v7a (default) and armeabi |
 |----------------------|-------------------------------------------------------|
 
 Note that build option values specified via command line are cached by CMake.

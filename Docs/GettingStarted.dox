@@ -130,25 +130,25 @@ The prerequisites are Doxygen and Graphviz. Tools to dump the \ref ScriptAPI "An
 \section Build_Options Build options
 
 A number of build options can be defined explicitly when invoking the above cmake_xxxx batch files or shell scripts.\n
-|Defines                                      |Build Options|
-|---------------------------------------------|---------------------|
-|-DENABLE_64BIT=1                             |to enable 64bit build|
-|-DENABLE_LUA=1                               |to enable additional Lua scripting support|
-|-DENABLE_LUAJIT=1                            |to enable Lua Just-in-time compilation, implied ENABLE_LUA (check its CMakeLists.txt for more options)|
-|-DENABLE_SAFE_LUA=1                          |to enable Lua C++ wrapper safety checks|
-|-DENABLE_SAMPLES=1                           |to build the C++ sample applications|
-|-DENABLE_TOOLS=1                             |to build the tools (only useful for Raspberry Pi build because this option is already enabled by default for other Desktop platforms)|
-|-DENABLE_DOCS=1                              |to build the docs when building all the targets|
-|-DENABLE_ANGELSCRIPT=0                       |to disable AngelScript scripting support|
-|-DENABLE_SSE=0                               |to disable SSE instruction set|
-|-DENABLE_MINIDUMPS=0                         |to disable minidumps on crash (VS only)|
-|-DUSE_OPENGL=1                               |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)|
-|-DUSE_MKLINK=1                               |to use mklink command to create symbolic links (Windows Vista and above only)|
-|-DUSE_STATIC_RUNTIME=1                       |to use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
-|-DSCP_TO_TARGET=user\@target:remote-location |to automatically scp executables to target system (Raspberry Pi cross-compiling build only), SSH digital key must be setup first for this to work|
-|-DCMAKE_BUILD_TYPE=Release/Debug/RelWithDebInfo |to tell CMake which build configuration to be generated, default is Release (cmake_gcc.sh and cmake_eclipse.sh only)|
-|-DURHO3D_LIB_TYPE=STATIC/SHARED              |to specify Urho3D library type, default is STATIC|
-|-DANDROID_ABI=armeabi                        |to build armeabi native code (Android build only), default is armeabi-v7a|
+|Defines               |Build Options|
+|----------------------|---------------------|
+|-DENABLE_64BIT=1      |to enable 64bit build|
+|-DENABLE_LUA=1        |to enable additional Lua scripting support|
+|-DENABLE_LUAJIT=1     |to enable Lua Just-in-time compilation, implied ENABLE_LUA (check its CMakeLists.txt for more options)|
+|-DENABLE_SAFE_LUA=1   |to enable Lua C++ wrapper safety checks|
+|-DENABLE_SAMPLES=1    |to build the C++ sample applications|
+|-DENABLE_TOOLS=1      |to build the tools (only useful for Raspberry Pi build because this option is already enabled by default for other Desktop platforms)|
+|-DENABLE_DOCS=1       |to build the docs when building all the targets|
+|-DENABLE_ANGELSCRIPT=0|to disable AngelScript scripting support|
+|-DENABLE_SSE=0        |to disable SSE instruction set|
+|-DENABLE_MINIDUMPS=0  |to disable minidumps on crash (VS only)|
+|-DUSE_OPENGL=1        |to use OpenGL instead of Direct3D (only useful for VS on Windows platform because this option is enabled by default for other platforms)|
+|-DUSE_MKLINK=1        |to use mklink command to create symbolic links (Windows Vista and above only)|
+|-DUSE_STATIC_RUNTIME=1|to use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
+|-DSCP_TO_TARGET=<v>   |to automatically scp executables to target system (Raspberry Pi cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc| 
+|-DCMAKE_BUILD_TYPE=<v>|to tell CMake which build configuration to be generated (Makefile generator only), possible values are Release (default), Debug, and RelWithDebInfo|
+|-DURHO3D_LIB_TYPE=<v> |to specify Urho3D library type, possible values are STATIC (default) and SHARED|
+|-DANDROID_ABI=<v>     |to specify ABI for native code (Android build only), possible values are armeabi-v7a (default) and armeabi|
 
 Note that build option values specified via command line are cached by CMake. The cached values will be used by CMake in the subsequent invocation. That is, the same build options are not required to be specified again and again. Once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly setting it via command line. That is, simply by NOT passing the corresponding build option would not work. One way to revert all the build options to their default values is by clearing the CMake cache by calling cmake_clean.bat or cmake_clean.sh.
 
