@@ -367,6 +367,11 @@ void UI::Render()
 {
     PROFILE(RenderUI);
 
+    // If the OS cursor is visible, apply its shape now if changed
+    bool osCursorVisible = GetSubsystem<Input>()->IsMouseVisible();
+    if (cursor_ && osCursorVisible)
+        cursor_->ApplyOSCursorShape();
+    
     SetVertexData(vertexBuffer_, vertexData_);
     SetVertexData(debugVertexBuffer_, debugVertexData_);
 
@@ -613,6 +618,7 @@ void UI::Initialize()
 
     initialized_ = true;
 
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(UI, HandleBeginFrame));
     SubscribeToEvent(E_POSTUPDATE, HANDLER(UI, HandlePostUpdate));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
 
@@ -905,8 +911,6 @@ void UI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, 
         if (!dragElement_ || dragElement_ == element || dragDropTest)
             element->OnHover(element->ScreenToElement(cursorPos), cursorPos, buttons, qualifiers, cursor);
     }
-    else if (cursor)
-        cursor->SetShape(CS_NORMAL);
 
     // Drag and drop test
     if (dragDropTest)
@@ -1006,8 +1010,6 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
             {
                 dragElement_->OnDragEnd(dragElement_->ScreenToElement(cursorPos), cursorPos, cursor);
                 SendDragEvent(E_DRAGEND, dragElement_, cursorPos);
-                if (cursor)
-                    cursor->SetShape(CS_NORMAL);
 
                 bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
                 if (dragSource)
@@ -1348,6 +1350,14 @@ void UI::HandleChar(StringHash eventType, VariantMap& eventData)
     UIElement* element = focusElement_;
     if (element)
         element->OnChar(eventData[P_CHAR].GetInt(), mouseButtons_, qualifiers_);
+}
+
+void UI::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+{
+    // If have a cursor, and a drag is not going on, reset the cursor shape. Application logic that wants to apply
+    // custom shapes can do it after this, but needs to do it each frame
+    if (cursor_ && !dragElement_)
+        cursor_->SetShape(CS_NORMAL);
 }
 
 void UI::HandlePostUpdate(StringHash eventType, VariantMap& eventData)

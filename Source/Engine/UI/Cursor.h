@@ -102,10 +102,10 @@ public:
     void SetShapesAttr(VariantVector value);
     /// Return shapes attribute.
     VariantVector GetShapesAttr() const;
-
+    /// Apply pending OS cursor shape. Called by UI. No-op when the OS mouse pointer is not used.
+    void ApplyOSCursorShape();
+    
 protected:
-    /// Apply the current shape.
-    void ApplyShape();
     /// Handle operating system mouse cursor visibility change event.
     void HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData);
     
@@ -115,6 +115,8 @@ protected:
     CursorShapeInfo shapeInfos_[CS_MAX_SHAPES];
     /// Use system default shapes flag.
     bool useSystemShapes_;
+    /// OS cursor shape needs update flag.
+    bool osShapeDirty_;
 };
 
 }

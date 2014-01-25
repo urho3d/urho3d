@@ -959,7 +959,7 @@ void UpdateView(float timeStep)
             UpdateNodeAttributes();
     }
 
-    // if not dragging
+    // If not dragging
     if (resizingBorder == 0)
     {
         UIElement@ uiElement = ui.GetElementAt(ui.cursorPosition);

@@ -192,6 +192,8 @@ private:
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
     /// Handle character event.
     void HandleChar(StringHash eventType, VariantMap& eventData);
+    /// Handle frame begin event.
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle logic post-update event.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
