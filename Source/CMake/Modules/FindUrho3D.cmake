@@ -26,6 +26,8 @@
 #  URHO3D_FOUND
 #  URHO3D_INCLUDE_DIRS
 #  URHO3D_LIBRARIES
+#  URHO3D_LIBRARIES_REL
+#  URHO3D_LIBRARIES_DBG
 #
 
 if (URHO3D_FOUND)
@@ -45,7 +47,7 @@ endif ()
 
 set (URHO3D_LIB_NAMES Urho3D)
 if (WIN32)
-    list (APPEND URHO3D_LIB_NAMES Urho3D_d)
+    set (URHO3D_LIB_NAMES_DBG Urho3D_d)
 endif ()
 
 if (CMAKE_PROJECT_NAME MATCHES Urho3D.* AND PROJECT_ROOT_DIR)
@@ -95,6 +97,9 @@ if (URHO3D_HOME)
             set (FOUND_MESSAGE "Found Urho3D: as CMake target")
         else ()
             find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+            if (WIN32)
+                find_library (URHO3D_LIBRARIES_DBG NAMES ${URHO3D_LIB_NAMES_DBG} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+            endif ()
         endif ()
     endif ()
 else ()
@@ -119,6 +124,9 @@ else ()
     endif ()
     find_path (URHO3D_INCLUDE_DIRS Urho3D.h PATHS ${URHO3D_INC_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
     find_library (URHO3D_LIBRARIES NAMES ${URHO3D_LIB_NAMES} PATHS ${URHO3D_LIB_SEARCH_PATH} PATH_SUFFIXES ${PATH_SUFFIX})
+    if (WIN32)
+        find_library (URHO3D_LIBRARIES_DBG NAMES ${URHO3D_LIB_NAMES_DBG} PATHS ${URHO3D_LIB_SEARCH_PATH} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    endif ()
 
     if (URHO3D_INCLUDE_DIRS)
         set (BASE_DIR ${URHO3D_INCLUDE_DIRS})
@@ -130,6 +138,11 @@ else ()
             list (APPEND URHO3D_INCLUDE_DIRS ${BASE_DIR}/${DIR})     # Note: variable change to list context after this, so we need BASE_DIR to remain the same
         endforeach ()
     endif ()
+endif ()
+
+if (WIN32)
+    set (URHO3D_LIBRARIES_REL ${URHO3D_LIBRARIES})
+    set (URHO3D_LIBRARIES ${URHO3D_LIBRARIES} ${URHO3D_LIBRARIES_DBG})
 endif ()
 
 if (URHO3D_INCLUDE_DIRS AND URHO3D_LIBRARIES)

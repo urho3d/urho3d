@@ -606,10 +606,20 @@ macro (define_dependency_libs TARGET)
             endif ()
         endif ()
 
-        # This variable value can either be 'Urho3D' target or an absolute path to an actual static/shared Urho3D library
+        # This variable value can either be 'Urho3D' target or an absolute path to an actual static/shared Urho3D library or empty (if we are building the library itself)
         # The former would cause CMake not only to link against the Urho3D library but also to add a dependency to Urho3D target
         if (URHO3D_LIBRARIES)
-            list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
+            if (WIN32 AND IS_ABSOLUTE ${URHO3D_LIBRARIES} AND TARGET ${TARGET_NAME})
+                if (URHO3D_LIBRARIES_DBG)
+                    set (WIN32_LIBS debug ${URHO3D_LIBRARIES_DBG})
+                endif ()
+                if (URHO3D_LIBRARIES_REL)
+                    list (APPEND WIN32_LIBS optimized ${URHO3D_LIBRARIES_REL})
+                endif ()
+                target_link_libraries (${TARGET_NAME} ${WIN32_LIBS})
+            else ()
+                list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
+            endif ()
         endif ()
 
         # LuaJIT specific - extra linker flags for linking against LuaJIT (adapted from LuaJIT's original Makefile)
