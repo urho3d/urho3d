@@ -228,8 +228,7 @@ void SetPathPoint()
             endPosDefined = true;
         }
         
-        if (startPosDefined && endPosDefined)
-            RecalculatePath();
+        RecalculatePath();
     }
 }
 
@@ -281,6 +280,9 @@ Node@ CreateMushroom(const Vector3& pos)
 
 void RecalculatePath()
 {
+    if (!startPosDefined || !endPosDefined)
+        return;
+
     NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
     currentPath = navMesh.FindPath(startPos, endPos);
 }

@@ -227,9 +227,7 @@ function SetPathPoint()
             endPosDefined = true
         end
         
-        if startPosDefined and endPosDefined then
-            RecalculatePath()
-        end
+        RecalculatePath()
     end
 end
 
@@ -271,6 +269,10 @@ function CreateMushroom(pos)
 end
 
 function RecalculatePath()
+    if not startPosDefined or not endPosDefined then
+        return
+    end
+
     local navMesh = scene_:GetComponent("NavigationMesh")
     currentPath = navMesh:FindPath(startPos, endPos)
 end

@@ -278,8 +278,7 @@ void Navigation::SetPathPoint()
             endPosDefined_ = true;
         }
         
-        if (startPosDefined_ && endPosDefined_)
-            RecalculatePath();
+        RecalculatePath();
     }
 }
 
@@ -331,6 +330,9 @@ Node* Navigation::CreateMushroom(const Vector3& pos)
 
 void Navigation::RecalculatePath()
 {
+    if (!startPosDefined_ || !endPosDefined_)
+        return;
+    
     NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
     navMesh->FindPath(currentPath_, startPos_, endPos_);
 }
