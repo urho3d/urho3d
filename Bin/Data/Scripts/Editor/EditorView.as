@@ -791,6 +791,7 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
     text.verticalAlignment = vAlign;
     text.SetFont(font, 11);
     text.color = Color(1, 1, 0);
+    text.textEffect = TE_SHADOW;
     text.priority = -100;
 }
 
