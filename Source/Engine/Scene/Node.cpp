@@ -1358,6 +1358,7 @@ Component* Node::SafeCreateComponent(const String& typeName, ShortStringHash typ
         return CreateComponent(type, mode, id);
     else
     {
+        LOGWARNING("Component type " + type.ToString() + " not known, creating UnknownComponent as placeholder");
         // Else create as UnknownComponent
         SharedPtr<UnknownComponent> newComponent(new UnknownComponent(context_));
         if (typeName.Empty() || typeName.StartsWith("Unknown", false))
