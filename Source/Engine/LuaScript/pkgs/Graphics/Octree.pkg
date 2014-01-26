@@ -6,10 +6,15 @@ class Octree : public Component
     void Update(const FrameInfo& frame);
     void AddManualDrawable(Drawable* drawable);
     void RemoveManualDrawable(Drawable* drawable);
-    
+
     // void GetDrawables(OctreeQuery& query) const;
+    tolua_outside PODVector<OctreeQueryResult> OctreeGetDrawablesPoint @ GetDrawables(const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
+    tolua_outside PODVector<OctreeQueryResult> OctreeGetDrawablesBoundingBox @ GetDrawables(const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
+    tolua_outside PODVector<OctreeQueryResult> OctreeGetDrawablesFrustum @ GetDrawables(const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
+    tolua_outside PODVector<OctreeQueryResult> OctreeGetDrawablesSphere @ GetDrawables(const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const;
+
     // void Raycast(RayOctreeQuery& query) const;
-    tolua_outside void OctreeRaycast @ Raycast(PODVector<RayQueryResult> &result, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const;
+    tolua_outside PODVector<RayQueryResult> OctreeRaycast @ Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const;
     // void RaycastSingle(RayOctreeQuery& query) const;
     tolua_outside RayQueryResult OctreeRaycastSingle @ RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const;
     
@@ -22,6 +27,66 @@ class Octree : public Component
 };
 
 ${
+static PODVector<OctreeQueryResult> OctreeGetDrawablesPoint(const Octree* octree, const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK)
+{
+    PODVector<Drawable*> drawableResult;
+    PointOctreeQuery query(drawableResult, point, drawableFlags, viewMask);
+    octree->GetDrawables(query);
+    
+    PODVector<OctreeQueryResult> result(drawableResult.Size());
+    for (unsigned i = 0; i < drawableResult.Size(); ++i)
+    {
+        result[i].drawable_ = drawableResult[i];
+        result[i].node_ = drawableResult[i]->GetNode();
+    }
+    return result;
+}
+
+static PODVector<OctreeQueryResult> OctreeGetDrawablesBoundingBox(const Octree* octree, const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK)
+{
+    PODVector<Drawable*> drawableResult;
+    BoxOctreeQuery query(drawableResult, box, drawableFlags, viewMask);
+    octree->GetDrawables(query);
+
+    PODVector<OctreeQueryResult> result(drawableResult.Size());
+    for (unsigned i = 0; i < drawableResult.Size(); ++i)
+    {
+        result[i].drawable_ = drawableResult[i];
+        result[i].node_ = drawableResult[i]->GetNode();
+    }
+    return result;
+}
+
+static PODVector<OctreeQueryResult> OctreeGetDrawablesFrustum(const Octree* octree, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK)
+{
+    PODVector<Drawable*> drawableResult;
+    FrustumOctreeQuery query(drawableResult, frustum, drawableFlags, viewMask);
+    octree->GetDrawables(query);
+
+    PODVector<OctreeQueryResult> result(drawableResult.Size());
+    for (unsigned i = 0; i < drawableResult.Size(); ++i)
+    {
+        result[i].drawable_ = drawableResult[i];
+        result[i].node_ = drawableResult[i]->GetNode();
+    }
+    return result;
+}
+
+static PODVector<OctreeQueryResult> OctreeGetDrawablesSphere(const Octree* octree, const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK)
+{
+    PODVector<Drawable*> drawableResult;
+    SphereOctreeQuery query(drawableResult, sphere, drawableFlags, viewMask);
+    octree->GetDrawables(query);
+
+    PODVector<OctreeQueryResult> result(drawableResult.Size());
+    for (unsigned i = 0; i < drawableResult.Size(); ++i)
+    {
+        result[i].drawable_ = drawableResult[i];
+        result[i].node_ = drawableResult[i]->GetNode();
+    }
+    return result;
+}
+
 static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
 {
     PODVector<RayQueryResult> result;
@@ -40,9 +105,11 @@ static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, 
     }
 }
 
-static void OctreeRaycast(const Octree* octree, PODVector<RayQueryResult> &result, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
+static PODVector<RayQueryResult> OctreeRaycast(const Octree* octree, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags)
 {
-    RayOctreeQuery query(result,ray,level,maxDistance,drawableFlags);
+    PODVector<RayQueryResult> result;
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags);
     octree->Raycast(query);
+    return result;
 }
 $}

@@ -261,8 +261,8 @@ function HandleUpdate(eventType, eventData)
                     return
                 end
             end
---  	  else
---  	      character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false)
+        else
+            character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false)
         end
     end
 

@@ -1,5 +1,13 @@
 $#include "OctreeQuery.h"
 
+struct OctreeQueryResult
+{
+    OctreeQueryResult();
+    
+    Drawable* drawable_ @ drawable;
+    Node* node_ @ node;
+};
+
 enum RayQueryLevel
 {
     RAY_AABB_NOSUBOBJECTS = 0,

@@ -21,7 +21,8 @@ class PhysicsWorld : public Component
     void SetSplitImpulse(bool enable);
     void SetMaxNetworkAngularVelocity(float velocity);
 
-    void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside PODVector<PhysicsRaycastResult> PhysicsWorldRaycast @ Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
 
     // void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingle @ RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
@@ -51,6 +52,13 @@ class PhysicsWorld : public Component
 };
 
 ${
+static PODVector<PhysicsRaycastResult> PhysicsWorldRaycast(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    PODVector<PhysicsRaycastResult> result;
+    physicsWorld->Raycast(result, ray, maxDistance, collisionMask);
+    return result;
+}
+
 static PhysicsRaycastResult PhysicsWorldRaycastSingle(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 {
     PhysicsRaycastResult result;

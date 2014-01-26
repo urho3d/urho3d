@@ -148,6 +148,25 @@ public:
     Frustum frustum_;
 };
 
+/// General octree query result. Used for Lua bindings only.
+struct URHO3D_API OctreeQueryResult
+{
+    /// Construct with defaults.
+    OctreeQueryResult() :
+        drawable_(0),
+        node_(0)
+    {
+    }
+
+    /// Test for inequality, added to prevent GCC from complaining.
+    bool operator != (const OctreeQueryResult& rhs) const { return drawable_ != rhs.drawable_ || node_ != rhs.node_; }
+    
+    /// Drawable.
+    Drawable* drawable_;
+    /// Scene node.
+    Node* node_;
+};
+
 /// Graphics raycast detail level.
 enum RayQueryLevel
 {
@@ -158,7 +177,7 @@ enum RayQueryLevel
 };
 
 /// Raycast result.
-struct RayQueryResult
+struct URHO3D_API RayQueryResult
 {
     /// Construct with defaults.
     RayQueryResult() :

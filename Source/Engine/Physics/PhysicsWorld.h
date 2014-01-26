@@ -55,8 +55,9 @@ class XMLElement;
 struct CollisionGeometryData;
 
 /// Physics raycast hit.
-struct PhysicsRaycastResult
+struct URHO3D_API PhysicsRaycastResult
 {
+    /// Construct with defaults.
     PhysicsRaycastResult() :
         body_(0)
     {

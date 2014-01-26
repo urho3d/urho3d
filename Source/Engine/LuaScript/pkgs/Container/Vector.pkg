@@ -5,7 +5,7 @@ $#include "PhysicsWorld.h"
 
 class PODVector
 {
-    TOLUA_TEMPLATE_BIND(T, Vector3, RayQueryResult, PhysicsRaycastResult)
+    TOLUA_TEMPLATE_BIND(T, Vector3, OctreeQueryResult, RayQueryResult, PhysicsRaycastResult)
     
     PODVector();
     PODVector(const PODVector<T>& vector);
@@ -52,5 +52,6 @@ class PODVector
     tolua_readonly tolua_property__no_prefix bool empty;
 };
 
+$renaming PODVector<OctreeQueryResult> @ OctreeQueryResultVector
 $renaming PODVector<RayQueryResult> @ RayQueryResultVector
 $renaming PODVector<PhysicsRaycastResult> @ PhysicsRaycastResultVector
