@@ -11,13 +11,17 @@
 -- 3 fingers touch & 4 fingers touch could be used to switch gyroscope on/off, activate/deactivate secondary viewport, activate a panel GUI, switch debug HUD/geometry, toggle console, switch the gyroscope...
 
 -- Setup:
--- on init, call this script using 'if GetPlatform() == "Android" or GetPlatform() == "iOS" then require "LuaScripts/Utilities/Touch" end'
--- subscribe to touch events (Begin, Move, End) using 'if GetPlatform() == "Android" or GetPlatform() == "iOS" then SubscribeToTouchEvents() end'
--- call the update function 'updateTouches()' from HandleUpdate or equivalent update handler function
+-- - On init, call this script using 'require "LuaScripts/Utilities/Touch" end' then 'InitTouchInput()' on mobile platforms
+--   -> to detect platform, use 'if GetPlatform() == "Android" or GetPlatform() == "iOS"')
+-- - Subscribe to touch events (Begin, Move, End) using 'SubscribeToTouchEvents()'
+-- - Call the update function 'updateTouches()' from HandleUpdate or equivalent update handler function
 
+TOUCH_SENSITIVITY = 5.0
+GYROSCOPE_THRESHOLD = 0.1
+CAMERA_MIN_DIST = 1.0
+CAMERA_INITIAL_DIST = 5.0
+CAMERA_MAX_DIST = 20.0
 
-local touchEnabled = true
-local touchSensitivity = 5
 local moveTouchID = -1
 local rotateTouchID = -1
 local fireTouchID = -1
@@ -26,14 +30,18 @@ local fireButton
 local touchButtonSize = 96
 local touchButtonBorder = 12
 local zoom = false
-local cameraMode = nil
+local newFirstPerson = nil
 local debugMode = nil
-local gyroscopeTreshold = 0.1 -- 0.05
 local shadowMode = true
 
+firstPerson = false
+touchEnabled = false
+cameraDistance = CAMERA_INITIAL_DIST
+cameraNode = nil
 
 -- Create Gamepad Buttons
 
+function InitTouchInput()
     moveButton = ui.root:CreateChild("BorderImage")
     moveButton.texture = cache:GetResource("Texture2D", "Textures/TouchInput.png")
     moveButton.imageRect = IntRect(0, 0, 96, 96) -- Crop right side of the texture
@@ -50,14 +58,16 @@ local shadowMode = true
     fireButton:SetSize(touchButtonSize, touchButtonSize)
     fireButton.opacity = 0.25
 
+    touchEnabled = true
+end
 
 function SubscribeToTouchEvents()
     SubscribeToEvent("TouchBegin", "HandleTouchBegin")
     SubscribeToEvent("TouchEnd", "HandleTouchEnd")
 end
 
-function updateTouches() -- Called from HandleUpdate
-    local charCtrl = characterNode:GetScriptObject().controls
+function updateTouches(controls) -- Called from HandleUpdate
+    local controls = characterNode:GetScriptObject().controls
     local camera = cameraNode:GetComponent("Camera")
     zoom = false -- reset bool
 
@@ -73,13 +83,13 @@ function updateTouches() -- Called from HandleUpdate
 
             if zoom then
                 if Abs(touch1.position.y - touch2.position.y) > Abs(touch1.lastPosition.y - touch2.lastPosition.y) then sens = -1 else sens = 1 end -- Check for zoom direction (in/out)
-                CAMERA_MAX_DIST = CAMERA_MAX_DIST + Abs( touch1.delta.y - touch2.delta.y ) * sens * touchSensitivity / 50
-                CAMERA_MAX_DIST = Clamp(CAMERA_MAX_DIST, CAMERA_MIN_DIST, 20) -- Restrict zoom range to [1;20]
+                cameraDistance = cameraDistance + Abs( touch1.delta.y - touch2.delta.y ) * sens * TOUCH_SENSITIVITY / 50
+                cameraDistance = Clamp(cameraDistance, CAMERA_MIN_DIST, CAMERA_MAX_DIST) -- Restrict zoom range to [1;20]
             end
         end
 
         -- Switch 1st/3rd person mode
-        if input.numTouches == 3 then cameraMode = not firstPerson end
+        if input.numTouches == 3 then newFirstPerson = not firstPerson end
 
         -- Switch draw debug
         if input.numTouches == 4 then shadowMode = not renderer.drawShadows end
@@ -91,33 +101,33 @@ function updateTouches() -- Called from HandleUpdate
                 local touch = input:GetTouch(i) -- TouchState
 
                 if touch.touchID == rotateTouchID then
-                    charCtrl.yaw = charCtrl.yaw + touchSensitivity * camera.fov / graphics.height * touch.delta.x
-                    charCtrl.pitch = charCtrl.pitch + touchSensitivity * camera.fov / graphics.height * touch.delta.y
-                    charCtrl.pitch = Clamp(charCtrl.pitch, -80, 80) -- Limit pitch
+                    controls.yaw = controls.yaw + TOUCH_SENSITIVITY * camera.fov / graphics.height * touch.delta.x
+                    controls.pitch = controls.pitch + TOUCH_SENSITIVITY * camera.fov / graphics.height * touch.delta.y
+                    controls.pitch = Clamp(controls.pitch, -80, 80) -- Limit pitch
                 end
 
 				if touch.touchID == moveTouchID then
                     local relX = touch.position.x - moveButton.screenPosition.x - touchButtonSize / 2
                     local relY = touch.position.y - moveButton.screenPosition.y - touchButtonSize / 2
-                        if relY < 0 and Abs(relX * 3 / 2) < Abs(relY) then charCtrl:Set(CTRL_FORWARD, true) end
-                        if relY > 0 and Abs(relX * 3 / 2) < Abs(relY) then charCtrl:Set(CTRL_BACK, true) end
-                        if relX < 0 and Abs(relY * 3 / 2) < Abs(relX) then charCtrl:Set(CTRL_LEFT, true) end
-                        if relX > 0 and Abs(relY * 3 / 2) < Abs(relX) then charCtrl:Set(CTRL_RIGHT, true) end
+                        if relY < 0 and Abs(relX * 3 / 2) < Abs(relY) then controls:Set(CTRL_FORWARD, true) end
+                        if relY > 0 and Abs(relX * 3 / 2) < Abs(relY) then controls:Set(CTRL_BACK, true) end
+                        if relX < 0 and Abs(relY * 3 / 2) < Abs(relX) then controls:Set(CTRL_LEFT, true) end
+                        if relX > 0 and Abs(relY * 3 / 2) < Abs(relX) then controls:Set(CTRL_RIGHT, true) end
                     end
                 end
         end
 
-        if fireTouchID >= 0 then charCtrl:Set(CTRL_JUMP, true) end
+        if fireTouchID >= 0 then controls:Set(CTRL_JUMP, true) end
     end
 
 	-- Gyroscope (emulated by SDL through a virtual joystick)
     if input.numJoysticks > 0 then -- numJoysticks = 1 on iOS & Android
         local joystick = input:GetJoystick(0) -- JoystickState
         if joystick.numAxes >= 2 then
-            if joystick:GetAxisPosition(0) < -gyroscopeTreshold then charCtrl:Set(CTRL_LEFT, true) end
-            if joystick:GetAxisPosition(0) > gyroscopeTreshold then charCtrl:Set(CTRL_RIGHT, true) end
-            if joystick:GetAxisPosition(1) < -gyroscopeTreshold then charCtrl:Set(CTRL_FORWARD, true) end
-            if joystick:GetAxisPosition(1) > gyroscopeTreshold then charCtrl:Set(CTRL_BACK, true) end
+            if joystick:GetAxisPosition(0) < -GYROSCOPE_THRESHOLD then controls:Set(CTRL_LEFT, true) end
+            if joystick:GetAxisPosition(0) > GYROSCOPE_THRESHOLD then controls:Set(CTRL_RIGHT, true) end
+            if joystick:GetAxisPosition(1) < -GYROSCOPE_THRESHOLD then controls:Set(CTRL_FORWARD, true) end
+            if joystick:GetAxisPosition(1) > GYROSCOPE_THRESHOLD then controls:Set(CTRL_BACK, true) end
         end
 	end
 end
@@ -154,6 +164,6 @@ function HandleTouchEnd(eventType, eventData)
     if touchID == fireTouchID then fireTouchID = -1 end
 
     -- On-release Update
-    firstPerson = cameraMode
+    firstPerson = newFirstPerson
     renderer.drawShadows = shadowMode
 end

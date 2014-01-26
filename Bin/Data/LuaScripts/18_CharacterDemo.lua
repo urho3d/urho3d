@@ -8,6 +8,7 @@
 --     - Using touch inputs/gyroscope for iOS/Android (implemented through an external file)
 
 require "LuaScripts/Utilities/Sample"
+require "LuaScripts/Utilities/Touch"
 
 -- Variables used by external file are made global in order to be accessed
 
@@ -24,13 +25,8 @@ local JUMP_FORCE = 7.0
 local YAW_SENSITIVITY = 0.1
 local INAIR_THRESHOLD_TIME = 0.1
 
-CAMERA_MIN_DIST = 1.0
-CAMERA_MAX_DIST = 5.0
-
 scene_ = nil
-cameraNode = nil
 characterNode = nil
-firstPerson = false
 
 local context = GetContext()
 
@@ -57,7 +53,7 @@ function Start()
     -- Activate mobile stuff only when appropriate
     if GetPlatform() == "Android" or GetPlatform() == "iOS" then 
         SetLogoVisible(false)
-        require "LuaScripts/Utilities/Touch"
+        InitTouchInput()
     end
 
     -- Subscribe to necessary events
@@ -212,7 +208,9 @@ function SubscribeToEvents()
     SubscribeToEvent("PostUpdate", "HandlePostUpdate")
 
     -- Subscribe to mobile touch events
-    if GetPlatform() == "Android" or GetPlatform() == "iOS" then SubscribeToTouchEvents() end
+    if touchEnabled == true then
+        SubscribeToTouchEvents()
+    end
 end
 
 function HandleUpdate(eventType, eventData)
@@ -225,11 +223,14 @@ function HandleUpdate(eventType, eventData)
         return
     end
 
-    character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false) -- clear previous controls
-    if GetPlatform() == "Android" or GetPlatform() == "iOS" then updateTouches()
+    -- Clear previous controls
+    character.controls:Set(CTRL_FORWARD + CTRL_BACK + CTRL_LEFT + CTRL_RIGHT + CTRL_JUMP, false)
 
-    else -- On desktop, get movement controls and assign them to the character logic component
-
+    if touchEnabled == true then
+        -- Update controls using touch (mobile)
+        updateTouches()
+    else 
+        -- Update controls using keys (desktop)
         if ui.focusElement == nil then
             if input:GetKeyDown(KEY_W) then character.controls:Set(CTRL_FORWARD, true) end
             if input:GetKeyDown(KEY_S) then character.controls:Set(CTRL_BACK, true) end
@@ -305,12 +306,12 @@ function HandlePostUpdate(eventType, eventData)
 
         -- Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the character properly
         local rayDir = dir * Vector3(0.0, 0.0, -1.0) -- For indoor scenes you can use dir * Vector3(0.0, 0.0, -0.5) to prevent camera from crossing the walls
-        local rayDistance = CAMERA_MAX_DIST
+        local rayDistance = cameraDistance
         local result = scene_:GetComponent("PhysicsWorld"):RaycastSingle(Ray(aimPoint, rayDir), rayDistance, 2)
         if result.body ~= nil then
             rayDistance = Min(rayDistance, result.distance)
         end
-        rayDistance = Clamp(rayDistance, CAMERA_MIN_DIST, CAMERA_MAX_DIST)
+        rayDistance = Clamp(rayDistance, CAMERA_MIN_DIST, cameraDistance)
 
         cameraNode.position = aimPoint + rayDir * rayDistance
         cameraNode.rotation = dir

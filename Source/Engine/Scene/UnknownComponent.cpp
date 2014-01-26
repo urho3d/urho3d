@@ -28,6 +28,8 @@
 #include "UnknownComponent.h"
 #include "XMLElement.h"
 
+#include "DebugNew.h"
+
 namespace Urho3D
 {
 
