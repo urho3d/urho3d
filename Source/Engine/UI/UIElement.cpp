@@ -1076,6 +1076,9 @@ void UIElement::BringToFront()
         if (other->IsEnabled() && other->bringToBack_ && other != ptr)
         {
             int priority = other->GetPriority();
+            // M_MAX_INT is used by popups and tooltips. Disregard these to avoid an "arms race" with the priorities
+            if (priority == M_MAX_INT)
+                continue;
             usedPriorities.Insert(priority);
             maxPriority = Max(priority, maxPriority);
         }
