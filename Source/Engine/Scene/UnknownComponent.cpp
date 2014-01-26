@@ -31,6 +31,52 @@
 namespace Urho3D
 {
 
+static HashMap<ShortStringHash, String> unknownTypeToName;
+static String letters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+static String GenerateNameFromType(ShortStringHash typeHash)
+{
+    if (unknownTypeToName.Contains(typeHash))
+        return unknownTypeToName[typeHash];
+    
+    String test;
+    
+    // Begin brute-force search
+    unsigned numLetters = letters.Length();
+    unsigned combinations = numLetters;
+    bool found = false;
+    
+    for (unsigned i = 1; i < 6; ++i)
+    {
+        test.Resize(i);
+        
+        for (unsigned j = 0; j < combinations; ++j)
+        {
+            unsigned current = j;
+            
+            for (unsigned k = 0; k < i; ++k)
+            {
+                test[k] = letters[current % numLetters];
+                current /= numLetters;
+            }
+            
+            if (ShortStringHash(test) == typeHash)
+            {
+                found = true;
+                break;
+            }
+        }
+        
+        if (found)
+            break;
+        
+        combinations *= numLetters;
+    }
+    
+    unknownTypeToName[typeHash] = test;
+    return test;
+}
+
 UnknownComponent::UnknownComponent(Context* context) :
     Component(context),
     useXML_(false)
@@ -125,7 +171,7 @@ void UnknownComponent::SetTypeName(const String& typeName)
 
 void UnknownComponent::SetType(ShortStringHash typeHash)
 {
-    typeName_ = "Unknown " + typeHash.ToString();
+    typeName_ = GenerateNameFromType(typeHash);
     typeHash_ = typeHash;
 }
 
