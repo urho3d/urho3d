@@ -2,7 +2,6 @@ $#include "Vector.h"
 $#include "Vector3.h"
 $#include "OctreeQuery.h"
 $#include "PhysicsWorld.h"
-$#include "Drawable.h"
 
 class PODVector
 {
