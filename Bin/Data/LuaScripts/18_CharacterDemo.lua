@@ -250,10 +250,10 @@ function HandleUpdate(eventType, eventData)
 
             -- Check for loading / saving the scene
             if input:GetKeyPress(KEY_F5) then
-                scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
+                scene_:SaveXML(fileSystem:GetProgramDir().."Data/Scenes/CharacterDemo.xml")
             end
             if input:GetKeyPress(KEY_F7) then
-                scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/PhysicsStressTest.xml")
+                scene_:LoadXML(fileSystem:GetProgramDir().."Data/Scenes/CharacterDemo.xml")
                 -- After loading we have to reacquire the character scene node, as it has been recreated
                 -- Simply find by name as there's only one of them
                 characterNode = scene_:GetChild("Jack", true)
