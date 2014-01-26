@@ -44,6 +44,8 @@ For further reference, see:
 \ref LuaScriptAPI "Lua Scripting API (generated)" <br>
 \ref EventList "Event list (generated)" <br>
 
+For Urho3D related links and projects, see \ref ExternalLinks "External Links".
+
 For credits, copyright and licensing information, see \ref Credits & \ref License.
 
 For release history and major changes, see \ref History.
@@ -260,6 +262,14 @@ V1.1
 V1.0
 
 - Original release.
+
+\page ExternalLinks External Links
+
+Related projects:
+
+- Urho3D Launcher (https://github.com/Hgdavidy/Urho3D_Launcher_Tools)
+
+- Urho3D libRocket Integration (https://github.com/realrunner/urho3d-librocket)
 
 */
 
