@@ -91,6 +91,8 @@ void UnknownComponent::RegisterObject(Context* context)
 bool UnknownComponent::Load(Deserializer& source, bool setInstanceDefault)
 {
     useXML_ = false;
+    xmlAttributes_.Clear();
+    xmlAttributeInfos_.Clear();
     
     // Assume we are reading from a component data buffer, and the type has already been read
     unsigned dataSize = source.GetSize() - source.GetPosition();
@@ -101,18 +103,32 @@ bool UnknownComponent::Load(Deserializer& source, bool setInstanceDefault)
 bool UnknownComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
     useXML_ = true;
+    xmlAttributes_.Clear();
+    xmlAttributeInfos_.Clear();
+    binaryAttributes_.Clear();
     
     XMLElement attrElem = source.GetChild("attribute");
     while (attrElem)
     {
-        Pair<String, String> attr;
-        attr.first_ = attrElem.GetAttribute("name");
-        attr.second_ = attrElem.GetAttribute("value");
-        if (!attr.first_.Empty())
-            xmlAttributes_.Push(attr);
+        AttributeInfo attr;
+        attr.mode_ = AM_FILE;
+        attr.name_ = attrElem.GetAttribute("name");
+        attr.type_ = VAR_STRING;
+        
+        if (!attr.name_.Empty())
+        {
+            String attrValue = attrElem.GetAttribute("value");
+            attr.defaultValue_ = String::EMPTY;
+            xmlAttributeInfos_.Push(attr);
+            xmlAttributes_.Push(attrValue);
+        }
         
         attrElem = attrElem.GetNext("attribute");
     }
+    
+    // Fix up pointers to the attributes after all have been read
+    for (unsigned i = 0; i < xmlAttributeInfos_.Size(); ++i)
+        xmlAttributeInfos_[i].ptr_ = &xmlAttributes_[i];
     
     return true;
 }
@@ -151,13 +167,11 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
     if (!dest.SetInt("id", id_))
         return false;
     
-    for (unsigned i = 0; i < xmlAttributes_.Size(); ++i)
+    for (unsigned i = 0; i < xmlAttributeInfos_.Size(); ++i)
     {
-        const Pair<String, String>& attr = xmlAttributes_[i];
-        
         XMLElement attrElem = dest.CreateChild("attribute");
-        attrElem.SetAttribute("name", attr.first_);
-        attrElem.SetAttribute("value", attr.second_);
+        attrElem.SetAttribute("name", xmlAttributeInfos_[i].name_);
+        attrElem.SetAttribute("value", xmlAttributes_[i]);
     }
     
     return true;

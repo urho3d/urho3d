@@ -41,6 +41,8 @@ public:
     virtual ShortStringHash GetType() const { return typeHash_; }
     /// Return type name of the stored component.
     virtual const String& GetTypeName() const { return typeName_; }
+    /// Return attribute descriptions, or null if none defined.
+    virtual const Vector<AttributeInfo>* GetAttributes() const { return &xmlAttributeInfos_; }
     /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Load from XML data. Return true if successful.
@@ -56,7 +58,7 @@ public:
     void SetType(ShortStringHash typeHash);
     
     /// Return the XML format attributes. Empty when loaded with binary serialization.
-    const Vector<Pair<String, String> >& GetXMLAttributes() const { return xmlAttributes_; }
+    const Vector<String>& GetXMLAttributes() const { return xmlAttributes_; }
     /// Return the binary attributes. Empty when loaded with XML serialization.
     const PODVector<unsigned char>& GetBinaryAttributes() const { return binaryAttributes_; }
     /// Return whether was loaded using XML data.
@@ -72,8 +74,10 @@ private:
     ShortStringHash typeHash_;
     /// Type name of the stored component.
     String typeName_;
-    /// XML format attributes.
-    Vector<Pair<String, String> > xmlAttributes_;
+    /// XML format attribute infos.
+    Vector<AttributeInfo> xmlAttributeInfos_;
+    /// XML format attribute data (as strings)
+    Vector<String> xmlAttributes_;
     /// Binary attributes.
     PODVector<unsigned char> binaryAttributes_;
     /// Flag of whether was loaded using XML data.
