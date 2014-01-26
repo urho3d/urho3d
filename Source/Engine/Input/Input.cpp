@@ -162,7 +162,7 @@ void Input::Update()
             {
                 using namespace MouseMove;
 
-                VariantMap eventData;
+                VariantMap& eventData = GetEventDataMap();
                 if (mouseVisible_)
                 {
                     eventData[P_X] = mousePosition.x_;
@@ -203,7 +203,7 @@ void Input::SetMouseVisible(bool enable)
 
         using namespace MouseVisibleChanged;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_VISIBLE] = mouseVisible_;
         SendEvent(E_MOUSEVISIBLECHANGED, eventData);
     }
@@ -504,8 +504,7 @@ void Input::ResetState()
 
         using namespace TouchEnd;
 
-        VariantMap eventData;
-
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_TOUCHID] = state.touchID_;
         eventData[P_X] = state.position_.x_;
         eventData[P_Y] = state.position_.y_;
@@ -526,7 +525,7 @@ void Input::SendInputFocusEvent()
 {
     using namespace InputFocus;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_FOCUS] = HasFocus();
     eventData[P_MINIMIZED] = IsMinimized();
     SendEvent(E_INPUTFOCUS, eventData);
@@ -563,7 +562,7 @@ void Input::SetMouseButton(int button, bool newState)
 
     using namespace MouseButtonDown;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_BUTTON] = button;
     eventData[P_BUTTONS] = mouseButtonDown_;
     eventData[P_QUALIFIERS] = GetQualifiers();
@@ -596,7 +595,7 @@ void Input::SetKey(int key, bool newState)
 
     using namespace KeyDown;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_KEY] = key;
     eventData[P_BUTTONS] = mouseButtonDown_;
     eventData[P_QUALIFIERS] = GetQualifiers();
@@ -620,7 +619,7 @@ void Input::SetMouseWheel(int delta)
 
         using namespace MouseWheel;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_WHEEL] = delta;
         eventData[P_BUTTONS] = mouseButtonDown_;
         eventData[P_QUALIFIERS] = GetQualifiers();
@@ -685,7 +684,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             using namespace MouseMove;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             if (mouseVisible_)
             {
                 eventData[P_X] = evt.motion.x;
@@ -716,8 +715,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             using namespace TouchBegin;
 
-            VariantMap eventData;
-
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_TOUCHID] = touchID;
             eventData[P_X] = state.position_.x_;
             eventData[P_Y] = state.position_.y_;
@@ -734,8 +732,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             using namespace TouchEnd;
 
-            VariantMap eventData;
-
+            VariantMap& eventData = GetEventDataMap();
             // Do not trust the position in the finger up event. Instead use the last position stored in the
             // touch structure
             eventData[P_TOUCHID] = touchID;
@@ -760,8 +757,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             using namespace TouchMove;
 
-            VariantMap eventData;
-
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_TOUCHID] = touchID;
             eventData[P_X] = state.position_.x_;
             eventData[P_Y] = state.position_.y_;
@@ -779,7 +775,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned button = evt.jbutton.button;
             unsigned joystickIndex = joystickIDMap_[evt.jbutton.which];
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_BUTTON] = button;
 
@@ -798,7 +794,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned button = evt.jbutton.button;
             unsigned joystickIndex = joystickIDMap_[evt.jbutton.which];
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_BUTTON] = button;
 
@@ -815,7 +811,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             unsigned joystickIndex = joystickIDMap_[evt.jaxis.which];
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_AXIS] = evt.jaxis.axis;
             eventData[P_POSITION] = Clamp((float)evt.jaxis.value / 32767.0f, -1.0f, 1.0f);
@@ -835,7 +831,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             unsigned joystickIndex = joystickIDMap_[evt.jaxis.which];
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_HAT] = evt.jhat.hat;
             eventData[P_POSITION] = evt.jhat.value;
@@ -856,7 +852,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned button = evt.cbutton.button;
             unsigned joystickIndex = joystickIDMap_[evt.cbutton.which];
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_BUTTON] = button;
 
@@ -875,7 +871,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             unsigned button = evt.cbutton.button;
             unsigned joystickIndex = joystickIDMap_[evt.cbutton.which];
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_BUTTON] = button;
 
@@ -892,7 +888,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             unsigned joystickIndex = joystickIDMap_[evt.caxis.which];
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_JOYSTICK] = joystickIndex;
             eventData[P_AXIS] = evt.caxis.axis;
             eventData[P_POSITION] = Clamp((float)evt.caxis.value / 32767.0f, -1.0f, 1.0f);
@@ -944,7 +940,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             using namespace DropFile;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_FILENAME] = GetInternalPath(String(evt.drop.file));
             SDL_free(evt.drop.file);
 

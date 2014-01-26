@@ -243,7 +243,7 @@ void Node::SetName(const String& name)
         {
             using namespace NodeNameChanged;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_SCENE] = (void*)scene_;
             eventData[P_NODE] = (void*)this;
 
@@ -457,7 +457,7 @@ void Node::SetEnabled(bool enable, bool recursive)
         {
             using namespace NodeEnabledChanged;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_SCENE] = (void*)scene_;
             eventData[P_NODE] = (void*)this;
 
@@ -473,7 +473,7 @@ void Node::SetEnabled(bool enable, bool recursive)
             {
                 using namespace ComponentEnabledChanged;
 
-                VariantMap eventData;
+                VariantMap& eventData = GetEventDataMap();
                 eventData[P_SCENE] = (void*)scene_;
                 eventData[P_NODE] = (void*)this;
                 eventData[P_COMPONENT] = (void*)(*i);
@@ -557,7 +557,7 @@ void Node::AddChild(Node* node)
     {
         using namespace NodeAdded;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_SCENE] = (void*)scene_;
         eventData[P_PARENT] = (void*)this;
         eventData[P_NODE] = (void*)node;
@@ -1316,7 +1316,7 @@ void Node::AddComponent(Component* component, unsigned id, CreateMode mode)
     {
         using namespace ComponentAdded;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_SCENE] = (void*)scene_;
         eventData[P_NODE] = (void*)this;
         eventData[P_COMPONENT] = (void*)component;
@@ -1397,7 +1397,7 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
     {
         using namespace NodeRemoved;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_SCENE] = (void*)scene_;
         eventData[P_PARENT] = (void*)this;
         eventData[P_NODE] = (void*)(*i).Get();
@@ -1502,7 +1502,7 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
     {
         using namespace ComponentRemoved;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_SCENE] = (void*)scene_;
         eventData[P_NODE] = (void*)this;
         eventData[P_COMPONENT] = (void*)(*i).Get();

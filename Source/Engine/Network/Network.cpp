@@ -83,7 +83,7 @@ void Network::HandleMessage(kNet::MessageConnection *source, kNet::packet_id_t p
         // If message was not handled internally, forward as an event
         using namespace NetworkMessage;
         
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_CONNECTION] = (void*)connection;
         eventData[P_MESSAGEID] = (int)msgId;
         eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
@@ -126,7 +126,7 @@ void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
     
     using namespace ClientConnected;
     
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_CONNECTION] = (void*)newConnection;
     newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
 }
@@ -144,7 +144,7 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
         
         using namespace ClientDisconnected;
         
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_CONNECTION] = (void*)connection;
         connection->SendEvent(E_CLIENTDISCONNECTED, eventData);
         

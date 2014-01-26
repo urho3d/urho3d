@@ -79,7 +79,7 @@ void Button::Update(float timeStep)
 
             using namespace Pressed;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_ELEMENT] = (void*)this;
             SendEvent(E_PRESSED, eventData);
         }
@@ -107,7 +107,7 @@ void Button::OnClickBegin(const IntVector2& position, const IntVector2& screenPo
 
         using namespace Pressed;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_ELEMENT] = (void*)this;
         SendEvent(E_PRESSED, eventData);
     }
@@ -121,7 +121,7 @@ void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
 
         using namespace Released;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_ELEMENT] = (void*)this;
         SendEvent(E_RELEASED, eventData);
     }

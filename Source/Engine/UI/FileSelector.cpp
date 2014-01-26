@@ -378,7 +378,7 @@ bool FileSelector::EnterFile()
         {
             using namespace FileSelected;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_FILENAME] = path_ + fileEntries_[index].name_;
             eventData[P_FILTER] = GetFilter();
             eventData[P_OK] = true;
@@ -459,7 +459,7 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
         {
             using namespace FileSelected;
 
-            VariantMap newEventData;
+            VariantMap& newEventData = GetEventDataMap();
             newEventData[P_FILENAME] = path_ + GetFileName();
             newEventData[P_FILTER] = GetFilter();
             newEventData[P_OK] = true;
@@ -470,7 +470,7 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
     {
         using namespace FileSelected;
 
-        VariantMap newEventData;
+        VariantMap& newEventData = GetEventDataMap();
         newEventData[P_FILENAME] = path_;
         newEventData[P_FILTER] = GetFilter();
         newEventData[P_OK] = true;
@@ -488,7 +488,7 @@ void FileSelector::HandleCancelPressed(StringHash eventType, VariantMap& eventDa
 
     using namespace FileSelected;
 
-    VariantMap newEventData;
+    VariantMap& newEventData = GetEventDataMap();
     newEventData[P_FILENAME] = String::EMPTY;
     newEventData[P_FILTER] = GetFilter();
     newEventData[P_OK] = false;

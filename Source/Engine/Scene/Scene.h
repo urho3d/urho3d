@@ -220,6 +220,8 @@ private:
     PODVector<Component*> delayedDirtyComponents_;
     /// Mutex for the delayed dirty notification queue.
     Mutex sceneMutex_;
+    /// Preallocated event data map for smoothing update events.
+    VariantMap smoothingData_;
     /// Next free non-local node ID.
     unsigned replicatedNodeID_;
     /// Next free non-local component ID.

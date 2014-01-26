@@ -528,7 +528,7 @@ void Scene::Update(float timeStep)
 
     using namespace SceneUpdate;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_SCENE] = (void*)this;
     eventData[P_TIMESTEP] = timeStep;
 
@@ -547,10 +547,9 @@ void Scene::Update(float timeStep)
 
         using namespace UpdateSmoothing;
 
-        VariantMap eventData;
-        eventData[P_CONSTANT] = constant;
-        eventData[P_SQUAREDSNAPTHRESHOLD] = squaredSnapThreshold;
-        SendEvent(E_UPDATESMOOTHING, eventData);
+        smoothingData_[P_CONSTANT] = constant;
+        smoothingData_[P_SQUAREDSNAPTHRESHOLD] = squaredSnapThreshold;
+        SendEvent(E_UPDATESMOOTHING, smoothingData_);
     }
 
     // Post-update variable timestep logic
@@ -910,7 +909,7 @@ void Scene::UpdateAsyncLoading()
 
     using namespace AsyncLoadProgress;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_SCENE] = (void*)this;
     eventData[P_PROGRESS] = (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
     eventData[P_LOADEDNODES]  = asyncProgress_.loadedNodes_;
@@ -927,7 +926,7 @@ void Scene::FinishAsyncLoading()
 
     using namespace AsyncLoadFinished;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_SCENE] = (void*)this;
     SendEvent(E_ASYNCLOADFINISHED, eventData);
 }

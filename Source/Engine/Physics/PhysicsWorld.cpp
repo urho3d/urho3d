@@ -569,7 +569,7 @@ void PhysicsWorld::PreStep(float timeStep)
     // Send pre-step event
     using namespace PhysicsPreStep;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_WORLD] = (void*)this;
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPRESTEP, eventData);
@@ -595,7 +595,7 @@ void PhysicsWorld::PostStep(float timeStep)
     // Send post-step event
     using namespace PhysicsPreStep;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_WORLD] = (void*)this;
     eventData[P_TIMESTEP] = timeStep;
     SendEvent(E_PHYSICSPOSTSTEP, eventData);
@@ -606,15 +606,14 @@ void PhysicsWorld::SendCollisionEvents()
     PROFILE(SendCollisionEvents);
 
     currentCollisions_.Clear();
+    physicsCollisionData_.Clear();
+    nodeCollisionData_.Clear();
+    
     int numManifolds = collisionDispatcher_->getNumManifolds();
 
     if (numManifolds)
     {
-        VariantMap physicsCollisionData;
-        VariantMap nodeCollisionData;
-        VectorBuffer contacts;
-
-        physicsCollisionData[PhysicsCollision::P_WORLD] = (void*)this;
+        physicsCollisionData_[PhysicsCollision::P_WORLD] = (void*)this;
 
         for (int i = 0; i < numManifolds; ++i)
         {
@@ -675,88 +674,85 @@ void PhysicsWorld::SendCollisionEvents()
             bool phantom = bodyA->IsPhantom() || bodyB->IsPhantom();
             bool newCollision = !previousCollisions_.Contains(i->first_);
 
-            physicsCollisionData[PhysicsCollision::P_NODEA] = (void*)nodeA;
-            physicsCollisionData[PhysicsCollision::P_NODEB] = (void*)nodeB;
-            physicsCollisionData[PhysicsCollision::P_BODYA] = (void*)bodyA;
-            physicsCollisionData[PhysicsCollision::P_BODYB] = (void*)bodyB;
-            physicsCollisionData[PhysicsCollision::P_PHANTOM] = phantom;
+            physicsCollisionData_[PhysicsCollision::P_NODEA] = (void*)nodeA;
+            physicsCollisionData_[PhysicsCollision::P_NODEB] = (void*)nodeB;
+            physicsCollisionData_[PhysicsCollision::P_BODYA] = (void*)bodyA;
+            physicsCollisionData_[PhysicsCollision::P_BODYB] = (void*)bodyB;
+            physicsCollisionData_[PhysicsCollision::P_PHANTOM] = phantom;
 
-            contacts.Clear();
+            contacts_.Clear();
 
             for (int j = 0; j < numContacts; ++j)
             {
                 btManifoldPoint& point = contactManifold->getContactPoint(j);
-                contacts.WriteVector3(ToVector3(point.m_positionWorldOnB));
-                contacts.WriteVector3(ToVector3(point.m_normalWorldOnB));
-                contacts.WriteFloat(point.m_distance1);
-                contacts.WriteFloat(point.m_appliedImpulse);
+                contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
+                contacts_.WriteVector3(ToVector3(point.m_normalWorldOnB));
+                contacts_.WriteFloat(point.m_distance1);
+                contacts_.WriteFloat(point.m_appliedImpulse);
             }
 
-            physicsCollisionData[PhysicsCollision::P_CONTACTS] = contacts.GetBuffer();
+            physicsCollisionData_[PhysicsCollision::P_CONTACTS] = contacts_.GetBuffer();
 
             // Send separate collision start event if collision is new
             if (newCollision)
             {
-                SendEvent(E_PHYSICSCOLLISIONSTART, physicsCollisionData);
+                SendEvent(E_PHYSICSCOLLISIONSTART, physicsCollisionData_);
                 // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
 
             // Then send the ongoing collision event
-            SendEvent(E_PHYSICSCOLLISION, physicsCollisionData);
+            SendEvent(E_PHYSICSCOLLISION, physicsCollisionData_);
             if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                 continue;
 
-            nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyA;
-            nodeCollisionData[NodeCollision::P_OTHERNODE] = (void*)nodeB;
-            nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyB;
-            nodeCollisionData[NodeCollision::P_PHANTOM] = phantom;
-            nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
+            nodeCollisionData_[NodeCollision::P_BODY] = (void*)bodyA;
+            nodeCollisionData_[NodeCollision::P_OTHERNODE] = (void*)nodeB;
+            nodeCollisionData_[NodeCollision::P_OTHERBODY] = (void*)bodyB;
+            nodeCollisionData_[NodeCollision::P_PHANTOM] = phantom;
+            nodeCollisionData_[NodeCollision::P_CONTACTS] = contacts_.GetBuffer();
 
             if (newCollision)
             {
-                nodeA->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData);
+                nodeA->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData_);
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
 
-            nodeA->SendEvent(E_NODECOLLISION, nodeCollisionData);
+            nodeA->SendEvent(E_NODECOLLISION, nodeCollisionData_);
             if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                 continue;
 
-            contacts.Clear();
+            contacts_.Clear();
             for (int j = 0; j < numContacts; ++j)
             {
                 btManifoldPoint& point = contactManifold->getContactPoint(j);
-                contacts.WriteVector3(ToVector3(point.m_positionWorldOnB));
-                contacts.WriteVector3(-ToVector3(point.m_normalWorldOnB));
-                contacts.WriteFloat(point.m_distance1);
-                contacts.WriteFloat(point.m_appliedImpulse);
+                contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
+                contacts_.WriteVector3(-ToVector3(point.m_normalWorldOnB));
+                contacts_.WriteFloat(point.m_distance1);
+                contacts_.WriteFloat(point.m_appliedImpulse);
             }
 
-            nodeCollisionData[NodeCollision::P_BODY] = (void*)bodyB;
-            nodeCollisionData[NodeCollision::P_OTHERNODE] = (void*)nodeA;
-            nodeCollisionData[NodeCollision::P_OTHERBODY] = (void*)bodyA;
-            nodeCollisionData[NodeCollision::P_CONTACTS] = contacts.GetBuffer();
+            nodeCollisionData_[NodeCollision::P_BODY] = (void*)bodyB;
+            nodeCollisionData_[NodeCollision::P_OTHERNODE] = (void*)nodeA;
+            nodeCollisionData_[NodeCollision::P_OTHERBODY] = (void*)bodyA;
+            nodeCollisionData_[NodeCollision::P_CONTACTS] = contacts_.GetBuffer();
 
             if (newCollision)
             {
-                nodeB->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData);
+                nodeB->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData_);
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
             }
 
-            nodeB->SendEvent(E_NODECOLLISION, nodeCollisionData);
+            nodeB->SendEvent(E_NODECOLLISION, nodeCollisionData_);
         }
     }
 
     // Send collision end events as applicable
     {
-        VariantMap physicsCollisionData;
-        VariantMap nodeCollisionData;
-
-        physicsCollisionData[PhysicsCollisionEnd::P_WORLD] = (void*)this;
+        physicsCollisionData_[PhysicsCollisionEnd::P_WORLD] = (void*)this;
 
         for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
         {
@@ -783,31 +779,31 @@ void PhysicsWorld::SendCollisionEvents()
                 WeakPtr<Node> nodeWeakA(nodeA);
                 WeakPtr<Node> nodeWeakB(nodeB);
 
-                physicsCollisionData[PhysicsCollisionEnd::P_BODYA] = (void*)bodyA;
-                physicsCollisionData[PhysicsCollisionEnd::P_BODYB] = (void*)bodyB;
-                physicsCollisionData[PhysicsCollisionEnd::P_NODEA] = (void*)nodeA;
-                physicsCollisionData[PhysicsCollisionEnd::P_NODEB] = (void*)nodeB;
-                physicsCollisionData[PhysicsCollisionEnd::P_PHANTOM] = phantom;
+                physicsCollisionData_[PhysicsCollisionEnd::P_BODYA] = (void*)bodyA;
+                physicsCollisionData_[PhysicsCollisionEnd::P_BODYB] = (void*)bodyB;
+                physicsCollisionData_[PhysicsCollisionEnd::P_NODEA] = (void*)nodeA;
+                physicsCollisionData_[PhysicsCollisionEnd::P_NODEB] = (void*)nodeB;
+                physicsCollisionData_[PhysicsCollisionEnd::P_PHANTOM] = phantom;
 
-                SendEvent(E_PHYSICSCOLLISIONEND, physicsCollisionData);
+                SendEvent(E_PHYSICSCOLLISIONEND, physicsCollisionData_);
                 // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
 
-                nodeCollisionData[NodeCollisionEnd::P_BODY] = (void*)bodyA;
-                nodeCollisionData[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeB;
-                nodeCollisionData[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyB;
-                nodeCollisionData[NodeCollisionEnd::P_PHANTOM] = phantom;
+                nodeCollisionData_[NodeCollisionEnd::P_BODY] = (void*)bodyA;
+                nodeCollisionData_[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeB;
+                nodeCollisionData_[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyB;
+                nodeCollisionData_[NodeCollisionEnd::P_PHANTOM] = phantom;
 
-                nodeA->SendEvent(E_NODECOLLISIONEND, nodeCollisionData);
+                nodeA->SendEvent(E_NODECOLLISIONEND, nodeCollisionData_);
                 if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                     continue;
 
-                nodeCollisionData[NodeCollisionEnd::P_BODY] = (void*)bodyB;
-                nodeCollisionData[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeA;
-                nodeCollisionData[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyA;
+                nodeCollisionData_[NodeCollisionEnd::P_BODY] = (void*)bodyB;
+                nodeCollisionData_[NodeCollisionEnd::P_OTHERNODE] = (void*)nodeA;
+                nodeCollisionData_[NodeCollisionEnd::P_OTHERBODY] = (void*)bodyA;
 
-                nodeB->SendEvent(E_NODECOLLISIONEND, nodeCollisionData);
+                nodeB->SendEvent(E_NODECOLLISIONEND, nodeCollisionData_);
             }
         }
     }

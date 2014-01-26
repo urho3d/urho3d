@@ -85,7 +85,7 @@ void Time::BeginFrame(float timeStep)
         // Frame begin event
         using namespace BeginFrame;
         
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_FRAMENUMBER] = frameNumber_;
         eventData[P_TIMESTEP] = timeStep_;
         SendEvent(E_BEGINFRAME, eventData);

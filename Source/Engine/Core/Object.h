@@ -84,6 +84,8 @@ public:
     void SendEvent(StringHash eventType);
     /// Send event with parameters to all subscribers.
     void SendEvent(StringHash eventType, VariantMap& eventData);
+    /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
+    VariantMap& GetEventDataMap() const;
     
     /// Return execution context.
     Context* GetContext() const { return context_; }

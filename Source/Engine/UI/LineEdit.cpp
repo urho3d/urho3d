@@ -342,7 +342,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         {
             using namespace UnhandledKey;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_KEY] = key;
             eventData[P_BUTTONS] = buttons;
@@ -392,7 +392,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             
             using namespace TextFinished;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_TEXT] = line_;
             SendEvent(E_TEXTFINISHED, eventData);
@@ -562,7 +562,7 @@ void LineEdit::UpdateText()
 
     using namespace TextChanged;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_ELEMENT] = (void*)this;
     eventData[P_TEXT] = line_;
     SendEvent(E_TEXTCHANGED, eventData);

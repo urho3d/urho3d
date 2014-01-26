@@ -630,7 +630,7 @@ void Renderer::Update(float timeStep)
         // Update view. This may queue further views
         using namespace BeginViewUpdate;
         
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_SURFACE] = (void*)renderTarget.Get();
         eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
         eventData[P_SCENE] = (void*)scene;
@@ -692,7 +692,7 @@ void Renderer::Render()
             
             RenderSurface* renderTarget = views_[i]->GetRenderTarget();
             
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_SURFACE] = (void*)renderTarget;
             eventData[P_TEXTURE] = (void*)(renderTarget ? renderTarget->GetParentTexture() : 0);
             eventData[P_SCENE] = (void*)views_[i]->GetScene();

@@ -157,8 +157,7 @@ void UI::SetFocusElement(UIElement* element, bool byKey)
 {
     using namespace FocusChanged;
 
-    VariantMap eventData;
-    eventData[P_CLICKEDELEMENT] = (void*)element;
+    UIElement* originalElement = element;
 
     if (element)
     {
@@ -188,7 +187,7 @@ void UI::SetFocusElement(UIElement* element, bool byKey)
         UIElement* oldFocusElement = focusElement_;
         focusElement_.Reset();
 
-        VariantMap focusEventData;
+        VariantMap& focusEventData = GetEventDataMap();
         focusEventData[Defocused::P_ELEMENT] = oldFocusElement;
         oldFocusElement->SendEvent(E_DEFOCUSED, focusEventData);
     }
@@ -198,12 +197,14 @@ void UI::SetFocusElement(UIElement* element, bool byKey)
     {
         focusElement_ = element;
 
-        VariantMap focusEventData;
+        VariantMap& focusEventData = GetEventDataMap();
         focusEventData[Focused::P_ELEMENT] = element;
         focusEventData[Focused::P_BYKEY] = byKey;
         element->SendEvent(E_FOCUSED, focusEventData);
     }
 
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_CLICKEDELEMENT] = (void*)originalElement;
     eventData[P_ELEMENT] = (void*)element;
     SendEvent(E_FOCUSCHANGED, eventData);
 }
@@ -920,7 +921,7 @@ void UI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, 
         {
             using namespace DragDropTest;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_SOURCE] = (void*)dragElement_.Get();
             eventData[P_TARGET] = (void*)element.Get();
             eventData[P_ACCEPT] = accept;
@@ -1026,7 +1027,7 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
                         {
                             using namespace DragDropFinish;
 
-                            VariantMap eventData;
+                            VariantMap& eventData = GetEventDataMap();
                             eventData[P_SOURCE] = (void*)dragElement_.Get();
                             eventData[P_TARGET] = (void*)element.Get();
                             eventData[P_ACCEPT] = accept;
@@ -1086,7 +1087,7 @@ void UI::SendDragEvent(StringHash eventType, UIElement* element, const IntVector
 
     using namespace DragBegin;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_ELEMENT] = (void*)element;
     eventData[P_X] = screenPos.x_;
     eventData[P_Y] = screenPos.y_;
@@ -1098,7 +1099,7 @@ void UI::SendDragEvent(StringHash eventType, UIElement* element, const IntVector
 
 void UI::SendClickEvent(StringHash eventType, UIElement* element, const IntVector2& pos, int button, int buttons, int qualifiers)
 {
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[UIMouseClick::P_ELEMENT] = (void*)element;
     eventData[UIMouseClick::P_X] = pos.x_;
     eventData[UIMouseClick::P_Y] = pos.y_;

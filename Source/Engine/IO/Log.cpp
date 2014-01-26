@@ -166,7 +166,7 @@ void Log::Write(int level, const String& message)
 
     using namespace LogMessage;
 
-    VariantMap eventData;
+    VariantMap& eventData = logInstance->GetEventDataMap();
     eventData[P_MESSAGE] = formattedMessage;
     eventData[P_LEVEL] = level;
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
@@ -207,7 +207,7 @@ void Log::WriteRaw(const String& message, bool error)
 
     using namespace LogMessage;
 
-    VariantMap eventData;
+    VariantMap& eventData = logInstance->GetEventDataMap();
     eventData[P_MESSAGE] = message;
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
 

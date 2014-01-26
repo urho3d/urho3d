@@ -932,7 +932,7 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
         
         using namespace ClientSceneLoaded;
         
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_CONNECTION] = (void*)this;
         SendEvent(E_CLIENTSCENELOADED, eventData);
     }
@@ -1359,7 +1359,7 @@ void Connection::OnSceneLoadFailed()
     
     using namespace NetworkSceneLoadFailed;
     
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_CONNECTION] = (void*)this;
     SendEvent(E_NETWORKSCENELOADFAILED, eventData);
 }

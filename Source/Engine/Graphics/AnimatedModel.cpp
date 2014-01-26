@@ -708,7 +708,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 
         using namespace BoneHierarchyCreated;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_NODE] = (void*)node_;
         node_->SendEvent(E_BONEHIERARCHYCREATED, eventData);
     }

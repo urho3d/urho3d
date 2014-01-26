@@ -255,7 +255,7 @@ void WorkQueue::PurgeCompleted()
 {
     using namespace WorkItemCompleted;
     
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     
     // Purge completed work items and send completion events.
     for (List<WorkItem>::Iterator i = workItems_.Begin(); i != workItems_.End();)

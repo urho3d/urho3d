@@ -509,7 +509,7 @@ void Serializable::SetTemporary(bool enable)
         
         using namespace TemporaryChanged;
         
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_SERIALIZABLE] = (void*)this;
         
         SendEvent(E_TEMPORARYCHANGED, eventData);

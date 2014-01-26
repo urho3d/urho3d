@@ -203,7 +203,7 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
         // Send the command as an event for script subsystem
         using namespace ConsoleCommand;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_COMMAND] = line;
         SendEvent(E_CONSOLECOMMAND, eventData);
 

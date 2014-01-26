@@ -520,7 +520,7 @@ void Engine::Update()
     // Logic update event
     using namespace Update;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_TIMESTEP] = timeStep_;
     SendEvent(E_UPDATE, eventData);
 

@@ -136,7 +136,7 @@ void MessageBox::HandleMessageAcknowledged(StringHash eventType, VariantMap& eve
 {
     using namespace MessageACK;
 
-    VariantMap newEventData;
+    VariantMap& newEventData = GetEventDataMap();
     newEventData[P_OK] = eventData[Released::P_ELEMENT] == okButton_;
     SendEvent(E_MESSAGEACK, newEventData);
 

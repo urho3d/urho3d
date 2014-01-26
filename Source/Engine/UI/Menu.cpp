@@ -375,7 +375,7 @@ void Menu::HandlePressedReleased(StringHash eventType, VariantMap& eventData)
     {
         using namespace MenuSelected;
 
-        VariantMap newEventData;
+        VariantMap& newEventData = GetEventDataMap();
         newEventData[P_ELEMENT] = (void*)this;
         SendEvent(E_MENUSELECTED, newEventData);
     }

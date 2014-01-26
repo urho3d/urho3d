@@ -71,6 +71,11 @@ Context::~Context()
     
     subsystems_.Clear();
     factories_.Clear();
+    
+    // Delete allocated event data maps
+    for (PODVector<VariantMap*>::Iterator i = eventDataMaps_.Begin(); i != eventDataMaps_.End(); ++i)
+        delete *i;
+    eventDataMaps_.Clear();
 }
 
 SharedPtr<Object> Context::CreateObject(ShortStringHash objectType)
@@ -139,6 +144,18 @@ void Context::UpdateAttributeDefaultValue(ShortStringHash objectType, const char
     if (info)
         info->defaultValue_ = defaultValue;
 }
+
+VariantMap& Context::GetEventDataMap()
+{
+    unsigned nestingLevel = eventSenders_.Size();
+    while (eventDataMaps_.Size() < nestingLevel + 1)
+        eventDataMaps_.Push(new VariantMap());
+    
+    VariantMap& ret = *eventDataMaps_[nestingLevel];
+    ret.Clear();
+    return ret;
+}
+
 
 void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType)
 {

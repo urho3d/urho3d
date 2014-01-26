@@ -459,7 +459,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     using namespace ScreenMode;
     
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
@@ -2025,7 +2025,7 @@ void Graphics::WindowResized()
     
     using namespace ScreenMode;
     
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;

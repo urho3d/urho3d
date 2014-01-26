@@ -140,10 +140,10 @@ void DropDownList::OnHidePopup()
     // When the popup is hidden, propagate the selection
     using namespace ItemSelected;
 
-    VariantMap newEventData;
-    newEventData[P_ELEMENT] = (void*)this;
-    newEventData[P_SELECTION] = GetSelection();
-    SendEvent(E_ITEMSELECTED, newEventData);
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_SELECTION] = GetSelection();
+    SendEvent(E_ITEMSELECTED, eventData);
 }
 
 void DropDownList::OnSetEditable()

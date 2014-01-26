@@ -319,6 +319,11 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->EndSendEvent();
 }
 
+VariantMap& Object::GetEventDataMap() const
+{
+    return context_->GetEventDataMap();
+}
+
 Object* Object::GetSubsystem(ShortStringHash type) const
 {
     return context_->GetSubsystem(type);

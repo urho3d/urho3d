@@ -27,6 +27,7 @@
 #include "HashSet.h"
 #include "Sphere.h"
 #include "Vector3.h"
+#include "VectorBuffer.h"
 
 #include <LinearMath/btIDebugDraw.h>
 
@@ -250,6 +251,12 @@ private:
     HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> > triMeshCache_;
     /// Cache for convex geometry data by model and LOD level.
     HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> > convexCache_;
+    /// Preallocated event data map for physics collision events.
+    VariantMap physicsCollisionData_;
+    /// Preallocated event data map for node collision events.
+    VariantMap nodeCollisionData_;
+    /// Preallocated buffer for physics collision contact data.
+    VectorBuffer contacts_;
     /// Simulation steps per second.
     unsigned fps_;
     /// Time accumulator for non-interpolated mode.

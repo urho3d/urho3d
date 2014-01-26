@@ -256,7 +256,7 @@ void Window::SetModal(bool modal)
 
         using namespace ModalChanged;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_MODAL] = modal;
         SendEvent(E_MODALCHANGED, eventData);

@@ -289,7 +289,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
 
     using namespace UnhandledKey;
 
-    VariantMap eventData;
+    VariantMap& eventData = GetEventDataMap();
     eventData[P_ELEMENT] = (void*)this;
     eventData[P_KEY] = key;
     eventData[P_BUTTONS] = buttons;
@@ -490,7 +490,7 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
 
             using namespace ItemSelected;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMDESELECTED, eventData);
@@ -522,7 +522,7 @@ void ListView::SetSelections(const PODVector<unsigned>& indices)
 
                 using namespace ItemSelected;
 
-                VariantMap eventData;
+                VariantMap& eventData = GetEventDataMap();
                 eventData[P_ELEMENT] = (void*)this;
                 eventData[P_SELECTION] = *i;
                 SendEvent(E_ITEMSELECTED, eventData);
@@ -562,7 +562,7 @@ void ListView::AddSelection(unsigned index)
 
             using namespace ItemSelected;
 
-            VariantMap eventData;
+            VariantMap& eventData = GetEventDataMap();
             eventData[P_ELEMENT] = (void*)this;
             eventData[P_SELECTION] = index;
             SendEvent(E_ITEMSELECTED, eventData);
@@ -588,7 +588,7 @@ void ListView::RemoveSelection(unsigned index)
     {
         using namespace ItemSelected;
 
-        VariantMap eventData;
+        VariantMap& eventData = GetEventDataMap();
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_SELECTION] = index;
         SendEvent(E_ITEMDESELECTED, eventData);
@@ -1025,7 +1025,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
     }
     
     // Propagate the click as an event. Also include right-clicks
-    VariantMap clickEventData;
+    VariantMap& clickEventData = GetEventDataMap();
     clickEventData[ItemClicked::P_ELEMENT] = (void*)this;
     clickEventData[ItemClicked::P_ITEM] = (void*)element;
     clickEventData[ItemClicked::P_SELECTION] = i;
@@ -1047,7 +1047,7 @@ void ListView::HandleUIMouseDoubleClick(StringHash eventType, VariantMap& eventD
     if (i >= GetNumItems())
         return;
 
-    VariantMap clickEventData;
+    VariantMap& clickEventData = GetEventDataMap();
     clickEventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
     clickEventData[ItemDoubleClicked::P_ITEM] = (void*)element;
     clickEventData[ItemDoubleClicked::P_SELECTION] = i;
