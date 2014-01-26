@@ -151,7 +151,7 @@ Properties:
 
 Methods:
 
-- TOLUA_TEMPLATE_BIND(T, Vector3, RayQueryResult, PhysicsRaycastResult)
+- TOLUA_TEMPLATE_BIND(T, Vector3, OctreeQueryResult, RayQueryResult, PhysicsRaycastResult)
 - PODVector()
 - PODVector(const PODVector<T>& vector)
 - ~PODVector()
@@ -1162,7 +1162,11 @@ Methods:
 - void Update(const FrameInfo& frame)
 - void AddManualDrawable(Drawable* drawable)
 - void RemoveManualDrawable(Drawable* drawable)
-- void Raycast(PODVector<RayQueryResult> &result, const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
+- PODVector<OctreeQueryResult> GetDrawables(const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- PODVector<OctreeQueryResult> GetDrawables(const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- PODVector<OctreeQueryResult> GetDrawables(const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- PODVector<OctreeQueryResult> GetDrawables(const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- PODVector<RayQueryResult> Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
 - RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
 - unsigned GetNumLevels() const
 - void QueueUpdate(Drawable* drawable)
@@ -1171,6 +1175,17 @@ Methods:
 Properties:
 
 - unsigned numLevels (readonly)
+
+### OctreeQueryResult
+
+Methods:
+
+- OctreeQueryResult()
+
+Properties:
+
+- Drawable* drawable
+- Node* node
 
 ### RayQueryResult
 
@@ -3390,7 +3405,7 @@ Methods:
 - void SetInternalEdge(bool enable)
 - void SetSplitImpulse(bool enable)
 - void SetMaxNetworkAngularVelocity(float velocity)
-- void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- PODVector<PhysicsRaycastResult> Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - void DrawDebugGeometry(bool depthTest)
@@ -5481,6 +5496,7 @@ Properties:
 
 \section LuaScriptAPI_RenameTypes Rename types
 - PODVector<PhysicsRaycastResult> becomes PhysicsRaycastResultVector
+- PODVector<OctreeQueryResult> becomes OctreeQueryResultVector
 - PODVector<RayQueryResult> becomes RayQueryResultVector
 - SharedPtr<HttpRequest> becomes HttpRequestSPtr
 
