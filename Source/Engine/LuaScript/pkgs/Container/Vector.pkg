@@ -1,10 +1,12 @@
 $#include "Vector.h"
 $#include "Vector3.h"
 $#include "OctreeQuery.h"
+$#include "PhysicsWorld.h"
+$#include "Drawable.h"
 
 class PODVector
 {
-    TOLUA_TEMPLATE_BIND(T, Vector3, RayQueryResult)
+    TOLUA_TEMPLATE_BIND(T, Vector3, RayQueryResult, PhysicsRaycastResult)
     
     PODVector();
     PODVector(const PODVector<T>& vector);
@@ -52,3 +54,4 @@ class PODVector
 };
 
 $renaming PODVector<RayQueryResult> @ RayQueryResultVector
+$renaming PODVector<PhysicsRaycastResult> @ PhysicsRaycastResultVector

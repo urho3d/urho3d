@@ -9,14 +9,6 @@ struct PhysicsRaycastResult
     RigidBody* body_ @ body;
 };
 
-struct DelayedWorldTransform
-{
-    RigidBody* rigidBody_ @ rigidBody;
-    RigidBody* parentRigidBody_ @ parentRigidBody;
-    Vector3 worldPosition_ @ worldPosition;
-    Quaternion worldRotation_ @ worldRotation;
-};
-
 class PhysicsWorld : public Component
 {
     void Update(float timeStep);
@@ -29,9 +21,11 @@ class PhysicsWorld : public Component
     void SetSplitImpulse(bool enable);
     void SetMaxNetworkAngularVelocity(float velocity);
 
+    void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+
     // void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingle @ RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    
+
     // void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     tolua_outside PhysicsRaycastResult PhysicsWorldSphereCast @ SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
 

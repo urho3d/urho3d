@@ -521,7 +521,7 @@ void Octree::Raycast(RayOctreeQuery& query) const
         GetDrawablesOnlyInternal(query, rayQueryDrawables_);
 
         // Check that amount of drawables is large enough to justify threading
-        if (rayQueryDrawables_.Size() > RAYCASTS_PER_WORK_ITEM)
+        if (rayQueryDrawables_.Size() >= queue->GetNumThreads() * RAYCASTS_PER_WORK_ITEM)
         {
             for (unsigned i = 0; i < rayQueryResults_.Size(); ++i)
                 rayQueryResults_[i].Clear();

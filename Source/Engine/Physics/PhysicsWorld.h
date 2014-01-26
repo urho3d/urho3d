@@ -62,6 +62,9 @@ struct PhysicsRaycastResult
     {
     }
 
+    /// Test for inequality, added to prevent GCC from complaining.
+    bool operator != (const PhysicsRaycastResult& rhs) const { return position_ != rhs.position_ || normal_ != rhs.normal_ || distance_ != rhs.distance_ || body_ != rhs.body_; }
+    
     /// Hit worldspace position.
     Vector3 position_;
     /// Hit worldspace normal.
