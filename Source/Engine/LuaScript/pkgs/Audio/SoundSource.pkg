@@ -4,7 +4,6 @@ enum SoundType{};
 
 class SoundSource : public Component
 {
-
     void Play(Sound* sound);
     void Play(Sound* sound, float frequency);
     void Play(Sound* sound, float frequency, float gain);
@@ -17,7 +16,6 @@ class SoundSource : public Component
     void SetPanning(float panning);
     void SetAutoRemove(bool enable);
 
-    
     Sound* GetSound() const;
     SoundType GetSoundType() const;
     float GetTimePosition() const;
@@ -30,9 +28,7 @@ class SoundSource : public Component
     
     void PlayLockless(Sound* sound);
     void StopLockless();
-    void SetPlayPositionLockless(signed char* position);
-
-    
+        
     tolua_readonly tolua_property__get_set Sound* sound;
     tolua_property__get_set SoundType soundType;
     tolua_readonly tolua_property__get_set float timePosition;

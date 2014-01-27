@@ -196,6 +196,18 @@ template<> int tolua_pushurho3dpodvector<unsigned>(lua_State* L, void* data, con
     return 1;
 }
 
+template<> int tolua_pushurho3dpodvector<SoundSource*>(lua_State* L, void* data, const char* /*type*/)
+{
+    const PODVector<SoundSource*>& vector = *((const PODVector<SoundSource*>*)data);
+    lua_newtable(L);
+    for (unsigned i = 0; i < vector.Size(); ++i)
+    {
+        tolua_pushusertype(L, vector[i], "SoundSource");
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
 template<> int tolua_pushurho3dpodvector<UIElement*>(lua_State* L, void* data, const char* /*type*/)
 {
     const PODVector<UIElement*>& vector = *((const PODVector<UIElement*>*)data);

@@ -31,6 +31,7 @@ struct lua_State;
 
 namespace Urho3D
 {
+    class SoundSource;
     class UIElement;
 }
 
@@ -76,8 +77,11 @@ template<typename T> int tolua_pushurho3dpodvector(lua_State* L, void* data, con
 template<> int tolua_pushurho3dpodvector<int>(lua_State* L, void* data, const char* type);
 /// Push PODVector<unsigned> to Lua as a table.
 template<> int tolua_pushurho3dpodvector<unsigned>(lua_State* L, void* data, const char* type);
+/// Push PODVector<SoundSource*> to Lua as a table.
+template<> int tolua_pushurho3dpodvector<SoundSource*>(lua_State* L, void* data, const char* type);
 /// Push PODVector<UIElement*> to Lua as a table.
 template<> int tolua_pushurho3dpodvector<UIElement*>(lua_State* L, void* data, const char* type);
+
 /// Push PODVector<Vector3> to Lua as a table.
 template<> int tolua_pushurho3dpodvector<Vector3>(lua_State* L, void* data, const char* type);
 /// Push PODVector<IntVector2> to Lua as a table.

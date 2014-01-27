@@ -24,6 +24,7 @@ Methods:
 - bool IsInitialized() const
 - float GetMasterGain(SoundType type) const
 - SoundListener* GetListener() const
+- const PODVector<SoundSource*>& GetSoundSources() const
 - void AddSoundSource(SoundSource* soundSource)
 - void RemoveSoundSource(SoundSource* soundSource)
 - float GetSoundSourceMasterGain(SoundType type) const
@@ -34,10 +35,10 @@ Properties:
 - unsigned sampleSize (readonly)
 - int mixRate (readonly)
 - bool interpolation (readonly)
-- SoundListener* listener
 - bool stereo (readonly)
 - bool playing (readonly)
 - bool initialized (readonly)
+- SoundListener* listener
 
 ### Sound : Resource
 
@@ -107,7 +108,6 @@ Methods:
 - bool IsPlaying() const
 - void PlayLockless(Sound* sound)
 - void StopLockless()
-- void SetPlayPositionLockless(signed char* position)
 
 Properties:
 

@@ -27,19 +27,18 @@ class Audio : public Object
     bool IsInitialized() const;
     float GetMasterGain(SoundType type) const;
     SoundListener* GetListener() const;
+    const PODVector<SoundSource*>& GetSoundSources() const;
 
     void AddSoundSource(SoundSource* soundSource);
     void RemoveSoundSource(SoundSource* soundSource);
-
     float GetSoundSourceMasterGain(SoundType type) const;
     void MixOutput(void *dest, unsigned samples);
-    
+
     tolua_readonly tolua_property__get_set unsigned sampleSize;
     tolua_readonly tolua_property__get_set int mixRate;
     tolua_readonly tolua_property__get_set bool interpolation;
-
-    tolua_property__get_set SoundListener* listener;
-    tolua_readonly tolua_property__is_set bool stereo;    
+    tolua_readonly tolua_property__is_set bool stereo;
     tolua_readonly tolua_property__is_set bool playing;
     tolua_readonly tolua_property__is_set bool initialized;
+    tolua_property__get_set SoundListener* listener;
 };
