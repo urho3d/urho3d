@@ -110,6 +110,7 @@ function handleLine(line)
     if type == GLOBAL then
         if line:find("enum ") ~= nil then
             type = ENUM
+            table.insert(enums, line)
             return
         end
         
@@ -198,15 +199,28 @@ function writeGlobalConstants(ofile)
         line = line:gsub(";", "")
         ofile:write("- ", line, "\n")
     end
-        
-    for _, line in ipairs(enums) do
-        line = line:gsub(",", "")
-        line = line:gsub(" = .*", "")
-        ofile:write("- int ", line, "\n")
-    end
     
     ofile:write("\n")
 end 
+
+function writeEnums(ofile)
+    ofile:write("\\section LuaScriptAPI_Enums Enumerations\n")
+    for _, line in ipairs(enums) do
+        if line:find("enum ") ~= nil or line:find("struct ") ~= nil then
+            line = line:gsub("enum ", "")
+            --line = line:gsub("struct ", "")
+            --line = line:gsub("public ", "")
+            ofile:write("\n\n### ", line, "\n\n")
+            --firstProperty = true
+        else    
+            line = line:gsub(",", "")
+            line = line:gsub(" = .*", "")
+            ofile:write("- int ", line, "\n")
+        end
+    end
+
+    ofile:write("\n")
+end
 
 function writeClasses(ofile)
     ofile:write("\\section LuaScriptAPI_Classes Classes\n")
@@ -268,6 +282,7 @@ namespace Urho3D
 ofile:write("\n")
 
 writeClasses(ofile)
+writeEnums(ofile)
 writeGlobalFunctions(ofile)
 writeGlobalConstants(ofile)
 writeRenamings(ofile)
