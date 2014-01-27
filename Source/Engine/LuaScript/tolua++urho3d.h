@@ -74,6 +74,12 @@ template<> void* tolua_tourho3dpodvector<unsigned>(lua_State* L, int narg, void*
 template<typename T> int tolua_pushurho3dpodvector(lua_State* L, void* data, const char* type);
 /// Push PODVector<int> to Lua as a table.
 template<> int tolua_pushurho3dpodvector<int>(lua_State* L, void* data, const char* type);
+/// Push PODVector<unsigned> to Lua as a table.
+template<> int tolua_pushurho3dpodvector<unsigned>(lua_State* L, void* data, const char* type);
+/// Push PODVector<UIElement*> to Lua as a table.
+template<> int tolua_pushurho3dpodvector<UIElement*>(lua_State* L, void* data, const char* type);
+/// Push PODVector<Vector3> to Lua as a table.
+template<> int tolua_pushurho3dpodvector<Vector3>(lua_State* L, void* data, const char* type);
 /// Push PODVector<IntVector2> to Lua as a table.
 template<> int tolua_pushurho3dpodvector<IntVector2>(lua_State* L, void* data, const char* type);
 /// Push PODVector<OctreeQueryResult> to Lua as a table.
@@ -82,9 +88,3 @@ template<> int tolua_pushurho3dpodvector<OctreeQueryResult>(lua_State* L, void* 
 template<> int tolua_pushurho3dpodvector<PhysicsRaycastResult>(lua_State* L, void* data, const char* type);
 /// Push PODVector<RayQueryResult> to Lua as a table.
 template<> int tolua_pushurho3dpodvector<RayQueryResult>(lua_State* L, void* data, const char* type);
-/// Push PODVector<UIElement*> to Lua as a table.
-template<> int tolua_pushurho3dpodvector<UIElement*>(lua_State* L, void* data, const char* type);
-/// Push PODVector<unsigned> to Lua as a table.
-template<> int tolua_pushurho3dpodvector<unsigned>(lua_State* L, void* data, const char* type);
-/// Push PODVector<Vector3> to Lua as a table.
-template<> int tolua_pushurho3dpodvector<Vector3>(lua_State* L, void* data, const char* type);
