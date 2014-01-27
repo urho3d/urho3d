@@ -1335,6 +1335,7 @@ Methods:
 - void SetViewport(unsigned index, Viewport* viewport)
 - void SetDefaultRenderPath(RenderPath* renderPath)
 - void SetDefaultRenderPath(XMLFile* file)
+- void SetHDRRendering(bool enable)
 - void SetSpecularLighting(bool enable)
 - void SetTextureAnisotropy(int level)
 - void SetTextureFilterMode(TextureFilterMode mode)
@@ -1357,6 +1358,7 @@ Methods:
 - unsigned GetNumViewports() const
 - Viewport* GetViewport(unsigned index) const
 - RenderPath* GetDefaultRenderPath() const
+- bool GetHDRRendering() const
 - bool GetSpecularLighting() const
 - bool GetDrawShadows() const
 - int GetTextureAnisotropy() const
@@ -1401,6 +1403,7 @@ Properties:
 
 - unsigned numViewports
 - RenderPath* defaultRenderPath
+- bool HDRRendering
 - bool specularLighting
 - bool drawShadows
 - int textureAnisotropy
@@ -5303,6 +5306,7 @@ Properties:
 - int TU_INDIRECTION
 - int TU_DEPTHBUFFER
 - int TU_LIGHTBUFFER
+- int TU_VOLUMEMAP
 - int MAX_TEXTURE_UNITS
 - int SP_FRAME
 - int SP_CAMERA

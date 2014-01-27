@@ -99,6 +99,7 @@ namespace Urho3D
 - TU_NORMALBUFFER
 - TU_DEPTHBUFFER
 - TU_LIGHTBUFFER
+- TU_VOLUMEMAP
 - MAX_MATERIAL_TEXTURE_UNITS
 - MAX_TEXTURE_UNITS
 
@@ -1453,6 +1454,7 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool Load(File@)
 - bool Save(File@) const
+- bool LoadColorLUT(File@)
 - void FlipVertical()
 - void SaveBMP(const String&)
 - void SavePNG(const String&)
@@ -2333,6 +2335,47 @@ Properties:
 - RenderSurface@ renderSurface (readonly)
 
 
+### Texture3D
+
+Methods:
+
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool Load(File@)
+- bool Save(File@) const
+- void SetNumLevels(uint)
+- void ClearDataLost()
+- bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
+- bool Load(Image@, bool = false)
+
+Properties:
+
+- int refs (readonly)
+- int weakRefs (readonly)
+- ShortStringHash type (readonly)
+- ShortStringHash baseType (readonly)
+- String typeName (readonly)
+- String category (readonly)
+- String name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- TextureUsage usage (readonly)
+- uint format (readonly)
+- bool compressed (readonly)
+- uint levels (readonly)
+- int width (readonly)
+- int height (readonly)
+- int[] levelWidth (readonly)
+- int[] levelHeight (readonly)
+- TextureFilterMode filterMode
+- TextureAddressMode[] addressMode
+- Color borderColor
+- bool sRGB
+- Texture@ backupTexture
+- int[] mipsToSkip
+- bool dataLost (readonly)
+- RenderSurface@ renderSurface (readonly)
+
+
 ### TextureCube
 
 Methods:
@@ -2736,6 +2779,8 @@ Properties:
 - Color fogColor
 - float fogStart
 - float fogEnd
+- float fogHeight
+- float fogHeightScale
 - int priority
 - bool override
 - bool ambientGradient
@@ -3658,6 +3703,7 @@ Properties:
 - Viewport@[] viewports
 - RenderPath@ defaultRenderPath
 - Zone@ defaultZone (readonly)
+- bool hdrRendering
 - bool specularLighting
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode

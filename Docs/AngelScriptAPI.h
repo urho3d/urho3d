@@ -103,6 +103,7 @@ TU_ALBEDOBUFFER,
 TU_NORMALBUFFER,
 TU_DEPTHBUFFER,
 TU_LIGHTBUFFER,
+TU_VOLUMEMAP,
 MAX_MATERIAL_TEXTURE_UNITS,
 MAX_TEXTURE_UNITS,
 };
@@ -1521,6 +1522,7 @@ class Image
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool Load(File);
 bool Save(File) const;
+bool LoadColorLUT(File);
 void FlipVertical();
 void SaveBMP(const String&);
 void SavePNG(const String&);
@@ -2579,6 +2581,63 @@ bool dataLost;
 RenderSurface renderSurface;
 };
 
+class Texture3D
+{
+// Methods:
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool Load(File);
+bool Save(File) const;
+void SetNumLevels(uint);
+void ClearDataLost();
+bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
+bool Load(Image, bool = false);
+
+// Properties:
+/* (readonly) */
+int refs;
+/* (readonly) */
+int weakRefs;
+/* (readonly) */
+ShortStringHash type;
+/* (readonly) */
+ShortStringHash baseType;
+/* (readonly) */
+String typeName;
+/* (readonly) */
+String category;
+String name;
+/* (readonly) */
+uint memoryUse;
+/* (readonly) */
+uint useTimer;
+/* (readonly) */
+TextureUsage usage;
+/* (readonly) */
+uint format;
+/* (readonly) */
+bool compressed;
+/* (readonly) */
+uint levels;
+/* (readonly) */
+int width;
+/* (readonly) */
+int height;
+/* (readonly) */
+Array<int> levelWidth;
+/* (readonly) */
+Array<int> levelHeight;
+TextureFilterMode filterMode;
+Array<TextureAddressMode> addressMode;
+Color borderColor;
+bool sRGB;
+Texture backupTexture;
+Array<int> mipsToSkip;
+/* (readonly) */
+bool dataLost;
+/* (readonly) */
+RenderSurface renderSurface;
+};
+
 class TextureCube
 {
 // Methods:
@@ -3080,6 +3139,8 @@ Color ambientEndColor;
 Color fogColor;
 float fogStart;
 float fogEnd;
+float fogHeight;
+float fogHeightScale;
 int priority;
 bool override;
 bool ambientGradient;
@@ -4228,6 +4289,7 @@ Array<Viewport> viewports;
 RenderPath defaultRenderPath;
 /* (readonly) */
 Zone defaultZone;
+bool hdrRendering;
 bool specularLighting;
 int textureAnisotropy;
 TextureFilterMode textureFilterMode;
