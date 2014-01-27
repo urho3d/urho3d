@@ -5458,9 +5458,6 @@ Properties:
 - int DRAG_RESIZE_LEFT
 
 \section LuaScriptAPI_RenameTypes Rename types
-- const PODVector<PhysicsRaycastResult>& becomes PhysicsRaycastResultVector
-- const PODVector<OctreeQueryResult>& becomes OctreeQueryResultVector
-- const PODVector<RayQueryResult>& becomes RayQueryResultVector
 - SharedPtr<HttpRequest> becomes HttpRequestSPtr
 
 */
