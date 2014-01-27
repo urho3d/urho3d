@@ -247,6 +247,7 @@ function HandleUpdate(eventType, eventData)
             -- Switch between 1st and 3rd person
             if input:GetKeyPress(KEY_F) then
                 firstPerson = not firstPerson
+                newFirstPerson = firstPerson
             end
 
             -- Check for loading / saving the scene

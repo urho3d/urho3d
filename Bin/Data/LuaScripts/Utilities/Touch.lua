@@ -31,7 +31,6 @@ local touchButtonSize = 96
 local touchButtonBorder = 12
 local zoom = false
 local newFirstPerson = nil
-local debugMode = nil
 local shadowMode = true
 
 firstPerson = false
@@ -79,11 +78,13 @@ function updateTouches(controls) -- Called from HandleUpdate
             local touch1 = input:GetTouch(0)
             local touch2 = input:GetTouch(1)
 
-            if (touch1.delta.y > 0 and touch2.delta.y < 0) or (touch1.delta.y < 0 and touch2.delta.y > 0) then zoom = true else zoom = false end -- Check for zoom pattern (touches moving in opposite directions)
+            -- Check for zoom pattern (touches moving in opposite directions)
+            if (touch1.delta.y > 0 and touch2.delta.y < 0) or (touch1.delta.y < 0 and touch2.delta.y > 0) then zoom = true else zoom = false end
 
+            -- Check for zoom direction (in/out)
             if zoom then
-                if Abs(touch1.position.y - touch2.position.y) > Abs(touch1.lastPosition.y - touch2.lastPosition.y) then sens = -1 else sens = 1 end -- Check for zoom direction (in/out)
-                cameraDistance = cameraDistance + Abs( touch1.delta.y - touch2.delta.y ) * sens * TOUCH_SENSITIVITY / 50
+                if Abs(touch1.position.y - touch2.position.y) > Abs(touch1.lastPosition.y - touch2.lastPosition.y) then sens = -1 else sens = 1 end
+                cameraDistance = cameraDistance + Abs(touch1.delta.y - touch2.delta.y) * sens * TOUCH_SENSITIVITY / 50
                 cameraDistance = Clamp(cameraDistance, CAMERA_MIN_DIST, CAMERA_MAX_DIST) -- Restrict zoom range to [1;20]
             end
         end
@@ -106,7 +107,7 @@ function updateTouches(controls) -- Called from HandleUpdate
                     controls.pitch = Clamp(controls.pitch, -80, 80) -- Limit pitch
                 end
 
-				if touch.touchID == moveTouchID then
+                if touch.touchID == moveTouchID then
                     local relX = touch.position.x - moveButton.screenPosition.x - touchButtonSize / 2
                     local relY = touch.position.y - moveButton.screenPosition.y - touchButtonSize / 2
                         if relY < 0 and Abs(relX * 3 / 2) < Abs(relY) then controls:Set(CTRL_FORWARD, true) end
@@ -120,7 +121,7 @@ function updateTouches(controls) -- Called from HandleUpdate
         if fireTouchID >= 0 then controls:Set(CTRL_JUMP, true) end
     end
 
-	-- Gyroscope (emulated by SDL through a virtual joystick)
+    -- Gyroscope (emulated by SDL through a virtual joystick)
     if input.numJoysticks > 0 then -- numJoysticks = 1 on iOS & Android
         local joystick = input:GetJoystick(0) -- JoystickState
         if joystick.numAxes >= 2 then
@@ -129,7 +130,7 @@ function updateTouches(controls) -- Called from HandleUpdate
             if joystick:GetAxisPosition(1) < -GYROSCOPE_THRESHOLD then controls:Set(CTRL_FORWARD, true) end
             if joystick:GetAxisPosition(1) > GYROSCOPE_THRESHOLD then controls:Set(CTRL_BACK, true) end
         end
-	end
+    end
 end
 
 function HandleTouchBegin(eventType, eventData)

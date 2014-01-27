@@ -26,7 +26,6 @@ bool firstPerson = false;
 bool touchEnabled = false;
 bool zoom = false;
 bool newFirstPerson = false;
-bool debugMode = true;
 bool shadowMode = true;
 
 Node@ cameraNode;
@@ -78,20 +77,24 @@ void UpdateTouches(Controls& controls) // Called from HandleUpdate
         // Zoom in/out
         if (input.numTouches == 2)
         {
-			TouchState@ touch1 = input.touches[0];
-			TouchState@ touch2 = input.touches[1];
+            TouchState@ touch1 = input.touches[0];
+            TouchState@ touch2 = input.touches[1];
 
-            if ((touch1.delta.y > 0 && touch2.delta.y < 0) || (touch1.delta.y < 0 && touch2.delta.y > 0)) // Check for zoom pattern (touches moving in opposite directions)
+            // Check for zoom pattern (touches moving in opposite directions)
+            if ((touch1.delta.y > 0 && touch2.delta.y < 0) || (touch1.delta.y < 0 && touch2.delta.y > 0))
                 zoom = true;
-            else zoom = false;
+            else 
+                zoom = false;
 
             if (zoom)
             {
                 int sens = 0;
-                if (Abs(touch1.position.y - touch2.position.y) > Abs(touch1.lastPosition.y - touch2.lastPosition.y)) // Check for zoom direction (in/out)
+                // Check for zoom direction (in/out)
+                if (Abs(touch1.position.y - touch2.position.y) > Abs(touch1.lastPosition.y - touch2.lastPosition.y))
                     sens = -1;
-                else sens = 1;
-                cameraDistance += Abs( touch1.delta.y - touch2.delta.y ) * sens * TOUCH_SENSITIVITY / 50;
+                else
+                    sens = 1;
+                cameraDistance += Abs(touch1.delta.y - touch2.delta.y) * sens * TOUCH_SENSITIVITY / 50;
                 cameraDistance = Clamp(cameraDistance, CAMERA_MIN_DIST, CAMERA_MAX_DIST); // Restrict zoom range to [1;20]
             }
         }
@@ -135,15 +138,13 @@ void UpdateTouches(Controls& controls) // Called from HandleUpdate
         }
 
         if (fireTouchID >= 0)
-        {
             controls.Set(CTRL_JUMP, true);
-        }
     }
 
-	// Gyroscope (emulated by SDL through a virtual joystick)
+    // Gyroscope (emulated by SDL through a virtual joystick)
     if (input.numJoysticks > 0) // numJoysticks = 1 on iOS & Android
     {
-		JoystickState@ joystick = input.joysticks[0];
+        JoystickState@ joystick = input.joysticks[0];
         if (joystick.numAxes >= 2)
         {
             if (joystick.axisPosition[0] < -GYROSCOPE_THRESHOLD)
@@ -155,7 +156,7 @@ void UpdateTouches(Controls& controls) // Called from HandleUpdate
             if (joystick.axisPosition[1] > GYROSCOPE_THRESHOLD)
                 controls.Set(CTRL_BACK, true);
         }
-	}
+    }
 }
 
 void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
