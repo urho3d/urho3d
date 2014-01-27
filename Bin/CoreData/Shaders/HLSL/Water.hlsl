@@ -56,5 +56,5 @@ void PS(
     float3 reflectColor = tex2D(sDiffMap, reflectUV).rgb;
     float3 finalColor = lerp(refractColor, reflectColor, fresnel);
 
-    oColor = float4(GetFog(finalColor, iEyeVec.w), 1.0);
+    oColor = float4(GetFog(finalColor, GetFogFactor(iEyeVec.w)), 1.0);
 }

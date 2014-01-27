@@ -29,5 +29,5 @@ void main()
     vec3 reflectColor = texture2D(sDiffMap, reflectUV).rgb;
     vec3 finalColor = mix(refractColor, reflectColor, fresnel);
 
-    gl_FragColor = vec4(GetFog(finalColor, vEyeVec.w), 1.0);
+    gl_FragColor = vec4(GetFog(finalColor, GetFogFactor(vEyeVec.w)), 1.0);
 }
