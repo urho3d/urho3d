@@ -3,22 +3,6 @@ local currentString = ''
 local out
 local WRITE, OUTPUT = write, output
 
-_is_functions["const PODVector<IntVector2>"] = "not implemented"
-_to_functions["const PODVector<IntVector2>"] = "not implemented"
-_push_functions["const PODVector<IntVector2>"] = "tolua_pushurho3dconstpodvectorintvector2"
-
-_is_functions["const PODVector<UIElement*>"] = "not implemented"
-_to_functions["const PODVector<UIElement*>"] = "not implemented"
-_push_functions["const PODVector<UIElement*>"] = "tolua_pushurho3dpodvectoruielement"
-
-_is_functions["const PODVector<unsigned>"] = "tolua_isurho3dconstpodvectorunsigned"
-_to_functions["const PODVector<unsigned>"] = "tolua_tourho3dconstpodvectorunsigned"
-_push_functions["const PODVector<unsigned>"] = "tolua_pushurho3dconstpodvectorunsigned"
-
-_is_functions["const Vector<String>"] = "tolua_isurho3dconstvectorstring"
-_to_functions["const Vector<String>"] = "tolua_tourho3dconstvectorstring"
-_push_functions["const Vector<String>"] = "tolua_pushurho3dconstvectorstring"
-
 function output(s)
     out = _OUTPUT
     output = OUTPUT -- restore
@@ -89,6 +73,56 @@ function post_output_hook(package)
     )
 
     WRITE(result)
+end
+
+-- Is Urho3D Vector type.
+function urho3d_is_vector(t)
+    return t:find("Vector<") ~= nil
+end
+
+-- Is Urho3D PODVector type.
+function urho3d_is_podvector(t)
+    return t:find("PODVector<") ~= nil
+end
+
+local old_get_push_function = get_push_function
+local old_get_to_function = get_to_function
+local old_get_is_function = get_is_function
+
+function get_push_function(t)
+    if not urho3d_is_vector(t) then
+        return old_get_push_function(t)
+    end
+    
+    if not urho3d_is_podvector(t) then
+        return "tolua_pushurho3dvector" .. t:match("<.*>")
+    else
+        return "tolua_pushurho3dpodvector" .. t:match("<.*>")
+    end
+end
+
+function get_to_function(t)
+    if not urho3d_is_vector(t) then
+        return old_get_to_function(t)
+    end
+    
+    if not urho3d_is_podvector(t) then
+        return "tolua_tourho3dvector" .. t:match("<.*>")
+    else
+        return "tolua_tourho3dpodvector" .. t:match("<.*>")
+    end
+end
+
+function get_is_function(t)
+    if not urho3d_is_vector(t) then
+        return old_get_is_function(t)
+    end
+    
+    if not urho3d_is_podvector(t) then
+        return "tolua_isurho3dvector" .. t:match("<.*>")
+    else
+        return "tolua_isurho3dpodvector" .. t:match("<.*>")
+    end
 end
 
 function get_property_methods_hook(ptype, name)

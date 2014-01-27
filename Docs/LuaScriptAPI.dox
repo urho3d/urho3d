@@ -147,47 +147,6 @@ Properties:
 - float outerAngle
 - float rolloffFactor
 
-### PODVector
-
-Methods:
-
-- TOLUA_TEMPLATE_BIND(T, Vector3, OctreeQueryResult, RayQueryResult, PhysicsRaycastResult)
-- PODVector()
-- PODVector(const PODVector<T>& vector)
-- ~PODVector()
-- PODVector<T> operator + (const T& rhs) const
-- PODVector<T> operator + (const PODVector<T>& rhs) const
-- bool operator == (const PODVector<T>& rhs) const
-- T& operator [] (unsigned index)
-- const T& operator [] (unsigned index) const
-- T& At(unsigned index)
-- const T& At(unsigned index) const
-- void Push(const T& value)
-- void Push(const PODVector<T>& vector)
-- void Pop()
-- void Insert(unsigned pos, const T& value)
-- void Insert(unsigned pos, const PODVector<T>& vector)
-- void Erase(unsigned pos, unsigned length = 1)
-- bool Remove(const T& value)
-- void Clear()
-- void Resize(unsigned newSize)
-- void Reserve(unsigned newCapacity)
-- void Compact()
-- bool Contains(const T& value) const
-- T& Front()
-- const T& Front() const
-- T& Back()
-- const T& Back() const
-- unsigned Size() const
-- unsigned Capacity() const
-- bool Empty() const
-
-Properties:
-
-- unsigned size (readonly)
-- unsigned capacity (readonly)
-- bool empty (readonly)
-
 ### Context
 
 Methods:
@@ -1162,11 +1121,11 @@ Methods:
 - void Update(const FrameInfo& frame)
 - void AddManualDrawable(Drawable* drawable)
 - void RemoveManualDrawable(Drawable* drawable)
-- PODVector<OctreeQueryResult> GetDrawables(const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- PODVector<OctreeQueryResult> GetDrawables(const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- PODVector<OctreeQueryResult> GetDrawables(const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- PODVector<OctreeQueryResult> GetDrawables(const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
-- PODVector<RayQueryResult> Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
+- const PODVector<OctreeQueryResult>& GetDrawables(const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<OctreeQueryResult>& GetDrawables(const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<OctreeQueryResult>& GetDrawables(const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<OctreeQueryResult>& GetDrawables(const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) const
+- const PODVector<RayQueryResult>& Raycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
 - RayQueryResult RaycastSingle(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags) const
 - unsigned GetNumLevels() const
 - void QueueUpdate(Drawable* drawable)
@@ -3053,7 +3012,7 @@ Methods:
 - bool Build(const BoundingBox& boundingBox)
 - Vector3 FindNearestPoint(const Vector3& point, const Vector3& extents = Vector3::ONE)
 - Vector3 MoveAlongSurface(const Vector3& start, const Vector3& end, const Vector3& extents=Vector3::ONE, int maxVisited=3)
-- PODVector<Vector3> FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
+- const PODVector<Vector3>& FindPath(const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE)
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3& center, float radius, const Vector3& extents = Vector3::ONE)
 - float GetDistanceToWall(const Vector3& point, float radius, const Vector3& extents = Vector3::ONE)
@@ -3408,7 +3367,7 @@ Methods:
 - void SetInternalEdge(bool enable)
 - void SetSplitImpulse(bool enable)
 - void SetMaxNetworkAngularVelocity(float velocity)
-- PODVector<PhysicsRaycastResult> Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+- const PODVector<PhysicsRaycastResult>& Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - PhysicsRaycastResult SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
 - void DrawDebugGeometry(bool depthTest)
@@ -5499,9 +5458,9 @@ Properties:
 - int DRAG_RESIZE_LEFT
 
 \section LuaScriptAPI_RenameTypes Rename types
-- PODVector<PhysicsRaycastResult> becomes PhysicsRaycastResultVector
-- PODVector<OctreeQueryResult> becomes OctreeQueryResultVector
-- PODVector<RayQueryResult> becomes RayQueryResultVector
+- const PODVector<PhysicsRaycastResult>& becomes PhysicsRaycastResultVector
+- const PODVector<OctreeQueryResult>& becomes OctreeQueryResultVector
+- const PODVector<RayQueryResult>& becomes RayQueryResultVector
 - SharedPtr<HttpRequest> becomes HttpRequestSPtr
 
 */

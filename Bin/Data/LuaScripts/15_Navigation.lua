@@ -328,10 +328,11 @@ function HandlePostRenderUpdate(eventType, eventData)
         debug:AddBoundingBox(BoundingBox(endPos - Vector3(0.1, 0.1, 0.1), endPos + Vector3(0.1, 0.1, 0.1)), Color(1.0, 1.0, 1.0))
     end
     
-    if currentPath ~= nil and currentPath:Size() > 0 then
+    if currentPath ~= nil then
         -- Draw the path with a small upward bias so that it does not clip into the surfaces
         local bias = Vector3(0.0, 0.05, 0.0)
-        for i = 0, currentPath:Size() - 2 do
+        local size = table.maxn(currentPath)
+        for i = 1, size - 1 do
             debug:AddLine(currentPath[i] + bias, currentPath[i + 1] + bias, Color(1.0, 1.0, 1.0))
         end
     end
