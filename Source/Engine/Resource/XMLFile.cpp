@@ -26,6 +26,7 @@
 #include "Deserializer.h"
 #include "Log.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
 #include "Serializer.h"
 #include "XMLFile.h"
 
@@ -46,14 +47,14 @@ public:
         success_(true)
     {
     }
-    
+
     /// Write bytes to output.
     void write(const void* data, size_t size)
     {
         if (dest_.Write(data, size) != size)
             success_ = false;
     }
-    
+
     /// Destination serializer.
     Serializer& dest_;
     /// Success flag.
@@ -80,7 +81,7 @@ void XMLFile::RegisterObject(Context* context)
 bool XMLFile::Load(Deserializer& source)
 {
     PROFILE(LoadXMLFile);
-    
+
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
@@ -91,13 +92,34 @@ bool XMLFile::Load(Deserializer& source)
     SharedArrayPtr<char> buffer(new char[dataSize]);
     if (source.Read(buffer.Get(), dataSize) != dataSize)
         return false;
-    
+
     if (!document_->load_buffer(buffer.Get(), dataSize))
     {
         LOGERROR("Could not parse XML data from " + source.GetName());
         return false;
     }
-    
+
+    XMLElement rootElem = GetRoot();
+    String inherit = rootElem ? rootElem.GetAttribute("inherit") : String::EMPTY;
+    if (!inherit.Empty())
+    {
+        // The existence of this attribute indicates this is an RFC 5261 patch file
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        XMLFile* inheritedXMLFile = cache->GetResource<XMLFile>(inherit);
+        if (!inheritedXMLFile)
+        {
+            LOGERRORF("Could not find inherit RenderPath XML file: %s", inherit.CString());
+            return false;
+        }
+
+        // Patch this XMLFile and leave the original inherited XMLFile as it is
+        pugi::xml_document* patchDocument = document_;
+        document_ = new pugi::xml_document();
+        document_->reset(*inheritedXMLFile->document_);      // Unfortunately there is no way to adjust the data size correctly
+        Patch(rootElem);
+        delete patchDocument;
+    }
+
     // Note: this probably does not reflect internal data structure size accurately
     SetMemoryUse(dataSize);
     return true;
@@ -122,7 +144,7 @@ XMLElement XMLFile::GetRoot(const String& name)
     pugi::xml_node root = document_->first_child();
     if (root.empty())
         return XMLElement();
-    
+
     if (!name.Empty() && name != root.name())
         return XMLElement();
     else

@@ -22,10 +22,8 @@
 
 #include "Precompiled.h"
 #include "Graphics.h"
-#include "Log.h"
 #include "Material.h"
 #include "RenderPath.h"
-#include "ResourceCache.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
 
@@ -278,23 +276,6 @@ bool RenderPath::Append(XMLFile* file)
     if (!rootElem)
         return false;
     
-    String inherit = rootElem.GetAttribute("inherit");
-    if (!inherit.Empty())
-    {
-        // The existence of this attribute indicates this is an RFC 5261 patch file
-        ResourceCache* cache = file->GetSubsystem<ResourceCache>();
-        XMLFile* inheritedXMLFile = cache->GetResource<XMLFile>(inherit);
-        if (!file)
-        {
-            LOGERRORF("Could not find inherit RenderPath XML file: %s", inherit.CString());
-            return false;
-        }
-        inheritedXMLFile->Patch(rootElem);
-        rootElem = inheritedXMLFile->GetRoot();
-        if (!rootElem)
-            return false;
-    }
-
     XMLElement rtElem = rootElem.GetChild("rendertarget");
     while (rtElem)
     {
