@@ -536,4 +536,14 @@ bool IsDigit(unsigned ch)
     return ch < 256 ? isdigit(ch) != 0 : false;
 }
 
+unsigned ToUpper(unsigned ch)
+{
+    return toupper(ch);
+}
+
+unsigned ToLower(unsigned ch)
+{
+    return tolower(ch);
+}
+
 }

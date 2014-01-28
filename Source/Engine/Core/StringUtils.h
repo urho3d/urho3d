@@ -101,5 +101,9 @@ URHO3D_API String ToString(const char* formatString, ...);
 URHO3D_API bool IsAlpha(unsigned ch);
 /// Return whether a char is a digit.
 URHO3D_API bool IsDigit(unsigned ch);
+/// Return char in uppercase.
+URHO3D_API unsigned ToUpper(unsigned ch);
+/// Return char in lowercase.
+URHO3D_API unsigned ToLower(unsigned ch);
 
 }

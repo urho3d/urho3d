@@ -19,3 +19,5 @@ String ToStringHex(unsigned value);
 
 bool IsAlpha(unsigned ch);
 bool IsDigit(unsigned ch);
+unsigned ToUpper(unsigned ch);
+unsigned ToLower(unsigned ch);

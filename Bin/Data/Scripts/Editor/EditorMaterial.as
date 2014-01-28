@@ -221,7 +221,10 @@ void RefreshMaterialTextures(bool fullUpdate = true)
     
         for (uint i = 0; i < MAX_MATERIAL_TEXTURE_UNITS; ++i)
         {
-            UIElement@ parent = CreateAttributeEditorParentWithSeparatedLabel(list, GetTextureUnitName(TextureUnit(i)), i, 0, false);
+            String tuName = GetTextureUnitName(TextureUnit(i));
+            tuName[0] = ToUpper(tuName[0]);
+
+            UIElement@ parent = CreateAttributeEditorParentWithSeparatedLabel(list, "Unit " + i + " " + tuName, i, 0, false);
             
             UIElement@ container = UIElement();
             container.SetLayout(LM_HORIZONTAL, 4, IntRect(10, 0, 4, 0));

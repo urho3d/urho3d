@@ -573,6 +573,8 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("String Join(String[]&, const String&in glue)", asFUNCTION(StringJoined), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsDigit(uint)", asFUNCTION(IsDigit), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsAlpha(uint)", asFUNCTION(IsAlpha), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint ToUpper(uint)", asFUNCTION(ToUpper), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint ToLower(uint)", asFUNCTION(ToLower), asCALL_CDECL);
 }
 
 static void ConstructTimer(Timer* ptr)
