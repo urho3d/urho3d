@@ -1530,9 +1530,15 @@ void View::SetTextures(RenderPathCommand& command)
         // Bind a texture from the resource system
         Texture* texture;
 
-        // Detect 3d textures by file extension: they are defined by an XML file
+        // Detect cube/3D textures by file extension: they are defined by an XML file
         if (GetExtension(command.textureNames_[i]) == ".xml")
-            texture = cache->GetResource<Texture3D>(command.textureNames_[i]);
+        {
+            // Assume 3D textures are only bound to the volume map unit, otherwise it's a cube texture
+            if (i == TU_VOLUMEMAP)
+                texture = cache->GetResource<Texture3D>(command.textureNames_[i]);
+            else
+                texture = cache->GetResource<TextureCube>(command.textureNames_[i]);
+        }
         else
             texture = cache->GetResource<Texture2D>(command.textureNames_[i]);
 
