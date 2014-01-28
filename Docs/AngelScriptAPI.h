@@ -8203,6 +8203,7 @@ class XMLFile
 XMLElement CreateRoot(const String&);
 XMLElement GetRoot(const String& = String ( ));
 bool Load(File);
+void Patch(XMLElement);
 void Patch(XMLFile);
 bool Save(File) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));

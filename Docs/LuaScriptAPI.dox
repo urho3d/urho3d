@@ -3639,6 +3639,7 @@ Methods:
 
 - XMLElement GetRoot(const String name = String::EMPTY)
 - void Patch(XMLFile* patchFile)
+- void Patch(XMLElement patchElement)
 
 ### Serializable : Object
 
