@@ -100,7 +100,7 @@ bool XMLFile::Load(Deserializer& source)
     }
 
     XMLElement rootElem = GetRoot();
-    String inherit = rootElem ? rootElem.GetAttribute("inherit") : String::EMPTY;
+    String inherit = rootElem.GetAttribute("inherit");
     if (!inherit.Empty())
     {
         // The existence of this attribute indicates this is an RFC 5261 patch file
