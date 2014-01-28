@@ -133,6 +133,21 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
     }
 }
 
+bool ComparePropertyStrings(const String& lhs, const String& rhs)
+{
+    int spaceLhs = lhs.Find(' ');
+    int spaceRhs = rhs.Find(' ');
+    if (spaceLhs != String::NPOS && spaceRhs != String::NPOS)
+        return String::Compare(lhs.CString() + spaceLhs, rhs.CString() + spaceRhs, true) < 0;
+    else
+        return String::Compare(lhs.CString(), rhs.CString(), true) < 0;
+}
+
+bool ComparePropertyInfos(const PropertyInfo& lhs, const PropertyInfo& rhs)
+{
+    return String::Compare(lhs.name_.CString(), rhs.name_.CString(), true) < 0;
+}
+
 Script::Script(Context* context) :
     Object(context),
     scriptEngine_(0),
@@ -264,41 +279,26 @@ void Script::DumpAPI(DumpMode mode)
             "#define null 0\n");
 
     if (mode == DOXYGEN)
-        Log::WriteRaw("\\section ScriptAPI_Enums Enumerations\n");
-    else if (mode == C_HEADER)
-        Log::WriteRaw("\n// Enumerations\n");
-
-    unsigned enums = scriptEngine_->GetEnumCount();
-    for (unsigned i = 0; i < enums; ++i)
-    {
-        int typeId;
-        if (mode == DOXYGEN)
-            Log::WriteRaw("\n### " + String(scriptEngine_->GetEnumByIndex(i, &typeId)) + "\n\n");
-        else if (mode == C_HEADER)
-            Log::WriteRaw("\nenum " + String(scriptEngine_->GetEnumByIndex(i, &typeId)) + "\n{\n");
-
-        for (unsigned j = 0; j < (unsigned)scriptEngine_->GetEnumValueCount(typeId); ++j)
-        {
-            int value = 0;
-            const char* name = scriptEngine_->GetEnumValueByIndex(typeId, j, &value);
-            OutputAPIRow(mode, String(name), false, ",");
-        }
-
-        if (mode == DOXYGEN)
-            Log::WriteRaw("\n");
-        else if (mode == C_HEADER)
-            Log::WriteRaw("};\n");
-    }
-
-    if (mode == DOXYGEN)
         Log::WriteRaw("\\section ScriptAPI_Classes Classes\n");
     else if (mode == C_HEADER)
         Log::WriteRaw("\n// Classes\n");
 
     unsigned types = scriptEngine_->GetObjectTypeCount();
+    Vector<Pair<String, unsigned> > sortedTypes;
     for (unsigned i = 0; i < types; ++i)
     {
         asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(i);
+        if (type)
+        {
+            String typeName(type->GetName());
+            sortedTypes.Push(MakePair(typeName, i));
+        }
+    }
+    Sort(sortedTypes.Begin(), sortedTypes.End());
+    
+    for (unsigned i = 0; i < sortedTypes.Size(); ++i)
+    {
+        asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
         if (type)
         {
             String typeName(type->GetName());
@@ -353,7 +353,10 @@ void Script::DumpAPI(DumpMode mode)
                 newInfo.read_ = newInfo.write_ = true;
                 propertyInfos.Push(newInfo);
             }
-
+            
+            Sort(methodDeclarations.Begin(), methodDeclarations.End(), ComparePropertyStrings);
+            Sort(propertyInfos.Begin(), propertyInfos.End(), ComparePropertyInfos);
+            
             if (!methodDeclarations.Empty())
             {
                 if (mode == DOXYGEN)
@@ -411,6 +414,44 @@ void Script::DumpAPI(DumpMode mode)
             globalFunctions.Push(declaration);
     }
 
+    Sort(globalFunctions.Begin(), globalFunctions.End(), ComparePropertyStrings);
+    Sort(globalPropertyInfos.Begin(), globalPropertyInfos.End(), ComparePropertyInfos);
+
+    if (mode == DOXYGEN)
+        Log::WriteRaw("\\section ScriptAPI_Enums Enumerations\n");
+    else if (mode == C_HEADER)
+        Log::WriteRaw("\n// Enumerations\n");
+
+    unsigned enums = scriptEngine_->GetEnumCount();
+    Vector<Pair<String, unsigned> > sortedEnums;
+    for (unsigned i = 0; i < enums; ++i)
+    {
+        int typeId;
+        sortedEnums.Push(MakePair(String(scriptEngine_->GetEnumByIndex(i, &typeId)), i));
+    }
+    Sort(sortedEnums.Begin(), sortedEnums.End());
+    
+    for (unsigned i = 0; i < sortedEnums.Size(); ++i)
+    {
+        int typeId;
+        if (mode == DOXYGEN)
+            Log::WriteRaw("\n### " + String(scriptEngine_->GetEnumByIndex(sortedEnums[i].second_, &typeId)) + "\n\n");
+        else if (mode == C_HEADER)
+            Log::WriteRaw("\nenum " + String(scriptEngine_->GetEnumByIndex(sortedEnums[i].second_, &typeId)) + "\n{\n");
+
+        for (unsigned j = 0; j < (unsigned)scriptEngine_->GetEnumValueCount(typeId); ++j)
+        {
+            int value = 0;
+            const char* name = scriptEngine_->GetEnumValueByIndex(typeId, j, &value);
+            OutputAPIRow(mode, String(name), false, ",");
+        }
+
+        if (mode == DOXYGEN)
+            Log::WriteRaw("\n");
+        else if (mode == C_HEADER)
+            Log::WriteRaw("};\n");
+    }
+    
     if (mode == DOXYGEN)
         Log::WriteRaw("\\section ScriptAPI_GlobalFunctions Global functions\n");
     else if (mode == C_HEADER)
@@ -432,6 +473,7 @@ void Script::DumpAPI(DumpMode mode)
     else if (mode == C_HEADER)
         Log::WriteRaw("\n// Global constants\n");
 
+    Vector<String> globalConstants;
     unsigned properties = scriptEngine_->GetGlobalPropertyCount();
     for (unsigned i = 0; i < properties; ++i)
     {
@@ -442,8 +484,13 @@ void Script::DumpAPI(DumpMode mode)
         propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
 
         String type(propertyDeclaration);
-        OutputAPIRow(mode, type + " " + String(propertyName), true);
+        globalConstants.Push(type + " " + String(propertyName));
     }
+    
+    Sort(globalConstants.Begin(), globalConstants.End(), ComparePropertyStrings);
+    
+    for (unsigned i = 0; i < globalConstants.Size(); ++i)
+        OutputAPIRow(mode, globalConstants[i], true);
 
     // Dump event descriptions in Doxygen mode. This means going through the header files, as the information is not
     // available otherwise
