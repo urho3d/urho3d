@@ -451,10 +451,8 @@ bool Texture3D::Create()
     Release();
     
     #ifdef GL_ES_VERSION_2_0
-    {
-        LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
-        return false;
-    }
+    LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
+    return false;
     #else
     if (!graphics_ || !width_ || !height_ || !depth_)
         return false;
