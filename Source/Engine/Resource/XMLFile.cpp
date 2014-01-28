@@ -131,7 +131,12 @@ XMLElement XMLFile::GetRoot(const String& name)
 
 void XMLFile::Patch(XMLFile* patchFile)
 {
-    pugi::xml_node root = patchFile->document_->first_child();
+    Patch(patchFile->GetRoot());
+}
+
+void XMLFile::Patch(XMLElement patchElement)
+{
+    pugi::xml_node root = pugi::xml_node(patchElement.GetNode());
 
     for (pugi::xml_node::iterator patch = root.begin(); patch != root.end(); patch++)
     {
@@ -142,7 +147,7 @@ void XMLFile::Patch(XMLFile* patchFile)
             continue;
         }
 
-        // Only select a single node at a time, they can use xpath to select specific ones in multiple otherwise the node set becomes invalid due to changes.
+        // Only select a single node at a time, they can use xpath to select specific ones in multiple otherwise the node set becomes invalid due to changes
         pugi::xpath_node original = document_->select_single_node(sel.value());
         if (!original)
         {
@@ -163,14 +168,14 @@ void XMLFile::Patch(XMLFile* patchFile)
 
 void XMLFile::PatchAdd(const pugi::xml_node& patch, pugi::xpath_node& original)
 {
-    // If not a node, log an error.
+    // If not a node, log an error
     if (original.attribute())
     {
         LOGERRORF("XML Patch failed calling Add due to not selecting a node, %s attribute was selected.", original.attribute().name());
         return;
     }
 
-    // If no type add node, if contains '@' treat as attribute.
+    // If no type add node, if contains '@' treat as attribute
     pugi::xml_attribute type = patch.attribute("type");
     if (!type || strlen(type.value()) <= 0)
         AddNode(patch, original);
@@ -180,7 +185,7 @@ void XMLFile::PatchAdd(const pugi::xml_node& patch, pugi::xpath_node& original)
 
 void XMLFile::PatchReplace(const pugi::xml_node& patch, pugi::xpath_node& original)
 {
-    // If no attribute but node then its a node, otherwise its an attribute or null.
+    // If no attribute but node then its a node, otherwise its an attribute or null
     if (!original.attribute() && original.node())
     {
         pugi::xml_node parent = original.node().parent();
@@ -196,7 +201,7 @@ void XMLFile::PatchReplace(const pugi::xml_node& patch, pugi::xpath_node& origin
 
 void XMLFile::PatchRemove(const pugi::xpath_node& original)
 {
-    // If no attribute but node then its a node, otherwise its an attribute or null.
+    // If no attribute but node then its a node, otherwise its an attribute or null
     if (!original.attribute() && original.node())
     {
         pugi::xml_node parent = original.parent();
@@ -211,15 +216,15 @@ void XMLFile::PatchRemove(const pugi::xpath_node& original)
 
 void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
 {
-    // If pos is null, append or prepend add as a child, otherwise add before or after, the default is to append as a child.
+    // If pos is null, append or prepend add as a child, otherwise add before or after, the default is to append as a child
     pugi::xml_attribute pos = patch.attribute("pos");
     if (!pos || strlen(pos.value()) <= 0 || pos.value() == "append")
     {
         pugi::xml_node::iterator start = patch.begin();
         pugi::xml_node::iterator end = patch.end();
 
-        // There can not be two consecutive text nodes, so check to see if they need to be combined.
-        // If they have been we can skip the first node of the nodes to add.
+        // There can not be two consecutive text nodes, so check to see if they need to be combined
+        // If they have been we can skip the first node of the nodes to add
         if (CombineText(patch.first_child(), original.node().last_child(), false))
             start++;
 
@@ -231,8 +236,8 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
         pugi::xml_node::iterator start = patch.begin();
         pugi::xml_node::iterator end = patch.end();
 
-        // There can not be two consecutive text nodes, so check to see if they need to be combined.
-        // If they have been we can skip the last node of the nodes to add.
+        // There can not be two consecutive text nodes, so check to see if they need to be combined
+        // If they have been we can skip the last node of the nodes to add
         if (CombineText(patch.last_child(), original.node().first_child(), true))
             end--;
 
@@ -245,13 +250,13 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
         pugi::xml_node::iterator start = patch.begin();
         pugi::xml_node::iterator end = patch.end();
 
-        // There can not be two consecutive text nodes, so check to see if they need to be combined.
-        // If they have been we can skip the first node of the nodes to add.
+        // There can not be two consecutive text nodes, so check to see if they need to be combined
+        // If they have been we can skip the first node of the nodes to add
         if (CombineText(patch.first_child(), original.node().previous_sibling(), false))
             start++;
 
-        // There can not be two consecutive text nodes, so check to see if they need to be combined.
-        // If they have been we can skip the last node of the nodes to add.
+        // There can not be two consecutive text nodes, so check to see if they need to be combined
+        // If they have been we can skip the last node of the nodes to add
         if (CombineText(patch.last_child(), original.node(), true))
             end--;
 
@@ -263,13 +268,13 @@ void XMLFile::AddNode(const pugi::xml_node& patch, pugi::xpath_node& original)
         pugi::xml_node::iterator start = patch.begin();
         pugi::xml_node::iterator end = patch.end();
 
-        // There can not be two consecutive text nodes, so check to see if they need to be combined.
-        // If they have been we can skip the first node of the nodes to add.
+        // There can not be two consecutive text nodes, so check to see if they need to be combined
+        // If they have been we can skip the first node of the nodes to add
         if (CombineText(patch.first_child(), original.node(), false))
             start++;
 
-        // There can not be two consecutive text nodes, so check to see if they need to be combined.
-        // If they have been we can skip the last node of the nodes to add.
+        // There can not be two consecutive text nodes, so check to see if they need to be combined
+        // If they have been we can skip the last node of the nodes to add
         if (CombineText(patch.last_child(), original.node().next_sibling(), true))
             end--;
 
