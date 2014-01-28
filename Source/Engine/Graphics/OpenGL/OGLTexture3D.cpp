@@ -41,7 +41,11 @@ namespace Urho3D
 Texture3D::Texture3D(Context* context) :
     Texture(context)
 {
+    #ifndef GL_ES_VERSION_2_0
     target_ = GL_TEXTURE_3D;
+    #else
+    target_ = 0;
+    #endif
 }
 
 Texture3D::~Texture3D()
@@ -257,6 +261,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     bool wholeLevel = x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth;
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     
+    #ifndef GL_ES_VERSION_2_0
     if (!IsCompressed())
     {
         if (wholeLevel)
@@ -271,6 +276,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         else
             glCompressedTexSubImage3D(target_, level, x, y, z, width, height, depth, format, GetDataSize(width, height, depth), data);
     }
+    #endif
     
     graphics_->SetTexture(0, 0);
     return true;
@@ -444,6 +450,12 @@ bool Texture3D::Create()
 {
     Release();
     
+    #ifdef GL_ES_VERSION_2_0
+    {
+        LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
+        return false;
+    }
+    #else
     if (!graphics_ || !width_ || !height_ || !depth_)
         return false;
     
@@ -487,17 +499,16 @@ bool Texture3D::Create()
             ++levels_;
         }
     }
-    
-    #ifndef GL_ES_VERSION_2_0
+
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
-    #endif
-    
+
     // Set initial parameters, then unbind the texture
     UpdateParameters();
     graphics_->SetTexture(0, 0);
     
     return success;
+    #endif
 }
 
 void Texture3D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)

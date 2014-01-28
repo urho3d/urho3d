@@ -8,8 +8,8 @@ uniform samplerCube sEnvCubeMap;
 uniform sampler2D sLightRampMap;
 uniform sampler2D sLightSpotMap;
 uniform samplerCube sLightCubeMap;
-uniform sampler3D sVolumeMap;
 #ifndef GL_ES
+uniform sampler3D sVolumeMap;
 uniform sampler2D sAlbedoBuffer;
 uniform sampler2D sNormalBuffer;
 uniform sampler2D sDepthBuffer;

@@ -842,6 +842,8 @@ OpenGL ES 2.0 has further limitations:
 
 - Custom clip planes are not currently supported.
 
+- 3D textures are not currently supported.
+
 \page Materials Materials
 
 Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. By default, materials exist in the Bin/CoreData/Materials & Bin/Data/Materials subdirectories, and techniques exist in the Bin/CoreData/Techniques subdirectory.
