@@ -65,6 +65,11 @@ extern "C" {
     __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }
 
+// Fix missing define in MinGW headers
+#ifndef D3DPRESENT_LINEAR_CONTENT
+#define D3DPRESENT_LINEAR_CONTENT 0x00000002L
+#endif
+
 namespace Urho3D
 {
 
