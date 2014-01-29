@@ -18,8 +18,6 @@ local drawDebug = false
 local startPosDefined = false
 local endPosDefined = false
 
-local context = GetContext()
-
 local cache = GetCache()
 local input = GetInput()
 local graphics = GetGraphics()
@@ -44,7 +42,7 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    scene_ = Scene()
     -- Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     -- Also create a DebugRenderer component so that we can draw debug geometry
     scene_:CreateComponent("Octree")
@@ -125,7 +123,7 @@ function CreateUI()
     -- Create a Cursor UI element because we want to be able to hide and show it at will. When hidden, the mouse cursor will
     -- control the camera, and when visible, it will point the raycast target
     local style = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
-    local cursor = Cursor:new(context)
+    local cursor = Cursor:new()
     cursor:SetStyleAuto(style)
     ui.cursor = cursor
     -- Set starting position of the cursor at the rendering window center
@@ -149,7 +147,7 @@ end
 
 function SetupViewport()
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
 end
 

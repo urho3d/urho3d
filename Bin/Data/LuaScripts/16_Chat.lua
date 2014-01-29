@@ -19,8 +19,6 @@ local connectButton = nil
 local disconnectButton = nil
 local startServerButton = nil
 
-local context = GetContext()
-
 local cache = GetCache()
 local input = GetInput()
 local graphics = GetGraphics()

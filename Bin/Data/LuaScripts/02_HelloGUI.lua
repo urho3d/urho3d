@@ -8,8 +8,6 @@ require "LuaScripts/Utilities/Sample"
 
 local window = nil
 
-local context = GetContext()
-
 local cache = GetCache()
 local engine = GetEngine()
 local input = GetInput()
@@ -39,16 +37,16 @@ end
 
 function InitControls()
     -- Create a CheckBox
-    local checkBox = CheckBox:new(context)
+    local checkBox = CheckBox:new()
     checkBox:SetName("CheckBox")
 
     -- Create a Button
-    local button = Button:new(context)
+    local button = Button:new()
     button:SetName("Button")
     button.minHeight = 24
 
     -- Create a LineEdit
-    local lineEdit = LineEdit:new(context)
+    local lineEdit = LineEdit:new()
     lineEdit:SetName("LineEdit")
     lineEdit.minHeight = 24
 
@@ -65,7 +63,7 @@ end
 
 function InitWindow()
     -- Create the Window and add it to the UI's root node
-    window = Window:new(context)
+    window = Window:new()
     ui.root:AddChild(window)
     
     -- Set Window size and layout settings
@@ -75,19 +73,19 @@ function InitWindow()
     window:SetName("Window")
     
     -- Create Window 'titlebar' container
-    local titleBar = UIElement:new(context)
+    local titleBar = UIElement:new()
     titleBar:SetMinSize(0, 24)
     titleBar.verticalAlignment = VA_TOP
     titleBar.layoutMode = LM_HORIZONTAL
 
     -- Create the Window title Text
-    local windowTitle = Text:new(context)
+    local windowTitle = Text:new()
     windowTitle.name = "WindowTitle"
     windowTitle.text = "Hello GUI!"
     
     
     -- Create the Window's close button
-    local buttonClose = Button:new(context)
+    local buttonClose = Button:new()
     buttonClose:SetName("CloseButton")
 
     -- Add the controls to the title bar

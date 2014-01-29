@@ -19,8 +19,7 @@ end
 
 function CreateText()
     -- Construct new Text object
-    local context = GetContext()
-    local helloText = Text:new(context)
+    local helloText = Text:new()
 
     -- Set String to display
     helloText.text = "Hello World from Urho3D!"

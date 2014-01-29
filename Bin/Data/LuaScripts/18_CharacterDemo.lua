@@ -28,8 +28,6 @@ local INAIR_THRESHOLD_TIME = 0.1
 scene_ = nil
 characterNode = nil
 
-local context = GetContext()
-
 cache = GetCache()
 local fileSystem = GetFileSystem()
 input = GetInput()
@@ -62,17 +60,17 @@ end
 
 function CreateScene()
 
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     -- Create scene subsystem components
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("PhysicsWorld")
 
     -- Create camera and define viewport. Camera does not necessarily have to belong to the scene
-    cameraNode = Node(context)
+    cameraNode = Node()
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 300.0
-    renderer:SetViewport(0, Viewport:new(context, scene_, camera))
+    renderer:SetViewport(0, Viewport:new(scene_, camera))
 
     -- Create a Zone component for ambient lighting & fog control
     local zoneNode = scene_:CreateChild("Zone")

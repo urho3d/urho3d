@@ -12,8 +12,6 @@ local rttCameraNode = nil
 local yaw = 0.0
 local pitch = 0.0
 
-local context = GetContext()
-
 local cache = GetCache()
 local input = GetInput()
 local graphics = GetGraphics()
@@ -39,7 +37,7 @@ end
 
 function CreateScene()
     -- Create the scene which will be rendered to a texture
-    rttScene_ = Scene(context)
+    rttScene_ = Scene()
 
     -- Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     rttScene_:CreateComponent("Octree")
@@ -82,7 +80,7 @@ function CreateScene()
     light.range = 30.0
 
     -- Create the scene in which we move around
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     -- Create octree, use also default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     scene_:CreateComponent("Octree")
@@ -132,13 +130,13 @@ function CreateScene()
     screenObject.model = cache:GetResource("Model", "Models/Plane.mdl")
 
     -- Create a renderable texture (1024x768, RGB format), enable bilinear filtering on it
-    local renderTexture = Texture2D:new(context)
+    local renderTexture = Texture2D:new()
     renderTexture:SetSize(1024, 768, Graphics:GetRGBFormat(), TEXTURE_RENDERTARGET)
     renderTexture.filterMode = FILTER_BILINEAR
     
     -- Create a new material from scratch, use the diffuse unlit technique, assign the render texture
     -- as its diffuse texture, then assign the material to the screen plane object
-    local renderMaterial = Material:new(context)
+    local renderMaterial = Material:new()
     renderMaterial:SetTechnique(0, cache:GetResource("Technique", "Techniques/DiffUnlit.xml"))
     renderMaterial:SetTexture(TU_DIFFUSE, renderTexture)
     screenObject.material = renderMaterial
@@ -148,7 +146,7 @@ function CreateScene()
     -- to the Renderer subsystem. By default the texture viewport will be updated when the texture is visible
     -- in the main view
     local surface = renderTexture.renderSurface
-    local rttViewport = Viewport:new(context, rttScene_, rttCameraNode:GetComponent("Camera"))
+    local rttViewport = Viewport:new(rttScene_, rttCameraNode:GetComponent("Camera"))
     surface:SetViewport(0, rttViewport)
 
     -- Create the camera which we will move around. Limit far clip distance to match the fog
@@ -174,7 +172,7 @@ end
 
 function SetupViewport()
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
 end
 

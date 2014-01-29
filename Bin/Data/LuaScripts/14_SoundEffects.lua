@@ -7,8 +7,6 @@ require "LuaScripts/Utilities/Sample"
 
 local scene_ = nil
 
-local context = GetContext()
-
 local audio = GetAudio()
 local cache = GetCache()
 local input = GetInput()
@@ -39,7 +37,7 @@ end
 
 function CreateUI()
     -- Create a scene which will not be actually rendered, but is used to hold SoundSource components while they play sounds
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
     -- Set style to the UI root so that elements will inherit it

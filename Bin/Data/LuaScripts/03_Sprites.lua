@@ -12,8 +12,6 @@ local sprites = {}
 -- Custom variable identifier for storing sprite velocity within the UI element
 local VAR_VELOCITY = ShortStringHash("Velocity")
 
-local context = GetContext()
-
 local cache = GetCache()
 local engine = GetEngine()
 local graphics = GetGraphics()
@@ -38,7 +36,7 @@ function CreateSprites()
     
     for i = 1, numSprites do
         -- Create a new sprite, set it to use the texture
-        local sprite = Sprite:new(context)
+        local sprite = Sprite:new()
         sprite.texture = decalTex
         sprite:SetFullImageRect()       
         

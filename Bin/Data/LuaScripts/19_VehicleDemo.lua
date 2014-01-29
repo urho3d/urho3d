@@ -20,8 +20,6 @@ local scene_ = nil
 local cameraNode = nil
 local vehicleNode = nil
 
-local context = GetContext()
-
 local cache = GetCache()
 local fileSystem = GetFileSystem()
 local input = GetInput()
@@ -47,18 +45,18 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     -- Create scene subsystem components
     scene_:CreateComponent("Octree")
     scene_:CreateComponent("PhysicsWorld")
 
     -- Create camera and define viewport. Camera does not necessarily have to belong to the scene
-    cameraNode = Node(context)
+    cameraNode = Node()
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 500.0
     
-    renderer:SetViewport(0, Viewport:new(context, scene_, camera))
+    renderer:SetViewport(0, Viewport:new(scene_, camera))
     
     -- Create static scene content. First create a zone for ambient lighting and fog control
     local zoneNode = scene_:CreateChild("Zone")

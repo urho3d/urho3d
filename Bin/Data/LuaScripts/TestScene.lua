@@ -8,8 +8,6 @@ local yaw = 0
 local pitch = 0
 local drawDebug = 0
 
-local context = GetContext()
-
 local audio = GetAudio()
 local cache = GetCache()
 local engine = GetEngine()
@@ -76,7 +74,7 @@ end
 function InitUI()
     local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
     
-    local newCursor = Cursor:new(context)
+    local newCursor = Cursor:new()
     newCursor.styleAuto = uiStyle
     newCursor.position = IntVector2(graphics:GetWidth()/ 2, graphics:GetHeight() / 2)
     ui.cursor = newCursor
@@ -87,15 +85,15 @@ function InitUI()
 end
 
 function InitScene()
-    testScene = Scene(context)
+    testScene = Scene()
     
     -- Create the camera outside the scene so it is unaffected by scene load/save
-    cameraNode = Node(context)
+    cameraNode = Node()
     camera = cameraNode:CreateComponent("Camera")
     cameraNode.position = Vector3(0, 2, 0)
 
     if not engine:IsHeadless() then
-        renderer:SetViewport(0, Viewport:new(context, testScene, camera))
+        renderer:SetViewport(0, Viewport:new(testScene, camera))
         
         -- Add bloom & FXAA effects to the renderpath. Clone the default renderpath so that we don't affect it
         -- local newRenderPathPtr = renderer:GetViewport(0):GetRenderPath():Clone()

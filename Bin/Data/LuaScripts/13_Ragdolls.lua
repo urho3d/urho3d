@@ -12,8 +12,6 @@ local yaw = 0.0
 local pitch = 0.0
 local drawDebug = false
 
-local context = GetContext()
-
 local cache = GetCache()
 local fileSystem = GetFileSystem()
 local input = GetInput()
@@ -38,7 +36,7 @@ function Start()
 end
 
 function CreateScene()
-    scene_ = Scene(context)
+    scene_ = Scene()
 
     -- Create octree, use default volume (-1000, -1000, -1000) to (1000, 1000, 1000)
     -- Create a physics simulation world with default parameters, which will update at 60fps. Like the Octree must
@@ -117,7 +115,7 @@ function CreateScene()
 
     -- Create the camera. Limit far clip distance to match the fog. Note: now we actually create the camera node outside
     -- the scene, because we want it to be unaffected by scene load / save
-    cameraNode = Node(context)
+    cameraNode = Node()
     local camera = cameraNode:CreateComponent("Camera")
     camera.farClip = 300.0
 
@@ -145,7 +143,7 @@ end
 
 function SetupViewport()
     -- Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    local viewport = Viewport:new(context, scene_, cameraNode:GetComponent("Camera"))
+    local viewport = Viewport:new(scene_, cameraNode:GetComponent("Camera"))
     renderer:SetViewport(0, viewport)
 end
 
