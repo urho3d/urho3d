@@ -44,7 +44,7 @@ Properties:
 
 Methods:
 
-- Sound(Context* context)
+- Sound()
 - ~Sound()
 - bool LoadRaw(Deserializer& source)
 - bool LoadWav(Deserializer& source)
@@ -1055,7 +1055,7 @@ Properties:
 
 Methods:
 
-- Material(Context* context)
+- Material()
 - ~Material()
 - void SetNumTechniques(unsigned num)
 - void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f)
@@ -1710,7 +1710,7 @@ Properties:
 
 Methods:
 
-- Texture2D(Context* context)
+- Texture2D()
 - ~Texture2D()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
 - RenderSurface* GetRenderSurface() const
@@ -1729,9 +1729,9 @@ Methods:
 
 Methods:
 
-- Viewport(Context* context)
-- Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* renderPath = 0)
-- Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0)
+- Viewport()
+- Viewport(Scene* scene, Camera* camera, RenderPath* renderPath = 0)
+- Viewport(Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0)
 - ~Viewport()
 - void SetScene(Scene* scene)
 - void SetCamera(Camera* camera)
@@ -1845,9 +1845,9 @@ Properties:
 
 Methods:
 
-- File(Context* context)
-- File(Context* context, const String fileName, FileMode mode = FILE_READ)
-- File(Context* context, PackageFile* package, const String fileName)
+- File()
+- File(const String fileName, FileMode mode = FILE_READ)
+- File(PackageFile* package, const String fileName)
 - ~File()
 - bool Open(const String fileName, FileMode mode = FILE_READ)
 - bool Open(PackageFile* package, const String fileName)
@@ -2013,8 +2013,8 @@ Properties:
 
 Methods:
 
-- PackageFile(Context* context)
-- PackageFile(Context* context, const String fileName, unsigned startOffset = 0)
+- PackageFile()
+- PackageFile(const String fileName, unsigned startOffset = 0)
 - ~PackageFile()
 - bool Open(const String fileName, unsigned startOffset = 0)
 - bool Exists(const String fileName) const
@@ -3670,7 +3670,7 @@ Methods:
 
 Methods:
 
-- Node(Context* context)
+- Node()
 - virtual ~Node()
 - bool SaveXML(File* dest) const
 - void SetName(const String name)
@@ -3827,7 +3827,7 @@ Properties:
 
 Methods:
 
-- Scene(Context* context)
+- Scene()
 - virtual ~Scene()
 - bool Load(File* source)
 - bool Save(File* dest) const
@@ -3920,7 +3920,7 @@ Properties:
 
 Methods:
 
-- UIElement(Context* context)
+- UIElement()
 - virtual ~UIElement()
 - virtual const IntVector2& GetScreenPosition() const
 - bool LoadXML(Deserializer& source)
@@ -4120,7 +4120,7 @@ Properties:
 
 Methods:
 
-- BorderImage(Context* context)
+- BorderImage()
 - virtual ~BorderImage()
 - void SetTexture(Texture* texture)
 - void SetImageRect(const IntRect& rect)
@@ -4153,7 +4153,7 @@ Properties:
 
 Methods:
 
-- Button(Context* context)
+- Button()
 - virtual ~Button()
 - void SetPressedOffset(const IntVector2& offset)
 - void SetPressedOffset(int x, int y)
@@ -4180,7 +4180,7 @@ Properties:
 
 Methods:
 
-- CheckBox(Context* context)
+- CheckBox()
 - virtual ~CheckBox()
 - void SetChecked(bool enable)
 - void SetCheckedOffset(const IntVector2& rect)
@@ -4197,7 +4197,7 @@ Properties:
 
 Methods:
 
-- Cursor(Context* context)
+- Cursor()
 - virtual ~Cursor()
 - void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot)
 - void SetShape(CursorShape shape)
@@ -4224,7 +4224,7 @@ Properties:
 
 Methods:
 
-- FileSelector(Context* context)
+- FileSelector()
 - virtual ~FileSelector()
 - void SetDefaultStyle(XMLFile* style)
 - void SetTitle(const String text)
@@ -4279,7 +4279,7 @@ Methods:
 
 Methods:
 
-- LineEdit(Context* context)
+- LineEdit()
 - virtual ~LineEdit()
 - void SetText(const String text)
 - void SetCursorPosition(unsigned position)
@@ -4317,7 +4317,7 @@ Properties:
 
 Methods:
 
-- Menu(Context* context)
+- Menu()
 - virtual ~Menu()
 - void SetPopup(UIElement* element)
 - void SetPopupOffset(const IntVector2& offset)
@@ -4342,7 +4342,7 @@ Properties:
 
 Methods:
 
-- MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- MessageBox(const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - virtual ~MessageBox()
 - void SetTitle(const String& text)
 - void SetMessage(const String& text)
@@ -4360,7 +4360,7 @@ Properties:
 
 Methods:
 
-- DropDownList(Context* context)
+- DropDownList()
 - ~DropDownList()
 - void AddItem(UIElement* item)
 - void InsertItem(unsigned index, UIElement* item)
@@ -4395,7 +4395,7 @@ Properties:
 
 Methods:
 
-- Slider(Context* context)
+- Slider()
 - virtual ~Slider()
 - void SetOrientation(Orientation orientation)
 - void SetRange(float range)
@@ -4420,7 +4420,7 @@ Properties:
 
 Methods:
 
-- ScrollBar(Context* context)
+- ScrollBar()
 - virtual ~ScrollBar()
 - void SetOrientation(Orientation orientation)
 - void SetRange(float range)
@@ -4456,7 +4456,7 @@ Properties:
 
 Methods:
 
-- ScrollView(Context* context)
+- ScrollView()
 - virtual ~ScrollView()
 - void SetContentElement(UIElement* element)
 - void SetViewPosition(const IntVector2& position)
@@ -4490,7 +4490,7 @@ Properties:
 
 Methods:
 
-- ListView(Context* context)
+- ListView()
 - virtual ~ListView()
 - void AddItem(UIElement* item)
 - void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0)
@@ -4542,7 +4542,7 @@ Properties:
 
 Methods:
 
-- Sprite(Context* context)
+- Sprite()
 - virtual ~Sprite()
 - void SetPosition(const Vector2& position)
 - void SetPosition(float x, float y)
@@ -4583,7 +4583,7 @@ Properties:
 
 Methods:
 
-- Text(Context* context)
+- Text()
 - virtual ~Text()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
@@ -4641,7 +4641,7 @@ Properties:
 
 Methods:
 
-- Text3D(Context* context)
+- Text3D()
 - ~Text3D()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
@@ -4714,7 +4714,7 @@ Properties:
 
 Methods:
 
-- ToolTip(Context* context)
+- ToolTip()
 - virtual ~ToolTip()
 - void SetDelay(float delay)
 - float GetDelay() const
@@ -4795,7 +4795,7 @@ Properties:
 
 Methods:
 
-- Window(Context* context)
+- Window()
 - virtual ~Window()
 - void SetMovable(bool enable)
 - void SetResizable(bool enable)
@@ -4832,7 +4832,7 @@ Properties:
 
 Methods:
 
-- View3D(Context* context)
+- View3D()
 - ~View3D()
 - void SetView(Scene* scene, Camera* camera)
 - void SetFormat(unsigned format)

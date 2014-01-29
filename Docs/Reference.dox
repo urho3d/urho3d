@@ -621,8 +621,6 @@ end
 
 The binding of Urho3D C++ classes is accomplished with the tolua++ library, which for the most part binds the exact same function parameters as C++. Compared to the AngelScript API, you will always have the classes' Get / Set functions available, but in addition convenience properties also exist.
 
-When constructing Object subclasses, you need to supply the Context pointer as the first parameter. Use the global function GetContext() to get it. Similarly, use eg. GetFileSystem() or GetInput() to access the subsystems.
-
 As seen above from the event handling examples, VariantMap handling has some differences to both C++ and AngelScript. To get a value, supply its key name as a string. To get a pointer to an object, supply first the object type, then the key name.
 
 For the rest of the functions and classes, see the generated \ref LuaScriptAPI "Lua script API reference". Also, look at the Lua counterparts of the sample applications in the Bin/Data/LuaScripts directory and compare them to the C++ and AngelScript versions to familiarize yourself with how things are done on the Lua side.
@@ -633,8 +631,7 @@ There are two ways to allocate a C++ object in Lua scripting, which behave diffe
 
 1) Call object's contructor:
 \code
-local context = GetContext()
-local scene = Scene(context)
+local scene = Scene()
 \endcode
 tolua++ will register this C++ object with garbage collection, and Lua will collect it eventually. Do not use this form if you will add the
 object to an object hierarchy that is kept alive on the C++ side with SharedPtr's, for example child scene nodes or %UI child elements.
@@ -643,8 +640,7 @@ Otherwise the object will be double-deleted, resulting in a crash.
 
 2) Call the new function:
 \code
-local context = GetContext()
-local text = Text:new(context)
+local text = Text:new()
 \endcode
 When using this form the object will not collected by Lua, so it is safe to pass into C++ object hierarchies.
 Otherwise, to prevent memory leaks it needs to be deleted manually by calling the delete function on it:
