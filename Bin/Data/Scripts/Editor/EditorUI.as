@@ -456,12 +456,15 @@ bool Exit()
         if (sceneModified || uiLayoutModified)
         {
             MessageBox@ messageBox = MessageBox(message + "Continue to exit?", "Warning");
-            Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
-            cancelButton.visible = true;
-            cancelButton.focus = true;
-            SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
-            messageBoxCallback = @Exit;
-            return false;
+            if (messageBox.window !is null)
+            {
+                Button@ cancelButton = messageBox.window.GetChild("CancelButton", true);
+                cancelButton.visible = true;
+                cancelButton.focus = true;
+                SubscribeToEvent(messageBox, "MessageACK", "HandleMessageAcknowledgement");
+                messageBoxCallback = @Exit;
+                return false;
+            }
         }
     }
     else

@@ -49,13 +49,15 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
         layoutFile = cache->GetResource<XMLFile>("UI/MessageBox.xml");
         if (!layoutFile)
         {
-            LOGERROR("Could not find default message box layout file: UI/MessageBox.xml");
-            assert(false);  // Bark loudly in debug mode
+            LOGERROR("Could not find default message box layout file");
             return;
         }
     }
 
     UI* ui = GetSubsystem<UI>();
+    if (!ui)
+        return;
+    
     window_ = ui->LoadLayout(layoutFile, styleFile);
     ui->GetRoot()->AddChild(window_);
 
