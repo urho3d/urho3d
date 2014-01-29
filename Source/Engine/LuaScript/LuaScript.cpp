@@ -63,14 +63,10 @@ extern int tolua_LuaScriptLuaAPI_open(lua_State*);
 namespace Urho3D
 {
 
-static Context* currentContext_ = 0;
-
 LuaScript::LuaScript(Context* context) :
     Object(context),
     luaState_(0)
 {
-    currentContext_ = context_;
-
     RegisterLuaScriptLibrary(context_);
 
     luaState_ = luaL_newstate();
@@ -269,7 +265,7 @@ int LuaScript::AtPanic(lua_State* L)
 
 int LuaScript::Loader(lua_State* L)
 {
-    ResourceCache* cache = currentContext_->GetSubsystem<ResourceCache>();
+    ResourceCache* cache = ::GetContext(L)->GetSubsystem<ResourceCache>();
     if (!cache)
         return 0;
 
@@ -423,11 +419,6 @@ void RegisterLuaScriptLibrary(Context* context)
 {
     LuaFile::RegisterObject(context);
     LuaScriptInstance::RegisterObject(context);
-}
-
-Context* GetContext()
-{
-    return currentContext_;
 }
 
 }

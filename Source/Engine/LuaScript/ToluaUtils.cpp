@@ -48,7 +48,7 @@ void SetContext(lua_State* L, Context* context)
 }
 
 Context* GetContext(lua_State* L)
-{   
+{
     HashMap<void*, Context*>::ConstIterator i = contextMapping.Find(L);
     if (i == contextMapping.End())
         return 0;

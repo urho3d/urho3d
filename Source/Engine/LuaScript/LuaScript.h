@@ -106,7 +106,4 @@ private:
 /// Register Lua script library objects.
 void URHO3D_API RegisterLuaScriptLibrary(Context* context);
 
-/// Return context.
-Context* GetContext();
-
 }
