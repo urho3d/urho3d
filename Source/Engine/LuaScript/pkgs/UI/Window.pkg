@@ -16,7 +16,7 @@ enum WindowDragMode
 
 class Window : public BorderImage
 {
-    Window(Context* context);
+    Window();
     virtual ~Window();
     
     void SetMovable(bool enable);
@@ -49,3 +49,17 @@ class Window : public BorderImage
     tolua_property__get_set Color& modalFrameColor;
     tolua_property__get_set IntVector2& modalFrameSize;
 };
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Window_new00
+static int tolua_UILuaAPI_Window_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Window>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Window_new00_local
+static int tolua_UILuaAPI_Window_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Window>(tolua_S);
+}
+$}

@@ -69,7 +69,7 @@ function post_output_hook(package)
 
 #include "Precompiled.h"
 #include "tolua++.h"
-#include "tolua++urho3d.h"]]
+#include "ToluaUtils.h"]]
     )
 
     WRITE(result)
@@ -95,9 +95,9 @@ function get_push_function(t)
     end
     
     if not urho3d_is_podvector(t) then
-        return "tolua_pushurho3dvector" .. t:match("<.*>")
+        return "ToluaPushVector" .. t:match("<.*>")
     else
-        return "tolua_pushurho3dpodvector" .. t:match("<.*>")
+        return "ToluaPushPODVector" .. t:match("<.*>")
     end
 end
 
@@ -107,9 +107,9 @@ function get_to_function(t)
     end
     
     if not urho3d_is_podvector(t) then
-        return "tolua_tourho3dvector" .. t:match("<.*>")
+        return "ToluaToVector" .. t:match("<.*>")
     else
-        return "tolua_tourho3dpodvector" .. t:match("<.*>")
+        return "ToluaToPODVector" .. t:match("<.*>")
     end
 end
 
@@ -119,9 +119,9 @@ function get_is_function(t)
     end
     
     if not urho3d_is_podvector(t) then
-        return "tolua_isurho3dvector" .. t:match("<.*>")
+        return "ToluaIsVector" .. t:match("<.*>")
     else
-        return "tolua_isurho3dpodvector" .. t:match("<.*>")
+        return "ToluaIsPODVector" .. t:match("<.*>")
     end
 end
 

@@ -4,7 +4,7 @@ enum CullMode{};
 
 class Material : public Resource
 {
-    Material(Context* context);
+    Material();
     ~Material();
     
     void SetNumTechniques(unsigned num);
@@ -45,3 +45,16 @@ class Material : public Resource
     tolua_readonly tolua_property__get_set bool specular;
 };
 
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Material_new00
+static int tolua_GraphicsLuaAPI_Material_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Material>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Material_new00_local
+static int tolua_GraphicsLuaAPI_Material_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Material>(tolua_S);
+}
+$}

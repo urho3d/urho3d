@@ -2,7 +2,7 @@ $#include "View3D.h"
 
 class View3D : public Window
 {
-    View3D(Context* context);
+    View3D();
     ~View3D();
 
     void SetView(Scene* scene, Camera* camera);
@@ -21,3 +21,17 @@ class View3D : public Window
     tolua_property__get_set unsigned format;
     tolua_property__get_set bool autoUpdate;
 };
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_View3D_new00
+static int tolua_UILuaAPI_View3D_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<View3D>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_View3D_new00_local
+static int tolua_UILuaAPI_View3D_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<View3D>(tolua_S);
+}
+$}

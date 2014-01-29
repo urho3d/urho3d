@@ -2,7 +2,7 @@ $#include "Text3D.h"
 
 class Text3D : public Drawable
 {
-    Text3D(Context* context);
+    Text3D();
     ~Text3D();
     
     bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
@@ -78,6 +78,18 @@ class Text3D : public Drawable
 };
 
 ${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Text3D_new00
+static int tolua_UILuaAPI_Text3D_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Text3D>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Text3D_new00_local
+static int tolua_UILuaAPI_Text3D_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Text3D>(tolua_S);
+}
+
 #define SetColorAttr SetColor
 #define TOLUA_DISABLE_tolua_get_Text3D_color_ref
 #define tolua_get_Text3D_color_ref NULL

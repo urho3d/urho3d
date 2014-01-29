@@ -44,7 +44,7 @@ extern "C"
 #include <lauxlib.h>
 }
 #include "tolua++.h"
-#include "tolua++urho3d.h"
+#include "ToluaUtils.h"
 
 #include "DebugNew.h"
 

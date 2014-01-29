@@ -15,7 +15,7 @@ enum CursorShape
 
 class Cursor : public BorderImage
 {
-    Cursor(Context* context);
+    Cursor();
     virtual ~Cursor();
     
     void DefineShape(CursorShape shape, Image* image, const IntRect& imageRect, const IntVector2& hotSpot);
@@ -28,3 +28,17 @@ class Cursor : public BorderImage
     tolua_property__get_set CursorShape shape;
     tolua_property__get_set bool useSystemShapes;
 };
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Cursor_new00
+static int tolua_UILuaAPI_Cursor_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Cursor>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Cursor_new00_local
+static int tolua_UILuaAPI_Cursor_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Cursor>(tolua_S);
+}
+$}

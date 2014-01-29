@@ -2,7 +2,7 @@ $#include "CheckBox.h"
 
 class CheckBox : public BorderImage
 {
-    CheckBox(Context* context);
+    CheckBox();
     virtual ~CheckBox();
     
     void SetChecked(bool enable);
@@ -15,3 +15,17 @@ class CheckBox : public BorderImage
     tolua_property__is_set bool checked;
     tolua_property__get_set IntVector2& checkedOffset;
 };
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_CheckBox_new00
+static int tolua_UILuaAPI_CheckBox_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<CheckBox>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_CheckBox_new00_local
+static int tolua_UILuaAPI_CheckBox_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<CheckBox>(tolua_S);
+}
+$}

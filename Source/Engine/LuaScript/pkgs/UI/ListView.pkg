@@ -9,7 +9,7 @@ enum HighlightMode
 
 class ListView : public ScrollView
 {
-    ListView(Context* context);
+    ListView();
     virtual ~ListView();
     
     void AddItem(UIElement* item);
@@ -65,6 +65,18 @@ class ListView : public ScrollView
 };
 
 ${
+#define TOLUA_DISABLE_tolua_UILuaAPI_ListView_new00
+static int tolua_UILuaAPI_ListView_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ListView>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_ListView_new00_local
+static int tolua_UILuaAPI_ListView_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ListView>(tolua_S);
+}
+
 static const PODVector<UIElement*>& ListViewGetItems(const ListView* listView)
 {
     static PODVector<UIElement*> items;

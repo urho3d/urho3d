@@ -2,7 +2,7 @@ $#include "Button.h"
 
 class Button : public BorderImage
 {
-    Button(Context* context);
+    Button();
     virtual ~Button();
     
     void SetPressedOffset(const IntVector2& offset);
@@ -25,3 +25,17 @@ class Button : public BorderImage
     tolua_property__get_set float repeatRate;
     tolua_readonly tolua_property__is_set bool pressed;
 };
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Button_new00
+static int tolua_UILuaAPI_Button_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Button>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Button_new00_local
+static int tolua_UILuaAPI_Button_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Button>(tolua_S);
+}
+$}

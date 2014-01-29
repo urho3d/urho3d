@@ -2,7 +2,7 @@ $#include "MessageBox.h"
 
 class MessageBox : public Object
 {
-    MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    MessageBox(const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     virtual ~MessageBox();
 
     void SetTitle(const String& text);
@@ -16,3 +16,176 @@ class MessageBox : public Object
     tolua_property__get_set String& message;
     tolua_readonly tolua_property__get_set UIElement* window;
 };
+
+${
+/* method: new of class  MessageBox */
+#define TOLUA_DISABLE_tolua_UILuaAPI_MessageBox_new00
+static int tolua_UILuaAPI_MessageBox_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MessageBox",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  MessageBox* tolua_ret = (MessageBox*)  Mtolua_new((MessageBox)(GetContext(tolua_S)));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"MessageBox");
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: new_local of class  MessageBox */
+#define TOLUA_DISABLE_tolua_UILuaAPI_MessageBox_new00_local
+static int tolua_UILuaAPI_MessageBox_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MessageBox",0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+ {
+  MessageBox* tolua_ret = (MessageBox*)  Mtolua_new((MessageBox)(GetContext(tolua_S)));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"MessageBox");
+ tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+ }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+
+/* method: new of class  MessageBox */
+#define TOLUA_DISABLE_tolua_UILuaAPI_MessageBox_new01
+static int tolua_UILuaAPI_MessageBox_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MessageBox",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const String messageString = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+ {
+  MessageBox* tolua_ret = (MessageBox*)  Mtolua_new((MessageBox)(GetContext(tolua_S),messageString));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"MessageBox");
+ tolua_pushurho3dstring(tolua_S,(const char*)messageString);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_UILuaAPI_MessageBox_new00(tolua_S);
+}
+
+/* method: new_local of class  MessageBox */
+#define TOLUA_DISABLE_tolua_UILuaAPI_MessageBox_new01_local
+static int tolua_UILuaAPI_MessageBox_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MessageBox",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const String messageString = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+ {
+  MessageBox* tolua_ret = (MessageBox*)  Mtolua_new((MessageBox)(GetContext(tolua_S),messageString));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"MessageBox");
+ tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+ tolua_pushurho3dstring(tolua_S,(const char*)messageString);
+ }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_UILuaAPI_MessageBox_new00_local(tolua_S);
+}
+
+/* method: new of class  MessageBox */
+#define TOLUA_DISABLE_tolua_UILuaAPI_MessageBox_new02
+static int tolua_UILuaAPI_MessageBox_new02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MessageBox",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,3,0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,4,"XMLFile",1,&tolua_err) ||
+ !tolua_isusertype(tolua_S,5,"XMLFile",1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const String messageString = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+  const String titleString = ((const String)  tolua_tourho3dstring(tolua_S,3,0));
+  XMLFile* layoutFile = ((XMLFile*)  tolua_tousertype(tolua_S,4,0));
+  XMLFile* styleFile = ((XMLFile*)  tolua_tousertype(tolua_S,5,0));
+ {
+  MessageBox* tolua_ret = (MessageBox*)  Mtolua_new((MessageBox)(GetContext(tolua_S),messageString,titleString,layoutFile,styleFile));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"MessageBox");
+ tolua_pushurho3dstring(tolua_S,(const char*)messageString);
+ tolua_pushurho3dstring(tolua_S,(const char*)titleString);
+ }
+ }
+ return 3;
+tolua_lerror:
+ return tolua_UILuaAPI_MessageBox_new01(tolua_S);
+}
+
+/* method: new_local of class  MessageBox */
+#define TOLUA_DISABLE_tolua_UILuaAPI_MessageBox_new02_local
+static int tolua_UILuaAPI_MessageBox_new02_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"MessageBox",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,3,0,&tolua_err) ||
+ !tolua_isusertype(tolua_S,4,"XMLFile",1,&tolua_err) ||
+ !tolua_isusertype(tolua_S,5,"XMLFile",1,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const String messageString = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+  const String titleString = ((const String)  tolua_tourho3dstring(tolua_S,3,0));
+  XMLFile* layoutFile = ((XMLFile*)  tolua_tousertype(tolua_S,4,0));
+  XMLFile* styleFile = ((XMLFile*)  tolua_tousertype(tolua_S,5,0));
+ {
+  MessageBox* tolua_ret = (MessageBox*)  Mtolua_new((MessageBox)(GetContext(tolua_S),messageString,titleString,layoutFile,styleFile));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"MessageBox");
+ tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+ tolua_pushurho3dstring(tolua_S,(const char*)messageString);
+ tolua_pushurho3dstring(tolua_S,(const char*)titleString);
+ }
+ }
+ return 3;
+tolua_lerror:
+ return tolua_UILuaAPI_MessageBox_new01_local(tolua_S);
+}
+$}

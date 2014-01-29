@@ -4,7 +4,7 @@ enum BlendMode{};
 
 class BorderImage : public UIElement
 {
-    BorderImage(Context* context);
+    BorderImage();
     virtual ~BorderImage();
     
     void SetTexture(Texture* texture);
@@ -34,3 +34,18 @@ class BorderImage : public UIElement
     tolua_property__is_set bool tiled;
     tolua_property__get_set ResourceRef textureAttr;
 };
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_BorderImage_new00
+static int tolua_UILuaAPI_BorderImage_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<BorderImage>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_BorderImage_new00_local
+static int tolua_UILuaAPI_BorderImage_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<BorderImage>(tolua_S);
+}
+$}
+

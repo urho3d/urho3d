@@ -2,7 +2,7 @@ $#include "DropDownList.h"
 
 class DropDownList : public Menu
 {
-    DropDownList(Context* context);
+    DropDownList();
     ~DropDownList();
     
     void AddItem(UIElement* item);
@@ -39,6 +39,18 @@ class DropDownList : public Menu
 };
 
 ${
+#define TOLUA_DISABLE_tolua_UILuaAPI_DropDownList_new00
+static int tolua_UILuaAPI_DropDownList_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<DropDownList>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_DropDownList_new00_local
+static int tolua_UILuaAPI_DropDownList_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<DropDownList>(tolua_S);
+}
+
 static const PODVector<UIElement*>& DropDownListGetItems(const DropDownList* list)
 {
     static PODVector<UIElement*> items;

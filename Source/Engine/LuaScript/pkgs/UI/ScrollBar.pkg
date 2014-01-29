@@ -2,7 +2,7 @@ $#include "ScrollBar.h"
 
 class ScrollBar : public UIElement
 {
-    ScrollBar(Context* context);
+    ScrollBar();
     virtual ~ScrollBar();
     
     void SetOrientation(Orientation orientation);
@@ -34,3 +34,17 @@ class ScrollBar : public UIElement
     tolua_readonly tolua_property__get_set Button* forwardButton;
     tolua_readonly tolua_property__get_set Slider* slider;
 };
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_ScrollBar_new00
+static int tolua_UILuaAPI_ScrollBar_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ScrollBar>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_ScrollBar_new00_local
+static int tolua_UILuaAPI_ScrollBar_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ScrollBar>(tolua_S);
+}
+$}

@@ -57,7 +57,7 @@ static const unsigned DD_SOURCE_AND_TARGET;
 
 class UIElement : public Serializable
 {
-    UIElement(Context* context);
+    UIElement();
     virtual ~UIElement();
 
     virtual const IntVector2& GetScreenPosition() const;
@@ -268,6 +268,18 @@ class UIElement : public Serializable
 };
 
 ${
+#define TOLUA_DISABLE_tolua_UILuaAPI_UIElement_new00
+static int tolua_UILuaAPI_UIElement_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<UIElement>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_UIElement_new00_local
+static int tolua_UILuaAPI_UIElement_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<UIElement>(tolua_S);
+}
+
 // Disable generated CreateChild function.
 #define TOLUA_DISABLE_tolua_UILuaAPI_UIElement_CreateChild00
 

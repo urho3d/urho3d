@@ -40,7 +40,7 @@ extern "C"
 #include <lauxlib.h>
 }
 #include "tolua++.h"
-#include "tolua++urho3d.h"
+#include "ToluaUtils.h"
 
 #include "DebugNew.h"
 
@@ -80,6 +80,8 @@ LuaScript::LuaScript(Context* context) :
         return;
     }
 
+    SetContext(luaState_, context_);
+
     lua_gc(luaState_, LUA_GCSETPAUSE, 125);
     lua_atpanic(luaState_, &LuaScript::AtPanic);
 
@@ -113,6 +115,8 @@ LuaScript::~LuaScript()
 
     lua_State* luaState = luaState_;
     luaState_ = 0;
+
+    SetContext(luaState_, 0);
 
     if (luaState)
         lua_close(luaState);

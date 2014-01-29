@@ -2,7 +2,7 @@ $#include "Sound.h"
 
 class Sound : public Resource
 {
-    Sound(Context* context);
+    Sound();
     ~Sound();
     bool LoadRaw(Deserializer& source);
     bool LoadWav(Deserializer& source);
@@ -33,3 +33,17 @@ class Sound : public Resource
     tolua_readonly tolua_property__is_set bool stereo;
     tolua_readonly tolua_property__is_set bool compressed;
 };
+
+${
+#define TOLUA_DISABLE_tolua_AudioLuaAPI_Sound_new00
+static int tolua_AudioLuaAPI_Sound_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Sound>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_AudioLuaAPI_Sound_new00_local
+static int tolua_AudioLuaAPI_Sound_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Sound>(tolua_S);
+}
+$}

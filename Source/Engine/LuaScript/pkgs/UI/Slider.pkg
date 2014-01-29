@@ -2,7 +2,7 @@ $#include "Slider.h"
 
 class Slider : public BorderImage
 {
-    Slider(Context* context);
+    Slider();
     virtual ~Slider();
     
     void SetOrientation(Orientation orientation);
@@ -23,3 +23,17 @@ class Slider : public BorderImage
     tolua_readonly tolua_property__get_set BorderImage* knob;
     tolua_property__get_set float repeatRate;
 };
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Slider_new00
+static int tolua_UILuaAPI_Slider_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Slider>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Slider_new00_local
+static int tolua_UILuaAPI_Slider_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Slider>(tolua_S);
+}
+$}

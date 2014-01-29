@@ -10,7 +10,7 @@ enum CreateMode
 
 class Node : public Serializable
 {
-    Node(Context* context);
+    Node();
     virtual ~Node();
 
     tolua_outside bool NodeSaveXML @ SaveXML(File* dest) const;
@@ -214,6 +214,18 @@ class Node : public Serializable
 };
 
 ${
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_new00
+static int tolua_SceneLuaAPI_Node_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Node>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_new00_local
+static int tolua_SceneLuaAPI_Node_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Node>(tolua_S);
+}
+
 static bool NodeSaveXML(const Node* node, File* file)
 {
     return file ? node->SaveXML(*file) : false;
