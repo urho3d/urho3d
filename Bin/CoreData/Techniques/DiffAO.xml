@@ -1,9 +1,9 @@
-<technique>
-    <pass name="base" vs="LitSolid_AO" ps="LitSolid_DiffAO" />
-    <pass name="light" vs="LitSolid" ps="LitSolid_Diff" depthtest="equal" depthwrite="false" blend="add" />
-    <pass name="prepass" vs="LitSolid" ps="LitSolid_DiffPrepass" />
-    <pass name="material" vs="LitSolid_AO" ps="LitSolid_DiffAOMaterial" depthtest="equal" depthwrite="false" />
-    <pass name="deferred" vs="LitSolid_AO" ps="LitSolid_DiffAODeferred" />
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
+    <pass name="base" vsdefines="AO" psdefines="AO" />
+    <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" psdefines="PREPASS" />
+    <pass name="material" vsdefines="AO" psdefines="MATERIAL AO" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vsdefines="AO" psdefines="DEFERRED AO" />
     <pass name="depth" vs="Depth" ps="Depth" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

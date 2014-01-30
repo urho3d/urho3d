@@ -1,3 +1,4 @@
+#ifdef COMPILEVS
 vec4 GetScreenPos(vec4 clipPos)
 {
     return vec4(
@@ -47,4 +48,4 @@ vec3 GetNearRay(vec4 clipPos)
     
     return (cCameraRot * viewRay) * cDepthMode.x;
 }
-
+#endif

@@ -182,6 +182,9 @@ bool Technique::Load(Deserializer& source)
         globalVSDefines += ' ';
     if (!globalPSDefines.Empty())
         globalPSDefines += ' ';
+    bool globalAlphaMask = false;
+    if (rootElem.HasAttribute("alphamask"))
+        globalAlphaMask = rootElem.GetBool("alphamask");
     
     unsigned numPasses = 0;
     
@@ -194,18 +197,27 @@ bool Technique::Load(Deserializer& source)
             Pass* newPass = CreatePass(nameHash);
             ++numPasses;
             
+            // Append global defines only when pass does not redefine the shader
             if (passElem.HasAttribute("vs"))
+            {
                 newPass->SetVertexShader(passElem.GetAttribute("vs"));
+                newPass->SetVertexShaderDefines(passElem.GetAttribute("vsdefines"));
+            }
             else
+            {
                 newPass->SetVertexShader(globalVS);
-            
+                newPass->SetVertexShaderDefines(globalVSDefines + passElem.GetAttribute("vsdefines"));
+            }
             if (passElem.HasAttribute("ps"))
+            {
                 newPass->SetPixelShader(passElem.GetAttribute("ps"));
+                newPass->SetPixelShaderDefines(passElem.GetAttribute("psdefines"));
+            }
             else
+            {
                 newPass->SetPixelShader(globalPS);
-            
-            newPass->SetVertexShaderDefines(globalVSDefines + passElem.GetAttribute("psdefines"));
-            newPass->SetPixelShaderDefines(globalPSDefines + passElem.GetAttribute("vsdefines"));
+                newPass->SetPixelShaderDefines(globalPSDefines + passElem.GetAttribute("psdefines"));
+            }
             
             if (passElem.HasAttribute("lighting"))
             {
@@ -234,6 +246,8 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("alphamask"))
                 newPass->SetAlphaMask(passElem.GetBool("alphamask"));
+            else
+                newPass->SetAlphaMask(globalAlphaMask);
         }
         else
             LOGERROR("Missing pass name");

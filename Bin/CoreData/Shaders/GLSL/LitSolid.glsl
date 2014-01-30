@@ -1,7 +1,9 @@
-#include "Uniforms.frag"
-#include "Samplers.frag"
-#include "Lighting.frag"
-#include "Fog.frag"
+#include "Uniforms.glsl"
+#include "Samplers.glsl"
+#include "Transform.glsl"
+#include "ScreenPos.glsl"
+#include "Lighting.glsl"
+#include "Fog.glsl"
 
 varying vec2 vTexCoord;
 #ifdef HEIGHTFOG
@@ -40,7 +42,93 @@ varying vec2 vTexCoord;
     #endif
 #endif
 
-void main()
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vTexCoord = GetTexCoord(iTexCoord);
+    
+    #ifdef HEIGHTFOG
+        vWorldPos = worldPos;
+    #endif
+
+    #if defined(PERPIXEL) && defined(NORMALMAP)
+        vec3 vNormal;
+        vec3 vTangent;
+        vec3 vBitangent;
+    #endif
+
+    vNormal = GetWorldNormal(modelMatrix);
+    #ifdef NORMALMAP
+        vTangent = GetWorldTangent(modelMatrix);
+        vBitangent = cross(vTangent, vNormal) * iTangent.w;
+    #endif
+    
+    #ifdef PERPIXEL
+        // Per-pixel forward lighting
+        vec4 projWorldPos = vec4(worldPos, 1.0);
+
+        #ifdef SHADOW
+            // Shadow projection: transform from world space to shadow space
+            for (int i = 0; i < NUMCASCADES; i++)
+                vShadowPos[i] = GetShadowPos(i, projWorldPos);
+        #endif
+
+        #ifdef SPOTLIGHT
+            // Spotlight projection: transform from world space to projector texture coordinates
+            vSpotPos = cLightMatrices[0] * projWorldPos;
+        #endif
+    
+        #ifdef POINTLIGHT
+            vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * (cLightPos.xyz - worldPos);
+        #endif
+    
+        #ifdef NORMALMAP
+            mat3 tbn = mat3(vTangent, vBitangent, vNormal);
+            #ifdef DIRLIGHT
+                vLightVec = vec4(cLightDir * tbn, GetDepth(gl_Position));
+            #else
+                vLightVec = vec4((cLightPos.xyz - worldPos) * tbn * cLightPos.w, GetDepth(gl_Position));
+            #endif
+            #ifdef SPECULAR
+                vEyeVec = (cCameraPos - worldPos) * tbn;
+            #endif
+        #else
+            #ifdef DIRLIGHT
+                vLightVec = vec4(cLightDir, GetDepth(gl_Position));
+            #else
+                vLightVec = vec4((cLightPos.xyz - worldPos) * cLightPos.w, GetDepth(gl_Position));
+            #endif
+            #ifdef SPECULAR
+                vEyeVec = cCameraPos - worldPos;
+            #endif
+        #endif
+    #else
+        // Ambient & per-vertex lighting
+        #if defined(LIGHTMAP) || defined(AO)
+            // If using lightmap, disregard zone ambient light
+            // If using AO, calculate ambient in the PS
+            vVertexLight = vec4(0.0, 0.0, 0.0, GetDepth(gl_Position));
+            vTexCoord2 = iTexCoord2;
+        #else
+            vVertexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
+        #endif
+        
+        #ifdef NUMVERTEXLIGHTS
+            for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
+                vVertexLight.rgb += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
+        #endif
+        
+        vScreenPos = GetScreenPos(gl_Position);
+
+        #ifdef ENVCUBEMAP
+            vReflectionVec = worldPos - cCameraPos;
+        #endif
+    #endif
+}
+
+void PS()
 {
     // Get material diffuse albedo
     #ifdef DIFFMAP
