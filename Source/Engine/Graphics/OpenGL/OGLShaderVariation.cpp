@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
+#include "Log.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
@@ -104,17 +105,28 @@ bool ShaderVariation::Create()
         return false;
     }
     
+    const String& originalShaderCode = owner_->GetSourceCode(shaderType_);
     String shaderCode;
-    
     // Distinguish between VS and PS compile in case the shader code wants to include/omit different things
     shaderCode += shaderType_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
     
     // Prepend the defines to the shader code
     Vector<String> defineVec = defines_.Split(' ');
     for (unsigned i = 0; i < defineVec.Size(); ++i)
-        shaderCode += "#define " + defineVec[i].Replaced('=', ' ') + "\n";
+    {
+        // Add extra space for the checking code below
+        String defineString = "#define " + defineVec[i].Replaced('=', ' ') + " \n";
+        shaderCode += defineString;
+        
+        // In debug mode, check that all defines are referenced by the shader code
+        #ifdef _DEBUG
+        String defineCheck = defineString.Substring(8, defineString.Find(' ', 8) - 8);
+        if (originalShaderCode.Find(defineCheck) == String::NPOS)
+            LOGWARNING("Shader " + GetName() + " does not use the define " + defineCheck);
+        #endif
+    }
     
-    shaderCode += owner_->GetSourceCode(shaderType_);
+    shaderCode += originalShaderCode;
     
     const char* shaderCStr = shaderCode.CString();
     glShaderSource(object_, 1, &shaderCStr, 0);

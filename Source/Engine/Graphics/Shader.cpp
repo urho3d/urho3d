@@ -190,9 +190,29 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
 String Shader::SanitateDefines(const String& definesIn)
 {
     String ret;
-    unsigned numSpaces = 0;
+    ret.Reserve(definesIn.Length());
     
+    unsigned numSpaces = 0;
+    unsigned start = 0, end = definesIn.Length();
+    
+    // Trim spaces from start & begin. Do not use String::Trimmed() as we also need to trim spaces from the middle
     for (unsigned i = 0; i < definesIn.Length(); ++i)
+    {
+        if (definesIn[i] != ' ')
+        {
+            start = i;
+            break;
+        }
+    }
+    for (unsigned i = definesIn.Length() - 1; i < definesIn.Length(); --i)
+    {
+        if (definesIn[i] != ' ')
+        {
+            end = i + 1;
+            break;
+        }
+    }
+    for (unsigned i = start; i < end; ++i)
     {
         // Ensure only one space in a row
         if (definesIn[i] == ' ')
@@ -204,7 +224,7 @@ String Shader::SanitateDefines(const String& definesIn)
             ret += definesIn[i];
     }
     
-    return ret.Trimmed();
+    return ret;
 }
 
 }
