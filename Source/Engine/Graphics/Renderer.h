@@ -286,10 +286,8 @@ public:
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
     /// Return the instancing vertex buffer
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
-    /// Return a vertex shader by name.
-    ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
-    /// Return a pixel shader by name.
-    ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const;
+    /// Return a shader by name and defines.
+    ShaderVariation* GetShader(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
     /// Return the stencil vertex shader.
     ShaderVariation* GetStencilVS() const { return stencilVS_; }
     /// Return the stencil pixel shader.
@@ -309,7 +307,7 @@ public:
     void QueueViewport(RenderSurface* renderTarget, Viewport* viewport);
     
     /// Populate light volume shaders.
-    void GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& psName);
+    void GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& vsDefines, const String& psName, const String& psDefines);
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
@@ -322,8 +320,6 @@ public:
     OcclusionBuffer* GetOcclusionBuffer(Camera* camera);
     /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
     Camera* GetShadowCamera();
-    /// Get a shader program.
-    ShaderVariation* GetShader(ShaderType type, const String& name, bool checkExists) const;
     /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
     /// Choose shaders for a light volume batch.
@@ -443,6 +439,8 @@ private:
     Mutex rendererMutex_;
     /// Base directory for shaders.
     String shaderPath_;
+    /// File extension for shaders.
+    String shaderExtension_;
     /// Frame info for rendering.
     FrameInfo frame_;
     /// Texture anisotropy level.

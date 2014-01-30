@@ -607,12 +607,12 @@ void UI::Initialize()
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     rootModalElement_->SetSize(rootElement_->GetSize());
 
-    noTextureVS_ = renderer->GetVertexShader("Basic_VCol");
-    diffTextureVS_ = renderer->GetVertexShader("Basic_DiffVCol");
-    noTexturePS_ = renderer->GetPixelShader("Basic_VCol");
-    diffTexturePS_ = renderer->GetPixelShader("Basic_DiffVCol");
-    diffMaskTexturePS_ = renderer->GetPixelShader("Basic_DiffAlphaMaskVCol");
-    alphaTexturePS_ = renderer->GetPixelShader("Basic_AlphaVCol");
+    noTextureVS_ = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
+    diffTextureVS_ = renderer->GetShader(VS, "Basic", "DIFFMAP VERTEXCOLOR");
+    noTexturePS_ = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
+    diffTexturePS_ = renderer->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR");
+    diffMaskTexturePS_ = renderer->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
+    alphaTexturePS_ = renderer->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
 
     vertexBuffer_ = new VertexBuffer(context_);
     debugVertexBuffer_ = new VertexBuffer(context_);

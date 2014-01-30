@@ -165,6 +165,10 @@ struct RenderPathCommand
     String vertexShaderName_;
     /// Pixel shader name.
     String pixelShaderName_;
+    /// Vertex shader defines.
+    String vertexShaderDefines_;
+    /// Pixel shader defines.
+    String pixelShaderDefines_;
     /// Textures.
     String textureNames_[MAX_TEXTURE_UNITS];
     /// %Shader parameters.

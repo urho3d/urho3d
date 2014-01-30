@@ -34,8 +34,8 @@ namespace Urho3D
 
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
+    owner_(owner),
     shaderType_(type),
-    sourceCodeLength_(0),
     compiled_(false)
 {
 }
@@ -91,8 +91,11 @@ bool ShaderVariation::Create()
 {
     Release();
     
-    if (!sourceCode_ || !sourceCodeLength_)
+    if (!owner_)
+    {
+        compilerOutput_ = "Owner shader has expired";
         return false;
+    }
     
     object_ = glCreateShader(shaderType_ == VS ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
     if (!object_)
@@ -101,28 +104,17 @@ bool ShaderVariation::Create()
         return false;
     }
     
+    String shaderCode;
+    
+    // Distinguish between VS and PS compile in case the shader code wants to include/omit different things
+    shaderCode += shaderType_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
+    
     // Prepend the defines to the shader code
-    // Check if there is a version definition; it must stay in the beginning
-    String shaderCode(sourceCode_.Get(), sourceCodeLength_);
-    String defines;
+    Vector<String> defineVec = defines_.Split(' ');
+    for (unsigned i = 0; i < defineVec.Size(); ++i)
+        shaderCode += "#define " + defineVec[i].Replaced('=', ' ') + "\n";
     
-    for (unsigned i = 0; i < defines_.Size(); ++i)
-        defines += "#define " + defines_[i] + " " + defineValues_[i] + "\n";
-    
-    if (!defines_.Empty())
-        defines += "\n";
-    
-    unsigned pos = 0;
-    if (shaderCode.StartsWith("#version"))
-    {
-        pos = shaderCode.Find('\n');
-        if (pos != String::NPOS)
-            ++pos;
-        else
-            pos = 0;
-    }
-    
-    shaderCode.Insert(pos, defines);
+    shaderCode += owner_->GetSourceCode(shaderType_);
     
     const char* shaderCStr = shaderCode.CString();
     glShaderSource(object_, 1, &shaderCStr, 0);
@@ -149,19 +141,9 @@ void ShaderVariation::SetName(const String& name)
     name_ = name;
 }
 
-void ShaderVariation::SetSourceCode(const SharedArrayPtr<char>& code, unsigned length)
+void ShaderVariation::SetDefines(const String& defines)
 {
-    sourceCode_ = code;
-    sourceCodeLength_ = length;
-}
-
-void ShaderVariation::SetDefines(const Vector<String>& defines, const Vector<String>& defineValues)
-{
-    if (defines.Size() == defineValues.Size())
-    {
-        defines_ = defines;
-        defineValues_ = defineValues;
-    }
+    defines_ = defines;
 }
 
 }

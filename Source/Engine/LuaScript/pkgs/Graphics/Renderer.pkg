@@ -161,10 +161,6 @@ class Renderer
     TextureCube* GetFaceSelectCubeMap() const;
     TextureCube* GetIndirectionCubeMap() const;
     VertexBuffer* GetInstancingBuffer() const;
-    ShaderVariation* GetVertexShader(const String name, bool checkExists = false) const;
-    ShaderVariation* GetPixelShader(const String name, bool checkExists = false) const;
-    ShaderVariation* GetStencilVS() const;
-    ShaderVariation* GetStencilPS() const;
     const FrameInfo& GetFrameInfo();
     
     void DrawDebugGeometry(bool depthTest);
@@ -194,13 +190,7 @@ class Renderer
     tolua_readonly tolua_property__get_set unsigned numPrimitives;
     tolua_readonly tolua_property__get_set unsigned numBatches;
     tolua_readonly tolua_property__get_set Zone* defaultZone;
-    tolua_readonly tolua_property__get_set Light* quadDirLight;
     tolua_readonly tolua_property__get_set Material* defaultMaterial;
     tolua_readonly tolua_property__get_set Texture2D* defaultLightRamp;
     tolua_readonly tolua_property__get_set Texture2D* defaultLightSpot;
-    tolua_readonly tolua_property__get_set TextureCube* faceSelectCubeMap;
-    tolua_readonly tolua_property__get_set TextureCube* indirectionCubeMap;
-    tolua_readonly tolua_property__get_set VertexBuffer* instancingBuffer;
-    tolua_readonly tolua_property__get_set ShaderVariation* stencilVS;
-    tolua_readonly tolua_property__get_set ShaderVariation* stencilPS;
 };

@@ -123,6 +123,18 @@ void Pass::SetPixelShader(const String& name)
     ReleaseShaders();
 }
 
+void Pass::SetVertexShaderDefines(const String& defines)
+{
+    vertexShaderDefines_ = defines;
+    ReleaseShaders();
+}
+
+void Pass::SetPixelShaderDefines(const String& defines)
+{
+    pixelShaderDefines_ = defines;
+    ReleaseShaders();
+}
+
 void Pass::ReleaseShaders()
 {
     vertexShaders_.Clear();
@@ -161,6 +173,16 @@ bool Technique::Load(Deserializer& source)
     if (rootElem.HasAttribute("sm3"))
         isSM3_ = rootElem.GetBool("sm3");
     
+    String globalVS = rootElem.GetAttribute("vs");
+    String globalPS = rootElem.GetAttribute("ps");
+    String globalVSDefines = rootElem.GetAttribute("vsdefines");
+    String globalPSDefines = rootElem.GetAttribute("psdefines");
+    // End with space so that the pass-specific defines can be appended
+    if (!globalVSDefines.Empty())
+        globalVSDefines += ' ';
+    if (!globalPSDefines.Empty())
+        globalPSDefines += ' ';
+    
     unsigned numPasses = 0;
     
     XMLElement passElem = rootElem.GetChild("pass");
@@ -174,9 +196,16 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("vs"))
                 newPass->SetVertexShader(passElem.GetAttribute("vs"));
+            else
+                newPass->SetVertexShader(globalVS);
             
             if (passElem.HasAttribute("ps"))
                 newPass->SetPixelShader(passElem.GetAttribute("ps"));
+            else
+                newPass->SetPixelShader(globalPS);
+            
+            newPass->SetVertexShaderDefines(globalVSDefines + passElem.GetAttribute("psdefines"));
+            newPass->SetPixelShaderDefines(globalPSDefines + passElem.GetAttribute("vsdefines"));
             
             if (passElem.HasAttribute("lighting"))
             {

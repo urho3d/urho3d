@@ -1,5 +1,6 @@
-#include "Uniforms.frag"
-#include "Samplers.frag"
+#include "Uniforms.glsl"
+#include "Samplers.glsl"
+#include "Transform.glsl"
 
 #if defined(DIFFMAP) || defined(ALPHAMAP)
     varying vec2 vTexCoord;
@@ -8,7 +9,21 @@
     varying vec4 vColor;
 #endif
 
-void main()
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    
+    #ifdef DIFFMAP
+        vTexCoord = iTexCoord;
+    #endif
+    #ifdef VERTEXCOLOR
+        vColor = iColor;
+    #endif
+}
+
+void PS()
 {
     vec4 diffColor = cMatDiffColor;
 

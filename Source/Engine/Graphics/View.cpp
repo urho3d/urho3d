@@ -409,7 +409,9 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         
         if (command.type_ == CMD_LIGHTVOLUMES)
         {
-            renderer_->GetLightVolumeShaders(lightVS_, lightPS_, command.vertexShaderName_, command.pixelShaderName_);
+            /// \todo Do not re-query each frame, as it involves string manipulation
+            renderer_->GetLightVolumeShaders(lightVS_, lightPS_, command.vertexShaderName_, command.vertexShaderDefines_,
+                command.pixelShaderName_, command.pixelShaderDefines_);
             deferred_ = true;
         }
     }
@@ -1555,10 +1557,11 @@ void View::SetTextures(RenderPathCommand& command)
 void View::RenderQuad(RenderPathCommand& command)
 {
     // If shader can not be found, clear it from the command to prevent redundant attempts
-    ShaderVariation* vs = renderer_->GetVertexShader(command.vertexShaderName_);
+    /// \todo Do not re-query each frame, as it involves string manipulation
+    ShaderVariation* vs = renderer_->GetShader(VS, command.vertexShaderName_, command.vertexShaderDefines_);
     if (!vs)
         command.vertexShaderName_ = String::EMPTY;
-    ShaderVariation* ps = renderer_->GetPixelShader(command.pixelShaderName_);
+    ShaderVariation* ps = renderer_->GetShader(PS, command.pixelShaderName_, command.pixelShaderDefines_);
     if (!ps)
         command.pixelShaderName_ = String::EMPTY;
     
@@ -1814,7 +1817,7 @@ void View::BlitFramebuffer(Texture2D* source, RenderSurface* destination, bool d
     graphics_->SetViewport(viewRect_);
     
     String shaderName = "CopyFramebuffer";
-    graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
+    graphics_->SetShaders(renderer_->GetShader(VS, shaderName), renderer_->GetShader(PS, shaderName));
     
     float rtWidth = (float)rtSize_.x_;
     float rtHeight = (float)rtSize_.y_;

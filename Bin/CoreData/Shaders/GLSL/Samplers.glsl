@@ -1,3 +1,4 @@
+#ifdef COMPILEPS
 uniform sampler2D sDiffMap;
 uniform samplerCube sDiffCubeMap;
 uniform sampler2D sNormalMap;
@@ -9,16 +10,16 @@ uniform sampler2D sLightRampMap;
 uniform sampler2D sLightSpotMap;
 uniform samplerCube sLightCubeMap;
 #ifndef GL_ES
-uniform sampler3D sVolumeMap;
-uniform sampler2D sAlbedoBuffer;
-uniform sampler2D sNormalBuffer;
-uniform sampler2D sDepthBuffer;
-uniform sampler2D sLightBuffer;
-uniform sampler2DShadow sShadowMap;
-uniform samplerCube sFaceSelectCubeMap;
-uniform samplerCube sIndirectionCubeMap;
+    uniform sampler3D sVolumeMap;
+    uniform sampler2D sAlbedoBuffer;
+    uniform sampler2D sNormalBuffer;
+    uniform sampler2D sDepthBuffer;
+    uniform sampler2D sLightBuffer;
+    uniform sampler2DShadow sShadowMap;
+    uniform samplerCube sFaceSelectCubeMap;
+    uniform samplerCube sIndirectionCubeMap;
 #else
-uniform sampler2D sShadowMap;
+    uniform sampler2D sShadowMap;
 #endif
 
 vec3 DecodeNormal(vec4 normalInput)
@@ -50,3 +51,4 @@ float DecodeDepth(vec3 depth)
     const vec3 dotValues = vec3(1.0, 1.0 / 255.0, 1.0 / (255.0 * 255.0));
     return dot(depth, dotValues);
 }
+#endif

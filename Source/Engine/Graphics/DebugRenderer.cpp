@@ -319,9 +319,9 @@ void DebugRenderer::Render()
 
     // Cache shaders
     if (!vs_)
-        vs_ = renderer->GetVertexShader("Basic_VCol");
+        vs_ = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
     if (!ps_)
-        ps_ = renderer->GetPixelShader("Basic_VCol");
+        ps_ = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
     
     unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2;
     // Resize the vertex buffer if too small or much too large

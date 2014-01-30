@@ -51,37 +51,29 @@ public:
     bool Create();
     /// Set name.
     void SetName(const String& name);
-    /// Set source code.
-    void SetSourceCode(const SharedArrayPtr<char>& code, unsigned length);
     /// Set defines.
-    void SetDefines(const Vector<String>& defines, const Vector<String>& defineValues);
+    void SetDefines(const String& defines);
     
     /// Return shader type.
     ShaderType GetShaderType() const { return shaderType_; }
     /// Return full shader name.
     const String& GetName() const { return name_; }
     /// Return defines.
-    const Vector<String>& GetDefines() const { return defines_; }
-    /// Return define values.
-    const Vector<String>& GetDefineValues() const { return defineValues_; }
+    const String& GetDefines() const { return defines_; }
     /// Return whether successfully compiled.
     bool IsCompiled() const { return compiled_; }
     /// Return compile error/warning string.
     const String& GetCompilerOutput() const { return compilerOutput_; }
     
 private:
+    /// Shader this variation belongs to.
+    WeakPtr<Shader> owner_;
     /// Shader type.
     ShaderType shaderType_;
     /// Full shader name.
     String name_;
-    /// GLSL source code.
-    SharedArrayPtr<char> sourceCode_;
-    /// Source code length.
-    unsigned sourceCodeLength_;
     /// Defines to use in compiling.
-    Vector<String> defines_;
-    /// Define values to use in compiling.
-    Vector<String> defineValues_;
+    String defines_;
     /// Shader compile error string.
     String compilerOutput_;
     /// Compiled flag.

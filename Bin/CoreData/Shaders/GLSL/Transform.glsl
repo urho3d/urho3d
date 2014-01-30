@@ -1,3 +1,4 @@
+#ifdef COMPILEVS
 attribute vec4 iPos;
 attribute vec3 iNormal;
 attribute vec4 iColor;
@@ -115,4 +116,4 @@ vec3 GetWorldTangent(mat4 modelMatrix)
         return normalize(normalMatrix * iTangent.xyz);
     #endif
 }
-
+#endif
