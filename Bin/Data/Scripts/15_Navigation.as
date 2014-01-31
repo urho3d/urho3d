@@ -231,7 +231,7 @@ void SetPathPoint()
         {
             // Teleport
             currentPath.Clear();
-            jackNode.LookAt(pathPos, Vector3(0.0f, 1.0f, 0.0f));
+            jackNode.LookAt(Vector3(pathPos.x, jackNode.position.y, pathPos.z), Vector3(0.0f, 1.0f, 0.0f));
             jackNode.position = pathPos;
         }
         else

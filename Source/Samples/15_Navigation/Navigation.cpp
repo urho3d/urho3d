@@ -282,7 +282,7 @@ void Navigation::SetPathPoint()
         {
             // Teleport
             currentPath_.Clear();
-            jackNode_->LookAt(pathPos, Vector3(0.0f, 1.0f, 0.0f));
+            jackNode_->LookAt(Vector3(pathPos.x_, jackNode_->GetPosition().y_, pathPos.z_), Vector3(0.0f, 1.0f, 0.0f));
             jackNode_->SetPosition(pathPos);
         }
         else

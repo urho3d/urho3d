@@ -229,7 +229,7 @@ function SetPathPoint()
         if input:GetQualifierDown(QUAL_SHIFT) then
             -- Teleport
             currentPath = {}
-            jackNode:LookAt(pathPos, Vector3(0.0, 1.0, 0.0))
+            jackNode:LookAt(Vector3(pathPos.x, jackNode.position.y, pathPos.z), Vector3(0.0, 1.0, 0.0))
             jackNode.position = pathPos;
         else
             -- Calculate path from Jack's current position to the end point
