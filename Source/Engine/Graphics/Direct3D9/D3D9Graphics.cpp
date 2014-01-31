@@ -519,27 +519,57 @@ bool Graphics::TakeScreenShot(Image& destImage)
     // If possible, get the backbuffer data, because it is a lot faster.
     // However, if we are multisampled, need to use the front buffer
     bool useBackBuffer = true;
+    unsigned surfaceWidth = width_;
+    unsigned surfaceHeight = height_;
+    
     if (impl_->presentParams_.MultiSampleType)
     {
+        // If windowed and multisampled, must still capture the whole screen
+        if (!fullscreen_)
+        {
+            IntVector2 desktopSize = GetDesktopResolution();
+            surfaceWidth = desktopSize.x_;
+            surfaceHeight = desktopSize.y_;
+        }
         useBackBuffer = false;
         surfaceDesc.Format = D3DFMT_A8R8G8B8;
     }
     
     IDirect3DSurface9* surface = 0;
-    impl_->device_->CreateOffscreenPlainSurface(width_, height_, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
+    impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
     if (!surface)
+    {
+        LOGERROR("Could not create surface for taking a screenshot");
         return false;
+    }
     
     if (useBackBuffer)
         impl_->device_->GetRenderTargetData(impl_->defaultColorSurface_, surface);
     else
         impl_->device_->GetFrontBufferData(0, surface);
     
+    // If capturing the whole screen, determine the window rect
+    RECT sourceRect;
+    if (surfaceHeight == height_ && surfaceWidth == width_)
+    {
+        sourceRect.left = 0;
+        sourceRect.top = 0;
+        sourceRect.right = width_;
+        sourceRect.bottom = height_;
+    }
+    else
+    {
+        HWND hwnd = WIN_GetWindowHandle(impl_->window_);
+        GetClientRect(hwnd, &sourceRect);
+        ClientToScreen(hwnd, (LPPOINT)&sourceRect);
+    }
+    
     D3DLOCKED_RECT lockedRect;
     lockedRect.pBits = 0;
-    surface->LockRect(&lockedRect, 0, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
+    surface->LockRect(&lockedRect, &sourceRect, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
     if (!lockedRect.pBits)
     {
+        LOGERROR("Could not lock surface for taking a screenshot");
         surface->Release();
         return false;
     }
