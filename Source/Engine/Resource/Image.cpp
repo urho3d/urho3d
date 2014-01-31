@@ -50,153 +50,153 @@ namespace Urho3D
 
 struct DDColorKey
 {
-	unsigned dwColorSpaceLowValue_;
-	unsigned dwColorSpaceHighValue_;
+    unsigned dwColorSpaceLowValue_;
+    unsigned dwColorSpaceHighValue_;
 };
 
 struct DDPixelFormat
 {
-	unsigned dwSize_;
-	unsigned dwFlags_;
-	unsigned dwFourCC_;
-	union
-	{
-		unsigned dwRGBBitCount_;
-		unsigned dwYUVBitCount_;
-		unsigned dwZBufferBitDepth_;
-		unsigned dwAlphaBitDepth_;
-		unsigned dwLuminanceBitCount_;
-		unsigned dwBumpBitCount_;
-		unsigned dwPrivateFormatBitCount_;
-	};
-	union
-	{
-		unsigned dwRBitMask_;
-		unsigned dwYBitMask_;
-		unsigned dwStencilBitDepth_;
-		unsigned dwLuminanceBitMask_;
-		unsigned dwBumpDuBitMask_;
-		unsigned dwOperations_;
-	};
-	union
-	{
-		unsigned dwGBitMask_;
-		unsigned dwUBitMask_;
-		unsigned dwZBitMask_;
-		unsigned dwBumpDvBitMask_;
-		struct
-		{
-			unsigned short wFlipMSTypes_;
-			unsigned short wBltMSTypes_;
-		} multiSampleCaps_;
-	};
-	union
-	{
-		unsigned dwBBitMask_;
-		unsigned dwVBitMask_;
-		unsigned dwStencilBitMask_;
-		unsigned dwBumpLuminanceBitMask_;
-	};
-	union
-	{
-		unsigned dwRGBAlphaBitMask_;
-		unsigned dwYUVAlphaBitMask_;
-		unsigned dwLuminanceAlphaBitMask_;
-		unsigned dwRGBZBitMask_;
-		unsigned dwYUVZBitMask_;
-	};
+    unsigned dwSize_;
+    unsigned dwFlags_;
+    unsigned dwFourCC_;
+    union
+    {
+        unsigned dwRGBBitCount_;
+        unsigned dwYUVBitCount_;
+        unsigned dwZBufferBitDepth_;
+        unsigned dwAlphaBitDepth_;
+        unsigned dwLuminanceBitCount_;
+        unsigned dwBumpBitCount_;
+        unsigned dwPrivateFormatBitCount_;
+    };
+    union
+    {
+        unsigned dwRBitMask_;
+        unsigned dwYBitMask_;
+        unsigned dwStencilBitDepth_;
+        unsigned dwLuminanceBitMask_;
+        unsigned dwBumpDuBitMask_;
+        unsigned dwOperations_;
+    };
+    union
+    {
+        unsigned dwGBitMask_;
+        unsigned dwUBitMask_;
+        unsigned dwZBitMask_;
+        unsigned dwBumpDvBitMask_;
+        struct
+        {
+            unsigned short wFlipMSTypes_;
+            unsigned short wBltMSTypes_;
+        } multiSampleCaps_;
+    };
+    union
+    {
+        unsigned dwBBitMask_;
+        unsigned dwVBitMask_;
+        unsigned dwStencilBitMask_;
+        unsigned dwBumpLuminanceBitMask_;
+    };
+    union
+    {
+        unsigned dwRGBAlphaBitMask_;
+        unsigned dwYUVAlphaBitMask_;
+        unsigned dwLuminanceAlphaBitMask_;
+        unsigned dwRGBZBitMask_;
+        unsigned dwYUVZBitMask_;
+    };
 };
 
 struct DDSCaps2
 {
-	unsigned dwCaps_;
-	unsigned dwCaps2_;
-	unsigned dwCaps3_;
-	union
-	{
-		unsigned dwCaps4_;
-		unsigned dwVolumeDepth_;
-	};
+    unsigned dwCaps_;
+    unsigned dwCaps2_;
+    unsigned dwCaps3_;
+    union
+    {
+        unsigned dwCaps4_;
+        unsigned dwVolumeDepth_;
+    };
 };
 
 struct DDSurfaceDesc2
 {
-	unsigned dwSize_;
-	unsigned dwFlags_;
-	unsigned dwHeight_;
-	unsigned dwWidth_;
-	union
-	{
-		unsigned lPitch_;
-		unsigned dwLinearSize_;
-	};
-	union
-	{
-		unsigned dwBackBufferCount_;
-		unsigned dwDepth_;
-	};
-	union
-	{
-		unsigned dwMipMapCount_;
-		unsigned dwRefreshRate_;
-		unsigned dwSrcVBHandle_;
-	};
-	unsigned dwAlphaBitDepth_;
-	unsigned dwReserved_;
-	unsigned lpSurface_; // Do not define as a void pointer, as it is 8 bytes in a 64bit build
-	union
-	{
-		DDColorKey ddckCKDestOverlay_;
-		unsigned dwEmptyFaceColor_;
-	};
-	DDColorKey ddckCKDestBlt_;
-	DDColorKey ddckCKSrcOverlay_;
-	DDColorKey ddckCKSrcBlt_;
-	union
-	{
-		DDPixelFormat ddpfPixelFormat_;
-		unsigned dwFVF_;
-	};
-	DDSCaps2 ddsCaps_;
-	unsigned dwTextureStage_;
+    unsigned dwSize_;
+    unsigned dwFlags_;
+    unsigned dwHeight_;
+    unsigned dwWidth_;
+    union
+    {
+        unsigned lPitch_;
+        unsigned dwLinearSize_;
+    };
+    union
+    {
+        unsigned dwBackBufferCount_;
+        unsigned dwDepth_;
+    };
+    union
+    {
+        unsigned dwMipMapCount_;
+        unsigned dwRefreshRate_;
+        unsigned dwSrcVBHandle_;
+    };
+    unsigned dwAlphaBitDepth_;
+    unsigned dwReserved_;
+    unsigned lpSurface_; // Do not define as a void pointer, as it is 8 bytes in a 64bit build
+    union
+    {
+        DDColorKey ddckCKDestOverlay_;
+        unsigned dwEmptyFaceColor_;
+    };
+    DDColorKey ddckCKDestBlt_;
+    DDColorKey ddckCKSrcOverlay_;
+    DDColorKey ddckCKSrcBlt_;
+    union
+    {
+        DDPixelFormat ddpfPixelFormat_;
+        unsigned dwFVF_;
+    };
+    DDSCaps2 ddsCaps_;
+    unsigned dwTextureStage_;
 };
 
 bool CompressedLevel::Decompress(unsigned char* dest)
 {
-	if (!data_)
-		return false;
-	
-	switch (format_)
-	{
-	case CF_DXT1:
-	case CF_DXT3:
-	case CF_DXT5:
-		DecompressImageDXT(dest, data_, width_, height_, depth_, format_);
-		return true;
-		
-	case CF_ETC1:
-		DecompressImageETC(dest, data_, width_, height_);
-		return true;
-		
-	case CF_PVRTC_RGB_2BPP:
-	case CF_PVRTC_RGBA_2BPP:
-	case CF_PVRTC_RGB_4BPP:
-	case CF_PVRTC_RGBA_4BPP:
-		DecompressImagePVRTC(dest, data_, width_, height_, format_);
-		return true;
-	
-	default:
-		 // Unknown format
-		 return false;
-	}    
+    if (!data_)
+        return false;
+    
+    switch (format_)
+    {
+    case CF_DXT1:
+    case CF_DXT3:
+    case CF_DXT5:
+        DecompressImageDXT(dest, data_, width_, height_, depth_, format_);
+        return true;
+        
+    case CF_ETC1:
+        DecompressImageETC(dest, data_, width_, height_);
+        return true;
+        
+    case CF_PVRTC_RGB_2BPP:
+    case CF_PVRTC_RGBA_2BPP:
+    case CF_PVRTC_RGB_4BPP:
+    case CF_PVRTC_RGBA_4BPP:
+        DecompressImagePVRTC(dest, data_, width_, height_, format_);
+        return true;
+    
+    default:
+         // Unknown format
+         return false;
+    }    
 }
 
 Image::Image(Context* context) :
-	Resource(context),
-	width_(0),
-	height_(0),
-	depth_(0),
-	components_(0)
+    Resource(context),
+    width_(0),
+    height_(0),
+    depth_(0),
+    components_(0)
 {
 }
 
@@ -206,831 +206,831 @@ Image::~Image()
 
 void Image::RegisterObject(Context* context)
 {
-	context->RegisterFactory<Image>();
+    context->RegisterFactory<Image>();
 }
 
 bool Image::Load(Deserializer& source)
 {
-	// Check for DDS, KTX or PVR compressed format
-	String fileID = source.ReadFileID();
-	
-	if (fileID == "DDS ")
-	{
-		// DDS compressed format
-		DDSurfaceDesc2 ddsd;
-		source.Read(&ddsd, sizeof(ddsd));
-		
-		switch (ddsd.ddpfPixelFormat_.dwFourCC_)
-		{
-		case FOURCC_DXT1:
-			compressedFormat_ = CF_DXT1;
-			components_ = 3;
-			break;
-			
-		case FOURCC_DXT3:
-			compressedFormat_ = CF_DXT3;
-			components_ = 4;
-			break;
-			
-		case FOURCC_DXT5:
-			compressedFormat_ = CF_DXT5;
-			components_ = 4;
-			break;
-			
-		default:
-			LOGERROR("Unsupported DDS format");
-			return false;
-		}
-		
-		unsigned dataSize = source.GetSize() - source.GetPosition();
-		data_ = new unsigned char[dataSize];
-		width_ = ddsd.dwWidth_;
-		height_ = ddsd.dwHeight_;
-		depth_ = ddsd.dwDepth_;
-		numCompressedLevels_ = ddsd.dwMipMapCount_;
-		if (!numCompressedLevels_)
-			numCompressedLevels_ = 1;
-		SetMemoryUse(dataSize);
-		source.Read(data_.Get(), dataSize);
-	}
-	else if (fileID == "\253KTX")
-	{
-		source.Seek(12);
-		
-		unsigned endianness = source.ReadUInt();
-		unsigned type = source.ReadUInt();
-		/* unsigned typeSize = */ source.ReadUInt();
-		unsigned format = source.ReadUInt();
-		unsigned internalFormat = source.ReadUInt();
-		/* unsigned baseInternalFormat = */ source.ReadUInt();
-		unsigned width = source.ReadUInt();
-		unsigned height = source.ReadUInt();
-		unsigned depth = source.ReadUInt();
-		/* unsigned arrayElements = */ source.ReadUInt();
-		unsigned faces = source.ReadUInt();
-		unsigned mipmaps = source.ReadUInt();
-		unsigned keyValueBytes = source.ReadUInt();
-		
-		if (endianness != 0x04030201)
-		{
-			LOGERROR("Big-endian KTX files not supported");
-			return false;
-		}
-		
-		if (type != 0 || format != 0)
-		{
-			LOGERROR("Uncompressed KTX files not supported");
-			return false;
-		}
-		
-		if (faces > 1 || depth > 1)
-		{
-			LOGERROR("3D or cube KTX files not supported");
-			return false;
-		}
-		
-		if (mipmaps == 0)
-		{
-			LOGERROR("KTX files without explicitly specified mipmap count not supported");
-			return false;
-		}
-		
-		compressedFormat_ = CF_NONE;
-		switch (internalFormat)
-		{
-		case 0x83f1:
-			compressedFormat_ = CF_DXT1;
-			components_ = 4;
-			break;
-			
-		case 0x83f2:
-			compressedFormat_ = CF_DXT3;
-			components_ = 4;
-			break;
-			
-		case 0x83f3:
-			compressedFormat_ = CF_DXT5;
-			components_ = 4;
-			break;
-			
-		case 0x8d64:
-			compressedFormat_ = CF_ETC1;
-			components_ = 3;
-			break;
-			
-		case 0x8c00:
-			compressedFormat_ = CF_PVRTC_RGB_4BPP;
-			components_ = 3;
-			break;
-			
-		case 0x8c01:
-			compressedFormat_ = CF_PVRTC_RGB_2BPP;
-			components_ = 3;
-			break;
-			
-		case 0x8c02:
-			compressedFormat_ = CF_PVRTC_RGBA_4BPP;
-			components_ = 4;
-			break;
-			
-		case 0x8c03:
-			compressedFormat_ = CF_PVRTC_RGBA_2BPP;
-			components_ = 4;
-			break;
-		}
-		
-		if (compressedFormat_ == CF_NONE)
-		{
-			LOGERROR("Unsupported texture format in KTX file");
-			return false;
-		}
-		
-		source.Seek(source.GetPosition() + keyValueBytes);
-		unsigned dataSize = source.GetSize() - source.GetPosition() - mipmaps * sizeof(unsigned);
-		
-		data_ = new unsigned char[dataSize];
-		width_ = width;
-		height_ = height;
-		numCompressedLevels_ = mipmaps;
-		
-		unsigned dataOffset = 0;
-		for (unsigned i = 0; i < mipmaps; ++i)
-		{
-			unsigned levelSize = source.ReadUInt();
-			if (levelSize + dataOffset > dataSize)
-			{
-				LOGERROR("KTX mipmap level data size exceeds file size");
-				return false;
-			}
-			
-			source.Read(&data_[dataOffset], levelSize);
-			dataOffset += levelSize;
-			if (source.GetPosition() & 3)
-				source.Seek((source.GetPosition() + 3) & 0xfffffffc);
-		}
-		
-		SetMemoryUse(dataSize);
-	}
-	else if (fileID == "PVR\3")
-	{
-		/* unsigned flags = */ source.ReadUInt();
-		unsigned pixelFormatLo = source.ReadUInt();
-		/* unsigned pixelFormatHi = */ source.ReadUInt();
-		/* unsigned colourSpace = */ source.ReadUInt();
-		/* unsigned channelType = */ source.ReadUInt();
-		unsigned height = source.ReadUInt();
-		unsigned width = source.ReadUInt();
-		unsigned depth = source.ReadUInt();
-		/* unsigned numSurfaces = */ source.ReadUInt();
-		unsigned numFaces = source.ReadUInt();
-		unsigned mipmapCount = source.ReadUInt();
-		unsigned metaDataSize = source.ReadUInt();
-		
-		if (depth > 1 || numFaces > 1)
-		{
-			LOGERROR("3D or cube PVR files not supported");
-			return false;
-		}
-		
-		if (mipmapCount == 0)
-		{
-			LOGERROR("PVR files without explicitly specified mipmap count not supported");
-			return false;
-		}
-		
-		compressedFormat_ = CF_NONE;
-		switch (pixelFormatLo)
-		{
-		case 0:
-			compressedFormat_ = CF_PVRTC_RGB_2BPP;
-			components_ = 3;
-			break;
-			
-		case 1:
-			compressedFormat_ = CF_PVRTC_RGBA_2BPP;
-			components_ = 4;
-			break;
-			
-		case 2:
-			compressedFormat_ = CF_PVRTC_RGB_4BPP;
-			components_ = 3;
-			break;
-			
-		case 3:
-			compressedFormat_ = CF_PVRTC_RGBA_4BPP;
-			components_ = 4;
-			break;
-			
-		case 6:
-			compressedFormat_ = CF_ETC1;
-			components_ = 3;
-			break;
-			
-		case 7:
-			compressedFormat_ = CF_DXT1;
-			components_ = 4;
-			break;
-			
-		case 9:
-			compressedFormat_ = CF_DXT3;
-			components_ = 4;
-			break;
-			
-		case 11:
-			compressedFormat_ = CF_DXT5;
-			components_ = 4;
-			break;
-		}
-		
-		if (compressedFormat_ == CF_NONE)
-		{
-			LOGERROR("Unsupported texture format in PVR file");
-			return false;
-		}
-		
-		source.Seek(source.GetPosition() + metaDataSize);
-		unsigned dataSize = source.GetSize() - source.GetPosition();
-		
-		data_ = new unsigned char[dataSize];
-		width_ = width;
-		height_ = height;
-		numCompressedLevels_ = mipmapCount;
-		
-		source.Read(data_.Get(), dataSize);
-		SetMemoryUse(dataSize);
-	}
-	else
-	{
-		// Not DDS, KTX or PVR, use STBImage to load other image formats as uncompressed
-		source.Seek(0);
-		int width, height;
-		unsigned components;
-		unsigned char* pixelData = GetImageData(source, width, height, components);
-		if (!pixelData)
-		{
-			LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
-			return false;
-		}
-		SetSize(width, height, components);
-		SetData(pixelData);
-		FreeImageData(pixelData);
-	}
-	
-	return true;
+    // Check for DDS, KTX or PVR compressed format
+    String fileID = source.ReadFileID();
+    
+    if (fileID == "DDS ")
+    {
+        // DDS compressed format
+        DDSurfaceDesc2 ddsd;
+        source.Read(&ddsd, sizeof(ddsd));
+        
+        switch (ddsd.ddpfPixelFormat_.dwFourCC_)
+        {
+        case FOURCC_DXT1:
+            compressedFormat_ = CF_DXT1;
+            components_ = 3;
+            break;
+            
+        case FOURCC_DXT3:
+            compressedFormat_ = CF_DXT3;
+            components_ = 4;
+            break;
+            
+        case FOURCC_DXT5:
+            compressedFormat_ = CF_DXT5;
+            components_ = 4;
+            break;
+            
+        default:
+            LOGERROR("Unsupported DDS format");
+            return false;
+        }
+        
+        unsigned dataSize = source.GetSize() - source.GetPosition();
+        data_ = new unsigned char[dataSize];
+        width_ = ddsd.dwWidth_;
+        height_ = ddsd.dwHeight_;
+        depth_ = ddsd.dwDepth_;
+        numCompressedLevels_ = ddsd.dwMipMapCount_;
+        if (!numCompressedLevels_)
+            numCompressedLevels_ = 1;
+        SetMemoryUse(dataSize);
+        source.Read(data_.Get(), dataSize);
+    }
+    else if (fileID == "\253KTX")
+    {
+        source.Seek(12);
+        
+        unsigned endianness = source.ReadUInt();
+        unsigned type = source.ReadUInt();
+        /* unsigned typeSize = */ source.ReadUInt();
+        unsigned format = source.ReadUInt();
+        unsigned internalFormat = source.ReadUInt();
+        /* unsigned baseInternalFormat = */ source.ReadUInt();
+        unsigned width = source.ReadUInt();
+        unsigned height = source.ReadUInt();
+        unsigned depth = source.ReadUInt();
+        /* unsigned arrayElements = */ source.ReadUInt();
+        unsigned faces = source.ReadUInt();
+        unsigned mipmaps = source.ReadUInt();
+        unsigned keyValueBytes = source.ReadUInt();
+        
+        if (endianness != 0x04030201)
+        {
+            LOGERROR("Big-endian KTX files not supported");
+            return false;
+        }
+        
+        if (type != 0 || format != 0)
+        {
+            LOGERROR("Uncompressed KTX files not supported");
+            return false;
+        }
+        
+        if (faces > 1 || depth > 1)
+        {
+            LOGERROR("3D or cube KTX files not supported");
+            return false;
+        }
+        
+        if (mipmaps == 0)
+        {
+            LOGERROR("KTX files without explicitly specified mipmap count not supported");
+            return false;
+        }
+        
+        compressedFormat_ = CF_NONE;
+        switch (internalFormat)
+        {
+        case 0x83f1:
+            compressedFormat_ = CF_DXT1;
+            components_ = 4;
+            break;
+            
+        case 0x83f2:
+            compressedFormat_ = CF_DXT3;
+            components_ = 4;
+            break;
+            
+        case 0x83f3:
+            compressedFormat_ = CF_DXT5;
+            components_ = 4;
+            break;
+            
+        case 0x8d64:
+            compressedFormat_ = CF_ETC1;
+            components_ = 3;
+            break;
+            
+        case 0x8c00:
+            compressedFormat_ = CF_PVRTC_RGB_4BPP;
+            components_ = 3;
+            break;
+            
+        case 0x8c01:
+            compressedFormat_ = CF_PVRTC_RGB_2BPP;
+            components_ = 3;
+            break;
+            
+        case 0x8c02:
+            compressedFormat_ = CF_PVRTC_RGBA_4BPP;
+            components_ = 4;
+            break;
+            
+        case 0x8c03:
+            compressedFormat_ = CF_PVRTC_RGBA_2BPP;
+            components_ = 4;
+            break;
+        }
+        
+        if (compressedFormat_ == CF_NONE)
+        {
+            LOGERROR("Unsupported texture format in KTX file");
+            return false;
+        }
+        
+        source.Seek(source.GetPosition() + keyValueBytes);
+        unsigned dataSize = source.GetSize() - source.GetPosition() - mipmaps * sizeof(unsigned);
+        
+        data_ = new unsigned char[dataSize];
+        width_ = width;
+        height_ = height;
+        numCompressedLevels_ = mipmaps;
+        
+        unsigned dataOffset = 0;
+        for (unsigned i = 0; i < mipmaps; ++i)
+        {
+            unsigned levelSize = source.ReadUInt();
+            if (levelSize + dataOffset > dataSize)
+            {
+                LOGERROR("KTX mipmap level data size exceeds file size");
+                return false;
+            }
+            
+            source.Read(&data_[dataOffset], levelSize);
+            dataOffset += levelSize;
+            if (source.GetPosition() & 3)
+                source.Seek((source.GetPosition() + 3) & 0xfffffffc);
+        }
+        
+        SetMemoryUse(dataSize);
+    }
+    else if (fileID == "PVR\3")
+    {
+        /* unsigned flags = */ source.ReadUInt();
+        unsigned pixelFormatLo = source.ReadUInt();
+        /* unsigned pixelFormatHi = */ source.ReadUInt();
+        /* unsigned colourSpace = */ source.ReadUInt();
+        /* unsigned channelType = */ source.ReadUInt();
+        unsigned height = source.ReadUInt();
+        unsigned width = source.ReadUInt();
+        unsigned depth = source.ReadUInt();
+        /* unsigned numSurfaces = */ source.ReadUInt();
+        unsigned numFaces = source.ReadUInt();
+        unsigned mipmapCount = source.ReadUInt();
+        unsigned metaDataSize = source.ReadUInt();
+        
+        if (depth > 1 || numFaces > 1)
+        {
+            LOGERROR("3D or cube PVR files not supported");
+            return false;
+        }
+        
+        if (mipmapCount == 0)
+        {
+            LOGERROR("PVR files without explicitly specified mipmap count not supported");
+            return false;
+        }
+        
+        compressedFormat_ = CF_NONE;
+        switch (pixelFormatLo)
+        {
+        case 0:
+            compressedFormat_ = CF_PVRTC_RGB_2BPP;
+            components_ = 3;
+            break;
+            
+        case 1:
+            compressedFormat_ = CF_PVRTC_RGBA_2BPP;
+            components_ = 4;
+            break;
+            
+        case 2:
+            compressedFormat_ = CF_PVRTC_RGB_4BPP;
+            components_ = 3;
+            break;
+            
+        case 3:
+            compressedFormat_ = CF_PVRTC_RGBA_4BPP;
+            components_ = 4;
+            break;
+            
+        case 6:
+            compressedFormat_ = CF_ETC1;
+            components_ = 3;
+            break;
+            
+        case 7:
+            compressedFormat_ = CF_DXT1;
+            components_ = 4;
+            break;
+            
+        case 9:
+            compressedFormat_ = CF_DXT3;
+            components_ = 4;
+            break;
+            
+        case 11:
+            compressedFormat_ = CF_DXT5;
+            components_ = 4;
+            break;
+        }
+        
+        if (compressedFormat_ == CF_NONE)
+        {
+            LOGERROR("Unsupported texture format in PVR file");
+            return false;
+        }
+        
+        source.Seek(source.GetPosition() + metaDataSize);
+        unsigned dataSize = source.GetSize() - source.GetPosition();
+        
+        data_ = new unsigned char[dataSize];
+        width_ = width;
+        height_ = height;
+        numCompressedLevels_ = mipmapCount;
+        
+        source.Read(data_.Get(), dataSize);
+        SetMemoryUse(dataSize);
+    }
+    else
+    {
+        // Not DDS, KTX or PVR, use STBImage to load other image formats as uncompressed
+        source.Seek(0);
+        int width, height;
+        unsigned components;
+        unsigned char* pixelData = GetImageData(source, width, height, components);
+        if (!pixelData)
+        {
+            LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
+            return false;
+        }
+        SetSize(width, height, components);
+        SetData(pixelData);
+        FreeImageData(pixelData);
+    }
+    
+    return true;
 }
 
 void Image::SetSize(int width, int height, unsigned components)
 {
-	SetSize(width, height, 1, components);
+    SetSize(width, height, 1, components);
 }
 
 void Image::SetSize(int width, int height, int depth, unsigned components)
 {
-	if (width == width_ && height == height_ && depth == depth_ && components == components_)
-		return;
-	
-	if (width <= 0 || height <= 0 || depth <= 0)
-		return;
-	
-	data_ = new unsigned char[width * height * depth * components];
-	width_ = width;
-	height_ = height;
-	depth_ = depth;
-	components_ = components;
-	compressedFormat_ = CF_NONE;
-	numCompressedLevels_ = 0;
-	
-	SetMemoryUse(width * height * depth * components);
+    if (width == width_ && height == height_ && depth == depth_ && components == components_)
+        return;
+    
+    if (width <= 0 || height <= 0 || depth <= 0)
+        return;
+    
+    data_ = new unsigned char[width * height * depth * components];
+    width_ = width;
+    height_ = height;
+    depth_ = depth;
+    components_ = components;
+    compressedFormat_ = CF_NONE;
+    numCompressedLevels_ = 0;
+    
+    SetMemoryUse(width * height * depth * components);
 }
 
 void Image::SetData(const unsigned char* pixelData)
 {
-	memcpy(data_.Get(), pixelData, width_ * height_ * depth_ * components_);
+    memcpy(data_.Get(), pixelData, width_ * height_ * depth_ * components_);
 }
 
 bool Image::LoadColorLUT(Deserializer& source)
 {
-	String fileID = source.ReadFileID();
-	
-	if (fileID == "DDS " || fileID == "\253KTX" || fileID == "PVR\3")
-	{
-		LOGERROR("Invalid image format, can not load image");
-		return false;
-	}
+    String fileID = source.ReadFileID();
+    
+    if (fileID == "DDS " || fileID == "\253KTX" || fileID == "PVR\3")
+    {
+        LOGERROR("Invalid image format, can not load image");
+        return false;
+    }
 
-	source.Seek(0);
-	int width, height;
-	unsigned components;
-	unsigned char* pixelDataIn = GetImageData(source, width, height, components);
-	if (!pixelDataIn)
-	{
-		LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
-		return false;
-	}
-	if (components != 3)
-	{
-		LOGERROR("Invalid image format, can not load image");
-		return false;
-	}
+    source.Seek(0);
+    int width, height;
+    unsigned components;
+    unsigned char* pixelDataIn = GetImageData(source, width, height, components);
+    if (!pixelDataIn)
+    {
+        LOGERROR("Could not load image " + source.GetName() + ": " + String(stbi_failure_reason()));
+        return false;
+    }
+    if (components != 3)
+    {
+        LOGERROR("Invalid image format, can not load image");
+        return false;
+    }
 
-	SetSize(COLOR_LUT_SIZE, COLOR_LUT_SIZE, COLOR_LUT_SIZE, components);
-	SetMemoryUse(width_ * height_ * depth_ * components);
+    SetSize(COLOR_LUT_SIZE, COLOR_LUT_SIZE, COLOR_LUT_SIZE, components);
+    SetMemoryUse(width_ * height_ * depth_ * components);
 
-	unsigned char* pixelDataOut = GetData();
+    unsigned char* pixelDataOut = GetData();
 
-	for (int z = 0; z < depth_; ++z)
-	{
-		for (int y = 0; y < height_; ++y)
-		{
-			unsigned char* in = &pixelDataIn[z*width_*3 + y*width*3];
-			unsigned char* out = &pixelDataOut[z*width_*height_*3 + y*width_*3];
+    for (int z = 0; z < depth_; ++z)
+    {
+        for (int y = 0; y < height_; ++y)
+        {
+            unsigned char* in = &pixelDataIn[z*width_*3 + y*width*3];
+            unsigned char* out = &pixelDataOut[z*width_*height_*3 + y*width_*3];
 
-			for (int x = 0; x < width_*3; x += 3)
-			{
-				out[x] = in[x];
-				out[x+1] = in[x+1];
-				out[x+2] = in[x+2];
-			}
-		}
-	}
+            for (int x = 0; x < width_*3; x += 3)
+            {
+                out[x] = in[x];
+                out[x+1] = in[x+1];
+                out[x+2] = in[x+2];
+            }
+        }
+    }
 
-	FreeImageData(pixelDataIn);
+    FreeImageData(pixelDataIn);
 
-	return true;
+    return true;
 }
 
 void Image::FlipVertical()
 {
-	if (!data_)
-		return;
-	
-	if (IsCompressed())
-	{
-		LOGERROR("Can not flip a compressed image");
-		return;
-	}
-	
-	SharedArrayPtr<unsigned char> newData(new unsigned char[width_ * height_ * components_]);
-	unsigned rowSize = width_ * components_;
-	
-	for (int y = 0; y < height_; ++y)
-		memcpy(&newData[(height_ - y - 1) * rowSize], &data_[y * rowSize], rowSize);
-	
-	data_ = newData;
+    if (!data_)
+        return;
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not flip a compressed image");
+        return;
+    }
+    
+    SharedArrayPtr<unsigned char> newData(new unsigned char[width_ * height_ * components_]);
+    unsigned rowSize = width_ * components_;
+    
+    for (int y = 0; y < height_; ++y)
+        memcpy(&newData[(height_ - y - 1) * rowSize], &data_[y * rowSize], rowSize);
+    
+    data_ = newData;
 }
 
 bool Image::SaveBMP(const String& fileName)
 {
-	FileSystem* fileSystem = GetSubsystem<FileSystem>();
-	if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
-	{
-		LOGERROR("Access denied to " + fileName);
-		return false;
-	}
-	
-	if (IsCompressed())
-	{
-		LOGERROR("Can not save compressed image to BMP");
-		return false;
-	}
-	
-	if (data_)
-		return stbi_write_bmp(fileName.CString(), width_, height_, components_, data_.Get()) != 0;
-	else
-		return false;
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image to BMP");
+        return false;
+    }
+    
+    if (data_)
+        return stbi_write_bmp(fileName.CString(), width_, height_, components_, data_.Get()) != 0;
+    else
+        return false;
 }
 
 bool Image::SavePNG(const String& fileName)
 {
-	FileSystem* fileSystem = GetSubsystem<FileSystem>();
-	if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
-	{
-		LOGERROR("Access denied to " + fileName);
-		return false;
-	}
-	
-	if (IsCompressed())
-	{
-		LOGERROR("Can not save compressed image to PNG");
-		return false;
-	}
-	
-	if (data_)
-		return stbi_write_png(fileName.CString(), width_, height_, components_, data_.Get(), 0) != 0;
-	else
-		return false;
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image to PNG");
+        return false;
+    }
+    
+    if (data_)
+        return stbi_write_png(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get(), 0) != 0;
+    else
+        return false;
 }
 
 bool Image::SaveTGA(const String& fileName)
 {
-	FileSystem* fileSystem = GetSubsystem<FileSystem>();
-	if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
-	{
-		LOGERROR("Access denied to " + fileName);
-		return false;
-	}
-	
-	if (IsCompressed())
-	{
-		LOGERROR("Can not save compressed image to TGA");
-		return false;
-	}
-	
-	if (data_)
-		return stbi_write_tga(fileName.CString(), width_, height_, components_, data_.Get()) != 0;
-	else
-		return false;
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image to TGA");
+        return false;
+    }
+    
+    if (data_)
+        return stbi_write_tga(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get()) != 0;
+    else
+        return false;
 }
 
 bool Image::SaveJPG(const String & fileName, int quality)
 {
-	FileSystem* fileSystem = GetSubsystem<FileSystem>();
-	if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
-	{
-		LOGERROR("Access denied to " + fileName);
-		return false;
-	}
-	
-	if (IsCompressed())
-	{
-		LOGERROR("Can not save compressed image to JPG");
-		return false;
-	}
-	
-	if (data_)
-		return jo_write_jpg(fileName.CString(), data_.Get(), width_, height_, components_, quality) != 0;
-	else
-		return false;
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+    
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image to JPG");
+        return false;
+    }
+    
+    if (data_)
+        return jo_write_jpg(GetNativePath(fileName).CString(), data_.Get(), width_, height_, components_, quality) != 0;
+    else
+        return false;
 }
 
 unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height, unsigned& components)
 {
-	unsigned dataSize = source.GetSize();
-	
-	SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
-	source.Read(buffer.Get(), dataSize);
-	return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, (int *)&components, 0);
+    unsigned dataSize = source.GetSize();
+    
+    SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
+    source.Read(buffer.Get(), dataSize);
+    return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, (int *)&components, 0);
 }
 
 void Image::FreeImageData(unsigned char* pixelData)
 {
-	if (!pixelData)
-		return;
-	
-	stbi_image_free(pixelData);
+    if (!pixelData)
+        return;
+    
+    stbi_image_free(pixelData);
 }
 
 SharedPtr<Image> Image::GetNextLevel() const
 {
-	if (IsCompressed())
-	{
-		LOGERROR("Can not generate mip level from compressed data");
-		return SharedPtr<Image>();
-	}
-	if (components_ < 1 || components_ > 4)
-	{
-		LOGERROR("Illegal number of image components for mip level generation");
-		return SharedPtr<Image>();
-	}
-	
-	int widthOut = width_ / 2;
-	int heightOut = height_ / 2;
-	int depthOut = depth_ / 2;
-	
-	if (widthOut < 1)
-		widthOut = 1;
-	if (heightOut < 1)
-		heightOut = 1;
-	if (depthOut < 1)
-		depthOut = 1;
-	
-	SharedPtr<Image> mipImage(new Image(context_));
+    if (IsCompressed())
+    {
+        LOGERROR("Can not generate mip level from compressed data");
+        return SharedPtr<Image>();
+    }
+    if (components_ < 1 || components_ > 4)
+    {
+        LOGERROR("Illegal number of image components for mip level generation");
+        return SharedPtr<Image>();
+    }
+    
+    int widthOut = width_ / 2;
+    int heightOut = height_ / 2;
+    int depthOut = depth_ / 2;
+    
+    if (widthOut < 1)
+        widthOut = 1;
+    if (heightOut < 1)
+        heightOut = 1;
+    if (depthOut < 1)
+        depthOut = 1;
+    
+    SharedPtr<Image> mipImage(new Image(context_));
 
-	if (depth_ > 1)
-		mipImage->SetSize(widthOut, heightOut, depthOut, components_);
-	else
-		mipImage->SetSize(widthOut, heightOut, components_);
-	
-	const unsigned char* pixelDataIn = data_.Get();
-	unsigned char* pixelDataOut = mipImage->data_.Get();
-	
-	// 1D case
-	if (depth_ == 1 && (height_ == 1 || width_ == 1))
-	{
-		// Loop using the larger dimension
-		if (widthOut < heightOut) 
-			widthOut = heightOut;
-		
-		switch (components_)
-		{
-		case 1:
-			for (int x = 0; x < widthOut; ++x)
-				pixelDataOut[x] = ((unsigned)pixelDataIn[x*2] + pixelDataIn[x*2+1]) >> 1;
-			break;
-			
-		case 2:
-			for (int x = 0; x < widthOut*2; x += 2)
-			{
-				pixelDataOut[x] = ((unsigned)pixelDataIn[x*2] + pixelDataIn[x*2+2]) >> 1;
-				pixelDataOut[x+1] = ((unsigned)pixelDataIn[x*2+1] + pixelDataIn[x*2+3]) >> 1;
-			}
-			break;
-			
-		case 3:
-			for (int x = 0; x < widthOut*3; x += 3)
-			{
-				pixelDataOut[x] = ((unsigned)pixelDataIn[x*2] + pixelDataIn[x*2+3]) >> 1;
-				pixelDataOut[x+1] = ((unsigned)pixelDataIn[x*2+1] + pixelDataIn[x*2+4]) >> 1;
-				pixelDataOut[x+2] = ((unsigned)pixelDataIn[x*2+2] + pixelDataIn[x*2+5]) >> 1;
-			}
-			break;
-			
-		case 4:
-			for (int x = 0; x < widthOut*4; x += 4)
-			{
-				pixelDataOut[x] = ((unsigned)pixelDataIn[x*2] + pixelDataIn[x*2+4]) >> 1;
-				pixelDataOut[x+1] = ((unsigned)pixelDataIn[x*2+1] + pixelDataIn[x*2+5]) >> 1;
-				pixelDataOut[x+2] = ((unsigned)pixelDataIn[x*2+2] + pixelDataIn[x*2+6]) >> 1;
-				pixelDataOut[x+3] = ((unsigned)pixelDataIn[x*2+3] + pixelDataIn[x*2+7]) >> 1;
-			}
-			break;
-		}
-	}
-	// 2D case
-	else if (depth_ == 1)
-	{
-		switch (components_)
-		{
-		case 1:
-			for (int y = 0; y < heightOut; ++y)
-			{
-				const unsigned char* inUpper = &pixelDataIn[(y*2)*width_];
-				const unsigned char* inLower = &pixelDataIn[(y*2+1)*width_];
-				unsigned char* out = &pixelDataOut[y*widthOut];
-				
-				for (int x = 0; x < widthOut; ++x)
-				{
-					out[x] = ((unsigned)inUpper[x*2] + inUpper[x*2+1] + inLower[x*2] + inLower[x*2+1]) >> 2;
-				}
-			}
-			break;
-			
-		case 2:
-			for (int y = 0; y < heightOut; ++y)
-			{
-				const unsigned char* inUpper = &pixelDataIn[(y*2)*width_*2];
-				const unsigned char* inLower = &pixelDataIn[(y*2+1)*width_*2];
-				unsigned char* out = &pixelDataOut[y*widthOut*2];
-				
-				for (int x = 0; x < widthOut*2; x += 2)
-				{
-					out[x] = ((unsigned)inUpper[x*2] + inUpper[x*2+2] + inLower[x*2] + inLower[x*2+2]) >> 2;
-					out[x+1] = ((unsigned)inUpper[x*2+1] + inUpper[x*2+3] + inLower[x*2+1] + inLower[x*2+3]) >> 2;
-				}
-			}
-			break;
-			
-		case 3:
-			for (int y = 0; y < heightOut; ++y)
-			{
-				const unsigned char* inUpper = &pixelDataIn[(y*2)*width_*3];
-				const unsigned char* inLower = &pixelDataIn[(y*2+1)*width_*3];
-				unsigned char* out = &pixelDataOut[y*widthOut*3];
-				
-				for (int x = 0; x < widthOut*3; x += 3)
-				{
-					out[x] = ((unsigned)inUpper[x*2] + inUpper[x*2+3] + inLower[x*2] + inLower[x*2+3]) >> 2;
-					out[x+1] = ((unsigned)inUpper[x*2+1] + inUpper[x*2+4] + inLower[x*2+1] + inLower[x*2+4]) >> 2;
-					out[x+2] = ((unsigned)inUpper[x*2+2] + inUpper[x*2+5] + inLower[x*2+2] + inLower[x*2+5]) >> 2;
-				}
-			}
-			break;
-			
-		case 4:
-			for (int y = 0; y < heightOut; ++y)
-			{
-				const unsigned char* inUpper = &pixelDataIn[(y*2)*width_*4];
-				const unsigned char* inLower = &pixelDataIn[(y*2+1)*width_*4];
-				unsigned char* out = &pixelDataOut[y*widthOut*4];
-				
-				for (int x = 0; x < widthOut*4; x += 4)
-				{
-					out[x] = ((unsigned)inUpper[x*2] + inUpper[x*2+4] + inLower[x*2] + inLower[x*2+4]) >> 2;
-					out[x+1] = ((unsigned)inUpper[x*2+1] + inUpper[x*2+5] + inLower[x*2+1] + inLower[x*2+5]) >> 2;
-					out[x+2] = ((unsigned)inUpper[x*2+2] + inUpper[x*2+6] + inLower[x*2+2] + inLower[x*2+6]) >> 2;
-					out[x+3] = ((unsigned)inUpper[x*2+3] + inUpper[x*2+7] + inLower[x*2+3] + inLower[x*2+7]) >> 2;
-				}
-			}
-			break;
-		}
-	}
-	// 3D case
-	else
-	{
-		switch (components_)
-		{
-		case 1:
-			for (int z = 0; z < depthOut; ++z)
-			{
-				const unsigned char* inOuter = &pixelDataIn[(z*2)*width_*height_];
-				const unsigned char* inInner = &pixelDataIn[(z*2+1)*width_*height_];
+    if (depth_ > 1)
+        mipImage->SetSize(widthOut, heightOut, depthOut, components_);
+    else
+        mipImage->SetSize(widthOut, heightOut, components_);
+    
+    const unsigned char* pixelDataIn = data_.Get();
+    unsigned char* pixelDataOut = mipImage->data_.Get();
+    
+    // 1D case
+    if (depth_ == 1 && (height_ == 1 || width_ == 1))
+    {
+        // Loop using the larger dimension
+        if (widthOut < heightOut) 
+            widthOut = heightOut;
+        
+        switch (components_)
+        {
+        case 1:
+            for (int x = 0; x < widthOut; ++x)
+                pixelDataOut[x] = ((unsigned)pixelDataIn[x*2] + pixelDataIn[x*2+1]) >> 1;
+            break;
+            
+        case 2:
+            for (int x = 0; x < widthOut*2; x += 2)
+            {
+                pixelDataOut[x] = ((unsigned)pixelDataIn[x*2] + pixelDataIn[x*2+2]) >> 1;
+                pixelDataOut[x+1] = ((unsigned)pixelDataIn[x*2+1] + pixelDataIn[x*2+3]) >> 1;
+            }
+            break;
+            
+        case 3:
+            for (int x = 0; x < widthOut*3; x += 3)
+            {
+                pixelDataOut[x] = ((unsigned)pixelDataIn[x*2] + pixelDataIn[x*2+3]) >> 1;
+                pixelDataOut[x+1] = ((unsigned)pixelDataIn[x*2+1] + pixelDataIn[x*2+4]) >> 1;
+                pixelDataOut[x+2] = ((unsigned)pixelDataIn[x*2+2] + pixelDataIn[x*2+5]) >> 1;
+            }
+            break;
+            
+        case 4:
+            for (int x = 0; x < widthOut*4; x += 4)
+            {
+                pixelDataOut[x] = ((unsigned)pixelDataIn[x*2] + pixelDataIn[x*2+4]) >> 1;
+                pixelDataOut[x+1] = ((unsigned)pixelDataIn[x*2+1] + pixelDataIn[x*2+5]) >> 1;
+                pixelDataOut[x+2] = ((unsigned)pixelDataIn[x*2+2] + pixelDataIn[x*2+6]) >> 1;
+                pixelDataOut[x+3] = ((unsigned)pixelDataIn[x*2+3] + pixelDataIn[x*2+7]) >> 1;
+            }
+            break;
+        }
+    }
+    // 2D case
+    else if (depth_ == 1)
+    {
+        switch (components_)
+        {
+        case 1:
+            for (int y = 0; y < heightOut; ++y)
+            {
+                const unsigned char* inUpper = &pixelDataIn[(y*2)*width_];
+                const unsigned char* inLower = &pixelDataIn[(y*2+1)*width_];
+                unsigned char* out = &pixelDataOut[y*widthOut];
+                
+                for (int x = 0; x < widthOut; ++x)
+                {
+                    out[x] = ((unsigned)inUpper[x*2] + inUpper[x*2+1] + inLower[x*2] + inLower[x*2+1]) >> 2;
+                }
+            }
+            break;
+            
+        case 2:
+            for (int y = 0; y < heightOut; ++y)
+            {
+                const unsigned char* inUpper = &pixelDataIn[(y*2)*width_*2];
+                const unsigned char* inLower = &pixelDataIn[(y*2+1)*width_*2];
+                unsigned char* out = &pixelDataOut[y*widthOut*2];
+                
+                for (int x = 0; x < widthOut*2; x += 2)
+                {
+                    out[x] = ((unsigned)inUpper[x*2] + inUpper[x*2+2] + inLower[x*2] + inLower[x*2+2]) >> 2;
+                    out[x+1] = ((unsigned)inUpper[x*2+1] + inUpper[x*2+3] + inLower[x*2+1] + inLower[x*2+3]) >> 2;
+                }
+            }
+            break;
+            
+        case 3:
+            for (int y = 0; y < heightOut; ++y)
+            {
+                const unsigned char* inUpper = &pixelDataIn[(y*2)*width_*3];
+                const unsigned char* inLower = &pixelDataIn[(y*2+1)*width_*3];
+                unsigned char* out = &pixelDataOut[y*widthOut*3];
+                
+                for (int x = 0; x < widthOut*3; x += 3)
+                {
+                    out[x] = ((unsigned)inUpper[x*2] + inUpper[x*2+3] + inLower[x*2] + inLower[x*2+3]) >> 2;
+                    out[x+1] = ((unsigned)inUpper[x*2+1] + inUpper[x*2+4] + inLower[x*2+1] + inLower[x*2+4]) >> 2;
+                    out[x+2] = ((unsigned)inUpper[x*2+2] + inUpper[x*2+5] + inLower[x*2+2] + inLower[x*2+5]) >> 2;
+                }
+            }
+            break;
+            
+        case 4:
+            for (int y = 0; y < heightOut; ++y)
+            {
+                const unsigned char* inUpper = &pixelDataIn[(y*2)*width_*4];
+                const unsigned char* inLower = &pixelDataIn[(y*2+1)*width_*4];
+                unsigned char* out = &pixelDataOut[y*widthOut*4];
+                
+                for (int x = 0; x < widthOut*4; x += 4)
+                {
+                    out[x] = ((unsigned)inUpper[x*2] + inUpper[x*2+4] + inLower[x*2] + inLower[x*2+4]) >> 2;
+                    out[x+1] = ((unsigned)inUpper[x*2+1] + inUpper[x*2+5] + inLower[x*2+1] + inLower[x*2+5]) >> 2;
+                    out[x+2] = ((unsigned)inUpper[x*2+2] + inUpper[x*2+6] + inLower[x*2+2] + inLower[x*2+6]) >> 2;
+                    out[x+3] = ((unsigned)inUpper[x*2+3] + inUpper[x*2+7] + inLower[x*2+3] + inLower[x*2+7]) >> 2;
+                }
+            }
+            break;
+        }
+    }
+    // 3D case
+    else
+    {
+        switch (components_)
+        {
+        case 1:
+            for (int z = 0; z < depthOut; ++z)
+            {
+                const unsigned char* inOuter = &pixelDataIn[(z*2)*width_*height_];
+                const unsigned char* inInner = &pixelDataIn[(z*2+1)*width_*height_];
 
-				for (int y = 0; y < heightOut; ++y)
-				{
-					const unsigned char* inOuterUpper = &inOuter[(y*2)*width_];
-					const unsigned char* inOuterLower = &inOuter[(y*2+1)*width_];
-					const unsigned char* inInnerUpper = &inInner[(y*2)*width_];
-					const unsigned char* inInnerLower = &inInner[(y*2+1)*width_];
-					unsigned char* out = &pixelDataOut[z*widthOut*heightOut + y*widthOut];
-					
-					for (int x = 0; x < widthOut; ++x)
-					{
-						out[x] = ((unsigned)inOuterUpper[x*2] + inOuterUpper[x*2+1] + inOuterLower[x*2] + inOuterLower[x*2+1] + 
-							inInnerUpper[x*2] + inInnerUpper[x*2+1] + inInnerLower[x*2] + inInnerLower[x*2+1]) >> 3;
-					}
-				}
-			}
-			break;
-			
-		case 2:
-			for (int z = 0; z < depthOut; ++z)
-			{
-				const unsigned char* inOuter = &pixelDataIn[(z*2)*width_*height_*2];
-				const unsigned char* inInner = &pixelDataIn[(z*2+1)*width_*height_*2];
+                for (int y = 0; y < heightOut; ++y)
+                {
+                    const unsigned char* inOuterUpper = &inOuter[(y*2)*width_];
+                    const unsigned char* inOuterLower = &inOuter[(y*2+1)*width_];
+                    const unsigned char* inInnerUpper = &inInner[(y*2)*width_];
+                    const unsigned char* inInnerLower = &inInner[(y*2+1)*width_];
+                    unsigned char* out = &pixelDataOut[z*widthOut*heightOut + y*widthOut];
+                    
+                    for (int x = 0; x < widthOut; ++x)
+                    {
+                        out[x] = ((unsigned)inOuterUpper[x*2] + inOuterUpper[x*2+1] + inOuterLower[x*2] + inOuterLower[x*2+1] + 
+                            inInnerUpper[x*2] + inInnerUpper[x*2+1] + inInnerLower[x*2] + inInnerLower[x*2+1]) >> 3;
+                    }
+                }
+            }
+            break;
+            
+        case 2:
+            for (int z = 0; z < depthOut; ++z)
+            {
+                const unsigned char* inOuter = &pixelDataIn[(z*2)*width_*height_*2];
+                const unsigned char* inInner = &pixelDataIn[(z*2+1)*width_*height_*2];
 
-				for (int y = 0; y < heightOut; ++y)
-				{
-					const unsigned char* inOuterUpper = &inOuter[(y*2)*width_*2];
-					const unsigned char* inOuterLower = &inOuter[(y*2+1)*width_*2];
-					const unsigned char* inInnerUpper = &inInner[(y*2)*width_*2];
-					const unsigned char* inInnerLower = &inInner[(y*2+1)*width_*2];
-					unsigned char* out = &pixelDataOut[z*widthOut*heightOut*2 + y*widthOut*2];
-					
-					for (int x = 0; x < widthOut*2; x += 2)
-					{
-						out[x] = ((unsigned)inOuterUpper[x*2] + inOuterUpper[x*2+2] + inOuterLower[x*2] + inOuterLower[x*2+2] + 
-							inInnerUpper[x*2] + inInnerUpper[x*2+2] + inInnerLower[x*2] + inInnerLower[x*2+2]) >> 3;
-						out[x+1] = ((unsigned)inOuterUpper[x*2+1] + inOuterUpper[x*2+3] + inOuterLower[x*2+1] + inOuterLower[x*2+3] + 
-							inInnerUpper[x*2+1] + inInnerUpper[x*2+3] + inInnerLower[x*2+1] + inInnerLower[x*2+3]) >> 3;
-					}
-				}
-			}
-			break;
-			
-		case 3:
-			for (int z = 0; z < depthOut; ++z)
-			{
-				const unsigned char* inOuter = &pixelDataIn[(z*2)*width_*height_*3];
-				const unsigned char* inInner = &pixelDataIn[(z*2+1)*width_*height_*3];
+                for (int y = 0; y < heightOut; ++y)
+                {
+                    const unsigned char* inOuterUpper = &inOuter[(y*2)*width_*2];
+                    const unsigned char* inOuterLower = &inOuter[(y*2+1)*width_*2];
+                    const unsigned char* inInnerUpper = &inInner[(y*2)*width_*2];
+                    const unsigned char* inInnerLower = &inInner[(y*2+1)*width_*2];
+                    unsigned char* out = &pixelDataOut[z*widthOut*heightOut*2 + y*widthOut*2];
+                    
+                    for (int x = 0; x < widthOut*2; x += 2)
+                    {
+                        out[x] = ((unsigned)inOuterUpper[x*2] + inOuterUpper[x*2+2] + inOuterLower[x*2] + inOuterLower[x*2+2] + 
+                            inInnerUpper[x*2] + inInnerUpper[x*2+2] + inInnerLower[x*2] + inInnerLower[x*2+2]) >> 3;
+                        out[x+1] = ((unsigned)inOuterUpper[x*2+1] + inOuterUpper[x*2+3] + inOuterLower[x*2+1] + inOuterLower[x*2+3] + 
+                            inInnerUpper[x*2+1] + inInnerUpper[x*2+3] + inInnerLower[x*2+1] + inInnerLower[x*2+3]) >> 3;
+                    }
+                }
+            }
+            break;
+            
+        case 3:
+            for (int z = 0; z < depthOut; ++z)
+            {
+                const unsigned char* inOuter = &pixelDataIn[(z*2)*width_*height_*3];
+                const unsigned char* inInner = &pixelDataIn[(z*2+1)*width_*height_*3];
 
-				for (int y = 0; y < heightOut; ++y)
-				{
-					const unsigned char* inOuterUpper = &inOuter[(y*2)*width_*3];
-					const unsigned char* inOuterLower = &inOuter[(y*2+1)*width_*3];
-					const unsigned char* inInnerUpper = &inInner[(y*2)*width_*3];
-					const unsigned char* inInnerLower = &inInner[(y*2+1)*width_*3];
-					unsigned char* out = &pixelDataOut[z*widthOut*heightOut*3 + y*widthOut*3];
-					
-					for (int x = 0; x < widthOut*3; x += 3)
-					{
-						out[x] = ((unsigned)inOuterUpper[x*2] + inOuterUpper[x*2+3] + inOuterLower[x*2] + inOuterLower[x*2+3] + 
-							inInnerUpper[x*2] + inInnerUpper[x*2+3] + inInnerLower[x*2] + inInnerLower[x*2+3]) >> 3;
-						out[x+1] = ((unsigned)inOuterUpper[x*2+1] + inOuterUpper[x*2+4] + inOuterLower[x*2+1] + inOuterLower[x*2+4] + 
-							inInnerUpper[x*2+1] + inInnerUpper[x*2+4] + inInnerLower[x*2+1] + inInnerLower[x*2+4]) >> 3;
-						out[x+2] = ((unsigned)inOuterUpper[x*2+2] + inOuterUpper[x*2+5] + inOuterLower[x*2+2] + inOuterLower[x*2+5] + 
-							inInnerUpper[x*2+2] + inInnerUpper[x*2+5] + inInnerLower[x*2+2] + inInnerLower[x*2+5]) >> 3;
-					}
-				}
-			}
-			break;
-			
-		case 4:
-			for (int z = 0; z < depthOut; ++z)
-			{
-				const unsigned char* inOuter = &pixelDataIn[(z*2)*width_*height_*4];
-				const unsigned char* inInner = &pixelDataIn[(z*2+1)*width_*height_*4];
+                for (int y = 0; y < heightOut; ++y)
+                {
+                    const unsigned char* inOuterUpper = &inOuter[(y*2)*width_*3];
+                    const unsigned char* inOuterLower = &inOuter[(y*2+1)*width_*3];
+                    const unsigned char* inInnerUpper = &inInner[(y*2)*width_*3];
+                    const unsigned char* inInnerLower = &inInner[(y*2+1)*width_*3];
+                    unsigned char* out = &pixelDataOut[z*widthOut*heightOut*3 + y*widthOut*3];
+                    
+                    for (int x = 0; x < widthOut*3; x += 3)
+                    {
+                        out[x] = ((unsigned)inOuterUpper[x*2] + inOuterUpper[x*2+3] + inOuterLower[x*2] + inOuterLower[x*2+3] + 
+                            inInnerUpper[x*2] + inInnerUpper[x*2+3] + inInnerLower[x*2] + inInnerLower[x*2+3]) >> 3;
+                        out[x+1] = ((unsigned)inOuterUpper[x*2+1] + inOuterUpper[x*2+4] + inOuterLower[x*2+1] + inOuterLower[x*2+4] + 
+                            inInnerUpper[x*2+1] + inInnerUpper[x*2+4] + inInnerLower[x*2+1] + inInnerLower[x*2+4]) >> 3;
+                        out[x+2] = ((unsigned)inOuterUpper[x*2+2] + inOuterUpper[x*2+5] + inOuterLower[x*2+2] + inOuterLower[x*2+5] + 
+                            inInnerUpper[x*2+2] + inInnerUpper[x*2+5] + inInnerLower[x*2+2] + inInnerLower[x*2+5]) >> 3;
+                    }
+                }
+            }
+            break;
+            
+        case 4:
+            for (int z = 0; z < depthOut; ++z)
+            {
+                const unsigned char* inOuter = &pixelDataIn[(z*2)*width_*height_*4];
+                const unsigned char* inInner = &pixelDataIn[(z*2+1)*width_*height_*4];
 
-				for (int y = 0; y < heightOut; ++y)
-				{
-					const unsigned char* inOuterUpper = &inOuter[(y*2)*width_*4];
-					const unsigned char* inOuterLower = &inOuter[(y*2+1)*width_*4];
-					const unsigned char* inInnerUpper = &inInner[(y*2)*width_*4];
-					const unsigned char* inInnerLower = &inInner[(y*2+1)*width_*4];
-					unsigned char* out = &pixelDataOut[z*widthOut*heightOut*4 + y*widthOut*4];
-					
-					for (int x = 0; x < widthOut*4; x += 4)
-					{
-						out[x] = ((unsigned)inOuterUpper[x*2] + inOuterUpper[x*2+4] + inOuterLower[x*2] + inOuterLower[x*2+4] + 
-							inInnerUpper[x*2] + inInnerUpper[x*2+4] + inInnerLower[x*2] + inInnerLower[x*2+4]) >> 3;
-						out[x+1] = ((unsigned)inOuterUpper[x*2+1] + inOuterUpper[x*2+5] + inOuterLower[x*2+1] + inOuterLower[x*2+5] + 
-							inInnerUpper[x*2+1] + inInnerUpper[x*2+5] + inInnerLower[x*2+1] + inInnerLower[x*2+5]) >> 3;
-						out[x+2] = ((unsigned)inOuterUpper[x*2+2] + inOuterUpper[x*2+6] + inOuterLower[x*2+2] + inOuterLower[x*2+6] + 
-							inInnerUpper[x*2+2] + inInnerUpper[x*2+6] + inInnerLower[x*2+2] + inInnerLower[x*2+6]) >> 3;
-					}
-				}
-			}
-			break;
-		}
-	}
-	
-	return mipImage;
+                for (int y = 0; y < heightOut; ++y)
+                {
+                    const unsigned char* inOuterUpper = &inOuter[(y*2)*width_*4];
+                    const unsigned char* inOuterLower = &inOuter[(y*2+1)*width_*4];
+                    const unsigned char* inInnerUpper = &inInner[(y*2)*width_*4];
+                    const unsigned char* inInnerLower = &inInner[(y*2+1)*width_*4];
+                    unsigned char* out = &pixelDataOut[z*widthOut*heightOut*4 + y*widthOut*4];
+                    
+                    for (int x = 0; x < widthOut*4; x += 4)
+                    {
+                        out[x] = ((unsigned)inOuterUpper[x*2] + inOuterUpper[x*2+4] + inOuterLower[x*2] + inOuterLower[x*2+4] + 
+                            inInnerUpper[x*2] + inInnerUpper[x*2+4] + inInnerLower[x*2] + inInnerLower[x*2+4]) >> 3;
+                        out[x+1] = ((unsigned)inOuterUpper[x*2+1] + inOuterUpper[x*2+5] + inOuterLower[x*2+1] + inOuterLower[x*2+5] + 
+                            inInnerUpper[x*2+1] + inInnerUpper[x*2+5] + inInnerLower[x*2+1] + inInnerLower[x*2+5]) >> 3;
+                        out[x+2] = ((unsigned)inOuterUpper[x*2+2] + inOuterUpper[x*2+6] + inOuterLower[x*2+2] + inOuterLower[x*2+6] + 
+                            inInnerUpper[x*2+2] + inInnerUpper[x*2+6] + inInnerLower[x*2+2] + inInnerLower[x*2+6]) >> 3;
+                    }
+                }
+            }
+            break;
+        }
+    }
+    
+    return mipImage;
 }
 
 CompressedLevel Image::GetCompressedLevel(unsigned index) const
 {
-	CompressedLevel level;
-	
-	if (compressedFormat_ == CF_NONE)
-	{
-		LOGERROR("Image is not compressed");
-		return level;
-	}
-	if (index >= numCompressedLevels_)
-	{
-		LOGERROR("Compressed image mip level out of bounds");
-		return level;
-	}
-	
-	level.format_ = compressedFormat_;
-	level.width_ = width_;
-	level.height_ = height_;
-	level.depth_ = depth_;
-	
-	if (compressedFormat_ < CF_PVRTC_RGB_2BPP)
-	{
-		level.blockSize_ = (compressedFormat_ == CF_DXT1 || compressedFormat_ == CF_ETC1) ? 8 : 16;
-		unsigned i = 0;
-		unsigned offset = 0;
-		
-		for (;;)
-		{
-			if (!level.width_)
-				level.width_ = 1;
-			if (!level.height_)
-				level.height_ = 1;
-			if (!level.depth_)
-				level.depth_ = 1;
-			
-			level.rowSize_ = ((level.width_ + 3) / 4) * level.blockSize_;
-			level.rows_ = ((level.height_ + 3) / 4);
-			level.data_ = data_.Get() + offset;
-			level.dataSize_ = level.depth_ * level.rows_ * level.rowSize_;
-			
-			if (offset + level.dataSize_ > GetMemoryUse())
-			{
-				LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
-					" Datasize: " + String(GetMemoryUse()));
-				level.data_ = 0;
-				return level;
-			}
-			
-			if (i == index)
-				return level;
-			
-			offset += level.dataSize_;
-			level.width_ /= 2;
-			level.height_ /= 2;
-			level.depth_ /= 2;
-			++i;
-		}
-	}
-	else
-	{
-		level.blockSize_ = compressedFormat_ < CF_PVRTC_RGB_4BPP ? 2 : 4;
-		unsigned i = 0;
-		unsigned offset = 0;
-		
-		for (;;)
-		{
-			if (!level.width_)
-				level.width_ = 1;
-			if (!level.height_)
-				level.height_ = 1;
-			
-			int dataWidth = Max(level.width_, level.blockSize_ == 2 ? 16 : 8);
-			int dataHeight = Max(level.height_, 8);
-			level.data_ = data_.Get() + offset;
-			level.dataSize_ = (dataWidth * dataHeight * level.blockSize_ + 7) >> 3;
-			level.rows_ = dataHeight;
-			level.rowSize_ = level.dataSize_ / level.rows_;
-			
-			if (offset + level.dataSize_ > GetMemoryUse())
-			{
-				LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
-					" Datasize: " + String(GetMemoryUse()));
-				level.data_ = 0;
-				return level;
-			}
-			
-			if (i == index)
-				return level;
-			
-			offset += level.dataSize_;
-			level.width_ /= 2;
-			level.height_ /= 2;
-			++i;
-		}
-	}
+    CompressedLevel level;
+    
+    if (compressedFormat_ == CF_NONE)
+    {
+        LOGERROR("Image is not compressed");
+        return level;
+    }
+    if (index >= numCompressedLevels_)
+    {
+        LOGERROR("Compressed image mip level out of bounds");
+        return level;
+    }
+    
+    level.format_ = compressedFormat_;
+    level.width_ = width_;
+    level.height_ = height_;
+    level.depth_ = depth_;
+    
+    if (compressedFormat_ < CF_PVRTC_RGB_2BPP)
+    {
+        level.blockSize_ = (compressedFormat_ == CF_DXT1 || compressedFormat_ == CF_ETC1) ? 8 : 16;
+        unsigned i = 0;
+        unsigned offset = 0;
+        
+        for (;;)
+        {
+            if (!level.width_)
+                level.width_ = 1;
+            if (!level.height_)
+                level.height_ = 1;
+            if (!level.depth_)
+                level.depth_ = 1;
+            
+            level.rowSize_ = ((level.width_ + 3) / 4) * level.blockSize_;
+            level.rows_ = ((level.height_ + 3) / 4);
+            level.data_ = data_.Get() + offset;
+            level.dataSize_ = level.depth_ * level.rows_ * level.rowSize_;
+            
+            if (offset + level.dataSize_ > GetMemoryUse())
+            {
+                LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                    " Datasize: " + String(GetMemoryUse()));
+                level.data_ = 0;
+                return level;
+            }
+            
+            if (i == index)
+                return level;
+            
+            offset += level.dataSize_;
+            level.width_ /= 2;
+            level.height_ /= 2;
+            level.depth_ /= 2;
+            ++i;
+        }
+    }
+    else
+    {
+        level.blockSize_ = compressedFormat_ < CF_PVRTC_RGB_4BPP ? 2 : 4;
+        unsigned i = 0;
+        unsigned offset = 0;
+        
+        for (;;)
+        {
+            if (!level.width_)
+                level.width_ = 1;
+            if (!level.height_)
+                level.height_ = 1;
+            
+            int dataWidth = Max(level.width_, level.blockSize_ == 2 ? 16 : 8);
+            int dataHeight = Max(level.height_, 8);
+            level.data_ = data_.Get() + offset;
+            level.dataSize_ = (dataWidth * dataHeight * level.blockSize_ + 7) >> 3;
+            level.rows_ = dataHeight;
+            level.rowSize_ = level.dataSize_ / level.rows_;
+            
+            if (offset + level.dataSize_ > GetMemoryUse())
+            {
+                LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                    " Datasize: " + String(GetMemoryUse()));
+                level.data_ = 0;
+                return level;
+            }
+            
+            if (i == index)
+                return level;
+            
+            offset += level.dataSize_;
+            level.width_ /= 2;
+            level.height_ /= 2;
+            ++i;
+        }
+    }
 }
 
 SDL_Surface* Image::GetSDLSurface(const IntRect& rect) const
