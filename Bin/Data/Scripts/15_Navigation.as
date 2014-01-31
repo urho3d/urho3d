@@ -5,21 +5,18 @@
 //     - Rebuilding the navigation mesh partially when adding or removing objects
 //     - Visualizing custom debug geometry
 //     - Raycasting drawable components
-//     - Make a node follow the Detour path
+//     - Making a node follow the Detour path
 
 #include "Scripts/Utilities/Sample.as"
 
 Scene@ scene_;
 Node@ cameraNode;
-Vector3 startPos;
 Vector3 endPos;
 Array<Vector3> currentPath;
 float yaw = 0.0f;
 float pitch = 0.0f;
 bool drawDebug = false;
-bool startPosDefined = false;
-bool endPosDefined = false;
-Node@ Jack;
+Node@ jackNode;
 
 void Start()
 {
@@ -97,8 +94,9 @@ void CreateScene()
     }
 
     // Create Jack node that will follow the path
-    Jack = scene_.CreateChild("Jack");
-    Jack.position = Vector3(-5.0f, 0.0f, 20.0f);
+    jackNode = scene_.CreateChild("Jack");
+    jackNode.position = Vector3(-5.0f, 0.0f, 20.0f);
+    AnimatedModel@ modelObject = jackNode.CreateComponent("AnimatedModel");
     modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
     modelObject.material = cache.GetResource("Material", "Materials/Jack.xml");
     modelObject.castShadows = true;
@@ -140,7 +138,7 @@ void CreateUI()
     Text@ instructionText = ui.root.CreateChild("Text");
     instructionText.text =
         "Use WASD keys to move, RMB to rotate view\n"
-        "Shift+LMB to set path start, LMB to set path end\n"
+        "LMB to set destination, SHIFT+LMB to teleport\n"
         "MMB to add or remove obstacles\n"
         "Space to toggle debug geometry";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
@@ -178,12 +176,12 @@ void MoveCamera(float timeStep)
     // Do not move if the UI has a focused element (the console)
     if (ui.focusElement !is null)
         return;
-    
+
     // Movement speed as world units per second
     const float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
-    
+
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     // Only move the camera when the cursor is hidden
     if (!ui.cursor.visible)
@@ -207,7 +205,7 @@ void MoveCamera(float timeStep)
     if (input.keyDown['D'])
         cameraNode.TranslateRelative(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 
-    // Set route start/endpoint with left mouse button, recalculate route if applicable
+    // Set destination or teleport with left mouse button
     if (input.mouseButtonPress[MOUSEB_LEFT])
         SetPathPoint();
     // Add or remove objects with middle mouse button, then rebuild navigation mesh partially
@@ -224,24 +222,24 @@ void SetPathPoint()
     Vector3 hitPos;
     Drawable@ hitDrawable;
     NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
-    
+
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
-        bool setStart = input.qualifierDown[QUAL_SHIFT];
-        if (setStart)
+        Vector3 pathPos = navMesh.FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
+
+        if (input.qualifierDown[QUAL_SHIFT])
         {
-            startPos = navMesh.FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
-            startPosDefined = true;
+            // Teleport
+            currentPath.Clear();
+            jackNode.LookAt(pathPos, Vector3(0.0f, 1.0f, 0.0f));
+            jackNode.position = pathPos;
         }
         else
         {
-            endPos = navMesh.FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
-            endPosDefined = true;
+            // Calculate path from Jack's current position to the end point
+            endPos = pathPos;
+            currentPath = navMesh.FindPath(jackNode.position, endPos);
         }
-        
-        //RecalculatePath();
-        if (startPosDefined)
-            Jack.position = startPos; // Reset Jack position to start
     }
 }
 
@@ -250,13 +248,13 @@ void AddOrRemoveObject()
     // Raycast and check if we hit a mushroom node. If yes, remove it, if no, create a new one
     Vector3 hitPos;
     Drawable@ hitDrawable;
-    
+
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
         // The part of the navigation mesh we must update, which is the world bounding box of the associated
         // drawable component
         BoundingBox updateBox;
-        
+
         Node@ hitNode = hitDrawable.node;
         if (hitNode.name == "Mushroom")
         {
@@ -269,11 +267,12 @@ void AddOrRemoveObject()
             StaticModel@ newObject = newNode.GetComponent("StaticModel");
             updateBox = newObject.worldBoundingBox;
         }
-        
-        // Rebuild part of the navigation mesh, then recalculate path if applicable
+
+        // Rebuild part of the navigation mesh, then rebuild the path if applicable
         NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
         navMesh.Build(updateBox);
-        //RecalculatePath();
+        if (currentPath.length > 0)
+            currentPath = navMesh.FindPath(jackNode.position, endPos);
     }
 }
 
@@ -287,17 +286,8 @@ Node@ CreateMushroom(const Vector3& pos)
     mushroomObject.model = cache.GetResource("Model", "Models/Mushroom.mdl");
     mushroomObject.material = cache.GetResource("Material", "Materials/Mushroom.xml");
     mushroomObject.castShadows = true;
-    
+
     return mushroomNode;
-}
-
-void RecalculatePath()
-{
-    if (!startPosDefined || !endPosDefined)
-        return;
-
-    NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
-    currentPath = navMesh.FindPath(startPos, endPos);
 }
 
 bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
@@ -324,22 +314,19 @@ bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
     return false;
 }
 
-void followPath(float timeStep)
+void FollowPath(float timeStep)
 {
-    if (startPosDefined && endPosDefined)
+    if (currentPath.length > 0)
     {
-        // Get next waypoint to reach
-        NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
-		currentPath = navMesh.FindPath(Jack.position, endPos);
-		if (currentPath.length < 2)
-		    return;
-		Vector3 nextWaypoint = currentPath[1]; // NB: currentPath[0] is the starting position
-        if (Floor(Jack.position.x) ==  Floor(endPos.x) && Floor(Jack.position.z) ==  Floor(endPos.z))
-            return;
+        Vector3 nextWaypoint = currentPath[0]; // NB: currentPath[0] is the next waypoint in order
 
         // Rotate Jack toward next waypoint to reach and move
-        Jack.LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
-        Jack.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * 5 * timeStep);
+        jackNode.LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
+        jackNode.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * 5 * timeStep);
+
+        // Remove waypoint if reached it
+        if ((jackNode.position - nextWaypoint).length < 0.1)
+            currentPath.Erase(0);
     }
 }
 
@@ -352,7 +339,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     // Make Jack follow the Detour path
-    followPath(timeStep);
+    FollowPath(timeStep);
 }
 
 void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
@@ -364,18 +351,22 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
         navMesh.DrawDebugGeometry(true);
     }
 
-    // Visualize the start and end points and the last calculated path
-    // Note the convenience accessor to the DebugRenderer component
-    DebugRenderer@ debug = scene_.debugRenderer;
-    if (startPosDefined)
-        debug.AddBoundingBox(BoundingBox(startPos - Vector3(0.1f, 0.1f, 0.1f), startPos + Vector3(0.1f, 0.1f, 0.1f)), Color(1.0f, 1.0f, 1.0f));
-    if (endPosDefined)
-        debug.AddBoundingBox(BoundingBox(endPos - Vector3(0.1f, 0.1f, 0.1f), endPos + Vector3(0.1f, 0.1f, 0.1f)), Color(1.0f, 1.0f, 1.0f));
-    if (currentPath.length > 1)
+    if (currentPath.length > 0)
     {
+        // Visualize the current calculated path
+        // Note the convenience accessor to the DebugRenderer component
+        DebugRenderer@ debug = scene_.debugRenderer;
+        debug.AddBoundingBox(BoundingBox(endPos - Vector3(0.1f, 0.1f, 0.1f), endPos + Vector3(0.1f, 0.1f, 0.1f)),
+            Color(1.0f, 1.0f, 1.0f));
+
         // Draw the path with a small upward bias so that it does not clip into the surfaces
         Vector3 bias(0.0f, 0.05f, 0.0f);
-        for (uint i = 0; i < currentPath.length - 1; ++i)
-            debug.AddLine(currentPath[i] + bias, currentPath[i + 1] + bias, Color(1.0f, 1.0f, 1.0f));
+        debug.AddLine(jackNode.position + bias, currentPath[0] + bias, Color(1.0f, 1.0f, 1.0f));
+
+        if (currentPath.length > 1)
+        {
+            for (uint i = 0; i < currentPath.length - 1; ++i)
+                debug.AddLine(currentPath[i] + bias, currentPath[i + 1] + bias, Color(1.0f, 1.0f, 1.0f));
+        }
     }
 }

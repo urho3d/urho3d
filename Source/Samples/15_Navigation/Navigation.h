@@ -39,6 +39,8 @@ class Scene;
 ///     - Performing path queries to the navigation mesh
 ///     - Rebuilding the navigation mesh partially when adding or removing objects
 ///     - Visualizing custom debug geometry
+///     - Raycasting drawable components
+///     - Making a node follow the Detour path
 class Navigation : public Sample
 {
     OBJECT(Navigation);
@@ -69,10 +71,8 @@ private:
     Node* CreateMushroom(const Vector3& pos);
     /// Utility function to raycast to the cursor position. Return true if hit
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
-    /// Recalculate path. Requires both start and endpoint defined.
-    void RecalculatePath();
-    /// Make Jack follow the Detour path
-    void followPath(float timeStep);
+    /// Make Jack follow the Detour path.
+    void FollowPath(float timeStep);
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post-render update event.
@@ -84,14 +84,10 @@ private:
     SharedPtr<Node> cameraNode_;
     /// Last calculated path.
     PODVector<Vector3> currentPath_;
-    /// Path start position.
-    Vector3 startPos_;
     /// Path end position.
     Vector3 endPos_;
-    /// Start position defined flag.
-    bool startPosDefined_;
-    /// End position defined flag.
-    bool endPosDefined_;
+    /// Jack scene node.
+    SharedPtr<Node> jackNode_;
     /// Camera yaw angle.
     float yaw_;
     /// Camera pitch angle.
