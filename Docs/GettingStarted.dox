@@ -270,6 +270,7 @@ F2          Toggle debug HUD
 6           Cycle shadow filtering quality
 7           Toggle occlusion culling
 8           Toggle dynamic instancing
+9           Take a screenshot and save to the Data directory
 \endverbatim
 
 

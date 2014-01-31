@@ -24,6 +24,7 @@
 #include "Console.h"
 #include "DebugHud.h"
 #include "Engine.h"
+#include "FileSystem.h"
 #include "Graphics.h"
 #include "InputEvents.h"
 #include "Renderer.h"
@@ -225,8 +226,9 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             Graphics* graphics = GetSubsystem<Graphics>();
             Image screenshot(context_);
             graphics->TakeScreenShot(screenshot);
-            screenshot.FlipVertical();
-            screenshot.SavePNG("Data/" + Time::GetTimeStamp() + "Screenshot.png"); // Here we save in the Data folder with date and time appended
-	    }
+            // Here we save in the Data folder with date and time appended
+            screenshot.SavePNG(GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Screenshot_" +
+                Time::GetTimeStamp().Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+        }
     }
 }

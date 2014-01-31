@@ -178,9 +178,10 @@ function HandleKeyDown(eventType, eventData)
             local graphics = GetGraphics()
             local screenshot = Image()
             graphics:TakeScreenShot(screenshot)
-            screenshot:FlipVertical()
             local timeStamp = Time:GetTimeStamp()
-            screenshot:SavePNG("Data/" .. timeStamp .. " Screenshot.png") -- Here we save in the Data folder with date and time appended
+            timeStamp = string.gsub(timeStamp, "[:. ]", "_")
+            -- Here we save in the Data folder with date and time appended
+            screenshot:SavePNG(GetFileSystem():GetProgramDir() .. "Data/Screenshot_" .. timeStamp .. ".png")
         end
     end
 end

@@ -174,10 +174,11 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         // Take screenshot
         else if (key == '9')
         {
-        Image@ screenshot = Image();
-        graphics.TakeScreenShot(screenshot);
-        screenshot.FlipVertical();
-        screenshot.SavePNG("Data/" + time.timeStamp + " Screenshot.png"); // Here we save in the Data folder with date and time appended
-	    }
+            Image@ screenshot = Image();
+            graphics.TakeScreenShot(screenshot);
+            // Here we save in the Data folder with date and time appended
+            screenshot.SavePNG(fileSystem.programDir + "Data/Screenshot_" +
+                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+        }
     }
 }
