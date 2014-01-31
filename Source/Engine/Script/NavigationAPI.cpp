@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,8 +48,8 @@ void RegisterNavigationMesh(asIScriptEngine* engine)
     RegisterComponent<NavigationMesh>(engine, "NavigationMesh");
     engine->RegisterObjectMethod("NavigationMesh", "bool Build()", asMETHODPR(NavigationMesh, Build, (void), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "bool Build(const BoundingBox&in)", asMETHODPR(NavigationMesh, Build, (const BoundingBox&), bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavigationMesh", "Vector3 FindNearestPoint()", asMETHOD(NavigationMesh, FindNearestPoint), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NavigationMesh", "Vector3 MoveAlongSurface()", asMETHOD(NavigationMesh, MoveAlongSurface), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "Vector3 FindNearestPoint(const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(NavigationMesh, FindNearestPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NavigationMesh", "Vector3 MoveAlongSurface(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0), uint = 3)", asMETHOD(NavigationMesh, MoveAlongSurface), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "Array<Vector3>@ FindPath(const Vector3&in, const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindPath), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("NavigationMesh", "Vector3 GetRandomPoint()", asMETHOD(NavigationMesh, GetRandomPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("NavigationMesh", "Vector3 GetRandomPointInCircle(const Vector3&in, float, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asMETHOD(NavigationMesh, GetRandomPointInCircle), asCALL_THISCALL);
