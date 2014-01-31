@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,8 @@ private:
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Recalculate path. Requires both start and endpoint defined.
     void RecalculatePath();
+    /// Make Jack follow the Detour path
+    void followPath(float timeStep);
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post-render update event.
