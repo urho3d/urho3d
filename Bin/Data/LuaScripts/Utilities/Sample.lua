@@ -1,7 +1,9 @@
 -- Common sample initialization as a framework for all samples.
 --    - Create Urho3D logo at screen
+--    - Set custom window title and icon
 --    - Create Console and Debug HUD, and use F1 and F2 key to toggle them
 --    - Toggle rendering options from the keys 1-8
+--    - Take screenshots with key 9
 --    - Handle Esc key down to hide Console or exit application
 
 local logoSprite = nil
@@ -9,7 +11,10 @@ local logoSprite = nil
 function SampleStart()
     -- Create logo
     CreateLogo()
-    
+
+    -- Set custom window Title & Icon
+    SetWindowTitleAndIcon()
+
     -- Create console and debug HUD
     CreateConsoleAndDebugHud()
 
@@ -58,6 +63,14 @@ function CreateLogo()
     
     -- Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite.priority = -100
+end
+
+function SetWindowTitleAndIcon()
+    local cache = GetCache()
+    local graphics = GetGraphics()
+    local icon = cache:GetResource("Image", "Textures/LogoLarge.png")
+    graphics:SetWindowIcon(icon)
+    graphics.windowTitle = "Urho3D Sample"
 end
 
 function CreateConsoleAndDebugHud()
@@ -159,6 +172,15 @@ function HandleKeyDown(eventType, eventData)
         -- Instancing
         elseif key == KEY_8 then
             renderer.dynamicInstancing = not renderer.dynamicInstancing
+        
+        -- Take screenshot
+        elseif key == KEY_9 then
+            local graphics = GetGraphics()
+            local screenshot = Image()
+            graphics:TakeScreenShot(screenshot)
+            screenshot:FlipVertical()
+            local timeStamp = Time:GetTimeStamp()
+            screenshot:SavePNG("Data/" .. timeStamp .. " Screenshot.png") -- Here we save in the Data folder with date and time appended
         end
     end
 end
