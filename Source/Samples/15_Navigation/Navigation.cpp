@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "AnimatedModel.h"
 #include "Camera.h"
 #include "CoreEvents.h"
 #include "Cursor.h"
@@ -132,7 +133,15 @@ void Navigation::CreateScene()
         if (size >= 3.0f)
             boxObject->SetOccluder(true);
     }
-    
+
+    // Create Jack node that will follow the path
+    Node* modelNode = scene_->CreateChild("Jack");
+    modelNode->SetPosition(Vector3(-5.0f, 0.0f, 20.0f));
+    AnimatedModel* modelObject = modelNode->CreateComponent<AnimatedModel>();
+    modelObject->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
+    modelObject->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
+    modelObject->SetCastShadows(true);
+
     // Create a NavigationMesh component to the scene root
     NavigationMesh* navMesh = scene_->CreateComponent<NavigationMesh>();
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -263,22 +272,28 @@ void Navigation::SetPathPoint()
 {
     Vector3 hitPos;
     Drawable* hitDrawable;
+    NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
     
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
         bool setStart = GetSubsystem<Input>()->GetQualifierDown(QUAL_SHIFT);
         if (setStart)
         {
-            startPos_ = hitPos;
+            startPos_ = navMesh->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
             startPosDefined_ = true;
         }
         else
         {
-            endPos_ = hitPos;
+            endPos_ = navMesh->FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
             endPosDefined_ = true;
         }
         
-        RecalculatePath();
+        //RecalculatePath();
+        if (startPosDefined_)
+        {
+			Node* Jack = scene_->GetChild("Jack", true);
+            Jack->SetPosition(startPos_); // Reset Jack position to start
+        }
     }
 }
 
@@ -308,7 +323,7 @@ void Navigation::AddOrRemoveObject()
         
         // Rebuild part of the navigation mesh, then recalculate path if applicable
         scene_->GetComponent<NavigationMesh>()->Build(updateBox);
-        RecalculatePath();
+        //RecalculatePath();
     }
 }
 
@@ -365,6 +380,26 @@ bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawa
     return false;
 }
 
+void Navigation::followPath(float timeStep)
+{
+    if (startPosDefined_ && endPosDefined_)
+    {
+        // Get next waypoint to reach
+        NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
+        Node* Jack = scene_->GetChild("Jack", true);
+		navMesh->FindPath(currentPath_, Jack->GetPosition(), endPos_);
+		if (currentPath_.Size() < 2)
+		    return;
+		Vector3 nextWaypoint = currentPath_[1]; // NB: currentPath_[0] is the starting position
+        if (floorf(Jack->GetPosition().x_) ==  floorf(endPos_.x_) && floorf(Jack->GetPosition().z_) ==  floorf(endPos_.z_))
+            return;
+
+        // Rotate Jack toward next waypoint to reach and move
+        Jack->LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
+        Jack->TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * 5 * timeStep);
+    }
+}
+
 void Navigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
@@ -374,6 +409,9 @@ void Navigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
     
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+
+    // Make Jack follow the Detour path
+    followPath(timeStep);
 }
 
 void Navigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)

@@ -4,6 +4,8 @@
 --     - Performing path queries to the navigation mesh
 --     - Rebuilding the navigation mesh partially when adding or removing objects
 --     - Visualizing custom debug geometry
+--     - Raycasting drawable components
+--     - Make a node follow the Detour path
 
 require "LuaScripts/Utilities/Sample"
 
@@ -96,7 +98,15 @@ function CreateScene()
             boxObject.occluder = true
         end
     end
-    
+
+    -- Create Jack node that will follow the path
+    Jack = scene_:CreateChild("Jack")
+    Jack.position = Vector3(-5, 0, 20)
+    local modelObject = Jack:CreateComponent("AnimatedModel")
+    modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
+    modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
+    modelObject.castShadows = true
+
     -- Create a NavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("NavigationMesh")
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -215,17 +225,18 @@ end
 
 function SetPathPoint()
     local result, hitPos, hitDrawable = Raycast(250.0)
+    local navMesh = scene_:GetComponent("NavigationMesh")
     if result then
         local setStart = input:GetQualifierDown(QUAL_SHIFT)
         if setStart then
-            startPos = hitPos
+            startPos = navMesh:FindNearestPoint(hitPos, Vector3.ONE)
             startPosDefined = true
         else
-            endPos = hitPos
+            endPos = navMesh:FindNearestPoint(hitPos, Vector3.ONE)
             endPosDefined = true
         end
-        
-        RecalculatePath()
+        if startPosDefined then Jack.position = startPos end -- Reset Jack position to start
+        --RecalculatePath()
     end
 end
 
@@ -250,7 +261,7 @@ function AddOrRemoveObject()
         -- Rebuild part of the navigation mesh, then recalculate path if applicable
         local navMesh = scene_:GetComponent("NavigationMesh")
         navMesh:Build(updateBox)
-        RecalculatePath()
+        --RecalculatePath()
     end
 end
 
@@ -306,6 +317,25 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
+
+    -- Make Jack follow the Detour path
+    followPath(timeStep)
+end
+
+function followPath(timeStep)
+    if startPosDefined and endPosDefined then
+
+        -- Get next waypoint to reach
+        local navMesh = scene_:GetComponent("NavigationMesh")
+		currentPath = navMesh:FindPath(Jack.position, navMesh:FindNearestPoint(endPos, Vector3.ONE))
+		if table.maxn(currentPath) < 2 then return end
+		local nextWaypoint = currentPath[2] -- NB: currentPath[1] is the starting position
+		if math.floor(Jack.position.x) ==  math.floor(endPos.x) and math.floor(Jack.position.z) ==  math.floor(endPos.z) then return end
+
+        -- Rotate Jack toward next waypoint to reach and move
+        Jack:LookAt(nextWaypoint, Vector3.UP)
+        Jack:TranslateRelative(Vector3.FORWARD * 5 * timeStep)
+    end
 end
 
 function HandlePostRenderUpdate(eventType, eventData)

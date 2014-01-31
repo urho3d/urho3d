@@ -4,6 +4,8 @@
 //     - Performing path queries to the navigation mesh
 //     - Rebuilding the navigation mesh partially when adding or removing objects
 //     - Visualizing custom debug geometry
+//     - Raycasting drawable components
+//     - Make a node follow the Detour path
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -17,6 +19,7 @@ float pitch = 0.0f;
 bool drawDebug = false;
 bool startPosDefined = false;
 bool endPosDefined = false;
+Node@ Jack;
 
 void Start()
 {
@@ -92,7 +95,14 @@ void CreateScene()
         if (size >= 3.0f)
             boxObject.occluder = true;
     }
-    
+
+    // Create Jack node that will follow the path
+    Jack = scene_.CreateChild("Jack");
+    Jack.position = Vector3(-5.0f, 0.0f, 20.0f);
+    modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
+    modelObject.material = cache.GetResource("Material", "Materials/Jack.xml");
+    modelObject.castShadows = true;
+
     // Create a NavigationMesh component to the scene root
     NavigationMesh@ navMesh = scene_.CreateComponent("NavigationMesh");
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
@@ -213,22 +223,25 @@ void SetPathPoint()
 {
     Vector3 hitPos;
     Drawable@ hitDrawable;
+    NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
     
     if (Raycast(250.0f, hitPos, hitDrawable))
     {
         bool setStart = input.qualifierDown[QUAL_SHIFT];
         if (setStart)
         {
-            startPos = hitPos;
+            startPos = navMesh.FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
             startPosDefined = true;
         }
         else
         {
-            endPos = hitPos;
+            endPos = navMesh.FindNearestPoint(hitPos, Vector3(1.0f, 1.0f, 1.0f));
             endPosDefined = true;
         }
         
-        RecalculatePath();
+        //RecalculatePath();
+        if (startPosDefined)
+            Jack.position = startPos; // Reset Jack position to start
     }
 }
 
@@ -260,7 +273,7 @@ void AddOrRemoveObject()
         // Rebuild part of the navigation mesh, then recalculate path if applicable
         NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
         navMesh.Build(updateBox);
-        RecalculatePath();
+        //RecalculatePath();
     }
 }
 
@@ -311,6 +324,25 @@ bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
     return false;
 }
 
+void followPath(float timeStep)
+{
+    if (startPosDefined && endPosDefined)
+    {
+        // Get next waypoint to reach
+        NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
+		currentPath = navMesh.FindPath(Jack.position, endPos);
+		if (currentPath.length < 2)
+		    return;
+		Vector3 nextWaypoint = currentPath[1]; // NB: currentPath[0] is the starting position
+        if (Floor(Jack.position.x) ==  Floor(endPos.x) && Floor(Jack.position.z) ==  Floor(endPos.z))
+            return;
+
+        // Rotate Jack toward next waypoint to reach and move
+        Jack.LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
+        Jack.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * 5 * timeStep);
+    }
+}
+
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Take the frame time step, which is stored as a float
@@ -318,6 +350,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+
+    // Make Jack follow the Detour path
+    followPath(timeStep);
 }
 
 void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
