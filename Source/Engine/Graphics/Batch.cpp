@@ -415,6 +415,9 @@ void Batch::Prepare(View* view, bool setModelTransform) const
     
     if (light && graphics->NeedParameterUpdate(SP_LIGHT, light))
     {
+        // Deferred light volume batches operate in a camera-centered space. Detect from material, zone & pass all being null
+        bool isLightVolume = !material_ && !pass_ && !zone_;
+        
         Matrix3x4 cameraEffectiveTransform = camera_->GetEffectiveWorldTransform();
         Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
 
@@ -479,7 +482,8 @@ void Batch::Prepare(View* view, bool setModelTransform) const
         
         graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetColor(), light->GetSpecularIntensity()) * fade);
         graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
-        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition() - cameraEffectivePos, atten));
+        graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4((isLightVolume ? (lightNode->GetWorldPosition() -
+            cameraEffectivePos) : lightNode->GetWorldPosition()), atten));
         
         if (graphics->HasShaderParameter(PS, PSP_LIGHTMATRICES))
         {
@@ -490,8 +494,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
                     unsigned numSplits = lightQueue_->shadowSplits_.Size();
                     for (unsigned i = 0; i < numSplits; ++i)
-                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, cameraEffectivePos);
-                    
+                    {
+                        CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, isLightVolume ? cameraEffectivePos :
+                            Vector3::ZERO);
+                    }
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                 }
                 break;
@@ -503,7 +509,10 @@ void Batch::Prepare(View* view, bool setModelTransform) const
                     CalculateSpotMatrix(shadowMatrices[0], light, cameraEffectivePos);
                     bool isShadowed = lightQueue_->shadowMap_ != 0;
                     if (isShadowed)
-                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, cameraEffectivePos);
+                    {
+                        CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, isLightVolume ? cameraEffectivePos :
+                            Vector3::ZERO);
+                    }
                     
                     graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                 }
