@@ -1,6 +1,8 @@
-#include "Uniforms.frag"
-#include "Samplers.frag"
-#include "Lighting.frag"
+#include "Uniforms.glsl"
+#include "Samplers.glsl"
+#include "Transform.glsl"
+#include "ScreenPos.glsl"
+#include "Lighting.glsl"
 
 #ifdef DIRLIGHT
     varying vec2 vScreenPos;
@@ -12,7 +14,27 @@ varying vec3 vFarRay;
     varying vec3 vNearRay;
 #endif
 
-void main()
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    #ifdef DIRLIGHT
+        vScreenPos = GetScreenPosPreDiv(gl_Position);
+        vFarRay = GetFarRay(gl_Position);
+        #ifdef ORTHO
+            vNearRay = GetNearRay(gl_Position);
+        #endif
+    #else
+        vScreenPos = GetScreenPos(gl_Position);
+        vFarRay = GetFarRay(gl_Position) * gl_Position.w;
+        #ifdef ORTHO
+            vNearRay = GetNearRay(gl_Position) * gl_Position.w;
+        #endif
+    #endif
+}
+
+void PS()
 {
     // If rendering a directional light quad, optimize out the w divide
     #ifdef DIRLIGHT
