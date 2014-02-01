@@ -391,9 +391,10 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         }
     }
     
-    // Get light volume shaders according to the renderpath, if it needs them
+    // Go through commands to check for deferred rendering
     deferred_ = false;
     deferredAmbient_ = false;
+    
     for (unsigned i = 0; i < renderPath_->commands_.Size(); ++i)
     {
         const RenderPathCommand& command = renderPath_->commands_[i];
@@ -409,16 +410,10 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
         
         if (command.type_ == CMD_LIGHTVOLUMES)
         {
-            /// \todo Do not re-query each frame, as it involves string manipulation
-            renderer_->GetLightVolumeShaders(lightVS_, lightPS_, command.vertexShaderName_, command.vertexShaderDefines_,
-                command.pixelShaderName_, command.pixelShaderDefines_);
+            lightVolumeVSName_ = command.vertexShaderName_;
+            lightVolumePSName_ = command.pixelShaderName_;
             deferred_ = true;
         }
-    }
-    if (!deferred_)
-    {
-        lightVS_.Clear();
-        lightPS_.Clear();
     }
     
     // Validate the rect and calculate size. If zero rect, use whole rendertarget size
@@ -928,7 +923,7 @@ void View::GetBatches()
                     volumeBatch.material_ = 0;
                     volumeBatch.pass_ = 0;
                     volumeBatch.zone_ = 0;
-                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVS_, lightPS_);
+                    renderer_->SetLightVolumeBatchShaders(volumeBatch, lightVolumeVSName_, lightVolumePSName_);
                     lightQueue.volumeBatches_.Push(volumeBatch);
                 }
             }

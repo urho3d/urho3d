@@ -46,16 +46,17 @@ public:
     /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// Return a variation with defines.
-    ShaderVariation* GetVariation(ShaderType type, const String& definesIn);
+    /// Return a variation with defines, which should be processed with SanitateDefines() if possible.
+    ShaderVariation* GetVariation(ShaderType type, const String& defines);
     /// Return either vertex or pixel shader source code.
     const String& GetSourceCode(ShaderType type) const { return type == VS ? vsSourceCode_ : psSourceCode_; }
+    
+    /// Remove extra spaces from a define string to ensure that the same defines are not compiled twice.
+    static String SanitateDefines(const String& definesIn);
     
 private:
     /// Process source code and include files. Return true if successful.
     bool ProcessSource(String& code, Deserializer& file);
-    /// Remove extra spaces from a define string to ensure that the same defines are not compiled twice.
-    String SanitateDefines(const String& definesIn);
     
     /// Source code adapted for vertex shader.
     String vsSourceCode_;

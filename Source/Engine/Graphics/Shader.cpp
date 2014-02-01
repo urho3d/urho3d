@@ -101,9 +101,8 @@ bool Shader::Load(Deserializer& source)
     return true;
 }
 
-ShaderVariation* Shader::GetVariation(ShaderType type, const String& definesIn)
+ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines)
 {
-    String defines = SanitateDefines(definesIn);
     StringHash definesHash(defines);
     
     if (type == VS)
@@ -148,6 +147,28 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& definesIn)
     }
 }
 
+String Shader::SanitateDefines(const String& definesIn)
+{
+    String ret;
+    ret.Reserve(definesIn.Length());
+    
+    unsigned numSpaces = 0;
+    
+    for (unsigned i = 0; i < definesIn.Length(); ++i)
+    {
+        // Ensure only one space in a row
+        if (definesIn[i] == ' ')
+            ++numSpaces;
+        else
+            numSpaces = 0;
+        
+        if (numSpaces <= 1)
+            ret += definesIn[i];
+    }
+    
+    return ret.Trimmed();
+}
+
 bool Shader::ProcessSource(String& code, Deserializer& source)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -185,46 +206,6 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
     code += "\n";
     
     return true;
-}
-
-String Shader::SanitateDefines(const String& definesIn)
-{
-    String ret;
-    ret.Reserve(definesIn.Length());
-    
-    unsigned numSpaces = 0;
-    unsigned start = 0, end = definesIn.Length();
-    
-    // Trim spaces from start & begin. Do not use String::Trimmed() as we also need to trim spaces from the middle
-    for (unsigned i = 0; i < definesIn.Length(); ++i)
-    {
-        if (definesIn[i] != ' ')
-        {
-            start = i;
-            break;
-        }
-    }
-    for (unsigned i = definesIn.Length() - 1; i < definesIn.Length(); --i)
-    {
-        if (definesIn[i] != ' ')
-        {
-            end = i + 1;
-            break;
-        }
-    }
-    for (unsigned i = start; i < end; ++i)
-    {
-        // Ensure only one space in a row
-        if (definesIn[i] == ' ')
-            ++numSpaces;
-        else
-            numSpaces = 0;
-        
-        if (numSpaces <= 1)
-            ret += definesIn[i];
-    }
-    
-    return ret;
 }
 
 }

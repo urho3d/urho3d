@@ -43,6 +43,7 @@ class Graphics;
 class RenderPath;
 class RenderSurface;
 class ResourceCache;
+class Shader;
 class Skeleton;
 class OcclusionBuffer;
 class Texture2D;
@@ -286,14 +287,10 @@ public:
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
     /// Return the instancing vertex buffer
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
-    /// Return a shader by name and defines.
+    /// Return a shader variation by name and defines.
     ShaderVariation* GetShader(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
-    /// Return the stencil vertex shader.
-    ShaderVariation* GetStencilVS() const { return stencilVS_; }
-    /// Return the stencil pixel shader.
-    ShaderVariation* GetStencilPS() const { return stencilPS_; }
     /// Return the frame update parameters.
-    const FrameInfo& GetFrameInfo() { return frame_; }
+    const FrameInfo& GetFrameInfo() const { return frame_; }
     
     /// Update for rendering. Called by HandleRenderUpdate().
     void Update(float timeStep);
@@ -306,8 +303,6 @@ public:
     /// Queue a viewport for rendering. Null surface means backbuffer.
     void QueueViewport(RenderSurface* renderTarget, Viewport* viewport);
     
-    /// Populate light volume shaders.
-    void GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS, const String& vsName, const String& vsDefines, const String& psName, const String& psDefines);
     /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
@@ -322,8 +317,8 @@ public:
     Camera* GetShadowCamera();
     /// Choose shaders for a forward rendering batch.
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
-    /// Choose shaders for a light volume batch.
-    void SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS);
+    /// Choose shaders for a deferred light volume batch.
+    void SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName);
     /// Set cull mode while taking possible projection flipping into account.
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
@@ -403,10 +398,6 @@ private:
     SharedPtr<TextureCube> faceSelectCubeMap_;
     /// Indirection cube map for shadowed pointlights.
     SharedPtr<TextureCube> indirectionCubeMap_;
-    /// Stencil rendering vertex shader.
-    SharedPtr<ShaderVariation> stencilVS_;
-    /// Stencil rendering pixel shader.
-    SharedPtr<ShaderVariation> stencilPS_;
     /// Reusable scene nodes with shadow camera components.
     Vector<SharedPtr<Node> > shadowCameraNodes_;
     /// Reusable occlusion buffers.
@@ -441,6 +432,12 @@ private:
     String shaderPath_;
     /// File extension for shaders.
     String shaderExtension_;
+    /// Current variation names for deferred light volume shaders.
+    Vector<String> deferredLightPSVariations_;
+    /// Last used shader in shader variation query.
+    mutable WeakPtr<Shader> lastShader_;
+    /// Last used shader name in shader variation query.
+    mutable String lastShaderName_;
     /// Frame info for rendering.
     FrameInfo frame_;
     /// Texture anisotropy level.

@@ -317,11 +317,8 @@ void DebugRenderer::Render()
 
     PROFILE(RenderDebugGeometry);
 
-    // Cache shaders
-    if (!vs_)
-        vs_ = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
-    if (!ps_)
-        ps_ = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* vs = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* ps = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
     
     unsigned numVertices = (lines_.Size() + noDepthLines_.Size()) * 2;
     // Resize the vertex buffer if too small or much too large
@@ -364,7 +361,7 @@ void DebugRenderer::Render()
     graphics->SetDepthWrite(true);
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
-    graphics->SetShaders(vs_, ps_);
+    graphics->SetShaders(vs, ps);
     graphics->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
     graphics->SetShaderParameter(VSP_VIEWPROJ, projection_ * view_);
     graphics->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));

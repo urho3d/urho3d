@@ -552,15 +552,17 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
 
 ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, const String& defines) const
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    String shaderName = shaderPath_ + name + shaderExtension_;
-    String variationName;
+    if (name != lastShaderName_ || !lastShader_)
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        if (!cache)
+            return 0;
+        
+        lastShader_ = cache->GetResource<Shader>(shaderPath_ + name + shaderExtension_);
+        lastShaderName_ = name;
+    }
     
-    Shader* shader = cache->GetResource<Shader>(shaderName);
-    if (shader)
-        return shader->GetVariation(type, defines);
-    else
-        return 0;
+    return lastShader_ ? lastShader_->GetVariation(type, defines) : (ShaderVariation*)0;
 }
 
 void Renderer::Update(float timeStep)
@@ -786,33 +788,6 @@ void Renderer::QueueViewport(RenderSurface* renderTarget, Viewport* viewport)
     {
         queuedViews_.Push(Pair<WeakPtr<RenderSurface>, WeakPtr<Viewport> >(WeakPtr<RenderSurface>(renderTarget),
             WeakPtr<Viewport>(viewport)));
-    }
-}
-
-void Renderer::GetLightVolumeShaders(PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS,
-    const String& vsName, const String& vsDefines, const String& psName, const String& psDefines)
-{
-    lightVS.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
-    lightPS.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
-    
-    unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
-    
-    for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
-        lightVS[i] = GetShader(VS, vsName, vsDefines + " " + deferredLightVSVariations[i]);
-    
-    for (unsigned i = 0; i < lightPS.Size(); ++i)
-    {
-        String ortho;
-        if (i >= DLPS_ORTHO)
-            ortho = "ORTHO ";
-        
-        if (i & DLPS_SHADOW)
-        {
-            lightPS[i] = GetShader(PS, psName, psDefines + " " + ortho + lightPSVariations[i % DLPS_ORTHO] +
-                shadowVariations[shadows]);
-        }
-        else
-            lightPS[i] = GetShader(PS, psName, psDefines + " " + ortho + lightPSVariations[i % DLPS_ORTHO]);
     }
 }
 
@@ -1196,8 +1171,10 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
     }
 }
 
-void Renderer::SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariation*>& lightVS, PODVector<ShaderVariation*>& lightPS)
+void Renderer::SetLightVolumeBatchShaders(Batch& batch, const String& vsName, const String& psName)
 {
+    assert(deferredLightPSVariations_.Size());
+    
     unsigned vsi = DLVS_NONE;
     unsigned psi = DLPS_NONE;
     Light* light = batch.lightQueue_->light_;
@@ -1207,7 +1184,7 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariatio
     case LIGHT_DIRECTIONAL:
         vsi += DLVS_DIR;
         break;
-            
+        
     case LIGHT_SPOT:
         psi += DLPS_SPOT;
         break;
@@ -1232,8 +1209,8 @@ void Renderer::SetLightVolumeBatchShaders(Batch& batch, PODVector<ShaderVariatio
         psi += DLPS_ORTHO;
     }
     
-    batch.vertexShader_ = lightVS[vsi];
-    batch.pixelShader_ = lightPS[psi];
+    batch.vertexShader_ = GetShader(VS, vsName, deferredLightVSVariations[vsi]);
+    batch.pixelShader_ = GetShader(PS, psName, deferredLightPSVariations_[psi]);
 }
 
 void Renderer::SetCullMode(CullMode mode, Camera* camera)
@@ -1347,7 +1324,7 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
         graphics_->SetColorWrite(false);
         graphics_->SetDepthWrite(false);
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, lightStencilValue_);
-        graphics_->SetShaders(stencilVS_, stencilPS_);
+        graphics_->SetShaders(GetShader(VS, "Stencil"), GetShader(PS, "Stencil"));
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
         graphics_->SetShaderParameter(VSP_MODEL, light->GetVolumeTransform(camera));
         
@@ -1496,9 +1473,17 @@ void Renderer::LoadShaders()
     ReleaseMaterialShaders();
     shadersChangedFrameNumber_ = GetSubsystem<Time>()->GetFrameNumber();
     
-    // Load inbuilt shaders
-    stencilVS_ = GetShader(VS, "Stencil");
-    stencilPS_ = GetShader(PS, "Stencil");
+    // Construct new names for deferred light volume pixel shaders based on rendering options
+    deferredLightPSVariations_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
+    unsigned shadows = (graphics_->GetHardwareShadowSupport() ? 1 : 0) | (shadowQuality_ & SHADOWQUALITY_HIGH_16BIT);
+    for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
+    {
+        deferredLightPSVariations_[i] = lightPSVariations[i % DLPS_ORTHO];
+        if (i & DLPS_SHADOW)
+            deferredLightPSVariations_[i] += shadowVariations[shadows];
+        if (i & DLPS_ORTHO)
+            deferredLightPSVariations_[i] += "ORTHO";
+    }
     
     shadersDirty_ = false;
 }
@@ -1530,18 +1515,19 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
         {
             unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
             unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
-            vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " + lightVSVariations[l]
-                + geometryVSVariations[g]);
+            vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), Shader::SanitateDefines(pass->GetVertexShaderDefines() + " " +
+                lightVSVariations[l] + geometryVSVariations[g]));
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
         {
             if (j & LPS_SHADOW)
             {
-                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " + lightPSVariations[j]
-                    + shadowVariations[shadows]);
+                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), Shader::SanitateDefines(pass->GetPixelShaderDefines() +
+                    " " + lightPSVariations[j] + shadowVariations[shadows]));
             }
             else
-                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + " " + lightPSVariations[j]);
+                pixelShaders[j] = GetShader(PS, pass->GetPixelShader(), Shader::SanitateDefines(pass->GetPixelShaderDefines() +
+                    " " + lightPSVariations[j]));
         }
     }
     else
@@ -1554,8 +1540,8 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
             {
                 unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
                 unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
-                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
-                    vertexLightVSVariations[l] + geometryVSVariations[g]);
+                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), Shader::SanitateDefines(pass->GetVertexShaderDefines() +
+                    " " + vertexLightVSVariations[l] + geometryVSVariations[g]));
             }
         }
         else
@@ -1563,13 +1549,13 @@ void Renderer::LoadPassShaders(Technique* tech, StringHash type)
             vertexShaders.Resize(MAX_GEOMETRYTYPES);
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
             {
-                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), pass->GetVertexShaderDefines() + " " +
-                    geometryVSVariations[j]);
+                vertexShaders[j] = GetShader(VS, pass->GetVertexShader(), Shader::SanitateDefines(pass->GetVertexShaderDefines() +
+                    " " + geometryVSVariations[j]));
             }
         }
         
         pixelShaders.Resize(1);
-        pixelShaders[0] = GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines());
+        pixelShaders[0] = GetShader(PS, pass->GetPixelShader(), Shader::SanitateDefines(pass->GetPixelShaderDefines()));
     }
     
     pass->MarkShadersLoaded(shadersChangedFrameNumber_);

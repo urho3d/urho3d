@@ -320,10 +320,6 @@ private:
     PODVector<Drawable*> occluders_;
     /// Lights.
     PODVector<Light*> lights_;
-    /// Light volume vertex shaders.
-    PODVector<ShaderVariation*> lightVS_;
-    /// Light volume pixel shaders.
-    PODVector<ShaderVariation*> lightPS_;
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;
     /// Rendertargets defined by the renderpath.
@@ -350,6 +346,10 @@ private:
     StringHash litBasePassName_;
     /// Hash of the litalpha pass.
     StringHash litAlphaPassName_;
+    /// Name of light volume vertex shader.
+    String lightVolumeVSName_;
+    /// Name of light volume pixel shader.
+    String lightVolumePSName_;
 };
 
 }

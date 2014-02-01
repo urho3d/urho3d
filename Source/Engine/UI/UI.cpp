@@ -595,9 +595,8 @@ bool UI::HasModalElement() const
 void UI::Initialize()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
-    Renderer* renderer = GetSubsystem<Renderer>();
 
-    if (!graphics || !graphics->IsInitialized() || !renderer)
+    if (!graphics || !graphics->IsInitialized())
         return;
 
     PROFILE(InitUI);
@@ -606,13 +605,6 @@ void UI::Initialize()
 
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     rootModalElement_->SetSize(rootElement_->GetSize());
-
-    noTextureVS_ = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
-    diffTextureVS_ = renderer->GetShader(VS, "Basic", "DIFFMAP VERTEXCOLOR");
-    noTexturePS_ = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
-    diffTexturePS_ = renderer->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR");
-    diffMaskTexturePS_ = renderer->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
-    alphaTexturePS_ = renderer->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
 
     vertexBuffer_ = new VertexBuffer(context_);
     debugVertexBuffer_ = new VertexBuffer(context_);
@@ -660,7 +652,8 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
 
-    if (batches.Empty())
+    Renderer* renderer = GetSubsystem<Renderer>();
+    if (!renderer || batches.Empty())
         return;
 
     Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
@@ -684,8 +677,12 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->ResetRenderTargets();
     graphics_->SetVertexBuffer(buffer);
 
-    ShaderVariation* ps = 0;
-    ShaderVariation* vs = 0;
+    ShaderVariation* noTextureVS = renderer->GetShader(VS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* diffTextureVS = renderer->GetShader(VS, "Basic", "DIFFMAP VERTEXCOLOR");
+    ShaderVariation* noTexturePS = renderer->GetShader(PS, "Basic", "VERTEXCOLOR");
+    ShaderVariation* diffTexturePS = renderer->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR");
+    ShaderVariation* diffMaskTexturePS = renderer->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
+    ShaderVariation* alphaTexturePS = renderer->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
 
     unsigned alphaFormat = Graphics::GetAlphaFormat();
 
@@ -695,22 +692,25 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         if (batch.vertexStart_ == batch.vertexEnd_)
             continue;
 
+        ShaderVariation* ps;
+        ShaderVariation* vs;
+
         if (!batch.texture_)
         {
-            ps = noTexturePS_;
-            vs = noTextureVS_;
+            ps = noTexturePS;
+            vs = noTextureVS;
         }
         else
         {
             // If texture contains only an alpha channel, use alpha shader (for fonts)
-            vs = diffTextureVS_;
+            vs = diffTextureVS;
 
             if (batch.texture_->GetFormat() == alphaFormat)
-                ps = alphaTexturePS_;
+                ps = alphaTexturePS;
             else if (batch.blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
-                ps = diffMaskTexturePS_;
+                ps = diffMaskTexturePS;
             else
-                ps = diffTexturePS_;
+                ps = diffTexturePS;
         }
 
         graphics_->SetShaders(vs, ps);
