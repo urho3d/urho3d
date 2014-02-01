@@ -120,8 +120,10 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 	// Remove global functions
 	for( n = 0; n < scriptFunctions.GetLength(); n++ )
 	{
+		int index = engine->registeredGlobalFuncs.GetIndex(scriptFunctions[n]);
+		if( index >= 0 )
+			engine->registeredGlobalFuncs.Erase(index);
 		scriptFunctions[n]->Release();
-		engine->registeredGlobalFuncs.RemoveValue(scriptFunctions[n]);
 		if( engine->stringFactory == scriptFunctions[n] )
 			engine->stringFactory = 0;
 	}
@@ -143,20 +145,23 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 	}
 	funcDefs.SetLength(0);
 
+	engine->ClearUnusedTypes();
+
 	// Remove object types (skip this if it is possible other groups are still using the types)
 	if( !notUsed )
 	{
 		for( n = 0; n < objTypes.GetLength(); n++ )
 		{
 			asCObjectType *t = objTypes[n];
-			int idx = engine->objectTypes.IndexOf(t);
-			if( idx >= 0 )
+			asSMapNode<asSNameSpaceNamePair, asCObjectType*> *cursor;
+			if( engine->allRegisteredTypes.MoveTo(&cursor, asSNameSpaceNamePair(t->nameSpace, t->name)) &&
+				cursor->value == t )
 			{
 #ifdef AS_DEBUG
 				ValidateNoUsage(engine, t);
 #endif
 
-				engine->objectTypes.RemoveIndex(idx);
+				engine->allRegisteredTypes.Erase(cursor);
 				if( engine->defaultArrayObjectType == t )
 					engine->defaultArrayObjectType = 0;
 
@@ -164,10 +169,27 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 					engine->registeredTypeDefs.RemoveValue(t);
 				else if( t->flags & asOBJ_ENUM )
 					engine->registeredEnums.RemoveValue(t);
+				else if( t->flags & asOBJ_TEMPLATE )
+					engine->registeredTemplateTypes.RemoveValue(t);
 				else
 					engine->registeredObjTypes.RemoveValue(t);
 
 				asDELETE(t, asCObjectType);
+			}
+			else
+			{
+				int idx = engine->templateInstanceTypes.IndexOf(t);
+				if( idx >= 0 )
+				{
+#ifdef AS_DEBUG
+					ValidateNoUsage(engine, t);
+#endif
+
+					engine->templateInstanceTypes.RemoveIndexUnordered(idx);
+					t->templateSubTypes.SetLength(0);
+
+					asDELETE(t, asCObjectType);
+				}
 			}
 		}
 		objTypes.SetLength(0);
@@ -188,18 +210,22 @@ void asCConfigGroup::ValidateNoUsage(asCScriptEngine *engine, asCObjectType *typ
 		if( func == 0 ) continue;
 
 		// Ignore factory, list factory, and members
-		if( func->name == "_beh_2_" || func->name == "_beh_3_" || func->objectType == type )
+		if( func->name == "_beh_3_" || func->name == "_beh_4_" || func->objectType == type )
 			continue;
 
 		// Ignore function definitions too, as they aren't released until the engine is destroyed
 		if( func->funcType == asFUNC_FUNCDEF )
 			continue;
 
+		// Ignore functions whose object type has already reached refCount 0 as they are to be removed
+		if( func->objectType && func->objectType->GetRefCount() == 0 )
+			continue;
+
 		if( func->returnType.GetObjectType() == type )
 		{
 			asCString msg;
 			// We can only use the function name here, because the types used by the function may have been deleted already
-			msg.Format(TXT_TYPE_s_IS_STILL_USED_BY_FUNC_s, type->name.AddressOf(), func->GetName());
+			msg.Format(TXT_TYPE_s_IS_STILL_USED_BY_FUNC_s, type->name.AddressOf(), func->GetDeclaration());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
 		}
 		else
@@ -210,7 +236,7 @@ void asCConfigGroup::ValidateNoUsage(asCScriptEngine *engine, asCObjectType *typ
 				{
 					asCString msg;
 					// We can only use the function name here, because the types used by the function may have been deleted already
-					msg.Format(TXT_TYPE_s_IS_STILL_USED_BY_FUNC_s, type->name.AddressOf(), func->GetName());
+					msg.Format(TXT_TYPE_s_IS_STILL_USED_BY_FUNC_s, type->name.AddressOf(), func->GetDeclaration());
 					engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
 					break;
 				}

@@ -67,8 +67,8 @@ struct sFunctionDescription
 struct sGlobalVariableDescription
 {
 	asCScriptCode     *script;
-	asCScriptNode     *idNode;
-	asCScriptNode     *nextNode;
+	asCScriptNode     *declaredAtNode;
+	asCScriptNode     *initializationNode;
 	asCString          name;
 	asCGlobalProperty *property;
 	asCDataType        datatype;
@@ -161,13 +161,7 @@ protected:
 	void               WriteError(const asCString &msg, asCScriptCode *file, asCScriptNode *node);
 	void               WriteWarning(const asCString &scriptname, const asCString &msg, int r, int c);
 
-	asCObjectProperty *GetObjectProperty(asCDataType &obj, const char *prop);
 	asCGlobalProperty *GetGlobalProperty(const char *prop, asSNameSpace *ns, bool *isCompiled, bool *isPureConstant, asQWORD *constantValue, bool *isAppProp);
-
-	asCScriptFunction *GetFunctionDescription(int funcId);
-	void               GetFunctionDescriptions(const char *name, asCArray<int> &funcs, asSNameSpace *ns);
-	void               GetObjectMethodDescriptions(const char *name, asCObjectType *objectType, asCArray<int> &methods, bool objIsConst, const asCString &scope = "");
-
 	int                ValidateDefaultArgs(asCScriptCode *script, asCScriptNode *node, asCScriptFunction *func);
 	asCString          GetCleanExpressionString(asCScriptNode *n, asCScriptCode *file);
 
@@ -175,7 +169,6 @@ protected:
 	asCString          GetScopeFromNode(asCScriptNode *n, asCScriptCode *script, asCScriptNode **next = 0);
 	asSNameSpace      *GetParentNameSpace(asSNameSpace *ns);
 
-	bool               DoesTypeExist(const asCString &type);
 	asCObjectType     *GetObjectType(const char *type, asSNameSpace *ns);
 	asCScriptFunction *GetFuncDef(const char *type);
 	asCObjectType     *GetObjectTypeFromTypesKnownByObject(const char *type, asCObjectType *currentType);
@@ -235,6 +228,11 @@ protected:
 	void               CompileGlobalVariables();
 	int                GetEnumValueFromObjectType(asCObjectType *objType, const char *name, asCDataType &outDt, asDWORD &outValue);
 	int                GetEnumValue(const char *name, asCDataType &outDt, asDWORD &outValue, asSNameSpace *ns);
+	bool               DoesTypeExist(const asCString &type);
+	asCObjectProperty *GetObjectProperty(asCDataType &obj, const char *prop);
+	asCScriptFunction *GetFunctionDescription(int funcId);
+	void               GetFunctionDescriptions(const char *name, asCArray<int> &funcs, asSNameSpace *ns);
+	void               GetObjectMethodDescriptions(const char *name, asCObjectType *objectType, asCArray<int> &methods, bool objIsConst, const asCString &scope = "");
 
 	asCArray<asCScriptCode *>                  scripts;
 	asCArray<sFunctionDescription *>           functions;
@@ -244,6 +242,10 @@ protected:
 	asCArray<sClassDeclaration *>              namedTypeDeclarations;
 	asCArray<sFuncDef *>                       funcDefs;
 	asCArray<sMixinClass *>                    mixinClasses;
+
+	// For use with the DoesTypeExists() method
+	bool                    hasCachedKnownTypes;
+	asCMap<asCString, bool> knownTypes;
 #endif
 };
 

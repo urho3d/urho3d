@@ -61,7 +61,6 @@ public:
 	void   GCEnumCallback(void *reference);
 	int    AddScriptObjectToGC(void *obj, asCObjectType *objType);
 	int    GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj, asIObjectType **type);
-	bool   IsObjectInGC(void *obj);
 
 	int    ReportAndReleaseUndestroyedObjects();
 

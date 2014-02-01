@@ -67,7 +67,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.28.0 (http://www.angelcode.com/angelscript/)
+- AngelScript 2.28.1 (http://www.angelcode.com/angelscript/)
 - Bullet 2.81 (http://www.bulletphysics.org/)
 - Civetweb (http://sourceforge.net/projects/civetweb/)
 - FreeType 2.5.0 (http://www.freetype.org/)

@@ -217,6 +217,7 @@ public:
 	asCArray<asCObjectProperty*> properties;
 	asCArray<int>                methods;
 	asCArray<asCObjectType*>     interfaces;
+	asCArray<asUINT>             interfaceVFTOffsets;
 	asCArray<asSEnumValue*>      enumValues;
 	asCObjectType *              derivedFrom;
 	asCArray<asCScriptFunction*> virtualFunctionTable;

@@ -176,6 +176,7 @@ public:
 	friend class asCRestore;
 
 	void InternalReset();
+	bool IsEmpty() const;
 
 	int  CallInit(asIScriptContext *ctx);
 	void CallExit();

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2012 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -117,7 +117,7 @@ END_AS_NAMESPACE
 #else
 #define WIN32_LEAN_AND_MEAN
 #ifndef _WIN32_WINNT
-  #define _WIN32_WINNT 0x0400 // We need this to get the declaration for TryEnterCriticalSection
+  #define _WIN32_WINNT 0x0600 // We need this to get the declaration for Windows Phone compatible Ex functions
 #endif
 #include <windows.h>
 #endif

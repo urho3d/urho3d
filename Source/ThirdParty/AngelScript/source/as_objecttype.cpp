@@ -738,9 +738,18 @@ asCObjectProperty *asCObjectType::AddPropertyToClass(const asCString &name, cons
 	int propSize;
 	if( dt.IsObject() )
 	{
-		propSize = dt.GetSizeOnStackDWords()*4;
-		if( !dt.IsObjectHandle() )
-			prop->type.MakeReference(true);
+		// Non-POD value types can't be allocated inline,
+		// because there is a risk that the script might
+		// try to access the content without knowing that
+		// it hasn't been initialized yet.
+		if( dt.GetObjectType()->flags & asOBJ_POD )
+			propSize = dt.GetSizeInMemoryBytes();
+		else
+		{
+			propSize = dt.GetSizeOnStackDWords()*4;
+			if( !dt.IsObjectHandle() )
+				prop->type.MakeReference(true);
+		}
 	}
 	else
 		propSize = dt.GetSizeInMemoryBytes();

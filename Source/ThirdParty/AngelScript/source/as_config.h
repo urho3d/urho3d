@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -27,6 +27,7 @@
    Andreas Jonsson
    andreas@angelcode.com
 */
+
 
 
 //
@@ -195,6 +196,10 @@
 
 // AS_ARM
 // Use assembler code for the ARM CPU family
+
+// AS_SOFTFP
+// Use to tell compiler that ARM soft-float ABI
+// should be used instead of ARM hard-float ABI
 
 // AS_X64_GCC
 // Use GCC assembler code for the X64 AMD/Intel CPU family
@@ -377,6 +382,7 @@
 #endif
 
 // Microsoft Visual C++
+// Ref: http://msdn.microsoft.com/en-us/library/b0084kay.aspx
 #if defined(_MSC_VER) && !defined(__MWERKS__)
 
 	#if _MSC_VER <= 1200 // MSVC6
@@ -457,7 +463,7 @@
 		#endif
 	#endif
 
-	#ifdef _ARM_
+	#if defined(_ARM_) || defined(_M_ARM)
 		#define AS_ARM
 		#define AS_CALLEE_DESTROY_OBJ_BY_VAL
 		#define CDECL_RETURN_SIMPLE_IN_MEMORY
@@ -465,6 +471,7 @@
 		#define COMPLEX_OBJS_PASSED_BY_REF
 		#define COMPLEX_MASK asOBJ_APP_CLASS_ASSIGNMENT
 		#define COMPLEX_RETURN_MASK asOBJ_APP_CLASS_ASSIGNMENT
+		#define AS_SOFTFP
 	#endif
 
 	#ifndef COMPLEX_MASK
@@ -545,7 +552,7 @@
 #endif
 
 // GNU C (and MinGW or Cygwin on Windows)
-// Use the following command to determine predefined macros: echo . | mingw32-g++ -dM -E -
+// Use the following command to determine predefined macros: echo . | g++ -dM -E -
 #if (defined(__GNUC__) && !defined(__SNC__)) || defined(EPPC) || defined(__CYGWIN__) // JWC -- use this instead for Wii
 	#define GNU_STYLE_VIRTUAL_METHOD
 #if !defined( __amd64__ )
@@ -591,6 +598,8 @@
 			#define AS_X86
 		#elif defined(I3D_ARCH_ARM)
 			#define AS_ARM
+
+			#define AS_SOFTFP
 
 			// Marmalade appear to use the same ABI as Android when built for ARM
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
@@ -640,9 +649,8 @@
 		#endif
 
 		#if (defined(_ARM_) || defined(__arm__))
-			// The IPhone use an ARM processor
+			// iOS use ARM processor
 			#define AS_ARM
-			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
@@ -661,6 +669,9 @@
 			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			#undef COMPLEX_RETURN_MASK
 			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+
+			// iOS uses soft-float ABI
+			#define AS_SOFTFP
 
 			// STDCALL is not available on ARM
 			#undef STDCALL
@@ -785,7 +796,9 @@
 			#define STDCALL
 		#elif defined(__ARMEL__) || defined(__arm__)
 			#define AS_ARM
-			#define AS_NO_ATOMIC
+
+			#undef STDCALL
+			#define STDCALL
 
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
@@ -798,6 +811,20 @@
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+
+			#ifndef AS_MAX_PORTABILITY
+			// Make a few checks against incompatible ABI combinations
+			#if defined(__FAST_MATH__) && __FAST_MATH__ == 1
+				#error -ffast-math is not supported with native calling conventions
+			#endif
+			#endif
+
+			// Verify if soft-float or hard-float ABI is used
+			#if defined(__SOFTFP__) && __SOFTFP__ == 1
+				// -ffloat-abi=softfp or -ffloat-abi=soft
+				#define AS_SOFTFP	
+			#endif
+
 		#elif defined(__mips__)
 			#define AS_MIPS
 			#define AS_BIG_ENDIAN
@@ -916,6 +943,7 @@
 			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 
 			#define AS_ARM
+			#define AS_SOFTFP
 			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
 		#endif
 
