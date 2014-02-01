@@ -360,17 +360,16 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             info.vertexLights_ = command.vertexLights_;
             
             // Check scenepass metadata for defining custom passes which interact with lighting
-            String metadata = command.metadata_.Trimmed().ToLower();
-            if (!metadata.Empty())
+            if (!command.metadata_.Empty())
             {
-                if (metadata == "gbuffer")
+                if (command.metadata_ == "gbuffer")
                     gBufferPassName_ = command.pass_;
-                else if (metadata == "base")
+                else if (command.metadata_ == "base" && command.pass_ != "base")
                 {
                     basePassName_ = command.pass_;
                     litBasePassName_ = "lit" + command.pass_;
                 }
-                else if (metadata == "alpha")
+                else if (command.metadata_ == "alpha" && command.pass_ != "alpha")
                 {
                     alphaPassName_ = command.pass_;
                     litAlphaPassName_ = "lit" + command.pass_;
@@ -384,11 +383,9 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             
             scenePasses_.Push(info);
         }
-        else if (command.type_ == CMD_FORWARDLIGHTS)
-        {
-            if (!command.pass_.Trimmed().Empty())
-                lightPassName_ = command.pass_;
-        }
+        // Allow a custom forward light pass
+        else if (command.type_ == CMD_FORWARDLIGHTS && !command.pass_.Empty())
+            lightPassName_ = command.pass_;
     }
     
     // Go through commands to check for deferred rendering

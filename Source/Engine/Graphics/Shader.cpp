@@ -103,6 +103,11 @@ bool Shader::Load(Deserializer& source)
 
 ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines)
 {
+    return GetVariation(type, defines.CString());
+}
+
+ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
+{
     StringHash definesHash(defines);
     
     if (type == VS)
@@ -112,12 +117,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines)
         if (i == vsVariations_.End())
         {
             i = vsVariations_.Insert(MakePair(definesHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
-            String path, fileName, extension;
-            SplitPath(GetName(), path, fileName, extension);
-            String fullName = path + fileName + "_" + defines.Replaced(' ', '_');
-            if (fullName.EndsWith("_"))
-                fullName.Resize(fullName.Length() - 1);
-            i->second_->SetName(fullName);
+            i->second_->SetName(GetFileName(GetName()) + "_" + defines);
             i->second_->SetDefines(defines);
             
             SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));
@@ -132,12 +132,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines)
         if (i == psVariations_.End())
         {
             i = psVariations_.Insert(MakePair(definesHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
-            String path, fileName, extension;
-            SplitPath(GetName(), path, fileName, extension);
-            String fullName = path + fileName + "_" + defines.Replaced(' ', '_');
-            if (fullName.EndsWith("_"))
-                fullName.Resize(fullName.Length() - 1);
-            i->second_->SetName(fullName);
+            i->second_->SetName(GetFileName(GetName()) + "_" + defines);
             i->second_->SetDefines(defines);
             
             SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));

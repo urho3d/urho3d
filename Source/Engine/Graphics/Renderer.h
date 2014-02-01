@@ -289,6 +289,8 @@ public:
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)0; }
     /// Return a shader variation by name and defines.
     ShaderVariation* GetShader(ShaderType type, const String& name, const String& defines = String::EMPTY) const;
+    /// Return a shader variation by name and defines.
+    ShaderVariation* GetShader(ShaderType type, const char* name, const char* defines) const;
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() const { return frame_; }
     

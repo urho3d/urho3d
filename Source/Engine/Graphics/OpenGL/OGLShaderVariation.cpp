@@ -150,7 +150,7 @@ bool ShaderVariation::Create()
 
 void ShaderVariation::SetName(const String& name)
 {
-    name_ = name;
+    name_ = name.Trimmed().Replaced(' ', '_');
 }
 
 void ShaderVariation::SetDefines(const String& defines)

@@ -552,7 +552,12 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
 
 ShaderVariation* Renderer::GetShader(ShaderType type, const String& name, const String& defines) const
 {
-    if (name != lastShaderName_ || !lastShader_)
+    return GetShader(type, name.CString(), defines.CString());
+}
+
+ShaderVariation* Renderer::GetShader(ShaderType type, const char* name, const char* defines) const
+{
+    if (lastShaderName_ != name || !lastShader_)
     {
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (!cache)

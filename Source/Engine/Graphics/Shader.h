@@ -48,6 +48,8 @@ public:
     
     /// Return a variation with defines, which should be processed with SanitateDefines() if possible.
     ShaderVariation* GetVariation(ShaderType type, const String& defines);
+    /// Return a variation with defines, which should be processed with SanitateDefines() if possible.
+    ShaderVariation* GetVariation(ShaderType type, const char* defines);
     /// Return either vertex or pixel shader source code.
     const String& GetSourceCode(ShaderType type) const { return type == VS ? vsSourceCode_ : psSourceCode_; }
     
