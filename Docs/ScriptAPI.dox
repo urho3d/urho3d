@@ -3048,7 +3048,7 @@ Methods:
 - bool Build(const BoundingBox&)
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
-- Vector3 FindNearestPoint()
+- Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - Vector3[]@ FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
@@ -3058,7 +3058,7 @@ Methods:
 - bool Load(File@, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
-- Vector3 MoveAlongSurface()
+- Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), uint = 3)
 - Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
 - void Remove()
 - void RemoveInstanceDefault()
