@@ -318,9 +318,15 @@ function FollowPath(timeStep)
     if table.maxn(currentPath) > 0 then
         local nextWaypoint = currentPath[1] -- NB: currentPath[1] is the next waypoint in order
 
-        -- Rotate Jack toward next waypoint to reach and move
+        -- Rotate Jack toward next waypoint to reach and move. Check for not overshooting the target
+        local move = 5 * timeStep
+        local distance = (jackNode.position - nextWaypoint):Length()
+        if move > distance then
+            move = distance
+        end
+
         jackNode:LookAt(nextWaypoint, Vector3(0.0, 1.0, 0.0))
-        jackNode:TranslateRelative(Vector3(0.0, 0.0, 1.0) * 5 * timeStep)
+        jackNode:TranslateRelative(Vector3(0.0, 0.0, 1.0) * move)
 
         -- Remove waypoint if reached it
         if (jackNode.position - nextWaypoint):Length() < 0.1 then

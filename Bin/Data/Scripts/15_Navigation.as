@@ -320,9 +320,14 @@ void FollowPath(float timeStep)
     {
         Vector3 nextWaypoint = currentPath[0]; // NB: currentPath[0] is the next waypoint in order
 
-        // Rotate Jack toward next waypoint to reach and move
+        // Rotate Jack toward next waypoint to reach and move. Check for not overshooting the target
+        float move = 5.0f * timeStep;
+        float distance = (jackNode.position - nextWaypoint).length;
+        if (move > distance)
+            move = distance;
+        
         jackNode.LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
-        jackNode.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * 5 * timeStep);
+        jackNode.TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * move);
 
         // Remove waypoint if reached it
         if ((jackNode.position - nextWaypoint).length < 0.1)

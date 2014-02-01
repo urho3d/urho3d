@@ -282,7 +282,7 @@ void Navigation::SetPathPoint()
         {
             // Teleport
             currentPath_.Clear();
-            jackNode_->LookAt(Vector3(pathPos.x_, jackNode_->GetPosition().y_, pathPos.z_), Vector3(0.0f, 1.0f, 0.0f));
+            jackNode_->LookAt(Vector3(pathPos.x_, jackNode_->GetPosition().y_, pathPos.z_), Vector3::UP);
             jackNode_->SetPosition(pathPos);
         }
         else
@@ -376,9 +376,14 @@ void Navigation::FollowPath(float timeStep)
     {
         Vector3 nextWaypoint = currentPath_[0]; // NB: currentPath[0] is the next waypoint in order
 
-        // Rotate Jack toward next waypoint to reach and move
-        jackNode_->LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
-        jackNode_->TranslateRelative(Vector3(0.0f, 0.0f, 1.0f) * 5.0f * timeStep);
+        // Rotate Jack toward next waypoint to reach and move. Check for not overshooting the target
+        float move = 5.0f * timeStep;
+        float distance = (jackNode_->GetPosition() - nextWaypoint).Length();
+        if (move > distance)
+            move = distance;
+        
+        jackNode_->LookAt(nextWaypoint, Vector3::UP);
+        jackNode_->TranslateRelative(Vector3::FORWARD * move);
 
         // Remove waypoint if reached it
         if ((jackNode_->GetPosition() - nextWaypoint).Length() < 0.1f)
