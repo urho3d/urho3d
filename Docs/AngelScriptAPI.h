@@ -3639,7 +3639,7 @@ bool Build();
 bool Build(const BoundingBox&);
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
-Vector3 FindNearestPoint();
+Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 Array<Vector3> FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 Variant GetAttribute(const String&) const;
 Variant GetAttributeDefault(const String&) const;
@@ -3649,7 +3649,7 @@ Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 (
 bool Load(File, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
-Vector3 MoveAlongSurface();
+Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), uint = 3);
 Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 void Remove();
 void RemoveInstanceDefault();

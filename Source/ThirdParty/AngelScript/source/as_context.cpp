@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -35,7 +35,7 @@
 // This class handles the execution of the byte code
 //
 
-#include <math.h> // fmodf()
+#include <math.h> // fmodf() pow()
 
 #include "as_config.h"
 #include "as_context.h"
@@ -310,7 +310,7 @@ int asCContext::Prepare(asIScriptFunction *func)
 	if( m_status == asEXECUTION_ACTIVE || m_status == asEXECUTION_SUSPENDED )
 	{
 		asCString str;
-		str.Format(TXT_FAILED_IN_FUNC_s_d, "Prepare", asCONTEXT_ACTIVE);
+		str.Format(TXT_FAILED_IN_FUNC_s_WITH_s_d, "Prepare", func->GetDeclaration(true, true), asCONTEXT_ACTIVE);
 		m_engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 		return asCONTEXT_ACTIVE;
 	}
@@ -337,6 +337,15 @@ int asCContext::Prepare(asIScriptFunction *func)
 	else
 	{
 		asASSERT( m_engine );
+
+		// Make sure the function is from the same engine as the context to avoid mixups
+		if( m_engine != func->GetEngine() )
+		{
+			asCString str;
+			str.Format(TXT_FAILED_IN_FUNC_s_WITH_s_d, "Prepare", func->GetDeclaration(true, true), asINVALID_ARG);
+			m_engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
+			return asINVALID_ARG;
+		}
 
 		if( m_initialFunction )
 		{
@@ -1104,13 +1113,10 @@ int asCContext::Execute()
 					}
 				}
 
-				if( realFunc )
-				{
-					if( realFunc->signatureId != m_currentFunction->signatureId )
-						SetInternalException(TXT_NULL_POINTER_ACCESS);
-					else
-						m_currentFunction = realFunc;
-				}
+				if( realFunc && realFunc->signatureId == m_currentFunction->signatureId )
+					m_currentFunction = realFunc;
+				else
+					SetInternalException(TXT_NULL_POINTER_ACCESS);
 			}
 		}
 
@@ -1136,8 +1142,9 @@ int asCContext::Execute()
 		}
 		else
 		{
-			// This shouldn't happen
-			asASSERT(false);
+			// This shouldn't happen unless there was an error in which
+			// case an exception should have been raised already
+			asASSERT( m_status == asEXECUTION_EXCEPTION );
 		}
 	}
 
@@ -1565,39 +1572,44 @@ void asCContext::CallInterfaceMethod(asCScriptFunction *func)
 
 	asCObjectType *objType = obj->objType;
 
-	// TODO: runtime optimize: The object type should have a list of only those methods that
-	//                         implement interface methods. This list should be ordered by
-	//                         the signatureId so that a binary search can be made, instead
-	//                         of a linear search.
-	//
-	//                         When this is done, we must also make sure the signatureId of a
-	//                         function never changes, e.g. when if the signature functions are
-	//                         released.
-
 	// Search the object type for a function that matches the interface function
 	asCScriptFunction *realFunc = 0;
 	if( func->funcType == asFUNC_INTERFACE )
 	{
-		for( asUINT n = 0; n < objType->methods.GetLength(); n++ )
+		// Find the offset for the interface's virtual function table chunk
+		asUINT offset = 0;
+		bool found = false;
+		asCObjectType *findInterface = func->objectType;
+
+		// TODO: runtime optimize: The list of interfaces should be ordered by the address
+		//                         Then a binary search pattern can be used.
+		asUINT intfCount = asUINT(objType->interfaces.GetLength());
+		for( asUINT n = 0; n < intfCount; n++ )
 		{
-			asCScriptFunction *f2 = m_engine->scriptFunctions[objType->methods[n]];
-			if( f2->signatureId == func->signatureId )
+			if( objType->interfaces[n] == findInterface )
 			{
-				if( f2->funcType == asFUNC_VIRTUAL )
-					realFunc = objType->virtualFunctionTable[f2->vfTableIdx];
-				else
-					realFunc = f2;
+				offset = objType->interfaceVFTOffsets[n];
+				found = true;
 				break;
 			}
 		}
 
-		if( realFunc == 0 )
+		if( !found )
 		{
 			// Tell the exception handler to clean up the arguments to this method
 			m_needToCleanupArgs = true;
 			SetInternalException(TXT_NULL_POINTER_ACCESS);
 			return;
 		}
+
+		// Find the real function in the virtual table chunk with the found offset
+		realFunc = objType->virtualFunctionTable[func->vfTableIdx + offset];
+
+		// Since the interface was implemented by the class, it shouldn't
+		// be possible that the real function isn't found
+		asASSERT( realFunc );
+
+		asASSERT( realFunc->signatureId == func->signatureId );
 	}
 	else // if( func->funcType == asFUNC_VIRTUAL )
 	{
@@ -3634,7 +3646,7 @@ void asCContext::ExecuteNext()
 				}
 				else if( func->funcType == asFUNC_DELEGATE )
 				{
-					// Push the object pointer on the stack. There is always a reserved space for this so 
+					// Push the object pointer on the stack. There is always a reserved space for this so
 					// we don't don't need to worry about overflowing the allocated memory buffer
 					asASSERT( m_regs.stackPointer - AS_PTR_SIZE >= m_stackBlocks[m_stackIndex] );
 					m_regs.stackPointer -= AS_PTR_SIZE;
@@ -3904,7 +3916,7 @@ void asCContext::ExecuteNext()
 
 	case asBC_SetListSize:
 		{
-			// Set the size element in the buffer 
+			// Set the size element in the buffer
 			asBYTE *var = *(asBYTE**)(l_fp - asBC_SWORDARG0(l_bc));
 			asUINT off  = asBC_DWORDARG(l_bc);
 			asUINT size = asBC_DWORDARG(l_bc+1);
@@ -3924,7 +3936,7 @@ void asCContext::ExecuteNext()
 			asUINT off = asBC_DWORDARG(l_bc);
 
 			asASSERT( var );
-			
+
 			l_sp -= AS_PTR_SIZE;
 			*(asPWORD*)l_sp = asPWORD(var+off);
 		}
@@ -3933,7 +3945,7 @@ void asCContext::ExecuteNext()
 
 	case asBC_SetListType:
 		{
-			// Set the type id in the buffer 
+			// Set the type id in the buffer
 			asBYTE *var = *(asBYTE**)(l_fp - asBC_SWORDARG0(l_bc));
 			asUINT off  = asBC_DWORDARG(l_bc);
 			asUINT type = asBC_DWORDARG(l_bc+1);
@@ -3945,16 +3957,143 @@ void asCContext::ExecuteNext()
 		l_bc += 3;
 		break;
 
+	//------------------------------
+	// Exponent operations
+	case asBC_POWi:
+		{
+			bool isOverflow;
+			*(int*)(l_fp - asBC_SWORDARG0(l_bc)) = as_powi(*(int*)(l_fp - asBC_SWORDARG1(l_bc)), *(int*)(l_fp - asBC_SWORDARG2(l_bc)), isOverflow);
+			if( isOverflow )
+			{
+				// Need to move the values back to the context
+				m_regs.programPointer    = l_bc;
+				m_regs.stackPointer      = l_sp;
+				m_regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_POW_OVERFLOW);
+				return;
+			}
+		}
+		l_bc += 2;
+		break;
+
+	case asBC_POWu:
+		{
+			bool isOverflow;
+			*(asDWORD*)(l_fp - asBC_SWORDARG0(l_bc)) = as_powu(*(asDWORD*)(l_fp - asBC_SWORDARG1(l_bc)), *(asDWORD*)(l_fp - asBC_SWORDARG2(l_bc)), isOverflow);
+			if( isOverflow )
+			{
+				// Need to move the values back to the context
+				m_regs.programPointer    = l_bc;
+				m_regs.stackPointer      = l_sp;
+				m_regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_POW_OVERFLOW);
+				return;
+			}
+		}
+		l_bc += 2;
+		break;
+
+	case asBC_POWf:
+		{
+			float r = powf(*(float*)(l_fp - asBC_SWORDARG1(l_bc)), *(float*)(l_fp - asBC_SWORDARG2(l_bc)));
+			*(float*)(l_fp - asBC_SWORDARG0(l_bc)) = r;
+			if( r == float(HUGE_VAL) )
+			{
+				// Need to move the values back to the context
+				m_regs.programPointer    = l_bc;
+				m_regs.stackPointer      = l_sp;
+				m_regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_POW_OVERFLOW);
+				return;
+			}
+		}
+		l_bc += 2;
+		break;
+
+	case asBC_POWd:
+		{
+			double r = pow(*(double*)(l_fp - asBC_SWORDARG1(l_bc)), *(double*)(l_fp - asBC_SWORDARG2(l_bc)));
+			*(double*)(l_fp - asBC_SWORDARG0(l_bc)) = r;
+			if( r == HUGE_VAL )
+			{
+				// Need to move the values back to the context
+				m_regs.programPointer    = l_bc;
+				m_regs.stackPointer      = l_sp;
+				m_regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_POW_OVERFLOW);
+				return;
+			}
+		}
+		l_bc += 2;
+		break;
+
+	case asBC_POWdi:
+		{
+			double r = pow(*(double*)(l_fp - asBC_SWORDARG1(l_bc)), *(int*)(l_fp - asBC_SWORDARG2(l_bc)));
+			*(double*)(l_fp - asBC_SWORDARG0(l_bc)) = r;
+			if( r == HUGE_VAL )
+			{
+				// Need to move the values back to the context
+				m_regs.programPointer    = l_bc;
+				m_regs.stackPointer      = l_sp;
+				m_regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_POW_OVERFLOW);
+				return;
+			}
+			l_bc += 2;
+		}
+		break;
+
+	case asBC_POWi64:
+		{
+			bool isOverflow;
+			*(asINT64*)(l_fp - asBC_SWORDARG0(l_bc)) = as_powi64(*(asINT64*)(l_fp - asBC_SWORDARG1(l_bc)), *(asINT64*)(l_fp - asBC_SWORDARG2(l_bc)), isOverflow);
+			if( isOverflow )
+			{
+				// Need to move the values back to the context
+				m_regs.programPointer    = l_bc;
+				m_regs.stackPointer      = l_sp;
+				m_regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_POW_OVERFLOW);
+				return;
+			}
+		}
+		l_bc += 2;
+		break;
+
+	case asBC_POWu64:
+		{
+			bool isOverflow;
+			*(asQWORD*)(l_fp - asBC_SWORDARG0(l_bc)) = as_powu64(*(asQWORD*)(l_fp - asBC_SWORDARG1(l_bc)), *(asQWORD*)(l_fp - asBC_SWORDARG2(l_bc)), isOverflow);
+			if( isOverflow )
+			{
+				// Need to move the values back to the context
+				m_regs.programPointer    = l_bc;
+				m_regs.stackPointer      = l_sp;
+				m_regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_POW_OVERFLOW);
+				return;
+			}
+		}
+		l_bc += 2;
+		break;
+
 	// Don't let the optimizer optimize for size,
 	// since it requires extra conditions and jumps
-	case 193: l_bc = (asDWORD*)193; break;
-	case 194: l_bc = (asDWORD*)194; break;
-	case 195: l_bc = (asDWORD*)195; break;
-	case 196: l_bc = (asDWORD*)196; break;
-	case 197: l_bc = (asDWORD*)197; break;
-	case 198: l_bc = (asDWORD*)198; break;
-	case 199: l_bc = (asDWORD*)199; break;
-	case 200: l_bc = (asDWORD*)200; break;
 	case 201: l_bc = (asDWORD*)201; break;
 	case 202: l_bc = (asDWORD*)202; break;
 	case 203: l_bc = (asDWORD*)203; break;
@@ -4553,7 +4692,7 @@ int asCContext::GetExceptionLineNumber(int *column, const char **sectionName)
 
 	if( column ) *column = m_exceptionColumn;
 
-	if( sectionName ) 
+	if( sectionName )
 	{
 		// The section index can be -1 if the exception was raised in a generated function, e.g. factstub for templates
 		if( m_exceptionSectionIdx >= 0 )
@@ -4826,7 +4965,7 @@ void *asCContext::GetAddressOfVar(asUINT varIndex, asUINT stackLevel)
 	if( func == 0 )
 		return 0;
 
-	if( func->scriptData == 0 ) 
+	if( func->scriptData == 0 )
 		return 0;
 
 	if( varIndex >= func->scriptData->variables.GetLength() )
@@ -4954,6 +5093,375 @@ void *asCContext::GetThisPointer(asUINT stackLevel)
 	// NOTE: this returns the pointer to the 'this' while the GetVarPointer functions return
 	// a pointer to a pointer. I can't imagine someone would want to change the 'this'
 	return thisPointer;
+}
+
+
+
+
+
+
+
+// TODO: Move these to as_utils.cpp
+
+struct POW_INFO
+{
+	asQWORD MaxBaseu64;
+	asDWORD MaxBasei64;
+	asWORD  MaxBaseu32;
+	asWORD  MaxBasei32;
+	char    HighBit;
+};
+
+const POW_INFO pow_info[] =
+{
+	{          0ULL,          0UL,     0,     0, 0 },  // 0 is a special case
+	{          0ULL,          0UL,     0,     0, 1 },  // 1 is a special case
+    { 3037000499ULL, 2147483647UL, 65535, 46340, 2 },  // 2
+    {    2097152ULL,    1664510UL,  1625,  1290, 2 },  // 3
+    {      55108ULL,      46340UL,   255,   215, 3 },  // 4
+    {       6208ULL,       5404UL,    84,    73, 3 },  // 5
+    {       1448ULL,       1290UL,    40,    35, 3 },  // 6
+    {        511ULL,        463UL,    23,    21, 3 },  // 7
+    {        234ULL,        215UL,    15,    14, 4 },  // 8
+    {        128ULL,        118UL,    11,    10, 4 },  // 9
+    {         78ULL,         73UL,     9,     8, 4 },  // 10
+    {         52ULL,         49UL,     7,     7, 4 },  // 11
+    {         38ULL,         35UL,     6,     5, 4 },  // 12
+    {         28ULL,         27UL,     5,     5, 4 },  // 13
+    {         22ULL,         21UL,     4,     4, 4 },  // 14
+    {         18ULL,         17UL,     4,     4, 4 },  // 15
+    {         15ULL,         14UL,     3,     3, 5 },  // 16
+    {         13ULL,         12UL,     3,     3, 5 },  // 17
+    {         11ULL,         10UL,     3,     3, 5 },  // 18
+    {          9ULL,          9UL,     3,     3, 5 },  // 19
+    {          8ULL,          8UL,     3,     2, 5 },  // 20
+    {          8ULL,          7UL,     2,     2, 5 },  // 21
+    {          7ULL,          7UL,     2,     2, 5 },  // 22
+    {          6ULL,          6UL,     2,     2, 5 },  // 23
+    {          6ULL,          5UL,     2,     2, 5 },  // 24
+    {          5ULL,          5UL,     2,     2, 5 },  // 25
+    {          5ULL,          5UL,     2,     2, 5 },  // 26
+    {          5ULL,          4UL,     2,     2, 5 },  // 27
+    {          4ULL,          4UL,     2,     2, 5 },  // 28
+    {          4ULL,          4UL,     2,     2, 5 },  // 29
+    {          4ULL,          4UL,     2,     2, 5 },  // 30
+    {          4ULL,          4UL,     2,     1, 5 },  // 31
+    {          3ULL,          3UL,     1,     1, 6 },  // 32
+    {          3ULL,          3UL,     1,     1, 6 },  // 33
+    {          3ULL,          3UL,     1,     1, 6 },  // 34
+    {          3ULL,          3UL,     1,     1, 6 },  // 35
+    {          3ULL,          3UL,     1,     1, 6 },  // 36
+    {          3ULL,          3UL,     1,     1, 6 },  // 37
+    {          3ULL,          3UL,     1,     1, 6 },  // 38
+    {          3ULL,          3UL,     1,     1, 6 },  // 39
+    {          2ULL,          2UL,     1,     1, 6 },  // 40
+    {          2ULL,          2UL,     1,     1, 6 },  // 41
+    {          2ULL,          2UL,     1,     1, 6 },  // 42
+    {          2ULL,          2UL,     1,     1, 6 },  // 43
+    {          2ULL,          2UL,     1,     1, 6 },  // 44
+    {          2ULL,          2UL,     1,     1, 6 },  // 45
+    {          2ULL,          2UL,     1,     1, 6 },  // 46
+    {          2ULL,          2UL,     1,     1, 6 },  // 47
+    {          2ULL,          2UL,     1,     1, 6 },  // 48
+    {          2ULL,          2UL,     1,     1, 6 },  // 49
+    {          2ULL,          2UL,     1,     1, 6 },  // 50
+    {          2ULL,          2UL,     1,     1, 6 },  // 51
+    {          2ULL,          2UL,     1,     1, 6 },  // 52
+    {          2ULL,          2UL,     1,     1, 6 },  // 53
+    {          2ULL,          2UL,     1,     1, 6 },  // 54
+    {          2ULL,          2UL,     1,     1, 6 },  // 55
+    {          2ULL,          2UL,     1,     1, 6 },  // 56
+    {          2ULL,          2UL,     1,     1, 6 },  // 57
+    {          2ULL,          2UL,     1,     1, 6 },  // 58
+    {          2ULL,          2UL,     1,     1, 6 },  // 59
+    {          2ULL,          2UL,     1,     1, 6 },  // 60
+    {          2ULL,          2UL,     1,     1, 6 },  // 61
+    {          2ULL,          2UL,     1,     1, 6 },  // 62
+	{          2ULL,          1UL,     1,     1, 6 },  // 63
+};
+
+int as_powi(int base, int exponent, bool& isOverflow)
+{
+	if( exponent < 0 )
+	{
+		if( base == 0 )
+			// Divide by zero
+			isOverflow = true;
+		else
+			// Result is less than 1, so it truncates to 0
+			isOverflow = false;
+
+		return 0;
+	}
+	else if( exponent == 0 && base == 0 )
+	{
+		// Domain error
+		isOverflow = true;
+		return 0;
+	}
+	else if( exponent >= 31 )
+	{
+		switch( base )
+		{
+		case -1:
+			isOverflow = false;
+			return exponent & 1 ? -1 : 1;
+		case 0:
+			isOverflow = false;
+			break;
+		case 1:
+			isOverflow = false;
+			return 1;
+		default:
+			isOverflow = true;
+			break;
+		}
+		return 0;
+	}
+	else
+	{
+		const asWORD max_base = pow_info[exponent].MaxBasei32;
+		const char high_bit = pow_info[exponent].HighBit;
+		if( max_base != 0 && max_base < (base < 0 ? -base : base) )
+		{
+			isOverflow = true;
+			return 0;  // overflow
+		}
+
+		int result = 1;
+		switch( high_bit )
+		{
+		case 5:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 4:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 3:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 2:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 1:
+			if( exponent ) result *= base;
+		default:
+			isOverflow = false;
+			return result;
+		}
+	}
+}
+
+asDWORD as_powu(asDWORD base, asDWORD exponent, bool& isOverflow)
+{
+	if( exponent == 0 && base == 0 )
+	{
+		// Domain error
+		isOverflow = true;
+		return 0;
+	}
+	else if( exponent >= 32 )
+	{
+		switch( base )
+		{
+		case 0:
+			isOverflow = false;
+			break;
+		case 1:
+			isOverflow = false;
+			return 1;
+		default:
+			isOverflow = true;
+			break;
+		}
+		return 0;
+	}
+	else
+	{
+		const asWORD max_base = pow_info[exponent].MaxBaseu32;
+		const char high_bit = pow_info[exponent].HighBit;
+		if( max_base != 0 && max_base < base )
+		{
+			isOverflow = true;
+			return 0;  // overflow
+		}
+
+		asDWORD result = 1;
+		switch( high_bit )
+		{
+		case 5:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 4:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 3:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 2:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 1:
+			if( exponent ) result *= base;
+		default:
+			isOverflow = false;
+			return result;
+		}
+	}
+}
+
+asINT64 as_powi64(asINT64 base, asINT64 exponent, bool& isOverflow)
+{
+	if( exponent < 0 )
+	{
+		if( base == 0 )
+			// Divide by zero
+			isOverflow = true;
+		else
+			// Result is less than 1, so it truncates to 0
+			isOverflow = false;
+
+		return 0;
+	}
+	else if( exponent == 0 && base == 0 )
+	{
+		// Domain error
+		isOverflow = true;
+		return 0;
+	}
+	else if( exponent >= 63 )
+	{
+		switch( base )
+		{
+		case -1:
+			isOverflow = false;
+			return exponent & 1 ? -1 : 1;
+		case 0:
+			isOverflow = false;
+			break;
+		case 1:
+			isOverflow = false;
+			return 1;
+		default:
+			isOverflow = true;
+			break;
+		}
+		return 0;
+	}
+	else
+	{
+		const asDWORD max_base = pow_info[exponent].MaxBasei64;
+		const char high_bit = pow_info[exponent].HighBit;
+		if( max_base != 0 && max_base < (base < 0 ? -base : base) )
+		{
+			isOverflow = true;
+			return 0;  // overflow
+		}
+
+		asINT64 result = 1;
+		switch( high_bit )
+		{
+		case 6:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 5:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 4:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 3:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 2:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 1:
+			if( exponent ) result *= base;
+		default:
+			isOverflow = false;
+			return result;
+		}
+	}
+}
+
+asQWORD as_powu64(asQWORD base, asQWORD exponent, bool& isOverflow)
+{
+	if( exponent == 0 && base == 0 )
+	{
+		// Domain error
+		isOverflow = true;
+		return 0;
+	}
+	else if( exponent >= 64 )
+	{
+		switch( base )
+		{
+		case 0:
+			isOverflow = false;
+			break;
+		case 1:
+			isOverflow = false;
+			return 1;
+		default:
+			isOverflow = true;
+			break;
+		}
+		return 0;
+	}
+	else
+	{
+		const asQWORD max_base = pow_info[exponent].MaxBaseu64;
+		const char high_bit = pow_info[exponent].HighBit;
+		if( max_base != 0 && max_base < base )
+		{
+			isOverflow = true;
+			return 0;  // overflow
+		}
+
+		asQWORD result = 1;
+		switch( high_bit )
+		{
+		case 6:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 5:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 4:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 3:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 2:
+			if( exponent & 1 ) result *= base;
+			exponent >>= 1;
+			base *= base;
+		case 1:
+			if( exponent ) result *= base;
+		default:
+			isOverflow = false;
+			return result;
+		}
+	}
 }
 
 END_AS_NAMESPACE

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -80,9 +80,9 @@ public:
 	virtual int ClearMessageCallback();
 	virtual int WriteMessage(const char *section, int row, int col, asEMsgType type, const char *message);
 
-    // JIT Compiler
-    virtual int SetJITCompiler(asIJITCompiler *compiler);
-    virtual asIJITCompiler *GetJITCompiler() const;
+	// JIT Compiler
+	virtual int SetJITCompiler(asIJITCompiler *compiler);
+	virtual asIJITCompiler *GetJITCompiler() const;
 
 	// Global functions
 	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *objForThiscall = 0);
@@ -151,7 +151,7 @@ public:
 
 	// Script functions
 	virtual asIScriptFunction *GetFunctionById(int funcId) const;
-    virtual asIScriptFunction *GetFuncDefFromTypeId(int typeId) const;
+	virtual asIScriptFunction *GetFuncDefFromTypeId(int typeId) const;
 
 	// Type identification
 	virtual asIObjectType *GetObjectTypeById(int typeId) const;
@@ -263,7 +263,7 @@ public:
 
 	int CreateContext(asIScriptContext **context, bool isInternal);
 
-	asCObjectType *GetObjectType(const char *type, asSNameSpace *ns) const;
+	asCObjectType *GetRegisteredObjectType(const asCString &name, asSNameSpace *ns) const;
 
 	asCObjectType *GetListPatternType(int listPatternFuncId);
 	void DestroyList(asBYTE *buffer, const asCObjectType *listPatternType);
@@ -328,23 +328,26 @@ public:
 	asCObjectType    globalPropertyBehaviours;
 
 	// Registered interface
-	asCArray<asCObjectType *>          registeredObjTypes;
-	asCArray<asCObjectType *>          registeredTypeDefs;
-	asCArray<asCObjectType *>          registeredEnums;
-	asCSymbolTable<asCGlobalProperty>  registeredGlobalProps;
-	asCArray<asCScriptFunction *>      registeredGlobalFuncs;
-	asCArray<asCScriptFunction *>      registeredFuncDefs;
-	asCScriptFunction                 *stringFactory;
+	asCArray<asCObjectType *>         registeredObjTypes;
+	asCArray<asCObjectType *>         registeredTypeDefs;
+	asCArray<asCObjectType *>         registeredEnums;
+	asCSymbolTable<asCGlobalProperty> registeredGlobalProps; // TODO: memory savings: Since there can be only one property with the same name a simpler symbol table should be used
+	asCSymbolTable<asCScriptFunction> registeredGlobalFuncs;
+	asCArray<asCScriptFunction *>     registeredFuncDefs;
+	asCArray<asCObjectType *>         registeredTemplateTypes;
+	asCScriptFunction                *stringFactory;
 	bool configFailed;
 
-	// Stores all known object types, both application registered, and script declared
-	asCArray<asCObjectType *>      objectTypes;
+	// Stores all registered types except funcdefs
+	asCMap<asSNameSpaceNamePair, asCObjectType*> allRegisteredTypes;  
+
+	// Dummy types used to name the subtypes in the template objects 
 	asCArray<asCObjectType *>      templateSubTypes;
 
 	// Store information about template types
 	// This list will contain all instances of templates, both registered specialized 
 	// types and those automacially instanciated from scripts
-	asCArray<asCObjectType *>      templateTypes;
+	asCArray<asCObjectType *>      templateInstanceTypes;
 
 	// Store information about list patterns
 	asCArray<asCObjectType *>      listPatternTypes;
@@ -407,7 +410,7 @@ public:
 	asSSystemFunctionInterface  msgCallbackFunc;
 	void                       *msgCallbackObj;
 
-    asIJITCompiler              *jitCompiler;
+	asIJITCompiler             *jitCompiler;
 
 	// Namespaces
 	// These are shared between all entities and are 

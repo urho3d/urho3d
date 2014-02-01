@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -469,6 +469,8 @@ void asCModule::InternalReset()
 
 	// Allow the engine to clean up what is not used
 	engine->CleanupAfterDiscardModule();
+
+	asASSERT( IsEmpty() );
 }
 
 // interface
@@ -1125,6 +1127,21 @@ asCGlobalProperty *asCModule::AllocateGlobalProperty(const char *name, const asC
 	return prop;
 }
 
+// internal
+bool asCModule::IsEmpty() const
+{
+	if( scriptFunctions.GetLength()  ) return false;
+	if( globalFunctions.GetSize()    ) return false;
+	if( bindInformations.GetLength() ) return false;
+	if( scriptGlobals.GetSize()      ) return false;
+	if( classTypes.GetLength()       ) return false;
+	if( enumTypes.GetLength()        ) return false;
+	if( typeDefs.GetLength()         ) return false;
+	if( funcDefs.GetLength()         ) return false;
+
+	return true;
+}
+
 // interface
 int asCModule::SaveByteCode(asIBinaryStream *out, bool stripDebugInfo) const
 {
@@ -1134,6 +1151,10 @@ int asCModule::SaveByteCode(asIBinaryStream *out, bool stripDebugInfo) const
 	return asNOT_SUPPORTED;
 #else
 	if( out == 0 ) return asINVALID_ARG;
+
+	// Make sure there is actually something to save
+	if( IsEmpty() )
+		return asERROR;
 
 	asCWriter write(const_cast<asCModule*>(this), out, engine, stripDebugInfo);
 	return write.Write();
@@ -1154,7 +1175,7 @@ int asCModule::LoadByteCode(asIBinaryStream *in, bool *wasDebugInfoStripped)
 	asCReader read(this, in, engine);
 	r = read.Read(wasDebugInfoStripped);
 
-    JITCompile();
+	JITCompile();
 
 #ifdef AS_DEBUG
 	// Verify that there are no unwanted gaps in the scriptFunctions array.

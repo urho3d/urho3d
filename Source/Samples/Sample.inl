@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2013 the Urho3D project.
+// Copyright (c) 2008-2014 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,14 @@
 #include "Console.h"
 #include "DebugHud.h"
 #include "Engine.h"
+#include "FileSystem.h"
+#include "Graphics.h"
 #include "InputEvents.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "Sprite.h"
 #include "Texture2D.h"
+#include "Timer.h"
 #include "UI.h"
 #include "XMLFile.h"
 
@@ -50,6 +53,9 @@ void Sample::Start()
 {
     // Create logo
     CreateLogo();
+
+    // Set custom window Title & Icon
+    SetWindowTitleAndIcon();
 
     // Create console and debug HUD
     CreateConsoleAndDebugHud();
@@ -99,6 +105,15 @@ void Sample::CreateLogo()
     
     // Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite_->SetPriority(-100);
+}
+
+void Sample::SetWindowTitleAndIcon()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Graphics* graphics = GetSubsystem<Graphics>();
+    Image* icon = cache->GetResource<Image>("Textures/LogoLarge.png");
+    graphics->SetWindowIcon(icon);
+    graphics->SetWindowTitle("Urho3D Sample");
 }
 
 void Sample::CreateConsoleAndDebugHud()
@@ -204,5 +219,16 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         // Instancing
         else if (key == '8')
             renderer->SetDynamicInstancing(!renderer->GetDynamicInstancing());
+        
+        // Take screenshot
+        else if (key == '9')
+        {
+            Graphics* graphics = GetSubsystem<Graphics>();
+            Image screenshot(context_);
+            graphics->TakeScreenShot(screenshot);
+            // Here we save in the Data folder with date and time appended
+            screenshot.SavePNG(GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Screenshot_" +
+                Time::GetTimeStamp().Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+        }
     }
 }

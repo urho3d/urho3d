@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -71,6 +71,7 @@ enum eTokenType
 	ttStar,                // *
 	ttSlash,               // /
 	ttPercent,             // %
+	ttStarStar,            // **
 
 	ttHandle,              // @
 
@@ -79,6 +80,7 @@ enum eTokenType
 	ttMulAssign,           // *=
 	ttDivAssign,           // /=
 	ttModAssign,           // %=
+	ttPowAssign,           // **=
 
 	ttOrAssign,            // |=
 	ttAndAssign,           // &=
@@ -149,9 +151,9 @@ enum eTokenType
 	ttFalse,               // false
 	ttReturn,              // return
 	ttNot,                 // not
-	ttAnd,                 // and
-	ttOr,                  // or
-	ttXor,                 // xor
+	ttAnd,                 // and, &&
+	ttOr,                  // or, ||
+	ttXor,                 // xor, ^^
 	ttBreak,               // break
 	ttContinue,            // continue
 	ttConst,               // const
@@ -196,6 +198,8 @@ sTokenWord const tokenWords[] =
 	asTokenDef("/="        , ttDivAssign),
 	asTokenDef("%"         , ttPercent),
 	asTokenDef("%="        , ttModAssign),
+	asTokenDef("**"        , ttStarStar),
+	asTokenDef("**="       , ttPowAssign),
 	asTokenDef("="         , ttAssignment),
 	asTokenDef("=="        , ttEqual),
 	asTokenDef("."         , ttDot),

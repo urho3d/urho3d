@@ -12,7 +12,7 @@ uint resizingBorder = 0; // current border that is dragging
 uint viewportMode = VIEWPORT_SINGLE;
 int  viewportBorderOffset = 2; // used to center borders over viewport seams,  should be half of width
 int  viewportBorderWidth = 4; // width of a viewport resize border
-IntRect viewportArea(0, 0, graphics.width, graphics.height); // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that
+IntRect viewportArea; // the area where the editor viewport is. if we ever want to have the viewport not take up the whole screen this abstracts that
 IntRect viewportUIClipBorder = IntRect(27, 60, 0, 0); // used to clip viewport borders, the borders are ugly when going behind the transparent toolbars
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
@@ -184,6 +184,9 @@ Array<String> fillModeText = {
 
 void CreateCamera()
 {
+    // Set the initial viewport rect
+    viewportArea = IntRect(0, 0, graphics.width, graphics.height);
+    
     SetViewportMode(viewportMode);
     SetActiveViewport(viewports[0]);
 
@@ -202,12 +205,12 @@ void CreateViewportUI()
     {
         viewportUI = UIElement();
         ui.root.AddChild(viewportUI);
-        viewportUI.SetFixedSize(viewportArea.width, viewportArea.height);
-        viewportUI.position = IntVector2(viewportArea.top, viewportArea.left);
-        viewportUI.clipChildren = true;
-        viewportUI.clipBorder = viewportUIClipBorder;
     }
-
+        
+    viewportUI.SetFixedSize(viewportArea.width, viewportArea.height);
+    viewportUI.position = IntVector2(viewportArea.top, viewportArea.left);
+    viewportUI.clipChildren = true;
+    viewportUI.clipBorder = viewportUIClipBorder;
     viewportUI.RemoveAllChildren();
 
     Array<BorderImage@> borders;

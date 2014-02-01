@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -209,6 +209,35 @@ public:
 	// Registers available to JIT compiler functions
 	asSVMRegisters m_regs;
 };
+
+// TODO: Move these to as_utils.h
+int     as_powi(int base, int exponent, bool& isOverflow);
+asDWORD as_powu(asDWORD base, asDWORD exponent, bool& isOverflow);
+asINT64 as_powi64(asINT64 base, asINT64 exponent, bool& isOverflow);
+asQWORD as_powu64(asQWORD base, asQWORD exponent, bool& isOverflow);
+
+// Optional template version of powi if overflow detection is not used.
+#if 0
+template <class T>
+T as_powi(T base, T exponent)
+{
+	// Test for sign bit (huge number is OK)
+	if( exponent & (T(1)<<(sizeof(T)*8-1)) )
+		return 0;
+	else
+	{
+		int result = 1;
+		while( exponent )
+		{
+			if( exponent & 1 )
+				result *= base;
+			exponent >>= 1;
+			base *= base;
+		}
+		return result;
+	}
+}
+#endif
 
 END_AS_NAMESPACE
 

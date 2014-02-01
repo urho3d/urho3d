@@ -41,7 +41,7 @@
 
 #if defined(__arm__) || defined(__ARM__) || defined(I3D_ARCH_ARM)
 
-#if !defined(__linux__) || defined(__ANDROID__) || defined(ANDROID)
+#if !defined(__linux__) || defined(__ANDROID__) || defined(ANDROID) || defined(__SOFTFP__)
 
 /* iOS, Android, and Marmalade goes here */
 
@@ -260,7 +260,7 @@ nomoreargsarmFuncR0R1:
     ldmia   sp!, {r4-r8, pc}
 
 /* --------------------------------------------------------------------------------------------*/
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__SOFTFP__)
 
 /* The Linux code goes here */
 

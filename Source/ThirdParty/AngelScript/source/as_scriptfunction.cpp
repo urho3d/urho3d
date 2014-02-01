@@ -144,8 +144,13 @@ void RegisterScriptFunction(asCScriptEngine *engine)
 	r = engine->RegisterGlobalFunction("void f(int &in, int &in)", asFUNCTION(ScriptFunction_CreateDelegate_Generic), asCALL_GENERIC); asASSERT( r >= 0 );
 #endif
 
-	// Change the return type so the VM will know the function really returns a handle
+	// Rename the function so that it cannot be called manually by the script
+	int idx = engine->registeredGlobalFuncs.GetIndex(engine->scriptFunctions[r]);
+	engine->registeredGlobalFuncs.Erase(idx);
 	engine->scriptFunctions[r]->name = DELEGATE_FACTORY;
+	engine->registeredGlobalFuncs.Put(engine->scriptFunctions[r]);
+
+	// Change the return type so the VM will know the function really returns a handle
 	engine->scriptFunctions[r]->returnType = asCDataType::CreateObject(&engine->functionBehaviours, false);
 	engine->scriptFunctions[r]->returnType.MakeHandle(true);
 }

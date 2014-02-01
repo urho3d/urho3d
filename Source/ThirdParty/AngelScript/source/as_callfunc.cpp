@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -76,13 +76,18 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 				return asINVALID_ARG;
 			internal->objForThiscall = objForThiscall;
 			internal->callConv       = ICC_THISCALL;
+
+			// This is really a thiscall, so it is necessary to check for virtual method pointers
+			base = asCALL_THISCALL;
+			isMethod = true;
 		}
 		else if( base == asCALL_GENERIC )
 			internal->callConv = ICC_GENERIC_FUNC;
 		else
 			return asNOT_SUPPORTED;
 	}
-	else
+	
+	if( isMethod )
 	{
 #ifndef AS_NO_CLASS_METHODS
 		if( base == asCALL_THISCALL )

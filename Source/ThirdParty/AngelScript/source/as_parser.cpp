@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2014 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -865,6 +865,7 @@ bool asCParser::IsDataType(const sToken &token)
 {
 	if( token.type == ttIdentifier )
 	{
+#ifndef AS_NO_COMPILER
 		if( checkValidTypes )
 		{
 			// Check if this is an existing type, regardless of namespace
@@ -872,6 +873,7 @@ bool asCParser::IsDataType(const sToken &token)
 			if( !builder->DoesTypeExist(tempString.AddressOf()) )
 				return false;
 		}
+#endif
 		return true;
 	}
 
@@ -1633,6 +1635,7 @@ bool asCParser::IsOperator(int tokenType)
 		tokenType == ttStar ||
 		tokenType == ttSlash ||
 		tokenType == ttPercent ||
+		tokenType == ttStarStar ||
 		tokenType == ttAnd ||
 		tokenType == ttOr ||
 		tokenType == ttXor ||
@@ -1663,6 +1666,7 @@ bool asCParser::IsAssignOperator(int tokenType)
 		tokenType == ttMulAssign ||
 		tokenType == ttDivAssign ||
 		tokenType == ttModAssign ||
+		tokenType == ttPowAssign ||
 		tokenType == ttAndAssign ||
 		tokenType == ttOrAssign ||
 		tokenType == ttXorAssign ||
@@ -1725,6 +1729,13 @@ int asCParser::ParseScript(asCScriptCode *script)
 
 	if( errorWhileParsing )
 		return -1;
+
+	// Warn in case there isn't anything in the script
+	if( scriptNode->firstChild == 0 )
+	{
+		if( builder )
+			builder->WriteWarning(script->name, TXT_SECTION_IS_EMPTY, 1, 1);
+	}
 
 	return 0;
 }
