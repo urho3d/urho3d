@@ -132,6 +132,7 @@ void Urho3DPlayer::Start()
         }
 #else
         ErrorExit("AngelScript is not enabled!");
+        return;
 #endif
     }
     else
@@ -149,6 +150,7 @@ void Urho3DPlayer::Start()
         }
 #else
         ErrorExit("Lua is not enabled!");
+        return;
 #endif
     }
 
