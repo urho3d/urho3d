@@ -1,12 +1,18 @@
+$#include "File.h"
 $#include "Sound.h"
 
 class Sound : public Resource
 {
     Sound();
     ~Sound();
+    
     bool LoadRaw(Deserializer& source);
     bool LoadWav(Deserializer& source);
     bool LoadOggVorbis(Deserializer& source);
+    tolua_outside bool SoundLoadRaw @ LoadRaw(const String fileName);
+    tolua_outside bool SoundLoadWav @ LoadWav(const String fileName);
+    tolua_outside bool SoundLoadOggVorbis @ LoadOggVorbis(const String fileName);
+
     void SetSize(unsigned dataSize);
     void SetData(const void* data, unsigned dataSize);
     void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
@@ -45,5 +51,41 @@ static int tolua_AudioLuaAPI_Sound_new00(lua_State* tolua_S)
 static int tolua_AudioLuaAPI_Sound_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<Sound>(tolua_S);
+}
+
+static bool SoundLoadRaw(Sound* sound, const String& fileName)
+{
+    if (!sound)
+        return false;
+
+    File file(sound->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return sound->LoadRaw(file);
+}
+
+static bool SoundLoadWav(Sound* sound, const String& fileName)
+{
+    if (!sound)
+        return false;
+
+    File file(sound->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return sound->LoadWav(file);
+}
+
+static bool SoundLoadOggVorbis(Sound* sound, const String& fileName)
+{
+    if (!sound)
+        return false;
+
+    File file(sound->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return sound->LoadOggVorbis(file);
 }
 $}
