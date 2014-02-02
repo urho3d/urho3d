@@ -117,7 +117,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
         if (i == vsVariations_.End())
         {
             i = vsVariations_.Insert(MakePair(definesHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, VS))));
-            i->second_->SetName(GetFileName(GetName()) + "_" + defines);
+            i->second_->SetName(GetFileName(GetName()) + " " + defines);
             i->second_->SetDefines(defines);
             
             SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));
@@ -132,7 +132,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
         if (i == psVariations_.End())
         {
             i = psVariations_.Insert(MakePair(definesHash, SharedPtr<ShaderVariation>(new ShaderVariation(this, PS))));
-            i->second_->SetName(GetFileName(GetName()) + "_" + defines);
+            i->second_->SetName(GetFileName(GetName()) + " " + defines);
             i->second_->SetDefines(defines);
             
             SetMemoryUse(GetMemoryUse() + sizeof(ShaderVariation));

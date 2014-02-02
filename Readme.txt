@@ -363,14 +363,11 @@ Compiling Direct3D shaders
 
 When building with the Windows 8 SDK, copy d3dcompiler_46.dll from
 C:/Program Files (x86)/Windows Kits/8.0/bin/x86 to Urho3D Bin directory so that
-the ShaderCompiler program will run correctly.
-
-To make the Urho3D examples start faster on Windows & Direct3D9 mode, run
-CompileAllShaders.bat from the Bin directory first.
+Urho3D executables will run correctly.
 
 Note that you can also force an OpenGL mode build on Windows by using the CMake
-option in the table below; OpenGL does not need a separate shader compilation 
-step or utility.
+option in the table below; OpenGL does not depend on a separate shader compiler
+DLL.
 
 
 Documentation build

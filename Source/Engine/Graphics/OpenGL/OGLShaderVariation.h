@@ -55,7 +55,7 @@ public:
     void SetDefines(const String& defines);
     
     /// Return shader type.
-    ShaderType GetShaderType() const { return shaderType_; }
+    ShaderType GetShaderType() const { return type_; }
     /// Return full shader name.
     const String& GetName() const { return name_; }
     /// Return defines.
@@ -69,7 +69,7 @@ private:
     /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;
     /// Shader type.
-    ShaderType shaderType_;
+    ShaderType type_;
     /// Full shader name.
     String name_;
     /// Defines to use in compiling.

@@ -69,34 +69,26 @@ public:
     /// Destruct.
     virtual ~ShaderVariation();
     
-    /// Create the shader program. Return true if successful.
-    bool Create();
-    /// Release shader.
+    /// Release the shader.
     virtual void Release();
     
+    /// Compile the shader. Return true if successful.
+    bool Create();
     /// Set name.
     void SetName(const String& name);
-    /// Set bytecode.
-    void SetByteCode(const SharedArrayPtr<unsigned char>& byteCode);
-    /// Add a parameter.
-    void AddParameter(StringHash param, const ShaderParameter& definition);
-    /// Add a texture unit.
-    void AddTextureUnit(TextureUnit unit);
-    /// Clear parameters and texture unit use flags.
-    void ClearParameters();
-    /// Optimize the parameter map for optimal query speed
-    void OptimizeParameters();
+    /// Set defines.
+    void SetDefines(const String& defines);
     
     /// Return shader type.
-    ShaderType GetShaderType() const { return shaderType_; }
+    ShaderType GetShaderType() const { return type_; }
     /// Return full shader name.
     const String& GetName() const { return name_; }
-    /// Return parent shader resource.
-    Shader* GetOwner() const;
-    /// Return whether created successfully.
-    bool IsCreated() const;
-    /// Return whether compile failed.
-    bool IsFailed() const { return failed_; }
+    /// Return defines.
+    const String& GetDefines() const { return defines_; }
+    /// Return whether successfully compiled.
+    bool IsCompiled() const { return compiled_; }
+    /// Return compile error/warning string.
+    const String& GetCompilerOutput() const { return compilerOutput_; }
     /// Return whether uses a parameter.
     bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
     /// Return whether uses a texture unit (only for pixel shaders.)
@@ -105,16 +97,23 @@ public:
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
     
 private:
-    /// Parent shader resource.
+    /// Inspect the constant parameters of the shader bytecode using MojoShader.
+    void ParseParameters(unsigned char* bufData, unsigned bufSize);
+    /// Strip comments from shader bytecode and store it.
+    void CopyStrippedCode(PODVector<unsigned>& dest, unsigned char* bufData, unsigned bufSize);
+    
+    /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;
     /// Shader type.
-    ShaderType shaderType_;
+    ShaderType type_;
     /// Full shader name.
     String name_;
-    /// Shader bytecode.
-    SharedArrayPtr<unsigned char> byteCode_;
-    /// Compile failed flag.
-    bool failed_;
+    /// Defines to use in compiling.
+    String defines_;
+    /// Shader compile error string.
+    String compilerOutput_;
+    /// Compiled flag.
+    bool compiled_;
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.

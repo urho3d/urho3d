@@ -36,7 +36,7 @@ namespace Urho3D
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
-    shaderType_(type),
+    type_(type),
     compiled_(false)
 {
 }
@@ -66,7 +66,7 @@ void ShaderVariation::Release()
         
         if (!graphics_->IsDeviceLost())
         {
-            if (shaderType_ == VS)
+            if (type_ == VS)
             {
                 if (graphics_->GetVertexShader() == this)
                     graphics_->SetShaders(0, 0);
@@ -98,17 +98,17 @@ bool ShaderVariation::Create()
         return false;
     }
     
-    object_ = glCreateShader(shaderType_ == VS ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+    object_ = glCreateShader(type_ == VS ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
     if (!object_)
     {
         compilerOutput_ = "Could not create shader object";
         return false;
     }
     
-    const String& originalShaderCode = owner_->GetSourceCode(shaderType_);
+    const String& originalShaderCode = owner_->GetSourceCode(type_);
     String shaderCode;
     // Distinguish between VS and PS compile in case the shader code wants to include/omit different things
-    shaderCode += shaderType_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
+    shaderCode += type_ == VS ? "#define COMPILEVS\n" : "#define COMPILEPS\n";
     
     // Prepend the defines to the shader code
     Vector<String> defineVec = defines_.Split(' ');

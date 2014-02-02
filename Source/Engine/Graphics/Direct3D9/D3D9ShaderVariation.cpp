@@ -26,6 +26,10 @@
 #include "Shader.h"
 #include "ShaderVariation.h"
 
+#include <windows.h>
+#include <d3dcompiler.h>
+#include <mojoshader.h>
+
 #include "DebugNew.h"
 
 namespace Urho3D
@@ -34,10 +38,11 @@ namespace Urho3D
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
-    shaderType_(type),
-    failed_(false)
+    type_(type),
+    compiled_(false)
 {
-    ClearParameters();
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        useTextureUnit_[i] = false;
 }
 
 ShaderVariation::~ShaderVariation()
@@ -52,27 +57,119 @@ bool ShaderVariation::Create()
     if (!graphics_)
         return false;
     
-    // Load bytecode and/or compile shader if necessary
-    if (!byteCode_ && owner_)
-        owner_->PrepareVariation(this);
+    // Compile shader if don't have loadable bytecode
+    PODVector<unsigned> byteCode;
     
-    IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-    if (shaderType_ == VS)
+    if (byteCode.Empty())
     {
-        if (!byteCode_ || !device || FAILED(device->CreateVertexShader(
-            (const DWORD*)byteCode_.Get(),
+        Vector<String> defines = defines_.Split(' ');
+        
+        // Set the entrypoint, profile and flags according to the shader being compiled
+        const char* entryPoint = 0;
+        const char* profile = 0;
+        unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
+        bool useSM3 = graphics_->GetSM3Support();
+        
+        if (type_ == VS)
+        {
+            entryPoint = "VS";
+            defines.Push("COMPILEVS");
+            if (!useSM3)
+                profile = "vs_2_0";
+            else
+                profile = "vs_3_0";
+        }
+        else
+        {
+            entryPoint = "PS";
+            defines.Push("COMPILEPS");
+            if (!useSM3)
+                profile = "ps_2_0";
+            else
+            {
+                profile = "ps_3_0";
+                flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
+            }
+        }
+        
+        if (useSM3)
+            defines.Push("SM3");
+        
+        // Collect defines into macros
+        Vector<String> defineValues;
+        PODVector<D3D_SHADER_MACRO> macros;
+        
+        for (unsigned i = 0; i < defines.Size(); ++i)
+        {
+            unsigned equalsPos = defines[i].Find('=');
+            if (equalsPos != String::NPOS)
+            {
+                defineValues.Push(defines[i].Substring(equalsPos + 1));
+                defines[i].Resize(equalsPos);
+            }
+            else
+                defineValues.Push("1");
+        }
+        for (unsigned i = 0; i < defines.Size(); ++i)
+        {
+            D3D_SHADER_MACRO macro;
+            macro.Name = defines[i].CString();
+            macro.Definition = defineValues[i].CString();
+            macros.Push(macro);
+        }
+        
+        D3D_SHADER_MACRO endMacro;
+        endMacro.Name = 0;
+        endMacro.Definition = 0;
+        macros.Push(endMacro);
+        
+        // Compile using D3DCompile
+        const String& sourceCode = owner_->GetSourceCode(type_);
+        LPD3DBLOB shaderCode = 0;
+        LPD3DBLOB errorMsgs = 0;
+        
+        if (FAILED(D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
+            entryPoint, profile, flags, 0, &shaderCode, &errorMsgs)))
+            compilerOutput_ = String((const char*)errorMsgs->GetBufferPointer(), errorMsgs->GetBufferSize());
+        else
+        {
+            // Inspect the produced bytecode using MojoShader, then strip and store it
+            unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
+            unsigned bufSize = shaderCode->GetBufferSize();
+            ParseParameters(bufData, bufSize);
+            CopyStrippedCode(byteCode, bufData, bufSize);
+        }
+
+        if (shaderCode)
+            shaderCode->Release();
+        if (errorMsgs)
+            errorMsgs->Release();
+        if (byteCode.Empty())
+            return false;
+    }
+    
+    // Then create shader from the bytecode
+    IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+    if (type_ == VS)
+    {
+        if (!device || FAILED(device->CreateVertexShader(
+            (const DWORD*)&byteCode[0],
             (IDirect3DVertexShader9**)&object_)))
-            failed_ = true;
+            compilerOutput_ = "Could not create vertex shader";
+        else
+            compiled_ = true;
     }
     else
     {
-        if (!byteCode_ || !device || FAILED(device->CreatePixelShader(
-            (const DWORD*)byteCode_.Get(),
+        if (!device || FAILED(device->CreatePixelShader(
+            (const DWORD*)&byteCode[0],
             (IDirect3DPixelShader9**)&object_)))
-            failed_ = true;
+            compilerOutput_ = "Could not create pixel shader";
+        else
+            compiled_ = true;
     }
     
-    return !failed_;
+    return compiled_;
 }
 
 void ShaderVariation::Release()
@@ -82,7 +179,7 @@ void ShaderVariation::Release()
         if (!graphics_)
             return;
         
-        if (shaderType_ == VS)
+        if (type_ == VS)
         {
             if (graphics_->GetVertexShader() == this)
                 graphics_->SetShaders(0, 0);
@@ -98,46 +195,91 @@ void ShaderVariation::Release()
         }
         
         object_ = 0;
+        compiled_ = false;
+        compilerOutput_.Clear();
+        
+        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+            useTextureUnit_[i] = false;
+        parameters_.Clear();
     }
-    
-    failed_ = false;
 }
 
 void ShaderVariation::SetName(const String& name)
 {
-    name_ = name;
+    name_ = name.Trimmed().Replaced(' ', '_');
 }
 
-void ShaderVariation::SetByteCode(const SharedArrayPtr<unsigned char>& byteCode)
+void ShaderVariation::SetDefines(const String& defines)
 {
-    byteCode_ = byteCode;
+    defines_ = defines;
 }
 
-void ShaderVariation::AddParameter(StringHash param, const ShaderParameter& definition)
+void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 {
-    parameters_[param] = definition;
-}
+    MOJOSHADER_parseData const *parseData = MOJOSHADER_parse("bytecode", bufData, bufSize, 0, 0, 0, 0, 0, 0, 0);
 
-void ShaderVariation::AddTextureUnit(TextureUnit unit)
-{
-    useTextureUnit_[unit] = true;
-}
+    for (int i = 0; i < parseData->symbol_count; i++)
+    {
+        MOJOSHADER_symbol const& symbol = parseData->symbols[i];
 
-void ShaderVariation::ClearParameters()
-{
-    parameters_.Clear();
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
-}
+        String name(symbol.name);
+        unsigned reg = symbol.register_index;
+        unsigned regCount = symbol.register_count;
 
-void ShaderVariation::OptimizeParameters()
-{
+        // Check if the parameter is a constant or a texture sampler
+        bool isSampler = (name[0] == 's');
+        name = name.Substring(1);
+        
+        if (isSampler)
+        {
+
+            // Skip if it's a G-buffer sampler, which are aliases for the standard texture units
+            if (reg < MAX_TEXTURE_UNITS)
+            {
+                if (name != "AlbedoBuffer" && name != "NormalBuffer" && name != "DepthBuffer" && name != "LightBuffer")
+                    useTextureUnit_[reg] = true;
+            }
+        }
+        else
+        {
+            ShaderParameter newParam(type_, reg, regCount);
+            HashMap<StringHash, ShaderParameter>::Iterator i = parameters_.Insert(MakePair(StringHash(name), newParam));
+            graphics_->RegisterShaderParameter(i->first_, i->second_);
+        }
+    }
+    
+    MOJOSHADER_freeParseData(parseData);
+    
+    // Optimize shader parameter lookup by rehashing to next power of two
     parameters_.Rehash(NextPowerOfTwo(parameters_.Size()));
 }
 
-bool ShaderVariation::IsCreated() const
+void ShaderVariation::CopyStrippedCode(PODVector<unsigned>& dest, unsigned char* bufData, unsigned bufSize)
 {
-    return object_ != 0;
+    unsigned const D3DSIO_COMMENT = 0xFFFE;
+    unsigned* srcWords = (unsigned*)bufData;
+    unsigned srcWordSize = bufSize >> 2;
+    
+    dest.Clear();
+    
+    for (unsigned i = 0; i < srcWordSize; ++i)
+    {
+        unsigned opcode = srcWords[i] & 0xffff;
+        unsigned paramLength = (srcWords[i] & 0x0f000000) >> 24;
+        unsigned commentLength = srcWords[i] >> 16;
+        
+        // For now, skip comment only at fixed position to prevent false positives
+        if (i == 1 && opcode == D3DSIO_COMMENT)
+        {
+            // Skip the comment
+            i += commentLength;
+        }
+        else
+        {
+            // Not a comment, copy the data
+            dest.Push(srcWords[i]);
+        }
+    }
 }
 
 }

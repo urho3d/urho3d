@@ -1,3 +1,4 @@
+#ifdef COMPILEVS
 #ifdef SKINNED
 float4x3 GetSkinMatrix(float4 blendWeights, int4 blendIndices)
 {
@@ -59,3 +60,4 @@ float3 GetBillboardNormal()
 #endif
 
 #define GetWorldTangent(modelMatrix) normalize(mul(iTangent.xyz, (float3x3)modelMatrix))
+#endif

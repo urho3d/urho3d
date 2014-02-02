@@ -1,3 +1,4 @@
+#ifdef COMPILEPS
 sampler2D sDiffMap : register(S0);
 samplerCUBE sDiffCubeMap : register(S0);
 sampler2D sAlbedoBuffer : register(S0);
@@ -38,3 +39,4 @@ float3 DecodeNormal(float4 normalInput)
         return normalize(normalInput.rgb * 2.0 - 1.0);
     #endif
 }
+#endif
