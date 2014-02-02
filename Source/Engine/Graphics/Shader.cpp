@@ -73,6 +73,7 @@ bool Shader::Load(Deserializer& source)
     // and on OpenGL, rename either VS() or PS() to main()
     #ifdef USE_OPENGL
     vsSourceCode_ = shaderCode;
+    vsSourceCode_.Replace("uniform sampler", "// uniform sampler");
     vsSourceCode_.Replace("void VS(", "void main(");
     if (vsSourceCode_.Find("void PS(") != String::NPOS)
     {
