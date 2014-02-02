@@ -1367,7 +1367,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     // Check if texture is currently bound as a rendertarget. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
-        if (texture == viewTexture_ || (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture))
+        if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
     }
     
@@ -1560,20 +1560,6 @@ void Graphics::SetDepthStencil(Texture2D* texture)
         depthStencil = texture->GetRenderSurface();
     
     SetDepthStencil(depthStencil);
-}
-
-void Graphics::SetViewTexture(Texture* texture)
-{
-    viewTexture_ = texture;
-    
-    if (viewTexture_)
-    {
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        {
-            if (textures_[i] == viewTexture_)
-                SetTexture(i, textures_[i]->GetBackupTexture());
-        }
-    }
 }
 
 void Graphics::SetViewport(const IntRect& rect)
@@ -2588,7 +2574,6 @@ void Graphics::ResetCachedState()
     
     depthStencil_ = 0;
     impl_->depthStencilSurface_ = 0;
-    viewTexture_ = 0;
     viewport_ = IntRect(0, 0, width_, height_);
     impl_->sRGBWrite_ = false;
     

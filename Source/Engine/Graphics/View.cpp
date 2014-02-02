@@ -523,11 +523,8 @@ void View::Render()
         graphics_->SetTexture(TU_INDIRECTION, renderer_->GetIndirectionCubeMap());
     }
     
-    // Set "view texture" to prevent destination texture sampling during all renderpasses
     if (renderTarget_)
     {
-        graphics_->SetViewTexture(renderTarget_->GetParentTexture());
-        
         // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
         // as a render texture produced on Direct3D9
         #ifdef USE_OPENGL
@@ -545,7 +542,6 @@ void View::Render()
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
-    graphics_->SetViewTexture(0);
     graphics_->ResetStreamFrequencies();
     
     // Run framebuffer blitting if necessary

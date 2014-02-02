@@ -181,8 +181,6 @@ public:
     void SetDepthStencil(RenderSurface* depthStencil);
     /// Set depth-stencil surface.
     void SetDepthStencil(Texture2D* texture);
-    /// Set view texture (deferred rendering final output rendertarget) to prevent it from being sampled.
-    void SetViewTexture(Texture* texture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
     /// Set blending mode.
@@ -515,8 +513,6 @@ private:
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.
     RenderSurface* depthStencil_;
-    /// View texture.
-    Texture* viewTexture_;
     /// Viewport coordinates.
     IntRect viewport_;
     /// Texture anisotropy level.
