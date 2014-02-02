@@ -1033,9 +1033,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 PROFILE(CompileVertexShader);
 
                 bool success = vs->Create();
-                if (success)
-                    LOGDEBUG("Compiled vertex shader " + vs->GetName());
-                else
+                if (!success)
                 {
                     LOGERROR("Failed to compile vertex shader " + vs->GetName() + ":\n" + vs->GetCompilerOutput());
                     vs = 0;
@@ -1078,9 +1076,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 PROFILE(CompilePixelShader);
 
                 bool success = ps->Create();
-                if (success)
-                    LOGDEBUG("Compiled pixel shader " + ps->GetName());
-                else
+                if (!success)
                 {
                     LOGERROR("Failed to compile pixel shader " + ps->GetName() + ":\n" + ps->GetCompilerOutput());
                     ps = 0;
@@ -2001,6 +1997,16 @@ TextureUnit Graphics::GetTextureUnit(const String& name)
         return i->second_;
     else
         return MAX_TEXTURE_UNITS;
+}
+
+const String& Graphics::GetTextureUnitName(TextureUnit unit)
+{
+    for (HashMap<String, TextureUnit>::Iterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
+    {
+        if (i->second_ == unit)
+            return i->first_;
+    }
+    return String::EMPTY;
 }
 
 Texture* Graphics::GetTexture(unsigned index) const

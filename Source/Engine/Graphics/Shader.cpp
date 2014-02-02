@@ -38,7 +38,8 @@ namespace Urho3D
 {
 
 Shader::Shader(Context* context) :
-    Resource(context)
+    Resource(context),
+    timeStamp_(0)
 {
 }
 
@@ -63,6 +64,7 @@ bool Shader::Load(Deserializer& source)
         return false;
     
     // Load the shader source code and resolve any includes
+    timeStamp_ = 0;
     String shaderCode;
     if (!ProcessSource(shaderCode, source))
         return false;
@@ -169,6 +171,20 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     if (!cache)
         return false;
+    
+    // If the source if a non-packaged file, store the timestamp
+    File* file = dynamic_cast<File*>(&source);
+    if (file && !file->IsPackaged())
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        if (fileSystem)
+        {
+            String fullName = cache->GetResourceFileName(file->GetName());
+            unsigned fileTimeStamp = fileSystem->GetLastModifiedTime(fullName);
+            if (fileTimeStamp > timeStamp_)
+                timeStamp_ = fileTimeStamp;
+        }
+    }
     
     // Store resource dependencies for includes so that we know to reload if any of them changes
     if (source.GetName() != GetName())

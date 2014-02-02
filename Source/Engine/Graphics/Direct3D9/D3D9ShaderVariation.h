@@ -45,8 +45,9 @@ struct ShaderParameter
     }
     
     /// Construct with parameters.
-    ShaderParameter(ShaderType type, unsigned reg, unsigned regCount) :
+    ShaderParameter(ShaderType type, const String& name, unsigned reg, unsigned regCount) :
         type_(type),
+        name_(name),
         register_(reg),
         regCount_(regCount)
     {
@@ -54,6 +55,8 @@ struct ShaderParameter
     
     /// %Shader type.
     ShaderType type_;
+    /// Name of the parameter.
+    String name_;
     /// Hardware register.
     unsigned register_;
     /// Number of registers.
@@ -97,10 +100,16 @@ public:
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
     
 private:
+    /// Load bytecode from a file. Return true if successful.
+    bool LoadByteCode(PODVector<unsigned>& byteCode, const String& binaryShaderName);
+    /// Compile from source. Return true if successful.
+    bool Compile(PODVector<unsigned>& byteCode);
     /// Inspect the constant parameters of the shader bytecode using MojoShader.
     void ParseParameters(unsigned char* bufData, unsigned bufSize);
     /// Strip comments from shader bytecode and store it.
-    void CopyStrippedCode(PODVector<unsigned>& dest, unsigned char* bufData, unsigned bufSize);
+    void CopyStrippedCode(PODVector<unsigned>& byteCode, unsigned char* bufData, unsigned bufSize);
+    /// Save bytecode to a file.
+    void SaveByteCode(const PODVector<unsigned>& byteCode, const String& binaryShaderName);
     
     /// Shader this variation belongs to.
     WeakPtr<Shader> owner_;

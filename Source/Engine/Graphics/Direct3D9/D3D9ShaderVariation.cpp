@@ -21,8 +21,12 @@
 //
 
 #include "Precompiled.h"
+#include "File.h"
+#include "FileSystem.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
+#include "Log.h"
+#include "ResourceCache.h"
 #include "Shader.h"
 #include "ShaderVariation.h"
 
@@ -54,98 +58,29 @@ bool ShaderVariation::Create()
 {
     Release();
     
-    if (!graphics_)
+    if (!graphics_ || !owner_)
         return false;
-    
-    // Compile shader if don't have loadable bytecode
+
     PODVector<unsigned> byteCode;
     
-    if (byteCode.Empty())
+    // Check for up-to-date bytecode on disk
+    bool useSM3 = graphics_->GetSM3Support();
+    String path, name, extension;
+    SplitPath(owner_->GetName(), path, name, extension);
+    if (useSM3)
+        extension = type_ == VS ? ".vs3" : ".ps3";
+    else
+        extension = type_ == VS ? ".vs2" : ".ps2";
+    String binaryShaderName = path + "Cache/" + name + "_" + StringHash(defines_).ToString() + extension;
+    
+    if (!LoadByteCode(byteCode, binaryShaderName))
     {
-        Vector<String> defines = defines_.Split(' ');
-        
-        // Set the entrypoint, profile and flags according to the shader being compiled
-        const char* entryPoint = 0;
-        const char* profile = 0;
-        unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
-        bool useSM3 = graphics_->GetSM3Support();
-        
-        if (type_ == VS)
-        {
-            entryPoint = "VS";
-            defines.Push("COMPILEVS");
-            if (!useSM3)
-                profile = "vs_2_0";
-            else
-                profile = "vs_3_0";
-        }
-        else
-        {
-            entryPoint = "PS";
-            defines.Push("COMPILEPS");
-            if (!useSM3)
-                profile = "ps_2_0";
-            else
-            {
-                profile = "ps_3_0";
-                flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
-            }
-        }
-        
-        if (useSM3)
-            defines.Push("SM3");
-        
-        // Collect defines into macros
-        Vector<String> defineValues;
-        PODVector<D3D_SHADER_MACRO> macros;
-        
-        for (unsigned i = 0; i < defines.Size(); ++i)
-        {
-            unsigned equalsPos = defines[i].Find('=');
-            if (equalsPos != String::NPOS)
-            {
-                defineValues.Push(defines[i].Substring(equalsPos + 1));
-                defines[i].Resize(equalsPos);
-            }
-            else
-                defineValues.Push("1");
-        }
-        for (unsigned i = 0; i < defines.Size(); ++i)
-        {
-            D3D_SHADER_MACRO macro;
-            macro.Name = defines[i].CString();
-            macro.Definition = defineValues[i].CString();
-            macros.Push(macro);
-        }
-        
-        D3D_SHADER_MACRO endMacro;
-        endMacro.Name = 0;
-        endMacro.Definition = 0;
-        macros.Push(endMacro);
-        
-        // Compile using D3DCompile
-        const String& sourceCode = owner_->GetSourceCode(type_);
-        LPD3DBLOB shaderCode = 0;
-        LPD3DBLOB errorMsgs = 0;
-        
-        if (FAILED(D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
-            entryPoint, profile, flags, 0, &shaderCode, &errorMsgs)))
-            compilerOutput_ = String((const char*)errorMsgs->GetBufferPointer(), errorMsgs->GetBufferSize());
-        else
-        {
-            // Inspect the produced bytecode using MojoShader, then strip and store it
-            unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
-            unsigned bufSize = shaderCode->GetBufferSize();
-            ParseParameters(bufData, bufSize);
-            CopyStrippedCode(byteCode, bufData, bufSize);
-        }
-
-        if (shaderCode)
-            shaderCode->Release();
-        if (errorMsgs)
-            errorMsgs->Release();
-        if (byteCode.Empty())
+        // Compile shader if don't have valid bytecode
+        if (!Compile(byteCode))
             return false;
+        // Save the bytecode after successful compile, but not if the source is from a package
+        if (owner_->GetTimeStamp())
+            SaveByteCode(byteCode, binaryShaderName);
     }
     
     // Then create shader from the bytecode
@@ -214,6 +149,168 @@ void ShaderVariation::SetDefines(const String& defines)
     defines_ = defines;
 }
 
+bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& binaryShaderName)
+{
+    ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
+    FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
+    if (!cache || !fileSystem || !cache->Exists(binaryShaderName))
+        return false;
+    
+    unsigned sourceTimeStamp = owner_->GetTimeStamp();
+    // If source code is loaded from a package, its timestamp will be zero. Else check that binary is not older
+    // than source
+    if (sourceTimeStamp && fileSystem->GetLastModifiedTime(cache->GetResourceFileName(binaryShaderName)) <
+        sourceTimeStamp)
+        return false;
+    
+    SharedPtr<File> file = cache->GetFile(binaryShaderName);
+    if (!file || file->ReadFileID() != "USHD")
+    {
+        LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
+        return false;
+    }
+    
+    /// \todo Check that shader type and model match
+    unsigned short shaderType = file->ReadUShort();
+    unsigned short shaderModel = file->ReadUShort();
+    
+    unsigned numParameters = file->ReadUInt();
+    for (unsigned i = 0; i < numParameters; ++i)
+    {
+        String name = file->ReadString();
+        unsigned reg = file->ReadUByte();
+        unsigned regCount = file->ReadUByte();
+        
+        ShaderParameter parameter(type_, name, reg, regCount);
+        HashMap<StringHash, ShaderParameter>::Iterator j = parameters_.Insert(MakePair(StringHash(name), parameter));
+        
+        // Register the parameter globally
+        graphics_->RegisterShaderParameter(j->first_, j->second_);
+    }
+    
+    unsigned numTextureUnits = file->ReadUInt();
+    for (unsigned i = 0; i < numTextureUnits; ++i)
+    {
+        String unitName = file->ReadString();
+        unsigned reg = file->ReadUByte();
+        
+        if (reg < MAX_TEXTURE_UNITS)
+            useTextureUnit_[reg] = true;
+    }
+    
+    unsigned byteCodeSize = file->ReadUInt();
+    if (byteCodeSize)
+    {
+        byteCode.Resize(byteCodeSize >> 2);
+        file->Read(&byteCode[0], byteCodeSize);
+        
+        if (type_ == VS)
+            LOGDEBUG("Loaded cached vertex shader " + name_);
+        else
+            LOGDEBUG("Loaded cached pixel shader " + name_);
+        
+        return true;
+    }
+    else
+    {
+        LOGERROR(binaryShaderName + " has zero length bytecode");
+        return false;
+    }
+}
+
+bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
+{
+    Vector<String> defines = defines_.Split(' ');
+    
+    // Set the entrypoint, profile and flags according to the shader being compiled
+    const char* entryPoint = 0;
+    const char* profile = 0;
+    unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
+    bool useSM3 = graphics_->GetSM3Support();
+    
+    if (type_ == VS)
+    {
+        entryPoint = "VS";
+        defines.Push("COMPILEVS");
+        if (!useSM3)
+            profile = "vs_2_0";
+        else
+            profile = "vs_3_0";
+    }
+    else
+    {
+        entryPoint = "PS";
+        defines.Push("COMPILEPS");
+        if (!useSM3)
+            profile = "ps_2_0";
+        else
+        {
+            profile = "ps_3_0";
+            flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
+        }
+    }
+    
+    if (useSM3)
+        defines.Push("SM3");
+    
+    // Collect defines into macros
+    Vector<String> defineValues;
+    PODVector<D3D_SHADER_MACRO> macros;
+    
+    for (unsigned i = 0; i < defines.Size(); ++i)
+    {
+        unsigned equalsPos = defines[i].Find('=');
+        if (equalsPos != String::NPOS)
+        {
+            defineValues.Push(defines[i].Substring(equalsPos + 1));
+            defines[i].Resize(equalsPos);
+        }
+        else
+            defineValues.Push("1");
+    }
+    for (unsigned i = 0; i < defines.Size(); ++i)
+    {
+        D3D_SHADER_MACRO macro;
+        macro.Name = defines[i].CString();
+        macro.Definition = defineValues[i].CString();
+        macros.Push(macro);
+    }
+    
+    D3D_SHADER_MACRO endMacro;
+    endMacro.Name = 0;
+    endMacro.Definition = 0;
+    macros.Push(endMacro);
+    
+    // Compile using D3DCompile
+    const String& sourceCode = owner_->GetSourceCode(type_);
+    LPD3DBLOB shaderCode = 0;
+    LPD3DBLOB errorMsgs = 0;
+    
+    if (FAILED(D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
+        entryPoint, profile, flags, 0, &shaderCode, &errorMsgs)))
+        compilerOutput_ = String((const char*)errorMsgs->GetBufferPointer(), errorMsgs->GetBufferSize());
+    else
+    {
+        if (type_ == VS)
+            LOGDEBUG("Compiled vertex shader " + name_);
+        else
+            LOGDEBUG("Compiled pixel shader " + name_);
+        
+        // Inspect the produced bytecode using MojoShader, then strip and store it
+        unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
+        unsigned bufSize = shaderCode->GetBufferSize();
+        ParseParameters(bufData, bufSize);
+        CopyStrippedCode(byteCode, bufData, bufSize);
+    }
+
+    if (shaderCode)
+        shaderCode->Release();
+    if (errorMsgs)
+        errorMsgs->Release();
+    
+    return !byteCode.Empty();
+}
+
 void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 {
     MOJOSHADER_parseData const *parseData = MOJOSHADER_parse("bytecode", bufData, bufSize, 0, 0, 0, 0, 0, 0, 0);
@@ -232,7 +329,6 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         
         if (isSampler)
         {
-
             // Skip if it's a G-buffer sampler, which are aliases for the standard texture units
             if (reg < MAX_TEXTURE_UNITS)
             {
@@ -242,8 +338,10 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         }
         else
         {
-            ShaderParameter newParam(type_, reg, regCount);
+            ShaderParameter newParam(type_, name, reg, regCount);
             HashMap<StringHash, ShaderParameter>::Iterator i = parameters_.Insert(MakePair(StringHash(name), newParam));
+            
+            // Register the parameter globally
             graphics_->RegisterShaderParameter(i->first_, i->second_);
         }
     }
@@ -254,13 +352,11 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     parameters_.Rehash(NextPowerOfTwo(parameters_.Size()));
 }
 
-void ShaderVariation::CopyStrippedCode(PODVector<unsigned>& dest, unsigned char* bufData, unsigned bufSize)
+void ShaderVariation::CopyStrippedCode(PODVector<unsigned>& byteCode, unsigned char* bufData, unsigned bufSize)
 {
     unsigned const D3DSIO_COMMENT = 0xFFFE;
     unsigned* srcWords = (unsigned*)bufData;
     unsigned srcWordSize = bufSize >> 2;
-    
-    dest.Clear();
     
     for (unsigned i = 0; i < srcWordSize; ++i)
     {
@@ -277,9 +373,59 @@ void ShaderVariation::CopyStrippedCode(PODVector<unsigned>& dest, unsigned char*
         else
         {
             // Not a comment, copy the data
-            dest.Push(srcWords[i]);
+            byteCode.Push(srcWords[i]);
         }
     }
+}
+
+void ShaderVariation::SaveByteCode(const PODVector<unsigned>& byteCode, const String& binaryShaderName)
+{
+    ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
+    FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
+    if (!cache || !fileSystem)
+        return;
+    
+    String path = GetPath(cache->GetResourceFileName(owner_->GetName())) + "Cache/";
+    String fullName = path + GetFileNameAndExtension(binaryShaderName);
+    if (!fileSystem->DirExists(path))
+        fileSystem->CreateDir(path);
+    
+    SharedPtr<File> file(new File(owner_->GetContext(), fullName, FILE_WRITE));
+    if (!file->IsOpen())
+        return;
+    
+    file->WriteFileID("USHD");
+    file->WriteShort((unsigned short)type_);
+    file->WriteShort(graphics_->GetSM3Support() ? 3 : 2);
+
+    file->WriteUInt(parameters_.Size());
+    for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Begin(); i != parameters_.End(); ++i)
+    {
+        file->WriteString(i->second_.name_);
+        file->WriteUByte(i->second_.register_);
+        file->WriteUByte(i->second_.regCount_);
+    }
+    
+    unsigned usedTextureUnits = 0;
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+    {
+        if (useTextureUnit_[i])
+            ++usedTextureUnits;
+    }
+    file->WriteUInt(usedTextureUnits);
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+    {
+        if (useTextureUnit_[i])
+        {
+            file->WriteString(graphics_->GetTextureUnitName((TextureUnit)i));
+            file->WriteUByte(i);
+        }
+    }
+    
+    unsigned dataSize = byteCode.Size() << 2;
+    file->WriteUInt(dataSize);
+    if (dataSize)
+        file->Write(&byteCode[0], dataSize);
 }
 
 }

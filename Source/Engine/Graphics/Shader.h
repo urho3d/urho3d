@@ -52,7 +52,8 @@ public:
     ShaderVariation* GetVariation(ShaderType type, const char* defines);
     /// Return either vertex or pixel shader source code.
     const String& GetSourceCode(ShaderType type) const { return type == VS ? vsSourceCode_ : psSourceCode_; }
-    
+    /// Return the latest timestamp of the shader code and its includes.
+    unsigned GetTimeStamp() const { return timeStamp_; }
     /// Remove extra spaces from a define string to ensure that the same defines are not compiled twice.
     static String SanitateDefines(const String& definesIn);
     
@@ -68,6 +69,8 @@ private:
     HashMap<StringHash, SharedPtr<ShaderVariation> > vsVariations_;
     /// Pixel shader variations.
     HashMap<StringHash, SharedPtr<ShaderVariation> > psVariations_;
+    /// Source code timestamp.
+    unsigned timeStamp_;
 };
 
 }

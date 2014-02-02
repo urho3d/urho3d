@@ -2491,13 +2491,8 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
             const TechniqueEntry& entry = techniques[i];
             Technique* tech = entry.technique_;
 
-            #ifdef USE_OPENGL
-            if (!tech || materialQuality_ < entry.qualityLevel_)
-                continue;
-            #else
             if (!tech || (tech->IsSM3() && !graphics_->GetSM3Support()) || materialQuality_ < entry.qualityLevel_)
                 continue;
-            #endif
             if (lodDistance >= entry.lodDistance_)
                 return tech;
         }
