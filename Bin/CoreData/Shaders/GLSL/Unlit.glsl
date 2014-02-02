@@ -1,6 +1,8 @@
-#include "Uniforms.frag"
-#include "Samplers.frag"
-#include "Fog.frag"
+#include "Uniforms.glsl"
+#include "Samplers.glsl"
+#include "Transform.glsl"
+#include "ScreenPos.glsl"
+#include "Fog.glsl"
 
 varying vec2 vTexCoord;
 #ifdef VERTEXCOLOR
@@ -11,7 +13,24 @@ varying vec2 vTexCoord;
 #endif
 varying float vDepth;
 
-void main()
+void VS()
+{
+    mat4 modelMatrix = iModelMatrix;
+    vec3 worldPos = GetWorldPos(modelMatrix);
+    gl_Position = GetClipPos(worldPos);
+    vTexCoord = GetTexCoord(iTexCoord);
+    vDepth = GetDepth(gl_Position);
+
+    #ifdef HEIGHTFOG
+        vWorldPos = worldPos;
+    #endif
+
+    #ifdef VERTEXCOLOR
+        vColor = iColor;
+    #endif
+}
+
+void PS()
 {
     #ifdef DIFFMAP
         vec4 diffColor = cMatDiffColor * texture2D(sDiffMap, vTexCoord);
@@ -35,4 +54,3 @@ void main()
 
     gl_FragColor = vec4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
 }
-

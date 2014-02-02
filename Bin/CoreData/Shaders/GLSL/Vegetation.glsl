@@ -1,7 +1,7 @@
-#include "Uniforms.vert"
-#include "Transform.vert"
-#include "ScreenPos.vert"
-#include "Lighting.vert"
+#include "Uniforms.glsl"
+#include "Transform.glsl"
+#include "ScreenPos.glsl"
+#include "Lighting.glsl"
 
 uniform float cWindHeightFactor;
 uniform float cWindHeightPivot;
@@ -30,7 +30,7 @@ varying vec2 vTexCoord;
         varying vec3 vCubeMaskVec;
     #endif
 #else
-    varying vec4 vVertexLight;
+    varying vec4 vglslexLight;
     varying vec3 vNormal;
     #ifdef NORMALMAP
         varying vec3 vTangent;
@@ -39,7 +39,7 @@ varying vec2 vTexCoord;
     varying vec4 vScreenPos;
 #endif
 
-void main()
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -109,12 +109,12 @@ void main()
             #endif
         #endif
     #else
-        // Ambient & per-vertex lighting
-        vVertexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
+        // Ambient & per-glslex lighting
+        vglslexLight = vec4(GetAmbient(GetZonePos(worldPos)), GetDepth(gl_Position));
 
-        #ifdef NUMVERTEXLIGHTS
-            for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
-                vVertexLight.rgb += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
+        #ifdef NUMglslEXLIGHTS
+            for (int i = 0; i < NUMglslEXLIGHTS; ++i)
+                vglslexLight.rgb += GetglslexLight(i, worldPos, vNormal) * cglslexLights[i * 3].rgb;
         #endif
         
         vScreenPos = GetScreenPos(gl_Position);

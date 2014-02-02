@@ -1,5 +1,5 @@
-<technique>
+<technique vs="Vegetation" ps="Unlit" psdefines="DIFFMAP ALPHAMASK" alphamask="true" >
     <pass name="base" vs="Vegetation" ps="Unlit_DiffAlphaMask" />
-    <pass name="depth" vs="VegetationDepth" ps="Depth" />
-    <pass name="shadow" vs="VegetationShadow" ps="Shadow" />
+    <pass name="depth" vs="VegetationDepth" ps="Depth" psdefines="ALPHAMASK" />
+    <pass name="shadow" vs="VegetationShadow" ps="Shadow" psdefines="ALPHAMASK" />
 </technique>

@@ -1,10 +1,10 @@
-<technique>
-    <pass name="base" vs="LitSolid" ps="LitSolid" />
-    <pass name="litbase" vs="LitSolid_Normal" ps="LitSolid_NormalPackedAmbient" />
-    <pass name="light" vs="LitSolid_Normal" ps="LitSolid_NormalPacked" depthtest="equal" depthwrite="false" blend="add" />
-    <pass name="prepass" vs="LitSolid_Normal" ps="LitSolid_NormalPackedPrepass" />
-    <pass name="material" vs="LitSolid" ps="LitSolid_Material" depthtest="equal" depthwrite="false" />
-    <pass name="deferred" vs="LitSolid_Normal" ps="LitSolid_NormalPackedDeferred" />
+<technique vs="LitSolid" ps="LitSolid">
+    <pass name="base" />
+    <pass name="litbase" vsdefines="NORMALMAP" psdefines="AMBIENT NORMALMAP PACKEDNORMAL" />
+    <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP PACKEDNORMAL" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP PACKEDNORMAL" />
+    <pass name="material" psdefines="MATERIAL" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vsdefines="NORMALMAP" psdefines="DEFERRED NORMALMAP PACKEDNORMAL" />
     <pass name="depth" vs="Depth" ps="Depth" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

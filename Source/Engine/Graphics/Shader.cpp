@@ -74,21 +74,34 @@ bool Shader::Load(Deserializer& source)
     #ifdef USE_OPENGL
     vsSourceCode_ = shaderCode;
     vsSourceCode_.Replace("void VS(", "void main(");
-    vsSourceCode_.Replace("void PS(", "/* void PS(");
-    vsSourceCode_ += "*/\n";
+    if (vsSourceCode_.Find("void PS(") != String::NPOS)
+    {
+        vsSourceCode_.Replace("void PS(", "/* void PS(");
+        vsSourceCode_ += "*/\n";
+    }
     
     psSourceCode_ = shaderCode;
     psSourceCode_.Replace("attribute ", "// attribute ");
-    psSourceCode_.Replace("void VS(", "/* void VS(");
-    psSourceCode_.Replace("void PS(", "*/\nvoid main(");
+    psSourceCode_.Replace("void PS(", "void main(");
+    if (psSourceCode_.Find("void VS(") != String::NPOS)
+    {
+        psSourceCode_.Replace("void VS(", "/* void VS(");
+        psSourceCode_.Replace("void main(", "*/\nvoid main(");
+    }
     #else
     vsSourceCode_ = shaderCode;
-    vsSourceCode_.Replace("void PS(", "/* void PS(");
-    vsSourceCode_ += "*/\n";
+    if (vsSourceCode_.Find("void PS(") != String::NPOS)
+    {
+        vsSourceCode_.Replace("void PS(", "/* void PS(");
+        vsSourceCode_ += "*/\n";
+    }
     
     psSourceCode_ = shaderCode;
-    psSourceCode_.Replace("void VS(", "/* void VS(");
-    psSourceCode_.Replace("void PS(", "*/\nvoid PS(");
+    if (psSourceCode_.Find("void VS(") != String::NPOS)
+    {
+        psSourceCode_.Replace("void VS(", "/* void VS(");
+        psSourceCode_.Replace("void PS(", "*/\nvoid PS(");
+    }
     #endif
     
     // If variations had already been created, release them and require recompile

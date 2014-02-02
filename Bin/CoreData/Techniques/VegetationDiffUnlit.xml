@@ -1,5 +1,5 @@
-<technique>
-    <pass name="base" vs="Vegetation" ps="Unlit_Diff" />
+<technique vs="Vegetation" ps="Unlit" psdefines="DIFFMAP" >
+    <pass name="base" />
     <pass name="depth" vs="VegetationDepth" ps="Depth" />
     <pass name="shadow" vs="VegetationShadow" ps="Shadow" />
 </technique>

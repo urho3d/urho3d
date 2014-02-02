@@ -1,5 +1,5 @@
-#include "Uniforms.vert"
-#include "Transform.vert"
+#include "Uniforms.glsl"
+#include "Transform.glsl"
 
 uniform float cWindHeightFactor;
 uniform float cWindHeightPivot;
@@ -8,7 +8,7 @@ uniform vec2 cWindWorldSpacing;
 
 varying vec3 vTexCoord;
 
-void main()
+void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
