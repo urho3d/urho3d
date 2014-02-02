@@ -563,7 +563,12 @@ ShaderVariation* Renderer::GetShader(ShaderType type, const char* name, const ch
         if (!cache)
             return 0;
         
-        lastShader_ = cache->GetResource<Shader>(shaderPath_ + name + shaderExtension_);
+        String fullShaderName = shaderPath_ + name + shaderExtension_;
+        // Try to reduce repeated error log prints because of missing shaders
+        if (lastShaderName_ == name && !cache->Exists(fullShaderName))
+            return 0;
+        
+        lastShader_ = cache->GetResource<Shader>(fullShaderName);
         lastShaderName_ = name;
     }
     
