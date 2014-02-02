@@ -49,6 +49,9 @@ Methods:
 - bool LoadRaw(Deserializer& source)
 - bool LoadWav(Deserializer& source)
 - bool LoadOggVorbis(Deserializer& source)
+- bool LoadRaw(const String fileName)
+- bool LoadWav(const String fileName)
+- bool LoadOggVorbis(const String fileName)
 - void SetSize(unsigned dataSize)
 - void SetData(const void* data, unsigned dataSize)
 - void SetFormat(unsigned frequency, bool sixteenBit, bool stereo)
@@ -153,7 +156,7 @@ Methods:
 
 - Object* GetEventSender() const
 - EventHandler* GetEventHandler() const
-- const String GetTypeName(ShortStringHash type) const
+- const String GetTypeName(ShortStringHash objectType) const
 
 ### Object : RefCounted
 
@@ -3496,6 +3499,10 @@ Properties:
 
 Methods:
 
+- bool Load(Deserializer& source)
+- bool Save(Serializer& dest) const
+- bool Load(const String fileName)
+- bool Save(const String fileName) const
 - const String GetName() const
 - StringHash GetNameHash() const
 - unsigned GetMemoryUse() const
@@ -3512,6 +3519,8 @@ Methods:
 
 - Image()
 - ~Image()
+- bool LoadColorLUT(Deserializer& source)
+- bool LoadColorLUT(const String& fileName)
 - void FlipVertical()
 - bool SaveBMP(const String fileName)
 - bool SavePNG(const String fileName)
@@ -3519,6 +3528,7 @@ Methods:
 - bool SaveJPG(const String fileName, int quality)
 - int GetWidth() const
 - int GetHeight() const
+- int GetDepth() const
 - unsigned GetComponents() const
 - bool IsCompressed() const
 - CompressedFormat GetCompressedFormat() const
@@ -3529,6 +3539,7 @@ Properties:
 
 - int width (readonly)
 - int height (readonly)
+- int depth (readonly)
 - unsigned components (readonly)
 - bool compressed (readonly)
 - CompressedFormat compressedFormat (readonly)
@@ -3639,6 +3650,9 @@ Properties:
 
 Methods:
 
+- XMLFile()
+- ~XMLFile()
+- XMLElement CreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
 - void Patch(XMLFile* patchFile)
 - void Patch(XMLElement patchElement)
