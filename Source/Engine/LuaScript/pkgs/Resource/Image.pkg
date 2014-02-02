@@ -25,6 +25,7 @@ class Image : public Resource
     
     int GetWidth() const;
     int GetHeight() const;
+    int GetDepth() const;
     unsigned GetComponents() const;
     bool IsCompressed() const;
     CompressedFormat GetCompressedFormat() const;
@@ -33,6 +34,7 @@ class Image : public Resource
     
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set int depth;
     tolua_readonly tolua_property__get_set unsigned components;
     tolua_readonly tolua_property__is_set bool compressed;
     tolua_readonly tolua_property__get_set CompressedFormat compressedFormat;
