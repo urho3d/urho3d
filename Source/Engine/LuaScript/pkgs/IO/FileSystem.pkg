@@ -40,7 +40,19 @@ String GetInternalPath(const String pathName);
 String GetNativePath(const String pathName);
 bool IsAbsolutePath(const String pathName);
 
+FileSystem * GetFileSystem();
+tolua_readonly tolua_property__get_set FileSystem* fileSystem;
+
 ${
+#define TOLUA_DISABLE_tolua_IOLuaAPI_GetFileSystem00
+static int tolua_IOLuaAPI_GetFileSystem00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<FileSystem>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_fileSystem_ptr
+#define tolua_get_fileSystem_ptr tolua_IOLuaAPI_GetFileSystem00
+
 static const Vector<String>& FileSystemScanDir(const FileSystem* fileSystem, const String pathName, const String filter, unsigned flags, bool recursive)
 {
     static Vector<String> result;

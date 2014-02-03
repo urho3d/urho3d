@@ -26,3 +26,17 @@ class Log : public Object
     tolua_property__get_set bool timeStamp;
     tolua_property__is_set bool quiet;
 };
+
+Log* GetLog();
+tolua_readonly tolua_property__get_set Log* log;
+
+${
+#define TOLUA_DISABLE_tolua_IOLuaAPI_GetLog00
+static int tolua_IOLuaAPI_GetLog00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Log>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_log_ptr
+#define tolua_get_log_ptr tolua_IOLuaAPI_GetLog00
+$}

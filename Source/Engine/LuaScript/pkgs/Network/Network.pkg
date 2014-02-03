@@ -44,3 +44,17 @@ class Network
     tolua_readonly tolua_property__is_set bool serverRunning;
     tolua_property__get_set String packageCacheDir;
 };
+
+Network* GetNetwork();
+tolua_readonly tolua_property__get_set Network* network;
+
+${
+#define TOLUA_DISABLE_tolua_NetworkLuaAPI_GetNetwork00
+static int tolua_NetworkLuaAPI_GetNetwork00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Network>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_network_ptr
+#define tolua_get_network_ptr tolua_NetworkLuaAPI_GetNetwork00
+$}

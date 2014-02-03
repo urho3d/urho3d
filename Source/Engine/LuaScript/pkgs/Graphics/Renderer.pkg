@@ -204,3 +204,17 @@ class Renderer
     tolua_readonly tolua_property__get_set ShaderVariation* stencilVS;
     tolua_readonly tolua_property__get_set ShaderVariation* stencilPS;
 };
+
+Renderer* GetRenderer();
+tolua_readonly tolua_property__get_set Renderer* renderer;
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_GetRenderer00
+static int tolua_GraphicsLuaAPI_GetRenderer00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Renderer>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_renderer_ptr
+#define tolua_get_renderer_ptr tolua_GraphicsLuaAPI_GetRenderer00
+$}

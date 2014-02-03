@@ -3,7 +3,7 @@ $#include "Graphics.h"
 class Graphics : public Object
 {
     void SetWindowTitle(const String windowTitle);
-	void SetWindowIcon(Image* windowIcon);
+    void SetWindowIcon(Image* windowIcon);
     void SetWindowPosition(const IntVector2& position);
     void SetWindowPosition(int x, int y);
 
@@ -79,3 +79,17 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool sRGBWriteSupport;
     tolua_readonly tolua_property__get_set IntVector2 desktopResolution;
 };
+
+Graphics* GetGraphics();
+tolua_readonly tolua_property__get_set Graphics* graphics;
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_GetGraphics00
+static int tolua_GraphicsLuaAPI_GetGraphics00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Graphics>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_graphics_ptr
+#define tolua_get_graphics_ptr tolua_GraphicsLuaAPI_GetGraphics00
+$}

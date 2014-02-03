@@ -1,18 +1,4 @@
-$#include "Audio.h"
-$#include "Console.h"
 $#include "Context.h"
-$#include "DebugHud.h"
-$#include "Engine.h"
-$#include "FileSystem.h"
-$#include "Graphics.h"
-$#include "Input.h"
-$#include "Log.h"
-$#include "Network.h"
-$#include "LuaScript.h"
-$#include "Renderer.h"
-$#include "ResourceCache.h"
-$#include "Timer.h"
-$#include "UI.h"
 
 class Context
 {
@@ -24,20 +10,6 @@ class Context
 Context* GetContext();
 Object* GetEventSender();
 EventHandler* GetEventHandler() const;
-
-Audio* GetAudio();
-Console* GetConsole();
-DebugHud* GetDebugHud();
-Engine* GetEngine();
-FileSystem* GetFileSystem();
-Graphics* GetGraphics();
-Input* GetInput();
-Log* GetLog();
-Network* GetNetwork();
-Renderer* GetRenderer();
-ResourceCache* GetCache();
-Time* GetTime();
-UI* GetUI();
 
 ${
 #define TOLUA_DISABLE_tolua_CoreLuaAPI_GetContext00
@@ -63,49 +35,4 @@ static int tolua_CoreLuaAPI_GetEventHandler00(lua_State* tolua_S)
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"EventHandler");
     return 1;
 }
-
-#define GET_SUBSYSTEM(subsystem) \
-static int tolua_CoreLuaAPI_Get ## subsystem ## 00(lua_State* tolua_S) \
-{ \
-  subsystem* tolua_ret = GetContext(tolua_S)->GetSubsystem<subsystem>(); \
-  tolua_pushusertype(tolua_S,(void*)tolua_ret,#subsystem); \
-  return 1; \
-}
-
-#define GET_SUBSYSTEM_RENAME(subsystem, newname) \
-static int tolua_CoreLuaAPI_Get ## newname ## 00(lua_State* tolua_S) \
-{ \
-  subsystem* tolua_ret = GetContext(tolua_S)->GetSubsystem<subsystem>(); \
-  tolua_pushusertype(tolua_S,(void*)tolua_ret,#subsystem); \
-  return 1; \
-}
-
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetAudio00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetConsole00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetDebugHud00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetEngine00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetFileSystem00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetGraphics00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetInput00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetLog00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetNetwork00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetRenderer00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetCache00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetTime00
-#define TOLUA_DISABLE_tolua_CoreLuaAPI_GetUI00
-
-GET_SUBSYSTEM(Audio)
-GET_SUBSYSTEM(Console)
-GET_SUBSYSTEM(DebugHud)
-GET_SUBSYSTEM(Engine)
-GET_SUBSYSTEM(FileSystem)
-GET_SUBSYSTEM(Graphics)
-GET_SUBSYSTEM(Input)
-GET_SUBSYSTEM(Log)
-GET_SUBSYSTEM(Network)
-GET_SUBSYSTEM(Renderer)
-GET_SUBSYSTEM_RENAME(ResourceCache, Cache)
-GET_SUBSYSTEM(Time)
-GET_SUBSYSTEM(UI)
-
 $}

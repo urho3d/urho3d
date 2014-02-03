@@ -32,7 +32,19 @@ class ResourceCache
     tolua_readonly tolua_property__get_set bool searchPackagesFirst;
 };
 
+ResourceCache* GetCache();
+tolua_readonly tolua_property__get_set ResourceCache* cache;
+
 ${
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_GetCache00
+static int tolua_ResourceLuaAPI_GetCache00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<ResourceCache>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_cache_ptr
+#define tolua_get_cache_ptr tolua_ResourceLuaAPI_GetCache00
+
 static File* ResourceCacheGetFile(ResourceCache* cache, const String& fileName)
 {
     SharedPtr<File> file = cache->GetFile(fileName);

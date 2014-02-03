@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Context.h"
 #include "OctreeQuery.h"
 #include "PhysicsWorld.h"
 #include "Vector2.h"
@@ -52,19 +53,27 @@ void SetContext(lua_State* L, Context* context);
 /// Return context.
 Context* GetContext(lua_State* L);
 
-/// Create new object.
+/// Create object.
 template<typename T> int ToluaNewObject(lua_State* tolua_S)
 {
     T* object = Mtolua_new(T(GetContext(tolua_S)));
     tolua_pushusertype(tolua_S, (void*)object,T::GetTypeNameStatic().CString());
     return 1;
 }
-/// Create new object with GC.
+/// Create object with GC.
 template<typename T> int ToluaNewObjectGC(lua_State* tolua_S)
 {
     T* object = Mtolua_new(T(GetContext(tolua_S)));
     tolua_pushusertype(tolua_S, (void*)object,T::GetTypeNameStatic().CString());
     tolua_register_gc(tolua_S, lua_gettop(tolua_S));
+    return 1;
+}
+
+/// Return subsystem.
+template<typename T> int ToluaGetSubsystem(lua_State* tolua_S)
+{
+    T* subsystem = GetContext(tolua_S)->GetSubsystem<T>();
+    tolua_pushusertype(tolua_S, (void*)subsystem, T::GetTypeNameStatic().CString());
     return 1;
 }
 
