@@ -18,8 +18,10 @@ class DropDownList : public Menu
    
     unsigned GetNumItems() const;
     UIElement* GetItem(unsigned index) const;
+    
     // PODVector<UIElement*> GetItems() const;
     tolua_outside const PODVector<UIElement*>& DropDownListGetItems @ GetItems() const;
+    
     unsigned GetSelection() const;
     UIElement* GetSelectedItem() const;
     ListView* GetListView() const;
@@ -27,14 +29,12 @@ class DropDownList : public Menu
     const String GetPlaceholderText() const;
     bool GetResizePopup() const;
     
-    void SetSelectionAttr(unsigned index);
-    
     tolua_readonly tolua_property__get_set unsigned numItems;
     tolua_property__get_set unsigned selection;
     tolua_readonly tolua_property__get_set UIElement* selectedItem;
     tolua_readonly tolua_property__get_set ListView* listView;
     tolua_readonly tolua_property__get_set UIElement* placeholder;
-    tolua_property__get_set String& placeholderText;
+    tolua_property__get_set String placeholderText;
     tolua_property__get_set bool resizePopup;
 };
 

@@ -11,11 +11,6 @@ local cameraNode = nil
 local yaw = 0.0
 local pitch = 0.0
 
-local cache = GetCache()
-local input = GetInput()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()

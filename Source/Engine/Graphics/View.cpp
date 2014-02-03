@@ -1652,9 +1652,9 @@ bool View::CheckViewportWrite(const RenderPathCommand& command)
 
 bool View::CheckPingpong(unsigned index)
 {
-    // Current command must be a viewport-writing quad to begin the pingpong chain
+    // Current command must be a viewport-reading & writing quad to begin the pingpong chain
     RenderPathCommand& current = renderPath_->commands_[index];
-    if (current.type_ != CMD_QUAD || !CheckViewportWrite(current))
+    if (current.type_ != CMD_QUAD || !CheckViewportRead(current) || !CheckViewportWrite(current))
         return false;
 
     // If there are commands other than quads that target the viewport, we must keep rendering to the final target and resolving

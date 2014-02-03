@@ -73,3 +73,17 @@ class Input : public Object
     tolua_readonly tolua_property__has_set bool focus;
     tolua_readonly tolua_property__is_set bool minimized;
 };
+
+Input* GetInput();
+tolua_readonly tolua_property__get_set Input* input;
+
+${
+#define TOLUA_DISABLE_tolua_InputLuaAPI_GetInput00
+static int tolua_InputLuaAPI_GetInput00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Input>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_input_ptr
+#define tolua_get_input_ptr tolua_InputLuaAPI_GetInput00
+$}

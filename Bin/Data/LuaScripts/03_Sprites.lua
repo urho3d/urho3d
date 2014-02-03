@@ -12,11 +12,6 @@ local sprites = {}
 -- Custom variable identifier for storing sprite velocity within the UI element
 local VAR_VELOCITY = ShortStringHash("Velocity")
 
-local cache = GetCache()
-local engine = GetEngine()
-local graphics = GetGraphics()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()

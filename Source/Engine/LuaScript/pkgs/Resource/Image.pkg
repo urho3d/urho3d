@@ -17,6 +17,10 @@ class Image : public Resource
 {
     Image();
     ~Image();
+    
+    bool LoadColorLUT(Deserializer& source);
+    tolua_outside bool ImageLoadColorLUT @ LoadColorLUT(const String fileName);
+
     void FlipVertical();
     bool SaveBMP(const String fileName);
     bool SavePNG(const String fileName);
@@ -25,6 +29,7 @@ class Image : public Resource
     
     int GetWidth() const;
     int GetHeight() const;
+    int GetDepth() const;
     unsigned GetComponents() const;
     bool IsCompressed() const;
     CompressedFormat GetCompressedFormat() const;
@@ -33,6 +38,7 @@ class Image : public Resource
     
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set int depth;
     tolua_readonly tolua_property__get_set unsigned components;
     tolua_readonly tolua_property__is_set bool compressed;
     tolua_readonly tolua_property__get_set CompressedFormat compressedFormat;
@@ -50,5 +56,17 @@ static int tolua_ResourceLuaAPI_Image_new00(lua_State* tolua_S)
 static int tolua_ResourceLuaAPI_Image_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<Image>(tolua_S);
+}
+
+static bool ImageLoadColorLUT(Image* image, const String& fileName)
+{
+    if (!image)
+        return false;
+
+    File file(image->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return image->LoadColorLUT(file);
 }
 $}

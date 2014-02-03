@@ -56,7 +56,7 @@ class UI : public Object
     tolua_readonly tolua_property__get_set UIElement* frontElement;
     tolua_readonly tolua_property__get_set UIElement* dragElement;
 
-    tolua_property__get_set String& clipBoardText;
+    tolua_property__get_set String clipBoardText;
     tolua_property__get_set float doubleClickInterval;
     tolua_property__get_set float dragBeginInterval;
     tolua_property__get_set int dragBeginDistance;
@@ -69,3 +69,17 @@ class UI : public Object
     tolua_property__get_set bool forceAutoHint;
     tolua_readonly tolua_property__has_set bool modalElement;
 };
+
+UI* GetUI();
+tolua_readonly tolua_property__get_set UI* ui;
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_GetUI00
+static int tolua_UILuaAPI_GetUI00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<UI>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_ui_ptr
+#define tolua_get_ui_ptr tolua_UILuaAPI_GetUI00
+$}

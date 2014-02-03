@@ -28,13 +28,6 @@ local INAIR_THRESHOLD_TIME = 0.1
 scene_ = nil
 characterNode = nil
 
-cache = GetCache()
-local fileSystem = GetFileSystem()
-input = GetInput()
-graphics = GetGraphics()
-renderer = GetRenderer()
-ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()

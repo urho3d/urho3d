@@ -61,6 +61,6 @@ class Connection : public Object
     tolua_readonly tolua_property__get_set String address;
     tolua_readonly tolua_property__get_set unsigned short port;
     tolua_readonly tolua_property__get_set unsigned numDownloads;
-    tolua_readonly tolua_property__get_set String& downloadName;
+    tolua_readonly tolua_property__get_set String downloadName;
     tolua_readonly tolua_property__get_set float downloadProgress;
 };

@@ -49,6 +49,9 @@ Methods:
 - bool LoadRaw(Deserializer& source)
 - bool LoadWav(Deserializer& source)
 - bool LoadOggVorbis(Deserializer& source)
+- bool LoadRaw(const String fileName)
+- bool LoadWav(const String fileName)
+- bool LoadOggVorbis(const String fileName)
 - void SetSize(unsigned dataSize)
 - void SetData(const void* data, unsigned dataSize)
 - void SetFormat(unsigned frequency, bool sixteenBit, bool stereo)
@@ -153,7 +156,7 @@ Methods:
 
 - Object* GetEventSender() const
 - EventHandler* GetEventHandler() const
-- const String GetTypeName(ShortStringHash type) const
+- const String GetTypeName(ShortStringHash objectType) const
 
 ### Object : RefCounted
 
@@ -605,7 +608,7 @@ Methods:
 
 Properties:
 
-- String& animationName (readonly)
+- String animationName (readonly)
 - StringHash animationNameHash (readonly)
 - float length (readonly)
 - unsigned numTracks (readonly)
@@ -1480,7 +1483,7 @@ Methods:
 
 - unsigned GetNumBones() const
 - Bone* GetRootBone()
-- Bone* GetBone(String& name)
+- Bone* GetBone(const String name)
 - Bone* GetBone(unsigned index)
 
 Properties:
@@ -1835,7 +1838,7 @@ Methods:
 
 Properties:
 
-- String& name (readonly)
+- String name (readonly)
 - unsigned checksum (readonly)
 - unsigned position (readonly)
 - unsigned size (readonly)
@@ -1938,7 +1941,7 @@ Properties:
 - FileMode mode (readonly)
 - bool open (readonly)
 - bool packaged (readonly)
-- String& name (readonly)
+- String name (readonly)
 - unsigned checksum (readonly)
 - unsigned position (readonly)
 - unsigned size (readonly)
@@ -2029,7 +2032,7 @@ Methods:
 
 Properties:
 
-- String& name (readonly)
+- String name (readonly)
 - StringHash nameHash (readonly)
 - unsigned numFiles (readonly)
 - unsigned totalSize (readonly)
@@ -2164,7 +2167,7 @@ Methods:
 
 Properties:
 
-- String& name (readonly)
+- String name (readonly)
 - unsigned checksum (readonly)
 - unsigned position (readonly)
 - unsigned size (readonly)
@@ -3139,7 +3142,7 @@ Properties:
 - String address (readonly)
 - unsigned short port (readonly)
 - unsigned numDownloads (readonly)
-- String& downloadName (readonly)
+- String downloadName (readonly)
 - float downloadProgress (readonly)
 
 ### Controls
@@ -3212,7 +3215,7 @@ Methods:
 - void UnregisterRemoteEvent(const String eventType)
 - void UnregisterAllRemoteEvents()
 - void SetPackageCacheDir(const String path)
-- SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY)
+- SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY)
 - int GetUpdateFps() const
 - Connection* GetServerConnection() const
 - bool IsServerRunning() const
@@ -3224,7 +3227,7 @@ Properties:
 - int updateFps
 - Connection* serverConnection (readonly)
 - bool serverRunning (readonly)
-- String& packageCacheDir
+- String packageCacheDir
 
 ### NetworkPriority : Component
 
@@ -3496,13 +3499,17 @@ Properties:
 
 Methods:
 
+- bool Load(Deserializer& source)
+- bool Save(Serializer& dest) const
+- bool Load(const String fileName)
+- bool Save(const String fileName) const
 - const String GetName() const
 - StringHash GetNameHash() const
 - unsigned GetMemoryUse() const
 
 Properties:
 
-- String& name (readonly)
+- String name (readonly)
 - StringHash nameHash (readonly)
 - unsigned memoryUse (readonly)
 
@@ -3512,6 +3519,8 @@ Methods:
 
 - Image()
 - ~Image()
+- bool LoadColorLUT(Deserializer& source)
+- bool LoadColorLUT(const String fileName)
 - void FlipVertical()
 - bool SaveBMP(const String fileName)
 - bool SavePNG(const String fileName)
@@ -3519,6 +3528,7 @@ Methods:
 - bool SaveJPG(const String fileName, int quality)
 - int GetWidth() const
 - int GetHeight() const
+- int GetDepth() const
 - unsigned GetComponents() const
 - bool IsCompressed() const
 - CompressedFormat GetCompressedFormat() const
@@ -3529,6 +3539,7 @@ Properties:
 
 - int width (readonly)
 - int height (readonly)
+- int depth (readonly)
 - unsigned components (readonly)
 - bool compressed (readonly)
 - CompressedFormat compressedFormat (readonly)
@@ -3639,6 +3650,9 @@ Properties:
 
 Methods:
 
+- XMLFile()
+- ~XMLFile()
+- XMLElement CreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
 - void Patch(XMLFile* patchFile)
 - void Patch(XMLElement patchElement)
@@ -3801,7 +3815,7 @@ Methods:
 Properties:
 
 - unsigned ID
-- String& name
+- String name
 - StringHash nameHash (readonly)
 - Node* parent
 - Scene* scene
@@ -3927,6 +3941,8 @@ Methods:
 - virtual const IntVector2& GetScreenPosition() const
 - bool LoadXML(Deserializer& source)
 - bool SaveXML(Serializer& dest) const
+- bool LoadXML(const String fileName)
+- bool SaveXML(const String fileName) const
 - bool FilterAttributes(XMLElement& dest) const
 - void SetName(const String name)
 - void SetPosition(const IntVector2& position)
@@ -3985,7 +4001,7 @@ Methods:
 - void AddChild(UIElement* element)
 - void InsertChild(unsigned index, UIElement* element)
 - void RemoveChild(UIElement* element, unsigned index = 0)
-- void RemoveChild(unsigned index)
+- void RemoveChildAtIndex(unsigned index)
 - void RemoveAllChildren()
 - void Remove()
 - unsigned FindChild(UIElement* element) const
@@ -4056,7 +4072,7 @@ Methods:
 - int GetIndentWidth() const
 - void SetChildOffset(const IntVector2& offset)
 - void SetHovering(bool enable)
-- const Color& GetColorAttr() const
+- const Color& GetColor() const
 - TraversalMode GetTraversalMode() const
 - bool IsElementEventSender() const
 - UIElement* GetElementEventSender() const
@@ -4064,7 +4080,7 @@ Methods:
 Properties:
 
 - IntVector2& screenPosition (readonly)
-- String& name
+- String name
 - IntVector2& position
 - IntVector2 size
 - int width
@@ -4082,6 +4098,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
+- Color& colorAttr @ color
 - int priority
 - float opacity
 - float derivedOpacity (readonly)
@@ -4100,7 +4117,7 @@ Properties:
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - unsigned dragDropMode
-- String& style
+- String style
 - XMLFile* defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4114,7 +4131,6 @@ Properties:
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- Color& colorAttr
 - TraversalMode traversalMode
 - bool elementEventSender
 
@@ -4138,8 +4154,6 @@ Methods:
 - const IntVector2& GetHoverOffset() const
 - BlendMode GetBlendMode() const
 - bool IsTiled() const
-- void SetTextureAttr(ResourceRef value)
-- ResourceRef GetTextureAttr() const
 
 Properties:
 
@@ -4149,7 +4163,6 @@ Properties:
 - IntVector2& hoverOffset
 - BlendMode blendMode
 - bool tiled
-- ResourceRef textureAttr
 
 ### Button : BorderImage
 
@@ -4265,10 +4278,10 @@ Properties:
 - Button* OKButton (readonly)
 - Button* cancelButton (readonly)
 - Button* closeButton (readonly)
-- String& title
-- String& path
-- String& fileName
-- String& filter (readonly)
+- String title
+- String path
+- String fileName
+- String filter (readonly)
 - unsigned filterIndex (readonly)
 - bool directoryMode
 
@@ -4304,7 +4317,7 @@ Methods:
 
 Properties:
 
-- String& text
+- String text
 - unsigned cursorPosition
 - float cursorBlinkRate
 - unsigned maxLength
@@ -4344,18 +4357,18 @@ Properties:
 
 Methods:
 
-- MessageBox(const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- MessageBox(const String messageString = String::EMPTY, const String titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - virtual ~MessageBox()
-- void SetTitle(const String& text)
-- void SetMessage(const String& text)
+- void SetTitle(const String text)
+- void SetMessage(const String text)
 - const String GetTitle() const
 - const String GetMessage() const
 - UIElement* GetWindow() const
 
 Properties:
 
-- String& title
-- String& message
+- String title
+- String message
 - UIElement* window (readonly)
 
 ### DropDownList : Menu
@@ -4381,7 +4394,6 @@ Methods:
 - UIElement* GetPlaceholder() const
 - const String GetPlaceholderText() const
 - bool GetResizePopup() const
-- void SetSelectionAttr(unsigned index)
 
 Properties:
 
@@ -4390,7 +4402,7 @@ Properties:
 - UIElement* selectedItem (readonly)
 - ListView* listView (readonly)
 - UIElement* placeholder (readonly)
-- String& placeholderText
+- String placeholderText
 - bool resizePopup
 
 ### Slider : BorderImage
@@ -4475,7 +4487,6 @@ Methods:
 - bool GetScrollBarsAutoVisible() const
 - float GetScrollStep() const
 - float GetPageStep() const
-- void SetViewPositionAttr(const IntVector2& value)
 
 Properties:
 
@@ -4565,8 +4576,6 @@ Methods:
 - Texture* GetTexture() const
 - const IntRect& GetImageRect() const
 - BlendMode GetBlendMode() const
-- void SetTextureAttr(ResourceRef value)
-- ResourceRef GetTextureAttr() const
 - const Matrix3x4& GetTransform() const
 
 Properties:
@@ -4578,7 +4587,6 @@ Properties:
 - Texture* texture
 - IntRect& imageRect
 - BlendMode blendMode
-- ResourceRef textureAttr
 - Matrix3x4& transform (readonly)
 
 ### Text : UIElement
@@ -4618,14 +4626,12 @@ Methods:
 - const PODVector<IntVector2>& GetCharSizes() const
 - void SetEffectDepthBias(float bias)
 - float GetEffectDepthBias() const
-- void SetFontAttr(ResourceRef value)
-- ResourceRef GetFontAttr() const
 
 Properties:
 
 - Font* font
 - int fontSize (readonly)
-- String& text
+- String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
 - bool wordwrap
@@ -4637,7 +4643,6 @@ Properties:
 - Color& effectColor
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
-- ResourceRef fontAttr
 
 ### Text3D : Drawable
 
@@ -4647,7 +4652,6 @@ Methods:
 - ~Text3D()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(Font* font)
 - void SetMaterial(Material* material)
 - void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -4683,18 +4687,13 @@ Methods:
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
 - bool GetFaceCamera() const
-- void SetFontAttr(ResourceRef value)
-- ResourceRef GetFontAttr() const
-- void SetMaterialAttr(ResourceRef value)
-- ResourceRef GetMaterialAttr() const
-- const Color& GetColorAttr() const
 
 Properties:
 
 - Font* font
 - Material* material
 - int fontSize (readonly)
-- String& text
+- String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
@@ -4708,9 +4707,6 @@ Properties:
 - unsigned numRows (readonly)
 - float opacity
 - bool faceCamera
-- ResourceRef fontAttr
-- ResourceRef materialAttr
-- Color& colorAttr (readonly)
 
 ### ToolTip : UIElement
 
@@ -4780,7 +4776,7 @@ Properties:
 - UIElement* focusElement (readonly)
 - UIElement* frontElement (readonly)
 - UIElement* dragElement (readonly)
-- String& clipBoardText
+- String clipBoardText
 - float doubleClickInterval
 - float dragBeginInterval
 - int dragBeginDistance
@@ -5376,22 +5372,10 @@ Properties:
 - int DRAG_RESIZE_LEFT
 
 \section LuaScriptAPI_GlobalFunctions Global functions
+- Audio* GetAudio()
 - Context* GetContext()
 - Object* GetEventSender()
 - EventHandler* GetEventHandler() const
-- Audio* GetAudio()
-- Console* GetConsole()
-- DebugHud* GetDebugHud()
-- Engine* GetEngine()
-- FileSystem* GetFileSystem()
-- Graphics* GetGraphics()
-- Input* GetInput()
-- Log* GetLog()
-- Network* GetNetwork()
-- Renderer* GetRenderer()
-- ResourceCache* GetCache()
-- Time* GetTime()
-- UI* GetUI()
 - void ErrorDialog(const String title, const String message)
 - void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
 - void OpenConsoleWindow()
@@ -5419,6 +5403,12 @@ Properties:
 - bool IsDigit(unsigned ch)
 - unsigned ToUpper(unsigned ch)
 - unsigned ToLower(unsigned ch)
+- Time* GetTime()
+- Console* GetConsole()
+- DebugHud* GetDebugHud()
+- Engine* GetEngine()
+- Graphics* GetGraphics()
+- Renderer* GetRenderer()
 - String GetPath(const String fullPath)
 - String GetFileName(const String fullPath)
 - String GetExtension(const String fullPath, bool lowercaseExtension = true)
@@ -5430,6 +5420,9 @@ Properties:
 - String GetInternalPath(const String pathName)
 - String GetNativePath(const String pathName)
 - bool IsAbsolutePath(const String pathName)
+- FileSystem * GetFileSystem()
+- Log* GetLog()
+- Input* GetInput()
 - void SendEvent(const String eventName, VariantMap& eventData)
 - void SubscribeToEvent(const String eventName, const String functionName)
 - void UnsubscribeFromEvent(const String eventName)
@@ -5453,13 +5446,21 @@ Properties:
 - void SetRandomSeed(unsigned seed)
 - unsigned GetRandomSeed()
 - int Rand()
+- Network* GetNetwork()
+- ResourceCache* GetCache()
+- UI* GetUI()
 
 \section LuaScriptAPI_GlobalConstants Global constants
+- tolua_readonly tolua_property__get_set Audio* audio
+- tolua_readonly tolua_property__get_set Time* time
+- tolua_readonly tolua_property__get_set Console* console
 - unsigned DEBUGHUD_SHOW_NONE
 - unsigned DEBUGHUD_SHOW_STATS
 - unsigned DEBUGHUD_SHOW_MODE
 - unsigned DEBUGHUD_SHOW_PROFILER
 - unsigned DEBUGHUD_SHOW_ALL
+- tolua_readonly tolua_property__get_set DebugHud* debugHud
+- tolua_readonly tolua_property__get_set Engine* engine
 - int QUALITY_LOW
 - int QUALITY_MEDIUM
 - int QUALITY_HIGH
@@ -5488,16 +5489,21 @@ Properties:
 - unsigned VO_LOW_MATERIAL_QUALITY
 - unsigned VO_DISABLE_SHADOWS
 - unsigned VO_DISABLE_OCCLUSION
+- tolua_readonly tolua_property__get_set Graphics* graphics
 - int SHADOW_MIN_PIXELS
 - int INSTANCING_BUFFER_DEFAULT_SIZE
+- tolua_readonly tolua_property__get_set Renderer* renderer
 - unsigned SCAN_FILES
 - unsigned SCAN_DIRS
 - unsigned SCAN_HIDDEN
+- tolua_readonly tolua_property__get_set FileSystem* fileSystem
 - int LOG_DEBUG
 - int LOG_INFO
 - int LOG_WARNING
 - int LOG_ERROR
 - int LOG_NONE
+- tolua_readonly tolua_property__get_set Log* log
+- tolua_readonly tolua_property__get_set Input* input
 - int MOUSEB_LEFT
 - int MOUSEB_MIDDLE
 - int MOUSEB_RIGHT
@@ -5657,6 +5663,8 @@ Properties:
 - float M_RADTODEG
 - unsigned NUM_FRUSTUM_PLANES
 - unsigned NUM_FRUSTUM_VERTICES
+- tolua_readonly tolua_property__get_set Network* network
+- tolua_readonly tolua_property__get_set ResourceCache* cache
 - unsigned FIRST_REPLICATED_ID
 - unsigned LAST_REPLICATED_ID
 - unsigned FIRST_LOCAL_ID
@@ -5665,6 +5673,7 @@ Properties:
 - unsigned DD_SOURCE
 - unsigned DD_TARGET
 - unsigned DD_SOURCE_AND_TARGET
+- tolua_readonly tolua_property__get_set UI* ui
 
 \section LuaScriptAPI_RenameTypes Rename types
 - SharedPtr<HttpRequest> becomes HttpRequestSPtr

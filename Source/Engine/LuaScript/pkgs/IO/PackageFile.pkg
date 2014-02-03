@@ -25,7 +25,7 @@ class PackageFile : public Object
     unsigned GetChecksum() const;
     bool IsCompressed() const;
 
-    tolua_readonly tolua_property__get_set String& name;
+    tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set StringHash nameHash;
     tolua_readonly tolua_property__get_set unsigned numFiles;
     tolua_readonly tolua_property__get_set unsigned totalSize;

@@ -107,7 +107,7 @@ class VectorBuffer
     bool WriteLine(const String value);
     
     // From Deserializer
-    tolua_readonly tolua_property__get_set String& name;
+    tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set unsigned checksum;
     tolua_readonly tolua_property__get_set unsigned position;
     tolua_readonly tolua_property__get_set unsigned size;

@@ -39,3 +39,17 @@ class DebugHud : public Object
     tolua_property__get_set float profilerInterval;
     tolua_property__get_set bool useRendererStats;
 };
+
+DebugHud* GetDebugHud();
+tolua_readonly tolua_property__get_set DebugHud* debugHud;
+
+${
+#define TOLUA_DISABLE_tolua_EngineLuaAPI_GetDebugHud00
+static int tolua_EngineLuaAPI_GetDebugHud00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<DebugHud>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_debugHud_ptr
+#define tolua_get_debugHud_ptr tolua_EngineLuaAPI_GetDebugHud00
+$}

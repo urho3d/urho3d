@@ -23,16 +23,12 @@ class BorderImage : public UIElement
     BlendMode GetBlendMode() const;
     bool IsTiled() const;
     
-    void SetTextureAttr(ResourceRef value);
-    ResourceRef GetTextureAttr() const;
-    
     tolua_property__get_set Texture* texture;
     tolua_property__get_set IntRect& imageRect;
     tolua_property__get_set IntRect& border;
     tolua_property__get_set IntVector2& hoverOffset;
     tolua_property__get_set BlendMode blendMode;
     tolua_property__is_set bool tiled;
-    tolua_property__get_set ResourceRef textureAttr;
 };
 
 ${

@@ -7,11 +7,6 @@ require "LuaScripts/Utilities/Sample"
 
 local scene_ = nil
 
-local audio = GetAudio()
-local cache = GetCache()
-local input = GetInput()
-local ui = GetUI()
-
 local soundNames = {
     "Fist",
     "Explosion",

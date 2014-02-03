@@ -15,11 +15,6 @@ local pitch = 0.0
 local animate = false
 local useGroups = false
 
-local cache = GetCache()
-local input = GetInput()
-local renderer = GetRenderer()
-local ui = GetUI()
-
 function Start()
     -- Execute the common startup for samples
     SampleStart()

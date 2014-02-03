@@ -26,7 +26,7 @@ class LineEdit : public BorderImage
     Text* GetTextElement() const;
     BorderImage* GetCursor() const;
 
-    tolua_property__get_set String& text;
+    tolua_property__get_set String text;
     tolua_property__get_set unsigned cursorPosition;
     tolua_property__get_set float cursorBlinkRate;
     tolua_property__get_set unsigned maxLength;

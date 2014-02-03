@@ -42,3 +42,17 @@ class Audio : public Object
     tolua_readonly tolua_property__is_set bool initialized;
     tolua_property__get_set SoundListener* listener;
 };
+
+Audio* GetAudio();
+tolua_readonly tolua_property__get_set Audio* audio;
+
+${
+#define TOLUA_DISABLE_tolua_AudioLuaAPI_GetAudio00
+static int tolua_AudioLuaAPI_GetAudio00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Audio>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_audio_ptr
+#define tolua_get_audio_ptr tolua_AudioLuaAPI_GetAudio00
+$}

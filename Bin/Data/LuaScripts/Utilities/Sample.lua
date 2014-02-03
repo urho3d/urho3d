@@ -30,14 +30,12 @@ end
 
 function CreateLogo()
     -- Get logo texture
-    local cache = GetCache()
     local logoTexture = cache:GetResource("Texture2D", "Textures/LogoLarge.png")
     if logoTexture == nil then
         return
     end
     
     -- Create logo sprite and add to the UI layout
-    local ui = GetUI()
     logoSprite = ui.root:CreateChild("Sprite")
     
     -- Set logo sprite texture
@@ -66,8 +64,6 @@ function CreateLogo()
 end
 
 function SetWindowTitleAndIcon()
-    local cache = GetCache()
-    local graphics = GetGraphics()
     local icon = cache:GetResource("Image", "Textures/LogoLarge.png")
     graphics:SetWindowIcon(icon)
     graphics.windowTitle = "Urho3D Sample"
@@ -75,19 +71,17 @@ end
 
 function CreateConsoleAndDebugHud()
     -- Get default style
-    local cache = GetCache()
     local uiStyle = cache:GetResource("XMLFile", "UI/DefaultStyle.xml")
     if uiStyle == nil then
         return
     end
     
     -- Create console
-    local engine = GetEngine()
-    local console = engine:CreateConsole()
+    engine:CreateConsole()
     console.defaultStyle = uiStyle
     
     -- Create debug HUD
-    local debugHud = engine:CreateDebugHud()
+    engine:CreateDebugHud()
     debugHud.defaultStyle = uiStyle
 end
 
@@ -95,26 +89,20 @@ function HandleKeyDown(eventType, eventData)
     local key = eventData:GetInt("Key")
     -- Close console (if open) or exit when ESC is pressed
     if key == KEY_ESC then
-        local console = GetConsole()
         if not console:IsVisible() then
-            local engine = GetEngine()
             engine:Exit()
         else
             console:SetVisible(false)
         end
 
     elseif key == KEY_F1 then
-        local console = GetConsole()
         console:Toggle()
 
     elseif key == KEY_F2 then
-        local debugHud = GetDebugHud()
         debugHud:ToggleAll()
     end
 
-    local ui = GetUI()
     if ui.focusElement == nil then
-        local renderer = GetRenderer()
         -- Texture quality
         if key == KEY_1 then
             local quality = renderer.textureQuality
@@ -175,13 +163,12 @@ function HandleKeyDown(eventType, eventData)
         
         -- Take screenshot
         elseif key == KEY_9 then
-            local graphics = GetGraphics()
             local screenshot = Image()
             graphics:TakeScreenShot(screenshot)
             local timeStamp = Time:GetTimeStamp()
             timeStamp = string.gsub(timeStamp, "[:. ]", "_")
             -- Here we save in the Data folder with date and time appended
-            screenshot:SavePNG(GetFileSystem():GetProgramDir() .. "Data/Screenshot_" .. timeStamp .. ".png")
+            screenshot:SavePNG(fileSystem:GetProgramDir() .. "Data/Screenshot_" .. timeStamp .. ".png")
         end
     end
 end

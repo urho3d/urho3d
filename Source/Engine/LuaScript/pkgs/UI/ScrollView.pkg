@@ -22,8 +22,6 @@ class ScrollView : public UIElement
     float GetScrollStep() const;
     float GetPageStep() const;
     
-    void SetViewPositionAttr(const IntVector2& value);
-    
     tolua_property__get_set IntVector2& viewPosition;
     tolua_property__get_set UIElement* contentElement;
     tolua_readonly tolua_property__get_set ScrollBar* horizontalScrollBar;

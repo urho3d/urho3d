@@ -188,7 +188,7 @@ class Node : public Serializable
     void AddComponent(Component* component, unsigned id, CreateMode mode);
 
     tolua_property__get_set unsigned ID;
-    tolua_property__get_set String& name;
+    tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set StringHash nameHash;
     tolua_property__get_set Node* parent;
     tolua_property__get_set Scene* scene;

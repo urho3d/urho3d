@@ -38,14 +38,18 @@ class ListView : public ScrollView
     
     unsigned GetNumItems() const;
     UIElement* GetItem(unsigned index) const;
+    
     // PODVector<UIElement*> GetItems() const;
     tolua_outside const PODVector<UIElement*>& ListViewGetItems @ GetItems() const;
+    
     unsigned FindItem(UIElement* item) const;
     unsigned GetSelection() const;
     const PODVector<unsigned>& GetSelections() const;
     UIElement* GetSelectedItem() const;
+    
     // PODVector<UIElement*> GetSelectedItems() const;
     tolua_outside const PODVector<UIElement*>& ListViewGetSelectedItems @ GetSelectedItems() const;
+    
     bool IsSelected(unsigned index) const;
     bool IsExpanded(unsigned index) const;
     HighlightMode GetHighlightMode() const;
