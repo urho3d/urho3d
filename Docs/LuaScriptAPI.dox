@@ -608,7 +608,7 @@ Methods:
 
 Properties:
 
-- String& animationName (readonly)
+- String animationName (readonly)
 - StringHash animationNameHash (readonly)
 - float length (readonly)
 - unsigned numTracks (readonly)
@@ -1483,7 +1483,7 @@ Methods:
 
 - unsigned GetNumBones() const
 - Bone* GetRootBone()
-- Bone* GetBone(String& name)
+- Bone* GetBone(const String name)
 - Bone* GetBone(unsigned index)
 
 Properties:
@@ -1838,7 +1838,7 @@ Methods:
 
 Properties:
 
-- String& name (readonly)
+- String name (readonly)
 - unsigned checksum (readonly)
 - unsigned position (readonly)
 - unsigned size (readonly)
@@ -1941,7 +1941,7 @@ Properties:
 - FileMode mode (readonly)
 - bool open (readonly)
 - bool packaged (readonly)
-- String& name (readonly)
+- String name (readonly)
 - unsigned checksum (readonly)
 - unsigned position (readonly)
 - unsigned size (readonly)
@@ -2032,7 +2032,7 @@ Methods:
 
 Properties:
 
-- String& name (readonly)
+- String name (readonly)
 - StringHash nameHash (readonly)
 - unsigned numFiles (readonly)
 - unsigned totalSize (readonly)
@@ -2167,7 +2167,7 @@ Methods:
 
 Properties:
 
-- String& name (readonly)
+- String name (readonly)
 - unsigned checksum (readonly)
 - unsigned position (readonly)
 - unsigned size (readonly)
@@ -3142,7 +3142,7 @@ Properties:
 - String address (readonly)
 - unsigned short port (readonly)
 - unsigned numDownloads (readonly)
-- String& downloadName (readonly)
+- String downloadName (readonly)
 - float downloadProgress (readonly)
 
 ### Controls
@@ -3215,7 +3215,7 @@ Methods:
 - void UnregisterRemoteEvent(const String eventType)
 - void UnregisterAllRemoteEvents()
 - void SetPackageCacheDir(const String path)
-- SharedPtr<HttpRequest> MakeHttpRequest(const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String& postData = String::EMPTY)
+- SharedPtr<HttpRequest> MakeHttpRequest(const String url, const String verb = String::EMPTY, const Vector<String>& headers = Vector<String>(), const String postData = String::EMPTY)
 - int GetUpdateFps() const
 - Connection* GetServerConnection() const
 - bool IsServerRunning() const
@@ -3227,7 +3227,7 @@ Properties:
 - int updateFps
 - Connection* serverConnection (readonly)
 - bool serverRunning (readonly)
-- String& packageCacheDir
+- String packageCacheDir
 
 ### NetworkPriority : Component
 
@@ -3509,7 +3509,7 @@ Methods:
 
 Properties:
 
-- String& name (readonly)
+- String name (readonly)
 - StringHash nameHash (readonly)
 - unsigned memoryUse (readonly)
 
@@ -3520,7 +3520,7 @@ Methods:
 - Image()
 - ~Image()
 - bool LoadColorLUT(Deserializer& source)
-- bool LoadColorLUT(const String& fileName)
+- bool LoadColorLUT(const String fileName)
 - void FlipVertical()
 - bool SaveBMP(const String fileName)
 - bool SavePNG(const String fileName)
@@ -3815,7 +3815,7 @@ Methods:
 Properties:
 
 - unsigned ID
-- String& name
+- String name
 - StringHash nameHash (readonly)
 - Node* parent
 - Scene* scene
@@ -3941,6 +3941,8 @@ Methods:
 - virtual const IntVector2& GetScreenPosition() const
 - bool LoadXML(Deserializer& source)
 - bool SaveXML(Serializer& dest) const
+- bool LoadXML(const String fileName)
+- bool SaveXML(const String fileName) const
 - bool FilterAttributes(XMLElement& dest) const
 - void SetName(const String name)
 - void SetPosition(const IntVector2& position)
@@ -3999,7 +4001,7 @@ Methods:
 - void AddChild(UIElement* element)
 - void InsertChild(unsigned index, UIElement* element)
 - void RemoveChild(UIElement* element, unsigned index = 0)
-- void RemoveChild(unsigned index)
+- void RemoveChildAtIndex(unsigned index)
 - void RemoveAllChildren()
 - void Remove()
 - unsigned FindChild(UIElement* element) const
@@ -4070,7 +4072,7 @@ Methods:
 - int GetIndentWidth() const
 - void SetChildOffset(const IntVector2& offset)
 - void SetHovering(bool enable)
-- const Color& GetColorAttr() const
+- const Color& GetColor() const
 - TraversalMode GetTraversalMode() const
 - bool IsElementEventSender() const
 - UIElement* GetElementEventSender() const
@@ -4078,7 +4080,7 @@ Methods:
 Properties:
 
 - IntVector2& screenPosition (readonly)
-- String& name
+- String name
 - IntVector2& position
 - IntVector2 size
 - int width
@@ -4096,6 +4098,7 @@ Properties:
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
 - IntRect clipBorder
+- Color& colorAttr @ color
 - int priority
 - float opacity
 - float derivedOpacity (readonly)
@@ -4114,7 +4117,7 @@ Properties:
 - bool colorGradient (readonly)
 - FocusMode focusMode
 - unsigned dragDropMode
-- String& style
+- String style
 - XMLFile* defaultStyle
 - LayoutMode layoutMode
 - int layoutSpacing
@@ -4128,7 +4131,6 @@ Properties:
 - int indent
 - int indentSpacing
 - int indentWidth (readonly)
-- Color& colorAttr
 - TraversalMode traversalMode
 - bool elementEventSender
 
@@ -4152,8 +4154,6 @@ Methods:
 - const IntVector2& GetHoverOffset() const
 - BlendMode GetBlendMode() const
 - bool IsTiled() const
-- void SetTextureAttr(ResourceRef value)
-- ResourceRef GetTextureAttr() const
 
 Properties:
 
@@ -4163,7 +4163,6 @@ Properties:
 - IntVector2& hoverOffset
 - BlendMode blendMode
 - bool tiled
-- ResourceRef textureAttr
 
 ### Button : BorderImage
 
@@ -4279,10 +4278,10 @@ Properties:
 - Button* OKButton (readonly)
 - Button* cancelButton (readonly)
 - Button* closeButton (readonly)
-- String& title
-- String& path
-- String& fileName
-- String& filter (readonly)
+- String title
+- String path
+- String fileName
+- String filter (readonly)
 - unsigned filterIndex (readonly)
 - bool directoryMode
 
@@ -4318,7 +4317,7 @@ Methods:
 
 Properties:
 
-- String& text
+- String text
 - unsigned cursorPosition
 - float cursorBlinkRate
 - unsigned maxLength
@@ -4358,18 +4357,18 @@ Properties:
 
 Methods:
 
-- MessageBox(const String& messageString = String::EMPTY, const String& titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
+- MessageBox(const String messageString = String::EMPTY, const String titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - virtual ~MessageBox()
-- void SetTitle(const String& text)
-- void SetMessage(const String& text)
+- void SetTitle(const String text)
+- void SetMessage(const String text)
 - const String GetTitle() const
 - const String GetMessage() const
 - UIElement* GetWindow() const
 
 Properties:
 
-- String& title
-- String& message
+- String title
+- String message
 - UIElement* window (readonly)
 
 ### DropDownList : Menu
@@ -4395,7 +4394,6 @@ Methods:
 - UIElement* GetPlaceholder() const
 - const String GetPlaceholderText() const
 - bool GetResizePopup() const
-- void SetSelectionAttr(unsigned index)
 
 Properties:
 
@@ -4404,7 +4402,7 @@ Properties:
 - UIElement* selectedItem (readonly)
 - ListView* listView (readonly)
 - UIElement* placeholder (readonly)
-- String& placeholderText
+- String placeholderText
 - bool resizePopup
 
 ### Slider : BorderImage
@@ -4489,7 +4487,6 @@ Methods:
 - bool GetScrollBarsAutoVisible() const
 - float GetScrollStep() const
 - float GetPageStep() const
-- void SetViewPositionAttr(const IntVector2& value)
 
 Properties:
 
@@ -4579,8 +4576,6 @@ Methods:
 - Texture* GetTexture() const
 - const IntRect& GetImageRect() const
 - BlendMode GetBlendMode() const
-- void SetTextureAttr(ResourceRef value)
-- ResourceRef GetTextureAttr() const
 - const Matrix3x4& GetTransform() const
 
 Properties:
@@ -4592,7 +4587,6 @@ Properties:
 - Texture* texture
 - IntRect& imageRect
 - BlendMode blendMode
-- ResourceRef textureAttr
 - Matrix3x4& transform (readonly)
 
 ### Text : UIElement
@@ -4632,14 +4626,12 @@ Methods:
 - const PODVector<IntVector2>& GetCharSizes() const
 - void SetEffectDepthBias(float bias)
 - float GetEffectDepthBias() const
-- void SetFontAttr(ResourceRef value)
-- ResourceRef GetFontAttr() const
 
 Properties:
 
 - Font* font
 - int fontSize (readonly)
-- String& text
+- String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
 - bool wordwrap
@@ -4651,7 +4643,6 @@ Properties:
 - Color& effectColor
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
-- ResourceRef fontAttr
 
 ### Text3D : Drawable
 
@@ -4661,7 +4652,6 @@ Methods:
 - ~Text3D()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(Font* font)
 - void SetMaterial(Material* material)
 - void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -4697,18 +4687,13 @@ Methods:
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
 - bool GetFaceCamera() const
-- void SetFontAttr(ResourceRef value)
-- ResourceRef GetFontAttr() const
-- void SetMaterialAttr(ResourceRef value)
-- ResourceRef GetMaterialAttr() const
-- const Color& GetColorAttr() const
 
 Properties:
 
 - Font* font
 - Material* material
 - int fontSize (readonly)
-- String& text
+- String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
@@ -4722,9 +4707,6 @@ Properties:
 - unsigned numRows (readonly)
 - float opacity
 - bool faceCamera
-- ResourceRef fontAttr
-- ResourceRef materialAttr
-- Color& colorAttr (readonly)
 
 ### ToolTip : UIElement
 
@@ -4794,7 +4776,7 @@ Properties:
 - UIElement* focusElement (readonly)
 - UIElement* frontElement (readonly)
 - UIElement* dragElement (readonly)
-- String& clipBoardText
+- String clipBoardText
 - float doubleClickInterval
 - float dragBeginInterval
 - int dragBeginDistance
