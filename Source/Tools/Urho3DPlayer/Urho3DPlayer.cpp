@@ -112,7 +112,7 @@ void Urho3DPlayer::Setup()
 void Urho3DPlayer::Start()
 {
     String extension = GetExtension(scriptFileName_);
-    if (extension != ".lua")
+    if (extension != ".lua" && extension != ".luc")
     {
 #ifdef ENABLE_ANGELSCRIPT
         // Instantiate and register the AngelScript subsystem
